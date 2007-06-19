@@ -1,0 +1,3 @@
+com.sun.ws.rest.impl.container.httpserver.HttpHandlerContainerProvider
+com.sun.ws.rest.impl.container.jaxws.ProviderContainerProvider
+com.sun.ws.rest.impl.container.grizzly.GrizzlyContainerProvider

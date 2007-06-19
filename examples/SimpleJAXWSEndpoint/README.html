@@ -1,0 +1,117 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html>
+  <head>
+    <title>Simple JAX-WS Endpoint Example</title>
+  </head>
+  <body>
+      <h1>Simple JAX-WS Endpoint Example</h1>
+      <p>This example demonstrates how to develop RESTful web services with a JAX-WS
+      <a href="https://jax-ws.dev.java.net/nonav/jax-ws-20-fcs/api/javax/xml/ws/Endpoint.html">Endpoint</a>.</p>
+      
+      <h2>Contents</h2>
+      <p>The example consists of five Java classes, one HTML file and one JPEG image:</p>
+      <dl>
+          <dt><code>com.sun.ws.rest.samples.jaxws.Main</code></dt>
+          <dd>Contains the main function which creates, publishes and stops the JAX-WS Endpoint.</dd>
+          <dt><code>com.sun.ws.rest.samples.jaxws.resources.MasterResourceBean</code></dt>
+          <dd>A resource class that produces a form in response to a HTTP GET,
+          the form will be used to exercise the other resources in this sample applicaton.</dd>
+          <dt><code>com.sun.ws.rest.samples.jaxws.resources.ResourceBean1</code></dt>
+          <dd>A resource class that produces the string "Hello World from resource 1" in response to a HTTP GET.</dd>
+          <dt><code>com.sun.ws.rest.samples.jaxws.resources.ResourceBean2</code></dt>
+          <dd>A resource class that produces the string "Hello World from resource 2" in response to a HTTP GET.</dd>
+          <dt><code>com.sun.ws.rest.samples.jaxws.resources.ResourceBean3</code></dt>
+          <dd>A resource class that produces different responses based on either the value of a
+           "rep" query parameter or the "Accept" header of a HTTP GET invocation.  The form contained
+           in the index.html file will allow you to specify whether to use either the query parameter
+           or the MimeType to use for the request.
+          </dd>
+          <dt><code>index.html</code></dt>
+          <dd>A static HTML file that is returned by the MasterResourceBean resource.</dd>
+          <dt><code>java.jpg</code></dt>
+          <dd>A JPEG image returned by the ResourceBean3 resource.</dd>
+      </dl>
+    <p>The mapping of the URI path space is presented in the following table:</p>
+	<table border="1">
+	<tr>
+	<th>URI path</th>
+	<th>Resource class</th>
+	<th>HTTP methods</th>
+	</tr>
+	<tr>
+	<td>/start</td>
+	<td>MasterResourceBean</td>
+	<td>GET</td>
+	</tr>
+	<tr>
+	<td>/resource1</td>
+	<td>ResourceBean1</td>
+	<td>GET</td>
+	</tr>
+	<tr>
+	<td>/resource2</td>
+	<td>ResourceBean2</td>
+	<td>GET</td>
+	</tr>
+	<tr>
+	<td>/resource3/{arg1}/{arg2}</td>
+	<td>ResourceBean3</td>
+	<td>GET</td>
+	</tr>
+	</table>
+
+      <h2>Running the Sample</h2>
+      <p>Run the sample as follows:</p>
+      <blockquote><pre>cd samples/SimpleJAXWSEndpoint
+ant run</pre></blockquote>
+
+      <p>From a Web browser, visit:</p>
+      <blockquote><code>http://127.0.0.1:9998/endpoint/start</code></blockquote>
+      <p>Select the resource to test in the form and submit it by hitting the <b>Test Resource</b> 
+          button. If you select "Resouce 1" or "Resouce 2", a <b>Test Details</b> section will appear
+      on the form showing you what the requested URL was, any Query string used, the value 
+      of the "Accept" header used, the HTTP headers received on the result and the conent 
+      of the result.
+  
+      Here is a sample of what you would see if you select "Resource 1":
+      <pre>            
+            <b>Test Details:</b><br><br>
+            <b>Resource:</b>
+            Resource 1<br>
+            <b>Request:</b>
+            /endpoint/resource1
+            <b>Query:</b> 
+            <br>
+
+            <b>Accept MimeType:</b> 
+            <br>
+            <b>Result Headers:</b> 
+            Last-Modified: Tue, 09 Jan 2007 20:59:59 GMT Content-Type: text/plain Transfer-Encoding: chunked
+            <b>Result:</b> 
+            Hello World from resource 1
+      </pre>
+          If you select "Resource 3" a <b>Resouce 3 Inputs</b> section of the form will appear.  The
+          <b>Param 1</b> and <b>Param 2</b> are URI parameters that will be used in the
+          result of testing the "text/plain" or "application/x-www-form-urlencoded" <b>MimeType</b>.
+          The <b>Selection method:</b> lets you choose whether the "rep" query parameter or
+          the "Accept" HTTP header should be used to retrieve the result.  After filling in the
+          <b>Resource 3 Input</b>, hit the <b>Test Resource 3</b> button to see the <b>Test Details</b>.
+      </p>
+      <p>You can exercise ResourceBean1 directly by visiting:</p>
+      <blockquote><code><a href="http://127.0.0.1:9998/endpoint/resource1">http://127.0.0.1:9998/endpoint/resource1<a></code></blockquote>
+      <p>You can exercise ResourceBean2 directly by visiting:</p>
+      <blockquote><code><a href="http://127.0.0.1:9998/endpoint/resource2">http://127.0.0.1:9998/endpoint/resource2<a></code></blockquote>
+      <p>From a Web browser, you can only test the query parameter portion of ResourceBean3.
+      You will need to provide two URI parameters and the <b>rep</b> query parameter.
+      The following URLs can be used:
+         <ul>
+             <li><code><a href="http://127.0.0.1:9998/endpoint/resource3/ramesh/rajiv?rep=0">http://127.0.0.1:9998/endpoint/resource3/ramesh/rajiv?rep=0</a></code>
+             <li><code><a href="http://127.0.0.1:9998/endpoint/resource3/dave/steve?rep=1">http://127.0.0.1:9998/endpoint/resource3/dave/steve?rep=1</a></code>
+             <li><code><a href="http://127.0.0.1:9998/endpoint/resource3/bill/john?rep=2">http://127.0.0.1:9998/endpoint/resource3/bill/john?rep=2</a></code>
+             <li><code><a href="http://127.0.0.1:9998/endpoint/resource3/marc/paul?rep=3">http://127.0.0.1:9998/endpoint/resource3/marc/paul?rep=3</a></code>             
+         </ul>
+     </p>
+     You can stop the sample by hitting the "return" button from the console that you started the sample from.
+  </body>
+</html>

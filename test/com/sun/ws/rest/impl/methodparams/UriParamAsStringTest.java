@@ -1,0 +1,79 @@
+/*
+ * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+ * 
+ * Copyright 2007 Sun Microsystems, Inc. All rights reserved. 
+ * 
+ * The contents of this file are subject to the terms of the Common Development
+ * and Distribution License("CDDL") (the "License").  You may not use this file
+ * except in compliance with the License. 
+ * 
+ * You can obtain a copy of the License at:
+ *     https://jersey.dev.java.net/license.txt
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ * When distributing the Covered Code, include this CDDL Header Notice in each
+ * file and include the License file at:
+ *     https://jersey.dev.java.net/license.txt
+ * If applicable, add the following below this CDDL Header, with the fields
+ * enclosed by brackets [] replaced by your own identifying information:
+ *     "Portions Copyrighted [year] [name of copyright owner]"
+ */
+
+package com.sun.ws.rest.impl.methodparams;
+
+import com.sun.ws.rest.api.Entity;
+import javax.ws.rs.HttpMethod;
+import javax.ws.rs.UriParam;
+import javax.ws.rs.UriTemplate;
+import com.sun.ws.rest.api.core.HttpResponseContext;
+import com.sun.ws.rest.impl.bean.*;
+
+/**
+ *
+ * @author Paul.Sandoz@Sun.Com
+ */
+@SuppressWarnings("unchecked")
+public class UriParamAsStringTest extends AbstractBeanTester {
+
+    public UriParamAsStringTest(String testName) {
+        super(testName);
+    }
+
+    @UriTemplate("/{arg1}/{arg2}/{arg3}")
+    public static class Resource1 {
+        @HttpMethod("GET")
+        public String doGet(@UriParam("arg1") String arg1, 
+                @UriParam("arg2") String arg2, @UriParam("arg3") String arg3) {
+            assertEquals("a", arg1);
+            assertEquals("b", arg2);
+            assertEquals("c", arg3);
+            return "content";
+        }
+        
+        @HttpMethod("POST")
+        public String doPost(@UriParam("arg1") String arg1, 
+                @UriParam("arg2") String arg2, @UriParam("arg3") String arg3,
+                Entity<String> r) {
+            assertEquals("a", arg1);
+            assertEquals("b", arg2);
+            assertEquals("c", arg3);
+            assertEquals("content", r.getContent());
+            return "content";
+        }
+    }
+    
+    public void testStringArgsGet() {
+        Class r = Resource1.class;
+        callGet(r, "/a/b/c",
+                "text/html");
+    }
+    
+    public void testStringArgsPost() {
+        Class r = Resource1.class;
+        HttpResponseContext response = callPost(r, "/a/b/c", 
+                "text/html", "content");
+        String rep = (String)response.getResponse().getEntity();
+        assertEquals("content", rep);
+    }
+}

@@ -1,0 +1,266 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head><title>Storage Service Example</title></head>
+
+
+  <body>
+    <h1>Storage Service Example</h1>
+    <p>This example demonstrates a simple
+        in-memory web storage service.
+    </p>
+    <p>The web storage service enables clients to create and delete containers.
+        Containers are used to create, read, update, and delete items of 
+        arbitrary content, and to search for items containing certain content. 
+        A container can be thought of as a hash map of items. The key of
+        an item is a URI path.
+    </p>
+    <p>The web storage service ensures that content can be cached (by browsers
+        and proxies) by supporting the HTTP features <code>Last-Modified</code> 
+        and <code>ETag</code>.
+    </p>
+  
+    <h2>Contents</h2>
+    <p>The example consists of three web resources implemented by the following:
+        </p><dl>
+            <dt><code>com.sun.ws.rest.samples.storageservice.resources.ContainersResource</code></dt>
+            <dd>This Java class provides meta-data information on the containers.
+                The resource statically references the ContainerResource resource using the 
+                SubResources annotation declared on the class.
+            </dd>
+            <dt><code>com.sun.ws.rest.samples.storageservice.resources.ContainerResource</code></dt>
+            <dd>This Java class provides read, create and delete of a container.
+                Searching of items is supported using a URI query parameter.
+                The resource dynamically references the ItemResource resource using the 
+                getItemResource method that is annotated with UriTemplate.
+            </dd>
+            <dt><code>com.sun.ws.rest.samples.storageservice.resources.ItemResource</code></dt>
+            <dd>This Java class provides read, create, update, and delete of an item.
+                The last modified time and entity tag are supported such that 
+                it conditionally returns content only if the browser
+                or proxy has an older version of the content.
+            </dd>
+        </dl>
+    <p>The mapping of the URI path space is presented in the following table:</p>
+	<table border="1">
+	<tr>
+	<th>URI path</th>
+	<th>Resource class</th>
+	<th>HTTP methods</th>
+	</tr>
+	<tr>
+	<td>/containers</td>
+	<td>ContainersResource</td>
+	<td>GET</td>
+	</tr>
+	<tr>
+	<td>/containers/{container}</td>
+	<td>ContainerResource</td>
+	<td>GET, PUT, DELETE</td>
+	</tr>
+	<tr>
+	<td>/containers/{container}/{item}</td>
+	<td>ItemResource</td>
+	<td>GET, PUT, DELETE</td>
+	</tr>
+	</table>
+ 
+    <h2>Running the Example</h2>
+    <p>Run the example as follows:</p>
+    <blockquote><pre>cd samples/StorageService
+ant run-server</pre></blockquote>
+    <p>This deploys the web storage service using the
+        <a href="http://java.sun.com/javase/6/docs/jre/api/net/httpserver/spec/index.html">Lightweight HTTP Server</a>
+        included in Sun's Java Platform, Standard Edition 6 (Java SE 6)
+ release.
+    </p>
+    <p>A <a href="http://wadl.dev.java.net/#spec">WADL description</a> is automatically
+    generated. See the following URL for a generated description:</p>
+    <blockquote><code><a href="http://127.0.0.1:9998/storage/application.wadl">http://127.0.0.1:9998/storage/application.wadl</a></code></blockquote>
+
+    <p>Get the containers:</p>
+    <blockquote><pre> java -jar dist/StorageService.jar GET http://127.0.0.1:9998/storage/containers</pre></blockquote>
+    <p>This returns the following XML document:</p>
+    <blockquote><pre>&lt;containers/&gt;</pre></blockquote>
+    <p>No containers are present.</p>
+    <p>Create a container:</p>
+    <blockquote><pre>java -jar dist/StorageService.jar PUT http://127.0.0.1:9998/storage/containers/quotes</pre></blockquote>
+    <p>This creates a container called 'quotes'. Getting the containers:</p>
+    <blockquote><pre> java -jar dist/StorageService.jar GET http://127.0.0.1:9998/storage/containers</pre></blockquote>
+    <p>returns information about the 'quotes' container:</p>
+    <blockquote><pre>&lt;containers&gt;
+    &lt;container&gt;
+        &lt;name&gt;quotes&lt;/name&gt;
+        &lt;uri&gt;http://localhost:9998/storage/containers/quotes&lt;/uri&gt;
+    &lt;/container&gt;
+&lt;/containers&gt;</pre></blockquote>
+    <p>Create some content:</p>
+    <blockquote><pre>echo "Something is rotten in the state of Denmark" | java -jar dist/StorageService.jar PUT http://127.0.0.1:9998/storage/containers/quotes/1 text/plain
+echo "I could be bounded in a nutshell" | java -jar dist/StorageService.jar PUT http://127.0.0.1:9998/storage/containers/quotes/2 text/plain
+echo "catch the conscience of the king" | java -jar dist/StorageService.jar PUT http://127.0.0.1:9998/storage/containers/quotes/3 text/plain
+echo "Get thee to a nunnery" | java -jar dist/StorageService.jar PUT http://127.0.0.1:9998/storage/containers/quotes/4 text/plain</pre></blockquote>
+    <p>The 'quotes' container has four items associated with keys 1, 2, 3, and 4 when GETing the quotes container:</p>
+    <blockquote><pre>&lt;container&gt;
+    &lt;item&gt;
+        &lt;digest&gt;7a54c57975de11bffcda5bc6bd92a0460d17ad03&lt;/digest&gt;
+        &lt;lastModified&gt;2007-01-10T15:07:48+01:00&lt;/lastModified&gt;
+        &lt;mimeType&gt;text/plain&lt;/mimeType&gt;
+        &lt;name&gt;1&lt;/name&gt;
+        &lt;uri&gt;http://localhost:9998/storage/containers/quotes/1&lt;/uri&gt;
+    &lt;/item&gt;
+    &lt;item&gt;
+        &lt;digest&gt;4769363fcf4d0513619c6a30724daab396a1d196&lt;/digest&gt;
+        &lt;lastModified&gt;2007-01-10T15:08:37+01:00&lt;/lastModified&gt;
+        &lt;mimeType&gt;text/plain&lt;/mimeType&gt;
+        &lt;name&gt;2&lt;/name&gt;
+        &lt;uri&gt;http://localhost:9998/storage/containers/quotes/2&lt;/uri&gt;
+    &lt;/item&gt;
+    &lt;item&gt;
+        &lt;digest&gt;-71240529c42b5b92e3086e624618d19164658616&lt;/digest&gt;
+        &lt;lastModified&gt;2007-01-10T15:11:51+01:00&lt;/lastModified&gt;
+        &lt;mimeType&gt;text/plain&lt;/mimeType&gt;
+        &lt;name&gt;3&lt;/name&gt;
+        &lt;uri&gt;http://localhost:9998/storage/containers/quotes/3&lt;/uri&gt;
+    &lt;/item&gt;
+    &lt;item&gt;
+        &lt;digest&gt;493388267529403c84628e12141ffe9a013205a4&lt;/digest&gt;
+        &lt;lastModified&gt;2007-01-10T15:12:08+01:00&lt;/lastModified&gt;
+        &lt;mimeType&gt;text/plain&lt;/mimeType&gt;
+        &lt;name&gt;4&lt;/name&gt;
+        &lt;uri&gt;http://localhost:9998/storage/containers/quotes/4&lt;/uri&gt;
+    &lt;/item&gt;
+    &lt;name&gt;quotes&lt;/name&gt;
+    &lt;uri&gt;http://localhost:9998/storage/containers/quotes&lt;/uri&gt;
+&lt;/container&gt;</pre></blockquote>
+    <p>Search the container for all items containing the word 'king':</p>
+    <blockquote><pre> java -jar dist/StorageService.jar GET http://127.0.0.1:9998/storage/containers/quotes?search=king</pre></blockquote>
+    <p>which returns the following XML document containing one item, 3:</p>
+    <blockquote><pre>&lt;container&gt;
+    &lt;item&gt;
+        &lt;digest&gt;-71240529c42b5b92e3086e624618d19164658616&lt;/digest&gt;
+        &lt;lastModified&gt;2007-01-10T15:11:51+01:00&lt;/lastModified&gt;
+        &lt;mimeType&gt;text/plain&lt;/mimeType&gt;
+        &lt;name&gt;3&lt;/name&gt;
+        &lt;uri&gt;http://localhost:9998/storage/containers/quotes/3&lt;/uri&gt;
+    &lt;/item&gt;
+    &lt;name&gt;quotes&lt;/name&gt;
+    &lt;uri&gt;http://localhost:9998/storage/containers/quotes&lt;/uri&gt;
+&lt;/container&gt;</pre></blockquote>
+    <p>Get the contents of item 3:</p>
+    <blockquote><pre> java -jar dist/StorageService.jar GET http://127.0.0.1:9998/storage/containers/quotes/3</pre></blockquote>
+    <p>which returns the following:</p>
+    <blockquote><pre>catch the conscience of the king</pre></blockquote>
+    <p>Update the contents of item 3:</p>
+    <blockquote><pre>echo "The play's the thing Wherein I'll catch the conscience of the king" | java -jar dist/StorageService.jar PUT http://127.0.0.1:9998/storage/containers/quotes/3 text/plain</pre></blockquote>
+    <p>A new search shows that the content has been updated, because the digest is different and the last modified time is more recent:</p>
+    <blockquote><pre>&lt;container&gt;
+    &lt;item&gt;
+        &lt;digest&gt;<b>36d586647af7886aadbc21f238cee7740cf319e9</b>&lt;/digest&gt;
+        &lt;lastModified&gt;<b>2007-01-10T15:46:46+01:00</b>&lt;/lastModified&gt;
+        &lt;mimeType&gt;text/plain&lt;/mimeType&gt;
+        &lt;name&gt;3&lt;/name&gt;
+        &lt;uri&gt;http://localhost:9998/storage/containers/quotes/3&lt;/uri&gt;
+    &lt;/item&gt;
+    &lt;name&gt;quotes&lt;/name&gt;
+    &lt;uri&gt;http://localhost:9998/storage/containers/quotes&lt;/uri&gt;
+&lt;/container&gt;</pre></blockquote>
+    <p>Get the updated contents of item 3:</p>
+    <blockquote><pre> java -jar dist/StorageService.jar GET http://127.0.0.1:9998/storage/containers/quotes/3</pre></blockquote>
+    <p>which returns the following:</p>
+    <blockquote><pre>The play's the thing Wherein I'll catch the conscience of the king</pre></blockquote>
+    <p>Delete item 3:</p>
+    <blockquote><pre> java -jar dist/StorageService.jar DELETE http://127.0.0.1:9998/storage/containers/quotes/3</pre></blockquote>
+    <p>A new search using 'king' returns no items.</p>
+    <p>Delete container 'quotes':</p>
+    <blockquote><pre> java -jar dist/StorageService.jar DELETE http://127.0.0.1:9998/storage/containers/quotes</pre></blockquote>
+    <p>The state of the service is now equivalent to that of a newly started storage service.</p>
+
+    <h2>Caching of content</h2>
+    <p>The getting of item 3 in the previous example supports the HTTP features <code>Last-Modified</code> 
+        and <code>ETag</code>. The following shows a set of HTTP requests and responses 
+        from the Firefox web browser to the web storage service that highlights the
+        caching mechanism.</p>
+    <p>Request</p>
+<blockquote><pre>GET /storage/containers/quotes/3 HTTP/1.1
+Host: 127.0.0.1:9999
+User-Agent: Mozilla/5.0 (X11; U; SunOS i86pc; en-US; rv:1.8.1) Gecko/20061024 Firefox/2.0
+Accept: text/xml,application/xml,application/xhtml+xml,text/html;q=0.9,text/plain;q=0.8,image/png,*/*;q=0.5
+Accept-Language: en-us,en;q=0.5
+Accept-Encoding: gzip,deflate
+Accept-Charset: ISO-8859-1,utf-8;q=0.7,*;q=0.7
+Keep-Alive: 300
+Connection: keep-alive
+</pre></blockquote>
+    <p>Response</p>
+<blockquote><pre>HTTP/1.1 200 OK
+Last-modified: Wed, 10 Jan 2007 15:12:05 GMT
+Content-type: text/plain
+Etag: "-71240529c42b5b92e3086e624618d19164658616"
+Transfer-encoding: chunked
+
+21
+catch the conscience of the king
+
+0
+</pre></blockquote>
+    <p>The response includes the <code>Last-Modified</code> and <code>ETag</code> 
+        header fields in the response.</p>
+    <p>Getting the same item again:</p>
+    <p>Request</p>
+<blockquote><pre>GET /storage/containers/quotes/3 HTTP/1.1
+Host: 127.0.0.1:9999
+User-Agent: Mozilla/5.0 (X11; U; SunOS i86pc; en-US; rv:1.8.1) Gecko/20061024 Firefox/2.0
+Accept: text/xml,application/xml,application/xhtml+xml,text/html;q=0.9,text/plain;q=0.8,image/png,*/*;q=0.5
+Accept-Language: en-us,en;q=0.5
+Accept-Encoding: gzip,deflate
+Accept-Charset: ISO-8859-1,utf-8;q=0.7,*;q=0.7
+Keep-Alive: 300
+Connection: keep-alive
+If-Modified-Since: Wed, 10 Jan 2007 15:12:05 GMT
+If-None-Match: "-71240529c42b5b92e3086e624618d19164658616"
+
+</pre></blockquote>
+    <p>Response</p>
+<blockquote><pre>HTTP/1.1 304 Not Modified
+Content-length: 0
+Etag: "-71240529c42b5b92e3086e624618d19164658616"
+
+</pre></blockquote>
+
+    <p>The request contains the <code>Last-Modified</code> and <code>ETag</code>
+        returned in the first response in the <code>If-Modified-Since</code>
+        and <code>If-None-Match</code> header fields. The response contains
+        no content, and a 304 status code is returned because the item has not 
+        been modified (updated).</p>
+    <p>Getting the updated item:</p>
+    <p>Request</p>
+<blockquote><pre>GET /storage/containers/quotes/3 HTTP/1.1
+Host: 127.0.0.1:9999
+User-Agent: Mozilla/5.0 (X11; U; SunOS i86pc; en-US; rv:1.8.1) Gecko/20061024 Firefox/2.0
+Accept: text/xml,application/xml,application/xhtml+xml,text/html;q=0.9,text/plain;q=0.8,image/png,*/*;q=0.5
+Accept-Language: en-us,en;q=0.5
+Accept-Encoding: gzip,deflate
+Accept-Charset: ISO-8859-1,utf-8;q=0.7,*;q=0.7
+Keep-Alive: 300
+Connection: keep-alive
+If-Modified-Since: Wed, 10 Jan 2007 15:12:05 GMT
+If-None-Match: "-71240529c42b5b92e3086e624618d19164658616"
+
+</pre></blockquote>
+    <p>Response</p>
+<blockquote><pre>HTTP/1.1 200 OK
+Last-modified: Wed, 10 Jan 2007 15:14:17 GMT
+Content-type: text/plain
+Etag: "36d586647af7886aadbc21f238cee7740cf319e9"
+Transfer-encoding: chunked
+
+43
+The play's the thing Wherein I'll catch the conscience of the king
+
+0
+
+</pre></blockquote>
+    <p>Since item 3 has been updated, the <code>If-Modified-Since</code>
+        and <code>If-None-Match</code> of the request do not result in 
+        a 304 response being returned. The updated content is returned
+        with the latest <code>Last-Modified</code> and <code>ETag</code>
+        values.</p>
+  </body></html>

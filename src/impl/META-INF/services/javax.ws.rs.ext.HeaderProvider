@@ -1,0 +1,7 @@
+com.sun.ws.rest.impl.provider.header.EntityTagProvider
+com.sun.ws.rest.impl.provider.header.MediaTypeProvider
+com.sun.ws.rest.impl.provider.header.CacheControlProvider
+com.sun.ws.rest.impl.provider.header.NewCookieProvider
+com.sun.ws.rest.impl.provider.header.URIProvider
+com.sun.ws.rest.impl.provider.header.DateProvider
+com.sun.ws.rest.impl.provider.header.StringProvider

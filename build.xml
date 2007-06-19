@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+   DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+
+   Copyright 2007 Sun Microsystems, Inc. All rights reserved. 
+
+   The contents of this file are subject to the terms of the Common Development
+   and Distribution License("CDDL") (the "License").  You may not use this file
+   except in compliance with the License. 
+
+   You can obtain a copy of the License at:
+       https://jersey.dev.java.net/license.txt
+   See the License for the specific language governing permissions and
+   limitations under the License.
+
+   When distributing the Covered Code, include this CDDL Header Notice in each
+   file and include the License file at:
+       https://jersey.dev.java.net/license.txt
+   If applicable, add the following below this CDDL Header, with the fields
+   enclosed by brackets [] replaced by your own identifying information:
+       "Portions Copyrighted [year] [name of copyright owner]"
+-->
+<project name="Jersey" default="jar" basedir=".">
+    <description>Builds, tests, and runs project Jersey.</description>
+    <import file="nbproject/build-impl.xml"/>
+    
+    <!-- initialize build properties -->
+    <property file="${basedir}/build.properties" />
+    
+    <property name="tools.jar" value="${java.home}/../lib/tools.jar"/>
+    <condition property="tools.jar" value="${java.home}/lib/tools.jar">
+        <available type="file" file="${java.home}/lib/tools.jar"/>
+    </condition>
+    
+    <path id="test.classpath">
+        <fileset dir="${jersey-dist.dir}/lib" includes="*.jar"/>
+        <fileset dir="${basedir}/lib" includes="junit*.jar"/>
+        <pathelement location="${build.test.classes.dir}"/>
+        <pathelement location="${tools.jar}"/>
+    </path>
+    
+    <!-- task that generates a manifest file -->
+    <macrodef name="createManifest">
+        <attribute name="file"/>
+        <sequential>
+            <copy tofile="@{file}"
+                  file="${manifest.root}/manifest.mf"
+                  overwrite="yes"/>
+            <replace file="@{file}">
+                <replacefilter token="@@@@SPEC_VERSION@@@@"
+                               value="${release.spec.version}" />
+                <replacefilter token="@@@@IMPL_VERSION@@@@"
+                               value="${release.impl.version}"/>
+                <replacefilter token="@@@@VENDOR_ID@@@@"
+                               value="com.sun"/>
+                <replacefilter token="@@@@BUILD_ID@@@@"
+                               value="${build.id}"/>
+            </replace>
+        </sequential>
+    </macrodef>
+    
+    <taskdef name="resourcegen" classname="com.sun.tools.localizer.resourcegen.ResourceGenTask">
+        <classpath>
+            <fileset dir="lib" includes="*.jar" />
+        </classpath>
+    </taskdef>    
+    
+    <target name="-pre-compile">
+        <tstamp>
+            <format property="now" pattern="MM/dd/yyyy hh:mm aa" unit="hour"/>
+        </tstamp>
+        <property name="build.id" value="${now}(${user.name})" />
+        <property name="build.version" value="${release.impl.version}-${build.id}-${release.impl.version.suffix}" />
+        <echo message="The build id is: ${build.version}" />
+        
+        <createManifest file="${basedir}/build/manifest.mf"/>
+        
+        <resourcegen destDir="build/gen-src">
+            <resource dir="src/api" includes="**/*.properties"/>
+        </resourcegen>    
+        <resourcegen destDir="build/gen-src">
+            <resource dir="src/spi" includes="**/*.properties"/>
+        </resourcegen>    
+        <resourcegen destDir="build/gen-src">
+            <resource dir="src/impl" includes="**/*.properties"/>
+        </resourcegen>    
+        <resourcegen destDir="build/gen-src">
+            <resource dir="src/tools/common" includes="**/*.properties"/>
+        </resourcegen>    
+    </target>
+        
+    <target name="dist" depends="jar, javadoc">
+        <!-- create lib -->
+        <mkdir dir="${jersey-dist.dir}/lib"/>
+        <copy file="${dist.jar}" 
+              todir="${jersey-dist.dir}/lib"/>
+        <copy todir="${jersey-dist.dir}/lib">
+            <fileset dir="${basedir}/lib" excludes="junit*.jar, *.zip"/>
+        </copy>
+        
+        <!-- license -->
+        <copy file="${basedir}/license.txt" 
+              todir="${jersey-dist.dir}"/>
+        
+        <!-- create docs -->
+        <!-- TODO -->
+
+        <copy todir="${jersey-dist.dir}/docs">
+            <fileset dir="${basedir}/docs" excludes="CVS"/>
+        </copy>
+        
+        <!-- create samples -->
+        <ant dir="samples2" target="samples"/>
+        
+        <!-- create a zip file of the distribution -->
+        <zip destfile="${basedir}/dist/jersey.zip"
+             basedir="${basedir}/dist" includes="jersey/**"/>
+    </target>
+    
+    <taskdef name="junit2" classname="com.sun.ant.junit.JUnitTask">
+        <classpath>
+            <pathelement path="${basedir}/lib/junit-anttask.jar" />
+            <pathelement path="${basedir}/lib/junit-3.8.1.jar" />
+        </classpath>
+    </taskdef>
+    
+    <target name="hudson-unit-tests" depends="init">
+        <mkdir dir="${build.test.classes.dir}"/>
+        <mkdir dir="${build.test.results.dir}"/>
+        <javac srcdir="${test.src.dir}" 
+               destdir="${build.test.classes.dir}" debug="true" 
+               classpathref="test.classpath"/>
+        <copy todir="${build.test.classes.dir}">
+            <fileset dir="${test.src.dir}" excludes="**/*.java"/>
+        </copy>
+        <junit2 showoutput="true" fork="true" dir="${basedir}" failureproperty="tests.failed" errorproperty="tests.failed">
+            <batchtest todir="${build.test.results.dir}">
+                <fileset dir="${test.src.dir}" includes="**/*Test.java"/>
+            </batchtest>
+            <classpath>
+                <fileset dir="${jersey-dist.dir}/lib" includes="*.jar"/>
+                <pathelement location="${build.test.classes.dir}"/>
+                <pathelement location="${tools.jar}"/>
+            </classpath>
+            <syspropertyset>
+                <propertyref prefix="test-sys-prop."/>
+                <mapper type="glob" from="test-sys-prop.*" to="*"/>
+            </syspropertyset>
+            <formatter type="brief" usefile="false"/>
+            <formatter type="xml"/>
+            <jvmarg line="${run.jvmargs}"/>
+        </junit2>
+    </target>
+    
+    <target name="clean-tests" depends="init">
+        <delete dir="${build.test.classes.dir}"/>
+    </target>
+    
+</project>

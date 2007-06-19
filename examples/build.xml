@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+   DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+
+   Copyright 2007 Sun Microsystems, Inc. All rights reserved. 
+
+   The contents of this file are subject to the terms of the Common Development
+   and Distribution License("CDDL") (the "License").  You may not use this file
+   except in compliance with the License. 
+
+   You can obtain a copy of the License at:
+       https://jersey.dev.java.net/license.txt
+   See the License for the specific language governing permissions and
+   limitations under the License.
+
+   When distributing the Covered Code, include this CDDL Header Notice in each
+   file and include the License file at:
+       https://jersey.dev.java.net/license.txt
+   If applicable, add the following below this CDDL Header, with the fields
+   enclosed by brackets [] replaced by your own identifying information:
+       "Portions Copyrighted [year] [name of copyright owner]"
+-->
+<project name="Samples" default="build" basedir=".">
+    <target name="delegate-target">
+	<ant dir="SimpleServlet" target="${target}" inheritAll="false"/>
+	<ant dir="SimpleConsole" target="${target}" inheritAll="false"/>
+	<ant dir="SimpleJAXWSEndpoint" target="${target}" inheritAll="false"/>
+	<ant dir="SimpleAtomServer" target="${target}" inheritAll="false"/>
+	<ant dir="StorageService" target="${target}" inheritAll="false"/>
+	<ant dir="OptimisticConcurrency" target="${target}" inheritAll="false"/>
+	<ant dir="Bookstore" target="${target}" inheritAll="false"/>
+	<ant dir="HelloWorld" target="${target}" inheritAll="false"/>
+    </target>
+
+    <target name="clean">
+        <antcall target="delegate-target">
+            <param name="target" value="clean"/>
+        </antcall>
+    </target>
+
+    <target name="build">
+        <antcall target="delegate-target">
+            <param name="target" value="default"/>
+        </antcall>
+    </target>
+
+    <target name="convert-property">
+	<!-- replace property for jersey.jar for NB projects -->
+	<propertyfile
+		file="../dist/jersey/samples/${sample}/nbproject/project.properties">
+	    <entry key="file.reference.jersey.jar" value="../../lib/jersey.jar"/>
+	</propertyfile>
+    </target>
+
+    <target name="samples" depends="build, clean">
+	<mkdir dir="../dist/jersey/samples"/>
+	<copy todir="../dist/jersey/samples">
+            <!-- ignore any private directories for NB projects -->
+	    <fileset dir="." excludes="build.xml, **/nbproject/private/, GlassfishDB/"/>
+	</copy>
+
+	<!-- replace property for jersey in NB projects -->
+        <antcall target="convert-property">
+            <param name="sample" value="SimpleServlet"/>
+        </antcall>
+        <antcall target="convert-property">
+            <param name="sample" value="SimpleConsole"/>
+        </antcall>
+        <antcall target="convert-property">
+            <param name="sample" value="SimpleJAXWSEndpoint"/>
+        </antcall>
+        <antcall target="convert-property">
+            <param name="sample" value="SimpleAtomServer"/>
+        </antcall>
+        <antcall target="convert-property">
+            <param name="sample" value="StorageService"/>
+        </antcall>
+        <antcall target="convert-property">
+            <param name="sample" value="OptimisticConcurrency"/>
+        </antcall>
+        <antcall target="convert-property">
+            <param name="sample" value="Bookstore"/>
+        </antcall>
+        <antcall target="convert-property">
+            <param name="sample" value="HelloWorld"/>
+        </antcall>
+    </target>
+</project>

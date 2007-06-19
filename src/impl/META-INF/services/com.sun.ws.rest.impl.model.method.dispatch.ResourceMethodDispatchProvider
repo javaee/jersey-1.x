@@ -1,0 +1,3 @@
+com.sun.ws.rest.impl.model.method.dispatch.VoidVoidDispatchProvider
+com.sun.ws.rest.impl.model.method.dispatch.HttpReqResDispatchProvider
+com.sun.ws.rest.impl.model.method.dispatch.EntityParamDispatchProvider

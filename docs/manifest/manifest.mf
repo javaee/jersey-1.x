@@ -1,0 +1,9 @@
+Manifest-Version: 1.0
+Specification-Title: JAX-RS: Java API for RESTful Web Services
+Specification-Version: @@SPEC_VERSION@@
+Specification-Vendor: Sun Microsystems, Inc.
+Implementation-Title: Jersey: JAX-RS Reference Implementation
+Implementation-Version: @@IMPL_VERSION@@
+Implementation-Vendor: Sun Microsystems, Inc.
+Implementation-Vendor-Id: @@VENDOR_ID@@
+Build-Id: @@BUILD_ID@@
