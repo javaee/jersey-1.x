@@ -131,7 +131,7 @@
         <zip destfile="${basedir}/dist/${release.impl.name}.zip"
              basedir="${basedir}/dist" includes="${release.impl.name}/**"/>
         <!-- copy to non-versioned name -->
-        <copy file="{basedir}/dist/${release.impl.name}.zip" 
+        <copy file="${basedir}/dist/${release.impl.name}.zip" 
               tofile="${basedir}/dist/jersey.zip"/>
     </target>
     
