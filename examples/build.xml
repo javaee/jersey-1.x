@@ -47,14 +47,14 @@
     <target name="convert-property">
 	<!-- replace property for jersey.jar for NB projects -->
 	<propertyfile
-		file="../dist/jersey/examples/${example}/nbproject/project.properties">
+		file="${release.impl.dir}/examples/${example}/nbproject/project.properties">
 	    <entry key="file.reference.jersey.jar" value="../../lib/jersey.jar"/>
 	</propertyfile>
     </target>
 
-    <target name="examples" depends="build, clean">
-	<mkdir dir="../dist/jersey/examples"/>
-	<copy todir="../dist/jersey/examples">
+    <target name="dist" depends="clean">
+	<mkdir dir="${release.impl.dir}/examples"/>
+	<copy todir="${release.impl.dir}/examples">
             <!-- ignore any private directories for NB projects -->
 	    <fileset dir="." excludes="build.xml, **/nbproject/private/, GlassfishDB/"/>
 	</copy>

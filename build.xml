@@ -88,33 +88,45 @@
             <resource dir="src/tools/common" includes="**/*.properties"/>
         </resourcegen>    
     </target>
+
+    <target name="dist" depends="dist-release"/>
+    
+    <target name="dist-src" depends="jar, javadoc">
+        <!-- build the examples -->
+        <ant dir="examples" target="build"/>
+        <ant dir="examples" target="clean"/>
         
-    <target name="dist" depends="jar, javadoc">
+        <!-- create a zip file of the source distribution -->
+        <zip destfile="${basedir}/dist/${release.src.name}.zip"
+             basedir=".." includes="jersey/**"/>
+    </target>
+        
+    <target name="dist-release" depends="dist-src">
         <!-- create lib -->
-        <mkdir dir="${jersey-dist.dir}/lib"/>
+        <mkdir dir="${release.impl.dir}/lib"/>
         <copy file="${dist.jar}" 
-              todir="${jersey-dist.dir}/lib"/>
-        <copy todir="${jersey-dist.dir}/lib">
+              todir="${release.impl.dir}/lib"/>
+        <copy todir="${release.impl.dir}/lib">
             <fileset dir="${basedir}/lib" excludes="junit*.jar, *.zip"/>
         </copy>
         
         <!-- license -->
         <copy file="${basedir}/license.txt" 
-              todir="${jersey-dist.dir}"/>
+              todir="${release.impl.dir}"/>
         
         <!-- create docs -->
         <!-- TODO -->
 
-        <copy todir="${jersey-dist.dir}/docs">
-            <fileset dir="${basedir}/docs" excludes="CVS"/>
+        <copy todir="${release.impl.dir}/docs">
+            <fileset dir="${basedir}/docs"/>
         </copy>
         
-        <!-- create samples -->
-        <ant dir="examples" target="examples"/>
+        <!-- create samples distribution -->
+        <ant dir="examples" target="dist"/>
         
         <!-- create a zip file of the distribution -->
-        <zip destfile="${basedir}/dist/jersey.zip"
-             basedir="${basedir}/dist" includes="jersey/**"/>
+        <zip destfile="${basedir}/dist/${release.impl.name}.zip"
+             basedir="${basedir}/dist" includes="${release.impl.name}/**"/>
     </target>
     
     <taskdef name="junit2" classname="com.sun.ant.junit.JUnitTask">
