@@ -1,0 +1,5 @@
+release 0.1.1 (2007-xx-xx)
+- include version information in manifest of jersey.jar
+
+release 0.1 (2007-06-19)
+- initial stable snapshot
