@@ -30,7 +30,7 @@ import java.net.InetSocketAddress;
 
 /**
  *
- * @author Paul.Sandosz@Sun.Com
+ * @author Paul.Sandoz@Sun.Com
  */
 public class Server {
     public static void main(String[] args) throws IOException {
@@ -38,7 +38,7 @@ public class Server {
                 "com.sun.ws.rest.samples.atomserver.resources");
         
         HttpServer server = startServerInNewThread("/atom", handler);
-        
+
         System.out.println("Server running, hit return to stop...");
         System.in.read();
         System.out.println("Stopping server");
