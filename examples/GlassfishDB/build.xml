@@ -64,6 +64,6 @@
         </copy>
     </target>
     
-    <target name="default" depends="test,jar"/>
+    <target name="default" depends="test,dist"/>
 
 </project>
