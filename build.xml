@@ -110,7 +110,7 @@
         </copy>
         
         <!-- create samples -->
-        <ant dir="samples2" target="samples"/>
+        <ant dir="examples" target="examples"/>
         
         <!-- create a zip file of the distribution -->
         <zip destfile="${basedir}/dist/jersey.zip"

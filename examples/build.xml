@@ -20,7 +20,7 @@
    enclosed by brackets [] replaced by your own identifying information:
        "Portions Copyrighted [year] [name of copyright owner]"
 -->
-<project name="Samples" default="build" basedir=".">
+<project name="Examples" default="build" basedir=".">
     <target name="delegate-target">
 	<ant dir="SimpleServlet" target="${target}" inheritAll="false"/>
 	<ant dir="SimpleConsole" target="${target}" inheritAll="false"/>
@@ -47,42 +47,42 @@
     <target name="convert-property">
 	<!-- replace property for jersey.jar for NB projects -->
 	<propertyfile
-		file="../dist/jersey/samples/${sample}/nbproject/project.properties">
+		file="../dist/jersey/examples/${example}/nbproject/project.properties">
 	    <entry key="file.reference.jersey.jar" value="../../lib/jersey.jar"/>
 	</propertyfile>
     </target>
 
-    <target name="samples" depends="build, clean">
-	<mkdir dir="../dist/jersey/samples"/>
-	<copy todir="../dist/jersey/samples">
+    <target name="examples" depends="build, clean">
+	<mkdir dir="../dist/jersey/examples"/>
+	<copy todir="../dist/jersey/examples">
             <!-- ignore any private directories for NB projects -->
 	    <fileset dir="." excludes="build.xml, **/nbproject/private/, GlassfishDB/"/>
 	</copy>
 
 	<!-- replace property for jersey in NB projects -->
         <antcall target="convert-property">
-            <param name="sample" value="SimpleServlet"/>
+            <param name="example" value="SimpleServlet"/>
         </antcall>
         <antcall target="convert-property">
-            <param name="sample" value="SimpleConsole"/>
+            <param name="example" value="SimpleConsole"/>
         </antcall>
         <antcall target="convert-property">
-            <param name="sample" value="SimpleJAXWSEndpoint"/>
+            <param name="example" value="SimpleJAXWSEndpoint"/>
         </antcall>
         <antcall target="convert-property">
-            <param name="sample" value="SimpleAtomServer"/>
+            <param name="example" value="SimpleAtomServer"/>
         </antcall>
         <antcall target="convert-property">
-            <param name="sample" value="StorageService"/>
+            <param name="example" value="StorageService"/>
         </antcall>
         <antcall target="convert-property">
-            <param name="sample" value="OptimisticConcurrency"/>
+            <param name="example" value="OptimisticConcurrency"/>
         </antcall>
         <antcall target="convert-property">
-            <param name="sample" value="Bookstore"/>
+            <param name="example" value="Bookstore"/>
         </antcall>
         <antcall target="convert-property">
-            <param name="sample" value="HelloWorld"/>
+            <param name="example" value="HelloWorld"/>
         </antcall>
     </target>
 </project>
