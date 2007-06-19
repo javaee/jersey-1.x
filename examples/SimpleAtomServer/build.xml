@@ -44,7 +44,7 @@
     <target name="-pre-compile">
         <echo message="Processing resource classes"/>
         <rbpt fork="true" destdir="${build.classes.dir}" xEndorsed="true"
-             sourcedestdir="gen-src" sourcePath="${src.dir}">
+             nocompile="true" sourcedestdir="gen-src" sourcePath="${src.dir}">
             <classpath>
                 <path path="${javac.classpath}"/>
                 <pathelement location="${build.dir}"/>
@@ -56,10 +56,7 @@
                 <include name="**/*.java"/>
                 <exclude name="**/Main.java"/>
             </source>
-        </rbpt>    
-        <copy todir="${build.classes.dir}">
-            <fileset dir="${src.dir}" excludes="**/*.java"/>
-        </copy>
+        </rbpt>
     </target>
     
     <target name="default" depends="test,jar"/>
