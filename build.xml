@@ -32,13 +32,6 @@
         <available type="file" file="${java.home}/lib/tools.jar"/>
     </condition>
     
-    <path id="test.classpath">
-        <fileset dir="${jersey-dist.dir}/lib" includes="*.jar"/>
-        <fileset dir="${basedir}/lib" includes="junit*.jar"/>
-        <pathelement location="${build.test.classes.dir}"/>
-        <pathelement location="${tools.jar}"/>
-    </path>
-    
     <!-- task that generates a manifest file -->
     <macrodef name="createManifest">
         <attribute name="file"/>
@@ -142,7 +135,14 @@
         </classpath>
     </taskdef>
     
+    
     <target name="hudson-unit-tests" depends="init">
+        <path id="test.classpath">
+            <fileset dir="${basedir}/lib" includes="*.jar"/>
+            <fileset dir="${dist.dir}" includes="*.jar"/>
+            <pathelement location="${build.test.classes.dir}"/>
+            <pathelement location="${tools.jar}"/>
+        </path>
         <mkdir dir="${build.test.classes.dir}"/>
         <mkdir dir="${build.test.results.dir}"/>
         <javac srcdir="${test.src.dir}" 
@@ -156,12 +156,7 @@
             <batchtest todir="${build.test.results.dir}">
                 <fileset dir="${test.src.dir}" includes="**/*Test.java"/>
             </batchtest>
-            <classpath>
-                <fileset dir="${basedir}/lib" includes="*.jar"/>
-                <fileset dir="${dist.dir}/lib" includes="*.jar"/>
-                <pathelement location="${build.test.classes.dir}"/>
-                <pathelement location="${tools.jar}"/>
-            </classpath>
+            <classpath refid="test.classpath"/>
             <syspropertyset>
                 <propertyref prefix="test-sys-prop."/>
                 <mapper type="glob" from="test-sys-prop.*" to="*"/>
