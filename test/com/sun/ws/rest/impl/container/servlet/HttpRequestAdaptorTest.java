@@ -169,7 +169,7 @@ public class HttpRequestAdaptorTest extends TestCase {
         }
 
         public String getContextPath() {
-            return "";
+            return "/";
         }
 
         public String getQueryString() {
@@ -193,11 +193,11 @@ public class HttpRequestAdaptorTest extends TestCase {
         }
 
         public String getRequestURI() {
-            return "";
+            return getPathInfo();
         }
 
         public StringBuffer getRequestURL() {
-            return new StringBuffer("");
+            return new StringBuffer(getRequestURI());
         }
 
         public String getServletPath() {

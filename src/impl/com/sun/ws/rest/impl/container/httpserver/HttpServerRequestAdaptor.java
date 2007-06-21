@@ -56,7 +56,8 @@ public class HttpServerRequestAdaptor extends HttpRequestContextImpl {
     
     private void extractPathAndBaseURI() {
         // The path relative to the HTTP context
-        URI uri = exchange.getRequestURI();
+        // Note that this is not the complete URI (with host information)
+        this.uri = exchange.getRequestURI();
         
         // The base path context of the handler
         String contextPath = exchange.getHttpContext().getPath();
@@ -64,7 +65,7 @@ public class HttpServerRequestAdaptor extends HttpRequestContextImpl {
         // The path for the Web application
         this.uriPath = uri.getPath().substring(contextPath.length());
         if (!contextPath.endsWith("/")) {
-            // Ensure path is relative, TODO may need to check for multiple '/'
+            // Ensure path is relative
             if (uriPath.startsWith("/")) {
                 int i = 0;
                 while (uriPath.charAt(i) == '/')
@@ -75,6 +76,10 @@ public class HttpServerRequestAdaptor extends HttpRequestContextImpl {
             }
         }
         
+        /*
+         * The following is madness, there is no easy way to get 
+         * the complete URI
+         */
         HttpServer server = exchange.getHttpContext().getServer();
         String scheme = (server instanceof HttpsServer) ? "https" : "http";
         InetSocketAddress addr = exchange.getLocalAddress();
@@ -84,6 +89,8 @@ public class HttpServerRequestAdaptor extends HttpRequestContextImpl {
         } catch (URISyntaxException ex) {
             throw new IllegalArgumentException(ex);
         }
+        // Resolve to the complete URI
+        this.uri = this.baseURI.resolve(this.uri);
     }
     
     protected void copyHttpHeaders() {

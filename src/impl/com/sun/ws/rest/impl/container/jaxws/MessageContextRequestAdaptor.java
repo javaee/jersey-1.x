@@ -55,7 +55,7 @@ public class MessageContextRequestAdaptor extends HttpRequestContextImpl {
             this.uriPath = this.uriPath.substring(1);
         
         // TODO create base URI
-        this.baseURI = URI.create("");
+        this.baseURI = URI.create("/");
         this.context = context;
         copyHttpHeaders();
         extractQueryParameters();

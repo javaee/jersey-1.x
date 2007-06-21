@@ -31,7 +31,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URLDecoder;
+import java.net.URLEncoder;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Date;
@@ -53,9 +55,10 @@ public class HttpRequestContextImpl implements ContainerRequest {
 
     protected InputStream entity;
     protected String method;
-    
-    protected String uriPath;
+
+    protected URI uri;
     protected URI baseURI;
+    protected String uriPath;
     protected MultivaluedMap<String, String> queryParameters;
     protected MultivaluedMap<String, String> templateValues;
     protected List<PathSegment> pathSegments;
@@ -135,7 +138,16 @@ public class HttpRequestContextImpl implements ContainerRequest {
     }
     
     public URI getURI() {
-        return baseURI.resolve(uriPath);
+        if (uri == null) {
+            try {
+                URI u = new URI(null, null, uriPath, null);
+                uri = baseURI.resolve(u);
+            } catch (URISyntaxException e) {
+                throw new IllegalArgumentException(e);
+            }
+        }
+            
+        return uri;
     }
 
     public MultivaluedMap<String, String> getURIParameters() {
@@ -144,6 +156,18 @@ public class HttpRequestContextImpl implements ContainerRequest {
 
     public MultivaluedMap<String, String> getQueryParameters() {
         return queryParameters;
+    }
+    
+    /**
+     * Get the base URI given a URI and a relative URI path.
+     * @param uri the URI
+     * @param path the URI path (decoded)
+     */
+    protected URI getBaseURI(URI uri, String path) {
+        String uriPath = uri.getPath();
+        int i = uriPath.lastIndexOf(path);
+        String contextPath = uriPath.substring(0, i);
+        return uri.resolve(contextPath);
     }
 
     

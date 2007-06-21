@@ -25,6 +25,7 @@ package com.sun.ws.rest.impl.container.servlet;
 import com.sun.ws.rest.impl.HttpRequestContextImpl;
 import java.io.IOException;
 import java.net.URI;
+import java.net.URLEncoder;
 import java.util.Enumeration;
 import java.util.LinkedList;
 import java.util.List;
@@ -46,7 +47,7 @@ public class HttpRequestAdaptor extends HttpRequestContextImpl {
         this.request = request;
         
         extractQueryParameters(request.getQueryString());
-        setBaseURI();
+        setURIs();
         copyHttpHeaders();
     }
     
@@ -77,21 +78,11 @@ public class HttpRequestAdaptor extends HttpRequestContextImpl {
         }
     }
 
-    protected void setBaseURI() {
-        if (request.getPathInfo() != null) {
-            String path = request.getPathInfo();
-            StringBuffer uri = request.getRequestURL();
-            
-            int i = uri.lastIndexOf(path);
-            this.uriPath = path.substring(1);
-            this.baseURI = URI.create(uri.substring(0, i + 1));
-        } else {
-            String path = request.getServletPath();
-            StringBuffer uri = request.getRequestURL();
-            
-            int i = uri.lastIndexOf(path);
-            this.uriPath = path.substring(1);
-            this.baseURI = URI.create(uri.substring(0, i + 1));
-        }
-    }
+    protected void setURIs() {
+        this.uri = URI.create(request.getRequestURL().toString());        
+        this.uriPath = (request.getPathInfo() != null) 
+            ? request.getPathInfo().substring(1)
+            : request.getServletPath().substring(1);
+        this.baseURI = getBaseURI(this.uri, this.uriPath);
+    }    
 }

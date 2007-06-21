@@ -22,6 +22,8 @@
 
 package com.sun.ws.rest.spi.dispatch;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -31,6 +33,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import com.sun.ws.rest.impl.ImplMessages;
+import java.net.URLDecoder;
 
 /**
  * URI template implementation.
@@ -182,6 +185,14 @@ public final class URITemplateType {
         
         if (template.length() == 0 && (rightHandPattern == null || rightHandPattern.length() == 0))
             throw new IllegalArgumentException(ImplMessages.TEMPLATE_NAME_TO_VALUE_NOT_NULL());
+
+        try {
+            // TODO should only contain valuid URI characters plus '{' and '}'?
+            // Decode the template to process escaped characters
+            template = URLDecoder.decode(template, "UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            throw new IllegalArgumentException("Template cannot be decoded", e);
+        }
         
         this.template = template;
         this.rightHandPattern = rightHandPattern;
