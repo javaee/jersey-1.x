@@ -22,8 +22,9 @@
 
 package com.sun.ws.rest.spi.dispatch;
 
+import com.sun.ws.rest.spi.SpiMessages;
 import java.io.UnsupportedEncodingException;
-import java.net.URI;
+import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -32,8 +33,6 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import com.sun.ws.rest.impl.ImplMessages;
-import java.net.URLDecoder;
 
 /**
  * URI template implementation.
@@ -181,10 +180,10 @@ public final class URITemplateType {
      */
     public URITemplateType(String template, String rightHandPattern) {
         if (template == null)
-            throw new IllegalArgumentException(ImplMessages.URITEMPLATE_CANNOT_BE_NULL());
+            throw new IllegalArgumentException(SpiMessages.URITEMPLATE_CANNOT_BE_NULL());
         
         if (template.length() == 0 && (rightHandPattern == null || rightHandPattern.length() == 0))
-            throw new IllegalArgumentException(ImplMessages.TEMPLATE_NAME_TO_VALUE_NOT_NULL());
+            throw new IllegalArgumentException(SpiMessages.TEMPLATE_NAME_TO_VALUE_NOT_NULL());
 
         try {
             // TODO should only contain valuid URI characters plus '{' and '}'?
@@ -327,7 +326,7 @@ public final class URITemplateType {
      */
     public boolean match(String uri, Map<String, String> templateNameToValue) {
         if (templateNameToValue == null) 
-            throw new IllegalArgumentException(ImplMessages.TEMPLATE_NAME_TO_VALUE_NOT_NULL());
+            throw new IllegalArgumentException(SpiMessages.TEMPLATE_NAME_TO_VALUE_NOT_NULL());
 
         templateNameToValue.clear();
                 

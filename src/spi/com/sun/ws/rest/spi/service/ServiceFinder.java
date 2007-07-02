@@ -58,7 +58,7 @@ import java.util.NoSuchElementException;
 import java.util.Set;
 import java.util.TreeSet;
 
-import com.sun.ws.rest.api.ApiMessages;
+import com.sun.ws.rest.spi.SpiMessages;
 
 
 /**
@@ -272,14 +272,14 @@ public final class ServiceFinder<T> implements Iterable<T> {
         int n = ln.length();
         if (n != 0) {
             if ((ln.indexOf(' ') >= 0) || (ln.indexOf('\t') >= 0))
-                fail(service, u, lc, ApiMessages.ILLEGAL_CONFIG_SYNTAX()); 
+                fail(service, u, lc, SpiMessages.ILLEGAL_CONFIG_SYNTAX()); 
             int cp = ln.codePointAt(0);
             if (!Character.isJavaIdentifierStart(cp))
-                fail(service, u, lc, ApiMessages.ILLEGAL_PROVIDER_CLASS_NAME(ln));
+                fail(service, u, lc, SpiMessages.ILLEGAL_PROVIDER_CLASS_NAME(ln));
             for (int i = Character.charCount(cp); i < n; i += Character.charCount(cp)) {
                 cp = ln.codePointAt(i);
                 if (!Character.isJavaIdentifierPart(cp) && (cp != '.'))
-                    fail(service, u, lc, ApiMessages.ILLEGAL_PROVIDER_CLASS_NAME(ln));
+                    fail(service, u, lc, SpiMessages.ILLEGAL_PROVIDER_CLASS_NAME(ln));
             }
             if (!returned.contains(ln)) {
                 names.add(ln);
@@ -380,10 +380,10 @@ public final class ServiceFinder<T> implements Iterable<T> {
                 return service.cast(Class.forName(cn, true, loader).newInstance());
             } catch (ClassNotFoundException x) {
                 fail(service,
-                    ApiMessages.PROVIDER_NOT_FOUND(cn));
+                    SpiMessages.PROVIDER_NOT_FOUND(cn));
             } catch (Exception x) {
                 fail(service,
-                    ApiMessages.PROVIDER_COULD_NOT_BE_CREATED(cn, x.getLocalizedMessage()),
+                    SpiMessages.PROVIDER_COULD_NOT_BE_CREATED(cn, x.getLocalizedMessage()),
                     x);
             }
             return null;    /* This cannot happen */

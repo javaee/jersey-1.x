@@ -111,10 +111,13 @@
               todir="${release.impl.dir}"/>
         
         <!-- create docs -->
-        <!-- TODO -->
-
+        <copy todir="${release.impl.dir}/docs/jersey-api">
+            <fileset dir="${dist.javadoc.dir}"/>
+        </copy>
+        <!-- TODO include 311 javadocs -->
+        
         <copy todir="${release.impl.dir}/docs">
-            <fileset dir="${basedir}/docs"/>
+            <fileset dir="${basedir}/docs" excludes="manifest/**"/>
         </copy>
         
         <!-- create samples distribution -->
@@ -127,6 +130,33 @@
         <copy file="${basedir}/dist/${release.impl.name}.zip" 
               tofile="${basedir}/dist/jersey.zip"/>
     </target>
+    
+    <!-- Override default javadoc to only document api and spi -->
+    <target name="-javadoc-build" depends="compile">
+        <mkdir dir="${dist.javadoc.dir}"/>
+        <javadoc destdir="${dist.javadoc.dir}" 
+        source="${javac.source}" notree="${javadoc.notree}" 
+        use="${javadoc.use}" nonavbar="${javadoc.nonavbar}" 
+        noindex="${javadoc.noindex}" splitindex="${javadoc.splitindex}" 
+        author="${javadoc.author}" version="${javadoc.version}" 
+        windowtitle="${javadoc.windowtitle}" private="${javadoc.private}" 
+        additionalparam="${javadoc.additionalparam}" 
+        failonerror="true" useexternalfile="true">
+            <classpath>
+                <path path="${javac.classpath}"/>
+            </classpath>
+            <sourcepath>
+                <pathelement location="${src.api.dir}"/>
+                <pathelement location="${src.spi.dir}"/>
+                <pathelement location="build/gen-src"/>
+            </sourcepath>
+            <packageset dir="${src.api.dir}" includes="*/**"/>
+            <packageset dir="${src.spi.dir}" includes="*/**"/>
+            <fileset dir="${src.api.dir}" includes="*.java"/>
+            <fileset dir="${src.spi.dir}" includes="*.java"/>
+        </javadoc>
+    </target>
+
     
     <taskdef name="junit2" classname="com.sun.ant.junit.JUnitTask">
         <classpath>
