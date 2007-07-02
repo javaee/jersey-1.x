@@ -1,4 +1,6 @@
 release 0.1.1 (2007-xx-xx)
+- refactored API/SPI messages
+- include jersey API/SPI javadoc
 - URIs and URI templates with escaped space character throw exception for URI.create,
   found by Julian Reschke:
   https://jersey.dev.java.net/servlets/ReadMsg?list=dev&msgNo=1 
