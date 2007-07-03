@@ -1,4 +1,5 @@
 release 0.1.1 (2007-xx-xx)
+- fixed the formatting of java.util.Date for HTTP-date to conform to RFC 1123
 - refactored API/SPI messages
 - include jersey API/SPI javadoc
 - URIs and URI templates with escaped space character throw exception for URI.create,

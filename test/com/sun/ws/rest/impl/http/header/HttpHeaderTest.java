@@ -91,7 +91,7 @@ public class HttpHeaderTest extends TestCase {
         EntityTag e = new EntityTag(entityTag);
     }
     
-    public void testDate() throws ParseException {
+    public void testDateParsing() throws ParseException {
         String date_RFC1123 = "Sun, 06 Nov 1994 08:49:37 GMT";
         String date_RFC1036 = "Sunday, 06-Nov-94 08:49:37 GMT";
         String date_ANSI_C = "Sun Nov  6 08:49:37 1994";
@@ -102,5 +102,12 @@ public class HttpHeaderTest extends TestCase {
         d = HttpHeaderReader.readDate(date_ANSI_C);
     }
     
+    public void testDateFormatting() throws ParseException {
+        String date_RFC1123 = "Sun, 06 Nov 1994 08:49:37 GMT";
+        Date date = HttpHeaderReader.readDate(date_RFC1123);
+        
+        String date_formatted = HttpDateFormat.getPreferedDateFormat().format(date);
+        assertEquals(date_RFC1123, date_formatted);
+    }
 
 }

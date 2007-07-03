@@ -22,6 +22,7 @@
 
 package com.sun.ws.rest.impl.http.header.reader;
 
+import com.sun.ws.rest.impl.http.header.HttpDateFormat;
 import com.sun.ws.rest.impl.http.header.QualityFactor;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
@@ -33,9 +34,7 @@ import java.util.Comparator;
 import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
-import java.util.TimeZone;
 
 /**
  *
@@ -117,46 +116,12 @@ public abstract class HttpHeaderReader {
     public static HttpHeaderReader newHttpHeaderReader(String header, boolean processComments) {
         return new HttpHeaderReaderImpl(header, processComments);
     }
-    
-    /**
-     * The date format pattern for RFC 1123.
-     */
-    private static final String RFC1123_DATE_FORMAT_PATTERN = "EEE, dd MMM yyyy HH:mm:ss zzz";
-    
-    /**
-     * The date format pattern for RFC 1036.
-     */
-    private static final String RFC1036_DATE_FORMAT_PATTERN = "EEEE, dd-MMM-yy HH:mm:ss zzz";
-    
-    /**
-     * The date format pattern for ANSI C asctime().
-     */
-    private static final String ANSI_C_ASCTIME_DATE_FORMAT_PATTERN = "EEE MMM d HH:mm:ss yyyy";
-    
-    private static SimpleDateFormat[] dateFormats = getDateFormats();
         
-    private static SimpleDateFormat[] getDateFormats() {
-        SimpleDateFormat[] dateFormats = new SimpleDateFormat[3];
-        dateFormats[0] = new SimpleDateFormat(RFC1123_DATE_FORMAT_PATTERN, Locale.US);
-        dateFormats[1] = new SimpleDateFormat(RFC1036_DATE_FORMAT_PATTERN, Locale.US);
-        dateFormats[2] = new SimpleDateFormat(ANSI_C_ASCTIME_DATE_FORMAT_PATTERN, Locale.US);
-        
-        TimeZone tz = TimeZone.getTimeZone("GMT");
-        dateFormats[0].setTimeZone(tz);
-        dateFormats[1].setTimeZone(tz);
-        dateFormats[2].setTimeZone(tz);
-        
-        return dateFormats;
-    }
-    
     public static Date readDate(String date) throws ParseException {
-        // TODO consider using thread local for date formats
         ParseException pe = null;
-        for (SimpleDateFormat f : dateFormats) {
+        for (SimpleDateFormat f : HttpDateFormat.getDateFormats()) {
             try {
-                synchronized (f) {
-                    return f.parse(date);
-                }
+                return f.parse(date);
             } catch (ParseException e) {
                 pe = (pe == null) ? e : pe;
             }

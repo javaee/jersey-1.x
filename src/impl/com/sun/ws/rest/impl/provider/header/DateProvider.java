@@ -22,9 +22,8 @@
 
 package com.sun.ws.rest.impl.provider.header;
 
+import com.sun.ws.rest.impl.http.header.HttpDateFormat;
 import com.sun.ws.rest.impl.http.header.HttpHeaderFactory;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.text.ParseException;
 import java.util.Date;
 import javax.ws.rs.ext.HeaderProvider;
@@ -40,8 +39,7 @@ public class DateProvider implements HeaderProvider<Date> {
     }
 
     public String toString(Date header) {
-        // TODO should the date be formatted?
-        return header.toString();
+        return HttpDateFormat.getPreferedDateFormat().format(header);
     }
 
     public Date fromString(String header) throws ParseException {
