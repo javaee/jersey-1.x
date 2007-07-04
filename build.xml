@@ -110,11 +110,16 @@
         <copy file="${basedir}/license.txt" 
               todir="${release.impl.dir}"/>
         
-        <!-- create docs -->
+        <!-- create jersey docs -->
         <copy todir="${release.impl.dir}/docs/jersey-api">
             <fileset dir="${dist.javadoc.dir}"/>
         </copy>
-        <!-- TODO include 311 javadocs -->
+        <!-- include 311 docs -->
+	<unzip src="${basedir}/jsr311/jsr311-api.zip"
+	    dest="${dist.dir}/jsr311"/>
+        <copy todir="${release.impl.dir}/docs">
+            <fileset dir="${dist.dir}/jsr311/docs"/>
+        </copy>
         
         <copy todir="${release.impl.dir}/docs">
             <fileset dir="${basedir}/docs" excludes="manifest/**"/>
