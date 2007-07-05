@@ -22,12 +22,13 @@
 
 package com.sun.ws.rest.samples.optimisticconcurrency.resources;
 
-import com.sun.ws.rest.api.Entity;
 import com.sun.ws.rest.samples.optimisticconcurrency.ItemData;
 import javax.ws.rs.HttpMethod;
 import javax.ws.rs.UriParam;
 import javax.ws.rs.UriTemplate;
 import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.HttpContext;
+import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
@@ -55,7 +56,8 @@ public class ItemContentResource {
     @UriTemplate("{version}")
     public void put(
             @UriParam("version") int version,
-            Entity<byte[]> in) {
+            @HttpContext HttpHeaders headers,
+            byte[] in) {
         ItemData id = ItemData.ITEM;
         synchronized (id) {
             int currentVersion = id.getVersion();
@@ -63,7 +65,7 @@ public class ItemContentResource {
                 Response r = Response.Builder.representation("Conflict", "text/plain").status(409).build();
                 throw new WebApplicationException(r);
             }
-            id.update(in.getMediaType(), in.getContent());
+            id.update(headers.getMediaType(), in);
         }
         
     }    

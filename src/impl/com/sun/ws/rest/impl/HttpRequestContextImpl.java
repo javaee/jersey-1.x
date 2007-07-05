@@ -22,7 +22,6 @@
 
 package com.sun.ws.rest.impl;
 
-import com.sun.ws.rest.api.Entity;
 import com.sun.ws.rest.impl.http.header.reader.HttpHeaderReader;
 import com.sun.ws.rest.impl.model.HttpHelper;
 import com.sun.ws.rest.impl.response.Responses;
@@ -33,7 +32,6 @@ import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URLDecoder;
-import java.net.URLEncoder;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Date;
@@ -101,13 +99,12 @@ public class HttpRequestContextImpl implements ContainerRequest {
         
     // HttpRequestContext 
     
-    public <T> Entity<T> getEntity(Class<T> type) {
+    public <T> T getEntity(Class<T> type) {
         try {
             String mediaType = headers.getFirst("Content-Type");
             
-            T t = ProviderFactory.newInstance().createEntityProvider(type).
+            return ProviderFactory.newInstance().createEntityProvider(type).
                     readFrom(type, mediaType, headers, entity);
-            return new EntityImpl<T>(t, mediaType, headers);
         } catch (IOException e) {
             throw new IllegalArgumentException(e);
         }

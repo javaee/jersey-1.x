@@ -22,7 +22,6 @@
 
 package com.sun.ws.rest.api.core;
 
-import com.sun.ws.rest.api.Entity;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.PreconditionEvaluator;
 import javax.ws.rs.core.UriInfo;
@@ -39,7 +38,7 @@ public interface HttpRequestContext extends HttpHeaders, UriInfo, PreconditionEv
      * @throws java.lang.IllegalArgumentException if the content of the request
      * cannot be mapped to an entity of the requested type
      */
-    public <T> Entity<T> getEntity(Class<T> type) 
+    public <T> T getEntity(Class<T> type) 
       throws IllegalArgumentException;
         
     /**

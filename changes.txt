@@ -1,4 +1,6 @@
 release 0.1.1 (2007-xx-xx)
+- removed Entity class, equivalent functionality is supported by the 
+  javax.ws.rs.core.HttpHeaders class
 - Bookmark example added
 - include 311 API distribution, src and javadoc
 - fixed the formatting of java.util.Date for HTTP-date to conform to RFC 1123

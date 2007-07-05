@@ -24,7 +24,6 @@ package com.sun.ws.rest.impl.container.httpserver;
 
 import com.sun.net.httpserver.HttpHandler;
 import com.sun.net.httpserver.HttpServer;
-import com.sun.ws.rest.api.Entity;
 import javax.ws.rs.UriTemplate;
 import com.sun.ws.rest.api.container.ContainerFactory;
 import com.sun.ws.rest.api.core.HttpRequestContext;
@@ -56,8 +55,8 @@ public class HttpServerAdaptorTest extends TestCase {
             assertEquals("a", request.getURIParameters().getFirst("arg1"));
             assertEquals("b/c", request.getURIParameters().getFirst("arg2"));
             
-            Entity<String> s = request.getEntity(String.class);
-            assertEquals("RESOURCE-ONE", s.getContent());
+            String s = request.getEntity(String.class);
+            assertEquals("RESOURCE-ONE", s);
             
             response.setResponse(Response.Builder.representation("RESOURCE-ONE").build());
         }
@@ -70,8 +69,8 @@ public class HttpServerAdaptorTest extends TestCase {
             
             assertEquals("a", request.getURIParameters().getFirst("arg1"));
             
-            Entity<String> s = request.getEntity(String.class);
-            assertEquals("RESOURCE-TWO", s.getContent());
+            String s = request.getEntity(String.class);
+            assertEquals("RESOURCE-TWO", s);
             
             response.setResponse(Response.Builder.representation("RESOURCE-TWO").build());
         }

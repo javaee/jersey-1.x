@@ -22,7 +22,6 @@
 
 package com.sun.ws.rest.impl.bean;
 
-import com.sun.ws.rest.api.Entity;
 import com.sun.ws.rest.api.core.HttpContextAccess;
 import com.sun.ws.rest.impl.RequestHttpHeadersImpl;
 import java.net.URI;
@@ -48,8 +47,8 @@ public class WebResorceWithFieldInjectionTest extends AbstractBeanTester {
         private @HttpContext HttpContextAccess context;
         
         @HttpMethod("POST")
-        public String doPost(Entity<String> in) {
-            assertEquals("BEAN-ONE", in.getContent());
+        public String doPost(String in) {
+            assertEquals("BEAN-ONE", in);
             String method = context.getHttpRequestContext().getHttpMethod();
             assertEquals("POST", method);
             return "RETURN";
@@ -63,8 +62,8 @@ public class WebResorceWithFieldInjectionTest extends AbstractBeanTester {
         }
         
         @HttpMethod("PUT")
-        public String doPut(Entity<String> in) {
-            assertEquals("BEAN-ONE", in.getContent());
+        public String doPut(String in) {
+            assertEquals("BEAN-ONE", in);
             String method = context.getHttpRequestContext().getHttpMethod();
             assertEquals("PUT", method);
             return "RETURN";

@@ -22,7 +22,6 @@
 
 package com.sun.ws.rest.impl.bean;
 
-import com.sun.ws.rest.api.Entity;
 import javax.ws.rs.UriTemplate;
 import javax.ws.rs.HttpMethod;
 
@@ -39,8 +38,8 @@ public class RepresentationBeanTest extends AbstractBeanTester {
     @UriTemplate("/{arg1}/{arg2}")
     public static class TestOneWebResourceBean {
         @HttpMethod("POST")
-        public String doPost(Entity<String> in) {
-            assertEquals("BEAN-ONE", in.getContent());
+        public String doPost(String in) {
+            assertEquals("BEAN-ONE", in);
             return "RETURN";
         }
         
@@ -50,8 +49,8 @@ public class RepresentationBeanTest extends AbstractBeanTester {
         }
         
         @HttpMethod("PUT")
-        public String doPut(Entity<String> in) {
-            assertEquals("BEAN-ONE", in.getContent());
+        public String doPut(String in) {
+            assertEquals("BEAN-ONE", in);
             return "RETURN";
         }
         

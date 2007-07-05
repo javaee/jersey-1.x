@@ -25,12 +25,13 @@ package com.sun.ws.rest.samples.atomserver.resources;
 import com.sun.syndication.feed.atom.Entry;
 import com.sun.syndication.feed.atom.Feed;
 import com.sun.syndication.io.FeedException;
-import com.sun.ws.rest.api.Entity;
 import java.io.IOException;
 import java.util.Date;
 import javax.ws.rs.ConsumeMime;
 import javax.ws.rs.HttpMethod;
 import javax.ws.rs.UriTemplate;
+import javax.ws.rs.core.HttpContext;
+import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.UriInfo;
 
 /**
@@ -86,7 +87,8 @@ public class EditEntryResource extends EntryResource {
     @HttpMethod
     @UriTemplate("media")
     @ConsumeMime("*/*")
-    public void putMedia(Entity<byte[]> update) throws IOException, FeedException {
+    public void putMedia(@HttpContext HttpHeaders headers,
+            byte[] update) throws IOException, FeedException {
         // Check if media exists, otherwise 404
         String mediaPath = AtomStore.getMediaPath(entryId);
         AtomStore.checkExistence(mediaPath);
@@ -101,12 +103,14 @@ public class EditEntryResource extends EntryResource {
         AtomStore.updateLink(e, "edit", editEntryUri.replaceFirst("/media", ""));
         AtomStore.updateLink(e, "edit-media", editEntryUri);
         
+        // TODO update the content type
+        
         // Write out the feed document
         AtomStore.updateFeedDocument(f);
         // Write out the entry document
         AtomStore.createEntryDocument(entryId, e);
         // Write out the media
-        AtomStore.createMediaDocument(entryId, update.getContent());
+        AtomStore.createMediaDocument(entryId, update);
     }
         
     protected String getEditURI() {

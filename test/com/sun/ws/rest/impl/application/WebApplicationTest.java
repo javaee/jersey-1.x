@@ -22,7 +22,6 @@
 
 package com.sun.ws.rest.impl.application;
 
-import com.sun.ws.rest.api.Entity;
 import com.sun.ws.rest.api.core.HttpResponseContext;
 import javax.ws.rs.UriTemplate;
 import com.sun.ws.rest.api.core.HttpRequestContext;
@@ -55,8 +54,8 @@ public class WebApplicationTest extends TestCase {
             assertEquals("a", request.getURIParameters().getFirst("arg1"));
             assertEquals("b/c", request.getURIParameters().getFirst("arg2"));
             
-            Entity<String> s = request.getEntity(String.class);
-            assertEquals("RESOURCE-ONE", s.getContent());
+            String s = request.getEntity(String.class);
+            assertEquals("RESOURCE-ONE", s);
         }
     }
     
@@ -70,8 +69,8 @@ public class WebApplicationTest extends TestCase {
             boolean b = v.equals("a") || v.equals("a.foo");
             assertTrue(b);
             
-            Entity<String> s = request.getEntity(String.class);
-            assertEquals("RESOURCE-TWO", s.getContent());
+            String s = request.getEntity(String.class);
+            assertEquals("RESOURCE-TWO", s);
         }
     }
     
@@ -83,8 +82,8 @@ public class WebApplicationTest extends TestCase {
             System.out.println(request.getURIPath());
             assertEquals("a", request.getURIParameters().getFirst("arg1"));
             
-            Entity<String> s = request.getEntity(String.class);
-            assertEquals("RESOURCE-THREE", s.getContent());
+            String s = request.getEntity(String.class);
+            assertEquals("RESOURCE-THREE", s);
         }
     }
         

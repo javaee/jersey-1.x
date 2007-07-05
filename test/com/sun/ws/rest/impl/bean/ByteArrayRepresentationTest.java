@@ -22,7 +22,6 @@
 
 package com.sun.ws.rest.impl.bean;
 
-import com.sun.ws.rest.api.Entity;
 import javax.ws.rs.HttpMethod;
 import javax.ws.rs.UriTemplate;
 import com.sun.ws.rest.api.core.HttpResponseContext;
@@ -41,8 +40,8 @@ public class ByteArrayRepresentationTest extends AbstractBeanTester {
     @UriTemplate("/")
     static public class Resource { 
         @HttpMethod("POST")
-        public byte[] doPost(Entity<byte[]> in) {
-            assertEquals("CONTENT", new String(in.getContent()));
+        public byte[] doPost(byte[] in) {
+            assertEquals("CONTENT", new String(in));
             return "CONTENT".getBytes();
         }
     }

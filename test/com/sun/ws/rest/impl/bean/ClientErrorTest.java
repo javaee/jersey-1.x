@@ -23,7 +23,6 @@
 package com.sun.ws.rest.impl.bean;
 
 import javax.ws.rs.ConsumeMime;
-import com.sun.ws.rest.api.Entity;
 import javax.ws.rs.HttpMethod;
 import javax.ws.rs.ProduceMime;
 import javax.ws.rs.UriTemplate;
@@ -53,7 +52,7 @@ public class ClientErrorTest extends AbstractBeanTester {
         @ConsumeMime("application/bar")
         @ProduceMime("application/foo")
         @HttpMethod("POST")
-        public String doPost(Entity<String> entity) {
+        public String doPost(String entity) {
             return "content";
         }
     }
@@ -63,7 +62,7 @@ public class ClientErrorTest extends AbstractBeanTester {
         @ConsumeMime("application/bar")
         @ProduceMime("application/bar")
         @HttpMethod("POST")
-        public String doPost(Entity<String> entity) {
+        public String doPost(String entity) {
             return "content";
         }
     }

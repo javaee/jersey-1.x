@@ -22,7 +22,6 @@
 
 package com.sun.ws.rest.impl.model.method.dispatch;
 
-import com.sun.ws.rest.api.Entity;
 import javax.ws.rs.WebApplicationException;
 import com.sun.ws.rest.api.container.ContainerException;
 import com.sun.ws.rest.api.core.HttpRequestContext;
@@ -58,19 +57,6 @@ public class EntityParamDispatchProvider implements ResourceMethodDispatchProvid
         @SuppressWarnings("unchecked")
         public Object extract(HttpRequestContext request) {
             return request.getEntity(parameterEntityType);
-        }
-    }
-    
-    static final class TypeFromEntityExtractor implements ParameterExtractor {
-        final Class parameterEntityType;
-        
-        TypeFromEntityExtractor(Class parameterEntityType) {
-            this.parameterEntityType = parameterEntityType;
-        }
-        
-        @SuppressWarnings("unchecked")
-        public Object extract(HttpRequestContext request) {
-            return request.getEntity(parameterEntityType).getContent();
         }
     }
     
@@ -246,19 +232,7 @@ public class EntityParamDispatchProvider implements ResourceMethodDispatchProvid
                 return null;
             }
             
-            // Process annotated parameterClass
-            if (parameterClass == Entity.class) {
-                // Get the generic type used for the Entity
-                Class genericClass = ReflectionHelper.getGenericClass(parameterType);
-                if (genericClass == null) {
-                    // There is no generic type
-                    return null;
-                }
-
-                return new EntityExtractor(genericClass);
-            } else {
-                return new TypeFromEntityExtractor(parameterClass);
-            }
+            return new EntityExtractor(parameterClass);
         }
                 
         if (l.size() == 0) {

@@ -22,7 +22,6 @@
 
 package com.sun.ws.rest.impl.bean;
 
-import com.sun.ws.rest.api.Entity;
 import javax.ws.rs.HttpMethod;
 import javax.ws.rs.UriTemplate;
 import java.util.HashSet;
@@ -50,14 +49,14 @@ public class DryHttpMethods extends AbstractBeanTester {
         }
         
         @HttpMethod
-        public String putMe(Entity<String> s) {
-            assertEquals("putMe", s.getContent());
+        public String putMe(String s) {
+            assertEquals("putMe", s);
             return "putMe";
         }
 
         @HttpMethod
-        public String postMe(Entity<String> s) {
-            assertEquals("postMe", s.getContent());
+        public String postMe(String s) {
+            assertEquals("postMe", s);
             return "postMe";
         }
         

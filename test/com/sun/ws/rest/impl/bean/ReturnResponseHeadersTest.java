@@ -22,7 +22,6 @@
 
 package com.sun.ws.rest.impl.bean;
 
-import com.sun.ws.rest.api.Entity;
 import com.sun.ws.rest.api.core.HttpResponseContext;
 import javax.ws.rs.HttpMethod;
 import javax.ws.rs.UriTemplate;
@@ -41,7 +40,7 @@ public class ReturnResponseHeadersTest extends AbstractBeanTester {
     @UriTemplate("/")
     static public class TestRepresentationBean { 
         @HttpMethod("POST")
-        public Response doPost(Entity<String> in) {
+        public Response doPost(String in) {
             return Response.Builder.representation("content", "text/plain").language("en").build();
         }
     }

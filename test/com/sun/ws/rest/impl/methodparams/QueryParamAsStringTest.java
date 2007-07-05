@@ -23,7 +23,6 @@
 package com.sun.ws.rest.impl.methodparams;
 
 import javax.ws.rs.DefaultValue;
-import com.sun.ws.rest.api.Entity;
 import javax.ws.rs.HttpMethod;
 import javax.ws.rs.ProduceMime;
 import javax.ws.rs.QueryParam;
@@ -57,11 +56,11 @@ public class QueryParamAsStringTest extends AbstractBeanTester {
         @HttpMethod("POST")
         public String doPost(@QueryParam("arg1") String arg1, 
                 @QueryParam("arg2") String arg2, @QueryParam("arg3") String arg3,
-                Entity<String> r) {
+                String r) {
             assertEquals("a", arg1);
             assertEquals("b", arg2);
             assertEquals("c", arg3);
-            assertEquals("content", r.getContent());
+            assertEquals("content", r);
             return "content";
         }
     }

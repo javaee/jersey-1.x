@@ -26,7 +26,6 @@ import com.sun.syndication.feed.atom.Content;
 import com.sun.syndication.feed.atom.Entry;
 import com.sun.syndication.feed.atom.Feed;
 import com.sun.syndication.io.FeedException;
-import com.sun.ws.rest.api.Entity;
 import java.io.IOException;
 import java.net.URI;
 import javax.ws.rs.ConsumeMime;
@@ -35,6 +34,7 @@ import javax.ws.rs.ProduceMime;
 import javax.ws.rs.UriParam;
 import javax.ws.rs.UriTemplate;
 import javax.ws.rs.core.HttpContext;
+import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 
@@ -62,6 +62,9 @@ public class FeedResource {
         return getURI("edit/" + path);
     }
         
+//   Uncomment the following methods, and comment out the above equivalent 
+//   methods, to support optimisitic concurrency when updating entries
+    
 //    @UriTemplate("edit/{version}/{entry}")
 //    public EntryResource getEditEntryResource(
 //            @UriParam("entry") String entryId,
@@ -112,7 +115,9 @@ public class FeedResource {
     }
 
     @HttpMethod
-    public Response postMediaEntry(Entity<byte[]> entry) throws IOException, FeedException {
+    public Response postMediaEntry(
+            @HttpContext HttpHeaders headers,
+            byte[] entry) throws IOException, FeedException {
         // Get the next unique name of the entry
         String entryId = FileStore.FS.getNextId();
 
@@ -138,7 +143,7 @@ public class FeedResource {
         
         // Set the content to link to the media
         Content c = new Content();
-        c.setType(entry.getMediaType().toString());
+        c.setType(headers.getMediaType().toString());
         // Set the link source
         c.setSrc(mediaUri.toString());
         e.getContents().add(c);
@@ -146,7 +151,7 @@ public class FeedResource {
         // Store entry document 
         AtomStore.createEntryDocument(entryId, e);
         // Store the media
-        AtomStore.createMediaDocument(entryId, entry.getContent());
+        AtomStore.createMediaDocument(entryId, entry);
         
         // Update the feed document with the entry
         Feed f = AtomStore.getFeedDocument(uriInfo.getURI());

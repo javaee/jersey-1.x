@@ -22,7 +22,6 @@
 
 package com.sun.ws.rest.samples.storageservice.resources;
 
-import com.sun.ws.rest.api.Entity;
 import com.sun.ws.rest.api.NotFoundException;
 import com.sun.ws.rest.samples.storageservice.Container;
 import com.sun.ws.rest.samples.storageservice.Item;
@@ -34,6 +33,8 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 import javax.ws.rs.HttpMethod;
 import javax.ws.rs.core.EntityTag;
+import javax.ws.rs.core.HttpContext;
+import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.PreconditionEvaluator;
 import javax.ws.rs.core.Response;
@@ -76,15 +77,17 @@ public class ItemResource {
     }    
     
     @HttpMethod
-    public Response putItem(Entity<byte[]> data) {
+    public Response putItem(
+            @HttpContext HttpHeaders headers,
+            byte[] data) {
         System.out.println("PUT ITEM " + container + " " + item);
         
         URI uri = getUri(container, item);
-        MediaType mimeType = data.getMediaType();
+        MediaType mimeType = headers.getMediaType();
         GregorianCalendar gc = new GregorianCalendar();
         gc.set(GregorianCalendar.MILLISECOND, 0);
         Item i = new Item(item, uri.toString(), mimeType.toString(), gc);
-        String digest = computeDigest(data.getContent());
+        String digest = computeDigest(data);
         i.setDigest(digest);
         
         Response r;
@@ -94,13 +97,13 @@ public class ItemResource {
             r = Response.Builder.ok().build();
         }
         
-        Item ii = MemoryStore.MS.createOrUpdateItem(container, i, data.getContent());
+        Item ii = MemoryStore.MS.createOrUpdateItem(container, i, data);
         if (ii == null) {
             // Create the container if one has not been created
             URI containerUri = getUri(container);
             Container c = new Container(container, containerUri.toString());
             MemoryStore.MS.createContainer(c);
-            i = MemoryStore.MS.createOrUpdateItem(container, i, data.getContent());
+            i = MemoryStore.MS.createOrUpdateItem(container, i, data);
             if (i == null)
                 throw new NotFoundException("Container not found");
         }

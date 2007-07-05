@@ -22,7 +22,6 @@
 
 package com.sun.ws.rest.impl.application;
 
-import com.sun.ws.rest.api.Entity;
 import javax.ws.rs.UriTemplate;
 import com.sun.ws.rest.api.core.HttpRequestContext;
 import com.sun.ws.rest.api.core.HttpResponseContext;
@@ -35,8 +34,8 @@ public class ResourceTwo implements WebResource {
         if (!request.getHttpMethod().equals("GET"))
             throw new RuntimeException("Method didn't match");
         
-        Entity<String> s = request.getEntity(String.class);
-        if (!s.getContent().equals("RESOURCE-TWO"))
+        String s = request.getEntity(String.class);
+        if (!s.equals("RESOURCE-TWO"))
             throw new RuntimeException("Content didn't match");            
     }
 }

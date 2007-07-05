@@ -22,7 +22,6 @@
 
 package com.sun.ws.rest.impl.bean;
 
-import com.sun.ws.rest.api.Entity;
 import javax.ws.rs.HttpMethod;
 import javax.ws.rs.UriTemplate;
 import java.util.HashSet;
@@ -48,8 +47,8 @@ public class PutTest extends AbstractBeanTester {
     @UriTemplate("/PutNoReturnResource")
     static public class PutNoReturnResource { 
         @HttpMethod("PUT")
-        public void doPut(Entity<String> in) {
-            assertEquals("PutNoReturnResource", in.getContent());
+        public void doPut(String in) {
+            assertEquals("PutNoReturnResource", in);
         }
     }
     
@@ -64,8 +63,8 @@ public class PutTest extends AbstractBeanTester {
     @UriTemplate("/PutResource")
     static public class PutResource { 
         @HttpMethod("PUT")
-        public String doPut(Entity<String> in) {
-            assertEquals("PutResource", in.getContent());
+        public String doPut(String in) {
+            assertEquals("PutResource", in);
             return "PutResource";
         }
     }
