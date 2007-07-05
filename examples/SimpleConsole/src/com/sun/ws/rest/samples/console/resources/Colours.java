@@ -27,12 +27,10 @@ import java.util.List;
 import javax.ws.rs.HttpMethod;
 import javax.ws.rs.ProduceMime;
 import javax.ws.rs.QueryParam;
-import javax.ws.rs.UriTemplate;
 
 /**
  * A web resource for a list of colours.
  */
-@UriTemplate("colours")
 public class Colours {
     
     private static String colours[] = {"red","orange","yellow","green","blue","indigo","violet"};

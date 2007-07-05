@@ -42,11 +42,15 @@ import javax.ws.rs.core.UriInfo;
  *
  * @author Paul.Sandoz@Sun.Com
  */
-@UriTemplate("{container}")
 @ProduceMime("application/xml")
 public class ContainerResource {
     @HttpContext UriInfo uriInfo;
     @HttpContext PreconditionEvaluator preconditionEvaluator;
+    
+    ContainerResource(UriInfo uriInfo, PreconditionEvaluator preconditionEvaluator) {
+        this.uriInfo = uriInfo;
+        this.preconditionEvaluator = preconditionEvaluator;
+    }
     
     @HttpMethod
     public Container getContainer(

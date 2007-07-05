@@ -1,4 +1,5 @@
 release 0.1.1 (2007-xx-xx)
+- removed the @SubResource annotation from the examples
 - removed Entity class, equivalent functionality is supported by the 
   javax.ws.rs.core.HttpHeaders class
 - Bookmark example added

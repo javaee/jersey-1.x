@@ -28,7 +28,6 @@ import java.util.Date;
 import javax.ws.rs.ConsumeMime;
 import javax.ws.rs.HttpMethod;
 import javax.ws.rs.ProduceMime;
-import javax.ws.rs.SubResources;
 import javax.ws.rs.UriTemplate;
 import javax.ws.rs.core.Cookie;
 import javax.ws.rs.core.HttpContext;
@@ -42,12 +41,18 @@ import javax.ws.rs.core.Response;
  * 
  */
 @UriTemplate("/form")
-@SubResources({Colours.class})
 @ProduceMime("text/html")
 public class Form {
     
+    private static final Colours coloursResource = new Colours();
+    
     @HttpContext
     HttpHeaders headers;
+    
+    @UriTemplate("colours")
+    public Colours getColours() {
+        return coloursResource;
+    }
     
     /**
      * Produce a form from a static HTML file packaged with the compiled class

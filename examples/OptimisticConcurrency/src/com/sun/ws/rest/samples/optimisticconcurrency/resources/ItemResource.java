@@ -27,7 +27,6 @@ import com.sun.ws.rest.samples.optimisticconcurrency.ItemData;
 import java.net.URI;
 import javax.ws.rs.HttpMethod;
 import javax.ws.rs.ProduceMime;
-import javax.ws.rs.SubResources;
 import javax.ws.rs.UriTemplate;
 import javax.ws.rs.core.HttpContext;
 import javax.ws.rs.core.MediaType;
@@ -38,9 +37,13 @@ import javax.ws.rs.core.UriInfo;
  * @author Paul.Sandoz@Sun.Com
  */
 @UriTemplate("/item")
-@SubResources({ItemContentResource.class})
 public class ItemResource {
     @HttpContext UriInfo uriInfo;
+    
+    @UriTemplate("content")
+    public ItemContentResource getItemContentResource() {
+        return new ItemContentResource();
+    }
     
     @HttpMethod
     @ProduceMime("application/xml")

@@ -36,7 +36,6 @@ import javax.ws.rs.core.Response;
  *
  * @author Paul.Sandoz@Sun.Com
  */
-@UriTemplate("content")
 public class ItemContentResource {
     
     @HttpMethod
