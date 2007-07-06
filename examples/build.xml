@@ -21,6 +21,9 @@
        "Portions Copyrighted [year] [name of copyright owner]"
 -->
 <project name="Examples" default="build" basedir=".">
+    <!-- TODO use for task to avoid the repetition.
+	http://ant-contrib.sourceforge.net/tasks/tasks/for.html
+    -->
     <target name="delegate-target">
 	<ant dir="SimpleServlet" target="${target}" inheritAll="false"/>
 	<ant dir="SimpleConsole" target="${target}" inheritAll="false"/>
@@ -30,6 +33,7 @@
 	<ant dir="OptimisticConcurrency" target="${target}" inheritAll="false"/>
 	<ant dir="Bookstore" target="${target}" inheritAll="false"/>
 	<ant dir="HelloWorld" target="${target}" inheritAll="false"/>
+	<ant dir="Bookmark" target="${target}" inheritAll="false"/>
     </target>
 
     <target name="clean">
@@ -83,6 +87,9 @@
         </antcall>
         <antcall target="convert-property">
             <param name="example" value="HelloWorld"/>
+        </antcall>
+        <antcall target="convert-property">
+            <param name="example" value="Bookmark"/>
         </antcall>
     </target>
 </project>
