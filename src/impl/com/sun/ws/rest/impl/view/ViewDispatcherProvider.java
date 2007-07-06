@@ -27,11 +27,11 @@ import com.sun.ws.rest.api.core.HttpRequestContext;
 import com.sun.ws.rest.api.core.HttpResponseContext;
 import com.sun.ws.rest.api.core.ResourceConfig;
 import com.sun.ws.rest.api.view.Views;
-import com.sun.ws.rest.impl.dispatch.AbstractDispatcher;
+import com.sun.ws.rest.impl.dispatch.URITemplateDispatcher;
 import com.sun.ws.rest.impl.response.Responses;
 import com.sun.ws.rest.spi.dispatch.DispatchContext;
 import com.sun.ws.rest.spi.dispatch.Dispatcher;
-import com.sun.ws.rest.spi.dispatch.DispatcherProvider;
+import com.sun.ws.rest.impl.dispatch.DispatcherProvider;
 import com.sun.ws.rest.spi.dispatch.URITemplateType;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -47,7 +47,7 @@ import javax.ws.rs.core.Response;
  */
 public class ViewDispatcherProvider implements DispatcherProvider {
     
-    private final class ViewDispatcher extends AbstractDispatcher {
+    private final class ViewDispatcher extends URITemplateDispatcher {
         private String view;
         
         ViewDispatcher(URITemplateType t, String view) {
@@ -72,7 +72,7 @@ public class ViewDispatcherProvider implements DispatcherProvider {
         }
     }
     
-    private Dispatcher createViewDispatcher(String path, Class<?> resource) {
+    private URITemplateDispatcher createViewDispatcher(String path, Class<?> resource) {
         if (path.startsWith("/")) {
             // TODO get the name of the leaf node of the path
             // and use that for the URI template
@@ -92,7 +92,7 @@ public class ViewDispatcherProvider implements DispatcherProvider {
         }
     }
     
-    public Dispatcher[] createDispatchers(Class<?> resource, ResourceConfig config) throws ContainerException {
+    public URITemplateDispatcher[] createDispatchers(Class<?> resource, ResourceConfig config) throws ContainerException {
         if (resource == null)
             return null;
         
@@ -118,14 +118,14 @@ public class ViewDispatcherProvider implements DispatcherProvider {
         if (viewMap.isEmpty())
             return null;
         
-        List<Dispatcher> ds = new ArrayList<Dispatcher>();
+        List<URITemplateDispatcher> ds = new ArrayList<URITemplateDispatcher>();
         for (Map.Entry<String, Class<?>> view : viewMap.entrySet()) {
-            Dispatcher d = createViewDispatcher(view.getKey(), view.getValue());
+            URITemplateDispatcher d = createViewDispatcher(view.getKey(), view.getValue());
             if (d != null)
                 ds.add(d);
         }
 
-        return ds.toArray(new Dispatcher[0]);
+        return ds.toArray(new URITemplateDispatcher[0]);
     }
     
 }

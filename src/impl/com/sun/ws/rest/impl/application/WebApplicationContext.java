@@ -28,18 +28,16 @@ import com.sun.ws.rest.api.core.HttpRequestContext;
 import com.sun.ws.rest.api.core.HttpResponseContext;
 import com.sun.ws.rest.impl.ResponseBuilderImpl;
 import com.sun.ws.rest.spi.dispatch.DispatchContext;
-import com.sun.ws.rest.spi.dispatch.Dispatcher;
 import com.sun.ws.rest.impl.model.ResourceClass;
 import com.sun.ws.rest.impl.view.ViewFactory;
 import com.sun.ws.rest.impl.view.ViewType;
 import com.sun.ws.rest.spi.container.ContainerRequest;
 import com.sun.ws.rest.spi.container.ContainerResponse;
+import com.sun.ws.rest.spi.dispatch.URITemplateType;
 import com.sun.ws.rest.spi.resolver.WebResourceResolverListener;
 import com.sun.ws.rest.spi.view.View;
 import java.io.IOException;
-import java.net.URI;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
@@ -98,52 +96,6 @@ final class WebApplicationContext implements HttpContextAccess, ViewType, Dispat
     
     Map<String, String> templateValues = new HashMap<String, String>();
     
-    public boolean dispatch(final List<Dispatcher> dispatchers, final String path) {
-        return dispatch(dispatchers, null, path);
-    }
-    
-    private boolean dispatch(final List<Dispatcher> dispatchers, 
-            final Object node, String path) {
-        it = node;
-        for (final Dispatcher d : dispatchers) {
-            if (d.getTemplate().match(path, templateValues)) {
-                setTemplateValues(templateValues);
-                
-                // Get the right hand side of the path
-                path = templateValues.get(null);
-                if (path == null) {
-                    // Redirect to path ending with a '/' if template
-                    // ends in '/'
-                    if (d.getTemplate().endsWithSlash())
-                        return redirect();
-                } else if (path.length() == 1) {
-                    // No match if path ends in '/' but template does not
-                    if (!d.getTemplate().endsWithSlash())
-                        return false;
-                    
-                    // Consume the '/'
-                    path = null;
-                }
-                
-                return d.dispatch(this, node, path);
-            }
-        }
-        return false;
-    }    
-
-    private void setTemplateValues(Map<String, String> templateValues) {
-        final MultivaluedMap<String, String> m = request.getURIParameters();
-        for (Map.Entry<String, String> e : templateValues.entrySet()) {
-            m.putSingle(e.getKey(), e.getValue());
-        }
-    }
-    
-    private boolean redirect() {
-        response.setResponse(ResponseBuilderImpl.
-                temporaryRedirect(URI.create(request.getURIPath() + "/")).build());        
-        return true;
-    }
-    
     // DispatchContext
     
     public HttpContextAccess getHttpContext() {
@@ -152,17 +104,34 @@ final class WebApplicationContext implements HttpContextAccess, ViewType, Dispat
     
     public boolean dispatchTo(final Class nodeClass, final String path) {
         final ResourceClass resourceClass = app.getResourceClass(nodeClass);
-        final Object node = resourceClass.resolver.resolve(request, this);
-        
-        return dispatch(resourceClass.dispatchers, 
-                node, path);
+        final Object node = it = resourceClass.resolver.resolve(request, this);
+        return resourceClass.dispatch(this, node, path);
     }
 
     public boolean dispatchTo(final Object node, final String path) {
-        return dispatch(app.getResourceClass(node.getClass()).dispatchers, 
-                node, path);
+        it = node;
+        return app.getResourceClass(node.getClass()).dispatch(this, node, path);
     }
     
+    public boolean matchLeftHandPath(URITemplateType t, String path) {
+        if (t.match(path, templateValues)) {
+            setTemplateValues();
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    public String getRightHandPath() {
+        return templateValues.get(null);
+    }
+    
+    private void setTemplateValues() {
+        final MultivaluedMap<String, String> m = request.getURIParameters();
+        for (Map.Entry<String, String> e : templateValues.entrySet()) {
+            m.putSingle(e.getKey(), e.getValue());
+        }
+    }
     
     // WebResourceResolverListener
             

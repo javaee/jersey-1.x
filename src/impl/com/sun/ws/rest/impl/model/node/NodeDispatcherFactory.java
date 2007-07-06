@@ -24,9 +24,8 @@ package com.sun.ws.rest.impl.model.node;
 
 import javax.ws.rs.UnmatchedPath;
 import com.sun.ws.rest.api.container.ContainerException;
-import com.sun.ws.rest.api.core.HttpRequestContext;
 import com.sun.ws.rest.impl.ImplMessages;
-import com.sun.ws.rest.spi.dispatch.Dispatcher;
+import com.sun.ws.rest.impl.dispatch.URITemplateDispatcher;
 import com.sun.ws.rest.impl.model.parameter.AbstractParameterProcessor;
 import com.sun.ws.rest.impl.model.parameter.ParameterExtractor;
 import com.sun.ws.rest.impl.model.parameter.ParameterProcessor;
@@ -45,7 +44,7 @@ public final class NodeDispatcherFactory {
     private NodeDispatcherFactory() {
     }
 
-    public static Dispatcher create(final URITemplateType t, final Method m) {
+    public static URITemplateDispatcher create(final URITemplateType t, final Method m) {
         ParameterExtractor[] extractors = processParameters(m);
         if (extractors == null) {
             String msg = ImplMessages.NOT_VALID_DYNAMICRESOLVINGMETHOD(m, 

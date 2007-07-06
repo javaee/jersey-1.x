@@ -30,7 +30,7 @@ import com.sun.ws.rest.api.core.HttpResponseContext;
 import com.sun.ws.rest.impl.ResponseBuilderImpl;
 import javax.ws.rs.core.MediaType;
 import com.sun.ws.rest.impl.ImplMessages;
-import com.sun.ws.rest.impl.dispatch.AbstractDispatcher;
+import com.sun.ws.rest.impl.dispatch.URITemplateDispatcher;
 import com.sun.ws.rest.spi.dispatch.DispatchContext;
 import com.sun.ws.rest.impl.model.HttpHelper;
 import com.sun.ws.rest.impl.response.Responses;
@@ -46,7 +46,7 @@ import javax.ws.rs.core.Response;
  *
  * @author Paul.Sandoz@Sun.Com
  */
-public class ResourceMethodMapDispatcher extends AbstractDispatcher {
+public class ResourceMethodMapDispatcher extends URITemplateDispatcher {
     private static final Logger LOGGER = Logger.getLogger(ResourceMethodMapDispatcher.class.getName());
     
     final ResourceMethodMap map;

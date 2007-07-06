@@ -30,17 +30,19 @@ import java.util.Comparator;
  *
  * @author Paul.Sandoz@Sun.Com
  */
-public abstract class AbstractDispatcher implements Dispatcher {
-    static public final Comparator<Dispatcher> COMPARATOR = new Comparator<Dispatcher>() {
-        public int compare(Dispatcher o1, Dispatcher o2) {
+public abstract class URITemplateDispatcher implements Dispatcher {
+    static public final Comparator<URITemplateDispatcher> COMPARATOR = new Comparator<URITemplateDispatcher>() {
+        public int compare(URITemplateDispatcher o1, URITemplateDispatcher o2) {
             return URITemplateType.COMPARATOR.compare(o1.getTemplate(), o2.getTemplate());
         }    
     };
     
     private final URITemplateType template;
     
-    /** Creates a new instance of AbstractDispatcher */
-    public AbstractDispatcher(URITemplateType template) {
+    /**
+     * Creates a new instance of URITemplateDispatcher
+     */
+    public URITemplateDispatcher(URITemplateType template) {
         this.template = template;
     }
     

@@ -22,6 +22,7 @@
 
 package com.sun.ws.rest.impl.model;
 
+import com.sun.ws.rest.spi.dispatch.DispatchContext;
 import javax.ws.rs.ConsumeMime;
 import javax.ws.rs.HttpMethod;
 import javax.ws.rs.ProduceMime;
@@ -33,9 +34,8 @@ import com.sun.ws.rest.api.core.HttpResponseContext;
 import com.sun.ws.rest.api.core.ResourceConfig;
 import com.sun.ws.rest.api.core.WebResource;
 import com.sun.ws.rest.impl.ResponseBuilderImpl;
-import com.sun.ws.rest.impl.dispatch.AbstractDispatcher;
 import com.sun.ws.rest.impl.dispatch.DispatcherFactory;
-import com.sun.ws.rest.spi.dispatch.Dispatcher;
+import com.sun.ws.rest.impl.dispatch.URITemplateDispatcher;
 import com.sun.ws.rest.impl.model.method.HttpRequestDispatcher;
 import com.sun.ws.rest.impl.model.method.ResourceGenericMethod;
 import com.sun.ws.rest.impl.model.method.ResourceHttpMethod;
@@ -48,22 +48,20 @@ import com.sun.ws.rest.spi.dispatch.URITemplateType;
 import com.sun.ws.rest.spi.resolver.WebResourceResolver;
 import com.sun.ws.rest.spi.resolver.WebResourceResolverFactory;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
+import java.net.URI;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.logging.Logger;
-import javax.ws.rs.core.Response;
 
 /**
  *
  * @author Paul.Sandoz@Sun.Com
  */
-public final class ResourceClass {
+public final class ResourceClass extends BaseResourceClass {
     private static final Logger LOGGER = Logger.getLogger(ResourceClass.class.getName());
 
     public final ResourceConfig config;
@@ -78,8 +76,6 @@ public final class ResourceClass {
     
     public final boolean hasSubResources;
     
-    public final List<Dispatcher> dispatchers;
-    
     public ResourceClass(Class<?> c, ResourceConfig config) {
         this(c, config, null);
     }
@@ -92,7 +88,6 @@ public final class ResourceClass {
         
         this.consumeMime = getConsumeMimeList();
         this.produceMime = getProduceMimeList();
-        this.dispatchers = new ArrayList<Dispatcher>();
 
         MethodList methods = new MethodList(c);
 
@@ -120,7 +115,7 @@ public final class ResourceClass {
                     tValue = "/" + tValue;
                 URITemplateType t = new URITemplateType(tValue, URITemplateType.RIGHT_HANDED_REGEX);
 
-                Dispatcher d = ClassDispatcherFactory.create(t, subResource);
+                URITemplateDispatcher d = ClassDispatcherFactory.create(t, subResource);
                 dispatchers.add(d);
             }
         }
@@ -136,7 +131,7 @@ public final class ResourceClass {
             URITemplateType t = new URITemplateType(
                     tValue, URITemplateType.RIGHT_HANDED_REGEX);
             
-            final Dispatcher d = NodeDispatcherFactory.create(t, m);            
+            final URITemplateDispatcher d = NodeDispatcherFactory.create(t, m);            
             dispatchers.add(d);
         }
         
@@ -173,7 +168,6 @@ public final class ResourceClass {
             methodMap.put(rm);
         }
         
-        
         // WebResource interface method for HTTP methods
         if (WebResource.class.isAssignableFrom(c)) {
             try {
@@ -205,12 +199,13 @@ public final class ResourceClass {
             dispatchers.add(new ResourceMethodMapDispatcher(URITemplateType.NULL, methodMap));
         }
         
+        
         // Add all dispatchers created from dispatch providers
         
-        Dispatcher[] ds = DispatcherFactory.createDispatchers(c, config);
+        URITemplateDispatcher[] ds = DispatcherFactory.createDispatchers(c, config);
         if (ds != null && ds.length > 0) {
             hasSubResources = true;
-            for (Dispatcher d : ds)
+            for (URITemplateDispatcher d : ds)
                 if (!d.getTemplate().equals(URITemplateType.NULL))
                     hasSubResources = true;
             Collections.addAll(dispatchers, ds);
@@ -225,7 +220,7 @@ public final class ResourceClass {
         }
         
         // Sort the dispatchers using the URI template as the primiary sort key
-        Collections.sort(dispatchers, AbstractDispatcher.COMPARATOR);
+        Collections.sort(dispatchers, URITemplateDispatcher.COMPARATOR);
         this.hasSubResources = hasSubResources;
     }
     
@@ -235,5 +230,42 @@ public final class ResourceClass {
         
     private MediaTypeList getProduceMimeList() {
         return MimeHelper.createMediaTypes(c.getAnnotation(ProduceMime.class));
+    }
+
+    // Dispatcher 
+    
+    public boolean dispatch(DispatchContext context, Object node, String path) {
+        for (final URITemplateDispatcher d : dispatchers) {
+            if (context.matchLeftHandPath(d.getTemplate(), path)) {
+                // Get the right hand side of the path
+                path = context.getRightHandPath();
+                if (path == null) {
+                    // Redirect to path ending with a '/' if template
+                    // ends in '/'
+                    if (d.getTemplate().endsWithSlash())
+                        return redirect(context);
+                } else if (path.length() == 1) {
+                    // No matchLeftHandPath if path ends in '/' but template does not
+                    if (!d.getTemplate().endsWithSlash())
+                        return false;
+                    
+                    // Consume the '/'
+                    path = null;
+                }
+                
+                return d.dispatch(context, node, path);
+            }
+        }
+        
+        return false;
+    }
+    
+    private boolean redirect(DispatchContext context) {
+        HttpRequestContext request = context.getHttpRequestContext();
+        HttpResponseContext response = context.getHttpResponseContext();
+        
+        response.setResponse(ResponseBuilderImpl.
+                temporaryRedirect(URI.create(request.getURIPath() + "/")).build());        
+        return true;
     }
 }

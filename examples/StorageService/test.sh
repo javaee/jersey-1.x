@@ -1,4 +1,4 @@
-!#/bin/sh
+#!/bin/sh
 echo -- Get the containers
 java -jar dist/StorageService.jar GET http://127.0.0.1:9998/storage/containers
 echo

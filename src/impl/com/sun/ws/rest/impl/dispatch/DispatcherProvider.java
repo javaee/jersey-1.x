@@ -20,7 +20,7 @@
  *     "Portions Copyrighted [year] [name of copyright owner]"
  */
 
-package com.sun.ws.rest.spi.dispatch;
+package com.sun.ws.rest.impl.dispatch;
 
 import com.sun.ws.rest.api.container.ContainerException;
 import com.sun.ws.rest.api.core.ResourceConfig;
@@ -39,5 +39,5 @@ public interface DispatcherProvider {
      * @param config the resource configuration.
      * @return the array of dispatchers for the resource.
      */
-    Dispatcher[] createDispatchers(Class<?> resource, ResourceConfig config) throws ContainerException;    
+    URITemplateDispatcher[] createDispatchers(Class<?> resource, ResourceConfig config) throws ContainerException;    
 }

@@ -41,4 +41,8 @@ public interface DispatchContext {
     public boolean dispatchTo(Class nodeClass, String path);
     
     public boolean dispatchTo(Object node, String path);
+    
+    public boolean matchLeftHandPath(URITemplateType t, String path);
+
+    public String getRightHandPath();
 }

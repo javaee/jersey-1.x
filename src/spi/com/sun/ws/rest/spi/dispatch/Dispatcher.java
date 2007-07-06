@@ -22,15 +22,10 @@
 
 package com.sun.ws.rest.spi.dispatch;
 
-import com.sun.ws.rest.spi.dispatch.URITemplateType;
-import java.util.Comparator;
-
 /**
  *
  * @author Paul.Sandoz@Sun.Com
  */
 public interface Dispatcher {
-    URITemplateType getTemplate();
-    
     boolean dispatch(DispatchContext context, Object node, String path);
 }

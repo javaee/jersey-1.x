@@ -22,7 +22,7 @@
 
 package com.sun.ws.rest.impl.model;
 
-import com.sun.ws.rest.spi.dispatch.Dispatcher;
+import com.sun.ws.rest.impl.dispatch.URITemplateDispatcher;
 import com.sun.ws.rest.spi.dispatch.URITemplateType;
 
 /**
@@ -34,7 +34,7 @@ public final class ClassDispatcherFactory {
     private ClassDispatcherFactory() {
     }
 
-    public static Dispatcher create(final URITemplateType t, final Class c) {
+    public static URITemplateDispatcher create(final URITemplateType t, final Class c) {
         return new ClassDispatcher(t, c);
     }    
 }

@@ -25,14 +25,14 @@ package com.sun.ws.rest.impl.model.node;
 import javax.ws.rs.WebApplicationException;
 import com.sun.ws.rest.api.container.ContainerException;
 import com.sun.ws.rest.api.core.HttpRequestContext;
-import com.sun.ws.rest.impl.dispatch.AbstractDispatcher;
+import com.sun.ws.rest.impl.dispatch.URITemplateDispatcher;
 import com.sun.ws.rest.spi.dispatch.DispatchContext;
 import com.sun.ws.rest.impl.model.parameter.ParameterExtractor;
 import com.sun.ws.rest.spi.dispatch.URITemplateType;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
-class NodeDispatcher extends AbstractDispatcher {
+class NodeDispatcher extends URITemplateDispatcher {
     final ParameterExtractor[] extractors;
     
     final Method m;

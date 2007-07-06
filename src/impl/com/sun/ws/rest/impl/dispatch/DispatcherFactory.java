@@ -24,8 +24,7 @@ package com.sun.ws.rest.impl.dispatch;
 
 import com.sun.ws.rest.api.container.ContainerException;
 import com.sun.ws.rest.api.core.ResourceConfig;
-import com.sun.ws.rest.spi.dispatch.Dispatcher;
-import com.sun.ws.rest.spi.dispatch.DispatcherProvider;
+import com.sun.ws.rest.impl.dispatch.DispatcherProvider;
 import com.sun.ws.rest.spi.service.ServiceFinder;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -47,15 +46,15 @@ public final class DispatcherFactory {
      * @param config the the resource configuration.
      * @return the array of dispatchers for the resource.
      */
-    public static Dispatcher[] createDispatchers(Class resource, ResourceConfig config) throws ContainerException {
-        List<Dispatcher> l = new ArrayList<Dispatcher>();
+    public static URITemplateDispatcher[] createDispatchers(Class resource, ResourceConfig config) throws ContainerException {
+        List<URITemplateDispatcher> l = new ArrayList<URITemplateDispatcher>();
         
         for (DispatcherProvider vp : ServiceFinder.find(DispatcherProvider.class)) {
-            Dispatcher[] ds = vp.createDispatchers(resource, config);
+            URITemplateDispatcher[] ds = vp.createDispatchers(resource, config);
             if (ds != null)
                 Collections.addAll(l, ds);
         }
         
-        return l.toArray(new Dispatcher[0]);
+        return l.toArray(new URITemplateDispatcher[0]);
     }    
 }

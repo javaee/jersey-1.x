@@ -25,7 +25,6 @@ package com.sun.ws.rest.impl.application;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
-import javax.ws.rs.UriTemplate;
 import javax.ws.rs.WebApplicationException;
 import com.sun.ws.rest.api.container.ContainerException;
 import com.sun.ws.rest.api.core.HttpContextAccess;
@@ -33,13 +32,11 @@ import com.sun.ws.rest.api.core.HttpResponseContext;
 import com.sun.ws.rest.api.core.ResourceConfig;
 import com.sun.ws.rest.impl.ResponseBuilderImpl;
 import com.sun.ws.rest.impl.ThreadLocalHttpContext;
-import com.sun.ws.rest.impl.dispatch.AbstractDispatcher;
-import com.sun.ws.rest.spi.dispatch.Dispatcher;
-import com.sun.ws.rest.impl.model.ClassDispatcherFactory;
+import com.sun.ws.rest.impl.dispatch.URITemplateDispatcher;
 import com.sun.ws.rest.impl.model.ResourceClass;
+import com.sun.ws.rest.impl.model.RootResourceClass;
 import com.sun.ws.rest.impl.response.Responses;
 import com.sun.ws.rest.spi.resolver.WebResourceResolverFactory;
-import com.sun.ws.rest.spi.dispatch.URITemplateType;
 import com.sun.ws.rest.spi.container.ContainerRequest;
 import com.sun.ws.rest.spi.container.ContainerResponse;
 import com.sun.ws.rest.spi.container.WebApplication;
@@ -51,7 +48,6 @@ import java.net.URI;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -74,8 +70,8 @@ import javax.ws.rs.core.UriInfo;
  */
 public final class WebApplicationImpl implements WebApplication {
     ResourceConfig resourceConfig;
-            
-    WebResourceResolverFactory resolverFactory;
+    
+    RootResourceClass rootResourceClass;
     
     final ThreadLocalHttpContext context;
     
@@ -89,7 +85,7 @@ public final class WebApplicationImpl implements WebApplication {
     
     final Map<Class<?>, Injectable> injectables;
     
-    public final List<Dispatcher> dispatchers = new ArrayList<Dispatcher>();
+    public final List<URITemplateDispatcher> dispatchers = new ArrayList<URITemplateDispatcher>();
     
     private final Map<Class, ResourceClass> metaClassMap = new WeakHashMap<Class, ResourceClass>();
 
@@ -118,85 +114,19 @@ public final class WebApplicationImpl implements WebApplication {
     }
     
     public ResourceClass getResourceClass(Class c) {
-        if(c == null) return null;
-        
-        synchronized(metaClassMap) {
-            ResourceClass rmc = metaClassMap.get(c);
-            if(rmc == null) {
-                rmc = new ResourceClass(c, resourceConfig, resolverFactory);
-                metaClassMap.put(c, rmc);
-            }
-            return rmc;
-        }
+        return rootResourceClass.getResourceClass(c);
     }
-    
+
+    // WebApplication
+            
     public void initiate(ResourceConfig resourceConfig, WebResourceResolverFactory resolverFactory) {
         if (resourceConfig == null)
             throw new IllegalArgumentException();
         
         this.resourceConfig = resourceConfig;
-        this.resolverFactory = resolverFactory;
-        
-        add(resourceConfig.getResourceClasses());
+        this.rootResourceClass = new RootResourceClass(resourceConfig, resolverFactory);
     }
 
-    /**
-     * Add a Web resource class to the Web application.
-     * 
-     * @param resourceClasses The putSingle of Web resource class
-     * @throws ContainerException if a Web resource could not
-     *         be processed.
-     */
-    public void add(Set<Class> resourceClasses) throws ContainerException {
-        for (Class resourceClass : resourceClasses)
-            addResource(resourceClass);
-        
-        Collections.sort(dispatchers, AbstractDispatcher.COMPARATOR);
-    }
-    
-    /**
-     * Add an array of Web resource class to the Web application.
-     *
-     * @param resourceClasses The array of Web resource class
-     * @throws ContainerException if a Web resource could not
-     *         be processed.
-     */
-    public void add(Class<?>... resourceClasses) throws ContainerException {
-        for (Class resourceClass : resourceClasses)
-            addResource(resourceClass);
-        
-        Collections.sort(dispatchers, AbstractDispatcher.COMPARATOR);
-    }
-    
-    private void addResource(final Class<?> c) throws ContainerException {
-        final UriTemplate tAnnotation = c.getAnnotation(UriTemplate.class);
-        if (tAnnotation == null)
-            return;
-
-        String tValue = tAnnotation.value();
-        
-        if (!tValue.startsWith("/")) {
-            throw new ContainerException(
-                    "The URI template " 
-                    + tAnnotation.value() + 
-                    ", of class "
-                    + c +
-                    ", is not an absolute path (it does not start with a '/' character)");
-        }
-        
-        ResourceClass resourceClass = getResourceClass(c);
-
-        String rightHandPattern = (resourceClass.hasSubResources) ? 
-                URITemplateType.RIGHT_HANDED_REGEX : URITemplateType.RIGHT_SLASHED_REGEX;
-        URITemplateType t = new URITemplateType(tValue, rightHandPattern);
-        
-        Dispatcher d = ClassDispatcherFactory.create(t, c);
-        dispatchers.add(d);
-    }
-    
-    
-    // WebApplication
-            
     public void handleRequest(ContainerRequest request, ContainerResponse response) {
         final WebApplicationContext localContext = new WebApplicationContext(this, request, response);        
         context.set(localContext);
@@ -220,7 +150,7 @@ public final class WebApplicationImpl implements WebApplication {
             path = stripMatrixParams(path);
 
         try {
-            if (!localContext.dispatch(dispatchers, path)) {
+            if (!rootResourceClass.dispatch(localContext, path)) {
                 // Resource was not found
                 response.setResponse(Responses.NOT_FOUND);
             }

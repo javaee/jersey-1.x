@@ -22,7 +22,7 @@
 
 package com.sun.ws.rest.impl.model;
 
-import com.sun.ws.rest.impl.dispatch.AbstractDispatcher;
+import com.sun.ws.rest.impl.dispatch.URITemplateDispatcher;
 import com.sun.ws.rest.spi.dispatch.DispatchContext;
 import com.sun.ws.rest.spi.dispatch.URITemplateType;
 
@@ -30,7 +30,7 @@ import com.sun.ws.rest.spi.dispatch.URITemplateType;
  *
  * @author Paul.Sandoz@Sun.Com
  */
-class ClassDispatcher extends AbstractDispatcher {
+class ClassDispatcher extends URITemplateDispatcher {
     
     final Class c;
     
