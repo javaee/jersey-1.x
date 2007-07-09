@@ -22,7 +22,6 @@
 
 package com.sun.ws.rest.impl.bean;
 
-import com.sun.org.apache.bcel.internal.verifier.statics.StringRepresentation;
 import javax.ws.rs.HttpMethod;
 import javax.ws.rs.UriTemplate;
 import com.sun.ws.rest.api.core.HttpContextAccess;
