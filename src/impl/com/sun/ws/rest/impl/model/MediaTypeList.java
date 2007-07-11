@@ -28,26 +28,9 @@ import java.util.ArrayList;
 /**
  * List of {@link MediaType}.
  *
+ * TODO remove this class.
+ *
  * @author Paul.Sandoz@Sun.Com
  */
 public final class MediaTypeList extends ArrayList<MediaType> {
-
-    private boolean isDefault;
-    
-    public MediaTypeList() {
-        this(false);
-    }
-    
-    public MediaTypeList(boolean isDefault) {
-        this.isDefault = isDefault;
-    }
-  
-    /**
-     * Ascertain if the list of media types is a default value.
-     * @return true if the list of media types is a default value,
-     *         otherwise false.
-     */
-    public boolean isDefault() {
-        return isDefault;
-    }
 }

@@ -25,7 +25,7 @@ package com.sun.ws.rest.impl.model;
 import com.sun.ws.rest.api.container.ContainerException;
 import com.sun.ws.rest.api.core.ResourceConfig;
 import com.sun.ws.rest.impl.dispatch.URITemplateDispatcher;
-import com.sun.ws.rest.spi.dispatch.DispatchContext;
+import com.sun.ws.rest.spi.dispatch.ResourceDispatchContext;
 import com.sun.ws.rest.spi.dispatch.URITemplateType;
 import com.sun.ws.rest.spi.resolver.WebResourceResolverFactory;
 import java.util.Collections;
@@ -45,7 +45,11 @@ public final class RootResourceClass extends BaseResourceClass {
     
     private final Map<Class, ResourceClass> metaClassMap = new WeakHashMap<Class, ResourceClass>();
     
-    public RootResourceClass(ResourceConfig resourceConfig, WebResourceResolverFactory resolverFactory) {
+    private final Object containerMemento;
+    
+    public RootResourceClass(Object containerMemento, ResourceConfig resourceConfig, 
+            WebResourceResolverFactory resolverFactory) {
+        this.containerMemento = containerMemento;
         this.resourceConfig = resourceConfig;
         this.resolverFactory = resolverFactory;
         
@@ -58,7 +62,7 @@ public final class RootResourceClass extends BaseResourceClass {
         synchronized(metaClassMap) {
             ResourceClass rmc = metaClassMap.get(c);
             if(rmc == null) {
-                rmc = new ResourceClass(c, resourceConfig, resolverFactory);
+                rmc = new ResourceClass(containerMemento, c, resourceConfig, resolverFactory);
                 metaClassMap.put(c, rmc);
             }
             return rmc;
@@ -105,7 +109,7 @@ public final class RootResourceClass extends BaseResourceClass {
         dispatchers.add(d);
     }
     
-    public boolean dispatch(DispatchContext context, String path) {
+    public boolean dispatch(ResourceDispatchContext context, String path) {
         return dispatch(context, null, path);
     }
 }

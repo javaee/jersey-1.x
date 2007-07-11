@@ -72,7 +72,9 @@ public final class WebApplicationImpl implements WebApplication {
     ResourceConfig resourceConfig;
     
     RootResourceClass rootResourceClass;
-    
+
+    Object containerMomento;
+
     final ThreadLocalHttpContext context;
     
     final HttpHeaders httpHeadersProxy;
@@ -119,12 +121,13 @@ public final class WebApplicationImpl implements WebApplication {
 
     // WebApplication
             
-    public void initiate(ResourceConfig resourceConfig, WebResourceResolverFactory resolverFactory) {
+    public void initiate(Object containerMomento, ResourceConfig resourceConfig, 
+            WebResourceResolverFactory resolverFactory) {
         if (resourceConfig == null)
             throw new IllegalArgumentException();
         
         this.resourceConfig = resourceConfig;
-        this.rootResourceClass = new RootResourceClass(resourceConfig, resolverFactory);
+        this.rootResourceClass = new RootResourceClass(containerMomento, resourceConfig, resolverFactory);
     }
 
     public void handleRequest(ContainerRequest request, ContainerResponse response) {

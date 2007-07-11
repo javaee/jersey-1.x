@@ -111,7 +111,7 @@ public class ServletAdaptor extends HttpServlet implements WebResourceResolverFa
             ResourceConfig resourceConfig = (ResourceConfig)resClassSetClass.newInstance();
         
             application = WebApplicationFactory.createWebApplication();
-            application.initiate(resourceConfig, this);
+            application.initiate(this, resourceConfig, this);
         } catch (Exception e) {
             e.printStackTrace(System.err);
             throw new ServletException(

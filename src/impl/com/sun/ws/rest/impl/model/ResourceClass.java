@@ -22,7 +22,7 @@
 
 package com.sun.ws.rest.impl.model;
 
-import com.sun.ws.rest.spi.dispatch.DispatchContext;
+import com.sun.ws.rest.impl.view.ViewFactory;
 import javax.ws.rs.ConsumeMime;
 import javax.ws.rs.HttpMethod;
 import javax.ws.rs.ProduceMime;
@@ -33,22 +33,22 @@ import com.sun.ws.rest.api.core.HttpRequestContext;
 import com.sun.ws.rest.api.core.HttpResponseContext;
 import com.sun.ws.rest.api.core.ResourceConfig;
 import com.sun.ws.rest.api.core.WebResource;
-import com.sun.ws.rest.impl.ResponseBuilderImpl;
+import com.sun.ws.rest.api.view.Views;
 import com.sun.ws.rest.impl.dispatch.DispatcherFactory;
 import com.sun.ws.rest.impl.dispatch.URITemplateDispatcher;
-import com.sun.ws.rest.impl.model.method.HttpRequestDispatcher;
 import com.sun.ws.rest.impl.model.method.ResourceGenericMethod;
 import com.sun.ws.rest.impl.model.method.ResourceHttpMethod;
 import com.sun.ws.rest.impl.model.method.ResourceMethod;
 import com.sun.ws.rest.impl.model.method.ResourceMethodMap;
 import com.sun.ws.rest.impl.model.method.ResourceMethodMapDispatcher;
+import com.sun.ws.rest.impl.model.method.ResourceViewMethod;
 import com.sun.ws.rest.impl.model.node.NodeDispatcherFactory;
 import com.sun.ws.rest.impl.resolver.WebResourceResolverFactoryFacade;
 import com.sun.ws.rest.spi.dispatch.URITemplateType;
 import com.sun.ws.rest.spi.resolver.WebResourceResolver;
 import com.sun.ws.rest.spi.resolver.WebResourceResolverFactory;
+import com.sun.ws.rest.spi.view.View;
 import java.lang.reflect.Method;
-import java.net.URI;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
@@ -76,11 +76,12 @@ public final class ResourceClass extends BaseResourceClass {
     
     public final boolean hasSubResources;
     
-    public ResourceClass(Class<?> c, ResourceConfig config) {
-        this(c, config, null);
+    public ResourceClass(Object containerMemento, Class<?> c, ResourceConfig config) {
+        this(containerMemento, c, config, null);
     }
     
-    public ResourceClass(Class<?> c, ResourceConfig config, WebResourceResolverFactory resolverFactory) {
+    public ResourceClass(Object containerMemento, Class<?> c, ResourceConfig config, 
+            WebResourceResolverFactory resolverFactory) {
         this.c = c;
         this.config = config;
         this.resolver = WebResourceResolverFactoryFacade.
@@ -145,20 +146,9 @@ public final class ResourceClass extends BaseResourceClass {
             URITemplateType t = new URITemplateType(tValue, 
                     URITemplateType.RIGHT_SLASHED_REGEX);
             
-            ResourceMethodMap rmm = templatedMethodMap.get(t);
-            if (rmm == null) {
-                rmm = new ResourceMethodMap();
-                templatedMethodMap.put(t, rmm);
-            }
             ResourceMethod rm = new ResourceHttpMethod(this, m);
-            rmm.put(rm);
+            addToTemplatedMethodMap(templatedMethodMap, t, rm);
         }        
-        for (Map.Entry<URITemplateType, ResourceMethodMap> e : templatedMethodMap.entrySet()) {
-            hasSubResources = true;
-            
-            e.getValue().sort();
-            dispatchers.add(new ResourceMethodMapDispatcher(e.getKey(), e.getValue()));
-        }
         
         
         // HTTP methods
@@ -173,12 +163,7 @@ public final class ResourceClass extends BaseResourceClass {
             try {
                 Method m = c.getMethod("handleRequest", HttpRequestContext.class, HttpResponseContext.class);
                 
-                HttpRequestDispatcher hrd = new HttpRequestDispatcher() {
-                    public void dispatch(Object resource, HttpRequestContext request, HttpResponseContext response) {
-                        ((WebResource)resource).handleRequest(request, response);                        
-                    }
-                };
-                ResourceMethod genericMethod = new ResourceGenericMethod(this, m, hrd);
+                ResourceMethod genericMethod = new ResourceGenericMethod(this, m);
                 
                 // TODO check if the method has a URI template
                 
@@ -193,23 +178,24 @@ public final class ResourceClass extends BaseResourceClass {
             }
         }
         
+        // Process the views
+        processViews(containerMemento, methodMap, templatedMethodMap);
+
+        
+        // Process templated HTTP methods
+        for (Map.Entry<URITemplateType, ResourceMethodMap> e : templatedMethodMap.entrySet()) {
+            hasSubResources = true;
+            
+            e.getValue().sort();
+            dispatchers.add(new ResourceMethodMapDispatcher(e.getKey(), e.getValue()));
+        }
+        
         // Process HTTP methods
         if (!methodMap.isEmpty()) {
             methodMap.sort();
             dispatchers.add(new ResourceMethodMapDispatcher(URITemplateType.NULL, methodMap));
         }
         
-        
-        // Add all dispatchers created from dispatch providers
-        
-        URITemplateDispatcher[] ds = DispatcherFactory.createDispatchers(c, config);
-        if (ds != null && ds.length > 0) {
-            hasSubResources = true;
-            for (URITemplateDispatcher d : ds)
-                if (!d.getTemplate().equals(URITemplateType.NULL))
-                    hasSubResources = true;
-            Collections.addAll(dispatchers, ds);
-        }
         
         if (dispatchers.isEmpty()) {
             String message = "The class " 
@@ -224,6 +210,18 @@ public final class ResourceClass extends BaseResourceClass {
         this.hasSubResources = hasSubResources;
     }
     
+    private void addToTemplatedMethodMap(
+            Map<URITemplateType, ResourceMethodMap> tmm,
+            URITemplateType t,
+            ResourceMethod rm) {
+        ResourceMethodMap rmm = tmm.get(t);
+        if (rmm == null) {
+            rmm = new ResourceMethodMap();
+            tmm.put(t, rmm);
+        }
+        rmm.put(rm);
+    }
+    
     private MediaTypeList getConsumeMimeList() {
         return MimeHelper.createMediaTypes(c.getAnnotation(ConsumeMime.class));
     }
@@ -231,41 +229,91 @@ public final class ResourceClass extends BaseResourceClass {
     private MediaTypeList getProduceMimeList() {
         return MimeHelper.createMediaTypes(c.getAnnotation(ProduceMime.class));
     }
-
-    // Dispatcher 
     
-    public boolean dispatch(DispatchContext context, Object node, String path) {
-        for (final URITemplateDispatcher d : dispatchers) {
-            if (context.matchLeftHandPath(d.getTemplate(), path)) {
-                // Get the right hand side of the path
-                path = context.getRightHandPath();
-                if (path == null) {
-                    // Redirect to path ending with a '/' if template
-                    // ends in '/'
-                    if (d.getTemplate().endsWithSlash())
-                        return redirect(context);
-                } else if (path.length() == 1) {
-                    // No matchLeftHandPath if path ends in '/' but template does not
-                    if (!d.getTemplate().endsWithSlash())
-                        return false;
-                    
-                    // Consume the '/'
-                    path = null;
-                }
-                
-                return d.dispatch(context, node, path);
+    
+    private void processViews(Object containerMemento, 
+            ResourceMethodMap methodMap, 
+            Map<URITemplateType, ResourceMethodMap> templatedMethodMap) {        
+
+        // Get all the view names
+        Map<String, Class<?>> viewMap = getViews();
+
+        // Create the views
+        for (Map.Entry<String, Class<?>> view : viewMap.entrySet()) {
+            final Class<?> resourceClass = view.getValue();
+            final String viewName = view.getKey();
+            
+            String path = getAbsolutePathOfView(resourceClass, viewName);
+            URITemplateType t = getURITemplateOfView(resourceClass, viewName);
+            
+            View v = ViewFactory.createView(containerMemento, path);
+            if (v == null)
+                continue;
+            
+            ResourceMethod rm = new ResourceViewMethod(this, v);
+            if (t.equals(URITemplateType.NULL)) {
+                methodMap.put(rm);
+            } else {
+                addToTemplatedMethodMap(templatedMethodMap, t, rm);
+            }
+        }        
+    }
+    
+    private Map<String, Class<?>> getViews() {
+        // Find all the view names
+        Class<?> resourceClass = c;
+        Map<String, Class<?>> viewMap = new HashMap<String, Class<?>>();
+        Set<String> views = new HashSet<String>();
+        for (;resourceClass != null; resourceClass = resourceClass.getSuperclass()) {
+            Views vAnnotation = resourceClass.getAnnotation(Views.class);
+            if (vAnnotation == null)
+                continue;
+            
+            for (String name : vAnnotation.value()) {
+                if (views.contains(name))
+                    continue;
+
+                if (!name.startsWith("/") && name.contains("/"))
+                    continue;
+
+                views.add(name);
+                viewMap.put(name, resourceClass);
             }
         }
         
-        return false;
+        return viewMap;
     }
     
-    private boolean redirect(DispatchContext context) {
-        HttpRequestContext request = context.getHttpRequestContext();
-        HttpResponseContext response = context.getHttpResponseContext();
+    private URITemplateType getURITemplateOfView(Class<?> resourceClass, String path) {
+        if (path.startsWith("/")) {
+            // TODO get the name of the leaf node of the path
+            // and use that for the URI template
+            return null;
+        } 
         
-        response.setResponse(ResponseBuilderImpl.
-                temporaryRedirect(URI.create(request.getURIPath() + "/")).build());        
-        return true;
+        if (path.matches("index\\.[^/]*")) {
+            return URITemplateType.NULL;
+        } else {
+            path = "/" + path;            
+            int i = path.lastIndexOf('.');
+            if (i > 0)
+                path = path.substring(0, i);
+            
+            return new URITemplateType(path);            
+        }
+    }
+    
+    private String getAbsolutePathOfView(Class<?> resourceClass, String path) {
+        if (path.startsWith("/")) {
+            // TODO get the name of the leaf node of the path
+            // and use that for the URI template
+            return null;
+        } 
+        
+        return getAbsolutePathOfClass(resourceClass) + '/' + path;
+    }
+    
+    private String getAbsolutePathOfClass(Class<?> resourceClass) {
+        return "/" + resourceClass.getName().replace('.','/').replace('$','/');
     }
 }

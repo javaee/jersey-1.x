@@ -24,18 +24,16 @@ package com.sun.ws.rest.impl.model.method;
 
 import com.sun.ws.rest.impl.provider.header.MediaTypeProvider;
 import javax.ws.rs.WebApplicationException;
-import com.sun.ws.rest.api.container.ContainerException;
 import com.sun.ws.rest.api.core.HttpRequestContext;
 import com.sun.ws.rest.api.core.HttpResponseContext;
 import com.sun.ws.rest.impl.ResponseBuilderImpl;
 import javax.ws.rs.core.MediaType;
 import com.sun.ws.rest.impl.ImplMessages;
 import com.sun.ws.rest.impl.dispatch.URITemplateDispatcher;
-import com.sun.ws.rest.spi.dispatch.DispatchContext;
+import com.sun.ws.rest.spi.dispatch.ResourceDispatchContext;
 import com.sun.ws.rest.impl.model.HttpHelper;
 import com.sun.ws.rest.impl.response.Responses;
 import com.sun.ws.rest.spi.dispatch.URITemplateType;
-import java.lang.reflect.InvocationTargetException;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.logging.Logger;
@@ -56,7 +54,7 @@ public class ResourceMethodMapDispatcher extends URITemplateDispatcher {
         this.map = map;
     }
 
-    public boolean dispatch(DispatchContext context, Object node, String path) {
+    public boolean dispatch(ResourceDispatchContext context, Object node, String path) {
         final HttpRequestContext request = context.getHttpRequestContext();
         final HttpResponseContext response = context.getHttpResponseContext();
         final String httpMethod = request.getHttpMethod();
@@ -91,22 +89,7 @@ public class ResourceMethodMapDispatcher extends URITemplateDispatcher {
             // If there is a match choose the first method
             ResourceMethod method = matches.get(0);
 
-            // Invoke the method on the resource
-            try {
-                method.getDispatcher().dispatch(node, request, response);
-            } catch (InvocationTargetException e) {
-                Throwable t = e.getTargetException();
-                if (t instanceof RuntimeException) {
-                    // Rethrow the runtime exception
-                    throw (RuntimeException)t;
-                } else {
-                    // TODO should a checked exception be wrapped in 
-                    // WebApplicationException ?
-                    throw new ContainerException(t);
-                }
-            } catch (IllegalAccessException e) {
-                throw new ContainerException(e);
-            }
+            method.getDispatcher().dispatch(node, request, response);
 
             // Verify the response
             verifyResponse(method, accept, response);                        
@@ -144,8 +127,8 @@ public class ResourceMethodMapDispatcher extends URITemplateDispatcher {
             // The 'Content-Type' is not a member of @ProduceMime.
             // Check if the 'Content-Type' is acceptable
             if (!HttpHelper.produces(contentType, accept)) {
-                String error = ImplMessages.RESOURCE_NOT_ACCEPTABLE(method.method.getDeclaringClass(),
-                                                                         method.method,
+                String error = ImplMessages.RESOURCE_NOT_ACCEPTABLE(method.getResourceClass(),
+                                                                         method.getMethod(),
                                                                          contentType);
                 LOGGER.severe(error);
                 
@@ -155,8 +138,8 @@ public class ResourceMethodMapDispatcher extends URITemplateDispatcher {
                 // TODO should this be ContainerException ???
                 throw new WebApplicationException(r);
             } else {
-                String error = ImplMessages.RESOURCE_MIMETYPE_NOT_IN_PRODUCE_MIME(method.method.getDeclaringClass(),
-                                                                                       method.method,
+                String error = ImplMessages.RESOURCE_MIMETYPE_NOT_IN_PRODUCE_MIME(method.getResourceClass(),
+                                                                                       method.getMethod(),
                                                                                        contentType,
                                                                                        method.produceMime);
                 LOGGER.warning(error);

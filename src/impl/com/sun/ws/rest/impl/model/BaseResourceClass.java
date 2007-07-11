@@ -22,12 +22,12 @@
 
 package com.sun.ws.rest.impl.model;
 
-import com.sun.ws.rest.spi.dispatch.DispatchContext;
+import com.sun.ws.rest.spi.dispatch.ResourceDispatchContext;
 import com.sun.ws.rest.api.core.HttpRequestContext;
 import com.sun.ws.rest.api.core.HttpResponseContext;
 import com.sun.ws.rest.impl.ResponseBuilderImpl;
 import com.sun.ws.rest.impl.dispatch.URITemplateDispatcher;
-import com.sun.ws.rest.spi.dispatch.Dispatcher;
+import com.sun.ws.rest.spi.dispatch.ResourceDispatcher;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
@@ -36,7 +36,7 @@ import java.util.List;
  *
  * @author Paul.Sandoz@Sun.Com
  */
-public class BaseResourceClass implements Dispatcher {
+public abstract class BaseResourceClass implements ResourceDispatcher {
     
     protected final List<URITemplateDispatcher> dispatchers;
     
@@ -44,9 +44,9 @@ public class BaseResourceClass implements Dispatcher {
         this.dispatchers = new ArrayList<URITemplateDispatcher>();
     }
     
-    // Dispatcher 
+    // ResourceDispatcher 
     
-    public boolean dispatch(DispatchContext context, Object node, String path) {
+    public boolean dispatch(ResourceDispatchContext context, Object node, String path) {
         for (final URITemplateDispatcher d : dispatchers) {
             if (context.matchLeftHandPath(d.getTemplate(), path)) {
                 // Get the right hand side of the path
@@ -72,7 +72,7 @@ public class BaseResourceClass implements Dispatcher {
         return false;
     }
     
-    private boolean redirect(DispatchContext context) {
+    private boolean redirect(ResourceDispatchContext context) {
         HttpRequestContext request = context.getHttpRequestContext();
         HttpResponseContext response = context.getHttpResponseContext();
         

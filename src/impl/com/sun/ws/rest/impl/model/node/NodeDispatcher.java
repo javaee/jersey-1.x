@@ -26,7 +26,7 @@ import javax.ws.rs.WebApplicationException;
 import com.sun.ws.rest.api.container.ContainerException;
 import com.sun.ws.rest.api.core.HttpRequestContext;
 import com.sun.ws.rest.impl.dispatch.URITemplateDispatcher;
-import com.sun.ws.rest.spi.dispatch.DispatchContext;
+import com.sun.ws.rest.spi.dispatch.ResourceDispatchContext;
 import com.sun.ws.rest.impl.model.parameter.ParameterExtractor;
 import com.sun.ws.rest.spi.dispatch.URITemplateType;
 import java.lang.reflect.InvocationTargetException;
@@ -54,7 +54,7 @@ class NodeDispatcher extends URITemplateDispatcher {
         }
     }
 
-    public boolean dispatch(DispatchContext context, Object node, String path) {
+    public boolean dispatch(ResourceDispatchContext context, Object node, String path) {
         try {
             if (extractors.length == 0) {
                 node = m.invoke(node);

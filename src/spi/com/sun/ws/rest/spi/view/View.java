@@ -22,12 +22,8 @@
 
 package com.sun.ws.rest.spi.view;
 
-import com.sun.ws.rest.api.container.ContainerException;
-import com.sun.ws.rest.api.core.HttpRequestContext;
-import com.sun.ws.rest.api.core.HttpResponseContext;
-import com.sun.ws.rest.spi.container.ContainerResponse;
-import java.io.IOException;
-import java.io.OutputStream;
+import com.sun.ws.rest.spi.dispatch.RequestDispatcher;
+import javax.ws.rs.core.MediaType;
 
 /**
  * A view (connetected to a resource) that is capable of producing a 
@@ -35,16 +31,10 @@ import java.io.OutputStream;
  *
  * @author Paul.Sandoz@Sun.Com
  */
-public interface View {
+public interface View extends RequestDispatcher {
 
     /**
-     * Process a view writing the contents of processing to the {@link OutputStream}
-     * obtained from {@link ContainerResponse#getOutputStream()}
-     *
-     * @param it the object to be passed to the view.
-     * @param request the HTTP request.
-     * @param response the HTTP response.
+     * Get the media type produced by the view
      */
-    void process(Object it, 
-            HttpRequestContext request, HttpResponseContext response) throws IOException, ContainerException;
+    MediaType getProduceMime();    
 }

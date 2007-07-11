@@ -25,9 +25,13 @@ package com.sun.ws.rest.impl.container.servlet;
 import com.sun.ws.rest.api.container.ContainerException;
 import com.sun.ws.rest.api.core.HttpRequestContext;
 import com.sun.ws.rest.api.core.HttpResponseContext;
-import com.sun.ws.rest.spi.view.View;
 import com.sun.ws.rest.spi.view.ViewProvider;
+import com.sun.ws.rest.spi.view.View;
 import java.io.IOException;
+import java.net.MalformedURLException;
+import java.util.ArrayList;
+import java.util.List;
+import javax.ws.rs.core.MediaType;
 
 /**
  *
@@ -36,31 +40,43 @@ import java.io.IOException;
 public class JSPViewProvider implements ViewProvider {
     
     static final class JSPView implements View {
-        final String path;
+        private final String path;
+        private final MediaType mediaType;
         
         JSPView(String path) {
             this.path = path;
+            this.mediaType = new MediaType("text/html");
         }
                 
-        public void process(Object it, 
-                HttpRequestContext request, HttpResponseContext response) throws IOException, ContainerException {
+        public void dispatch(Object it, 
+                HttpRequestContext request, HttpResponseContext response) {
             ((HttpResponseAdaptor)response).forwardTo(path, it);                
+        }
+
+        public MediaType getProduceMime() {
+            return mediaType;
         }
     }
     
-    public View createView(HttpRequestContext request, Object it, String resource) throws ContainerException {
-        if (resource.endsWith(".jsp")) {
-            if (!(request instanceof HttpRequestAdaptor)) {
-                throw new ContainerException("Java Server Pages not supported by the container");
-            }
-
-            // TODO check for relative or absolute path
-            // If relative then use 'it' location to produce
-            // base path
-            
-            return new JSPView(resource);
+    public View createView(Object containerMemento, String absolutePath) throws ContainerException {
+        if (!absolutePath.endsWith(".jsp"))
+            return null;
+        
+        if (!(containerMemento instanceof ServletAdaptor)) {
+            throw new ContainerException("Java Server Pages not supported by the container");
         }
         
-        return null;
+        ServletAdaptor a = (ServletAdaptor)containerMemento;
+        try {
+            if (a.getServletContext().getResource(absolutePath) == null) {
+                // TODO log
+                return null;
+            }
+        } catch (MalformedURLException ex) {
+            // TODO log
+            return null;
+        }
+        
+        return new JSPView(absolutePath);
     }
 }

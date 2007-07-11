@@ -34,28 +34,29 @@ import java.lang.reflect.Method;
  *
  * @author Paul.Sandoz@Sun.Com
  */
-public final class ResourceHttpMethod extends ResourceMethod {
+public final class ResourceHttpMethod extends ResourceJavaMethod {
     /**
      * Common HTTP methods. Other HTTP methods are also supported, e.g. those
      * specified by WebDAV but are not listed here for reasons of conciseness.
      */
     public static final String COMMON_METHODS[] = {GET, POST, PUT, DELETE, HEAD};
     
-    public final HttpRequestDispatcher dispatcher;
-    
-    public ResourceHttpMethod(ResourceClass metaClass, Method method) throws ContainerException {
-        super(metaClass, method);
+    public ResourceHttpMethod(ResourceClass resourceClass, Method method) throws ContainerException {
+        super(resourceClass, method);
+        this.httpMethod = getHttpMethod(method);
         
-        this.dispatcher = ResourceMethodDispatcherFactory.create(this);
+        ResourceMethodData rmd = new ResourceMethodData(method, httpMethod, consumeMime, produceMime);
+        this.dispatcher = ResourceMethodDispatcherFactory.create(rmd);
         if (dispatcher == null) {
             String msg = ImplMessages.NOT_VALID_HTTPMETHOD(method, 
                                                                 httpMethod, 
-                                                                method.getDeclaringClass());
+                                                                resourceClass);
             throw new ContainerException(msg);
         }
     }
     
-    protected String getHttpMethod(HttpMethod httpMethod) throws ContainerException {
+    private String getHttpMethod(Method method) throws ContainerException {
+        HttpMethod httpMethod = method.getAnnotation(HttpMethod.class);
         if (httpMethod == null) {
             throw new ContainerException("Java method is not annotated with HttpMethod");
         }
@@ -72,9 +73,5 @@ public final class ResourceHttpMethod extends ResourceMethod {
         
         throw new ContainerException("The HTTP method cannot be determined from the name of the Java method " +
                 method + " of the class " + method.getDeclaringClass());
-    }
-    
-    public HttpRequestDispatcher getDispatcher() {
-        return dispatcher;
-    }
+    }    
 }

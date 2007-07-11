@@ -27,19 +27,18 @@ import com.sun.ws.rest.api.core.HttpRequestContext;
 
 /**
  * A provider of {@link View} instances.
- *
+ * 
  * @author Paul.Sandoz@Sun.Com
  */
 public interface ViewProvider {
   
     /**
-     * Create a view from a resource.
+     * Create a view.
      * 
-     * @param request the HTTP request
-     * @param it the object associated with the view
-     * @param resource the path to the resource from which the view shall
-     *        be created.
+     * @param containerMemento the container memento
+     * @param absolutePath the absolute path to the view resource from which the 
+     *        view shall be created.
      * @return the view.
      */
-    View createView(HttpRequestContext request, Object it, String resource) throws ContainerException;
+    View createView(Object containerMemento, String absolutePath) throws ContainerException;
 }

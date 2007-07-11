@@ -20,12 +20,30 @@
  *     "Portions Copyrighted [year] [name of copyright owner]"
  */
 
-package com.sun.ws.rest.spi.dispatch;
+package com.sun.ws.rest.impl.model.method;
+
+import com.sun.ws.rest.api.container.ContainerException;
+import com.sun.ws.rest.impl.model.MediaTypeList;
+import java.lang.reflect.Method;
 
 /**
  *
  * @author Paul.Sandoz@Sun.Com
  */
-public interface Dispatcher {
-    boolean dispatch(DispatchContext context, Object node, String path);
+public final class ResourceMethodData {    
+    public final Method method;
+    
+    public final String httpMethod;
+    
+    public final MediaTypeList consumeMime;
+    
+    public final MediaTypeList produceMime;
+        
+    public ResourceMethodData(Method method, String httpMethod, 
+            MediaTypeList consumeMime, MediaTypeList produceMime) throws ContainerException {
+        this.method = method;
+        this.httpMethod = httpMethod;
+        this.consumeMime = consumeMime;
+        this.produceMime = produceMime;        
+    }
 }

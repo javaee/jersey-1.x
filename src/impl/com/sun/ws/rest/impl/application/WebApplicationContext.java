@@ -27,7 +27,7 @@ import com.sun.ws.rest.api.core.HttpContextAccess;
 import com.sun.ws.rest.api.core.HttpRequestContext;
 import com.sun.ws.rest.api.core.HttpResponseContext;
 import com.sun.ws.rest.impl.ResponseBuilderImpl;
-import com.sun.ws.rest.spi.dispatch.DispatchContext;
+import com.sun.ws.rest.spi.dispatch.ResourceDispatchContext;
 import com.sun.ws.rest.impl.model.ResourceClass;
 import com.sun.ws.rest.impl.view.ViewFactory;
 import com.sun.ws.rest.impl.view.ViewType;
@@ -46,7 +46,7 @@ import javax.ws.rs.core.Response;
  *
  * @author Paul.Sandoz@Sun.Com
  */
-final class WebApplicationContext implements HttpContextAccess, ViewType, DispatchContext, WebResourceResolverListener {
+final class WebApplicationContext implements HttpContextAccess, ResourceDispatchContext, WebResourceResolverListener {
     final ContainerRequest request;
     
     final ContainerResponse response;
@@ -68,35 +68,29 @@ final class WebApplicationContext implements HttpContextAccess, ViewType, Dispat
     }
 
     
-    View v;
-
     public Response createLocalForward(String path) throws ContainerException {
-        v = ViewFactory.createView(request, it, path);
+        final View v = ViewFactory.createView(app.containerMomento, path);
         if (v == null) {
             throw new ContainerException("No view for \"" + path + "\"");
         }
 
-        // Set the default view to "text/html"
-        // TODO need to fix this, namely the View should specify the
-        // static media type or set it when the view is processed
-        return ResponseBuilderImpl.ok(this).type("text/html").build();
+        ViewType vt = new ViewType() {
+            public void process() throws IOException, ContainerException {
+                v.dispatch(it, request, response);
+            }
+        };
+        
+        return ResponseBuilderImpl.representation(vt, v.getProduceMime()).build();
     }
 
     
-    // View type
-    
-    public void process() throws IOException, ContainerException {
-        v.process(it, request, response);
-    }    
-
-    
-    // Dispatching logic 
+    // Dispatching fields
     
     Object it;
     
     Map<String, String> templateValues = new HashMap<String, String>();
     
-    // DispatchContext
+    // ResourceDispatchContext
     
     public HttpContextAccess getHttpContext() {
         return this;

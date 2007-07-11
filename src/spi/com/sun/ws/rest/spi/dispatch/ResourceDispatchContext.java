@@ -20,20 +20,29 @@
  *     "Portions Copyrighted [year] [name of copyright owner]"
  */
 
-package com.sun.ws.rest.impl.model.method.dispatch;
+package com.sun.ws.rest.spi.dispatch;
 
-import com.sun.ws.rest.impl.model.method.HttpRequestDispatcher;
-import com.sun.ws.rest.impl.model.method.ResourceMethod;
-import java.lang.reflect.Method;
+import com.sun.ws.rest.api.core.HttpContextAccess;
+import com.sun.ws.rest.api.core.HttpRequestContext;
+import com.sun.ws.rest.api.core.HttpResponseContext;
 
 /**
  *
  * @author Paul.Sandoz@Sun.Com
  */
-public abstract class AbstractResourceMethodDispatcher implements HttpRequestDispatcher {
-    protected final Method method;
+public interface ResourceDispatchContext {
+
+    public HttpContextAccess getHttpContext();
     
-    public AbstractResourceMethodDispatcher(ResourceMethod method) {
-        this.method = method.method;
-    }    
+    public HttpRequestContext getHttpRequestContext();
+    
+    public HttpResponseContext getHttpResponseContext();
+
+    public boolean dispatchTo(Class nodeClass, String path);
+    
+    public boolean dispatchTo(Object node, String path);
+    
+    public boolean matchLeftHandPath(URITemplateType t, String path);
+
+    public String getRightHandPath();
 }

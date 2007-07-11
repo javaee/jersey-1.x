@@ -176,7 +176,7 @@ public abstract class AbstractBeanTester extends TestCase {
             }
         };
 
-        a.initiate(c, null);
+        a.initiate(null, c, null);
 
         // Make the path relative to the base URI
         if (path.length() > 0 && path.charAt(0) == '/')

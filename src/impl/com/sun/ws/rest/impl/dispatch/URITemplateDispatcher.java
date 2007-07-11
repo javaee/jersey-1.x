@@ -23,14 +23,14 @@
 package com.sun.ws.rest.impl.dispatch;
 
 import com.sun.ws.rest.spi.dispatch.URITemplateType;
-import com.sun.ws.rest.spi.dispatch.Dispatcher;
+import com.sun.ws.rest.spi.dispatch.ResourceDispatcher;
 import java.util.Comparator;
 
 /**
  *
  * @author Paul.Sandoz@Sun.Com
  */
-public abstract class URITemplateDispatcher implements Dispatcher {
+public abstract class URITemplateDispatcher implements ResourceDispatcher {
     static public final Comparator<URITemplateDispatcher> COMPARATOR = new Comparator<URITemplateDispatcher>() {
         public int compare(URITemplateDispatcher o1, URITemplateDispatcher o2) {
             return URITemplateType.COMPARATOR.compare(o1.getTemplate(), o2.getTemplate());

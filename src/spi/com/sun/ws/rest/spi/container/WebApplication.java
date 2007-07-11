@@ -34,6 +34,7 @@ import com.sun.ws.rest.spi.resolver.WebResourceResolverFactory;
 public interface WebApplication {
     /**
      * Initiate the Web application.
+     * @param containerMemento the object representing the container
      * @param resourceConfig the resource configuration containing the set
      *        of Web resources to be managed by the Web application.
      * @param resolverFactory the Web resource resolver factory to be used
@@ -41,7 +42,8 @@ public interface WebApplication {
      *        Web resources.
      * @throws IllegalArgumentException if resourceConfig is null.
      */
-    void initiate(ResourceConfig resourceConfig, 
+    void initiate(Object containerMemento,
+            ResourceConfig resourceConfig, 
             WebResourceResolverFactory resolverFactory) throws IllegalArgumentException;
     
     /**

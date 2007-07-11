@@ -23,7 +23,7 @@
 package com.sun.ws.rest.impl.model;
 
 import com.sun.ws.rest.impl.dispatch.URITemplateDispatcher;
-import com.sun.ws.rest.spi.dispatch.DispatchContext;
+import com.sun.ws.rest.spi.dispatch.ResourceDispatchContext;
 import com.sun.ws.rest.spi.dispatch.URITemplateType;
 
 /**
@@ -39,7 +39,7 @@ class ClassDispatcher extends URITemplateDispatcher {
         this.c = c;
     }
 
-    public boolean dispatch(DispatchContext context, Object node, String path) {
+    public boolean dispatch(ResourceDispatchContext context, Object node, String path) {
         return context.dispatchTo(c, path);
     }
     

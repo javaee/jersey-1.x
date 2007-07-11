@@ -1,12 +1,12 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
- * 
- * Copyright 2007 Sun Microsystems, Inc. All rights reserved. 
- * 
+ *
+ * Copyright 2007 Sun Microsystems, Inc. All rights reserved.
+ *
  * The contents of this file are subject to the terms of the Common Development
  * and Distribution License("CDDL") (the "License").  You may not use this file
- * except in compliance with the License. 
- * 
+ * except in compliance with the License.
+ *
  * You can obtain a copy of the License at:
  *     https://jersey.dev.java.net/license.txt
  * See the License for the specific language governing permissions and
@@ -23,24 +23,27 @@
 package com.sun.ws.rest.impl.model.method;
 
 import com.sun.ws.rest.api.container.ContainerException;
+import com.sun.ws.rest.api.core.HttpRequestContext;
+import com.sun.ws.rest.api.core.HttpResponseContext;
+import com.sun.ws.rest.api.core.WebResource;
 import com.sun.ws.rest.impl.model.ResourceClass;
+import com.sun.ws.rest.spi.dispatch.RequestDispatcher;
 import java.lang.reflect.Method;
 
 /**
  *
  * @author Paul.Sandoz@Sun.Com
  */
-public final class ResourceGenericMethod extends ResourceMethod {
-    public final HttpRequestDispatcher dispatcher;
-    
-    public ResourceGenericMethod(ResourceClass metaClass, Method method, HttpRequestDispatcher dispatcher) 
-    throws ContainerException {
+public final class ResourceGenericMethod extends ResourceJavaMethod {
+        
+    public ResourceGenericMethod(ResourceClass metaClass, Method method)
+            throws ContainerException {
         super(metaClass, method);
         
-        this.dispatcher = dispatcher;
-    }
-        
-    public HttpRequestDispatcher getDispatcher() {
-        return dispatcher;
-    }
+        this.dispatcher = new RequestDispatcher() {
+            public void dispatch(Object resource, HttpRequestContext request, HttpResponseContext response) {
+                ((WebResource)resource).handleRequest(request, response);                        
+            }
+        };
+    }    
 }

@@ -122,7 +122,7 @@ public final class HttpResponseAdaptor extends HttpResponseContextImpl {
         return d;
     }
         
-    public void forwardTo(String path, Object it) throws ContainerException {        
+    public void forwardTo(String path, Object it) {        
         d = context.getRequestDispatcher(path);
         if (d == null) {
             throw new ContainerException("No request dispatcher for: " + path);

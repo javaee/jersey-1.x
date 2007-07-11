@@ -27,11 +27,11 @@ import com.sun.ws.rest.api.container.ContainerException;
 import com.sun.ws.rest.api.core.HttpRequestContext;
 import com.sun.ws.rest.api.core.HttpResponseContext;
 import com.sun.ws.rest.impl.ResponseBuilderImpl;
-import com.sun.ws.rest.impl.model.method.HttpRequestDispatcher;
-import com.sun.ws.rest.impl.model.ReflectionHelper;
+import com.sun.ws.rest.spi.dispatch.RequestDispatcher;
 import com.sun.ws.rest.impl.model.parameter.ParameterExtractor;
 import com.sun.ws.rest.impl.model.parameter.ParameterProcessor;
 import com.sun.ws.rest.impl.model.method.ResourceMethod;
+import com.sun.ws.rest.impl.model.method.ResourceMethodData;
 import com.sun.ws.rest.impl.model.parameter.AbstractParameterProcessor;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationTargetException;
@@ -60,12 +60,12 @@ public class EntityParamDispatchProvider implements ResourceMethodDispatchProvid
         }
     }
     
-    static abstract class EntityParamInInvoker extends AbstractResourceMethodDispatcher {        
+    static abstract class EntityParamInInvoker extends ResourceJavaMethodDispatcher {        
         final private ParameterExtractor[] injectors;
         
         final protected MediaType mediaType;
 
-        EntityParamInInvoker(ResourceMethod method, ParameterExtractor[] injectors) {
+        EntityParamInInvoker(ResourceMethodData method, ParameterExtractor[] injectors) {
             super(method);
             this.injectors = injectors;
 
@@ -96,26 +96,26 @@ public class EntityParamDispatchProvider implements ResourceMethodDispatchProvid
     }
     
     static final class VoidOutInvoker extends EntityParamInInvoker {
-        VoidOutInvoker(ResourceMethod method, ParameterExtractor[] injectors) {
+        VoidOutInvoker(ResourceMethodData method, ParameterExtractor[] injectors) {
             super(method, injectors);
         }
 
         @SuppressWarnings("unchecked")
-        public void dispatch(Object resource, HttpRequestContext request, HttpResponseContext response) 
-        throws WebApplicationException, IllegalAccessException, InvocationTargetException {
+        public void _dispatch(Object resource, HttpRequestContext request, HttpResponseContext response) 
+        throws IllegalAccessException, InvocationTargetException {
             final Object[] params = getParams(request);
             method.invoke(resource, params);
         }
     }
     
     static final class TypeOutInvoker extends EntityParamInInvoker {
-        TypeOutInvoker(ResourceMethod method, ParameterExtractor[] injectors) {
+        TypeOutInvoker(ResourceMethodData method, ParameterExtractor[] injectors) {
             super(method, injectors);
         }
 
         @SuppressWarnings("unchecked")
-        public void dispatch(Object resource, HttpRequestContext request, HttpResponseContext response)
-        throws WebApplicationException, IllegalAccessException, InvocationTargetException {
+        public void _dispatch(Object resource, HttpRequestContext request, HttpResponseContext response)
+        throws IllegalAccessException, InvocationTargetException {
             final Object[] params = getParams(request);
             
             Object o = (Object)method.invoke(resource, params);
@@ -125,13 +125,13 @@ public class EntityParamDispatchProvider implements ResourceMethodDispatchProvid
     }
     
     static final class ResponseOutInvoker extends EntityParamInInvoker {
-        ResponseOutInvoker(ResourceMethod method, ParameterExtractor[] injectors) {
+        ResponseOutInvoker(ResourceMethodData method, ParameterExtractor[] injectors) {
             super(method, injectors);
         }
 
         @SuppressWarnings("unchecked")
-        public void dispatch(Object resource, HttpRequestContext requestContext, HttpResponseContext responseContext)
-        throws WebApplicationException, IllegalAccessException, InvocationTargetException {
+        public void _dispatch(Object resource, HttpRequestContext requestContext, HttpResponseContext responseContext)
+        throws IllegalAccessException, InvocationTargetException {
             final Object[] params = getParams(requestContext);
 
             Response r = (Response)method.invoke(resource, params);
@@ -140,13 +140,13 @@ public class EntityParamDispatchProvider implements ResourceMethodDispatchProvid
     }
     
     static final class ObjectOutInvoker extends EntityParamInInvoker {
-        ObjectOutInvoker(ResourceMethod method, ParameterExtractor[] injectors) {
+        ObjectOutInvoker(ResourceMethodData method, ParameterExtractor[] injectors) {
             super(method, injectors);
         }
 
         @SuppressWarnings("unchecked")
-        public void dispatch(Object resource, HttpRequestContext requestContext, HttpResponseContext responseContext)
-        throws WebApplicationException, IllegalAccessException, InvocationTargetException {
+        public void _dispatch(Object resource, HttpRequestContext requestContext, HttpResponseContext responseContext)
+        throws IllegalAccessException, InvocationTargetException {
             final Object[] params = getParams(requestContext);
             
             Object o = method.invoke(resource, params);
@@ -162,7 +162,7 @@ public class EntityParamDispatchProvider implements ResourceMethodDispatchProvid
     }
         
     
-    public HttpRequestDispatcher create(ResourceMethod method) {
+    public RequestDispatcher create(ResourceMethodData method) {
         boolean requireReturnOfRepresentation = false;
         boolean requireNoEntityParameter = false;
         

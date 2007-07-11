@@ -23,10 +23,10 @@
 package com.sun.ws.rest.impl.view;
 
 import com.sun.ws.rest.api.container.ContainerException;
-import com.sun.ws.rest.api.core.HttpRequestContext;
 import com.sun.ws.rest.spi.service.ServiceFinder;
-import com.sun.ws.rest.spi.view.View;
 import com.sun.ws.rest.spi.view.ViewProvider;
+import com.sun.ws.rest.spi.view.ViewProvider;
+import com.sun.ws.rest.spi.view.View;
 
 /**
  *
@@ -45,9 +45,13 @@ public final class ViewFactory {
      *        be created.
      * @return the view.
      */
-    public static View createView(HttpRequestContext request, Object it, String resource) throws ContainerException {
+    public static View createView(Object containerMemento, String absolutePath) throws ContainerException {
         for (ViewProvider vp : ServiceFinder.find(ViewProvider.class)) {
-            View v = vp.createView(request, it, resource);
+            System.out.println(vp);
+        }
+        
+        for (ViewProvider vp : ServiceFinder.find(ViewProvider.class)) {
+            View v = vp.createView(containerMemento, absolutePath);
             if (v != null)
                 return v;
         }

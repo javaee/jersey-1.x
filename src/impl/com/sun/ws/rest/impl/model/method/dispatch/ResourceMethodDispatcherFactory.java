@@ -23,8 +23,8 @@
 package com.sun.ws.rest.impl.model.method.dispatch;
 
 import com.sun.ws.rest.impl.ImplMessages;
-import com.sun.ws.rest.impl.model.method.HttpRequestDispatcher;
-import com.sun.ws.rest.impl.model.method.ResourceMethod;
+import com.sun.ws.rest.spi.dispatch.RequestDispatcher;
+import com.sun.ws.rest.impl.model.method.ResourceMethodData;
 import com.sun.ws.rest.spi.service.ServiceFinder;
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -37,10 +37,10 @@ import java.util.logging.Logger;
 public final class ResourceMethodDispatcherFactory {
     private static final Logger LOGGER = Logger.getLogger(ResourceMethodDispatcherFactory.class.getName());
     
-    public static HttpRequestDispatcher create(ResourceMethod method) {
+    public static RequestDispatcher create(ResourceMethodData method) {
         for (ResourceMethodDispatchProvider ip : ServiceFinder.find(ResourceMethodDispatchProvider.class)) {
             try {
-                HttpRequestDispatcher d = ip.create(method);
+                RequestDispatcher d = ip.create(method);
                 if (d != null)
                     return d;
             } catch (Exception e) {

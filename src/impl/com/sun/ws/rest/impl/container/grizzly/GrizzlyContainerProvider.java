@@ -39,7 +39,8 @@ public class GrizzlyContainerProvider implements ContainerProvider<Adapter> {
         if (type != Adapter.class)
             return null;
         
-        application.initiate(resourceConfig, null);
-        return new GrizzlyContainer(application);
+        GrizzlyContainer c = new GrizzlyContainer(application);
+        application.initiate(c, resourceConfig, null);
+        return c;
     }
 }

@@ -90,7 +90,7 @@ public final class MimeHelper {
     public static final MediaTypeList GENERAL_MEDIA_TYPE_LIST = createMediaTypeList();
     
     private static MediaTypeList createMediaTypeList() {
-        MediaTypeList l = new MediaTypeList(true);
+        MediaTypeList l = new MediaTypeList();
         l.add(GENERAL_MEDIA_TYPE);
         return l;
     }
@@ -151,7 +151,7 @@ public final class MimeHelper {
      * @return the list of MediaType, ordered according to {@link #MEDIA_TYPE_COMPARATOR}.
      */
     public static MediaTypeList createMediaTypes(String[] mediaTypes) {
-        MediaTypeList l = new MediaTypeList(false);
+        MediaTypeList l = new MediaTypeList();
         for (String mediaType : mediaTypes) {
             l.add(new MediaType(mediaType));
         }

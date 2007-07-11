@@ -23,11 +23,11 @@
 package com.sun.ws.rest.impl.model.method.dispatch;
 
 import com.sun.ws.rest.api.container.ContainerException;
-import com.sun.ws.rest.impl.model.method.HttpRequestDispatcher;
-import com.sun.ws.rest.impl.model.method.ResourceMethod;
+import com.sun.ws.rest.spi.dispatch.RequestDispatcher;
+import com.sun.ws.rest.impl.model.method.ResourceMethodData;
 
 /**
- * Service-provider interface for creating {@link HttpRequestDispatcher} instances.
+ * Service-provider interface for creating {@link RequestDispatcher} instances.
  * <p>
  * An implementation (a service-provider) identifies itself by placing a 
  * provider-configuration file (if not already present), 
@@ -43,17 +43,19 @@ import com.sun.ws.rest.impl.model.method.ResourceMethod;
  * parameters) to complex patterns that take type URI and query arguments 
  * and HTTP reuqest headers as typed parameters.
  * 
+ * 
  * @author Paul.Sandoz@Sun.Com
  */
 public interface ResourceMethodDispatchProvider {
     
     /**
-     * Create a {@link HttpRequestDispatcher} according the {@link ResourceMethod} 
+     * Create a {@link RequestDispatcher} according the {@link ResourceMethod} 
      * of a Web resource.
      * <p>
+     * 
      * 
      * @param method the model of a method of a Web resource.
      * @return the dispatcher, otherwise null if it could not be created.
      */
-    HttpRequestDispatcher create(ResourceMethod method) throws ContainerException;    
+    RequestDispatcher create(ResourceMethodData method) throws ContainerException;    
 }

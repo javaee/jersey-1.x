@@ -40,7 +40,8 @@ public final class ProviderContainerProvider implements ContainerProvider<Provid
         if (type != Provider.class)
             return null;
         
-        application.initiate(resourceConfig, null);
-        return new ProviderContainer(application);        
+        ProviderContainer c = new ProviderContainer(application);        
+        application.initiate(c, resourceConfig, null);
+        return c;        
     }
 }

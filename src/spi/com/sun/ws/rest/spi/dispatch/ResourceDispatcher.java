@@ -22,27 +22,10 @@
 
 package com.sun.ws.rest.spi.dispatch;
 
-import com.sun.ws.rest.api.core.HttpContextAccess;
-import com.sun.ws.rest.api.core.HttpRequestContext;
-import com.sun.ws.rest.api.core.HttpResponseContext;
-
 /**
  *
  * @author Paul.Sandoz@Sun.Com
  */
-public interface DispatchContext {
-
-    public HttpContextAccess getHttpContext();
-    
-    public HttpRequestContext getHttpRequestContext();
-    
-    public HttpResponseContext getHttpResponseContext();
-
-    public boolean dispatchTo(Class nodeClass, String path);
-    
-    public boolean dispatchTo(Object node, String path);
-    
-    public boolean matchLeftHandPath(URITemplateType t, String path);
-
-    public String getRightHandPath();
+public interface ResourceDispatcher {
+    boolean dispatch(ResourceDispatchContext context, Object node, String path);
 }

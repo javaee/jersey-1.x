@@ -22,39 +22,46 @@
 
 package com.sun.ws.rest.impl.model.method.dispatch;
 
-import javax.ws.rs.WebApplicationException;
+import com.sun.ws.rest.api.container.ContainerException;
 import com.sun.ws.rest.api.core.HttpRequestContext;
 import com.sun.ws.rest.api.core.HttpResponseContext;
 import com.sun.ws.rest.spi.dispatch.RequestDispatcher;
 import com.sun.ws.rest.impl.model.method.ResourceMethodData;
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 
 /**
  *
  * @author Paul.Sandoz@Sun.Com
  */
-public class HttpReqResDispatchProvider implements ResourceMethodDispatchProvider {
+public abstract class ResourceJavaMethodDispatcher implements RequestDispatcher {
+    protected final Method method;
     
-    static final class HttpReqResDispatcher extends ResourceJavaMethodDispatcher {
-        HttpReqResDispatcher(ResourceMethodData method) {
-            super(method);
-        }
-
-        public void _dispatch(Object resource, HttpRequestContext request, HttpResponseContext response) 
-        throws IllegalAccessException, InvocationTargetException {
-            method.invoke(resource, request, response);
+    public ResourceJavaMethodDispatcher(ResourceMethodData method) {
+        this.method = method.method;
+    }    
+    
+    public final void dispatch(Object resource, 
+            HttpRequestContext request, HttpResponseContext response) {
+        // Invoke the method on the resource
+        try {
+            _dispatch(resource, request, response);
+        } catch (InvocationTargetException e) {
+            Throwable t = e.getTargetException();
+            if (t instanceof RuntimeException) {
+                // Rethrow the runtime exception
+                throw (RuntimeException)t;
+            } else {
+                // TODO should a checked exception be wrapped in 
+                // WebApplicationException ?
+                throw new ContainerException(t);
+            }
+        } catch (IllegalAccessException e) {
+            throw new ContainerException(e);
         }
     }
-
     
-    public RequestDispatcher create(ResourceMethodData method) {
-        if (method.method.getReturnType() != void.class) return null;
-        
-        Class<?>[] parameters = method.method.getParameterTypes();
-        if (parameters.length != 2) return null;
-        if (parameters[0] != HttpRequestContext.class) return null;
-        if (parameters[1] != HttpResponseContext.class) return null;
-                
-        return new HttpReqResDispatcher(method);
-    }
+    protected abstract void _dispatch(Object resource, 
+            HttpRequestContext request, HttpResponseContext response) 
+            throws IllegalAccessException, InvocationTargetException;
 }

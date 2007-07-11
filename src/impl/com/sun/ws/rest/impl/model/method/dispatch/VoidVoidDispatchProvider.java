@@ -25,8 +25,8 @@ package com.sun.ws.rest.impl.model.method.dispatch;
 import javax.ws.rs.WebApplicationException;
 import com.sun.ws.rest.api.core.HttpRequestContext;
 import com.sun.ws.rest.api.core.HttpResponseContext;
-import com.sun.ws.rest.impl.model.method.HttpRequestDispatcher;
-import com.sun.ws.rest.impl.model.method.ResourceMethod;
+import com.sun.ws.rest.spi.dispatch.RequestDispatcher;
+import com.sun.ws.rest.impl.model.method.ResourceMethodData;
 import java.lang.reflect.InvocationTargetException;
 
 /**
@@ -35,19 +35,19 @@ import java.lang.reflect.InvocationTargetException;
  */
 public class VoidVoidDispatchProvider implements ResourceMethodDispatchProvider {
     
-    public static final class VoidVoidMethodInvoker extends AbstractResourceMethodDispatcher {
-        public VoidVoidMethodInvoker(ResourceMethod method) {
+    public static final class VoidVoidMethodInvoker extends ResourceJavaMethodDispatcher {
+        public VoidVoidMethodInvoker(ResourceMethodData method) {
             super(method);
         }
 
-        public void dispatch(Object resource, HttpRequestContext request, HttpResponseContext response) 
-        throws WebApplicationException, IllegalAccessException, InvocationTargetException {
+        public void _dispatch(Object resource, HttpRequestContext request, HttpResponseContext response) 
+        throws IllegalAccessException, InvocationTargetException {
             method.invoke(resource);
         }
     }
     
 
-    public HttpRequestDispatcher create(ResourceMethod method) {
+    public RequestDispatcher create(ResourceMethodData method) {
         if (method.method.getParameterTypes().length != 0) return null;
         if (method.method.getReturnType() != void.class) return null;
         

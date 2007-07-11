@@ -64,7 +64,6 @@ public abstract class HttpResponseContextImpl implements ContainerResponse {
         this.response = (response != null) ? response : EMPTY_RESPONSE;
         this.headers = new ResponseHttpHeadersImpl();
         
-        
         if (response instanceof ResponseImpl) {
             setResponseOptimal((ResponseImpl)response, contentType);
         } else {

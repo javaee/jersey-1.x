@@ -20,19 +20,16 @@
  *     "Portions Copyrighted [year] [name of copyright owner]"
  */
 
-package com.sun.ws.rest.impl.model.method;
+package com.sun.ws.rest.spi.dispatch;
 
-import javax.ws.rs.WebApplicationException;
 import com.sun.ws.rest.api.core.HttpRequestContext;
 import com.sun.ws.rest.api.core.HttpResponseContext;
-import java.lang.reflect.InvocationTargetException;
 
 /**
  *
  * @author Paul.Sandoz@Sun.Com
  */
-public interface HttpRequestDispatcher {
-    public void dispatch(Object resource, HttpRequestContext request, HttpResponseContext response) 
-            throws WebApplicationException, IllegalAccessException, InvocationTargetException;
-    
+public interface RequestDispatcher {
+    public void dispatch(Object resource, 
+            HttpRequestContext requestContext, HttpResponseContext responseContext);    
 }
