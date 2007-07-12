@@ -29,9 +29,9 @@ import com.sun.ws.rest.spi.dispatch.ResourceDispatchContext;
 import com.sun.ws.rest.spi.dispatch.URITemplateType;
 import com.sun.ws.rest.spi.resolver.WebResourceResolverFactory;
 import java.util.Collections;
-import java.util.Map;
 import java.util.Set;
-import java.util.WeakHashMap;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 import javax.ws.rs.UriTemplate;
 
 /**
@@ -43,8 +43,8 @@ public final class RootResourceClass extends BaseResourceClass {
             
     private final WebResourceResolverFactory resolverFactory;
     
-    private final Map<Class, ResourceClass> metaClassMap = new WeakHashMap<Class, ResourceClass>();
-    
+    private final ConcurrentMap<Class, ResourceClass> metaClassMap = new ConcurrentHashMap();
+        
     private final Object containerMemento;
     
     public RootResourceClass(Object containerMemento, ResourceConfig resourceConfig, 
@@ -57,14 +57,23 @@ public final class RootResourceClass extends BaseResourceClass {
     }
     
     public ResourceClass getResourceClass(Class c) {
-        if(c == null) return null;
+        assert c != null;
         
+        // Try the non-blocking read, the most common opertaion
+        ResourceClass rmc = metaClassMap.get(c);
+        if (rmc != null) return rmc;
+                
+        // ResourceClass is not present use a synchronized block
+        // to ensure that only one ResourceClass instance is created
+        // and put to the map
         synchronized(metaClassMap) {
-            ResourceClass rmc = metaClassMap.get(c);
-            if(rmc == null) {
-                rmc = new ResourceClass(containerMemento, c, resourceConfig, resolverFactory);
-                metaClassMap.put(c, rmc);
-            }
+            // One or more threads may have been blocking on the synchronized
+            // block, re-check the map
+            rmc = metaClassMap.get(c);
+            if (rmc != null) return rmc;
+            
+            rmc = new ResourceClass(containerMemento, c, resourceConfig, resolverFactory);
+            metaClassMap.put(c, rmc);
             return rmc;
         }
     }
