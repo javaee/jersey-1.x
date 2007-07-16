@@ -37,39 +37,20 @@ class NodeDispatcher extends URITemplateDispatcher {
     
     final Method m;
 
-    int unmatchedPathExtractorIndex = -1;
-    
     NodeDispatcher(final URITemplateType t, final Method m, ParameterExtractor[] extractors) {
         super(t);
         this.m = m;
-        this.extractors = (extractors == null) ? new ParameterExtractor[0] : extractors;
-        // TODO this is a bit of a hack but the extracting the
-        // unmatched path requires access to a stack-based variable
-        // so UnmatchedPathExtractor is a marker interface.
-        for (int i = 0; i < this.extractors.length; i++) {
-            if (this.extractors[i] instanceof UnmatchedPathExtractor) {
-                this.unmatchedPathExtractorIndex = i;
-                break;   
-            }
-        }
+        this.extractors = extractors;
     }
 
     public boolean dispatch(ResourceDispatchContext context, Object node, String path) {
         try {
-            if (extractors.length == 0) {
+            if (extractors == null) {
                 node = m.invoke(node);
             } else {
                 final Object[] params = new Object[extractors.length];
                 for (int i = 0; i < extractors.length; i++) {
-                    if (unmatchedPathExtractorIndex != i) {
-                        params[i] = extractors[i].extract(context.getHttpRequestContext());
-                    } else {
-                        if (path != null && path.charAt(0) == '/')
-                            path = path.substring(1);
-                        params[i] = path;
-                        // Consume the path
-                        path = null;
-                    }
+                    params[i] = extractors[i].extract(context.getHttpRequestContext());
                 }
                 
                 node = m.invoke(node, params);

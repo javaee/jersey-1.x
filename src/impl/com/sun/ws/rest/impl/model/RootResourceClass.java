@@ -43,7 +43,7 @@ public final class RootResourceClass extends BaseResourceClass {
             
     private final WebResourceResolverFactory resolverFactory;
     
-    private final ConcurrentMap<Class, ResourceClass> metaClassMap = new ConcurrentHashMap();
+    private final ConcurrentMap<Class, ResourceClass> metaClassMap = new ConcurrentHashMap<Class, ResourceClass>();
         
     private final Object containerMemento;
     

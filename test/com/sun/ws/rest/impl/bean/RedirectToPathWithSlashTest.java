@@ -24,7 +24,6 @@ package com.sun.ws.rest.impl.bean;
 
 import com.sun.ws.rest.api.core.HttpResponseContext;
 import javax.ws.rs.HttpMethod;
-import javax.ws.rs.SubResources;
 import javax.ws.rs.UriTemplate;
 import javax.ws.rs.core.Response;
 
@@ -102,13 +101,17 @@ public class RedirectToPathWithSlashTest extends AbstractBeanTester {
     }    
     
     @UriTemplate("/project/")
-    @SubResources({BuildWithSubMethods.class})
     static public class ProjectWithSubResource { 
         @HttpMethod
         public String getMe() {
             return "project";
         }
 
+        @UriTemplate("build/")
+        public BuildWithSubMethods getBuildResource() {
+            return new BuildWithSubMethods();
+        }
+        
         @UriTemplate("/details")
         @HttpMethod
         public String getDetails() {

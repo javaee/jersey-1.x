@@ -26,7 +26,6 @@ import com.sun.ws.rest.impl.view.ViewFactory;
 import javax.ws.rs.ConsumeMime;
 import javax.ws.rs.HttpMethod;
 import javax.ws.rs.ProduceMime;
-import javax.ws.rs.SubResources;
 import javax.ws.rs.UriTemplate;
 import com.sun.ws.rest.api.container.ContainerException;
 import com.sun.ws.rest.api.core.HttpRequestContext;
@@ -34,7 +33,6 @@ import com.sun.ws.rest.api.core.HttpResponseContext;
 import com.sun.ws.rest.api.core.ResourceConfig;
 import com.sun.ws.rest.api.core.WebResource;
 import com.sun.ws.rest.api.view.Views;
-import com.sun.ws.rest.impl.dispatch.DispatcherFactory;
 import com.sun.ws.rest.impl.dispatch.URITemplateDispatcher;
 import com.sun.ws.rest.impl.model.method.ResourceGenericMethod;
 import com.sun.ws.rest.impl.model.method.ResourceHttpMethod;
@@ -49,7 +47,6 @@ import com.sun.ws.rest.spi.resolver.WebResourceResolver;
 import com.sun.ws.rest.spi.resolver.WebResourceResolverFactory;
 import com.sun.ws.rest.spi.view.View;
 import java.lang.reflect.Method;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -93,44 +90,20 @@ public final class ResourceClass extends BaseResourceClass {
         MethodList methods = new MethodList(c);
 
         boolean hasSubResources = false;
-        
-        // Sub-resources as static classes
-        SubResources subResources = c.getAnnotation(SubResources.class);
-        if (subResources != null) {
-            // Remove duplicates
-            Set<Class> subResourceSet = new HashSet<Class>(Arrays.asList(subResources.value()));
-            for (final Class<?> subResource : subResourceSet) {
-                hasSubResources = true;
-
-                UriTemplate tAnnotation = subResource.getAnnotation(UriTemplate.class);
-                if (tAnnotation == null) {
-                    throw new ContainerException("Sub-resource " 
-                            + subResource + 
-                            ", references by resource " 
-                            + c + 
-                            ", is not annotated with a UriTemplate");
-                }
-
-                String tValue = tAnnotation.value();
-                if (!tValue.startsWith("/"))
-                    tValue = "/" + tValue;
-                URITemplateType t = new URITemplateType(tValue, URITemplateType.RIGHT_HANDED_REGEX);
-
-                URITemplateDispatcher d = ClassDispatcherFactory.create(t, subResource);
-                dispatchers.add(d);
-            }
-        }
-        
+                
         
         // Resolver methods
         for (final Method m : methods.hasNotAnnotation(HttpMethod.class).hasAnnotation(UriTemplate.class)) {
             hasSubResources = true;
             
-            String tValue = m.getAnnotation(UriTemplate.class).value();
+            UriTemplate at = m.getAnnotation(UriTemplate.class);
+            String tValue = at.value();
             if (!tValue.startsWith("/"))
                 tValue = "/" + tValue;
-            URITemplateType t = new URITemplateType(
-                    tValue, URITemplateType.RIGHT_HANDED_REGEX);
+            URITemplateType t = (at.limited()) ? new URITemplateType(
+                    tValue, URITemplateType.RIGHT_HANDED_REGEX) : 
+                new URITemplateType(
+                    tValue, URITemplateType.RIGHT_SLASHED_REGEX);
             
             final URITemplateDispatcher d = NodeDispatcherFactory.create(t, m);            
             dispatchers.add(d);

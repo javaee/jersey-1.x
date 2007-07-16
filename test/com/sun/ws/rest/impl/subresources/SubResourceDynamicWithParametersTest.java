@@ -24,7 +24,6 @@ package com.sun.ws.rest.impl.subresources;
 
 import javax.ws.rs.HttpMethod;
 import javax.ws.rs.QueryParam;
-import javax.ws.rs.UnmatchedPath;
 import javax.ws.rs.UriParam;
 import javax.ws.rs.UriTemplate;
 import com.sun.ws.rest.impl.bean.*;
@@ -57,10 +56,10 @@ public class SubResourceDynamicWithParametersTest extends AbstractBeanTester {
             return new ChildWithTemplates();
         }
         
-        @UriTemplate("unmatchedPath/")
+        @UriTemplate(value="unmatchedPath/{path}", limited=false)
         public UnmatchedPathResource getUnmatchedPath(
                 @UriParam("p") String p,
-                @UnmatchedPath String path) {
+                @UriParam("path") String path) {
             assertEquals("parent", p);
             return new UnmatchedPathResource(path);
         }

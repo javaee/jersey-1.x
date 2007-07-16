@@ -64,7 +64,7 @@ public final class HttpResponseAdaptor extends HttpResponseContextImpl {
     
         final Object entity = this.getResponse().getEntity();
         if (entity != null) {
-            final EntityProvider p = ProviderFactory.newInstance().createEntityProvider(entity.getClass());
+            final EntityProvider p = ProviderFactory.getInstance().createEntityProvider(entity.getClass());
             p.writeTo(entity, this.getHttpHeaders(), this.getOutputStream());
         }
     }

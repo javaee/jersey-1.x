@@ -69,7 +69,7 @@ public abstract class AbstractStreamingTester extends TestCase {
         h.add("Content-Type", mediaType);
 
         ByteArrayInputStream in = new ByteArrayInputStream(b);
-        EntityProvider<T> tsp = ProviderFactory.newInstance().createEntityProvider(c);
+        EntityProvider<T> tsp = ProviderFactory.getInstance().createEntityProvider(c);
         return tsp.readFrom(c, mediaType, h, in);
     }
     
@@ -90,7 +90,7 @@ public abstract class AbstractStreamingTester extends TestCase {
         Response r = new ResponseBuilderImpl(rc.getResponse()).type(mediaType).build();
         rc.setResponse(r);
         
-        EntityProvider<T> tsp = ProviderFactory.newInstance().createEntityProvider((Class<T>)t.getClass());
+        EntityProvider<T> tsp = ProviderFactory.getInstance().createEntityProvider((Class<T>)t.getClass());
         tsp.writeTo(t, rc.getHttpHeaders(), rc.getOutputStream());
         return out.toByteArray();
     }

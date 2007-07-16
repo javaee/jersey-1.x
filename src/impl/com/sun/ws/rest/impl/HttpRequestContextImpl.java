@@ -103,7 +103,7 @@ public class HttpRequestContextImpl implements ContainerRequest {
         try {
             String mediaType = headers.getFirst("Content-Type");
             
-            return ProviderFactory.newInstance().createEntityProvider(type).
+            return ProviderFactory.getInstance().createEntityProvider(type).
                     readFrom(type, mediaType, headers, entity);
         } catch (IOException e) {
             throw new IllegalArgumentException(e);
@@ -121,6 +121,10 @@ public class HttpRequestContextImpl implements ContainerRequest {
         return uriPath;
     }
     
+    public String getURIPath(boolean decode) {
+        throw new UnsupportedOperationException();
+    }
+    
     public List<PathSegment> getURIPathSegments() {
         if (pathSegments != null) {
             return pathSegments;
@@ -128,6 +132,10 @@ public class HttpRequestContextImpl implements ContainerRequest {
             
         extractPathSegments(uriPath);
         return pathSegments;
+    }
+    
+    public List<PathSegment> getURIPathSegments(boolean decode) {
+        throw new UnsupportedOperationException();
     }
     
     public URI getBaseURI() {
@@ -151,8 +159,16 @@ public class HttpRequestContextImpl implements ContainerRequest {
         return templateValues;
     }
 
+    public MultivaluedMap<String, String> getURIParameters(boolean decode) {
+        throw new UnsupportedOperationException();        
+    }
+    
     public MultivaluedMap<String, String> getQueryParameters() {
         return queryParameters;
+    }
+    
+    public MultivaluedMap<String, String> getQueryParameters(boolean decode) {
+        throw new UnsupportedOperationException();                
     }
     
     /**

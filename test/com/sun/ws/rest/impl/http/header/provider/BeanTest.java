@@ -68,21 +68,21 @@ public class BeanTest extends AbstractBeanTester {
         String stringValue;
         value = headers.getFirst("Last-Modified");
         stringValue = r.getHeaderValue(value);
-        assertEquals(ProviderFactory.newInstance().
+        assertEquals(ProviderFactory.getInstance().
                 createHeaderProvider(Date.class).
                 toString(new GregorianCalendar(2007, 0, 0, 0, 0, 0).getTime()),
                 stringValue);
         
         value = headers.getFirst("ETag");
         stringValue = r.getHeaderValue(value);
-        assertEquals(ProviderFactory.newInstance().
+        assertEquals(ProviderFactory.getInstance().
                 createHeaderProvider(EntityTag.class).
                 toString(new EntityTag("TAG")),
                 stringValue);
         
         value = headers.getFirst("Location");
         stringValue = r.getHeaderValue(value);
-        assertEquals(ProviderFactory.newInstance().
+        assertEquals(ProviderFactory.getInstance().
                 createHeaderProvider(URI.class).
                 toString(URI.create("/")),
                 stringValue);

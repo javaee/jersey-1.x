@@ -22,7 +22,6 @@
 
 package com.sun.ws.rest.impl.model.node;
 
-import javax.ws.rs.UnmatchedPath;
 import com.sun.ws.rest.api.container.ContainerException;
 import com.sun.ws.rest.impl.ImplMessages;
 import com.sun.ws.rest.impl.dispatch.URITemplateDispatcher;
@@ -84,16 +83,8 @@ public final class NodeDispatcherFactory {
         List<Annotation> l = AbstractParameterProcessor.getAnnotationList(parameterAnnotations);
         
         if (l.size() == 0) {
-            if (AbstractParameterProcessor.hasAnnotation(UnmatchedPath.class, parameterAnnotations)) {
-                if (parameterAnnotations.length > 1) {
-                    // Only one param annotation must be present
-                    return null;
-                }
-                return new UnmatchedPathExtractor();
-            } else {
-                // A param annotation must be present.
-                return null;
-            }
+            // A param annotation must be present.
+            return null;
         } else if (l.size() > 1) {
             // Only one param annotation must be present
             return null;

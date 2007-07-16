@@ -105,7 +105,7 @@ public abstract class HttpResponseContextImpl implements ContainerResponse {
     @SuppressWarnings("unchecked")
     public String getHeaderValue(Object headerValue) {
         // TODO: performance, this is very slow
-        HeaderProvider hp = ProviderFactory.newInstance().createHeaderProvider(headerValue.getClass());
+        HeaderProvider hp = ProviderFactory.getInstance().createHeaderProvider(headerValue.getClass());
         return hp.toString(headerValue);
     }
 }

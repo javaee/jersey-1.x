@@ -1,4 +1,5 @@
-release 0.1.1 (2007-xx-xx)
+release 0.2 (2007-xx-xx)
+- Removed implementation of @SubResources and @UnmatchedPath
 - JSON support added to JAXB entity provider for use with "application/json"
   media type. BadgerFish convention is used.
 - Views refactored to work correctly in combination with HTTP methods
