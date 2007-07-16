@@ -23,12 +23,11 @@
 package com.sun.ws.rest.impl.provider.entity;
 
 import com.sun.ws.rest.impl.ImplMessages;
+import com.sun.ws.rest.impl.util.ThrowHelper;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
-import java.io.StringWriter;
 import java.util.Map;
 import java.util.WeakHashMap;
 import javax.ws.rs.core.MultivaluedMap;
@@ -48,13 +47,13 @@ import org.codehaus.jettison.json.JSONObject;
  * @author Paul.Sandoz@Sun.Com
  */
 public final class JAXBElementProvider extends AbstractTypeEntityProvider<Object> {
-
+    
     static Map<Class, JAXBContext> jaxbContexts = new WeakHashMap<Class, JAXBContext>();
-
+    
     public boolean supports(Class<?> type) {
         return type.getAnnotation(XmlRootElement.class) != null;
     }
-
+    
     public Object readFrom(Class<Object> type, String mediaType, MultivaluedMap<String, String> headers, InputStream entityStream) throws IOException {
         try {
             JAXBContext context = getJAXBContext(type);
@@ -65,21 +64,24 @@ public final class JAXBElementProvider extends AbstractTypeEntityProvider<Object
             } else {
                 try {
                     return unmarshaller.unmarshal(
-                            new BadgerFishXMLStreamReader(new JSONObject(stringFromIS(entityStream))));
-                    
+                            new BadgerFishXMLStreamReader(new JSONObject(readFromAsString(entityStream))));
                 } catch (XMLStreamException xmlStreamException) {
-                    throw (IOException)(new IOException("error parsing json object")).initCause(xmlStreamException);
+                    throw ThrowHelper.withInitCause(xmlStreamException,
+                            new IOException("error parsing json object")
+                            );
                 } catch (JSONException jsonException) {
-                    throw (IOException)(new IOException("error parsing json object")).initCause(jsonException);
+                    throw ThrowHelper.withInitCause(jsonException,
+                            new IOException("error parsing json object")
+                            );
                 }
             }
         } catch (JAXBException cause) {
-            IOException effect = new IOException(ImplMessages.ERROR_MARSHALLING_JAXB(type));
-            effect.initCause(cause);
-            throw effect;
+            throw ThrowHelper.withInitCause(cause,
+                    new IOException(ImplMessages.ERROR_MARSHALLING_JAXB(type))
+                    );
         }
     }
-
+    
     public void writeTo(Object t, MultivaluedMap<String, Object> headers, OutputStream entityStream) throws IOException {
         try {
             JAXBContext context = getJAXBContext(t.getClass());
@@ -91,12 +93,12 @@ public final class JAXBElementProvider extends AbstractTypeEntityProvider<Object
                 marshaller.marshal(t, entityStream);
             }
         } catch (JAXBException cause) {
-            IOException effect = new IOException(ImplMessages.ERROR_MARSHALLING_JAXB(t.getClass()));
-            effect.initCause(cause);
-            throw effect;
+            throw ThrowHelper.withInitCause(cause,
+                    new IOException(ImplMessages.ERROR_MARSHALLING_JAXB(t.getClass()))
+                    );
         }
     }
-
+    
     private JAXBContext getJAXBContext(Class type) throws JAXBException {
         synchronized (jaxbContexts) {
             JAXBContext context = jaxbContexts.get(type);
@@ -105,16 +107,5 @@ public final class JAXBElementProvider extends AbstractTypeEntityProvider<Object
             }
             return context;
         }
-    }
-    
-    private String stringFromIS(InputStream is) throws IOException {
-        InputStreamReader isr = new InputStreamReader(is);
-        StringWriter sw = new StringWriter();
-        int read;
-        char[] cbuf = new char[2048];
-        while ((read = isr.read(cbuf, 0, 2048)) > -1) {
-            sw.write(cbuf, 0, read);
-        }
-        return sw.toString();
     }
 }

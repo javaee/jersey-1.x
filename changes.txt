@@ -1,4 +1,7 @@
 release 0.1.1 (2007-xx-xx)
+- JSON support added to JAXB entity provider for use with "application/json"
+  media type. BadgerFish convention is used.
+- Views refactored to work correctly in combination with HTTP methods
 - removed the @SubResource annotation from the examples
 - removed Entity class, equivalent functionality is supported by the 
   javax.ws.rs.core.HttpHeaders class
