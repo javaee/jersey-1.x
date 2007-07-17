@@ -91,71 +91,21 @@ public final class ResourceClass extends BaseResourceClass {
 
         boolean hasSubResources = false;
                 
-        
-        // Resolver methods
-        for (final Method m : methods.hasNotAnnotation(HttpMethod.class).hasAnnotation(UriTemplate.class)) {
-            hasSubResources = true;
-            
-            UriTemplate at = m.getAnnotation(UriTemplate.class);
-            String tValue = at.value();
-            if (!tValue.startsWith("/"))
-                tValue = "/" + tValue;
-            URITemplateType t = (at.limited()) ? new URITemplateType(
-                    tValue, URITemplateType.RIGHT_HANDED_REGEX) : 
-                new URITemplateType(
-                    tValue, URITemplateType.RIGHT_SLASHED_REGEX);
-            
-            final URITemplateDispatcher d = NodeDispatcherFactory.create(t, m);            
-            dispatchers.add(d);
-        }
-        
-        
-        // Templated HTTP methods
-        Map<URITemplateType, ResourceMethodMap> templatedMethodMap = new HashMap<URITemplateType, ResourceMethodMap>();
-        for (Method m : methods.hasAnnotation(HttpMethod.class).hasAnnotation(UriTemplate.class)) {            
-            String tValue = m.getAnnotation(UriTemplate.class).value();
-            if (!tValue.startsWith("/"))
-                tValue = "/" + tValue;            
-            URITemplateType t = new URITemplateType(tValue, 
-                    URITemplateType.RIGHT_SLASHED_REGEX);
-            
-            ResourceMethod rm = new ResourceHttpMethod(this, m);
-            addToTemplatedMethodMap(templatedMethodMap, t, rm);
-        }        
-        
-        
-        // HTTP methods
-        final ResourceMethodMap methodMap = new ResourceMethodMap();
-        for (Method m : methods.hasAnnotation(HttpMethod.class).hasNotAnnotation(UriTemplate.class)) {
-            ResourceMethod rm = new ResourceHttpMethod(this, m);
-            methodMap.put(rm);
-        }
-        
-        // WebResource interface method for HTTP methods
-        if (WebResource.class.isAssignableFrom(c)) {
-            try {
-                Method m = c.getMethod("handleRequest", HttpRequestContext.class, HttpResponseContext.class);
+        hasSubResources = 
+                processSubResourceLocators(methods);
                 
-                ResourceMethod genericMethod = new ResourceGenericMethod(this, m);
-                
-                // TODO check if the method has a URI template
-                
-                // Add the generic method to the list of all existing methods
-                for (String methodName : methodMap.keySet()) {
-                    methodMap.get(methodName).add(genericMethod);
-                }
-                // Add to the null method to support any methods not declared
-                methodMap.put(genericMethod);
-            } catch (NoSuchMethodException ex) {
-                ex.printStackTrace();
-            }
-        }
+        final Map<URITemplateType, ResourceMethodMap> templatedMethodMap = 
+                processSubResourceMethods(methods);
+
+        final ResourceMethodMap methodMap = 
+                processMethods(methods);
         
-        // Process the views
+        processWebResourceInterface(methodMap);
+                
         processViews(containerMemento, methodMap, templatedMethodMap);
 
         
-        // Process templated HTTP methods
+        // Create the dispatchers for the sub-resource HTTP methods
         for (Map.Entry<URITemplateType, ResourceMethodMap> e : templatedMethodMap.entrySet()) {
             hasSubResources = true;
             
@@ -163,7 +113,7 @@ public final class ResourceClass extends BaseResourceClass {
             dispatchers.add(new ResourceMethodMapDispatcher(e.getKey(), e.getValue()));
         }
         
-        // Process HTTP methods
+        // Create the dispatcher for the HTTP methods
         if (!methodMap.isEmpty()) {
             methodMap.sort();
             dispatchers.add(new ResourceMethodMapDispatcher(URITemplateType.NULL, methodMap));
@@ -173,10 +123,11 @@ public final class ResourceClass extends BaseResourceClass {
         if (dispatchers.isEmpty()) {
             String message = "The class " 
                     + c + 
-                    " does not contain any static sub-resources, HTTP methods or resolving methods";
+                    " does not contain any sub-resource locators, sub-resource HTTP methods or HTTP methods";
             LOGGER.severe(message);
             throw new ContainerException(message);
         }
+
         
         // Sort the dispatchers using the URI template as the primiary sort key
         Collections.sort(dispatchers, URITemplateDispatcher.COMPARATOR);
@@ -203,6 +154,75 @@ public final class ResourceClass extends BaseResourceClass {
         return MimeHelper.createMediaTypes(c.getAnnotation(ProduceMime.class));
     }
     
+    private boolean processSubResourceLocators(MethodList methods) {
+        boolean hasSubResources = false;
+        for (final Method m : methods.hasNotAnnotation(HttpMethod.class).hasAnnotation(UriTemplate.class)) {
+            hasSubResources = true;
+            
+            UriTemplate tAnnotation = m.getAnnotation(UriTemplate.class);
+            String tValue = tAnnotation.value();
+            if (!tValue.startsWith("/"))
+                tValue = "/" + tValue;
+            URITemplateType t = (tAnnotation.limited()) ? new URITemplateType(
+                    tValue, URITemplateType.RIGHT_HANDED_REGEX) : 
+                new URITemplateType(
+                    tValue, URITemplateType.RIGHT_SLASHED_REGEX);
+            
+            final URITemplateDispatcher d = NodeDispatcherFactory.create(t, m);            
+            dispatchers.add(d);
+        }
+        
+        return hasSubResources;
+    }
+    
+    private Map<URITemplateType, ResourceMethodMap> processSubResourceMethods(MethodList methods) {
+        final Map<URITemplateType, ResourceMethodMap> templatedMethodMap = 
+                new HashMap<URITemplateType, ResourceMethodMap>();
+        for (Method m : methods.hasAnnotation(HttpMethod.class).hasAnnotation(UriTemplate.class)) {
+            // TODO what does it mean to support limited=false
+            // for sub-resource methods?
+            String tValue = m.getAnnotation(UriTemplate.class).value();
+            if (!tValue.startsWith("/"))
+                tValue = "/" + tValue;            
+            URITemplateType t = new URITemplateType(tValue, 
+                    URITemplateType.RIGHT_SLASHED_REGEX);
+            
+            ResourceMethod rm = new ResourceHttpMethod(this, m);
+            addToTemplatedMethodMap(templatedMethodMap, t, rm);
+        }
+        return templatedMethodMap;
+    }
+
+    private ResourceMethodMap processMethods(MethodList methods) {
+        final ResourceMethodMap methodMap = new ResourceMethodMap();
+        for (Method m : methods.hasAnnotation(HttpMethod.class).hasNotAnnotation(UriTemplate.class)) {
+            ResourceMethod rm = new ResourceHttpMethod(this, m);
+            methodMap.put(rm);
+        }
+        return methodMap;
+    }
+    
+    private void processWebResourceInterface(ResourceMethodMap methodMap) {
+        if (WebResource.class.isAssignableFrom(c)) {
+            try {
+                Method m = c.getMethod("handleRequest", HttpRequestContext.class, HttpResponseContext.class);
+                
+                ResourceMethod genericMethod = new ResourceGenericMethod(this, m);
+                
+                // TODO check if the method has a URI template
+                
+                // Add the generic method to the list of all existing methods
+                for (String methodName : methodMap.keySet()) {
+                    methodMap.get(methodName).add(genericMethod);
+                }
+                // Add to the null method to support any methods not declared
+                methodMap.put(genericMethod);
+            } catch (NoSuchMethodException ex) {
+                // This should never occur if WebResource is assignable from the class
+                ex.printStackTrace();
+            }
+        }
+    }
     
     private void processViews(Object containerMemento, 
             ResourceMethodMap methodMap, 

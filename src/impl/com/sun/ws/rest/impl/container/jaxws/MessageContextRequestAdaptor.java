@@ -76,7 +76,7 @@ public class MessageContextRequestAdaptor extends HttpRequestContextImpl {
     }
 
     protected void extractQueryParameters() {
-        String query = (String)context.get(QUERY_STRING);
-        extractQueryParameters(query);
+        this.queryString = (String)context.get(QUERY_STRING);
+        this.queryParameters = extractQueryParameters(this.queryString, true);
     }    
 }

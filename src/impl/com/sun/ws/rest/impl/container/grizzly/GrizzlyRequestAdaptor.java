@@ -52,7 +52,8 @@ public class GrizzlyRequestAdaptor  extends HttpRequestContextImpl {
         if (this.uriPath.startsWith("/"))
             this.uriPath = this.uriPath.substring(1);
         
-        extractQueryParameters(request.queryString().toString());
+        this.queryString = request.queryString().toString();
+        this.queryParameters = extractQueryParameters(this.queryString, true);
         try {
             String scheme = request.scheme().toString();
             String host = request.serverName().toString();

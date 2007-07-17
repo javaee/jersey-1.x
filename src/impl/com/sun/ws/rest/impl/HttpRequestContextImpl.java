@@ -32,11 +32,13 @@ import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URLDecoder;
+import java.net.URLEncoder;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import javax.ws.rs.core.Cookie;
 import javax.ws.rs.core.EntityTag;
 import javax.ws.rs.core.MediaType;
@@ -57,6 +59,7 @@ public class HttpRequestContextImpl implements ContainerRequest {
     protected URI uri;
     protected URI baseURI;
     protected String uriPath;
+    protected String queryString;
     protected MultivaluedMap<String, String> queryParameters;
     protected MultivaluedMap<String, String> templateValues;
     protected List<PathSegment> pathSegments;
@@ -85,16 +88,18 @@ public class HttpRequestContextImpl implements ContainerRequest {
         this.baseURI = URI.create(baseURI);
     }
     
-    public HttpRequestContextImpl(String method, String uriPath, URI baseURI, String queryParameters,
+    public HttpRequestContextImpl(String method, String uriPath, URI baseURI, String queryString,
             InputStream entity) {
         this(method, uriPath, baseURI, entity);
-        extractQueryParameters(queryParameters);
+        this.queryString = queryString;
+        this.queryParameters = extractQueryParameters(queryString, true);
     }
     
-    public HttpRequestContextImpl(String method, String uriPath, String baseURI, String queryParameters,
+    public HttpRequestContextImpl(String method, String uriPath, String baseURI, String queryString,
             InputStream entity) {
         this(method, uriPath, baseURI, entity);
-        extractQueryParameters(queryParameters);
+        this.queryString = queryString;
+        this.queryParameters = extractQueryParameters(queryString, true);
     }
         
     // HttpRequestContext 
@@ -122,7 +127,11 @@ public class HttpRequestContextImpl implements ContainerRequest {
     }
     
     public String getURIPath(boolean decode) {
-        throw new UnsupportedOperationException();
+        if (decode) {
+            return uriPath;
+        } else {
+            return baseURI.relativize(getURI()).getRawPath();
+        }
     }
     
     public List<PathSegment> getURIPathSegments() {
@@ -130,12 +139,16 @@ public class HttpRequestContextImpl implements ContainerRequest {
             return pathSegments;
         }
             
-        extractPathSegments(uriPath);
+        pathSegments = extractPathSegments(uriPath, true);
         return pathSegments;
     }
     
     public List<PathSegment> getURIPathSegments(boolean decode) {
-        throw new UnsupportedOperationException();
+        if (decode) {
+            return getURIPathSegments();
+        } else {
+            return extractPathSegments(getURIPath(false), false);
+        }
     }
     
     public URI getBaseURI() {
@@ -160,7 +173,23 @@ public class HttpRequestContextImpl implements ContainerRequest {
     }
 
     public MultivaluedMap<String, String> getURIParameters(boolean decode) {
-        throw new UnsupportedOperationException();        
+        if (decode) {
+            return templateValues;
+        } else {
+            MultivaluedMapImpl encodedTemplateValues = new MultivaluedMapImpl();
+            for (Map.Entry<String, List<String>> e : templateValues.entrySet()) {
+                List<String> l = new ArrayList<String>();
+                for (String v : e.getValue()) {
+                    try {
+                        l.add(URLEncoder.encode(v, "UTF-8"));
+                    } catch (UnsupportedEncodingException ex) {
+                        ex.printStackTrace();
+                    }
+                }
+                encodedTemplateValues.put(e.getKey(), l);
+            }
+            return encodedTemplateValues;
+        }
     }
     
     public MultivaluedMap<String, String> getQueryParameters() {
@@ -168,7 +197,11 @@ public class HttpRequestContextImpl implements ContainerRequest {
     }
     
     public MultivaluedMap<String, String> getQueryParameters(boolean decode) {
-        throw new UnsupportedOperationException();                
+        if (decode) {
+            return queryParameters;
+        } else {
+            return extractQueryParameters(queryString, false);
+        }
     }
     
     /**
@@ -239,11 +272,11 @@ public class HttpRequestContextImpl implements ContainerRequest {
      * Extract the path segments from the path
      * TODO: This is not very efficient
      */
-    protected void extractPathSegments(String path) {
-        pathSegments = new LinkedList<PathSegment>();
+    protected List<PathSegment> extractPathSegments(String path, boolean decode) {
+        List<PathSegment> pathSegments = new LinkedList<PathSegment>();
         
         if (path == null)
-            return;
+            return pathSegments;
         
         // TODO the extraction algorithm requires an absolute path
         if (!path.startsWith("/")) {
@@ -254,7 +287,7 @@ public class HttpRequestContextImpl implements ContainerRequest {
         if (subPaths.length == 0) {
             PathSegment pathSegment = new PathSegmentImpl("", new MultivaluedMapImpl());
             pathSegments.add(pathSegment);
-            return;
+            return pathSegments;
         }
         
         for (String subPath : subPaths) {
@@ -266,12 +299,14 @@ public class HttpRequestContextImpl implements ContainerRequest {
             if (colon != -1) {
                 String matrixParameters = subPath.substring(colon + 1);
                 subPath = (colon == 0) ? "" : subPath.substring(0, colon);
-                extractParameters(matrixParameters, ";", matrixMap);
+                extractParameters(matrixParameters, ";", matrixMap, decode);
             }
             
             PathSegment pathSegment = new PathSegmentImpl(subPath, matrixMap);
             pathSegments.add(pathSegment);
         }
+        
+        return pathSegments;
     }
     
     /**
@@ -279,33 +314,34 @@ public class HttpRequestContextImpl implements ContainerRequest {
      * them to the query parameters map.
      * TODO: This is not very efficient
      */
-    protected void extractQueryParameters(String queryString) {
-        queryParameters = new MultivaluedMapImpl();
+    protected MultivaluedMap<String, String> extractQueryParameters(String queryString, boolean decode) {
+        MultivaluedMap<String, String> queryParameters = new MultivaluedMapImpl();
         
         if (queryString == null || queryString.length() == 0)
-            return;
+            return queryParameters;
         
-        extractParameters(queryString, "&", queryParameters);
+        extractParameters(queryString, "&", queryParameters, decode);
+        return queryParameters;
     }
     
     /**
      * TODO: This is not very efficient
      */
     protected void extractParameters(String parameters, String deliminator, 
-            MultivaluedMap<String, String> map) {
+            MultivaluedMap<String, String> map, boolean decode) {
         for (String s : parameters.split(deliminator)) {
             if (s.length() == 0)
                 continue;
             
             String[] keyVal = s.split("=");
             try {
-                String key = URLDecoder.decode(keyVal[0], "UTF-8");
+                String key = (decode) ? URLDecoder.decode(keyVal[0], "UTF-8") : keyVal[0];
                 if (key.length() == 0)
                     continue;
                 
                 // Query parameter may not have a value, if so default to "";
                 String val = (keyVal.length == 2) ? 
-                    URLDecoder.decode(keyVal[1], "UTF-8") : "";
+                    (decode) ? URLDecoder.decode(keyVal[1], "UTF-8") : keyVal[1] : "";
                 
                 List<String> list = map.get(key);
                 if (map.get(key) == null) {

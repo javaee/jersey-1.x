@@ -46,7 +46,8 @@ public class HttpRequestAdaptor extends HttpRequestContextImpl {
         super(request.getMethod(), request.getInputStream());
         this.request = request;
         
-        extractQueryParameters(request.getQueryString());
+        this.queryString = request.getQueryString();
+        this.queryParameters = extractQueryParameters(this.queryString, true);
         setURIs();
         copyHttpHeaders();
     }

@@ -22,7 +22,6 @@
 
 package com.sun.ws.rest.impl.model;
 
-import com.sun.ws.rest.api.container.ContainerException;
 import com.sun.ws.rest.api.core.ResourceConfig;
 import com.sun.ws.rest.impl.dispatch.URITemplateDispatcher;
 import com.sun.ws.rest.spi.dispatch.ResourceDispatchContext;
@@ -78,38 +77,32 @@ public final class RootResourceClass extends BaseResourceClass {
         }
     }
     
-    public void add(Set<Class> resourceClasses) throws ContainerException {
+    public void add(Set<Class> resourceClasses) {
         for (Class resourceClass : resourceClasses)
             addResource(resourceClass);
         
         Collections.sort(dispatchers, URITemplateDispatcher.COMPARATOR);
     }
     
-    public void add(Class<?>... resourceClasses) throws ContainerException {
+    public void add(Class<?>... resourceClasses) {
         for (Class resourceClass : resourceClasses)
             addResource(resourceClass);
         
         Collections.sort(dispatchers, URITemplateDispatcher.COMPARATOR);
     }
     
-    private void addResource(final Class<?> c) throws ContainerException {
+    private void addResource(final Class<?> c) {
         final UriTemplate tAnnotation = c.getAnnotation(UriTemplate.class);
         if (tAnnotation == null)
             return;
 
-        String tValue = tAnnotation.value();
-        
-        if (!tValue.startsWith("/")) {
-            throw new ContainerException(
-                    "The URI template " 
-                    + tAnnotation.value() + 
-                    ", of class "
-                    + c +
-                    ", is not an absolute path (it does not start with a '/' character)");
-        }
-        
         ResourceClass resourceClass = getResourceClass(c);
 
+        // TODO what does it mean to support limited=false
+        // when there are sub-resources present?
+        String tValue = tAnnotation.value();
+        if (!tValue.startsWith("/"))
+            tValue = "/" + tValue;
         String rightHandPattern = (resourceClass.hasSubResources) ? 
                 URITemplateType.RIGHT_HANDED_REGEX : URITemplateType.RIGHT_SLASHED_REGEX;
         URITemplateType t = new URITemplateType(tValue, rightHandPattern);
