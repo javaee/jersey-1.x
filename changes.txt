@@ -1,4 +1,6 @@
 release 0.2 (2007-xx-xx)
+- WebApplication.initiate can only be called once. Throw exception on subsequent
+  calls.
 - Removed implementation of @SubResources and @UnmatchedPath
 - JSON support added to JAXB entity provider for use with "application/json"
   media type. BadgerFish convention is used.

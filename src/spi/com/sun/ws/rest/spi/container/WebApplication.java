@@ -34,6 +34,9 @@ import com.sun.ws.rest.spi.resolver.WebResourceResolverFactory;
 public interface WebApplication {
     /**
      * Initiate the Web application.
+     * <p>
+     * This method can only be called once. Further calls will result in an
+     * exception.
      * @param containerMemento the object representing the container
      * @param resourceConfig the resource configuration containing the set
      *        of Web resources to be managed by the Web application.
@@ -41,10 +44,13 @@ public interface WebApplication {
      *        for creating Web resource resolvers for the managed set of 
      *        Web resources.
      * @throws IllegalArgumentException if resourceConfig is null.
+     * @throws ContainerException if a second or further call to the method 
+     *         is invoked.
      */
     void initiate(Object containerMemento,
             ResourceConfig resourceConfig, 
-            WebResourceResolverFactory resolverFactory) throws IllegalArgumentException;
+            WebResourceResolverFactory resolverFactory) 
+            throws IllegalArgumentException, ContainerException;
     
     /**
      * Handle an HTTP request by dispatching the request to the appropriate

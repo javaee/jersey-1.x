@@ -77,14 +77,14 @@ public final class RootResourceClass extends BaseResourceClass {
         }
     }
     
-    public void add(Set<Class> resourceClasses) {
+    private void add(Set<Class> resourceClasses) {
         for (Class resourceClass : resourceClasses)
             addResource(resourceClass);
         
         Collections.sort(dispatchers, URITemplateDispatcher.COMPARATOR);
     }
     
-    public void add(Class<?>... resourceClasses) {
+    private void add(Class<?>... resourceClasses) {
         for (Class resourceClass : resourceClasses)
             addResource(resourceClass);
         

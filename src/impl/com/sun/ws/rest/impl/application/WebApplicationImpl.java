@@ -48,7 +48,9 @@ import java.net.URI;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -69,6 +71,8 @@ import javax.ws.rs.core.UriInfo;
  * @author Paul.Sandoz@Sun.Com
  */
 public final class WebApplicationImpl implements WebApplication {
+    boolean initiated;
+    
     ResourceConfig resourceConfig;
     
     RootResourceClass rootResourceClass;
@@ -126,10 +130,25 @@ public final class WebApplicationImpl implements WebApplication {
         if (resourceConfig == null)
             throw new IllegalArgumentException();
         
+        if (initiated)
+            throw new ContainerException("Web application is already initiated");
+        
+        this.initiated = true;
         this.resourceConfig = resourceConfig;
         this.rootResourceClass = new RootResourceClass(containerMomento, resourceConfig, resolverFactory);
     }
 
+    public void register(Class... resourceClasses) {
+        Set<Class> resourceClassesSet = new HashSet<Class>(
+                Arrays.asList(resourceClasses));
+        register(resourceClassesSet);
+    }
+  
+    public void register(Set<Class> resourceClasses) {
+        // TODO, dynamically add resource classes to initiated web application
+        throw new UnsupportedOperationException();
+    }
+    
     public void handleRequest(ContainerRequest request, ContainerResponse response) {
         final WebApplicationContext localContext = new WebApplicationContext(this, request, response);        
         context.set(localContext);
