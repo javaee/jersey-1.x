@@ -1,9 +1,14 @@
 release 0.2 (2007-xx-xx)
+- fixed WADL generation not correctly determining the HTTP method from 
+  @HttpMethod Java method name.
 - WebApplication.initiate can only be called once. Throw exception on subsequent
   calls.
-- Removed implementation of @SubResources and @UnmatchedPath
-- JSON support added to JAXB entity provider for use with "application/json"
-  media type. BadgerFish convention is used.
+- Removed implementation of @SubResources, equivalent functionality supported 
+  by sub-resource locator methods.
+- Removed implementation of @UnmatchedPath, equivalent functionality supported 
+  by greedy parameter on @UriTemplate.
+- JSON support added to JAXB entity provider for use with "application/json",
+  media type. BadgerFish convention is used. Runtime dependency on jettison jar.
 - Views refactored to work correctly in combination with HTTP methods
 - removed the @SubResource annotation from the examples
 - removed Entity class, equivalent functionality is supported by the 
@@ -13,8 +18,8 @@ release 0.2 (2007-xx-xx)
 - fixed the formatting of java.util.Date for HTTP-date to conform to RFC 1123
 - refactored API/SPI messages
 - include jersey API/SPI javadoc
-- URIs and URI templates with escaped space character throw exception for URI.create,
-  found by Julian Reschke:
+- URIs and URI templates with escaped space character throw exception for 
+  URI.create, found by Julian Reschke:
   https://jersey.dev.java.net/servlets/ReadMsg?list=dev&msgNo=1 
 - include version information in manifest of jersey.jar
 

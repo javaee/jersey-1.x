@@ -44,10 +44,16 @@ import com.sun.mirror.type.VoidType;
 import com.sun.mirror.type.WildcardType;
 import com.sun.mirror.util.SimpleTypeVisitor;
 import com.sun.mirror.util.TypeVisitor;
+import com.sun.ws.rest.impl.model.method.ResourceHttpMethod;
 import com.sun.ws.rest.tools.annotation.AnnotationProcessorContext;
 import com.sun.ws.rest.tools.annotation.Method;
 import com.sun.ws.rest.tools.annotation.Param;
 import com.sun.ws.rest.tools.annotation.Resource;
+import com.sun.ws.rest.tools.wadl.resource.WadlResourceGenerator;
+import com.sun.ws.rest.tools.wadl.writer.WadlWriter;
+import com.sun.ws.rest.tools.webapp.WebResourcesGenerator;
+import com.sun.ws.rest.tools.webapp.writer.WebAppWriter;
+import com.sun.ws.rest.tools.Messager;
 import javax.ws.rs.ConsumeMime;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.HttpMethod;
@@ -55,11 +61,6 @@ import javax.ws.rs.ProduceMime;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.UriParam;
 import javax.ws.rs.UriTemplate;
-import com.sun.ws.rest.tools.wadl.resource.WadlResourceGenerator;
-import com.sun.ws.rest.tools.wadl.writer.WadlWriter;
-import com.sun.ws.rest.tools.webapp.WebResourcesGenerator;
-import com.sun.ws.rest.tools.webapp.writer.WebAppWriter;
-import com.sun.ws.rest.tools.Messager;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -268,7 +269,9 @@ public class UriTemplateProcessor implements Messager, AnnotationProcessor {
                         md.getSimpleName(), r.getClassName());
                 return;
             }
-            Method m = new Method(httpMethod.value(), r);
+            Method m = new Method(
+                    ResourceHttpMethod.getHttpMethod(httpMethod, md.getSimpleName()),
+                    r);
             ConsumeMime c = md.getAnnotation(ConsumeMime.class);
             if (c != null)
                 m.setConsumes(c.value());

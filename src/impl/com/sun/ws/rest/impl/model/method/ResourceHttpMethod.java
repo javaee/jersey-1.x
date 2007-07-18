@@ -61,17 +61,25 @@ public final class ResourceHttpMethod extends ResourceJavaMethod {
             throw new ContainerException("Java method is not annotated with HttpMethod");
         }
 
+        String methodName = getHttpMethod(httpMethod, method.getName());
+        if (methodName.length() > 0)
+            return methodName;
+        
+        throw new ContainerException("The HTTP method cannot be determined from the name of the Java method " +
+                method + " of the class " + method.getDeclaringClass());
+    }    
+    
+    public static String getHttpMethod(HttpMethod httpMethod, String javaMethodName) throws ContainerException {
         if (httpMethod.value().length() > 0)
             return httpMethod.value();
         
-        String methodName = method.getName().toUpperCase();
+        String methodName = javaMethodName.toUpperCase();
         for (String m : COMMON_METHODS) {
             if (methodName.startsWith(m)) {
                 return m;
             }
         }
-        
-        throw new ContainerException("The HTTP method cannot be determined from the name of the Java method " +
-                method + " of the class " + method.getDeclaringClass());
+
+        return "";
     }    
 }
