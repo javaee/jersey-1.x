@@ -1,4 +1,6 @@
 release 0.2 (2007-xx-xx)
+- fixed WADL generation mixing up produce/consume information when generating
+  responses.
 - fixed WADL generation not correctly determining the HTTP method from 
   @HttpMethod Java method name.
 - WebApplication.initiate can only be called once. Throw exception on subsequent

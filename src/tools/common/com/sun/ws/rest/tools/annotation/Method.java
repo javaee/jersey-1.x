@@ -58,7 +58,7 @@ public class Method {
     }
 
     public String getProduces() {
-        return combineMimeTypeArray((produces != null) ? consumes : parent.getProduces());
+        return combineMimeTypeArray((produces != null) ? produces : parent.getProduces());
     }
 
     public void setProduces(String... produces) {
