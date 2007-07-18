@@ -52,7 +52,7 @@ public class TempRedirectTest extends AbstractBeanTester {
 
         HttpResponseContext response = callNoStatusCheck(Resource.class, "GET", "/", 
             null, "", "");
-        assertEquals(307, response.getResponse().getStatus());
+        assertEquals(307, response.getStatus());
         String location = response.getHttpHeaders().getFirst("Location").toString();
         assertEquals(getBaseUri().toASCIIString() + "subpath", location);
     }   

@@ -56,7 +56,7 @@ public class ContentTypeOverrideTest extends AbstractBeanTester {
         HttpResponseContext response = callNoStatusCheck(WebResourceOverride.class, "GET", "/", 
                 null, "application/foo, application/bar", "");
         
-        assertEquals(200, response.getResponse().getStatus());
+        assertEquals(200, response.getStatus());
         
         Object contentType = response.getHttpHeaders().getFirst("Content-Type");
         assertEquals("application/foo", contentType);

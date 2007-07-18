@@ -52,7 +52,7 @@ public class GrizzlyResponseAdaptor extends HttpResponseContextImpl {
     
     @SuppressWarnings("unchecked")
     public void commit() throws IOException {
-        response.setStatus(this.getResponse().getStatus());
+        response.setStatus(this.getStatus());
         MimeHeaders mh = response.getMimeHeaders();
         for (Map.Entry<String, List<Object>> e : this.getHttpHeaders().entrySet()) {
             String key = e.getKey();
@@ -63,7 +63,7 @@ public class GrizzlyResponseAdaptor extends HttpResponseContextImpl {
         }
 
         
-        Object entity = this.getResponse().getEntity();
+        Object entity = this.getEntity();
         if (entity != null) {
             response.setContentType(mh.getValue("Content-Type").getString());
         }

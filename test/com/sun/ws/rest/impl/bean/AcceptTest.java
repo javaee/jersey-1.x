@@ -69,34 +69,34 @@ public class AcceptTest extends AbstractBeanTester {
     public void testAcceptGet() {
         HttpResponseContext r = callGet(WebResource.class, "/", 
                 "application/foo");
-        String rep = (String)r.getResponse().getEntity();
+        String rep = (String)r.getEntity();
         assertEquals("foo", rep);
         
         r = callGet(WebResource.class, "/", 
                 "application/foo;q=0.1");
-        rep = (String)r.getResponse().getEntity();
+        rep = (String)r.getEntity();
         assertEquals("foo", rep);
         
         r = callGet(WebResource.class, "/", 
                 "application/foo, application/bar;q=0.4, application/baz;q=0.2");
-        rep = (String)r.getResponse().getEntity();
+        rep = (String)r.getEntity();
         assertEquals("foo", rep);
         
         r = callGet(WebResource.class, "/", 
                 "application/foo;q=0.4, application/bar, application/baz;q=0.2");
-        rep = (String)r.getResponse().getEntity();
+        rep = (String)r.getEntity();
         assertEquals("bar", rep);
         
         r = callGet(WebResource.class, "/", 
                 "application/foo;q=0.4, application/bar;q=0.2, application/baz");
-        rep = (String)r.getResponse().getEntity();
+        rep = (String)r.getEntity();
         assertEquals("baz", rep);
     }   
     
     public void testAcceptGetWildCard() {
         HttpResponseContext r = callGet(WebResource.class, "/", 
                 "application/wildcard, application/foo;q=0.6, application/bar;q=0.4, application/baz;q=0.2");
-        String rep = (String)r.getResponse().getEntity();
+        String rep = (String)r.getEntity();
         assertEquals("wildcard", rep);
     }   
     
@@ -104,13 +104,13 @@ public class AcceptTest extends AbstractBeanTester {
         HttpResponseContext response = callNoStatusCheck(
                 WebResource.class, "GET", "/", 
                 null, "application/foo;q=1.1", "");
-        assertEquals(400, response.getResponse().getStatus());        
+        assertEquals(400, response.getStatus());        
     }
     
     public void testQualityErrorMoreThanThreeDigits() {
         HttpResponseContext response = callNoStatusCheck(
                 WebResource.class, "GET", "/", 
                 null, "application/foo;q=0.1234", "");
-        assertEquals(400, response.getResponse().getStatus());        
+        assertEquals(400, response.getStatus());        
     }
 }

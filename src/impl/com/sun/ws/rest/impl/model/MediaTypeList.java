@@ -33,4 +33,25 @@ import java.util.ArrayList;
  * @author Paul.Sandoz@Sun.Com
  */
 public final class MediaTypeList extends ArrayList<MediaType> {
+    public boolean equals(Object o) {
+        if (this == o)
+            return true;
+        
+        if (o == null)
+            return false;
+        
+        if (!(o instanceof MediaTypeList))
+            return false;
+        
+        MediaTypeList that = (MediaTypeList)o;
+        
+        if (this.size() != that.size())
+            return false;
+        
+        for (int i = 0; i < this.size(); i++)
+            if (!this.get(i).equals(that.get(i)))
+                return false;
+            
+         return true;
+    }
 }

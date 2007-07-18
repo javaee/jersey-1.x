@@ -42,13 +42,15 @@ public abstract class HttpResponseContextImpl implements ContainerResponse {
             
     private final HttpRequestContext requestContext;
     
-    private Response response;
+    private int status;
     
     private MultivaluedMap<String, Object> headers;
     
+    private Object entity;
+    
     public HttpResponseContextImpl(HttpRequestContext requestContext) {
         this.requestContext = requestContext;
-        this.response = EMPTY_RESPONSE;
+        this.status = EMPTY_RESPONSE.getStatus();
     }
 
     // HttpResponseContext
@@ -61,21 +63,43 @@ public abstract class HttpResponseContextImpl implements ContainerResponse {
         if (contentType == null)
             contentType = APPLICATION_OCTET_STREAM;
         
-        this.response = (response != null) ? response : EMPTY_RESPONSE;
-        this.headers = new ResponseHttpHeadersImpl();
+        response = (response != null) ? response : EMPTY_RESPONSE;
         
+        this.status = response.getStatus();
+        this.entity = response.getEntity();
+        
+        // If HTTP method is HEAD then there should be no entity
+        if (requestContext.getHttpMethod().equals("HEAD"))
+            this.entity = null;
+        // Otherwise if there is no entity then there should be no content type
+        else if (this.entity == null) 
+            contentType = null;
+        
+        this.headers = new ResponseHttpHeadersImpl();
         if (response instanceof ResponseImpl) {
             setResponseOptimal((ResponseImpl)response, contentType);
         } else {
-            this.response.addMetadata(headers);
+            response.addMetadata(headers);
             setResponseNonOptimal(response, contentType);
         }        
     }
     
-    public Response getResponse() {
-        return response;
+    public int getStatus() {
+        return status;
     }
-            
+    
+    public void getStatus(int status) {
+        this.status = status;
+    }
+    
+    public Object getEntity() {
+        return entity;
+    }
+    
+    public void setEntity(Object entity) {
+        this.entity = entity;
+    }
+    
     public MultivaluedMap<String, Object> getHttpHeaders() {
         if (headers == null)
             headers = new ResponseHttpHeadersImpl();
@@ -89,7 +113,7 @@ public abstract class HttpResponseContextImpl implements ContainerResponse {
     }
     
     private void setResponseNonOptimal(Response r, MediaType contentType) {
-        if (response.getEntity() != null && headers.getFirst("Content-Type") == null) {
+        if (headers.getFirst("Content-Type") == null && contentType != null) {
             headers.putSingle("Content-Type", contentType);
         }
         

@@ -58,11 +58,11 @@ public class CreatedTest extends AbstractBeanTester {
 
         HttpResponseContext response = callNoStatusCheck(Resource.class, "GET", "/", 
             null, "", "");
-        assertEquals(201, response.getResponse().getStatus());
+        assertEquals(201, response.getStatus());
         String location = response.getHttpHeaders().getFirst("Location").toString();
         assertEquals(getBaseUri().toASCIIString() + "subpath", location);
         
-        String r = (String)response.getResponse().getEntity();
+        String r = (String)response.getEntity();
         assertEquals("CONTENT", r);        
     }   
 }

@@ -212,6 +212,6 @@ public class QueryParamStringConstructorTest extends AbstractBeanTester {
         Class r = ResourceString.class;
         HttpResponseContext response = callNoStatusCheck(r, "GET",
                 "/?arg1=ABCDEF&arg2=3145&arg3=http://test", null, "text/plain", "");
-        assertEquals(400, response.getResponse().getStatus());
+        assertEquals(400, response.getStatus());
     }
 }

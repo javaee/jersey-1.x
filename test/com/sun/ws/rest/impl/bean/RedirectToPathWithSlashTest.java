@@ -49,10 +49,10 @@ public class RedirectToPathWithSlashTest extends AbstractBeanTester {
         String content;
         
         HttpResponseContext rc = callNoStatusCheck(Project.class, "GET", "/project", "", "", "");
-        assertEquals(Response.Builder.temporaryRedirect(null).build().getStatus(), rc.getResponse().getStatus());
+        assertEquals(Response.Builder.temporaryRedirect(null).build().getStatus(), rc.getStatus());
         assertEquals(getBaseUri().resolve("project/"), rc.getHttpHeaders().getFirst("Location"));
 
-        String s = (String)callGet(Project.class, "/project/", "").getResponse().getEntity();
+        String s = (String)callGet(Project.class, "/project/", "").getEntity();
         assertEquals("project", s);
     }    
     
@@ -80,23 +80,23 @@ public class RedirectToPathWithSlashTest extends AbstractBeanTester {
         String content;
         
         HttpResponseContext rc = callNoStatusCheck(ProjectWithSubMethods.class, "GET", "/project", "", "", "");
-        assertEquals(Response.Builder.temporaryRedirect(null).build().getStatus(), rc.getResponse().getStatus());
+        assertEquals(Response.Builder.temporaryRedirect(null).build().getStatus(), rc.getStatus());
         assertEquals(getBaseUri().resolve("project/"), rc.getHttpHeaders().getFirst("Location"));
 
-        String s = (String)callGet(ProjectWithSubMethods.class, "/project/", "").getResponse().getEntity();
+        String s = (String)callGet(ProjectWithSubMethods.class, "/project/", "").getEntity();
         assertEquals("project", s);
         
-        s = (String)callGet(ProjectWithSubMethods.class, "/project/details", "").getResponse().getEntity();
+        s = (String)callGet(ProjectWithSubMethods.class, "/project/details", "").getEntity();
         assertEquals("details", s);
         
         rc = callNoStatusCheck(ProjectWithSubMethods.class, "GET", "/project/details/", "", "", "");
-        assertEquals(404, rc.getResponse().getStatus());
+        assertEquals(404, rc.getStatus());
         
         rc = callNoStatusCheck(ProjectWithSubMethods.class, "GET", "/project/moreDetails", "", "", "");
-        assertEquals(Response.Builder.temporaryRedirect(null).build().getStatus(), rc.getResponse().getStatus());
+        assertEquals(Response.Builder.temporaryRedirect(null).build().getStatus(), rc.getStatus());
         assertEquals(getBaseUri().resolve("project/moreDetails/"), rc.getHttpHeaders().getFirst("Location"));
         
-        s = (String)callGet(ProjectWithSubMethods.class, "/project/moreDetails/", "").getResponse().getEntity();
+        s = (String)callGet(ProjectWithSubMethods.class, "/project/moreDetails/", "").getEntity();
         assertEquals("moreDetails", s);
     }    
     
@@ -149,44 +149,44 @@ public class RedirectToPathWithSlashTest extends AbstractBeanTester {
         String content;
         
         HttpResponseContext rc = callNoStatusCheck(ProjectWithSubResource.class, "GET", "/project", "", "", "");
-        assertEquals(Response.Builder.temporaryRedirect(null).build().getStatus(), rc.getResponse().getStatus());
+        assertEquals(Response.Builder.temporaryRedirect(null).build().getStatus(), rc.getStatus());
         assertEquals(getBaseUri().resolve("project/"), rc.getHttpHeaders().getFirst("Location"));
 
-        String s = (String)callGet(ProjectWithSubResource.class, "/project/", "").getResponse().getEntity();
+        String s = (String)callGet(ProjectWithSubResource.class, "/project/", "").getEntity();
         assertEquals("project", s);
         
-        s = (String)callGet(ProjectWithSubResource.class, "/project/details", "").getResponse().getEntity();
+        s = (String)callGet(ProjectWithSubResource.class, "/project/details", "").getEntity();
         assertEquals("details", s);
         
         rc = callNoStatusCheck(ProjectWithSubResource.class, "GET", "/project/details/", "", "", "");
-        assertEquals(404, rc.getResponse().getStatus());
+        assertEquals(404, rc.getStatus());
         
         rc = callNoStatusCheck(ProjectWithSubResource.class, "GET", "/project/moreDetails", "", "", "");
-        assertEquals(Response.Builder.temporaryRedirect(null).build().getStatus(), rc.getResponse().getStatus());
+        assertEquals(Response.Builder.temporaryRedirect(null).build().getStatus(), rc.getStatus());
         assertEquals(getBaseUri().resolve("project/moreDetails/"), rc.getHttpHeaders().getFirst("Location"));
         
-        s = (String)callGet(ProjectWithSubResource.class, "/project/moreDetails/", "").getResponse().getEntity();
+        s = (String)callGet(ProjectWithSubResource.class, "/project/moreDetails/", "").getEntity();
         assertEquals("moreDetails", s);
         
         
         rc = callNoStatusCheck(ProjectWithSubResource.class, "GET", "/project/build", "", "", "");
-        assertEquals(Response.Builder.temporaryRedirect(null).build().getStatus(), rc.getResponse().getStatus());
+        assertEquals(Response.Builder.temporaryRedirect(null).build().getStatus(), rc.getStatus());
         assertEquals(getBaseUri().resolve("project/build/"), rc.getHttpHeaders().getFirst("Location"));
         
-        s = (String)callGet(ProjectWithSubResource.class, "/project/build/", "").getResponse().getEntity();
+        s = (String)callGet(ProjectWithSubResource.class, "/project/build/", "").getEntity();
         assertEquals("build", s);
         
-        s = (String)callGet(ProjectWithSubResource.class, "/project/build/details", "").getResponse().getEntity();
+        s = (String)callGet(ProjectWithSubResource.class, "/project/build/details", "").getEntity();
         assertEquals("details", s);
         
         rc = callNoStatusCheck(ProjectWithSubResource.class, "GET", "/project/build/details/", "", "", "");
-        assertEquals(404, rc.getResponse().getStatus());
+        assertEquals(404, rc.getStatus());
         
         rc = callNoStatusCheck(ProjectWithSubResource.class, "GET", "/project/build/moreDetails", "", "", "");
-        assertEquals(Response.Builder.temporaryRedirect(null).build().getStatus(), rc.getResponse().getStatus());
+        assertEquals(Response.Builder.temporaryRedirect(null).build().getStatus(), rc.getStatus());
         assertEquals(getBaseUri().resolve("project/build/moreDetails/"), rc.getHttpHeaders().getFirst("Location"));
         
-        s = (String)callGet(ProjectWithSubResource.class, "/project/build/moreDetails/", "").getResponse().getEntity();
+        s = (String)callGet(ProjectWithSubResource.class, "/project/build/moreDetails/", "").getEntity();
         assertEquals("moreDetails", s);
     }    
 }

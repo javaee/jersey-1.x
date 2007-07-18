@@ -22,7 +22,6 @@
 
 package com.sun.ws.rest.impl.model.method;
 
-import com.sun.ws.rest.impl.provider.header.MediaTypeProvider;
 import javax.ws.rs.WebApplicationException;
 import com.sun.ws.rest.api.core.HttpRequestContext;
 import com.sun.ws.rest.api.core.HttpResponseContext;
@@ -92,7 +91,9 @@ public class ResourceMethodMapDispatcher extends URITemplateDispatcher {
             method.getDispatcher().dispatch(node, request, response);
 
             // Verify the response
-            verifyResponse(method, accept, response);                        
+            // TODO verification for HEAD
+            if (!httpMethod.equals("HEAD"))
+                verifyResponse(method, accept, response);                        
         } else if (s == ResourceMethodList.MatchStatus.NO_MATCH_FOR_CONSUME) {
             response.setResponse(Responses.UNSUPPORTED_MEDIA_TYPE);
         } else if (s == ResourceMethodList.MatchStatus.NO_MATCH_FOR_PRODUCE) {
@@ -110,12 +111,12 @@ public class ResourceMethodMapDispatcher extends URITemplateDispatcher {
     private void verifyResponse(ResourceMethod method, 
             List<MediaType> accept,
             HttpResponseContext responseContext) {
-        Object entity = responseContext.getResponse().getEntity();
+        Object entity = responseContext.getEntity();
         MediaType contentType = HttpHelper.getContentType(
                 responseContext.getHttpHeaders().getFirst("Content-Type"));
         
         if (contentType != null && entity == null) {
-            String ct = new MediaTypeProvider().toString(contentType);
+            String ct = contentType.toString();
             String error = "The \"Content-Type\" header is set to " + ct + ", but the response has no entity";
             LOGGER.severe(error);
             Response r = ResponseBuilderImpl.serverError().entity(error).type("text/plain").build();

@@ -219,12 +219,12 @@ public class UriParamAsPrimitiveTest extends AbstractBeanTester {
     public void testBadPrimitiveValue() {
         HttpResponseContext response = callNoStatusCheck(ResourceUriInt.class, "GET",
                 "/int/abcdef", null, "text/plain", "");
-        assertEquals(400, response.getResponse().getStatus());
+        assertEquals(400, response.getStatus());
     }
     
     public void testBadPrimitiveWrapperValue() {
         HttpResponseContext response = callNoStatusCheck(ResourceUriIntWrapper.class, "GET",
                 "/int/wrapper/abcdef", null, "text/plain", "");
-        assertEquals(400, response.getResponse().getStatus());
+        assertEquals(400, response.getStatus());
     }    
 }

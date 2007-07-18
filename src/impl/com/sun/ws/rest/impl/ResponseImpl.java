@@ -75,8 +75,9 @@ public final class ResponseImpl implements Response {
     
     public void addMetadataOptimal(MultivaluedMap<String, Object> that, 
             HttpRequestContext requestContext, MediaType contentType) {
-        if (values.length == 0 && entity != null) {
-            that.putSingle(ResponseBuilderImpl.getHeader(ResponseBuilderImpl.CONTENT_TYPE), contentType);
+        if (values.length == 0 && contentType != null) {
+            that.putSingle(ResponseBuilderImpl.
+                    getHeader(ResponseBuilderImpl.CONTENT_TYPE), contentType);
         }
         
         for (int i = 0; i < values.length; i++) {
@@ -84,7 +85,7 @@ public final class ResponseImpl implements Response {
                 case ResponseBuilderImpl.CONTENT_TYPE:
                     if (values[i] != null)
                         that.putSingle(ResponseBuilderImpl.getHeader(i), values[i]);
-                    else if (entity != null)
+                    else if (contentType != null)
                         that.putSingle(ResponseBuilderImpl.getHeader(i), contentType);
                     break;
                 case ResponseBuilderImpl.LOCATION:

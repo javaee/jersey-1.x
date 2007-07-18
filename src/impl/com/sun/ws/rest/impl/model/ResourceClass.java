@@ -35,8 +35,10 @@ import com.sun.ws.rest.api.core.WebResource;
 import com.sun.ws.rest.api.view.Views;
 import com.sun.ws.rest.impl.dispatch.URITemplateDispatcher;
 import com.sun.ws.rest.impl.model.method.ResourceGenericMethod;
+import com.sun.ws.rest.impl.model.method.ResourceHeadWrapperMethod;
 import com.sun.ws.rest.impl.model.method.ResourceHttpMethod;
 import com.sun.ws.rest.impl.model.method.ResourceMethod;
+import com.sun.ws.rest.impl.model.method.ResourceMethodList;
 import com.sun.ws.rest.impl.model.method.ResourceMethodMap;
 import com.sun.ws.rest.impl.model.method.ResourceMethodMapDispatcher;
 import com.sun.ws.rest.impl.model.method.ResourceViewMethod;
@@ -99,7 +101,7 @@ public final class ResourceClass extends BaseResourceClass {
 
         final ResourceMethodMap methodMap = 
                 processMethods(methods);
-        
+
         processWebResourceInterface(methodMap);
                 
         processViews(containerMemento, methodMap, templatedMethodMap);
@@ -190,6 +192,9 @@ public final class ResourceClass extends BaseResourceClass {
             ResourceMethod rm = new ResourceHttpMethod(this, m);
             addToTemplatedMethodMap(templatedMethodMap, t, rm);
         }
+        
+        // TODO
+        // Process head methods for sub-resource methods
         return templatedMethodMap;
     }
 
@@ -199,9 +204,47 @@ public final class ResourceClass extends BaseResourceClass {
             ResourceMethod rm = new ResourceHttpMethod(this, m);
             methodMap.put(rm);
         }
+        
+        processHead(methodMap);
+        
         return methodMap;
     }
     
+    private void processHead(ResourceMethodMap methodMap) {
+        ResourceMethodList getList = methodMap.get(HttpMethod.GET);
+        if (getList == null || getList.isEmpty())
+            return;
+        
+        ResourceMethodList headList = methodMap.get(HttpMethod.HEAD);        
+        if (headList == null) headList = new ResourceMethodList();
+        
+        for (ResourceMethod getMethod : getList) {
+            boolean foundHeadMethod = false;
+            for (ResourceMethod headMethod : headList) {
+                if (getMethod.mediaEquals(headMethod)) {
+                    foundHeadMethod = true;
+                    break;
+                }
+            }
+            
+            if (!foundHeadMethod) {
+                ResourceMethod headMethod = new ResourceHeadWrapperMethod(getMethod);
+                methodMap.put(headMethod);
+                headList = methodMap.get(HttpMethod.HEAD);
+            }
+        }
+    }
+    
+    private void processHeadAndOptions(Map<URITemplateType, ResourceMethodMap> templatedMethodMap, 
+            ResourceMethodMap methods) {
+        
+    }
+    
+    private void processOptions(ResourceMethodMap methods) {
+        ResourceMethodList l = methods.get("OPTIONS");
+        if (l == null)
+            return;
+    } 
     private void processWebResourceInterface(ResourceMethodMap methodMap) {
         if (WebResource.class.isAssignableFrom(c)) {
             try {

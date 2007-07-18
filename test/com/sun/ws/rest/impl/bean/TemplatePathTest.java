@@ -78,15 +78,15 @@ public class TemplatePathTest extends AbstractBeanTester {
         s.add(ResourceAB.class);
         
         HttpResponseContext response = call(s, "GET", "/a/a", null, null, "foo");
-        String sr = (String)response.getResponse().getEntity();
+        String sr = (String)response.getEntity();
         assertEquals("A", sr);
         
         response = call(s, "GET", "/a/a/a", null, null, "foo");
-        sr = (String)response.getResponse().getEntity();
+        sr = (String)response.getEntity();
         assertEquals("A", sr);
         
         response = call(s, "GET", "/a/b/ab", null, null, "foo");
-        sr = (String)response.getResponse().getEntity();
+        sr = (String)response.getEntity();
         assertEquals("AB", sr);
     }    
     
@@ -96,15 +96,15 @@ public class TemplatePathTest extends AbstractBeanTester {
         s.add(ResourceAArg1B.class);
         
         HttpResponseContext response = call(s, "GET", "/a/a", null, null, "foo");
-        String sr = (String)response.getResponse().getEntity();
+        String sr = (String)response.getEntity();
         assertEquals("A", sr);
         
         response = call(s, "GET", "/a/a/a", null, null, "foo");
-        sr = (String)response.getResponse().getEntity();
+        sr = (String)response.getEntity();
         assertEquals("A", sr);
         
         response = call(s, "GET", "/a/infix/b", null, null, "foo");
-        sr = (String)response.getResponse().getEntity();
+        sr = (String)response.getEntity();
         assertEquals("AArg1B", sr);
     }    
     
@@ -114,11 +114,11 @@ public class TemplatePathTest extends AbstractBeanTester {
         s.add(ResourceAArg1C.class);
         
         HttpResponseContext response = call(s, "GET", "/a/infix/b", null, null, "foo");
-        String sr = (String)response.getResponse().getEntity();
+        String sr = (String)response.getEntity();
         assertEquals("AArg1B", sr);
                 
         response = call(s, "GET", "/a/infix/c", null, null, "foo");
-        sr = (String)response.getResponse().getEntity();
+        sr = (String)response.getEntity();
         assertEquals("AArg1C", sr);
     }    
 }

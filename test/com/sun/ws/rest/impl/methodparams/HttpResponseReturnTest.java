@@ -49,7 +49,7 @@ public class HttpResponseReturnTest extends AbstractBeanTester {
     @SuppressWarnings("unchecked")
     public void testReturnHttpResponse() {
         HttpResponseContext response = callGet(Resource.class, "/", "");
-        byte[] r = (byte[])response.getResponse().getEntity();
+        byte[] r = (byte[])response.getEntity();
         assertEquals("CONTENT", new String(r));
     }
 }

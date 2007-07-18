@@ -64,28 +64,28 @@ public class PreconditionTest extends AbstractBeanTester {
         MultivaluedMap<String, String> headers = new RequestHttpHeadersImpl();
         headers.putSingle("If-Unmodified-Since", "Sat, 30 Dec 2006 00:00:00 GMT");
         HttpResponseContext r = callNoStatusCheck(LastModifiedResource.class, "GET", "/", headers, "");
-        assertEquals(412, r.getResponse().getStatus());
+        assertEquals(412, r.getStatus());
     }    
 
     public void testIfUnmodifiedSinceAfterLastModified() {
         MultivaluedMap<String, String> headers = new RequestHttpHeadersImpl();
         headers.putSingle("If-Unmodified-Since", "Tue, 2 Jan 2007 00:00:00 GMT");
         HttpResponseContext r = callNoStatusCheck(LastModifiedResource.class, "GET", "/", headers, "");
-        assertEquals(200, r.getResponse().getStatus());
+        assertEquals(200, r.getStatus());
     }    
 
     public void testIfModifiedSinceBeforeLastModified() {
         MultivaluedMap<String, String> headers = new RequestHttpHeadersImpl();
         headers.putSingle("If-Modified-Since", "Sat, 30 Dec 2006 00:00:00 GMT");
         HttpResponseContext r = callNoStatusCheck(LastModifiedResource.class, "GET", "/", headers, "");
-        assertEquals(200, r.getResponse().getStatus());
+        assertEquals(200, r.getStatus());
     }    
 
     public void testIfModifiedSinceAfterLastModified() {
         MultivaluedMap<String, String> headers = new RequestHttpHeadersImpl();
         headers.putSingle("If-Modified-Since", "Tue, 2 Jan 2007 00:00:00 GMT");
         HttpResponseContext r = callNoStatusCheck(LastModifiedResource.class, "GET", "/", headers, "");
-        assertEquals(304, r.getResponse().getStatus());
+        assertEquals(304, r.getStatus());
     }    
 
     public void testIfUnmodifiedSinceBeforeLastModified_IfModifiedSinceBeforeLastModified() {
@@ -93,7 +93,7 @@ public class PreconditionTest extends AbstractBeanTester {
         headers.putSingle("If-Unmodified-Since", "Sat, 30 Dec 2006 00:00:00 GMT");
         headers.putSingle("If-Modified-Since", "Sat, 30 Dec 2006 00:00:00 GMT");
         HttpResponseContext r = callNoStatusCheck(LastModifiedResource.class, "GET", "/", headers, "");
-        assertEquals(412, r.getResponse().getStatus());
+        assertEquals(412, r.getStatus());
     }    
 
     public void testIfUnmodifiedSinceBeforeLastModified_IfModifiedSinceAfterLastModified() {
@@ -101,7 +101,7 @@ public class PreconditionTest extends AbstractBeanTester {
         headers.putSingle("If-Unmodified-Since", "Sat, 30 Dec 2006 00:00:00 GMT");
         headers.putSingle("If-Modified-Since", "Tue, 2 Jan 2007 00:00:00 GMT");
         HttpResponseContext r = callNoStatusCheck(LastModifiedResource.class, "GET", "/", headers, "");
-        assertEquals(412, r.getResponse().getStatus());
+        assertEquals(412, r.getStatus());
     }    
     
     public void testIfUnmodifiedSinceAfterLastModified_IfModifiedSinceAfterLastModified() {
@@ -109,7 +109,7 @@ public class PreconditionTest extends AbstractBeanTester {
         headers.putSingle("If-Unmodified-Since", "Tue, 2 Jan 2007 00:00:00 GMT");
         headers.putSingle("If-Modified-Since", "Tue, 2 Jan 2007 00:00:00 GMT");
         HttpResponseContext r = callNoStatusCheck(LastModifiedResource.class, "GET", "/", headers, "");
-        assertEquals(304, r.getResponse().getStatus());
+        assertEquals(304, r.getStatus());
     }    
 
     public void testIfUnmodifiedSinceAfterLastModified_IfModifiedSinceBeforeLastModified() {
@@ -117,7 +117,7 @@ public class PreconditionTest extends AbstractBeanTester {
         headers.putSingle("If-Unmodified-Since", "Tue, 2 Jan 2007 00:00:00 GMT");
         headers.putSingle("If-Modified-Since", "Sat, 30 Dec 2006 00:00:00 GMT");
         HttpResponseContext r = callNoStatusCheck(LastModifiedResource.class, "GET", "/", headers, "");
-        assertEquals(200, r.getResponse().getStatus());
+        assertEquals(200, r.getStatus());
     }
         
     
@@ -139,28 +139,28 @@ public class PreconditionTest extends AbstractBeanTester {
         MultivaluedMap<String, String> headers = new RequestHttpHeadersImpl();
         headers.putSingle("If-Match", "\"1\"");
         HttpResponseContext r = callNoStatusCheck(EtagResource.class, "GET", "/", headers, "");
-        assertEquals(200, r.getResponse().getStatus());
+        assertEquals(200, r.getStatus());
     }
     
     public void testIfMatchWithoutMatchingETag() {
         MultivaluedMap<String, String> headers = new RequestHttpHeadersImpl();
         headers.putSingle("If-Match", "\"2\"");
         HttpResponseContext r = callNoStatusCheck(EtagResource.class, "GET", "/", headers, "");
-        assertEquals(412, r.getResponse().getStatus());
+        assertEquals(412, r.getStatus());
     }
     
     public void testIfMatchWildCard() {
         MultivaluedMap<String, String> headers = new RequestHttpHeadersImpl();
         headers.putSingle("If-Match", "*");
         HttpResponseContext r = callNoStatusCheck(EtagResource.class, "GET", "/", headers, "");
-        assertEquals(200, r.getResponse().getStatus());
+        assertEquals(200, r.getStatus());
     }
     
     public void testIfNonMatchWithMatchingETag() {
         MultivaluedMap<String, String> headers = new RequestHttpHeadersImpl();
         headers.putSingle("If-None-Match", "\"1\"");
         HttpResponseContext r = callNoStatusCheck(EtagResource.class, "GET", "/", headers, "");
-        assertEquals(304, r.getResponse().getStatus());
+        assertEquals(304, r.getStatus());
         assertEquals(new EntityTag("1"), r.getHttpHeaders().getFirst("ETag"));
     }
     
@@ -168,14 +168,14 @@ public class PreconditionTest extends AbstractBeanTester {
         MultivaluedMap<String, String> headers = new RequestHttpHeadersImpl();
         headers.putSingle("If-None-Match", "\"2\"");
         HttpResponseContext r = callNoStatusCheck(EtagResource.class, "GET", "/", headers, "");
-        assertEquals(200, r.getResponse().getStatus());
+        assertEquals(200, r.getStatus());
     }
     
     public void testIfNonMatchWildCard() {
         MultivaluedMap<String, String> headers = new RequestHttpHeadersImpl();
         headers.putSingle("If-None-Match", "*");
         HttpResponseContext r = callNoStatusCheck(EtagResource.class, "GET", "/", headers, "");
-        assertEquals(304, r.getResponse().getStatus());
+        assertEquals(304, r.getStatus());
         assertEquals(new EntityTag("1"), r.getHttpHeaders().getFirst("ETag"));
     }
     
@@ -185,7 +185,7 @@ public class PreconditionTest extends AbstractBeanTester {
         headers.putSingle("If-Match", "\"1\"");
         headers.putSingle("If-None-Match", "\"1\"");
         HttpResponseContext r = callNoStatusCheck(EtagResource.class, "GET", "/", headers, "");
-        assertEquals(304, r.getResponse().getStatus());
+        assertEquals(304, r.getStatus());
     }
     
     public void testIfMatchWithMatchingETag_IfNonMatchWithoutMatchingETag() {
@@ -193,7 +193,7 @@ public class PreconditionTest extends AbstractBeanTester {
         headers.putSingle("If-Match", "\"1\"");
         headers.putSingle("If-None-Match", "\"2\"");
         HttpResponseContext r = callNoStatusCheck(EtagResource.class, "GET", "/", headers, "");
-        assertEquals(200, r.getResponse().getStatus());
+        assertEquals(200, r.getStatus());
     }
     
     public void testIfMatchWithoutMatchingETag_IfNonMatchWithMatchingETag() {
@@ -201,7 +201,7 @@ public class PreconditionTest extends AbstractBeanTester {
         headers.putSingle("If-Match", "\"2\"");
         headers.putSingle("If-None-Match", "\"1\"");
         HttpResponseContext r = callNoStatusCheck(EtagResource.class, "GET", "/", headers, "");
-        assertEquals(412, r.getResponse().getStatus());
+        assertEquals(412, r.getStatus());
     }
     
     public void testIfMatchWithoutMatchingETag_IfNonMatchWithoutMatchingETag() {
@@ -209,6 +209,6 @@ public class PreconditionTest extends AbstractBeanTester {
         headers.putSingle("If-Match", "\"2\"");
         headers.putSingle("If-None-Match", "\"2\"");
         HttpResponseContext r = callNoStatusCheck(EtagResource.class, "GET", "/", headers, "");
-        assertEquals(412, r.getResponse().getStatus());
+        assertEquals(412, r.getStatus());
     }
 }

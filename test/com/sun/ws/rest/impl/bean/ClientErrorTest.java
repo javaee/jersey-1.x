@@ -71,27 +71,27 @@ public class ClientErrorTest extends AbstractBeanTester {
         HttpResponseContext response = callNoStatusCheck(
                 WebResourceNotFoundMethodNotAllowed.class, "GET", "/foo", 
                 null, "application/foo", "");
-        assertEquals(404, response.getResponse().getStatus());
+        assertEquals(404, response.getStatus());
     }
     
     public void testMethodNotAllowed() {
         HttpResponseContext response = callNoStatusCheck(
                 WebResourceNotFoundMethodNotAllowed.class, "POST", "/", 
                 "application/foo", "application/foo", "");
-        assertEquals(405, response.getResponse().getStatus());
+        assertEquals(405, response.getStatus());
     }    
     
     public void testUnsupportedMediaType() {
         HttpResponseContext response = callNoStatusCheck(
                 WebResourceUnsupportedMediaType.class, "POST", "/", 
                 "application/foo", "application/foo", "");
-        assertEquals(415, response.getResponse().getStatus());
+        assertEquals(415, response.getStatus());
     }
     
     public void testNotAcceptable() {
         HttpResponseContext response = callNoStatusCheck(
                 WebResourceUnsupportedMediaType.class, "POST", "/", 
                 "application/bar", "application/bar", "");
-        assertEquals(406, response.getResponse().getStatus());
+        assertEquals(406, response.getStatus());
     }    
 }

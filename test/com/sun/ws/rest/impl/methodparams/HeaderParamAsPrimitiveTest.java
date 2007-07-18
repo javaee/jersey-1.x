@@ -1066,7 +1066,7 @@ public class HeaderParamAsPrimitiveTest extends AbstractBeanTester {
         m.add("int", "abcdef");
         HttpResponseContext response = callNoStatusCheck(ResourceQueryPrimitives.class, "GET",
                 "/", m, "");
-        assertEquals(400, response.getResponse().getStatus());
+        assertEquals(400, response.getStatus());
     }
     
     public void testBadPrimitiveWrapperValue() {
@@ -1075,7 +1075,7 @@ public class HeaderParamAsPrimitiveTest extends AbstractBeanTester {
         m.add("int", "abcdef");
         HttpResponseContext response = callNoStatusCheck(ResourceQueryPrimitiveWrappers.class, "GET",
                 "/", m, "");
-        assertEquals(400, response.getResponse().getStatus());
+        assertEquals(400, response.getStatus());
     }
     
     public void testBadPrimitiveListValue() {
@@ -1086,6 +1086,6 @@ public class HeaderParamAsPrimitiveTest extends AbstractBeanTester {
         m.add("int", "abcdef");
         HttpResponseContext response = callNoStatusCheck(ResourceQueryPrimitiveWrappers.class, "GET",
                 "/", m, "");
-        assertEquals(400, response.getResponse().getStatus());
+        assertEquals(400, response.getStatus());
     }
 }

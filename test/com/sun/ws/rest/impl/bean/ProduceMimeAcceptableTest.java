@@ -54,7 +54,7 @@ public class ProduceMimeAcceptableTest extends AbstractBeanTester {
     public void testNotAcceptable() {
         HttpResponseContext response = callNoStatusCheck(WebResource.class, "GET", "/", 
                 null, "application/foo", "");
-        assertEquals(500, response.getResponse().getStatus());
+        assertEquals(500, response.getStatus());
     }
 
     

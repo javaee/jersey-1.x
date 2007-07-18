@@ -62,7 +62,7 @@ public final class HttpResponseAdaptor extends HttpResponseContextImpl {
     public void commit() throws IOException {
         commitMetaData();
     
-        final Object entity = this.getResponse().getEntity();
+        final Object entity = this.getEntity();
         if (entity != null) {
             final EntityProvider p = ProviderFactory.getInstance().createEntityProvider(entity.getClass());
             p.writeTo(entity, this.getHttpHeaders(), this.getOutputStream());
@@ -70,7 +70,7 @@ public final class HttpResponseAdaptor extends HttpResponseContextImpl {
     }
 
     public void commitMetaData() {
-        response.setStatus(this.getResponse().getStatus());
+        response.setStatus(this.getStatus());
         
         MultivaluedMap<String, Object> headers = this.getHttpHeaders();
         for (Map.Entry<String, List<Object>> e : headers.entrySet()) {

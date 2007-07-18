@@ -62,6 +62,6 @@ public class UriParamStringConstructorTest extends AbstractBeanTester {
         Class r = Resource.class;
         HttpResponseContext response = callNoStatusCheck(r, "GET",
                 "/ABCDE/ABCDE", null, "text/plain", "");
-        assertEquals(400, response.getResponse().getStatus());
+        assertEquals(400, response.getStatus());
     }
 }

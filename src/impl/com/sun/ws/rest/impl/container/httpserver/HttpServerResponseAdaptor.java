@@ -59,9 +59,9 @@ public class HttpServerResponseAdaptor extends HttpResponseContextImpl {
             eh.put(e.getKey(), values);
         }
         
-        Object entity = this.getResponse().getEntity();
+        Object entity = this.getEntity();
         if (entity != null) {
-            exchange.sendResponseHeaders(this.getResponse().getStatus(), 0);
+            exchange.sendResponseHeaders(this.getStatus(), 0);
             
             final EntityProvider p = ProviderFactory.getInstance().createEntityProvider(entity.getClass());
             p.writeTo(entity, this.getHttpHeaders(), this.getOutputStream());
@@ -70,7 +70,7 @@ public class HttpServerResponseAdaptor extends HttpResponseContextImpl {
                 out.close();
             }
         } else {
-            exchange.sendResponseHeaders(this.getResponse().getStatus(), -1);
+            exchange.sendResponseHeaders(this.getStatus(), -1);
         }
         exchange.close();        
     }

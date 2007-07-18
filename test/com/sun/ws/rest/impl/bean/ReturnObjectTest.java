@@ -55,13 +55,13 @@ public class ReturnObjectTest extends AbstractBeanTester {
     
     public void testMethodType() {        
         HttpResponseContext r = call(ResourceType.class, "GET", "/", null, null, "");
-        String rep = (String)r.getResponse().getEntity();
+        String rep = (String)r.getEntity();
         assertEquals("TYPE", rep);    
     }
         
     public void testMethoResponse() {        
         HttpResponseContext r = call(ResourceHttpResponse.class, "GET", "/", null, null, "");
-        String rep = (String)r.getResponse().getEntity();
+        String rep = (String)r.getEntity();
         assertEquals("HTTP_RESPONSE", rep);    
     }
 }

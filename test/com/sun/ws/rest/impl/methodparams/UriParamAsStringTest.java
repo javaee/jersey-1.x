@@ -72,7 +72,7 @@ public class UriParamAsStringTest extends AbstractBeanTester {
         Class r = Resource1.class;
         HttpResponseContext response = callPost(r, "/a/b/c", 
                 "text/html", "content");
-        String rep = (String)response.getResponse().getEntity();
+        String rep = (String)response.getEntity();
         assertEquals("content", rep);
     }
 }

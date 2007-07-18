@@ -251,7 +251,7 @@ public class QueryParamAsStringTest extends AbstractBeanTester {
         Class r = ResourceString.class;
         HttpResponseContext response = callPost(r, "/?arg1=a&arg2=b&arg3=c", 
                 "text/plain", "content");
-        String rep = (String)response.getResponse().getEntity();
+        String rep = (String)response.getEntity();
         assertEquals("content", rep);
     }
     

@@ -61,13 +61,13 @@ public class SubResourceHttpMethodsTest extends AbstractBeanTester {
         String content;
         
         content = (String)callGet(SubResourceMethods.class, "/", "").
-                getResponse().getEntity();
+                getEntity();
         assertEquals("/", content);
         content = (String)callGet(SubResourceMethods.class, "/sub", "").
-                getResponse().getEntity();
+                getEntity();
         assertEquals("/sub", content);
         content = (String)callGet(SubResourceMethods.class, "/sub/sub", "").
-                getResponse().getEntity();
+                getEntity();
         assertEquals("/sub/sub", content);
     }
     
@@ -95,13 +95,13 @@ public class SubResourceHttpMethodsTest extends AbstractBeanTester {
         String content;
         
         content = (String)callGet(SubResourceMethodsWithTemplates.class, "/", "").
-                getResponse().getEntity();
+                getEntity();
         assertEquals("/", content);
         content = (String)callGet(SubResourceMethodsWithTemplates.class, "/subvalue/a", "").
-                getResponse().getEntity();
+                getEntity();
         assertEquals("value/a", content);
         content = (String)callGet(SubResourceMethodsWithTemplates.class, "/sub/a/b/c/d", "").
-                getResponse().getEntity();
+                getEntity();
         assertEquals("a/b/c/d", content);
     }
 }

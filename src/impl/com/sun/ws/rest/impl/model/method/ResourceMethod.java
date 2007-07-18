@@ -145,5 +145,13 @@ public abstract class ResourceMethod {
             }            
         }
         return -1;
-    }    
+    }
+    
+    public boolean mediaEquals(ResourceMethod that) {
+        boolean v = consumeMime.equals(that.consumeMime);
+        if (v == false)
+            return false;
+        
+        return produceMime.equals(that.produceMime);
+    }
 }

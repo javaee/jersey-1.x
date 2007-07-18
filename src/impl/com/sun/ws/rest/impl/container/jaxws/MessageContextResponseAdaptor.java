@@ -78,7 +78,7 @@ public class MessageContextResponseAdaptor extends HttpResponseContextImpl {
 
         @SuppressWarnings("unchecked")
         public InputStream getInputStream() throws IOException {
-            final Object entity = getResponse().getEntity();
+            final Object entity = getEntity();
             if (entity != null) {
                 final EntityProvider p = ProviderFactory.getInstance().createEntityProvider(entity.getClass());
                 p.writeTo(entity, 
@@ -98,7 +98,7 @@ public class MessageContextResponseAdaptor extends HttpResponseContextImpl {
     public DataSource getResultDataSource() throws IOException {
         // If JAX-WS is deployed using servlet
         if (response != null) {
-            response.setStatus(getResponse().getStatus());
+            response.setStatus(getStatus());
             MultivaluedMap<String, Object> headers = this.getHttpHeaders();
             for (Map.Entry<String, List<Object>> e : headers.entrySet()) {
                 for (Object v : e.getValue()) {
@@ -116,7 +116,7 @@ public class MessageContextResponseAdaptor extends HttpResponseContextImpl {
                     values.add(getHeaderValue(v));
                 map.put(header, values);
             }              
-            context.put(context.HTTP_RESPONSE_CODE, getResponse().getStatus());
+            context.put(context.HTTP_RESPONSE_CODE, getStatus());
             context.put(context.HTTP_RESPONSE_HEADERS, map);
         }
         return new HttpResponseDataSource();

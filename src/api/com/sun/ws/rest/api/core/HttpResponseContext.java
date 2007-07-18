@@ -49,20 +49,26 @@ public interface HttpResponseContext {
      *                    "application/octet-stream" will be used.
      */
     void setResponse(Response response, MediaType contentType);
+
+    /**
+     * Get the status of the response.
+     */
+    int getStatus();
     
     /**
-     * Get the response object.
-     * @return the response object
+     * Set the status of the response.
      */
-    Response getResponse();
-        
+    void getStatus(int status);
+    
     /**
-     * Get an OutputStream to which a representation may be written. The first
-     * byte written will cause any headers currently set to be flushed.
-     * @return the output stream
-     * @throws java.io.IOException if an IO error occurs
+     * Get the entity of the response
      */
-    OutputStream getOutputStream() throws IOException;
+    Object getEntity();
+    
+    /**
+     * Set the entity of the response
+     */
+    void setEntity(Object entity);
     
     /**
      * Get the HTTP response headers. The returned map is case-insensitive wrt
@@ -72,5 +78,14 @@ public interface HttpResponseContext {
      * included in the response. Any headers explicitly set will override
      * automatically generated values.
      */
-    MultivaluedMap<String, Object> getHttpHeaders();    
+    MultivaluedMap<String, Object> getHttpHeaders();
+    
+    /**
+     * Get an OutputStream to which a representation may be written. The first
+     * byte written will cause any headers currently set to be flushed.
+     * @return the output stream
+     * @throws java.io.IOException if an IO error occurs
+     */
+    OutputStream getOutputStream() throws IOException;
+    
 }

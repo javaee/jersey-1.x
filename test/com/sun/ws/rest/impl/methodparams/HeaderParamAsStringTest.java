@@ -263,7 +263,7 @@ public class HeaderParamAsStringTest extends AbstractBeanTester {
         m.add("arg3", "c");
         HttpResponseContext response = callPost(r, "/", 
                 m, "content");
-        String rep = (String)response.getResponse().getEntity();
+        String rep = (String)response.getEntity();
         assertEquals("content", rep);
     }
     

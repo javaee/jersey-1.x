@@ -61,10 +61,10 @@ public class SubResourceDynamicTest extends AbstractBeanTester {
         String content;
         
         content = (String)callGet(Parent.class, "/parent", "").
-                getResponse().getEntity();
+                getEntity();
         assertEquals("parent", content);
         content = (String)callGet(Parent.class, "/parent/child", "").
-                getResponse().getEntity();
+                getEntity();
         assertEquals("child", content);
     }    
     
@@ -92,10 +92,10 @@ public class SubResourceDynamicTest extends AbstractBeanTester {
         String content;
         
         content = (String)callGet(ParentWithTemplates.class, "/parent", "").
-                getResponse().getEntity();
+                getEntity();
         assertEquals("parent", content);
         content = (String)callGet(ParentWithTemplates.class, "/parent/child/first", "").
-                getResponse().getEntity();
+                getEntity();
         assertEquals("first", content);
     }    
 }

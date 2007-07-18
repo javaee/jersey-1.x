@@ -167,10 +167,10 @@ public class WebApplicationTest extends TestCase {
         };
 
         a.handleRequest(request, response);
-        if (response.getResponse().getEntity() != null) {
-            assertEquals(200, response.getResponse().getStatus());        
+        if (response.getEntity() != null) {
+            assertEquals(200, response.getStatus());        
         } else {            
-            assertEquals(204, response.getResponse().getStatus());        
+            assertEquals(204, response.getStatus());        
         }
     }
 }

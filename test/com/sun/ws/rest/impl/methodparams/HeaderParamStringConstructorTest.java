@@ -235,6 +235,6 @@ public class HeaderParamStringConstructorTest extends AbstractBeanTester {
         m.add("arg3", "http://test");
         HttpResponseContext response = callNoStatusCheck(r, "GET",
                 "/", m, "");
-        assertEquals(400, response.getResponse().getStatus());
+        assertEquals(400, response.getStatus());
     }
 }

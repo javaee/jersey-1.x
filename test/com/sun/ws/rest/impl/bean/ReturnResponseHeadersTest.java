@@ -51,8 +51,8 @@ public class ReturnResponseHeadersTest extends AbstractBeanTester {
         HttpResponseContext response = callNoStatusCheck(TestRepresentationBean.class, "POST", "/", 
             "text/plain", null, "content");
 
-        assertEquals(200, response.getResponse().getStatus());
-        String sr = (String)response.getResponse().getEntity();
+        assertEquals(200, response.getStatus());
+        String sr = (String)response.getEntity();
         
         assertEquals("en", response.getHttpHeaders().getFirst("Content-Language"));
     }

@@ -59,7 +59,7 @@ public class TypeReturnTest extends AbstractBeanTester {
     @SuppressWarnings("unchecked")
     public void testReturnType() {
         HttpResponseContext response = callGet(Resource.class, "/", "");
-        String r = (String)response.getResponse().getEntity();
+        String r = (String)response.getEntity();
 
         assertEquals("CONTENT", r);
         assertEquals(new MediaType("application/octet-stream"), response.getHttpHeaders().getFirst("Content-Type"));
@@ -68,7 +68,7 @@ public class TypeReturnTest extends AbstractBeanTester {
     @SuppressWarnings("unchecked")
     public void testReturnHttpTypeWithSingleProduceMime() {
         HttpResponseContext response = callGet(ResourceWithSingleProduceMime.class, "/", "");
-        String r = (String)response.getResponse().getEntity();
+        String r = (String)response.getEntity();
 
         assertEquals("CONTENT", r);
         assertEquals(new MediaType("text/plain"), response.getHttpHeaders().getFirst("Content-Type"));

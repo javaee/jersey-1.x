@@ -22,6 +22,7 @@
 
 package com.sun.ws.rest.impl.entity;
 
+import com.sun.ws.rest.impl.HttpRequestContextImpl;
 import com.sun.ws.rest.impl.HttpResponseContextImpl;
 import com.sun.ws.rest.impl.RequestHttpHeadersImpl;
 import com.sun.ws.rest.impl.ResponseBuilderImpl;
@@ -81,17 +82,18 @@ public abstract class AbstractStreamingTester extends TestCase {
     <T> byte[] writeTo(T t, String mediaType) throws IOException {
         
         final ByteArrayOutputStream out = new ByteArrayOutputStream();
-        HttpResponseContextImpl rc = new HttpResponseContextImpl(null) {
+        HttpRequestContextImpl reqc = new HttpRequestContextImpl("GET", null);
+        HttpResponseContextImpl resc = new HttpResponseContextImpl(reqc) {
             public OutputStream getOutputStream() throws IOException {
                 return out;
             }
         };
         
-        Response r = new ResponseBuilderImpl(rc.getResponse()).type(mediaType).build();
-        rc.setResponse(r);
+        Response r = new ResponseBuilderImpl().type(mediaType).build();
+        resc.setResponse(r);
         
         EntityProvider<T> tsp = ProviderFactory.getInstance().createEntityProvider((Class<T>)t.getClass());
-        tsp.writeTo(t, rc.getHttpHeaders(), rc.getOutputStream());
+        tsp.writeTo(t, resc.getHttpHeaders(), resc.getOutputStream());
         return out.toByteArray();
     }
 }

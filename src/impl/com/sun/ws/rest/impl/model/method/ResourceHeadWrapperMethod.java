@@ -20,35 +20,37 @@
  *     "Portions Copyrighted [year] [name of copyright owner]"
  */
 
-package com.sun.ws.rest.impl.bean;
+package com.sun.ws.rest.impl.model.method;
 
+import com.sun.ws.rest.spi.dispatch.RequestDispatcher;
+import com.sun.ws.rest.api.container.ContainerException;
+import java.lang.reflect.Method;
 import javax.ws.rs.HttpMethod;
-import javax.ws.rs.UriTemplate;
-import com.sun.ws.rest.api.core.HttpResponseContext;
 
 /**
  *
  * @author Paul.Sandoz@Sun.Com
  */
-@SuppressWarnings("unchecked")
-public class ByteArrayRepresentationTest extends AbstractBeanTester {
+public final class ResourceHeadWrapperMethod extends ResourceMethod {
+    private final RequestDispatcher dispatcher;
     
-    public ByteArrayRepresentationTest(String testName) {
-        super(testName);
-    }
-
-    @UriTemplate("/")
-    static public class Resource { 
-        @HttpMethod("POST")
-        public byte[] doPost(byte[] in) {
-            assertEquals("CONTENT", new String(in));
-            return "CONTENT".getBytes();
+    public ResourceHeadWrapperMethod(ResourceMethod m) throws ContainerException {
+        super(m.resourceClass);
+        
+        if (!m.httpMethod.equals("GET")) {
+            throw new ContainerException("");
         }
+        this.httpMethod = HttpMethod.HEAD;
+        this.consumeMime = m.consumeMime;
+        this.produceMime = m.produceMime;
+        this.dispatcher = m.getDispatcher();
     }
     
-    public void testPut() {
-        HttpResponseContext response = call(Resource.class, "POST", "/", null, null, "CONTENT");
-        byte[] r = (byte[])response.getEntity();
-        assertEquals("CONTENT", new String(r));
+    public Method getMethod() {
+        return null;
     }
+    
+    public RequestDispatcher getDispatcher() {
+        return dispatcher;
+    }    
 }

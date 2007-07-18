@@ -61,7 +61,7 @@ public class SubResourceDynamicWithDuplcateTemplateNames extends AbstractBeanTes
         String content;
         
         content = (String)callGet(ParentWithTemplates.class, "/parent/child/child/first", "").
-                getResponse().getEntity();
+                getEntity();
         assertEquals("first", content);
     }    
 }

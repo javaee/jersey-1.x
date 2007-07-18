@@ -935,18 +935,18 @@ public class QueryParamAsPrimitiveTest extends AbstractBeanTester {
     public void testBadPrimitiveValue() {
         HttpResponseContext response = callNoStatusCheck(ResourceQueryPrimitives.class, "GET",
                 "/?int=abcdef", null, "application/int", "");
-        assertEquals(400, response.getResponse().getStatus());
+        assertEquals(400, response.getStatus());
     }
     
     public void testBadPrimitiveWrapperValue() {
         HttpResponseContext response = callNoStatusCheck(ResourceQueryPrimitiveWrappers.class, "GET",
                 "/?int=abcdef", null, "application/int", "");
-        assertEquals(400, response.getResponse().getStatus());
+        assertEquals(400, response.getStatus());
     }
     
     public void testBadPrimitiveListValue() {
         HttpResponseContext response = callNoStatusCheck(ResourceQueryPrimitiveWrappers.class, "GET",
                 "/?int=abcdef&int=abcdef", null, "application/int", "");
-        assertEquals(400, response.getResponse().getStatus());
+        assertEquals(400, response.getStatus());
     }
 }

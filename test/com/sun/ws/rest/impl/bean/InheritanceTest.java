@@ -67,25 +67,25 @@ public class InheritanceTest extends AbstractBeanTester {
 
     public void testSuperResourceGet() {
         HttpResponseContext response = callGet(SubResource.class, "/", "application/super");
-        String sr = (String)response.getResponse().getEntity();
+        String sr = (String)response.getEntity();
         assertEquals("super", sr);
     }
     
     public void testSubResourceGet() {
         HttpResponseContext response = callGet(SubResource.class, "/", "application/sub");
-        String sr = (String)response.getResponse().getEntity();
+        String sr = (String)response.getEntity();
         assertEquals("sub", sr);
     }
     
     public void testSuperResourceOverrideGet() {
         HttpResponseContext response = callNoStatusCheck(SubResourceOverride.class, "GET", 
                 "/", null, "application/super", "");
-        assertEquals(406, response.getResponse().getStatus());
+        assertEquals(406, response.getStatus());
     }
     
     public void testSubResourceOverrideGet() {
         HttpResponseContext response = callGet(SubResourceOverride.class, "/", "application/sub");
-        String sr = (String)response.getResponse().getEntity();
+        String sr = (String)response.getEntity();
         assertEquals("suboverride", sr);
     }
 
@@ -117,25 +117,25 @@ public class InheritanceTest extends AbstractBeanTester {
     
     public void testSuperResourceWithProduceGet() {
         HttpResponseContext response = callGet(SubResourceWithProduce.class, "/", "application/super");
-        String sr = (String)response.getResponse().getEntity();
+        String sr = (String)response.getEntity();
         assertEquals("super", sr);
     }
     
     public void testSubResourceWithProduceGet() {
         HttpResponseContext response = callGet(SubResourceWithProduce.class, "/", "application/default");
-        String sr = (String)response.getResponse().getEntity();
+        String sr = (String)response.getEntity();
         assertEquals("sub", sr);
     }
     
     public void testSuperResourceOverrideWithProduceGet() {
         HttpResponseContext response = callNoStatusCheck(SubResourceWithProduceOverride.class, "GET", 
                 "/", null, "application/super", "");
-        assertEquals(406, response.getResponse().getStatus());
+        assertEquals(406, response.getStatus());
     }
     
     public void testSubResourceOverrideWithProduceGet() {
         HttpResponseContext response = callGet(SubResourceWithProduceOverride.class, "/", "application/default");
-        String sr = (String)response.getResponse().getEntity();
+        String sr = (String)response.getEntity();
         assertEquals("suboverride", sr);
     }
     
@@ -166,25 +166,25 @@ public class InheritanceTest extends AbstractBeanTester {
     
     public void testSuperResourceWithTemplateGet() {
         HttpResponseContext response = callGet(SubResourceWithTemplate.class, "/", "application/super");
-        String sr = (String)response.getResponse().getEntity();
+        String sr = (String)response.getEntity();
         assertEquals("super", sr);
     }
     
     public void testSubResourceWithTemplateGet() {
         HttpResponseContext response = callGet(SubResourceWithTemplate.class, "/", "application/sub");
-        String sr = (String)response.getResponse().getEntity();
+        String sr = (String)response.getEntity();
         assertEquals("sub", sr);
     }
     
     public void testSuperResourceWithTemplateOverrideGet() {
         HttpResponseContext response = callNoStatusCheck(SubResourceWithTemplateOverride.class, "GET", 
                 "/", null, "application/super", "");
-        assertEquals(404, response.getResponse().getStatus());
+        assertEquals(404, response.getStatus());
     }
     
     public void testSubResourceWithTemplateOverrideGet() {
         HttpResponseContext response = callGet(SubResourceWithTemplateOverride.class, "/override", "application/sub");
-        String sr = (String)response.getResponse().getEntity();
+        String sr = (String)response.getEntity();
         assertEquals("sub", sr);
     }
 }

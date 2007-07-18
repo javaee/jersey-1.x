@@ -109,9 +109,11 @@ public final class ResponseBuilderImpl extends Response.Builder {
         if (r instanceof ResponseImpl) {
             ResponseImpl ri = (ResponseImpl)r;
             Object[] v = ri.getValues();
-            if (v.length > 0)
+            if (v.length > 0) {
+                this.values = new Object[HEADER_MAP.size()];
                 System.arraycopy(v, 0, this.values, 0, v.length);
-
+            }
+            
             if (ri.getNameValuePairs().size() > 0)
                 this.nameValuePairs = new ArrayList<Object>(ri.getNameValuePairs());
         } else {
