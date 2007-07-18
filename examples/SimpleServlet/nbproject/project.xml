@@ -53,6 +53,10 @@
                     <path-in-war>WEB-INF/lib</path-in-war>
                 </library>
                 <library files="1">
+                    <file>${file.reference.jettison-1.0-RC1.jar}</file>
+                    <path-in-war>WEB-INF/lib</path-in-war>
+                </library>
+                <library files="1">
                     <file>${file.reference.wadl2java.jar}</file>
                 </library>
                 <library files="1">
