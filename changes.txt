@@ -1,4 +1,7 @@
-release 0.2 (2007-xx-xx)
+release 0.2.1 (2007-08-xx)
+
+
+release 0.2 (2007-07-19)
 - include Allow header in a 405 (Method Not Allowed) response.
 - support by default OPTIONS request if OPTIONS is not implemented.
 - support by default HEAD request if HEAD is not implemented by calling GET 
