@@ -1,4 +1,6 @@
 release 0.2 (2007-xx-xx)
+- support by default HEAD request if HEAD is not implemented by calling GET 
+  and removing the entity.
 - fixed WADL generation mixing up produce/consume information when generating
   responses.
 - fixed WADL generation not correctly determining the HTTP method from 

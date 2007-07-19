@@ -99,5 +99,19 @@ public final class ResourceMethodList extends ArrayList<ResourceMethod> {
         }
         
         return MatchStatus.MATCH;
-    }    
+    }
+
+    /**
+     * Determin if a the resource method list contains a method that 
+     * has the same consume/produce media as another resource method.
+     * @param method the resource method to check
+     * @return true if the list contains a method with the same media as method.
+     */
+    public boolean containsMediaOfMethod(ResourceMethod method) {
+        for (ResourceMethod m : this)
+            if (method.mediaEquals(m))
+                return true;
+        
+        return false;
+    }
 }

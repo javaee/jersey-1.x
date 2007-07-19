@@ -193,8 +193,10 @@ public final class ResourceClass extends BaseResourceClass {
             addToTemplatedMethodMap(templatedMethodMap, t, rm);
         }
         
-        // TODO
-        // Process head methods for sub-resource methods
+        for (ResourceMethodMap methodMap : templatedMethodMap.values()) {
+            processHead(methodMap);
+        }
+        
         return templatedMethodMap;
     }
 
@@ -219,15 +221,7 @@ public final class ResourceClass extends BaseResourceClass {
         if (headList == null) headList = new ResourceMethodList();
         
         for (ResourceMethod getMethod : getList) {
-            boolean foundHeadMethod = false;
-            for (ResourceMethod headMethod : headList) {
-                if (getMethod.mediaEquals(headMethod)) {
-                    foundHeadMethod = true;
-                    break;
-                }
-            }
-            
-            if (!foundHeadMethod) {
+            if (!headList.containsMediaOfMethod(getMethod)) {
                 ResourceMethod headMethod = new ResourceHeadWrapperMethod(getMethod);
                 methodMap.put(headMethod);
                 headList = methodMap.get(HttpMethod.HEAD);
