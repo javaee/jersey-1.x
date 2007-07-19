@@ -37,6 +37,7 @@ import com.sun.ws.rest.impl.dispatch.URITemplateDispatcher;
 import com.sun.ws.rest.impl.model.method.ResourceGenericMethod;
 import com.sun.ws.rest.impl.model.method.ResourceHeadWrapperMethod;
 import com.sun.ws.rest.impl.model.method.ResourceHttpMethod;
+import com.sun.ws.rest.impl.model.method.ResourceHttpOptionsMethod;
 import com.sun.ws.rest.impl.model.method.ResourceMethod;
 import com.sun.ws.rest.impl.model.method.ResourceMethodList;
 import com.sun.ws.rest.impl.model.method.ResourceMethodMap;
@@ -195,6 +196,7 @@ public final class ResourceClass extends BaseResourceClass {
         
         for (ResourceMethodMap methodMap : templatedMethodMap.values()) {
             processHead(methodMap);
+            processOptions(methodMap);
         }
         
         return templatedMethodMap;
@@ -208,6 +210,7 @@ public final class ResourceClass extends BaseResourceClass {
         }
         
         processHead(methodMap);
+        processOptions(methodMap);
         
         return methodMap;
     }
@@ -229,16 +232,15 @@ public final class ResourceClass extends BaseResourceClass {
         }
     }
     
-    private void processHeadAndOptions(Map<URITemplateType, ResourceMethodMap> templatedMethodMap, 
-            ResourceMethodMap methods) {
+    private void processOptions(ResourceMethodMap methodMap) {
+        ResourceMethodList l = methodMap.get("OPTIONS");
+        if (l != null)
+            return;
         
+        ResourceMethod optionsMethod = new ResourceHttpOptionsMethod(this, methodMap.getAllow());
+        methodMap.put(optionsMethod);
     }
     
-    private void processOptions(ResourceMethodMap methods) {
-        ResourceMethodList l = methods.get("OPTIONS");
-        if (l == null)
-            return;
-    } 
     private void processWebResourceInterface(ResourceMethodMap methodMap) {
         if (WebResource.class.isAssignableFrom(c)) {
             try {

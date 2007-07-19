@@ -1,4 +1,6 @@
 release 0.2 (2007-xx-xx)
+- include Allow header in a 405 (Method Not Allowed) response.
+- support by default OPTIONS request if OPTIONS is not implemented.
 - support by default HEAD request if HEAD is not implemented by calling GET 
   and removing the entity.
 - fixed WADL generation mixing up produce/consume information when generating

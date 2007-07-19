@@ -79,6 +79,8 @@ public class ClientErrorTest extends AbstractBeanTester {
                 WebResourceNotFoundMethodNotAllowed.class, "POST", "/", 
                 "application/foo", "application/foo", "");
         assertEquals(405, response.getStatus());
+        String allow = response.getHttpHeaders().getFirst("Allow").toString();
+        assertTrue(allow.contains("GET"));
     }    
     
     public void testUnsupportedMediaType() {

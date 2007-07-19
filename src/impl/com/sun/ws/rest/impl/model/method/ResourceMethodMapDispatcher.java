@@ -75,7 +75,9 @@ public class ResourceMethodMapDispatcher extends URITemplateDispatcher {
             methods = map.get(null);
             if (methods == null) {
                 // If no methods are found move on to next template
-                response.setResponse(Responses.METHOD_NOT_ALLOWED);
+                Response r = new ResponseBuilderImpl(Responses.METHOD_NOT_ALLOWED).
+                        header("Allow", map.getAllow()).build();
+                response.setResponse(r);
                 return true;
             }
         }

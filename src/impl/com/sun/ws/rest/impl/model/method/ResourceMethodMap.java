@@ -33,6 +33,7 @@ import java.util.Map;
  * @author Paul.Sandoz@Sun.Com
  */
 public final class ResourceMethodMap extends HashMap<String, ResourceMethodList> {
+    private String allow;
     
     public ResourceMethodMap(int initialCapacity, float loadFactor) {
         super(initialCapacity, loadFactor);
@@ -82,6 +83,7 @@ public final class ResourceMethodMap extends HashMap<String, ResourceMethodList>
         }
         l.add(method);
         
+        setAllow();
     }
     
     /**
@@ -91,5 +93,25 @@ public final class ResourceMethodMap extends HashMap<String, ResourceMethodList>
         for (Map.Entry<String, ResourceMethodList> e : entrySet()) {
             Collections.sort(e.getValue(), ResourceMethod.COMPARATOR);
         }
-    } 
+    }
+    
+    /**
+     * Get the Allow entity-header field
+     */
+    public String getAllow() {
+        return allow;
+    }
+    
+    private void setAllow() {
+        StringBuilder s = new StringBuilder();
+        boolean first = true;
+        for (String method : this.keySet()) {
+            if (!first) s.append(",");
+            first = false;
+            
+            s.append(method);
+        }
+        
+        allow = s.toString();
+    }
 }
