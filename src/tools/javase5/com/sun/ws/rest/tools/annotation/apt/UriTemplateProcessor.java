@@ -231,9 +231,6 @@ public class UriTemplateProcessor implements Messager, AnnotationProcessor {
             UriTemplate uriTemplate = typedecl.getAnnotation(UriTemplate.class);
             if (uriTemplate == null)
                 continue;
-            // Only absolute template values will be processed further
-            if (!uriTemplate.value().startsWith("/"))
-                continue;
             Resource r = processResource(typedecl, uriTemplate);
             if (r != null)
                 context.getResources().add(r);
