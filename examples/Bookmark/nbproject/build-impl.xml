@@ -424,17 +424,17 @@
         <copy-ear-war file="${file.reference.rome-0.9.jar-1}" propname="included.lib.file.reference.rome-0.9.jar-1.X"/>
         <basename property="included.lib.file.reference.wadl2java.jar-1" file="${file.reference.wadl2java.jar-1}"/>
         <copy-ear-war file="${file.reference.wadl2java.jar-1}" propname="included.lib.file.reference.wadl2java.jar-1.X"/>
-        <basename property="included.lib.file.reference.json.org.jar" file="${file.reference.json.org.jar}"/>
-        <copy-ear-war file="${file.reference.json.org.jar}" propname="included.lib.file.reference.json.org.jar.X"/>
         <basename property="included.lib.file.reference.jettison-1.0-RC1.jar" file="${file.reference.jettison-1.0-RC1.jar}"/>
         <copy-ear-war file="${file.reference.jettison-1.0-RC1.jar}" propname="included.lib.file.reference.jettison-1.0-RC1.jar.X"/>
         <basename property="included.lib.file.reference.jersey.jar" file="${file.reference.jersey.jar}"/>
         <copy-ear-war file="${file.reference.jersey.jar}" propname="included.lib.file.reference.jersey.jar.X"/>
         <basename property="included.lib.file.reference.javaee.jar" file="${file.reference.javaee.jar}"/>
         <copy-ear-war file="${file.reference.javaee.jar}" propname="included.lib.file.reference.javaee.jar.X"/>
+        <basename property="included.lib.file.reference.json.org.jar" file="${file.reference.json.org.jar}"/>
+        <copy-ear-war file="${file.reference.json.org.jar}" propname="included.lib.file.reference.json.org.jar.X"/>
         <mkdir dir="${build.web.dir.real}/META-INF"/>
         <manifest file="${build.web.dir.real}/META-INF/MANIFEST.MF" mode="update">
-            <attribute name="Class-Path" value="${included.lib.file.reference.activation.jar-1} ${included.lib.file.reference.http.jar-1} ${included.lib.file.reference.jaxb-api.jar-1} ${included.lib.file.reference.jaxb-impl.jar-1} ${included.lib.file.reference.jaxb-xjc.jar-1} ${included.lib.file.reference.jaxws-api.jar-1} ${included.lib.file.reference.jdom-1.0.jar-1} ${included.lib.file.reference.jsr173_api.jar-1} ${included.lib.file.reference.jsr250-api.jar-1} ${included.lib.file.reference.jsr311-api.jar} ${included.lib.file.reference.localizer.jar-1} ${included.lib.file.reference.mail.jar-1} ${included.lib.file.reference.persistence-api-1.0.jar-1} ${included.lib.file.reference.rome-0.9.jar-1} ${included.lib.file.reference.wadl2java.jar-1} ${included.lib.file.reference.json.org.jar} ${included.lib.file.reference.jettison-1.0-RC1.jar} ${included.lib.file.reference.jersey.jar} ${included.lib.file.reference.javaee.jar} "/>
+            <attribute name="Class-Path" value="${included.lib.file.reference.activation.jar-1} ${included.lib.file.reference.http.jar-1} ${included.lib.file.reference.jaxb-api.jar-1} ${included.lib.file.reference.jaxb-impl.jar-1} ${included.lib.file.reference.jaxb-xjc.jar-1} ${included.lib.file.reference.jaxws-api.jar-1} ${included.lib.file.reference.jdom-1.0.jar-1} ${included.lib.file.reference.jsr173_api.jar-1} ${included.lib.file.reference.jsr250-api.jar-1} ${included.lib.file.reference.jsr311-api.jar} ${included.lib.file.reference.localizer.jar-1} ${included.lib.file.reference.mail.jar-1} ${included.lib.file.reference.persistence-api-1.0.jar-1} ${included.lib.file.reference.rome-0.9.jar-1} ${included.lib.file.reference.wadl2java.jar-1} ${included.lib.file.reference.jettison-1.0-RC1.jar} ${included.lib.file.reference.jersey.jar} ${included.lib.file.reference.javaee.jar} ${included.lib.file.reference.json.org.jar} "/>
         </manifest>
         <delete dir="${dist.ear.dir}/temp"/>
     </target>
@@ -454,10 +454,10 @@
         <copy file="${file.reference.persistence-api-1.0.jar-1}" todir="${build.web.dir.real}/WEB-INF/lib"/>
         <copy file="${file.reference.rome-0.9.jar-1}" todir="${build.web.dir.real}/WEB-INF/lib"/>
         <copy file="${file.reference.wadl2java.jar-1}" todir="${build.web.dir.real}/WEB-INF/lib"/>
-        <copy file="${file.reference.json.org.jar}" todir="${build.web.dir.real}/WEB-INF/lib"/>
         <copy file="${file.reference.jettison-1.0-RC1.jar}" todir="${build.web.dir.real}/WEB-INF/lib"/>
         <copy file="${file.reference.jersey.jar}" todir="${build.web.dir.real}/WEB-INF/lib"/>
         <copy file="${file.reference.javaee.jar}" todir="${build.web.dir.real}/WEB-INF/lib"/>
+        <copy file="${file.reference.json.org.jar}" todir="${build.web.dir.real}/WEB-INF/lib"/>
     </target>
     <target name="do-ear-dist" depends="init,compile,compile-jsps,-pre-dist,library-inclusion-in-manifest">
         <dirname property="dist.jar.dir" file="${dist.ear.war}"/>

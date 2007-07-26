@@ -20,10 +20,11 @@
  *     "Portions Copyrighted [year] [name of copyright owner]"
  */
 
-package com.sun.ws.rest.samples.bookmark.spi.impl;
+package com.sun.ws.rest.impl.provider.entity;
 
 
-import com.sun.ws.rest.impl.provider.entity.AbstractTypeEntityProvider;
+import com.sun.ws.rest.impl.ImplMessages;
+import com.sun.ws.rest.impl.util.ThrowHelper;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -36,13 +37,8 @@ import org.json.JSONObject;
  *
  * @author japod
  */
-public class JSONObjectEntityProvider  extends AbstractTypeEntityProvider<JSONObject>{
+public class JSONObjectProvider  extends AbstractTypeEntityProvider<JSONObject>{
     
-    /**
-     * Creates a new instance of JSONObjectEntityProvider
-     */
-    public JSONObjectEntityProvider() {
-    }
     
     public void writeTo(JSONObject jsonObject, MultivaluedMap httpHeaders, OutputStream entityStream) throws IOException {
         try {
@@ -51,7 +47,7 @@ public class JSONObjectEntityProvider  extends AbstractTypeEntityProvider<JSONOb
             writer.write("\n");
             writer.flush();
         } catch (JSONException je) {
-            throw (IOException)(new IOException("error writing json object")).initCause(je);
+            throw ThrowHelper.withInitCause(je, new IOException(ImplMessages.ERROR_WRITING_JSON_OBJECT()));
         }
     }
     
@@ -63,7 +59,7 @@ public class JSONObjectEntityProvider  extends AbstractTypeEntityProvider<JSONOb
         try {
             return new JSONObject(readFromAsString(is));
         } catch (JSONException je) {
-            throw (IOException)(new IOException("error parsing json object")).initCause(je);
+            throw ThrowHelper.withInitCause(je, new IOException(ImplMessages.ERROR_PARSING_JSON_OBJECT()));
         }
     }
 }

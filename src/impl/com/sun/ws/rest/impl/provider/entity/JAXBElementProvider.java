@@ -67,11 +67,11 @@ public final class JAXBElementProvider extends AbstractTypeEntityProvider<Object
                             new BadgerFishXMLStreamReader(new JSONObject(readFromAsString(entityStream))));
                 } catch (XMLStreamException xmlStreamException) {
                     throw ThrowHelper.withInitCause(xmlStreamException,
-                            new IOException("error parsing json object")
+                            new IOException(ImplMessages.ERROR_PARSING_JSON_OBJECT())
                             );
                 } catch (JSONException jsonException) {
                     throw ThrowHelper.withInitCause(jsonException,
-                            new IOException("error parsing json object")
+                            new IOException(ImplMessages.ERROR_PARSING_JSON_OBJECT())
                             );
                 }
             }

@@ -20,9 +20,10 @@
  *     "Portions Copyrighted [year] [name of copyright owner]"
  */
 
-package com.sun.ws.rest.samples.bookmark.spi.impl;
+package com.sun.ws.rest.impl.provider.entity;
 
-import com.sun.ws.rest.impl.provider.entity.AbstractTypeEntityProvider;
+import com.sun.ws.rest.impl.ImplMessages;
+import com.sun.ws.rest.impl.util.ThrowHelper;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -35,13 +36,8 @@ import org.json.JSONException;
  *
  * @author japod
  */
-public class JSONArrayEntityProvider  extends AbstractTypeEntityProvider<JSONArray>{
+public class JSONArrayProvider  extends AbstractTypeEntityProvider<JSONArray>{
     
-    /**
-     * Creates a new instance of JSONObjectEntityProvider
-     */
-    public JSONArrayEntityProvider() {
-    }
     
     public void writeTo(JSONArray jsonArray, MultivaluedMap<String, Object> httpHeaders, OutputStream entityStream) throws IOException {
         try {
@@ -50,7 +46,7 @@ public class JSONArrayEntityProvider  extends AbstractTypeEntityProvider<JSONArr
             writer.write("\n");
             writer.flush();
         } catch (JSONException je) {
-            throw (IOException)(new IOException("error writing json array")).initCause(je);
+            throw ThrowHelper.withInitCause(je, new IOException(ImplMessages.ERROR_WRITING_JSON_ARRAY()));
         }
     }
     
@@ -62,7 +58,7 @@ public class JSONArrayEntityProvider  extends AbstractTypeEntityProvider<JSONArr
         try {
             return new JSONArray(readFromAsString(is));
         } catch (JSONException je) {
-            throw (IOException)(new IOException("error parsing json array")).initCause(je);
+            throw ThrowHelper.withInitCause(je, new IOException(ImplMessages.ERROR_PARSING_JSON_ARRAY()));
         }
     }
 }

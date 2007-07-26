@@ -9,3 +9,5 @@ com.sun.ws.rest.impl.provider.entity.InputStreamProvider
 com.sun.ws.rest.impl.provider.entity.JAXBElementProvider
 com.sun.ws.rest.impl.provider.entity.MimeMultipartProvider
 com.sun.ws.rest.impl.provider.entity.StringProvider
+com.sun.ws.rest.impl.provider.entity.JSONArrayProvider
+com.sun.ws.rest.impl.provider.entity.JSONObjectProvider
