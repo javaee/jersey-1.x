@@ -448,7 +448,7 @@ relative to APT's destination directory.</p>
 refer to them for concrete examples of how to invoke APT</p>
 
 <p>
-The following is taken from the <a href="../samples/SimpleServlet/README.html">SimpleServlet</a> example.  For the APT ant 
+The following is taken from the <a href="../examples/SimpleServlet/README.html">SimpleServlet</a> example.  For the APT ant 
 task to run, it must have the <code>jersey.jar</code> and the <code>tools.jar</code>
 from Java SE 5 or higher. To execute the APT ant task in Java SE 6 requires that the <code>xEnsorsed="true"</code> be set on the task. (Note that if there
 is a runtime dependency on JAXB 2.1 or JAX-WS 2.1 jars then these jars must be placed in the endorsed directory of the Java SE 6 distribution, or by setting the endorsed directory using the system property "java.endorsed.dirs".)
@@ -497,7 +497,7 @@ is a runtime dependency on JAXB 2.1 or JAX-WS 2.1 jars then these jars must be p
     deployed to your servlet container.</p>
 <p>
 The following shows the <code>WEB-INF/web.xml</code> file generated for the
-<a href="../samples/SimpleServlet/README.html">SimpleServlet</a> example.  The <code>web.xml</code> specifies the 
+<a href="../examples/SimpleServlet/README.html">SimpleServlet</a> example.  The <code>web.xml</code> specifies the 
 <code>com.sun.ws.rest.impl.container.servlet.ServletAdaptor</code> as the 
 &lt;servlet-class&gt;.  This adapter uses the <code>resourcebean</code>
 &lt;init-param&gt; to get the set of Java classes to include in the application.</p>
@@ -521,7 +521,7 @@ The following shows the <code>WEB-INF/web.xml</code> file generated for the
 &lt;/web-app&gt;
 </pre>
 <p>
-The following shows the contents of the <a href="../samples/SimpleServlet/README.html">SimpleServlet</a> sample WAR file.
+The following shows the contents of the <a href="../examples/SimpleServlet/README.html">SimpleServlet</a> sample WAR file.
 </p><pre>META-INF/context.xml
 WEB-INF/classes/com/sun/ws/rest/samples/servlet/resources/MasterResourceBean.class
 WEB-INF/classes/com/sun/ws/rest/samples/servlet/resources/WebResources.class
@@ -555,7 +555,7 @@ index.html
 <p>When deploying to a JAX-WS Endpoint container, you do not need the generated
     <code>WEB-INF/web.xml</code>, because a servlet container is not used.
     To prevent the generation of this file, you can use the <code>noservlet</code>
-    option for APT.  The following is taken from the <a href="../samples/SimpleJAXWSEndpoint/README.html">SimpleJAXWSEndpoint</a>
+    option for APT.  The following is taken from the <a href="../examples/SimpleJAXWSEndpoint/README.html">SimpleJAXWSEndpoint</a>
     example.
     It shows how the APT ant task is used with this option.
     </p>
@@ -583,7 +583,7 @@ index.html
     
 <p>To deploy to a JAX-WS endpoint, you must write a simple Main class that can be used 
 to publish the endpoint.  The following is the Main class taken from the
-<a href="../samples/SimpleJAXWSEndpoint/README.html">SimpleJAXWSEndpoint</a>
+<a href="../examples/SimpleJAXWSEndpoint/README.html">SimpleJAXWSEndpoint</a>
 example.</p>
 <pre>
 import com.sun.ws.rest.api.container.ContainerFactory;
@@ -654,7 +654,7 @@ the API, runtime and dependent jar files, the JAX-WS runtime jar files, the gene
 Java classes must all be in the classpath.</p>
 
 <h3>Lightweight HTTP Server Container</h3>
-<p>The <a href="../samples/SimpleConsole/README.html">SimpleConsole</a> example application shows how to use
+<p>The <a href="../examples/SimpleConsole/README.html">SimpleConsole</a> example application shows how to use
 the API with the lightweight HTTP server. Note in particular the <code>-pre-compile</code> target in the
 <code>build.xml</code> file that generates the classes (primarily <code>WebResources</code>) (as described above). 
 Note also the use of the <code>noservlet</code> option to
@@ -665,19 +665,19 @@ prevent generation of a web.xml file as in the previous example.</p>
 <p>The distribution contains the following examples that utilize the features of the 
 RESTful API (some of which have been described in this document):
 </p><ul>
-    <li><a href="../samples/OptimisticConcurrency/README.html">OptimisticConcurrency</a> - 
+    <li><a href="../examples/OptimisticConcurrency/README.html">OptimisticConcurrency</a> - 
         Demonstrates the application of optimistic concurrency to a web resource.</li>
-    <li><a href="../samples/SimpleAtomServer/README.html">SimpleAtomServer</a> - 
+    <li><a href="../examples/SimpleAtomServer/README.html">SimpleAtomServer</a> - 
         Demonstrates a simple Atom server that partially conforms to the 
         <a href="http://www.ietf.org/html.charters/atompub-charter.html">Atom Publishing Format and Protocol</a>.</li>
-    <li><a href="../samples/SimpleConsole/README.html">SimpleConsole</a> - Demonstrates how to use the 
+    <li><a href="../examples/SimpleConsole/README.html">SimpleConsole</a> - Demonstrates how to use the 
         <a href="http://java.sun.com/javase/6/docs/jre/api/net/httpserver/spec/index.html">Lightweight HTTP Server</a> 
         included in Sun's Java SE 6.0 release.</li>
-    <li><a href="../samples/SimpleJAXWSEndpoint/README.html">SimpleJAXWSEndpoint</a> - Demonstrates how to use a JAX-WS 
+    <li><a href="../examples/SimpleJAXWSEndpoint/README.html">SimpleJAXWSEndpoint</a> - Demonstrates how to use a JAX-WS 
         <a href="https://jax-ws.dev.java.net/nonav/jax-ws-20-fcs/api/javax/xml/ws/Endpoint.html">Endpoint</a>.</li>
-    <li><a href="../samples/SimpleServlet/README.html">SimpleServlet</a> - Demonstrates how to use a Servlet container.</li>
-    <li><a href="../samples/StorageService/README.html">StorageService</a> - Demonstrates a basic in-memory web storage service.</li>
-    <li><a href="../samples/Bookstore/README.html">Bookstore</a> - Demonstrates how to use ploymorphism with resources and views that are JSP pages.</li>
+    <li><a href="../examples/SimpleServlet/README.html">SimpleServlet</a> - Demonstrates how to use a Servlet container.</li>
+    <li><a href="../examples/StorageService/README.html">StorageService</a> - Demonstrates a basic in-memory web storage service.</li>
+    <li><a href="../examples/Bookstore/README.html">Bookstore</a> - Demonstrates how to use ploymorphism with resources and views that are JSP pages.</li>
 </ul>
 <p></p>
 
