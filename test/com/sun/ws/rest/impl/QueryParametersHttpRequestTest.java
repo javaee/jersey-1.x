@@ -100,7 +100,23 @@ public class QueryParametersHttpRequestTest extends TestCase {
         MultivaluedMap<String, String> p = r.getQueryParameters(true);
         assertEquals(" 1 ", p.getFirst("x "));
         assertEquals(" 2", p.getFirst(" y "));
+        
+        r = new HttpRequestContextImpl("GET", "/widgets/10", "/context", "x=1&y=1+%2B+2", null) {};
+        p = r.getQueryParameters(true);
+        assertEquals("1", p.getFirst("x"));
+        assertEquals("1 + 2", p.getFirst("y"));
+        
+        r = new HttpRequestContextImpl("GET", "/widgets/10", "/context", "x=1&y=1+%26+2", null) {};
+        p = r.getQueryParameters(true);
+        assertEquals("1", p.getFirst("x"));
+        assertEquals("1 & 2", p.getFirst("y"));
+        
+        r = new HttpRequestContextImpl("GET", "/widgets/10", "/context", "x=1&y=1+%7C%7C+2", null) {};
+        p = r.getQueryParameters(true);
+        assertEquals("1", p.getFirst("x"));
+        assertEquals("1 || 2", p.getFirst("y"));
     }
+        
     public void testEncoded() throws Exception {
         HttpRequestContext r = new HttpRequestContextImpl("GET", "/widgets/10", "/context", "x+=+1%20&%20y+=+2", null) {};
         MultivaluedMap<String, String> p = r.getQueryParameters(false);
