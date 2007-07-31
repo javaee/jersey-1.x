@@ -108,7 +108,7 @@ public class HttpServerRequestAdaptor extends HttpRequestContextImpl {
     }
     
     protected void extractQueryParameters() {
-        this.queryString = exchange.getRequestURI().getQuery();
+        this.queryString = exchange.getRequestURI().getRawQuery();
         this.queryParameters = extractQueryParameters(this.queryString, true);
     }    
 }
