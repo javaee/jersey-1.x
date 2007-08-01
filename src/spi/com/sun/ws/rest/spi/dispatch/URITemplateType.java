@@ -137,8 +137,8 @@ public final class URITemplateType {
         this.template = null;
         this.rightHandPattern = null;
         this.endsWithSlash = false;
-        this.templateNames = null;
-        this.templateRegex = null;
+        this.templateNames = Collections.emptyList();
+        this.templateRegex = "";
         this.templateRegexPattern = null;
     }
     
