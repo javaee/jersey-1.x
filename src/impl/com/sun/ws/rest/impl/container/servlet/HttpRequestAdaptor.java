@@ -25,7 +25,6 @@ package com.sun.ws.rest.impl.container.servlet;
 import com.sun.ws.rest.impl.HttpRequestContextImpl;
 import java.io.IOException;
 import java.net.URI;
-import java.net.URLEncoder;
 import java.util.Enumeration;
 import java.util.LinkedList;
 import java.util.List;

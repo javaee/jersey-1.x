@@ -24,7 +24,6 @@ package com.sun.ws.rest.impl.model.method;
 
 import com.sun.ws.rest.api.core.HttpRequestContext;
 import com.sun.ws.rest.api.core.HttpResponseContext;
-import com.sun.ws.rest.impl.ResponseBuilderImpl;
 import com.sun.ws.rest.spi.dispatch.RequestDispatcher;
 import com.sun.ws.rest.api.container.ContainerException;
 import com.sun.ws.rest.impl.model.MimeHelper;

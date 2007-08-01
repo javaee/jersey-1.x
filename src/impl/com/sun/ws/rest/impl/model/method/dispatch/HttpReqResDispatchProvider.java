@@ -22,7 +22,6 @@
 
 package com.sun.ws.rest.impl.model.method.dispatch;
 
-import javax.ws.rs.WebApplicationException;
 import com.sun.ws.rest.api.core.HttpRequestContext;
 import com.sun.ws.rest.api.core.HttpResponseContext;
 import com.sun.ws.rest.spi.dispatch.RequestDispatcher;

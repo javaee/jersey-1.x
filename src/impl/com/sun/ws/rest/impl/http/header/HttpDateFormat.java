@@ -55,16 +55,18 @@ public final class HttpDateFormat {
     private static final String ANSI_C_ASCTIME_DATE_FORMAT_PATTERN = "EEE MMM d HH:mm:ss yyyy";
     
     private static ThreadLocal<List<SimpleDateFormat>> dateFormats = new ThreadLocal<List<SimpleDateFormat>>() {
+        @Override
         protected synchronized List<SimpleDateFormat> initialValue() {
             return createDateFormats();
         }
     };
     
     private static List<SimpleDateFormat> createDateFormats() {
-        SimpleDateFormat[] dateFormats = new SimpleDateFormat[3];
-        dateFormats[0] = new SimpleDateFormat(RFC1123_DATE_FORMAT_PATTERN, Locale.US);
-        dateFormats[1] = new SimpleDateFormat(RFC1036_DATE_FORMAT_PATTERN, Locale.US);
-        dateFormats[2] = new SimpleDateFormat(ANSI_C_ASCTIME_DATE_FORMAT_PATTERN, Locale.US);
+        SimpleDateFormat[] dateFormats = new SimpleDateFormat[] {
+            new SimpleDateFormat(RFC1123_DATE_FORMAT_PATTERN, Locale.US),
+            new SimpleDateFormat(RFC1036_DATE_FORMAT_PATTERN, Locale.US),
+            new SimpleDateFormat(ANSI_C_ASCTIME_DATE_FORMAT_PATTERN, Locale.US)
+        };
         
         TimeZone tz = TimeZone.getTimeZone("GMT");
         dateFormats[0].setTimeZone(tz);

@@ -23,10 +23,6 @@
 package com.sun.ws.rest.impl.model.method;
 
 import com.sun.ws.rest.spi.dispatch.RequestDispatcher;
-import javax.ws.rs.ConsumeMime;
-import javax.ws.rs.HttpMethod;
-import javax.ws.rs.ProduceMime;
-import com.sun.ws.rest.api.container.ContainerException;
 import javax.ws.rs.core.MediaType;
 import com.sun.ws.rest.impl.http.header.AcceptMediaType;
 import com.sun.ws.rest.impl.model.MediaTypeList;

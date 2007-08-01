@@ -22,8 +22,6 @@
 
 package com.sun.ws.rest.spi.container;
 
-import java.util.Map;
-
 /**
  * The HTTP request context supplied by the container.
  * <p>

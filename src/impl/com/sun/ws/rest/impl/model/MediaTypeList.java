@@ -33,6 +33,7 @@ import java.util.ArrayList;
  * @author Paul.Sandoz@Sun.Com
  */
 public final class MediaTypeList extends ArrayList<MediaType> {
+    @Override
     public boolean equals(Object o) {
         if (this == o)
             return true;

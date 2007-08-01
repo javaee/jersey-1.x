@@ -44,7 +44,7 @@ public class AcceptableToken extends Token implements QualityFactor {
         token = reader.nextToken();        
         
         if (reader.hasNext()) {
-            quality = reader.readQualityFactorParameter(reader);
+            quality = HttpHeaderReader.readQualityFactorParameter(reader);
         }
     }
     

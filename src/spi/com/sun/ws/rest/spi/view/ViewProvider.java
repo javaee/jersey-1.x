@@ -23,7 +23,6 @@
 package com.sun.ws.rest.spi.view;
 
 import com.sun.ws.rest.api.container.ContainerException;
-import com.sun.ws.rest.api.core.HttpRequestContext;
 
 /**
  * A provider of {@link View} instances.

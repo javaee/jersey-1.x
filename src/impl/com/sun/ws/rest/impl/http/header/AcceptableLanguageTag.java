@@ -51,7 +51,7 @@ public class AcceptableLanguageTag extends LanguageTag implements QualityFactor 
             parse(tag);
         
         if (reader.hasNext()) {
-            quality = reader.readQualityFactorParameter(reader);
+            quality = HttpHeaderReader.readQualityFactorParameter(reader);
         }
     }
     

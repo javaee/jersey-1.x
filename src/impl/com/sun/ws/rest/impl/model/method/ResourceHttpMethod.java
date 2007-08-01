@@ -55,7 +55,7 @@ public final class ResourceHttpMethod extends ResourceJavaMethod {
         }
     }
     
-    private String getHttpMethod(Method method) throws ContainerException {
+    private static String getHttpMethod(Method method) throws ContainerException {
         HttpMethod httpMethod = method.getAnnotation(HttpMethod.class);
         if (httpMethod == null) {
             throw new ContainerException("Java method is not annotated with HttpMethod");

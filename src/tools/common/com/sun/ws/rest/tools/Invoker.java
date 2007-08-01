@@ -25,7 +25,6 @@ package com.sun.ws.rest.tools;
 import com.sun.istack.tools.MaskingClassLoader;
 import com.sun.istack.tools.ParallelWorldClassLoader;
 import com.sun.tools.xjc.api.util.ToolsJarNotFoundException;
-import com.sun.xml.bind.util.Which;
 
 import javax.xml.ws.Service;
 import javax.xml.ws.WebServiceFeature;

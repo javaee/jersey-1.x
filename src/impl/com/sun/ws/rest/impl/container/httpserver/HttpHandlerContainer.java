@@ -27,7 +27,6 @@ import com.sun.net.httpserver.HttpHandler;
 import com.sun.ws.rest.api.container.ContainerException;
 import com.sun.ws.rest.api.core.HttpResponseContext;
 import com.sun.ws.rest.impl.ResponseBuilderImpl;
-import com.sun.ws.rest.impl.application.WebApplicationImpl;
 import com.sun.ws.rest.spi.container.WebApplication;
 import java.io.IOException;
 import java.io.PrintWriter;

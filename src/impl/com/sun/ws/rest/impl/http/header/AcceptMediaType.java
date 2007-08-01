@@ -23,7 +23,6 @@
 package com.sun.ws.rest.impl.http.header;
 
 import javax.ws.rs.core.MediaType;
-import com.sun.ws.rest.impl.http.header.reader.HttpHeaderReader;
 import java.util.Map;
 
 public class AcceptMediaType extends MediaType {

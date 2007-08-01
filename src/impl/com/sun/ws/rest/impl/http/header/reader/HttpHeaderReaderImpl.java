@@ -22,12 +22,7 @@
 
 package com.sun.ws.rest.impl.http.header.reader;
 
-import java.lang.reflect.Constructor;
 import java.text.ParseException;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
 
 /**
  *

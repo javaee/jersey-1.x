@@ -70,7 +70,7 @@ public class MediaTypeProvider implements HeaderProvider<MediaType> {
         Map<String, String> params = null;
         
         if (reader.hasNext())
-            params = reader.readParameters(reader);
+            params = HttpHeaderReader.readParameters(reader);
         
         return new MediaType(type,subType,params);
     }

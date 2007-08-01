@@ -30,7 +30,6 @@ import com.sun.ws.rest.impl.ResponseBuilderImpl;
 import com.sun.ws.rest.spi.dispatch.RequestDispatcher;
 import com.sun.ws.rest.impl.model.parameter.ParameterExtractor;
 import com.sun.ws.rest.impl.model.parameter.ParameterProcessor;
-import com.sun.ws.rest.impl.model.method.ResourceMethod;
 import com.sun.ws.rest.impl.model.method.ResourceMethodData;
 import com.sun.ws.rest.impl.model.parameter.AbstractParameterProcessor;
 import java.lang.annotation.Annotation;
@@ -118,7 +117,7 @@ public class EntityParamDispatchProvider implements ResourceMethodDispatchProvid
         throws IllegalAccessException, InvocationTargetException {
             final Object[] params = getParams(request);
             
-            Object o = (Object)method.invoke(resource, params);
+            Object o = method.invoke(resource, params);
             Response r = ResponseBuilderImpl.representation(o, mediaType).build();
             response.setResponse(r);
         }

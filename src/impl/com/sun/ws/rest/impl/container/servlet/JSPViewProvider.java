@@ -27,10 +27,7 @@ import com.sun.ws.rest.api.core.HttpRequestContext;
 import com.sun.ws.rest.api.core.HttpResponseContext;
 import com.sun.ws.rest.spi.view.ViewProvider;
 import com.sun.ws.rest.spi.view.View;
-import java.io.IOException;
 import java.net.MalformedURLException;
-import java.util.ArrayList;
-import java.util.List;
 import javax.ws.rs.core.MediaType;
 
 /**

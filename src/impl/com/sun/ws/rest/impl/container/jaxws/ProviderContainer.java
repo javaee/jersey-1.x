@@ -23,7 +23,6 @@
 package com.sun.ws.rest.impl.container.jaxws;
 
 import com.sun.ws.rest.api.container.ContainerException;
-import java.net.URISyntaxException;
 import com.sun.ws.rest.impl.ImplMessages;
 import com.sun.ws.rest.spi.container.WebApplication;
 import java.io.IOException;

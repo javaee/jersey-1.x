@@ -24,7 +24,6 @@ package com.sun.ws.rest.impl.model.node;
 
 import javax.ws.rs.WebApplicationException;
 import com.sun.ws.rest.api.container.ContainerException;
-import com.sun.ws.rest.api.core.HttpRequestContext;
 import com.sun.ws.rest.impl.dispatch.URITemplateDispatcher;
 import com.sun.ws.rest.spi.dispatch.ResourceDispatchContext;
 import com.sun.ws.rest.impl.model.parameter.ParameterExtractor;

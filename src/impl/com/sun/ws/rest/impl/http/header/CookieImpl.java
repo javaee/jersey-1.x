@@ -22,7 +22,6 @@
 
 package com.sun.ws.rest.impl.http.header;
 
-import com.sun.ws.rest.impl.http.header.writer.WriterUtil;
 import java.util.ArrayList;
 import java.util.List;
 import javax.ws.rs.core.Cookie;

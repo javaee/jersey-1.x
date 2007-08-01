@@ -24,7 +24,6 @@ package com.sun.ws.rest.impl.dispatch;
 
 import com.sun.ws.rest.api.container.ContainerException;
 import com.sun.ws.rest.api.core.ResourceConfig;
-import com.sun.ws.rest.impl.dispatch.DispatcherProvider;
 import com.sun.ws.rest.spi.service.ServiceFinder;
 import java.util.ArrayList;
 import java.util.Collections;
