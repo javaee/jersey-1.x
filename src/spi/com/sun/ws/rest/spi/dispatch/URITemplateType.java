@@ -103,7 +103,7 @@ public final class URITemplateType {
      */
     public static final String RIGHT_SLASHED_REGEX = "(/)?";
     
-    static public final URITemplateType NULL = new URITemplateType();
+    public static final URITemplateType NULL = new URITemplateType();
             
     /**
      * The URI template.
@@ -121,7 +121,7 @@ public final class URITemplateType {
      * The names of templates in the URI template.
      */
     private final List<String> templateNames;
-
+    
     /**
      * The regular expression for matching URIs and obtaining template values.
      */
@@ -134,7 +134,7 @@ public final class URITemplateType {
 
     // Constructor for NULL template
     private URITemplateType() {
-        this.template = null;
+        this.template = "";
         this.rightHandPattern = null;
         this.endsWithSlash = false;
         this.templateNames = Collections.emptyList();
