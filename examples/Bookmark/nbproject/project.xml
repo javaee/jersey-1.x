@@ -16,10 +16,6 @@
                     <path-in-war>WEB-INF/lib</path-in-war>
                 </library>
                 <library files="1">
-                    <file>${file.reference.http.jar-1}</file>
-                    <path-in-war>WEB-INF/lib</path-in-war>
-                </library>
-                <library files="1">
                     <file>${file.reference.jaxb-api.jar-1}</file>
                     <path-in-war>WEB-INF/lib</path-in-war>
                 </library>
