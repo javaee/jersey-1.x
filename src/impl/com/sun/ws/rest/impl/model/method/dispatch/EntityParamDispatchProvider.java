@@ -118,7 +118,7 @@ public class EntityParamDispatchProvider implements ResourceMethodDispatchProvid
             final Object[] params = getParams(request);
             
             Object o = method.invoke(resource, params);
-            Response r = ResponseBuilderImpl.representation(o, mediaType).build();
+            Response r = new ResponseBuilderImpl().status(200).entity(o).type(mediaType).build();
             response.setResponse(r);
         }
     }
@@ -154,7 +154,7 @@ public class EntityParamDispatchProvider implements ResourceMethodDispatchProvid
                 Response r = (Response)o;
                 responseContext.setResponse(r, mediaType);
             } else {
-                Response r = ResponseBuilderImpl.representation(o, mediaType).build();
+                Response r = new ResponseBuilderImpl().status(200).entity(o).type(mediaType).build();
                 responseContext.setResponse(r);
             }            
         }

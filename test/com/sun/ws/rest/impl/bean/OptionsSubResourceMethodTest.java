@@ -72,7 +72,7 @@ public class OptionsSubResourceMethodTest extends AbstractBeanTester {
         
     public void testNoOptions() {
         HttpResponseContext r = callNoStatusCheck(ResourceNoOptions.class, "OPTIONS", "/sub", null, null, "");
-        assertEquals(200, r.getStatus());
+        assertEquals(204, r.getStatus());
         assertEquals(null, r.getEntity());
         String allow = r.getHttpHeaders().getFirst("Allow").toString();
         assertTrue(allow.contains("GET"));
@@ -151,14 +151,14 @@ public class OptionsSubResourceMethodTest extends AbstractBeanTester {
     
     public void testNoOptionsDifferentSub() {
         HttpResponseContext r = callNoStatusCheck(ResourceNoOptionsDifferentSub.class, "OPTIONS", "/sub1", null, null, "");
-        assertEquals(200, r.getStatus());
+        assertEquals(204, r.getStatus());
         assertEquals(null, r.getEntity());
         String allow = r.getHttpHeaders().getFirst("Allow").toString();
         assertTrue(allow.contains("GET"));
         assertFalse(allow.contains("PUT"));
         
         r = callNoStatusCheck(ResourceNoOptionsDifferentSub.class, "OPTIONS", "/sub2", null, null, "");
-        assertEquals(200, r.getStatus());
+        assertEquals(204, r.getStatus());
         assertEquals(null, r.getEntity());
         allow = r.getHttpHeaders().getFirst("Allow").toString();
         assertTrue(allow.contains("PUT"));

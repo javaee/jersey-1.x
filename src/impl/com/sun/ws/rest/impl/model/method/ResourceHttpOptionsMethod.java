@@ -49,8 +49,7 @@ public final class ResourceHttpOptionsMethod extends ResourceMethod {
         public void dispatch(Object resource, 
                 HttpRequestContext requestContext, 
                 HttpResponseContext responseContext) {
-            Response r = new ResponseBuilderImpl().ok().
-                    header("Allow", allow).build();
+            Response r = new ResponseBuilderImpl().header("Allow", allow).build();
             responseContext.setResponse(r, null);
         }
     }
