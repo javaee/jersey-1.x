@@ -34,6 +34,7 @@
 	<ant dir="Bookstore" target="${target}" inheritAll="false"/>
 	<ant dir="HelloWorld" target="${target}" inheritAll="false"/>
 	<ant dir="Bookmark" target="${target}" inheritAll="false"/>
+	<ant dir="EntityProvider" target="${target}" inheritAll="false"/>
     </target>
 
     <target name="clean">
@@ -90,6 +91,9 @@
         </antcall>
         <antcall target="convert-property">
             <param name="example" value="Bookmark"/>
+        </antcall>
+        <antcall target="convert-property">
+            <param name="example" value="EntityProvider"/>
         </antcall>
     </target>
 </project>
