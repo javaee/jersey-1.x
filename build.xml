@@ -216,6 +216,34 @@
             <jvmarg line="${run.jvmargs}"/>
         </junit2>
     </target>
+
+    <target name="-check-findbugs">
+        <available file="findbugs/findbugs.zip" property="findbugsExists"/>
+    </target>
+
+    <target name="-get-findbugs" depends="-check-findbugs" unless="findbugsExists">
+        <mkdir dir="findbugs"/>
+        <get src="http://prdownloads.sourceforge.net/findbugs/findbugs-1.2.1.zip?download" dest="findbugs/findbugs.zip"/>
+        <unzip src="findbugs/findbugs.zip" dest="findbugs/"/>
+    </target>
+
+    <target name="findbugs" depends="dist, -get-findbugs">
+        <taskdef name="findbugs" classname="edu.umd.cs.findbugs.anttask.FindBugsTask">
+            <classpath>
+                <pathelement path="findbugs/findbugs-1.2.1/lib/findbugs-ant.jar" />
+            </classpath>
+        </taskdef>
+        <findbugs home="findbugs/findbugs-1.2.1"
+                  output="xml"
+                  outputFile="jersey-fb.xml" >
+            <auxClasspath>
+                <fileset dir="${basedir}/lib" includes="*.jar"/>
+                <pathelement location="${tools.jar}"/>
+            </auxClasspath>
+            <sourcePath path="src" />
+            <class location="dist/jersey.jar" />
+        </findbugs>	
+    </target>
     
     <target name="clean-tests" depends="init">
         <delete dir="${build.test.classes.dir}"/>
