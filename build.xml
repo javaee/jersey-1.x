@@ -85,25 +85,40 @@
     <target name="dist" depends="dist-release"/>
     
     <target name="dist-src" depends="jar, javadoc">
+        <!-- create source zip -->
+        <zip destfile="${basedir}/dist/${release.impl.basename}.src.zip">
+            <fileset dir="src/api"/>
+            <fileset dir="src/spi"/>
+            <fileset dir="src/impl"/>
+            <fileset dir="src/tools/common"/>
+            <fileset dir="src/tools/javase5"/>
+            <fileset dir="build/gen-src"/>
+        </zip>
+        
         <!-- build the examples -->
         <ant dir="examples" target="build"/>
         <ant dir="examples" target="clean"/>
         
         <!-- create a zip file of the source distribution -->
-        <zip destfile="${basedir}/dist/${release.src.name}.zip"
+        <zip destfile="${basedir}/dist/${release.snapshot.name}.zip"
              basedir=".." includes="jersey/**"/>
         <!-- copy to non-versioned name -->
-        <copy file="${basedir}/dist/${release.src.name}.zip" 
-              tofile="${basedir}/dist/jersey-src.zip"/>
+        <copy file="${basedir}/dist/${release.snapshot.name}.zip" 
+              tofile="${basedir}/dist/${release.snapshot.basename}.zip"/>
     </target>
         
     <target name="dist-release" depends="dist-src">
         <!-- create lib -->
         <mkdir dir="${release.impl.dir}/lib"/>
+        <!-- copy src -->
+        <copy file="${basedir}/dist/${release.impl.basename}.src.zip" 
+              todir="${release.impl.dir}/lib"/>
+        <!-- copy jar -->
         <copy file="${dist.jar}" 
               todir="${release.impl.dir}/lib"/>
+        <!-- copy runtime dependent jars -->
         <copy todir="${release.impl.dir}/lib">
-            <fileset dir="${basedir}/lib" excludes="junit*.jar, *.zip"/>
+            <fileset dir="${basedir}/lib" excludes="junit*.jar"/>
         </copy>
         
         <!-- license -->
@@ -133,7 +148,7 @@
              basedir="${basedir}/dist" includes="${release.impl.name}/**"/>
         <!-- copy to non-versioned name -->
         <copy file="${basedir}/dist/${release.impl.name}.zip" 
-              tofile="${basedir}/dist/jersey.zip"/>
+              tofile="${basedir}/dist/${release.impl.basename}.zip"/>
     </target>
     
     <!-- Override default javadoc to only document api and spi -->

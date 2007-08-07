@@ -1,4 +1,8 @@
 release 0.2.1 (2007-08-xx)
+- Rename the zip of the Jersey respository from 'jersey-src' to 
+  'jersey-snapshot'.
+- Include zip of 311 src and Jersey src in the lib directory of the 
+  distribution to faciliate easier debugging.
 - Fixed bug in light weight HTTP server container that caused query parameters
   to be decoded twice and incorrectly extracted from the URI query string.
 - JSON entity providers added to support JSONArray and JSONObject 
