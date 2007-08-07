@@ -22,8 +22,11 @@
 
 package com.sun.ws.rest.impl.model;
 
+import com.sun.ws.rest.impl.http.header.AcceptMediaType;
 import javax.ws.rs.core.MediaType;
 import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
 /**
  * List of {@link MediaType}.
@@ -54,5 +57,26 @@ public final class MediaTypeList extends ArrayList<MediaType> {
                 return false;
             
          return true;
+    }
+    
+    /**
+     * Get a media type given a list of acceptable media type.
+     *
+     * @param accept the list of acceptable media type. The list MUST be ordered
+     * according to the quality parameter of the media type, the highest quality
+     * media type occuring first.
+     * @return the acceptable media type
+     */
+    public MediaType getAcceptableMediaType(List<MediaType> accept) {
+        Iterator<MediaType> i = accept.iterator();
+        while (i.hasNext()) {
+            MediaType a = i.next();
+            if (a.getType().equals(MediaType.MEDIA_TYPE_WILDCARD)) 
+                return get(0);
+        
+            for (MediaType m : this)
+                if (m.isCompatible(a)) return m;
+        }
+        return null;
     }
 }

@@ -26,6 +26,7 @@ import javax.ws.rs.HttpMethod;
 import javax.ws.rs.ProduceMime;
 import javax.ws.rs.UriTemplate;
 import com.sun.ws.rest.api.core.HttpResponseContext;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 /**
@@ -113,4 +114,39 @@ public class AcceptTest extends AbstractBeanTester {
                 null, "application/foo;q=0.1234", "");
         assertEquals(400, response.getStatus());        
     }
+    
+    @UriTemplate("/")
+    public static class MultipleResource {
+        @ProduceMime({"application/foo", "application/bar"})
+        @HttpMethod
+        public String get() {
+            return "GET";
+        }        
+    }
+    
+    public void testAcceptMultiple() {
+        HttpResponseContext r = callGet(MultipleResource.class, "/", 
+                "application/foo");
+        String rep = (String)r.getEntity();
+        assertEquals("GET", rep);
+        assertEquals(new MediaType("application/foo"), r.getHttpHeaders().getFirst("Content-Type"));
+        
+        r = callGet(MultipleResource.class, "/", 
+                "application/bar");
+        rep = (String)r.getEntity();
+        assertEquals("GET", rep);
+        assertEquals(new MediaType("application/bar"), r.getHttpHeaders().getFirst("Content-Type"));
+        
+        r = callGet(MultipleResource.class, "/", 
+                "*");
+        rep = (String)r.getEntity();
+        assertEquals("GET", rep);
+        assertEquals(new MediaType("application/foo"), r.getHttpHeaders().getFirst("Content-Type"));
+        
+        r = callGet(MultipleResource.class, "/", 
+                "application/*");
+        rep = (String)r.getEntity();
+        assertEquals("GET", rep);
+        assertEquals(new MediaType("application/foo"), r.getHttpHeaders().getFirst("Content-Type"));
+    }   
 }

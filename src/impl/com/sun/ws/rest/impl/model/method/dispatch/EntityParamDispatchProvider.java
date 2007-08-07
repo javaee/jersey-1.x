@@ -27,6 +27,7 @@ import com.sun.ws.rest.api.container.ContainerException;
 import com.sun.ws.rest.api.core.HttpRequestContext;
 import com.sun.ws.rest.api.core.HttpResponseContext;
 import com.sun.ws.rest.impl.ResponseBuilderImpl;
+import com.sun.ws.rest.impl.model.MediaTypeList;
 import com.sun.ws.rest.spi.dispatch.RequestDispatcher;
 import com.sun.ws.rest.impl.model.parameter.ParameterExtractor;
 import com.sun.ws.rest.impl.model.parameter.ParameterProcessor;
@@ -62,12 +63,16 @@ public class EntityParamDispatchProvider implements ResourceMethodDispatchProvid
     static abstract class EntityParamInInvoker extends ResourceJavaMethodDispatcher {        
         final private ParameterExtractor[] injectors;
         
-        final protected MediaType mediaType;
+        final private MediaType mediaType;
 
+        final private MediaTypeList produceMime;
+        
         EntityParamInInvoker(ResourceMethodData method, ParameterExtractor[] injectors) {
             super(method);
+            this.produceMime = method.produceMime;
             this.injectors = injectors;
 
+            
             if (method.produceMime.size() == 1) {
                 MediaType c = method.produceMime.get(0);
                 if (c.getType().equals("*") || c.getSubtype().equals("*")) 
@@ -92,6 +97,21 @@ public class EntityParamDispatchProvider implements ResourceMethodDispatchProvid
                 throw new ContainerException("Exception injecting parameters to Web resource method", e);
             }
         }
+        
+        protected final MediaType getAcceptableMediaType(HttpRequestContext requestContext) {
+            if (produceMime.size() == 1) {
+                return mediaType;
+            } else {
+                MediaType m = produceMime.getAcceptableMediaType(requestContext.getAcceptableMediaTypes());
+                if (m != null) {
+                    if (m.getType().equals(MediaType.MEDIA_TYPE_WILDCARD) ||
+                            m.getSubtype().equals(MediaType.MEDIA_TYPE_WILDCARD))
+                        return null;
+                }
+                
+                return m;
+            }
+        }
     }
     
     static final class VoidOutInvoker extends EntityParamInInvoker {
@@ -100,9 +120,9 @@ public class EntityParamDispatchProvider implements ResourceMethodDispatchProvid
         }
 
         @SuppressWarnings("unchecked")
-        public void _dispatch(Object resource, HttpRequestContext request, HttpResponseContext response) 
+        public void _dispatch(Object resource, HttpRequestContext requestContext, HttpResponseContext responseContext) 
         throws IllegalAccessException, InvocationTargetException {
-            final Object[] params = getParams(request);
+            final Object[] params = getParams(requestContext);
             method.invoke(resource, params);
         }
     }
@@ -113,13 +133,14 @@ public class EntityParamDispatchProvider implements ResourceMethodDispatchProvid
         }
 
         @SuppressWarnings("unchecked")
-        public void _dispatch(Object resource, HttpRequestContext request, HttpResponseContext response)
+        public void _dispatch(Object resource, HttpRequestContext requestContext, HttpResponseContext responseContext)
         throws IllegalAccessException, InvocationTargetException {
-            final Object[] params = getParams(request);
+            final Object[] params = getParams(requestContext);
             
             Object o = method.invoke(resource, params);
+            MediaType mediaType = getAcceptableMediaType(requestContext);
             Response r = new ResponseBuilderImpl().status(200).entity(o).type(mediaType).build();
-            response.setResponse(r);
+            responseContext.setResponse(r);
         }
     }
     
@@ -134,6 +155,7 @@ public class EntityParamDispatchProvider implements ResourceMethodDispatchProvid
             final Object[] params = getParams(requestContext);
 
             Response r = (Response)method.invoke(resource, params);
+            MediaType mediaType = getAcceptableMediaType(requestContext);
             responseContext.setResponse(r, mediaType);
         }
     }
@@ -150,6 +172,7 @@ public class EntityParamDispatchProvider implements ResourceMethodDispatchProvid
             
             Object o = method.invoke(resource, params);
             
+            MediaType mediaType = getAcceptableMediaType(requestContext);
             if (o instanceof Response) {
                 Response r = (Response)o;
                 responseContext.setResponse(r, mediaType);

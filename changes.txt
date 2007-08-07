@@ -1,4 +1,8 @@
 release 0.2.1 (2007-08-xx)
+- For an HTTP method that produces more than one media type automatically
+  select the appropriate media type according to what is acceptable. This
+  enables a developer to implement one method for the returning of a JAXB 
+  bean that can be serialized as XML or JSON.
 - Rename the zip of the Jersey respository from 'jersey-src' to 
   'jersey-snapshot'.
 - Include zip of 311 src and Jersey src in the lib directory of the 

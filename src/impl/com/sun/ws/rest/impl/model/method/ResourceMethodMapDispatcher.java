@@ -66,7 +66,6 @@ public class ResourceMethodMapDispatcher extends URITemplateDispatcher {
         MediaType contentType = null;
         if (!httpMethod.equals("GET") && !httpMethod.equals("DELETE"))
             contentType = HttpHelper.getContentType(request);
-        List<MediaType> accept = request.getAcceptableMediaTypes();
         
         // Get the list of methods for the HTTP method
         ResourceMethodList methods = map.get(httpMethod);
@@ -83,6 +82,7 @@ public class ResourceMethodMapDispatcher extends URITemplateDispatcher {
         }
 
         // Get the list of matching methods
+        List<MediaType> accept = request.getAcceptableMediaTypes();
         LinkedList<ResourceMethod> matches = 
             new LinkedList<ResourceMethod>();
         ResourceMethodList.MatchStatus s = methods.match(contentType, accept, matches);
