@@ -227,7 +227,10 @@
         <unzip src="findbugs/findbugs.zip" dest="findbugs/"/>
     </target>
 
-    <target name="findbugs" depends="dist, -get-findbugs">
+    <target name="findbugs" depends="dist, -findbugs"/>
+    <target name="hudson-findbugs" depends="-findbugs"/>
+
+    <target name="-findbugs" depends="-get-findbugs">
         <taskdef name="findbugs" classname="edu.umd.cs.findbugs.anttask.FindBugsTask">
             <classpath>
                 <pathelement path="findbugs/findbugs-1.2.1/lib/findbugs-ant.jar" />
@@ -235,7 +238,7 @@
         </taskdef>
         <findbugs home="findbugs/findbugs-1.2.1"
                   output="xml"
-                  outputFile="jersey-fb.xml" >
+                  outputFile="findbugs.xml" >
             <auxClasspath>
                 <fileset dir="${basedir}/lib" includes="*.jar"/>
                 <pathelement location="${tools.jar}"/>
