@@ -1,7 +1,6 @@
 release 0.2.1 (2007-08-xx)
-- removed [json.org.jar] from libraries. 
-  JSONObject and JSONArray classes will be taken from [jettison-1.0-RC1.jar]:
-  org.json.JSON* -> org.codehaus.jettison.json.JSON*
+- JAXB beans can be serialized as JSON or XML using one HTTP method with
+  a @ProduceMime({"application/xml", "application/json"}).
 - For an HTTP method that produces more than one media type automatically
   select the appropriate media type according to what is acceptable. This
   enables a developer to implement one method for the returning of a JAXB 
@@ -13,8 +12,7 @@ release 0.2.1 (2007-08-xx)
 - Fixed bug in light weight HTTP server container that caused query parameters
   to be decoded twice and incorrectly extracted from the URI query string.
 - JSON entity providers added to support JSONArray and JSONObject 
-  entities from http://www.json.org/java/index.html
-
+  entities from Jettison.
 
 release 0.2 (2007-07-19)
 - include Allow header in a 405 (Method Not Allowed) response.
