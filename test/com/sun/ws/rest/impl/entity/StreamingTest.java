@@ -34,6 +34,8 @@ import javax.mail.internet.MimeBodyPart;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Marshaller;
 import javax.mail.internet.MimeMultipart;
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 /**
  *
@@ -109,5 +111,21 @@ public class StreamingTest extends AbstractStreamingTester {
         fp.put("source", "Gulp-CalGul-1.05");
         
         roundTrip(FormURLEncodedProperties.class, fp);
-    }    
+    }
+    
+    public void testJSONArray() throws Exception {
+        JSONArray array = new JSONArray();
+        array.put("One").put("Two").put("Three").put(1).put(2.0);
+        roundTrip(JSONArray.class, array);
+    }
+    
+    public void testJSONObject() throws Exception {
+        JSONObject object = new JSONObject();
+        object.put("userid", 1234).
+        put("username", "1234").
+        put("email", "a@b").
+        put("password", "****");
+        
+        roundTrip(JSONObject.class, object);
+    }
 }
