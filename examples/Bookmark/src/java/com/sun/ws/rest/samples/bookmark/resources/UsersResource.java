@@ -32,7 +32,8 @@ import javax.ws.rs.UriParam;
 import javax.ws.rs.UriTemplate;
 import javax.ws.rs.core.HttpContext;
 import javax.ws.rs.core.UriInfo;
-import org.json.JSONArray;
+import org.codehaus.jettison.json.JSONArray;
+
 
 /**
  *

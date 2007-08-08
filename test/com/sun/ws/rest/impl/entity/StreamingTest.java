@@ -34,8 +34,8 @@ import javax.mail.internet.MimeBodyPart;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Marshaller;
 import javax.mail.internet.MimeMultipart;
-import org.json.JSONArray;
-import org.json.JSONObject;
+import org.codehaus.jettison.json.JSONArray;
+import org.codehaus.jettison.json.JSONObject;
 
 /**
  *

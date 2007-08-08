@@ -27,7 +27,7 @@ import java.io.InputStream;
 import java.net.ContentHandler;
 import java.net.ContentHandlerFactory;
 import java.net.URLConnection;
-import org.json.JSONArray;
+import org.codehaus.jettison.json.JSONArray;
 
 /**
  *

@@ -32,11 +32,10 @@ import javax.ws.rs.HttpMethod;
 import javax.ws.rs.ProduceMime;
 import javax.ws.rs.UriTemplate;
 import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.core.HttpContext;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
-import org.json.JSONException;
-import org.json.JSONObject;
+import org.codehaus.jettison.json.JSONException;
+import org.codehaus.jettison.json.JSONObject;
 
 /**
  *
