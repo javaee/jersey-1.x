@@ -102,7 +102,9 @@
         
         <!-- create a zip file of the source distribution -->
         <zip destfile="${basedir}/dist/${release.snapshot.name}.zip"
-             basedir=".." includes="jersey/**"/>
+             basedir=".."
+	     includes="jersey/**"
+	     excludes="jersey/findbugs/**"/>
         <!-- copy to non-versioned name -->
         <copy file="${basedir}/dist/${release.snapshot.name}.zip" 
               tofile="${basedir}/dist/${release.snapshot.basename}.zip"/>
@@ -145,8 +147,10 @@
         <ant dir="examples" target="dist"/>
         
         <!-- create a zip file of the distribution -->
+        <delete file="${basedir}/dist/${release.impl.name}.zip"/>
         <zip destfile="${basedir}/dist/${release.impl.name}.zip"
-             basedir="${basedir}/dist" includes="${release.impl.name}/**"/>
+             basedir="${basedir}/dist"
+	    includes="${release.impl.name}/**"/>
         <!-- copy to non-versioned name -->
         <copy file="${basedir}/dist/${release.impl.name}.zip" 
               tofile="${basedir}/dist/${release.impl.basename}.zip"/>
