@@ -249,7 +249,7 @@ public class HttpRequestContextImpl implements ContainerRequest {
     }
     
     
-    private final class PathSegmentImpl implements PathSegment {
+    private static final class PathSegmentImpl implements PathSegment {
         private String path;
         
         private MultivaluedMap<String, String> matrixParameters;

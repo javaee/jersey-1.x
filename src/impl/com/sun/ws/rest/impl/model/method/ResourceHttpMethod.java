@@ -36,10 +36,9 @@ import java.lang.reflect.Method;
  */
 public final class ResourceHttpMethod extends ResourceJavaMethod {
     /**
-     * Common HTTP methods. Other HTTP methods are also supported, e.g. those
-     * specified by WebDAV but are not listed here for reasons of conciseness.
+     * HTTP methods that may be used as the prefix of a Java method name.
      */
-    public static final String COMMON_METHODS[] = {GET, POST, PUT, DELETE, HEAD};
+    private static final String COMMON_METHODS[] = {GET, POST, PUT, DELETE, HEAD};
     
     public ResourceHttpMethod(ResourceClass resourceClass, Method method) throws ContainerException {
         super(resourceClass, method);

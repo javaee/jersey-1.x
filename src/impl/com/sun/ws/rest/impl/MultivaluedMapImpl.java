@@ -61,7 +61,7 @@ public final class MultivaluedMapImpl
         List<String> l = getList(key);
         
         if (value != null)
-            l.add(value.toString());
+            l.add(value);
         else 
             l.add("");
     }

@@ -136,6 +136,7 @@ public final class WebApplicationImpl implements WebApplication {
         this.initiated = true;
         this.resourceConfig = resourceConfig;
         this.rootResourceClass = new RootResourceClass(containerMomento, resourceConfig, resolverFactory);
+        this.containerMomento = containerMomento;
     }
 
     public void register(Class... resourceClasses) {

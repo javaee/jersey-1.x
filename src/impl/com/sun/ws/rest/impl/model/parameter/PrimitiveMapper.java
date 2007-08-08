@@ -47,13 +47,13 @@ final class PrimitiveMapper {
         primitiveToClassMap.put(Float.TYPE, Float.class);
         primitiveToClassMap.put(Double.TYPE, Double.class);
         
-        primitiveToDefaultValueMap.put(Boolean.class, new Boolean(false));
-        primitiveToDefaultValueMap.put(Byte.class, new Byte((byte)0));
-        primitiveToDefaultValueMap.put(Short.class, new Short((short)0));
-        primitiveToDefaultValueMap.put(Integer.class, new Integer(0));
-        primitiveToDefaultValueMap.put(Long.class, new Long(0l));
-        primitiveToDefaultValueMap.put(Float.class, new Float(0.0f));
-        primitiveToDefaultValueMap.put(Double.class, new Double(0.0d));
+        primitiveToDefaultValueMap.put(Boolean.class, Boolean.valueOf(false));
+        primitiveToDefaultValueMap.put(Byte.class, Byte.valueOf((byte)0));
+        primitiveToDefaultValueMap.put(Short.class, Short.valueOf((short)0));
+        primitiveToDefaultValueMap.put(Integer.class, Integer.valueOf(0));
+        primitiveToDefaultValueMap.put(Long.class, Long.valueOf(0l));
+        primitiveToDefaultValueMap.put(Float.class, Float.valueOf(0.0f));
+        primitiveToDefaultValueMap.put(Double.class, Double.valueOf(0.0d));
     }
     
 }

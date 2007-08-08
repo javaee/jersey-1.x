@@ -54,7 +54,7 @@ public final class HttpResponseAdaptor extends HttpResponseContextImpl {
         super(requestContext);
         this.context = context;
         this.response = response;
-        this.response = response;
+        this.request = request;
     }
 
     @SuppressWarnings("unchecked")

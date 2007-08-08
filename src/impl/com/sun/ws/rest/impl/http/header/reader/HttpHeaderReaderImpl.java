@@ -111,7 +111,7 @@ public final class HttpHeaderReaderImpl extends HttpHeaderReader {
 	this.header = (header == null) ? "" : header;
 	this.processComments = processComments;
 	this.index = 0;
-	this.length = header.length();
+	this.length = this.header.length();
     }
 
     public HttpHeaderReaderImpl(String header)  {
@@ -193,13 +193,13 @@ public final class HttpHeaderReaderImpl extends HttpHeaderReader {
                 return Event.Token;
             }
             case QUOTED_STRING:
-                processQuotedString(c);
+                processQuotedString();
                 return Event.QuotedString;
             case COMMENT:
                 if (!processComments) 
                     throw new ParseException("Comments are not allowed", index);
 
-                processComment(c);
+                processComment();
                 return Event.Comment;
             case SEPARATOR:
                 index++;
@@ -215,14 +215,14 @@ public final class HttpHeaderReaderImpl extends HttpHeaderReader {
         }
     }
     
-    private void processComment(char c) throws ParseException {        
+    private void processComment() throws ParseException {        
 	boolean filter = false;
         int nesting;
         int start;
         for (start = ++index, nesting = 1; 
              nesting > 0 && index < length;
              index++) {
-            c = header.charAt(index);
+            char c = header.charAt(index);
             if (c == '\\') {
                 index++;
                 filter = true;
@@ -241,10 +241,10 @@ public final class HttpHeaderReaderImpl extends HttpHeaderReader {
             : header.substring(start, index - 1);
     }
     
-    private void processQuotedString(char c) throws ParseException {        
+    private void processQuotedString() throws ParseException {        
         boolean filter = false;
         for (int start = ++index; index < length; index++) {
-            c = this.header.charAt(index);
+            char c = this.header.charAt(index);
             if (c == '\\') {
                 index++;
                 filter = true;

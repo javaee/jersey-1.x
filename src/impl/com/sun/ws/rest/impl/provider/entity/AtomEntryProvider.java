@@ -96,13 +96,7 @@ public final class AtomEntryProvider extends AbstractTypeEntityProvider<Entry> {
         WireFeedOutput wireFeedOutput = new WireFeedOutput();
         Document feedDoc = wireFeedOutput.outputJDom(feed);
         feedDoc.getRootElement().addContent(fetchedEntryElement);
-        
-        // Check for our special namespaced element. If it's there, then we 
-        // know that client is not preserving foreign markup.
-        Namespace ns = Namespace.getNamespace(
-            "https://rome.dev.java.net/namespaces/app");
-        Element customElement = fetchedEntryElement.getChild("atom-draft", ns);
-        
+                
         WireFeedInput input = new WireFeedInput();
         Feed parsedFeed = (Feed)input.build(feedDoc);
         return (Entry)parsedFeed.getEntries().get(0);
@@ -133,14 +127,7 @@ public final class AtomEntryProvider extends AbstractTypeEntityProvider<Entry> {
         
         // Grab entry element from feed and get JDOM to serialize it
         Element entryElement= (Element)feedDoc.getRootElement().getChildren().get(0);
-        
-        // Add custom namespaced element, so we can determine if we can 
-        // count on client to preserve foreign markup as it should.
-        Element customElement = new Element("atom-draft", 
-            "https://rome.dev.java.net/namespaces/app");
-        customElement.setText("10");
-        entryElement.addContent(customElement);
-        
+                
         XMLOutputter outputter = new XMLOutputter();
         outputter.setFormat(Format.getPrettyFormat());
         
