@@ -1,4 +1,7 @@
 release 0.2.1 (2007-08-xx)
+- removed [json.org.jar] from libraries. 
+  JSONObject and JSONArray classes will be taken from [jettison-1.0-RC1.jar]:
+  org.json.JSON* -> org.codehaus.jettison.json.JSON*
 - For an HTTP method that produces more than one media type automatically
   select the appropriate media type according to what is acceptable. This
   enables a developer to implement one method for the returning of a JAXB 
