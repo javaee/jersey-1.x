@@ -85,7 +85,7 @@
 
     <!-- Distribution tasks -->
 
-    <target name="dist-src" depends="jar, javadoc">
+    <target name="dist-snapshot" depends="jar, javadoc, findbugs">
         <!-- create source zip -->
         <zip destfile="${basedir}/dist/${release.impl.basename}.src.zip">
             <fileset dir="src/api"/>
@@ -101,6 +101,7 @@
         <ant dir="examples" target="clean"/>
         
         <!-- create a zip file of the source distribution -->
+        <delete file="${basedir}/dist/${release.snapshot.name}.zip"/>
         <zip destfile="${basedir}/dist/${release.snapshot.name}.zip"
              basedir=".."
 	     includes="jersey/**"
@@ -110,7 +111,7 @@
               tofile="${basedir}/dist/${release.snapshot.basename}.zip"/>
     </target>
         
-    <target name="dist-release" depends="dist-src">
+    <target name="dist-release" depends="dist-snapshot">
         <!-- create lib -->
         <mkdir dir="${release.impl.dir}/lib"/>
         <!-- copy src -->
@@ -147,7 +148,6 @@
         <ant dir="examples" target="dist"/>
         
         <!-- create a zip file of the distribution -->
-        <delete file="${basedir}/dist/${release.impl.name}.zip"/>
         <zip destfile="${basedir}/dist/${release.impl.name}.zip"
              basedir="${basedir}/dist"
 	    includes="${release.impl.name}/**"/>
@@ -156,7 +156,7 @@
               tofile="${basedir}/dist/${release.impl.basename}.zip"/>
     </target>
     
-    <target name="dist" depends="dist-release, findbugs"/>
+    <target name="dist" depends="dist-release"/>
     
 
     <!-- Java doc tasks -->
@@ -256,7 +256,7 @@
         </taskdef>
         <mkdir dir="build/findbugs"/>
         <findbugs home="findbugs/findbugs-1.2.1"
-                  output="xml"
+                  output="xml:withMessages"
                   outputFile="build/findbugs/findbugs.xml" >
             <auxClasspath>
                 <fileset dir="${basedir}/lib" includes="*.jar"/>
