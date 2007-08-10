@@ -28,6 +28,7 @@ import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -42,9 +43,9 @@ import java.util.regex.Pattern;
 public final class URITemplateType {
     /**
      * Order the templates according to the template with the highest number
-     * of template values first. 
+     * of template variables first. 
      * <p>
-     * If two templates have the same number of template values then order 
+     * If two templates have the same number of template variables then order 
      * according to the string comparison of the template regular expressions.
      * A template with a more explicit template regular expression (more
      * characters) occurs before a template with a less explicit regular
@@ -68,7 +69,7 @@ public final class URITemplateType {
             
             
             // Compare the number of templates
-            int i = o2.getNumberOfTemplateNames() - o1.getNumberOfTemplateNames();
+            int i = o2.getNumberOfTemplateVariables() - o1.getNumberOfTemplateVariables();
             if (i != 0) return i;
 
             // Compare the template regular expressions, if the number of
@@ -118,9 +119,9 @@ public final class URITemplateType {
     private final boolean endsWithSlash;
     
     /**
-     * The names of templates in the URI template.
+     * The template variables in the URI template.
      */
-    private final List<String> templateNames;
+    private final List<String> templateVariables;
     
     /**
      * The regular expression for matching URIs and obtaining template values.
@@ -137,7 +138,7 @@ public final class URITemplateType {
         this.template = "";
         this.rightHandPattern = null;
         this.endsWithSlash = false;
-        this.templateNames = Collections.emptyList();
+        this.templateVariables = Collections.emptyList();
         this.templateRegex = "";
         this.templateRegexPattern = null;
     }
@@ -145,10 +146,10 @@ public final class URITemplateType {
     /**
      * Construct a new URI template.
      * <p>
-     * The template will be parsed to extract template names.
+     * The template will be parsed to extract template variables.
      * <p>
      * A specific regular expressions will be generated from the template
-     * to match URIs according to the template and map template names to
+     * to match URIs according to the template and map template variables to
      * template values. 
      * <p>
      * @param template the template.
@@ -164,10 +165,10 @@ public final class URITemplateType {
     /**
      * Construct a new URI template.
      * <p>
-     * The template will be parsed to extract template names.
+     * The template will be parsed to extract template variables.
      * <p>
      * A specific regular expressions will be generated from the template
-     * to match URIs according to the template and map template names to
+     * to match URIs according to the template and map template variables to
      * template values. 
      * <p>
      * @param template the template.
@@ -199,7 +200,7 @@ public final class URITemplateType {
         StringBuilder b = new StringBuilder();
         List<String> names = new ArrayList<String>();
         
-        // Find all template names
+        // Find all template variables
         // Create regular expression for template matching
         Matcher m = TEMPLATE_NAMES_PATTERN.matcher(template);
         int i = 0;
@@ -211,7 +212,7 @@ public final class URITemplateType {
         }
         copyURITemplateCharacters(template, i, template.length(), b);
 
-        templateNames = Collections.unmodifiableList(names);
+        templateVariables = Collections.unmodifiableList(names);
         
         int endPos = b.length() - 1;
         this.endsWithSlash = (endPos >= 0) ? b.charAt(endPos) == '/' : false;
@@ -270,22 +271,22 @@ public final class URITemplateType {
     }
     
     /**
-     * Get the list of template names for the template.
-     * @return the list of template names.
+     * Get the list of template variables for the template.
+     * @return the list of template variables.
      */
-    public List<String> getTemplateNames() {
-        return templateNames;
+    public List<String> getTemplateVariables() {
+        return templateVariables;
     }
     
     /**
-     * Ascertain if a template name is a member of this
+     * Ascertain if a template variable is a member of this
      * template.
-     * @param name name The template name.
-     * @return true if the template name is a member of the template, otherwise
+     * @param name name The template variable.
+     * @return true if the template variable is a member of the template, otherwise
      * false.
      */
-    public boolean isTemplateNamePresent(String name) {
-        for (String s : templateNames) {
+    public boolean isTemplateVariablePresent(String name) {
+        for (String s : templateVariables) {
             if (s.equals(name))
                 return true;
         }
@@ -294,11 +295,11 @@ public final class URITemplateType {
     }
     
     /**
-     * Get the number of template names.
-     * @return the number of tempalte names.
+     * Get the number of template variables.
+     * @return the number of template variables.
      */
-    public int getNumberOfTemplateNames() {
-        return templateNames.size();
+    public int getNumberOfTemplateVariables() {
+        return templateVariables.size();
     }
     
     /**
@@ -312,23 +313,24 @@ public final class URITemplateType {
     /**
      * Match a URI against the template.
      * <p>
-     * If the URI matches against the pattern then the template name to value 
-     * map will be filled with template names as keys and template values as 
+     * If the URI matches against the pattern then the template variable to value 
+     * map will be filled with template variables as keys and template values as 
      * values.
      * <p>
+     * 
      * @param uri the uri to match against the template.
-     * @param templateNameToValue the map where to put template names (as keys)
+     * @param templateVariableToValue the map where to put template variables (as keys)
      *        and template values (as values). The map is cleared before any
-     *        entries are added.
+     *        entries are put.
      * @return true if the URI matches the template, otherwise false.
      * @throws {@link IllegalArgumentException} if the uri or 
-     *         templateNameToValue is null.
+     *         templateVariableToValue is null.
      */
-    public boolean match(String uri, Map<String, String> templateNameToValue) {
-        if (templateNameToValue == null) 
+    public boolean match(String uri, Map<String, String> templateVariableToValue) {
+        if (templateVariableToValue == null) 
             throw new IllegalArgumentException(SpiMessages.TEMPLATE_NAME_TO_VALUE_NOT_NULL());
 
-        templateNameToValue.clear();
+        templateVariableToValue.clear();
                 
         if (uri == null)
             return (templateRegexPattern == null) ? true : false;
@@ -341,27 +343,92 @@ public final class URITemplateType {
         if (!m.matches())
             return false;
 
-        // Assign the matched template values to template names
+        // Assign the matched template values to template variables
         int i = 1;
-        for (String name : templateNames) {
-            String previousValue = templateNameToValue.get(name);
+        for (String name : templateVariables) {
+            String previousValue = templateVariableToValue.get(name);
             String currentValue = m.group(i++);
             
-            // URI templates can have the same template name
+            // URI templates can have the same template variable
             // occuring more than once, check that the template
             // values are same.
             if (previousValue != null && !previousValue.equals(currentValue))
                 return false;
             
-            templateNameToValue.put(name, currentValue);
+            templateVariableToValue.put(name, currentValue);
         }
         
         // Assign the right hand side value to the null key
         if (rightHandPattern != null) {
-            templateNameToValue.put(null, m.group(i));
+            templateVariableToValue.put(null, m.group(i));
         }
         
         return true;
+    }
+    
+    /**
+     * Create a URI by substituting any template variables
+     * for corresponding template values.
+     * <p>
+     * A URI template varibale without a value will be substituted by the 
+     * empty string.
+     *
+     * @param values the map of template variables to template values.
+     * @return the URI.
+     */
+    public String createURI(Map<String, String> values) {
+        StringBuilder b = new StringBuilder();
+        // Find all template variables
+        Matcher m = TEMPLATE_NAMES_PATTERN.matcher(template);
+        int i = 0;
+        while(m.find()) {
+            b.append(template, i, m.start());
+            String tValue = values.get(m.group(1));
+            if (tValue != null) b.append(tValue);
+            i = m.end();
+        }
+        b.append(template, i, template.length());
+        return b.toString();
+    }
+    
+    /**
+     * Create a URI by substituting any template variables
+     * for corresponding template values.
+     * <p>
+     * A URI template varibale without a value will be substituted by the 
+     * empty string.
+     *
+     * @param values the array of template values. The values will be 
+     *        substituted in order of occurence of unique template variables.
+     * @return the URI.
+     */
+    public String createURI(String... values) {
+        Map<String, String> mapValues = new HashMap<String, String>();
+        StringBuilder b = new StringBuilder();
+        // Find all template variables
+        Matcher m = TEMPLATE_NAMES_PATTERN.matcher(template);
+        int v = 0;
+        int i = 0;
+        while(m.find()) {
+            b.append(template, i, m.start());
+            String tVariable = m.group(1);
+            // Check if a template variable has already occurred
+            // If so use the value to ensure that two or more declarations of 
+            // a template variable have the same value
+            String tValue = mapValues.get(tVariable);
+            if (tValue != null) {
+                b.append(tValue);
+            } else {
+                if (v < values.length) {
+                    tValue = values[v++];
+                    mapValues.put(tVariable, tValue);
+                    b.append(tValue);
+                }
+            }
+            i = m.end();
+        }
+        b.append(template, i, template.length());
+        return b.toString();
     }
     
     public String toString() {
