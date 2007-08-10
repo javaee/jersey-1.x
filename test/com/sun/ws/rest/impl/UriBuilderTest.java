@@ -24,6 +24,8 @@ package com.sun.ws.rest.impl;
 
 import com.sun.ws.rest.api.core.UriBuilder;
 import java.net.URI;
+import java.util.HashMap;
+import java.util.Map;
 import junit.framework.*;
 
 /**
@@ -115,5 +117,19 @@ public class UriBuilderTest extends TestCase {
                 path("a").matrixParam("x", "foo").matrixParam("y", "bar").
                 path("b").matrixParam("x", "foo").matrixParam("y", "bar").build();
         assertEquals(URI.create("http://localhost:8080/a;x=foo;y=bar/b;x=foo;y=bar"), bu);
+    }
+    
+    public void testTemplates() {
+        URI bu = UriBuilder.fromUri(URI.create("http://localhost:8080/a/b/c")).
+                path("/{foo}/{bar}/{baz}").build("x", "y", "z");
+        assertEquals(URI.create("http://localhost:8080/a/b/c/x/y/z"), bu);   
+        
+        Map<String, String> m = new HashMap<String, String>();
+        m.put("foo", "x");
+        m.put("bar", "y");
+        m.put("baz", "z");
+        bu = UriBuilder.fromUri(URI.create("http://localhost:8080/a/b/c")).
+                path("/{foo}/{bar}/{baz}").build(m);
+        assertEquals(URI.create("http://localhost:8080/a/b/c/x/y/z"), bu);   
     }
 }

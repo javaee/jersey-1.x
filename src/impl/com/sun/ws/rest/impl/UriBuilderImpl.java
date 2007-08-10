@@ -23,6 +23,7 @@
 package com.sun.ws.rest.impl;
 
 import com.sun.ws.rest.api.core.UriBuilder;
+import com.sun.ws.rest.spi.dispatch.URITemplateType;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Map;
@@ -225,11 +226,25 @@ public class UriBuilderImpl extends UriBuilder {
     }
 
     public URI build(Map<String, String> values) {
-        throw new UnsupportedOperationException();
+        URI u = create(null, userInfo, host, port, 
+                replaceEmptyString(path.toString()), 
+                replaceEmptyString(query.toString()), 
+                null);
+        String ssp = u.getRawSchemeSpecificPart();
+        URITemplateType t = new URITemplateType(ssp);
+        ssp = t.createURI(values);
+        return create(scheme, ssp, fragment);
     }
 
     public URI build(String... values) {
-        throw new UnsupportedOperationException();
+        URI u = create(null, userInfo, host, port, 
+                replaceEmptyString(path.toString()), 
+                replaceEmptyString(query.toString()), 
+                null);
+        String ssp = u.getRawSchemeSpecificPart();
+        URITemplateType t = new URITemplateType(ssp);
+        ssp = t.createURI(values);
+        return create(scheme, ssp, fragment);
     }
     
     private void appendPath(String segment) {
@@ -301,7 +316,7 @@ public class UriBuilderImpl extends UriBuilder {
             throw new IllegalArgumentException(ex);
         }        
     }
- 
+     
     private String replaceNull(String s) {
         return (s != null) ? s : "";
     }
