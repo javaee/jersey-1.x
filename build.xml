@@ -81,8 +81,8 @@
             <resource dir="src/tools/common" includes="**/*.properties"/>
         </resourcegen>    
     </target>
-
-
+    
+    
     <!-- Distribution tasks -->
 
     <target name="dist-snapshot" depends="jar, javadoc, findbugs">
@@ -104,13 +104,13 @@
         <delete file="${basedir}/dist/${release.snapshot.name}.zip"/>
         <zip destfile="${basedir}/dist/${release.snapshot.name}.zip"
              basedir=".."
-	     includes="jersey/**"
-	     excludes="jersey/findbugs/**"/>
+             includes="jersey/**"
+             excludes="jersey/findbugs/**"/>
         <!-- copy to non-versioned name -->
         <copy file="${basedir}/dist/${release.snapshot.name}.zip" 
               tofile="${basedir}/dist/${release.snapshot.basename}.zip"/>
     </target>
-        
+    
     <target name="dist-release" depends="dist-snapshot">
         <!-- create lib -->
         <mkdir dir="${release.impl.dir}/lib"/>
@@ -134,8 +134,8 @@
             <fileset dir="${dist.javadoc.dir}"/>
         </copy>
         <!-- include 311 docs -->
-	<unzip src="${basedir}/jsr311/jsr311-api.zip"
-	    dest="${dist.dir}/jsr311"/>
+        <unzip src="${basedir}/jsr311/jsr311-api.zip"
+        dest="${dist.dir}/jsr311"/>
         <copy todir="${release.impl.dir}/docs">
             <fileset dir="${dist.dir}/jsr311/docs"/>
         </copy>
@@ -150,7 +150,7 @@
         <!-- create a zip file of the distribution -->
         <zip destfile="${basedir}/dist/${release.impl.name}.zip"
              basedir="${basedir}/dist"
-	    includes="${release.impl.name}/**"/>
+             includes="${release.impl.name}/**"/>
         <!-- copy to non-versioned name -->
         <copy file="${basedir}/dist/${release.impl.name}.zip" 
               tofile="${basedir}/dist/${release.impl.basename}.zip"/>
@@ -158,20 +158,20 @@
     
     <target name="dist" depends="dist-release"/>
     
-
+    
     <!-- Java doc tasks -->
     <!-- Override default javadoc to only document api and spi -->
 
     <target name="-javadoc-build" depends="compile">
         <mkdir dir="${dist.javadoc.dir}"/>
         <javadoc destdir="${dist.javadoc.dir}" 
-        source="${javac.source}" notree="${javadoc.notree}" 
-        use="${javadoc.use}" nonavbar="${javadoc.nonavbar}" 
-        noindex="${javadoc.noindex}" splitindex="${javadoc.splitindex}" 
-        author="${javadoc.author}" version="${javadoc.version}" 
-        windowtitle="${javadoc.windowtitle}" private="${javadoc.private}" 
-        additionalparam="${javadoc.additionalparam}" 
-        failonerror="true" useexternalfile="true">
+                 source="${javac.source}" notree="${javadoc.notree}" 
+                 use="${javadoc.use}" nonavbar="${javadoc.nonavbar}" 
+                 noindex="${javadoc.noindex}" splitindex="${javadoc.splitindex}" 
+                 author="${javadoc.author}" version="${javadoc.version}" 
+                 windowtitle="${javadoc.windowtitle}" private="${javadoc.private}" 
+                 additionalparam="${javadoc.additionalparam}" 
+                 failonerror="true" useexternalfile="true">
             <classpath>
                 <path path="${javac.classpath}"/>
             </classpath>
@@ -186,8 +186,8 @@
             <fileset dir="${src.spi.dir}" includes="*.java"/>
         </javadoc>
     </target>
-
-
+    
+    
     <!-- Unit tests tasks -->
     
     <taskdef name="junit2" classname="com.sun.ant.junit.JUnitTask">
@@ -213,7 +213,7 @@
             <fileset dir="${test.src.dir}" excludes="**/*.java"/>
         </copy>
         <junit2 showoutput="true" fork="true" dir="${basedir}" 
-        failureproperty="tests.failed" errorproperty="tests.failed">
+                failureproperty="tests.failed" errorproperty="tests.failed">
             <batchtest todir="${build.test.results.dir}">
                 <fileset dir="${test.src.dir}" includes="**/*Test.java"/>
             </batchtest>
@@ -227,27 +227,27 @@
             <jvmarg line="${run.jvmargs}"/>
         </junit2>
     </target>
-
+    
     <target name="clean-tests" depends="init">
         <delete dir="${build.test.classes.dir}"/>
     </target>
     
-
+    
     <!-- Find bugs tasks -->
 
     <target name="-check-findbugs">
         <available file="findbugs/findbugs.zip" property="findbugsExists"/>
     </target>
-
+    
     <target name="-get-findbugs" depends="-check-findbugs" unless="findbugsExists">
         <mkdir dir="findbugs"/>
         <get src="http://prdownloads.sourceforge.net/findbugs/findbugs-1.2.1.zip?download" dest="findbugs/findbugs.zip"/>
         <unzip src="findbugs/findbugs.zip" dest="findbugs/"/>
     </target>
-
+    
     <target name="findbugs" depends="jar, -findbugs"/>
     <target name="hudson-findbugs" depends="-findbugs"/>
-
+    
     <target name="-findbugs" depends="-get-findbugs">
         <taskdef name="findbugs" classname="edu.umd.cs.findbugs.anttask.FindBugsTask">
             <classpath>
