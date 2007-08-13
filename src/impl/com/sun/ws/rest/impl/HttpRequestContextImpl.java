@@ -69,38 +69,13 @@ public class HttpRequestContextImpl implements ContainerRequest {
     protected List<MediaType> accept;
     protected List<Cookie> cookies;
 
-    public HttpRequestContextImpl(String method, InputStream entity) {
+    protected HttpRequestContextImpl(String method, InputStream entity) {
         this.method = method;
         this.headers = new RequestHttpHeadersImpl();
         this.templateValues = new MultivaluedMapImpl();
         this.entity = entity;
     }
     
-    public HttpRequestContextImpl(String method, String uriPath, URI baseURI, InputStream entity) {
-        this(method, entity);
-        this.uriPath = uriPath;
-        this.baseURI = baseURI;
-    }
-    
-    public HttpRequestContextImpl(String method, String uriPath, String baseURI, InputStream entity)  {
-        this(method, entity);
-        this.uriPath = uriPath;
-        this.baseURI = URI.create(baseURI);
-    }
-    
-    public HttpRequestContextImpl(String method, String uriPath, URI baseURI, String queryString,
-            InputStream entity) {
-        this(method, uriPath, baseURI, entity);
-        this.queryString = queryString;
-        this.queryParameters = extractQueryParameters(queryString, true);
-    }
-    
-    public HttpRequestContextImpl(String method, String uriPath, String baseURI, String queryString,
-            InputStream entity) {
-        this(method, uriPath, baseURI, entity);
-        this.queryString = queryString;
-        this.queryParameters = extractQueryParameters(queryString, true);
-    }
         
     // HttpRequestContext 
     
@@ -158,6 +133,11 @@ public class HttpRequestContextImpl implements ContainerRequest {
     public URI getURI() {
         if (uri == null) {
             try {
+                // TODO fix
+                // This method is buggy
+                // a relative URI path segment that contains a URI
+                // will result in an invalid URI, for example:
+                //   ";a=http://host""
                 URI u = new URI(null, null, uriPath, null);
                 uri = baseURI.resolve(u);
             } catch (URISyntaxException e) {

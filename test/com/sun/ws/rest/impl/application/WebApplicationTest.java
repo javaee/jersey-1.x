@@ -29,6 +29,7 @@ import com.sun.ws.rest.api.core.ResourceConfig;
 import com.sun.ws.rest.api.core.WebResource;
 import com.sun.ws.rest.impl.HttpRequestContextImpl;
 import com.sun.ws.rest.impl.HttpResponseContextImpl;
+import com.sun.ws.rest.impl.TestHttpRequestContext;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -155,11 +156,12 @@ public class WebApplicationTest extends TestCase {
     
     public void call(WebApplicationImpl a, String method, String path, String content) {
         // Make the path relative to the base URI
-        if (path.length() > 0 && path.charAt(0) == '/')
-            path = path.substring(1);
+        String relativePath = (path.length() > 0 && path.charAt(0) == '/') 
+            ? path.substring(1) : path;
 
         ByteArrayInputStream e = new ByteArrayInputStream(content.getBytes());
-        HttpRequestContextImpl request = new HttpRequestContextImpl(method, path, "/", e);
+        HttpRequestContextImpl request = new TestHttpRequestContext(method, e, 
+                path, "/", relativePath);
         HttpResponseContextImpl response = new HttpResponseContextImpl(request) {
             public OutputStream getOutputStream() throws IOException {
                 throw new UnsupportedOperationException();

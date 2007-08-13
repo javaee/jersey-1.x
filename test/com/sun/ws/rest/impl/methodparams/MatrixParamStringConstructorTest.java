@@ -150,7 +150,7 @@ public class MatrixParamStringConstructorTest extends AbstractBeanTester {
     
     public void testStringConstructorGet() {
         Class r = ResourceString.class;
-        callGet(r, "/;arg1=3.145;arg2=3145;arg3=http%3A%2F%2Ftest", 
+        callGet(r, "/;arg1=3.145;arg2=3145;arg3=http:%2F%2Ftest", 
                 "text/plain");
     }
     
@@ -211,7 +211,7 @@ public class MatrixParamStringConstructorTest extends AbstractBeanTester {
     public void testBadStringConstructorValue() {
         Class r = ResourceString.class;
         HttpResponseContext response = callNoStatusCheck(r, "GET",
-                "/;arg1=ABCDEF;arg2=3145;arg3=http%3A%2F%2Ftest", null, "text/plain", "");
+                "/;arg1=ABCDEF;arg2=3145;arg3=http:%2F%2Ftest", null, "text/plain", "");
         assertEquals(400, response.getStatus());
     }
 }

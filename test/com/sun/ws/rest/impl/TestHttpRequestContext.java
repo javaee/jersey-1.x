@@ -22,33 +22,28 @@
 
 package com.sun.ws.rest.impl;
 
-import com.sun.ws.rest.api.core.HttpRequestContext;
-import javax.ws.rs.core.MultivaluedMap;
-import junit.framework.*;
+import java.io.InputStream;
+import java.net.URI;
 
 /**
  *
  * @author Paul.Sandoz@Sun.Com
  */
-public class UriPathHttpRequestTest extends TestCase {
+public class TestHttpRequestContext extends HttpRequestContextImpl {
     
-    public UriPathHttpRequestTest(String testName) {
-        super(testName);
+    public TestHttpRequestContext() {
+        super("GET", null);
     }
+
+    // method, entity, uri, baseUri, uriPath
     
-    public void testGeneral() throws Exception {
-        HttpRequestContext r = new TestHttpRequestContext("GET", null,
-                "/context/widgets/10", "/context", "widgets/10");
-        assertEquals("widgets/10", r.getURIPath());
-        assertEquals("widgets/10", r.getURIPath(true));
-        assertEquals("widgets/10", r.getURIPath(false));
-    }    
-    
-    public void testEncoded() throws Exception {
-        HttpRequestContext r = new TestHttpRequestContext("GET", null,
-                "/context/widgets%20/%2010", "/context", "widgets / 10");
-        assertEquals("widgets / 10", r.getURIPath());
-        assertEquals("widgets / 10", r.getURIPath(true));
-        assertEquals("widgets%20/%2010", r.getURIPath(false));
+    public TestHttpRequestContext(String method, InputStream entity, 
+            String uri, String baseUri, String decodedUriPath)  {
+        super(method, entity);
+        this.uri = URI.create(uri);
+        this.baseURI = URI.create(baseUri);
+        this.uriPath = decodedUriPath;
+        this.queryString = this.uri.getRawQuery();
+        this.queryParameters = extractQueryParameters(queryString, true);
     }    
 }

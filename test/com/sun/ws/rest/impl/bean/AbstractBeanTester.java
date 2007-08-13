@@ -27,6 +27,7 @@ import com.sun.ws.rest.api.core.ResourceConfig;
 import com.sun.ws.rest.impl.HttpRequestContextImpl;
 import com.sun.ws.rest.impl.HttpResponseContextImpl;
 import com.sun.ws.rest.impl.MultivaluedMapImpl;
+import com.sun.ws.rest.impl.TestHttpRequestContext;
 import com.sun.ws.rest.impl.application.WebApplicationImpl;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -153,13 +154,23 @@ public abstract class AbstractBeanTester extends TestCase {
     HttpResponseContextImpl invoke(final Set<Class> r, String method, String path, 
         MultivaluedMap<String, String> headers, String content) {
 
-        String query = null;
-        try {
-            URI u = new URI(path);
-            path = u.getRawPath();
-            query = u.getQuery();
-        } catch (URISyntaxException ex) {
+        // The URI
+        String uri = BASE_URI;
+        if (path.startsWith("/")) {
+            uri += path.substring(1);
+        } else {
+            uri += path;
         }
+        
+        // The base URI
+        String baseUri = BASE_URI;
+        
+        // The decoded URI path
+        URI u = URI.create(path);
+        String decodedPath = u.getPath();
+        // Make the path relative to the base URI path
+        if (decodedPath.startsWith("/"))
+            decodedPath = decodedPath.substring(1);
 
         WebApplicationImpl a = new WebApplicationImpl();
         ResourceConfig c = new ResourceConfig() {
@@ -178,12 +189,9 @@ public abstract class AbstractBeanTester extends TestCase {
 
         a.initiate(null, c, null);
 
-        // Make the path relative to the base URI
-        if (path.length() > 0 && path.charAt(0) == '/')
-            path = path.substring(1);
-
         ByteArrayInputStream e = new ByteArrayInputStream(content.getBytes());
-        final HttpRequestContextImpl request = new HttpRequestContextImpl(method, path, BASE_URI, query, e);
+        final HttpRequestContextImpl request = new TestHttpRequestContext(method, e,
+                uri, baseUri, decodedPath);
         for (Map.Entry<String, List<String>> h : headers.entrySet()) {
             request.getRequestHeaders().put(h.getKey(), h.getValue());
         }            

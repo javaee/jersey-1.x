@@ -26,6 +26,8 @@ import com.sun.ws.rest.impl.HttpRequestContextImpl;
 import com.sun.ws.rest.impl.HttpResponseContextImpl;
 import com.sun.ws.rest.impl.RequestHttpHeadersImpl;
 import com.sun.ws.rest.impl.ResponseBuilderImpl;
+import com.sun.ws.rest.impl.TestHttpRequestContext;
+import java.net.URI;
 import javax.ws.rs.ext.EntityProvider;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -82,7 +84,7 @@ public abstract class AbstractStreamingTester extends TestCase {
     <T> byte[] writeTo(T t, String mediaType) throws IOException {
         
         final ByteArrayOutputStream out = new ByteArrayOutputStream();
-        HttpRequestContextImpl reqc = new HttpRequestContextImpl("GET", null);
+        HttpRequestContextImpl reqc = new TestHttpRequestContext();
         HttpResponseContextImpl resc = new HttpResponseContextImpl(reqc) {
             public OutputStream getOutputStream() throws IOException {
                 return out;
