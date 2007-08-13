@@ -98,6 +98,14 @@ public class UriBuilderTest extends TestCase {
         bu = UriBuilder.fromUri(URI.create("http://localhost:8080/a/b/c")).
                 path("x/y/z").build();
         assertEquals(URI.create("http://localhost:8080/a/b/c/x/y/z"), bu);
+        
+        bu = UriBuilder.fromUri(URI.create("http://localhost:8080/a/b/c")).
+                path("/").build();
+        assertEquals(URI.create("http://localhost:8080/a/b/c/"), bu);
+        
+        bu = UriBuilder.fromUri(URI.create("http://localhost:8080/a/b/c")).
+                path("").build();
+        assertEquals(URI.create("http://localhost:8080/a/b/c"), bu);
     }
     
     public void testAppendQueryParams() {

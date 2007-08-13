@@ -248,7 +248,7 @@ public class UriBuilderImpl extends UriBuilder {
     }
     
     private void appendPath(String segment) {
-        if (segment == null)
+        if (segment == null || segment.length() == 0)
             return;
         
         StringBuilder sb;
