@@ -25,10 +25,10 @@ package com.sun.ws.rest.impl.model;
 import com.sun.ws.rest.spi.dispatch.ResourceDispatchContext;
 import com.sun.ws.rest.api.core.HttpRequestContext;
 import com.sun.ws.rest.api.core.HttpResponseContext;
+import com.sun.ws.rest.api.core.UriBuilder;
 import com.sun.ws.rest.impl.ResponseBuilderImpl;
 import com.sun.ws.rest.impl.dispatch.URITemplateDispatcher;
 import com.sun.ws.rest.spi.dispatch.ResourceDispatcher;
-import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -76,8 +76,11 @@ public abstract class BaseResourceClass implements ResourceDispatcher {
         HttpRequestContext request = context.getHttpRequestContext();
         HttpResponseContext response = context.getHttpResponseContext();
         
-        response.setResponse(ResponseBuilderImpl.
-                temporaryRedirect(URI.create(request.getURIPath() + "/")).build());        
+        response.setResponse(
+                ResponseBuilderImpl.temporaryRedirect(
+                    UriBuilder.fromUri(request.getURI()).path("/").build()
+                ).build()
+                );
         return true;
     }
 }
