@@ -139,7 +139,7 @@ public class HttpRequestContextImpl implements ContainerRequest {
             return pathSegments;
         }
             
-        pathSegments = extractPathSegments(uriPath, true);
+        pathSegments = extractPathSegments(uriPath, false);
         return pathSegments;
     }
     
