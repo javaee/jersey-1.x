@@ -159,7 +159,7 @@
     <target name="dist" depends="dist-release"/>
     
     
-    <!-- Java doc tasks -->
+    <!-- Javadoc tasks -->
     <!-- Override default javadoc to only document api and spi -->
 
     <target name="-javadoc-build" depends="compile">
@@ -233,7 +233,7 @@
     </target>
     
     
-    <!-- Find bugs tasks -->
+    <!-- Findbugs tasks -->
 
     <target name="-check-findbugs">
         <available file="findbugs/findbugs.zip" property="findbugsExists"/>
