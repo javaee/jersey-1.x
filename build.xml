@@ -157,6 +157,43 @@
     </target>
     
     <target name="dist" depends="dist-release"/>
+
+
+    <!-- GlassFish Update Center Tasks -->
+
+    <!-- TODO: depends="dist" --> 
+    <target name="create-uc-module"> 
+      <!-- delete the old gen-module dir, if any -->
+      <delete dir="${basedir}/gf-uc/gen-module"/>
+      <!-- prepare zip archive content -->
+      <!-- TODO: decide what else will come to the archive -->
+      <copy todir="${basedir}/gf-uc/archive-content/lib">
+        <fileset dir="${basedir}/dist">
+          <include name="jersey.jar"/>
+        </fileset>
+      </copy>
+      <!-- create a new module-gen dir structure for generated module content-->
+      <mkdir dir="${basedir}/gf-uc/gen-module/Info"/>
+      <mkdir dir="${basedir}/gf-uc/gen-module/module"/>
+      <!-- create a zip archive for the module -->
+      <zip destfile="${basedir}/gf-uc/gen-module/module/module_jersey.zip"
+           basedir="${basedir}/gf-uc/archive-content"/>
+      <!-- copy and update the info.xml file for the module -->
+      <!-- TODO: update part missing -->
+      <copy file="${basedir}/gf-uc/module-skeleton/Info/info.xml"
+            tofile="${basedir}/gf-uc/gen-module/Info/info.xml"/>
+      <!-- create the final module -->
+      <mkdir dir="${basedir}/gf-uc/dist"/>
+      <jar basedir="${basedir}/gf-uc/gen-module"
+           destfile="${basedir}/gf-uc/dist/module_jersey.jar"/>
+      <!-- update test Update Center dir -->
+      <copy todir="${basedir}/gf-uc/updatecenter/beta/modules/jersey">
+        <fileset dir="${basedir}/gf-uc/desc" includes="overview.html support.html tech-specs.html"/>
+        <fileset dir="${basedir}/gf-uc/dist" includes="module_jersey.jar"/>
+      </copy> 
+      <copy file="${basedir}/gf-uc/gen-module/Info/info.xml"
+            tofile="${basedir}/gf-uc/updatecenter/beta/update-center.xml"/>
+    </target>
     
     
     <!-- Javadoc tasks -->
