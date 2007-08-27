@@ -104,4 +104,31 @@ public class SubResourceHttpMethodsTest extends AbstractBeanTester {
                 getEntity();
         assertEquals("a/b/c/d", content);
     }
+    
+    @UriTemplate("/")
+    static public class SubResourceMethodsWithDifferentTemplates { 
+        @UriTemplate("{foo}")
+        @HttpMethod
+        public String getFoo(@UriParam("foo") String foo) {
+            return foo;
+        }
+        
+        @UriTemplate("{bar}")
+        @HttpMethod
+        public String postBar(@UriParam("bar") String bar) {
+            return bar;
+        }
+    }
+    
+    public void testSubResourceMethodsWithDifferentTemplates() {
+        String content;
+        
+        content = (String)callGet(SubResourceMethodsWithDifferentTemplates.class, "/foo", "").
+                getEntity();
+        assertEquals("foo", content);
+        
+        content = (String)callPost(SubResourceMethodsWithDifferentTemplates.class, "/bar", "text/plain", "bar").
+                getEntity();
+        assertEquals("bar", content);
+    }
 }
