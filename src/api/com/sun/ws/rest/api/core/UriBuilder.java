@@ -22,9 +22,7 @@
 
 package com.sun.ws.rest.api.core;
 
-import com.sun.org.apache.xerces.internal.impl.xs.identity.ValueStore;
 import java.net.URI;
-import java.util.List;
 import java.util.Map;
 import javax.ws.rs.ext.Contract;
 import javax.ws.rs.ext.ProviderFactory;
