@@ -1,4 +1,5 @@
 release 0.2.1 (2007-08-xx)
+- Simpler getting started document included.
 - Fixed bug that caused matrix parameters to be decoded twice.
 - JAXB beans can be serialized as JSON or XML using one HTTP method with
   a @ProduceMime({"application/xml", "application/json"}).
