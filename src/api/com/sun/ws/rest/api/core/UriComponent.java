@@ -24,7 +24,9 @@ package com.sun.ws.rest.api.core;
 import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
 import java.nio.charset.Charset;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 /**
  * Utility class for validating, encoding and decoding components
@@ -35,7 +37,7 @@ import java.util.Arrays;
 public final class UriComponent {
 
     public enum Type {
-        SCHEME, USER_INFO, HOST, PATH, QUERY, FRAGMENT,
+        SCHEME, USER_INFO, HOST, PATH, PATH_SEGMENT, QUERY, FRAGMENT,
     }
     
     private UriComponent() {
@@ -51,7 +53,14 @@ public final class UriComponent {
      * @return true if the encoded string is valid.
      */
     public static boolean validate(String s, Type t) {
-        throw new UnsupportedOperationException();
+        boolean[] table = ENCODING_TABLES[t.ordinal()];
+        
+        for (int i = 0; i < s.length(); i++) {
+            final char c = s.charAt(i);
+            if ((c < 0x80 && !table[c]) || c >= 0x80)
+                return false;
+        }
+        return true;
     }
 
     /**
@@ -65,9 +74,101 @@ public final class UriComponent {
      * @return the encoded string.
      */
     public static String encode(String s, Type t) {
-        throw new UnsupportedOperationException();
+        boolean[] table = ENCODING_TABLES[t.ordinal()];
+
+        StringBuilder sb = null;
+        for (int i = 0; i < s.length(); i++) {
+            final char c = s.charAt(i);
+            if (c < 0x80 && table[c]) {
+                if (sb != null) sb.append(c);
+            } else {
+                if (sb == null) { 
+                    sb = new StringBuilder();
+                    sb.append(s.substring(0, i));
+                }
+
+                if (c < 0x80)
+                    appendPercentEncodedOctet(sb, c);
+                else 
+                    appendUTF8EncodedCharacter(sb, c);
+            }            
+        }
+        
+        return (sb == null) ? s : sb.toString();
     }
 
+    private final static char[] HEX_DIGITS = {
+	'0', '1', '2', '3', '4', '5', '6', '7',
+	'8', '9', 'A', 'B', 'C', 'D', 'E', 'F'
+    };
+
+    private static void appendPercentEncodedOctet(StringBuilder sb, int b) {
+	sb.append('%');
+	sb.append(HEX_DIGITS[b >> 4]);
+	sb.append(HEX_DIGITS[b & 0x0F]);
+    }
+    
+    private static void appendUTF8EncodedCharacter(StringBuilder sb, char c) {
+        final ByteBuffer bb = UTF_8_CHARSET.encode("" + c);
+        
+	while (bb.hasRemaining()) {
+            appendPercentEncodedOctet(sb, bb.get() & 0xFF);
+	}
+    }
+    
+    private static final String[] SCHEME = {"0-9", "A-Z", "a-z", "+", "-", "."};
+    
+    private static final String[] UNRESERVED = {"0-9", "A-Z", "a-z", "-", ".", "_", "~"};
+    
+    private static final String[] SUB_DELIMS = {"!", "$", "&", "'", "(", ")", "*", "+", ",", ";", "="};
+    
+    private static final boolean[][] ENCODING_TABLES = creatingEncodingTables();
+    
+    private static boolean[][] creatingEncodingTables() {
+        boolean[][] tables = new boolean[Type.values().length][];
+
+        List<String> l = new ArrayList<String>();
+        l.addAll(Arrays.asList(SCHEME));
+        tables[Type.SCHEME.ordinal()] = creatingEncodingTable(l);
+
+        l.clear();
+        l.addAll(Arrays.asList(UNRESERVED));
+        l.addAll(Arrays.asList(SUB_DELIMS));
+
+        tables[Type.HOST.ordinal()] = creatingEncodingTable(l);
+        
+        l.add(":");
+
+        tables[Type.USER_INFO.ordinal()] = creatingEncodingTable(l);
+
+        l.add("@");
+
+        tables[Type.PATH_SEGMENT.ordinal()] = creatingEncodingTable(l);
+        
+        l.add("/");
+        
+        tables[Type.PATH.ordinal()] = creatingEncodingTable(l);
+        
+        l.add("?");
+        
+        tables[Type.QUERY.ordinal()] = creatingEncodingTable(l);
+        tables[Type.FRAGMENT.ordinal()] = tables[Type.QUERY.ordinal()];
+        
+        return tables;
+    }
+    
+    private static boolean[] creatingEncodingTable(List<String> allowed) {
+        boolean[] table = new boolean[0x80];
+        for (String range : allowed) {
+            if (range.length() == 1)
+                table[range.charAt(0)] = true;
+            else if (range.length() == 3 && range.charAt(1) == '-')
+                for (int i = range.charAt(0); i <= range.charAt(2); i++)
+                    table[i] = true;                
+        }
+        
+        return table;
+    }
     
     private static final Charset UTF_8_CHARSET = Charset.forName("UTF-8");
     
@@ -197,7 +298,7 @@ public final class UriComponent {
      */
     private static int decodeOctets(int i, ByteBuffer bb, StringBuilder sb) {
         // If there is only one octet and is an ASCII character
-        if (bb.limit() == 1 && (bb.get(0) & 0xFF) < 128) {
+        if (bb.limit() == 1 && (bb.get(0) & 0xFF) < 0x80) {
             // Octet can be appended directly
             sb.append((char)bb.get(0));
             return i + 2;
@@ -221,7 +322,7 @@ public final class UriComponent {
     private static final int[] HEX_TABLE = createHexTable();
     
     private static int[] createHexTable() {
-        int[] table = new int[128];
+        int[] table = new int[0x80];
         Arrays.fill(table, -1);
         
         for (char c = '0'; c <= '9'; c++) table[c] = c - '0';
