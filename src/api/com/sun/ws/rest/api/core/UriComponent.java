@@ -85,6 +85,8 @@ public final class UriComponent {
      * @param s the string to be decoded.
      * @param t the URI component type, may be null.
      * @return the decoded string.
+     * @throw IllegalArgumentException if a malformed percent-encoded octet is
+     *         detected
      */
     public static String decode(String s, Type t) {
 	if (s == null)
@@ -100,11 +102,13 @@ public final class UriComponent {
         
         // Malformed percent-escaped octet at the end
         if (n < 2)
-	    throw new IllegalArgumentException();
+            // TODO localize
+	    throw new IllegalArgumentException("Malformed percent-encoded octet at index 1");
             
         // Malformed percent-escaped octet at the end
         if (s.charAt(n - 2) == '%')
-	    throw new IllegalArgumentException();
+            // TODO localize
+	    throw new IllegalArgumentException("Malformed percent-encoded octet at index " + (n - 2));
 
         return (t != Type.HOST) ? decode(s, n) : decodeHost(s, n);
     }
@@ -171,7 +175,7 @@ public final class UriComponent {
             if (s.charAt(i++) != '%')
                 break;
             
-            // Check of the byte buffer needs to be increased in size
+            // Check if the byte buffer needs to be increased in size
             if (bb.position() == bb.capacity()) {
                 bb.flip();
                 // Create a new byte buffer with the maximum number of possible
@@ -208,7 +212,9 @@ public final class UriComponent {
     private static int decodeHex(String s, int i) {
         final int v = decodeHex(s.charAt(i));
         if (v == -1)
-            throw new IllegalArgumentException("Malformed hex character '" + s.charAt(i) + "' at index " + i);
+            // TODO localize
+            throw new IllegalArgumentException("Malformed percent-encoded octet at index " + i + 
+                    ", invalid hexadecimal digit '" + s.charAt(i) + "'");
         return v;
     }    
     
