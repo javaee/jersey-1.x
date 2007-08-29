@@ -161,41 +161,110 @@
 
     <!-- GlassFish Update Center Tasks -->
 
+    <macrodef name="update-nb-prop">
+      <attribute name="nb.prop.file"/>
+      <sequential>
+        <replace file="@{nb.prop.file}">
+          <replacefilter token="../../lib" value="${ashome.jersey.lib.dir}"/>
+          <replacefilter token="/jaxb-api.jar" value="/webservices-rt.jar"/>
+          <replacefilter token="/jaxb-impl.jar" value="/webservices-rt.jar"/>
+          <replacefilter token="/jaxb-xjc.jar" value="/webservices-tools.jar"/>
+          <replacefilter token="/jaxws-api.jar" value="/webservices-rt.jar"/>
+        </replace>
+        <replace file="@{nb.prop.file}">
+          <replacefilter token="${ashome.jersey.lib.dir}/mail.jar" value="${ashome.lib.dir}/mail.jar"/>
+          <replacefilter token="${ashome.jersey.lib.dir}/activation.jar" value="${ashome.lib.dir}/activation.jar"/>
+          <replacefilter token="${ashome.jersey.lib.dir}/webservices-tools.jar" value="${ashome.lib.dir}/webservices-tools.jar"/>
+          <replacefilter token="${ashome.jersey.lib.dir}/webservices-rt.jar" value="${ashome.lib.dir}/webservices-rt.jar"/>
+        </replace>
+        <tempfile property="nb.prop.temp.file"/>
+        <concat destfile="${nb.prop.temp.file}">
+          <header trimleading="yes">ashome.jersey.lib.dir=../../lib
+                                    ashome.lib.dir=../../../lib
+          </header>
+          <fileset file="@{nb.prop.file}"/>
+        </concat>
+        <move file="${nb.prop.temp.file}" tofile="@{nb.prop.file}"/>
+      </sequential>
+    </macrodef>
+
     <!-- TODO: depends="dist" --> 
-    <target name="create-uc-module"> 
-      <!-- delete the old gen-module dir, if any -->
-      <delete dir="${basedir}/gf-uc/gen-module"/>
-      <!-- prepare zip archive content -->
-      <!-- TODO: decide what else will come to the archive -->
-      <copy todir="${basedir}/gf-uc/archive-content/lib">
-        <fileset dir="${basedir}/dist">
-          <include name="jersey.jar"/>
+    <target name="create-uc-module" depends="clean-uc-module" description="Generate GlassFish Update Center Module"> 
+      <!-- Base dist file could be taken from [base.uc.dist.file] parameter -->
+      <condition property="base.uc.dist.file" value="${basedir}/dist/${release.impl.name}.zip">
+        <not>
+          <isset property="base.uc.dist.file"/>
+        </not>
+      </condition>
+      <echo message="Taking ${base.uc.dist.file} as a base distribution file..."/>
+      <!-- unzip the dist archive and rename the base dir to jersey -->
+      <mkdir dir="${basedir}/gf-uc/as-home"/>
+      <unzip src="${base.uc.dist.file}" dest="${basedir}/gf-uc/as-home"/>
+      <move file="${basedir}/gf-uc/as-home/${release.impl.name}" tofile="${basedir}/gf-uc/as-home/jersey"/>
+      <!-- remove unnecessary jar files, which are already part of glassfish -->
+      <delete>
+        <fileset dir="${basedir}/gf-uc/as-home/jersey/lib">
+          <!-- remove source bundles -->
+          <include name="*src.zip"/>
+          <!-- directly in [$AS_HOME/lib] -->
+          <include name="activation.jar"/>
+          <include name="mail.jar"/>
+          <!-- jaxb and jax-ws should be already there as well as part of [$AS_HOME/lib/webservices*jar] -->
+          <include name="jaxb-*.jar"/>
+          <include name="jaxws-*.jar"/>
+          <!-- ant.jar is in [$AS_HOME/lib/ant/lib] -->
+          <include name="ant.jar"/>
+          <!-- grizzly should be in [$AS_HOME/lib/appserv-rt.jar] -->
+          <include name="grizzly*jar"/>
         </fileset>
-      </copy>
+      </delete>
+      <!-- and move the lib dir directly to [$AS_HOME] -->
+      <!-- not recommended <move file="${basedir}/gf-uc/as-home/jersey/lib" todir="${basedir}/gf-uc/as-home"/> -->
+      <!-- remove jar files dirs from particular examples -->
+      <delete file="${basedir}/gf-uc/as-home/jersey/examples/Bookmark/lib/javaee.jar"/>
+      <delete file="${basedir}/gf-uc/as-home/jersey/examples/SimpleJAXWSEndpoint/lib/jaxws-rt.jar"/>
+      <!-- update examples lib config -->
+      <update-nb-prop nb.prop.file="${basedir}/gf-uc/as-home/jersey/examples/SimpleServlet/nbproject/project.properties"/>
+      <!-- TODO: remove following line -->
+      <delete dir="${basedir}/gf-uc/as-home/jersey/docs"/>
       <!-- create a new module-gen dir structure for generated module content-->
       <mkdir dir="${basedir}/gf-uc/gen-module/Info"/>
       <mkdir dir="${basedir}/gf-uc/gen-module/module"/>
       <!-- create a zip archive for the module -->
       <zip destfile="${basedir}/gf-uc/gen-module/module/module_jersey.zip"
-           basedir="${basedir}/gf-uc/archive-content"/>
+           basedir="${basedir}/gf-uc/as-home"/>
       <!-- copy and update the info.xml file for the module -->
-      <!-- TODO: update part missing -->
       <copy file="${basedir}/gf-uc/module-skeleton/Info/info.xml"
             tofile="${basedir}/gf-uc/gen-module/Info/info.xml"/>
+      <length file="${basedir}/gf-uc/gen-module/module/module_jersey.zip" property="uc.module.length"/>
+      <replace file="${basedir}/gf-uc/gen-module/Info/info.xml" token="@@@@DOWNLOAD_SIZE@@@@" value="${uc.module.length}"/>
+      <tstamp>
+        <format property="uc.module.timestamp" pattern="ss/mm/hh/dd/MM/yyyy"/>
+        <format property="uc.module.release.date" pattern="yyyy/MM/dd"/>
+        <format property="uc.module.impl.version" pattern="yyyyMMddhhmm"/>
+      </tstamp>
+      <replace file="${basedir}/gf-uc/gen-module/Info/info.xml" token="@@@@MODULE_TIMESTAMP@@@@" value="${uc.module.timestamp}"/>
+      <replace file="${basedir}/gf-uc/gen-module/Info/info.xml" token="@@@@MODULE_RELEASE_DATE@@@@" value="${uc.module.release.date}"/>
+      <replace file="${basedir}/gf-uc/gen-module/Info/info.xml" token="@@@@MODULE_IMPL_VERSION@@@@" value="${uc.module.impl.version}"/>
       <!-- create the final module -->
       <mkdir dir="${basedir}/gf-uc/dist"/>
       <jar basedir="${basedir}/gf-uc/gen-module"
-           destfile="${basedir}/gf-uc/dist/module_jersey.jar"/>
+           destfile="${basedir}/gf-uc/dist/module_jersey.nbm"/>
       <!-- update test Update Center dir -->
       <copy todir="${basedir}/gf-uc/updatecenter/beta/modules/jersey">
         <fileset dir="${basedir}/gf-uc/desc" includes="overview.html support.html tech-specs.html"/>
-        <fileset dir="${basedir}/gf-uc/dist" includes="module_jersey.jar"/>
+        <fileset dir="${basedir}/gf-uc/dist" includes="module_jersey.nbm"/>
       </copy> 
       <copy file="${basedir}/gf-uc/gen-module/Info/info.xml"
             tofile="${basedir}/gf-uc/updatecenter/beta/update-center.xml"/>
     </target>
-    
-    
+
+    <target name="clean-uc-module" description="Clean UC related things">
+      <delete dir="${basedir}/gf-uc/as-home"/>
+      <delete dir="${basedir}/gf-uc/gen-module"/>
+    </target>
+ 
+
     <!-- Javadoc tasks -->
     <!-- Override default javadoc to only document api and spi -->
 
