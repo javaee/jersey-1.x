@@ -23,77 +23,45 @@
 package com.sun.ws.rest.impl;
 
 import com.sun.ws.rest.api.core.UriBuilder;
+import com.sun.ws.rest.api.core.UriBuilderException;
+import com.sun.ws.rest.api.core.UriComponent;
 import com.sun.ws.rest.spi.dispatch.URITemplateType;
+import java.io.UnsupportedEncodingException;
+import java.lang.reflect.Method;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.net.URLEncoder;
 import java.util.Map;
 import javax.ws.rs.UriTemplate;
 
 /*
- * Notes on API while implementing
-
-I don think we need an encode option. This will open us up to bugs because 
-the client may say that the string is already encoded but may not be. 
-The only reliable solution is to check the string regardless and encode as 
-necessary.
-
-
-For the following methods are template values expected to be encoded or not:
-
-    public abstract URI build(Map<String, String> values);    
-    public abstract URI build(String... values);
-
-
-For the following:
-
-    public abstract URI build(String... values);
-
-What do we do for a repeating template such as:
-
-   /{a}/foo/{a}
-
-is it expected to supply one or two values. Two values don't make any sense 
-since there is really one one value. So the values correspond to the number 
-and order of unique templates.
-
-
-Specify a value of -1 as no port? 
-
-    public abstract UriBuilder port(int port);
-
-
-What happens if a path segment contains a '/' for:
-
-    public UriBuilder path(String... segments)
-
-
-What happens to the matrix parameters when a path is replaced, i presume they 
-are removed.
-
-    public UriBuilder replacePath(String path, boolean encode) {
-
-
-Change:
-
-    public UriBuilder path(Class resource) {
-
-to
-
-    public UriBuilder path(Class<?> resource) {
-
-so that it is easier to get access to an annotation.
-
-
-What about null segment values, and queryParam/matrixPath names ?
-*/
+ * NOTEs
+ *
+ * static methods fromUri and fromPath(String path, boolean encode) 
+ * need to call encode(...)
+ *
+ * Should fromResource really take the encode value from the URI template.
+ * Are they not independent from each other? For example the URI template
+ * encode value may change and as a result may break code.
+ *
+ * What about null values?
+ *
+ * replaceQueryParams, the value can contain template parameters?
+ *
+ * fragment, the value can contain template parameters?
+ *
+ * what is the state of UriBuilder after build has been called?
+ */
 
 /**
- * TODO template support
- *
  * @author Paul.Sandoz@Sun.Com
  */
 public class UriBuilderImpl extends UriBuilder {
 
+    // All fields should be in the percent-encoded form
+    
+    private boolean encode = true;
+    
     private String scheme;
     
     private String userInfo;
@@ -113,6 +81,11 @@ public class UriBuilderImpl extends UriBuilder {
         query = new StringBuilder();
     }
 
+    public UriBuilder encode(boolean enable) {
+        encode = enable;
+        return this;
+    }
+    
     public UriBuilder uri(URI uri) {
         scheme = uri.getScheme();
         userInfo = uri.getRawUserInfo();
@@ -130,7 +103,8 @@ public class UriBuilderImpl extends UriBuilder {
     }
 
     public UriBuilder schemeSpecificPart(String ssp) {
-        URI uri = create(null, ssp, null);
+        // TODO This is buggy because the spp is percent-encoded
+        URI uri = createURI(null, ssp, null);
         userInfo = uri.getRawUserInfo();
         host = uri.getHost();
         port = uri.getPort();
@@ -140,15 +114,16 @@ public class UriBuilderImpl extends UriBuilder {
     }
 
     public UriBuilder authority(String authority) {
-        URI uri = create(null, "localhost:8080", null, null, null);
+        // TODO This is buggy because the authority is percent-encoded
+        URI uri = createURI(null, authority, null, null, null);
         userInfo = uri.getRawUserInfo();
         host = uri.getHost();
         port = uri.getPort();
         return this;
     }
 
-    public UriBuilder userInfo(String ui, boolean encode) {
-        this.userInfo = ui;
+    public UriBuilder userInfo(String ui) {
+        this.userInfo = encode(ui, UriComponent.Type.USER_INFO);
         return this;
     }
 
@@ -162,13 +137,13 @@ public class UriBuilderImpl extends UriBuilder {
         return this;
     }
 
-    public UriBuilder replacePath(String path, boolean encode) {
+    public UriBuilder replacePath(String path) {
         this.path.setLength(0);
-        this.path.append(path);
+        this.path.append(encode(path, UriComponent.Type.PATH));
         return this;
     }
 
-    public UriBuilder path(boolean encode, String... segments) {
+    public UriBuilder path(String... segments) {
         for (String segment : segments)
             appendPath(segment);
         
@@ -185,73 +160,60 @@ public class UriBuilderImpl extends UriBuilder {
         return this;
     }
 
-    public UriBuilder replaceMatrixParams(String matrix, boolean encode) {
+    public UriBuilder path(Class resource, String method) {
+        throw new UnsupportedOperationException();
+    }
+
+    public UriBuilder path(Method... methods) {
+        throw new UnsupportedOperationException();
+    }
+    
+    public UriBuilder replaceMatrixParams(String matrix) {
         int i = path.lastIndexOf("/");
         if (i != -1) i = 0;
         i = path.indexOf(";", i);
         if (i != -1) path.setLength(i + 1);
         
-        path.append(matrix);
+        path.append(encode(matrix, UriComponent.Type.PATH));
         return this;
     }
 
-    public UriBuilder matrixParam(String name, String value, boolean encode) {
+    public UriBuilder matrixParam(String name, String value) {
         if (path.length() > 0) path.append(';');
-        path.append(name);
-        if (value != null && value.length() > 0) path.append('=').append(value);
+        path.append(encode(name, UriComponent.Type.PATH));
+        if (value != null && value.length() > 0) 
+            path.append('=').append(encode(value, UriComponent.Type.PATH));
         return this;
     }
 
-    public UriBuilder replaceQueryParams(String query, boolean encode) {
+    public UriBuilder replaceQueryParams(String query) {
         this.query.setLength(0);
-        this.query.append(query);
+        this.query.append(encode(query, UriComponent.Type.QUERY));
         return this;
     }
 
-    public UriBuilder queryParam(String name, String value, boolean encode) {
-        if (query.length() > 0) query.append('&');
-        query.append(name);
-        if (value != null && value.length() > 0) query.append('=').append(value);
+    public UriBuilder queryParam(String name, String value) {
+        try {
+            if (query.length() > 0) query.append('&');
+                query.append(URLEncoder.encode(name, "UTF-8"));
+            if (value != null && value.length() > 0) 
+                query.append('=').append(URLEncoder.encode(value, "UTF-8"));
+        } catch (UnsupportedEncodingException ex) {
+            assert false;
+        }
         return this;
     }
 
-    public UriBuilder fragment(String fragment, boolean encode) {
-        this.fragment = fragment;
+    public UriBuilder fragment(String fragment) {
+        this.fragment = encode(fragment, UriComponent.Type.FRAGMENT);
         return this;
     }
 
-    
-    public URI build() {
-        return create();
-    }
-
-    public URI build(Map<String, String> values) {
-        URI u = create(null, userInfo, host, port, 
-                replaceEmptyString(path.toString()), 
-                replaceEmptyString(query.toString()), 
-                null);
-        String ssp = u.getRawSchemeSpecificPart();
-        URITemplateType t = new URITemplateType(ssp);
-        ssp = t.createURI(values);
-        return create(scheme, ssp, fragment);
-    }
-
-    public URI build(String... values) {
-        URI u = create(null, userInfo, host, port, 
-                replaceEmptyString(path.toString()), 
-                replaceEmptyString(query.toString()), 
-                null);
-        String ssp = u.getRawSchemeSpecificPart();
-        URITemplateType t = new URITemplateType(ssp);
-        ssp = t.createURI(values);
-        return create(scheme, ssp, fragment);
-    }
-    
     private void appendPath(String segment) {
         if (segment == null || segment.length() == 0)
             return;
-        
-        StringBuilder sb;
+
+        segment = encode(segment, UriComponent.Type.PATH);
         
         final boolean pathEndsInSlash = path.charAt(path.length() - 1) == '/';
         final boolean segmentStartsWithSlash = segment.charAt(0) == '/';
@@ -262,26 +224,107 @@ public class UriBuilderImpl extends UriBuilder {
         
         path.append(segment);
     }
+        
+    private String encode(String s, UriComponent.Type type) {
+        if (encode)
+            return UriComponent.encode(s, type, true);
+        
+        UriComponent.validate(s, type, true);
+        return s;
+    }
     
-    private URI create() {
+    
+    public URI build() {
+        return createURI(create());
+    }
+
+    public URI build(Map<String, String> values) {
+        // TODO values need to be validated or encoded according to their 
+        // corresponding component
+        
+        String ssp = createSchemeSpecificPart();
+        
+        URITemplateType t = new URITemplateType(ssp);
+        ssp = t.createURI(values);
+        
+        return createURI(create(ssp));
+    }
+
+    public URI build(String... values) {
+        // TODO values need to be validated or encoded according to their 
+        // corresponding component
+        
+        String ssp = createSchemeSpecificPart();
+        
+        URITemplateType t = new URITemplateType(ssp);
+        ssp = t.createURI(values);
+        
+        return createURI(create(ssp));
+    }
+    
+    
+    private String create() {
+        StringBuilder sb = new StringBuilder();
+        create(sb);        
+        return sb.toString();
+    }
+    
+    private String create(String ssp) {
+        StringBuilder sb = new StringBuilder();
+        create(sb, ssp);        
+        return sb.toString();
+    }
+        
+    private void create(StringBuilder sb, String ssp) {
+        if (scheme != null) sb.append(scheme).append(':');
+
+        sb.append(ssp);
+        
+        if (fragment != null) sb.append('#').append(fragment);
+    }
+    
+    private void create(StringBuilder sb) {
+        if (scheme != null) sb.append(scheme).append(':');
+
+        createSchemeSpecificPart(sb);
+        
+        if (fragment != null) sb.append('#').append(fragment);
+    }
+    
+    private String createSchemeSpecificPart() {
+        StringBuilder sb = new StringBuilder();
+        createSchemeSpecificPart(sb);
+        return sb.toString();
+    }
+    
+    private void createSchemeSpecificPart(StringBuilder sb) {
+        if (userInfo != null || host != null || port != -1) {
+            sb.append("//");
+            
+            if (userInfo != null) sb.append(userInfo).append('@');
+            
+            if (host != null) {
+                // TODO check IPv6 address
+                sb.append(host);
+            }
+            
+            if (port != -1) sb.append(':').append(port);
+        }
+
+        if (path.length() > 0) sb.append(path);
+        
+        if (query.length() > 0) sb.append('?').append(query);
+    }
+
+    private URI createURI(String uri) {
         try {
-            return new URI(scheme, 
-                    userInfo, 
-                    host, 
-                    port, 
-                    replaceEmptyString(path.toString()), 
-                    replaceEmptyString(query.toString()), 
-                    fragment);
+            return new URI(uri);
         } catch (URISyntaxException ex) {
-            throw new IllegalArgumentException(ex);
+            throw new UriBuilderException(ex);
         }
     }
     
-    private URI create(String uri) {
-        return URI.create(uri);
-    }
-    
-    private URI create(String scheme,
+    private URI createURI(String scheme,
            String ssp,
            String fragment) {
         try {
@@ -291,21 +334,7 @@ public class UriBuilderImpl extends UriBuilder {
         }                
     }
     
-    private URI create(String scheme,
-           String userInfo,
-           String host,
-           int port,
-           String path,
-           String query,
-           String fragment) {
-        try {
-            return new URI(scheme, userInfo, host, port, path, query, fragment);
-        } catch (URISyntaxException ex) {
-            throw new IllegalArgumentException(ex);
-        }
-    }
-    
-    private URI create(String scheme,
+    private URI createURI(String scheme,
            String authority,
            String path,
            String query,
@@ -316,12 +345,10 @@ public class UriBuilderImpl extends UriBuilder {
             throw new IllegalArgumentException(ex);
         }        
     }
-     
+    
+    
     private String replaceNull(String s) {
         return (s != null) ? s : "";
     }
     
-    private String replaceEmptyString(String s) {
-        return (s.length() != 0) ? s : null;
-    }
 }

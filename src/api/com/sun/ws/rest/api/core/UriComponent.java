@@ -44,25 +44,74 @@ public final class UriComponent {
     }
 
     /**
-     * Validates the characters of a percent-encoded string that represents a 
-     * URI component type.
+     * Validates the legal characters of a percent-encoded string that 
+     * represents a URI component type.
      *
      * @param s the encoded string.
-     * @param t the URI compontent type identifying the ASCII characters that 
-     *          must be percent-encoded.
-     * @return true if the encoded string is valid.
+     * @param t the URI compontent type identifying the legal characters.
+     * @throws IllegalArgumentException if the encoded string contains illegal
+     *         characters.
      */
-    public static boolean validate(String s, Type t) {
+    public static void validate(String s, Type t) {
+        validate(s, t, false);
+    }
+    
+    /**
+     * Validates the legal characters of a percent-encoded string that 
+     * represents a URI component type.
+     *
+     * @param s the encoded string.
+     * @param t the URI compontent type identifying the legal characters.
+     * @param template true if the encoded string contains URI template variables
+     * @throws IllegalArgumentException if the encoded string contains illegal
+     *         characters.
+     */
+    public static void validate(String s, Type t, boolean template) {
+        int i = _valid(s, t, template);
+        if (i > -1)
+            // TODO localize
+            throw new IllegalArgumentException("The string '" + s + 
+                    "' for the URI component " + t + 
+                    " contains an invalid character, '" + s.charAt(i) + "', at index " + i);
+    }
+
+    /**
+     * Validates the legal characters of a percent-encoded string that 
+     * represents a URI component type.
+     *
+     * @param s the encoded string.
+     * @param t the URI compontent type identifying the legal characters.
+     * @return true if the encoded string is valid, otherwise false.
+     */
+    public static boolean valid(String s, Type t) {
+        return valid(s, t, false);
+    }
+    
+    /**
+     * Validates the legal characters of a percent-encoded string that 
+     * represents a URI component type.
+     *
+     * @param s the encoded string.
+     * @param t the URI compontent type identifying the legal characters.
+     * @param template true if the encoded string contains URI template variables
+     * @return true if the encoded string is valid, otherwise false.
+     */
+    public static boolean valid(String s, Type t, boolean template) {
+        return _valid(s, t, template) == -1;
+    }
+    
+    private static int _valid(String s, Type t, boolean template) {
         boolean[] table = ENCODING_TABLES[t.ordinal()];
         
         for (int i = 0; i < s.length(); i++) {
             final char c = s.charAt(i);
             if ((c < 0x80 && !table[c]) || c >= 0x80)
-                return false;
+                if (!template || (c != '{' && c != '}'))
+                    return i;
         }
-        return true;
+        return -1;
     }
-
+    
     /**
      * Encodes the characters of string that are either non-ASCII characters 
      * or are ASCII characters that must be percent-encoded using the 
@@ -74,6 +123,21 @@ public final class UriComponent {
      * @return the encoded string.
      */
     public static String encode(String s, Type t) {
+        return encode(s, t, false);
+    }
+    
+    /**
+     * Encodes the characters of string that are either non-ASCII characters 
+     * or are ASCII characters that must be percent-encoded using the 
+     * UTF-8 encoding.
+     *
+     * @param s the string to be encoded.
+     * @param t the URI compontent type identifying the ASCII characters that 
+     *          must be percent-encoded.
+     * @param template true if the encoded string contains URI template variables
+     * @return the encoded string.
+     */
+    public static String encode(String s, Type t, boolean template) {
         boolean[] table = ENCODING_TABLES[t.ordinal()];
 
         StringBuilder sb = null;
@@ -82,6 +146,11 @@ public final class UriComponent {
             if (c < 0x80 && table[c]) {
                 if (sb != null) sb.append(c);
             } else {
+                if (template && (c == '{' || c == '}')) {
+                    if (sb != null) sb.append(c);
+                    continue;
+                }
+
                 if (sb == null) { 
                     sb = new StringBuilder();
                     sb.append(s.substring(0, i));

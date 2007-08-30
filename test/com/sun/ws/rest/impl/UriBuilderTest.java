@@ -106,6 +106,10 @@ public class UriBuilderTest extends TestCase {
         bu = UriBuilder.fromUri(URI.create("http://localhost:8080/a/b/c")).
                 path("").build();
         assertEquals(URI.create("http://localhost:8080/a/b/c"), bu);
+        
+        bu = UriBuilder.fromUri(URI.create("http://localhost:8080/a%20/b%20/c%20")).
+                path("/x /y /z ").build();
+        assertEquals(URI.create("http://localhost:8080/a%20/b%20/c%20/x%20/y%20/z%20"), bu);
     }
     
     public void testAppendQueryParams() {
