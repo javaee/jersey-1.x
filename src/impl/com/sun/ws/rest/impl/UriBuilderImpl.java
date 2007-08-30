@@ -104,6 +104,7 @@ public class UriBuilderImpl extends UriBuilder {
 
     public UriBuilder schemeSpecificPart(String ssp) {
         // TODO This is buggy because the spp is percent-encoded
+        // Any template present variables will result in an exception
         URI uri = createURI(null, ssp, null);
         userInfo = uri.getRawUserInfo();
         host = uri.getHost();
@@ -115,6 +116,7 @@ public class UriBuilderImpl extends UriBuilder {
 
     public UriBuilder authority(String authority) {
         // TODO This is buggy because the authority is percent-encoded
+        // Any template present variables will result in an exception
         URI uri = createURI(null, authority, null, null, null);
         userInfo = uri.getRawUserInfo();
         host = uri.getHost();
@@ -150,22 +152,37 @@ public class UriBuilderImpl extends UriBuilder {
         return this;
     }
 
-    @SuppressWarnings("unchecked")
     public UriBuilder path(Class resource) {
+        @SuppressWarnings("unchecked")
         UriTemplate ut = (UriTemplate)resource.getAnnotation(UriTemplate.class);
-        if (ut == null)
-            throw new IllegalArgumentException();
-        
-        appendPath(ut.value());
+        appendPath(ut);
         return this;
     }
 
-    public UriBuilder path(Class resource, String method) {
-        throw new UnsupportedOperationException();
+    public UriBuilder path(Class resource, String methodName) {
+        Method[] methods = resource.getDeclaredMethods();
+        Method found = null;
+        for (Method m : methods) {
+            if (methodName.equals(m.getName())) {
+                if (found == null) found = m;
+                else 
+                    throw new IllegalArgumentException();
+            }
+        }
+
+        if (found == null)
+            throw new IllegalArgumentException();
+        
+        appendPath(found.getAnnotation(UriTemplate.class));
+        
+        return this;
     }
 
     public UriBuilder path(Method... methods) {
-        throw new UnsupportedOperationException();
+        for (Method m : methods)
+            appendPath(m.getAnnotation(UriTemplate.class));
+
+        return this;
     }
     
     public UriBuilder replaceMatrixParams(String matrix) {
@@ -209,6 +226,16 @@ public class UriBuilderImpl extends UriBuilder {
         return this;
     }
 
+    private void appendPath(UriTemplate t) {
+        if (t == null)
+            throw new IllegalArgumentException();
+        
+        boolean _encode = encode;
+        encode = t.encode();
+        appendPath(t.value());
+        encode = _encode;
+    }
+    
     private void appendPath(String segment) {
         if (segment == null || segment.length() == 0)
             return;
@@ -240,7 +267,7 @@ public class UriBuilderImpl extends UriBuilder {
 
     public URI build(Map<String, String> values) {
         // TODO values need to be validated or encoded according to their 
-        // corresponding component
+        // corresponding component(s)
         
         String ssp = createSchemeSpecificPart();
         
@@ -252,7 +279,7 @@ public class UriBuilderImpl extends UriBuilder {
 
     public URI build(String... values) {
         // TODO values need to be validated or encoded according to their 
-        // corresponding component
+        // corresponding component(s)
         
         String ssp = createSchemeSpecificPart();
         
