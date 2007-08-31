@@ -22,6 +22,7 @@
 
 package com.sun.ws.rest.spi.dispatch;
 
+import com.sun.ws.rest.api.core.UriComponent;
 import com.sun.ws.rest.spi.SpiMessages;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
@@ -403,11 +404,29 @@ public final class URITemplateType {
      * @return the URI.
      */
     public String createURI(String... values) {
+        return createURI(values, 0, values.length);
+    }
+    
+    /**
+     * Create a URI by substituting any template variables
+     * for corresponding template values.
+     * <p>
+     * A URI template varibale without a value will be substituted by the 
+     * empty string.
+     *
+     * @param values the array of template values. The values will be 
+     *        substituted in order of occurence of unique template variables.
+     * @param offset the offset into the array
+     * @param length the length of the array
+     * @return the URI.
+     */
+    public String createURI(String[] values, int offset, int length) {
         Map<String, String> mapValues = new HashMap<String, String>();
         StringBuilder b = new StringBuilder();
         // Find all template variables
         Matcher m = TEMPLATE_NAMES_PATTERN.matcher(template);
-        int v = 0;
+        int v = offset;
+        length += offset;
         int i = 0;
         while(m.find()) {
             b.append(template, i, m.start());
@@ -419,10 +438,12 @@ public final class URITemplateType {
             if (tValue != null) {
                 b.append(tValue);
             } else {
-                if (v < values.length) {
+                if (v < length) {
                     tValue = values[v++];
-                    mapValues.put(tVariable, tValue);
-                    b.append(tValue);
+                    if (tValue != null) {
+                        mapValues.put(tVariable, tValue);
+                        b.append(tValue);
+                    }
                 }
             }
             i = m.end();
@@ -448,5 +469,196 @@ public final class URITemplateType {
         } else {
             return false;
         }
+    }
+    
+    /**
+     * Construct a URI from the component parts each of which may contain 
+     * template variables.
+     *
+     * @param scheme the URI scheme component
+     * @param userInfo the URI user info component
+     * @param host the URI host component
+     * @param port the URI port component
+     * @param path the URI path component
+     * @param query the URI query componnet
+     * @param fragment the URI fragment component
+     * @param values the template variable to value map
+     * @param encode if true encode a template value according to the correspond
+     *        component type of the associated template variable, otherwise
+     *        validate the template value
+     * @return a URI
+     */
+    public static String createURI(final String scheme, 
+            final String userInfo, final String host, final String port, 
+            final String path, final String query, final String fragment,
+            final Map<String, String> values, final boolean encode) {
+        
+        StringBuilder sb = new StringBuilder();
+        
+        if (scheme != null)
+            createURIComponent(UriComponent.Type.SCHEME, scheme, values, false, sb).
+                    append(':');
+        
+        if (userInfo != null || host != null || port != null) {
+            sb.append("//");
+            
+            if (userInfo != null && userInfo.length() > 0) 
+                createURIComponent(UriComponent.Type.USER_INFO, userInfo, values, encode, sb).
+                    append('@');
+            
+            if (host != null) {
+                // TODO check IPv6 address
+                createURIComponent(UriComponent.Type.HOST, host, values, encode, sb);
+            }
+
+            if (port != null && port.length() > 0) {
+                sb.append(':');
+                createURIComponent(UriComponent.Type.PORT, port, values, false, sb);                
+            }
+        }
+
+        if (path != null)
+            createURIComponent(UriComponent.Type.PATH, path, values, encode, sb);                
+        
+        if (query != null && query.length() > 0) {
+            sb.append('?');
+            createURIComponent(UriComponent.Type.QUERY, query, values, encode, sb);
+        }
+         
+        if (fragment != null && fragment.length() > 0) {
+            sb.append('#');
+            createURIComponent(UriComponent.Type.FRAGMENT, path, values, encode, sb);                
+        }
+        return sb.toString();
+    }
+    
+    private static StringBuilder createURIComponent(final UriComponent.Type t, final String template, 
+            final Map<String, String> values, 
+            final boolean encode, 
+            final StringBuilder b) {
+        if (template.indexOf('{') == -1) {
+            b.append(template);
+            return b;
+        }
+        
+        // Find all template variables
+        final Matcher m = TEMPLATE_NAMES_PATTERN.matcher(template);
+        int i = 0;
+        while(m.find()) {
+            b.append(template, i, m.start());
+            String tValue = values.get(m.group(1));
+            if (tValue != null) {
+                if (encode)
+                    tValue = UriComponent.encode(tValue, t);
+                else
+                    UriComponent.validate(tValue, t);
+                b.append(tValue);
+            }
+            i = m.end();
+        }
+        b.append(template, i, template.length());
+        return b;
+    }
+    
+    /**
+     * Construct a URI from the component parts each of which may contain 
+     * template variables.
+     *
+     * @param scheme the URI scheme component
+     * @param userInfo the URI user info component
+     * @param host the URI host component
+     * @param port the URI port component
+     * @param path the URI path component
+     * @param query the URI query componnet
+     * @param fragment the URI fragment component
+     * @param values the array of template values
+     * @param encode if true encode a template value according to the correspond
+     *        component type of the associated template variable, otherwise
+     *        validate the template value
+     * @return a URI
+     */
+    public static String createURI(final String scheme, 
+            final String userInfo, final String host, final String port, 
+            final String path, final String query, final String fragment,
+            final String[] values, final boolean encode) {
+        
+        final Map<String, String> mapValues = new HashMap<String, String>();
+        final StringBuilder sb = new StringBuilder();
+        int offset = 0;
+        
+        if (scheme != null) {
+            offset = createURIComponent(UriComponent.Type.SCHEME, scheme, values, offset, false, mapValues, sb);
+            sb.append(':');
+        }
+        
+        if (userInfo != null || host != null || port != null) {
+            sb.append("//");
+            
+            if (userInfo != null && userInfo.length() > 0) {
+                offset = createURIComponent(UriComponent.Type.USER_INFO, userInfo, values, offset, encode, mapValues, sb);
+                sb.append('@');
+            }
+            
+            if (host != null) {
+                // TODO check IPv6 address
+                offset = createURIComponent(UriComponent.Type.HOST, host, values, offset, encode, mapValues, sb);
+            }
+
+            if (port != null && port.length() > 0) {
+                sb.append(':');
+                offset = createURIComponent(UriComponent.Type.PORT, port, values, offset, false, mapValues, sb);                
+            }
+        }
+
+        if (path != null)
+            offset = createURIComponent(UriComponent.Type.PATH, path, values, offset, encode, mapValues, sb);                
+        
+        if (query != null && query.length() > 0) {
+            sb.append('?');
+            offset = createURIComponent(UriComponent.Type.QUERY, query, values, offset, encode, mapValues, sb);
+        }
+         
+        if (fragment != null && fragment.length() > 0) {
+            sb.append('#');
+            offset = createURIComponent(UriComponent.Type.FRAGMENT, path, values, offset, encode, mapValues, sb);                
+        }
+        return sb.toString();
+    }
+    
+    private static int createURIComponent(final UriComponent.Type t, final String template,
+            final String[] values, final int offset,
+            final boolean encode, 
+            final Map<String, String> mapValues,
+            final StringBuilder b) {
+        // Find all template variables
+        final Matcher m = TEMPLATE_NAMES_PATTERN.matcher(template);
+        int v = offset;
+        int i = 0;
+        while(m.find()) {
+            b.append(template, i, m.start());
+            final String tVariable = m.group(1);
+            // Check if a template variable has already occurred
+            // If so use the value to ensure that two or more declarations of 
+            // a template variable have the same value
+            String tValue = mapValues.get(tVariable);
+            if (tValue != null) {
+                b.append(tValue);
+            } else {
+                if (v < values.length) {
+                    tValue = values[v++];
+                    if (tValue != null) {
+                        mapValues.put(tVariable, tValue);
+                        if (encode)
+                            tValue = UriComponent.encode(tValue, t);
+                        else
+                            UriComponent.validate(tValue, t);
+                        b.append(tValue);
+                    }
+                }
+            }
+            i = m.end();
+        }
+        b.append(template, i, template.length());
+        return v;
     }
 }

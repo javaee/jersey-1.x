@@ -37,7 +37,7 @@ import java.util.List;
 public final class UriComponent {
 
     public enum Type {
-        SCHEME, USER_INFO, HOST, PATH, PATH_SEGMENT, QUERY, FRAGMENT,
+        SCHEME, USER_INFO, HOST, PORT, PATH, PATH_SEGMENT, QUERY, FRAGMENT,
     }
     
     private UriComponent() {
@@ -205,6 +205,8 @@ public final class UriComponent {
         l.addAll(Arrays.asList(SUB_DELIMS));
 
         tables[Type.HOST.ordinal()] = creatingEncodingTable(l);
+        
+        tables[Type.PORT.ordinal()] = creatingEncodingTable(Arrays.asList("0-9"));
         
         l.add(":");
 

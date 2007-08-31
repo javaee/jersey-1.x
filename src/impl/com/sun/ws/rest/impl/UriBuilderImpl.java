@@ -31,32 +31,17 @@ import java.lang.reflect.Method;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URLEncoder;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import javax.ws.rs.UriTemplate;
-
-/*
- * NOTEs
- *
- * static methods fromUri and fromPath(String path, boolean encode) 
- * need to call encode(...)
- *
- * Should fromResource really take the encode value from the URI template.
- * Are they not independent from each other? For example the URI template
- * encode value may change and as a result may break code.
- *
- * What about null values?
- *
- * replaceQueryParams, the value can contain template parameters?
- *
- * fragment, the value can contain template parameters?
- *
- * what is the state of UriBuilder after build has been called?
- */
 
 /**
  * @author Paul.Sandoz@Sun.Com
  */
-public class UriBuilderImpl extends UriBuilder {
+public final class UriBuilderImpl extends UriBuilder {
 
     // All fields should be in the percent-encoded form
     
@@ -97,8 +82,14 @@ public class UriBuilderImpl extends UriBuilder {
         return this;
     }
 
+    public UriBuilder uri(String uri) {
+        uri(createURI(uri));
+        return this;
+    }
+    
     public UriBuilder scheme(String scheme) {
         this.scheme = scheme;
+        UriComponent.validate(scheme, UriComponent.Type.SCHEME, true);
         return this;
     }
 
@@ -130,7 +121,7 @@ public class UriBuilderImpl extends UriBuilder {
     }
 
     public UriBuilder host(String host) {
-        this.host = host;
+        this.host = encode(host, UriComponent.Type.HOST);
         return this;
     }
 
@@ -266,69 +257,30 @@ public class UriBuilderImpl extends UriBuilder {
     }
 
     public URI build(Map<String, String> values) {
-        // TODO values need to be validated or encoded according to their 
-        // corresponding component(s)
-        
-        String ssp = createSchemeSpecificPart();
-        
-        URITemplateType t = new URITemplateType(ssp);
-        ssp = t.createURI(values);
-        
-        return createURI(create(ssp));
+        String uri = URITemplateType.createURI(scheme, 
+                userInfo, host, String.valueOf(port), 
+                path.toString(), query.toString(), fragment, values, encode);
+        return createURI(uri);
     }
 
     public URI build(String... values) {
-        // TODO values need to be validated or encoded according to their 
-        // corresponding component(s)
-        
-        String ssp = createSchemeSpecificPart();
-        
-        URITemplateType t = new URITemplateType(ssp);
-        ssp = t.createURI(values);
-        
-        return createURI(create(ssp));
+        String uri = URITemplateType.createURI(scheme, 
+                userInfo, host, String.valueOf(port), 
+                path.toString(), query.toString(), fragment, values, encode);
+        return createURI(uri);              
     }
     
     
     private String create() {
         StringBuilder sb = new StringBuilder();
-        create(sb);        
-        return sb.toString();
-    }
-    
-    private String create(String ssp) {
-        StringBuilder sb = new StringBuilder();
-        create(sb, ssp);        
-        return sb.toString();
-    }
         
-    private void create(StringBuilder sb, String ssp) {
         if (scheme != null) sb.append(scheme).append(':');
 
-        sb.append(ssp);
-        
-        if (fragment != null) sb.append('#').append(fragment);
-    }
-    
-    private void create(StringBuilder sb) {
-        if (scheme != null) sb.append(scheme).append(':');
-
-        createSchemeSpecificPart(sb);
-        
-        if (fragment != null) sb.append('#').append(fragment);
-    }
-    
-    private String createSchemeSpecificPart() {
-        StringBuilder sb = new StringBuilder();
-        createSchemeSpecificPart(sb);
-        return sb.toString();
-    }
-    
-    private void createSchemeSpecificPart(StringBuilder sb) {
         if (userInfo != null || host != null || port != -1) {
             sb.append("//");
             
-            if (userInfo != null) sb.append(userInfo).append('@');
+            if (userInfo != null && userInfo.length() > 0) 
+                sb.append(userInfo).append('@');
             
             if (host != null) {
                 // TODO check IPv6 address
@@ -341,8 +293,12 @@ public class UriBuilderImpl extends UriBuilder {
         if (path.length() > 0) sb.append(path);
         
         if (query.length() > 0) sb.append('?').append(query);
+        
+        if (fragment != null) sb.append('#').append(fragment);
+        
+        return sb.toString();
     }
-
+    
     private URI createURI(String uri) {
         try {
             return new URI(uri);
