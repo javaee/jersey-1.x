@@ -41,7 +41,7 @@
 <module_updates timestamp="@@@@MODULE_TIMESTAMP@@@@">
 
 <module codenamebase="com.sun.ws.rest" distribution="http://localhost/beta/modules/jersey/module_jersey.nbm" downloadsize="@@@@DOWNLOAD_SIZE@@@@" homepage="https://jersey.dev.java.net/" license="1BAE3EA4" moduleauthor="" needsrestart="false" releasedate="@@@@MODULE_RELEASE_DATE@@@@">
-    <manifest OpenIDE-Module="com.sun.ws.rest/1" OpenIDE-Module-Display-Category="Runtime" OpenIDE-Module-Implementation-Version="@@@@MODULE_IMPL_VERSION@@@@" OpenIDE-Module-Long-Description="Jersey libraries, documentation and samples" OpenIDE-Module-Module-Dependencies="" OpenIDE-Module-Name="Jersey" OpenIDE-Module-Requires="" OpenIDE-Module-Short-Description="Jersey" OpenIDE-Module-Specification-Version="1.0" Module-Type="ARCHIVE" Target-Container="sjas91beta"/>
+    <manifest OpenIDE-Module="com.sun.ws.rest/1" OpenIDE-Module-Display-Category="Runtime" OpenIDE-Module-Implementation-Version="@@@@MODULE_IMPL_VERSION@@@@" OpenIDE-Module-Long-Description="Jersey libraries, documentation and samples" OpenIDE-Module-Module-Dependencies="" OpenIDE-Module-Name="Jersey" OpenIDE-Module-Requires="" OpenIDE-Module-Short-Description="Jersey" OpenIDE-Module-Specification-Version="0.2" Module-Type="ARCHIVE" Target-Container="sjas91beta"/>
 </module>
 
 <license name="1BAE3EA4">For Update Center Project:

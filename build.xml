@@ -147,6 +147,9 @@
         <!-- create samples distribution -->
         <ant dir="examples" target="dist"/>
         
+        <!-- copy installation ant scripts -->
+        <copy file="${basedir}/etc/jersey-on-glassfish.xml" todir="${release.impl.dir}"/>
+
         <!-- create a zip file of the distribution -->
         <zip destfile="${basedir}/dist/${release.impl.name}.zip"
              basedir="${basedir}/dist"
@@ -161,72 +164,13 @@
 
     <!-- GlassFish Update Center Tasks -->
 
-    <macrodef name="update-nb-prop">
-      <attribute name="nb.prop.file"/>
-      <sequential>
-        <replace file="@{nb.prop.file}">
-          <replacefilter token="../../lib" value="${ashome.jersey.lib.dir}"/>
-          <replacefilter token="/jaxb-api.jar" value="/webservices-rt.jar"/>
-          <replacefilter token="/jaxb-impl.jar" value="/webservices-rt.jar"/>
-          <replacefilter token="/jaxb-xjc.jar" value="/webservices-tools.jar"/>
-          <replacefilter token="/jaxws-api.jar" value="/webservices-rt.jar"/>
-        </replace>
-        <replace file="@{nb.prop.file}">
-          <replacefilter token="${ashome.jersey.lib.dir}/mail.jar" value="${ashome.lib.dir}/mail.jar"/>
-          <replacefilter token="${ashome.jersey.lib.dir}/activation.jar" value="${ashome.lib.dir}/activation.jar"/>
-          <replacefilter token="${ashome.jersey.lib.dir}/webservices-tools.jar" value="${ashome.lib.dir}/webservices-tools.jar"/>
-          <replacefilter token="${ashome.jersey.lib.dir}/webservices-rt.jar" value="${ashome.lib.dir}/webservices-rt.jar"/>
-        </replace>
-        <tempfile property="nb.prop.temp.file"/>
-        <concat destfile="${nb.prop.temp.file}">
-          <header trimleading="yes">ashome.jersey.lib.dir=../../lib
-                                    ashome.lib.dir=../../../lib
-          </header>
-          <fileset file="@{nb.prop.file}"/>
-        </concat>
-        <move file="${nb.prop.temp.file}" tofile="@{nb.prop.file}"/>
-      </sequential>
-    </macrodef>
-
-    <!-- TODO: depends="dist" --> 
-    <target name="create-uc-module" depends="clean-uc-module" description="Generate GlassFish Update Center Module"> 
-      <!-- Base dist file could be taken from [base.uc.dist.file] parameter -->
-      <condition property="base.uc.dist.file" value="${basedir}/dist/${release.impl.name}.zip">
-        <not>
-          <isset property="base.uc.dist.file"/>
-        </not>
-      </condition>
-      <echo message="Taking ${base.uc.dist.file} as a base distribution file..."/>
-      <!-- unzip the dist archive and rename the base dir to jersey -->
+    <target name="create-uc-module" depends="clean-uc-module, dist" description="Generate GlassFish Update Center Module"> 
       <mkdir dir="${basedir}/gf-uc/as-home"/>
-      <unzip src="${base.uc.dist.file}" dest="${basedir}/gf-uc/as-home"/>
-      <move file="${basedir}/gf-uc/as-home/${release.impl.name}" tofile="${basedir}/gf-uc/as-home/jersey"/>
-      <!-- remove unnecessary jar files, which are already part of glassfish -->
-      <delete>
-        <fileset dir="${basedir}/gf-uc/as-home/jersey/lib">
-          <!-- remove source bundles -->
-          <include name="*src.zip"/>
-          <!-- directly in [$AS_HOME/lib] -->
-          <include name="activation.jar"/>
-          <include name="mail.jar"/>
-          <!-- jaxb and jax-ws should be already there as well as part of [$AS_HOME/lib/webservices*jar] -->
-          <include name="jaxb-*.jar"/>
-          <include name="jaxws-*.jar"/>
-          <!-- ant.jar is in [$AS_HOME/lib/ant/lib] -->
-          <include name="ant.jar"/>
-          <!-- grizzly should be in [$AS_HOME/lib/appserv-rt.jar] -->
-          <include name="grizzly*jar"/>
-        </fileset>
-      </delete>
-      <!-- and move the lib dir directly to [$AS_HOME] -->
-      <!-- not recommended <move file="${basedir}/gf-uc/as-home/jersey/lib" todir="${basedir}/gf-uc/as-home"/> -->
-      <!-- remove jar files dirs from particular examples -->
-      <delete file="${basedir}/gf-uc/as-home/jersey/examples/Bookmark/lib/javaee.jar"/>
-      <delete file="${basedir}/gf-uc/as-home/jersey/examples/SimpleJAXWSEndpoint/lib/jaxws-rt.jar"/>
-      <!-- update examples lib config -->
-      <update-nb-prop nb.prop.file="${basedir}/gf-uc/as-home/jersey/examples/SimpleServlet/nbproject/project.properties"/>
-      <!-- TODO: remove following line -->
-      <delete dir="${basedir}/gf-uc/as-home/jersey/docs"/>
+      <ant dir="${basedir}/dist/${release.impl.name}" 
+           antfile="jersey-on-glassfish.xml" 
+           target="install" inheritAll="false">
+        <property name="gf.home" value="${basedir}/gf-uc/as-home"/>
+      </ant> 
       <!-- create a new module-gen dir structure for generated module content-->
       <mkdir dir="${basedir}/gf-uc/gen-module/Info"/>
       <mkdir dir="${basedir}/gf-uc/gen-module/module"/>
