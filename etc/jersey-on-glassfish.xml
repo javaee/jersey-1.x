@@ -23,7 +23,12 @@
 <project name="Jersey on GlassFish V2" default="help" basedir=".">
 
   <target name="help" description="Provides help on script usage">
-    <echo message="TODO: text should come here"/>
+    <echo message="The script expects you provide GlassFish home directory"/>
+    <echo message="via gf.home parameter: ant -Dgf.home=$AS_HOME ..."/>
+    <echo message=""/>
+    <echo message="install: creates a new $AS_HOME/jersey subdirectory"/>
+    <echo message="         containing Jersey docs, jars and examples"/>
+    <echo message="uninstall: removes $AS_HOME/jersey subdirectory"/>
   </target>
 
   <macrodef name="ensure-gf-home-set">
