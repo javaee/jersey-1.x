@@ -35,6 +35,7 @@
 	<ant dir="HelloWorld" target="${target}" inheritAll="false"/>
 	<ant dir="Bookmark" target="${target}" inheritAll="false"/>
 	<ant dir="EntityProvider" target="${target}" inheritAll="false"/>
+	<ant dir="JsonFromJaxb" target="${target}" inheritAll="false"/>
     </target>
 
     <target name="clean">
@@ -94,6 +95,9 @@
         </antcall>
         <antcall target="convert-property">
             <param name="example" value="EntityProvider"/>
+        </antcall>
+        <antcall target="convert-property">
+            <param name="example" value="JsonFromJaxb"/>
         </antcall>
     </target>
 </project>
