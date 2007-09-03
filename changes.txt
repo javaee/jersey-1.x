@@ -1,4 +1,6 @@
 release 0.2.1 (2007-08-xx)
+- JsonFromJaxb example added to demonstrate using JSON representation 
+  of JAXB based resources
 - 'jersey-on-glassfish.xml' ant script added to distribution
   so that users can install jersey jars, docs and examples on GlassFish
 - Simpler getting started document included.
