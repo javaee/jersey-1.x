@@ -1,12 +1,12 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
- * 
- * Copyright 2007 Sun Microsystems, Inc. All rights reserved. 
- * 
+ *
+ * Copyright 2007 Sun Microsystems, Inc. All rights reserved.
+ *
  * The contents of this file are subject to the terms of the Common Development
  * and Distribution License("CDDL") (the "License").  You may not use this file
- * except in compliance with the License. 
- * 
+ * except in compliance with the License.
+ *
  * You can obtain a copy of the License at:
  *     https://jersey.dev.java.net/license.txt
  * See the License for the specific language governing permissions and
@@ -124,12 +124,13 @@ import com.sun.ws.rest.spi.SpiMessages;
  * @since 1.3
  */
 public final class ServiceFinder<T> implements Iterable<T> {
-
+    
     private static final String prefix = "META-INF/services/";
-
+    
     private final Class<T> serviceClass;
     private final ClassLoader classLoader;
-
+    private final boolean ignoreOnClassNotFound;
+    
     /**
      * Locates and incrementally instantiates the available providers of a
      * given service using the given class loader.
@@ -156,9 +157,40 @@ public final class ServiceFinder<T> implements Iterable<T> {
      * @return the service finder
      */
     public static <T> ServiceFinder<T> find(Class<T> service, ClassLoader loader) throws ServiceConfigurationError {
-        return new ServiceFinder<T>(service,loader);
+        return find(service, loader, false);
     }
-
+    
+    /**
+     * Locates and incrementally instantiates the available providers of a
+     * given service using the given class loader.
+     * <p/>
+     * <p> This method transforms the name of the given service class into a
+     * provider-configuration filename as described above and then uses the
+     * <tt>getResources</tt> method of the given class loader to find all
+     * available files with that name.  These files are then read and parsed to
+     * produce a list of provider-class names.  The iterator that is returned
+     * uses the given class loader to lookup and then instantiate each element
+     * of the list.
+     * <p/>
+     * <p> Because it is possible for extensions to be installed into a running
+     * Java virtual machine, this method may return different results each time
+     * it is invoked. <p>
+     * @param service The service's abstract service class
+     * @param loader The class loader to be used to load provider-configuration files
+     *                and instantiate provider classes, or <tt>null</tt> if the system
+     *                class loader (or, failing that the bootstrap class loader) is to
+     *                be used
+     * @param ignoreOnClassNotFound If a provider cannot be loaded by the class loader
+     *                              then move on to the next available provider.
+     * @throws ServiceConfigurationError If a provider-configuration file violates the specified format
+     *                                   or names a provider class that cannot be found and instantiated
+     * @see #find(Class)
+     * @return the service finder
+     */
+    public static <T> ServiceFinder<T> find(Class<T> service, ClassLoader loader, boolean ignoreOnClassNotFound) throws ServiceConfigurationError {
+        return new ServiceFinder<T>(service,loader,ignoreOnClassNotFound);
+    }
+    
     /**
      * Locates and incrementally instantiates the available providers of a
      * given service using the context class loader.  This convenience method
@@ -166,7 +198,7 @@ public final class ServiceFinder<T> implements Iterable<T> {
      * <p/>
      * <pre>
      *   ClassLoader cl = Thread.currentThread().getContextClassLoader();
-     *   return Service.providers(service, cl);
+     *   return Service.providers(service, cl, false);
      * </pre>
      * @param service The service's abstract service class
      * @throws ServiceConfigurationError If a provider-configuration file violates the specified format
@@ -175,14 +207,37 @@ public final class ServiceFinder<T> implements Iterable<T> {
      * @return the service finder
      */
     public static <T> ServiceFinder<T> find(Class<T> service) throws ServiceConfigurationError {
-        return find(service,Thread.currentThread().getContextClassLoader());
+        return find(service,Thread.currentThread().getContextClassLoader(), false);
     }
-
-    private ServiceFinder(Class<T> service, ClassLoader loader) {
+    
+    /**
+     * Locates and incrementally instantiates the available providers of a
+     * given service using the context class loader.  This convenience method
+     * is equivalent to
+     * <p/>
+     * <pre>
+     *   ClassLoader cl = Thread.currentThread().getContextClassLoader();
+     *   boolean ingore = ...
+     *   return Service.providers(service, cl, ignore);
+     * </pre>
+     * @param service The service's abstract service class
+     * @param ignoreOnClassNotFound If a provider cannot be loaded by the class loader
+     *                              then move on to the next available provider.
+     * @throws ServiceConfigurationError If a provider-configuration file violates the specified format
+     *                                   or names a provider class that cannot be found and instantiated
+     * @see #find(Class, ClassLoader)
+     * @return the service finder
+     */
+    public static <T> ServiceFinder<T> find(Class<T> service, boolean ignoreOnClassNotFound) throws ServiceConfigurationError {
+        return find(service,Thread.currentThread().getContextClassLoader(), ignoreOnClassNotFound);
+    }
+    
+    private ServiceFinder(Class<T> service, ClassLoader loader, boolean ignoreOnClassNotFound) {
         this.serviceClass = service;
         this.classLoader = loader;
+        this.ignoreOnClassNotFound = ignoreOnClassNotFound;
     }
-
+    
     /**
      * Returns discovered objects incrementally.
      *
@@ -193,9 +248,9 @@ public final class ServiceFinder<T> implements Iterable<T> {
      *         be found and instantiated.
      */
     public Iterator<T> iterator() {
-        return new LazyIterator<T>(serviceClass,classLoader);
+        return new LazyIterator<T>(serviceClass,classLoader,ignoreOnClassNotFound);
     }
-
+    
     /**
      * Returns discovered objects all at once.
      *
@@ -213,33 +268,33 @@ public final class ServiceFinder<T> implements Iterable<T> {
         }
         return result.toArray((T[])Array.newInstance(serviceClass,result.size()));
     }
-
+    
     private static void fail(Class service, String msg, Throwable cause)
-        throws ServiceConfigurationError {
+    throws ServiceConfigurationError {
         ServiceConfigurationError sce
-            = new ServiceConfigurationError(service.getName() + ": " + msg);
+                = new ServiceConfigurationError(service.getName() + ": " + msg);
         sce.initCause(cause);
         throw sce;
     }
-
+    
     private static void fail(Class service, String msg)
-        throws ServiceConfigurationError {
+    throws ServiceConfigurationError {
         throw new ServiceConfigurationError(service.getName() + ": " + msg);
     }
-
+    
     private static void fail(Class service, URL u, int line, String msg)
-        throws ServiceConfigurationError {
+    throws ServiceConfigurationError {
         fail(service, u + ":" + line + ": " + msg);
     }
-
+    
     /**
      * Parse a single line from the given configuration file, adding the name
      * on the line to both the names list and the returned set iff the name is
      * not already a member of the returned set.
      */
     private static int parseLine(Class service, URL u, BufferedReader r, int lc,
-                                 List<String> names, Set<String> returned)
-        throws IOException, ServiceConfigurationError {
+            List<String> names, Set<String> returned)
+            throws IOException, ServiceConfigurationError {
         String ln = r.readLine();
         if (ln == null) {
             return -1;
@@ -250,7 +305,7 @@ public final class ServiceFinder<T> implements Iterable<T> {
         int n = ln.length();
         if (n != 0) {
             if ((ln.indexOf(' ') >= 0) || (ln.indexOf('\t') >= 0))
-                fail(service, u, lc, SpiMessages.ILLEGAL_CONFIG_SYNTAX()); 
+                fail(service, u, lc, SpiMessages.ILLEGAL_CONFIG_SYNTAX());
             int cp = ln.codePointAt(0);
             if (!Character.isJavaIdentifierStart(cp))
                 fail(service, u, lc, SpiMessages.ILLEGAL_PROVIDER_CLASS_NAME(ln));
@@ -266,7 +321,7 @@ public final class ServiceFinder<T> implements Iterable<T> {
         }
         return lc + 1;
     }
-
+    
     /**
      * Parse the content of the given URL as a provider-configuration file.
      *
@@ -284,7 +339,7 @@ public final class ServiceFinder<T> implements Iterable<T> {
      */
     @SuppressWarnings({"StatementWithEmptyBody"})
     private static Iterator<String> parse(Class service, URL u, Set<String> returned)
-        throws ServiceConfigurationError {
+    throws ServiceConfigurationError {
         InputStream in = null;
         BufferedReader r = null;
         ArrayList<String> names = new ArrayList<String>();
@@ -305,24 +360,31 @@ public final class ServiceFinder<T> implements Iterable<T> {
         }
         return names.iterator();
     }
-
-
+    
+    
     /**
      * Private inner class implementing fully-lazy provider lookup
      */
     private static class LazyIterator<T> implements Iterator<T> {
-        Class<T> service;
-        ClassLoader loader;
+        final Class<T> service;
+        final ClassLoader loader;
+        final boolean ignoreOnClassNotFound;
+        
         Enumeration<URL> configs = null;
         Iterator<String> pending = null;
         Set<String> returned = new TreeSet<String>();
         String nextName = null;
-
+        
         private LazyIterator(Class<T> service, ClassLoader loader) {
+            this(service, loader, false);
+        }
+        
+        private LazyIterator(Class<T> service, ClassLoader loader, boolean ignoreOnClassNotFound) {
             this.service = service;
             this.loader = loader;
+            this.ignoreOnClassNotFound = ignoreOnClassNotFound;
         }
-
+        
         public boolean hasNext() throws ServiceConfigurationError {
             if (nextName != null) {
                 return true;
@@ -338,16 +400,32 @@ public final class ServiceFinder<T> implements Iterable<T> {
                     fail(service, ": " + x);
                 }
             }
-            while ((pending == null) || !pending.hasNext()) {
-                if (!configs.hasMoreElements()) {
-                    return false;
+            
+            while (nextName == null) {
+                while ((pending == null) || !pending.hasNext()) {
+                    if (!configs.hasMoreElements()) {
+                        return false;
+                    }
+                    pending = parse(service, configs.nextElement(), returned);
                 }
-                pending = parse(service, configs.nextElement(), returned);
+                nextName = pending.next();
+                if (ignoreOnClassNotFound) {
+                    try {
+                        Class.forName(nextName, true, loader);
+                    } catch (ClassNotFoundException ex) {
+                        // Provider not found
+                        // TODO log error
+                        nextName = null;
+                    } catch (NoClassDefFoundError ex) {
+                        // Dependent class of provider not found
+                        // TODO log error
+                        nextName = null;                        
+                    }
+                }
             }
-            nextName = pending.next();
             return true;
         }
-
+        
         public T next() throws ServiceConfigurationError {
             if (!hasNext()) {
                 throw new NoSuchElementException();
@@ -358,15 +436,15 @@ public final class ServiceFinder<T> implements Iterable<T> {
                 return service.cast(Class.forName(cn, true, loader).newInstance());
             } catch (ClassNotFoundException x) {
                 fail(service,
-                    SpiMessages.PROVIDER_NOT_FOUND(cn));
+                        SpiMessages.PROVIDER_NOT_FOUND(cn));
             } catch (Exception x) {
                 fail(service,
-                    SpiMessages.PROVIDER_COULD_NOT_BE_CREATED(cn, x.getLocalizedMessage()),
-                    x);
+                        SpiMessages.PROVIDER_COULD_NOT_BE_CREATED(cn, x.getLocalizedMessage()),
+                        x);
             }
             return null;    /* This cannot happen */
         }
-
+        
         public void remove() {
             throw new UnsupportedOperationException();
         }

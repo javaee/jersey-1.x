@@ -46,7 +46,7 @@ public class ProviderFactoryImpl extends ProviderFactory {
         // This is obviously slow
         // Caching the providers using a Map with key of type and value of provider
         // for previously created resources will be faster
-        for (HeaderProvider<T> tsp : ServiceFinder.find(HeaderProvider.class)) {
+        for (HeaderProvider<T> tsp : ServiceFinder.find(HeaderProvider.class, true)) {
             if (tsp.supports(type))
                 return tsp;
         }     
@@ -59,7 +59,7 @@ public class ProviderFactoryImpl extends ProviderFactory {
         // This is obviously slow
         // Caching the providers using a Map with key of type and value of provider
         // for previously created resources will be faster
-        for (EntityProvider<T> tsp : ServiceFinder.find(EntityProvider.class)) {
+        for (EntityProvider<T> tsp : ServiceFinder.find(EntityProvider.class, true)) {
             if (tsp.supports(type))
                 return tsp;
         }     
