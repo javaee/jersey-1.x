@@ -1,0 +1,96 @@
+<html>
+    <head>
+        <title>Dependencies</title>
+    </head>
+    <body>
+        <h1>Dependencies</h1>
+        <p>An application depending on Jersey requires that it in turn
+        includes the set of jars that Jersey depends on.</p>
+        <p>Jersey has a pluggable component
+            architecture for the HTTP container of an application and the Java
+            types used for entities of HTTP requests/responses so the set of jars
+            required to be include in the class path can be different for each
+        application.</p>
+        <p>Jersey's runtime dependences are be categorized into the
+        following:</p>
+        <ul>
+            <li><p>Core. The minimum set of jars that Jersey depends on.</p>
+            <li><p>Container. The set of container dependent jars. Each
+            container provider has a dependency on a set of jars.</p>
+            <li><p>Entity. The set of entity dependent jars. Each entity
+            provider has a dependency on a set of jars</p>
+            <li><p>Tools. The set of jars required for tooling.</p>
+        </ul>
+        <p>All jar files explicitly referenced below are present in the
+        Jersey distribution.</p>
+        <h2>Core</h2>
+        <p>When using Java SE (5 or 6) the minimum set of required jars are: 
+        </p>
+        <p><blockquote>jersey.jar, jsr311-api.jar, localizer.jar,
+        persistence-api-1.0.jar, jsr250.jar</blockquote></p>
+        <p>When using Java EE 5 the minimum set of required jars are:</p>
+        <p><blockquote>jersey.jar, jsr311-api.jar, localizer.jar
+        </blockquote></p>
+        <h2>Container</h2>
+        <h3>Light weight HTTP server</h3>
+        <p>Deploying an application using the light weight HTTP server with
+        Java SE 5 requires:</p>
+        <p><blockquote>http.jar</blockquote></p>
+        <p>Deploying an application using the light weight HTTP server with
+        Java SE 6 requires no additional jars.</p>
+        <h3>JAX-WS provider</h3>
+        <p>Deploying an application using a JAX-WS provider with Java SE 5 or
+            6 or Java EE 5 requires the JAX-WS reference implementation version
+        2.1.x or higher with the following jars:</p>
+        <p><blockquote>jaxws-rt.jar, jaxws-api.jar, jsr181-api.jar, jsr250-api.jar,
+                saaj-api.jar, saaj-impl.jar, jsr173_api.jar, sjsxp.jar, 
+                resolver.jar, jaxb-api.jar, jaxb-impl.jar, activation.jar, 
+        stax-ex.jar, streambuffer.jar, stax-utils.jar</blockquote></p>
+        <h3>Servlet</h3>
+        <p>Deploying an application on a servlet container requires a
+        deployment dependency with that container.</p>
+        <h2>Entity</h2>
+        <h3>JAXB elements</h3>
+        <p>The use of Java types that are JAXB elements with Java SE 5 or 6
+            or Java EE 4 or 5 requires the JAXB reference implementation version
+        2.1.x or higher with the following jars:</p>
+        <p><blockquote>jaxb-impl.jar, jaxb-api.jar, activation.jar, jsr173_api.jar
+        </blockquote></p>
+        <p>In addition since the JAXB entity provider also supports the JSON
+        serialization former additional jars are also required:</p>
+        <p><blockquote>jettison-1.0-RC1.jar</blockquote></p>
+        <h3>Atom</h3>
+        <p>The use of the Java types com.sun.syndication.feed.atom.Entry and
+            com.sun.syndication.feed.atom.Feed requires ROME version 0.9 or
+        higher with the following jars:</p>
+        <p><blockquote>rome-0.9.jar, jdom-1.0.jar</blockquote></p>
+        <h3>JSON</h3>
+        <p>The use of the Java types org.codehaus.jettison.json.JSONObject
+            and org.codehaus.jettison.json.JSONArray requires Jettison version
+        1.0 RC1 or higher with the following jars:</p>
+        <p><blockquote>jettison-1.0-RC1.jar</blockquote></p>
+        <h3>Mail</h3>
+        <p>The use of the
+            Java type javax.mail.internet.MimeMultipart with Java SE 5 or 6
+        requires Java Mail version 1.4 or higher with the following jars:</p>
+        <p><blockquote>mail.jar, activation.jar</blockquote></p>
+        <p>The use of the Java type javax.mail.internet.MimeMultipart with
+        Java EE 5 requires no additional jars.</p>
+        <h3>Activation</h3>
+        <p>The use of the Java type javax.activation.DataSource with Java SE
+        5 requires Java Activation 1.0 or higher with the following jars:</p>
+        <p><blockquote>activation.jar</blockquote></p>
+        <h2>Tools</h2>
+        <p>The use of the ant task
+            com.sun.ws.rest.tools.ant.WebResourcesProcessorTask (to process the
+            root resource classes of an application and to generate a WADL
+            description of such resources) requires JAXB version 2.1.x tooling or
+            higher, WADL2Java and JAX-WS version 2.1.x tooling (<B>NOTE</B>: the
+        JAX-WS dependency needs to be removed) with the following jars:</p>
+        <p><blockquote>jaxb-xjc.jar jaxb-api.jar jaxb-impl.jar jsr173_api.jar
+        activation.jar, wadl2java.jar, jaxws-tools.jar</blockquote></p>
+        <p>Such jars do not need to be included in the runtime class path or
+        included in a WAR file unless some of the jars are required by the 
+        application for non-tooling functionality.</p>
+    </body>
+</html>
