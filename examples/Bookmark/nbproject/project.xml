@@ -17,18 +17,15 @@
                 </library>
                 <library files="1">
                     <file>${file.reference.jaxb-api.jar-1}</file>
-                    <path-in-war>WEB-INF/lib</path-in-war>
                 </library>
                 <library files="1">
                     <file>${file.reference.jaxb-impl.jar-1}</file>
-                    <path-in-war>WEB-INF/lib</path-in-war>
                 </library>
                 <library files="1">
                     <file>${file.reference.jaxb-xjc.jar-1}</file>
                 </library>
                 <library files="1">
                     <file>${file.reference.jaxws-api.jar-1}</file>
-                    <path-in-war>WEB-INF/lib</path-in-war>
                 </library>
                 <library files="1">
                     <file>${file.reference.jdom-1.0.jar-1}</file>
