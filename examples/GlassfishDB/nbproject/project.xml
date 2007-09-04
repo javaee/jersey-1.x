@@ -28,15 +28,12 @@
                 </library>
                 <library files="1">
                     <file>${file.reference.jaxb-api.jar}</file>
-                    <path-in-war>WEB-INF/lib</path-in-war>
                 </library>
                 <library files="1">
                     <file>${file.reference.jaxws-api.jar}</file>
-                    <path-in-war>WEB-INF/lib</path-in-war>
                 </library>
                 <library files="1">
                     <file>${file.reference.jaxb-impl.jar}</file>
-                    <path-in-war>WEB-INF/lib</path-in-war>
                 </library>
                 <library files="1">
                     <file>${file.reference.jaxb-xjc.jar}</file>
@@ -52,6 +49,9 @@
                 <library files="1">
                     <file>${file.reference.rome-0.9.jar}</file>
                     <path-in-war>WEB-INF/lib</path-in-war>
+                </library>
+                <library files="1">
+                    <file>${file.reference.jettison-1.0-RC1.jar}</file>
                 </library>
                 <library files="1">
                     <file>${file.reference.wadl2java.jar}</file>

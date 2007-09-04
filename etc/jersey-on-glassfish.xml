@@ -100,8 +100,8 @@
      <update-nb-prop nb.prop.file="${gf.home}/jersey/examples/Bookstore/nbproject/project.properties"/>
      <copy-example example.name="EntityProvider"/>
      <update-nb-prop nb.prop.file="${gf.home}/jersey/examples/EntityProvider/nbproject/project.properties"/>
-     <!--<copy-example example.name="GlassfishDB"/>
-     <update-nb-prop nb.prop.file="${gf.home}/jersey/examples/GlassfishDB/nbproject/project.properties"/> -->
+     <copy-example example.name="GlassfishDB"/>
+     <update-nb-prop nb.prop.file="${gf.home}/jersey/examples/GlassfishDB/nbproject/project.properties"/>
      <copy-example example.name="HelloWorld"/>
      <update-nb-prop nb.prop.file="${gf.home}/jersey/examples/HelloWorld/nbproject/project.properties"/>
      <copy-example example.name="JsonFromJaxb"/>

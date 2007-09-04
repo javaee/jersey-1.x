@@ -28,7 +28,7 @@
 	<ant dir="Bookmark" target="${target}" inheritAll="false"/>
 	<ant dir="Bookstore" target="${target}" inheritAll="false"/>
 	<ant dir="EntityProvider" target="${target}" inheritAll="false"/>
-<!--	<ant dir="GlassfishDB" target="${target}" inheritAll="false"/> -->
+	<ant dir="GlassfishDB" target="${target}" inheritAll="false"/> 
 	<ant dir="HelloWorld" target="${target}" inheritAll="false"/>
 	<ant dir="JsonFromJaxb" target="${target}" inheritAll="false"/>
 	<ant dir="OptimisticConcurrency" target="${target}" inheritAll="false"/>
@@ -63,7 +63,7 @@
 	<mkdir dir="${release.impl.dir}/examples"/>
 	<copy todir="${release.impl.dir}/examples">
             <!-- ignore any private directories for NB projects -->
-	    <fileset dir="." excludes="build.xml, **/nbproject/private/, GlassfishDB/"/>
+	    <fileset dir="." excludes="build.xml, **/nbproject/private/"/>
 	</copy>
 
 	<!-- replace property for jersey in NB projects -->
@@ -76,9 +76,9 @@
         <antcall target="convert-property">
             <param name="example" value="EntityProvider"/>
         </antcall>
-<!--        <antcall target="convert-property">
+        <antcall target="convert-property">
             <param name="example" value="GlassfishDB"/>
-        </antcall> -->
+        </antcall>
         <antcall target="convert-property">
             <param name="example" value="HelloWorld"/>
         </antcall>
