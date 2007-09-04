@@ -1,0 +1,89 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<title>JsonFromJaxb Example</title>
+<style type="text/css"><!--
+  .figure { text-align:center;
+            margin: 20px}
+  .cliSample { background-color:lightgray }
+--></style>
+</head>
+
+
+  <body>
+    <h1>JsonFromJaxb Example</h1>
+    <p>This example demonstrates how to use JSON representation of JAXB based resources. 
+    <p>A simple web application is presented with just one resource: flight list. A client can obtain
+the list or update it using XML or JSON representation of the list. 
+     
+
+    <h2>Contents</h2>
+    <p>The flight list web resource is implemented by <code>com.sun.ws.rest.samples.jsonfromjaxb.resources.FlightList</code> class.
+    <p>The mapping of the URI path space is presented in the following table:</p>
+	<table border="1">
+	<tr>
+	<th>URI path</th>
+	<th>Resource class</th>
+	<th>HTTP methods</th>
+	</tr>
+
+	<tr>
+	<td>/flights/</td>
+	<td>FlightList</td>
+	<td>GET, PUT</td>
+	</tr>
+	<tr>
+
+	</table>
+
+    <h2>Running the Example</h2>
+
+<p>JsonFromJaxb example runs on Glassfish application server (<a href="http://glassfish.dev.java.net/">http://glassfish.dev.java.net</a>) and comes along with 
+Netbeans (open source IDE, <a href="http://www.netbeans.org">http://www.netbeans.org/</a>) project files.
+So it is easy to run it from Netbeans IDE.
+
+<h3>Running on Netbeans 5.5.1</h3>
+
+<p>Presuming, you have installed Netbeans 5.5.1 and Glassfish v2.
+
+<h4>Building And Starting The JsonFromJaxb Service</h4>
+
+<p>Open <b>JsonFromJaxb</b> project in Netbeans IDE. If you do not have your Glassfish V2 application server 
+already registered in Netbeans, you will be asked to resolve missing server problem. Netbeans IDE will guide you to do so.
+
+<p>You can now build and deploy the project by pressing <b>F6</b> (Run Main Project)
+
+
+<h4>Test Client Running</h4>
+
+<p>Open <b>JsonFromJaxb Test Client</b> project located in <code>JsonFromJaxbTestClient</code> subdirecory.
+Then press <code>F6</code> (Run Main Project).
+
+If you see something similar in your Netbeans window, you successfully deployed and tested the service:
+<div class="figure"><img src="img/testClientOut.png"/></div>
+
+
+
+<h3>Running Without Netbeans 5.5.1</h3>
+
+<p>Presuming, you have installed Glassfish v2. <code>AS_HOME</code> variable should point to
+your glassfish installation directory.
+
+<h4>Building And Starting The JsonFromJaxb Service</h4>
+
+You make it from <code>JsonFromJaxb</code> directory by
+<pre class="cliSample">
+% $AS_HOME/lib/ant/bin/ant 
+% $AS_HOME/bin/asadmin start-domain
+% $AS_HOME/bin/asadmin deploy dist/JsonFromJaxb.war
+</pre>
+
+<h4>Test Client Running</h4>
+
+<pre class="cliSample">
+% cd JsonFromJaxbTestClient
+% $AS_HOME/lib/ant/bin/ant run
+</pre>
+
+  </body>
+</html>
