@@ -1,4 +1,4 @@
-release 0.2.1 (2007-08-xx)
+release 0.2.1 (2007-09-04)
 - Fixed issue 4: Unsed jars required to be included in the class path for use of certain entity providers
   https://jersey.dev.java.net/issues/show_bug.cgi?id=4
 - JsonFromJaxb example added to demonstrate using JSON representation 
