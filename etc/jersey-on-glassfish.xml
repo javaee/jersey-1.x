@@ -94,10 +94,30 @@
      <copy todir="${gf.home}/jersey/docs"><fileset dir="docs" includes="**/*"/></copy>
      <!-- copy examples -->
      <mkdir dir="${gf.home}/jersey/examples"/>
-     <copy-example example.name="SimpleServlet"/>
-     <update-nb-prop nb.prop.file="${gf.home}/jersey/examples/SimpleServlet/nbproject/project.properties"/>
+     <copy-example example.name="Bookmark"/>
+     <update-nb-prop nb.prop.file="${gf.home}/jersey/examples/Bookmark/nbproject/project.properties"/>
      <copy-example example.name="Bookstore"/>
      <update-nb-prop nb.prop.file="${gf.home}/jersey/examples/Bookstore/nbproject/project.properties"/>
+     <copy-example example.name="EntityProvider"/>
+     <update-nb-prop nb.prop.file="${gf.home}/jersey/examples/EntityProvider/nbproject/project.properties"/>
+     <!--<copy-example example.name="GlassfishDB"/>
+     <update-nb-prop nb.prop.file="${gf.home}/jersey/examples/GlassfishDB/nbproject/project.properties"/> -->
+     <copy-example example.name="HelloWorld"/>
+     <update-nb-prop nb.prop.file="${gf.home}/jersey/examples/HelloWorld/nbproject/project.properties"/>
+     <copy-example example.name="JsonFromJaxb"/>
+     <update-nb-prop nb.prop.file="${gf.home}/jersey/examples/JsonFromJaxb/nbproject/project.properties"/>
+     <copy-example example.name="OptimisticConcurrency"/>
+     <update-nb-prop nb.prop.file="${gf.home}/jersey/examples/OptimisticConcurrency/nbproject/project.properties"/>
+     <copy-example example.name="SimpleAtomServer"/>
+     <update-nb-prop nb.prop.file="${gf.home}/jersey/examples/SimpleAtomServer/nbproject/project.properties"/>
+     <copy-example example.name="SimpleConsole"/>
+     <update-nb-prop nb.prop.file="${gf.home}/jersey/examples/SimpleConsole/nbproject/project.properties"/>
+     <copy-example example.name="SimpleJAXWSEndpoint"/>
+     <update-nb-prop nb.prop.file="${gf.home}/jersey/examples/SimpleJAXWSEndpoint/nbproject/project.properties"/>
+     <copy-example example.name="SimpleServlet"/>
+     <update-nb-prop nb.prop.file="${gf.home}/jersey/examples/SimpleServlet/nbproject/project.properties"/>
+     <copy-example example.name="StorageService"/>
+     <update-nb-prop nb.prop.file="${gf.home}/jersey/examples/StorageService/nbproject/project.properties"/>
   </target>
 
   <target name="uninstall" description="Uninstalls Jersey from GlassFish V2">

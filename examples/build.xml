@@ -25,17 +25,18 @@
 	http://ant-contrib.sourceforge.net/tasks/tasks/for.html
     -->
     <target name="delegate-target">
-	<ant dir="SimpleServlet" target="${target}" inheritAll="false"/>
+	<ant dir="Bookmark" target="${target}" inheritAll="false"/>
+	<ant dir="Bookstore" target="${target}" inheritAll="false"/>
+	<ant dir="EntityProvider" target="${target}" inheritAll="false"/>
+<!--	<ant dir="GlassfishDB" target="${target}" inheritAll="false"/> -->
+	<ant dir="HelloWorld" target="${target}" inheritAll="false"/>
+	<ant dir="JsonFromJaxb" target="${target}" inheritAll="false"/>
+	<ant dir="OptimisticConcurrency" target="${target}" inheritAll="false"/>
+	<ant dir="SimpleAtomServer" target="${target}" inheritAll="false"/>
 	<ant dir="SimpleConsole" target="${target}" inheritAll="false"/>
 	<ant dir="SimpleJAXWSEndpoint" target="${target}" inheritAll="false"/>
-	<ant dir="SimpleAtomServer" target="${target}" inheritAll="false"/>
+	<ant dir="SimpleServlet" target="${target}" inheritAll="false"/>
 	<ant dir="StorageService" target="${target}" inheritAll="false"/>
-	<ant dir="OptimisticConcurrency" target="${target}" inheritAll="false"/>
-	<ant dir="Bookstore" target="${target}" inheritAll="false"/>
-	<ant dir="HelloWorld" target="${target}" inheritAll="false"/>
-	<ant dir="Bookmark" target="${target}" inheritAll="false"/>
-	<ant dir="EntityProvider" target="${target}" inheritAll="false"/>
-	<ant dir="JsonFromJaxb" target="${target}" inheritAll="false"/>
     </target>
 
     <target name="clean">
@@ -67,7 +68,28 @@
 
 	<!-- replace property for jersey in NB projects -->
         <antcall target="convert-property">
-            <param name="example" value="SimpleServlet"/>
+            <param name="example" value="Bookmark"/>
+        </antcall>
+        <antcall target="convert-property">
+            <param name="example" value="Bookstore"/>
+        </antcall>
+        <antcall target="convert-property">
+            <param name="example" value="EntityProvider"/>
+        </antcall>
+<!--        <antcall target="convert-property">
+            <param name="example" value="GlassfishDB"/>
+        </antcall> -->
+        <antcall target="convert-property">
+            <param name="example" value="HelloWorld"/>
+        </antcall>
+        <antcall target="convert-property">
+            <param name="example" value="JsonFromJaxb"/>
+        </antcall>
+        <antcall target="convert-property">
+            <param name="example" value="OptimisticConcurrency"/>
+        </antcall>
+        <antcall target="convert-property">
+            <param name="example" value="SimpleAtomServer"/>
         </antcall>
         <antcall target="convert-property">
             <param name="example" value="SimpleConsole"/>
@@ -76,28 +98,10 @@
             <param name="example" value="SimpleJAXWSEndpoint"/>
         </antcall>
         <antcall target="convert-property">
-            <param name="example" value="SimpleAtomServer"/>
+            <param name="example" value="SimpleServlet"/>
         </antcall>
         <antcall target="convert-property">
             <param name="example" value="StorageService"/>
-        </antcall>
-        <antcall target="convert-property">
-            <param name="example" value="OptimisticConcurrency"/>
-        </antcall>
-        <antcall target="convert-property">
-            <param name="example" value="Bookstore"/>
-        </antcall>
-        <antcall target="convert-property">
-            <param name="example" value="HelloWorld"/>
-        </antcall>
-        <antcall target="convert-property">
-            <param name="example" value="Bookmark"/>
-        </antcall>
-        <antcall target="convert-property">
-            <param name="example" value="EntityProvider"/>
-        </antcall>
-        <antcall target="convert-property">
-            <param name="example" value="JsonFromJaxb"/>
         </antcall>
     </target>
 </project>
