@@ -24,6 +24,7 @@ package com.sun.ws.rest.spi.container;
 
 import com.sun.ws.rest.api.container.ContainerException;
 import com.sun.ws.rest.spi.service.ServiceFinder;
+import java.util.Iterator;
 
 /**
  * A factory for WebApplication instances. Container providers use this class
@@ -43,11 +44,12 @@ public final class WebApplicationFactory {
      * @throws ContainerException if there is an error creating the Web application.
      */
     public static WebApplication createWebApplication() throws ContainerException {
-        WebApplicationProvider[] wap = ServiceFinder.find(WebApplicationProvider.class).toArray();
-        if (wap.length == 0) {
-            throw new ContainerException("No WebApplication provider is present in ");
+        for (WebApplicationProvider wap : ServiceFinder.find(WebApplicationProvider.class)) {
+            // Use the first provider found
+            return wap.createWebApplication();
         }
-        return wap[0].createWebApplication();        
+                
+        throw new ContainerException("No WebApplication provider is present");
     }
     
 }
