@@ -41,7 +41,7 @@ public final class HttpHandlerContainerProvider implements ContainerProvider<Htt
             return null;
         
         HttpHandlerContainer c = new HttpHandlerContainer(application);
-        application.initiate(c, resourceConfig, null);
+        application.initiate(c, resourceConfig);
         return c;
     }
 }

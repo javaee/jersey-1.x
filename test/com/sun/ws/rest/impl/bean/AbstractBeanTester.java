@@ -187,7 +187,7 @@ public abstract class AbstractBeanTester extends TestCase {
             }
         };
 
-        a.initiate(null, c, null);
+        a.initiate(null, c);
 
         ByteArrayInputStream e = new ByteArrayInputStream(content.getBytes());
         final HttpRequestContextImpl request = new TestHttpRequestContext(method, e,

@@ -23,20 +23,14 @@
 package com.sun.ws.rest.impl.container.servlet;
 
 import com.sun.ws.rest.api.container.ContainerException;
-import com.sun.ws.rest.api.core.HttpRequestContext;
 import com.sun.ws.rest.api.core.ResourceConfig;
 import com.sun.ws.rest.impl.ImplMessages;
 import com.sun.ws.rest.impl.ThreadLocalInvoker;
 import com.sun.ws.rest.spi.container.WebApplication;
 import com.sun.ws.rest.spi.container.WebApplicationFactory;
-import com.sun.ws.rest.spi.resolver.WebResourceResolver;
-import com.sun.ws.rest.spi.resolver.WebResourceResolverFactory;
-import com.sun.ws.rest.spi.resolver.WebResourceResolverListener;
+import com.sun.ws.rest.spi.resource.Injectable;
 import java.io.IOException;
-import java.lang.reflect.Field;
 import java.lang.reflect.Proxy;
-import java.security.AccessController;
-import java.security.PrivilegedAction;
 import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.HashMap;
@@ -57,7 +51,7 @@ import javax.servlet.http.HttpServletResponse;
  * Dispatch a servlet request to the appropriate Resource
  * 
  */
-public class ServletAdaptor extends HttpServlet implements WebResourceResolverFactory {
+public class ServletAdaptor extends HttpServlet {
     private static final String WEB_RESOURCE_CLASS = "webresourceclass";
     
     private WebApplication application;
@@ -86,6 +80,28 @@ public class ServletAdaptor extends HttpServlet implements WebResourceResolverFa
             classLoader = getClass().getClassLoader();
         }
         
+        /* Persistence units that may be injected must be configured in web.xml 
+         * in the normal way plus an additional servlet parameter to enable the
+         * Jersey servlet to locate them in JNDI. E.g. with the following
+         * persistence unit configuration:
+         *
+         * <persistence-unit-ref>
+         *     <persistence-unit-ref-name>persistence/widget</persistence-unit-ref-name>
+         *     <persistence-unit-name>WidgetPU</persistence-unit-name>
+         * </persistence-unit-ref>
+         *
+         * the Jersey servlet requires an additional servlet parameter as
+         * follows:
+         *
+         * <init-param>
+         *     <param-name>unit:WidgetPU</param-name>
+         *     <param-value>persistence/widget</param-value>
+         * </init-param>
+         *
+         * Given the above, Jersey will inject the EntityManagerFactory found
+         * at java:comp/env/persistence/widget in JNDI when encountering a
+         * field annotated with @PersistenceUnit(unitName="WidgetPU").
+         */
         String resources = null;
         for (Enumeration e = servletConfig.getInitParameterNames() ; e.hasMoreElements() ;) {
             String key = (String)e.nextElement();
@@ -104,9 +120,57 @@ public class ServletAdaptor extends HttpServlet implements WebResourceResolverFa
         try {
             Class resClassSetClass = classLoader.loadClass(resources);
             ResourceConfig resourceConfig = (ResourceConfig)resClassSetClass.newInstance();
-        
+            
             application = WebApplicationFactory.createWebApplication();
-            application.initiate(this, resourceConfig, this);
+            application.addInjectable(HttpServletRequest.class,
+                    new Injectable<Resource, HttpServletRequest>() {
+                public Class<Resource> getAnnotationClass() {
+                    return Resource.class;
+                }
+                
+                public HttpServletRequest getInjectableValue(Resource r) {
+                    HttpServletRequest servletRequest = (HttpServletRequest)Proxy.newProxyInstance(
+                            HttpServletRequest.class.getClassLoader(),
+                            new Class[] { HttpServletRequest.class },
+                            requestInvoker);
+                    return servletRequest;
+                }
+            }
+            );
+            application.addInjectable(ServletConfig.class,
+                    new Injectable<Resource, ServletConfig>() {
+                public Class<Resource> getAnnotationClass() {
+                    return Resource.class;
+                }
+                
+                public ServletConfig getInjectableValue(Resource r) {
+                    return getServletConfig();
+                }
+            }
+            );
+            application.addInjectable(EntityManagerFactory.class, 
+                    new Injectable<PersistenceUnit, EntityManagerFactory>() {
+                public Class<PersistenceUnit> getAnnotationClass() {
+                    return PersistenceUnit.class;
+                }
+                public EntityManagerFactory getInjectableValue(PersistenceUnit pu) {
+                        // TODO localize error message
+                        if (!persistenceUnits.containsKey(pu.unitName()))
+                            throw new ContainerException("Persistence unit '"+
+                                    pu.unitName()+
+                                    "' is not configured as a servlet parameter in web.xml");
+                        String jndiName = persistenceUnits.get(pu.unitName());
+                        ThreadLocalNamedInvoker<EntityManagerFactory> emfHandler = 
+                                new ThreadLocalNamedInvoker<EntityManagerFactory>(jndiName);
+                        EntityManagerFactory emf = (EntityManagerFactory) Proxy.newProxyInstance(
+                                EntityManagerFactory.class.getClassLoader(),
+                                new Class[] {EntityManagerFactory.class },
+                                emfHandler);
+                        return emf;
+                }
+            }
+            );
+            application.initiate(this, resourceConfig);
         } catch (Exception e) {
             e.printStackTrace(System.err);
             throw new ServletException(
@@ -139,94 +203,4 @@ public class ServletAdaptor extends HttpServlet implements WebResourceResolverFa
         }
     }
 
-    public WebResourceResolver createWebResourceResolver(Class<?> resourceClass) {
-        return this.new StatelessServletResolver(resourceClass);
-    }
-    
-    /**
-     * A servlet specific resolver
-     */
-    private class StatelessServletResolver implements WebResourceResolver {
-        private Class resourceClass;
-        private Object resource;
-
-        public StatelessServletResolver(Class resourceClass) {
-            this.resourceClass = resourceClass;
-        }
-
-        public Class<?> getWebResourceClass() {
-            return resource.getClass();
-        }
-
-        public Object resolve(HttpRequestContext request, WebResourceResolverListener listener) {
-            if (resource == null) {
-                instantiate();
-                // perform any requested injections
-                Field[] fs = resourceClass.getDeclaredFields();
-                for (final Field f : fs) {
-                    Class c = f.getType();
-                    if (!injectables.contains(c))
-                        continue; // skip fields we don't know how to inject
-                    if (c==HttpServletRequest.class) {
-                        Resource ra = f.getAnnotation(Resource.class);
-                        if (ra==null)
-                            continue; // skip fields that aren't annotated
-                        HttpServletRequest req = (HttpServletRequest) Proxy.newProxyInstance(
-                                HttpServletRequest.class.getClassLoader(),
-                                new Class[] { HttpServletRequest.class },
-                                requestInvoker);
-                        setFieldValue(f, req);
-                    } else if (c == ServletConfig.class) {
-                        Resource ra = f.getAnnotation(Resource.class);
-                        if (ra==null)
-                            continue; // skip fields that aren't annotated
-                        setFieldValue(f, getServletConfig());
-                    } else if (c==EntityManagerFactory.class && isEE) {
-                        PersistenceUnit pu = f.getAnnotation(PersistenceUnit.class);
-                        if (pu==null)
-                            continue;
-                        if (!persistenceUnits.containsKey(pu.unitName()))
-                            throw new ContainerException("Persistence unit '"+pu.unitName()+"' is not configured as a servlet parameter in web.xml");
-                        String jndiName = persistenceUnits.get(pu.unitName());
-                        ThreadLocalNamedInvoker<EntityManagerFactory> emfHandler = new ThreadLocalNamedInvoker<EntityManagerFactory>(jndiName);
-                        EntityManagerFactory emf = (EntityManagerFactory) Proxy.newProxyInstance(
-                                EntityManagerFactory.class.getClassLoader(),
-                                new Class[] {EntityManagerFactory.class },
-                                emfHandler);
-                        setFieldValue(f, emf);
-                    }
-                }
-
-                // call listeners to perform any additional injections
-                listener.onInstantiation(resource);
-            }
-            return resource;
-        }
-        
-        private void setFieldValue(final Field f, final Object value) {
-            AccessController.doPrivileged(new PrivilegedAction<Object>() {
-                public Object run() {
-                    try {
-                        if (!f.isAccessible()) {
-                            f.setAccessible(true);
-                        }
-                        f.set(resource, value);
-                        return null;
-                    } catch (IllegalAccessException e) {
-                        throw new ContainerException(e);
-                    }
-                }
-            });
-        }
-
-        private void instantiate() {
-            try {
-                resource = resourceClass.newInstance();
-            } catch (IllegalAccessException e) {
-                throw new ContainerException("Illegal access to Class " + resourceClass, e);
-            } catch (InstantiationException e) {
-                throw new ContainerException("Instantiation error for Class " + resourceClass, e);
-            }
-        }
-    }
 }

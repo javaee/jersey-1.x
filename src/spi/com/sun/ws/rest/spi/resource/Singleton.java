@@ -20,22 +20,27 @@
  *     "Portions Copyrighted [year] [name of copyright owner]"
  */
 
-package com.sun.ws.rest.spi.resolver;
+/*
+ * Singleton.java
+ *
+ * Created on August 3, 2007, 3:01 PM
+ *
+ */
+
+package com.sun.ws.rest.spi.resource;
+
+import com.sun.ws.rest.impl.resource.SingletonProvider;
+import java.lang.annotation.Documented;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
 /**
- * A factory for WebResourceRsolver instances
- * @author Paul.Sandoz@Sun.Com
+ * Used to annotate resources that should be treated as singletons
  */
-public interface WebResourceResolverFactory {
-    /**
-     * Create the resolver for the Web resource.
-     * <p>
-     * The resolver will be used by the Web application to resolve the 
-     * Class of the Web resource to an instance of that Class.
-     *
-     * @param resourceClass the Web resource class.
-     * @return the Web resource resolver, or null if 
-     * no resolving strategy for the Web resource is supported.
-     */
-    WebResourceResolver createWebResourceResolver(Class<?> resourceClass);
-}
+@Target({ElementType.TYPE})
+@Retention(RetentionPolicy.RUNTIME)
+@Documented
+@ResourceFactory(SingletonProvider.class)
+public @interface Singleton {}

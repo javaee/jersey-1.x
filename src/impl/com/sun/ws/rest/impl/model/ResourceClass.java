@@ -44,10 +44,9 @@ import com.sun.ws.rest.impl.model.method.ResourceMethodMap;
 import com.sun.ws.rest.impl.model.method.ResourceMethodMapDispatcher;
 import com.sun.ws.rest.impl.model.method.ResourceViewMethod;
 import com.sun.ws.rest.impl.model.node.NodeDispatcherFactory;
-import com.sun.ws.rest.impl.resolver.WebResourceResolverFactoryFacade;
 import com.sun.ws.rest.spi.dispatch.URITemplateType;
-import com.sun.ws.rest.spi.resolver.WebResourceResolver;
-import com.sun.ws.rest.spi.resolver.WebResourceResolverFactory;
+import com.sun.ws.rest.spi.resource.ResourceProvider;
+import com.sun.ws.rest.spi.resource.ResourceProviderFactory;
 import com.sun.ws.rest.spi.view.View;
 import java.lang.reflect.Method;
 import java.util.Collections;
@@ -68,7 +67,7 @@ public final class ResourceClass extends BaseResourceClass {
     
     public final Class<?> c;
     
-    public final WebResourceResolver resolver;
+    public final ResourceProvider resolver;
             
     public final MediaTypeList consumeMime;
     
@@ -76,16 +75,11 @@ public final class ResourceClass extends BaseResourceClass {
     
     public final boolean hasSubResources;
     
-    public ResourceClass(Object containerMemento, Class<?> c, ResourceConfig config) {
-        this(containerMemento, c, config, null);
-    }
-    
     public ResourceClass(Object containerMemento, Class<?> c, ResourceConfig config, 
-            WebResourceResolverFactory resolverFactory) {
+            ResourceProviderFactory resolverFactory) {
         this.c = c;
         this.config = config;
-        this.resolver = WebResourceResolverFactoryFacade.
-                createWebResourceResolver(resolverFactory, c);
+        this.resolver = resolverFactory.createProvider(c);
         
         this.consumeMime = getConsumeMimeList();
         this.produceMime = getProduceMimeList();

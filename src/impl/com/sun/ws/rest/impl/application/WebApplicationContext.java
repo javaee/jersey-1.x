@@ -27,6 +27,8 @@ import com.sun.ws.rest.api.core.HttpContextAccess;
 import com.sun.ws.rest.api.core.HttpRequestContext;
 import com.sun.ws.rest.api.core.HttpResponseContext;
 import com.sun.ws.rest.impl.ResponseBuilderImpl;
+import com.sun.ws.rest.impl.model.node.NodeDispatcherFactory;
+import com.sun.ws.rest.impl.model.parameter.ParameterExtractor;
 import com.sun.ws.rest.spi.dispatch.ResourceDispatchContext;
 import com.sun.ws.rest.impl.model.ResourceClass;
 import com.sun.ws.rest.impl.view.ViewFactory;
@@ -34,9 +36,10 @@ import com.sun.ws.rest.impl.view.ViewType;
 import com.sun.ws.rest.spi.container.ContainerRequest;
 import com.sun.ws.rest.spi.container.ContainerResponse;
 import com.sun.ws.rest.spi.dispatch.URITemplateType;
-import com.sun.ws.rest.spi.resolver.WebResourceResolverListener;
+import com.sun.ws.rest.spi.resource.ResourceProviderContext;
 import com.sun.ws.rest.spi.view.View;
 import java.io.IOException;
+import java.lang.reflect.Constructor;
 import java.util.HashMap;
 import java.util.Map;
 import javax.ws.rs.core.MultivaluedMap;
@@ -46,7 +49,7 @@ import javax.ws.rs.core.Response;
  *
  * @author Paul.Sandoz@Sun.Com
  */
-final class WebApplicationContext implements HttpContextAccess, ResourceDispatchContext, WebResourceResolverListener {
+final class WebApplicationContext implements HttpContextAccess, ResourceDispatchContext, ResourceProviderContext {
     final ContainerRequest request;
     
     final ContainerResponse response;
@@ -98,7 +101,7 @@ final class WebApplicationContext implements HttpContextAccess, ResourceDispatch
     
     public boolean dispatchTo(final Class nodeClass, final String path) {
         final ResourceClass resourceClass = app.getResourceClass(nodeClass);
-        final Object node = it = resourceClass.resolver.resolve(request, this);
+        final Object node = it = resourceClass.resolver.getInstance(this);
         return resourceClass.dispatch(this, node, path);
     }
 
@@ -127,13 +130,25 @@ final class WebApplicationContext implements HttpContextAccess, ResourceDispatch
         }
     }
     
-    // WebResourceResolverListener
+    // ResourceProviderContext
             
-    public void onInstantiation(Object resource) {
+    public void injectDependencies(Object resource) {
         app.injectResources(resource);
         
         // TODO defer to other injection providers
     }    
+
+    public Object[] getParameterValues(Constructor ctor) {
+        ParameterExtractor[] extractors = NodeDispatcherFactory.processParameters(ctor);
+        Object[] values = new Object[extractors.length];
+        for (int i = 0; i < extractors.length; i++) {
+            if (extractors[i] == null)
+                values[i] = null;
+            else
+                values[i] = extractors[i].extract(getHttpRequestContext());
+        }
+        return values;
+    }
     
     
 }

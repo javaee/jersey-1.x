@@ -150,7 +150,7 @@ public class WebApplicationTest extends TestCase {
                 return true;
             }
         };
-        a.initiate(null, c, null);
+        a.initiate(null, c);
         return a;
     }
     

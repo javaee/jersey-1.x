@@ -22,6 +22,7 @@
 
 package com.sun.ws.rest.impl.application;
 
+import com.sun.ws.rest.spi.resource.Injectable;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
@@ -36,7 +37,6 @@ import com.sun.ws.rest.impl.dispatch.URITemplateDispatcher;
 import com.sun.ws.rest.impl.model.ResourceClass;
 import com.sun.ws.rest.impl.model.RootResourceClass;
 import com.sun.ws.rest.impl.response.Responses;
-import com.sun.ws.rest.spi.resolver.WebResourceResolverFactory;
 import com.sun.ws.rest.spi.container.ContainerRequest;
 import com.sun.ws.rest.spi.container.ContainerResponse;
 import com.sun.ws.rest.spi.container.WebApplication;
@@ -94,7 +94,7 @@ public final class WebApplicationImpl implements WebApplication {
     public final List<URITemplateDispatcher> dispatchers = new ArrayList<URITemplateDispatcher>();
     
     private final Map<Class, ResourceClass> metaClassMap = new WeakHashMap<Class, ResourceClass>();
-
+    
     public WebApplicationImpl() {
         this.context = new ThreadLocalHttpContext();
         this.entityManagerCache = new HashMap<String, EntityManagerFactory>();
@@ -111,6 +111,10 @@ public final class WebApplicationImpl implements WebApplication {
         this.injectables = createInjectables();
     }
     
+    public void addInjectable(Class fieldType, Injectable injectable) {
+        injectables.put(fieldType, injectable);
+    }
+    
     @SuppressWarnings("unchecked")
     private <T> T createProxy(Class<T> c, InvocationHandler i) {
         return (T)Proxy.newProxyInstance(
@@ -125,8 +129,7 @@ public final class WebApplicationImpl implements WebApplication {
 
     // WebApplication
             
-    public void initiate(Object containerMomento, ResourceConfig resourceConfig, 
-            WebResourceResolverFactory resolverFactory) {
+    public void initiate(Object containerMomento, ResourceConfig resourceConfig) {
         if (resourceConfig == null)
             throw new IllegalArgumentException();
         
@@ -135,7 +138,7 @@ public final class WebApplicationImpl implements WebApplication {
         
         this.initiated = true;
         this.resourceConfig = resourceConfig;
-        this.rootResourceClass = new RootResourceClass(containerMomento, resourceConfig, resolverFactory);
+        this.rootResourceClass = new RootResourceClass(containerMomento, resourceConfig);
         this.containerMomento = containerMomento;
     }
 
@@ -211,62 +214,7 @@ public final class WebApplicationImpl implements WebApplication {
         
         return sb.toString();
     }  
-    
-    private abstract class Injectable<T extends Annotation, V> {
-        abstract Class<T> getAnnotationClass();
         
-        void inject(Object resource, Field f) {
-            if (getFieldValue(resource, f) != null) {
-                // skip fields that already have a value 
-                // (may have been injected by the container impl)
-                return; 
-            }
-            
-            T a = f.getAnnotation(getAnnotationClass());
-            if (a == null) {
-                // skip if the annotation is not declared
-                return;
-            }
-            
-            V value = getInjectableValue(a);
-            if (value != null)
-                setFieldValue(resource, f, value);
-        }
-        
-        abstract V getInjectableValue(T a);
-        
-        private void setFieldValue(final Object resource, final Field f, final Object value) {
-            AccessController.doPrivileged(new PrivilegedAction<Object>() {
-                public Object run() {
-                    try {
-                        if (!f.isAccessible()) {
-                            f.setAccessible(true);
-                        }
-                        f.set(resource, value);
-                        return null;
-                    } catch (IllegalAccessException e) {
-                        throw new ContainerException(e);
-                    }
-                }
-            });
-        }
-
-        private Object getFieldValue(final Object resource, final Field f) {
-            return AccessController.doPrivileged(new PrivilegedAction<Object>() {
-                public Object run() {
-                    try {
-                        if (!f.isAccessible()) {
-                            f.setAccessible(true);
-                        }
-                        return f.get(resource);
-                    } catch (IllegalAccessException e) {
-                        throw new ContainerException(e);
-                    }
-                }
-            });
-        }
-    }
-    
     private abstract class HttpContextInjectable<V> extends Injectable<HttpContext, V> {
         public Class<HttpContext> getAnnotationClass() {
             return HttpContext.class;
@@ -329,7 +277,7 @@ public final class WebApplicationImpl implements WebApplication {
      * @param resourceClass the class of the resource
      * @param resource the resource instance
      */
-    /* package */ void injectResources(Object resource) {
+    void injectResources(Object resource) {
         Class resourceClass = resource.getClass();
         for (Field f : resourceClass.getDeclaredFields()) {
             

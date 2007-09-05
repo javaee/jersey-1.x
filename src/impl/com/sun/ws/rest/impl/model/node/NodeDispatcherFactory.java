@@ -30,6 +30,7 @@ import com.sun.ws.rest.impl.model.parameter.ParameterExtractor;
 import com.sun.ws.rest.impl.model.parameter.ParameterProcessor;
 import com.sun.ws.rest.spi.dispatch.URITemplateType;
 import java.lang.annotation.Annotation;
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 import java.util.List;
@@ -45,14 +46,24 @@ public final class NodeDispatcherFactory {
 
     public static URITemplateDispatcher create(final URITemplateType t, final Method m) {
         ParameterExtractor[] extractors = processParameters(m);
-        if (extractors == null) {
-            String msg = ImplMessages.NOT_VALID_DYNAMICRESOLVINGMETHOD(m, 
-                                                                t.toString(), 
-                                                                m.getDeclaringClass());
-            throw new ContainerException(msg);
+        for (ParameterExtractor extractor: extractors) {
+            if (extractor == null) {
+                String msg = ImplMessages.NOT_VALID_DYNAMICRESOLVINGMETHOD(m, 
+                                                                    t.toString(), 
+                                                                    m.getDeclaringClass());
+                throw new ContainerException(msg);
+            }
         }
         
         return new NodeDispatcher(t, m, extractors);
+    }
+    
+    public static ParameterExtractor[] processParameters(Constructor ctor) {
+        Class[] parameterTypes = ctor.getParameterTypes();
+        Type[] genericParameterTypes = ctor.getGenericParameterTypes();
+        Annotation[][] parameterAnnotations = ctor.getParameterAnnotations();
+        
+        return processParameters(parameterTypes, genericParameterTypes, parameterAnnotations);
     }
     
     private static ParameterExtractor[] processParameters(Method method) {
@@ -60,15 +71,17 @@ public final class NodeDispatcherFactory {
         Type[] genericParameterTypes = method.getGenericParameterTypes();
         Annotation[][] parameterAnnotations = method.getParameterAnnotations();
         
+        return processParameters(parameterTypes, genericParameterTypes, parameterAnnotations);
+    }
+        
+    private static ParameterExtractor[] processParameters(Class[] parameterTypes, Type[] genericParameterTypes, Annotation[][] parameterAnnotations) {
+
         ParameterExtractor[] extractors = new ParameterExtractor[parameterTypes.length];
         for (int i = 0; i < parameterTypes.length; i++) {
             extractors[i] = processParameter(
                     parameterTypes[i], 
                     genericParameterTypes[i], 
                     parameterAnnotations[i]);
-            
-            if (extractors[i] == null)
-                return null;
         }
         
         return extractors;

@@ -20,45 +20,37 @@
  *     "Portions Copyrighted [year] [name of copyright owner]"
  */
 
-package com.sun.ws.rest.impl.resolver;
+package com.sun.ws.rest.impl.resource;
 
 import com.sun.ws.rest.api.container.ContainerException;
-import com.sun.ws.rest.api.core.HttpRequestContext;
-import com.sun.ws.rest.spi.resolver.WebResourceResolver;
-import com.sun.ws.rest.spi.resolver.WebResourceResolverListener;
+import com.sun.ws.rest.spi.resource.ResourceProviderContext;
+import com.sun.ws.rest.spi.resource.ResourceProvider;
 
 /**
- *
- * @author Paul.Sandoz@Sun.Com
+ * A simple provider that maintains a singleton resource class instance
  */
-public final class StatelessResolver implements WebResourceResolver {
-    private Class resourceClass;
-    private Object resource;
+public class SingletonProvider implements ResourceProvider {
 
-    public StatelessResolver(Class resourceClass) {
+    private Class<?> resourceClass;
+    
+    private Object resource;
+    
+    public void init(Class<?> resourceClass) {
         this.resourceClass = resourceClass;
     }
 
-    public Class<?> getWebResourceClass() {
-        return resource.getClass();
-    }
-    
-    public Object resolve(HttpRequestContext request, WebResourceResolverListener listener) {
-        if (resource == null) {
-            instantiate();
-            listener.onInstantiation(resource);
-        }
-        return resource;
-    }
-    
-    private void instantiate() {
+    public Object getInstance(ResourceProviderContext context) {
+        if (resource != null)
+            return resource;
+
         try {
             resource = resourceClass.newInstance();
-        } catch (IllegalAccessException e) {
-            throw new ContainerException("Illegal access to Class " + resourceClass, e);
-        } catch (InstantiationException e) {
-            throw new ContainerException("Instantiation error for Class " + resourceClass, e);
+            context.injectDependencies(resource);
+            return resource;
+        } catch (InstantiationException ex) {
+            throw new ContainerException("Unable to create resource", ex);
+        } catch (IllegalAccessException ex) {
+            throw new ContainerException("Unable to create resource", ex);
         }
     }
-    
 }

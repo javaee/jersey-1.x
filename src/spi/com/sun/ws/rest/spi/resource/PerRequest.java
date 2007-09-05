@@ -20,23 +20,28 @@
  *     "Portions Copyrighted [year] [name of copyright owner]"
  */
 
-package com.sun.ws.rest.spi.resolver;
+/*
+ * PerRequest.java
+ *
+ * Created on August 3, 2007, 3:09 PM
+ *
+ */
 
-import com.sun.ws.rest.api.container.ContainerException;
+package com.sun.ws.rest.spi.resource;
+
+import com.sun.ws.rest.impl.resource.PerRequestProvider;
+import java.lang.annotation.Documented;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
 /**
- * Listener for Web resource resolver events.
- *
- * @author Paul.Sandoz@Sun.Com
+ * Used to annotate resource classes that require a new instance to be used
+ * for each request.
  */
-public interface WebResourceResolverListener {
-    /**
-     * Called when a the {@link WebResourceResolver#resolve} method
-     * results in the instantiation of a new Web resource instance.
-     * 
-     * @param resource the resolved web resource instance that has been newly
-     * instantiated.
-     * @throws ContainerException if there is an error produced by the listener.
-     */
-    void onInstantiation(Object resource) throws ContainerException;
-}
+@Target({ElementType.TYPE})
+@Retention(RetentionPolicy.RUNTIME)
+@Documented
+@ResourceFactory(PerRequestProvider.class)
+public @interface PerRequest {}

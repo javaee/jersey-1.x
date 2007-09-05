@@ -20,28 +20,31 @@
  *     "Portions Copyrighted [year] [name of copyright owner]"
  */
 
-package com.sun.ws.rest.impl.resolver;
+package com.sun.ws.rest.spi.resource;
 
-import com.sun.ws.rest.spi.resolver.WebResourceResolver;
-import com.sun.ws.rest.spi.resolver.WebResourceResolverFactory;
+import com.sun.ws.rest.spi.resource.ResourceProviderContext;
 
 /**
- *
- * @author Paul.Sandoz@Sun.Com
+ * A provider that manages the creation of resource class instances. A provider
+ * instance is specific to a particular class of resource.
  */
-public final class WebResourceResolverFactoryFacade {
-    
-    private WebResourceResolverFactoryFacade() { }
-    
-    public static WebResourceResolver createWebResourceResolver(WebResourceResolverFactory resolverFactory, Class<?> resourceClass) {
-        WebResourceResolver resolver = null;
-        if (resolverFactory != null) {
-            resolver = resolverFactory.createWebResourceResolver(resourceClass);
-        }
-        
-        return (resolver != null) 
-            ? resolver 
-            : new StatelessResolver(resourceClass);
-    }
+public interface ResourceProvider {
 
+    /**
+     * Specifies the class of the resource that the provider
+     * instance will manage access to.
+     *
+     * @param resourceClass the class of the resource
+     */
+    void init(Class<?> resourceClass);
+    
+    /**
+     * Called to obtain an instance of a resource class.
+     * 
+     * @param context a context for resource providers, used to perform
+     * resource injection on new instances and obtain values for constructor
+     * parameters
+     * @return an initialized instance of the supplied class
+     */
+    Object getInstance(ResourceProviderContext context);
 }

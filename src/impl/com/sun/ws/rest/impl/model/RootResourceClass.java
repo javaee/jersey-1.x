@@ -26,7 +26,7 @@ import com.sun.ws.rest.api.core.ResourceConfig;
 import com.sun.ws.rest.impl.dispatch.URITemplateDispatcher;
 import com.sun.ws.rest.spi.dispatch.ResourceDispatchContext;
 import com.sun.ws.rest.spi.dispatch.URITemplateType;
-import com.sun.ws.rest.spi.resolver.WebResourceResolverFactory;
+import com.sun.ws.rest.spi.resource.ResourceProviderFactory;
 import java.util.Collections;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -40,17 +40,16 @@ import javax.ws.rs.UriTemplate;
 public final class RootResourceClass extends BaseResourceClass {
     private final ResourceConfig resourceConfig;
             
-    private final WebResourceResolverFactory resolverFactory;
+    private final ResourceProviderFactory resolverFactory;
     
     private final ConcurrentMap<Class, ResourceClass> metaClassMap = new ConcurrentHashMap<Class, ResourceClass>();
         
     private final Object containerMemento;
     
-    public RootResourceClass(Object containerMemento, ResourceConfig resourceConfig, 
-            WebResourceResolverFactory resolverFactory) {
+    public RootResourceClass(Object containerMemento, ResourceConfig resourceConfig) {
         this.containerMemento = containerMemento;
         this.resourceConfig = resourceConfig;
-        this.resolverFactory = resolverFactory;
+        this.resolverFactory = ResourceProviderFactory.getInstance();
         
         add(resourceConfig.getResourceClasses());
     }
