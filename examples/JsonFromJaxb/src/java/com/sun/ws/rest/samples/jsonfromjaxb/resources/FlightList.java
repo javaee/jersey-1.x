@@ -25,7 +25,7 @@ package com.sun.ws.rest.samples.jsonfromjaxb.resources;
 
 import com.sun.ws.rest.samples.jsonfromjaxb.jaxb.FlightType;
 import com.sun.ws.rest.samples.jsonfromjaxb.jaxb.Flights;
-import com.sun.ws.rest.samples.jsonfromjaxb.jaxb.ObjectFactory;
+import com.sun.ws.rest.spi.resource.Singleton;
 import javax.ws.rs.ConsumeMime;
 import javax.ws.rs.UriTemplate;
 import javax.ws.rs.HttpMethod;
@@ -34,46 +34,45 @@ import javax.ws.rs.ProduceMime;
 /**
  * @author Jakub Podlesak
  */
+@Singleton
 @UriTemplate(value = "/flights/")
 public class FlightList {
 
-    Flights myFlights;
+    private Flights myFlights;
 
+    /**
+     * This class is annotated with @Singleton meaning that only
+     * one instance of this class will be instantated per web
+     * application. 
+     * <p>
+     * The flight lists will be constructed just once
+     * when the first request to the flight list resource occurs.
+     */
     public FlightList() {
+        myFlights = new Flights();
+        FlightType flight123 = new FlightType();
+        flight123.setCompany("Czech Airlines");
+        flight123.setNumber(123);
+        flight123.setFlightId("OK123");
+        flight123.setAircraft("B737");
+        FlightType flight124 = new FlightType();
+        flight124.setCompany("Czech Airlines");
+        flight124.setNumber(124);
+        flight124.setFlightId("OK124");
+        flight124.setAircraft("AB115");
+        myFlights.getFlight().add(flight123);
+        myFlights.getFlight().add(flight124);
     }
 
-    @HttpMethod(value = "GET")
+    @HttpMethod
     @ProduceMime({"application/json", "application/xml"})
-    public Flights getFlightList() {
-        return getFlights();
-    }
-
-    @HttpMethod(value = "PUT")
-    @ConsumeMime({"application/json", "application/xml"})
-    public void putFlightListAsXml(Flights flights) {
-        setFlights(flights);
-    }
-
-    private synchronized void setFlights(Flights flights) {
-        myFlights = flights;
-    }
-
-    private synchronized Flights getFlights() {
-        if (null == myFlights) {
-            myFlights = (new ObjectFactory()).createFlights();
-            FlightType fligth123 = new FlightType();
-            fligth123.setCompany("Czech Airlines");
-            fligth123.setNumber(123);
-            fligth123.setFlightId("OK123");
-            fligth123.setAircraft("B737");
-            FlightType fligth124 = new FlightType();
-            fligth124.setCompany("Czech Airlines");
-            fligth124.setNumber(124);
-            fligth124.setFlightId("OK124");
-            fligth124.setAircraft("AB115");
-            myFlights.getFlight().add(fligth123);
-            myFlights.getFlight().add(fligth124);
-        }
+    public synchronized Flights getFlightList() {
         return myFlights;
+    }
+
+    @HttpMethod
+    @ConsumeMime({"application/json", "application/xml"})
+    public synchronized void putFlightList(Flights flights) {
+        myFlights = flights;
     }
 }
