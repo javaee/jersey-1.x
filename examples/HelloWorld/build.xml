@@ -20,7 +20,7 @@
    enclosed by brackets [] replaced by your own identifying information:
        "Portions Copyrighted [year] [name of copyright owner]"
 -->
-<project name="HelloWorld" default="jar" basedir=".">
+<project name="HelloWorld" default="run" basedir=".">
     <description>Builds, tests, and runs the project HelloWorld.</description>
     <import file="nbproject/build-impl.xml"/>
     
