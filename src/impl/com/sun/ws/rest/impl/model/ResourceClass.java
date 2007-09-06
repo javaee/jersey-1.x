@@ -34,7 +34,7 @@ import com.sun.ws.rest.api.core.ResourceConfig;
 import com.sun.ws.rest.api.core.WebResource;
 import com.sun.ws.rest.api.view.Views;
 import com.sun.ws.rest.impl.dispatch.URITemplateDispatcher;
-import com.sun.ws.rest.impl.model.method.ResourceGenericMethod;
+import com.sun.ws.rest.impl.model.method.WebResourceInterfaceMethod;
 import com.sun.ws.rest.impl.model.method.ResourceHeadWrapperMethod;
 import com.sun.ws.rest.impl.model.method.ResourceHttpMethod;
 import com.sun.ws.rest.impl.model.method.ResourceHttpOptionsMethod;
@@ -240,7 +240,7 @@ public final class ResourceClass extends BaseResourceClass {
             try {
                 Method m = c.getMethod("handleRequest", HttpRequestContext.class, HttpResponseContext.class);
                 
-                ResourceMethod genericMethod = new ResourceGenericMethod(this, m);
+                ResourceMethod genericMethod = new WebResourceInterfaceMethod(this, m);
                 
                 // TODO check if the method has a URI template
                 

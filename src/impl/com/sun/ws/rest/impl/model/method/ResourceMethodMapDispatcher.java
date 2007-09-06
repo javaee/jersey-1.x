@@ -112,12 +112,12 @@ public class ResourceMethodMapDispatcher extends URITemplateDispatcher {
         
     private void verifyResponse(ResourceMethod method, 
             List<MediaType> accept,
-            HttpResponseContext responseContext) {
+            HttpResponseContext responseContext) {        
         Object entity = responseContext.getEntity();
         MediaType contentType = HttpHelper.getContentType(
                 responseContext.getHttpHeaders().getFirst("Content-Type"));
         
-        if (contentType != null && entity == null) {
+        if (!responseContext.isCommitted() && contentType != null && entity == null) {
             String ct = contentType.toString();
             String error = "The \"Content-Type\" header is set to " + ct + ", but the response has no entity";
             LOGGER.severe(error);

@@ -38,21 +38,31 @@ import org.apache.tomcat.util.http.MimeHeaders;
  *
  * @author Marc.Hadley@Sun.Com
  */
-public class GrizzlyResponseAdaptor extends HttpResponseContextImpl {
+public final class GrizzlyResponseAdaptor extends HttpResponseContextImpl {
     
     private final Response response;
     
     private OutputStream output;
+
     
-    /** Creates a new instance of GrizzlyResponseAdaptor */
-    public GrizzlyResponseAdaptor(Response response, GrizzlyRequestAdaptor requestContext) {
+    /* package */ GrizzlyResponseAdaptor(Response response, GrizzlyRequestAdaptor requestContext) {
         super(requestContext);
         this.response = response;
     }
     
-    @SuppressWarnings("unchecked")
-    public void commit() throws IOException {
+    
+    // HttpResponseContextImpl
+
+    protected OutputStream getUnderlyingOutputStream() throws IOException {
+        if (output != null)
+            return output;
+        
+        return output = new GrizzlyResponseOutputStream();
+    }
+    
+    protected void commit() throws IOException {
         response.setStatus(this.getStatus());
+        
         MimeHeaders mh = response.getMimeHeaders();
         for (Map.Entry<String, List<Object>> e : this.getHttpHeaders().entrySet()) {
             String key = e.getKey();
@@ -62,36 +72,35 @@ public class GrizzlyResponseAdaptor extends HttpResponseContextImpl {
             }
         }
 
+        if (mh.getValue("Content-Type") != null) {
+            response.setContentType(mh.getValue("Content-Type").getString());
+        }
+        
+        response.sendHeaders();
+    }    
+    
+    @SuppressWarnings("unchecked")
+    /* package */ void commitAll() throws IOException {
+        if (isCommitted())
+            return;
+        
+        commit();
         
         Object entity = this.getEntity();
         if (entity != null) {
-            response.setContentType(mh.getValue("Content-Type").getString());
-        }
-        response.sendHeaders();
-        
-        if (entity != null) {
             final EntityProvider p = ProviderFactory.getInstance().createEntityProvider(entity.getClass());
-            p.writeTo(entity, this.getHttpHeaders(), this.getOutputStream());
+            p.writeTo(entity, this.getHttpHeaders(), this.getUnderlyingOutputStream());
             if (output != null)
                 output.close();
         }
     }
-    
-    public OutputStream getOutputStream() throws IOException {
-        if (output != null)
-            return output;
         
-        return output = new GrizzlyResponseOutputStream(response);
-    }
-    
-    private static class GrizzlyResponseOutputStream extends OutputStream {
-        
-        Response response;
-        ByteChunk chunk;
+    private final class GrizzlyResponseOutputStream extends OutputStream {
         public final static int BUFFER_SIZE = 4096;
         
-        public GrizzlyResponseOutputStream(Response response) {
-            this.response = response;
+        final ByteChunk chunk;
+        
+        public GrizzlyResponseOutputStream() {
             chunk = new ByteChunk(BUFFER_SIZE);
         }
         

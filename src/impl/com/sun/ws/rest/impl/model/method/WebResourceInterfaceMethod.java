@@ -27,23 +27,37 @@ import com.sun.ws.rest.api.core.HttpRequestContext;
 import com.sun.ws.rest.api.core.HttpResponseContext;
 import com.sun.ws.rest.api.core.WebResource;
 import com.sun.ws.rest.impl.model.ResourceClass;
-import com.sun.ws.rest.spi.dispatch.RequestDispatcher;
+import com.sun.ws.rest.impl.model.method.dispatch.ResourceJavaMethodDispatcher;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import javax.ws.rs.core.MediaType;
 
 /**
  *
  * @author Paul.Sandoz@Sun.Com
  */
-public final class ResourceGenericMethod extends ResourceJavaMethod {
+public final class WebResourceInterfaceMethod extends ResourceJavaMethod {
         
-    public ResourceGenericMethod(ResourceClass metaClass, Method method)
+    private final static class WebResourceInterfaceRequestDispatcher extends ResourceJavaMethodDispatcher {
+        WebResourceInterfaceRequestDispatcher(ResourceMethodData method) {
+            super(method);
+        }
+
+        public void _dispatch(Object resource, 
+                HttpRequestContext requestContext, HttpResponseContext responseContext) 
+                throws IllegalAccessException, InvocationTargetException {
+            ((WebResource)resource).handleRequest(requestContext, responseContext);
+            MediaType m = getAcceptableMediaType(requestContext);
+            if (m != null) responseContext.getHttpHeaders().putSingle("Content-Type", m);            
+        }        
+    }
+    
+    public WebResourceInterfaceMethod(ResourceClass metaClass, Method method)
             throws ContainerException {
         super(metaClass, method);
         
-        this.dispatcher = new RequestDispatcher() {
-            public void dispatch(Object resource, HttpRequestContext request, HttpResponseContext response) {
-                ((WebResource)resource).handleRequest(request, response);                        
-            }
-        };
+        ResourceMethodData rmd = new ResourceMethodData(method, httpMethod, consumeMime, produceMime);
+        
+        this.dispatcher = new WebResourceInterfaceRequestDispatcher(rmd);
     }    
 }

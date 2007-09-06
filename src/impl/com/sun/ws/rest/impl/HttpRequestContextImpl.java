@@ -94,6 +94,17 @@ public class HttpRequestContextImpl implements ContainerRequest {
         return method;
     }
     
+    public MediaType getAcceptableMediaType(List<MediaType> mediaTypes) {
+        for (MediaType a : getAcceptableMediaTypes()) {
+            if (a.getType().equals(MediaType.MEDIA_TYPE_WILDCARD)) 
+                return mediaTypes.get(0);
+            
+            for (MediaType m : mediaTypes)
+                if (m.isCompatible(a)) return m;
+        }
+        
+        return null;
+    }
     
     // UriInfo
     

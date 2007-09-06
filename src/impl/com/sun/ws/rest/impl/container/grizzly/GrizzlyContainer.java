@@ -60,7 +60,7 @@ public class GrizzlyContainer implements Adapter {
         }
         
         try {
-            responseAdaptor.commit();
+            responseAdaptor.commitAll();
             request.action( ActionCode.ACTION_POST_REQUEST , null);
         } catch (Exception e) {
             // TODO

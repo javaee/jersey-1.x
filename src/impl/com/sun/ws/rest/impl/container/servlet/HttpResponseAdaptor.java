@@ -41,15 +41,17 @@ import javax.ws.rs.ext.ProviderFactory;
  *
  */
 public final class HttpResponseAdaptor extends HttpResponseContextImpl {
-    private ServletContext context;
+    private final ServletContext context;
             
-    private HttpServletRequest request;
+    private final HttpServletRequest request;
     
-    private HttpServletResponse response;
+    private final HttpServletResponse response;
     
     private RequestDispatcher d;
         
-    public HttpResponseAdaptor(ServletContext context, HttpServletResponse response, 
+    private OutputStream out;
+    
+    /* package */ HttpResponseAdaptor(ServletContext context, HttpServletResponse response, 
             HttpServletRequest request, HttpRequestAdaptor requestContext) {
         super(requestContext);
         this.context = context;
@@ -57,27 +59,8 @@ public final class HttpResponseAdaptor extends HttpResponseContextImpl {
         this.request = request;
     }
 
-    @SuppressWarnings("unchecked")
-    public void commit() throws IOException {
-        commitMetaData();
     
-        final Object entity = this.getEntity();
-        if (entity != null) {
-            final EntityProvider p = ProviderFactory.getInstance().createEntityProvider(entity.getClass());
-            p.writeTo(entity, this.getHttpHeaders(), this.getOutputStream());
-        }
-    }
-
-    public void commitMetaData() {
-        response.setStatus(this.getStatus());
-        
-        MultivaluedMap<String, Object> headers = this.getHttpHeaders();
-        for (Map.Entry<String, List<Object>> e : headers.entrySet()) {
-            for (Object v : e.getValue()) {
-                response.addHeader(e.getKey(), getHeaderValue(v));
-            }
-        }
-    }
+    // HttpResponseContextImpl
     
     final class OutputStreamAdapter extends OutputStream {
         OutputStream out;
@@ -113,15 +96,45 @@ public final class HttpResponseAdaptor extends HttpResponseContextImpl {
         }
     }
     
-    public OutputStream getOutputStream() throws IOException {
-        return new OutputStreamAdapter();
+    protected OutputStream getUnderlyingOutputStream() throws IOException {
+        if (out == null)
+            out = new OutputStreamAdapter();
+        
+        return out;
     }
+
+    protected void commit() throws IOException {
+        response.setStatus(this.getStatus());
+        
+        MultivaluedMap<String, Object> headers = this.getHttpHeaders();
+        for (Map.Entry<String, List<Object>> e : headers.entrySet()) {
+            for (Object v : e.getValue()) {
+                response.addHeader(e.getKey(), getHeaderValue(v));
+            }
+        }
+    }
+
     
-    public RequestDispatcher getRequestDispatcher() {
+    @SuppressWarnings("unchecked")
+    /* package */ void commitAll() throws IOException {
+        if (isCommitted()) return;
+        
+        if (response.isCommitted()) return;
+        
+        commit();
+    
+        final Object entity = this.getEntity();
+        if (entity != null) {
+            final EntityProvider p = ProviderFactory.getInstance().createEntityProvider(entity.getClass());
+            p.writeTo(entity, this.getHttpHeaders(), this.getUnderlyingOutputStream());
+        }
+    }    
+    
+    /* package */ RequestDispatcher getRequestDispatcher() {
         return d;
     }
         
-    public void forwardTo(String path, Object it) {        
+    /* package */ void forwardTo(String path, Object it) {        
         d = context.getRequestDispatcher(path);
         if (d == null) {
             throw new ContainerException("No request dispatcher for: " + path);

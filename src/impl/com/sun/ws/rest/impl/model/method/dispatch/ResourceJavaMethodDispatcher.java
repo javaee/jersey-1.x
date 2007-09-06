@@ -25,10 +25,12 @@ package com.sun.ws.rest.impl.model.method.dispatch;
 import com.sun.ws.rest.api.container.ContainerException;
 import com.sun.ws.rest.api.core.HttpRequestContext;
 import com.sun.ws.rest.api.core.HttpResponseContext;
+import com.sun.ws.rest.impl.model.MediaTypeList;
 import com.sun.ws.rest.spi.dispatch.RequestDispatcher;
 import com.sun.ws.rest.impl.model.method.ResourceMethodData;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import javax.ws.rs.core.MediaType;
 
 /**
  *
@@ -37,8 +39,23 @@ import java.lang.reflect.Method;
 public abstract class ResourceJavaMethodDispatcher implements RequestDispatcher {
     protected final Method method;
     
+    final private MediaTypeList produceMime;
+    
+    final private MediaType mediaType;
+
     public ResourceJavaMethodDispatcher(ResourceMethodData method) {
         this.method = method.method;
+        this.produceMime = method.produceMime;
+        
+        if (method.produceMime.size() == 1) {
+            MediaType c = method.produceMime.get(0);
+            if (c.getType().equals("*") || c.getSubtype().equals("*")) 
+                mediaType = null;
+            else
+                mediaType = method.produceMime.get(0);
+        } else {
+            mediaType = null;
+        }        
     }    
     
     public final void dispatch(Object resource, 
@@ -58,6 +75,21 @@ public abstract class ResourceJavaMethodDispatcher implements RequestDispatcher 
             }
         } catch (IllegalAccessException e) {
             throw new ContainerException(e);
+        }
+    }
+    
+    protected final MediaType getAcceptableMediaType(HttpRequestContext requestContext) {
+        if (produceMime.size() == 1) {
+            return mediaType;
+        } else {
+            MediaType m = requestContext.getAcceptableMediaType(produceMime);
+            if (m != null) {
+                if (m.getType().equals(MediaType.MEDIA_TYPE_WILDCARD) ||
+                        m.getSubtype().equals(MediaType.MEDIA_TYPE_WILDCARD))
+                    return null;
+            }
+
+            return m;
         }
     }
     

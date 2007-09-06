@@ -38,19 +38,47 @@ import javax.ws.rs.ext.ProviderFactory;
  *
  * @author Paul.Sandoz@Sun.Com
  */
-public class HttpServerResponseAdaptor extends HttpResponseContextImpl {
+public final class HttpServerResponseAdaptor extends HttpResponseContextImpl {
     
     private final HttpExchange exchange;
     
     private OutputStream out;
     
-    public HttpServerResponseAdaptor(HttpExchange exchange, HttpServerRequestAdaptor requestContext) {
+    /* package */ HttpServerResponseAdaptor(HttpExchange exchange, HttpServerRequestAdaptor requestContext) {
         super(requestContext);
         this.exchange = exchange;
     }
 
+    // HttpResponseContextImpl
+        
+    protected OutputStream getUnderlyingOutputStream() throws IOException {
+        if (out != null)
+            return out;
+        
+        return out = exchange.getResponseBody();
+    }
+
+    protected void commit() throws IOException {
+        Headers eh = exchange.getResponseHeaders();
+        for (Map.Entry<String, List<Object>> e : this.getHttpHeaders().entrySet()) {
+            List<String> values = new ArrayList<String>();
+            for (Object v : e.getValue())
+                values.add(getHeaderValue(v));
+            eh.put(e.getKey(), values);
+        }
+        
+        exchange.sendResponseHeaders(this.getStatus(), 0);
+    }
+    
+    //
+    
     @SuppressWarnings("unchecked")
-    public void commit() throws IOException {
+    /* package */ void commitAll() throws IOException {
+        if (isCommitted()) {
+            exchange.close();        
+            return;
+        }
+        
         Headers eh = exchange.getResponseHeaders();
         for (Map.Entry<String, List<Object>> e : this.getHttpHeaders().entrySet()) {
             List<String> values = new ArrayList<String>();
@@ -64,23 +92,14 @@ public class HttpServerResponseAdaptor extends HttpResponseContextImpl {
             exchange.sendResponseHeaders(this.getStatus(), 0);
             
             final EntityProvider p = ProviderFactory.getInstance().createEntityProvider(entity.getClass());
-            p.writeTo(entity, this.getHttpHeaders(), this.getOutputStream());
-            if (out != null) {
-                out.flush();
-                out.close();
-            }
+            OutputStream out = exchange.getResponseBody();
+            p.writeTo(entity, this.getHttpHeaders(), out);
+            out.flush();
+            out.close();
         } else {
             exchange.sendResponseHeaders(this.getStatus(), -1);
         }
         exchange.close();        
     }
 
-    // HttpResponseContext
-    
-    public OutputStream getOutputStream() throws IOException {
-        if (out != null)
-            return out;
-        
-        return out = exchange.getResponseBody();
-    }
 }

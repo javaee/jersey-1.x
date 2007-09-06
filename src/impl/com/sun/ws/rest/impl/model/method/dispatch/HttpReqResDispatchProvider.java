@@ -27,6 +27,7 @@ import com.sun.ws.rest.api.core.HttpResponseContext;
 import com.sun.ws.rest.spi.dispatch.RequestDispatcher;
 import com.sun.ws.rest.impl.model.method.ResourceMethodData;
 import java.lang.reflect.InvocationTargetException;
+import javax.ws.rs.core.MediaType;
 
 /**
  *
@@ -42,6 +43,8 @@ public class HttpReqResDispatchProvider implements ResourceMethodDispatchProvide
         public void _dispatch(Object resource, HttpRequestContext request, HttpResponseContext response) 
         throws IllegalAccessException, InvocationTargetException {
             method.invoke(resource, request, response);
+            MediaType m = getAcceptableMediaType(request);
+            if (m != null) response.getHttpHeaders().putSingle("Content-Type", m);
         }
     }
 

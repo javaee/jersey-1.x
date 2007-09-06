@@ -1,12 +1,12 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
- * 
- * Copyright 2007 Sun Microsystems, Inc. All rights reserved. 
- * 
+ *
+ * Copyright 2007 Sun Microsystems, Inc. All rights reserved.
+ *
  * The contents of this file are subject to the terms of the Common Development
  * and Distribution License("CDDL") (the "License").  You may not use this file
- * except in compliance with the License. 
- * 
+ * except in compliance with the License.
+ *
  * You can obtain a copy of the License at:
  *     https://jersey.dev.java.net/license.txt
  * See the License for the specific language governing permissions and
@@ -49,7 +49,7 @@ import javax.servlet.http.HttpServletResponse;
 
 /**
  * Dispatch a servlet request to the appropriate Resource
- * 
+ *
  */
 public class ServletAdaptor extends HttpServlet {
     private static final String WEB_RESOURCE_CLASS = "webresourceclass";
@@ -69,7 +69,7 @@ public class ServletAdaptor extends HttpServlet {
     
     public void init(ServletConfig servletConfig) throws ServletException {
         super.init(servletConfig);
-    
+        
         // tomcat returns null, glassfish returns a string
         isEE = System.getProperty("product.name") == null ? false : true;
         
@@ -116,7 +116,7 @@ public class ServletAdaptor extends HttpServlet {
         
         if (resources == null)
             throw new ServletException(ImplMessages.NO_WEBRESOURCECLASS_IN_WEBXML());
-            
+        
         try {
             Class resClassSetClass = classLoader.loadClass(resources);
             ResourceConfig resourceConfig = (ResourceConfig)resClassSetClass.newInstance();
@@ -183,7 +183,7 @@ public class ServletAdaptor extends HttpServlet {
     throws ServletException, IOException {
         HttpRequestAdaptor requestAdaptor = new HttpRequestAdaptor(req);
         HttpResponseAdaptor responseAdaptor = new HttpResponseAdaptor(context, resp, req, requestAdaptor);
-
+        
         try {
             requestInvoker.set(req); // save req as thread local
             application.handleRequest(requestAdaptor, responseAdaptor);
@@ -192,15 +192,17 @@ public class ServletAdaptor extends HttpServlet {
         } finally {
             requestInvoker.set(null);
         }
+        
         // Let all other runtime exceptions be handled by the servlet container
         // Those exceptions will be bugs
         
-        responseAdaptor.commit();                
+        responseAdaptor.commitAll();
+        
         if (responseAdaptor.getRequestDispatcher() != null) {
             // For some odd reason forward can only be called from the
             // same class as the servlet
             responseAdaptor.getRequestDispatcher().forward(req, resp);
         }
     }
-
+    
 }

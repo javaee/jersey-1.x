@@ -28,6 +28,7 @@ import javax.ws.rs.ProduceMime;
 import javax.ws.rs.UriTemplate;
 import com.sun.ws.rest.api.core.WebResource;
 import javax.ws.rs.HttpMethod;
+import javax.ws.rs.core.Response;
 
 /**
  *
@@ -62,6 +63,7 @@ public class BeanWithWebResourceTest extends AbstractBeanTester {
         public void doGet(HttpRequestContext request, HttpResponseContext response) {
             assertEquals("GET", request.getHttpMethod());
             assertEquals("text/html", request.getRequestHeaders().getFirst("Accept"));
+            response.setResponse(Response.Builder.ok("RESPONSE").build());
         }
         
         @ProduceMime("text/xhtml")
@@ -74,6 +76,8 @@ public class BeanWithWebResourceTest extends AbstractBeanTester {
             String accept = request.getRequestHeaders().getFirst("Accept");
             match = accept == null | "text/xhtml".equals(accept);
             assertTrue(match);
+            
+            response.setResponse(Response.Builder.ok("RESPONSE").build());
         }
     }
     

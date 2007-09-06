@@ -28,6 +28,7 @@ import javax.ws.rs.UriTemplate;
 import javax.ws.rs.ConsumeMime;
 import javax.ws.rs.HttpMethod;
 import javax.ws.rs.ProduceMime;
+import javax.ws.rs.core.Response;
 
 /**
  *
@@ -46,6 +47,7 @@ public class ConsumeProduceSimpleTest extends AbstractBeanTester {
         public void doPostHtml(HttpRequestContext request, HttpResponseContext response) {
             assertEquals("POST", request.getHttpMethod());
             assertEquals("text/html", request.getRequestHeaders().getFirst("Content-Type"));
+            response.setResponse(Response.Builder.ok("RESPONSE").build());
         }
         
         @HttpMethod("POST")
@@ -53,6 +55,7 @@ public class ConsumeProduceSimpleTest extends AbstractBeanTester {
         public void doPostXHtml(HttpRequestContext request, HttpResponseContext response) {
             assertEquals("POST", request.getHttpMethod());            
             assertEquals("text/xhtml", request.getRequestHeaders().getFirst("Content-Type"));
+            response.setResponse(Response.Builder.ok("RESPONSE").build());
         }
     }
         
@@ -63,6 +66,7 @@ public class ConsumeProduceSimpleTest extends AbstractBeanTester {
         public void doGetHtml(HttpRequestContext request, HttpResponseContext response) {
             assertEquals("GET", request.getHttpMethod());
             assertEquals("text/html", request.getRequestHeaders().getFirst("Accept"));
+            response.setResponse(Response.Builder.ok("RESPONSE").build());
         }
         
         @HttpMethod("GET")
@@ -70,6 +74,7 @@ public class ConsumeProduceSimpleTest extends AbstractBeanTester {
         public void doGetXhtml(HttpRequestContext request, HttpResponseContext response) {
             assertEquals("GET", request.getHttpMethod());            
             assertEquals("text/xhtml", request.getRequestHeaders().getFirst("Accept"));
+            response.setResponse(Response.Builder.ok("RESPONSE").build());
         }
     }
     
@@ -81,6 +86,7 @@ public class ConsumeProduceSimpleTest extends AbstractBeanTester {
         public void doGetHtml(HttpRequestContext request, HttpResponseContext response) {
             assertEquals("GET", request.getHttpMethod());
             assertEquals("text/html", request.getRequestHeaders().getFirst("Accept"));
+            response.setResponse(Response.Builder.ok("RESPONSE").build());
         }
         
         @HttpMethod("GET")
@@ -88,6 +94,7 @@ public class ConsumeProduceSimpleTest extends AbstractBeanTester {
         public void doGetXhtml(HttpRequestContext request, HttpResponseContext response) {
             assertEquals("GET", request.getHttpMethod());            
             assertEquals("text/xhtml", request.getRequestHeaders().getFirst("Accept"));
+            response.setResponse(Response.Builder.ok("RESPONSE").build());
         }
         
         @HttpMethod("POST")
@@ -95,6 +102,7 @@ public class ConsumeProduceSimpleTest extends AbstractBeanTester {
             assertEquals("POST", request.getHttpMethod());
             assertEquals("text/html", request.getRequestHeaders().getFirst("Content-Type"));
             assertEquals("text/html", request.getRequestHeaders().getFirst("Accept"));
+            response.setResponse(Response.Builder.ok("RESPONSE").build());
         }
         
         @HttpMethod("POST")
@@ -104,6 +112,7 @@ public class ConsumeProduceSimpleTest extends AbstractBeanTester {
             assertEquals("POST", request.getHttpMethod());            
             assertEquals("text/xhtml", request.getRequestHeaders().getFirst("Content-Type"));
             assertEquals("text/xhtml", request.getRequestHeaders().getFirst("Accept"));
+            response.setResponse(Response.Builder.ok("RESPONSE").build());
         }
     }
     

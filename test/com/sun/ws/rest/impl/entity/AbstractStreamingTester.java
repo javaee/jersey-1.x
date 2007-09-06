@@ -22,17 +22,13 @@
 
 package com.sun.ws.rest.impl.entity;
 
-import com.sun.ws.rest.impl.HttpRequestContextImpl;
-import com.sun.ws.rest.impl.HttpResponseContextImpl;
 import com.sun.ws.rest.impl.RequestHttpHeadersImpl;
 import com.sun.ws.rest.impl.ResponseBuilderImpl;
 import com.sun.ws.rest.impl.TestHttpRequestContext;
-import java.net.URI;
+import com.sun.ws.rest.impl.TestHttpResponseContext;
 import javax.ws.rs.ext.EntityProvider;
 import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.ProviderFactory;
 import junit.framework.TestCase;
@@ -83,19 +79,14 @@ public abstract class AbstractStreamingTester extends TestCase {
     @SuppressWarnings("unchecked")
     <T> byte[] writeTo(T t, String mediaType) throws IOException {
         
-        final ByteArrayOutputStream out = new ByteArrayOutputStream();
-        HttpRequestContextImpl reqc = new TestHttpRequestContext();
-        HttpResponseContextImpl resc = new HttpResponseContextImpl(reqc) {
-            public OutputStream getOutputStream() throws IOException {
-                return out;
-            }
-        };
+        TestHttpRequestContext reqc = new TestHttpRequestContext();
+        TestHttpResponseContext resc = new TestHttpResponseContext(reqc);
         
         Response r = new ResponseBuilderImpl().type(mediaType).build();
         resc.setResponse(r);
         
         EntityProvider<T> tsp = ProviderFactory.getInstance().createEntityProvider((Class<T>)t.getClass());
         tsp.writeTo(t, resc.getHttpHeaders(), resc.getOutputStream());
-        return out.toByteArray();
+        return resc.getEntityAsByteArray();
     }
 }

@@ -28,10 +28,9 @@ import com.sun.ws.rest.impl.HttpRequestContextImpl;
 import com.sun.ws.rest.impl.HttpResponseContextImpl;
 import com.sun.ws.rest.impl.MultivaluedMapImpl;
 import com.sun.ws.rest.impl.TestHttpRequestContext;
+import com.sun.ws.rest.impl.TestHttpResponseContext;
 import com.sun.ws.rest.impl.application.WebApplicationImpl;
 import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.OutputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.HashSet;
@@ -196,11 +195,7 @@ public abstract class AbstractBeanTester extends TestCase {
             request.getRequestHeaders().put(h.getKey(), h.getValue());
         }            
 
-        final HttpResponseContextImpl response = new HttpResponseContextImpl(request) {
-            public OutputStream getOutputStream() throws IOException {
-                throw new UnsupportedOperationException();
-            }
-        };
+        final HttpResponseContextImpl response = new TestHttpResponseContext(request);
 
         a.handleRequest(request, response);
         return response;

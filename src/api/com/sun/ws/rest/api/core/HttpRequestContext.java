@@ -22,7 +22,9 @@
 
 package com.sun.ws.rest.api.core;
 
+import java.util.List;
 import javax.ws.rs.core.HttpHeaders;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.PreconditionEvaluator;
 import javax.ws.rs.core.UriInfo;
 
@@ -30,6 +32,16 @@ import javax.ws.rs.core.UriInfo;
  * An abstraction for a HTTP request
  */
 public interface HttpRequestContext extends HttpHeaders, UriInfo, PreconditionEvaluator {
+    /**
+     * Select the first media type, from a list of media types, that is most
+     * acceptable according to the requested acceptable media types.
+     *
+     * @param mediaTypes the list of media types
+     * @return the most acceptable media type, or null if no media type
+     *         was found to be acceptable.
+     */
+    public MediaType getAcceptableMediaType(List<MediaType> mediaTypes);
+    
     /**
      * Get the request entity, returns null if the request does not
      * contain an entity body.
@@ -45,5 +57,5 @@ public interface HttpRequestContext extends HttpHeaders, UriInfo, PreconditionEv
      * Get the HTTP method name
      * @return the method name as a String
      */
-    public String getHttpMethod();    
+    public String getHttpMethod();
 }

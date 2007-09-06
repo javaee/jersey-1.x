@@ -30,9 +30,8 @@ import com.sun.ws.rest.api.core.WebResource;
 import com.sun.ws.rest.impl.HttpRequestContextImpl;
 import com.sun.ws.rest.impl.HttpResponseContextImpl;
 import com.sun.ws.rest.impl.TestHttpRequestContext;
+import com.sun.ws.rest.impl.TestHttpResponseContext;
 import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.OutputStream;
 import java.util.HashSet;
 import java.util.Set;
 import junit.framework.*;
@@ -162,11 +161,7 @@ public class WebApplicationTest extends TestCase {
         ByteArrayInputStream e = new ByteArrayInputStream(content.getBytes());
         HttpRequestContextImpl request = new TestHttpRequestContext(method, e, 
                 path, "/", relativePath);
-        HttpResponseContextImpl response = new HttpResponseContextImpl(request) {
-            public OutputStream getOutputStream() throws IOException {
-                throw new UnsupportedOperationException();
-            }
-        };
+        HttpResponseContextImpl response = new TestHttpResponseContext(request);
 
         a.handleRequest(request, response);
         if (response.getEntity() != null) {

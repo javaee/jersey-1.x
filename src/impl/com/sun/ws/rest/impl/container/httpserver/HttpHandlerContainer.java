@@ -60,7 +60,7 @@ public class HttpHandlerContainer implements HttpHandler {
         }
         
         try {
-            responseAdaptor.commit();
+            responseAdaptor.commitAll();
         } catch (RuntimeException e) {
             e.printStackTrace();
             throw e;

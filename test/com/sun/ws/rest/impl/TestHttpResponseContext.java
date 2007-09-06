@@ -20,35 +20,33 @@
  *     "Portions Copyrighted [year] [name of copyright owner]"
  */
 
-package com.sun.ws.rest.spi.container;
+package com.sun.ws.rest.impl;
 
-import com.sun.ws.rest.api.container.ContainerException;
-import com.sun.ws.rest.spi.service.ServiceFinder;
+import com.sun.ws.rest.api.core.HttpRequestContext;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
 
 /**
- * A factory for WebApplication instances. Container providers use this class
- * to obtain an instance of the API runtime.
  *
  * @author Paul.Sandoz@Sun.Com
  */
-public final class WebApplicationFactory {
+public class TestHttpResponseContext extends HttpResponseContextImpl {
+
+    private ByteArrayOutputStream baos = new ByteArrayOutputStream();
     
-    private WebApplicationFactory() {
+    public TestHttpResponseContext(HttpRequestContext requestContext) {
+        super(requestContext);
     }
     
-    /**
-     * Create a Web application instance.
-     *
-     * @return the web application.
-     * @throws ContainerException if there is an error creating the Web application.
-     */
-    public static WebApplication createWebApplication() throws ContainerException {
-        for (WebApplicationProvider wap : ServiceFinder.find(WebApplicationProvider.class)) {
-            // Use the first provider found
-            return wap.createWebApplication();
-        }
-                
-        throw new ContainerException("No WebApplication provider is present");
+    protected OutputStream getUnderlyingOutputStream() throws IOException {
+        return baos;
+    }
+
+    protected void commit() throws IOException {
     }
     
+    public byte[] getEntityAsByteArray() {
+        return baos.toByteArray();
+    }
 }

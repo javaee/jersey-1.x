@@ -30,23 +30,32 @@ import javax.ws.rs.core.Response;
 
 /**
  * Encapsulates the response to a HTTP request.
+ * <p>
+ * The default state of a response is a HTTP response with a status code of 204 
+ * (OK) with no HTTP response headers and no entity.
  */
 public interface HttpResponseContext {
     
     /**
-     * Set the response object. If not set an empty '204 OK' will be
-     * sent.
+     * Set the response state from a Response instance. This replaces a 
+     * pre-existing response state.
+     * <p>
+     * If an entity is set but there is no MIME media type declared for the 
+     * Content-Type response header then the MIME media type will be set to 
+     * "application/octet-stream".
+     *
      * @param response the response.
      */
     void setResponse(Response response);
     
     /**
-     * Set the response object. If not set an empty '204 OK' will be
-     * sent.
+     * Set the response state from a Response instance. This replaces a 
+     * pre-existing response state.
+     *
      * @param response the response.
-     * @param contentType the content type to use if content type 
-     *                    is not set in the respose, if null then 
-     *                    "application/octet-stream" will be used.
+     * @param contentType the MIME media type to use fot the Content-Type response
+     *        header if the header is not set by the response. If null then
+     *        "application/octet-stream" will be used.
      */
     void setResponse(Response response, MediaType contentType);
 
@@ -58,7 +67,7 @@ public interface HttpResponseContext {
     /**
      * Set the status of the response.
      */
-    void getStatus(int status);
+    void setStatus(int status);
     
     /**
      * Get the entity of the response
@@ -74,6 +83,7 @@ public interface HttpResponseContext {
      * Get the HTTP response headers. The returned map is case-insensitive wrt
      * keys. Note that <code>setHttpResponse</code> can change the HTTP response
      * headers and may overwrite headers set previously.
+     *
      * @return a mutable map of HTTP header names and values that will be
      * included in the response. Any headers explicitly set will override
      * automatically generated values.
@@ -81,11 +91,23 @@ public interface HttpResponseContext {
     MultivaluedMap<String, Object> getHttpHeaders();
     
     /**
-     * Get an OutputStream to which a representation may be written. The first
-     * byte written will cause any headers currently set to be flushed.
+     * Get an OutputStream to which an entity may be written.
+     * <p>
+     * The first byte written will cause the status code and headers 
+     * (if any) to be committed to the underlying container.
+     *
      * @return the output stream
      * @throws java.io.IOException if an IO error occurs
      */
     OutputStream getOutputStream() throws IOException;
     
+    /**
+     * Ascertain if a response has been committed to an underlying container.
+     * <p>
+     * A response is committed if the status code, headers (if any) have been
+     * committed to the underlying container.
+     *  
+     * @return true if the response has been committed.
+     */
+    boolean isCommitted();
 }

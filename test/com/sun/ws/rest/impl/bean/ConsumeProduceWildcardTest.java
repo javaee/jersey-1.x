@@ -27,6 +27,7 @@ import com.sun.ws.rest.api.core.HttpResponseContext;
 import javax.ws.rs.UriTemplate;
 import javax.ws.rs.ConsumeMime;
 import javax.ws.rs.HttpMethod;
+import javax.ws.rs.core.Response;
 
 /**
  *
@@ -45,6 +46,7 @@ public class ConsumeProduceWildcardTest extends AbstractBeanTester {
         public void doPostHtml(HttpRequestContext request, HttpResponseContext response) {
             assertEquals("POST", request.getHttpMethod());
             assertEquals("text/html", request.getRequestHeaders().getFirst("Content-Type"));
+            response.setResponse(Response.Builder.ok("RESPONSE").build());
         }
         
         @HttpMethod("POST")
@@ -52,6 +54,7 @@ public class ConsumeProduceWildcardTest extends AbstractBeanTester {
         public void doPostXHtml(HttpRequestContext request, HttpResponseContext response) {
             assertEquals("POST", request.getHttpMethod());
             assertEquals("text/xhtml", request.getRequestHeaders().getFirst("Content-Type"));
+            response.setResponse(Response.Builder.ok("RESPONSE").build());
         }
     }
         

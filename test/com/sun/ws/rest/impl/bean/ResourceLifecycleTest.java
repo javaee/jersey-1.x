@@ -23,23 +23,18 @@
 package com.sun.ws.rest.impl.bean;
 
 import com.sun.ws.rest.api.core.ResourceConfig;
-import com.sun.ws.rest.impl.HttpRequestContextImpl;
-import com.sun.ws.rest.impl.HttpResponseContextImpl;
-import com.sun.ws.rest.impl.MultivaluedMapImpl;
 import com.sun.ws.rest.impl.TestHttpRequestContext;
+import com.sun.ws.rest.impl.TestHttpResponseContext;
 import com.sun.ws.rest.impl.application.WebApplicationImpl;
+import com.sun.ws.rest.spi.container.ContainerRequest;
+import com.sun.ws.rest.spi.container.ContainerResponse;
 import com.sun.ws.rest.spi.resource.PerRequest;
 import com.sun.ws.rest.spi.resource.Singleton;
 import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.OutputStream;
 import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import javax.ws.rs.UriTemplate;
 import javax.ws.rs.HttpMethod;
-import javax.ws.rs.core.MultivaluedMap;
 import junit.framework.TestCase;
 
 /**
@@ -157,13 +152,8 @@ public class ResourceLifecycleTest extends TestCase {
     
     public String doGET(String path) {
         ByteArrayInputStream e = new ByteArrayInputStream("".getBytes());
-        final HttpRequestContextImpl request = new TestHttpRequestContext("GET", e, path, "/base/", path);
-
-        HttpResponseContextImpl response = new HttpResponseContextImpl(request) {
-            public OutputStream getOutputStream() throws IOException {
-                throw new UnsupportedOperationException();
-            }
-        };
+        final ContainerRequest request = new TestHttpRequestContext("GET", e, path, "/base/", path);
+        final ContainerResponse response = new TestHttpResponseContext(request);
 
         a.handleRequest(request, response);        
         String retVal = (String)response.getEntity();

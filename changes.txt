@@ -1,3 +1,21 @@
+release 0.3 (2007-10-xx)
+- Correctly support the writing of responses for the method signature:
+    void <method>(HttpRequestContext, HttpResponseContext)
+  this includes the method signature for resources that implement the interface
+  com.sun.ws.rest.api.core.WebResource.
+  An entity may be directly written by the application by obtaining an 
+  OutputStream from the HttpResponseContext.getOutputStream() method.
+- New SPI com.sun.ws.rest.spi.resource.* replaces com.sun.ws.rest.spi.resolver.*
+  Supports addition of new resource providers that are responsible for creating 
+  resource class instances and managing their lifecycle. The provider for a 
+  particular resource class is set via the ResourceFactory meta-annotation, 
+  see com.sun.ws.rest.spi.resource.Singleton for an example of its usage. 
+  Default lifecycle for resource class instances is per-request, the prior 
+  behaviour can be obtained by annotating a resource class with 
+  com.sun.ws.rest.spi.resource.Singleton. Resource class constructors with a 
+  per-request lifecycle can now have the same parameters as methods annotated 
+  with HttpMethod.
+
 release 0.2.1 (2007-09-04)
 - Fixed issue 4: Unsed jars required to be included in the class path for use of certain entity providers
   https://jersey.dev.java.net/issues/show_bug.cgi?id=4

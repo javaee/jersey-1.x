@@ -43,25 +43,23 @@ import javax.xml.ws.handler.MessageContext;
  * Adapts a JAX-WS <code>Endpoint</code> response to provide the methods of HttpResponse
  *
  */
-public class MessageContextResponseAdaptor extends HttpResponseContextImpl {
+public final class MessageContextResponseAdaptor extends HttpResponseContextImpl {
     
     private final HttpServletResponse response; 
     
     private final MessageContext context;
     
-    private ByteArrayOutputStream out = new ByteArrayOutputStream();
+    private final ByteArrayOutputStream out = new ByteArrayOutputStream();
     
-    /**
-     * Creates a new instance of MessageContextResponseAdaptor
-     */
-    public MessageContextResponseAdaptor(MessageContext context, 
+    
+    /* package */ MessageContextResponseAdaptor(MessageContext context, 
             MessageContextRequestAdaptor requestContext) {
         super(requestContext);
         this.context = context;
         this.response = (HttpServletResponse)context.get(context.SERVLET_RESPONSE);
     }
 
-    class HttpResponseDataSource implements DataSource {
+    private final class HttpResponseDataSource implements DataSource {
         final private String mediaType;
 
         public HttpResponseDataSource() {
@@ -81,9 +79,7 @@ public class MessageContextResponseAdaptor extends HttpResponseContextImpl {
             final Object entity = getEntity();
             if (entity != null) {
                 final EntityProvider p = ProviderFactory.getInstance().createEntityProvider(entity.getClass());
-                p.writeTo(entity, 
-                        MessageContextResponseAdaptor.this.getHttpHeaders(), 
-                        MessageContextResponseAdaptor.this.getOutputStream());
+                p.writeTo(entity, getHttpHeaders(), getUnderlyingOutputStream());
                 return new ByteArrayInputStream(out.toByteArray());
             } else {
                 return new ByteArrayInputStream(new byte[0]);
@@ -95,7 +91,21 @@ public class MessageContextResponseAdaptor extends HttpResponseContextImpl {
         }
     } 
 
-    public DataSource getResultDataSource() throws IOException {
+    /* package */ DataSource getResultDataSource() throws IOException {
+        if (!isCommitted())
+            commit();
+        
+        return new HttpResponseDataSource();
+    }
+
+    
+    // HttpResponseContextImpl
+
+    protected OutputStream getUnderlyingOutputStream() throws IOException {
+        return out;
+    }
+    
+    protected void commit() throws IOException {
         // If JAX-WS is deployed using servlet
         if (response != null) {
             response.setStatus(getStatus());
@@ -119,10 +129,5 @@ public class MessageContextResponseAdaptor extends HttpResponseContextImpl {
             context.put(context.HTTP_RESPONSE_CODE, getStatus());
             context.put(context.HTTP_RESPONSE_HEADERS, map);
         }
-        return new HttpResponseDataSource();
-    }
-
-    public OutputStream getOutputStream() throws IOException {
-        return out;
     }
 }
