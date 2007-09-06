@@ -62,6 +62,17 @@ public abstract class UriBuilder {
     }
     
     /**
+     * Create a new instance initialized from an existing URI with automatic encoding 
+     * (see {@link #encode} method) turned on.
+     * @param uri a URI that will be used to initialize the UriBuilder.
+     * @return a new UriBuilder
+     * @throws IllegalArgumentException if uri is not a valid URI or is null
+     */
+    public static UriBuilder fromUri(String uri) {
+        return fromUri(URI.create(uri));
+    }
+
+    /**
      * Create a new instance initialized from an unencoded URI path,
      * equivalent to <code>fromPath(path, true)</code>.
      * @param path a URI path that will be used to initialize the UriBuilder.
@@ -103,6 +114,14 @@ public abstract class UriBuilder {
         b.path(resource);
         return b;
     }
+    
+     /**
+     * Create a copy of the UriBuilder preserving its state. This is a more
+     * efficient means of creating a copy than constructing a new UriBuilder
+     * from a URI returned by the {@link #build} method.
+     * @return a copy of the UriBuilder
+     */   
+    public abstract UriBuilder clone();
     
     /**
      * Controls whether the UriBuilder will automatically encode URI components

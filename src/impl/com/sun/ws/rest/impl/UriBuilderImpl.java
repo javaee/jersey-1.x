@@ -66,6 +66,21 @@ public final class UriBuilderImpl extends UriBuilder {
         query = new StringBuilder();
     }
 
+    private UriBuilderImpl(UriBuilderImpl that) {
+        this.encode = that.encode;
+        this.scheme = that.scheme;
+        this.userInfo = that.userInfo;
+        this.host = that.host;
+        this.port = that.port;
+        this.path = new StringBuilder(that.path);
+        this.query = new StringBuilder(that.query);
+        this.fragment = that.fragment;
+    }
+    
+    public UriBuilder clone() {
+        return new UriBuilderImpl(this);
+    }
+    
     public UriBuilder encode(boolean enable) {
         encode = enable;
         return this;

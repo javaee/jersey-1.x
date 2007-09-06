@@ -39,100 +39,100 @@ public class UriBuilderTest extends TestCase {
     }
 
     public void testReplaceScheme() {
-        URI bu = UriBuilder.fromUri(URI.create("http://localhost:8080/a/b/c")).
+        URI bu = UriBuilder.fromUri("http://localhost:8080/a/b/c").
                 scheme("https").build();
         assertEquals(URI.create("https://localhost:8080/a/b/c"), bu);
     }
     
     public void testReplaceUserInfo() {
-        URI bu = UriBuilder.fromUri(URI.create("http://bob@localhost:8080/a/b/c")).
+        URI bu = UriBuilder.fromUri("http://bob@localhost:8080/a/b/c").
                 userInfo("sue").build();
         assertEquals(URI.create("http://sue@localhost:8080/a/b/c"), bu);
     }
     
     public void testReplaceHost() {
-        URI bu = UriBuilder.fromUri(URI.create("http://localhost:8080/a/b/c")).
+        URI bu = UriBuilder.fromUri("http://localhost:8080/a/b/c").
                 host("a.com").build();
         assertEquals(URI.create("http://a.com:8080/a/b/c"), bu);
     }
     
     public void testReplacePort() {
-        URI bu = UriBuilder.fromUri(URI.create("http://localhost:8080/a/b/c")).
+        URI bu = UriBuilder.fromUri("http://localhost:8080/a/b/c").
                 port(9090).build();
         assertEquals(URI.create("http://localhost:9090/a/b/c"), bu);
         
-        bu = UriBuilder.fromUri(URI.create("http://localhost:8080/a/b/c")).
+        bu = UriBuilder.fromUri("http://localhost:8080/a/b/c").
                 port(-1).build();
         assertEquals(URI.create("http://localhost/a/b/c"), bu);
     }
     
     public void testReplacePath() {
-        URI bu = UriBuilder.fromUri(URI.create("http://localhost:8080/a/b/c")).
+        URI bu = UriBuilder.fromUri("http://localhost:8080/a/b/c").
                 replacePath("/x/y/z").build();
         assertEquals(URI.create("http://localhost:8080/x/y/z"), bu);
     }
     
     public void testReplaceMatrixParam() {
-        URI bu = UriBuilder.fromUri(URI.create("http://localhost:8080/a/b/c;a=x;b=y")).
+        URI bu = UriBuilder.fromUri("http://localhost:8080/a/b/c;a=x;b=y").
                 replaceMatrixParams("x=a;y=b").build();
         assertEquals(URI.create("http://localhost:8080/a/b/c;x=a;y=b"), bu);
     }
     
     public void testReplaceQueryParams() {
-        URI bu = UriBuilder.fromUri(URI.create("http://localhost:8080/a/b/c?a=x&b=y")).
+        URI bu = UriBuilder.fromUri("http://localhost:8080/a/b/c?a=x&b=y").
                 replaceQueryParams("x=a&y=b").build();
         assertEquals(URI.create("http://localhost:8080/a/b/c?x=a&y=b"), bu);
     }
     
     public void testReplaceFragment() {
-        URI bu = UriBuilder.fromUri(URI.create("http://localhost:8080/a/b/c?a=x&b=y#frag")).
+        URI bu = UriBuilder.fromUri("http://localhost:8080/a/b/c?a=x&b=y#frag").
                 fragment("ment").build();
         assertEquals(URI.create("http://localhost:8080/a/b/c?a=x&b=y#ment"), bu);
     }
     
     public void testAppendPath() {
-        URI bu = UriBuilder.fromUri(URI.create("http://localhost:8080/a/b/c")).
+        URI bu = UriBuilder.fromUri("http://localhost:8080/a/b/c").
                 path("/x/y/z").build();
         assertEquals(URI.create("http://localhost:8080/a/b/c/x/y/z"), bu);
         
-        bu = UriBuilder.fromUri(URI.create("http://localhost:8080/a/b/c")).
+        bu = UriBuilder.fromUri("http://localhost:8080/a/b/c").
                 path("x/y/z").build();
         assertEquals(URI.create("http://localhost:8080/a/b/c/x/y/z"), bu);
         
-        bu = UriBuilder.fromUri(URI.create("http://localhost:8080/a/b/c")).
+        bu = UriBuilder.fromUri("http://localhost:8080/a/b/c").
                 path("/").build();
         assertEquals(URI.create("http://localhost:8080/a/b/c/"), bu);
         
-        bu = UriBuilder.fromUri(URI.create("http://localhost:8080/a/b/c")).
+        bu = UriBuilder.fromUri("http://localhost:8080/a/b/c").
                 path("").build();
         assertEquals(URI.create("http://localhost:8080/a/b/c"), bu);
         
-        bu = UriBuilder.fromUri(URI.create("http://localhost:8080/a%20/b%20/c%20")).
+        bu = UriBuilder.fromUri("http://localhost:8080/a%20/b%20/c%20").
                 path("/x /y /z ").build();
         assertEquals(URI.create("http://localhost:8080/a%20/b%20/c%20/x%20/y%20/z%20"), bu);
     }
     
     public void testAppendQueryParams() {
-        URI bu = UriBuilder.fromUri(URI.create("http://localhost:8080/a/b/c?a=x&b=y")).
+        URI bu = UriBuilder.fromUri("http://localhost:8080/a/b/c?a=x&b=y").
                 queryParam("c", "z").build();
         assertEquals(URI.create("http://localhost:8080/a/b/c?a=x&b=y&c=z"), bu);
     }
     
     public void testAppendMatrixParams() {
-        URI bu = UriBuilder.fromUri(URI.create("http://localhost:8080/a/b/c;a=x;b=y")).
+        URI bu = UriBuilder.fromUri("http://localhost:8080/a/b/c;a=x;b=y").
                 matrixParam("c", "z").build();
         assertEquals(URI.create("http://localhost:8080/a/b/c;a=x;b=y;c=z"), bu);
     }
     
     public void testAppendPathAndMatrixParams() {
-        URI bu = UriBuilder.fromUri(URI.create("http://localhost:8080/")).
+        URI bu = UriBuilder.fromUri("http://localhost:8080/").
                 path("a").matrixParam("x", "foo").matrixParam("y", "bar").
                 path("b").matrixParam("x", "foo").matrixParam("y", "bar").build();
         assertEquals(URI.create("http://localhost:8080/a;x=foo;y=bar/b;x=foo;y=bar"), bu);
     }
     
     public void testTemplates() {
-        URI bu = UriBuilder.fromUri(URI.create("http://localhost:8080/a/b/c")).
+        URI bu = UriBuilder.fromUri("http://localhost:8080/a/b/c").
                 path("/{foo}/{bar}/{baz}/{foo}").build("x", "y", "z");
         assertEquals(URI.create("http://localhost:8080/a/b/c/x/y/z/x"), bu);   
         
@@ -140,8 +140,17 @@ public class UriBuilderTest extends TestCase {
         m.put("foo", "x");
         m.put("bar", "y");
         m.put("baz", "z");
-        bu = UriBuilder.fromUri(URI.create("http://localhost:8080/a/b/c")).
+        bu = UriBuilder.fromUri("http://localhost:8080/a/b/c").
                 path("/{foo}/{bar}/{baz}/{foo}").build(m);
         assertEquals(URI.create("http://localhost:8080/a/b/c/x/y/z/x"), bu);   
+    }
+    
+    public void testClone() {
+        UriBuilder ub = UriBuilder.fromUri("http://user@localhost:8080/?query#fragment").path("a");
+        URI full = ub.clone().path("b").build();
+        URI base = ub.build();
+        
+        assertEquals(URI.create("http://user@localhost:8080/a?query#fragment"), base);
+        assertEquals(URI.create("http://user@localhost:8080/a/b?query#fragment"), full);
     }
 }
