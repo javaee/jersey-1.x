@@ -61,9 +61,11 @@ public class ServletAdaptor extends HttpServlet {
     private boolean isEE;
     
     @SuppressWarnings("unchecked")
-    private static List<Class<?>> injectables = Arrays.asList(HttpServletRequest.class, ServletConfig.class, EntityManagerFactory.class);
+    private static List<Class<?>> injectables = Arrays.asList(
+            HttpServletRequest.class, HttpServletResponse.class, ServletConfig.class, EntityManagerFactory.class);
     
     private ThreadLocalInvoker<HttpServletRequest> requestInvoker = new ThreadLocalInvoker<HttpServletRequest>();
+    private ThreadLocalInvoker<HttpServletResponse> responseInvoker = new ThreadLocalInvoker<HttpServletResponse>();
     
     private Map<String, String> persistenceUnits = new HashMap<String, String>();
     
@@ -137,6 +139,21 @@ public class ServletAdaptor extends HttpServlet {
                 }
             }
             );
+            application.addInjectable(HttpServletResponse.class,
+                    new Injectable<Resource, HttpServletResponse>() {
+                public Class<Resource> getAnnotationClass() {
+                    return Resource.class;
+                }
+                
+                public HttpServletResponse getInjectableValue(Resource r) {
+                    HttpServletResponse servletResponse = (HttpServletResponse)Proxy.newProxyInstance(
+                            HttpServletResponse.class.getClassLoader(),
+                            new Class[] { HttpServletResponse.class },
+                            responseInvoker);
+                    return servletResponse;
+                }
+            }
+            );
             application.addInjectable(ServletConfig.class,
                     new Injectable<Resource, ServletConfig>() {
                 public Class<Resource> getAnnotationClass() {
@@ -185,7 +202,9 @@ public class ServletAdaptor extends HttpServlet {
         HttpResponseAdaptor responseAdaptor = new HttpResponseAdaptor(context, resp, req, requestAdaptor);
         
         try {
-            requestInvoker.set(req); // save req as thread local
+            // save thread locals for use in injection
+            requestInvoker.set(req);
+            responseInvoker.set(resp);
             application.handleRequest(requestAdaptor, responseAdaptor);
         } catch (ContainerException e) {
             throw new ServletException(e);
