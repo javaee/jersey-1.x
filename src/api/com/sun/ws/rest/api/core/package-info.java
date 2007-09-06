@@ -1,13 +1,8 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
-
-<html>
-  <head>
-    <title></title>
-  </head>
-  <body>
-    <p>Low-level interfaces and annotations used to create RESTful service
-    resources. E.g.:</p>
-    <pre>&#064;URITemplate("widgets/{widgetid}")
+/**
+ * Low-level interfaces and annotations used to create RESTful service
+ * resources. E.g.:
+<pre>
+&#064;URITemplate("widgets/{widgetid}")
 public class WidgetResource extends WebResource {
 
   public void handleRequest(HTTPRequest request, HTTPResponse response) {
@@ -21,6 +16,7 @@ public class WidgetResource extends WebResource {
     else ...
   }
 
-}</pre>
-  </body>
-</html>
+}
+</pre>
+ */
+package com.sun.ws.rest.api.core;
