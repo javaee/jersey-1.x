@@ -102,10 +102,11 @@
         
         <!-- create a zip file of the source distribution -->
         <delete file="${basedir}/dist/${release.snapshot.name}.zip"/>
+        <delete file="${basedir}/dist/${release.snapshot.basename}.zip"/>
         <zip destfile="${basedir}/dist/${release.snapshot.name}.zip"
              basedir=".."
              includes="jersey/**"
-             excludes="jersey/findbugs/**"/>
+             excludes="jersey/findbugs/** jersey/emma/**"/>
         <!-- copy to non-versioned name -->
         <copy file="${basedir}/dist/${release.snapshot.name}.zip" 
               tofile="${basedir}/dist/${release.snapshot.basename}.zip"/>
@@ -247,12 +248,32 @@
         </classpath>
     </taskdef>
     
-    <target name="hudson-unit-tests" depends="init">
+    <target name="hudson-unit-tests" depends="init,-get-emma">
+<!-- Emma ****************************-->
+        <mkdir dir="build/emma"/>
+
+        <property name="emma.dir" value="emma/emma-2.0.5312/lib" />
+
+        <path id="emma.lib" >
+          <pathelement location="${emma.dir}/emma.jar" />
+          <pathelement location="${emma.dir}/emma_ant.jar" />
+        </path>
+
+        <taskdef resource="emma_ant.properties" classpathref="emma.lib" />
+
+        <emma enabled="true">
+          <instr instrpath="dist/jersey.jar" mode="overwrite" metadatafile="build/emma/metadata.emma"/>
+        </emma>
+<!-- /Emma ***************************-->
+
         <path id="test.classpath">
             <fileset dir="${basedir}/lib" includes="*.jar"/>
             <fileset dir="${dist.dir}" includes="*.jar"/>
             <pathelement location="${build.test.classes.dir}"/>
             <pathelement location="${tools.jar}"/>
+<!-- Emma ****************************-->
+            <path refid="emma.lib"/>
+<!-- /Emma ***************************-->
         </path>
         <mkdir dir="${build.test.classes.dir}"/>
         <mkdir dir="${build.test.results.dir}"/>
@@ -262,9 +283,9 @@
         <copy todir="${build.test.classes.dir}">
             <fileset dir="${test.src.dir}" excludes="**/*.java"/>
         </copy>
-        <junit2 showoutput="true" fork="true" dir="${basedir}" 
+        <junit2 showoutput="true" fork="true" forkmode="once" dir="${basedir}" 
                 failureproperty="tests.failed" errorproperty="tests.failed">
-            <batchtest todir="${build.test.results.dir}">
+            <batchtest fork="true" todir="${build.test.results.dir}">
                 <fileset dir="${test.src.dir}" includes="**/*Test.java"/>
             </batchtest>
             <classpath refid="test.classpath"/>
@@ -275,7 +296,24 @@
             <formatter type="brief" usefile="false"/>
             <formatter type="xml"/>
             <jvmarg line="${run.jvmargs}"/>
+<!-- Emma ****************************-->
+            <jvmarg value="-Demma.coverage.out.file=build/emma/coverage.emma"/>
+            <jvmarg value="-Demma.coverage.out.merge=true"/>
+<!-- /Emma ***************************-->
         </junit2>
+
+<!-- Emma ****************************-->
+        <emma enabled="true">
+          <report sourcepath="src" >
+            <fileset dir="build/emma" >
+              <include name="*.emma" />
+            </fileset>
+
+            <xml outfile="build/emma/coverage.xml" />
+            <html outfile="build/emma/coverage.html" />
+          </report>
+        </emma> 
+<!-- /Emma ***************************-->
     </target>
     
     <target name="clean-tests" depends="init">
@@ -283,6 +321,18 @@
     </target>
     
     
+    <!-- Emma tasks -->
+ 
+    <target name="-check-emma">
+        <available file="emma/emma.zip" property="emmaExists"/>
+    </target>
+
+    <target name="-get-emma" depends="-check-emma" unless="emmaExists">
+        <mkdir dir="emma"/>
+        <get src="http://downloads.sourceforge.net/emma/emma-2.0.5312.zip" dest="emma/emma.zip"/>
+        <unzip src="emma/emma.zip" dest="emma/"/>
+    </target>
+
     <!-- Findbugs tasks -->
 
     <target name="-check-findbugs">
