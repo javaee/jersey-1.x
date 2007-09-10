@@ -25,6 +25,7 @@ package com.sun.ws.rest.impl.provider.entity;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 
 /**
@@ -37,12 +38,13 @@ public final class StringProvider extends AbstractTypeEntityProvider<String> {
         return type == String.class;
     }
 
-    public String readFrom(Class<String> type,
-            String mediaType, MultivaluedMap<String, String> headers, InputStream entityStream) throws IOException {
+    public String readFrom(Class<String> type, MediaType mediaType,
+            MultivaluedMap<String, String> headers, InputStream entityStream) throws IOException {
         return readFromAsString(entityStream);
     }
 
-    public void writeTo(String t, MultivaluedMap<String, Object> headers, OutputStream entityStream) throws IOException {
+    public void writeTo(String t, MediaType mediaType,
+            MultivaluedMap<String, Object> headers, OutputStream entityStream) throws IOException {
         entityStream.write(t.getBytes());
     }
 }

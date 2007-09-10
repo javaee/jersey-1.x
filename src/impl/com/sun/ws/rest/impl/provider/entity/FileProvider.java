@@ -28,6 +28,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 
 /**
@@ -40,8 +41,8 @@ public final class FileProvider extends AbstractTypeEntityProvider<File> {
         return type == File.class;
     }
 
-    public File readFrom(Class<File> type, 
-            String mediaType, MultivaluedMap<String, String> headers, InputStream entityStream) throws IOException {
+    public File readFrom(Class<File> type, MediaType mediaType,
+            MultivaluedMap<String, String> headers, InputStream entityStream) throws IOException {
         File f = File.createTempFile("rep","tmp");        
         OutputStream out = new FileOutputStream(f);
         writeTo(entityStream, out);
@@ -49,7 +50,7 @@ public final class FileProvider extends AbstractTypeEntityProvider<File> {
         return f;
     }
 
-    public void writeTo(File t, 
+    public void writeTo(File t, MediaType mediaType,
             MultivaluedMap<String, Object> headers, OutputStream entityStream) throws IOException {
         InputStream in = new FileInputStream(t);
         writeTo(in, entityStream);

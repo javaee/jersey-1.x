@@ -46,7 +46,7 @@ public class EditOptimisiticEntryResource extends EditEntryResource {
         String editLink = AtomStore.getLink(e, "edit");
         
         // Compare against the requested link
-        editURI = uriInfo.getURI().toString();
+        editURI = uriInfo.getAbsolute().toString();
         boolean conflict = !editURI.startsWith(editLink);        
         if (conflict) {
             // Response with 409 Conflict
@@ -56,7 +56,7 @@ public class EditOptimisiticEntryResource extends EditEntryResource {
 
         // Increment the version and update the edit URI
         int newVersion = version + 1;
-        editURI = uriInfo.getURI().toString();
+        editURI = uriInfo.getAbsolute().toString();
         editURI = editURI.replaceFirst("/" + version + "/", "/" + newVersion + "/");
     }    
     

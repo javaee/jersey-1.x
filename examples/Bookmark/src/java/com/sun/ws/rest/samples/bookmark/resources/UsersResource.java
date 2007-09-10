@@ -66,7 +66,7 @@ public class UsersResource {
     public JSONArray getUsersAsJsonArray() {
         JSONArray uriArray = new JSONArray();
         for (UserEntity userEntity : getUsers()) {
-            uriArray.put(uriInfo.getURI().resolve(userEntity.getUserid()).toString());
+            uriArray.put(uriInfo.getAbsolute().resolve(userEntity.getUserid()).toString());
         }
         return uriArray;
     }

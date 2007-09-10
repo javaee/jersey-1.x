@@ -124,7 +124,7 @@ final class WebApplicationContext implements HttpContextAccess, ResourceDispatch
     }
     
     private void setTemplateValues() {
-        final MultivaluedMap<String, String> m = request.getURIParameters();
+        final MultivaluedMap<String, String> m = request.getTemplateParameters();
         for (Map.Entry<String, String> e : templateValues.entrySet()) {
             m.putSingle(e.getKey(), e.getValue());
         }

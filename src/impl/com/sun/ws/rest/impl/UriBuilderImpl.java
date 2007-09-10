@@ -22,8 +22,6 @@
 
 package com.sun.ws.rest.impl;
 
-import com.sun.ws.rest.api.core.UriBuilder;
-import com.sun.ws.rest.api.core.UriBuilderException;
 import com.sun.ws.rest.api.core.UriComponent;
 import com.sun.ws.rest.spi.dispatch.URITemplateType;
 import java.io.UnsupportedEncodingException;
@@ -31,12 +29,10 @@ import java.lang.reflect.Method;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URLEncoder;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import javax.ws.rs.UriTemplate;
+import javax.ws.rs.core.UriBuilder;
+import javax.ws.rs.core.UriBuilderException;
 
 /**
  * @author Paul.Sandoz@Sun.Com

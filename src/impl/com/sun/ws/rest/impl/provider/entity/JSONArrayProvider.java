@@ -28,6 +28,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
@@ -38,8 +39,21 @@ import org.codehaus.jettison.json.JSONException;
  */
 public class JSONArrayProvider  extends AbstractTypeEntityProvider<JSONArray>{
     
+    public boolean supports(Class<?> type) {
+        return type == JSONArray.class;
+    }
+        
+    public JSONArray readFrom(Class<JSONArray> o, MediaType mediaType,
+            MultivaluedMap<String, String> headers, InputStream is) throws IOException {
+        try {
+            return new JSONArray(readFromAsString(is));
+        } catch (JSONException je) {
+            throw ThrowHelper.withInitCause(je, new IOException(ImplMessages.ERROR_PARSING_JSON_ARRAY()));
+        }
+    }
     
-    public void writeTo(JSONArray jsonArray, MultivaluedMap<String, Object> httpHeaders, OutputStream entityStream) throws IOException {
+    public void writeTo(JSONArray jsonArray, MediaType mediaType,
+            MultivaluedMap<String, Object> httpHeaders, OutputStream entityStream) throws IOException {
         try {
             OutputStreamWriter writer = new OutputStreamWriter(entityStream);
             jsonArray.write(writer);
@@ -50,15 +64,4 @@ public class JSONArrayProvider  extends AbstractTypeEntityProvider<JSONArray>{
         }
     }
     
-    public boolean supports(Class<?> type) {
-        return type == JSONArray.class;
-    }
-    
-    public JSONArray readFrom(Class<JSONArray> o, String mediaType, MultivaluedMap<String, String> headers, InputStream is) throws IOException {
-        try {
-            return new JSONArray(readFromAsString(is));
-        } catch (JSONException je) {
-            throw ThrowHelper.withInitCause(je, new IOException(ImplMessages.ERROR_PARSING_JSON_ARRAY()));
-        }
-    }
 }

@@ -41,7 +41,7 @@ public final class UriParameterProcessor implements ParameterProcessor<UriParam>
         }
         
         public Object extract(HttpRequestContext request) {
-            return extractor.extract(request.getURIParameters());
+            return extractor.extract(request.getTemplateParameters());
         }
     }
     

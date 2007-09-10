@@ -52,8 +52,8 @@ public class HttpServerAdaptorTest extends TestCase {
         public void handleRequest(HttpRequestContext request, HttpResponseContext response) {
             assertEquals("POST", request.getHttpMethod());
             
-            assertEquals("a", request.getURIParameters().getFirst("arg1"));
-            assertEquals("b/c", request.getURIParameters().getFirst("arg2"));
+            assertEquals("a", request.getTemplateParameters().getFirst("arg1"));
+            assertEquals("b/c", request.getTemplateParameters().getFirst("arg2"));
             
             String s = request.getEntity(String.class);
             assertEquals("RESOURCE-ONE", s);
@@ -67,7 +67,7 @@ public class HttpServerAdaptorTest extends TestCase {
         public void handleRequest(HttpRequestContext request, HttpResponseContext response) {
             assertEquals("POST", request.getHttpMethod());
             
-            assertEquals("a", request.getURIParameters().getFirst("arg1"));
+            assertEquals("a", request.getTemplateParameters().getFirst("arg1"));
             
             String s = request.getEntity(String.class);
             assertEquals("RESOURCE-TWO", s);

@@ -30,6 +30,7 @@ import java.net.URI;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.ext.EntityProvider;
 import javax.ws.rs.ext.HeaderProvider;
 import javax.ws.rs.ext.ProviderFactory;
 
@@ -187,6 +188,36 @@ public abstract class HttpResponseContextImpl implements ContainerResponse {
      */
     abstract protected void commit() throws IOException;
 
+    /**
+     * Write the entity to the output stream
+     */
+    @SuppressWarnings("unchecked")
+    protected final void writeEntity(OutputStream out) throws IOException {
+        final Object entity = this.getEntity();
+        if (entity != null) {
+            writeEntity(entity, out);
+        }
+        
+    }
+    
+    /**
+     * Write the entity to the output stream
+     */
+    @SuppressWarnings("unchecked")
+    protected final void writeEntity(Object entity, OutputStream out) throws IOException {
+        final EntityProvider p = ProviderFactory.getInstance().createEntityProvider(entity.getClass());
+
+        final Object mediaType = getHttpHeaders().getFirst("Content-Type");
+        if (mediaType instanceof MediaType) {
+            p.writeTo(entity, (MediaType)mediaType, getHttpHeaders(), out);
+        } else {
+            if (mediaType != null) {
+                p.writeTo(entity, new MediaType(mediaType.toString()), getHttpHeaders(), out);
+            } else {
+                p.writeTo(entity, null, getHttpHeaders(), out);
+            }
+        }
+    }
     
     //
 
@@ -202,7 +233,7 @@ public abstract class HttpResponseContextImpl implements ContainerResponse {
         Object location = headers.getFirst("Location");
         if (location != null) {
             if (location instanceof URI) {
-                URI absoluteLocation = requestContext.getBaseURI().resolve((URI)location);
+                URI absoluteLocation = requestContext.getBase().resolve((URI)location);
                 headers.putSingle("Location", absoluteLocation);
             }
         }
@@ -213,5 +244,5 @@ public abstract class HttpResponseContextImpl implements ContainerResponse {
         // TODO: performance, this is very slow
         HeaderProvider hp = ProviderFactory.getInstance().createHeaderProvider(headerValue.getClass());
         return hp.toString(headerValue);
-    }
+    }    
 }

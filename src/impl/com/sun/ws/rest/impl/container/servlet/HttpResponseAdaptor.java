@@ -123,11 +123,7 @@ public final class HttpResponseAdaptor extends HttpResponseContextImpl {
         
         commit();
     
-        final Object entity = this.getEntity();
-        if (entity != null) {
-            final EntityProvider p = ProviderFactory.getInstance().createEntityProvider(entity.getClass());
-            p.writeTo(entity, this.getHttpHeaders(), this.getUnderlyingOutputStream());
-        }
+        writeEntity(getUnderlyingOutputStream());
     }    
     
     /* package */ RequestDispatcher getRequestDispatcher() {

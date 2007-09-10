@@ -76,7 +76,7 @@ public class BookmarksResource {
         JSONArray uriArray = new JSONArray();
         for (BookmarkEntity bookmarkEntity : getBookmarks()) {
             uriArray.put(
-                    uriInfo.getURI().resolve(bookmarkEntity.getBookmarkEntityPK().getBmid()).toString());
+                    uriInfo.getAbsolute().resolve(bookmarkEntity.getBookmarkEntityPK().getBmid()).toString());
         }
         return uriArray;
     }
@@ -97,7 +97,7 @@ public class BookmarksResource {
                 em.merge(userResource.getUserEntity());
             }});
             return Response.Builder.created(
-                    uriInfo.getURI().resolve(bookmarkEntity.getBookmarkEntityPK().getBmid())).build();
+                    uriInfo.getAbsolute().resolve(bookmarkEntity.getBookmarkEntityPK().getBmid())).build();
         } catch (JSONException jsone) {
             throw new WebApplicationException(jsone);
         }

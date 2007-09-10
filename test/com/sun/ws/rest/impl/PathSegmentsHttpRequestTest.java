@@ -41,7 +41,7 @@ public class PathSegmentsHttpRequestTest extends TestCase {
     public void testGeneral() throws Exception {
         HttpRequestContext r = new TestHttpRequestContext("GET", null,
                 "/context/p1;x=1;y=1/p2;x=2;y=2/p3;x=3;y=3", "/context", "p1;x=1;y=1/p2;x=2;y=2/p3;x=3;y=3");
-        List<PathSegment> segments = r.getURIPathSegments();
+        List<PathSegment> segments = r.getPathSegments();
         
         assertEquals(3, segments.size());
         
@@ -67,7 +67,7 @@ public class PathSegmentsHttpRequestTest extends TestCase {
     public void testMultipleSlash() throws Exception {
         HttpRequestContext r = new TestHttpRequestContext("GET", null,
                 "/context/p//p//p//", "/context", "p//p//p//");
-        List<PathSegment> segments = r.getURIPathSegments();
+        List<PathSegment> segments = r.getPathSegments();
         
         assertEquals(3, segments.size());
         for (PathSegment segment : segments) {
@@ -79,7 +79,7 @@ public class PathSegmentsHttpRequestTest extends TestCase {
     public void testMultipleMatrixParams() throws Exception {
         HttpRequestContext r = new TestHttpRequestContext("GET", null,
                 "/context/p;x=1;x=2;x=3", "/context", "p;x=1;x=2;x=3");
-        List<PathSegment> segments = r.getURIPathSegments();
+        List<PathSegment> segments = r.getPathSegments();
         
         MultivaluedMap<String, String> m = segments.get(0).getMatrixParameters();        
 
@@ -92,7 +92,7 @@ public class PathSegmentsHttpRequestTest extends TestCase {
     public void testEmptyPathSegmentsWithMultipleMatrixParams() throws Exception {
         HttpRequestContext r = new TestHttpRequestContext("GET", null,
                 "/context/;x=1;y=1/;x=2;y=2/;x=3;y=3", "/context", ";x=1;y=1/;x=2;y=2/;x=3;y=3");
-        List<PathSegment> segments = r.getURIPathSegments();
+        List<PathSegment> segments = r.getPathSegments();
         
         assertEquals(3, segments.size());
         

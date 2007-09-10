@@ -29,6 +29,7 @@ import com.sun.ws.rest.impl.TestHttpResponseContext;
 import javax.ws.rs.ext.EntityProvider;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.ProviderFactory;
 import junit.framework.TestCase;
@@ -60,10 +61,10 @@ public abstract class AbstractStreamingTester extends TestCase {
     }
     
     <T> T readFrom(Class<T> c, byte[] b) throws IOException {
-        return readFrom(c, b, "text/plain");
+        return readFrom(c, b, new MediaType("text/plain"));
     }
     
-    <T> T readFrom(Class<T> c, byte[] b, String mediaType) throws IOException {
+    <T> T readFrom(Class<T> c, byte[] b, MediaType mediaType) throws IOException {
         RequestHttpHeadersImpl h = new RequestHttpHeadersImpl();
         h.add("Content-Type", mediaType);
 
@@ -73,11 +74,11 @@ public abstract class AbstractStreamingTester extends TestCase {
     }
     
     <T> byte[] writeTo(T t) throws IOException {
-        return writeTo(t, "text/plain");
+        return writeTo(t, new MediaType("text/plain"));
     }
     
     @SuppressWarnings("unchecked")
-    <T> byte[] writeTo(T t, String mediaType) throws IOException {
+    <T> byte[] writeTo(T t, MediaType mediaType) throws IOException {
         
         TestHttpRequestContext reqc = new TestHttpRequestContext();
         TestHttpResponseContext resc = new TestHttpResponseContext(reqc);
@@ -86,7 +87,7 @@ public abstract class AbstractStreamingTester extends TestCase {
         resc.setResponse(r);
         
         EntityProvider<T> tsp = ProviderFactory.getInstance().createEntityProvider((Class<T>)t.getClass());
-        tsp.writeTo(t, resc.getHttpHeaders(), resc.getOutputStream());
+        tsp.writeTo(t, mediaType, resc.getHttpHeaders(), resc.getOutputStream());
         return resc.getEntityAsByteArray();
     }
 }

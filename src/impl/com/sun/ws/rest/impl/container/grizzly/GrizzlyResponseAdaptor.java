@@ -27,8 +27,6 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.util.List;
 import java.util.Map;
-import javax.ws.rs.ext.EntityProvider;
-import javax.ws.rs.ext.ProviderFactory;
 import org.apache.coyote.Response;
 import org.apache.tomcat.util.buf.ByteChunk;
 import org.apache.tomcat.util.buf.MessageBytes;
@@ -79,20 +77,15 @@ public final class GrizzlyResponseAdaptor extends HttpResponseContextImpl {
         response.sendHeaders();
     }    
     
-    @SuppressWarnings("unchecked")
     /* package */ void commitAll() throws IOException {
         if (isCommitted())
             return;
         
         commit();
         
-        Object entity = this.getEntity();
-        if (entity != null) {
-            final EntityProvider p = ProviderFactory.getInstance().createEntityProvider(entity.getClass());
-            p.writeTo(entity, this.getHttpHeaders(), this.getUnderlyingOutputStream());
-            if (output != null)
-                output.close();
-        }
+        final OutputStream out = getUnderlyingOutputStream();
+        writeEntity(out);
+        out.close();
     }
         
     private final class GrizzlyResponseOutputStream extends OutputStream {

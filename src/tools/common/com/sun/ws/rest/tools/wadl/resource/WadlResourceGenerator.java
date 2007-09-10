@@ -100,7 +100,7 @@ public class WadlResourceGenerator {
             getWadl.annotate(HttpMethod.class).param("value","GET");
             JBlock body = getWadl.body();
             JVar is = body.decl(inputStream, "is", JExpr._this().invoke("getClass").invoke("getResourceAsStream").arg("application.wadl"));
-            JVar str = body.decl(cm.ref(String.class), "str", wadlReader.staticInvoke("read").arg(is).arg(uriInfo.invoke("getBaseURI")));
+            JVar str = body.decl(cm.ref(String.class), "str", wadlReader.staticInvoke("read").arg(is).arg(uriInfo.invoke("getBase")));
             // TODO patch baseURI in WADL to that of Servlet root
             body._return(str);
             cm.build(cw);

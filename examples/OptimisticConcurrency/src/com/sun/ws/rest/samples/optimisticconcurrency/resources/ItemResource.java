@@ -57,8 +57,8 @@ public class ItemResource {
         }
         
         return new Item(
-                getUri(uriInfo.getURI()), 
-                getUpdateUri(uriInfo.getURI(), version),
+                getUri(uriInfo.getAbsolute()), 
+                getUpdateUri(uriInfo.getAbsolute(), version),
                 mediaType.toString());
     }    
     

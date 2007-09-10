@@ -93,7 +93,7 @@ public final class ResponseImpl implements Response {
                     if (location != null) {
                         if (location instanceof URI) {
                             if (!((URI)location).isAbsolute())
-                                location = requestContext.getBaseURI().resolve((URI)location);
+                                location = requestContext.getBase().resolve((URI)location);
                         }
                         that.putSingle(ResponseBuilderImpl.getHeader(i), location);
                     }

@@ -26,6 +26,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Properties;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.ext.EntityProvider;
 
@@ -44,7 +45,7 @@ public class PropertiesProvider implements EntityProvider<Properties> {
         return Properties.class.isAssignableFrom(type);
     }
         
-    public Properties readFrom(Class<Properties> type, String mediaType, 
+    public Properties readFrom(Class<Properties> type, MediaType mediaType, 
             MultivaluedMap<String, String> headers, InputStream in) throws IOException {
         // Create a new Properties instance and load using the
         // key/value pair format
@@ -53,7 +54,7 @@ public class PropertiesProvider implements EntityProvider<Properties> {
         return p;
     }
     
-    public void writeTo(Properties p,
+    public void writeTo(Properties p, MediaType mediaType,
             MultivaluedMap<String, Object> headers, OutputStream out) throws IOException {
         // Store the Properties instance using the key/value pair format
         p.store(out, null);

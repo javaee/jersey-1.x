@@ -30,6 +30,7 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.util.Map;
 import java.util.WeakHashMap;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -50,15 +51,18 @@ public final class JAXBElementProvider extends AbstractTypeEntityProvider<Object
     
     static Map<Class, JAXBContext> jaxbContexts = new WeakHashMap<Class, JAXBContext>();
     
+    static MediaType JSON = new MediaType("application/json");
+    
     public boolean supports(Class<?> type) {
         return type.getAnnotation(XmlRootElement.class) != null;
     }
     
-    public Object readFrom(Class<Object> type, String mediaType, MultivaluedMap<String, String> headers, InputStream entityStream) throws IOException {
+    public Object readFrom(Class<Object> type, MediaType mediaType,
+            MultivaluedMap<String, String> headers, InputStream entityStream) throws IOException {
         try {
             JAXBContext context = getJAXBContext(type);
             Unmarshaller unmarshaller = context.createUnmarshaller();
-            boolean jsonUsed = "application/json".equals(mediaType);
+            boolean jsonUsed = mediaType.equals(JSON);
             if (!jsonUsed) {
                 return unmarshaller.unmarshal(entityStream);
             } else {
@@ -82,12 +86,12 @@ public final class JAXBElementProvider extends AbstractTypeEntityProvider<Object
         }
     }
     
-    public void writeTo(Object t, MultivaluedMap<String, Object> headers, OutputStream entityStream) throws IOException {
+    public void writeTo(Object t, MediaType mediaType,
+            MultivaluedMap<String, Object> headers, OutputStream entityStream) throws IOException {
         try {
             JAXBContext context = getJAXBContext(t.getClass());
             Marshaller marshaller = context.createMarshaller();
-            boolean jsonRequired = headers.containsKey("Content-Type") && "application/json".equals(headers.get("Content-Type").get(0).toString());
-            if (jsonRequired) {
+            if (JSON.equals(mediaType)) {
                 marshaller.marshal(t, new BadgerFishXMLStreamWriter(new OutputStreamWriter(entityStream)));
             } else {
                 marshaller.marshal(t, entityStream);

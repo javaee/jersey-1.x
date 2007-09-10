@@ -48,7 +48,7 @@ public class EditEntryResource extends EntryResource {
     
     @HttpMethod
     public Entry putEntry(Entry e) throws IOException, FeedException {
-        String entryUri = uriInfo.getBaseURI() + "collection/" + entryId;
+        String entryUri = uriInfo.getBase() + "collection/" + entryId;
         AtomStore.updateLink(e, "self", entryUri);
         
         String editEntryUri = getEditURI();
@@ -114,6 +114,6 @@ public class EditEntryResource extends EntryResource {
     }
         
     protected String getEditURI() {
-        return uriInfo.getURI().toString();
+        return uriInfo.getAbsolute().toString();
     }
 }

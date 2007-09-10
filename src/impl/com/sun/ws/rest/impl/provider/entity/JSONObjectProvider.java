@@ -29,6 +29,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
@@ -39,8 +40,21 @@ import org.codehaus.jettison.json.JSONObject;
  */
 public class JSONObjectProvider  extends AbstractTypeEntityProvider<JSONObject>{
     
+    public boolean supports(Class<?> type) {
+        return type == JSONObject.class;
+    }
     
-    public void writeTo(JSONObject jsonObject, MultivaluedMap httpHeaders, OutputStream entityStream) throws IOException {
+    public JSONObject readFrom(Class<JSONObject> o, MediaType mediaType, 
+            MultivaluedMap<String, String> headers, InputStream is) throws IOException {
+        try {
+            return new JSONObject(readFromAsString(is));
+        } catch (JSONException je) {
+            throw ThrowHelper.withInitCause(je, new IOException(ImplMessages.ERROR_PARSING_JSON_OBJECT()));
+        }
+    }
+    
+    public void writeTo(JSONObject jsonObject, MediaType mediaType,
+            MultivaluedMap<String, Object> httpHeaders, OutputStream entityStream) throws IOException {
         try {
             OutputStreamWriter writer = new OutputStreamWriter(entityStream);
             jsonObject.write(writer);
@@ -51,15 +65,4 @@ public class JSONObjectProvider  extends AbstractTypeEntityProvider<JSONObject>{
         }
     }
     
-    public boolean supports(Class<?> type) {
-        return type == JSONObject.class;
-    }
-    
-    public JSONObject readFrom(Class<JSONObject> o, String mediaType, MultivaluedMap<String, String> headers, InputStream is) throws IOException {
-        try {
-            return new JSONObject(readFromAsString(is));
-        } catch (JSONException je) {
-            throw ThrowHelper.withInitCause(je, new IOException(ImplMessages.ERROR_PARSING_JSON_OBJECT()));
-        }
-    }
 }

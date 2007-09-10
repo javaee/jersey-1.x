@@ -92,8 +92,10 @@ public final class RootResourceClass extends BaseResourceClass {
     
     private void addResource(final Class<?> c) {
         final UriTemplate tAnnotation = c.getAnnotation(UriTemplate.class);
-        if (tAnnotation == null)
-            return;
+        if (tAnnotation == null) {
+            // TODO log warning
+            return;   
+        }
 
         ResourceClass resourceClass = getResourceClass(c);
 

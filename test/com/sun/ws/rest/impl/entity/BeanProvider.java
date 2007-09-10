@@ -28,6 +28,7 @@ import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.OutputStream;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 
 /**
@@ -40,8 +41,8 @@ public class BeanProvider extends AbstractTypeEntityProvider<Bean> {
         return type == Bean.class;
     }
 
-    public Bean readFrom(Class<Bean> type, 
-            String mediaType, MultivaluedMap<String, String> headers, InputStream entityStream) throws IOException {
+    public Bean readFrom(Class<Bean> type, MediaType mediaType, 
+            MultivaluedMap<String, String> headers, InputStream entityStream) throws IOException {
         ObjectInputStream oin = new ObjectInputStream(entityStream);
         try {
             return (Bean)oin.readObject();
@@ -52,7 +53,7 @@ public class BeanProvider extends AbstractTypeEntityProvider<Bean> {
         }
     }
 
-    public void writeTo(Bean t, 
+    public void writeTo(Bean t, MediaType mediaType,
             MultivaluedMap<String, Object> headers, OutputStream entityStream) throws IOException {
         ObjectOutputStream out = new ObjectOutputStream(entityStream);
         out.writeObject(t);

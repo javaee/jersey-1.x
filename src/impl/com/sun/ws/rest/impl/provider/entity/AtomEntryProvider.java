@@ -33,11 +33,11 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.JDOMException;
-import org.jdom.Namespace;
 import org.jdom.input.SAXBuilder;
 import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
@@ -53,8 +53,8 @@ public final class AtomEntryProvider extends AbstractTypeEntityProvider<Entry> {
         return type == Entry.class;
     }
 
-    public Entry readFrom(Class<Entry> type, 
-            String mediaType, MultivaluedMap<String, String> headers, InputStream entityStream) throws IOException {
+    public Entry readFrom(Class<Entry> type, MediaType mediaType, 
+            MultivaluedMap<String, String> headers, InputStream entityStream) throws IOException {
         try {
             return parseEntry(entityStream);
         } catch (FeedException cause) {
@@ -68,7 +68,7 @@ public final class AtomEntryProvider extends AbstractTypeEntityProvider<Entry> {
         }
     }
 
-    public void writeTo(Entry t, 
+    public void writeTo(Entry t, MediaType mediaType,
             MultivaluedMap<String, Object> headers, OutputStream entityStream) throws IOException {
         try {
             serializeEntry(t, entityStream);

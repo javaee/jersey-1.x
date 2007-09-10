@@ -27,6 +27,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import javax.activation.DataSource;
 import javax.mail.util.ByteArrayDataSource;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 
 /**
@@ -38,13 +39,13 @@ public class DataSourceProvider extends AbstractTypeEntityProvider<DataSource> {
         return DataSource.class.isAssignableFrom(type);
     }
 
-    public DataSource readFrom(Class<DataSource> type, 
-            String mediaType, MultivaluedMap<String, String> headers, InputStream entityStream) throws IOException {
-        ByteArrayDataSource ds = new ByteArrayDataSource(entityStream, mediaType);
+    public DataSource readFrom(Class<DataSource> type, MediaType mediaType,
+            MultivaluedMap<String, String> headers, InputStream entityStream) throws IOException {
+        ByteArrayDataSource ds = new ByteArrayDataSource(entityStream, mediaType.toString());
         return ds;
     }
 
-    public void writeTo(DataSource t,
+    public void writeTo(DataSource t, MediaType mediaType,
             MultivaluedMap<String, Object> headers, OutputStream entityStream) throws IOException {
         writeTo(t.getInputStream(), entityStream);
     }

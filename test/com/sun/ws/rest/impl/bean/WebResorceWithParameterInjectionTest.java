@@ -45,8 +45,8 @@ public class WebResorceWithParameterInjectionTest extends AbstractBeanTester {
     public static class TestParameterInjectedUriInfo {
         @HttpMethod("GET")
         public String doGet(@HttpContext UriInfo uriInfo) {
-            URI baseUri = uriInfo.getBaseURI();
-            URI uri = uriInfo.getURI();
+            URI baseUri = uriInfo.getBase();
+            URI uri = uriInfo.getAbsolute();
             assertEquals("/base/a/b", uri.toString());
             return "RETURN";
         }        
@@ -69,8 +69,8 @@ public class WebResorceWithParameterInjectionTest extends AbstractBeanTester {
             String value = httpHeaders.getRequestHeaders().getFirst("X-TEST");
             assertEquals("TEST", value);
             
-            URI baseUri = uriInfo.getBaseURI();
-            URI uri = uriInfo.getURI();
+            URI baseUri = uriInfo.getBase();
+            URI uri = uriInfo.getAbsolute();
             assertEquals("/base/a/b", uri.toString());
             return "RETURN";
         }        

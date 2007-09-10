@@ -90,11 +90,8 @@ public final class HttpServerResponseAdaptor extends HttpResponseContextImpl {
         Object entity = this.getEntity();
         if (entity != null) {
             exchange.sendResponseHeaders(this.getStatus(), 0);
-            
-            final EntityProvider p = ProviderFactory.getInstance().createEntityProvider(entity.getClass());
             OutputStream out = exchange.getResponseBody();
-            p.writeTo(entity, this.getHttpHeaders(), out);
-            out.flush();
+            writeEntity(entity, out);
             out.close();
         } else {
             exchange.sendResponseHeaders(this.getStatus(), -1);

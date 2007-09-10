@@ -77,13 +77,13 @@ public class FeedResource {
 //    }
     
     private URI getURI(String path) {
-        return uriInfo.getURI().resolve(path);
+        return uriInfo.getAbsolute().resolve(path);
     }    
     
     
     @HttpMethod
     public Feed getFeed() throws IOException, FeedException {
-        return AtomStore.getFeedDocument(uriInfo.getURI());
+        return AtomStore.getFeedDocument(uriInfo.getAbsolute());
     }
 
     @HttpMethod
@@ -107,7 +107,7 @@ public class FeedResource {
         AtomStore.createEntryDocument(entryId, e);
 
         // Update the feed document with the entry
-        Feed f = AtomStore.getFeedDocument(uriInfo.getURI());
+        Feed f = AtomStore.getFeedDocument(uriInfo.getAbsolute());
         AtomStore.updateFeedDocumentWithNewEntry(f, e);
         
         // Return 201 Created
@@ -154,7 +154,7 @@ public class FeedResource {
         AtomStore.createMediaDocument(entryId, entry);
         
         // Update the feed document with the entry
-        Feed f = AtomStore.getFeedDocument(uriInfo.getURI());
+        Feed f = AtomStore.getFeedDocument(uriInfo.getAbsolute());
         AtomStore.updateFeedDocumentWithNewEntry(f, e);
         
         // Return 201 Created

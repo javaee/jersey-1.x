@@ -22,10 +22,10 @@
 
 package com.sun.ws.rest.impl;
 
-import com.sun.ws.rest.api.core.UriBuilder;
 import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
+import javax.ws.rs.core.UriBuilder;
 import junit.framework.*;
 
 /**

@@ -26,6 +26,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 
 /**
@@ -38,14 +39,14 @@ public final class ByteArrayProvider extends AbstractTypeEntityProvider<byte[]> 
         return type == byte[].class;
     }
 
-    public byte[] readFrom(Class<byte[]> type, 
-            String mediaType, MultivaluedMap<String, String> headers, InputStream entityStream) throws IOException {
+    public byte[] readFrom(Class<byte[]> type, MediaType mediaType,
+            MultivaluedMap<String, String> headers, InputStream entityStream) throws IOException {
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         writeTo(entityStream, out);
         return out.toByteArray();
     }
 
-    public void writeTo(byte[] t, 
+    public void writeTo(byte[] t, MediaType mediaType,
             MultivaluedMap<String, Object> headers, OutputStream entityStream) throws IOException {
         entityStream.write(t);
     }

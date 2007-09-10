@@ -45,6 +45,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.PathSegment;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.ext.ProviderFactory;
 
 /**
@@ -81,10 +82,8 @@ public class HttpRequestContextImpl implements ContainerRequest {
     
     public <T> T getEntity(Class<T> type) {
         try {
-            String mediaType = headers.getFirst("Content-Type");
-            
             return ProviderFactory.getInstance().createEntityProvider(type).
-                    readFrom(type, mediaType, headers, entity);
+                    readFrom(type, getMediaType(), headers, entity);
         } catch (IOException e) {
             throw new IllegalArgumentException(e);
         }
@@ -108,19 +107,19 @@ public class HttpRequestContextImpl implements ContainerRequest {
     
     // UriInfo
     
-    public String getURIPath() {
+    public String getPath() {
         return uriPath;
     }
     
-    public String getURIPath(boolean decode) {
+    public String getPath(boolean decode) {
         if (decode) {
             return uriPath;
         } else {
-            return baseURI.relativize(getURI()).getRawPath();
+            return baseURI.relativize(getAbsolute()).getRawPath();
         }
     }
     
-    public List<PathSegment> getURIPathSegments() {
+    public List<PathSegment> getPathSegments() {
         if (pathSegments != null) {
             return pathSegments;
         }
@@ -129,19 +128,23 @@ public class HttpRequestContextImpl implements ContainerRequest {
         return pathSegments;
     }
     
-    public List<PathSegment> getURIPathSegments(boolean decode) {
+    public List<PathSegment> getPathSegments(boolean decode) {
         if (decode) {
-            return getURIPathSegments();
+            return getPathSegments();
         } else {
-            return extractPathSegments(getURIPath(false), false);
+            return extractPathSegments(getPath(false), false);
         }
     }
     
-    public URI getBaseURI() {
+    public URI getBase() {
         return baseURI;
     }
     
-    public URI getURI() {
+    public UriBuilder getBaseBuilder() {
+        return UriBuilder.fromUri(getBase());
+    }
+    
+    public URI getAbsolute() {
         if (uri == null) {
             try {
                 // TODO fix
@@ -159,11 +162,15 @@ public class HttpRequestContextImpl implements ContainerRequest {
         return uri;
     }
 
-    public MultivaluedMap<String, String> getURIParameters() {
+    public UriBuilder getBuilder() {
+        return UriBuilder.fromUri(getAbsolute());
+    }
+    
+    public MultivaluedMap<String, String> getTemplateParameters() {
         return templateValues;
     }
 
-    public MultivaluedMap<String, String> getURIParameters(boolean decode) {
+    public MultivaluedMap<String, String> getTemplateParameters(boolean decode) {
         if (decode) {
             return templateValues;
         } else {

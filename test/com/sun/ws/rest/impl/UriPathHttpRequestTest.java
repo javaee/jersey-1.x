@@ -39,16 +39,16 @@ public class UriPathHttpRequestTest extends TestCase {
     public void testGeneral() throws Exception {
         HttpRequestContext r = new TestHttpRequestContext("GET", null,
                 "/context/widgets/10", "/context", "widgets/10");
-        assertEquals("widgets/10", r.getURIPath());
-        assertEquals("widgets/10", r.getURIPath(true));
-        assertEquals("widgets/10", r.getURIPath(false));
+        assertEquals("widgets/10", r.getPath());
+        assertEquals("widgets/10", r.getPath(true));
+        assertEquals("widgets/10", r.getPath(false));
     }    
     
     public void testEncoded() throws Exception {
         HttpRequestContext r = new TestHttpRequestContext("GET", null,
                 "/context/widgets%20/%2010", "/context", "widgets / 10");
-        assertEquals("widgets / 10", r.getURIPath());
-        assertEquals("widgets / 10", r.getURIPath(true));
-        assertEquals("widgets%20/%2010", r.getURIPath(false));
+        assertEquals("widgets / 10", r.getPath());
+        assertEquals("widgets / 10", r.getPath(true));
+        assertEquals("widgets%20/%2010", r.getPath(false));
     }    
 }

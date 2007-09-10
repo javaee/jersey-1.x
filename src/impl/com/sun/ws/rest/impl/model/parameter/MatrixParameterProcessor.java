@@ -43,7 +43,7 @@ public final class MatrixParameterProcessor extends AbstractParameterProcessor<M
         }
         
         public Object extract(HttpRequestContext request) {
-            List<PathSegment> l = request.getURIPathSegments();
+            List<PathSegment> l = request.getPathSegments();
             PathSegment p = l.get(l.size() - 1);
             return extractor.extract(p.getMatrixParameters());
         }

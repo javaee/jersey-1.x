@@ -102,7 +102,7 @@ public class UserResource {
             TransactionManager.manage(new Transactional(em) { public void transact() {
                 em.persist(userEntity);
             }});
-            rBuilder.created(uriInfo.getURI());
+            rBuilder.created(uriInfo.getAbsolute());
          } else {
             TransactionManager.manage(new Transactional(em) { public void transact() {
                 em.merge(userEntity);

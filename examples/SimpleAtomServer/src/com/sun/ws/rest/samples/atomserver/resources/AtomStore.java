@@ -173,14 +173,14 @@ class AtomStore {
     static void updateFeedDocument(Feed f) throws IOException {
         EntityProvider<Feed> ep = ProviderFactory.getInstance().createEntityProvider(Feed.class);
         synchronized(FileStore.FS) {
-            ep.writeTo(f, null, FileStore.FS.getFileOutputStream(AtomStore.getFeedPath()));
+            ep.writeTo(f, null, null, FileStore.FS.getFileOutputStream(AtomStore.getFeedPath()));
         }
     }
             
     static void createEntryDocument(String id, Entry e) throws IOException {
         EntityProvider<Entry> ep = ProviderFactory.getInstance().createEntityProvider(Entry.class);
         String path = AtomStore.getEntryPath(id);
-        ep.writeTo(e, null, FileStore.FS.getFileOutputStream(path));
+        ep.writeTo(e, null, null, FileStore.FS.getFileOutputStream(path));
     }
     
     static void createMediaDocument(String id, byte[] content) throws IOException {
@@ -204,7 +204,7 @@ class AtomStore {
         f.getOtherLinks().add(selfLink);
         
         EntityProvider<Feed> ep = ProviderFactory.getInstance().createEntityProvider(Feed.class);
-        ep.writeTo(f, null, FileStore.FS.getFileOutputStream(AtomStore.getFeedPath()));
+        ep.writeTo(f, null, null, FileStore.FS.getFileOutputStream(AtomStore.getFeedPath()));
         
         return FileStore.FS.getFileContents(AtomStore.getFeedPath());
     }

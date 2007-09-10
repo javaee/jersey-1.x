@@ -78,8 +78,7 @@ public final class MessageContextResponseAdaptor extends HttpResponseContextImpl
         public InputStream getInputStream() throws IOException {
             final Object entity = getEntity();
             if (entity != null) {
-                final EntityProvider p = ProviderFactory.getInstance().createEntityProvider(entity.getClass());
-                p.writeTo(entity, getHttpHeaders(), getUnderlyingOutputStream());
+                writeEntity(entity, out);
                 return new ByteArrayInputStream(out.toByteArray());
             } else {
                 return new ByteArrayInputStream(new byte[0]);

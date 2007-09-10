@@ -83,8 +83,8 @@ public class WebResorceWithFieldInjectionTest extends AbstractBeanTester {
         
         @HttpMethod("GET")
         public String doGet() {
-            URI baseUri = uriInfo.getBaseURI();
-            URI uri = uriInfo.getURI();
+            URI baseUri = uriInfo.getBase();
+            URI uri = uriInfo.getAbsolute();
             assertEquals("/base/a/b", uri.toString());
             return "RETURN";
         }        

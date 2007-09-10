@@ -46,9 +46,9 @@ public class EscapedURITest extends TestCase {
     public static class EscapedURIResource {
         @HttpMethod
         public String get(@HttpContext UriInfo info) {
-            assertEquals("http://localhost:9998/context/x%20y", info.getURI().toString());
-            assertEquals("http://localhost:9998/context/", info.getBaseURI().toString());
-            assertEquals("x y", info.getURIPath());
+            assertEquals("http://localhost:9998/context/x%20y", info.getAbsolute().toString());
+            assertEquals("http://localhost:9998/context/", info.getBase().toString());
+            assertEquals("x y", info.getPath());
             return "CONTENT";
         }
     }

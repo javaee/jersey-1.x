@@ -52,7 +52,7 @@ public class ConstructorParamsTest extends AbstractBeanTester {
         @HttpMethod("GET")
         public void doGet() {
             assertEquals(id, "foo");            
-            assertEquals("foo", info.getURIPath());            
+            assertEquals("foo", info.getPath());            
         }
         
     }

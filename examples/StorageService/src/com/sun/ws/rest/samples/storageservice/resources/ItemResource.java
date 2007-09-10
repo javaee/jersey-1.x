@@ -122,11 +122,11 @@ public class ItemResource {
     }
     
     private URI getUri(String container) {
-        return uriInfo.getBaseURI().resolve("containers/" + container);
+        return uriInfo.getBase().resolve("containers/" + container);
     }
     
     private URI getUri(String container, String item) {
-        return uriInfo.getBaseURI().resolve("containers/" + container + "/" + item);
+        return uriInfo.getBase().resolve("containers/" + container + "/" + item);
     }
     
     private String computeDigest(byte[] content) {

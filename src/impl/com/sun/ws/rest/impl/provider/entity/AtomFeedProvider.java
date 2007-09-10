@@ -32,6 +32,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import org.jdom.Document;
 import org.jdom.output.Format;
@@ -48,8 +49,8 @@ public final class AtomFeedProvider extends AbstractTypeEntityProvider<Feed> {
         return type == Feed.class;
     }
 
-    public Feed readFrom(Class<Feed> type, 
-            String mediaType, MultivaluedMap<String, String> headers, InputStream entityStream) throws IOException {
+    public Feed readFrom(Class<Feed> type, MediaType mediaType, 
+            MultivaluedMap<String, String> headers, InputStream entityStream) throws IOException {
         try {
             WireFeedInput input = new WireFeedInput();                      
             WireFeed wireFeed = input.build(new InputStreamReader(entityStream));    
@@ -64,7 +65,7 @@ public final class AtomFeedProvider extends AbstractTypeEntityProvider<Feed> {
         }
     }
 
-    public void writeTo(Feed t, 
+    public void writeTo(Feed t, MediaType mediaType,
             MultivaluedMap<String, Object> headers, OutputStream entityStream) throws IOException {
         try {
             t.setFeedType(FEED_TYPE);

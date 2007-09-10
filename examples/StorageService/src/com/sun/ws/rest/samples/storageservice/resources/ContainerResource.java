@@ -111,7 +111,7 @@ public class ContainerResource {
     }
     
     private URI getUri(String container) {
-        return uriInfo.getBaseURI().resolve("containers/" + container);
+        return uriInfo.getBase().resolve("containers/" + container);
     }
 
     private boolean match(byte[] search, String container, String item) {

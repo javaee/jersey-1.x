@@ -28,6 +28,7 @@ import java.io.OutputStream;
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMultipart;
 import javax.mail.util.ByteArrayDataSource;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 
 /**
@@ -40,11 +41,11 @@ public final class MimeMultipartProvider extends AbstractTypeEntityProvider<Mime
         return type == MimeMultipart.class;
     }
 
-    public MimeMultipart readFrom(Class<MimeMultipart> type,
-            String mediaType, MultivaluedMap<String, String> headers, InputStream entityStream) throws IOException {
+    public MimeMultipart readFrom(Class<MimeMultipart> type, MediaType mediaType,
+            MultivaluedMap<String, String> headers, InputStream entityStream) throws IOException {
         if (mediaType == null)
-            mediaType = "multipart/form-data";
-        ByteArrayDataSource ds = new ByteArrayDataSource(entityStream, mediaType);
+            mediaType = new MediaType("multipart/form-data");
+        ByteArrayDataSource ds = new ByteArrayDataSource(entityStream, mediaType.toString());
         try {
             return new MimeMultipart(ds);
         } catch (MessagingException cause) {
@@ -54,7 +55,7 @@ public final class MimeMultipartProvider extends AbstractTypeEntityProvider<Mime
         }
     }
 
-    public void writeTo(MimeMultipart t, 
+    public void writeTo(MimeMultipart t, MediaType mediaType,
             MultivaluedMap<String, Object> headers, OutputStream entityStream) throws IOException {
         try {
             // TODO put boundary string as parameter of media type?

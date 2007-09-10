@@ -29,6 +29,7 @@ import java.io.OutputStream;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.util.StringTokenizer;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 
 /**
@@ -40,8 +41,8 @@ public final class FormURLEncodedProvider extends AbstractTypeEntityProvider<For
         return type == FormURLEncodedProperties.class;
     }
 
-    public FormURLEncodedProperties readFrom(Class<FormURLEncodedProperties> type, 
-            String mediaType, MultivaluedMap<String, String> headers, InputStream entityStream) throws IOException {
+    public FormURLEncodedProperties readFrom(Class<FormURLEncodedProperties> type, MediaType mediaType,
+            MultivaluedMap<String, String> headers, InputStream entityStream) throws IOException {
         String decoded = URLDecoder.decode(readFromAsString(entityStream), "UTF-8");
     
         FormURLEncodedProperties map = new FormURLEncodedProperties();
@@ -59,7 +60,7 @@ public final class FormURLEncodedProvider extends AbstractTypeEntityProvider<For
         return map;
     }
 
-    public void writeTo(FormURLEncodedProperties t, 
+    public void writeTo(FormURLEncodedProperties t, MediaType mediaType,
             MultivaluedMap<String, Object> headers, OutputStream entityStream) throws IOException {
         StringBuilder sb = new StringBuilder();
         int cnt = 0;

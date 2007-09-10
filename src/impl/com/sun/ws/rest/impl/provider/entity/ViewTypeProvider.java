@@ -27,6 +27,7 @@ import java.io.OutputStream;
 import javax.ws.rs.ext.EntityProvider;
 import java.io.IOException;
 import java.io.InputStream;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 
 /**
@@ -39,12 +40,13 @@ public final class ViewTypeProvider implements EntityProvider<ViewType> {
         return ViewType.class.isAssignableFrom(type);
     }
 
-    public ViewType readFrom(Class<ViewType> type,
-            String mediaType, MultivaluedMap<String, String> headers, InputStream entityStream) throws IOException {
+    public ViewType readFrom(Class<ViewType> type, MediaType mediaType,
+            MultivaluedMap<String, String> headers, InputStream entityStream) throws IOException {
         throw new UnsupportedOperationException();
     }
 
-    public void writeTo(ViewType t, MultivaluedMap<String, Object> httpHeaders, OutputStream entityStream) throws IOException {
+    public void writeTo(ViewType t, MediaType mediaType,
+            MultivaluedMap<String, Object> httpHeaders, OutputStream entityStream) throws IOException {
         t.process();
     }
 }

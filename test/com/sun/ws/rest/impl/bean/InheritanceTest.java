@@ -137,54 +137,5 @@ public class InheritanceTest extends AbstractBeanTester {
         HttpResponseContext response = callGet(SubResourceWithProduceOverride.class, "/", "application/default");
         String sr = (String)response.getEntity();
         assertEquals("suboverride", sr);
-    }
-    
-    
-    @UriTemplate("/")
-    static public abstract class SuperResourceWithTemplate { 
-        @HttpMethod("GET")
-        @ProduceMime("application/super")
-        public String doGet() {
-            return "super";
-        }
-    }
-    
-    static public class SubResourceWithTemplate extends SuperResourceWithTemplate { 
-        @HttpMethod("GET")
-        public Response doGetSub() {
-            return Response.Builder.representation("sub", "application/default").build();
-        }
-    }
-    
-    @UriTemplate("/override")
-    static public class SubResourceWithTemplateOverride extends SuperResourceWithTemplate { 
-        @HttpMethod("GET")
-        public Response doGetSub() {
-            return Response.Builder.representation("sub", "application/default").build();
-        }
-    }
-    
-    public void testSuperResourceWithTemplateGet() {
-        HttpResponseContext response = callGet(SubResourceWithTemplate.class, "/", "application/super");
-        String sr = (String)response.getEntity();
-        assertEquals("super", sr);
-    }
-    
-    public void testSubResourceWithTemplateGet() {
-        HttpResponseContext response = callGet(SubResourceWithTemplate.class, "/", "application/sub");
-        String sr = (String)response.getEntity();
-        assertEquals("sub", sr);
-    }
-    
-    public void testSuperResourceWithTemplateOverrideGet() {
-        HttpResponseContext response = callNoStatusCheck(SubResourceWithTemplateOverride.class, "GET", 
-                "/", null, "application/super", "");
-        assertEquals(404, response.getStatus());
-    }
-    
-    public void testSubResourceWithTemplateOverrideGet() {
-        HttpResponseContext response = callGet(SubResourceWithTemplateOverride.class, "/override", "application/sub");
-        String sr = (String)response.getEntity();
-        assertEquals("sub", sr);
-    }
+    }        
 }

@@ -28,12 +28,24 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.Reader;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.MultivaluedMap;
 
 /**
  *
  * @author Paul.Sandoz@Sun.Com
  */
 public abstract class AbstractTypeEntityProvider<T> implements EntityProvider<T> {
+    public final void writeTo(T t, 
+            MultivaluedMap<String, Object> httpHeaders,
+            OutputStream entityStream) throws IOException {
+        Object mediaType = httpHeaders.getFirst("Content-Type");
+        if (mediaType instanceof MediaType) {
+            writeTo(t, (MediaType)mediaType, httpHeaders, entityStream);
+        } else {
+            writeTo(t, new MediaType(mediaType.toString()), httpHeaders, entityStream);
+        }
+    }
     
     public final void writeTo(InputStream in, OutputStream out) throws IOException {
         int read;

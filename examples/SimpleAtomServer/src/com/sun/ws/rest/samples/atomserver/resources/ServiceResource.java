@@ -68,6 +68,6 @@ public class ServiceResource {
     @HttpContext UriInfo uriInfo;
     
     private String getCollectionUri() {
-        return uriInfo.getBaseURI() + "collection/";
+        return uriInfo.getBase() + "collection/";
     }
 }

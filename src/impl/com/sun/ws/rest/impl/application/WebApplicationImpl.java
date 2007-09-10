@@ -158,7 +158,7 @@ public final class WebApplicationImpl implements WebApplication {
         context.set(localContext);
         
         if (resourceConfig.isRedirectToNormalizedURI()) {
-            final URI uri = request.getURI();
+            final URI uri = request.getAbsolute();
             final URI normalizedUri = uri.normalize();            
 
             if (uri != normalizedUri) {
@@ -168,7 +168,7 @@ public final class WebApplicationImpl implements WebApplication {
         }
 
         // TODO the matching algorithm currently works from an absolute path
-        String path = "/" + request.getURIPath();
+        String path = "/" + request.getPath();
 
         if (resourceConfig.isIgnoreMatrixParams())
             // TODO check for annotation on resource
