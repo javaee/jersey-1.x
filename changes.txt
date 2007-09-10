@@ -1,4 +1,6 @@
 release 0.3 (2007-10-xx)
+- Integrated JSR 311 API 0.3. 
+  <TODO include summary of API changes>
 - Correctly support the writing of responses for the method signature:
     void <method>(HttpRequestContext, HttpResponseContext)
   this includes the method signature for resources that implement the interface
