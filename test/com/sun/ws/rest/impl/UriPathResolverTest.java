@@ -193,6 +193,7 @@ public class UriPathResolverTest extends TestCase {
         resolver.add(new UriTemplateType("/{p1}", UriTemplateType.RIGHT_HANDED_REGEX), "/{p1}");        
         resolver.add(new UriTemplateType("/edit", UriTemplateType.RIGHT_HANDED_REGEX), "/edit");        
         resolver.add(new UriTemplateType("/edit/{p1}", UriTemplateType.RIGHT_HANDED_REGEX), "/edit/{p1}");        
+        resolver.add(new UriTemplateType("/edit/a{p1}", UriTemplateType.RIGHT_HANDED_REGEX), "/edit/a{p1}");        
         
         StringBuilder path = new StringBuilder("/a");
         String s = resolver.resolve(path, path, templateValues);
@@ -201,17 +202,31 @@ public class UriPathResolverTest extends TestCase {
         assertEquals("a", templateValues.get("p1"));
         assertEquals("", path.toString());
         
-        path = new StringBuilder("/edit/a");
-        s = resolver.resolve(path, path, templateValues);
-        assertEquals("/edit/{p1}", s);
-        assertEquals(1, templateValues.size());
-        assertEquals("a", templateValues.get("p1"));
-        assertEquals("", path.toString());
-        
         path = new StringBuilder("/edit");
         s = resolver.resolve(path, path, templateValues);
         assertEquals("/edit", s);
         assertEquals(0, templateValues.size());
+        assertEquals("", path.toString());
+        
+        path = new StringBuilder("/edit/b");
+        s = resolver.resolve(path, path, templateValues);
+        assertEquals("/edit/{p1}", s);
+        assertEquals(1, templateValues.size());
+        assertEquals("b", templateValues.get("p1"));
+        assertEquals("", path.toString());
+                
+        path = new StringBuilder("/edit/a");
+        s = resolver.resolve(path, path, templateValues);
+        assertEquals("/edit/a{p1}", s);
+        assertEquals(1, templateValues.size());
+        assertEquals("", templateValues.get("p1"));
+        assertEquals("", path.toString());
+        
+        path = new StringBuilder("/edit/a_one");
+        s = resolver.resolve(path, path, templateValues);
+        assertEquals("/edit/a{p1}", s);
+        assertEquals(1, templateValues.size());
+        assertEquals("_one", templateValues.get("p1"));
         assertEquals("", path.toString());
     }
     
