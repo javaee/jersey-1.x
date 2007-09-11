@@ -23,9 +23,9 @@
 package com.sun.ws.rest.impl.model;
 
 import com.sun.ws.rest.api.core.ResourceConfig;
-import com.sun.ws.rest.impl.dispatch.URITemplateDispatcher;
+import com.sun.ws.rest.impl.dispatch.UriTemplateDispatcher;
 import com.sun.ws.rest.spi.dispatch.ResourceDispatchContext;
-import com.sun.ws.rest.spi.dispatch.URITemplateType;
+import com.sun.ws.rest.spi.dispatch.UriTemplateType;
 import com.sun.ws.rest.spi.resource.ResourceProviderFactory;
 import java.util.Collections;
 import java.util.Set;
@@ -79,15 +79,11 @@ public final class RootResourceClass extends BaseResourceClass {
     private void add(Set<Class> resourceClasses) {
         for (Class resourceClass : resourceClasses)
             addResource(resourceClass);
-        
-        Collections.sort(dispatchers, URITemplateDispatcher.COMPARATOR);
     }
     
     private void add(Class<?>... resourceClasses) {
         for (Class resourceClass : resourceClasses)
             addResource(resourceClass);
-        
-        Collections.sort(dispatchers, URITemplateDispatcher.COMPARATOR);
     }
     
     private void addResource(final Class<?> c) {
@@ -105,14 +101,14 @@ public final class RootResourceClass extends BaseResourceClass {
         if (!tValue.startsWith("/"))
             tValue = "/" + tValue;
         String rightHandPattern = (resourceClass.hasSubResources) ? 
-                URITemplateType.RIGHT_HANDED_REGEX : URITemplateType.RIGHT_SLASHED_REGEX;
-        URITemplateType t = new URITemplateType(tValue, rightHandPattern);
+                UriTemplateType.RIGHT_HANDED_REGEX : UriTemplateType.RIGHT_SLASHED_REGEX;
+        UriTemplateType t = new UriTemplateType(tValue, rightHandPattern);
         
-        URITemplateDispatcher d = ClassDispatcherFactory.create(t, c);
-        dispatchers.add(d);
+        UriTemplateDispatcher d = ClassDispatcherFactory.create(t, c);
+        uriResolver.add(d.getTemplate(), d);
     }
     
-    public boolean dispatch(ResourceDispatchContext context, String path) {
+    public boolean dispatch(ResourceDispatchContext context, StringBuilder path) {
         return dispatch(context, null, path);
     }
 }

@@ -24,11 +24,11 @@ package com.sun.ws.rest.impl.model.node;
 
 import com.sun.ws.rest.api.container.ContainerException;
 import com.sun.ws.rest.impl.ImplMessages;
-import com.sun.ws.rest.impl.dispatch.URITemplateDispatcher;
+import com.sun.ws.rest.impl.dispatch.UriTemplateDispatcher;
 import com.sun.ws.rest.impl.model.parameter.AbstractParameterProcessor;
 import com.sun.ws.rest.impl.model.parameter.ParameterExtractor;
 import com.sun.ws.rest.impl.model.parameter.ParameterProcessor;
-import com.sun.ws.rest.spi.dispatch.URITemplateType;
+import com.sun.ws.rest.spi.dispatch.UriTemplateType;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
@@ -44,7 +44,7 @@ public final class NodeDispatcherFactory {
     private NodeDispatcherFactory() {
     }
 
-    public static URITemplateDispatcher create(final URITemplateType t, final Method m) {
+    public static UriTemplateDispatcher create(final UriTemplateType t, final Method m) {
         ParameterExtractor[] extractors = processParameters(m);
         for (ParameterExtractor extractor: extractors) {
             if (extractor == null) {

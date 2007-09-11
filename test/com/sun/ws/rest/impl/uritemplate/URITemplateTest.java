@@ -22,7 +22,7 @@
 
 package com.sun.ws.rest.impl.uritemplate;
 
-import com.sun.ws.rest.spi.dispatch.URITemplateType;
+import com.sun.ws.rest.spi.dispatch.UriTemplateType;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -57,7 +57,7 @@ public class URITemplateTest extends TestCase {
     }
     
     void _testTemplateNames(String template, String... names) {
-        URITemplateType t = new URITemplateType(template);
+        UriTemplateType t = new UriTemplateType(template);
         _testTemplateNames(t.getTemplateVariables(), names);
     }
     
@@ -98,7 +98,7 @@ public class URITemplateTest extends TestCase {
     }
     
     void _testMatching(String template, String uri, String... values) {
-        URITemplateType t = new URITemplateType(template);
+        UriTemplateType t = new UriTemplateType(template);
         Map<String, String> m = new HashMap<String, String>();
         
         System.out.println("TEMPLATE: " + template);
@@ -121,27 +121,27 @@ public class URITemplateTest extends TestCase {
     public void testNullMatching() {
         Map<String, String> m = new HashMap<String, String>();
         
-        URITemplateType t = URITemplateType.NULL;
+        UriTemplateType t = UriTemplateType.NULL;
         assertEquals(false, t.match("/", m));
         assertEquals(true, t.match(null, m));
         
-        t = new URITemplateType("/{v}");
+        t = new UriTemplateType("/{v}");
         assertEquals(false, t.match(null, m));
         assertEquals(true, t.match("/one", m));
     }
     
     public void testNullOrder() {
-        List<URITemplateType> l = new ArrayList<URITemplateType>();
+        List<UriTemplateType> l = new ArrayList<UriTemplateType>();
         
-        l.add(URITemplateType.NULL);
-        l.add(new URITemplateType("/{a}"));
-        l.add(new URITemplateType("/{a}/{b}"));
-        l.add(new URITemplateType("/{a}/one/{b}"));
+        l.add(UriTemplateType.NULL);
+        l.add(new UriTemplateType("/{a}"));
+        l.add(new UriTemplateType("/{a}/{b}"));
+        l.add(new UriTemplateType("/{a}/one/{b}"));
         
-        Collections.sort(l, URITemplateType.COMPARATOR);
+        Collections.sort(l, UriTemplateType.COMPARATOR);
         
-        URITemplateType t = l.get(l.size() - 1);
-        assertEquals(URITemplateType.NULL, t);
+        UriTemplateType t = l.get(l.size() - 1);
+        assertEquals(UriTemplateType.NULL, t);
     }
     
     public void testSubstitutionArray() {
@@ -172,7 +172,7 @@ public class URITemplateTest extends TestCase {
     }
     
     void _testSubstitutionArray(String template, String uri, String... values) {
-        URITemplateType t = new URITemplateType(template);
+        UriTemplateType t = new UriTemplateType(template);
         
         assertEquals(uri, t.createURI(values));
     }
@@ -209,7 +209,7 @@ public class URITemplateTest extends TestCase {
     }
     
     void _testSubstitutionMap(String template, String uri, String... variablesAndvalues) {
-        URITemplateType t = new URITemplateType(template);
+        UriTemplateType t = new UriTemplateType(template);
         
         Map<String, String> variableMap = new HashMap<String, String>();
         for (int i = 0; i < variablesAndvalues.length; i+=2)

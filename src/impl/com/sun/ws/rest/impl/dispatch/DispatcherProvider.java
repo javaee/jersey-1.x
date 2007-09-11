@@ -39,5 +39,5 @@ public interface DispatcherProvider {
      * @param config the resource configuration.
      * @return the array of dispatchers for the resource.
      */
-    URITemplateDispatcher[] createDispatchers(Class<?> resource, ResourceConfig config) throws ContainerException;    
+    UriTemplateDispatcher[] createDispatchers(Class<?> resource, ResourceConfig config) throws ContainerException;    
 }

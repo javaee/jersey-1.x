@@ -27,5 +27,5 @@ package com.sun.ws.rest.spi.dispatch;
  * @author Paul.Sandoz@Sun.Com
  */
 public interface ResourceDispatcher {
-    boolean dispatch(ResourceDispatchContext context, Object node, String path);
+    boolean dispatch(ResourceDispatchContext context, Object node, StringBuilder path);
 }

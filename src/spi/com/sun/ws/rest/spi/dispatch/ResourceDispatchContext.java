@@ -25,6 +25,7 @@ package com.sun.ws.rest.spi.dispatch;
 import com.sun.ws.rest.api.core.HttpContextAccess;
 import com.sun.ws.rest.api.core.HttpRequestContext;
 import com.sun.ws.rest.api.core.HttpResponseContext;
+import java.util.Map;
 
 /**
  *
@@ -38,11 +39,12 @@ public interface ResourceDispatchContext {
     
     public HttpResponseContext getHttpResponseContext();
 
-    public boolean dispatchTo(Class nodeClass, String path);
+    public boolean dispatchTo(Class nodeClass, StringBuilder path);
     
-    public boolean dispatchTo(Object node, String path);
+    public boolean dispatchTo(Object node, StringBuilder path);
     
-    public boolean matchLeftHandPath(URITemplateType t, String path);
-
-    public String getRightHandPath();
+        
+    public Map<String, String> getTemplateParameters();
+    
+    public void commitTemplateParameters(Map<String, String> templateParameters);
 }

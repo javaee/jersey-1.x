@@ -28,11 +28,11 @@ import com.sun.ws.rest.api.core.HttpResponseContext;
 import com.sun.ws.rest.impl.ResponseBuilderImpl;
 import javax.ws.rs.core.MediaType;
 import com.sun.ws.rest.impl.ImplMessages;
-import com.sun.ws.rest.impl.dispatch.URITemplateDispatcher;
+import com.sun.ws.rest.impl.dispatch.UriTemplateDispatcher;
 import com.sun.ws.rest.spi.dispatch.ResourceDispatchContext;
 import com.sun.ws.rest.impl.model.HttpHelper;
 import com.sun.ws.rest.impl.response.Responses;
-import com.sun.ws.rest.spi.dispatch.URITemplateType;
+import com.sun.ws.rest.spi.dispatch.UriTemplateType;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.logging.Logger;
@@ -43,17 +43,17 @@ import javax.ws.rs.core.Response;
  *
  * @author Paul.Sandoz@Sun.Com
  */
-public class ResourceMethodMapDispatcher extends URITemplateDispatcher {
+public class ResourceMethodMapDispatcher extends UriTemplateDispatcher {
     private static final Logger LOGGER = Logger.getLogger(ResourceMethodMapDispatcher.class.getName());
     
     final ResourceMethodMap map;
     
-    public ResourceMethodMapDispatcher(URITemplateType template, ResourceMethodMap map) {
+    public ResourceMethodMapDispatcher(UriTemplateType template, ResourceMethodMap map) {
         super(template);
         this.map = map;
     }
 
-    public boolean dispatch(ResourceDispatchContext context, Object node, String path) {
+    public boolean dispatch(ResourceDispatchContext context, Object node, StringBuilder path) {
         final HttpRequestContext request = context.getHttpRequestContext();
         final HttpResponseContext response = context.getHttpResponseContext();
         final String httpMethod = request.getHttpMethod();

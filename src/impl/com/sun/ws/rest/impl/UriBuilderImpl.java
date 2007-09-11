@@ -23,7 +23,7 @@
 package com.sun.ws.rest.impl;
 
 import com.sun.ws.rest.api.core.UriComponent;
-import com.sun.ws.rest.spi.dispatch.URITemplateType;
+import com.sun.ws.rest.spi.dispatch.UriTemplateType;
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Method;
 import java.net.URI;
@@ -268,14 +268,14 @@ public final class UriBuilderImpl extends UriBuilder {
     }
 
     public URI build(Map<String, String> values) {
-        String uri = URITemplateType.createURI(scheme, 
+        String uri = UriTemplateType.createURI(scheme, 
                 userInfo, host, String.valueOf(port), 
                 path.toString(), query.toString(), fragment, values, encode);
         return createURI(uri);
     }
 
     public URI build(String... values) {
-        String uri = URITemplateType.createURI(scheme, 
+        String uri = UriTemplateType.createURI(scheme, 
                 userInfo, host, String.valueOf(port), 
                 path.toString(), query.toString(), fragment, values, encode);
         return createURI(uri);              

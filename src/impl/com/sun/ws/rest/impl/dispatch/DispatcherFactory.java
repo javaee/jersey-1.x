@@ -45,15 +45,15 @@ public final class DispatcherFactory {
      * @param config the the resource configuration.
      * @return the array of dispatchers for the resource.
      */
-    public static URITemplateDispatcher[] createDispatchers(Class resource, ResourceConfig config) throws ContainerException {
-        List<URITemplateDispatcher> l = new ArrayList<URITemplateDispatcher>();
+    public static UriTemplateDispatcher[] createDispatchers(Class resource, ResourceConfig config) throws ContainerException {
+        List<UriTemplateDispatcher> l = new ArrayList<UriTemplateDispatcher>();
         
         for (DispatcherProvider vp : ServiceFinder.find(DispatcherProvider.class)) {
-            URITemplateDispatcher[] ds = vp.createDispatchers(resource, config);
+            UriTemplateDispatcher[] ds = vp.createDispatchers(resource, config);
             if (ds != null)
                 Collections.addAll(l, ds);
         }
         
-        return l.toArray(new URITemplateDispatcher[0]);
+        return l.toArray(new UriTemplateDispatcher[0]);
     }    
 }

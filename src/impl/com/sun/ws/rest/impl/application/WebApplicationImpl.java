@@ -33,7 +33,7 @@ import com.sun.ws.rest.api.core.HttpResponseContext;
 import com.sun.ws.rest.api.core.ResourceConfig;
 import com.sun.ws.rest.impl.ResponseBuilderImpl;
 import com.sun.ws.rest.impl.ThreadLocalHttpContext;
-import com.sun.ws.rest.impl.dispatch.URITemplateDispatcher;
+import com.sun.ws.rest.impl.dispatch.UriTemplateDispatcher;
 import com.sun.ws.rest.impl.model.ResourceClass;
 import com.sun.ws.rest.impl.model.RootResourceClass;
 import com.sun.ws.rest.impl.response.Responses;
@@ -91,7 +91,7 @@ public final class WebApplicationImpl implements WebApplication {
     
     final Map<Class<?>, Injectable> injectables;
     
-    public final List<URITemplateDispatcher> dispatchers = new ArrayList<URITemplateDispatcher>();
+    public final List<UriTemplateDispatcher> dispatchers = new ArrayList<UriTemplateDispatcher>();
     
     private final Map<Class, ResourceClass> metaClassMap = new WeakHashMap<Class, ResourceClass>();
     
@@ -168,7 +168,8 @@ public final class WebApplicationImpl implements WebApplication {
         }
 
         // TODO the matching algorithm currently works from an absolute path
-        String path = "/" + request.getPath();
+        StringBuilder path = new StringBuilder();
+        path.append("/").append(request.getPath());
 
         if (resourceConfig.isIgnoreMatrixParams())
             // TODO check for annotation on resource
@@ -188,8 +189,8 @@ public final class WebApplicationImpl implements WebApplication {
     /**
      * Strip the matrix parameters from a path
      */
-    private String stripMatrixParams(String path) {        
-        int e = path.indexOf(';');
+    private StringBuilder stripMatrixParams(StringBuilder path) {        
+        int e = path.indexOf(";");
         if (e == -1)
             return path;
 
@@ -200,11 +201,11 @@ public final class WebApplicationImpl implements WebApplication {
             sb.append(path, s, e);
 
             // Skip everything up to but not including the '/'
-            s = path.indexOf('/', e + 1);
+            s = path.indexOf("/", e + 1);
             if (s == -1) {
                 break;
             }
-            e = path.indexOf(';', s);
+            e = path.indexOf(";", s);
         } while(e != -1);
         
         if (s != -1) {
@@ -212,7 +213,7 @@ public final class WebApplicationImpl implements WebApplication {
             sb.append(path, s, path.length());
         }
         
-        return sb.toString();
+        return sb;
     }  
         
     private abstract class HttpContextInjectable<V> extends Injectable<HttpContext, V> {

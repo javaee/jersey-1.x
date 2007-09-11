@@ -35,7 +35,7 @@ import com.sun.ws.rest.impl.view.ViewFactory;
 import com.sun.ws.rest.impl.view.ViewType;
 import com.sun.ws.rest.spi.container.ContainerRequest;
 import com.sun.ws.rest.spi.container.ContainerResponse;
-import com.sun.ws.rest.spi.dispatch.URITemplateType;
+import com.sun.ws.rest.spi.dispatch.UriTemplateType;
 import com.sun.ws.rest.spi.resource.ResourceProviderContext;
 import com.sun.ws.rest.spi.view.View;
 import java.io.IOException;
@@ -99,36 +99,28 @@ final class WebApplicationContext implements HttpContextAccess, ResourceDispatch
         return this;
     }
     
-    public boolean dispatchTo(final Class nodeClass, final String path) {
+    public boolean dispatchTo(final Class nodeClass, final StringBuilder path) {
         final ResourceClass resourceClass = app.getResourceClass(nodeClass);
         final Object node = it = resourceClass.resolver.getInstance(this);
         return resourceClass.dispatch(this, node, path);
     }
 
-    public boolean dispatchTo(final Object node, final String path) {
+    public boolean dispatchTo(final Object node, final StringBuilder path) {
         it = node;
         return app.getResourceClass(node.getClass()).dispatch(this, node, path);
     }
-    
-    public boolean matchLeftHandPath(URITemplateType t, String path) {
-        if (t.match(path, templateValues)) {
-            setTemplateValues();
-            return true;
-        } else {
-            return false;
-        }
-    }
-
-    public String getRightHandPath() {
-        return templateValues.get(null);
+        
+    public Map<String, String> getTemplateParameters() {
+        return templateValues;
     }
     
-    private void setTemplateValues() {
+    public void commitTemplateParameters(Map<String, String> templateParameters) {
         final MultivaluedMap<String, String> m = request.getTemplateParameters();
-        for (Map.Entry<String, String> e : templateValues.entrySet()) {
+        for (Map.Entry<String, String> e : templateParameters.entrySet()) {
             m.putSingle(e.getKey(), e.getValue());
-        }
+        }        
     }
+    
     
     // ResourceProviderContext
             

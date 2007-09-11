@@ -24,25 +24,25 @@ package com.sun.ws.rest.impl.model.node;
 
 import javax.ws.rs.WebApplicationException;
 import com.sun.ws.rest.api.container.ContainerException;
-import com.sun.ws.rest.impl.dispatch.URITemplateDispatcher;
+import com.sun.ws.rest.impl.dispatch.UriTemplateDispatcher;
 import com.sun.ws.rest.spi.dispatch.ResourceDispatchContext;
 import com.sun.ws.rest.impl.model.parameter.ParameterExtractor;
-import com.sun.ws.rest.spi.dispatch.URITemplateType;
+import com.sun.ws.rest.spi.dispatch.UriTemplateType;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
-class NodeDispatcher extends URITemplateDispatcher {
+class NodeDispatcher extends UriTemplateDispatcher {
     final ParameterExtractor[] extractors;
     
     final Method m;
 
-    NodeDispatcher(final URITemplateType t, final Method m, ParameterExtractor[] extractors) {
+    NodeDispatcher(final UriTemplateType t, final Method m, ParameterExtractor[] extractors) {
         super(t);
         this.m = m;
         this.extractors = extractors;
     }
 
-    public boolean dispatch(ResourceDispatchContext context, Object node, String path) {
+    public boolean dispatch(ResourceDispatchContext context, Object node, StringBuilder path) {
         try {
             if (extractors == null) {
                 node = m.invoke(node);

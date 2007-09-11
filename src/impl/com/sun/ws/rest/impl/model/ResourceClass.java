@@ -33,7 +33,7 @@ import com.sun.ws.rest.api.core.HttpResponseContext;
 import com.sun.ws.rest.api.core.ResourceConfig;
 import com.sun.ws.rest.api.core.WebResource;
 import com.sun.ws.rest.api.view.Views;
-import com.sun.ws.rest.impl.dispatch.URITemplateDispatcher;
+import com.sun.ws.rest.impl.dispatch.UriTemplateDispatcher;
 import com.sun.ws.rest.impl.model.method.WebResourceInterfaceMethod;
 import com.sun.ws.rest.impl.model.method.ResourceHeadWrapperMethod;
 import com.sun.ws.rest.impl.model.method.ResourceHttpMethod;
@@ -44,7 +44,7 @@ import com.sun.ws.rest.impl.model.method.ResourceMethodMap;
 import com.sun.ws.rest.impl.model.method.ResourceMethodMapDispatcher;
 import com.sun.ws.rest.impl.model.method.ResourceViewMethod;
 import com.sun.ws.rest.impl.model.node.NodeDispatcherFactory;
-import com.sun.ws.rest.spi.dispatch.URITemplateType;
+import com.sun.ws.rest.spi.dispatch.UriTemplateType;
 import com.sun.ws.rest.spi.resource.ResourceProvider;
 import com.sun.ws.rest.spi.resource.ResourceProviderFactory;
 import com.sun.ws.rest.spi.view.View;
@@ -91,7 +91,7 @@ public final class ResourceClass extends BaseResourceClass {
         hasSubResources = 
                 processSubResourceLocators(methods);
                 
-        final Map<URITemplateType, ResourceMethodMap> templatedMethodMap = 
+        final Map<UriTemplateType, ResourceMethodMap> templatedMethodMap = 
                 processSubResourceMethods(methods);
 
         final ResourceMethodMap methodMap = 
@@ -103,37 +103,36 @@ public final class ResourceClass extends BaseResourceClass {
 
         
         // Create the dispatchers for the sub-resource HTTP methods
-        for (Map.Entry<URITemplateType, ResourceMethodMap> e : templatedMethodMap.entrySet()) {
+        for (Map.Entry<UriTemplateType, ResourceMethodMap> e : templatedMethodMap.entrySet()) {
             hasSubResources = true;
             
             e.getValue().sort();
-            dispatchers.add(new ResourceMethodMapDispatcher(e.getKey(), e.getValue()));
+            uriResolver.add(e.getKey(), 
+                    new ResourceMethodMapDispatcher(e.getKey(), e.getValue()));
         }
         
         // Create the dispatcher for the HTTP methods
         if (!methodMap.isEmpty()) {
             methodMap.sort();
-            dispatchers.add(new ResourceMethodMapDispatcher(URITemplateType.NULL, methodMap));
+            uriResolver.add(UriTemplateType.NULL, 
+                    new ResourceMethodMapDispatcher(UriTemplateType.NULL, methodMap));
         }
         
         
-        if (dispatchers.isEmpty()) {
+        if (uriResolver.getUriTemplates().isEmpty()) {
             String message = "The class " 
                     + c + 
                     " does not contain any sub-resource locators, sub-resource HTTP methods or HTTP methods";
             LOGGER.severe(message);
             throw new ContainerException(message);
         }
-
         
-        // Sort the dispatchers using the URI template as the primiary sort key
-        Collections.sort(dispatchers, URITemplateDispatcher.COMPARATOR);
         this.hasSubResources = hasSubResources;
     }
     
     private void addToTemplatedMethodMap(
-            Map<URITemplateType, ResourceMethodMap> tmm,
-            URITemplateType t,
+            Map<UriTemplateType, ResourceMethodMap> tmm,
+            UriTemplateType t,
             ResourceMethod rm) {
         ResourceMethodMap rmm = tmm.get(t);
         if (rmm == null) {
@@ -160,29 +159,29 @@ public final class ResourceClass extends BaseResourceClass {
             String tValue = tAnnotation.value();
             if (!tValue.startsWith("/"))
                 tValue = "/" + tValue;
-            URITemplateType t = (tAnnotation.limited()) ? new URITemplateType(
-                    tValue, URITemplateType.RIGHT_HANDED_REGEX) : 
-                new URITemplateType(
-                    tValue, URITemplateType.RIGHT_SLASHED_REGEX);
+            UriTemplateType t = (tAnnotation.limited()) ? new UriTemplateType(
+                    tValue, UriTemplateType.RIGHT_HANDED_REGEX) : 
+                new UriTemplateType(
+                    tValue, UriTemplateType.RIGHT_SLASHED_REGEX);
             
-            final URITemplateDispatcher d = NodeDispatcherFactory.create(t, m);            
-            dispatchers.add(d);
+            final UriTemplateDispatcher d = NodeDispatcherFactory.create(t, m);            
+            uriResolver.add(d.getTemplate(), d);
         }
         
         return hasSubResources;
     }
     
-    private Map<URITemplateType, ResourceMethodMap> processSubResourceMethods(MethodList methods) {
-        final Map<URITemplateType, ResourceMethodMap> templatedMethodMap = 
-                new HashMap<URITemplateType, ResourceMethodMap>();
+    private Map<UriTemplateType, ResourceMethodMap> processSubResourceMethods(MethodList methods) {
+        final Map<UriTemplateType, ResourceMethodMap> templatedMethodMap = 
+                new HashMap<UriTemplateType, ResourceMethodMap>();
         for (Method m : methods.hasAnnotation(HttpMethod.class).hasAnnotation(UriTemplate.class)) {
             // TODO what does it mean to support limited=false
             // for sub-resource methods?
             String tValue = m.getAnnotation(UriTemplate.class).value();
             if (!tValue.startsWith("/"))
                 tValue = "/" + tValue;            
-            URITemplateType t = new URITemplateType(tValue, 
-                    URITemplateType.RIGHT_SLASHED_REGEX);
+            UriTemplateType t = new UriTemplateType(tValue, 
+                    UriTemplateType.RIGHT_SLASHED_REGEX);
             
             ResourceMethod rm = new ResourceHttpMethod(this, m);
             addToTemplatedMethodMap(templatedMethodMap, t, rm);
@@ -259,7 +258,7 @@ public final class ResourceClass extends BaseResourceClass {
     
     private void processViews(Object containerMemento, 
             ResourceMethodMap methodMap, 
-            Map<URITemplateType, ResourceMethodMap> templatedMethodMap) {        
+            Map<UriTemplateType, ResourceMethodMap> templatedMethodMap) {        
 
         // Get all the view names
         Map<String, Class<?>> viewMap = getViews();
@@ -270,14 +269,14 @@ public final class ResourceClass extends BaseResourceClass {
             final String viewName = view.getKey();
             
             String path = getAbsolutePathOfView(resourceClass, viewName);
-            URITemplateType t = getURITemplateOfView(resourceClass, viewName);
+            UriTemplateType t = getURITemplateOfView(resourceClass, viewName);
             
             View v = ViewFactory.createView(containerMemento, path);
             if (v == null)
                 continue;
             
             ResourceMethod rm = new ResourceViewMethod(this, v);
-            if (t.equals(URITemplateType.NULL)) {
+            if (t.equals(UriTemplateType.NULL)) {
                 methodMap.put(rm);
             } else {
                 addToTemplatedMethodMap(templatedMethodMap, t, rm);
@@ -310,7 +309,7 @@ public final class ResourceClass extends BaseResourceClass {
         return viewMap;
     }
     
-    private URITemplateType getURITemplateOfView(Class<?> resourceClass, String path) {
+    private UriTemplateType getURITemplateOfView(Class<?> resourceClass, String path) {
         if (path.startsWith("/")) {
             // TODO get the name of the leaf node of the path
             // and use that for the URI template
@@ -318,14 +317,14 @@ public final class ResourceClass extends BaseResourceClass {
         } 
         
         if (path.matches("index\\.[^/]*")) {
-            return URITemplateType.NULL;
+            return UriTemplateType.NULL;
         } else {
             path = "/" + path;            
             int i = path.lastIndexOf('.');
             if (i > 0)
                 path = path.substring(0, i);
             
-            return new URITemplateType(path);            
+            return new UriTemplateType(path);            
         }
     }
     

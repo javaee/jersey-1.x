@@ -41,7 +41,7 @@ import java.util.regex.Pattern;
  * <p>
  * @author Paul.Sandoz@Sun.Com
  */
-public final class URITemplateType {
+public final class UriTemplateType {
     /**
      * Order the templates according to the template with the highest number
      * of template variables first. 
@@ -52,8 +52,8 @@ public final class URITemplateType {
      * characters) occurs before a template with a less explicit regular
      * expression.
      */
-    static public final Comparator<URITemplateType> COMPARATOR = new Comparator<URITemplateType>() {
-        public int compare(URITemplateType o1, URITemplateType o2) {
+    static public final Comparator<UriTemplateType> COMPARATOR = new Comparator<UriTemplateType>() {
+        public int compare(UriTemplateType o1, UriTemplateType o2) {
             if (o1 == null && o2 == null)
                 return 0;
             if (o1 == null)
@@ -105,7 +105,7 @@ public final class URITemplateType {
      */
     public static final String RIGHT_SLASHED_REGEX = "(/)?";
     
-    public static final URITemplateType NULL = new URITemplateType();
+    public static final UriTemplateType NULL = new UriTemplateType();
             
     /**
      * The URI template.
@@ -135,7 +135,7 @@ public final class URITemplateType {
     private final Pattern templateRegexPattern;
 
     // Constructor for NULL template
-    private URITemplateType() {
+    private UriTemplateType() {
         this.template = "";
         this.rightHandPattern = null;
         this.endsWithSlash = false;
@@ -159,7 +159,7 @@ public final class URITemplateType {
      * @throws {@link IllegalArgumentException} if the template is null or
      *         an empty string.
      */
-    public URITemplateType(String template) {
+    public UriTemplateType(String template) {
         this(template, null);
     }
     
@@ -180,7 +180,7 @@ public final class URITemplateType {
      * @throws {@link IllegalArgumentException} if the template is null or
      *         an empty string.
      */
-    public URITemplateType(String template, String rightHandPattern) {
+    public UriTemplateType(String template, String rightHandPattern) {
         if (template == null)
             throw new IllegalArgumentException(SpiMessages.URITEMPLATE_CANNOT_BE_NULL());
         
@@ -322,18 +322,19 @@ public final class URITemplateType {
      * @param uri the uri to match against the template.
      * @param templateVariableToValue the map where to put template variables (as keys)
      *        and template values (as values). The map is cleared before any
-     *        entries are put.
+     *        entries are put. The matching group for a right hand expression (if any)
+     *        is placed in the map using the NULL key.
      * @return true if the URI matches the template, otherwise false.
      * @throws {@link IllegalArgumentException} if the uri or 
      *         templateVariableToValue is null.
      */
-    public boolean match(String uri, Map<String, String> templateVariableToValue) {
+    public boolean match(CharSequence uri, Map<String, String> templateVariableToValue) {
         if (templateVariableToValue == null) 
             throw new IllegalArgumentException(SpiMessages.TEMPLATE_NAME_TO_VALUE_NOT_NULL());
 
         templateVariableToValue.clear();
                 
-        if (uri == null)
+        if (uri == null || uri.length() == 0)
             return (templateRegexPattern == null) ? true : false;
         
         if (templateRegexPattern == null)
@@ -362,6 +363,81 @@ public final class URITemplateType {
         // Assign the right hand side value to the null key
         if (rightHandPattern != null) {
             templateVariableToValue.put(null, m.group(i));
+        }
+        
+        return true;
+    }
+    
+    /**
+     * Match a URI against the template.
+     * <p>
+     * If the URI matches against the pattern then the template variable to value 
+     * map will be filled with template variables as keys and template values as 
+     * values.
+     * <p>
+     * 
+     * @param uri the uri to match against the template.
+     * @param rightHandGroup the StringBuilder to place the right hand group of
+     *        the matching right hand expression. The rightHandPath and the uri
+     *        may refer to the same StringBuilder instance.
+     * @param templateVariableToValue the map where to put template variables (as keys)
+     *        and template values (as values). The map is cleared before any
+     *        entries are put.
+     * @return true if the URI matches the template, otherwise false.
+     * @throws {@link IllegalArgumentException} if the uri or 
+     *         templateVariableToValue is null.
+     */
+    public boolean match(CharSequence uri, StringBuilder rightHandGroup, 
+            Map<String, String> templateVariableToValue) {
+        if (templateVariableToValue == null) 
+            throw new IllegalArgumentException(SpiMessages.TEMPLATE_NAME_TO_VALUE_NOT_NULL());
+
+        templateVariableToValue.clear();
+                
+        if (uri == null || uri.length() == 0)
+            return (templateRegexPattern == null) ? true : false;
+        
+        if (templateRegexPattern == null)
+            return false;
+                
+        // Match the URI to the URI template regular expression
+        Matcher m = templateRegexPattern.matcher(uri);
+        if (!m.matches())
+            return false;
+
+        // Assign the matched template values to template variables
+        int i = 1;
+        for (String name : templateVariables) {
+            String previousValue = templateVariableToValue.get(name);
+            String currentValue = m.group(i++);
+            
+            // URI templates can have the same template variable
+            // occuring more than once, check that the template
+            // values are same.
+            if (previousValue != null && !previousValue.equals(currentValue))
+                return false;
+            
+            templateVariableToValue.put(name, currentValue);
+        }
+
+        // Return the matching right hand group
+        if (rightHandPattern != null) {
+            // Check the same StringBuilder is used for the URI and the right
+            // hand group
+            if (uri == rightHandGroup) {
+                i = m.start(i);
+                // Remove the left hand path
+                if (i >= 0)
+                    rightHandGroup.delete(0, i);
+                else
+                    rightHandGroup.setLength(0);
+            } else {
+                // Reset the right hand group
+                rightHandGroup.setLength(0);
+                final String rightHandGroupString = m.group(i);
+                if (rightHandGroupString != null)
+                    rightHandGroup.append(rightHandGroupString);        
+            }
         }
         
         return true;
@@ -461,8 +537,8 @@ public final class URITemplateType {
     }
 
     public boolean equals(Object o) {
-        if (o instanceof URITemplateType) {
-            URITemplateType that = (URITemplateType)o;
+        if (o instanceof UriTemplateType) {
+            UriTemplateType that = (UriTemplateType)o;
             if (template == that.template)
                 return true;
             return template.equals(that.template);

@@ -22,24 +22,24 @@
 
 package com.sun.ws.rest.impl.model;
 
-import com.sun.ws.rest.impl.dispatch.URITemplateDispatcher;
+import com.sun.ws.rest.impl.dispatch.UriTemplateDispatcher;
 import com.sun.ws.rest.spi.dispatch.ResourceDispatchContext;
-import com.sun.ws.rest.spi.dispatch.URITemplateType;
+import com.sun.ws.rest.spi.dispatch.UriTemplateType;
 
 /**
  *
  * @author Paul.Sandoz@Sun.Com
  */
-class ClassDispatcher extends URITemplateDispatcher {
+class ClassDispatcher extends UriTemplateDispatcher {
     
     final Class c;
     
-    public ClassDispatcher(URITemplateType template, Class c) {
+    public ClassDispatcher(UriTemplateType template, Class c) {
         super(template);
         this.c = c;
     }
 
-    public boolean dispatch(ResourceDispatchContext context, Object node, String path) {
+    public boolean dispatch(ResourceDispatchContext context, Object node, StringBuilder path) {
         return context.dispatchTo(c, path);
     }
     
