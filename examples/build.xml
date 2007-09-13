@@ -30,6 +30,7 @@
 	<ant dir="EntityProvider" target="${target}" inheritAll="false"/>
 	<ant dir="GlassfishDB" target="${target}" inheritAll="false"/> 
 	<ant dir="HelloWorld" target="${target}" inheritAll="false"/>
+	<ant dir="HelloWorldWebApp" target="${target}" inheritAll="false"/>
 	<ant dir="JsonFromJaxb" target="${target}" inheritAll="false"/>
 	<ant dir="OptimisticConcurrency" target="${target}" inheritAll="false"/>
 	<ant dir="SimpleAtomServer" target="${target}" inheritAll="false"/>
@@ -81,6 +82,9 @@
         </antcall>
         <antcall target="convert-property">
             <param name="example" value="HelloWorld"/>
+        </antcall>
+        <antcall target="convert-property">
+            <param name="example" value="HelloWorldWebApp"/>
         </antcall>
         <antcall target="convert-property">
             <param name="example" value="JsonFromJaxb"/>
