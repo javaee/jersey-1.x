@@ -23,28 +23,24 @@
 package com.sun.ws.rest.impl.container.servlet;
 
 import com.sun.ws.rest.api.core.ResourceConfig;
-import java.util.HashSet;
+import com.sun.ws.rest.impl.test.util.TestingResourceConfig;
+import java.util.Map;
 import java.util.Set;
 
-public class WebResources
-    implements ResourceConfig
-{
-    private Set<Class> resources = new HashSet<Class>();
-
+public class WebResources implements ResourceConfig {
+    
+    private ResourceConfig myConfig;
+    
     public WebResources() {
-        resources.add(com.sun.ws.rest.impl.container.servlet.MyWebResourceBean.class);
+        myConfig = new TestingResourceConfig();
+        myConfig.getResourceClasses().add(com.sun.ws.rest.impl.container.servlet.MyWebResourceBean.class);
     }
 
     public Set<Class> getResourceClasses() {
-        return resources;
+        return myConfig.getResourceClasses();
     }
-
-    public boolean isIgnoreMatrixParams() {
-        return true;
-    }
-
-    public boolean isRedirectToNormalizedURI() {
-        return true;
-    }
-
+    
+    public Map<String, Boolean> getFeatures() {
+        return myConfig.getFeatures();
+    }    
 }

@@ -30,6 +30,7 @@ import com.sun.ws.rest.impl.MultivaluedMapImpl;
 import com.sun.ws.rest.impl.TestHttpRequestContext;
 import com.sun.ws.rest.impl.TestHttpResponseContext;
 import com.sun.ws.rest.impl.application.WebApplicationImpl;
+import com.sun.ws.rest.impl.test.util.TestingResourceConfig;
 import java.io.ByteArrayInputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -172,19 +173,7 @@ public abstract class AbstractBeanTester extends TestCase {
             decodedPath = decodedPath.substring(1);
 
         WebApplicationImpl a = new WebApplicationImpl();
-        ResourceConfig c = new ResourceConfig() {
-            public Set<Class> getResourceClasses() {
-                return r;
-            }
-
-            public boolean isIgnoreMatrixParams() {
-                return true;
-            }
-
-            public boolean isRedirectToNormalizedURI() {
-                return true;
-            }
-        };
+        ResourceConfig c = new TestingResourceConfig(r);
 
         a.initiate(null, c);
 

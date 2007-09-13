@@ -44,6 +44,7 @@ import com.sun.mirror.type.VoidType;
 import com.sun.mirror.type.WildcardType;
 import com.sun.mirror.util.SimpleTypeVisitor;
 import com.sun.mirror.util.TypeVisitor;
+import com.sun.ws.rest.api.core.ResourceConfig;
 import com.sun.ws.rest.impl.model.method.ResourceHttpMethod;
 import com.sun.ws.rest.tools.annotation.AnnotationProcessorContext;
 import com.sun.ws.rest.tools.annotation.Method;
@@ -115,6 +116,26 @@ public class UriTemplateProcessor implements Messager, AnnotationProcessor {
     boolean generateWadl = true;
     
     /**
+     * Determines if request should be redirected or silently forwarded
+     */
+    boolean redirect = true;
+    
+    /**
+     * Determines if URI path should be canonicalized
+     */
+    boolean canonicalizeURIPath = true;
+
+    /**
+     * Determines if URI should be normalized
+     */
+    boolean normalizeURI = true;
+    
+    /**
+     * matrix params should be ignored
+     */
+    boolean ignoreMatrixParams = true;
+    
+    /**
      * output directory for apt
      */
     String destDirectory = null;
@@ -157,6 +178,14 @@ public class UriTemplateProcessor implements Messager, AnnotationProcessor {
                 generateWebXml = false;
             } else if (key.startsWith("-Anowadl")) {
                 generateWadl = false;
+            } else if (key.startsWith("-Aredirect")) {
+                redirect = !"false".equalsIgnoreCase(key.split("=")[1]);
+            } else if (key.startsWith("-AnormalizeURI")) {
+                normalizeURI = !"false".equalsIgnoreCase(key.split("=")[1]);
+            } else if (key.startsWith("-AcanonicalizeURIPath")) {
+                canonicalizeURIPath = !"false".equalsIgnoreCase(key.split("=")[1]);
+            } else if (key.startsWith("-AignoreMatrixParams")) {
+                ignoreMatrixParams = !"false".equalsIgnoreCase(key.split("=")[1]);
             } else if (key.startsWith("-Awebresourcesdestdir")) {
                 restDestDirectory = key.split("=")[1];
                 if (!(restDestDirectory.endsWith("/") ||
@@ -165,6 +194,12 @@ public class UriTemplateProcessor implements Messager, AnnotationProcessor {
                 }
             }
         }
+        
+        context.getRCFeatures().put(ResourceConfig.NORMALIZE_URI, normalizeURI);
+        context.getRCFeatures().put(ResourceConfig.REDIRECT, redirect);
+        context.getRCFeatures().put(ResourceConfig.CANONICALIZE_URI_PATH, canonicalizeURIPath);
+        context.getRCFeatures().put(ResourceConfig.IGNORE_MATRIX_PARAMS, ignoreMatrixParams);
+        
         if (!generateWebXml) {
            if (servletClassName != null)
                apEnv.getMessager().printError("-Aservletclassname cannot be used with the -Anoservlet option.");

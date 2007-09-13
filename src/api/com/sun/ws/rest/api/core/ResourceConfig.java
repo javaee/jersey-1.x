@@ -22,6 +22,8 @@
 
 package com.sun.ws.rest.api.core;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -31,23 +33,38 @@ import java.util.Set;
  */
 public interface ResourceConfig {
     /**
+     * URI should be normalized as specified by java.net.URI.normalize() method javadoc
+     */
+    public static final String NORMALIZE_URI = "com.sun.ws.rest.config.feature.NormalizeURI";
+    
+    /**
+     * URI path should be canonicalized by removing contiguous slashes. (i.e. all /+ should be replaced by /)
+     */
+    public static final String CANONICALIZE_URI_PATH = "com.sun.ws.rest.config.feature.CanonicalizeURIPath";
+    
+    /**
+     * If REDIRECT is set and either of NORMALIZE_URI and CANONICALIZE_URI_PATH is set and the appropriate operation results
+     * in different URI, the client is (temporarily) redirected to the new URI. Otherwise the request is silently forwarded
+     * to the new URI/resource
+     */
+    public static final String REDIRECT = "com.sun.ws.rest.config.feature.Redirect";
+    
+    /**
+     * Matric params (/in/uri/like/this/par1=a;par2=b) should be ignored
+     */
+    public static final String IGNORE_MATRIX_PARAMS = "com.sun.ws.rest.config.feature.IgnoreMatrixParams";
+   
+ 
+    /**
      * Get the set of resource classes that should be deployed. A resource class
      * is a class with a <code>UriTemplate</code> annotation.
      * @return the set of resource classes.
      */
     Set<Class> getResourceClasses();
-
+    
     /**
-     * Specifies whether matrix parameters are ignored for the purposes
-     * of matching a request URI to a resource class.
-     * @return true if matrix params should be ignored, false if not
+     * Get the unmodifiable map containing set of features associated with the WebApplication 
+     * @return the unmodifiable map of features.
      */
-    boolean isIgnoreMatrixParams();
-
-    /**
-     * Specifies whether the runtime should silently normalize the request URI
-     * or issue a client redirect to the normailzed request URI.
-     * @return true if redirects will be used, false if not
-     */
-    boolean isRedirectToNormalizedURI();
+    Map<String, Boolean> getFeatures();
 }

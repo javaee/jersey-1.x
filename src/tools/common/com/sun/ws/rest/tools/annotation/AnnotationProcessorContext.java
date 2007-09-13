@@ -29,6 +29,7 @@ import java.util.ArrayList;
 
 
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -54,6 +55,9 @@ public class AnnotationProcessorContext {
     
     /** The name of the <code>ResourceBean</code> to be generated. */
     private String resourceBeanClassName;
+    
+    /** Features to go to ResourceConfig */
+    private final Map<String, Boolean> features = new HashMap<String, Boolean>();
     
     /** 
      * APT round number 
@@ -117,5 +121,8 @@ public class AnnotationProcessorContext {
     public String getResourceBeanClassName() {
         return resourceBeanClassName;
     }
-     
+    
+    public Map<String, Boolean> getRCFeatures() {
+        return features;
+    }
 }

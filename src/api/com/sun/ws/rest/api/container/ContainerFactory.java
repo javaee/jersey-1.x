@@ -1,12 +1,12 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
- * 
- * Copyright 2007 Sun Microsystems, Inc. All rights reserved. 
- * 
+ *
+ * Copyright 2007 Sun Microsystems, Inc. All rights reserved.
+ *
  * The contents of this file are subject to the terms of the Common Development
  * and Distribution License("CDDL") (the "License").  You may not use this file
- * except in compliance with the License. 
- * 
+ * except in compliance with the License.
+ *
  * You can obtain a copy of the License at:
  *     https://jersey.dev.java.net/license.txt
  * See the License for the specific language governing permissions and
@@ -28,7 +28,9 @@ import com.sun.ws.rest.spi.container.WebApplication;
 import com.sun.ws.rest.spi.container.WebApplicationFactory;
 import com.sun.ws.rest.spi.service.ServiceFinder;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -43,40 +45,41 @@ public final class ContainerFactory {
     
     private static final class ResourceConfigImpl implements ResourceConfig {
         private final Set<Class> resourceClasses;
+        private final Map<String, Boolean> features = new HashMap<String, Boolean>();
         
         ResourceConfigImpl(Set<Class> resourceClasses) {
             this.resourceClasses = new HashSet<Class>(resourceClasses);
+            this.features.put(ResourceConfig.CANONICALIZE_URI_PATH, true);
+            this.features.put(ResourceConfig.IGNORE_MATRIX_PARAMS, true);
+            this.features.put(ResourceConfig.NORMALIZE_URI, true);
+            this.features.put(ResourceConfig.REDIRECT, true);
         }
         
         public Set<Class> getResourceClasses() {
             return resourceClasses;
         }
-
-        public boolean isIgnoreMatrixParams() {
-            return true;
-        }
-
-        public boolean isRedirectToNormalizedURI() {
-            return true;
+        
+        public Map<String, Boolean> getFeatures() {
+            return features;
         }
     }
     
     /**
      * Create a container according to the class requested.
      * <p>
-     * The list of service-provider supporting the {@link ContainerProvider} 
+     * The list of service-provider supporting the {@link ContainerProvider}
      * service-provider will be iterated over until one returns a non-null
      * container instance.
      * <p>
      * @param type the type of the container.
-     * @param resourceClasses the list of Web resources to be managed by the 
+     * @param resourceClasses the list of Web resources to be managed by the
      *        Web application.
      * @return the container.
      * @throws ContainerException if there is an error creating the container.
      * @throws IllegalArgumentException if no container provider supports the type.
      */
     @SuppressWarnings("unchecked")
-    public static <A> A createContainer(Class<A> type, Class... resourceClasses) 
+    public static <A> A createContainer(Class<A> type, Class... resourceClasses)
     throws ContainerException, IllegalArgumentException {
         Set<Class> resourceClassesSet = new HashSet<Class>(
                 Arrays.asList(resourceClasses));
@@ -87,19 +90,19 @@ public final class ContainerFactory {
     /**
      * Create a container according to the class requested.
      * <p>
-     * The list of service-provider supporting the {@link ContainerProvider} 
+     * The list of service-provider supporting the {@link ContainerProvider}
      * service-provider will be iterated over until one returns a non-null
      * container instance.
      * <p>
      * @param type the type of the container.
-     * @param resourceClasses the set of Web resources to be managed by the 
+     * @param resourceClasses the set of Web resources to be managed by the
      *        Web application.
      * @return the container.
      * @throws ContainerException if there is an error creating the container.
      * @throws IllegalArgumentException if no container provider supports the type.
      */
     @SuppressWarnings("unchecked")
-    public static <A> A createContainer(Class<A> type, Set<Class> resourceClasses) 
+    public static <A> A createContainer(Class<A> type, Set<Class> resourceClasses)
     throws ContainerException, IllegalArgumentException {
         return createContainer(type, new ResourceConfigImpl(resourceClasses));
     }
@@ -107,7 +110,7 @@ public final class ContainerFactory {
     /**
      * Create a container according to the class requested.
      * <p>
-     * The list of service-provider supporting the {@link ContainerProvider} 
+     * The list of service-provider supporting the {@link ContainerProvider}
      * service-provider will be iterated over until one returns a non-null
      * container instance.
      * <p>
@@ -119,8 +122,8 @@ public final class ContainerFactory {
      * @throws IllegalArgumentException if no container provider supports the type.
      */
     @SuppressWarnings("unchecked")
-    public static <A> A createContainer(Class<A> type, ResourceConfig resourceConfig) 
-    throws ContainerException, IllegalArgumentException {        
+    public static <A> A createContainer(Class<A> type, ResourceConfig resourceConfig)
+    throws ContainerException, IllegalArgumentException {
         WebApplication wa = WebApplicationFactory.createWebApplication();
         
         for (ContainerProvider<A> rp : ServiceFinder.find(ContainerProvider.class)) {
@@ -128,25 +131,25 @@ public final class ContainerFactory {
             if (r != null) {
                 return r;
             }
-        }     
+        }
         
         throw new IllegalArgumentException("No container provider supports the type " + type);
     }
     
     /**
      * Create an instance of a container according to the class requested.
-     * 
+     *
      * @param type the type of the container.
-     * @param packageName the name of the package where to find the resource configuration 
+     * @param packageName the name of the package where to find the resource configuration
      *        class.
-     * @return the HTTP handler, if a handler could not be created then null is 
+     * @return the HTTP handler, if a handler could not be created then null is
      * returned.
      * @throws ContainerException if the resource configuration class could not
      *         be found and instantiated or there is an error creating the container.
      * @throws IllegalArgumentException if no container provider supports the type.
      */
     @SuppressWarnings("unchecked")
-    public static <A> A createContainer(Class<A> type, String packageName) 
+    public static <A> A createContainer(Class<A> type, String packageName)
     throws ContainerException, IllegalArgumentException {
         String resourcesClassName = packageName + ".WebResources";
         try {
@@ -161,4 +164,4 @@ public final class ContainerFactory {
             throw new ContainerException(e);
         }
     }
- }
+}

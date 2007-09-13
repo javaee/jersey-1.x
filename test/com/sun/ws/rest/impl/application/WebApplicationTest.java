@@ -31,6 +31,7 @@ import com.sun.ws.rest.impl.HttpRequestContextImpl;
 import com.sun.ws.rest.impl.HttpResponseContextImpl;
 import com.sun.ws.rest.impl.TestHttpRequestContext;
 import com.sun.ws.rest.impl.TestHttpResponseContext;
+import com.sun.ws.rest.impl.test.util.TestingResourceConfig;
 import java.io.ByteArrayInputStream;
 import java.util.HashSet;
 import java.util.Set;
@@ -136,19 +137,7 @@ public class WebApplicationTest extends TestCase {
             s.add(resource);
         
         WebApplicationImpl a = new WebApplicationImpl();
-        ResourceConfig c = new ResourceConfig() {
-            public Set<Class> getResourceClasses() {
-                return s;
-            }
-
-            public boolean isIgnoreMatrixParams() {
-                return true;
-            }
-
-            public boolean isRedirectToNormalizedURI() {
-                return true;
-            }
-        };
+        ResourceConfig c = new TestingResourceConfig(s);
         a.initiate(null, c);
         return a;
     }

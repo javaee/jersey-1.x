@@ -30,7 +30,10 @@ import com.sun.ws.rest.tools.ToolsMessages;
 import com.sun.ws.rest.tools.annotation.AnnotationProcessorContext;
 import com.sun.ws.rest.api.core.ResourceConfig;
 import java.io.IOException;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -95,13 +98,18 @@ public class WebResourcesGenerator {
             // members
             JClass setClass = cm.ref(Set.class).narrow(Class.class);
             JClass hs = cm.ref(HashSet.class).narrow(Class.class);
-            JFieldVar field = cls.field(JMod.PRIVATE, setClass, "resources");
-            field.init(JExpr._new(hs));
+            JFieldVar fieldResources = cls.field(JMod.PRIVATE | JMod.FINAL, setClass, "resources");
+            fieldResources.init(JExpr._new(hs));
             
+            JClass mapClass = cm.ref(Map.class).narrow(String.class, Boolean.class);
+            JClass hm = cm.ref(HashMap.class).narrow(String.class, Boolean.class);
+            JFieldVar fieldFeatures = cls.field(JMod.PRIVATE | JMod.FINAL, mapClass, "features");
+            fieldFeatures.init(JExpr._new(hm));
+
             //Constructor
             JMethod constrc1 = cls.constructor(JMod.PUBLIC);
             doc = constrc1.javadoc();
-            doc.add("Initializes the Set of web resource classes\n");
+            doc.add("Initializes the Set of web resource classes and features\n");
             doc.add("to be included in a web application.");
             JBlock cb1 = constrc1.body();
             
@@ -109,17 +117,19 @@ public class WebResourcesGenerator {
                 cb1.directStatement("resources.add("+clazz+".class);");
             }
             
+            for (Map.Entry<String, Boolean> feature : context.getRCFeatures().entrySet()) {
+                cb1.directStatement("features.put(\"" + feature.getKey() + "\", " + feature.getValue() + ");");
+            }
+            
             JMethod method = cls.method(JMod.PUBLIC, setClass, "getResourceClasses");
             JBlock body = method.body();
-            body._return(field);
+            body._return(fieldResources);
             
-            method = cls.method(JMod.PUBLIC, cm.BOOLEAN, "isIgnoreMatrixParams");
+            JClass collectionsClass = cm.ref(Collections.class);
+            method = cls.method(JMod.PUBLIC, mapClass, "getFeatures");
             body = method.body();
-            body._return(JExpr.TRUE);
+            body._return(collectionsClass.staticInvoke("unmodifiableMap").arg(JExpr.ref("features")));
             
-            method = cls.method(JMod.PUBLIC, cm.BOOLEAN, "isRedirectToNormalizedURI");
-            body = method.body();
-            body._return(JExpr.TRUE);
             
 //            if(options.verbose)
 //                cw = new ProgressCodeWriter(cw, System.out);

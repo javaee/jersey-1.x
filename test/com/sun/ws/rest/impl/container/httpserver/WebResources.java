@@ -23,26 +23,25 @@
 package com.sun.ws.rest.impl.container.httpserver;
 
 import com.sun.ws.rest.api.core.ResourceConfig;
-import java.util.HashSet;
+import com.sun.ws.rest.impl.test.util.TestingResourceConfig;
+import java.util.Map;
 import java.util.Set;
 
 public class WebResources implements ResourceConfig {
-    private Set<Class> resources = new HashSet<Class>();
+    
+    ResourceConfig myConfig;
 
     public WebResources() {
-        resources.add(HttpServerAdaptorTest.TestOneWebResource.class);
-        resources.add(HttpServerAdaptorTest.TestTwoWebResource.class);
+        myConfig = new TestingResourceConfig();
+        myConfig.getResourceClasses().add(HttpServerAdaptorTest.TestOneWebResource.class);
+        myConfig.getResourceClasses().add(HttpServerAdaptorTest.TestTwoWebResource.class);
     }
 
     public Set<Class> getResourceClasses() {
-        return resources;
+        return myConfig.getResourceClasses();
     }
-
-    public boolean isIgnoreMatrixParams() {
-        return true;
-    }
-
-    public boolean isRedirectToNormalizedURI() {
-        return true;
-    }
+    
+    public Map<String, Boolean> getFeatures() {
+        return myConfig.getFeatures();
+    }    
 }

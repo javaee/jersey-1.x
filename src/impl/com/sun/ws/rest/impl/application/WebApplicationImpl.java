@@ -157,7 +157,7 @@ public final class WebApplicationImpl implements WebApplication {
         final WebApplicationContext localContext = new WebApplicationContext(this, request, response);        
         context.set(localContext);
         
-        if (resourceConfig.isRedirectToNormalizedURI()) {
+        if (resourceConfig.getFeatures().get(ResourceConfig.NORMALIZE_URI)) {
             final URI uri = request.getAbsolute();
             final URI normalizedUri = uri.normalize();            
 
@@ -171,7 +171,7 @@ public final class WebApplicationImpl implements WebApplication {
         StringBuilder path = new StringBuilder();
         path.append("/").append(request.getPath());
 
-        if (resourceConfig.isIgnoreMatrixParams())
+        if (resourceConfig.getFeatures().get(ResourceConfig.IGNORE_MATRIX_PARAMS))
             // TODO check for annotation on resource
             // Need to support overriding functionality on resource        
             path = stripMatrixParams(path);

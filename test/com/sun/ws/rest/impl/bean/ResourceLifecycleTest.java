@@ -26,6 +26,7 @@ import com.sun.ws.rest.api.core.ResourceConfig;
 import com.sun.ws.rest.impl.TestHttpRequestContext;
 import com.sun.ws.rest.impl.TestHttpResponseContext;
 import com.sun.ws.rest.impl.application.WebApplicationImpl;
+import com.sun.ws.rest.impl.test.util.TestingResourceConfig;
 import com.sun.ws.rest.spi.container.ContainerRequest;
 import com.sun.ws.rest.spi.container.ContainerResponse;
 import com.sun.ws.rest.spi.resource.PerRequest;
@@ -107,19 +108,7 @@ public class ResourceLifecycleTest extends TestCase {
         r.add(TestBazBean.class);
         
         a = new WebApplicationImpl();
-        ResourceConfig c = new ResourceConfig() {
-            public Set<Class> getResourceClasses() {
-                return r;
-            }
-
-            public boolean isIgnoreMatrixParams() {
-                return true;
-            }
-
-            public boolean isRedirectToNormalizedURI() {
-                return true;
-            }
-        };
+        ResourceConfig c = new TestingResourceConfig(r);
 
         a.initiate(null, c);
 
