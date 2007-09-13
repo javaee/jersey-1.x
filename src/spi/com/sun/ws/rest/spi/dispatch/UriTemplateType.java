@@ -24,8 +24,6 @@ package com.sun.ws.rest.spi.dispatch;
 
 import com.sun.ws.rest.api.core.UriComponent;
 import com.sun.ws.rest.spi.SpiMessages;
-import java.io.UnsupportedEncodingException;
-import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -37,11 +35,11 @@ import java.util.regex.Pattern;
 
 
 /**
- * URI template implementation.
- * <p>
+ * A URI template.
+ *
  * @author Paul.Sandoz@Sun.Com
  */
-public final class UriTemplateType {
+public class UriTemplateType {
     /**
      * Order the templates according to the template with the highest number
      * of template variables first. 
@@ -68,6 +66,20 @@ public final class UriTemplateType {
             if (o2 == NULL)
                 return -1;
             
+            
+// This code should be uncommented when the specification changes
+// the order of the primary and secondary keys
+//
+//            // Compare the template regular expressions, if the number of
+//            // templates are equal.
+//            // Note that it is important that o2 is compared against o1
+//            // so that a regular expression with more characters (more explicit) 
+//            // is less than a regular expression with less characters.
+//            int i = o2.getTemplateRegex().compareTo(o1.getTemplateRegex());
+//            if (i != 0) return i;
+//            
+//            // Compare the number of templates
+//            return o2.getNumberOfTemplateVariables() - o1.getNumberOfTemplateVariables();
             
             // Compare the number of templates
             int i = o2.getNumberOfTemplateVariables() - o1.getNumberOfTemplateVariables();
@@ -149,9 +161,9 @@ public final class UriTemplateType {
      * <p>
      * The template will be parsed to extract template variables.
      * <p>
-     * A specific regular expressions will be generated from the template
+     * A specific regular expression will be generated from the template
      * to match URIs according to the template and map template variables to
-     * template values. 
+     * template values.
      * <p>
      * @param template the template.
      * @throws {@link java.util.regex.PatternSyntaxException} if the specific
@@ -173,8 +185,31 @@ public final class UriTemplateType {
      * template values. 
      * <p>
      * @param template the template.
-     * @param rightHandPattern the right hand pattern if this URI template
-     *        represents the left hand pattern.
+     * @param limited if true the right hand expression "(/.*)?" is appended 
+     *        to the regular expression generated from the URI template,
+     *        otherwise the expression "(/)?" is appended.
+     * @throws {@link java.util.regex.PatternSyntaxException} if the specific
+     *         regular expression could not be generated
+     * @throws {@link IllegalArgumentException} if the template is null or
+     *         an empty string.
+     */
+    public UriTemplateType(String template, boolean limited) {
+        this(template, (limited) ? UriTemplateType.RIGHT_HANDED_REGEX : 
+            UriTemplateType.RIGHT_SLASHED_REGEX);        
+    }
+    
+    /**
+     * Construct a new URI template.
+     * <p>
+     * The template will be parsed to extract template variables.
+     * <p>
+     * A specific regular expressions will be generated from the template
+     * to match URIs according to the template and map template variables to
+     * template values. 
+     * <p>
+     * @param template the template.
+     * @param rightHandPattern the right hand pattern to be appended
+     *        to the regular expression generated from the URI template.
      * @throws {@link java.util.regex.PatternSyntaxException} if the specific
      *         regular expression could not be generated
      * @throws {@link IllegalArgumentException} if the template is null or
@@ -187,17 +222,11 @@ public final class UriTemplateType {
         if (template.length() == 0 && (rightHandPattern == null || rightHandPattern.length() == 0))
             throw new IllegalArgumentException(SpiMessages.TEMPLATE_NAME_TO_VALUE_NOT_NULL());
 
-        try {
-            // TODO should only contain valuid URI characters plus '{' and '}'?
-            // Decode the template to process escaped characters
-            template = URLDecoder.decode(template, "UTF-8");
-        } catch (UnsupportedEncodingException e) {
-            throw new IllegalArgumentException("Template cannot be decoded", e);
-        }
-        
         this.template = template;
         this.rightHandPattern = rightHandPattern;
-                
+
+        // TODO correctly validate template
+        
         StringBuilder b = new StringBuilder();
         List<String> names = new ArrayList<String>();
         
@@ -255,7 +284,7 @@ public final class UriTemplateType {
      * Get the URI template as a String.
      * @return the URI template.
      */
-    public String getTemplate() {
+    public final String getTemplate() {
         return template;
     }
     
@@ -263,11 +292,11 @@ public final class UriTemplateType {
      * Check if the URI template is left handed.
      * @return true if the URI template is left handed, otherwise false.
      */
-    public boolean isLeftHanded() {
+    public final boolean isLeftHanded() {
         return rightHandPattern != null;
     }
     
-    public boolean endsWithSlash() {
+    public final boolean endsWithSlash() {
         return endsWithSlash;
     }
     
@@ -275,7 +304,7 @@ public final class UriTemplateType {
      * Get the list of template variables for the template.
      * @return the list of template variables.
      */
-    public List<String> getTemplateVariables() {
+    public final List<String> getTemplateVariables() {
         return templateVariables;
     }
     
@@ -286,7 +315,7 @@ public final class UriTemplateType {
      * @return true if the template variable is a member of the template, otherwise
      * false.
      */
-    public boolean isTemplateVariablePresent(String name) {
+    public final boolean isTemplateVariablePresent(String name) {
         for (String s : templateVariables) {
             if (s.equals(name))
                 return true;
@@ -299,7 +328,7 @@ public final class UriTemplateType {
      * Get the number of template variables.
      * @return the number of template variables.
      */
-    public int getNumberOfTemplateVariables() {
+    public final int getNumberOfTemplateVariables() {
         return templateVariables.size();
     }
     
@@ -307,7 +336,7 @@ public final class UriTemplateType {
      * Get the regular expression used for matching URIs to the template.
      * @return the regular expression for matching URIs.
      */
-    public String getTemplateRegex() {
+    public final String getTemplateRegex() {
         return templateRegex;
     }
 
@@ -328,7 +357,7 @@ public final class UriTemplateType {
      * @throws {@link IllegalArgumentException} if the uri or 
      *         templateVariableToValue is null.
      */
-    public boolean match(CharSequence uri, Map<String, String> templateVariableToValue) {
+    public final boolean match(CharSequence uri, Map<String, String> templateVariableToValue) {
         if (templateVariableToValue == null) 
             throw new IllegalArgumentException(SpiMessages.TEMPLATE_NAME_TO_VALUE_NOT_NULL());
 
@@ -387,7 +416,7 @@ public final class UriTemplateType {
      * @throws {@link IllegalArgumentException} if the uri or 
      *         templateVariableToValue is null.
      */
-    public boolean match(CharSequence uri, StringBuilder rightHandGroup, 
+    public final boolean match(CharSequence uri, StringBuilder rightHandGroup, 
             Map<String, String> templateVariableToValue) {
         if (templateVariableToValue == null) 
             throw new IllegalArgumentException(SpiMessages.TEMPLATE_NAME_TO_VALUE_NOT_NULL());
@@ -453,7 +482,7 @@ public final class UriTemplateType {
      * @param values the map of template variables to template values.
      * @return the URI.
      */
-    public String createURI(Map<String, String> values) {
+    public final String createURI(Map<String, String> values) {
         StringBuilder b = new StringBuilder();
         // Find all template variables
         Matcher m = TEMPLATE_NAMES_PATTERN.matcher(template);
@@ -479,7 +508,7 @@ public final class UriTemplateType {
      *        substituted in order of occurence of unique template variables.
      * @return the URI.
      */
-    public String createURI(String... values) {
+    public final String createURI(String... values) {
         return createURI(values, 0, values.length);
     }
     
@@ -496,7 +525,7 @@ public final class UriTemplateType {
      * @param length the length of the array
      * @return the URI.
      */
-    public String createURI(String[] values, int offset, int length) {
+    public final String createURI(String[] values, int offset, int length) {
         Map<String, String> mapValues = new HashMap<String, String>();
         StringBuilder b = new StringBuilder();
         // Find all template variables
@@ -528,15 +557,15 @@ public final class UriTemplateType {
         return b.toString();
     }
     
-    public String toString() {
+    public final String toString() {
         return templateRegex;
     }
     
-    public int hashCode() {
+    public final int hashCode() {
         return template.hashCode();
     }
 
-    public boolean equals(Object o) {
+    public final boolean equals(Object o) {
         if (o instanceof UriTemplateType) {
             UriTemplateType that = (UriTemplateType)o;
             if (template == that.template)

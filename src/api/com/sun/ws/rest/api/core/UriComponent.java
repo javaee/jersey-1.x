@@ -32,6 +32,8 @@ import java.util.List;
  * Utility class for validating, encoding and decoding components
  * of a URI.
  *
+ * TODO rewrite to use masks and not lookup tables
+ *
  * @author Paul.Sandoz@Sun.Com
  */
 public final class UriComponent {
@@ -105,7 +107,7 @@ public final class UriComponent {
         
         for (int i = 0; i < s.length(); i++) {
             final char c = s.charAt(i);
-            if ((c < 0x80 && !table[c]) || c >= 0x80)
+            if ((c < 0x80 && c != '%' && !table[c]) || c >= 0x80)
                 if (!template || (c != '{' && c != '}'))
                     return i;
         }

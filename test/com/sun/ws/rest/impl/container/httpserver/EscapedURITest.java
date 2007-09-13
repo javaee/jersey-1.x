@@ -42,7 +42,7 @@ import junit.framework.*;
  * @author Paul.Sandoz@Sun.Com
  */
 public class EscapedURITest extends TestCase {
-    @UriTemplate("/x%20y")
+    @UriTemplate(value="/x%20y", encode=false)
     public static class EscapedURIResource {
         @HttpMethod
         public String get(@HttpContext UriInfo info) {
@@ -65,7 +65,7 @@ public class EscapedURITest extends TestCase {
         server.setExecutor(null);
         server.start();
                 
-        get("http://localhost:9998/context/x%20y");
+        get("http://x.y@localhost:9998/context/x%20y");
         
         server.stop(1);
     }

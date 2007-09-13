@@ -44,12 +44,12 @@ import com.sun.ws.rest.impl.model.method.ResourceMethodMap;
 import com.sun.ws.rest.impl.model.method.ResourceMethodMapDispatcher;
 import com.sun.ws.rest.impl.model.method.ResourceViewMethod;
 import com.sun.ws.rest.impl.model.node.NodeDispatcherFactory;
+import com.sun.ws.rest.spi.dispatch.UriPathTemplate;
 import com.sun.ws.rest.spi.dispatch.UriTemplateType;
 import com.sun.ws.rest.spi.resource.ResourceProvider;
 import com.sun.ws.rest.spi.resource.ResourceProviderFactory;
 import com.sun.ws.rest.spi.view.View;
 import java.lang.reflect.Method;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -155,15 +155,9 @@ public final class ResourceClass extends BaseResourceClass {
         for (final Method m : methods.hasNotAnnotation(HttpMethod.class).hasAnnotation(UriTemplate.class)) {
             hasSubResources = true;
             
-            UriTemplate tAnnotation = m.getAnnotation(UriTemplate.class);
-            String tValue = tAnnotation.value();
-            if (!tValue.startsWith("/"))
-                tValue = "/" + tValue;
-            UriTemplateType t = (tAnnotation.limited()) ? new UriTemplateType(
-                    tValue, UriTemplateType.RIGHT_HANDED_REGEX) : 
-                new UriTemplateType(
-                    tValue, UriTemplateType.RIGHT_SLASHED_REGEX);
-            
+            UriTemplateType t = new UriPathTemplate(
+                    m.getAnnotation(UriTemplate.class));
+                        
             final UriTemplateDispatcher d = NodeDispatcherFactory.create(t, m);            
             uriResolver.add(d.getTemplate(), d);
         }
@@ -175,14 +169,11 @@ public final class ResourceClass extends BaseResourceClass {
         final Map<UriTemplateType, ResourceMethodMap> templatedMethodMap = 
                 new HashMap<UriTemplateType, ResourceMethodMap>();
         for (Method m : methods.hasAnnotation(HttpMethod.class).hasAnnotation(UriTemplate.class)) {
-            // TODO what does it mean to support limited=false
-            // for sub-resource methods?
-            String tValue = m.getAnnotation(UriTemplate.class).value();
-            if (!tValue.startsWith("/"))
-                tValue = "/" + tValue;            
-            UriTemplateType t = new UriTemplateType(tValue, 
-                    UriTemplateType.RIGHT_SLASHED_REGEX);
             
+            // TODO what does it mean to support limited=false
+            UriTemplateType t = new UriPathTemplate(
+                    m.getAnnotation(UriTemplate.class), false);
+                        
             ResourceMethod rm = new ResourceHttpMethod(this, m);
             addToTemplatedMethodMap(templatedMethodMap, t, rm);
         }
@@ -319,12 +310,12 @@ public final class ResourceClass extends BaseResourceClass {
         if (path.matches("index\\.[^/]*")) {
             return UriTemplateType.NULL;
         } else {
-            path = "/" + path;            
+            // Remove the type of view from the URI template
             int i = path.lastIndexOf('.');
             if (i > 0)
                 path = path.substring(0, i);
             
-            return new UriTemplateType(path);            
+            return new UriPathTemplate(path, false, true);
         }
     }
     

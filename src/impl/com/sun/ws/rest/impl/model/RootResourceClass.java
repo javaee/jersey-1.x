@@ -25,9 +25,9 @@ package com.sun.ws.rest.impl.model;
 import com.sun.ws.rest.api.core.ResourceConfig;
 import com.sun.ws.rest.impl.dispatch.UriTemplateDispatcher;
 import com.sun.ws.rest.spi.dispatch.ResourceDispatchContext;
+import com.sun.ws.rest.spi.dispatch.UriPathTemplate;
 import com.sun.ws.rest.spi.dispatch.UriTemplateType;
 import com.sun.ws.rest.spi.resource.ResourceProviderFactory;
-import java.util.Collections;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -97,13 +97,9 @@ public final class RootResourceClass extends BaseResourceClass {
 
         // TODO what does it mean to support limited=false
         // when there are sub-resources present?
-        String tValue = tAnnotation.value();
-        if (!tValue.startsWith("/"))
-            tValue = "/" + tValue;
-        String rightHandPattern = (resourceClass.hasSubResources) ? 
-                UriTemplateType.RIGHT_HANDED_REGEX : UriTemplateType.RIGHT_SLASHED_REGEX;
-        UriTemplateType t = new UriTemplateType(tValue, rightHandPattern);
-        
+        UriTemplateType t = new UriPathTemplate(
+                tAnnotation, resourceClass.hasSubResources);
+                
         UriTemplateDispatcher d = ClassDispatcherFactory.create(t, c);
         uriResolver.add(d.getTemplate(), d);
     }

@@ -41,9 +41,9 @@ import javax.ws.rs.core.MultivaluedMap;
  *
  * @author Paul.Sandoz@Sun.Com
  */
-public class HttpServerRequestAdaptor extends HttpRequestContextImpl {
+public final class HttpServerRequestAdaptor extends HttpRequestContextImpl {
     
-    protected HttpExchange exchange;
+    private final HttpExchange exchange;
     
     public HttpServerRequestAdaptor(HttpExchange exchange) throws IOException {
         super(exchange.getRequestMethod(), exchange.getRequestBody());
@@ -55,22 +55,24 @@ public class HttpServerRequestAdaptor extends HttpRequestContextImpl {
     }
     
     private void extractPathAndBaseURI() {
-        // The path relative to the HTTP context
-        // Note that this is not the complete URI (with host information)
-        this.uri = exchange.getRequestURI();
+        /*
+         * This is a URI that only contains the URI path component!
+         */
+        final URI exchangeUri = exchange.getRequestURI();
         
         // The base path context of the handler
+        // Is this in encoded or decoded form?
         String contextPath = exchange.getHttpContext().getPath();
         
         // The path for the Web application
-        this.uriPath = uri.getPath().substring(contextPath.length());
+        this.encodedUriPath = exchangeUri.getRawPath().substring(contextPath.length());
         if (!contextPath.endsWith("/")) {
             // Ensure path is relative
-            if (uriPath.startsWith("/")) {
+            if (this.encodedUriPath.startsWith("/")) {
                 int i = 0;
-                while (uriPath.charAt(i) == '/')
+                while (this.encodedUriPath.charAt(i) == '/')
                     i++;
-                this.uriPath = this.uriPath.substring(i);
+                this.encodedUriPath = this.encodedUriPath.substring(i);
                 // Ensure that base URI ends in '/'
                 contextPath += "/";
             }
@@ -78,7 +80,10 @@ public class HttpServerRequestAdaptor extends HttpRequestContextImpl {
         
         /*
          * The following is madness, there is no easy way to get 
-         * the complete URI
+         * the complete URI of the HTTP request!!
+         *
+         * TODO this is missing the user information component, how
+         * can this be obtained?
          */
         HttpServer server = exchange.getHttpContext().getServer();
         String scheme = (server instanceof HttpsServer) ? "https" : "http";
@@ -89,8 +94,9 @@ public class HttpServerRequestAdaptor extends HttpRequestContextImpl {
         } catch (URISyntaxException ex) {
             throw new IllegalArgumentException(ex);
         }
+        
         // Resolve to the complete URI
-        this.uri = this.baseURI.resolve(this.uri);
+        this.uri = this.baseURI.resolve(exchangeUri);
     }
     
     protected void copyHttpHeaders() {

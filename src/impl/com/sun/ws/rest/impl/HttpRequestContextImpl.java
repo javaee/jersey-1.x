@@ -22,6 +22,7 @@
 
 package com.sun.ws.rest.impl;
 
+import com.sun.ws.rest.api.core.UriComponent;
 import com.sun.ws.rest.impl.http.header.reader.HttpHeaderReader;
 import com.sun.ws.rest.impl.model.HttpHelper;
 import com.sun.ws.rest.impl.response.Responses;
@@ -59,6 +60,7 @@ public class HttpRequestContextImpl implements ContainerRequest {
 
     protected URI uri;
     protected URI baseURI;
+    protected String encodedUriPath;
     protected String uriPath;
     protected String queryString;
     protected MultivaluedMap<String, String> queryParameters;
@@ -108,14 +110,19 @@ public class HttpRequestContextImpl implements ContainerRequest {
     // UriInfo
     
     public String getPath() {
-        return uriPath;
+        return getPath(true);
     }
     
     public String getPath(boolean decode) {
         if (decode) {
-            return uriPath;
+            if (uriPath != null) return uriPath;
+            return uriPath = UriComponent.decode(encodedUriPath, 
+                    UriComponent.Type.PATH);
         } else {
-            return baseURI.relativize(getAbsolute()).getRawPath();
+            // TODO the encodedUriPath should never be null
+            if (encodedUriPath != null) return encodedUriPath;
+            return encodedUriPath = UriComponent.encode(uriPath, 
+                    UriComponent.Type.PATH);
         }
     }
     
