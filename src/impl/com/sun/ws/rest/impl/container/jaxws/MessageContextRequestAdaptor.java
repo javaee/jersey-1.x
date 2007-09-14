@@ -39,30 +39,35 @@ import static javax.xml.ws.handler.MessageContext.QUERY_STRING;
 /**
  * Adapts a JAX-WS <code>Endpoint</code> request to provide the methods of HttpRequest
  */
-public class MessageContextRequestAdaptor extends HttpRequestContextImpl {
+public final class MessageContextRequestAdaptor extends HttpRequestContextImpl {
     
-    MessageContext context;
+    final MessageContext context;
     
     /**
      * Creates a new instance of MessageContextRequestAdaptor
      */
     public MessageContextRequestAdaptor(DataSource request, MessageContext context) throws IOException {
         super((String)context.get(HTTP_REQUEST_METHOD), request != null ? request.getInputStream() : null );
-                
-        this.uriPath = (String)context.get(PATH_INFO);
+        this.context = context;
+        
+        initiateUriInfo();
+        copyHttpHeaders();
+    }
+
+    private void initiateUriInfo() {        
+        this.decodedPath = (String)context.get(PATH_INFO);
         // Ensure path is relative, TODO may need to check for multiple '/'
-        if (this.uriPath.startsWith("/"))
-            this.uriPath = this.uriPath.substring(1);
+        if (this.decodedPath.startsWith("/"))
+            this.decodedPath = this.decodedPath.substring(1);
+        
+        this.encodedQuery = (String)context.get(QUERY_STRING);
         
         // TODO create base URI
-        this.baseURI = URI.create("/");
-        this.context = context;
-        copyHttpHeaders();
-        extractQueryParameters();
+        this.baseUri = URI.create("/");
     }
     
     @SuppressWarnings("unchecked")
-    protected void copyHttpHeaders() {
+    private void copyHttpHeaders() {
         Map<String, List<String>> headers = (Map<String, List<String>>)context.get(HTTP_REQUEST_HEADERS);
         MultivaluedMap<String, String> restHeaders = getRequestHeaders();
         for (Map.Entry<String, List<String>> e : headers.entrySet()) {
@@ -74,9 +79,4 @@ public class MessageContextRequestAdaptor extends HttpRequestContextImpl {
             }
         }        
     }
-
-    protected void extractQueryParameters() {
-        this.queryString = (String)context.get(QUERY_STRING);
-        this.queryParameters = extractQueryParameters(this.queryString, true);
-    }    
 }

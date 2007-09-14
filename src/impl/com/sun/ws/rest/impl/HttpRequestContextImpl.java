@@ -53,24 +53,73 @@ import javax.ws.rs.ext.ProviderFactory;
  *
  * @author Paul.Sandoz@Sun.Com
  */
-public class HttpRequestContextImpl implements ContainerRequest {
+public abstract class HttpRequestContextImpl implements ContainerRequest {
 
-    protected InputStream entity;
-    protected String method;
+    private final String method;
+    private final InputStream entity;
 
-    protected URI uri;
-    protected URI baseURI;
-    protected String encodedUriPath;
-    protected String uriPath;
-    protected String queryString;
-    protected MultivaluedMap<String, String> queryParameters;
-    protected MultivaluedMap<String, String> templateValues;
-    protected List<PathSegment> pathSegments;
+    /**
+     * The complete URI of a request, including the query and fragment
+     * components (if any).
+     */
+    protected URI completeUri;
     
-    protected MultivaluedMap<String, String> headers;
-    protected MediaType contentType;
-    protected List<MediaType> accept;
-    protected List<Cookie> cookies;
+    /**
+     * The absolute URI of a request that is equivalent to the complete URI
+     * minus the query and fragment components.
+     *
+     * The absolute URI must be equivalent to the following:
+     *
+     *   UriBuilder.fromUri(completeUri).
+     *       replaceQuery(null).fragment(null).build();
+     *
+     *   UriBuilder.fromUri(baseUri).encode(false).
+     *       append(encodedPath).build();
+     */
+    protected URI absoluteUri;
+    
+    /**
+     * The base URI of the request.
+     *
+     * The schema, user info, host and port components must be equivalent to
+     * those of the complete URI. The path component of the complete URI must
+     * start with the path component of the base URI. The base URI must not 
+     * contain the query and fragment components and the path component must 
+     * end in a '/'.
+     */
+    protected URI baseUri;
+
+    /**
+     * The percent-encoded path component.
+     *
+     * The path is relative to the path component of the base URI. The path
+     * must not start with a '/'.
+     */
+    protected String encodedPath;
+    
+    /**
+     * The decoded path component.
+     */
+    protected String decodedPath;
+    
+    /**
+     * The percent-encoded query component.
+     */
+    protected String encodedQuery;
+    
+    /**
+     * The percent-encoded fragment component.
+     */
+    protected String encodedFragment;
+    
+    private MultivaluedMap<String, String> queryParameters;
+    private MultivaluedMap<String, String> templateValues;
+    private List<PathSegment> pathSegments;
+    
+    private MultivaluedMap<String, String> headers;
+    private MediaType contentType;
+    private List<MediaType> accept;
+    private List<Cookie> cookies;
 
     protected HttpRequestContextImpl(String method, InputStream entity) {
         this.method = method;
@@ -115,13 +164,13 @@ public class HttpRequestContextImpl implements ContainerRequest {
     
     public String getPath(boolean decode) {
         if (decode) {
-            if (uriPath != null) return uriPath;
-            return uriPath = UriComponent.decode(encodedUriPath, 
+            if (decodedPath != null) return decodedPath;
+            return decodedPath = UriComponent.decode(encodedPath, 
                     UriComponent.Type.PATH);
         } else {
             // TODO the encodedUriPath should never be null
-            if (encodedUriPath != null) return encodedUriPath;
-            return encodedUriPath = UriComponent.encode(uriPath, 
+            if (encodedPath != null) return encodedPath;
+            return encodedPath = UriComponent.encode(decodedPath, 
                     UriComponent.Type.PATH);
         }
     }
@@ -131,7 +180,7 @@ public class HttpRequestContextImpl implements ContainerRequest {
             return pathSegments;
         }
             
-        pathSegments = extractPathSegments(uriPath, false);
+        pathSegments = extractPathSegments(decodedPath, false);
         return pathSegments;
     }
     
@@ -144,7 +193,7 @@ public class HttpRequestContextImpl implements ContainerRequest {
     }
     
     public URI getBase() {
-        return baseURI;
+        return baseUri;
     }
     
     public UriBuilder getBaseBuilder() {
@@ -152,21 +201,21 @@ public class HttpRequestContextImpl implements ContainerRequest {
     }
     
     public URI getAbsolute() {
-        if (uri == null) {
+        if (absoluteUri == null) {
             try {
                 // TODO fix
                 // This method is buggy
                 // a relative URI path segment that contains a URI
                 // will result in an invalid URI, for example:
                 //   ";a=http://host""
-                URI u = new URI(null, null, uriPath, null);
-                uri = baseURI.resolve(u);
+                URI u = new URI(null, null, decodedPath, null);
+                absoluteUri = baseUri.resolve(u);
             } catch (URISyntaxException e) {
                 throw new IllegalArgumentException(e);
             }
         }
             
-        return uri;
+        return absoluteUri;
     }
 
     public UriBuilder getBuilder() {
@@ -198,14 +247,16 @@ public class HttpRequestContextImpl implements ContainerRequest {
     }
     
     public MultivaluedMap<String, String> getQueryParameters() {
-        return queryParameters;
+        return getQueryParameters(true);
     }
     
     public MultivaluedMap<String, String> getQueryParameters(boolean decode) {
         if (decode) {
-            return queryParameters;
+            if (queryParameters != null) return queryParameters;
+            
+            return queryParameters = extractQueryParameters(encodedQuery, true);
         } else {
-            return extractQueryParameters(queryString, false);
+            return extractQueryParameters(encodedQuery, false);
         }
     }
     

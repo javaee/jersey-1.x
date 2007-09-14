@@ -39,32 +39,37 @@ import org.apache.tomcat.util.http.MimeHeaders;
  *
  * @author Marc.Hadley@Sun.Com
  */
-public class GrizzlyRequestAdaptor  extends HttpRequestContextImpl {
+public final class GrizzlyRequestAdaptor  extends HttpRequestContextImpl {
     
-    private Request request;
+    private final Request request;
     
     /** Creates a new instance of GrizzlyRequestAdaptor */
     public GrizzlyRequestAdaptor(Request request) {
         super(request.method().toString(), new GrizzlyRequestInputStream(request));
         this.request = request;
-        this.uriPath = request.requestURI().toString();
-        // Ensure path is relative, TODO may need to check for multiple '/'
-        if (this.uriPath.startsWith("/"))
-            this.uriPath = this.uriPath.substring(1);
         
-        this.queryString = request.queryString().toString();
-        this.queryParameters = extractQueryParameters(this.queryString, true);
+        initiateUriInfo();
+        copyHttpHeaders();
+    }
+
+    private void initiateUriInfo() {
+        this.decodedPath = request.requestURI().toString();
+        // Ensure path is relative, TODO may need to check for multiple '/'
+        if (this.decodedPath.startsWith("/"))
+            this.decodedPath = this.decodedPath.substring(1);
+        
+        this.encodedQuery = request.queryString().toString();
         try {
             String scheme = request.scheme().toString();
             String host = request.serverName().toString();
-            this.baseURI = new URI(scheme, host, null);
+            this.baseUri = new URI(scheme, host, null);
         } catch (URISyntaxException ex) {
             ex.printStackTrace();
+            throw new IllegalArgumentException(ex);
         }
-        copyHttpHeaders();
     }
     
-    protected void copyHttpHeaders() {
+    private void copyHttpHeaders() {
         MultivaluedMap<String, String> headers = getRequestHeaders();
         
         MimeHeaders mh = request.getMimeHeaders();
@@ -78,17 +83,15 @@ public class GrizzlyRequestAdaptor  extends HttpRequestContextImpl {
             }
         }
     }
-
     
-    private static class GrizzlyRequestInputStream extends InputStream {
+    private static final class GrizzlyRequestInputStream extends InputStream {
         
-        Request request;
-        ByteArrayInputStream stream;
-        ByteChunk chunk;
+        private final Request request;
+        private final ByteChunk chunk;
+        private ByteArrayInputStream stream;
         
         public GrizzlyRequestInputStream(Request request) {
             this.request = request;
-            this.stream = null;
             this.chunk = new ByteChunk();
         }
 

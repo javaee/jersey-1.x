@@ -36,23 +36,30 @@ import javax.ws.rs.core.NewCookie;
 /**
  * Adapts a HttpServletRequest to provide the methods of HttpRequest
  */
-public class HttpRequestAdaptor extends HttpRequestContextImpl {
+public final class HttpRequestAdaptor extends HttpRequestContextImpl {
     
-    HttpServletRequest request;
+    final HttpServletRequest request;
     
     /** Creates a new instance of HttpRequestAdaptor */
     public HttpRequestAdaptor(HttpServletRequest request) throws IOException {
         super(request.getMethod(), request.getInputStream());
         this.request = request;
         
-        this.queryString = request.getQueryString();
-        this.queryParameters = extractQueryParameters(this.queryString, true);
-        setURIs();
+        initiateUriInfo();
         copyHttpHeaders();
     }
+
+    private void initiateUriInfo() {
+        this.encodedQuery = request.getQueryString();
+        this.absoluteUri = URI.create(request.getRequestURL().toString());        
+        this.decodedPath = (request.getPathInfo() != null) 
+            ? request.getPathInfo().substring(1)
+            : request.getServletPath().substring(1);
+        this.baseUri = getBaseURI(this.absoluteUri, this.decodedPath);
+    }    
     
     @SuppressWarnings("unchecked")
-    protected void copyHttpHeaders() {
+    private void copyHttpHeaders() {
         MultivaluedMap<String, String> headers = getRequestHeaders();
         for (Enumeration<String> names = request.getHeaderNames() ; names.hasMoreElements() ;) {
             String name = names.nextElement();
@@ -77,12 +84,4 @@ public class HttpRequestAdaptor extends HttpRequestContextImpl {
             }
         }
     }
-
-    protected void setURIs() {
-        this.uri = URI.create(request.getRequestURL().toString());        
-        this.uriPath = (request.getPathInfo() != null) 
-            ? request.getPathInfo().substring(1)
-            : request.getServletPath().substring(1);
-        this.baseURI = getBaseURI(this.uri, this.uriPath);
-    }    
 }

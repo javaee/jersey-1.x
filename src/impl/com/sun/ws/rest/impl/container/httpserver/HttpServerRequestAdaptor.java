@@ -49,12 +49,11 @@ public final class HttpServerRequestAdaptor extends HttpRequestContextImpl {
         super(exchange.getRequestMethod(), exchange.getRequestBody());
         this.exchange = exchange;
         
-        extractPathAndBaseURI();
+        initiateUriInfo();
         copyHttpHeaders();
-        extractQueryParameters();
     }
     
-    private void extractPathAndBaseURI() {
+    private void initiateUriInfo() {
         /*
          * This is a URI that only contains the URI path component!
          */
@@ -65,14 +64,14 @@ public final class HttpServerRequestAdaptor extends HttpRequestContextImpl {
         String contextPath = exchange.getHttpContext().getPath();
         
         // The path for the Web application
-        this.encodedUriPath = exchangeUri.getRawPath().substring(contextPath.length());
+        this.encodedPath = exchangeUri.getRawPath().substring(contextPath.length());
         if (!contextPath.endsWith("/")) {
             // Ensure path is relative
-            if (this.encodedUriPath.startsWith("/")) {
+            if (this.encodedPath.startsWith("/")) {
                 int i = 0;
-                while (this.encodedUriPath.charAt(i) == '/')
+                while (this.encodedPath.charAt(i) == '/')
                     i++;
-                this.encodedUriPath = this.encodedUriPath.substring(i);
+                this.encodedPath = this.encodedPath.substring(i);
                 // Ensure that base URI ends in '/'
                 contextPath += "/";
             }
@@ -89,17 +88,19 @@ public final class HttpServerRequestAdaptor extends HttpRequestContextImpl {
         String scheme = (server instanceof HttpsServer) ? "https" : "http";
         InetSocketAddress addr = exchange.getLocalAddress();
         try {
-            this.baseURI = new URI(scheme, null, addr.getHostName(), addr.getPort(), 
+            this.baseUri = new URI(scheme, null, addr.getHostName(), addr.getPort(), 
                     contextPath, null, null);
         } catch (URISyntaxException ex) {
             throw new IllegalArgumentException(ex);
         }
         
         // Resolve to the complete URI
-        this.uri = this.baseURI.resolve(exchangeUri);
+        this.absoluteUri = this.baseUri.resolve(exchangeUri);
+        
+        this.encodedQuery = exchangeUri.getRawQuery();
     }
     
-    protected void copyHttpHeaders() {
+    private void copyHttpHeaders() {
         MultivaluedMap<String, String> headers = getRequestHeaders();
         
         Headers eh = exchange.getRequestHeaders();
@@ -111,10 +112,5 @@ public final class HttpServerRequestAdaptor extends HttpRequestContextImpl {
                 }
             }
         }
-    }
-    
-    protected void extractQueryParameters() {
-        this.queryString = exchange.getRequestURI().getRawQuery();
-        this.queryParameters = extractQueryParameters(this.queryString, true);
     }    
 }
