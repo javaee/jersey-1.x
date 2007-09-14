@@ -54,7 +54,6 @@
             </classpath>
             <option key="webresourcesdestdir" value="../.."/>
             <option key="webresourcespkg" value="com.example.resources"/>
-            <option key="noservlet"/>
             <source dir="${src.dir}/com/example/resources">
                 <include name="**/*.java"/>
             </source>

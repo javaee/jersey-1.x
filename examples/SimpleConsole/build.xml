@@ -52,7 +52,6 @@
             </classpath>                 
             <option key="webresourcesdestdir" value="."/>
             <option key="webresourcespkg" value="com.sun.ws.rest.samples.console.resources"/>
-            <option key="noservlet"/>
             <source dir="${src.dir}">
                 <include name="**/*.java"/>
                 <exclude name="**/Main.java"/>

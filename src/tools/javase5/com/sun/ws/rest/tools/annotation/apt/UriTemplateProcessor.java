@@ -108,7 +108,7 @@ public class UriTemplateProcessor implements Messager, AnnotationProcessor {
     /**
      * Determines if web.xml should be generated
      */
-    boolean generateWebXml = true;
+    boolean generateWebXml = false;
     
     /**
      * Determines if wadl should be generated
@@ -174,8 +174,8 @@ public class UriTemplateProcessor implements Messager, AnnotationProcessor {
                 servletName = key.split("=")[1];
             } else if (key.startsWith("-Awebresourcespkg")) {
                 webresourcesPackage = key.split("=")[1];
-            } else if (key.startsWith("-Anoservlet")) {
-                generateWebXml = false;
+            } else if (key.startsWith("-Aservlet")) {
+                generateWebXml = true;
             } else if (key.startsWith("-Anowadl")) {
                 generateWadl = false;
             } else if (key.startsWith("-Aredirect")) {
@@ -202,14 +202,16 @@ public class UriTemplateProcessor implements Messager, AnnotationProcessor {
         
         if (!generateWebXml) {
            if (servletClassName != null)
-               apEnv.getMessager().printError("-Aservletclassname cannot be used with the -Anoservlet option.");
+               apEnv.getMessager().printError("-Aservletclassname requires the -Aservlet option to be set.");
            
            if (servletName != null)
-               apEnv.getMessager().printError("-Aservletname cannot be used with the -Anoservlet option.");
+               apEnv.getMessager().printError("-Aservletname requires the -Aservlet option to be set.");
               
            if (urlPattern != null)
-               apEnv.getMessager().printError("-Aurlpattern cannot be used with the -Anoservlet option.");
+               apEnv.getMessager().printError("-Aurlpattern requires the -Aservlet option to be set.");
         } else {
+            if (context.round < 1)
+            System.err.println("Warning: The -Aservet option will generate a web.xml and override any pre-existing web.xml");
             if (servletClassName == null)
                 servletClassName = "com.sun.ws.rest.impl.container.servlet.ServletAdaptor";
             if (servletName == null)
