@@ -1,6 +1,14 @@
 release 0.3 (2007-10-xx)
-- Integrated JSR 311 API 0.3. 
-  <TODO include summary of API changes>
+- Fixed issue 2: URI path matching should operate on the encoded path
+  https://jersey.dev.java.net/issues/show_bug.cgi?id=2
+- Integrated JSR 311 API 0.3.
+  The class javax.ws.rs.core.UriBuilder is implemented. This is the preferred
+  way to create URIs.
+  Method names on javax.ws.rs.core.UriInfo were modified, the string "URI"
+  or "Uri" was removed.
+  The methods javax.ws.rs.ext.EntityProvider#readFrom/writeTo take
+  a MediaType as a paramater, which corresponds to the "Content-Type"
+  HTTP header field.
 - Correctly support the writing of responses for the method signature:
     void <method>(HttpRequestContext, HttpResponseContext)
   this includes the method signature for resources that implement the interface
@@ -19,7 +27,8 @@ release 0.3 (2007-10-xx)
   with HttpMethod.
 
 release 0.2.1 (2007-09-04)
-- Fixed issue 4: Unsed jars required to be included in the class path for use of certain entity providers
+- Fixed issue 4: Unsed jars required to be included in the class path for use 
+  of certain entity providers
   https://jersey.dev.java.net/issues/show_bug.cgi?id=4
 - JsonFromJaxb example added to demonstrate using JSON representation 
   of JAXB based resources
