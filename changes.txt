@@ -1,4 +1,5 @@
 release 0.3 (2007-10-xx)
+- Fixed issue 8: apt tool silently overwrites existing web.xml by default
 - Fixed issue 2: URI path matching should operate on the encoded path
   https://jersey.dev.java.net/issues/show_bug.cgi?id=2
 - Integrated JSR 311 API 0.3.
