@@ -141,7 +141,7 @@ public abstract class HttpRequestContextImpl implements ContainerRequest {
         
         if (decodedTemplateValues != null) {
             for (Map.Entry<String, String> e : values.entrySet()) {
-                encodedTemplateValues.putSingle(
+                decodedTemplateValues.putSingle(
                         UriComponent.decode(e.getKey(), UriComponent.Type.PATH_SEGMENT),
                         UriComponent.decode(e.getValue(), UriComponent.Type.PATH));            
             }
