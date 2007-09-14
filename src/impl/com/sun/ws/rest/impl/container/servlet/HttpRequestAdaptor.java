@@ -61,6 +61,12 @@ public final class HttpRequestAdaptor extends HttpRequestContextImpl {
         /**
          * The HttpServletRequest.getPathInfo() and 
          * HttpServletRequest.getServletPath() are in decoded form.
+         *
+         * On some servlet implementations the getPathInfo() removed
+         * contiguous '/' characters. This is problematic if URIs
+         * are embedded, for example as the last path segment.
+         * We need to work around this and not use getPathInfo
+         * for the decodedPath.
          */
         this.decodedPath = (request.getPathInfo() != null) 
             ? request.getPathInfo().substring(1)
