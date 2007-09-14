@@ -53,12 +53,20 @@ public final class GrizzlyRequestAdaptor  extends HttpRequestContextImpl {
     }
 
     private void initiateUriInfo() {
+        /**
+         * TODO find out exactly what the URI related methods 
+         * on org.apache.coyote.Request actually return.
+         * If URI components are returned are they in encoded or decoded form?
+         * If URIs are returned what components to they contain?
+         */
+        
         this.decodedPath = request.requestURI().toString();
         // Ensure path is relative, TODO may need to check for multiple '/'
         if (this.decodedPath.startsWith("/"))
             this.decodedPath = this.decodedPath.substring(1);
         
         this.encodedQuery = request.queryString().toString();
+        
         try {
             String scheme = request.scheme().toString();
             String host = request.serverName().toString();

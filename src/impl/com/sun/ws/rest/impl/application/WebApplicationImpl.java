@@ -167,9 +167,12 @@ public final class WebApplicationImpl implements WebApplication {
             }
         }
 
-        // TODO the matching algorithm currently works from an absolute path
+        /**
+         * The matching algorithm currently works from an absolute path.
+         * The path is required to be in encoded form.
+         */
         StringBuilder path = new StringBuilder();
-        path.append("/").append(request.getPath());
+        path.append("/").append(request.getPath(false));
 
         if (resourceConfig.getFeatures().get(ResourceConfig.IGNORE_MATRIX_PARAMS))
             // TODO check for annotation on resource

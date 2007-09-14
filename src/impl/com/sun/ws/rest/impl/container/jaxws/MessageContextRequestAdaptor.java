@@ -46,24 +46,33 @@ public final class MessageContextRequestAdaptor extends HttpRequestContextImpl {
     /**
      * Creates a new instance of MessageContextRequestAdaptor
      */
-    public MessageContextRequestAdaptor(DataSource request, MessageContext context) throws IOException {
-        super((String)context.get(HTTP_REQUEST_METHOD), request != null ? request.getInputStream() : null );
+    public MessageContextRequestAdaptor(DataSource request, 
+            MessageContext context) throws IOException {
+        super((String)context.get(HTTP_REQUEST_METHOD), 
+                request != null ? request.getInputStream() : null );
         this.context = context;
         
         initiateUriInfo();
         copyHttpHeaders();
     }
 
-    private void initiateUriInfo() {        
+    private void initiateUriInfo() {
+        /**
+         * TODO obtain base URI
+         *
+         * JAX-WS access to URIs is very limited. It is necessary to drop down
+         * to the underlying container, which makes using the JAX-WS provider
+         * mostly useless.
+         */
+        
+        this.baseUri = URI.create("/");
+        
         this.decodedPath = (String)context.get(PATH_INFO);
         // Ensure path is relative, TODO may need to check for multiple '/'
         if (this.decodedPath.startsWith("/"))
             this.decodedPath = this.decodedPath.substring(1);
         
-        this.encodedQuery = (String)context.get(QUERY_STRING);
-        
-        // TODO create base URI
-        this.baseUri = URI.create("/");
+        this.encodedQuery = (String)context.get(QUERY_STRING);                
     }
     
     @SuppressWarnings("unchecked")

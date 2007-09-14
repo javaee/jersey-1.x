@@ -54,27 +54,30 @@ public final class HttpServerRequestAdaptor extends HttpRequestContextImpl {
     }
     
     private void initiateUriInfo() {
-        /*
-         * This is a URI that only contains the URI path component!
+        /**
+         * This is a URI that contains the path, query and
+         * fragment components.
          */
         final URI exchangeUri = exchange.getRequestURI();
         
-        // The base path context of the handler
-        // Is this in encoded or decoded form?
-        String contextPath = exchange.getHttpContext().getPath();
-        
-        // The path for the Web application
-        this.encodedPath = exchangeUri.getRawPath().substring(contextPath.length());
-        if (!contextPath.endsWith("/")) {
-            // Ensure path is relative
-            if (this.encodedPath.startsWith("/")) {
-                int i = 0;
-                while (this.encodedPath.charAt(i) == '/')
-                    i++;
-                this.encodedPath = this.encodedPath.substring(i);
-                // Ensure that base URI ends in '/'
-                contextPath += "/";
-            }
+        /**
+         * The base path specified by the HTTP context of the HTTP handler.
+         * It is in decoded form.
+         */
+        String decodedBasePath = exchange.getHttpContext().getPath();
+        if (!decodedBasePath.endsWith("/")) {
+            decodedBasePath += "/";                
+        }
+
+        /**
+         * Extract the decoded path
+         */
+        this.decodedPath = exchangeUri.getPath().substring(decodedBasePath.length());
+        if (this.decodedPath.startsWith("/")) {
+            int i = 0;
+            while (this.decodedPath.charAt(i) == '/')
+                i++;
+            this.decodedPath = this.decodedPath.substring(i);
         }
         
         /*
@@ -89,15 +92,16 @@ public final class HttpServerRequestAdaptor extends HttpRequestContextImpl {
         InetSocketAddress addr = exchange.getLocalAddress();
         try {
             this.baseUri = new URI(scheme, null, addr.getHostName(), addr.getPort(), 
-                    contextPath, null, null);
+                    decodedBasePath, null, null);
         } catch (URISyntaxException ex) {
             throw new IllegalArgumentException(ex);
         }
         
-        // Resolve to the complete URI
         this.absoluteUri = this.baseUri.resolve(exchangeUri);
         
         this.encodedQuery = exchangeUri.getRawQuery();
+        
+        this.encodedFragment = exchangeUri.getRawFragment();
     }
     
     private void copyHttpHeaders() {

@@ -32,6 +32,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.core.Cookie;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.NewCookie;
+import javax.ws.rs.core.UriBuilder;
 
 /**
  * Adapts a HttpServletRequest to provide the methods of HttpRequest
@@ -50,13 +51,42 @@ public final class HttpRequestAdaptor extends HttpRequestContextImpl {
     }
 
     private void initiateUriInfo() {
-        this.encodedQuery = request.getQueryString();
-        this.absoluteUri = URI.create(request.getRequestURL().toString());        
+        /**
+         * The HttpServletRequest.getRequestURL() contains the complete URI
+         * minus the query and fragment components.
+         */
+        UriBuilder absoluteUriBuilder = UriBuilder.fromUri(
+                request.getRequestURL().toString());
+        
+        /**
+         * The HttpServletRequest.getPathInfo() and 
+         * HttpServletRequest.getServletPath() are in decoded form.
+         */
         this.decodedPath = (request.getPathInfo() != null) 
             ? request.getPathInfo().substring(1)
             : request.getServletPath().substring(1);
-        this.baseUri = getBaseURI(this.absoluteUri, this.decodedPath);
+
+        String decodedBasePath = (request.getPathInfo() != null)
+            ? request.getContextPath() + request.getServletPath() + "/"
+            : request.getContextPath() + "/";
+        
+        /**
+         * The HttpServletRequest.getQueryString() is in encoded form.
+         */
+        this.encodedQuery = request.getQueryString();
+                
+        this.absoluteUri = absoluteUriBuilder.build();
+        
+        this.baseUri = absoluteUriBuilder.replacePath(decodedBasePath).build();
     }    
+    
+    protected URI getBaseURI(URI uri, String path) {
+        String uriPath = uri.getPath();
+        int i = uriPath.lastIndexOf(path);
+        String contextPath = uriPath.substring(0, i);
+        return uri.resolve(contextPath);
+    }
+
     
     @SuppressWarnings("unchecked")
     private void copyHttpHeaders() {

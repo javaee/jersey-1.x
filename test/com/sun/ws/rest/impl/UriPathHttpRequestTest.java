@@ -46,7 +46,7 @@ public class UriPathHttpRequestTest extends TestCase {
     
     public void testEncoded() throws Exception {
         HttpRequestContext r = new TestHttpRequestContext("GET", null,
-                "/context/widgets%20/%2010", "/context", "widgets / 10");
+                "/context/widgets%20/%2010", "/context", "widgets%20/%2010");
         assertEquals("widgets / 10", r.getPath());
         assertEquals("widgets / 10", r.getPath(true));
         assertEquals("widgets%20/%2010", r.getPath(false));

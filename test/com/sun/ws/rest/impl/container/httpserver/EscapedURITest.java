@@ -42,13 +42,14 @@ import junit.framework.*;
  * @author Paul.Sandoz@Sun.Com
  */
 public class EscapedURITest extends TestCase {
-    @UriTemplate(value="/x%20y", encode=false)
+    @UriTemplate(value="x%20y", encode=false)
     public static class EscapedURIResource {
         @HttpMethod
         public String get(@HttpContext UriInfo info) {
             assertEquals("http://localhost:9998/context/x%20y", info.getAbsolute().toString());
             assertEquals("http://localhost:9998/context/", info.getBase().toString());
             assertEquals("x y", info.getPath());
+            assertEquals("x%20y", info.getPath(false));
             return "CONTENT";
         }
     }

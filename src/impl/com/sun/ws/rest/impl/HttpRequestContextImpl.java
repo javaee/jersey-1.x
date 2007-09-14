@@ -1,12 +1,12 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
- * 
- * Copyright 2007 Sun Microsystems, Inc. All rights reserved. 
- * 
+ *
+ * Copyright 2007 Sun Microsystems, Inc. All rights reserved.
+ *
  * The contents of this file are subject to the terms of the Common Development
  * and Distribution License("CDDL") (the "License").  You may not use this file
- * except in compliance with the License. 
- * 
+ * except in compliance with the License.
+ *
  * You can obtain a copy of the License at:
  *     https://jersey.dev.java.net/license.txt
  * See the License for the specific language governing permissions and
@@ -54,10 +54,10 @@ import javax.ws.rs.ext.ProviderFactory;
  * @author Paul.Sandoz@Sun.Com
  */
 public abstract class HttpRequestContextImpl implements ContainerRequest {
-
+    
     private final String method;
     private final InputStream entity;
-
+    
     /**
      * The complete URI of a request, including the query and fragment
      * components (if any).
@@ -83,12 +83,12 @@ public abstract class HttpRequestContextImpl implements ContainerRequest {
      *
      * The schema, user info, host and port components must be equivalent to
      * those of the complete URI. The path component of the complete URI must
-     * start with the path component of the base URI. The base URI must not 
-     * contain the query and fragment components and the path component must 
+     * start with the path component of the base URI. The base URI must not
+     * contain the query and fragment components and the path component must
      * end in a '/'.
      */
     protected URI baseUri;
-
+    
     /**
      * The percent-encoded path component.
      *
@@ -112,15 +112,20 @@ public abstract class HttpRequestContextImpl implements ContainerRequest {
      */
     protected String encodedFragment;
     
-    private MultivaluedMap<String, String> queryParameters;
+    private List<PathSegment> decodedPathSegments;
+    private List<PathSegment> encodedPathSegments;
+    
+    private MultivaluedMap<String, String> decodedQueryParameters;
+    private MultivaluedMap<String, String> encodedQueryParameters;
+    
     private MultivaluedMap<String, String> templateValues;
-    private List<PathSegment> pathSegments;
+    
     
     private MultivaluedMap<String, String> headers;
     private MediaType contentType;
     private List<MediaType> accept;
     private List<Cookie> cookies;
-
+    
     protected HttpRequestContextImpl(String method, InputStream entity) {
         this.method = method;
         this.headers = new RequestHttpHeadersImpl();
@@ -128,8 +133,8 @@ public abstract class HttpRequestContextImpl implements ContainerRequest {
         this.entity = entity;
     }
     
-        
-    // HttpRequestContext 
+    
+    // HttpRequestContext
     
     public <T> T getEntity(Class<T> type) {
         try {
@@ -139,14 +144,14 @@ public abstract class HttpRequestContextImpl implements ContainerRequest {
             throw new IllegalArgumentException(e);
         }
     }
-
+    
     public String getHttpMethod() {
         return method;
     }
     
     public MediaType getAcceptableMediaType(List<MediaType> mediaTypes) {
         for (MediaType a : getAcceptableMediaTypes()) {
-            if (a.getType().equals(MediaType.MEDIA_TYPE_WILDCARD)) 
+            if (a.getType().equals(MediaType.MEDIA_TYPE_WILDCARD))
                 return mediaTypes.get(0);
             
             for (MediaType m : mediaTypes)
@@ -165,30 +170,32 @@ public abstract class HttpRequestContextImpl implements ContainerRequest {
     public String getPath(boolean decode) {
         if (decode) {
             if (decodedPath != null) return decodedPath;
-            return decodedPath = UriComponent.decode(encodedPath, 
+            
+            return decodedPath = UriComponent.decode(encodedPath,
                     UriComponent.Type.PATH);
         } else {
-            // TODO the encodedUriPath should never be null
             if (encodedPath != null) return encodedPath;
-            return encodedPath = UriComponent.encode(decodedPath, 
+            
+            return encodedPath = UriComponent.encode(decodedPath,
                     UriComponent.Type.PATH);
         }
     }
     
     public List<PathSegment> getPathSegments() {
-        if (pathSegments != null) {
-            return pathSegments;
-        }
-            
-        pathSegments = extractPathSegments(decodedPath, false);
-        return pathSegments;
+        return getPathSegments(true);
     }
     
     public List<PathSegment> getPathSegments(boolean decode) {
         if (decode) {
-            return getPathSegments();
+            if (decodedPathSegments != null)
+                return decodedPathSegments;
+            
+            return decodedPathSegments = extractPathSegments(getPath(false), true);
         } else {
-            return extractPathSegments(getPath(false), false);
+            if (encodedPathSegments != null)
+                return encodedPathSegments;
+            
+            return encodedPathSegments = extractPathSegments(getPath(false), false);
         }
     }
     
@@ -201,31 +208,33 @@ public abstract class HttpRequestContextImpl implements ContainerRequest {
     }
     
     public URI getAbsolute() {
-        if (absoluteUri == null) {
-            try {
-                // TODO fix
-                // This method is buggy
-                // a relative URI path segment that contains a URI
-                // will result in an invalid URI, for example:
-                //   ";a=http://host""
-                URI u = new URI(null, null, decodedPath, null);
-                absoluteUri = baseUri.resolve(u);
-            } catch (URISyntaxException e) {
-                throw new IllegalArgumentException(e);
-            }
-        }
-            
-        return absoluteUri;
+        if (absoluteUri != null) return absoluteUri;
+        
+        return absoluteUri = getBaseBuilder().encode(false).
+                path(getPath(false)).
+                build();
     }
-
+    
     public UriBuilder getBuilder() {
         return UriBuilder.fromUri(getAbsolute());
+    }
+    
+    public URI getComplete() {
+        if (completeUri != null) return completeUri;
+        
+        return completeUri = getBuilder().encode(false).
+                replaceQueryParams(encodedQuery).fragment(encodedFragment).
+                build();
+    }
+    
+    public UriBuilder getCompleteBuilder() {
+        return UriBuilder.fromUri(getComplete());
     }
     
     public MultivaluedMap<String, String> getTemplateParameters() {
         return templateValues;
     }
-
+    
     public MultivaluedMap<String, String> getTemplateParameters(boolean decode) {
         if (decode) {
             return templateValues;
@@ -234,11 +243,7 @@ public abstract class HttpRequestContextImpl implements ContainerRequest {
             for (Map.Entry<String, List<String>> e : templateValues.entrySet()) {
                 List<String> l = new ArrayList<String>();
                 for (String v : e.getValue()) {
-                    try {
-                        l.add(URLEncoder.encode(v, "UTF-8"));
-                    } catch (UnsupportedEncodingException ex) {
-                        ex.printStackTrace();
-                    }
+                    l.add(UriComponent.encode(v, UriComponent.Type.PATH));
                 }
                 encodedTemplateValues.put(e.getKey(), l);
             }
@@ -252,40 +257,31 @@ public abstract class HttpRequestContextImpl implements ContainerRequest {
     
     public MultivaluedMap<String, String> getQueryParameters(boolean decode) {
         if (decode) {
-            if (queryParameters != null) return queryParameters;
+            if (decodedQueryParameters != null)
+                return decodedQueryParameters;
             
-            return queryParameters = extractQueryParameters(encodedQuery, true);
+            return decodedQueryParameters = extractQueryParameters(encodedQuery, true);
         } else {
-            return extractQueryParameters(encodedQuery, false);
+            if (encodedQueryParameters != null)
+                return encodedQueryParameters;
+            
+            return encodedQueryParameters = extractQueryParameters(encodedQuery, false);
         }
     }
-    
-    /**
-     * Get the base URI given a URI and a relative URI path.
-     * @param uri the URI
-     * @param path the URI path (decoded)
-     */
-    protected URI getBaseURI(URI uri, String path) {
-        String uriPath = uri.getPath();
-        int i = uriPath.lastIndexOf(path);
-        String contextPath = uriPath.substring(0, i);
-        return uri.resolve(contextPath);
-    }
-
     
     // HttpHeaders
     
     public MultivaluedMap<String, String> getRequestHeaders() {
         return headers;
     }
-
+    
     public List<MediaType> getAcceptableMediaTypes() {
         if (accept == null)
             accept = HttpHelper.getAccept(this);
         
         return accept;
     }
-
+    
     public MediaType getMediaType() {
         if (contentType == null)
             contentType = HttpHelper.getContentType(this);
@@ -318,12 +314,12 @@ public abstract class HttpRequestContextImpl implements ContainerRequest {
         public String getPath() {
             return path;
         }
-
+        
         public MultivaluedMap<String, String> getMatrixParameters() {
             return matrixParameters;
         }
     }
-                
+    
     /**
      * Extract the path segments from the path
      * TODO: This is not very efficient
@@ -355,8 +351,11 @@ public abstract class HttpRequestContextImpl implements ContainerRequest {
             if (colon != -1) {
                 String matrixParameters = subPath.substring(colon + 1);
                 subPath = (colon == 0) ? "" : subPath.substring(0, colon);
-                extractParameters(matrixParameters, ";", matrixMap, decode);
+                extractPathParameters(matrixParameters, ";", matrixMap, decode);
             }
+            
+            if (decode)
+                subPath = UriComponent.decode(subPath, UriComponent.Type.PATH_SEGMENT);
             
             PathSegment pathSegment = new PathSegmentImpl(subPath, matrixMap);
             pathSegments.add(pathSegment);
@@ -376,14 +375,14 @@ public abstract class HttpRequestContextImpl implements ContainerRequest {
         if (queryString == null || queryString.length() == 0)
             return queryParameters;
         
-        extractParameters(queryString, "&", queryParameters, decode);
+        extractQueryParameters(queryString, "&", queryParameters, decode);
         return queryParameters;
     }
     
     /**
      * TODO: This is not very efficient
      */
-    protected void extractParameters(String parameters, String deliminator, 
+    protected void extractQueryParameters(String parameters, String deliminator,
             MultivaluedMap<String, String> map, boolean decode) {
         for (String s : parameters.split(deliminator)) {
             if (s.length() == 0)
@@ -396,7 +395,7 @@ public abstract class HttpRequestContextImpl implements ContainerRequest {
                     continue;
                 
                 // Query parameter may not have a value, if so default to "";
-                String val = (keyVal.length == 2) ? 
+                String val = (keyVal.length == 2) ?
                     (decode) ? URLDecoder.decode(keyVal[1], "UTF-8") : keyVal[1] : "";
                 
                 List<String> list = map.get(key);
@@ -409,55 +408,83 @@ public abstract class HttpRequestContextImpl implements ContainerRequest {
                 ex.printStackTrace();
             }
         }
-    }    
+    }
     
+    /**
+     * TODO: This is not very efficient
+     */
+    protected void extractPathParameters(String parameters, String deliminator,
+            MultivaluedMap<String, String> map, boolean decode) {
+        for (String s : parameters.split(deliminator)) {
+            if (s.length() == 0)
+                continue;
+            
+            String[] keyVal = s.split("=");
+            String key = (decode)
+            ? UriComponent.decode(keyVal[0], UriComponent.Type.PATH_SEGMENT)
+            : keyVal[0];
+            if (key.length() == 0)
+                continue;
+
+            // parameter may not have a value, if so default to "";
+            String val = (keyVal.length == 2) ?
+                (decode) ? UriComponent.decode(keyVal[1], UriComponent.Type.PATH_SEGMENT) : keyVal[1] : "";
+
+            List<String> list = map.get(key);
+            if (map.get(key) == null) {
+                list = new LinkedList<String>();
+                map.put(key, list);
+            }
+            list.add(val);
+        }
+    }
     
     public Response evaluate(EntityTag eTag) {
         Response r = evaluateIfMatch(eTag);
-        if (r == null) 
+        if (r == null)
             r = evaluateIfNoneMatch(eTag);
-
+        
         return r;
     }
-
+    
     public Response evaluate(Date lastModified) {
         long lastModifiedTime = lastModified.getTime();
         Response r = evaluateIfUnmodifiedSince(lastModifiedTime);
         if (r == null)
             r = evaluateIfModifiedSince(lastModifiedTime);
-
+        
         return r;
     }
-
+    
     public Response evaluate(Date lastModified, EntityTag eTag) {
         Response r = evaluateIfMatch(eTag);
         if (r == null) {
             long lastModifiedTime = lastModified.getTime();
             r = evaluateIfUnmodifiedSince(lastModifiedTime);
-            if (r == null) 
+            if (r == null)
                 r = evaluateIfNoneMatch(eTag);
             if (r == null)
                 r = evaluateIfModifiedSince(lastModifiedTime);
         }
-
+        
         return r;
     }
-
-
+    
+    
     private Response evaluateIfMatch(EntityTag eTag) {
         String ifMatchHeader = getRequestHeaders().getFirst("If-Match");
         // TODO require support for eTag types
         // Strong comparison of entity tags is required
-        if (ifMatchHeader != null && 
+        if (ifMatchHeader != null &&
                 !ifMatchHeader.trim().equals("*") &&
                 !ifMatchHeader.contains(eTag.getValue())) {
             // 412 Precondition Failed
             return Responses.PRECONDITION_FAILED;
         }
-
+        
         return null;
     }
-
+    
     private Response evaluateIfNoneMatch(EntityTag eTag) {
         String ifNoneMatchHeader = getRequestHeaders().getFirst("If-None-Match");
         if (ifNoneMatchHeader != null) {
@@ -477,11 +504,11 @@ public abstract class HttpRequestContextImpl implements ContainerRequest {
                     return Responses.PRECONDITION_FAILED;
                 }
             }
-        }     
-
+        }
+        
         return null;
     }
-
+    
     private Response evaluateIfUnmodifiedSince(long lastModified) {
         String ifUnmodifiedSinceHeader = getRequestHeaders().getFirst("If-Unmodified-Since");
         if (ifUnmodifiedSinceHeader != null) {
@@ -495,10 +522,10 @@ public abstract class HttpRequestContextImpl implements ContainerRequest {
                 // Ignore the header if parsing error
             }
         }
-
+        
         return null;
-    }        
-
+    }
+    
     private Response evaluateIfModifiedSince(long lastModified) {
         String ifModifiedSinceHeader = getRequestHeaders().getFirst("If-Modified-Since");
         if (ifModifiedSinceHeader != null) {
@@ -508,12 +535,12 @@ public abstract class HttpRequestContextImpl implements ContainerRequest {
                 if (ifModifiedSince  > lastModified) {
                     // 304 Not modified
                     return Responses.NOT_MODIFIED;
-                }                    
+                }
             } catch (ParseException ex) {
                 // Ignore the header if parsing error
             }
         }
-
+        
         return null;
     }
     
