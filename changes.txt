@@ -1,9 +1,9 @@
 release 0.3 (2007-10-xx)
 - Fixed issue 8: apt tool silently overwrites existing web.xml by default
   The "noservlet" option used with the WebResourcesProcessorTask ant task
-  has been modified so that by default Servlet is not assumed so that no
-  overriding of any web.xml occurs. The option "servlet" is required for the
-  ant task (and apt tool) to generate a web.xml.
+  has been removed so that by default Servlet is not assumed no overriding 
+  of a web.xml occurs. A new option "servlet" replaces the old option and is 
+  required to be set for the ant task (and apt tool) to generate a web.xml.
 - Fixed issue 2: URI path matching should operate on the encoded path
   https://jersey.dev.java.net/issues/show_bug.cgi?id=2
 - Integrated JSR 311 API 0.3.
