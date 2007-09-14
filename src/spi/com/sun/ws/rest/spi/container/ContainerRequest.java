@@ -22,6 +22,9 @@
 
 package com.sun.ws.rest.spi.container;
 
+import com.sun.ws.rest.api.core.HttpRequestContext;
+import java.util.Map;
+
 /**
  * The HTTP request context supplied by the container.
  * <p>
@@ -30,5 +33,14 @@ package com.sun.ws.rest.spi.container;
  *
  * @author Paul.Sandoz@Sun.Com
  */
-public interface ContainerRequest extends com.sun.ws.rest.api.core.HttpRequestContext {
+public interface ContainerRequest extends HttpRequestContext {
+    
+    /**
+     * Add templates values to the HTTP request.
+     * <p>
+     * The template names and values must be in encoded form.
+     *
+     * @param values the map of template values.
+     */
+    public void addTemplateValues(Map<String, String> values);
 }

@@ -31,9 +31,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.net.URLDecoder;
-import java.net.URLEncoder;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Date;
@@ -118,7 +116,8 @@ public abstract class HttpRequestContextImpl implements ContainerRequest {
     private MultivaluedMap<String, String> decodedQueryParameters;
     private MultivaluedMap<String, String> encodedQueryParameters;
     
-    private MultivaluedMap<String, String> templateValues;
+    private MultivaluedMap<String, String> encodedTemplateValues;
+    private MultivaluedMap<String, String> decodedTemplateValues;
     
     
     private MultivaluedMap<String, String> headers;
@@ -129,8 +128,24 @@ public abstract class HttpRequestContextImpl implements ContainerRequest {
     protected HttpRequestContextImpl(String method, InputStream entity) {
         this.method = method;
         this.headers = new RequestHttpHeadersImpl();
-        this.templateValues = new MultivaluedMapImpl();
+        this.encodedTemplateValues = new MultivaluedMapImpl();
         this.entity = entity;
+    }
+    
+    // ContainerRequest
+    
+    public void addTemplateValues(Map<String, String> values) {
+        for (Map.Entry<String, String> e : values.entrySet()) {
+            encodedTemplateValues.putSingle(e.getKey(), e.getValue());
+        }
+        
+        if (decodedTemplateValues != null) {
+            for (Map.Entry<String, String> e : values.entrySet()) {
+                encodedTemplateValues.putSingle(
+                        UriComponent.decode(e.getKey(), UriComponent.Type.PATH_SEGMENT),
+                        UriComponent.decode(e.getValue(), UriComponent.Type.PATH));            
+            }
+        }
     }
     
     
@@ -232,21 +247,27 @@ public abstract class HttpRequestContextImpl implements ContainerRequest {
     }
     
     public MultivaluedMap<String, String> getTemplateParameters() {
-        return templateValues;
+        return getTemplateParameters(true);
     }
     
     public MultivaluedMap<String, String> getTemplateParameters(boolean decode) {
         if (decode) {
-            return templateValues;
-        } else {
-            MultivaluedMapImpl encodedTemplateValues = new MultivaluedMapImpl();
-            for (Map.Entry<String, List<String>> e : templateValues.entrySet()) {
+            if (decodedTemplateValues != null) 
+                return decodedTemplateValues;
+            
+            decodedTemplateValues = new MultivaluedMapImpl();
+            for (Map.Entry<String, List<String>> e : encodedTemplateValues.entrySet()) {
                 List<String> l = new ArrayList<String>();
                 for (String v : e.getValue()) {
-                    l.add(UriComponent.encode(v, UriComponent.Type.PATH));
+                    l.add(UriComponent.decode(v, UriComponent.Type.PATH));
                 }
-                encodedTemplateValues.put(e.getKey(), l);
+                decodedTemplateValues.put(
+                        UriComponent.decode(e.getKey(), UriComponent.Type.PATH_SEGMENT), 
+                        l);
             }
+            
+            return decodedTemplateValues;
+        } else {
             return encodedTemplateValues;
         }
     }
@@ -324,7 +345,7 @@ public abstract class HttpRequestContextImpl implements ContainerRequest {
      * Extract the path segments from the path
      * TODO: This is not very efficient
      */
-    protected List<PathSegment> extractPathSegments(String path, boolean decode) {
+    private List<PathSegment> extractPathSegments(String path, boolean decode) {
         List<PathSegment> pathSegments = new LinkedList<PathSegment>();
         
         if (path == null)
@@ -365,11 +386,40 @@ public abstract class HttpRequestContextImpl implements ContainerRequest {
     }
     
     /**
+     * TODO: This is not very efficient
+     */
+    private void extractPathParameters(String parameters, String deliminator,
+            MultivaluedMap<String, String> map, boolean decode) {
+        for (String s : parameters.split(deliminator)) {
+            if (s.length() == 0)
+                continue;
+            
+            String[] keyVal = s.split("=");
+            String key = (decode)
+            ? UriComponent.decode(keyVal[0], UriComponent.Type.PATH_SEGMENT)
+            : keyVal[0];
+            if (key.length() == 0)
+                continue;
+
+            // parameter may not have a value, if so default to "";
+            String val = (keyVal.length == 2) ?
+                (decode) ? UriComponent.decode(keyVal[1], UriComponent.Type.PATH_SEGMENT) : keyVal[1] : "";
+
+            List<String> list = map.get(key);
+            if (map.get(key) == null) {
+                list = new LinkedList<String>();
+                map.put(key, list);
+            }
+            list.add(val);
+        }
+    }
+    
+    /**
      * Extract the query parameters from a string and add
      * them to the query parameters map.
      * TODO: This is not very efficient
      */
-    protected MultivaluedMap<String, String> extractQueryParameters(String queryString, boolean decode) {
+    private MultivaluedMap<String, String> extractQueryParameters(String queryString, boolean decode) {
         MultivaluedMap<String, String> queryParameters = new MultivaluedMapImpl();
         
         if (queryString == null || queryString.length() == 0)
@@ -382,7 +432,7 @@ public abstract class HttpRequestContextImpl implements ContainerRequest {
     /**
      * TODO: This is not very efficient
      */
-    protected void extractQueryParameters(String parameters, String deliminator,
+    private void extractQueryParameters(String parameters, String deliminator,
             MultivaluedMap<String, String> map, boolean decode) {
         for (String s : parameters.split(deliminator)) {
             if (s.length() == 0)
@@ -409,36 +459,10 @@ public abstract class HttpRequestContextImpl implements ContainerRequest {
             }
         }
     }
+        
     
-    /**
-     * TODO: This is not very efficient
-     */
-    protected void extractPathParameters(String parameters, String deliminator,
-            MultivaluedMap<String, String> map, boolean decode) {
-        for (String s : parameters.split(deliminator)) {
-            if (s.length() == 0)
-                continue;
+    // PreconditionEvaluator
             
-            String[] keyVal = s.split("=");
-            String key = (decode)
-            ? UriComponent.decode(keyVal[0], UriComponent.Type.PATH_SEGMENT)
-            : keyVal[0];
-            if (key.length() == 0)
-                continue;
-
-            // parameter may not have a value, if so default to "";
-            String val = (keyVal.length == 2) ?
-                (decode) ? UriComponent.decode(keyVal[1], UriComponent.Type.PATH_SEGMENT) : keyVal[1] : "";
-
-            List<String> list = map.get(key);
-            if (map.get(key) == null) {
-                list = new LinkedList<String>();
-                map.put(key, list);
-            }
-            list.add(val);
-        }
-    }
-    
     public Response evaluate(EntityTag eTag) {
         Response r = evaluateIfMatch(eTag);
         if (r == null)
@@ -469,7 +493,6 @@ public abstract class HttpRequestContextImpl implements ContainerRequest {
         
         return r;
     }
-    
     
     private Response evaluateIfMatch(EntityTag eTag) {
         String ifMatchHeader = getRequestHeaders().getFirst("If-Match");
@@ -543,5 +566,4 @@ public abstract class HttpRequestContextImpl implements ContainerRequest {
         
         return null;
     }
-    
 }
