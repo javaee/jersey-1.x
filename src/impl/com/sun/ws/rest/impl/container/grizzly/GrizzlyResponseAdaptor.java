@@ -58,7 +58,7 @@ public final class GrizzlyResponseAdaptor extends HttpResponseContextImpl {
         return output = new GrizzlyResponseOutputStream();
     }
     
-    protected void commit() throws IOException {
+    protected void commitStatusAndHeaders() throws IOException {
         response.setStatus(this.getStatus());
         
         MimeHeaders mh = response.getMimeHeaders();
@@ -81,7 +81,7 @@ public final class GrizzlyResponseAdaptor extends HttpResponseContextImpl {
         if (isCommitted())
             return;
         
-        commit();
+        commitStatusAndHeaders();
         
         final OutputStream out = getUnderlyingOutputStream();
         writeEntity(out);

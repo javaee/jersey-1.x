@@ -40,9 +40,6 @@ public interface WebApplication {
      * @param containerMemento the object representing the container
      * @param resourceConfig the resource configuration containing the set
      *        of Web resources to be managed by the Web application.
-     * @param resolverFactory the Web resource resolver factory to be used
-     *        for creating Web resource resolvers for the managed set of 
-     *        Web resources.
      * @throws IllegalArgumentException if resourceConfig is null.
      * @throws ContainerException if a second or further call to the method 
      *         is invoked.

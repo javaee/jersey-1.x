@@ -22,7 +22,7 @@
 
 package com.sun.ws.rest.impl;
 
-import com.sun.ws.rest.api.core.HttpRequestContext;
+import com.sun.ws.rest.spi.container.ContainerRequest;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -35,7 +35,7 @@ public class TestHttpResponseContext extends HttpResponseContextImpl {
 
     private ByteArrayOutputStream baos = new ByteArrayOutputStream();
     
-    public TestHttpResponseContext(HttpRequestContext requestContext) {
+    public TestHttpResponseContext(ContainerRequest requestContext) {
         super(requestContext);
     }
     
@@ -43,7 +43,7 @@ public class TestHttpResponseContext extends HttpResponseContextImpl {
         return baos;
     }
 
-    protected void commit() throws IOException {
+    protected void commitStatusAndHeaders() throws IOException {
     }
     
     public byte[] getEntityAsByteArray() {

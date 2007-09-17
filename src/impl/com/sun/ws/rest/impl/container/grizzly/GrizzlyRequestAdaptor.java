@@ -60,17 +60,24 @@ public final class GrizzlyRequestAdaptor  extends HttpRequestContextImpl {
          * If URIs are returned what components to they contain?
          */
         
-        this.decodedPath = request.requestURI().toString();
-        // Ensure path is relative, TODO may need to check for multiple '/'
-        if (this.decodedPath.startsWith("/"))
-            this.decodedPath = this.decodedPath.substring(1);
-        
-        this.encodedQuery = request.queryString().toString();
-        
         try {
-            String scheme = request.scheme().toString();
-            String host = request.serverName().toString();
-            this.baseUri = new URI(scheme, host, null);
+            this.completeUri = new URI(
+                    request.scheme().toString(), 
+                    null,
+                    request.serverName().toString(), 
+                    request.getServerPort(),
+                    "/", 
+                    null, 
+                    null);
+            
+            this.completeUri = new URI(
+                    request.scheme().toString(), 
+                    null,
+                    request.serverName().toString(), 
+                    request.getServerPort(),
+                    request.requestURI().toString(), 
+                    request.queryString().toString(), 
+                    null);
         } catch (URISyntaxException ex) {
             ex.printStackTrace();
             throw new IllegalArgumentException(ex);

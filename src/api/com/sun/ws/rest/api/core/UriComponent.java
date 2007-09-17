@@ -259,7 +259,7 @@ public final class UriComponent {
      * @param s the string to be decoded.
      * @param t the URI component type, may be null.
      * @return the decoded string.
-     * @throw IllegalArgumentException if a malformed percent-encoded octet is
+     * @throws IllegalArgumentException if a malformed percent-encoded octet is
      *         detected
      */
     public static String decode(String s, Type t) {

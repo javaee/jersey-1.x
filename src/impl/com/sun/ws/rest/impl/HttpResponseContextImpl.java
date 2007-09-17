@@ -1,12 +1,12 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
- * 
- * Copyright 2007 Sun Microsystems, Inc. All rights reserved. 
- * 
+ *
+ * Copyright 2007 Sun Microsystems, Inc. All rights reserved.
+ *
  * The contents of this file are subject to the terms of the Common Development
  * and Distribution License("CDDL") (the "License").  You may not use this file
- * except in compliance with the License. 
- * 
+ * except in compliance with the License.
+ *
  * You can obtain a copy of the License at:
  *     https://jersey.dev.java.net/license.txt
  * See the License for the specific language governing permissions and
@@ -22,7 +22,7 @@
 
 package com.sun.ws.rest.impl;
 
-import com.sun.ws.rest.api.core.HttpRequestContext;
+import com.sun.ws.rest.spi.container.ContainerRequest;
 import com.sun.ws.rest.spi.container.ContainerResponse;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -35,15 +35,38 @@ import javax.ws.rs.ext.HeaderProvider;
 import javax.ws.rs.ext.ProviderFactory;
 
 /**
- *
+ * An abstract implementation of {@link ContainerResponse}.
+ * <p>
+ * Specific containers may extend this class and instances may be passed to
+ * the runtime using the method {@link WebApplication#handleRequest}.
+ * <p>
+ * When the call to the method {@link WebApplication#handleRequest} returns
+ * a container must commit the response, if the response has not already been
+ * committed, by committing the status and headers, and writing the entity
+ * to the underlying output stream, for example:
+ * <pre>
+ *   if (!isCommitted()) {
+ *       commitStatusAndHeaders();
+ *       writeEntity(getUnderlyingOutputStream());
+ *   }
+ * </pre>
+ * <p>
+ * The runtime may call the method {@link #getUnderlyingOutputStream} and
+ * before any bytes are written to this stream call the method
+ * {@link #commitStatusAndHeaders}. When one or more bytes are written to the
+ * stream the response is marked as committed. Such behaviour arises when a
+ * resource chooses to write an entity directly to an output stream obtained
+ * from the method {@link #getOutputStream}.
  * @author Paul.Sandoz@Sun.Com
  */
 public abstract class HttpResponseContextImpl implements ContainerResponse {
-    private static final MediaType APPLICATION_OCTET_STREAM = new MediaType("application/octet-stream");
-        
-    public static final Response EMPTY_RESPONSE = Response.Builder.noContent().build();
-            
-    private final HttpRequestContext requestContext;
+    private static final MediaType APPLICATION_OCTET_STREAM
+            = new MediaType("application/octet-stream");
+    
+    public static final Response EMPTY_RESPONSE
+            = Response.Builder.noContent().build();
+    
+    private final ContainerRequest request;
     
     private int status;
     
@@ -66,12 +89,12 @@ public abstract class HttpResponseContextImpl implements ContainerResponse {
             commitWrite();
             o.write(b);
         }
-
+        
         public void write(byte b[], int off, int len) throws IOException {
             commitWrite();
             o.write(b, off, len);
         }
-
+        
         public void write(int b) throws IOException {
             commitWrite();
             o.write(b);
@@ -80,7 +103,7 @@ public abstract class HttpResponseContextImpl implements ContainerResponse {
         public void flush() throws IOException {
             o.flush();
         }
-
+        
         public void close() throws IOException {
             commitClose();
             o.close();
@@ -91,23 +114,41 @@ public abstract class HttpResponseContextImpl implements ContainerResponse {
                 if (getStatus() == 204)
                     setStatus(200);
                 isCommitted = true;
-                HttpResponseContextImpl.this.commit();
+                commitStatusAndHeaders();
             }
         }
         
         private void commitClose() throws IOException {
             if (!isCommitted) {
                 isCommitted = true;
-                HttpResponseContextImpl.this.commit();
+                commitStatusAndHeaders();
             }
         }
     };
     
-    public HttpResponseContextImpl(HttpRequestContext requestContext) {
-        this.requestContext = requestContext;
+    /**
+     *
+     * @param request the container request associated with this response.
+     */
+    protected HttpResponseContextImpl(ContainerRequest request) {
+        this.request = request;
         this.status = EMPTY_RESPONSE.getStatus();
     }
-
+    
+    /**
+     * Get the OutputStream provided by the underlying container response.
+     *
+     * @return the OutputStream of the underlying container response.
+     */
+    abstract protected OutputStream getUnderlyingOutputStream() throws IOException;
+    
+    /**
+     * Commit the status code and headers (if any) to the underlying
+     * container response.
+     */
+    abstract protected void commitStatusAndHeaders() throws IOException;
+    
+    
     // HttpResponseContext
     
     public final void setResponse(Response response) {
@@ -124,10 +165,10 @@ public abstract class HttpResponseContextImpl implements ContainerResponse {
         this.entity = response.getEntity();
         
         // If HTTP method is HEAD then there should be no entity
-        if (requestContext.getHttpMethod().equals("HEAD"))
+        if (request.getHttpMethod().equals("HEAD"))
             this.entity = null;
         // Otherwise if there is no entity then there should be no content type
-        else if (this.entity == null) 
+        else if (this.entity == null)
             contentType = null;
         
         this.headers = new ResponseHttpHeadersImpl();
@@ -136,7 +177,7 @@ public abstract class HttpResponseContextImpl implements ContainerResponse {
         } else {
             response.addMetadata(headers);
             setResponseNonOptimal(response, contentType);
-        }        
+        }
     }
     
     public final int getStatus() {
@@ -159,35 +200,20 @@ public abstract class HttpResponseContextImpl implements ContainerResponse {
         if (headers == null)
             headers = new ResponseHttpHeadersImpl();
         return headers;
-    }    
-
+    }
+    
     
     public final OutputStream getOutputStream() throws IOException {
         if (out == null)
             out = new CommittingOutputStream(getUnderlyingOutputStream());
-            
+        
         return out;
     }
     
     public final boolean isCommitted() {
         return isCommitted;
     }
-
-    //
     
-    /**
-     * Get the OutputStream provided by the underlying container response.
-     *
-     * @return the OutputStream of the the underlying container response.
-     */
-    abstract protected OutputStream getUnderlyingOutputStream() throws IOException;
-
-    /**
-     * Commit the status code and headers (if any) to the underlying 
-     * container response.
-     */
-    abstract protected void commit() throws IOException;
-
     /**
      * Write the entity to the output stream
      */
@@ -197,7 +223,6 @@ public abstract class HttpResponseContextImpl implements ContainerResponse {
         if (entity != null) {
             writeEntity(entity, out);
         }
-        
     }
     
     /**
@@ -206,7 +231,7 @@ public abstract class HttpResponseContextImpl implements ContainerResponse {
     @SuppressWarnings("unchecked")
     protected final void writeEntity(Object entity, OutputStream out) throws IOException {
         final EntityProvider p = ProviderFactory.getInstance().createEntityProvider(entity.getClass());
-
+        
         final Object mediaType = getHttpHeaders().getFirst("Content-Type");
         if (mediaType instanceof MediaType) {
             p.writeTo(entity, (MediaType)mediaType, getHttpHeaders(), out);
@@ -220,9 +245,9 @@ public abstract class HttpResponseContextImpl implements ContainerResponse {
     }
     
     //
-
+    
     private void setResponseOptimal(ResponseImpl r, MediaType contentType) {
-        r.addMetadataOptimal(headers, requestContext, contentType);
+        r.addMetadataOptimal(headers, request, contentType);
     }
     
     private void setResponseNonOptimal(Response r, MediaType contentType) {
@@ -233,16 +258,16 @@ public abstract class HttpResponseContextImpl implements ContainerResponse {
         Object location = headers.getFirst("Location");
         if (location != null) {
             if (location instanceof URI) {
-                URI absoluteLocation = requestContext.getBase().resolve((URI)location);
+                URI absoluteLocation = request.getBase().resolve((URI)location);
                 headers.putSingle("Location", absoluteLocation);
             }
         }
     }
-        
+    
     @SuppressWarnings("unchecked")
     public String getHeaderValue(Object headerValue) {
         // TODO: performance, this is very slow
         HeaderProvider hp = ProviderFactory.getInstance().createHeaderProvider(headerValue.getClass());
         return hp.toString(headerValue);
-    }    
+    }
 }

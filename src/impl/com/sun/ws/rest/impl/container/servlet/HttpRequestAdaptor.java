@@ -49,7 +49,7 @@ public final class HttpRequestAdaptor extends HttpRequestContextImpl {
         initiateUriInfo();
         copyHttpHeaders();
     }
-
+    
     private void initiateUriInfo() {
         /**
          * The HttpServletRequest.getRequestURL() contains the complete URI
@@ -68,32 +68,28 @@ public final class HttpRequestAdaptor extends HttpRequestContextImpl {
          * We need to work around this and not use getPathInfo
          * for the decodedPath.
          */
-        this.decodedPath = (request.getPathInfo() != null) 
+        final String decodedPath = (request.getPathInfo() != null) 
             ? request.getPathInfo().substring(1)
             : request.getServletPath().substring(1);
 
-        String decodedBasePath = (request.getPathInfo() != null)
+        final String decodedBasePath = (request.getPathInfo() != null)
             ? request.getContextPath() + request.getServletPath() + "/"
             : request.getContextPath() + "/";
         
-        /**
-         * The HttpServletRequest.getQueryString() is in encoded form.
-         */
-        this.encodedQuery = request.getQueryString();
-                
-        this.absoluteUri = absoluteUriBuilder.build();
+        String queryParameters = request.getQueryString();
+        if (queryParameters == null) queryParameters = "";
         
-        this.baseUri = absoluteUriBuilder.replacePath(decodedBasePath).build();
+        this.baseUri = absoluteUriBuilder.
+                replacePath(decodedBasePath).
+                build();
+        
+        this.completeUri = absoluteUriBuilder.encode(true).
+                path(decodedPath).
+                encode(false).
+                replaceQueryParams(queryParameters).
+                build();
     }    
-    
-    protected URI getBaseURI(URI uri, String path) {
-        String uriPath = uri.getPath();
-        int i = uriPath.lastIndexOf(path);
-        String contextPath = uriPath.substring(0, i);
-        return uri.resolve(contextPath);
-    }
-
-    
+        
     @SuppressWarnings("unchecked")
     private void copyHttpHeaders() {
         MultivaluedMap<String, String> headers = getRequestHeaders();

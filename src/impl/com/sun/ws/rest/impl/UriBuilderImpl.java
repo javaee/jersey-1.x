@@ -305,7 +305,7 @@ public final class UriBuilderImpl extends UriBuilder {
         
         if (query.length() > 0) sb.append('?').append(query);
         
-        if (fragment != null) sb.append('#').append(fragment);
+        if (fragment != null && fragment.length() > 0) sb.append('#').append(fragment);
         
         return sb.toString();
     }

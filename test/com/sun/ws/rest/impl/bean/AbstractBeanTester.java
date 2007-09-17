@@ -165,13 +165,6 @@ public abstract class AbstractBeanTester extends TestCase {
         // The base URI
         String baseUri = BASE_URI;
         
-        // The decoded URI path
-        URI u = URI.create(path);
-        String encodedPath = u.getRawPath();
-        // Make the path relative to the base URI path
-        if (encodedPath.startsWith("/"))
-            encodedPath = encodedPath.substring(1);
-
         WebApplicationImpl a = new WebApplicationImpl();
         ResourceConfig c = new TestingResourceConfig(r);
 
@@ -179,7 +172,7 @@ public abstract class AbstractBeanTester extends TestCase {
 
         ByteArrayInputStream e = new ByteArrayInputStream(content.getBytes());
         final HttpRequestContextImpl request = new TestHttpRequestContext(method, e,
-                uri, baseUri, encodedPath);
+                uri, baseUri);
         for (Map.Entry<String, List<String>> h : headers.entrySet()) {
             request.getRequestHeaders().put(h.getKey(), h.getValue());
         }            

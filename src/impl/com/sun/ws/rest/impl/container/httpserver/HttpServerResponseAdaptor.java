@@ -42,8 +42,6 @@ public final class HttpServerResponseAdaptor extends HttpResponseContextImpl {
     
     private final HttpExchange exchange;
     
-    private OutputStream out;
-    
     /* package */ HttpServerResponseAdaptor(HttpExchange exchange, HttpServerRequestAdaptor requestContext) {
         super(requestContext);
         this.exchange = exchange;
@@ -52,13 +50,18 @@ public final class HttpServerResponseAdaptor extends HttpResponseContextImpl {
     // HttpResponseContextImpl
         
     protected OutputStream getUnderlyingOutputStream() throws IOException {
-        if (out != null)
-            return out;
-        
-        return out = exchange.getResponseBody();
+        return exchange.getResponseBody();
     }
 
-    protected void commit() throws IOException {
+    protected void commitStatusAndHeaders() throws IOException {
+        commitHeaders();
+        
+        exchange.sendResponseHeaders(this.getStatus(), 0);
+    }
+    
+    //
+    
+    private void commitHeaders() throws IOException {
         Headers eh = exchange.getResponseHeaders();
         for (Map.Entry<String, List<Object>> e : this.getHttpHeaders().entrySet()) {
             List<String> values = new ArrayList<String>();
@@ -66,11 +69,7 @@ public final class HttpServerResponseAdaptor extends HttpResponseContextImpl {
                 values.add(getHeaderValue(v));
             eh.put(e.getKey(), values);
         }
-        
-        exchange.sendResponseHeaders(this.getStatus(), 0);
     }
-    
-    //
     
     @SuppressWarnings("unchecked")
     /* package */ void commitAll() throws IOException {
@@ -79,20 +78,12 @@ public final class HttpServerResponseAdaptor extends HttpResponseContextImpl {
             return;
         }
         
-        Headers eh = exchange.getResponseHeaders();
-        for (Map.Entry<String, List<Object>> e : this.getHttpHeaders().entrySet()) {
-            List<String> values = new ArrayList<String>();
-            for (Object v : e.getValue())
-                values.add(getHeaderValue(v));
-            eh.put(e.getKey(), values);
-        }
+        commitHeaders();
         
         Object entity = this.getEntity();
         if (entity != null) {
             exchange.sendResponseHeaders(this.getStatus(), 0);
-            OutputStream out = exchange.getResponseBody();
-            writeEntity(entity, out);
-            out.close();
+            writeEntity(entity, getUnderlyingOutputStream());
         } else {
             exchange.sendResponseHeaders(this.getStatus(), -1);
         }

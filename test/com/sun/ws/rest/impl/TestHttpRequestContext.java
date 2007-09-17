@@ -38,11 +38,9 @@ public class TestHttpRequestContext extends HttpRequestContextImpl {
     // method, entity, uri, baseUri, uriPath
     
     public TestHttpRequestContext(String method, InputStream entity, 
-            String uri, String baseUri, String encodedUriPath)  {
+            String uri, String baseUri)  {
         super(method, entity);
-        this.absoluteUri = URI.create(uri);
         this.baseUri = URI.create(baseUri);
-        this.encodedPath = encodedUriPath;
-        this.encodedQuery = this.absoluteUri.getRawQuery();
+        this.completeUri = URI.create(uri);
     }    
 }

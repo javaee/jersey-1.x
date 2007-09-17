@@ -149,7 +149,7 @@ public class WebApplicationTest extends TestCase {
 
         ByteArrayInputStream e = new ByteArrayInputStream(content.getBytes());
         HttpRequestContextImpl request = new TestHttpRequestContext(method, e, 
-                path, "/", relativePath);
+                path, "/");
         HttpResponseContextImpl response = new TestHttpResponseContext(request);
 
         a.handleRequest(request, response);

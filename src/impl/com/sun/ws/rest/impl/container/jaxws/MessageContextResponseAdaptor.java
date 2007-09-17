@@ -76,13 +76,8 @@ public final class MessageContextResponseAdaptor extends HttpResponseContextImpl
 
         @SuppressWarnings("unchecked")
         public InputStream getInputStream() throws IOException {
-            final Object entity = getEntity();
-            if (entity != null) {
-                writeEntity(entity, out);
-                return new ByteArrayInputStream(out.toByteArray());
-            } else {
-                return new ByteArrayInputStream(new byte[0]);
-            }
+            writeEntity(out);
+            return new ByteArrayInputStream(out.toByteArray());
         }
 
         public String getContentType() {
@@ -92,7 +87,7 @@ public final class MessageContextResponseAdaptor extends HttpResponseContextImpl
 
     /* package */ DataSource getResultDataSource() throws IOException {
         if (!isCommitted())
-            commit();
+            commitStatusAndHeaders();
         
         return new HttpResponseDataSource();
     }
@@ -104,7 +99,7 @@ public final class MessageContextResponseAdaptor extends HttpResponseContextImpl
         return out;
     }
     
-    protected void commit() throws IOException {
+    protected void commitStatusAndHeaders() throws IOException {
         // If JAX-WS is deployed using servlet
         if (response != null) {
             response.setStatus(getStatus());

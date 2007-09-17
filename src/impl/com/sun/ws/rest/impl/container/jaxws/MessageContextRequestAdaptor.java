@@ -1,12 +1,12 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
- * 
- * Copyright 2007 Sun Microsystems, Inc. All rights reserved. 
- * 
+ *
+ * Copyright 2007 Sun Microsystems, Inc. All rights reserved.
+ *
  * The contents of this file are subject to the terms of the Common Development
  * and Distribution License("CDDL") (the "License").  You may not use this file
- * except in compliance with the License. 
- * 
+ * except in compliance with the License.
+ *
  * You can obtain a copy of the License at:
  *     https://jersey.dev.java.net/license.txt
  * See the License for the specific language governing permissions and
@@ -26,6 +26,7 @@ import com.sun.ws.rest.impl.HttpRequestContextImpl;
 import com.sun.ws.rest.impl.http.header.HttpHeaderFactory;
 import java.io.IOException;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Map;
 import javax.activation.DataSource;
@@ -46,16 +47,16 @@ public final class MessageContextRequestAdaptor extends HttpRequestContextImpl {
     /**
      * Creates a new instance of MessageContextRequestAdaptor
      */
-    public MessageContextRequestAdaptor(DataSource request, 
+    public MessageContextRequestAdaptor(DataSource request,
             MessageContext context) throws IOException {
-        super((String)context.get(HTTP_REQUEST_METHOD), 
+        super((String)context.get(HTTP_REQUEST_METHOD),
                 request != null ? request.getInputStream() : null );
         this.context = context;
         
         initiateUriInfo();
         copyHttpHeaders();
     }
-
+    
     private void initiateUriInfo() {
         /**
          * TODO obtain base URI
@@ -67,12 +68,14 @@ public final class MessageContextRequestAdaptor extends HttpRequestContextImpl {
         
         this.baseUri = URI.create("/");
         
-        this.decodedPath = (String)context.get(PATH_INFO);
-        // Ensure path is relative, TODO may need to check for multiple '/'
-        if (this.decodedPath.startsWith("/"))
-            this.decodedPath = this.decodedPath.substring(1);
-        
-        this.encodedQuery = (String)context.get(QUERY_STRING);                
+        try {
+            this.completeUri = new URI(null, null, null, -1,
+                    (String)context.get(PATH_INFO),
+                    (String)context.get(QUERY_STRING),
+                    null);
+        } catch (URISyntaxException ex) {
+            throw new IllegalArgumentException(ex);
+        }
     }
     
     @SuppressWarnings("unchecked")
@@ -86,6 +89,6 @@ public final class MessageContextRequestAdaptor extends HttpRequestContextImpl {
                     getCookies().addAll(HttpHeaderFactory.createCookies(headerValue));
                 }
             }
-        }        
+        }
     }
 }

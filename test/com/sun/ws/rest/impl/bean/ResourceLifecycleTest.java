@@ -141,7 +141,7 @@ public class ResourceLifecycleTest extends TestCase {
     
     public String doGET(String path) {
         ByteArrayInputStream e = new ByteArrayInputStream("".getBytes());
-        final ContainerRequest request = new TestHttpRequestContext("GET", e, path, "/base/", path);
+        final ContainerRequest request = new TestHttpRequestContext("GET", e, "/base/" + path, "/base/");
         final ContainerResponse response = new TestHttpResponseContext(request);
 
         a.handleRequest(request, response);        

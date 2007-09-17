@@ -103,7 +103,7 @@ public final class HttpResponseAdaptor extends HttpResponseContextImpl {
         return out;
     }
 
-    protected void commit() throws IOException {
+    protected void commitStatusAndHeaders() throws IOException {
         response.setStatus(this.getStatus());
         
         MultivaluedMap<String, Object> headers = this.getHttpHeaders();
@@ -121,7 +121,7 @@ public final class HttpResponseAdaptor extends HttpResponseContextImpl {
         
         if (response.isCommitted()) return;
         
-        commit();
+        commitStatusAndHeaders();
     
         writeEntity(getUnderlyingOutputStream());
     }    

@@ -69,17 +69,6 @@ public final class HttpServerRequestAdaptor extends HttpRequestContextImpl {
             decodedBasePath += "/";                
         }
 
-        /**
-         * Extract the decoded path
-         */
-        this.decodedPath = exchangeUri.getPath().substring(decodedBasePath.length());
-        if (this.decodedPath.startsWith("/")) {
-            int i = 0;
-            while (this.decodedPath.charAt(i) == '/')
-                i++;
-            this.decodedPath = this.decodedPath.substring(i);
-        }
-        
         /*
          * The following is madness, there is no easy way to get 
          * the complete URI of the HTTP request!!
@@ -96,13 +85,10 @@ public final class HttpServerRequestAdaptor extends HttpRequestContextImpl {
         } catch (URISyntaxException ex) {
             throw new IllegalArgumentException(ex);
         }
-        
-        this.absoluteUri = this.baseUri.resolve(exchangeUri);
-        
-        this.encodedQuery = exchangeUri.getRawQuery();
-        
-        this.encodedFragment = exchangeUri.getRawFragment();
+            
+        this.completeUri = this.baseUri.resolve(exchangeUri);
     }
+    
     
     private void copyHttpHeaders() {
         MultivaluedMap<String, String> headers = getRequestHeaders();

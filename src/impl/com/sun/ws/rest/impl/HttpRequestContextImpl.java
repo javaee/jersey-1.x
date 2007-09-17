@@ -48,13 +48,37 @@ import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.ext.ProviderFactory;
 
 /**
- *
+ * An abstract implementation of {@link ContainerRequest}.
+ * <p>
+ * Specific containers may extend this class and instances may be passed to
+ * the runtime using the method {@link WebApplication#handleRequest}.
+ * <p>
+ * The following are required by a concrete implementation when constructed
+ * or before the instance is passed to the runtime.
+ * <ul>
+ * <li>The two protected variables baseUri and completeUri must be correctly
+ * set.</li>
+ * <li>The HTTP headers must be set by calling the method
+ * {@link #getRequestHeaders} and copying the container specific headers
+ * to the returned {@link MultivaluedMap} instance.</li>
+ * </ul>
  * @author Paul.Sandoz@Sun.Com
  */
 public abstract class HttpRequestContextImpl implements ContainerRequest {
     
     private final String method;
     private final InputStream entity;
+    
+    /**
+     * The base URI of the request.
+     * <p>
+     * The schema, user info, host and port components must be equivalent to
+     * those of the complete URI. The encoded path component of the complete
+     * URI must start with the encoded path component of the base URI.
+     * The base URI must not contain the query and fragment components and
+     * the encoded path component must end in a '/' character.
+     */
+    protected URI baseUri;
     
     /**
      * The complete URI of a request, including the query and fragment
@@ -65,7 +89,7 @@ public abstract class HttpRequestContextImpl implements ContainerRequest {
     /**
      * The absolute URI of a request that is equivalent to the complete URI
      * minus the query and fragment components.
-     *
+     * <p>
      * The absolute URI must be equivalent to the following:
      *
      *   UriBuilder.fromUri(completeUri).
@@ -74,18 +98,7 @@ public abstract class HttpRequestContextImpl implements ContainerRequest {
      *   UriBuilder.fromUri(baseUri).encode(false).
      *       append(encodedPath).build();
      */
-    protected URI absoluteUri;
-    
-    /**
-     * The base URI of the request.
-     *
-     * The schema, user info, host and port components must be equivalent to
-     * those of the complete URI. The path component of the complete URI must
-     * start with the path component of the base URI. The base URI must not
-     * contain the query and fragment components and the path component must
-     * end in a '/'.
-     */
-    protected URI baseUri;
+    private URI absoluteUri;
     
     /**
      * The percent-encoded path component.
@@ -93,22 +106,12 @@ public abstract class HttpRequestContextImpl implements ContainerRequest {
      * The path is relative to the path component of the base URI. The path
      * must not start with a '/'.
      */
-    protected String encodedPath;
+    private String encodedPath;
     
     /**
      * The decoded path component.
      */
-    protected String decodedPath;
-    
-    /**
-     * The percent-encoded query component.
-     */
-    protected String encodedQuery;
-    
-    /**
-     * The percent-encoded fragment component.
-     */
-    protected String encodedFragment;
+    private String decodedPath;
     
     private List<PathSegment> decodedPathSegments;
     private List<PathSegment> encodedPathSegments;
@@ -125,6 +128,11 @@ public abstract class HttpRequestContextImpl implements ContainerRequest {
     private List<MediaType> accept;
     private List<Cookie> cookies;
     
+    /**
+     *
+     * @param method the HTTP method
+     * @param entity the InputStream of the request entity
+     */
     protected HttpRequestContextImpl(String method, InputStream entity) {
         this.method = method;
         this.headers = new RequestHttpHeadersImpl();
@@ -143,7 +151,7 @@ public abstract class HttpRequestContextImpl implements ContainerRequest {
             for (Map.Entry<String, String> e : values.entrySet()) {
                 decodedTemplateValues.putSingle(
                         UriComponent.decode(e.getKey(), UriComponent.Type.PATH_SEGMENT),
-                        UriComponent.decode(e.getValue(), UriComponent.Type.PATH));            
+                        UriComponent.decode(e.getValue(), UriComponent.Type.PATH));
             }
         }
     }
@@ -186,14 +194,19 @@ public abstract class HttpRequestContextImpl implements ContainerRequest {
         if (decode) {
             if (decodedPath != null) return decodedPath;
             
-            return decodedPath = UriComponent.decode(encodedPath,
+            return decodedPath = UriComponent.decode(
+                    getEncodedPath(),
                     UriComponent.Type.PATH);
         } else {
-            if (encodedPath != null) return encodedPath;
-            
-            return encodedPath = UriComponent.encode(decodedPath,
-                    UriComponent.Type.PATH);
+            return getEncodedPath();
         }
+    }
+    
+    private String getEncodedPath() {
+        if (encodedPath != null) return encodedPath;
+        
+        return encodedPath  = completeUri.getRawPath().substring(
+                baseUri.getRawPath().length());
     }
     
     public List<PathSegment> getPathSegments() {
@@ -225,8 +238,8 @@ public abstract class HttpRequestContextImpl implements ContainerRequest {
     public URI getAbsolute() {
         if (absoluteUri != null) return absoluteUri;
         
-        return absoluteUri = getBaseBuilder().encode(false).
-                path(getPath(false)).
+        return absoluteUri = getCompleteBuilder().encode(false).
+                replaceQueryParams("").fragment("").
                 build();
     }
     
@@ -235,11 +248,7 @@ public abstract class HttpRequestContextImpl implements ContainerRequest {
     }
     
     public URI getComplete() {
-        if (completeUri != null) return completeUri;
-        
-        return completeUri = getBuilder().encode(false).
-                replaceQueryParams(encodedQuery).fragment(encodedFragment).
-                build();
+        return completeUri;
     }
     
     public UriBuilder getCompleteBuilder() {
@@ -252,7 +261,7 @@ public abstract class HttpRequestContextImpl implements ContainerRequest {
     
     public MultivaluedMap<String, String> getTemplateParameters(boolean decode) {
         if (decode) {
-            if (decodedTemplateValues != null) 
+            if (decodedTemplateValues != null)
                 return decodedTemplateValues;
             
             decodedTemplateValues = new MultivaluedMapImpl();
@@ -262,7 +271,7 @@ public abstract class HttpRequestContextImpl implements ContainerRequest {
                     l.add(UriComponent.decode(v, UriComponent.Type.PATH));
                 }
                 decodedTemplateValues.put(
-                        UriComponent.decode(e.getKey(), UriComponent.Type.PATH_SEGMENT), 
+                        UriComponent.decode(e.getKey(), UriComponent.Type.PATH_SEGMENT),
                         l);
             }
             
@@ -281,12 +290,14 @@ public abstract class HttpRequestContextImpl implements ContainerRequest {
             if (decodedQueryParameters != null)
                 return decodedQueryParameters;
             
-            return decodedQueryParameters = extractQueryParameters(encodedQuery, true);
+            return decodedQueryParameters = extractQueryParameters(
+                    getComplete().getRawQuery(), true);
         } else {
             if (encodedQueryParameters != null)
                 return encodedQueryParameters;
             
-            return encodedQueryParameters = extractQueryParameters(encodedQuery, false);
+            return encodedQueryParameters = extractQueryParameters(
+                    getComplete().getRawQuery(), false);
         }
     }
     
@@ -400,11 +411,11 @@ public abstract class HttpRequestContextImpl implements ContainerRequest {
             : keyVal[0];
             if (key.length() == 0)
                 continue;
-
+            
             // parameter may not have a value, if so default to "";
             String val = (keyVal.length == 2) ?
                 (decode) ? UriComponent.decode(keyVal[1], UriComponent.Type.PATH_SEGMENT) : keyVal[1] : "";
-
+            
             List<String> list = map.get(key);
             if (map.get(key) == null) {
                 list = new LinkedList<String>();
@@ -459,10 +470,10 @@ public abstract class HttpRequestContextImpl implements ContainerRequest {
             }
         }
     }
-        
+    
     
     // PreconditionEvaluator
-            
+    
     public Response evaluate(EntityTag eTag) {
         Response r = evaluateIfMatch(eTag);
         if (r == null)
