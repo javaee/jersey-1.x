@@ -59,19 +59,19 @@ public class ServletAdaptor extends HttpServlet {
             HttpServletRequest.class, HttpServletResponse.class,
             ServletConfig.class, EntityManagerFactory.class);
     
-    private transient WebApplication application;
+    private WebApplication application;
     
-    private transient ServletContext context;
+    private ServletContext context;
     
-    private transient boolean isEE;
+    private boolean isEE;
     
-    private transient ThreadLocalInvoker<HttpServletRequest> requestInvoker =
+    private ThreadLocalInvoker<HttpServletRequest> requestInvoker =
             new ThreadLocalInvoker<HttpServletRequest>();
     
-    private transient ThreadLocalInvoker<HttpServletResponse> responseInvoker =
+    private ThreadLocalInvoker<HttpServletResponse> responseInvoker =
             new ThreadLocalInvoker<HttpServletResponse>();
     
-    private transient Map<String, String> persistenceUnits =
+    private Map<String, String> persistenceUnits =
             new HashMap<String, String>();
     
     
