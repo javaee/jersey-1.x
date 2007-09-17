@@ -54,20 +54,26 @@ import javax.servlet.http.HttpServletResponse;
 public class ServletAdaptor extends HttpServlet {
     private static final String WEB_RESOURCE_CLASS = "webresourceclass";
     
-    private WebApplication application;
-    
-    private ServletContext context;
-    
-    private boolean isEE;
-    
     @SuppressWarnings("unchecked")
-    private static List<Class<?>> injectables = Arrays.asList(
-            HttpServletRequest.class, HttpServletResponse.class, ServletConfig.class, EntityManagerFactory.class);
+    private static List<Class<?>> INJECTABLES = Arrays.asList(
+            HttpServletRequest.class, HttpServletResponse.class,
+            ServletConfig.class, EntityManagerFactory.class);
     
-    private ThreadLocalInvoker<HttpServletRequest> requestInvoker = new ThreadLocalInvoker<HttpServletRequest>();
-    private ThreadLocalInvoker<HttpServletResponse> responseInvoker = new ThreadLocalInvoker<HttpServletResponse>();
+    private transient WebApplication application;
     
-    private Map<String, String> persistenceUnits = new HashMap<String, String>();
+    private transient ServletContext context;
+    
+    private transient boolean isEE;
+    
+    private transient ThreadLocalInvoker<HttpServletRequest> requestInvoker =
+            new ThreadLocalInvoker<HttpServletRequest>();
+    
+    private transient ThreadLocalInvoker<HttpServletResponse> responseInvoker =
+            new ThreadLocalInvoker<HttpServletResponse>();
+    
+    private transient Map<String, String> persistenceUnits =
+            new HashMap<String, String>();
+    
     
     public void init(ServletConfig servletConfig) throws ServletException {
         super.init(servletConfig);
@@ -82,7 +88,7 @@ public class ServletAdaptor extends HttpServlet {
             classLoader = getClass().getClassLoader();
         }
         
-        /* Persistence units that may be injected must be configured in web.xml 
+        /* Persistence units that may be injected must be configured in web.xml
          * in the normal way plus an additional servlet parameter to enable the
          * Jersey servlet to locate them in JNDI. E.g. with the following
          * persistence unit configuration:
@@ -165,25 +171,25 @@ public class ServletAdaptor extends HttpServlet {
                 }
             }
             );
-            application.addInjectable(EntityManagerFactory.class, 
+            application.addInjectable(EntityManagerFactory.class,
                     new Injectable<PersistenceUnit, EntityManagerFactory>() {
                 public Class<PersistenceUnit> getAnnotationClass() {
                     return PersistenceUnit.class;
                 }
                 public EntityManagerFactory getInjectableValue(PersistenceUnit pu) {
-                        // TODO localize error message
-                        if (!persistenceUnits.containsKey(pu.unitName()))
-                            throw new ContainerException("Persistence unit '"+
-                                    pu.unitName()+
-                                    "' is not configured as a servlet parameter in web.xml");
-                        String jndiName = persistenceUnits.get(pu.unitName());
-                        ThreadLocalNamedInvoker<EntityManagerFactory> emfHandler = 
-                                new ThreadLocalNamedInvoker<EntityManagerFactory>(jndiName);
-                        EntityManagerFactory emf = (EntityManagerFactory) Proxy.newProxyInstance(
-                                EntityManagerFactory.class.getClassLoader(),
-                                new Class[] {EntityManagerFactory.class },
-                                emfHandler);
-                        return emf;
+                    // TODO localize error message
+                    if (!persistenceUnits.containsKey(pu.unitName()))
+                        throw new ContainerException("Persistence unit '"+
+                                pu.unitName()+
+                                "' is not configured as a servlet parameter in web.xml");
+                    String jndiName = persistenceUnits.get(pu.unitName());
+                    ThreadLocalNamedInvoker<EntityManagerFactory> emfHandler =
+                            new ThreadLocalNamedInvoker<EntityManagerFactory>(jndiName);
+                    EntityManagerFactory emf = (EntityManagerFactory) Proxy.newProxyInstance(
+                            EntityManagerFactory.class.getClassLoader(),
+                            new Class[] {EntityManagerFactory.class },
+                            emfHandler);
+                    return emf;
                 }
             }
             );
@@ -199,7 +205,8 @@ public class ServletAdaptor extends HttpServlet {
     public void service(HttpServletRequest req, HttpServletResponse resp)
     throws ServletException, IOException {
         HttpRequestAdaptor requestAdaptor = new HttpRequestAdaptor(req);
-        HttpResponseAdaptor responseAdaptor = new HttpResponseAdaptor(context, resp, req, requestAdaptor);
+        HttpResponseAdaptor responseAdaptor = new HttpResponseAdaptor(context, 
+                resp, req, requestAdaptor);
         
         try {
             // save thread locals for use in injection

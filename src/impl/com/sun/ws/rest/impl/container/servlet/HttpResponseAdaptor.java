@@ -115,7 +115,6 @@ public final class HttpResponseAdaptor extends HttpResponseContextImpl {
     }
 
     
-    @SuppressWarnings("unchecked")
     /* package */ void commitAll() throws IOException {
         if (isCommitted()) return;
         

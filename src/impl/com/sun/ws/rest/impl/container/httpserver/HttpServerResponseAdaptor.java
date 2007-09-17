@@ -71,7 +71,6 @@ public final class HttpServerResponseAdaptor extends HttpResponseContextImpl {
         }
     }
     
-    @SuppressWarnings("unchecked")
     /* package */ void commitAll() throws IOException {
         if (isCommitted()) {
             exchange.close();        

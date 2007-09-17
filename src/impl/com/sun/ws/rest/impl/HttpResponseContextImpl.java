@@ -217,7 +217,6 @@ public abstract class HttpResponseContextImpl implements ContainerResponse {
     /**
      * Write the entity to the output stream
      */
-    @SuppressWarnings("unchecked")
     protected final void writeEntity(OutputStream out) throws IOException {
         final Object entity = this.getEntity();
         if (entity != null) {

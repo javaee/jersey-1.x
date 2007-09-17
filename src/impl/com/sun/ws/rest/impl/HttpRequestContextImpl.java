@@ -72,11 +72,15 @@ public abstract class HttpRequestContextImpl implements ContainerRequest {
     /**
      * The base URI of the request.
      * <p>
-     * The schema, user info, host and port components must be equivalent to
-     * those of the complete URI. The encoded path component of the complete
-     * URI must start with the encoded path component of the base URI.
-     * The base URI must not contain the query and fragment components and
-     * the encoded path component must end in a '/' character.
+     * The scheme, user info, host and port components must be equivalent to
+     * the same componnents of the complete URI. 
+     * 
+     * The base URI must not contain the query and fragment components.
+     *
+     * The encoded path component of the complete URI must start with the 
+     * encoded path component of the base URI.
+     *
+     * The encoded path component must end in a '/' character.
      */
     protected URI baseUri;
     

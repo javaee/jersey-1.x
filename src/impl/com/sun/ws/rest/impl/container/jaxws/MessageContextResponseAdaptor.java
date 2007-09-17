@@ -74,7 +74,6 @@ public final class MessageContextResponseAdaptor extends HttpResponseContextImpl
             return getClass().toString();
         }
 
-        @SuppressWarnings("unchecked")
         public InputStream getInputStream() throws IOException {
             writeEntity(out);
             return new ByteArrayInputStream(out.toByteArray());
