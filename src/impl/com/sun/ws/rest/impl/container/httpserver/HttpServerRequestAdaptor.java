@@ -26,7 +26,7 @@ import com.sun.net.httpserver.Headers;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpServer;
 import com.sun.net.httpserver.HttpsServer;
-import com.sun.ws.rest.impl.HttpRequestContextImpl;
+import com.sun.ws.rest.spi.container.AbstractContainerRequest;
 import com.sun.ws.rest.impl.http.header.HttpHeaderFactory;
 import java.io.IOException;
 import java.net.InetSocketAddress;
@@ -41,7 +41,7 @@ import javax.ws.rs.core.MultivaluedMap;
  *
  * @author Paul.Sandoz@Sun.Com
  */
-public final class HttpServerRequestAdaptor extends HttpRequestContextImpl {
+public final class HttpServerRequestAdaptor extends AbstractContainerRequest {
     
     private final HttpExchange exchange;
     

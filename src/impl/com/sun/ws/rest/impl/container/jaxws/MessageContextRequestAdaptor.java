@@ -22,7 +22,7 @@
 
 package com.sun.ws.rest.impl.container.jaxws;
 
-import com.sun.ws.rest.impl.HttpRequestContextImpl;
+import com.sun.ws.rest.spi.container.AbstractContainerRequest;
 import com.sun.ws.rest.impl.http.header.HttpHeaderFactory;
 import java.io.IOException;
 import java.net.URI;
@@ -40,7 +40,7 @@ import static javax.xml.ws.handler.MessageContext.QUERY_STRING;
 /**
  * Adapts a JAX-WS <code>Endpoint</code> request to provide the methods of HttpRequest
  */
-public final class MessageContextRequestAdaptor extends HttpRequestContextImpl {
+public final class MessageContextRequestAdaptor extends AbstractContainerRequest {
     
     final MessageContext context;
     

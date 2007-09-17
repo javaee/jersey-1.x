@@ -24,7 +24,7 @@ package com.sun.ws.rest.impl.container.httpserver;
 
 import com.sun.net.httpserver.Headers;
 import com.sun.net.httpserver.HttpExchange;
-import com.sun.ws.rest.impl.HttpResponseContextImpl;
+import com.sun.ws.rest.spi.container.AbstractContainerResponse;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ArrayList;
@@ -38,7 +38,7 @@ import javax.ws.rs.ext.ProviderFactory;
  *
  * @author Paul.Sandoz@Sun.Com
  */
-public final class HttpServerResponseAdaptor extends HttpResponseContextImpl {
+public final class HttpServerResponseAdaptor extends AbstractContainerResponse {
     
     private final HttpExchange exchange;
     

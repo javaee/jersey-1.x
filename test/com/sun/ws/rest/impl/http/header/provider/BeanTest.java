@@ -22,7 +22,7 @@
 
 package com.sun.ws.rest.impl.http.header.provider;
 
-import com.sun.ws.rest.impl.HttpResponseContextImpl;
+import com.sun.ws.rest.spi.container.AbstractContainerResponse;
 import javax.ws.rs.HttpMethod;
 import javax.ws.rs.UriTemplate;
 import com.sun.ws.rest.impl.RequestHttpHeadersImpl;
@@ -61,7 +61,7 @@ public class BeanTest extends AbstractBeanTester {
     
     public void testHeaders() {
         MultivaluedMap<String, String> h = new RequestHttpHeadersImpl();
-        HttpResponseContextImpl r = callNoStatusCheck(TestResource.class, "GET", "/", h, "");
+        AbstractContainerResponse r = callNoStatusCheck(TestResource.class, "GET", "/", h, "");
         
         MultivaluedMap<String, Object> headers = r.getHttpHeaders();
         Object value;

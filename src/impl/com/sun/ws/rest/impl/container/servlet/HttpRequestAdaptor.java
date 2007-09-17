@@ -22,7 +22,7 @@
 
 package com.sun.ws.rest.impl.container.servlet;
 
-import com.sun.ws.rest.impl.HttpRequestContextImpl;
+import com.sun.ws.rest.spi.container.AbstractContainerRequest;
 import java.io.IOException;
 import java.net.URI;
 import java.util.Enumeration;
@@ -37,12 +37,12 @@ import javax.ws.rs.core.UriBuilder;
 /**
  * Adapts a HttpServletRequest to provide the methods of HttpRequest
  */
-public final class HttpRequestAdaptor extends HttpRequestContextImpl {
+public final class HttpRequestAdaptor extends AbstractContainerRequest {
     
-    final HttpServletRequest request;
+    private final HttpServletRequest request;
     
     /** Creates a new instance of HttpRequestAdaptor */
-    public HttpRequestAdaptor(HttpServletRequest request) throws IOException {
+    /* package */ HttpRequestAdaptor(HttpServletRequest request) throws IOException {
         super(request.getMethod(), request.getInputStream());
         this.request = request;
         

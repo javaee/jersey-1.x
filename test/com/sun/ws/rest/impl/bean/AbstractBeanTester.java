@@ -24,8 +24,8 @@ package com.sun.ws.rest.impl.bean;
 
 import com.sun.ws.rest.api.core.HttpResponseContext;
 import com.sun.ws.rest.api.core.ResourceConfig;
-import com.sun.ws.rest.impl.HttpRequestContextImpl;
-import com.sun.ws.rest.impl.HttpResponseContextImpl;
+import com.sun.ws.rest.spi.container.AbstractContainerRequest;
+import com.sun.ws.rest.spi.container.AbstractContainerResponse;
 import com.sun.ws.rest.impl.MultivaluedMapImpl;
 import com.sun.ws.rest.impl.TestHttpRequestContext;
 import com.sun.ws.rest.impl.TestHttpResponseContext;
@@ -51,7 +51,7 @@ public abstract class AbstractBeanTester extends TestCase {
         super(testName);
     }
     
-    protected HttpResponseContextImpl callGet(Class<?> r, String path, 
+    protected AbstractContainerResponse callGet(Class<?> r, String path, 
             String accept) {
         MultivaluedMap<String, String> headers = new MultivaluedMapImpl();
         if (accept != null) headers.add("Accept", accept);
@@ -59,12 +59,12 @@ public abstract class AbstractBeanTester extends TestCase {
         return call(r, "GET", path, headers, "");
     }
     
-    protected HttpResponseContextImpl callGet(Class<?> r, String path, 
+    protected AbstractContainerResponse callGet(Class<?> r, String path, 
             MultivaluedMap<String, String> headers) {
         return call(r, "GET", path, headers, "");
     }
     
-    protected HttpResponseContextImpl callPost(Class<?> r, String path, 
+    protected AbstractContainerResponse callPost(Class<?> r, String path, 
             String contentType, String content) {
         MultivaluedMap<String, String> headers = new MultivaluedMapImpl();
         if (contentType != null) headers.add("Content-Type", contentType);
@@ -72,7 +72,7 @@ public abstract class AbstractBeanTester extends TestCase {
         return call(r, "POST", path, headers, content);
     }
     
-    protected HttpResponseContextImpl callPost(Class<?> r, String path, 
+    protected AbstractContainerResponse callPost(Class<?> r, String path, 
             String contentType, String accept, String content) {
         MultivaluedMap<String, String> headers = new MultivaluedMapImpl();
         if (contentType != null) headers.add("Content-Type", contentType);
@@ -81,32 +81,32 @@ public abstract class AbstractBeanTester extends TestCase {
         return call(r, "POST", path, headers, content);
     }
 
-    protected HttpResponseContextImpl callPost(Class<?> r, String path, 
+    protected AbstractContainerResponse callPost(Class<?> r, String path, 
             MultivaluedMap<String, String> headers, String content) {
         return call(r, "POST", path, headers, content);
     }
     
-    protected HttpResponseContextImpl call(Class<?> r, String method, String path, 
+    protected AbstractContainerResponse call(Class<?> r, String method, String path, 
             String contentType, String accept, String content) {
         MultivaluedMap<String, String> headers = new MultivaluedMapImpl();
         if (contentType != null) headers.add("Content-Type", contentType);
         if (accept != null) headers.add("Accept", accept);
         
-        HttpResponseContextImpl response = callNoStatusCheck(r, method, path, headers, content);
+        AbstractContainerResponse response = callNoStatusCheck(r, method, path, headers, content);
         check20xStatus(response);
         return response;
     }
     
-    protected HttpResponseContextImpl call(Class<?> r, String method, String path, 
+    protected AbstractContainerResponse call(Class<?> r, String method, String path, 
             MultivaluedMap<String, String> headers, String content) {
-        HttpResponseContextImpl response = callNoStatusCheck(r, method, path, headers, content);
+        AbstractContainerResponse response = callNoStatusCheck(r, method, path, headers, content);
         check20xStatus(response);
         return response;
     }
     
-    protected HttpResponseContextImpl call(Set<Class> r, String method, String path, 
+    protected AbstractContainerResponse call(Set<Class> r, String method, String path, 
             String contentType, String accept, String content) {
-        HttpResponseContextImpl response = callNoStatusCheck(r, method, path, contentType, accept, content);
+        AbstractContainerResponse response = callNoStatusCheck(r, method, path, contentType, accept, content);
         check20xStatus(response);
         return response;
     }
@@ -119,7 +119,7 @@ public abstract class AbstractBeanTester extends TestCase {
         }
     }
     
-    protected HttpResponseContextImpl callNoStatusCheck(Class<?> r, String method, String path, 
+    protected AbstractContainerResponse callNoStatusCheck(Class<?> r, String method, String path, 
             String contentType, String accept, String content) {
         MultivaluedMap<String, String> headers = new MultivaluedMapImpl();
         if (contentType != null) headers.add("Content-Type", contentType);
@@ -130,14 +130,14 @@ public abstract class AbstractBeanTester extends TestCase {
         return callNoStatusCheck(rs, method, path, headers, content);
     }
     
-    protected HttpResponseContextImpl callNoStatusCheck(Class<?> r, String method, String path, 
+    protected AbstractContainerResponse callNoStatusCheck(Class<?> r, String method, String path, 
             MultivaluedMap<String, String> headers, String content) {
         Set<Class> rs = new HashSet<Class>();
         rs.add(r);
         return callNoStatusCheck(rs, method, path, headers, content);
     }
     
-    protected HttpResponseContextImpl callNoStatusCheck(Set<Class> r, String method, String path, 
+    protected AbstractContainerResponse callNoStatusCheck(Set<Class> r, String method, String path, 
             String contentType, String accept, String content) {
         MultivaluedMap<String, String> headers = new MultivaluedMapImpl();
         if (contentType != null) headers.add("Content-Type", contentType);
@@ -146,12 +146,12 @@ public abstract class AbstractBeanTester extends TestCase {
         return invoke(r, method, path, headers, content);
     }
     
-    protected HttpResponseContextImpl callNoStatusCheck(Set<Class> r, String method, String path, 
+    protected AbstractContainerResponse callNoStatusCheck(Set<Class> r, String method, String path, 
             MultivaluedMap<String, String> headers, String content) {
         return invoke(r, method, path, headers, content);
     }
     
-    HttpResponseContextImpl invoke(final Set<Class> r, String method, String path, 
+    AbstractContainerResponse invoke(final Set<Class> r, String method, String path, 
         MultivaluedMap<String, String> headers, String content) {
 
         // The URI
@@ -171,13 +171,13 @@ public abstract class AbstractBeanTester extends TestCase {
         a.initiate(null, c);
 
         ByteArrayInputStream e = new ByteArrayInputStream(content.getBytes());
-        final HttpRequestContextImpl request = new TestHttpRequestContext(method, e,
+        final AbstractContainerRequest request = new TestHttpRequestContext(method, e,
                 uri, baseUri);
         for (Map.Entry<String, List<String>> h : headers.entrySet()) {
             request.getRequestHeaders().put(h.getKey(), h.getValue());
         }            
 
-        final HttpResponseContextImpl response = new TestHttpResponseContext(request);
+        final AbstractContainerResponse response = new TestHttpResponseContext(request);
 
         a.handleRequest(request, response);
         return response;

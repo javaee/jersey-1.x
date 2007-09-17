@@ -23,7 +23,7 @@
 package com.sun.ws.rest.impl.container.servlet;
 
 import com.sun.ws.rest.api.container.ContainerException;
-import com.sun.ws.rest.impl.HttpResponseContextImpl;
+import com.sun.ws.rest.spi.container.AbstractContainerResponse;
 import javax.ws.rs.ext.EntityProvider;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -40,7 +40,7 @@ import javax.ws.rs.ext.ProviderFactory;
  * Adapts a HttpServletResponse to provide the methods of HttpResponse
  *
  */
-public final class HttpResponseAdaptor extends HttpResponseContextImpl {
+public final class HttpResponseAdaptor extends AbstractContainerResponse {
     private final ServletContext context;
             
     private final HttpServletRequest request;

@@ -22,7 +22,7 @@
 
 package com.sun.ws.rest.impl.container.jaxws;
 
-import com.sun.ws.rest.impl.HttpResponseContextImpl;
+import com.sun.ws.rest.spi.container.AbstractContainerResponse;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -43,7 +43,7 @@ import javax.xml.ws.handler.MessageContext;
  * Adapts a JAX-WS <code>Endpoint</code> response to provide the methods of HttpResponse
  *
  */
-public final class MessageContextResponseAdaptor extends HttpResponseContextImpl {
+public final class MessageContextResponseAdaptor extends AbstractContainerResponse {
     
     private final HttpServletResponse response; 
     

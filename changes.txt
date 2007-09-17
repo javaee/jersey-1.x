@@ -1,4 +1,10 @@
 release 0.3 (2007-10-xx)
+- Created SPI container helper classes AbstractContainerRequest and
+  AbstractContainerResponse.
+  This makes it easier for developers to write and maintain their own
+  containers. Previously it was necessary to implement the interfaces
+  ContainerRequest and ContainerResponse or depend on the implementation 
+  specific classes HttpRequestContextImpl and HttpResponseContextImpl.
 - Fixed issue 8: apt tool silently overwrites existing web.xml by default
   The "noservlet" option used with the WebResourcesProcessorTask ant task
   has been removed so that by default Servlet is not assumed no overriding 

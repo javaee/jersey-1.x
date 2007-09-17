@@ -20,10 +20,10 @@
  *     "Portions Copyrighted [year] [name of copyright owner]"
  */
 
-package com.sun.ws.rest.impl;
+package com.sun.ws.rest.spi.container;
 
-import com.sun.ws.rest.spi.container.ContainerRequest;
-import com.sun.ws.rest.spi.container.ContainerResponse;
+import com.sun.ws.rest.impl.ResponseHttpHeadersImpl;
+import com.sun.ws.rest.impl.ResponseImpl;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.URI;
@@ -59,7 +59,7 @@ import javax.ws.rs.ext.ProviderFactory;
  * from the method {@link #getOutputStream}.
  * @author Paul.Sandoz@Sun.Com
  */
-public abstract class HttpResponseContextImpl implements ContainerResponse {
+public abstract class AbstractContainerResponse implements ContainerResponse {
     private static final MediaType APPLICATION_OCTET_STREAM
             = new MediaType("application/octet-stream");
     
@@ -130,7 +130,7 @@ public abstract class HttpResponseContextImpl implements ContainerResponse {
      *
      * @param request the container request associated with this response.
      */
-    protected HttpResponseContextImpl(ContainerRequest request) {
+    protected AbstractContainerResponse(ContainerRequest request) {
         this.request = request;
         this.status = EMPTY_RESPONSE.getStatus();
     }

@@ -22,6 +22,7 @@
 
 package com.sun.ws.rest.impl;
 
+import com.sun.ws.rest.spi.container.AbstractContainerRequest;
 import java.io.InputStream;
 import java.net.URI;
 
@@ -29,7 +30,7 @@ import java.net.URI;
  *
  * @author Paul.Sandoz@Sun.Com
  */
-public class TestHttpRequestContext extends HttpRequestContextImpl {
+public class TestHttpRequestContext extends AbstractContainerRequest {
     
     public TestHttpRequestContext() {
         super("GET", null);

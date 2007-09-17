@@ -22,7 +22,7 @@
 
 package com.sun.ws.rest.impl.container.grizzly;
 
-import com.sun.ws.rest.impl.HttpRequestContextImpl;
+import com.sun.ws.rest.spi.container.AbstractContainerRequest;
 import com.sun.ws.rest.impl.http.header.HttpHeaderFactory;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -39,7 +39,7 @@ import org.apache.tomcat.util.http.MimeHeaders;
  *
  * @author Marc.Hadley@Sun.Com
  */
-public final class GrizzlyRequestAdaptor  extends HttpRequestContextImpl {
+public final class GrizzlyRequestAdaptor  extends AbstractContainerRequest {
     
     private final Request request;
     
