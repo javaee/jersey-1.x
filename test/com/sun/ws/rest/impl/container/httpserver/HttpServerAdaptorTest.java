@@ -30,7 +30,7 @@ import com.sun.ws.rest.api.core.HttpRequestContext;
 import com.sun.ws.rest.api.core.HttpResponseContext;
 import com.sun.ws.rest.api.core.ResourceConfig;
 import com.sun.ws.rest.api.core.WebResource;
-import com.sun.ws.rest.impl.test.util.TestingResourceConfig;
+import com.sun.ws.rest.api.core.DefaultResourceConfig;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -87,7 +87,7 @@ public class HttpServerAdaptorTest extends TestCase {
         resources.add(TestOneWebResource.class);
         resources.add(TestTwoWebResource.class);
         
-        ResourceConfig config = new TestingResourceConfig(resources);
+        ResourceConfig config = new DefaultResourceConfig(resources);
         
         HttpHandler handler = ContainerFactory.createContainer(HttpHandler.class, config);
         

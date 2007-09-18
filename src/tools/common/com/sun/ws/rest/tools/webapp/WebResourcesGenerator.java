@@ -24,17 +24,13 @@ package com.sun.ws.rest.tools.webapp;
 
 import static com.sun.codemodel.ClassType.CLASS;
 import com.sun.codemodel.*;
+import com.sun.ws.rest.api.core.DefaultResourceConfig;
+import com.sun.ws.rest.api.core.ResourceConfig;
 import com.sun.ws.rest.tools.FilerCodeWriter;
 import com.sun.ws.rest.tools.Messager;
 import com.sun.ws.rest.tools.ToolsMessages;
 import com.sun.ws.rest.tools.annotation.AnnotationProcessorContext;
-import com.sun.ws.rest.api.core.ResourceConfig;
 import java.io.IOException;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
 
 /**
  * This class generates a class that implements
@@ -88,48 +84,23 @@ public class WebResourcesGenerator {
         context.setResourceBeanClassName(className);
         try {
             CodeWriter cw = new FilerCodeWriter(context.getSourceDir(), context.getFiler());
+            
             JDefinedClass cls = getCMClass(className, CLASS);
-            cls._implements(ResourceConfig.class);
+            cls._extends(DefaultResourceConfig.class);
             JDocComment doc = cls.javadoc();
             doc.add("This class was generated.\n\n");
-            doc.add("It is used to retrieve a Set<Class>\n");
-            doc.add("where each <code>Class</code> in the <code>Set</code>\n");
-            doc.add("represents a Web resource.");
-            // members
-            JClass setClass = cm.ref(Set.class).narrow(Class.class);
-            JClass hs = cm.ref(HashSet.class).narrow(Class.class);
-            JFieldVar fieldResources = cls.field(JMod.PRIVATE | JMod.FINAL, setClass, "resources");
-            fieldResources.init(JExpr._new(hs));
-            
-            JClass mapClass = cm.ref(Map.class).narrow(String.class, Boolean.class);
-            JClass hm = cm.ref(HashMap.class).narrow(String.class, Boolean.class);
-            JFieldVar fieldFeatures = cls.field(JMod.PRIVATE | JMod.FINAL, mapClass, "features");
-            fieldFeatures.init(JExpr._new(hm));
+            doc.add("It is used to declare the set of root resource classes.");
 
-            //Constructor
+            // Constructor
             JMethod constrc1 = cls.constructor(JMod.PUBLIC);
             doc = constrc1.javadoc();
-            doc.add("Initializes the Set of web resource classes and features\n");
-            doc.add("to be included in a web application.");
+            doc.add("Declare the set of root resource classes.");
             JBlock cb1 = constrc1.body();
-            
+               
+            // TODO: improve using code model types
             for (String clazz : context.getResourceClasses()) {
-                cb1.directStatement("resources.add("+clazz+".class);");
-            }
-            
-            for (Map.Entry<String, Boolean> feature : context.getRCFeatures().entrySet()) {
-                cb1.directStatement("features.put(\"" + feature.getKey() + "\", " + feature.getValue() + ");");
-            }
-            
-            JMethod method = cls.method(JMod.PUBLIC, setClass, "getResourceClasses");
-            JBlock body = method.body();
-            body._return(fieldResources);
-            
-            JClass collectionsClass = cm.ref(Collections.class);
-            method = cls.method(JMod.PUBLIC, mapClass, "getFeatures");
-            body = method.body();
-            body._return(collectionsClass.staticInvoke("unmodifiableMap").arg(JExpr.ref("features")));
-            
+                cb1.directStatement("getResourceClasses().add("+clazz+".class);");
+            }            
             
 //            if(options.verbose)
 //                cw = new ProgressCodeWriter(cw, System.out);

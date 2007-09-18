@@ -31,7 +31,7 @@ import com.sun.ws.rest.spi.container.AbstractContainerRequest;
 import com.sun.ws.rest.spi.container.AbstractContainerResponse;
 import com.sun.ws.rest.impl.TestHttpRequestContext;
 import com.sun.ws.rest.impl.TestHttpResponseContext;
-import com.sun.ws.rest.impl.test.util.TestingResourceConfig;
+import com.sun.ws.rest.api.core.DefaultResourceConfig;
 import java.io.ByteArrayInputStream;
 import java.util.HashSet;
 import java.util.Set;
@@ -137,7 +137,7 @@ public class WebApplicationTest extends TestCase {
             s.add(resource);
         
         WebApplicationImpl a = new WebApplicationImpl();
-        ResourceConfig c = new TestingResourceConfig(s);
+        ResourceConfig c = new DefaultResourceConfig(s);
         a.initiate(null, c);
         return a;
     }

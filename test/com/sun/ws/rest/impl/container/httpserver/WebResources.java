@@ -23,25 +23,14 @@
 package com.sun.ws.rest.impl.container.httpserver;
 
 import com.sun.ws.rest.api.core.ResourceConfig;
-import com.sun.ws.rest.impl.test.util.TestingResourceConfig;
+import com.sun.ws.rest.api.core.DefaultResourceConfig;
 import java.util.Map;
 import java.util.Set;
 
-public class WebResources implements ResourceConfig {
+public class WebResources extends DefaultResourceConfig {
     
-    ResourceConfig myConfig;
-
     public WebResources() {
-        myConfig = new TestingResourceConfig();
-        myConfig.getResourceClasses().add(HttpServerAdaptorTest.TestOneWebResource.class);
-        myConfig.getResourceClasses().add(HttpServerAdaptorTest.TestTwoWebResource.class);
+        getResourceClasses().add(HttpServerAdaptorTest.TestOneWebResource.class);
+        getResourceClasses().add(HttpServerAdaptorTest.TestTwoWebResource.class);
     }
-
-    public Set<Class> getResourceClasses() {
-        return myConfig.getResourceClasses();
-    }
-    
-    public Map<String, Boolean> getFeatures() {
-        return myConfig.getFeatures();
-    }    
 }

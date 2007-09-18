@@ -217,6 +217,7 @@ public class ServletAdaptor extends HttpServlet {
             throw new ServletException(e);
         } finally {
             requestInvoker.set(null);
+            responseInvoker.set(null);
         }
         
         // Let all other runtime exceptions be handled by the servlet container

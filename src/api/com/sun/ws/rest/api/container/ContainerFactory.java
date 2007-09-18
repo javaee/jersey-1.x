@@ -22,15 +22,14 @@
 
 package com.sun.ws.rest.api.container;
 
+import com.sun.ws.rest.api.core.DefaultResourceConfig;
 import com.sun.ws.rest.api.core.ResourceConfig;
 import com.sun.ws.rest.spi.container.ContainerProvider;
 import com.sun.ws.rest.spi.container.WebApplication;
 import com.sun.ws.rest.spi.container.WebApplicationFactory;
 import com.sun.ws.rest.spi.service.ServiceFinder;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 
 /**
@@ -41,27 +40,6 @@ import java.util.Set;
 public final class ContainerFactory {
     
     private ContainerFactory() {
-    }
-    
-    private static final class ResourceConfigImpl implements ResourceConfig {
-        private final Set<Class> resourceClasses;
-        private final Map<String, Boolean> features = new HashMap<String, Boolean>();
-        
-        ResourceConfigImpl(Set<Class> resourceClasses) {
-            this.resourceClasses = new HashSet<Class>(resourceClasses);
-            this.features.put(ResourceConfig.CANONICALIZE_URI_PATH, true);
-            this.features.put(ResourceConfig.IGNORE_MATRIX_PARAMS, true);
-            this.features.put(ResourceConfig.NORMALIZE_URI, true);
-            this.features.put(ResourceConfig.REDIRECT, true);
-        }
-        
-        public Set<Class> getResourceClasses() {
-            return resourceClasses;
-        }
-        
-        public Map<String, Boolean> getFeatures() {
-            return features;
-        }
     }
     
     /**
@@ -84,7 +62,7 @@ public final class ContainerFactory {
         Set<Class> resourceClassesSet = new HashSet<Class>(
                 Arrays.asList(resourceClasses));
         
-        return createContainer(type, new ResourceConfigImpl(resourceClassesSet));
+        return createContainer(type, new DefaultResourceConfig(resourceClassesSet));
     }
     
     /**
@@ -104,7 +82,7 @@ public final class ContainerFactory {
     @SuppressWarnings("unchecked")
     public static <A> A createContainer(Class<A> type, Set<Class> resourceClasses)
     throws ContainerException, IllegalArgumentException {
-        return createContainer(type, new ResourceConfigImpl(resourceClasses));
+        return createContainer(type, new DefaultResourceConfig(resourceClasses));
     }
     
     /**
