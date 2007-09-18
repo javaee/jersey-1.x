@@ -79,7 +79,8 @@ public final class ResourceClass extends BaseResourceClass {
             ResourceProviderFactory resolverFactory) {
         this.c = c;
         this.config = config;
-        this.resolver = resolverFactory.createProvider(c);
+        this.resolver = resolverFactory.createProvider(c, 
+                config.getFeatures(), config.getProperties());
         
         this.consumeMime = getConsumeMimeList();
         this.produceMime = getProduceMimeList();

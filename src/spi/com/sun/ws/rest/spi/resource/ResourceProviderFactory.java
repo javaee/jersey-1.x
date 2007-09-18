@@ -23,8 +23,10 @@
 package com.sun.ws.rest.spi.resource;
 
 import com.sun.ws.rest.api.container.ContainerException;
+import com.sun.ws.rest.api.core.ResourceConfig;
 import com.sun.ws.rest.impl.resource.PerRequestProvider;
 import java.lang.annotation.Annotation;
+import java.util.Map;
 
 /**
  * A singleton that manages access to resource provider instances.
@@ -41,9 +43,29 @@ public class ResourceProviderFactory {
     
     /**
      * Obtain a ResourceProvider instance for the supplied
-     * resourceClass
+     * resourceClass.
+     * <p>
+     * This method will first search for a class that implements 
+     * {@link ResourceProvider} that is declared as an annotation on 
+     * resourceClass.
+     * 
+     * If not found the the {@link ResourceProvider} class will be looked up 
+     * in the resourceProperties using the property name 
+     * "com.sun.ws.rest.config.property.DefaultResourceProviderClass".
+     * 
+     * If there is no such property then the {@link PerRequestProvider} will
+     * ne chosen.
+     * 
+     * @param resourceClass the resource class for the provider.
+     * @param resourceFeatures the resource features
+     * @param resourceFeatures the resource properties
+     * @return the resource provider.
+     * @throws IllegalArgumentException if the Java type of resource provider
+     *         property is not Class<? extends ResourceProvider>.
      */
-    public ResourceProvider createProvider(Class resourceClass) {
+    public ResourceProvider createProvider(Class resourceClass,
+            Map<String, Boolean> resourceFeatures,
+            Map<String, Object> resourceProperties) {
         Class<? extends ResourceProvider> providerClass = null;
         
         // Use annotations to identify the correct provider, note that
@@ -59,14 +81,33 @@ public class ResourceProviderFactory {
                 throw new ContainerException(resourceClass.toString()+
                         " has multiple ResourceFactory annotations");
         }
-        // Use default provider if none specified
-        if (providerClass == null)
-            providerClass = PerRequestProvider.class;
+        
+        if (providerClass == null) {
+            Object v = resourceProperties.
+                    get(ResourceConfig.PROPERTY_DEFAULT_RESOURCE_PROVIDER_CLASS);
+            if (v == null) {
+                // Use default provider if none specified
+                providerClass = PerRequestProvider.class;
+            } else if (v instanceof Class) {
+                Class<?> c = (Class<?>)v;
+                if (ResourceProvider.class.isAssignableFrom(c)) {
+                    providerClass = c.asSubclass(ResourceProvider.class);
+                } else {
+                    throw new IllegalArgumentException("Property value for " 
+                            + ResourceConfig.PROPERTY_DEFAULT_RESOURCE_PROVIDER_CLASS
+                            + " is not of type Class<? extends com.sun.ws.rest.spi.resource.ResourceProvider>");
+                }
+            } else {
+                throw new IllegalArgumentException("Property value for " 
+                        + ResourceConfig.PROPERTY_DEFAULT_RESOURCE_PROVIDER_CLASS
+                        + " is not of type Class<? extends com.sun.ws.rest.spi.resource.ResourceProvider>");
+            }
+        }
         
         try {
             // create and stash a new instance of the desired provider
             ResourceProvider r = providerClass.newInstance();
-            r.init(resourceClass);
+            r.init(resourceClass, resourceFeatures, resourceProperties);
             return r;
         } catch (IllegalAccessException ex) {
             throw new ContainerException("Unable to create resource provider", ex);

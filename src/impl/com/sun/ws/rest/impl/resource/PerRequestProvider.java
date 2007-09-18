@@ -34,10 +34,9 @@ package com.sun.ws.rest.impl.resource;
 import com.sun.ws.rest.api.container.ContainerException;
 import com.sun.ws.rest.spi.resource.ResourceProvider;
 import com.sun.ws.rest.spi.resource.ResourceProviderContext;
-import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Type;
+import java.util.Map;
 
 /**
  *
@@ -47,7 +46,9 @@ public class PerRequestProvider  implements ResourceProvider {
 
     private Class<?> resourceClass;
     
-    public void init(Class<?> resourceClass) {
+    public void init(Class<?> resourceClass,
+            Map<String, Boolean> resourceFeatures,
+            Map<String, Object> resourceProperties) {
         this.resourceClass = resourceClass;
     }
 

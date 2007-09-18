@@ -22,6 +22,8 @@
 
 package com.sun.ws.rest.spi.resource;
 
+import java.util.Map;
+
 /**
  * A provider that manages the creation of resource class instances. A provider
  * instance is specific to a particular class of resource.
@@ -33,8 +35,12 @@ public interface ResourceProvider {
      * instance will manage access to.
      *
      * @param resourceClass the class of the resource
+     * @param resourceFeatures the resource features
+     * @param resourceFeatures the resource properties
      */
-    void init(Class<?> resourceClass);
+    void init(Class<?> resourceClass,
+            Map<String, Boolean> resourceFeatures,
+            Map<String, Object> resourceProperties);
     
     /**
      * Called to obtain an instance of a resource class.

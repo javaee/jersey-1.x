@@ -25,6 +25,7 @@ package com.sun.ws.rest.impl.resource;
 import com.sun.ws.rest.api.container.ContainerException;
 import com.sun.ws.rest.spi.resource.ResourceProviderContext;
 import com.sun.ws.rest.spi.resource.ResourceProvider;
+import java.util.Map;
 
 /**
  * A simple provider that maintains a singleton resource class instance
@@ -35,7 +36,9 @@ public class SingletonProvider implements ResourceProvider {
     
     private Object resource;
     
-    public void init(Class<?> resourceClass) {
+    public void init(Class<?> resourceClass,
+            Map<String, Boolean> resourceFeatures,
+            Map<String, Object> resourceProperties) {
         this.resourceClass = resourceClass;
     }
 

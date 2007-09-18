@@ -22,7 +22,6 @@
 
 package com.sun.ws.rest.api.core;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
@@ -35,7 +34,7 @@ public interface ResourceConfig {
      * {@link java.net.URI#normalize}. If not true the request URI is not
      * modified.
      */
-    public static final String NORMALIZE_URI 
+    public static final String FEATURE_NORMALIZE_URI 
             = "com.sun.ws.rest.config.feature.NormalizeURI";
     
     /**
@@ -43,7 +42,7 @@ public interface ResourceConfig {
      * contiguous slashes (i.e. all /+ will be replaced by /). If not true the
      * request URI path component is mot modified.
      */
-    public static final String CANONICALIZE_URI_PATH 
+    public static final String FEATURE_CANONICALIZE_URI_PATH 
             = "com.sun.ws.rest.config.feature.CanonicalizeURIPath";
     
     /**
@@ -53,7 +52,7 @@ public interface ResourceConfig {
      * then the client is (temporarily) redirected to the new URI. Otherwise
      * the request URI is set to be the new URI.
      */
-    public static final String REDIRECT 
+    public static final String FEATURE_REDIRECT 
             = "com.sun.ws.rest.config.feature.Redirect";
     
     /**
@@ -61,9 +60,22 @@ public interface ResourceConfig {
      * will be ignored when matching the path to URI templates declared by
      * resource classes.
      */
-    public static final String IGNORE_MATRIX_PARAMS 
+    public static final String FEATURE_IGNORE_MATRIX_PARAMS 
             = "com.sun.ws.rest.config.feature.IgnoreMatrixParams";
     
+    /**
+     * If set the default resource provider to be used by the 
+     * @{link ResourceProviderFactory}.
+     * <p>
+     * The type of this property must be a Java class that implementations
+     * {@link ResourceProvider}.
+     * <p>
+     * If not set the default resource provider will be 
+     * {@link PerRequestProvider}.
+     */
+    public static final String PROPERTY_DEFAULT_RESOURCE_PROVIDER_CLASS
+            = "com.sun.ws.rest.config.property.DefaultResourceProviderClass";
+            
     /**
      * Get the set of root resource classes to be deployed by the Web
      * application.

@@ -195,10 +195,10 @@ public class UriTemplateProcessor implements Messager, AnnotationProcessor {
             }
         }
         
-        context.getRCFeatures().put(ResourceConfig.NORMALIZE_URI, normalizeURI);
-        context.getRCFeatures().put(ResourceConfig.REDIRECT, redirect);
-        context.getRCFeatures().put(ResourceConfig.CANONICALIZE_URI_PATH, canonicalizeURIPath);
-        context.getRCFeatures().put(ResourceConfig.IGNORE_MATRIX_PARAMS, ignoreMatrixParams);
+        context.getRCFeatures().put(ResourceConfig.FEATURE_NORMALIZE_URI, normalizeURI);
+        context.getRCFeatures().put(ResourceConfig.FEATURE_REDIRECT, redirect);
+        context.getRCFeatures().put(ResourceConfig.FEATURE_CANONICALIZE_URI_PATH, canonicalizeURIPath);
+        context.getRCFeatures().put(ResourceConfig.FEATURE_IGNORE_MATRIX_PARAMS, ignoreMatrixParams);
         
         if (!generateWebXml) {
            if (servletClassName != null)
