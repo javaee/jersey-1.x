@@ -24,10 +24,7 @@ package com.sun.ws.rest.spi.resource;
 
 import com.sun.ws.rest.api.container.ContainerException;
 import com.sun.ws.rest.impl.resource.PerRequestProvider;
-import com.sun.ws.rest.impl.resource.SingletonProvider;
 import java.lang.annotation.Annotation;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
 
 /**
  * A singleton that manages access to resource provider instances.
