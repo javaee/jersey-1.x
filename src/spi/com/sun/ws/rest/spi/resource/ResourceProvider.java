@@ -22,8 +22,6 @@
 
 package com.sun.ws.rest.spi.resource;
 
-import com.sun.ws.rest.spi.resource.ResourceProviderContext;
-
 /**
  * A provider that manages the creation of resource class instances. A provider
  * instance is specific to a particular class of resource.
