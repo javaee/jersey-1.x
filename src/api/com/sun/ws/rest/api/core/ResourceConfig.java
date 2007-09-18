@@ -93,4 +93,21 @@ public interface ResourceConfig {
      *         present.
      */
     boolean getFeature(String featureName);
+    
+    /**
+     * Get the map of properties associated with the Web application.
+     *
+     * @return the properties.
+     *         The returned value shall never be null.
+     */
+    Map<String, Object> getProperties();
+
+    /**
+     * Get the value of a property.
+     *
+     * @param propertyName the property name.
+     * @return the property, or null if there is no property present for the
+     *         given property name.
+     */
+    Object getProperty(String propertyName);
 }

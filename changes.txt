@@ -1,6 +1,6 @@
 release 0.3 (2007-10-xx)
-- ResourceConfig interface is modified to support a feature bag with
-  documented standard features.
+- ResourceConfig interface is modified to support a feature bag and property
+  bag with documented standard features.
   DefaultResourceConfig is mutable implementation of ResourceConfig.
   The APT tool generates ResourceConfig classes that inherit from 
   DefaultResourceConfig.

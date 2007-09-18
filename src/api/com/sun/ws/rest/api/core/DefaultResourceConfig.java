@@ -30,13 +30,18 @@ import java.util.Set;
 /**
  * A mutable implementation of {@link ResourceConfig} that declares
  * default values for features.
- * 
+ * <p>
+ * The set of features and properties may be modified by modifying the instances 
+ * returned from the methods {@link ResourceConfig#getFeatures} and 
+ * {@link ResourceConfig#getProperties} respectively.
  */
 public class DefaultResourceConfig implements ResourceConfig {
     
+    private final Set<Class> resources = new HashSet<Class>();
+    
     private final Map<String, Boolean> features = new HashMap<String, Boolean>();
     
-    private final Set<Class> resources = new HashSet<Class>();
+    private final Map<String, Object> properties = new HashMap<String, Object>();
     
     /**
      */
@@ -68,5 +73,13 @@ public class DefaultResourceConfig implements ResourceConfig {
     public boolean getFeature(String featureName) {
         final Boolean v = features.get(featureName);
         return (v != null) ? v : false;
+    }
+    
+    public Map<String, Object> getProperties() {
+        return properties;
+    }
+
+    public Object getProperty(String propertyName) {
+        return properties.get(propertyName);
     }
 }
