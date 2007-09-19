@@ -249,6 +249,10 @@ public final class UriBuilderImpl extends UriBuilder {
         
         if (!pathEndsInSlash && !segmentStartsWithSlash) {
             path.append('/');
+        } else if (pathEndsInSlash && segmentStartsWithSlash) {
+            segment = segment.substring(1);
+            if (segment.length() == 0)
+                return;
         }
         
         path.append(segment);
