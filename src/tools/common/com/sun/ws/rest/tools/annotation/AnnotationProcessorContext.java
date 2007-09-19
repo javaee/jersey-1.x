@@ -59,10 +59,13 @@ public class AnnotationProcessorContext {
     /** Features to go to ResourceConfig */
     private final Map<String, Boolean> features = new HashMap<String, Boolean>();
     
+    private boolean verbose;
+    
     /** 
      * APT round number 
      */
     public int round = 0;
+    
     
     /** Creates a new instance of AnnotationProcessorContext */
     public AnnotationProcessorContext() {
@@ -122,7 +125,15 @@ public class AnnotationProcessorContext {
         return resourceBeanClassName;
     }
     
-    public Map<String, Boolean> getRCFeatures() {
+    public Map<String, Boolean> getResourceConfigFeatures() {
         return features;
+    }
+    
+    public boolean isVerbose() {
+        return verbose;
+    }
+    
+    public void setVerbose(boolean verbose) {
+        this.verbose = verbose;
     }
 }

@@ -114,27 +114,7 @@ public class UriTemplateProcessor implements Messager, AnnotationProcessor {
      * Determines if wadl should be generated
      */
     boolean generateWadl = true;
-    
-    /**
-     * Determines if request should be redirected or silently forwarded
-     */
-    boolean redirect = true;
-    
-    /**
-     * Determines if URI path should be canonicalized
-     */
-    boolean canonicalizeURIPath = true;
-
-    /**
-     * Determines if URI should be normalized
-     */
-    boolean normalizeURI = true;
-    
-    /**
-     * matrix params should be ignored
-     */
-    boolean ignoreMatrixParams = true;
-    
+        
     /**
      * output directory for apt
      */
@@ -161,31 +141,38 @@ public class UriTemplateProcessor implements Messager, AnnotationProcessor {
     public void init(AnnotationProcessorEnvironment apEnv) {
         this.apEnv = apEnv;
         context.setAnnotationProcessorEnvironment(apEnv);
+        
+        // TODO can we use args4J to improve this code?
         Map<String, String>options = apEnv.getOptions();
         destDirectory = options.get("-d");
         verbose = options.containsKey("-verbose");
+        context.setVerbose(verbose);
         for (String key : options.keySet()) {
             log("key: "+ key+ " value: "+options.get(key));
             if (key.startsWith("-Aurlpattern")) {
-                urlPattern = key.split("=")[1];
+                urlPattern = getStringValue(key);
             } else if (key.startsWith("-Aservletclassname")) {
-                servletClassName = key.split("=")[1];
+                servletClassName = getStringValue(key);
             } else if (key.startsWith("-Aservletname")) {
-                servletName = key.split("=")[1];
+                servletName = getStringValue(key);
             } else if (key.startsWith("-Awebresourcespkg")) {
-                webresourcesPackage = key.split("=")[1];
+                webresourcesPackage = getStringValue(key);
             } else if (key.startsWith("-Aservlet")) {
                 generateWebXml = true;
             } else if (key.startsWith("-Anowadl")) {
                 generateWadl = false;
             } else if (key.startsWith("-Aredirect")) {
-                redirect = !"false".equalsIgnoreCase(key.split("=")[1]);
+                context.getResourceConfigFeatures().put(ResourceConfig.FEATURE_REDIRECT, 
+                        getBooleanValue(key));
             } else if (key.startsWith("-AnormalizeURI")) {
-                normalizeURI = !"false".equalsIgnoreCase(key.split("=")[1]);
+                context.getResourceConfigFeatures().put(ResourceConfig.FEATURE_NORMALIZE_URI, 
+                        getBooleanValue(key));
             } else if (key.startsWith("-AcanonicalizeURIPath")) {
-                canonicalizeURIPath = !"false".equalsIgnoreCase(key.split("=")[1]);
+                context.getResourceConfigFeatures().put(ResourceConfig.FEATURE_CANONICALIZE_URI_PATH, 
+                        getBooleanValue(key));
             } else if (key.startsWith("-AignoreMatrixParams")) {
-                ignoreMatrixParams = !"false".equalsIgnoreCase(key.split("=")[1]);
+                context.getResourceConfigFeatures().put(ResourceConfig.FEATURE_IGNORE_MATRIX_PARAMS,
+                        getBooleanValue(key));
             } else if (key.startsWith("-Awebresourcesdestdir")) {
                 restDestDirectory = key.split("=")[1];
                 if (!(restDestDirectory.endsWith("/") ||
@@ -194,12 +181,7 @@ public class UriTemplateProcessor implements Messager, AnnotationProcessor {
                 }
             }
         }
-        
-        context.getRCFeatures().put(ResourceConfig.FEATURE_NORMALIZE_URI, normalizeURI);
-        context.getRCFeatures().put(ResourceConfig.FEATURE_REDIRECT, redirect);
-        context.getRCFeatures().put(ResourceConfig.FEATURE_CANONICALIZE_URI_PATH, canonicalizeURIPath);
-        context.getRCFeatures().put(ResourceConfig.FEATURE_IGNORE_MATRIX_PARAMS, ignoreMatrixParams);
-        
+                
         if (!generateWebXml) {
            if (servletClassName != null)
                apEnv.getMessager().printError("-Aservletclassname requires the -Aservlet option to be set.");
@@ -218,6 +200,25 @@ public class UriTemplateProcessor implements Messager, AnnotationProcessor {
                 servletName = "Jersey Web Application";
             if (urlPattern == null)
                 urlPattern = "/resources/*";
+        }
+    }
+    
+    private boolean getBooleanValue(String expression) {
+        String value = getStringValue(expression);
+        return (value == null) ? true : Boolean.valueOf(value);
+    }
+    
+    private String getStringValue(String expression) {
+        return getStringValue(expression, true);
+    }
+    
+    private String getStringValue(String expression, boolean trim) {
+        String[] splitExpression = expression.split("=");
+        if (splitExpression.length == 2) {
+            String value = (trim) ? splitExpression[1].trim() : splitExpression[1];
+            return (value.length() == 0) ? null : value;
+        } else {
+            return null;        
         }
     }
     

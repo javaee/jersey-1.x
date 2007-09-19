@@ -25,12 +25,12 @@ package com.sun.ws.rest.tools.webapp;
 import static com.sun.codemodel.ClassType.CLASS;
 import com.sun.codemodel.*;
 import com.sun.ws.rest.api.core.DefaultResourceConfig;
-import com.sun.ws.rest.api.core.ResourceConfig;
 import com.sun.ws.rest.tools.FilerCodeWriter;
 import com.sun.ws.rest.tools.Messager;
 import com.sun.ws.rest.tools.ToolsMessages;
 import com.sun.ws.rest.tools.annotation.AnnotationProcessorContext;
 import java.io.IOException;
+import java.util.Map;
 
 /**
  * This class generates a class that implements
@@ -102,14 +102,19 @@ public class WebResourcesGenerator {
                 cb1.directStatement("getResourceClasses().add("+clazz+".class);");
             }            
             
-//            if(options.verbose)
-//                cw = new ProgressCodeWriter(cw, System.out);
-            
+            // TODO: improve using code model types
+            for (Map.Entry<String, Boolean> e : context.getResourceConfigFeatures().entrySet()) {
+                cb1.directStatement("getFeatures().put(" + 
+                        "\"" + e.getKey() + "\"" +
+                        ", " +
+                        e.getValue() + 
+                        ");");
+            }
+                        
             cm.build(cw);
         } catch (IOException e) {
             messager.reportError(ToolsMessages.NESTED_ERROR(e.getLocalizedMessage()));
         }
-        
     }
     
     protected JDefinedClass getCMClass(String className, com.sun.codemodel.ClassType type) {
