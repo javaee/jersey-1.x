@@ -91,7 +91,11 @@ public class UriBuilderTest extends TestCase {
     }
     
     public void testAppendPath() {
-        URI bu = UriBuilder.fromUri("http://localhost:8080/a/b/c").
+        URI bu = UriBuilder.fromUri("http://localhost:8080/a/b/c/").
+                path("/x/y/z").build();
+        assertEquals(URI.create("http://localhost:8080/a/b/c/x/y/z"), bu);
+        
+        bu = UriBuilder.fromUri("http://localhost:8080/a/b/c").
                 path("/x/y/z").build();
         assertEquals(URI.create("http://localhost:8080/a/b/c/x/y/z"), bu);
         
