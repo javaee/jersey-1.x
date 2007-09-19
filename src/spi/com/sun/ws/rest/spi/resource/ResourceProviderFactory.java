@@ -95,12 +95,12 @@ public class ResourceProviderFactory {
                 } else {
                     throw new IllegalArgumentException("Property value for " 
                             + ResourceConfig.PROPERTY_DEFAULT_RESOURCE_PROVIDER_CLASS
-                            + " is not of type Class<? extends com.sun.ws.rest.spi.resource.ResourceProvider>");
+                            + " of type " + v.getClass() + " not of a subclass of com.sun.ws.rest.spi.resource.ResourceProvider");
                 }
             } else {
                 throw new IllegalArgumentException("Property value for " 
                         + ResourceConfig.PROPERTY_DEFAULT_RESOURCE_PROVIDER_CLASS
-                        + " is not of type Class<? extends com.sun.ws.rest.spi.resource.ResourceProvider>");
+                        + " of type " + v.getClass() + " not of type Class<? extends com.sun.ws.rest.spi.resource.ResourceProvider>");
             }
         }
         

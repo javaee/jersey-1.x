@@ -27,6 +27,7 @@ import com.sun.ws.rest.impl.TestHttpRequestContext;
 import com.sun.ws.rest.impl.TestHttpResponseContext;
 import com.sun.ws.rest.impl.application.WebApplicationImpl;
 import com.sun.ws.rest.api.core.DefaultResourceConfig;
+import com.sun.ws.rest.impl.resource.PerRequestProvider;
 import com.sun.ws.rest.spi.container.ContainerRequest;
 import com.sun.ws.rest.spi.container.ContainerResponse;
 import com.sun.ws.rest.spi.resource.PerRequest;
@@ -101,20 +102,73 @@ public class ResourceLifecycleTest extends TestCase {
     
     public ResourceLifecycleTest(String testName) {
         super(testName);
-
+    }
+    
+    private void initiate(ResourceConfig c) {
+        a = new WebApplicationImpl();
+        a.initiate(null, c);        
+    }
+    
+    private ResourceConfig getResourceConfig() {
         final Set<Class> r = new HashSet<Class>();
         r.add(TestFooBean.class);
         r.add(TestBarBean.class);
         r.add(TestBazBean.class);
-        
-        a = new WebApplicationImpl();
-        ResourceConfig c = new DefaultResourceConfig(r);
-
-        a.initiate(null, c);
-
+        return new DefaultResourceConfig(r);
     }
     
-    public void testOneWebResource() {
+    public void testDefault() {
+        initiate(getResourceConfig());
+        _test();
+    }
+    
+    public void testOverrideDefault() {
+        ResourceConfig c = getResourceConfig();
+        c.getProperties().put(ResourceConfig.PROPERTY_DEFAULT_RESOURCE_PROVIDER_CLASS,
+                PerRequestProvider.class);
+        
+        initiate(c);
+        _test();
+    }
+    
+    public void testNullResourceProviderProperty() {
+        ResourceConfig c = getResourceConfig();
+        c.getProperties().put(ResourceConfig.PROPERTY_DEFAULT_RESOURCE_PROVIDER_CLASS,
+                null);
+        
+        initiate(c);
+        _test();
+    }
+    
+    public void testBadTypeResourceProviderProperty() {
+        ResourceConfig c = getResourceConfig();
+        c.getProperties().put(ResourceConfig.PROPERTY_DEFAULT_RESOURCE_PROVIDER_CLASS,
+                "VALUE");
+
+        boolean caught = false;
+        try {
+            initiate(c);
+        } catch (IllegalArgumentException e) {
+            caught = true;
+        }
+        assertTrue(caught);
+    }
+    
+    public void testBadClassResourceProviderProperty() {
+        ResourceConfig c = getResourceConfig();
+        c.getProperties().put(ResourceConfig.PROPERTY_DEFAULT_RESOURCE_PROVIDER_CLASS,
+                String.class);
+        
+        boolean caught = false;
+        try {
+            initiate(c);
+        } catch (IllegalArgumentException e) {
+            caught = true;
+        }
+        assertTrue(caught);
+    }
+    
+    private void _test() {
         String count;
         
         count = doGET("foo");
@@ -136,10 +190,10 @@ public class ResourceLifecycleTest extends TestCase {
         count = doGET("baz");
         assertEquals(count, "1");
         count = doGET("baz");
-        assertEquals(count, "1");        
+        assertEquals(count, "1");                
     }
     
-    public String doGET(String path) {
+    private String doGET(String path) {
         ByteArrayInputStream e = new ByteArrayInputStream("".getBytes());
         final ContainerRequest request = new TestHttpRequestContext("GET", e, "/base/" + path, "/base/");
         final ContainerResponse response = new TestHttpResponseContext(request);
