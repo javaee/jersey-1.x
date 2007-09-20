@@ -22,6 +22,7 @@
 
 package com.sun.ws.rest.samples.optimisticconcurrency;
 
+import java.net.URI;
 import javax.xml.bind.annotation.XmlRootElement;
 
 @XmlRootElement
@@ -40,9 +41,9 @@ public class Item {
         setUpdateUri(updateUri);
     }
     
-    public Item(String uri, String updateUri, String mediaType) {
-        setUri(uri);
-        setUpdateUri(updateUri);
+    public Item(URI uri, URI updateUri, String mediaType) {
+        setUri(uri.toString());
+        setUpdateUri(updateUri.toString());
         setMediaType(mediaType);
     }
     

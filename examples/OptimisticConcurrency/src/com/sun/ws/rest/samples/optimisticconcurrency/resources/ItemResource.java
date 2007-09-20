@@ -24,12 +24,12 @@ package com.sun.ws.rest.samples.optimisticconcurrency.resources;
 
 import com.sun.ws.rest.samples.optimisticconcurrency.Item;
 import com.sun.ws.rest.samples.optimisticconcurrency.ItemData;
-import java.net.URI;
 import javax.ws.rs.HttpMethod;
 import javax.ws.rs.ProduceMime;
 import javax.ws.rs.UriTemplate;
 import javax.ws.rs.core.HttpContext;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
 
 /**
@@ -56,17 +56,10 @@ public class ItemResource {
             mediaType = id.getMediaType();
         }
         
+        UriBuilder ub = uriInfo.getBuilder().path("content");
         return new Item(
-                getUri(uriInfo.getAbsolute()), 
-                getUpdateUri(uriInfo.getAbsolute(), version),
+                ub.build(),
+                ub.path(version).build(),
                 mediaType.toString());
-    }    
-    
-    private String getUri(URI uri) {
-        return uri + "/content";
-    }
-    
-    private String getUpdateUri(URI uri, String version) {
-        return uri + "/content/" + version;
     }
 }
