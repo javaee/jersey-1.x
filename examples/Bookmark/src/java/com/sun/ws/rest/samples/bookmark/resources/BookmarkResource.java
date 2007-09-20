@@ -49,12 +49,16 @@ public class BookmarkResource {
     BookmarkEntity bookmarkEntity;
     
     /** Creates a new instance of UserResource */
-    public BookmarkResource(UriInfo uriInfo, EntityManager em, UserEntity userEntity, String bmid) {
+    public BookmarkResource(UriInfo uriInfo, EntityManager em, 
+            UserEntity userEntity, String bmid) {
         this.uriInfo = uriInfo;
         this.em = em;
-        bookmarkEntity = em.find(BookmarkEntity.class, new BookmarkEntityPK(bmid, userEntity.getUserid()));
+        bookmarkEntity = em.find(BookmarkEntity.class, 
+                new BookmarkEntityPK(bmid, userEntity.getUserid()));
         if (null == bookmarkEntity) {
-            throw new NotFoundException("bookmark with userid=" + userEntity.getUserid() + " and bmid=" + bmid + " not found\n");
+            throw new NotFoundException("bookmark with userid=" + 
+                    userEntity.getUserid() + " and bmid=" + 
+                    bmid + " not found\n");
         }
         bookmarkEntity.setUserEntity(userEntity);
     }

@@ -26,6 +26,7 @@ import com.sun.ws.rest.samples.bookmark.entities.BookmarkEntity;
 import com.sun.ws.rest.samples.bookmark.util.tx.TransactionManager;
 import com.sun.ws.rest.samples.bookmark.util.tx.Transactional;
 import java.math.BigInteger;
+import java.net.URI;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Collection;
@@ -38,6 +39,7 @@ import javax.ws.rs.UriParam;
 import javax.ws.rs.UriTemplate;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
@@ -55,7 +57,8 @@ public class BookmarksResource {
     UserResource userResource; // parent user resource
     
     /** Creates a new instance of BookmarksResource */
-    public BookmarksResource(UriInfo uriInfo, EntityManager em, UserResource userResource) {
+    public BookmarksResource(UriInfo uriInfo, 
+            EntityManager em, UserResource userResource) {
         this.uriInfo = uriInfo;
         this.em = em;
         this.userResource = userResource;
@@ -67,16 +70,21 @@ public class BookmarksResource {
     
     @UriTemplate("{bmid}/")
     public BookmarkResource getBookmark(@UriParam("bmid") String bmid) {
-        return new BookmarkResource(uriInfo, em, userResource.getUserEntity(), bmid);
+        return new BookmarkResource(uriInfo, em, 
+                userResource.getUserEntity(), bmid);
     }
     
     @HttpMethod("GET")
     @ProduceMime("application/json")
     public JSONArray getBookmarksAsJsonArray() {
         JSONArray uriArray = new JSONArray();
+        UriBuilder ub = null;
         for (BookmarkEntity bookmarkEntity : getBookmarks()) {
-            uriArray.put(
-                    uriInfo.getAbsolute().resolve(bookmarkEntity.getBookmarkEntityPK().getBmid()).toString());
+            ub = (ub == null) ? uriInfo.getBuilder() : ub.clone();
+            URI bookmarkUri = ub.
+                    path(bookmarkEntity.getBookmarkEntityPK().getBmid()).
+                    build();
+            uriArray.put(bookmarkUri.toString());
         }
         return uriArray;
     }
@@ -85,8 +93,10 @@ public class BookmarksResource {
     @ConsumeMime("application/json")
     public Response postForm(JSONObject bookmark) {
         try {
-            final BookmarkEntity bookmarkEntity =
-                    new BookmarkEntity(getBookmarkId(bookmark.getString("uri")), userResource.getUserEntity().getUserid());
+            final BookmarkEntity bookmarkEntity = new BookmarkEntity(
+                    getBookmarkId(bookmark.getString("uri")), 
+                    userResource.getUserEntity().getUserid());
+            
             bookmarkEntity.setUri(bookmark.getString("uri"));
             bookmarkEntity.setUpdated(new Date());
             bookmarkEntity.setSdesc(bookmark.getString("sdesc"));
@@ -96,8 +106,11 @@ public class BookmarksResource {
             TransactionManager.manage(new Transactional(em) { public void transact() {
                 em.merge(userResource.getUserEntity());
             }});
-            return Response.Builder.created(
-                    uriInfo.getAbsolute().resolve(bookmarkEntity.getBookmarkEntityPK().getBmid())).build();
+            
+            URI bookmarkUri = uriInfo.getBuilder().
+                    path(bookmarkEntity.getBookmarkEntityPK().getBmid()).
+                    build();
+            return Response.Builder.created(bookmarkUri).build();
         } catch (JSONException jsone) {
             throw new WebApplicationException(jsone);
         }

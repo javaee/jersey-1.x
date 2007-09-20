@@ -23,6 +23,7 @@
 package com.sun.ws.rest.samples.bookmark.resources;
 
 import com.sun.ws.rest.samples.bookmark.entities.UserEntity;
+import java.net.URI;
 import java.util.List;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.PersistenceUnit;
@@ -31,6 +32,7 @@ import javax.ws.rs.ProduceMime;
 import javax.ws.rs.UriParam;
 import javax.ws.rs.UriTemplate;
 import javax.ws.rs.core.HttpContext;
+import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
 import org.codehaus.jettison.json.JSONArray;
 
@@ -65,8 +67,13 @@ public class UsersResource {
     @ProduceMime("application/json")
     public JSONArray getUsersAsJsonArray() {
         JSONArray uriArray = new JSONArray();
+        UriBuilder ub = null;
         for (UserEntity userEntity : getUsers()) {
-            uriArray.put(uriInfo.getAbsolute().resolve(userEntity.getUserid()).toString());
+            ub = (ub == null) ? uriInfo.getBuilder() : ub.clone();
+            URI userUri = ub.
+                    path(userEntity.getUserid()).
+                    build();
+            uriArray.put(userUri.toString());
         }
         return uriArray;
     }
