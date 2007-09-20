@@ -26,19 +26,25 @@ import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
 
 /**
- * A HTTP 404 (Not Found) exception.
+ * A HTTP 409 (Conflict) exception.
  * 
  * @author Paul.Sandoz@Sun.Com
  */
-public class NotFoundException extends WebApplicationException {
+public class ConflictException extends WebApplicationException {
    
     /**
-     * Create a HTTP 404 (Not Found) exception.
-     * @param message the String that is the entity of the 404 response.
+     * Create a HTTP 409 (Conflict) exception.
      */
-    public NotFoundException(String message) {
-        super(Response.Builder.serverError().status(404).
-                entity(message).type("text/plain").build());
+    public ConflictException() {
+        super(Response.Builder.serverError().status(409).build());
     }
     
+    /**
+     * Create a HTTP 409 (Conflict) exception.
+     * @param message the String that is the entity of the 409 response.
+     */
+    public ConflictException(String message) {
+        super(Response.Builder.serverError().status(409).
+                entity(message).type("text/plain").build());
+    }    
 }
