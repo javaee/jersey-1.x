@@ -80,7 +80,7 @@ public class ContainerResource {
     public Response putContainer(@UriParam("container") String container) {
         System.out.println("PUT CONTAINER " + container);
         
-        URI uri = getUri(container);
+        URI uri =  uriInfo.getAbsolute();
         Container c = new Container(container, uri.toString());
         
         Response r;
@@ -110,10 +110,6 @@ public class ContainerResource {
         return new ItemResource(uriInfo, preconditionEvaluator, container, item);
     }
     
-    private URI getUri(String container) {
-        return uriInfo.getBase().resolve("containers/" + container);
-    }
-
     private boolean match(byte[] search, String container, String item) {
         byte[] b = MemoryStore.MS.getItemData(container, item);
         

@@ -82,7 +82,7 @@ public class ItemResource {
             byte[] data) {
         System.out.println("PUT ITEM " + container + " " + item);
         
-        URI uri = getUri(container, item);
+        URI uri = uriInfo.getAbsolute();
         MediaType mimeType = headers.getMediaType();
         GregorianCalendar gc = new GregorianCalendar();
         gc.set(GregorianCalendar.MILLISECOND, 0);
@@ -100,7 +100,8 @@ public class ItemResource {
         Item ii = MemoryStore.MS.createOrUpdateItem(container, i, data);
         if (ii == null) {
             // Create the container if one has not been created
-            URI containerUri = getUri(container);
+            URI containerUri = uriInfo.getBuilder().path("..").
+                    build().normalize();
             Container c = new Container(container, containerUri.toString());
             MemoryStore.MS.createContainer(c);
             i = MemoryStore.MS.createOrUpdateItem(container, i, data);
@@ -121,13 +122,6 @@ public class ItemResource {
         }
     }
     
-    private URI getUri(String container) {
-        return uriInfo.getBase().resolve("containers/" + container);
-    }
-    
-    private URI getUri(String container, String item) {
-        return uriInfo.getBase().resolve("containers/" + container + "/" + item);
-    }
     
     private String computeDigest(byte[] content) {
         try {
