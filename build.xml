@@ -364,4 +364,33 @@
         </findbugs>	
     </target>
     
+    <!-- Maven tasks -->
+
+     <target name="-check-maven-task">
+         <available file="maven/maven-repository-importer.jar" property="mavenExists" />
+     </target>
+
+     <target name="-get-maven-task" depends="-check-maven-task" unless="mavenExists">
+         <get src="https://maven-repository.dev.java.net/nonav/repository/com.sun.wts.tools.mri/jars/maven-repository-importer-1.2.jar" dest="maven/maven-repository-importer.jar" />
+     </target>
+
+     <target name="push-to-maven-prepare" depends="dist-release,-get-maven-task" description="Generates a Maven repository">
+         <taskdef resource="maven-repository-importer.properties">
+             <classpath>
+                 <pathelement path="maven/maven-repository-importer.jar" />
+             </classpath>
+         </taskdef>
+         <!-- clean it -->
+         <delete dir="build/maven-repo" />
+         <maven-repository-importer destdir="build/maven-repo" version="${release.spec.version}">
+             <artifact jar="dist/jsr311/lib/jsr311-api.jar" pom="maven/jsr311-pom.xml" srczip="dist/jsr311/lib/jsr311-api.src.zip" />
+         </maven-repository-importer>
+         <maven-repository-importer destdir="build/maven-repo" version="${release.impl.version}-${release.impl.version.suffix}">
+             <artifact jar="dist/jersey.jar" pom="maven/jersey-pom.xml" srczip="dist/jersey.src.zip" />
+             <filterset>
+                 <filter token="JSR311_VERSION" value="${release.spec.version}" />
+             </filterset>
+         </maven-repository-importer>
+     </target>
+
 </project>
