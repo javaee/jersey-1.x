@@ -36,6 +36,7 @@ import javax.ws.rs.UriTemplate;
 import javax.ws.rs.core.HttpContext;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
 
 /**
@@ -57,9 +58,9 @@ public class FeedResource {
     public EntryResource getEditEntryResource(@UriParam("entry") String entryId) {
         return new EditEntryResource(entryId, uriInfo);
     }
-    
-    private URI getEditURI(String path) {
-        return getURI("edit/" + path);
+        
+    private UriBuilder getEditUriBuilder() {
+        return uriInfo.getBuilder().path("edit");
     }
         
 //   Uncomment the following methods, and comment out the above equivalent 
@@ -72,13 +73,9 @@ public class FeedResource {
 //        return new EditOptimisiticEntryResource(entryId, version, uriInfo);
 //    }
 //    
-//    private URI getEditURI(String path) {
-//        return getURI("edit/0/" + path);
+//    private UriBuilder getEditUriBuilder() {
+//        return uriInfo.getBuilder().path("edit/0");
 //    }
-    
-    private URI getURI(String path) {
-        return uriInfo.getAbsolute().resolve(path);
-    }    
     
     
     @HttpMethod
@@ -93,12 +90,14 @@ public class FeedResource {
         String entryId = FileStore.FS.getNextId();
         
         // Set the self link 
-        URI entryUri = getURI(entryId);
-        AtomStore.addLink(e, "self", entryUri.toString());
+        URI entryUri = uriInfo.getBuilder().
+                path(entryId).build();
+        AtomStore.addLink(e, "self", entryUri);
         
         // Set the edit link
-        URI editEntryUri = getEditURI(entryId);
-        AtomStore.addLink(e, "edit", editEntryUri.toString());
+        URI editEntryUri = getEditUriBuilder().
+                path(entryId).build();
+        AtomStore.addLink(e, "edit", editEntryUri);
 
         // Set the id
         e.setId(entryId);
@@ -123,20 +122,22 @@ public class FeedResource {
 
         // Create a default entry
         Entry e = AtomStore.createDefaulMediaLinkEntryDocument();
-        
-        URI mediaUri = getURI(entryId + "/media");
+                
+        UriBuilder entryUriBuilder = uriInfo.getBuilder().path(entryId);
+        UriBuilder editEntryUriBuilder = getEditUriBuilder().path(entryId);
         
         // Set the self link
-        URI entryUri = getURI(entryId);
-        AtomStore.addLink(e, "self", entryUri.toString());
+        URI entryUri = entryUriBuilder.build();        
+        AtomStore.addLink(e, "self", entryUri);
         
         // Set the edit link
-        URI editEntryUri = getEditURI(entryId);
-        AtomStore.addLink(e, "edit", editEntryUri.toString());
+        URI editEntryUri = editEntryUriBuilder.build();
+        AtomStore.addLink(e, "edit", editEntryUri);
         
         // Set the edit-media link
-        URI editMediaUri = getEditURI(entryId + "/media");
-        AtomStore.addLink(e, "edit-media", editMediaUri.toString());        
+        URI editMediaUri = editEntryUriBuilder.
+                path("media").build();
+        AtomStore.addLink(e, "edit-media", editMediaUri);        
         
         // Set the id
         e.setId(entryId);
@@ -144,7 +145,9 @@ public class FeedResource {
         // Set the content to link to the media
         Content c = new Content();
         c.setType(headers.getMediaType().toString());
-        // Set the link source
+        URI mediaUri = entryUriBuilder.
+                path("media").
+                build();
         c.setSrc(mediaUri.toString());
         e.getContents().add(c);
         

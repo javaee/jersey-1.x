@@ -25,8 +25,8 @@ package com.sun.ws.rest.samples.atomserver.resources;
 import com.sun.syndication.feed.atom.Entry;
 import com.sun.syndication.feed.atom.Feed;
 import com.sun.syndication.io.FeedException;
-import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.core.Response;
+import com.sun.ws.rest.api.ConflictException;
+import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
 
 /**
@@ -34,8 +34,7 @@ import javax.ws.rs.core.UriInfo;
  * @author Paul.Sandoz@Sun.Com
  */
 public class EditOptimisiticEntryResource extends EditEntryResource {
-    private int version;
-    String editURI;
+    private final UriBuilder editUriBuilder;
     
     public EditOptimisiticEntryResource(String entryId, int version, UriInfo uriInfo) throws FeedException {
         super(entryId, uriInfo);
@@ -46,21 +45,21 @@ public class EditOptimisiticEntryResource extends EditEntryResource {
         String editLink = AtomStore.getLink(e, "edit");
         
         // Compare against the requested link
-        editURI = uriInfo.getAbsolute().toString();
-        boolean conflict = !editURI.startsWith(editLink);        
-        if (conflict) {
+        String editUri = uriInfo.getAbsolute().toString();
+        if (!editUri.startsWith(editLink)) {
             // Response with 409 Conflict
-            Response r = Response.Builder.noContent().status(409).build();
-            throw new WebApplicationException(r);
+            throw new ConflictException();
         }
 
         // Increment the version and update the edit URI
         int newVersion = version + 1;
-        editURI = uriInfo.getAbsolute().toString();
-        editURI = editURI.replaceFirst("/" + version + "/", "/" + newVersion + "/");
+        editUri = editUri.replaceFirst("/" + version + "/", 
+                "/" + newVersion + "/");
+        
+        editUriBuilder = UriBuilder.fromUri(editUri);
     }    
     
-    protected String getEditURI() {
-        return editURI;
+    protected UriBuilder getUriBuilder() {
+        return editUriBuilder;
     }
 }

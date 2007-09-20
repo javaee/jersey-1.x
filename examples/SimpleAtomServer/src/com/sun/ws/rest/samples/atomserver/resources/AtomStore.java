@@ -132,10 +132,10 @@ class AtomStore {
         return null;        
     }
     
-    static void addLink(Entry e, String rel, String uri) {
+    static void addLink(Entry e, String rel, URI uri) {
         Link l = new Link();
         l.setRel(rel);
-        l.setHref(uri);
+        l.setHref(uri.toString());
         e.getOtherLinks().add(l);
     }    
     
@@ -152,7 +152,7 @@ class AtomStore {
         return null;
     }    
     
-    static void updateLink(Entry e, String rel, String uri) {
+    static void updateLink(Entry e, String rel, URI uri) {
         List links = e.getOtherLinks();
         
         Link l = null;
@@ -166,7 +166,7 @@ class AtomStore {
         
         l = new Link();
         l.setRel(rel);
-        l.setHref(uri);
+        l.setHref(uri.toString());
         links.add(l);
     }    
     

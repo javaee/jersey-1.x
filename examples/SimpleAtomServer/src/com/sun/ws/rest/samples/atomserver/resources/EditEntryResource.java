@@ -26,12 +26,14 @@ import com.sun.syndication.feed.atom.Entry;
 import com.sun.syndication.feed.atom.Feed;
 import com.sun.syndication.io.FeedException;
 import java.io.IOException;
+import java.net.URI;
 import java.util.Date;
 import javax.ws.rs.ConsumeMime;
 import javax.ws.rs.HttpMethod;
 import javax.ws.rs.UriTemplate;
 import javax.ws.rs.core.HttpContext;
 import javax.ws.rs.core.HttpHeaders;
+import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
 
 /**
@@ -48,17 +50,19 @@ public class EditEntryResource extends EntryResource {
     
     @HttpMethod
     public Entry putEntry(Entry e) throws IOException, FeedException {
-        String entryUri = uriInfo.getBase() + "collection/" + entryId;
-        AtomStore.updateLink(e, "self", entryUri);
+        UriBuilder entryUri = uriInfo.getBaseBuilder().
+                path(FeedResource.class).
+                path(entryId);
+        AtomStore.updateLink(e, "self", entryUri.build());
         
-        String editEntryUri = getEditURI();
-        AtomStore.updateLink(e, "edit", editEntryUri);
+        UriBuilder editEntryUri = getUriBuilder();
+        AtomStore.updateLink(e, "edit", editEntryUri.build());
         
         if (AtomStore.hasMedia(entryId)) {
             // TODO update content link
-            String mediaUri = entryUri + "/media";
+            URI mediaUri = entryUri.path("media").build();
             
-            String editMediaUri = editEntryUri + "/media";
+            URI editMediaUri = editEntryUri.path("media").build();
             AtomStore.updateLink(e, "edit-media", editMediaUri);
         }
         e.setId(entryId);
@@ -99,9 +103,12 @@ public class EditEntryResource extends EntryResource {
         
         // Update the entry
         e.setUpdated(new Date());
-        String editEntryUri = getEditURI();
-        AtomStore.updateLink(e, "edit", editEntryUri.replaceFirst("/media", ""));
-        AtomStore.updateLink(e, "edit-media", editEntryUri);
+        UriBuilder editMediaEntryUri = getUriBuilder();
+        AtomStore.updateLink(e, "edit-media", 
+                editMediaEntryUri.build());
+        editMediaEntryUri.path("..");
+        AtomStore.updateLink(e, "edit", 
+                editMediaEntryUri.build().normalize());
         
         // TODO update the content type
         
@@ -113,7 +120,7 @@ public class EditEntryResource extends EntryResource {
         AtomStore.createMediaDocument(entryId, update);
     }
         
-    protected String getEditURI() {
-        return uriInfo.getAbsolute().toString();
+    protected UriBuilder getUriBuilder() {
+        return uriInfo.getBuilder();
     }
 }

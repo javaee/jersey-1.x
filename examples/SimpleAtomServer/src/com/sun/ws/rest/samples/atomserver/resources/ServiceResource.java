@@ -68,6 +68,7 @@ public class ServiceResource {
     @HttpContext UriInfo uriInfo;
     
     private String getCollectionUri() {
-        return uriInfo.getBase() + "collection/";
+        return uriInfo.getBaseBuilder().path(FeedResource.class).
+                build().toString();
     }
 }
