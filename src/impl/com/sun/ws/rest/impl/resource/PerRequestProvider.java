@@ -73,7 +73,15 @@ public class PerRequestProvider  implements ResourceProvider {
         } catch (IllegalAccessException ex) {
             throw new ContainerException("Unable to create resource", ex);
         } catch (InvocationTargetException ex) {
-            throw new ContainerException("Unable to create resource", ex);
+            Throwable t = ex.getTargetException();
+            if (t instanceof RuntimeException) {
+                // Rethrow the runtime exception
+                throw (RuntimeException)t;
+            } else {
+                // TODO should a checked exception be wrapped in 
+                // WebApplicationException ?
+                throw new ContainerException("Unable to create resource", t);
+            }
         }
     }
 }
