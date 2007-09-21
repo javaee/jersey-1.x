@@ -191,6 +191,7 @@
       <replace file="${basedir}/gf-uc/gen-module/Info/info.xml" token="@@@@MODULE_TIMESTAMP@@@@" value="${uc.module.timestamp}"/>
       <replace file="${basedir}/gf-uc/gen-module/Info/info.xml" token="@@@@MODULE_RELEASE_DATE@@@@" value="${uc.module.release.date}"/>
       <replace file="${basedir}/gf-uc/gen-module/Info/info.xml" token="@@@@MODULE_IMPL_VERSION@@@@" value="${uc.module.impl.version}"/>
+      <replace file="${basedir}/gf-uc/gen-module/Info/info.xml" token="@@@@RELEASE_IMPL_VERSION@@@@" value="${release.impl.version}"/>
       <!-- create the final module -->
       <mkdir dir="${basedir}/gf-uc/dist"/>
       <jar basedir="${basedir}/gf-uc/gen-module"
@@ -202,6 +203,10 @@
       </copy> 
       <copy file="${basedir}/gf-uc/gen-module/Info/info.xml"
             tofile="${basedir}/gf-uc/updatecenter/beta/update-center.xml"/>
+      <!-- update version info in descriptional html pages -->
+      <replace file="${basedir}/gf-uc/updatecenter/beta/modules/jersey/overview.html" token="@@@@RELEASE_IMPL_VERSION@@@@" value="${release.impl.version}"/>
+      <replace file="${basedir}/gf-uc/updatecenter/beta/modules/jersey/tech-specs.html" token="@@@@RELEASE_IMPL_VERSION@@@@" value="${release.impl.version}"/>
+      <replace file="${basedir}/gf-uc/updatecenter/beta/modules/jersey/support.html" token="@@@@RELEASE_IMPL_VERSION@@@@" value="${release.impl.version}"/>
     </target>
 
     <target name="clean-uc-module" description="Clean UC related things">
