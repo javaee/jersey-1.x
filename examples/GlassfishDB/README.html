@@ -17,12 +17,15 @@
       </dl>
       
       <h2>Running the Example</h2>
-      <p>Run the example as follows. First start Glassfish:</p>
-      <blockquote><pre>asadmin start-domain
-asadmin start-database</pre></blockquote>
+      <p>The example uses <code>sun-appserv-samples</code> database, which comes along with <code>Java EE 5 Samples</code> GlassFish update center module. In order to install the module you need to run update center client:
+<blockquote><pre>$AS_HOME/updatecenter/bin/updatetool</pre></blockquote>
+And then install <code>Java EE 5 Samples</code> module from <code>Available Software</code> list.
+      <p>Then run the example as follows. First start Glassfish:</p>
+      <blockquote><pre>$AS_HOME/bin/asadmin start-domain
+$AS_HOME/bin/asadmin start-database</pre></blockquote>
 	<p>Build the example via ant, it will create <code>dist/GlassfishDB.war</code> archive.
       <p>Deploy GlassfishDB.war using the <a href="http://localhost:4848/">admin console</a> or via
-<blockquote><pre>asadmin deploy GlassfishDB.war</pre></blockquote> and then using a web browser, visit:</p>
+<blockquote><pre>$AS_HOME/bin/asadmin deploy dist/GlassfishDB.war</pre></blockquote> and then using a web browser, visit:</p>
       <blockquote><code><a href="http://localhost:8080/GlassfishDB/resources/widgets">http://localhost:8080/GlassfishDB/resources/widgets</a></code></blockquote>
       
       <p>If this is the first time running this example you will likely see an empty window. In order to get some content you have to add some rows to the database as follows:</p>
