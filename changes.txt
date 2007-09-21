@@ -1,4 +1,6 @@
-release 0.3 (2007-10-xx)
+release 0.4 (2007-11-xx)
+
+release 0.3 (2007-09-21)
 - ResourceConfig interface is modified to support a feature bag and property
   bag with documented standard features.
   DefaultResourceConfig is mutable implementation of ResourceConfig.
