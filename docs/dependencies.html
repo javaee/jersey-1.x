@@ -24,12 +24,9 @@
         <p>All jar files explicitly referenced below are present in the
         Jersey distribution.</p>
         <h2>Core</h2>
-        <p>When using Java SE (5 or 6) the minimum set of required jars are: 
+        <p>When using Java SE (5 or 6) or Java EE 5 the minimum set of required jars are: 
         </p>
-        <p><blockquote>jersey.jar, jsr311-api.jar, localizer.jar,
-        persistence-api-1.0.jar, jsr250.jar</blockquote></p>
-        <p>When using Java EE 5 the minimum set of required jars are:</p>
-        <p><blockquote>jersey.jar, jsr311-api.jar, localizer.jar
+        <p><blockquote>jersey.jar, jsr311-api.jar</blockquote></p>
         </blockquote></p>
         <h2>Container</h2>
         <h3>Light weight HTTP server</h3>
@@ -49,6 +46,14 @@
         <h3>Servlet</h3>
         <p>Deploying an application on a servlet container requires a
         deployment dependency with that container.</p>
+	<p>Using servlet
+	<blockquote>com.sun.ws.rest.spi.container.servlet.ServletContainer</blockquote>
+	in a non-EE 5 servlet container requires the following jars:</p>
+        <p><blockquote>jsr250-api.jar</blockquote></p>
+	<p>Using servlet
+	<blockquote>com.sun.ws.rest.impl.container.servlet.ServletAdaptor</blockquote>
+	in a non-EE 5 servlet container requires the following jars:</p>
+        <p><blockquote>jsr250-api.jar, persistence-api-1.0.jar</blockquote></p>
         <h2>Entity</h2>
         <h3>JAXB elements</h3>
         <p>The use of Java types that are JAXB elements with Java SE 5 or 6
