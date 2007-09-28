@@ -51,7 +51,7 @@ public final class HttpResponseAdaptor extends AbstractContainerResponse {
         
     private OutputStream out;
     
-    /* package */ HttpResponseAdaptor(ServletContext context, HttpServletResponse response, 
+    public HttpResponseAdaptor(ServletContext context, HttpServletResponse response, 
             HttpServletRequest request, HttpRequestAdaptor requestContext) {
         super(requestContext);
         this.context = context;
@@ -115,7 +115,7 @@ public final class HttpResponseAdaptor extends AbstractContainerResponse {
     }
 
     
-    /* package */ void commitAll() throws IOException {
+    public void commitAll() throws IOException {
         if (isCommitted()) return;
         
         if (response.isCommitted()) return;
@@ -125,7 +125,7 @@ public final class HttpResponseAdaptor extends AbstractContainerResponse {
         writeEntity(getUnderlyingOutputStream());
     }    
     
-    /* package */ RequestDispatcher getRequestDispatcher() {
+    public  RequestDispatcher getRequestDispatcher() {
         return d;
     }
         

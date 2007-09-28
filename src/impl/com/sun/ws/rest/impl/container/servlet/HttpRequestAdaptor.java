@@ -42,7 +42,7 @@ public final class HttpRequestAdaptor extends AbstractContainerRequest {
     private final HttpServletRequest request;
     
     /** Creates a new instance of HttpRequestAdaptor */
-    /* package */ HttpRequestAdaptor(HttpServletRequest request) throws IOException {
+    public HttpRequestAdaptor(HttpServletRequest request) throws IOException {
         super(request.getMethod(), request.getInputStream());
         this.request = request;
         

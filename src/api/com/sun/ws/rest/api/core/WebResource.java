@@ -23,25 +23,19 @@
 package com.sun.ws.rest.api.core;
 
 /**
- * Low level interface for implementing web resource classes. Implmenting
- * classes must be annotated with <code>@UriTemplate</code> and may use
- * <code>@ConsumeMime</code> and <code>@ProduceMime</code> to filter the
- * requests they will receive.
+ * Low level interface for implementing web resource classes.
+ * <p>
+ * <code>@ConsumeMime</code> and <code>@ProduceMime</code> may be used to 
+ * filter the requests received.
  *
- * The container must honour annotations from the javax.annotation package. In
- * particular, resource class instance lifecycle can be managed using the
- * javax.annotation.PostConstruct and java.annotation.PreDestroy annotations
- * and a class can obtain access to container context information using 
- * javax.annotation.Resource as specified in JSR 250.
- *
- * @see javax.ws.rs.UriTemplate
  * @see javax.ws.rs.ConsumeMime
  * @see javax.ws.rs.ProduceMime
  */
 public interface WebResource {
     
   /**
-   * Called for each HTTP request
+   * Called for each HTTP request.
+   *
    * @param request the HTTP request information
    * @param response the HTTP response information
    */

@@ -23,7 +23,6 @@
 package com.sun.ws.rest.impl.application;
 
 import com.sun.ws.rest.spi.resource.Injectable;
-import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import javax.ws.rs.WebApplicationException;
@@ -45,8 +44,6 @@ import java.io.StringWriter;
 import java.lang.reflect.Field;
 import java.lang.reflect.Proxy;
 import java.net.URI;
-import java.security.AccessController;
-import java.security.PrivilegedAction;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -55,9 +52,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.WeakHashMap;
-import javax.persistence.EntityManagerFactory;
-import javax.persistence.Persistence;
-import javax.persistence.PersistenceUnit;
 import javax.ws.rs.core.HttpContext;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.PreconditionEvaluator;
@@ -87,8 +81,6 @@ public final class WebApplicationImpl implements WebApplication {
     
     final PreconditionEvaluator preconditionEvaluatorProxy;
     
-    final Map<String, EntityManagerFactory> entityManagerCache;
-    
     final Map<Class<?>, Injectable> injectables;
     
     public final List<UriTemplateDispatcher> dispatchers = new ArrayList<UriTemplateDispatcher>();
@@ -97,7 +89,6 @@ public final class WebApplicationImpl implements WebApplication {
     
     public WebApplicationImpl() {
         this.context = new ThreadLocalHttpContext();
-        this.entityManagerCache = new HashMap<String, EntityManagerFactory>();
         
         InvocationHandler i = new InvocationHandler() {
             public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
@@ -259,18 +250,6 @@ public final class WebApplicationImpl implements WebApplication {
                     }
                 }
             );
-            
-        injectables.put(EntityManagerFactory.class,
-                new Injectable<PersistenceUnit, EntityManagerFactory>() {
-                    public Class<PersistenceUnit> getAnnotationClass() {
-                        return PersistenceUnit.class;
-                    }
-                    
-                    public EntityManagerFactory getInjectableValue(PersistenceUnit pu) {
-                        return getEntityManagerFactory(pu.unitName());
-                    }
-                }
-            );
 
         return injectables;
     }
@@ -291,17 +270,6 @@ public final class WebApplicationImpl implements WebApplication {
         }
     }
     
-    synchronized EntityManagerFactory getEntityManagerFactory(String persistenceUnit) {
-        EntityManagerFactory emf;
-        if (entityManagerCache.containsKey(persistenceUnit)) {
-            emf = entityManagerCache.get(persistenceUnit);
-        } else {
-            emf = Persistence.createEntityManagerFactory(persistenceUnit);
-            entityManagerCache.put(persistenceUnit, emf);
-        }
-        return emf;
-    }
-
     public static void onExceptionWithWebApplication(WebApplicationException e, HttpResponseContext response) {
         // Log the stack trace
         e.printStackTrace();
