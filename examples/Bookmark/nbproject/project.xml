@@ -12,10 +12,6 @@
             <minimum-ant-version>1.6</minimum-ant-version>
             <web-module-libraries>
                 <library files="1">
-                    <file>${file.reference.activation.jar-1}</file>
-                    <path-in-war>WEB-INF/lib</path-in-war>
-                </library>
-                <library files="1">
                     <file>${file.reference.jaxb-api.jar-1}</file>
                 </library>
                 <library files="1">
@@ -28,11 +24,13 @@
                     <file>${file.reference.jaxws-api.jar-1}</file>
                 </library>
                 <library files="1">
-                    <file>${file.reference.jdom-1.0.jar-1}</file>
-                    <path-in-war>WEB-INF/lib</path-in-war>
+                    <file>${file.reference.wadl2java.jar-1}</file>
                 </library>
                 <library files="1">
-                    <file>${file.reference.jsr173_api.jar-1}</file>
+                    <file>${file.reference.javaee.jar}</file>
+                </library>
+                <library files="1">
+                    <file>${file.reference.jettison-1.0-RC1.jar}</file>
                     <path-in-war>WEB-INF/lib</path-in-war>
                 </library>
                 <library files="1">
@@ -40,30 +38,7 @@
                     <path-in-war>WEB-INF/lib</path-in-war>
                 </library>
                 <library files="1">
-                    <file>${file.reference.jsr311-api.jar}</file>
-                    <path-in-war>WEB-INF/lib</path-in-war>
-                </library>
-                <library files="1">
-                    <file>${file.reference.localizer.jar-1}</file>
-                    <path-in-war>WEB-INF/lib</path-in-war>
-                </library>
-                <library files="1">
-                    <file>${file.reference.mail.jar-1}</file>
-                    <path-in-war>WEB-INF/lib</path-in-war>
-                </library>
-                <library files="1">
                     <file>${file.reference.persistence-api-1.0.jar-1}</file>
-                    <path-in-war>WEB-INF/lib</path-in-war>
-                </library>
-                <library files="1">
-                    <file>${file.reference.rome-0.9.jar-1}</file>
-                    <path-in-war>WEB-INF/lib</path-in-war>
-                </library>
-                <library files="1">
-                    <file>${file.reference.wadl2java.jar-1}</file>
-                </library>
-                <library files="1">
-                    <file>${file.reference.jettison-1.0-RC1.jar}</file>
                     <path-in-war>WEB-INF/lib</path-in-war>
                 </library>
                 <library files="1">
@@ -71,7 +46,7 @@
                     <path-in-war>WEB-INF/lib</path-in-war>
                 </library>
                 <library files="1">
-                    <file>${file.reference.javaee.jar}</file>
+                    <file>${file.reference.jsr311-api.jar}</file>
                     <path-in-war>WEB-INF/lib</path-in-war>
                 </library>
             </web-module-libraries>
