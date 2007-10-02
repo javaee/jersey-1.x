@@ -23,8 +23,8 @@
 package com.sun.ws.rest.spi.container.servlet;
 
 import com.sun.ws.rest.api.container.ContainerException;
+import com.sun.ws.rest.api.core.DefaultResourceConfig;
 import com.sun.ws.rest.api.core.ResourceConfig;
-import com.sun.ws.rest.impl.ImplMessages;
 import com.sun.ws.rest.impl.ThreadLocalInvoker;
 import com.sun.ws.rest.impl.container.servlet.HttpRequestAdaptor;
 import com.sun.ws.rest.impl.container.servlet.HttpResponseAdaptor;
@@ -34,6 +34,8 @@ import com.sun.ws.rest.spi.resource.Injectable;
 import java.io.IOException;
 import java.lang.reflect.Proxy;
 import java.util.Enumeration;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.annotation.Resource;
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletContext;
@@ -46,10 +48,14 @@ import javax.servlet.http.HttpServletResponse;
 /**
  * A servlet container for deploying root resource classes.
  * <p>
- * The web.xml that uses this class MUST configure the servlet to have an 
- * initialization parameter whose param name is "webresourceclass" and whose 
+ * The web.xml MAY configure the servlet to have an initialization parameter 
+ * whose param name is "webresourceclass" and whose 
  * value is a fully qualified name of a class that implements 
- * {@link ResourceConfig}.
+ * {@link ResourceConfig}. If the param name "webresourceclass" is not present
+ * a new instance of @{link DefaultResourceConfig} is created instead.
+ * In this case it is necesary to extend this class and declare the
+ * set of root resource class on the @{link DefaultResourceConfig} instance
+ * by overriding the configure method.
  * <p>
  * A new {@link WebApplication} instance will be created and configured such
  * that the following classes may be injected onto the field of a root 
@@ -90,22 +96,11 @@ public class ServletContainer extends HttpServlet {
             }
         }
         
-        if (resources == null)
-            throw new ServletException(ImplMessages.NO_WEBRESOURCECLASS_IN_WEBXML());
-        
-        try {
-            ResourceConfig resourceConfig = (ResourceConfig)classLoader.
-                    loadClass(resources).newInstance();
-            
-            this.application = create();
-            configure(servletConfig, resourceConfig, this.application);
-            initiate(resourceConfig, this.application);            
-        } catch (Exception e) {
-            e.printStackTrace(System.err);
-            throw new ServletException(
-                    ImplMessages.FAILED_TO_CREATE_WEB_RESOURCE(servletConfig.getServletName()),
-                    e);
-        }
+        ResourceConfig resourceConfig = createResourceConfig(resources);
+        this.application = create();
+        configure(servletConfig, resourceConfig, this.application);
+        initiate(resourceConfig, this.application);            
+
     }
     
     public final void service(HttpServletRequest req, HttpServletResponse resp)
@@ -138,6 +133,26 @@ public class ServletContainer extends HttpServlet {
         }
     }
     
+    private ResourceConfig createResourceConfig(String resources) 
+    throws ServletException {
+        if (resources == null)
+            return new DefaultResourceConfig();
+
+        try {
+            ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
+            if (classLoader == null) {
+                classLoader = getClass().getClassLoader();
+            }
+
+            return (ResourceConfig) classLoader.
+                loadClass(resources).newInstance();
+        } catch (Exception e) {
+            String message = "ResourceConfig instance, " + resources + ", could not be instantiated";
+            Logger.getLogger(ServletContainer.class.getName()).log(Level.SEVERE, message, e);
+            throw new ServletException(message, e);        
+        }
+    }
+
     /**
      * Create a new instance of a {@link WebApplication}.
      */
