@@ -22,6 +22,7 @@
 
 package com.sun.ws.rest.impl.model;
 
+import com.sun.ws.rest.api.container.ContainerException;
 import com.sun.ws.rest.api.core.ResourceConfig;
 import com.sun.ws.rest.impl.dispatch.UriTemplateDispatcher;
 import com.sun.ws.rest.spi.dispatch.ResourceDispatchContext;
@@ -31,6 +32,7 @@ import com.sun.ws.rest.spi.resource.ResourceProviderFactory;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+import java.util.logging.Logger;
 import javax.ws.rs.UriTemplate;
 
 /**
@@ -38,6 +40,8 @@ import javax.ws.rs.UriTemplate;
  * @author Paul.Sandoz@Sun.Com
  */
 public final class RootResourceClass extends BaseResourceClass {
+    private static final Logger LOGGER = Logger.getLogger(RootResourceClass.class.getName());
+
     private final ResourceConfig resourceConfig;
             
     private final ResourceProviderFactory resolverFactory;
@@ -52,6 +56,12 @@ public final class RootResourceClass extends BaseResourceClass {
         this.resolverFactory = ResourceProviderFactory.getInstance();
         
         add(resourceConfig.getResourceClasses());
+
+        if (uriResolver.getUriTemplates().isEmpty()) {
+            String message = "The ResourceConfig instance does not contain any root resource classes";
+            LOGGER.severe(message);
+            throw new ContainerException(message);
+        }
     }
     
     public ResourceClass getResourceClass(Class c) {
