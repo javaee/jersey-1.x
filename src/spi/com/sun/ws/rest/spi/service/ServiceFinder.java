@@ -35,8 +35,11 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import com.sun.ws.rest.spi.SpiMessages;
+import com.sun.ws.rest.spi.Constants;
 
 
 /**
@@ -130,6 +133,8 @@ public final class ServiceFinder<T> implements Iterable<T> {
     private final Class<T> serviceClass;
     private final ClassLoader classLoader;
     private final boolean ignoreOnClassNotFound;
+    
+    private static final Logger logger = Logger.getLogger(Constants.SPI_LOGGER_ID);
     
     /**
      * Locates and incrementally instantiates the available providers of a
@@ -414,11 +419,15 @@ public final class ServiceFinder<T> implements Iterable<T> {
                         Class.forName(nextName, true, loader);
                     } catch (ClassNotFoundException ex) {
                         // Provider not found
-                        // TODO log error
+                        if(logger.isLoggable(Level.WARNING)) {
+                            logger.log(Level.WARNING, SpiMessages.PROVIDER_NOT_FOUND(nextName) , ex);
+                        }
                         nextName = null;
                     } catch (NoClassDefFoundError ex) {
                         // Dependent class of provider not found
-                        // TODO log error
+                        if(logger.isLoggable(Level.WARNING)) {
+                            logger.log(Level.WARNING , SpiMessages.DEPENDENT_CLASS_OF_PROVIDER_NOT_FOUND(nextName) , ex);
+                        }
                         nextName = null;                        
                     }
                 }
@@ -435,7 +444,7 @@ public final class ServiceFinder<T> implements Iterable<T> {
             try {
                 return service.cast(Class.forName(cn, true, loader).newInstance());
             } catch (ClassNotFoundException x) {
-                fail(service,
+                fail(service, 
                         SpiMessages.PROVIDER_NOT_FOUND(cn));
             } catch (Exception x) {
                 fail(service,
