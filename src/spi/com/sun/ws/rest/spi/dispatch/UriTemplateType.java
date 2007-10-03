@@ -41,14 +41,16 @@ import java.util.regex.Pattern;
  */
 public class UriTemplateType {
     /**
-     * Order the templates according to the template with the highest number
-     * of template variables first. 
+     * Order the templates according to the string comparison of the
+     * template regular expressions.
      * <p>
-     * If two templates have the same number of template variables then order 
-     * according to the string comparison of the template regular expressions.
-     * A template with a more explicit template regular expression (more
-     * characters) occurs before a template with a less explicit regular
-     * expression.
+     * The JSR-311 specification states:
+     *     "Sort the set of matching resource classes using the number of 
+     *      characters in the regular expression not resulting from template 
+     *      variables as the primary key and the number of matching groups 
+     *      as a secondary key"
+     * The ordering of regular expressions conforms to this because the
+     * matching groups for template variables are uniform.
      */
     static public final Comparator<UriTemplateType> COMPARATOR = new Comparator<UriTemplateType>() {
         public int compare(UriTemplateType o1, UriTemplateType o2) {
@@ -65,31 +67,26 @@ public class UriTemplateType {
                 return 1;
             if (o2 == NULL)
                 return -1;
-            
-            
-// This code should be uncommented when the specification changes
-// the order of the primary and secondary keys
-//
-//            // Compare the template regular expressions, if the number of
-//            // templates are equal.
-//            // Note that it is important that o2 is compared against o1
-//            // so that a regular expression with more characters (more explicit) 
-//            // is less than a regular expression with less characters.
-//            int i = o2.getTemplateRegex().compareTo(o1.getTemplateRegex());
-//            if (i != 0) return i;
-//            
-//            // Compare the number of templates
-//            return o2.getNumberOfTemplateVariables() - o1.getNumberOfTemplateVariables();
-            
-            // Compare the number of templates
-            int i = o2.getNumberOfTemplateVariables() - o1.getNumberOfTemplateVariables();
+
+            // Compare the number of explicit characters
+            // Note that it is important that o2 is compared against o1
+            // so that a regular expression with say 10 explicit characters
+            // is less than a regular expression with say 5 explicit characters.
+            int i = o2.getNumberOfExplicitCharacters() - o1.getNumberOfExplicitCharacters();
             if (i != 0) return i;
 
-            // Compare the template regular expressions, if the number of
-            // templates are equal.
+            // If the number of explicit characters is equal
+            // compare the number of template varibales
             // Note that it is important that o2 is compared against o1
-            // so that a regular expression with more characters (more explicit) 
-            // is less than a regular expression with less characters.
+            // so that a regular expression with say 10 template variables
+            // is less than a regular expression with say 5 template variables.
+            i = o2.getNumberOfTemplateVariables() - o1.getNumberOfTemplateVariables();
+            if (i != 0) return i;
+
+            // If the number of explicit characters and template variables
+            // are equal then comapre the regexes
+            // The order does not matter as long as templates with different
+            // explicit characters are distinguishable
             return o2.getTemplateRegex().compareTo(o1.getTemplateRegex());
         }
     };
@@ -137,6 +134,12 @@ public class UriTemplateType {
     private final List<String> templateVariables;
     
     /**
+     * The number of characters in the regular expression not resulting
+     * from conversion of template variables.
+     */
+    private final int numOfCharacters;
+
+    /**
      * The regular expression for matching URIs and obtaining template values.
      */
     private final String templateRegex;
@@ -152,6 +155,7 @@ public class UriTemplateType {
         this.rightHandPattern = null;
         this.endsWithSlash = false;
         this.templateVariables = Collections.emptyList();
+        this.numOfCharacters = 0;
         this.templateRegex = "";
         this.templateRegexPattern = null;
     }
@@ -234,13 +238,17 @@ public class UriTemplateType {
         // Create regular expression for template matching
         Matcher m = TEMPLATE_NAMES_PATTERN.matcher(template);
         int i = 0;
+        int c = 0;
         while(m.find()) {
+            c += m.start() - i;
             copyURITemplateCharacters(template, i, m.start(), b);
             b.append(TEMPLATE_VALUE_REGEX);
             names.add(m.group(1));
             i = m.end();
         }
         copyURITemplateCharacters(template, i, template.length(), b);
+        c += template.length() - i;
+        this.numOfCharacters = c;
 
         templateVariables = Collections.unmodifiableList(names);
         
@@ -324,6 +332,15 @@ public class UriTemplateType {
         return false;
     }
     
+    /** 
+     * Get the number of characters in the regular expression not resulting
+     * from conversion of template variables.
+     * @return the number of explicit characters
+     */
+    public final int getNumberOfExplicitCharacters() {
+        return numOfCharacters;
+    }
+
     /**
      * Get the number of template variables.
      * @return the number of template variables.

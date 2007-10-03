@@ -230,6 +230,24 @@ public class UriPathResolverTest extends TestCase {
         assertEquals("", path.toString());
     }
     
+    public void testTemplatesWithSameNumOfCharactersAndTemplates() {
+        resolver.add(new UriTemplateType("/a/{p1}/b", UriTemplateType.RIGHT_HANDED_REGEX), "/a/{p1}/b");        
+        resolver.add(new UriTemplateType("/a/{p1}/c", UriTemplateType.RIGHT_HANDED_REGEX), "/a/{p1}/c");  
+      
+        StringBuilder path = new StringBuilder("/a/infix/b");
+        String s = resolver.resolve(path, path, templateValues);
+        assertEquals("/a/{p1}/b", s);
+        assertEquals(1, templateValues.size());
+        assertEquals("infix", templateValues.get("p1"));
+        assertEquals("", path.toString());
+    
+        path = new StringBuilder("/a/infix/c");
+        s = resolver.resolve(path, path, templateValues);
+        assertEquals("/a/{p1}/c", s);
+        assertEquals(1, templateValues.size());
+        assertEquals("infix", templateValues.get("p1"));
+        assertEquals("", path.toString());    }
+
     protected UriPathResolver getResolver() {
         return new LinearOrderedUriPathResolver<String>();
     }
