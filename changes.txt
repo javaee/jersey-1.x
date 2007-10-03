@@ -1,4 +1,17 @@
 release 0.4 (2007-11-xx)
+- Updated URI template ordering to conform to latest changes in JAX-RS:
+  "Sort the set of matching resource classes using the number of 
+   characters in the regular expression not resulting from template 
+   variables as the primary key and the number of matching groups 
+   as a secondary key"
+  This means that a URI template such as "/edit" will take precedence over 
+  a URI template such as /{id}, where as previous this was not the case.
+- Fixed issue 13: Create AbstractServletAdapter class that allows modification 
+  of its WebApplication
+  https://jersey.dev.java.net/issues/show_bug.cgi?id=13
+  The servlet implementation has been split into two. The servlet,
+  com.sun.ws.rest.spi.container.servlet.ServletContainer may be used
+  directly or extended for additional configuration requirements.
 
 release 0.3 (2007-09-21)
 - ResourceConfig interface is modified to support a feature bag and property
