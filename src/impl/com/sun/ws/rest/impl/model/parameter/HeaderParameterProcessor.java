@@ -25,6 +25,7 @@ package com.sun.ws.rest.impl.model.parameter;
 import javax.ws.rs.HeaderParam;
 import com.sun.ws.rest.api.core.HttpRequestContext;
 import java.lang.annotation.Annotation;
+import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 
 /**
@@ -45,7 +46,8 @@ public final class HeaderParameterProcessor extends AbstractParameterProcessor<H
         }
     }
     
-    public ParameterExtractor process(HeaderParam parameterAnnotation,            
+    public ParameterExtractor process(boolean decode,
+            HeaderParam parameterAnnotation,
             Class<?> parameter, 
             Type parameterType, 
             Annotation[] parameterAnnotations) {

@@ -66,13 +66,5 @@ public abstract class AbstractParameterProcessor<T> implements ParameterProcesso
         }
         
         return l;
-    }
-    
-    public static boolean hasAnnotation(Class<?> c, Annotation[] parameterAnnotations) {
-        for (Annotation a : parameterAnnotations) 
-            if (a.annotationType() == c)
-                return true;
-        
-        return false;
-    }
+    } 
 }

@@ -23,6 +23,7 @@
 package com.sun.ws.rest.impl.model.parameter;
 
 import java.lang.annotation.Annotation;
+import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 
 /**
@@ -32,6 +33,7 @@ import java.lang.reflect.Type;
 public interface ParameterProcessor<T> {
     
     ParameterExtractor process(
+            boolean decode,
             T parameterAnnotation,
             Class<?> parameter, 
             Type parameterType,

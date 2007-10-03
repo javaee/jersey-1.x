@@ -25,15 +25,18 @@ package com.sun.ws.rest.impl.model.node;
 import com.sun.ws.rest.api.container.ContainerException;
 import com.sun.ws.rest.impl.ImplMessages;
 import com.sun.ws.rest.impl.dispatch.UriTemplateDispatcher;
+import com.sun.ws.rest.impl.model.ReflectionHelper;
 import com.sun.ws.rest.impl.model.parameter.AbstractParameterProcessor;
 import com.sun.ws.rest.impl.model.parameter.ParameterExtractor;
 import com.sun.ws.rest.impl.model.parameter.ParameterProcessor;
 import com.sun.ws.rest.spi.dispatch.UriTemplateType;
 import java.lang.annotation.Annotation;
+import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 import java.util.List;
+import javax.ws.rs.Encoded;
 
 /**
  *
@@ -63,7 +66,9 @@ public final class NodeDispatcherFactory {
         Type[] genericParameterTypes = ctor.getGenericParameterTypes();
         Annotation[][] parameterAnnotations = ctor.getParameterAnnotations();
         
-        return processParameters(parameterTypes, genericParameterTypes, parameterAnnotations);
+        return processParameters(ctor.getDeclaringClass(),
+                ctor,
+                parameterTypes, genericParameterTypes, parameterAnnotations);
     }
     
     private static ParameterExtractor[] processParameters(Method method) {
@@ -71,14 +76,22 @@ public final class NodeDispatcherFactory {
         Type[] genericParameterTypes = method.getGenericParameterTypes();
         Annotation[][] parameterAnnotations = method.getParameterAnnotations();
         
-        return processParameters(parameterTypes, genericParameterTypes, parameterAnnotations);
+        return processParameters(method.getDeclaringClass(),
+                method,
+                parameterTypes, genericParameterTypes, parameterAnnotations);
     }
         
-    private static ParameterExtractor[] processParameters(Class[] parameterTypes, Type[] genericParameterTypes, Annotation[][] parameterAnnotations) {
+    private static ParameterExtractor[] processParameters(
+            Class<?> declaringClass,
+            AccessibleObject accessible,
+            Class[] parameterTypes,
+            Type[] genericParameterTypes, Annotation[][] parameterAnnotations) {
 
         ParameterExtractor[] extractors = new ParameterExtractor[parameterTypes.length];
         for (int i = 0; i < parameterTypes.length; i++) {
             extractors[i] = processParameter(
+                    declaringClass,
+                    accessible,
                     parameterTypes[i], 
                     genericParameterTypes[i], 
                     parameterAnnotations[i]);
@@ -89,6 +102,8 @@ public final class NodeDispatcherFactory {
     
     @SuppressWarnings("unchecked")
     private static ParameterExtractor processParameter(
+            Class<?> declaringClass,
+            AccessibleObject accessible,
             Class<?> parameterClass, 
             Type parameterType,  
             Annotation[] parameterAnnotations) {
@@ -104,7 +119,12 @@ public final class NodeDispatcherFactory {
         }
 
         Annotation annotation = l.get(0);
-        ParameterProcessor p = AbstractParameterProcessor.PARAM_PROCESSOR_MAP.get(annotation.annotationType());
-        return p.process(annotation, parameterClass, parameterType, parameterAnnotations);
+        ParameterProcessor p = AbstractParameterProcessor.PARAM_PROCESSOR_MAP.
+                get(annotation.annotationType());
+        boolean decode = !ReflectionHelper.hasAnnotation(
+                Encoded.class, parameterAnnotations,
+                declaringClass, accessible);
+        return p.process(decode, annotation, 
+                parameterClass, parameterType, parameterAnnotations);
     }
 }

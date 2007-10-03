@@ -25,27 +25,31 @@ package com.sun.ws.rest.impl.model.parameter;
 import javax.ws.rs.UriParam;
 import com.sun.ws.rest.api.core.HttpRequestContext;
 import java.lang.annotation.Annotation;
+import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 
 /**
  *
  * @author Paul.Sandoz@Sun.Com
  */
-public final class UriParameterProcessor implements ParameterProcessor<UriParam> {
+public final class UriParameterProcessor extends AbstractParameterProcessor<UriParam> {
     
     private static final class UriParameterExtractor implements ParameterExtractor {
-        private MultivaluedParameterExtractor extractor;
+        private final MultivaluedParameterExtractor extractor;
+        private final boolean decode;
         
-        UriParameterExtractor(MultivaluedParameterExtractor extractor) {
+        UriParameterExtractor(MultivaluedParameterExtractor extractor, boolean decode) {
             this.extractor = extractor;
+            this.decode = decode;
         }
         
         public Object extract(HttpRequestContext request) {
-            return extractor.extract(request.getTemplateParameters());
+            return extractor.extract(request.getTemplateParameters(decode));
         }
     }
     
-    public ParameterExtractor process(UriParam parameterAnnotation, 
+    public ParameterExtractor process(boolean decode,
+            UriParam parameterAnnotation,
             Class<?> parameter, 
             Type parameterType, 
             Annotation[] parameterAnnotations) {
@@ -61,6 +65,6 @@ public final class UriParameterProcessor implements ParameterProcessor<UriParam>
         if (e == null)
             return null;
         
-        return new UriParameterExtractor(e);
+        return new UriParameterExtractor(e, decode);
     }
 }

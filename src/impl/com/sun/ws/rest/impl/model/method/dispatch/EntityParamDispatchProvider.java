@@ -27,6 +27,7 @@ import com.sun.ws.rest.api.container.ContainerException;
 import com.sun.ws.rest.api.core.HttpRequestContext;
 import com.sun.ws.rest.api.core.HttpResponseContext;
 import com.sun.ws.rest.impl.ResponseBuilderImpl;
+import com.sun.ws.rest.impl.model.ReflectionHelper;
 import com.sun.ws.rest.spi.dispatch.RequestDispatcher;
 import com.sun.ws.rest.impl.model.parameter.ParameterExtractor;
 import com.sun.ws.rest.impl.model.parameter.ParameterProcessor;
@@ -37,6 +38,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 import java.util.List;
+import javax.ws.rs.Encoded;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
@@ -195,6 +197,7 @@ public class EntityParamDispatchProvider implements ResourceMethodDispatchProvid
         ParameterExtractor[] injectors = new ParameterExtractor[parameterTypes.length];
         for (int i = 0; i < parameterTypes.length; i++) {
             injectors[i] = processParameter(
+                    method,
                     parameterTypes[i], 
                     genericParameterTypes[i], 
                     parameterAnnotations[i],
@@ -209,6 +212,7 @@ public class EntityParamDispatchProvider implements ResourceMethodDispatchProvid
 
     @SuppressWarnings("unchecked")
     private ParameterExtractor processParameter(
+            Method method,
             Class<?> parameterClass, 
             Type parameterType,  
             Annotation[] parameterAnnotations, 
@@ -237,6 +241,10 @@ public class EntityParamDispatchProvider implements ResourceMethodDispatchProvid
         ParameterProcessor p = AbstractParameterProcessor.PARAM_PROCESSOR_MAP.get(annotation.annotationType());
         if (p == null)
             return null;
-        return p.process(annotation, parameterClass, parameterType, parameterAnnotations);        
+        boolean decode = !ReflectionHelper.hasAnnotation(
+                Encoded.class, parameterAnnotations,
+                method.getDeclaringClass(), method);
+        return p.process(decode, annotation, 
+                parameterClass, parameterType, parameterAnnotations);
     }        
 }

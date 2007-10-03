@@ -25,6 +25,7 @@ package com.sun.ws.rest.impl.model.parameter;
 import javax.ws.rs.MatrixParam;
 import com.sun.ws.rest.api.core.HttpRequestContext;
 import java.lang.annotation.Annotation;
+import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 import java.util.List;
 import javax.ws.rs.core.PathSegment;
@@ -35,21 +36,28 @@ import javax.ws.rs.core.PathSegment;
  */
 public final class MatrixParameterProcessor extends AbstractParameterProcessor<MatrixParam> {
 
-    private static final class HeaderParameterExtractor implements ParameterExtractor {
-        private MultivaluedParameterExtractor extractor;
+    private static final class MatrixParameterExtractor implements ParameterExtractor {
+        private final MultivaluedParameterExtractor extractor;
+        private final boolean decode;
         
-        HeaderParameterExtractor(MultivaluedParameterExtractor extractor) {
+        MatrixParameterExtractor(MultivaluedParameterExtractor extractor) {
+            this(extractor, true);
+        }
+        
+        MatrixParameterExtractor(MultivaluedParameterExtractor extractor, boolean decode) {
             this.extractor = extractor;
+            this.decode = decode;
         }
         
         public Object extract(HttpRequestContext request) {
-            List<PathSegment> l = request.getPathSegments();
+            List<PathSegment> l = request.getPathSegments(decode);
             PathSegment p = l.get(l.size() - 1);
             return extractor.extract(p.getMatrixParameters());
         }
     }
     
-    public ParameterExtractor process(MatrixParam parameterAnnotation, 
+    public ParameterExtractor process(boolean decode,
+            MatrixParam parameterAnnotation,
             Class<?> parameter, 
             Type parameterType, 
             Annotation[] parameterAnnotations) {
@@ -65,6 +73,6 @@ public final class MatrixParameterProcessor extends AbstractParameterProcessor<M
         if (e == null)
             return null;
         
-        return new HeaderParameterExtractor(e);
+        return new MatrixParameterExtractor(e, decode);
     }
 }

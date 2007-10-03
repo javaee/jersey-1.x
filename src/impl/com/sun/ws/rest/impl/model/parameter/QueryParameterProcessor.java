@@ -25,6 +25,7 @@ package com.sun.ws.rest.impl.model.parameter;
 import javax.ws.rs.QueryParam;
 import com.sun.ws.rest.api.core.HttpRequestContext;
 import java.lang.annotation.Annotation;
+import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 
 /**
@@ -34,18 +35,21 @@ import java.lang.reflect.Type;
 public final class QueryParameterProcessor extends AbstractParameterProcessor<QueryParam> {
 
     private static final class QueryParameterExtractor implements ParameterExtractor {
-        private MultivaluedParameterExtractor extractor;
+        private final MultivaluedParameterExtractor extractor;
+        private final boolean decode;
         
-        QueryParameterExtractor(MultivaluedParameterExtractor extractor) {
+        QueryParameterExtractor(MultivaluedParameterExtractor extractor, boolean decode) {
             this.extractor = extractor;
+            this.decode = decode;
         }
         
         public Object extract(HttpRequestContext request) {
-            return extractor.extract(request.getQueryParameters());
+            return extractor.extract(request.getQueryParameters(decode));
         }
     }
     
-    public ParameterExtractor process(QueryParam parameterAnnotation,
+    public ParameterExtractor process(boolean decode,
+            QueryParam parameterAnnotation,
             Class<?> parameter, 
             Type parameterType, 
             Annotation[] parameterAnnotations) {
@@ -61,6 +65,6 @@ public final class QueryParameterProcessor extends AbstractParameterProcessor<Qu
         if (e == null)
             return null;
         
-        return new QueryParameterExtractor(e);
+        return new QueryParameterExtractor(e, decode);
     }
 }

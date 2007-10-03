@@ -25,6 +25,7 @@ package com.sun.ws.rest.impl.model;
 import com.sun.ws.rest.api.container.ContainerException;
 import com.sun.ws.rest.impl.ImplMessages;
 import java.lang.annotation.Annotation;
+import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Array;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.GenericArrayType;
@@ -46,6 +47,37 @@ public final class ReflectionHelper {
         }
         
         return null;
+    }
+    
+    /**
+     * Ascertain if an annotation is a member of an array of annotations.
+     */
+    public static boolean hasAnnotation(Class<?> c, Annotation[] annotations) {
+        for (Annotation a : annotations) 
+            if (a.annotationType() == c)
+                return true;
+        
+        return false;
+    }
+        
+    /**
+     * Ascertain if an annotation is a member of an array of annotations,
+     * if not present check if the annotation is present on an accessible
+     * object,
+     * if not present check if the annotation is present on the declaring class
+     * of the accessible object.
+     */
+    public static boolean hasAnnotation(Class<?> c, 
+            Annotation[] annotations,
+            Class<?> declaringClass,
+            AccessibleObject ao) {
+        if (hasAnnotation(c, annotations))
+            return true;
+ 
+        if (hasAnnotation(c, ao.getDeclaredAnnotations()))
+            return true;
+
+        return hasAnnotation(c, declaringClass.getDeclaredAnnotations());
     }
     
     public static Class getGenericClass(Type parameterType) {

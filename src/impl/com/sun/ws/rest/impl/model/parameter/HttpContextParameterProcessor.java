@@ -24,6 +24,7 @@ package com.sun.ws.rest.impl.model.parameter;
 
 import com.sun.ws.rest.api.core.HttpRequestContext;
 import java.lang.annotation.Annotation;
+import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 import java.util.HashMap;
 import java.util.Map;
@@ -58,7 +59,8 @@ public final class HttpContextParameterProcessor implements ParameterProcessor<H
         extractors.put(PreconditionEvaluator.class, extractor);
     }
     
-    public ParameterExtractor process(HttpContext parameterAnnotation, 
+    public ParameterExtractor process(boolean decode,
+            HttpContext parameterAnnotation,
             Class<?> parameter, 
             Type parameterType, 
             Annotation[] parameterAnnotations) {
