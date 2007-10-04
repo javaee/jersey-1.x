@@ -86,6 +86,9 @@ public final class HttpServerResponseAdaptor extends AbstractContainerResponse {
         } else {
             exchange.sendResponseHeaders(this.getStatus(), -1);
         }
+        // This is required for the LW HTTP server shipped with Java SE 6
+        // exchange.close() does not work as documented
+        exchange.getResponseBody().close();
         exchange.close();        
     }
 
