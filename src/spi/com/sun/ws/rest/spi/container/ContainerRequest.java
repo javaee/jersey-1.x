@@ -23,7 +23,9 @@
 package com.sun.ws.rest.spi.container;
 
 import com.sun.ws.rest.api.core.HttpRequestContext;
+import java.net.URI;
 import java.util.Map;
+import javax.ws.rs.core.UriBuilder;
 
 /**
  * The HTTP request context supplied by the container.
@@ -43,4 +45,13 @@ public interface ContainerRequest extends HttpRequestContext {
      * @param values the map of template values.
      */
     public void addTemplateValues(Map<String, String> values);
+    
+    /**
+     * TODO
+     * The following methods are temporary until such methods are
+     * available on UriInfo, and thus can be removed later on.
+     */
+    public URI getComplete();
+    
+    public UriBuilder getCompleteBuilder();
 }

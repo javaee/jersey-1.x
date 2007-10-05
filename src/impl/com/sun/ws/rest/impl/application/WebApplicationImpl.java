@@ -150,7 +150,7 @@ public final class WebApplicationImpl implements WebApplication {
         context.set(localContext);
         
         if (resourceConfig.getFeature(ResourceConfig.FEATURE_NORMALIZE_URI)) {
-            final URI uri = request.getAbsolute();
+            final URI uri = request.getComplete();
             final URI normalizedUri = UriHelper.normalize(uri, !resourceConfig.getFeature(ResourceConfig.FEATURE_CANONICALIZE_URI_PATH));
 
             if (uri != normalizedUri) {
