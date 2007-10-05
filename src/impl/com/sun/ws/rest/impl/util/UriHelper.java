@@ -23,9 +23,9 @@
 package com.sun.ws.rest.impl.util;
 
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.LinkedList;
 import java.util.List;
+import javax.ws.rs.core.UriBuilder;
 
 /**
  *
@@ -60,7 +60,7 @@ public final class UriHelper {
     //            including the initial "/" character (if any) and any subsequent characters up to, but not including, 
     //            the next "/" character or the end of the input buffer.
     //   3. Finally, the output buffer is returned as the result of remove_dot_segments.
-    protected static String removeDotSegments(String path, boolean preserveContdSlashes) {
+    public static String removeDotSegments(String path, boolean preserveContdSlashes) {
         
         if (null == path) {
             return null;
@@ -117,24 +117,17 @@ public final class UriHelper {
     
     public static URI normalize(URI u, boolean preserveContdSlashes) {
         
-        if (!u.getPath().contains("//")) {
+        if (!u.getRawPath().contains("//")) {
             return u.normalize();
         }
         
-        String np = removeDotSegments(u.getPath(), preserveContdSlashes);
+        String np = removeDotSegments(u.getRawPath(), preserveContdSlashes);
 
-        if (np.equals(u.getPath())) {
+        if (np.equals(u.getRawPath())) {
             return u;
         }
         
-        URI v = null;
-        
-        try {
-            v = new URI(u.getScheme(), u.getUserInfo(), u.getHost(), u.getPort(), np, u.getQuery(), u.getFragment());
-        } catch (URISyntaxException ex) {
-            ex.printStackTrace();
-        }
-       
-        return v;
+        UriBuilder ub = UriBuilder.fromUri(u);
+        return ub.encode(false).replacePath(np).build();
     }
 }

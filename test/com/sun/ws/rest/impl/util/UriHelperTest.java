@@ -90,7 +90,7 @@ public class UriHelperTest extends TestCase {
 
         try {
             uri = new URI("http://example.org/foo/../r%65source/uri/http://example.org");
-            expResult = new URI("http://example.org/resource/uri/http://example.org");;
+            expResult = new URI("http://example.org/r%65source/uri/http://example.org");;
             result = UriHelper.normalize(uri, true);
             assertEquals(expResult, result);
             assertEquals("/resource/uri/http://example.org", result.getPath()); // double check

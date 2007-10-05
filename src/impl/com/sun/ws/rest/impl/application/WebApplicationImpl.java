@@ -153,7 +153,7 @@ public final class WebApplicationImpl implements WebApplication {
             final URI uri = request.getAbsolute();
             final URI normalizedUri = UriHelper.normalize(uri, !resourceConfig.getFeature(ResourceConfig.FEATURE_CANONICALIZE_URI_PATH));
 
-            if (!uri.equals(normalizedUri)) {
+            if (uri != normalizedUri) {
                 response.setResponse(ResponseBuilderImpl.temporaryRedirect(normalizedUri).build());
                 return;
             }
