@@ -36,6 +36,7 @@ import com.sun.ws.rest.impl.dispatch.UriTemplateDispatcher;
 import com.sun.ws.rest.impl.model.ResourceClass;
 import com.sun.ws.rest.impl.model.RootResourceClass;
 import com.sun.ws.rest.impl.response.Responses;
+import com.sun.ws.rest.impl.util.UriHelper;
 import com.sun.ws.rest.spi.container.ContainerRequest;
 import com.sun.ws.rest.spi.container.ContainerResponse;
 import com.sun.ws.rest.spi.container.WebApplication;
@@ -150,9 +151,9 @@ public final class WebApplicationImpl implements WebApplication {
         
         if (resourceConfig.getFeature(ResourceConfig.FEATURE_NORMALIZE_URI)) {
             final URI uri = request.getAbsolute();
-            final URI normalizedUri = uri.normalize();            
+            final URI normalizedUri = UriHelper.normalize(uri, !resourceConfig.getFeature(ResourceConfig.FEATURE_CANONICALIZE_URI_PATH));
 
-            if (uri != normalizedUri) {
+            if (!uri.equals(normalizedUri)) {
                 response.setResponse(ResponseBuilderImpl.temporaryRedirect(normalizedUri).build());
                 return;
             }

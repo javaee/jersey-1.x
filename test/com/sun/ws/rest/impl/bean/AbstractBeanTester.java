@@ -167,6 +167,7 @@ public abstract class AbstractBeanTester extends TestCase {
         
         WebApplicationImpl a = new WebApplicationImpl();
         ResourceConfig c = new DefaultResourceConfig(r);
+        c.getFeatures().put(ResourceConfig.FEATURE_CANONICALIZE_URI_PATH, false);
 
         a.initiate(null, c);
 
