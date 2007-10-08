@@ -25,6 +25,7 @@ package com.sun.ws.rest.impl.container.servlet;
 import com.sun.ws.rest.spi.container.AbstractContainerRequest;
 import java.io.IOException;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.Enumeration;
 import java.util.LinkedList;
 import java.util.List;
@@ -68,14 +69,25 @@ public final class HttpRequestAdaptor extends AbstractContainerRequest {
          * We need to work around this and not use getPathInfo
          * for the decodedPath.
          */
-        final String decodedPath = (request.getPathInfo() != null) 
-            ? request.getPathInfo().substring(1)
-            : request.getServletPath().substring(1);
-
         final String decodedBasePath = (request.getPathInfo() != null)
             ? request.getContextPath() + request.getServletPath() + "/"
             : request.getContextPath() + "/";
         
+        String decodedCompletePath;
+
+        try {
+            decodedCompletePath = (new URI(request.getRequestURI())).getPath();
+        } catch (URISyntaxException ex) {
+            decodedCompletePath = decodedBasePath +     // only a backup solution -- getPathInfo() might have eaten contiguos '/' chars
+                ((request.getPathInfo() != null) 
+                    ? request.getPathInfo().substring(1)
+                    : request.getServletPath().substring(1));            
+        }
+        
+        // some servlet implementations return fake context and servlet paths
+        final String decodedPath = (decodedCompletePath.startsWith(decodedBasePath)) ? 
+                                        decodedCompletePath.substring(decodedBasePath.length()) : decodedCompletePath;
+
         String queryParameters = request.getQueryString();
         if (queryParameters == null) queryParameters = "";
         

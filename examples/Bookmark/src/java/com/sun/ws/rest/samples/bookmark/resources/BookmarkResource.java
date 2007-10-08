@@ -65,7 +65,7 @@ public class BookmarkResource {
     
     @HttpMethod("GET")
     @ProduceMime("application/json")
-    public JSONObject getBookmark() {//@UriParam("userid") String userid) {
+    public JSONObject getBookmark() {
         return asJson();
     }
     

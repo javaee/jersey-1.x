@@ -132,7 +132,7 @@ public class Main {
                     "POST",
                     UrlBase + "users/testuid/bookmarks",
                     "application/json",
-                    "{\"uri\":\"http://java.sun.com/\", \"sdesc\":\"test desc\", \"ldesc\":\"long test description\"}");
+                    "{\"uri\":\"http://java.sun.com\", \"sdesc\":\"test desc\", \"ldesc\":\"long test description\"}");
             System.out.println(new Formatter().format("Response code: %d \n%s", response.code, response.message));
             System.out.println("-----");
             
@@ -142,8 +142,8 @@ public class Main {
             System.out.println("-----");
             
             String testBookmarkUrl = ((JSONArray)response.content).getString(0);
-            
-            System.out.println("Getting bookmark details:");
+           
+            System.out.println("Getting bookmark details, bookmark URL='" + testBookmarkUrl + "':");
             response = makeHttpRequest("GET", testBookmarkUrl);
             System.out.println(new Formatter().format("Bookmark details:\n%s", response.content));
             System.out.println("-----");

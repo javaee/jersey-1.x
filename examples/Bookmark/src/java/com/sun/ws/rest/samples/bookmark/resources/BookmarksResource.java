@@ -25,10 +25,7 @@ package com.sun.ws.rest.samples.bookmark.resources;
 import com.sun.ws.rest.samples.bookmark.entities.BookmarkEntity;
 import com.sun.ws.rest.samples.bookmark.util.tx.TransactionManager;
 import com.sun.ws.rest.samples.bookmark.util.tx.Transactional;
-import java.math.BigInteger;
 import java.net.URI;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.util.Collection;
 import java.util.Date;
 import javax.persistence.EntityManager;
@@ -68,7 +65,7 @@ public class BookmarksResource {
         return userResource.getUserEntity().getBookmarkEntityCollection();
     }
     
-    @UriTemplate("{bmid}/")
+    @UriTemplate(value = "{bmid}", limited = false)
     public BookmarkResource getBookmark(@UriParam("bmid") String bmid) {
         return new BookmarkResource(uriInfo, em, 
                 userResource.getUserEntity(), bmid);
@@ -117,13 +114,6 @@ public class BookmarksResource {
     }
 
     private String getBookmarkId(String uri) {
-        try {
-            MessageDigest md5digest = MessageDigest.getInstance("MD5");
-            byte[] md5sum = md5digest.digest(uri.getBytes());
-            BigInteger md5BigInt = new BigInteger(1, md5sum);
-            return md5BigInt.toString(16);
-        } catch (NoSuchAlgorithmException nsae) {
-            throw new WebApplicationException(nsae);
-        }
+        return uri;
     }
 }

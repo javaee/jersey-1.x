@@ -44,6 +44,7 @@
             </classpath>
             <option key="webresourcesdestdir" value="../.."/>
             <option key="webresourcespkg" value="com.sun.ws.rest.samples.bookmark.resources"/>
+            <option key="canonicalizeURIPath" value="false"/>
             <source dir="${src.dir}">
                 <include name="**/*.java"/>
             </source>
