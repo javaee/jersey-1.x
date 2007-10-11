@@ -284,6 +284,8 @@ public class UriTemplateType {
             char c = template.charAt(i);
             // TODO need to escape all regex characters present
             if (c == '?') b.append("\\?");
+            else if (c == '(') b.append("\\(");
+            else if (c == ')') b.append("\\)");
             else b.append(c);
         }
     }
