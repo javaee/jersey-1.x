@@ -25,6 +25,7 @@
 	http://ant-contrib.sourceforge.net/tasks/tasks/for.html
     -->
     <target name="delegate-target">
+	<ant dir="Mandel" target="${target}" inheritAll="false"/>
 	<ant dir="Bookmark" target="${target}" inheritAll="false"/>
 	<ant dir="Bookstore" target="${target}" inheritAll="false"/>
 	<ant dir="EntityProvider" target="${target}" inheritAll="false"/>
@@ -68,6 +69,9 @@
 	</copy>
 
 	<!-- replace property for jersey in NB projects -->
+        <antcall target="convert-property">
+            <param name="example" value="Mandel"/>
+        </antcall>
         <antcall target="convert-property">
             <param name="example" value="Bookmark"/>
         </antcall>
