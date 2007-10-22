@@ -65,7 +65,7 @@
 	<mkdir dir="${release.impl.dir}/examples"/>
 	<copy todir="${release.impl.dir}/examples">
             <!-- ignore any private directories for NB projects -->
-	    <fileset dir="." excludes="build.xml, **/nbproject/private/"/>
+	    <fileset dir="." excludes="build.xml, **/nbproject/private/, Mandel/scala/**"/>
 	</copy>
 
 	<!-- replace property for jersey in NB projects -->

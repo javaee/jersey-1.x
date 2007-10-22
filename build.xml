@@ -106,7 +106,7 @@
         <zip destfile="${basedir}/dist/${release.snapshot.name}.zip"
              basedir=".."
              includes="jersey/**"
-             excludes="jersey/findbugs/** jersey/emma/**"/>
+             excludes="jersey/findbugs/** jersey/emma/** jersey/examples/Mandel/scala/**"/>
         <!-- copy to non-versioned name -->
         <copy file="${basedir}/dist/${release.snapshot.name}.zip" 
               tofile="${basedir}/dist/${release.snapshot.basename}.zip"/>
