@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="Mandel" default="default" basedir=".">
+    <description>Builds, tests, and runs the project Mandel.</description>
+    <import file="nbproject/build-impl.xml"/>
+    <property name="scala.zip" value="scala-2.6.0-final.zip"/>
+
+    <target name="-check-scala">
+        <available file="scala/${scala.zip}" property="scalaExists"/>
+    </target>
+
+    <target name="-get-scala" depends="-check-scala" unless="scalaExists">
+        <mkdir dir="scala"/>
+        <get src="http://www.scala-lang.org/downloads/distrib/files/${scala.zip}" dest="scala/${scala.zip}"/>
+        <unzip src="scala/${scala.zip}" dest="scala"/>
+    </target>
+
+    <target name="-post-compile" depends="-get-scala">
+        <taskdef resource="scala/tools/ant/antlib.xml">
+            <classpath>
+                <pathelement location="${file.reference.scala-compiler.jar}"/>
+                <pathelement location="${file.reference.scala-library.jar}"/>
+            </classpath>
+        </taskdef>
+                
+        <scalac srcdir="${src.dir}"
+                destdir="${build.classes.dir}"
+                classpath="${javac.classpath}"
+                target="jvm-1.5"
+                force="changed">
+            <include name="**/*.scala"/>
+        </scalac>
+    </target>
+    
+    <target name="run" depends="compile">
+        <java fork="true" classname="mandel.MandelServer"
+            classpath="${run.classpath}">
+        </java>
+    </target>
+</project>
