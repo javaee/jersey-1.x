@@ -23,6 +23,9 @@
 package com.sun.ws.rest.impl.provider;
 
 import com.sun.ws.rest.spi.service.ServiceFinder;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.concurrent.atomic.AtomicReference;
 import javax.ws.rs.ext.EntityProvider;
 import javax.ws.rs.ext.HeaderProvider;
 import javax.ws.rs.ext.ProviderFactory;
@@ -31,7 +34,12 @@ import javax.ws.rs.ext.ProviderFactory;
  *
  * @author Paul.Sandoz@Sun.Com
  */
-public class ProviderFactoryImpl extends ProviderFactory {
+public final class ProviderFactoryImpl extends ProviderFactory {
+    private AtomicReference<Set<HeaderProvider>> atomicHeaderProviders = 
+            new AtomicReference<Set<HeaderProvider>>();
+    
+    private AtomicReference<Set<EntityProvider>> atomicEntityProviders = 
+            new AtomicReference<Set<EntityProvider>>();
     
     public <T> T createInstance(Class<T> type) {
         for (T t : ServiceFinder.find(type)) {
@@ -43,28 +51,43 @@ public class ProviderFactoryImpl extends ProviderFactory {
 
     @SuppressWarnings("unchecked")
     public <T> HeaderProvider<T> createHeaderProvider(Class<T> type) {
-        // This is obviously slow
-        // Caching the providers using a Map with key of type and value of provider
-        // for previously created resources will be faster
-        for (HeaderProvider<T> tsp : ServiceFinder.find(HeaderProvider.class, true)) {
-            if (tsp.supports(type))
-                return tsp;
-        }     
+        Set<HeaderProvider> headerProviders = atomicHeaderProviders.get();
+        if (headerProviders == null) {
+            headerProviders = cacheProviders(atomicHeaderProviders, HeaderProvider.class);
+        }
         
+        for (HeaderProvider p: headerProviders) 
+            if (p.supports(type))
+                return p;
+
         throw new IllegalArgumentException("A header provider for type, " + type + ", is not supported");
     }
     
     @SuppressWarnings("unchecked")
     public <T> EntityProvider<T> createEntityProvider(Class<T> type) {
-        // This is obviously slow
-        // Caching the providers using a Map with key of type and value of provider
-        // for previously created resources will be faster
-        for (EntityProvider<T> tsp : ServiceFinder.find(EntityProvider.class, true)) {
-            if (tsp.supports(type))
-                return tsp;
-        }     
+        Set<EntityProvider> entityProviders = atomicEntityProviders.get();
+        if (entityProviders == null) {
+            entityProviders = cacheProviders(atomicEntityProviders, EntityProvider.class);
+        }
+        
+        for (EntityProvider p: entityProviders) 
+            if (p.supports(type))
+                return p;
         
         throw new IllegalArgumentException("A entity provider for type, " + type + ", is not supported");
     }
 
+    private <T> Set<T> cacheProviders(AtomicReference<Set<T>> atomicSet, Class<T> c) {
+        synchronized(atomicSet) {
+            Set<T> s = atomicSet.get();
+            if (s == null) {
+                s = new HashSet<T>();
+                for (T p : ServiceFinder.find(c, true)) {
+                    s.add(p);
+                }     
+                atomicSet.set(s);
+            }
+            return s;
+        }
+    }
 }

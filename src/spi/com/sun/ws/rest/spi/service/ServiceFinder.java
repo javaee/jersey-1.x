@@ -426,9 +426,13 @@ public final class ServiceFinder<T> implements Iterable<T> {
                     } catch (NoClassDefFoundError ex) {
                         // Dependent class of provider not found
                         if(logger.isLoggable(Level.WARNING)) {
-                            logger.log(Level.WARNING , SpiMessages.DEPENDENT_CLASS_OF_PROVIDER_NOT_FOUND(nextName) , ex);
+                            // This assumes that ex.getLocalizedMessage() returns
+                            // the name of a dependent class that is not found
+                            logger.log(Level.WARNING , 
+                                    SpiMessages.DEPENDENT_CLASS_OF_PROVIDER_NOT_FOUND(
+                                    ex.getLocalizedMessage(), nextName));
                         }
-                        nextName = null;                        
+                        nextName = null; 
                     }
                 }
             }
