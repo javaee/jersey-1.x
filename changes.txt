@@ -1,4 +1,6 @@
 release 0.4 (2007-11-xx)
+- Added new example, Mandel, for accessing Mandelbrots as a web service.
+  The example is written in Scala and uses Scala actors.
 - Support the @Encoded on class, method and method parameters.
   https://jsr311.dev.java.net/nonav/javadoc/javax/ws/rs/Encoded.html
   Advanced developers may work in the encoded space of URI parameters,
