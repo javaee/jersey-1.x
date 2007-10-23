@@ -27,19 +27,16 @@ import com.sun.net.httpserver.HttpServer;
 import com.sun.ws.rest.api.container.ContainerFactory;
 import com.sun.ws.rest.api.core.DefaultResourceConfig;
 import com.sun.ws.rest.api.core.ResourceConfig;
-import com.sun.ws.rest.impl.test.util.AuxContentHandlerFactory;
-import com.sun.ws.rest.impl.test.util.HttpTestHelper;
-import com.sun.ws.rest.impl.test.util.HttpTestHelper.HttpResponse;
+import com.sun.ws.rest.impl.client.ResourceProxy;
 import java.io.IOException;
-import java.net.HttpURLConnection;
 import java.net.InetSocketAddress;
-import java.util.HashSet;
-import java.util.Set;
+import java.net.URI;
 import javax.ws.rs.HttpMethod;
 import javax.ws.rs.ProduceMime;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.UriParam;
 import javax.ws.rs.UriTemplate;
+import javax.ws.rs.core.UriBuilder;
 import junit.framework.*;
 
 /**
@@ -62,21 +59,21 @@ public class CanonicalizationFeatureTest extends TestCase {
             return uri;
         }
 
-        @UriTemplate(value = "slashes/{uriParam}/")
+        @UriTemplate("slashes/{uriParam}/")
         @HttpMethod
         @ProduceMime("text/plain")
         public String getSlashes(@UriParam("uriParam") String param) {
             return param;
         }
 
-        @UriTemplate(value = "dblslashes//{uriParam}//")
+        @UriTemplate("dblslashes//{uriParam}//")
         @HttpMethod
         @ProduceMime("text/plain")
         public String getDblSlashes(@UriParam("uriParam") String param) {
             return param;
         }
         
-        @UriTemplate(value = "qparam/a")
+        @UriTemplate("qparam/a")
         @HttpMethod
         @ProduceMime("text/plain")
         public String getQParam(@QueryParam("qParam") String param) {
@@ -84,14 +81,10 @@ public class CanonicalizationFeatureTest extends TestCase {
         }
     }
     
-    public void testContdSlashesProtection() {
-        
-        Set<Class> resourceClassesSet = new HashSet<Class>();
-        resourceClassesSet.add(TestWebResource.class);
-        ResourceConfig myResourceConfig = new DefaultResourceConfig(resourceClassesSet);
+    public void testContdSlashesProtection() throws IOException {
+        ResourceConfig myResourceConfig = new DefaultResourceConfig(TestWebResource.class);
         myResourceConfig.getFeatures().put(ResourceConfig.FEATURE_CANONICALIZE_URI_PATH, false);
         
-        HttpURLConnection.setContentHandlerFactory(new AuxContentHandlerFactory());
         HttpHandler handler = ContainerFactory.createContainer(
                 HttpHandler.class, myResourceConfig);
         
@@ -106,37 +99,34 @@ public class CanonicalizationFeatureTest extends TestCase {
                 break;
             }
         }
-        
         assertNotNull(server);
         
         server.createContext("/", handler);
-        server.setExecutor(null);
         server.start();
-        try {
-            HttpResponse response = 
-                    HttpTestHelper.makeHttpRequest("GET", "http://localhost:" + port + "/test/uri/http://jersey.dev.java.net");
-            assertEquals("http://jersey.dev.java.net", response.content);
-            response = 
-                    HttpTestHelper.makeHttpRequest("GET", "http://localhost:" + port + "/test/dblslashes//customers//");
-            assertEquals("customers", response.content);
-            
-            myResourceConfig.getFeatures().put(ResourceConfig.FEATURE_CANONICALIZE_URI_PATH, true);
-            
-            response = 
-                    HttpTestHelper.makeHttpRequest("GET", "http://localhost:" + port + "/test/uri/http://jersey.dev.java.net");
-            assertEquals("http:/jersey.dev.java.net", response.content);
-            response = 
-                    HttpTestHelper.makeHttpRequest("GET", "http://localhost:" + port + "/test/slashes//customers//");
-            assertEquals("customers", response.content);            
-            response = 
-                    HttpTestHelper.makeHttpRequest("GET", "http://localhost:" + port + "/test/qparam//a?qParam=val");
-            assertEquals("val", response.content);
-        } catch (Exception e) {
-            e.printStackTrace(System.err);
-            fail("HTTP request failed :-(");
-        } finally {
-            server.stop(0);
-        }
+        
+        URI baseUri = UriBuilder.fromUri("http://localhost").port(port).build();
+                
+        ResourceProxy r = ResourceProxy.create(UriBuilder.fromUri(baseUri).
+                path("/test/uri/http://jersey.dev.java.net").build());
+        assertEquals("http://jersey.dev.java.net", r.get(String.class));
+        r = ResourceProxy.create(UriBuilder.fromUri(baseUri).
+                path("/test/dblslashes//customers//").build());
+        assertEquals("customers", r.get(String.class));
+        
+        myResourceConfig.getFeatures().
+                put(ResourceConfig.FEATURE_CANONICALIZE_URI_PATH, true);
+        
+        r = ResourceProxy.create(UriBuilder.fromUri(baseUri).
+                path("/test/uri/http://jersey.dev.java.net").build());
+        assertEquals("http:/jersey.dev.java.net", r.get(String.class));
+        r = ResourceProxy.create(UriBuilder.fromUri(baseUri).
+                path("/test/slashes//customers//").build());
+        assertEquals("customers", r.get(String.class));
+        r = ResourceProxy.create(UriBuilder.fromUri(baseUri).
+                path("/test/qparam//a").queryParam("qParam", "val").build());
+        assertEquals("val", r.get(String.class));
+        
+        server.stop(0);        
     }
     
 }

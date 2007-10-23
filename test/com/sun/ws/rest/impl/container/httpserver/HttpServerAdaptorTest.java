@@ -28,19 +28,12 @@ import javax.ws.rs.UriTemplate;
 import com.sun.ws.rest.api.container.ContainerFactory;
 import com.sun.ws.rest.api.core.HttpRequestContext;
 import com.sun.ws.rest.api.core.HttpResponseContext;
-import com.sun.ws.rest.api.core.ResourceConfig;
 import com.sun.ws.rest.api.core.WebResource;
-import com.sun.ws.rest.api.core.DefaultResourceConfig;
-import java.io.ByteArrayOutputStream;
+import com.sun.ws.rest.impl.client.ResourceProxy;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.net.HttpURLConnection;
 import java.net.InetSocketAddress;
-import java.net.URL;
-import java.util.HashSet;
-import java.util.Set;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.UriBuilder;
 import junit.framework.*;
 
 /**
@@ -82,73 +75,36 @@ public class HttpServerAdaptorTest extends TestCase {
     }
     
     public void testExpliciWebResourceReference() throws IOException {
-        System.out.println("testExpliciWebResourceReference");
-        final Set<Class> resources = new HashSet<Class>();
-        resources.add(TestOneWebResource.class);
-        resources.add(TestTwoWebResource.class);
+        HttpHandler handler = ContainerFactory.createContainer(HttpHandler.class, 
+                TestOneWebResource.class, TestTwoWebResource.class);
         
-        ResourceConfig config = new DefaultResourceConfig(resources);
+        HttpServer server = HttpServer.create(new InetSocketAddress(9998), 0);
+        server.createContext("/context", handler);
+        server.start();
         
-        HttpHandler handler = ContainerFactory.createContainer(HttpHandler.class, config);
+        ResourceProxy r = ResourceProxy.create("http://localhost:9998/context/a");
+        assertEquals("RESOURCE-TWO", r.post(String.class, "RESOURCE-TWO"));
+
+        r = ResourceProxy.create(UriBuilder.fromUri(r.getURI()).path("b/c").build());
+        assertEquals("RESOURCE-ONE", r.post(String.class, "RESOURCE-ONE"));
         
-        HttpServer server = startServerInNewThread("/context", handler, 9998);
-        
-        post("http://localhost:9998/context/a/b/c", "RESOURCE-ONE");
-        post("http://localhost:9998/context/a", "RESOURCE-TWO");
-        
-        server.stop(1);
-        server.removeContext("/context");
+        server.stop(0);
     }
     
     public void testPackageReference() throws IOException {
-        System.out.println("testPackageReference");
-        HttpHandler handler = ContainerFactory.createContainer(HttpHandler.class, this.getClass().getPackage().getName());
+        HttpHandler handler = ContainerFactory.createContainer(HttpHandler.class, 
+                this.getClass().getPackage().getName());
         
-        HttpServer server = startServerInNewThread("/context", handler, 9999);
+        HttpServer server = HttpServer.create(new InetSocketAddress(9999), 0);
+        server.createContext("/context", handler);
+        server.start();
         
-        post("http://localhost:9999/context/a/b/c", "RESOURCE-ONE");
-        post("http://localhost:9999/context/a", "RESOURCE-TWO");
+        ResourceProxy r = ResourceProxy.create("http://localhost:9999/context/a");
+        assertEquals("RESOURCE-TWO", r.post(String.class, "RESOURCE-TWO"));
+
+        r = ResourceProxy.create(UriBuilder.fromUri(r.getURI()).path("b/c").build());
+        assertEquals("RESOURCE-ONE", r.post(String.class, "RESOURCE-ONE"));
         
-        server.stop(1);
-        server.removeContext("/context");
+        server.stop(0);
     }
-    
-    private HttpServer startServerInNewThread(String context, HttpHandler handler, int port) throws IOException {
-        final HttpServer server = HttpServer.create(new InetSocketAddress(port), 0);
-        server.createContext(context, handler);
-        server.setExecutor(null);
-        
-        Runnable r = new Runnable() {
-            public void run() {
-                server.start();
-            }
-        };
-        
-        new Thread(r).start();
-        
-        return server;
-    }    
-    
-    private void post(String uri, String contents) throws IOException {
-        URL u = new URL(uri);
-        HttpURLConnection uc = (HttpURLConnection)u.openConnection();
-        uc.setRequestMethod("POST");
-        uc.setDoInput(true);
-        uc.setDoOutput(true);
-        OutputStream out = uc.getOutputStream();
-        out.write(contents.getBytes());
-        out.close();
-        
-        assertEquals(200, uc.getResponseCode());
-        
-        InputStream in = uc.getInputStream();
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        byte[] buffer = new byte[1024];
-        int r;
-        while ((r = in.read(buffer)) != -1) {
-            baos.write(buffer, 0, r);
-        }
-        String s = new String(baos.toByteArray());
-        assertEquals(contents, s);
-    }    
 }

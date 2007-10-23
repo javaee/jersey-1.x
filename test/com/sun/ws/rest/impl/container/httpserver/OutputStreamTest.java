@@ -28,13 +28,9 @@ import javax.ws.rs.UriTemplate;
 import com.sun.ws.rest.api.container.ContainerFactory;
 import com.sun.ws.rest.api.core.HttpRequestContext;
 import com.sun.ws.rest.api.core.HttpResponseContext;
-import java.io.ByteArrayOutputStream;
+import com.sun.ws.rest.impl.client.ResourceProxy;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.net.HttpURLConnection;
 import java.net.InetSocketAddress;
-import java.net.URL;
 import javax.ws.rs.HttpMethod;
 import javax.ws.rs.ProduceMime;
 import junit.framework.*;
@@ -70,34 +66,11 @@ public class OutputStreamTest extends TestCase {
         
         HttpServer server = HttpServer.create(new InetSocketAddress(9998), 0);
         server.createContext("/context", handler);
-        server.setExecutor(null);
         server.start();
                 
-        post("http://localhost:9998/context/output", "RESOURCE");
+        ResourceProxy r = ResourceProxy.create("http://localhost:9998/context/output");
+        assertEquals("RESOURCE", r.post(String.class, "RESOURCE"));
         
         server.stop(0);
     }
-    
-    
-    private void post(String uri, String contents) throws IOException {
-        URL u = new URL(uri);
-        HttpURLConnection uc = (HttpURLConnection)u.openConnection();
-        uc.setRequestMethod("POST");
-        uc.setDoInput(true);
-        uc.setDoOutput(true);
-        OutputStream out = uc.getOutputStream();
-        out.write(contents.getBytes());
-        out.close();
-        
-        assertEquals(200, uc.getResponseCode());
-        InputStream in = uc.getInputStream();
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        byte[] buffer = new byte[1024];
-        int r;
-        while ((r = in.read(buffer)) != -1) {
-            baos.write(buffer, 0, r);
-        }
-        String s = new String(baos.toByteArray());
-        assertEquals(contents, s);
-    }    
 }

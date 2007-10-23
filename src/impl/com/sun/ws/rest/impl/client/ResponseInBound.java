@@ -20,14 +20,22 @@
  *     "Portions Copyrighted [year] [name of copyright owner]"
  */
 
-package com.sun.ws.rest.impl.container.httpserver;
+package com.sun.ws.rest.impl.client;
 
-import com.sun.ws.rest.api.core.DefaultResourceConfig;
+import java.io.IOException;
+import javax.ws.rs.core.MultivaluedMap;
 
-public class WebResources extends DefaultResourceConfig {
+/**
+ *
+ * @author Paul.Sandoz@Sun.Com
+ */
+public interface ResponseInBound {
     
-    public WebResources() {
-        super(HttpServerAdaptorTest.TestOneWebResource.class, 
-                HttpServerAdaptorTest.TestTwoWebResource.class);
-    }
+    int getStatus();
+    
+    MultivaluedMap<String, String> getHeaders();
+    
+    <T> T getEntity(Class<T> c) throws IOException;
+    
+    <T> T getEntity(Class<T> c, boolean successful) throws IOException;
 }

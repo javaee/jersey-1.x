@@ -20,14 +20,35 @@
  *     "Portions Copyrighted [year] [name of copyright owner]"
  */
 
-package com.sun.ws.rest.impl.container.httpserver;
+package com.sun.ws.rest.impl.client;
 
-import com.sun.ws.rest.api.core.DefaultResourceConfig;
+import javax.ws.rs.core.MultivaluedMap;
 
-public class WebResources extends DefaultResourceConfig {
+final class RequestOutBoundImpl implements RequestOutBound {
+    private final Object entity;
+    private final MultivaluedMap<String, Object> metadata;
+
+    RequestOutBoundImpl() {
+        this.entity = null;
+        this.metadata = null;
+    }
     
-    public WebResources() {
-        super(HttpServerAdaptorTest.TestOneWebResource.class, 
-                HttpServerAdaptorTest.TestTwoWebResource.class);
+    RequestOutBoundImpl(Object entity) {
+        this.entity = entity;
+        this.metadata = null;
+    }
+    
+    RequestOutBoundImpl(Object entity, MultivaluedMap<String, Object> metadata) {
+        this.entity = entity;
+        this.metadata = metadata;
+    }
+
+    public Object getEntity() {
+        return entity;
+    }
+
+    public void addMetadata(MultivaluedMap<String, Object> metadata) {
+        if (this.metadata != null)
+            metadata.putAll(this.metadata);
     }
 }

@@ -212,14 +212,11 @@ public final class UriBuilderImpl extends UriBuilder {
     }
 
     public UriBuilder queryParam(String name, String value) {
-        try {
-            if (query.length() > 0) query.append('&');
-                query.append(URLEncoder.encode(name, "UTF-8"));
-            if (value != null && value.length() > 0) 
-                query.append('=').append(URLEncoder.encode(value, "UTF-8"));
-        } catch (UnsupportedEncodingException ex) {
-            assert false;
-        }
+        if (query.length() > 0) query.append('&');
+        query.append(encodeQuery(name));
+
+        if (value != null && value.length() > 0)
+            query.append('=').append(encodeQuery(value));
         return this;
     }
 
@@ -244,7 +241,7 @@ public final class UriBuilderImpl extends UriBuilder {
 
         segment = encode(segment, UriComponent.Type.PATH);
         
-        final boolean pathEndsInSlash = path.charAt(path.length() - 1) == '/';
+        final boolean pathEndsInSlash = path.length() > 0 && path.charAt(path.length() - 1) == '/';
         final boolean segmentStartsWithSlash = segment.charAt(0) == '/';
         
         if (!pathEndsInSlash && !segmentStartsWithSlash) {
@@ -266,6 +263,18 @@ public final class UriBuilderImpl extends UriBuilder {
         return s;
     }
     
+    private String encodeQuery(String s) {
+        if (encode) {
+            try {
+                return URLEncoder.encode(s, "UTF-8");
+            } catch (UnsupportedEncodingException ex) {
+                assert false;
+            }
+        }
+        
+        UriComponent.validate(s, UriComponent.Type.QUERY, true);
+        return s;
+    }
     
     public URI build() {
         return createURI(create());

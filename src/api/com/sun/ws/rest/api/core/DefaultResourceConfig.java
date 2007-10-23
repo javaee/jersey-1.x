@@ -22,6 +22,7 @@
 
 package com.sun.ws.rest.api.core;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -46,7 +47,14 @@ public class DefaultResourceConfig implements ResourceConfig {
     /**
      */
     public DefaultResourceConfig() {
-        this(null);
+        this((Set<Class>)null);
+    }
+    
+    /**
+     * @param resources the initial set of root resource classes
+     */
+    public DefaultResourceConfig(Class... resources) {
+        this(new HashSet<Class>(Arrays.asList(resources)));
     }
     
     /**

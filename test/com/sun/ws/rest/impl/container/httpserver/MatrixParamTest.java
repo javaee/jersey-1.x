@@ -26,14 +26,12 @@ import com.sun.net.httpserver.HttpHandler;
 import com.sun.net.httpserver.HttpServer;
 import javax.ws.rs.UriTemplate;
 import com.sun.ws.rest.api.container.ContainerFactory;
-import java.io.ByteArrayOutputStream;
+import com.sun.ws.rest.impl.client.ResourceProxy;
 import java.io.IOException;
-import java.io.InputStream;
-import java.net.HttpURLConnection;
 import java.net.InetSocketAddress;
-import java.net.URL;
 import javax.ws.rs.HttpMethod;
 import javax.ws.rs.MatrixParam;
+import javax.ws.rs.core.UriBuilder;
 import junit.framework.*;
 
 /**
@@ -58,33 +56,22 @@ public class MatrixParamTest extends TestCase {
         
         HttpServer server = HttpServer.create(new InetSocketAddress(9998), 0);
         server.createContext("/context", handler);
-        server.setExecutor(null);
         server.start();
-                
-        assertEquals("1", get("http://localhost:9998/context/test;y=1"));
-        assertEquals("1 + 2", get("http://localhost:9998/context/test;x=1;y=1%20%2B%202"));
-        assertEquals("1 & 2", get("http://localhost:9998/context/test;x=1;y=1%20%26%202"));
-        assertEquals("1 || 2", get("http://localhost:9998/context/test;x=1;y=1%20%7C%7C%202"));
+
+        UriBuilder base = UriBuilder.fromUri("http://localhost:9998/context/test");
+            
+        ResourceProxy r = ResourceProxy.create(base.clone().matrixParam("y", "1").build());
+        assertEquals("1", r.get(String.class));
+        r = ResourceProxy.create(base.clone().
+                matrixParam("x", "1").encode(false).matrixParam("y", "1%20%2B%202").build());
+        assertEquals("1 + 2", r.get(String.class));
+        r = ResourceProxy.create(base.clone().
+                matrixParam("x", "1").encode(false).matrixParam("y", "1%20%26%202").build());
+        assertEquals("1 & 2", r.get(String.class));
+        r = ResourceProxy.create(base.clone().
+                matrixParam("x", "1").encode(false).matrixParam("y", "1%20%7C%7C%202").build());
+        assertEquals("1 || 2", r.get(String.class));
         
-        server.stop(1);
+        server.stop(0);
     }
-        
-    private String get(String uri) throws IOException {
-        URL u = new URL(uri);
-        HttpURLConnection uc = (HttpURLConnection)u.openConnection();
-        uc.setRequestMethod("GET");
-        
-        assertEquals(200, uc.getResponseCode());
-        
-        InputStream in = uc.getInputStream();
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        byte[] buffer = new byte[1024];
-        int r;
-        while ((r = in.read(buffer)) != -1) {
-            baos.write(buffer, 0, r);
-        }
-        String s= new String(baos.toByteArray());
-        System.out.println(s);
-        return new String(baos.toByteArray());
-    }    
 }

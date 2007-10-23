@@ -26,12 +26,9 @@ import com.sun.net.httpserver.HttpHandler;
 import com.sun.net.httpserver.HttpServer;
 import javax.ws.rs.UriTemplate;
 import com.sun.ws.rest.api.container.ContainerFactory;
-import java.io.ByteArrayOutputStream;
+import com.sun.ws.rest.impl.client.ResourceProxy;
 import java.io.IOException;
-import java.io.InputStream;
-import java.net.HttpURLConnection;
 import java.net.InetSocketAddress;
-import java.net.URL;
 import javax.ws.rs.HttpMethod;
 import javax.ws.rs.core.HttpContext;
 import javax.ws.rs.core.UriInfo;
@@ -59,33 +56,16 @@ public class EscapedURITest extends TestCase {
     }
     
     public void testExpliciWebResourceReference() throws IOException {
-        HttpHandler handler = ContainerFactory.createContainer(HttpHandler.class, EscapedURIResource.class);
+        HttpHandler handler = ContainerFactory.createContainer(HttpHandler.class, 
+                EscapedURIResource.class);
         
         HttpServer server = HttpServer.create(new InetSocketAddress(9998), 0);
         server.createContext("/context", handler);
-        server.setExecutor(null);
         server.start();
                 
-        get("http://x.y@localhost:9998/context/x%20y");
+        ResourceProxy r = ResourceProxy.create("http://x.y@localhost:9998/context/x%20y");
+        assertEquals("CONTENT", r.get(String.class));
         
-        server.stop(1);
-    }
-        
-    private void get(String uri) throws IOException {
-        URL u = new URL(uri);
-        HttpURLConnection uc = (HttpURLConnection)u.openConnection();
-        uc.setRequestMethod("GET");
-        
-        assertEquals(200, uc.getResponseCode());
-        
-        InputStream in = uc.getInputStream();
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        byte[] buffer = new byte[1024];
-        int r;
-        while ((r = in.read(buffer)) != -1) {
-            baos.write(buffer, 0, r);
-        }
-        String s = new String(baos.toByteArray());
-        assertEquals("CONTENT", s);
-    }    
+        server.stop(0);
+    } 
 }

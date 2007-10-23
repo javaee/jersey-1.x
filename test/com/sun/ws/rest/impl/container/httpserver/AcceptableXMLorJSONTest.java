@@ -24,18 +24,17 @@ package com.sun.ws.rest.impl.container.httpserver;
 
 import com.sun.net.httpserver.HttpHandler;
 import com.sun.net.httpserver.HttpServer;
+import com.sun.ws.rest.impl.client.RequestOutBound;
+import com.sun.ws.rest.impl.client.ResponseInBound;
+import java.net.URI;
 import javax.ws.rs.UriTemplate;
 import com.sun.ws.rest.api.container.ContainerFactory;
-import java.io.ByteArrayOutputStream;
+import com.sun.ws.rest.impl.client.ResourceProxy;
+import com.sun.ws.rest.impl.client.ResourceProxyFilter;
 import java.io.IOException;
-import java.io.InputStream;
-import java.net.HttpURLConnection;
 import java.net.InetSocketAddress;
-import java.net.URL;
 import javax.ws.rs.HttpMethod;
 import javax.ws.rs.ProduceMime;
-import javax.ws.rs.core.HttpContext;
-import javax.ws.rs.core.UriInfo;
 import javax.xml.bind.annotation.XmlRootElement;
 import junit.framework.*;
 
@@ -43,7 +42,7 @@ import junit.framework.*;
  *
  * @author Paul.Sandoz@Sun.Com
  */
-public class AcceptableXMLorJSON extends TestCase {
+public class AcceptableXMLorJSONTest extends TestCase {
     @XmlRootElement
     public static class JAXBBean {
 
@@ -75,7 +74,7 @@ public class AcceptableXMLorJSON extends TestCase {
         }
     }
         
-    public AcceptableXMLorJSON(String testName) {
+    public AcceptableXMLorJSONTest(String testName) {
         super(testName);
     }
     
@@ -84,37 +83,39 @@ public class AcceptableXMLorJSON extends TestCase {
         
         HttpServer server = HttpServer.create(new InetSocketAddress(9998), 0);
         server.createContext("/context", handler);
-        server.setExecutor(null);
         server.start();
+
+        ResourceProxy r = ResourceProxy.create("http://localhost:9998/context/resource");
+        r.addFilter(new ResourceProxyFilter() {
+            public ResponseInBound invoke(URI u, String method, RequestOutBound ro) throws IOException {
+                ResponseInBound ri = getNext().invoke(u, method, ro);
                 
-        String content = get("http://localhost:9998/context/resource", "application/xml");
+                assertEquals(200, ri.getStatus());
+                assertEquals("application/xml", ri.getHeaders().getFirst("Content-Type"));
+                return ri;
+            }
+        });        
+        String content = r.acceptable("application/xml").get(String.class);
         assertTrue(content.contains("<jaxbBean><value>test</value></jaxbBean>"));
-        content = get("http://localhost:9998/context/resource", "application/*");
+        content = r.acceptable("application/*").get(String.class);
         assertTrue(content.contains("<jaxbBean><value>test</value></jaxbBean>"));
-        content = get("http://localhost:9998/context/resource", "*");
+        content = r.acceptable("*/*").get(String.class);
         assertTrue(content.contains("<jaxbBean><value>test</value></jaxbBean>"));
+
         
-        content = get("http://localhost:9998/context/resource", "application/json");
-        assertEquals("{\"jaxbBean\":{\"value\":{\"$\":\"test\"}}}", content);
-        
-        server.stop(1);
+        r.removeAllFilters();
+        r.addFilter(new ResourceProxyFilter() {
+            public ResponseInBound invoke(URI u, String method, RequestOutBound ro) throws IOException {
+                ResponseInBound ri = getNext().invoke(u, method, ro);
+                
+                assertEquals(200, ri.getStatus());
+                assertEquals("application/json", ri.getHeaders().getFirst("Content-Type"));
+                return ri;
+            }
+        });
+        content = r.acceptable("application/json").get(String.class);
+        assertTrue(content.contains("{\"jaxbBean\":{\"value\":{\"$\":\"test\"}}}"));
+                
+        server.stop(0);
     }
-        
-    private String get(String uri, String accept) throws IOException {
-        URL u = new URL(uri);
-        HttpURLConnection uc = (HttpURLConnection)u.openConnection();
-        uc.setRequestMethod("GET");
-        uc.setRequestProperty("Accept", accept);
-        
-        assertEquals(200, uc.getResponseCode());
-        
-        InputStream in = uc.getInputStream();
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        byte[] buffer = new byte[1024];
-        int r;
-        while ((r = in.read(buffer)) != -1) {
-            baos.write(buffer, 0, r);
-        }
-        return new String(baos.toByteArray());
-    }    
 }
