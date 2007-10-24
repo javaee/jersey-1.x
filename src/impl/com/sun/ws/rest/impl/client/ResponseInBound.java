@@ -22,6 +22,7 @@
 
 package com.sun.ws.rest.impl.client;
 
+import java.net.URI;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 
@@ -36,6 +37,8 @@ public interface ResponseInBound {
     MultivaluedMap<String, String> getMetadata();
     
     MediaType getContentType();
+    
+    URI getLocation();
     
     boolean hasEntity();
     

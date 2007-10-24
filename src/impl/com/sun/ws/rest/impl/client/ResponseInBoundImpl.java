@@ -22,6 +22,7 @@
 
 package com.sun.ws.rest.impl.client;
 
+import java.net.URI;
 import javax.ws.rs.core.MediaType;
 
 /**
@@ -34,4 +35,10 @@ public abstract class ResponseInBoundImpl implements ResponseInBound {
         String ct = getMetadata().getFirst("Content-Type");
         return (ct != null) ? new MediaType(ct) : null;
     }
+    
+    public URI getLocation() {
+        String l = getMetadata().getFirst("Location");        
+        return (l != null) ? URI.create(l) : null;
+    }
+
 }
