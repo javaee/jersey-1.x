@@ -33,8 +33,10 @@ public interface RequestOutBound {
     
     Object getEntity();
     
-    void addMetadata(MultivaluedMap<String, Object> metadata);
-    
+    MultivaluedMap<String, Object> getMetadata();
+
+    RequestOutBound clone();
+
     public static abstract class Builder {
         public abstract RequestOutBound build();
         

@@ -42,7 +42,10 @@ public class RequestOutBoundBuilder extends RequestOutBound.Builder {
     }
     
     public RequestOutBound build() {
-        return new RequestOutBoundImpl(entity, metadata);
+        RequestOutBoundImpl ro = new RequestOutBoundImpl(entity, metadata);
+        entity = null;
+        metadata = null;
+        return ro;
     }
 
     public Builder entity(Object entity) {
@@ -52,25 +55,31 @@ public class RequestOutBoundBuilder extends RequestOutBound.Builder {
 
     public Builder entity(Object entity, MediaType type) {
         entity(entity);
-        metadata.putSingle("Content-Type", type);
+        getMetadata().putSingle("Content-Type", type);
         return this;
     }
 
     public Builder entity(Object entity, String type) {
         entity(entity);
-        metadata.putSingle("Content-Type", type);
+        getMetadata().putSingle("Content-Type", type);
         return this;
     }
     
     public Builder accept(MediaType... types) {
         for (MediaType type : types)
-            metadata.add("Accept", type);
+            getMetadata().add("Accept", type);
         return this;
     }
     
     public Builder accept(String... types) {
         for (String type : types)
-            metadata.add("Accept", type);
+            getMetadata().add("Accept", type);
         return this;
+    }
+    
+    private MultivaluedMap<String, Object> getMetadata() {
+        if (metadata != null) return metadata;
+        
+        return metadata = new ResponseHttpHeadersImpl();
     }
 }
