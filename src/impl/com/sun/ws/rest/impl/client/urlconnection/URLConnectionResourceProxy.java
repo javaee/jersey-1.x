@@ -118,15 +118,13 @@ public final class URLConnectionResourceProxy extends ResourceProxy {
         uc.setRequestMethod(method);
 
         // Write the request headers
-        MultivaluedMap<String, Object> metadata = new ResponseHttpHeadersImpl();
-        ro.addMetadata(metadata);
-        writeHeaders(metadata, uc);
+        writeHeaders(ro.getMetadata(), uc);
         
         // Write the entity (if any)
         Object entity = ro.getEntity();
         if (entity != null) {
             uc.setDoOutput(true);
-            writeEntity(metadata, entity, uc.getOutputStream());
+            writeEntity(ro.getMetadata(), entity, uc.getOutputStream());
         }
         
         // Return the in-bound response
