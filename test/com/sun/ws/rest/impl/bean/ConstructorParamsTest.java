@@ -22,6 +22,7 @@
 
 package com.sun.ws.rest.impl.bean;
 
+import com.sun.ws.rest.impl.client.ResourceProxy;
 import javax.ws.rs.UriParam;
 import javax.ws.rs.UriTemplate;
 import javax.ws.rs.HttpMethod;
@@ -50,15 +51,16 @@ public class ConstructorParamsTest extends AbstractBeanTester {
         }
         
         @HttpMethod("GET")
-        public void doGet() {
+        public String doGet() {
             assertEquals(id, "foo");            
             assertEquals("foo", info.getPath());            
+            return "foo";
         }
         
     }
     
     public void testOneWebResource() {
-        Class r = TestOneWebResourceBean.class;
-        call(r, "GET", "/foo", null, null, "BEAN-ONE");
+        initiateWebApplication(TestOneWebResourceBean.class);
+        resourceProxy("/foo").get(String.class);
     }    
 }

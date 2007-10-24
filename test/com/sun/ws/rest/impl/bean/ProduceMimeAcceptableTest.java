@@ -22,7 +22,7 @@
 
 package com.sun.ws.rest.impl.bean;
 
-import com.sun.ws.rest.api.core.HttpResponseContext;
+import com.sun.ws.rest.impl.client.ResponseInBound;
 import javax.ws.rs.HttpMethod;
 import javax.ws.rs.ProduceMime;
 import javax.ws.rs.UriTemplate;
@@ -48,12 +48,16 @@ public class ProduceMimeAcceptableTest extends AbstractBeanTester {
     }
         
     public void testAcceptable() {
-        callGet(WebResource.class, "/", "application/foo, application/bar");
+        initiateWebApplication(WebResource.class);
+        
+        resourceProxy("/").acceptable("application/foo", "application/bar").get(String.class);
     }
     
     public void testNotAcceptable() {
-        HttpResponseContext response = callNoStatusCheck(WebResource.class, "GET", "/", 
-                null, "application/foo", "");
+        initiateWebApplication(WebResource.class);
+        
+        ResponseInBound response = resourceProxy("/", false).
+                acceptable("application/foo").get(ResponseInBound.class);
         assertEquals(500, response.getStatus());
     }
 
@@ -68,7 +72,9 @@ public class ProduceMimeAcceptableTest extends AbstractBeanTester {
     }
     
     public void testProduceGeneric() {
-        callGet(WebResourceProduceGeneric.class, "/", "application/bar");
+        initiateWebApplication(WebResourceProduceGeneric.class);
+        
+        resourceProxy("/").acceptable("application/bar").get(String.class);
     }
     
 }

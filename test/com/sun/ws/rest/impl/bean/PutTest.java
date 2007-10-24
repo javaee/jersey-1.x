@@ -22,10 +22,9 @@
 
 package com.sun.ws.rest.impl.bean;
 
+import com.sun.ws.rest.impl.client.ResponseInBound;
 import javax.ws.rs.HttpMethod;
 import javax.ws.rs.UriTemplate;
-import java.util.HashSet;
-import java.util.Set;
 
 /**
  *
@@ -70,15 +69,23 @@ public class PutTest extends AbstractBeanTester {
     }
     
     public void testPut() {
-        Set<Class> s = new HashSet<Class>();
-        s.add(PutNoInputNoReturnResource.class);
-        s.add(PutNoReturnResource.class);
-        s.add(PutNoInputResource.class);
-        s.add(PutResource.class);
+        initiateWebApplication(PutNoInputNoReturnResource.class, 
+                PutNoReturnResource.class,
+                PutNoInputResource.class,
+                PutResource.class);
+
+        ResponseInBound response = resourceProxy("/PutNoInputNoReturnResource").
+                put(ResponseInBound.class);
+        assertEquals(204, response.getStatus());
         
-        call(s, "PUT", "/PutNoInputNoReturnResource", null, null, "PutNoInputNoReturnResource");
-        call(s, "PUT", "/PutNoReturnResource", null, null, "PutNoReturnResource");
-        call(s, "PUT", "/PutNoInputResource", null, null, "PutNoInputResource");
-        call(s, "PUT", "/PutResource", null, null, "PutResource");
+        response = resourceProxy("/PutNoReturnResource").
+                put(ResponseInBound.class, "PutNoReturnResource");
+        assertEquals(204, response.getStatus());
+        
+        String s = resourceProxy("/PutNoInputResource").put(String.class);
+        assertEquals(s, "PutNoInputResource");
+        
+        s = resourceProxy("/PutResource").put(String.class, "PutResource");
+        assertEquals(s, "PutResource");
     }
 }

@@ -22,7 +22,6 @@
 
 package com.sun.ws.rest.impl.bean;
 
-import com.sun.corba.se.impl.protocol.InfoOnlyServantCacheLocalCRDImpl;
 import javax.ws.rs.HttpMethod;
 import javax.ws.rs.UriParam;
 import javax.ws.rs.UriTemplate;
@@ -57,8 +56,7 @@ public class EncodedUriTemplateValuesTest extends AbstractBeanTester {
     }
         
     public void testEncodedTemplateValues() {
-        Class r = Resource.class;
-        callGet(r, "/a%20b/x%20y", 
-                "text/plain");
+        initiateWebApplication(Resource.class);
+        resourceProxy("/a%20b/x%20y").get(String.class);
     }
 }

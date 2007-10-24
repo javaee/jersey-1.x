@@ -22,10 +22,12 @@
 
 package com.sun.ws.rest.impl.bean;
 
-import com.sun.ws.rest.api.core.HttpResponseContext;
+import com.sun.ws.rest.impl.client.ResourceProxy;
+import com.sun.ws.rest.impl.client.ResponseInBound;
 import javax.ws.rs.HttpMethod;
 import javax.ws.rs.ProduceMime;
 import javax.ws.rs.UriTemplate;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 /**
@@ -47,9 +49,12 @@ public class HeadTest extends AbstractBeanTester {
     }
         
     public void testGetNoHead() {
-        HttpResponseContext r = callNoStatusCheck(ResourceGetNoHead.class, "HEAD", "/", null, null, "");
-        assertEquals(200, r.getStatus());
-        assertEquals(null, r.getEntity());
+        initiateWebApplication(ResourceGetNoHead.class);
+        
+        ResponseInBound response = resourceProxy("/", false).
+                head();
+        assertEquals(200, response.getStatus());
+        assertFalse(response.hasEntity());
     }
     
     @UriTemplate("/")
@@ -66,10 +71,13 @@ public class HeadTest extends AbstractBeanTester {
     }
     
     public void testGetWithHead() {
-        HttpResponseContext r = callNoStatusCheck(ResourceGetWithHead.class, "HEAD", "/", null, null, "");
-        assertEquals(200, r.getStatus());
-        assertEquals(null, r.getEntity());
-        assertEquals("HEAD", r.getHttpHeaders().getFirst("X-TEST").toString());
+        initiateWebApplication(ResourceGetWithHead.class);
+        
+        ResponseInBound response = resourceProxy("/", false).
+                head();
+        assertEquals(200, response.getStatus());
+        assertFalse(response.hasEntity());
+        assertEquals("HEAD", response.getMetadata().getFirst("X-TEST"));
     }
     
     @UriTemplate("/")
@@ -88,15 +96,20 @@ public class HeadTest extends AbstractBeanTester {
     }
     
     public void testGetWithProduceNoHead() {
-        HttpResponseContext r = callNoStatusCheck(ResourceGetWithProduceNoHead.class, "HEAD", "/", null, "application/foo", "");
-        assertEquals(200, r.getStatus());
-        assertEquals(null, r.getEntity());
-        assertEquals("application/foo", r.getHttpHeaders().getFirst("Content-Type").toString());
+        initiateWebApplication(ResourceGetWithProduceNoHead.class);
+        ResourceProxy r = resourceProxy("/", false);
         
-        r = callNoStatusCheck(ResourceGetWithProduceNoHead.class, "HEAD", "/", null, "application/bar", "");
-        assertEquals(200, r.getStatus());
-        assertEquals(null, r.getEntity());
-        assertEquals("application/bar", r.getHttpHeaders().getFirst("Content-Type").toString());
+        MediaType foo = new MediaType("application/foo");
+        ResponseInBound response = r.acceptable(foo).head();
+        assertEquals(200, response.getStatus());
+        assertFalse(response.hasEntity());
+        assertEquals(foo, response.getContentType());
+        
+        MediaType bar = new MediaType("application/bar");
+        response = r.acceptable(bar).head();
+        assertEquals(200, response.getStatus());
+        assertFalse(response.hasEntity());
+        assertEquals(bar, response.getContentType());
     }
     
     @UriTemplate("/")
@@ -128,16 +141,21 @@ public class HeadTest extends AbstractBeanTester {
     }
     
     public void testGetWithProduceWithHead() {
-        HttpResponseContext r = callNoStatusCheck(ResourceGetWithProduceWithHead.class, "HEAD", "/", null, "application/foo", "");
-        assertEquals(200, r.getStatus());
-        assertEquals(null, r.getEntity());
-        assertEquals("application/foo", r.getHttpHeaders().getFirst("Content-Type").toString());
-        assertEquals("FOO-HEAD", r.getHttpHeaders().getFirst("X-TEST").toString());
+        initiateWebApplication(ResourceGetWithProduceWithHead.class);
+        ResourceProxy r = resourceProxy("/", false);
         
-        r = callNoStatusCheck(ResourceGetWithProduceWithHead.class, "HEAD", "/", null, "application/bar", "");
-        assertEquals(200, r.getStatus());
-        assertEquals(null, r.getEntity());
-        assertEquals("application/bar", r.getHttpHeaders().getFirst("Content-Type").toString());
-        assertEquals("BAR-HEAD", r.getHttpHeaders().getFirst("X-TEST").toString());
+        MediaType foo = new MediaType("application/foo");
+        ResponseInBound response = r.acceptable(foo).head();
+        assertEquals(200, response.getStatus());
+        assertFalse(response.hasEntity());
+        assertEquals(foo, response.getContentType());
+        assertEquals("FOO-HEAD", response.getMetadata().getFirst("X-TEST").toString());
+        
+        MediaType bar = new MediaType("application/bar");
+        response = r.acceptable(bar).head();
+        assertEquals(200, response.getStatus());
+        assertFalse(response.hasEntity());
+        assertEquals(bar, response.getContentType());        
+        assertEquals("BAR-HEAD", response.getMetadata().getFirst("X-TEST").toString());
     }
 }

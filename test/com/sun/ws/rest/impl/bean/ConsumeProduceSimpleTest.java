@@ -24,6 +24,7 @@ package com.sun.ws.rest.impl.bean;
 
 import com.sun.ws.rest.api.core.HttpRequestContext;
 import com.sun.ws.rest.api.core.HttpResponseContext;
+import com.sun.ws.rest.impl.client.ResourceProxy;
 import javax.ws.rs.UriTemplate;
 import javax.ws.rs.ConsumeMime;
 import javax.ws.rs.HttpMethod;
@@ -47,7 +48,7 @@ public class ConsumeProduceSimpleTest extends AbstractBeanTester {
         public void doPostHtml(HttpRequestContext request, HttpResponseContext response) {
             assertEquals("POST", request.getHttpMethod());
             assertEquals("text/html", request.getRequestHeaders().getFirst("Content-Type"));
-            response.setResponse(Response.Builder.ok("RESPONSE").build());
+            response.setResponse(Response.Builder.ok("HTML").build());
         }
         
         @HttpMethod("POST")
@@ -55,7 +56,7 @@ public class ConsumeProduceSimpleTest extends AbstractBeanTester {
         public void doPostXHtml(HttpRequestContext request, HttpResponseContext response) {
             assertEquals("POST", request.getHttpMethod());            
             assertEquals("text/xhtml", request.getRequestHeaders().getFirst("Content-Type"));
-            response.setResponse(Response.Builder.ok("RESPONSE").build());
+            response.setResponse(Response.Builder.ok("XHTML").build());
         }
     }
         
@@ -66,7 +67,7 @@ public class ConsumeProduceSimpleTest extends AbstractBeanTester {
         public void doGetHtml(HttpRequestContext request, HttpResponseContext response) {
             assertEquals("GET", request.getHttpMethod());
             assertEquals("text/html", request.getRequestHeaders().getFirst("Accept"));
-            response.setResponse(Response.Builder.ok("RESPONSE").build());
+            response.setResponse(Response.Builder.ok("HTML").build());
         }
         
         @HttpMethod("GET")
@@ -74,7 +75,7 @@ public class ConsumeProduceSimpleTest extends AbstractBeanTester {
         public void doGetXhtml(HttpRequestContext request, HttpResponseContext response) {
             assertEquals("GET", request.getHttpMethod());            
             assertEquals("text/xhtml", request.getRequestHeaders().getFirst("Accept"));
-            response.setResponse(Response.Builder.ok("RESPONSE").build());
+            response.setResponse(Response.Builder.ok("XHTML").build());
         }
     }
     
@@ -86,7 +87,7 @@ public class ConsumeProduceSimpleTest extends AbstractBeanTester {
         public void doGetHtml(HttpRequestContext request, HttpResponseContext response) {
             assertEquals("GET", request.getHttpMethod());
             assertEquals("text/html", request.getRequestHeaders().getFirst("Accept"));
-            response.setResponse(Response.Builder.ok("RESPONSE").build());
+            response.setResponse(Response.Builder.ok("HTML").build());
         }
         
         @HttpMethod("GET")
@@ -94,7 +95,7 @@ public class ConsumeProduceSimpleTest extends AbstractBeanTester {
         public void doGetXhtml(HttpRequestContext request, HttpResponseContext response) {
             assertEquals("GET", request.getHttpMethod());            
             assertEquals("text/xhtml", request.getRequestHeaders().getFirst("Accept"));
-            response.setResponse(Response.Builder.ok("RESPONSE").build());
+            response.setResponse(Response.Builder.ok("XHTML").build());
         }
         
         @HttpMethod("POST")
@@ -102,7 +103,7 @@ public class ConsumeProduceSimpleTest extends AbstractBeanTester {
             assertEquals("POST", request.getHttpMethod());
             assertEquals("text/html", request.getRequestHeaders().getFirst("Content-Type"));
             assertEquals("text/html", request.getRequestHeaders().getFirst("Accept"));
-            response.setResponse(Response.Builder.ok("RESPONSE").build());
+            response.setResponse(Response.Builder.ok("HTML").build());
         }
         
         @HttpMethod("POST")
@@ -112,27 +113,33 @@ public class ConsumeProduceSimpleTest extends AbstractBeanTester {
             assertEquals("POST", request.getHttpMethod());            
             assertEquals("text/xhtml", request.getRequestHeaders().getFirst("Content-Type"));
             assertEquals("text/xhtml", request.getRequestHeaders().getFirst("Accept"));
-            response.setResponse(Response.Builder.ok("RESPONSE").build());
+            response.setResponse(Response.Builder.ok("XHTML").build());
         }
     }
     
     public void testConsumeSimpleBean() {
-        Class r = ConsumeSimpleBean.class;
-        callPost(r, "/a/b", "text/html", "");
-        callPost(r, "/a/b", "text/xhtml", "");
+        initiateWebApplication(ConsumeSimpleBean.class);
+        ResourceProxy r = resourceProxy("/a/b");
+        
+        assertEquals("HTML", r.content("", "text/html").post(String.class));
+        assertEquals("XHTML", r.content("", "text/xhtml").post(String.class));
     }
     
     public void testProduceSimpleBean() {
-        Class r = ProduceSimpleBean.class;
-        callGet(r, "/a/b", "text/html");
-        callGet(r, "/a/b", "text/xhtml");
+        initiateWebApplication(ProduceSimpleBean.class);
+        ResourceProxy r = resourceProxy("/a/b");
+
+        assertEquals("HTML", r.acceptable("text/html").get(String.class));
+        assertEquals("XHTML", r.acceptable("text/xhtml").get(String.class));
     }
     
     public void testConsumeProduceSimpleBean() {
-        Class r = ConsumeProduceSimpleBean.class;
-        callGet(r, "/a/b", "text/html");
-        callGet(r, "/a/b", "text/xhtml");
-        callPost(r, "/a/b", "text/html", "text/html", "");
-        callPost(r, "/a/b", "text/xhtml", "text/xhtml", "");
+        initiateWebApplication(ConsumeProduceSimpleBean.class);
+        ResourceProxy r = resourceProxy("/a/b");
+        
+        assertEquals("HTML", r.content("", "text/html").accept("text/html").post(String.class));
+        assertEquals("XHTML", r.content("", "text/xhtml").accept("text/xhtml").post(String.class));
+        assertEquals("HTML", r.acceptable("text/html").get(String.class));
+        assertEquals("XHTML", r.acceptable("text/xhtml").get(String.class));
     }
 }

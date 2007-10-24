@@ -23,7 +23,7 @@
 package com.sun.ws.rest.impl.bean;
 
 import com.sun.ws.rest.api.container.ContainerException;
-import com.sun.ws.rest.api.core.HttpResponseContext;
+import com.sun.ws.rest.impl.client.ResponseInBound;
 import javax.ws.rs.HttpMethod;
 import javax.ws.rs.UriTemplate;
 
@@ -52,32 +52,31 @@ public class ExceptionTest extends AbstractBeanTester {
     }
 
     public void testExceptionChecked() {
+        initiateWebApplication(ExceptionCheckedResource.class);
+        
         boolean caught = false;
         try {
-            HttpResponseContext response = call(ExceptionCheckedResource.class, 
-                    "GET", "/exception/checked",
-                    null, "", "");
+            resourceProxy("/exception/checked").get(ResponseInBound.class);
         } catch (ContainerException e) {
             caught = true;
             assertEquals(CheckedException.class, e.getCause().getClass());
         }
-        assertEquals(true, caught);
     }
     
     @UriTemplate("/exception/runtime")
     static public class ExceptionRutimeResource { 
         @HttpMethod
-        public String get() throws CheckedException {
+        public String get() {
             throw new UnsupportedOperationException();
         }
     }
     
     public void testExceptionRuntime() {
+        initiateWebApplication(ExceptionRutimeResource.class);
+        
         boolean caught = false;
         try {
-            HttpResponseContext response = call(ExceptionRutimeResource.class, 
-                    "GET", "/exception/runtime",
-                    null, "", "");
+            resourceProxy("/exception/runtime").get(ResponseInBound.class);
         } catch (UnsupportedOperationException e) {
             caught = true;
         }

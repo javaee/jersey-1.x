@@ -22,12 +22,15 @@
 
 package com.sun.ws.rest.impl.bean;
 
-import com.sun.ws.rest.api.core.HttpResponseContext;
+import com.sun.ws.rest.impl.TestResourceProxy;
+import com.sun.ws.rest.impl.client.ResourceProxy;
+import com.sun.ws.rest.impl.client.ResponseInBound;
 import java.net.URI;
 import java.net.URISyntaxException;
 import javax.ws.rs.HttpMethod;
 import javax.ws.rs.UriTemplate;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.UriBuilder;
 
 /**
  *
@@ -39,30 +42,25 @@ public class CreatedTest extends AbstractBeanTester {
         super(testName);
     }
     
-    @SuppressWarnings("unchecked")
     @UriTemplate("/")
     static public class Resource { 
-        @HttpMethod("GET")
-        public Response doGet() {
-            try {
-                return Response.Builder.created("CONTENT", new URI("subpath")).build();
-            } catch (URISyntaxException ex) {
-                return null;
-            }
+        @HttpMethod("POST")
+        public Response doPost() {
+            return Response.Builder.created("CONTENT", URI.create("subpath")).build();
         }
     }
     
     @SuppressWarnings("unchecked")
     public void testReturnType() {
-        // HttpResponseContext response = callGet(Resource.class, "/", "");
+        initiateWebApplication(Resource.class);
+        ResourceProxy r = resourceProxy("/", false);
 
-        HttpResponseContext response = callNoStatusCheck(Resource.class, "GET", "/", 
-            null, "", "");
+        ResponseInBound response = r.post(ResponseInBound.class);        
         assertEquals(201, response.getStatus());
-        String location = response.getHttpHeaders().getFirst("Location").toString();
-        assertEquals(getBaseUri().toASCIIString() + "subpath", location);
         
-        String r = (String)response.getEntity();
-        assertEquals("CONTENT", r);        
+        URI l = UriBuilder.fromUri(TestResourceProxy.base).path("subpath").build();
+        assertEquals(l, response.getLocation());
+        
+        assertEquals("CONTENT", response.getEntity(String.class));        
     }   
 }

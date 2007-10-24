@@ -27,6 +27,8 @@ import javax.ws.rs.HttpMethod;
 import javax.ws.rs.ProduceMime;
 import javax.ws.rs.UriTemplate;
 import com.sun.ws.rest.api.core.HttpResponseContext;
+import com.sun.ws.rest.impl.client.ResourceProxy;
+import com.sun.ws.rest.impl.client.ResponseInBound;
 
 /**
  *
@@ -57,43 +59,40 @@ public class ClientErrorTest extends AbstractBeanTester {
         }
     }
     
-    @UriTemplate("/")
-    public static class WebResourceNotAcceptable {
-        @ConsumeMime("application/bar")
-        @ProduceMime("application/bar")
-        @HttpMethod("POST")
-        public String doPost(String entity) {
-            return "content";
-        }
-    }
-    
     public void testNotFound() {
-        HttpResponseContext response = callNoStatusCheck(
-                WebResourceNotFoundMethodNotAllowed.class, "GET", "/foo", 
-                null, "application/foo", "");
+        initiateWebApplication(WebResourceNotFoundMethodNotAllowed.class);
+        ResourceProxy r = resourceProxy("/foo", false);
+
+        ResponseInBound response = r.acceptable("application/foo").get(ResponseInBound.class);
         assertEquals(404, response.getStatus());
     }
     
     public void testMethodNotAllowed() {
-        HttpResponseContext response = callNoStatusCheck(
-                WebResourceNotFoundMethodNotAllowed.class, "POST", "/", 
-                "application/foo", "application/foo", "");
+        initiateWebApplication(WebResourceNotFoundMethodNotAllowed.class);
+        ResourceProxy r = resourceProxy("/", false);
+        
+        ResponseInBound response = r.content("content", "application/foo").
+                accept("application/foo").post(ResponseInBound.class);
         assertEquals(405, response.getStatus());
-        String allow = response.getHttpHeaders().getFirst("Allow").toString();
+        String allow = response.getMetadata().getFirst("Allow").toString();
         assertTrue(allow.contains("GET"));
     }    
     
     public void testUnsupportedMediaType() {
-        HttpResponseContext response = callNoStatusCheck(
-                WebResourceUnsupportedMediaType.class, "POST", "/", 
-                "application/foo", "application/foo", "");
+        initiateWebApplication(WebResourceUnsupportedMediaType.class);
+        ResourceProxy r = resourceProxy("/", false);
+        
+        ResponseInBound response = r.content("content", "application/foo").
+                accept("application/foo").post(ResponseInBound.class);
         assertEquals(415, response.getStatus());
     }
     
     public void testNotAcceptable() {
-        HttpResponseContext response = callNoStatusCheck(
-                WebResourceUnsupportedMediaType.class, "POST", "/", 
-                "application/bar", "application/bar", "");
+        initiateWebApplication(WebResourceUnsupportedMediaType.class);
+        ResourceProxy r = resourceProxy("/", false);
+        
+        ResponseInBound response = r.content("content", "application/bar").
+                accept("application/bar").post(ResponseInBound.class);
         assertEquals(406, response.getStatus());
     }    
 }

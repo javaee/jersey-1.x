@@ -55,7 +55,7 @@ public class TestResourceProxy extends ResourceProxy {
     private final WebApplication w;
     
     public TestResourceProxy(String path, WebApplication w) {
-        super(UriBuilder.fromUri(base).path(path).build());
+        super(UriBuilder.fromUri(base).encode(false).path(path).build());
         this.w = w;
     }
     

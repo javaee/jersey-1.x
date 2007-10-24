@@ -24,6 +24,7 @@ package com.sun.ws.rest.impl.bean;
 
 import com.sun.ws.rest.api.core.HttpRequestContext;
 import com.sun.ws.rest.api.core.HttpResponseContext;
+import com.sun.ws.rest.impl.client.ResourceProxy;
 import javax.ws.rs.UriTemplate;
 import javax.ws.rs.ConsumeMime;
 import javax.ws.rs.HttpMethod;
@@ -46,7 +47,7 @@ public class ConsumeProduceWildcardTest extends AbstractBeanTester {
         public void doPostHtml(HttpRequestContext request, HttpResponseContext response) {
             assertEquals("POST", request.getHttpMethod());
             assertEquals("text/html", request.getRequestHeaders().getFirst("Content-Type"));
-            response.setResponse(Response.Builder.ok("RESPONSE").build());
+            response.setResponse(Response.Builder.ok("HTML").build());
         }
         
         @HttpMethod("POST")
@@ -54,13 +55,15 @@ public class ConsumeProduceWildcardTest extends AbstractBeanTester {
         public void doPostXHtml(HttpRequestContext request, HttpResponseContext response) {
             assertEquals("POST", request.getHttpMethod());
             assertEquals("text/xhtml", request.getRequestHeaders().getFirst("Content-Type"));
-            response.setResponse(Response.Builder.ok("RESPONSE").build());
+            response.setResponse(Response.Builder.ok("XHTML").build());
         }
     }
         
     public void testConsumeWildCardBean() {
-        Class r = ConsumeWildCardBean.class;
-        callPost(r, "/a/b", "text/html", "");
-        callPost(r, "/a/b", "text/xhtml", "");
+        initiateWebApplication(ConsumeWildCardBean.class);
+        ResourceProxy r = resourceProxy("/a/b");
+        
+        assertEquals("HTML", r.content("", "text/html").post(String.class));
+        assertEquals("XHTML", r.content("", "text/xhtml").post(String.class));
     }    
 }

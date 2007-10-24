@@ -22,9 +22,9 @@
 
 package com.sun.ws.rest.impl.bean;
 
+import com.sun.ws.rest.impl.client.ResourceProxy;
 import javax.ws.rs.HttpMethod;
 import javax.ws.rs.UriTemplate;
-import com.sun.ws.rest.api.core.HttpResponseContext;
 
 /**
  *
@@ -47,8 +47,9 @@ public class ByteArrayRepresentationTest extends AbstractBeanTester {
     }
     
     public void testPut() {
-        HttpResponseContext response = call(Resource.class, "POST", "/", null, null, "CONTENT");
-        byte[] r = (byte[])response.getEntity();
-        assertEquals("CONTENT", new String(r));
+        initiateWebApplication(Resource.class);
+        ResourceProxy r = resourceProxy("/");
+        
+        assertEquals("CONTENT", r.post(String.class, "CONTENT"));
     }
 }

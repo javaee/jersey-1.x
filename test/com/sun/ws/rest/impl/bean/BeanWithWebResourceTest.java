@@ -89,7 +89,7 @@ public class BeanWithWebResourceTest extends AbstractBeanTester {
     
     public void testBeanWithWebResource() {
         initiateWebApplication(BeanWithWebResource.class);
-        ResourceProxy r = resourceProxy("/a/b", false);
+        ResourceProxy r = resourceProxy("/a/b");
         
         r.acceptable("text/html").get(String.class);
         r.acceptable("text/xhtml").post();
@@ -99,7 +99,7 @@ public class BeanWithWebResourceTest extends AbstractBeanTester {
     
     public void testBeanProduceWithWebResource() {
         initiateWebApplication(BeanProduceWithWebResource.class);
-        ResourceProxy r = resourceProxy("/a/b", false);
+        ResourceProxy r = resourceProxy("/a/b");
         
         r.acceptable("text/html").get(String.class);
         r.acceptable("text/xhtml").post();

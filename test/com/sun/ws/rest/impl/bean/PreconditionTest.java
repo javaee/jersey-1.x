@@ -24,13 +24,10 @@ package com.sun.ws.rest.impl.bean;
 
 import javax.ws.rs.HttpMethod;
 import javax.ws.rs.UriTemplate;
-import com.sun.ws.rest.api.core.HttpContextAccess;
-import com.sun.ws.rest.api.core.HttpResponseContext;
-import com.sun.ws.rest.impl.RequestHttpHeadersImpl;
+import com.sun.ws.rest.impl.client.ResponseInBound;
 import java.util.GregorianCalendar;
 import javax.ws.rs.core.EntityTag;
 import javax.ws.rs.core.HttpContext;
-import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.PreconditionEvaluator;
 import javax.ws.rs.core.Response;
 
@@ -61,63 +58,68 @@ public class PreconditionTest extends AbstractBeanTester {
     }
     
     public void testIfUnmodifiedSinceBeforeLastModified() {
-        MultivaluedMap<String, String> headers = new RequestHttpHeadersImpl();
-        headers.putSingle("If-Unmodified-Since", "Sat, 30 Dec 2006 00:00:00 GMT");
-        HttpResponseContext r = callNoStatusCheck(LastModifiedResource.class, "GET", "/", headers, "");
-        assertEquals(412, r.getStatus());
+        initiateWebApplication(LastModifiedResource.class);
+        ResponseInBound response = resourceProxy("/", false).
+                request("If-Unmodified-Since", "Sat, 30 Dec 2006 00:00:00 GMT").
+                get(ResponseInBound.class);
+        assertEquals(412, response.getStatus());
     }    
 
     public void testIfUnmodifiedSinceAfterLastModified() {
-        MultivaluedMap<String, String> headers = new RequestHttpHeadersImpl();
-        headers.putSingle("If-Unmodified-Since", "Tue, 2 Jan 2007 00:00:00 GMT");
-        HttpResponseContext r = callNoStatusCheck(LastModifiedResource.class, "GET", "/", headers, "");
-        assertEquals(200, r.getStatus());
+        initiateWebApplication(LastModifiedResource.class);
+        resourceProxy("/").
+                request("If-Unmodified-Since", "Tue, 2 Jan 2007 00:00:00 GMT").
+                get(ResponseInBound.class);
     }    
 
     public void testIfModifiedSinceBeforeLastModified() {
-        MultivaluedMap<String, String> headers = new RequestHttpHeadersImpl();
-        headers.putSingle("If-Modified-Since", "Sat, 30 Dec 2006 00:00:00 GMT");
-        HttpResponseContext r = callNoStatusCheck(LastModifiedResource.class, "GET", "/", headers, "");
-        assertEquals(200, r.getStatus());
+        initiateWebApplication(LastModifiedResource.class);
+        resourceProxy("/").
+                request("If-Modified-Since", "Sat, 30 Dec 2006 00:00:00 GMT").
+                get(ResponseInBound.class);
     }    
 
     public void testIfModifiedSinceAfterLastModified() {
-        MultivaluedMap<String, String> headers = new RequestHttpHeadersImpl();
-        headers.putSingle("If-Modified-Since", "Tue, 2 Jan 2007 00:00:00 GMT");
-        HttpResponseContext r = callNoStatusCheck(LastModifiedResource.class, "GET", "/", headers, "");
-        assertEquals(304, r.getStatus());
+        initiateWebApplication(LastModifiedResource.class);
+        ResponseInBound response = resourceProxy("/", false).
+                request("If-Modified-Since", "Tue, 2 Jan 2007 00:00:00 GMT").
+                get(ResponseInBound.class);
+        assertEquals(304, response.getStatus());
     }    
 
     public void testIfUnmodifiedSinceBeforeLastModified_IfModifiedSinceBeforeLastModified() {
-        MultivaluedMap<String, String> headers = new RequestHttpHeadersImpl();
-        headers.putSingle("If-Unmodified-Since", "Sat, 30 Dec 2006 00:00:00 GMT");
-        headers.putSingle("If-Modified-Since", "Sat, 30 Dec 2006 00:00:00 GMT");
-        HttpResponseContext r = callNoStatusCheck(LastModifiedResource.class, "GET", "/", headers, "");
-        assertEquals(412, r.getStatus());
+        initiateWebApplication(LastModifiedResource.class);
+        ResponseInBound response = resourceProxy("/", false).
+                request("If-Unmodified-Since", "Sat, 30 Dec 2006 00:00:00 GMT").
+                header("If-Modified-Since", "Sat, 30 Dec 2006 00:00:00 GMT").
+                get(ResponseInBound.class);
+        assertEquals(412, response.getStatus());
     }    
 
     public void testIfUnmodifiedSinceBeforeLastModified_IfModifiedSinceAfterLastModified() {
-        MultivaluedMap<String, String> headers = new RequestHttpHeadersImpl();
-        headers.putSingle("If-Unmodified-Since", "Sat, 30 Dec 2006 00:00:00 GMT");
-        headers.putSingle("If-Modified-Since", "Tue, 2 Jan 2007 00:00:00 GMT");
-        HttpResponseContext r = callNoStatusCheck(LastModifiedResource.class, "GET", "/", headers, "");
-        assertEquals(412, r.getStatus());
+        initiateWebApplication(LastModifiedResource.class);
+        ResponseInBound response = resourceProxy("/", false).
+                request("If-Unmodified-Since", "Sat, 30 Dec 2006 00:00:00 GMT").
+                header("If-Modified-Since", "Tue, 2 Jan 2007 00:00:00 GMT").
+                get(ResponseInBound.class);
+        assertEquals(412, response.getStatus());
     }    
     
     public void testIfUnmodifiedSinceAfterLastModified_IfModifiedSinceAfterLastModified() {
-        MultivaluedMap<String, String> headers = new RequestHttpHeadersImpl();
-        headers.putSingle("If-Unmodified-Since", "Tue, 2 Jan 2007 00:00:00 GMT");
-        headers.putSingle("If-Modified-Since", "Tue, 2 Jan 2007 00:00:00 GMT");
-        HttpResponseContext r = callNoStatusCheck(LastModifiedResource.class, "GET", "/", headers, "");
-        assertEquals(304, r.getStatus());
+        initiateWebApplication(LastModifiedResource.class);
+        ResponseInBound response = resourceProxy("/", false).
+                request("If-Unmodified-Since", "Tue, 2 Jan 2007 00:00:00 GMT").
+                header("If-Modified-Since", "Tue, 2 Jan 2007 00:00:00 GMT").
+                get(ResponseInBound.class);
+        assertEquals(304, response.getStatus());
     }    
 
     public void testIfUnmodifiedSinceAfterLastModified_IfModifiedSinceBeforeLastModified() {
-        MultivaluedMap<String, String> headers = new RequestHttpHeadersImpl();
-        headers.putSingle("If-Unmodified-Since", "Tue, 2 Jan 2007 00:00:00 GMT");
-        headers.putSingle("If-Modified-Since", "Sat, 30 Dec 2006 00:00:00 GMT");
-        HttpResponseContext r = callNoStatusCheck(LastModifiedResource.class, "GET", "/", headers, "");
-        assertEquals(200, r.getStatus());
+        initiateWebApplication(LastModifiedResource.class);
+        resourceProxy("/").
+                request("If-Unmodified-Since", "Tue, 2 Jan 2007 00:00:00 GMT").
+                header("If-Modified-Since", "Sat, 30 Dec 2006 00:00:00 GMT").
+                get(ResponseInBound.class);
     }
         
     
@@ -136,79 +138,86 @@ public class PreconditionTest extends AbstractBeanTester {
     }
 
     public void testIfMatchWithMatchingETag() {
-        MultivaluedMap<String, String> headers = new RequestHttpHeadersImpl();
-        headers.putSingle("If-Match", "\"1\"");
-        HttpResponseContext r = callNoStatusCheck(EtagResource.class, "GET", "/", headers, "");
-        assertEquals(200, r.getStatus());
+        initiateWebApplication(EtagResource.class);
+        resourceProxy("/").
+                request("If-Match", "\"1\"").
+                get(ResponseInBound.class);
     }
     
     public void testIfMatchWithoutMatchingETag() {
-        MultivaluedMap<String, String> headers = new RequestHttpHeadersImpl();
-        headers.putSingle("If-Match", "\"2\"");
-        HttpResponseContext r = callNoStatusCheck(EtagResource.class, "GET", "/", headers, "");
-        assertEquals(412, r.getStatus());
+        initiateWebApplication(EtagResource.class);
+        ResponseInBound response = resourceProxy("/", false).
+                request("If-Match", "\"2\"").
+                get(ResponseInBound.class);
+        assertEquals(412, response.getStatus());        
     }
     
     public void testIfMatchWildCard() {
-        MultivaluedMap<String, String> headers = new RequestHttpHeadersImpl();
-        headers.putSingle("If-Match", "*");
-        HttpResponseContext r = callNoStatusCheck(EtagResource.class, "GET", "/", headers, "");
-        assertEquals(200, r.getStatus());
+        initiateWebApplication(EtagResource.class);
+        resourceProxy("/").
+                request("If-Match", "*").
+                get(ResponseInBound.class);
     }
     
     public void testIfNonMatchWithMatchingETag() {
-        MultivaluedMap<String, String> headers = new RequestHttpHeadersImpl();
-        headers.putSingle("If-None-Match", "\"1\"");
-        HttpResponseContext r = callNoStatusCheck(EtagResource.class, "GET", "/", headers, "");
-        assertEquals(304, r.getStatus());
-        assertEquals(new EntityTag("1"), r.getHttpHeaders().getFirst("ETag"));
+        initiateWebApplication(EtagResource.class);
+        ResponseInBound response = resourceProxy("/", false).
+                request("If-None-Match", "\"1\"").
+                get(ResponseInBound.class);
+        assertEquals(304, response.getStatus());
+        assertEquals(new EntityTag("1"), response.getEntityTag());
     }
     
     public void testIfNonMatchWithoutMatchingETag() {
-        MultivaluedMap<String, String> headers = new RequestHttpHeadersImpl();
-        headers.putSingle("If-None-Match", "\"2\"");
-        HttpResponseContext r = callNoStatusCheck(EtagResource.class, "GET", "/", headers, "");
-        assertEquals(200, r.getStatus());
+        initiateWebApplication(EtagResource.class);
+        resourceProxy("/").
+                request("If-None-Match", "\"2\"").
+                get(ResponseInBound.class);
     }
     
     public void testIfNonMatchWildCard() {
-        MultivaluedMap<String, String> headers = new RequestHttpHeadersImpl();
-        headers.putSingle("If-None-Match", "*");
-        HttpResponseContext r = callNoStatusCheck(EtagResource.class, "GET", "/", headers, "");
-        assertEquals(304, r.getStatus());
-        assertEquals(new EntityTag("1"), r.getHttpHeaders().getFirst("ETag"));
+        initiateWebApplication(EtagResource.class);
+        ResponseInBound response = resourceProxy("/", false).
+                request("If-None-Match", "*").
+                get(ResponseInBound.class);
+        assertEquals(304, response.getStatus());
+        assertEquals(new EntityTag("1"), response.getEntityTag());
     }
     
     
     public void testIfMatchWithMatchingETag_IfNonMatchWithMatchingETag() {
-        MultivaluedMap<String, String> headers = new RequestHttpHeadersImpl();
-        headers.putSingle("If-Match", "\"1\"");
-        headers.putSingle("If-None-Match", "\"1\"");
-        HttpResponseContext r = callNoStatusCheck(EtagResource.class, "GET", "/", headers, "");
-        assertEquals(304, r.getStatus());
+        initiateWebApplication(EtagResource.class);
+        ResponseInBound response = resourceProxy("/", false).
+                request("If-Match", "\"1\"").
+                header("If-None-Match", "\"1\"").
+                get(ResponseInBound.class);
+        assertEquals(304, response.getStatus());
+        assertEquals(new EntityTag("1"), response.getEntityTag());
     }
     
     public void testIfMatchWithMatchingETag_IfNonMatchWithoutMatchingETag() {
-        MultivaluedMap<String, String> headers = new RequestHttpHeadersImpl();
-        headers.putSingle("If-Match", "\"1\"");
-        headers.putSingle("If-None-Match", "\"2\"");
-        HttpResponseContext r = callNoStatusCheck(EtagResource.class, "GET", "/", headers, "");
-        assertEquals(200, r.getStatus());
+        initiateWebApplication(EtagResource.class);
+        resourceProxy("/").
+                request("If-Match", "\"1\"").
+                header("If-None-Match", "\"2\"").
+                get(ResponseInBound.class);
     }
     
     public void testIfMatchWithoutMatchingETag_IfNonMatchWithMatchingETag() {
-        MultivaluedMap<String, String> headers = new RequestHttpHeadersImpl();
-        headers.putSingle("If-Match", "\"2\"");
-        headers.putSingle("If-None-Match", "\"1\"");
-        HttpResponseContext r = callNoStatusCheck(EtagResource.class, "GET", "/", headers, "");
-        assertEquals(412, r.getStatus());
+        initiateWebApplication(EtagResource.class);
+        ResponseInBound response = resourceProxy("/", false).
+                request("If-Match", "\"2\"").
+                header("If-None-Match", "\"1\"").
+                get(ResponseInBound.class);
+        assertEquals(412, response.getStatus());
     }
     
     public void testIfMatchWithoutMatchingETag_IfNonMatchWithoutMatchingETag() {
-        MultivaluedMap<String, String> headers = new RequestHttpHeadersImpl();
-        headers.putSingle("If-Match", "\"2\"");
-        headers.putSingle("If-None-Match", "\"2\"");
-        HttpResponseContext r = callNoStatusCheck(EtagResource.class, "GET", "/", headers, "");
-        assertEquals(412, r.getStatus());
+        initiateWebApplication(EtagResource.class);
+        ResponseInBound response = resourceProxy("/", false).
+                request("If-Match", "\"2\"").
+                header("If-None-Match", "\"2\"").
+                get(ResponseInBound.class);
+        assertEquals(412, response.getStatus());
     }
 }

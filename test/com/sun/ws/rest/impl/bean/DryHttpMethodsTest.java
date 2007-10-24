@@ -22,18 +22,17 @@
 
 package com.sun.ws.rest.impl.bean;
 
+import com.sun.ws.rest.impl.client.ResourceProxy;
 import javax.ws.rs.HttpMethod;
 import javax.ws.rs.UriTemplate;
-import java.util.HashSet;
-import java.util.Set;
 
 /**
  *
  * @author Paul.Sandoz@Sun.Com
  */
-public class DryHttpMethods extends AbstractBeanTester {
+public class DryHttpMethodsTest extends AbstractBeanTester {
     
-    public DryHttpMethods(String testName) {
+    public DryHttpMethodsTest(String testName) {
         super(testName);
     }
 
@@ -45,7 +44,7 @@ public class DryHttpMethods extends AbstractBeanTester {
         
         @HttpMethod
         public String getMe() {
-            return "GET";
+            return "getMe";
         }
         
         @HttpMethod
@@ -67,13 +66,13 @@ public class DryHttpMethods extends AbstractBeanTester {
     }
     
     public void testMethod() {
-        Set<Class> s = new HashSet<Class>();
-        s.add(Resource.class);
+        initiateWebApplication(Resource.class);
+        ResourceProxy r = resourceProxy("/");
         
-        call(s, "HEAD", "/", null, null, "");
-        call(s, "GET", "/", null, null, "");
-        call(s, "PUT", "/", null, null, "putMe");
-        call(s, "POST", "/", null, null, "postMe");
-        call(s, "DELETE", "/", null, null, "deleteMe");
+        r.head();
+        assertEquals("getMe", r.get(String.class));
+        assertEquals("putMe", r.put(String.class, "putMe"));
+        assertEquals("postMe", r.post(String.class, "postMe"));
+        assertEquals("deleteMe", r.delete(String.class));
     }
 }

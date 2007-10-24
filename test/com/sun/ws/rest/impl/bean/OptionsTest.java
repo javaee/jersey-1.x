@@ -22,9 +22,8 @@
 
 package com.sun.ws.rest.impl.bean;
 
-import com.sun.ws.rest.api.core.HttpResponseContext;
+import com.sun.ws.rest.impl.client.ResponseInBound;
 import javax.ws.rs.HttpMethod;
-import javax.ws.rs.ProduceMime;
 import javax.ws.rs.UriTemplate;
 import javax.ws.rs.core.Response;
 
@@ -66,10 +65,11 @@ public class OptionsTest extends AbstractBeanTester {
     }
         
     public void testNoOptions() {
-        HttpResponseContext r = callNoStatusCheck(ResourceNoOptions.class, "OPTIONS", "/", null, null, "");
-        assertEquals(204, r.getStatus());
-        assertEquals(null, r.getEntity());
-        String allow = r.getHttpHeaders().getFirst("Allow").toString();
+        initiateWebApplication(ResourceNoOptions.class);
+
+        ResponseInBound response = resourceProxy("/").invoke("OPTIONS", 
+                ResponseInBound.class);
+        String allow = response.getMetadata().getFirst("Allow").toString();
         assertTrue(allow.contains("GET"));
         assertTrue(allow.contains("PUT"));
         assertTrue(allow.contains("POST"));
@@ -112,10 +112,11 @@ public class OptionsTest extends AbstractBeanTester {
     }
     
     public void testWithOptions() {
-        HttpResponseContext r = callNoStatusCheck(ResourceWithOptions.class, "OPTIONS", "/", null, null, "");
-        assertEquals(200, r.getStatus());
-        assertEquals("OPTIONS", r.getEntity());
-        String allow = r.getHttpHeaders().getFirst("Allow").toString();
+        initiateWebApplication(ResourceWithOptions.class);
+
+        ResponseInBound response = resourceProxy("/").invoke("OPTIONS", 
+                ResponseInBound.class);
+        String allow = response.getMetadata().getFirst("Allow").toString();
         assertTrue(allow.contains("GET"));
         assertTrue(allow.contains("PUT"));
         assertTrue(allow.contains("POST"));

@@ -22,11 +22,10 @@
 
 package com.sun.ws.rest.impl.bean;
 
-import com.sun.ws.rest.api.core.HttpResponseContext;
+import com.sun.ws.rest.impl.client.ResponseInBound;
 import javax.ws.rs.HttpMethod;
 import javax.ws.rs.ProduceMime;
 import javax.ws.rs.UriTemplate;
-import javax.ws.rs.core.Response;
 
 /**
  *
@@ -66,27 +65,28 @@ public class InheritanceTest extends AbstractBeanTester {
     }
 
     public void testSuperResourceGet() {
-        HttpResponseContext response = callGet(SubResource.class, "/", "application/super");
-        String sr = (String)response.getEntity();
-        assertEquals("super", sr);
+        initiateWebApplication(SubResource.class);
+        String s = resourceProxy("/").acceptable("application/super").get(String.class);
+        assertEquals("super", s);
     }
     
     public void testSubResourceGet() {
-        HttpResponseContext response = callGet(SubResource.class, "/", "application/sub");
-        String sr = (String)response.getEntity();
-        assertEquals("sub", sr);
+        initiateWebApplication(SubResource.class);
+        String s = resourceProxy("/").acceptable("application/sub").get(String.class);
+        assertEquals("sub", s);
     }
     
     public void testSuperResourceOverrideGet() {
-        HttpResponseContext response = callNoStatusCheck(SubResourceOverride.class, "GET", 
-                "/", null, "application/super", "");
+        initiateWebApplication(SubResourceOverride.class);
+        ResponseInBound response = resourceProxy("/", false).acceptable("application/super").
+                get(ResponseInBound.class);
         assertEquals(406, response.getStatus());
     }
     
     public void testSubResourceOverrideGet() {
-        HttpResponseContext response = callGet(SubResourceOverride.class, "/", "application/sub");
-        String sr = (String)response.getEntity();
-        assertEquals("suboverride", sr);
+        initiateWebApplication(SubResourceOverride.class);
+        String s = resourceProxy("/").acceptable("application/sub").get(String.class);
+        assertEquals("suboverride", s);
     }
 
     
@@ -116,26 +116,27 @@ public class InheritanceTest extends AbstractBeanTester {
     }
     
     public void testSuperResourceWithProduceGet() {
-        HttpResponseContext response = callGet(SubResourceWithProduce.class, "/", "application/super");
-        String sr = (String)response.getEntity();
-        assertEquals("super", sr);
+        initiateWebApplication(SubResourceWithProduce.class);
+        String s = resourceProxy("/").acceptable("application/super").get(String.class);
+        assertEquals("super", s);
     }
     
     public void testSubResourceWithProduceGet() {
-        HttpResponseContext response = callGet(SubResourceWithProduce.class, "/", "application/default");
-        String sr = (String)response.getEntity();
-        assertEquals("sub", sr);
+        initiateWebApplication(SubResourceWithProduce.class);
+        String s = resourceProxy("/").acceptable("application/default").get(String.class);
+        assertEquals("sub", s);
     }
     
     public void testSuperResourceOverrideWithProduceGet() {
-        HttpResponseContext response = callNoStatusCheck(SubResourceWithProduceOverride.class, "GET", 
-                "/", null, "application/super", "");
+        initiateWebApplication(SubResourceWithProduceOverride.class);
+        ResponseInBound response = resourceProxy("/", false).acceptable("application/super").
+                get(ResponseInBound.class);
         assertEquals(406, response.getStatus());
     }
     
     public void testSubResourceOverrideWithProduceGet() {
-        HttpResponseContext response = callGet(SubResourceWithProduceOverride.class, "/", "application/default");
-        String sr = (String)response.getEntity();
-        assertEquals("suboverride", sr);
+        initiateWebApplication(SubResourceWithProduceOverride.class);
+        String s = resourceProxy("/").acceptable("application/default").get(String.class);
+        assertEquals("suboverride", s);
     }        
 }

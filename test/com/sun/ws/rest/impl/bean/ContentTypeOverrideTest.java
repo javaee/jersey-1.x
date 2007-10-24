@@ -23,7 +23,8 @@
 package com.sun.ws.rest.impl.bean;
 
 import com.sun.ws.rest.api.core.HttpContextAccess;
-import com.sun.ws.rest.api.core.HttpResponseContext;
+import com.sun.ws.rest.impl.client.ResourceProxy;
+import com.sun.ws.rest.impl.client.ResponseInBound;
 import javax.ws.rs.HttpMethod;
 import javax.ws.rs.ProduceMime;
 import javax.ws.rs.UriTemplate;
@@ -53,12 +54,12 @@ public class ContentTypeOverrideTest extends AbstractBeanTester {
     }
     
     public void testOverridden() {
-        HttpResponseContext response = callNoStatusCheck(WebResourceOverride.class, "GET", "/", 
-                null, "application/foo, application/bar", "");
+        initiateWebApplication(WebResourceOverride.class);
+        ResourceProxy r = resourceProxy("/");
         
-        assertEquals(200, response.getStatus());
-        
-        Object contentType = response.getHttpHeaders().getFirst("Content-Type");
-        assertEquals("application/foo", contentType);
+        ResponseInBound response = r.acceptable("application/foo", "application/bar").
+                get(ResponseInBound.class);
+
+        assertEquals(new MediaType("application/foo"), response.getContentType());
     }
 }
