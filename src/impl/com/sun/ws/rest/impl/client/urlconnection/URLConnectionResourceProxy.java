@@ -73,6 +73,11 @@ public final class URLConnectionResourceProxy extends ResourceProxy {
             return metadata;
         }
 
+        public boolean hasEntity() {
+            int l = uc.getContentLength();
+            return l > 0 || l == -1;
+        }
+        
         public <T> T getEntity(Class<T> c) {
             return getEntity(c, false);
         }

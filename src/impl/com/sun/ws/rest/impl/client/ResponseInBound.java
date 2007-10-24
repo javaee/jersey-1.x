@@ -37,6 +37,8 @@ public interface ResponseInBound {
     
     MediaType getContentType();
     
+    boolean hasEntity();
+    
     <T> T getEntity(Class<T> c) throws IllegalArgumentException;
     
     <T> T getEntity(Class<T> c, boolean successful) throws IllegalArgumentException;
