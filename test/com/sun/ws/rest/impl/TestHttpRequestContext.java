@@ -36,12 +36,15 @@ public class TestHttpRequestContext extends AbstractContainerRequest {
         super("GET", null);
     }
 
-    // method, entity, uri, baseUri, uriPath
+    public TestHttpRequestContext(String method, InputStream entity, 
+            String completeUri, String baseUri)  {
+        this(method, entity, URI.create(completeUri), URI.create(baseUri));
+    }
     
     public TestHttpRequestContext(String method, InputStream entity, 
-            String uri, String baseUri)  {
+            URI completeUri, URI baseUri)  {
         super(method, entity);
-        this.baseUri = URI.create(baseUri);
-        this.completeUri = URI.create(uri);
-    }    
+        this.completeUri = completeUri;
+        this.baseUri = baseUri;
+    }
 }

@@ -22,6 +22,7 @@
 
 package com.sun.ws.rest.impl.bean;
 
+import com.sun.ws.rest.impl.TestResourceProxy;
 import com.sun.ws.rest.api.core.HttpResponseContext;
 import com.sun.ws.rest.api.core.ResourceConfig;
 import com.sun.ws.rest.spi.container.AbstractContainerRequest;
@@ -31,9 +32,12 @@ import com.sun.ws.rest.impl.TestHttpRequestContext;
 import com.sun.ws.rest.impl.TestHttpResponseContext;
 import com.sun.ws.rest.impl.application.WebApplicationImpl;
 import com.sun.ws.rest.api.core.DefaultResourceConfig;
+import com.sun.ws.rest.impl.client.ResourceProxy;
+import com.sun.ws.rest.spi.container.WebApplication;
 import java.io.ByteArrayInputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -46,10 +50,33 @@ import junit.framework.TestCase;
  * @author Paul.Sandoz@Sun.Com
  */
 public abstract class AbstractBeanTester extends TestCase {
-        
+
+    protected WebApplication w;
+    
     protected AbstractBeanTester(String testName) {
         super(testName);
     }
+    
+    protected void initiateWebApplication(Class... resources) {
+        w = createWebApplication(resources);
+    }
+    
+    protected WebApplication createWebApplication(Class... resources) {
+        return createWebApplication(new HashSet<Class>(Arrays.asList(resources)));
+    }
+    
+    protected WebApplication createWebApplication(Set<Class> resources) {
+        WebApplicationImpl a = new WebApplicationImpl();
+        ResourceConfig c = new DefaultResourceConfig(resources);
+
+        a.initiate(null, c);
+        return a;
+    }
+    
+    protected ResourceProxy resourceProxy(String path) {
+        return new TestResourceProxy(path, w);
+    }
+    
     
     protected AbstractContainerResponse callGet(Class<?> r, String path, 
             String accept) {
