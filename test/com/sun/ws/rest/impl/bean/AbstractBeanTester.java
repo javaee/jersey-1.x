@@ -25,6 +25,8 @@ package com.sun.ws.rest.impl.bean;
 import com.sun.ws.rest.impl.TestResourceProxy;
 import com.sun.ws.rest.api.core.HttpResponseContext;
 import com.sun.ws.rest.api.core.ResourceConfig;
+import com.sun.ws.rest.impl.client.RequestOutBound;
+import com.sun.ws.rest.impl.client.ResponseInBound;
 import com.sun.ws.rest.spi.container.AbstractContainerRequest;
 import com.sun.ws.rest.spi.container.AbstractContainerResponse;
 import com.sun.ws.rest.impl.MultivaluedMapImpl;
@@ -33,6 +35,7 @@ import com.sun.ws.rest.impl.TestHttpResponseContext;
 import com.sun.ws.rest.impl.application.WebApplicationImpl;
 import com.sun.ws.rest.api.core.DefaultResourceConfig;
 import com.sun.ws.rest.impl.client.ResourceProxy;
+import com.sun.ws.rest.impl.client.ResourceProxyFilter;
 import com.sun.ws.rest.spi.container.WebApplication;
 import java.io.ByteArrayInputStream;
 import java.net.URI;
@@ -74,9 +77,27 @@ public abstract class AbstractBeanTester extends TestCase {
     }
     
     protected ResourceProxy resourceProxy(String path) {
-        return new TestResourceProxy(path, w);
+        return resourceProxy(path, true);
     }
     
+    protected ResourceProxy resourceProxy(String path, boolean checkStatus) {
+        ResourceProxy r = new TestResourceProxy(path, w);
+        if (checkStatus) {
+            r.addFilter(new ResourceProxyFilter() {
+                public ResponseInBound invoke(URI u, String method, RequestOutBound ro) {
+                    ResponseInBound r = getNext().invoke(u, method, ro);
+                    if (r.hasEntity()) {
+                        assertEquals(200, r.getStatus());
+                    } else {
+                        assertEquals(204, r.getStatus());
+                    }
+                    return r;
+                }
+            });
+        }
+        
+        return r;
+    }
     
     protected AbstractContainerResponse callGet(Class<?> r, String path, 
             String accept) {

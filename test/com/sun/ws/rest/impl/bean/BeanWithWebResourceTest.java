@@ -27,6 +27,7 @@ import com.sun.ws.rest.api.core.HttpResponseContext;
 import javax.ws.rs.ProduceMime;
 import javax.ws.rs.UriTemplate;
 import com.sun.ws.rest.api.core.WebResource;
+import com.sun.ws.rest.impl.client.ResourceProxy;
 import javax.ws.rs.HttpMethod;
 import javax.ws.rs.core.Response;
 
@@ -45,6 +46,8 @@ public class BeanWithWebResourceTest extends AbstractBeanTester {
         @HttpMethod("GET")
         public void doGet(HttpRequestContext request, HttpResponseContext response) {
             assertEquals("GET", request.getHttpMethod());
+            
+            response.setResponse(Response.Builder.ok("RESPONSE").build());
         }
         
         public void handleRequest(HttpRequestContext request, HttpResponseContext response) {
@@ -53,6 +56,8 @@ public class BeanWithWebResourceTest extends AbstractBeanTester {
             boolean match = "POST".equals(method) | "DELETE".equals(method) | 
                     "PUT".equals(method);
             assertTrue(match);
+            
+            response.setResponse(Response.Builder.ok("RESPONSE").build());
         }
     }
         
@@ -63,6 +68,7 @@ public class BeanWithWebResourceTest extends AbstractBeanTester {
         public void doGet(HttpRequestContext request, HttpResponseContext response) {
             assertEquals("GET", request.getHttpMethod());
             assertEquals("text/html", request.getRequestHeaders().getFirst("Accept"));
+            
             response.setResponse(Response.Builder.ok("RESPONSE").build());
         }
         
@@ -82,18 +88,22 @@ public class BeanWithWebResourceTest extends AbstractBeanTester {
     }
     
     public void testBeanWithWebResource() {
-        Class r = BeanWithWebResource.class;
-        callGet(r, "/a/b", "text/html");
-        callPost(r, "/a/b", "text/xhtml", "");
-        call(r, "PUT", "/a/b", "text/xhtml", "text/xhtml", "");
-        call(r, "DELETE", "/a/b", null, null, "");
+        initiateWebApplication(BeanWithWebResource.class);
+        ResourceProxy r = resourceProxy("/a/b", false);
+        
+        r.acceptable("text/html").get(String.class);
+        r.acceptable("text/xhtml").post();
+        r.acceptable("text/xhtml").put();
+        r.delete();
     }    
     
     public void testBeanProduceWithWebResource() {
-        Class r = BeanProduceWithWebResource.class;
-        callGet(r, "/a/b", "text/html");
-        callPost(r, "/a/b", "text/xhtml", "");
-        call(r, "PUT", "/a/b", "text/xhtml", "text/xhtml", "");
-        call(r, "DELETE", "/a/b", null, null, "");
+        initiateWebApplication(BeanProduceWithWebResource.class);
+        ResourceProxy r = resourceProxy("/a/b", false);
+        
+        r.acceptable("text/html").get(String.class);
+        r.acceptable("text/xhtml").post();
+        r.acceptable("text/xhtml").put();
+        r.delete();        
     }    
 }

@@ -78,6 +78,10 @@ public class TestResourceProxy extends ResourceProxy {
             return metadata;
         }
 
+        public boolean hasEntity() {
+            return response.getEntity() != null;
+        }
+        
         public <T> T getEntity(Class<T> c) {
             return getEntity(c, false);
         }

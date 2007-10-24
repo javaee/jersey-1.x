@@ -104,7 +104,7 @@ public class AcceptTest extends AbstractBeanTester {
     
     public void testQualityErrorGreaterThanOne() {
         initiateWebApplication(WebResource.class);
-        ResourceProxy r = resourceProxy("/");
+        ResourceProxy r = resourceProxy("/", false);
 
         ResponseInBound response = r.acceptable("application/foo;q=1.1").get(ResponseInBound.class);
         assertEquals(400, response.getStatus());        
@@ -112,7 +112,7 @@ public class AcceptTest extends AbstractBeanTester {
     
     public void testQualityErrorMoreThanThreeDigits() {
         initiateWebApplication(WebResource.class);
-        ResourceProxy r = resourceProxy("/");
+        ResourceProxy r = resourceProxy("/", false);
         
         ResponseInBound response = r.acceptable("application/foo;q=0.1234").get(ResponseInBound.class);
         assertEquals(400, response.getStatus());
