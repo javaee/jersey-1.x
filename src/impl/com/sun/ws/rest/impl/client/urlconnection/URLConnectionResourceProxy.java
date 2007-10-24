@@ -23,10 +23,11 @@
 package com.sun.ws.rest.impl.client.urlconnection;
 
 import com.sun.ws.rest.impl.RequestHttpHeadersImpl;
-import com.sun.ws.rest.impl.ResponseHttpHeadersImpl;
 import com.sun.ws.rest.impl.client.RequestOutBound;
 import com.sun.ws.rest.impl.client.ResourceProxy;
+import com.sun.ws.rest.impl.client.ResourceProxyException;
 import com.sun.ws.rest.impl.client.ResponseInBound;
+import com.sun.ws.rest.impl.client.ResponseInBoundImpl;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -48,7 +49,7 @@ import javax.ws.rs.ext.ProviderFactory;
  * @author Paul.Sandoz@Sun.Com
  */
 public final class URLConnectionResourceProxy extends ResourceProxy {
-    private final static class URLConnectionResponse implements ResponseInBound {
+    private final static class URLConnectionResponse extends ResponseInBoundImpl {
         private final int status;
         private final HttpURLConnection uc;
         private final MultivaluedMap<String, String> metadata;
@@ -68,17 +69,21 @@ public final class URLConnectionResourceProxy extends ResourceProxy {
             return status;
         }
 
-        public MultivaluedMap<String, String> getHeaders() {
+        public MultivaluedMap<String, String> getMetadata() {
             return metadata;
         }
 
-        public <T> T getEntity(Class<T> c) throws IOException {
+        public <T> T getEntity(Class<T> c) {
             return getEntity(c, false);
         }
         
-        public <T> T getEntity(Class<T> c, boolean successful) throws IOException {
-            return ProviderFactory.getInstance().createEntityProvider(c).
-                    readFrom(c, getMediaType(), null, getInputStream(successful));
+        public <T> T getEntity(Class<T> c, boolean successful) {
+            try {
+                return ProviderFactory.getInstance().createEntityProvider(c).
+                        readFrom(c, getContentType(), null, getInputStream(successful));
+            } catch (IOException ex) {
+                throw new IllegalArgumentException(ex);
+            }
         }
 
         private InputStream getInputStream(boolean successful) throws IOException {
@@ -90,23 +95,17 @@ public final class URLConnectionResourceProxy extends ResourceProxy {
                 return uc.getErrorStream();
             }
         }
-        
-        private MediaType getMediaType() {
-            return new MediaType(metadata.getFirst("Content-Type"));
-        }
     }
     
     public URLConnectionResourceProxy(URI u) throws MalformedURLException, IOException {
         super(u);
     }
     
-    public ResponseInBound invoke(URI u, String method, RequestOutBound ro) throws IOException {
+    public ResponseInBound invoke(URI u, String method, RequestOutBound ro) {
         try {
             return _invoke(u.toURL(), method, ro);
-        } catch (ProtocolException ex) {
-            IOException ioex = new IOException();
-            ioex.initCause(ex);
-            throw ioex;
+        } catch (Exception ex) {
+            throw new ResourceProxyException(ex);
         }
     }
 

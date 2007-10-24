@@ -22,22 +22,25 @@
 
 package com.sun.ws.rest.impl.client;
 
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.MultivaluedMap;
-
 /**
  *
  * @author Paul.Sandoz@Sun.Com
  */
-public interface ResponseInBound {
+public class ResourceProxyException extends RuntimeException {
+
+    public ResourceProxyException() {
+        super();
+    }    
     
-    int getStatus();
+    public ResourceProxyException(String message) {
+	super(message);
+    }
     
-    MultivaluedMap<String, String> getMetadata();
+    public ResourceProxyException(String message, Throwable cause) {
+        super(message, cause);
+    }
     
-    MediaType getContentType();
-    
-    <T> T getEntity(Class<T> c) throws IllegalArgumentException;
-    
-    <T> T getEntity(Class<T> c, boolean successful) throws IllegalArgumentException;
+    public ResourceProxyException(Throwable cause) {
+        super(cause);
+    }    
 }

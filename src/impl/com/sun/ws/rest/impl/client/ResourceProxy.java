@@ -74,95 +74,95 @@ public abstract class ResourceProxy implements ResourceProxyInvoker {
         this.head = this;
     }
     
-    public final ResponseInBound head() throws IOException {
+    public final ResponseInBound head() {
         return head(new RequestOutBoundImpl());
     }
     
-    public final ResponseInBound head(RequestOutBound ro) throws IOException {
+    public final ResponseInBound head(RequestOutBound ro) {
         return _invoke(u, "HEAD", ro);
     }
 
     
-    public final <T> T get(Class<T> c) throws IOException {
+    public final <T> T get(Class<T> c) {
         return get(c, new RequestOutBoundImpl());
     }
     
-    public final <T> T get(Class<T> c, RequestOutBound ro) throws IOException {
+    public final <T> T get(Class<T> c, RequestOutBound ro) {
         return invoke("GET", c, ro);
     }
     
     
-    public final void put() throws IOException {
+    public final void put() {
         put(new RequestOutBoundImpl());
     }
     
-    public final void put(Object requestEntity) throws IOException {
+    public final void put(Object requestEntity) {
         put(new RequestOutBoundImpl(requestEntity));
     }
     
-    public final void put(RequestOutBound ro) throws IOException {
+    public final void put(RequestOutBound ro) {
         voidInvoke("PUT", ro);
     }
     
-    public final <T> T put(Class<T> c) throws IOException {
+    public final <T> T put(Class<T> c) {
         return put(c, new RequestOutBoundImpl());
     }
 
-    public final <T> T put(Class<T> c, Object requestEntity) throws IOException {
+    public final <T> T put(Class<T> c, Object requestEntity) {
         return put(c, new RequestOutBoundImpl(requestEntity));
     }
     
-    public final <T> T put(Class<T> c, RequestOutBound ro) throws IOException {
+    public final <T> T put(Class<T> c, RequestOutBound ro) {
         return invoke("PUT", c, ro);
     }
     
     
-    public final void post() throws IOException {
+    public final void post() {
         put(new RequestOutBoundImpl());
     }
     
-    public final void post(Object requestEntity) throws IOException {
+    public final void post(Object requestEntity) {
         put(new RequestOutBoundImpl(requestEntity));
     }
     
-    public final void post(RequestOutBound ro) throws IOException {
+    public final void post(RequestOutBound ro) {
         voidInvoke("POST", ro);
     }
     
-    public final <T> T post(Class<T> c) throws IOException {
+    public final <T> T post(Class<T> c) {
         return post(c, new RequestOutBoundImpl());    
     }
 
-    public final <T> T post(Class<T> c, Object requestEntity) throws IOException {
+    public final <T> T post(Class<T> c, Object requestEntity) {
         return post(c, new RequestOutBoundImpl(requestEntity));
     }
     
-    public final <T> T post(Class<T> c, RequestOutBound ro) throws IOException {
+    public final <T> T post(Class<T> c, RequestOutBound ro) {
         return invoke("POST", c, ro);
     }    
     
     
-    public final void delete() throws IOException {
+    public final void delete() {
         delete(new RequestOutBoundImpl());
     }
     
-    public final void delete(Object requestEntity) throws IOException {
+    public final void delete(Object requestEntity) {
         delete(new RequestOutBoundImpl(requestEntity));
     }
     
-    public final void delete(RequestOutBound ro) throws IOException {
+    public final void delete(RequestOutBound ro) {
         voidInvoke("DELETE", ro);
     }
     
-    public final <T> T delete(Class<T> c) throws IOException {
+    public final <T> T delete(Class<T> c) {
         return delete(c, new RequestOutBoundImpl());    
     }
 
-    public final <T> T delete(Class<T> c, Object requestEntity) throws IOException {
+    public final <T> T delete(Class<T> c, Object requestEntity) {
         return delete(c, new RequestOutBoundImpl(requestEntity));
     }
     
-    public final <T> T delete(Class<T> c, RequestOutBound ro) throws IOException {
+    public final <T> T delete(Class<T> c, RequestOutBound ro) {
         return invoke("DELETE", c, ro);
     }    
     
@@ -200,39 +200,39 @@ public abstract class ResourceProxy implements ResourceProxyInvoker {
         }
         
         
-        public final ResponseInBound head() throws IOException {
+        public final ResponseInBound head() {
             return ResourceProxy.this.head(b.build());
         }
     
         
-        public final <T> T get(Class<T> c) throws IOException {
+        public final <T> T get(Class<T> c) {
             return ResourceProxy.this.get(c, b.build());
         }
         
         
-        public final void put() throws IOException {
+        public final void put() {
             ResourceProxy.this.put(b.build());
         }
 
-        public final <T> T put(Class<T> c) throws IOException {
+        public final <T> T put(Class<T> c) {
             return ResourceProxy.this.put(c, b.build());
         }
     
         
-        public final void post() throws IOException {
+        public final void post() {
             ResourceProxy.this.post(b.build());
         }
 
-        public final <T> T post(Class<T> c) throws IOException {
+        public final <T> T post(Class<T> c) {
             return ResourceProxy.this.post(c, b.build());
         }
         
         
-        public final void delete() throws IOException {
+        public final void delete() {
             ResourceProxy.this.delete(b.build());
         }
 
-        public final <T> T delete(Class<T> c) throws IOException {
+        public final <T> T delete(Class<T> c) {
             return ResourceProxy.this.delete(c, b.build());
         }
     }
@@ -258,22 +258,22 @@ public abstract class ResourceProxy implements ResourceProxyInvoker {
     }    
     
     
-    public final <T> T invoke(String method, Class<T> c, RequestOutBound ro) throws IOException {
+    public final <T> T invoke(String method, Class<T> c, RequestOutBound ro) {
         ResponseInBound r = _invoke(u, method, ro);
         return (c == ResponseInBound.class) ? c.cast(r) : r.getEntity(c, true);        
     }
     
-    private final void voidInvoke(String method, RequestOutBound ro) throws IOException {
+    private final void voidInvoke(String method, RequestOutBound ro) {
         ResponseInBound r = _invoke(u, method, ro);
         if (r.getStatus() >= 300)
-            throw new IOException();
+            throw new ResourceProxyException();
     }
     
-    private final ResponseInBound _invoke(URI u, String method, RequestOutBound ro) throws IOException {
+    private final ResponseInBound _invoke(URI u, String method, RequestOutBound ro) {
         return head.invoke(u, method, ro);
     }
     
-    public abstract ResponseInBound invoke(URI u, String method, RequestOutBound ro) throws IOException;
+    public abstract ResponseInBound invoke(URI u, String method, RequestOutBound ro);
     
     
     public static ResourceProxy create(String u) {

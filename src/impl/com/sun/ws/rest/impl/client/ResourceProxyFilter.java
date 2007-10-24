@@ -1,6 +1,5 @@
 package com.sun.ws.rest.impl.client;
 
-import java.io.IOException;
 import java.net.URI;
 
 /**
@@ -18,5 +17,5 @@ public abstract class ResourceProxyFilter implements ResourceProxyInvoker {
         return next;
     }
     
-    public abstract ResponseInBound invoke(URI u, String method, RequestOutBound ro) throws IOException;
+    public abstract ResponseInBound invoke(URI u, String method, RequestOutBound ro);
 }

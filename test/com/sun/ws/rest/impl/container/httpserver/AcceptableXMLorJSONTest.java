@@ -87,11 +87,11 @@ public class AcceptableXMLorJSONTest extends TestCase {
 
         ResourceProxy r = ResourceProxy.create("http://localhost:9998/context/resource");
         r.addFilter(new ResourceProxyFilter() {
-            public ResponseInBound invoke(URI u, String method, RequestOutBound ro) throws IOException {
+            public ResponseInBound invoke(URI u, String method, RequestOutBound ro) {
                 ResponseInBound ri = getNext().invoke(u, method, ro);
                 
                 assertEquals(200, ri.getStatus());
-                assertEquals("application/xml", ri.getHeaders().getFirst("Content-Type"));
+                assertEquals("application/xml", ri.getMetadata().getFirst("Content-Type"));
                 return ri;
             }
         });        
@@ -105,11 +105,11 @@ public class AcceptableXMLorJSONTest extends TestCase {
         
         r.removeAllFilters();
         r.addFilter(new ResourceProxyFilter() {
-            public ResponseInBound invoke(URI u, String method, RequestOutBound ro) throws IOException {
+            public ResponseInBound invoke(URI u, String method, RequestOutBound ro) {
                 ResponseInBound ri = getNext().invoke(u, method, ro);
                 
                 assertEquals(200, ri.getStatus());
-                assertEquals("application/json", ri.getHeaders().getFirst("Content-Type"));
+                assertEquals("application/json", ri.getMetadata().getFirst("Content-Type"));
                 return ri;
             }
         });

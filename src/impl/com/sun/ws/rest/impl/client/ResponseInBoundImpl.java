@@ -23,21 +23,15 @@
 package com.sun.ws.rest.impl.client;
 
 import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.MultivaluedMap;
 
 /**
  *
  * @author Paul.Sandoz@Sun.Com
  */
-public interface ResponseInBound {
+public abstract class ResponseInBoundImpl implements ResponseInBound {
     
-    int getStatus();
-    
-    MultivaluedMap<String, String> getMetadata();
-    
-    MediaType getContentType();
-    
-    <T> T getEntity(Class<T> c) throws IllegalArgumentException;
-    
-    <T> T getEntity(Class<T> c, boolean successful) throws IllegalArgumentException;
+    public MediaType getContentType() {
+        String ct = getMetadata().getFirst("Content-Type");
+        return (ct != null) ? new MediaType(ct) : null;
+    }
 }
