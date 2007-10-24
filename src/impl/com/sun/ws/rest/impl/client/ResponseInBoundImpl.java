@@ -23,13 +23,19 @@
 package com.sun.ws.rest.impl.client;
 
 import java.net.URI;
+import java.text.ParseException;
+import javax.ws.rs.core.EntityTag;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.ext.HeaderProvider;
+import javax.ws.rs.ext.ProviderFactory;
 
 /**
  *
  * @author Paul.Sandoz@Sun.Com
  */
 public abstract class ResponseInBoundImpl implements ResponseInBound {
+    private static final HeaderProvider<EntityTag> entityTagProvider = 
+            ProviderFactory.getInstance().createHeaderProvider(EntityTag.class);
     
     public MediaType getContentType() {
         String ct = getMetadata().getFirst("Content-Type");
@@ -39,6 +45,16 @@ public abstract class ResponseInBoundImpl implements ResponseInBound {
     public URI getLocation() {
         String l = getMetadata().getFirst("Location");        
         return (l != null) ? URI.create(l) : null;
+    }
+    
+    public EntityTag getEntityTag() {
+        String t = getMetadata().getFirst("ETag");
+        
+        try {
+            return (t != null) ? entityTagProvider.fromString(t) : null;
+        } catch (ParseException ex) {
+            throw new IllegalArgumentException(ex);
+        }
     }
 
 }

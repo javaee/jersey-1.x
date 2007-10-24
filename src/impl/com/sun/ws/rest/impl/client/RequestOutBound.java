@@ -60,6 +60,10 @@ public interface RequestOutBound {
             return new RequestOutBoundBuilder().accept(types);            
         }
         
+        public static Builder request(String name, Object value) {
+            return new RequestOutBoundBuilder().header(name, value);
+        }
+        
         public abstract Builder entity(Object entity);
         
         public abstract Builder entity(Object entity, MediaType type);
@@ -69,5 +73,7 @@ public interface RequestOutBound {
         public abstract Builder accept(MediaType... types);
     
         public abstract Builder accept(String... types);
+        
+        public abstract Builder header(String name, Object value);
     }
 }

@@ -199,6 +199,10 @@ public abstract class ResourceProxy implements ResourceProxyInvoker {
             return this;
         }
         
+        public Builder header(String name, Object value) {
+            b.header(name, value);
+            return this;
+        }
         
         public final ResponseInBound head() {
             return ResourceProxy.this.head(b.build());
@@ -257,7 +261,16 @@ public abstract class ResourceProxy implements ResourceProxyInvoker {
         return new Builder(RequestOutBound.Builder.acceptable(types));
     }    
     
+    public final Builder request(String name, Object value) {
+        return new Builder(RequestOutBound.Builder.request(name, value));    
+    }
+
     
+    
+    public final <T> T invoke(String method, Class<T> c) {
+        return invoke(method, c, new RequestOutBoundImpl());
+    }
+
     public final <T> T invoke(String method, Class<T> c, RequestOutBound ro) {
         ResponseInBound r = _invoke(u, method, ro);
         return (c == ResponseInBound.class) ? c.cast(r) : r.getEntity(c, true);        

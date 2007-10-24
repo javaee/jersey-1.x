@@ -77,6 +77,11 @@ public class RequestOutBoundBuilder extends RequestOutBound.Builder {
         return this;
     }
     
+    public Builder header(String name, Object value) {
+        getMetadata().add(name, value);
+        return this;
+    }
+    
     private MultivaluedMap<String, Object> getMetadata() {
         if (metadata != null) return metadata;
         

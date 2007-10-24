@@ -23,6 +23,7 @@
 package com.sun.ws.rest.impl.client;
 
 import java.net.URI;
+import javax.ws.rs.core.EntityTag;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 
@@ -39,6 +40,8 @@ public interface ResponseInBound {
     MediaType getContentType();
     
     URI getLocation();
+    
+    EntityTag getEntityTag();
     
     boolean hasEntity();
     
