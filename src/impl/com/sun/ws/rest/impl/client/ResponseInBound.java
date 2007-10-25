@@ -23,6 +23,7 @@
 package com.sun.ws.rest.impl.client;
 
 import java.net.URI;
+import java.util.Date;
 import javax.ws.rs.core.EntityTag;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
@@ -42,6 +43,8 @@ public interface ResponseInBound {
     URI getLocation();
     
     EntityTag getEntityTag();
+    
+    Date getLastModified();
     
     String getLangauge();
     

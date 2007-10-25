@@ -24,6 +24,7 @@ package com.sun.ws.rest.impl.client;
 
 import java.net.URI;
 import java.text.ParseException;
+import java.util.Date;
 import javax.ws.rs.core.EntityTag;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.ext.HeaderProvider;
@@ -36,6 +37,9 @@ import javax.ws.rs.ext.ProviderFactory;
 public abstract class ResponseInBoundImpl implements ResponseInBound {
     private static final HeaderProvider<EntityTag> entityTagProvider = 
             ProviderFactory.getInstance().createHeaderProvider(EntityTag.class);
+    
+    private static final HeaderProvider<Date> dateProvider = 
+            ProviderFactory.getInstance().createHeaderProvider(Date.class);
     
     public MediaType getContentType() {
         String ct = getMetadata().getFirst("Content-Type");
@@ -55,6 +59,16 @@ public abstract class ResponseInBoundImpl implements ResponseInBound {
         } catch (ParseException ex) {
             throw new IllegalArgumentException(ex);
         }
+    }
+    
+    public Date getLastModified() {
+        String d = getMetadata().getFirst("Last-Modified");
+        
+        try {
+            return (d != null) ? dateProvider.fromString(d) : null;
+        } catch (ParseException ex) {
+            throw new IllegalArgumentException(ex);
+        }        
     }
 
     public String getLangauge() {
