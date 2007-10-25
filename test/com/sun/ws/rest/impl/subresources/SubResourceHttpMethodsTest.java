@@ -31,7 +31,7 @@ import com.sun.ws.rest.impl.bean.*;
  *
  * @author Paul.Sandoz@Sun.Com
  */
-public class SubResourceHttpMethodsTest extends AbstractBeanTester {
+public class SubResourceHttpMethodsTest extends AbstractResourceTester {
     
     public SubResourceHttpMethodsTest(String testName) {
         super(testName);

@@ -30,7 +30,7 @@ import javax.ws.rs.UriTemplate;
  *
  * @author Paul.Sandoz@Sun.Com
  */
-public class TypeParameterTest extends AbstractBeanTester {
+public class TypeParameterTest extends AbstractResourceTester {
     
     public TypeParameterTest(String testName) {
         super(testName);

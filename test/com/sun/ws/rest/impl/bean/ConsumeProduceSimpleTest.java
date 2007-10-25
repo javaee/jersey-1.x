@@ -35,7 +35,7 @@ import javax.ws.rs.core.Response;
  *
  * @author Paul.Sandoz@Sun.Com
  */
-public class ConsumeProduceSimpleTest extends AbstractBeanTester {
+public class ConsumeProduceSimpleTest extends AbstractResourceTester {
     
     public ConsumeProduceSimpleTest(String testName) {
         super(testName);

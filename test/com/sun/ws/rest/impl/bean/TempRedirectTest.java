@@ -24,7 +24,7 @@ package com.sun.ws.rest.impl.bean;
 
 import javax.ws.rs.HttpMethod;
 import javax.ws.rs.UriTemplate;
-import com.sun.ws.rest.impl.bean.AbstractBeanTester;
+import com.sun.ws.rest.impl.bean.AbstractResourceTester;
 import com.sun.ws.rest.impl.client.ResponseInBound;
 import java.net.URI;
 import javax.ws.rs.core.Response;
@@ -34,7 +34,7 @@ import javax.ws.rs.core.UriBuilder;
  *
  * @author Paul.Sandoz@Sun.Com
  */
-public class TempRedirectTest extends AbstractBeanTester {
+public class TempRedirectTest extends AbstractResourceTester {
     
     public TempRedirectTest(String testName) {
         super(testName);

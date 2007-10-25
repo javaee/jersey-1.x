@@ -36,7 +36,7 @@ import javax.ws.rs.core.Response;
  *
  * @author Paul.Sandoz@Sun.Com
  */
-public class ContentTypeOverrideTest extends AbstractBeanTester {
+public class ContentTypeOverrideTest extends AbstractResourceTester {
     
     public ContentTypeOverrideTest(String testName) {
         super(testName);

@@ -37,7 +37,7 @@ import java.util.List;
  *
  * @author Paul.Sandoz@Sun.Com
  */
-public class QueryParamStringConstructorTest extends AbstractBeanTester {
+public class QueryParamStringConstructorTest extends AbstractResourceTester {
 
     public QueryParamStringConstructorTest(String testName) {
         super(testName);

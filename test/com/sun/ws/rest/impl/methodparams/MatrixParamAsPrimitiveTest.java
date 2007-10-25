@@ -35,7 +35,7 @@ import java.util.List;
  *
  * @author Paul.Sandoz@Sun.Com
  */
-public class MatrixParamAsPrimitiveTest extends AbstractBeanTester {
+public class MatrixParamAsPrimitiveTest extends AbstractResourceTester {
 
     public MatrixParamAsPrimitiveTest(String testName) {
         super(testName);

@@ -30,7 +30,7 @@ import javax.ws.rs.UriTemplate;
  *
  * @author Paul.Sandoz@Sun.Com
  */
-public class DryHttpMethodsTest extends AbstractBeanTester {
+public class DryHttpMethodsTest extends AbstractResourceTester {
     
     public DryHttpMethodsTest(String testName) {
         super(testName);

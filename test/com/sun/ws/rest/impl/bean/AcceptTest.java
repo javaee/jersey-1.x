@@ -36,7 +36,7 @@ import javax.ws.rs.core.Response;
  * @author Paul.Sandoz@Sun.Com
  */
 @SuppressWarnings("unchecked")
-public class AcceptTest extends AbstractBeanTester {
+public class AcceptTest extends AbstractResourceTester {
     
     public AcceptTest(String testName) {
         super(testName);

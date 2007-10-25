@@ -34,7 +34,7 @@ import java.math.BigInteger;
  *
  * @author Paul.Sandoz@Sun.Com
  */
-public class UriParamStringConstructorTest extends AbstractBeanTester {
+public class UriParamStringConstructorTest extends AbstractResourceTester {
 
     public UriParamStringConstructorTest(String testName) {
         super(testName);

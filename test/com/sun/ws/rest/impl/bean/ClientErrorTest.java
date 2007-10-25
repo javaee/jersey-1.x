@@ -34,7 +34,7 @@ import com.sun.ws.rest.impl.client.ResponseInBound;
  *
  * @author Paul.Sandoz@Sun.Com
  */
-public class ClientErrorTest extends AbstractBeanTester {
+public class ClientErrorTest extends AbstractResourceTester {
     
     public ClientErrorTest(String testName) {
         super(testName);

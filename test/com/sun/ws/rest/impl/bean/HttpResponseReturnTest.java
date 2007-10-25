@@ -24,14 +24,14 @@ package com.sun.ws.rest.impl.bean;
 
 import javax.ws.rs.HttpMethod;
 import javax.ws.rs.UriTemplate;
-import com.sun.ws.rest.impl.bean.AbstractBeanTester;
+import com.sun.ws.rest.impl.bean.AbstractResourceTester;
 import javax.ws.rs.core.Response;
 
 /**
  *
  * @author Paul.Sandoz@Sun.Com
  */
-public class HttpResponseReturnTest extends AbstractBeanTester {
+public class HttpResponseReturnTest extends AbstractResourceTester {
     
     public HttpResponseReturnTest(String testName) {
         super(testName);

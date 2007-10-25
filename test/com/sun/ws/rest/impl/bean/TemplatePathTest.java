@@ -31,7 +31,7 @@ import javax.ws.rs.UriParam;
  * @author Paul.Sandoz@Sun.Com
  */
 @SuppressWarnings("unchecked")
-public class TemplatePathTest extends AbstractBeanTester {
+public class TemplatePathTest extends AbstractResourceTester {
     
     public TemplatePathTest(String testName) {
         super(testName);

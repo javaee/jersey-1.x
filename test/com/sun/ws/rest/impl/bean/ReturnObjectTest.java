@@ -30,7 +30,7 @@ import javax.ws.rs.core.Response;
  *
  * @author Paul.Sandoz@Sun.Com
  */
-public class ReturnObjectTest extends AbstractBeanTester {
+public class ReturnObjectTest extends AbstractResourceTester {
     
     public ReturnObjectTest(String testName) {
         super(testName);

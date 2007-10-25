@@ -36,7 +36,7 @@ import javax.ws.rs.core.UriBuilder;
  *
  * @author Paul.Sandoz@Sun.Com
  */
-public class CreatedTest extends AbstractBeanTester {
+public class CreatedTest extends AbstractResourceTester {
     
     public CreatedTest(String testName) {
         super(testName);

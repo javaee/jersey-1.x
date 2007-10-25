@@ -32,7 +32,7 @@ import com.sun.ws.rest.impl.client.ResourceProxy;
  *
  * @author Paul.Sandoz@Sun.Com
  */
-public class WebResourceBeanTest extends AbstractBeanTester {
+public class WebResourceBeanTest extends AbstractResourceTester {
     
     public WebResourceBeanTest(String testName) {
         super(testName);

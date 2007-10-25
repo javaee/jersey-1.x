@@ -33,7 +33,7 @@ import javax.ws.rs.core.UriBuilder;
  *
  * @author Paul.Sandoz@Sun.Com
  */
-public class RedirectToPathWithSlashTest extends AbstractBeanTester {
+public class RedirectToPathWithSlashTest extends AbstractResourceTester {
     
     public RedirectToPathWithSlashTest(String testName) {
         super(testName);

@@ -35,7 +35,7 @@ import java.util.List;
  *
  * @author Paul.Sandoz@Sun.Com
  */
-public class QueryParamAsPrimitiveTest extends AbstractBeanTester {
+public class QueryParamAsPrimitiveTest extends AbstractResourceTester {
 
     public QueryParamAsPrimitiveTest(String testName) {
         super(testName);

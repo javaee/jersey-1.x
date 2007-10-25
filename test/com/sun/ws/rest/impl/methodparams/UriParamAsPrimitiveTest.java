@@ -33,7 +33,7 @@ import com.sun.ws.rest.impl.client.ResponseInBound;
  *
  * @author Paul.Sandoz@Sun.Com
  */
-public class UriParamAsPrimitiveTest extends AbstractBeanTester {
+public class UriParamAsPrimitiveTest extends AbstractResourceTester {
 
     public UriParamAsPrimitiveTest(String testName) {
         super(testName);

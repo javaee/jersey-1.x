@@ -31,7 +31,7 @@ import javax.ws.rs.UriTemplate;
  * @author Paul.Sandoz@Sun.Com
  */
 @SuppressWarnings("unchecked")
-public class ByteArrayRepresentationTest extends AbstractBeanTester {
+public class ByteArrayRepresentationTest extends AbstractResourceTester {
     
     public ByteArrayRepresentationTest(String testName) {
         super(testName);

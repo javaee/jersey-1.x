@@ -31,7 +31,7 @@ import javax.ws.rs.core.Response;
  *
  * @author Paul.Sandoz@Sun.Com
  */
-public class ReturnResponseHeadersTest extends AbstractBeanTester {
+public class ReturnResponseHeadersTest extends AbstractResourceTester {
     
     public ReturnResponseHeadersTest(String testName) {
         super(testName);

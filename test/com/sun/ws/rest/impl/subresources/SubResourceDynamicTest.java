@@ -31,7 +31,7 @@ import com.sun.ws.rest.impl.bean.*;
  *
  * @author Paul.Sandoz@Sun.Com
  */
-public class SubResourceDynamicTest extends AbstractBeanTester {
+public class SubResourceDynamicTest extends AbstractResourceTester {
     
     public SubResourceDynamicTest(String testName) {
         super(testName);

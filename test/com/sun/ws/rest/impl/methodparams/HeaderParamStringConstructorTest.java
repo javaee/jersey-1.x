@@ -37,7 +37,7 @@ import java.util.List;
  *
  * @author Paul.Sandoz@Sun.Com
  */
-public class HeaderParamStringConstructorTest extends AbstractBeanTester {
+public class HeaderParamStringConstructorTest extends AbstractResourceTester {
 
     public HeaderParamStringConstructorTest(String testName) {
         super(testName);

@@ -41,12 +41,12 @@ import junit.framework.TestCase;
  *
  * @author Paul.Sandoz@Sun.Com
  */
-public abstract class AbstractBeanTester extends TestCase {
+public abstract class AbstractResourceTester extends TestCase {
     protected static final URI BASE_URI = URI.create("/base/");
 
     protected WebApplication w;
     
-    protected AbstractBeanTester(String testName) {
+    protected AbstractResourceTester(String testName) {
         super(testName);
     }
     

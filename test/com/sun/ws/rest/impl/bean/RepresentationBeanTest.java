@@ -30,7 +30,7 @@ import javax.ws.rs.HttpMethod;
  *
  * @author Paul.Sandoz@Sun.Com
  */
-public class RepresentationBeanTest extends AbstractBeanTester {
+public class RepresentationBeanTest extends AbstractResourceTester {
     
     public RepresentationBeanTest(String testName) {
         super(testName);

@@ -38,7 +38,7 @@ import javax.ws.rs.HttpMethod;
  *
  * @author Marc Hadley
  */
-public class ResourceLifecycleTest extends AbstractBeanTester {
+public class ResourceLifecycleTest extends AbstractResourceTester {
     
     @UriTemplate("foo")
     @Singleton

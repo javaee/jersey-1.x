@@ -32,7 +32,7 @@ import javax.ws.rs.core.Response;
  *
  * @author Paul.Sandoz@Sun.Com
  */
-public class ProduceMimeAcceptableTest extends AbstractBeanTester {
+public class ProduceMimeAcceptableTest extends AbstractResourceTester {
     
     public ProduceMimeAcceptableTest(String testName) {
         super(testName);

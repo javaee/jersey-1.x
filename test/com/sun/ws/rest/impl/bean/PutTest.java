@@ -30,7 +30,7 @@ import javax.ws.rs.UriTemplate;
  *
  * @author Paul.Sandoz@Sun.Com
  */
-public class PutTest extends AbstractBeanTester {
+public class PutTest extends AbstractResourceTester {
     
     public PutTest(String testName) {
         super(testName);

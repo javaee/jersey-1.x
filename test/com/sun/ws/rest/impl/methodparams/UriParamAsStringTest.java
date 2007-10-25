@@ -32,7 +32,7 @@ import com.sun.ws.rest.impl.bean.*;
  * @author Paul.Sandoz@Sun.Com
  */
 @SuppressWarnings("unchecked")
-public class UriParamAsStringTest extends AbstractBeanTester {
+public class UriParamAsStringTest extends AbstractResourceTester {
 
     public UriParamAsStringTest(String testName) {
         super(testName);

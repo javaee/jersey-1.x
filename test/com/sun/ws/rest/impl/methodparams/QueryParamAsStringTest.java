@@ -35,7 +35,7 @@ import java.util.List;
  * @author Paul.Sandoz@Sun.Com
  */
 @SuppressWarnings("unchecked")
-public class QueryParamAsStringTest extends AbstractBeanTester {
+public class QueryParamAsStringTest extends AbstractResourceTester {
 
     public QueryParamAsStringTest(String testName) {
         super(testName);

@@ -36,7 +36,7 @@ import javax.ws.rs.core.Response;
  * @author Paul.Sandoz@Sun.Com
  */
 @SuppressWarnings("unchecked")
-public class PreconditionTest extends AbstractBeanTester {
+public class PreconditionTest extends AbstractResourceTester {
     
     public PreconditionTest(String testName) {
         super(testName);

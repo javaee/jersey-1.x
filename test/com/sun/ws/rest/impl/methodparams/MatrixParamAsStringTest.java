@@ -35,7 +35,7 @@ import java.util.List;
  * @author Paul.Sandoz@Sun.Com
  */
 @SuppressWarnings("unchecked")
-public class MatrixParamAsStringTest extends AbstractBeanTester {
+public class MatrixParamAsStringTest extends AbstractResourceTester {
 
     public MatrixParamAsStringTest(String testName) {
         super(testName);

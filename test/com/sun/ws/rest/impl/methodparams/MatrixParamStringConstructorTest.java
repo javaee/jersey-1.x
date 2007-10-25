@@ -37,7 +37,7 @@ import java.util.List;
  *
  * @author Paul.Sandoz@Sun.Com
  */
-public class MatrixParamStringConstructorTest extends AbstractBeanTester {
+public class MatrixParamStringConstructorTest extends AbstractResourceTester {
 
     public MatrixParamStringConstructorTest(String testName) {
         super(testName);

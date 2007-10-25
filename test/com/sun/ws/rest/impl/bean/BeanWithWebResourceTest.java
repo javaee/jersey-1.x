@@ -35,7 +35,7 @@ import javax.ws.rs.core.Response;
  *
  * @author Paul.Sandoz@Sun.Com
  */
-public class BeanWithWebResourceTest extends AbstractBeanTester {
+public class BeanWithWebResourceTest extends AbstractResourceTester {
     
     public BeanWithWebResourceTest(String testName) {
         super(testName);

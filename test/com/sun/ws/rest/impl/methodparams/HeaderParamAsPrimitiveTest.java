@@ -35,7 +35,7 @@ import javax.ws.rs.UriTemplate;
  *
  * @author Paul.Sandoz@Sun.Com
  */
-public class HeaderParamAsPrimitiveTest extends AbstractBeanTester {
+public class HeaderParamAsPrimitiveTest extends AbstractResourceTester {
 
     public HeaderParamAsPrimitiveTest(String testName) {
         super(testName);

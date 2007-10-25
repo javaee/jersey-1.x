@@ -31,7 +31,7 @@ import javax.ws.rs.core.Response;
  *
  * @author Paul.Sandoz@Sun.Com
  */
-public class OptionsTest extends AbstractBeanTester {
+public class OptionsTest extends AbstractResourceTester {
     
     public OptionsTest(String testName) {
         super(testName);

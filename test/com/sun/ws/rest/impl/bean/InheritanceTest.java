@@ -32,7 +32,7 @@ import javax.ws.rs.UriTemplate;
  * @author Paul.Sandoz@Sun.Com
  */
 @SuppressWarnings("unchecked")
-public class InheritanceTest extends AbstractBeanTester {
+public class InheritanceTest extends AbstractResourceTester {
     
     public InheritanceTest(String testName) {
         super(testName);

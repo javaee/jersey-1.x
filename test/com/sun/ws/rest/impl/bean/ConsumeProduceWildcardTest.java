@@ -34,7 +34,7 @@ import javax.ws.rs.core.Response;
  *
  * @author Paul.Sandoz@Sun.Com
  */
-public class ConsumeProduceWildcardTest extends AbstractBeanTester {
+public class ConsumeProduceWildcardTest extends AbstractResourceTester {
     
     public ConsumeProduceWildcardTest(String testName) {
         super(testName);

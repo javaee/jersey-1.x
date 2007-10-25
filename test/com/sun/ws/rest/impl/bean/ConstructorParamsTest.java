@@ -33,7 +33,7 @@ import javax.ws.rs.core.UriInfo;
  *
  * @author Marc Hadley
  */
-public class ConstructorParamsTest extends AbstractBeanTester {
+public class ConstructorParamsTest extends AbstractResourceTester {
     
     public ConstructorParamsTest(String testName) {
         super(testName);

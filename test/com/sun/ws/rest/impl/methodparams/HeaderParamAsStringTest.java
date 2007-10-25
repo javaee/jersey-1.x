@@ -35,7 +35,7 @@ import java.util.List;
  * @author Paul.Sandoz@Sun.Com
  */
 @SuppressWarnings("unchecked")
-public class HeaderParamAsStringTest extends AbstractBeanTester {
+public class HeaderParamAsStringTest extends AbstractResourceTester {
 
     public HeaderParamAsStringTest(String testName) {
         super(testName);

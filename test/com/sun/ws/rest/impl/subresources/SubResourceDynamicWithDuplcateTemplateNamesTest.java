@@ -31,7 +31,7 @@ import com.sun.ws.rest.impl.bean.*;
  *
  * @author Paul.Sandoz@Sun.Com
  */
-public class SubResourceDynamicWithDuplcateTemplateNamesTest extends AbstractBeanTester {
+public class SubResourceDynamicWithDuplcateTemplateNamesTest extends AbstractResourceTester {
     
     public SubResourceDynamicWithDuplcateTemplateNamesTest(String testName) {
         super(testName);

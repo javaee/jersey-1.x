@@ -36,7 +36,7 @@ import javax.ws.rs.core.UriInfo;
  *
  * @author Paul.Sandoz@Sun.Com
  */
-public class WebResorceWithFieldInjectionTest extends AbstractBeanTester {
+public class WebResorceWithFieldInjectionTest extends AbstractResourceTester {
     
     public WebResorceWithFieldInjectionTest(String testName) {
         super(testName);

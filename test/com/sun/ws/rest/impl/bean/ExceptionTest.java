@@ -31,7 +31,7 @@ import javax.ws.rs.UriTemplate;
  *
  * @author Paul.Sandoz@Sun.Com
  */
-public class ExceptionTest extends AbstractBeanTester {
+public class ExceptionTest extends AbstractResourceTester {
     
     public ExceptionTest(String testName) {
         super(testName);

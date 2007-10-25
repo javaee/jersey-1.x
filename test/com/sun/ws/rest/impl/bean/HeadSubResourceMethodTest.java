@@ -34,7 +34,7 @@ import javax.ws.rs.core.Response;
  *
  * @author Paul.Sandoz@Sun.Com
  */
-public class HeadSubResourceMethodTest extends AbstractBeanTester {
+public class HeadSubResourceMethodTest extends AbstractResourceTester {
     
     public HeadSubResourceMethodTest(String testName) {
         super(testName);

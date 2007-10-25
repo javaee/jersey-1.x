@@ -32,7 +32,7 @@ import javax.ws.rs.core.UriInfo;
  *
  * @author Paul.Sandoz@Sun.Com
  */
-public class EncodedUriTemplateValuesTest extends AbstractBeanTester {
+public class EncodedUriTemplateValuesTest extends AbstractResourceTester {
 
     public EncodedUriTemplateValuesTest(String testName) {
         super(testName);

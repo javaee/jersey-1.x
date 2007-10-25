@@ -24,7 +24,7 @@ package com.sun.ws.rest.impl.http.header.provider;
 
 import javax.ws.rs.HttpMethod;
 import javax.ws.rs.UriTemplate;
-import com.sun.ws.rest.impl.bean.AbstractBeanTester;
+import com.sun.ws.rest.impl.bean.AbstractResourceTester;
 import com.sun.ws.rest.impl.client.ResponseInBound;
 import java.net.URI;
 import java.util.GregorianCalendar;
@@ -36,7 +36,7 @@ import javax.ws.rs.core.Response;
  * @author Paul.Sandoz@Sun.Com
  */
 @SuppressWarnings("unchecked")
-public class BeanTest extends AbstractBeanTester {
+public class BeanTest extends AbstractResourceTester {
     
     public BeanTest(String testName) {
         super(testName);
