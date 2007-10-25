@@ -31,9 +31,9 @@ import com.sun.ws.rest.impl.bean.*;
  *
  * @author Paul.Sandoz@Sun.Com
  */
-public class SubResourceDynamicWithDuplcateTemplateNames extends AbstractBeanTester {
+public class SubResourceDynamicWithDuplcateTemplateNamesTest extends AbstractBeanTester {
     
-    public SubResourceDynamicWithDuplcateTemplateNames(String testName) {
+    public SubResourceDynamicWithDuplcateTemplateNamesTest(String testName) {
         super(testName);
     }
     
@@ -58,10 +58,8 @@ public class SubResourceDynamicWithDuplcateTemplateNames extends AbstractBeanTes
     }
     
     public void testSubResourceDynamicWithTemplates() {
-        String content;
+        initiateWebApplication(ParentWithTemplates.class);
         
-        content = (String)callGet(ParentWithTemplates.class, "/parent/child/child/first", "").
-                getEntity();
-        assertEquals("first", content);
+        assertEquals("first", resourceProxy("/parent/child/child/first").get(String.class));
     }    
 }

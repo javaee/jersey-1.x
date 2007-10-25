@@ -58,14 +58,10 @@ public class SubResourceDynamicTest extends AbstractBeanTester {
     }
     
     public void testSubResourceDynamic() {
-        String content;
+        initiateWebApplication(Parent.class);
         
-        content = (String)callGet(Parent.class, "/parent", "").
-                getEntity();
-        assertEquals("parent", content);
-        content = (String)callGet(Parent.class, "/parent/child", "").
-                getEntity();
-        assertEquals("child", content);
+        assertEquals("parent", resourceProxy("/parent").get(String.class));
+        assertEquals("child", resourceProxy("/parent/child").get(String.class));
     }    
     
     @UriTemplate("/{p}")
@@ -89,13 +85,9 @@ public class SubResourceDynamicTest extends AbstractBeanTester {
     }
     
     public void testSubResourceDynamicWithTemplates() {
-        String content;
+        initiateWebApplication(ParentWithTemplates.class);
         
-        content = (String)callGet(ParentWithTemplates.class, "/parent", "").
-                getEntity();
-        assertEquals("parent", content);
-        content = (String)callGet(ParentWithTemplates.class, "/parent/child/first", "").
-                getEntity();
-        assertEquals("first", content);
+        assertEquals("parent", resourceProxy("/parent").get(String.class));
+        assertEquals("first", resourceProxy("/parent/child/first").get(String.class));
     }    
 }

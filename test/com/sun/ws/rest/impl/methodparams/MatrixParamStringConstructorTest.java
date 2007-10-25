@@ -26,8 +26,8 @@ import javax.ws.rs.DefaultValue;
 import javax.ws.rs.HttpMethod;
 import javax.ws.rs.MatrixParam;
 import javax.ws.rs.UriTemplate;
-import com.sun.ws.rest.api.core.HttpResponseContext;
 import com.sun.ws.rest.impl.bean.*;
+import com.sun.ws.rest.impl.client.ResponseInBound;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.net.URI;
@@ -149,69 +149,79 @@ public class MatrixParamStringConstructorTest extends AbstractBeanTester {
     }
     
     public void testStringConstructorGet() {
-        Class r = ResourceString.class;
-        callGet(r, "/;arg1=3.145;arg2=3145;arg3=http:%2F%2Ftest", 
-                "text/plain");
+        initiateWebApplication(ResourceString.class);
+        
+        resourceProxy("/;arg1=3.145;arg2=3145;arg3=http:%2F%2Ftest").
+                get(String.class);
     }
     
     public void testStringConstructorListGet() {
-        Class r = ResourceStringList.class;
-        callGet(r, "/;args=3.145;args=2.718;args=1.618", 
-                "application/stringlist");
+        initiateWebApplication(ResourceStringList.class);
+        
+        resourceProxy("/;args=3.145;args=2.718;args=1.618").
+                acceptable("application/stringlist").
+                get(String.class);
     }
     
     public void testStringConstructorListEmptyGet() {
-        Class r = ResourceStringListEmpty.class;
-        callGet(r, "/;args;args;args", 
-                "application/stringlist");
+        initiateWebApplication(ResourceStringListEmpty.class);
+        
+        resourceProxy("/;args;args;args").
+                acceptable("application/stringlist").
+                get(String.class);
     }
     
     public void testStringConstructorListAbsentGet() {
-        Class r = ResourceStringListAbsent.class;
-        callGet(r, "/", 
-                "application/stringlist");
+        initiateWebApplication(ResourceStringListAbsent.class);
+        
+        resourceProxy("/").
+            acceptable("application/stringlist").
+            get(String.class);
     }
     
     public void testStringConstructorNullDefault() {
-        Class r = ResourceStringNullDefault.class;
-        callGet(r, "/", 
-                "text/plain");
+        initiateWebApplication(ResourceStringNullDefault.class);
+        
+        resourceProxy("/").get(String.class);
     }
     
     public void testStringConstructorDefault() {
-        Class r = ResourceStringDefault.class;
-        callGet(r, "/", 
-                "text/plain");
+        initiateWebApplication(ResourceStringDefault.class);
+        
+        resourceProxy("/").get(String.class);
     }
     
     public void testStringConstructorDefaultOverride() {
-        Class r = ResourceStringDefault.class;
-        callGet(r, "/;args=2.718", 
-                "text/plain");
+        initiateWebApplication(ResourceStringDefault.class);
+        
+        resourceProxy("/;args=2.718").
+                get(String.class);
     }
     
     public void testStringConstructorListNullDefault() {
-        Class r = ResourceStringListNullDefault.class;
-        callGet(r, "/", 
-                "text/plain");
+        initiateWebApplication(ResourceStringListNullDefault.class);
+        
+        resourceProxy("/").get(String.class);
     }
     
     public void testStringConstructorListDefault() {
-        Class r = ResourceStringListDefault.class;
-        callGet(r, "/", 
-                "text/plain");
+        initiateWebApplication(ResourceStringListDefault.class);
+        
+        resourceProxy("/").get(String.class);
     }
     
     public void testStringConstructorListDefaultOverride() {
-        Class r = ResourceStringListDefaultOverride.class;
-        callGet(r, "/;args=2.718", 
-                "text/plain");
+        initiateWebApplication(ResourceStringListDefaultOverride.class);
+        
+        resourceProxy("/;args=2.718").
+                get(String.class);
     }
     
     public void testBadStringConstructorValue() {
-        Class r = ResourceString.class;
-        HttpResponseContext response = callNoStatusCheck(r, "GET",
-                "/;arg1=ABCDEF;arg2=3145;arg3=http:%2F%2Ftest", null, "text/plain", "");
+        initiateWebApplication(ResourceString.class);
+        
+        ResponseInBound response = resourceProxy("/;arg1=ABCDEF;arg2=3145;arg3=http:%2F%2Ftest", false).
+                get(ResponseInBound.class);
         assertEquals(400, response.getStatus());
     }
 }

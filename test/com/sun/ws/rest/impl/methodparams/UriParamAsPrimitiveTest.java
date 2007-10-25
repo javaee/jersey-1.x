@@ -27,6 +27,7 @@ import javax.ws.rs.UriParam;
 import javax.ws.rs.UriTemplate;
 import com.sun.ws.rest.api.core.HttpResponseContext;
 import com.sun.ws.rest.impl.bean.*;
+import com.sun.ws.rest.impl.client.ResponseInBound;
 
 /**
  *
@@ -36,6 +37,22 @@ public class UriParamAsPrimitiveTest extends AbstractBeanTester {
 
     public UriParamAsPrimitiveTest(String testName) {
         super(testName);
+        initiateWebApplication(
+                ResourceUriBoolean.class,
+                ResourceUriByte.class,
+                ResourceUriShort.class,
+                ResourceUriInt.class,
+                ResourceUriLong.class,
+                ResourceUriFloat.class,
+                ResourceUriDouble.class,
+                ResourceUriBooleanWrapper.class,
+                ResourceUriByteWrapper.class,
+                ResourceUriShortWrapper.class,
+                ResourceUriIntWrapper.class,
+                ResourceUriLongWrapper.class,
+                ResourceUriFloatWrapper.class,
+                ResourceUriDoubleWrapper.class
+        );
     }
 
     @UriTemplate("/boolean/{arg}")
@@ -166,65 +183,52 @@ public class UriParamAsPrimitiveTest extends AbstractBeanTester {
     }
     
     
+    void _test(String type, String value) {
+        resourceProxy("/"+ type + "/" + value).
+                get(String.class);
+        resourceProxy("/"+ type + "/wrapper/" + value).
+                get(String.class);
+    }
     
     public void testGetBoolean() {
-        callGet(ResourceUriBoolean.class, 
-                "/boolean/true", "text/plain");
-        callGet(ResourceUriBooleanWrapper.class, 
-                "/boolean/wrapper/true", "text/plain");        
+        _test("boolean", "true");
     }    
     
     public void testGetByte() {
-        callGet(ResourceUriByte.class, 
-                "/byte/127", "text/plain");
-        callGet(ResourceUriByteWrapper.class, 
-                "/byte/wrapper/127", "text/plain");
+        _test("byte", "127");
     }    
     
     public void testGetShort() {
-        callGet(ResourceUriShort.class, 
-                "/short/32767", "text/plain");
-        callGet(ResourceUriShortWrapper.class, 
-                "/short/wrapper/32767", "text/plain");
+        _test("short", "32767");
     }    
     
     public void testGetInt() {
-        callGet(ResourceUriInt.class, 
-                "/int/2147483647", "text/plain");
-        callGet(ResourceUriIntWrapper.class, 
-                "/int/wrapper/2147483647", "text/plain");
+        _test("int", "2147483647");
     }    
     
     public void testGetLong() {
-        callGet(ResourceUriLong.class, 
-                "/long/9223372036854775807", "text/plain");
-        callGet(ResourceUriLongWrapper.class, 
-                "/long/wrapper/9223372036854775807", "text/plain");
+        _test("long", "9223372036854775807");
     }    
     
     public void testGetFloat() {
-        callGet(ResourceUriFloat.class, 
-                "/float/3.14159265", "text/plain");
-        callGet(ResourceUriFloatWrapper.class, 
-                "/float/wrapper/3.14159265", "text/plain");
+        _test("float", "3.14159265");
     }    
     
     public void testGetDouble() {
-        callGet(ResourceUriDouble.class, 
-                "/double/3.14159265358979", "text/plain");
-        callGet(ResourceUriDoubleWrapper.class, 
-                "/double/wrapper/3.14159265358979", "text/plain");
+        _test("double", "3.14159265358979");
     }
     
     public void testBadPrimitiveValue() {
-        HttpResponseContext response = callNoStatusCheck(ResourceUriInt.class, "GET",
-                "/int/abcdef", null, "text/plain", "");
+        ResponseInBound response = resourceProxy("/int/abcdef", false).
+                get(ResponseInBound.class);
+        
         assertEquals(400, response.getStatus());
     }
     
     public void testBadPrimitiveWrapperValue() {
-        HttpResponseContext response = callNoStatusCheck(ResourceUriIntWrapper.class, "GET",
-                "/int/wrapper/abcdef", null, "text/plain", "");
+        ResponseInBound response = resourceProxy("/int/wrapper/abcdef", false).
+                get(ResponseInBound.class);
+        
         assertEquals(400, response.getStatus());
     }    
 }

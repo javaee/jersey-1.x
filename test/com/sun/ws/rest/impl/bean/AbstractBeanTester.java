@@ -23,29 +23,18 @@
 package com.sun.ws.rest.impl.bean;
 
 import com.sun.ws.rest.impl.TestResourceProxy;
-import com.sun.ws.rest.api.core.HttpResponseContext;
 import com.sun.ws.rest.api.core.ResourceConfig;
 import com.sun.ws.rest.impl.client.RequestOutBound;
 import com.sun.ws.rest.impl.client.ResponseInBound;
-import com.sun.ws.rest.spi.container.AbstractContainerRequest;
-import com.sun.ws.rest.spi.container.AbstractContainerResponse;
-import com.sun.ws.rest.impl.MultivaluedMapImpl;
-import com.sun.ws.rest.impl.TestHttpRequestContext;
-import com.sun.ws.rest.impl.TestHttpResponseContext;
 import com.sun.ws.rest.impl.application.WebApplicationImpl;
 import com.sun.ws.rest.api.core.DefaultResourceConfig;
 import com.sun.ws.rest.impl.client.ResourceProxy;
 import com.sun.ws.rest.impl.client.ResourceProxyFilter;
 import com.sun.ws.rest.spi.container.WebApplication;
-import java.io.ByteArrayInputStream;
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.Arrays;
 import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
 import java.util.Set;
-import javax.ws.rs.core.MultivaluedMap;
 import junit.framework.TestCase;
 
 /**
@@ -114,149 +103,4 @@ public abstract class AbstractBeanTester extends TestCase {
         
         return URI.create(baseUri.toString() + relativeUri);
     }
-    
-    protected AbstractContainerResponse callGet(Class<?> r, String path, 
-            String accept) {
-        MultivaluedMap<String, String> headers = new MultivaluedMapImpl();
-        if (accept != null) headers.add("Accept", accept);
-        
-        return call(r, "GET", path, headers, "");
-    }
-    
-    protected AbstractContainerResponse callGet(Class<?> r, String path, 
-            MultivaluedMap<String, String> headers) {
-        return call(r, "GET", path, headers, "");
-    }
-    
-    protected AbstractContainerResponse callPost(Class<?> r, String path, 
-            String contentType, String content) {
-        MultivaluedMap<String, String> headers = new MultivaluedMapImpl();
-        if (contentType != null) headers.add("Content-Type", contentType);
-        
-        return call(r, "POST", path, headers, content);
-    }
-    
-    protected AbstractContainerResponse callPost(Class<?> r, String path, 
-            String contentType, String accept, String content) {
-        MultivaluedMap<String, String> headers = new MultivaluedMapImpl();
-        if (contentType != null) headers.add("Content-Type", contentType);
-        if (accept != null) headers.add("Accept", accept);
-        
-        return call(r, "POST", path, headers, content);
-    }
-
-    protected AbstractContainerResponse callPost(Class<?> r, String path, 
-            MultivaluedMap<String, String> headers, String content) {
-        return call(r, "POST", path, headers, content);
-    }
-    
-    protected AbstractContainerResponse call(Class<?> r, String method, String path, 
-            String contentType, String accept, String content) {
-        MultivaluedMap<String, String> headers = new MultivaluedMapImpl();
-        if (contentType != null) headers.add("Content-Type", contentType);
-        if (accept != null) headers.add("Accept", accept);
-        
-        AbstractContainerResponse response = callNoStatusCheck(r, method, path, headers, content);
-        check20xStatus(response);
-        return response;
-    }
-    
-    protected AbstractContainerResponse call(Class<?> r, String method, String path, 
-            MultivaluedMap<String, String> headers, String content) {
-        AbstractContainerResponse response = callNoStatusCheck(r, method, path, headers, content);
-        check20xStatus(response);
-        return response;
-    }
-    
-    protected AbstractContainerResponse call(Set<Class> r, String method, String path, 
-            String contentType, String accept, String content) {
-        AbstractContainerResponse response = callNoStatusCheck(r, method, path, contentType, accept, content);
-        check20xStatus(response);
-        return response;
-    }
-    
-    void check20xStatus(HttpResponseContext response) {
-        if (response.getEntity() != null) {
-            assertEquals(200, response.getStatus());        
-        } else {            
-            assertEquals(204, response.getStatus());        
-        }
-    }
-    
-    protected AbstractContainerResponse callNoStatusCheck(Class<?> r, String method, String path, 
-            String contentType, String accept, String content) {
-        MultivaluedMap<String, String> headers = new MultivaluedMapImpl();
-        if (contentType != null) headers.add("Content-Type", contentType);
-        if (accept != null) headers.add("Accept", accept);
-        
-        Set<Class> rs = new HashSet<Class>();
-        rs.add(r);
-        return callNoStatusCheck(rs, method, path, headers, content);
-    }
-    
-    protected AbstractContainerResponse callNoStatusCheck(Class<?> r, String method, String path, 
-            MultivaluedMap<String, String> headers, String content) {
-        Set<Class> rs = new HashSet<Class>();
-        rs.add(r);
-        return callNoStatusCheck(rs, method, path, headers, content);
-    }
-    
-    protected AbstractContainerResponse callNoStatusCheck(Set<Class> r, String method, String path, 
-            String contentType, String accept, String content) {
-        MultivaluedMap<String, String> headers = new MultivaluedMapImpl();
-        if (contentType != null) headers.add("Content-Type", contentType);
-        if (accept != null) headers.add("Accept", accept);
-        
-        return invoke(r, method, path, headers, content);
-    }
-    
-    protected AbstractContainerResponse callNoStatusCheck(Set<Class> r, String method, String path, 
-            MultivaluedMap<String, String> headers, String content) {
-        return invoke(r, method, path, headers, content);
-    }
-    
-    AbstractContainerResponse invoke(final Set<Class> r, String method, String path, 
-        MultivaluedMap<String, String> headers, String content) {
-
-        // The URI
-        String uri = _BASE_URI;
-        if (path.startsWith("/")) {
-            uri += path.substring(1);
-        } else {
-            uri += path;
-        }
-        
-        // The base URI
-        String baseUri = _BASE_URI;
-        
-        WebApplicationImpl a = new WebApplicationImpl();
-        ResourceConfig c = new DefaultResourceConfig(r);
-
-        a.initiate(null, c);
-
-        ByteArrayInputStream e = new ByteArrayInputStream(content.getBytes());
-        final AbstractContainerRequest request = new TestHttpRequestContext(method, e,
-                uri, baseUri);
-        for (Map.Entry<String, List<String>> h : headers.entrySet()) {
-            request.getRequestHeaders().put(h.getKey(), h.getValue());
-        }            
-
-        final AbstractContainerResponse response = new TestHttpResponseContext(request);
-
-        a.handleRequest(request, response);
-        return response;
-    }
-    
-    private static String _BASE_URI = "/base/";
-    
-    public URI getBaseUri() {
-        try {
-            return new URI(_BASE_URI);
-        } catch (URISyntaxException ex) {            
-            ex.printStackTrace();
-        }
-        
-        return null;
-    }
-    
 }

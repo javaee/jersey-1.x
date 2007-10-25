@@ -87,24 +87,16 @@ public class SubResourceDynamicWithParametersTest extends AbstractBeanTester {
     }
     
     public void testSubResourceDynamicWithTemplates() {
-        String content;
+        initiateWebApplication(ParentWithTemplates.class);
         
-        content = (String)callGet(ParentWithTemplates.class, "/parent", "").
-                getEntity();
-        assertEquals("parent", content);
-        content = (String)callGet(ParentWithTemplates.class, "/parent/child/first?a=1&b=2", "").
-                getEntity();
-        assertEquals("first", content);
+        assertEquals("parent", resourceProxy("/parent").get(String.class));
+        assertEquals("first", resourceProxy("/parent/child/first?a=1&b=2").get(String.class));
     }
     
     public void testSubResourceDynamicWithUnmatchedPath() {
-        String content;
+        initiateWebApplication(ParentWithTemplates.class);
         
-        content = (String)callGet(ParentWithTemplates.class, "/parent/unmatchedPath/", "").
-                getEntity();
-        assertEquals("", content);
-        content = (String)callGet(ParentWithTemplates.class, "/parent/unmatchedPath/a/b/c/d", "").
-                getEntity();
-        assertEquals("a/b/c/d", content);
+        assertEquals("", resourceProxy("/parent/unmatchedPath/").get(String.class));
+        assertEquals("a/b/c/d", resourceProxy("/parent/unmatchedPath/a/b/c/d").get(String.class));
     }
 }

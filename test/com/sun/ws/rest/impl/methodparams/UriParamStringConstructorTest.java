@@ -25,8 +25,8 @@ package com.sun.ws.rest.impl.methodparams;
 import javax.ws.rs.HttpMethod;
 import javax.ws.rs.UriParam;
 import javax.ws.rs.UriTemplate;
-import com.sun.ws.rest.api.core.HttpResponseContext;
 import com.sun.ws.rest.impl.bean.*;
+import com.sun.ws.rest.impl.client.ResponseInBound;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 
@@ -38,6 +38,7 @@ public class UriParamStringConstructorTest extends AbstractBeanTester {
 
     public UriParamStringConstructorTest(String testName) {
         super(testName);
+        initiateWebApplication(Resource.class);
     }
 
     @UriTemplate("/{a}/{b}")
@@ -53,15 +54,13 @@ public class UriParamStringConstructorTest extends AbstractBeanTester {
     }
         
     public void testStringConstructorGet() {
-        Class r = Resource.class;
-        callGet(r, "/3.145/3145", 
-                "text/plain");
+        resourceProxy("/3.145/3145").
+                get(String.class);
     }
     
     public void testBadStringConstructorValue() {
-        Class r = Resource.class;
-        HttpResponseContext response = callNoStatusCheck(r, "GET",
-                "/ABCDE/ABCDE", null, "text/plain", "");
+        ResponseInBound response = resourceProxy("/ABCDE/ABCDE", false).
+                get(ResponseInBound.class);
         assertEquals(400, response.getStatus());
     }
 }

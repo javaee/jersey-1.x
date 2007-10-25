@@ -58,17 +58,11 @@ public class SubResourceHttpMethodsTest extends AbstractBeanTester {
     }
     
     public void testSubResourceMethods() {
-        String content;
+        initiateWebApplication(SubResourceMethods.class);
         
-        content = (String)callGet(SubResourceMethods.class, "/", "").
-                getEntity();
-        assertEquals("/", content);
-        content = (String)callGet(SubResourceMethods.class, "/sub", "").
-                getEntity();
-        assertEquals("/sub", content);
-        content = (String)callGet(SubResourceMethods.class, "/sub/sub", "").
-                getEntity();
-        assertEquals("/sub/sub", content);
+        assertEquals("/", resourceProxy("/").get(String.class));
+        assertEquals("/sub", resourceProxy("/sub").get(String.class));
+        assertEquals("/sub/sub", resourceProxy("/sub/sub").get(String.class));
     }
     
     @UriTemplate("/")
@@ -92,17 +86,11 @@ public class SubResourceHttpMethodsTest extends AbstractBeanTester {
     }
     
     public void testSubResourceMethodsWithTemplates() {
-        String content;
+        initiateWebApplication(SubResourceMethodsWithTemplates.class);
         
-        content = (String)callGet(SubResourceMethodsWithTemplates.class, "/", "").
-                getEntity();
-        assertEquals("/", content);
-        content = (String)callGet(SubResourceMethodsWithTemplates.class, "/subvalue/a", "").
-                getEntity();
-        assertEquals("value/a", content);
-        content = (String)callGet(SubResourceMethodsWithTemplates.class, "/sub/a/b/c/d", "").
-                getEntity();
-        assertEquals("a/b/c/d", content);
+        assertEquals("/", resourceProxy("/").get(String.class));
+        assertEquals("value/a", resourceProxy("/subvalue/a").get(String.class));
+        assertEquals("a/b/c/d", resourceProxy("/sub/a/b/c/d").get(String.class));
     }
     
     @UriTemplate("/")
@@ -121,14 +109,9 @@ public class SubResourceHttpMethodsTest extends AbstractBeanTester {
     }
     
     public void testSubResourceMethodsWithDifferentTemplates() {
-        String content;
+        initiateWebApplication(SubResourceMethodsWithDifferentTemplates.class);
         
-        content = (String)callGet(SubResourceMethodsWithDifferentTemplates.class, "/foo", "").
-                getEntity();
-        assertEquals("foo", content);
-        
-        content = (String)callPost(SubResourceMethodsWithDifferentTemplates.class, "/bar", "text/plain", "bar").
-                getEntity();
-        assertEquals("bar", content);
+        assertEquals("foo", resourceProxy("/foo").get(String.class));
+        assertEquals("bar", resourceProxy("/bar").get(String.class));
     }
 }

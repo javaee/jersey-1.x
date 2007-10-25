@@ -27,8 +27,8 @@ import javax.ws.rs.HttpMethod;
 import javax.ws.rs.ProduceMime;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.UriTemplate;
-import com.sun.ws.rest.api.core.HttpResponseContext;
 import com.sun.ws.rest.impl.bean.*;
+import com.sun.ws.rest.impl.client.ResponseInBound;
 import java.util.List;
 
 /**
@@ -39,6 +39,20 @@ public class QueryParamAsPrimitiveTest extends AbstractBeanTester {
 
     public QueryParamAsPrimitiveTest(String testName) {
         super(testName);
+        initiateWebApplication(
+                ResourceQueryPrimitives.class,
+                ResourceQueryPrimitivesDefaultNull.class,
+                ResourceQueryPrimitivesDefault.class,
+                ResourceQueryPrimitivesDefaultOverride.class,
+                ResourceQueryPrimitiveWrappers.class,
+                ResourceQueryPrimitiveWrappersDefaultNull.class,
+                ResourceQueryPrimitiveWrappersDefault.class,
+                ResourceQueryPrimitiveWrappersDefaultOverride.class,                
+                ResourceQueryPrimitiveList.class,
+                ResourceQueryPrimitiveListDefaultNull.class,
+                ResourceQueryPrimitiveListDefault.class,
+                ResourceQueryPrimitiveListDefaultOverride.class
+                );
     }
 
     @UriTemplate("/")
@@ -93,8 +107,8 @@ public class QueryParamAsPrimitiveTest extends AbstractBeanTester {
         }        
     }
     
-    @UriTemplate("/")
-    public static class ResourceQueryPrimitivesNullDefault {
+    @UriTemplate("/default/null")
+    public static class ResourceQueryPrimitivesDefaultNull {
         @HttpMethod("GET")
         @ProduceMime("application/boolean")
         public String doGet(@QueryParam("boolean") boolean v) {
@@ -145,7 +159,7 @@ public class QueryParamAsPrimitiveTest extends AbstractBeanTester {
         }        
     }
     
-    @UriTemplate("/")
+    @UriTemplate("/default")
     public static class ResourceQueryPrimitivesDefault {
         @HttpMethod("GET")
         @ProduceMime("application/boolean")
@@ -197,7 +211,7 @@ public class QueryParamAsPrimitiveTest extends AbstractBeanTester {
         }        
     }
     
-    @UriTemplate("/")
+    @UriTemplate("/default/override")
     public static class ResourceQueryPrimitivesDefaultOverride {
         @HttpMethod("GET")
         @ProduceMime("application/boolean")
@@ -249,7 +263,7 @@ public class QueryParamAsPrimitiveTest extends AbstractBeanTester {
         }        
     }
     
-    @UriTemplate("/")
+    @UriTemplate("/wrappers")
     public static class ResourceQueryPrimitiveWrappers {
         @HttpMethod("GET")
         @ProduceMime("application/boolean")
@@ -301,8 +315,8 @@ public class QueryParamAsPrimitiveTest extends AbstractBeanTester {
         }        
     }
     
-    @UriTemplate("/")
-    public static class ResourceQueryPrimitiveWrappersNullDefault {
+    @UriTemplate("/wrappers/default/null")
+    public static class ResourceQueryPrimitiveWrappersDefaultNull {
         @HttpMethod("GET")
         @ProduceMime("application/boolean")
         public String doGet(@QueryParam("boolean") Boolean v) {
@@ -353,7 +367,7 @@ public class QueryParamAsPrimitiveTest extends AbstractBeanTester {
         }        
     }
     
-    @UriTemplate("/")
+    @UriTemplate("/wrappers/default")
     public static class ResourceQueryPrimitiveWrappersDefault {
         @HttpMethod("GET")
         @ProduceMime("application/boolean")
@@ -405,7 +419,7 @@ public class QueryParamAsPrimitiveTest extends AbstractBeanTester {
         }        
     }
     
-    @UriTemplate("/")
+    @UriTemplate("/wrappers/default/override")
     public static class ResourceQueryPrimitiveWrappersDefaultOverride {
         @HttpMethod("GET")
         @ProduceMime("application/boolean")
@@ -457,7 +471,7 @@ public class QueryParamAsPrimitiveTest extends AbstractBeanTester {
         }        
     }
     
-    @UriTemplate("/")
+    @UriTemplate("/list")
     public static class ResourceQueryPrimitiveList {
         @HttpMethod("GET")
         @ProduceMime("application/boolean")
@@ -523,8 +537,8 @@ public class QueryParamAsPrimitiveTest extends AbstractBeanTester {
         }        
     }
     
-    @UriTemplate("/")
-    public static class ResourceQueryPrimitiveListNullDefault {
+    @UriTemplate("/list/default/null")
+    public static class ResourceQueryPrimitiveListDefaultNull {
         @HttpMethod("GET")
         @ProduceMime("application/boolean")
         public String doGetBoolean(@QueryParam("boolean") List<Boolean> v) {
@@ -575,7 +589,7 @@ public class QueryParamAsPrimitiveTest extends AbstractBeanTester {
         }        
     }
     
-    @UriTemplate("/")
+    @UriTemplate("/list/default")
     public static class ResourceQueryPrimitiveListDefault {
         @HttpMethod("GET")
         @ProduceMime("application/boolean")
@@ -627,7 +641,7 @@ public class QueryParamAsPrimitiveTest extends AbstractBeanTester {
         }        
     }
     
-    @UriTemplate("/")
+    @UriTemplate("/list/default/override")
     public static class ResourceQueryPrimitiveListDefaultOverride {
         @HttpMethod("GET")
         @ProduceMime("application/boolean")
@@ -679,274 +693,176 @@ public class QueryParamAsPrimitiveTest extends AbstractBeanTester {
         }        
     }
     
+    public void _test(String type, String value) {
+        String param = type + "=" + value;
+        
+        resourceProxy("/?" + param).acceptable("application/" + type).
+                get(String.class);
+        
+        resourceProxy("/wrappers?" + param).acceptable("application/" + type).
+                get(String.class);    
+        
+        resourceProxy("/list?" + param + "&" + param + "&" + param).acceptable("application/" + type).
+                get(String.class);
+    }
+
+     public void _testDefault(String base, String type, String value) {
+        resourceProxy(base + "default/null").acceptable("application/" + type).
+                get(String.class);
+        
+        resourceProxy(base + "default").acceptable("application/" + type).
+                get(String.class);
+        
+        String param = type + "=" + value;
+        resourceProxy(base + "default/override?" + param).acceptable("application/" + type).
+                get(String.class);        
+    }
+     
+    public void _testDefault(String type, String value) {
+        _testDefault("/", type, value);
+    }
+    
+    public void _testWrappersDefault(String type, String value) {
+        _testDefault("/wrappers/", type, value);
+    }
+
+    public void _testListDefault(String type, String value) {
+        _testDefault("/list/", type, value);
+    }
     
     public void testGetBoolean() {
-        callGet(ResourceQueryPrimitives.class, 
-                "/?boolean=true", "application/boolean");
-        callGet(ResourceQueryPrimitiveWrappers.class, 
-                "/?boolean=true", "application/boolean");
-        callGet(ResourceQueryPrimitiveList.class, 
-                "/?boolean=true&boolean=true&boolean=true", "application/boolean");
+        _test("boolean", "true");
     }
     
     public void testGetBooleanPrimitivesDefault() {
-        callGet(ResourceQueryPrimitivesNullDefault.class,
-                "/", "application/boolean");
-        callGet(ResourceQueryPrimitivesDefault.class, 
-                "/", "application/boolean");
-        callGet(ResourceQueryPrimitivesDefaultOverride.class, 
-                "/?boolean=true", "application/boolean");
+        _testDefault("boolean", "true");
     }
     
     public void testGetBooleanPrimitiveWrapperDefault() {
-        callGet(ResourceQueryPrimitiveWrappersNullDefault.class,
-                "/", "application/boolean");
-        callGet(ResourceQueryPrimitiveWrappersDefault.class, 
-                "/", "application/boolean");
-        callGet(ResourceQueryPrimitiveWrappersDefaultOverride.class, 
-                "/?boolean=true", "application/boolean");
+        _testWrappersDefault("boolean", "true");
     }
     
     public void testGetBooleanPrimitiveListDefault() {
-        callGet(ResourceQueryPrimitiveListNullDefault.class,
-                "/", "application/boolean");
-        callGet(ResourceQueryPrimitiveListDefault.class, 
-                "/", "application/boolean");
-        callGet(ResourceQueryPrimitiveListDefaultOverride.class, 
-                "/?boolean=true", "application/boolean");
+        _testListDefault("boolean", "true");
     }    
     
     public void testGetByte() {
-        callGet(ResourceQueryPrimitives.class, 
-                "/?byte=127", "application/byte");
-        callGet(ResourceQueryPrimitiveWrappers.class, 
-                "/?byte=127", "application/byte");
-        callGet(ResourceQueryPrimitiveList.class, 
-                "/?byte=127&byte=127&byte=127", "application/byte");
+        _test("byte", "127");
     }
     
     public void testGetBytePrimitivesDefault() {
-        callGet(ResourceQueryPrimitivesNullDefault.class, 
-                "/", "application/byte");
-        callGet(ResourceQueryPrimitivesDefault.class, 
-                "/", "application/byte");
-        callGet(ResourceQueryPrimitivesDefaultOverride.class, 
-                "/?byte=127", "application/byte");
+        _testDefault("byte", "127");
     }
     
     public void testGetBytePrimitiveWrappersDefault() {
-        callGet(ResourceQueryPrimitiveWrappersNullDefault.class, 
-                "/", "application/byte");
-        callGet(ResourceQueryPrimitiveWrappersDefault.class, 
-                "/", "application/byte");
-        callGet(ResourceQueryPrimitiveWrappersDefaultOverride.class, 
-                "/?byte=127", "application/byte");
+        _testWrappersDefault("byte", "127");
     }
     
     public void testGetBytePrimitiveListDefault() {
-        callGet(ResourceQueryPrimitiveListNullDefault.class, 
-                "/", "application/byte");
-        callGet(ResourceQueryPrimitiveListDefault.class, 
-                "/", "application/byte");
-        callGet(ResourceQueryPrimitiveListDefaultOverride.class, 
-                "/?byte=127", "application/byte");
+        _testListDefault("byte", "127");
     }    
     
     public void testGetShort() {
-        callGet(ResourceQueryPrimitives.class,
-                "/?short=32767", "application/short");
-        callGet(ResourceQueryPrimitiveWrappers.class,
-                "/?short=32767", "application/short");
-        callGet(ResourceQueryPrimitiveList.class,
-                "/?short=32767&short=32767&short=32767", "application/short");
+        _test("short", "32767");
     }
     
     public void testGetShortPrimtivesDefault() {
-        callGet(ResourceQueryPrimitivesNullDefault.class, 
-                "/", "application/short");
-        callGet(ResourceQueryPrimitivesDefault.class, 
-                "/", "application/short");
-        callGet(ResourceQueryPrimitivesDefaultOverride.class, 
-                "/?short=32767", "application/short");
+        _testDefault("short", "32767");
     }
     
     public void testGetShortPrimtiveWrappersDefault() {
-        callGet(ResourceQueryPrimitiveWrappersNullDefault.class, 
-                "/", "application/short");
-        callGet(ResourceQueryPrimitiveWrappersDefault.class, 
-                "/", "application/short");
-        callGet(ResourceQueryPrimitiveWrappersDefaultOverride.class, 
-                "/?short=32767", "application/short");
+        _testWrappersDefault("short", "32767");
     }
     
     public void testGetShortPrimtiveListDefault() {
-        callGet(ResourceQueryPrimitiveListNullDefault.class, 
-                "/", "application/short");
-        callGet(ResourceQueryPrimitiveListDefault.class, 
-                "/", "application/short");
-        callGet(ResourceQueryPrimitiveListDefaultOverride.class, 
-                "/?short=32767", "application/short");
+        _testListDefault("short", "32767");
     }    
     
     public void testGetInt() {
-        callGet(ResourceQueryPrimitives.class,
-                "/?int=2147483647", "application/int");
-        callGet(ResourceQueryPrimitiveWrappers.class,
-                "/?int=2147483647", "application/int");
-        callGet(ResourceQueryPrimitiveList.class,
-                "/?int=2147483647&int=2147483647&int=2147483647", "application/int");
+        _test("int", "2147483647");
     }
     
     public void testGetIntPrimitivesDefault() {
-        callGet(ResourceQueryPrimitivesNullDefault.class, 
-                "/", "application/int");
-        callGet(ResourceQueryPrimitivesDefault.class, 
-                "/", "application/int");
-        callGet(ResourceQueryPrimitivesDefaultOverride.class, 
-                "/?int=2147483647", "application/int");
+        _testDefault("int", "2147483647");
     }
     
     public void testGetIntPrimitiveWrappersDefault() {
-        callGet(ResourceQueryPrimitiveWrappersNullDefault.class, 
-                "/", "application/int");
-        callGet(ResourceQueryPrimitiveWrappersDefault.class, 
-                "/", "application/int");
-        callGet(ResourceQueryPrimitiveWrappersDefaultOverride.class, 
-                "/?int=2147483647", "application/int");
+        _testWrappersDefault("int", "2147483647");
     }
     
     public void testGetIntPrimitiveListDefault() {
-        callGet(ResourceQueryPrimitiveListNullDefault.class, 
-                "/", "application/int");
-        callGet(ResourceQueryPrimitiveListDefault.class, 
-                "/", "application/int");
-        callGet(ResourceQueryPrimitiveListDefaultOverride.class, 
-                "/?int=2147483647", "application/int");
+        _testListDefault("int", "2147483647");
     }    
     
     public void testGetLong() {
-        callGet(ResourceQueryPrimitives.class, 
-                "/?long=9223372036854775807", "application/long");
-        callGet(ResourceQueryPrimitiveWrappers.class, 
-                "/?long=9223372036854775807", "application/long");
-        callGet(ResourceQueryPrimitiveList.class, 
-                "/?long=9223372036854775807&long=9223372036854775807&long=9223372036854775807", "application/long");
+        _test("long", "9223372036854775807");
     }
     
     public void testGetLongPrimitivesDefault() {
-        callGet(ResourceQueryPrimitivesNullDefault.class, 
-                "/", "application/long");
-        callGet(ResourceQueryPrimitivesDefault.class, 
-                "/", "application/long");
-        callGet(ResourceQueryPrimitivesDefaultOverride.class, 
-                "/?long=9223372036854775807", "application/long");
+        _testDefault("long", "9223372036854775807");
     }
     
     public void testGetLongPrimitiveWrappersDefault() {
-        callGet(ResourceQueryPrimitiveWrappersNullDefault.class, 
-                "/", "application/long");
-        callGet(ResourceQueryPrimitiveWrappersDefault.class, 
-                "/", "application/long");
-        callGet(ResourceQueryPrimitiveWrappersDefaultOverride.class, 
-                "/?long=9223372036854775807", "application/long");
+        _testWrappersDefault("long", "9223372036854775807");
     }
     
     public void testGetLongPrimitiveListDefault() {
-        callGet(ResourceQueryPrimitiveListNullDefault.class, 
-                "/", "application/long");
-        callGet(ResourceQueryPrimitiveListDefault.class, 
-                "/", "application/long");
-        callGet(ResourceQueryPrimitiveListDefaultOverride.class, 
-                "/?long=9223372036854775807", "application/long");
+        _testListDefault("long", "9223372036854775807");
     }    
     
     public void testGetFloat() {
-        callGet(ResourceQueryPrimitives.class, 
-                "/?float=3.14159265", "application/float");
-        callGet(ResourceQueryPrimitiveWrappers.class, 
-                "/?float=3.14159265", "application/float");
-        callGet(ResourceQueryPrimitiveList.class, 
-                "/?float=3.14159265&float=3.14159265&float=3.14159265", "application/float");
+        _test("float", "3.14159265");
     }
     
     public void testGetFloatPrimitivesDefault() {
-        callGet(ResourceQueryPrimitivesNullDefault.class, 
-                "/", "application/float");
-        callGet(ResourceQueryPrimitivesDefault.class, 
-                "/", "application/float");
-        callGet(ResourceQueryPrimitivesDefaultOverride.class, 
-                "/?float=3.14159265", "application/float");
+        _testDefault("float", "3.14159265");
     }
     
     public void testGetFloatPrimitiveWrappersDefault() {
-        callGet(ResourceQueryPrimitiveWrappersNullDefault.class, 
-                "/", "application/float");
-        callGet(ResourceQueryPrimitiveWrappersDefault.class, 
-                "/", "application/float");
-        callGet(ResourceQueryPrimitiveWrappersDefaultOverride.class, 
-                "/?float=3.14159265", "application/float");
+        _testWrappersDefault("float", "3.14159265");
     }
     
     public void testGetFloatPrimitiveListDefault() {
-        callGet(ResourceQueryPrimitiveListNullDefault.class, 
-                "/", "application/float");
-        callGet(ResourceQueryPrimitiveListDefault.class, 
-                "/", "application/float");
-        callGet(ResourceQueryPrimitiveListDefaultOverride.class, 
-                "/?float=3.14159265", "application/float");
+        _testListDefault("float", "3.14159265");
     }    
     
     public void testGetDouble() {
-        callGet(ResourceQueryPrimitives.class, 
-                "/?double=3.14159265358979", "application/double");
-        callGet(ResourceQueryPrimitiveWrappers.class, 
-                "/?double=3.14159265358979", "application/double");
-        callGet(ResourceQueryPrimitiveList.class, 
-                "/?double=3.14159265358979&double=3.14159265358979&double=3.14159265358979", "application/double");
+        _test("double", "3.14159265358979");
     }
     
     public void testGetDoublePrimitivesDefault() {
-        callGet(ResourceQueryPrimitivesNullDefault.class, 
-                "/", "application/double");
-        callGet(ResourceQueryPrimitivesDefault.class, 
-                "/", "application/double");
-        callGet(ResourceQueryPrimitivesDefaultOverride.class, 
-                "/?double=3.14159265358979", "application/double");
+        _testDefault("double", "3.14159265358979");
     }
     
     public void testGetDoublePrimitiveWrappersDefault() {
-        callGet(ResourceQueryPrimitiveWrappersNullDefault.class, 
-                "/", "application/double");
-        callGet(ResourceQueryPrimitiveWrappersDefault.class, 
-                "/", "application/double");
-        callGet(ResourceQueryPrimitiveWrappersDefaultOverride.class, 
-                "/?double=3.14159265358979", "application/double");
+        _testWrappersDefault("double", "3.14159265358979");
     }
     
     public void testGetDoublePrimitiveListDefault() {
-        callGet(ResourceQueryPrimitiveListNullDefault.class, 
-                "/", "application/double");
-        callGet(ResourceQueryPrimitiveListDefault.class, 
-                "/", "application/double");
-        callGet(ResourceQueryPrimitiveListDefaultOverride.class, 
-                "/?double=3.14159265358979", "application/double");
+        _testListDefault("double", "3.14159265358979");
     }
     
     public void testBadPrimitiveValue() {
-        HttpResponseContext response = callNoStatusCheck(ResourceQueryPrimitives.class, "GET",
-                "/?int=abcdef", null, "application/int", "");
+        ResponseInBound response = resourceProxy("/?int=abcdef", false).
+                acceptable("application/int").
+                get(ResponseInBound.class);
+        
         assertEquals(400, response.getStatus());
     }
     
     public void testBadPrimitiveWrapperValue() {
-        HttpResponseContext response = callNoStatusCheck(ResourceQueryPrimitiveWrappers.class, "GET",
-                "/?int=abcdef", null, "application/int", "");
+        ResponseInBound response = resourceProxy("/wrappers?int=abcdef", false).
+                acceptable("application/int").
+                get(ResponseInBound.class);
+        
         assertEquals(400, response.getStatus());
     }
     
     public void testBadPrimitiveListValue() {
-        HttpResponseContext response = callNoStatusCheck(ResourceQueryPrimitiveWrappers.class, "GET",
-                "/?int=abcdef&int=abcdef", null, "application/int", "");
+        ResponseInBound response = resourceProxy("/list?int=abcdef&int=abcdef", false).
+                acceptable("application/int").
+                get(ResponseInBound.class);
+        
         assertEquals(400, response.getStatus());
     }
 }

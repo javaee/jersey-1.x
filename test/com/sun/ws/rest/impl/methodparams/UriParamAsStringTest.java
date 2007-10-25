@@ -25,7 +25,6 @@ package com.sun.ws.rest.impl.methodparams;
 import javax.ws.rs.HttpMethod;
 import javax.ws.rs.UriParam;
 import javax.ws.rs.UriTemplate;
-import com.sun.ws.rest.api.core.HttpResponseContext;
 import com.sun.ws.rest.impl.bean.*;
 
 /**
@@ -37,10 +36,11 @@ public class UriParamAsStringTest extends AbstractBeanTester {
 
     public UriParamAsStringTest(String testName) {
         super(testName);
+        initiateWebApplication(Resource.class);
     }
 
     @UriTemplate("/{arg1}/{arg2}/{arg3}")
-    public static class Resource1 {
+    public static class Resource {
         @HttpMethod("GET")
         public String doGet(@UriParam("arg1") String arg1, 
                 @UriParam("arg2") String arg2, @UriParam("arg3") String arg3) {
@@ -63,16 +63,14 @@ public class UriParamAsStringTest extends AbstractBeanTester {
     }
     
     public void testStringArgsGet() {
-        Class r = Resource1.class;
-        callGet(r, "/a/b/c",
-                "text/html");
+        resourceProxy("/a/b/c").
+                get(String.class);
     }
     
     public void testStringArgsPost() {
-        Class r = Resource1.class;
-        HttpResponseContext response = callPost(r, "/a/b/c", 
-                "text/html", "content");
-        String rep = (String)response.getEntity();
-        assertEquals("content", rep);
+        String s = resourceProxy("/a/b/c").
+                post(String.class, "content");
+
+        assertEquals("content", s);
     }
 }

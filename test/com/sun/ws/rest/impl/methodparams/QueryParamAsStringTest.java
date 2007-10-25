@@ -27,7 +27,6 @@ import javax.ws.rs.HttpMethod;
 import javax.ws.rs.ProduceMime;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.UriTemplate;
-import com.sun.ws.rest.api.core.HttpResponseContext;
 import com.sun.ws.rest.impl.bean.*;
 import java.util.List;
 
@@ -230,100 +229,124 @@ public class QueryParamAsStringTest extends AbstractBeanTester {
     }
     
     public void testStringGet() {
-        Class r = ResourceString.class;
-        callGet(r, "/?arg1=a&arg2=b&arg3=c", 
-                "text/plain");
+        initiateWebApplication(ResourceString.class);
+        
+        resourceProxy("/?arg1=a&arg2=b&arg3=c").
+            get(String.class);
     }
     
     public void testStringEmptyGet() {
-        Class r = ResourceStringEmpty.class;
-        callGet(r, "/?arg1", 
-                "text/plain");
+        initiateWebApplication(ResourceStringEmpty.class);
+        
+        resourceProxy("/?arg1").
+            get(String.class);
     }
     
     public void testStringAbsentGet() {
-        Class r = ResourceStringAbsent.class;
-        callGet(r, "/", 
-                "text/plain");
+        initiateWebApplication(ResourceStringAbsent.class);
+        
+        resourceProxy("/").
+            get(String.class);
     }
     
     public void testStringPost() {
-        Class r = ResourceString.class;
-        HttpResponseContext response = callPost(r, "/?arg1=a&arg2=b&arg3=c", 
-                "text/plain", "content");
-        String rep = (String)response.getEntity();
-        assertEquals("content", rep);
+         initiateWebApplication(ResourceString.class);
+        
+        String s = resourceProxy("/?arg1=a&arg2=b&arg3=c").
+            content("content").
+            post(String.class);
+        
+        assertEquals("content", s);
     }
     
     public void testStringListGet() {
-        Class r = ResourceStringList.class;
-        callGet(r, "/?args=a&args=b&args=c", 
-                "application/stringlist");
+        initiateWebApplication(ResourceStringList.class);
+        
+        resourceProxy("/?args=a&args=b&args=c").
+            acceptable("application/stringlist").
+            get(String.class);
     }
     
     public void testStringListEmptyGet() {
-        Class r = ResourceStringListEmpty.class;
-        callGet(r, "/?args&args&args", 
-                "application/stringlist");
+        initiateWebApplication(ResourceStringListEmpty.class);
+        
+        resourceProxy("/?args&args&args").
+            acceptable("application/stringlist").
+            get(String.class);
     }
     
     public void testStringListAbsentGet() {
-        Class r = ResourceStringListAbsent.class;
-        callGet(r, "/", 
-                "application/stringlist");
+        initiateWebApplication(ResourceStringListAbsent.class);
+        
+        resourceProxy("/").
+            acceptable("application/stringlist").
+            get(String.class);
     }
     
     public void testListGet() {
-        Class r = ResourceStringList.class;
-        callGet(r, "/?args=a&args=b&args=c", 
-                "application/list");
-    }
+         initiateWebApplication(ResourceStringList.class);
+        
+        resourceProxy("/?args=a&args=b&args=c").
+            acceptable("application/list").
+            get(String.class);
+   }
     
     public void testStringNullDefault() {
-        Class r = ResourceStringNullDefault.class;
-        callGet(r, "/", 
-                "text/plain");
+        initiateWebApplication(ResourceStringNullDefault.class);
+        
+        resourceProxy("/").get(String.class);
     }
     
     public void testStringDefault() {
-        Class r = ResourceStringDefault.class;
-        callGet(r, "/", 
-                "text/plain");
+        initiateWebApplication(ResourceStringDefault.class);
+        
+        resourceProxy("/").get(String.class);
     }
     
     public void testStringDefaultOverride() {
-        Class r = ResourceStringDefaultOverride.class;
-        callGet(r, "/?arg1=d&arg2=e&arg3=f", 
-                "text/plain");
+        initiateWebApplication(ResourceStringDefaultOverride.class);
+        
+        resourceProxy("/?arg1=d&arg2=e&arg3=f").
+            get(String.class);
     }
     
     public void testStringListNullDefault() {
-        Class r = ResourceStringListNullDefault.class;
-        callGet(r, "/", 
-                "application/stringlist");
+        initiateWebApplication(ResourceStringListNullDefault.class);
+        
+        resourceProxy("/").
+            acceptable("application/stringlist").
+            get(String.class);
     }
     
     public void testListNullDefault() {
-        Class r = ResourceStringListNullDefault.class;
-        callGet(r, "/", 
-                "application/list");
+        initiateWebApplication(ResourceStringListNullDefault.class);
+        
+        resourceProxy("/").
+            acceptable("application/list").
+            get(String.class);
     }
     
     public void testStringListDefault() {
-        Class r = ResourceStringListDefault.class;
-        callGet(r, "/", 
-                "application/stringlist");
+        initiateWebApplication(ResourceStringListDefault.class);
+        
+        resourceProxy("/").
+            acceptable("application/stringlist").
+            get(String.class);
     }
     
     public void testListDefault() {
-        Class r = ResourceStringListDefault.class;
-        callGet(r, "/", 
-                "application/list");
+        initiateWebApplication(ResourceStringListDefault.class);
+        
+        resourceProxy("/").
+            acceptable("application/list").
+            get(String.class);
     }
     
     public void testListDefaultOverride() {
-        Class r = ResourceStringListDefaultOverride.class;
-        callGet(r, "/?args=b", 
-                "application/list");
+        initiateWebApplication(ResourceStringListDefaultOverride.class);
+        
+        resourceProxy("/?args=b").
+            acceptable("application/list").
+            get(String.class);
     }
 }
