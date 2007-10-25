@@ -20,13 +20,13 @@
  *     "Portions Copyrighted [year] [name of copyright owner]"
  */
 
-package com.sun.ws.rest.impl.methodparams;
+package com.sun.ws.rest.impl.bean;
 
 import javax.ws.rs.HttpMethod;
 import javax.ws.rs.ProduceMime;
 import javax.ws.rs.UriTemplate;
-import com.sun.ws.rest.api.core.HttpResponseContext;
 import com.sun.ws.rest.impl.bean.AbstractBeanTester;
+import com.sun.ws.rest.impl.client.ResponseInBound;
 import javax.ws.rs.core.MediaType;
 
 /**
@@ -58,19 +58,21 @@ public class TypeReturnTest extends AbstractBeanTester {
     
     @SuppressWarnings("unchecked")
     public void testReturnType() {
-        HttpResponseContext response = callGet(Resource.class, "/", "");
-        String r = (String)response.getEntity();
-
-        assertEquals("CONTENT", r);
-        assertEquals(new MediaType("application/octet-stream"), response.getHttpHeaders().getFirst("Content-Type"));
+        initiateWebApplication(Resource.class);
+        
+        ResponseInBound response = resourceProxy("/", false).get(ResponseInBound.class);                
+        assertEquals("CONTENT", response.getEntity(String.class));
+        assertEquals(new MediaType("application/octet-stream"), 
+                response.getContentType());
     }
     
     @SuppressWarnings("unchecked")
     public void testReturnHttpTypeWithSingleProduceMime() {
-        HttpResponseContext response = callGet(ResourceWithSingleProduceMime.class, "/", "");
-        String r = (String)response.getEntity();
-
-        assertEquals("CONTENT", r);
-        assertEquals(new MediaType("text/plain"), response.getHttpHeaders().getFirst("Content-Type"));
+        initiateWebApplication(ResourceWithSingleProduceMime.class);
+        
+        ResponseInBound response = resourceProxy("/", false).get(ResponseInBound.class);                
+        assertEquals("CONTENT", response.getEntity(String.class));
+        assertEquals(new MediaType("text/plain"), 
+                response.getContentType());
     }
 }

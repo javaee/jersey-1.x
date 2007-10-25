@@ -20,22 +20,20 @@
  *     "Portions Copyrighted [year] [name of copyright owner]"
  */
 
-package com.sun.ws.rest.impl.methodparams;
+package com.sun.ws.rest.impl.bean;
 
 import javax.ws.rs.HttpMethod;
 import javax.ws.rs.UriTemplate;
-import com.sun.ws.rest.api.core.HttpResponseContext;
 import com.sun.ws.rest.impl.bean.AbstractBeanTester;
-import java.net.URI;
 import javax.ws.rs.core.Response;
 
 /**
  *
  * @author Paul.Sandoz@Sun.Com
  */
-public class TempRedirectTest extends AbstractBeanTester {
+public class HttpResponseReturnTest extends AbstractBeanTester {
     
-    public TempRedirectTest(String testName) {
+    public HttpResponseReturnTest(String testName) {
         super(testName);
     }
     
@@ -43,17 +41,14 @@ public class TempRedirectTest extends AbstractBeanTester {
     static public class Resource { 
         @HttpMethod("GET")
         public Response doGet() {
-            return Response.Builder.temporaryRedirect(URI.create("subpath")).build();
+            return Response.Builder.representation("CONTENT".getBytes()).build();
         }
     }
     
-    public void testReturnType() {
-        // HttpResponseContext response = callGet(Resource.class, "/", "");
-
-        HttpResponseContext response = callNoStatusCheck(Resource.class, "GET", "/", 
-            null, "", "");
-        assertEquals(307, response.getStatus());
-        String location = response.getHttpHeaders().getFirst("Location").toString();
-        assertEquals(getBaseUri().toASCIIString() + "subpath", location);
-    }   
+    @SuppressWarnings("unchecked")
+    public void testReturnHttpResponse() {
+        initiateWebApplication(Resource.class);
+        
+        assertEquals("CONTENT", resourceProxy("/").get(String.class));
+    }
 }
