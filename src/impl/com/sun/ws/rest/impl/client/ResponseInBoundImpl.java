@@ -57,4 +57,7 @@ public abstract class ResponseInBoundImpl implements ResponseInBound {
         }
     }
 
+    public String getLangauge() {
+        return getMetadata().getFirst("Content-Language");
+    }
 }

@@ -43,6 +43,8 @@ public interface ResponseInBound {
     
     EntityTag getEntityTag();
     
+    String getLangauge();
+    
     boolean hasEntity();
     
     <T> T getEntity(Class<T> c) throws IllegalArgumentException;

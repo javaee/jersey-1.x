@@ -193,6 +193,8 @@ public abstract class AbstractContainerResponse implements ContainerResponse {
     }
     
     public final void setEntity(Object entity) {
+        if (status == 204 && entity != null) status = 200;
+        else if (status == 200 && entity == null) status = 204;
         this.entity = entity;
     }
     
