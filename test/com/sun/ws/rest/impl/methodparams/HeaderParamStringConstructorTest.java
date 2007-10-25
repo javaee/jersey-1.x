@@ -26,14 +26,12 @@ import javax.ws.rs.DefaultValue;
 import javax.ws.rs.HttpMethod;
 import javax.ws.rs.HeaderParam;
 import javax.ws.rs.UriTemplate;
-import com.sun.ws.rest.api.core.HttpResponseContext;
-import com.sun.ws.rest.impl.MultivaluedMapImpl;
 import com.sun.ws.rest.impl.bean.*;
+import com.sun.ws.rest.impl.client.ResponseInBound;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.net.URI;
 import java.util.List;
-import javax.ws.rs.core.MultivaluedMap;
 
 /**
  *
@@ -151,90 +149,93 @@ public class HeaderParamStringConstructorTest extends AbstractBeanTester {
     }
     
     public void testStringConstructorGet() {
-        Class r = ResourceString.class;
-        MultivaluedMap<String, String> m = new MultivaluedMapImpl();
-        m.add("Accept", "text/plain");
-        m.add("arg1", "3.145");
-        m.add("arg2", "3145");
-        m.add("arg3", "http://test");
-        callGet(r, "/", m);
+        initiateWebApplication(ResourceString.class);
+        
+        resourceProxy("/").
+                request("arg1", "3.145").
+                header("arg2", "3145").
+                header("arg3", "http://test").
+                get(String.class);
     }
     
     public void testStringConstructorListGet() {
-        Class r = ResourceStringList.class;
-        MultivaluedMap<String, String> m = new MultivaluedMapImpl();
-        m.add("Accept", "application/stringlist");
-        m.add("args", "3.145");
-        m.add("args", "2.718");
-        m.add("args", "1.618");
-        callGet(r, "/", m);
+        initiateWebApplication(ResourceStringList.class);
+        
+        resourceProxy("/").
+                acceptable("application/stringlist").
+                header("args", "3.145").
+                header("args", "2.718").
+                header("args", "1.618").
+                get(String.class);
     }
     
     public void testStringConstructorListEmptyGet() {
-        Class r = ResourceStringListEmpty.class;
-        MultivaluedMap<String, String> m = new MultivaluedMapImpl();
-        m.add("Accept", "application/stringlist");
-        m.add("args", "");
-        m.add("args", "");
-        m.add("args", "");
-        callGet(r, "/", m);
+        initiateWebApplication(ResourceStringListEmpty.class);
+        
+        resourceProxy("/").
+                acceptable("application/stringlist").
+                header("args", "").
+                header("args", "").
+                header("args", "").
+                get(String.class);
     }
     
     public void testStringConstructorListAbsentGet() {
-        Class r = ResourceStringListAbsent.class;
-        callGet(r, "/", 
-                "application/stringlist");
+        initiateWebApplication(ResourceStringListAbsent.class);
+        
+        resourceProxy("/").
+            acceptable("application/stringlist").
+            get(String.class);
     }
     
     public void testStringConstructorNullDefault() {
-        Class r = ResourceStringNullDefault.class;
-        callGet(r, "/", 
-                "text/plain");
+        initiateWebApplication(ResourceStringNullDefault.class);
+        
+        resourceProxy("/").get(String.class);
     }
     
     public void testStringConstructorDefault() {
-        Class r = ResourceStringDefault.class;
-        callGet(r, "/", 
-                "text/plain");
+        initiateWebApplication(ResourceStringDefault.class);
+        
+        resourceProxy("/").get(String.class);
     }
     
     public void testStringConstructorDefaultOverride() {
-        Class r = ResourceStringDefault.class;
-        MultivaluedMap<String, String> m = new MultivaluedMapImpl();
-        m.add("Accept", "text/plain");
-        m.add("args", "2.718");
-        callGet(r, "/", m);
+        initiateWebApplication(ResourceStringDefault.class);
+        
+        resourceProxy("/").
+                request("args", "2.718").
+                get(String.class);
     }
     
     public void testStringConstructorListNullDefault() {
-        Class r = ResourceStringListNullDefault.class;
-        callGet(r, "/", 
-                "text/plain");
+        initiateWebApplication(ResourceStringListNullDefault.class);
+        
+        resourceProxy("/").get(String.class);
     }
     
     public void testStringConstructorListDefault() {
-        Class r = ResourceStringListDefault.class;
-        callGet(r, "/", 
-                "text/plain");
+        initiateWebApplication(ResourceStringListDefault.class);
+        
+        resourceProxy("/").get(String.class);
     }
     
     public void testStringConstructorListDefaultOverride() {
-        Class r = ResourceStringListDefaultOverride.class;
-        MultivaluedMap<String, String> m = new MultivaluedMapImpl();
-        m.add("Accept", "text/plain");
-        m.add("args", "2.718");
-        callGet(r, "/", m);
+        initiateWebApplication(ResourceStringListDefaultOverride.class);
+        
+        resourceProxy("/").
+                request("args", "2.718").
+                get(String.class);
     }
     
     public void testBadStringConstructorValue() {
-        Class r = ResourceString.class;
-        MultivaluedMap<String, String> m = new MultivaluedMapImpl();
-        m.add("Accept", "text/plain");
-        m.add("arg1", "ABCDEF");
-        m.add("arg2", "3145");
-        m.add("arg3", "http://test");
-        HttpResponseContext response = callNoStatusCheck(r, "GET",
-                "/", m, "");
+        initiateWebApplication(ResourceString.class);
+        
+        ResponseInBound response = resourceProxy("/", false).
+                request("arg1", "ABCDEF").
+                header("arg2", "3145").
+                header("arg3", "http://test").
+                get(ResponseInBound.class);
         assertEquals(400, response.getStatus());
     }
 }

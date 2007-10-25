@@ -66,9 +66,9 @@ public class EncodedParamsTest extends AbstractBeanTester {
     }
             
     public void testEncodedOnClass() {
-        Class r = EncodedOnClass.class;
-        callGet(r, "/%20u;m=%20m?q=%20q", 
-                "text/plain");
+        initiateWebApplication(EncodedOnClass.class);
+        
+        resourceProxy("/%20u;m=%20m?q=%20q").get(String.class);
     }
     
     @UriTemplate("/{u}")
@@ -98,9 +98,9 @@ public class EncodedParamsTest extends AbstractBeanTester {
     }
     
     public void testEncodedOnAccessibleObject() {
-        Class r = EncodedOnAccessibleObject.class;
-        callGet(r, "/%20u;m=%20m?q=%20q", 
-                "text/plain");
+        initiateWebApplication(EncodedOnAccessibleObject.class);
+        
+        resourceProxy("/%20u;m=%20m?q=%20q").get(String.class);
     }
     
     @UriTemplate("/{u}")
@@ -127,9 +127,9 @@ public class EncodedParamsTest extends AbstractBeanTester {
     }
 
     public void testEncodedOnParameters() {
-        Class r = EncodedOnParameters.class;
-        callGet(r, "/%20u;m=%20m?q=%20q", 
-                "text/plain");
+        initiateWebApplication(EncodedOnParameters.class);
+        
+        resourceProxy("/%20u;m=%20m?q=%20q").get(String.class);
     }
 
     @UriTemplate("/{u}")
@@ -168,8 +168,8 @@ public class EncodedParamsTest extends AbstractBeanTester {
     }
     
     public void testMixedEncodedOnParameters() {
-        Class r = MixedEncodedOnParameters.class;
-        callGet(r, "/%20u;m=%20m?q=%20q", 
-                "text/plain");
+        initiateWebApplication(MixedEncodedOnParameters.class);
+        
+        resourceProxy("/%20u;m=%20m?q=%20q").get(String.class);
     }
 }

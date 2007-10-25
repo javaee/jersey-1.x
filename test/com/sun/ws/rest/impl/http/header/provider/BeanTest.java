@@ -22,18 +22,14 @@
 
 package com.sun.ws.rest.impl.http.header.provider;
 
-import com.sun.ws.rest.spi.container.AbstractContainerResponse;
 import javax.ws.rs.HttpMethod;
 import javax.ws.rs.UriTemplate;
-import com.sun.ws.rest.impl.RequestHttpHeadersImpl;
 import com.sun.ws.rest.impl.bean.AbstractBeanTester;
+import com.sun.ws.rest.impl.client.ResponseInBound;
 import java.net.URI;
-import java.util.Date;
 import java.util.GregorianCalendar;
 import javax.ws.rs.core.EntityTag;
-import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
-import javax.ws.rs.ext.ProviderFactory;
 
 /**
  *
@@ -54,41 +50,26 @@ public class BeanTest extends AbstractBeanTester {
             return Response.Builder.ok().
                     lastModified(lastModified.getTime()).
                     tag(new EntityTag("TAG")).
-                    location(URI.create("/")).
+                    location(URI.create("/location")).
                     language("en").build();
         }
     }
     
     public void testHeaders() {
-        MultivaluedMap<String, String> h = new RequestHttpHeadersImpl();
-        AbstractContainerResponse r = callNoStatusCheck(TestResource.class, "GET", "/", h, "");
+        initiateWebApplication(TestResource.class);
         
-        MultivaluedMap<String, Object> headers = r.getHttpHeaders();
-        Object value;
-        String stringValue;
-        value = headers.getFirst("Last-Modified");
-        stringValue = r.getHeaderValue(value);
-        assertEquals(ProviderFactory.getInstance().
-                createHeaderProvider(Date.class).
-                toString(new GregorianCalendar(2007, 0, 0, 0, 0, 0).getTime()),
-                stringValue);
+        ResponseInBound response = resourceProxy("/").get(ResponseInBound.class);
         
-        value = headers.getFirst("ETag");
-        stringValue = r.getHeaderValue(value);
-        assertEquals(ProviderFactory.getInstance().
-                createHeaderProvider(EntityTag.class).
-                toString(new EntityTag("TAG")),
-                stringValue);
+        assertEquals(new GregorianCalendar(2007, 0, 0, 0, 0, 0).getTime(),
+                response.getLastModified());
         
-        value = headers.getFirst("Location");
-        stringValue = r.getHeaderValue(value);
-        assertEquals(ProviderFactory.getInstance().
-                createHeaderProvider(URI.class).
-                toString(URI.create("/")),
-                stringValue);
+        assertEquals(new EntityTag("TAG"),
+                response.getEntityTag());
         
-        value = headers.getFirst("Content-Language");
-        stringValue = r.getHeaderValue(value);
-        assertEquals("en", stringValue);
+        assertEquals(URI.create("/location"),
+                response.getLocation());
+
+        assertEquals("en",
+                response.getLangauge());
     }
 }

@@ -22,16 +22,14 @@
 
 package com.sun.ws.rest.impl.methodparams;
 
-import com.sun.ws.rest.api.core.HttpResponseContext;
-import com.sun.ws.rest.impl.MultivaluedMapImpl;
 import com.sun.ws.rest.impl.bean.*;
+import com.sun.ws.rest.impl.client.ResponseInBound;
 import java.util.List;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.HttpMethod;
 import javax.ws.rs.ProduceMime;
 import javax.ws.rs.HeaderParam;
 import javax.ws.rs.UriTemplate;
-import javax.ws.rs.core.MultivaluedMap;
 
 /**
  *
@@ -41,10 +39,24 @@ public class HeaderParamAsPrimitiveTest extends AbstractBeanTester {
 
     public HeaderParamAsPrimitiveTest(String testName) {
         super(testName);
+        initiateWebApplication(
+                ResourceHeaderPrimitives.class,
+                ResourceHeaderPrimitivesDefaultNull.class,
+                ResourceHeaderPrimitivesDefault.class,
+                ResourceHeaderPrimitivesDefaultOverride.class,
+                ResourceHeaderPrimitiveWrappers.class,
+                ResourceHeaderPrimitiveWrappersDefaultNull.class,
+                ResourceHeaderPrimitiveWrappersDefault.class,
+                ResourceHeaderPrimitiveWrappersDefaultOverride.class,                
+                ResourceHeaderPrimitiveList.class,
+                ResourceHeaderPrimitiveListDefaultNull.class,
+                ResourceHeaderPrimitiveListDefault.class,
+                ResourceHeaderPrimitiveListDefaultOverride.class
+                );
     }
 
     @UriTemplate("/")
-    public static class ResourceQueryPrimitives {
+    public static class ResourceHeaderPrimitives {
         @HttpMethod("GET")
         @ProduceMime("application/boolean")
         public String doGet(@HeaderParam("boolean") boolean v) {
@@ -95,8 +107,8 @@ public class HeaderParamAsPrimitiveTest extends AbstractBeanTester {
         }        
     }
     
-    @UriTemplate("/")
-    public static class ResourceQueryPrimitivesNullDefault {
+    @UriTemplate("/default/null")
+    public static class ResourceHeaderPrimitivesDefaultNull {
         @HttpMethod("GET")
         @ProduceMime("application/boolean")
         public String doGet(@HeaderParam("boolean") boolean v) {
@@ -147,8 +159,8 @@ public class HeaderParamAsPrimitiveTest extends AbstractBeanTester {
         }        
     }
     
-    @UriTemplate("/")
-    public static class ResourceQueryPrimitivesDefault {
+    @UriTemplate("/default")
+    public static class ResourceHeaderPrimitivesDefault {
         @HttpMethod("GET")
         @ProduceMime("application/boolean")
         public String doGet(@HeaderParam("boolean") @DefaultValue("true") boolean v) {
@@ -199,8 +211,8 @@ public class HeaderParamAsPrimitiveTest extends AbstractBeanTester {
         }        
     }
     
-    @UriTemplate("/")
-    public static class ResourceQueryPrimitivesDefaultOverride {
+    @UriTemplate("/default/override")
+    public static class ResourceHeaderPrimitivesDefaultOverride {
         @HttpMethod("GET")
         @ProduceMime("application/boolean")
         public String doGet(@HeaderParam("boolean") @DefaultValue("false") boolean v) {
@@ -251,8 +263,8 @@ public class HeaderParamAsPrimitiveTest extends AbstractBeanTester {
         }        
     }
     
-    @UriTemplate("/")
-    public static class ResourceQueryPrimitiveWrappers {
+    @UriTemplate("/wrappers")
+    public static class ResourceHeaderPrimitiveWrappers {
         @HttpMethod("GET")
         @ProduceMime("application/boolean")
         public String doGet(@HeaderParam("boolean") Boolean v) {
@@ -303,8 +315,8 @@ public class HeaderParamAsPrimitiveTest extends AbstractBeanTester {
         }        
     }
     
-    @UriTemplate("/")
-    public static class ResourceQueryPrimitiveWrappersNullDefault {
+    @UriTemplate("/wrappers/default/null")
+    public static class ResourceHeaderPrimitiveWrappersDefaultNull {
         @HttpMethod("GET")
         @ProduceMime("application/boolean")
         public String doGet(@HeaderParam("boolean") Boolean v) {
@@ -355,8 +367,8 @@ public class HeaderParamAsPrimitiveTest extends AbstractBeanTester {
         }        
     }
     
-    @UriTemplate("/")
-    public static class ResourceQueryPrimitiveWrappersDefault {
+    @UriTemplate("/wrappers/default")
+    public static class ResourceHeaderPrimitiveWrappersDefault {
         @HttpMethod("GET")
         @ProduceMime("application/boolean")
         public String doGet(@HeaderParam("boolean") @DefaultValue("true") Boolean v) {
@@ -407,8 +419,8 @@ public class HeaderParamAsPrimitiveTest extends AbstractBeanTester {
         }        
     }
     
-    @UriTemplate("/")
-    public static class ResourceQueryPrimitiveWrappersDefaultOverride {
+    @UriTemplate("/wrappers/default/override")
+    public static class ResourceHeaderPrimitiveWrappersDefaultOverride {
         @HttpMethod("GET")
         @ProduceMime("application/boolean")
         public String doGet(@HeaderParam("boolean") @DefaultValue("false") Boolean v) {
@@ -459,8 +471,8 @@ public class HeaderParamAsPrimitiveTest extends AbstractBeanTester {
         }        
     }
     
-    @UriTemplate("/")
-    public static class ResourceQueryPrimitiveList {
+    @UriTemplate("/list")
+    public static class ResourceHeaderPrimitiveList {
         @HttpMethod("GET")
         @ProduceMime("application/boolean")
         public String doGetBoolean(@HeaderParam("boolean") List<Boolean> v) {
@@ -525,8 +537,8 @@ public class HeaderParamAsPrimitiveTest extends AbstractBeanTester {
         }        
     }
     
-    @UriTemplate("/")
-    public static class ResourceQueryPrimitiveListNullDefault {
+    @UriTemplate("/list/default/null")
+    public static class ResourceHeaderPrimitiveListDefaultNull {
         @HttpMethod("GET")
         @ProduceMime("application/boolean")
         public String doGetBoolean(@HeaderParam("boolean") List<Boolean> v) {
@@ -577,8 +589,8 @@ public class HeaderParamAsPrimitiveTest extends AbstractBeanTester {
         }        
     }
     
-    @UriTemplate("/")
-    public static class ResourceQueryPrimitiveListDefault {
+    @UriTemplate("/list/default")
+    public static class ResourceHeaderPrimitiveListDefault {
         @HttpMethod("GET")
         @ProduceMime("application/boolean")
         public String doGetBoolean(@HeaderParam("boolean") @DefaultValue("true") List<Boolean> v) {
@@ -629,8 +641,8 @@ public class HeaderParamAsPrimitiveTest extends AbstractBeanTester {
         }        
     }
     
-    @UriTemplate("/")
-    public static class ResourceQueryPrimitiveListDefaultOverride {
+    @UriTemplate("/list/default/override")
+    public static class ResourceHeaderPrimitiveListDefaultOverride {
         @HttpMethod("GET")
         @ProduceMime("application/boolean")
         public String doGetBoolean(@HeaderParam("boolean") @DefaultValue("false") List<Boolean> v) {
@@ -682,410 +694,176 @@ public class HeaderParamAsPrimitiveTest extends AbstractBeanTester {
     }
     
     
+    public void _test(String type, String value) {
+        resourceProxy("/").acceptable("application/" + type).
+                header(type, value).get(String.class);
+        
+        resourceProxy("/wrappers").acceptable("application/" + type).
+                header(type, value).get(String.class);    
+        
+        resourceProxy("/list").acceptable("application/" + type).
+                header(type, value).
+                header(type, value).
+                header(type, value).
+                get(String.class);
+    }
+    
+    public void _testDefault(String base, String type, String value) {
+        resourceProxy(base + "default/null").acceptable("application/" + type).
+                get(String.class);
+        
+        resourceProxy(base + "default").acceptable("application/" + type).
+                get(String.class);
+        
+        resourceProxy(base + "default/override").acceptable("application/" + type).
+                header(type, value).get(String.class);        
+    }
+    
+    public void _testDefault(String type, String value) {
+        _testDefault("/", type, value);
+    }
+    
+    public void _testWrappersDefault(String type, String value) {
+        _testDefault("/wrappers/", type, value);
+    }
+
+    public void _testListDefault(String type, String value) {
+        _testDefault("/list/", type, value);
+    }
+
     public void testGetBoolean() {
-        MultivaluedMap<String, String> m = new MultivaluedMapImpl();
-        m.add("Accept", "application/boolean");
-        m.add("boolean", "true");
-        callGet(ResourceQueryPrimitives.class, 
-                "/", m);
-        callGet(ResourceQueryPrimitiveWrappers.class, 
-                "/", m);
-                
-        m.add("boolean", "true");
-        m.add("boolean", "true");
-        callGet(ResourceQueryPrimitiveList.class, 
-                "/", m);
+        _test("boolean", "true");
     }
     
     public void testGetBooleanPrimitivesDefault() {
-        callGet(ResourceQueryPrimitivesNullDefault.class,
-                "/", "application/boolean");
-        callGet(ResourceQueryPrimitivesDefault.class, 
-                "/", "application/boolean");
-                
-        MultivaluedMap<String, String> m = new MultivaluedMapImpl();
-        m.add("Accept", "application/boolean");
-        m.add("boolean", "true");
-        callGet(ResourceQueryPrimitivesDefaultOverride.class, 
-                "/", m);
+        _testDefault("boolean", "true");
     }
     
     public void testGetBooleanPrimitiveWrapperDefault() {
-        callGet(ResourceQueryPrimitiveWrappersNullDefault.class,
-                "/", "application/boolean");
-        callGet(ResourceQueryPrimitiveWrappersDefault.class, 
-                "/", "application/boolean");
-        
-        MultivaluedMap<String, String> m = new MultivaluedMapImpl();
-        m.add("Accept", "application/boolean");
-        m.add("boolean", "true");
-        callGet(ResourceQueryPrimitiveWrappersDefaultOverride.class, 
-                "/", m);
+        _testWrappersDefault("boolean", "true");
     }
     
     public void testGetBooleanPrimitiveListDefault() {
-        callGet(ResourceQueryPrimitiveListNullDefault.class,
-                "/", "application/boolean");
-        callGet(ResourceQueryPrimitiveListDefault.class, 
-                "/", "application/boolean");
-        
-        MultivaluedMap<String, String> m = new MultivaluedMapImpl();
-        m.add("Accept", "application/boolean");
-        m.add("boolean", "true");
-        callGet(ResourceQueryPrimitiveListDefaultOverride.class, 
-                "/", m);
+        _testListDefault("boolean", "true");
     }    
     
     public void testGetByte() {
-        MultivaluedMap<String, String> m = new MultivaluedMapImpl();
-        m.add("Accept", "application/byte");
-        m.add("byte", "127");
-        callGet(ResourceQueryPrimitives.class, 
-                "/", m);
-        callGet(ResourceQueryPrimitiveWrappers.class, 
-                "/", m);
-        
-        m.add("byte", "127");
-        m.add("byte", "127");        
-        callGet(ResourceQueryPrimitiveList.class, 
-                "/", m);
+        _test("byte", "127");
     }
     
     public void testGetBytePrimitivesDefault() {
-        callGet(ResourceQueryPrimitivesNullDefault.class, 
-                "/", "application/byte");
-        callGet(ResourceQueryPrimitivesDefault.class, 
-                "/", "application/byte");
-
-        MultivaluedMap<String, String> m = new MultivaluedMapImpl();
-        m.add("Accept", "application/byte");
-        m.add("byte", "127");        
-        callGet(ResourceQueryPrimitivesDefaultOverride.class, 
-                "/", m);
+        _testDefault("byte", "127");
     }
     
     public void testGetBytePrimitiveWrappersDefault() {
-        callGet(ResourceQueryPrimitiveWrappersNullDefault.class, 
-                "/", "application/byte");
-        callGet(ResourceQueryPrimitiveWrappersDefault.class, 
-                "/", "application/byte");
-
-        MultivaluedMap<String, String> m = new MultivaluedMapImpl();
-        m.add("Accept", "application/byte");
-        m.add("byte", "127");        
-        callGet(ResourceQueryPrimitiveWrappersDefaultOverride.class, 
-                "/", m);
+        _testWrappersDefault("byte", "127");
     }
     
     public void testGetBytePrimitiveListDefault() {
-        callGet(ResourceQueryPrimitiveListNullDefault.class, 
-                "/", "application/byte");
-        callGet(ResourceQueryPrimitiveListDefault.class, 
-                "/", "application/byte");
-
-        MultivaluedMap<String, String> m = new MultivaluedMapImpl();
-        m.add("Accept", "application/byte");
-        m.add("byte", "127");        
-        callGet(ResourceQueryPrimitiveListDefaultOverride.class, 
-                "/", m);
+        _testListDefault("byte", "127");
     }    
     
     public void testGetShort() {
-        MultivaluedMap<String, String> m = new MultivaluedMapImpl();
-        m.add("Accept", "application/short");
-        m.add("short", "32767");
-        callGet(ResourceQueryPrimitives.class,
-                "/", m);
-        callGet(ResourceQueryPrimitiveWrappers.class,
-                "/", m);
-
-        m.add("short", "32767");
-        m.add("short", "32767");
-        callGet(ResourceQueryPrimitiveList.class,
-                "/", m);
+        _test("short", "32767");
     }
     
     public void testGetShortPrimtivesDefault() {
-        callGet(ResourceQueryPrimitivesNullDefault.class, 
-                "/", "application/short");
-        callGet(ResourceQueryPrimitivesDefault.class, 
-                "/", "application/short");
-
-        MultivaluedMap<String, String> m = new MultivaluedMapImpl();
-        m.add("Accept", "application/short");
-        m.add("short", "32767");
-        callGet(ResourceQueryPrimitivesDefaultOverride.class, 
-                "/", m);
+        _testDefault("short", "32767");
     }
     
     public void testGetShortPrimtiveWrappersDefault() {
-        callGet(ResourceQueryPrimitiveWrappersNullDefault.class, 
-                "/", "application/short");
-        callGet(ResourceQueryPrimitiveWrappersDefault.class, 
-                "/", "application/short");
-
-        MultivaluedMap<String, String> m = new MultivaluedMapImpl();
-        m.add("Accept", "application/short");
-        m.add("short", "32767");
-        callGet(ResourceQueryPrimitiveWrappersDefaultOverride.class, 
-                "/", m);
+        _testWrappersDefault("short", "32767");
     }
     
     public void testGetShortPrimtiveListDefault() {
-        callGet(ResourceQueryPrimitiveListNullDefault.class, 
-                "/", "application/short");
-        callGet(ResourceQueryPrimitiveListDefault.class, 
-                "/", "application/short");
-
-        MultivaluedMap<String, String> m = new MultivaluedMapImpl();
-        m.add("Accept", "application/short");
-        m.add("short", "32767");
-        callGet(ResourceQueryPrimitiveListDefaultOverride.class, 
-                "/", m);
+        _testListDefault("short", "32767");
     }    
     
     public void testGetInt() {
-        MultivaluedMap<String, String> m = new MultivaluedMapImpl();
-        m.add("Accept", "application/int");
-        m.add("int", "2147483647");
-        callGet(ResourceQueryPrimitives.class,
-                "/", m);
-        callGet(ResourceQueryPrimitiveWrappers.class,
-                "/", m);
-        
-        m.add("int", "2147483647");
-        m.add("int", "2147483647");
-        callGet(ResourceQueryPrimitiveList.class,
-                "/", m);
+        _test("int", "2147483647");
     }
     
     public void testGetIntPrimitivesDefault() {
-        callGet(ResourceQueryPrimitivesNullDefault.class, 
-                "/", "application/int");
-        callGet(ResourceQueryPrimitivesDefault.class, 
-                "/", "application/int");
-
-        MultivaluedMap<String, String> m = new MultivaluedMapImpl();
-        m.add("Accept", "application/int");
-        m.add("int", "2147483647");
-        callGet(ResourceQueryPrimitivesDefaultOverride.class, 
-                "/", m);
+        _testDefault("int", "2147483647");
     }
     
     public void testGetIntPrimitiveWrappersDefault() {
-        callGet(ResourceQueryPrimitiveWrappersNullDefault.class, 
-                "/", "application/int");
-        callGet(ResourceQueryPrimitiveWrappersDefault.class, 
-                "/", "application/int");
-
-        MultivaluedMap<String, String> m = new MultivaluedMapImpl();
-        m.add("Accept", "application/int");
-        m.add("int", "2147483647");
-        callGet(ResourceQueryPrimitiveWrappersDefaultOverride.class, 
-                "/", m);
+        _testWrappersDefault("int", "2147483647");
     }
     
     public void testGetIntPrimitiveListDefault() {
-        callGet(ResourceQueryPrimitiveListNullDefault.class, 
-                "/", "application/int");
-        callGet(ResourceQueryPrimitiveListDefault.class, 
-                "/", "application/int");
-
-        MultivaluedMap<String, String> m = new MultivaluedMapImpl();
-        m.add("Accept", "application/int");
-        m.add("int", "2147483647");
-        callGet(ResourceQueryPrimitiveListDefaultOverride.class, 
-                "/", m);
+        _testListDefault("int", "2147483647");
     }    
     
     public void testGetLong() {
-        MultivaluedMap<String, String> m = new MultivaluedMapImpl();
-        m.add("Accept", "application/long");
-        m.add("long", "9223372036854775807");
-        callGet(ResourceQueryPrimitives.class, 
-                "/", m);
-        callGet(ResourceQueryPrimitiveWrappers.class, 
-                "/", m);
-
-        m.add("long", "9223372036854775807");
-        m.add("long", "9223372036854775807");
-        callGet(ResourceQueryPrimitiveList.class, 
-                "/", m);
+        _test("long", "9223372036854775807");
     }
     
     public void testGetLongPrimitivesDefault() {
-        callGet(ResourceQueryPrimitivesNullDefault.class, 
-                "/", "application/long");
-        callGet(ResourceQueryPrimitivesDefault.class, 
-                "/", "application/long");
-
-        MultivaluedMap<String, String> m = new MultivaluedMapImpl();
-        m.add("Accept", "application/long");
-        m.add("long", "9223372036854775807");
-        callGet(ResourceQueryPrimitivesDefaultOverride.class, 
-                "/", m);
+        _testDefault("long", "9223372036854775807");
     }
     
     public void testGetLongPrimitiveWrappersDefault() {
-        callGet(ResourceQueryPrimitiveWrappersNullDefault.class, 
-                "/", "application/long");
-        callGet(ResourceQueryPrimitiveWrappersDefault.class, 
-                "/", "application/long");
-
-        MultivaluedMap<String, String> m = new MultivaluedMapImpl();
-        m.add("Accept", "application/long");
-        m.add("long", "9223372036854775807");
-        callGet(ResourceQueryPrimitiveWrappersDefaultOverride.class, 
-                "/", m);
+        _testWrappersDefault("long", "9223372036854775807");
     }
     
     public void testGetLongPrimitiveListDefault() {
-        callGet(ResourceQueryPrimitiveListNullDefault.class, 
-                "/", "application/long");
-        callGet(ResourceQueryPrimitiveListDefault.class, 
-                "/", "application/long");
-
-        MultivaluedMap<String, String> m = new MultivaluedMapImpl();
-        m.add("Accept", "application/long");
-        m.add("long", "9223372036854775807");
-        callGet(ResourceQueryPrimitiveListDefaultOverride.class, 
-                "/", m);
+        _testListDefault("long", "9223372036854775807");
     }    
     
     public void testGetFloat() {
-        MultivaluedMap<String, String> m = new MultivaluedMapImpl();
-        m.add("Accept", "application/float");
-        m.add("float", "3.14159265");
-        callGet(ResourceQueryPrimitives.class, 
-                "/", m);
-        callGet(ResourceQueryPrimitiveWrappers.class, 
-                "/", m);
-        
-        m.add("float", "3.14159265");
-        m.add("float", "3.14159265");
-        callGet(ResourceQueryPrimitiveList.class, 
-                "/", m);
+        _test("float", "3.14159265");
     }
     
     public void testGetFloatPrimitivesDefault() {
-        callGet(ResourceQueryPrimitivesNullDefault.class, 
-                "/", "application/float");
-        callGet(ResourceQueryPrimitivesDefault.class, 
-                "/", "application/float");
-        
-        MultivaluedMap<String, String> m = new MultivaluedMapImpl();
-        m.add("Accept", "application/float");
-        m.add("float", "3.14159265");
-        callGet(ResourceQueryPrimitivesDefaultOverride.class, 
-                "/", m);
+        _testDefault("float", "3.14159265");
     }
     
     public void testGetFloatPrimitiveWrappersDefault() {
-        callGet(ResourceQueryPrimitiveWrappersNullDefault.class, 
-                "/", "application/float");
-        callGet(ResourceQueryPrimitiveWrappersDefault.class, 
-                "/", "application/float");
-        
-        MultivaluedMap<String, String> m = new MultivaluedMapImpl();
-        m.add("Accept", "application/float");
-        m.add("float", "3.14159265");
-        callGet(ResourceQueryPrimitiveWrappersDefaultOverride.class, 
-                "/", m);
+        _testWrappersDefault("float", "3.14159265");
     }
     
     public void testGetFloatPrimitiveListDefault() {
-        callGet(ResourceQueryPrimitiveListNullDefault.class, 
-                "/", "application/float");
-        callGet(ResourceQueryPrimitiveListDefault.class, 
-                "/", "application/float");
-        
-        MultivaluedMap<String, String> m = new MultivaluedMapImpl();
-        m.add("Accept", "application/float");
-        m.add("float", "3.14159265");
-        callGet(ResourceQueryPrimitiveListDefaultOverride.class, 
-                "/", m);
+        _testListDefault("float", "3.14159265");
     }    
     
     public void testGetDouble() {
-        MultivaluedMap<String, String> m = new MultivaluedMapImpl();
-        m.add("Accept", "application/double");
-        m.add("double", "3.14159265358979");
-        callGet(ResourceQueryPrimitives.class, 
-                "/", m);
-        callGet(ResourceQueryPrimitiveWrappers.class, 
-                "/", m);
-
-        m.add("double", "3.14159265358979");
-        m.add("double", "3.14159265358979");
-        callGet(ResourceQueryPrimitiveList.class, 
-                "/", m);
+        _test("double", "3.14159265358979");
     }
     
     public void testGetDoublePrimitivesDefault() {
-        callGet(ResourceQueryPrimitivesNullDefault.class, 
-                "/", "application/double");
-        callGet(ResourceQueryPrimitivesDefault.class, 
-                "/", "application/double");
-
-        MultivaluedMap<String, String> m = new MultivaluedMapImpl();
-        m.add("Accept", "application/double");
-        m.add("double", "3.14159265358979");
-        callGet(ResourceQueryPrimitivesDefaultOverride.class, 
-                "/", m);
+        _testDefault("double", "3.14159265358979");
     }
     
     public void testGetDoublePrimitiveWrappersDefault() {
-        callGet(ResourceQueryPrimitiveWrappersNullDefault.class, 
-                "/", "application/double");
-        callGet(ResourceQueryPrimitiveWrappersDefault.class, 
-                "/", "application/double");
-
-        MultivaluedMap<String, String> m = new MultivaluedMapImpl();
-        m.add("Accept", "application/double");
-        m.add("double", "3.14159265358979");
-        callGet(ResourceQueryPrimitiveWrappersDefaultOverride.class, 
-                "/", m);
+        _testWrappersDefault("double", "3.14159265358979");
     }
     
     public void testGetDoublePrimitiveListDefault() {
-        callGet(ResourceQueryPrimitiveListNullDefault.class, 
-                "/", "application/double");
-        callGet(ResourceQueryPrimitiveListDefault.class, 
-                "/", "application/double");
-
-        MultivaluedMap<String, String> m = new MultivaluedMapImpl();
-        m.add("Accept", "application/double");
-        m.add("double", "3.14159265358979");
-        callGet(ResourceQueryPrimitiveListDefaultOverride.class, 
-                "/", m);
+        _testListDefault("double", "3.14159265358979");
     }
     
     public void testBadPrimitiveValue() {
-        MultivaluedMap<String, String> m = new MultivaluedMapImpl();
-        m.add("Accept", "application/int");
-        m.add("int", "abcdef");
-        HttpResponseContext response = callNoStatusCheck(ResourceQueryPrimitives.class, "GET",
-                "/", m, "");
+        ResponseInBound response = resourceProxy("/", false).acceptable("application/int").
+                header("int", "abcdef").get(ResponseInBound.class);
+        
         assertEquals(400, response.getStatus());
     }
     
     public void testBadPrimitiveWrapperValue() {
-        MultivaluedMap<String, String> m = new MultivaluedMapImpl();
-        m.add("Accept", "application/int");
-        m.add("int", "abcdef");
-        HttpResponseContext response = callNoStatusCheck(ResourceQueryPrimitiveWrappers.class, "GET",
-                "/", m, "");
+        ResponseInBound response = resourceProxy("/wrappers", false).acceptable("application/int").
+                header("int", "abcdef").get(ResponseInBound.class);
+        
         assertEquals(400, response.getStatus());
     }
     
     public void testBadPrimitiveListValue() {
-        MultivaluedMap<String, String> m = new MultivaluedMapImpl();
-        m.add("Accept", "application/int");
-        m.add("int", "abcdef");
-        m.add("int", "abcdef");
-        m.add("int", "abcdef");
-        HttpResponseContext response = callNoStatusCheck(ResourceQueryPrimitiveWrappers.class, "GET",
-                "/", m, "");
+        ResponseInBound response = resourceProxy("/wrappers", false).acceptable("application/int").
+                header("int", "abcdef").
+                header("int", "abcdef").
+                header("int", "abcdef").
+                get(ResponseInBound.class);
+        
         assertEquals(400, response.getStatus());
     }
 }

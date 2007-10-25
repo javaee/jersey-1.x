@@ -27,8 +27,6 @@ import javax.ws.rs.HttpMethod;
 import javax.ws.rs.ProduceMime;
 import javax.ws.rs.HeaderParam;
 import javax.ws.rs.UriTemplate;
-import com.sun.ws.rest.api.core.HttpResponseContext;
-import com.sun.ws.rest.impl.MultivaluedMapImpl;
 import com.sun.ws.rest.impl.bean.*;
 import java.util.List;
 
@@ -231,129 +229,144 @@ public class HeaderParamAsStringTest extends AbstractBeanTester {
     }
     
     public void testStringGet() {
-        Class r = ResourceString.class;
-        MultivaluedMapImpl m = new MultivaluedMapImpl();
-        m.add("Accept", "text/plain");
-        m.add("arg1", "a");
-        m.add("arg2", "b");
-        m.add("arg3", "c");
-        callGet(r, "/", m);
+        initiateWebApplication(ResourceString.class);
+        
+        resourceProxy("/").
+            request("arg1", "a").
+            header("arg2", "b").
+            header("arg3", "c").
+            get(String.class);
     }
     
     public void testStringEmptyGet() {
-        Class r = ResourceStringEmpty.class;
-        MultivaluedMapImpl m = new MultivaluedMapImpl();
-        m.add("Accept", "text/plain");
-        m.add("arg1", null);
-        callGet(r, "/", m);
+        initiateWebApplication(ResourceStringEmpty.class);
+        
+        resourceProxy("/").
+            request("arg1", "").
+            get(String.class);
     }
     
     public void testStringAbsentGet() {
-        Class r = ResourceStringAbsent.class;
-        callGet(r, "/", 
-                "text/plain");
+        initiateWebApplication(ResourceStringAbsent.class);
+        
+        resourceProxy("/").
+            get(String.class);
     }
     
     public void testStringPost() {
-        Class r = ResourceString.class;
-        MultivaluedMapImpl m = new MultivaluedMapImpl();
-        m.add("Content-Type", "text/plain");
-        m.add("arg1", "a");
-        m.add("arg2", "b");
-        m.add("arg3", "c");
-        HttpResponseContext response = callPost(r, "/", 
-                m, "content");
-        String rep = (String)response.getEntity();
-        assertEquals("content", rep);
+        initiateWebApplication(ResourceString.class);
+        
+        String s = resourceProxy("/").
+            content("content").
+            header("arg1", "a").
+            header("arg2", "b").
+            header("arg3", "c").
+            post(String.class);
+        
+        assertEquals("content", s);
     }
     
     public void testStringListGet() {
-        Class r = ResourceStringList.class;
-        MultivaluedMapImpl m = new MultivaluedMapImpl();
-        m.add("Accept", "application/stringlist");
-        m.add("args", "a");
-        m.add("args", "b");
-        m.add("args", "c");
-        callGet(r, "/", m);
+        initiateWebApplication(ResourceStringList.class);
+        
+        resourceProxy("/").
+            acceptable("application/stringlist").
+            header("args", "a").
+            header("args", "b").
+            header("args", "c").
+            get(String.class);
     }
     
     public void testStringListEmptyGet() {
-        Class r = ResourceStringListEmpty.class;
-        MultivaluedMapImpl m = new MultivaluedMapImpl();
-        m.add("Accept", "application/stringlist");
-        m.add("args", "");
-        m.add("args", "");
-        m.add("args", "");
-        callGet(r, "/", m);
+        initiateWebApplication(ResourceStringListEmpty.class);
+        
+        resourceProxy("/").
+            acceptable("application/stringlist").
+            header("args", "").
+            header("args", "").
+            header("args", "").
+            get(String.class);
     }
     
     public void testStringListAbsentGet() {
-        Class r = ResourceStringListAbsent.class;
-        callGet(r, "/", 
-                "application/stringlist");
+        initiateWebApplication(ResourceStringListAbsent.class);
+        
+        resourceProxy("/").
+            acceptable("application/stringlist").
+            get(String.class);
     }
     
     public void testListGet() {
-        Class r = ResourceStringList.class;
-        MultivaluedMapImpl m = new MultivaluedMapImpl();
-        m.add("Accept", "application/list");
-        m.add("args", "a");
-        m.add("args", "b");
-        m.add("args", "c");
-        callGet(r, "/", m);
+        initiateWebApplication(ResourceStringList.class);
+        
+        resourceProxy("/").
+            acceptable("application/list").
+            header("args", "a").
+            header("args", "b").
+            header("args", "c").
+            get(String.class);
     }
     
     public void testStringNullDefault() {
-        Class r = ResourceStringNullDefault.class;
-        callGet(r, "/", 
-                "text/plain");
+        initiateWebApplication(ResourceStringNullDefault.class);
+        
+        resourceProxy("/").get(String.class);
     }
     
     public void testStringDefault() {
-        Class r = ResourceStringDefault.class;
-        callGet(r, "/", 
-                "text/plain");
+        initiateWebApplication(ResourceStringDefault.class);
+        
+        resourceProxy("/").get(String.class);
     }
     
     public void testStringDefaultOverride() {
-        Class r = ResourceStringDefaultOverride.class;
-        MultivaluedMapImpl m = new MultivaluedMapImpl();
-        m.add("Content-Type", "text/plain");
-        m.add("arg1", "d");
-        m.add("arg2", "e");
-        m.add("arg3", "f");
-        callGet(r, "/", m);
+        initiateWebApplication(ResourceStringDefaultOverride.class);
+        
+        resourceProxy("/").
+            request("arg1", "d").
+            header("arg2", "e").
+            header("arg3", "f").
+            get(String.class);
     }
     
     public void testStringListNullDefault() {
-        Class r = ResourceStringListNullDefault.class;
-        callGet(r, "/", 
-                "application/stringlist");
+        initiateWebApplication(ResourceStringListNullDefault.class);
+        
+        resourceProxy("/").
+            acceptable("application/stringlist").
+            get(String.class);
     }
     
     public void testListNullDefault() {
-        Class r = ResourceStringListNullDefault.class;
-        callGet(r, "/", 
-                "application/list");
+        initiateWebApplication(ResourceStringListNullDefault.class);
+        
+        resourceProxy("/").
+            acceptable("application/list").
+            get(String.class);
     }
     
     public void testStringListDefault() {
-        Class r = ResourceStringListDefault.class;
-        callGet(r, "/", 
-                "application/stringlist");
+        initiateWebApplication(ResourceStringListDefault.class);
+        
+        resourceProxy("/").
+            acceptable("application/stringlist").
+            get(String.class);
     }
     
     public void testListDefault() {
-        Class r = ResourceStringListDefault.class;
-        callGet(r, "/", 
-                "application/list");
+        initiateWebApplication(ResourceStringListDefault.class);
+        
+        resourceProxy("/").
+            acceptable("application/list").
+            get(String.class);
     }
     
     public void testListDefaultOverride() {
-        Class r = ResourceStringListDefaultOverride.class;
-        MultivaluedMapImpl m = new MultivaluedMapImpl();
-        m.add("Accept", "application/list");
-        m.add("args", "b");
-        callGet(r, "/", m);
+        initiateWebApplication(ResourceStringListDefaultOverride.class);
+        
+        resourceProxy("/").
+            acceptable("application/list").
+            header("args", "b").
+            get(String.class);
     }
 }
