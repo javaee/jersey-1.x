@@ -22,6 +22,7 @@
 
 package com.sun.ws.rest.impl.bean;
 
+import com.sun.ws.rest.impl.AbstractResourceTester;
 import javax.ws.rs.UriTemplate;
 import javax.ws.rs.HttpMethod;
 import com.sun.ws.rest.api.core.HttpRequestContext;

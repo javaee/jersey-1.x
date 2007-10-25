@@ -22,6 +22,7 @@
 
 package com.sun.ws.rest.impl.methodparams;
 
+import com.sun.ws.rest.impl.AbstractResourceTester;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.HttpMethod;
 import javax.ws.rs.QueryParam;

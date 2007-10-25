@@ -22,6 +22,7 @@
 
 package com.sun.ws.rest.impl.bean;
 
+import com.sun.ws.rest.impl.AbstractResourceTester;
 import com.sun.ws.rest.api.core.HttpRequestContext;
 import com.sun.ws.rest.api.core.HttpResponseContext;
 import javax.ws.rs.ProduceMime;

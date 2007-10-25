@@ -22,6 +22,7 @@
 
 package com.sun.ws.rest.impl.subresources;
 
+import com.sun.ws.rest.impl.AbstractResourceTester;
 import javax.ws.rs.HttpMethod;
 import javax.ws.rs.UriParam;
 import javax.ws.rs.UriTemplate;

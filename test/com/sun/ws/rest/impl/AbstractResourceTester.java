@@ -20,9 +20,8 @@
  *     "Portions Copyrighted [year] [name of copyright owner]"
  */
 
-package com.sun.ws.rest.impl.bean;
+package com.sun.ws.rest.impl;
 
-import com.sun.ws.rest.impl.TestResourceProxy;
 import com.sun.ws.rest.api.core.ResourceConfig;
 import com.sun.ws.rest.impl.client.RequestOutBound;
 import com.sun.ws.rest.impl.client.ResponseInBound;

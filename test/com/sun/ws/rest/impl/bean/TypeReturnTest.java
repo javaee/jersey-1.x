@@ -25,7 +25,7 @@ package com.sun.ws.rest.impl.bean;
 import javax.ws.rs.HttpMethod;
 import javax.ws.rs.ProduceMime;
 import javax.ws.rs.UriTemplate;
-import com.sun.ws.rest.impl.bean.AbstractResourceTester;
+import com.sun.ws.rest.impl.AbstractResourceTester;
 import com.sun.ws.rest.impl.client.ResponseInBound;
 import javax.ws.rs.core.MediaType;
 
