@@ -163,6 +163,7 @@ public abstract class AbstractContainerResponse implements ContainerResponse {
         
         this.status = response.getStatus();
         this.entity = response.getEntity();
+        checkStatusAndEntity();
         
         // If HTTP method is HEAD then there should be no entity
         if (request.getHttpMethod().equals("HEAD"))
@@ -193,9 +194,8 @@ public abstract class AbstractContainerResponse implements ContainerResponse {
     }
     
     public final void setEntity(Object entity) {
-        if (status == 204 && entity != null) status = 200;
-        else if (status == 200 && entity == null) status = 204;
         this.entity = entity;
+        checkStatusAndEntity();
     }
     
     public final MultivaluedMap<String, Object> getHttpHeaders() {
@@ -246,6 +246,11 @@ public abstract class AbstractContainerResponse implements ContainerResponse {
     }
     
     //
+    
+    private void checkStatusAndEntity() {
+        if (status == 204 && entity != null) status = 200;
+        else if (status == 200 && entity == null) status = 204;
+    }
     
     private void setResponseOptimal(ResponseImpl r, MediaType contentType) {
         r.addMetadataOptimal(headers, request, contentType);
