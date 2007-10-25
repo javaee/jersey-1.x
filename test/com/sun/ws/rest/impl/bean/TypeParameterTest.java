@@ -25,8 +25,6 @@ package com.sun.ws.rest.impl.bean;
 import javax.ws.rs.HttpMethod;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.UriTemplate;
-import java.util.HashSet;
-import java.util.Set;
 
 /**
  *
@@ -58,10 +56,9 @@ public class TypeParameterTest extends AbstractBeanTester {
     }
     
     public void testMethod() {
-        Set<Class> s = new HashSet<Class>();
-        s.add(Resource.class);
+        initiateWebApplication(Resource.class);
         
-        call(s, "PUT", "/?a=a&b=b", null, null, "putMe");
-        call(s, "POST", "/?a=a&b=b", null, null, "postMe");
+        assertEquals("putMe", resourceProxy("/?a=a&b=b").put(String.class, "putMe"));
+        assertEquals("postMe", resourceProxy("/?a=a&b=b").post(String.class, "postMe"));
     }
 }

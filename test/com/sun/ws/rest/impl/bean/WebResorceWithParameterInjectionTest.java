@@ -29,6 +29,7 @@ import javax.ws.rs.UriTemplate;
 import javax.ws.rs.core.HttpContext;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MultivaluedMap;
+import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
 
 /**
@@ -47,8 +48,10 @@ public class WebResorceWithParameterInjectionTest extends AbstractBeanTester {
         public String doGet(@HttpContext UriInfo uriInfo) {
             URI baseUri = uriInfo.getBase();
             URI uri = uriInfo.getAbsolute();
-            assertEquals("/base/a/b", uri.toString());
-            return "RETURN";
+            assertEquals(BASE_URI, baseUri);
+            assertEquals(UriBuilder.fromUri(BASE_URI).path("a/b").build(), uri);
+
+            return "GET";
         }        
     }
     
@@ -58,7 +61,7 @@ public class WebResorceWithParameterInjectionTest extends AbstractBeanTester {
         public String doGet(@HttpContext HttpHeaders httpHeaders) {
             String value = httpHeaders.getRequestHeaders().getFirst("X-TEST");
             assertEquals("TEST", value);
-            return "RETURN";
+            return "GET";
         }        
     }
         
@@ -71,27 +74,29 @@ public class WebResorceWithParameterInjectionTest extends AbstractBeanTester {
             
             URI baseUri = uriInfo.getBase();
             URI uri = uriInfo.getAbsolute();
-            assertEquals("/base/a/b", uri.toString());
-            return "RETURN";
+            assertEquals(BASE_URI, baseUri);
+            assertEquals(UriBuilder.fromUri(BASE_URI).path("a/b").build(), uri);
+            return "GET";
         }        
     }
     
     public void testParameterInjectedUriInfo() {
-        Class r = TestParameterInjectedUriInfo.class;
-        call(r, "GET", "/a/b", null, null, "BEAN-ONE");
+        initiateWebApplication(TestParameterInjectedUriInfo.class);
+        
+        assertEquals("GET", resourceProxy("a/b").get(String.class));
     }
     
     public void testParameterInjectedHttpHeaders() {
-        Class r = TestParameterInjectedHttpHeaders.class;
-        MultivaluedMap<String, String> headers = new RequestHttpHeadersImpl();
-        headers.putSingle("X-TEST", "TEST");
-        call(r, "GET", "/a/b", headers, "BEAN-ONE");
+        initiateWebApplication(TestParameterInjectedHttpHeaders.class);
+        
+        assertEquals("GET", resourceProxy("a/b").
+                request("X-TEST", "TEST").get(String.class));
     }
     
     public void testParameterInjectedUriInfoHttpHeaders() {
-        Class r = TestParameterInjectedUriInfoHttpHeaders.class;
-        MultivaluedMap<String, String> headers = new RequestHttpHeadersImpl();
-        headers.putSingle("X-TEST", "TEST");
-        call(r, "GET", "/a/b", headers, "BEAN-ONE");
+        initiateWebApplication(TestParameterInjectedUriInfoHttpHeaders.class);
+        
+        assertEquals("GET", resourceProxy("a/b").
+                request("X-TEST", "TEST").get(String.class));
     }
 }

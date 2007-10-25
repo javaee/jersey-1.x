@@ -22,7 +22,7 @@
 
 package com.sun.ws.rest.impl.bean;
 
-import com.sun.ws.rest.api.core.HttpResponseContext;
+import com.sun.ws.rest.impl.client.ResponseInBound;
 import javax.ws.rs.HttpMethod;
 import javax.ws.rs.UriTemplate;
 import javax.ws.rs.core.Response;
@@ -47,13 +47,11 @@ public class ReturnResponseHeadersTest extends AbstractBeanTester {
 
     @SuppressWarnings("unchecked")
     public void testRepresentationHeaders() throws Exception {
+        initiateWebApplication(TestRepresentationBean.class);
         
-        HttpResponseContext response = callNoStatusCheck(TestRepresentationBean.class, "POST", "/", 
-            "text/plain", null, "content");
-
-        assertEquals(200, response.getStatus());
-        String sr = (String)response.getEntity();
-        
-        assertEquals("en", response.getHttpHeaders().getFirst("Content-Language"));
+        ResponseInBound response = resourceProxy("/").content("content").
+                accept("text/plain").post(ResponseInBound.class);
+        assertEquals("content", response.getEntity(String.class));
+        assertEquals("en", response.getLangauge());
     }
 }

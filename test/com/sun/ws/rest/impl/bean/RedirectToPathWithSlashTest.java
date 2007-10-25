@@ -53,7 +53,7 @@ public class RedirectToPathWithSlashTest extends AbstractBeanTester {
         ResponseInBound response = resourceProxy("/project", false).get(ResponseInBound.class);
         assertEquals(Response.Builder.temporaryRedirect(null).build().getStatus(), 
                 response.getStatus());
-        assertEquals(UriBuilder.fromUri(TestResourceProxy.base).path("project/").build(), 
+        assertEquals(UriBuilder.fromUri(BASE_URI).path("project/").build(), 
                 response.getLocation());
 
         String s = resourceProxy("/project/", false).get(String.class);
@@ -86,7 +86,7 @@ public class RedirectToPathWithSlashTest extends AbstractBeanTester {
         ResponseInBound response = resourceProxy("/project", false).get(ResponseInBound.class);
         assertEquals(Response.Builder.temporaryRedirect(null).build().getStatus(), 
                 response.getStatus());
-        assertEquals(UriBuilder.fromUri(TestResourceProxy.base).path("project/").build(), 
+        assertEquals(UriBuilder.fromUri(BASE_URI).path("project/").build(), 
                 response.getLocation());        
         
         String s = resourceProxy("/project/", false).get(String.class);
@@ -101,7 +101,7 @@ public class RedirectToPathWithSlashTest extends AbstractBeanTester {
         response = resourceProxy("/project/moreDetails", false).get(ResponseInBound.class);
         assertEquals(Response.Builder.temporaryRedirect(null).build().getStatus(), 
                 response.getStatus());
-        assertEquals(UriBuilder.fromUri(TestResourceProxy.base).path("project/moreDetails/").build(), 
+        assertEquals(UriBuilder.fromUri(BASE_URI).path("project/moreDetails/").build(), 
                 response.getLocation());        
 
         s = resourceProxy("/project/moreDetails/", false).get(String.class);
@@ -159,7 +159,7 @@ public class RedirectToPathWithSlashTest extends AbstractBeanTester {
         ResponseInBound response = resourceProxy("/project", false).get(ResponseInBound.class);
         assertEquals(Response.Builder.temporaryRedirect(null).build().getStatus(), 
                 response.getStatus());
-        assertEquals(UriBuilder.fromUri(TestResourceProxy.base).path("project/").build(), 
+        assertEquals(UriBuilder.fromUri(BASE_URI).path("project/").build(), 
                 response.getLocation());        
         
         String s = resourceProxy("/project/", false).get(String.class);
@@ -174,7 +174,7 @@ public class RedirectToPathWithSlashTest extends AbstractBeanTester {
         response = resourceProxy("/project/moreDetails", false).get(ResponseInBound.class);
         assertEquals(Response.Builder.temporaryRedirect(null).build().getStatus(), 
                 response.getStatus());
-        assertEquals(UriBuilder.fromUri(TestResourceProxy.base).path("project/moreDetails/").build(), 
+        assertEquals(UriBuilder.fromUri(BASE_URI).path("project/moreDetails/").build(), 
                 response.getLocation());        
 
         s = resourceProxy("/project/moreDetails/", false).get(String.class);
@@ -184,7 +184,7 @@ public class RedirectToPathWithSlashTest extends AbstractBeanTester {
         response = resourceProxy("/project/build", false).get(ResponseInBound.class);
         assertEquals(Response.Builder.temporaryRedirect(null).build().getStatus(), 
                 response.getStatus());
-        assertEquals(UriBuilder.fromUri(TestResourceProxy.base).path("/project/build/").build(), 
+        assertEquals(UriBuilder.fromUri(BASE_URI).path("/project/build/").build(), 
                 response.getLocation());        
         
         s = resourceProxy("/project/build/", false).get(String.class);
@@ -199,7 +199,7 @@ public class RedirectToPathWithSlashTest extends AbstractBeanTester {
         response = resourceProxy("/project/build/moreDetails", false).get(ResponseInBound.class);
         assertEquals(Response.Builder.temporaryRedirect(null).build().getStatus(), 
                 response.getStatus());
-        assertEquals(UriBuilder.fromUri(TestResourceProxy.base).path("project/build/moreDetails/").build(), 
+        assertEquals(UriBuilder.fromUri(BASE_URI).path("project/build/moreDetails/").build(), 
                 response.getLocation());        
 
         s = resourceProxy("/project/build/moreDetails/", false).get(String.class);

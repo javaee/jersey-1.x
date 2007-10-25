@@ -58,7 +58,7 @@ public class CreatedTest extends AbstractBeanTester {
         ResponseInBound response = r.post(ResponseInBound.class);        
         assertEquals(201, response.getStatus());
         
-        URI l = UriBuilder.fromUri(TestResourceProxy.base).path("subpath").build();
+        URI l = UriBuilder.fromUri(BASE_URI).path("subpath").build();
         assertEquals(l, response.getLocation());
         
         assertEquals("CONTENT", response.getEntity(String.class));        

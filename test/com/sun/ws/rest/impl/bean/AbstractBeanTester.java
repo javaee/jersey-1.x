@@ -53,6 +53,7 @@ import junit.framework.TestCase;
  * @author Paul.Sandoz@Sun.Com
  */
 public abstract class AbstractBeanTester extends TestCase {
+    protected static final URI BASE_URI = URI.create("/base/");
 
     protected WebApplication w;
     
@@ -64,24 +65,32 @@ public abstract class AbstractBeanTester extends TestCase {
         w = createWebApplication(resources);
     }
     
+    protected void initiateWebApplication(ResourceConfig c) {
+        w = createWebApplication(c);
+    }
+    
     protected WebApplication createWebApplication(Class... resources) {
         return createWebApplication(new HashSet<Class>(Arrays.asList(resources)));
     }
     
     protected WebApplication createWebApplication(Set<Class> resources) {
+        return createWebApplication(new DefaultResourceConfig(resources));
+    }
+    
+    protected WebApplication createWebApplication(ResourceConfig c) {
         WebApplicationImpl a = new WebApplicationImpl();
-        ResourceConfig c = new DefaultResourceConfig(resources);
-
         a.initiate(null, c);
         return a;
     }
-    
-    protected ResourceProxy resourceProxy(String path) {
-        return resourceProxy(path, true);
+
+    protected ResourceProxy resourceProxy(String relativeUri) {
+        return resourceProxy(relativeUri, true);
     }
     
-    protected ResourceProxy resourceProxy(String path, boolean checkStatus) {
-        ResourceProxy r = new TestResourceProxy(path, w);
+    protected ResourceProxy resourceProxy(String relativeUri, boolean checkStatus) {
+        ResourceProxy r = new TestResourceProxy(
+                createCompleteUri(BASE_URI, relativeUri), BASE_URI, 
+                w);
         if (checkStatus) {
             r.addFilter(new ResourceProxyFilter() {
                 public ResponseInBound invoke(URI u, String method, RequestOutBound ro) {
@@ -97,6 +106,13 @@ public abstract class AbstractBeanTester extends TestCase {
         }
         
         return r;
+    }
+    
+    private URI createCompleteUri(URI baseUri, String relativeUri) {
+        if (relativeUri.startsWith("/"))
+            relativeUri = relativeUri.substring(1);
+        
+        return URI.create(baseUri.toString() + relativeUri);
     }
     
     protected AbstractContainerResponse callGet(Class<?> r, String path, 
@@ -203,7 +219,7 @@ public abstract class AbstractBeanTester extends TestCase {
         MultivaluedMap<String, String> headers, String content) {
 
         // The URI
-        String uri = BASE_URI;
+        String uri = _BASE_URI;
         if (path.startsWith("/")) {
             uri += path.substring(1);
         } else {
@@ -211,7 +227,7 @@ public abstract class AbstractBeanTester extends TestCase {
         }
         
         // The base URI
-        String baseUri = BASE_URI;
+        String baseUri = _BASE_URI;
         
         WebApplicationImpl a = new WebApplicationImpl();
         ResourceConfig c = new DefaultResourceConfig(r);
@@ -231,11 +247,11 @@ public abstract class AbstractBeanTester extends TestCase {
         return response;
     }
     
-    private static String BASE_URI = "/base/";
+    private static String _BASE_URI = "/base/";
     
     public URI getBaseUri() {
         try {
-            return new URI(BASE_URI);
+            return new URI(_BASE_URI);
         } catch (URISyntaxException ex) {            
             ex.printStackTrace();
         }

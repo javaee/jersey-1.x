@@ -23,13 +23,13 @@
 package com.sun.ws.rest.impl.bean;
 
 import com.sun.ws.rest.api.core.HttpContextAccess;
-import com.sun.ws.rest.impl.RequestHttpHeadersImpl;
+import com.sun.ws.rest.impl.client.ResourceProxy;
 import java.net.URI;
 import javax.ws.rs.HttpMethod;
 import javax.ws.rs.UriTemplate;
 import javax.ws.rs.core.HttpContext;
 import javax.ws.rs.core.HttpHeaders;
-import javax.ws.rs.core.MultivaluedMap;
+import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
 
 /**
@@ -51,14 +51,14 @@ public class WebResorceWithFieldInjectionTest extends AbstractBeanTester {
             assertEquals("BEAN-ONE", in);
             String method = context.getHttpRequestContext().getHttpMethod();
             assertEquals("POST", method);
-            return "RETURN";
+            return "POST";
         }
         
         @HttpMethod("GET")
         public String doGet() {
             String method = context.getHttpRequestContext().getHttpMethod();
             assertEquals("GET", method);
-            return "RETURN";
+            return "GET";
         }
         
         @HttpMethod("PUT")
@@ -66,14 +66,14 @@ public class WebResorceWithFieldInjectionTest extends AbstractBeanTester {
             assertEquals("BEAN-ONE", in);
             String method = context.getHttpRequestContext().getHttpMethod();
             assertEquals("PUT", method);
-            return "RETURN";
+            return "PUT";
         }
         
         @HttpMethod("DELETE")
         public String doDelete() {
             String method = context.getHttpRequestContext().getHttpMethod();
             assertEquals("DELETE", method);
-            return "RETURN";
+            return "DELETE";
         }
     }
     
@@ -85,8 +85,9 @@ public class WebResorceWithFieldInjectionTest extends AbstractBeanTester {
         public String doGet() {
             URI baseUri = uriInfo.getBase();
             URI uri = uriInfo.getAbsolute();
-            assertEquals("/base/a/b", uri.toString());
-            return "RETURN";
+            assertEquals(BASE_URI, baseUri);
+            assertEquals(UriBuilder.fromUri(BASE_URI).path("a/b").build(), uri);
+            return "GET";
         }        
     }
     
@@ -98,27 +99,31 @@ public class WebResorceWithFieldInjectionTest extends AbstractBeanTester {
         public String doGet() {
             String value = httpHeaders.getRequestHeaders().getFirst("X-TEST");
             assertEquals("TEST", value);
-            return "RETURN";
+            return "GET";
         }        
     }
     
     public void testFieldInjectedHttpContextAccess() {
-        Class r = TestFieldInjectedHttpContextAccess.class;
-        call(r, "POST", "/a/b", null, null, "BEAN-ONE");
-        call(r, "GET", "/a/b", null, null, "BEAN-ONE");
-        call(r, "PUT", "/a/b", null, null, "BEAN-ONE");
-        call(r, "DELETE", "/a/b", null, null, "BEAN-ONE");
+        initiateWebApplication(TestFieldInjectedHttpContextAccess.class);
+        
+        ResourceProxy r = resourceProxy("a/b");
+        
+        assertEquals("POST", r.post(String.class, "BEAN-ONE"));
+        assertEquals("GET", r.get(String.class));
+        assertEquals("PUT", r.put(String.class, "BEAN-ONE"));
+        assertEquals("DELETE", r.delete(String.class, "BEAN-ONE"));
     }
     
     public void testFieldInjectedUriInfo() {
-        Class r = TestFieldInjectedUriInfo.class;
-        call(r, "GET", "/a/b", null, null, "BEAN-ONE");
+        initiateWebApplication(TestFieldInjectedUriInfo.class);
+        
+        assertEquals("GET", resourceProxy("a/b").get(String.class));
     }
     
     public void testFieldInjectedHttpHeaders() {
-        Class r = TestFieldInjectedHttpHeaders.class;
-        MultivaluedMap<String, String> headers = new RequestHttpHeadersImpl();
-        headers.putSingle("X-TEST", "TEST");
-        call(r, "GET", "/a/b", headers, "BEAN-ONE");
+        initiateWebApplication(TestFieldInjectedHttpHeaders.class);
+        
+        assertEquals("GET", resourceProxy("a/b").
+                request("X-TEST", "TEST").get(String.class));
     }
 }

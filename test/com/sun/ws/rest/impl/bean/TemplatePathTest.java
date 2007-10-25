@@ -22,12 +22,9 @@
 
 package com.sun.ws.rest.impl.bean;
 
-import com.sun.ws.rest.api.core.HttpResponseContext;
 import javax.ws.rs.UriTemplate;
 import javax.ws.rs.HttpMethod;
 import javax.ws.rs.UriParam;
-import java.util.HashSet;
-import java.util.Set;
 
 /**
  *
@@ -73,52 +70,25 @@ public class TemplatePathTest extends AbstractBeanTester {
     }
     
     public void testTemplateAtEnd() {
-        Set<Class> s = new HashSet<Class>();
-        s.add(ResourceA.class);
-        s.add(ResourceAB.class);
+        initiateWebApplication(ResourceA.class, ResourceAB.class);
         
-        HttpResponseContext response = call(s, "GET", "/a/a", null, null, "foo");
-        String sr = (String)response.getEntity();
-        assertEquals("A", sr);
-        
-        response = call(s, "GET", "/a/a/a", null, null, "foo");
-        sr = (String)response.getEntity();
-        assertEquals("A", sr);
-        
-        response = call(s, "GET", "/a/b/ab", null, null, "foo");
-        sr = (String)response.getEntity();
-        assertEquals("AB", sr);
-    }    
+        assertEquals("A", resourceProxy("/a/a").get(String.class));
+        assertEquals("A", resourceProxy("/a/a/a").get(String.class));
+        assertEquals("AB", resourceProxy("/a/b/ab").get(String.class));
+    }
     
     public void testTemplateInMiddle() {
-        Set<Class> s = new HashSet<Class>();
-        s.add(ResourceA.class);
-        s.add(ResourceAArg1B.class);
+        initiateWebApplication(ResourceA.class, ResourceAArg1B.class);
         
-        HttpResponseContext response = call(s, "GET", "/a/a", null, null, "foo");
-        String sr = (String)response.getEntity();
-        assertEquals("A", sr);
-        
-        response = call(s, "GET", "/a/a/a", null, null, "foo");
-        sr = (String)response.getEntity();
-        assertEquals("A", sr);
-        
-        response = call(s, "GET", "/a/infix/b", null, null, "foo");
-        sr = (String)response.getEntity();
-        assertEquals("AArg1B", sr);
+        assertEquals("A", resourceProxy("/a/a").get(String.class));
+        assertEquals("A", resourceProxy("/a/a/a").get(String.class));
+        assertEquals("AArg1B", resourceProxy("/a/infix/b").get(String.class));
     }    
     
     public void testTwoTemplatesInMiddle() {
-        Set<Class> s = new HashSet<Class>();
-        s.add(ResourceAArg1B.class);
-        s.add(ResourceAArg1C.class);
+        initiateWebApplication(ResourceAArg1B.class, ResourceAArg1C.class);
         
-        HttpResponseContext response = call(s, "GET", "/a/infix/b", null, null, "foo");
-        String sr = (String)response.getEntity();
-        assertEquals("AArg1B", sr);
-                
-        response = call(s, "GET", "/a/infix/c", null, null, "foo");
-        sr = (String)response.getEntity();
-        assertEquals("AArg1C", sr);
+        assertEquals("AArg1B", resourceProxy("/a/infix/b").get(String.class));
+        assertEquals("AArg1C", resourceProxy("/a/infix/c").get(String.class));
     }    
 }

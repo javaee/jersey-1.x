@@ -26,6 +26,7 @@ import javax.ws.rs.UriTemplate;
 import javax.ws.rs.HttpMethod;
 import com.sun.ws.rest.api.core.HttpRequestContext;
 import com.sun.ws.rest.api.core.HttpResponseContext;
+import com.sun.ws.rest.impl.client.ResourceProxy;
 
 /**
  *
@@ -42,29 +43,36 @@ public class WebResourceBeanTest extends AbstractBeanTester {
         @HttpMethod("POST")
         public void doPost(HttpRequestContext request, HttpResponseContext response) {
             assertEquals("POST", request.getHttpMethod());
+            response.setEntity("POST");
         }
         
         @HttpMethod("GET")
         public void doGet(HttpRequestContext request, HttpResponseContext response) {
             assertEquals("GET", request.getHttpMethod());            
+            response.setEntity("GET");
         }
         
         @HttpMethod("PUT")
         public void doPut(HttpRequestContext request, HttpResponseContext response) {
             assertEquals("PUT", request.getHttpMethod());            
+            response.setEntity("PUT");
         }
         
         @HttpMethod("DELETE")
         public void doDelete(HttpRequestContext request, HttpResponseContext response) {
             assertEquals("DELETE", request.getHttpMethod());            
+            response.setEntity("DELETE");
         }
     }
     
     public void testOneWebResource() {
-        Class r = TestOneWebResourceBean.class;
-        call(r, "POST", "/a/b", null, null, "BEAN-ONE");
-        call(r, "GET", "/a/b", null, null, "BEAN-ONE");
-        call(r, "PUT", "/a/b", null, null, "BEAN-ONE");
-        call(r, "DELETE", "/a/b", null, null, "BEAN-ONE");
+        initiateWebApplication(TestOneWebResourceBean.class);
+        
+        ResourceProxy r = resourceProxy("a/b");
+        
+        assertEquals("POST", r.post(String.class));
+        assertEquals("GET", r.get(String.class));
+        assertEquals("PUT", r.put(String.class));
+        assertEquals("DELETE", r.delete(String.class));
     }    
 }

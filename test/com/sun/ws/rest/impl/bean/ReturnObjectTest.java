@@ -22,7 +22,6 @@
 
 package com.sun.ws.rest.impl.bean;
 
-import com.sun.ws.rest.api.core.HttpResponseContext;
 import javax.ws.rs.HttpMethod;
 import javax.ws.rs.UriTemplate;
 import javax.ws.rs.core.Response;
@@ -53,15 +52,15 @@ public class ReturnObjectTest extends AbstractBeanTester {
         }        
     }
     
-    public void testMethodType() {        
-        HttpResponseContext r = call(ResourceType.class, "GET", "/", null, null, "");
-        String rep = (String)r.getEntity();
-        assertEquals("TYPE", rep);    
+    public void testMethodType() {
+        initiateWebApplication(ResourceType.class);
+        
+        assertEquals("TYPE", resourceProxy("/").get(String.class));
     }
         
     public void testMethoResponse() {        
-        HttpResponseContext r = call(ResourceHttpResponse.class, "GET", "/", null, null, "");
-        String rep = (String)r.getEntity();
-        assertEquals("HTTP_RESPONSE", rep);    
+        initiateWebApplication(ResourceHttpResponse.class);
+        
+        assertEquals("HTTP_RESPONSE", resourceProxy("/").get(String.class));
     }
 }

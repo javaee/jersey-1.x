@@ -23,27 +23,22 @@
 package com.sun.ws.rest.impl.bean;
 
 import com.sun.ws.rest.api.core.ResourceConfig;
-import com.sun.ws.rest.impl.TestHttpRequestContext;
-import com.sun.ws.rest.impl.TestHttpResponseContext;
 import com.sun.ws.rest.impl.application.WebApplicationImpl;
 import com.sun.ws.rest.api.core.DefaultResourceConfig;
+import com.sun.ws.rest.impl.client.ResourceProxy;
 import com.sun.ws.rest.impl.resource.PerRequestProvider;
-import com.sun.ws.rest.spi.container.ContainerRequest;
-import com.sun.ws.rest.spi.container.ContainerResponse;
 import com.sun.ws.rest.spi.resource.PerRequest;
 import com.sun.ws.rest.spi.resource.Singleton;
-import java.io.ByteArrayInputStream;
 import java.util.HashSet;
 import java.util.Set;
 import javax.ws.rs.UriTemplate;
 import javax.ws.rs.HttpMethod;
-import junit.framework.TestCase;
 
 /**
  *
  * @author Marc Hadley
  */
-public class ResourceLifecycleTest extends TestCase {
+public class ResourceLifecycleTest extends AbstractBeanTester {
     
     @UriTemplate("foo")
     @Singleton
@@ -118,7 +113,7 @@ public class ResourceLifecycleTest extends TestCase {
     }
     
     public void testDefault() {
-        initiate(getResourceConfig());
+        initiateWebApplication(getResourceConfig());
         _test();
     }
     
@@ -127,7 +122,7 @@ public class ResourceLifecycleTest extends TestCase {
         c.getProperties().put(ResourceConfig.PROPERTY_DEFAULT_RESOURCE_PROVIDER_CLASS,
                 PerRequestProvider.class);
         
-        initiate(c);
+        initiateWebApplication(c);
         _test();
     }
     
@@ -136,7 +131,7 @@ public class ResourceLifecycleTest extends TestCase {
         c.getProperties().put(ResourceConfig.PROPERTY_DEFAULT_RESOURCE_PROVIDER_CLASS,
                 null);
         
-        initiate(c);
+        initiateWebApplication(c);
         _test();
     }
     
@@ -147,7 +142,7 @@ public class ResourceLifecycleTest extends TestCase {
 
         boolean caught = false;
         try {
-            initiate(c);
+            initiateWebApplication(c);
         } catch (IllegalArgumentException e) {
             caught = true;
         }
@@ -161,7 +156,7 @@ public class ResourceLifecycleTest extends TestCase {
         
         boolean caught = false;
         try {
-            initiate(c);
+            initiateWebApplication(c);
         } catch (IllegalArgumentException e) {
             caught = true;
         }
@@ -169,37 +164,19 @@ public class ResourceLifecycleTest extends TestCase {
     }
     
     private void _test() {
-        String count;
+        ResourceProxy r = resourceProxy("/foo");        
+        assertEquals("1", r.get(String.class));
+        assertEquals("2", r.get(String.class));
+        assertEquals("3", r.get(String.class));
         
-        count = doGET("foo");
-        assertEquals(count, "1");
-        count = doGET("foo");
-        assertEquals(count, "2");
-        count = doGET("foo");
-        assertEquals(count, "3");
-
-        count = doGET("bar");
-        assertEquals(count, "1");
-        count = doGET("bar");
-        assertEquals(count, "1");
-        count = doGET("bar");
-        assertEquals(count, "1");
+        r = resourceProxy("/bar");        
+        assertEquals("1", r.get(String.class));
+        assertEquals("1", r.get(String.class));
+        assertEquals("1", r.get(String.class));
         
-        count = doGET("baz");
-        assertEquals(count, "1");
-        count = doGET("baz");
-        assertEquals(count, "1");
-        count = doGET("baz");
-        assertEquals(count, "1");                
-    }
-    
-    private String doGET(String path) {
-        ByteArrayInputStream e = new ByteArrayInputStream("".getBytes());
-        final ContainerRequest request = new TestHttpRequestContext("GET", e, "/base/" + path, "/base/");
-        final ContainerResponse response = new TestHttpResponseContext(request);
-
-        a.handleRequest(request, response);        
-        String retVal = (String)response.getEntity();
-        return retVal;
+        r = resourceProxy("/baz");        
+        assertEquals("1", r.get(String.class));
+        assertEquals("1", r.get(String.class));
+        assertEquals("1", r.get(String.class));
     }
 }

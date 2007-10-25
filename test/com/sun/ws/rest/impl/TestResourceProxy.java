@@ -40,7 +40,6 @@ import java.util.List;
 import java.util.Map;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
-import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.ext.EntityProvider;
 import javax.ws.rs.ext.HeaderProvider;
 import javax.ws.rs.ext.ProviderFactory;
@@ -50,12 +49,13 @@ import javax.ws.rs.ext.ProviderFactory;
  * @author Paul.Sandoz@Sun.Com
  */
 public class TestResourceProxy extends ResourceProxy {
-    public static final URI base = URI.create("/base/");
-    
     private final WebApplication w;
     
-    public TestResourceProxy(String path, WebApplication w) {
-        super(UriBuilder.fromUri(base).encode(false).path(path).build());
+    private final URI baseUri;
+    
+    public TestResourceProxy(URI completeUri, URI baseUri, WebApplication w) {
+        super(completeUri);
+        this.baseUri = baseUri;
         this.w = w;
     }
     
@@ -105,7 +105,7 @@ public class TestResourceProxy extends ResourceProxy {
     public ResponseInBound invoke(URI u, String method, RequestOutBound ro) {
         final AbstractContainerRequest request = new TestHttpRequestContext(
                 method, writeEntity(ro.getMetadata(), ro.getEntity()),
-                u, base);
+                u, baseUri);
         
         writeHeaders(ro.getMetadata(), request.getRequestHeaders());
 

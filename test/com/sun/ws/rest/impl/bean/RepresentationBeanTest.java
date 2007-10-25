@@ -22,6 +22,7 @@
 
 package com.sun.ws.rest.impl.bean;
 
+import com.sun.ws.rest.impl.client.ResourceProxy;
 import javax.ws.rs.UriTemplate;
 import javax.ws.rs.HttpMethod;
 
@@ -40,31 +41,33 @@ public class RepresentationBeanTest extends AbstractBeanTester {
         @HttpMethod("POST")
         public String doPost(String in) {
             assertEquals("BEAN-ONE", in);
-            return "RETURN";
+            return "POST";
         }
         
         @HttpMethod("GET")
         public String doGet() {
-            return "RETURN";
+            return "GET";
         }
         
         @HttpMethod("PUT")
         public String doPut(String in) {
             assertEquals("BEAN-ONE", in);
-            return "RETURN";
+            return "PUT";
         }
         
         @HttpMethod("DELETE")
         public String doDelete() {
-            return "RETURN";
+            return "DELETE";
         }
     }
     
     public void testOneWebResource() {
-        Class r = TestOneWebResourceBean.class;
-        call(r, "POST", "/a/b", null, null, "BEAN-ONE");
-        call(r, "GET", "/a/b", null, null, "BEAN-ONE");
-        call(r, "PUT", "/a/b", null, null, "BEAN-ONE");
-        call(r, "DELETE", "/a/b", null, null, "BEAN-ONE");
+        initiateWebApplication(TestOneWebResourceBean.class);
+        
+        ResourceProxy r = resourceProxy("/a/b");
+        assertEquals("POST", r.post(String.class, "BEAN-ONE"));
+        assertEquals("GET", r.get(String.class));
+        assertEquals("PUT", r.put(String.class, "BEAN-ONE"));
+        assertEquals("DELETE", r.delete(String.class));
     }    
 }
