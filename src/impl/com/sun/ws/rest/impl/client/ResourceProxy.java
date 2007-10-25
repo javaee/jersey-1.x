@@ -23,7 +23,6 @@
 package com.sun.ws.rest.impl.client;
 
 import com.sun.ws.rest.impl.client.urlconnection.URLConnectionResourceProxy;
-import java.io.IOException;
 import java.net.URI;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.UriBuilder;
