@@ -163,14 +163,16 @@ public abstract class AbstractContainerResponse implements ContainerResponse {
         
         this.status = response.getStatus();
         this.entity = response.getEntity();
-        checkStatusAndEntity();
         
         // If HTTP method is HEAD then there should be no entity
         if (request.getHttpMethod().equals("HEAD"))
             this.entity = null;
         // Otherwise if there is no entity then there should be no content type
-        else if (this.entity == null)
+        else if (this.entity == null) {
             contentType = null;
+            if (status == 200) status = 204;
+        } else
+            if (status == 204) status = 200;
         
         this.headers = new ResponseHttpHeadersImpl();
         if (response instanceof ResponseImpl) {
