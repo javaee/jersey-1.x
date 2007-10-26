@@ -47,15 +47,21 @@ public final class FileProvider extends AbstractTypeEntityProvider<File> {
             MultivaluedMap<String, String> headers, InputStream entityStream) throws IOException {
         File f = File.createTempFile("rep","tmp");        
         OutputStream out = new BufferedOutputStream(new FileOutputStream(f));
-        writeTo(entityStream, out);
-        out.close();
+        try {
+            writeTo(entityStream, out);
+        } finally {
+            out.close();
+        }
         return f;
     }
 
     public void writeTo(File t, MediaType mediaType,
             MultivaluedMap<String, Object> headers, OutputStream entityStream) throws IOException {
         InputStream in = new BufferedInputStream(new FileInputStream(t));
-        writeTo(in, entityStream);
-        in.close();
+        try {
+            writeTo(in, entityStream);
+        } finally {
+            in.close();
+        }
     }
 }

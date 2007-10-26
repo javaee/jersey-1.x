@@ -47,6 +47,11 @@ public class DataSourceProvider extends AbstractTypeEntityProvider<DataSource> {
 
     public void writeTo(DataSource t, MediaType mediaType,
             MultivaluedMap<String, Object> headers, OutputStream entityStream) throws IOException {
-        writeTo(t.getInputStream(), entityStream);
+        InputStream in = t.getInputStream();
+        try {
+            writeTo(in, entityStream);
+        } finally {
+            in.close();
+        }
     }
 }
