@@ -1,4 +1,6 @@
 release 0.4 (2007-11-xx)
+- The runtime no longer logs the stack trace for a caught 
+  WebApplicationException with a status code < 500. 
 - Fixed bug in File entity provider, the FileInput/OutputStream is
   wrapped around a BufferedInput/OutputStream.
 - Fixed bug in InputStream and DataStource entity providers, after the bytes 
