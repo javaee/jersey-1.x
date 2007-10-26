@@ -25,7 +25,7 @@ package com.sun.ws.rest.impl.methodparams;
 import javax.ws.rs.HttpMethod;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.UriTemplate;
-import com.sun.ws.rest.impl.bean.*;
+import com.sun.ws.rest.impl.AbstractResourceTester;
 import javax.ws.rs.Encoded;
 import javax.ws.rs.MatrixParam;
 import javax.ws.rs.UriParam;

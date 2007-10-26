@@ -27,7 +27,7 @@ import javax.ws.rs.DefaultValue;
 import javax.ws.rs.HttpMethod;
 import javax.ws.rs.HeaderParam;
 import javax.ws.rs.UriTemplate;
-import com.sun.ws.rest.impl.bean.*;
+import com.sun.ws.rest.impl.AbstractResourceTester;
 import com.sun.ws.rest.impl.client.ResponseInBound;
 import java.math.BigDecimal;
 import java.math.BigInteger;

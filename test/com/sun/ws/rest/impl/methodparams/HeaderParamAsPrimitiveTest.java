@@ -23,7 +23,7 @@
 package com.sun.ws.rest.impl.methodparams;
 
 import com.sun.ws.rest.impl.AbstractResourceTester;
-import com.sun.ws.rest.impl.bean.*;
+import com.sun.ws.rest.impl.AbstractResourceTester;
 import com.sun.ws.rest.impl.client.ResponseInBound;
 import java.util.List;
 import javax.ws.rs.DefaultValue;
