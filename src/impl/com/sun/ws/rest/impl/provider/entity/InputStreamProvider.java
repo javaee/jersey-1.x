@@ -46,5 +46,6 @@ public final class InputStreamProvider extends AbstractTypeEntityProvider<InputS
     public void writeTo(InputStream t, MediaType mediaType,
             MultivaluedMap<String, Object> headers, OutputStream entityStream) throws IOException {
         writeTo(t, entityStream);
+        t.close();
     }
 }
