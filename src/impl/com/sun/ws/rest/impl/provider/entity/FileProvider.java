@@ -22,6 +22,8 @@
 
 package com.sun.ws.rest.impl.provider.entity;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -44,7 +46,7 @@ public final class FileProvider extends AbstractTypeEntityProvider<File> {
     public File readFrom(Class<File> type, MediaType mediaType,
             MultivaluedMap<String, String> headers, InputStream entityStream) throws IOException {
         File f = File.createTempFile("rep","tmp");        
-        OutputStream out = new FileOutputStream(f);
+        OutputStream out = new BufferedOutputStream(new FileOutputStream(f));
         writeTo(entityStream, out);
         out.close();
         return f;
@@ -52,7 +54,7 @@ public final class FileProvider extends AbstractTypeEntityProvider<File> {
 
     public void writeTo(File t, MediaType mediaType,
             MultivaluedMap<String, Object> headers, OutputStream entityStream) throws IOException {
-        InputStream in = new FileInputStream(t);
+        InputStream in = new BufferedInputStream(new FileInputStream(t));
         writeTo(in, entityStream);
         in.close();
     }
