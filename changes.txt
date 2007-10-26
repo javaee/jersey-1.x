@@ -1,4 +1,8 @@
 release 0.4 (2007-11-xx)
+- Fixed bug in File entity provider, the FileInput/OutputStream is
+  wrapped around a BufferedInput/OutputStream.
+- Fixed bug in InputStream entity provider, after the bytes read from the
+  InputStream have been written the InputStream is closed.
 - Added new example, Mandel, for accessing Mandelbrots as a web service.
   The example is written in Scala and uses Scala actors.
 - Support the @Encoded on class, method and method parameters.
