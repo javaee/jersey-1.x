@@ -272,11 +272,13 @@ public final class WebApplicationImpl implements WebApplication {
     }
     
     public static void onExceptionWithWebApplication(WebApplicationException e, HttpResponseContext response) {
-        // Log the stack trace
-        e.printStackTrace();
-
         Response r = e.getResponse();
-        if (r.getStatus() >= 400 && r.getEntity() == null) {
+        
+        // Log the stack trace
+        if (r.getStatus() >= 500)
+            e.printStackTrace();
+        
+        if (r.getStatus() >= 500 && r.getEntity() == null) {
             // Write out the exception to a string
             StringWriter sw = new StringWriter();
             PrintWriter pw = new PrintWriter(sw);
