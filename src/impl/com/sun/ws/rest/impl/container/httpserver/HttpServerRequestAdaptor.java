@@ -35,6 +35,7 @@ import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Map.Entry;
 import javax.ws.rs.core.MultivaluedMap;
+import javax.ws.rs.core.UriBuilder;
 
 /**
  * A HTTP request adapter for {@link HttpExchange}.
@@ -58,14 +59,29 @@ public final class HttpServerRequestAdaptor extends AbstractContainerRequest {
          * This is a URI that contains the path, query and
          * fragment components.
          */
-        final URI exchangeUri = exchange.getRequestURI();
+        URI requestUri = exchange.getRequestURI();
         
         /**
          * The base path specified by the HTTP context of the HTTP handler.
          * It is in decoded form.
          */
         String decodedBasePath = exchange.getHttpContext().getPath();
+        
+        // Ensure that the base path ends with a '/'
         if (!decodedBasePath.endsWith("/")) {
+            if (decodedBasePath.equals(requestUri.getPath())) {
+                /**
+                 * This is an edge case where the request path
+                 * does not end in a '/' and is equal to the context 
+                 * path of the HTTP handler.
+                 * Both the request path and base path need to end in a '/'
+                 * Currently the request path is modified.
+                 * TODO support redirection in accordance with resource
+                 * configuration feature.
+                 */
+                requestUri = UriBuilder.fromUri(requestUri).
+                        path("/").build();
+            }
             decodedBasePath += "/";                
         }
 
@@ -86,9 +102,8 @@ public final class HttpServerRequestAdaptor extends AbstractContainerRequest {
             throw new IllegalArgumentException(ex);
         }
             
-        this.completeUri = this.baseUri.resolve(exchangeUri);
+        this.completeUri = this.baseUri.resolve(requestUri);
     }
-    
     
     private void copyHttpHeaders() {
         MultivaluedMap<String, String> headers = getRequestHeaders();
