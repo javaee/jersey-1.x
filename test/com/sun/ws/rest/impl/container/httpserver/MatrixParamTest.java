@@ -62,7 +62,5 @@ public class MatrixParamTest extends AbstractHttpServerTester {
         r = ResourceProxy.create(base.clone().
                 matrixParam("x", "1").encode(false).matrixParam("y", "1%20%7C%7C%202").build());
         assertEquals("1 || 2", r.get(String.class));
-        
-        stopServer();
     }
 }

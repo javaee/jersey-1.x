@@ -77,8 +77,6 @@ public class HttpServerAdaptorTest extends AbstractHttpServerTester {
 
         r = ResourceProxy.create(UriBuilder.fromUri(r.getURI()).path("b/c").build());
         assertEquals("RESOURCE-ONE", r.post(String.class, "RESOURCE-ONE"));
-        
-        stopServer();
     }
     
     public void testPackageReference() {
@@ -89,7 +87,5 @@ public class HttpServerAdaptorTest extends AbstractHttpServerTester {
 
         r = ResourceProxy.create(UriBuilder.fromUri(r.getURI()).path("b/c").build());
         assertEquals("RESOURCE-ONE", r.post(String.class, "RESOURCE-ONE"));
-        
-        stopServer();
     }
 }

@@ -62,7 +62,5 @@ public class OutputStreamTest extends AbstractHttpServerTester {
                 
         ResourceProxy r = ResourceProxy.create(getUri().path("output").build());
         assertEquals("RESOURCE", r.post(String.class, "RESOURCE"));
-        
-        stopServer();
     }
 }

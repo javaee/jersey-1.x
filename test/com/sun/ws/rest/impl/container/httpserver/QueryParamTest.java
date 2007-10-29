@@ -60,7 +60,5 @@ public class QueryParamTest extends AbstractHttpServerTester {
         r = ResourceProxy.create(base.clone().
                 queryParam("x", "1").encode(false).queryParam("y", "1+%7C%7C+2").build());
         assertEquals("1 || 2", r.get(String.class));
-        
-        stopServer();
     }
 }

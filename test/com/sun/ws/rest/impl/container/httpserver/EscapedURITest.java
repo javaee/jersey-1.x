@@ -56,7 +56,5 @@ public class EscapedURITest extends AbstractHttpServerTester {
         ResourceProxy r = ResourceProxy.create(getUri().
                 userInfo("x.y").encode(false).path("x%20y").build());
         assertEquals("CONTENT", r.get(String.class));
-        
-        stopServer();
     } 
 }

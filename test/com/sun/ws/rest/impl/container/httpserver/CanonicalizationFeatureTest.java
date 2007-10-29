@@ -99,8 +99,6 @@ public class CanonicalizationFeatureTest extends AbstractHttpServerTester {
         r = ResourceProxy.create(getUri().
                 path("/test/qparam//a").queryParam("qParam", "val").build());
         assertEquals("val", r.get(String.class));
-        
-        stopServer();
     }
     
 }

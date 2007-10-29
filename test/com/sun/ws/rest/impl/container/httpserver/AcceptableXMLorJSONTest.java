@@ -107,7 +107,5 @@ public class AcceptableXMLorJSONTest extends AbstractHttpServerTester {
         });
         content = r.acceptable("application/json").get(String.class);
         assertTrue(content.contains("{\"jaxbBean\":{\"value\":{\"$\":\"test\"}}}"));
-                
-        stopServer();
     }
 }

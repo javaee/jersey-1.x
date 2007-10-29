@@ -44,21 +44,17 @@ public class HandlerContextTest extends AbstractHttpServerTester {
         super(testName);
     }
     
+    public void setUp() {
+        startServer(Resource.class);        
+    }
+    
     public void testRequestWithTerminatingSlash() {
-        startServer(Resource.class);
-                
         ResourceProxy r = ResourceProxy.create(getUri().path("/").build());
         assertEquals("CONTENT", r.get(String.class));
-
-        stopServer();
     } 
     
     public void testRequestWithoutTerminatingSlash() {
-        startServer(Resource.class);
-                
         ResourceProxy r = ResourceProxy.create(getUri().build());
         assertEquals("CONTENT", r.get(String.class));
-        
-        stopServer();
     }
 }

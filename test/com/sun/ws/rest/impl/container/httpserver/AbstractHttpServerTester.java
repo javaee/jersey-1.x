@@ -75,6 +75,11 @@ public abstract class AbstractHttpServerTester extends TestCase {
     }
     
     public void stopServer() {
-        server.stop(0);
+        if (server != null)
+            server.stop(0);
+    }
+    
+    public void tearDown() {
+        stopServer();
     }
 }
