@@ -22,16 +22,11 @@
 
 package com.sun.ws.rest.impl.container.httpserver;
 
-import com.sun.net.httpserver.HttpHandler;
-import com.sun.net.httpserver.HttpServer;
 import javax.ws.rs.UriTemplate;
-import com.sun.ws.rest.api.container.ContainerFactory;
 import com.sun.ws.rest.api.core.HttpRequestContext;
 import com.sun.ws.rest.api.core.HttpResponseContext;
 import com.sun.ws.rest.api.core.WebResource;
 import com.sun.ws.rest.impl.client.ResourceProxy;
-import java.io.IOException;
-import java.net.InetSocketAddress;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
 import junit.framework.*;
@@ -40,7 +35,7 @@ import junit.framework.*;
  *
  * @author Paul.Sandoz@Sun.Com
  */
-public class HttpServerAdaptorTest extends TestCase {
+public class HttpServerAdaptorTest extends AbstractHttpServerTester {
     @UriTemplate("/{arg1}/{arg2}")
     public static class TestOneWebResource implements WebResource {
         public void handleRequest(HttpRequestContext request, HttpResponseContext response) {
@@ -74,37 +69,27 @@ public class HttpServerAdaptorTest extends TestCase {
         super(testName);
     }
     
-    public void testExpliciWebResourceReference() throws IOException {
-        HttpHandler handler = ContainerFactory.createContainer(HttpHandler.class, 
-                TestOneWebResource.class, TestTwoWebResource.class);
+    public void testExpliciWebResourceReference() {
+        startServer(TestOneWebResource.class, TestTwoWebResource.class);
         
-        HttpServer server = HttpServer.create(new InetSocketAddress(9998), 0);
-        server.createContext("/context", handler);
-        server.start();
-        
-        ResourceProxy r = ResourceProxy.create("http://localhost:9998/context/a");
+        ResourceProxy r = ResourceProxy.create(getUri().path("a").build());
         assertEquals("RESOURCE-TWO", r.post(String.class, "RESOURCE-TWO"));
 
         r = ResourceProxy.create(UriBuilder.fromUri(r.getURI()).path("b/c").build());
         assertEquals("RESOURCE-ONE", r.post(String.class, "RESOURCE-ONE"));
         
-        server.stop(0);
+        stopServer();
     }
     
-    public void testPackageReference() throws IOException {
-        HttpHandler handler = ContainerFactory.createContainer(HttpHandler.class, 
-                this.getClass().getPackage().getName());
+    public void testPackageReference() {
+        startServer(this.getClass().getPackage().getName());
         
-        HttpServer server = HttpServer.create(new InetSocketAddress(9999), 0);
-        server.createContext("/context", handler);
-        server.start();
-        
-        ResourceProxy r = ResourceProxy.create("http://localhost:9999/context/a");
+        ResourceProxy r = ResourceProxy.create(getUri().path("a").build());
         assertEquals("RESOURCE-TWO", r.post(String.class, "RESOURCE-TWO"));
 
         r = ResourceProxy.create(UriBuilder.fromUri(r.getURI()).path("b/c").build());
         assertEquals("RESOURCE-ONE", r.post(String.class, "RESOURCE-ONE"));
         
-        server.stop(0);
+        stopServer();
     }
 }

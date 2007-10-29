@@ -25,43 +25,39 @@ package com.sun.ws.rest.impl.container.httpserver;
 import javax.ws.rs.UriTemplate;
 import com.sun.ws.rest.impl.client.ResourceProxy;
 import javax.ws.rs.HttpMethod;
-import javax.ws.rs.MatrixParam;
-import javax.ws.rs.core.UriBuilder;
 import junit.framework.*;
 
 /**
  *
  * @author Paul.Sandoz@Sun.Com
  */
-public class MatrixParamTest extends AbstractHttpServerTester {
-    @UriTemplate("/test")
-    public static class MatrixParamResource {
+public class HandlerContextTest extends AbstractHttpServerTester {
+    @UriTemplate("/")
+    public static class Resource {
         @HttpMethod
-        public String get(@MatrixParam("x") String x, @MatrixParam("y") String y) {
-            return y;
+        public String get() {
+            return "CONTENT";
         }
     }
         
-    public MatrixParamTest(String testName) {
+    public HandlerContextTest(String testName) {
         super(testName);
     }
     
-    public void testMatrixParam() {
-        startServer(MatrixParamResource.class);
+    public void testRequestWithTerminatingSlash() {
+        startServer(Resource.class);
+                
+        ResourceProxy r = ResourceProxy.create(getUri().path("/").build());
+        assertEquals("CONTENT", r.get(String.class));
 
-        UriBuilder base = getUri().path("test");
-            
-        ResourceProxy r = ResourceProxy.create(base.clone().matrixParam("y", "1").build());
-        assertEquals("1", r.get(String.class));
-        r = ResourceProxy.create(base.clone().
-                matrixParam("x", "1").encode(false).matrixParam("y", "1%20%2B%202").build());
-        assertEquals("1 + 2", r.get(String.class));
-        r = ResourceProxy.create(base.clone().
-                matrixParam("x", "1").encode(false).matrixParam("y", "1%20%26%202").build());
-        assertEquals("1 & 2", r.get(String.class));
-        r = ResourceProxy.create(base.clone().
-                matrixParam("x", "1").encode(false).matrixParam("y", "1%20%7C%7C%202").build());
-        assertEquals("1 || 2", r.get(String.class));
+        stopServer();
+    } 
+    
+    public void testRequestWithoutTerminatingSlash() {
+        startServer(Resource.class);
+                
+        ResourceProxy r = ResourceProxy.create(getUri().build());
+        assertEquals("CONTENT", r.get(String.class));
         
         stopServer();
     }

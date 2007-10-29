@@ -22,13 +22,8 @@
 
 package com.sun.ws.rest.impl.container.httpserver;
 
-import com.sun.net.httpserver.HttpHandler;
-import com.sun.net.httpserver.HttpServer;
 import javax.ws.rs.UriTemplate;
-import com.sun.ws.rest.api.container.ContainerFactory;
 import com.sun.ws.rest.impl.client.ResourceProxy;
-import java.io.IOException;
-import java.net.InetSocketAddress;
 import javax.ws.rs.HttpMethod;
 import javax.ws.rs.core.HttpContext;
 import javax.ws.rs.core.UriInfo;
@@ -38,13 +33,13 @@ import junit.framework.*;
  *
  * @author Paul.Sandoz@Sun.Com
  */
-public class EscapedURITest extends TestCase {
+public class EscapedURITest extends AbstractHttpServerTester {
     @UriTemplate(value="x%20y", encode=false)
     public static class EscapedURIResource {
         @HttpMethod
         public String get(@HttpContext UriInfo info) {
-            assertEquals("http://localhost:9998/context/x%20y", info.getAbsolute().toString());
-            assertEquals("http://localhost:9998/context/", info.getBase().toString());
+            assertEquals(CONTEXT + "/x%20y", info.getAbsolute().getRawPath());
+            assertEquals(CONTEXT + "/", info.getBase().getRawPath());
             assertEquals("x y", info.getPath());
             assertEquals("x%20y", info.getPath(false));
             return "CONTENT";
@@ -55,17 +50,13 @@ public class EscapedURITest extends TestCase {
         super(testName);
     }
     
-    public void testExpliciWebResourceReference() throws IOException {
-        HttpHandler handler = ContainerFactory.createContainer(HttpHandler.class, 
-                EscapedURIResource.class);
-        
-        HttpServer server = HttpServer.create(new InetSocketAddress(9998), 0);
-        server.createContext("/context", handler);
-        server.start();
+    public void testExpliciWebResourceReference() {
+        startServer(EscapedURIResource.class);
                 
-        ResourceProxy r = ResourceProxy.create("http://x.y@localhost:9998/context/x%20y");
+        ResourceProxy r = ResourceProxy.create(getUri().
+                userInfo("x.y").encode(false).path("x%20y").build());
         assertEquals("CONTENT", r.get(String.class));
         
-        server.stop(0);
+        stopServer();
     } 
 }

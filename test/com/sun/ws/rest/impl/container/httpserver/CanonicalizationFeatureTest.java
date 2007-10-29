@@ -22,28 +22,21 @@
 
 package com.sun.ws.rest.impl.container.httpserver;
 
-import com.sun.net.httpserver.HttpHandler;
-import com.sun.net.httpserver.HttpServer;
-import com.sun.ws.rest.api.container.ContainerFactory;
 import com.sun.ws.rest.api.core.DefaultResourceConfig;
 import com.sun.ws.rest.api.core.ResourceConfig;
 import com.sun.ws.rest.impl.client.ResourceProxy;
-import java.io.IOException;
-import java.net.InetSocketAddress;
-import java.net.URI;
 import javax.ws.rs.HttpMethod;
 import javax.ws.rs.ProduceMime;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.UriParam;
 import javax.ws.rs.UriTemplate;
-import javax.ws.rs.core.UriBuilder;
 import junit.framework.*;
 
 /**
  *
  * @author Jakub Podlesak (japod at sun dot com)
  */
-public class CanonicalizationFeatureTest extends TestCase {
+public class CanonicalizationFeatureTest extends AbstractHttpServerTester {
     
     public CanonicalizationFeatureTest(String testName) {
         super(testName);
@@ -81,52 +74,33 @@ public class CanonicalizationFeatureTest extends TestCase {
         }
     }
     
-    public void testContdSlashesProtection() throws IOException {
-        ResourceConfig myResourceConfig = new DefaultResourceConfig(TestWebResource.class);
-        myResourceConfig.getFeatures().put(ResourceConfig.FEATURE_CANONICALIZE_URI_PATH, false);
+    public void testContdSlashesProtection() {        
+        ResourceConfig rc = new DefaultResourceConfig(TestWebResource.class);
+        rc.getFeatures().put(ResourceConfig.FEATURE_CANONICALIZE_URI_PATH, false);
         
-        HttpHandler handler = ContainerFactory.createContainer(
-                HttpHandler.class, myResourceConfig);
+        startServer(rc);
         
-        HttpServer server = null;
-        int port;
-        for (port = 9998; port < 10998; port++) {
-            try {
-                server = HttpServer.create(new InetSocketAddress(port), 0);
-            } catch (IOException ex) {
-            }
-            if (null != server) { // free port number found :-)
-                break;
-            }
-        }
-        assertNotNull(server);
-        
-        server.createContext("/", handler);
-        server.start();
-        
-        URI baseUri = UriBuilder.fromUri("http://localhost").port(port).build();
-                
-        ResourceProxy r = ResourceProxy.create(UriBuilder.fromUri(baseUri).
+        ResourceProxy r = ResourceProxy.create(getUri().
                 path("/test/uri/http://jersey.dev.java.net").build());
         assertEquals("http://jersey.dev.java.net", r.get(String.class));
-        r = ResourceProxy.create(UriBuilder.fromUri(baseUri).
+        r = ResourceProxy.create(getUri().
                 path("/test/dblslashes//customers//").build());
         assertEquals("customers", r.get(String.class));
         
-        myResourceConfig.getFeatures().
+        rc.getFeatures().
                 put(ResourceConfig.FEATURE_CANONICALIZE_URI_PATH, true);
         
-        r = ResourceProxy.create(UriBuilder.fromUri(baseUri).
+        r = ResourceProxy.create(getUri().
                 path("/test/uri/http://jersey.dev.java.net").build());
         assertEquals("http:/jersey.dev.java.net", r.get(String.class));
-        r = ResourceProxy.create(UriBuilder.fromUri(baseUri).
+        r = ResourceProxy.create(getUri().
                 path("/test/slashes//customers//").build());
         assertEquals("customers", r.get(String.class));
-        r = ResourceProxy.create(UriBuilder.fromUri(baseUri).
+        r = ResourceProxy.create(getUri().
                 path("/test/qparam//a").queryParam("qParam", "val").build());
         assertEquals("val", r.get(String.class));
         
-        server.stop(0);        
+        stopServer();
     }
     
 }

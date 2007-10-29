@@ -22,15 +22,11 @@
 
 package com.sun.ws.rest.impl.container.httpserver;
 
-import com.sun.net.httpserver.HttpHandler;
-import com.sun.net.httpserver.HttpServer;
 import javax.ws.rs.UriTemplate;
-import com.sun.ws.rest.api.container.ContainerFactory;
 import com.sun.ws.rest.api.core.HttpRequestContext;
 import com.sun.ws.rest.api.core.HttpResponseContext;
 import com.sun.ws.rest.impl.client.ResourceProxy;
 import java.io.IOException;
-import java.net.InetSocketAddress;
 import javax.ws.rs.HttpMethod;
 import javax.ws.rs.ProduceMime;
 import junit.framework.*;
@@ -39,7 +35,7 @@ import junit.framework.*;
  *
  * @author Paul.Sandoz@Sun.Com
  */
-public class OutputStreamTest extends TestCase {
+public class OutputStreamTest extends AbstractHttpServerTester {
     @UriTemplate("/output")
     public static class TestResource { // implements WebResource {
 
@@ -61,16 +57,12 @@ public class OutputStreamTest extends TestCase {
         super(testName);
     }
     
-    public void testOutputStream() throws IOException {
-        HttpHandler handler = ContainerFactory.createContainer(HttpHandler.class, TestResource.class);
-        
-        HttpServer server = HttpServer.create(new InetSocketAddress(9998), 0);
-        server.createContext("/context", handler);
-        server.start();
+    public void testOutputStream() {
+        startServer(TestResource.class);
                 
-        ResourceProxy r = ResourceProxy.create("http://localhost:9998/context/output");
+        ResourceProxy r = ResourceProxy.create(getUri().path("output").build());
         assertEquals("RESOURCE", r.post(String.class, "RESOURCE"));
         
-        server.stop(0);
+        stopServer();
     }
 }

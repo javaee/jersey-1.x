@@ -23,16 +23,12 @@
 package com.sun.ws.rest.impl.container.httpserver;
 
 import com.sun.net.httpserver.HttpHandler;
-import com.sun.net.httpserver.HttpServer;
 import com.sun.ws.rest.impl.client.RequestOutBound;
 import com.sun.ws.rest.impl.client.ResponseInBound;
 import java.net.URI;
 import javax.ws.rs.UriTemplate;
-import com.sun.ws.rest.api.container.ContainerFactory;
 import com.sun.ws.rest.impl.client.ResourceProxy;
 import com.sun.ws.rest.impl.client.ResourceProxyFilter;
-import java.io.IOException;
-import java.net.InetSocketAddress;
 import javax.ws.rs.HttpMethod;
 import javax.ws.rs.ProduceMime;
 import javax.xml.bind.annotation.XmlRootElement;
@@ -42,7 +38,7 @@ import junit.framework.*;
  *
  * @author Paul.Sandoz@Sun.Com
  */
-public class AcceptableXMLorJSONTest extends TestCase {
+public class AcceptableXMLorJSONTest extends AbstractHttpServerTester {
     @XmlRootElement
     public static class JAXBBean {
 
@@ -78,14 +74,10 @@ public class AcceptableXMLorJSONTest extends TestCase {
         super(testName);
     }
     
-    public void testExpliciWebResourceReference() throws IOException {
-        HttpHandler handler = ContainerFactory.createContainer(HttpHandler.class, WebResource.class);
-        
-        HttpServer server = HttpServer.create(new InetSocketAddress(9998), 0);
-        server.createContext("/context", handler);
-        server.start();
+    public void testExpliciWebResourceReference() {
+        startServer(HttpHandler.class, WebResource.class);
 
-        ResourceProxy r = ResourceProxy.create("http://localhost:9998/context/resource");
+        ResourceProxy r = ResourceProxy.create(getUri().path("resource").build());
         r.addFilter(new ResourceProxyFilter() {
             public ResponseInBound invoke(URI u, String method, RequestOutBound ro) {
                 ResponseInBound ri = getNext().invoke(u, method, ro);
@@ -116,6 +108,6 @@ public class AcceptableXMLorJSONTest extends TestCase {
         content = r.acceptable("application/json").get(String.class);
         assertTrue(content.contains("{\"jaxbBean\":{\"value\":{\"$\":\"test\"}}}"));
                 
-        server.stop(0);
+        stopServer();
     }
 }

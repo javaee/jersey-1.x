@@ -22,13 +22,8 @@
 
 package com.sun.ws.rest.impl.container.httpserver;
 
-import com.sun.net.httpserver.HttpHandler;
-import com.sun.net.httpserver.HttpServer;
 import javax.ws.rs.UriTemplate;
-import com.sun.ws.rest.api.container.ContainerFactory;
 import com.sun.ws.rest.impl.client.ResourceProxy;
-import java.io.IOException;
-import java.net.InetSocketAddress;
 import javax.ws.rs.HttpMethod;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.UriBuilder;
@@ -38,7 +33,7 @@ import junit.framework.*;
  *
  * @author Paul.Sandoz@Sun.Com
  */
-public class QueryParamTest extends TestCase {
+public class QueryParamTest extends AbstractHttpServerTester {
     @UriTemplate("/test")
     public static class QueryParamResource {
         @HttpMethod
@@ -51,14 +46,10 @@ public class QueryParamTest extends TestCase {
         super(testName);
     }
     
-    public void testQueryParam() throws IOException {
-        HttpHandler handler = ContainerFactory.createContainer(HttpHandler.class, QueryParamResource.class);
-        
-        HttpServer server = HttpServer.create(new InetSocketAddress(9998), 0);
-        server.createContext("/context", handler);
-        server.start();
+    public void testQueryParam() {
+        startServer(QueryParamResource.class);
                 
-        UriBuilder base = UriBuilder.fromUri("http://localhost:9998/context/test");
+        UriBuilder base = getUri().path("test");
             
         ResourceProxy r = ResourceProxy.create(base.clone().
                 queryParam("x", "1").encode(false).queryParam("y", "1+%2B+2").build());
@@ -70,6 +61,6 @@ public class QueryParamTest extends TestCase {
                 queryParam("x", "1").encode(false).queryParam("y", "1+%7C%7C+2").build());
         assertEquals("1 || 2", r.get(String.class));
         
-        server.stop(0);
+        stopServer();
     }
 }
