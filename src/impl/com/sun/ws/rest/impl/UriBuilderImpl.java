@@ -116,16 +116,6 @@ public final class UriBuilderImpl extends UriBuilder {
         return this;
     }
 
-    public UriBuilder authority(String authority) {
-        // TODO This is buggy because the authority is percent-encoded
-        // Any template present variables will result in an exception
-        URI uri = createURI(null, authority, null, null, null);
-        userInfo = uri.getRawUserInfo();
-        host = uri.getHost();
-        port = uri.getPort();
-        return this;
-    }
-
     public UriBuilder userInfo(String ui) {
         this.userInfo = encode(ui, UriComponent.Type.USER_INFO);
         return this;

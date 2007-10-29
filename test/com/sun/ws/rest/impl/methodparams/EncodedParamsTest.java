@@ -73,15 +73,14 @@ public class EncodedParamsTest extends AbstractResourceTester {
     
     @UriTemplate("/{u}")
     public static class EncodedOnAccessibleObject {
-        // TODO update when @Encoded supports target of CONSTRUCTOR
-        // @Encoded
+        @Encoded
         public EncodedOnAccessibleObject(
                 @UriParam("u") String u,
                 @QueryParam("q") String q, 
                 @MatrixParam("m") String m) {
-            assertEquals(" u", u);
-            assertEquals(" q", q);
-            assertEquals(" m", m);
+            assertEquals("%20u", u);
+            assertEquals("%20q", q);
+            assertEquals("%20m", m);
         }
         
         @Encoded

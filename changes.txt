@@ -1,4 +1,5 @@
 release 0.4 (2007-11-xx)
+- Integrated JSR 311 API 0.4.
 - The runtime no longer logs the stack trace for a caught 
   WebApplicationException with a status code < 500. 
 - Fixed bug in File entity provider, the FileInput/OutputStream is
