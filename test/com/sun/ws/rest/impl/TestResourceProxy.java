@@ -91,7 +91,7 @@ public class TestResourceProxy extends ResourceProxy {
             
             try {
                 return ProviderFactory.getInstance().createEntityProvider(c).
-                        readFrom(c, getContentType(), null, getInputStream(successful));
+                        readFrom(c, getContentType(), metadata, getInputStream(successful));
             } catch (IOException ex) {
                 throw new ResourceProxyException(ex);
             }
@@ -147,12 +147,12 @@ public class TestResourceProxy extends ResourceProxy {
         try {
             final Object mediaType = metadata.getFirst("Content-Type");
             if (mediaType instanceof MediaType) {
-                p.writeTo(entity, (MediaType)mediaType, null, out);
+                p.writeTo(entity, (MediaType)mediaType, metadata, out);
             } else {
                 if (mediaType != null) {
-                    p.writeTo(entity, new MediaType(mediaType.toString()), null, out);
+                    p.writeTo(entity, new MediaType(mediaType.toString()), metadata, out);
                 } else {
-                    p.writeTo(entity, null, null, out);
+                    p.writeTo(entity, null, metadata, out);
                 }
             }
             out.flush();

@@ -85,7 +85,7 @@ public final class URLConnectionResourceProxy extends ResourceProxy {
         public <T> T getEntity(Class<T> c, boolean successful) {
             try {
                 return ProviderFactory.getInstance().createEntityProvider(c).
-                        readFrom(c, getContentType(), null, getInputStream(successful));
+                        readFrom(c, getContentType(), metadata, getInputStream(successful));
             } catch (IOException ex) {
                 throw new IllegalArgumentException(ex);
             }
@@ -167,12 +167,12 @@ public final class URLConnectionResourceProxy extends ResourceProxy {
         
         final Object mediaType = metadata.getFirst("Content-Type");
         if (mediaType instanceof MediaType) {
-            p.writeTo(entity, (MediaType)mediaType, null, out);
+            p.writeTo(entity, (MediaType)mediaType, metadata, out);
         } else {
             if (mediaType != null) {
-                p.writeTo(entity, new MediaType(mediaType.toString()), null, out);
+                p.writeTo(entity, new MediaType(mediaType.toString()), metadata, out);
             } else {
-                p.writeTo(entity, null, null, out);
+                p.writeTo(entity, null, metadata, out);
             }
         }
         out.flush();
