@@ -1,4 +1,4 @@
-release 0.4 (2007-11-xx)
+release 0.4 (2007-11-02)
 - Integrated JSR 311 API 0.4.
 - The runtime no longer logs the stack trace for a caught 
   WebApplicationException with a status code < 500. 
@@ -8,7 +8,7 @@ release 0.4 (2007-11-xx)
   read from the InputStream have been written the InputStream is closed.
 - Added new example, Mandel, for accessing Mandelbrots as a web service.
   The example is written in Scala and uses Scala actors.
-- Support the @Encoded on class, method and method parameters.
+- Support the @Encoded on class, constructors, method and method parameters.
   https://jsr311.dev.java.net/nonav/javadoc/javax/ws/rs/Encoded.html
   Advanced developers may work in the encoded space of URI parameters,
   query parameters and matrix parameters by declaring this annotation on
