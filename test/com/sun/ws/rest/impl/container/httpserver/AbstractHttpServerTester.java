@@ -62,6 +62,9 @@ public abstract class AbstractHttpServerTester extends TestCase {
     }
     
     private void start(HttpHandler handler) {
+        if (server != null)
+            stopServer();
+        
         try {
             server = HttpServer.create(new InetSocketAddress(port), 0);
         } catch (IOException ex) {
