@@ -22,10 +22,10 @@
 
 package com.sun.ws.rest.impl.container.servlet;
 
+import com.sun.ws.rest.api.container.ContainerException;
+import com.sun.ws.rest.api.core.UriComponent;
 import com.sun.ws.rest.spi.container.AbstractContainerRequest;
 import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.Enumeration;
 import java.util.LinkedList;
 import java.util.List;
@@ -73,35 +73,21 @@ public final class HttpRequestAdaptor extends AbstractContainerRequest {
             ? request.getContextPath() + request.getServletPath() + "/"
             : request.getContextPath() + "/";
         
-        final String encodedBasePath = UriBuilder.fromPath(decodedBasePath, true).build().toString();
+        final String encodedBasePath = UriComponent.encode(decodedBasePath, UriComponent.Type.PATH);
         
-        String encodedCompletePath;
-
-        try {
-            encodedCompletePath = (new URI(request.getRequestURI())).getRawPath();
-        } catch (URISyntaxException ex) {
-            // TODO: shall we throw an exception instead?
-            //       we should at least log it
-            //       the path is not actually encoded here, since getPathInfo and getServletPath are not encoded
-            encodedCompletePath = encodedBasePath +     // also getPathInfo() might have eaten contiguos '/' chars
-                ((request.getPathInfo() != null) 
-                    ? request.getPathInfo().substring(1)
-                    : request.getServletPath().substring(1));
+        if (!decodedBasePath.equals(encodedBasePath)) {
+            throw new ContainerException("The servlet context path and or the servlet path contain characters that are percent enocded");
         }
         
-        // some servlet implementations return fake context and servlet paths
-        final String encodedPath = (encodedCompletePath.startsWith(encodedBasePath)) ? 
-                                        encodedCompletePath.substring(encodedBasePath.length()) : encodedCompletePath;
-
         String queryParameters = request.getQueryString();
         if (queryParameters == null) queryParameters = "";
         
-        this.baseUri = absoluteUriBuilder.
-                replacePath(decodedBasePath).
+        this.baseUri = absoluteUriBuilder.encode(false).
+                replacePath(encodedBasePath).
                 build();
         
         this.completeUri = absoluteUriBuilder.encode(false).
-                path(encodedPath).
+                replacePath(request.getRequestURI()).
                 replaceQueryParams(queryParameters).
                 build();
     }    
