@@ -73,20 +73,25 @@ public final class HttpRequestAdaptor extends AbstractContainerRequest {
             ? request.getContextPath() + request.getServletPath() + "/"
             : request.getContextPath() + "/";
         
-        String decodedCompletePath;
+        final String encodedBasePath = UriBuilder.fromPath(decodedBasePath, true).build().toString();
+        
+        String encodedCompletePath;
 
         try {
-            decodedCompletePath = (new URI(request.getRequestURI())).getPath();
+            encodedCompletePath = (new URI(request.getRequestURI())).getRawPath();
         } catch (URISyntaxException ex) {
-            decodedCompletePath = decodedBasePath +     // only a backup solution -- getPathInfo() might have eaten contiguos '/' chars
+            // TODO: shall we throw an exception instead?
+            //       we should at least log it
+            //       the path is not actually encoded here, since getPathInfo and getServletPath are not encoded
+            encodedCompletePath = encodedBasePath +     // also getPathInfo() might have eaten contiguos '/' chars
                 ((request.getPathInfo() != null) 
                     ? request.getPathInfo().substring(1)
-                    : request.getServletPath().substring(1));            
+                    : request.getServletPath().substring(1));
         }
         
         // some servlet implementations return fake context and servlet paths
-        final String decodedPath = (decodedCompletePath.startsWith(decodedBasePath)) ? 
-                                        decodedCompletePath.substring(decodedBasePath.length()) : decodedCompletePath;
+        final String encodedPath = (encodedCompletePath.startsWith(encodedBasePath)) ? 
+                                        encodedCompletePath.substring(encodedBasePath.length()) : encodedCompletePath;
 
         String queryParameters = request.getQueryString();
         if (queryParameters == null) queryParameters = "";
@@ -95,9 +100,8 @@ public final class HttpRequestAdaptor extends AbstractContainerRequest {
                 replacePath(decodedBasePath).
                 build();
         
-        this.completeUri = absoluteUriBuilder.encode(true).
-                path(decodedPath).
-                encode(false).
+        this.completeUri = absoluteUriBuilder.encode(false).
+                path(encodedPath).
                 replaceQueryParams(queryParameters).
                 build();
     }    
