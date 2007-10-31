@@ -1,4 +1,7 @@
 release 0.4 (2007-11-02)
+- Fixed issue 19: java.lang.StringIndexOutOfBoundsException for 
+  LW HTTP container
+  https://jersey.dev.java.net/issues/show_bug.cgi?id=19
 - Integrated JSR 311 API 0.4.
 - The runtime no longer logs the stack trace for a caught 
   WebApplicationException with a status code < 500. 
