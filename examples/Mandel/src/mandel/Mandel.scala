@@ -2,13 +2,12 @@ package mandel
 
 object Mandel {
     def iter(c: Complex, limit: int) = {
-        var z = c
-        var i = 0;
-        while(z.modSquared < 4 && i < limit) {
-            z = z * z + c;
-            i = i + 1;
-        }
+	limit - _iter(c, c, limit)
+    }
 
-        i
+    private def _iter(z: Complex, c: Complex, limit: int) : int = {
+	if (limit == 0 || z.modSquared >= 4) return limit
+
+	_iter(z * z + c, c, limit - 1);
     }
 }
