@@ -79,10 +79,20 @@ public class WadlWriter {
                             continue;
                         com.sun.research.ws.wadl.Param param = new com.sun.research.ws.wadl.Param();
                         param.setName(paramModel.getName());
-                        if (paramModel.getStyle() == com.sun.ws.rest.tools.annotation.Param.Style.QUERY)
-                            param.setStyle(ParamStyle.QUERY);
-                        else if (paramModel.getStyle() == com.sun.ws.rest.tools.annotation.Param.Style.URI)
-                            param.setStyle(ParamStyle.TEMPLATE);
+                        switch (paramModel.getStyle()) {
+                            case QUERY:
+                                param.setStyle(ParamStyle.QUERY);
+                                break;
+                            case URI:
+                                param.setStyle(ParamStyle.TEMPLATE);
+                                break;
+                            case MATRIX:
+                                param.setStyle(ParamStyle.MATRIX);
+                                break;
+                            case HEADER:
+                                param.setStyle(ParamStyle.HEADER);
+                                break;
+                        }
                         if (paramModel.getDefaultValue() != null)
                             param.setDefault(paramModel.getDefaultValue());
                         param.setRepeating(paramModel.isRepeating());

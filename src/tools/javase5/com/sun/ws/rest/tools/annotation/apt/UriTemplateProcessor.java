@@ -30,20 +30,11 @@ import com.sun.mirror.declaration.MethodDeclaration;
 import com.sun.mirror.declaration.Modifier;
 import com.sun.mirror.declaration.ParameterDeclaration;
 import com.sun.mirror.declaration.TypeDeclaration;
-import com.sun.mirror.type.AnnotationType;
 import com.sun.mirror.type.ArrayType;
-import com.sun.mirror.type.ClassType;
-import com.sun.mirror.type.DeclaredType;
 import com.sun.mirror.type.EnumType;
-import com.sun.mirror.type.InterfaceType;
 import com.sun.mirror.type.PrimitiveType;
-import com.sun.mirror.type.ReferenceType;
-import com.sun.mirror.type.TypeMirror;
-import com.sun.mirror.type.TypeVariable;
 import com.sun.mirror.type.VoidType;
-import com.sun.mirror.type.WildcardType;
 import com.sun.mirror.util.SimpleTypeVisitor;
-import com.sun.mirror.util.TypeVisitor;
 import com.sun.ws.rest.api.core.ResourceConfig;
 import com.sun.ws.rest.impl.model.method.ResourceHttpMethod;
 import com.sun.ws.rest.tools.annotation.AnnotationProcessorContext;
@@ -63,10 +54,11 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.UriParam;
 import javax.ws.rs.UriTemplate;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Map;
+import javax.ws.rs.HeaderParam;
+import javax.ws.rs.MatrixParam;
 import javax.xml.namespace.QName;
  
 
@@ -339,6 +331,12 @@ public class UriTemplateProcessor implements Messager, AnnotationProcessor {
         UriParam up = pd.getAnnotation(UriParam.class);
         if (up != null)
             return new Param(up.value(), Param.Style.URI, defaultValue, type.getSchemaType(), type.isRepeating());
+        MatrixParam mp = pd.getAnnotation(MatrixParam.class);
+        if (mp != null)
+            return new Param(mp.value(), Param.Style.MATRIX, defaultValue, type.getSchemaType(), type.isRepeating());
+        HeaderParam hp = pd.getAnnotation(HeaderParam.class);
+        if (hp != null)
+            return new Param(hp.value(), Param.Style.HEADER, defaultValue, type.getSchemaType(), type.isRepeating());
         return new Param(pd.getSimpleName(), Param.Style.ENTITY, defaultValue, type.getSchemaType(), type.isRepeating());
     }
     

@@ -64,5 +64,5 @@ public class Param {
         return repeating;
     }
     
-    public enum Style {QUERY, URI, ENTITY};
+    public enum Style {QUERY, URI, ENTITY, MATRIX, HEADER};
 }
