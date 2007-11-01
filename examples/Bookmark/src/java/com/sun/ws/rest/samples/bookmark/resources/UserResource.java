@@ -133,7 +133,8 @@ public class UserResource {
             .put("userid", userEntity.getUserid())
             .put("username", userEntity.getUsername())
             .put("email", userEntity.getEmail())
-            .put("password", userEntity.getPassword());
+            .put("password", userEntity.getPassword())
+            .put("bookmarks", uriInfo.getBuilder().path("bookmarks").build());
         } catch (JSONException je){
             throw new WebApplicationException(je);
         }
