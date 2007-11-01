@@ -1,12 +1,12 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
- * 
- * Copyright 2007 Sun Microsystems, Inc. All rights reserved. 
- * 
+ *
+ * Copyright 2007 Sun Microsystems, Inc. All rights reserved.
+ *
  * The contents of this file are subject to the terms of the Common Development
  * and Distribution License("CDDL") (the "License").  You may not use this file
- * except in compliance with the License. 
- * 
+ * except in compliance with the License.
+ *
  * You can obtain a copy of the License at:
  *     https://jersey.dev.java.net/license.txt
  * See the License for the specific language governing permissions and
@@ -72,7 +72,16 @@ public class UserResource {
         if (null == userEntity) {
             throw new NotFoundException("userid " + userid + "does not exist!");
         }
-        return asJson();
+        try {
+            return new JSONObject()
+            .put("userid", userEntity.getUserid())
+            .put("username", userEntity.getUsername())
+            .put("email", userEntity.getEmail())
+            .put("password", userEntity.getPassword())
+            .put("bookmarks", uriInfo.getBuilder().path("bookmarks").build());
+        } catch (JSONException je){
+            throw new WebApplicationException(je);
+        }
     }
     
     @HttpMethod("PUT")
@@ -83,7 +92,7 @@ public class UserResource {
         Response.Builder rBuilder = Response.Builder.noContent();
         
         if ((null != jsonUserid) && !jsonUserid.equals(userid)) {
-            rBuilder.status(409); 
+            rBuilder.status(409);
             rBuilder.representation("userids differ!\n");
             return rBuilder.build();
         }
@@ -103,12 +112,12 @@ public class UserResource {
                 em.persist(userEntity);
             }});
             rBuilder.created(uriInfo.getAbsolute());
-         } else {
+        } else {
             TransactionManager.manage(new Transactional(em) { public void transact() {
                 em.merge(userEntity);
             }});
             rBuilder.status(204);
-          }
+        }
         return rBuilder.build();
     }
     
@@ -122,22 +131,9 @@ public class UserResource {
         }});
     }
     
-
+    
     public String asString() {
         return toString();
-    }
-    
-    public JSONObject asJson() {
-        try {
-            return new JSONObject()
-            .put("userid", userEntity.getUserid())
-            .put("username", userEntity.getUsername())
-            .put("email", userEntity.getEmail())
-            .put("password", userEntity.getPassword())
-            .put("bookmarks", uriInfo.getBuilder().path("bookmarks").build());
-        } catch (JSONException je){
-            throw new WebApplicationException(je);
-        }
     }
     
     public String toString() {
