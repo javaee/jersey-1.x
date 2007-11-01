@@ -68,20 +68,16 @@ public class UserResource {
     
     @HttpMethod("GET")
     @ProduceMime("application/json")
-    public JSONObject getUser() {
+    public JSONObject getUser() throws JSONException {
         if (null == userEntity) {
             throw new NotFoundException("userid " + userid + "does not exist!");
         }
-        try {
-            return new JSONObject()
+        return new JSONObject()
             .put("userid", userEntity.getUserid())
             .put("username", userEntity.getUsername())
             .put("email", userEntity.getEmail())
             .put("password", userEntity.getPassword())
             .put("bookmarks", uriInfo.getBuilder().path("bookmarks").build());
-        } catch (JSONException je){
-            throw new WebApplicationException(je);
-        }
     }
     
     @HttpMethod("PUT")
