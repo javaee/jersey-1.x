@@ -1,8 +1,8 @@
 release 0.4 (2007-11-02)
 - Fixed issue 17: Matrix Parameter With URL Value Ends Up With 404
   https://jersey.dev.java.net/issues/show_bug.cgi?id=17
-  A specific JVM option parameter is required to be set as well 
-  (see issue for details).
+  A specific JVM option parameter is required to be set when using
+  Glassfish (see issue for details).
 - Added matrix and header param support to WADL
 - Fixed issue 19: java.lang.StringIndexOutOfBoundsException for 
   LW HTTP container
