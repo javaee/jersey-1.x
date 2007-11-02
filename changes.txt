@@ -1,3 +1,6 @@
+release 0.5 (2007-12-xx/2008-01-xx)
+
+
 release 0.4 (2007-11-02)
 - Fixed issue 17: Matrix Parameter With URL Value Ends Up With 404
   https://jersey.dev.java.net/issues/show_bug.cgi?id=17
