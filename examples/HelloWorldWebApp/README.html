@@ -1,33 +1,17 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
-<html><head><title>Simple Servlet Example</title></head>
+<html><head><title>HelloWorldWebApp Example</title></head>
 
 
   <body>
-      <h1>Simple Servlet Example</h1>
+      <h1>HelloWorldWebApp Example</h1>
       
-      <p>This example demonstrates how to develop RESTful web services with a Servlet 2.5 container.</p>
+      <p>This example demonstrates how to develop RESTful hello world web service with a Servlet 2.5 container.</p>
       
       <h2>Contents</h2>
-      <p>The example consists of five Java classes, one HTML file, and one JPEG image:</p>
+      <p>The example consists of just one Java class:</p>
       <dl>
-          <dt><code>com.sun.ws.rest.samples.jaxws.resources.MasterResourceBean</code></dt>
-          <dd>A resource class that produces a form in response to an HTTP GET. Tthe form is used to exercise the other resources in this sample applicaton.</dd>
-          <dt><code>com.sun.ws.rest.samples.jaxws.resources.ResourceBean1</code></dt>
-          <dd>A resource class that produces the string "Hello World from resource 1" in response to an HTTP GET.</dd>
-          <dt><code>com.sun.ws.rest.samples.jaxws.resources.ResourceBean2</code></dt>
-          <dd>A resource class that produces the string "Hello World from resource 2" in response to an HTTP GET.</dd>
-          <dt><code>com.sun.ws.rest.samples.jaxws.resources.ResourceBean3</code></dt>
-          <dd>A resource class that produces different responses based on either the value of a
-           "rep" query parameter or the "Accept" header of a HTTP GET invocation.  The form contained
-           in the index.html file will allow you to specify whether to use the query parameter
-           or a MimeType for the request.
-          </dd>
-          <dt><code>com.sun.ws.rest.samples.jaxws.resources.ResourceBean4</code></dt>
-          <dd>A resource class that produces the string "&lt;response&gt;Hello World&lt;/response&gt;" in response to an HTTP GET.</dd>
-          <dt><code>index.html</code></dt>
-          <dd>A static HTML file that is returned by the MasterResourceBean resource.</dd>
-          <dt><code>java.jpg</code></dt>
-          <dd>A JPEG image that is returned by the ResourceBean3 resource.</dd>
+          <dt><code>com.sun.ws.rest.samples.helloworld.resources.HelloWorldResource</code></dt>
+          <dd>A resource class that produces a textual response to an HTTP GET.</dd>
       </dl>
     <p>The mapping of the URI path space is presented in the following table:</p>
 	<table border="1">
@@ -37,82 +21,16 @@
 	<th>HTTP methods</th>
 	</tr>
 	<tr>
-	<td>/start</td>
-	<td>MasterResourceBean</td>
-	<td>GET</td>
-	</tr>
-	<tr>
-	<td>/resource1</td>
-	<td>ResourceBean1</td>
-	<td>GET</td>
-	</tr>
-	<tr>
-	<td>/resource2</td>
-	<td>ResourceBean2</td>
-	<td>GET</td>
-	</tr>
-	<tr>
-	<td>/resource3/{arg1}/{arg2}</td>
-	<td>ResourceBean3</td>
-	<td>GET</td>
-	</tr>
-	<tr>
-	<td>/resource4</td>
-	<td>ResourceBean4</td>
+	<td>/helloworld</td>
+	<td>HelloWorldResource</td>
 	<td>GET</td>
 	</tr>
 	</table>
 
       <h2>Running the Example</h2>
       <p>Run the example as follows:</p>
-      <p>Open the project using NetBeans 5.5.1 and deploy the project.<p>
+      <p>Open the project using NetBeans 5.5.1 and deploy the project, you must have a servlet container registered in Netbeans to be able to deploy the application.<p>
       <p>From a web browser, visit:</p>
-      <blockquote><code>http://&lt;host:port&gt;/SimpleServlet/resources/start</code></blockquote>
-      <blockquote><code>(for GlassFish: <a href="http://localhost:8080/SimpleServlet/resources/start">http://localhost:8080/SimpleServlet/resources/start</a>)</code></blockquote>
-      <p>Select the resource to test in the form and submit it by clicking the Test Resource
-          button. If you select Resource 1 or Resource 2, a Test Details section  appears
-      on the form showing what the requested URL was, any Query string used, the value 
-      of the "Accept" header used, the HTTP headers received on the result, and the content 
-      of the result.
-  
-      Here is a sample of what you would see if you select Resource 1:
-      </p><pre>            
-            <b>Test Details:</b><br><br>
-            <b>Resource:</b>
-            Resource 1<br>
-            <b>Request:</b>
-            /endpoint/resource1
-            <b>Query:</b> 
-            <br>
- 
-            <b>Accept MimeType:</b> 
-            <br>
-            <b>Result Headers:</b> 
-            Last-Modified: Tue, 09 Jan 2007 20:59:59 GMT Content-Type: text/plain Transfer-Encoding: chunked
-            <b>Result:</b> 
-            Hello World from resource 1
-      </pre>
-          If you select Resource 3, a Resource 3 Inputs section of the form  appears.  
-          Param 1 and Param 2 are URI parameters that are used in the
-          result of testing the "text/plain" or "application/x-www-form-urlencoded" MimeType.
-          The Selection method: lets you choose whether the "rep" query parameter or
-          the "Accept" HTTP header should be used to retrieve the result.  After filling in the
-          Resource 3 Input, click the Test Resource 3 button to see the Test Details.
-      <p></p>
-      <p>You can exercise ResourceBean1 directly:</p>
-      <blockquote><code>http:&lt;host:port&gt;//SimpleServlet/resources/resource1</code></blockquote>
-      <p>You can exercise ResourceBean2 directly:</p>
-      <blockquote><code>http:&lt;host:port&gt;//SimpleServlet/resources/resource2</code></blockquote>
-      <p>From a web browser, you can only test the query parameter portion of ResourceBean3.
-      You must provide two URI parameters and the <code>rep</code> query parameter.
-      The following URLs can be used:
-         </p><ul>
-             <li><code>http:&lt;host:port&gt;//SimpleServlet/resources/resource3/ramesh/rajiv?rep=0</code>
-             </li><li><code>http:&lt;host:port&gt;//SimpleServlet/resources/resource3/dave/steve?rep=1</code>
-             </li><li><code>http:&lt;host:port&gt;//SimpleServlet/resources/resource3/bill/john?rep=2</code>
-             </li><li><code>http:&lt;host:port&gt;//SimpleServlet/resources/resource3/marc/paul?rep=3</code>             
-         </li></ul>
-     <p></p>
-      <p>You can exercise ResourceBean4 directly:</p>
-      <blockquote><code>http:&lt;host:port&gt;//SimpleServlet/resources/resource4</code></blockquote>
-  </body></html>
+      <blockquote><code>http://&lt;host:port&gt;/HelloWorldWebApp/resources/helloworld</code></blockquote>
+      <blockquote><code>(for GlassFish: <a href="http://localhost:8080/HelloWorldWebApp/resources/helloworld">http://localhost:8080/HelloWorldWebApp/resources/helloworld</a>)</code></blockquote>
+ </body></html>
