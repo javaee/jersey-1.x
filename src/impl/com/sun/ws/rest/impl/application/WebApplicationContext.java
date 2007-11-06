@@ -35,31 +35,31 @@ import com.sun.ws.rest.impl.view.ViewFactory;
 import com.sun.ws.rest.impl.view.ViewType;
 import com.sun.ws.rest.spi.container.ContainerRequest;
 import com.sun.ws.rest.spi.container.ContainerResponse;
-import com.sun.ws.rest.spi.dispatch.UriTemplateType;
 import com.sun.ws.rest.spi.resource.ResourceProviderContext;
 import com.sun.ws.rest.spi.view.View;
 import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.util.HashMap;
 import java.util.Map;
-import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 
 /**
  *
  * @author Paul.Sandoz@Sun.Com
  */
-final class WebApplicationContext implements HttpContextAccess, ResourceDispatchContext, ResourceProviderContext {
-    final ContainerRequest request;
+final class WebApplicationContext implements 
+        HttpContextAccess, ResourceDispatchContext, ResourceProviderContext {
+    private final ContainerRequest request;
     
-    final ContainerResponse response;
+    private final ContainerResponse response;
     
-    final WebApplicationImpl app;
+    private final WebApplicationImpl app;
 
-    WebApplicationContext(WebApplicationImpl app, ContainerRequest request, ContainerResponse response) {
+    /* package */ WebApplicationContext(WebApplicationImpl app, 
+            ContainerRequest request, ContainerResponse response) {
+        this.app = app;
         this.request = request;
         this.response = response;
-        this.app = app;
     }
 
     public HttpRequestContext getHttpRequestContext() {
@@ -89,9 +89,9 @@ final class WebApplicationContext implements HttpContextAccess, ResourceDispatch
     
     // Dispatching fields
     
-    Object it;
+    private Object it;
     
-    Map<String, String> templateValues = new HashMap<String, String>();
+    private Map<String, String> templateValues = new HashMap<String, String>();
     
     // ResourceDispatchContext
     
@@ -138,6 +138,4 @@ final class WebApplicationContext implements HttpContextAccess, ResourceDispatch
         }
         return values;
     }
-    
-    
 }

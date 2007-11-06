@@ -32,7 +32,6 @@ import com.sun.ws.rest.api.core.HttpResponseContext;
 import com.sun.ws.rest.api.core.ResourceConfig;
 import com.sun.ws.rest.impl.ResponseBuilderImpl;
 import com.sun.ws.rest.impl.ThreadLocalHttpContext;
-import com.sun.ws.rest.impl.dispatch.UriTemplateDispatcher;
 import com.sun.ws.rest.impl.model.ResourceClass;
 import com.sun.ws.rest.impl.model.RootResourceClass;
 import com.sun.ws.rest.impl.response.Responses;
@@ -45,14 +44,11 @@ import java.io.StringWriter;
 import java.lang.reflect.Field;
 import java.lang.reflect.Proxy;
 import java.net.URI;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.WeakHashMap;
 import javax.ws.rs.core.HttpContext;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.PreconditionEvaluator;
@@ -66,28 +62,24 @@ import javax.ws.rs.core.UriInfo;
  * @author Paul.Sandoz@Sun.Com
  */
 public final class WebApplicationImpl implements WebApplication {
-    boolean initiated;
+    private boolean initiated;
     
-    ResourceConfig resourceConfig;
+    private ResourceConfig resourceConfig;
     
-    RootResourceClass rootResourceClass;
+    private RootResourceClass rootResourceClass;
 
-    Object containerMomento;
+    /* package */ Object containerMomento;
 
-    final ThreadLocalHttpContext context;
+    private final ThreadLocalHttpContext context;
     
-    final HttpHeaders httpHeadersProxy;
+    private final HttpHeaders httpHeadersProxy;
     
-    final UriInfo uriInfoProxy;
+    private final UriInfo uriInfoProxy;
     
-    final PreconditionEvaluator preconditionEvaluatorProxy;
+    private final PreconditionEvaluator preconditionEvaluatorProxy;
     
-    final Map<Class<?>, Injectable> injectables;
-    
-    public final List<UriTemplateDispatcher> dispatchers = new ArrayList<UriTemplateDispatcher>();
-    
-    private final Map<Class, ResourceClass> metaClassMap = new WeakHashMap<Class, ResourceClass>();
-    
+    private final Map<Class<?>, Injectable> injectables;
+            
     public WebApplicationImpl() {
         this.context = new ThreadLocalHttpContext();
         
@@ -177,7 +169,7 @@ public final class WebApplicationImpl implements WebApplication {
                 response.setResponse(Responses.NOT_FOUND);
             }
         } catch (WebApplicationException e) {
-            onExceptionWithWebApplication(e, localContext.response);
+            onExceptionWithWebApplication(e, response);
         }
     }
     
