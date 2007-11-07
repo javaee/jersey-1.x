@@ -25,7 +25,6 @@ package com.sun.ws.rest.impl.container.config;
 import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
-import java.net.URI;
 import java.net.URL;
 import java.util.Enumeration;
 import java.util.HashSet;

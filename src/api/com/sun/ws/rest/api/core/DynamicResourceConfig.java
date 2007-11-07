@@ -22,10 +22,8 @@
 
 package com.sun.ws.rest.api.core;
 
-import com.sun.ws.rest.impl.container.config.*;
+import com.sun.ws.rest.impl.container.config.ResourceClassScanner;
 import java.io.File;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -34,20 +32,21 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- * A mutable implementation of {@link ResourceConfig} that declares
- * default values for features and dynamically searches for root resource
- * classes in the paths declared by the property 
- * {@link ResourceConfig#PROPERTY_RESOURCE_PATHS}. That property MUST be included 
- * in the map of initial properties passed to the constructor.
+ * A mutable implementation of {@link DefaultResourceConfig} that dynamically 
+ * searches for root resource classes in the paths declared by the property 
+ * {@link ResourceConfig#PROPERTY_RESOURCE_PATHS}. That property MUST be 
+ * included in the map of initial properties passed to the constructor.
  * <p>
- * The set of features and properties may be modified by modifying the instances 
- * returned from the methods {@link ResourceConfig#getFeatures} and 
- * {@link ResourceConfig#getProperties} respectively.
+ * Root resource classes MUST be present in the java class path.
+ * 
  * @author Frank D. Martinez. fmartinez@asimovt.com
  */
-public class DynamicResourceConfig extends DefaultResourceConfig {
-    
-    /** Creates a new instance of ASMResourceConfig */
+public final class DynamicResourceConfig extends DefaultResourceConfig {
+
+    /**
+     * @param props the property bag that contains the property 
+     *        {@link ResourceConfig#PROPERTY_RESOURCE_PATHS}. 
+     */
     public DynamicResourceConfig(Map<String, Object> props) {
         super();
         getProperties().putAll(props);

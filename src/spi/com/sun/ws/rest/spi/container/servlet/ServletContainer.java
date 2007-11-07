@@ -23,7 +23,6 @@
 package com.sun.ws.rest.spi.container.servlet;
 
 import com.sun.ws.rest.api.container.ContainerException;
-import com.sun.ws.rest.api.core.DefaultResourceConfig;
 import com.sun.ws.rest.api.core.ResourceConfig;
 import com.sun.ws.rest.impl.ThreadLocalInvoker;
 import com.sun.ws.rest.api.core.DynamicResourceConfig;
@@ -35,7 +34,6 @@ import com.sun.ws.rest.spi.resource.Injectable;
 import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Proxy;
-import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
@@ -53,13 +51,19 @@ import javax.servlet.http.HttpServletResponse;
  * A servlet container for deploying root resource classes.
  * <p>
  * The web.xml MAY configure the servlet to have an initialization parameter 
- * whose param name is "webresourceclass" and whose 
- * value is a fully qualified name of a class that implements 
- * {@link ResourceConfig}. If the param name "webresourceclass" is not present
- * a new instance of @{link DefaultResourceConfig} is created instead.
- * In this case it is necesary to extend this class and declare the
- * set of root resource class on the @{link DefaultResourceConfig} instance
- * by overriding the configure method.
+ * "webresourceclass" and whose value is a fully qualified name of a class 
+ * that implements {@link ResourceConfig}.
+ * <p>
+ * If the parameter "webresourceclass" is not present a new instance of 
+ * @{link DyanmicResourceConfig} is created. The initialization parameter 
+ * "com.sun.ws.rest.config.property.ResourcePaths" MAY be set to provide the 
+ * one or more paths. This value is passed as the property 
+ * (@link ResourceConfig.PROPERTY_RESOURCE_PATHS} as part of a property bag
+ * passed to the constructor of @{link DyanmicResourceConfig}. Each path MUST 
+ * be separated by ';'. Each path MUST be a virtual path as specified by the 
+ * {@link Servlet#getRealPath} method. If this parameter is not set then the 
+ * default value is set to the following virtual paths: 
+ * "/WEB-INF/lib;/WEB-INF/classes".
  * <p>
  * A new {@link WebApplication} instance will be created and configured such
  * that the following classes may be injected onto the field of a root 
@@ -81,6 +85,7 @@ public class ServletContainer extends HttpServlet {
             new ThreadLocalInvoker<HttpServletResponse>();
     
     
+    @Override
     public final void init(ServletConfig servletConfig) throws ServletException {
         super.init(servletConfig);
         
