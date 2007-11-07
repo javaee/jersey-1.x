@@ -113,12 +113,13 @@ public final class MessageContextResponseAdaptor extends AbstractContainerRespon
             Map<String, List<String>> map = new HashMap<String, List<String>>();
             MultivaluedMap<String, Object> headers = this.getHttpHeaders();
             
-            for (String header: headers.keySet()) {
+            for (Map.Entry<String, List<Object>> e : headers.entrySet()) {
                 List<String> values = new ArrayList<String>();
-                for (Object v : headers.get(header))
+                for (Object v : e.getValue())
                     values.add(getHeaderValue(v));
-                map.put(header, values);
-            }              
+                map.put(e.getKey(), values);
+            }
+
             context.put(context.HTTP_RESPONSE_CODE, getStatus());
             context.put(context.HTTP_RESPONSE_HEADERS, map);
         }
