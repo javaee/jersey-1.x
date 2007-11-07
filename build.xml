@@ -308,8 +308,17 @@
         </junit2>
 
 <!-- Emma ****************************-->
+        <path id="src.ref" >
+          <pathelement location="${src.api.dir}" />
+          <pathelement location="${src.common.dir}" />
+          <pathelement location="${src.gen-src.dir}" />
+          <pathelement location="${src.impl.dir}" />
+          <pathelement location="${src.javase5.dir}" />
+          <pathelement location="${src.spi.dir}" />
+        </path>
+        
         <emma enabled="true">
-          <report sourcepath="src" >
+          <report sourcepathref="src.ref" >
             <fileset dir="build/emma" >
               <include name="*.emma" />
             </fileset>
