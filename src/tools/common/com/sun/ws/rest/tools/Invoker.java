@@ -47,6 +47,8 @@ import java.util.List;
  * @author Kohsuke Kawaguchi
  */
 public final class Invoker {
+    
+    @SuppressWarnings("unchecked")
     static int invoke(String mainClass, String[] args) throws Throwable {
         // use the platform default proxy if available.
         // see sun.net.spi.DefaultProxySelector for details.

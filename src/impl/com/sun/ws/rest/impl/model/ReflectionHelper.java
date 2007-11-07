@@ -113,6 +113,7 @@ public final class ReflectionHelper {
         }
     }
     
+    @SuppressWarnings("unchecked")
     public static Method getValueOfStringMethod(Class c) {
         try {
             Method m = c.getDeclaredMethod("valueOf", String.class);
@@ -125,6 +126,7 @@ public final class ReflectionHelper {
         }
     }
     
+    @SuppressWarnings("unchecked")
     public static Constructor getStringConstructor(Class c) {
         try {
             return c.getConstructor(String.class);

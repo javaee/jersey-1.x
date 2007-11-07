@@ -35,20 +35,15 @@ import javax.xml.ws.http.HTTPBinding;
  */
 public class Main {
     
-    /** Creates a new instance of Main */
-    public Main() {
-    }
-    
     /**
      * @param args the command line arguments
      */
     public static void main(String[] args) throws Exception {
         /** Create a JAX-WS Provider */
-        Provider provider = ContainerFactory.createContainer(Provider.class,
-                "com.sun.ws.rest.samples.jaxws.resources");
+        Provider provider = ContainerFactory.createContainer(Provider.class);
         
         /** Create a JAX-WS Endpoint with the provider */
-        Endpoint endpoint = Endpoint.create(HTTPBinding.HTTP_BINDING,provider);
+        Endpoint endpoint = Endpoint.create(HTTPBinding.HTTP_BINDING, provider);
         /** publish the endpoint */
         endpoint.publish("http://localhost:9998/endpoint");
         

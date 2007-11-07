@@ -43,8 +43,6 @@ import com.sun.ws.rest.tools.annotation.Param;
 import com.sun.ws.rest.tools.annotation.Resource;
 import com.sun.ws.rest.tools.wadl.resource.WadlResourceGenerator;
 import com.sun.ws.rest.tools.wadl.writer.WadlWriter;
-import com.sun.ws.rest.tools.webapp.WebResourcesGenerator;
-import com.sun.ws.rest.tools.webapp.writer.WebAppWriter;
 import com.sun.ws.rest.tools.Messager;
 import javax.ws.rs.ConsumeMime;
 import javax.ws.rs.DefaultValue;
@@ -69,59 +67,27 @@ import javax.xml.namespace.QName;
 
 public class UriTemplateProcessor implements Messager, AnnotationProcessor {
     
-    AnnotationProcessorEnvironment apEnv;
+    private AnnotationProcessorEnvironment apEnv;
     
-    protected AnnotationProcessorContext context;
+    private AnnotationProcessorContext context;
     
     /**
      * The Base URL used for the WebApplication
      * This will be used to generated the &lt;url-pattern> in the web.xml
      */
-    String urlPattern = null;
-    
-    /**
-     * The Class name of the servlet
-     * This will be used to generated the &lt;url-pattern> in the web.xml
-     */
-    String servletClassName = null;
-    
-    /**
-     * The WebApplication name.
-     * This will be used as the &lt;servlet-name> in the generated web.xml
-     */
-    String servletName = null;
-    
-    /**
-     * The package that the generated <code>WebResouces</code>
-     * glass should be generated into
-     */
-    String webresourcesPackage = "webresources";
-    
-    /**
-     * Determines if web.xml should be generated
-     */
-    boolean generateWebXml = false;
-    
-    /**
-     * Determines if wadl should be generated
-     */
-    boolean generateWadl = true;
-        
+    private String urlPattern = null;
+                        
     /**
      * output directory for apt
      */
-    String destDirectory = null;
-    
-    PrintWriter resourcebeanWriter;
-    PrintWriter servletWriter;
-    
-    
+    private String destDirectory = null;
+        
     /**
      * output directory for wadl and web.xml (in web-inf subdirectory)
      */
-    String restDestDirectory = "";    
+    private String restDestDirectory = "";    
     
-    boolean verbose = false;
+    private boolean verbose = false;
     
     /**
      * Creates a new instance of UriTemplateProcessor
@@ -143,28 +109,6 @@ public class UriTemplateProcessor implements Messager, AnnotationProcessor {
             log("key: "+ key+ " value: "+options.get(key));
             if (key.startsWith("-Aurlpattern")) {
                 urlPattern = getStringValue(key);
-            } else if (key.startsWith("-Aservletclassname")) {
-                servletClassName = getStringValue(key);
-            } else if (key.startsWith("-Aservletname")) {
-                servletName = getStringValue(key);
-            } else if (key.startsWith("-Awebresourcespkg")) {
-                webresourcesPackage = getStringValue(key);
-            } else if (key.startsWith("-Aservlet")) {
-                generateWebXml = true;
-            } else if (key.startsWith("-Anowadl")) {
-                generateWadl = false;
-            } else if (key.startsWith("-Aredirect")) {
-                context.getResourceConfigFeatures().put(ResourceConfig.FEATURE_REDIRECT, 
-                        getBooleanValue(key));
-            } else if (key.startsWith("-AnormalizeURI")) {
-                context.getResourceConfigFeatures().put(ResourceConfig.FEATURE_NORMALIZE_URI, 
-                        getBooleanValue(key));
-            } else if (key.startsWith("-AcanonicalizeURIPath")) {
-                context.getResourceConfigFeatures().put(ResourceConfig.FEATURE_CANONICALIZE_URI_PATH, 
-                        getBooleanValue(key));
-            } else if (key.startsWith("-AignoreMatrixParams")) {
-                context.getResourceConfigFeatures().put(ResourceConfig.FEATURE_IGNORE_MATRIX_PARAMS,
-                        getBooleanValue(key));
             } else if (key.startsWith("-Awebresourcesdestdir")) {
                 restDestDirectory = key.split("=")[1];
                 if (!(restDestDirectory.endsWith("/") ||
@@ -172,32 +116,7 @@ public class UriTemplateProcessor implements Messager, AnnotationProcessor {
                     restDestDirectory += File.separator;
                 }
             }
-        }
-                
-        if (!generateWebXml) {
-           if (servletClassName != null)
-               apEnv.getMessager().printError("-Aservletclassname requires the -Aservlet option to be set.");
-           
-           if (servletName != null)
-               apEnv.getMessager().printError("-Aservletname requires the -Aservlet option to be set.");
-              
-           if (urlPattern != null)
-               apEnv.getMessager().printError("-Aurlpattern requires the -Aservlet option to be set.");
-        } else {
-            if (context.round < 1)
-            System.err.println("Warning: The -Aservet option will generate a web.xml and override any pre-existing web.xml");
-            if (servletClassName == null)
-                servletClassName = "com.sun.ws.rest.impl.container.servlet.ServletAdaptor";
-            if (servletName == null)
-                servletName = "Jersey Web Application";
-            if (urlPattern == null)
-                urlPattern = "/resources/*";
-        }
-    }
-    
-    private boolean getBooleanValue(String expression) {
-        String value = getStringValue(expression);
-        return (value == null) ? true : Boolean.valueOf(value);
+        }                
     }
     
     private String getStringValue(String expression) {
@@ -215,39 +134,23 @@ public class UriTemplateProcessor implements Messager, AnnotationProcessor {
     }
     
     public void process() {
-        if (context.round > 1)
+        if (context.round > 0)
             return;
         log("round: "+context.round);
         if (processAnnotations()) {      
-            if (context.round == 0 && generateWadl) {
-                WadlWriter wadlWriter = new WadlWriter(context, urlPattern);
-                WadlResourceGenerator wadlResourceGen = new WadlResourceGenerator(context, null);
-                try {
-                    wadlResourceGen.generate();
-                    String pkg = wadlResourceGen.getPackage();
-                    pkg = pkg.replaceAll("\\.", "\\"+File.separator);
-                    String wadl = pkg + (pkg.length() > 0 ? File.separator : "");
-                    wadl+="application.wadl";
-                    wadlWriter.write(apEnv.getFiler().createTextFile(Filer.Location.CLASS_TREE, "",new File(wadl), null));
-                } catch (IOException ex) {
-                    reportError(ex.getMessage());
-                    if (verbose)
-                        ex.printStackTrace();
-                }
-            } else if (context.round == 1 || !generateWadl) {
-                WebAppWriter webAppWriter = new WebAppWriter(servletClassName, servletName, urlPattern, context);
-                WebResourcesGenerator classGen = new WebResourcesGenerator(this, context);
-                classGen.generateResourceClassSet(webresourcesPackage);
-                try {
-                    if (generateWebXml) {
-                        String webxml = restDestDirectory+"WEB-INF/web.xml";
-                        webAppWriter.write(apEnv.getFiler().createTextFile(Filer.Location.CLASS_TREE, "",new File(webxml), null));
-                    }
-                } catch (IOException ex) {
-                    reportError(ex.getMessage());
-                    if (verbose)
-                        ex.printStackTrace();
-                }
+            WadlWriter wadlWriter = new WadlWriter(context, urlPattern);
+            WadlResourceGenerator wadlResourceGen = new WadlResourceGenerator(context, null);
+            try {
+                wadlResourceGen.generate();
+                String pkg = wadlResourceGen.getPackage();
+                pkg = pkg.replaceAll("\\.", "\\"+File.separator);
+                String wadl = pkg + (pkg.length() > 0 ? File.separator : "");
+                wadl+="application.wadl";
+                wadlWriter.write(apEnv.getFiler().createTextFile(Filer.Location.CLASS_TREE, "",new File(wadl), null));
+            } catch (IOException ex) {
+                reportError(ex.getMessage());
+                if (verbose)
+                    ex.printStackTrace();
             }
         }
         context.round++;

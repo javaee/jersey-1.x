@@ -53,7 +53,6 @@
                 <pathelement location="${build.web.dir}/WEB-INF/classes"/>
             </classpath>
             <option key="webresourcesdestdir" value="../.."/>
-            <option key="webresourcespkg" value="com.example.resources"/>
             <source dir="${src.dir}/com/example/resources">
                 <include name="**/*.java"/>
             </source>

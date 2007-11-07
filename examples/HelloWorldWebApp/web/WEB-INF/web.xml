@@ -3,10 +3,12 @@
     <servlet>
         <servlet-name>Jersey Web Application</servlet-name>
         <servlet-class>com.sun.ws.rest.spi.container.servlet.ServletContainer</servlet-class>
+        <!--
         <init-param>
-            <param-name>webresourceclass</param-name>
-            <param-value>com.sun.ws.rest.samples.helloworld.resources.WebResources</param-value>
+            <param-name>com.sun.ws.rest.config.property.ResourcePaths</param-name>
+            <param-value>/WEB-INF/classes</param-value>
         </init-param>
+        -->
         <load-on-startup>1</load-on-startup>
     </servlet>
     <servlet-mapping>

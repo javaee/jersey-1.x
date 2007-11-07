@@ -1,22 +1,11 @@
 package mandel
 
 object MandelServer {
-    import com.sun.ws.rest.api.container.ContainerFactory
-    import com.sun.net.httpserver.HttpHandler
     import com.sun.net.httpserver.HttpServer
-    import java.net.InetSocketAddress
-    import java.util.HashSet
+    import com.sun.ws.rest.api.container.httpserver.HttpServerFactory
 
     def run() {
-        val resources = new HashSet()
-        resources.add(classOf[MandelService])
-        val handler =
-            ContainerFactory.createContainer(classOf[HttpHandler], resources).
-        asInstanceOf[HttpHandler];
-        val server = HttpServer.create(
-            new InetSocketAddress(9998), 0);
-        server.createContext("/mandelbrot", handler);
-        server.setExecutor(null);
+        val server = HttpServerFactory.create("http://localhost:9998/mandelbrot");
         server.start();
 
         println("Server running");

@@ -4,8 +4,8 @@
         <servlet-name>Jersey Web Application</servlet-name>
         <servlet-class>com.sun.ws.rest.impl.container.servlet.ServletAdaptor</servlet-class>
         <init-param>
-            <param-name>webresourceclass</param-name>
-            <param-value>com.sun.ws.rest.samples.bookmark.resources.WebResources</param-value>
+            <param-name>com.sun.ws.rest.config.feature.CanonicalizeURIPath</param-name>
+            <param-value>false</param-value>
         </init-param>
         <init-param>
             <param-name>unit:BookmarkPU</param-name>

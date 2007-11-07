@@ -24,12 +24,16 @@ package com.sun.ws.rest.api.container;
 
 import com.sun.ws.rest.api.core.DefaultResourceConfig;
 import com.sun.ws.rest.api.core.ResourceConfig;
+import com.sun.ws.rest.api.core.DynamicResourceConfig;
 import com.sun.ws.rest.spi.container.ContainerProvider;
 import com.sun.ws.rest.spi.container.WebApplication;
 import com.sun.ws.rest.spi.container.WebApplicationFactory;
 import com.sun.ws.rest.spi.service.ServiceFinder;
+import java.io.File;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -142,4 +146,41 @@ public final class ContainerFactory {
             throw new ContainerException(e);
         }
     }
+    
+    /**
+     * Create an instance of a container according to the class requested.
+     * <p>
+     * All java classpath will be scanned for Root Resource Classes.
+     * </p>
+     * @param type the type of the container.
+     *
+     * @return the HTTP handler, if a handler could not be created then null is
+     * returned.
+     * @throws IllegalArgumentException if no container provider supports the type.
+     */
+    public static <A> A createContainer(Class<A> type) {
+        String classPath = System.getProperty("java.class.path");
+        String[] paths = classPath.split(File.pathSeparator);
+        return createContainer(type, paths);
+    }
+    
+    /**
+     * Create an instance of a container according to the class requested.
+     * <p>
+     * Root Resource Classes will be scanned in paths.
+     * </p>
+     * @param type the type of the container.
+     * @param paths a list of paths to be scanned for resource classes.
+     *
+     * @return the HTTP handler, if a handler could not be created then null is
+     * returned.
+     * @throws IllegalArgumentException if no container provider supports the type.
+     */
+    public static <A> A createContainer(Class<A> type, String... paths) {
+        Map<String, Object> props = new HashMap<String, Object>();
+        props.put(ResourceConfig.PROPERTY_RESOURCE_PATHS, paths);
+        DynamicResourceConfig config = new DynamicResourceConfig(props);
+        return createContainer(type, config);
+    }
+    
 }

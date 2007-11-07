@@ -22,7 +22,12 @@
 
 package com.sun.ws.rest.impl.container.servlet;
 
+import com.sun.ws.rest.api.core.ResourceConfig;
+import java.io.InputStream;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.Enumeration;
+import java.util.Set;
 import java.util.Vector;
 import junit.framework.*;
 import javax.servlet.*;
@@ -38,14 +43,13 @@ public class ServletAdaptorTest extends TestCase {
         super(testName);
     }
 
-    /**
-     * Test of init method, of class com.sun.ws.rest.impl.servlet.ServletAdaptor.
-     */
+    // TODO fix later
     public void testInit() throws ServletException {
         System.out.println("init");
         
         ServletAdaptor instance = new ServletAdaptor();
-        ServletConfig servletConfig = new MyServletConfig("TestServlet", "com.sun.ws.rest.impl.container.servlet.WebResources");        
+        ServletConfig servletConfig = new MyServletConfig("TestServlet", 
+                "build/test/classes/com/sun/ws/rest/impl/container/config/toplevel");
         
         instance.init(servletConfig);
         
@@ -64,16 +68,16 @@ public class ServletAdaptorTest extends TestCase {
         ServletAdaptor instance = new ServletAdaptor();
     }
     
-    public static class MyServletConfig implements ServletConfig {
-        String resources;
+    static class MyServletConfig implements ServletConfig {
+        String resourcePaths;
         String servletName;
         MyServletConfig(String servletName, String resources) {
             this.servletName = servletName;
-            this.resources = resources;
+            this.resourcePaths = resources;
         }
         
         public ServletContext getServletContext() {
-            return null;
+            return new MyServletContext();
         }
         
         @SuppressWarnings("unchecked")
@@ -84,13 +88,117 @@ public class ServletAdaptorTest extends TestCase {
         }
         
         public String getInitParameter(String param) {
-            if (param.equals("webresourceclass"))
-                return resources;
+            if (param.equals(ResourceConfig.PROPERTY_RESOURCE_PATHS))
+                return resourcePaths;
             return null;
         }
         
         public String getServletName() {
             return servletName;
         }
-    }    
+    }   
+    
+    static class MyServletContext implements ServletContext {
+
+        public String getContextPath() {
+            throw new UnsupportedOperationException("Not supported yet.");
+        }
+
+        public ServletContext getContext(String arg0) {
+            throw new UnsupportedOperationException("Not supported yet.");
+        }
+
+        public int getMajorVersion() {
+            throw new UnsupportedOperationException("Not supported yet.");
+        }
+
+        public int getMinorVersion() {
+            throw new UnsupportedOperationException("Not supported yet.");
+        }
+
+        public String getMimeType(String arg0) {
+            throw new UnsupportedOperationException("Not supported yet.");
+        }
+
+        public Set getResourcePaths(String arg0) {
+            throw new UnsupportedOperationException("Not supported yet.");
+        }
+
+        public URL getResource(String arg0) throws MalformedURLException {
+            throw new UnsupportedOperationException("Not supported yet.");
+        }
+
+        public InputStream getResourceAsStream(String arg0) {
+            throw new UnsupportedOperationException("Not supported yet.");
+        }
+
+        public RequestDispatcher getRequestDispatcher(String arg0) {
+            throw new UnsupportedOperationException("Not supported yet.");
+        }
+
+        public RequestDispatcher getNamedDispatcher(String arg0) {
+            throw new UnsupportedOperationException("Not supported yet.");
+        }
+
+        public Servlet getServlet(String arg0) throws ServletException {
+            throw new UnsupportedOperationException("Not supported yet.");
+        }
+
+        public Enumeration getServlets() {
+            throw new UnsupportedOperationException("Not supported yet.");
+        }
+
+        public Enumeration getServletNames() {
+            throw new UnsupportedOperationException("Not supported yet.");
+        }
+
+        public void log(String arg0) {
+            throw new UnsupportedOperationException("Not supported yet.");
+        }
+
+        public void log(Exception arg0, String arg1) {
+            throw new UnsupportedOperationException("Not supported yet.");
+        }
+
+        public void log(String arg0, Throwable arg1) {
+            throw new UnsupportedOperationException("Not supported yet.");
+        }
+
+        public String getRealPath(String arg0) {
+            return arg0;
+        }
+
+        public String getServerInfo() {
+            throw new UnsupportedOperationException("Not supported yet.");
+        }
+
+        public String getInitParameter(String arg0) {
+            throw new UnsupportedOperationException("Not supported yet.");
+        }
+
+        public Enumeration getInitParameterNames() {
+            throw new UnsupportedOperationException("Not supported yet.");
+        }
+
+        public Object getAttribute(String arg0) {
+            throw new UnsupportedOperationException("Not supported yet.");
+        }
+
+        public Enumeration getAttributeNames() {
+            throw new UnsupportedOperationException("Not supported yet.");
+        }
+
+        public void setAttribute(String arg0, Object arg1) {
+            throw new UnsupportedOperationException("Not supported yet.");
+        }
+
+        public void removeAttribute(String arg0) {
+            throw new UnsupportedOperationException("Not supported yet.");
+        }
+
+        public String getServletContextName() {
+            throw new UnsupportedOperationException("Not supported yet.");
+        }
+        
+    }
 }

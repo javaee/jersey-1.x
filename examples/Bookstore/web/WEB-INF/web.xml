@@ -7,10 +7,6 @@
     <servlet>
         <servlet-name>Jersey Web Application</servlet-name>
         <servlet-class>com.sun.ws.rest.impl.container.servlet.ServletAdaptor</servlet-class>
-        <init-param>
-            <param-name>webresourceclass</param-name>
-            <param-value>com.sun.ws.rest.samples.bookstore.WebResources</param-value>
-        </init-param>
         <load-on-startup>1</load-on-startup>
     </servlet>
     <servlet-mapping>

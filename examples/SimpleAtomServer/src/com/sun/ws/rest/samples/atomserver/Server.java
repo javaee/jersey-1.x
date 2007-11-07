@@ -22,11 +22,9 @@
 
 package com.sun.ws.rest.samples.atomserver;
 
-import com.sun.net.httpserver.HttpHandler;
 import com.sun.net.httpserver.HttpServer;
-import com.sun.ws.rest.api.container.ContainerFactory;
+import com.sun.ws.rest.api.container.httpserver.HttpServerFactory;
 import java.io.IOException;
-import java.net.InetSocketAddress;
 
 /**
  *
@@ -34,11 +32,9 @@ import java.net.InetSocketAddress;
  */
 public class Server {
     public static void main(String[] args) throws IOException {
-        HttpHandler handler = ContainerFactory.createContainer(HttpHandler.class,
-                "com.sun.ws.rest.samples.atomserver.resources");
+        HttpServer server = HttpServerFactory.create("http://localhost:9998/atom");
+        server.start();
         
-        HttpServer server = startServerInNewThread("/atom", handler);
-
         System.out.println("Server running, hit return to stop...");
         System.in.read();
         System.out.println("Stopping server");
@@ -46,20 +42,4 @@ public class Server {
         server.stop(0);
         System.out.println("Server stopped");
     }
-    
-    private static HttpServer startServerInNewThread(String context, HttpHandler handler) throws IOException {
-        final HttpServer server = HttpServer.create(new InetSocketAddress(9998), 0);
-        server.createContext(context, handler);
-        server.setExecutor(null);
-        
-        Runnable r = new Runnable() {
-            public void run() {
-                server.start();
-            }
-        };
-        
-        new Thread(r).start();
-        
-        return server;
-    }    
 }

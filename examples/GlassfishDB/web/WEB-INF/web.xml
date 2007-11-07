@@ -4,10 +4,6 @@
         <servlet-name>Jersey Web Application Application</servlet-name>
         <servlet-class>com.sun.ws.rest.impl.container.servlet.ServletAdaptor</servlet-class>
         <init-param>
-            <param-name>webresourceclass</param-name>
-            <param-value>com.example.resources.WebResources</param-value>
-        </init-param>
-        <init-param>
             <param-name>unit:WidgetPU</param-name>
             <param-value>persistence/widget</param-value>
         </init-param>

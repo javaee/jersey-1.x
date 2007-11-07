@@ -22,29 +22,14 @@
 
 package com.sun.ws.rest.samples.helloworld;
 
-import com.sun.net.httpserver.HttpHandler;
 import com.sun.net.httpserver.HttpServer;
-import com.sun.ws.rest.api.container.ContainerFactory;
-import com.sun.ws.rest.samples.helloworld.resources.HelloWorldResource;
+import com.sun.ws.rest.api.container.httpserver.HttpServerFactory;
 import java.io.IOException;
-import java.net.InetSocketAddress;
-import java.util.Arrays;
-import java.util.HashSet;
-
 
 public class Main {
     
     public static void main(String[] args) throws IOException {
-        // Create the HttpHandler
-        // Pass in the HelloWorldResource class
-        HttpHandler handler = ContainerFactory.createContainer(
-                HttpHandler.class,
-                HelloWorldResource.class);
-
-        // Create the HTTP server using the HttpHandler
-        HttpServer server = HttpServer.create(new InetSocketAddress(9998), 0);
-        server.createContext("/", handler);
-        server.setExecutor(null);
+        HttpServer server = HttpServerFactory.create("http://localhost:9998/");
         server.start();
         
         System.out.println("Server running");

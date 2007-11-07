@@ -35,7 +35,6 @@
                 <pathelement location="${build.web.dir}/WEB-INF/classes"/>
             </classpath>
             <option key="webresourcesdestdir" value="../.."/>
-            <option key="webresourcespkg" value="com.sun.ws.rest.samples.jsonfromjaxb.resources"/>
             <source dir="${src.dir}">
                 <include name="**/*.java"/>
             </source>

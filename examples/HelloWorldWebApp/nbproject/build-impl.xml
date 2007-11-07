@@ -416,9 +416,11 @@
         <copy-ear-war file="${file.reference.jsr311-api.jar}" propname="included.lib.file.reference.jsr311-api.jar.X"/>
         <basename property="included.lib.file.reference.jersey.jar" file="${file.reference.jersey.jar}"/>
         <copy-ear-war file="${file.reference.jersey.jar}" propname="included.lib.file.reference.jersey.jar.X"/>
+        <basename property="included.lib.file.reference.asm-3.0.jar" file="${file.reference.asm-3.0.jar}"/>
+        <copy-ear-war file="${file.reference.asm-3.0.jar}" propname="included.lib.file.reference.asm-3.0.jar.X"/>
         <mkdir dir="${build.web.dir.real}/META-INF"/>
         <manifest file="${build.web.dir.real}/META-INF/MANIFEST.MF" mode="update">
-            <attribute name="Class-Path" value="${included.lib.file.reference.jsr173_api.jar} ${included.lib.file.reference.jaxb-api.jar} ${included.lib.file.reference.jaxb-impl.jar} ${included.lib.file.reference.activation.jar} ${included.lib.file.reference.mail.jar} ${included.lib.file.reference.jettison-1.0-RC1.jar} ${included.lib.file.reference.jdom-1.0.jar} ${included.lib.file.reference.rome-0.9.jar} ${included.lib.file.reference.jsr250-api.jar} ${included.lib.file.reference.jsr311-api.jar} ${included.lib.file.reference.jersey.jar} "/>
+            <attribute name="Class-Path" value="${included.lib.file.reference.jsr173_api.jar} ${included.lib.file.reference.jaxb-api.jar} ${included.lib.file.reference.jaxb-impl.jar} ${included.lib.file.reference.activation.jar} ${included.lib.file.reference.mail.jar} ${included.lib.file.reference.jettison-1.0-RC1.jar} ${included.lib.file.reference.jdom-1.0.jar} ${included.lib.file.reference.rome-0.9.jar} ${included.lib.file.reference.jsr250-api.jar} ${included.lib.file.reference.jsr311-api.jar} ${included.lib.file.reference.jersey.jar} ${included.lib.file.reference.asm-3.0.jar} "/>
         </manifest>
         <delete dir="${dist.ear.dir}/temp"/>
     </target>
@@ -434,6 +436,7 @@
         <copy file="${file.reference.jsr250-api.jar}" todir="${build.web.dir.real}/WEB-INF/lib"/>
         <copy file="${file.reference.jsr311-api.jar}" todir="${build.web.dir.real}/WEB-INF/lib"/>
         <copy file="${file.reference.jersey.jar}" todir="${build.web.dir.real}/WEB-INF/lib"/>
+        <copy file="${file.reference.asm-3.0.jar}" todir="${build.web.dir.real}/WEB-INF/lib"/>
     </target>
     <target name="do-ear-dist" depends="init,compile,compile-jsps,-pre-dist,library-inclusion-in-manifest">
         <dirname property="dist.jar.dir" file="${dist.ear.war}"/>

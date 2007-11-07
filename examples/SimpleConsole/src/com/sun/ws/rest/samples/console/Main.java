@@ -22,11 +22,9 @@
 
 package com.sun.ws.rest.samples.console;
 
-import com.sun.net.httpserver.HttpHandler;
 import com.sun.net.httpserver.HttpServer;
-import com.sun.ws.rest.api.container.ContainerFactory;
+import com.sun.ws.rest.api.container.httpserver.HttpServerFactory;
 import java.io.IOException;
-import java.net.InetSocketAddress;
 
 public class Main {
     
@@ -34,10 +32,8 @@ public class Main {
      * @param args the command line arguments
      */
     public static void main(String[] args) throws IOException {
-        HttpHandler handler = ContainerFactory.createContainer(HttpHandler.class,
-                "com.sun.ws.rest.samples.console.resources");
-        
-        HttpServer server = startServerInNewThread("/resources", handler);
+        HttpServer server = HttpServerFactory.create("http://localhost:9998/resources");
+        server.start();
         
         System.out.println("Server running, visit: http://127.0.0.1:9998/resources/form, hit return to stop...");
         System.in.read();
@@ -45,21 +41,5 @@ public class Main {
         
         server.stop(0);
         System.out.println("Server stopped");
-    }
-    
-    private static HttpServer startServerInNewThread(String context, HttpHandler handler) throws IOException {
-        final HttpServer server = HttpServer.create(new InetSocketAddress(9998), 0);
-        server.createContext(context, handler);
-        server.setExecutor(null);
-        
-        Runnable r = new Runnable() {
-            public void run() {
-                server.start();
-            }
-        };
-        
-        new Thread(r).start();
-        
-        return server;
     }
 }

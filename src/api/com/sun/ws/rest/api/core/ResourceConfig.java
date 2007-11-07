@@ -75,6 +75,14 @@ public interface ResourceConfig {
      */
     public static final String PROPERTY_DEFAULT_RESOURCE_PROVIDER_CLASS
             = "com.sun.ws.rest.config.property.DefaultResourceProviderClass";
+
+    /**
+     * String array containing paths to be scanned for resource classes.
+     * This property will be passed to the ResourceConfig implementation
+     * constructor in a Map<String, Object> parameter if supported.
+     */
+    public static final String PROPERTY_RESOURCE_PATHS
+            = "com.sun.ws.rest.config.property.ResourcePaths";
             
     /**
      * Get the set of root resource classes to be deployed by the Web
@@ -122,4 +130,5 @@ public interface ResourceConfig {
      *         given property name.
      */
     Object getProperty(String propertyName);
+    
 }

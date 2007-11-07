@@ -42,6 +42,10 @@
                     <path-in-war>WEB-INF/lib</path-in-war>
                 </library>
                 <library files="1">
+                    <file>${file.reference.asm-3.0.jar}</file>
+                    <path-in-war>WEB-INF/lib</path-in-war>
+                </library>
+                <library files="1">
                     <file>${file.reference.jersey.jar}</file>
                     <path-in-war>WEB-INF/lib</path-in-war>
                 </library>

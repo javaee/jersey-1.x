@@ -97,12 +97,7 @@ public class UriTemplateProcessorTest extends TestCase {
         URL[] urls = {fileToURL(dest)};
         URLClassLoader classLoader = URLClassLoader.newInstance(urls);
         Class resClass = classLoader.loadClass("com.sun.ws.rest.annotation.MyResource");
-        Class beansClass = classLoader.loadClass("webresources.WebResources");
         Class wadlClass = classLoader.loadClass("com.sun.ws.rest.wadl.resource.WadlResource");
-        ResourceConfig resBeans = (ResourceConfig)beansClass.newInstance();
-        assertTrue(resBeans.getResourceClasses().size() == 2);
-        assertTrue(resBeans.getResourceClasses().contains(resClass));
-        assertTrue(resBeans.getResourceClasses().contains(wadlClass));
     }
     
     private void validateWADL(File destDir) throws Exception {
@@ -168,10 +163,6 @@ public class UriTemplateProcessorTest extends TestCase {
                     return false;
         return file.delete();
     }
-/*
-    public static void main(java.lang.String[] argList) {
-        junit.textui.TestRunner.run(suite());
-    }*/
     
     private static class NSResolver implements NamespaceContext {
         private String prefix;

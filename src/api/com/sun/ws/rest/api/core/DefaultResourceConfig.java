@@ -90,4 +90,5 @@ public class DefaultResourceConfig implements ResourceConfig {
     public Object getProperty(String propertyName) {
         return properties.get(propertyName);
     }
+
 }

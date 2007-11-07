@@ -398,19 +398,22 @@
         <copy-ear-war file="${file.reference.jsr250-api.jar}" propname="included.lib.file.reference.jsr250-api.jar.X"/>
         <basename property="included.lib.file.reference.persistence-api-1.0.jar" file="${file.reference.persistence-api-1.0.jar}"/>
         <copy-ear-war file="${file.reference.persistence-api-1.0.jar}" propname="included.lib.file.reference.persistence-api-1.0.jar.X"/>
+        <basename property="included.lib.file.reference.asm-3.0.jar" file="${file.reference.asm-3.0.jar}"/>
+        <copy-ear-war file="${file.reference.asm-3.0.jar}" propname="included.lib.file.reference.asm-3.0.jar.X"/>
         <basename property="included.lib.file.reference.jsr311-api.jar" file="${file.reference.jsr311-api.jar}"/>
         <copy-ear-war file="${file.reference.jsr311-api.jar}" propname="included.lib.file.reference.jsr311-api.jar.X"/>
         <basename property="included.lib.file.reference.jersey.jar" file="${file.reference.jersey.jar}"/>
         <copy-ear-war file="${file.reference.jersey.jar}" propname="included.lib.file.reference.jersey.jar.X"/>
         <mkdir dir="${build.web.dir.real}/META-INF"/>
         <manifest file="${build.web.dir.real}/META-INF/MANIFEST.MF" mode="update">
-            <attribute name="Class-Path" value="${included.lib.file.reference.jsr250-api.jar} ${included.lib.file.reference.persistence-api-1.0.jar} ${included.lib.file.reference.jsr311-api.jar} ${included.lib.file.reference.jersey.jar} "/>
+            <attribute name="Class-Path" value="${included.lib.file.reference.jsr250-api.jar} ${included.lib.file.reference.persistence-api-1.0.jar} ${included.lib.file.reference.asm-3.0.jar} ${included.lib.file.reference.jsr311-api.jar} ${included.lib.file.reference.jersey.jar} "/>
         </manifest>
         <delete dir="${dist.ear.dir}/temp"/>
     </target>
     <target name="library-inclusion-in-archive" depends="init" unless="dist.ear.dir">
         <copy file="${file.reference.jsr250-api.jar}" todir="${build.web.dir.real}/WEB-INF/lib"/>
         <copy file="${file.reference.persistence-api-1.0.jar}" todir="${build.web.dir.real}/WEB-INF/lib"/>
+        <copy file="${file.reference.asm-3.0.jar}" todir="${build.web.dir.real}/WEB-INF/lib"/>
         <copy file="${file.reference.jsr311-api.jar}" todir="${build.web.dir.real}/WEB-INF/lib"/>
         <copy file="${file.reference.jersey.jar}" todir="${build.web.dir.real}/WEB-INF/lib"/>
     </target>
