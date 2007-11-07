@@ -331,19 +331,6 @@ public final class UriBuilderImpl extends UriBuilder {
         }                
     }
     
-    private URI createURI(String scheme,
-           String authority,
-           String path,
-           String query,
-           String fragment) {
-        try {
-            return new URI(scheme, authority, path, query, fragment);
-        } catch (URISyntaxException ex) {
-            throw new IllegalArgumentException(ex);
-        }        
-    }
-    
-    
     private String replaceNull(String s) {
         return (s != null) ? s : "";
     }
