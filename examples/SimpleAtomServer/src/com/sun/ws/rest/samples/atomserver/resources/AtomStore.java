@@ -36,7 +36,8 @@ import java.io.OutputStream;
 import java.net.URI;
 import java.util.Date;
 import java.util.List;
-import javax.ws.rs.ext.EntityProvider;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.ext.MessageBodyWriter;
 import javax.ws.rs.ext.ProviderFactory;
 
 /**
@@ -44,6 +45,8 @@ import javax.ws.rs.ext.ProviderFactory;
  * @author Paul.Sandoz@Sun.Com
  */
 class AtomStore {
+    private static final MediaType atomMediaType = new MediaType("application", "atom+xml");
+
     static String getCollectionPath() {
         return "collection";
     }
@@ -171,16 +174,16 @@ class AtomStore {
     }    
     
     static void updateFeedDocument(Feed f) throws IOException {
-        EntityProvider<Feed> ep = ProviderFactory.getInstance().createEntityProvider(Feed.class);
+        MessageBodyWriter<Feed> ep = ProviderFactory.getInstance().createMessageBodyWriter(Feed.class, atomMediaType);
         synchronized(FileStore.FS) {
-            ep.writeTo(f, null, null, FileStore.FS.getFileOutputStream(AtomStore.getFeedPath()));
+            ep.writeTo(f, atomMediaType, null, FileStore.FS.getFileOutputStream(AtomStore.getFeedPath()));
         }
     }
             
     static void createEntryDocument(String id, Entry e) throws IOException {
-        EntityProvider<Entry> ep = ProviderFactory.getInstance().createEntityProvider(Entry.class);
+        MessageBodyWriter<Entry> ep = ProviderFactory.getInstance().createMessageBodyWriter(Entry.class, atomMediaType);
         String path = AtomStore.getEntryPath(id);
-        ep.writeTo(e, null, null, FileStore.FS.getFileOutputStream(path));
+        ep.writeTo(e, atomMediaType, null, FileStore.FS.getFileOutputStream(path));
     }
     
     static void createMediaDocument(String id, byte[] content) throws IOException {
@@ -203,8 +206,8 @@ class AtomStore {
         selfLink.setHref(uri);
         f.getOtherLinks().add(selfLink);
         
-        EntityProvider<Feed> ep = ProviderFactory.getInstance().createEntityProvider(Feed.class);
-        ep.writeTo(f, null, null, FileStore.FS.getFileOutputStream(AtomStore.getFeedPath()));
+        MessageBodyWriter<Feed> ep = ProviderFactory.getInstance().createMessageBodyWriter(Feed.class, atomMediaType);
+        ep.writeTo(f, atomMediaType, null, FileStore.FS.getFileOutputStream(AtomStore.getFeedPath()));
         
         return FileStore.FS.getFileContents(AtomStore.getFeedPath());
     }

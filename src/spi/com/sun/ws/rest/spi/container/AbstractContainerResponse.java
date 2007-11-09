@@ -30,7 +30,7 @@ import java.net.URI;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
-import javax.ws.rs.ext.EntityProvider;
+import javax.ws.rs.ext.MessageBodyWriter;
 import javax.ws.rs.ext.HeaderProvider;
 import javax.ws.rs.ext.ProviderFactory;
 
@@ -233,21 +233,22 @@ public abstract class AbstractContainerResponse implements ContainerResponse {
      */
     @SuppressWarnings("unchecked")
     protected final void writeEntity(Object entity, OutputStream out) throws IOException {
-        final EntityProvider p = ProviderFactory.getInstance().createEntityProvider(entity.getClass());
+        MediaType mediaType = null;
         
-        final Object mediaType = getHttpHeaders().getFirst("Content-Type");
-        if (mediaType instanceof MediaType) {
-            p.writeTo(entity, (MediaType)mediaType, getHttpHeaders(), out);
+        final Object mediaTypeHeader = getHttpHeaders().getFirst("Content-Type");
+        if (mediaTypeHeader instanceof MediaType) {
+            mediaType = (MediaType)mediaTypeHeader;
         } else {
-            if (mediaType != null) {
-                p.writeTo(entity, new MediaType(mediaType.toString()), getHttpHeaders(), out);
+            if (mediaTypeHeader != null) {
+                mediaType = new MediaType(mediaTypeHeader.toString());
             } else {
-                p.writeTo(entity, null, getHttpHeaders(), out);
+                mediaType = new MediaType("application", "octet-stream");
             }
         }
+        
+        final MessageBodyWriter p = ProviderFactory.getInstance().createMessageBodyWriter(entity.getClass(), mediaType);
+        p.writeTo(entity, mediaType, getHttpHeaders(), out);
     }
-    
-    //
     
     private void checkStatusAndEntity() {
         if (status == 204 && entity != null) status = 200;

@@ -24,7 +24,7 @@ package com.sun.ws.rest.impl.provider.entity;
 
 import com.sun.ws.rest.impl.view.ViewType;
 import java.io.OutputStream;
-import javax.ws.rs.ext.EntityProvider;
+import javax.ws.rs.ext.MessageBodyWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import javax.ws.rs.core.MediaType;
@@ -34,19 +34,18 @@ import javax.ws.rs.core.MultivaluedMap;
  *
  * @author Paul.Sandoz@Sun.Com
  */
-public final class ViewTypeProvider implements EntityProvider<ViewType> {
+public final class ViewTypeProvider implements MessageBodyWriter<ViewType> {
     
-    public boolean supports(Class type) {
-        return ViewType.class.isAssignableFrom(type);
-    }
-
-    public ViewType readFrom(Class<ViewType> type, MediaType mediaType,
-            MultivaluedMap<String, String> headers, InputStream entityStream) throws IOException {
-        throw new UnsupportedOperationException();
-    }
-
     public void writeTo(ViewType t, MediaType mediaType,
             MultivaluedMap<String, Object> httpHeaders, OutputStream entityStream) throws IOException {
         t.process();
+    }
+
+    public boolean isWriteable(Class<?> type) {
+        return ViewType.class.isAssignableFrom(type);
+    }
+
+    public long getSize(ViewType t) {
+        return -1;
     }
 }

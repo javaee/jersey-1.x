@@ -26,7 +26,8 @@ import com.sun.ws.rest.impl.RequestHttpHeadersImpl;
 import com.sun.ws.rest.impl.ResponseBuilderImpl;
 import com.sun.ws.rest.impl.TestHttpRequestContext;
 import com.sun.ws.rest.impl.TestHttpResponseContext;
-import javax.ws.rs.ext.EntityProvider;
+import javax.ws.rs.ext.MessageBodyReader;
+import javax.ws.rs.ext.MessageBodyWriter;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import javax.ws.rs.core.MediaType;
@@ -69,7 +70,7 @@ public abstract class AbstractStreamingTester extends TestCase {
         h.add("Content-Type", mediaType);
 
         ByteArrayInputStream in = new ByteArrayInputStream(b);
-        EntityProvider<T> tsp = ProviderFactory.getInstance().createEntityProvider(c);
+        MessageBodyReader<T> tsp = ProviderFactory.getInstance().createMessageBodyReader(c, mediaType);
         return tsp.readFrom(c, mediaType, h, in);
     }
     
@@ -86,7 +87,7 @@ public abstract class AbstractStreamingTester extends TestCase {
         Response r = new ResponseBuilderImpl().type(mediaType).build();
         resc.setResponse(r);
         
-        EntityProvider<T> tsp = ProviderFactory.getInstance().createEntityProvider((Class<T>)t.getClass());
+        MessageBodyWriter<T> tsp = ProviderFactory.getInstance().createMessageBodyWriter((Class<T>)t.getClass(), mediaType);
         tsp.writeTo(t, mediaType, resc.getHttpHeaders(), resc.getOutputStream());
         return resc.getEntityAsByteArray();
     }

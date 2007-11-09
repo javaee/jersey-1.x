@@ -35,8 +35,6 @@ import java.util.Map;
 import javax.activation.DataSource;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.core.MultivaluedMap;
-import javax.ws.rs.ext.EntityProvider;
-import javax.ws.rs.ext.ProviderFactory;
 import javax.xml.ws.handler.MessageContext;
 
 /**

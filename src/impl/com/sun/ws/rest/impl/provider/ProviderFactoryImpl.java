@@ -26,7 +26,9 @@ import com.sun.ws.rest.spi.service.ServiceFinder;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
-import javax.ws.rs.ext.EntityProvider;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.ext.MessageBodyReader;
+import javax.ws.rs.ext.MessageBodyWriter;
 import javax.ws.rs.ext.HeaderProvider;
 import javax.ws.rs.ext.ProviderFactory;
 
@@ -38,8 +40,10 @@ public final class ProviderFactoryImpl extends ProviderFactory {
     private AtomicReference<Set<HeaderProvider>> atomicHeaderProviders = 
             new AtomicReference<Set<HeaderProvider>>();
     
-    private AtomicReference<Set<EntityProvider>> atomicEntityProviders = 
-            new AtomicReference<Set<EntityProvider>>();
+    private AtomicReference<Set<MessageBodyReader>> atomicReaderProviders = 
+            new AtomicReference<Set<MessageBodyReader>>();
+    private AtomicReference<Set<MessageBodyWriter>> atomicWriterProviders = 
+            new AtomicReference<Set<MessageBodyWriter>>();
     
     public <T> T createInstance(Class<T> type) {
         for (T t : ServiceFinder.find(type)) {
@@ -63,20 +67,6 @@ public final class ProviderFactoryImpl extends ProviderFactory {
         throw new IllegalArgumentException("A header provider for type, " + type + ", is not supported");
     }
     
-    @SuppressWarnings("unchecked")
-    public <T> EntityProvider<T> createEntityProvider(Class<T> type) {
-        Set<EntityProvider> entityProviders = atomicEntityProviders.get();
-        if (entityProviders == null) {
-            entityProviders = cacheProviders(atomicEntityProviders, EntityProvider.class);
-        }
-        
-        for (EntityProvider p: entityProviders) 
-            if (p.supports(type))
-                return p;
-        
-        throw new IllegalArgumentException("A entity provider for type, " + type + ", is not supported");
-    }
-
     private <T> Set<T> cacheProviders(AtomicReference<Set<T>> atomicSet, Class<T> c) {
         synchronized(atomicSet) {
             Set<T> s = atomicSet.get();
@@ -89,5 +79,34 @@ public final class ProviderFactoryImpl extends ProviderFactory {
             }
             return s;
         }
+    }
+
+    // TODO: implement selection by mediaType filtering
+    @SuppressWarnings("unchecked")
+    public <T> MessageBodyReader<T> createMessageBodyReader(Class<T> type, MediaType mediaType) {
+        Set<MessageBodyReader> entityProviders = atomicReaderProviders.get();
+        if (entityProviders == null) {
+            entityProviders = cacheProviders(atomicReaderProviders, MessageBodyReader.class);
+        }
+        
+        for (MessageBodyReader p: entityProviders) 
+            if (p.isReadable(type))
+                return p;
+        
+        throw new IllegalArgumentException("A message body reader for type, " + type + ", is not supported");
+    }
+
+    @SuppressWarnings("unchecked")
+    public <T> MessageBodyWriter<T> createMessageBodyWriter(Class<T> type, MediaType mediaType) {
+        Set<MessageBodyWriter> entityProviders = atomicWriterProviders.get();
+        if (entityProviders == null) {
+            entityProviders = cacheProviders(atomicWriterProviders, MessageBodyWriter.class);
+        }
+        
+        for (MessageBodyWriter p: entityProviders) 
+            if (p.isWriteable(type))
+                return p;
+        
+        throw new IllegalArgumentException("A message body writer for type, " + type + ", is not supported");
     }
 }

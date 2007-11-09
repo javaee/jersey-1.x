@@ -7,17 +7,9 @@ import javax.ws.rs._
 import javax.ws.rs.core._
 import javax.ws.rs.ext._
 
-class RenderedImageProvider extends EntityProvider {
-    def supports(t: Class) : boolean = {
+class RenderedImageProvider extends MessageBodyWriter {
+    def isWriteable(t: Class) : boolean = {
         classOf[RenderedImage].isAssignableFrom(t)
-    }
-
-    def readFrom(t: Class,
-            mediaType: MediaType, 
-            httpHeaders: MultivaluedMap, 
-            entityStream: InputStream) : RenderedImage = {
-        // Not implemented
-        null
     }
 
     def writeTo(t: Any,
@@ -30,6 +22,9 @@ class RenderedImageProvider extends EntityProvider {
         ImageIO.write(t.asInstanceOf[RenderedImage], formatName, entityStream)
     }
 
+    def getSize(t: Any) : long = {
+        -1
+    }
 }
 
 object RenderedImageProvider {

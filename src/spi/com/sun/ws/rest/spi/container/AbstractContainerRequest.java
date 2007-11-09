@@ -167,8 +167,9 @@ public abstract class AbstractContainerRequest implements ContainerRequest {
     
     public <T> T getEntity(Class<T> type) {
         try {
-            return ProviderFactory.getInstance().createEntityProvider(type).
-                    readFrom(type, getMediaType(), headers, entity);
+            MediaType mediaType = getMediaType();
+            return ProviderFactory.getInstance().createMessageBodyReader(type, mediaType).
+                    readFrom(type, mediaType, headers, entity);
         } catch (IOException e) {
             throw new IllegalArgumentException(e);
         }

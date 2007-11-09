@@ -28,7 +28,8 @@ import java.io.OutputStream;
 import java.util.Properties;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
-import javax.ws.rs.ext.EntityProvider;
+import javax.ws.rs.ext.MessageBodyReader;
+import javax.ws.rs.ext.MessageBodyWriter;
 
 /**
  * Entity provider for encoding and decoding java.util.Properties.
@@ -38,13 +39,8 @@ import javax.ws.rs.ext.EntityProvider;
  *
  * @author Paul.Sandoz@Sun.Com
  */
-public class PropertiesProvider implements EntityProvider<Properties> {
+public class PropertiesProvider implements MessageBodyReader<Properties>, MessageBodyWriter<Properties> {
     
-    public boolean supports(Class<?> type) {
-        // Only support the Properties classe and inherited classes of
-        return Properties.class.isAssignableFrom(type);
-    }
-        
     public Properties readFrom(Class<Properties> type, MediaType mediaType, 
             MultivaluedMap<String, String> headers, InputStream in) throws IOException {
         // Create a new Properties instance and load using the
@@ -58,5 +54,19 @@ public class PropertiesProvider implements EntityProvider<Properties> {
             MultivaluedMap<String, Object> headers, OutputStream out) throws IOException {
         // Store the Properties instance using the key/value pair format
         p.store(out, null);
+    }
+
+    public boolean isReadable(Class<?> type) {
+        // Only support the Properties class and inherited classes of
+        return Properties.class.isAssignableFrom(type);
+    }
+
+    public boolean isWriteable(Class<?> type) {
+        // Only support the Properties classe and inherited classes of
+        return Properties.class.isAssignableFrom(type);
+    }
+
+    public long getSize(Properties p) {
+        return -1;
     }
 }

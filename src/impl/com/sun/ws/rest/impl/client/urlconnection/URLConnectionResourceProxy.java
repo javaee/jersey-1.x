@@ -40,7 +40,8 @@ import java.util.List;
 import java.util.Map;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
-import javax.ws.rs.ext.EntityProvider;
+import javax.ws.rs.ext.MessageBodyReader;
+import javax.ws.rs.ext.MessageBodyWriter;
 import javax.ws.rs.ext.HeaderProvider;
 import javax.ws.rs.ext.ProviderFactory;
 
@@ -84,8 +85,9 @@ public final class URLConnectionResourceProxy extends ResourceProxy {
         
         public <T> T getEntity(Class<T> c, boolean successful) {
             try {
-                return ProviderFactory.getInstance().createEntityProvider(c).
-                        readFrom(c, getContentType(), metadata, getInputStream(successful));
+                MediaType mediaType = getContentType();
+                return ProviderFactory.getInstance().createMessageBodyReader(c, mediaType).
+                        readFrom(c, mediaType, metadata, getInputStream(successful));
             } catch (IOException ex) {
                 throw new IllegalArgumentException(ex);
             }
@@ -163,18 +165,21 @@ public final class URLConnectionResourceProxy extends ResourceProxy {
     @SuppressWarnings("unchecked")
     private void writeEntity(MultivaluedMap<String, Object> metadata, Object entity, 
             OutputStream out) throws IOException {
-        final EntityProvider p = ProviderFactory.getInstance().createEntityProvider(entity.getClass());
-        
-        final Object mediaType = metadata.getFirst("Content-Type");
-        if (mediaType instanceof MediaType) {
-            p.writeTo(entity, (MediaType)mediaType, metadata, out);
+        MediaType mediaType = null;
+        final Object mediaTypeHeader = metadata.getFirst("Content-Type");
+        if (mediaTypeHeader instanceof MediaType) {
+            mediaType = (MediaType)mediaTypeHeader;
         } else {
-            if (mediaType != null) {
-                p.writeTo(entity, new MediaType(mediaType.toString()), metadata, out);
+            if (mediaTypeHeader != null) {
+                mediaType = new MediaType(mediaTypeHeader.toString());
             } else {
-                p.writeTo(entity, null, metadata, out);
+                mediaType = new MediaType("application", "octet-stream");
             }
         }
+                
+        final MessageBodyWriter p = ProviderFactory.getInstance().createMessageBodyWriter(entity.getClass(), mediaType);
+        p.writeTo(entity, mediaType, metadata, out);
+        
         out.flush();
         out.close();
     }
