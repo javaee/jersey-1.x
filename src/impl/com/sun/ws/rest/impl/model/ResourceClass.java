@@ -31,10 +31,8 @@ import com.sun.ws.rest.api.container.ContainerException;
 import com.sun.ws.rest.api.core.HttpRequestContext;
 import com.sun.ws.rest.api.core.HttpResponseContext;
 import com.sun.ws.rest.api.core.ResourceConfig;
-import com.sun.ws.rest.api.core.WebResource;
 import com.sun.ws.rest.api.view.Views;
 import com.sun.ws.rest.impl.dispatch.UriTemplateDispatcher;
-import com.sun.ws.rest.impl.model.method.WebResourceInterfaceMethod;
 import com.sun.ws.rest.impl.model.method.ResourceHeadWrapperMethod;
 import com.sun.ws.rest.impl.model.method.ResourceHttpMethod;
 import com.sun.ws.rest.impl.model.method.ResourceHttpOptionsMethod;
@@ -98,8 +96,6 @@ public final class ResourceClass extends BaseResourceClass {
         final ResourceMethodMap methodMap = 
                 processMethods(methods);
 
-        processWebResourceInterface(methodMap);
-                
         processViews(containerMemento, methodMap, templatedMethodMap);
 
         
@@ -224,28 +220,6 @@ public final class ResourceClass extends BaseResourceClass {
         
         ResourceMethod optionsMethod = new ResourceHttpOptionsMethod(this, methodMap.getAllow());
         methodMap.put(optionsMethod);
-    }
-    
-    private void processWebResourceInterface(ResourceMethodMap methodMap) {
-        if (WebResource.class.isAssignableFrom(c)) {
-            try {
-                Method m = c.getMethod("handleRequest", HttpRequestContext.class, HttpResponseContext.class);
-                
-                ResourceMethod genericMethod = new WebResourceInterfaceMethod(this, m);
-                
-                // TODO check if the method has a URI template
-                
-                // Add the generic method to the list of all existing methods
-                for (String methodName : methodMap.keySet()) {
-                    methodMap.get(methodName).add(genericMethod);
-                }
-                // Add to the null method to support any methods not declared
-                methodMap.put(genericMethod);
-            } catch (NoSuchMethodException ex) {
-                // This should never occur if WebResource is assignable from the class
-                ex.printStackTrace();
-            }
-        }
     }
     
     private void processViews(Object containerMemento, 

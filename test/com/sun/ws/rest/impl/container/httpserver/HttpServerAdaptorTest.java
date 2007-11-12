@@ -25,11 +25,10 @@ package com.sun.ws.rest.impl.container.httpserver;
 import javax.ws.rs.UriTemplate;
 import com.sun.ws.rest.api.core.HttpRequestContext;
 import com.sun.ws.rest.api.core.HttpResponseContext;
-import com.sun.ws.rest.api.core.WebResource;
 import com.sun.ws.rest.impl.client.ResourceProxy;
+import javax.ws.rs.HttpMethod;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
-import junit.framework.*;
 
 /**
  *
@@ -37,7 +36,8 @@ import junit.framework.*;
  */
 public class HttpServerAdaptorTest extends AbstractHttpServerTester {
     @UriTemplate("/{arg1}/{arg2}")
-    public static class TestOneWebResource implements WebResource {
+    public static class TestOneWebResource {
+        @HttpMethod("POST")
         public void handleRequest(HttpRequestContext request, HttpResponseContext response) {
             assertEquals("POST", request.getHttpMethod());
             
@@ -52,7 +52,8 @@ public class HttpServerAdaptorTest extends AbstractHttpServerTester {
     }
     
     @UriTemplate("/{arg1}")
-    public static class TestTwoWebResource implements WebResource {
+    public static class TestTwoWebResource {
+        @HttpMethod("POST")
         public void handleRequest(HttpRequestContext request, HttpResponseContext response) {
             assertEquals("POST", request.getHttpMethod());
             
@@ -69,7 +70,7 @@ public class HttpServerAdaptorTest extends AbstractHttpServerTester {
         super(testName);
     }
     
-    public void testExpliciWebResourceReference() {
+    public void testExplicitWebResourceReference() {
         startServer(TestOneWebResource.class, TestTwoWebResource.class);
         
         ResourceProxy r = ResourceProxy.create(getUri().path("a").build());

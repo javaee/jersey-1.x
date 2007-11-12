@@ -25,17 +25,19 @@ package com.sun.ws.rest.impl.application;
 import javax.ws.rs.UriTemplate;
 import com.sun.ws.rest.api.core.HttpRequestContext;
 import com.sun.ws.rest.api.core.HttpResponseContext;
-import com.sun.ws.rest.api.core.WebResource;
+import javax.ws.rs.HttpMethod;
 
     
 @UriTemplate("/resource1")
-public class ResourceOne implements WebResource {
+public class ResourceOne {
+    
+    @HttpMethod("GET")
     public void handleRequest(HttpRequestContext request, HttpResponseContext response) {
         if (!request.getHttpMethod().equals("GET"))
             throw new RuntimeException("Method didn't match");
         
         String s = request.getEntity(String.class);
         if (!s.equals("RESOURCE-ONE"))
-            throw new RuntimeException("Content didn't match");            
+            throw new RuntimeException("Content didn't match");
     }
 }

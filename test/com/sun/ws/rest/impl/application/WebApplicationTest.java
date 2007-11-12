@@ -26,7 +26,6 @@ import com.sun.ws.rest.api.core.HttpResponseContext;
 import javax.ws.rs.UriTemplate;
 import com.sun.ws.rest.api.core.HttpRequestContext;
 import com.sun.ws.rest.api.core.ResourceConfig;
-import com.sun.ws.rest.api.core.WebResource;
 import com.sun.ws.rest.spi.container.AbstractContainerRequest;
 import com.sun.ws.rest.spi.container.AbstractContainerResponse;
 import com.sun.ws.rest.impl.TestHttpRequestContext;
@@ -35,6 +34,7 @@ import com.sun.ws.rest.api.core.DefaultResourceConfig;
 import java.io.ByteArrayInputStream;
 import java.util.HashSet;
 import java.util.Set;
+import javax.ws.rs.HttpMethod;
 import junit.framework.*;
 
 /**
@@ -48,7 +48,8 @@ public class WebApplicationTest extends TestCase {
     }
     
     @UriTemplate("/{arg1}/{arg2}")
-    public static class TestOneWebResource implements WebResource {
+    public static class TestOneWebResource {
+        @HttpMethod("GET")
         public void handleRequest(HttpRequestContext request, HttpResponseContext response) {
             assertEquals("GET", request.getHttpMethod());
             
@@ -61,7 +62,8 @@ public class WebApplicationTest extends TestCase {
     }
     
     @UriTemplate("/{arg1}")
-    public static class TestTwoWebResource implements WebResource {
+    public static class TestTwoWebResource {
+        @HttpMethod("GET")
         public void handleRequest(HttpRequestContext request, HttpResponseContext response) {
             assertEquals("GET", request.getHttpMethod());
             
@@ -76,7 +78,8 @@ public class WebApplicationTest extends TestCase {
     }
     
     @UriTemplate("/{arg1}.xml")
-    public static class TestThreeWebResource implements WebResource {
+    public static class TestThreeWebResource {
+        @HttpMethod("GET")
         public void handleRequest(HttpRequestContext request, HttpResponseContext response) {
             assertEquals("GET", request.getHttpMethod());
             

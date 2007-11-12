@@ -25,11 +25,13 @@ package com.sun.ws.rest.impl.application;
 import javax.ws.rs.UriTemplate;
 import com.sun.ws.rest.api.core.HttpRequestContext;
 import com.sun.ws.rest.api.core.HttpResponseContext;
-import com.sun.ws.rest.api.core.WebResource;
+import javax.ws.rs.HttpMethod;
 
 
 @UriTemplate("/resource2")
-public class ResourceTwo implements WebResource {
+public class ResourceTwo {
+    
+    @HttpMethod("GET")
     public void handleRequest(HttpRequestContext request, HttpResponseContext response) {
         if (!request.getHttpMethod().equals("GET"))
             throw new RuntimeException("Method didn't match");

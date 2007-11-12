@@ -1,12 +1,12 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
- * 
- * Copyright 2007 Sun Microsystems, Inc. All rights reserved. 
- * 
+ *
+ * Copyright 2007 Sun Microsystems, Inc. All rights reserved.
+ *
  * The contents of this file are subject to the terms of the Common Development
  * and Distribution License("CDDL") (the "License").  You may not use this file
- * except in compliance with the License. 
- * 
+ * except in compliance with the License.
+ *
  * You can obtain a copy of the License at:
  *     https://jersey.dev.java.net/license.txt
  * See the License for the specific language governing permissions and
@@ -27,7 +27,6 @@ import com.sun.ws.rest.api.core.HttpRequestContext;
 import com.sun.ws.rest.api.core.HttpResponseContext;
 import javax.ws.rs.ProduceMime;
 import javax.ws.rs.UriTemplate;
-import com.sun.ws.rest.api.core.WebResource;
 import com.sun.ws.rest.impl.client.ResourceProxy;
 import javax.ws.rs.HttpMethod;
 import javax.ws.rs.core.Response;
@@ -43,7 +42,7 @@ public class BeanWithWebResourceTest extends AbstractResourceTester {
     }
     
     @UriTemplate("/{arg1}/{arg2}")
-    public static class BeanWithWebResource implements WebResource {
+    public static class BeanWithWebResource{
         @HttpMethod("GET")
         public void doGet(HttpRequestContext request, HttpResponseContext response) {
             assertEquals("GET", request.getHttpMethod());
@@ -51,19 +50,34 @@ public class BeanWithWebResourceTest extends AbstractResourceTester {
             response.setResponse(Response.Builder.ok("RESPONSE").build());
         }
         
+        @HttpMethod("PUT")
+        public void putReqWrapper(HttpRequestContext request, HttpResponseContext response) {
+            handleRequest(request, response);
+        }
+        
+        @HttpMethod("POST")
+        public void postReqWrapper(HttpRequestContext request, HttpResponseContext response) {
+            handleRequest(request, response);
+        }
+        
+        @HttpMethod("DELETE")
+        public void deleteReqWrapper(HttpRequestContext request, HttpResponseContext response) {
+            handleRequest(request, response);
+        }
+        
         public void handleRequest(HttpRequestContext request, HttpResponseContext response) {
             String method = request.getHttpMethod();
             
-            boolean match = "POST".equals(method) | "DELETE".equals(method) | 
+            boolean match = "POST".equals(method) | "DELETE".equals(method) |
                     "PUT".equals(method);
             assertTrue(match);
             
             response.setResponse(Response.Builder.ok("RESPONSE").build());
         }
     }
-        
+    
     @UriTemplate("/{arg1}/{arg2}")
-    public static class BeanProduceWithWebResource implements WebResource {
+    public static class BeanProduceWithWebResource {
         @HttpMethod("GET")
         @ProduceMime("text/html")
         public void doGet(HttpRequestContext request, HttpResponseContext response) {
@@ -73,10 +87,28 @@ public class BeanWithWebResourceTest extends AbstractResourceTester {
             response.setResponse(Response.Builder.ok("RESPONSE").build());
         }
         
+        //TODO: reunify the following 3 methods once PUT, POST, DELETE annotations are available
         @ProduceMime("text/xhtml")
+        @HttpMethod("PUT")
+        public void putRequestWrapper(HttpRequestContext request, HttpResponseContext response) {
+            handleRequest(request, response);
+        }
+        
+        @ProduceMime("text/xhtml")
+        @HttpMethod("POST")
+        public void postRequestWrapper(HttpRequestContext request, HttpResponseContext response) {
+            handleRequest(request, response);
+        }
+        
+        @ProduceMime("text/xhtml")
+        @HttpMethod("DELETE")
+        public void deleteRequestWrapper(HttpRequestContext request, HttpResponseContext response) {
+            handleRequest(request, response);
+        }
+        
         public void handleRequest(HttpRequestContext request, HttpResponseContext response) {
             String method = request.getHttpMethod();
-            boolean match = "POST".equals(method) | "DELETE".equals(method) | 
+            boolean match = "POST".equals(method) | "DELETE".equals(method) |
                     "PUT".equals(method);
             assertTrue(match);
             
@@ -96,7 +128,7 @@ public class BeanWithWebResourceTest extends AbstractResourceTester {
         r.acceptable("text/xhtml").post();
         r.acceptable("text/xhtml").put();
         r.delete();
-    }    
+    }
     
     public void testBeanProduceWithWebResource() {
         initiateWebApplication(BeanProduceWithWebResource.class);
@@ -105,6 +137,6 @@ public class BeanWithWebResourceTest extends AbstractResourceTester {
         r.acceptable("text/html").get(String.class);
         r.acceptable("text/xhtml").post();
         r.acceptable("text/xhtml").put();
-        r.delete();        
-    }    
+        r.delete();
+    }
 }
