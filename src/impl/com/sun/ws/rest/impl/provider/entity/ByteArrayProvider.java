@@ -50,4 +50,9 @@ public final class ByteArrayProvider extends AbstractTypeEntityProvider<byte[]> 
             MultivaluedMap<String, Object> headers, OutputStream entityStream) throws IOException {
         entityStream.write(t);
     }
+    
+    @Override
+    public long getSize(byte[] t) {
+        return t.length;
+    }
 }

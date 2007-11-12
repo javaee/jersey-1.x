@@ -64,4 +64,9 @@ public final class FileProvider extends AbstractTypeEntityProvider<File> {
             in.close();
         }
     }
+
+    @Override
+    public long getSize(File t) {
+        return t.length();
+    }
 }

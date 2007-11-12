@@ -47,4 +47,9 @@ public final class StringProvider extends AbstractTypeEntityProvider<String> {
             MultivaluedMap<String, Object> headers, OutputStream entityStream) throws IOException {
         entityStream.write(t.getBytes());
     }
+
+    @Override
+    public long getSize(String t) {
+        return t.getBytes().length;
+    }
 }
