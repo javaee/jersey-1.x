@@ -28,6 +28,8 @@ import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.OutputStream;
+import javax.ws.rs.ConsumeMime;
+import javax.ws.rs.ProduceMime;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 
@@ -35,6 +37,8 @@ import javax.ws.rs.core.MultivaluedMap;
  *
  * @author Paul.Sandoz@Sun.Com
  */
+@ProduceMime("application/bean")
+@ConsumeMime("application/bean")
 public class BeanProvider extends AbstractTypeEntityProvider<Bean> {
     
     public boolean supports(Class type) {

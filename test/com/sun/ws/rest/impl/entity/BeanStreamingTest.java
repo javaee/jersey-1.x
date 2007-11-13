@@ -34,6 +34,16 @@ public class BeanStreamingTest extends AbstractStreamingTester {
     
     public void testBean() throws Exception {
         Bean b = new Bean("bean", 123, 3.1415f);
-        roundTrip(Bean.class, b);
+        // the following should work using BeanProvider which 
+        // supports Bean.class for type application/bean
+        roundTrip(Bean.class, b, "application/bean");
+        try {
+            // the following should fail since there's no entity
+            // provider for Bean.class that supports text/plain
+            roundTrip(Bean.class, b, "text/plain");
+            assert(false);
+        } catch (IllegalArgumentException ex) {
+            assert(true);
+        }
     }
 }

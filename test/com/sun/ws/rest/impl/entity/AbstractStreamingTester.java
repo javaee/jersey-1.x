@@ -50,9 +50,10 @@ public abstract class AbstractStreamingTester extends TestCase {
     }
     
     <T> void roundTrip(Class<T> c, T t1, String mediaType) throws IOException {
-        byte[] b1 = writeTo(t1);
-        T t2 = readFrom(c, b1);
-        byte[] b2 = writeTo(t2);
+        MediaType mt = new MediaType(mediaType);
+        byte[] b1 = writeTo(t1, mt);
+        T t2 = readFrom(c, b1, mt);
+        byte[] b2 = writeTo(t2, mt);
         assertEquals(b1.length, b2.length);
         boolean e = false;
         for (int i = 0; i < b1.length; i++) {
