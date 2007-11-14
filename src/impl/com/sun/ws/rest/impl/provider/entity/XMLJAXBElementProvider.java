@@ -27,58 +27,25 @@ import com.sun.ws.rest.impl.util.ThrowHelper;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.io.OutputStreamWriter;
-import java.util.Map;
-import java.util.WeakHashMap;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
-import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.stream.XMLStreamException;
-import org.codehaus.jettison.badgerfish.BadgerFishXMLStreamReader;
-import org.codehaus.jettison.badgerfish.BadgerFishXMLStreamWriter;
-import org.codehaus.jettison.json.JSONException;
-import org.codehaus.jettison.json.JSONObject;
 
 /**
  *
  * @author Paul.Sandoz@Sun.Com
  */
-public final class JAXBElementProvider extends AbstractTypeEntityProvider<Object> {
-    
-    static Map<Class, JAXBContext> jaxbContexts = new WeakHashMap<Class, JAXBContext>();
-    
-    static MediaType JSON = new MediaType("application/json");
-    
-    public boolean supports(Class<?> type) {
-        return type.getAnnotation(XmlRootElement.class) != null;
-    }
+public final class XMLJAXBElementProvider extends AbstractJAXBElementProvider {
     
     public Object readFrom(Class<Object> type, MediaType mediaType,
             MultivaluedMap<String, String> headers, InputStream entityStream) throws IOException {
         try {
             JAXBContext context = getJAXBContext(type);
             Unmarshaller unmarshaller = context.createUnmarshaller();
-            boolean jsonUsed = mediaType.equals(JSON);
-            if (!jsonUsed) {
-                return unmarshaller.unmarshal(entityStream);
-            } else {
-                try {
-                    return unmarshaller.unmarshal(
-                            new BadgerFishXMLStreamReader(new JSONObject(readFromAsString(entityStream))));
-                } catch (XMLStreamException xmlStreamException) {
-                    throw ThrowHelper.withInitCause(xmlStreamException,
-                            new IOException(ImplMessages.ERROR_PARSING_JSON_OBJECT())
-                            );
-                } catch (JSONException jsonException) {
-                    throw ThrowHelper.withInitCause(jsonException,
-                            new IOException(ImplMessages.ERROR_PARSING_JSON_OBJECT())
-                            );
-                }
-            }
+            return unmarshaller.unmarshal(entityStream);
         } catch (JAXBException cause) {
             throw ThrowHelper.withInitCause(cause,
                     new IOException(ImplMessages.ERROR_MARSHALLING_JAXB(type))
@@ -91,25 +58,11 @@ public final class JAXBElementProvider extends AbstractTypeEntityProvider<Object
         try {
             JAXBContext context = getJAXBContext(t.getClass());
             Marshaller marshaller = context.createMarshaller();
-            if (JSON.equals(mediaType)) {
-                marshaller.marshal(t, new BadgerFishXMLStreamWriter(new OutputStreamWriter(entityStream)));
-            } else {
-                marshaller.marshal(t, entityStream);
-            }
+            marshaller.marshal(t, entityStream);
         } catch (JAXBException cause) {
             throw ThrowHelper.withInitCause(cause,
                     new IOException(ImplMessages.ERROR_MARSHALLING_JAXB(t.getClass()))
                     );
-        }
-    }
-    
-    private JAXBContext getJAXBContext(Class type) throws JAXBException {
-        synchronized (jaxbContexts) {
-            JAXBContext context = jaxbContexts.get(type);
-            if (context == null) {
-                context = JAXBContext.newInstance(type);
-            }
-            return context;
         }
     }
 }

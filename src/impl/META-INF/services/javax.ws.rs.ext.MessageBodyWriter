@@ -8,6 +8,7 @@ com.sun.ws.rest.impl.provider.entity.ViewTypeProvider
 com.sun.ws.rest.impl.provider.entity.AtomFeedProvider
 com.sun.ws.rest.impl.provider.entity.AtomEntryProvider
 com.sun.ws.rest.impl.provider.entity.FormURLEncodedProvider
-com.sun.ws.rest.impl.provider.entity.JAXBElementProvider
+com.sun.ws.rest.impl.provider.entity.XMLJAXBElementProvider
+com.sun.ws.rest.impl.provider.entity.JSONJAXBElementProvider
 com.sun.ws.rest.impl.provider.entity.JSONArrayProvider
 com.sun.ws.rest.impl.provider.entity.JSONObjectProvider
