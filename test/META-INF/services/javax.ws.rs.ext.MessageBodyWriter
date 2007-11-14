@@ -1,1 +1,4 @@
-com.sun.ws.rest.impl.entity.BeanProvider
+com.sun.ws.rest.impl.entity.BeanStreamingTest$BeanWildProvider
+com.sun.ws.rest.impl.entity.BeanStreamingTest$BeanProvider
+com.sun.ws.rest.impl.entity.BeanStreamingTest$Bean2WildProvider
+com.sun.ws.rest.impl.entity.BeanStreamingTest$Bean2Provider
