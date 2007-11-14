@@ -1,5 +1,18 @@
-release 0.5 (2007-12-xx/2008-01-xx)
-
+release 0.5 (2008-01-18)
+- Removed the com.sun.ws.rest.api.core.WebResource interface and resource class
+  support for this interface.
+- Root resource classes, by default, are now found at runtime (rather than
+  compile time) by efficiently scanning the Java class files of the 
+  java.class.path for SE-based deployments or the WEB-INF/lib and WEB-INF/classes
+  for Servlet-based deployments.
+  See the JavaDoc of the following classes for more details:
+    - com.sun.ws.rest.api.container.ContainerFactory
+    - com.sun.ws.rest.spi.container.servlet.ServletContainer
+- JAXB XML and JSON support now split into separate implementations,
+  and the former no longer requires the jars of the latter in the classpath.
+- Partially integrated JSR 311 API 0.5
+  - EntityProvider is split into two separate interfaces
+    MessageBodyReader and MessageBodyWriter
 
 release 0.4 (2007-11-02)
 - Fixed issue 17: Matrix Parameter With URL Value Ends Up With 404
