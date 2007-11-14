@@ -418,9 +418,10 @@ public final class ServiceFinder<T> implements Iterable<T> {
                     try {
                         Class.forName(nextName, true, loader);
                     } catch (ClassNotFoundException ex) {
-                        // Provider not found
+                        // Provider implementation not found
                         if(logger.isLoggable(Level.WARNING)) {
-                            logger.log(Level.WARNING, SpiMessages.PROVIDER_NOT_FOUND(nextName) , ex);
+                            logger.log(Level.WARNING, 
+                                    SpiMessages.PROVIDER_NOT_FOUND(nextName, service));
                         }
                         nextName = null;
                     } catch (NoClassDefFoundError ex) {
@@ -430,7 +431,7 @@ public final class ServiceFinder<T> implements Iterable<T> {
                             // the name of a dependent class that is not found
                             logger.log(Level.WARNING , 
                                     SpiMessages.DEPENDENT_CLASS_OF_PROVIDER_NOT_FOUND(
-                                    ex.getLocalizedMessage(), nextName));
+                                    ex.getLocalizedMessage(), nextName, service));
                         }
                         nextName = null; 
                     }
@@ -449,10 +450,10 @@ public final class ServiceFinder<T> implements Iterable<T> {
                 return service.cast(Class.forName(cn, true, loader).newInstance());
             } catch (ClassNotFoundException x) {
                 fail(service, 
-                        SpiMessages.PROVIDER_NOT_FOUND(cn));
+                        SpiMessages.PROVIDER_NOT_FOUND(cn, service));
             } catch (Exception x) {
                 fail(service,
-                        SpiMessages.PROVIDER_COULD_NOT_BE_CREATED(cn, x.getLocalizedMessage()),
+                        SpiMessages.PROVIDER_COULD_NOT_BE_CREATED(cn, service, x.getLocalizedMessage()),
                         x);
             }
             return null;    /* This cannot happen */
