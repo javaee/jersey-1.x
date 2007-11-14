@@ -24,6 +24,7 @@ package com.sun.ws.rest.impl.model.method.dispatch;
 
 import com.sun.ws.rest.api.core.HttpRequestContext;
 import com.sun.ws.rest.api.core.HttpResponseContext;
+import com.sun.ws.rest.api.model.AbstractResourceMethod;
 import com.sun.ws.rest.spi.dispatch.RequestDispatcher;
 import com.sun.ws.rest.impl.model.method.ResourceMethodData;
 import java.lang.reflect.InvocationTargetException;
@@ -36,8 +37,8 @@ import javax.ws.rs.core.MediaType;
 public class HttpReqResDispatchProvider implements ResourceMethodDispatchProvider {
     
     static final class HttpReqResDispatcher extends ResourceJavaMethodDispatcher {
-        HttpReqResDispatcher(ResourceMethodData method) {
-            super(method);
+        HttpReqResDispatcher(AbstractResourceMethod abstractResourceMethod) {
+            super(abstractResourceMethod);
         }
 
         public void _dispatch(Object resource, HttpRequestContext request, HttpResponseContext response) 
@@ -49,14 +50,16 @@ public class HttpReqResDispatchProvider implements ResourceMethodDispatchProvide
     }
 
     
-    public RequestDispatcher create(ResourceMethodData method) {
-        if (method.method.getReturnType() != void.class) return null;
+    public RequestDispatcher create(AbstractResourceMethod abstractResourceMethod) {
+        // TODO: add return type to ARM
+        if (abstractResourceMethod.getMethod().getReturnType() != void.class) return null;
         
-        Class<?>[] parameters = method.method.getParameterTypes();
+        // TODO: use ARM getParams instead
+        Class<?>[] parameters = abstractResourceMethod.getMethod().getParameterTypes();
         if (parameters.length != 2) return null;
         if (parameters[0] != HttpRequestContext.class) return null;
         if (parameters[1] != HttpResponseContext.class) return null;
                 
-        return new HttpReqResDispatcher(method);
+        return new HttpReqResDispatcher(abstractResourceMethod);
     }
 }

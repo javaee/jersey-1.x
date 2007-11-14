@@ -26,47 +26,39 @@ import com.sun.ws.rest.spi.dispatch.RequestDispatcher;
 import javax.ws.rs.ConsumeMime;
 import javax.ws.rs.ProduceMime;
 import com.sun.ws.rest.api.container.ContainerException;
+import com.sun.ws.rest.api.model.AbstractResourceMethod;
 import com.sun.ws.rest.impl.model.MediaTypeList;
 import com.sun.ws.rest.impl.model.MimeHelper;
 import com.sun.ws.rest.impl.model.ResourceClass;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
+import javax.ws.rs.core.MediaType;
 
 /**
  *
  * @author Paul.Sandoz@Sun.Com
  */
 public abstract class ResourceJavaMethod extends ResourceMethod {
-    protected final Method method;
+    protected final AbstractResourceMethod abstractResourceMethod;
 
     protected RequestDispatcher dispatcher;
     
-    protected ResourceJavaMethod(ResourceClass resourceClass, Method method) throws ContainerException {
+    protected ResourceJavaMethod(
+            ResourceClass resourceClass, AbstractResourceMethod abstractResourceMethod) throws ContainerException {
         super(resourceClass);
-        this.consumeMime = getConsumeMimeList(resourceClass, method);
-        this.produceMime = getProduceMimeList(resourceClass, method);
+        this.consumeMime = new MediaTypeList();
+        this.consumeMime.addAll(abstractResourceMethod.getSupportedInputTypes());
+        this.produceMime = new MediaTypeList();
+        this.produceMime.addAll(abstractResourceMethod.getSupportedOutputTypes());
 
-        this.method = method;
+        this.abstractResourceMethod = abstractResourceMethod;
     }
     
     public Method getMethod() {
-        return method;
+        return this.abstractResourceMethod.getMethod();
     }
     
     public RequestDispatcher getDispatcher() {
         return dispatcher;
-    }
-    
-    private MediaTypeList getConsumeMimeList(ResourceClass mc, Method method) {
-        if (method.isAnnotationPresent(ConsumeMime.class))
-            return MimeHelper.createMediaTypes(method.getAnnotation(ConsumeMime.class));
-        else
-            return mc.consumeMime;
-    }
-        
-    private MediaTypeList getProduceMimeList(ResourceClass mc, Method method) {
-        if (method.isAnnotationPresent(ProduceMime.class))
-            return MimeHelper.createMediaTypes(method.getAnnotation(ProduceMime.class));
-        else
-            return mc.produceMime;
     }
 }

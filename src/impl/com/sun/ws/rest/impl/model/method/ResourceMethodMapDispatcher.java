@@ -148,6 +148,10 @@ public class ResourceMethodMapDispatcher extends UriTemplateDispatcher {
                 LOGGER.warning(error);
             }
         }
-        
-    }    
+    }
+    
+    public String toString() {
+        return "ResourceMethodMapDispatcher(\"" + this.getTemplate().getTemplate() + "\")";
+    }
+    
 }

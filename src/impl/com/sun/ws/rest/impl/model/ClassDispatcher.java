@@ -43,4 +43,8 @@ class ClassDispatcher extends UriTemplateDispatcher {
         return context.dispatchTo(c, path);
     }
     
+    public String toString() {
+        return "ClassDispatcher(\"" + this.getTemplate().getTemplate() + "\"->" + this.c.getName() + ")";
+    }
+    
 }

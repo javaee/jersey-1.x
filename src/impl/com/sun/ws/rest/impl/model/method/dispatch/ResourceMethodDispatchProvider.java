@@ -23,8 +23,8 @@
 package com.sun.ws.rest.impl.model.method.dispatch;
 
 import com.sun.ws.rest.api.container.ContainerException;
+import com.sun.ws.rest.api.model.AbstractResourceMethod;
 import com.sun.ws.rest.spi.dispatch.RequestDispatcher;
-import com.sun.ws.rest.impl.model.method.ResourceMethodData;
 
 /**
  * Service-provider interface for creating {@link RequestDispatcher} instances.
@@ -57,5 +57,5 @@ public interface ResourceMethodDispatchProvider {
      * @param method the model of a method of a Web resource.
      * @return the dispatcher, otherwise null if it could not be created.
      */
-    RequestDispatcher create(ResourceMethodData method) throws ContainerException;    
+    RequestDispatcher create(AbstractResourceMethod abstractResourceMethod) throws ContainerException;    
 }

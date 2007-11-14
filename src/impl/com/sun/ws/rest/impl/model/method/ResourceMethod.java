@@ -76,7 +76,7 @@ public abstract class ResourceMethod {
     }
 
     public Class<?> getResourceClass() {
-        return resourceClass.c;
+        return resourceClass.resource.getResourceClass();
     }
     
     public abstract Method getMethod();

@@ -70,4 +70,9 @@ class NodeDispatcher extends UriTemplateDispatcher {
             throw new ContainerException("Exception injecting parameters to dynamic resolving method", e);
         }    
     }
+    
+    public String toString() {
+        return "NodeDispatcher(\"" + this.getTemplate().getTemplate() + "\"->" + this.m.getName() + ")";
+    }
+    
 }

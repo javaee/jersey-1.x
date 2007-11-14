@@ -23,62 +23,30 @@
 package com.sun.ws.rest.impl.model.method;
 
 import static javax.ws.rs.HttpMethod.*;
-import javax.ws.rs.HttpMethod;
 import com.sun.ws.rest.api.container.ContainerException;
+import com.sun.ws.rest.api.model.AbstractResourceMethod;
 import com.sun.ws.rest.impl.ImplMessages;
 import com.sun.ws.rest.impl.model.ResourceClass;
 import com.sun.ws.rest.impl.model.method.dispatch.ResourceMethodDispatcherFactory;
-import java.lang.reflect.Method;
 
 /**
  *
  * @author Paul.Sandoz@Sun.Com
  */
 public final class ResourceHttpMethod extends ResourceJavaMethod {
-    /**
-     * HTTP methods that may be used as the prefix of a Java method name.
-     */
-    private static final String COMMON_METHODS[] = {GET, POST, PUT, DELETE, HEAD};
     
-    public ResourceHttpMethod(ResourceClass resourceClass, Method method) throws ContainerException {
-        super(resourceClass, method);
-        this.httpMethod = getHttpMethod(method);
+    public ResourceHttpMethod(ResourceClass resourceClass, AbstractResourceMethod abstractResourceMethod) throws ContainerException {
+        super(resourceClass, abstractResourceMethod);
+        this.httpMethod = abstractResourceMethod.getHttpMethod();
         
-        ResourceMethodData rmd = new ResourceMethodData(method, httpMethod, consumeMime, produceMime);
-        this.dispatcher = ResourceMethodDispatcherFactory.create(rmd);
+        this.dispatcher = ResourceMethodDispatcherFactory.create(abstractResourceMethod);
         if (dispatcher == null) {
-            String msg = ImplMessages.NOT_VALID_HTTPMETHOD(method, 
+            String msg = ImplMessages.NOT_VALID_HTTPMETHOD(abstractResourceMethod.getMethod(), 
                                                                 httpMethod, 
                                                                 resourceClass);
             throw new ContainerException(msg);
         }
     }
     
-    private static String getHttpMethod(Method method) throws ContainerException {
-        HttpMethod httpMethod = method.getAnnotation(HttpMethod.class);
-        if (httpMethod == null) {
-            throw new ContainerException("Java method is not annotated with HttpMethod");
-        }
-
-        String methodName = getHttpMethod(httpMethod, method.getName());
-        if (methodName.length() > 0)
-            return methodName;
-        
-        throw new ContainerException("The HTTP method cannot be determined from the name of the Java method " +
-                method + " of the class " + method.getDeclaringClass());
-    }    
     
-    public static String getHttpMethod(HttpMethod httpMethod, String javaMethodName) throws ContainerException {
-        if (httpMethod.value().length() > 0)
-            return httpMethod.value();
-        
-        String methodName = javaMethodName.toUpperCase();
-        for (String m : COMMON_METHODS) {
-            if (methodName.startsWith(m)) {
-                return m;
-            }
-        }
-
-        return "";
-    }    
 }

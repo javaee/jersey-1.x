@@ -26,6 +26,7 @@ import javax.ws.rs.WebApplicationException;
 import com.sun.ws.rest.api.container.ContainerException;
 import com.sun.ws.rest.api.core.HttpRequestContext;
 import com.sun.ws.rest.api.core.HttpResponseContext;
+import com.sun.ws.rest.api.model.AbstractResourceMethod;
 import com.sun.ws.rest.impl.ResponseBuilderImpl;
 import com.sun.ws.rest.impl.model.ReflectionHelper;
 import com.sun.ws.rest.spi.dispatch.RequestDispatcher;
@@ -64,8 +65,8 @@ public class EntityParamDispatchProvider implements ResourceMethodDispatchProvid
     static abstract class EntityParamInInvoker extends ResourceJavaMethodDispatcher {        
         final private ParameterExtractor[] injectors;
         
-        EntityParamInInvoker(ResourceMethodData method, ParameterExtractor[] injectors) {
-            super(method);
+        EntityParamInInvoker(AbstractResourceMethod abstractResourceMethod, ParameterExtractor[] injectors) {
+            super(abstractResourceMethod);
             this.injectors = injectors;
         }
 
@@ -85,8 +86,8 @@ public class EntityParamDispatchProvider implements ResourceMethodDispatchProvid
     }
     
     static final class VoidOutInvoker extends EntityParamInInvoker {
-        VoidOutInvoker(ResourceMethodData method, ParameterExtractor[] injectors) {
-            super(method, injectors);
+        VoidOutInvoker(AbstractResourceMethod abstractResourceMethod, ParameterExtractor[] injectors) {
+            super(abstractResourceMethod, injectors);
         }
 
         @SuppressWarnings("unchecked")
@@ -98,8 +99,8 @@ public class EntityParamDispatchProvider implements ResourceMethodDispatchProvid
     }
     
     static final class TypeOutInvoker extends EntityParamInInvoker {
-        TypeOutInvoker(ResourceMethodData method, ParameterExtractor[] injectors) {
-            super(method, injectors);
+        TypeOutInvoker(AbstractResourceMethod abstractResourceMethod, ParameterExtractor[] injectors) {
+            super(abstractResourceMethod, injectors);
         }
 
         @SuppressWarnings("unchecked")
@@ -115,8 +116,8 @@ public class EntityParamDispatchProvider implements ResourceMethodDispatchProvid
     }
     
     static final class ResponseOutInvoker extends EntityParamInInvoker {
-        ResponseOutInvoker(ResourceMethodData method, ParameterExtractor[] injectors) {
-            super(method, injectors);
+        ResponseOutInvoker(AbstractResourceMethod abstractResourceMethod, ParameterExtractor[] injectors) {
+            super(abstractResourceMethod, injectors);
         }
 
         @SuppressWarnings("unchecked")
@@ -131,8 +132,8 @@ public class EntityParamDispatchProvider implements ResourceMethodDispatchProvid
     }
     
     static final class ObjectOutInvoker extends EntityParamInInvoker {
-        ObjectOutInvoker(ResourceMethodData method, ParameterExtractor[] injectors) {
-            super(method, injectors);
+        ObjectOutInvoker(AbstractResourceMethod abstractResourceMethod, ParameterExtractor[] injectors) {
+            super(abstractResourceMethod, injectors);
         }
 
         @SuppressWarnings("unchecked")
@@ -154,37 +155,37 @@ public class EntityParamDispatchProvider implements ResourceMethodDispatchProvid
     }
         
     
-    public RequestDispatcher create(ResourceMethodData method) {
+    public RequestDispatcher create(AbstractResourceMethod abstractResourceMethod) {
         boolean requireReturnOfRepresentation = false;
         boolean requireNoEntityParameter = false;
         
-        if (method.httpMethod.equals("GET")) {
+        if ("GET".equals(abstractResourceMethod.getHttpMethod())) {
             requireReturnOfRepresentation = true;
             requireNoEntityParameter = true;
-        } else if (method.httpMethod.equals("POST")) {
-        } else if (method.httpMethod.equals("PUT")) {
-        } else if (method.httpMethod.equals("DELETE")) {
+        } else if ("POST".equals(abstractResourceMethod.getHttpMethod())) {
+        } else if ("PUT".equals(abstractResourceMethod.getHttpMethod())) {
+        } else if ("DELETE".equals(abstractResourceMethod.getHttpMethod())) {
             requireNoEntityParameter = true;
         }
         // Let through other methods
         
-        ParameterExtractor[] injectors = processParameters(method.method, requireNoEntityParameter);
+        ParameterExtractor[] injectors = processParameters(abstractResourceMethod.getMethod(), requireNoEntityParameter);
         if (injectors == null)
             return null;
         
-        Class<?> returnType = method.method.getReturnType();
+        Class<?> returnType = abstractResourceMethod.getMethod().getReturnType();
         if (Response.class.isAssignableFrom(returnType)) {
-            return new ResponseOutInvoker(method, injectors);                
+            return new ResponseOutInvoker(abstractResourceMethod, injectors);                
         } else if (returnType != void.class) {
             if (returnType == Object.class) {
-                return new ObjectOutInvoker(method, injectors);
+                return new ObjectOutInvoker(abstractResourceMethod, injectors);
             } else {
-                return new TypeOutInvoker(method, injectors);
+                return new TypeOutInvoker(abstractResourceMethod, injectors);
             }
         } else if (requireReturnOfRepresentation) {
             return null;
         } else {
-            return new VoidOutInvoker(method, injectors);
+            return new VoidOutInvoker(abstractResourceMethod, injectors);
         }
     }
     

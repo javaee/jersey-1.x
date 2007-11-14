@@ -67,6 +67,12 @@ import javax.xml.namespace.QName;
 
 public class UriTemplateProcessor implements Messager, AnnotationProcessor {
     
+    /**
+     * HTTP methods that may be used as the prefix of a Java method name.
+     * TODO: get rid of it (used by getHttpMethod helper method)
+     */
+    private enum COMMON_METHODS {GET, POST, PUT, DELETE, HEAD};
+
     private AnnotationProcessorEnvironment apEnv;
     
     private AnnotationProcessorContext context;
@@ -200,7 +206,7 @@ public class UriTemplateProcessor implements Messager, AnnotationProcessor {
                 return;
             }
             Method m = new Method(
-                    ResourceHttpMethod.getHttpMethod(httpMethod, md.getSimpleName()),
+                    getHttpMethod(httpMethod, md.getSimpleName()),
                     r);
             ConsumeMime c = md.getAnnotation(ConsumeMime.class);
             if (c != null)
@@ -306,4 +312,19 @@ public class UriTemplateProcessor implements Messager, AnnotationProcessor {
         }
 
     }
+    
+    private static String getHttpMethod(HttpMethod httpMethod, String javaMethodName) {
+        if (httpMethod.value().length() > 0)
+            return httpMethod.value();
+        
+        String methodName = javaMethodName.toUpperCase();
+        for (COMMON_METHODS methodConstant : COMMON_METHODS.values()) {
+            if (methodName.startsWith(methodConstant.toString())) {
+                return methodConstant.toString();
+            }
+        }
+
+        return "";
+    }    
+    
 }

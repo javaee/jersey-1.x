@@ -25,9 +25,9 @@ package com.sun.ws.rest.impl.model.method.dispatch;
 import com.sun.ws.rest.api.container.ContainerException;
 import com.sun.ws.rest.api.core.HttpRequestContext;
 import com.sun.ws.rest.api.core.HttpResponseContext;
+import com.sun.ws.rest.api.model.AbstractResourceMethod;
 import com.sun.ws.rest.impl.model.MediaTypeList;
 import com.sun.ws.rest.spi.dispatch.RequestDispatcher;
-import com.sun.ws.rest.impl.model.method.ResourceMethodData;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import javax.ws.rs.core.MediaType;
@@ -37,22 +37,24 @@ import javax.ws.rs.core.MediaType;
  * @author Paul.Sandoz@Sun.Com
  */
 public abstract class ResourceJavaMethodDispatcher implements RequestDispatcher {
+
     protected final Method method;
     
     final private MediaTypeList produceMime;
     
     final private MediaType mediaType;
 
-    public ResourceJavaMethodDispatcher(ResourceMethodData method) {
-        this.method = method.method;
-        this.produceMime = method.produceMime;
+    public ResourceJavaMethodDispatcher(AbstractResourceMethod abstractResourceMethod) {
+        this.method = abstractResourceMethod.getMethod();
+        this.produceMime = new MediaTypeList();
+        this.produceMime.addAll(abstractResourceMethod.getSupportedOutputTypes());
         
-        if (method.produceMime.size() == 1) {
-            MediaType c = method.produceMime.get(0);
+        if (this.produceMime.size() == 1) {
+            MediaType c = this.produceMime.get(0);
             if (c.getType().equals("*") || c.getSubtype().equals("*")) 
                 mediaType = null;
             else
-                mediaType = method.produceMime.get(0);
+                mediaType = this.produceMime.get(0);
         } else {
             mediaType = null;
         }        

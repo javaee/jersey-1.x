@@ -20,7 +20,7 @@
  *     "Portions Copyrighted [year] [name of copyright owner]"
  */
 
-package com.sun.ws.rest.impl.model;
+package com.sun.ws.rest.impl.modelapi.annotation;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;

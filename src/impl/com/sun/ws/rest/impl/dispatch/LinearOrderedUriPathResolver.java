@@ -27,6 +27,8 @@ import com.sun.ws.rest.spi.dispatch.UriTemplateType;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * A URI path resolver implementation that sorts URI templates in order 
@@ -35,11 +37,17 @@ import java.util.TreeMap;
  * @author Paul.Sandoz@Sun.Com
  */
 public class LinearOrderedUriPathResolver<T> implements UriPathResolver<T> {
+    
+    private static final Logger LOGGER = Logger.getLogger(LinearOrderedUriPathResolver.class.getName());
+    
     Map<UriTemplateType, T> map = 
             new TreeMap<UriTemplateType, T>(UriTemplateType.COMPARATOR);
             
     public boolean add(UriTemplateType template, T t) {
         map.put(template, t);
+        if (LOGGER.isLoggable(Level.FINEST)) {
+            LOGGER.finest("Adding dispatcher: " + template + ":" + t.toString());
+        }
         return true;
     }
     
@@ -54,6 +62,9 @@ public class LinearOrderedUriPathResolver<T> implements UriPathResolver<T> {
     
     public T resolve(CharSequence path, StringBuilder rightHandPath, 
             Map<String, String> templateValues) {
+        if (LOGGER.isLoggable(Level.FINEST)) {
+            LOGGER.finest("resolving: path="+path+",rightHandPath="+rightHandPath.toString());
+        }
         // Iterate through the entry set
         for (Map.Entry<UriTemplateType, T> e : map.entrySet()) {
             // Match each template

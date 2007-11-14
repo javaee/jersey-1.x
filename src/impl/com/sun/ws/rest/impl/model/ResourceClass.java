@@ -22,15 +22,11 @@
 
 package com.sun.ws.rest.impl.model;
 
-import com.sun.ws.rest.impl.view.ViewFactory;
-import javax.ws.rs.ConsumeMime;
-import javax.ws.rs.HttpMethod;
-import javax.ws.rs.ProduceMime;
-import javax.ws.rs.UriTemplate;
 import com.sun.ws.rest.api.container.ContainerException;
-import com.sun.ws.rest.api.core.HttpRequestContext;
-import com.sun.ws.rest.api.core.HttpResponseContext;
 import com.sun.ws.rest.api.core.ResourceConfig;
+import com.sun.ws.rest.api.model.AbstractResource;
+import com.sun.ws.rest.api.model.AbstractSubResourceLocator;
+import com.sun.ws.rest.api.model.AbstractSubResourceMethod;
 import com.sun.ws.rest.api.view.Views;
 import com.sun.ws.rest.impl.dispatch.UriTemplateDispatcher;
 import com.sun.ws.rest.impl.model.method.ResourceHeadWrapperMethod;
@@ -42,17 +38,20 @@ import com.sun.ws.rest.impl.model.method.ResourceMethodMap;
 import com.sun.ws.rest.impl.model.method.ResourceMethodMapDispatcher;
 import com.sun.ws.rest.impl.model.method.ResourceViewMethod;
 import com.sun.ws.rest.impl.model.node.NodeDispatcherFactory;
+import com.sun.ws.rest.impl.modelapi.annotation.IntrospectionModeller;
+import com.sun.ws.rest.impl.view.ViewFactory;
 import com.sun.ws.rest.spi.dispatch.UriPathTemplate;
 import com.sun.ws.rest.spi.dispatch.UriTemplateType;
 import com.sun.ws.rest.spi.resource.ResourceProvider;
 import com.sun.ws.rest.spi.resource.ResourceProviderFactory;
 import com.sun.ws.rest.spi.view.View;
-import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.logging.Logger;
+import javax.ws.rs.HttpMethod;
+
 
 /**
  *
@@ -63,38 +62,26 @@ public final class ResourceClass extends BaseResourceClass {
 
     public final ResourceConfig config;
     
-    public final Class<?> c;
+    public final AbstractResource resource;
     
     public final ResourceProvider resolver;
             
-    public final MediaTypeList consumeMime;
-    
-    public final MediaTypeList produceMime;
-    
     public final boolean hasSubResources;
     
     public ResourceClass(Object containerMemento, Class<?> c, ResourceConfig config, 
             ResourceProviderFactory resolverFactory) {
-        this.c = c;
+        this.resource = IntrospectionModeller.createResource(c);
         this.config = config;
         this.resolver = resolverFactory.createProvider(c, 
                 config.getFeatures(), config.getProperties());
-        
-        this.consumeMime = getConsumeMimeList();
-        this.produceMime = getProduceMimeList();
-
-        MethodList methods = new MethodList(c);
 
         boolean hasSubResources = false;
                 
-        hasSubResources = 
-                processSubResourceLocators(methods);
+        hasSubResources = processSubResourceLocators();
                 
-        final Map<UriTemplateType, ResourceMethodMap> templatedMethodMap = 
-                processSubResourceMethods(methods);
+        final Map<UriTemplateType, ResourceMethodMap> templatedMethodMap = processSubResourceMethods();
 
-        final ResourceMethodMap methodMap = 
-                processMethods(methods);
+        final ResourceMethodMap methodMap = processMethods();
 
         processViews(containerMemento, methodMap, templatedMethodMap);
 
@@ -139,39 +126,35 @@ public final class ResourceClass extends BaseResourceClass {
         rmm.put(rm);
     }
     
-    private MediaTypeList getConsumeMimeList() {
-        return MimeHelper.createMediaTypes(c.getAnnotation(ConsumeMime.class));
-    }
-        
-    private MediaTypeList getProduceMimeList() {
-        return MimeHelper.createMediaTypes(c.getAnnotation(ProduceMime.class));
-    }
-    
-    private boolean processSubResourceLocators(MethodList methods) {
+    private boolean processSubResourceLocators() {
         boolean hasSubResources = false;
-        for (final Method m : methods.hasNotAnnotation(HttpMethod.class).hasAnnotation(UriTemplate.class)) {
+        for (final AbstractSubResourceLocator subResourceLocator : this.resource.getSubResourceLocators()) {
             hasSubResources = true;
             
             UriTemplateType t = new UriPathTemplate(
-                    m.getAnnotation(UriTemplate.class));
+                    subResourceLocator.getUriTemplate().getRawTemplate(), 
+                    subResourceLocator.getUriTemplate().isLimited(), 
+                    subResourceLocator.getUriTemplate().isEncode());
                         
-            final UriTemplateDispatcher d = NodeDispatcherFactory.create(t, m);            
+            final UriTemplateDispatcher d = NodeDispatcherFactory.create(t, subResourceLocator.getMethod());            
             uriResolver.add(d.getTemplate(), d);
         }
         
         return hasSubResources;
     }
     
-    private Map<UriTemplateType, ResourceMethodMap> processSubResourceMethods(MethodList methods) {
+    private Map<UriTemplateType, ResourceMethodMap> processSubResourceMethods() {
         final Map<UriTemplateType, ResourceMethodMap> templatedMethodMap = 
                 new HashMap<UriTemplateType, ResourceMethodMap>();
-        for (Method m : methods.hasAnnotation(HttpMethod.class).hasAnnotation(UriTemplate.class)) {
+        for (final AbstractSubResourceMethod subResourceMethod : this.resource.getSubResourceMethods()) {
             
             // TODO what does it mean to support limited=false
             UriTemplateType t = new UriPathTemplate(
-                    m.getAnnotation(UriTemplate.class), false);
+                    subResourceMethod.getUriTemplate().getRawTemplate(), 
+                    false,
+                    subResourceMethod.getUriTemplate().isEncode());
                         
-            ResourceMethod rm = new ResourceHttpMethod(this, m);
+            ResourceMethod rm = new ResourceHttpMethod(this, subResourceMethod);
             addToTemplatedMethodMap(templatedMethodMap, t, rm);
         }
         
@@ -183,10 +166,10 @@ public final class ResourceClass extends BaseResourceClass {
         return templatedMethodMap;
     }
 
-    private ResourceMethodMap processMethods(MethodList methods) {
+    private ResourceMethodMap processMethods() {
         final ResourceMethodMap methodMap = new ResourceMethodMap();
-        for (Method m : methods.hasAnnotation(HttpMethod.class).hasNotAnnotation(UriTemplate.class)) {
-            ResourceMethod rm = new ResourceHttpMethod(this, m);
+        for (final com.sun.ws.rest.api.model.AbstractResourceMethod resourceMethod : this.resource.getResourceMethods()) {
+            ResourceMethod rm = new ResourceHttpMethod(this, resourceMethod);
             methodMap.put(rm);
         }
         
@@ -252,7 +235,7 @@ public final class ResourceClass extends BaseResourceClass {
     
     private Map<String, Class<?>> getViews() {
         // Find all the view names
-        Class<?> resourceClass = c;
+        Class<?> resourceClass = this.resource.getResourceClass();
         Map<String, Class<?>> viewMap = new HashMap<String, Class<?>>();
         Set<String> views = new HashSet<String>();
         for (;resourceClass != null; resourceClass = resourceClass.getSuperclass()) {

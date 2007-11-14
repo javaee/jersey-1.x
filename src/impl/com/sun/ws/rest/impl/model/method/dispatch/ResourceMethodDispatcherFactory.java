@@ -22,9 +22,9 @@
 
 package com.sun.ws.rest.impl.model.method.dispatch;
 
+import com.sun.ws.rest.api.model.AbstractResourceMethod;
 import com.sun.ws.rest.impl.ImplMessages;
 import com.sun.ws.rest.spi.dispatch.RequestDispatcher;
-import com.sun.ws.rest.impl.model.method.ResourceMethodData;
 import com.sun.ws.rest.spi.service.ServiceFinder;
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -37,16 +37,16 @@ import java.util.logging.Logger;
 public final class ResourceMethodDispatcherFactory {
     private static final Logger LOGGER = Logger.getLogger(ResourceMethodDispatcherFactory.class.getName());
     
-    public static RequestDispatcher create(ResourceMethodData method) {
+    public static RequestDispatcher create(AbstractResourceMethod abstractResourceMethod) {
         for (ResourceMethodDispatchProvider ip : ServiceFinder.find(ResourceMethodDispatchProvider.class)) {
             try {
-                RequestDispatcher d = ip.create(method);
+                RequestDispatcher d = ip.create(abstractResourceMethod);
                 if (d != null)
                     return d;
             } catch (Exception e) {
                 StringWriter sw = new StringWriter();
                 
-                sw.write(ImplMessages.ERROR_PROCESSING_METHOD(method.method, ip.getClass().getName()));
+                sw.write(ImplMessages.ERROR_PROCESSING_METHOD(abstractResourceMethod.getMethod(), ip.getClass().getName()));
                 PrintWriter pw = new PrintWriter(sw);
                 e.printStackTrace(pw);
                 pw.flush();
