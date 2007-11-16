@@ -1,4 +1,9 @@
 release 0.5 (2008-01-18)
+- Fixed issue 1: Matching errors for sub-resource methods with equivalent URI 
+  templatesregexs but different template variables
+  https://jersey.dev.java.net/issues/show_bug.cgi?id=1
+  Different sub-resource locator and HTTP methods may have different
+  URI templates that differ only by template variable name.
 - Removed the com.sun.ws.rest.api.core.WebResource interface and resource class
   support for this interface.
 - Root resource classes, by default, are now found at runtime (rather than
