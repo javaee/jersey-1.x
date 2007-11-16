@@ -33,22 +33,25 @@ import com.sun.ws.rest.api.core.ResourceConfig;
 import com.sun.ws.rest.impl.ResponseBuilderImpl;
 import com.sun.ws.rest.impl.ThreadLocalHttpContext;
 import com.sun.ws.rest.impl.model.ResourceClass;
-import com.sun.ws.rest.impl.model.RootResourceClass;
 import com.sun.ws.rest.impl.response.Responses;
+import com.sun.ws.rest.impl.uri.rules.RootResourceClassesRule;
 import com.sun.ws.rest.impl.util.UriHelper;
 import com.sun.ws.rest.spi.container.ContainerRequest;
 import com.sun.ws.rest.spi.container.ContainerResponse;
 import com.sun.ws.rest.spi.container.WebApplication;
+import com.sun.ws.rest.spi.resource.ResourceProviderFactory;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.lang.reflect.Field;
 import java.lang.reflect.Proxy;
 import java.net.URI;
-import java.util.Arrays;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
+import java.util.logging.Logger;
+import javax.ws.rs.UriTemplate;
 import javax.ws.rs.core.HttpContext;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.PreconditionEvaluator;
@@ -62,13 +65,12 @@ import javax.ws.rs.core.UriInfo;
  * @author Paul.Sandoz@Sun.Com
  */
 public final class WebApplicationImpl implements WebApplication {
-    private boolean initiated;
-    
-    private ResourceConfig resourceConfig;
-    
-    private RootResourceClass rootResourceClass;
+    private static final Logger LOGGER = Logger.getLogger(WebApplicationImpl.class.getName());
 
-    /* package */ Object containerMomento;
+    private final ConcurrentMap<Class, ResourceClass> metaClassMap = 
+            new ConcurrentHashMap<Class, ResourceClass>();
+
+    private final ResourceProviderFactory resolverFactory;
 
     private final ThreadLocalHttpContext context;
     
@@ -80,7 +82,17 @@ public final class WebApplicationImpl implements WebApplication {
     
     private final Map<Class<?>, Injectable> injectables;
             
+    private boolean initiated;
+    
+    private ResourceConfig resourceConfig;
+    
+    private RootResourceClassesRule rootsRule;
+            
+    /* package */ Object containerMomento;
+    
     public WebApplicationImpl() {
+        this.resolverFactory = ResourceProviderFactory.getInstance();
+
         this.context = new ThreadLocalHttpContext();
         
         InvocationHandler i = new InvocationHandler() {
@@ -95,22 +107,43 @@ public final class WebApplicationImpl implements WebApplication {
         this.injectables = createInjectables();
     }
     
-    public void addInjectable(Class fieldType, Injectable injectable) {
-        injectables.put(fieldType, injectable);
-    }
-    
-    @SuppressWarnings("unchecked")
-    private <T> T createProxy(Class<T> c, InvocationHandler i) {
-        return (T)Proxy.newProxyInstance(
-            this.getClass().getClassLoader(),
-            new Class[] { c },
-            i);
-    }
-    
     public ResourceClass getResourceClass(Class c) {
-        return rootResourceClass.getResourceClass(c);
+        assert c != null;
+        
+        // Try the non-blocking read, the most common opertaion
+        ResourceClass rmc = metaClassMap.get(c);
+        if (rmc != null) return rmc;
+                
+        // ResourceClass is not present use a synchronized block
+        // to ensure that only one ResourceClass instance is created
+        // and put to the map
+        synchronized(metaClassMap) {
+            // One or more threads may have been blocking on the synchronized
+            // block, re-check the map
+            rmc = metaClassMap.get(c);
+            if (rmc != null) return rmc;
+            
+            rmc = new ResourceClass(containerMomento, c, resourceConfig, resolverFactory);
+            metaClassMap.put(c, rmc);
+            return rmc;
+        }
     }
 
+    /**
+     * Inject resources on a Web resource.
+     * @param resourceClass the class of the resource
+     * @param resource the resource instance
+     */
+    public void injectResources(Object resource) {
+        Class resourceClass = resource.getClass();
+        for (Field f : resourceClass.getDeclaredFields()) {
+            
+            Injectable i = injectables.get(f.getType());
+            if (i != null)
+                i.inject(resource, f);
+        }
+    }
+    
     // WebApplication
             
     public void initiate(Object containerMomento, ResourceConfig resourceConfig) {
@@ -122,21 +155,12 @@ public final class WebApplicationImpl implements WebApplication {
         
         this.initiated = true;
         this.resourceConfig = resourceConfig;
-        this.rootResourceClass = new RootResourceClass(containerMomento, resourceConfig);
         this.containerMomento = containerMomento;
+        this.rootsRule = new RootResourceClassesRule();
+        
+        addRootResources(resourceConfig.getResourceClasses());
     }
 
-    public void register(Class... resourceClasses) {
-        Set<Class> resourceClassesSet = new HashSet<Class>(
-                Arrays.asList(resourceClasses));
-        register(resourceClassesSet);
-    }
-  
-    public void register(Set<Class> resourceClasses) {
-        // TODO, dynamically add resource classes to initiated web application
-        throw new UnsupportedOperationException();
-    }
-    
     public void handleRequest(ContainerRequest request, ContainerResponse response) {
         final WebApplicationContext localContext = new WebApplicationContext(this, request, response);        
         context.set(localContext);
@@ -164,7 +188,7 @@ public final class WebApplicationImpl implements WebApplication {
             path = stripMatrixParams(path);
 
         try {
-            if (!rootResourceClass.accept(path, localContext)) {
+            if (!rootsRule.accept(path, null, localContext)) {
                 // Resource was not found
                 response.setResponse(Responses.NOT_FOUND);                
             }
@@ -173,6 +197,36 @@ public final class WebApplicationImpl implements WebApplication {
         }
     }
     
+    public void addInjectable(Class fieldType, Injectable injectable) {
+        injectables.put(fieldType, injectable);
+    }
+    
+
+    // 
+
+    private void addRootResources(Set<Class> resourceClasses) {
+        if (resourceClasses.isEmpty()) {
+            String message = "The ResourceConfig instance does not contain any root resource classes";
+            LOGGER.severe(message);
+            throw new ContainerException(message);            
+        }
+        
+        for (Class resourceClass : resourceClasses)
+            addRootResource(resourceClass);
+    }
+
+    private void addRootResource(Class<?> c) {
+        // Ignore if not a root resource
+        // TODO defer to the abstract model
+        // Note that a non root resource should not be added to the cache
+        if (c.getAnnotation(UriTemplate.class) == null) {
+            // TODO log warning
+            return;   
+        }
+
+        rootsRule.addRootResource(getResourceClass(c));
+    }
+
     /**
      * Strip the matrix parameters from a path
      */
@@ -203,6 +257,14 @@ public final class WebApplicationImpl implements WebApplication {
         return sb;
     }  
         
+    @SuppressWarnings("unchecked")
+    private <T> T createProxy(Class<T> c, InvocationHandler i) {
+        return (T)Proxy.newProxyInstance(
+            this.getClass().getClassLoader(),
+            new Class[] { c },
+            i);
+    }
+    
     private abstract class HttpContextInjectable<V> extends Injectable<HttpContext, V> {
         public Class<HttpContext> getAnnotationClass() {
             return HttpContext.class;
@@ -248,22 +310,8 @@ public final class WebApplicationImpl implements WebApplication {
     }
 
 
-    /**
-     * Inject resources on a Web resource.
-     * @param resourceClass the class of the resource
-     * @param resource the resource instance
-     */
-    void injectResources(Object resource) {
-        Class resourceClass = resource.getClass();
-        for (Field f : resourceClass.getDeclaredFields()) {
-            
-            Injectable i = injectables.get(f.getType());
-            if (i != null)
-                i.inject(resource, f);
-        }
-    }
-    
-    public static void onExceptionWithWebApplication(WebApplicationException e, HttpResponseContext response) {
+    private static void onExceptionWithWebApplication(WebApplicationException e, 
+        HttpResponseContext response) {
         Response r = e.getResponse();
         
         // Log the stack trace

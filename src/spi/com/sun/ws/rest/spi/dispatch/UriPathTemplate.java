@@ -23,7 +23,6 @@
 package com.sun.ws.rest.spi.dispatch;
 
 import com.sun.ws.rest.api.core.UriComponent;
-import javax.ws.rs.UriTemplate;
 
 /**
  * A URI template for a URI path.
@@ -31,59 +30,6 @@ import javax.ws.rs.UriTemplate;
  * @author Paul.Sandoz@Sun.Com
  */
 public final class UriPathTemplate extends UriTemplateType {
-    
-    /**
-     * Create a URI template from the UriTemplate annotation.
-     *
-     * @param template the URI template annotation. If template.value() does
-     *        does not start with a '/' then the path is modified to start with
-     *        a '/'
-     */
-    public UriPathTemplate(UriTemplate template) {
-        this(prefixWithSlash(template.value()), 
-                template.limited(), template.encode());
-    }
-    
-    /**
-     * Create a URI template from the UriTemplate annotation.
-     *
-     * @param template the URI template annotation. If template.value() does
-     *        does not start with a '/' then the path is modified to start with
-     *        a '/'
-     * @param limited overrides the value declared in template.      
-     */
-    public UriPathTemplate(UriTemplate template, boolean limited) {
-        this(prefixWithSlash(template.value()), 
-                limited, template.encode());
-    }
-    
-    /**
-     * Create a URI template from a URI path containing template variables.
-     * <p>
-     * This is equivalent to calling the constructor 
-     * UriPathTemplate(path, true, true).
-     *
-     * @param path the URI path.
-     */
-    public UriPathTemplate(String path) {
-        this(path, true, true);
-    }
-    
-    /**
-     * Create a URI template from a URI path containing template variables.
-     * <p>
-     * This is equivalent to calling the constructor 
-     * UriPathTemplate(path, limited, true).
-     *
-     * @param path the URI path.
-     * @param limited if true the right hand expression "(/)?" is appended 
-     *        to the regular expression generated from the URI path,
-     *        otherwise the expression "(/.*)?" is appended.
-     */
-    public UriPathTemplate(String path, boolean limited) {
-        this(path, limited, true);
-    }
-    
     /**
      * Create a URI template from a URI path containing template variables.
      * <p>

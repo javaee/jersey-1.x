@@ -41,6 +41,7 @@ import com.sun.ws.rest.impl.uri.rules.SubLocatorRule;
 import com.sun.ws.rest.impl.modelapi.annotation.IntrospectionModeller;
 import com.sun.ws.rest.impl.view.ViewFactory;
 import com.sun.ws.rest.impl.modelapi.annotation.IntrospectionModeller;
+import com.sun.ws.rest.impl.uri.rules.LinearMatchingUriTemplateRules;
 import com.sun.ws.rest.impl.view.ViewFactory;
 import com.sun.ws.rest.spi.dispatch.UriPathTemplate;
 import com.sun.ws.rest.spi.dispatch.UriTemplateType;
@@ -61,10 +62,12 @@ import javax.ws.rs.HttpMethod;
  *
  * @author Paul.Sandoz@Sun.Com
  */
-public final class ResourceClass extends BaseResourceClass {
+public final class ResourceClass {
     private static final Logger LOGGER = Logger.getLogger(ResourceClass.class.getName());
 
-    public final ResourceConfig config;
+    private final UriRules<UriTemplateType, UriRule> rules;
+
+    private final ResourceConfig config;
     
     public final AbstractResource resource;
     
@@ -74,16 +77,21 @@ public final class ResourceClass extends BaseResourceClass {
     
     public ResourceClass(Object containerMemento, Class<?> c, ResourceConfig config, 
             ResourceProviderFactory resolverFactory) {
+        this.rules = new LinearMatchingUriTemplateRules<UriRule>();
+        
         this.resource = IntrospectionModeller.createResource(c);
+        
         this.config = config;
-        this.resolver = resolverFactory.createProvider(c, 
+        
+        this.resolver = resolverFactory.createProvider(c,
                 config.getFeatures(), config.getProperties());
 
         boolean hasSubResources = false;
                 
         hasSubResources = processSubResourceLocators();
                 
-        final Map<UriTemplateType, ResourceMethodMap> templatedMethodMap = processSubResourceMethods();
+        final Map<UriTemplateType, ResourceMethodMap> templatedMethodMap = 
+                processSubResourceMethods();
 
         final ResourceMethodMap methodMap = processMethods();
 
@@ -91,7 +99,8 @@ public final class ResourceClass extends BaseResourceClass {
 
         
         // Create the dispatchers for the sub-resource HTTP methods
-        for (Map.Entry<UriTemplateType, ResourceMethodMap> e : templatedMethodMap.entrySet()) {
+        for (Map.Entry<UriTemplateType, ResourceMethodMap> e : 
+            templatedMethodMap.entrySet()) {
             hasSubResources = true;
             
             e.getValue().sort();
@@ -135,7 +144,8 @@ public final class ResourceClass extends BaseResourceClass {
     
     private boolean processSubResourceLocators() {
         boolean hasSubResources = false;
-        for (final AbstractSubResourceLocator subResourceLocator : this.resource.getSubResourceLocators()) {
+        for (final AbstractSubResourceLocator subResourceLocator : 
+            this.resource.getSubResourceLocators()) {
             hasSubResources = true;
             
             UriTemplateType t = new UriPathTemplate(
@@ -154,7 +164,8 @@ public final class ResourceClass extends BaseResourceClass {
     private Map<UriTemplateType, ResourceMethodMap> processSubResourceMethods() {
         final Map<UriTemplateType, ResourceMethodMap> templatedMethodMap = 
                 new HashMap<UriTemplateType, ResourceMethodMap>();
-        for (final AbstractSubResourceMethod subResourceMethod : this.resource.getSubResourceMethods()) {
+        for (final AbstractSubResourceMethod subResourceMethod : 
+            this.resource.getSubResourceMethods()) {
             
             // TODO what does it mean to support limited=false
             UriTemplateType t = new UriPathTemplate(
@@ -176,7 +187,8 @@ public final class ResourceClass extends BaseResourceClass {
 
     private ResourceMethodMap processMethods() {
         final ResourceMethodMap methodMap = new ResourceMethodMap();
-        for (final com.sun.ws.rest.api.model.AbstractResourceMethod resourceMethod : this.resource.getResourceMethods()) {
+        for (final com.sun.ws.rest.api.model.AbstractResourceMethod resourceMethod : 
+            this.resource.getResourceMethods()) {
             ResourceMethod rm = new ResourceHttpMethod(this, resourceMethod);
             methodMap.put(rm);
         }

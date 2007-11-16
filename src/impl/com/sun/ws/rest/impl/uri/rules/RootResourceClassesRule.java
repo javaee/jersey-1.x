@@ -22,6 +22,9 @@
 
 package com.sun.ws.rest.impl.uri.rules;
 
+import com.sun.ws.rest.impl.model.ResourceClass;
+import com.sun.ws.rest.spi.dispatch.UriPathTemplate;
+import com.sun.ws.rest.spi.dispatch.UriTemplateType;
 import com.sun.ws.rest.spi.uri.rules.UriRule;
 import com.sun.ws.rest.spi.uri.rules.UriRuleContext;
 import com.sun.ws.rest.spi.uri.rules.UriRules;
@@ -34,13 +37,23 @@ import java.util.Iterator;
  */
 public final class RootResourceClassesRule implements UriRule {
 
-    private final UriRules<?, UriRule> rules;
+    private final UriRules<UriTemplateType, UriRule> rules;
     
-    public RootResourceClassesRule(UriRules<?, UriRule> rules) {
-        this.rules = rules;
+    public RootResourceClassesRule() {
+        this.rules = new LinearMatchingUriTemplateRules<UriRule>();
     }
     
-    public boolean accept(CharSequence path, Object resource, UriRuleContext context) {
+    public void addRootResource(ResourceClass r) {
+        // TODO check if a root resource
+        // TODO use the limited flag
+        UriTemplateType t = new UriPathTemplate(
+                r.resource.getUriTemplate().getRawTemplate(), 
+                r.hasSubResources, 
+                r.resource.getUriTemplate().isEncode());        
+        rules.add(t, new ResourceClassRule(t, r.resource.getResourceClass()));                
+    }
+    
+    public boolean accept(CharSequence path, Object resource, UriRuleContext context) {        
         final Iterator<UriRule> matches = rules.
                 match(path, context.capturingGroupValues());
         while(matches.hasNext())
