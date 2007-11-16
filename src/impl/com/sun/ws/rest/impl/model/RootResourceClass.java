@@ -24,11 +24,13 @@ package com.sun.ws.rest.impl.model;
 
 import com.sun.ws.rest.api.container.ContainerException;
 import com.sun.ws.rest.api.core.ResourceConfig;
-import com.sun.ws.rest.impl.dispatch.UriTemplateDispatcher;
-import com.sun.ws.rest.spi.dispatch.ResourceDispatchContext;
+import com.sun.ws.rest.impl.uri.rules.ResourceClassRule;
+import com.sun.ws.rest.impl.uri.rules.RootResourceClassesRule;
 import com.sun.ws.rest.spi.dispatch.UriPathTemplate;
 import com.sun.ws.rest.spi.dispatch.UriTemplateType;
 import com.sun.ws.rest.spi.resource.ResourceProviderFactory;
+import com.sun.ws.rest.spi.uri.rules.UriRule;
+import com.sun.ws.rest.spi.uri.rules.UriRuleContext;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -46,22 +48,26 @@ public final class RootResourceClass extends BaseResourceClass {
             
     private final ResourceProviderFactory resolverFactory;
     
-    private final ConcurrentMap<Class, ResourceClass> metaClassMap = new ConcurrentHashMap<Class, ResourceClass>();
+    private final ConcurrentMap<Class, ResourceClass> metaClassMap = 
+            new ConcurrentHashMap<Class, ResourceClass>();
         
     private final Object containerMemento;
-    
+
+    private final UriRule rootsRule;
+            
     public RootResourceClass(Object containerMemento, ResourceConfig resourceConfig) {
         this.containerMemento = containerMemento;
         this.resourceConfig = resourceConfig;
         this.resolverFactory = ResourceProviderFactory.getInstance();
         
         add(resourceConfig.getResourceClasses());
-
-        if (uriResolver.getUriTemplates().isEmpty()) {
+        if (rules.getRules().isEmpty()) {
             String message = "The ResourceConfig instance does not contain any root resource classes";
             LOGGER.severe(message);
-            throw new ContainerException(message);
+            throw new ContainerException(message);            
         }
+        
+        this.rootsRule = new RootResourceClassesRule(rules);
     }
     
     public ResourceClass getResourceClass(Class c) {
@@ -109,12 +115,10 @@ public final class RootResourceClass extends BaseResourceClass {
         // when there are sub-resources present?
         UriTemplateType t = new UriPathTemplate(
                 tAnnotation, resourceClass.hasSubResources);
-                
-        UriTemplateDispatcher d = ClassDispatcherFactory.create(t, c);
-        uriResolver.add(d.getTemplate(), d);
+        rules.add(t, new ResourceClassRule(t, c));
     }
     
-    public boolean dispatch(ResourceDispatchContext context, StringBuilder path) {
-        return dispatch(context, null, path);
+    public boolean accept(CharSequence path, UriRuleContext c) {
+        return rootsRule.accept(path, null, c);
     }
 }

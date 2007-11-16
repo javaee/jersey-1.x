@@ -28,19 +28,21 @@ import com.sun.ws.rest.api.core.HttpRequestContext;
 import com.sun.ws.rest.api.core.HttpResponseContext;
 import com.sun.ws.rest.impl.ResponseBuilderImpl;
 import com.sun.ws.rest.impl.model.ResourceClass;
-import com.sun.ws.rest.impl.model.node.NodeDispatcherFactory;
 import com.sun.ws.rest.impl.model.parameter.ParameterExtractor;
-import com.sun.ws.rest.spi.dispatch.ResourceDispatchContext;
+import com.sun.ws.rest.impl.model.parameter.ParameterExtractorFactory;
 import com.sun.ws.rest.impl.view.ViewFactory;
 import com.sun.ws.rest.impl.view.ViewType;
 import com.sun.ws.rest.spi.container.ContainerRequest;
 import com.sun.ws.rest.spi.container.ContainerResponse;
 import com.sun.ws.rest.spi.resource.ResourceProviderContext;
+import com.sun.ws.rest.spi.uri.rules.UriRule;
+import com.sun.ws.rest.spi.uri.rules.UriRuleContext;
+import com.sun.ws.rest.spi.uri.rules.UriRules;
 import com.sun.ws.rest.spi.view.View;
 import java.io.IOException;
 import java.lang.reflect.Constructor;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.ArrayList;
+import java.util.List;
 import javax.ws.rs.core.Response;
 
 /**
@@ -48,7 +50,8 @@ import javax.ws.rs.core.Response;
  * @author Paul.Sandoz@Sun.Com
  */
 final class WebApplicationContext implements 
-        HttpContextAccess, ResourceDispatchContext, ResourceProviderContext {
+        HttpContextAccess, ResourceProviderContext, 
+        UriRuleContext {
     private final ContainerRequest request;
     
     private final ContainerResponse response;
@@ -87,38 +90,6 @@ final class WebApplicationContext implements
     }
 
     
-    // Dispatching fields
-    
-    private Object it;
-    
-    private Map<String, String> templateValues = new HashMap<String, String>();
-    
-    // ResourceDispatchContext
-    
-    public HttpContextAccess getHttpContext() {
-        return this;
-    }
-    
-    public boolean dispatchTo(final Class nodeClass, final StringBuilder path) {
-        final ResourceClass resourceClass = app.getResourceClass(nodeClass);
-        final Object node = it = resourceClass.resolver.getInstance(this);
-        return resourceClass.dispatch(this, node, path);
-    }
-
-    public boolean dispatchTo(final Object node, final StringBuilder path) {
-        it = node;
-        return app.getResourceClass(node.getClass()).dispatch(this, node, path);
-    }
-        
-    public Map<String, String> getTemplateParameters() {
-        return templateValues;
-    }
-    
-    public void commitTemplateParameters(Map<String, String> templateParameters) {
-        request.addTemplateValues(templateParameters);
-    }
-    
-    
     // ResourceProviderContext
             
     public void injectDependencies(Object resource) {
@@ -128,7 +99,10 @@ final class WebApplicationContext implements
     }    
 
     public Object[] getParameterValues(Constructor ctor) {
-        ParameterExtractor[] extractors = NodeDispatcherFactory.processParameters(ctor);
+        // TODO the extractors can be pre-calculated and associated with
+        // the the resource class
+        ParameterExtractor[] extractors = ParameterExtractorFactory.
+                createExtractorsForConstructor(ctor);
         Object[] values = new Object[extractors.length];
         for (int i = 0; i < extractors.length; i++) {
             if (extractors[i] == null)
@@ -137,5 +111,33 @@ final class WebApplicationContext implements
                 values[i] = extractors[i].extract(getHttpRequestContext());
         }
         return values;
+    }
+
+    // UriRuleContext
+
+    private Object it;
+    
+    private final List<String> capturingGroupValues = new ArrayList<String>();
+        
+    public HttpContextAccess getHttpContext() {
+        return this;
+    }
+
+    public Object getResource(Class resourceClass) {
+        final ResourceClass rc = app.getResourceClass(resourceClass);
+        return it = rc.resolver.getInstance(this);
+    }
+
+    public UriRules<?, UriRule> getRules(Class resourceClass) {
+        final ResourceClass rc = app.getResourceClass(resourceClass);
+        return rc.getRules();
+    }
+
+    public List<String> capturingGroupValues() {
+        return capturingGroupValues;
+    }
+    
+    public void commitTemplateValues(List<String> names) {
+        request.addTemplateValues(names, capturingGroupValues);
     }
 }

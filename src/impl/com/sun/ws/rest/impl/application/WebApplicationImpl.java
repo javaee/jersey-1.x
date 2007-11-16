@@ -164,9 +164,9 @@ public final class WebApplicationImpl implements WebApplication {
             path = stripMatrixParams(path);
 
         try {
-            if (!rootResourceClass.dispatch(localContext, path)) {
+            if (!rootResourceClass.accept(path, localContext)) {
                 // Resource was not found
-                response.setResponse(Responses.NOT_FOUND);
+                response.setResponse(Responses.NOT_FOUND);                
             }
         } catch (WebApplicationException e) {
             onExceptionWithWebApplication(e, response);

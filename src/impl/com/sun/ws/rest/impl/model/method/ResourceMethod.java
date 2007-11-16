@@ -79,6 +79,14 @@ public abstract class ResourceMethod {
         return resourceClass.resource.getResourceClass();
     }
     
+    public MediaTypeList getConsumeMime() {
+        return produceMime;
+    }
+    
+    public MediaTypeList getProduceMime() {
+        return produceMime;
+    }
+    
     public abstract Method getMethod();
     
     public abstract RequestDispatcher getDispatcher();

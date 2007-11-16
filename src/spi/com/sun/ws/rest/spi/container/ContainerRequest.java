@@ -24,6 +24,7 @@ package com.sun.ws.rest.spi.container;
 
 import com.sun.ws.rest.api.core.HttpRequestContext;
 import java.net.URI;
+import java.util.List;
 import java.util.Map;
 import javax.ws.rs.core.UriBuilder;
 
@@ -42,9 +43,10 @@ public interface ContainerRequest extends HttpRequestContext {
      * <p>
      * The template names and values must be in encoded form.
      *
-     * @param values the map of template values.
+     * @param names the list of template names.
+     * @param values the list of template values.
      */
-    public void addTemplateValues(Map<String, String> values);
+    public void addTemplateValues(List<String> names, List<String> values);
     
     /**
      * TODO

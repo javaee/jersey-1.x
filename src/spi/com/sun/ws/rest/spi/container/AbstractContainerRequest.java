@@ -29,6 +29,7 @@ import com.sun.ws.rest.impl.ResponseBuilderImpl;
 import com.sun.ws.rest.impl.http.header.reader.HttpHeaderReader;
 import com.sun.ws.rest.impl.model.HttpHelper;
 import com.sun.ws.rest.impl.response.Responses;
+import com.sun.ws.rest.spi.dispatch.UriTemplateType;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
@@ -148,20 +149,19 @@ public abstract class AbstractContainerRequest implements ContainerRequest {
     
     // ContainerRequest
     
-    public void addTemplateValues(Map<String, String> values) {
-        for (Map.Entry<String, String> e : values.entrySet()) {
-            encodedTemplateValues.putSingle(e.getKey(), e.getValue());
-        }
-        
-        if (decodedTemplateValues != null) {
-            for (Map.Entry<String, String> e : values.entrySet()) {
+    public void addTemplateValues(List<String> names, List<String> values) {
+        int i = 0;
+        for (String name : names) {
+            final String value = values.get(i++);
+            encodedTemplateValues.putSingle(name, value);
+            
+            if (decodedTemplateValues != null) {
                 decodedTemplateValues.putSingle(
-                        UriComponent.decode(e.getKey(), UriComponent.Type.PATH_SEGMENT),
-                        UriComponent.decode(e.getValue(), UriComponent.Type.PATH));
+                        UriComponent.decode(name, UriComponent.Type.PATH_SEGMENT),
+                        UriComponent.decode(value, UriComponent.Type.PATH));                
             }
         }
     }
-    
     
     // HttpRequestContext
     

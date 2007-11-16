@@ -360,6 +360,30 @@ public class UriTemplateType {
     }
 
     /**
+     * Extract the right hand path (the last captured group value) from a
+     * list of captured groups.
+     * <p>
+     * It is assumed the list of captured groups values have been obtained from
+     * from a succesful match on the same or an equivalent template instance.
+     * 
+     * @param capturedGroupValues the list of captured groups obtained from
+     *        a successful match
+     * @return the right hand path, if the last captured group value is null or 
+     *         there is no associated capturing group for matching the right 
+     *         hand path then an empty String is returned.
+     */
+    public final String extractRightHandPath(List<String> capturedGroupValues) {
+        if (rightHandPattern != null) {
+            final String rightHandGroupValue = capturedGroupValues.get(
+                    capturedGroupValues.size() - 1);
+            if (rightHandGroupValue != null)
+                return rightHandGroupValue;
+        }
+        
+        return "";
+    }
+    
+    /**
      * Match a URI against the template.
      * <p>
      * If the URI matches against the pattern then the template variable to value 
@@ -411,6 +435,46 @@ public class UriTemplateType {
         // Assign the right hand side value to the null key
         if (rightHandPattern != null) {
             templateVariableToValue.put(null, m.group(i));
+        }
+        
+        return true;
+    }
+    
+    /**
+     * Match a URI against the template.
+     * <p>
+     * If the URI matches against the pattern then the template variable to value 
+     * map will be filled with template variables as keys and template values as 
+     * values.
+     * <p>
+     * 
+     * @param uri the uri to match against the template.
+     * @param capturingGroupValues the list to store the values of a pattern's 
+     *        capturing groups is matching is successful. The values are stored 
+     *        in the same order as the pattern's capturing groups.
+     * @return true if the URI matches the template, otherwise false.
+     * @throws {@link IllegalArgumentException} if the uri or 
+     *         templateVariableToValue is null.
+     */
+    public final boolean match(CharSequence uri, List<String> capturingGroupValues) {
+        if (capturingGroupValues == null) 
+            throw new IllegalArgumentException(SpiMessages.TEMPLATE_NAME_TO_VALUE_NOT_NULL());
+
+        capturingGroupValues.clear();
+                
+        if (uri == null || uri.length() == 0)
+            return (templateRegexPattern == null) ? true : false;
+        
+        if (templateRegexPattern == null)
+            return false;
+                
+        // Match the URI to the URI template regular expression
+        Matcher m = templateRegexPattern.matcher(uri);
+        if (!m.matches())
+            return false;
+
+        for (int i = 1; i <= m.groupCount(); i++) {
+            capturingGroupValues.add(m.group(i));
         }
         
         return true;
@@ -495,7 +559,7 @@ public class UriTemplateType {
      * Create a URI by substituting any template variables
      * for corresponding template values.
      * <p>
-     * A URI template varibale without a value will be substituted by the 
+     * A URI template variable without a value will be substituted by the 
      * empty string.
      *
      * @param values the map of template variables to template values.
@@ -576,20 +640,31 @@ public class UriTemplateType {
         return b.toString();
     }
     
+    @Override
     public final String toString() {
         return templateRegex;
     }
     
+    /**
+     * Hashcode is calculated from String of the regular expression 
+     * generated from the template.
+     */
+    @Override
     public final int hashCode() {
-        return template.hashCode();
+        return templateRegex.hashCode();
     }
 
+    /**
+     * Equality is calculated from the String of the regular expression 
+     * generated from the templates.
+     */
+    @Override
     public final boolean equals(Object o) {
         if (o instanceof UriTemplateType) {
             UriTemplateType that = (UriTemplateType)o;
-            if (template == that.template)
+            if (templateRegex == that.templateRegex)
                 return true;
-            return template.equals(that.template);
+            return templateRegex.equals(that.templateRegex);
         } else {
             return false;
         }

@@ -20,16 +20,11 @@
  *     "Portions Copyrighted [year] [name of copyright owner]"
  */
 
-package com.sun.ws.rest.impl.model.node;
+package com.sun.ws.rest.impl.model.parameter;
 
 import com.sun.ws.rest.api.container.ContainerException;
 import com.sun.ws.rest.impl.ImplMessages;
-import com.sun.ws.rest.impl.dispatch.UriTemplateDispatcher;
 import com.sun.ws.rest.impl.model.ReflectionHelper;
-import com.sun.ws.rest.impl.model.parameter.AbstractParameterProcessor;
-import com.sun.ws.rest.impl.model.parameter.ParameterExtractor;
-import com.sun.ws.rest.impl.model.parameter.ParameterProcessor;
-import com.sun.ws.rest.spi.dispatch.UriTemplateType;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Constructor;
@@ -42,26 +37,38 @@ import javax.ws.rs.Encoded;
  *
  * @author Paul.Sandoz@Sun.Com
  */
-public final class NodeDispatcherFactory {
+public final class ParameterExtractorFactory {
         
-    private NodeDispatcherFactory() {
+    private ParameterExtractorFactory() {
     }
 
-    public static UriTemplateDispatcher create(final UriTemplateType t, final Method m) {
+    /**
+     * Create parameter extractors for a Java method that is a sub-locator.
+     * 
+     * @param m the Java method
+     * @return the array of parameter extractors
+     */
+    public static ParameterExtractor[] createExtractorsForSublocator(Method m) {
         ParameterExtractor[] extractors = processParameters(m);
         for (ParameterExtractor extractor: extractors) {
             if (extractor == null) {
+                // This requires better message
                 String msg = ImplMessages.NOT_VALID_DYNAMICRESOLVINGMETHOD(m, 
-                                                                    t.toString(), 
+                                                                    "", 
                                                                     m.getDeclaringClass());
                 throw new ContainerException(msg);
             }
         }
-        
-        return new NodeDispatcher(t, m, extractors);
+        return extractors;
     }
     
-    public static ParameterExtractor[] processParameters(Constructor ctor) {
+    /**
+     * Create parameter extractors for the constructor of a resource class.
+     *
+     * @param ctor the constructor of a resource class
+     * @return the array of parameter extractors
+     */
+    public static ParameterExtractor[] createExtractorsForConstructor(Constructor ctor) {
         Class[] parameterTypes = ctor.getParameterTypes();
         Type[] genericParameterTypes = ctor.getGenericParameterTypes();
         Annotation[][] parameterAnnotations = ctor.getParameterAnnotations();

@@ -28,22 +28,26 @@ import com.sun.ws.rest.api.model.AbstractResource;
 import com.sun.ws.rest.api.model.AbstractSubResourceLocator;
 import com.sun.ws.rest.api.model.AbstractSubResourceMethod;
 import com.sun.ws.rest.api.view.Views;
-import com.sun.ws.rest.impl.dispatch.UriTemplateDispatcher;
 import com.sun.ws.rest.impl.model.method.ResourceHeadWrapperMethod;
 import com.sun.ws.rest.impl.model.method.ResourceHttpMethod;
 import com.sun.ws.rest.impl.model.method.ResourceHttpOptionsMethod;
 import com.sun.ws.rest.impl.model.method.ResourceMethod;
 import com.sun.ws.rest.impl.model.method.ResourceMethodList;
 import com.sun.ws.rest.impl.model.method.ResourceMethodMap;
-import com.sun.ws.rest.impl.model.method.ResourceMethodMapDispatcher;
 import com.sun.ws.rest.impl.model.method.ResourceViewMethod;
-import com.sun.ws.rest.impl.model.node.NodeDispatcherFactory;
+import com.sun.ws.rest.impl.model.parameter.ParameterExtractorFactory;
+import com.sun.ws.rest.impl.uri.rules.HttpMethodRule;
+import com.sun.ws.rest.impl.uri.rules.SubLocatorRule;
+import com.sun.ws.rest.impl.modelapi.annotation.IntrospectionModeller;
+import com.sun.ws.rest.impl.view.ViewFactory;
 import com.sun.ws.rest.impl.modelapi.annotation.IntrospectionModeller;
 import com.sun.ws.rest.impl.view.ViewFactory;
 import com.sun.ws.rest.spi.dispatch.UriPathTemplate;
 import com.sun.ws.rest.spi.dispatch.UriTemplateType;
 import com.sun.ws.rest.spi.resource.ResourceProvider;
 import com.sun.ws.rest.spi.resource.ResourceProviderFactory;
+import com.sun.ws.rest.spi.uri.rules.UriRule;
+import com.sun.ws.rest.spi.uri.rules.UriRules;
 import com.sun.ws.rest.spi.view.View;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -91,27 +95,30 @@ public final class ResourceClass extends BaseResourceClass {
             hasSubResources = true;
             
             e.getValue().sort();
-            uriResolver.add(e.getKey(), 
-                    new ResourceMethodMapDispatcher(e.getKey(), e.getValue()));
+            rules.add(e.getKey(),
+                    new HttpMethodRule(e.getKey(), e.getValue()));
         }
         
         // Create the dispatcher for the HTTP methods
         if (!methodMap.isEmpty()) {
             methodMap.sort();
-            uriResolver.add(UriTemplateType.NULL, 
-                    new ResourceMethodMapDispatcher(UriTemplateType.NULL, methodMap));
+            rules.add(UriTemplateType.NULL,
+                    new HttpMethodRule(UriTemplateType.NULL, methodMap));
         }
         
-        
-        if (uriResolver.getUriTemplates().isEmpty()) {
+        if (rules.getRules().isEmpty()) {
             String message = "The class " 
                     + c + 
                     " does not contain any sub-resource locators, sub-resource HTTP methods or HTTP methods";
             LOGGER.severe(message);
-            throw new ContainerException(message);
+            throw new ContainerException(message);            
         }
         
         this.hasSubResources = hasSubResources;
+    }
+    
+    public UriRules<?, UriRule> getRules() {
+        return rules;
     }
     
     private void addToTemplatedMethodMap(
@@ -135,9 +142,10 @@ public final class ResourceClass extends BaseResourceClass {
                     subResourceLocator.getUriTemplate().getRawTemplate(), 
                     subResourceLocator.getUriTemplate().isLimited(), 
                     subResourceLocator.getUriTemplate().isEncode());
-                        
-            final UriTemplateDispatcher d = NodeDispatcherFactory.create(t, subResourceLocator.getMethod());            
-            uriResolver.add(d.getTemplate(), d);
+            UriRule r = new SubLocatorRule(t,  subResourceLocator.getMethod(), 
+                    ParameterExtractorFactory.createExtractorsForSublocator(
+                    subResourceLocator.getMethod()));
+            rules.add(t, r);
         }
         
         return hasSubResources;

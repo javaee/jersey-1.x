@@ -22,65 +22,22 @@
 
 package com.sun.ws.rest.impl.model;
 
-import com.sun.ws.rest.spi.dispatch.ResourceDispatchContext;
-import com.sun.ws.rest.api.core.HttpRequestContext;
-import com.sun.ws.rest.api.core.HttpResponseContext;
-import com.sun.ws.rest.impl.ResponseBuilderImpl;
-import com.sun.ws.rest.impl.dispatch.LinearOrderedUriPathResolver;
-import com.sun.ws.rest.impl.dispatch.UriTemplateDispatcher;
-import com.sun.ws.rest.spi.dispatch.ResourceDispatcher;
-import com.sun.ws.rest.spi.dispatch.UriPathResolver;
-import java.util.ArrayList;
-import java.util.List;
-import javax.ws.rs.core.UriBuilder;
+import com.sun.ws.rest.impl.uri.rules.LinearMatchingUriTemplateRules;
+import com.sun.ws.rest.spi.dispatch.UriTemplateType;
+import com.sun.ws.rest.spi.uri.rules.UriRule;
+import com.sun.ws.rest.spi.uri.rules.UriRules;
 
 /**
  *
  * @author Paul.Sandoz@Sun.Com
  */
-public abstract class BaseResourceClass implements ResourceDispatcher {
-    
-    protected final UriPathResolver<UriTemplateDispatcher> uriResolver;
+public abstract class BaseResourceClass {
+
+    protected final UriRules<UriTemplateType, UriRule> rules;
     
     protected BaseResourceClass() {
-        this.uriResolver = new LinearOrderedUriPathResolver<UriTemplateDispatcher>();
-    }
-    
-    // ResourceDispatcher 
-    
-    public boolean dispatch(ResourceDispatchContext context, Object node, StringBuilder path) {
-        UriTemplateDispatcher d = uriResolver.resolve(path, path, context.getTemplateParameters());
-        if (d != null) {
-            context.commitTemplateParameters(context.getTemplateParameters());
-            if (path.length() == 0) {
-                // Redirect to path ending with a '/' if template
-                // ends in '/'
-                if (d.getTemplate().endsWithSlash())
-                    return redirect(context);
-            } else if (path.length() == 1) {
-                // No matchLeftHandPath if path ends in '/' but template does not
-                if (!d.getTemplate().endsWithSlash())
-                    return false;
-
-                // Consume the '/'
-                path.setLength(0);
-            }
-            
-            return d.dispatch(context, node, path);
-        }
-                
-        return false;
-    }
-    
-    private boolean redirect(ResourceDispatchContext context) {
-        HttpRequestContext request = context.getHttpRequestContext();
-        HttpResponseContext response = context.getHttpResponseContext();
-        
-        response.setResponse(
-                ResponseBuilderImpl.temporaryRedirect(
-                    UriBuilder.fromUri(request.getAbsolute()).path("/").build()
-                ).build()
-                );
-        return true;
+        //this.uriResolver = new LinearOrderedUriPathResolver<UriTemplateDispatcher>();
+        // this.uriResolver = new TrieUriPathResolver<UriTemplateDispatcher>();
+        this.rules = new LinearMatchingUriTemplateRules<UriRule>();
     }
 }
