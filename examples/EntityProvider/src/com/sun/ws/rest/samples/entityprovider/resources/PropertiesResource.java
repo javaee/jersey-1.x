@@ -37,11 +37,4 @@ public class PropertiesResource {
     public Properties getSystemProperties() {
         return System.getProperties();
     }
-
-    // Reflect POSTed properties
-    @HttpMethod("POST")
-    @ConsumeMime("text/plain")
-    public Properties reflectProperties(Properties p) {
-        return p;
-    }
 }

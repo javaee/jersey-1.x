@@ -26,29 +26,21 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Properties;
+import javax.ws.rs.ProduceMime;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.ext.MessageBodyReader;
 import javax.ws.rs.ext.MessageBodyWriter;
+import javax.ws.rs.ext.Provider;
 
 /**
- * Entity provider for encoding and decoding java.util.Properties.
- *
- * Exercise for the reader: modify this provider to support the additional
- * encoding/decoding of to/from XML if the MIME type is XML-based.
+ * Entity provider for encoding java.util.Properties.
  *
  * @author Paul.Sandoz@Sun.Com
  */
-public class PropertiesProvider implements MessageBodyReader<Properties>, MessageBodyWriter<Properties> {
-    
-    public Properties readFrom(Class<Properties> type, MediaType mediaType, 
-            MultivaluedMap<String, String> headers, InputStream in) throws IOException {
-        // Create a new Properties instance and load using the
-        // key/value pair format
-        Properties p = new Properties();
-        p.load(in);
-        return p;
-    }
+@ProduceMime("text/plain")
+@Provider
+public class PropertiesProvider implements MessageBodyWriter<Properties> {
     
     public void writeTo(Properties p, MediaType mediaType,
             MultivaluedMap<String, Object> headers, OutputStream out) throws IOException {
@@ -56,13 +48,8 @@ public class PropertiesProvider implements MessageBodyReader<Properties>, Messag
         p.store(out, null);
     }
 
-    public boolean isReadable(Class<?> type) {
-        // Only support the Properties class and inherited classes of
-        return Properties.class.isAssignableFrom(type);
-    }
-
     public boolean isWriteable(Class<?> type) {
-        // Only support the Properties classe and inherited classes of
+        // Only support the Properties class and inherited classes of
         return Properties.class.isAssignableFrom(type);
     }
 
