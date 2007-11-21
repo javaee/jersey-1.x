@@ -43,18 +43,18 @@ public final class FormURLEncodedProvider extends AbstractTypeEntityProvider<For
 
     public FormURLEncodedProperties readFrom(Class<FormURLEncodedProperties> type, MediaType mediaType,
             MultivaluedMap<String, String> headers, InputStream entityStream) throws IOException {
-        String decoded = URLDecoder.decode(readFromAsString(entityStream), "UTF-8");
+        String encoded = readFromAsString(entityStream);
     
         FormURLEncodedProperties map = new FormURLEncodedProperties();
-        StringTokenizer tokenizer = new StringTokenizer(decoded, "&");
+        StringTokenizer tokenizer = new StringTokenizer(encoded, "&");
         String token;
         while (tokenizer.hasMoreTokens()) {
             token = tokenizer.nextToken();
             int idx = token.indexOf('=');
             if (idx < 0) {
-                map.put(token, null);
+                map.put(URLDecoder.decode(token,"UTF-8"), null);
             } else if (idx > 0) {
-                map.put(token.substring(0, idx), token.substring(idx+1));
+                map.put(URLDecoder.decode(token.substring(0, idx),"UTF-8"), URLDecoder.decode(token.substring(idx+1),"UTF-8"));
             }
         }
         return map;
