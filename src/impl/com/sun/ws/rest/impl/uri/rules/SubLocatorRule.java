@@ -25,12 +25,12 @@ package com.sun.ws.rest.impl.uri.rules;
 import com.sun.ws.rest.api.container.ContainerException;
 import com.sun.ws.rest.api.core.HttpRequestContext;
 import com.sun.ws.rest.impl.model.parameter.ParameterExtractor;
-import com.sun.ws.rest.spi.dispatch.UriTemplateType;
 import com.sun.ws.rest.spi.uri.rules.UriRule;
 import com.sun.ws.rest.spi.uri.rules.UriRuleContext;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Iterator;
+import java.util.List;
 import javax.ws.rs.WebApplicationException;
 
 /**
@@ -38,20 +38,20 @@ import javax.ws.rs.WebApplicationException;
  * 
  * @author Paul.Sandoz@Sun.Com
  */
-public final class SubLocatorRule extends UriTemplateRule {
+public final class SubLocatorRule extends BaseRule {
 
     private final ParameterExtractor[] extractors;
     
     private final Method m;
 
-    public SubLocatorRule(UriTemplateType t, 
+    public SubLocatorRule(List<String> groupNames,
             Method m, ParameterExtractor[] extractors) {
-        super(t);
+        super(groupNames);
         this.m = m;
         this.extractors = extractors;
     }
 
-    public boolean _accept(CharSequence path, Object resource, UriRuleContext context) {
+    public boolean accept(CharSequence path, Object resource, UriRuleContext context) {
         // Set the template values
         setTemplateValues(context);
 
@@ -60,7 +60,7 @@ public final class SubLocatorRule extends UriTemplateRule {
 
         // Match sub-rules on the returned resource class
         final Iterator<UriRule> matches = context.getRules(resource.getClass()).
-                match(path, context.capturingGroupValues());
+                match(path, context.getGroupValues());
         while(matches.hasNext())
             if(matches.next().accept(path, resource, context))
                 return true;

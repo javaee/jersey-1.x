@@ -22,14 +22,13 @@
 
 package com.sun.ws.rest.spi.container;
 
-import com.sun.ws.rest.api.core.UriComponent;
+import com.sun.ws.rest.api.uri.UriComponent;
 import com.sun.ws.rest.impl.MultivaluedMapImpl;
 import com.sun.ws.rest.impl.RequestHttpHeadersImpl;
 import com.sun.ws.rest.impl.ResponseBuilderImpl;
 import com.sun.ws.rest.impl.http.header.reader.HttpHeaderReader;
 import com.sun.ws.rest.impl.model.HttpHelper;
 import com.sun.ws.rest.impl.response.Responses;
-import com.sun.ws.rest.spi.dispatch.UriTemplateType;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;

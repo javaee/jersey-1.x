@@ -52,19 +52,20 @@ public interface UriRuleContext {
      * @param resourceClass the resource class that has rules
      * @return the rules
      */
-    UriRules<?, UriRule> getRules(Class resourceClass);
+    UriRules<UriRule> getRules(Class resourceClass);
 
     /**
      * Get the list to store the values of a pattern's 
      * capturing groups.
      */
-    List<String> capturingGroupValues();
+    List<String> getGroupValues();
         
     /**
-     *  Commit template values that are the values of a pattern's
+     *  Set template values that are the values of a pattern's
      *  capturing groups.
      * 
-     *  @param names the template names.
+     *  @param names the template names associated with the capturing group
+     *         values.
      */
-    void commitTemplateValues(List<String> names);
+    void setTemplateValues(List<String> names);
 }

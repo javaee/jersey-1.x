@@ -20,9 +20,9 @@
  *     "Portions Copyrighted [year] [name of copyright owner]"
  */
 
-package com.sun.ws.rest.impl.uritemplate;
+package com.sun.ws.rest.impl.uri;
 
-import com.sun.ws.rest.spi.dispatch.UriTemplateType;
+import com.sun.ws.rest.api.uri.UriTemplate;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -35,9 +35,9 @@ import junit.framework.*;
  *
  * @author Paul.Sandoz@Sun.Com
  */
-public class URITemplateTest extends TestCase {
+public class UriTemplateTest extends TestCase {
     
-    public URITemplateTest(String testName) {
+    public UriTemplateTest(String testName) {
         super(testName);
     }
     
@@ -57,7 +57,7 @@ public class URITemplateTest extends TestCase {
     }
     
     void _testTemplateNames(String template, String... names) {
-        UriTemplateType t = new UriTemplateType(template);
+        UriTemplate t = new UriTemplate(template);
         _testTemplateNames(t.getTemplateVariables(), names);
     }
     
@@ -98,11 +98,11 @@ public class URITemplateTest extends TestCase {
     }
     
     void _testMatching(String template, String uri, String... values) {
-        UriTemplateType t = new UriTemplateType(template);
+        UriTemplate t = new UriTemplate(template);
         Map<String, String> m = new HashMap<String, String>();
         
         System.out.println("TEMPLATE: " + template);
-        System.out.println("REGEX: " + t.getTemplateRegex());
+        System.out.println("REGEX: " + t.getPattern().getRegex());
         System.out.println("TEMPLATE NAMES: " + t.getTemplateVariables());
         
         boolean isMatch = t.match(uri, m);
@@ -121,27 +121,34 @@ public class URITemplateTest extends TestCase {
     public void testNullMatching() {
         Map<String, String> m = new HashMap<String, String>();
         
-        UriTemplateType t = UriTemplateType.NULL;
+        UriTemplate t = UriTemplate.EMPTY;
         assertEquals(false, t.match("/", m));
         assertEquals(true, t.match(null, m));
+        assertEquals(true, t.match("", m));
         
-        t = new UriTemplateType("/{v}");
+        t = new UriTemplate("/{v}");
         assertEquals(false, t.match(null, m));
         assertEquals(true, t.match("/one", m));
     }
     
-    public void testNullOrder() {
-        List<UriTemplateType> l = new ArrayList<UriTemplateType>();
+    public void testOrder() {
+        List<UriTemplate> l = new ArrayList<UriTemplate>();
         
-        l.add(UriTemplateType.NULL);
-        l.add(new UriTemplateType("/{a}"));
-        l.add(new UriTemplateType("/{a}/{b}"));
-        l.add(new UriTemplateType("/{a}/one/{b}"));
+        l.add(UriTemplate.EMPTY);
+        l.add(new UriTemplate("/{a}"));
+        l.add(new UriTemplate("/{a}/{b}"));
+        l.add(new UriTemplate("/{a}/one/{b}"));
         
-        Collections.sort(l, UriTemplateType.COMPARATOR);
+        Collections.sort(l, UriTemplate.COMPARATOR);
         
-        UriTemplateType t = l.get(l.size() - 1);
-        assertEquals(UriTemplateType.NULL, t);
+        assertEquals(new UriTemplate("/{a}/one/{b}").getTemplate(), 
+                l.get(0).getTemplate());
+        assertEquals(new UriTemplate("/{a}/{b}").getTemplate(), 
+                l.get(1).getTemplate());
+        assertEquals(new UriTemplate("/{a}").getTemplate(), 
+                l.get(2).getTemplate());
+        assertEquals(UriTemplate.EMPTY.getTemplate(), 
+                l.get(3).getTemplate());
     }
     
     public void testSubstitutionArray() {
@@ -172,7 +179,7 @@ public class URITemplateTest extends TestCase {
     }
     
     void _testSubstitutionArray(String template, String uri, String... values) {
-        UriTemplateType t = new UriTemplateType(template);
+        UriTemplate t = new UriTemplate(template);
         
         assertEquals(uri, t.createURI(values));
     }
@@ -209,7 +216,7 @@ public class URITemplateTest extends TestCase {
     }
     
     void _testSubstitutionMap(String template, String uri, String... variablesAndvalues) {
-        UriTemplateType t = new UriTemplateType(template);
+        UriTemplate t = new UriTemplate(template);
         
         Map<String, String> variableMap = new HashMap<String, String>();
         for (int i = 0; i < variablesAndvalues.length; i+=2)

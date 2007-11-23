@@ -32,8 +32,6 @@ import com.sun.ws.rest.impl.model.method.ResourceHeadWrapperMethod;
 import com.sun.ws.rest.impl.model.method.ResourceHttpMethod;
 import com.sun.ws.rest.impl.model.method.ResourceHttpOptionsMethod;
 import com.sun.ws.rest.impl.model.method.ResourceMethod;
-import com.sun.ws.rest.impl.model.method.ResourceMethodList;
-import com.sun.ws.rest.impl.model.method.ResourceMethodMap;
 import com.sun.ws.rest.impl.model.method.ResourceViewMethod;
 import com.sun.ws.rest.impl.model.parameter.ParameterExtractorFactory;
 import com.sun.ws.rest.impl.uri.rules.HttpMethodRule;
@@ -41,17 +39,21 @@ import com.sun.ws.rest.impl.uri.rules.SubLocatorRule;
 import com.sun.ws.rest.impl.modelapi.annotation.IntrospectionModeller;
 import com.sun.ws.rest.impl.view.ViewFactory;
 import com.sun.ws.rest.impl.modelapi.annotation.IntrospectionModeller;
-import com.sun.ws.rest.impl.uri.rules.LinearMatchingUriTemplateRules;
+import com.sun.ws.rest.impl.uri.PathPattern;
+import com.sun.ws.rest.impl.uri.PathTemplate;
+import com.sun.ws.rest.api.uri.UriTemplate;
+import com.sun.ws.rest.impl.uri.rules.RightHandPathRule;
+import com.sun.ws.rest.impl.uri.rules.UriRulesFactory;
 import com.sun.ws.rest.impl.view.ViewFactory;
-import com.sun.ws.rest.spi.dispatch.UriPathTemplate;
-import com.sun.ws.rest.spi.dispatch.UriTemplateType;
 import com.sun.ws.rest.spi.resource.ResourceProvider;
 import com.sun.ws.rest.spi.resource.ResourceProviderFactory;
 import com.sun.ws.rest.spi.uri.rules.UriRule;
 import com.sun.ws.rest.spi.uri.rules.UriRules;
 import com.sun.ws.rest.spi.view.View;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.logging.Logger;
@@ -65,7 +67,7 @@ import javax.ws.rs.HttpMethod;
 public final class ResourceClass {
     private static final Logger LOGGER = Logger.getLogger(ResourceClass.class.getName());
 
-    private final UriRules<UriTemplateType, UriRule> rules;
+    private final UriRules<UriRule> rules;
 
     private final ResourceConfig config;
     
@@ -77,8 +79,6 @@ public final class ResourceClass {
     
     public ResourceClass(Object containerMemento, Class<?> c, ResourceConfig config, 
             ResourceProviderFactory resolverFactory) {
-        this.rules = new LinearMatchingUriTemplateRules<UriRule>();
-        
         this.resource = IntrospectionModeller.createResource(c);
         
         this.config = config;
@@ -88,34 +88,39 @@ public final class ResourceClass {
 
         boolean hasSubResources = false;
                 
-        hasSubResources = processSubResourceLocators();
+        RulesMap<UriRule> rulesMap = new RulesMap<UriRule>();
+        
+        hasSubResources = processSubResourceLocators(rulesMap);
                 
-        final Map<UriTemplateType, ResourceMethodMap> templatedMethodMap = 
+        final Map<PathPattern, ResourceMethodMap> patternMethodMap = 
                 processSubResourceMethods();
 
         final ResourceMethodMap methodMap = processMethods();
 
-        processViews(containerMemento, methodMap, templatedMethodMap);
+        processViews(containerMemento, methodMap, patternMethodMap);
 
         
-        // Create the dispatchers for the sub-resource HTTP methods
-        for (Map.Entry<UriTemplateType, ResourceMethodMap> e : 
-            templatedMethodMap.entrySet()) {
+        // Create the rules for the sub-resource HTTP methods
+        for (Map.Entry<PathPattern, ResourceMethodMap> e :
+            patternMethodMap.entrySet()) {
             hasSubResources = true;
             
+            PathPattern p = e.getKey();
             e.getValue().sort();
-            rules.add(e.getKey(),
-                    new HttpMethodRule(e.getKey(), e.getValue()));
+            rulesMap.put(p,
+                    new RightHandPathRule(p.getTemplate().endsWithSlash(),
+                        new HttpMethodRule(e.getValue())));
         }
         
-        // Create the dispatcher for the HTTP methods
+        // Create the rules for the HTTP methods
         if (!methodMap.isEmpty()) {
             methodMap.sort();
-            rules.add(UriTemplateType.NULL,
-                    new HttpMethodRule(UriTemplateType.NULL, methodMap));
+            // No need to adapt with the RightHandPathRule as the URI path
+            // will be consumed when such a rule is accepted
+            rulesMap.put(PathPattern.EMPTY_PATH, new HttpMethodRule(methodMap));
         }
         
-        if (rules.getRules().isEmpty()) {
+        if (rulesMap.isEmpty()) {
             String message = "The class " 
                     + c + 
                     " does not contain any sub-resource locators, sub-resource HTTP methods or HTTP methods";
@@ -124,72 +129,82 @@ public final class ResourceClass {
         }
         
         this.hasSubResources = hasSubResources;
+        
+        this.rules = UriRulesFactory.create(rulesMap);
     }
     
-    public UriRules<?, UriRule> getRules() {
+    public UriRules<UriRule> getRules() {
         return rules;
     }
     
-    private void addToTemplatedMethodMap(
-            Map<UriTemplateType, ResourceMethodMap> tmm,
-            UriTemplateType t,
+    private void addToPatternMethodMap(
+            Map<PathPattern, ResourceMethodMap> tmm,
+            PathPattern p,
             ResourceMethod rm) {
-        ResourceMethodMap rmm = tmm.get(t);
+        ResourceMethodMap rmm = tmm.get(p);
         if (rmm == null) {
             rmm = new ResourceMethodMap();
-            tmm.put(t, rmm);
+            tmm.put(p, rmm);
         }
         rmm.put(rm);
     }
     
-    private boolean processSubResourceLocators() {
+    private boolean processSubResourceLocators(RulesMap<UriRule> rulesMap) {
         boolean hasSubResources = false;
-        for (final AbstractSubResourceLocator subResourceLocator : 
-            this.resource.getSubResourceLocators()) {
+        for (final AbstractSubResourceLocator locator : 
+            resource.getSubResourceLocators()) {
             hasSubResources = true;
             
-            UriTemplateType t = new UriPathTemplate(
-                    subResourceLocator.getUriTemplate().getRawTemplate(), 
-                    subResourceLocator.getUriTemplate().isLimited(), 
-                    subResourceLocator.getUriTemplate().isEncode());
-            UriRule r = new SubLocatorRule(t,  subResourceLocator.getMethod(), 
+            UriTemplate t = new PathTemplate(
+                    locator.getUriTemplate().getRawTemplate(),
+                    locator.getUriTemplate().isEncode());
+            
+            PathPattern p = new PathPattern(
+                    t,
+                    locator.getUriTemplate().isLimited());
+            
+            UriRule r = new SubLocatorRule(t.getTemplateVariables(),
+                    locator.getMethod(),
                     ParameterExtractorFactory.createExtractorsForSublocator(
-                    subResourceLocator.getMethod()));
-            rules.add(t, r);
+                        locator.getMethod()));
+            
+            rulesMap.put(p, new RightHandPathRule(t.endsWithSlash(), r));
         }
         
         return hasSubResources;
     }
     
-    private Map<UriTemplateType, ResourceMethodMap> processSubResourceMethods() {
-        final Map<UriTemplateType, ResourceMethodMap> templatedMethodMap = 
-                new HashMap<UriTemplateType, ResourceMethodMap>();
-        for (final AbstractSubResourceMethod subResourceMethod : 
+    private Map<PathPattern, ResourceMethodMap> processSubResourceMethods() {
+        final Map<PathPattern, ResourceMethodMap> patternMethodMap = 
+                new HashMap<PathPattern, ResourceMethodMap>();
+        for (final AbstractSubResourceMethod method : 
             this.resource.getSubResourceMethods()) {
             
+            UriTemplate t = new PathTemplate(
+                    method.getUriTemplate().getRawTemplate(),
+                    method.getUriTemplate().isEncode());
+            
             // TODO what does it mean to support limited=false
-            UriTemplateType t = new UriPathTemplate(
-                    subResourceMethod.getUriTemplate().getRawTemplate(), 
-                    false,
-                    subResourceMethod.getUriTemplate().isEncode());
-                        
-            ResourceMethod rm = new ResourceHttpMethod(this, subResourceMethod);
-            addToTemplatedMethodMap(templatedMethodMap, t, rm);
+            PathPattern p = new PathPattern(t, false);
+            
+            ResourceMethod rm = new ResourceHttpMethod(t.getTemplateVariables(),
+                    method);
+            addToPatternMethodMap(patternMethodMap, p, rm);
         }
         
-        for (ResourceMethodMap methodMap : templatedMethodMap.values()) {
+        for (ResourceMethodMap methodMap : patternMethodMap.values()) {
             processHead(methodMap);
             processOptions(methodMap);
         }
         
-        return templatedMethodMap;
+        return patternMethodMap;
     }
 
     private ResourceMethodMap processMethods() {
         final ResourceMethodMap methodMap = new ResourceMethodMap();
         for (final com.sun.ws.rest.api.model.AbstractResourceMethod resourceMethod : 
             this.resource.getResourceMethods()) {
-            ResourceMethod rm = new ResourceHttpMethod(this, resourceMethod);
+            ResourceMethod rm = new ResourceHttpMethod(resourceMethod);
             methodMap.put(rm);
         }
         
@@ -200,15 +215,15 @@ public final class ResourceClass {
     }
     
     private void processHead(ResourceMethodMap methodMap) {
-        ResourceMethodList getList = methodMap.get(HttpMethod.GET);
+        List<ResourceMethod> getList = methodMap.get(HttpMethod.GET);
         if (getList == null || getList.isEmpty())
             return;
         
-        ResourceMethodList headList = methodMap.get(HttpMethod.HEAD);        
-        if (headList == null) headList = new ResourceMethodList();
+        List<ResourceMethod> headList = methodMap.get(HttpMethod.HEAD);        
+        if (headList == null) headList = new ArrayList<ResourceMethod>();
         
         for (ResourceMethod getMethod : getList) {
-            if (!headList.containsMediaOfMethod(getMethod)) {
+            if (!containsMediaOfMethod(headList, getMethod)) {
                 ResourceMethod headMethod = new ResourceHeadWrapperMethod(getMethod);
                 methodMap.put(headMethod);
                 headList = methodMap.get(HttpMethod.HEAD);
@@ -216,18 +231,35 @@ public final class ResourceClass {
         }
     }
     
+    /**
+     * Determin if a the resource method list contains a method that 
+     * has the same consume/produce media as another resource method.
+     * 
+     * @param methods the resource methods
+     * @param method the resource method to check
+     * @return true if the list contains a method with the same media as method.
+     */
+    private boolean containsMediaOfMethod(List<ResourceMethod> methods, 
+            ResourceMethod method) {
+        for (ResourceMethod m : methods)
+            if (method.mediaEquals(m))
+                return true;
+        
+        return false;
+    }
+    
     private void processOptions(ResourceMethodMap methodMap) {
-        ResourceMethodList l = methodMap.get("OPTIONS");
+        List<ResourceMethod> l = methodMap.get("OPTIONS");
         if (l != null)
             return;
         
-        ResourceMethod optionsMethod = new ResourceHttpOptionsMethod(this, methodMap.getAllow());
+        ResourceMethod optionsMethod = new ResourceHttpOptionsMethod(methodMap);
         methodMap.put(optionsMethod);
     }
     
     private void processViews(Object containerMemento, 
             ResourceMethodMap methodMap, 
-            Map<UriTemplateType, ResourceMethodMap> templatedMethodMap) {        
+            Map<PathPattern, ResourceMethodMap> patternMethodMap) {        
 
         // Get all the view names
         Map<String, Class<?>> viewMap = getViews();
@@ -238,17 +270,20 @@ public final class ResourceClass {
             final String viewName = view.getKey();
             
             String path = getAbsolutePathOfView(resourceClass, viewName);
-            UriTemplateType t = getURITemplateOfView(resourceClass, viewName);
             
+            String pathPattern = getPathPatternOfView(resourceClass, viewName);
+                    
             View v = ViewFactory.createView(containerMemento, path);
             if (v == null)
                 continue;
             
-            ResourceMethod rm = new ResourceViewMethod(this, v);
-            if (t.equals(UriTemplateType.NULL)) {
+            ResourceMethod rm = new ResourceViewMethod(v);
+            if (pathPattern.length() == 0) {
                 methodMap.put(rm);
             } else {
-                addToTemplatedMethodMap(templatedMethodMap, t, rm);
+                UriTemplate t = new PathTemplate(pathPattern, true);
+                PathPattern p = new PathPattern(t, false);
+                addToPatternMethodMap(patternMethodMap, p, rm);
             }
         }        
     }
@@ -278,22 +313,22 @@ public final class ResourceClass {
         return viewMap;
     }
     
-    private UriTemplateType getURITemplateOfView(Class<?> resourceClass, String path) {
+    private String getPathPatternOfView(Class<?> resourceClass, String path) {
         if (path.startsWith("/")) {
+            throw new IllegalArgumentException();
             // TODO get the name of the leaf node of the path
             // and use that for the URI template
-            return null;
         } 
         
         if (path.matches("index\\.[^/]*")) {
-            return UriTemplateType.NULL;
+            return "";
         } else {
             // Remove the type of view from the URI template
             int i = path.lastIndexOf('.');
             if (i > 0)
                 path = path.substring(0, i);
-            
-            return new UriPathTemplate(path, false, true);
+
+            return path;
         }
     }
     

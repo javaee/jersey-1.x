@@ -22,29 +22,28 @@
 
 package com.sun.ws.rest.impl.model.method;
 
-import com.sun.ws.rest.api.container.ContainerException;
 import com.sun.ws.rest.api.core.HttpRequestContext;
 import com.sun.ws.rest.api.core.HttpResponseContext;
 import com.sun.ws.rest.impl.ResponseBuilderImpl;
-import com.sun.ws.rest.impl.model.MediaTypeList;
 import com.sun.ws.rest.impl.model.MimeHelper;
-import com.sun.ws.rest.impl.model.ResourceClass;
 import com.sun.ws.rest.impl.view.ViewType;
 import com.sun.ws.rest.spi.dispatch.RequestDispatcher;
 import com.sun.ws.rest.spi.view.View;
 import java.io.IOException;
-import java.lang.reflect.Method;
+import java.util.Arrays;
 
 /**
  *
  * @author Paul.Sandoz@Sun.Com
  */
 public final class ResourceViewMethod extends ResourceMethod {
-    protected final View v;
+    private static final class ViewMethodDispatcher implements RequestDispatcher {
+        private final View v;
 
-    protected RequestDispatcher dispatcher;
-    
-    private class ViewMethodDispatcher implements RequestDispatcher {
+        ViewMethodDispatcher(View v) {
+            this.v = v;
+        }
+        
         public void dispatch(final Object resource, 
                 final HttpRequestContext requestContext, 
                 final HttpResponseContext responseContext) {
@@ -54,28 +53,21 @@ public final class ResourceViewMethod extends ResourceMethod {
                     v.dispatch(resource, requestContext, responseContext);
                 }
             };
-            responseContext.setResponse(ResponseBuilderImpl.representation(vt, v.getProduceMime()).build());
+            responseContext.setResponse(ResponseBuilderImpl.
+                    representation(vt, v.getProduceMime()).build());
         }
     }
     
-    public ResourceViewMethod(ResourceClass resourceClass, View v) throws ContainerException {
-        super(resourceClass);
-        this.consumeMime = MimeHelper.GENERAL_MEDIA_TYPE_LIST;
-        this.produceMime = new MediaTypeList();
-        this.produceMime.add(v.getProduceMime());
-        this.httpMethod = "GET";
-        
-        this.v = v;
-        this.dispatcher = new ViewMethodDispatcher();
+    public ResourceViewMethod(View v) {
+        super("GET",
+                null,
+                MimeHelper.GENERAL_MEDIA_TYPE_LIST,
+                Arrays.asList(v.getProduceMime()),
+                new ViewMethodDispatcher(v));
     }
     
-    public Method getMethod() {
-        // TODO
-        return null;
+    @Override
+    public String toString() {
+        return "View" ;
     }
-    
-    public RequestDispatcher getDispatcher() {
-        return dispatcher;
-    }
-    
 }

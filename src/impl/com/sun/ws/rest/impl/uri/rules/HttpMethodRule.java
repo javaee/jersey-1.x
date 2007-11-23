@@ -26,15 +26,16 @@ import com.sun.ws.rest.api.core.HttpRequestContext;
 import com.sun.ws.rest.api.core.HttpResponseContext;
 import com.sun.ws.rest.impl.ImplMessages;
 import com.sun.ws.rest.impl.ResponseBuilderImpl;
+import com.sun.ws.rest.impl.http.header.AcceptMediaType;
 import com.sun.ws.rest.impl.model.HttpHelper;
 import com.sun.ws.rest.impl.model.method.ResourceMethod;
-import com.sun.ws.rest.impl.model.method.ResourceMethodList;
-import com.sun.ws.rest.impl.model.method.ResourceMethodMap;
 import com.sun.ws.rest.impl.response.Responses;
-import com.sun.ws.rest.spi.dispatch.UriTemplateType;
+import com.sun.ws.rest.spi.uri.rules.UriRule;
 import com.sun.ws.rest.spi.uri.rules.UriRuleContext;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.ListIterator;
+import java.util.Map;
 import java.util.logging.Logger;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
@@ -43,24 +44,36 @@ import javax.ws.rs.core.Response;
 
 /**
  * The rule for accepting an HTTP method.
- * TODO 
- * Consider separate rules for HTTP method and sub-resource HTTP method
- * The former does not require redirection checking
  * 
  * @author Paul.Sandoz@Sun.Com
  */
-public final class HttpMethodRule extends UriTemplateRule {
+public final class HttpMethodRule implements UriRule {
     private static final Logger LOGGER = 
             Logger.getLogger(HttpMethodRule.class.getName());
 
-    private final ResourceMethodMap map;
+    private final Map<String, List<ResourceMethod>> map;
     
-    public HttpMethodRule(UriTemplateType template, ResourceMethodMap map) {
-        super(template);
-        this.map = map;
+    private final String allow;
+            
+    public HttpMethodRule(Map<String, List<ResourceMethod>> methods) {
+        this.map = methods;
+        this.allow = getAllow(methods);
     }
           
-    public boolean _accept(CharSequence path, Object resource, UriRuleContext context) {
+    private String getAllow(Map<String, List<ResourceMethod>> methods) {
+        StringBuilder s = new StringBuilder();
+        boolean first = true;
+        for (String method : methods.keySet()) {
+            if (!first) s.append(",");
+            first = false;
+            
+            s.append(method);
+        }
+        
+        return s.toString();
+    }
+
+    public boolean accept(CharSequence path, Object resource, UriRuleContext context) {
         final HttpRequestContext request = context.getHttpContext().
                 getHttpRequestContext();
         final HttpResponseContext response = context.getHttpContext().
@@ -76,41 +89,37 @@ public final class HttpMethodRule extends UriTemplateRule {
         if (!httpMethod.equals("GET") && !httpMethod.equals("DELETE"))
             contentType = HttpHelper.getContentType(request);
         
-        // Get the list of methods for the HTTP method
-        ResourceMethodList methods = map.get(httpMethod);
+        // Get the list of resource methods for the HTTP method
+        List<ResourceMethod> methods = map.get(httpMethod);
         if (methods == null) {
-            // Check for generic support of methods
-            methods = map.get(null);
-            if (methods == null) {
-                // If no methods are found move on to next template
-                Response r = new ResponseBuilderImpl(Responses.METHOD_NOT_ALLOWED).
-                        header("Allow", map.getAllow()).build();
-                response.setResponse(r);
-                return true;
-            }
+            // No resource methods are found
+            Response r = new ResponseBuilderImpl(Responses.METHOD_NOT_ALLOWED).
+                    header("Allow", allow).build();
+            response.setResponse(r);
+            return true;
         }
 
         // Get the list of matching methods
         List<MediaType> accept = request.getAcceptableMediaTypes();
         LinkedList<ResourceMethod> matches = 
             new LinkedList<ResourceMethod>();
-        ResourceMethodList.MatchStatus s = methods.match(contentType, accept, matches);
-        if (s == ResourceMethodList.MatchStatus.MATCH) {
+        MatchStatus s = match(methods, contentType, accept, matches);
+        if (s == MatchStatus.MATCH) {
             // If there is a match choose the first method
             ResourceMethod method = matches.get(0);
 
             // Set the template values
-            setTemplateValues(context);
-        
+            context.setTemplateValues(method.getTemplateVariables());
+            
             method.getDispatcher().dispatch(resource, request, response);
 
             // Verify the response
             // TODO verification for HEAD
             if (!httpMethod.equals("HEAD"))
                 verifyResponse(method, accept, response);                        
-        } else if (s == ResourceMethodList.MatchStatus.NO_MATCH_FOR_CONSUME) {
+        } else if (s == MatchStatus.NO_MATCH_FOR_CONSUME) {
             response.setResponse(Responses.UNSUPPORTED_MEDIA_TYPE);
-        } else if (s == ResourceMethodList.MatchStatus.NO_MATCH_FOR_PRODUCE) {
+        } else if (s == MatchStatus.NO_MATCH_FOR_PRODUCE) {
             response.setResponse(Responses.NOT_ACCEPTABLE);
         }
         
@@ -122,6 +131,74 @@ public final class HttpMethodRule extends UriTemplateRule {
                 headers.getFirst("Transfer-Encoding") != null);
     }
         
+    private enum MatchStatus {
+        MATCH, NO_MATCH_FOR_CONSUME, NO_MATCH_FOR_PRODUCE
+    }
+    
+    /**
+     * Find the subset of methods that match the 'Content-Type' and 'Accept'.
+     *
+     * @param methods the list of resource methods
+     * @param contentType the 'Content-Type'.
+     * @param accept the 'Accept' as a list. This list
+     *        MUST be ordered with the highest quality acceptable Media type 
+     *        occuring first (see 
+     *        {@link com.sun.ws.rest.impl.model.MimeHelper#ACCEPT_MEDIA_TYPE_COMPARATOR}).
+     * @param matches the list to add the matches to.
+     * @return the match status.
+     */
+    private MatchStatus match(List<ResourceMethod> methods,
+            MediaType contentType,
+            List<MediaType> accept,
+            LinkedList<ResourceMethod> matches) {
+                
+        if (contentType != null) {
+            // Find all methods that consume the MIME type of 'Content-Type'
+            for (ResourceMethod method : methods)
+                if (method.consumes(contentType))
+                    matches.add(method);
+            
+            if (matches.isEmpty())
+                return MatchStatus.NO_MATCH_FOR_CONSUME;
+            
+        } else {
+            matches.addAll(methods);
+        }
+
+        // Find all methods that produce the one or more Media types of 'Accept'
+        ListIterator<ResourceMethod> i = matches.listIterator();
+        int currentQuality = AcceptMediaType.MINUMUM_QUALITY;
+        int currentIndex = 0;
+        while(i.hasNext()) {
+            int index = i.nextIndex();
+            int quality = i.next().produces(accept);
+            
+            if (quality == -1) {
+                // No match
+                i.remove();
+            } else if (quality < currentQuality) {
+                // Match but of a lower quality than a previous match
+                i.remove();
+            } else if (quality > currentQuality) {
+                // Match and of a higher quality than the pervious match
+                currentIndex = index;
+                currentQuality = quality;
+            }
+        }
+
+        if (matches.isEmpty())
+            return MatchStatus.NO_MATCH_FOR_PRODUCE;
+
+        // Remove all methods of a lower quality at the 
+        // start of the list
+        while (currentIndex > 0) {
+            matches.removeFirst();
+            currentIndex--;
+        }
+        
+        return MatchStatus.MATCH;
+    }    
+    
     private void verifyResponse(ResourceMethod method, 
             List<MediaType> accept,
             HttpResponseContext responseContext) {        
@@ -143,8 +220,7 @@ public final class HttpMethodRule extends UriTemplateRule {
             // Check if the 'Content-Type' is acceptable
             if (!HttpHelper.produces(contentType, accept)) {
                 String error = ImplMessages.RESOURCE_NOT_ACCEPTABLE(
-                        method.getResourceClass(),
-                        method.getMethod(),
+                        method,
                         contentType);
                 LOGGER.severe(error);
                 
@@ -155,13 +231,11 @@ public final class HttpMethodRule extends UriTemplateRule {
                 throw new WebApplicationException(r);
             } else {
                 String error = ImplMessages.RESOURCE_MIMETYPE_NOT_IN_PRODUCE_MIME(
-                        method.getResourceClass(),
-                        method.getMethod(),
+                        method,
                         contentType,
                         method.getProduceMime());
                 LOGGER.warning(error);
             }
-        }
-        
+        }   
     }
 }

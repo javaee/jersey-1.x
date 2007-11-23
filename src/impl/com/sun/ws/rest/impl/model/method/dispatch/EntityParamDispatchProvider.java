@@ -32,7 +32,6 @@ import com.sun.ws.rest.impl.model.ReflectionHelper;
 import com.sun.ws.rest.spi.dispatch.RequestDispatcher;
 import com.sun.ws.rest.impl.model.parameter.ParameterExtractor;
 import com.sun.ws.rest.impl.model.parameter.ParameterProcessor;
-import com.sun.ws.rest.impl.model.method.ResourceMethodData;
 import com.sun.ws.rest.impl.model.parameter.AbstractParameterProcessor;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationTargetException;

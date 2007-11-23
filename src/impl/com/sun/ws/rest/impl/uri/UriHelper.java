@@ -20,7 +20,7 @@
  *     "Portions Copyrighted [year] [name of copyright owner]"
  */
 
-package com.sun.ws.rest.impl.util;
+package com.sun.ws.rest.impl.uri;
 
 import java.net.URI;
 import java.util.LinkedList;

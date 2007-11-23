@@ -22,35 +22,31 @@
 
 package com.sun.ws.rest.impl.model.method;
 
-import com.sun.ws.rest.spi.dispatch.RequestDispatcher;
 import com.sun.ws.rest.api.container.ContainerException;
-import java.lang.reflect.Method;
-import javax.ws.rs.HttpMethod;
 
 /**
  *
  * @author Paul.Sandoz@Sun.Com
  */
 public final class ResourceHeadWrapperMethod extends ResourceMethod {
-    private final RequestDispatcher dispatcher;
+    private final ResourceMethod m;
     
-    public ResourceHeadWrapperMethod(ResourceMethod m) throws ContainerException {
-        super(m.resourceClass);
+    public ResourceHeadWrapperMethod(ResourceMethod m) {
+        super("HEAD",
+                m.getTemplateVariables(),
+                m.getConsumeMime(), 
+                m.getProduceMime(),
+                m.getDispatcher());
         
-        if (!m.httpMethod.equals("GET")) {
+        if (!m.getHttpMethod().equals("GET")) {
             throw new ContainerException("");
         }
-        this.httpMethod = HttpMethod.HEAD;
-        this.consumeMime = m.consumeMime;
-        this.produceMime = m.produceMime;
-        this.dispatcher = m.getDispatcher();
+        
+        this.m = m;
     }
     
-    public Method getMethod() {
-        return null;
+    @Override
+    public String toString() {
+        return m.toString();
     }
-    
-    public RequestDispatcher getDispatcher() {
-        return dispatcher;
-    }    
 }

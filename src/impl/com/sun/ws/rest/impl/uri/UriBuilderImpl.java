@@ -20,17 +20,16 @@
  *     "Portions Copyrighted [year] [name of copyright owner]"
  */
 
-package com.sun.ws.rest.impl;
+package com.sun.ws.rest.impl.uri;
 
-import com.sun.ws.rest.api.core.UriComponent;
-import com.sun.ws.rest.spi.dispatch.UriTemplateType;
+import com.sun.ws.rest.api.uri.UriComponent;
+import com.sun.ws.rest.api.uri.UriTemplate;
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Method;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URLEncoder;
 import java.util.Map;
-import javax.ws.rs.UriTemplate;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriBuilderException;
 
@@ -146,7 +145,8 @@ public final class UriBuilderImpl extends UriBuilder {
 
     public UriBuilder path(Class resource) {
         @SuppressWarnings("unchecked")
-        UriTemplate ut = (UriTemplate)resource.getAnnotation(UriTemplate.class);
+        javax.ws.rs.UriTemplate ut = (javax.ws.rs.UriTemplate)
+                resource.getAnnotation(javax.ws.rs.UriTemplate.class);
         appendPath(ut);
         return this;
     }
@@ -165,14 +165,14 @@ public final class UriBuilderImpl extends UriBuilder {
         if (found == null)
             throw new IllegalArgumentException();
         
-        appendPath(found.getAnnotation(UriTemplate.class));
+        appendPath(found.getAnnotation(javax.ws.rs.UriTemplate.class));
         
         return this;
     }
 
     public UriBuilder path(Method... methods) {
         for (Method m : methods)
-            appendPath(m.getAnnotation(UriTemplate.class));
+            appendPath(m.getAnnotation(javax.ws.rs.UriTemplate.class));
 
         return this;
     }
@@ -215,7 +215,7 @@ public final class UriBuilderImpl extends UriBuilder {
         return this;
     }
 
-    private void appendPath(UriTemplate t) {
+    private void appendPath(javax.ws.rs.UriTemplate t) {
         if (t == null)
             throw new IllegalArgumentException();
         
@@ -271,14 +271,14 @@ public final class UriBuilderImpl extends UriBuilder {
     }
 
     public URI build(Map<String, String> values) {
-        String uri = UriTemplateType.createURI(scheme, 
+        String uri = UriTemplate.createURI(scheme, 
                 userInfo, host, String.valueOf(port), 
                 path.toString(), query.toString(), fragment, values, encode);
         return createURI(uri);
     }
 
     public URI build(String... values) {
-        String uri = UriTemplateType.createURI(scheme, 
+        String uri = UriTemplate.createURI(scheme, 
                 userInfo, host, String.valueOf(port), 
                 path.toString(), query.toString(), fragment, values, encode);
         return createURI(uri);              

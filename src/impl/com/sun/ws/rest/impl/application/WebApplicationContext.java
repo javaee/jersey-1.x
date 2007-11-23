@@ -128,16 +128,16 @@ final class WebApplicationContext implements
         return it = rc.resolver.getInstance(this);
     }
 
-    public UriRules<?, UriRule> getRules(Class resourceClass) {
+    public UriRules<UriRule> getRules(Class resourceClass) {
         final ResourceClass rc = app.getResourceClass(resourceClass);
         return rc.getRules();
     }
 
-    public List<String> capturingGroupValues() {
+    public List<String> getGroupValues() {
         return capturingGroupValues;
     }
     
-    public void commitTemplateValues(List<String> names) {
+    public void setTemplateValues(List<String> names) {
         request.addTemplateValues(names, capturingGroupValues);
     }
 }

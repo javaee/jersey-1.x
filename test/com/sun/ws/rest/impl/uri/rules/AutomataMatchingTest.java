@@ -19,24 +19,36 @@
  * enclosed by brackets [] replaced by your own identifying information:
  *     "Portions Copyrighted [year] [name of copyright owner]"
  */
-package com.sun.ws.rest.impl;
 
-import com.sun.ws.rest.api.uri.UriComponent;
-import junit.framework.*;
+package com.sun.ws.rest.impl.uri.rules;
+
+import com.sun.ws.rest.impl.uri.PathPattern;
+import com.sun.ws.rest.impl.uri.rules.automata.AutomataMatchingUriTemplateRules;
+import com.sun.ws.rest.spi.uri.rules.UriRules;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 /**
  *
- * @author Paul.Sandoz@Sun.Com
+ * @author mnesarco
  */
-public class UriComponentValidateTest extends TestCase {
+public class AutomataMatchingTest extends AbstractMatchingTester {
     
-    public UriComponentValidateTest(String testName) {
+    public AutomataMatchingTest(String testName) {
         super(testName);
     }
-
-    public void testPath() {
-        assertEquals(false, UriComponent.valid("/x y", UriComponent.Type.PATH));
-        assertEquals(true, UriComponent.valid("/x20y", UriComponent.Type.PATH));
-        assertEquals(true, UriComponent.valid("/x%20y", UriComponent.Type.PATH));
+    
+    private class AutomataRulesBuilder extends RulesBuilder {
+        protected UriRules<String> _build() {
+            List<PatternRulePair<String>> l = new ArrayList<PatternRulePair<String>>();
+            for (Map.Entry<PathPattern, String> e : rulesMap.entrySet())
+                l.add(new PatternRulePair<String>(e.getKey(), e.getValue()));            
+            return new AutomataMatchingUriTemplateRules<String>(l);
+        }
+    }
+    
+    protected RulesBuilder create() {
+        return new AutomataRulesBuilder();
     }    
 }

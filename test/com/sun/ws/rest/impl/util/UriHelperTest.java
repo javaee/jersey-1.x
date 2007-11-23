@@ -22,6 +22,7 @@
 
 package com.sun.ws.rest.impl.util;
 
+import com.sun.ws.rest.impl.uri.UriHelper;
 import junit.framework.*;
 import java.net.URI;
 import java.net.URISyntaxException;

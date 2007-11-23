@@ -113,6 +113,6 @@ public class SubResourceHttpMethodsTest extends AbstractResourceTester {
         initiateWebApplication(SubResourceMethodsWithDifferentTemplates.class);
         
         assertEquals("foo", resourceProxy("/foo").get(String.class));
-        assertEquals("bar", resourceProxy("/bar").get(String.class));
+        assertEquals("bar", resourceProxy("/bar").post(String.class));
     }
 }

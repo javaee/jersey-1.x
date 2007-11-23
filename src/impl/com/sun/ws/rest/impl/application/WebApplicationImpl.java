@@ -33,13 +33,20 @@ import com.sun.ws.rest.api.core.ResourceConfig;
 import com.sun.ws.rest.impl.ResponseBuilderImpl;
 import com.sun.ws.rest.impl.ThreadLocalHttpContext;
 import com.sun.ws.rest.impl.model.ResourceClass;
+import com.sun.ws.rest.impl.model.RulesMap;
 import com.sun.ws.rest.impl.response.Responses;
+import com.sun.ws.rest.impl.uri.PathPattern;
+import com.sun.ws.rest.impl.uri.PathTemplate;
+import com.sun.ws.rest.api.uri.UriTemplate;
+import com.sun.ws.rest.impl.uri.rules.ResourceClassRule;
+import com.sun.ws.rest.impl.uri.rules.RightHandPathRule;
 import com.sun.ws.rest.impl.uri.rules.RootResourceClassesRule;
-import com.sun.ws.rest.impl.util.UriHelper;
+import com.sun.ws.rest.impl.uri.UriHelper;
 import com.sun.ws.rest.spi.container.ContainerRequest;
 import com.sun.ws.rest.spi.container.ContainerResponse;
 import com.sun.ws.rest.spi.container.WebApplication;
 import com.sun.ws.rest.spi.resource.ResourceProviderFactory;
+import com.sun.ws.rest.spi.uri.rules.UriRule;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.lang.reflect.Field;
@@ -51,7 +58,6 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.logging.Logger;
-import javax.ws.rs.UriTemplate;
 import javax.ws.rs.core.HttpContext;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.PreconditionEvaluator;
@@ -156,9 +162,8 @@ public final class WebApplicationImpl implements WebApplication {
         this.initiated = true;
         this.resourceConfig = resourceConfig;
         this.containerMomento = containerMomento;
-        this.rootsRule = new RootResourceClassesRule();
-        
-        addRootResources(resourceConfig.getResourceClasses());
+        this.rootsRule = new RootResourceClassesRule(
+            processRootResources(resourceConfig.getResourceClasses()));
     }
 
     public void handleRequest(ContainerRequest request, ContainerResponse response) {
@@ -204,27 +209,37 @@ public final class WebApplicationImpl implements WebApplication {
 
     // 
 
-    private void addRootResources(Set<Class> resourceClasses) {
-        if (resourceClasses.isEmpty()) {
+    private RulesMap<UriRule> processRootResources(Set<Class> classes) {
+        if (classes.isEmpty()) {
             String message = "The ResourceConfig instance does not contain any root resource classes";
             LOGGER.severe(message);
             throw new ContainerException(message);            
         }
         
-        for (Class resourceClass : resourceClasses)
-            addRootResource(resourceClass);
-    }
-
-    private void addRootResource(Class<?> c) {
-        // Ignore if not a root resource
-        // TODO defer to the abstract model
-        // Note that a non root resource should not be added to the cache
-        if (c.getAnnotation(UriTemplate.class) == null) {
-            // TODO log warning
-            return;   
+        RulesMap<UriRule> rulesMap = new RulesMap<UriRule>();
+        
+        for (Class<?> c : classes) {
+            // Ignore if not a root resource
+            // TODO defer to the abstract model
+            // Note that a non root resource should not be added to the cache
+            if (c.getAnnotation(javax.ws.rs.UriTemplate.class) == null) {
+                // TODO log warning
+                continue;   
+            }
+            
+            ResourceClass r = getResourceClass(c);
+            
+            UriTemplate t = new PathTemplate(
+                    r.resource.getUriTemplate().getRawTemplate(),
+                    r.resource.getUriTemplate().isEncode());
+            
+            PathPattern p = new PathPattern(t, r.hasSubResources);
+                    
+            rulesMap.put(p, new RightHandPathRule(t.endsWithSlash(),
+                    new ResourceClassRule(t.getTemplateVariables(), c)));
         }
-
-        rootsRule.addRootResource(getResourceClass(c));
+        
+        return rulesMap;
     }
 
     /**

@@ -22,31 +22,43 @@
 
 package com.sun.ws.rest.impl.model.method;
 
-import static javax.ws.rs.HttpMethod.*;
 import com.sun.ws.rest.api.container.ContainerException;
 import com.sun.ws.rest.api.model.AbstractResourceMethod;
 import com.sun.ws.rest.impl.ImplMessages;
-import com.sun.ws.rest.impl.model.ResourceClass;
 import com.sun.ws.rest.impl.model.method.dispatch.ResourceMethodDispatcherFactory;
+import java.lang.reflect.Method;
+import java.util.List;
 
 /**
  *
  * @author Paul.Sandoz@Sun.Com
  */
-public final class ResourceHttpMethod extends ResourceJavaMethod {
+public final class ResourceHttpMethod extends ResourceMethod {
+    private final Method m;
+
+    public ResourceHttpMethod(AbstractResourceMethod method) {
+        this(null, method);
+    }
     
-    public ResourceHttpMethod(ResourceClass resourceClass, AbstractResourceMethod abstractResourceMethod) throws ContainerException {
-        super(resourceClass, abstractResourceMethod);
-        this.httpMethod = abstractResourceMethod.getHttpMethod();
+    public ResourceHttpMethod(List<String> templateVariables,
+            AbstractResourceMethod method) {
+        super(method.getHttpMethod(),
+                templateVariables,
+                method.getSupportedInputTypes(), 
+                method.getSupportedOutputTypes(),
+                ResourceMethodDispatcherFactory.create(method));
+
+        this.m = method.getMethod();
         
-        this.dispatcher = ResourceMethodDispatcherFactory.create(abstractResourceMethod);
-        if (dispatcher == null) {
-            String msg = ImplMessages.NOT_VALID_HTTPMETHOD(abstractResourceMethod.getMethod(), 
-                                                                httpMethod, 
-                                                                resourceClass);
+        if (getDispatcher() == null) {
+            String msg = ImplMessages.NOT_VALID_HTTPMETHOD(m,
+                    method.getHttpMethod(), m.getDeclaringClass());
             throw new ContainerException(msg);
         }
     }
     
-    
+    @Override
+    public String toString() {
+        return ImplMessages.RESOURCE_METHOD(m.getDeclaringClass(), m.getName());
+    }
 }

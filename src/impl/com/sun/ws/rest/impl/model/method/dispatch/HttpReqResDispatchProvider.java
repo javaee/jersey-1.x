@@ -26,7 +26,6 @@ import com.sun.ws.rest.api.core.HttpRequestContext;
 import com.sun.ws.rest.api.core.HttpResponseContext;
 import com.sun.ws.rest.api.model.AbstractResourceMethod;
 import com.sun.ws.rest.spi.dispatch.RequestDispatcher;
-import com.sun.ws.rest.impl.model.method.ResourceMethodData;
 import java.lang.reflect.InvocationTargetException;
 import javax.ws.rs.core.MediaType;
 

@@ -27,6 +27,7 @@ import javax.ws.rs.ProduceMime;
 import javax.ws.rs.core.MediaType;
 import com.sun.ws.rest.impl.http.header.AcceptMediaType;
 import com.sun.ws.rest.impl.provider.header.AcceptMediaTypeProvider;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -74,7 +75,8 @@ public final class MimeHelper {
      * Assumes each list is already ordered according to {@link #MEDIA_TYPE_COMPARATOR}
      * and therefore the least specific media type is at the end of the list.
      */
-    static public final Comparator<List<MediaType>> MEDIA_TYPE_LIST_COMPARATOR = new Comparator<List<MediaType>>() {
+    static public final Comparator<List<MediaType>> MEDIA_TYPE_LIST_COMPARATOR = 
+            new Comparator<List<MediaType>>() {
         public int compare(List<MediaType> o1, List<MediaType> o2) {
             return MEDIA_TYPE_COMPARATOR.compare(getLeastSpecific(o1), getLeastSpecific(o2));
         }
@@ -87,10 +89,11 @@ public final class MimeHelper {
     
     public static final MediaType GENERAL_MEDIA_TYPE = new MediaType("*", "*");
     
-    public static final MediaTypeList GENERAL_MEDIA_TYPE_LIST = createMediaTypeList();
+    public static final List<MediaType> GENERAL_MEDIA_TYPE_LIST = 
+            createMediaTypeList();
     
-    private static MediaTypeList createMediaTypeList() {
-        MediaTypeList l = new MediaTypeList();
+    private static List<MediaType> createMediaTypeList() {
+        List<MediaType> l = new ArrayList<MediaType>();
         l.add(GENERAL_MEDIA_TYPE);
         return l;
     }
@@ -99,16 +102,18 @@ public final class MimeHelper {
     /**
      * Comparator for MIME types with a quality parameter.
      */
-    static public final Comparator<AcceptMediaType> ACCEPT_MEDIA_TYPE_COMPARATOR = new Comparator<AcceptMediaType>() {
-        
+    static public final Comparator<AcceptMediaType> ACCEPT_MEDIA_TYPE_COMPARATOR 
+            = new Comparator<AcceptMediaType>() {
         public int compare(AcceptMediaType o1, AcceptMediaType o2) {
             return o2.getQ() - o1.getQ();
         }
     };
     
-    public static final AcceptMediaType GENERAL_ACCEPT_MEDIA_TYPE = new AcceptMediaType("*", "*");
+    public static final AcceptMediaType GENERAL_ACCEPT_MEDIA_TYPE = 
+            new AcceptMediaType("*", "*");
     
-    public static final List<MediaType> GENERAL_ACCEPT_MEDIA_TYPE_LIST = createAcceptMediaTypeList();
+    public static final List<MediaType> GENERAL_ACCEPT_MEDIA_TYPE_LIST = 
+            createAcceptMediaTypeList();
     
     private static List<MediaType> createAcceptMediaTypeList() {
         List<MediaType> l = new ArrayList<MediaType>();        
@@ -122,7 +127,7 @@ public final class MimeHelper {
      * @param mime the ConsumeMime annotation.
      * @return the list of MediaType, ordered according to {@link #MEDIA_TYPE_COMPARATOR}.
      */
-    public static MediaTypeList createMediaTypes(ConsumeMime mime) {
+    public static List<MediaType> createMediaTypes(ConsumeMime mime) {
         if (mime == null) {
             return GENERAL_MEDIA_TYPE_LIST;
         }
@@ -136,7 +141,7 @@ public final class MimeHelper {
      * @param mime the ProduceMime annotation.
      * @return the list of MediaType, ordered according to {@link #MEDIA_TYPE_COMPARATOR}.
      */
-    public static MediaTypeList createMediaTypes(ProduceMime mime) {
+    public static List<MediaType> createMediaTypes(ProduceMime mime) {
         if (mime == null) {
             return GENERAL_MEDIA_TYPE_LIST;
         }
@@ -150,8 +155,8 @@ public final class MimeHelper {
      * @param mediaTypes the array of MIME types.
      * @return the list of MediaType, ordered according to {@link #MEDIA_TYPE_COMPARATOR}.
      */
-    public static MediaTypeList createMediaTypes(String[] mediaTypes) {
-        MediaTypeList l = new MediaTypeList();
+    public static List<MediaType> createMediaTypes(String[] mediaTypes) {
+        List<MediaType> l = new ArrayList<MediaType>();
         for (String mediaType : mediaTypes) {
             l.add(new MediaType(mediaType));
         }
@@ -168,7 +173,8 @@ public final class MimeHelper {
      * @return The list of AcceptMediaType. If mediaTypes is null then a list with
      *         a single item of the media type "*\\/*" is returned.
      */
-    public static List<MediaType> createAcceptMediaTypes(String mediaTypes) throws java.text.ParseException {
+    public static List<MediaType> createAcceptMediaTypes(String mediaTypes) 
+            throws ParseException {
         if (mediaTypes == null || mediaTypes.length() == 0) {
             return GENERAL_ACCEPT_MEDIA_TYPE_LIST;
         }

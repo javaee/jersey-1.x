@@ -20,35 +20,42 @@
  *     "Portions Copyrighted [year] [name of copyright owner]"
  */
 
-package com.sun.ws.rest.impl.uri.rules;
+package com.sun.ws.rest.impl.model;
 
-import com.sun.ws.rest.impl.uri.PathPattern;
-import com.sun.ws.rest.spi.uri.rules.UriRules;
+import com.sun.ws.rest.impl.model.method.ResourceMethod;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import junit.framework.*;
 
 /**
- *
+ * A {@link HashMap} with HTTP methods as keys and {@link ResourceMethodList} 
+ * as values.
+ * 
  * @author Paul.Sandoz@Sun.Com
  */
-public class LinearMatchingTest extends AbstractMatchingTester {
-    
-    public LinearMatchingTest(String testName) {
-        super(testName);
-    }
-    
-    private class LinearRulesBuilder extends RulesBuilder {
-        protected UriRules<String> _build() {
-            List<PatternRulePair<String>> l = new ArrayList<PatternRulePair<String>>();
-            for (Map.Entry<PathPattern, String> e : rulesMap.entrySet())
-                l.add(new PatternRulePair<String>(e.getKey(), e.getValue()));            
-            return new LinearMatchingUriTemplateRules<String>(l);
+/* package */ final class ResourceMethodMap extends HashMap<String, List<ResourceMethod>> {
+    /**
+     * Merge a HTTP method and associated resource method.
+     * 
+     * @param method the resource method.
+     */
+    public void put(ResourceMethod method) {
+        List<ResourceMethod> l = get(method.getHttpMethod());
+        if (l == null) {
+            l = new ArrayList<ResourceMethod>();
+            put(method.getHttpMethod(), l);            
         }
+        l.add(method);
     }
     
-    protected RulesBuilder create() {
-        return new LinearRulesBuilder();
+    /**
+     * Sort the list methods for each value in the method map.
+     */
+    public void sort() {
+        for (Map.Entry<String, List<ResourceMethod>> e : entrySet()) {
+            Collections.sort(e.getValue(), ResourceMethod.COMPARATOR);
+        }
     }
 }

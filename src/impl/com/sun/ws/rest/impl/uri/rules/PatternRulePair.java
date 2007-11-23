@@ -19,24 +19,23 @@
  * enclosed by brackets [] replaced by your own identifying information:
  *     "Portions Copyrighted [year] [name of copyright owner]"
  */
-package com.sun.ws.rest.impl;
 
-import com.sun.ws.rest.api.uri.UriComponent;
-import junit.framework.*;
+package com.sun.ws.rest.impl.uri.rules;
+
+import com.sun.ws.rest.api.uri.UriPattern;
 
 /**
- *
+ * A tuple of a {@link UriPattern} and a generic rule.
+ * 
  * @author Paul.Sandoz@Sun.Com
  */
-public class UriComponentValidateTest extends TestCase {
+public class PatternRulePair<R> {
+    public final UriPattern p;
     
-    public UriComponentValidateTest(String testName) {
-        super(testName);
+    public final R r;
+    
+    public PatternRulePair(UriPattern p, R r) {
+        this.p = p;
+        this.r = r;
     }
-
-    public void testPath() {
-        assertEquals(false, UriComponent.valid("/x y", UriComponent.Type.PATH));
-        assertEquals(true, UriComponent.valid("/x20y", UriComponent.Type.PATH));
-        assertEquals(true, UriComponent.valid("/x%20y", UriComponent.Type.PATH));
-    }    
 }

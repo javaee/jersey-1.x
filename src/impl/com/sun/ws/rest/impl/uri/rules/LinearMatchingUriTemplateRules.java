@@ -22,15 +22,11 @@
 
 package com.sun.ws.rest.impl.uri.rules;
 
-import com.sun.ws.rest.spi.dispatch.UriTemplateType;
 import com.sun.ws.rest.spi.uri.rules.UriRules;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.NoSuchElementException;
-import java.util.TreeMap;
 
 /**
  * Rules associated with instances of {@link UriTemplateType) and matched 
@@ -38,23 +34,18 @@ import java.util.TreeMap;
  * 
  * @author Paul.Sandoz@Sun.Com
  */
-public class LinearMatchingUriTemplateRules<R> implements UriRules<UriTemplateType, R> {
-    private final Map<UriTemplateType, R> map = 
-            new TreeMap<UriTemplateType, R>(UriTemplateType.COMPARATOR);
+public final class LinearMatchingUriTemplateRules<R> implements UriRules<R> {
+    private final Collection<PatternRulePair<R>> rules;
 
-    public void add(UriTemplateType pattern, R rule) {
-        map.put(pattern, rule);
+    public LinearMatchingUriTemplateRules(Collection<PatternRulePair<R>> rules) {
+        this.rules = rules;
     }
-
-    public Collection<R> getRules() {
-        return Collections.unmodifiableCollection(map.values());
-    }
-
+    
     public Iterator<R> match(CharSequence path, List<String> capturingGroupValues) {
-        for (Map.Entry<UriTemplateType, R> e : map.entrySet()) {
+        for (PatternRulePair<R> prp : rules) {
             // Match each template
-            if (e.getKey().match(path, capturingGroupValues)) {
-                return new SingleEntryIterator<R>(e.getValue());
+            if (prp.p.match(path, capturingGroupValues)) {
+                return new SingleEntryIterator<R>(prp.r);
             }
         }
 

@@ -26,10 +26,10 @@ import com.sun.ws.rest.api.container.ContainerException;
 import com.sun.ws.rest.api.core.HttpRequestContext;
 import com.sun.ws.rest.api.core.HttpResponseContext;
 import com.sun.ws.rest.api.model.AbstractResourceMethod;
-import com.sun.ws.rest.impl.model.MediaTypeList;
 import com.sun.ws.rest.spi.dispatch.RequestDispatcher;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.List;
 import javax.ws.rs.core.MediaType;
 
 /**
@@ -40,14 +40,13 @@ public abstract class ResourceJavaMethodDispatcher implements RequestDispatcher 
 
     protected final Method method;
     
-    final private MediaTypeList produceMime;
+    final private List<MediaType> produceMime;
     
     final private MediaType mediaType;
 
     public ResourceJavaMethodDispatcher(AbstractResourceMethod abstractResourceMethod) {
         this.method = abstractResourceMethod.getMethod();
-        this.produceMime = new MediaTypeList();
-        this.produceMime.addAll(abstractResourceMethod.getSupportedOutputTypes());
+        this.produceMime = abstractResourceMethod.getSupportedOutputTypes();
         
         if (this.produceMime.size() == 1) {
             MediaType c = this.produceMime.get(0);

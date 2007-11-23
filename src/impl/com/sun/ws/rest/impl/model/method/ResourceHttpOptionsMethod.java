@@ -25,11 +25,10 @@ package com.sun.ws.rest.impl.model.method;
 import com.sun.ws.rest.api.core.HttpRequestContext;
 import com.sun.ws.rest.api.core.HttpResponseContext;
 import com.sun.ws.rest.spi.dispatch.RequestDispatcher;
-import com.sun.ws.rest.api.container.ContainerException;
 import com.sun.ws.rest.impl.ResponseBuilderImpl;
 import com.sun.ws.rest.impl.model.MimeHelper;
-import com.sun.ws.rest.impl.model.ResourceClass;
-import java.lang.reflect.Method;
+import java.util.List;
+import java.util.Map;
 import javax.ws.rs.core.Response;
 
 /**
@@ -37,9 +36,21 @@ import javax.ws.rs.core.Response;
  * @author Paul.Sandoz@Sun.Com
  */
 public final class ResourceHttpOptionsMethod extends ResourceMethod {
-    private final RequestDispatcher dispatcher;
     
-    private static class OptionsRequestDispatcher implements RequestDispatcher {
+    private static final String getAllow(Map<String, List<ResourceMethod>> methods) {
+        StringBuilder s = new StringBuilder();
+        boolean first = true;
+        for (String method : methods.keySet()) {
+            if (!first) s.append(",");
+            first = false;
+            
+            s.append(method);
+        }
+        
+        return s.toString();
+    }
+    
+    private static final class OptionsRequestDispatcher implements RequestDispatcher {
         private final String allow;
         
         OptionsRequestDispatcher(String allow) {
@@ -54,20 +65,16 @@ public final class ResourceHttpOptionsMethod extends ResourceMethod {
         }
     }
     
-    public ResourceHttpOptionsMethod(ResourceClass resourceClass, String allow) throws ContainerException {
-        super(resourceClass);
-        
-        this.httpMethod = "OPTIONS";
-        this.consumeMime = MimeHelper.GENERAL_MEDIA_TYPE_LIST;
-        this.produceMime = MimeHelper.GENERAL_MEDIA_TYPE_LIST;
-        this.dispatcher = new OptionsRequestDispatcher(allow);
+    public ResourceHttpOptionsMethod(Map<String, List<ResourceMethod>> methods) {
+        super("OPTIONS",
+                null,
+                MimeHelper.GENERAL_MEDIA_TYPE_LIST, 
+                MimeHelper.GENERAL_MEDIA_TYPE_LIST,
+                new OptionsRequestDispatcher(getAllow(methods)));
     }
     
-    public Method getMethod() {
-        return null;
+    @Override
+    public String toString() {
+        return "OPTIONS";
     }
-    
-    public RequestDispatcher getDispatcher() {
-        return dispatcher;
-    }    
 }

@@ -20,41 +20,37 @@
  *     "Portions Copyrighted [year] [name of copyright owner]"
  */
 
+
 package com.sun.ws.rest.impl.uri.rules;
 
+import com.sun.ws.rest.impl.uri.PathPattern;
+import com.sun.ws.rest.impl.uri.rules.automata.AutomataMatchingUriTemplateRules;
 import com.sun.ws.rest.spi.uri.rules.UriRule;
-import com.sun.ws.rest.spi.uri.rules.UriRuleContext;
-import java.util.Iterator;
+import com.sun.ws.rest.spi.uri.rules.UriRules;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
- * The rule for accepting a resource class.
- * 
+ *
  * @author Paul.Sandoz@Sun.Com
  */
-public final class ResourceClassRule extends BaseRule {
-
-    private final Class resourceClass;
+public final class UriRulesFactory {
+    private UriRulesFactory() {}
     
-    public ResourceClassRule(List<String> groupNames, Class resourceClass) {
-        super(groupNames);
-        this.resourceClass = resourceClass;
+    public static UriRules<UriRule> create(Map<PathPattern, UriRule> rulesMap) {
+        List<PatternRulePair<UriRule>> l = new ArrayList<PatternRulePair<UriRule>>();
+        for (Map.Entry<PathPattern, UriRule> e : rulesMap.entrySet())
+            l.add(new PatternRulePair<UriRule>(e.getKey(), e.getValue()));
+
+        return create(l);
     }
     
-    public boolean accept(CharSequence path, Object resource, UriRuleContext context) {
-        // Set the template values
-        setTemplateValues(context);
-
-        // Get the resource instance from the resource class
-        resource = context.getResource(resourceClass);
-        
-        // Match sub-rules on the resource class
-        final Iterator<UriRule> matches = context.getRules(resourceClass).
-                match(path, context.getGroupValues());
-        while(matches.hasNext())
-            if(matches.next().accept(path, resource, context))
-                return true;
-        
-        return false;
+    public static UriRules<UriRule> create(List<PatternRulePair<UriRule>> rules) {
+        if (rules.size() < 8) {
+            return new LinearMatchingUriTemplateRules<UriRule>(rules);
+        } else {
+            return new AutomataMatchingUriTemplateRules<UriRule>(rules);
+        }
     }
 }

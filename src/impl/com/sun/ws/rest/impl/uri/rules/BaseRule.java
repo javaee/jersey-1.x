@@ -20,31 +20,30 @@
  *     "Portions Copyrighted [year] [name of copyright owner]"
  */
 
-package com.sun.ws.rest.spi.uri.rules;
+package com.sun.ws.rest.impl.uri.rules;
 
-import java.util.Iterator;
+import com.sun.ws.rest.spi.uri.rules.UriRule;
+import com.sun.ws.rest.spi.uri.rules.UriRuleContext;
 import java.util.List;
 
 /**
- * A collection of URI rules that can be matched using associated patterns.
- * <p>
- * The precedence of the rules and the type of patterns is specified by an 
- * implementation of this interface.
+ * Abstract class for a rule that manages capturing group names.
  * 
  * @author Paul.Sandoz@Sun.Com
  */
-public interface UriRules<R> {
+public abstract class BaseRule implements UriRule {
+    private final List<String> groupNames;
+    
+    public BaseRule(List<String> groupNames) {
+        assert groupNames != null;
+        
+        this.groupNames = groupNames;
+    }
+    
     /**
-     * Match a URI path to the collection of rules and iterate over
-     * the matching rules.
-     *
-     * @param path the URI path to be matched
-     * @param capturingGroupValues the list to store the values of a pattern's 
-     *        capturing groups. This list will be cleared and modified each time 
-     *        {@link Iterator#next} is called according to the pattern 
-     *        associated with the returned rule. The values are stored in
-     *        the same order as the pattern's capturing groups.
-     * @return an iterator of matching rules
+     * Set the URI temaplte values.
      */
-    Iterator<R> match(CharSequence path, List<String> capturingGroupValues);
+    protected final void setTemplateValues(UriRuleContext context) {
+        context.setTemplateValues(groupNames);
+    }
 }

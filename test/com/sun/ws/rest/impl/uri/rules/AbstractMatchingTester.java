@@ -22,7 +22,9 @@
 
 package com.sun.ws.rest.impl.uri.rules;
 
-import com.sun.ws.rest.spi.dispatch.UriTemplateType;
+import com.sun.ws.rest.impl.model.RulesMap;
+import com.sun.ws.rest.impl.uri.PathPattern;
+import com.sun.ws.rest.api.uri.UriTemplate;
 import com.sun.ws.rest.spi.uri.rules.UriRules;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -35,25 +37,62 @@ import junit.framework.*;
  */
 public abstract class AbstractMatchingTester extends TestCase {
     
-    protected UriRules<UriTemplateType, String> resolver;
+    protected UriRules<String> rules;
 
     final List<String> groupValues = new ArrayList<String>();
     
     public AbstractMatchingTester(String testName) {
         super(testName);
-        
-        resolver = new LinearMatchingUriTemplateRules<String>();
     }
 
+    protected abstract class RulesBuilder {
+        protected RulesMap<String> rulesMap = new RulesMap<String>();
+        
+        public RulesBuilder add(UriTemplate t, String s) {
+            return add(t, true, s);
+        }
+        
+        public RulesBuilder add(UriTemplate t, boolean limited, String s) {
+            rulesMap.put(new PathPattern(t, limited), s);
+            return this;
+        }
+        
+        public RulesBuilder add(PathPattern p, String s) {
+            rulesMap.put(p, s);
+            return this;
+        }
+
+        public void build() {
+            rules = _build();
+        }
+        
+        protected abstract UriRules<String> _build();
+    }
+    
+    public final RulesBuilder add(UriTemplate t, String s) {
+        return create().add(t, s);
+    }
+    
+    public final RulesBuilder add(UriTemplate t, boolean limited, String s) {
+        return create().add(t, limited, s);
+    }
+    
+    public final RulesBuilder add(PathPattern p, String s) {
+        return create().add(p, s);
+    }
+    
+    protected abstract RulesBuilder create();
+    
     protected String match(CharSequence path) {
-        Iterator<String> i = resolver.match(path, groupValues);
+        Iterator<String> i = rules.match(path, groupValues);
         if (!i.hasNext())
             return null;
         return i.next();
     }
     
     public void testNull() {
-        resolver.add(UriTemplateType.NULL, "MATCH");
+        add(PathPattern.EMPTY_PATH, "MATCH").
+                build();
         
         String s = match("");
         
@@ -62,7 +101,8 @@ public abstract class AbstractMatchingTester extends TestCase {
     }
     
     public void testSlash() {
-        resolver.add(new UriTemplateType("/", UriTemplateType.RIGHT_SLASHED_REGEX), "MATCH");
+        add(new UriTemplate("/"), false, "MATCH").
+                build();
         
         String s = match("/");
         
@@ -72,7 +112,8 @@ public abstract class AbstractMatchingTester extends TestCase {
     }
     
     public void testSlashWithMorePath() {
-        resolver.add(new UriTemplateType("/", UriTemplateType.RIGHT_HANDED_REGEX), "MATCH");
+        add(new UriTemplate("/"), "MATCH").
+                build();
         
         String s = match("/a/b/c/d");
         
@@ -82,7 +123,8 @@ public abstract class AbstractMatchingTester extends TestCase {
     }
     
     public void testLiteralTemplateWithMorePath() {
-        resolver.add(new UriTemplateType("/a", UriTemplateType.RIGHT_HANDED_REGEX), "MATCH");
+        add(new UriTemplate("/a"), "MATCH").
+                build();
         
         StringBuilder path = new StringBuilder("/a/b/c/d");
         String s = match("/a/b/c/d");
@@ -93,7 +135,8 @@ public abstract class AbstractMatchingTester extends TestCase {
     }
     
     public void testSingleTemplate() {
-        resolver.add(new UriTemplateType("/{t}", UriTemplateType.RIGHT_HANDED_REGEX), "MATCH");
+        add(new UriTemplate("/{t}"), "MATCH").
+                build();
         
         String s = match("/a");
         
@@ -104,7 +147,8 @@ public abstract class AbstractMatchingTester extends TestCase {
     }
     
     public void testSingleTemplateWithMorePath() {
-        resolver.add(new UriTemplateType("/{t}", UriTemplateType.RIGHT_HANDED_REGEX), "MATCH");
+        add(new UriTemplate("/{t}"), "MATCH").
+                build();
         
         String s = match("/a/b/c/d");
         
@@ -115,10 +159,11 @@ public abstract class AbstractMatchingTester extends TestCase {
     }
     
     public void testMultipleTemplates() {
-        resolver.add(new UriTemplateType("/-{p1}-/-{p2}-/-{p3}-", UriTemplateType.RIGHT_HANDED_REGEX), "/-{p1}-/-{p2}-/-{p3}-");        
-        resolver.add(new UriTemplateType("/{p1}/{p2}/{p3}", UriTemplateType.RIGHT_HANDED_REGEX), "/{p1}/{p2}/{p3}");        
-        resolver.add(new UriTemplateType("/{p1}/{p2}", UriTemplateType.RIGHT_HANDED_REGEX), "/{p1}/{p2}");        
-        resolver.add(new UriTemplateType("/{p1}", UriTemplateType.RIGHT_HANDED_REGEX), "/{p1}");        
+        add(new UriTemplate("/-{p1}-/-{p2}-/-{p3}-"), "/-{p1}-/-{p2}-/-{p3}-")     
+        .add(new UriTemplate("/{p1}/{p2}/{p3}"), "/{p1}/{p2}/{p3}")
+        .add(new UriTemplate("/{p1}/{p2}"), "/{p1}/{p2}")
+        .add(new UriTemplate("/{p1}"), "/{p1}").
+                build();
 
         String s = match("/-a-/-b-/-c-");
         assertEquals("/-{p1}-/-{p2}-/-{p3}-", s);
@@ -185,10 +230,11 @@ public abstract class AbstractMatchingTester extends TestCase {
     }
     
     public void testMultipleTemplatesWithExplicitPath() {
-        resolver.add(new UriTemplateType("/{p1}", UriTemplateType.RIGHT_HANDED_REGEX), "/{p1}");        
-        resolver.add(new UriTemplateType("/edit", UriTemplateType.RIGHT_HANDED_REGEX), "/edit");        
-        resolver.add(new UriTemplateType("/edit/{p1}", UriTemplateType.RIGHT_HANDED_REGEX), "/edit/{p1}");        
-        resolver.add(new UriTemplateType("/edit/a{p1}", UriTemplateType.RIGHT_HANDED_REGEX), "/edit/a{p1}");        
+        add(new UriTemplate("/{p1}"), "/{p1}")  
+        .add(new UriTemplate("/edit"), "/edit")
+        .add(new UriTemplate("/edit/{p1}"), "/edit/{p1}")  
+        .add(new UriTemplate("/edit/a{p1}"), "/edit/a{p1}").
+                build();
         
         String s = match("/a");
         assertEquals("/{p1}", s);
@@ -221,8 +267,9 @@ public abstract class AbstractMatchingTester extends TestCase {
     }
     
     public void testTemplatesWithSlash() {
-        resolver.add(new UriTemplateType("/edit/", UriTemplateType.RIGHT_HANDED_REGEX), "/edit/");        
-        resolver.add(new UriTemplateType("/edit/{p1}/", UriTemplateType.RIGHT_HANDED_REGEX), "/edit/{p1}/");        
+        add(new UriTemplate("/edit/"), "/edit/")      
+        .add(new UriTemplate("/edit/{p1}/"), "/edit/{p1}/").
+                build();
         
         String s = match("/edit");
         assertEquals("/edit/", s);
@@ -236,8 +283,9 @@ public abstract class AbstractMatchingTester extends TestCase {
     }
 
     public void testTemplatesWithSameNumOfCharactersAndTemplates() {
-        resolver.add(new UriTemplateType("/a/{p1}/b", UriTemplateType.RIGHT_HANDED_REGEX), "/a/{p1}/b");        
-        resolver.add(new UriTemplateType("/a/{p1}/c", UriTemplateType.RIGHT_HANDED_REGEX), "/a/{p1}/c");  
+        add(new UriTemplate("/a/{p1}/b"), "/a/{p1}/b")        
+        .add(new UriTemplate("/a/{p1}/c"), "/a/{p1}/c").
+                build();
       
         String s = match("/a/infix/b");
         assertEquals("/a/{p1}/b", s);

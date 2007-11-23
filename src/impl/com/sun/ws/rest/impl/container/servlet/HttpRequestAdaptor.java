@@ -23,7 +23,7 @@
 package com.sun.ws.rest.impl.container.servlet;
 
 import com.sun.ws.rest.api.container.ContainerException;
-import com.sun.ws.rest.api.core.UriComponent;
+import com.sun.ws.rest.api.uri.UriComponent;
 import com.sun.ws.rest.spi.container.AbstractContainerRequest;
 import java.io.IOException;
 import java.util.Enumeration;
