@@ -61,7 +61,7 @@ public final class GrizzlyRequestAdaptor  extends AbstractContainerRequest {
          */
         
         try {
-            this.completeUri = new URI(
+            this.baseUri = new URI(
                     request.scheme().toString(), 
                     null,
                     request.serverName().toString(), 
