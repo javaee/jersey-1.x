@@ -103,6 +103,8 @@ public final class ResourceClassScanner {
             } else if (child.getName().endsWith(".jar")) {
                 indexJar(child);
             } else if (child.getName().endsWith(".class")) {
+                System.out.println("C: " + child);
+
                 analyzeClassFile(child.toURI());
             }
         }        
@@ -186,7 +188,7 @@ public final class ResourceClassScanner {
         }
         
         public AnnotationVisitor visitAnnotation(String desc, boolean visible) {
-            isAnnotated = annotations.contains(desc);
+            isAnnotated |= annotations.contains(desc);
             return null;
         }
         
@@ -205,6 +207,7 @@ public final class ResourceClassScanner {
         }
         
         public void visitEnd() {
+            System.out.println("V: " + isScoped + " " + isAnnotated);
             if (isScoped && isAnnotated) {
                 // Correctly scoped and annotated
                 // add to list of root resource classes.
