@@ -146,7 +146,7 @@ public class DynamicResourceConfigTest extends TestCase {
     }
     
     private File createJarFile(String base, String... entries) throws IOException {
-        File tempJar = File.createTempFile("test", "jar");
+        File tempJar = File.createTempFile("test", ".jar");
         tempJar.deleteOnExit();
         JarOutputStream jos = new JarOutputStream(
                 new BufferedOutputStream(
