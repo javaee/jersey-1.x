@@ -108,7 +108,7 @@ public final class ContainerFactory {
     throws ContainerException, IllegalArgumentException {
         WebApplication wa = WebApplicationFactory.createWebApplication();
         
-        for (ContainerProvider<A> rp : ServiceFinder.find(ContainerProvider.class)) {
+        for (ContainerProvider<A> rp : ServiceFinder.find(ContainerProvider.class, true)) {
             A r = rp.createContainer(type, resourceConfig, wa);
             if (r != null) {
                 return r;
