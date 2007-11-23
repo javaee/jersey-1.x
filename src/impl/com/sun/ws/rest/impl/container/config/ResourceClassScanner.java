@@ -103,8 +103,6 @@ public final class ResourceClassScanner {
             } else if (child.getName().endsWith(".jar")) {
                 indexJar(child);
             } else if (child.getName().endsWith(".class")) {
-                System.out.println("C: " + child);
-
                 analyzeClassFile(child.toURI());
             }
         }        
@@ -207,7 +205,6 @@ public final class ResourceClassScanner {
         }
         
         public void visitEnd() {
-            System.out.println("V: " + isScoped + " " + isAnnotated);
             if (isScoped && isAnnotated) {
                 // Correctly scoped and annotated
                 // add to list of root resource classes.
