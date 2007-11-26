@@ -28,6 +28,7 @@ import com.sun.ws.rest.spi.dispatch.RequestDispatcher;
 import com.sun.ws.rest.spi.service.ServiceFinder;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.util.LinkedList;
 import java.util.logging.Logger;
 
 /**
@@ -38,15 +39,23 @@ public final class ResourceMethodDispatcherFactory {
     private static final Logger LOGGER = Logger.getLogger(ResourceMethodDispatcherFactory.class.getName());
     
     public static RequestDispatcher create(AbstractResourceMethod abstractResourceMethod) {
-        for (ResourceMethodDispatchProvider ip : ServiceFinder.find(ResourceMethodDispatchProvider.class)) {
+        LinkedList<ResourceMethodDispatchProvider> rmdps = 
+                new LinkedList<ResourceMethodDispatchProvider>();
+        for (ResourceMethodDispatchProvider rmdp : ServiceFinder.find(
+                ResourceMethodDispatchProvider.class, true))
+            rmdps.addFirst(rmdp);
+        
+        for (ResourceMethodDispatchProvider rmdp : rmdps) {
             try {
-                RequestDispatcher d = ip.create(abstractResourceMethod);
+                RequestDispatcher d = rmdp.create(abstractResourceMethod);
                 if (d != null)
                     return d;
             } catch (Exception e) {
                 StringWriter sw = new StringWriter();
                 
-                sw.write(ImplMessages.ERROR_PROCESSING_METHOD(abstractResourceMethod.getMethod(), ip.getClass().getName()));
+                sw.write(ImplMessages.ERROR_PROCESSING_METHOD(
+                        abstractResourceMethod.getMethod(), 
+                        rmdp.getClass().getName()));
                 PrintWriter pw = new PrintWriter(sw);
                 e.printStackTrace(pw);
                 pw.flush();
