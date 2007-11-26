@@ -46,6 +46,7 @@ public class AbstractResource implements UriTemplated {
             Constructor[] constructors = resourceClass.getConstructors();
             if (constructors.length > 0) {
                 // TODO: what about parameters?
+                //       currently parameters are processed by IntrospectionModeller
                 result = new AbstractResourceConstructor(constructors[0]);
             }
         } catch (SecurityException ex) {
