@@ -24,6 +24,7 @@ package com.sun.ws.rest.spi.resource;
 
 import com.sun.ws.rest.api.container.ContainerException;
 import com.sun.ws.rest.api.core.ResourceConfig;
+import com.sun.ws.rest.api.model.AbstractResource;
 import com.sun.ws.rest.impl.resource.PerRequestProvider;
 import java.lang.annotation.Annotation;
 import java.util.Map;
@@ -63,7 +64,7 @@ public class ResourceProviderFactory {
      * @throws IllegalArgumentException if the Java type of resource provider
      *         property is not Class<? extends ResourceProvider>.
      */
-    public ResourceProvider createProvider(Class resourceClass,
+    public ResourceProvider createProvider(AbstractResource resource,
             Map<String, Boolean> resourceFeatures,
             Map<String, Object> resourceProperties) {
         Class<? extends ResourceProvider> providerClass = null;
@@ -71,14 +72,14 @@ public class ResourceProviderFactory {
         // Use annotations to identify the correct provider, note that
         // @ResourceFactory is a meta-annotation so we look for annotations
         // on the annotations of the resource class
-        Annotation annotations[] = resourceClass.getAnnotations();
+        Annotation annotations[] = resource.getResourceClass().getAnnotations();
         for (Annotation a: annotations) {
             Class<?> annotationClass = a.annotationType();
             ResourceFactory rf = annotationClass.getAnnotation(ResourceFactory.class);
             if (rf != null && providerClass==null)
                 providerClass = rf.value();
             else if (rf != null && providerClass!=null)
-                throw new ContainerException(resourceClass.toString()+
+                throw new ContainerException(resource.getResourceClass().toString()+
                         " has multiple ResourceFactory annotations");
         }
         
@@ -107,7 +108,7 @@ public class ResourceProviderFactory {
         try {
             // create and stash a new instance of the desired provider
             ResourceProvider r = providerClass.newInstance();
-            r.init(resourceClass, resourceFeatures, resourceProperties);
+            r.init(resource, resourceFeatures, resourceProperties);
             return r;
         } catch (IllegalAccessException ex) {
             throw new ContainerException("Unable to create resource provider", ex);

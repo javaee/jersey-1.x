@@ -1,12 +1,12 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
- * 
- * Copyright 2007 Sun Microsystems, Inc. All rights reserved. 
- * 
+ *
+ * Copyright 2007 Sun Microsystems, Inc. All rights reserved.
+ *
  * The contents of this file are subject to the terms of the Common Development
  * and Distribution License("CDDL") (the "License").  You may not use this file
- * except in compliance with the License. 
- * 
+ * except in compliance with the License.
+ *
  * You can obtain a copy of the License at:
  *     https://jersey.dev.java.net/license.txt
  * See the License for the specific language governing permissions and
@@ -23,39 +23,35 @@
 package com.sun.ws.rest.impl.model.parameter;
 
 import com.sun.ws.rest.api.container.ContainerException;
+import com.sun.ws.rest.api.model.AbstractResourceConstructor;
+import com.sun.ws.rest.api.model.AbstractSubResourceLocator;
+import com.sun.ws.rest.api.model.Parameter;
 import com.sun.ws.rest.impl.ImplMessages;
-import com.sun.ws.rest.impl.model.ReflectionHelper;
-import java.lang.annotation.Annotation;
-import java.lang.reflect.AccessibleObject;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Method;
-import java.lang.reflect.Type;
 import java.util.List;
-import javax.ws.rs.Encoded;
 
 /**
  *
  * @author Paul.Sandoz@Sun.Com
  */
 public final class ParameterExtractorFactory {
-        
+    
     private ParameterExtractorFactory() {
     }
-
+    
     /**
      * Create parameter extractors for a Java method that is a sub-locator.
-     * 
+     *
      * @param m the Java method
      * @return the array of parameter extractors
      */
-    public static ParameterExtractor[] createExtractorsForSublocator(Method m) {
-        ParameterExtractor[] extractors = processParameters(m);
+    public static ParameterExtractor[] createExtractorsForSublocator(AbstractSubResourceLocator subResLocator) {
+        ParameterExtractor[] extractors = processParameters(subResLocator);
         for (ParameterExtractor extractor: extractors) {
             if (extractor == null) {
                 // This requires better message
-                String msg = ImplMessages.NOT_VALID_DYNAMICRESOLVINGMETHOD(m, 
-                                                                    "", 
-                                                                    m.getDeclaringClass());
+                String msg = ImplMessages.NOT_VALID_DYNAMICRESOLVINGMETHOD(subResLocator.getMethod(),
+                        "",
+                        subResLocator.getMethod().getDeclaringClass());
                 throw new ContainerException(msg);
             }
         }
@@ -68,70 +64,33 @@ public final class ParameterExtractorFactory {
      * @param ctor the constructor of a resource class
      * @return the array of parameter extractors
      */
-    public static ParameterExtractor[] createExtractorsForConstructor(Constructor ctor) {
-        Class[] parameterTypes = ctor.getParameterTypes();
-        Type[] genericParameterTypes = ctor.getGenericParameterTypes();
-        Annotation[][] parameterAnnotations = ctor.getParameterAnnotations();
-        
-        return processParameters(ctor.getDeclaringClass(),
-                ctor,
-                parameterTypes, genericParameterTypes, parameterAnnotations);
+    public static ParameterExtractor[] createExtractorsForConstructor(AbstractResourceConstructor aRCtor) {
+        return processParameters(aRCtor.getParameters());
     }
     
-    private static ParameterExtractor[] processParameters(Method method) {
-        Class[] parameterTypes = method.getParameterTypes();
-        Type[] genericParameterTypes = method.getGenericParameterTypes();
-        Annotation[][] parameterAnnotations = method.getParameterAnnotations();
-        
-        return processParameters(method.getDeclaringClass(),
-                method,
-                parameterTypes, genericParameterTypes, parameterAnnotations);
+    
+    private static ParameterExtractor[] processParameters(AbstractSubResourceLocator subResLocator) {
+        return processParameters(subResLocator.getParameters());
     }
+    
+    
+    private static ParameterExtractor[] processParameters(List<Parameter> parameters) {
         
-    private static ParameterExtractor[] processParameters(
-            Class<?> declaringClass,
-            AccessibleObject accessible,
-            Class[] parameterTypes,
-            Type[] genericParameterTypes, Annotation[][] parameterAnnotations) {
-
-        ParameterExtractor[] extractors = new ParameterExtractor[parameterTypes.length];
-        for (int i = 0; i < parameterTypes.length; i++) {
-            extractors[i] = processParameter(
-                    declaringClass,
-                    accessible,
-                    parameterTypes[i], 
-                    genericParameterTypes[i], 
-                    parameterAnnotations[i]);
+        ParameterExtractor[] extractors = new ParameterExtractor[parameters.size()];
+        for (int i = 0; i < parameters.size(); i++) {
+            extractors[i] = processParameter(parameters.get(i));
         }
         
         return extractors;
     }
     
     @SuppressWarnings("unchecked")
-    private static ParameterExtractor processParameter(
-            Class<?> declaringClass,
-            AccessibleObject accessible,
-            Class<?> parameterClass, 
-            Type parameterType,  
-            Annotation[] parameterAnnotations) {
-
-        List<Annotation> l = AbstractParameterProcessor.getAnnotationList(parameterAnnotations);
+    private static ParameterExtractor processParameter(Parameter parameter) {
         
-        if (l.size() == 0) {
-            // A param annotation must be present.
-            return null;
-        } else if (l.size() > 1) {
-            // Only one param annotation must be present
+        ParameterProcessor p = ParameterProcessorFactory.createParameterProcessor(parameter.getSource());
+        if (null == p) {
             return null;
         }
-
-        Annotation annotation = l.get(0);
-        ParameterProcessor p = AbstractParameterProcessor.PARAM_PROCESSOR_MAP.
-                get(annotation.annotationType());
-        boolean decode = !ReflectionHelper.hasAnnotation(
-                Encoded.class, parameterAnnotations,
-                declaringClass, accessible);
-        return p.process(decode, annotation, 
-                parameterClass, parameterType, parameterAnnotations);
+        return p.process(parameter);
     }
 }

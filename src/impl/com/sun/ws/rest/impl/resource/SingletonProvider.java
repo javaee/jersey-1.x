@@ -23,6 +23,7 @@
 package com.sun.ws.rest.impl.resource;
 
 import com.sun.ws.rest.api.container.ContainerException;
+import com.sun.ws.rest.api.model.AbstractResource;
 import com.sun.ws.rest.spi.resource.ResourceProviderContext;
 import com.sun.ws.rest.spi.resource.ResourceProvider;
 import java.util.Map;
@@ -32,14 +33,14 @@ import java.util.Map;
  */
 public class SingletonProvider implements ResourceProvider {
 
-    private Class<?> resourceClass;
+    private AbstractResource abstractResource;
     
     private Object resource;
     
-    public void init(Class<?> resourceClass,
+    public void init(AbstractResource abstractResource,
             Map<String, Boolean> resourceFeatures,
             Map<String, Object> resourceProperties) {
-        this.resourceClass = resourceClass;
+        this.abstractResource = abstractResource;
     }
 
     public Object getInstance(ResourceProviderContext context) {
@@ -47,7 +48,7 @@ public class SingletonProvider implements ResourceProvider {
             return resource;
 
         try {
-            resource = resourceClass.newInstance();
+            resource = abstractResource.getResourceClass().newInstance();
             context.injectDependencies(resource);
             return resource;
         } catch (InstantiationException ex) {

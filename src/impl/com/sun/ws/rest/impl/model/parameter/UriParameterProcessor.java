@@ -1,12 +1,12 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
- * 
- * Copyright 2007 Sun Microsystems, Inc. All rights reserved. 
- * 
+ *
+ * Copyright 2007 Sun Microsystems, Inc. All rights reserved.
+ *
  * The contents of this file are subject to the terms of the Common Development
  * and Distribution License("CDDL") (the "License").  You may not use this file
- * except in compliance with the License. 
- * 
+ * except in compliance with the License.
+ *
  * You can obtain a copy of the License at:
  *     https://jersey.dev.java.net/license.txt
  * See the License for the specific language governing permissions and
@@ -22,17 +22,14 @@
 
 package com.sun.ws.rest.impl.model.parameter;
 
-import javax.ws.rs.UriParam;
 import com.sun.ws.rest.api.core.HttpRequestContext;
-import java.lang.annotation.Annotation;
-import java.lang.reflect.Method;
-import java.lang.reflect.Type;
+import com.sun.ws.rest.api.model.Parameter;
 
 /**
  *
  * @author Paul.Sandoz@Sun.Com
  */
-public final class UriParameterProcessor extends AbstractParameterProcessor<UriParam> {
+public final class UriParameterProcessor implements ParameterProcessor {
     
     private static final class UriParameterExtractor implements ParameterExtractor {
         private final MultivaluedParameterExtractor extractor;
@@ -48,23 +45,19 @@ public final class UriParameterProcessor extends AbstractParameterProcessor<UriP
         }
     }
     
-    public ParameterExtractor process(boolean decode,
-            UriParam parameterAnnotation,
-            Class<?> parameter, 
-            Type parameterType, 
-            Annotation[] parameterAnnotations) {
-        String parameterName = parameterAnnotation.value();
+    public ParameterExtractor process(Parameter parameter) {
+        String parameterName = parameter.getSourceName();
         if (parameterName == null || parameterName.length() == 0) {
             // Invalid URI parameter name
             return null;
         }
         
-        MultivaluedParameterExtractor e = 
-                MultivaluedParameterProcessor.process(parameter, 
-                parameterType, parameterName);
+        MultivaluedParameterExtractor e = MultivaluedParameterProcessor.
+                process(parameter.getParameterClass(), parameter.getParameterType(), parameterName);
+        
         if (e == null)
             return null;
         
-        return new UriParameterExtractor(e, decode);
+        return new UriParameterExtractor(e, !parameter.isEncoded());
     }
 }

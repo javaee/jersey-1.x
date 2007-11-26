@@ -22,17 +22,14 @@
 
 package com.sun.ws.rest.impl.model.parameter;
 
-import javax.ws.rs.HeaderParam;
 import com.sun.ws.rest.api.core.HttpRequestContext;
-import java.lang.annotation.Annotation;
-import java.lang.reflect.Method;
-import java.lang.reflect.Type;
+import com.sun.ws.rest.api.model.Parameter;
 
 /**
  *
  * @author Paul.Sandoz@Sun.Com
  */
-public final class HeaderParameterProcessor extends AbstractParameterProcessor<HeaderParam> {
+public final class HeaderParameterProcessor implements ParameterProcessor {
 
     private static final class HeaderParameterExtractor implements ParameterExtractor {
         private MultivaluedParameterExtractor extractor;
@@ -46,20 +43,15 @@ public final class HeaderParameterProcessor extends AbstractParameterProcessor<H
         }
     }
     
-    public ParameterExtractor process(boolean decode,
-            HeaderParam parameterAnnotation,
-            Class<?> parameter, 
-            Type parameterType, 
-            Annotation[] parameterAnnotations) {
-        String parameterName = parameterAnnotation.value();
+    public ParameterExtractor process(Parameter parameter) {
+        String parameterName = parameter.getSourceName();
         if (parameterName == null || parameterName.length() == 0) {
             // Invalid header parameter name
             return null;
         }
         
-        MultivaluedParameterExtractor e = 
-                MultivaluedDefaultListParameterProcessor.process(parameterAnnotations, parameter, 
-                parameterType, parameterName);
+        MultivaluedParameterExtractor e =  MultivaluedDefaultListParameterProcessor.
+                process(parameter.getDefaultValue(), parameter.getParameterClass(), parameter.getParameterType(), parameterName);
         if (e == null)
             return null;
         

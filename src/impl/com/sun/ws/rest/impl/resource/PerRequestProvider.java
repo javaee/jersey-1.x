@@ -32,6 +32,8 @@
 package com.sun.ws.rest.impl.resource;
 
 import com.sun.ws.rest.api.container.ContainerException;
+import com.sun.ws.rest.api.model.AbstractResource;
+import com.sun.ws.rest.api.model.AbstractResourceConstructor;
 import com.sun.ws.rest.spi.resource.ResourceProvider;
 import com.sun.ws.rest.spi.resource.ResourceProviderContext;
 import java.lang.reflect.Constructor;
@@ -44,27 +46,26 @@ import java.util.Map;
  */
 public class PerRequestProvider  implements ResourceProvider {
 
-    private Class<?> resourceClass;
+    private AbstractResource abstractResource;
     
-    public void init(Class<?> resourceClass,
+    public void init(AbstractResource abstractResource,
             Map<String, Boolean> resourceFeatures,
             Map<String, Object> resourceProperties) {
-        this.resourceClass = resourceClass;
+        this.abstractResource = abstractResource;
     }
 
     public Object getInstance(ResourceProviderContext context) {
         try {
             Object resource = null;
             // get the public constructors
-            Constructor<?> constructors[] = resourceClass.getConstructors();
-            if (constructors.length==0)
-                resource = resourceClass.newInstance();
+            // TODO abstract resource keeps just one constructor, is it ok?
+            AbstractResourceConstructor arCtor = this.abstractResource.getConstructor();
+            if (null == arCtor)
+                resource = abstractResource.getResourceClass().newInstance();
             else {
                 // take the first constructor
-                // TODO be more systematic about choosing a constructor
-                Constructor<?> ctor = constructors[0];
-                Object[] params = context.getParameterValues(ctor);
-                resource=ctor.newInstance(params);
+                Object[] params = context.getParameterValues(arCtor);
+                resource = arCtor.getCtor().newInstance(params);
             }
             context.injectDependencies(resource);
             return resource;

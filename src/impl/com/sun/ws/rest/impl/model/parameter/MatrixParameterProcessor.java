@@ -22,11 +22,8 @@
 
 package com.sun.ws.rest.impl.model.parameter;
 
-import javax.ws.rs.MatrixParam;
 import com.sun.ws.rest.api.core.HttpRequestContext;
-import java.lang.annotation.Annotation;
-import java.lang.reflect.Method;
-import java.lang.reflect.Type;
+import com.sun.ws.rest.api.model.Parameter;
 import java.util.List;
 import javax.ws.rs.core.PathSegment;
 
@@ -34,7 +31,7 @@ import javax.ws.rs.core.PathSegment;
  *
  * @author Paul.Sandoz@Sun.Com
  */
-public final class MatrixParameterProcessor extends AbstractParameterProcessor<MatrixParam> {
+public final class MatrixParameterProcessor implements ParameterProcessor {
 
     private static final class MatrixParameterExtractor implements ParameterExtractor {
         private final MultivaluedParameterExtractor extractor;
@@ -56,23 +53,19 @@ public final class MatrixParameterProcessor extends AbstractParameterProcessor<M
         }
     }
     
-    public ParameterExtractor process(boolean decode,
-            MatrixParam parameterAnnotation,
-            Class<?> parameter, 
-            Type parameterType, 
-            Annotation[] parameterAnnotations) {
-        String parameterName = parameterAnnotation.value();
+    public ParameterExtractor process(Parameter parameter) {
+        String parameterName = parameter.getSourceName();
         if (parameterName == null || parameterName.length() == 0) {
             // Invalid header parameter name
             return null;
         }
         
-        MultivaluedParameterExtractor e = 
-                MultivaluedDefaultListParameterProcessor.process(parameterAnnotations, parameter, 
-                parameterType, parameterName);
+        MultivaluedParameterExtractor e =  MultivaluedDefaultListParameterProcessor.
+                process(parameter.getDefaultValue(), parameter.getParameterClass(), parameter.getParameterType(), parameterName);
+        
         if (e == null)
             return null;
         
-        return new MatrixParameterExtractor(e, decode);
+        return new MatrixParameterExtractor(e, !parameter.isEncoded());
     }
 }

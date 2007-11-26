@@ -22,11 +22,9 @@
 
 package com.sun.ws.rest.impl.model.parameter;
 
-import javax.ws.rs.DefaultValue;
 import com.sun.ws.rest.api.container.ContainerException;
 import com.sun.ws.rest.impl.ImplMessages;
 import com.sun.ws.rest.impl.model.ReflectionHelper;
-import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
@@ -38,9 +36,8 @@ import java.util.List;
  */
 public class MultivaluedDefaultListParameterProcessor {
     
-    public static MultivaluedParameterExtractor process(Annotation[] parameterAnnotations, Class<?> parameter, Type parameterType, String parameterName) {
-        String defaultValue = getDefaultValue(parameterAnnotations);
-        
+    public static MultivaluedParameterExtractor process(String defaultValue, Class<?> parameter, Type parameterType, String parameterName) {
+       
         if (parameter == List.class) {
             // Get the generic type of the list
             // If none default to String
@@ -113,15 +110,4 @@ public class MultivaluedDefaultListParameterProcessor {
                 
         return null;
     }
-
-    private static String getDefaultValue(final Annotation[] parameterAnnotations) {
-        DefaultValue dv = ReflectionHelper.getAnnotiationType(DefaultValue.class, parameterAnnotations);
-        String defaultValue = null;
-        if (dv != null) {
-            defaultValue = dv.value();
-            if (defaultValue.length() == 0)
-                defaultValue = null;
-        }
-        return defaultValue;
-    }    
 }

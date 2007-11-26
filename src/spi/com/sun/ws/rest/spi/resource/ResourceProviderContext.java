@@ -23,7 +23,7 @@
 package com.sun.ws.rest.spi.resource;
 
 import com.sun.ws.rest.api.container.ContainerException;
-import java.lang.reflect.Constructor;
+import com.sun.ws.rest.api.model.AbstractResourceConstructor;
 
 /**
  * Context for resource providers.
@@ -51,5 +51,5 @@ public interface ResourceProviderContext {
      * wishes to invoke
      * @return an array of values corresponding to the constructor parameters
      */
-    Object[] getParameterValues(Constructor ctor);
+    Object[] getParameterValues(AbstractResourceConstructor abstractResourceConstructor);
 }

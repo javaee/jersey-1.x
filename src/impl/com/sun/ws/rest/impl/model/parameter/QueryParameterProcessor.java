@@ -1,12 +1,12 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
- * 
- * Copyright 2007 Sun Microsystems, Inc. All rights reserved. 
- * 
+ *
+ * Copyright 2007 Sun Microsystems, Inc. All rights reserved.
+ *
  * The contents of this file are subject to the terms of the Common Development
  * and Distribution License("CDDL") (the "License").  You may not use this file
- * except in compliance with the License. 
- * 
+ * except in compliance with the License.
+ *
  * You can obtain a copy of the License at:
  *     https://jersey.dev.java.net/license.txt
  * See the License for the specific language governing permissions and
@@ -22,18 +22,15 @@
 
 package com.sun.ws.rest.impl.model.parameter;
 
-import javax.ws.rs.QueryParam;
 import com.sun.ws.rest.api.core.HttpRequestContext;
-import java.lang.annotation.Annotation;
-import java.lang.reflect.Method;
-import java.lang.reflect.Type;
+import com.sun.ws.rest.api.model.Parameter;
 
 /**
  *
  * @author Paul.Sandoz@Sun.Com
  */
-public final class QueryParameterProcessor extends AbstractParameterProcessor<QueryParam> {
-
+public final class QueryParameterProcessor implements ParameterProcessor {
+    
     private static final class QueryParameterExtractor implements ParameterExtractor {
         private final MultivaluedParameterExtractor extractor;
         private final boolean decode;
@@ -48,23 +45,19 @@ public final class QueryParameterProcessor extends AbstractParameterProcessor<Qu
         }
     }
     
-    public ParameterExtractor process(boolean decode,
-            QueryParam parameterAnnotation,
-            Class<?> parameter, 
-            Type parameterType, 
-            Annotation[] parameterAnnotations) {
-        String parameterName = parameterAnnotation.value();
+    public ParameterExtractor process(Parameter parameter) {
+        String parameterName = parameter.getSourceName();
         if (parameterName == null || parameterName.length() == 0) {
             // Invalid query parameter name
             return null;
         }
         
-        MultivaluedParameterExtractor e = 
-                MultivaluedDefaultListParameterProcessor.process(parameterAnnotations, parameter, 
-                parameterType, parameterName);
+        MultivaluedParameterExtractor e = MultivaluedDefaultListParameterProcessor.
+                process(parameter.getDefaultValue(), parameter.getParameterClass(), parameter.getParameterType(), parameterName);
+        
         if (e == null)
             return null;
         
-        return new QueryParameterExtractor(e, decode);
+        return new QueryParameterExtractor(e, !parameter.isEncoded());
     }
 }

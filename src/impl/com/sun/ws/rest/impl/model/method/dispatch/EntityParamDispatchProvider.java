@@ -27,18 +27,13 @@ import com.sun.ws.rest.api.container.ContainerException;
 import com.sun.ws.rest.api.core.HttpRequestContext;
 import com.sun.ws.rest.api.core.HttpResponseContext;
 import com.sun.ws.rest.api.model.AbstractResourceMethod;
+import com.sun.ws.rest.api.model.Parameter;
 import com.sun.ws.rest.impl.ResponseBuilderImpl;
-import com.sun.ws.rest.impl.model.ReflectionHelper;
 import com.sun.ws.rest.spi.dispatch.RequestDispatcher;
 import com.sun.ws.rest.impl.model.parameter.ParameterExtractor;
 import com.sun.ws.rest.impl.model.parameter.ParameterProcessor;
-import com.sun.ws.rest.impl.model.parameter.AbstractParameterProcessor;
-import java.lang.annotation.Annotation;
+import com.sun.ws.rest.impl.model.parameter.ParameterProcessorFactory;
 import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.lang.reflect.Type;
-import java.util.List;
-import javax.ws.rs.Encoded;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
@@ -168,83 +163,67 @@ public class EntityParamDispatchProvider implements ResourceMethodDispatchProvid
         }
         // Let through other methods
         
-        ParameterExtractor[] injectors = processParameters(abstractResourceMethod.getMethod(), requireNoEntityParameter);
-        if (injectors == null)
+        ParameterExtractor[] extractors = processParameters(abstractResourceMethod, requireNoEntityParameter);
+        if (extractors == null)
             return null;
         
         Class<?> returnType = abstractResourceMethod.getMethod().getReturnType();
         if (Response.class.isAssignableFrom(returnType)) {
-            return new ResponseOutInvoker(abstractResourceMethod, injectors);                
+            return new ResponseOutInvoker(abstractResourceMethod, extractors);                
         } else if (returnType != void.class) {
             if (returnType == Object.class) {
-                return new ObjectOutInvoker(abstractResourceMethod, injectors);
+                return new ObjectOutInvoker(abstractResourceMethod, extractors);
             } else {
-                return new TypeOutInvoker(abstractResourceMethod, injectors);
+                return new TypeOutInvoker(abstractResourceMethod, extractors);
             }
         } else if (requireReturnOfRepresentation) {
             return null;
         } else {
-            return new VoidOutInvoker(abstractResourceMethod, injectors);
+            return new VoidOutInvoker(abstractResourceMethod, extractors);
         }
     }
     
-    private ParameterExtractor[] processParameters(Method method,
+    private ParameterExtractor[] processParameters(AbstractResourceMethod method,
             boolean requireNoEntityParameter) {
-        Class[] parameterTypes = method.getParameterTypes();
-        Type[] genericParameterTypes = method.getGenericParameterTypes();
-        Annotation[][] parameterAnnotations = method.getParameterAnnotations();
         
-        ParameterExtractor[] injectors = new ParameterExtractor[parameterTypes.length];
-        for (int i = 0; i < parameterTypes.length; i++) {
-            injectors[i] = processParameter(
+        if ((null == method.getParameters()) || (0 == method.getParameters().size())) {
+            return new ParameterExtractor[0];
+        }
+        
+        ParameterExtractor[] extractors = new ParameterExtractor[method.getParameters().size()];
+        for (int i = 0; i < method.getParameters().size(); i++) {
+            extractors[i] = processParameter(
                     method,
-                    parameterTypes[i], 
-                    genericParameterTypes[i], 
-                    parameterAnnotations[i],
+                    method.getParameters().get(i),
                     requireNoEntityParameter);
             
-            if (injectors[i] == null)
+            if (extractors[i] == null)
                 return null;
         }
         
-        return injectors;
+        return extractors;
     }
 
     @SuppressWarnings("unchecked")
     private ParameterExtractor processParameter(
-            Method method,
-            Class<?> parameterClass, 
-            Type parameterType,  
-            Annotation[] parameterAnnotations, 
+            AbstractResourceMethod method,
+            Parameter parameter, 
             boolean requireNoEntityParameter) {
 
-        List<Annotation> l = AbstractParameterProcessor.getAnnotationList(parameterAnnotations);
-
-        if (l.isEmpty()) {
+        if (Parameter.Source.ENTITY == parameter.getSource()) {
             if (requireNoEntityParameter) {
                 // Entity as a method parameterClass is not required
                 return null;
             }
             
-            return new EntityExtractor(parameterClass);
-        }
-                
-        if (l.size() == 0) {
-            // A param annotation must be present.
-            return null;            
-        } else if (l.size() > 1) {
-            // Only one param annotation must be present
-            return null;
+            return new EntityExtractor(parameter.getParameterClass());
         }
 
-        Annotation annotation = l.get(0);
-        ParameterProcessor p = AbstractParameterProcessor.PARAM_PROCESSOR_MAP.get(annotation.annotationType());
-        if (p == null)
+        ParameterProcessor p = ParameterProcessorFactory.createParameterProcessor(parameter.getSource());
+        if (null == p) {
             return null;
-        boolean decode = !ReflectionHelper.hasAnnotation(
-                Encoded.class, parameterAnnotations,
-                method.getDeclaringClass(), method);
-        return p.process(decode, annotation, 
-                parameterClass, parameterType, parameterAnnotations);
+        }
+        
+        return p.process(parameter);
     }        
 }

@@ -22,6 +22,7 @@
 
 package com.sun.ws.rest.spi.resource;
 
+import com.sun.ws.rest.api.model.AbstractResource;
 import java.util.Map;
 
 /**
@@ -38,7 +39,7 @@ public interface ResourceProvider {
      * @param resourceFeatures the resource features
      * @param resourceFeatures the resource properties
      */
-    void init(Class<?> resourceClass,
+    void init(AbstractResource resource,
             Map<String, Boolean> resourceFeatures,
             Map<String, Object> resourceProperties);
     

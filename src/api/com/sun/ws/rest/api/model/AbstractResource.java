@@ -42,13 +42,13 @@ public class AbstractResource implements UriTemplated {
     private static AbstractResourceConstructor getDefaultConstructor(Class<?> resourceClass) {
         AbstractResourceConstructor result = null;
         try {
-            // TODO: what about the other ctors if the default no-arg constructor does not exist?
-            Constructor noArgCtor = resourceClass.getConstructor();
-            result = new AbstractResourceConstructor(noArgCtor);
+            // TODO: looks like a random selection :-(
+            Constructor[] constructors = resourceClass.getConstructors();
+            if (constructors.length > 0) {
+                // TODO: what about parameters?
+                result = new AbstractResourceConstructor(constructors[0]);
+            }
         } catch (SecurityException ex) {
-            // TODO: (log it?) and handle it somehow better
-            ex.printStackTrace();
-        } catch (NoSuchMethodException ex) {
             // TODO: (log it?) and handle it somehow better
             ex.printStackTrace();
         }

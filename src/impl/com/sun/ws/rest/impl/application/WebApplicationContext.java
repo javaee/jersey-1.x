@@ -26,6 +26,7 @@ import com.sun.ws.rest.api.container.ContainerException;
 import com.sun.ws.rest.api.core.HttpContextAccess;
 import com.sun.ws.rest.api.core.HttpRequestContext;
 import com.sun.ws.rest.api.core.HttpResponseContext;
+import com.sun.ws.rest.api.model.AbstractResourceConstructor;
 import com.sun.ws.rest.impl.ResponseBuilderImpl;
 import com.sun.ws.rest.impl.model.ResourceClass;
 import com.sun.ws.rest.impl.model.parameter.ParameterExtractor;
@@ -40,7 +41,6 @@ import com.sun.ws.rest.spi.uri.rules.UriRuleContext;
 import com.sun.ws.rest.spi.uri.rules.UriRules;
 import com.sun.ws.rest.spi.view.View;
 import java.io.IOException;
-import java.lang.reflect.Constructor;
 import java.util.ArrayList;
 import java.util.List;
 import javax.ws.rs.core.Response;
@@ -98,11 +98,11 @@ final class WebApplicationContext implements
         // TODO defer to other injection providers
     }    
 
-    public Object[] getParameterValues(Constructor ctor) {
+    public Object[] getParameterValues(AbstractResourceConstructor abstractResourceConstructor) {
         // TODO the extractors can be pre-calculated and associated with
         // the the resource class
         ParameterExtractor[] extractors = ParameterExtractorFactory.
-                createExtractorsForConstructor(ctor);
+                createExtractorsForConstructor(abstractResourceConstructor);
         Object[] values = new Object[extractors.length];
         for (int i = 0; i < extractors.length; i++) {
             if (extractors[i] == null)

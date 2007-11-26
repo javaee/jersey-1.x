@@ -83,8 +83,7 @@ public final class ResourceClass {
         
         this.config = config;
         
-        this.resolver = resolverFactory.createProvider(c,
-                config.getFeatures(), config.getProperties());
+        this.resolver = resolverFactory.createProvider(resource, config.getFeatures(), config.getProperties());
 
         boolean hasSubResources = false;
                 
@@ -163,10 +162,10 @@ public final class ResourceClass {
                     t,
                     locator.getUriTemplate().isLimited());
             
-            UriRule r = new SubLocatorRule(t.getTemplateVariables(),
+            UriRule r = new SubLocatorRule(
+                    t.getTemplateVariables(),
                     locator.getMethod(),
-                    ParameterExtractorFactory.createExtractorsForSublocator(
-                        locator.getMethod()));
+                    ParameterExtractorFactory.createExtractorsForSublocator(locator));
             
             rulesMap.put(p, new RightHandPathRule(t.endsWithSlash(), r));
         }
