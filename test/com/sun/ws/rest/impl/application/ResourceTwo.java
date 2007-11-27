@@ -22,13 +22,13 @@
 
 package com.sun.ws.rest.impl.application;
 
-import javax.ws.rs.UriTemplate;
+import javax.ws.rs.Path;
 import com.sun.ws.rest.api.core.HttpRequestContext;
 import com.sun.ws.rest.api.core.HttpResponseContext;
 import javax.ws.rs.HttpMethod;
 
 
-@UriTemplate("/resource2")
+@Path("/resource2")
 public class ResourceTwo {
     
     @HttpMethod("GET")

@@ -27,7 +27,7 @@ import com.sun.ws.rest.impl.client.ResourceProxy;
 import com.sun.ws.rest.impl.client.ResponseInBound;
 import javax.ws.rs.HttpMethod;
 import javax.ws.rs.ProduceMime;
-import javax.ws.rs.UriTemplate;
+import javax.ws.rs.Path;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
@@ -41,9 +41,9 @@ public class HeadSubResourceMethodTest extends AbstractResourceTester {
         super(testName);
     }
 
-    @UriTemplate("/")
+    @Path("/")
     static public class ResourceGetNoHead {
-        @UriTemplate("sub")
+        @Path("sub")
         @HttpMethod
         public String get() {
             return "GET";
@@ -59,15 +59,15 @@ public class HeadSubResourceMethodTest extends AbstractResourceTester {
         assertFalse(response.hasEntity());
     }
     
-    @UriTemplate("/")
+    @Path("/")
     static public class ResourceGetWithHead { 
-        @UriTemplate("sub")
+        @Path("sub")
         @HttpMethod
         public Response head() {
             return Response.Builder.ok().header("X-TEST", "HEAD").build();
         }
         
-        @UriTemplate("sub")
+        @Path("sub")
         @HttpMethod
         public Response get() {
             return Response.Builder.representation("GET").header("X-TEST", "GET").build();
@@ -84,16 +84,16 @@ public class HeadSubResourceMethodTest extends AbstractResourceTester {
         assertEquals("HEAD", response.getMetadata().getFirst("X-TEST"));
     }
     
-    @UriTemplate("/")
+    @Path("/")
     static public class ResourceGetWithProduceNoHead { 
-        @UriTemplate("sub")
+        @Path("sub")
         @HttpMethod
         @ProduceMime("application/foo")
         public String getFoo() {
             return "FOO";
         }
         
-        @UriTemplate("sub")
+        @Path("sub")
         @HttpMethod
         @ProduceMime("application/bar")
         public String getBar() {
@@ -118,31 +118,31 @@ public class HeadSubResourceMethodTest extends AbstractResourceTester {
         assertEquals(bar, response.getContentType());
     }
     
-    @UriTemplate("/")
+    @Path("/")
     static public class ResourceGetWithProduceWithHead { 
         
-        @UriTemplate("sub")
+        @Path("sub")
         @HttpMethod
         @ProduceMime("application/foo")
         public Response headFoo() {
             return Response.Builder.ok().header("X-TEST", "FOO-HEAD").build();
         }
         
-        @UriTemplate("sub")
+        @Path("sub")
         @HttpMethod
         @ProduceMime("application/foo")
         public Response getFoo() {
             return Response.Builder.representation("GET","application/foo").header("X-TEST", "FOO-GET").build();
         }
                 
-        @UriTemplate("sub")
+        @Path("sub")
         @HttpMethod
         @ProduceMime("application/bar")
         public Response headBar() {
             return Response.Builder.ok().header("X-TEST", "BAR-HEAD").build();
         }
         
-        @UriTemplate("sub")
+        @Path("sub")
         @HttpMethod
         @ProduceMime("application/bar")
         public Response getBar() {
@@ -169,16 +169,16 @@ public class HeadSubResourceMethodTest extends AbstractResourceTester {
         assertEquals("BAR-HEAD", response.getMetadata().getFirst("X-TEST").toString());
     }
     
-    @UriTemplate("/")
+    @Path("/")
     static public class ResourceGetWithProduceNoHeadDifferentSub { 
-        @UriTemplate("sub1")
+        @Path("sub1")
         @HttpMethod
         @ProduceMime("application/foo")
         public String getFoo() {
             return "FOO";
         }
         
-        @UriTemplate("sub2")
+        @Path("sub2")
         @HttpMethod
         @ProduceMime("application/bar")
         public String getBar() {

@@ -233,32 +233,32 @@ public abstract class AbstractContainerRequest implements ContainerRequest {
         }
     }
     
-    public URI getBase() {
+    public URI getBaseUri() {
         return baseUri;
     }
     
-    public UriBuilder getBaseBuilder() {
-        return UriBuilder.fromUri(getBase());
+    public UriBuilder getBaseUriBuilder() {
+        return UriBuilder.fromUri(getBaseUri());
     }
     
-    public URI getAbsolute() {
+    public URI getAbsolutePath() {
         if (absoluteUri != null) return absoluteUri;
         
-        return absoluteUri = getCompleteBuilder().encode(false).
+        return absoluteUri = getRequestUriBuilder().encode(false).
                 replaceQueryParams("").fragment("").
                 build();
     }
     
-    public UriBuilder getBuilder() {
-        return UriBuilder.fromUri(getAbsolute());
+    public UriBuilder getAbsolutePathBuilder() {
+        return UriBuilder.fromUri(getAbsolutePath());
     }
     
-    public URI getComplete() {
+    public URI getRequestUri() {
         return completeUri;
     }
     
-    public UriBuilder getCompleteBuilder() {
-        return UriBuilder.fromUri(getComplete());
+    public UriBuilder getRequestUriBuilder() {
+        return UriBuilder.fromUri(getRequestUri());
     }
     
     public MultivaluedMap<String, String> getTemplateParameters() {
@@ -297,13 +297,13 @@ public abstract class AbstractContainerRequest implements ContainerRequest {
                 return decodedQueryParameters;
             
             return decodedQueryParameters = extractQueryParameters(
-                    getComplete().getRawQuery(), true);
+                    getRequestUri().getRawQuery(), true);
         } else {
             if (encodedQueryParameters != null)
                 return encodedQueryParameters;
             
             return encodedQueryParameters = extractQueryParameters(
-                    getComplete().getRawQuery(), false);
+                    getRequestUri().getRawQuery(), false);
         }
     }
     

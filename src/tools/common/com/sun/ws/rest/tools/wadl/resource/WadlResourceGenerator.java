@@ -37,7 +37,7 @@ import com.sun.codemodel.JVar;
 import com.sun.ws.rest.tools.annotation.AnnotationProcessorContext;
 import javax.ws.rs.HttpMethod;
 import javax.ws.rs.ProduceMime;
-import javax.ws.rs.UriTemplate;
+import javax.ws.rs.Path;
 import com.sun.ws.rest.impl.wadl.WadlReader;
 import com.sun.ws.rest.tools.FilerCodeWriter;
 import java.io.IOException;
@@ -88,7 +88,7 @@ public class WadlResourceGenerator {
             doc.add("of all of the other resources\n");
             // annotations
             cls.annotate(ProduceMime.class).param("value", WADL_MEDIA_TYPE);
-            cls.annotate(UriTemplate.class).param("value", "/application.wadl");
+            cls.annotate(Path.class).param("value", "/application.wadl");
             // fields
             JFieldVar uriInfo = cls.field(JMod.PUBLIC, UriInfo.class, "uriInfo");
             uriInfo.annotate(HttpContext.class);
@@ -100,7 +100,7 @@ public class WadlResourceGenerator {
             getWadl.annotate(HttpMethod.class).param("value","GET");
             JBlock body = getWadl.body();
             JVar is = body.decl(inputStream, "is", JExpr._this().invoke("getClass").invoke("getResourceAsStream").arg("application.wadl"));
-            JVar str = body.decl(cm.ref(String.class), "str", wadlReader.staticInvoke("read").arg(is).arg(uriInfo.invoke("getBase")));
+            JVar str = body.decl(cm.ref(String.class), "str", wadlReader.staticInvoke("read").arg(is).arg(uriInfo.invoke("getBaseUri")));
             // TODO patch baseURI in WADL to that of Servlet root
             body._return(str);
             cm.build(cw);

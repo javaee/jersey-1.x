@@ -29,13 +29,13 @@ import javax.activation.FileDataSource;
 import javax.ws.rs.HttpMethod;
 import javax.ws.rs.ProduceMime;
 import javax.ws.rs.UriParam;
-import javax.ws.rs.UriTemplate;
+import javax.ws.rs.Path;
 import javax.ws.rs.core.HttpContext;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 
-@UriTemplate("/resource3/{arg1}/{arg2}")
+@Path("/resource3/{arg1}/{arg2}")
 public class ResourceBean3  {    
     @HttpContext UriInfo uriInfo;
     

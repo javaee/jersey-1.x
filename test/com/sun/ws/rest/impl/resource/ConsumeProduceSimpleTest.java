@@ -26,7 +26,7 @@ import com.sun.ws.rest.impl.AbstractResourceTester;
 import com.sun.ws.rest.api.core.HttpRequestContext;
 import com.sun.ws.rest.api.core.HttpResponseContext;
 import com.sun.ws.rest.impl.client.ResourceProxy;
-import javax.ws.rs.UriTemplate;
+import javax.ws.rs.Path;
 import javax.ws.rs.ConsumeMime;
 import javax.ws.rs.HttpMethod;
 import javax.ws.rs.ProduceMime;
@@ -42,7 +42,7 @@ public class ConsumeProduceSimpleTest extends AbstractResourceTester {
         super(testName);
     }
     
-    @UriTemplate("/{arg1}/{arg2}")
+    @Path("/{arg1}/{arg2}")
     @ConsumeMime("text/html")
     public static class ConsumeSimpleBean {
         @HttpMethod("POST")
@@ -61,7 +61,7 @@ public class ConsumeProduceSimpleTest extends AbstractResourceTester {
         }
     }
         
-    @UriTemplate("/{arg1}/{arg2}")
+    @Path("/{arg1}/{arg2}")
     @ProduceMime("text/html")
     public static class ProduceSimpleBean {
         @HttpMethod("GET")
@@ -80,7 +80,7 @@ public class ConsumeProduceSimpleTest extends AbstractResourceTester {
         }
     }
     
-    @UriTemplate("/{arg1}/{arg2}")
+    @Path("/{arg1}/{arg2}")
     @ConsumeMime("text/html")
     @ProduceMime("text/html")
     public static class ConsumeProduceSimpleBean {

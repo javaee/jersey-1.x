@@ -30,6 +30,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URLEncoder;
 import java.util.Map;
+import javax.ws.rs.Path;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriBuilderException;
 
@@ -145,8 +146,8 @@ public final class UriBuilderImpl extends UriBuilder {
 
     public UriBuilder path(Class resource) {
         @SuppressWarnings("unchecked")
-        javax.ws.rs.UriTemplate ut = (javax.ws.rs.UriTemplate)
-                resource.getAnnotation(javax.ws.rs.UriTemplate.class);
+        javax.ws.rs.Path ut = (javax.ws.rs.Path)
+                resource.getAnnotation(Path.class);
         appendPath(ut);
         return this;
     }
@@ -165,14 +166,14 @@ public final class UriBuilderImpl extends UriBuilder {
         if (found == null)
             throw new IllegalArgumentException();
         
-        appendPath(found.getAnnotation(javax.ws.rs.UriTemplate.class));
+        appendPath(found.getAnnotation(Path.class));
         
         return this;
     }
 
     public UriBuilder path(Method... methods) {
         for (Method m : methods)
-            appendPath(m.getAnnotation(javax.ws.rs.UriTemplate.class));
+            appendPath(m.getAnnotation(Path.class));
 
         return this;
     }
@@ -215,7 +216,7 @@ public final class UriBuilderImpl extends UriBuilder {
         return this;
     }
 
-    private void appendPath(javax.ws.rs.UriTemplate t) {
+    private void appendPath(Path t) {
         if (t == null)
             throw new IllegalArgumentException();
         

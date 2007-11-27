@@ -26,7 +26,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import javax.ws.rs.HttpMethod;
 import javax.ws.rs.ProduceMime;
-import javax.ws.rs.UriTemplate;
+import javax.ws.rs.Path;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.HttpContext;
 import javax.ws.rs.core.UriInfo;
@@ -40,7 +40,7 @@ import org.jdom.output.XMLOutputter;
  *
  * @author Paul.Sandoz@Sun.Com
  */
-@UriTemplate("/service")
+@Path("/service")
 @ProduceMime("application/atomserv+xml")
 public class ServiceResource {
     
@@ -68,7 +68,7 @@ public class ServiceResource {
     @HttpContext UriInfo uriInfo;
     
     private String getCollectionUri() {
-        return uriInfo.getBaseBuilder().path(FeedResource.class).
+        return uriInfo.getBaseUriBuilder().path(FeedResource.class).
                 build().toString();
     }
 }

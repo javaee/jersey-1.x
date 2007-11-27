@@ -25,7 +25,7 @@ package com.sun.ws.rest.impl.resource;
 import com.sun.ws.rest.impl.AbstractResourceTester;
 import com.sun.ws.rest.impl.client.ResourceProxy;
 import javax.ws.rs.UriParam;
-import javax.ws.rs.UriTemplate;
+import javax.ws.rs.Path;
 import javax.ws.rs.HttpMethod;
 import javax.ws.rs.core.HttpContext;
 import javax.ws.rs.core.UriInfo;
@@ -40,7 +40,7 @@ public class ConstructorParamsTest extends AbstractResourceTester {
         super(testName);
     }
     
-    @UriTemplate("/{id}")
+    @Path("/{id}")
     public static class TestOneWebResourceBean {
         
         private String id;

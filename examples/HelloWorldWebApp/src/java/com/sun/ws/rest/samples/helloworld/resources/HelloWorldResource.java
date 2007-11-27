@@ -24,10 +24,10 @@ package com.sun.ws.rest.samples.helloworld.resources;
 
 import javax.ws.rs.HttpMethod;
 import javax.ws.rs.ProduceMime;
-import javax.ws.rs.UriTemplate;
+import javax.ws.rs.Path;
 
 // The Java class will be hosted at the URI path "/helloworld"
-@UriTemplate("/helloworld")
+@Path("/helloworld")
 public class HelloWorldResource {
 
     // The Java method will process HTTP GET requests

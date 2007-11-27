@@ -29,7 +29,7 @@ import javax.ws.rs.HttpMethod;
 import javax.ws.rs.ProduceMime;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.UriParam;
-import javax.ws.rs.UriTemplate;
+import javax.ws.rs.Path;
 import junit.framework.*;
 
 /**
@@ -42,31 +42,31 @@ public class CanonicalizationFeatureTest extends AbstractHttpServerTester {
         super(testName);
     }
     
-    @UriTemplate("test")
+    @Path("test")
     public static class TestWebResource {
         
-        @UriTemplate(value = "uri/{uriParam}", limited = false)
+        @Path(value = "uri/{uriParam}", limited = false)
         @HttpMethod
         @ProduceMime("text/plain")
         public String getUri(@UriParam("uriParam") String uri) {
             return uri;
         }
 
-        @UriTemplate("slashes/{uriParam}/")
+        @Path("slashes/{uriParam}/")
         @HttpMethod
         @ProduceMime("text/plain")
         public String getSlashes(@UriParam("uriParam") String param) {
             return param;
         }
 
-        @UriTemplate("dblslashes//{uriParam}//")
+        @Path("dblslashes//{uriParam}//")
         @HttpMethod
         @ProduceMime("text/plain")
         public String getDblSlashes(@UriParam("uriParam") String param) {
             return param;
         }
         
-        @UriTemplate("qparam/a")
+        @Path("qparam/a")
         @HttpMethod
         @ProduceMime("text/plain")
         public String getQParam(@QueryParam("qParam") String param) {

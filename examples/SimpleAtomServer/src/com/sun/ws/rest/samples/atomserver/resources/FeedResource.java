@@ -32,7 +32,7 @@ import javax.ws.rs.ConsumeMime;
 import javax.ws.rs.HttpMethod;
 import javax.ws.rs.ProduceMime;
 import javax.ws.rs.UriParam;
-import javax.ws.rs.UriTemplate;
+import javax.ws.rs.Path;
 import javax.ws.rs.core.HttpContext;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.Response;
@@ -43,30 +43,30 @@ import javax.ws.rs.core.UriInfo;
  *
  * @author Paul.Sandoz@Sun.Com
  */
-@UriTemplate("/collection/")
+@Path("/collection/")
 @ProduceMime("application/atom+xml")
 public class FeedResource {
     @HttpContext UriInfo uriInfo;
 
     
-    @UriTemplate("{entry}")
+    @Path("{entry}")
     public EntryResource getEntryResource(@UriParam("entry") String entryId) {
         return new EntryResource(entryId);
     }
     
-    @UriTemplate("edit/{entry}")
+    @Path("edit/{entry}")
     public EntryResource getEditEntryResource(@UriParam("entry") String entryId) {
         return new EditEntryResource(entryId, uriInfo);
     }
         
     private UriBuilder getEditUriBuilder() {
-        return uriInfo.getBuilder().path("edit");
+        return uriInfo.getAbsolutePathBuilder().path("edit");
     }
         
 //   Uncomment the following methods, and comment out the above equivalent 
 //   methods, to support optimisitic concurrency when updating entries
     
-//    @UriTemplate("edit/{version}/{entry}")
+//    @Path("edit/{version}/{entry}")
 //    public EntryResource getEditEntryResource(
 //            @UriParam("entry") String entryId,
 //            @UriParam("version") int version) throws FeedException {
@@ -74,13 +74,13 @@ public class FeedResource {
 //    }
 //    
 //    private UriBuilder getEditUriBuilder() {
-//        return uriInfo.getBuilder().path("edit/0");
+//        return uriInfo.getAbsolutePathBuilder().path("edit/0");
 //    }
     
     
     @HttpMethod
     public Feed getFeed() throws IOException, FeedException {
-        return AtomStore.getFeedDocument(uriInfo.getAbsolute());
+        return AtomStore.getFeedDocument(uriInfo.getAbsolutePath());
     }
 
     @HttpMethod
@@ -90,7 +90,7 @@ public class FeedResource {
         String entryId = FileStore.FS.getNextId();
         
         // Set the self link 
-        URI entryUri = uriInfo.getBuilder().
+        URI entryUri = uriInfo.getAbsolutePathBuilder().
                 path(entryId).build();
         AtomStore.addLink(e, "self", entryUri);
         
@@ -106,7 +106,7 @@ public class FeedResource {
         AtomStore.createEntryDocument(entryId, e);
 
         // Update the feed document with the entry
-        Feed f = AtomStore.getFeedDocument(uriInfo.getAbsolute());
+        Feed f = AtomStore.getFeedDocument(uriInfo.getAbsolutePath());
         AtomStore.updateFeedDocumentWithNewEntry(f, e);
         
         // Return 201 Created
@@ -123,7 +123,7 @@ public class FeedResource {
         // Create a default entry
         Entry e = AtomStore.createDefaulMediaLinkEntryDocument();
                 
-        UriBuilder entryUriBuilder = uriInfo.getBuilder().path(entryId);
+        UriBuilder entryUriBuilder = uriInfo.getAbsolutePathBuilder().path(entryId);
         UriBuilder editEntryUriBuilder = getEditUriBuilder().path(entryId);
         
         // Set the self link
@@ -157,7 +157,7 @@ public class FeedResource {
         AtomStore.createMediaDocument(entryId, entry);
         
         // Update the feed document with the entry
-        Feed f = AtomStore.getFeedDocument(uriInfo.getAbsolute());
+        Feed f = AtomStore.getFeedDocument(uriInfo.getAbsolutePath());
         AtomStore.updateFeedDocumentWithNewEntry(f, e);
         
         // Return 201 Created

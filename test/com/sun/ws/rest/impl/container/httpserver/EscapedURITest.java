@@ -22,7 +22,7 @@
 
 package com.sun.ws.rest.impl.container.httpserver;
 
-import javax.ws.rs.UriTemplate;
+import javax.ws.rs.Path;
 import com.sun.ws.rest.impl.client.ResourceProxy;
 import javax.ws.rs.HttpMethod;
 import javax.ws.rs.core.HttpContext;
@@ -34,12 +34,12 @@ import junit.framework.*;
  * @author Paul.Sandoz@Sun.Com
  */
 public class EscapedURITest extends AbstractHttpServerTester {
-    @UriTemplate(value="x%20y", encode=false)
+    @Path(value="x%20y", encode=false)
     public static class EscapedURIResource {
         @HttpMethod
         public String get(@HttpContext UriInfo info) {
-            assertEquals(CONTEXT + "/x%20y", info.getAbsolute().getRawPath());
-            assertEquals(CONTEXT + "/", info.getBase().getRawPath());
+            assertEquals(CONTEXT + "/x%20y", info.getAbsolutePath().getRawPath());
+            assertEquals(CONTEXT + "/", info.getBaseUri().getRawPath());
             assertEquals("x y", info.getPath());
             assertEquals("x%20y", info.getPath(false));
             return "CONTENT";

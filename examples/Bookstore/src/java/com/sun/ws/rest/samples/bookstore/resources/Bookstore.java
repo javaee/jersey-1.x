@@ -28,9 +28,9 @@ import com.sun.ws.rest.spi.resource.Singleton;
 import java.util.Map;
 import java.util.TreeMap;
 import javax.ws.rs.UriParam;
-import javax.ws.rs.UriTemplate;
+import javax.ws.rs.Path;
 
-@UriTemplate("/")
+@Path("/")
 @Views({"index.jsp", "count.jsp", "time.jsp"})
 @Singleton
 public class Bookstore {    
@@ -48,7 +48,7 @@ public class Bookstore {
             new Track("Sarka",32)}));
     }
     
-    @UriTemplate("items/{itemid}/")
+    @Path("items/{itemid}/")
     public Item getItem(@UriParam("itemid") String itemid) {
         Item i = getItems().get(itemid);
         if (i == null)

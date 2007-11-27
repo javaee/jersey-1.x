@@ -25,7 +25,6 @@ package com.sun.ws.rest.impl.model;
 import com.sun.ws.rest.impl.ImplMessages;
 import javax.ws.rs.ConsumeMime;
 import javax.ws.rs.ProduceMime;
-import javax.ws.rs.UriTemplate;
 import javax.ws.rs.HttpMethod;
 import com.sun.ws.rest.api.container.ContainerException;
 import java.lang.reflect.Method;
@@ -41,11 +40,6 @@ public final class ErrorHelper {
         return new ContainerException(ImplMessages.OBJECT_NOT_A_WEB_RESOURCE(resourceClass.getName()));
     }
     
-    public static ContainerException badURITemplate(Exception e, Class resourceClass, UriTemplate t) {
-        return new ContainerException(ImplMessages.BAD_URITEMPLATE(resourceClass, 
-                                                                             t.value()), e);
-    }
-            
     public static ContainerException badClassConsumeMime(Exception e, Class resourceClass, ConsumeMime c) {
         return new ContainerException(ImplMessages.BAD_CLASS_CONSUMEMIME(resourceClass,
                                                                                            c.value()), e);

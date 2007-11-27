@@ -26,7 +26,7 @@ import com.sun.ws.rest.impl.AbstractResourceTester;
 import javax.ws.rs.ConsumeMime;
 import javax.ws.rs.HttpMethod;
 import javax.ws.rs.ProduceMime;
-import javax.ws.rs.UriTemplate;
+import javax.ws.rs.Path;
 import com.sun.ws.rest.api.core.HttpResponseContext;
 import com.sun.ws.rest.impl.client.ResourceProxy;
 import com.sun.ws.rest.impl.client.ResponseInBound;
@@ -41,7 +41,7 @@ public class ClientErrorTest extends AbstractResourceTester {
         super(testName);
     }
 
-    @UriTemplate("/")
+    @Path("/")
     public static class WebResourceNotFoundMethodNotAllowed {
         @ProduceMime("application/foo")
         @HttpMethod("GET")
@@ -50,7 +50,7 @@ public class ClientErrorTest extends AbstractResourceTester {
         }
     }
         
-    @UriTemplate("/")
+    @Path("/")
     public static class WebResourceUnsupportedMediaType {
         @ConsumeMime("application/bar")
         @ProduceMime("application/foo")

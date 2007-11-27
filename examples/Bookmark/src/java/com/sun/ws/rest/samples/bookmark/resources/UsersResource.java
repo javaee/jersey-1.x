@@ -30,7 +30,7 @@ import javax.persistence.PersistenceUnit;
 import javax.ws.rs.HttpMethod;
 import javax.ws.rs.ProduceMime;
 import javax.ws.rs.UriParam;
-import javax.ws.rs.UriTemplate;
+import javax.ws.rs.Path;
 import javax.ws.rs.core.HttpContext;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
@@ -41,7 +41,7 @@ import org.codehaus.jettison.json.JSONArray;
  *
  * @author japod
  */
-@UriTemplate("/users/")
+@Path("/users/")
 //@Views({"index.jsp"})
 public class UsersResource {
     
@@ -58,7 +58,7 @@ public class UsersResource {
         return emf.createEntityManager().createQuery("SELECT u from UserEntity u").getResultList();
     }
     
-    @UriTemplate("{userid}/")
+    @Path("{userid}/")
     public UserResource getUser(@UriParam("userid") String userid) {
         return new UserResource(uriInfo, emf.createEntityManager(), userid);
     }
@@ -69,7 +69,7 @@ public class UsersResource {
         JSONArray uriArray = new JSONArray();
         UriBuilder ub = null;
         for (UserEntity userEntity : getUsers()) {
-            ub = (ub == null) ? uriInfo.getBuilder() : ub.clone();
+            ub = (ub == null) ? uriInfo.getAbsolutePathBuilder() : ub.clone();
             URI userUri = ub.
                     path(userEntity.getUserid()).
                     build();

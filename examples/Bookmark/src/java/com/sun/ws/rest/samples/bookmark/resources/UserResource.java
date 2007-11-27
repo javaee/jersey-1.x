@@ -30,7 +30,7 @@ import javax.persistence.EntityManager;
 import javax.ws.rs.ConsumeMime;
 import javax.ws.rs.HttpMethod;
 import javax.ws.rs.ProduceMime;
-import javax.ws.rs.UriTemplate;
+import javax.ws.rs.Path;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
@@ -57,7 +57,7 @@ public class UserResource {
         userEntity = em.find(UserEntity.class, userid);
     }
     
-    @UriTemplate("bookmarks/")
+    @Path("bookmarks/")
     public BookmarksResource getBookmarksResource() {
         if (null == userEntity) {
             throw new NotFoundException("userid " + userid + " does not exist!");
@@ -77,7 +77,7 @@ public class UserResource {
             .put("username", userEntity.getUsername())
             .put("email", userEntity.getEmail())
             .put("password", userEntity.getPassword())
-            .put("bookmarks", uriInfo.getBuilder().path("bookmarks").build());
+            .put("bookmarks", uriInfo.getAbsolutePathBuilder().path("bookmarks").build());
     }
     
     @HttpMethod("PUT")
@@ -107,7 +107,7 @@ public class UserResource {
             TransactionManager.manage(new Transactional(em) { public void transact() {
                 em.persist(userEntity);
             }});
-            rBuilder.created(uriInfo.getAbsolute());
+            rBuilder.created(uriInfo.getAbsolutePath());
         } else {
             TransactionManager.manage(new Transactional(em) { public void transact() {
                 em.merge(userEntity);

@@ -26,7 +26,7 @@ import com.sun.ws.rest.impl.AbstractResourceTester;
 import com.sun.ws.rest.impl.RequestHttpHeadersImpl;
 import java.net.URI;
 import javax.ws.rs.HttpMethod;
-import javax.ws.rs.UriTemplate;
+import javax.ws.rs.Path;
 import javax.ws.rs.core.HttpContext;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MultivaluedMap;
@@ -43,12 +43,12 @@ public class WebResorceWithParameterInjectionTest extends AbstractResourceTester
         super(testName);
     }
         
-    @UriTemplate("/{arg1}/{arg2}")
+    @Path("/{arg1}/{arg2}")
     public static class TestParameterInjectedUriInfo {
         @HttpMethod("GET")
         public String doGet(@HttpContext UriInfo uriInfo) {
-            URI baseUri = uriInfo.getBase();
-            URI uri = uriInfo.getAbsolute();
+            URI baseUri = uriInfo.getBaseUri();
+            URI uri = uriInfo.getAbsolutePath();
             assertEquals(BASE_URI, baseUri);
             assertEquals(UriBuilder.fromUri(BASE_URI).path("a/b").build(), uri);
 
@@ -56,7 +56,7 @@ public class WebResorceWithParameterInjectionTest extends AbstractResourceTester
         }        
     }
     
-    @UriTemplate("/{arg1}/{arg2}")
+    @Path("/{arg1}/{arg2}")
     public static class TestParameterInjectedHttpHeaders {
         @HttpMethod("GET")
         public String doGet(@HttpContext HttpHeaders httpHeaders) {
@@ -66,15 +66,15 @@ public class WebResorceWithParameterInjectionTest extends AbstractResourceTester
         }        
     }
         
-    @UriTemplate("/{arg1}/{arg2}")
+    @Path("/{arg1}/{arg2}")
     public static class TestParameterInjectedUriInfoHttpHeaders {
         @HttpMethod("GET")
         public String doGet(@HttpContext UriInfo uriInfo, @HttpContext HttpHeaders httpHeaders) {
             String value = httpHeaders.getRequestHeaders().getFirst("X-TEST");
             assertEquals("TEST", value);
             
-            URI baseUri = uriInfo.getBase();
-            URI uri = uriInfo.getAbsolute();
+            URI baseUri = uriInfo.getBaseUri();
+            URI uri = uriInfo.getAbsolutePath();
             assertEquals(BASE_URI, baseUri);
             assertEquals(UriBuilder.fromUri(BASE_URI).path("a/b").build(), uri);
             return "GET";

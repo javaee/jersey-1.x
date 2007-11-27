@@ -51,7 +51,7 @@ import javax.ws.rs.MatrixParam;
 import javax.ws.rs.ProduceMime;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.UriParam;
-import javax.ws.rs.UriTemplate;
+import javax.ws.rs.Path;
 import javax.ws.rs.core.HttpContext;
 
 /**
@@ -86,8 +86,8 @@ public class IntrospectionModeller {
     }
     
     public static final AbstractResource createResource(Class<?> resourceClass) {
-        final UriTemplate rUriTemplateAnnotation = resourceClass.getAnnotation(UriTemplate.class);
-        final boolean isRootResourceClass = (null != rUriTemplateAnnotation);
+        final Path rPathAnnotation = resourceClass.getAnnotation(Path.class);
+        final boolean isRootResourceClass = (null != rPathAnnotation);
         
         final boolean isEncodedAnotOnClass = (null != resourceClass.getAnnotation(Encoded.class));
         
@@ -95,7 +95,7 @@ public class IntrospectionModeller {
         
         if (isRootResourceClass) {
             resource = new AbstractResource(resourceClass,
-                    new UriTemplateValue(rUriTemplateAnnotation.value(), rUriTemplateAnnotation.encode(), rUriTemplateAnnotation.limited()));
+                    new UriTemplateValue(rPathAnnotation.value(), rPathAnnotation.encode(), rPathAnnotation.limited()));
         } else { // just a subresource class
             resource = new AbstractResource(resourceClass);
         }
@@ -146,7 +146,7 @@ public class IntrospectionModeller {
             AbstractResource resource, MethodList methodList, boolean isEncoded,
             ConsumeMime classScopeConsumeMimeAnnotation, ProduceMime classScopeProduceMimeAnnotation) {
         
-        for (Method method : methodList.hasAnnotation(HttpMethod.class).hasNotAnnotation(UriTemplate.class)) {
+        for (Method method : methodList.hasAnnotation(HttpMethod.class).hasNotAnnotation(Path.class)) {
             
             final HttpMethod httpMethodAnnotation = method.getAnnotation(HttpMethod.class);
             AbstractResourceMethod resourceMethod;
@@ -173,20 +173,20 @@ public class IntrospectionModeller {
             AbstractResource resource, MethodList methodList, boolean isEncoded,
             ConsumeMime classScopeConsumeMimeAnnotation, ProduceMime classScopeProduceMimeAnnotation) {
         
-        for (Method method : methodList.hasAnnotation(HttpMethod.class).hasAnnotation(UriTemplate.class)) {
+        for (Method method : methodList.hasAnnotation(HttpMethod.class).hasAnnotation(Path.class)) {
             
             final HttpMethod httpMethodAnnotation = method.getAnnotation(HttpMethod.class);
-            final UriTemplate mUriTemplateAnnotation = method.getAnnotation(UriTemplate.class);
+            final Path mPathAnnotation = method.getAnnotation(Path.class);
             AbstractSubResourceMethod subResourceMethod;
             
             if (null != httpMethodAnnotation.value()) {
                 subResourceMethod = new AbstractSubResourceMethod(
                         method,
-                        new UriTemplateValue(mUriTemplateAnnotation.value(), mUriTemplateAnnotation.encode(), mUriTemplateAnnotation.limited()),
+                        new UriTemplateValue(mPathAnnotation.value(), mPathAnnotation.encode(), mPathAnnotation.limited()),
                         httpMethodAnnotation.value());
             } else {
                 subResourceMethod = new AbstractSubResourceMethod(method,
-                        new UriTemplateValue(mUriTemplateAnnotation.value(), mUriTemplateAnnotation.encode(), mUriTemplateAnnotation.limited()));
+                        new UriTemplateValue(mPathAnnotation.value(), mPathAnnotation.encode(), mPathAnnotation.limited()));
             }
             
             findOutConsumeMimeTypes(subResourceMethod, classScopeConsumeMimeAnnotation);
@@ -200,11 +200,11 @@ public class IntrospectionModeller {
     
     private static final void workOutSubResourceLocatorsList(AbstractResource resource, MethodList methodList, boolean isEncoded) {
         
-        for (Method method : methodList.hasNotAnnotation(HttpMethod.class).hasAnnotation(UriTemplate.class)) {
-            final UriTemplate mUriTemplateAnnotation = method.getAnnotation(UriTemplate.class);
+        for (Method method : methodList.hasNotAnnotation(HttpMethod.class).hasAnnotation(Path.class)) {
+            final Path mPathAnnotation = method.getAnnotation(Path.class);
             final AbstractSubResourceLocator subResourceLocator = new AbstractSubResourceLocator(
                     method,
-                    new UriTemplateValue(mUriTemplateAnnotation.value(), mUriTemplateAnnotation.encode(), mUriTemplateAnnotation.limited()));
+                    new UriTemplateValue(mPathAnnotation.value(), mPathAnnotation.encode(), mPathAnnotation.limited()));
             
             processParameters(subResourceLocator, subResourceLocator.getMethod(), isEncoded);
             

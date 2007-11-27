@@ -26,7 +26,7 @@ import java.io.InputStream;
 import javax.ws.rs.ConsumeMime;
 import javax.ws.rs.HttpMethod;
 import javax.ws.rs.ProduceMime;
-import javax.ws.rs.UriTemplate;
+import javax.ws.rs.Path;
 import javax.ws.rs.core.Response;
 
 /**
@@ -53,7 +53,7 @@ public class EntryResource {
     }    
     
     @HttpMethod
-    @UriTemplate("media")
+    @Path("media")
     @ProduceMime("*/*")
     public Response getMedia() {
         // Check that the media exists, otherwise 404

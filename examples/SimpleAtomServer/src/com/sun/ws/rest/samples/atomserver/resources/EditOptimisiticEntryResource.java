@@ -45,7 +45,7 @@ public class EditOptimisiticEntryResource extends EditEntryResource {
         String editLink = AtomStore.getLink(e, "edit");
         
         // Compare against the requested link
-        String editUri = uriInfo.getAbsolute().toString();
+        String editUri = uriInfo.getAbsolutePath().toString();
         if (!editUri.startsWith(editLink)) {
             // Response with 409 Conflict
             throw new ConflictException();

@@ -4,7 +4,7 @@ import java.awt.image._
 import javax.imageio._
 import javax.ws.rs._
 
-@UriTemplate("({lx},{ly}),({ux},{uy})")
+@Path("({lx},{ly}),({ux},{uy})")
 class MandelService(
         @UriParam("lx") lx: double, 
         @UriParam("ly") ly: double,

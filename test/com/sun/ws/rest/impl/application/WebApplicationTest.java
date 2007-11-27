@@ -23,7 +23,7 @@
 package com.sun.ws.rest.impl.application;
 
 import com.sun.ws.rest.api.core.HttpResponseContext;
-import javax.ws.rs.UriTemplate;
+import javax.ws.rs.Path;
 import com.sun.ws.rest.api.core.HttpRequestContext;
 import com.sun.ws.rest.api.core.ResourceConfig;
 import com.sun.ws.rest.spi.container.AbstractContainerRequest;
@@ -47,7 +47,7 @@ public class WebApplicationTest extends TestCase {
         super(testName);
     }
     
-    @UriTemplate("/{arg1}/{arg2}")
+    @Path("/{arg1}/{arg2}")
     public static class TestOneWebResource {
         @HttpMethod("GET")
         public void handleRequest(HttpRequestContext request, HttpResponseContext response) {
@@ -61,7 +61,7 @@ public class WebApplicationTest extends TestCase {
         }
     }
     
-    @UriTemplate("/{arg1}")
+    @Path("/{arg1}")
     public static class TestTwoWebResource {
         @HttpMethod("GET")
         public void handleRequest(HttpRequestContext request, HttpResponseContext response) {
@@ -77,7 +77,7 @@ public class WebApplicationTest extends TestCase {
         }
     }
     
-    @UriTemplate("/{arg1}.xml")
+    @Path("/{arg1}.xml")
     public static class TestThreeWebResource {
         @HttpMethod("GET")
         public void handleRequest(HttpRequestContext request, HttpResponseContext response) {

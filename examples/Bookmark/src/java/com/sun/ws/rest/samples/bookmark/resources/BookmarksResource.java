@@ -33,7 +33,7 @@ import javax.ws.rs.ConsumeMime;
 import javax.ws.rs.HttpMethod;
 import javax.ws.rs.ProduceMime;
 import javax.ws.rs.UriParam;
-import javax.ws.rs.UriTemplate;
+import javax.ws.rs.Path;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
@@ -65,7 +65,7 @@ public class BookmarksResource {
         return userResource.getUserEntity().getBookmarkEntityCollection();
     }
     
-    @UriTemplate(value = "{bmid}", limited = false)
+    @Path(value = "{bmid}", limited = false)
     public BookmarkResource getBookmark(@UriParam("bmid") String bmid) {
         return new BookmarkResource(uriInfo, em, 
                 userResource.getUserEntity(), bmid);
@@ -77,7 +77,7 @@ public class BookmarksResource {
         JSONArray uriArray = new JSONArray();
         UriBuilder ub = null;
         for (BookmarkEntity bookmarkEntity : getBookmarks()) {
-            ub = (ub == null) ? uriInfo.getBuilder() : ub.clone();
+            ub = (ub == null) ? uriInfo.getAbsolutePathBuilder() : ub.clone();
             URI bookmarkUri = ub.
                     path(bookmarkEntity.getBookmarkEntityPK().getBmid()).
                     build();
@@ -104,7 +104,7 @@ public class BookmarksResource {
                 em.merge(userResource.getUserEntity());
             }});
             
-            URI bookmarkUri = uriInfo.getBuilder().
+            URI bookmarkUri = uriInfo.getAbsolutePathBuilder().
                     path(bookmarkEntity.getBookmarkEntityPK().getBmid()).
                     build();
             return Response.Builder.created(bookmarkUri).build();

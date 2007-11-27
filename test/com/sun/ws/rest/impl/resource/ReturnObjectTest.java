@@ -24,7 +24,7 @@ package com.sun.ws.rest.impl.resource;
 
 import com.sun.ws.rest.impl.AbstractResourceTester;
 import javax.ws.rs.HttpMethod;
-import javax.ws.rs.UriTemplate;
+import javax.ws.rs.Path;
 import javax.ws.rs.core.Response;
 
 /**
@@ -37,7 +37,7 @@ public class ReturnObjectTest extends AbstractResourceTester {
         super(testName);
     }
 
-    @UriTemplate("/")
+    @Path("/")
     static public class ResourceType { 
         @HttpMethod
         public Object get() {
@@ -45,7 +45,7 @@ public class ReturnObjectTest extends AbstractResourceTester {
         }
     }
         
-    @UriTemplate("/")
+    @Path("/")
     static public class ResourceHttpResponse { 
         @HttpMethod
         public Object get() {

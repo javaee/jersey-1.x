@@ -26,7 +26,7 @@ import com.sun.ws.rest.impl.AbstractResourceTester;
 import com.sun.ws.rest.impl.client.ResponseInBound;
 import javax.ws.rs.HttpMethod;
 import javax.ws.rs.ProduceMime;
-import javax.ws.rs.UriTemplate;
+import javax.ws.rs.Path;
 import javax.ws.rs.core.Response;
 
 /**
@@ -39,7 +39,7 @@ public class ProduceMimeAcceptableTest extends AbstractResourceTester {
         super(testName);
     }
 
-    @UriTemplate("/")
+    @Path("/")
     public static class WebResource {
         @ProduceMime("application/foo")
         @HttpMethod("GET")
@@ -63,7 +63,7 @@ public class ProduceMimeAcceptableTest extends AbstractResourceTester {
     }
 
     
-    @UriTemplate("/")
+    @Path("/")
     public static class WebResourceProduceGeneric {
         @ProduceMime("*/*")
         @HttpMethod("GET")

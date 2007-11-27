@@ -23,7 +23,7 @@
 package com.sun.ws.rest.impl.resource;
 
 import com.sun.ws.rest.impl.AbstractResourceTester;
-import javax.ws.rs.UriTemplate;
+import javax.ws.rs.Path;
 import javax.ws.rs.HttpMethod;
 import javax.ws.rs.UriParam;
 
@@ -38,7 +38,7 @@ public class TemplatePathTest extends AbstractResourceTester {
         super(testName);
     }
     
-    @UriTemplate("/a/{arg1}")
+    @Path("/a/{arg1}")
     public static class ResourceA {
         @HttpMethod("GET")
         public String doGet(@UriParam("arg1") String arg1) {
@@ -46,7 +46,7 @@ public class TemplatePathTest extends AbstractResourceTester {
         }
     }
     
-    @UriTemplate("/a/b/{arg1}")
+    @Path("/a/b/{arg1}")
     public static class ResourceAB {
         @HttpMethod("GET")
         public String doGet(@UriParam("arg1") String arg1) {
@@ -54,7 +54,7 @@ public class TemplatePathTest extends AbstractResourceTester {
         }
     }
     
-    @UriTemplate("/a/{arg1}/b")
+    @Path("/a/{arg1}/b")
     public static class ResourceAArg1B {
         @HttpMethod("GET")
         public String doGet(@UriParam("arg1") String arg1) {
@@ -62,7 +62,7 @@ public class TemplatePathTest extends AbstractResourceTester {
         }
     }
     
-    @UriTemplate("/a/{arg1}/c")
+    @Path("/a/{arg1}/c")
     public static class ResourceAArg1C {
         @HttpMethod("GET")
         public String doGet(@UriParam("arg1") String arg1) {

@@ -171,7 +171,7 @@ public final class WebApplicationImpl implements WebApplication {
         context.set(localContext);
         
         if (resourceConfig.getFeature(ResourceConfig.FEATURE_NORMALIZE_URI)) {
-            final URI uri = request.getComplete();
+            final URI uri = request.getRequestUri();
             final URI normalizedUri = UriHelper.normalize(uri, !resourceConfig.getFeature(ResourceConfig.FEATURE_CANONICALIZE_URI_PATH));
 
             if (uri != normalizedUri) {
@@ -222,7 +222,7 @@ public final class WebApplicationImpl implements WebApplication {
             // Ignore if not a root resource
             // TODO defer to the abstract model
             // Note that a non root resource should not be added to the cache
-            if (c.getAnnotation(javax.ws.rs.UriTemplate.class) == null) {
+            if (c.getAnnotation(javax.ws.rs.Path.class) == null) {
                 // TODO log warning
                 continue;   
             }

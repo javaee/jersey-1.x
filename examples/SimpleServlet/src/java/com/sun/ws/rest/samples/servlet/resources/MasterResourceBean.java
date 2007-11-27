@@ -25,9 +25,9 @@ package com.sun.ws.rest.samples.servlet.resources;
 import java.io.InputStream;
 import javax.ws.rs.HttpMethod;
 import javax.ws.rs.ProduceMime;
-import javax.ws.rs.UriTemplate;
+import javax.ws.rs.Path;
 
-@UriTemplate("/start")
+@Path("/start")
 public class MasterResourceBean  {
     @HttpMethod("GET")
     @ProduceMime("text/html")

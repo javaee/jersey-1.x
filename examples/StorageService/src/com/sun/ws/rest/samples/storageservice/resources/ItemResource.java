@@ -82,7 +82,7 @@ public class ItemResource {
             byte[] data) {
         System.out.println("PUT ITEM " + container + " " + item);
         
-        URI uri = uriInfo.getAbsolute();
+        URI uri = uriInfo.getAbsolutePath();
         MediaType mimeType = headers.getMediaType();
         GregorianCalendar gc = new GregorianCalendar();
         gc.set(GregorianCalendar.MILLISECOND, 0);
@@ -100,7 +100,7 @@ public class ItemResource {
         Item ii = MemoryStore.MS.createOrUpdateItem(container, i, data);
         if (ii == null) {
             // Create the container if one has not been created
-            URI containerUri = uriInfo.getBuilder().path("..").
+            URI containerUri = uriInfo.getAbsolutePathBuilder().path("..").
                     build().normalize();
             Container c = new Container(container, containerUri.toString());
             MemoryStore.MS.createContainer(c);

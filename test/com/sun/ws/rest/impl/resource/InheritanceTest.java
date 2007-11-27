@@ -26,7 +26,7 @@ import com.sun.ws.rest.impl.AbstractResourceTester;
 import com.sun.ws.rest.impl.client.ResponseInBound;
 import javax.ws.rs.HttpMethod;
 import javax.ws.rs.ProduceMime;
-import javax.ws.rs.UriTemplate;
+import javax.ws.rs.Path;
 
 /**
  *
@@ -47,7 +47,7 @@ public class InheritanceTest extends AbstractResourceTester {
         }
     }
     
-    @UriTemplate("/")
+    @Path("/")
     static public class SubResource extends SuperResource { 
         @HttpMethod("GET")
         @ProduceMime("application/sub")
@@ -56,7 +56,7 @@ public class InheritanceTest extends AbstractResourceTester {
         }
     }
 
-    @UriTemplate("/")
+    @Path("/")
     static public class SubResourceOverride extends SuperResource { 
         @HttpMethod("GET")
         @ProduceMime("application/sub")
@@ -100,7 +100,7 @@ public class InheritanceTest extends AbstractResourceTester {
         }
     }
     
-    @UriTemplate("/")
+    @Path("/")
     static public class SubResourceWithProduce extends SuperResourceWithProduce { 
         @HttpMethod("GET")
         public String doGetSub() {
@@ -108,7 +108,7 @@ public class InheritanceTest extends AbstractResourceTester {
         }
     }
         
-    @UriTemplate("/")
+    @Path("/")
     static public class SubResourceWithProduceOverride extends SuperResourceWithProduce { 
         @HttpMethod("GET")
         public String doGet() {

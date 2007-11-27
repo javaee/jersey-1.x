@@ -25,7 +25,7 @@ package com.sun.ws.rest.impl.resource;
 import com.sun.ws.rest.impl.AbstractResourceTester;
 import javax.ws.rs.HttpMethod;
 import javax.ws.rs.ProduceMime;
-import javax.ws.rs.UriTemplate;
+import javax.ws.rs.Path;
 import com.sun.ws.rest.impl.client.ResourceProxy;
 import com.sun.ws.rest.impl.client.ResponseInBound;
 import java.io.IOException;
@@ -43,7 +43,7 @@ public class AcceptTest extends AbstractResourceTester {
         super(testName);
     }
 
-    @UriTemplate("/")
+    @Path("/")
     public static class WebResource {
         @ProduceMime("application/foo")
         @HttpMethod("GET")
@@ -119,7 +119,7 @@ public class AcceptTest extends AbstractResourceTester {
         assertEquals(400, response.getStatus());
     }
     
-    @UriTemplate("/")
+    @Path("/")
     public static class MultipleResource {
         @ProduceMime({"application/foo", "application/bar"})
         @HttpMethod

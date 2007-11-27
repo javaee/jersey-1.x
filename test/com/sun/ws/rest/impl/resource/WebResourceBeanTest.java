@@ -23,7 +23,7 @@
 package com.sun.ws.rest.impl.resource;
 
 import com.sun.ws.rest.impl.AbstractResourceTester;
-import javax.ws.rs.UriTemplate;
+import javax.ws.rs.Path;
 import javax.ws.rs.HttpMethod;
 import com.sun.ws.rest.api.core.HttpRequestContext;
 import com.sun.ws.rest.api.core.HttpResponseContext;
@@ -39,7 +39,7 @@ public class WebResourceBeanTest extends AbstractResourceTester {
         super(testName);
     }
     
-    @UriTemplate("/{arg1}/{arg2}")
+    @Path("/{arg1}/{arg2}")
     public static class TestOneWebResourceBean {
         @HttpMethod("POST")
         public void doPost(HttpRequestContext request, HttpResponseContext response) {

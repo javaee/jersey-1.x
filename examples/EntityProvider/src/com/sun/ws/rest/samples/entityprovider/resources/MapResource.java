@@ -23,13 +23,13 @@ import com.sun.ws.rest.spi.resource.Singleton;
 import java.util.Hashtable;
 import javax.ws.rs.HttpMethod;
 import javax.ws.rs.ProduceMime;
-import javax.ws.rs.UriTemplate;
+import javax.ws.rs.Path;
 
 /**
  * A resource that manages a map of name/value pairs.
  */
 @Singleton
-@UriTemplate("data")
+@Path("data")
 public class MapResource {
     
     private static Hashtable<String, String> data = new Hashtable<String, String>();

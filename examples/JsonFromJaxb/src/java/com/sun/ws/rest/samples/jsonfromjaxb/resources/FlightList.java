@@ -27,7 +27,7 @@ import com.sun.ws.rest.samples.jsonfromjaxb.jaxb.FlightType;
 import com.sun.ws.rest.samples.jsonfromjaxb.jaxb.Flights;
 import com.sun.ws.rest.spi.resource.Singleton;
 import javax.ws.rs.ConsumeMime;
-import javax.ws.rs.UriTemplate;
+import javax.ws.rs.Path;
 import javax.ws.rs.HttpMethod;
 import javax.ws.rs.ProduceMime;
 
@@ -35,7 +35,7 @@ import javax.ws.rs.ProduceMime;
  * @author Jakub Podlesak
  */
 @Singleton
-@UriTemplate(value = "/flights/")
+@Path(value = "/flights/")
 public class FlightList {
 
     private Flights myFlights;

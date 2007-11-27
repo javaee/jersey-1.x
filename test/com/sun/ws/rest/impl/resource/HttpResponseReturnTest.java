@@ -23,7 +23,7 @@
 package com.sun.ws.rest.impl.resource;
 
 import javax.ws.rs.HttpMethod;
-import javax.ws.rs.UriTemplate;
+import javax.ws.rs.Path;
 import com.sun.ws.rest.impl.AbstractResourceTester;
 import javax.ws.rs.core.Response;
 
@@ -37,7 +37,7 @@ public class HttpResponseReturnTest extends AbstractResourceTester {
         super(testName);
     }
     
-    @UriTemplate("/")
+    @Path("/")
     static public class Resource { 
         @HttpMethod("GET")
         public Response doGet() {

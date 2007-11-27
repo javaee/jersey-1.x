@@ -26,7 +26,7 @@ import com.sun.net.httpserver.HttpHandler;
 import com.sun.ws.rest.impl.client.RequestOutBound;
 import com.sun.ws.rest.impl.client.ResponseInBound;
 import java.net.URI;
-import javax.ws.rs.UriTemplate;
+import javax.ws.rs.Path;
 import com.sun.ws.rest.impl.client.ResourceProxy;
 import com.sun.ws.rest.impl.client.ResourceProxyFilter;
 import javax.ws.rs.HttpMethod;
@@ -61,7 +61,7 @@ public class AcceptableXMLorJSONTest extends AbstractHttpServerTester {
         }
     }
     
-    @UriTemplate("/resource")
+    @Path("/resource")
     public static class WebResource {
         @HttpMethod
         @ProduceMime({"application/xml", "application/json"})

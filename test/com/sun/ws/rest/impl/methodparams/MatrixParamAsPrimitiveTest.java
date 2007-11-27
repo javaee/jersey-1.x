@@ -27,7 +27,7 @@ import javax.ws.rs.DefaultValue;
 import javax.ws.rs.HttpMethod;
 import javax.ws.rs.ProduceMime;
 import javax.ws.rs.MatrixParam;
-import javax.ws.rs.UriTemplate;
+import javax.ws.rs.Path;
 import com.sun.ws.rest.impl.AbstractResourceTester;
 import com.sun.ws.rest.impl.client.ResponseInBound;
 import java.util.List;
@@ -56,7 +56,7 @@ public class MatrixParamAsPrimitiveTest extends AbstractResourceTester {
                 );
     }
 
-    @UriTemplate("/")
+    @Path("/")
     public static class ResourceMatrixPrimitives {
         @HttpMethod("GET")
         @ProduceMime("application/boolean")
@@ -108,7 +108,7 @@ public class MatrixParamAsPrimitiveTest extends AbstractResourceTester {
         }        
     }
     
-    @UriTemplate("/default/null")
+    @Path("/default/null")
     public static class ResourceMatrixPrimitivesDefaultNull {
         @HttpMethod("GET")
         @ProduceMime("application/boolean")
@@ -160,7 +160,7 @@ public class MatrixParamAsPrimitiveTest extends AbstractResourceTester {
         }        
     }
     
-    @UriTemplate("/default")
+    @Path("/default")
     public static class ResourceMatrixPrimitivesDefault {
         @HttpMethod("GET")
         @ProduceMime("application/boolean")
@@ -212,7 +212,7 @@ public class MatrixParamAsPrimitiveTest extends AbstractResourceTester {
         }        
     }
     
-    @UriTemplate("/default/override")
+    @Path("/default/override")
     public static class ResourceMatrixPrimitivesDefaultOverride {
         @HttpMethod("GET")
         @ProduceMime("application/boolean")
@@ -264,7 +264,7 @@ public class MatrixParamAsPrimitiveTest extends AbstractResourceTester {
         }        
     }
     
-    @UriTemplate("/wrappers")
+    @Path("/wrappers")
     public static class ResourceMatrixPrimitiveWrappers {
         @HttpMethod("GET")
         @ProduceMime("application/boolean")
@@ -316,7 +316,7 @@ public class MatrixParamAsPrimitiveTest extends AbstractResourceTester {
         }        
     }
     
-    @UriTemplate("/wrappers/default/null")
+    @Path("/wrappers/default/null")
     public static class ResourceMatrixPrimitiveWrappersDefaultNull {
         @HttpMethod("GET")
         @ProduceMime("application/boolean")
@@ -368,7 +368,7 @@ public class MatrixParamAsPrimitiveTest extends AbstractResourceTester {
         }        
     }
     
-    @UriTemplate("/wrappers/default")
+    @Path("/wrappers/default")
     public static class ResourceMatrixPrimitiveWrappersDefault {
         @HttpMethod("GET")
         @ProduceMime("application/boolean")
@@ -420,7 +420,7 @@ public class MatrixParamAsPrimitiveTest extends AbstractResourceTester {
         }        
     }
     
-    @UriTemplate("/wrappers/default/override")
+    @Path("/wrappers/default/override")
     public static class ResourceMatrixPrimitiveWrappersDefaultOverride {
         @HttpMethod("GET")
         @ProduceMime("application/boolean")
@@ -472,7 +472,7 @@ public class MatrixParamAsPrimitiveTest extends AbstractResourceTester {
         }        
     }
     
-    @UriTemplate("/list")
+    @Path("/list")
     public static class ResourceMatrixPrimitiveList {
         @HttpMethod("GET")
         @ProduceMime("application/boolean")
@@ -538,7 +538,7 @@ public class MatrixParamAsPrimitiveTest extends AbstractResourceTester {
         }        
     }
     
-    @UriTemplate("/list/default/null")
+    @Path("/list/default/null")
     public static class ResourceMatrixPrimitiveListDefaultNull {
         @HttpMethod("GET")
         @ProduceMime("application/boolean")
@@ -590,7 +590,7 @@ public class MatrixParamAsPrimitiveTest extends AbstractResourceTester {
         }        
     }
     
-    @UriTemplate("/list/default")
+    @Path("/list/default")
     public static class ResourceMatrixPrimitiveListDefault {
         @HttpMethod("GET")
         @ProduceMime("application/boolean")
@@ -642,7 +642,7 @@ public class MatrixParamAsPrimitiveTest extends AbstractResourceTester {
         }        
     }
     
-    @UriTemplate("/list/default/override")
+    @Path("/list/default/override")
     public static class ResourceMatrixPrimitiveListDefaultOverride {
         @HttpMethod("GET")
         @ProduceMime("application/boolean")

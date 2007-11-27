@@ -50,7 +50,7 @@ import javax.ws.rs.HttpMethod;
 import javax.ws.rs.ProduceMime;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.UriParam;
-import javax.ws.rs.UriTemplate;
+import javax.ws.rs.Path;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -167,10 +167,10 @@ public class UriTemplateProcessor implements Messager, AnnotationProcessor {
         for (TypeDeclaration typedecl : apEnv.getTypeDeclarations()) {
             if (!(typedecl instanceof ClassDeclaration))
                 continue;
-            UriTemplate uriTemplate = typedecl.getAnnotation(UriTemplate.class);
-            if (uriTemplate == null)
+            Path path = typedecl.getAnnotation(Path.class);
+            if (path == null)
                 continue;
-            Resource r = processResource(typedecl, uriTemplate);
+            Resource r = processResource(typedecl, path);
             if (r != null)
                 context.getResources().add(r);
             processedAnnotations = true;
@@ -178,9 +178,9 @@ public class UriTemplateProcessor implements Messager, AnnotationProcessor {
         return processedAnnotations;
     }
     
-    private Resource processResource(TypeDeclaration decl, UriTemplate uriTemplate) {
+    private Resource processResource(TypeDeclaration decl, Path path) {
         log("Processing resource: "+decl.getQualifiedName());
-        Resource r = new Resource(decl.getQualifiedName(), uriTemplate.value());
+        Resource r = new Resource(decl.getQualifiedName(), path.value());
         
         ConsumeMime c = decl.getAnnotation(ConsumeMime.class);
         if (c != null)

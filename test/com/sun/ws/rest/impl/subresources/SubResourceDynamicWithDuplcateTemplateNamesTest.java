@@ -25,7 +25,7 @@ package com.sun.ws.rest.impl.subresources;
 import com.sun.ws.rest.impl.AbstractResourceTester;
 import javax.ws.rs.HttpMethod;
 import javax.ws.rs.UriParam;
-import javax.ws.rs.UriTemplate;
+import javax.ws.rs.Path;
 import com.sun.ws.rest.impl.AbstractResourceTester;
 
 /**
@@ -38,9 +38,9 @@ public class SubResourceDynamicWithDuplcateTemplateNamesTest extends AbstractRes
         super(testName);
     }
     
-    @UriTemplate("/{v}")
+    @Path("/{v}")
     static public class ParentWithTemplates { 
-        @UriTemplate("child/")
+        @Path("child/")
         public ChildWithTemplates getChildWithTemplates(@UriParam("v") String v) {
             return new ChildWithTemplates();
         }
@@ -52,7 +52,7 @@ public class SubResourceDynamicWithDuplcateTemplateNamesTest extends AbstractRes
             return v;
         }
         
-        @UriTemplate("child/{v}")
+        @Path("child/{v}")
         public ChildWithTemplates getChildWithTemplates() {
             return new ChildWithTemplates();
         }

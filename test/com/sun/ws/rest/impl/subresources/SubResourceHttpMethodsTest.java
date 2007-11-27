@@ -25,7 +25,7 @@ package com.sun.ws.rest.impl.subresources;
 import com.sun.ws.rest.impl.AbstractResourceTester;
 import javax.ws.rs.HttpMethod;
 import javax.ws.rs.UriParam;
-import javax.ws.rs.UriTemplate;
+import javax.ws.rs.Path;
 import com.sun.ws.rest.impl.AbstractResourceTester;
 
 /**
@@ -38,20 +38,20 @@ public class SubResourceHttpMethodsTest extends AbstractResourceTester {
         super(testName);
     }
 
-    @UriTemplate("/")
+    @Path("/")
     static public class SubResourceMethods { 
         @HttpMethod
         public String getMe() {
             return "/";
         }
 
-        @UriTemplate("sub")
+        @Path("sub")
         @HttpMethod
         public String getMeSub() {
             return "/sub";
         }
         
-        @UriTemplate("sub/sub")
+        @Path("sub/sub")
         @HttpMethod
         public String getMeSubSub() {
             return "/sub/sub";
@@ -66,20 +66,20 @@ public class SubResourceHttpMethodsTest extends AbstractResourceTester {
         assertEquals("/sub/sub", resourceProxy("/sub/sub").get(String.class));
     }
     
-    @UriTemplate("/")
+    @Path("/")
     static public class SubResourceMethodsWithTemplates { 
         @HttpMethod
         public String getMe() {
             return "/";
         }
 
-        @UriTemplate("sub{t}")
+        @Path("sub{t}")
         @HttpMethod
         public String getMeSub(@UriParam("t") String t) {
             return t;
         }
         
-        @UriTemplate("sub/{t}")
+        @Path("sub/{t}")
         @HttpMethod
         public String getMeSubSub(@UriParam("t") String t) {
             return t;
@@ -94,15 +94,15 @@ public class SubResourceHttpMethodsTest extends AbstractResourceTester {
         assertEquals("a/b/c/d", resourceProxy("/sub/a/b/c/d").get(String.class));
     }
     
-    @UriTemplate("/")
+    @Path("/")
     static public class SubResourceMethodsWithDifferentTemplates { 
-        @UriTemplate("{foo}")
+        @Path("{foo}")
         @HttpMethod
         public String getFoo(@UriParam("foo") String foo) {
             return foo;
         }
         
-        @UriTemplate("{bar}")
+        @Path("{bar}")
         @HttpMethod
         public String postBar(@UriParam("bar") String bar) {
             return bar;

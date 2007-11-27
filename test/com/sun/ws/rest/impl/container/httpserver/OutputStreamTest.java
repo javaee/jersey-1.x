@@ -22,7 +22,7 @@
 
 package com.sun.ws.rest.impl.container.httpserver;
 
-import javax.ws.rs.UriTemplate;
+import javax.ws.rs.Path;
 import com.sun.ws.rest.api.core.HttpRequestContext;
 import com.sun.ws.rest.api.core.HttpResponseContext;
 import com.sun.ws.rest.impl.client.ResourceProxy;
@@ -36,7 +36,7 @@ import junit.framework.*;
  * @author Paul.Sandoz@Sun.Com
  */
 public class OutputStreamTest extends AbstractHttpServerTester {
-    @UriTemplate("/output")
+    @Path("/output")
     public static class TestResource { // implements WebResource {
 
         @ProduceMime("text/plain")

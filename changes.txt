@@ -1,6 +1,6 @@
 release 0.5 (2008-01-18)
 - Fixed issue 1: Matching errors for sub-resource methods with equivalent URI 
-  templatesregexs but different template variables
+  template regexs but different template variables
   https://jersey.dev.java.net/issues/show_bug.cgi?id=1
   Different sub-resource locator and HTTP methods may have different
   URI templates that differ only by template variable name.
@@ -18,6 +18,13 @@ release 0.5 (2008-01-18)
 - Partially integrated JSR 311 API 0.5
   - EntityProvider is split into two separate interfaces
     MessageBodyReader and MessageBodyWriter
+  - java.ws.rs.UriTemplate renamed to java.ws.rs.Path
+  - javax.ws.rs.core.UriInfo has the following changes
+    - renamed method getBase to getBaseUri
+    - renamed method getBaseBuilder to getBaseUriBuilder
+    - renamed method getAbsolute to getAbsolutePath
+    - renamed method getBuilder to getAbsolutePathBuilder
+    - add methods getRequestUri and getRequestUriBuilder
 
 release 0.4 (2007-11-02)
 - Fixed issue 17: Matrix Parameter With URL Value Ends Up With 404

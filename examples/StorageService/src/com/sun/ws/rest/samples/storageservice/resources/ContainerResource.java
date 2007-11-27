@@ -32,7 +32,7 @@ import javax.ws.rs.HttpMethod;
 import javax.ws.rs.ProduceMime;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.UriParam;
-import javax.ws.rs.UriTemplate;
+import javax.ws.rs.Path;
 import javax.ws.rs.core.HttpContext;
 import javax.ws.rs.core.PreconditionEvaluator;
 import javax.ws.rs.core.Response;
@@ -80,7 +80,7 @@ public class ContainerResource {
     public Response putContainer(@UriParam("container") String container) {
         System.out.println("PUT CONTAINER " + container);
         
-        URI uri =  uriInfo.getAbsolute();
+        URI uri =  uriInfo.getAbsolutePath();
         Container c = new Container(container, uri.toString());
         
         Response r;
@@ -104,7 +104,7 @@ public class ContainerResource {
     } 
     
     
-    @UriTemplate("{item}")
+    @Path("{item}")
     public ItemResource getItemResource(@UriParam("container") String container, 
             @UriParam("item") String item) {
         return new ItemResource(uriInfo, preconditionEvaluator, container, item);

@@ -37,9 +37,9 @@ import javax.persistence.PersistenceUnit;
 import javax.persistence.Query;
 import javax.ws.rs.HttpMethod;
 import javax.ws.rs.ProduceMime;
-import javax.ws.rs.UriTemplate;
+import javax.ws.rs.Path;
 
-@UriTemplate("/widgets")
+@Path("/widgets")
 public class WidgetsResource {
     
     @PersistenceUnit(unitName="WidgetPU")

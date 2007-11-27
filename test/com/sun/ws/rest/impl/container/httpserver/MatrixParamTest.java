@@ -22,7 +22,7 @@
 
 package com.sun.ws.rest.impl.container.httpserver;
 
-import javax.ws.rs.UriTemplate;
+import javax.ws.rs.Path;
 import com.sun.ws.rest.impl.client.ResourceProxy;
 import javax.ws.rs.HttpMethod;
 import javax.ws.rs.MatrixParam;
@@ -34,7 +34,7 @@ import junit.framework.*;
  * @author Paul.Sandoz@Sun.Com
  */
 public class MatrixParamTest extends AbstractHttpServerTester {
-    @UriTemplate("/test")
+    @Path("/test")
     public static class MatrixParamResource {
         @HttpMethod
         public String get(@MatrixParam("x") String x, @MatrixParam("y") String y) {

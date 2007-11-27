@@ -30,7 +30,7 @@ import java.net.URI;
 import java.util.Date;
 import javax.ws.rs.ConsumeMime;
 import javax.ws.rs.HttpMethod;
-import javax.ws.rs.UriTemplate;
+import javax.ws.rs.Path;
 import javax.ws.rs.core.HttpContext;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.UriBuilder;
@@ -50,7 +50,7 @@ public class EditEntryResource extends EntryResource {
     
     @HttpMethod
     public Entry putEntry(Entry e) throws IOException, FeedException {
-        UriBuilder entryUri = uriInfo.getBaseBuilder().
+        UriBuilder entryUri = uriInfo.getBaseUriBuilder().
                 path(FeedResource.class).
                 path(entryId);
         AtomStore.updateLink(e, "self", entryUri.build());
@@ -89,7 +89,7 @@ public class EditEntryResource extends EntryResource {
     
     
     @HttpMethod
-    @UriTemplate("media")
+    @Path("media")
     @ConsumeMime("*/*")
     public void putMedia(@HttpContext HttpHeaders headers,
             byte[] update) throws IOException, FeedException {
@@ -121,6 +121,6 @@ public class EditEntryResource extends EntryResource {
     }
         
     protected UriBuilder getUriBuilder() {
-        return uriInfo.getBuilder();
+        return uriInfo.getAbsolutePathBuilder();
     }
 }

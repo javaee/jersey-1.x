@@ -27,7 +27,7 @@ import javax.ws.rs.DefaultValue;
 import javax.ws.rs.HttpMethod;
 import javax.ws.rs.ProduceMime;
 import javax.ws.rs.HeaderParam;
-import javax.ws.rs.UriTemplate;
+import javax.ws.rs.Path;
 import com.sun.ws.rest.impl.AbstractResourceTester;
 import java.util.List;
 
@@ -42,7 +42,7 @@ public class HeaderParamAsStringTest extends AbstractResourceTester {
         super(testName);
     }
 
-    @UriTemplate("/")
+    @Path("/")
     public static class ResourceString {
         @HttpMethod("GET")
         public String doGet(@HeaderParam("arg1") String arg1, 
@@ -65,7 +65,7 @@ public class HeaderParamAsStringTest extends AbstractResourceTester {
         }
     }
     
-    @UriTemplate("/")
+    @Path("/")
     public static class ResourceStringEmpty {
         @HttpMethod("GET")
         public String doGet(@HeaderParam("arg1") String arg1) {
@@ -74,7 +74,7 @@ public class HeaderParamAsStringTest extends AbstractResourceTester {
         }
     }
     
-    @UriTemplate("/")
+    @Path("/")
     public static class ResourceStringAbsent {
         @HttpMethod("GET")
         public String doGet(@HeaderParam("arg1") String arg1) {
@@ -83,7 +83,7 @@ public class HeaderParamAsStringTest extends AbstractResourceTester {
         }
     }
     
-    @UriTemplate("/")
+    @Path("/")
     public static class ResourceStringList {
         @HttpMethod("GET")
         @ProduceMime("application/stringlist")
@@ -107,7 +107,7 @@ public class HeaderParamAsStringTest extends AbstractResourceTester {
         }
     }
     
-    @UriTemplate("/")
+    @Path("/")
     public static class ResourceStringListEmpty {
         @HttpMethod("GET")
         @ProduceMime("application/stringlist")
@@ -120,7 +120,7 @@ public class HeaderParamAsStringTest extends AbstractResourceTester {
         }        
     }
     
-    @UriTemplate("/")
+    @Path("/")
     public static class ResourceStringListAbsent {
         @HttpMethod("GET")
         @ProduceMime("application/stringlist")
@@ -130,7 +130,7 @@ public class HeaderParamAsStringTest extends AbstractResourceTester {
         }        
     }
     
-    @UriTemplate("/")
+    @Path("/")
     public static class ResourceStringNullDefault {
         @HttpMethod("GET")
         public String doGet(@HeaderParam("arg1") String arg1, 
@@ -142,7 +142,7 @@ public class HeaderParamAsStringTest extends AbstractResourceTester {
         }        
     }
     
-    @UriTemplate("/")
+    @Path("/")
     public static class ResourceStringDefault {
         @HttpMethod("GET")
         public String doGet(
@@ -156,7 +156,7 @@ public class HeaderParamAsStringTest extends AbstractResourceTester {
         }        
     }
     
-    @UriTemplate("/")
+    @Path("/")
     public static class ResourceStringDefaultOverride {
         @HttpMethod("GET")
         public String doGet(
@@ -170,7 +170,7 @@ public class HeaderParamAsStringTest extends AbstractResourceTester {
         }        
     }
     
-    @UriTemplate("/")
+    @Path("/")
     public static class ResourceStringListNullDefault {
         @HttpMethod("GET")
         @ProduceMime("application/stringlist")
@@ -189,7 +189,7 @@ public class HeaderParamAsStringTest extends AbstractResourceTester {
         }
     }
     
-    @UriTemplate("/")
+    @Path("/")
     public static class ResourceStringListDefault {
         @HttpMethod("GET")
         @ProduceMime("application/stringlist")
@@ -209,7 +209,7 @@ public class HeaderParamAsStringTest extends AbstractResourceTester {
         }
     }
     
-    @UriTemplate("/")
+    @Path("/")
     public static class ResourceStringListDefaultOverride {
         @HttpMethod("GET")
         @ProduceMime("application/stringlist")

@@ -26,7 +26,7 @@ import com.sun.ws.rest.api.ConflictException;
 import com.sun.ws.rest.samples.optimisticconcurrency.ItemData;
 import javax.ws.rs.HttpMethod;
 import javax.ws.rs.UriParam;
-import javax.ws.rs.UriTemplate;
+import javax.ws.rs.Path;
 import javax.ws.rs.core.HttpContext;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
@@ -52,7 +52,7 @@ public class ItemContentResource {
     }
     
     @HttpMethod
-    @UriTemplate("{version}")
+    @Path("{version}")
     public void put(
             @UriParam("version") int version,
             @HttpContext HttpHeaders headers,

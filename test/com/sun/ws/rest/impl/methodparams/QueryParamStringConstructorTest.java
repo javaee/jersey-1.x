@@ -26,7 +26,7 @@ import com.sun.ws.rest.impl.AbstractResourceTester;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.HttpMethod;
 import javax.ws.rs.QueryParam;
-import javax.ws.rs.UriTemplate;
+import javax.ws.rs.Path;
 import com.sun.ws.rest.impl.AbstractResourceTester;
 import com.sun.ws.rest.impl.client.ResponseInBound;
 import java.math.BigDecimal;
@@ -44,7 +44,7 @@ public class QueryParamStringConstructorTest extends AbstractResourceTester {
         super(testName);
     }
 
-    @UriTemplate("/")
+    @Path("/")
     public static class ResourceString {
         @HttpMethod("GET")
         public String doGet(
@@ -58,7 +58,7 @@ public class QueryParamStringConstructorTest extends AbstractResourceTester {
         }
     }
     
-    @UriTemplate("/")
+    @Path("/")
     public static class ResourceStringList {
         @HttpMethod("GET")
         public String doGetString(@QueryParam("args") List<BigDecimal> args) {
@@ -69,7 +69,7 @@ public class QueryParamStringConstructorTest extends AbstractResourceTester {
         }
     }
     
-    @UriTemplate("/")
+    @Path("/")
     public static class ResourceStringListEmpty {
         @HttpMethod("GET")
         public String doGetString(@QueryParam("args") List<BigDecimal> args) {
@@ -81,7 +81,7 @@ public class QueryParamStringConstructorTest extends AbstractResourceTester {
         }
     }
     
-    @UriTemplate("/")
+    @Path("/")
     public static class ResourceStringListAbsent {
         @HttpMethod("GET")
         public String doGetString(@QueryParam("args") List<BigDecimal> args) {
@@ -90,7 +90,7 @@ public class QueryParamStringConstructorTest extends AbstractResourceTester {
         }
     }
     
-    @UriTemplate("/")
+    @Path("/")
     public static class ResourceStringNullDefault {
         @HttpMethod("GET")
         public String doGet(
@@ -100,7 +100,7 @@ public class QueryParamStringConstructorTest extends AbstractResourceTester {
         }
     }
     
-    @UriTemplate("/")
+    @Path("/")
     public static class ResourceStringDefault {
         @HttpMethod("GET")
         public String doGet(
@@ -110,7 +110,7 @@ public class QueryParamStringConstructorTest extends AbstractResourceTester {
         }
     }
     
-    @UriTemplate("/")
+    @Path("/")
     public static class ResourceStringDefaultOverride {
         @HttpMethod("GET")
         public String doGet(
@@ -120,7 +120,7 @@ public class QueryParamStringConstructorTest extends AbstractResourceTester {
         }
     }
     
-    @UriTemplate("/")
+    @Path("/")
     public static class ResourceStringListNullDefault {
         @HttpMethod("GET")
         public String doGetString(@QueryParam("args") List<BigDecimal> args) {
@@ -129,7 +129,7 @@ public class QueryParamStringConstructorTest extends AbstractResourceTester {
         }
     }
     
-    @UriTemplate("/")
+    @Path("/")
     public static class ResourceStringListDefault {
         @HttpMethod("GET")
         public String doGetString(
@@ -139,7 +139,7 @@ public class QueryParamStringConstructorTest extends AbstractResourceTester {
         }
     }
     
-    @UriTemplate("/")
+    @Path("/")
     public static class ResourceStringListDefaultOverride {
         @HttpMethod("GET")
         public String doGetString(

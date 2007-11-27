@@ -23,14 +23,14 @@
 package com.sun.ws.rest.impl.container.config.innerstatic;
 
 import javax.ws.rs.HttpMethod;
-import javax.ws.rs.UriTemplate;
+import javax.ws.rs.Path;
 
 /**
  *
  * @author Paul.Sandoz@Sun.Com
  */
 public class InnerStaticClass {
-    @UriTemplate("/")
+    @Path("/")
     public static class PublicClass {
         @HttpMethod
         public String getMe() {
@@ -38,7 +38,7 @@ public class InnerStaticClass {
         }
     }
     
-    @UriTemplate("/")
+    @Path("/")
     private static class PrivateClass {
         @HttpMethod
         public String getMe() {
@@ -46,7 +46,7 @@ public class InnerStaticClass {
         }
     }
     
-    @UriTemplate("/")
+    @Path("/")
     protected static class ProtectedClass {
         @HttpMethod
         public String getMe() {
@@ -54,7 +54,7 @@ public class InnerStaticClass {
         }
     }
     
-    @UriTemplate("/")
+    @Path("/")
     /* package */ static class PackageClass {
         @HttpMethod
         public String getMe() {

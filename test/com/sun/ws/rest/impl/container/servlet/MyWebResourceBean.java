@@ -23,7 +23,7 @@
 package com.sun.ws.rest.impl.container.servlet;
 
 import javax.ws.rs.HttpMethod;
-import javax.ws.rs.UriTemplate;
+import javax.ws.rs.Path;
 import com.sun.ws.rest.api.core.HttpContextAccess;
 import com.sun.ws.rest.api.core.HttpRequestContext;
 import com.sun.ws.rest.api.representation.FormURLEncodedProperties;
@@ -31,7 +31,7 @@ import java.util.List;
 import javax.ws.rs.core.HttpContext;
 import javax.ws.rs.core.MultivaluedMap;
 
-@UriTemplate("/test2/{arg1}/{arg2}")
+@Path("/test2/{arg1}/{arg2}")
 public class MyWebResourceBean  {
     @HttpContext HttpContextAccess context;
     

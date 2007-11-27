@@ -22,7 +22,7 @@
 
 package com.sun.ws.rest.impl.container.httpserver;
 
-import javax.ws.rs.UriTemplate;
+import javax.ws.rs.Path;
 import com.sun.ws.rest.impl.client.ResourceProxy;
 import javax.ws.rs.HttpMethod;
 import junit.framework.*;
@@ -32,7 +32,7 @@ import junit.framework.*;
  * @author Paul.Sandoz@Sun.Com
  */
 public class HandlerContextTest extends AbstractHttpServerTester {
-    @UriTemplate("/")
+    @Path("/")
     public static class Resource {
         @HttpMethod
         public String get() {

@@ -22,7 +22,7 @@
 
 package com.sun.ws.rest.impl.container.httpserver;
 
-import javax.ws.rs.UriTemplate;
+import javax.ws.rs.Path;
 import com.sun.ws.rest.api.core.HttpRequestContext;
 import com.sun.ws.rest.api.core.HttpResponseContext;
 import com.sun.ws.rest.impl.client.ResourceProxy;
@@ -35,7 +35,7 @@ import javax.ws.rs.core.UriBuilder;
  * @author Paul.Sandoz@Sun.Com
  */
 public class HttpServerAdaptorTest extends AbstractHttpServerTester {
-    @UriTemplate("/{arg1}/{arg2}")
+    @Path("/{arg1}/{arg2}")
     public static class TestOneWebResource {
         @HttpMethod("POST")
         public void handleRequest(HttpRequestContext request, HttpResponseContext response) {
@@ -51,7 +51,7 @@ public class HttpServerAdaptorTest extends AbstractHttpServerTester {
         }
     }
     
-    @UriTemplate("/{arg1}")
+    @Path("/{arg1}")
     public static class TestTwoWebResource {
         @HttpMethod("POST")
         public void handleRequest(HttpRequestContext request, HttpResponseContext response) {

@@ -23,20 +23,20 @@
 package com.sun.ws.rest.impl.container.config.toplevelinnerstatic;
 
 import javax.ws.rs.HttpMethod;
-import javax.ws.rs.UriTemplate;
+import javax.ws.rs.Path;
 
 /**
  *
  * @author Paul.Sandoz@Sun.Com
  */
-@UriTemplate("/")
+@Path("/")
 public class PublicRootResourceInnerStaticClass {
     @HttpMethod
     public String getMe() {
         return "ME";
     }
        
-    @UriTemplate("/")
+    @Path("/")
     public static class PublicClass {
         @HttpMethod
         public String getMe() {

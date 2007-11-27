@@ -30,7 +30,7 @@ import javax.ws.rs.DefaultValue;
 import javax.ws.rs.HttpMethod;
 import javax.ws.rs.ProduceMime;
 import javax.ws.rs.HeaderParam;
-import javax.ws.rs.UriTemplate;
+import javax.ws.rs.Path;
 
 /**
  *
@@ -56,7 +56,7 @@ public class HeaderParamAsPrimitiveTest extends AbstractResourceTester {
                 );
     }
 
-    @UriTemplate("/")
+    @Path("/")
     public static class ResourceHeaderPrimitives {
         @HttpMethod("GET")
         @ProduceMime("application/boolean")
@@ -108,7 +108,7 @@ public class HeaderParamAsPrimitiveTest extends AbstractResourceTester {
         }        
     }
     
-    @UriTemplate("/default/null")
+    @Path("/default/null")
     public static class ResourceHeaderPrimitivesDefaultNull {
         @HttpMethod("GET")
         @ProduceMime("application/boolean")
@@ -160,7 +160,7 @@ public class HeaderParamAsPrimitiveTest extends AbstractResourceTester {
         }        
     }
     
-    @UriTemplate("/default")
+    @Path("/default")
     public static class ResourceHeaderPrimitivesDefault {
         @HttpMethod("GET")
         @ProduceMime("application/boolean")
@@ -212,7 +212,7 @@ public class HeaderParamAsPrimitiveTest extends AbstractResourceTester {
         }        
     }
     
-    @UriTemplate("/default/override")
+    @Path("/default/override")
     public static class ResourceHeaderPrimitivesDefaultOverride {
         @HttpMethod("GET")
         @ProduceMime("application/boolean")
@@ -264,7 +264,7 @@ public class HeaderParamAsPrimitiveTest extends AbstractResourceTester {
         }        
     }
     
-    @UriTemplate("/wrappers")
+    @Path("/wrappers")
     public static class ResourceHeaderPrimitiveWrappers {
         @HttpMethod("GET")
         @ProduceMime("application/boolean")
@@ -316,7 +316,7 @@ public class HeaderParamAsPrimitiveTest extends AbstractResourceTester {
         }        
     }
     
-    @UriTemplate("/wrappers/default/null")
+    @Path("/wrappers/default/null")
     public static class ResourceHeaderPrimitiveWrappersDefaultNull {
         @HttpMethod("GET")
         @ProduceMime("application/boolean")
@@ -368,7 +368,7 @@ public class HeaderParamAsPrimitiveTest extends AbstractResourceTester {
         }        
     }
     
-    @UriTemplate("/wrappers/default")
+    @Path("/wrappers/default")
     public static class ResourceHeaderPrimitiveWrappersDefault {
         @HttpMethod("GET")
         @ProduceMime("application/boolean")
@@ -420,7 +420,7 @@ public class HeaderParamAsPrimitiveTest extends AbstractResourceTester {
         }        
     }
     
-    @UriTemplate("/wrappers/default/override")
+    @Path("/wrappers/default/override")
     public static class ResourceHeaderPrimitiveWrappersDefaultOverride {
         @HttpMethod("GET")
         @ProduceMime("application/boolean")
@@ -472,7 +472,7 @@ public class HeaderParamAsPrimitiveTest extends AbstractResourceTester {
         }        
     }
     
-    @UriTemplate("/list")
+    @Path("/list")
     public static class ResourceHeaderPrimitiveList {
         @HttpMethod("GET")
         @ProduceMime("application/boolean")
@@ -538,7 +538,7 @@ public class HeaderParamAsPrimitiveTest extends AbstractResourceTester {
         }        
     }
     
-    @UriTemplate("/list/default/null")
+    @Path("/list/default/null")
     public static class ResourceHeaderPrimitiveListDefaultNull {
         @HttpMethod("GET")
         @ProduceMime("application/boolean")
@@ -590,7 +590,7 @@ public class HeaderParamAsPrimitiveTest extends AbstractResourceTester {
         }        
     }
     
-    @UriTemplate("/list/default")
+    @Path("/list/default")
     public static class ResourceHeaderPrimitiveListDefault {
         @HttpMethod("GET")
         @ProduceMime("application/boolean")
@@ -642,7 +642,7 @@ public class HeaderParamAsPrimitiveTest extends AbstractResourceTester {
         }        
     }
     
-    @UriTemplate("/list/default/override")
+    @Path("/list/default/override")
     public static class ResourceHeaderPrimitiveListDefaultOverride {
         @HttpMethod("GET")
         @ProduceMime("application/boolean")

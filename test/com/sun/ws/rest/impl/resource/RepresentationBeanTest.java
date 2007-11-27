@@ -24,7 +24,7 @@ package com.sun.ws.rest.impl.resource;
 
 import com.sun.ws.rest.impl.AbstractResourceTester;
 import com.sun.ws.rest.impl.client.ResourceProxy;
-import javax.ws.rs.UriTemplate;
+import javax.ws.rs.Path;
 import javax.ws.rs.HttpMethod;
 
 /**
@@ -37,7 +37,7 @@ public class RepresentationBeanTest extends AbstractResourceTester {
         super(testName);
     }
     
-    @UriTemplate("/{arg1}/{arg2}")
+    @Path("/{arg1}/{arg2}")
     public static class TestOneWebResourceBean {
         @HttpMethod("POST")
         public String doPost(String in) {

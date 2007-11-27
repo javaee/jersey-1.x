@@ -24,7 +24,7 @@ package com.sun.ws.rest.impl.methodparams;
 
 import javax.ws.rs.HttpMethod;
 import javax.ws.rs.QueryParam;
-import javax.ws.rs.UriTemplate;
+import javax.ws.rs.Path;
 import com.sun.ws.rest.impl.AbstractResourceTester;
 import javax.ws.rs.Encoded;
 import javax.ws.rs.MatrixParam;
@@ -42,7 +42,7 @@ public class EncodedParamsTest extends AbstractResourceTester {
     }
 
     @Encoded
-    @UriTemplate("/{u}")
+    @Path("/{u}")
     public static class EncodedOnClass {
         public EncodedOnClass(
                 @UriParam("u") String u,
@@ -71,7 +71,7 @@ public class EncodedParamsTest extends AbstractResourceTester {
         resourceProxy("/%20u;m=%20m?q=%20q").get(String.class);
     }
     
-    @UriTemplate("/{u}")
+    @Path("/{u}")
     public static class EncodedOnAccessibleObject {
         @Encoded
         public EncodedOnAccessibleObject(
@@ -102,7 +102,7 @@ public class EncodedParamsTest extends AbstractResourceTester {
         resourceProxy("/%20u;m=%20m?q=%20q").get(String.class);
     }
     
-    @UriTemplate("/{u}")
+    @Path("/{u}")
     public static class EncodedOnParameters {
         public EncodedOnParameters(
                 @Encoded @UriParam("u") String u,
@@ -131,7 +131,7 @@ public class EncodedParamsTest extends AbstractResourceTester {
         resourceProxy("/%20u;m=%20m?q=%20q").get(String.class);
     }
 
-    @UriTemplate("/{u}")
+    @Path("/{u}")
     public static class MixedEncodedOnParameters {
         public MixedEncodedOnParameters(
                 @UriParam("u") String du,

@@ -26,7 +26,7 @@ import com.sun.ws.rest.impl.AbstractResourceTester;
 import com.sun.ws.rest.impl.TestResourceProxy;
 import com.sun.ws.rest.impl.client.ResponseInBound;
 import javax.ws.rs.HttpMethod;
-import javax.ws.rs.UriTemplate;
+import javax.ws.rs.Path;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
 
@@ -40,7 +40,7 @@ public class RedirectToPathWithSlashTest extends AbstractResourceTester {
         super(testName);
     }
 
-    @UriTemplate("/project/")
+    @Path("/project/")
     static public class Project { 
         @HttpMethod
         public String getMe() {
@@ -61,20 +61,20 @@ public class RedirectToPathWithSlashTest extends AbstractResourceTester {
         assertEquals("project", s);
     }    
     
-    @UriTemplate("/project/")
+    @Path("/project/")
     static public class ProjectWithSubMethods { 
         @HttpMethod
         public String getMe() {
             return "project";
         }
 
-        @UriTemplate("/details")
+        @Path("/details")
         @HttpMethod
         public String getDetails() {
             return "details";
         }
         
-        @UriTemplate("/moreDetails/")
+        @Path("/moreDetails/")
         @HttpMethod
         public String getMoreDetails() {
             return "moreDetails";
@@ -109,45 +109,45 @@ public class RedirectToPathWithSlashTest extends AbstractResourceTester {
         assertEquals("moreDetails", s);
     }    
     
-    @UriTemplate("/project/")
+    @Path("/project/")
     static public class ProjectWithSubResource { 
         @HttpMethod
         public String getMe() {
             return "project";
         }
 
-        @UriTemplate("build/")
+        @Path("build/")
         public BuildWithSubMethods getBuildResource() {
             return new BuildWithSubMethods();
         }
         
-        @UriTemplate("/details")
+        @Path("/details")
         @HttpMethod
         public String getDetails() {
             return "details";
         }
         
-        @UriTemplate("/moreDetails/")
+        @Path("/moreDetails/")
         @HttpMethod
         public String getMoreDetails() {
             return "moreDetails";
         }
     }
     
-    @UriTemplate("build/")
+    @Path("build/")
     static public class BuildWithSubMethods { 
         @HttpMethod
         public String getMe() {
             return "build";
         }
         
-        @UriTemplate("/details")
+        @Path("/details")
         @HttpMethod
         public String getDetails() {
             return "details";
         }
         
-        @UriTemplate("/moreDetails/")
+        @Path("/moreDetails/")
         @HttpMethod
         public String getMoreDetails() {
             return "moreDetails";

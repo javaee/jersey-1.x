@@ -26,13 +26,13 @@ import javax.ws.rs.DefaultValue;
 import javax.ws.rs.HttpMethod;
 import javax.ws.rs.ProduceMime;
 import javax.ws.rs.QueryParam;
-import javax.ws.rs.UriTemplate;
+import javax.ws.rs.Path;
 
 /**
  *
  * @author Doug Kohlert
  */
-@UriTemplate("/widgets")
+@Path("/widgets")
 public class MyResource {
     
     @HttpMethod("GET")

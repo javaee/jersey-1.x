@@ -27,7 +27,7 @@ import com.sun.ws.rest.api.core.HttpContextAccess;
 import com.sun.ws.rest.impl.client.ResourceProxy;
 import java.net.URI;
 import javax.ws.rs.HttpMethod;
-import javax.ws.rs.UriTemplate;
+import javax.ws.rs.Path;
 import javax.ws.rs.core.HttpContext;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.UriBuilder;
@@ -43,7 +43,7 @@ public class WebResorceWithFieldInjectionTest extends AbstractResourceTester {
         super(testName);
     }
     
-    @UriTemplate("/{arg1}/{arg2}")
+    @Path("/{arg1}/{arg2}")
     public static class TestFieldInjectedHttpContextAccess {
         private @HttpContext HttpContextAccess context;
         
@@ -78,21 +78,21 @@ public class WebResorceWithFieldInjectionTest extends AbstractResourceTester {
         }
     }
     
-    @UriTemplate("/{arg1}/{arg2}")
+    @Path("/{arg1}/{arg2}")
     public static class TestFieldInjectedUriInfo {
         private @HttpContext UriInfo uriInfo;
         
         @HttpMethod("GET")
         public String doGet() {
-            URI baseUri = uriInfo.getBase();
-            URI uri = uriInfo.getAbsolute();
+            URI baseUri = uriInfo.getBaseUri();
+            URI uri = uriInfo.getAbsolutePath();
             assertEquals(BASE_URI, baseUri);
             assertEquals(UriBuilder.fromUri(BASE_URI).path("a/b").build(), uri);
             return "GET";
         }        
     }
     
-    @UriTemplate("/{arg1}/{arg2}")
+    @Path("/{arg1}/{arg2}")
     public static class TestFieldInjectedHttpHeaders {
         private @HttpContext HttpHeaders httpHeaders;
         

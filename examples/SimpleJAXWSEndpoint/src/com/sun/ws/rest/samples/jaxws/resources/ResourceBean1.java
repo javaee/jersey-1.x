@@ -24,9 +24,9 @@ package com.sun.ws.rest.samples.jaxws.resources;
 
 import javax.ws.rs.HttpMethod;
 import javax.ws.rs.ProduceMime;
-import javax.ws.rs.UriTemplate;
+import javax.ws.rs.Path;
 
-@UriTemplate("/resource1")
+@Path("/resource1")
 public class ResourceBean1 {
     
     @HttpMethod("GET")

@@ -26,7 +26,7 @@ import com.sun.ws.rest.impl.AbstractResourceTester;
 import com.sun.ws.rest.api.core.HttpRequestContext;
 import com.sun.ws.rest.api.core.HttpResponseContext;
 import javax.ws.rs.ProduceMime;
-import javax.ws.rs.UriTemplate;
+import javax.ws.rs.Path;
 import com.sun.ws.rest.impl.client.ResourceProxy;
 import javax.ws.rs.HttpMethod;
 import javax.ws.rs.core.Response;
@@ -41,7 +41,7 @@ public class BeanWithWebResourceTest extends AbstractResourceTester {
         super(testName);
     }
     
-    @UriTemplate("/{arg1}/{arg2}")
+    @Path("/{arg1}/{arg2}")
     public static class BeanWithWebResource{
         @HttpMethod("GET")
         public void doGet(HttpRequestContext request, HttpResponseContext response) {
@@ -76,7 +76,7 @@ public class BeanWithWebResourceTest extends AbstractResourceTester {
         }
     }
     
-    @UriTemplate("/{arg1}/{arg2}")
+    @Path("/{arg1}/{arg2}")
     public static class BeanProduceWithWebResource {
         @HttpMethod("GET")
         @ProduceMime("text/html")

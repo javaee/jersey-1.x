@@ -25,7 +25,7 @@ package com.sun.ws.rest.impl.methodparams;
 import com.sun.ws.rest.impl.AbstractResourceTester;
 import javax.ws.rs.HttpMethod;
 import javax.ws.rs.UriParam;
-import javax.ws.rs.UriTemplate;
+import javax.ws.rs.Path;
 import com.sun.ws.rest.impl.AbstractResourceTester;
 import com.sun.ws.rest.impl.client.ResponseInBound;
 import java.math.BigDecimal;
@@ -42,7 +42,7 @@ public class UriParamStringConstructorTest extends AbstractResourceTester {
         initiateWebApplication(Resource.class);
     }
 
-    @UriTemplate("/{a}/{b}")
+    @Path("/{a}/{b}")
     public static class Resource {
         @HttpMethod("GET")
         public String doGet(

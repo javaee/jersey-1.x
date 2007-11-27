@@ -27,7 +27,7 @@ import com.sun.ws.rest.impl.client.ResourceProxy;
 import com.sun.ws.rest.impl.client.ResponseInBound;
 import javax.ws.rs.HttpMethod;
 import javax.ws.rs.ProduceMime;
-import javax.ws.rs.UriTemplate;
+import javax.ws.rs.Path;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
@@ -41,7 +41,7 @@ public class HeadTest extends AbstractResourceTester {
         super(testName);
     }
 
-    @UriTemplate("/")
+    @Path("/")
     static public class ResourceGetNoHead { 
         @HttpMethod
         public String get() {
@@ -58,7 +58,7 @@ public class HeadTest extends AbstractResourceTester {
         assertFalse(response.hasEntity());
     }
     
-    @UriTemplate("/")
+    @Path("/")
     static public class ResourceGetWithHead { 
         @HttpMethod
         public Response head() {
@@ -81,7 +81,7 @@ public class HeadTest extends AbstractResourceTester {
         assertEquals("HEAD", response.getMetadata().getFirst("X-TEST"));
     }
     
-    @UriTemplate("/")
+    @Path("/")
     static public class ResourceGetWithProduceNoHead { 
         @HttpMethod
         @ProduceMime("application/foo")
@@ -113,7 +113,7 @@ public class HeadTest extends AbstractResourceTester {
         assertEquals(bar, response.getContentType());
     }
     
-    @UriTemplate("/")
+    @Path("/")
     static public class ResourceGetWithProduceWithHead { 
         
         @HttpMethod

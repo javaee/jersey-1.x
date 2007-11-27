@@ -25,7 +25,7 @@ package com.sun.ws.rest.impl.resource;
 import com.sun.ws.rest.impl.AbstractResourceTester;
 import com.sun.ws.rest.impl.client.ResponseInBound;
 import javax.ws.rs.HttpMethod;
-import javax.ws.rs.UriTemplate;
+import javax.ws.rs.Path;
 import javax.ws.rs.core.Response;
 
 /**
@@ -38,7 +38,7 @@ public class OptionsTest extends AbstractResourceTester {
         super(testName);
     }
 
-    @UriTemplate("/")
+    @Path("/")
     static public class ResourceNoOptions { 
         @HttpMethod
         public String get() {
@@ -78,7 +78,7 @@ public class OptionsTest extends AbstractResourceTester {
         assertTrue(allow.contains("PATCH"));
     }
     
-    @UriTemplate("/")
+    @Path("/")
     static public class ResourceWithOptions { 
         
         @HttpMethod("OPTIONS")

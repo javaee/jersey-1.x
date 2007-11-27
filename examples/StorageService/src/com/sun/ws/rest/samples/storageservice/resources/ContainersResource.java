@@ -26,7 +26,7 @@ import com.sun.ws.rest.samples.storageservice.Containers;
 import com.sun.ws.rest.samples.storageservice.MemoryStore;
 import javax.ws.rs.HttpMethod;
 import javax.ws.rs.ProduceMime;
-import javax.ws.rs.UriTemplate;
+import javax.ws.rs.Path;
 import javax.ws.rs.core.HttpContext;
 import javax.ws.rs.core.PreconditionEvaluator;
 import javax.ws.rs.core.UriInfo;
@@ -35,13 +35,13 @@ import javax.ws.rs.core.UriInfo;
  *
  * @author Paul.Sandoz@Sun.Com
  */
-@UriTemplate("/containers")
+@Path("/containers")
 @ProduceMime("application/xml")
 public class ContainersResource {
     @HttpContext UriInfo uriInfo;
     @HttpContext PreconditionEvaluator preconditionEvaluator;
     
-    @UriTemplate("{container}")
+    @Path("{container}")
     public ContainerResource getContainerResource() {
         return new ContainerResource(uriInfo, preconditionEvaluator);
     }

@@ -267,7 +267,7 @@ public abstract class AbstractContainerResponse implements ContainerResponse {
         Object location = headers.getFirst("Location");
         if (location != null) {
             if (location instanceof URI) {
-                URI absoluteLocation = request.getBase().resolve((URI)location);
+                URI absoluteLocation = request.getBaseUri().resolve((URI)location);
                 headers.putSingle("Location", absoluteLocation);
             }
         }

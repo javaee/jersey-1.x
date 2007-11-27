@@ -25,7 +25,7 @@ package com.sun.ws.rest.impl.resource;
 import com.sun.ws.rest.impl.AbstractResourceTester;
 import com.sun.ws.rest.impl.client.ResponseInBound;
 import javax.ws.rs.HttpMethod;
-import javax.ws.rs.UriTemplate;
+import javax.ws.rs.Path;
 import javax.ws.rs.core.Response;
 
 /**
@@ -38,32 +38,32 @@ public class OptionsSubResourceMethodTest extends AbstractResourceTester {
         super(testName);
     }
 
-    @UriTemplate("/")
+    @Path("/")
     static public class ResourceNoOptions { 
-        @UriTemplate("sub")
+        @Path("sub")
         @HttpMethod
         public String get() {
             return "GET";
         }
         
-        @UriTemplate("sub")
+        @Path("sub")
         @HttpMethod
         public String put(String e) {
             return "PUT";
         }
         
-        @UriTemplate("sub")
+        @Path("sub")
         @HttpMethod
         public String post(String e) {
             return "POST";
         }
         
-        @UriTemplate("sub")
+        @Path("sub")
         @HttpMethod
         public void delete() {
         }
         
-        @UriTemplate("sub")
+        @Path("sub")
         @HttpMethod("PATCH")
         public String patch(String e) {
             return "PATCH";
@@ -83,40 +83,40 @@ public class OptionsSubResourceMethodTest extends AbstractResourceTester {
         assertTrue(allow.contains("PATCH"));
     }
     
-    @UriTemplate("/")
+    @Path("/")
     static public class ResourceWithOptions { 
         
-        @UriTemplate("sub")
+        @Path("sub")
         @HttpMethod("OPTIONS")
         public Response options() {
             return Response.Builder.representation("OPTIONS").
                     header("Allow", "GET, PUT, POST, DELETE, PATCH").build();
         }
         
-        @UriTemplate("sub")
+        @Path("sub")
         @HttpMethod
         public String get() {
             return "GET";
         }
         
-        @UriTemplate("sub")
+        @Path("sub")
         @HttpMethod
         public String put(String e) {
             return "PUT";
         }
         
-        @UriTemplate("sub")
+        @Path("sub")
         @HttpMethod
         public String post(String e) {
             return "POST";
         }
         
-        @UriTemplate("sub")
+        @Path("sub")
         @HttpMethod
         public void delete() {
         }
         
-        @UriTemplate("sub")
+        @Path("sub")
         @HttpMethod("PATCH")
         public String patch(String e) {
             return "PATCH";
@@ -136,15 +136,15 @@ public class OptionsSubResourceMethodTest extends AbstractResourceTester {
         assertTrue(allow.contains("PATCH"));
     }
     
-    @UriTemplate("/")
+    @Path("/")
     static public class ResourceNoOptionsDifferentSub { 
-        @UriTemplate("sub1")
+        @Path("sub1")
         @HttpMethod
         public String getFoo() {
             return "FOO";
         }
         
-        @UriTemplate("sub2")
+        @Path("sub2")
         @HttpMethod
         public String putBar() {
             return "BAR";

@@ -23,7 +23,7 @@ import javax.ws.rs.HttpMethod;
 import javax.ws.rs.MatrixParam;
 import javax.ws.rs.ProduceMime;
 import javax.ws.rs.UriParam;
-import javax.ws.rs.UriTemplate;
+import javax.ws.rs.Path;
 import javax.ws.rs.core.MediaType;
 
 /**
@@ -32,7 +32,7 @@ import javax.ws.rs.core.MediaType;
  */
 public class IntrospectionModellerTest extends TestCase {
     
-    @UriTemplate("/one")
+    @Path("/one")
     public class TestRootResourceOne {
         
         /** Creates a new instance of TestRootResourceOne */
@@ -45,21 +45,21 @@ public class IntrospectionModellerTest extends TestCase {
             return "Hi there, here is a resource method.";
         }
         
-        @UriTemplate("/subres-locator/{p1}")
+        @Path("/subres-locator/{p1}")
         public TestSubResourceOne getSubResourceMethodTester(
                 @UriParam("p1") String pOne, @MatrixParam("p2") int pTwo, @HeaderParam("p3") String pThree) {
             return new TestSubResourceOne();
         }
         
         @HttpMethod("PUT")
-        @UriTemplate("/subres-method")
+        @Path("/subres-method")
         public String getSubResourceMethod(String entityParam) {
             return "Hi there, here is a subresource method!";
         }
         
         @HttpMethod
         @ProduceMime("text/plain")
-        @UriTemplate("/with-params/{one}")
+        @Path("/with-params/{one}")
         public String getSubResourceMethodWithParams(@UriParam("one") String paramOne) {
             return "Hi there, here is a subresource method!";
         }
@@ -170,7 +170,7 @@ public class IntrospectionModellerTest extends TestCase {
         assertTrue("*/*".equals(resourceMethod.getSupportedOutputTypes().get(0).toString()));
         
         AbstractSubResourceLocator locator = rootResource.getSubResourceLocators().get(0);
-//        @UriTemplate("/subres-locator/{p1}")
+//        @Path("/subres-locator/{p1}")
 //        public TestSubResourceOne getSubResourceMethodTester(
 //                @UriParam("p1") String pOne, @MatrixParam("p2") int pTwo, @HeaderParam("p3") String pThree) {
 //            return new TestSubResourceOne();
@@ -197,7 +197,7 @@ public class IntrospectionModellerTest extends TestCase {
             subResMethod1 = rootResource.getSubResourceMethods().get(1);
         }
 //        @HttpMethod("PUT")
-//        @UriTemplate("/subres-method")
+//        @Path("/subres-method")
 //        public String getSubResourceMethod(String entityParam) {
 //            return "Hi there, here is a subresource method!";
 //        }
@@ -206,7 +206,7 @@ public class IntrospectionModellerTest extends TestCase {
         assertTrue(1 == subResMethod1.getParameters().size());
         assertTrue(Parameter.Source.ENTITY == subResMethod1.getParameters().get(0).getSource());
 //        @HttpMethod
-//        @UriTemplate("/with-params/{one}")
+//        @Path("/with-params/{one}")
 //        @ProduceMime("text/plain")
 //        public String getSubResourceMethodWithParams(@UriParam("one") String paramOne) {
 //            return "Hi there, here is a subresource method!";

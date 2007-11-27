@@ -26,7 +26,7 @@ import com.sun.ws.rest.samples.optimisticconcurrency.Item;
 import com.sun.ws.rest.samples.optimisticconcurrency.ItemData;
 import javax.ws.rs.HttpMethod;
 import javax.ws.rs.ProduceMime;
-import javax.ws.rs.UriTemplate;
+import javax.ws.rs.Path;
 import javax.ws.rs.core.HttpContext;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.UriBuilder;
@@ -36,11 +36,11 @@ import javax.ws.rs.core.UriInfo;
  *
  * @author Paul.Sandoz@Sun.Com
  */
-@UriTemplate("/item")
+@Path("/item")
 public class ItemResource {
     @HttpContext UriInfo uriInfo;
     
-    @UriTemplate("content")
+    @Path("content")
     public ItemContentResource getItemContentResource() {
         return new ItemContentResource();
     }
@@ -56,7 +56,7 @@ public class ItemResource {
             mediaType = id.getMediaType();
         }
         
-        UriBuilder ub = uriInfo.getBuilder().path("content");
+        UriBuilder ub = uriInfo.getAbsolutePathBuilder().path("content");
         return new Item(
                 ub.build(),
                 ub.path(version).build(),

@@ -32,7 +32,7 @@ import com.sun.ws.rest.spi.resource.PerRequest;
 import com.sun.ws.rest.spi.resource.Singleton;
 import java.util.HashSet;
 import java.util.Set;
-import javax.ws.rs.UriTemplate;
+import javax.ws.rs.Path;
 import javax.ws.rs.HttpMethod;
 
 /**
@@ -41,7 +41,7 @@ import javax.ws.rs.HttpMethod;
  */
 public class ResourceLifecycleTest extends AbstractResourceTester {
     
-    @UriTemplate("foo")
+    @Path("foo")
     @Singleton
     public static class TestFooBean {
         
@@ -59,7 +59,7 @@ public class ResourceLifecycleTest extends AbstractResourceTester {
         
     }
     
-    @UriTemplate("bar")
+    @Path("bar")
     @PerRequest
     public static class TestBarBean {
         
@@ -77,7 +77,7 @@ public class ResourceLifecycleTest extends AbstractResourceTester {
         
     }
     
-    @UriTemplate("baz")
+    @Path("baz")
     public static class TestBazBean {
         
         private int count;

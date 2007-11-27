@@ -26,7 +26,7 @@ import com.sun.ws.rest.impl.AbstractResourceTester;
 import javax.ws.rs.HttpMethod;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.UriParam;
-import javax.ws.rs.UriTemplate;
+import javax.ws.rs.Path;
 import com.sun.ws.rest.impl.AbstractResourceTester;
 
 /**
@@ -39,14 +39,14 @@ public class SubResourceDynamicWithParametersTest extends AbstractResourceTester
         super(testName);
     }
     
-    @UriTemplate("/{p}")
+    @Path("/{p}")
     static public class ParentWithTemplates { 
         @HttpMethod
         public String getMe(@UriParam("p") String p) {
             return p;
         }
         
-        @UriTemplate("child/{c}")
+        @Path("child/{c}")
         public ChildWithTemplates getChildWithTemplates(
                 @UriParam("p") String p, @UriParam("c") String c,
                 @QueryParam("a") int a, @QueryParam("b") int b) {
@@ -57,7 +57,7 @@ public class SubResourceDynamicWithParametersTest extends AbstractResourceTester
             return new ChildWithTemplates();
         }
         
-        @UriTemplate(value="unmatchedPath/{path}", limited=false)
+        @Path(value="unmatchedPath/{path}", limited=false)
         public UnmatchedPathResource getUnmatchedPath(
                 @UriParam("p") String p,
                 @UriParam("path") String path) {

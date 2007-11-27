@@ -24,7 +24,7 @@ package com.sun.ws.rest.impl.resource;
 
 import com.sun.ws.rest.impl.AbstractResourceTester;
 import javax.ws.rs.HttpMethod;
-import javax.ws.rs.UriTemplate;
+import javax.ws.rs.Path;
 import com.sun.ws.rest.impl.client.ResponseInBound;
 import java.util.GregorianCalendar;
 import javax.ws.rs.core.EntityTag;
@@ -43,7 +43,7 @@ public class PreconditionTest extends AbstractResourceTester {
         super(testName);
     }
 
-    @UriTemplate("/")
+    @Path("/")
     public static class LastModifiedResource {
         @HttpContext PreconditionEvaluator evaluator;
 
@@ -124,7 +124,7 @@ public class PreconditionTest extends AbstractResourceTester {
     }
         
     
-    @UriTemplate("/")
+    @Path("/")
     public static class EtagResource {
         @HttpContext PreconditionEvaluator evaluator;
 

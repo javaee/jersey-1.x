@@ -29,7 +29,7 @@ import com.sun.ws.rest.impl.client.ResponseInBound;
 import java.net.URI;
 import java.net.URISyntaxException;
 import javax.ws.rs.HttpMethod;
-import javax.ws.rs.UriTemplate;
+import javax.ws.rs.Path;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
 
@@ -43,7 +43,7 @@ public class CreatedTest extends AbstractResourceTester {
         super(testName);
     }
     
-    @UriTemplate("/")
+    @Path("/")
     static public class Resource { 
         @HttpMethod("POST")
         public Response doPost() {

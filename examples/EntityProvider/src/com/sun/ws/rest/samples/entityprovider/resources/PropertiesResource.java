@@ -26,9 +26,9 @@ import java.util.Properties;
 import javax.ws.rs.ConsumeMime;
 import javax.ws.rs.HttpMethod;
 import javax.ws.rs.ProduceMime;
-import javax.ws.rs.UriTemplate;
+import javax.ws.rs.Path;
 
-@UriTemplate("/properties")
+@Path("/properties")
 @ProduceMime("text/plain")
 public class PropertiesResource {
 

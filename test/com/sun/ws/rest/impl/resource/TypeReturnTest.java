@@ -24,7 +24,7 @@ package com.sun.ws.rest.impl.resource;
 
 import javax.ws.rs.HttpMethod;
 import javax.ws.rs.ProduceMime;
-import javax.ws.rs.UriTemplate;
+import javax.ws.rs.Path;
 import com.sun.ws.rest.impl.AbstractResourceTester;
 import com.sun.ws.rest.impl.client.ResponseInBound;
 import javax.ws.rs.core.MediaType;
@@ -39,7 +39,7 @@ public class TypeReturnTest extends AbstractResourceTester {
         super(testName);
     }
     
-    @UriTemplate("/")
+    @Path("/")
     static public class Resource { 
         @HttpMethod("GET")
         public String doGet() {
@@ -47,7 +47,7 @@ public class TypeReturnTest extends AbstractResourceTester {
         }
     }
     
-    @UriTemplate("/")
+    @Path("/")
     static public class ResourceWithSingleProduceMime { 
         @HttpMethod("GET")
         @ProduceMime("text/plain")

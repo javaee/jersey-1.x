@@ -28,7 +28,7 @@ import java.util.Date;
 import javax.ws.rs.ConsumeMime;
 import javax.ws.rs.HttpMethod;
 import javax.ws.rs.ProduceMime;
-import javax.ws.rs.UriTemplate;
+import javax.ws.rs.Path;
 import javax.ws.rs.core.Cookie;
 import javax.ws.rs.core.HttpContext;
 import javax.ws.rs.core.HttpHeaders;
@@ -40,7 +40,7 @@ import javax.ws.rs.core.Response;
  * submitting it.
  * 
  */
-@UriTemplate("/form")
+@Path("/form")
 @ProduceMime("text/html")
 public class Form {
     
@@ -49,7 +49,7 @@ public class Form {
     @HttpContext
     HttpHeaders headers;
     
-    @UriTemplate("colours")
+    @Path("colours")
     public Colours getColours() {
         return coloursResource;
     }
