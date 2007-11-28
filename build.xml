@@ -76,10 +76,7 @@
         </resourcegen>    
         <resourcegen destDir="build/gen-src">
             <resource dir="src/impl" includes="**/*.properties"/>
-        </resourcegen>    
-        <resourcegen destDir="build/gen-src">
-            <resource dir="src/tools/common" includes="**/*.properties"/>
-        </resourcegen>    
+        </resourcegen>
     </target>
     
     
