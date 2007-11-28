@@ -9,8 +9,6 @@
                 <root id="src.api.dir" name="api"/>
                 <root id="src.spi.dir" name="spi"/>
                 <root id="src.impl.dir" name="impl"/>
-                <root id="src.common.dir" name="tools"/>
-                <root id="src.javase5.dir" name="tools/apt"/>
                 <root id="src.gen-src.dir"/>
             </source-roots>
             <test-roots>

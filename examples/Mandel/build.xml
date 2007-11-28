@@ -36,4 +36,6 @@
             classpath="${run.classpath}">
         </java>
     </target>
+    
+    <target name="default" depends="test,jar"/>    
 </project>

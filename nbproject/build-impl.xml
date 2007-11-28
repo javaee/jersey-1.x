@@ -70,8 +70,6 @@ is divided into following sections:
                 <available file="${src.api.dir}"/>
                 <available file="${src.spi.dir}"/>
                 <available file="${src.impl.dir}"/>
-                <available file="${src.common.dir}"/>
-                <available file="${src.javase5.dir}"/>
                 <available file="${src.gen-src.dir}"/>
             </or>
         </condition>
@@ -103,8 +101,6 @@ is divided into following sections:
         <fail unless="src.api.dir">Must set src.api.dir</fail>
         <fail unless="src.spi.dir">Must set src.spi.dir</fail>
         <fail unless="src.impl.dir">Must set src.impl.dir</fail>
-        <fail unless="src.common.dir">Must set src.common.dir</fail>
-        <fail unless="src.javase5.dir">Must set src.javase5.dir</fail>
         <fail unless="src.gen-src.dir">Must set src.gen-src.dir</fail>
         <fail unless="test.src.dir">Must set test.src.dir</fail>
         <fail unless="build.dir">Must set build.dir</fail>
@@ -127,7 +123,7 @@ is divided into following sections:
     </target>
     <target name="-init-macrodef-javac">
         <macrodef name="javac" uri="http://www.netbeans.org/ns/j2se-project/3">
-            <attribute name="srcdir" default="${src.api.dir}:${src.spi.dir}:${src.impl.dir}:${src.common.dir}:${src.javase5.dir}:${src.gen-src.dir}"/>
+            <attribute name="srcdir" default="${src.api.dir}:${src.spi.dir}:${src.impl.dir}:${src.gen-src.dir}"/>
             <attribute name="destdir" default="${build.classes.dir}"/>
             <attribute name="classpath" default="${javac.classpath}"/>
             <attribute name="debug" default="${javac.debug}"/>
@@ -257,8 +253,6 @@ is divided into following sections:
             <fileset dir="${src.api.dir}" excludes="${build.classes.excludes}"/>
             <fileset dir="${src.spi.dir}" excludes="${build.classes.excludes}"/>
             <fileset dir="${src.impl.dir}" excludes="${build.classes.excludes}"/>
-            <fileset dir="${src.common.dir}" excludes="${build.classes.excludes}"/>
-            <fileset dir="${src.javase5.dir}" excludes="${build.classes.excludes}"/>
             <fileset dir="${src.gen-src.dir}" excludes="${build.classes.excludes}"/>
         </copy>
     </target>
@@ -412,21 +406,15 @@ is divided into following sections:
                 <pathelement location="${src.api.dir}"/>
                 <pathelement location="${src.spi.dir}"/>
                 <pathelement location="${src.impl.dir}"/>
-                <pathelement location="${src.common.dir}"/>
-                <pathelement location="${src.javase5.dir}"/>
                 <pathelement location="${src.gen-src.dir}"/>
             </sourcepath>
             <packageset dir="${src.api.dir}" includes="*/**"/>
             <packageset dir="${src.spi.dir}" includes="*/**"/>
             <packageset dir="${src.impl.dir}" includes="*/**"/>
-            <packageset dir="${src.common.dir}" includes="*/**"/>
-            <packageset dir="${src.javase5.dir}" includes="*/**"/>
             <packageset dir="${src.gen-src.dir}" includes="*/**"/>
             <fileset dir="${src.api.dir}" includes="*.java"/>
             <fileset dir="${src.spi.dir}" includes="*.java"/>
             <fileset dir="${src.impl.dir}" includes="*.java"/>
-            <fileset dir="${src.common.dir}" includes="*.java"/>
-            <fileset dir="${src.javase5.dir}" includes="*.java"/>
             <fileset dir="${src.gen-src.dir}" includes="*.java"/>
         </javadoc>
     </target>
