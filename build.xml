@@ -88,8 +88,6 @@
             <fileset dir="src/api"/>
             <fileset dir="src/spi"/>
             <fileset dir="src/impl"/>
-            <fileset dir="src/tools/common"/>
-            <fileset dir="src/tools/javase5"/>
             <fileset dir="build/gen-src"/>
         </zip>
         
@@ -307,10 +305,8 @@
 <!-- Emma ****************************-->
         <path id="src.ref" >
           <pathelement location="${src.api.dir}" />
-          <pathelement location="${src.common.dir}" />
           <pathelement location="${src.gen-src.dir}" />
           <pathelement location="${src.impl.dir}" />
-          <pathelement location="${src.javase5.dir}" />
           <pathelement location="${src.spi.dir}" />
         </path>
         
