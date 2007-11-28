@@ -21,7 +21,7 @@
        "Portions Copyrighted [year] [name of copyright owner]"
 -->
 <project name="Bookstore" default="default" basedir=".">
-    <description>Builds, tests, and runs the project ServletHttpState.</description>
+    <description>Builds, tests, and runs the project Bookstore.</description>
     <import file="nbproject/build-impl.xml"/>
     
     <property environment="env"/>
@@ -30,6 +30,9 @@
      <condition property="ext" value="" else=".bat">
         <os family="unix"/>
     </condition>
+
+    <property name="javac.source"  value="1.5"/>
+    <property name="javac.target"  value="1.5"/>
 
     <target name="start-glassfish">
         <exec executable="${as.home}/bin/asadmin${ext}">
