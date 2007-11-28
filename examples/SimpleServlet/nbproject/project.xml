@@ -10,6 +10,10 @@
                     <file>${file.reference.servlet.jar}</file>
                 </library>
                 <library files="1">
+                    <file>${file.reference.activation.jar}</file>
+                    <path-in-war>WEB-INF/lib</path-in-war>
+                </library>
+                <library files="1">
                     <file>${file.reference.jsr250-api.jar}</file>
                     <path-in-war>WEB-INF/lib</path-in-war>
                 </library>
