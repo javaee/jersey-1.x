@@ -21,7 +21,8 @@ package com.sun.ws.rest.samples.entityprovider.resources;
 
 import com.sun.ws.rest.spi.resource.Singleton;
 import java.util.Hashtable;
-import javax.ws.rs.HttpMethod;
+import javax.ws.rs.GET;
+import javax.ws.rs.POST;
 import javax.ws.rs.ProduceMime;
 import javax.ws.rs.Path;
 
@@ -32,20 +33,20 @@ import javax.ws.rs.Path;
 @Path("data")
 public class MapResource {
     
-    private static Hashtable<String, String> data = new Hashtable<String, String>();
+    private Hashtable<String, String> data = new Hashtable<String, String>();
     
     /** Creates a new instance of MapResource */
     public MapResource() {
         data.put("foo", "bar");
     }
     
-    @HttpMethod("GET")
+    @GET
     @ProduceMime("text/html")
     public Hashtable<String, String> getData() {
         return data;
     }
     
-    @HttpMethod("POST")
+    @POST
     @ProduceMime("text/html")
     public Hashtable<String, String> updateDataItem(NameValuePair item) {
         if (item.getName()!=null) {

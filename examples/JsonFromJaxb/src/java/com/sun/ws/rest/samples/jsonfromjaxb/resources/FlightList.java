@@ -27,8 +27,9 @@ import com.sun.ws.rest.samples.jsonfromjaxb.jaxb.FlightType;
 import com.sun.ws.rest.samples.jsonfromjaxb.jaxb.Flights;
 import com.sun.ws.rest.spi.resource.Singleton;
 import javax.ws.rs.ConsumeMime;
+import javax.ws.rs.GET;
+import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
-import javax.ws.rs.HttpMethod;
 import javax.ws.rs.ProduceMime;
 
 /**
@@ -64,13 +65,13 @@ public class FlightList {
         myFlights.getFlight().add(flight124);
     }
 
-    @HttpMethod
+    @GET
     @ProduceMime({"application/json", "application/xml"})
     public synchronized Flights getFlightList() {
         return myFlights;
     }
 
-    @HttpMethod
+    @PUT
     @ConsumeMime({"application/json", "application/xml"})
     public synchronized void putFlightList(Flights flights) {
         myFlights = flights;

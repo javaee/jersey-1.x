@@ -29,7 +29,8 @@ import com.sun.syndication.io.FeedException;
 import java.io.IOException;
 import java.net.URI;
 import javax.ws.rs.ConsumeMime;
-import javax.ws.rs.HttpMethod;
+import javax.ws.rs.GET;
+import javax.ws.rs.POST;
 import javax.ws.rs.ProduceMime;
 import javax.ws.rs.UriParam;
 import javax.ws.rs.Path;
@@ -78,12 +79,12 @@ public class FeedResource {
 //    }
     
     
-    @HttpMethod
+    @GET
     public Feed getFeed() throws IOException, FeedException {
         return AtomStore.getFeedDocument(uriInfo.getAbsolutePath());
     }
 
-    @HttpMethod
+    @POST
     @ConsumeMime("application/atom+xml")
     public Response postEntry(Entry e) throws IOException, FeedException {
         // Get the next unique name of the entry
@@ -113,7 +114,7 @@ public class FeedResource {
         return Response.Builder.created(e, entryUri).build();
     }
 
-    @HttpMethod
+    @POST
     public Response postMediaEntry(
             @HttpContext HttpHeaders headers,
             byte[] entry) throws IOException, FeedException {

@@ -35,7 +35,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.PersistenceUnit;
 import javax.persistence.Query;
-import javax.ws.rs.HttpMethod;
+import javax.ws.rs.GET;
 import javax.ws.rs.ProduceMime;
 import javax.ws.rs.Path;
 
@@ -50,7 +50,7 @@ public class WidgetsResource {
     }
     
     @ProduceMime("text/plain")
-    @HttpMethod("GET")
+    @GET
     public String getListOfWidgets() {
         StringBuilder b = new StringBuilder();
         EntityManager em = null;

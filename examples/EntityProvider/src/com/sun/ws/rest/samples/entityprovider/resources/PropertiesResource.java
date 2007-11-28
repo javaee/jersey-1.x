@@ -23,8 +23,7 @@
 package com.sun.ws.rest.samples.entityprovider.resources;
 
 import java.util.Properties;
-import javax.ws.rs.ConsumeMime;
-import javax.ws.rs.HttpMethod;
+import javax.ws.rs.GET;
 import javax.ws.rs.ProduceMime;
 import javax.ws.rs.Path;
 
@@ -33,7 +32,7 @@ import javax.ws.rs.Path;
 public class PropertiesResource {
 
     // Get the current system properties of the JVM
-    @HttpMethod
+    @GET
     public Properties getSystemProperties() {
         return System.getProperties();
     }

@@ -29,7 +29,8 @@ import java.io.IOException;
 import java.net.URI;
 import java.util.Date;
 import javax.ws.rs.ConsumeMime;
-import javax.ws.rs.HttpMethod;
+import javax.ws.rs.DELETE;
+import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.core.HttpContext;
 import javax.ws.rs.core.HttpHeaders;
@@ -48,7 +49,7 @@ public class EditEntryResource extends EntryResource {
         this.uriInfo = uriInfo;
     }
     
-    @HttpMethod
+    @PUT
     public Entry putEntry(Entry e) throws IOException, FeedException {
         UriBuilder entryUri = uriInfo.getBaseUriBuilder().
                 path(FeedResource.class).
@@ -79,7 +80,7 @@ public class EditEntryResource extends EntryResource {
     }
 
     
-    @HttpMethod
+    @DELETE
     public void deleteEntry() throws IOException, FeedException {
         AtomStore.deleteEntry(entryId);
         
@@ -88,7 +89,7 @@ public class EditEntryResource extends EntryResource {
     }
     
     
-    @HttpMethod
+    @PUT
     @Path("media")
     @ConsumeMime("*/*")
     public void putMedia(@HttpContext HttpHeaders headers,

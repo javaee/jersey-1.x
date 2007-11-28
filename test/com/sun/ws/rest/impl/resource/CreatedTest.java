@@ -23,12 +23,10 @@
 package com.sun.ws.rest.impl.resource;
 
 import com.sun.ws.rest.impl.AbstractResourceTester;
-import com.sun.ws.rest.impl.TestResourceProxy;
 import com.sun.ws.rest.impl.client.ResourceProxy;
 import com.sun.ws.rest.impl.client.ResponseInBound;
 import java.net.URI;
-import java.net.URISyntaxException;
-import javax.ws.rs.HttpMethod;
+import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
@@ -45,7 +43,7 @@ public class CreatedTest extends AbstractResourceTester {
     
     @Path("/")
     static public class Resource { 
-        @HttpMethod("POST")
+        @POST
         public Response doPost() {
             return Response.Builder.created("CONTENT", URI.create("subpath")).build();
         }

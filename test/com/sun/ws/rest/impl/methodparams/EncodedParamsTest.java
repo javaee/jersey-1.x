@@ -22,11 +22,11 @@
 
 package com.sun.ws.rest.impl.methodparams;
 
-import javax.ws.rs.HttpMethod;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.Path;
 import com.sun.ws.rest.impl.AbstractResourceTester;
 import javax.ws.rs.Encoded;
+import javax.ws.rs.GET;
 import javax.ws.rs.MatrixParam;
 import javax.ws.rs.UriParam;
 
@@ -53,7 +53,7 @@ public class EncodedParamsTest extends AbstractResourceTester {
             assertEquals("%20m", m);
         }
         
-        @HttpMethod("GET")
+        @GET
         public String doGet(
                 @UriParam("u") String u,
                 @QueryParam("q") String q, 
@@ -84,7 +84,7 @@ public class EncodedParamsTest extends AbstractResourceTester {
         }
         
         @Encoded
-        @HttpMethod("GET")
+        @GET
         public String doGet(
                 @UriParam("u") String u,
                 @QueryParam("q") String q, 
@@ -113,7 +113,7 @@ public class EncodedParamsTest extends AbstractResourceTester {
             assertEquals("%20m", m);
         }
         
-        @HttpMethod("GET")
+        @GET
         public String doGet(
                 @Encoded @UriParam("u") String u,
                 @Encoded @QueryParam("q") String q, 
@@ -148,7 +148,7 @@ public class EncodedParamsTest extends AbstractResourceTester {
             assertEquals("%20m", em);
         }
         
-        @HttpMethod("GET")
+        @GET
         public String doGet(
                 @UriParam("u") String du,
                 @QueryParam("q") String dq, 

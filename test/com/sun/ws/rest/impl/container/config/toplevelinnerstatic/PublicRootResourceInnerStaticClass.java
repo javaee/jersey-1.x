@@ -22,7 +22,7 @@
 
 package com.sun.ws.rest.impl.container.config.toplevelinnerstatic;
 
-import javax.ws.rs.HttpMethod;
+import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 
 /**
@@ -31,14 +31,14 @@ import javax.ws.rs.Path;
  */
 @Path("/")
 public class PublicRootResourceInnerStaticClass {
-    @HttpMethod
+    @GET
     public String getMe() {
         return "ME";
     }
        
     @Path("/")
     public static class PublicClass {
-        @HttpMethod
+        @GET
         public String getMe() {
             return "ME";
         }

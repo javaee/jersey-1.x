@@ -23,10 +23,11 @@
 package com.sun.ws.rest.impl.methodparams;
 
 import com.sun.ws.rest.impl.AbstractResourceTester;
-import javax.ws.rs.HttpMethod;
 import javax.ws.rs.UriParam;
 import javax.ws.rs.Path;
 import com.sun.ws.rest.impl.AbstractResourceTester;
+import javax.ws.rs.GET;
+import javax.ws.rs.POST;
 
 /**
  *
@@ -42,7 +43,7 @@ public class UriParamAsStringTest extends AbstractResourceTester {
 
     @Path("/{arg1}/{arg2}/{arg3}")
     public static class Resource {
-        @HttpMethod("GET")
+        @GET
         public String doGet(@UriParam("arg1") String arg1, 
                 @UriParam("arg2") String arg2, @UriParam("arg3") String arg3) {
             assertEquals("a", arg1);
@@ -51,7 +52,7 @@ public class UriParamAsStringTest extends AbstractResourceTester {
             return "content";
         }
         
-        @HttpMethod("POST")
+        @POST
         public String doPost(@UriParam("arg1") String arg1, 
                 @UriParam("arg2") String arg2, @UriParam("arg3") String arg3,
                 String r) {

@@ -24,8 +24,11 @@ package com.sun.ws.rest.impl.resource;
 
 import com.sun.ws.rest.impl.AbstractResourceTester;
 import com.sun.ws.rest.impl.client.ResourceProxy;
+import javax.ws.rs.DELETE;
+import javax.ws.rs.GET;
+import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
-import javax.ws.rs.HttpMethod;
 
 /**
  *
@@ -39,24 +42,24 @@ public class RepresentationBeanTest extends AbstractResourceTester {
     
     @Path("/{arg1}/{arg2}")
     public static class TestOneWebResourceBean {
-        @HttpMethod("POST")
+        @POST
         public String doPost(String in) {
             assertEquals("BEAN-ONE", in);
             return "POST";
         }
         
-        @HttpMethod("GET")
+        @GET
         public String doGet() {
             return "GET";
         }
         
-        @HttpMethod("PUT")
+        @PUT
         public String doPut(String in) {
             assertEquals("BEAN-ONE", in);
             return "PUT";
         }
         
-        @HttpMethod("DELETE")
+        @DELETE
         public String doDelete() {
             return "DELETE";
         }

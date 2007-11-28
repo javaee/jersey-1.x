@@ -24,7 +24,7 @@ package com.sun.ws.rest.impl.container.httpserver;
 
 import javax.ws.rs.Path;
 import com.sun.ws.rest.impl.client.ResourceProxy;
-import javax.ws.rs.HttpMethod;
+import javax.ws.rs.GET;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.UriBuilder;
 import junit.framework.*;
@@ -36,7 +36,7 @@ import junit.framework.*;
 public class QueryParamTest extends AbstractHttpServerTester {
     @Path("/test")
     public static class QueryParamResource {
-        @HttpMethod
+        @GET
         public String get(@QueryParam("x") String x, @QueryParam("y") String y) {
             return y;
         }

@@ -28,7 +28,7 @@ import com.sun.ws.rest.api.core.HttpResponseContext;
 import com.sun.ws.rest.impl.client.ResourceProxy;
 import javax.ws.rs.Path;
 import javax.ws.rs.ConsumeMime;
-import javax.ws.rs.HttpMethod;
+import javax.ws.rs.POST;
 import javax.ws.rs.core.Response;
 
 /**
@@ -44,14 +44,14 @@ public class ConsumeProduceWildcardTest extends AbstractResourceTester {
     @Path("/{arg1}/{arg2}")
     @ConsumeMime("text/*")
     public static class ConsumeWildCardBean {
-        @HttpMethod("POST")
+        @POST
         public void doPostHtml(HttpRequestContext request, HttpResponseContext response) {
             assertEquals("POST", request.getHttpMethod());
             assertEquals("text/html", request.getRequestHeaders().getFirst("Content-Type"));
             response.setResponse(Response.Builder.ok("HTML").build());
         }
         
-        @HttpMethod("POST")
+        @POST
         @ConsumeMime("text/xhtml")
         public void doPostXHtml(HttpRequestContext request, HttpResponseContext response) {
             assertEquals("POST", request.getHttpMethod());

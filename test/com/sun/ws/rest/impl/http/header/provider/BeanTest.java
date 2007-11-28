@@ -22,12 +22,12 @@
 
 package com.sun.ws.rest.impl.http.header.provider;
 
-import javax.ws.rs.HttpMethod;
 import javax.ws.rs.Path;
 import com.sun.ws.rest.impl.AbstractResourceTester;
 import com.sun.ws.rest.impl.client.ResponseInBound;
 import java.net.URI;
 import java.util.GregorianCalendar;
+import javax.ws.rs.GET;
 import javax.ws.rs.core.EntityTag;
 import javax.ws.rs.core.Response;
 
@@ -44,7 +44,7 @@ public class BeanTest extends AbstractResourceTester {
 
     @Path("/")
     public static class TestResource {
-        @HttpMethod("GET")
+        @GET
         public Response doGet() {
             GregorianCalendar lastModified = new GregorianCalendar(2007, 0, 0, 0, 0, 0);
             return Response.Builder.ok().

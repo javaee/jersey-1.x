@@ -23,11 +23,11 @@
 package com.sun.ws.rest.impl.subresources;
 
 import com.sun.ws.rest.impl.AbstractResourceTester;
-import javax.ws.rs.HttpMethod;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.UriParam;
 import javax.ws.rs.Path;
 import com.sun.ws.rest.impl.AbstractResourceTester;
+import javax.ws.rs.GET;
 
 /**
  *
@@ -41,7 +41,7 @@ public class SubResourceDynamicWithParametersTest extends AbstractResourceTester
     
     @Path("/{p}")
     static public class ParentWithTemplates { 
-        @HttpMethod
+        @GET
         public String getMe(@UriParam("p") String p) {
             return p;
         }
@@ -67,7 +67,7 @@ public class SubResourceDynamicWithParametersTest extends AbstractResourceTester
     }
     
     static public class ChildWithTemplates { 
-        @HttpMethod
+        @GET
         public String getMe(@UriParam("c") String c) {
             return c;
         }
@@ -80,7 +80,7 @@ public class SubResourceDynamicWithParametersTest extends AbstractResourceTester
             this.path = path;
         }
         
-        @HttpMethod
+        @GET
         public String getMe() {
             if (path == null) path = "";
             return path;

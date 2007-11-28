@@ -28,7 +28,10 @@ import com.sun.ws.rest.api.core.HttpResponseContext;
 import javax.ws.rs.ProduceMime;
 import javax.ws.rs.Path;
 import com.sun.ws.rest.impl.client.ResourceProxy;
-import javax.ws.rs.HttpMethod;
+import javax.ws.rs.DELETE;
+import javax.ws.rs.GET;
+import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
 import javax.ws.rs.core.Response;
 
 /**
@@ -43,24 +46,24 @@ public class BeanWithWebResourceTest extends AbstractResourceTester {
     
     @Path("/{arg1}/{arg2}")
     public static class BeanWithWebResource{
-        @HttpMethod("GET")
+        @GET
         public void doGet(HttpRequestContext request, HttpResponseContext response) {
             assertEquals("GET", request.getHttpMethod());
             
             response.setResponse(Response.Builder.ok("RESPONSE").build());
         }
         
-        @HttpMethod("PUT")
+        @PUT
         public void putReqWrapper(HttpRequestContext request, HttpResponseContext response) {
             handleRequest(request, response);
         }
         
-        @HttpMethod("POST")
+        @POST
         public void postReqWrapper(HttpRequestContext request, HttpResponseContext response) {
             handleRequest(request, response);
         }
         
-        @HttpMethod("DELETE")
+        @DELETE
         public void deleteReqWrapper(HttpRequestContext request, HttpResponseContext response) {
             handleRequest(request, response);
         }
@@ -78,7 +81,7 @@ public class BeanWithWebResourceTest extends AbstractResourceTester {
     
     @Path("/{arg1}/{arg2}")
     public static class BeanProduceWithWebResource {
-        @HttpMethod("GET")
+        @GET
         @ProduceMime("text/html")
         public void doGet(HttpRequestContext request, HttpResponseContext response) {
             assertEquals("GET", request.getHttpMethod());
@@ -89,19 +92,19 @@ public class BeanWithWebResourceTest extends AbstractResourceTester {
         
         //TODO: reunify the following 3 methods once PUT, POST, DELETE annotations are available
         @ProduceMime("text/xhtml")
-        @HttpMethod("PUT")
+        @PUT
         public void putRequestWrapper(HttpRequestContext request, HttpResponseContext response) {
             handleRequest(request, response);
         }
         
         @ProduceMime("text/xhtml")
-        @HttpMethod("POST")
+        @POST
         public void postRequestWrapper(HttpRequestContext request, HttpResponseContext response) {
             handleRequest(request, response);
         }
         
         @ProduceMime("text/xhtml")
-        @HttpMethod("DELETE")
+        @DELETE
         public void deleteRequestWrapper(HttpRequestContext request, HttpResponseContext response) {
             handleRequest(request, response);
         }

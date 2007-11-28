@@ -24,7 +24,7 @@ package com.sun.ws.rest.samples.atomserver.resources;
 
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
-import javax.ws.rs.HttpMethod;
+import javax.ws.rs.GET;
 import javax.ws.rs.ProduceMime;
 import javax.ws.rs.Path;
 import javax.ws.rs.WebApplicationException;
@@ -44,7 +44,7 @@ import org.jdom.output.XMLOutputter;
 @ProduceMime("application/atomserv+xml")
 public class ServiceResource {
     
-    @HttpMethod
+    @GET
     public byte[] getService() {
 
         InputStream in = this.getClass().getResourceAsStream("service.xml");

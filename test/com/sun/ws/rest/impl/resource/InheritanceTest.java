@@ -24,7 +24,7 @@ package com.sun.ws.rest.impl.resource;
 
 import com.sun.ws.rest.impl.AbstractResourceTester;
 import com.sun.ws.rest.impl.client.ResponseInBound;
-import javax.ws.rs.HttpMethod;
+import javax.ws.rs.GET;
 import javax.ws.rs.ProduceMime;
 import javax.ws.rs.Path;
 
@@ -40,7 +40,7 @@ public class InheritanceTest extends AbstractResourceTester {
     }
 
     static public abstract class SuperResource { 
-        @HttpMethod("GET")
+        @GET
         @ProduceMime("application/super")
         public String doGet() {
             return "super";
@@ -49,7 +49,7 @@ public class InheritanceTest extends AbstractResourceTester {
     
     @Path("/")
     static public class SubResource extends SuperResource { 
-        @HttpMethod("GET")
+        @GET
         @ProduceMime("application/sub")
         public String doGetSub() {
             return "sub";
@@ -58,7 +58,7 @@ public class InheritanceTest extends AbstractResourceTester {
 
     @Path("/")
     static public class SubResourceOverride extends SuperResource { 
-        @HttpMethod("GET")
+        @GET
         @ProduceMime("application/sub")
         public String doGet() {
             return "suboverride";
@@ -93,7 +93,7 @@ public class InheritanceTest extends AbstractResourceTester {
     
     @ProduceMime("application/default")
     static public abstract class SuperResourceWithProduce { 
-        @HttpMethod("GET")
+        @GET
         @ProduceMime("application/super")
         public String doGet() {
             return "super";
@@ -102,7 +102,7 @@ public class InheritanceTest extends AbstractResourceTester {
     
     @Path("/")
     static public class SubResourceWithProduce extends SuperResourceWithProduce { 
-        @HttpMethod("GET")
+        @GET
         public String doGetSub() {
             return "sub";
         }
@@ -110,7 +110,7 @@ public class InheritanceTest extends AbstractResourceTester {
         
     @Path("/")
     static public class SubResourceWithProduceOverride extends SuperResourceWithProduce { 
-        @HttpMethod("GET")
+        @GET
         public String doGet() {
             return "suboverride";
         }

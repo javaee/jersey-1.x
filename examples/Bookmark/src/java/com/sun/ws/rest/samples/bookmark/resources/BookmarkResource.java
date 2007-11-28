@@ -31,7 +31,9 @@ import com.sun.ws.rest.samples.bookmark.util.tx.Transactional;
 import java.util.Date;
 import javax.persistence.EntityManager;
 import javax.ws.rs.ConsumeMime;
-import javax.ws.rs.HttpMethod;
+import javax.ws.rs.DELETE;
+import javax.ws.rs.GET;
+import javax.ws.rs.PUT;
 import javax.ws.rs.ProduceMime;
 import javax.ws.rs.core.UriInfo;
 import org.codehaus.jettison.json.JSONException;
@@ -63,13 +65,13 @@ public class BookmarkResource {
         bookmarkEntity.setUserEntity(userEntity);
     }
     
-    @HttpMethod("GET")
+    @GET
     @ProduceMime("application/json")
     public JSONObject getBookmark() {
         return asJson();
     }
     
-    @HttpMethod("PUT")
+    @PUT
     @ConsumeMime("application/json")
     public void putBookmark(JSONObject jsonEntity) throws JSONException {
 
@@ -82,7 +84,7 @@ public class BookmarkResource {
         }});
     }    
     
-    @HttpMethod("DELETE")
+    @DELETE
     public void deleteBookmark() {
         TransactionManager.manage(new Transactional(em) { public void transact() {
             UserEntity userEntity = bookmarkEntity.getUserEntity();

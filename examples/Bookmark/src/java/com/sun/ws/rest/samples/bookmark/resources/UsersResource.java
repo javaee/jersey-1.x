@@ -27,7 +27,7 @@ import java.net.URI;
 import java.util.List;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.PersistenceUnit;
-import javax.ws.rs.HttpMethod;
+import javax.ws.rs.GET;
 import javax.ws.rs.ProduceMime;
 import javax.ws.rs.UriParam;
 import javax.ws.rs.Path;
@@ -63,7 +63,7 @@ public class UsersResource {
         return new UserResource(uriInfo, emf.createEntityManager(), userid);
     }
 
-    @HttpMethod("GET")
+    @GET
     @ProduceMime("application/json")
     public JSONArray getUsersAsJsonArray() {
         JSONArray uriArray = new JSONArray();

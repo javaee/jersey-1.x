@@ -24,10 +24,13 @@ package com.sun.ws.rest.impl.resource;
 
 import com.sun.ws.rest.impl.AbstractResourceTester;
 import javax.ws.rs.Path;
-import javax.ws.rs.HttpMethod;
 import com.sun.ws.rest.api.core.HttpRequestContext;
 import com.sun.ws.rest.api.core.HttpResponseContext;
 import com.sun.ws.rest.impl.client.ResourceProxy;
+import javax.ws.rs.DELETE;
+import javax.ws.rs.GET;
+import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
 
 /**
  *
@@ -41,25 +44,25 @@ public class WebResourceBeanTest extends AbstractResourceTester {
     
     @Path("/{arg1}/{arg2}")
     public static class TestOneWebResourceBean {
-        @HttpMethod("POST")
+        @POST
         public void doPost(HttpRequestContext request, HttpResponseContext response) {
             assertEquals("POST", request.getHttpMethod());
             response.setEntity("POST");
         }
         
-        @HttpMethod("GET")
+        @GET
         public void doGet(HttpRequestContext request, HttpResponseContext response) {
             assertEquals("GET", request.getHttpMethod());            
             response.setEntity("GET");
         }
         
-        @HttpMethod("PUT")
+        @PUT
         public void doPut(HttpRequestContext request, HttpResponseContext response) {
             assertEquals("PUT", request.getHttpMethod());            
             response.setEntity("PUT");
         }
         
-        @HttpMethod("DELETE")
+        @DELETE
         public void doDelete(HttpRequestContext request, HttpResponseContext response) {
             assertEquals("DELETE", request.getHttpMethod());            
             response.setEntity("DELETE");

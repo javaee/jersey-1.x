@@ -22,7 +22,7 @@
 
 package com.sun.ws.rest.impl.container.config.toplevel;
 
-import javax.ws.rs.HttpMethod;
+import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 
 /**
@@ -32,7 +32,7 @@ import javax.ws.rs.Path;
 @Path("/")
 public class PublicRootResourceClass {
     
-    @HttpMethod
+    @GET
     public String getMe() {
         return "ME";
     }

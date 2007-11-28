@@ -23,7 +23,8 @@
 package com.sun.ws.rest.impl.resource;
 
 import com.sun.ws.rest.impl.AbstractResourceTester;
-import javax.ws.rs.HttpMethod;
+import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.Path;
 
@@ -39,7 +40,7 @@ public class TypeParameterTest extends AbstractResourceTester {
 
     @Path("/")
     static public class Resource { 
-        @HttpMethod
+        @PUT
         public String putMe(String s, @QueryParam("a") String a, @QueryParam("b") String b) {
             assertEquals("putMe", s);
             assertEquals("a", a);
@@ -47,7 +48,7 @@ public class TypeParameterTest extends AbstractResourceTester {
             return "putMe";
         }
 
-        @HttpMethod
+        @POST
         public String postMe(@QueryParam("a") String a, String s, @QueryParam("b") String b) {
             assertEquals("postMe", s);
             assertEquals("a", a);

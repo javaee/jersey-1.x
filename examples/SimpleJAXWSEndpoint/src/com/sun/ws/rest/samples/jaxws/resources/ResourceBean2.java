@@ -22,14 +22,14 @@
 
 package com.sun.ws.rest.samples.jaxws.resources;
 
-import javax.ws.rs.HttpMethod;
+import javax.ws.rs.GET;
 import javax.ws.rs.ProduceMime;
 import javax.ws.rs.Path;
 
 @Path("/resource2")
 public class ResourceBean2 {
     
-    @HttpMethod("GET")
+    @GET
     @ProduceMime("text/plain")
     public String describe() {
         return "Hello World from resource 2";

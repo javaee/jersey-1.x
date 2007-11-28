@@ -91,7 +91,8 @@
             <fileset dir="build/gen-src"/>
         </zip>
         
-        <!-- build the examples -->
+        <!-- clean, build clean the examples -->
+        <ant dir="examples" target="clean"/>
         <ant dir="examples" target="build"/>
         <ant dir="examples" target="clean"/>
         

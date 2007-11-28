@@ -23,7 +23,8 @@
 package com.sun.ws.rest.samples.servlet.resources;
 
 import javax.ws.rs.ConsumeMime;
-import javax.ws.rs.HttpMethod;
+import javax.ws.rs.GET;
+import javax.ws.rs.POST;
 import javax.ws.rs.ProduceMime;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.Path;
@@ -36,31 +37,31 @@ public class ResourceBean4 {
     public ResourceBean4() {
     }
     
-    @HttpMethod("GET")
+    @GET
     @ProduceMime("text/html")
     public String getAsHtml() {
         return "<html><head></head><body><p>Hello World</p></body></html>";
     }
 
-    @HttpMethod("GET")
+    @GET
     @ProduceMime("application/xml")
     public String getAsXml() {
         return "<response>Hello World</response>";
     }
     
-    @HttpMethod("GET")
+    @GET
     @ProduceMime("text/plain")
     public String getAsText() {
         return "Hello World";
     }
     
-    @HttpMethod("GET")
+    @GET
     @ProduceMime("*/*")
     public Response get(@QueryParam("format") String format) {
         return Response.Builder.representation("Hello World", format).build();
     }
     
-    @HttpMethod("POST")
+    @POST
     @ProduceMime("text/plain")
     public String postText(String input) {
         return input;

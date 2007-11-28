@@ -24,6 +24,7 @@ package com.sun.ws.rest.samples.console.resources;
 
 import java.util.ArrayList;
 import java.util.List;
+import javax.ws.rs.GET;
 import javax.ws.rs.HttpMethod;
 import javax.ws.rs.ProduceMime;
 import javax.ws.rs.QueryParam;
@@ -41,7 +42,7 @@ public class Colours {
      * those that contain this substring
      * @return the list of colours matching the filter
      */
-    @HttpMethod
+    @GET
     @ProduceMime("text/plain")
     public String getColourListAsText(@QueryParam("match") String filter) {
         StringBuffer buf = new StringBuffer();
@@ -58,7 +59,7 @@ public class Colours {
      * those that contain this substring
      * @return the list of colours matching the filter
      */
-    @HttpMethod
+    @GET
     @ProduceMime("application/json")
     public String getColourListAsJSON(@QueryParam("match") String filter) {
         StringBuffer buf = new StringBuffer();

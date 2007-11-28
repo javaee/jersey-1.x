@@ -23,10 +23,10 @@
 package com.sun.ws.rest.impl.subresources;
 
 import com.sun.ws.rest.impl.AbstractResourceTester;
-import javax.ws.rs.HttpMethod;
 import javax.ws.rs.UriParam;
 import javax.ws.rs.Path;
 import com.sun.ws.rest.impl.AbstractResourceTester;
+import javax.ws.rs.GET;
 
 /**
  *
@@ -47,7 +47,7 @@ public class SubResourceDynamicWithDuplcateTemplateNamesTest extends AbstractRes
     }
     
     static public class ChildWithTemplates { 
-        @HttpMethod
+        @GET
         public String getMe(@UriParam("v") String v) {
             return v;
         }

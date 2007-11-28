@@ -26,7 +26,8 @@ import com.sun.ws.rest.api.representation.FormURLEncodedProperties;
 import java.net.URL;
 import javax.activation.DataSource;
 import javax.activation.FileDataSource;
-import javax.ws.rs.HttpMethod;
+import javax.ws.rs.GET;
+import javax.ws.rs.POST;
 import javax.ws.rs.ProduceMime;
 import javax.ws.rs.UriParam;
 import javax.ws.rs.Path;
@@ -41,12 +42,12 @@ public class ResourceBean3  {
     
     int count =0;
     
-    @HttpMethod("POST")
+    @POST
     public void doPost() {
         System.out.println("ResourceBean3 POST");
     }
     
-    @HttpMethod("GET")
+    @GET
     public Response doGet() {
         MultivaluedMap<String, String> params = uriInfo.getTemplateParameters();
         String arg1 = params.getFirst("arg1");
@@ -92,7 +93,7 @@ public class ResourceBean3  {
     }
     
     @ProduceMime("text/plain")
-    @HttpMethod("GET")
+    @GET
     public String getStringRep(@UriParam("arg1")String arg1, 
             @UriParam("arg2")String arg2) {
         return "representation: StringRepresentation: arg1: "
@@ -100,7 +101,7 @@ public class ResourceBean3  {
     }    
     
     @ProduceMime("application/x-www-form-urlencoded")
-    @HttpMethod("GET")
+    @GET
     public FormURLEncodedProperties  getFormURLEncodedRep(
             @UriParam("arg1")String arg1, 
             @UriParam("arg2")String arg2) {
@@ -114,7 +115,7 @@ public class ResourceBean3  {
     }
 
     @ProduceMime("image/jpg")
-    @HttpMethod("GET")
+    @GET
     public DataSource getImageRep() {
         URL jpgURL = this.getClass().getResource("java.jpg");
         return new FileDataSource(jpgURL.getFile());

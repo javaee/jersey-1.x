@@ -28,7 +28,8 @@ import com.sun.ws.rest.api.core.HttpResponseContext;
 import com.sun.ws.rest.impl.client.ResourceProxy;
 import javax.ws.rs.Path;
 import javax.ws.rs.ConsumeMime;
-import javax.ws.rs.HttpMethod;
+import javax.ws.rs.GET;
+import javax.ws.rs.POST;
 import javax.ws.rs.ProduceMime;
 import javax.ws.rs.core.Response;
 
@@ -45,14 +46,14 @@ public class ConsumeProduceSimpleTest extends AbstractResourceTester {
     @Path("/{arg1}/{arg2}")
     @ConsumeMime("text/html")
     public static class ConsumeSimpleBean {
-        @HttpMethod("POST")
+        @POST
         public void doPostHtml(HttpRequestContext request, HttpResponseContext response) {
             assertEquals("POST", request.getHttpMethod());
             assertEquals("text/html", request.getRequestHeaders().getFirst("Content-Type"));
             response.setResponse(Response.Builder.ok("HTML").build());
         }
         
-        @HttpMethod("POST")
+        @POST
         @ConsumeMime("text/xhtml")
         public void doPostXHtml(HttpRequestContext request, HttpResponseContext response) {
             assertEquals("POST", request.getHttpMethod());            
@@ -64,14 +65,14 @@ public class ConsumeProduceSimpleTest extends AbstractResourceTester {
     @Path("/{arg1}/{arg2}")
     @ProduceMime("text/html")
     public static class ProduceSimpleBean {
-        @HttpMethod("GET")
+        @GET
         public void doGetHtml(HttpRequestContext request, HttpResponseContext response) {
             assertEquals("GET", request.getHttpMethod());
             assertEquals("text/html", request.getRequestHeaders().getFirst("Accept"));
             response.setResponse(Response.Builder.ok("HTML").build());
         }
         
-        @HttpMethod("GET")
+        @GET
         @ProduceMime("text/xhtml")
         public void doGetXhtml(HttpRequestContext request, HttpResponseContext response) {
             assertEquals("GET", request.getHttpMethod());            
@@ -84,14 +85,14 @@ public class ConsumeProduceSimpleTest extends AbstractResourceTester {
     @ConsumeMime("text/html")
     @ProduceMime("text/html")
     public static class ConsumeProduceSimpleBean {
-        @HttpMethod("GET")
+        @GET
         public void doGetHtml(HttpRequestContext request, HttpResponseContext response) {
             assertEquals("GET", request.getHttpMethod());
             assertEquals("text/html", request.getRequestHeaders().getFirst("Accept"));
             response.setResponse(Response.Builder.ok("HTML").build());
         }
         
-        @HttpMethod("GET")
+        @GET
         @ProduceMime("text/xhtml")
         public void doGetXhtml(HttpRequestContext request, HttpResponseContext response) {
             assertEquals("GET", request.getHttpMethod());            
@@ -99,7 +100,7 @@ public class ConsumeProduceSimpleTest extends AbstractResourceTester {
             response.setResponse(Response.Builder.ok("XHTML").build());
         }
         
-        @HttpMethod("POST")
+        @POST
         public void doPostHtml(HttpRequestContext request, HttpResponseContext response) {
             assertEquals("POST", request.getHttpMethod());
             assertEquals("text/html", request.getRequestHeaders().getFirst("Content-Type"));
@@ -107,7 +108,7 @@ public class ConsumeProduceSimpleTest extends AbstractResourceTester {
             response.setResponse(Response.Builder.ok("HTML").build());
         }
         
-        @HttpMethod("POST")
+        @POST
         @ConsumeMime("text/xhtml")
         @ProduceMime("text/xhtml")
         public void doPostXHtml(HttpRequestContext request, HttpResponseContext response) {

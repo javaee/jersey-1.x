@@ -23,10 +23,10 @@
 package com.sun.ws.rest.impl.resource;
 
 import com.sun.ws.rest.impl.AbstractResourceTester;
-import javax.ws.rs.HttpMethod;
 import javax.ws.rs.Path;
 import com.sun.ws.rest.impl.client.ResponseInBound;
 import java.util.GregorianCalendar;
+import javax.ws.rs.GET;
 import javax.ws.rs.core.EntityTag;
 import javax.ws.rs.core.HttpContext;
 import javax.ws.rs.core.PreconditionEvaluator;
@@ -47,7 +47,7 @@ public class PreconditionTest extends AbstractResourceTester {
     public static class LastModifiedResource {
         @HttpContext PreconditionEvaluator evaluator;
 
-        @HttpMethod("GET")
+        @GET
         public Response doGet() {
             GregorianCalendar lastModified = new GregorianCalendar(2007, 0, 0, 0, 0, 0);
             Response r = evaluator.evaluate(lastModified.getTime());
@@ -128,7 +128,7 @@ public class PreconditionTest extends AbstractResourceTester {
     public static class EtagResource {
         @HttpContext PreconditionEvaluator evaluator;
 
-        @HttpMethod("GET")
+        @GET
         public Response doGet() {
             Response r = evaluator.evaluate(new EntityTag("1"));
             if (r != null)

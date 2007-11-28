@@ -30,7 +30,8 @@ import java.util.Collection;
 import java.util.Date;
 import javax.persistence.EntityManager;
 import javax.ws.rs.ConsumeMime;
-import javax.ws.rs.HttpMethod;
+import javax.ws.rs.GET;
+import javax.ws.rs.POST;
 import javax.ws.rs.ProduceMime;
 import javax.ws.rs.UriParam;
 import javax.ws.rs.Path;
@@ -71,7 +72,7 @@ public class BookmarksResource {
                 userResource.getUserEntity(), bmid);
     }
     
-    @HttpMethod("GET")
+    @GET
     @ProduceMime("application/json")
     public JSONArray getBookmarksAsJsonArray() {
         JSONArray uriArray = new JSONArray();
@@ -86,7 +87,7 @@ public class BookmarksResource {
         return uriArray;
     }
     
-    @HttpMethod("POST")
+    @POST
     @ConsumeMime("application/json")
     public Response postForm(JSONObject bookmark) {
         try {

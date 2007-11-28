@@ -23,7 +23,6 @@
 package com.sun.ws.rest.impl.application;
 
 import com.sun.ws.rest.api.core.HttpResponseContext;
-import javax.ws.rs.Path;
 import com.sun.ws.rest.api.core.HttpRequestContext;
 import com.sun.ws.rest.api.core.ResourceConfig;
 import com.sun.ws.rest.spi.container.AbstractContainerRequest;
@@ -34,7 +33,8 @@ import com.sun.ws.rest.api.core.DefaultResourceConfig;
 import java.io.ByteArrayInputStream;
 import java.util.HashSet;
 import java.util.Set;
-import javax.ws.rs.HttpMethod;
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
 import junit.framework.*;
 
 /**
@@ -49,7 +49,7 @@ public class WebApplicationTest extends TestCase {
     
     @Path("/{arg1}/{arg2}")
     public static class TestOneWebResource {
-        @HttpMethod("GET")
+        @GET
         public void handleRequest(HttpRequestContext request, HttpResponseContext response) {
             assertEquals("GET", request.getHttpMethod());
             
@@ -63,7 +63,7 @@ public class WebApplicationTest extends TestCase {
     
     @Path("/{arg1}")
     public static class TestTwoWebResource {
-        @HttpMethod("GET")
+        @GET
         public void handleRequest(HttpRequestContext request, HttpResponseContext response) {
             assertEquals("GET", request.getHttpMethod());
             
@@ -79,7 +79,7 @@ public class WebApplicationTest extends TestCase {
     
     @Path("/{arg1}.xml")
     public static class TestThreeWebResource {
-        @HttpMethod("GET")
+        @GET
         public void handleRequest(HttpRequestContext request, HttpResponseContext response) {
             assertEquals("GET", request.getHttpMethod());
             

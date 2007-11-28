@@ -32,8 +32,8 @@ import com.sun.ws.rest.spi.resource.PerRequest;
 import com.sun.ws.rest.spi.resource.Singleton;
 import java.util.HashSet;
 import java.util.Set;
+import javax.ws.rs.GET;
 import javax.ws.rs.Path;
-import javax.ws.rs.HttpMethod;
 
 /**
  *
@@ -51,7 +51,7 @@ public class ResourceLifecycleTest extends AbstractResourceTester {
             this.count = 0;
         }
         
-        @HttpMethod("GET")
+        @GET
         public String doGet() {
             count++;
             return Integer.toString(count);
@@ -69,7 +69,7 @@ public class ResourceLifecycleTest extends AbstractResourceTester {
             this.count = 0;
         }
         
-        @HttpMethod("GET")
+        @GET
         public String doGet() {
             count++;
             return Integer.toString(count);
@@ -86,7 +86,7 @@ public class ResourceLifecycleTest extends AbstractResourceTester {
             this.count = 0;
         }
         
-        @HttpMethod("GET")
+        @GET
         public String doGet() {
             count++;
             return Integer.toString(count);

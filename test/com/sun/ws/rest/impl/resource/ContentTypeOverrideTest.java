@@ -26,7 +26,7 @@ import com.sun.ws.rest.impl.AbstractResourceTester;
 import com.sun.ws.rest.api.core.HttpContextAccess;
 import com.sun.ws.rest.impl.client.ResourceProxy;
 import com.sun.ws.rest.impl.client.ResponseInBound;
-import javax.ws.rs.HttpMethod;
+import javax.ws.rs.GET;
 import javax.ws.rs.ProduceMime;
 import javax.ws.rs.Path;
 import javax.ws.rs.core.HttpContext;
@@ -48,7 +48,7 @@ public class ContentTypeOverrideTest extends AbstractResourceTester {
         @HttpContext HttpContextAccess context;
         
         @ProduceMime({"application/foo", "application/bar"})
-        @HttpMethod("GET")
+        @GET
         public Response doGet() {
             return Response.Builder.representation("content", "application/foo").build();
         }

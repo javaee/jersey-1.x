@@ -23,13 +23,13 @@
 package com.sun.ws.rest.samples.servlet.resources;
 
 import java.io.InputStream;
-import javax.ws.rs.HttpMethod;
+import javax.ws.rs.GET;
 import javax.ws.rs.ProduceMime;
 import javax.ws.rs.Path;
 
 @Path("/start")
 public class MasterResourceBean  {
-    @HttpMethod("GET")
+    @GET
     @ProduceMime("text/html")
     public InputStream doGet() {
         return this.getClass().getResourceAsStream("index.html");

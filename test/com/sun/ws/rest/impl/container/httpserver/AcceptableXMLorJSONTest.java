@@ -29,7 +29,7 @@ import java.net.URI;
 import javax.ws.rs.Path;
 import com.sun.ws.rest.impl.client.ResourceProxy;
 import com.sun.ws.rest.impl.client.ResourceProxyFilter;
-import javax.ws.rs.HttpMethod;
+import javax.ws.rs.GET;
 import javax.ws.rs.ProduceMime;
 import javax.xml.bind.annotation.XmlRootElement;
 import junit.framework.*;
@@ -63,7 +63,7 @@ public class AcceptableXMLorJSONTest extends AbstractHttpServerTester {
     
     @Path("/resource")
     public static class WebResource {
-        @HttpMethod
+        @GET
         @ProduceMime({"application/xml", "application/json"})
         public JAXBBean get() {
             return new JAXBBean("test");

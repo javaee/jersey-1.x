@@ -22,16 +22,16 @@
 
 package com.sun.ws.rest.impl.application;
 
-import javax.ws.rs.Path;
 import com.sun.ws.rest.api.core.HttpRequestContext;
 import com.sun.ws.rest.api.core.HttpResponseContext;
-import javax.ws.rs.HttpMethod;
+import javax.ws.rs.Path;
+import javax.ws.rs.GET;
 
 
 @Path("/resource2")
 public class ResourceTwo {
     
-    @HttpMethod("GET")
+    @GET
     public void handleRequest(HttpRequestContext request, HttpResponseContext response) {
         if (!request.getHttpMethod().equals("GET"))
             throw new RuntimeException("Method didn't match");

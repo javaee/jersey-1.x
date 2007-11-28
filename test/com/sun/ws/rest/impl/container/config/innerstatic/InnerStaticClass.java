@@ -22,7 +22,7 @@
 
 package com.sun.ws.rest.impl.container.config.innerstatic;
 
-import javax.ws.rs.HttpMethod;
+import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 
 /**
@@ -32,7 +32,7 @@ import javax.ws.rs.Path;
 public class InnerStaticClass {
     @Path("/")
     public static class PublicClass {
-        @HttpMethod
+        @GET
         public String getMe() {
             return "ME";
         }
@@ -40,7 +40,7 @@ public class InnerStaticClass {
     
     @Path("/")
     private static class PrivateClass {
-        @HttpMethod
+        @GET
         public String getMe() {
             return "ME";
         }
@@ -48,7 +48,7 @@ public class InnerStaticClass {
     
     @Path("/")
     protected static class ProtectedClass {
-        @HttpMethod
+        @GET
         public String getMe() {
             return "ME";
         }
@@ -56,7 +56,7 @@ public class InnerStaticClass {
     
     @Path("/")
     /* package */ static class PackageClass {
-        @HttpMethod
+        @GET
         public String getMe() {
             return "ME";
         }

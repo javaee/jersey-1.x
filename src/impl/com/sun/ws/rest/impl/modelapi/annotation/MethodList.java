@@ -57,10 +57,34 @@ class MethodList implements Iterable<Method> {
         });
     }
     
+    <T extends Annotation> MethodList hasMetaAnnotation(final Class<T> annotation) {
+        return filter(new Filter() {
+            public boolean keep(Method m) {
+                for (Annotation a : m.getAnnotations()) {
+                    if (a.annotationType().getAnnotation(annotation) != null)
+                        return true;
+                }
+                return false;
+            }
+        });
+    }
+    
     <T extends Annotation> MethodList hasNotAnnotation(final Class<T> annotation) {
         return filter(new Filter() {
             public boolean keep(Method m) {
                 return m.getAnnotation(annotation) == null;
+            }
+        });
+    }
+    
+    <T extends Annotation> MethodList hasNotMetaAnnotation(final Class<T> annotation) {
+        return filter(new Filter() {
+            public boolean keep(Method m) {
+                for (Annotation a : m.getAnnotations()) {
+                    if (a.annotationType().getAnnotation(annotation) != null)
+                        return false;
+                }                
+                return true;
             }
         });
     }

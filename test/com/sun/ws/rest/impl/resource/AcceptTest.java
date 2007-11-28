@@ -23,12 +23,12 @@
 package com.sun.ws.rest.impl.resource;
 
 import com.sun.ws.rest.impl.AbstractResourceTester;
-import javax.ws.rs.HttpMethod;
 import javax.ws.rs.ProduceMime;
 import javax.ws.rs.Path;
 import com.sun.ws.rest.impl.client.ResourceProxy;
 import com.sun.ws.rest.impl.client.ResponseInBound;
 import java.io.IOException;
+import javax.ws.rs.GET;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
@@ -46,25 +46,25 @@ public class AcceptTest extends AbstractResourceTester {
     @Path("/")
     public static class WebResource {
         @ProduceMime("application/foo")
-        @HttpMethod("GET")
+        @GET
         public String doGetFoo() {
             return "foo";
         }
         
         @ProduceMime("application/bar")
-        @HttpMethod("GET")
+        @GET
         public String doGetBar() {
             return "bar";
         }
         
         @ProduceMime("application/baz")
-        @HttpMethod("GET")
+        @GET
         public String doGetBaz() {
             return "baz";
         }
         
         @ProduceMime("*/*")
-        @HttpMethod("GET")
+        @GET
         public Response doGetWildCard() {
             return Response.Builder.representation("wildcard", "application/wildcard").build();
         }
@@ -122,7 +122,7 @@ public class AcceptTest extends AbstractResourceTester {
     @Path("/")
     public static class MultipleResource {
         @ProduceMime({"application/foo", "application/bar"})
-        @HttpMethod
+        @GET
         public String get() {
             return "GET";
         }        

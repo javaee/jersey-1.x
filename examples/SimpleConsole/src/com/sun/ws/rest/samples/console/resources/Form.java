@@ -26,7 +26,8 @@ import com.sun.ws.rest.api.representation.FormURLEncodedProperties;
 import java.io.InputStream;
 import java.util.Date;
 import javax.ws.rs.ConsumeMime;
-import javax.ws.rs.HttpMethod;
+import javax.ws.rs.GET;
+import javax.ws.rs.POST;
 import javax.ws.rs.ProduceMime;
 import javax.ws.rs.Path;
 import javax.ws.rs.core.Cookie;
@@ -58,7 +59,7 @@ public class Form {
      * Produce a form from a static HTML file packaged with the compiled class
      * @return a stream from which the HTML form can be read.
      */
-    @HttpMethod
+    @GET
     public Response getForm() {
         Date now = new Date();
 
@@ -73,7 +74,7 @@ public class Form {
      * @return a dynamically generated HTML table.
      * @param formData the data from the form submission
      */
-    @HttpMethod("POST")
+    @POST
     @ConsumeMime("application/x-www-form-urlencoded")
     public String processForm(FormURLEncodedProperties formData) {
         StringBuffer buf = new StringBuffer();

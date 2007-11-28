@@ -24,12 +24,13 @@ package com.sun.ws.rest.impl.methodparams;
 
 import com.sun.ws.rest.impl.AbstractResourceTester;
 import javax.ws.rs.DefaultValue;
-import javax.ws.rs.HttpMethod;
 import javax.ws.rs.ProduceMime;
 import javax.ws.rs.MatrixParam;
 import javax.ws.rs.Path;
 import com.sun.ws.rest.impl.AbstractResourceTester;
 import java.util.List;
+import javax.ws.rs.GET;
+import javax.ws.rs.POST;
 
 /**
  *
@@ -44,7 +45,7 @@ public class MatrixParamAsStringTest extends AbstractResourceTester {
 
     @Path("/")
     public static class ResourceString {
-        @HttpMethod("GET")
+        @GET
         public String doGet(@MatrixParam("arg1") String arg1, 
                 @MatrixParam("arg2") String arg2, @MatrixParam("arg3") String arg3) {
             assertEquals("a", arg1);
@@ -53,7 +54,7 @@ public class MatrixParamAsStringTest extends AbstractResourceTester {
             return "content";
         }
         
-        @HttpMethod("POST")
+        @POST
         public String doPost(@MatrixParam("arg1") String arg1, 
                 @MatrixParam("arg2") String arg2, @MatrixParam("arg3") String arg3,
                 String r) {
@@ -67,7 +68,7 @@ public class MatrixParamAsStringTest extends AbstractResourceTester {
     
     @Path("/")
     public static class ResourceStringEmpty {
-        @HttpMethod("GET")
+        @GET
         public String doGet(@MatrixParam("arg1") String arg1) {
             assertEquals("", arg1);
             return "content";
@@ -76,7 +77,7 @@ public class MatrixParamAsStringTest extends AbstractResourceTester {
     
     @Path("/")
     public static class ResourceStringAbsent {
-        @HttpMethod("GET")
+        @GET
         public String doGet(@MatrixParam("arg1") String arg1) {
             assertEquals(null, arg1);
             return "content";
@@ -85,7 +86,7 @@ public class MatrixParamAsStringTest extends AbstractResourceTester {
     
     @Path("/")
     public static class ResourceStringList {
-        @HttpMethod("GET")
+        @GET
         @ProduceMime("application/stringlist")
         public String doGetString(@MatrixParam("args") List<String> args) {
             assertEquals("a", args.get(0));
@@ -94,7 +95,7 @@ public class MatrixParamAsStringTest extends AbstractResourceTester {
             return "content";
         }
         
-        @HttpMethod("GET")
+        @GET
         @ProduceMime("application/list")
         public String doGet(@MatrixParam("args") List args) {
             assertEquals(String.class, args.get(0).getClass());
@@ -109,7 +110,7 @@ public class MatrixParamAsStringTest extends AbstractResourceTester {
     
     @Path("/")
     public static class ResourceStringListEmpty {
-        @HttpMethod("GET")
+        @GET
         @ProduceMime("application/stringlist")
         public String doGetString(@MatrixParam("args") List<String> args) {
             assertEquals(3, args.size());
@@ -122,7 +123,7 @@ public class MatrixParamAsStringTest extends AbstractResourceTester {
     
     @Path("/")
     public static class ResourceStringListAbsent {
-        @HttpMethod("GET")
+        @GET
         @ProduceMime("application/stringlist")
         public String doGetString(@MatrixParam("args") List<String> args) {
             assertEquals(null, args);
@@ -132,7 +133,7 @@ public class MatrixParamAsStringTest extends AbstractResourceTester {
     
     @Path("/")
     public static class ResourceStringNullDefault {
-        @HttpMethod("GET")
+        @GET
         public String doGet(@MatrixParam("arg1") String arg1, 
                 @MatrixParam("arg2") String arg2, @MatrixParam("arg3") String arg3) {
             assertEquals(null, arg1);
@@ -144,7 +145,7 @@ public class MatrixParamAsStringTest extends AbstractResourceTester {
     
     @Path("/")
     public static class ResourceStringDefault {
-        @HttpMethod("GET")
+        @GET
         public String doGet(
                 @MatrixParam("arg1") @DefaultValue("a") String arg1, 
                 @MatrixParam("arg2") @DefaultValue("b") String arg2, 
@@ -158,7 +159,7 @@ public class MatrixParamAsStringTest extends AbstractResourceTester {
     
     @Path("/")
     public static class ResourceStringDefaultOverride {
-        @HttpMethod("GET")
+        @GET
         public String doGet(
                 @MatrixParam("arg1") @DefaultValue("a") String arg1, 
                 @MatrixParam("arg2") @DefaultValue("b") String arg2, 
@@ -172,7 +173,7 @@ public class MatrixParamAsStringTest extends AbstractResourceTester {
     
     @Path("/")
     public static class ResourceStringListNullDefault {
-        @HttpMethod("GET")
+        @GET
         @ProduceMime("application/stringlist")
         public String doGetString(
                 @MatrixParam("args") List<String> args) {
@@ -180,7 +181,7 @@ public class MatrixParamAsStringTest extends AbstractResourceTester {
             return "content";
         }
         
-        @HttpMethod("GET")
+        @GET
         @ProduceMime("application/list")
         public String doGet(
                 @MatrixParam("args") List args) {
@@ -191,7 +192,7 @@ public class MatrixParamAsStringTest extends AbstractResourceTester {
     
     @Path("/")
     public static class ResourceStringListDefault {
-        @HttpMethod("GET")
+        @GET
         @ProduceMime("application/stringlist")
         public String doGetString(
                 @MatrixParam("args") @DefaultValue("a") List<String> args) {
@@ -199,7 +200,7 @@ public class MatrixParamAsStringTest extends AbstractResourceTester {
             return "content";
         }
         
-        @HttpMethod("GET")
+        @GET
         @ProduceMime("application/list")
         public String doGet(
                 @MatrixParam("args") @DefaultValue("a") List args) {
@@ -211,7 +212,7 @@ public class MatrixParamAsStringTest extends AbstractResourceTester {
     
     @Path("/")
     public static class ResourceStringListDefaultOverride {
-        @HttpMethod("GET")
+        @GET
         @ProduceMime("application/stringlist")
         public String doGetString(
                 @MatrixParam("args") @DefaultValue("a") List<String> args) {
@@ -219,7 +220,7 @@ public class MatrixParamAsStringTest extends AbstractResourceTester {
             return "content";
         }
         
-        @HttpMethod("GET")
+        @GET
         @ProduceMime("application/list")
         public String doGet(
                 @MatrixParam("args") @DefaultValue("a") List args) {

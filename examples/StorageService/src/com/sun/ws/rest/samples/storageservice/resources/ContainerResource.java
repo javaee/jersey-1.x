@@ -28,7 +28,9 @@ import com.sun.ws.rest.samples.storageservice.Item;
 import com.sun.ws.rest.samples.storageservice.MemoryStore;
 import java.net.URI;
 import java.util.Iterator;
-import javax.ws.rs.HttpMethod;
+import javax.ws.rs.DELETE;
+import javax.ws.rs.GET;
+import javax.ws.rs.PUT;
 import javax.ws.rs.ProduceMime;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.UriParam;
@@ -52,7 +54,7 @@ public class ContainerResource {
         this.preconditionEvaluator = preconditionEvaluator;
     }
     
-    @HttpMethod
+    @GET
     public Container getContainer(
             @UriParam("container") String container,
             @QueryParam("search") String search) {
@@ -76,7 +78,7 @@ public class ContainerResource {
         return c;
     }    
 
-    @HttpMethod
+    @PUT
     public Response putContainer(@UriParam("container") String container) {
         System.out.println("PUT CONTAINER " + container);
         
@@ -94,7 +96,7 @@ public class ContainerResource {
         return r;
     }
     
-    @HttpMethod
+    @DELETE
     public void deleteContainer(@UriParam("container") String container) {
         System.out.println("DELETE CONTAINER " + container);
         

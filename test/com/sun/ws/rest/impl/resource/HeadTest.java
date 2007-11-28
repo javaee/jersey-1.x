@@ -25,7 +25,8 @@ package com.sun.ws.rest.impl.resource;
 import com.sun.ws.rest.impl.AbstractResourceTester;
 import com.sun.ws.rest.impl.client.ResourceProxy;
 import com.sun.ws.rest.impl.client.ResponseInBound;
-import javax.ws.rs.HttpMethod;
+import javax.ws.rs.GET;
+import javax.ws.rs.HEAD;
 import javax.ws.rs.ProduceMime;
 import javax.ws.rs.Path;
 import javax.ws.rs.core.MediaType;
@@ -43,7 +44,7 @@ public class HeadTest extends AbstractResourceTester {
 
     @Path("/")
     static public class ResourceGetNoHead { 
-        @HttpMethod
+        @GET
         public String get() {
             return "GET";
         }
@@ -60,12 +61,12 @@ public class HeadTest extends AbstractResourceTester {
     
     @Path("/")
     static public class ResourceGetWithHead { 
-        @HttpMethod
+        @HEAD
         public Response head() {
             return Response.Builder.ok().header("X-TEST", "HEAD").build();
         }
         
-        @HttpMethod
+        @GET
         public Response get() {
             return Response.Builder.representation("GET").header("X-TEST", "GET").build();
         }
@@ -83,13 +84,13 @@ public class HeadTest extends AbstractResourceTester {
     
     @Path("/")
     static public class ResourceGetWithProduceNoHead { 
-        @HttpMethod
+        @GET
         @ProduceMime("application/foo")
         public String getFoo() {
             return "FOO";
         }
         
-        @HttpMethod
+        @GET
         @ProduceMime("application/bar")
         public String getBar() {
             return "BAR";
@@ -116,25 +117,25 @@ public class HeadTest extends AbstractResourceTester {
     @Path("/")
     static public class ResourceGetWithProduceWithHead { 
         
-        @HttpMethod
+        @HEAD
         @ProduceMime("application/foo")
         public Response headFoo() {
             return Response.Builder.ok().header("X-TEST", "FOO-HEAD").build();
         }
         
-        @HttpMethod
+        @GET
         @ProduceMime("application/foo")
         public Response getFoo() {
             return Response.Builder.representation("GET","application/foo").header("X-TEST", "FOO-GET").build();
         }
                 
-        @HttpMethod
+        @HEAD
         @ProduceMime("application/bar")
         public Response headBar() {
             return Response.Builder.ok().header("X-TEST", "BAR-HEAD").build();
         }
         
-        @HttpMethod
+        @GET
         @ProduceMime("application/bar")
         public Response getBar() {
             return Response.Builder.representation("GET").header("X-TEST", "BAR-GET").build();

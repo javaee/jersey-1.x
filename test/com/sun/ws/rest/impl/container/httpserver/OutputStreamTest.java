@@ -27,7 +27,7 @@ import com.sun.ws.rest.api.core.HttpRequestContext;
 import com.sun.ws.rest.api.core.HttpResponseContext;
 import com.sun.ws.rest.impl.client.ResourceProxy;
 import java.io.IOException;
-import javax.ws.rs.HttpMethod;
+import javax.ws.rs.POST;
 import javax.ws.rs.ProduceMime;
 import junit.framework.*;
 
@@ -40,7 +40,7 @@ public class OutputStreamTest extends AbstractHttpServerTester {
     public static class TestResource { // implements WebResource {
 
         @ProduceMime("text/plain")
-        @HttpMethod("POST")
+        @POST
         public void handleRequest(HttpRequestContext requestContext, 
                 HttpResponseContext responseContext) throws IOException {
             assertEquals("POST", requestContext.getHttpMethod());

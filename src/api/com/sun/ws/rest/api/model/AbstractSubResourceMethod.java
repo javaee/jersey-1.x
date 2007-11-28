@@ -29,14 +29,6 @@ public class AbstractSubResourceMethod extends AbstractResourceMethod implements
     
     private UriTemplateValue uriTemplate;
     
-    /**
-     * Creates a new instance of AbstractSubResourceMethod
-     */
-    public AbstractSubResourceMethod(Method method, UriTemplateValue uriTemplate) {
-        super(method);
-        this.uriTemplate = uriTemplate;
-    }
-
     public AbstractSubResourceMethod(Method method, UriTemplateValue uriTemplate, String httpMethod) {
         super(method, httpMethod);
         this.uriTemplate = uriTemplate;

@@ -24,7 +24,7 @@ package com.sun.ws.rest.impl.container.httpserver;
 
 import javax.ws.rs.Path;
 import com.sun.ws.rest.impl.client.ResourceProxy;
-import javax.ws.rs.HttpMethod;
+import javax.ws.rs.GET;
 import junit.framework.*;
 
 /**
@@ -34,7 +34,7 @@ import junit.framework.*;
 public class HandlerContextTest extends AbstractHttpServerTester {
     @Path("/")
     public static class Resource {
-        @HttpMethod
+        @GET
         public String get() {
             return "CONTENT";
         }

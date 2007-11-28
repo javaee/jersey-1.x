@@ -24,7 +24,7 @@ package com.sun.ws.rest.samples.storageservice.resources;
 
 import com.sun.ws.rest.samples.storageservice.Containers;
 import com.sun.ws.rest.samples.storageservice.MemoryStore;
-import javax.ws.rs.HttpMethod;
+import javax.ws.rs.GET;
 import javax.ws.rs.ProduceMime;
 import javax.ws.rs.Path;
 import javax.ws.rs.core.HttpContext;
@@ -46,7 +46,7 @@ public class ContainersResource {
         return new ContainerResource(uriInfo, preconditionEvaluator);
     }
     
-    @HttpMethod
+    @GET
     public Containers getContainers() {
         System.out.println("GET CONTAINERS");
         

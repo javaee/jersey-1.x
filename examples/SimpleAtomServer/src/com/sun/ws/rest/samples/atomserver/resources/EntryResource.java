@@ -24,7 +24,7 @@ package com.sun.ws.rest.samples.atomserver.resources;
 
 import java.io.InputStream;
 import javax.ws.rs.ConsumeMime;
-import javax.ws.rs.HttpMethod;
+import javax.ws.rs.GET;
 import javax.ws.rs.ProduceMime;
 import javax.ws.rs.Path;
 import javax.ws.rs.core.Response;
@@ -47,12 +47,12 @@ public class EntryResource {
         AtomStore.checkExistence(entryPath);
     }
     
-    @HttpMethod
+    @GET
     public InputStream getEntry() {
         return FileStore.FS.getFileContents(entryPath);
     }    
     
-    @HttpMethod
+    @GET
     @Path("media")
     @ProduceMime("*/*")
     public Response getMedia() {

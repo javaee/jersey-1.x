@@ -24,43 +24,47 @@ package com.sun.ws.rest.impl.resource;
 
 import com.sun.ws.rest.impl.AbstractResourceTester;
 import com.sun.ws.rest.impl.client.ResourceProxy;
-import javax.ws.rs.HttpMethod;
+import javax.ws.rs.DELETE;
+import javax.ws.rs.GET;
+import javax.ws.rs.HEAD;
+import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 
 /**
  *
  * @author Paul.Sandoz@Sun.Com
  */
-public class DryHttpMethodsTest extends AbstractResourceTester {
+public class HttpMethodsTest extends AbstractResourceTester {
     
-    public DryHttpMethodsTest(String testName) {
+    public HttpMethodsTest(String testName) {
         super(testName);
     }
 
     @Path("/")
     static public class Resource { 
-        @HttpMethod
+        @HEAD
         public void headMe() {
         }
         
-        @HttpMethod
+        @GET
         public String getMe() {
             return "getMe";
         }
         
-        @HttpMethod
+        @PUT
         public String putMe(String s) {
             assertEquals("putMe", s);
             return "putMe";
         }
 
-        @HttpMethod
+        @POST
         public String postMe(String s) {
             assertEquals("postMe", s);
             return "postMe";
         }
         
-        @HttpMethod
+        @DELETE
         public String deleteMe() {
             return "deleteMe";
         }

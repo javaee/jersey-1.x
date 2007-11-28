@@ -24,7 +24,7 @@ package com.sun.ws.rest.impl.resource;
 
 import com.sun.ws.rest.impl.AbstractResourceTester;
 import com.sun.ws.rest.impl.client.ResponseInBound;
-import javax.ws.rs.HttpMethod;
+import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.core.Response;
 
@@ -40,7 +40,7 @@ public class ReturnResponseHeadersTest extends AbstractResourceTester {
 
     @Path("/")
     static public class TestRepresentationBean { 
-        @HttpMethod("POST")
+        @POST
         public Response doPost(String in) {
             return Response.Builder.representation("content", "text/plain").language("en").build();
         }

@@ -35,7 +35,9 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 
 import java.util.Set;
@@ -146,19 +148,12 @@ public class IntrospectionModeller {
             AbstractResource resource, MethodList methodList, boolean isEncoded,
             ConsumeMime classScopeConsumeMimeAnnotation, ProduceMime classScopeProduceMimeAnnotation) {
         
-        for (Method method : methodList.hasAnnotation(HttpMethod.class).hasNotAnnotation(Path.class)) {
-            
-            final HttpMethod httpMethodAnnotation = method.getAnnotation(HttpMethod.class);
-            AbstractResourceMethod resourceMethod;
-            
-            boolean httpMethodAnnotationValueNotNullAndNotEmpty =
-                    (null != httpMethodAnnotation.value()) &&  (!"".equals(httpMethodAnnotation.value()));
-            
-            if (httpMethodAnnotationValueNotNullAndNotEmpty) {
-                resourceMethod = new AbstractResourceMethod(method, httpMethodAnnotation.value());
-            } else {
-                resourceMethod = new AbstractResourceMethod(method);
-            }
+        // TODO what to do about multiple meta HttpMethod annotations?
+        // Should the method be added more than once to the model and
+        // then validation could reject?
+        for (Method method : methodList.hasMetaAnnotation(HttpMethod.class).hasNotAnnotation(Path.class)) {
+            final AbstractResourceMethod resourceMethod = new AbstractResourceMethod(method, 
+                    getMetaAnnotations(method, HttpMethod.class).get(0).value());
             
             findOutConsumeMimeTypes(resourceMethod, classScopeConsumeMimeAnnotation);
             findOutProduceMimeTypes(resourceMethod, classScopeProduceMimeAnnotation);
@@ -168,27 +163,20 @@ public class IntrospectionModeller {
         }
     }
     
-    
     private static final void workOutSubResourceMethodsList(
             AbstractResource resource, MethodList methodList, boolean isEncoded,
             ConsumeMime classScopeConsumeMimeAnnotation, ProduceMime classScopeProduceMimeAnnotation) {
         
-        for (Method method : methodList.hasAnnotation(HttpMethod.class).hasAnnotation(Path.class)) {
-            
-            final HttpMethod httpMethodAnnotation = method.getAnnotation(HttpMethod.class);
+        // TODO what to do about multiple meta HttpMethod annotations?
+        // Should the method be added more than once to the model and
+        // then validation could reject?
+        for (Method method : methodList.hasMetaAnnotation(HttpMethod.class).hasAnnotation(Path.class)) {
             final Path mPathAnnotation = method.getAnnotation(Path.class);
-            AbstractSubResourceMethod subResourceMethod;
-            
-            if (null != httpMethodAnnotation.value()) {
-                subResourceMethod = new AbstractSubResourceMethod(
+            final AbstractSubResourceMethod subResourceMethod = new AbstractSubResourceMethod(
                         method,
                         new UriTemplateValue(mPathAnnotation.value(), mPathAnnotation.encode(), mPathAnnotation.limited()),
-                        httpMethodAnnotation.value());
-            } else {
-                subResourceMethod = new AbstractSubResourceMethod(method,
-                        new UriTemplateValue(mPathAnnotation.value(), mPathAnnotation.encode(), mPathAnnotation.limited()));
-            }
-            
+                        getMetaAnnotations(method, HttpMethod.class).get(0).value());
+       
             findOutConsumeMimeTypes(subResourceMethod, classScopeConsumeMimeAnnotation);
             findOutProduceMimeTypes(subResourceMethod, classScopeProduceMimeAnnotation);
             processParameters(subResourceMethod, subResourceMethod.getMethod(), isEncoded);
@@ -197,10 +185,27 @@ public class IntrospectionModeller {
         }
     }
     
+    /**
+     * Return a list of specific meta-annotations decared on annotations of
+     * a method.
+     */
+    private static final <T extends Annotation> List<T> getMetaAnnotations(
+            Method m, Class<T> annotation) {
+        List <T> ma = new ArrayList<T>();
+        for (Annotation a : m.getAnnotations()) {
+            if (a.annotationType().getAnnotation(annotation) != null) {
+                ma.add(a.annotationType().getAnnotation(annotation));
+            }
+        }
+        
+        return ma;
+    }
+    
+    
     
     private static final void workOutSubResourceLocatorsList(AbstractResource resource, MethodList methodList, boolean isEncoded) {
         
-        for (Method method : methodList.hasNotAnnotation(HttpMethod.class).hasAnnotation(Path.class)) {
+        for (Method method : methodList.hasNotMetaAnnotation(HttpMethod.class).hasAnnotation(Path.class)) {
             final Path mPathAnnotation = method.getAnnotation(Path.class);
             final AbstractSubResourceLocator subResourceLocator = new AbstractSubResourceLocator(
                     method,

@@ -22,11 +22,11 @@
 
 package com.sun.ws.rest.impl.resource;
 
-import javax.ws.rs.HttpMethod;
 import javax.ws.rs.Path;
 import com.sun.ws.rest.impl.AbstractResourceTester;
 import com.sun.ws.rest.impl.client.ResponseInBound;
 import java.net.URI;
+import javax.ws.rs.GET;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
 
@@ -42,7 +42,7 @@ public class TempRedirectTest extends AbstractResourceTester {
     
     @Path("/")
     static public class Resource { 
-        @HttpMethod("GET")
+        @GET
         public Response doGet() {
             return Response.Builder.temporaryRedirect(URI.create("subpath")).build();
         }

@@ -24,7 +24,7 @@ package com.sun.ws.rest.impl.resource;
 
 import com.sun.ws.rest.impl.AbstractResourceTester;
 import com.sun.ws.rest.impl.client.ResourceProxy;
-import javax.ws.rs.HttpMethod;
+import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 
 /**
@@ -40,7 +40,7 @@ public class ByteArrayRepresentationTest extends AbstractResourceTester {
 
     @Path("/")
     static public class Resource { 
-        @HttpMethod("POST")
+        @POST
         public byte[] doPost(byte[] in) {
             assertEquals("CONTENT", new String(in));
             return "CONTENT".getBytes();

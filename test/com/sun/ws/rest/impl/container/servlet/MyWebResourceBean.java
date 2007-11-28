@@ -22,12 +22,15 @@
 
 package com.sun.ws.rest.impl.container.servlet;
 
-import javax.ws.rs.HttpMethod;
 import javax.ws.rs.Path;
 import com.sun.ws.rest.api.core.HttpContextAccess;
 import com.sun.ws.rest.api.core.HttpRequestContext;
 import com.sun.ws.rest.api.representation.FormURLEncodedProperties;
 import java.util.List;
+import javax.ws.rs.DELETE;
+import javax.ws.rs.GET;
+import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
 import javax.ws.rs.core.HttpContext;
 import javax.ws.rs.core.MultivaluedMap;
 
@@ -37,13 +40,13 @@ public class MyWebResourceBean  {
     
     int count =0;
     
-    @HttpMethod("POST")
+    @POST
     public void doPost() {
         System.out.println("MyWebResourceBean POST: " + 
                 context.getHttpRequestContext().getHttpMethod());
     }
     
-    @HttpMethod("GET")
+    @GET
     public Object doGet() {
         HttpRequestContext request = context.getHttpRequestContext();
         System.out.println("MyWebResourceBean GET: "+ request.getHttpMethod());
@@ -90,13 +93,13 @@ public class MyWebResourceBean  {
         return representation;
     }
     
-    @HttpMethod("PUT")
+    @PUT
     public void doPut() {
         System.out.println("MyWebResourceBean PUT: " +
                 context.getHttpRequestContext().getHttpMethod());
     }
     
-    @HttpMethod("DELETE")
+    @DELETE
     public void doDelete() {
         System.out.println("MyWebResourceBean DELETE: " +
                 context.getHttpRequestContext().getHttpMethod());

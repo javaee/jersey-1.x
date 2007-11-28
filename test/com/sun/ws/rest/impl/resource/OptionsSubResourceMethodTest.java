@@ -24,7 +24,15 @@ package com.sun.ws.rest.impl.resource;
 
 import com.sun.ws.rest.impl.AbstractResourceTester;
 import com.sun.ws.rest.impl.client.ResponseInBound;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
+import javax.ws.rs.DELETE;
+import javax.ws.rs.GET;
 import javax.ws.rs.HttpMethod;
+import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.core.Response;
 
@@ -33,6 +41,17 @@ import javax.ws.rs.core.Response;
  * @author Paul.Sandoz@Sun.Com
  */
 public class OptionsSubResourceMethodTest extends AbstractResourceTester {
+    @Target({ElementType.METHOD})
+    @Retention(RetentionPolicy.RUNTIME)
+    @HttpMethod("PATCH")
+    public @interface PATCH { 
+    }
+    
+    @Target({ElementType.METHOD})
+    @Retention(RetentionPolicy.RUNTIME)
+    @HttpMethod("PATCH")
+    public @interface OPTIONS { 
+    }
     
     public OptionsSubResourceMethodTest(String testName) {
         super(testName);
@@ -41,30 +60,30 @@ public class OptionsSubResourceMethodTest extends AbstractResourceTester {
     @Path("/")
     static public class ResourceNoOptions { 
         @Path("sub")
-        @HttpMethod
+        @GET
         public String get() {
             return "GET";
         }
         
         @Path("sub")
-        @HttpMethod
+        @PUT
         public String put(String e) {
             return "PUT";
         }
         
         @Path("sub")
-        @HttpMethod
+        @POST
         public String post(String e) {
             return "POST";
         }
         
         @Path("sub")
-        @HttpMethod
+        @DELETE
         public void delete() {
         }
         
         @Path("sub")
-        @HttpMethod("PATCH")
+        @PATCH
         public String patch(String e) {
             return "PATCH";
         }
@@ -87,37 +106,37 @@ public class OptionsSubResourceMethodTest extends AbstractResourceTester {
     static public class ResourceWithOptions { 
         
         @Path("sub")
-        @HttpMethod("OPTIONS")
+        @OPTIONS
         public Response options() {
             return Response.Builder.representation("OPTIONS").
                     header("Allow", "GET, PUT, POST, DELETE, PATCH").build();
         }
         
         @Path("sub")
-        @HttpMethod
+        @GET
         public String get() {
             return "GET";
         }
         
         @Path("sub")
-        @HttpMethod
+        @PUT
         public String put(String e) {
             return "PUT";
         }
         
         @Path("sub")
-        @HttpMethod
+        @POST
         public String post(String e) {
             return "POST";
         }
         
         @Path("sub")
-        @HttpMethod
+        @DELETE
         public void delete() {
         }
         
         @Path("sub")
-        @HttpMethod("PATCH")
+        @PATCH
         public String patch(String e) {
             return "PATCH";
         }
@@ -139,13 +158,13 @@ public class OptionsSubResourceMethodTest extends AbstractResourceTester {
     @Path("/")
     static public class ResourceNoOptionsDifferentSub { 
         @Path("sub1")
-        @HttpMethod
+        @GET
         public String getFoo() {
             return "FOO";
         }
         
         @Path("sub2")
-        @HttpMethod
+        @PUT
         public String putBar() {
             return "BAR";
         }

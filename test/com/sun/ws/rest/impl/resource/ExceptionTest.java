@@ -25,7 +25,7 @@ package com.sun.ws.rest.impl.resource;
 import com.sun.ws.rest.impl.AbstractResourceTester;
 import com.sun.ws.rest.api.container.ContainerException;
 import com.sun.ws.rest.impl.client.ResponseInBound;
-import javax.ws.rs.HttpMethod;
+import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 
 /**
@@ -46,7 +46,7 @@ public class ExceptionTest extends AbstractResourceTester {
     
     @Path("/exception/checked")
     static public class ExceptionCheckedResource { 
-        @HttpMethod
+        @GET
         public String get() throws CheckedException {
             throw new CheckedException();
         }
@@ -66,7 +66,7 @@ public class ExceptionTest extends AbstractResourceTester {
     
     @Path("/exception/runtime")
     static public class ExceptionRutimeResource { 
-        @HttpMethod
+        @GET
         public String get() {
             throw new UnsupportedOperationException();
         }

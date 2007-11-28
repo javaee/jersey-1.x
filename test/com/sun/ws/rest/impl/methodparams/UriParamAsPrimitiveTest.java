@@ -23,12 +23,11 @@
 package com.sun.ws.rest.impl.methodparams;
 
 import com.sun.ws.rest.impl.AbstractResourceTester;
-import javax.ws.rs.HttpMethod;
 import javax.ws.rs.UriParam;
 import javax.ws.rs.Path;
-import com.sun.ws.rest.api.core.HttpResponseContext;
 import com.sun.ws.rest.impl.AbstractResourceTester;
 import com.sun.ws.rest.impl.client.ResponseInBound;
+import javax.ws.rs.GET;
 
 /**
  *
@@ -58,7 +57,7 @@ public class UriParamAsPrimitiveTest extends AbstractResourceTester {
 
     @Path("/boolean/{arg}")
     public static class ResourceUriBoolean {
-        @HttpMethod("GET")
+        @GET
         public String doGet(@UriParam("arg") boolean v) {
             assertEquals(true, v);
             return "content";
@@ -67,7 +66,7 @@ public class UriParamAsPrimitiveTest extends AbstractResourceTester {
     
     @Path("/byte/{arg}")
     public static class ResourceUriByte {
-        @HttpMethod("GET")
+        @GET
         public String doGet(@UriParam("arg") byte v) {
             assertEquals(127, v);
             return "content";
@@ -76,7 +75,7 @@ public class UriParamAsPrimitiveTest extends AbstractResourceTester {
     
     @Path("/short/{arg}")
     public static class ResourceUriShort {
-        @HttpMethod("GET")
+        @GET
         public String doGet(@UriParam("arg") short v) {
             assertEquals(32767, v);
             return "content";
@@ -85,7 +84,7 @@ public class UriParamAsPrimitiveTest extends AbstractResourceTester {
     
     @Path("/int/{arg}")
     public static class ResourceUriInt {
-        @HttpMethod("GET")
+        @GET
         public String doGet(@UriParam("arg") int v) {
             assertEquals(2147483647, v);
             return "content";
@@ -94,7 +93,7 @@ public class UriParamAsPrimitiveTest extends AbstractResourceTester {
     
     @Path("/long/{arg}")
     public static class ResourceUriLong {
-        @HttpMethod("GET")
+        @GET
         public String doGet(@UriParam("arg") long v) {
             assertEquals(9223372036854775807L, v);
             return "content";
@@ -103,7 +102,7 @@ public class UriParamAsPrimitiveTest extends AbstractResourceTester {
     
     @Path("/float/{arg}")
     public static class ResourceUriFloat {
-        @HttpMethod("GET")
+        @GET
         public String doGet(@UriParam("arg") float v) {
             assertEquals(3.14159265f, v);
             return "content";
@@ -112,7 +111,7 @@ public class UriParamAsPrimitiveTest extends AbstractResourceTester {
     
     @Path("/double/{arg}")
     public static class ResourceUriDouble {
-        @HttpMethod("GET")
+        @GET
         public String doGet(@UriParam("arg") double v) {
             assertEquals(3.14159265358979d, v);
             return "content";
@@ -122,7 +121,7 @@ public class UriParamAsPrimitiveTest extends AbstractResourceTester {
     
     @Path("/boolean/wrapper/{arg}")
     public static class ResourceUriBooleanWrapper {
-        @HttpMethod("GET")
+        @GET
         public String doGet(@UriParam("arg") Boolean v) {
             assertEquals(true, v.booleanValue());
             return "content";
@@ -131,7 +130,7 @@ public class UriParamAsPrimitiveTest extends AbstractResourceTester {
     
     @Path("/byte/wrapper/{arg}")
     public static class ResourceUriByteWrapper {
-        @HttpMethod("GET")
+        @GET
         public String doGet(@UriParam("arg") Byte v) {
             assertEquals(127, v.byteValue());
             return "content";
@@ -140,7 +139,7 @@ public class UriParamAsPrimitiveTest extends AbstractResourceTester {
     
     @Path("/short/wrapper/{arg}")
     public static class ResourceUriShortWrapper {
-        @HttpMethod("GET")
+        @GET
         public String doGet(@UriParam("arg") Short v) {
             assertEquals(32767, v.shortValue());
             return "content";
@@ -149,7 +148,7 @@ public class UriParamAsPrimitiveTest extends AbstractResourceTester {
     
     @Path("/int/wrapper/{arg}")
     public static class ResourceUriIntWrapper {
-        @HttpMethod("GET")
+        @GET
         public String doGet(@UriParam("arg") Integer v) {
             assertEquals(2147483647, v.intValue());
             return "content";
@@ -158,7 +157,7 @@ public class UriParamAsPrimitiveTest extends AbstractResourceTester {
     
     @Path("/long/wrapper/{arg}")
     public static class ResourceUriLongWrapper {
-        @HttpMethod("GET")
+        @GET
         public String doGet(@UriParam("arg") Long v) {
             assertEquals(9223372036854775807L, v.longValue());
             return "content";
@@ -167,7 +166,7 @@ public class UriParamAsPrimitiveTest extends AbstractResourceTester {
     
     @Path("/float/wrapper/{arg}")
     public static class ResourceUriFloatWrapper {
-        @HttpMethod("GET")
+        @GET
         public String doGet(@UriParam("arg") Float v) {
             assertEquals(3.14159265f, v.floatValue());
             return "content";
@@ -176,7 +175,7 @@ public class UriParamAsPrimitiveTest extends AbstractResourceTester {
     
     @Path("/double/wrapper/{arg}")
     public static class ResourceUriDoubleWrapper {
-        @HttpMethod("GET")
+        @GET
         public String doGet(@UriParam("arg") Double v) {
             assertEquals(3.14159265358979d, v.doubleValue());
             return "content";

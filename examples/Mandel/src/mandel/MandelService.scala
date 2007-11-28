@@ -24,7 +24,7 @@ class MandelService(
     val height : int = if (dy >= dx) imageSize else (dy/dx * imageSize).toInt
     
     @ProduceMime(Array("image/png"))
-    @HttpMethod
+    @GET
     def getMandelbrot() = {
         val image = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
         new ParallelMandelRenderer(workers, lower, upper, limit, image.getRaster()).render();

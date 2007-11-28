@@ -26,7 +26,10 @@ import com.sun.ws.rest.impl.AbstractResourceTester;
 import com.sun.ws.rest.api.core.HttpContextAccess;
 import com.sun.ws.rest.impl.client.ResourceProxy;
 import java.net.URI;
-import javax.ws.rs.HttpMethod;
+import javax.ws.rs.DELETE;
+import javax.ws.rs.GET;
+import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.core.HttpContext;
 import javax.ws.rs.core.HttpHeaders;
@@ -47,7 +50,7 @@ public class WebResorceWithFieldInjectionTest extends AbstractResourceTester {
     public static class TestFieldInjectedHttpContextAccess {
         private @HttpContext HttpContextAccess context;
         
-        @HttpMethod("POST")
+        @POST
         public String doPost(String in) {
             assertEquals("BEAN-ONE", in);
             String method = context.getHttpRequestContext().getHttpMethod();
@@ -55,14 +58,14 @@ public class WebResorceWithFieldInjectionTest extends AbstractResourceTester {
             return "POST";
         }
         
-        @HttpMethod("GET")
+        @GET
         public String doGet() {
             String method = context.getHttpRequestContext().getHttpMethod();
             assertEquals("GET", method);
             return "GET";
         }
         
-        @HttpMethod("PUT")
+        @PUT
         public String doPut(String in) {
             assertEquals("BEAN-ONE", in);
             String method = context.getHttpRequestContext().getHttpMethod();
@@ -70,7 +73,7 @@ public class WebResorceWithFieldInjectionTest extends AbstractResourceTester {
             return "PUT";
         }
         
-        @HttpMethod("DELETE")
+        @DELETE
         public String doDelete() {
             String method = context.getHttpRequestContext().getHttpMethod();
             assertEquals("DELETE", method);
@@ -82,7 +85,7 @@ public class WebResorceWithFieldInjectionTest extends AbstractResourceTester {
     public static class TestFieldInjectedUriInfo {
         private @HttpContext UriInfo uriInfo;
         
-        @HttpMethod("GET")
+        @GET
         public String doGet() {
             URI baseUri = uriInfo.getBaseUri();
             URI uri = uriInfo.getAbsolutePath();
@@ -96,7 +99,7 @@ public class WebResorceWithFieldInjectionTest extends AbstractResourceTester {
     public static class TestFieldInjectedHttpHeaders {
         private @HttpContext HttpHeaders httpHeaders;
         
-        @HttpMethod("GET")
+        @GET
         public String doGet() {
             String value = httpHeaders.getRequestHeaders().getFirst("X-TEST");
             assertEquals("TEST", value);

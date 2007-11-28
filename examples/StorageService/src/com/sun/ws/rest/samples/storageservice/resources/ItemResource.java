@@ -31,7 +31,9 @@ import java.net.URI;
 import java.security.MessageDigest;
 import java.util.Date;
 import java.util.GregorianCalendar;
-import javax.ws.rs.HttpMethod;
+import javax.ws.rs.DELETE;
+import javax.ws.rs.GET;
+import javax.ws.rs.PUT;
 import javax.ws.rs.core.EntityTag;
 import javax.ws.rs.core.HttpContext;
 import javax.ws.rs.core.HttpHeaders;
@@ -58,7 +60,7 @@ public class ItemResource {
         this.item = item;
     }
     
-    @HttpMethod
+    @GET
     public Response getItem() {
         System.out.println("GET ITEM " + container + " " + item);
         
@@ -76,7 +78,7 @@ public class ItemResource {
                 lastModified(lastModified).tag(et).build();
     }    
     
-    @HttpMethod
+    @PUT
     public Response putItem(
             @HttpContext HttpHeaders headers,
             byte[] data) {
@@ -112,7 +114,7 @@ public class ItemResource {
         return r;
     }    
     
-    @HttpMethod
+    @DELETE
     public void deleteItem() {
         System.out.println("DELETE ITEM " + container + " " + item);
         

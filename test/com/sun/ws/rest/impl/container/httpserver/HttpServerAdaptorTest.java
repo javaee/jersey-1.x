@@ -26,7 +26,7 @@ import javax.ws.rs.Path;
 import com.sun.ws.rest.api.core.HttpRequestContext;
 import com.sun.ws.rest.api.core.HttpResponseContext;
 import com.sun.ws.rest.impl.client.ResourceProxy;
-import javax.ws.rs.HttpMethod;
+import javax.ws.rs.POST;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
 
@@ -37,7 +37,7 @@ import javax.ws.rs.core.UriBuilder;
 public class HttpServerAdaptorTest extends AbstractHttpServerTester {
     @Path("/{arg1}/{arg2}")
     public static class TestOneWebResource {
-        @HttpMethod("POST")
+        @POST
         public void handleRequest(HttpRequestContext request, HttpResponseContext response) {
             assertEquals("POST", request.getHttpMethod());
             
@@ -53,7 +53,7 @@ public class HttpServerAdaptorTest extends AbstractHttpServerTester {
     
     @Path("/{arg1}")
     public static class TestTwoWebResource {
-        @HttpMethod("POST")
+        @POST
         public void handleRequest(HttpRequestContext request, HttpResponseContext response) {
             assertEquals("POST", request.getHttpMethod());
             

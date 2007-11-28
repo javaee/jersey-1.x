@@ -24,7 +24,8 @@ package com.sun.ws.rest.samples.optimisticconcurrency.resources;
 
 import com.sun.ws.rest.api.ConflictException;
 import com.sun.ws.rest.samples.optimisticconcurrency.ItemData;
-import javax.ws.rs.HttpMethod;
+import javax.ws.rs.GET;
+import javax.ws.rs.PUT;
 import javax.ws.rs.UriParam;
 import javax.ws.rs.Path;
 import javax.ws.rs.core.HttpContext;
@@ -38,7 +39,7 @@ import javax.ws.rs.core.Response;
  */
 public class ItemContentResource {
     
-    @HttpMethod
+    @GET
     public Response get() {
         ItemData id = ItemData.ITEM;
         MediaType mediaType = null;
@@ -51,7 +52,7 @@ public class ItemContentResource {
         return Response.Builder.representation(content, mediaType).build();
     }
     
-    @HttpMethod
+    @PUT
     @Path("{version}")
     public void put(
             @UriParam("version") int version,

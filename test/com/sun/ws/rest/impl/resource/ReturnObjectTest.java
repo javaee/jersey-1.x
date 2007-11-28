@@ -23,7 +23,7 @@
 package com.sun.ws.rest.impl.resource;
 
 import com.sun.ws.rest.impl.AbstractResourceTester;
-import javax.ws.rs.HttpMethod;
+import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.core.Response;
 
@@ -39,7 +39,7 @@ public class ReturnObjectTest extends AbstractResourceTester {
 
     @Path("/")
     static public class ResourceType { 
-        @HttpMethod
+        @GET
         public Object get() {
             return new String("TYPE");
         }
@@ -47,7 +47,7 @@ public class ReturnObjectTest extends AbstractResourceTester {
         
     @Path("/")
     static public class ResourceHttpResponse { 
-        @HttpMethod
+        @GET
         public Object get() {
             return Response.Builder.representation("HTTP_RESPONSE").type("text/plain").build();
         }        

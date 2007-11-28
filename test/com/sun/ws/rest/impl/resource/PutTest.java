@@ -24,7 +24,7 @@ package com.sun.ws.rest.impl.resource;
 
 import com.sun.ws.rest.impl.AbstractResourceTester;
 import com.sun.ws.rest.impl.client.ResponseInBound;
-import javax.ws.rs.HttpMethod;
+import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 
 /**
@@ -39,14 +39,14 @@ public class PutTest extends AbstractResourceTester {
 
     @Path("/PutNoInputNoReturnResource")
     static public class PutNoInputNoReturnResource { 
-        @HttpMethod("PUT")
+        @PUT
         public void doPut() {
         }
     }
     
     @Path("/PutNoReturnResource")
     static public class PutNoReturnResource { 
-        @HttpMethod("PUT")
+        @PUT
         public void doPut(String in) {
             assertEquals("PutNoReturnResource", in);
         }
@@ -54,7 +54,7 @@ public class PutTest extends AbstractResourceTester {
     
     @Path("/PutNoInputResource")
     static public class PutNoInputResource { 
-        @HttpMethod("PUT")
+        @PUT
         public String doPut() {
             return "PutNoInputResource";
         }
@@ -62,7 +62,7 @@ public class PutTest extends AbstractResourceTester {
     
     @Path("/PutResource")
     static public class PutResource { 
-        @HttpMethod("PUT")
+        @PUT
         public String doPut(String in) {
             assertEquals("PutResource", in);
             return "PutResource";

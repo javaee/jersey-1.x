@@ -25,7 +25,7 @@ package com.sun.ws.rest.impl.container.httpserver;
 import com.sun.ws.rest.api.core.DefaultResourceConfig;
 import com.sun.ws.rest.api.core.ResourceConfig;
 import com.sun.ws.rest.impl.client.ResourceProxy;
-import javax.ws.rs.HttpMethod;
+import javax.ws.rs.GET;
 import javax.ws.rs.ProduceMime;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.UriParam;
@@ -46,28 +46,28 @@ public class CanonicalizationFeatureTest extends AbstractHttpServerTester {
     public static class TestWebResource {
         
         @Path(value = "uri/{uriParam}", limited = false)
-        @HttpMethod
+        @GET
         @ProduceMime("text/plain")
         public String getUri(@UriParam("uriParam") String uri) {
             return uri;
         }
 
         @Path("slashes/{uriParam}/")
-        @HttpMethod
+        @GET
         @ProduceMime("text/plain")
         public String getSlashes(@UriParam("uriParam") String param) {
             return param;
         }
 
         @Path("dblslashes//{uriParam}//")
-        @HttpMethod
+        @GET
         @ProduceMime("text/plain")
         public String getDblSlashes(@UriParam("uriParam") String param) {
             return param;
         }
         
         @Path("qparam/a")
-        @HttpMethod
+        @GET
         @ProduceMime("text/plain")
         public String getQParam(@QueryParam("qParam") String param) {
             return param;

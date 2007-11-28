@@ -24,7 +24,15 @@ package com.sun.ws.rest.impl.resource;
 
 import com.sun.ws.rest.impl.AbstractResourceTester;
 import com.sun.ws.rest.impl.client.ResponseInBound;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
+import javax.ws.rs.DELETE;
+import javax.ws.rs.GET;
 import javax.ws.rs.HttpMethod;
+import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.core.Response;
 
@@ -33,6 +41,17 @@ import javax.ws.rs.core.Response;
  * @author Paul.Sandoz@Sun.Com
  */
 public class OptionsTest extends AbstractResourceTester {
+    @Target({ElementType.METHOD})
+    @Retention(RetentionPolicy.RUNTIME)
+    @HttpMethod("PATCH")
+    public @interface PATCH { 
+    }
+    
+    @Target({ElementType.METHOD})
+    @Retention(RetentionPolicy.RUNTIME)
+    @HttpMethod("PATCH")
+    public @interface OPTIONS { 
+    }
     
     public OptionsTest(String testName) {
         super(testName);
@@ -40,26 +59,26 @@ public class OptionsTest extends AbstractResourceTester {
 
     @Path("/")
     static public class ResourceNoOptions { 
-        @HttpMethod
+        @GET
         public String get() {
             return "GET";
         }
         
-        @HttpMethod
+        @PUT
         public String put(String e) {
             return "PUT";
         }
         
-        @HttpMethod
+        @POST
         public String post(String e) {
             return "POST";
         }
         
-        @HttpMethod
+        @DELETE
         public void delete() {
         }
         
-        @HttpMethod("PATCH")
+        @PATCH
         public String patch(String e) {
             return "PATCH";
         }
@@ -81,32 +100,32 @@ public class OptionsTest extends AbstractResourceTester {
     @Path("/")
     static public class ResourceWithOptions { 
         
-        @HttpMethod("OPTIONS")
+        @OPTIONS
         public Response options() {
             return Response.Builder.representation("OPTIONS").
                     header("Allow", "GET, PUT, POST, DELETE, PATCH").build();
         }
         
-        @HttpMethod
+        @GET
         public String get() {
             return "GET";
         }
         
-        @HttpMethod
+        @PUT
         public String put(String e) {
             return "PUT";
         }
         
-        @HttpMethod
+        @POST
         public String post(String e) {
             return "POST";
         }
         
-        @HttpMethod
+        @DELETE
         public void delete() {
         }
         
-        @HttpMethod("PATCH")
+        @PATCH
         public String patch(String e) {
             return "PATCH";
         }

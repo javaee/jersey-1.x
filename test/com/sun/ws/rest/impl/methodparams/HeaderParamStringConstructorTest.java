@@ -24,7 +24,6 @@ package com.sun.ws.rest.impl.methodparams;
 
 import com.sun.ws.rest.impl.AbstractResourceTester;
 import javax.ws.rs.DefaultValue;
-import javax.ws.rs.HttpMethod;
 import javax.ws.rs.HeaderParam;
 import javax.ws.rs.Path;
 import com.sun.ws.rest.impl.AbstractResourceTester;
@@ -33,6 +32,7 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.net.URI;
 import java.util.List;
+import javax.ws.rs.GET;
 
 /**
  *
@@ -46,7 +46,7 @@ public class HeaderParamStringConstructorTest extends AbstractResourceTester {
 
     @Path("/")
     public static class ResourceString {
-        @HttpMethod("GET")
+        @GET
         public String doGet(
                 @HeaderParam("arg1") BigDecimal arg1, 
                 @HeaderParam("arg2") BigInteger arg2,
@@ -60,7 +60,7 @@ public class HeaderParamStringConstructorTest extends AbstractResourceTester {
     
     @Path("/")
     public static class ResourceStringList {
-        @HttpMethod("GET")
+        @GET
         public String doGetString(@HeaderParam("args") List<BigDecimal> args) {
             assertEquals("3.145", args.get(0).toString());
             assertEquals("2.718", args.get(1).toString());
@@ -71,7 +71,7 @@ public class HeaderParamStringConstructorTest extends AbstractResourceTester {
     
     @Path("/")
     public static class ResourceStringListEmpty {
-        @HttpMethod("GET")
+        @GET
         public String doGetString(@HeaderParam("args") List<BigDecimal> args) {
             assertEquals(3, args.size());
             assertEquals(null, args.get(0));
@@ -83,7 +83,7 @@ public class HeaderParamStringConstructorTest extends AbstractResourceTester {
     
     @Path("/")
     public static class ResourceStringListAbsent {
-        @HttpMethod("GET")
+        @GET
         public String doGetString(@HeaderParam("args") List<BigDecimal> args) {
             assertEquals(null, args);
             return "content";
@@ -92,7 +92,7 @@ public class HeaderParamStringConstructorTest extends AbstractResourceTester {
     
     @Path("/")
     public static class ResourceStringNullDefault {
-        @HttpMethod("GET")
+        @GET
         public String doGet(
                 @HeaderParam("arg1") BigDecimal arg1) {
             assertEquals(null, arg1);
@@ -102,7 +102,7 @@ public class HeaderParamStringConstructorTest extends AbstractResourceTester {
     
     @Path("/")
     public static class ResourceStringDefault {
-        @HttpMethod("GET")
+        @GET
         public String doGet(
                 @HeaderParam("arg1") @DefaultValue("3.145") BigDecimal arg1) {
             assertEquals("3.145", arg1.toString());
@@ -112,7 +112,7 @@ public class HeaderParamStringConstructorTest extends AbstractResourceTester {
     
     @Path("/")
     public static class ResourceStringDefaultOverride {
-        @HttpMethod("GET")
+        @GET
         public String doGet(
                 @HeaderParam("arg1") @DefaultValue("3.145") BigDecimal arg1) {
             assertEquals("2.718", arg1.toString());
@@ -122,7 +122,7 @@ public class HeaderParamStringConstructorTest extends AbstractResourceTester {
     
     @Path("/")
     public static class ResourceStringListNullDefault {
-        @HttpMethod("GET")
+        @GET
         public String doGetString(@HeaderParam("args") List<BigDecimal> args) {
             assertEquals(null, args);
             return "content";
@@ -131,7 +131,7 @@ public class HeaderParamStringConstructorTest extends AbstractResourceTester {
     
     @Path("/")
     public static class ResourceStringListDefault {
-        @HttpMethod("GET")
+        @GET
         public String doGetString(
                 @HeaderParam("args") @DefaultValue("3.145") List<BigDecimal> args) {
             assertEquals("3.145", args.get(0).toString());
@@ -141,7 +141,7 @@ public class HeaderParamStringConstructorTest extends AbstractResourceTester {
     
     @Path("/")
     public static class ResourceStringListDefaultOverride {
-        @HttpMethod("GET")
+        @GET
         public String doGetString(
                 @HeaderParam("args") @DefaultValue("3.145") List<BigDecimal> args) {
             assertEquals("2.718", args.get(0).toString());

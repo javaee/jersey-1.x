@@ -28,10 +28,11 @@ import com.sun.ws.rest.samples.bookmark.util.tx.TransactionManager;
 import com.sun.ws.rest.samples.bookmark.util.tx.Transactional;
 import javax.persistence.EntityManager;
 import javax.ws.rs.ConsumeMime;
-import javax.ws.rs.HttpMethod;
+import javax.ws.rs.DELETE;
+import javax.ws.rs.GET;
+import javax.ws.rs.PUT;
 import javax.ws.rs.ProduceMime;
 import javax.ws.rs.Path;
-import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 import org.codehaus.jettison.json.JSONException;
@@ -66,7 +67,7 @@ public class UserResource {
     }
     
     
-    @HttpMethod("GET")
+    @GET
     @ProduceMime("application/json")
     public JSONObject getUser() throws JSONException {
         if (null == userEntity) {
@@ -80,7 +81,7 @@ public class UserResource {
             .put("bookmarks", uriInfo.getAbsolutePathBuilder().path("bookmarks").build());
     }
     
-    @HttpMethod("PUT")
+    @PUT
     @ConsumeMime("application/json")
     public Response putUser(JSONObject jsonEntity) throws JSONException {
         
@@ -117,7 +118,7 @@ public class UserResource {
         return rBuilder.build();
     }
     
-    @HttpMethod("DELETE")
+    @DELETE
     public void deleteUser() {
         if (null == userEntity) {
             throw new NotFoundException("userid " + userid + "does not exist!");

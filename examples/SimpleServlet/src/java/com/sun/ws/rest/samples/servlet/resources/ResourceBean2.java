@@ -22,7 +22,7 @@
 
 package com.sun.ws.rest.samples.servlet.resources;
 
-import javax.ws.rs.HttpMethod;
+import javax.ws.rs.GET;
 import javax.ws.rs.ProduceMime;
 import javax.ws.rs.Path;
 
@@ -30,7 +30,7 @@ import javax.ws.rs.Path;
 public class ResourceBean2 {
     
     
-    @HttpMethod("GET")
+    @GET
     @ProduceMime("text/plain")
     public String describe() {
         return "Hello World from resource 2";

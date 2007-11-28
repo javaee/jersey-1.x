@@ -25,7 +25,7 @@ package com.sun.ws.rest.samples.servlet.resources;
 import javax.annotation.Resource;
 import javax.servlet.ServletConfig;
 import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.HttpMethod;
+import javax.ws.rs.GET;
 import javax.ws.rs.ProduceMime;
 import javax.ws.rs.Path;
 
@@ -38,7 +38,7 @@ public class ResourceBean1 {
     @Resource
     ServletConfig servletConfig;
         
-    @HttpMethod("GET")
+    @GET
     @ProduceMime("text/plain")
     public String describe() {
         return "Hello World from resource 1 in servlet: '" +

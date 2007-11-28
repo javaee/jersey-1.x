@@ -35,50 +35,9 @@ public class AbstractResourceMethod implements Parameterized {
     private String httpMethod;
     private Method method;
     
-    // TODO: what other methods to include?
-    private enum HttpMETHOD {
-        
-        GET, POST, PUT, DELETE, HEAD;
-                
-        boolean isPrefixOf(final String what) {
-            if (null == what) {
-                return false;
-            }
-            return what.startsWith(this.name());
-        }
-    }
-    
-    
-    private static String extractHttpMethodName(Method method) {
-
-        final String upperCaseMethodName = method.getName().toUpperCase();
-
-        for (HttpMETHOD httpMethod : HttpMETHOD.values()) {
-            if (httpMethod.isPrefixOf(upperCaseMethodName)) {
-                return httpMethod.name();
-            }
-        }
-        // no http method found
-        // TODO: shall we really return null?
-        //       what e.g. a "NULL_HTTP_METHOD"
-        return null;
-    }
-    
-    
-    /**
-     * Creates a new instance of AbstractResourceMethod
-     */
-    public AbstractResourceMethod(Method method) {
-        this(method, null);
-    }
-
     public AbstractResourceMethod(Method method, String httpMethod) {
         this.method = method;
-        if (null == httpMethod || "".equals(httpMethod)) {
-            this.httpMethod = extractHttpMethodName(method);
-        } else {
-            this.httpMethod = httpMethod;
-        }
+        this.httpMethod = httpMethod;
         this.consumeMimeList = new ArrayList<MediaType>();
         this.produceMimeList = new ArrayList<MediaType>();
         this.parameters = new ArrayList<Parameter>();
