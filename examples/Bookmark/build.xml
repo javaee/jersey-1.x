@@ -12,6 +12,9 @@
     <condition property="ext" value="" else=".bat">
         <os family="unix"/>
     </condition>
+    
+    <property name="javac.source"  value="1.5"/>
+    <property name="javac.target"  value="1.5"/>
 
     <target name="start-glassfish">
         <exec executable="${as.home}/bin/asadmin${ext}">
