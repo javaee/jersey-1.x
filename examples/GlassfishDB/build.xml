@@ -24,5 +24,8 @@
     <description>Builds, tests, and runs the project GlassfishDB.</description>
     <import file="nbproject/build-impl.xml"/>
     
+    <property name="javac.source"  value="1.5"/>
+    <property name="javac.target"  value="1.5"/>
+    
     <target name="default" depends="test,dist"/>
 </project>
