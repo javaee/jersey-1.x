@@ -153,14 +153,15 @@ public class EntityParamDispatchProvider implements ResourceMethodDispatchProvid
         boolean requireReturnOfRepresentation = false;
         boolean requireNoEntityParameter = false;
         
+        // TODO
+        // Strictly speaking a GET request can contain an entity in the
+        // message body, but this is likely to be not implemented by many
+        // servers and clients, but should we support it?
         if ("GET".equals(abstractResourceMethod.getHttpMethod())) {
             requireReturnOfRepresentation = true;
             requireNoEntityParameter = true;
-        } else if ("POST".equals(abstractResourceMethod.getHttpMethod())) {
-        } else if ("PUT".equals(abstractResourceMethod.getHttpMethod())) {
-        } else if ("DELETE".equals(abstractResourceMethod.getHttpMethod())) {
-            requireNoEntityParameter = true;
         }
+        
         // Let through other methods
         
         ParameterExtractor[] extractors = processParameters(abstractResourceMethod, requireNoEntityParameter);
