@@ -79,15 +79,7 @@ public final class HttpMethodRule implements UriRule {
         final HttpResponseContext response = context.getHttpContext().
                 getHttpResponseContext();
         final String httpMethod = request.getHttpMethod();
-        
-        /* TODO
-         * Replace with
-         *   hasMessageBody(request.getHttpHeaders());
-         * after unit tests have been fixed.
-         */
-        MediaType contentType = null;
-        if (!httpMethod.equals("GET") && !httpMethod.equals("DELETE"))
-            contentType = HttpHelper.getContentType(request);
+        final MediaType contentType = HttpHelper.getContentType(request);
         
         // Get the list of resource methods for the HTTP method
         List<ResourceMethod> methods = map.get(httpMethod);
