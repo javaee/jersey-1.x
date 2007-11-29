@@ -42,7 +42,7 @@ public abstract class AbstractGrizzlyServerTester extends TestCase {
 
     private final SelectorThread selectorThread = new SelectorThread();
 
-    private int port = 9998;
+    private int port = 9997;
     
     public AbstractGrizzlyServerTester(String name) {
         super(name);
