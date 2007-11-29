@@ -43,6 +43,8 @@ public final class ResponseImpl extends Response {
     
     private final List<Object> nameValuePairs;
     
+    private MultivaluedMap<String, Object> headers;
+    
     ResponseImpl(int status, Object entity, Object[] values, List<Object> nameValuePairs) {
         this.status = status;
         this.entity = entity;
@@ -60,6 +62,64 @@ public final class ResponseImpl extends Response {
         return status;
     }
 
+    public MultivaluedMap<String, Object> getMetadata() {
+        if (headers == null)
+            headers = new ResponseHttpHeadersImpl();
+        
+        for (int i = 0; i < values.length; i++)
+            if (values[i] != null)
+                headers.putSingle(ResponseBuilderImpl.getHeader(i), values[i]);
+
+        Iterator i = nameValuePairs.iterator();
+        while (i.hasNext()) {
+            headers.add((String)i.next(), i.next());
+        }
+        
+        return headers;
+    }
+    
+    public MultivaluedMap<String, Object> getMetadataOptimal(
+            HttpRequestContext requestContext, MediaType contentType) {
+        if (headers == null)
+            headers = new ResponseHttpHeadersImpl();
+
+        if (values.length == 0 && contentType != null) {
+            headers.putSingle(ResponseBuilderImpl.
+                    getHeader(ResponseBuilderImpl.CONTENT_TYPE), contentType);
+        }
+        
+        for (int i = 0; i < values.length; i++) {
+            switch(i) {
+                case ResponseBuilderImpl.CONTENT_TYPE:
+                    if (values[i] != null)
+                        headers.putSingle(ResponseBuilderImpl.getHeader(i), values[i]);
+                    else if (contentType != null)
+                        headers.putSingle(ResponseBuilderImpl.getHeader(i), contentType);
+                    break;
+                case ResponseBuilderImpl.LOCATION:
+                    Object location = values[i];
+                    if (location != null) {
+                        if (location instanceof URI) {
+                            if (!((URI)location).isAbsolute())
+                                location = requestContext.getBaseUri().resolve((URI)location);
+                        }
+                        headers.putSingle(ResponseBuilderImpl.getHeader(i), location);
+                    }
+                    break;
+                default:
+                    if (values[i] != null)
+                        headers.putSingle(ResponseBuilderImpl.getHeader(i), values[i]);
+            }
+        }
+
+        Iterator i = nameValuePairs.iterator();
+        while (i.hasNext()) {
+            headers.add((String)i.next(), i.next());
+        }
+        
+        return headers;
+    }
+    
     public void addMetadata(MultivaluedMap<String, Object> that) {        
         for (int i = 0; i < values.length; i++)
             if (values[i] != null)

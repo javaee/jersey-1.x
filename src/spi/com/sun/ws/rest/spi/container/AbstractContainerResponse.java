@@ -174,12 +174,10 @@ public abstract class AbstractContainerResponse implements ContainerResponse {
         } else
             if (status == 204) status = 200;
         
-        this.headers = new ResponseHttpHeadersImpl();
         if (response instanceof ResponseImpl) {
-            setResponseOptimal((ResponseImpl)response, contentType);
+            this.headers = setResponseOptimal((ResponseImpl)response, contentType);
         } else {
-            response.addMetadata(headers);
-            setResponseNonOptimal(response, contentType);
+            this.headers = setResponseNonOptimal(response, contentType);
         }
     }
     
@@ -246,7 +244,8 @@ public abstract class AbstractContainerResponse implements ContainerResponse {
             }
         }
         
-        final MessageBodyWriter p = ProviderFactory.getInstance().createMessageBodyWriter(entity.getClass(), mediaType);
+        final MessageBodyWriter p = ProviderFactory.getInstance().
+                createMessageBodyWriter(entity.getClass(), mediaType);
         p.writeTo(entity, mediaType, getHttpHeaders(), out);
     }
     
@@ -255,11 +254,13 @@ public abstract class AbstractContainerResponse implements ContainerResponse {
         else if (status == 200 && entity == null) status = 204;
     }
     
-    private void setResponseOptimal(ResponseImpl r, MediaType contentType) {
-        r.addMetadataOptimal(headers, request, contentType);
+    private MultivaluedMap<String, Object> setResponseOptimal(ResponseImpl r, MediaType contentType) {
+        return r.getMetadataOptimal(request, contentType);
     }
     
-    private void setResponseNonOptimal(Response r, MediaType contentType) {
+    private MultivaluedMap<String, Object> setResponseNonOptimal(Response r, MediaType contentType) {
+        MultivaluedMap<String, Object> headers = r.getMetadata();
+        
         if (headers.getFirst("Content-Type") == null && contentType != null) {
             headers.putSingle("Content-Type", contentType);
         }
@@ -271,12 +272,15 @@ public abstract class AbstractContainerResponse implements ContainerResponse {
                 headers.putSingle("Location", absoluteLocation);
             }
         }
+        
+        return headers;
     }
     
     @SuppressWarnings("unchecked")
     public String getHeaderValue(Object headerValue) {
         // TODO: performance, this is very slow
-        HeaderProvider hp = ProviderFactory.getInstance().createHeaderProvider(headerValue.getClass());
+        HeaderProvider hp = ProviderFactory.getInstance().
+                createHeaderProvider(headerValue.getClass());
         return hp.toString(headerValue);
     }
 }

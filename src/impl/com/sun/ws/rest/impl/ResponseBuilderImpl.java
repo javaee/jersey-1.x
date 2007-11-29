@@ -94,39 +94,10 @@ public final class ResponseBuilderImpl extends Response.Builder {
     
     private List<Object> nameValuePairs;
 
-    static Response.Builder create(Response r) {
-        return new ResponseBuilderImpl(r);
-    }
-    
     // Response.Builder
     
     public ResponseBuilderImpl() { }
-    
-    public ResponseBuilderImpl(Response r) {
-        this.status = r.getStatus();
-        this.entity = r.getEntity();
         
-        if (r instanceof ResponseImpl) {
-            ResponseImpl ri = (ResponseImpl)r;
-            Object[] v = ri.getValues();
-            if (v.length > 0) {
-                this.values = new Object[HEADER_MAP.size()];
-                System.arraycopy(v, 0, this.values, 0, v.length);
-            }
-            
-            if (ri.getNameValuePairs().size() > 0)
-                this.nameValuePairs = new ArrayList<Object>(ri.getNameValuePairs());
-        } else {
-            MultivaluedMap<String, Object> headers = new ResponseHttpHeadersImpl();
-            r.addMetadata(headers);
-            for (Map.Entry<String, List<Object>> e : headers.entrySet()) {
-                String headerName = e.getKey();
-                for (Object headerValue : e.getValue())
-                    add(headerName, headerValue);
-            }
-        }
-    }
-    
     public Response build() {
         Response r = new ResponseImpl(status, entity, 
                 (values != null) ? values : EMPTY_VALUES, 
