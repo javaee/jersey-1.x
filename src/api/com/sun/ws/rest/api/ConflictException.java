@@ -36,7 +36,7 @@ public class ConflictException extends WebApplicationException {
      * Create a HTTP 409 (Conflict) exception.
      */
     public ConflictException() {
-        super(Response.serverError().status(409).build());
+        super(Responses.conflict());
     }
     
     /**
@@ -44,7 +44,7 @@ public class ConflictException extends WebApplicationException {
      * @param message the String that is the entity of the 409 response.
      */
     public ConflictException(String message) {
-        super(Response.serverError().status(409).
+        super(Response.serverError().status(Responses.CONFLICT).
                 entity(message).type("text/plain").build());
     }    
 }

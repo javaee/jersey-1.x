@@ -25,11 +25,10 @@ package com.sun.ws.rest.impl.uri.rules;
 import com.sun.ws.rest.api.core.HttpRequestContext;
 import com.sun.ws.rest.api.core.HttpResponseContext;
 import com.sun.ws.rest.impl.ImplMessages;
-import com.sun.ws.rest.impl.ResponseBuilderImpl;
 import com.sun.ws.rest.impl.http.header.AcceptMediaType;
 import com.sun.ws.rest.impl.model.HttpHelper;
 import com.sun.ws.rest.impl.model.method.ResourceMethod;
-import com.sun.ws.rest.impl.response.Responses;
+import com.sun.ws.rest.api.Responses;
 import com.sun.ws.rest.spi.uri.rules.UriRule;
 import com.sun.ws.rest.spi.uri.rules.UriRuleContext;
 import java.util.LinkedList;
@@ -85,9 +84,8 @@ public final class HttpMethodRule implements UriRule {
         List<ResourceMethod> methods = map.get(httpMethod);
         if (methods == null) {
             // No resource methods are found
-            Response r = new ResponseBuilderImpl(Responses.METHOD_NOT_ALLOWED).
-                    header("Allow", allow).build();
-            response.setResponse(r);
+            response.setResponse(Response.ok().status(Responses.METHOD_NOT_ALLOWED).
+                    header("Allow", allow).build());
             return true;
         }
 
@@ -110,9 +108,9 @@ public final class HttpMethodRule implements UriRule {
             if (!httpMethod.equals("HEAD"))
                 verifyResponse(method, accept, response);                        
         } else if (s == MatchStatus.NO_MATCH_FOR_CONSUME) {
-            response.setResponse(Responses.UNSUPPORTED_MEDIA_TYPE);
+            response.setResponse(Responses.unsupportedMediaType());
         } else if (s == MatchStatus.NO_MATCH_FOR_PRODUCE) {
-            response.setResponse(Responses.NOT_ACCEPTABLE);
+            response.setResponse(Responses.notAcceptable());
         }
         
         return true;
@@ -202,9 +200,9 @@ public final class HttpMethodRule implements UriRule {
             String ct = contentType.toString();
             String error = "The \"Content-Type\" header is set to " + ct + ", but the response has no entity";
             LOGGER.severe(error);
-            Response r = Response.serverError().entity(error).type("text/plain").build();
             // TODO should this be ContainerException ???
-            throw new WebApplicationException(r);            
+            throw new WebApplicationException(Response.serverError().
+                    entity(error).type("text/plain").build());            
         } else if (contentType != null && !method.produces(contentType)) {
             // Check if 'Content-Type' of the responseContext is a member of @ProduceMime
             // The resource is not honoring the @ProduceMime contract
@@ -218,9 +216,9 @@ public final class HttpMethodRule implements UriRule {
                 
                 // The resource is returning a MIME type that is not acceptable
                 // Return 500 Internal Server Error
-                Response r = Response.serverError().entity(error).type("text/plain").build();
                 // TODO should this be ContainerException ???
-                throw new WebApplicationException(r);
+                throw new WebApplicationException(Response.serverError().
+                        entity(error).type("text/plain").build());
             } else {
                 String error = ImplMessages.RESOURCE_MIMETYPE_NOT_IN_PRODUCE_MIME(
                         method,

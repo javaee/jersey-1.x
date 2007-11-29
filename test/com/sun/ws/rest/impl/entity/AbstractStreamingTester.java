@@ -23,7 +23,6 @@
 package com.sun.ws.rest.impl.entity;
 
 import com.sun.ws.rest.impl.RequestHttpHeadersImpl;
-import com.sun.ws.rest.impl.ResponseBuilderImpl;
 import com.sun.ws.rest.impl.TestHttpRequestContext;
 import com.sun.ws.rest.impl.TestHttpResponseContext;
 import javax.ws.rs.ext.MessageBodyReader;
@@ -85,7 +84,7 @@ public abstract class AbstractStreamingTester extends TestCase {
         TestHttpRequestContext reqc = new TestHttpRequestContext();
         TestHttpResponseContext resc = new TestHttpResponseContext(reqc);
         
-        Response r = new ResponseBuilderImpl().type(mediaType).build();
+        Response r = Response.ok().type(mediaType).build();
         resc.setResponse(r);
         
         MessageBodyWriter<T> tsp = ProviderFactory.getInstance().createMessageBodyWriter((Class<T>)t.getClass(), mediaType);

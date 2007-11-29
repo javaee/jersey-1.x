@@ -25,10 +25,9 @@ package com.sun.ws.rest.spi.container;
 import com.sun.ws.rest.api.uri.UriComponent;
 import com.sun.ws.rest.impl.MultivaluedMapImpl;
 import com.sun.ws.rest.impl.RequestHttpHeadersImpl;
-import com.sun.ws.rest.impl.ResponseBuilderImpl;
 import com.sun.ws.rest.impl.http.header.reader.HttpHeaderReader;
 import com.sun.ws.rest.impl.model.HttpHelper;
-import com.sun.ws.rest.impl.response.Responses;
+import com.sun.ws.rest.api.Responses;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
@@ -519,7 +518,7 @@ public abstract class AbstractContainerRequest implements ContainerRequest {
                 !ifMatchHeader.trim().equals("*") &&
                 !ifMatchHeader.contains(eTag.getValue())) {
             // 412 Precondition Failed
-            return Responses.PRECONDITION_FAILED;
+            return Responses.preconditionFailed();
         }
         
         return null;
@@ -541,7 +540,7 @@ public abstract class AbstractContainerRequest implements ContainerRequest {
                     return Response.notModified(eTag).build();
                 } else {
                     // 412 Precondition Failed
-                    return Responses.PRECONDITION_FAILED;
+                    return Responses.preconditionFailed();
                 }
             }
         }
@@ -556,7 +555,7 @@ public abstract class AbstractContainerRequest implements ContainerRequest {
                 long ifUnmodifiedSince = HttpHeaderReader.readDate(ifUnmodifiedSinceHeader).getTime() + 1000;
                 if (lastModified > ifUnmodifiedSince) {
                     // 412 Precondition Failed
-                    return Responses.PRECONDITION_FAILED;
+                    return Responses.preconditionFailed();
                 }
             } catch (ParseException ex) {
                 // Ignore the header if parsing error
@@ -574,7 +573,7 @@ public abstract class AbstractContainerRequest implements ContainerRequest {
                 long ifModifiedSince = HttpHeaderReader.readDate(ifModifiedSinceHeader).getTime() + 1000;
                 if (ifModifiedSince  > lastModified) {
                     // 304 Not modified
-                    return Responses.NOT_MODIFIED;
+                    return Responses.notModified();
                 }
             } catch (ParseException ex) {
                 // Ignore the header if parsing error

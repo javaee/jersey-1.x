@@ -30,11 +30,10 @@ import com.sun.ws.rest.api.container.ContainerException;
 import com.sun.ws.rest.api.core.HttpContextAccess;
 import com.sun.ws.rest.api.core.HttpResponseContext;
 import com.sun.ws.rest.api.core.ResourceConfig;
-import com.sun.ws.rest.impl.ResponseBuilderImpl;
 import com.sun.ws.rest.impl.ThreadLocalHttpContext;
 import com.sun.ws.rest.impl.model.ResourceClass;
 import com.sun.ws.rest.impl.model.RulesMap;
-import com.sun.ws.rest.impl.response.Responses;
+import com.sun.ws.rest.api.Responses;
 import com.sun.ws.rest.impl.uri.PathPattern;
 import com.sun.ws.rest.impl.uri.PathTemplate;
 import com.sun.ws.rest.api.uri.UriTemplate;
@@ -195,7 +194,7 @@ public final class WebApplicationImpl implements WebApplication {
         try {
             if (!rootsRule.accept(path, null, localContext)) {
                 // Resource was not found
-                response.setResponse(Responses.NOT_FOUND);                
+                response.setResponse(Responses.notFound());                
             }
         } catch (WebApplicationException e) {
             onExceptionWithWebApplication(e, response);
@@ -340,7 +339,7 @@ public final class WebApplicationImpl implements WebApplication {
             e.printStackTrace(pw);
             pw.flush();
 
-            r = new ResponseBuilderImpl(r).entity(sw.toString()).type("text/plain").build();
+            r = Response.ok(sw.toString(), "text/plain").build();
         }
         response.setResponse(r);
     }

@@ -25,7 +25,6 @@ package com.sun.ws.rest.impl.model.method;
 import com.sun.ws.rest.api.core.HttpRequestContext;
 import com.sun.ws.rest.api.core.HttpResponseContext;
 import com.sun.ws.rest.spi.dispatch.RequestDispatcher;
-import com.sun.ws.rest.impl.ResponseBuilderImpl;
 import com.sun.ws.rest.impl.model.MimeHelper;
 import java.util.List;
 import java.util.Map;
@@ -60,7 +59,7 @@ public final class ResourceHttpOptionsMethod extends ResourceMethod {
         public void dispatch(Object resource, 
                 HttpRequestContext requestContext, 
                 HttpResponseContext responseContext) {
-            Response r = new ResponseBuilderImpl().header("Allow", allow).build();
+            Response r = Response.ok().header("Allow", allow).build();
             responseContext.setResponse(r, null);
         }
     }
