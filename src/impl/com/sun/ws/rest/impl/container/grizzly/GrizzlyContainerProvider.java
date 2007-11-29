@@ -26,7 +26,7 @@ import com.sun.ws.rest.api.container.ContainerException;
 import com.sun.ws.rest.api.core.ResourceConfig;
 import com.sun.ws.rest.spi.container.ContainerProvider;
 import com.sun.ws.rest.spi.container.WebApplication;
-import org.apache.coyote.Adapter;
+import com.sun.grizzly.tcp.Adapter;
 
 /**
  *

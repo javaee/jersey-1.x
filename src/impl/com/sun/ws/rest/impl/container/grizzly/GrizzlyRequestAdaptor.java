@@ -22,6 +22,13 @@
 
 package com.sun.ws.rest.impl.container.grizzly;
 
+import com.sun.grizzly.tcp.Request;
+import com.sun.grizzly.util.buf.B2CConverter;
+import com.sun.grizzly.util.buf.ByteChunk;
+import com.sun.grizzly.util.buf.CharChunk;
+import com.sun.grizzly.util.buf.MessageBytes;
+import com.sun.grizzly.util.http.MimeHeaders;
+import com.sun.grizzly.util.http.Parameters;
 import com.sun.ws.rest.spi.container.AbstractContainerRequest;
 import com.sun.ws.rest.impl.http.header.HttpHeaderFactory;
 import java.io.ByteArrayInputStream;
@@ -31,9 +38,6 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Enumeration;
 import javax.ws.rs.core.MultivaluedMap;
-import org.apache.coyote.Request;
-import org.apache.tomcat.util.buf.ByteChunk;
-import org.apache.tomcat.util.http.MimeHeaders;
 
 /**
  *
@@ -53,13 +57,6 @@ public final class GrizzlyRequestAdaptor  extends AbstractContainerRequest {
     }
 
     private void initiateUriInfo() {
-        /**
-         * TODO find out exactly what the URI related methods 
-         * on org.apache.coyote.Request actually return.
-         * If URI components are returned are they in encoded or decoded form?
-         * If URIs are returned what components to they contain?
-         */
-        
         try {
             this.baseUri = new URI(
                     request.scheme().toString(), 
@@ -69,15 +66,12 @@ public final class GrizzlyRequestAdaptor  extends AbstractContainerRequest {
                     "/", 
                     null, 
                     null);
-            
-            this.completeUri = new URI(
-                    request.scheme().toString(), 
-                    null,
-                    request.serverName().toString(), 
-                    request.getServerPort(),
-                    request.requestURI().toString(), 
-                    request.queryString().toString(), 
-                    null);
+
+            /*
+             * request.unparsedURI() is a URI in encoded form that contains
+             * the URI path and URI query components.
+             */
+            this.completeUri = baseUri.resolve(request.unparsedURI().toString());
         } catch (URISyntaxException ex) {
             ex.printStackTrace();
             throw new IllegalArgumentException(ex);

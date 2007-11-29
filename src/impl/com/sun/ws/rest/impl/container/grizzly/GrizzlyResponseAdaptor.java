@@ -27,10 +27,10 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.util.List;
 import java.util.Map;
-import org.apache.coyote.Response;
-import org.apache.tomcat.util.buf.ByteChunk;
-import org.apache.tomcat.util.buf.MessageBytes;
-import org.apache.tomcat.util.http.MimeHeaders;
+import com.sun.grizzly.tcp.Response;
+import com.sun.grizzly.util.buf.ByteChunk;
+import com.sun.grizzly.util.buf.MessageBytes;
+import com.sun.grizzly.util.http.MimeHeaders;
 
 /**
  *

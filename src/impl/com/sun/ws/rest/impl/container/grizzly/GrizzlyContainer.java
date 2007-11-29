@@ -28,10 +28,10 @@ import com.sun.ws.rest.impl.ResponseBuilderImpl;
 import com.sun.ws.rest.spi.container.WebApplication;
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import org.apache.coyote.ActionCode;
-import org.apache.coyote.Adapter;
-import org.apache.coyote.Request;
-import org.apache.coyote.Response;
+import com.sun.grizzly.tcp.ActionCode;
+import com.sun.grizzly.tcp.Adapter;
+import com.sun.grizzly.tcp.Request;
+import com.sun.grizzly.tcp.Response;
 
 /**
  *

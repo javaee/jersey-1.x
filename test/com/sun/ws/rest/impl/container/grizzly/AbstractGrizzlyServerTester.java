@@ -20,14 +20,16 @@
  *     "Portions Copyrighted [year] [name of copyright owner]"
  */
 
-package com.sun.ws.rest.impl.container.httpserver;
+package com.sun.ws.rest.impl.container.grizzly;
 
-import com.sun.net.httpserver.HttpHandler;
-import com.sun.net.httpserver.HttpServer;
+import com.sun.grizzly.http.SelectorThread;
+import com.sun.grizzly.standalone.StaticStreamAlgorithm;
+import com.sun.grizzly.tcp.Adapter;
 import com.sun.ws.rest.api.container.ContainerFactory;
 import com.sun.ws.rest.api.core.ResourceConfig;
 import java.io.IOException;
-import java.net.InetSocketAddress;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.ws.rs.core.UriBuilder;
 import junit.framework.TestCase;
 
@@ -35,14 +37,14 @@ import junit.framework.TestCase;
  *
  * @author Paul.Sandoz@Sun.Com
  */
-public abstract class AbstractHttpServerTester extends TestCase {
-    public static final String CONTEXT = "/context";
-    
-    private HttpServer server;
-    
+public abstract class AbstractGrizzlyServerTester extends TestCase {
+    public static final String CONTEXT = "";
+
+    private final SelectorThread selectorThread = new SelectorThread();
+
     private int port = 9998;
     
-    public AbstractHttpServerTester(String name) {
+    public AbstractGrizzlyServerTester(String name) {
         super(name);
     }
     
@@ -51,36 +53,57 @@ public abstract class AbstractHttpServerTester extends TestCase {
     }
     
     public void startServer(Class... resources) {
-        start(ContainerFactory.createContainer(HttpHandler.class, resources));
+        start(ContainerFactory.createContainer(Adapter.class, resources));
     }
     
     public void startServer(ResourceConfig config) {
-        start(ContainerFactory.createContainer(HttpHandler.class, config));
+        start(ContainerFactory.createContainer(Adapter.class, config));
     }
     
     public void startServer(String packageName) {
-        start(ContainerFactory.createContainer(HttpHandler.class, packageName));
+        start(ContainerFactory.createContainer(Adapter.class, packageName));
     }
     
-    private void start(HttpHandler handler) {
-        if (server != null)
+    private void start(Adapter adapter) {
+        if (selectorThread.isRunning()){
             stopServer();
+        }
         
+        selectorThread.setAlgorithmClassName(StaticStreamAlgorithm.class.getName());
+        selectorThread.setPort(port);
+        selectorThread.setAdapter(adapter);
         try {
-            server = HttpServer.create(new InetSocketAddress(port), 0);
-        } catch (IOException ex) {
+            selectorThread.initEndpoint();
+        } catch (Exception ex) {
             RuntimeException e = new RuntimeException();
             e.initCause(ex);
             throw e;
         }
-            
-        server.createContext(CONTEXT, handler);
-        server.start();        
+
+        new Thread() {
+            public void run() {
+                try {
+                    selectorThread.startEndpoint();
+                } catch (Exception ex) {
+                    RuntimeException e = new RuntimeException();
+                    e.initCause(ex);
+                    throw e;
+                }
+            }
+        }.start();
+        
+        try {    
+            // Wait for the server to start
+            Thread.sleep(500); 
+        } catch (InterruptedException ex) {
+            ex.printStackTrace();
+        } 
     }
     
     public void stopServer() {
-        if (server != null)
-            server.stop(0);
+        if (selectorThread.isRunning()){
+            selectorThread.stopEndpoint();
+        }
     }
     
     public void tearDown() {
