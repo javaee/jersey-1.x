@@ -101,7 +101,7 @@ public abstract class AbstractGrizzlyServerTester extends TestCase {
     }
     
     public void stopServer() {
-        if (selectorThread.isRunning()){
+        if (selectorThread.isRunning()) {
             selectorThread.stopEndpoint();
         }
     }

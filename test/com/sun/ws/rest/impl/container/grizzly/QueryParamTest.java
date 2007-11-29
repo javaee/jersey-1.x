@@ -52,7 +52,6 @@ public class QueryParamTest extends AbstractGrizzlyServerTester {
             
         ResourceProxy r = ResourceProxy.create(base.clone().
                 queryParam("x", "1").encode(false).queryParam("y", "1+%2B+2").build());
-        System.out.println("====> " + r.get(String.class));
         assertEquals("1 + 2", r.get(String.class));
         r = ResourceProxy.create(base.clone().
                 queryParam("x", "1").encode(false).queryParam("y", "1+%26+2").build());
