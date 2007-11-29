@@ -51,7 +51,7 @@ public class RedirectToPathWithSlashTest extends AbstractResourceTester {
         initiateWebApplication(Project.class);
         
         ResponseInBound response = resourceProxy("/project", false).get(ResponseInBound.class);
-        assertEquals(Response.Builder.temporaryRedirect(null).build().getStatus(), 
+        assertEquals(Response.temporaryRedirect(null).build().getStatus(), 
                 response.getStatus());
         assertEquals(UriBuilder.fromUri(BASE_URI).path("project/").build(), 
                 response.getLocation());
@@ -84,7 +84,7 @@ public class RedirectToPathWithSlashTest extends AbstractResourceTester {
         initiateWebApplication(ProjectWithSubMethods.class);
         
         ResponseInBound response = resourceProxy("/project", false).get(ResponseInBound.class);
-        assertEquals(Response.Builder.temporaryRedirect(null).build().getStatus(), 
+        assertEquals(Response.temporaryRedirect(null).build().getStatus(), 
                 response.getStatus());
         assertEquals(UriBuilder.fromUri(BASE_URI).path("project/").build(), 
                 response.getLocation());        
@@ -99,7 +99,7 @@ public class RedirectToPathWithSlashTest extends AbstractResourceTester {
         assertEquals(404, response.getStatus());
         
         response = resourceProxy("/project/moreDetails", false).get(ResponseInBound.class);
-        assertEquals(Response.Builder.temporaryRedirect(null).build().getStatus(), 
+        assertEquals(Response.temporaryRedirect(null).build().getStatus(), 
                 response.getStatus());
         assertEquals(UriBuilder.fromUri(BASE_URI).path("project/moreDetails/").build(), 
                 response.getLocation());        
@@ -157,7 +157,7 @@ public class RedirectToPathWithSlashTest extends AbstractResourceTester {
         initiateWebApplication(ProjectWithSubResource.class);
         
         ResponseInBound response = resourceProxy("/project", false).get(ResponseInBound.class);
-        assertEquals(Response.Builder.temporaryRedirect(null).build().getStatus(), 
+        assertEquals(Response.temporaryRedirect(null).build().getStatus(), 
                 response.getStatus());
         assertEquals(UriBuilder.fromUri(BASE_URI).path("project/").build(), 
                 response.getLocation());        
@@ -172,7 +172,7 @@ public class RedirectToPathWithSlashTest extends AbstractResourceTester {
         assertEquals(404, response.getStatus());
         
         response = resourceProxy("/project/moreDetails", false).get(ResponseInBound.class);
-        assertEquals(Response.Builder.temporaryRedirect(null).build().getStatus(), 
+        assertEquals(Response.temporaryRedirect(null).build().getStatus(), 
                 response.getStatus());
         assertEquals(UriBuilder.fromUri(BASE_URI).path("project/moreDetails/").build(), 
                 response.getLocation());        
@@ -182,7 +182,7 @@ public class RedirectToPathWithSlashTest extends AbstractResourceTester {
 
         
         response = resourceProxy("/project/build", false).get(ResponseInBound.class);
-        assertEquals(Response.Builder.temporaryRedirect(null).build().getStatus(), 
+        assertEquals(Response.temporaryRedirect(null).build().getStatus(), 
                 response.getStatus());
         assertEquals(UriBuilder.fromUri(BASE_URI).path("/project/build/").build(), 
                 response.getLocation());        
@@ -197,7 +197,7 @@ public class RedirectToPathWithSlashTest extends AbstractResourceTester {
         assertEquals(404, response.getStatus());
         
         response = resourceProxy("/project/build/moreDetails", false).get(ResponseInBound.class);
-        assertEquals(Response.Builder.temporaryRedirect(null).build().getStatus(), 
+        assertEquals(Response.temporaryRedirect(null).build().getStatus(), 
                 response.getStatus());
         assertEquals(UriBuilder.fromUri(BASE_URI).path("project/build/moreDetails/").build(), 
                 response.getLocation());        

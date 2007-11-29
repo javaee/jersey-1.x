@@ -50,7 +50,7 @@ public class ContentTypeOverrideTest extends AbstractResourceTester {
         @ProduceMime({"application/foo", "application/bar"})
         @GET
         public Response doGet() {
-            return Response.Builder.representation("content", "application/foo").build();
+            return Response.ok("content", "application/foo").build();
         }
     }
     

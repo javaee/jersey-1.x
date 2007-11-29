@@ -86,7 +86,7 @@ final class WebApplicationContext implements
             }
         };
         
-        return ResponseBuilderImpl.representation(vt, v.getProduceMime()).build();
+        return Response.ok(vt, v.getProduceMime()).build();
     }
 
     

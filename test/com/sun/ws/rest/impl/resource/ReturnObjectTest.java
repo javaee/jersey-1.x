@@ -49,7 +49,7 @@ public class ReturnObjectTest extends AbstractResourceTester {
     static public class ResourceHttpResponse { 
         @GET
         public Object get() {
-            return Response.Builder.representation("HTTP_RESPONSE").type("text/plain").build();
+            return Response.ok().entity("HTTP_RESPONSE").type("text/plain").build();
         }        
     }
     

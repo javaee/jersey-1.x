@@ -89,29 +89,25 @@ public class BookmarksResource {
     
     @POST
     @ConsumeMime("application/json")
-    public Response postForm(JSONObject bookmark) {
-        try {
-            final BookmarkEntity bookmarkEntity = new BookmarkEntity(
-                    getBookmarkId(bookmark.getString("uri")), 
-                    userResource.getUserEntity().getUserid());
-            
-            bookmarkEntity.setUri(bookmark.getString("uri"));
-            bookmarkEntity.setUpdated(new Date());
-            bookmarkEntity.setSdesc(bookmark.getString("sdesc"));
-            bookmarkEntity.setLdesc(bookmark.getString("ldesc"));
-            userResource.getUserEntity().getBookmarkEntityCollection().add(bookmarkEntity);
-            
-            TransactionManager.manage(new Transactional(em) { public void transact() {
-                em.merge(userResource.getUserEntity());
-            }});
-            
-            URI bookmarkUri = uriInfo.getAbsolutePathBuilder().
-                    path(bookmarkEntity.getBookmarkEntityPK().getBmid()).
-                    build();
-            return Response.Builder.created(bookmarkUri).build();
-        } catch (JSONException jsone) {
-            throw new WebApplicationException(jsone);
-        }
+    public Response postForm(JSONObject bookmark) throws JSONException {
+        final BookmarkEntity bookmarkEntity = new BookmarkEntity(
+                getBookmarkId(bookmark.getString("uri")), 
+                userResource.getUserEntity().getUserid());
+
+        bookmarkEntity.setUri(bookmark.getString("uri"));
+        bookmarkEntity.setUpdated(new Date());
+        bookmarkEntity.setSdesc(bookmark.getString("sdesc"));
+        bookmarkEntity.setLdesc(bookmark.getString("ldesc"));
+        userResource.getUserEntity().getBookmarkEntityCollection().add(bookmarkEntity);
+
+        TransactionManager.manage(new Transactional(em) { public void transact() {
+            em.merge(userResource.getUserEntity());
+        }});
+
+        URI bookmarkUri = uriInfo.getAbsolutePathBuilder().
+                path(bookmarkEntity.getBookmarkEntityPK().getBmid()).
+                build();
+        return Response.created(bookmarkUri).build();
     }
 
     private String getBookmarkId(String uri) {

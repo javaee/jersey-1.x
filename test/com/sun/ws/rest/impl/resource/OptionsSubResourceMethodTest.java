@@ -108,7 +108,7 @@ public class OptionsSubResourceMethodTest extends AbstractResourceTester {
         @Path("sub")
         @OPTIONS
         public Response options() {
-            return Response.Builder.representation("OPTIONS").
+            return Response.ok().entity("OPTIONS").
                     header("Allow", "GET, PUT, POST, DELETE, PATCH").build();
         }
         

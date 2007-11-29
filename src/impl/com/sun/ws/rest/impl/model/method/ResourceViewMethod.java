@@ -24,13 +24,13 @@ package com.sun.ws.rest.impl.model.method;
 
 import com.sun.ws.rest.api.core.HttpRequestContext;
 import com.sun.ws.rest.api.core.HttpResponseContext;
-import com.sun.ws.rest.impl.ResponseBuilderImpl;
 import com.sun.ws.rest.impl.model.MimeHelper;
 import com.sun.ws.rest.impl.view.ViewType;
 import com.sun.ws.rest.spi.dispatch.RequestDispatcher;
 import com.sun.ws.rest.spi.view.View;
 import java.io.IOException;
 import java.util.Arrays;
+import javax.ws.rs.core.Response;
 
 /**
  *
@@ -53,8 +53,8 @@ public final class ResourceViewMethod extends ResourceMethod {
                     v.dispatch(resource, requestContext, responseContext);
                 }
             };
-            responseContext.setResponse(ResponseBuilderImpl.
-                    representation(vt, v.getProduceMime()).build());
+            responseContext.setResponse(
+                    Response.ok(vt, v.getProduceMime()).build());
         }
     }
     

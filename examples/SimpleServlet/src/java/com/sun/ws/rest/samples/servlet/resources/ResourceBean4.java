@@ -58,7 +58,7 @@ public class ResourceBean4 {
     @GET
     @ProduceMime("*/*")
     public Response get(@QueryParam("format") String format) {
-        return Response.Builder.representation("Hello World", format).build();
+        return Response.ok("Hello World", format).build();
     }
     
     @POST

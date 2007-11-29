@@ -34,7 +34,7 @@ import javax.ws.rs.core.Response;
  *
  * @author Paul.Sandoz@Sun.Com
  */
-public final class ResponseImpl implements Response {
+public final class ResponseImpl extends Response {
     private final int status;
 
     private final Object entity;

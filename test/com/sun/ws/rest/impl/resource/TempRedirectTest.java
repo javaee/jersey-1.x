@@ -44,7 +44,7 @@ public class TempRedirectTest extends AbstractResourceTester {
     static public class Resource { 
         @GET
         public Response doGet() {
-            return Response.Builder.temporaryRedirect(URI.create("subpath")).build();
+            return Response.temporaryRedirect(URI.create("subpath")).build();
         }
     }
     

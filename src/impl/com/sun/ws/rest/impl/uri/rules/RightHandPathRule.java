@@ -24,10 +24,10 @@ package com.sun.ws.rest.impl.uri.rules;
 
 import com.sun.ws.rest.api.core.HttpRequestContext;
 import com.sun.ws.rest.api.core.HttpResponseContext;
-import com.sun.ws.rest.impl.ResponseBuilderImpl;
 import com.sun.ws.rest.spi.uri.rules.UriRule;
 import com.sun.ws.rest.spi.uri.rules.UriRuleContext;
 import java.util.List;
+import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
 
 /**
@@ -110,7 +110,7 @@ public class RightHandPathRule implements UriRule {
                 getHttpResponseContext();
         
         response.setResponse(
-                ResponseBuilderImpl.temporaryRedirect(
+                Response.temporaryRedirect(
                     UriBuilder.fromUri(request.getAbsolutePath()).path("/").build()
                 ).build()
                 );

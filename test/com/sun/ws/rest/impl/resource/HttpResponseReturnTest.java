@@ -41,7 +41,7 @@ public class HttpResponseReturnTest extends AbstractResourceTester {
     static public class Resource { 
         @GET
         public Response doGet() {
-            return Response.Builder.representation("CONTENT".getBytes()).build();
+            return Response.ok().entity("CONTENT".getBytes()).build();
         }
     }
     

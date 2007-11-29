@@ -47,7 +47,7 @@ public class BeanTest extends AbstractResourceTester {
         @GET
         public Response doGet() {
             GregorianCalendar lastModified = new GregorianCalendar(2007, 0, 0, 0, 0, 0);
-            return Response.Builder.ok().
+            return Response.ok().
                     lastModified(lastModified.getTime()).
                     tag(new EntityTag("TAG")).
                     location(URI.create("/location")).

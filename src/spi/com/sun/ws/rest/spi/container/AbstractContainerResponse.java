@@ -64,7 +64,7 @@ public abstract class AbstractContainerResponse implements ContainerResponse {
             = new MediaType("application/octet-stream");
     
     public static final Response EMPTY_RESPONSE
-            = Response.Builder.noContent().build();
+            = Response.noContent().build();
     
     private final ContainerRequest request;
     

@@ -26,11 +26,11 @@ import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import com.sun.ws.rest.api.container.ContainerException;
 import com.sun.ws.rest.api.core.HttpResponseContext;
-import com.sun.ws.rest.impl.ResponseBuilderImpl;
 import com.sun.ws.rest.spi.container.WebApplication;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import javax.ws.rs.core.Response;
 
 /**
  * A {@link HttpHandler} for a {@link WebApplicationImpl}.
@@ -77,7 +77,7 @@ public class HttpHandlerContainer implements HttpHandler {
         e.printStackTrace(pw);
         pw.flush();
 
-        response.setResponse(ResponseBuilderImpl.serverError().
+        response.setResponse(Response.serverError().
                 entity(sw.toString()).type("text/plain").build());
     }    
 }

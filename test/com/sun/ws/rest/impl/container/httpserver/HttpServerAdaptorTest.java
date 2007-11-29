@@ -47,7 +47,7 @@ public class HttpServerAdaptorTest extends AbstractHttpServerTester {
             String s = request.getEntity(String.class);
             assertEquals("RESOURCE-ONE", s);
             
-            response.setResponse(Response.Builder.representation("RESOURCE-ONE").build());
+            response.setResponse(Response.ok().entity("RESOURCE-ONE").build());
         }
     }
     
@@ -62,7 +62,7 @@ public class HttpServerAdaptorTest extends AbstractHttpServerTester {
             String s = request.getEntity(String.class);
             assertEquals("RESOURCE-TWO", s);
             
-            response.setResponse(Response.Builder.representation("RESOURCE-TWO").build());
+            response.setResponse(Response.ok().entity("RESOURCE-TWO").build());
         }
     }
     

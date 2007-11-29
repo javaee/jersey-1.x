@@ -538,7 +538,7 @@ public abstract class AbstractContainerRequest implements ContainerRequest {
                     // TODO
                     // Include cache related header fields
                     // such as ETag
-                    return ResponseBuilderImpl.notModified(eTag).build();
+                    return Response.notModified(eTag).build();
                 } else {
                     // 412 Precondition Failed
                     return Responses.PRECONDITION_FAILED;

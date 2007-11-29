@@ -49,7 +49,7 @@ public class ItemContentResource {
             content = id.getContent();
         }
         
-        return Response.Builder.representation(content, mediaType).build();
+        return Response.ok(content, mediaType).build();
     }
     
     @PUT

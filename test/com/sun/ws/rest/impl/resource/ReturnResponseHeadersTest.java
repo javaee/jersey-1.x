@@ -42,7 +42,7 @@ public class ReturnResponseHeadersTest extends AbstractResourceTester {
     static public class TestRepresentationBean { 
         @POST
         public Response doPost(String in) {
-            return Response.Builder.representation("content", "text/plain").language("en").build();
+            return Response.ok("content", "text/plain").language("en").build();
         }
     }
 

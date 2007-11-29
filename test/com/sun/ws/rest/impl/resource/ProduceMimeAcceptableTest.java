@@ -44,7 +44,7 @@ public class ProduceMimeAcceptableTest extends AbstractResourceTester {
         @ProduceMime("application/foo")
         @GET
         public Response doGet() {
-            return Response.Builder.representation("content", "application/bar").build();
+            return Response.ok("content", "application/bar").build();
         }
     }
         
@@ -68,7 +68,7 @@ public class ProduceMimeAcceptableTest extends AbstractResourceTester {
         @ProduceMime("*/*")
         @GET
         public Response doGet() {
-            return Response.Builder.representation("content", "application/bar").build();
+            return Response.ok("content", "application/bar").build();
         }
     }
     

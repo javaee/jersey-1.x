@@ -24,7 +24,6 @@ package com.sun.ws.rest.impl.container.grizzly;
 
 import com.sun.ws.rest.api.container.ContainerException;
 import com.sun.ws.rest.api.core.HttpResponseContext;
-import com.sun.ws.rest.impl.ResponseBuilderImpl;
 import com.sun.ws.rest.spi.container.WebApplication;
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -89,7 +88,7 @@ public class GrizzlyContainer implements Adapter {
         e.printStackTrace(pw);
         pw.flush();
 
-        response.setResponse(ResponseBuilderImpl.serverError().
+        response.setResponse(javax.ws.rs.core.Response.serverError().
                 entity(sw.toString()).type("text/plain").build());
     }
 }

@@ -87,9 +87,9 @@ public class ContainerResource {
         
         Response r;
         if (!MemoryStore.MS.hasContainer(c)) {
-            r = Response.Builder.created(uri).build();
+            r = Response.created(uri).build();
         } else {
-            r = Response.Builder.ok().build();
+            r = Response.ok().build();
         }
         
         MemoryStore.MS.createContainer(c);

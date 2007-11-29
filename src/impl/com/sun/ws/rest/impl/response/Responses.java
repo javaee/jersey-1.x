@@ -22,7 +22,6 @@
 
 package com.sun.ws.rest.impl.response;
 
-import com.sun.ws.rest.impl.ResponseBuilderImpl;
 import javax.ws.rs.core.Response;
 
 /**
@@ -30,15 +29,15 @@ import javax.ws.rs.core.Response;
  * @author Paul.Sandoz@Sun.Com
  */
 public final class Responses {
-    public static final Response NOT_MODIFIED = ResponseBuilderImpl.serverError().status(304).build();
+    public static final Response NOT_MODIFIED = Response.serverError().status(304).build();
     
-    public static final Response NOT_FOUND = ResponseBuilderImpl.serverError().status(404).build();
+    public static final Response NOT_FOUND = Response.serverError().status(404).build();
     
-    public static final Response METHOD_NOT_ALLOWED = ResponseBuilderImpl.serverError().status(405).build();
+    public static final Response METHOD_NOT_ALLOWED = Response.serverError().status(405).build();
     
-    public static final Response NOT_ACCEPTABLE = ResponseBuilderImpl.serverError().status(406).build();
+    public static final Response NOT_ACCEPTABLE = Response.serverError().status(406).build();
     
-    public static final Response PRECONDITION_FAILED = ResponseBuilderImpl.serverError().status(412).build();
+    public static final Response PRECONDITION_FAILED = Response.serverError().status(412).build();
     
-    public static final Response UNSUPPORTED_MEDIA_TYPE = ResponseBuilderImpl.serverError().status(415).build();
+    public static final Response UNSUPPORTED_MEDIA_TYPE = Response.serverError().status(415).build();
 }

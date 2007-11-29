@@ -45,7 +45,7 @@ public class CreatedTest extends AbstractResourceTester {
     static public class Resource { 
         @POST
         public Response doPost() {
-            return Response.Builder.created("CONTENT", URI.create("subpath")).build();
+            return Response.created("CONTENT", URI.create("subpath")).build();
         }
     }
     

@@ -54,7 +54,7 @@ public class PreconditionTest extends AbstractResourceTester {
             if (r != null)
                 return r;
             
-            return Response.Builder.representation("foo", "text/plain").build();
+            return Response.ok("foo", "text/plain").build();
         }
     }
     
@@ -134,7 +134,7 @@ public class PreconditionTest extends AbstractResourceTester {
             if (r != null)
                 return r;
             
-            return Response.Builder.representation("foo", "text/plain").build();
+            return Response.ok("foo", "text/plain").build();
         }
     }
 

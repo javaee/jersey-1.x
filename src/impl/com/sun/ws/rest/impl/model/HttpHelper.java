@@ -23,19 +23,13 @@
 package com.sun.ws.rest.impl.model;
 
 import com.sun.ws.rest.api.core.HttpRequestContext;
-import com.sun.ws.rest.impl.ResponseBuilderImpl;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import com.sun.ws.rest.impl.ImplMessages;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.GregorianCalendar;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Locale;
 import java.util.Set;
-import java.util.TimeZone;
+import javax.ws.rs.core.Response;
 
 /**
  * Helper classes for HTTP.
@@ -158,7 +152,7 @@ public final class HttpHelper {
     }
     
     private static WebApplicationException clientError(String message, Exception e) {        
-        return new WebApplicationException(e, ResponseBuilderImpl.serverError().
+        return new WebApplicationException(e, Response.serverError().
                 status(400).entity(message).type("text/plain").build());
     }
     

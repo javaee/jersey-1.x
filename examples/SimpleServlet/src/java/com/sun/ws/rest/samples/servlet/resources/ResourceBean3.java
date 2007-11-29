@@ -68,23 +68,23 @@ public class ResourceBean3  {
         System.out.println("rep: "+rep);
         switch (rep) {
             case 0:                        
-                r = Response.Builder.representation(help, "text/plain").
+                r = Response.ok(help, "text/plain").
                         header("resource3-header", "text/plain").build();
                 break;
             case 1:
-                r = Response.Builder.representation(getStringRep(arg1, arg2), "text/plain").
+                r = Response.ok(getStringRep(arg1, arg2), "text/plain").
                         header("resource3-header", "text/plain").build();
                 break;
             case 2:
-                r = Response.Builder.representation(getFormURLEncodedRep(arg1, arg2), "text/plain").
+                r = Response.ok(getFormURLEncodedRep(arg1, arg2), "text/plain").
                         header("resource3-header", "text/plain").build();
                 break;
             case 3:
-                r = Response.Builder.representation(getImageRep(), "text/plain").
+                r = Response.ok(getImageRep(), "text/plain").
                         header("resource3-header", "text/plain").build();
                 break;
             default :
-                r = Response.Builder.representation(help, "text/plain").build();
+                r = Response.ok(help, "text/plain").build();
                 break;
         } 
        

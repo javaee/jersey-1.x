@@ -202,7 +202,7 @@ public final class HttpMethodRule implements UriRule {
             String ct = contentType.toString();
             String error = "The \"Content-Type\" header is set to " + ct + ", but the response has no entity";
             LOGGER.severe(error);
-            Response r = ResponseBuilderImpl.serverError().entity(error).type("text/plain").build();
+            Response r = Response.serverError().entity(error).type("text/plain").build();
             // TODO should this be ContainerException ???
             throw new WebApplicationException(r);            
         } else if (contentType != null && !method.produces(contentType)) {
@@ -218,7 +218,7 @@ public final class HttpMethodRule implements UriRule {
                 
                 // The resource is returning a MIME type that is not acceptable
                 // Return 500 Internal Server Error
-                Response r = ResponseBuilderImpl.serverError().entity(error).type("text/plain").build();
+                Response r = Response.serverError().entity(error).type("text/plain").build();
                 // TODO should this be ContainerException ???
                 throw new WebApplicationException(r);
             } else {

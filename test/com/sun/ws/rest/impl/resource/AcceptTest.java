@@ -66,7 +66,7 @@ public class AcceptTest extends AbstractResourceTester {
         @ProduceMime("*/*")
         @GET
         public Response doGetWildCard() {
-            return Response.Builder.representation("wildcard", "application/wildcard").build();
+            return Response.ok("wildcard", "application/wildcard").build();
         }
     }
     

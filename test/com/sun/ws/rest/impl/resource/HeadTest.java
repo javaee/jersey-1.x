@@ -63,12 +63,12 @@ public class HeadTest extends AbstractResourceTester {
     static public class ResourceGetWithHead { 
         @HEAD
         public Response head() {
-            return Response.Builder.ok().header("X-TEST", "HEAD").build();
+            return Response.ok().header("X-TEST", "HEAD").build();
         }
         
         @GET
         public Response get() {
-            return Response.Builder.representation("GET").header("X-TEST", "GET").build();
+            return Response.ok().entity("GET").header("X-TEST", "GET").build();
         }
     }
     
@@ -120,25 +120,25 @@ public class HeadTest extends AbstractResourceTester {
         @HEAD
         @ProduceMime("application/foo")
         public Response headFoo() {
-            return Response.Builder.ok().header("X-TEST", "FOO-HEAD").build();
+            return Response.ok().header("X-TEST", "FOO-HEAD").build();
         }
         
         @GET
         @ProduceMime("application/foo")
         public Response getFoo() {
-            return Response.Builder.representation("GET","application/foo").header("X-TEST", "FOO-GET").build();
+            return Response.ok("GET","application/foo").header("X-TEST", "FOO-GET").build();
         }
                 
         @HEAD
         @ProduceMime("application/bar")
         public Response headBar() {
-            return Response.Builder.ok().header("X-TEST", "BAR-HEAD").build();
+            return Response.ok().header("X-TEST", "BAR-HEAD").build();
         }
         
         @GET
         @ProduceMime("application/bar")
         public Response getBar() {
-            return Response.Builder.representation("GET").header("X-TEST", "BAR-GET").build();
+            return Response.ok().entity("GET").header("X-TEST", "BAR-GET").build();
         }
     }
     

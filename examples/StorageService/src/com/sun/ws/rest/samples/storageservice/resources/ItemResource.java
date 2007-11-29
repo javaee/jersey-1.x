@@ -74,7 +74,7 @@ public class ItemResource {
             return r;
             
         byte[] b = MemoryStore.MS.getItemData(container, item);
-        return Response.Builder.representation(b, i.getMimeType()).
+        return Response.ok(b, i.getMimeType()).
                 lastModified(lastModified).tag(et).build();
     }    
     
@@ -94,9 +94,9 @@ public class ItemResource {
         
         Response r;
         if (!MemoryStore.MS.hasItem(container, item)) {
-            r = Response.Builder.created(uri).build();
+            r = Response.created(uri).build();
         } else {
-            r = Response.Builder.ok().build();
+            r = Response.ok().build();
         }
         
         Item ii = MemoryStore.MS.createOrUpdateItem(container, i, data);

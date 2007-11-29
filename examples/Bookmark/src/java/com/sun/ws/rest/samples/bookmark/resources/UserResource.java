@@ -86,12 +86,9 @@ public class UserResource {
     public Response putUser(JSONObject jsonEntity) throws JSONException {
         
         String jsonUserid = jsonEntity.getString("userid");
-        Response.Builder rBuilder = Response.Builder.noContent();
         
         if ((null != jsonUserid) && !jsonUserid.equals(userid)) {
-            rBuilder.status(409);
-            rBuilder.representation("userids differ!\n");
-            return rBuilder.build();
+            return Response.ok().status(409).entity("userids differ!\n").build();
         }
         
         final boolean newRecord = (null == userEntity); // insert or update ?
@@ -108,14 +105,13 @@ public class UserResource {
             TransactionManager.manage(new Transactional(em) { public void transact() {
                 em.persist(userEntity);
             }});
-            rBuilder.created(uriInfo.getAbsolutePath());
+            return Response.created(uriInfo.getAbsolutePath()).build();
         } else {
             TransactionManager.manage(new Transactional(em) { public void transact() {
                 em.merge(userEntity);
             }});
-            rBuilder.status(204);
+            return Response.noContent().build();
         }
-        return rBuilder.build();
     }
     
     @DELETE

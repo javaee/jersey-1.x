@@ -50,7 +50,7 @@ public class BeanWithWebResourceTest extends AbstractResourceTester {
         public void doGet(HttpRequestContext request, HttpResponseContext response) {
             assertEquals("GET", request.getHttpMethod());
             
-            response.setResponse(Response.Builder.ok("RESPONSE").build());
+            response.setResponse(Response.ok().entity("RESPONSE").build());
         }
         
         @PUT
@@ -75,7 +75,7 @@ public class BeanWithWebResourceTest extends AbstractResourceTester {
                     "PUT".equals(method);
             assertTrue(match);
             
-            response.setResponse(Response.Builder.ok("RESPONSE").build());
+            response.setResponse(Response.ok().entity("RESPONSE").build());
         }
     }
     
@@ -87,7 +87,7 @@ public class BeanWithWebResourceTest extends AbstractResourceTester {
             assertEquals("GET", request.getHttpMethod());
             assertEquals("text/html", request.getRequestHeaders().getFirst("Accept"));
             
-            response.setResponse(Response.Builder.ok("RESPONSE").build());
+            response.setResponse(Response.ok().entity("RESPONSE").build());
         }
         
         //TODO: reunify the following 3 methods once PUT, POST, DELETE annotations are available
@@ -119,7 +119,7 @@ public class BeanWithWebResourceTest extends AbstractResourceTester {
             match = accept == null | "text/xhtml".equals(accept);
             assertTrue(match);
             
-            response.setResponse(Response.Builder.ok("RESPONSE").build());
+            response.setResponse(Response.ok().entity("RESPONSE").build());
         }
     }
     
