@@ -25,6 +25,11 @@ release 0.5 (2008-01-18)
     - renamed method getAbsolute to getAbsolutePath
     - renamed method getBuilder to getAbsolutePathBuilder
     - add methods getRequestUri and getRequestUriBuilder
+  - Refactored @HttpMethod:
+    - @HttpMethod is now a meta-annotation
+    - Specific annotations @HEAD, @GET, @PUT, @DELETE and @POST replace 
+      @HttpMethod("<method") and @HttpMethod with the HTTP method derived 
+      from the Java method name.
 
 release 0.4 (2007-11-02)
 - Fixed issue 17: Matrix Parameter With URL Value Ends Up With 404
