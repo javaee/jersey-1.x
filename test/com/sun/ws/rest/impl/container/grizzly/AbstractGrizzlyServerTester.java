@@ -27,9 +27,6 @@ import com.sun.grizzly.standalone.StaticStreamAlgorithm;
 import com.sun.grizzly.tcp.Adapter;
 import com.sun.ws.rest.api.container.ContainerFactory;
 import com.sun.ws.rest.api.core.ResourceConfig;
-import java.io.IOException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.ws.rs.core.UriBuilder;
 import junit.framework.TestCase;
 
