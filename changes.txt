@@ -8,8 +8,8 @@ release 0.5 (2008-01-18)
   support for this interface.
 - Root resource classes, by default, are now found at runtime (rather than
   compile time) by efficiently scanning the Java class files of the 
-  java.class.path for SE-based deployments or the WEB-INF/lib and WEB-INF/classes
-  for Servlet-based deployments.
+  java.class.path for SE-based deployments or the WEB-INF/lib and 
+  WEB-INF/classes for Servlet-based deployments.
   See the JavaDoc of the following classes for more details:
     - com.sun.ws.rest.api.container.ContainerFactory
     - com.sun.ws.rest.spi.container.servlet.ServletContainer
@@ -19,7 +19,7 @@ release 0.5 (2008-01-18)
   - EntityProvider is split into two separate interfaces
     MessageBodyReader and MessageBodyWriter
   - java.ws.rs.UriTemplate renamed to java.ws.rs.Path
-  - javax.ws.rs.core.UriInfo has the following changes
+  - javax.ws.rs.core.UriInfo has the following changes:
     - renamed method getBase to getBaseUri
     - renamed method getBaseBuilder to getBaseUriBuilder
     - renamed method getAbsolute to getAbsolutePath
@@ -30,10 +30,12 @@ release 0.5 (2008-01-18)
     - Specific annotations @HEAD, @GET, @PUT, @DELETE and @POST replace 
       @HttpMethod("<method") and @HttpMethod with the HTTP method derived 
       from the Java method name.
-  - Refactored javax.ws.rs.core.Response
+  - javax.ws.rs.core.Response has the following changes:
     - Changed from interface to abstract class
     - Static methods on Response.Builder moved to Response 
       (and in some cases renamed).
+    - Changed method "addMetaData(MultivaluedMap)" to 
+      "MultivaluedMap getMetaData()"
 
 release 0.4 (2007-11-02)
 - Fixed issue 17: Matrix Parameter With URL Value Ends Up With 404
