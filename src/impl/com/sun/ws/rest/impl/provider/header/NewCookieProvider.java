@@ -30,7 +30,7 @@ import javax.ws.rs.core.NewCookie;
 public class NewCookieProvider implements HeaderProvider<NewCookie> {
     
     public boolean supports(Class<?> type) {
-        return type == NewCookie.class ? true : false;
+        return type == NewCookie.class;
     }
 
     public String toString(NewCookie cookie) {

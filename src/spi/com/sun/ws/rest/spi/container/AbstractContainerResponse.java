@@ -22,6 +22,7 @@
 
 package com.sun.ws.rest.spi.container;
 
+import com.sun.ws.rest.api.Responses;
 import com.sun.ws.rest.impl.ResponseHttpHeadersImpl;
 import com.sun.ws.rest.impl.ResponseImpl;
 import java.io.IOException;
@@ -61,10 +62,7 @@ import javax.ws.rs.ext.ProviderFactory;
  */
 public abstract class AbstractContainerResponse implements ContainerResponse {
     private static final MediaType APPLICATION_OCTET_STREAM
-            = new MediaType("application/octet-stream");
-    
-    public static final Response EMPTY_RESPONSE
-            = Response.noContent().build();
+            = new MediaType("application", "octet-stream");
     
     private final ContainerRequest request;
     
@@ -132,7 +130,7 @@ public abstract class AbstractContainerResponse implements ContainerResponse {
      */
     protected AbstractContainerResponse(ContainerRequest request) {
         this.request = request;
-        this.status = EMPTY_RESPONSE.getStatus();
+        this.status = Responses.NO_CONTENT;
     }
     
     /**
@@ -159,7 +157,7 @@ public abstract class AbstractContainerResponse implements ContainerResponse {
         if (contentType == null)
             contentType = APPLICATION_OCTET_STREAM;
         
-        response = (response != null) ? response : EMPTY_RESPONSE;
+        response = (response != null) ? response : Responses.noContent();
         
         this.status = response.getStatus();
         this.entity = response.getEntity();
@@ -238,9 +236,9 @@ public abstract class AbstractContainerResponse implements ContainerResponse {
             mediaType = (MediaType)mediaTypeHeader;
         } else {
             if (mediaTypeHeader != null) {
-                mediaType = new MediaType(mediaTypeHeader.toString());
+                mediaType = MediaType.parse(mediaTypeHeader.toString());
             } else {
-                mediaType = new MediaType("application", "octet-stream");
+                mediaType = APPLICATION_OCTET_STREAM;
             }
         }
         

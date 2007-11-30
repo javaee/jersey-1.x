@@ -30,6 +30,8 @@ import javax.ws.rs.core.Response;
  * @author Paul.Sandoz@Sun.Com
  */
 public final class Responses {
+    public static final int NO_CONTENT = 204;
+    
     public static final int NOT_MODIFIED = 304;
     
     public static final int NOT_FOUND = 404;
@@ -43,6 +45,10 @@ public final class Responses {
     public static final int PRECONDITION_FAILED = 412;
     
     public static final int UNSUPPORTED_MEDIA_TYPE = 415;
+    
+    public static Response noContent() {
+        return status(NO_CONTENT);
+    }
     
     public static Response notModified() {
         return status(NOT_MODIFIED);

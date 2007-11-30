@@ -107,14 +107,9 @@ public final class HttpRequestAdaptor extends AbstractContainerRequest {
         javax.servlet.http.Cookie servletCookies[] = request.getCookies();
         if (servletCookies != null) {
             for (javax.servlet.http.Cookie c: servletCookies) {
-                NewCookie n = new NewCookie(c.getName(), c.getValue());
-                n.setComment(c.getComment());
-                n.setDomain(c.getDomain());
-                n.setPath(c.getPath());
-                n.setSecure(c.getSecure());
-                n.setVersion(c.getVersion());
-                n.setMaxAge(c.getMaxAge());
-                cookies.add(n);
+                Cookie _c = new Cookie(c.getName(), c.getValue(), c.getPath(), 
+                        c.getDomain(), c.getVersion());
+                cookies.add(_c);
             }
         }
     }

@@ -49,7 +49,7 @@ public abstract class AbstractStreamingTester extends TestCase {
     }
     
     <T> void roundTrip(Class<T> c, T t1, String mediaType) throws IOException {
-        MediaType mt = new MediaType(mediaType);
+        MediaType mt = MediaType.parse(mediaType);
         byte[] b1 = writeTo(t1, mt);
         T t2 = readFrom(c, b1, mt);
         byte[] b2 = writeTo(t2, mt);
@@ -62,7 +62,7 @@ public abstract class AbstractStreamingTester extends TestCase {
     }
     
     <T> T readFrom(Class<T> c, byte[] b) throws IOException {
-        return readFrom(c, b, new MediaType("text/plain"));
+        return readFrom(c, b, new MediaType("text", "plain"));
     }
     
     <T> T readFrom(Class<T> c, byte[] b, MediaType mediaType) throws IOException {
@@ -75,7 +75,7 @@ public abstract class AbstractStreamingTester extends TestCase {
     }
     
     <T> byte[] writeTo(T t) throws IOException {
-        return writeTo(t, new MediaType("text/plain"));
+        return writeTo(t, new MediaType("text", "plain"));
     }
     
     @SuppressWarnings("unchecked")

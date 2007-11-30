@@ -61,6 +61,6 @@ public class ContentTypeOverrideTest extends AbstractResourceTester {
         ResponseInBound response = r.acceptable("application/foo", "application/bar").
                 get(ResponseInBound.class);
 
-        assertEquals(new MediaType("application/foo"), response.getContentType());
+        assertEquals(MediaType.parse("application/foo"), response.getContentType());
     }
 }

@@ -62,7 +62,7 @@ public class TypeReturnTest extends AbstractResourceTester {
         
         ResponseInBound response = resourceProxy("/", false).get(ResponseInBound.class);                
         assertEquals("CONTENT", response.getEntity(String.class));
-        assertEquals(new MediaType("application/octet-stream"), 
+        assertEquals(MediaType.parse("application/octet-stream"), 
                 response.getContentType());
     }
     
@@ -72,7 +72,7 @@ public class TypeReturnTest extends AbstractResourceTester {
         
         ResponseInBound response = resourceProxy("/", false).get(ResponseInBound.class);                
         assertEquals("CONTENT", response.getEntity(String.class));
-        assertEquals(new MediaType("text/plain"), 
+        assertEquals(MediaType.parse("text/plain"), 
                 response.getContentType());
     }
 }

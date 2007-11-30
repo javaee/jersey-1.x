@@ -101,13 +101,13 @@ public class HeadTest extends AbstractResourceTester {
         initiateWebApplication(ResourceGetWithProduceNoHead.class);
         ResourceProxy r = resourceProxy("/", false);
         
-        MediaType foo = new MediaType("application/foo");
+        MediaType foo = MediaType.parse("application/foo");
         ResponseInBound response = r.acceptable(foo).head();
         assertEquals(200, response.getStatus());
         assertFalse(response.hasEntity());
         assertEquals(foo, response.getContentType());
         
-        MediaType bar = new MediaType("application/bar");
+        MediaType bar = MediaType.parse("application/bar");
         response = r.acceptable(bar).head();
         assertEquals(200, response.getStatus());
         assertFalse(response.hasEntity());
@@ -146,14 +146,14 @@ public class HeadTest extends AbstractResourceTester {
         initiateWebApplication(ResourceGetWithProduceWithHead.class);
         ResourceProxy r = resourceProxy("/", false);
         
-        MediaType foo = new MediaType("application/foo");
+        MediaType foo = MediaType.parse("application/foo");
         ResponseInBound response = r.acceptable(foo).head();
         assertEquals(200, response.getStatus());
         assertFalse(response.hasEntity());
         assertEquals(foo, response.getContentType());
         assertEquals("FOO-HEAD", response.getMetadata().getFirst("X-TEST").toString());
         
-        MediaType bar = new MediaType("application/bar");
+        MediaType bar = MediaType.parse("application/bar");
         response = r.acceptable(bar).head();
         assertEquals(200, response.getStatus());
         assertFalse(response.hasEntity());

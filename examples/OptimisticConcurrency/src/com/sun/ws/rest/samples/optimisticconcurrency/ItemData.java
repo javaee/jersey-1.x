@@ -52,7 +52,7 @@ public class ItemData {
     public byte[] content = "Today is the first day of the REST of my life".getBytes();
     
     public ItemData() {
-        mediaType = new MediaType("text/plain");
+        mediaType = new MediaType("text", "plain");
     }
     
     public int getVersion() {
@@ -72,7 +72,7 @@ public class ItemData {
     }
     
     public void update(byte[] content) {
-        update(new MediaType("application/octet-stream"), content);
+        update(new MediaType("application", "octet-stream"), content);
     }
     
     public synchronized void update(MediaType mediaType, byte[] content) {

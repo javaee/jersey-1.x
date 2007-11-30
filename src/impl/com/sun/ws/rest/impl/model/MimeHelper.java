@@ -158,7 +158,7 @@ public final class MimeHelper {
     public static List<MediaType> createMediaTypes(String[] mediaTypes) {
         List<MediaType> l = new ArrayList<MediaType>();
         for (String mediaType : mediaTypes) {
-            l.add(new MediaType(mediaType));
+            l.add(MediaType.parse(mediaType));
         }
         
         Collections.sort(l, MEDIA_TYPE_COMPARATOR);

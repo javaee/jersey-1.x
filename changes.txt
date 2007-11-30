@@ -36,6 +36,13 @@ release 0.5 (2008-01-18)
       (and in some cases renamed).
     - Changed method "addMetaData(MultivaluedMap)" to 
       "MultivaluedMap getMetaData()"
+  - HTTP header related classes have the following changes:
+    - Where appropriate such classes have a static parse method
+      to create an instance from a String representation, for example
+      MediaType m = MediaType.parse("text/plain") instead of a constructor.
+    - All classes override toString for serialization
+    - javax.ws.rs.core.Cookie is changed to an immutable class
+    - javax.ws.rs.core.NewCookie is changed to an immutable class
 
 release 0.4 (2007-11-02)
 - Fixed issue 17: Matrix Parameter With URL Value Ends Up With 404

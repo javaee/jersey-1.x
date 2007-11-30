@@ -171,7 +171,7 @@ public final class URLConnectionResourceProxy extends ResourceProxy {
             mediaType = (MediaType)mediaTypeHeader;
         } else {
             if (mediaTypeHeader != null) {
-                mediaType = new MediaType(mediaTypeHeader.toString());
+                mediaType = MediaType.parse(mediaTypeHeader.toString());
             } else {
                 mediaType = new MediaType("application", "octet-stream");
             }

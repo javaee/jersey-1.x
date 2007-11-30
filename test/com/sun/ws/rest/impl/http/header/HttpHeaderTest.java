@@ -53,7 +53,7 @@ public class HttpHeaderTest extends TestCase {
     
     public void testMediaType() throws ParseException {
         String mimeType = "application/xml;charset=UTF-8";
-        MediaType m = new MediaType(mimeType);
+        MediaType m = MediaType.parse(mimeType);
     }
         
     public void testLanguageTag() throws ParseException {

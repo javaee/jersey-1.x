@@ -106,7 +106,7 @@ public final class ProviderFactoryImpl extends ProviderFactory {
                         cacheClassCapability(s, p, MimeHelper.GENERAL_MEDIA_TYPE);
                     else
                         for (String type: values)
-                            cacheClassCapability(s, p, new MediaType(type));
+                            cacheClassCapability(s, p, MediaType.parse(type));
                 }     
                 atomicMap.set(s);
             }

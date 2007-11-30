@@ -25,19 +25,78 @@ package com.sun.ws.rest.impl.http.header;
 import java.util.ArrayList;
 import java.util.List;
 import javax.ws.rs.core.Cookie;
-import javax.ws.rs.core.NewCookie;
 
 /**
- *
+ * TODO use the HttpHeaderReader
+ * 
  * @author Marc.Hadley@Sun.Com
  */
-public class CookieImpl {
+/* protected */ class CookiesParser {
+    private static class MutableCookie {
+        private String name;
+        private String value;
+        private int version = -1;
+        private String path = null;
+        private String domain = null;
+
+        public MutableCookie(String name, String value) {
+            this.name = name;
+            this.value = value;
+        }
+
+        public Cookie getImmutableCookie() {
+            return new Cookie(name, value, path, domain, version);
+        }
+        public String getName() {
+            return name;
+        }
+
+        public void setName(String name) {
+            this.name = name;
+        }
+
+
+        public String getValue() {
+            return value;
+        }
+
+        public void setValue(String value) {
+            this.value = value;
+        }
+
+
+        public int getVersion() {
+            return version;
+        }
+
+        public void setVersion(int version) {
+            this.version = version;
+        }
+
+
+        public String getPath() {
+            return path;
+        }
+
+        public void setPath(String path) {
+            this.path = path;
+        }
+
+
+        public String getDomain() {
+            return domain;
+        }
+
+        public void setDomain(String domain) {
+            this.domain = domain;
+        }
+    }
     
     public static List<Cookie> createCookies(String header) {
         String bites[] = header.split("[;,]");
         List<Cookie> cookies = new ArrayList<Cookie>();
         int version = 0;
-        NewCookie cookie = null;
+        MutableCookie cookie = null;
         for (String bite: bites) {
             String crumbs[] = bite.split("=", 2);
             String name = crumbs.length>0 ? crumbs[0].trim() : "";
@@ -46,8 +105,8 @@ public class CookieImpl {
                 value = value.substring(1,value.length()-1);
             if (!name.startsWith("$")) {
                 if (cookie != null)
-                    cookies.add(cookie);
-                cookie = new NewCookie(name, value);
+                    cookies.add(cookie.getImmutableCookie());
+                cookie = new MutableCookie(name, value);
                 cookie.setVersion(version);
             }
             else if (name.startsWith("$Version"))
@@ -58,7 +117,8 @@ public class CookieImpl {
                 cookie.setDomain(value);
         }
         if (cookie != null)
-            cookies.add(cookie);
+            cookies.add(cookie.getImmutableCookie());
         return cookies;
-    }    
+    }
+
 }

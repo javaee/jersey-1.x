@@ -42,7 +42,7 @@ public class JSPViewProvider implements ViewProvider {
         
         JSPView(String path) {
             this.path = path;
-            this.mediaType = new MediaType("text/html");
+            this.mediaType = new MediaType("text", "html");
         }
                 
         public void dispatch(Object it, 

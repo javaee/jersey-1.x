@@ -38,20 +38,14 @@ public class CookieImplTest extends TestCase {
         super(testName);
     }
 
-    protected void setUp() throws Exception {
-    }
-
-    protected void tearDown() throws Exception {
-    }
-
     /**
-     * Test of createCookies method, of class com.sun.ws.rest.impl.http.header.CookieImpl.
+     * Test of createCookies method, of class com.sun.ws.rest.impl.http.header.CookiesParser.
      */
     public void testCreateCookies() {
         System.out.println("createCookies");
         
         String cookieHeader = "fred=flintstone";
-        List<Cookie> cookies = CookieImpl.createCookies(cookieHeader);
+        List<Cookie> cookies = CookiesParser.createCookies(cookieHeader);
         assertEquals(cookies.size(), 1);
         Cookie c = cookies.get(0);
         assertEquals(c.getVersion(), 0);
@@ -59,7 +53,7 @@ public class CookieImplTest extends TestCase {
         assertTrue(c.getValue().equals("flintstone"));
         
         cookieHeader = "fred=flintstone,barney=rubble";
-        cookies = CookieImpl.createCookies(cookieHeader);
+        cookies = CookiesParser.createCookies(cookieHeader);
         assertEquals(cookies.size(), 2);
         c = cookies.get(0);
         assertEquals(c.getVersion(), 0);
@@ -71,7 +65,7 @@ public class CookieImplTest extends TestCase {
         assertTrue(c.getValue().equals("rubble"));
 
         cookieHeader = "fred=flintstone;barney=rubble";
-        cookies = CookieImpl.createCookies(cookieHeader);
+        cookies = CookiesParser.createCookies(cookieHeader);
         assertEquals(cookies.size(), 2);
         c = cookies.get(0);
         assertEquals(c.getVersion(), 0);
@@ -83,7 +77,7 @@ public class CookieImplTest extends TestCase {
         assertTrue(c.getValue().equals("rubble"));
     
         cookieHeader = "$Version=1;fred=flintstone;$Path=/path;barney=rubble";
-        cookies = CookieImpl.createCookies(cookieHeader);
+        cookies = CookiesParser.createCookies(cookieHeader);
         assertEquals(cookies.size(), 2);
         c = cookies.get(0);
         assertEquals(c.getVersion(), 1);
@@ -96,7 +90,7 @@ public class CookieImplTest extends TestCase {
         assertTrue(c.getValue().equals("rubble"));
 
         cookieHeader = "$Version=1;fred=flintstone;$Path=/path,barney=rubble;$Domain=.sun.com";
-        cookies = CookieImpl.createCookies(cookieHeader);
+        cookies = CookiesParser.createCookies(cookieHeader);
         assertEquals(cookies.size(), 2);
         c = cookies.get(0);
         assertEquals(c.getVersion(), 1);
@@ -110,7 +104,7 @@ public class CookieImplTest extends TestCase {
         assertTrue(c.getDomain().equals(".sun.com"));
 
         cookieHeader = "$Version=1; fred = flintstone ; $Path=/path, barney=rubble ;$Domain=.sun.com";
-        cookies = CookieImpl.createCookies(cookieHeader);
+        cookies = CookiesParser.createCookies(cookieHeader);
         assertEquals(cookies.size(), 2);
         c = cookies.get(0);
         assertEquals(c.getVersion(), 1);
@@ -125,11 +119,9 @@ public class CookieImplTest extends TestCase {
     }
     
     /**
-     * Test of toString method, of class com.sun.ws.rest.impl.http.header.CookieImpl.
+     * Test of toString method, of class com.sun.ws.rest.impl.http.header.CookiesParser.
      */
     public void testToStringWithProvider() {
-        System.out.println("toString");
-        
         NewCookieProvider ncp = new NewCookieProvider();
         
         NewCookie cookie = new NewCookie("fred", "flintstone");
@@ -138,15 +130,16 @@ public class CookieImplTest extends TestCase {
         String result = ncp.toString(cookie);
         assertEquals(expResult, result);
         
-        cookie.setMaxAge(60);
+        cookie = new NewCookie("fred", "flintstone", null, null, 
+                null, 60, false);
         expResult = "fred=flintstone;Version=1;Max-Age=60";
         result = ncp.toString(cookie);
         assertEquals(expResult, result);
         
-        cookie.setComment("a modern stonage family");
+        cookie = new NewCookie("fred", "flintstone", null, null, 
+                "a modern stonage family", 60, false);
         expResult = "fred=flintstone;Version=1;Comment=\"a modern stonage family\";Max-Age=60";
         result = ncp.toString(cookie);
         assertEquals(expResult, result);
-        
     }
 }

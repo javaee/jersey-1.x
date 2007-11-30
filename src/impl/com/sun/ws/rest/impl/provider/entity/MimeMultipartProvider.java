@@ -44,7 +44,7 @@ public final class MimeMultipartProvider extends AbstractTypeEntityProvider<Mime
     public MimeMultipart readFrom(Class<MimeMultipart> type, MediaType mediaType,
             MultivaluedMap<String, String> headers, InputStream entityStream) throws IOException {
         if (mediaType == null)
-            mediaType = new MediaType("multipart/form-data");
+            mediaType = new MediaType("multipart", "form-data");
         ByteArrayDataSource ds = new ByteArrayDataSource(entityStream, mediaType.toString());
         try {
             return new MimeMultipart(ds);

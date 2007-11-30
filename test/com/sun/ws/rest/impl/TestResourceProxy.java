@@ -151,7 +151,7 @@ public class TestResourceProxy extends ResourceProxy {
                 mediaType = (MediaType)mediaType;
             } else {
                 if (mediaTypeHeader != null) {
-                    mediaType = new MediaType(mediaTypeHeader.toString());
+                    mediaType = MediaType.parse(mediaTypeHeader.toString());
                 } else {
                     mediaType = new MediaType("application", "octet-stream");
                 }

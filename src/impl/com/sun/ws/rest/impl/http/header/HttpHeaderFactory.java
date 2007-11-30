@@ -51,7 +51,7 @@ public final class HttpHeaderFactory {
     }
     
     public static List<Cookie> createCookies(String header) {
-        return CookieImpl.createCookies(header);
+        return CookiesParser.createCookies(header);
     }
     
     public static void createAllow(String header) {
@@ -79,7 +79,7 @@ public final class HttpHeaderFactory {
     }
     
     public static MediaType createContentType(String header) throws ParseException {
-        return new MediaType(header);
+        return MediaType.parse(header);
     }
     
     public static Date createDate(String header) throws ParseException {

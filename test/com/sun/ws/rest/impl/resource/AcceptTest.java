@@ -132,8 +132,8 @@ public class AcceptTest extends AbstractResourceTester {
         initiateWebApplication(MultipleResource.class);
         ResourceProxy r = resourceProxy("/");
 
-        MediaType foo = new MediaType("application/foo");
-        MediaType bar = new MediaType("application/bar");
+        MediaType foo = MediaType.parse("application/foo");
+        MediaType bar = MediaType.parse("application/bar");
         
         ResponseInBound response = r.acceptable(foo).get(ResponseInBound.class);
         assertEquals("GET", response.getEntity(String.class));

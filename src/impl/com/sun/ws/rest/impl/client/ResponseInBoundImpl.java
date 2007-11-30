@@ -43,7 +43,7 @@ public abstract class ResponseInBoundImpl implements ResponseInBound {
     
     public MediaType getContentType() {
         String ct = getMetadata().getFirst("Content-Type");
-        return (ct != null) ? new MediaType(ct) : null;
+        return (ct != null) ? MediaType.parse(ct) : null;
     }
     
     public URI getLocation() {
