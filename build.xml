@@ -58,6 +58,12 @@
         </classpath>
     </taskdef>    
     
+    <taskdef name="xjc" classname="com.sun.tools.xjc.XJCTask">
+      <classpath>
+        <fileset dir="lib" includes="*.jar" />
+      </classpath>
+    </taskdef>
+    
     <target name="-pre-compile">
         <tstamp>
             <format property="now" pattern="MM/dd/yyyy hh:mm aa" unit="hour"/>
@@ -77,6 +83,11 @@
         <resourcegen destDir="build/gen-src">
             <resource dir="src/impl" includes="**/*.properties"/>
         </resourcegen>
+        
+        <echo message="Compiling the schema..." />
+        <xjc schema="etc/wadl.xsd" catalog="etc/catalog.xml" package="com.sun.research.ws.wadl" destDir="build/gen-src">
+            <produces dir="build/gen-src/com/sun/research/ws/wadl" includes="**/*.java" />
+        </xjc>
     </target>
     
     
