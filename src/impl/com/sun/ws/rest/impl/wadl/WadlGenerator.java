@@ -29,7 +29,11 @@ import com.sun.research.ws.wadl.Resources;
 import com.sun.research.ws.wadl.Response;
 import com.sun.ws.rest.api.model.AbstractResource;
 import com.sun.ws.rest.api.model.AbstractResourceMethod;
+import com.sun.ws.rest.api.model.AbstractSubResourceLocator;
+import com.sun.ws.rest.api.model.AbstractSubResourceMethod;
 import com.sun.ws.rest.api.model.Parameter;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
 import javax.ws.rs.core.MediaType;
 import javax.xml.bind.JAXBElement;
@@ -44,21 +48,61 @@ public class WadlGenerator {
     public static Application generate(Set<AbstractResource> resources) {
         Application wadlApplication = new Application();
         Resources wadlResources = new Resources();
+        Map<String, Param> wadlResourceParams = new HashMap<String, Param>();
+        Map<String, Resource> wadlSubResources = new HashMap<String, Resource>();
+        Map<String, Map<String, Param>> wadlSubResourcesParams = 
+                new HashMap<String, Map<String, Param>>();
         
+        // for each resource
         for (AbstractResource r: resources) {
             Resource wadlResource = new Resource();
             wadlResource.setPath(r.getUriTemplate().getRawTemplate());
+            // for each resource method
             for (AbstractResourceMethod m: r.getResourceMethods()) {
-                com.sun.research.ws.wadl.Method wadlMethod = 
-                        new com.sun.research.ws.wadl.Method();
-                wadlMethod.setName(m.getHttpMethod());
-                Request wadlRequest = generateRequest(m);
-                if (wadlRequest != null)
-                    wadlMethod.setRequest(wadlRequest);
-                Response wadlResponse = generateResponse(m);
-                if (wadlResponse != null)
-                    wadlMethod.setResponse(wadlResponse);
+                com.sun.research.ws.wadl.Method wadlMethod = generateMethod(wadlResourceParams, m);
                 wadlResource.getMethodOrResource().add(wadlMethod);
+            }
+            // add parameters that are associated with the resource URI template
+            for (Param wadlParam: wadlResourceParams.values()) {
+                wadlResource.getParam().add(wadlParam);
+            }
+            wadlResourceParams.clear();
+            // for each sub-resource method
+            for (AbstractSubResourceMethod m: r.getSubResourceMethods()) {
+                // find or create sub resource for uri template
+                String template = m.getUriTemplate().getRawTemplate();
+                Resource wadlSubResource = wadlSubResources.get(template);
+                Map<String,Param> wadlSubResourceParams = wadlSubResourcesParams.get(template);
+                if (wadlSubResource==null) {
+                    wadlSubResource = new Resource();
+                    wadlSubResource.setPath(template);
+                    wadlSubResources.put(template, wadlSubResource);
+                    wadlSubResourceParams = new HashMap<String,Param>();
+                    wadlSubResourcesParams.put(template, wadlSubResourceParams);
+                    wadlResource.getMethodOrResource().add(wadlSubResource);
+                }
+                com.sun.research.ws.wadl.Method wadlMethod = generateMethod(wadlSubResourceParams, m);
+                wadlSubResource.getMethodOrResource().add(wadlMethod);
+            }
+            // add parameters that are associated with each sub-resource method URI template
+            for (String template: wadlSubResources.keySet()) {
+                Resource wadlSubResource = wadlSubResources.get(template);
+                Map<String,Param> wadlSubResourceParams = wadlSubResourcesParams.get(template);
+                for(Param wadlParam: wadlSubResourceParams.values()) {
+                    wadlSubResource.getParam().add(wadlParam);
+                }
+            }
+            wadlSubResources.clear();
+            wadlSubResourcesParams.clear();
+            // for each sub resource
+            for (AbstractSubResourceLocator l: r.getSubResourceLocators()) {
+                Resource wadlSubResource = new Resource();
+                wadlSubResource.setPath(l.getUriTemplate().getRawTemplate());
+                for (Parameter p: l.getParameters()) {
+                    Param wadlParam = generateParam(p);
+                    wadlSubResource.getParam().add(wadlParam);
+                }
+                wadlResource.getMethodOrResource().add(wadlSubResource);
             }
             wadlResources.getResource().add(wadlResource);
         }
@@ -66,7 +110,23 @@ public class WadlGenerator {
         return wadlApplication;
     }
 
-    private static Request generateRequest(final AbstractResourceMethod m) {
+    private static com.sun.research.ws.wadl.Method generateMethod(final Map<String, Param> wadlResourceParams, final AbstractResourceMethod m) {
+        com.sun.research.ws.wadl.Method wadlMethod = 
+                new com.sun.research.ws.wadl.Method();
+        wadlMethod.setName(m.getHttpMethod());
+        // generate the request part
+        Request wadlRequest = generateRequest(m, wadlResourceParams);
+        if (wadlRequest != null)
+            wadlMethod.setRequest(wadlRequest);
+        // generate the response part
+        Response wadlResponse = generateResponse(m);
+        if (wadlResponse != null)
+            wadlMethod.setResponse(wadlResponse);
+        return wadlMethod;
+    }
+
+    private static Request generateRequest(final AbstractResourceMethod m, 
+            Map<String,Param> wadlResourceParams) {
         if (m.getParameters().size()==0)
             return null;
         
@@ -80,16 +140,19 @@ public class WadlGenerator {
                     wadlRequest.getRepresentation().add(wadlRepresentation);
                 }
             } else {
-                Param wadlParam = generateParam(p, wadlRequest, m);
-                if (wadlParam != null)
+                Param wadlParam = generateParam(p);
+                if (wadlParam == null)
+                    continue;
+                if (wadlParam.getStyle()==ParamStyle.TEMPLATE)
+                    wadlResourceParams.put(wadlParam.getName(),wadlParam);
+                else
                     wadlRequest.getParam().add(wadlParam);
             }
         }
         return wadlRequest;
     }
 
-    private static Param generateParam(final Parameter p, final Request wadlRequest, 
-            final AbstractResourceMethod m) {
+    private static Param generateParam(final Parameter p) {
         if (p.getSource()==Parameter.Source.ENTITY || p.getSource()==Parameter.Source.CONTEXT)
             return null;
         Param wadlParam = new Param();
@@ -110,6 +173,29 @@ public class WadlGenerator {
             default:
                 break;
         }
+        if (p.hasDefaultValue())
+            wadlParam.setDefault(p.getDefaultValue());
+        Class pClass = p.getParameterClass();
+        if (pClass.isArray()) {
+            wadlParam.setRepeating(true);
+            pClass = pClass.getComponentType();
+        }
+        if (pClass.equals(int.class) || pClass.equals(Integer.class))
+            wadlParam.setType(new QName("http://www.w3.org/2001/XMLSchema", "int", "xs"));
+        else if (pClass.equals(boolean.class) || pClass.equals(Boolean.class))
+            wadlParam.setType(new QName("http://www.w3.org/2001/XMLSchema", "boolean", "xs"));
+        else if (pClass.equals(long.class) || pClass.equals(Long.class))
+            wadlParam.setType(new QName("http://www.w3.org/2001/XMLSchema", "long", "xs"));
+        else if (pClass.equals(short.class) || pClass.equals(Short.class))
+            wadlParam.setType(new QName("http://www.w3.org/2001/XMLSchema", "short", "xs"));
+        else if (pClass.equals(byte.class) || pClass.equals(Byte.class))
+            wadlParam.setType(new QName("http://www.w3.org/2001/XMLSchema", "byte", "xs"));
+        else if (pClass.equals(float.class) || pClass.equals(Float.class))
+            wadlParam.setType(new QName("http://www.w3.org/2001/XMLSchema", "float", "xs"));
+        else if (pClass.equals(double.class) || pClass.equals(Double.class))
+            wadlParam.setType(new QName("http://www.w3.org/2001/XMLSchema", "double", "xs"));
+        else
+            wadlParam.setType(new QName("http://www.w3.org/2001/XMLSchema", "string", "xs"));
         return wadlParam;
     }
 
