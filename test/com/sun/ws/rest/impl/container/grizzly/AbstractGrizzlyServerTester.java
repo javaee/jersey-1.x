@@ -23,10 +23,11 @@
 package com.sun.ws.rest.impl.container.grizzly;
 
 import com.sun.grizzly.http.SelectorThread;
-import com.sun.grizzly.standalone.StaticStreamAlgorithm;
 import com.sun.grizzly.tcp.Adapter;
 import com.sun.ws.rest.api.container.ContainerFactory;
+import com.sun.ws.rest.api.container.grizzly.GrizzlyServerFactory;
 import com.sun.ws.rest.api.core.ResourceConfig;
+import java.net.URI;
 import javax.ws.rs.core.UriBuilder;
 import junit.framework.TestCase;
 
@@ -37,7 +38,7 @@ import junit.framework.TestCase;
 public abstract class AbstractGrizzlyServerTester extends TestCase {
     public static final String CONTEXT = "";
 
-    private final SelectorThread selectorThread = new SelectorThread();
+    private SelectorThread selectorThread;
 
     private int port = 9997;
     
@@ -57,33 +58,13 @@ public abstract class AbstractGrizzlyServerTester extends TestCase {
         start(ContainerFactory.createContainer(Adapter.class, config));
     }
     
-    public void startServer(String packageName) {
-        start(ContainerFactory.createContainer(Adapter.class, packageName));
-    }
-    
     private void start(Adapter adapter) {
-        if (selectorThread.isRunning()){
+        if (selectorThread != null && selectorThread.isRunning()){
             stopServer();
         }
         
-        selectorThread.setAlgorithmClassName(StaticStreamAlgorithm.class.getName());
-        selectorThread.setPort(port);
-        selectorThread.setAdapter(adapter);
-        try {
-            selectorThread.initEndpoint();
-        } catch (Exception ex) {
-            throw new RuntimeException(ex);
-        }
-
-        new Thread() {
-            public void run() {
-                try {
-                    selectorThread.startEndpoint();
-                } catch (Exception ex) {
-                    throw new RuntimeException(ex);
-                }
-            }
-        }.start();
+        URI u = UriBuilder.fromUri("http://localhost").port(port).build();
+        selectorThread = GrizzlyServerFactory.create(u, adapter);
         
         try {    
             // Wait for the server to start

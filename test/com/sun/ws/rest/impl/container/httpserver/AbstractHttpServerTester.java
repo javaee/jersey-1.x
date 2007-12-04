@@ -25,9 +25,10 @@ package com.sun.ws.rest.impl.container.httpserver;
 import com.sun.net.httpserver.HttpHandler;
 import com.sun.net.httpserver.HttpServer;
 import com.sun.ws.rest.api.container.ContainerFactory;
+import com.sun.ws.rest.api.container.httpserver.HttpServerFactory;
 import com.sun.ws.rest.api.core.ResourceConfig;
 import java.io.IOException;
-import java.net.InetSocketAddress;
+import java.net.URI;
 import javax.ws.rs.core.UriBuilder;
 import junit.framework.TestCase;
 
@@ -66,15 +67,13 @@ public abstract class AbstractHttpServerTester extends TestCase {
         if (server != null)
             stopServer();
         
+        URI u = UriBuilder.fromUri("http://localhost").port(port).path(CONTEXT).
+                build();
         try {
-            server = HttpServer.create(new InetSocketAddress(port), 0);
+            server = HttpServerFactory.create(u, handler);
         } catch (IOException ex) {
-            RuntimeException e = new RuntimeException();
-            e.initCause(ex);
-            throw e;
+            throw new RuntimeException(ex);
         }
-            
-        server.createContext(CONTEXT, handler);
         server.start();        
     }
     
