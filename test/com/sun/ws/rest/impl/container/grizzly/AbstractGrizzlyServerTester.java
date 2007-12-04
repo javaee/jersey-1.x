@@ -72,9 +72,7 @@ public abstract class AbstractGrizzlyServerTester extends TestCase {
         try {
             selectorThread.initEndpoint();
         } catch (Exception ex) {
-            RuntimeException e = new RuntimeException();
-            e.initCause(ex);
-            throw e;
+            throw new RuntimeException(ex);
         }
 
         new Thread() {
@@ -82,9 +80,7 @@ public abstract class AbstractGrizzlyServerTester extends TestCase {
                 try {
                     selectorThread.startEndpoint();
                 } catch (Exception ex) {
-                    RuntimeException e = new RuntimeException();
-                    e.initCause(ex);
-                    throw e;
+                    throw new RuntimeException(ex);
                 }
             }
         }.start();
