@@ -149,7 +149,10 @@ public class WadlGenerator {
                     wadlRequest.getParam().add(wadlParam);
             }
         }
-        return wadlRequest;
+        if (wadlRequest.getRepresentation().size()+wadlRequest.getParam().size() == 0)
+            return null;
+        else
+            return wadlRequest;
     }
 
     private static Param generateParam(final Parameter p) {
