@@ -31,6 +31,8 @@ import com.sun.ws.rest.api.container.ContainerException;
 import com.sun.ws.rest.api.core.HttpContextAccess;
 import com.sun.ws.rest.api.core.HttpResponseContext;
 import com.sun.ws.rest.api.core.ResourceConfig;
+import com.sun.ws.rest.api.model.AbstractResource;
+import com.sun.ws.rest.impl.ResponseBuilderImpl;
 import com.sun.ws.rest.impl.ThreadLocalHttpContext;
 import com.sun.ws.rest.impl.model.ResourceClass;
 import com.sun.ws.rest.impl.model.RulesMap;
@@ -39,6 +41,7 @@ import com.sun.ws.rest.api.model.AbstractResource;
 import com.sun.ws.rest.impl.uri.PathPattern;
 import com.sun.ws.rest.impl.uri.PathTemplate;
 import com.sun.ws.rest.api.uri.UriTemplate;
+import com.sun.ws.rest.impl.modelapi.annotation.IntrospectionModeller;
 import com.sun.ws.rest.impl.uri.rules.ResourceClassRule;
 import com.sun.ws.rest.impl.uri.rules.RightHandPathRule;
 import com.sun.ws.rest.impl.uri.rules.RootResourceClassesRule;
@@ -134,11 +137,30 @@ public final class WebApplicationImpl implements WebApplication {
             rmc = metaClassMap.get(c);
             if (rmc != null) return rmc;
             
-            rmc = new ResourceClass(containerMomento, c, resourceConfig, resolverFactory);
+            rmc = newResourceClass(c);
             metaClassMap.put(c, rmc);
             return rmc;
         }
     }
+    
+    public ResourceClass getResourceClass(AbstractResource ar) {
+        ResourceClass rc = newResourceClass(ar);
+        metaClassMap.put(ar.getResourceClass(), rc);
+        return rc;
+    }
+        
+    private ResourceClass newResourceClass(Class c ) {
+        return newResourceClass(getAbstractResource(c));
+    }
+    
+    private ResourceClass newResourceClass(AbstractResource ar) {
+        return new ResourceClass(containerMomento, resourceConfig, resolverFactory, ar);
+    }
+    
+    private AbstractResource getAbstractResource(Class c) {
+        return IntrospectionModeller.createResource(c);
+    }
+    
 
     /**
      * Inject resources on a Web resource.
@@ -225,19 +247,17 @@ public final class WebApplicationImpl implements WebApplication {
         
         Set<AbstractResource> rootResources = new HashSet<AbstractResource>();
         for (Class<?> c : classes) {
-            // Ignore if not a root resource
-            // TODO defer to the abstract model
-            // Note that a non root resource should not be added to the cache
-            if (c.getAnnotation(javax.ws.rs.Path.class) == null) {
+            AbstractResource ar = getAbstractResource(c);
+            if (!ar.isRootResource()) {
                 // TODO log warning
                 continue;   
             }
             
-            ResourceClass r = getResourceClass(c);
+            ResourceClass r = getResourceClass(ar);
             rootResources.add(r.resource);
             
             UriTemplate t = new PathTemplate(
-                    r.resource.getUriTemplate().getRawTemplate(),
+                    r.resource.getUriTemplate().getValue(),
                     r.resource.getUriTemplate().isEncode());
             
             PathPattern p = new PathPattern(t, r.hasSubResources);

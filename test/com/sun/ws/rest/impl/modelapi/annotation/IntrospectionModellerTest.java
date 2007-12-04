@@ -27,11 +27,8 @@ import com.sun.ws.rest.api.model.AbstractResourceMethod;
 import com.sun.ws.rest.api.model.AbstractSubResourceLocator;
 import com.sun.ws.rest.api.model.AbstractSubResourceMethod;
 import junit.framework.*;
-import com.sun.ws.rest.api.model.AbstractWebAppModel;
 import com.sun.ws.rest.api.model.Parameter;
 import com.sun.ws.rest.impl.modelapi.annotation.IntrospectionModellerTest.TestSubResourceOne;
-import java.util.HashSet;
-import java.util.Set;
 import javax.ws.rs.ConsumeMime;
 import javax.ws.rs.GET;
 import javax.ws.rs.HeaderParam;
@@ -102,9 +99,6 @@ public class IntrospectionModellerTest extends TestCase {
         
     }
 
-    final Set<Class> resourceClasses = new HashSet<Class>();
-    AbstractWebAppModel webAppModel;
-
     
     public IntrospectionModellerTest(String testName) {
         super(testName);
@@ -150,24 +144,10 @@ public class IntrospectionModellerTest extends TestCase {
 //        }
 //    }
     
-    protected void setUp() {
-        resourceClasses.add(TestRootResourceOne.class);
-        resourceClasses.add(TestSubResourceOne.class);
-        webAppModel = IntrospectionModeller.createModel(resourceClasses);
-    }
-    
-    /**
-     * Test of createModel method, of class com.sun.ws.rest.impl.model.IntrospectionModeller.
-     */
-    public void testCountRootAndSubResources() {
-        assertEquals(1, webAppModel.getRootResources().size());
-        assertEquals(1, webAppModel.getSubResources().size());
-    }
-    
     
     public void testRootResource() {
-        AbstractResource rootResource = webAppModel.getRootResources().get(0);
-        assertEquals("/one", rootResource.getUriTemplate().getRawTemplate());
+        AbstractResource rootResource = IntrospectionModeller.createResource(TestRootResourceOne.class);
+        assertEquals("/one", rootResource.getUriTemplate().getValue());
         assertEquals(1, rootResource.getResourceMethods().size());
         assertEquals(1 ,rootResource.getSubResourceLocators().size());
         assertEquals(2 ,rootResource.getSubResourceMethods().size());
@@ -192,7 +172,7 @@ public class IntrospectionModellerTest extends TestCase {
 //                @UriParam("p1") String pOne, @MatrixParam("p2") int pTwo, @HeaderParam("p3") String pThree) {
 //            return new TestSubResourceOne();
 //        }
-        assertEquals("/subres-locator/{p1}", locator.getUriTemplate().getRawTemplate());
+        assertEquals("/subres-locator/{p1}", locator.getUriTemplate().getValue());
         assertEquals(3, locator.getParameters().size());
         assertEquals(Parameter.Source.URI, locator.getParameters().get(0).getSource());
         assertEquals("p1", locator.getParameters().get(0).getSourceName());
@@ -218,7 +198,7 @@ public class IntrospectionModellerTest extends TestCase {
 //        public String getSubResourceMethod(String entityParam) {
 //            return "Hi there, here is a subresource method!";
 //        }
-        assertEquals("/subres-method", subResMethod1.getUriTemplate().getRawTemplate());
+        assertEquals("/subres-method", subResMethod1.getUriTemplate().getValue());
         assertEquals("PUT", subResMethod1.getHttpMethod());
         assertEquals(1, subResMethod1.getParameters().size());
         assertEquals(Parameter.Source.ENTITY, subResMethod1.getParameters().get(0).getSource());
@@ -228,7 +208,7 @@ public class IntrospectionModellerTest extends TestCase {
 //        public String getSubResourceMethodWithParams(@UriParam("one") String paramOne) {
 //            return "Hi there, here is a subresource method!";
 //        }
-        assertEquals("/with-params/{one}", subResMethod2.getUriTemplate().getRawTemplate());
+        assertEquals("/with-params/{one}", subResMethod2.getUriTemplate().getValue());
         assertEquals("GET", subResMethod2.getHttpMethod());
         assertEquals(1, subResMethod2.getParameters().size());
         assertEquals(Parameter.Source.URI, subResMethod2.getParameters().get(0).getSource());
@@ -237,7 +217,7 @@ public class IntrospectionModellerTest extends TestCase {
     }
 
     public void testSubResource() {
-        AbstractResource subResource = webAppModel.getSubResources().get(0);
+        AbstractResource subResource = IntrospectionModeller.createResource(TestSubResourceOne.class);
         assertEquals(null, subResource.getUriTemplate());
         assertEquals(2, subResource.getResourceMethods().size());
         assertEquals(0, subResource.getSubResourceLocators().size());

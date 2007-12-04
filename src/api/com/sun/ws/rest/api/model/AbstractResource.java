@@ -16,152 +16,110 @@
  * Created on October 5, 2007, 11:34 AM
  *
  */
-
 package com.sun.ws.rest.api.model;
 
-import java.io.PrintWriter;
-import java.io.StringWriter;
-import java.lang.reflect.Constructor;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
-import javax.ws.rs.core.MediaType;
 
 /**
  * Abstraction for resource class
  */
-public class AbstractResource implements UriTemplated {
-    
+public class AbstractResource implements UriTemplated, AbstractModelComponent {
+
     private Class<?> resourceClass;
     private UriTemplateValue uriTemplate;
     private List<AbstractResourceMethod> resourceMethods;
     private List<AbstractSubResourceMethod> subResourceMethods;
     private List<AbstractSubResourceLocator> subResourceLocators;
-    private AbstractResourceConstructor ctor;
-    
-    private static AbstractResourceConstructor getDefaultConstructor(Class<?> resourceClass) {
-        AbstractResourceConstructor result = null;
-        try {
-            // TODO: looks like a random selection :-(
-            Constructor[] constructors = resourceClass.getConstructors();
-            if (constructors.length > 0) {
-                // TODO: what about parameters?
-                //       currently parameters are processed by IntrospectionModeller
-                result = new AbstractResourceConstructor(constructors[0]);
-            }
-        } catch (SecurityException ex) {
-            // TODO: (log it?) and handle it somehow better
-            ex.printStackTrace();
-        }
-        return result;
-    }
-    
+    private List<AbstractResourceConstructor> constructors;
+
     /**
      * Creates a new instance of AbstractResource
      */
     public AbstractResource(Class<?> resourceClass) {
-        this(resourceClass, null, getDefaultConstructor(resourceClass));
+        this(resourceClass, null);
     }
-    
+
     /**
      * Creates a new instance of AbstractResource
      */
     public AbstractResource(Class<?> resourceClass, UriTemplateValue uriTemplate) {
-        this(resourceClass, uriTemplate, getDefaultConstructor(resourceClass));
-    }
-    
-    /**
-     * Creates a new instance of AbstractResource
-     */
-    public AbstractResource(Class<?> resourceClass, UriTemplateValue uriTemplate, AbstractResourceConstructor constructor) {
         this.resourceClass = resourceClass;
-        this.ctor = constructor;
         this.uriTemplate = uriTemplate;
+        this.constructors = new ArrayList<AbstractResourceConstructor>();
         this.resourceMethods = new ArrayList<AbstractResourceMethod>();
         this.subResourceLocators = new ArrayList<AbstractSubResourceLocator>();
         this.subResourceMethods = new ArrayList<AbstractSubResourceMethod>();
     }
-    
+
     public Class<?> getResourceClass() {
         return resourceClass;
     }
-    
+
     public boolean isSubResource() {
-        return uriTemplate==null;
+        return uriTemplate == null;
     }
-    
+
     public boolean isRootResource() {
-        return uriTemplate!=null;
+        return uriTemplate != null;
     }
-    
+
     public UriTemplateValue getUriTemplate() {
         return uriTemplate;
     }
-    
+
+    /**
+     * Provides a non-null list of resource methods available on the resource
+     * 
+     * @return non-null abstract resource method list
+     */
     public List<AbstractResourceMethod> getResourceMethods() {
         return resourceMethods;
     }
-    
+
+    /**
+     * Provides a non-null list of subresource methods available on the resource
+     * 
+     * @return non-null abstract subresource method list
+     */
     public List<AbstractSubResourceMethod> getSubResourceMethods() {
         return subResourceMethods;
     }
-    
+
+    /**
+     * Provides a non-null list of subresource locators available on the resource
+     * 
+     * @return non-null abstract subresource locator list
+     */
     public List<AbstractSubResourceLocator> getSubResourceLocators() {
         return subResourceLocators;
     }
-    
-    public AbstractResourceConstructor getConstructor() {
-        return ctor;
+
+    public List<AbstractResourceConstructor> getConstructors() {
+        return constructors;
     }
     
-    public List<AbstractResourceIssue> validate() {
-        // TODO: add validation logic
-        return new LinkedList<AbstractResourceIssue>();
+    public void accept(AbstractModelVisitor visitor) {
+        visitor.visitAbstractResource(this);
     }
-    
-    private void printMimeTypes(List<MediaType> mediaTypes, PrintWriter pWriter) {
-        boolean firstItem = true;
-        for(MediaType mediaType : mediaTypes) {
-            if (firstItem) {
-                firstItem = false;
-            } else {
-                pWriter.print(",");
-            }
-            pWriter.print(mediaType.getType() + "/" + mediaType.getSubtype());
-        }
-    }
-    
+
+    @Override
     public String toString() {
-        StringWriter stringWriter = new StringWriter();
-        PrintWriter pWriter = new PrintWriter(stringWriter);
-        pWriter.println("---Resource java class \"" + this.getResourceClass().getName() + "\"");
-        pWriter.println("---path \"" + this.getUriTemplate().getRawTemplate() + "\"");
-        for (AbstractResourceMethod rMethod : this.getResourceMethods()) {
-            pWriter.println("----method \""  + rMethod.getMethod().getName() + "\"");
-            pWriter.println("-----http method \""  + rMethod.getHttpMethod() + "\"");
-            pWriter.print("-----consumes: \"");
-            printMimeTypes(rMethod.getSupportedInputTypes(), pWriter);
-            pWriter.println("\"");
-            pWriter.print("-----produces: \"");
-            printMimeTypes(rMethod.getSupportedOutputTypes(), pWriter);
-            pWriter.println("\"");
-        }
-        for (AbstractSubResourceMethod rSubResMethod : this.getSubResourceMethods()) {
-            pWriter.println("----subresource method \""  + rSubResMethod.getMethod().getName() + "\"");
-            pWriter.println("-----path \"" + rSubResMethod.getUriTemplate().getRawTemplate()  + "\"");
-            pWriter.println("-----http method \""  + rSubResMethod.getHttpMethod() + "\"");
-            pWriter.print("-----consumes: \"");
-            printMimeTypes(rSubResMethod.getSupportedInputTypes(), pWriter);
-            pWriter.println("\"");
-            pWriter.print("-----produces: \"");
-            printMimeTypes(rSubResMethod.getSupportedOutputTypes(), pWriter);
-            pWriter.println("\"");
-        }
-        for (AbstractSubResourceLocator rSubResLocator : this.getSubResourceLocators()) {
-            pWriter.println("----subresource locator \""  + rSubResLocator.getMethod().getName() + "\"");
-            pWriter.println("-----path \"" + rSubResLocator.getUriTemplate().getRawTemplate()  + "\"");
-        }
-        
-        return stringWriter.getBuffer().toString();
+        return "AbstractResource(" 
+                + ((null == getUriTemplate()) ? "" : ("\"" + getUriTemplate().getValue() + "\", - ")) 
+                + getResourceClass().getSimpleName() + ": " 
+                + getResourceMethods().size() + " res methods, " 
+                + getSubResourceMethods().size() + " subres methods, " 
+                + getSubResourceLocators().size() + " subres locators " + ")";
+    }
+
+    public List<AbstractModelComponent> getComponents() {
+        List<AbstractModelComponent> components = new LinkedList<AbstractModelComponent>();
+        components.addAll(getConstructors());
+        components.addAll(getResourceMethods());
+        components.addAll(getSubResourceMethods());
+        components.addAll(getSubResourceLocators());
+        return components;
     }
 }

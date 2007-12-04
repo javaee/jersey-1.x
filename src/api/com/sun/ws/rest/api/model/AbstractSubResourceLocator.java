@@ -26,7 +26,7 @@ import java.util.List;
 /**
  * Abstraction for a sub resource locator
  */
-public class AbstractSubResourceLocator implements UriTemplated, Parameterized {
+public class AbstractSubResourceLocator implements UriTemplated, Parameterized, AbstractModelComponent {
     
     private UriTemplateValue uriTemplate;
     private Method method;
@@ -36,6 +36,9 @@ public class AbstractSubResourceLocator implements UriTemplated, Parameterized {
      * Creates a new instance of AbstractSubResourceLocator
      */
     public AbstractSubResourceLocator(Method method, UriTemplateValue uriTemplate) {
+        
+        assert null != method;
+        
         this.method = method;
         this.uriTemplate =  uriTemplate;
         this.parameters = new ArrayList<Parameter>();
@@ -51,5 +54,19 @@ public class AbstractSubResourceLocator implements UriTemplated, Parameterized {
 
     public List<Parameter> getParameters() {
         return parameters;
+    }
+
+    public void accept(AbstractModelVisitor visitor) {
+        visitor.visitAbstractSubResourceLocator(this);
+    }
+
+    public List<AbstractModelComponent> getComponents() {
+        return null;
+    }
+    
+    @Override
+    public String toString() {
+        return "AbstractSubResourceLocator(" 
+                + getMethod().getDeclaringClass().getSimpleName() + "#" + getMethod().getName() + ")";
     }
 }

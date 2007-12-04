@@ -16,7 +16,6 @@
  * Created on October 5, 2007, 11:46 AM
  *
  */
-
 package com.sun.ws.rest.api.model;
 
 import java.lang.reflect.Method;
@@ -27,22 +26,25 @@ import javax.ws.rs.core.MediaType;
 /**
  * Abstraction for a resource method
  */
-public class AbstractResourceMethod implements Parameterized {
-    
+public class AbstractResourceMethod implements Parameterized, AbstractModelComponent {
+
     private List<MediaType> consumeMimeList;
     private List<MediaType> produceMimeList;
     private List<Parameter> parameters;
     private String httpMethod;
     private Method method;
-    
+
     public AbstractResourceMethod(Method method, String httpMethod) {
+        
+        assert null != method;
+        
         this.method = method;
         this.httpMethod = httpMethod;
         this.consumeMimeList = new ArrayList<MediaType>();
         this.produceMimeList = new ArrayList<MediaType>();
         this.parameters = new ArrayList<Parameter>();
     }
-    
+
     public List<MediaType> getSupportedInputTypes() {
         return consumeMimeList;
     }
@@ -50,7 +52,7 @@ public class AbstractResourceMethod implements Parameterized {
     public List<MediaType> getSupportedOutputTypes() {
         return produceMimeList;
     }
-    
+
     public String getHttpMethod() {
         return httpMethod;
     }
@@ -62,4 +64,19 @@ public class AbstractResourceMethod implements Parameterized {
     public Method getMethod() {
         return method;
     }
+    
+    public void accept(AbstractModelVisitor visitor) {
+        visitor.visitAbstractResourceMethod(this);
+    }
+    
+    public List<AbstractModelComponent> getComponents() {
+        return null;
+    }
+
+    @Override
+    public String toString() {
+        return "AbstractResourceMethod(" 
+                + getMethod().getDeclaringClass().getSimpleName() + "#" + getMethod().getName() + ")";
+    }
+
 }

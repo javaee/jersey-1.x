@@ -57,13 +57,13 @@ public class PerRequestProvider  implements ResourceProvider {
     public Object getInstance(ResourceProviderContext context) {
         try {
             Object resource = null;
-            // get the public constructors
-            // TODO abstract resource keeps just one constructor, is it ok?
-            AbstractResourceConstructor arCtor = this.abstractResource.getConstructor();
-            if (null == arCtor)
+            // TODO select the most appropriate constructor instead of just picking up the first one
+            
+            if ((null == abstractResource.getConstructors()) || abstractResource.getConstructors().isEmpty())
                 resource = abstractResource.getResourceClass().newInstance();
             else {
                 // take the first constructor
+                AbstractResourceConstructor arCtor = this.abstractResource.getConstructors().get(0);
                 Object[] params = context.getParameterValues(arCtor);
                 resource = arCtor.getCtor().newInstance(params);
             }

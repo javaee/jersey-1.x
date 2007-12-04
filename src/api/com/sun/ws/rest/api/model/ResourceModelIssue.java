@@ -19,18 +19,18 @@ package com.sun.ws.rest.api.model;
  *
  * @author japod
  */
-public class AbstractResourceIssue {
+public class ResourceModelIssue {
     
-    AbstractResource abstractResource;
+    Object source;
     String message;
     boolean fatal;
 
-    public AbstractResourceIssue(AbstractResource abstractResource, String message) {
-        this(abstractResource, message, false);
+    public ResourceModelIssue(Object source, String message) {
+        this(source, message, false);
     }
     
-    public AbstractResourceIssue(AbstractResource abstractResource, String message, boolean fatal) {
-        this.abstractResource = abstractResource;
+    public ResourceModelIssue(Object source, String message, boolean fatal) {
+        this.source = source;
         this.message = message;
         this.fatal = fatal;
     }
@@ -45,8 +45,8 @@ public class AbstractResourceIssue {
         return this.fatal;
     }
     
-    /** Corresponding abstract resource (having the issue) */
-    public AbstractResource getAbstractResource() {
-        return this.abstractResource;
+    /** Corresponding object (having the issue) */
+    public Object getSource() {
+        return this.source;
     }
 }

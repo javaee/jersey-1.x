@@ -56,7 +56,7 @@ public class WadlGenerator {
         // for each resource
         for (AbstractResource r: resources) {
             Resource wadlResource = new Resource();
-            wadlResource.setPath(r.getUriTemplate().getRawTemplate());
+            wadlResource.setPath(r.getUriTemplate().getValue());
             // for each resource method
             for (AbstractResourceMethod m: r.getResourceMethods()) {
                 com.sun.research.ws.wadl.Method wadlMethod = generateMethod(wadlResourceParams, m);
@@ -70,7 +70,7 @@ public class WadlGenerator {
             // for each sub-resource method
             for (AbstractSubResourceMethod m: r.getSubResourceMethods()) {
                 // find or create sub resource for uri template
-                String template = m.getUriTemplate().getRawTemplate();
+                String template = m.getUriTemplate().getValue();
                 Resource wadlSubResource = wadlSubResources.get(template);
                 Map<String,Param> wadlSubResourceParams = wadlSubResourcesParams.get(template);
                 if (wadlSubResource==null) {
@@ -97,7 +97,7 @@ public class WadlGenerator {
             // for each sub resource
             for (AbstractSubResourceLocator l: r.getSubResourceLocators()) {
                 Resource wadlSubResource = new Resource();
-                wadlSubResource.setPath(l.getUriTemplate().getRawTemplate());
+                wadlSubResource.setPath(l.getUriTemplate().getValue());
                 for (Parameter p: l.getParameters()) {
                     Param wadlParam = generateParam(p);
                     wadlSubResource.getParam().add(wadlParam);

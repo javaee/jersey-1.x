@@ -26,7 +26,7 @@ import java.util.List;
 /**
  * Abstraction for a resource class constructor
  */
-public class AbstractResourceConstructor implements Parameterized {
+public class AbstractResourceConstructor implements Parameterized, AbstractModelComponent {
     
     private Constructor ctor;
     private List<Parameter> parameters;
@@ -45,6 +45,14 @@ public class AbstractResourceConstructor implements Parameterized {
 
     public Constructor getCtor() {
         return ctor;
+    }
+
+    public void accept(AbstractModelVisitor visitor) {
+        visitor.visitAbstractResourceConstructor(this);
+    }
+
+    public List<AbstractModelComponent> getComponents() {
+        throw new UnsupportedOperationException("Not supported yet.");
     }
     
 }

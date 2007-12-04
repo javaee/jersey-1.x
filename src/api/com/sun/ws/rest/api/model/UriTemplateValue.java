@@ -19,14 +19,12 @@
 
 package com.sun.ws.rest.api.model;
 
-import java.util.regex.Pattern;
-
 /**
  * Abstraction for a UriTemplate value
  */
 public class UriTemplateValue {
     
-    private String rawTemplate;
+    private String value;
     private boolean encode;
     private boolean limited;
     
@@ -42,13 +40,13 @@ public class UriTemplateValue {
 
     /** Creates a new instance of UriTemplateValue */
     public UriTemplateValue(String template, boolean encode, boolean limited) {
-        this.rawTemplate = template;
+        this.value = template;
         this.encode = encode;
         this.limited = limited;
     }
 
-    public String getRawTemplate() {
-        return rawTemplate;
+    public String getValue() {
+        return value;
     }
 
     public boolean isEncode() {
@@ -57,14 +55,5 @@ public class UriTemplateValue {
 
     public boolean isLimited() {
         return limited;
-    }
-
-    public String getEncodedTemplate() {
-        // TODO: implement - ignore template parameters when encoding
-        throw new UnsupportedOperationException();
-    }
-    public Pattern getRegExp() {
-        // TODO: implement - substitute matching patterns for template params
-        throw new UnsupportedOperationException();
     }
 }
