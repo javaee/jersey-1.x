@@ -48,7 +48,7 @@ public final class HttpServerFactory {
      * {@link ContainerFactory#createContainer(HttpHandler)} method for creating
      * an HttpHandler that manages the root resources.
      *
-     * @param the URI to create the http server. The URI scheme must be
+     * @param u the URI to create the http server. The URI scheme must be
      *        equal to "http" or "https". The URI user information and host
      *        are ignored If the URI port is not present then port 80 will be 
      *        used. The URI path must not be null or an empty string, and must 
@@ -73,7 +73,7 @@ public final class HttpServerFactory {
      * {@link ContainerFactory#createContainer(HttpHandler)} method for creating
      * an HttpHandler that manages the root resources.
      *
-     * @param the URI to create the http server. The URI scheme must be
+     * @param u the URI to create the http server. The URI scheme must be
      *        equal to "http" or "https". The URI user information and host
      *        are ignored If the URI port is not present then port 80 will be 
      *        used. The URI path must not be null or an empty string, and must 
@@ -83,6 +83,47 @@ public final class HttpServerFactory {
      * @return the http server
      */
     public static HttpServer create(URI u) throws IOException {
+        return create(u, ContainerFactory.createContainer(HttpHandler.class));
+    }
+    
+    /**
+     * Create a {@link HtppServer} that registers a HttpHandler that in turn
+     * manages all root resource classes found by searching the classes
+     * referenced in the java classath.
+     *
+     * @param u the URI to create the http server. The URI scheme must be
+     *        equal to "http" or "https". The URI user information and host
+     *        are ignored If the URI port is not present then port 80 will be 
+     *        used. The URI path must not be null or an empty string, and must 
+     *        not absolute (start with a '/' character). The URI path is used 
+     *        as the context of the HTTP handler (and corresponds to the base 
+     *        path). The URI query and fragment components are ignored.
+     * @param handler the HTTP handler
+     * @return the http server
+     */
+    public static HttpServer create(String u, HttpHandler handler) throws IOException {
+        if (u == null)
+            throw new IllegalArgumentException("The URI must not be null");
+
+        return create(URI.create(u), handler);
+    }
+    
+    /**
+     * Create a {@link HtppServer} that registers a HttpHandler that in turn
+     * manages all root resource classes found by searching the classes
+     * referenced in the java classath.
+     *
+     * @param u the URI to create the http server. The URI scheme must be
+     *        equal to "http" or "https". The URI user information and host
+     *        are ignored If the URI port is not present then port 80 will be 
+     *        used. The URI path must not be null or an empty string, and must 
+     *        not absolute (start with a '/' character). The URI path is used 
+     *        as the context of the HTTP handler (and corresponds to the base 
+     *        path). The URI query and fragment components are ignored.
+     * @param handler the HTTP handler
+     * @return the http server
+     */
+    public static HttpServer create(URI u, HttpHandler handler) throws IOException {
         if (u == null)
             throw new IllegalArgumentException("The URI must not be null");
             
@@ -102,9 +143,6 @@ public final class HttpServerFactory {
             throw new IllegalArgumentException("The URI path, of the URI " + u + 
                     ". must start with a '/'");
         
-        final HttpHandler handler = ContainerFactory.createContainer(
-                HttpHandler.class);
-
         final int port = (u.getPort() == -1) ? 80 : u.getPort();    
         final HttpServer server = (scheme.equalsIgnoreCase("http")) ? 
             HttpServer.create(new InetSocketAddress(port), 0) :
