@@ -78,8 +78,10 @@ public final class GrizzlyResponseAdaptor extends AbstractContainerResponse {
     }    
     
     /* package */ void commitAll() throws IOException {
-        if (isCommitted())
+        if (isCommitted()) {
+            getUnderlyingOutputStream().close();
             return;
+        }
         
         commitStatusAndHeaders();
         
