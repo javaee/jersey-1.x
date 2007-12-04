@@ -19,7 +19,7 @@
             container provider has a dependency on a set of jars.</p>
             <li><p>Entity. The set of entity dependent jars. Each entity
             provider has a dependency on a set of jars</p>
-            <li><p>Tools. The set of jars required for tooling.</p>
+            <li><p>Tools. The set of jars required for runtime tooling.</p>
         </ul>
         <p>All jar files explicitly referenced below are present in the
         Jersey distribution.</p>
@@ -85,17 +85,12 @@
         <p>The use of the Java type javax.activation.DataSource with Java SE
         5 requires Java Activation 1.0 or higher with the following jars:</p>
         <p><blockquote>activation.jar</blockquote></p>
-        <h2>Tools</h2>
-        <p>The use of the ant task
-            com.sun.ws.rest.tools.ant.WebResourcesProcessorTask (to process the
-            root resource classes of an application and to generate a WADL
-            description of such resources) requires JAXB version 2.1.x tooling or
-            higher, WADL2Java and JAX-WS version 2.1.x tooling (<B>NOTE</B>: the
-        JAX-WS dependency needs to be removed) with the following jars:</p>
-        <p><blockquote>jaxb-xjc.jar jaxb-api.jar jaxb-impl.jar jsr173_api.jar
-        activation.jar, wadl2java.jar, jaxws-tools.jar</blockquote></p>
-        <p>Such jars do not need to be included in the runtime class path or
-        included in a WAR file unless some of the jars are required by the 
-        application for non-tooling functionality.</p>
+        <h2>Runtime Tools</h2>
+        <p>By default WADL for resource classes is generated dynamically
+           at runtime. WADL requires the following jars:</p>
+        <p><blockquote>jaxb-impl.jar, jaxb-api.jar, activation.jar, jsr173_api.jar
+        </blockquote></p>
+        <p>If the above jars are not present then WADL generation is disabled
+           and a warning will be logged.</p>
     </body>
 </html>
