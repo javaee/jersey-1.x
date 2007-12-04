@@ -27,6 +27,7 @@ import com.sun.ws.rest.api.core.HttpRequestContext;
 import com.sun.ws.rest.api.core.HttpResponseContext;
 import com.sun.ws.rest.impl.client.ResourceProxy;
 import java.io.IOException;
+import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.ProduceMime;
 import junit.framework.*;
@@ -40,8 +41,18 @@ public class OutputStreamTest extends AbstractGrizzlyServerTester {
     public static class TestResource { // implements WebResource {
 
         @ProduceMime("text/plain")
+        @GET
+        public void get(HttpRequestContext requestContext, 
+                HttpResponseContext responseContext) throws IOException {
+            assertEquals("GET", requestContext.getHttpMethod());
+            
+            responseContext.getOutputStream().
+                    write("RESOURCE".getBytes());
+        }
+        
+        @ProduceMime("text/plain")
         @POST
-        public void handleRequest(HttpRequestContext requestContext, 
+        public void post(HttpRequestContext requestContext, 
                 HttpResponseContext responseContext) throws IOException {
             assertEquals("POST", requestContext.getHttpMethod());
             
@@ -57,10 +68,27 @@ public class OutputStreamTest extends AbstractGrizzlyServerTester {
         super(testName);
     }
     
-    public void testOutputStream() {
+    public void testGet() {
         startServer(TestResource.class);
                 
         ResourceProxy r = ResourceProxy.create(getUri().path("output").build());
+        assertEquals("RESOURCE", r.get(String.class));        
+    }
+    
+    public void testPost() {        
+        startServer(TestResource.class);
+                
+        ResourceProxy r = ResourceProxy.create(getUri().path("output").build());
+        assertEquals("RESOURCE", r.post(String.class, "RESOURCE"));
+    }
+    
+    public void testAll() {
+        startServer(TestResource.class);
+                
+        ResourceProxy r = ResourceProxy.create(getUri().path("output").build());
+        assertEquals("RESOURCE", r.get(String.class));        
+        
+        r = ResourceProxy.create(getUri().path("output").build());
         assertEquals("RESOURCE", r.post(String.class, "RESOURCE"));
     }
 }

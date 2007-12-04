@@ -91,7 +91,7 @@ public abstract class AbstractGrizzlyServerTester extends TestCase {
         
         try {    
             // Wait for the server to start
-            Thread.sleep(500); 
+            Thread.sleep(1000); 
         } catch (InterruptedException ex) {
             ex.printStackTrace();
         } 

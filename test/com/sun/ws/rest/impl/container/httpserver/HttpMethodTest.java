@@ -85,4 +85,19 @@ public class HttpMethodTest extends AbstractHttpServerTester {
         ResourceProxy r = ResourceProxy.create(getUri().path("test").build());
         assertEquals("DELETE", r.delete(String.class));
     }
+    
+    public void testAll() {
+        startServer(HttpMethodResource.class);
+        ResourceProxy r = ResourceProxy.create(getUri().path("test").build());
+        assertEquals("GET", r.get(String.class));
+
+        r = ResourceProxy.create(getUri().path("test").build());
+        assertEquals("POST", r.post(String.class, "POST"));
+        
+        r = ResourceProxy.create(getUri().path("test").build());
+        assertEquals("PUT", r.post(String.class, "PUT"));
+        
+        r = ResourceProxy.create(getUri().path("test").build());
+        assertEquals("DELETE", r.delete(String.class));
+    }
 }

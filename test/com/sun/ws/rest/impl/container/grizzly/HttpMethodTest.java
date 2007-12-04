@@ -62,7 +62,7 @@ public class HttpMethodTest extends AbstractGrizzlyServerTester {
         super(testName);
     }
     
-    public void _testGet() {
+    public void testGet() {
         startServer(HttpMethodResource.class);
         ResourceProxy r = ResourceProxy.create(getUri().path("test").build());
         assertEquals("GET", r.get(String.class));
@@ -74,15 +74,30 @@ public class HttpMethodTest extends AbstractGrizzlyServerTester {
         assertEquals("POST", r.post(String.class, "POST"));
     }    
     
-    public void _testPut() {
+    public void testPut() {
         startServer(HttpMethodResource.class);
         ResourceProxy r = ResourceProxy.create(getUri().path("test").build());
         assertEquals("PUT", r.post(String.class, "PUT"));
     }
     
-    public void _testDelete() {
+    public void testDelete() {
         startServer(HttpMethodResource.class);
         ResourceProxy r = ResourceProxy.create(getUri().path("test").build());
+        assertEquals("DELETE", r.delete(String.class));
+    }
+    
+    public void testAll() {
+        startServer(HttpMethodResource.class);
+        ResourceProxy r = ResourceProxy.create(getUri().path("test").build());
+        assertEquals("GET", r.get(String.class));
+
+        r = ResourceProxy.create(getUri().path("test").build());
+        assertEquals("POST", r.post(String.class, "POST"));
+        
+        r = ResourceProxy.create(getUri().path("test").build());
+        assertEquals("PUT", r.post(String.class, "PUT"));
+        
+        r = ResourceProxy.create(getUri().path("test").build());
         assertEquals("DELETE", r.delete(String.class));
     }
 }
