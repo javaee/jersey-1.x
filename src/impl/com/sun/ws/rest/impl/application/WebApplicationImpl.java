@@ -24,6 +24,7 @@ package com.sun.ws.rest.impl.application;
 
 import com.sun.ws.rest.spi.resource.Injectable;
 import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import javax.ws.rs.WebApplicationException;
 import com.sun.ws.rest.api.container.ContainerException;
@@ -34,6 +35,7 @@ import com.sun.ws.rest.impl.ThreadLocalHttpContext;
 import com.sun.ws.rest.impl.model.ResourceClass;
 import com.sun.ws.rest.impl.model.RulesMap;
 import com.sun.ws.rest.api.Responses;
+import com.sun.ws.rest.api.model.AbstractResource;
 import com.sun.ws.rest.impl.uri.PathPattern;
 import com.sun.ws.rest.impl.uri.PathTemplate;
 import com.sun.ws.rest.api.uri.UriTemplate;
@@ -41,6 +43,8 @@ import com.sun.ws.rest.impl.uri.rules.ResourceClassRule;
 import com.sun.ws.rest.impl.uri.rules.RightHandPathRule;
 import com.sun.ws.rest.impl.uri.rules.RootResourceClassesRule;
 import com.sun.ws.rest.impl.uri.UriHelper;
+import com.sun.ws.rest.impl.uri.rules.ResourceObjectRule;
+import com.sun.ws.rest.impl.wadl.WadlResource;
 import com.sun.ws.rest.spi.container.ContainerRequest;
 import com.sun.ws.rest.spi.container.ContainerResponse;
 import com.sun.ws.rest.spi.container.WebApplication;
@@ -48,10 +52,12 @@ import com.sun.ws.rest.spi.resource.ResourceProviderFactory;
 import com.sun.ws.rest.spi.uri.rules.UriRule;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Proxy;
 import java.net.URI;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -217,6 +223,7 @@ public final class WebApplicationImpl implements WebApplication {
         
         RulesMap<UriRule> rulesMap = new RulesMap<UriRule>();
         
+        Set<AbstractResource> rootResources = new HashSet<AbstractResource>();
         for (Class<?> c : classes) {
             // Ignore if not a root resource
             // TODO defer to the abstract model
@@ -227,6 +234,7 @@ public final class WebApplicationImpl implements WebApplication {
             }
             
             ResourceClass r = getResourceClass(c);
+            rootResources.add(r.resource);
             
             UriTemplate t = new PathTemplate(
                     r.resource.getUriTemplate().getRawTemplate(),
@@ -238,9 +246,53 @@ public final class WebApplicationImpl implements WebApplication {
                     new ResourceClassRule(t.getTemplateVariables(), c)));
         }
         
+        createWadlResource(rootResources, rulesMap);
+        
         return rulesMap;
     }
 
+    private void createWadlResource(Set<AbstractResource> rootResources, 
+            RulesMap<UriRule> rulesMap) {
+        // TODO get ResourceConfig to check the WADL generation feature
+        
+        Object wr = createWadlResource(rootResources);
+        if (wr == null) return;
+        
+        ResourceClass r = getResourceClass(WadlResource.class);
+        UriTemplate t = new PathTemplate(
+                "application.wadl",
+                false);
+        PathPattern p = new PathPattern(t, r.hasSubResources);
+        
+        rulesMap.put(p, new RightHandPathRule(false,
+                new ResourceObjectRule(t.getTemplateVariables(), wr)));        
+    }
+    
+    /**
+     * Create the WADL resource object.
+     * <p>
+     * This is created using reflection so that there is no runtime
+     * dependency on JAXB. If the JAXB jars are not in the class path
+     * then WADL generation will not be supported.
+     * 
+     * @param rootResources the set of root resources
+     * @return the WADL resource object
+     */
+    private Object createWadlResource(Set<AbstractResource> rootResources) {
+        try {
+            Class<?> wc = Class.forName("com.sun.ws.rest.impl.wadl.WadlResource");
+            Constructor<?> wcc = wc.getConstructor(Set.class);
+            return wcc.newInstance(rootResources);
+        } catch(Throwable e) {
+            e.printStackTrace();
+            // TODO log a warning saying WADL generation is not enabled
+            // TODO catch more specific exceptions to determine those
+            // class loading exceptions associated with JAXB not being in the
+            // class path
+            return null;
+        }
+    }
+    
     /**
      * Strip the matrix parameters from a path
      */
