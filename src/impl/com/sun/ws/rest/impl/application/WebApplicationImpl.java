@@ -32,7 +32,6 @@ import com.sun.ws.rest.api.core.HttpContextAccess;
 import com.sun.ws.rest.api.core.HttpResponseContext;
 import com.sun.ws.rest.api.core.ResourceConfig;
 import com.sun.ws.rest.api.model.AbstractResource;
-import com.sun.ws.rest.impl.ResponseBuilderImpl;
 import com.sun.ws.rest.impl.ThreadLocalHttpContext;
 import com.sun.ws.rest.impl.model.ResourceClass;
 import com.sun.ws.rest.impl.model.RulesMap;
@@ -303,14 +302,22 @@ public final class WebApplicationImpl implements WebApplication {
             Class<?> wc = Class.forName("com.sun.ws.rest.impl.wadl.WadlResource");
             Constructor<?> wcc = wc.getConstructor(Set.class);
             return wcc.newInstance(rootResources);
-        } catch(Throwable e) {
-            e.printStackTrace();
-            // TODO log a warning saying WADL generation is not enabled
-            // TODO catch more specific exceptions to determine those
-            // class loading exceptions associated with JAXB not being in the
-            // class path
-            return null;
+        } catch (InvocationTargetException e) {
+            if (e.getCause() instanceof NoClassDefFoundError) {
+                LOGGER.warning("WADL generation is disabled " +
+                        "because dependent Java classes cannot be found." + 
+                        "This is most likely because JAXB jars are not included in the java class path." +
+                        "To enable WADL include JAXB 2.x jars in the java class path.");
+            }
+        } catch(RuntimeException e) {
+            LOGGER.severe("Error configuring WADL support");
+            throw e;
+        } catch(Exception e) {
+            LOGGER.severe("Error configuring WADL support");
+            throw new ContainerException(e);
         }
+        
+        return null;
     }
     
     /**
