@@ -54,4 +54,13 @@ echo -- Get the containers
 java -jar dist/StorageService.jar GET http://127.0.0.1:9998/storage/containers
 echo
 
+echo -- Add something using more than one path segment
+echo "Something" | java -jar dist/StorageService.jar PUT http://127.0.0.1:9998/storage/containers/quotes/a/b/c/d text/plain
 
+echo -- Get the quote a/b/c/d
+java -jar dist/StorageService.jar GET http://127.0.0.1:9998/storage/containers/quotes/a/b/c/d
+echo
+
+echo -- Delete the quotes container
+java -jar dist/StorageService.jar DELETE http://127.0.0.1:9998/storage/containers/quotes
+echo
