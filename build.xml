@@ -261,7 +261,6 @@
     </taskdef>
     
     <target name="hudson-unit-tests" depends="init,-get-emma">
-<!-- Emma ****************************-->
         <mkdir dir="build/emma"/>
 
         <property name="emma.dir" value="emma/emma-2.0.5312/lib" />
@@ -274,19 +273,23 @@
         <taskdef resource="emma_ant.properties" classpathref="emma.lib" />
 
         <emma enabled="true">
-          <instr instrpath="dist/jersey.jar" mode="overwrite" metadatafile="build/emma/metadata.emma"/>
+          <instr
+                instrpath="${build.classes.dir}"
+                mode="overwrite" 
+                metadatafile="build/emma/metadata.emma">
+            <!-- ignore WADL generated JAXB classes -->
+            <filter excludes="com.sun.research.*" />
+          </instr>
         </emma>
-<!-- /Emma ***************************-->
-
+        
         <path id="test.classpath">
             <fileset dir="${basedir}/lib" includes="*.jar"/>
-            <fileset dir="${dist.dir}" includes="*.jar"/>
+            <pathelement location="${build.classes.dir}"/>
             <pathelement location="${build.test.classes.dir}"/>
             <pathelement location="${tools.jar}"/>
-<!-- Emma ****************************-->
             <path refid="emma.lib"/>
-<!-- /Emma ***************************-->
         </path>
+        
         <mkdir dir="${build.test.classes.dir}"/>
         <mkdir dir="${build.test.results.dir}"/>
         <javac srcdir="${test.src.dir}" 
@@ -308,13 +311,11 @@
             <formatter type="brief" usefile="false"/>
             <formatter type="xml"/>
             <jvmarg line="${run.jvmargs}"/>
-<!-- Emma ****************************-->
+            
             <jvmarg value="-Demma.coverage.out.file=build/emma/coverage.emma"/>
             <jvmarg value="-Demma.coverage.out.merge=true"/>
-<!-- /Emma ***************************-->
         </junit2>
 
-<!-- Emma ****************************-->
         <path id="src.ref" >
           <pathelement location="${src.api.dir}" />
           <pathelement location="${src.gen-src.dir}" />
@@ -332,7 +333,6 @@
             <html outfile="build/emma/coverage.html" />
           </report>
         </emma> 
-<!-- /Emma ***************************-->
     </target>
     
     <target name="clean-tests" depends="init">
