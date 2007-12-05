@@ -1,4 +1,6 @@
 release 0.5 (2008-01-18)
+- Fixed issue 25: UriBuilder uri() not concatinating properly
+  https://jersey.dev.java.net/issues/show_bug.cgi?id=25
 - Grizzly support is upgraded to the latest jars.
 - Grizzly and the LW HTTP server now now easy ways to start a server
   deployed with root resource classes, see: 
