@@ -19,7 +19,6 @@
  * enclosed by brackets [] replaced by your own identifying information:
  *     "Portions Copyrighted [year] [name of copyright owner]"
  */
-
 package com.sun.ws.rest.impl.container.httpserver;
 
 import com.sun.net.httpserver.HttpHandler;
@@ -28,6 +27,7 @@ import com.sun.ws.rest.api.container.ContainerFactory;
 import com.sun.ws.rest.api.container.httpserver.HttpServerFactory;
 import com.sun.ws.rest.api.core.ResourceConfig;
 import java.io.IOException;
+import java.net.BindException;
 import java.net.URI;
 import javax.ws.rs.core.UriBuilder;
 import junit.framework.TestCase;
@@ -37,51 +37,67 @@ import junit.framework.TestCase;
  * @author Paul.Sandoz@Sun.Com
  */
 public abstract class AbstractHttpServerTester extends TestCase {
+
     public static final String CONTEXT = "/context";
-    
     private HttpServer server;
-    
     private int port = 9998;
-    
+    private final static int MaxPORT = 9998 + 100; // try out 100 port numbers before giving up
+
     public AbstractHttpServerTester(String name) {
         super(name);
     }
-    
+
     public UriBuilder getUri() {
         return UriBuilder.fromUri("http://localhost").port(port).path(CONTEXT);
     }
-    
+
     public void startServer(Class... resources) {
         start(ContainerFactory.createContainer(HttpHandler.class, resources));
     }
-    
+
     public void startServer(ResourceConfig config) {
         start(ContainerFactory.createContainer(HttpHandler.class, config));
     }
-    
+
     public void startServer(String packageName) {
         start(ContainerFactory.createContainer(HttpHandler.class, packageName));
     }
-    
+
     private void start(HttpHandler handler) {
-        if (server != null)
+        if (server != null) {
             stopServer();
-        
+        }
+
         URI u = UriBuilder.fromUri("http://localhost").port(port).path(CONTEXT).
                 build();
-        try {
-            server = HttpServerFactory.create(u, handler);
-        } catch (IOException ex) {
-            throw new RuntimeException(ex);
+
+        while ((null == server) && (port < MaxPORT)) {
+            try {
+                server = HttpServerFactory.create(u, handler);
+            } catch (BindException be) {
+                // if all possible ports (bellow MaxPORT) were tried out,
+                // NPE will be thrown bellow at server.start()
+                port++;
+            } catch (IOException ex) {
+                throw new RuntimeException(ex);
+            }
         }
-        server.start();        
+        server.start();
+        try {
+            // Wait for the server to start
+            Thread.sleep(1000);
+        } catch (InterruptedException ex) {
+            ex.printStackTrace();
+        }
     }
-    
+
     public void stopServer() {
-        if (server != null)
+        if (server != null) {
             server.stop(0);
+        }
     }
-    
+
+    @Override
     public void tearDown() {
         stopServer();
     }
