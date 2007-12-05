@@ -90,6 +90,42 @@ public class UriBuilderTest extends TestCase {
         assertEquals(URI.create("http://localhost:8080/a/b/c?a=x&b=y#ment"), bu);
     }
     
+    public void testReplaceUri() {
+        URI u = URI.create("http://bob@localhost:8080/a/b/c?a=x&b=y#frag");
+        
+        URI bu = UriBuilder.fromUri(u).
+                uri(URI.create("https://bob@localhost:8080")).build();
+        assertEquals(URI.create("https://bob@localhost:8080/a/b/c?a=x&b=y#frag"), bu);
+        
+        bu = UriBuilder.fromUri(u).
+                uri(URI.create("https://sue@localhost:8080")).build();
+        assertEquals(URI.create("https://sue@localhost:8080/a/b/c?a=x&b=y#frag"), bu);
+        
+        bu = UriBuilder.fromUri(u).
+                uri(URI.create("https://sue@localhost:9090")).build();
+        assertEquals(URI.create("https://sue@localhost:9090/a/b/c?a=x&b=y#frag"), bu);
+        
+        bu = UriBuilder.fromUri(u).
+                uri(URI.create("/x/y/z")).build();
+        assertEquals(URI.create("http://bob@localhost:8080/x/y/z?a=x&b=y#frag"), bu);
+        
+        bu = UriBuilder.fromUri(u).
+                uri(URI.create("?x=a&b=y")).build();
+        assertEquals(URI.create("http://bob@localhost:8080/a/b/c?x=a&b=y#frag"), bu);
+        
+        bu = UriBuilder.fromUri(u).
+                uri(URI.create("#ment")).build();
+        assertEquals(URI.create("http://bob@localhost:8080/a/b/c?a=x&b=y#ment"), bu);        
+    }
+    
+    public void testSchemeSpecificPart() {
+        URI u = URI.create("http://bob@localhost:8080/a/b/c?a=x&b=y#frag");
+        
+        URI bu = UriBuilder.fromUri(u).
+                schemeSpecificPart("//sue@remotehost:9090/x/y/z?x=a&y=b").build();
+        assertEquals(URI.create("http://sue@remotehost:9090/x/y/z?x=a&y=b#frag"), bu);
+    }
+    
     public void testAppendPath() {
         URI bu = UriBuilder.fromUri("http://localhost:8080/a/b/c/").
                 path("/x/y/z").build();

@@ -51,9 +51,9 @@ public final class UriBuilderImpl extends UriBuilder {
     
     private int port = -1;
     
-    private StringBuilder path;
+    private final StringBuilder path;
     
-    private StringBuilder query;
+    private final StringBuilder query;
     
     private String fragment;
     
@@ -83,21 +83,23 @@ public final class UriBuilderImpl extends UriBuilder {
     }
     
     public UriBuilder uri(URI uri) {
-        scheme = uri.getScheme();
-        userInfo = uri.getRawUserInfo();
-        host = uri.getHost();
-        port = uri.getPort();
-        path = new StringBuilder(replaceNull(uri.getRawPath()));
-        query = new StringBuilder(replaceNull(uri.getRawQuery()));
-        fragment = uri.getRawFragment();
+        if (uri.getScheme() != null) scheme = uri.getScheme();
+        if (uri.getRawUserInfo() != null) userInfo = uri.getRawUserInfo();
+        if (uri.getHost() != null) host = uri.getHost();
+        if (uri.getPort() != -1) port = uri.getPort();
+        if (uri.getRawPath() != null && uri.getRawPath().length() > 0) {
+            path.setLength(0);
+            path.append(uri.getRawPath());
+        }
+        if (uri.getRawQuery() != null && uri.getRawQuery().length() > 0) {
+            query.setLength(0);
+            query.append(uri.getRawQuery());
+            
+        }
+        if (uri.getRawFragment() != null) fragment = uri.getRawFragment();
         return this;
     }
 
-    public UriBuilder uri(String uri) {
-        uri(createURI(uri));
-        return this;
-    }
-    
     public UriBuilder scheme(String scheme) {
         this.scheme = scheme;
         UriComponent.validate(scheme, UriComponent.Type.SCHEME, true);
@@ -111,8 +113,10 @@ public final class UriBuilderImpl extends UriBuilder {
         userInfo = uri.getRawUserInfo();
         host = uri.getHost();
         port = uri.getPort();
-        path = new StringBuilder(replaceNull(uri.getRawPath()));
-        query = new StringBuilder(replaceNull(uri.getRawQuery()));
+        path.setLength(0);
+        path.append(replaceNull(uri.getRawPath()));
+        query.setLength(0);
+        query.append(replaceNull(uri.getRawQuery()));
         return this;
     }
 
