@@ -106,7 +106,7 @@ public class ContainerResource {
     } 
     
     
-    @Path("{item}")
+    @Path(value="{item}", limited=false)
     public ItemResource getItemResource(@UriParam("container") String container, 
             @UriParam("item") String item) {
         return new ItemResource(uriInfo, preconditionEvaluator, container, item);
