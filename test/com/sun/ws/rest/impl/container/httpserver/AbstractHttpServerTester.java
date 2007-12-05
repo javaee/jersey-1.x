@@ -41,7 +41,6 @@ public abstract class AbstractHttpServerTester extends TestCase {
     public static final String CONTEXT = "/context";
     private HttpServer server;
     private int port = 9998;
-    private final static int MaxPORT = 9998 + 100; // try out 100 port numbers before giving up
 
     public AbstractHttpServerTester(String name) {
         super(name);
@@ -71,16 +70,10 @@ public abstract class AbstractHttpServerTester extends TestCase {
         URI u = UriBuilder.fromUri("http://localhost").port(port).path(CONTEXT).
                 build();
 
-        while ((null == server) && (port < MaxPORT)) {
-            try {
-                server = HttpServerFactory.create(u, handler);
-            } catch (BindException be) {
-                // if all possible ports (bellow MaxPORT) were tried out,
-                // NPE will be thrown bellow at server.start()
-                port++;
-            } catch (IOException ex) {
-                throw new RuntimeException(ex);
-            }
+        try {
+            server = HttpServerFactory.create(u, handler);
+        } catch (IOException ex) {
+            throw new RuntimeException(ex);
         }
         server.start();
         try {
