@@ -152,8 +152,8 @@ public final class HttpHelper {
     }
     
     private static WebApplicationException clientError(String message, Exception e) {        
-        return new WebApplicationException(e, Response.serverError().
-                status(400).entity(message).type("text/plain").build());
+        return new WebApplicationException(e, Response.status(400).
+                entity(message).type("text/plain").build());
     }
     
     /**

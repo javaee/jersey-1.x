@@ -25,13 +25,13 @@ package com.sun.ws.rest.api.core;
 import java.util.List;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.PreconditionEvaluator;
+import javax.ws.rs.core.Request;
 import javax.ws.rs.core.UriInfo;
 
 /**
  * An abstraction for a HTTP request
  */
-public interface HttpRequestContext extends HttpHeaders, UriInfo, PreconditionEvaluator {
+public interface HttpRequestContext extends HttpHeaders, UriInfo, Request {
     /**
      * Select the first media type, from a list of media types, that is most
      * acceptable according to the requested acceptable media types.

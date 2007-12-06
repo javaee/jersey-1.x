@@ -46,6 +46,7 @@ import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.PathSegment;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
+import javax.ws.rs.core.Variant;
 import javax.ws.rs.ext.ProviderFactory;
 
 /**
@@ -477,26 +478,42 @@ public abstract class AbstractContainerRequest implements ContainerRequest {
     }
     
     
-    // PreconditionEvaluator
+    // Request
+
+    public Variant selectVariant(List<Variant> variants) {
+        throw new UnsupportedOperationException();
+    }
     
-    public Response evaluate(EntityTag eTag) {
+    public Response evaluatePreconditions(EntityTag eTag) {
+        return evaluatePreconditions(eTag, (Variant)null);
+    }
+    
+    public Response evaluatePreconditions(EntityTag eTag, Variant variant) {
         Response r = evaluateIfMatch(eTag);
         if (r == null)
             r = evaluateIfNoneMatch(eTag);
         
-        return r;
+        return r;        
+    }
+
+    public Response evaluatePreconditions(Date lastModified) {
+        return evaluatePreconditions(lastModified, (Variant)null);
     }
     
-    public Response evaluate(Date lastModified) {
+    public Response evaluatePreconditions(Date lastModified, Variant variant) {
         long lastModifiedTime = lastModified.getTime();
         Response r = evaluateIfUnmodifiedSince(lastModifiedTime);
         if (r == null)
             r = evaluateIfModifiedSince(lastModifiedTime);
         
-        return r;
+        return r;        
     }
     
-    public Response evaluate(Date lastModified, EntityTag eTag) {
+    public Response evaluatePreconditions(Date lastModified, EntityTag eTag) {
+        return evaluatePreconditions(lastModified, eTag, null);
+    }
+    
+    public Response evaluatePreconditions(Date lastModified, EntityTag eTag, Variant variant) {
         Response r = evaluateIfMatch(eTag);
         if (r == null) {
             long lastModifiedTime = lastModified.getTime();
@@ -507,9 +524,9 @@ public abstract class AbstractContainerRequest implements ContainerRequest {
                 r = evaluateIfModifiedSince(lastModifiedTime);
         }
         
-        return r;
+        return r;        
     }
-    
+        
     private Response evaluateIfMatch(EntityTag eTag) {
         String ifMatchHeader = getRequestHeaders().getFirst("If-Match");
         // TODO require support for eTag types
@@ -552,7 +569,8 @@ public abstract class AbstractContainerRequest implements ContainerRequest {
         String ifUnmodifiedSinceHeader = getRequestHeaders().getFirst("If-Unmodified-Since");
         if (ifUnmodifiedSinceHeader != null) {
             try {
-                long ifUnmodifiedSince = HttpHeaderReader.readDate(ifUnmodifiedSinceHeader).getTime() + 1000;
+                long ifUnmodifiedSince = HttpHeaderReader.
+                        readDate(ifUnmodifiedSinceHeader).getTime() + 1000;
                 if (lastModified > ifUnmodifiedSince) {
                     // 412 Precondition Failed
                     return Responses.preconditionFailed();
@@ -570,7 +588,8 @@ public abstract class AbstractContainerRequest implements ContainerRequest {
         if (ifModifiedSinceHeader != null) {
             try {
                 // TODO round up if modified since or round down last modified
-                long ifModifiedSince = HttpHeaderReader.readDate(ifModifiedSinceHeader).getTime() + 1000;
+                long ifModifiedSince = HttpHeaderReader.
+                        readDate(ifModifiedSinceHeader).getTime() + 1000;
                 if (ifModifiedSince  > lastModified) {
                     // 304 Not modified
                     return Responses.notModified();

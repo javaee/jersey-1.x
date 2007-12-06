@@ -48,7 +48,7 @@ public class ConsumeProduceWildcardTest extends AbstractResourceTester {
         public void doPostHtml(HttpRequestContext request, HttpResponseContext response) {
             assertEquals("POST", request.getHttpMethod());
             assertEquals("text/html", request.getRequestHeaders().getFirst("Content-Type"));
-            response.setResponse(Response.ok().entity("HTML").build());
+            response.setResponse(Response.ok("HTML").build());
         }
         
         @POST
@@ -56,7 +56,7 @@ public class ConsumeProduceWildcardTest extends AbstractResourceTester {
         public void doPostXHtml(HttpRequestContext request, HttpResponseContext response) {
             assertEquals("POST", request.getHttpMethod());
             assertEquals("text/xhtml", request.getRequestHeaders().getFirst("Content-Type"));
-            response.setResponse(Response.ok().entity("XHTML").build());
+            response.setResponse(Response.ok("XHTML").build());
         }
     }
         

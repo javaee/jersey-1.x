@@ -111,7 +111,7 @@ public class FeedResource {
         AtomStore.updateFeedDocumentWithNewEntry(f, e);
         
         // Return 201 Created
-        return Response.created(e, entryUri).build();
+        return Response.created(entryUri).entity(e).build();
     }
 
     @POST
@@ -162,7 +162,7 @@ public class FeedResource {
         AtomStore.updateFeedDocumentWithNewEntry(f, e);
         
         // Return 201 Created
-        return Response.created(e, entryUri).build();
+        return Response.created(entryUri).entity(e).build();
     }
     
 }

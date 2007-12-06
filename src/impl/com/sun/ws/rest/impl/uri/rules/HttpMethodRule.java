@@ -84,7 +84,7 @@ public final class HttpMethodRule implements UriRule {
         List<ResourceMethod> methods = map.get(httpMethod);
         if (methods == null) {
             // No resource methods are found
-            response.setResponse(Response.ok().status(Responses.METHOD_NOT_ALLOWED).
+            response.setResponse(Response.status(Responses.METHOD_NOT_ALLOWED).
                     header("Allow", allow).build());
             return true;
         }

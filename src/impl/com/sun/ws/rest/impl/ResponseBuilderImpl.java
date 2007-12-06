@@ -35,6 +35,7 @@ import javax.ws.rs.core.EntityTag;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.NewCookie;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Variant;
 
 /**
  *
@@ -95,7 +96,7 @@ public final class ResponseBuilderImpl extends Response.Builder {
 
     // Response.Builder
     
-    public ResponseBuilderImpl() { }
+    // public ResponseBuilderImpl() { }
         
     public Response build() {
         Response r = new ResponseImpl(status, entity, 
@@ -133,6 +134,14 @@ public final class ResponseBuilderImpl extends Response.Builder {
         return this;
     }
 
+    public Response.Builder variant(Variant variant) {
+        throw new UnsupportedOperationException();
+    }
+    
+    public Response.Builder variants(List<Variant> variants) {
+        throw new UnsupportedOperationException();        
+    }
+        
     public Response.Builder language(String language) {
         set(CONTENT_LANGUAGE, language);
         return this;

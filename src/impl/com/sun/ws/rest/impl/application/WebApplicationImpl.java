@@ -67,7 +67,7 @@ import java.util.concurrent.ConcurrentMap;
 import java.util.logging.Logger;
 import javax.ws.rs.core.HttpContext;
 import javax.ws.rs.core.HttpHeaders;
-import javax.ws.rs.core.PreconditionEvaluator;
+import javax.ws.rs.core.Request;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 
@@ -91,7 +91,7 @@ public final class WebApplicationImpl implements WebApplication {
     
     private final UriInfo uriInfoProxy;
     
-    private final PreconditionEvaluator preconditionEvaluatorProxy;
+    private final Request requestProxy;
     
     private final Map<Class<?>, Injectable> injectables;
             
@@ -115,7 +115,7 @@ public final class WebApplicationImpl implements WebApplication {
         };
         this.httpHeadersProxy = createProxy(HttpHeaders.class, i);
         this.uriInfoProxy = createProxy(UriInfo.class, i);
-        this.preconditionEvaluatorProxy = createProxy(PreconditionEvaluator.class, i);
+        this.requestProxy = createProxy(Request.class, i);
         
         this.injectables = createInjectables();
     }
@@ -391,10 +391,10 @@ public final class WebApplicationImpl implements WebApplication {
                 }
             );
             
-        injectables.put(PreconditionEvaluator.class,
-                new HttpContextInjectable<PreconditionEvaluator>() {
-                    public PreconditionEvaluator getInjectableValue(HttpContext c) {
-                        return preconditionEvaluatorProxy;
+        injectables.put(Request.class,
+                new HttpContextInjectable<Request>() {
+                    public Request getInjectableValue(HttpContext c) {
+                        return requestProxy;
                     }
                 }
             );

@@ -29,7 +29,7 @@ import java.util.GregorianCalendar;
 import javax.ws.rs.GET;
 import javax.ws.rs.core.EntityTag;
 import javax.ws.rs.core.HttpContext;
-import javax.ws.rs.core.PreconditionEvaluator;
+import javax.ws.rs.core.Request;
 import javax.ws.rs.core.Response;
 
 /**
@@ -45,12 +45,12 @@ public class PreconditionTest extends AbstractResourceTester {
 
     @Path("/")
     public static class LastModifiedResource {
-        @HttpContext PreconditionEvaluator evaluator;
+        @HttpContext Request request;
 
         @GET
         public Response doGet() {
             GregorianCalendar lastModified = new GregorianCalendar(2007, 0, 0, 0, 0, 0);
-            Response r = evaluator.evaluate(lastModified.getTime());
+            Response r = request.evaluatePreconditions(lastModified.getTime());
             if (r != null)
                 return r;
             
@@ -126,11 +126,11 @@ public class PreconditionTest extends AbstractResourceTester {
     
     @Path("/")
     public static class EtagResource {
-        @HttpContext PreconditionEvaluator evaluator;
+        @HttpContext Request request;
 
         @GET
         public Response doGet() {
-            Response r = evaluator.evaluate(new EntityTag("1"));
+            Response r = request.evaluatePreconditions(new EntityTag("1"));
             if (r != null)
                 return r;
             

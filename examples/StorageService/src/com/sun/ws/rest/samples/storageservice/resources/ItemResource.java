@@ -38,7 +38,7 @@ import javax.ws.rs.core.EntityTag;
 import javax.ws.rs.core.HttpContext;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.PreconditionEvaluator;
+import javax.ws.rs.core.Request;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 
@@ -48,14 +48,14 @@ import javax.ws.rs.core.UriInfo;
  */
 public class ItemResource {
     UriInfo uriInfo;
-    PreconditionEvaluator preconditionEvaluator;
+    Request request;
     String container;
     String item;
     
-    public ItemResource(UriInfo uriInfo, PreconditionEvaluator preconditionEvaluator,
+    public ItemResource(UriInfo uriInfo, Request request,
             String container, String item) {
         this.uriInfo = uriInfo;
-        this.preconditionEvaluator = preconditionEvaluator;
+        this.request = request;
         this.container = container;
         this.item = item;
     }
@@ -69,7 +69,7 @@ public class ItemResource {
             throw new NotFoundException("Item not found");
         Date lastModified = i.getLastModified().getTime();
         EntityTag et = new EntityTag(i.getDigest());
-        Response r = preconditionEvaluator.evaluate(lastModified, et);
+        Response r = request.evaluatePreconditions(lastModified, et);
         if (r != null)
             return r;
             
@@ -96,7 +96,7 @@ public class ItemResource {
         if (!MemoryStore.MS.hasItem(container, item)) {
             r = Response.created(uri).build();
         } else {
-            r = Response.ok().build();
+            r = Response.noContent().build();
         }
         
         Item ii = MemoryStore.MS.createOrUpdateItem(container, i, data);

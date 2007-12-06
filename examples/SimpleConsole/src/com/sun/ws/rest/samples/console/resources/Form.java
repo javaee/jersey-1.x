@@ -64,7 +64,7 @@ public class Form {
         Date now = new Date();
 
         InputStream entity = this.getClass().getResourceAsStream("form.html");
-        return Response.ok().entity(entity).
+        return Response.ok(entity).
                 cookie(new NewCookie("date",now.toString())).build();
     }
     

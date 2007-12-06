@@ -88,7 +88,7 @@ public class UserResource {
         String jsonUserid = jsonEntity.getString("userid");
         
         if ((null != jsonUserid) && !jsonUserid.equals(userid)) {
-            return Response.ok().status(409).entity("userids differ!\n").build();
+            return Response.status(409).entity("userids differ!\n").build();
         }
         
         final boolean newRecord = (null == userEntity); // insert or update ?

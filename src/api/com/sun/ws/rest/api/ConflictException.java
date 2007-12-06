@@ -44,7 +44,7 @@ public class ConflictException extends WebApplicationException {
      * @param message the String that is the entity of the 409 response.
      */
     public ConflictException(String message) {
-        super(Response.serverError().status(Responses.CONFLICT).
+        super(Response.status(Responses.CONFLICT).
                 entity(message).type("text/plain").build());
     }    
 }

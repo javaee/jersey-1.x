@@ -27,7 +27,7 @@ import com.sun.ws.rest.api.model.Parameter;
 import java.util.HashMap;
 import java.util.Map;
 import javax.ws.rs.core.HttpHeaders;
-import javax.ws.rs.core.PreconditionEvaluator;
+import javax.ws.rs.core.Request;
 import javax.ws.rs.core.UriInfo;
 
 /**
@@ -53,7 +53,7 @@ public final class HttpContextParameterProcessor implements ParameterProcessor {
         
         extractors.put(HttpHeaders.class, extractor);
         extractors.put(UriInfo.class, extractor);
-        extractors.put(PreconditionEvaluator.class, extractor);
+        extractors.put(Request.class, extractor);
     }
     
     public ParameterExtractor process(Parameter parameter) {

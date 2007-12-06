@@ -68,7 +68,7 @@ public class HeadTest extends AbstractResourceTester {
         
         @GET
         public Response get() {
-            return Response.ok().entity("GET").header("X-TEST", "GET").build();
+            return Response.ok("GET").header("X-TEST", "GET").build();
         }
     }
     
@@ -138,7 +138,7 @@ public class HeadTest extends AbstractResourceTester {
         @GET
         @ProduceMime("application/bar")
         public Response getBar() {
-            return Response.ok().entity("GET").header("X-TEST", "BAR-GET").build();
+            return Response.ok("GET").header("X-TEST", "BAR-GET").build();
         }
     }
     

@@ -36,7 +36,7 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.UriParam;
 import javax.ws.rs.Path;
 import javax.ws.rs.core.HttpContext;
-import javax.ws.rs.core.PreconditionEvaluator;
+import javax.ws.rs.core.Request;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 
@@ -47,11 +47,11 @@ import javax.ws.rs.core.UriInfo;
 @ProduceMime("application/xml")
 public class ContainerResource {
     @HttpContext UriInfo uriInfo;
-    @HttpContext PreconditionEvaluator preconditionEvaluator;
+    @HttpContext Request request;
     
-    ContainerResource(UriInfo uriInfo, PreconditionEvaluator preconditionEvaluator) {
+    ContainerResource(UriInfo uriInfo, Request request) {
         this.uriInfo = uriInfo;
-        this.preconditionEvaluator = preconditionEvaluator;
+        this.request = request;
     }
     
     @GET
@@ -89,7 +89,7 @@ public class ContainerResource {
         if (!MemoryStore.MS.hasContainer(c)) {
             r = Response.created(uri).build();
         } else {
-            r = Response.ok().build();
+            r = Response.noContent().build();
         }
         
         MemoryStore.MS.createContainer(c);
@@ -109,7 +109,7 @@ public class ContainerResource {
     @Path(value="{item}", limited=false)
     public ItemResource getItemResource(@UriParam("container") String container, 
             @UriParam("item") String item) {
-        return new ItemResource(uriInfo, preconditionEvaluator, container, item);
+        return new ItemResource(uriInfo, request, container, item);
     }
     
     private boolean match(byte[] search, String container, String item) {

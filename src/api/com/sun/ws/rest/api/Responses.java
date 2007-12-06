@@ -79,6 +79,6 @@ public final class Responses {
     }
     
     private static Response status(int status) {
-        return Response.serverError().status(status).build();                
+        return Response.status(status).build();                
     }
 }

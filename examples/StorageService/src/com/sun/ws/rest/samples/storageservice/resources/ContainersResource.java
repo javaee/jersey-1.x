@@ -28,7 +28,7 @@ import javax.ws.rs.GET;
 import javax.ws.rs.ProduceMime;
 import javax.ws.rs.Path;
 import javax.ws.rs.core.HttpContext;
-import javax.ws.rs.core.PreconditionEvaluator;
+import javax.ws.rs.core.Request;
 import javax.ws.rs.core.UriInfo;
 
 /**
@@ -39,11 +39,11 @@ import javax.ws.rs.core.UriInfo;
 @ProduceMime("application/xml")
 public class ContainersResource {
     @HttpContext UriInfo uriInfo;
-    @HttpContext PreconditionEvaluator preconditionEvaluator;
+    @HttpContext Request request;
     
     @Path("{container}")
     public ContainerResource getContainerResource() {
-        return new ContainerResource(uriInfo, preconditionEvaluator);
+        return new ContainerResource(uriInfo, request);
     }
     
     @GET

@@ -44,7 +44,7 @@ public class NotFoundException extends WebApplicationException {
      * @param message the String that is the entity of the 404 response.
      */
     public NotFoundException(String message) {
-        super(Response.serverError().status(Responses.NOT_FOUND).
+        super(Response.status(Responses.NOT_FOUND).
                 entity(message).type("text/plain").build());
     }
     

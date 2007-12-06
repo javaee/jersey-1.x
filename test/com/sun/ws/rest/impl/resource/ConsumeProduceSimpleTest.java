@@ -50,7 +50,7 @@ public class ConsumeProduceSimpleTest extends AbstractResourceTester {
         public void doPostHtml(HttpRequestContext request, HttpResponseContext response) {
             assertEquals("POST", request.getHttpMethod());
             assertEquals("text/html", request.getRequestHeaders().getFirst("Content-Type"));
-            response.setResponse(Response.ok().entity("HTML").build());
+            response.setResponse(Response.ok("HTML").build());
         }
         
         @POST
@@ -58,7 +58,7 @@ public class ConsumeProduceSimpleTest extends AbstractResourceTester {
         public void doPostXHtml(HttpRequestContext request, HttpResponseContext response) {
             assertEquals("POST", request.getHttpMethod());            
             assertEquals("text/xhtml", request.getRequestHeaders().getFirst("Content-Type"));
-            response.setResponse(Response.ok().entity("XHTML").build());
+            response.setResponse(Response.ok("XHTML").build());
         }
     }
         
@@ -69,7 +69,7 @@ public class ConsumeProduceSimpleTest extends AbstractResourceTester {
         public void doGetHtml(HttpRequestContext request, HttpResponseContext response) {
             assertEquals("GET", request.getHttpMethod());
             assertEquals("text/html", request.getRequestHeaders().getFirst("Accept"));
-            response.setResponse(Response.ok().entity("HTML").build());
+            response.setResponse(Response.ok("HTML").build());
         }
         
         @GET
@@ -77,7 +77,7 @@ public class ConsumeProduceSimpleTest extends AbstractResourceTester {
         public void doGetXhtml(HttpRequestContext request, HttpResponseContext response) {
             assertEquals("GET", request.getHttpMethod());            
             assertEquals("text/xhtml", request.getRequestHeaders().getFirst("Accept"));
-            response.setResponse(Response.ok().entity("XHTML").build());
+            response.setResponse(Response.ok("XHTML").build());
         }
     }
     
@@ -89,7 +89,7 @@ public class ConsumeProduceSimpleTest extends AbstractResourceTester {
         public void doGetHtml(HttpRequestContext request, HttpResponseContext response) {
             assertEquals("GET", request.getHttpMethod());
             assertEquals("text/html", request.getRequestHeaders().getFirst("Accept"));
-            response.setResponse(Response.ok().entity("HTML").build());
+            response.setResponse(Response.ok("HTML").build());
         }
         
         @GET
@@ -97,7 +97,7 @@ public class ConsumeProduceSimpleTest extends AbstractResourceTester {
         public void doGetXhtml(HttpRequestContext request, HttpResponseContext response) {
             assertEquals("GET", request.getHttpMethod());            
             assertEquals("text/xhtml", request.getRequestHeaders().getFirst("Accept"));
-            response.setResponse(Response.ok().entity("XHTML").build());
+            response.setResponse(Response.ok("XHTML").build());
         }
         
         @POST
@@ -105,7 +105,7 @@ public class ConsumeProduceSimpleTest extends AbstractResourceTester {
             assertEquals("POST", request.getHttpMethod());
             assertEquals("text/html", request.getRequestHeaders().getFirst("Content-Type"));
             assertEquals("text/html", request.getRequestHeaders().getFirst("Accept"));
-            response.setResponse(Response.ok().entity("HTML").build());
+            response.setResponse(Response.ok("HTML").build());
         }
         
         @POST
@@ -115,7 +115,7 @@ public class ConsumeProduceSimpleTest extends AbstractResourceTester {
             assertEquals("POST", request.getHttpMethod());            
             assertEquals("text/xhtml", request.getRequestHeaders().getFirst("Content-Type"));
             assertEquals("text/xhtml", request.getRequestHeaders().getFirst("Accept"));
-            response.setResponse(Response.ok().entity("XHTML").build());
+            response.setResponse(Response.ok("XHTML").build());
         }
     }
     

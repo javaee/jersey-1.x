@@ -63,6 +63,6 @@ public class EntryResource {
         InputStream in = FileStore.FS.getFileContents(mediaPath);
 
         // TODO set the content type
-        return Response.ok().entity(in).build();
+        return Response.ok(in).build();
     }        
 }

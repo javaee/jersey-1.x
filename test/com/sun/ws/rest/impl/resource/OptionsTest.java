@@ -102,7 +102,7 @@ public class OptionsTest extends AbstractResourceTester {
         
         @OPTIONS
         public Response options() {
-            return Response.ok().entity("OPTIONS").
+            return Response.ok("OPTIONS").
                     header("Allow", "GET, PUT, POST, DELETE, PATCH").build();
         }
         
