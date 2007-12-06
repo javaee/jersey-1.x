@@ -39,7 +39,7 @@ public abstract class AbstractHttpServerTester extends TestCase {
 
     public static final String CONTEXT = "/context";
     private HttpServer server;
-    private int port = findOutPortNumber();
+    private int port = getEnvVariable("JERSEY_HTTP_PORT", 9998);
 
     public AbstractHttpServerTester(String name) {
         super(name);
@@ -78,19 +78,9 @@ public abstract class AbstractHttpServerTester extends TestCase {
             throw new RuntimeException(ex);
         }
         server.start();
-        
         System.out.println("Started HttpServer");
-        
-        int timeToSleep = 0;
-        String httpServerSleepValue = System.getenv("JERSEY_HTTP_SLEEP");
-        if (null != httpServerSleepValue) {
-            try {
-                timeToSleep = Integer.parseInt(httpServerSleepValue);
-            } catch (NumberFormatException e) {
-                // will use the default value instead (0)
-            }
-        }
-        
+
+        int timeToSleep = getEnvVariable("JERSEY_HTTP_SLEEP", 0);
         if (timeToSleep > 0) {
             System.out.println("Sleeping for " + timeToSleep + " ms");
             try {
@@ -105,7 +95,7 @@ public abstract class AbstractHttpServerTester extends TestCase {
     public void stopServer() {
         if (server != null) {
             System.out.println("Stopping HttpServer port number = " + server.getAddress().getPort());
-            server.stop(0);
+            server.stop(getEnvVariable("JERSEY_HTTP_STOPSEC", 0));
             System.out.println("Stopped HttpServer");
         }
     }
@@ -115,16 +105,18 @@ public abstract class AbstractHttpServerTester extends TestCase {
         stopServer();
     }
     
-    private static int findOutPortNumber() {
-        int defPort = 9998;
-        String httpPortValue = System.getenv("JERSEY_HTTP_PORT");
-        if (null != httpPortValue) {
+    private static int getEnvVariable(final String varName, int defaultValue) {
+        if (null == varName) {
+            return defaultValue;
+        }
+        String varValue = System.getenv(varName);
+        if (null != varValue) {
             try {
-                return Integer.parseInt(httpPortValue);
+                return Integer.parseInt(varValue);
             }catch (NumberFormatException e) {
                 // will return default value bellow
             }
         }
-        return defPort;
+        return defaultValue;
     }
 }
