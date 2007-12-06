@@ -120,6 +120,8 @@ public final class URLConnectionResourceProxy extends ResourceProxy {
             throws ProtocolException, IOException {
         HttpURLConnection uc = (HttpURLConnection)u.openConnection();
 
+        uc.setReadTimeout(5000);
+        
         // Set the request method
         uc.setRequestMethod(method);
 
