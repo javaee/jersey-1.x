@@ -65,6 +65,9 @@ public abstract class AbstractHttpServerTester extends TestCase {
         if (server != null) {
             stopServer();
         }
+        
+        // want to make the information available in hudson cli output
+        System.out.println("HttpServer port number = " + port);
 
         URI u = UriBuilder.fromUri("http://localhost").port(port).path(CONTEXT).
                 build();
@@ -75,11 +78,24 @@ public abstract class AbstractHttpServerTester extends TestCase {
             throw new RuntimeException(ex);
         }
         server.start();
-        try {
-            // Wait for the server to start
-            Thread.sleep(1000);
-        } catch (InterruptedException ex) {
-            ex.printStackTrace();
+        
+        int timeToSleep = 0;
+        String httpServerSleepValue = System.getenv("JERSEY_HTTP_SLEEP");
+        if (null != httpServerSleepValue) {
+            try {
+                timeToSleep = Integer.parseInt(httpServerSleepValue);
+            } catch (NumberFormatException e) {
+                // will use the default value instead (0)
+            }
+        }
+
+        if (timeToSleep > 0) {
+            try {
+                // Wait for the server to start
+                Thread.sleep(timeToSleep);
+            } catch (InterruptedException ex) {
+                ex.printStackTrace();
+            }
         }
     }
 
