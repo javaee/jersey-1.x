@@ -64,14 +64,7 @@ public abstract class AbstractGrizzlyServerTester extends TestCase {
         }
         
         URI u = UriBuilder.fromUri("http://localhost").port(port).build();
-        selectorThread = GrizzlyServerFactory.create(u, adapter);
-        
-        try {    
-            // Wait for the server to start
-            Thread.sleep(1000); 
-        } catch (InterruptedException ex) {
-            ex.printStackTrace();
-        } 
+        selectorThread = GrizzlyServerFactory.create(u, adapter);        
     }
     
     public void stopServer() {

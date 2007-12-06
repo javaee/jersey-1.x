@@ -3,7 +3,6 @@ package com.sun.ws.rest.api.container.grizzly;
 import com.sun.grizzly.http.SelectorThread;
 import com.sun.grizzly.standalone.StaticStreamAlgorithm;
 import com.sun.grizzly.tcp.Adapter;
-import com.sun.ws.rest.api.container.ContainerException;
 import com.sun.ws.rest.api.container.ContainerFactory;
 import java.net.URI;
 
@@ -130,22 +129,7 @@ public final class GrizzlyServerFactory {
 
         selectorThread.setAdapter(adapter);
         
-        try {
-            selectorThread.initEndpoint();
-        } catch (Exception ex) {
-            throw new ContainerException(ex);
-        }
-
-        new Thread() {
-            public void run() {
-                try {
-                    selectorThread.startEndpoint();
-                } catch (Exception ex) {
-                    throw new ContainerException(ex);
-                }
-            }
-        }.start();
-        
+        selectorThread.listen();
         return selectorThread;
     }    
 }
