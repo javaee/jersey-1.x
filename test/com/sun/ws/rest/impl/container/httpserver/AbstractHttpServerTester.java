@@ -27,7 +27,6 @@ import com.sun.ws.rest.api.container.ContainerFactory;
 import com.sun.ws.rest.api.container.httpserver.HttpServerFactory;
 import com.sun.ws.rest.api.core.ResourceConfig;
 import java.io.IOException;
-import java.net.BindException;
 import java.net.URI;
 import javax.ws.rs.core.UriBuilder;
 import junit.framework.TestCase;
@@ -40,7 +39,7 @@ public abstract class AbstractHttpServerTester extends TestCase {
 
     public static final String CONTEXT = "/context";
     private HttpServer server;
-    private int port = 9998;
+    private int port = findOutPortNumber();
 
     public AbstractHttpServerTester(String name) {
         super(name);
@@ -93,5 +92,18 @@ public abstract class AbstractHttpServerTester extends TestCase {
     @Override
     public void tearDown() {
         stopServer();
+    }
+    
+    private static int findOutPortNumber() {
+        int defPort = 9998;
+        String httpPortValue = System.getenv("JERSEY_HTTP_PORT");
+        if (null != httpPortValue) {
+            try {
+                return Integer.parseInt(httpPortValue);
+            }catch (NumberFormatException e) {
+                // will return default value bellow
+            }
+        }
+        return defPort;
     }
 }
