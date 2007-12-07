@@ -5,6 +5,7 @@
 
 package com.sun.ws.rest.impl.wadl;
 
+import com.sun.ws.rest.api.MediaTypes;
 import com.sun.ws.rest.impl.AbstractResourceTester;
 import com.sun.ws.rest.impl.client.ResourceProxy;
 import java.io.File;
@@ -140,6 +141,25 @@ public class WadlResourceTest extends AbstractResourceTester {
         assertEquals(val,"1");
     }
 
+    public void testGetResourceWadl() throws ParserConfigurationException, SAXException, IOException, XPathExpressionException {
+        initiateWebApplication(WidgetsResource.class, ExtraResource.class);
+        ResourceProxy r = resourceProxy("/widgets");
+        
+        File tmpFile = r.acceptable(MediaTypes.WADL).get(File.class);
+        DocumentBuilderFactory bf = DocumentBuilderFactory.newInstance();
+        bf.setNamespaceAware(true);
+        bf.setValidating(false);
+        bf.setXIncludeAware(false);
+        DocumentBuilder b = bf.newDocumentBuilder();
+        Document d = b.parse(tmpFile);
+        printSource(new DOMSource(d));
+        XPath xp = XPathFactory.newInstance().newXPath();
+        xp.setNamespaceContext(new NSResolver("wadl", "http://research.sun.com/wadl/2006/10"));
+
+        // TODO add XPath checks
+        // TODO test ExtraResource
+    }
+    
     private static class NSResolver implements NamespaceContext {
         private String prefix;
         private String nsURI;

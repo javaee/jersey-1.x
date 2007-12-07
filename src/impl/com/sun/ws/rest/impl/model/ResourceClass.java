@@ -21,6 +21,7 @@
  */
 package com.sun.ws.rest.impl.model;
 
+import com.sun.ws.rest.api.MediaTypes;
 import com.sun.ws.rest.api.container.ContainerException;
 import com.sun.ws.rest.api.core.ResourceConfig;
 import com.sun.ws.rest.api.model.AbstractResource;
@@ -48,6 +49,8 @@ import com.sun.ws.rest.spi.resource.ResourceProviderFactory;
 import com.sun.ws.rest.spi.uri.rules.UriRule;
 import com.sun.ws.rest.spi.uri.rules.UriRules;
 import com.sun.ws.rest.spi.view.View;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -56,6 +59,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.logging.Logger;
 import javax.ws.rs.HttpMethod;
+import javax.ws.rs.core.MediaType;
 
 /**
  *
@@ -91,7 +95,6 @@ public final class ResourceClass {
 
         processViews(containerMemento, methodMap, patternMethodMap);
 
-
         // Create the rules for the sub-resource HTTP methods
         for (Map.Entry<PathPattern, ResourceMethodMap> e : patternMethodMap.entrySet()) {
             hasSubResourcesAux = true;
@@ -104,13 +107,24 @@ public final class ResourceClass {
         }
 
         // Create the rules for the HTTP methods
+        methodMap.sort();
+        /**
+         * Add WADL method after method map has been sorted.
+         * This ensures that application specific methods get priority
+         * but it means if a method produces a wild card like "*\/*"
+         * then that method will consume the request even if the client
+         * explicitly accepts the WADL media type.
+         * TODO consider using a sub-resource method with the URI path
+         * "application.wadl" that way there will be no conflict, or
+         * returning WADL with the OPTIONS method.
+         */
+        processWadl(resource, methodMap);        
         if (!methodMap.isEmpty()) {
-            methodMap.sort();
             // No need to adapt with the RightHandPathRule as the URI path
             // will be consumed when such a rule is accepted
             rulesMap.put(PathPattern.EMPTY_PATH, new HttpMethodRule(methodMap));
         }
-
+        
         if (rulesMap.isEmpty()) {
             String message = "The class " + resource.getResourceClass() +
                     " does not contain any sub-resource locators, sub-resource HTTP methods or HTTP methods";
@@ -340,5 +354,52 @@ public final class ResourceClass {
 
     private String getAbsolutePathOfClass(Class<?> resourceClass) {
         return "/" + resourceClass.getName().replace('.', '/').replace('$', '/');
+    }
+    
+    private void processWadl(AbstractResource resource, ResourceMethodMap methodMap) {
+        // Check if there is already a method that explicitly produces WADL
+        // If so do not override that method
+        if (methodMap.get("GET") != null) {
+            for (ResourceMethod getMethod : methodMap.get("GET")) {
+                for (MediaType m : getMethod.getProduceMime())
+                    if (m.equals(MediaTypes.WADL))
+                        return;
+            }
+        }
+        
+        ResourceMethod wadlMethod = createWadlMethod(resource);
+        if (wadlMethod != null) methodMap.put(wadlMethod);
+    }
+    
+    /**
+     * Create the WADL resource method.
+     * <p>
+     * This is created using reflection so that there is no runtime
+     * dependency on JAXB. If the JAXB jars are not in the class path
+     * then WADL generation will not be supported.
+     * 
+     * @param resource the resource model
+     * @return the WADL resource method
+     */
+    private ResourceMethod createWadlMethod(AbstractResource resource) {
+        try {
+            Class<?> wm = Class.forName("com.sun.ws.rest.impl.wadl.WadlMethod");
+            Constructor<?> wcc = wm.getConstructor(AbstractResource.class);
+            return (ResourceMethod)wcc.newInstance(resource);
+        } catch (InvocationTargetException e) {
+            if (e.getCause() instanceof NoClassDefFoundError) {
+                // Ignore
+            } else {
+                // TODO log warning
+            }
+        } catch(RuntimeException e) {
+            LOGGER.severe("Error configuring WADL support");
+            throw e;
+        } catch(Exception e) {
+            LOGGER.severe("Error configuring WADL support");
+            throw new ContainerException(e);
+        }
+        
+        return null;
     }
 }

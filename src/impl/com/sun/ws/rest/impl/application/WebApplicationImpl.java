@@ -308,6 +308,8 @@ public final class WebApplicationImpl implements WebApplication {
                         "because dependent Java classes cannot be found." + 
                         "This is most likely because JAXB jars are not included in the java class path." +
                         "To enable WADL include JAXB 2.x jars in the java class path.");
+            } else {
+                // TODO log warning
             }
         } catch(RuntimeException e) {
             LOGGER.severe("Error configuring WADL support");
