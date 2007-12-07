@@ -145,6 +145,7 @@ public class WadlResourceTest extends AbstractResourceTester {
         initiateWebApplication(WidgetsResource.class, ExtraResource.class);
         ResourceProxy r = resourceProxy("/widgets");
         
+        // test WidgetsResource
         File tmpFile = r.acceptable(MediaTypes.WADL).get(File.class);
         DocumentBuilderFactory bf = DocumentBuilderFactory.newInstance();
         bf.setNamespaceAware(true);
@@ -156,8 +157,56 @@ public class WadlResourceTest extends AbstractResourceTester {
         XPath xp = XPathFactory.newInstance().newXPath();
         xp.setNamespaceContext(new NSResolver("wadl", "http://research.sun.com/wadl/2006/10"));
 
-        // TODO add XPath checks
-        // TODO test ExtraResource
+        // check base URI
+        String val = (String)xp.evaluate("/wadl:application/wadl:resources/@base", d, XPathConstants.STRING);
+        assertEquals(val,"/base/");
+        // check total number of resources is 3 (no ExtraResource details included)
+        val = (String)xp.evaluate("count(//wadl:resource)", d, XPathConstants.STRING);
+        assertEquals(val,"3");
+        // check only once resource with for {id}
+        val = (String)xp.evaluate("count(//wadl:resource[@path='{id}'])", d, XPathConstants.STRING);
+        assertEquals(val,"1");
+        // check only once resource with for {id}/verbose
+        val = (String)xp.evaluate("count(//wadl:resource[@path='{id}/verbose'])", d, XPathConstants.STRING);
+        assertEquals(val,"1");
+        // check only once resource with for widgets
+        val = (String)xp.evaluate("count(//wadl:resource[@path='widgets'])", d, XPathConstants.STRING);
+        assertEquals(val,"1");
+        // check 3 methods for {id}
+        val = (String)xp.evaluate("count(//wadl:resource[@path='{id}']/wadl:method)", d, XPathConstants.STRING);
+        assertEquals(val,"3");
+        // check 2 methods for widgets
+        val = (String)xp.evaluate("count(//wadl:resource[@path='widgets']/wadl:method)", d, XPathConstants.STRING);
+        assertEquals(val,"2");
+        // check type of {id} is int
+        val = (String)xp.evaluate("//wadl:resource[@path='{id}']/wadl:param[@name='id']/@type", d, XPathConstants.STRING);
+        assertEquals(val,"xs:int");
+        // check number of output representations is two
+        val = (String)xp.evaluate("count(//wadl:resource[@path='widgets']/wadl:method[@name='GET']/wadl:response/wadl:representation)", d, XPathConstants.STRING);
+        assertEquals(val,"2");
+        // check number of output representations is one
+        val = (String)xp.evaluate("count(//wadl:resource[@path='widgets']/wadl:method[@name='POST']/wadl:request/wadl:representation)", d, XPathConstants.STRING);
+        assertEquals(val,"1");
+
+        // test ExtraResource
+        r = resourceProxy("/foo");
+        
+        tmpFile = r.acceptable(MediaTypes.WADL).get(File.class);
+        b = bf.newDocumentBuilder();
+        d = b.parse(tmpFile);
+        printSource(new DOMSource(d));
+        // check base URI
+        val = (String)xp.evaluate("/wadl:application/wadl:resources/@base", d, XPathConstants.STRING);
+        assertEquals(val,"/base/");
+        // check total number of resources is 1 (no ExtraResource details included)
+        val = (String)xp.evaluate("count(//wadl:resource)", d, XPathConstants.STRING);
+        assertEquals(val,"1");
+        // check only once resource with path foo
+        val = (String)xp.evaluate("count(//wadl:resource[@path='foo'])", d, XPathConstants.STRING);
+        assertEquals(val,"1");
+        // check 0 methods for foo
+        val = (String)xp.evaluate("count(//wadl:resource[@path='foo']/wadl:method)", d, XPathConstants.STRING);
+        assertEquals(val,"0");
     }
     
     private static class NSResolver implements NamespaceContext {
