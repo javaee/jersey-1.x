@@ -26,6 +26,7 @@ import com.sun.net.httpserver.HttpServer;
 import com.sun.ws.rest.api.container.ContainerFactory;
 import com.sun.ws.rest.api.container.httpserver.HttpServerFactory;
 import com.sun.ws.rest.api.core.ResourceConfig;
+import com.sun.ws.rest.impl.test.util.TestHelper;
 import java.io.IOException;
 import java.net.URI;
 import javax.ws.rs.core.UriBuilder;
@@ -39,7 +40,7 @@ public abstract class AbstractHttpServerTester extends TestCase {
 
     public static final String CONTEXT = "/context";
     private HttpServer server;
-    private int port = getEnvVariable("JERSEY_HTTP_PORT", 9998);
+    private int port = TestHelper.getEnvVariable("JERSEY_HTTP_PORT", 9998);
 
     public AbstractHttpServerTester(String name) {
         super(name);
@@ -80,7 +81,7 @@ public abstract class AbstractHttpServerTester extends TestCase {
         server.start();
         System.out.println("Started HttpServer");
 
-        int timeToSleep = getEnvVariable("JERSEY_HTTP_SLEEP", 0);
+        int timeToSleep = TestHelper.getEnvVariable("JERSEY_HTTP_SLEEP", 0);
         if (timeToSleep > 0) {
             System.out.println("Sleeping for " + timeToSleep + " ms");
             try {
@@ -95,7 +96,7 @@ public abstract class AbstractHttpServerTester extends TestCase {
     public void stopServer() {
         if (server != null) {
             System.out.println("Stopping HttpServer port number = " + server.getAddress().getPort());
-            server.stop(getEnvVariable("JERSEY_HTTP_STOPSEC", 0));
+            server.stop(TestHelper.getEnvVariable("JERSEY_HTTP_STOPSEC", 0));
             System.out.println("Stopped HttpServer");
         }
     }
@@ -105,18 +106,5 @@ public abstract class AbstractHttpServerTester extends TestCase {
         stopServer();
     }
     
-    private static int getEnvVariable(final String varName, int defaultValue) {
-        if (null == varName) {
-            return defaultValue;
-        }
-        String varValue = System.getenv(varName);
-        if (null != varValue) {
-            try {
-                return Integer.parseInt(varValue);
-            }catch (NumberFormatException e) {
-                // will return default value bellow
-            }
-        }
-        return defaultValue;
-    }
+
 }

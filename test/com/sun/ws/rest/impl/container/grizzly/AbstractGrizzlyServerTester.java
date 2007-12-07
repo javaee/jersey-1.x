@@ -27,6 +27,7 @@ import com.sun.grizzly.tcp.Adapter;
 import com.sun.ws.rest.api.container.ContainerFactory;
 import com.sun.ws.rest.api.container.grizzly.GrizzlyServerFactory;
 import com.sun.ws.rest.api.core.ResourceConfig;
+import com.sun.ws.rest.impl.test.util.TestHelper;
 import java.net.URI;
 import javax.ws.rs.core.UriBuilder;
 import junit.framework.TestCase;
@@ -40,7 +41,7 @@ public abstract class AbstractGrizzlyServerTester extends TestCase {
 
     private SelectorThread selectorThread;
 
-    private int port = 9997;
+    private int port = TestHelper.getEnvVariable("JERSEY_HTTP_PORT", 9997);
     
     public AbstractGrizzlyServerTester(String name) {
         super(name);
@@ -62,9 +63,23 @@ public abstract class AbstractGrizzlyServerTester extends TestCase {
         if (selectorThread != null && selectorThread.isRunning()){
             stopServer();
         }
+
+        System.out.println("Starting GrizzlyServer port number = " + port);
         
         URI u = UriBuilder.fromUri("http://localhost").port(port).build();
-        selectorThread = GrizzlyServerFactory.create(u, adapter);        
+        selectorThread = GrizzlyServerFactory.create(u, adapter);
+        System.out.println("Started GrizzlyServer");
+
+        int timeToSleep = TestHelper.getEnvVariable("JERSEY_HTTP_SLEEP", 0);
+        if (timeToSleep > 0) {
+            System.out.println("Sleeping for " + timeToSleep + " ms");
+            try {
+                // Wait for the server to start
+                Thread.sleep(timeToSleep);
+            } catch (InterruptedException ex) {
+                System.out.println("Sleeping interrupted: " + ex.getLocalizedMessage());
+            }
+        }
     }
     
     public void stopServer() {
@@ -73,6 +88,7 @@ public abstract class AbstractGrizzlyServerTester extends TestCase {
         }
     }
     
+    @Override
     public void tearDown() {
         stopServer();
     }
