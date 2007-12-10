@@ -31,7 +31,6 @@ import javax.ws.rs.Path;
  *
  * @author Paul.Sandoz@Sun.Com
  */
-@SuppressWarnings("unchecked")
 public class GenericInheritanceTest extends AbstractResourceTester {
     
     public GenericInheritanceTest(String testName) {
