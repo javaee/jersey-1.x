@@ -27,6 +27,9 @@ import com.sun.ws.rest.impl.client.ResponseInBound;
 import javax.ws.rs.GET;
 import javax.ws.rs.ProduceMime;
 import javax.ws.rs.Path;
+import javax.ws.rs.core.HttpContext;
+import javax.ws.rs.core.Request;
+import javax.ws.rs.core.UriInfo;
 
 /**
  *
@@ -39,19 +42,25 @@ public class InheritanceTest extends AbstractResourceTester {
         super(testName);
     }
 
-    static public abstract class SuperResource { 
+    static public abstract class SuperResource {
+        @HttpContext UriInfo info;
+        
         @GET
         @ProduceMime("application/super")
         public String doGet() {
+            assertNotNull(info);
             return "super";
         }
     }
     
     @Path("/")
     static public class SubResource extends SuperResource { 
+        @HttpContext Request request;
+        
         @GET
         @ProduceMime("application/sub")
         public String doGetSub() {
+            assertNotNull(request);
             return "sub";
         }
     }

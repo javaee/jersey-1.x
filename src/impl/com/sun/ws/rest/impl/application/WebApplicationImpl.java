@@ -167,12 +167,17 @@ public final class WebApplicationImpl implements WebApplication {
      * @param resource the resource instance
      */
     public void injectResources(Object resource) {
-        Class resourceClass = resource.getClass();
-        for (Field f : resourceClass.getDeclaredFields()) {
-            
-            Injectable i = injectables.get(f.getType());
-            if (i != null)
-                i.inject(resource, f);
+        injectResources(resource.getClass(), resource);
+    }
+    
+    private void injectResources(Class resourceClass, Object resource) {
+        while (resourceClass != null) {
+            for (Field f : resourceClass.getDeclaredFields()) {            
+                Injectable i = injectables.get(f.getType());
+                if (i != null)
+                    i.inject(resource, f);
+            }
+            resourceClass = resourceClass.getSuperclass();
         }
     }
     
