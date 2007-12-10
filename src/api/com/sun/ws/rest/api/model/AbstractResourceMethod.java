@@ -27,17 +27,19 @@ import javax.ws.rs.core.MediaType;
  * Abstraction for a resource method
  */
 public class AbstractResourceMethod implements Parameterized, AbstractModelComponent {
-
+    private AbstractResource resource;
     private List<MediaType> consumeMimeList;
     private List<MediaType> produceMimeList;
     private List<Parameter> parameters;
     private String httpMethod;
     private Method method;
 
-    public AbstractResourceMethod(Method method, String httpMethod) {
+    public AbstractResourceMethod(AbstractResource resource, 
+            Method method, String httpMethod) {
         
         assert null != method;
-        
+
+        this.resource = resource;
         this.method = method;
         this.httpMethod = httpMethod;
         this.consumeMimeList = new ArrayList<MediaType>();
@@ -45,6 +47,10 @@ public class AbstractResourceMethod implements Parameterized, AbstractModelCompo
         this.parameters = new ArrayList<Parameter>();
     }
 
+    public AbstractResource getDeclaringResource() {
+        return resource;
+    }
+    
     public List<MediaType> getSupportedInputTypes() {
         return consumeMimeList;
     }

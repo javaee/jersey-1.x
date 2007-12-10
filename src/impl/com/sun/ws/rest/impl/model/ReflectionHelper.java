@@ -33,6 +33,9 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import java.lang.reflect.TypeVariable;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  *
@@ -134,4 +137,64 @@ public final class ReflectionHelper {
             return null;
         }
     }    
+    
+    /**
+     * Given a type variable resolve the Java class of that variable.
+     * 
+     * @param c the concrete class from which all type variables are resolved
+     * @param dc the declaring class where the type variable was defined
+     * @param tv the type variable
+     * @return the resolved Java class, otherwise null if the type variable
+     *         could not be resolved
+     */
+    public static Class resolveTypeVariable(Class c, Class dc, TypeVariable tv) {
+        return resolveTypeVariable(c, dc, tv, new HashMap<TypeVariable, Type>());
+    }
+    
+    private static Class resolveTypeVariable(Class c, Class dc, TypeVariable tv, 
+            Map<TypeVariable, Type> map) {
+        ParameterizedType pt = (ParameterizedType)c.getGenericSuperclass();
+        Type[] typeArguments = pt.getActualTypeArguments();
+        
+        Class sc = c.getSuperclass();        
+        TypeVariable[] typeParameters = sc.getTypeParameters();
+        
+        Map<TypeVariable, Type> submap = new HashMap<TypeVariable, Type>();
+        for (int i = 0; i < typeArguments.length; i++) {
+            // Substitute a type variable with the Java class
+            if (typeArguments[i] instanceof TypeVariable) {
+                Type t = map.get(typeArguments[i]);
+                submap.put(typeParameters[i], t);
+            } else {
+                submap.put(typeParameters[i], typeArguments[i]);
+            }
+        }
+        
+        if (sc == dc) {
+            Type t = submap.get(tv);
+            if (t instanceof Class) {
+                return (Class)t;
+            } else if (t instanceof GenericArrayType) {
+                t = ((GenericArrayType)t).getGenericComponentType();
+                if (t instanceof Class) {
+                    c = (Class)t;
+                    try {
+                        // TODO is there a better way to get the Class object 
+                        // representing an array
+                        Object o = Array.newInstance(c, 0);
+                        return o.getClass();
+                    } catch (Exception e) {
+                    } 
+                    return null;
+                } else {
+                    return null;
+                }
+            } else {
+                return null;
+            }
+        } else {    
+            return resolveTypeVariable(sc, dc, tv, submap);
+        }
+    }
+    
 }

@@ -19,7 +19,6 @@
 package com.sun.ws.rest.api.model;
 
 import java.lang.reflect.Method;
-import java.util.List;
 
 /**
  *
@@ -29,8 +28,9 @@ public class AbstractSubResourceMethod extends AbstractResourceMethod implements
 
     private UriTemplateValue uriTemplate;
 
-    public AbstractSubResourceMethod(Method method, UriTemplateValue uriTemplate, String httpMethod) {
-        super(method, httpMethod);
+    public AbstractSubResourceMethod(AbstractResource resource,
+            Method method, UriTemplateValue uriTemplate, String httpMethod) {
+        super(resource, method, httpMethod);
         this.uriTemplate = uriTemplate;
     }
 

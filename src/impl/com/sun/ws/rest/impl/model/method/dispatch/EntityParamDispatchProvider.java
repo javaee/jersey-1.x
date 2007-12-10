@@ -29,11 +29,13 @@ import com.sun.ws.rest.api.core.HttpResponseContext;
 import com.sun.ws.rest.api.model.AbstractResourceMethod;
 import com.sun.ws.rest.api.model.Parameter;
 import com.sun.ws.rest.impl.ResponseBuilderImpl;
+import com.sun.ws.rest.impl.model.ReflectionHelper;
 import com.sun.ws.rest.spi.dispatch.RequestDispatcher;
 import com.sun.ws.rest.impl.model.parameter.ParameterExtractor;
 import com.sun.ws.rest.impl.model.parameter.ParameterProcessor;
 import com.sun.ws.rest.impl.model.parameter.ParameterProcessorFactory;
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.TypeVariable;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
@@ -217,7 +219,16 @@ public class EntityParamDispatchProvider implements ResourceMethodDispatchProvid
                 return null;
             }
             
-            return new EntityExtractor(parameter.getParameterClass());
+            if (parameter.getParameterType() instanceof TypeVariable) {
+                Class c = ReflectionHelper.resolveTypeVariable(
+                        method.getDeclaringResource().getResourceClass(), 
+                        method.getMethod().getDeclaringClass(),
+                        (TypeVariable)parameter.getParameterType());
+                
+                return (c != null) ? new EntityExtractor(c) : null;
+            } else {
+                return new EntityExtractor(parameter.getParameterClass());
+            }
         }
 
         ParameterProcessor p = ParameterProcessorFactory.createParameterProcessor(parameter.getSource());

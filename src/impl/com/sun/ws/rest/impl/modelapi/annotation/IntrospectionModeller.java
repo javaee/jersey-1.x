@@ -134,7 +134,9 @@ public class IntrospectionModeller {
         // Should the method be added more than once to the model and
         // then validation could reject?
         for (Method method : methodList.hasMetaAnnotation(HttpMethod.class).hasNotAnnotation(Path.class)) {
-            final AbstractResourceMethod resourceMethod = new AbstractResourceMethod(method, 
+            final AbstractResourceMethod resourceMethod = new AbstractResourceMethod(
+                    resource,
+                    method, 
                     getMetaAnnotations(method, HttpMethod.class).get(0).value());
 
             findOutConsumeMimeTypes(resourceMethod, classScopeConsumeMimeAnnotation);
@@ -155,9 +157,10 @@ public class IntrospectionModeller {
         for (Method method : methodList.hasMetaAnnotation(HttpMethod.class).hasAnnotation(Path.class)) {
             final Path mPathAnnotation = method.getAnnotation(Path.class);
             final AbstractSubResourceMethod subResourceMethod = new AbstractSubResourceMethod(
-                        method,
-                        new UriTemplateValue(mPathAnnotation.value(), mPathAnnotation.encode(), mPathAnnotation.limited()),
-                        getMetaAnnotations(method, HttpMethod.class).get(0).value());
+                    resource,
+                    method,
+                    new UriTemplateValue(mPathAnnotation.value(), mPathAnnotation.encode(), mPathAnnotation.limited()),
+                    getMetaAnnotations(method, HttpMethod.class).get(0).value());
        
             findOutConsumeMimeTypes(subResourceMethod, classScopeConsumeMimeAnnotation);
             findOutProduceMimeTypes(subResourceMethod, classScopeProduceMimeAnnotation);

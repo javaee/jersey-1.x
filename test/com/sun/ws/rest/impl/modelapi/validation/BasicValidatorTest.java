@@ -69,10 +69,10 @@ public class BasicValidatorTest extends TestCase {
         BasicValidator validator = new BasicValidator();
         AbstractResourceMethod arm;
 
-        arm = new AbstractResourceMethod(TestResourceARM.class.getMethod("getStringMethod"), "GET");
+        arm = new AbstractResourceMethod(null, TestResourceARM.class.getMethod("getStringMethod"), "GET");
         assertTrue(validator.getIssueList().isEmpty());
         
-        arm = new AbstractResourceMethod(TestResourceARM.class.getMethod("getMethod"), "GET");
+        arm = new AbstractResourceMethod(null, TestResourceARM.class.getMethod("getMethod"), "GET");
         validator.validate(arm);
         assertTrue(!validator.getIssueList().isEmpty());
         printIssueList(validator);
@@ -100,13 +100,15 @@ public class BasicValidatorTest extends TestCase {
     
     public void testValidateASRM() throws NoSuchMethodException {
         BasicValidator validator = new BasicValidator();
-        AbstractSubResourceMethod asrm = new AbstractSubResourceMethod(TestResourceASRM.class.getMethod("subResMethod"), null, "GET");
+        AbstractSubResourceMethod asrm = new AbstractSubResourceMethod(
+                null, TestResourceASRM.class.getMethod("subResMethod"), null, "GET");
         validator.validate(asrm);
         int issueCount = validator.getIssueList().size();
         printIssueList(validator);
         assertTrue(issueCount > 0);
         validator.cleanIssueList();
-        asrm = new AbstractSubResourceMethod(TestResourceASRM.class.getMethod("subResMethod"), new UriTemplateValue("test"), "GET");
+        asrm = new AbstractSubResourceMethod(
+                null, TestResourceASRM.class.getMethod("subResMethod"), new UriTemplateValue("test"), "GET");
         validator.validate(asrm);
         assertTrue((issueCount - 1) == validator.getIssueList().size());
     }

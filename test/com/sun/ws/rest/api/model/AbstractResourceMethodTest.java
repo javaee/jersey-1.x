@@ -42,7 +42,8 @@ public class AbstractResourceMethodTest extends TestCase {
      * Test of getHttpMethod method, of class AbstractResourceMethod.
      */
     public void testGetHttpMethod() throws NoSuchMethodException {
-        AbstractResourceMethod arm = new AbstractResourceMethod(TestResource.class.getMethod("getMethod"), "PUT");
+        AbstractResourceMethod arm = new AbstractResourceMethod(
+                null, TestResource.class.getMethod("getMethod"), "PUT");
         assertEquals("PUT", arm.getHttpMethod());
     }
 }

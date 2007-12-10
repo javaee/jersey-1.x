@@ -40,21 +40,34 @@ public class GenericInheritanceTest extends AbstractResourceTester {
 
     static public abstract class GenericSuperResource<T> {
         @PUT
-        public void update(T t) {
-            System.out.println(t.toString());
+        public String update(T t) {
+            return t.getClass().getName();
         }
     }
     
     @Path("/")
-    static public class GenericSubResource extends GenericSuperResource<String> {
+    static public class StringSubResource extends GenericSuperResource<String> {
         @POST
-        public void create(String t) {
-            System.out.println(t.toString());
+        public String create(String t) {
+            return t;
         }    
     }
     
-    public void testGenericSuperResourcePut() {
-        initiateWebApplication(GenericSubResource.class);
-        resourceProxy("/").put("test");
+    @Path("/")
+    static public class ByteArraySubResource extends GenericSuperResource<byte[]> {
+        @POST
+        public byte[] create(byte[] t) {
+            return t;
+        }    
+    }
+    
+    public void testStringSubResource() {
+        initiateWebApplication(StringSubResource.class);
+        assertEquals("java.lang.String", resourceProxy("/").put(String.class, "string"));
+    }
+    
+    public void testByteArraySubResource() {
+        initiateWebApplication(ByteArraySubResource.class);
+        assertEquals("[B", resourceProxy("/").put(String.class, "bytes"));
     }    
 }
