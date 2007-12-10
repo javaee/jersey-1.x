@@ -35,7 +35,6 @@ import javax.ws.rs.UriParam;
  *
  * @author Paul.Sandoz@Sun.Com
  */
-@SuppressWarnings("unchecked")
 public class ContainerItemMatrixTest extends AbstractResourceTester {
     
     public ContainerItemMatrixTest(String testName) {
