@@ -56,7 +56,17 @@ public class ContainerItemMatrixTest extends AbstractResourceTester {
         
         @Path("items-no-slash")
         public ItemResource getItemsNoSlashResource() {
-            return new ItemResource(containerId);
+            return new ItemNoSlashResource(containerId);
+        }
+        
+        @Path("items-id/{id}")
+        public ItemResource getItemsIdResource() {
+            return new ItemIdResource(containerId);
+        }
+        
+        @Path("items-id-no-slash/{id}")
+        public ItemResource getItemsIdNoSlashResource() {
+            return new ItemIdNoSlashResource(containerId);
         }
         
         @GET
@@ -96,38 +106,74 @@ public class ContainerItemMatrixTest extends AbstractResourceTester {
     }
     
     @Path("/items-no-slash")
-    public static class ItemNoSlashResource {
-        String containerId;
-        
+    public static class ItemNoSlashResource extends ItemResource{
         public ItemNoSlashResource() {
+            super();
             this.containerId = null;
         }
         
         ItemNoSlashResource(String containerId) {
-            this.containerId = containerId;
-        }
-        
-        @GET
-        public String get(@MatrixParam("ids") List<String> ids) {
-            StringBuilder sb = new StringBuilder();
-            if (containerId != null) {
-                sb.append(containerId).append(":");
-            }
-            boolean first = true;
-            for (String id : ids) {
-                if (!first)
-                    sb.append(";");
-                first = false;
-                sb.append(id);
-            }
-            
-            return sb.toString();
+            super(containerId);
         }
     }
+    
+    @Path("/items-id/{id}")
+    public static class ItemIdResource extends ItemResource {
+        public ItemIdResource() {
+            super();
+            this.containerId = null;
+        }
+        
+        ItemIdResource(String containerId) {
+            super(containerId);
+        }
+    }
+    
+    @Path("/items-id-no-slash/{id}")
+    public static class ItemIdNoSlashResource extends ItemResource {
+        public ItemIdNoSlashResource() {
+            super();
+            this.containerId = null;
+        }
+        
+        ItemIdNoSlashResource(String containerId) {
+            super(containerId);
+        }
+    }
+    
     
     public void testGetItem() throws IOException {
         initiateWebApplication(ContainerResource.class, ItemResource.class);
         ResourceProxy r = resourceProxy("/items/;ids=1;ids=2;ids=3");
+        
+        assertEquals("1;2;3", r.get(String.class));
+    }   
+    
+    public void testGetItemId() throws IOException {
+        initiateWebApplication(ItemIdResource.class);
+        ResourceProxy r = resourceProxy("/items-id/item;ids=1;ids=2;ids=3");
+        
+        assertEquals("1;2;3", r.get(String.class));
+        
+        r = resourceProxy("/items-id/;ids=1;ids=2;ids=3");
+        
+        assertEquals("1;2;3", r.get(String.class));
+    }   
+    
+    public void testGetItemNoSlash() throws IOException {
+        initiateWebApplication(ItemNoSlashResource.class);
+        ResourceProxy r = resourceProxy("/items-no-slash/;ids=1;ids=2;ids=3");
+        
+        assertEquals("1;2;3", r.get(String.class));
+    }   
+    
+    public void testGetItemIdNoSlash() throws IOException {
+        initiateWebApplication(ItemIdNoSlashResource.class);
+        ResourceProxy r = resourceProxy("/items-id-no-slash/item;ids=1;ids=2;ids=3");
+        
+        assertEquals("1;2;3", r.get(String.class));
+        
+        r = resourceProxy("/items-id-no-slash/;ids=1;ids=2;ids=3");
         
         assertEquals("1;2;3", r.get(String.class));
     }   
@@ -146,11 +192,15 @@ public class ContainerItemMatrixTest extends AbstractResourceTester {
         assertEquals("c:1;2;3", r.get(String.class));
     }   
     
-    public void testGetItemNoSlash() throws IOException {
-        initiateWebApplication(ItemNoSlashResource.class);
-        ResourceProxy r = resourceProxy("/items-no-slash/;ids=1;ids=2;ids=3");
+    public void testGetContainerItemId() throws IOException {
+        initiateWebApplication(ContainerResource.class, ItemResource.class);
+        ResourceProxy r = resourceProxy("/container/c/items-id/;ids=1;ids=2;ids=3");
         
-        assertEquals("1;2;3", r.get(String.class));
+        assertEquals("c:1;2;3", r.get(String.class));
+        
+        r = resourceProxy("/container/c/items-id/item;ids=1;ids=2;ids=3");
+        
+        assertEquals("c:1;2;3", r.get(String.class));
     }   
     
     public void testGetContainerItemNoSlash() throws IOException {
@@ -160,4 +210,14 @@ public class ContainerItemMatrixTest extends AbstractResourceTester {
         assertEquals("c:1;2;3", r.get(String.class));
     }   
     
+    public void testGetContainerItemIdNoSlash() throws IOException {
+        initiateWebApplication(ContainerResource.class, ItemResource.class);
+        ResourceProxy r = resourceProxy("/container/c/items-id-no-slash/;ids=1;ids=2;ids=3");
+ 
+        assertEquals("c:1;2;3", r.get(String.class));
+
+        r = resourceProxy("/container/c/items-id-no-slash/item;ids=1;ids=2;ids=3");
+ 
+        assertEquals("c:1;2;3", r.get(String.class));
+    }   
 }
