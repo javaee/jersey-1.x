@@ -1,4 +1,9 @@
 release 0.5 (2008-01-18)
+- Updated NetBeans project files of Jersey and the examples files to 
+  version 6.0
+- Fixed bug for HTTP methods on a super class that have an entity parameter 
+  that is a (generic) type variable.
+- Fixed bug for injecting onto fields of a super class
 - Fixed issue 25: UriBuilder uri() not concatinating properly
   https://jersey.dev.java.net/issues/show_bug.cgi?id=25
 - Grizzly support is upgraded to the latest jars.
