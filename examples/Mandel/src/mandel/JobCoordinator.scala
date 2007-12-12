@@ -48,6 +48,10 @@ class JobCoordinator(n: int) {
         }}
     }
 
+    def job (j: => unit) : unit = {
+        coordinator ! new Job { def execute = j }
+    }
+
     def ! (j : Job) : unit = {
         coordinator ! j
     }

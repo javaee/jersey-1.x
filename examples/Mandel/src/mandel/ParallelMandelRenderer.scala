@@ -17,7 +17,7 @@ class ParallelMandelRenderer(n: int,
 
     override def render() : unit = {
         val c = new JobCoordinator(n)
-        yRanges foreach ( x => c ! (new c.Job { def execute = render(x._1, x._2) }) )
+        yRanges foreach ( x => c.job { render(x._1, x._2) } )
         c.waitForCompletion
     } 
 }
