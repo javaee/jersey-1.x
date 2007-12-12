@@ -1,6 +1,5 @@
 release 0.5 (2008-01-18)
-- Updated NetBeans project files of Jersey and the examples files to 
-  version 6.0
+- Updated NetBeans project files of Jersey and the examples to version 6.0
 - Fixed bug for HTTP methods on a super class that have an entity parameter 
   that is a (generic) type variable.
 - Fixed bug for injecting onto fields of a super class
