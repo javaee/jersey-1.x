@@ -24,8 +24,6 @@ package com.sun.ws.rest.impl.http.header.reader;
 
 import com.sun.ws.rest.impl.http.header.HttpDateFormat;
 import com.sun.ws.rest.impl.http.header.QualityFactor;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -239,24 +237,31 @@ public abstract class HttpHeaderReader {
             return o2.getQuality() - o1.getQuality();
         }
     }
+
+    public static interface ListElementCreator<T> {
+        T create(HttpHeaderReader reader)  throws ParseException;
+    }
     
-    @SuppressWarnings("unchecked")
-    public static <T> List<T> readList(Class<T> c, String header) throws ParseException, NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException {
-        Constructor<T> constructor = c.getConstructor(HttpHeaderReader.class);
-        
+    public static <T> List<T> readList(ListElementCreator<T> c, 
+            String header) throws ParseException {
         List<T> l = new ArrayList<T>();
         HttpHeaderReader reader = new HttpHeaderReaderImpl(header);
         HttpHeaderListAdapter adapter = new HttpHeaderListAdapter(reader);
         while(reader.hasNext()) {
-            l.add(constructor.newInstance(adapter));
+            l.add(c.create(adapter));
             adapter.reset();
             if (reader.hasNext())
                 reader.next();
         }
+        
+        return l;
+    }   
     
-        if (QualityFactor.class.isAssignableFrom(c)) {
-            Collections.sort((List<QualityFactor>)l, new QualityComparator());
-        }
+    public static <T extends QualityFactor> List<T> readAcceptableList(
+            ListElementCreator<T> c, 
+            String header) throws ParseException {
+        List<T> l = readList(c, header);
+        Collections.sort(l, new QualityComparator());
         return l;
     }
 }

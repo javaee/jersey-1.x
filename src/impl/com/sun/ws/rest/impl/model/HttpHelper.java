@@ -26,9 +26,11 @@ import com.sun.ws.rest.api.core.HttpRequestContext;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import com.sun.ws.rest.impl.ImplMessages;
-import java.util.HashSet;
+import com.sun.ws.rest.impl.http.header.AcceptableLanguageTag;
+import com.sun.ws.rest.impl.http.header.AcceptableToken;
+import com.sun.ws.rest.impl.http.header.HttpHeaderFactory;
+import java.util.Collections;
 import java.util.List;
-import java.util.Set;
 import javax.ws.rs.core.Response;
 
 /**
@@ -37,51 +39,7 @@ import javax.ws.rs.core.Response;
  * @author Paul.Sandoz@Sun.Com
  */
 public final class HttpHelper {
-    /**
-     * Set of characters for CTLs
-     */
-    private static final char[] CTLS = { 
-         0,  1,  2, 3,  4,  5,  6,  7,  8,  9, 
-        10, 11, 12, 13 ,14, 15, 16, 17, 18, 19,
-        21, 22, 23, 24, 25, 26, 27, 28, 29, 30,
-        31, 127,
-    };
-    
-    /**
-     * Set of characters for separator.
-     */
-    private static final char[] SEPARATORS = {
-        '(',  ')', '<', '>', '@', ',', ';', 
-        ':', '\\', '"', '/', '[', ']', '?', 
-        '=', '{', '}', ' ', 9,        
-    };
-    
-    /**
-     * Set of invalid characters for token.
-     */
-    private static final Set<Character> invalidTokens = new HashSet<Character>();
-    
-    static {
-        for (char c : CTLS)
-            invalidTokens.add(c);
-        for (char c : SEPARATORS)
-            invalidTokens.add(c);
-    }
-    
-    /**
-     * Check if an HTTP method is valid according to token.
-     *
-     * @param httpMethod the http method.
-     * @return true if the HTTP method is valid, otherwise false.
-     */
-    public static boolean isValidHttpMethod(String httpMethod) {
-        for (int i = 0; i < httpMethod.length(); i++)
-            if (invalidTokens.contains(httpMethod.charAt(i)))
-                return false;
-        
-        return true;
-    }
-    
+
     /**
      * Get the content type from the "Content-Type" of an HTTP request.
      * <p>
@@ -132,22 +90,68 @@ public final class HttpHelper {
      *         type "*\\/*" is returned.
      */
     public static List<MediaType> getAccept(HttpRequestContext request) {
-        final List<String> accept = request.getRequestHeaders().get("Accept");
-        if (accept == null || accept.isEmpty()) {   
-            return MimeHelper.GENERAL_ACCEPT_MEDIA_TYPE_LIST;
-        }
-        
-        String acceptString = accept.get(0);
-        if (accept.size() > 1) {
-            for (int i = 1; i < accept.size(); i++) {
-                acceptString += "," + accept.get(i);
-            }
-        }
-        
+        final String accept = request.getHeaderValue("Accept");
         try {
-            return MimeHelper.createAcceptMediaTypes(acceptString);
+            return MimeHelper.createAcceptMediaTypes(accept);
         } catch (java.text.ParseException e) {
-            throw clientError(ImplMessages.BAD_ACCEPT_FIELD(acceptString), e);
+            throw clientError(ImplMessages.BAD_ACCEPT_FIELD(accept), e);
+        }
+    }
+
+    /**
+     * Get the list of language tag from the "Accept-Language" of an HTTP request.
+     * <p>
+     * @param request The HTTP request.
+     * @return The list of LanguageTag. This list
+     *         is ordered with the highest quality acceptable language tag occuring first.
+     */
+    public static List<AcceptableLanguageTag> getAcceptLangauge(HttpRequestContext request) {
+        final String acceptLanguage = request.getHeaderValue("Accept-Language");
+        if (acceptLanguage == null || acceptLanguage.length() == 0) {
+            return Collections.emptyList();
+        }
+        try {
+            return HttpHeaderFactory.createAcceptLanguage(acceptLanguage);
+        } catch (java.text.ParseException e) {
+            throw clientError("Bad Accept-Language field: " + acceptLanguage, e);
+        }
+    }
+    
+    /**
+     * Get the list of language tag from the "Accept-Charset" of an HTTP request.
+     * <p>
+     * @param request The HTTP request.
+     * @return The list of AcceptableToken. This list
+     *         is ordered with the highest quality acceptable charset occuring first.
+     */
+    public static List<AcceptableToken> getAcceptCharset(HttpRequestContext request) {
+        final String acceptCharset = request.getHeaderValue("Accept-Charset");
+        if (acceptCharset == null || acceptCharset.length() == 0) {
+            return Collections.emptyList();
+        }
+        try {
+            return HttpHeaderFactory.createAcceptCharset(acceptCharset);
+        } catch (java.text.ParseException e) {
+            throw clientError("Bad Accept-Charset field: " + acceptCharset, e);
+        }
+    }
+    
+    /**
+     * Get the list of language tag from the "Accept-Charset" of an HTTP request.
+     * <p>
+     * @param request The HTTP request.
+     * @return The list of AcceptableToken. This list
+     *         is ordered with the highest quality acceptable charset occuring first.
+     */
+    public static List<AcceptableToken> getAcceptEncoding(HttpRequestContext request) {
+        final String acceptEncoding = request.getHeaderValue("Accept-Encoding");
+        if (acceptEncoding == null || acceptEncoding.length() == 0) {
+            return Collections.emptyList();
+        }
+        try {
+            return HttpHeaderFactory.createAcceptEncoding(acceptEncoding);
+        } catch (java.text.ParseException e) {
+            throw clientError("Bad Accept-Encoding field: " + acceptEncoding, e);
         }
     }
     

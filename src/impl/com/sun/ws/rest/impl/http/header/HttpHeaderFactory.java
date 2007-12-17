@@ -23,10 +23,12 @@
 package com.sun.ws.rest.impl.http.header;
 
 import com.sun.ws.rest.impl.http.header.reader.HttpHeaderReader;
+import com.sun.ws.rest.impl.http.header.reader.HttpHeaderReader.ListElementCreator;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.text.ParseException;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import javax.ws.rs.core.Cookie;
@@ -38,16 +40,38 @@ import javax.ws.rs.core.MediaType;
  * @author Paul.Sandoz@Sun.Com
  */
 public final class HttpHeaderFactory {
-    public static List<AcceptableToken> createAcceptCharset(String header) throws ParseException, 
-            NoSuchMethodException, InstantiationException, 
-            IllegalAccessException, InvocationTargetException {
-        return HttpHeaderReader.readList(AcceptableToken.class, header);
+    
+    public static final ListElementCreator<Token> TOKEN_CREATOR = 
+            new ListElementCreator<Token>() {
+        public Token create(HttpHeaderReader reader) throws ParseException {
+            return new Token(reader);
+        }
+    };
+    
+    public static final ListElementCreator<AcceptableToken> ACCEPTABLE_TOKEN_CREATOR = 
+            new ListElementCreator<AcceptableToken>() {
+        public AcceptableToken create(HttpHeaderReader reader) throws ParseException {
+            return new AcceptableToken(reader);
+        }
+    };
+    
+    public static List<AcceptableToken> createAcceptCharset(String header) throws ParseException {
+        return HttpHeaderReader.readAcceptableList(ACCEPTABLE_TOKEN_CREATOR, header);
     }
     
-    public static List<AcceptableToken> createAcceptEncoding(String header) throws ParseException, 
-            NoSuchMethodException, InstantiationException, 
-            IllegalAccessException, InvocationTargetException {
-        return HttpHeaderReader.readList(AcceptableToken.class, header);
+    public static List<AcceptableToken> createAcceptEncoding(String header) throws ParseException {
+        return HttpHeaderReader.readAcceptableList(ACCEPTABLE_TOKEN_CREATOR, header);
+    }
+    
+    private static final ListElementCreator<AcceptableLanguageTag> LANGUAGE_CREATOR = 
+            new ListElementCreator<AcceptableLanguageTag>() {
+        public AcceptableLanguageTag create(HttpHeaderReader reader) throws ParseException {
+            return new AcceptableLanguageTag(reader);
+        }
+    };
+    
+    public static List<AcceptableLanguageTag> createAcceptLanguage(String header) throws ParseException {
+        return HttpHeaderReader.readAcceptableList(LANGUAGE_CREATOR, header);
     }
     
     public static List<Cookie> createCookies(String header) {
@@ -102,24 +126,28 @@ public final class HttpHeaderFactory {
         throw new UnsupportedOperationException();
     }
     
-    public static List<URI> createIfMatch(String header) throws ParseException, 
+    public static List<String> createIfMatch(String header) throws ParseException, 
             NoSuchMethodException, InstantiationException, 
             IllegalAccessException, InvocationTargetException {
         if (header.equals("*"))
-            return null;
-        return HttpHeaderReader.readList(URI.class, header);
+            return Collections.emptyList();
+        
+        // TODO support list of etags
+        throw new UnsupportedOperationException();
     }
     
     public static Date createIfModifiedSince(String header) throws ParseException {
         return HttpHeaderReader.readDate(header);
     }
     
-    public static List<URI> createIfNoneMatch(String header) throws ParseException, 
+    public static List<String> createIfNoneMatch(String header) throws ParseException, 
             NoSuchMethodException, InstantiationException, 
             IllegalAccessException, InvocationTargetException {
         if (header.equals("*"))
-            return null;
-        return HttpHeaderReader.readList(URI.class, header);
+            return Collections.emptyList();
+        
+        // TODO support list of etags
+        throw new UnsupportedOperationException();
     }
     
     public static Date createIfUnmodifiedSince(String header) throws ParseException {
@@ -151,6 +179,6 @@ public final class HttpHeaderFactory {
             IllegalAccessException, InvocationTargetException {
         if (header.equals("*"))
             return null;
-        return HttpHeaderReader.readList(Token.class, header);
+        return HttpHeaderReader.readList(TOKEN_CREATOR, header);
     }
 }

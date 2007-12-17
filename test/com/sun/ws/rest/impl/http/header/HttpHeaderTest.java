@@ -68,8 +68,7 @@ public class HttpHeaderTest extends TestCase {
     
     public void testAcceptableLanguageTagList() throws Exception {
         String languageTags = "en-US;q=0.123, fr;q=0.2, en;q=0.3, *;q=0.01";
-        List<AcceptableLanguageTag> l = HttpHeaderReader.readList(
-                AcceptableLanguageTag.class, languageTags);
+        List<AcceptableLanguageTag> l = HttpHeaderFactory.createAcceptLanguage(languageTags);
         assertEquals("en", l.get(0).getTag());
         assertEquals("fr", l.get(1).getTag());
         assertEquals("en-US", l.get(2).getTag());
@@ -88,7 +87,8 @@ public class HttpHeaderTest extends TestCase {
     
     public void testAcceptableTokenList() throws Exception {
         String tokens = "gzip;q=0.123, compress;q=0.2, zlib;q=0.3, *;q=0.01";
-        List<AcceptableToken> l = HttpHeaderReader.readList(AcceptableToken.class, tokens);
+        List<AcceptableToken> l = HttpHeaderReader.readAcceptableList(
+                HttpHeaderFactory.ACCEPTABLE_TOKEN_CREATOR, tokens);
         assertEquals("zlib", l.get(0).getToken());
         assertEquals("compress", l.get(1).getToken());
         assertEquals("gzip", l.get(2).getToken());

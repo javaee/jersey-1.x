@@ -32,6 +32,18 @@ import javax.ws.rs.core.UriInfo;
  * An abstraction for a HTTP request
  */
 public interface HttpRequestContext extends HttpHeaders, UriInfo, Request {
+    
+    /**
+     * Get a HTTP header value.
+     * 
+     * @param name the HTTP header
+     * @return the HTTP header value. If the HTTP header is not present then
+     * null is returned. If the HTTP header is present but has no value then
+     * the empty string is returned. If the HTTP header is present more than
+     * once then the values of joined together and separated by a ',' character.
+     */
+    public String getHeaderValue(String name);
+
     /**
      * Select the first media type, from a list of media types, that is most
      * acceptable according to the requested acceptable media types.

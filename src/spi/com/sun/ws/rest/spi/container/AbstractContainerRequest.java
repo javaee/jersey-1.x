@@ -28,6 +28,8 @@ import com.sun.ws.rest.impl.RequestHttpHeadersImpl;
 import com.sun.ws.rest.impl.http.header.reader.HttpHeaderReader;
 import com.sun.ws.rest.impl.model.HttpHelper;
 import com.sun.ws.rest.api.Responses;
+import com.sun.ws.rest.impl.http.header.AcceptableLanguageTag;
+import com.sun.ws.rest.impl.http.header.AcceptableToken;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
@@ -38,6 +40,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Map;
 import javax.ws.rs.core.Cookie;
 import javax.ws.rs.core.EntityTag;
@@ -163,6 +166,24 @@ public abstract class AbstractContainerRequest implements ContainerRequest {
     }
     
     // HttpRequestContext
+    
+    public String getHeaderValue(String name) {
+        final List<String> v = getRequestHeaders().get(name);
+
+        if (v == null) return null;
+        
+        if (v.isEmpty()) return "";
+                
+        if (v.size() == 1) return v.get(0);
+        
+        StringBuilder sb = new StringBuilder(v.get(0));
+        for (int i = 1; i < v.size(); i++) {
+            final String s = v.get(i);
+            if (s.length() > 0)
+                sb.append(',').append(s);
+        }
+        return sb.toString();
+    }
     
     public <T> T getEntity(Class<T> type) {
         try {
@@ -481,7 +502,48 @@ public abstract class AbstractContainerRequest implements ContainerRequest {
     // Request
 
     public Variant selectVariant(List<Variant> variants) {
-        throw new UnsupportedOperationException();
+        if (variants == null || variants.isEmpty()) 
+            throw new IllegalArgumentException("The list of variants is null or empty");
+        
+        LinkedList<Variant> v1 = new LinkedList<Variant>(variants);
+        LinkedList<Variant> v2 = new LinkedList<Variant>();
+        selectMediaTypeVariants(v1, v2);
+        v1.clear();
+        selectLanguageVariants(v2, v1);
+        v2.clear();
+        selectCharsetVarients(v1, v2);
+        v1.clear();
+        selectEncodingVarients(v2, v1);
+    
+        return variants.size() > 0 ? variants.get(0) : null;
+    }
+    
+    private void selectMediaTypeVariants(List<Variant> v1, List<Variant> v2) {
+        for (MediaType am : getAcceptableMediaTypes()) {
+            for (Variant v : v1) {
+                final MediaType m = v.getMediaType();
+                if (m != null) {
+                    if (m.isCompatible(am)) 
+                        v2.add(v);
+                } else 
+                    v2.add(v);
+            }
+        }
+    }
+    
+    private void selectLanguageVariants(List<Variant> v1, List<Variant> v2) {
+        for (AcceptableLanguageTag al : HttpHelper.getAcceptLangauge(this)) {
+        }
+    }
+     
+    private void selectCharsetVarients(List<Variant> v1, List<Variant> v2) {
+        for (AcceptableToken ac : HttpHelper.getAcceptCharset(this)) {
+        }
+    }
+    
+    private void selectEncodingVarients(List<Variant> v1, List<Variant> v2) {
+        for (AcceptableToken ae : HttpHelper.getAcceptEncoding(this)) {
+        }
     }
     
     public Response evaluatePreconditions(EntityTag eTag) {
