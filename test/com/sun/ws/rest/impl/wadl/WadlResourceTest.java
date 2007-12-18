@@ -243,6 +243,37 @@ public class WadlResourceTest extends AbstractResourceTester {
         assertEquals(val,"1");
     }
     
+    public void testGetSubResourceWadl() throws ParserConfigurationException, SAXException, IOException, XPathExpressionException {
+/*        initiateWebApplication(WidgetsResource.class, ExtraResource.class);
+        ResourceProxy r = resourceProxy("/widgets/3");
+        
+        // test WidgetsResource
+        File tmpFile = r.acceptable(MediaTypes.WADL).get(File.class);
+        DocumentBuilderFactory bf = DocumentBuilderFactory.newInstance();
+        bf.setNamespaceAware(true);
+        bf.setValidating(false);
+        bf.setXIncludeAware(false);
+        DocumentBuilder b = bf.newDocumentBuilder();
+        Document d = b.parse(tmpFile);
+        printSource(new DOMSource(d));
+        XPath xp = XPathFactory.newInstance().newXPath();
+        xp.setNamespaceContext(new NSResolver("wadl", "http://research.sun.com/wadl/2006/10"));
+        String val = (String)xp.evaluate("/wadl:application/wadl:resources/@base", d, XPathConstants.STRING);
+        assertEquals(val,"/base/");
+        // check total number of resources is 1
+        val = (String)xp.evaluate("count(//wadl:resource)", d, XPathConstants.STRING);
+        assertEquals(val,"1");
+        // check only one resource with for {id}
+        val = (String)xp.evaluate("count(//wadl:resource[@path='widgets/{id}'])", d, XPathConstants.STRING);
+        assertEquals(val,"1");
+        // check 3 methods
+        val = (String)xp.evaluate("count(//wadl:resource[@path='widgets/{id}']/wadl:method)", d, XPathConstants.STRING);
+        assertEquals(val,"3");
+        // check type of {id} is int
+        val = (String)xp.evaluate("//wadl:resource[@path='widgets/{id}']/wadl:param[@name='id']/@type", d, XPathConstants.STRING);
+        assertEquals(val,"xs:int");*/
+    }
+    
     private static class NSResolver implements NamespaceContext {
         private String prefix;
         private String nsURI;

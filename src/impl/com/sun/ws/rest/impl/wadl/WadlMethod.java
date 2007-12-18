@@ -32,7 +32,6 @@ import com.sun.ws.rest.api.model.AbstractResource;
 import com.sun.ws.rest.impl.model.MediaTypeHelper;
 import com.sun.ws.rest.spi.dispatch.RequestDispatcher;
 import java.util.Arrays;
-import java.util.Collections;
 import javax.ws.rs.core.Response;
 
 /**
@@ -45,7 +44,7 @@ public final class WadlMethod extends ResourceMethod {
         private final Application a;
         
         WadlMethodDispatcher(AbstractResource resource) {
-            this.a = WadlGenerator.generate(Collections.singleton(resource));
+            this.a = WadlGenerator.generate(resource);
         }
         
         public void dispatch(final Object resource, 

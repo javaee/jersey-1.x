@@ -45,67 +45,50 @@ import javax.xml.namespace.QName;
  */
 public class WadlGenerator {
     
+    /**
+     * Generate WADL for a set of resources.
+     * @param resources the set of resources
+     * @return the JAXB WADL application bean
+     */
     public static Application generate(Set<AbstractResource> resources) {
         Application wadlApplication = new Application();
         Resources wadlResources = new Resources();
-        Map<String, Param> wadlResourceParams = new HashMap<String, Param>();
-        Map<String, Resource> wadlSubResources = new HashMap<String, Resource>();
-        Map<String, Map<String, Param>> wadlSubResourcesParams = 
-                new HashMap<String, Map<String, Param>>();
         
         // for each resource
         for (AbstractResource r: resources) {
-            Resource wadlResource = new Resource();
-            wadlResource.setPath(r.getUriTemplate().getValue());
-            // for each resource method
-            for (AbstractResourceMethod m: r.getResourceMethods()) {
-                com.sun.research.ws.wadl.Method wadlMethod = generateMethod(wadlResourceParams, m);
-                wadlResource.getMethodOrResource().add(wadlMethod);
-            }
-            // add parameters that are associated with the resource URI template
-            for (Param wadlParam: wadlResourceParams.values()) {
-                wadlResource.getParam().add(wadlParam);
-            }
-            wadlResourceParams.clear();
-            // for each sub-resource method
-            for (AbstractSubResourceMethod m: r.getSubResourceMethods()) {
-                // find or create sub resource for uri template
-                String template = m.getUriTemplate().getValue();
-                Resource wadlSubResource = wadlSubResources.get(template);
-                Map<String,Param> wadlSubResourceParams = wadlSubResourcesParams.get(template);
-                if (wadlSubResource==null) {
-                    wadlSubResource = new Resource();
-                    wadlSubResource.setPath(template);
-                    wadlSubResources.put(template, wadlSubResource);
-                    wadlSubResourceParams = new HashMap<String,Param>();
-                    wadlSubResourcesParams.put(template, wadlSubResourceParams);
-                    wadlResource.getMethodOrResource().add(wadlSubResource);
-                }
-                com.sun.research.ws.wadl.Method wadlMethod = generateMethod(wadlSubResourceParams, m);
-                wadlSubResource.getMethodOrResource().add(wadlMethod);
-            }
-            // add parameters that are associated with each sub-resource method URI template
-            for (String template: wadlSubResources.keySet()) {
-                Resource wadlSubResource = wadlSubResources.get(template);
-                Map<String,Param> wadlSubResourceParams = wadlSubResourcesParams.get(template);
-                for(Param wadlParam: wadlSubResourceParams.values()) {
-                    wadlSubResource.getParam().add(wadlParam);
-                }
-            }
-            wadlSubResources.clear();
-            wadlSubResourcesParams.clear();
-            // for each sub resource
-            for (AbstractSubResourceLocator l: r.getSubResourceLocators()) {
-                Resource wadlSubResource = new Resource();
-                wadlSubResource.setPath(l.getUriTemplate().getValue());
-                for (Parameter p: l.getParameters()) {
-                    Param wadlParam = generateParam(p);
-                    wadlSubResource.getParam().add(wadlParam);
-                }
-                wadlResource.getMethodOrResource().add(wadlSubResource);
-            }
+            Resource wadlResource = generateResource(r);
             wadlResources.getResource().add(wadlResource);
         }
+        wadlApplication.setResources(wadlResources);
+        return wadlApplication;
+    }
+    
+    /**
+     * Generate WADL for a resource.
+     * @param resource the resource
+     * @return the JAXB WADL application bean
+     */
+    public static Application generate(AbstractResource resource) {
+        Application wadlApplication = new Application();
+        Resources wadlResources = new Resources();
+        Resource wadlResource = generateResource(resource);
+        wadlResources.getResource().add(wadlResource);
+        wadlApplication.setResources(wadlResources);
+        return wadlApplication;
+    }
+
+    /**
+     * Generate WADL for a virtual subresource resulting from sub resource
+     * methods.
+     * @param resource the parent resource
+     * @param path the value of the methods path annotations
+     * @return the JAXB WADL application bean
+     */
+    public static Application generate(AbstractResource resource, String path) {
+        Application wadlApplication = new Application();
+        Resources wadlResources = new Resources();
+        Resource wadlResource = generateSubResource(resource, path);
+        wadlResources.getResource().add(wadlResource);
         wadlApplication.setResources(wadlResources);
         return wadlApplication;
     }
@@ -200,6 +183,88 @@ public class WadlGenerator {
         else
             wadlParam.setType(new QName("http://www.w3.org/2001/XMLSchema", "string", "xs"));
         return wadlParam;
+    }
+
+    private static Resource generateResource(AbstractResource r) {
+        Resource wadlResource = new Resource();
+        wadlResource.setPath(r.getUriTemplate().getValue());
+        // for each resource method
+        Map<String, Param> wadlResourceParams = new HashMap<String, Param>();
+        for (AbstractResourceMethod m : r.getResourceMethods()) {
+            com.sun.research.ws.wadl.Method wadlMethod = generateMethod(wadlResourceParams, m);
+            wadlResource.getMethodOrResource().add(wadlMethod);
+        }
+        // add parameters that are associated with the resource URI template
+        for (Param wadlParam : wadlResourceParams.values()) {
+            wadlResource.getParam().add(wadlParam);
+        }
+
+        // for each sub-resource method
+        Map<String, Resource> wadlSubResources = new HashMap<String, Resource>();
+        Map<String, Map<String, Param>> wadlSubResourcesParams = 
+                new HashMap<String, Map<String, Param>>();
+        for (AbstractSubResourceMethod m : r.getSubResourceMethods()) {
+            // find or create sub resource for uri template
+            String template = m.getUriTemplate().getValue();
+            Resource wadlSubResource = wadlSubResources.get(template);
+            Map<String, Param> wadlSubResourceParams = wadlSubResourcesParams.get(template);
+            if (wadlSubResource == null) {
+                wadlSubResource = new Resource();
+                wadlSubResource.setPath(template);
+                wadlSubResources.put(template, wadlSubResource);
+                wadlSubResourceParams = new HashMap<String, Param>();
+                wadlSubResourcesParams.put(template, wadlSubResourceParams);
+                wadlResource.getMethodOrResource().add(wadlSubResource);
+            }
+            com.sun.research.ws.wadl.Method wadlMethod = generateMethod(wadlSubResourceParams, m);
+            wadlSubResource.getMethodOrResource().add(wadlMethod);
+        }
+        // add parameters that are associated with each sub-resource method URI template
+        for (String template : wadlSubResources.keySet()) {
+            Resource wadlSubResource = wadlSubResources.get(template);
+            Map<String, Param> wadlSubResourceParams = wadlSubResourcesParams.get(template);
+            for (Param wadlParam : wadlSubResourceParams.values()) {
+                wadlSubResource.getParam().add(wadlParam);
+            }
+        }
+
+        // for each sub resource locator
+        for (AbstractSubResourceLocator l : r.getSubResourceLocators()) {
+            Resource wadlSubResource = new Resource();
+            wadlSubResource.setPath(l.getUriTemplate().getValue());
+            for (Parameter p : l.getParameters()) {
+                Param wadlParam = generateParam(p);
+                wadlSubResource.getParam().add(wadlParam);
+            }
+            wadlResource.getMethodOrResource().add(wadlSubResource);
+        }
+        return wadlResource;
+    }
+
+    private static Resource generateSubResource(AbstractResource r, String path) {
+        Resource wadlResource = new Resource();
+        StringBuilder b = new StringBuilder(r.getUriTemplate().getValue());
+        if (!(r.getUriTemplate().getValue().endsWith("/") || path.startsWith("/")))
+            b.append("/");
+        b.append(path);
+        wadlResource.setPath(b.toString());
+
+        // for each sub-resource method
+        Map<String, Param> wadlSubResourceParams = new HashMap<String, Param>();
+        for (AbstractSubResourceMethod m : r.getSubResourceMethods()) {
+            // find or create sub resource for uri template
+            String template = m.getUriTemplate().getValue();
+            if (!template.equals(path))
+                continue;
+            com.sun.research.ws.wadl.Method wadlMethod = generateMethod(wadlSubResourceParams, m);
+            wadlResource.getMethodOrResource().add(wadlMethod);
+        }
+        // add parameters that are associated with each sub-resource method URI template
+        for (Param wadlParam : wadlSubResourceParams.values()) {
+            wadlResource.getParam().add(wadlParam);
+        }
+
+        return wadlResource;
     }
 
     private static Response generateResponse(final AbstractResourceMethod m) {
