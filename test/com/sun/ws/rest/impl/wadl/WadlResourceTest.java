@@ -50,6 +50,11 @@ public class WadlResourceTest extends AbstractResourceTester {
     
     @Path("foo")
     public static class ExtraResource {
+        @GET
+        @ProduceMime("application/xml")
+        public String getRep() {
+            return null;
+        }
     }
 
     @Path("widgets")
@@ -88,7 +93,7 @@ public class WadlResourceTest extends AbstractResourceTester {
 
         @Path("{id}/verbose")
         public Object getVerbose(@UriParam("id")int id) {
-            return null;
+            return new ExtraResource();
         }
     }
     
@@ -204,9 +209,38 @@ public class WadlResourceTest extends AbstractResourceTester {
         // check only once resource with path foo
         val = (String)xp.evaluate("count(//wadl:resource[@path='foo'])", d, XPathConstants.STRING);
         assertEquals(val,"1");
-        // check 0 methods for foo
+        // check 1 methods for foo
         val = (String)xp.evaluate("count(//wadl:resource[@path='foo']/wadl:method)", d, XPathConstants.STRING);
-        assertEquals(val,"0");
+        assertEquals(val,"1");
+    }
+    
+    public void testGetLocatorWadl() throws ParserConfigurationException, SAXException, IOException, XPathExpressionException {
+        initiateWebApplication(WidgetsResource.class, ExtraResource.class);
+        ResourceProxy r = resourceProxy("/widgets/3/verbose");
+        
+        // test WidgetsResource
+        File tmpFile = r.acceptable(MediaTypes.WADL).get(File.class);
+        DocumentBuilderFactory bf = DocumentBuilderFactory.newInstance();
+        bf.setNamespaceAware(true);
+        bf.setValidating(false);
+        bf.setXIncludeAware(false);
+        DocumentBuilder b = bf.newDocumentBuilder();
+        Document d = b.parse(tmpFile);
+        printSource(new DOMSource(d));
+        XPath xp = XPathFactory.newInstance().newXPath();
+        xp.setNamespaceContext(new NSResolver("wadl", "http://research.sun.com/wadl/2006/10"));
+        // check base URI
+        String val = (String)xp.evaluate("/wadl:application/wadl:resources/@base", d, XPathConstants.STRING);
+        assertEquals(val,"/base/");
+        // check total number of resources is 1 (no ExtraResource details included)
+        val = (String)xp.evaluate("count(//wadl:resource)", d, XPathConstants.STRING);
+        assertEquals(val,"1");
+        // check only once resource with path 
+        val = (String)xp.evaluate("count(//wadl:resource[@path='widgets/3/verbose'])", d, XPathConstants.STRING);
+        assertEquals(val,"1");
+        // check 1 methods
+        val = (String)xp.evaluate("count(//wadl:resource[@path='widgets/3/verbose']/wadl:method)", d, XPathConstants.STRING);
+        assertEquals(val,"1");
     }
     
     private static class NSResolver implements NamespaceContext {
