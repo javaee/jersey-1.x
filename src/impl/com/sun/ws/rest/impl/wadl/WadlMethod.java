@@ -28,7 +28,7 @@ import com.sun.ws.rest.impl.model.method.*;
 import com.sun.ws.rest.api.core.HttpRequestContext;
 import com.sun.ws.rest.api.core.HttpResponseContext;
 import com.sun.ws.rest.api.model.AbstractResource;
-import com.sun.ws.rest.impl.model.MimeHelper;
+import com.sun.ws.rest.impl.model.MediaTypeHelper;
 import com.sun.ws.rest.spi.dispatch.RequestDispatcher;
 import java.util.Arrays;
 import java.util.Collections;
@@ -50,10 +50,8 @@ public final class WadlMethod extends ResourceMethod {
         public void dispatch(final Object resource, 
                 final HttpRequestContext requestContext, 
                 final HttpResponseContext responseContext) {
-            // TODO is it correct to use the base URI here?
-            // should it be the absolute URI
             if (a.getResources().getBase()==null)
-                a.getResources().setBase(requestContext.getBaseUri().toString());
+                a.getResources().setBase(requestContext.getAbsolutePath().toString());
                 
             responseContext.setResponse(
                     Response.ok(a, MediaTypes.WADL).build());
@@ -63,7 +61,7 @@ public final class WadlMethod extends ResourceMethod {
     public WadlMethod(AbstractResource resource) {
         super("GET",
                 null,
-                MimeHelper.GENERAL_MEDIA_TYPE_LIST,
+                MediaTypeHelper.GENERAL_MEDIA_TYPE_LIST,
                 Arrays.asList(MediaTypes.WADL),
                 new WadlMethodDispatcher(resource));
     }
