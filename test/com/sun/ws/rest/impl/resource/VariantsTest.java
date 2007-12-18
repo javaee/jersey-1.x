@@ -94,10 +94,43 @@ public class VariantsTest extends AbstractResourceTester {
                 "text/html;q=0.9",
                 "text/plain;q=0.8",
                 "*/*;q=0.5").
-                header("Accept-Language", "en-us,en;q=0.5").
+                header("Accept-Language", "en,en-us").
                 get(ResponseInBound.class);
         assertEquals("GET", r.getEntity(String.class));
         assertEquals(MediaType.parse("text/xml"), r.getContentType());
-        assertEquals("en-us", r.getLangauge());
+        assertEquals("en", r.getLangauge());
     }
+    
+    public void testGet3() throws IOException {
+        initiateWebApplication(WebResource.class);
+        ResourceProxy rp = resourceProxy("/");
+        
+        ResponseInBound r = rp.acceptable("application/xml",
+                "text/xml",
+                "application/xhtml+xml",
+                "image/png",
+                "text/html;q=0.9",
+                "text/plain;q=0.8",
+                "*/*;q=0.5").
+                header("Accept-Language", "en-us,en;q=0.5").
+                get(ResponseInBound.class);
+        assertEquals("GET", r.getEntity(String.class));
+        assertEquals(MediaType.parse("application/xml"), r.getContentType());
+        assertEquals("en-us", r.getLangauge());
+    }   
+    
+    public void testGetNotAcceptable() throws IOException {
+        initiateWebApplication(WebResource.class);
+        ResourceProxy rp = resourceProxy("/", false);
+        
+        ResponseInBound r = rp.acceptable("application/atom+xml").
+                header("Accept-Language", "en-us,en").
+                get(ResponseInBound.class);
+        assertEquals(406, r.getStatus());
+        
+        r = rp.acceptable("application/xml").
+                header("Accept-Language", "fr").
+                get(ResponseInBound.class);
+        assertEquals(406, r.getStatus());
+    }    
 }

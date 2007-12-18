@@ -50,8 +50,6 @@ public final class WadlMethod extends ResourceMethod {
         public void dispatch(final Object resource, 
                 final HttpRequestContext requestContext, 
                 final HttpResponseContext responseContext) {
-            // TODO is it correct to use the base URI here?
-            // should it be the absolute URI
             if (a.getResources().getBase()==null) {
                 a.getResources().setBase(requestContext.getBaseUri().toString());
                 

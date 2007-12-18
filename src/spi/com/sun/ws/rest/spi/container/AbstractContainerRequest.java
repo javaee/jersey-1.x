@@ -28,6 +28,7 @@ import com.sun.ws.rest.impl.MultivaluedMapImpl;
 import com.sun.ws.rest.impl.RequestHttpHeadersImpl;
 import com.sun.ws.rest.impl.http.header.AcceptableLanguageTag;
 import com.sun.ws.rest.impl.http.header.AcceptableMediaType;
+import com.sun.ws.rest.impl.http.header.AcceptableToken;
 import com.sun.ws.rest.impl.http.header.QualityFactor;
 import com.sun.ws.rest.impl.http.header.reader.HttpHeaderReader;
 import com.sun.ws.rest.impl.model.HttpHelper;
@@ -39,7 +40,6 @@ import java.net.URLDecoder;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -502,74 +502,201 @@ public abstract class AbstractContainerRequest implements ContainerRequest {
     
     // Request
 
+    private static final class ListEntry<T> {
+        private T t;
+        private ListEntry<T> prev;
+        private ListEntry<T> next;
+        
+        public ListEntry() { }
+        
+        public ListEntry(ListEntry<T> prev, T t) {
+            this.t = t;
+            
+            prev.next = this;
+            this.prev = prev;
+        }
+        
+        public T value() {
+            return t;
+        }
+        
+        public ListEntry<T> next() {
+            return next;
+        }
+
+        public void removeTail() {
+            if (next != null) {
+                next.prev = null;
+                next = null;
+            }
+        }
+        
+        public void remove() {
+            if (prev != null) {
+                prev.next = next;
+            }
+            if (next != null) {
+                next.prev = prev;
+            }            
+            prev = next = null;
+        }
+        
+        public void insertAfter(ListEntry<T> e) {
+            if (this.next == e)
+                return;
+            
+            e.remove();
+            e.prev = this;
+            e.next = this.next;
+            if (e.next != null)
+                e.next.prev = e;
+            this.next = e;
+        }
+        
+        public static <T> ListEntry<T> create(List<T> l) {
+            ListEntry<T> head = new ListEntry<T>();
+            ListEntry<T> e = head;
+            for (T t: l) {
+                e = new ListEntry<T>(e, t);
+            }
+            
+            return head;
+        }
+    }
+    
     public Variant selectVariant(List<Variant> variants) {
         if (variants == null || variants.isEmpty()) 
             throw new IllegalArgumentException("The list of variants is null or empty");
         
-        List<Variant> vs = new ArrayList<Variant>(variants);
-        List<Variant> _vs = new ArrayList<Variant>();
+        ListEntry<Variant> vs = ListEntry.create(variants);
         
-        eliminateMediaTypeVariants(vs, _vs);      
-        vs.clear();
-        eliminateLanguageVariants(_vs, vs);
-        
-        return vs.size() > 0 ? vs.get(0) : null;
-    }
-        
-    private void eliminateMediaTypeVariants(List<Variant> vs, List<Variant> _vs) {
-        int q = QualityFactor.MINUMUM_QUALITY;
-        for (AcceptableMediaType am : HttpHelper.getAccept(this)) {
-            if (am.getQuality() < q)
-                break;
-
-            Iterator<Variant> i = vs.iterator();
-            while (i.hasNext()) {
-                final Variant v = i.next();
-                final MediaType m = v.getMediaType();
+        selectVariants(vs, HttpHelper.getAccept(this), MEDIA_TYPE_DC);
+        selectVariants(vs, HttpHelper.getAcceptLangauge(this), LANGUAGE_TAG_DC);
+        selectVariants(vs, HttpHelper.getAcceptCharset(this), CHARSET_DC);
+        selectVariants(vs, HttpHelper.getAcceptEncoding(this), ENCODING_DC);
                 
-                if (m != null) {
-                    if (am.isCompatible(m)) {
-                        if (am.getQuality() > q) {
-                            q = am.getQuality();
-                        }
-                        _vs.add(0, v);
-                        i.remove();
-                    }                    
-                } else {
-                    _vs.add(v);                
-                    i.remove();
-                }
-            }            
+        return vs.next() != null ? vs.next().value() : null;
+    }
+
+    private static final DimensionChecker<AcceptableMediaType, MediaType> MEDIA_TYPE_DC = 
+            new DimensionChecker<AcceptableMediaType, MediaType>() {
+        public MediaType getDimension(Variant v) {
+            return v.getMediaType();
         }
+
+        public boolean isCompatible(AcceptableMediaType t, MediaType u) {
+            return t.isCompatible(u);
+        }        
+    };
+    
+    private static final DimensionChecker<AcceptableLanguageTag, String> LANGUAGE_TAG_DC = 
+            new DimensionChecker<AcceptableLanguageTag, String>() {
+        public String getDimension(Variant v) {
+            return v.getLanguage();
+        }
+
+        public boolean isCompatible(AcceptableLanguageTag t, String u) {
+            return t.isCompatible(u);
+        }        
+    };
+    
+    private static final DimensionChecker<AcceptableToken, String> CHARSET_DC = 
+            new DimensionChecker<AcceptableToken, String>() {
+        public String getDimension(Variant v) {
+            return v.getCharset();
+        }
+
+        public boolean isCompatible(AcceptableToken t, String u) {
+            return t.isCompatible(u);
+        }        
+    };
+    
+    private static final DimensionChecker<AcceptableToken, String> ENCODING_DC = 
+            new DimensionChecker<AcceptableToken, String>() {
+        public String getDimension(Variant v) {
+            return v.getEncoding();
+        }
+
+        public boolean isCompatible(AcceptableToken t, String u) {
+            return t.isCompatible(u);
+        }        
+    };
+    
+    /**
+     * Interface to get a dimension value from a variant and check if an
+     * acceptable dimension value is compatable with a dimension value.
+     * 
+     * @param T the acceptable dimension value type
+     * @param U the dimension value type
+     */
+    private static interface DimensionChecker<T, U> {
+        /**
+         * Get the dimension value from the variant
+         * 
+         * @param v the variant
+         * @return the dimension value
+         */
+        U getDimension(Variant v);
+        
+        /**
+         * Ascertain if the acceptable dimension value is compatible with
+         * the dimension value
+         * 
+         * @param t the acceptable dimension value
+         * @param u the dimension value
+         * @return true if the acceptable dimension value is compatible with
+         *         the dimension value
+         */
+        boolean isCompatible(T t, U u);
     }
     
-    private void eliminateLanguageVariants(List<Variant> vs, List<Variant> _vs) {
+    private <T extends QualityFactor, U> void selectVariants(ListEntry<Variant> head, 
+            List<T> as, DimensionChecker<T, U> dc) {
         int q = QualityFactor.MINUMUM_QUALITY;
-        for (AcceptableLanguageTag al : HttpHelper.getAcceptLangauge(this)) {
-            if (al.getQuality() < q)
+        // Iterate over the acceptable entries
+        // This assumes the the entries are ordered by the quality
+        for (T a : as) {
+            // If entries of the higest quality factor have already been
+            // selected no need to continue further
+            if (a.getQuality() < q)
                 break;
             
-            Iterator<Variant> i = vs.iterator();
-            while (i.hasNext()) {
-                final Variant v = i.next();
-                final String l = v.getLanguage();
+            // Iterate over the variants
+            ListEntry<Variant> i = head.next();
+            while (i != null) {
+                final ListEntry<Variant> i_next = i.next();
+                // Get the dimension value of the varient to check
+                final U d = dc.getDimension(i.value());
                 
-                if (l != null) {
-                    if (al.isCompatible(l)) {
-                        if (al.getQuality() > q) {
-                            q = al.getQuality();
-                        }
-                        _vs.add(0, v);
-                        i.remove();
-                    }                    
+                if (d != null) {
+                    // Check if the acceptable entry is compatable with
+                    // the dimension value
+                    if (dc.isCompatible(a, d)) {
+                        // Update the quality factor
+                        // assert(q >= a.getQuality())
+                        q = a.getQuality();
+                        // Move the compatible varient entry to occur after
+                        // the head
+                        head.insertAfter(i);
+                        // Set the head to the compatible varient entry
+                        // This ensures that compatible entries are only
+                        // checked once
+                        head = i;
+                    }
                 } else {
-                    _vs.add(v);                
-                    i.remove();
+                    // If there is no dimension value for the variant
+                    // then move it and set it to the head so as can be
+                    // checked in other dimensions
+                    head.insertAfter(i);
+                    head = i;
                 }
-            }            
+                i = i_next;
+            }
         }
+        // Remove the incompatible entries
+        // Any such entries will always occur after the head entry
+        head.removeTail();
     }
-    
     
     public Response evaluatePreconditions(EntityTag eTag) {
         return evaluatePreconditions(eTag, (Variant)null);
