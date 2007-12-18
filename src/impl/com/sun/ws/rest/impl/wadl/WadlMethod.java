@@ -23,6 +23,7 @@
 package com.sun.ws.rest.impl.wadl;
 
 import com.sun.research.ws.wadl.Application;
+import com.sun.research.ws.wadl.Resource;
 import com.sun.ws.rest.api.MediaTypes;
 import com.sun.ws.rest.impl.model.method.*;
 import com.sun.ws.rest.api.core.HttpRequestContext;
@@ -50,9 +51,17 @@ public final class WadlMethod extends ResourceMethod {
         public void dispatch(final Object resource, 
                 final HttpRequestContext requestContext, 
                 final HttpResponseContext responseContext) {
-            if (a.getResources().getBase()==null)
-                a.getResources().setBase(requestContext.getAbsolutePath().toString());
+            // TODO is it correct to use the base URI here?
+            // should it be the absolute URI
+            if (a.getResources().getBase()==null) {
+                a.getResources().setBase(requestContext.getBaseUri().toString());
                 
+                Resource r = a.getResources().getResource().get(0);
+                String p = requestContext.getBaseUri().relativize(
+                        requestContext.getAbsolutePath()).toString();
+                r.setPath(p);
+            }
+            
             responseContext.setResponse(
                     Response.ok(a, MediaTypes.WADL).build());
         }
