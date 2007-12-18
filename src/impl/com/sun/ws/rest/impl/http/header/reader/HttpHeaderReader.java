@@ -232,11 +232,11 @@ public abstract class HttpHeaderReader {
         return m;
     }
  
-    private static class QualityComparator implements Comparator<QualityFactor> {
+    private static final Comparator<QualityFactor> QUALITY_COMPARATOR = new Comparator<QualityFactor>() {
         public int compare(QualityFactor o1, QualityFactor o2) {
             return o2.getQuality() - o1.getQuality();
         }
-    }
+    };
 
     public static interface ListElementCreator<T> {
         T create(HttpHeaderReader reader)  throws ParseException;
@@ -261,7 +261,7 @@ public abstract class HttpHeaderReader {
             ListElementCreator<T> c, 
             String header) throws ParseException {
         List<T> l = readList(c, header);
-        Collections.sort(l, new QualityComparator());
+        Collections.sort(l, QUALITY_COMPARATOR);
         return l;
     }
 }

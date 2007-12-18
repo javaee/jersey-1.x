@@ -40,6 +40,16 @@ import javax.ws.rs.core.MediaType;
  * @author Paul.Sandoz@Sun.Com
  */
 public final class HttpHeaderFactory {
+    private static final ListElementCreator<AcceptableMediaType> ACCEPTABLE_MEDIA_TYPE_CREATOR = 
+            new ListElementCreator<AcceptableMediaType>() {
+        public AcceptableMediaType create(HttpHeaderReader reader) throws ParseException {
+            return AcceptableMediaType.parse(reader);
+        }
+    };
+    
+    public static List<AcceptableMediaType> createAcceptMediaType(String header) throws ParseException {
+        return HttpHeaderReader.readAcceptableList(ACCEPTABLE_MEDIA_TYPE_CREATOR, header);
+    }
     
     public static final ListElementCreator<Token> TOKEN_CREATOR = 
             new ListElementCreator<Token>() {
@@ -73,7 +83,7 @@ public final class HttpHeaderFactory {
     public static List<AcceptableLanguageTag> createAcceptLanguage(String header) throws ParseException {
         return HttpHeaderReader.readAcceptableList(LANGUAGE_CREATOR, header);
     }
-    
+
     public static List<Cookie> createCookies(String header) {
         return CookiesParser.createCookies(header);
     }

@@ -25,7 +25,7 @@ package com.sun.ws.rest.impl.model.method;
 import com.sun.ws.rest.api.core.HttpRequestContext;
 import com.sun.ws.rest.api.core.HttpResponseContext;
 import com.sun.ws.rest.spi.dispatch.RequestDispatcher;
-import com.sun.ws.rest.impl.model.MimeHelper;
+import com.sun.ws.rest.impl.model.MediaTypeHelper;
 import java.util.List;
 import java.util.Map;
 import javax.ws.rs.core.Response;
@@ -67,8 +67,8 @@ public final class ResourceHttpOptionsMethod extends ResourceMethod {
     public ResourceHttpOptionsMethod(Map<String, List<ResourceMethod>> methods) {
         super("OPTIONS",
                 null,
-                MimeHelper.GENERAL_MEDIA_TYPE_LIST, 
-                MimeHelper.GENERAL_MEDIA_TYPE_LIST,
+                MediaTypeHelper.GENERAL_MEDIA_TYPE_LIST, 
+                MediaTypeHelper.GENERAL_MEDIA_TYPE_LIST,
                 new OptionsRequestDispatcher(getAllow(methods)));
     }
     

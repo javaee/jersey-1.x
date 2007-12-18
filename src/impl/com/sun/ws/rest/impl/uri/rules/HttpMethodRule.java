@@ -25,7 +25,7 @@ package com.sun.ws.rest.impl.uri.rules;
 import com.sun.ws.rest.api.core.HttpRequestContext;
 import com.sun.ws.rest.api.core.HttpResponseContext;
 import com.sun.ws.rest.impl.ImplMessages;
-import com.sun.ws.rest.impl.http.header.AcceptMediaType;
+import com.sun.ws.rest.impl.http.header.AcceptableMediaType;
 import com.sun.ws.rest.impl.model.HttpHelper;
 import com.sun.ws.rest.impl.model.method.ResourceMethod;
 import com.sun.ws.rest.api.Responses;
@@ -157,7 +157,7 @@ public final class HttpMethodRule implements UriRule {
 
         // Find all methods that produce the one or more Media types of 'Accept'
         ListIterator<ResourceMethod> i = matches.listIterator();
-        int currentQuality = AcceptMediaType.MINUMUM_QUALITY;
+        int currentQuality = AcceptableMediaType.MINUMUM_QUALITY;
         int currentIndex = 0;
         while(i.hasNext()) {
             int index = i.nextIndex();

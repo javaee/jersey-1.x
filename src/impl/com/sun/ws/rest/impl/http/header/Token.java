@@ -53,4 +53,11 @@ public class Token {
     public String getToken() {
         return token;
     }
+    
+    public final boolean isCompatible(String token) {
+        if (this.token.equals("*"))
+            return true;
+        
+        return this.token.equals(token);
+    }    
 }

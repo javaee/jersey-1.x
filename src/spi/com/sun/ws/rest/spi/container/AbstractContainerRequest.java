@@ -22,14 +22,15 @@
 
 package com.sun.ws.rest.spi.container;
 
+import com.sun.ws.rest.api.Responses;
 import com.sun.ws.rest.api.uri.UriComponent;
 import com.sun.ws.rest.impl.MultivaluedMapImpl;
 import com.sun.ws.rest.impl.RequestHttpHeadersImpl;
+import com.sun.ws.rest.impl.http.header.AcceptableLanguageTag;
+import com.sun.ws.rest.impl.http.header.AcceptableMediaType;
+import com.sun.ws.rest.impl.http.header.QualityFactor;
 import com.sun.ws.rest.impl.http.header.reader.HttpHeaderReader;
 import com.sun.ws.rest.impl.model.HttpHelper;
-import com.sun.ws.rest.api.Responses;
-import com.sun.ws.rest.impl.http.header.AcceptableLanguageTag;
-import com.sun.ws.rest.impl.http.header.AcceptableToken;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
@@ -38,9 +39,9 @@ import java.net.URLDecoder;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.ListIterator;
 import java.util.Map;
 import javax.ws.rs.core.Cookie;
 import javax.ws.rs.core.EntityTag;
@@ -336,7 +337,7 @@ public abstract class AbstractContainerRequest implements ContainerRequest {
     
     public List<MediaType> getAcceptableMediaTypes() {
         if (accept == null)
-            accept = HttpHelper.getAccept(this);
+            accept = new ArrayList<MediaType>(HttpHelper.getAccept(this));            
         
         return accept;
     }
@@ -505,46 +506,70 @@ public abstract class AbstractContainerRequest implements ContainerRequest {
         if (variants == null || variants.isEmpty()) 
             throw new IllegalArgumentException("The list of variants is null or empty");
         
-        LinkedList<Variant> v1 = new LinkedList<Variant>(variants);
-        LinkedList<Variant> v2 = new LinkedList<Variant>();
-        selectMediaTypeVariants(v1, v2);
-        v1.clear();
-        selectLanguageVariants(v2, v1);
-        v2.clear();
-        selectCharsetVarients(v1, v2);
-        v1.clear();
-        selectEncodingVarients(v2, v1);
-    
-        return variants.size() > 0 ? variants.get(0) : null;
+        List<Variant> vs = new ArrayList<Variant>(variants);
+        List<Variant> _vs = new ArrayList<Variant>();
+        
+        eliminateMediaTypeVariants(vs, _vs);      
+        vs.clear();
+        eliminateLanguageVariants(_vs, vs);
+        
+        return vs.size() > 0 ? vs.get(0) : null;
     }
-    
-    private void selectMediaTypeVariants(List<Variant> v1, List<Variant> v2) {
-        for (MediaType am : getAcceptableMediaTypes()) {
-            for (Variant v : v1) {
+        
+    private void eliminateMediaTypeVariants(List<Variant> vs, List<Variant> _vs) {
+        int q = QualityFactor.MINUMUM_QUALITY;
+        for (AcceptableMediaType am : HttpHelper.getAccept(this)) {
+            if (am.getQuality() < q)
+                break;
+
+            Iterator<Variant> i = vs.iterator();
+            while (i.hasNext()) {
+                final Variant v = i.next();
                 final MediaType m = v.getMediaType();
+                
                 if (m != null) {
-                    if (m.isCompatible(am)) 
-                        v2.add(v);
-                } else 
-                    v2.add(v);
-            }
+                    if (am.isCompatible(m)) {
+                        if (am.getQuality() > q) {
+                            q = am.getQuality();
+                        }
+                        _vs.add(0, v);
+                        i.remove();
+                    }                    
+                } else {
+                    _vs.add(v);                
+                    i.remove();
+                }
+            }            
         }
     }
     
-    private void selectLanguageVariants(List<Variant> v1, List<Variant> v2) {
+    private void eliminateLanguageVariants(List<Variant> vs, List<Variant> _vs) {
+        int q = QualityFactor.MINUMUM_QUALITY;
         for (AcceptableLanguageTag al : HttpHelper.getAcceptLangauge(this)) {
-        }
-    }
-     
-    private void selectCharsetVarients(List<Variant> v1, List<Variant> v2) {
-        for (AcceptableToken ac : HttpHelper.getAcceptCharset(this)) {
+            if (al.getQuality() < q)
+                break;
+            
+            Iterator<Variant> i = vs.iterator();
+            while (i.hasNext()) {
+                final Variant v = i.next();
+                final String l = v.getLanguage();
+                
+                if (l != null) {
+                    if (al.isCompatible(l)) {
+                        if (al.getQuality() > q) {
+                            q = al.getQuality();
+                        }
+                        _vs.add(0, v);
+                        i.remove();
+                    }                    
+                } else {
+                    _vs.add(v);                
+                    i.remove();
+                }
+            }            
         }
     }
     
-    private void selectEncodingVarients(List<Variant> v1, List<Variant> v2) {
-        for (AcceptableToken ae : HttpHelper.getAcceptEncoding(this)) {
-        }
-    }
     
     public Response evaluatePreconditions(EntityTag eTag) {
         return evaluatePreconditions(eTag, (Variant)null);

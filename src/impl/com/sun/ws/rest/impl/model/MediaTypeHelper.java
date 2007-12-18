@@ -25,20 +25,18 @@ package com.sun.ws.rest.impl.model;
 import javax.ws.rs.ConsumeMime;
 import javax.ws.rs.ProduceMime;
 import javax.ws.rs.core.MediaType;
-import com.sun.ws.rest.impl.http.header.AcceptMediaType;
-import com.sun.ws.rest.impl.provider.header.AcceptMediaTypeProvider;
-import java.text.ParseException;
+import com.sun.ws.rest.impl.http.header.AcceptableMediaType;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
 /**
- * Helper claases for MIME.
+ * Helper claases for media types.
  *
  * @author Paul.Sandoz@Sun.Com
  */
-public final class MimeHelper {
+public final class MediaTypeHelper {
     /**
      * Comparator for media types.
      * <p>
@@ -99,24 +97,14 @@ public final class MimeHelper {
     }
                 
     
-    /**
-     * Comparator for MIME types with a quality parameter.
-     */
-    static public final Comparator<AcceptMediaType> ACCEPT_MEDIA_TYPE_COMPARATOR 
-            = new Comparator<AcceptMediaType>() {
-        public int compare(AcceptMediaType o1, AcceptMediaType o2) {
-            return o2.getQ() - o1.getQ();
-        }
-    };
+    public static final AcceptableMediaType GENERAL_ACCEPT_MEDIA_TYPE = 
+            new AcceptableMediaType("*", "*");
     
-    public static final AcceptMediaType GENERAL_ACCEPT_MEDIA_TYPE = 
-            new AcceptMediaType("*", "*");
-    
-    public static final List<MediaType> GENERAL_ACCEPT_MEDIA_TYPE_LIST = 
+    public static final List<AcceptableMediaType> GENERAL_ACCEPT_MEDIA_TYPE_LIST = 
             createAcceptMediaTypeList();
     
-    private static List<MediaType> createAcceptMediaTypeList() {
-        List<MediaType> l = new ArrayList<MediaType>();        
+    private static List<AcceptableMediaType> createAcceptMediaTypeList() {
+        List<AcceptableMediaType> l = new ArrayList<AcceptableMediaType>();        
         l.add(GENERAL_ACCEPT_MEDIA_TYPE);
         return l;
     }    
@@ -164,21 +152,4 @@ public final class MimeHelper {
         Collections.sort(l, MEDIA_TYPE_COMPARATOR);
         return l;
     }
-        
-    /**
-     * Create a list of content type from string containing media types separated
-     * by ',' of an HTTP Accept header.
-     * <p>
-     * @param mediaTypes The media types.
-     * @return The list of AcceptMediaType. If mediaTypes is null then a list with
-     *         a single item of the media type "*\\/*" is returned.
-     */
-    public static List<MediaType> createAcceptMediaTypes(String mediaTypes) 
-            throws ParseException {
-        if (mediaTypes == null || mediaTypes.length() == 0) {
-            return GENERAL_ACCEPT_MEDIA_TYPE_LIST;
-        }
-        
-        return AcceptMediaTypeProvider.fromString(mediaTypes);
-    }        
 }

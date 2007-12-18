@@ -30,7 +30,7 @@ import java.text.ParseException;
  *
  * @author Paul.Sandoz@Sun.Com
  */
-public class AcceptableLanguageTag extends LanguageTag implements QualityFactor {
+public final class AcceptableLanguageTag extends LanguageTag implements QualityFactor {
     
     protected int quality = DEFAULT_QUALITY_FACTOR;
     
@@ -49,6 +49,8 @@ public class AcceptableLanguageTag extends LanguageTag implements QualityFactor 
         tag = reader.nextToken();        
         if (!tag.equals("*"))
             parse(tag);
+        else
+            primaryTag = tag;
         
         if (reader.hasNext()) {
             quality = HttpHeaderReader.readQualityFactorParameter(reader);

@@ -22,7 +22,8 @@
 
 package com.sun.ws.rest.impl.http.header.provider;
 
-import com.sun.ws.rest.impl.provider.header.AcceptMediaTypeProvider;
+import com.sun.ws.rest.impl.http.header.AcceptableMediaType;
+import com.sun.ws.rest.impl.http.header.HttpHeaderFactory;
 import junit.framework.*;
 import javax.ws.rs.core.MediaType;
 import java.util.List;
@@ -35,7 +36,7 @@ public class AcceptMediaTypeProviderTest extends TestCase {
 
     public void testOneMediaType() throws Exception {
         String header = "application/xml";
-        List<MediaType> l = AcceptMediaTypeProvider.fromString(header);
+        List<AcceptableMediaType> l = HttpHeaderFactory.createAcceptMediaType(header);
         
         assertEquals(1, l.size());
         
@@ -47,7 +48,7 @@ public class AcceptMediaTypeProviderTest extends TestCase {
     
     public void testOneMediaTypeWithParameters() throws Exception {
         String header = "application/xml;charset=utf8";
-        List<MediaType> l = AcceptMediaTypeProvider.fromString(header);
+        List<AcceptableMediaType> l = HttpHeaderFactory.createAcceptMediaType(header);
         
         assertEquals(1, l.size());
         
@@ -61,7 +62,7 @@ public class AcceptMediaTypeProviderTest extends TestCase {
     
     public void testMultipleMediaType() throws Exception {
         String header = "application/xml, text/xml, text/html";
-        List<MediaType> l = AcceptMediaTypeProvider.fromString(header);
+        List<AcceptableMediaType> l = HttpHeaderFactory.createAcceptMediaType(header);
         
         assertEquals(3, l.size());
         
@@ -82,7 +83,7 @@ public class AcceptMediaTypeProviderTest extends TestCase {
     
     public void testMultipleMediaTypeWithQuality() throws Exception {
         String header = "application/xml;q=0.1, text/xml;q=0.2, text/html;q=0.3";
-        List<MediaType> l = AcceptMediaTypeProvider.fromString(header);
+        List<AcceptableMediaType> l = HttpHeaderFactory.createAcceptMediaType(header);
         
         assertEquals(3, l.size());
         
@@ -103,7 +104,7 @@ public class AcceptMediaTypeProviderTest extends TestCase {
     
     public void testHttpURLConnectionAcceptHeader() throws Exception {
         String header = "text/html, image/gif, image/jpeg, *; q=.2, */*; q=.2";
-        List<MediaType> l = AcceptMediaTypeProvider.fromString(header);
+        List<AcceptableMediaType> l = HttpHeaderFactory.createAcceptMediaType(header);
         
         assertEquals(5, l.size());
         
@@ -132,7 +133,7 @@ public class AcceptMediaTypeProviderTest extends TestCase {
 
     public void testFirefoxAcceptHeader() throws Exception {
         String header = "text/xml,application/xml,application/xhtml+xml,text/html;q=0.9,text/plain;q=0.8,image/png,*/*;q=0.5";
-        List<MediaType> l = AcceptMediaTypeProvider.fromString(header);
+        List<AcceptableMediaType> l = HttpHeaderFactory.createAcceptMediaType(header);
         
         assertEquals(7, l.size());
         
@@ -169,7 +170,7 @@ public class AcceptMediaTypeProviderTest extends TestCase {
     
     public void testWithStarAcceptHeader() throws Exception {
         String header = "application/xml;q=0.1, text/xml;q=0.2, *;q=0.3";
-        List<MediaType> l = AcceptMediaTypeProvider.fromString(header);
+        List<AcceptableMediaType> l = HttpHeaderFactory.createAcceptMediaType(header);
         
         assertEquals(3, l.size());
         

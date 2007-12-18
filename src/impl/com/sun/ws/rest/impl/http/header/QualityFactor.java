@@ -29,7 +29,11 @@ package com.sun.ws.rest.impl.http.header;
 public interface QualityFactor {
     static final String QUALITY_FACTOR = "q";
     
-    static final int DEFAULT_QUALITY_FACTOR = 1000;
+    static final int MINUMUM_QUALITY = 0;
+    
+    static final int MAXIMUM_QUALITY = 1000;
+    
+    static final int DEFAULT_QUALITY_FACTOR = MAXIMUM_QUALITY;
     
     int getQuality();
 }

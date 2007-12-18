@@ -42,6 +42,11 @@ public class LanguageTag {
     }
     
     public LanguageTag(String primaryTag, String subTags) {
+        if (subTags != null && subTags.length() > 0)
+            this.tag = primaryTag + "-" + subTags;
+        else 
+            this.tag = primaryTag;
+        
         this.primaryTag = primaryTag;
         this.subTags = subTags;
     }
@@ -60,6 +65,13 @@ public class LanguageTag {
             throw new ParseException("Invalid Language tag", reader.getIndex());
         
         parse(tag);
+    }
+    
+    public final boolean isCompatible(String tag) {
+        if (this.tag.equals("*"))
+            return true;
+        
+        return this.tag.equals(tag);
     }
     
     protected final void parse(String languageTag) throws ParseException {
@@ -96,15 +108,15 @@ public class LanguageTag {
         return (alphaCount != 0);
     }
 
-    public String getTag() {
+    public final String getTag() {
         return tag;
     }
 
-    public String getPrimaryTag() {
+    public final String getPrimaryTag() {
         return primaryTag;
     }
 
-    public String getSubTags() {
+    public final String getSubTags() {
         return subTags;
     }
 }

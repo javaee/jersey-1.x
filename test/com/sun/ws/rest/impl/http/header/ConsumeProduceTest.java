@@ -24,7 +24,7 @@ package com.sun.ws.rest.impl.http.header;
 
 import javax.ws.rs.ConsumeMime;
 import javax.ws.rs.ProduceMime;
-import com.sun.ws.rest.impl.model.MimeHelper;
+import com.sun.ws.rest.impl.model.MediaTypeHelper;
 import java.util.List;
 import javax.ws.rs.core.MediaType;
 import junit.framework.TestCase;
@@ -53,13 +53,13 @@ public class ConsumeProduceTest extends TestCase {
     
     public void testConsumeMime() {
         ConsumeMime c = ConsumeMimeClass.class.getAnnotation(ConsumeMime.class);
-        List<MediaType> l = MimeHelper.createMediaTypes(c);
+        List<MediaType> l = MediaTypeHelper.createMediaTypes(c);
         checkMediaTypes(l);
     }
     
     public void testProduceMime() {
         ProduceMime p = ProduceMimeClass.class.getAnnotation(ProduceMime.class);
-        List<MediaType> l = MimeHelper.createMediaTypes(p);
+        List<MediaType> l = MediaTypeHelper.createMediaTypes(p);
         checkMediaTypes(l);
     }
     

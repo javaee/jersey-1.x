@@ -135,11 +135,16 @@ public final class ResponseBuilderImpl extends Response.Builder {
     }
 
     public Response.Builder variant(Variant variant) {
-        throw new UnsupportedOperationException();
+        type(variant.getMediaType());
+        language(variant.getLanguage());
+        // TODO set charset and encoding
+        return this;
     }
     
     public Response.Builder variants(List<Variant> variants) {
-        throw new UnsupportedOperationException();        
+        status(406);
+        // TODO set Allows header field
+        return this;
     }
         
     public Response.Builder language(String language) {

@@ -20,42 +20,31 @@
  *     "Portions Copyrighted [year] [name of copyright owner]"
  */
 
-package com.sun.ws.rest.impl.provider.header;
+package com.sun.ws.rest.impl.http.header;
 
-import javax.ws.rs.core.MediaType;
-import com.sun.ws.rest.impl.http.header.reader.HttpHeaderListAdapter;
 import com.sun.ws.rest.impl.http.header.reader.HttpHeaderReader;
-import com.sun.ws.rest.impl.http.header.reader.HttpHeaderReaderImpl;
-import com.sun.ws.rest.impl.http.header.AcceptMediaType;
-import com.sun.ws.rest.impl.model.MimeHelper;
 import java.text.ParseException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import javax.ws.rs.core.MediaType;
 import java.util.Map;
 
-public class AcceptMediaTypeProvider {
-    private static final String QUALITY_FACTOR = "q";
+public final class AcceptableMediaType extends MediaType implements QualityFactor {
+    private final int q;
+
+    public AcceptableMediaType(String p, String s) {
+        super(p, s);
+        q = DEFAULT_QUALITY_FACTOR;
+    }
     
-    private static final int DEFAULT_QUALITY_FACTOR = 1000;
+    public AcceptableMediaType(String p, String s, int q, Map<String, String> parameters) {
+        super(p, s, parameters);
+        this.q = q;
+    }
+        
+    public int getQuality() {
+        return q;
+    }
     
-    @SuppressWarnings("unchecked")
-    public static List<MediaType> fromString(String header) throws ParseException {
-        List l = new ArrayList<AcceptMediaType>();
-        HttpHeaderReader reader = new HttpHeaderReaderImpl(header);
-        HttpHeaderListAdapter adapter = new HttpHeaderListAdapter(reader);
-        while(reader.hasNext()) {
-            l.add(create(adapter));
-            adapter.reset();
-            if (reader.hasNext())
-                reader.next();
-        }
-    
-        Collections.sort(l, MimeHelper.ACCEPT_MEDIA_TYPE_COMPARATOR);
-        return l;
-    }    
-    
-    private static AcceptMediaType create(HttpHeaderReader reader) throws ParseException {
+    public static AcceptableMediaType parse(HttpHeaderReader reader) throws ParseException {
         // Skip any white space
         reader.hasNext();
         
@@ -80,6 +69,6 @@ public class AcceptMediaTypeProvider {
             }
         }
         
-        return new AcceptMediaType(type, subType, quality, parameters);
+        return new AcceptableMediaType(type, subType, quality, parameters);  
     }
 }

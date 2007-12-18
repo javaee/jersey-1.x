@@ -22,7 +22,7 @@
 
 package com.sun.ws.rest.impl.provider;
 
-import com.sun.ws.rest.impl.model.MimeHelper;
+import com.sun.ws.rest.impl.model.MediaTypeHelper;
 import com.sun.ws.rest.spi.service.ServiceFinder;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -103,7 +103,7 @@ public final class ProviderFactoryImpl extends ProviderFactory {
                 for (T p : ServiceFinder.find(c, true)) {
                     String values[] = getAnnotationValues(p.getClass(), annotationClass);
                     if (values==null)
-                        cacheClassCapability(s, p, MimeHelper.GENERAL_MEDIA_TYPE);
+                        cacheClassCapability(s, p, MediaTypeHelper.GENERAL_MEDIA_TYPE);
                     else
                         for (String type: values)
                             cacheClassCapability(s, p, MediaType.parse(type));
@@ -184,10 +184,10 @@ public final class ProviderFactoryImpl extends ProviderFactory {
 
     private List<MediaType> createSearchList(MediaType mediaType) {
         if (mediaType==null)
-            return Arrays.asList(MimeHelper.GENERAL_MEDIA_TYPE);
+            return Arrays.asList(MediaTypeHelper.GENERAL_MEDIA_TYPE);
         else
             return Arrays.asList(mediaType, 
                     new MediaType(mediaType.getType(), MediaType.MEDIA_TYPE_WILDCARD), 
-                    MimeHelper.GENERAL_MEDIA_TYPE);
+                    MediaTypeHelper.GENERAL_MEDIA_TYPE);
     }
 }

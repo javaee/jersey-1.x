@@ -99,9 +99,9 @@ public class IntrospectionModeller {
 
         if (resourceMethod.getMethod().isAnnotationPresent(ConsumeMime.class)) {
             final ConsumeMime consumeMimeAnnotation = resourceMethod.getMethod().getAnnotation(ConsumeMime.class);
-            resourceMethod.getSupportedInputTypes().addAll(MimeHelper.createMediaTypes(consumeMimeAnnotation));
+            resourceMethod.getSupportedInputTypes().addAll(MediaTypeHelper.createMediaTypes(consumeMimeAnnotation));
         } else { // have to use the annotation from class
-            resourceMethod.getSupportedInputTypes().addAll(MimeHelper.createMediaTypes(classScopeConsumeMimeAnnotation));
+            resourceMethod.getSupportedInputTypes().addAll(MediaTypeHelper.createMediaTypes(classScopeConsumeMimeAnnotation));
         }
     }
 
@@ -110,9 +110,9 @@ public class IntrospectionModeller {
 
         if (resourceMethod.getMethod().isAnnotationPresent(ProduceMime.class)) {
             final ProduceMime produceMimeAnnotation = resourceMethod.getMethod().getAnnotation(ProduceMime.class);
-            resourceMethod.getSupportedOutputTypes().addAll(MimeHelper.createMediaTypes(produceMimeAnnotation));
+            resourceMethod.getSupportedOutputTypes().addAll(MediaTypeHelper.createMediaTypes(produceMimeAnnotation));
         } else { // have to use the annotation from class
-            resourceMethod.getSupportedOutputTypes().addAll(MimeHelper.createMediaTypes(classScopeProduceMimeAnnotation));
+            resourceMethod.getSupportedOutputTypes().addAll(MediaTypeHelper.createMediaTypes(classScopeProduceMimeAnnotation));
         }
     }
 

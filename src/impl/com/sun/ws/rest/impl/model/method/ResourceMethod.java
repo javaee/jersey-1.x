@@ -23,8 +23,8 @@
 package com.sun.ws.rest.impl.model.method;
 
 import com.sun.ws.rest.spi.dispatch.RequestDispatcher;
-import com.sun.ws.rest.impl.http.header.AcceptMediaType;
-import com.sun.ws.rest.impl.model.MimeHelper;
+import com.sun.ws.rest.impl.http.header.AcceptableMediaType;
+import com.sun.ws.rest.impl.model.MediaTypeHelper;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Iterator;
@@ -42,7 +42,7 @@ public abstract class ResourceMethod {
      * Comparator for resource methods, comparing the consumed and produced
      * media types.
      * <p>
-     * Defer to {@link MimeHelper#MEDIA_TYPE_LIST_COMPARATOR} for comparing
+     * Defer to {@link MediaTypeHelper#MEDIA_TYPE_LIST_COMPARATOR} for comparing
      * the list of media type that are comsumed and produced. The comparison of 
      * consumed media take precedence over the comparison of produced 
      * media.
@@ -50,10 +50,10 @@ public abstract class ResourceMethod {
     static public final Comparator<ResourceMethod> COMPARATOR = 
             new Comparator<ResourceMethod>() {
         public int compare(ResourceMethod o1, ResourceMethod o2) {
-            int i = MimeHelper.MEDIA_TYPE_LIST_COMPARATOR.
+            int i = MediaTypeHelper.MEDIA_TYPE_LIST_COMPARATOR.
                     compare(o1.consumeMime, o2.consumeMime);
             if (i == 0)
-                i = MimeHelper.MEDIA_TYPE_LIST_COMPARATOR.
+                i = MediaTypeHelper.MEDIA_TYPE_LIST_COMPARATOR.
                         compare(o1.produceMime, o2.produceMime);
             
             return i;
@@ -145,20 +145,20 @@ public abstract class ResourceMethod {
      * @param accept The list of media types of entities that may be produced. 
      *        This list MUST be ordered with the highest quality acceptable
      *        media type occuring first 
-     *        (see {@link MimeHelper#ACCEPT_MEDIA_TYPE_COMPARATOR}).
+     *        (see {@link MediaTypeHelper#ACCEPT_MEDIA_TYPE_COMPARATOR}).
      * @return the quality of the first acceptable media type in the accept 
      *         list, otherwise -1 if no media types are acceptable.
      */
     public final int produces(List accept) {
         Iterator i = accept.iterator();
         while (i.hasNext()) {
-            AcceptMediaType a = (AcceptMediaType)i.next();
-            if (a.getType().equals("*")) return a.getQ();
+            AcceptableMediaType a = (AcceptableMediaType)i.next();
+            if (a.getType().equals("*")) return a.getQuality();
         
             for (MediaType c : produceMime) {
-                if (c.getType().equals("*")) return a.getQ();
+                if (c.getType().equals("*")) return a.getQuality();
                 
-                if (c.isCompatible(a)) return a.getQ();
+                if (c.isCompatible(a)) return a.getQuality();
             }            
         }
         return -1;

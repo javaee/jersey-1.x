@@ -24,7 +24,7 @@ package com.sun.ws.rest.impl.model.method;
 
 import com.sun.ws.rest.api.core.HttpRequestContext;
 import com.sun.ws.rest.api.core.HttpResponseContext;
-import com.sun.ws.rest.impl.model.MimeHelper;
+import com.sun.ws.rest.impl.model.MediaTypeHelper;
 import com.sun.ws.rest.impl.view.ViewType;
 import com.sun.ws.rest.spi.dispatch.RequestDispatcher;
 import com.sun.ws.rest.spi.view.View;
@@ -61,7 +61,7 @@ public final class ResourceViewMethod extends ResourceMethod {
     public ResourceViewMethod(View v) {
         super("GET",
                 null,
-                MimeHelper.GENERAL_MEDIA_TYPE_LIST,
+                MediaTypeHelper.GENERAL_MEDIA_TYPE_LIST,
                 Arrays.asList(v.getProduceMime()),
                 new ViewMethodDispatcher(v));
     }

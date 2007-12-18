@@ -27,6 +27,7 @@ import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import com.sun.ws.rest.impl.ImplMessages;
 import com.sun.ws.rest.impl.http.header.AcceptableLanguageTag;
+import com.sun.ws.rest.impl.http.header.AcceptableMediaType;
 import com.sun.ws.rest.impl.http.header.AcceptableToken;
 import com.sun.ws.rest.impl.http.header.HttpHeaderFactory;
 import java.util.Collections;
@@ -85,19 +86,22 @@ public final class HttpHelper {
      * @param request The HTTP request.
      * @return The list of MediaType. This list
      *         is ordered with the highest quality acceptable Media type occuring first
-     *         (see {@link MimeHelper#ACCEPT_MEDIA_TYPE_COMPARATOR}).
+     *         (see {@link MediaTypeHelper#ACCEPT_MEDIA_TYPE_COMPARATOR}).
      *         If no "Accept" is present then a list with a single item of the Media
      *         type "*\\/*" is returned.
      */
-    public static List<MediaType> getAccept(HttpRequestContext request) {
+    public static List<AcceptableMediaType> getAccept(HttpRequestContext request) {
         final String accept = request.getHeaderValue("Accept");
+        if (accept == null || accept.length() == 0) {
+            return MediaTypeHelper.GENERAL_ACCEPT_MEDIA_TYPE_LIST;
+        }
         try {
-            return MimeHelper.createAcceptMediaTypes(accept);
+            return HttpHeaderFactory.createAcceptMediaType(accept);
         } catch (java.text.ParseException e) {
             throw clientError(ImplMessages.BAD_ACCEPT_FIELD(accept), e);
         }
     }
-
+    
     /**
      * Get the list of language tag from the "Accept-Language" of an HTTP request.
      * <p>
@@ -108,7 +112,7 @@ public final class HttpHelper {
     public static List<AcceptableLanguageTag> getAcceptLangauge(HttpRequestContext request) {
         final String acceptLanguage = request.getHeaderValue("Accept-Language");
         if (acceptLanguage == null || acceptLanguage.length() == 0) {
-            return Collections.emptyList();
+            return Collections.singletonList(new AcceptableLanguageTag("*", null));
         }
         try {
             return HttpHeaderFactory.createAcceptLanguage(acceptLanguage);
@@ -126,10 +130,10 @@ public final class HttpHelper {
      */
     public static List<AcceptableToken> getAcceptCharset(HttpRequestContext request) {
         final String acceptCharset = request.getHeaderValue("Accept-Charset");
-        if (acceptCharset == null || acceptCharset.length() == 0) {
-            return Collections.emptyList();
-        }
         try {
+            if (acceptCharset == null || acceptCharset.length() == 0) {
+                return Collections.singletonList(new AcceptableToken("*"));
+            }
             return HttpHeaderFactory.createAcceptCharset(acceptCharset);
         } catch (java.text.ParseException e) {
             throw clientError("Bad Accept-Charset field: " + acceptCharset, e);
@@ -145,10 +149,10 @@ public final class HttpHelper {
      */
     public static List<AcceptableToken> getAcceptEncoding(HttpRequestContext request) {
         final String acceptEncoding = request.getHeaderValue("Accept-Encoding");
-        if (acceptEncoding == null || acceptEncoding.length() == 0) {
-            return Collections.emptyList();
-        }
         try {
+            if (acceptEncoding == null || acceptEncoding.length() == 0) {
+                return Collections.singletonList(new AcceptableToken("*"));
+            }
             return HttpHeaderFactory.createAcceptEncoding(acceptEncoding);
         } catch (java.text.ParseException e) {
             throw clientError("Bad Accept-Encoding field: " + acceptEncoding, e);
@@ -167,7 +171,7 @@ public final class HttpHelper {
      * @param contentType The Media type.
      * @param accept The list of Media types of entities that may be produced. This list
      *        MUST be ordered with the highest quality acceptable Media type occuring first
-     *        (see {@link MimeHelper#ACCEPT_MEDIA_TYPE_COMPARATOR}).
+     *        (see {@link MediaTypeHelper#ACCEPT_MEDIA_TYPE_COMPARATOR}).
      * @return true if the Media type can be produced, otherwise false.
      */
     public static boolean produces(MediaType contentType, List<MediaType> accept) {
