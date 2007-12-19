@@ -274,6 +274,54 @@ public class WadlResourceTest extends AbstractResourceTester {
         assertEquals(val,"xs:int");
     }
     
+    @Path("root")
+    public static class RootResource {
+        @Path("loc")
+        public Object getSub() {
+            return new SubResource();
+        }
+    }
+    
+    @Path("foo")
+    public static class SubResource {
+        @Path("loc")
+        public Object getSub() {
+            return new SubResource();
+        }
+        
+        @GET
+        @ProduceMime("text/plain")
+        public String hello() {
+            return "Hello World !";
+        }
+        
+        @GET
+        @Path("sub")
+        @ProduceMime("text/plain")
+        public String helloSub() {
+            return "Hello World !";
+        }
+    }
+    
+    public void testRecursive() throws ParserConfigurationException, SAXException, IOException, XPathExpressionException {
+        initiateWebApplication(RootResource.class, SubResource.class);
+        ResourceProxy r = resourceProxy("/root/loc");
+        
+        // test WidgetsResource
+        File tmpFile = r.acceptable(MediaTypes.WADL).get(File.class);
+        DocumentBuilderFactory bf = DocumentBuilderFactory.newInstance();
+        bf.setNamespaceAware(true);
+        bf.setValidating(false);
+        bf.setXIncludeAware(false);
+        DocumentBuilder b = bf.newDocumentBuilder();
+        Document d = b.parse(tmpFile);
+        printSource(new DOMSource(d));
+        XPath xp = XPathFactory.newInstance().newXPath();
+        xp.setNamespaceContext(new NSResolver("wadl", "http://research.sun.com/wadl/2006/10"));
+        String val = (String)xp.evaluate("/wadl:application/wadl:resources/@base", d, XPathConstants.STRING);
+        assertEquals(val,"/base/");
+    }
+    
     private static class NSResolver implements NamespaceContext {
         private String prefix;
         private String nsURI;
