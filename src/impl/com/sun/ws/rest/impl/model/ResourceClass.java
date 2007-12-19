@@ -99,11 +99,14 @@ public final class ResourceClass {
         for (Map.Entry<PathPattern, ResourceMethodMap> e : patternMethodMap.entrySet()) {
             hasSubResourcesAux = true;
 
-            PathPattern p = e.getKey();
-            e.getValue().sort();
+            final PathPattern p = e.getKey();
+            final ResourceMethodMap rmm = e.getValue();
+            
+            rmm.sort();
+            processWadl(resource, p, rmm);        
             rulesMap.put(p,
                     new RightHandPathRule(p.getTemplate().endsWithSlash(),
-                    new HttpMethodRule(e.getValue())));
+                    new HttpMethodRule(rmm)));
         }
 
         // Create the rules for the HTTP methods
@@ -357,6 +360,10 @@ public final class ResourceClass {
     }
     
     private void processWadl(AbstractResource resource, ResourceMethodMap methodMap) {
+        processWadl(resource, null, methodMap);
+    }
+    
+    private void processWadl(AbstractResource resource, PathPattern p, ResourceMethodMap methodMap) {
         // Check if there is already a method that explicitly produces WADL
         // If so do not override that method
         if (methodMap.get("GET") != null) {
@@ -367,7 +374,7 @@ public final class ResourceClass {
             }
         }
         
-        ResourceMethod wadlMethod = createWadlMethod(resource);
+        ResourceMethod wadlMethod = createWadlMethod(resource, p);
         if (wadlMethod != null) methodMap.put(wadlMethod);
     }
     
@@ -381,11 +388,19 @@ public final class ResourceClass {
      * @param resource the resource model
      * @return the WADL resource method
      */
-    private ResourceMethod createWadlMethod(AbstractResource resource) {
+    private ResourceMethod createWadlMethod(AbstractResource resource, PathPattern p) {
         try {
             Class<?> wm = Class.forName("com.sun.ws.rest.impl.wadl.WadlMethod");
-            Constructor<?> wcc = wm.getConstructor(AbstractResource.class);
-            return (ResourceMethod)wcc.newInstance(resource);
+            if (p == null) {
+                Constructor<?> wcc = wm.getConstructor(AbstractResource.class);
+                return (ResourceMethod)wcc.newInstance(resource);
+            } else {
+                Constructor<?> wcc = wm.getConstructor(AbstractResource.class, 
+                        String.class);
+                // Remove the '/' from the beginning
+                String path = p.getTemplate().getTemplate().substring(1);
+                return (ResourceMethod)wcc.newInstance(resource, path);
+            }
         } catch (InvocationTargetException e) {
             if (e.getCause() instanceof NoClassDefFoundError) {
                 // Ignore

@@ -244,7 +244,7 @@ public class WadlResourceTest extends AbstractResourceTester {
     }
     
     public void testGetSubResourceWadl() throws ParserConfigurationException, SAXException, IOException, XPathExpressionException {
-/*        initiateWebApplication(WidgetsResource.class, ExtraResource.class);
+        initiateWebApplication(WidgetsResource.class, ExtraResource.class);
         ResourceProxy r = resourceProxy("/widgets/3");
         
         // test WidgetsResource
@@ -271,7 +271,7 @@ public class WadlResourceTest extends AbstractResourceTester {
         assertEquals(val,"3");
         // check type of {id} is int
         val = (String)xp.evaluate("//wadl:resource[@path='widgets/{id}']/wadl:param[@name='id']/@type", d, XPathConstants.STRING);
-        assertEquals(val,"xs:int");*/
+        assertEquals(val,"xs:int");
     }
     
     private static class NSResolver implements NamespaceContext {
@@ -305,6 +305,7 @@ public class WadlResourceTest extends AbstractResourceTester {
     
     private static void printSource(Source source) {
         try {
+            System.out.println("---------------------");
             Transformer trans = TransformerFactory.newInstance().newTransformer();
             Properties oprops = new Properties();
             oprops.put(OutputKeys.OMIT_XML_DECLARATION, "yes");

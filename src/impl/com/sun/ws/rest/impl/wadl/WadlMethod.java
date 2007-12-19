@@ -43,6 +43,10 @@ public final class WadlMethod extends ResourceMethod {
     private static final class WadlMethodDispatcher implements RequestDispatcher {
         private final Application a;
         
+        WadlMethodDispatcher(AbstractResource resource, String path) {
+            this.a = WadlGenerator.generate(resource, path);
+        }
+        
         WadlMethodDispatcher(AbstractResource resource) {
             this.a = WadlGenerator.generate(resource);
         }
@@ -62,6 +66,14 @@ public final class WadlMethod extends ResourceMethod {
             responseContext.setResponse(
                     Response.ok(a, MediaTypes.WADL).build());
         }
+    }
+    
+    public WadlMethod(AbstractResource resource, String path) {
+        super("GET",
+                null,
+                MediaTypeHelper.GENERAL_MEDIA_TYPE_LIST,
+                Arrays.asList(MediaTypes.WADL),
+                new WadlMethodDispatcher(resource, path));        
     }
     
     public WadlMethod(AbstractResource resource) {
