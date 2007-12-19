@@ -264,13 +264,13 @@ public class WadlResourceTest extends AbstractResourceTester {
         val = (String)xp.evaluate("count(//wadl:resource)", d, XPathConstants.STRING);
         assertEquals(val,"1");
         // check only one resource with for {id}
-        val = (String)xp.evaluate("count(//wadl:resource[@path='widgets/{id}'])", d, XPathConstants.STRING);
+        val = (String)xp.evaluate("count(//wadl:resource[@path='widgets/3'])", d, XPathConstants.STRING);
         assertEquals(val,"1");
         // check 3 methods
-        val = (String)xp.evaluate("count(//wadl:resource[@path='widgets/{id}']/wadl:method)", d, XPathConstants.STRING);
+        val = (String)xp.evaluate("count(//wadl:resource[@path='widgets/3']/wadl:method)", d, XPathConstants.STRING);
         assertEquals(val,"3");
         // check type of {id} is int
-        val = (String)xp.evaluate("//wadl:resource[@path='widgets/{id}']/wadl:param[@name='id']/@type", d, XPathConstants.STRING);
+        val = (String)xp.evaluate("//wadl:resource[@path='widgets/3']/wadl:param[@name='id']/@type", d, XPathConstants.STRING);
         assertEquals(val,"xs:int");
     }
     
