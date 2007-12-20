@@ -41,32 +41,38 @@ import javax.ws.rs.core.Response;
 public final class WadlMethod extends ResourceMethod {
     
     private static final class WadlMethodDispatcher implements RequestDispatcher {
-        private final Application a;
-        
-        WadlMethodDispatcher(AbstractResource resource, String path) {
-            this.a = WadlGenerator.generate(resource, path);
-        }
+        private final AbstractResource resource;
+        private final String path;
         
         WadlMethodDispatcher(AbstractResource resource) {
-            this.a = WadlGenerator.generate(resource);
+            this(resource, null);
         }
         
-        public void dispatch(final Object resource, 
+        WadlMethodDispatcher(AbstractResource resource, String path) {
+            this.resource = resource;
+            this.path = path;
+        }
+            
+        public void dispatch(final Object o, 
                 final HttpRequestContext requestContext, 
-                final HttpResponseContext responseContext) {
-            if (a.getResources().getBase()==null) {
-                a.getResources().setBase(requestContext.getBaseUri().toString());
+                final HttpResponseContext responseContext) {            
+            final Application a = generate();
+            a.getResources().setBase(requestContext.getBaseUri().toString());
                 
-                Resource r = a.getResources().getResource().get(0);
-                String p = requestContext.getBaseUri().relativize(
-                        requestContext.getAbsolutePath()).toString();
-                r.setPath(p);
-                // remove path params since path is fixed at this point
-                r.getParam().clear();
-            }
+            final Resource r = a.getResources().getResource().get(0);
+            r.setPath(requestContext.getBaseUri().relativize(
+                    requestContext.getAbsolutePath()).toString());
+            
+            // remove path params since path is fixed at this point
+            r.getParam().clear();
             
             responseContext.setResponse(
                     Response.ok(a, MediaTypes.WADL).build());
+        }
+        
+        private Application generate() {
+            return path == null ? WadlGenerator.generate(resource) : 
+                WadlGenerator.generate(resource, path);
         }
     }
     

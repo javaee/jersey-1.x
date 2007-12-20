@@ -269,9 +269,6 @@ public class WadlResourceTest extends AbstractResourceTester {
         // check 3 methods
         val = (String)xp.evaluate("count(//wadl:resource[@path='widgets/3']/wadl:method)", d, XPathConstants.STRING);
         assertEquals(val,"3");
-        // check type of {id} is int
-        val = (String)xp.evaluate("//wadl:resource[@path='widgets/3']/wadl:param[@name='id']/@type", d, XPathConstants.STRING);
-        assertEquals(val,"xs:int");
     }
     
     @Path("root")
@@ -319,6 +316,29 @@ public class WadlResourceTest extends AbstractResourceTester {
         xp.setNamespaceContext(new NSResolver("wadl", "http://research.sun.com/wadl/2006/10"));
         String val = (String)xp.evaluate("/wadl:application/wadl:resources/@base", d, XPathConstants.STRING);
         assertEquals(val,"/base/");
+        // check only one resource with for 'root/loc'
+        val = (String)xp.evaluate("count(//wadl:resource[@path='root/loc'])", d, XPathConstants.STRING);
+        assertEquals(val,"1");
+        
+        r = resourceProxy("/root/loc/loc");
+        
+        // test WidgetsResource
+        tmpFile = r.acceptable(MediaTypes.WADL).get(File.class);
+        bf = DocumentBuilderFactory.newInstance();
+        bf.setNamespaceAware(true);
+        bf.setValidating(false);
+        bf.setXIncludeAware(false);
+        b = bf.newDocumentBuilder();
+        d = b.parse(tmpFile);
+        printSource(new DOMSource(d));
+        xp = XPathFactory.newInstance().newXPath();
+        xp.setNamespaceContext(new NSResolver("wadl", "http://research.sun.com/wadl/2006/10"));
+        val = (String)xp.evaluate("/wadl:application/wadl:resources/@base", d, XPathConstants.STRING);
+        assertEquals(val,"/base/");
+        // check only one resource with for 'root/loc'
+        val = (String)xp.evaluate("count(//wadl:resource[@path='root/loc/loc'])", d, XPathConstants.STRING);
+        assertEquals(val,"1");
+        
     }
     
     private static class NSResolver implements NamespaceContext {
