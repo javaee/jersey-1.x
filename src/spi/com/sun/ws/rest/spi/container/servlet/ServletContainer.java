@@ -270,6 +270,17 @@ public class ServletContainer extends HttpServlet {
             }
         }
         );
+        wa.addInjectable(ServletContext.class,
+                new Injectable<Resource, ServletContext>() {
+            public Class<Resource> getAnnotationClass() {
+                return Resource.class;
+            }
+
+            public ServletContext getInjectableValue(Resource r) {
+                return (null != getServletConfig()) ? getServletConfig().getServletContext() : null;
+            }
+        }
+        );
     }
     
     /**
