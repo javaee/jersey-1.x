@@ -1,4 +1,7 @@
 release 0.5 (2008-01-18)
+- Support injection of the ServletContext on a resource class when
+  using the servlet container.
+- Updated Mandel example to use Scala 2.6.1.
 - Updated NetBeans project files of Jersey and the examples to version 6.0
 - Fixed bug for HTTP methods on a super class that have an entity parameter 
   that is a (generic) type variable.
