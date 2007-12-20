@@ -2,7 +2,7 @@
 <project name="Mandel" default="default" basedir=".">
     <description>Builds, tests, and runs the project Mandel.</description>
     <import file="nbproject/build-impl.xml"/>
-    <property name="scala.zip" value="scala-2.6.0-final.zip"/>
+    <property name="scala.zip" value="scala-2.6.1-final.zip"/>
 
     <target name="-check-scala">
         <available file="scala/${scala.zip}" property="scalaExists"/>
