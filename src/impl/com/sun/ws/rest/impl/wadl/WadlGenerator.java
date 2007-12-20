@@ -1,20 +1,23 @@
 /*
- * The contents of this file are subject to the terms
- * of the Common Development and Distribution License
- * (the "License").  You may not use this file except
- * in compliance with the License.
+ * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+ * 
+ * Copyright 2007 Sun Microsystems, Inc. All rights reserved. 
+ * 
+ * The contents of this file are subject to the terms of the Common Development
+ * and Distribution License("CDDL") (the "License").  You may not use this file
+ * except in compliance with the License. 
+ * 
+ * You can obtain a copy of the License at:
+ *     https://jersey.dev.java.net/license.txt
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  *
- * You can obtain a copy of the license at
- * http://www.opensource.org/licenses/cddl1.php
- * See the License for the specific language governing
- * permissions and limitations under the License.
- */
-
-/*
- * WadlGenerator.java
- *
- * Created on November 30, 2007, 2:09 PM
- *
+ * When distributing the Covered Code, include this CDDL Header Notice in each
+ * file and include the License file at:
+ *     https://jersey.dev.java.net/license.txt
+ * If applicable, add the following below this CDDL Header, with the fields
+ * enclosed by brackets [] replaced by your own identifying information:
+ *     "Portions Copyrighted [year] [name of copyright owner]"
  */
 
 package com.sun.ws.rest.impl.wadl;
@@ -43,7 +46,7 @@ import javax.xml.namespace.QName;
  *
  * @author mh124079
  */
-public class WadlGenerator {
+public final class WadlGenerator {
     
     /**
      * Generate WADL for a set of resources.
@@ -187,7 +190,9 @@ public class WadlGenerator {
 
     private static Resource generateResource(AbstractResource r) {
         Resource wadlResource = new Resource();
-        wadlResource.setPath(r.getUriTemplate().getValue());
+        if (r.isRootResource())
+            wadlResource.setPath(r.getUriTemplate().getValue());
+        
         // for each resource method
         Map<String, Param> wadlResourceParams = new HashMap<String, Param>();
         for (AbstractResourceMethod m : r.getResourceMethods()) {
@@ -243,12 +248,13 @@ public class WadlGenerator {
 
     private static Resource generateSubResource(AbstractResource r, String path) {
         Resource wadlResource = new Resource();
-        StringBuilder b = new StringBuilder(r.getUriTemplate().getValue());
-        if (!(r.getUriTemplate().getValue().endsWith("/") || path.startsWith("/")))
-            b.append("/");
-        b.append(path);
-        wadlResource.setPath(b.toString());
-
+        if (r.isRootResource()) {
+            StringBuilder b = new StringBuilder(r.getUriTemplate().getValue());
+            if (!(r.getUriTemplate().getValue().endsWith("/") || path.startsWith("/")))
+                b.append("/");
+            b.append(path);
+            wadlResource.setPath(b.toString());
+        }
         // for each sub-resource method
         Map<String, Param> wadlSubResourceParams = new HashMap<String, Param>();
         for (AbstractSubResourceMethod m : r.getSubResourceMethods()) {

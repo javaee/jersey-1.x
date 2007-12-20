@@ -19,6 +19,7 @@
  * enclosed by brackets [] replaced by your own identifying information:
  *     "Portions Copyrighted [year] [name of copyright owner]"
  */
+
 package com.sun.ws.rest.impl.model;
 
 import com.sun.ws.rest.api.MediaTypes;
@@ -44,13 +45,12 @@ import com.sun.ws.rest.api.uri.UriTemplate;
 import com.sun.ws.rest.impl.uri.rules.RightHandPathRule;
 import com.sun.ws.rest.impl.uri.rules.UriRulesFactory;
 import com.sun.ws.rest.impl.view.ViewFactory;
+import com.sun.ws.rest.impl.wadl.WadlFactory;
 import com.sun.ws.rest.spi.resource.ResourceProvider;
 import com.sun.ws.rest.spi.resource.ResourceProviderFactory;
 import com.sun.ws.rest.spi.uri.rules.UriRule;
 import com.sun.ws.rest.spi.uri.rules.UriRules;
 import com.sun.ws.rest.spi.view.View;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -66,8 +66,8 @@ import javax.ws.rs.core.MediaType;
  * @author Paul.Sandoz@Sun.Com
  */
 public final class ResourceClass {
-
     private static final Logger LOGGER = Logger.getLogger(ResourceClass.class.getName());
+    
     private final UriRules<UriRule> rules;
     private final ResourceConfig config;
     public final AbstractResource resource;
@@ -374,47 +374,7 @@ public final class ResourceClass {
             }
         }
         
-        ResourceMethod wadlMethod = createWadlMethod(resource, p);
+        ResourceMethod wadlMethod = WadlFactory.createWadlMethod(resource, p);
         if (wadlMethod != null) methodMap.put(wadlMethod);
-    }
-    
-    /**
-     * Create the WADL resource method.
-     * <p>
-     * This is created using reflection so that there is no runtime
-     * dependency on JAXB. If the JAXB jars are not in the class path
-     * then WADL generation will not be supported.
-     * 
-     * @param resource the resource model
-     * @return the WADL resource method
-     */
-    private ResourceMethod createWadlMethod(AbstractResource resource, PathPattern p) {
-        try {
-            Class<?> wm = Class.forName("com.sun.ws.rest.impl.wadl.WadlMethod");
-            if (p == null) {
-                Constructor<?> wcc = wm.getConstructor(AbstractResource.class);
-                return (ResourceMethod)wcc.newInstance(resource);
-            } else {
-                Constructor<?> wcc = wm.getConstructor(AbstractResource.class, 
-                        String.class);
-                // Remove the '/' from the beginning
-                String path = p.getTemplate().getTemplate().substring(1);
-                return (ResourceMethod)wcc.newInstance(resource, path);
-            }
-        } catch (InvocationTargetException e) {
-            if (e.getCause() instanceof NoClassDefFoundError) {
-                // Ignore
-            } else {
-                // TODO log warning
-            }
-        } catch(RuntimeException e) {
-            LOGGER.severe("Error configuring WADL support");
-            throw e;
-        } catch(Exception e) {
-            LOGGER.severe("Error configuring WADL support");
-            throw new ContainerException(e);
-        }
-        
-        return null;
     }
 }

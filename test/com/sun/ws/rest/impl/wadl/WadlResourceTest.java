@@ -282,7 +282,6 @@ public class WadlResourceTest extends AbstractResourceTester {
         }
     }
     
-    @Path("foo")
     public static class SubResource {
         @Path("loc")
         public Object getSub() {
@@ -304,7 +303,7 @@ public class WadlResourceTest extends AbstractResourceTester {
     }
     
     public void testRecursive() throws ParserConfigurationException, SAXException, IOException, XPathExpressionException {
-        initiateWebApplication(RootResource.class, SubResource.class);
+        initiateWebApplication(RootResource.class);
         ResourceProxy r = resourceProxy("/root/loc");
         
         // test WidgetsResource

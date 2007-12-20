@@ -24,7 +24,6 @@ package com.sun.ws.rest.impl.application;
 
 import com.sun.ws.rest.spi.resource.Injectable;
 import java.lang.reflect.InvocationHandler;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import javax.ws.rs.WebApplicationException;
 import com.sun.ws.rest.api.container.ContainerException;
@@ -46,6 +45,7 @@ import com.sun.ws.rest.impl.uri.rules.RightHandPathRule;
 import com.sun.ws.rest.impl.uri.rules.RootResourceClassesRule;
 import com.sun.ws.rest.impl.uri.UriHelper;
 import com.sun.ws.rest.impl.uri.rules.ResourceObjectRule;
+import com.sun.ws.rest.impl.wadl.WadlFactory;
 import com.sun.ws.rest.impl.wadl.WadlResource;
 import com.sun.ws.rest.spi.container.ContainerRequest;
 import com.sun.ws.rest.spi.container.ContainerResponse;
@@ -54,7 +54,6 @@ import com.sun.ws.rest.spi.resource.ResourceProviderFactory;
 import com.sun.ws.rest.spi.uri.rules.UriRule;
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Proxy;
 import java.net.URI;
@@ -279,7 +278,7 @@ public final class WebApplicationImpl implements WebApplication {
             RulesMap<UriRule> rulesMap) {
         // TODO get ResourceConfig to check the WADL generation feature
         
-        Object wr = createWadlResource(rootResources);
+        Object wr = WadlFactory.createWadlResource(rootResources);
         if (wr == null) return;
         
         ResourceClass r = getResourceClass(WadlResource.class);
@@ -291,42 +290,7 @@ public final class WebApplicationImpl implements WebApplication {
         rulesMap.put(p, new RightHandPathRule(false,
                 new ResourceObjectRule(t.getTemplateVariables(), wr)));        
     }
-    
-    /**
-     * Create the WADL resource object.
-     * <p>
-     * This is created using reflection so that there is no runtime
-     * dependency on JAXB. If the JAXB jars are not in the class path
-     * then WADL generation will not be supported.
-     * 
-     * @param rootResources the set of root resources
-     * @return the WADL resource object
-     */
-    private Object createWadlResource(Set<AbstractResource> rootResources) {
-        try {
-            Class<?> wc = Class.forName("com.sun.ws.rest.impl.wadl.WadlResource");
-            Constructor<?> wcc = wc.getConstructor(Set.class);
-            return wcc.newInstance(rootResources);
-        } catch (InvocationTargetException e) {
-            if (e.getCause() instanceof NoClassDefFoundError) {
-                LOGGER.warning("WADL generation is disabled " +
-                        "because dependent Java classes cannot be found." + 
-                        "This is most likely because JAXB jars are not included in the java class path." +
-                        "To enable WADL include JAXB 2.x jars in the java class path.");
-            } else {
-                // TODO log warning
-            }
-        } catch(RuntimeException e) {
-            LOGGER.severe("Error configuring WADL support");
-            throw e;
-        } catch(Exception e) {
-            LOGGER.severe("Error configuring WADL support");
-            throw new ContainerException(e);
-        }
         
-        return null;
-    }
-    
     /**
      * Strip the matrix parameters from a path
      */
