@@ -61,6 +61,8 @@ public final class WadlMethod extends ResourceMethod {
                 String p = requestContext.getBaseUri().relativize(
                         requestContext.getAbsolutePath()).toString();
                 r.setPath(p);
+                // remove path params since path is fixed at this point
+                r.getParam().clear();
             }
             
             responseContext.setResponse(
