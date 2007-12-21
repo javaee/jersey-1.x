@@ -219,17 +219,22 @@ public final class VariantSelector {
                         // checked once
                         head = i;
                     }
-                } else {
-                    // If there is no dimension value for the variant
-                    // then move it and set it to the head so as can be
-                    // checked in other dimensions
-                    head.insertAfter(i);
-                    head = i;
                 }
                 i = i_next;
             }
         }
-        // Remove the incompatible entries
+        // Order entries with null dimension values after those 
+        // with acceptable dimension values
+        ListEntry<Variant> i = head.next();
+        while (i != null) {
+            final ListEntry<Variant> i_next = i.next();
+            if (dc.getDimension(i.value()) == null) {
+                head.insertAfter(i);
+                head = i;                
+            }
+            i = i_next;
+        }        
+        // Remove the unacceptable entries
         // Any such entries will always occur after the head entry
         head.removeTail();
     }
