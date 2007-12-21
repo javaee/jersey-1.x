@@ -46,7 +46,7 @@ import javax.xml.namespace.QName;
  *
  * @author mh124079
  */
-public final class WadlGenerator {
+/* package */ final class WadlGenerator {
     
     /**
      * Generate WADL for a set of resources.

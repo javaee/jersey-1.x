@@ -195,9 +195,9 @@ public final class ResourceClass {
             addToPatternMethodMap(patternMethodMap, p, rm);
         }
 
-        for (ResourceMethodMap methodMap : patternMethodMap.values()) {
-            processHead(methodMap);
-            processOptions(methodMap);
+        for (Map.Entry<PathPattern, ResourceMethodMap> e : patternMethodMap.entrySet()) {
+            processHead(e.getValue());
+            processOptions(e.getValue(), this.resource, e.getKey());            
         }
 
         return patternMethodMap;
@@ -211,7 +211,7 @@ public final class ResourceClass {
         }
 
         processHead(methodMap);
-        processOptions(methodMap);
+        processOptions(methodMap, this.resource, null);
 
         return methodMap;
     }
@@ -255,13 +255,16 @@ public final class ResourceClass {
         return false;
     }
 
-    private void processOptions(ResourceMethodMap methodMap) {
+    private void processOptions(ResourceMethodMap methodMap, 
+            AbstractResource resource, PathPattern p) {
         List<ResourceMethod> l = methodMap.get("OPTIONS");
         if (l != null) {
             return;
         }
 
-        ResourceMethod optionsMethod = new ResourceHttpOptionsMethod(methodMap);
+        ResourceMethod optionsMethod = WadlFactory.createWadlOptionsMethod(methodMap, resource, p);
+        if (optionsMethod == null)
+            optionsMethod = new ResourceHttpOptionsMethod(methodMap);
         methodMap.put(optionsMethod);
     }
 
@@ -374,7 +377,7 @@ public final class ResourceClass {
             }
         }
         
-        ResourceMethod wadlMethod = WadlFactory.createWadlMethod(resource, p);
+        ResourceMethod wadlMethod = WadlFactory.createWadlGetMethod(resource, p);
         if (wadlMethod != null) methodMap.put(wadlMethod);
     }
 }

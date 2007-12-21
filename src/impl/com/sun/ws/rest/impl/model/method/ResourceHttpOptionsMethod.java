@@ -36,26 +36,26 @@ import javax.ws.rs.core.Response;
  */
 public final class ResourceHttpOptionsMethod extends ResourceMethod {
     
-    private static final String getAllow(Map<String, List<ResourceMethod>> methods) {
-        StringBuilder s = new StringBuilder();
-        boolean first = true;
-        for (String method : methods.keySet()) {
-            if (!first) s.append(",");
-            first = false;
-            
-            s.append(method);
+    public static class OptionsRequestDispatcher implements RequestDispatcher {
+        protected final String allow;
+        
+        public OptionsRequestDispatcher(Map<String, List<ResourceMethod>> methods) {
+            this.allow = getAllow(methods);
         }
         
-        return s.toString();
-    }
+        private String getAllow(Map<String, List<ResourceMethod>> methods) {
+            StringBuilder s = new StringBuilder();
+            boolean first = true;
+            for (String method : methods.keySet()) {
+                if (!first) s.append(",");
+                first = false;
+
+                s.append(method);
+            }
+
+            return s.toString();
+        }
     
-    private static final class OptionsRequestDispatcher implements RequestDispatcher {
-        private final String allow;
-        
-        OptionsRequestDispatcher(String allow) {
-            this.allow = allow;
-        }
-        
         public void dispatch(Object resource, 
                 HttpRequestContext requestContext, 
                 HttpResponseContext responseContext) {
@@ -69,7 +69,7 @@ public final class ResourceHttpOptionsMethod extends ResourceMethod {
                 null,
                 MediaTypeHelper.GENERAL_MEDIA_TYPE_LIST, 
                 MediaTypeHelper.GENERAL_MEDIA_TYPE_LIST,
-                new OptionsRequestDispatcher(getAllow(methods)));
+                new OptionsRequestDispatcher(methods));
     }
     
     @Override

@@ -1,4 +1,10 @@
 release 0.5 (2008-01-18)
+- WADL is now generated at runtime (rather then compile time). WADL is generated
+  as before for the application but in addition it is not possible to get WADL 
+  for a resource by the client sending a GET request that accepts 
+  "application/vnd.sun.wadl+xml", if the application does not override 
+  support for this media type or supports a more general type, or using the 
+  OPTIONS method.
 - Support injection of the ServletContext on a resource class when
   using the servlet container.
 - Updated Mandel example to use Scala 2.6.1.
@@ -8,8 +14,8 @@ release 0.5 (2008-01-18)
 - Fixed bug for injecting onto fields of a super class
 - Fixed issue 25: UriBuilder uri() not concatinating properly
   https://jersey.dev.java.net/issues/show_bug.cgi?id=25
-- Grizzly support is upgraded to the latest jars.
-- Grizzly and the LW HTTP server now now easy ways to start a server
+- Grizzly support is upgraded to 1.7.0.
+- Grizzly and the LW HTTP server now have easy ways to start a server
   deployed with root resource classes, see: 
   - com.sun.ws.rest.api.container.grizzly.GrizzlyServerFactory
   - com.sun.ws.rest.api.container.httpserver.HttpServerFactory

@@ -22,14 +22,11 @@
 
 package com.sun.ws.rest.impl.wadl;
 
-import com.sun.ws.rest.api.container.ContainerException;
 import com.sun.ws.rest.api.model.AbstractResource;
 import com.sun.ws.rest.impl.model.method.ResourceMethod;
 import com.sun.ws.rest.impl.uri.PathPattern;
-import java.io.PrintWriter;
-import java.io.StringWriter;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.logging.Logger;
 
@@ -52,34 +49,20 @@ public final class WadlFactory {
      */
     public static Object createWadlResource(Set<AbstractResource> rootResources) {
         try {
-            Class<?> wc = Class.forName("com.sun.ws.rest.impl.wadl.WadlResource");
-            Constructor<?> wcc = wc.getConstructor(Set.class);
-            return wcc.newInstance(rootResources);
-        } catch (InvocationTargetException e) {
-            if (e.getCause() instanceof NoClassDefFoundError) {
-                LOGGER.warning("WADL generation is disabled " +
-                        "because dependent Java classes cannot be found. " + 
-                        "This is most likely because JAXB jars are not " + 
-                        "included in the java class path. " +
-                        "To enable WADL include JAXB 2.x jars in the java class path.");
-            } else {
-                StringWriter s = new StringWriter();
-                e.getCause().printStackTrace(new PrintWriter(s));
-                LOGGER.severe("Error constructing WADL for root resources: " + s.toString());
-            }
-        } catch(RuntimeException e) {
-            LOGGER.severe("Error configuring WADL support");
-            throw e;
-        } catch(Exception e) {
-            LOGGER.severe("Error configuring WADL support");
-            throw new ContainerException(e);
+            checkForJAXB();
+        } catch(ClassNotFoundException e) {
+            LOGGER.warning("WADL generation is disabled " +
+                    "because JAXB jars are not " + 
+                    "included in the java class path. " +
+                    "To enable WADL include JAXB 2.x jars in the java class path."); 
+            return null;
         }
         
-        return null;
+        return new WadlResource(rootResources);
     }
     
     /**
-     * Create the WADL resource method.
+     * Create the WADL resource method for GET.
      * <p>
      * This is created using reflection so that there is no runtime
      * dependency on JAXB. If the JAXB jars are not in the class path
@@ -88,38 +71,56 @@ public final class WadlFactory {
      * @param resource the resource model
      * @return the WADL resource method
      */
-    public static ResourceMethod createWadlMethod(AbstractResource resource, PathPattern p) {
+    public static ResourceMethod createWadlGetMethod(AbstractResource resource, PathPattern p) {
         try {
-            Class<?> wm = Class.forName("com.sun.ws.rest.impl.wadl.WadlMethod");
-            if (p == null) {
-                Constructor<?> wcc = wm.getConstructor(AbstractResource.class);
-                return (ResourceMethod)wcc.newInstance(resource);
-            } else {
-                Constructor<?> wcc = wm.getConstructor(AbstractResource.class, 
-                        String.class);
-                // Remove the '/' from the beginning
-                String path = p.getTemplate().getTemplate().substring(1);
-                return (ResourceMethod)wcc.newInstance(resource, path);
-            }
-        } catch (InvocationTargetException e) {
-            if (e.getCause() instanceof NoClassDefFoundError) {
-                // Ignore
-                // The warning will be printed out once when attempting to 
-                // create the WADL of the application
-            } else {
-                StringWriter s = new StringWriter();
-                e.getCause().printStackTrace(new PrintWriter(s));
-                LOGGER.severe("Error constructing WADL for resource " + 
-                        resource.getClass() + ": " + s.toString());
-            }
-        } catch(RuntimeException e) {
-            LOGGER.severe("Error configuring WADL support");
-            throw e;
-        } catch(Exception e) {
-            LOGGER.severe("Error configuring WADL support");
-            throw new ContainerException(e);
+            checkForJAXB();
+        } catch(ClassNotFoundException e) {
+            return null;
         }
         
-        return null;
+        if (p == null) {
+            return new WadlMethodFactory.WadlGetMethod(resource, null);
+        } else {
+            // Remove the '/' from the beginning
+            String path = p.getTemplate().getTemplate().substring(1);
+            return new WadlMethodFactory.WadlGetMethod(resource, path);
+        }        
     }    
+    
+    /**
+     * Create the WADL resource method for OPTIONS.
+     * <p>
+     * This is created using reflection so that there is no runtime
+     * dependency on JAXB. If the JAXB jars are not in the class path
+     * then WADL generation will not be supported.
+     * 
+     * @param resource the resource model
+     * @return the WADL resource OPTIONS method
+     */
+    public static ResourceMethod createWadlOptionsMethod(
+            Map<String, List<ResourceMethod>> methods, 
+            AbstractResource resource, PathPattern p) {
+        try {
+            checkForJAXB();
+        } catch(ClassNotFoundException e) {
+            return null;
+        }
+        
+        if (p == null) {
+            return new WadlMethodFactory.WadlOptionsMethod(methods, resource, null);
+        } else {
+            // Remove the '/' from the beginning
+            String path = p.getTemplate().getTemplate().substring(1);
+            return new WadlMethodFactory.WadlOptionsMethod(methods, resource, path);
+        }
+    }        
+    
+    /**
+     * Check if JAXB is present in the class path
+     * 
+     * @throws java.lang.ClassNotFoundException
+     */
+    private static void checkForJAXB() throws ClassNotFoundException {
+        Class<?> c = Class.forName("javax.xml.bind.JAXBElement");
+    }
 }

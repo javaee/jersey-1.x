@@ -81,6 +81,14 @@ public abstract class ResourceProxy implements ResourceProxyInvoker {
         return _invoke(u, "HEAD", ro);
     }
 
+    public final <T> T options(Class<T> c) {
+        return options(c, new RequestOutBoundImpl());
+    }
+    
+    public final <T> T options(Class<T> c, RequestOutBound ro) {
+        return invoke("OPTIONS", c, ro);
+    }
+
     
     public final <T> T get(Class<T> c) {
         return get(c, new RequestOutBoundImpl());
@@ -206,7 +214,12 @@ public abstract class ResourceProxy implements ResourceProxyInvoker {
         public final ResponseInBound head() {
             return ResourceProxy.this.head(b.build());
         }
-    
+
+        
+        public final <T> T options(Class<T> c) {
+            return ResourceProxy.this.options(c, b.build());
+        }
+        
         
         public final <T> T get(Class<T> c) {
             return ResourceProxy.this.get(c, b.build());
