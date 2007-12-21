@@ -4,6 +4,7 @@ import com.sun.grizzly.http.SelectorThread;
 import com.sun.grizzly.standalone.StaticStreamAlgorithm;
 import com.sun.grizzly.tcp.Adapter;
 import com.sun.ws.rest.api.container.ContainerFactory;
+import java.io.IOException;
 import java.net.URI;
 
 /**
@@ -36,7 +37,7 @@ public final class GrizzlyServerFactory {
      *        used. The URI path, query and fragment components are ignored.
      * @return the select thread, with the endpoint started
      */
-    public static SelectorThread create(String u) {
+    public static SelectorThread create(String u) throws IOException {
         if (u == null)
             throw new IllegalArgumentException("The URI must not be null");
 
@@ -64,7 +65,7 @@ public final class GrizzlyServerFactory {
      *        used. The URI path, query and fragment components are ignored.
      * @return the select thread, with the endpoint started
      */
-    public static SelectorThread create(URI u) {
+    public static SelectorThread create(URI u) throws IOException {
         return create(u, ContainerFactory.createContainer(Adapter.class));
     }
         
@@ -86,7 +87,7 @@ public final class GrizzlyServerFactory {
      * @param adapter the Adapter
      * @return the select thread, with the endpoint started
      */
-    public static SelectorThread create(String u, Adapter adapter) {
+    public static SelectorThread create(String u, Adapter adapter) throws IOException {
         if (u == null)
             throw new IllegalArgumentException("The URI must not be null");
 
@@ -111,10 +112,11 @@ public final class GrizzlyServerFactory {
      * @param adapter the Adapter
      * @return the select thread, with the endpoint started
      */
-    public static SelectorThread create(URI u, Adapter adapter) {
+    public static SelectorThread create(URI u, Adapter adapter) throws IOException {
         if (u == null)
             throw new IllegalArgumentException("The URI must not be null");
             
+        // TODO support https
         final String scheme = u.getScheme();
         if (!scheme.equalsIgnoreCase("http"))
             throw new IllegalArgumentException("The URI scheme, of the URI " + u + 
@@ -129,7 +131,13 @@ public final class GrizzlyServerFactory {
 
         selectorThread.setAdapter(adapter);
         
-        selectorThread.listen();
+        try {
+            selectorThread.listen();
+        } catch (InstantiationException e) {
+            IOException _e = new IOException();
+            _e.initCause(e);
+            throw _e;
+        }
         return selectorThread;
     }    
 }

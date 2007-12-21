@@ -28,6 +28,7 @@ import com.sun.ws.rest.api.container.ContainerFactory;
 import com.sun.ws.rest.api.container.grizzly.GrizzlyServerFactory;
 import com.sun.ws.rest.api.core.ResourceConfig;
 import com.sun.ws.rest.impl.test.util.TestHelper;
+import java.io.IOException;
 import java.net.URI;
 import javax.ws.rs.core.UriBuilder;
 import junit.framework.TestCase;
@@ -67,7 +68,11 @@ public abstract class AbstractGrizzlyServerTester extends TestCase {
         System.out.println("Starting GrizzlyServer port number = " + port);
         
         URI u = UriBuilder.fromUri("http://localhost").port(port).build();
-        selectorThread = GrizzlyServerFactory.create(u, adapter);
+        try {
+            selectorThread = GrizzlyServerFactory.create(u, adapter);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
         System.out.println("Started GrizzlyServer");
 
         int timeToSleep = TestHelper.getEnvVariable("JERSEY_HTTP_SLEEP", 0);
