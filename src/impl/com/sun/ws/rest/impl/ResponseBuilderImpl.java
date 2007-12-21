@@ -136,17 +136,77 @@ public final class ResponseBuilderImpl extends Response.Builder {
 
     public Response.Builder variant(Variant variant) {
         type(variant.getMediaType());
+        // TODO set charset
         language(variant.getLanguage());
-        // TODO set charset and encoding
+        if (variant.getEncoding() != null)
+            header("Content-Encoding", variant.getEncoding());
+        
+        // TODO this is not the correct way to set the vary field
+        // since a dimension may only have one choice and therefore
+        // does not vary
+        StringBuilder vary = new StringBuilder();
+        append(vary, variant.getMediaType() != null, "Accept");
+        append(vary, variant.getCharset() != null, "Accept-Charset");
+        append(vary, variant.getLanguage() != null, "Accept-Language");
+        append(vary, variant.getEncoding() != null, "Accept-Encoding");
+        
+        if (vary.length() > 0)
+            header("Vary", vary.toString());
+        
         return this;
     }
     
     public Response.Builder variants(List<Variant> variants) {
         status(406);
-        // TODO set Allows header field
+        if (variants.isEmpty())
+            return this;
+
+        MediaType accept = variants.get(0).getMediaType();
+        boolean vAccept = false;
+        
+        String acceptCharset = variants.get(0).getCharset();
+        boolean vAcceptCharset = false;
+        
+        String acceptLanguage = variants.get(0).getLanguage();
+        boolean vAcceptLanguage = false;
+        
+        String acceptEncoding = variants.get(0).getEncoding();
+        boolean vAcceptEncoding = false;
+
+        for (Variant v : variants) {
+            vAccept |= !vAccept && vary(v.getMediaType(), accept);
+            vAcceptCharset |= !vAcceptCharset && vary(v.getCharset(), acceptCharset);
+            vAcceptLanguage |= !vAcceptLanguage && vary(v.getLanguage(), acceptLanguage);
+            vAcceptCharset |= !vAcceptEncoding && vary(v.getEncoding(), acceptEncoding);
+        }
+        
+        StringBuilder vary = new StringBuilder();
+        append(vary, vAccept, "Accept");
+        append(vary, vAcceptCharset, "Accept-Charset");
+        append(vary, vAcceptLanguage, "Accept-Language");
+        append(vary, vAcceptEncoding, "Accept-Encoding");
+        
+        if (vary.length() > 0)
+            header("Vary", vary.toString());
         return this;
     }
         
+    private boolean vary(MediaType v, MediaType vary) {
+        return v != null && !v.equals(vary);
+    }
+    
+    private boolean vary(String v, String vary) {
+        return v != null && !v.equalsIgnoreCase(vary);
+    }
+    
+    private void append(StringBuilder sb, boolean v, String s) {
+        if (v) {
+            if (sb.length() > 0)
+                sb.append(',');
+            sb.append(s);
+        }        
+    }
+    
     public Response.Builder language(String language) {
         set(CONTENT_LANGUAGE, language);
         return this;

@@ -126,11 +126,28 @@ public class VariantsTest extends AbstractResourceTester {
         ResponseInBound r = rp.acceptable("application/atom+xml").
                 header("Accept-Language", "en-us,en").
                 get(ResponseInBound.class);
+        String vary = r.getMetadata().getFirst("Vary");
+        assertNotNull(vary);
+        assertTrue(contains(vary, "Accept"));
+        assertTrue(contains(vary, "Accept-Language"));
         assertEquals(406, r.getStatus());
         
         r = rp.acceptable("application/xml").
                 header("Accept-Language", "fr").
                 get(ResponseInBound.class);
+        assertTrue(contains(vary, "Accept"));
+        assertTrue(contains(vary, "Accept-Language"));
         assertEquals(406, r.getStatus());
-    }    
+    }
+    
+    private boolean contains(String l, String v) {
+        String[] vs = l.split(",");
+        for (String s : vs) {
+            s = s.trim();
+            if (s.equalsIgnoreCase(v))
+                return true;
+        }
+        
+        return false;
+    }
 }
