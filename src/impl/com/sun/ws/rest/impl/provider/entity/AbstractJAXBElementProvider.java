@@ -40,11 +40,12 @@ public abstract class AbstractJAXBElementProvider extends AbstractTypeEntityProv
         return type.getAnnotation(XmlRootElement.class) != null;
     }
     
-    protected static JAXBContext getJAXBContext(Class type) throws JAXBException {
+    protected final static JAXBContext getJAXBContext(Class type) throws JAXBException {
         synchronized (jaxbContexts) {
             JAXBContext context = jaxbContexts.get(type);
             if (context == null) {
                 context = JAXBContext.newInstance(type);
+                jaxbContexts.put(type, context);
             }
             return context;
         }
