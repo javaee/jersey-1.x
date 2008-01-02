@@ -37,7 +37,7 @@ import java.util.Map;
 public class MediaTypeProvider implements HeaderProvider<MediaType> {
     
     public boolean supports(Class<?> type) {
-        return type==MediaType.class ? true : false;
+        return type == MediaType.class;
     }
 
     public String toString(MediaType header) {

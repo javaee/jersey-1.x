@@ -35,7 +35,7 @@ import javax.ws.rs.ext.HeaderProvider;
 public class DateProvider implements HeaderProvider<Date> {
     
     public boolean supports(Class<?> type) {
-        return type == Date.class;
+        return Date.class.isAssignableFrom(type);
     }
 
     public String toString(Date header) {
