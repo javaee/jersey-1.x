@@ -25,7 +25,6 @@ package com.sun.ws.rest.samples.console.resources;
 import java.util.ArrayList;
 import java.util.List;
 import javax.ws.rs.GET;
-import javax.ws.rs.HttpMethod;
 import javax.ws.rs.ProduceMime;
 import javax.ws.rs.QueryParam;
 
