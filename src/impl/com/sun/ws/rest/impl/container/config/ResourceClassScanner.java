@@ -150,7 +150,8 @@ public final class ResourceClassScanner {
     
     private Class getClassForName(String className) {
         try {
-            return Class.forName(className);
+            return Thread.currentThread().getContextClassLoader().
+                    loadClass(className);
         } catch (ClassNotFoundException ex) {
             String s = "A (root resource) class file of the class name, " + 
                     className + 

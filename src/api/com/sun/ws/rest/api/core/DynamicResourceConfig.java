@@ -44,6 +44,16 @@ import java.util.logging.Logger;
 public final class DynamicResourceConfig extends DefaultResourceConfig {
 
     /**
+     * @param paths the array paths consisting of either jar files or
+     *        directories containing jar files for class files.
+     */
+    public DynamicResourceConfig(String[] paths) {
+        if (paths == null || paths.length == 0)
+            throw new IllegalArgumentException("Array of paths must not be null or empty");
+        
+        init(paths);
+    }
+    /**
      * @param props the property bag that contains the property 
      *        {@link ResourceConfig#PROPERTY_RESOURCE_PATHS}. 
      */
