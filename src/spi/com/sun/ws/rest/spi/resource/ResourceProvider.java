@@ -35,9 +35,9 @@ public interface ResourceProvider {
      * Specifies the class of the resource that the provider
      * instance will manage access to.
      *
-     * @param resourceClass the class of the resource
+     * @param resource the abstract resource
      * @param resourceFeatures the resource features
-     * @param resourceFeatures the resource properties
+     * @param resourceProperties the resource properties
      */
     void init(AbstractResource resource,
             Map<String, Boolean> resourceFeatures,

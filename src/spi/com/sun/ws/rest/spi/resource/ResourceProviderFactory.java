@@ -57,9 +57,9 @@ public class ResourceProviderFactory {
      * If there is no such property then the {@link PerRequestProvider} will
      * ne chosen.
      * 
-     * @param resourceClass the resource class for the provider.
+     * @param resource the abstract resource for the provider.
      * @param resourceFeatures the resource features
-     * @param resourceFeatures the resource properties
+     * @param resourceProperties the resource properties
      * @return the resource provider.
      * @throws IllegalArgumentException if the Java type of resource provider
      *         property is not Class<? extends ResourceProvider>.
@@ -106,7 +106,6 @@ public class ResourceProviderFactory {
         }
         
         try {
-            // create and stash a new instance of the desired provider
             ResourceProvider r = providerClass.newInstance();
             r.init(resource, resourceFeatures, resourceProperties);
             return r;
