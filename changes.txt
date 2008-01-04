@@ -1,4 +1,7 @@
 release 0.5 (2008-01-18)
+- WADL ant task for generating a WADL document of the root resources present
+  in a given classpath. See the class:
+    com.sun.ws.rest.api.wadl.WadlGeneratorTask
 - WADL is now generated at runtime (rather then compile time). WADL is generated
   as before for the application but in addition it is not possible to get WADL 
   for a resource by the client sending a GET request that accepts 
@@ -35,7 +38,7 @@ release 0.5 (2008-01-18)
     - com.sun.ws.rest.spi.container.servlet.ServletContainer
 - JAXB XML and JSON support now split into separate implementations,
   and the former no longer requires the jars of the latter in the classpath.
-- Partially integrated JSR 311 API 0.5
+- Integrated JSR 311 API 0.5
   - EntityProvider is split into two separate interfaces
     MessageBodyReader and MessageBodyWriter
   - java.ws.rs.UriTemplate renamed to java.ws.rs.Path

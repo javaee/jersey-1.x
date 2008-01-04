@@ -43,6 +43,14 @@ import org.apache.tools.ant.types.Path;
 import org.apache.tools.ant.types.Reference;
 
 /**
+ * Ant task for generating WADL for root resource classes.
+ * 
+ * The task requires that the destfile attribute be set to the location
+ * of the WADL file to be generated, and the classpath be set.
+ * 
+ * The task will scan all classes in the classpath obtain the root resource
+ * classes and then create a WADL document from those root resources.
+ * 
  * @author Paul.Sandoz@Sun.Com
  */
 public class WadlGeneratorTask extends Task {
