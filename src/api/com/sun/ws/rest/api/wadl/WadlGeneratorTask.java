@@ -137,7 +137,7 @@ public class WadlGeneratorTask extends Task {
         final ClassLoader ncl = new Loader(classpath.list(), this.getClass().getClassLoader());
         Thread.currentThread().setContextClassLoader(ncl);
         try {
-            ResourceConfig rc = new ClasspathResourceConfig(classpath.list());
+            ResourceConfig rc = new DynamicResourceConfig(classpath.list());
             Set<AbstractResource> s = new HashSet<AbstractResource>();
             for (Class c : rc.getResourceClasses()) {
                 s.add(IntrospectionModeller.createResource(c));
