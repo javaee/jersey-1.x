@@ -22,7 +22,7 @@
 
 package com.sun.ws.rest.impl.container.config;
 
-import com.sun.ws.rest.api.core.DynamicResourceConfig;
+import com.sun.ws.rest.api.core.ClasspathResourceConfig;
 import com.sun.ws.rest.api.core.ResourceConfig;
 import com.sun.ws.rest.impl.container.config.innerstatic.InnerStaticClass;
 import com.sun.ws.rest.impl.container.config.toplevel.PublicRootResourceClass;
@@ -37,17 +37,17 @@ import junit.framework.*;
  *
  * @author Paul.Sandoz@Sun.Com
  */
-public class DynamicResourceConfigTest extends AbstractResourceConfigTester {
+public class ClasspathResourceConfigTest extends AbstractResourceConfigTester {
     
-    public DynamicResourceConfigTest(String testName) {
+    public ClasspathResourceConfigTest(String testName) {
         super(testName);
     }
     
     public void testTopLevel() {
         Map<String, Object> p = new HashMap<String, Object>();
         String[] paths = {"build/test/classes/com/sun/ws/rest/impl/container/config/toplevel"};
-        p.put(ResourceConfig.PROPERTY_RESOURCE_PATHS, paths);
-        ResourceConfig rc = new DynamicResourceConfig(p);
+        p.put(ClasspathResourceConfig.PROPERTY_CLASSPATH, paths);
+        ResourceConfig rc = new ClasspathResourceConfig(p);
         
         assertTrue(rc.getResourceClasses().contains(PublicRootResourceClass.class));
         assertEquals(1, rc.getResourceClasses().size());
@@ -56,8 +56,8 @@ public class DynamicResourceConfigTest extends AbstractResourceConfigTester {
     public void testInnerStatic() {
         Map<String, Object> p = new HashMap<String, Object>();
         String[] paths = {"build/test/classes/com/sun/ws/rest/impl/container/config/innerstatic"};
-        p.put(ResourceConfig.PROPERTY_RESOURCE_PATHS, paths);
-        ResourceConfig rc = new DynamicResourceConfig(p);
+        p.put(ClasspathResourceConfig.PROPERTY_CLASSPATH, paths);
+        ResourceConfig rc = new ClasspathResourceConfig(p);
         
         assertTrue(rc.getResourceClasses().contains(InnerStaticClass.PublicClass.class));
         assertEquals(1, rc.getResourceClasses().size());
@@ -66,8 +66,8 @@ public class DynamicResourceConfigTest extends AbstractResourceConfigTester {
     public void testTopLevelInnerStatic() {
         Map<String, Object> p = new HashMap<String, Object>();
         String[] paths = {"build/test/classes/com/sun/ws/rest/impl/container/config/toplevelinnerstatic"};
-        p.put(ResourceConfig.PROPERTY_RESOURCE_PATHS, paths);
-        ResourceConfig rc = new DynamicResourceConfig(p);
+        p.put(ClasspathResourceConfig.PROPERTY_CLASSPATH, paths);
+        ResourceConfig rc = new ClasspathResourceConfig(p);
         
         assertTrue(rc.getResourceClasses().contains(PublicRootResourceInnerStaticClass.class));
         assertTrue(rc.getResourceClasses().contains(PublicRootResourceInnerStaticClass.PublicClass.class));
@@ -77,8 +77,8 @@ public class DynamicResourceConfigTest extends AbstractResourceConfigTester {
     public void testAll() {
         Map<String, Object> p = new HashMap<String, Object>();
         String[] paths = {"build/test/classes/com/sun/ws/rest/impl/container/config"};
-        p.put(ResourceConfig.PROPERTY_RESOURCE_PATHS, paths);
-        ResourceConfig rc = new DynamicResourceConfig(p);
+        p.put(ClasspathResourceConfig.PROPERTY_CLASSPATH, paths);
+        ResourceConfig rc = new ClasspathResourceConfig(p);
         
         assertTrue(rc.getResourceClasses().contains(PublicRootResourceClass.class));
         assertTrue(rc.getResourceClasses().contains(InnerStaticClass.PublicClass.class));
@@ -87,6 +87,21 @@ public class DynamicResourceConfigTest extends AbstractResourceConfigTester {
         assertEquals(4, rc.getResourceClasses().size());
     }
     
+    public void testAllWithOnePath() {
+        Map<String, Object> p = new HashMap<String, Object>();
+        String paths = 
+                "build/test/classes/com/sun/ws/rest/impl/container/config/toplevel;" +
+                "build/test/classes/com/sun/ws/rest/impl/container/config/innerstatic;" +
+                "build/test/classes/com/sun/ws/rest/impl/container/config/toplevelinnerstatic";
+        p.put(ClasspathResourceConfig.PROPERTY_CLASSPATH, paths);
+        ResourceConfig rc = new ClasspathResourceConfig(p);
+        
+        assertTrue(rc.getResourceClasses().contains(PublicRootResourceClass.class));
+        assertTrue(rc.getResourceClasses().contains(InnerStaticClass.PublicClass.class));
+        assertTrue(rc.getResourceClasses().contains(PublicRootResourceInnerStaticClass.class));
+        assertTrue(rc.getResourceClasses().contains(PublicRootResourceInnerStaticClass.PublicClass.class));
+        assertEquals(4, rc.getResourceClasses().size());
+    }
     
     public void testJarTopLevel() throws IOException {
         File jarFile = createJarFile("build/test/classes/",
@@ -134,7 +149,7 @@ public class DynamicResourceConfigTest extends AbstractResourceConfigTester {
         Map<String, Object> p = new HashMap<String, Object>();
         String[] paths = new String[1];
         paths[0] = jarFile.getAbsolutePath();
-        p.put(ResourceConfig.PROPERTY_RESOURCE_PATHS, paths);
-        return new DynamicResourceConfig(p);        
+        p.put(ClasspathResourceConfig.PROPERTY_CLASSPATH, paths);
+        return new ClasspathResourceConfig(p);        
     }    
 }

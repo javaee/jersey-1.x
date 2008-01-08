@@ -25,7 +25,7 @@ package com.sun.ws.rest.spi.container.servlet;
 import com.sun.ws.rest.api.container.ContainerException;
 import com.sun.ws.rest.api.core.ResourceConfig;
 import com.sun.ws.rest.impl.ThreadLocalInvoker;
-import com.sun.ws.rest.api.core.DynamicResourceConfig;
+import com.sun.ws.rest.api.core.ClasspathResourceConfig;
 import com.sun.ws.rest.impl.container.servlet.HttpRequestAdaptor;
 import com.sun.ws.rest.impl.container.servlet.HttpResponseAdaptor;
 import com.sun.ws.rest.spi.container.WebApplication;
@@ -34,10 +34,11 @@ import com.sun.ws.rest.spi.resource.Injectable;
 import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Proxy;
+import java.util.ArrayList;
+import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.annotation.Resource;
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletContext;
@@ -51,17 +52,25 @@ import javax.servlet.http.HttpServletResponse;
  * A servlet container for deploying root resource classes.
  * <p>
  * The web.xml MAY configure the servlet to have an initialization parameter 
- * "webresourceclass" and whose value is a fully qualified name of a class 
- * that implements {@link ResourceConfig}.
+ * "com.sun.ws.rest.config.property.resourceConfigClass" and whose value is a 
+ * fully qualified name of a class that implements {@link ResourceConfig}. 
+ * If the concrete class has a constructor that takes a single parameter of the 
+ * type Map then the class is instantiated with that constructor and an instance 
+ * of Map that contains all the initialization parameters is passed as the parameter.
+ * Otherwise the default contructor is used to instantate the class.
  * <p>
- * If the parameter "webresourceclass" is not present a new instance of 
- * @{link DyanmicResourceConfig} is created. The initialization parameter 
- * "com.sun.ws.rest.config.property.ResourcePaths" MAY be set to provide the 
- * one or more paths. This value is passed as the property 
- * (@link ResourceConfig.PROPERTY_RESOURCE_PATHS} as part of a property bag
- * passed to the constructor of @{link DyanmicResourceConfig}. Each path MUST 
- * be separated by ';'. Each path MUST be a virtual path as specified by the 
- * {@link Servlet#getRealPath} method. If this parameter is not set then the 
+ * If the initialization parameter 
+ * "com.sun.ws.rest.config.property.resourceConfigClass" is not present a new 
+ * instance of @{link ClasspathResourceConfig} is created. The initialization 
+ * parameter "com.sun.ws.rest.config.property.classpath" MAY be set to provide 
+ * one or more paths. Each path MUST be separated by ';'. Each path MUST
+ * be a virtual path as specified by the {@link Servlet#getRealPath} method,
+ * and each path is transformed by that method. The transformed paths are
+ * added as a property value to a Map instance using the property name 
+ * (@link ClasspathResourceConfig.PROPERTY_CLASSPATH}. Any additional 
+ * initialization parameters are then added to the Map instance. Then that Map
+ * instance is passe to the constructor of @{link ClasspathResourceConfig}.
+ * If this parameter is not set then the 
  * default value is set to the following virtual paths: 
  * "/WEB-INF/lib;/WEB-INF/classes".
  * <p>
@@ -72,7 +81,8 @@ import javax.servlet.http.HttpServletResponse;
  * @{link HttpServletResponse} and {@link ServletConfig}.
  */
 public class ServletContainer extends HttpServlet {
-    private static final String WEB_RESOURCE_CLASS = "webresourceclass";
+    private static final String RESOURCE_CONFIG_CLASS = 
+            "com.sun.ws.rest.config.property.resourceConfigClass";
     
     private WebApplication application;
     
@@ -91,13 +101,7 @@ public class ServletContainer extends HttpServlet {
         
         this.context = servletConfig.getServletContext();
         
-        String resources = servletConfig.getInitParameter(WEB_RESOURCE_CLASS);
-        
-        String resourcePathsParam = servletConfig.getInitParameter(
-                ResourceConfig.PROPERTY_RESOURCE_PATHS);
-        
-        ResourceConfig resourceConfig = createResourceConfig(resources, 
-                getPaths(resourcePathsParam));
+        ResourceConfig resourceConfig = createResourceConfig(servletConfig);
         initResourceConfigFeatures(servletConfig, resourceConfig);
         
         this.application = create();
@@ -136,53 +140,90 @@ public class ServletContainer extends HttpServlet {
         }
     }
     
-    private String[] getPaths(String resourcePathsParam) {
-        if (resourcePathsParam == null) {
+    
+    private ResourceConfig createResourceConfig(ServletConfig servletConfig) 
+            throws ServletException {        
+        Map<String, Object> props = getInitParams(servletConfig);
+        
+        String resourceConfigClassName = servletConfig.getInitParameter(RESOURCE_CONFIG_CLASS);
+        if (resourceConfigClassName == null) {
+            String[] paths = getPaths(servletConfig.getInitParameter(
+                    ClasspathResourceConfig.PROPERTY_CLASSPATH));
+            props.put(ClasspathResourceConfig.PROPERTY_CLASSPATH, paths);
+            return new ClasspathResourceConfig(props);
+        }
+
+        try {
+            Class resourceConfigClass = getClassLoader().
+                    loadClass(resourceConfigClassName);
+            
+            if (resourceConfigClass == ClasspathResourceConfig.class) {
+                String[] paths = getPaths(servletConfig.getInitParameter(
+                        ClasspathResourceConfig.PROPERTY_CLASSPATH));
+                props.put(ClasspathResourceConfig.PROPERTY_CLASSPATH, paths);
+                return new ClasspathResourceConfig(props);
+            } else if (ResourceConfig.class.isAssignableFrom(resourceConfigClass)) {
+                try {                    
+                    Constructor constructor = resourceConfigClass.getConstructor(Map.class);
+                    return (ResourceConfig)constructor.newInstance(props);
+                } catch (NoSuchMethodException ex) {
+                    // Pass through and try the default constructor
+                } catch (Exception e) {
+                    throw new ServletException(e);
+                }
+                
+                try {
+                    return (ResourceConfig)resourceConfigClass.newInstance();
+                } catch(Exception e) {                    
+                    throw new ServletException(e);
+                }
+            } else {
+                String message = "Resource configuration class, " + resourceConfigClassName + 
+                        ", is not a super class of " + ResourceConfig.class;
+                throw new ServletException(message);
+            }
+        } catch (ClassNotFoundException e) {
+            String message = "Resource configuration class, " + resourceConfigClassName + 
+                    ", could not be loaded";
+            throw new ServletException(message, e);
+        }
+    }
+
+    private ClassLoader getClassLoader() {
+        ClassLoader classLoader = Thread.currentThread().getContextClassLoader();        
+        return (classLoader == null) ? getClass().getClassLoader() : classLoader;
+    }
+    
+    private Map<String, Object> getInitParams(ServletConfig servletConfig) {
+        Map<String, Object> props = new HashMap<String, Object>();
+        Enumeration names = servletConfig.getInitParameterNames();
+        while(names.hasMoreElements()) {
+            String name = (String)names.nextElement();
+            props.put(name, servletConfig.getInitParameter(name));
+        }
+        return props;
+    }
+    
+    private String[] getPaths(String classpath) {
+        if (classpath == null) {
             return new String[] {
                 context.getRealPath("/WEB-INF/lib"), 
                 context.getRealPath("/WEB-INF/classes")
             };
-        }
-        else {
-            String[] rels = resourcePathsParam.split(";");
-            String[] resourcePaths = new String[rels.length];
-            for (int i=0; i<rels.length; i++) {
-                resourcePaths[i] = context.getRealPath(rels[i].trim());
+        } else {
+            String[] virtualPaths = classpath.split(";");
+            List<String> resourcePaths = new ArrayList<String>();
+            for (String virtualPath : virtualPaths) {
+                virtualPath = virtualPath.trim();
+                if (virtualPath.length() == 0) continue;
+                
+                resourcePaths.add(context.getRealPath(virtualPath));
             }
-            return resourcePaths;
+            
+            return resourcePaths.toArray(new String[resourcePaths.size()]);
         }        
     }
     
-    private ResourceConfig createResourceConfig(String resources, String[] resourcePaths) 
-    throws ServletException {
-        
-        Map<String, Object> initParams = new HashMap<String, Object>();
-        initParams.put(ResourceConfig.PROPERTY_RESOURCE_PATHS, resourcePaths);
-        
-        if (resources == null) {
-            return new DynamicResourceConfig(initParams);
-        }
-
-        try {
-            ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
-            if (classLoader == null) {
-                classLoader = getClass().getClassLoader();
-            }
-            Class cls = classLoader.loadClass(resources);
-            try {
-                Constructor constructor = cls.getConstructor(Map.class);
-                return (ResourceConfig) constructor.newInstance(initParams);
-            }
-            catch (NoSuchMethodException ex) {
-                return (ResourceConfig) cls.newInstance();
-            }
-        } catch (Exception e) {
-            String message = "ResourceConfig instance, " + resources + ", could not be instantiated";
-            Logger.getLogger(ServletContainer.class.getName()).log(Level.SEVERE, message, e);
-            throw new ServletException(message, e);        
-        }
-    }
-
     private void initResourceConfigFeatures(ServletConfig servletConfig, ResourceConfig rc) {
         setResourceConfigFeature(servletConfig, rc, 
                 ResourceConfig.FEATURE_CANONICALIZE_URI_PATH);

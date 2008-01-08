@@ -22,7 +22,7 @@
 package com.sun.ws.rest.api.wadl;
 
 import com.sun.research.ws.wadl.Application;
-import com.sun.ws.rest.api.core.DynamicResourceConfig;
+import com.sun.ws.rest.api.core.ClasspathResourceConfig;
 import com.sun.ws.rest.api.core.ResourceConfig;
 import com.sun.ws.rest.api.model.AbstractResource;
 import com.sun.ws.rest.impl.modelapi.annotation.IntrospectionModeller;
@@ -137,7 +137,7 @@ public class WadlGeneratorTask extends Task {
         final ClassLoader ncl = new Loader(classpath.list(), this.getClass().getClassLoader());
         Thread.currentThread().setContextClassLoader(ncl);
         try {
-            ResourceConfig rc = new DynamicResourceConfig(classpath.list());
+            ResourceConfig rc = new ClasspathResourceConfig(classpath.list());
             Set<AbstractResource> s = new HashSet<AbstractResource>();
             for (Class c : rc.getResourceClasses()) {
                 s.add(IntrospectionModeller.createResource(c));

@@ -77,24 +77,6 @@ public interface ResourceConfig {
             = "com.sun.ws.rest.config.property.DefaultResourceProviderClass";
 
     /**
-     * If set on a property bag that is passed into constructor an implementation 
-     * of {@link ResourceConfig}, such as {@link DynamicResourceConfig}, then
-     * the implementation will scan for root resource classes and automatically
-     * set the root resource classes returned by {@link #getResourceClasses}.
-     * <p>
-     * The property value MUST be an instance String or String[]. Each String
-     * instance represents one or more paths that MUST be separated by ';'. 
-     * Each path MUST be an absolute or relative directory, or a Jar file. 
-     * The contents of a directory, including Java class files, jars files 
-     * and sub-directories (recusively) are scanned. The Java class files of 
-     * a jar file are scanned.
-     * <p>
-     * Root resource clases MUST be present in the Java class path.
-     */
-    public static final String PROPERTY_RESOURCE_PATHS
-            = "com.sun.ws.rest.config.property.ResourcePaths";
-            
-    /**
      * Get the set of root resource classes to be deployed by the Web
      * application.
      * <p>

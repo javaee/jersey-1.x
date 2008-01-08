@@ -22,7 +22,7 @@
 
 package com.sun.ws.rest.impl.container.servlet;
 
-import com.sun.ws.rest.api.core.ResourceConfig;
+import com.sun.ws.rest.api.core.ClasspathResourceConfig;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -88,7 +88,7 @@ public class ServletAdaptorTest extends TestCase {
         }
         
         public String getInitParameter(String param) {
-            if (param.equals(ResourceConfig.PROPERTY_RESOURCE_PATHS))
+            if (param.equals(ClasspathResourceConfig.PROPERTY_CLASSPATH))
                 return resourcePaths;
             return null;
         }

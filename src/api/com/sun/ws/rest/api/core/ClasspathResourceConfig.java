@@ -23,6 +23,7 @@
 package com.sun.ws.rest.api.core;
 
 import com.sun.ws.rest.impl.container.config.ResourceClassScanner;
+import java.io.File;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
@@ -33,11 +34,15 @@ import java.util.logging.Logger;
 
 /**
  * A mutable implementation of {@link DefaultResourceConfig} that dynamically 
- * searches for root resource classes given a set of package names.
+ * searches for root resource classes in the paths declared by the property 
+ * {@link ClasspathResourceConfig#PROPERTY_CLASSPATH}. That property MUST be 
+ * included in the map of initial properties passed to the constructor.
+ * <p>
+ * Root resource classes MUST be present in the java class path.
  * 
- * @author Paul.Sandoz@Sun.Com
+ * @author Frank D. Martinez. fmartinez@asimovt.com
  */
-public final class PackagesResourceConfig extends DefaultResourceConfig {
+public final class ClasspathResourceConfig extends DefaultResourceConfig {
     /**
      * The property value MUST be an instance String or String[]. Each String
      * instance represents one or more paths that MUST be separated by ';'. 
@@ -48,46 +53,54 @@ public final class PackagesResourceConfig extends DefaultResourceConfig {
      * <p>
      * Root resource clases MUST be present in the Java class path.
      */
-    public static final String PROPERTY_PACKAGES
-            = "com.sun.ws.rest.config.property.packages";
+    public static final String PROPERTY_CLASSPATH
+            = "com.sun.ws.rest.config.property.classpath";
     
     private static final Logger LOGGER = 
-            Logger.getLogger(PackagesResourceConfig.class.getName());
+            Logger.getLogger(ClasspathResourceConfig.class.getName());
 
     /**
-     * @param packages the array packages
+     * @param paths the array paths consisting of either jar files or
+     *        directories containing jar files for class files.
      */
-    public PackagesResourceConfig(String[] packages) {
-        if (packages == null || packages.length == 0)
-            throw new IllegalArgumentException("Array of packages must not be null or empty");
+    public ClasspathResourceConfig(String[] paths) {
+        super();
         
-        init(packages);
+        if (paths == null || paths.length == 0)
+            throw new IllegalArgumentException(
+                    "Array of paths must not be null or empty");
+        
+        init(paths);
     }
-
+    
     /**
      * @param props the property bag that contains the property 
-     *        {@link PackagesResourceConfig#PROPERTY_PACKAGES}. 
+     *        {@link ClasspathResourceConfig#PROPERTY_CLASSPATH}. 
      */
-    public PackagesResourceConfig(Map<String, Object> props) {
-        this(getPackages(props));
+    public ClasspathResourceConfig(Map<String, Object> props) {
+        this(getPaths(props));
         
         getProperties().putAll(props);
     }
-    
-    private void init(String[] packages) {
+
+    private void init(String[] paths) {    
+        File[] roots = new File[paths.length];
+        for (int i = 0;  i< paths.length; i++) {
+            roots[i] = new File(paths[i]);
+        }
+
         ResourceClassScanner scanner = new ResourceClassScanner(
                 javax.ws.rs.Path.class);
         if (LOGGER.isLoggable(Level.INFO)) {
             StringBuilder b = new StringBuilder();
-            b.append("Scanning for root resource classes in the packages:");
-            for (String p : packages)
+            b.append("Scanning for root resource classes in the paths:");
+            for (String p : paths)
                 b.append('\n').append("  ").append(p);
             
             LOGGER.log(Level.INFO, b.toString());
         }
-        Set<Class> classes = scanner.scan(packages);
+        Set<Class> classes = scanner.scan(roots);
 
-        
         getResourceClasses().addAll(classes);
         
         if (LOGGER.isLoggable(Level.INFO) && !getResourceClasses().isEmpty()) {
@@ -100,41 +113,41 @@ public final class PackagesResourceConfig extends DefaultResourceConfig {
         }
     }
     
-    private static String[] getPackages(Map<String, Object> props) {
-        Object v = props.get(PROPERTY_PACKAGES);
+    private static String[] getPaths(Map<String, Object> props) {
+        Object v = props.get(PROPERTY_CLASSPATH);
         if (v == null)
-            throw new IllegalArgumentException(PROPERTY_PACKAGES + 
+            throw new IllegalArgumentException(PROPERTY_CLASSPATH + 
                     " property is missing");
         
-        String[] packages = getPackages(v);
-        if (packages.length == 0)
-            throw new IllegalArgumentException(PROPERTY_PACKAGES + 
-                    " contains no packages");
+        String[] paths = getPaths(v);
+        if (paths.length == 0)
+            throw new IllegalArgumentException(PROPERTY_CLASSPATH + 
+                    " contains no paths");
         
-        return packages;
+        return paths;
     }
     
-    private static String[] getPackages(Object param) {
+    private static String[] getPaths(Object param) {
         if (param instanceof String) {
-            return getPackages((String)param);
+            return getPaths((String)param);
         } else if (param instanceof String[]) {
-            return getPackages((String[])param);
+            return getPaths((String[])param);
         } else {
-            throw new IllegalArgumentException(PROPERTY_PACKAGES + " must " +
+            throw new IllegalArgumentException(PROPERTY_CLASSPATH + " must " +
                     "have a property value of type String or String[]");
         }
     }
     
-    private static String[] getPackages(String[] elements) {
+    private static String[] getPaths(String[] elements) {
         List<String> paths = new LinkedList<String>();
         for (String element : elements) {
             if (element == null || element.length() == 0) continue;
-            Collections.addAll(paths, element);
+            Collections.addAll(paths, getPaths(element));
         }
         return paths.toArray(new String[paths.size()]);
     }
     
-    private static String[] getPackages(String paths) {
+    private static String[] getPaths(String paths) {
         return paths.split(";");
-    }     
+    } 
 }

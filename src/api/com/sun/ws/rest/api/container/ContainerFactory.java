@@ -24,7 +24,7 @@ package com.sun.ws.rest.api.container;
 
 import com.sun.ws.rest.api.core.DefaultResourceConfig;
 import com.sun.ws.rest.api.core.ResourceConfig;
-import com.sun.ws.rest.api.core.DynamicResourceConfig;
+import com.sun.ws.rest.api.core.ClasspathResourceConfig;
 import com.sun.ws.rest.spi.container.ContainerProvider;
 import com.sun.ws.rest.spi.container.WebApplication;
 import com.sun.ws.rest.spi.container.WebApplicationFactory;
@@ -177,9 +177,7 @@ public final class ContainerFactory {
      * @throws IllegalArgumentException if no container provider supports the type.
      */
     public static <A> A createContainer(Class<A> type, String... paths) {
-        Map<String, Object> props = new HashMap<String, Object>();
-        props.put(ResourceConfig.PROPERTY_RESOURCE_PATHS, paths);
-        DynamicResourceConfig config = new DynamicResourceConfig(props);
+        ClasspathResourceConfig config = new ClasspathResourceConfig(paths);
         return createContainer(type, config);
     }
     
