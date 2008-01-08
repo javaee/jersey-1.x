@@ -32,10 +32,13 @@ release 0.5 (2008-01-18)
 - Root resource classes, by default, are now found at runtime (rather than
   compile time) by efficiently scanning the Java class files of the 
   java.class.path for SE-based deployments or the WEB-INF/lib and 
-  WEB-INF/classes for Servlet-based deployments.
+  WEB-INF/classes for Servlet-based deployments. Alternatively it is optionally
+  possibly to scan the Java classes files using a list of package names.
   See the JavaDoc of the following classes for more details:
     - com.sun.ws.rest.api.container.ContainerFactory
     - com.sun.ws.rest.spi.container.servlet.ServletContainer
+    - com.sun.ws.rest.api.core.ClasspathResourceConfig
+    - com.sun.ws.rest.api.core.PackagesResourceConfig
 - JAXB XML and JSON support now split into separate implementations,
   and the former no longer requires the jars of the latter in the classpath.
 - Integrated JSR 311 API 0.5
