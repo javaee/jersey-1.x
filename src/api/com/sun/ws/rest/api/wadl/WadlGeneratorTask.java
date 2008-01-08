@@ -27,7 +27,10 @@ import com.sun.ws.rest.api.core.ResourceConfig;
 import com.sun.ws.rest.api.model.AbstractResource;
 import com.sun.ws.rest.impl.modelapi.annotation.IntrospectionModeller;
 import com.sun.ws.rest.impl.wadl.WadlGenerator;
+import java.io.BufferedOutputStream;
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.OutputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
@@ -106,7 +109,9 @@ public class WadlGeneratorTask extends Task {
             JAXBContext c = JAXBContext.newInstance("com.sun.research.ws.wadl", 
                     this.getClass().getClassLoader());
             Marshaller m = c.createMarshaller();
-            m.marshal(a, wadlFile);
+            OutputStream out = new BufferedOutputStream(new FileOutputStream(wadlFile));
+            m.marshal(a, out);
+            out.close();
         } catch (Exception e) {
             throw new BuildException(e);            
         }
