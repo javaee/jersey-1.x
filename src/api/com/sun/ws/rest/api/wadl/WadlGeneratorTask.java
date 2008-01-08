@@ -22,7 +22,7 @@
 package com.sun.ws.rest.api.wadl;
 
 import com.sun.research.ws.wadl.Application;
-import com.sun.ws.rest.api.core.DynamicResourceConfig;
+import com.sun.ws.rest.api.core.ClasspathResourceConfig;
 import com.sun.ws.rest.api.core.ResourceConfig;
 import com.sun.ws.rest.api.model.AbstractResource;
 import com.sun.ws.rest.impl.modelapi.annotation.IntrospectionModeller;
@@ -49,7 +49,8 @@ import org.apache.tools.ant.types.Reference;
  * Ant task for generating WADL for root resource classes.
  * 
  * The task requires that the destfile attribute be set to the location
- * of the WADL file to be generated, and the classpath be set.
+ * of the WADL file to be generated, the baseUri attribute set to the base
+ * URI of the WADL resources, and the classpath be set.
  * 
  * The task will scan all classes in the classpath obtain the root resource
  * classes and then create a WADL document from those root resources.
@@ -93,7 +94,16 @@ public class WadlGeneratorTask extends Task {
     public void setDestfile(File wadlFile) {
         this.wadlFile = wadlFile;
     }
+
+    private String baseUri;
     
+    public String getbaseUri() {
+        return baseUri;
+    }
+
+    public void setBaseUri(String baseUri) {
+        this.baseUri = baseUri;
+    }
     
     @Override
     public void execute() throws BuildException {
@@ -104,8 +114,13 @@ public class WadlGeneratorTask extends Task {
             throw new BuildException("destfile attribute required", getLocation());
         }
 
+        if (baseUri == null || baseUri.length() == 0) {
+            throw new BuildException("baseUri attribute required", getLocation());
+        }
+        
         try {
             Application a = createApplication(classpath.list());
+            a.getResources().setBase(baseUri);
             JAXBContext c = JAXBContext.newInstance("com.sun.research.ws.wadl", 
                     this.getClass().getClassLoader());
             Marshaller m = c.createMarshaller();
@@ -122,7 +137,7 @@ public class WadlGeneratorTask extends Task {
         final ClassLoader ncl = new Loader(classpath.list(), this.getClass().getClassLoader());
         Thread.currentThread().setContextClassLoader(ncl);
         try {
-            ResourceConfig rc = new DynamicResourceConfig(classpath.list());
+            ResourceConfig rc = new ClasspathResourceConfig(classpath.list());
             Set<AbstractResource> s = new HashSet<AbstractResource>();
             for (Class c : rc.getResourceClasses()) {
                 s.add(IntrospectionModeller.createResource(c));
