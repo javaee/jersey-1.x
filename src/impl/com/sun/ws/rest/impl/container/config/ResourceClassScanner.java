@@ -25,10 +25,9 @@ package com.sun.ws.rest.impl.container.config;
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
+import java.net.URL;
 import java.util.Enumeration;
 import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Set;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
@@ -51,42 +50,76 @@ public final class ResourceClassScanner {
             Logger.getLogger(ResourceClassScanner.class.getName());
     
     /** Root resource classes found. */
-    private List<Class> classes;
+    private Set<Class> classes;
     
     /** Annotation class names we are looking for. */
-    private Set<String> annotations;
+    private final Set<String> annotations;
+    
+    private final ClassLoader classloader;
+    
+    public ResourceClassScanner(Class... annotations) {
+        this.classloader = Thread.currentThread().getContextClassLoader();
+        this.annotations = getAnnotationSet(annotations);
+    }
     
     /**
-     * Scans into 'paths' for classes annotated with 'annotations'.
+     * Scans paths for matching classes.
      * 
      * @param paths A list of absolute paths used to scan for Resource classes.
-     * @param annotations A list of annotation classes to be scanned for.
-     * @return A list of classes annotated with specified annotations in the 
+     * @return A set of classes annotated with specified annotations in the 
      *         specified paths.
      */
-    public List<Class> scan(File[] paths, Class... annotations) {
-        // 1. Init classes
-        this.classes = new LinkedList<Class>();
-
-        // 2. Init annotations
-        this.annotations = new HashSet<String>();
-        for (Class cls : annotations) {
-            this.annotations.add(
-                "L" + cls.getName().replaceAll("\\.", "/") + ";");
-        }
-
-        // 3. Search
+    public Set<Class> scan(File[] paths) {
+        this.classes = new HashSet<Class>();
+        
         for (File file : paths) {
             index(file);
         }
 
-        // 4. Return
         return classes;
+    }
+
+    /**
+     * Scans packages for matching classes.
+     * 
+     * @param packages the array of packages.
+     * @return A set of classes annotated with specified annotations in the 
+     *         specified paths.
+     */
+    public Set<Class> scan(String[] packages) {
+        this.classes = new HashSet<Class>();
+        
+        for (String p : packages) {
+            try {
+                String fileP = p.replace('.', '/');
+                Enumeration<URL> urls = classloader.getResources(fileP);
+                while (urls.hasMoreElements()) {
+                    index(urls.nextElement(), fileP);
+                }
+            } catch (IOException ex) {
+                String s = "The resources for the package" + 
+                        p + 
+                        ", could not be obtained";
+                LOGGER.severe(s);
+                throw new RuntimeException(s, ex);
+            }
+        }
+        
+        return classes;
+    }
+    
+    private Set<String> getAnnotationSet(Class... annotations) {
+        Set<String> a = new HashSet<String>();
+        for (Class cls : annotations) {
+            a.add(
+                "L" + cls.getName().replaceAll("\\.", "/") + ";");
+        }
+        return a;
     }
     
     private void index(File file) {
         if (file.isDirectory()) {
-            indexDir(file);
+            indexDir(file, true);
         } else if (file.getName().endsWith(".jar")) {
             indexJar(file);
         } else {
@@ -96,11 +129,27 @@ public final class ResourceClassScanner {
         }
     }
     
-    private void indexDir(File root) {
+    private void index(URL u, String filePackageName) {
+        String protocol = u.getProtocol();
+        if (protocol.equals("file")) {
+            indexDir(new File(u.getPath()), false);
+        } else if (protocol.equals("jar")) {
+            URI jarUri = URI.create(u.getPath());
+            String jarFile = jarUri.getPath();
+            jarFile = jarFile.substring(0, jarFile.indexOf('!'));            
+            indexJar(new File(jarFile), filePackageName);
+        } else {
+            LOGGER.warning("URL, " + 
+                    u + 
+                    ", is ignored, it not a file or a jar file");            
+        }
+    }
+    
+    private void indexDir(File root, boolean indexJars) {
         for (File child : root.listFiles()) {
             if (child.isDirectory()) {
-                indexDir(child);
-            } else if (child.getName().endsWith(".jar")) {
+                indexDir(child, indexJars);
+            } else if (indexJars && child.getName().endsWith(".jar")) {
                 indexJar(child);
             } else if (child.getName().endsWith(".class")) {
                 analyzeClassFile(child.toURI());
@@ -109,17 +158,22 @@ public final class ResourceClassScanner {
     }
     
     private void indexJar(File file) {
+        indexJar(file, "");
+    }
+
+    private void indexJar(File file, String parent) {
         final JarFile jar = getJarFile(file);
         final Enumeration<JarEntry> entries = jar.entries();
         final String jarBase = "jar:" + file.toURI() + "!/";
         while (entries.hasMoreElements()) {
             JarEntry e = entries.nextElement();
-            if (e.getName().endsWith(".class")) {
+            if (!e.isDirectory() && e.getName().startsWith(parent) && 
+                    e.getName().endsWith(".class")) {
                 analyzeClassFile(URI.create(jarBase + e.getName()));
             }
         }
     }
-
+    
     private JarFile getJarFile(File file) {
         try {
             return new JarFile(file);
@@ -150,8 +204,7 @@ public final class ResourceClassScanner {
     
     private Class getClassForName(String className) {
         try {
-            return Thread.currentThread().getContextClassLoader().
-                    loadClass(className);
+            return classloader.loadClass(className);
         } catch (ClassNotFoundException ex) {
             String s = "A (root resource) class file of the class name, " + 
                     className + 

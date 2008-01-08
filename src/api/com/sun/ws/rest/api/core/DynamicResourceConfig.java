@@ -75,8 +75,8 @@ public final class DynamicResourceConfig extends DefaultResourceConfig {
             roots[i] = new File(paths[i]);
         }
 
-        ResourceClassScanner scanner = new ResourceClassScanner();
-        List<Class> classes = scanner.scan(roots, javax.ws.rs.Path.class);
+        ResourceClassScanner scanner = new ResourceClassScanner(javax.ws.rs.Path.class);
+        Set<Class> classes = scanner.scan(roots);
 
         Logger logger = Logger.getLogger(DynamicResourceConfig.class.getName());
         Set<Class> resources = getResourceClasses();

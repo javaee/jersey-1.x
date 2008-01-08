@@ -22,63 +22,54 @@
 
 package com.sun.ws.rest.impl.container.config;
 
-import com.sun.ws.rest.api.core.DynamicResourceConfig;
+import com.sun.ws.rest.api.core.PackagesResourceConfig;
 import com.sun.ws.rest.api.core.ResourceConfig;
 import com.sun.ws.rest.impl.container.config.innerstatic.InnerStaticClass;
 import com.sun.ws.rest.impl.container.config.toplevel.PublicRootResourceClass;
 import com.sun.ws.rest.impl.container.config.toplevelinnerstatic.PublicRootResourceInnerStaticClass;
-import java.io.File;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
+import java.net.URL;
+import java.net.URLClassLoader;
 import junit.framework.*;
 
 /**
  *
  * @author Paul.Sandoz@Sun.Com
  */
-public class DynamicResourceConfigTest extends AbstractResourceConfigTester {
+public class PackageResourceConfigTest extends AbstractResourceConfigTester {
     
-    public DynamicResourceConfigTest(String testName) {
+    public PackageResourceConfigTest(String testName) {
         super(testName);
     }
     
     public void testTopLevel() {
-        Map<String, Object> p = new HashMap<String, Object>();
-        String[] paths = {"build/test/classes/com/sun/ws/rest/impl/container/config/toplevel"};
-        p.put(ResourceConfig.PROPERTY_RESOURCE_PATHS, paths);
-        ResourceConfig rc = new DynamicResourceConfig(p);
+        String[] packages = {"com.sun.ws.rest.impl.container.config.toplevel"};
+        ResourceConfig rc = new PackagesResourceConfig(packages);
         
         assertTrue(rc.getResourceClasses().contains(PublicRootResourceClass.class));
         assertEquals(1, rc.getResourceClasses().size());
     }
     
     public void testInnerStatic() {
-        Map<String, Object> p = new HashMap<String, Object>();
-        String[] paths = {"build/test/classes/com/sun/ws/rest/impl/container/config/innerstatic"};
-        p.put(ResourceConfig.PROPERTY_RESOURCE_PATHS, paths);
-        ResourceConfig rc = new DynamicResourceConfig(p);
+        String[] packages = {"com.sun.ws.rest.impl.container.config.innerstatic"};
+        ResourceConfig rc = new PackagesResourceConfig(packages);
         
         assertTrue(rc.getResourceClasses().contains(InnerStaticClass.PublicClass.class));
         assertEquals(1, rc.getResourceClasses().size());
     }
     
     public void testTopLevelInnerStatic() {
-        Map<String, Object> p = new HashMap<String, Object>();
-        String[] paths = {"build/test/classes/com/sun/ws/rest/impl/container/config/toplevelinnerstatic"};
-        p.put(ResourceConfig.PROPERTY_RESOURCE_PATHS, paths);
-        ResourceConfig rc = new DynamicResourceConfig(p);
-        
+        String[] packages = {"com.sun.ws.rest.impl.container.config.toplevelinnerstatic"};
+        ResourceConfig rc = new PackagesResourceConfig(packages);
+                
         assertTrue(rc.getResourceClasses().contains(PublicRootResourceInnerStaticClass.class));
         assertTrue(rc.getResourceClasses().contains(PublicRootResourceInnerStaticClass.PublicClass.class));
         assertEquals(2, rc.getResourceClasses().size());
     }
     
     public void testAll() {
-        Map<String, Object> p = new HashMap<String, Object>();
-        String[] paths = {"build/test/classes/com/sun/ws/rest/impl/container/config"};
-        p.put(ResourceConfig.PROPERTY_RESOURCE_PATHS, paths);
-        ResourceConfig rc = new DynamicResourceConfig(p);
+        String[] packages = {"com.sun.ws.rest.impl.container.config"};
+        ResourceConfig rc = new PackagesResourceConfig(packages);
         
         assertTrue(rc.getResourceClasses().contains(PublicRootResourceClass.class));
         assertTrue(rc.getResourceClasses().contains(InnerStaticClass.PublicClass.class));
@@ -88,33 +79,38 @@ public class DynamicResourceConfigTest extends AbstractResourceConfigTester {
     }
     
     
-    public void testJarTopLevel() throws IOException {
-        File jarFile = createJarFile("build/test/classes/",
+    public void testJarTopLevel() throws Exception {
+        ClassLoader cl = createClassLoader("build/test/classes/",
                 "com/sun/ws/rest/impl/container/config/toplevel/PublicRootResourceClass.class",
                 "com/sun/ws/rest/impl/container/config/toplevel/PackageRootResourceClass.class"
                 );
-        ResourceConfig rc = createConfig(jarFile);
+        
+        ResourceConfig rc = createConfig(cl, 
+                "com.sun.ws.rest.impl.container.config.toplevel");
 
-        assertTrue(rc.getResourceClasses().contains(PublicRootResourceClass.class));
+        assertTrue(rc.getResourceClasses().contains(
+                cl.loadClass("com.sun.ws.rest.impl.container.config.toplevel.PublicRootResourceClass")));
         assertEquals(1, rc.getResourceClasses().size());
     }
     
-    public void testJarInnerStatic() throws IOException {
-        File jarFile = createJarFile("build/test/classes/",
+    public void testJarInnerStatic() throws Exception {
+        ClassLoader cl = createClassLoader("build/test/classes/",
                 "com/sun/ws/rest/impl/container/config/innerstatic/InnerStaticClass.class",
                 "com/sun/ws/rest/impl/container/config/innerstatic/InnerStaticClass$PublicClass.class",
                 "com/sun/ws/rest/impl/container/config/innerstatic/InnerStaticClass$PackageClass.class",
                 "com/sun/ws/rest/impl/container/config/innerstatic/InnerStaticClass$ProtectedClass.class",
                 "com/sun/ws/rest/impl/container/config/innerstatic/InnerStaticClass$PrivateClass.class"
                 );
-        ResourceConfig rc = createConfig(jarFile);
+        ResourceConfig rc = createConfig(cl, 
+                "com.sun.ws.rest.impl.container.config.innerstatic");
 
-        assertTrue(rc.getResourceClasses().contains(InnerStaticClass.PublicClass.class));
+        assertTrue(rc.getResourceClasses().contains(
+                cl.loadClass("com.sun.ws.rest.impl.container.config.innerstatic.InnerStaticClass$PublicClass")));
         assertEquals(1, rc.getResourceClasses().size());
     }
     
-    public void testJarBoth() throws IOException {
-        File jarFile = createJarFile("build/test/classes/",
+    public void testJarBoth() throws Exception {
+        ClassLoader cl = createClassLoader("build/test/classes/",
                 "com/sun/ws/rest/impl/container/config/toplevel/PublicRootResourceClass.class",
                 "com/sun/ws/rest/impl/container/config/toplevel/PackageRootResourceClass.class",
                 "com/sun/ws/rest/impl/container/config/innerstatic/InnerStaticClass.class",
@@ -123,18 +119,29 @@ public class DynamicResourceConfigTest extends AbstractResourceConfigTester {
                 "com/sun/ws/rest/impl/container/config/innerstatic/InnerStaticClass$ProtectedClass.class",
                 "com/sun/ws/rest/impl/container/config/innerstatic/InnerStaticClass$PrivateClass.class"
                 );
-        ResourceConfig rc = createConfig(jarFile);
+        ResourceConfig rc = createConfig(cl, 
+                "com.sun.ws.rest.impl.container.config");
 
-        assertTrue(rc.getResourceClasses().contains(PublicRootResourceClass.class));
-        assertTrue(rc.getResourceClasses().contains(InnerStaticClass.PublicClass.class));
+        assertTrue(rc.getResourceClasses().contains(
+                cl.loadClass("com.sun.ws.rest.impl.container.config.toplevel.PublicRootResourceClass")));
+        assertTrue(rc.getResourceClasses().contains(
+                cl.loadClass("com.sun.ws.rest.impl.container.config.innerstatic.InnerStaticClass$PublicClass")));
         assertEquals(2, rc.getResourceClasses().size());
     }
     
-    private ResourceConfig createConfig(File jarFile) {
-        Map<String, Object> p = new HashMap<String, Object>();
-        String[] paths = new String[1];
-        paths[0] = jarFile.getAbsolutePath();
-        p.put(ResourceConfig.PROPERTY_RESOURCE_PATHS, paths);
-        return new DynamicResourceConfig(p);        
+    private ResourceConfig createConfig(ClassLoader cl, String... packages) throws IOException {        
+        ClassLoader ocl = Thread.currentThread().getContextClassLoader();
+        Thread.currentThread().setContextClassLoader(cl);
+        try {
+            return new PackagesResourceConfig(packages);
+        } finally {
+            Thread.currentThread().setContextClassLoader(ocl);
+        }
+    }
+    
+    private ClassLoader createClassLoader(String base, String... entries) throws IOException {
+        URL[] us = new URL[1];
+        us[0] = createJarFile(base, entries).toURI().toURL();
+        return new URLClassLoader(us, null);
     }    
 }
