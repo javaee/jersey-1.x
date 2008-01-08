@@ -22,7 +22,7 @@
 package com.sun.ws.rest.api.wadl;
 
 import com.sun.research.ws.wadl.Application;
-import com.sun.ws.rest.api.core.ClasspathResourceConfig;
+import com.sun.ws.rest.api.core.DynamicResourceConfig;
 import com.sun.ws.rest.api.core.ResourceConfig;
 import com.sun.ws.rest.api.model.AbstractResource;
 import com.sun.ws.rest.impl.modelapi.annotation.IntrospectionModeller;
