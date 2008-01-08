@@ -32,6 +32,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.ws.rs.ConsumeMime;
 import javax.ws.rs.ProduceMime;
 import javax.ws.rs.core.MediaType;
@@ -45,6 +47,9 @@ import javax.ws.rs.ext.ProviderFactory;
  * @author Paul.Sandoz@Sun.Com
  */
 public final class ProviderFactoryImpl extends ProviderFactory {
+    private static final Logger LOGGER = 
+            Logger.getLogger(ProviderFactoryImpl.class.getName());
+    
     private AtomicReference<Set<HeaderProvider>> atomicHeaderProviders = 
             new AtomicReference<Set<HeaderProvider>>();
     
@@ -99,8 +104,10 @@ public final class ProviderFactoryImpl extends ProviderFactory {
         synchronized(atomicMap) {
             Map<MediaType, List<T>> s = atomicMap.get();
             if (s == null) {
+                LOGGER.log(Level.INFO, "Searching for providers that implement: " + c);
                 s = new HashMap<MediaType, List<T>>();
                 for (T p : ServiceFinder.find(c, true)) {
+                    LOGGER.log(Level.INFO, "    Provider found: " + p.getClass());
                     String values[] = getAnnotationValues(p.getClass(), annotationClass);
                     if (values==null)
                         cacheClassCapability(s, p, MediaTypeHelper.GENERAL_MEDIA_TYPE);
