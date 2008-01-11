@@ -33,6 +33,7 @@ import com.sun.ws.rest.impl.model.*;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -86,6 +87,8 @@ public class IntrospectionModeller {
         workOutResourceMethodsList(resource, methodList, isEncodedAnotOnClass, classScopeConsumeMimeAnnotation, classScopeProduceMimeAnnotation);
         workOutSubResourceMethodsList(resource, methodList, isEncodedAnotOnClass, classScopeConsumeMimeAnnotation, classScopeProduceMimeAnnotation);
         workOutSubResourceLocatorsList(resource, methodList, isEncodedAnotOnClass);
+        
+        logNonPublicMethods(resourceClass);
 
         if (LOGGER.isLoggable(Level.FINEST)) {
             LOGGER.finest("A new abstract resource created by IntrospectionModeler: \n" + resource.toString());
@@ -93,7 +96,7 @@ public class IntrospectionModeller {
 
         return resource;
     }
-
+    
     private static final void findOutConsumeMimeTypes(
             AbstractResourceMethod resourceMethod, ConsumeMime classScopeConsumeMimeAnnotation) {
 
@@ -334,5 +337,38 @@ public class IntrospectionModeller {
         }
 
         return new Parameter(paramSource, paramName, paramType, paramClass, paramEncoded, paramDefault);
+    }
+
+    private static final boolean isNotPublic(Method method) {
+        assert null != method;
+        return !Modifier.isPublic(method.getModifiers());
+    }
+
+    private static void logNonPublicMethods(final Class resourceClass) {
+        assert null != resourceClass;
+        
+        if (!LOGGER.isLoggable(Level.WARNING)) {
+            return; // does not make sense to check non-public methods
+        }
+        
+        final MethodList declaredMethods = new MethodList(resourceClass.getDeclaredMethods());
+        // non-public resource methods
+        for (Method method : declaredMethods.hasMetaAnnotation(HttpMethod.class).hasNotAnnotation(Path.class)) {
+            if (isNotPublic(method)) {
+                LOGGER.warning("Method \"" + method.toGenericString() + "\" found, which is annotated like a resource method, but is not public. The method will be ignored!");
+            }
+        }
+        // non-public subres methods
+        for (Method method : declaredMethods.hasMetaAnnotation(HttpMethod.class).hasAnnotation(Path.class)) {
+            if (isNotPublic(method)) {
+                LOGGER.warning("Method \"" + method.toGenericString() + "\" found, which is annotated like a subresource method, but is not public. The method will be ignored!");
+            }
+        }
+        // non-public subres locators
+        for (Method method : declaredMethods.hasNotMetaAnnotation(HttpMethod.class).hasAnnotation(Path.class)) {
+            if (isNotPublic(method)) {
+                LOGGER.warning("Method \"" + method.toGenericString() + "\" found, which is annotated like a subresource locator, but is not public. The method will be ignored!");
+            }
+        }
     }
 }

@@ -26,9 +26,13 @@ import com.sun.ws.rest.api.model.AbstractResource;
 import com.sun.ws.rest.api.model.AbstractResourceMethod;
 import com.sun.ws.rest.api.model.AbstractSubResourceLocator;
 import com.sun.ws.rest.api.model.AbstractSubResourceMethod;
+import java.util.logging.LogRecord;
 import junit.framework.*;
 import com.sun.ws.rest.api.model.Parameter;
 import com.sun.ws.rest.impl.modelapi.annotation.IntrospectionModellerTest.TestSubResourceOne;
+import java.util.logging.Handler;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.ws.rs.ConsumeMime;
 import javax.ws.rs.GET;
 import javax.ws.rs.HeaderParam;
@@ -97,6 +101,30 @@ public class IntrospectionModellerTest extends TestCase {
             return "hi, here is a put resource method of TestSubResourceOne";
         }
         
+    }
+    
+    @Path("/np")
+    public class TestRootResourceNonPubMethods {
+        
+        /** Creates a new instance of TestRootResourceOne */
+        public TestRootResourceNonPubMethods() {
+        }
+        
+        @GET
+        String nonPublicResourceMethod() {
+            return "jedna";
+        }
+
+        @Path("loc")
+        String nonPublicSubresLocator() {
+            return "dve";
+        }
+
+        @GET
+        @Path("poc")
+        String nonPublicSubresMethod() {
+            return "tri";
+        }
     }
 
     
@@ -222,6 +250,33 @@ public class IntrospectionModellerTest extends TestCase {
         assertEquals(2, subResource.getResourceMethods().size());
         assertEquals(0, subResource.getSubResourceLocators().size());
         assertEquals(0, subResource.getSubResourceMethods().size());
+    }
+    
+    public static class TestHandler extends Handler {
+        
+        public int nonPubCounter = 0;
+
+        @Override
+        public void publish(LogRecord record) {
+            if (record.getMessage().contains("nonPublic")) {
+                nonPubCounter++;
+            }
+        }
+
+        @Override
+        public void flush() {}
+
+        @Override
+        public void close() throws SecurityException {}
+    }
+    
+    public void testNonPubMethodLogging() {
+        Logger logger = Logger.getLogger(IntrospectionModeller.class.getName());
+        TestHandler myHandler = new TestHandler();
+        logger.addHandler(myHandler);
+        logger.setLevel(Level.WARNING);
+        IntrospectionModeller.createResource(TestRootResourceNonPubMethods.class);
+        assertEquals(3, myHandler.nonPubCounter);
     }
     
 }
