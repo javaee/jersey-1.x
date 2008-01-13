@@ -52,7 +52,7 @@ public class AbstractResourceConstructor implements Parameterized, AbstractModel
     }
 
     public List<AbstractModelComponent> getComponents() {
-        throw new UnsupportedOperationException("Not supported yet.");
+        return null;
     }
     
 }

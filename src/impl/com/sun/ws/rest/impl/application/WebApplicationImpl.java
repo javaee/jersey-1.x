@@ -36,10 +36,12 @@ import com.sun.ws.rest.impl.model.ResourceClass;
 import com.sun.ws.rest.impl.model.RulesMap;
 import com.sun.ws.rest.api.Responses;
 import com.sun.ws.rest.api.model.AbstractResource;
+import com.sun.ws.rest.api.model.ResourceModelIssue;
 import com.sun.ws.rest.impl.uri.PathPattern;
 import com.sun.ws.rest.impl.uri.PathTemplate;
 import com.sun.ws.rest.api.uri.UriTemplate;
 import com.sun.ws.rest.impl.modelapi.annotation.IntrospectionModeller;
+import com.sun.ws.rest.impl.modelapi.validation.BasicValidator;
 import com.sun.ws.rest.impl.uri.rules.ResourceClassRule;
 import com.sun.ws.rest.impl.uri.rules.RightHandPathRule;
 import com.sun.ws.rest.impl.uri.rules.RootResourceClassesRule;
@@ -63,6 +65,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.ws.rs.core.HttpContext;
 import javax.ws.rs.core.HttpHeaders;
@@ -135,7 +138,7 @@ public final class WebApplicationImpl implements WebApplication {
             rmc = metaClassMap.get(c);
             if (rmc != null) return rmc;
             
-            rmc = newResourceClass(c);
+            rmc = newResourceClass(getAbstractResource(c));
             metaClassMap.put(c, rmc);
             return rmc;
         }
@@ -147,11 +150,26 @@ public final class WebApplicationImpl implements WebApplication {
         return rc;
     }
         
-    private ResourceClass newResourceClass(Class c ) {
-        return newResourceClass(getAbstractResource(c));
-    }
-    
-    private ResourceClass newResourceClass(AbstractResource ar) {
+    private ResourceClass newResourceClass(final AbstractResource ar) {
+        assert null != ar;
+        BasicValidator validator = new BasicValidator();
+        validator.validate(ar);
+        boolean fatalIssueFound = false;
+        for (ResourceModelIssue issue : validator.getIssueList()) {
+            if (issue.isFatal()) {
+                fatalIssueFound = true;
+                if (LOGGER.isLoggable(Level.SEVERE)) {
+                    LOGGER.severe(issue.getMessage());
+                }
+            } else {
+                if (LOGGER.isLoggable(Level.WARNING)) {
+                    LOGGER.warning(issue.getMessage());
+                }
+            }
+        } // eof model validation
+        if (fatalIssueFound) {
+            // TODO: throw an exception
+        }
         return new ResourceClass(containerMomento, resourceConfig, resolverFactory, ar);
     }
     
