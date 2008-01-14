@@ -29,6 +29,7 @@ import com.sun.ws.rest.api.model.AbstractSubResourceMethod;
 import com.sun.ws.rest.api.model.Parameter;
 import com.sun.ws.rest.api.model.Parameterized;
 import com.sun.ws.rest.api.model.UriTemplateValue;
+import com.sun.ws.rest.impl.ImplMessages;
 import com.sun.ws.rest.impl.model.*;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
@@ -91,7 +92,7 @@ public class IntrospectionModeller {
         logNonPublicMethods(resourceClass);
 
         if (LOGGER.isLoggable(Level.FINEST)) {
-            LOGGER.finest("A new abstract resource created by IntrospectionModeler: \n" + resource.toString());
+            LOGGER.finest(ImplMessages.NEW_AR_CREATED_BY_INTROSPECTION_MODELER(resource.toString()));
         }
 
         return resource;
@@ -318,8 +319,7 @@ public class IntrospectionModeller {
                 ParamAnnotationHelper helper = ANOT_HELPER_MAP.get(annotation.annotationType());
                 if (null != paramSource) {
                     if (LOGGER.isLoggable(Level.WARNING)) {
-                        LOGGER.warning("Annotation for " + helper.getSource() + " parameter found " +
-                                "where another source (" + paramSource + ") has been already used.");
+                        LOGGER.warning(ImplMessages.AMBIGUOUS_PARAMETER_SOURCE(helper.getSource(), paramSource));
                     }
                 // TODO: throw an exception ?
                 }
@@ -348,26 +348,26 @@ public class IntrospectionModeller {
         assert null != resourceClass;
         
         if (!LOGGER.isLoggable(Level.WARNING)) {
-            return; // does not make sense to check non-public methods
+            return; // does not make sense to check when logging is disabled anyway
         }
         
         final MethodList declaredMethods = new MethodList(resourceClass.getDeclaredMethods());
         // non-public resource methods
         for (Method method : declaredMethods.hasMetaAnnotation(HttpMethod.class).hasNotAnnotation(Path.class)) {
             if (isNotPublic(method)) {
-                LOGGER.warning("Method \"" + method.toGenericString() + "\" found, which is annotated like a resource method, but is not public. The method will be ignored!");
+                LOGGER.warning(ImplMessages.NON_PUB_RES_METHOD(method.toGenericString()));
             }
         }
         // non-public subres methods
         for (Method method : declaredMethods.hasMetaAnnotation(HttpMethod.class).hasAnnotation(Path.class)) {
             if (isNotPublic(method)) {
-                LOGGER.warning("Method \"" + method.toGenericString() + "\" found, which is annotated like a subresource method, but is not public. The method will be ignored!");
+                LOGGER.warning(ImplMessages.NON_PUB_SUB_RES_METHOD(method.toGenericString()));
             }
         }
         // non-public subres locators
         for (Method method : declaredMethods.hasNotMetaAnnotation(HttpMethod.class).hasAnnotation(Path.class)) {
             if (isNotPublic(method)) {
-                LOGGER.warning("Method \"" + method.toGenericString() + "\" found, which is annotated like a subresource locator, but is not public. The method will be ignored!");
+                LOGGER.warning(ImplMessages.NON_PUB_SUB_RES_LOC(method.toGenericString()));
             }
         }
     }
