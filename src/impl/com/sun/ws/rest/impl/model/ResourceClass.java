@@ -127,13 +127,6 @@ public final class ResourceClass {
             // will be consumed when such a rule is accepted
             rulesMap.put(PathPattern.EMPTY_PATH, new HttpMethodRule(methodMap));
         }
-        
-        if (rulesMap.isEmpty()) {
-            String message = "The class " + resource.getResourceClass() +
-                    " does not contain any sub-resource locators, sub-resource HTTP methods or HTTP methods";
-            LOGGER.severe(message);
-            throw new ContainerException(message);
-        }
 
         this.hasSubResources = hasSubResourcesAux;
 

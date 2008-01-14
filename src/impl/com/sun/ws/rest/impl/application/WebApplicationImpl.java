@@ -40,6 +40,7 @@ import com.sun.ws.rest.api.model.ResourceModelIssue;
 import com.sun.ws.rest.impl.uri.PathPattern;
 import com.sun.ws.rest.impl.uri.PathTemplate;
 import com.sun.ws.rest.api.uri.UriTemplate;
+import com.sun.ws.rest.impl.ImplMessages;
 import com.sun.ws.rest.impl.modelapi.annotation.IntrospectionModeller;
 import com.sun.ws.rest.impl.modelapi.validation.BasicValidator;
 import com.sun.ws.rest.impl.uri.rules.ResourceClassRule;
@@ -168,7 +169,8 @@ public final class WebApplicationImpl implements WebApplication {
             }
         } // eof model validation
         if (fatalIssueFound) {
-            // TODO: throw an exception
+            LOGGER.severe(ImplMessages.FATAL_ISSUES_FOUND_AT_RES_CLASS(ar.getResourceClass().getName()));
+            throw new ContainerException(ImplMessages.FATAL_ISSUES_FOUND_AT_RES_CLASS(ar.getResourceClass().getName()));
         }
         return new ResourceClass(containerMomento, resourceConfig, resolverFactory, ar);
     }
@@ -205,7 +207,7 @@ public final class WebApplicationImpl implements WebApplication {
             throw new IllegalArgumentException();
         
         if (initiated)
-            throw new ContainerException("Web application is already initiated");
+            throw new ContainerException(ImplMessages.WEB_APP_ALREADY_INITIATED());
         
         this.initiated = true;
         this.resourceConfig = resourceConfig;
@@ -259,9 +261,8 @@ public final class WebApplicationImpl implements WebApplication {
 
     private RulesMap<UriRule> processRootResources(Set<Class> classes) {
         if (classes.isEmpty()) {
-            String message = "The ResourceConfig instance does not contain any root resource classes";
-            LOGGER.severe(message);
-            throw new ContainerException(message);            
+            LOGGER.severe(ImplMessages.NO_ROOT_RES_IN_RES_CFG());
+            throw new ContainerException(ImplMessages.NO_ROOT_RES_IN_RES_CFG());            
         }
         
         RulesMap<UriRule> rulesMap = new RulesMap<UriRule>();
