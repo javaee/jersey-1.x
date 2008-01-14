@@ -19,6 +19,7 @@ import com.sun.ws.rest.api.model.AbstractResourceMethod;
 import com.sun.ws.rest.api.model.AbstractSubResourceLocator;
 import com.sun.ws.rest.api.model.AbstractSubResourceMethod;
 import com.sun.ws.rest.api.model.ResourceModelIssue;
+import com.sun.ws.rest.impl.ImplMessages;
 
 /**
  *
@@ -31,14 +32,14 @@ public class BasicValidator extends AbstractModelValidator {
         if ((resource.getResourceMethods().size() + resource.getSubResourceMethods().size() + resource.getSubResourceLocators().size()) == 0) {
             issueList.add(new ResourceModelIssue(
                     resource,
-                    "No resource/subresource methods neither subresource locators found",
+                    ImplMessages.ERROR_NO_SUB_RES_METHOD_LOCATOR_FOUND(),
                     true));
         }
         // uri template of the resource, if present should not contain null or empty value
         if (resource.isRootResource() && ((null == resource.getUriTemplate()) || (null == resource.getUriTemplate().getValue()) || (resource.getUriTemplate().getValue().length() == 0))) {
             issueList.add(new ResourceModelIssue(
                     resource,
-                    "URI template associated with abstract resource has a null or empty value",
+                    ImplMessages.ERROR_RES_URI_PATH_EMPTY_OR_NULL(),
                     true)); // TODO: is it really a fatal issue?
         }
     }
@@ -48,19 +49,19 @@ public class BasicValidator extends AbstractModelValidator {
         if (!isRequestResponseMethod(method) && "PUT".equals(method.getHttpMethod()) && (0 == method.getParameters().size())) {
             issueList.add(new ResourceModelIssue(
                     method,
-                    "PUT method does not take any parameter",
+                    ImplMessages.ERROR_PUT_METHOD_WITHOUT_PARAM(),
                     false));
         }
         if (!isRequestResponseMethod(method) && "POST".equals(method.getHttpMethod()) && (0 == method.getParameters().size())) {
             issueList.add(new ResourceModelIssue(
                     method,
-                    "POST method does not take any parameter",
+                    ImplMessages.ERROR_POST_METHOD_WITHOUT_PARAM(),
                     false));
         }
         if (!isRequestResponseMethod(method) && ("GET".equals(method.getHttpMethod()) && (void.class == method.getMethod().getReturnType()))) {
             issueList.add(new ResourceModelIssue(
                     method,
-                    "GET method should return something!",
+                    ImplMessages.ERROR_GET_RETURNS_VOID(),
                     true));
         }
     // TODO: anything else ?
@@ -71,7 +72,7 @@ public class BasicValidator extends AbstractModelValidator {
         if ((null == method.getUriTemplate()) || (null == method.getUriTemplate().getValue()) || (method.getUriTemplate().getValue().length() == 0)) {
             issueList.add(new ResourceModelIssue(
                     method,
-                    "URI template associated with subresource method can not have null neither empty value",
+                    ImplMessages.ERROR_SUBRES_METHOD_URI_PATH_EMPTY_OR_NULL(),
                     true));
         }
     }
@@ -80,13 +81,13 @@ public class BasicValidator extends AbstractModelValidator {
         if (void.class == locator.getMethod().getReturnType()) {
             issueList.add(new ResourceModelIssue(
                     locator,
-                    "Subresource locator must return something!",
+                    ImplMessages.ERROR_SUBRES_LOC_RETURNS_VOID(),
                     true));
         }
         if ((null == locator.getUriTemplate()) || (null == locator.getUriTemplate().getValue()) || (locator.getUriTemplate().getValue().length() == 0)) {
             issueList.add(new ResourceModelIssue(
                     locator,
-                    "URI template associated with abstract resource can not have null neither empty value!",
+                    ImplMessages.ERROR_SUBRES_LOC_URI_PATH_EMPTY_OR_NULL(),
                     true));
         }
     }
