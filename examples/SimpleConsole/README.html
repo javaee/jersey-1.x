@@ -19,7 +19,7 @@
           list of colors. The list can be filtered by a client-supplied query 
           parameter.
           The resource references the Form resource using the 
-          UriTemplate annotation declared on the Colours.getColours method.          
+          Path annotation declared on the Colours.getColours method.          
           </dd>
           <dt><code>com.sun.ws.rest.samples.console.resource.Form</code></dt>
           <dd>A resource class that produces a form in response to an HTTP GET,
@@ -62,8 +62,7 @@ ant run</pre></blockquote>
 <p>Or see only those colors containing the letter 'r':</p>
  
       <blockquote><code><a href="http://127.0.0.1:9998/resources/form/colours?match=r">http://127.0.0.1:9998/resources/form/colours?match=r</a></code></blockquote>
-      <p>A <a href="http://wadl.dev.java.net/#spec">WADL description</a> is automatically
-      generated. See the generated description at:</p>
+      <p>A <a href="http://wadl.dev.java.net/#spec">WADL description</a> may be accessed at the URL:</p>
       <blockquote><code><a href="http://127.0.0.1:9998/resources/application.wadl">http://127.0.0.1:9998/resources/application.wadl</a></code></blockquote>
       
   </body></html>
