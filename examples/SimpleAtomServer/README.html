@@ -25,7 +25,7 @@
                 in the feed. It also provides support to create Atom Entries and
                 Atom Media Link Entries.
                 The resource references the EntryResource and EditEntryResource resources
-                using the UriTemplate annotation declared on the FeedResource.getEntryResource and 
+                using the Path annotation declared on the FeedResource.getEntryResource and 
                 FeedResource.getEditEntryResource methods respectively.
             </dd>
             <dt><code>com.sun.ws.rest.samples.atomserver.resources.EntryResource</code></dt>
@@ -108,8 +108,7 @@ ant run-server</pre></blockquote>
         included in Sun's Java Platform, Standard Edition 6 (Java SE 6)
  release.
     </p>
-    <p>A <a href="http://wadl.dev.java.net/#spec">WADL description</a> is automatically
-    generated. Visit the following URL to see the generated description:</p>
+    <p>A <a href="http://wadl.dev.java.net/#spec">WADL description</a> may be accessed at the URL:</p>
     <blockquote><code><a href="http://127.0.0.1:9998/atom/application.wadl">http://127.0.0.1:9998/atom/application.wadl</a></code></blockquote>
     <p>Get the service document:</p>
     <blockquote><pre>java -jar dist/SimpleAtomServer.jar GET http://127.0.0.1:9998/atom/service</pre></blockquote>
