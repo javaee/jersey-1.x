@@ -19,7 +19,7 @@
             <dt><code>com.sun.ws.rest.samples.bookstore.resources.Bookstore</code></dt>
             <dd>The bookstore resource that returns a list of items, either CDs or Books.
                 The resource dynamically references a Book or CD resource using the
-                getItem method that is annotated with UriTemplate.
+                getItem method that is annotated with Path.
                 The Book and CD resource both inherit from the Item class and thus the
                 resources can be managed ploymorphically.
             </dd>
@@ -29,7 +29,7 @@
             <dt><code>com.sun.ws.rest.samples.bookstore.resources.CD</code></dt>
             <dd>The CD resource that has a title, author and a list of tracks.
                 The resource dynamically references the Track resource using the
-                getTrack method that is annotated with UriTemplate.
+                getTrack method that is annotated with Path.
             </dd>
             <dt><code>com.sun.ws.rest.samples.bookstore.resources.Track</code></dt>
             <dd>The Tracks resource that has a name and the length of the track.
