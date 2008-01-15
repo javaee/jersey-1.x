@@ -83,31 +83,38 @@ instance for underlying data.
 
 <p>You have two natural options, which JavaDB installation to use.
 <ul>
-<li>JavaDB bundled with Netbeans 5.5.1
+<li>JavaDB bundled with Netbeans 6.0
 <li>JavaDB bundled with Glassfish V2
 </ul>
 
 <p>The example comes along with 
-Netbeans (open source IDE, <a href="http://www.netbeans.org">http://www.netbeans.org/</a>) project files,
+Netbeans 6.0 (open source IDE, <a href="http://www.netbeans.org">http://www.netbeans.org/</a>) project files,
 so the first option is convenient for people running on Netbeans.
 
-<h3>Running on Netbeans 5.5.1</h3>
+<h3>Running on Netbeans 6.0</h3>
 
-<p>Presuming, you have installed Netbeans 5.5.1 and Glassfish v2.
+<p>Presuming, you have installed Netbeans 6.0 with bundled Glassfish V2 server. 
 
 <h4>Building And Starting The Bookmark Service</h4>
 
-<p>Open <b>Bookmark</b> project in Netbeans IDE. If you do not have your Glassfish V2 application server 
-already registered in Netbeans, you will be asked to resolve missing server problem. 
-The following pop-up will get displayed:
-<div class="figure"><img src="img/resolveMissingServerProblemPopup.png"/></div>
-You will click on <code>Close</code> button and make a right-click to the <b>Bookmark</b> project:
-<div class="figure"><img src="img/resolveMissingServerProblemMenu.png"/></div>
-Then you click on <code>Resolve Missing Server Problem</code> item,
-which will bring you to:
-<div class="figure"><img src="img/resolveMissingServerProblemDialog.png"/></div>
-Here you click on <code>Add Server...</code> button and add your glassfish instance.
+<p>Open <b>Bookmark</b> project in Netbeans IDE. 
 
+<p>The following pop-up might get displayed:
+<div class="figure"><img src="img/EditObjectProperties.png"/></div>
+Just click on <code>Regenerate</code> button. 
+
+<p>Another pop-up will get displayed then, saying there is unregistered database connection:
+<div class="figure"><img src="img/ResolveDSProblem.png"/></div>
+Click on <code>Close</code> button and resolve the problem as follows.
+Make a right-click on the <b>Bookmark</b> project:
+<div class="figure"><img src="img/ResolveDSProblemMenu.png"/></div>
+Then you click on <code>Resolve Data Source Problem...</code> item,
+which will bring you to:
+<div class="figure"><img src="img/ResolveDSProblemDialog.png"/></div>
+Here you add <code>;create=true</code> parameter to <code>Database URL</code> field as 
+shown at the screenshot above and click on <code>OK</code> button. 
+On the following tab, you just confirm the selected <code>APP</code> schema:
+<div class="figure"><img src="img/ResolveDSProblemSchemaDialog.png"/></div>
 <p>You can now build and deploy the project by pressing <b>F6</b> (Run Main Project)
 
 
@@ -121,7 +128,7 @@ If you see something similar in your Netbeans window, you successfully deployed 
 
 
 
-<h3>Running Without Netbeans 5.5.1</h3>
+<h3>Running Without Netbeans 6.0</h3>
 
 <p>Presuming, you have installed Glassfish v2. <code>AS_HOME</code> variable should point to
 your glassfish installation directory.
@@ -134,6 +141,11 @@ You make it in just one shot from <code>Bookmark</code> directory by
 </pre>
 
 <h4>Test Client Running</h4>
+
+<p><b>Warning:</b> if you do not have your default http port number set to 11750, you will need to change
+the port number used by the test client Main class in variable <code>UrlBase</code>. See the port number
+highlighted at the snapshot above.
+
 
 <pre class="cliSample">
 % cd TestClient
