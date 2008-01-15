@@ -24,7 +24,7 @@
             <dd>This resource class provides meta-data information on the URIs to content resources 
                 that can be read and updated. JAXB is used to represent the meta-data as an XML document.
                 The resource references the ItemContentResource resource using the 
-                UriTemplate annotation declared on the ItemResource.getItemContentResource method.
+                Path annotation declared on the ItemResource.getItemContentResource method.
             </dd>
             <dt><code>com.sun.ws.rest.samples.optimisticconcurrency.resources.ItemContentResource</code></dt>
             <dd>This resource class provides read and update ccess to the content. In this example, the
@@ -64,8 +64,7 @@ ant run-server</pre></blockquote>
             <a href="http://java.sun.com/javase/6/docs/jre/api/net/httpserver/spec/index.html">Lightweight HTTP Server</a>
             included in Sun's Java Platform, Standard Edition 6 (Java SE 6) release.
         </p>
-        <p>A <a href="http://wadl.dev.java.net/#spec">WADL description</a> is automatically
-        generated. Visit the following URL to see the generated description:</p>
+        <p>A <a href="http://wadl.dev.java.net/#spec">WADL description</a> may be accessed at the URL:</p>
         <blockquote><code><a href="http://127.0.0.1:9998/occ/application.wadl">http://127.0.0.1:9998/occ/application.wadl</a></code></blockquote>
         
         <p>Get the item meta-data:</p>
