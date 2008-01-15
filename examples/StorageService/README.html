@@ -24,13 +24,13 @@
             <dt><code>com.sun.ws.rest.samples.storageservice.resources.ContainersResource</code></dt>
             <dd>This Java class provides meta-data information on the containers.
                 The resource references the ContainerResource resource using the 
-                UriTemplate annotation declared on the ContainersResource.getContainerResource method.
+                Path annotation declared on the ContainersResource.getContainerResource method.
             </dd>
             <dt><code>com.sun.ws.rest.samples.storageservice.resources.ContainerResource</code></dt>
             <dd>This Java class provides read, create and delete of a container.
                 Searching of items is supported using a URI query parameter.
                 The resource dynamically references the ItemResource resource using the 
-                getItemResource method that is annotated with UriTemplate.
+                getItemResource method that is annotated with Path.
             </dd>
             <dt><code>com.sun.ws.rest.samples.storageservice.resources.ItemResource</code></dt>
             <dd>This Java class provides read, create, update, and delete of an item.
@@ -72,8 +72,7 @@ ant run-server</pre></blockquote>
         included in Sun's Java Platform, Standard Edition 6 (Java SE 6)
  release.
     </p>
-    <p>A <a href="http://wadl.dev.java.net/#spec">WADL description</a> is automatically
-    generated. See the following URL for a generated description:</p>
+    <p>A <a href="http://wadl.dev.java.net/#spec">WADL description</a> may be accessed at the URL:</p>
     <blockquote><code><a href="http://127.0.0.1:9998/storage/application.wadl">http://127.0.0.1:9998/storage/application.wadl</a></code></blockquote>
 
     <p>Get the containers:</p>

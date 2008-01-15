@@ -48,16 +48,16 @@ import javax.ws.rs.core.UriInfo;
 public class ContainerResource {
     @HttpContext UriInfo uriInfo;
     @HttpContext Request request;
+    String container;
     
-    ContainerResource(UriInfo uriInfo, Request request) {
+    ContainerResource(UriInfo uriInfo, Request request, String container) {
         this.uriInfo = uriInfo;
         this.request = request;
+        this.container = container;
     }
     
     @GET
-    public Container getContainer(
-            @UriParam("container") String container,
-            @QueryParam("search") String search) {
+    public Container getContainer(@QueryParam("search") String search) {
         System.out.println("GET CONTAINER " + container + ", search = " + search);
 
         Container c = MemoryStore.MS.getContainer(container);
@@ -79,7 +79,7 @@ public class ContainerResource {
     }    
 
     @PUT
-    public Response putContainer(@UriParam("container") String container) {
+    public Response putContainer() {
         System.out.println("PUT CONTAINER " + container);
         
         URI uri =  uriInfo.getAbsolutePath();
@@ -97,7 +97,7 @@ public class ContainerResource {
     }
     
     @DELETE
-    public void deleteContainer(@UriParam("container") String container) {
+    public void deleteContainer() {
         System.out.println("DELETE CONTAINER " + container);
         
         Container c = MemoryStore.MS.deleteContainer(container);
@@ -107,8 +107,7 @@ public class ContainerResource {
     
     
     @Path(value="{item}", limited=false)
-    public ItemResource getItemResource(@UriParam("container") String container, 
-            @UriParam("item") String item) {
+    public ItemResource getItemResource(@UriParam("item") String item) {
         return new ItemResource(uriInfo, request, container, item);
     }
     
