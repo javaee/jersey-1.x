@@ -191,7 +191,7 @@ public final class WadlGenerator {
     private static Resource generateResource(AbstractResource r) {
         Resource wadlResource = new Resource();
         if (r.isRootResource())
-            wadlResource.setPath(r.getUriTemplate().getValue());
+            wadlResource.setPath(r.getUriPath().getValue());
         
         // for each resource method
         Map<String, Param> wadlResourceParams = new HashMap<String, Param>();
@@ -210,7 +210,7 @@ public final class WadlGenerator {
                 new HashMap<String, Map<String, Param>>();
         for (AbstractSubResourceMethod m : r.getSubResourceMethods()) {
             // find or create sub resource for uri template
-            String template = m.getUriTemplate().getValue();
+            String template = m.getUriPath().getValue();
             Resource wadlSubResource = wadlSubResources.get(template);
             Map<String, Param> wadlSubResourceParams = wadlSubResourcesParams.get(template);
             if (wadlSubResource == null) {
@@ -236,7 +236,7 @@ public final class WadlGenerator {
         // for each sub resource locator
         for (AbstractSubResourceLocator l : r.getSubResourceLocators()) {
             Resource wadlSubResource = new Resource();
-            wadlSubResource.setPath(l.getUriTemplate().getValue());
+            wadlSubResource.setPath(l.getUriPath().getValue());
             for (Parameter p : l.getParameters()) {
                 Param wadlParam = generateParam(p);
                 wadlSubResource.getParam().add(wadlParam);
@@ -249,8 +249,8 @@ public final class WadlGenerator {
     private static Resource generateSubResource(AbstractResource r, String path) {
         Resource wadlResource = new Resource();
         if (r.isRootResource()) {
-            StringBuilder b = new StringBuilder(r.getUriTemplate().getValue());
-            if (!(r.getUriTemplate().getValue().endsWith("/") || path.startsWith("/")))
+            StringBuilder b = new StringBuilder(r.getUriPath().getValue());
+            if (!(r.getUriPath().getValue().endsWith("/") || path.startsWith("/")))
                 b.append("/");
             b.append(path);
             wadlResource.setPath(b.toString());
@@ -259,7 +259,7 @@ public final class WadlGenerator {
         Map<String, Param> wadlSubResourceParams = new HashMap<String, Param>();
         for (AbstractSubResourceMethod m : r.getSubResourceMethods()) {
             // find or create sub resource for uri template
-            String template = m.getUriTemplate().getValue();
+            String template = m.getUriPath().getValue();
             if (!template.equals(path))
                 continue;
             com.sun.research.ws.wadl.Method wadlMethod = generateMethod(wadlSubResourceParams, m);

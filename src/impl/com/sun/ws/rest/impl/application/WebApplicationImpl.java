@@ -279,8 +279,8 @@ public final class WebApplicationImpl implements WebApplication {
             rootResources.add(r.resource);
             
             UriTemplate t = new PathTemplate(
-                    r.resource.getUriTemplate().getValue(),
-                    r.resource.getUriTemplate().isEncode());
+                    r.resource.getUriPath().getValue(),
+                    r.resource.getUriPath().isEncode());
             
             PathPattern p = new PathPattern(t, r.hasSubResources);
                     

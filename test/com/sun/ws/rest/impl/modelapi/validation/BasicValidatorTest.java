@@ -17,7 +17,7 @@ import com.sun.ws.rest.api.model.AbstractResourceMethod;
 import com.sun.ws.rest.api.model.AbstractSubResourceLocator;
 import com.sun.ws.rest.api.model.AbstractSubResourceMethod;
 import com.sun.ws.rest.api.model.ResourceModelIssue;
-import com.sun.ws.rest.api.model.UriTemplateValue;
+import com.sun.ws.rest.api.model.UriPathValue;
 import junit.framework.TestCase;
 
 /**
@@ -88,11 +88,11 @@ public class BasicValidatorTest extends TestCase {
         assertTrue(issueCount > 0);
         printIssueList(validator);
         // adding uri template to decrease number of issues
-        locator = new AbstractSubResourceLocator(TestResourceSRL.class.getMethod("subResLocator"), new UriTemplateValue("/test"));
+        locator = new AbstractSubResourceLocator(TestResourceSRL.class.getMethod("subResLocator"), new UriPathValue("/test"));
         validator.cleanIssueList();
         validator.validate(locator);
         assertTrue((issueCount - 1) == validator.getIssueList().size());
-        locator = new AbstractSubResourceLocator(TestResourceSRL.class.getMethod("validSubResLocator"), new UriTemplateValue("/test1"));
+        locator = new AbstractSubResourceLocator(TestResourceSRL.class.getMethod("validSubResLocator"), new UriPathValue("/test1"));
         validator.cleanIssueList();
         validator.validate(locator);
         assertTrue(0 == validator.getIssueList().size());
@@ -108,18 +108,18 @@ public class BasicValidatorTest extends TestCase {
         assertTrue(issueCount > 0);
         validator.cleanIssueList();
         asrm = new AbstractSubResourceMethod(
-                null, TestResourceASRM.class.getMethod("subResMethod"), new UriTemplateValue("test"), "GET");
+                null, TestResourceASRM.class.getMethod("subResMethod"), new UriPathValue("test"), "GET");
         validator.validate(asrm);
         assertTrue((issueCount - 1) == validator.getIssueList().size());
     }
     
     public void testValidateAR() {
         BasicValidator validator = new BasicValidator();
-        AbstractResource ar = new AbstractResource(TestResource.class, new UriTemplateValue(""));
+        AbstractResource ar = new AbstractResource(TestResource.class, new UriPathValue(null));
         validator.validate(ar);
         int issueCount = validator.getIssueList().size();
         printIssueList(validator);
-        ar = new AbstractResource(TestResource.class, new UriTemplateValue("/test"));
+        ar = new AbstractResource(TestResource.class, new UriPathValue("/test"));
         validator.cleanIssueList();
         validator.validate(ar);
         assertTrue((issueCount - 1) == validator.getIssueList().size());
@@ -127,7 +127,7 @@ public class BasicValidatorTest extends TestCase {
 
     private static void printIssueList(BasicValidator validator) {
         for (ResourceModelIssue issue : validator.getIssueList()) {
-            System.out.println((issue.isFatal() ? "ERROR: " : "WARNING: ") + issue.getMessage() + "(" + issue.getSource().toString() + ")");
+            System.out.println((issue.isFatal() ? "ERROR: " : "WARNING: ") + issue.getMessage());
         }
     }
 }

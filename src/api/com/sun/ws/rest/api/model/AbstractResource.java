@@ -25,10 +25,10 @@ import java.util.List;
 /**
  * Abstraction for resource class
  */
-public class AbstractResource implements UriTemplated, AbstractModelComponent {
+public class AbstractResource implements UriPathAnnotated, AbstractModelComponent {
 
     private Class<?> resourceClass;
-    private UriTemplateValue uriTemplate;
+    private UriPathValue uriPath;
     private List<AbstractResourceMethod> resourceMethods;
     private List<AbstractSubResourceMethod> subResourceMethods;
     private List<AbstractSubResourceLocator> subResourceLocators;
@@ -44,9 +44,9 @@ public class AbstractResource implements UriTemplated, AbstractModelComponent {
     /**
      * Creates a new instance of AbstractResource
      */
-    public AbstractResource(Class<?> resourceClass, UriTemplateValue uriTemplate) {
+    public AbstractResource(Class<?> resourceClass, UriPathValue uriPath) {
         this.resourceClass = resourceClass;
-        this.uriTemplate = uriTemplate;
+        this.uriPath = uriPath;
         this.constructors = new ArrayList<AbstractResourceConstructor>();
         this.resourceMethods = new ArrayList<AbstractResourceMethod>();
         this.subResourceLocators = new ArrayList<AbstractSubResourceLocator>();
@@ -58,15 +58,15 @@ public class AbstractResource implements UriTemplated, AbstractModelComponent {
     }
 
     public boolean isSubResource() {
-        return uriTemplate == null;
+        return uriPath == null;
     }
 
     public boolean isRootResource() {
-        return uriTemplate != null;
+        return uriPath != null;
     }
 
-    public UriTemplateValue getUriTemplate() {
-        return uriTemplate;
+    public UriPathValue getUriPath() {
+        return uriPath;
     }
 
     /**
@@ -107,7 +107,7 @@ public class AbstractResource implements UriTemplated, AbstractModelComponent {
     @Override
     public String toString() {
         return "AbstractResource(" 
-                + ((null == getUriTemplate()) ? "" : ("\"" + getUriTemplate().getValue() + "\", - ")) 
+                + ((null == getUriPath()) ? "" : ("\"" + getUriPath().getValue() + "\", - ")) 
                 + getResourceClass().getSimpleName() + ": " 
                 + getResourceMethods().size() + " res methods, " 
                 + getSubResourceMethods().size() + " subres methods, " 

@@ -28,7 +28,7 @@ import com.sun.ws.rest.api.model.AbstractSubResourceLocator;
 import com.sun.ws.rest.api.model.AbstractSubResourceMethod;
 import com.sun.ws.rest.api.model.Parameter;
 import com.sun.ws.rest.api.model.Parameterized;
-import com.sun.ws.rest.api.model.UriTemplateValue;
+import com.sun.ws.rest.api.model.UriPathValue;
 import com.sun.ws.rest.impl.ImplMessages;
 import com.sun.ws.rest.impl.model.*;
 import java.lang.annotation.Annotation;
@@ -74,7 +74,7 @@ public class IntrospectionModeller {
 
         if (isRootResourceClass) {
             resource = new AbstractResource(resourceClass,
-                    new UriTemplateValue(rPathAnnotation.value(), rPathAnnotation.encode(), rPathAnnotation.limited()));
+                    new UriPathValue(rPathAnnotation.value(), rPathAnnotation.encode(), rPathAnnotation.limited()));
         } else { // just a subresource class
             resource = new AbstractResource(resourceClass);
         }
@@ -163,7 +163,7 @@ public class IntrospectionModeller {
             final AbstractSubResourceMethod subResourceMethod = new AbstractSubResourceMethod(
                     resource,
                     method,
-                    new UriTemplateValue(mPathAnnotation.value(), mPathAnnotation.encode(), mPathAnnotation.limited()),
+                    new UriPathValue(mPathAnnotation.value(), mPathAnnotation.encode(), mPathAnnotation.limited()),
                     getMetaAnnotations(method, HttpMethod.class).get(0).value());
        
             findOutConsumeMimeTypes(subResourceMethod, classScopeConsumeMimeAnnotation);
@@ -196,7 +196,7 @@ public class IntrospectionModeller {
             final Path mPathAnnotation = method.getAnnotation(Path.class);
             final AbstractSubResourceLocator subResourceLocator = new AbstractSubResourceLocator(
                     method,
-                    new UriTemplateValue(mPathAnnotation.value(), mPathAnnotation.encode(), mPathAnnotation.limited()));
+                    new UriPathValue(mPathAnnotation.value(), mPathAnnotation.encode(), mPathAnnotation.limited()));
 
             processParameters(subResourceLocator, subResourceLocator.getMethod(), isEncoded);
 
@@ -206,6 +206,7 @@ public class IntrospectionModeller {
 
     private static final void processParameters(Parameterized parametrized, Constructor ctor, boolean isEncoded) {
         processParameters(
+                ctor.toString(),
                 parametrized,
                 ((null != ctor.getAnnotation(Encoded.class)) || isEncoded),
                 ctor.getParameterTypes(), ctor.getGenericParameterTypes(), ctor.getParameterAnnotations());
@@ -213,12 +214,14 @@ public class IntrospectionModeller {
 
     private static final void processParameters(Parameterized parametrized, Method method, boolean isEncoded) {
         processParameters(
+                method.toString(),
                 parametrized,
                 ((null != method.getAnnotation(Encoded.class)) || isEncoded),
                 method.getParameterTypes(), method.getGenericParameterTypes(), method.getParameterAnnotations());
     }
 
     private static final void processParameters(
+            String nameForLogging,
             Parameterized parametrized,
             boolean isEncoded,
             Class[] parameterTypes,
@@ -227,6 +230,7 @@ public class IntrospectionModeller {
 
         for (int i = 0; i < parameterTypes.length; i++) {
             Parameter parameter = createParameter(
+                    nameForLogging, i + 1,
                     isEncoded, parameterTypes[i], genericParameterTypes[i], parameterAnnotations[i]);
             if (null != parameter) {
                 parametrized.getParameters().add(parameter);
@@ -302,6 +306,7 @@ public class IntrospectionModeller {
     private final static Map<Class, ParamAnnotationHelper> ANOT_HELPER_MAP = createParamAnotHelperMap();
 
     private static final Parameter createParameter(
+            String nameForLogging, int order,
             boolean isEncoded, Class<?> paramClass, Type paramType, Annotation[] annotations) {
 
         if (null == annotations) {
@@ -319,7 +324,7 @@ public class IntrospectionModeller {
                 ParamAnnotationHelper helper = ANOT_HELPER_MAP.get(annotation.annotationType());
                 if (null != paramSource) {
                     if (LOGGER.isLoggable(Level.WARNING)) {
-                        LOGGER.warning(ImplMessages.AMBIGUOUS_PARAMETER_SOURCE(helper.getSource(), paramSource));
+                        LOGGER.warning(ImplMessages.AMBIGUOUS_PARAMETER(nameForLogging, Integer.toString(order)));
                     }
                 // TODO: throw an exception ?
                 }

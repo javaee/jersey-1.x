@@ -11,7 +11,7 @@
  */
 
 /*
- * UriTemplateValue.java
+ * UriPathValue.java
  *
  * Created on October 5, 2007, 11:51 AM
  *
@@ -20,27 +20,27 @@
 package com.sun.ws.rest.api.model;
 
 /**
- * Abstraction for a UriTemplate value
+ * Abstraction for a URI path value
  */
-public class UriTemplateValue {
+public class UriPathValue {
     
     private String value;
     private boolean encode;
     private boolean limited;
     
-    /** Creates a new instance of UriTemplateValue */
-    public UriTemplateValue(String template) {
-        this(template, true);
+    /** Creates a new instance of UriPathValue */
+    public UriPathValue(String path) {
+        this(path, true);
     }
     
-    /** Creates a new instance of UriTemplateValue */
-    public UriTemplateValue(String template, boolean encode) {
-        this(template, encode, true);
+    /** Creates a new instance of UriPathValue */
+    public UriPathValue(String path, boolean encode) {
+        this(path, encode, true);
     }
 
-    /** Creates a new instance of UriTemplateValue */
-    public UriTemplateValue(String template, boolean encode, boolean limited) {
-        this.value = template;
+    /** Creates a new instance of UriPathValue */
+    public UriPathValue(String path, boolean encode, boolean limited) {
+        this.value = path;
         this.encode = encode;
         this.limited = limited;
     }
@@ -55,5 +55,13 @@ public class UriTemplateValue {
 
     public boolean isLimited() {
         return limited;
+    }
+    
+    @Override
+    public String toString() {
+        return this.getClass().getSimpleName() 
+                + "(" 
+                + ((null == getValue())? "null" : ("\"" + getValue() + "\"")) 
+                + ")";
     }
 }

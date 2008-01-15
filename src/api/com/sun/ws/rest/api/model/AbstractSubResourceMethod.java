@@ -24,18 +24,18 @@ import java.lang.reflect.Method;
  *
  * @author mh124079
  */
-public class AbstractSubResourceMethod extends AbstractResourceMethod implements UriTemplated {
+public class AbstractSubResourceMethod extends AbstractResourceMethod implements UriPathAnnotated {
 
-    private UriTemplateValue uriTemplate;
+    private UriPathValue uriPath;
 
     public AbstractSubResourceMethod(AbstractResource resource,
-            Method method, UriTemplateValue uriTemplate, String httpMethod) {
+            Method method, UriPathValue uriPath, String httpMethod) {
         super(resource, method, httpMethod);
-        this.uriTemplate = uriTemplate;
+        this.uriPath = uriPath;
     }
 
-    public UriTemplateValue getUriTemplate() {
-        return uriTemplate;
+    public UriPathValue getUriPath() {
+        return uriPath;
     }
 
     @Override

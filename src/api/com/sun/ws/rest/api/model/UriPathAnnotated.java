@@ -11,7 +11,7 @@
  */
 
 /*
- * UriTemplated.java
+ * UriPathAnnotated.java
  *
  * Created on October 5, 2007, 1:36 PM
  *
@@ -23,6 +23,6 @@ package com.sun.ws.rest.api.model;
  *
  * @author mh124079
  */
-public interface UriTemplated {
-    public UriTemplateValue getUriTemplate();
+public interface UriPathAnnotated {
+    public UriPathValue getUriPath();
 }

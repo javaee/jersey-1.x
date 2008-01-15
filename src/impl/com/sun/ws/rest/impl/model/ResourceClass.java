@@ -155,12 +155,12 @@ public final class ResourceClass {
             hasSubResources = true;
 
             UriTemplate t = new PathTemplate(
-                    locator.getUriTemplate().getValue(),
-                    locator.getUriTemplate().isEncode());
+                    locator.getUriPath().getValue(),
+                    locator.getUriPath().isEncode());
 
             PathPattern p = new PathPattern(
                     t,
-                    locator.getUriTemplate().isLimited());
+                    locator.getUriPath().isLimited());
 
             UriRule r = new SubLocatorRule(
                     t.getTemplateVariables(),
@@ -178,8 +178,8 @@ public final class ResourceClass {
         for (final AbstractSubResourceMethod method : this.resource.getSubResourceMethods()) {
 
             UriTemplate t = new PathTemplate(
-                    method.getUriTemplate().getValue(),
-                    method.getUriTemplate().isEncode());
+                    method.getUriPath().getValue(),
+                    method.getUriPath().isEncode());
 
             // TODO what does it mean to support limited=false
             PathPattern p = new PathPattern(t, false);

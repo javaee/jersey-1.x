@@ -32,36 +32,24 @@ public class BasicValidator extends AbstractModelValidator {
         if ((resource.getResourceMethods().size() + resource.getSubResourceMethods().size() + resource.getSubResourceLocators().size()) == 0) {
             issueList.add(new ResourceModelIssue(
                     resource,
-                    ImplMessages.ERROR_NO_SUB_RES_METHOD_LOCATOR_FOUND(),
+                    ImplMessages.ERROR_NO_SUB_RES_METHOD_LOCATOR_FOUND(resource.getResourceClass()),
                     true));
         }
         // uri template of the resource, if present should not contain null or empty value
-        if (resource.isRootResource() && ((null == resource.getUriTemplate()) || (null == resource.getUriTemplate().getValue()) || (resource.getUriTemplate().getValue().length() == 0))) {
+        if (resource.isRootResource() && ((null == resource.getUriPath()) || (null == resource.getUriPath().getValue()))) {
             issueList.add(new ResourceModelIssue(
                     resource,
-                    ImplMessages.ERROR_RES_URI_PATH_EMPTY_OR_NULL(),
+                    ImplMessages.ERROR_RES_URI_PATH_INVALID(resource.getResourceClass(), resource.getUriPath()),
                     true)); // TODO: is it really a fatal issue?
         }
     }
 
     public void visitAbstractResourceMethod(AbstractResourceMethod method) {
         // TODO: check in req/resp case the method has both req and resp params
-        if (!isRequestResponseMethod(method) && "PUT".equals(method.getHttpMethod()) && (0 == method.getParameters().size())) {
-            issueList.add(new ResourceModelIssue(
-                    method,
-                    ImplMessages.ERROR_PUT_METHOD_WITHOUT_PARAM(),
-                    false));
-        }
-        if (!isRequestResponseMethod(method) && "POST".equals(method.getHttpMethod()) && (0 == method.getParameters().size())) {
-            issueList.add(new ResourceModelIssue(
-                    method,
-                    ImplMessages.ERROR_POST_METHOD_WITHOUT_PARAM(),
-                    false));
-        }
         if (!isRequestResponseMethod(method) && ("GET".equals(method.getHttpMethod()) && (void.class == method.getMethod().getReturnType()))) {
             issueList.add(new ResourceModelIssue(
                     method,
-                    ImplMessages.ERROR_GET_RETURNS_VOID(),
+                    ImplMessages.ERROR_GET_RETURNS_VOID(method.getMethod()),
                     true));
         }
     // TODO: anything else ?
@@ -69,10 +57,10 @@ public class BasicValidator extends AbstractModelValidator {
 
     public void visitAbstractSubResourceMethod(AbstractSubResourceMethod method) {
         visitAbstractResourceMethod(method);
-        if ((null == method.getUriTemplate()) || (null == method.getUriTemplate().getValue()) || (method.getUriTemplate().getValue().length() == 0)) {
+        if ((null == method.getUriPath()) || (null == method.getUriPath().getValue()) || (method.getUriPath().getValue().length() == 0)) {
             issueList.add(new ResourceModelIssue(
                     method,
-                    ImplMessages.ERROR_SUBRES_METHOD_URI_PATH_EMPTY_OR_NULL(),
+                    ImplMessages.ERROR_SUBRES_METHOD_URI_PATH_INVALID(method.getMethod(), method.getUriPath()),
                     true));
         }
     }
@@ -81,13 +69,13 @@ public class BasicValidator extends AbstractModelValidator {
         if (void.class == locator.getMethod().getReturnType()) {
             issueList.add(new ResourceModelIssue(
                     locator,
-                    ImplMessages.ERROR_SUBRES_LOC_RETURNS_VOID(),
+                    ImplMessages.ERROR_SUBRES_LOC_RETURNS_VOID(locator.getMethod()),
                     true));
         }
-        if ((null == locator.getUriTemplate()) || (null == locator.getUriTemplate().getValue()) || (locator.getUriTemplate().getValue().length() == 0)) {
+        if ((null == locator.getUriPath()) || (null == locator.getUriPath().getValue()) || (locator.getUriPath().getValue().length() == 0)) {
             issueList.add(new ResourceModelIssue(
                     locator,
-                    ImplMessages.ERROR_SUBRES_LOC_URI_PATH_EMPTY_OR_NULL(),
+                    ImplMessages.ERROR_SUBRES_LOC_URI_PATH_INVALID(locator.getMethod(), locator.getUriPath()),
                     true));
         }
     }
