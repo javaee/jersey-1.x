@@ -30,7 +30,7 @@
                     <file>${file.reference.jsr311-api.jar}</file>
                     <path-in-war>WEB-INF/lib</path-in-war>
                 </library>
-                <library>
+                <library files="1">
                     <file>${file.reference.jersey.jar}</file>
                     <path-in-war>WEB-INF/lib</path-in-war>
                 </library>
