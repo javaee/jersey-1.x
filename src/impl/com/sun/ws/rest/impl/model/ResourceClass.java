@@ -23,7 +23,6 @@
 package com.sun.ws.rest.impl.model;
 
 import com.sun.ws.rest.api.MediaTypes;
-import com.sun.ws.rest.api.container.ContainerException;
 import com.sun.ws.rest.api.core.ResourceConfig;
 import com.sun.ws.rest.api.model.AbstractResource;
 import com.sun.ws.rest.api.model.AbstractResourceMethod;
@@ -112,16 +111,18 @@ public final class ResourceClass {
         // Create the rules for the HTTP methods
         methodMap.sort();
         /**
-         * Add WADL method after method map has been sorted.
+         * Add WADL GET method after method map has been sorted.
          * This ensures that application specific methods get priority
          * but it means if a method produces a wild card like "*\/*"
          * then that method will consume the request even if the client
          * explicitly accepts the WADL media type.
-         * TODO consider using a sub-resource method with the URI path
-         * "application.wadl" that way there will be no conflict, or
-         * returning WADL with the OPTIONS method.
+         * 
+         * WADL will not be created if there are no sub-resource methods,
+         * sub-resource locators present and no resource methods present
+         * or only the HTTP OPTIONS resource method is present.
          */
-        processWadl(resource, methodMap);        
+        if (!rulesMap.isEmpty() || methodMap.size() > 1)
+            processWadl(resource, methodMap);        
         if (!methodMap.isEmpty()) {
             // No need to adapt with the RightHandPathRule as the URI path
             // will be consumed when such a rule is accepted
