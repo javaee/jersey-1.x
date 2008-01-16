@@ -33,9 +33,9 @@ public class BasicValidator extends AbstractModelValidator {
             issueList.add(new ResourceModelIssue(
                     resource,
                     ImplMessages.ERROR_NO_SUB_RES_METHOD_LOCATOR_FOUND(resource.getResourceClass()),
-                    true));
+                    false)); // there might still be Views associated with the resource
         }
-        // uri template of the resource, if present should not contain null or empty value
+        // uri template of the resource, if present should not contain null value
         if (resource.isRootResource() && ((null == resource.getUriPath()) || (null == resource.getUriPath().getValue()))) {
             issueList.add(new ResourceModelIssue(
                     resource,
