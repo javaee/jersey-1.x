@@ -135,9 +135,20 @@ your glassfish installation directory.
 
 <h4>Building And Starting The Bookmark Service</h4>
 
-You make it in just one shot from <code>Bookmark</code> directory by
+<p>If <code>.asadminpass</code> file is missing at your home directory, you
+will need to run the following command to get it created:
+<pre class="cliSample">
+% $AS_HOME/bin/asadmin login
+</pre>
+
+<p>You then build and run the example in just one shot from <code>Bookmark</code> directory by
 <pre class="cliSample">
 % $AS_HOME/lib/ant/bin/ant run-on-glassfish
+</pre>
+
+<p><b>Notice:</b> You might need to change access rights for the ant command before running it:
+<pre class="cliSample">
+% chmod +x $AS_HOME/lib/ant/bin/ant 
 </pre>
 
 <h4>Test Client Running</h4>
