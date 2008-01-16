@@ -37,7 +37,7 @@ import org.codehaus.jettison.json.JSONArray;
  */
 public class Main {
     
-    final static String UrlBase = "http://localhost:11750/Bookmark/resources/";
+    final static String UrlBase = "http://localhost:8080/Bookmark/resources/";
     
     final static class HttpResponse {
         Object content;
