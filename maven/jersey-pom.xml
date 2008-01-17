@@ -21,8 +21,8 @@
        "Portions Copyrighted [year] [name of copyright owner]"
 -->
 <project xmlns="http://maven.apache.org/POM/4.0.0"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>jersey</groupId>
     <artifactId>jersey</artifactId>
@@ -33,14 +33,14 @@
         Open source JAX-RS (JSR 311) Reference Implementation for building
         RESTful Web services
     </description>
-
+    
     <url>https://jersey.dev.java.net/</url>
-
+    
     <organization>
         <name>Sun Microsystems, Inc</name>
         <url>http://www.sun.com/</url>
     </organization>
-
+    
     <licenses>
         <license>
             <name>
@@ -50,7 +50,7 @@
             <distribution>repo</distribution>
         </license>
     </licenses>
-
+    
     <repositories>
         <repository>
             <id>java.net</id>
@@ -64,7 +64,7 @@
             </snapshots>
         </repository>
     </repositories>
-
+    
     <dependencies>
         <dependency>
             <groupId>javax.ws.rs</groupId>
@@ -89,6 +89,10 @@
             <version>2.5</version>
             <scope>provided</scope>
         </dependency>
-
+        <dependency>
+            <groupId>asm</groupId>
+            <artifactId>asm</artifactId>
+            <version>3.1</version>
+        </dependency>
     </dependencies>
 </project>
