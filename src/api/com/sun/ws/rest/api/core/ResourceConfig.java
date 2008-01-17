@@ -65,13 +65,13 @@ public interface ResourceConfig {
     
     /**
      * If set the default resource provider to be used by the 
-     * @{link ResourceProviderFactory}.
+     * {@link com.sun.ws.rest.spi.resource.ResourceProviderFactory}.
      * <p>
      * The type of this property must be a Java class that implementations
-     * {@link ResourceProvider}.
+     * {@link com.sun.ws.rest.spi.resource.ResourceProvider}.
      * <p>
-     * If not set the default resource provider will be 
-     * {@link PerRequestProvider}.
+     * If not set the default resource provider will be the per-request 
+     * resource provider
      */
     public static final String PROPERTY_DEFAULT_RESOURCE_PROVIDER_CLASS
             = "com.sun.ws.rest.config.property.DefaultResourceProviderClass";
@@ -80,7 +80,7 @@ public interface ResourceConfig {
      * Get the set of root resource classes to be deployed by the Web
      * application.
      * <p>
-     * A root resource class is a Java class with a {@link javax.ws.rs.UriTemplate} 
+     * A root resource class is a Java class with a {@link javax.ws.rs.Path} 
      * annotation declared on the class.
      * 
      * @return the set of root resource classes. 

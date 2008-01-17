@@ -47,7 +47,7 @@ public interface ResourceProviderContext {
      * argument list. 
      * Only arguments whose annotations are defined by JAX-RS will assigned a
      * non-null value, unknown parameters will have a value of null.
-     * @param ctor the resource class constructor that the resource provider
+     * @param abstractResourceConstructor the resource class constructor that the resource provider
      * wishes to invoke
      * @return an array of values corresponding to the constructor parameters
      */

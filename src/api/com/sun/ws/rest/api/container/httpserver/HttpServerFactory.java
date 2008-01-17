@@ -45,7 +45,7 @@ public final class HttpServerFactory {
      * referenced in the java classpath.
      * <p>
      * This implementation defers to the 
-     * {@link ContainerFactory#createContainer(HttpHandler)} method for creating
+     * {@link ContainerFactory#createContainer(Class)} method for creating
      * an HttpHandler that manages the root resources.
      *
      * @param u the URI to create the http server. The URI scheme must be
@@ -70,7 +70,7 @@ public final class HttpServerFactory {
      * referenced in the java classath.
      * <p>
      * This implementation defers to the 
-     * {@link ContainerFactory#createContainer(HttpHandler)} method for creating
+     * {@link ContainerFactory#createContainer(Class)} method for creating
      * an HttpHandler that manages the root resources.
      *
      * @param u the URI to create the http server. The URI scheme must be

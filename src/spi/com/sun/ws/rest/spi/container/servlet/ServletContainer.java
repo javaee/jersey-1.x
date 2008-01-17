@@ -61,7 +61,7 @@ import javax.servlet.http.HttpServletResponse;
  * <p>
  * If the initialization parameter 
  * "com.sun.ws.rest.config.property.resourceConfigClass" is not present a new 
- * instance of @{link ClasspathResourceConfig} is created. The initialization 
+ * instance of {@link ClasspathResourceConfig} is created. The initialization 
  * parameter "com.sun.ws.rest.config.property.classpath" MAY be set to provide 
  * one or more paths. Each path MUST be separated by ';'. Each path MUST
  * be a virtual path as specified by the {@link Servlet#getRealPath} method,
@@ -69,7 +69,7 @@ import javax.servlet.http.HttpServletResponse;
  * added as a property value to a Map instance using the property name 
  * (@link ClasspathResourceConfig.PROPERTY_CLASSPATH}. Any additional 
  * initialization parameters are then added to the Map instance. Then that Map
- * instance is passe to the constructor of @{link ClasspathResourceConfig}.
+ * instance is passe to the constructor of {@link ClasspathResourceConfig}.
  * If this parameter is not set then the 
  * default value is set to the following virtual paths: 
  * "/WEB-INF/lib;/WEB-INF/classes".
@@ -78,7 +78,7 @@ import javax.servlet.http.HttpServletResponse;
  * that the following classes may be injected onto the field of a root 
  * resource class or a parameter of a method of root resource class that is 
  * annotated with {@link Resource}: @{link HttpServletRequest}, 
- * @{link HttpServletResponse} and {@link ServletConfig}.
+ * {@link HttpServletResponse} and {@link ServletConfig}.
  */
 public class ServletContainer extends HttpServlet {
     private static final String RESOURCE_CONFIG_CLASS = 
@@ -260,7 +260,7 @@ public class ServletContainer extends HttpServlet {
      * An inheriting class may override this method to configure the 
      * {@link WebApplication} to provide alternative or additional instance
      * that may be injected into a root resource class, and may modify the
-     * features and properties of the {@ResourceConfig}. For an inheriting
+     * features and properties of the {@link ResourceConfig}. For an inheriting
      * class to extend configuration behaviour the overriding method MUST call
      * super.configure(servletConfig, rc, wa) as the first statement of that 
      * method.

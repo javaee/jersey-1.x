@@ -54,8 +54,8 @@ public class ResourceProviderFactory {
      * in the resourceProperties using the property name 
      * "com.sun.ws.rest.config.property.DefaultResourceProviderClass".
      * 
-     * If there is no such property then the {@link PerRequestProvider} will
-     * ne chosen.
+     * If there is no such property then the per-request resource provider
+     * will be chosen.
      * 
      * @param resource the abstract resource for the provider.
      * @param resourceFeatures the resource features

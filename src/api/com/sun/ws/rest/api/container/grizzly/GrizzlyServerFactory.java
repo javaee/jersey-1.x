@@ -28,7 +28,7 @@ public final class GrizzlyServerFactory {
      * state.
      * <p>
      * This implementation defers to the 
-     * {@link ContainerFactory#createContainer(Adapter)} method for creating
+     * {@link ContainerFactory#createContainer(Class)} method for creating
      * an Adapter that manages the root resources.
      *
      * @param u the URI to create the http server. The URI scheme must be
@@ -56,7 +56,7 @@ public final class GrizzlyServerFactory {
      * state.
      * <p>
      * This implementation defers to the 
-     * {@link ContainerFactory#createContainer(Adapter)} method for creating
+     * {@link ContainerFactory#createContainer(Class)} method for creating
      * an Adapter that manages the root resources.
      *
      * @param u the URI to create the http server. The URI scheme must be

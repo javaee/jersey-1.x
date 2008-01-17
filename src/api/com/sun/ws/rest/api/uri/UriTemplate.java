@@ -22,8 +22,6 @@
 
 package com.sun.ws.rest.api.uri;
 
-import com.sun.ws.rest.impl.uri.*;
-import com.sun.ws.rest.api.uri.UriComponent;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -330,7 +328,7 @@ public class UriTemplate {
      * <p>
      * 
      * @param uri the uri to match against the template.
-     * @param capturingGroupValues the list to store the values of a pattern's 
+     * @param groupValues the list to store the values of a pattern's 
      *        capturing groups is matching is successful. The values are stored 
      *        in the same order as the pattern's capturing groups.
      * @return true if the URI matches the template, otherwise false.
