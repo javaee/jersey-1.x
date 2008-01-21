@@ -134,7 +134,7 @@ public final class ResourceClassScanner {
         String protocol = u.getProtocol();
         if (protocol.equals("file")) {
             indexDir(new File(u.getPath()), false);
-        } else if (protocol.equals("jar")) {
+        } else if (protocol.equals("jar") || protocol.equals("zip")) {
             URI jarUri = URI.create(u.getPath());
             String jarFile = jarUri.getPath();
             jarFile = jarFile.substring(0, jarFile.indexOf('!'));            
