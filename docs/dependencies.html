@@ -27,6 +27,17 @@
         <p>When using Java SE (5 or 6) or Java EE 5 the minimum set of required jars are: 
         </p>
         <p><blockquote>jersey.jar, jsr311-api.jar, asm-3.1.jar</blockquote></p>
+        <p>Specifically the asm-3.1.jar dependency is required when either of 
+        the following <code>com.sun.ws.rest.api.core.ResourceConfig</code> implementations
+        are utilized:
+        <ul>
+            <li><p><code>com.sun.ws.rest.api.core.ClasspathResourceConfig</code>; or</p>
+            <li><p><code> com.sun.ws.rest.api.core.PackagesResourceConfig</code></p>
+        </ul>
+        <p>By default Jersey will utilize the <code>ClasspathResourceConfig</code> if
+        an alternative is not specified. If an alternative is specified that does
+        not depend on asm-3.1.jar then it is no longer necessary to include asm-3.1.jar
+        in the minimum set of required jars.</p>
         <h2>Container</h2>
         <h3>Grizzly HTTP Web server</h3>
         <p>Deploying an application using the Grizzly HTTP Web server requires:</p>
