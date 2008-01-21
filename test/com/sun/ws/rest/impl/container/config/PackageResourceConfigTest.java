@@ -129,6 +129,26 @@ public class PackageResourceConfigTest extends AbstractResourceConfigTester {
         assertEquals(2, rc.getResourceClasses().size());
     }
     
+    public void testJarAsZipBoth() throws Exception {
+        ClassLoader cl = createClassLoader(Suffix.zip, "build/test/classes/",
+                "com/sun/ws/rest/impl/container/config/toplevel/PublicRootResourceClass.class",
+                "com/sun/ws/rest/impl/container/config/toplevel/PackageRootResourceClass.class",
+                "com/sun/ws/rest/impl/container/config/innerstatic/InnerStaticClass.class",
+                "com/sun/ws/rest/impl/container/config/innerstatic/InnerStaticClass$PublicClass.class",
+                "com/sun/ws/rest/impl/container/config/innerstatic/InnerStaticClass$PackageClass.class",
+                "com/sun/ws/rest/impl/container/config/innerstatic/InnerStaticClass$ProtectedClass.class",
+                "com/sun/ws/rest/impl/container/config/innerstatic/InnerStaticClass$PrivateClass.class"
+                );
+        ResourceConfig rc = createConfig(cl, 
+                "com.sun.ws.rest.impl.container.config");
+
+        assertTrue(rc.getResourceClasses().contains(
+                cl.loadClass("com.sun.ws.rest.impl.container.config.toplevel.PublicRootResourceClass")));
+        assertTrue(rc.getResourceClasses().contains(
+                cl.loadClass("com.sun.ws.rest.impl.container.config.innerstatic.InnerStaticClass$PublicClass")));
+        assertEquals(2, rc.getResourceClasses().size());
+    }
+    
     private ResourceConfig createConfig(ClassLoader cl, String... packages) throws IOException {        
         ClassLoader ocl = Thread.currentThread().getContextClassLoader();
         Thread.currentThread().setContextClassLoader(cl);
@@ -140,8 +160,12 @@ public class PackageResourceConfigTest extends AbstractResourceConfigTester {
     }
     
     private ClassLoader createClassLoader(String base, String... entries) throws IOException {
+        return createClassLoader(Suffix.jar, base, entries);
+    }
+    
+    private ClassLoader createClassLoader(Suffix s, String base, String... entries) throws IOException {
         URL[] us = new URL[1];
-        us[0] = createJarFile(base, entries).toURI().toURL();
+        us[0] = createJarFile(s, base, entries).toURI().toURL();
         return new URLClassLoader(us, null);
     }    
 }

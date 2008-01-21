@@ -145,6 +145,23 @@ public class ClasspathResourceConfigTest extends AbstractResourceConfigTester {
         assertEquals(2, rc.getResourceClasses().size());
     }
     
+    public void testJarAzZipBoth() throws IOException {
+        File zipFile = createJarFile(Suffix.zip, "build/test/classes/",
+                "com/sun/ws/rest/impl/container/config/toplevel/PublicRootResourceClass.class",
+                "com/sun/ws/rest/impl/container/config/toplevel/PackageRootResourceClass.class",
+                "com/sun/ws/rest/impl/container/config/innerstatic/InnerStaticClass.class",
+                "com/sun/ws/rest/impl/container/config/innerstatic/InnerStaticClass$PublicClass.class",
+                "com/sun/ws/rest/impl/container/config/innerstatic/InnerStaticClass$PackageClass.class",
+                "com/sun/ws/rest/impl/container/config/innerstatic/InnerStaticClass$ProtectedClass.class",
+                "com/sun/ws/rest/impl/container/config/innerstatic/InnerStaticClass$PrivateClass.class"
+                );
+        ResourceConfig rc = createConfig(zipFile);
+
+        assertTrue(rc.getResourceClasses().contains(PublicRootResourceClass.class));
+        assertTrue(rc.getResourceClasses().contains(InnerStaticClass.PublicClass.class));
+        assertEquals(2, rc.getResourceClasses().size());
+    }
+    
     private ResourceConfig createConfig(File jarFile) {
         Map<String, Object> p = new HashMap<String, Object>();
         String[] paths = new String[1];

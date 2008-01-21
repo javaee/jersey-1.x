@@ -41,13 +41,20 @@ import junit.framework.*;
  * @author Paul.Sandoz@Sun.Com
  */
 public abstract class AbstractResourceConfigTester extends TestCase {
+    public enum Suffix {
+        jar, zip
+    }
     
     public AbstractResourceConfigTester(String testName) {
         super(testName);
     }
     
     public final File createJarFile(String base, String... entries) throws IOException {
-        File tempJar = File.createTempFile("test", ".jar");
+        return createJarFile(Suffix.jar, base, entries);
+    }
+    
+    public final File createJarFile(Suffix s, String base, String... entries) throws IOException {
+        File tempJar = File.createTempFile("test", "." + s);
         tempJar.deleteOnExit();
         JarOutputStream jos = new JarOutputStream(
                 new BufferedOutputStream(

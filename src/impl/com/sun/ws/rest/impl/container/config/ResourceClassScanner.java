@@ -120,12 +120,13 @@ public final class ResourceClassScanner {
     private void index(File file) {
         if (file.isDirectory()) {
             indexDir(file, true);
-        } else if (file.getName().endsWith(".jar")) {
+        } else if (file.getName().endsWith(".jar") || 
+                file.getName().endsWith(".zip")) {
             indexJar(file);
         } else {
             LOGGER.warning("File, " + 
                     file.getAbsolutePath() + 
-                    ", is ignored, it not a directory or a jar file");
+                    ", is ignored, it not a directory, a jar file or a zip file");
         }
     }
     
