@@ -64,7 +64,7 @@ import javax.servlet.http.HttpServletResponse;
  * instance of {@link ClasspathResourceConfig} is created. The initialization 
  * parameter "com.sun.ws.rest.config.property.classpath" MAY be set to provide 
  * one or more paths. Each path MUST be separated by ';'. Each path MUST
- * be a virtual path as specified by the {@link Servlet#getRealPath} method,
+ * be a virtual path as specified by the {@link ServletContext#getRealPath} method,
  * and each path is transformed by that method. The transformed paths are
  * added as a property value to a Map instance using the property name 
  * (@link ClasspathResourceConfig.PROPERTY_CLASSPATH}. Any additional 
