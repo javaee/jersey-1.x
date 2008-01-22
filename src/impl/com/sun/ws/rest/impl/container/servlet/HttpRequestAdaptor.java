@@ -29,6 +29,7 @@ import java.io.IOException;
 import java.util.Enumeration;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.core.Cookie;
 import javax.ws.rs.core.MultivaluedMap;
@@ -102,13 +103,13 @@ public final class HttpRequestAdaptor extends AbstractContainerRequest {
             }
             headers.put(name, valueList);
         }
-        List<Cookie> cookies = getCookies();
+        Map<String, Cookie> cookies = getCookies();
         javax.servlet.http.Cookie servletCookies[] = request.getCookies();
         if (servletCookies != null) {
             for (javax.servlet.http.Cookie c: servletCookies) {
                 Cookie _c = new Cookie(c.getName(), c.getValue(), c.getPath(), 
                         c.getDomain(), c.getVersion());
-                cookies.add(_c);
+                cookies.put(c.getName(), _c);
             }
         }
     }

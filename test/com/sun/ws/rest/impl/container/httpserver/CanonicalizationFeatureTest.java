@@ -28,7 +28,7 @@ import com.sun.ws.rest.impl.client.ResourceProxy;
 import javax.ws.rs.GET;
 import javax.ws.rs.ProduceMime;
 import javax.ws.rs.QueryParam;
-import javax.ws.rs.UriParam;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.Path;
 import junit.framework.*;
 
@@ -48,21 +48,21 @@ public class CanonicalizationFeatureTest extends AbstractHttpServerTester {
         @Path(value = "uri/{uriParam}", limited = false)
         @GET
         @ProduceMime("text/plain")
-        public String getUri(@UriParam("uriParam") String uri) {
+        public String getUri(@PathParam("uriParam") String uri) {
             return uri;
         }
 
         @Path("slashes/{uriParam}/")
         @GET
         @ProduceMime("text/plain")
-        public String getSlashes(@UriParam("uriParam") String param) {
+        public String getSlashes(@PathParam("uriParam") String param) {
             return param;
         }
 
         @Path("dblslashes//{uriParam}//")
         @GET
         @ProduceMime("text/plain")
-        public String getDblSlashes(@UriParam("uriParam") String param) {
+        public String getDblSlashes(@PathParam("uriParam") String param) {
             return param;
         }
         

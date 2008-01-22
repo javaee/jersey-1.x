@@ -25,15 +25,15 @@ package com.sun.ws.rest.impl.provider.header;
 import com.sun.ws.rest.impl.http.header.reader.HttpHeaderReader;
 import com.sun.ws.rest.impl.http.header.reader.HttpHeaderReaderImpl;
 import com.sun.ws.rest.impl.http.header.writer.WriterUtil;
+import com.sun.ws.rest.spi.HeaderDelegateProvider;
 import java.text.ParseException;
 import javax.ws.rs.core.EntityTag;
-import javax.ws.rs.ext.HeaderProvider;
 
 /**
  *
  * @author Marc.Hadley@Sun.Com
  */
-public class EntityTagProvider implements HeaderProvider<EntityTag> {
+public class EntityTagProvider implements HeaderDelegateProvider<EntityTag> {
     
     public boolean supports(Class<?> type) {
         return type == EntityTag.class;
@@ -47,15 +47,18 @@ public class EntityTagProvider implements HeaderProvider<EntityTag> {
         return b.toString();
     }
 
-    public EntityTag fromString(String header) throws ParseException {
+    public EntityTag fromString(String header) {
         boolean weak = false;
         if (header.startsWith("W/")) {
             header = header.substring(2);
             weak = true;
         }
         HttpHeaderReader reader = new HttpHeaderReaderImpl(header);
-        EntityTag eTag = new EntityTag(reader.nextQuotedString(),weak);
-        return eTag;
-    }
-    
+        try {
+            EntityTag eTag = new EntityTag(reader.nextQuotedString(),weak);
+            return eTag;
+        } catch (ParseException ex) {
+            throw new IllegalArgumentException(ex);
+        }
+    }    
 }

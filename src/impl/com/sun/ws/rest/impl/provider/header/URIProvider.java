@@ -22,16 +22,15 @@
 
 package com.sun.ws.rest.impl.provider.header;
 
+import com.sun.ws.rest.spi.HeaderDelegateProvider;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.text.ParseException;
-import javax.ws.rs.ext.HeaderProvider;
 
 /**
  *
  * @author Paul.Sandoz@Sun.Com
  */
-public class URIProvider implements HeaderProvider<URI> {
+public class URIProvider implements HeaderDelegateProvider<URI> {
     
     public boolean supports(Class<?> type) {
         return type == URI.class;
@@ -41,13 +40,11 @@ public class URIProvider implements HeaderProvider<URI> {
         return header.toASCIIString();
     }
 
-    public URI fromString(String header) throws ParseException {
+    public URI fromString(String header) {
         try {
             return new URI(header);
         } catch (URISyntaxException e) {
-            ParseException te = new ParseException("Error parsingURI", 0);
-            te.initCause(e);
-            throw te;
+            throw new IllegalArgumentException(e);
         }
     }
     

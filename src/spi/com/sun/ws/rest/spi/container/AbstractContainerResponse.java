@@ -25,6 +25,7 @@ package com.sun.ws.rest.spi.container;
 import com.sun.ws.rest.api.Responses;
 import com.sun.ws.rest.impl.ResponseHttpHeadersImpl;
 import com.sun.ws.rest.impl.ResponseImpl;
+import com.sun.ws.rest.impl.provider.ProviderFactory;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.URI;
@@ -32,8 +33,8 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.MessageBodyWriter;
-import javax.ws.rs.ext.HeaderProvider;
-import javax.ws.rs.ext.ProviderFactory;
+import javax.ws.rs.ext.RuntimeDelegate;
+import javax.ws.rs.ext.RuntimeDelegate.HeaderDelegate;
 
 /**
  * An abstract implementation of {@link ContainerResponse}.
@@ -277,8 +278,8 @@ public abstract class AbstractContainerResponse implements ContainerResponse {
     @SuppressWarnings("unchecked")
     public String getHeaderValue(Object headerValue) {
         // TODO: performance, this is very slow
-        HeaderProvider hp = ProviderFactory.getInstance().
-                createHeaderProvider(headerValue.getClass());
+        HeaderDelegate hp = RuntimeDelegate.getInstance().
+                createHeaderDelegate(headerValue.getClass());
         return hp.toString(headerValue);
     }
 }

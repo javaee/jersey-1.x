@@ -41,7 +41,7 @@ import javax.ws.rs.core.Variant;
  *
  * @author Paul.Sandoz@Sun.Com
  */
-public final class ResponseBuilderImpl extends Response.Builder {    
+public final class ResponseBuilderImpl extends Response.ResponseBuilder {    
     static final int CACHE_CONTROL     = 0;
     static final int CONTENT_LANGUAGE  = 1;
     static final int CONTENT_LOCATION  = 2;
@@ -114,58 +114,43 @@ public final class ResponseBuilderImpl extends Response.Builder {
     }
 
     
-    public Response.Builder status(int status) {
+    public Response.ResponseBuilder status(int status) {
         this.status = status;
         return this;
     }
 
-    public Response.Builder entity(Object entity) {
+    public Response.ResponseBuilder entity(Object entity) {
         this.entity = entity;
         return this;
     }
 
-    public Response.Builder type(MediaType type) {
+    public Response.ResponseBuilder type(MediaType type) {
         set(CONTENT_TYPE, type);
         return this;
     }
 
-    public Response.Builder type(String type) {
+    public Response.ResponseBuilder type(String type) {
         set(CONTENT_TYPE, type);
         return this;
     }
 
-    public Response.Builder variant(Variant variant) {
+    public Response.ResponseBuilder variant(Variant variant) {
         type(variant.getMediaType());
         // TODO set charset
         language(variant.getLanguage());
         if (variant.getEncoding() != null)
             header("Content-Encoding", variant.getEncoding());
         
-        // TODO this is not the correct way to set the vary field
-        // since a dimension may only have one choice and therefore
-        // does not vary
-        StringBuilder vary = new StringBuilder();
-        append(vary, variant.getMediaType() != null, "Accept");
-        append(vary, variant.getCharset() != null, "Accept-Charset");
-        append(vary, variant.getLanguage() != null, "Accept-Language");
-        append(vary, variant.getEncoding() != null, "Accept-Encoding");
-        
-        if (vary.length() > 0)
-            header("Vary", vary.toString());
-        
         return this;
     }
     
-    public Response.Builder variants(List<Variant> variants) {
+    public Response.ResponseBuilder variants(List<Variant> variants) {
         status(406);
         if (variants.isEmpty())
             return this;
 
         MediaType accept = variants.get(0).getMediaType();
         boolean vAccept = false;
-        
-        String acceptCharset = variants.get(0).getCharset();
-        boolean vAcceptCharset = false;
         
         String acceptLanguage = variants.get(0).getLanguage();
         boolean vAcceptLanguage = false;
@@ -175,14 +160,12 @@ public final class ResponseBuilderImpl extends Response.Builder {
 
         for (Variant v : variants) {
             vAccept |= !vAccept && vary(v.getMediaType(), accept);
-            vAcceptCharset |= !vAcceptCharset && vary(v.getCharset(), acceptCharset);
             vAcceptLanguage |= !vAcceptLanguage && vary(v.getLanguage(), acceptLanguage);
-            vAcceptCharset |= !vAcceptEncoding && vary(v.getEncoding(), acceptEncoding);
+            vAcceptEncoding |= !vAcceptEncoding && vary(v.getEncoding(), acceptEncoding);
         }
         
         StringBuilder vary = new StringBuilder();
         append(vary, vAccept, "Accept");
-        append(vary, vAcceptCharset, "Accept-Charset");
         append(vary, vAcceptLanguage, "Accept-Language");
         append(vary, vAcceptEncoding, "Accept-Encoding");
         
@@ -207,47 +190,48 @@ public final class ResponseBuilderImpl extends Response.Builder {
         }        
     }
     
-    public Response.Builder language(String language) {
+    public Response.ResponseBuilder language(String language) {
         set(CONTENT_LANGUAGE, language);
         return this;
     }
 
-    public Response.Builder location(URI location) {
+    public Response.ResponseBuilder location(URI location) {
         set(LOCATION, location);
         return this;
     }
 
-    public Response.Builder contentLocation(URI location) {
+    public Response.ResponseBuilder contentLocation(URI location) {
         set(CONTENT_LOCATION, location);
         return this;
     }
 
-    public Response.Builder tag(EntityTag tag) {
+    public Response.ResponseBuilder tag(EntityTag tag) {
         set(ETAG, tag);
         return this;
     }
 
-    public Response.Builder tag(String tag) {
-        set(ETAG, tag);
+    public Response.ResponseBuilder tag(String tag) {
+        set(ETAG, new EntityTag(tag));
         return this;
     }
 
-    public Response.Builder lastModified(Date lastModified) {
+    public Response.ResponseBuilder lastModified(Date lastModified) {
         set(LAST_MODIFIED, lastModified);
         return this;
     }
 
-    public Response.Builder cacheControl(CacheControl cacheControl) {
+    public Response.ResponseBuilder cacheControl(CacheControl cacheControl) {
         set(CACHE_CONTROL, cacheControl);
         return this;
     }
 
-    public Response.Builder cookie(NewCookie cookie) {
-        add("Set-Cookie", cookie);
+    public Response.ResponseBuilder cookie(NewCookie... cookies) {
+        for (NewCookie cookie : cookies)
+            add("Set-Cookie", cookie);
         return this;
     }
     
-    public Response.Builder header(String name, Object value) {
+    public Response.ResponseBuilder header(String name, Object value) {
         Integer id = HEADER_MAP.get(name);
         if (id != null)
             set(id, value);

@@ -31,6 +31,7 @@ import java.text.ParseException;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import javax.ws.rs.core.Cookie;
 import javax.ws.rs.core.EntityTag;
 import javax.ws.rs.core.MediaType;
@@ -84,7 +85,7 @@ public final class HttpHeaderFactory {
         return HttpHeaderReader.readAcceptableList(LANGUAGE_CREATOR, header);
     }
 
-    public static List<Cookie> createCookies(String header) {
+    public static Map<String, Cookie> createCookies(String header) {
         return CookiesParser.createCookies(header);
     }
     

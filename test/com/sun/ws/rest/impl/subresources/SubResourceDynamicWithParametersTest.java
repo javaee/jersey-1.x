@@ -24,7 +24,7 @@ package com.sun.ws.rest.impl.subresources;
 
 import com.sun.ws.rest.impl.AbstractResourceTester;
 import javax.ws.rs.QueryParam;
-import javax.ws.rs.UriParam;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.Path;
 import com.sun.ws.rest.impl.AbstractResourceTester;
 import javax.ws.rs.GET;
@@ -42,13 +42,13 @@ public class SubResourceDynamicWithParametersTest extends AbstractResourceTester
     @Path("/{p}")
     static public class ParentWithTemplates { 
         @GET
-        public String getMe(@UriParam("p") String p) {
+        public String getMe(@PathParam("p") String p) {
             return p;
         }
         
         @Path("child/{c}")
         public ChildWithTemplates getChildWithTemplates(
-                @UriParam("p") String p, @UriParam("c") String c,
+                @PathParam("p") String p, @PathParam("c") String c,
                 @QueryParam("a") int a, @QueryParam("b") int b) {
             assertEquals("parent", p);
             assertEquals("first", c);
@@ -59,8 +59,8 @@ public class SubResourceDynamicWithParametersTest extends AbstractResourceTester
         
         @Path(value="unmatchedPath/{path}", limited=false)
         public UnmatchedPathResource getUnmatchedPath(
-                @UriParam("p") String p,
-                @UriParam("path") String path) {
+                @PathParam("p") String p,
+                @PathParam("path") String path) {
             assertEquals("parent", p);
             return new UnmatchedPathResource(path);
         }
@@ -68,7 +68,7 @@ public class SubResourceDynamicWithParametersTest extends AbstractResourceTester
     
     static public class ChildWithTemplates { 
         @GET
-        public String getMe(@UriParam("c") String c) {
+        public String getMe(@PathParam("c") String c) {
             return c;
         }
     }

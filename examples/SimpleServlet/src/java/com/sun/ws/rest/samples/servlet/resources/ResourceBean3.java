@@ -29,8 +29,8 @@ import javax.activation.FileDataSource;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.ProduceMime;
-import javax.ws.rs.UriParam;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.core.HttpContext;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
@@ -94,8 +94,8 @@ public class ResourceBean3  {
     
     @ProduceMime("text/plain")
     @GET
-    public String getStringRep(@UriParam("arg1")String arg1, 
-            @UriParam("arg2")String arg2) {
+    public String getStringRep(@PathParam("arg1")String arg1, 
+            @PathParam("arg2")String arg2) {
         return "representation: StringRepresentation: arg1: "
                         +arg1+" arg2: "+arg2+"\n\n";
     }    
@@ -103,8 +103,8 @@ public class ResourceBean3  {
     @ProduceMime("application/x-www-form-urlencoded")
     @GET
     public FormURLEncodedProperties  getFormURLEncodedRep(
-            @UriParam("arg1")String arg1, 
-            @UriParam("arg2")String arg2) {
+            @PathParam("arg1")String arg1, 
+            @PathParam("arg2")String arg2) {
         FormURLEncodedProperties urlProps = new FormURLEncodedProperties();
         urlProps.put("representation", "FormURLEncodedRepresentation");
         urlProps.put("name", "Master Duke");

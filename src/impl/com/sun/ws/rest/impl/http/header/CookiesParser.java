@@ -22,8 +22,8 @@
 
 package com.sun.ws.rest.impl.http.header;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 import javax.ws.rs.core.Cookie;
 
 /**
@@ -92,9 +92,9 @@ import javax.ws.rs.core.Cookie;
         }
     }
     
-    public static List<Cookie> createCookies(String header) {
+    public static Map<String, Cookie> createCookies(String header) {
         String bites[] = header.split("[;,]");
-        List<Cookie> cookies = new ArrayList<Cookie>();
+        Map<String, Cookie> cookies = new HashMap<String, Cookie>();
         int version = 0;
         MutableCookie cookie = null;
         for (String bite: bites) {
@@ -105,7 +105,8 @@ import javax.ws.rs.core.Cookie;
                 value = value.substring(1,value.length()-1);
             if (!name.startsWith("$")) {
                 if (cookie != null)
-                    cookies.add(cookie.getImmutableCookie());
+                    cookies.put(cookie.getName(), cookie.getImmutableCookie());
+                
                 cookie = new MutableCookie(name, value);
                 cookie.setVersion(version);
             }
@@ -117,7 +118,7 @@ import javax.ws.rs.core.Cookie;
                 cookie.setDomain(value);
         }
         if (cookie != null)
-            cookies.add(cookie.getImmutableCookie());
+            cookies.put(cookie.getName(), cookie.getImmutableCookie());
         return cookies;
     }
 

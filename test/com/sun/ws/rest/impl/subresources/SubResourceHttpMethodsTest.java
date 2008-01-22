@@ -23,7 +23,7 @@
 package com.sun.ws.rest.impl.subresources;
 
 import com.sun.ws.rest.impl.AbstractResourceTester;
-import javax.ws.rs.UriParam;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.Path;
 import com.sun.ws.rest.impl.AbstractResourceTester;
 import javax.ws.rs.GET;
@@ -76,13 +76,13 @@ public class SubResourceHttpMethodsTest extends AbstractResourceTester {
 
         @Path("sub{t}")
         @GET
-        public String getMeSub(@UriParam("t") String t) {
+        public String getMeSub(@PathParam("t") String t) {
             return t;
         }
         
         @Path("sub/{t}")
         @GET
-        public String getMeSubSub(@UriParam("t") String t) {
+        public String getMeSubSub(@PathParam("t") String t) {
             return t;
         }
     }
@@ -99,13 +99,13 @@ public class SubResourceHttpMethodsTest extends AbstractResourceTester {
     static public class SubResourceMethodsWithDifferentTemplates { 
         @Path("{foo}")
         @GET
-        public String getFoo(@UriParam("foo") String foo) {
+        public String getFoo(@PathParam("foo") String foo) {
             return foo;
         }
         
         @Path("{bar}")
         @POST
-        public String postBar(@UriParam("bar") String bar) {
+        public String postBar(@PathParam("bar") String bar) {
             return bar;
         }
     }

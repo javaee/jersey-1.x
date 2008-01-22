@@ -88,7 +88,7 @@ public final class GrizzlyRequestAdaptor  extends AbstractContainerRequest {
             String value = mh.getHeader(name);
             headers.add(name, value);
             if (name.equalsIgnoreCase("cookie")) {
-                getCookies().addAll(HttpHeaderFactory.createCookies(value));
+                getCookies().putAll(HttpHeaderFactory.createCookies(value));
             }
         }
     }

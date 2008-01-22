@@ -23,7 +23,7 @@
 package com.sun.ws.rest.impl.methodparams;
 
 import com.sun.ws.rest.impl.AbstractResourceTester;
-import javax.ws.rs.UriParam;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.Path;
 import com.sun.ws.rest.impl.AbstractResourceTester;
 import com.sun.ws.rest.impl.client.ResponseInBound;
@@ -46,8 +46,8 @@ public class UriParamStringConstructorTest extends AbstractResourceTester {
     public static class Resource {
         @GET
         public String doGet(
-                @UriParam("a") BigDecimal a, 
-                @UriParam("b") BigInteger b) {
+                @PathParam("a") BigDecimal a, 
+                @PathParam("b") BigInteger b) {
             assertEquals("3.145", a.toString());
             assertEquals("3145", b.toString());
             return "content";

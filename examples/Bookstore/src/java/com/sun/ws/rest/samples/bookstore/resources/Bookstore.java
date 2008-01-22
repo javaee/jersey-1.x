@@ -27,8 +27,8 @@ import com.sun.ws.rest.api.view.Views;
 import com.sun.ws.rest.spi.resource.Singleton;
 import java.util.Map;
 import java.util.TreeMap;
-import javax.ws.rs.UriParam;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 
 @Path("/")
 @Views({"index.jsp", "count.jsp", "time.jsp"})
@@ -49,7 +49,7 @@ public class Bookstore {
     }
     
     @Path("items/{itemid}/")
-    public Item getItem(@UriParam("itemid") String itemid) {
+    public Item getItem(@PathParam("itemid") String itemid) {
         Item i = getItems().get(itemid);
         if (i == null)
             throw new NotFoundException("Item, " + itemid + ", is not found");

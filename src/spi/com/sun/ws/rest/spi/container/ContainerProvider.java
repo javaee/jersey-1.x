@@ -39,7 +39,7 @@ import com.sun.ws.rest.api.core.ResourceConfig;
  * <p>
  * An implementation (a service-provider) identifies itself by placing a 
  * provider-configuration file (if not already present), 
- * "com.sun.research.ws.rest.spi.container.ContainerProvider" in the 
+ * "com.sun.ws.rest.spi.container.ContainerProvider" in the 
  * resource directory <tt>META-INF/services</tt>, and including the fully qualified
  * service-provider-class of the implementation in the file.
  *
@@ -59,8 +59,6 @@ public interface ContainerProvider<T> {
      * @param resourceConfig the resource configuration.
      * @param application the Web application the container delegates to for 
      *         the handling of a HTTP request.
-     * @return the container, otherwise null if the provider does not support
-     *         the requested <code>type</code>.
      * @throws ContainerException if there is an error creating the container.
      */
     T createContainer(Class<T> type, ResourceConfig resourceConfig, WebApplication application) 

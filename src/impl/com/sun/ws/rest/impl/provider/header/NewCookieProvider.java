@@ -23,11 +23,10 @@
 package com.sun.ws.rest.impl.provider.header;
 
 import com.sun.ws.rest.impl.http.header.writer.WriterUtil;
-import javax.ws.rs.ext.HeaderProvider;
-import java.text.ParseException;
+import com.sun.ws.rest.spi.HeaderDelegateProvider;
 import javax.ws.rs.core.NewCookie;
 
-public class NewCookieProvider implements HeaderProvider<NewCookie> {
+public class NewCookieProvider implements HeaderDelegateProvider<NewCookie> {
     
     public boolean supports(Class<?> type) {
         return type == NewCookie.class;
@@ -61,7 +60,7 @@ public class NewCookieProvider implements HeaderProvider<NewCookie> {
         return b.toString();        
     }
 
-    public NewCookie fromString(String header) throws ParseException {
+    public NewCookie fromString(String header) {
         throw new UnsupportedOperationException();
     }
 

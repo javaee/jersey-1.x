@@ -23,23 +23,22 @@
 package com.sun.ws.rest.impl.client;
 
 import java.net.URI;
-import java.text.ParseException;
 import java.util.Date;
 import javax.ws.rs.core.EntityTag;
 import javax.ws.rs.core.MediaType;
-import javax.ws.rs.ext.HeaderProvider;
-import javax.ws.rs.ext.ProviderFactory;
+import javax.ws.rs.ext.RuntimeDelegate;
+import javax.ws.rs.ext.RuntimeDelegate.HeaderDelegate;
 
 /**
  *
  * @author Paul.Sandoz@Sun.Com
  */
 public abstract class ResponseInBoundImpl implements ResponseInBound {
-    private static final HeaderProvider<EntityTag> entityTagProvider = 
-            ProviderFactory.getInstance().createHeaderProvider(EntityTag.class);
+    private static final HeaderDelegate<EntityTag> entityTagDelegate = 
+            RuntimeDelegate.getInstance().createHeaderDelegate(EntityTag.class);
     
-    private static final HeaderProvider<Date> dateProvider = 
-            ProviderFactory.getInstance().createHeaderProvider(Date.class);
+    private static final HeaderDelegate<Date> dateDelegate = 
+            RuntimeDelegate.getInstance().createHeaderDelegate(Date.class);
     
     public MediaType getContentType() {
         String ct = getMetadata().getFirst("Content-Type");
@@ -54,21 +53,13 @@ public abstract class ResponseInBoundImpl implements ResponseInBound {
     public EntityTag getEntityTag() {
         String t = getMetadata().getFirst("ETag");
         
-        try {
-            return (t != null) ? entityTagProvider.fromString(t) : null;
-        } catch (ParseException ex) {
-            throw new IllegalArgumentException(ex);
-        }
+        return (t != null) ? entityTagDelegate.fromString(t) : null;
     }
     
     public Date getLastModified() {
         String d = getMetadata().getFirst("Last-Modified");
         
-        try {
-            return (d != null) ? dateProvider.fromString(d) : null;
-        } catch (ParseException ex) {
-            throw new IllegalArgumentException(ex);
-        }        
+        return (d != null) ? dateDelegate.fromString(d) : null;
     }
 
     public String getLangauge() {

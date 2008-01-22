@@ -32,8 +32,8 @@ import javax.ws.rs.ConsumeMime;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.ProduceMime;
-import javax.ws.rs.UriParam;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.core.HttpContext;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.Response;
@@ -51,12 +51,12 @@ public class FeedResource {
 
     
     @Path("{entry}")
-    public EntryResource getEntryResource(@UriParam("entry") String entryId) {
+    public EntryResource getEntryResource(@PathParam("entry") String entryId) {
         return new EntryResource(entryId);
     }
     
     @Path("edit/{entry}")
-    public EntryResource getEditEntryResource(@UriParam("entry") String entryId) {
+    public EntryResource getEditEntryResource(@PathParam("entry") String entryId) {
         return new EditEntryResource(entryId, uriInfo);
     }
         
@@ -69,8 +69,8 @@ public class FeedResource {
     
 //    @Path("edit/{version}/{entry}")
 //    public EntryResource getEditEntryResource(
-//            @UriParam("entry") String entryId,
-//            @UriParam("version") int version) throws FeedException {
+//            @PathParam("entry") String entryId,
+//            @PathParam("version") int version) throws FeedException {
 //        return new EditOptimisiticEntryResource(entryId, version, uriInfo);
 //    }
 //    

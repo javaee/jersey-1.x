@@ -30,7 +30,7 @@ import com.sun.ws.rest.api.model.Parameter;
 import com.sun.ws.rest.api.model.Parameterized;
 import com.sun.ws.rest.api.model.UriPathValue;
 import com.sun.ws.rest.impl.ImplMessages;
-import com.sun.ws.rest.impl.model.*;
+import com.sun.ws.rest.impl.model.MediaTypeHelper;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
@@ -49,10 +49,10 @@ import javax.ws.rs.Encoded;
 import javax.ws.rs.HeaderParam;
 import javax.ws.rs.HttpMethod;
 import javax.ws.rs.MatrixParam;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.ProduceMime;
 import javax.ws.rs.QueryParam;
-import javax.ws.rs.UriParam;
-import javax.ws.rs.Path;
 import javax.ws.rs.core.HttpContext;
 import javax.ws.rs.core.HttpContext;
 
@@ -291,10 +291,10 @@ public class IntrospectionModeller {
                 return Parameter.Source.QUERY;
             }
         });
-        m.put(UriParam.class, new ParamAnnotationHelper() {
+        m.put(PathParam.class, new ParamAnnotationHelper() {
 
             public String getValueOf(Annotation a) {
-                return ((UriParam) a).value();
+                return ((PathParam) a).value();
             }
 
             public Parameter.Source getSource() {

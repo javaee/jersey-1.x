@@ -1,6 +1,25 @@
 release 0.6 (2008-03-07)
 - When utilizing the ClasspathResourceConfig include files ending
   in .zip and treat them as jar files. 
+- Partially integrated JSR 311 API 0.6
+  - java.ws.rs.ext.ProviderFactory replaced with java.ws.rs.ext.RuntimeDelegate.
+  - java.ws.rs.ext.HeaderProvider is removed. This is replaced with
+    java.ws.rs.ext.RuntimeDelegate.HeaderDelegate.
+  - java.ws.rs.UriParam renamed to java.ws.rs.PathParam
+  - javax.ws.rs.core.Response.Builder renamed to 
+    javax.ws.rs.core.Response.ResponseBuilder
+  - The charset parameter is removed from javax.ws.rs.core.Variant
+    constructor and getters. The method to add one or more charsets has been
+    removed from javax.ws.rs.core.Variant.VariantListBuilder. The charset
+    parameter must be included as a "charset" parameter of the the media type.
+  - Response.ResponseBuilder.tag(String ) now assumes the String parameter
+    value is the contents of a strong entity tag rather than the entity tag
+    itself.
+  - javax.ws.rs.core.Response.ResponseBuilder.cookie now takes an array of 
+    javax.ws.rs.core.NewCookie.
+  - javax.ws.rs.core.HttpHeaders.getCookies now returns a type of 
+    Map<String, Cookie>, instead of a type List<Cookie>, where the key
+    is the name of the cookie.
 
 release 0.5 (2008-01-18)
 - WADL ant task for generating a WADL document of the root resources present

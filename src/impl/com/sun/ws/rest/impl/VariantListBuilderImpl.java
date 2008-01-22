@@ -73,30 +73,19 @@ public class VariantListBuilderImpl extends Variant.VariantListBuilder {
     }
     
     private void addLanguages(MediaType mediaType) {
-        if (languages.isEmpty()) addCharsets(mediaType, null);
-        else for (String language : languages) addCharsets(mediaType, language);        
+        if (languages.isEmpty()) addEncodings(mediaType, null);
+        else for (String language : languages) addEncodings(mediaType, language);        
     }
     
-    private void addCharsets(MediaType mediaType, String language) {
-        if (charsets.isEmpty()) addEncodings(mediaType, language, null);
-        else for (String charset : charsets) addEncodings(mediaType, language, charset);        
-    }
-    
-    private void addEncodings(MediaType mediaType, String language, String charset) {
-        if (encodings.isEmpty()) addVariant(mediaType, language, charset, null);
-        else for (String encoding : encodings) addVariant(mediaType, language, charset, encoding);        
+    private void addEncodings(MediaType mediaType, String language) {
+        if (encodings.isEmpty()) addVariant(mediaType, language, null);
+        else for (String encoding : encodings) addVariant(mediaType, language, encoding);        
     }
 
-    private void addVariant(MediaType mediaType, String language, String charset, String encoding) {
-        variants.add(new Variant(mediaType, language, charset, encoding));
+    private void addVariant(MediaType mediaType, String language, String encoding) {
+        variants.add(new Variant(mediaType, language, encoding));
     }
     
-    @Override
-    public VariantListBuilder charsets(String... charsets) {
-        for (String charset : charsets) this.charsets.add(charset);
-        return this;
-    }
-
     @Override
     public VariantListBuilder languages(String... languages) {
         for (String language : languages) this.languages.add(language);

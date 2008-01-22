@@ -89,7 +89,7 @@ public class Form {
             buf.append(formData.get(key));
             buf.append("</td></tr>");
         }
-        for (Cookie c: headers.getCookies()) {
+        for (Cookie c : headers.getCookies().values()) {
             buf.append("<tr><td>Cookie: ");
             buf.append(c.getName());
             buf.append("</td><td>");

@@ -24,7 +24,7 @@ package com.sun.ws.rest.impl.resource;
 
 import com.sun.ws.rest.impl.AbstractResourceTester;
 import javax.ws.rs.GET;
-import javax.ws.rs.UriParam;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.Path;
 import javax.ws.rs.core.HttpContext;
 import javax.ws.rs.core.UriInfo;
@@ -43,8 +43,8 @@ public class EncodedUriTemplateValuesTest extends AbstractResourceTester {
     public static class Resource {
         @GET
         public String doGet(
-                @UriParam("a") String a, 
-                @UriParam("b") String b,
+                @PathParam("a") String a, 
+                @PathParam("b") String b,
                 @HttpContext UriInfo info) {
             assertEquals("a b", a);
             assertEquals("x y", b);

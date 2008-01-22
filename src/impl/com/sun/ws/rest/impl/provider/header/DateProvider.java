@@ -24,15 +24,15 @@ package com.sun.ws.rest.impl.provider.header;
 
 import com.sun.ws.rest.impl.http.header.HttpDateFormat;
 import com.sun.ws.rest.impl.http.header.HttpHeaderFactory;
+import com.sun.ws.rest.spi.HeaderDelegateProvider;
 import java.text.ParseException;
 import java.util.Date;
-import javax.ws.rs.ext.HeaderProvider;
 
 /**
  *
  * @author Paul.Sandoz@Sun.Com
  */
-public class DateProvider implements HeaderProvider<Date> {
+public class DateProvider implements HeaderDelegateProvider<Date> {
     
     public boolean supports(Class<?> type) {
         return Date.class.isAssignableFrom(type);
@@ -42,8 +42,12 @@ public class DateProvider implements HeaderProvider<Date> {
         return HttpDateFormat.getPreferedDateFormat().format(header);
     }
 
-    public Date fromString(String header) throws ParseException {
-        return HttpHeaderFactory.createDate(header);
+    public Date fromString(String header) {
+        try {
+            return HttpHeaderFactory.createDate(header);
+        } catch (ParseException ex) {
+            throw new IllegalArgumentException(ex);
+        }
     }
     
 }

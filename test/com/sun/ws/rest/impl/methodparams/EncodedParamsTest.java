@@ -28,7 +28,7 @@ import com.sun.ws.rest.impl.AbstractResourceTester;
 import javax.ws.rs.Encoded;
 import javax.ws.rs.GET;
 import javax.ws.rs.MatrixParam;
-import javax.ws.rs.UriParam;
+import javax.ws.rs.PathParam;
 
 /**
  *
@@ -45,7 +45,7 @@ public class EncodedParamsTest extends AbstractResourceTester {
     @Path("/{u}")
     public static class EncodedOnClass {
         public EncodedOnClass(
-                @UriParam("u") String u,
+                @PathParam("u") String u,
                 @QueryParam("q") String q, 
                 @MatrixParam("m") String m) {
             assertEquals("%20u", u);
@@ -55,7 +55,7 @@ public class EncodedParamsTest extends AbstractResourceTester {
         
         @GET
         public String doGet(
-                @UriParam("u") String u,
+                @PathParam("u") String u,
                 @QueryParam("q") String q, 
                 @MatrixParam("m") String m) {
             assertEquals("%20u", u);
@@ -75,7 +75,7 @@ public class EncodedParamsTest extends AbstractResourceTester {
     public static class EncodedOnAccessibleObject {
         @Encoded
         public EncodedOnAccessibleObject(
-                @UriParam("u") String u,
+                @PathParam("u") String u,
                 @QueryParam("q") String q, 
                 @MatrixParam("m") String m) {
             assertEquals("%20u", u);
@@ -86,7 +86,7 @@ public class EncodedParamsTest extends AbstractResourceTester {
         @Encoded
         @GET
         public String doGet(
-                @UriParam("u") String u,
+                @PathParam("u") String u,
                 @QueryParam("q") String q, 
                 @MatrixParam("m") String m) {
             assertEquals("%20u", u);
@@ -105,7 +105,7 @@ public class EncodedParamsTest extends AbstractResourceTester {
     @Path("/{u}")
     public static class EncodedOnParameters {
         public EncodedOnParameters(
-                @Encoded @UriParam("u") String u,
+                @Encoded @PathParam("u") String u,
                 @Encoded @QueryParam("q") String q, 
                 @Encoded @MatrixParam("m") String m) {
             assertEquals("%20u", u);
@@ -115,7 +115,7 @@ public class EncodedParamsTest extends AbstractResourceTester {
         
         @GET
         public String doGet(
-                @Encoded @UriParam("u") String u,
+                @Encoded @PathParam("u") String u,
                 @Encoded @QueryParam("q") String q, 
                 @Encoded @MatrixParam("m") String m) {
             assertEquals("%20u", u);
@@ -134,10 +134,10 @@ public class EncodedParamsTest extends AbstractResourceTester {
     @Path("/{u}")
     public static class MixedEncodedOnParameters {
         public MixedEncodedOnParameters(
-                @UriParam("u") String du,
+                @PathParam("u") String du,
                 @QueryParam("q") String dq, 
                 @MatrixParam("m") String dm,                
-                @Encoded @UriParam("u") String eu,
+                @Encoded @PathParam("u") String eu,
                 @Encoded @QueryParam("q") String eq, 
                 @Encoded @MatrixParam("m") String em) {
             assertEquals(" u", du);
@@ -150,10 +150,10 @@ public class EncodedParamsTest extends AbstractResourceTester {
         
         @GET
         public String doGet(
-                @UriParam("u") String du,
+                @PathParam("u") String du,
                 @QueryParam("q") String dq, 
                 @MatrixParam("m") String dm,                
-                @Encoded @UriParam("u") String eu,
+                @Encoded @PathParam("u") String eu,
                 @Encoded @QueryParam("q") String eq, 
                 @Encoded @MatrixParam("m") String em) {
             assertEquals(" u", du);

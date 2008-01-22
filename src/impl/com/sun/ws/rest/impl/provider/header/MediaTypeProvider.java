@@ -26,7 +26,7 @@ import javax.ws.rs.core.MediaType;
 import com.sun.ws.rest.impl.http.header.reader.HttpHeaderReader;
 import com.sun.ws.rest.impl.http.header.reader.HttpHeaderReaderImpl;
 import com.sun.ws.rest.impl.http.header.writer.WriterUtil;
-import javax.ws.rs.ext.HeaderProvider;
+import com.sun.ws.rest.spi.HeaderDelegateProvider;
 import java.text.ParseException;
 import java.util.Map;
 
@@ -34,7 +34,7 @@ import java.util.Map;
  *
  * @author Marc.Hadley@Sun.Com
  */
-public class MediaTypeProvider implements HeaderProvider<MediaType> {
+public class MediaTypeProvider implements HeaderDelegateProvider<MediaType> {
     
     public boolean supports(Class<?> type) {
         return type == MediaType.class;
@@ -54,25 +54,28 @@ public class MediaTypeProvider implements HeaderProvider<MediaType> {
         return b.toString();
     }
 
-    public MediaType fromString(String header) throws ParseException {
-        if (header==null)
-            return new MediaType();
-        HttpHeaderReader reader = new HttpHeaderReaderImpl(header);
-        // Skip any white space
-        reader.hasNext();
-        
-        // Get the type
-        String type = reader.nextToken();
-        reader.nextSeparator('/');
-        // Get the subtype
-        String subType = reader.nextToken();
-        
-        Map<String, String> params = null;
-        
-        if (reader.hasNext())
-            params = HttpHeaderReader.readParameters(reader);
-        
-        return new MediaType(type,subType,params);
-    }
+    public MediaType fromString(String header) {
+        try {
+            if (header==null)
+                return new MediaType();
+            HttpHeaderReader reader = new HttpHeaderReaderImpl(header);
+            // Skip any white space
+            reader.hasNext();
 
+            // Get the type
+            String type = reader.nextToken();
+            reader.nextSeparator('/');
+            // Get the subtype
+            String subType = reader.nextToken();
+
+            Map<String, String> params = null;
+
+            if (reader.hasNext())
+                params = HttpHeaderReader.readParameters(reader);
+
+            return new MediaType(type,subType,params);
+        } catch (ParseException ex) {
+            throw new IllegalArgumentException(ex);
+        }
+    }
 }

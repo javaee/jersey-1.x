@@ -23,7 +23,6 @@
 package com.sun.ws.rest.impl;
 
 import com.sun.ws.rest.api.core.HttpRequestContext;
-import javax.ws.rs.core.MultivaluedMap;
 import junit.framework.*;
 
 /**

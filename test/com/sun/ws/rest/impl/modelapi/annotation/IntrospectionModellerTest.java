@@ -40,7 +40,7 @@ import javax.ws.rs.MatrixParam;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
 import javax.ws.rs.ProduceMime;
-import javax.ws.rs.UriParam;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.Path;
 import javax.ws.rs.core.MediaType;
 
@@ -65,7 +65,7 @@ public class IntrospectionModellerTest extends TestCase {
         
         @Path("/subres-locator/{p1}")
         public TestSubResourceOne getSubResourceMethodTester(
-                @UriParam("p1") String pOne, @MatrixParam("p2") int pTwo, @HeaderParam("p3") String pThree) {
+                @PathParam("p1") String pOne, @MatrixParam("p2") int pTwo, @HeaderParam("p3") String pThree) {
             return new TestSubResourceOne();
         }
         
@@ -78,7 +78,7 @@ public class IntrospectionModellerTest extends TestCase {
         @GET
         @ProduceMime("text/plain")
         @Path("/with-params/{one}")
-        public String getSubResourceMethodWithParams(@UriParam("one") String paramOne) {
+        public String getSubResourceMethodWithParams(@PathParam("one") String paramOne) {
             return "Hi there, here is a subresource method!";
         }
     }
@@ -197,7 +197,7 @@ public class IntrospectionModellerTest extends TestCase {
         AbstractSubResourceLocator locator = rootResource.getSubResourceLocators().get(0);
 //        @Path("/subres-locator/{p1}")
 //        public TestSubResourceOne getSubResourceMethodTester(
-//                @UriParam("p1") String pOne, @MatrixParam("p2") int pTwo, @HeaderParam("p3") String pThree) {
+//                @PathParam("p1") String pOne, @MatrixParam("p2") int pTwo, @HeaderParam("p3") String pThree) {
 //            return new TestSubResourceOne();
 //        }
         assertEquals("/subres-locator/{p1}", locator.getUriPath().getValue());
@@ -233,7 +233,7 @@ public class IntrospectionModellerTest extends TestCase {
 //        @HttpMethod
 //        @Path("/with-params/{one}")
 //        @ProduceMime("text/plain")
-//        public String getSubResourceMethodWithParams(@UriParam("one") String paramOne) {
+//        public String getSubResourceMethodWithParams(@PathParam("one") String paramOne) {
 //            return "Hi there, here is a subresource method!";
 //        }
         assertEquals("/with-params/{one}", subResMethod2.getUriPath().getValue());

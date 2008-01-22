@@ -33,9 +33,8 @@ import javax.ws.rs.ConsumeMime;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.ProduceMime;
-import javax.ws.rs.UriParam;
 import javax.ws.rs.Path;
-import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
@@ -67,7 +66,7 @@ public class BookmarksResource {
     }
     
     @Path(value = "{bmid}", limited = false)
-    public BookmarkResource getBookmark(@UriParam("bmid") String bmid) {
+    public BookmarkResource getBookmark(@PathParam("bmid") String bmid) {
         return new BookmarkResource(uriInfo, em, 
                 userResource.getUserEntity(), bmid);
     }

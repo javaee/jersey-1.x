@@ -20,26 +20,29 @@
  *     "Portions Copyrighted [year] [name of copyright owner]"
  */
 
-package com.sun.ws.rest.impl.provider.header;
+package com.sun.ws.rest.spi;
 
-import com.sun.ws.rest.spi.HeaderDelegateProvider;
+import javax.ws.rs.ext.RuntimeDelegate.HeaderDelegate;
 
 /**
- *
+ * A provider that supports the conversion of an HTTP header, of type T, to and
+ * from a {@link String}.
+ * <p>
+ * An implementation (a service-provider) identifies itself by placing a 
+ * provider-configuration file (if not already present), 
+ * "com.sun.ws.rest.spi.HeaderDelegateProvider" in the 
+ * resource directory <tt>META-INF/services</tt>, and including the fully qualified
+ * service-provider-class of the implementation in the file.
+
  * @author Paul.Sandoz@Sun.Com
  */
-public class StringProvider implements HeaderDelegateProvider<String> {
-    
-    public boolean supports(Class<?> type) {
-        return type == String.class;
-    }
+public interface HeaderDelegateProvider<T> extends HeaderDelegate<T> {
 
-    public String toString(String header) {
-        return header;
-    }
-
-    public String fromString(String header) {
-        return header;
-    }
-    
+    /**
+     * Ascertain if the Provider supports a particular type.
+     *
+     * @param type the type that is to be supported.
+     * @return true if the type is supported, otherwise false.
+     */
+    boolean supports(Class<?> type);
 }

@@ -29,7 +29,7 @@ import java.util.List;
 import javax.ws.rs.Path;
 import javax.ws.rs.GET;
 import javax.ws.rs.MatrixParam;
-import javax.ws.rs.UriParam;
+import javax.ws.rs.PathParam;
 
 /**
  *
@@ -45,7 +45,7 @@ public class ContainerItemMatrixTest extends AbstractResourceTester {
     public static class ContainerResource {
         String containerId;
         
-        public ContainerResource(@UriParam("container_id") String containerId) {
+        public ContainerResource(@PathParam("container_id") String containerId) {
             this.containerId = containerId;
         }
         

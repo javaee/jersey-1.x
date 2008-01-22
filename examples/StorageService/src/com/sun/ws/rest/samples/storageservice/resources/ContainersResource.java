@@ -27,7 +27,7 @@ import com.sun.ws.rest.samples.storageservice.MemoryStore;
 import javax.ws.rs.GET;
 import javax.ws.rs.ProduceMime;
 import javax.ws.rs.Path;
-import javax.ws.rs.UriParam;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.core.HttpContext;
 import javax.ws.rs.core.Request;
 import javax.ws.rs.core.UriInfo;
@@ -43,7 +43,7 @@ public class ContainersResource {
     @HttpContext Request request;
     
     @Path("{container}")
-    public ContainerResource getContainerResource(@UriParam("container") String container) {
+    public ContainerResource getContainerResource(@PathParam("container") String container) {
         return new ContainerResource(uriInfo, request, container);
     }
     

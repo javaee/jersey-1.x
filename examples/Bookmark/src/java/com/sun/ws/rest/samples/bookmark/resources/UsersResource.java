@@ -29,8 +29,8 @@ import javax.persistence.EntityManagerFactory;
 import javax.persistence.PersistenceUnit;
 import javax.ws.rs.GET;
 import javax.ws.rs.ProduceMime;
-import javax.ws.rs.UriParam;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.core.HttpContext;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
@@ -59,7 +59,7 @@ public class UsersResource {
     }
     
     @Path("{userid}/")
-    public UserResource getUser(@UriParam("userid") String userid) {
+    public UserResource getUser(@PathParam("userid") String userid) {
         return new UserResource(uriInfo, emf.createEntityManager(), userid);
     }
 

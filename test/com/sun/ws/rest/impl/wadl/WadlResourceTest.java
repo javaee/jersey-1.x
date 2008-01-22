@@ -19,7 +19,7 @@ import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.ProduceMime;
-import javax.ws.rs.UriParam;
+import javax.ws.rs.PathParam;
 import javax.xml.XMLConstants;
 import javax.xml.namespace.NamespaceContext;
 import javax.xml.parsers.DocumentBuilder;
@@ -76,23 +76,23 @@ public class WadlResourceTest extends AbstractResourceTester {
         @PUT
         @Path("{id}")
         @ConsumeMime("application/xml")
-        public void updateWidget(String bar, @UriParam("id")int id) {
+        public void updateWidget(String bar, @PathParam("id")int id) {
         }
 
         @GET
         @Path("{id}")
         @ProduceMime({"application/xml", "application/json"})
-        public String getWidget(@UriParam("id")int id) {
+        public String getWidget(@PathParam("id")int id) {
             return null;
         }
 
         @DELETE
         @Path("{id}")
-        public void deleteWidget(@UriParam("id")int id) {
+        public void deleteWidget(@PathParam("id")int id) {
         }
 
         @Path("{id}/verbose")
-        public Object getVerbose(@UriParam("id")int id) {
+        public Object getVerbose(@PathParam("id")int id) {
             return new ExtraResource();
         }
     }

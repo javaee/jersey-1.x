@@ -23,8 +23,8 @@
 package com.sun.ws.rest.impl.http.header;
 
 import com.sun.ws.rest.impl.provider.header.NewCookieProvider;
+import java.util.Map;
 import junit.framework.*;
-import java.util.List;
 import javax.ws.rs.core.Cookie;
 import javax.ws.rs.core.NewCookie;
 
@@ -45,9 +45,9 @@ public class CookieImplTest extends TestCase {
         System.out.println("createCookies");
         
         String cookieHeader = "fred=flintstone";
-        List<Cookie> cookies = CookiesParser.createCookies(cookieHeader);
+        Map<String, Cookie> cookies = CookiesParser.createCookies(cookieHeader);
         assertEquals(cookies.size(), 1);
-        Cookie c = cookies.get(0);
+        Cookie c = cookies.get("fred");
         assertEquals(c.getVersion(), 0);
         assertTrue(c.getName().equals("fred"));
         assertTrue(c.getValue().equals("flintstone"));
@@ -55,11 +55,11 @@ public class CookieImplTest extends TestCase {
         cookieHeader = "fred=flintstone,barney=rubble";
         cookies = CookiesParser.createCookies(cookieHeader);
         assertEquals(cookies.size(), 2);
-        c = cookies.get(0);
+        c = cookies.get("fred");
         assertEquals(c.getVersion(), 0);
         assertTrue(c.getName().equals("fred"));
         assertTrue(c.getValue().equals("flintstone"));
-        c = cookies.get(1);
+        c = cookies.get("barney");
         assertEquals(c.getVersion(), 0);
         assertTrue(c.getName().equals("barney"));
         assertTrue(c.getValue().equals("rubble"));
@@ -67,11 +67,11 @@ public class CookieImplTest extends TestCase {
         cookieHeader = "fred=flintstone;barney=rubble";
         cookies = CookiesParser.createCookies(cookieHeader);
         assertEquals(cookies.size(), 2);
-        c = cookies.get(0);
+        c = cookies.get("fred");
         assertEquals(c.getVersion(), 0);
         assertTrue(c.getName().equals("fred"));
         assertTrue(c.getValue().equals("flintstone"));
-        c = cookies.get(1);
+        c = cookies.get("barney");
         assertEquals(c.getVersion(), 0);
         assertTrue(c.getName().equals("barney"));
         assertTrue(c.getValue().equals("rubble"));
@@ -79,12 +79,12 @@ public class CookieImplTest extends TestCase {
         cookieHeader = "$Version=1;fred=flintstone;$Path=/path;barney=rubble";
         cookies = CookiesParser.createCookies(cookieHeader);
         assertEquals(cookies.size(), 2);
-        c = cookies.get(0);
+        c = cookies.get("fred");
         assertEquals(c.getVersion(), 1);
         assertTrue(c.getName().equals("fred"));
         assertTrue(c.getValue().equals("flintstone"));
         assertTrue(c.getPath().equals("/path"));
-        c = cookies.get(1);
+        c = cookies.get("barney");
         assertEquals(c.getVersion(), 1);
         assertTrue(c.getName().equals("barney"));
         assertTrue(c.getValue().equals("rubble"));
@@ -92,12 +92,12 @@ public class CookieImplTest extends TestCase {
         cookieHeader = "$Version=1;fred=flintstone;$Path=/path,barney=rubble;$Domain=.sun.com";
         cookies = CookiesParser.createCookies(cookieHeader);
         assertEquals(cookies.size(), 2);
-        c = cookies.get(0);
+        c = cookies.get("fred");
         assertEquals(c.getVersion(), 1);
         assertTrue(c.getName().equals("fred"));
         assertTrue(c.getValue().equals("flintstone"));
         assertTrue(c.getPath().equals("/path"));
-        c = cookies.get(1);
+        c = cookies.get("barney");
         assertEquals(c.getVersion(), 1);
         assertTrue(c.getName().equals("barney"));
         assertTrue(c.getValue().equals("rubble"));
@@ -106,12 +106,12 @@ public class CookieImplTest extends TestCase {
         cookieHeader = "$Version=1; fred = flintstone ; $Path=/path, barney=rubble ;$Domain=.sun.com";
         cookies = CookiesParser.createCookies(cookieHeader);
         assertEquals(cookies.size(), 2);
-        c = cookies.get(0);
+        c = cookies.get("fred");
         assertEquals(c.getVersion(), 1);
         assertTrue(c.getName().equals("fred"));
         assertTrue(c.getValue().equals("flintstone"));
         assertTrue(c.getPath().equals("/path"));
-        c = cookies.get(1);
+        c = cookies.get("barney");
         assertEquals(c.getVersion(), 1);
         assertTrue(c.getName().equals("barney"));
         assertTrue(c.getValue().equals("rubble"));

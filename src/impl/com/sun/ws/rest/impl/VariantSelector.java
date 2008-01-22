@@ -156,7 +156,8 @@ public final class VariantSelector {
     private static final DimensionChecker<AcceptableToken, String> CHARSET_DC = 
             new DimensionChecker<AcceptableToken, String>() {
         public String getDimension(Variant v) {
-            return v.getCharset();
+            MediaType m = v.getMediaType();
+            return (m != null) ? m.getParameters().get("charset") : null;
         }
 
         public boolean isCompatible(AcceptableToken t, String u) {

@@ -33,8 +33,8 @@ import javax.ws.rs.GET;
 import javax.ws.rs.PUT;
 import javax.ws.rs.ProduceMime;
 import javax.ws.rs.QueryParam;
-import javax.ws.rs.UriParam;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.core.HttpContext;
 import javax.ws.rs.core.Request;
 import javax.ws.rs.core.Response;
@@ -107,7 +107,7 @@ public class ContainerResource {
     
     
     @Path(value="{item}", limited=false)
-    public ItemResource getItemResource(@UriParam("item") String item) {
+    public ItemResource getItemResource(@PathParam("item") String item) {
         return new ItemResource(uriInfo, request, container, item);
     }
     

@@ -6,10 +6,10 @@ import javax.ws.rs._
 
 @Path("({lx},{ly}),({ux},{uy})")
 class MandelService(
-        @UriParam("lx") lx: double, 
-        @UriParam("ly") ly: double,
-        @UriParam("ux") ux: double,
-        @UriParam("uy") uy: double,
+        @PathParam("lx") lx: double, 
+        @PathParam("ly") ly: double,
+        @PathParam("ux") ux: double,
+        @PathParam("uy") uy: double,
         @DefaultValue("512") @QueryParam("imageSize") imageSize: int,
         @DefaultValue("512") @QueryParam("limit") limit: int,
         @DefaultValue("8") @QueryParam("workers") workers: int) {

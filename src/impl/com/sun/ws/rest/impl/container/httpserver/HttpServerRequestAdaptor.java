@@ -113,7 +113,7 @@ public final class HttpServerRequestAdaptor extends AbstractContainerRequest {
             headers.put(e.getKey(), e.getValue());
             if (e.getKey().equalsIgnoreCase("cookie")) {
                 for (String headerValue: e.getValue()) {
-                    getCookies().addAll(HttpHeaderFactory.createCookies(headerValue));
+                    getCookies().putAll(HttpHeaderFactory.createCookies(headerValue));
                 }
             }
         }

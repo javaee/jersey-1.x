@@ -24,8 +24,8 @@ package com.sun.ws.rest.samples.bookstore.resources;
 
 import com.sun.ws.rest.api.NotFoundException;
 import com.sun.ws.rest.api.view.Views;
-import javax.ws.rs.UriParam;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 
 @Views({"index.jsp"})
 public class CD extends Item {
@@ -42,7 +42,7 @@ public class CD extends Item {
     }
     
     @Path("tracks/{num}/")
-    public Track getTrack(@UriParam("num") int num) {
+    public Track getTrack(@PathParam("num") int num) {
         if (num >= tracks.length)
             throw new NotFoundException("Track, " + num + ", of CD, " + getTitle() + ", is not found");
         return tracks[num];

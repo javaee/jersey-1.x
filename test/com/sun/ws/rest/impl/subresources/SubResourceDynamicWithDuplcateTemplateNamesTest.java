@@ -23,7 +23,7 @@
 package com.sun.ws.rest.impl.subresources;
 
 import com.sun.ws.rest.impl.AbstractResourceTester;
-import javax.ws.rs.UriParam;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.Path;
 import com.sun.ws.rest.impl.AbstractResourceTester;
 import javax.ws.rs.GET;
@@ -41,14 +41,14 @@ public class SubResourceDynamicWithDuplcateTemplateNamesTest extends AbstractRes
     @Path("/{v}")
     static public class ParentWithTemplates { 
         @Path("child/")
-        public ChildWithTemplates getChildWithTemplates(@UriParam("v") String v) {
+        public ChildWithTemplates getChildWithTemplates(@PathParam("v") String v) {
             return new ChildWithTemplates();
         }
     }
     
     static public class ChildWithTemplates { 
         @GET
-        public String getMe(@UriParam("v") String v) {
+        public String getMe(@PathParam("v") String v) {
             return v;
         }
         

@@ -86,7 +86,7 @@ public final class MessageContextRequestAdaptor extends AbstractContainerRequest
             restHeaders.put(e.getKey(), e.getValue());
             if (e.getKey().equalsIgnoreCase("cookie")) {
                 for (String headerValue: e.getValue()) {
-                    getCookies().addAll(HttpHeaderFactory.createCookies(headerValue));
+                    getCookies().putAll(HttpHeaderFactory.createCookies(headerValue));
                 }
             }
         }

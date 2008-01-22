@@ -27,6 +27,7 @@ import com.sun.ws.rest.impl.client.ResourceProxy;
 import com.sun.ws.rest.impl.client.ResourceProxyException;
 import com.sun.ws.rest.impl.client.ResponseInBound;
 import com.sun.ws.rest.impl.client.ResponseInBoundImpl;
+import com.sun.ws.rest.impl.provider.ProviderFactory;
 import com.sun.ws.rest.spi.container.AbstractContainerRequest;
 import com.sun.ws.rest.spi.container.AbstractContainerResponse;
 import com.sun.ws.rest.spi.container.WebApplication;
@@ -40,10 +41,9 @@ import java.util.List;
 import java.util.Map;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
-import javax.ws.rs.ext.MessageBodyReader;
 import javax.ws.rs.ext.MessageBodyWriter;
-import javax.ws.rs.ext.HeaderProvider;
-import javax.ws.rs.ext.ProviderFactory;
+import javax.ws.rs.ext.RuntimeDelegate;
+import javax.ws.rs.ext.RuntimeDelegate.HeaderDelegate;
 
 /**
  *
@@ -129,7 +129,7 @@ public class TestResourceProxy extends ResourceProxy {
     
     @SuppressWarnings("unchecked")
     private static String writeHeaderValue(Object headerValue) {
-        HeaderProvider hp = ProviderFactory.getInstance().createHeaderProvider(headerValue.getClass());
+        HeaderDelegate hp = RuntimeDelegate.getInstance().createHeaderDelegate(headerValue.getClass());
         return hp.toString(headerValue);
     }
     

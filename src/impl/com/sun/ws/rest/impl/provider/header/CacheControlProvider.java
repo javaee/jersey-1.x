@@ -22,19 +22,19 @@
 
 package com.sun.ws.rest.impl.provider.header;
 
+import com.sun.ws.rest.spi.HeaderDelegateProvider;
 import java.text.ParseException;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.ws.rs.core.CacheControl;
-import javax.ws.rs.ext.HeaderProvider;
 
 /**
  *
  * @author Paul.Sandoz@Sun.Com
  */
-public final class CacheControlProvider implements HeaderProvider<CacheControl> {
+public final class CacheControlProvider implements HeaderDelegateProvider<CacheControl> {
     private static Pattern WHITESPACE = Pattern.compile("\\s");
     
     public boolean supports(Class<?> type) {
@@ -69,7 +69,7 @@ public final class CacheControlProvider implements HeaderProvider<CacheControl> 
         return b.toString();        
     }
 
-    public CacheControl fromString(String header) throws ParseException {
+    public CacheControl fromString(String header) {
         throw new UnsupportedOperationException();
     }
     

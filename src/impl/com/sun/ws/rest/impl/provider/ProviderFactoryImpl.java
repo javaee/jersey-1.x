@@ -39,8 +39,6 @@ import javax.ws.rs.ProduceMime;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.ext.MessageBodyReader;
 import javax.ws.rs.ext.MessageBodyWriter;
-import javax.ws.rs.ext.HeaderProvider;
-import javax.ws.rs.ext.ProviderFactory;
 
 /**
  *
@@ -50,53 +48,12 @@ public final class ProviderFactoryImpl extends ProviderFactory {
     private static final Logger LOGGER = 
             Logger.getLogger(ProviderFactoryImpl.class.getName());
     
-    private AtomicReference<Set<HeaderProvider>> atomicHeaderProviders = 
-            new AtomicReference<Set<HeaderProvider>>();
-    
     private AtomicReference<Map<MediaType, List<MessageBodyReader>>> atomicReaderProviders = 
             new AtomicReference<Map<MediaType, List<MessageBodyReader>>>();
+    
     private AtomicReference<Map<MediaType, List<MessageBodyWriter>>> atomicWriterProviders = 
             new AtomicReference<Map<MediaType, List<MessageBodyWriter>>>();
     
-    public <T> T createInstance(Class<T> type) {
-        for (T t : ServiceFinder.find(type)) {
-            return t;
-        }     
-        
-        return null;
-    }
-
-    @SuppressWarnings("unchecked")
-    public <T> HeaderProvider<T> createHeaderProvider(Class<T> type) {
-        Set<HeaderProvider> headerProviders = atomicHeaderProviders.get();
-        if (headerProviders == null) {
-            headerProviders = cacheProviderList(atomicHeaderProviders, 
-                    HeaderProvider.class);
-        }
-        
-        for (HeaderProvider p: headerProviders) 
-            if (p.supports(type))
-                return p;
-
-        throw new IllegalArgumentException("A header provider for type, " + type + 
-                ", is not supported");
-    }
-    
-    private <T> Set<T> cacheProviderList(AtomicReference<Set<T>> atomicSet, 
-            Class<T> c) {
-        synchronized(atomicSet) {
-            Set<T> s = atomicSet.get();
-            if (s == null) {
-                s = new HashSet<T>();
-                for (T p : ServiceFinder.find(c, true)) {
-                    s.add(p);
-                }     
-                atomicSet.set(s);
-            }
-            return s;
-        }
-    }
-
     private <T> Map<MediaType, List<T>> cacheProviderMap(
             AtomicReference<Map<MediaType, List<T>>> atomicMap, 
             Class<T> c,

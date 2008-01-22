@@ -26,12 +26,6 @@ import com.sun.ws.rest.impl.provider.header.MediaTypeProvider;
 import java.util.HashMap;
 import junit.framework.*;
 import javax.ws.rs.core.MediaType;
-import com.sun.ws.rest.impl.http.header.reader.HttpHeaderReader;
-import com.sun.ws.rest.impl.http.header.reader.HttpHeaderReaderImpl;
-import com.sun.ws.rest.impl.http.header.writer.WriterUtil;
-import javax.ws.rs.ext.HeaderProvider;
-import java.text.ParseException;
-import java.util.Map;
 
 /**
  *
@@ -41,12 +35,6 @@ public class MediaTypeProviderTest extends TestCase {
     
     public MediaTypeProviderTest(String testName) {
         super(testName);
-    }
-
-    protected void setUp() throws Exception {
-    }
-
-    protected void tearDown() throws Exception {
     }
 
     /**

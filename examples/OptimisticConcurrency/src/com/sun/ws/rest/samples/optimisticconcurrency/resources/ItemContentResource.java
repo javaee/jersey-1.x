@@ -26,8 +26,8 @@ import com.sun.ws.rest.api.ConflictException;
 import com.sun.ws.rest.samples.optimisticconcurrency.ItemData;
 import javax.ws.rs.GET;
 import javax.ws.rs.PUT;
-import javax.ws.rs.UriParam;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.core.HttpContext;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
@@ -55,7 +55,7 @@ public class ItemContentResource {
     @PUT
     @Path("{version}")
     public void put(
-            @UriParam("version") int version,
+            @PathParam("version") int version,
             @HttpContext HttpHeaders headers,
             byte[] in) {
         ItemData id = ItemData.ITEM;

@@ -25,7 +25,7 @@ package com.sun.ws.rest.impl.resource;
 import com.sun.ws.rest.impl.AbstractResourceTester;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
-import javax.ws.rs.UriParam;
+import javax.ws.rs.PathParam;
 
 /**
  *
@@ -41,7 +41,7 @@ public class TemplatePathTest extends AbstractResourceTester {
     @Path("/a/{arg1}")
     public static class ResourceA {
         @GET
-        public String doGet(@UriParam("arg1") String arg1) {
+        public String doGet(@PathParam("arg1") String arg1) {
             return "A";
         }
     }
@@ -49,7 +49,7 @@ public class TemplatePathTest extends AbstractResourceTester {
     @Path("/a/b/{arg1}")
     public static class ResourceAB {
         @GET
-        public String doGet(@UriParam("arg1") String arg1) {
+        public String doGet(@PathParam("arg1") String arg1) {
             return "AB";
         }
     }
@@ -57,7 +57,7 @@ public class TemplatePathTest extends AbstractResourceTester {
     @Path("/a/{arg1}/b")
     public static class ResourceAArg1B {
         @GET
-        public String doGet(@UriParam("arg1") String arg1) {
+        public String doGet(@PathParam("arg1") String arg1) {
             return "AArg1B";
         }
     }
@@ -65,7 +65,7 @@ public class TemplatePathTest extends AbstractResourceTester {
     @Path("/a/{arg1}/c")
     public static class ResourceAArg1C {
         @GET
-        public String doGet(@UriParam("arg1") String arg1) {
+        public String doGet(@PathParam("arg1") String arg1) {
             return "AArg1C";
         }
     }

@@ -29,6 +29,7 @@ import com.sun.ws.rest.impl.RequestHttpHeadersImpl;
 import com.sun.ws.rest.impl.VariantSelector;
 import com.sun.ws.rest.impl.http.header.reader.HttpHeaderReader;
 import com.sun.ws.rest.impl.model.HttpHelper;
+import com.sun.ws.rest.impl.provider.ProviderFactory;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
@@ -37,6 +38,7 @@ import java.net.URLDecoder;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -48,7 +50,6 @@ import javax.ws.rs.core.PathSegment;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.Variant;
-import javax.ws.rs.ext.ProviderFactory;
 
 /**
  * An abstract implementation of {@link ContainerRequest}.
@@ -133,7 +134,7 @@ public abstract class AbstractContainerRequest implements ContainerRequest {
     private MultivaluedMap<String, String> headers;
     private MediaType contentType;
     private List<MediaType> accept;
-    private List<Cookie> cookies;
+    private Map<String, Cookie> cookies;
     
     /**
      *
@@ -350,9 +351,9 @@ public abstract class AbstractContainerRequest implements ContainerRequest {
         return this.getRequestHeaders().getFirst("Langauge");
     }
     
-    public List<Cookie> getCookies() {
+    public Map<String, Cookie> getCookies() {
         if (cookies == null)
-            cookies = new ArrayList<Cookie>();
+            cookies = new HashMap<String, Cookie>();
         
         return cookies;
     }
@@ -502,15 +503,13 @@ public abstract class AbstractContainerRequest implements ContainerRequest {
     public Variant selectVariant(List<Variant> variants) {
         if (variants == null || variants.isEmpty()) 
             throw new IllegalArgumentException("The list of variants is null or empty");
+    
+        // TODO mark the Vary header to be added to the response
         
         return VariantSelector.selectVariant(this, variants);
     }
     
     public Response evaluatePreconditions(EntityTag eTag) {
-        return evaluatePreconditions(eTag, (Variant)null);
-    }
-    
-    public Response evaluatePreconditions(EntityTag eTag, Variant variant) {
         Response r = evaluateIfMatch(eTag);
         if (r == null)
             r = evaluateIfNoneMatch(eTag);
@@ -519,10 +518,6 @@ public abstract class AbstractContainerRequest implements ContainerRequest {
     }
 
     public Response evaluatePreconditions(Date lastModified) {
-        return evaluatePreconditions(lastModified, (Variant)null);
-    }
-    
-    public Response evaluatePreconditions(Date lastModified, Variant variant) {
         long lastModifiedTime = lastModified.getTime();
         Response r = evaluateIfUnmodifiedSince(lastModifiedTime);
         if (r == null)
@@ -532,10 +527,6 @@ public abstract class AbstractContainerRequest implements ContainerRequest {
     }
     
     public Response evaluatePreconditions(Date lastModified, EntityTag eTag) {
-        return evaluatePreconditions(lastModified, eTag, null);
-    }
-    
-    public Response evaluatePreconditions(Date lastModified, EntityTag eTag, Variant variant) {
         Response r = evaluateIfMatch(eTag);
         if (r == null) {
             long lastModifiedTime = lastModified.getTime();
