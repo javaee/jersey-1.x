@@ -112,9 +112,9 @@ public class ServletContainer extends HttpServlet {
     @Override
     public final void service(HttpServletRequest req, HttpServletResponse resp)
     throws ServletException, IOException {
-        HttpRequestAdaptor requestAdaptor = new HttpRequestAdaptor(req);
+        HttpRequestAdaptor requestAdaptor = new HttpRequestAdaptor(application, req);
         HttpResponseAdaptor responseAdaptor = new HttpResponseAdaptor(context, 
-                resp, req, requestAdaptor);
+                resp, req, application, requestAdaptor);
         
         try {
             // save thread locals for use in injection

@@ -28,6 +28,7 @@ import com.sun.net.httpserver.HttpServer;
 import com.sun.net.httpserver.HttpsServer;
 import com.sun.ws.rest.spi.container.AbstractContainerRequest;
 import com.sun.ws.rest.impl.http.header.HttpHeaderFactory;
+import com.sun.ws.rest.spi.container.MessageBodyContext;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.URI;
@@ -46,8 +47,8 @@ public final class HttpServerRequestAdaptor extends AbstractContainerRequest {
     
     private final HttpExchange exchange;
     
-    public HttpServerRequestAdaptor(HttpExchange exchange) throws IOException {
-        super(exchange.getRequestMethod(), exchange.getRequestBody());
+    public HttpServerRequestAdaptor(MessageBodyContext bodyContext, HttpExchange exchange) throws IOException {
+        super(bodyContext, exchange.getRequestMethod(), exchange.getRequestBody());
         this.exchange = exchange;
         
         initiateUriInfo();

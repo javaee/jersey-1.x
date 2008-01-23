@@ -23,14 +23,11 @@
 package com.sun.ws.rest.impl.container.grizzly;
 
 import com.sun.grizzly.tcp.Request;
-import com.sun.grizzly.util.buf.B2CConverter;
 import com.sun.grizzly.util.buf.ByteChunk;
-import com.sun.grizzly.util.buf.CharChunk;
-import com.sun.grizzly.util.buf.MessageBytes;
 import com.sun.grizzly.util.http.MimeHeaders;
-import com.sun.grizzly.util.http.Parameters;
 import com.sun.ws.rest.spi.container.AbstractContainerRequest;
 import com.sun.ws.rest.impl.http.header.HttpHeaderFactory;
+import com.sun.ws.rest.spi.container.MessageBodyContext;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -48,8 +45,8 @@ public final class GrizzlyRequestAdaptor  extends AbstractContainerRequest {
     private final Request request;
     
     /** Creates a new instance of GrizzlyRequestAdaptor */
-    public GrizzlyRequestAdaptor(Request request) {
-        super(request.method().toString(), new GrizzlyRequestInputStream(request));
+    public GrizzlyRequestAdaptor(MessageBodyContext bodyContext, Request request) {
+        super(bodyContext, request.method().toString(), new GrizzlyRequestInputStream(request));
         this.request = request;
         
         initiateUriInfo();

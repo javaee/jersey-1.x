@@ -23,6 +23,7 @@
 package com.sun.ws.rest.impl.container.jaxws;
 
 import com.sun.ws.rest.spi.container.AbstractContainerResponse;
+import com.sun.ws.rest.spi.container.MessageBodyContext;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -51,8 +52,8 @@ public final class MessageContextResponseAdaptor extends AbstractContainerRespon
     
     
     /* package */ MessageContextResponseAdaptor(MessageContext context, 
-            MessageContextRequestAdaptor requestContext) {
-        super(requestContext);
+            MessageBodyContext bodyContext, MessageContextRequestAdaptor requestContext) {
+        super(bodyContext, requestContext);
         this.context = context;
         this.response = (HttpServletResponse)context.get(context.SERVLET_RESPONSE);
     }

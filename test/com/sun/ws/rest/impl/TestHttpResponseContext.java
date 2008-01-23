@@ -24,6 +24,7 @@ package com.sun.ws.rest.impl;
 
 import com.sun.ws.rest.spi.container.AbstractContainerResponse;
 import com.sun.ws.rest.spi.container.ContainerRequest;
+import com.sun.ws.rest.spi.container.MessageBodyContext;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -36,8 +37,9 @@ public class TestHttpResponseContext extends AbstractContainerResponse {
 
     private ByteArrayOutputStream baos = new ByteArrayOutputStream();
     
-    public TestHttpResponseContext(ContainerRequest requestContext) {
-        super(requestContext);
+    public TestHttpResponseContext(MessageBodyContext bodyContext, 
+            ContainerRequest requestContext) {
+        super(bodyContext, requestContext);
     }
     
     protected OutputStream getUnderlyingOutputStream() throws IOException {

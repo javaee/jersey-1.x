@@ -23,6 +23,7 @@
 package com.sun.ws.rest.impl;
 
 import com.sun.ws.rest.spi.container.AbstractContainerRequest;
+import com.sun.ws.rest.spi.container.MessageBodyContext;
 import java.io.InputStream;
 import java.net.URI;
 
@@ -32,18 +33,21 @@ import java.net.URI;
  */
 public class TestHttpRequestContext extends AbstractContainerRequest {
     
-    public TestHttpRequestContext() {
-        super("GET", null);
+    public TestHttpRequestContext(MessageBodyContext bodyContext) {
+        super(null, "GET", null);
     }
 
-    public TestHttpRequestContext(String method, InputStream entity, 
+    public TestHttpRequestContext(MessageBodyContext bodyContext, 
+            String method, InputStream entity, 
             String completeUri, String baseUri)  {
-        this(method, entity, URI.create(completeUri), URI.create(baseUri));
+        this(bodyContext, method, entity, 
+                URI.create(completeUri), URI.create(baseUri));
     }
     
-    public TestHttpRequestContext(String method, InputStream entity, 
+    public TestHttpRequestContext(MessageBodyContext bodyContext,
+            String method, InputStream entity, 
             URI completeUri, URI baseUri)  {
-        super(method, entity);
+        super(bodyContext, method, entity);
         this.completeUri = completeUri;
         this.baseUri = baseUri;
     }

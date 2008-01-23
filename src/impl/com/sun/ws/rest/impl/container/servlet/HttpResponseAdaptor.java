@@ -24,6 +24,7 @@ package com.sun.ws.rest.impl.container.servlet;
 
 import com.sun.ws.rest.api.container.ContainerException;
 import com.sun.ws.rest.spi.container.AbstractContainerResponse;
+import com.sun.ws.rest.spi.container.MessageBodyContext;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.List;
@@ -49,9 +50,12 @@ public final class HttpResponseAdaptor extends AbstractContainerResponse {
         
     private OutputStream out;
     
-    public HttpResponseAdaptor(ServletContext context, HttpServletResponse response, 
-            HttpServletRequest request, HttpRequestAdaptor requestContext) {
-        super(requestContext);
+    public HttpResponseAdaptor(ServletContext context, 
+            HttpServletResponse response, 
+            HttpServletRequest request, 
+            MessageBodyContext bodyContext,
+            HttpRequestAdaptor requestContext) {
+        super(bodyContext, requestContext);
         this.context = context;
         this.response = response;
         this.request = request;

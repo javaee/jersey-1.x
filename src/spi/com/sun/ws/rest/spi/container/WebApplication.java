@@ -31,7 +31,7 @@ import com.sun.ws.rest.spi.resource.Injectable;
  *
  * @author Paul.Sandoz@Sun.Com
  */
-public interface WebApplication {
+public interface WebApplication extends MessageBodyContext {
     /**
      * Initiate the Web application.
      * <p>

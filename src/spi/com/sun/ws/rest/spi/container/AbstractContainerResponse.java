@@ -25,7 +25,6 @@ package com.sun.ws.rest.spi.container;
 import com.sun.ws.rest.api.Responses;
 import com.sun.ws.rest.impl.ResponseHttpHeadersImpl;
 import com.sun.ws.rest.impl.ResponseImpl;
-import com.sun.ws.rest.impl.provider.ProviderFactory;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.URI;
@@ -64,6 +63,8 @@ import javax.ws.rs.ext.RuntimeDelegate.HeaderDelegate;
 public abstract class AbstractContainerResponse implements ContainerResponse {
     private static final MediaType APPLICATION_OCTET_STREAM
             = new MediaType("application", "octet-stream");
+    
+    private final MessageBodyContext bodyContext;
     
     private final ContainerRequest request;
     
@@ -127,9 +128,11 @@ public abstract class AbstractContainerResponse implements ContainerResponse {
     
     /**
      *
+     * @param bodyContext the message body context.
      * @param request the container request associated with this response.
      */
-    protected AbstractContainerResponse(ContainerRequest request) {
+    protected AbstractContainerResponse(MessageBodyContext bodyContext, ContainerRequest request) {
+        this.bodyContext = bodyContext;
         this.request = request;
         this.status = Responses.NO_CONTENT;
     }
@@ -243,8 +246,7 @@ public abstract class AbstractContainerResponse implements ContainerResponse {
             }
         }
         
-        final MessageBodyWriter p = ProviderFactory.getInstance().
-                createMessageBodyWriter(entity.getClass(), mediaType);
+        final MessageBodyWriter p = bodyContext.getMessageBodyWriter(entity.getClass(), mediaType);
         p.writeTo(entity, mediaType, getHttpHeaders(), out);
     }
     

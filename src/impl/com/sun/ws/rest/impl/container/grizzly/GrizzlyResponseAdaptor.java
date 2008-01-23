@@ -31,6 +31,7 @@ import com.sun.grizzly.tcp.Response;
 import com.sun.grizzly.util.buf.ByteChunk;
 import com.sun.grizzly.util.buf.MessageBytes;
 import com.sun.grizzly.util.http.MimeHeaders;
+import com.sun.ws.rest.spi.container.MessageBodyContext;
 
 /**
  *
@@ -43,8 +44,8 @@ public final class GrizzlyResponseAdaptor extends AbstractContainerResponse {
     private OutputStream output;
 
     
-    /* package */ GrizzlyResponseAdaptor(Response response, GrizzlyRequestAdaptor requestContext) {
-        super(requestContext);
+    /* package */ GrizzlyResponseAdaptor(Response response, MessageBodyContext bodyContext, GrizzlyRequestAdaptor requestContext) {
+        super(bodyContext, requestContext);
         this.response = response;
     }
     

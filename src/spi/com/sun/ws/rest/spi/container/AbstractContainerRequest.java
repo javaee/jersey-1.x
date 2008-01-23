@@ -29,7 +29,6 @@ import com.sun.ws.rest.impl.RequestHttpHeadersImpl;
 import com.sun.ws.rest.impl.VariantSelector;
 import com.sun.ws.rest.impl.http.header.reader.HttpHeaderReader;
 import com.sun.ws.rest.impl.model.HttpHelper;
-import com.sun.ws.rest.impl.provider.ProviderFactory;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
@@ -70,7 +69,16 @@ import javax.ws.rs.core.Variant;
  */
 public abstract class AbstractContainerRequest implements ContainerRequest {
     
+    private final MessageBodyContext bodyContext;
+    
+    /**
+     * The HTTP method
+     */
     private final String method;
+    
+    /**
+     * The input stream of the request entity, if present.
+     */
     private final InputStream entity;
     
     /**
@@ -138,10 +146,13 @@ public abstract class AbstractContainerRequest implements ContainerRequest {
     
     /**
      *
+     * @param bodyContext the message body context
      * @param method the HTTP method
      * @param entity the InputStream of the request entity
      */
-    protected AbstractContainerRequest(String method, InputStream entity) {
+    protected AbstractContainerRequest(MessageBodyContext bodyContext,
+            String method, InputStream entity) {
+        this.bodyContext = bodyContext;
         this.method = method;
         this.headers = new RequestHttpHeadersImpl();
         this.encodedTemplateValues = new MultivaluedMapImpl();
@@ -187,7 +198,7 @@ public abstract class AbstractContainerRequest implements ContainerRequest {
     public <T> T getEntity(Class<T> type) {
         try {
             MediaType mediaType = getMediaType();
-            return ProviderFactory.getInstance().createMessageBodyReader(type, mediaType).
+            return bodyContext.getMessageBodyReader(type, mediaType).
                     readFrom(type, mediaType, headers, entity);
         } catch (IOException e) {
             throw new IllegalArgumentException(e);

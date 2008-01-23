@@ -151,9 +151,9 @@ public class WebApplicationTest extends TestCase {
             ? path.substring(1) : path;
 
         ByteArrayInputStream e = new ByteArrayInputStream(content.getBytes());
-        AbstractContainerRequest request = new TestHttpRequestContext(method, e, 
+        AbstractContainerRequest request = new TestHttpRequestContext(a, method, e, 
                 path, "/");
-        AbstractContainerResponse response = new TestHttpResponseContext(request);
+        AbstractContainerResponse response = new TestHttpResponseContext(a, request);
 
         a.handleRequest(request, response);
         if (response.getEntity() != null) {

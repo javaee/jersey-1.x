@@ -25,6 +25,7 @@ package com.sun.ws.rest.impl.container.servlet;
 import com.sun.ws.rest.api.container.ContainerException;
 import com.sun.ws.rest.api.uri.UriComponent;
 import com.sun.ws.rest.spi.container.AbstractContainerRequest;
+import com.sun.ws.rest.spi.container.MessageBodyContext;
 import java.io.IOException;
 import java.util.Enumeration;
 import java.util.LinkedList;
@@ -43,8 +44,9 @@ public final class HttpRequestAdaptor extends AbstractContainerRequest {
     private final HttpServletRequest request;
     
     /** Creates a new instance of HttpRequestAdaptor */
-    public HttpRequestAdaptor(HttpServletRequest request) throws IOException {
-        super(request.getMethod(), request.getInputStream());
+    public HttpRequestAdaptor(MessageBodyContext bodyContext, 
+            HttpServletRequest request) throws IOException {
+        super(bodyContext, request.getMethod(), request.getInputStream());
         this.request = request;
         
         initiateUriInfo();

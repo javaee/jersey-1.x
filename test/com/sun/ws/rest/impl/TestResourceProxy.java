@@ -106,12 +106,13 @@ public class TestResourceProxy extends ResourceProxy {
 
     public ResponseInBound invoke(URI u, String method, RequestOutBound ro) {
         final AbstractContainerRequest request = new TestHttpRequestContext(
-                method, writeEntity(ro.getMetadata(), ro.getEntity()),
+                w, method, writeEntity(ro.getMetadata(), ro.getEntity()),
                 u, baseUri);
         
         writeHeaders(ro.getMetadata(), request.getRequestHeaders());
 
-        final AbstractContainerResponse response = new TestHttpResponseContext(request);
+        final AbstractContainerResponse response = 
+                new TestHttpResponseContext(w, request);
         
         w.handleRequest(request, response);
         
@@ -156,7 +157,8 @@ public class TestResourceProxy extends ResourceProxy {
                     mediaType = new MediaType("application", "octet-stream");
                 }
             }
-            final MessageBodyWriter p = ProviderFactory.getInstance().createMessageBodyWriter(entity.getClass(), mediaType);
+            final MessageBodyWriter p = ProviderFactory.getInstance().
+                    createMessageBodyWriter(entity.getClass(), mediaType);
             p.writeTo(entity, (MediaType)mediaType, metadata, out);
             out.flush();
             out.close();

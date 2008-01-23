@@ -64,6 +64,9 @@ final class WebApplicationContext implements
         this.response = response;
     }
 
+    
+    // HttpContextAccess
+    
     public HttpRequestContext getHttpRequestContext() {
         return request;
     }
@@ -71,7 +74,6 @@ final class WebApplicationContext implements
     public HttpResponseContext getHttpResponseContext() {
         return response;
     }
-
     
     public Response createLocalForward(String path) throws ContainerException {
         final View v = ViewFactory.createView(app.containerMomento, path);

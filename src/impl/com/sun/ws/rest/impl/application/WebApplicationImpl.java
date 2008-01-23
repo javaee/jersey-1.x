@@ -41,6 +41,7 @@ import com.sun.ws.rest.impl.uri.PathPattern;
 import com.sun.ws.rest.impl.uri.PathTemplate;
 import com.sun.ws.rest.api.uri.UriTemplate;
 import com.sun.ws.rest.impl.ImplMessages;
+import com.sun.ws.rest.impl.model.MediaTypeHelper;
 import com.sun.ws.rest.impl.modelapi.annotation.IntrospectionModeller;
 import com.sun.ws.rest.impl.modelapi.validation.BasicValidator;
 import com.sun.ws.rest.impl.uri.rules.ResourceClassRule;
@@ -52,16 +53,20 @@ import com.sun.ws.rest.impl.wadl.WadlFactory;
 import com.sun.ws.rest.impl.wadl.WadlResource;
 import com.sun.ws.rest.spi.container.ContainerRequest;
 import com.sun.ws.rest.spi.container.ContainerResponse;
+import com.sun.ws.rest.spi.container.MessageBodyContext;
 import com.sun.ws.rest.spi.container.WebApplication;
 import com.sun.ws.rest.spi.resource.ResourceProviderFactory;
+import com.sun.ws.rest.spi.service.ComponentProvider;
 import com.sun.ws.rest.spi.uri.rules.UriRule;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.lang.reflect.Field;
 import java.lang.reflect.Proxy;
 import java.net.URI;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -70,9 +75,12 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.ws.rs.core.HttpContext;
 import javax.ws.rs.core.HttpHeaders;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Request;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
+import javax.ws.rs.ext.MessageBodyReader;
+import javax.ws.rs.ext.MessageBodyWriter;
 
 /**
  * A Web application that contains a set of resources, each referenced by 
@@ -80,7 +88,7 @@ import javax.ws.rs.core.UriInfo;
  * 
  * @author Paul.Sandoz@Sun.Com
  */
-public final class WebApplicationImpl implements WebApplication {
+public final class WebApplicationImpl implements ComponentProvider, WebApplication, MessageBodyContext {
     private static final Logger LOGGER = Logger.getLogger(WebApplicationImpl.class.getName());
 
     private final ConcurrentMap<Class, ResourceClass> metaClassMap = 
@@ -105,6 +113,8 @@ public final class WebApplicationImpl implements WebApplication {
     private RootResourceClassesRule rootsRule;
             
     /* package */ Object containerMomento;
+    
+    private MessageBodyContext bodyContext;
     
     public WebApplicationImpl() {
         this.resolverFactory = ResourceProviderFactory.getInstance();
@@ -181,39 +191,51 @@ public final class WebApplicationImpl implements WebApplication {
     
 
     /**
-     * Inject resources on a Web resource.
-     * @param resourceClass the class of the resource
-     * @param resource the resource instance
+     * Inject resources onto fields of an object.
+     * @param o the object
      */
-    public void injectResources(Object resource) {
-        injectResources(resource.getClass(), resource);
+    public void injectResources(Object o) {
+        injectResources(o.getClass(), o);
     }
     
-    private void injectResources(Class resourceClass, Object resource) {
-        while (resourceClass != null) {
-            for (Field f : resourceClass.getDeclaredFields()) {            
+    private void injectResources(Class oClass, Object o) {
+        while (oClass != null) {
+            for (Field f : oClass.getDeclaredFields()) {            
                 Injectable i = injectables.get(f.getType());
                 if (i != null)
-                    i.inject(resource, f);
+                    i.inject(o, f);
             }
-            resourceClass = resourceClass.getSuperclass();
+            oClass = oClass.getSuperclass();
         }
+    }
+
+    
+    // ComponentProvider
+    
+    public Object provide(Class<?> c) throws InstantiationException, IllegalAccessException {
+        Object o = c.newInstance();
+        injectResources(o);
+        return o;
     }
     
     // WebApplication
             
     public void initiate(Object containerMomento, ResourceConfig resourceConfig) {
         if (resourceConfig == null)
-            throw new IllegalArgumentException();
+            throw new IllegalArgumentException("ResourceConfig instance MUST NOT be null");
         
         if (initiated)
             throw new ContainerException(ImplMessages.WEB_APP_ALREADY_INITIATED());
-        
         this.initiated = true;
+        
         this.resourceConfig = resourceConfig;
+                
         this.containerMomento = containerMomento;
+        
         this.rootsRule = new RootResourceClassesRule(
             processRootResources(resourceConfig.getResourceClasses()));
+        
+        this.bodyContext = new MessageBodyFactory(this);
     }
 
     public void handleRequest(ContainerRequest request, ContainerResponse response) {
@@ -256,7 +278,26 @@ public final class WebApplicationImpl implements WebApplication {
         injectables.put(fieldType, injectable);
     }
     
+    
+    // MessageBodyContext    
 
+    public <T> MessageBodyReader<T> getMessageBodyReader(Class<T> type, MediaType mediaType) {
+        return bodyContext.getMessageBodyReader(type, mediaType);
+    }
+
+    public <T> MessageBodyWriter<T> getMessageBodyWriter(Class<T> type, MediaType mediaType) {
+        return bodyContext.getMessageBodyWriter(type, mediaType);
+    }
+
+    private List<MediaType> createSearchList(MediaType mediaType) {
+        if (mediaType==null)
+            return Arrays.asList(MediaTypeHelper.GENERAL_MEDIA_TYPE);
+        else
+            return Arrays.asList(mediaType, 
+                    new MediaType(mediaType.getType(), MediaType.MEDIA_TYPE_WILDCARD), 
+                    MediaTypeHelper.GENERAL_MEDIA_TYPE);
+    }
+    
     // 
 
     private RulesMap<UriRule> processRootResources(Set<Class> classes) {

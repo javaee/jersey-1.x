@@ -24,6 +24,7 @@ package com.sun.ws.rest.impl.container.jaxws;
 
 import com.sun.ws.rest.spi.container.AbstractContainerRequest;
 import com.sun.ws.rest.impl.http.header.HttpHeaderFactory;
+import com.sun.ws.rest.spi.container.MessageBodyContext;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -47,9 +48,9 @@ public final class MessageContextRequestAdaptor extends AbstractContainerRequest
     /**
      * Creates a new instance of MessageContextRequestAdaptor
      */
-    public MessageContextRequestAdaptor(DataSource request,
-            MessageContext context) throws IOException {
-        super((String)context.get(HTTP_REQUEST_METHOD),
+    public MessageContextRequestAdaptor(MessageBodyContext bodyContext, 
+            DataSource request, MessageContext context) throws IOException {
+        super(bodyContext, (String)context.get(HTTP_REQUEST_METHOD),
                 request != null ? request.getInputStream() : null );
         this.context = context;
         

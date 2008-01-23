@@ -52,12 +52,6 @@ public class HttpRequestAdaptorTest extends TestCase {
         super(testName);
     }
 
-    protected void setUp() throws Exception {
-    }
-
-    protected void tearDown() throws Exception {
-    }
-    
     public void testHeaders() {
         System.out.println("headers");
 
@@ -65,7 +59,7 @@ public class HttpRequestAdaptorTest extends TestCase {
                 "verbose=true&item=1&item=2", "<hello>world</hello>");
         HttpRequestAdaptor a = null;
         try {
-            a = new HttpRequestAdaptor(impl);
+            a = new HttpRequestAdaptor(null, impl);
         } catch (IOException ex) {
             fail("Unable to initialize adaptor");
         }
@@ -83,7 +77,7 @@ public class HttpRequestAdaptorTest extends TestCase {
                 "verbose=true&item=1&item=2", "<hello>world</hello>");
         HttpRequestAdaptor a = null;
         try {
-            a = new HttpRequestAdaptor(impl);
+            a = new HttpRequestAdaptor(null, impl);
         } catch (IOException ex) {
             fail("Unable to initialize adaptor");
         }

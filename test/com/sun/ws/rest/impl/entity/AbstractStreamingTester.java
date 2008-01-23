@@ -25,7 +25,8 @@ package com.sun.ws.rest.impl.entity;
 import com.sun.ws.rest.impl.RequestHttpHeadersImpl;
 import com.sun.ws.rest.impl.TestHttpRequestContext;
 import com.sun.ws.rest.impl.TestHttpResponseContext;
-import com.sun.ws.rest.impl.provider.ProviderFactory;
+import com.sun.ws.rest.impl.application.MessageBodyFactory;
+import com.sun.ws.rest.spi.container.MessageBodyContext;
 import javax.ws.rs.ext.MessageBodyReader;
 import javax.ws.rs.ext.MessageBodyWriter;
 import java.io.ByteArrayInputStream;
@@ -40,8 +41,11 @@ import junit.framework.TestCase;
  */
 public abstract class AbstractStreamingTester extends TestCase {
     
+    MessageBodyContext bodyContext;
+    
     public AbstractStreamingTester(String testName) {
         super(testName);
+        bodyContext = new MessageBodyFactory();
     }
     
     <T> void roundTrip(Class<T> c, T t) throws IOException {
@@ -70,7 +74,7 @@ public abstract class AbstractStreamingTester extends TestCase {
         h.add("Content-Type", mediaType);
 
         ByteArrayInputStream in = new ByteArrayInputStream(b);
-        MessageBodyReader<T> tsp = ProviderFactory.getInstance().createMessageBodyReader(c, mediaType);
+        MessageBodyReader<T> tsp = bodyContext.getMessageBodyReader(c, mediaType);
         return tsp.readFrom(c, mediaType, h, in);
     }
     
@@ -81,13 +85,14 @@ public abstract class AbstractStreamingTester extends TestCase {
     @SuppressWarnings("unchecked")
     <T> byte[] writeTo(T t, MediaType mediaType) throws IOException {
         
-        TestHttpRequestContext reqc = new TestHttpRequestContext();
-        TestHttpResponseContext resc = new TestHttpResponseContext(reqc);
+        TestHttpRequestContext reqc = new TestHttpRequestContext(null);
+        TestHttpResponseContext resc = new TestHttpResponseContext(null, reqc);
         
         Response r = Response.ok().type(mediaType).build();
         resc.setResponse(r);
         
-        MessageBodyWriter<T> tsp = ProviderFactory.getInstance().createMessageBodyWriter((Class<T>)t.getClass(), mediaType);
+        MessageBodyWriter<T> tsp = bodyContext.getMessageBodyWriter(
+                (Class<T>)t.getClass(), mediaType);
         tsp.writeTo(t, mediaType, resc.getHttpHeaders(), resc.getOutputStream());
         return resc.getEntityAsByteArray();
     }
