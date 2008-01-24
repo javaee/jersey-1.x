@@ -33,10 +33,6 @@ import java.net.URI;
  */
 public class TestHttpRequestContext extends AbstractContainerRequest {
     
-    public TestHttpRequestContext(MessageBodyContext bodyContext) {
-        super(null, "GET", null);
-    }
-
     public TestHttpRequestContext(MessageBodyContext bodyContext, 
             String method, InputStream entity, 
             String completeUri, String baseUri)  {

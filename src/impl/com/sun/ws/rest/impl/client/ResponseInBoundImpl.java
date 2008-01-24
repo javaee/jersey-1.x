@@ -24,6 +24,8 @@ package com.sun.ws.rest.impl.client;
 
 import java.net.URI;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 import javax.ws.rs.core.EntityTag;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.ext.RuntimeDelegate;
@@ -39,6 +41,14 @@ public abstract class ResponseInBoundImpl implements ResponseInBound {
     
     private static final HeaderDelegate<Date> dateDelegate = 
             RuntimeDelegate.getInstance().createHeaderDelegate(Date.class);
+    
+    private Map<String, Object> properties;
+    
+    public Map<String, Object> getProperties() {
+        if (properties != null) return properties;
+        
+        return properties = new HashMap<String, Object>();
+    }
     
     public MediaType getContentType() {
         String ct = getMetadata().getFirst("Content-Type");

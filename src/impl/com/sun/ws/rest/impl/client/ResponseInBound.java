@@ -24,6 +24,7 @@ package com.sun.ws.rest.impl.client;
 
 import java.net.URI;
 import java.util.Date;
+import java.util.Map;
 import javax.ws.rs.core.EntityTag;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
@@ -33,6 +34,7 @@ import javax.ws.rs.core.MultivaluedMap;
  * @author Paul.Sandoz@Sun.Com
  */
 public interface ResponseInBound {
+    Map<String, Object> getProperties();
     
     int getStatus();
     

@@ -22,6 +22,8 @@
 
 package com.sun.ws.rest.impl.entity;
 
+import com.sun.ws.rest.impl.AbstractResourceTester;
+import com.sun.ws.rest.impl.client.ResourceProxy;
 import com.sun.ws.rest.impl.provider.entity.AbstractTypeEntityProvider;
 import java.io.IOException;
 import java.io.InputStream;
@@ -30,6 +32,8 @@ import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 import java.io.Serializable;
 import javax.ws.rs.ConsumeMime;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
 import javax.ws.rs.ProduceMime;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
@@ -38,7 +42,7 @@ import javax.ws.rs.core.MultivaluedMap;
  *
  * @author Paul.Sandoz@Sun.Com
  */
-public class BeanStreamingTest extends AbstractStreamingTester {
+public class BeanStreamingTest extends AbstractResourceTester {
     public static class Bean implements Serializable {
         private String string;
         private int integer;
@@ -151,17 +155,81 @@ public class BeanStreamingTest extends AbstractStreamingTester {
         super(testName);
     }
     
+    
+    
+    @Path("/bean")
+    public static class BeanResource {
+        @POST
+        @ConsumeMime("application/bean")
+        @ProduceMime("application/bean")
+        public Bean post(Bean t) {
+            return t;
+        }
+    }
+    
+    @Path("/bean")
+    public static class Bean2Resource {
+        @POST
+        @ConsumeMime("application/bean")
+        @ProduceMime("application/bean")
+        public Bean2 post(Bean2 t) {
+            return t;
+        }
+    }
+    
+    @Path("/plain")
+    public static class BeanTextPlainResource {
+        @POST
+        @ConsumeMime("text/plain")
+        @ProduceMime("text/plain")
+        public Bean post(Bean t) {
+            return t;
+        }
+    }
+    
+    @Path("/plain")
+    public static class Bean2TextPlainResource {
+        @POST
+        @ConsumeMime("text/plain")
+        @ProduceMime("text/plain")
+        public Bean2 post(Bean2 t) {
+            return t;
+        }
+    }
+    
+    @Path("/wild")
+    public static class BeanWildResource {
+        @POST
+        @ConsumeMime("application/*")
+        @ProduceMime("application/*")
+        public Bean post(Bean t) {
+            return t;
+        }
+    }
+    
+    @Path("/wild")
+    public static class Bean2WildResource {
+        @POST
+        @ConsumeMime("application/*")
+        @ProduceMime("application/*")
+        public Bean2 post(Bean2 t) {
+            return t;
+        }
+    }
+    
     public void testBean() throws Exception {
-        Bean b = new Bean("bean", 123, 3.1415f);
+        initiateWebApplication(BeanResource.class, BeanTextPlainResource.class);
+                
+        Bean b = new Bean("bean", 123, 3.1415f);        
         
         // the following should work using BeanProvider which
         // supports Bean.class for type application/bean
-        roundTrip(Bean.class, b, "application/bean");
-        
+        ResourceProxy r = resourceProxy("/bean");
+        r.content(b, "application/bean").post(Bean.class);
+
         try {
-            // the following should fail since there's no entity
-            // provider for Bean.class that supports text/plain
-            roundTrip(Bean.class, b, "text/plain");
+            r = resourceProxy("/plain");
+            r.content(b, "text/plain").post(Bean.class);
             assertFalse(false);
         } catch (IllegalArgumentException ex) {
             assertTrue(true);
@@ -169,35 +237,72 @@ public class BeanStreamingTest extends AbstractStreamingTester {
     }
     
     public void testBeanWild() throws Exception {
+        initiateWebApplication(BeanWildResource.class);
+        
         Bean b = new Bean("bean", 123, 3.1415f);
         
         // the following should work using BeanWildProvider which
         // supports Bean.class for type application/*
-        roundTrip(Bean.class, b, "application/wild-bean");
+        ResourceProxy r = resourceProxy("/wild");
+        r.content(b, "application/wild-bean").post(Bean.class);
     }
     
+    
     public void testBean2() throws Exception {
-        Bean2 b = new Bean2("bean", 123, 3.1415f);
+        initiateWebApplication(Bean2Resource.class, Bean2TextPlainResource.class);
+                
+        Bean2 b = new Bean2("bean", 123, 3.1415f);        
         
-        // the following should work using BeanProvider which
-        // supports Bean.class for type application/bean
-        roundTrip(Bean2.class, b, "application/bean");
-        
+        ResourceProxy r = resourceProxy("/bean");
+        r.content(b, "application/bean").post(Bean2.class);
+
         try {
-            // the following should fail since there's no entity
-            // provider for Bean.class that supports text/plain
-            roundTrip(Bean2.class, b, "text/plain");
+            r = resourceProxy("/plain");
+            r.content(b, "text/plain").post(Bean2.class);
             assertFalse(false);
         } catch (IllegalArgumentException ex) {
             assertTrue(true);
         }
     }
     
+    public void testBean2UsingBean() throws Exception {
+        initiateWebApplication(BeanResource.class, BeanTextPlainResource.class);
+                
+        Bean2 b = new Bean2("bean", 123, 3.1415f);        
+        
+        // the following should work using BeanProvider which
+        // supports Bean.class for type application/bean
+        ResourceProxy r = resourceProxy("/bean");
+        r.content(b, "application/bean").post(Bean2.class);
+
+        try {
+            r = resourceProxy("/plain");
+            r.content(b, "text/plain").post(Bean2.class);
+            assertFalse(false);
+        } catch (IllegalArgumentException ex) {
+            assertTrue(true);
+        }
+    }
+
     public void testBean2Wild() throws Exception {
+        initiateWebApplication(Bean2WildResource.class);
+        
         Bean2 b = new Bean2("bean", 123, 3.1415f);
         
         // the following should work using BeanWildProvider which
         // supports Bean.class for type application/*
-        roundTrip(Bean2.class, b, "application/wild-bean2");
+        ResourceProxy r = resourceProxy("/wild");
+        r.content(b, "application/wild-bean").post(Bean2.class);
     }
+    
+    public void testBean2WildUsingBean() throws Exception {
+        initiateWebApplication(BeanWildResource.class);
+        
+        Bean2 b = new Bean2("bean", 123, 3.1415f);
+        
+        // the following should work using BeanWildProvider which
+        // supports Bean.class for type application/*
+        ResourceProxy r = resourceProxy("/wild");
+        r.content(b, "application/wild-bean").post(Bean2.class);
+    }    
 }

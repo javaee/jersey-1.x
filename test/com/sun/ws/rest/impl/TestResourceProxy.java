@@ -22,6 +22,7 @@
 
 package com.sun.ws.rest.impl;
 
+import com.sun.ws.rest.api.container.ContainerException;
 import com.sun.ws.rest.impl.client.RequestOutBound;
 import com.sun.ws.rest.impl.client.ResourceProxy;
 import com.sun.ws.rest.impl.client.ResourceProxyException;
@@ -61,10 +62,12 @@ public class TestResourceProxy extends ResourceProxy {
     }
     
     private final static class Response extends ResponseInBoundImpl {
+        private final InputStream responseEntity;
         private final AbstractContainerResponse response;
         private final MultivaluedMap<String, String> metadata;
         
-       Response(AbstractContainerResponse response) {
+       Response(InputStream responseEntity, AbstractContainerResponse response) {
+            this.responseEntity = responseEntity;
             this.response = response;
             this.metadata = new RequestHttpHeadersImpl();
             
@@ -93,30 +96,40 @@ public class TestResourceProxy extends ResourceProxy {
             try {
                 MediaType mediaType = getContentType();
                 return ProviderFactory.getInstance().createMessageBodyReader(c, mediaType).
-                        readFrom(c, mediaType, metadata, getInputStream(successful));
+                        readFrom(c, mediaType, metadata, responseEntity);
             } catch (IOException ex) {
                 throw new ResourceProxyException(ex);
             }
         }
-
-        private InputStream getInputStream(boolean successful) throws IOException {
-            return writeEntity(response.getHttpHeaders(), response.getEntity()); 
-        }
     }
 
-    public ResponseInBound invoke(URI u, String method, RequestOutBound ro) {
-        final AbstractContainerRequest request = new TestHttpRequestContext(
-                w, method, writeEntity(ro.getMetadata(), ro.getEntity()),
+    public ResponseInBound invoke(URI u, String method, RequestOutBound clientRequest) {
+        byte[] requestEntity = writeEntity(clientRequest.getMetadata(), 
+                clientRequest.getEntity());
+        final AbstractContainerRequest serverRequest = new TestHttpRequestContext(
+                w, method, new ByteArrayInputStream(requestEntity),
                 u, baseUri);
         
-        writeHeaders(ro.getMetadata(), request.getRequestHeaders());
+        writeHeaders(clientRequest.getMetadata(), serverRequest.getRequestHeaders());
 
-        final AbstractContainerResponse response = 
-                new TestHttpResponseContext(w, request);
+        final TestHttpResponseContext serverResponse = 
+                new TestHttpResponseContext(w, serverRequest);
         
-        w.handleRequest(request, response);
+        w.handleRequest(serverRequest, serverResponse);
+        try {
+            serverResponse.commitAll();
+        } catch (IOException e) {
+            throw new ContainerException(e);
+        }
         
-        return new Response(response);
+        byte[] responseEntity = serverResponse.
+                getUnderlyingByteArrayOutputStream().toByteArray();        
+        Response clientResponse = new Response(
+                new ByteArrayInputStream(responseEntity), serverResponse);
+        
+        clientResponse.getProperties().put("request.entity", requestEntity);
+        clientResponse.getProperties().put("response.entity", responseEntity);
+        return clientResponse;
     }
 
     private static void writeHeaders(MultivaluedMap<String, Object> metadata, 
@@ -134,10 +147,16 @@ public class TestResourceProxy extends ResourceProxy {
         return hp.toString(headerValue);
     }
     
-    private static InputStream writeEntity(MultivaluedMap<String, Object> metadata, Object entity) {
+//    private static ByteArrayInputStream writeEntity(MultivaluedMap<String, Object> metadata, Object entity) {
+//        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+//        writeEntity(metadata, entity, baos);
+//        return new ByteArrayInputStream(baos.toByteArray());        
+//    }
+    
+    private static byte[] writeEntity(MultivaluedMap<String, Object> metadata, Object entity) {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         writeEntity(metadata, entity, baos);
-        return new ByteArrayInputStream(baos.toByteArray());        
+        return baos.toByteArray();        
     }
     
     @SuppressWarnings("unchecked")

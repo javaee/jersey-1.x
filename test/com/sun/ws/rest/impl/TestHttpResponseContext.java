@@ -49,6 +49,18 @@ public class TestHttpResponseContext extends AbstractContainerResponse {
     protected void commitStatusAndHeaders() throws IOException {
     }
     
+    public void commitAll() throws IOException {
+        if (isCommitted()) return;
+        
+        commitStatusAndHeaders();
+    
+        writeEntity(getUnderlyingOutputStream());
+    }
+
+    public ByteArrayOutputStream getUnderlyingByteArrayOutputStream() {
+        return baos;
+    }
+    
     public byte[] getEntityAsByteArray() {
         return baos.toByteArray();
     }

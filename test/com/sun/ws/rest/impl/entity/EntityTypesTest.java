@@ -22,7 +22,11 @@
 
 package com.sun.ws.rest.impl.entity;
 
+import com.sun.syndication.feed.atom.Entry;
+import com.sun.syndication.feed.atom.Feed;
 import com.sun.ws.rest.api.representation.FormURLEncodedProperties;
+import com.sun.ws.rest.impl.provider.entity.AtomEntryProvider;
+import com.sun.ws.rest.impl.provider.entity.AtomFeedProvider;
 import com.sun.ws.rest.impl.provider.entity.FileProvider;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -31,9 +35,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import javax.mail.internet.InternetHeaders;
 import javax.mail.internet.MimeBodyPart;
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.Marshaller;
 import javax.mail.internet.MimeMultipart;
+import javax.ws.rs.Path;
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONObject;
 
@@ -41,33 +44,45 @@ import org.codehaus.jettison.json.JSONObject;
  *
  * @author Paul.Sandoz@Sun.Com
  */
-public class StreamingTest extends AbstractStreamingTester {
+public class EntityTypesTest extends AbstractTypeTester {
     
-    public StreamingTest(String testName) {
+    public EntityTypesTest(String testName) {
         super(testName);
     }
     
-    public void testString() throws IOException {
-        roundTrip(String.class, "THIS IS A TEST");
+    @Path("/")
+    public static class StringResource extends AResource<String> {}
+    
+    public void testString() {
+        _test(String.class, "CONTENT", StringResource.class);
     }
 
-    public void testByteArrayRepresentation() throws IOException {
-        roundTrip(byte[].class, "THIS IS A TEST".getBytes());
+    @Path("/")
+    public static class ByteArrayResource extends AResource<byte[]> {}
+    
+    public void testByteArrayRepresentation() {
+        _test(byte[].class, "CONTENT".getBytes(), ByteArrayResource.class);
     }
     
-    public void testJAXBRepresentation() throws Exception {
-        JAXBContext context = JAXBContext.newInstance(JAXBBean.class);
-        Marshaller marshaller = context.createMarshaller();
-        
-        JAXBBean in = new JAXBBean("THIS IS A TEST");
-        roundTrip(JAXBBean.class, in);
-    }    
+    @Path("/")
+    public static class JAXBBeanResource extends AResource<JAXBBean> {}
     
-    public void testFileRepresentation() throws Exception {
+    public void testJAXBBeanRepresentation() {
+        _test(JAXBBean.class, new JAXBBean("CONTENT"), JAXBBeanResource.class);
+    }
+    
+    @Path("/")
+    public static class FileResource extends AResource<File> {}
+    
+    public void testFileRepresentation() throws IOException {
         FileProvider fp = new FileProvider();
-        File in = fp.readFrom(File.class, null, null, new ByteArrayInputStream("THIS IS A TEST".getBytes()));
-        roundTrip(File.class, in);
+        File in = fp.readFrom(File.class, null, null, new ByteArrayInputStream("CONTENT".getBytes()));
+        
+        _test(File.class, in, FileResource.class);
     }
+    
+    @Path("/")
+    public static class MimeMultipartBeanResource extends AResource<MimeMultipart> {}
     
     public void testMimeMultipartRepresentation() throws Exception {
         InternetHeaders headers = new InternetHeaders();
@@ -97,35 +112,65 @@ public class StreamingTest extends AbstractStreamingTester {
         
         bp = new MimeBodyPart(headers3, outputStream.toByteArray());
         mmIn.addBodyPart(bp);
-
-        byte[] content = writeTo(mmIn);
-        mmIn = readFrom(MimeMultipart.class, content);
-        roundTrip(MimeMultipart.class, mmIn);
+        _test(MimeMultipart.class, mmIn, MimeMultipartBeanResource.class, false);
     }
     
-    public void testFormURLEncodedRepresentation() throws Exception {
+    @Path("/")
+    public static class FormResource extends AResource<FormURLEncodedProperties> {}
+    
+    public void testFormRepresentation() {
         FormURLEncodedProperties fp = new FormURLEncodedProperties();
         fp.put("Email", "johndoe@gmail.com");
         fp.put("Passwd", "north 23AZ");
         fp.put("service", "cl");
         fp.put("source", "Gulp-CalGul-1.05");
         
-        roundTrip(FormURLEncodedProperties.class, fp);
+        _test(FormURLEncodedProperties.class, fp, FormResource.class);
     }
     
-    public void testJSONArray() throws Exception {
-        JSONArray array = new JSONArray();
-        array.put("One").put("Two").put("Three").put(1).put(2.0);
-        roundTrip(JSONArray.class, array);
-    }
+    @Path("/")
+    public static class JSONObjectResource extends AResource<JSONObject> {}
     
-    public void testJSONObject() throws Exception {
+    public void testJSONObjectRepresentation() throws Exception {
         JSONObject object = new JSONObject();
         object.put("userid", 1234).
         put("username", "1234").
         put("email", "a@b").
         put("password", "****");
         
-        roundTrip(JSONObject.class, object);
+        _test(JSONObject.class, object, JSONObjectResource.class);
     }
+
+    @Path("/")
+    public static class JSONOArrayResource extends AResource<JSONArray> {}
+    
+    public void tesJSONArrayRepresentation() throws Exception {
+        JSONArray array = new JSONArray();
+        array.put("One").put("Two").put("Three").put(1).put(2.0);
+        
+        _test(JSONArray.class, array, JSONOArrayResource.class);
+    }
+    
+    @Path("/")
+    public static class FeedResource extends AResource<Feed> {}
+    
+    public void testFeedRepresentation() throws Exception {
+        InputStream in = this.getClass().getResourceAsStream("feed.xml");
+        AtomFeedProvider afp = new AtomFeedProvider();
+        Feed f = afp.readFrom(Feed.class, null, null, in);
+        
+        _test(Feed.class, f, FeedResource.class);
+    }
+    
+    @Path("/")
+    public static class EntryResource extends AResource<Entry> {}
+    
+    public void testEntryRepresentation() throws Exception {
+        InputStream in = this.getClass().getResourceAsStream("entry.xml");        
+        AtomEntryProvider afp = new AtomEntryProvider();
+        Entry e = afp.readFrom(Entry.class, null, null, in);
+        
+        _test(Entry.class, e, EntryResource.class);
+    }
+    
 }
