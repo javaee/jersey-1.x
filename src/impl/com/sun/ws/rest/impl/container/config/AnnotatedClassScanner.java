@@ -24,6 +24,7 @@ package com.sun.ws.rest.impl.container.config;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.annotation.Annotation;
 import java.net.URI;
 import java.net.URL;
 import java.util.Enumeration;
@@ -41,33 +42,44 @@ import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;
 
 /**
- * Search for root resource classes.
- *
+ * Search for Java classes that are annotated with one or more of a set
+ * of annotations.
+ * <p>
+ * The search is restricted to Java classes that are publically scoped.
+ * Inner static public classes are also searched.
+ * 
  * @author Frank D. Martinez. fmartinez@asimovt.com
  */
-public final class ResourceClassScanner {
+public final class AnnotatedClassScanner {
     private static final Logger LOGGER = 
-            Logger.getLogger(ResourceClassScanner.class.getName());
+            Logger.getLogger(AnnotatedClassScanner.class.getName());
     
-    /** Root resource classes found. */
+    /** Matching annotated classes. */
     private Set<Class> classes;
     
-    /** Annotation class names we are looking for. */
+    /** Set of annotations to search for. */
     private final Set<String> annotations;
     
+    /** The class loader to use to load matching Java class files */
     private final ClassLoader classloader;
+
     
-    public ResourceClassScanner(Class... annotations) {
+    /**
+     * 
+     * @param annotations the set of annotations to match
+     */
+    public AnnotatedClassScanner(Class... annotations) {
         this.classloader = Thread.currentThread().getContextClassLoader();
         this.annotations = getAnnotationSet(annotations);
+        this.classes = new HashSet<Class>();
     }
     
     /**
-     * Scans paths for matching classes.
+     * Scans paths for matching Java classes
      * 
-     * @param paths A list of absolute paths used to scan for Resource classes.
-     * @return A set of classes annotated with specified annotations in the 
-     *         specified paths.
+     * @param paths An array of absolute paths to search.
+     * @return The set of matching classes that are annotated with one or more of
+     *         the specified annotations.
      */
     public Set<Class> scan(File[] paths) {
         this.classes = new HashSet<Class>();
@@ -80,11 +92,11 @@ public final class ResourceClassScanner {
     }
 
     /**
-     * Scans packages for matching classes.
+     * Scans packages for matching Java classes.
      * 
-     * @param packages the array of packages.
-     * @return A set of classes annotated with specified annotations in the 
-     *         specified paths.
+     * @param packages An array of packages to search.
+     * @return The set of matching classes that are annotated with one or more of
+     *         the specified annotations.
      */
     public Set<Class> scan(String[] packages) {
         this.classes = new HashSet<Class>();
@@ -106,6 +118,42 @@ public final class ResourceClassScanner {
         }
         
         return classes;
+    }
+    
+    /**
+     * Get the current set of matching classes.
+     * 
+     * @return The set of matching classes that are annotated with one or more of
+     *         the specified annotations.
+     */
+    public Set<Class> getMatchingClasses() {
+        return classes;
+    }
+    
+    /**
+     * Get the current set of classes that match a set of annotations.
+     * 
+     * @param annotations the set of matching annotations
+     * @return The set of matching classes that are annotated with one or more of
+     *         the specified annotations.
+     */
+    public Set<Class> getMatchingClasses(Class... annotations) {
+        Set<Class> s = new HashSet<Class>();
+        for (Class c : classes) {
+            if (hasAnnotations(c, annotations))
+                s.add(c);
+        }
+        return s;
+    }
+    
+    @SuppressWarnings("unchecked")
+    private boolean hasAnnotations(Class c, Class... annotations) {
+        Annotation[] _as = c.getAnnotations();
+        for (Class a : annotations) {
+            if (c.getAnnotation(a) == null) return false;
+        }
+        
+        return true;
     }
     
     private Set<String> getAnnotationSet(Class... annotations) {
@@ -215,9 +263,9 @@ public final class ResourceClassScanner {
         }
     }
     
-    private final ResourceClassVisitor classVisitor = new ResourceClassVisitor();
+    private final AnnotatedClassVisitor classVisitor = new AnnotatedClassVisitor();
     
-    private final class ResourceClassVisitor implements ClassVisitor {
+    private final class AnnotatedClassVisitor implements ClassVisitor {
         /**
          * The name of the visited class.
          */
@@ -262,7 +310,7 @@ public final class ResourceClassScanner {
         public void visitEnd() {
             if (isScoped && isAnnotated) {
                 // Correctly scoped and annotated
-                // add to list of root resource classes.
+                // add to the set of matching classes.
                 classes.add(getClassForName(className.replaceAll("/", ".")));    
             }
         }

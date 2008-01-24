@@ -22,14 +22,15 @@
 
 package com.sun.ws.rest.api.core;
 
-import com.sun.ws.rest.impl.container.config.ResourceClassScanner;
+import com.sun.ws.rest.impl.container.config.AnnotatedClassScanner;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.ws.rs.Path;
+import javax.ws.rs.ext.Provider;
 
 /**
  * A mutable implementation of {@link DefaultResourceConfig} that dynamically 
@@ -75,8 +76,6 @@ public final class PackagesResourceConfig extends DefaultResourceConfig {
     }
     
     private void init(String[] packages) {
-        ResourceClassScanner scanner = new ResourceClassScanner(
-                javax.ws.rs.Path.class);
         if (LOGGER.isLoggable(Level.INFO)) {
             StringBuilder b = new StringBuilder();
             b.append("Scanning for root resource classes in the packages:");
@@ -85,10 +84,12 @@ public final class PackagesResourceConfig extends DefaultResourceConfig {
             
             LOGGER.log(Level.INFO, b.toString());
         }
-        Set<Class> classes = scanner.scan(packages);
-
         
-        getResourceClasses().addAll(classes);
+        AnnotatedClassScanner scanner = new AnnotatedClassScanner(Path.class);
+        scanner.scan(packages);        
+        
+        getResourceClasses().addAll(scanner.getMatchingClasses(Path.class));
+        getProviderClasses().addAll(scanner.getMatchingClasses(Provider.class));
         
         if (LOGGER.isLoggable(Level.INFO) && !getResourceClasses().isEmpty()) {
             StringBuilder b = new StringBuilder();

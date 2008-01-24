@@ -40,6 +40,8 @@ public class DefaultResourceConfig implements ResourceConfig {
     
     private final Set<Class> resources = new HashSet<Class>();
     
+    private final Set<Class> providers = new HashSet<Class>();
+    
     private final Map<String, Boolean> features = new HashMap<String, Boolean>();
     
     private final Map<String, Object> properties = new HashMap<String, Object>();
@@ -74,6 +76,10 @@ public class DefaultResourceConfig implements ResourceConfig {
         return resources;
     }
 
+    public Set<Class> getProviderClasses() {
+        return providers;
+    }
+    
     public Map<String, Boolean> getFeatures() {
         return features;
     }

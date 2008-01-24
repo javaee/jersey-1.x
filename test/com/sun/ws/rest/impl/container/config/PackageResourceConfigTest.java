@@ -27,7 +27,9 @@ import com.sun.ws.rest.api.core.ResourceConfig;
 import com.sun.ws.rest.impl.container.config.innerstatic.InnerStaticClass;
 import com.sun.ws.rest.impl.container.config.toplevel.PublicRootResourceClass;
 import com.sun.ws.rest.impl.container.config.toplevelinnerstatic.PublicRootResourceInnerStaticClass;
+import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.Constructor;
 import java.net.URL;
 import java.net.URLClassLoader;
 import junit.framework.*;
@@ -153,7 +155,12 @@ public class PackageResourceConfigTest extends AbstractResourceConfigTester {
         ClassLoader ocl = Thread.currentThread().getContextClassLoader();
         Thread.currentThread().setContextClassLoader(cl);
         try {
-            return new PackagesResourceConfig(packages);
+            Class prc = cl.loadClass("com.sun.ws.rest.api.core.PackagesResourceConfig");
+            Constructor c = prc.getConstructor(String[].class);
+            return (ResourceConfig)c.newInstance((Object)packages);
+            // return new PackagesResourceConfig(packages);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         } finally {
             Thread.currentThread().setContextClassLoader(ocl);
         }
@@ -166,6 +173,20 @@ public class PackageResourceConfigTest extends AbstractResourceConfigTester {
     private ClassLoader createClassLoader(Suffix s, String base, String... entries) throws IOException {
         URL[] us = new URL[1];
         us[0] = createJarFile(s, base, entries).toURI().toURL();
-        return new URLClassLoader(us, null);
-    }    
+        return new PackageClassLoader(us);
+    } 
+    
+    private static class PackageClassLoader extends URLClassLoader {
+        PackageClassLoader(URL[] urls) {
+            super(urls, null);
+        }
+        
+        public Class<?> findClass(String name) throws ClassNotFoundException {
+            try {
+                return super.findClass(name);
+            } catch (ClassNotFoundException e) {
+                return getSystemClassLoader().loadClass(name);
+            }
+        }        
+    }
 }

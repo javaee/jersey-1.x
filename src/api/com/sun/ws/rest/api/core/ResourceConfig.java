@@ -89,6 +89,19 @@ public interface ResourceConfig {
     Set<Class> getResourceClasses();
     
     /**
+     * Get the set of provider classes to be instantiated in the scope
+     * of the Web application.
+     * <p>
+     * A provider class is a Java class with a {@link javax.ws.rs.ext.Provider} 
+     * annotation declared on the class that implements a specific service 
+     * interface.
+     * 
+     * @return the set of provider classes. 
+     *         The returned value shall never be null.
+     */
+    Set<Class> getProviderClasses();
+    
+    /**
      * Get the map of features associated with the Web application.
      *
      * @return the features.
