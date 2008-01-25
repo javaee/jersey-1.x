@@ -1,19 +1,37 @@
 /*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
+ * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+ * 
+ * Copyright 2007 Sun Microsystems, Inc. All rights reserved. 
+ * 
+ * The contents of this file are subject to the terms of the Common Development
+ * and Distribution License("CDDL") (the "License").  You may not use this file
+ * except in compliance with the License. 
+ * 
+ * You can obtain a copy of the License at:
+ *     https://jersey.dev.java.net/license.txt
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ * When distributing the Covered Code, include this CDDL Header Notice in each
+ * file and include the License file at:
+ *     https://jersey.dev.java.net/license.txt
+ * If applicable, add the following below this CDDL Header, with the fields
+ * enclosed by brackets [] replaced by your own identifying information:
+ *     "Portions Copyrighted [year] [name of copyright owner]"
  */
 
 package com.sun.ws.rest.impl.application;
 
 import com.sun.ws.rest.impl.model.MediaTypeHelper;
 import com.sun.ws.rest.spi.container.MessageBodyContext;
-import com.sun.ws.rest.spi.service.ComponentProvider;
 import com.sun.ws.rest.spi.service.ServiceFinder;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.ws.rs.ConsumeMime;
@@ -27,44 +45,51 @@ import javax.ws.rs.ext.MessageBodyWriter;
  * @author Paul.Sandoz@Sun.Com
  */
 public final class MessageBodyFactory implements MessageBodyContext {
-    private static final ComponentProvider DEFAULT_COMPONENT_PROVIDER = new ComponentProvider() {
-        public Object provide(Class<?> c) throws InstantiationException, IllegalAccessException {
-            return c.newInstance();
-        }
-    };
-    
     private static final Logger LOGGER = Logger.getLogger(MessageBodyFactory.class.getName());
     
-    private final ComponentProvider componentProvider;
+    private final ComponentProviderCache componentProviderCache;
     
     private final Map<MediaType, List<MessageBodyReader>> readerProviders;
     
     private final Map<MediaType, List<MessageBodyWriter>> writerProviders;
     
-    public MessageBodyFactory() {
-        this(DEFAULT_COMPONENT_PROVIDER);
-    }
-    
-    public MessageBodyFactory(ComponentProvider componentProvider) {
-        this.componentProvider = componentProvider;
+    public MessageBodyFactory(ComponentProviderCache componentProviderCache) {
+        this.componentProviderCache = componentProviderCache;
         this.readerProviders = getProviderMap(MessageBodyReader.class, ConsumeMime.class);    
         this.writerProviders = getProviderMap(MessageBodyWriter.class, ProduceMime.class);
     }
                 
     private <T> Map<MediaType, List<T>> getProviderMap(
-            Class<T> c,
+            Class<T> serviceClass,
             Class<?> annotationClass) {
-        LOGGER.log(Level.CONFIG, "Searching for providers that implement: " + c);
+
+        // Get the application-defined provider classes that implement serviceClass
+        Set<Class> pcs =new LinkedHashSet<Class>(
+                componentProviderCache.getProviderClasses(serviceClass)); 
+        
+        // Get the service-defined provider classes that implement serviceClass
+        LOGGER.log(Level.CONFIG, "Searching for providers that implement: " + serviceClass);
+        Class<T>[] pca = ServiceFinder.find(serviceClass, true).toClassArray();
+        for (Class pc : pca)
+            LOGGER.log(Level.CONFIG, "    Provider found: " + pc);
+        
+        // Add service-defined providers to the set after application-defined
+        for (Class pc : pca)
+            pcs.add(pc);
+                        
         Map<MediaType, List<T>> s = new HashMap<MediaType, List<T>>();
-        for (T p : ServiceFinder.find(c, true, componentProvider)) {
-            LOGGER.log(Level.CONFIG, "    Provider found: " + p.getClass());
-            String values[] = getAnnotationValues(p.getClass(), annotationClass);
+        for (Class providerClass : pcs) {
+            T provider = serviceClass.cast(componentProviderCache.getComponent(providerClass));
+            
+            String values[] = getAnnotationValues(providerClass, annotationClass);
             if (values==null)
-                getClassCapability(s, p, MediaTypeHelper.GENERAL_MEDIA_TYPE);
+                getClassCapability(s, provider, MediaTypeHelper.GENERAL_MEDIA_TYPE);
             else
                 for (String type: values)
-                    getClassCapability(s, p, MediaType.parse(type));
-        }     
+                    getClassCapability(s, provider, MediaType.parse(type));
+            
+        }
+        
         return s;
     }
 

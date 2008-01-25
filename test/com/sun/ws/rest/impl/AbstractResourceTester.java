@@ -30,10 +30,13 @@ import com.sun.ws.rest.api.core.DefaultResourceConfig;
 import com.sun.ws.rest.impl.client.ResourceProxy;
 import com.sun.ws.rest.impl.client.ResourceProxyFilter;
 import com.sun.ws.rest.spi.container.WebApplication;
+import java.lang.annotation.Annotation;
 import java.net.URI;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
+import javax.ws.rs.Path;
+import javax.ws.rs.ext.Provider;
 import junit.framework.TestCase;
 
 /**
@@ -49,23 +52,28 @@ public abstract class AbstractResourceTester extends TestCase {
         super(testName);
     }
     
-    protected void initiateWebApplication(Class... resources) {
-        w = createWebApplication(resources);
+    protected void initiateWebApplication(Class... classes) {
+        w = createWebApplication(classes);
     }
     
     protected void initiateWebApplication(ResourceConfig c) {
         w = createWebApplication(c);
     }
     
-    protected WebApplication createWebApplication(Class... resources) {
-        return createWebApplication(new HashSet<Class>(Arrays.asList(resources)));
+    private WebApplication createWebApplication(Class... classes) {
+        return createWebApplication(new HashSet<Class>(Arrays.asList(classes)));
     }
     
-    protected WebApplication createWebApplication(Set<Class> resources) {
-        return createWebApplication(new DefaultResourceConfig(resources));
+    private WebApplication createWebApplication(Set<Class> classes) {
+        ResourceConfig rc = new DefaultResourceConfig(
+                getMatchingClasses(classes, Path.class));
+        rc.getProviderClasses().addAll(
+                getMatchingClasses(classes, Provider.class));
+        
+        return createWebApplication(rc);
     }
     
-    protected WebApplication createWebApplication(ResourceConfig c) {
+    private WebApplication createWebApplication(ResourceConfig c) {
         WebApplicationImpl a = new WebApplicationImpl();
         a.initiate(null, c);
         return a;
@@ -102,4 +110,23 @@ public abstract class AbstractResourceTester extends TestCase {
         
         return URI.create(baseUri.toString() + relativeUri);
     }
+    
+    private static Set<Class> getMatchingClasses(Set<Class> classes, Class... annotations) {
+        Set<Class> s = new HashSet<Class>();
+        for (Class c : classes) {
+            if (hasAnnotations(c, annotations))
+                s.add(c);
+        }
+        return s;
+    }
+    
+    @SuppressWarnings("unchecked")
+    private static boolean hasAnnotations(Class c, Class... annotations) {
+        Annotation[] _as = c.getAnnotations();
+        for (Class a : annotations) {
+            if (c.getAnnotation(a) == null) return false;
+        }
+        
+        return true;
+    }    
 }

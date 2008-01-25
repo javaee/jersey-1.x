@@ -27,7 +27,6 @@ import com.sun.ws.rest.api.core.ResourceConfig;
 import com.sun.ws.rest.impl.container.config.innerstatic.InnerStaticClass;
 import com.sun.ws.rest.impl.container.config.toplevel.PublicRootResourceClass;
 import com.sun.ws.rest.impl.container.config.toplevelinnerstatic.PublicRootResourceInnerStaticClass;
-import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.net.URL;

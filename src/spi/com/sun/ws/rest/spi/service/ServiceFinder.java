@@ -131,7 +131,7 @@ public final class ServiceFinder<T> implements Iterable<T> {
     private static final String prefix = "META-INF/services/";
     
     private static final ComponentProvider DEFAULT_COMPONENT_PROVIDER = new ComponentProvider() {
-        public Object provide(Class<?> c) throws InstantiationException, IllegalAccessException {
+        public Object provide(Class c) throws InstantiationException, IllegalAccessException {
             return c.newInstance();
         }
     };
@@ -311,7 +311,21 @@ public final class ServiceFinder<T> implements Iterable<T> {
      *         be found and instantiated.
      */
     public Iterator<T> iterator() {
-        return new LazyIterator<T>(serviceClass,classLoader,
+        return new LazyObjectIterator<T>(serviceClass,classLoader,
+                ignoreOnClassNotFound, componentProvider);
+    }
+    
+    /**
+     * Returns discovered classes incrementally.
+     *
+     * @return An <tt>Iterator</tt> that yields provider classes for the given
+     *         service, in some arbitrary order.  The iterator will throw a
+     *         <tt>ServiceConfigurationError</tt> if a provider-configuration
+     *         file violates the specified format or if a provider class cannot
+     *         be found.
+     */
+    public Iterator<Class<T>> classIterator() {
+        return new LazyClassIterator<T>(serviceClass,classLoader,
                 ignoreOnClassNotFound, componentProvider);
     }
     
@@ -331,6 +345,25 @@ public final class ServiceFinder<T> implements Iterable<T> {
             result.add(t);
         }
         return result.toArray((T[])Array.newInstance(serviceClass,result.size()));
+    }
+    
+    /**
+     * Returns discovered classes all at once.
+     *
+     * @return
+     *      can be empty but never null.
+     *
+     * @throws ServiceConfigurationError If a provider-configuration file violates the specified format
+     *                                   or names a provider class that cannot be found
+     */
+    @SuppressWarnings("unchecked")
+    public Class<T>[] toClassArray() throws ServiceConfigurationError {
+        List<Class<T>> result = new ArrayList<Class<T>>();
+        
+        Iterator<Class<T>> i = classIterator();
+        while (i.hasNext())
+            result.add(i.next());
+        return result.toArray((Class<T>[])Array.newInstance(Class.class,result.size()));
     }
     
     private static void fail(Class service, String msg, Throwable cause)
@@ -425,11 +458,7 @@ public final class ServiceFinder<T> implements Iterable<T> {
         return names.iterator();
     }
     
-    
-    /**
-     * Private inner class implementing fully-lazy provider lookup
-     */
-    private static class LazyIterator<T> implements Iterator<T> {
+    private static class AbstractLazyIterator<T> {
         final Class<T> service;
         final ClassLoader loader;
         final boolean ignoreOnClassNotFound;
@@ -440,7 +469,7 @@ public final class ServiceFinder<T> implements Iterable<T> {
         Set<String> returned = new TreeSet<String>();
         String nextName = null;
         
-        private LazyIterator(Class<T> service, ClassLoader loader, 
+        private AbstractLazyIterator(Class<T> service, ClassLoader loader, 
                 boolean ignoreOnClassNotFound, ComponentProvider componentProvider) {
             this.service = service;
             this.loader = loader;
@@ -498,7 +527,54 @@ public final class ServiceFinder<T> implements Iterable<T> {
             return true;
         }
         
-        public T next() throws ServiceConfigurationError {
+        public void remove() {
+            throw new UnsupportedOperationException();
+        }        
+    }
+    
+    private static final class LazyClassIterator<T> extends AbstractLazyIterator<T> 
+            implements Iterator<Class<T>> {
+
+        private LazyClassIterator(Class<T> service, ClassLoader loader, 
+                boolean ignoreOnClassNotFound, ComponentProvider componentProvider) {
+            super(service, loader, ignoreOnClassNotFound, componentProvider);
+        }
+        
+        @SuppressWarnings("unchecked")
+        public Class<T> next() {
+            if (!hasNext()) {
+                throw new NoSuchElementException();
+            }
+            String cn = nextName;
+            nextName = null;
+            try {
+                return (Class<T>)Class.forName(cn, true, loader);
+            } catch (ClassNotFoundException ex) {
+                fail(service, 
+                        SpiMessages.PROVIDER_NOT_FOUND(cn, service));
+            } catch (NoClassDefFoundError ex) {
+                fail(service,
+                        SpiMessages.DEPENDENT_CLASS_OF_PROVIDER_NOT_FOUND(
+                        ex.getLocalizedMessage(), cn, service));
+            } catch (Exception x) {
+                fail(service,
+                        SpiMessages.PROVIDER_CLASS_COULD_NOT_BE_LOADED(cn, service, x.getLocalizedMessage()),
+                        x);
+            }
+            
+            return null;    /* This cannot happen */
+        }
+    }
+    
+    private static final class LazyObjectIterator<T> extends AbstractLazyIterator<T> 
+            implements Iterator<T> {
+
+        private LazyObjectIterator(Class<T> service, ClassLoader loader, 
+                boolean ignoreOnClassNotFound, ComponentProvider componentProvider) {
+            super(service, loader, ignoreOnClassNotFound, componentProvider);
+        }
+        
+        public T next() {
             if (!hasNext()) {
                 throw new NoSuchElementException();
             }
@@ -515,10 +591,6 @@ public final class ServiceFinder<T> implements Iterable<T> {
                         x);
             }
             return null;    /* This cannot happen */
-        }
-        
-        public void remove() {
-            throw new UnsupportedOperationException();
         }
     }
 }

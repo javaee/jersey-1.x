@@ -78,14 +78,15 @@ public final class PackagesResourceConfig extends DefaultResourceConfig {
     private void init(String[] packages) {
         if (LOGGER.isLoggable(Level.INFO)) {
             StringBuilder b = new StringBuilder();
-            b.append("Scanning for root resource classes in the packages:");
+            b.append("Scanning for root resource and provider classes in the packages:");
             for (String p : packages)
                 b.append('\n').append("  ").append(p);
             
             LOGGER.log(Level.INFO, b.toString());
         }
         
-        AnnotatedClassScanner scanner = new AnnotatedClassScanner(Path.class);
+        AnnotatedClassScanner scanner = new AnnotatedClassScanner(
+                Path.class, Provider.class);
         scanner.scan(packages);        
         
         getResourceClasses().addAll(scanner.getMatchingClasses(Path.class));
@@ -98,6 +99,13 @@ public final class PackagesResourceConfig extends DefaultResourceConfig {
                 b.append('\n').append("  ").append(c);
             
             LOGGER.log(Level.INFO, b.toString());
+            
+            b = new StringBuilder();
+            b.append("Provider classes found:");
+            for (Class c : getProviderClasses())
+                b.append('\n').append("  ").append(c);
+            
+            LOGGER.log(Level.INFO, b.toString());            
         }
     }
     

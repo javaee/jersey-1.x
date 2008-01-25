@@ -37,6 +37,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.ProduceMime;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
+import javax.ws.rs.ext.Provider;
 
 /**
  *
@@ -69,6 +70,7 @@ public class BeanStreamingTest extends AbstractResourceTester {
         public void setReal(float real) { this.real = real; }    
     }
 
+    @Provider
     @ProduceMime("application/bean")
     @ConsumeMime("application/bean")
     public static class BeanProvider extends AbstractTypeEntityProvider<Bean> {
@@ -97,6 +99,7 @@ public class BeanStreamingTest extends AbstractResourceTester {
         }
     }
     
+    @Provider
     @ProduceMime("application/*")
     @ConsumeMime("application/*")
     public static class BeanWildProvider extends BeanProvider {
@@ -106,6 +109,7 @@ public class BeanStreamingTest extends AbstractResourceTester {
         }
     }
     
+    @Provider
     @ProduceMime("application/bean")
     @ConsumeMime("application/bean")
     public static class Bean2Provider extends AbstractTypeEntityProvider<Bean2> {
@@ -134,6 +138,7 @@ public class BeanStreamingTest extends AbstractResourceTester {
         }
     }
     
+    @Provider
     @ProduceMime("application/*")
     @ConsumeMime("application/*")
     public static class Bean2WildProvider extends Bean2Provider {
@@ -218,7 +223,11 @@ public class BeanStreamingTest extends AbstractResourceTester {
     }
     
     public void testBean() throws Exception {
-        initiateWebApplication(BeanResource.class, BeanTextPlainResource.class);
+        initiateWebApplication(
+                BeanProvider.class, BeanWildProvider.class, 
+                Bean2Provider.class,
+                Bean2WildProvider.class, 
+                BeanResource.class, BeanTextPlainResource.class);
                 
         Bean b = new Bean("bean", 123, 3.1415f);        
         
@@ -237,7 +246,11 @@ public class BeanStreamingTest extends AbstractResourceTester {
     }
     
     public void testBeanWild() throws Exception {
-        initiateWebApplication(BeanWildResource.class);
+        initiateWebApplication(
+                BeanProvider.class, BeanWildProvider.class, 
+                Bean2Provider.class,
+                Bean2WildProvider.class, 
+                BeanWildResource.class);
         
         Bean b = new Bean("bean", 123, 3.1415f);
         
@@ -249,7 +262,11 @@ public class BeanStreamingTest extends AbstractResourceTester {
     
     
     public void testBean2() throws Exception {
-        initiateWebApplication(Bean2Resource.class, Bean2TextPlainResource.class);
+        initiateWebApplication(
+                BeanProvider.class, BeanWildProvider.class, 
+                Bean2Provider.class,
+                Bean2WildProvider.class, 
+                Bean2Resource.class, Bean2TextPlainResource.class);
                 
         Bean2 b = new Bean2("bean", 123, 3.1415f);        
         
@@ -266,7 +283,11 @@ public class BeanStreamingTest extends AbstractResourceTester {
     }
     
     public void testBean2UsingBean() throws Exception {
-        initiateWebApplication(BeanResource.class, BeanTextPlainResource.class);
+        initiateWebApplication(
+                BeanProvider.class, BeanWildProvider.class, 
+                Bean2Provider.class,
+                Bean2WildProvider.class, 
+                BeanResource.class, BeanTextPlainResource.class);
                 
         Bean2 b = new Bean2("bean", 123, 3.1415f);        
         
@@ -285,7 +306,11 @@ public class BeanStreamingTest extends AbstractResourceTester {
     }
 
     public void testBean2Wild() throws Exception {
-        initiateWebApplication(Bean2WildResource.class);
+        initiateWebApplication(
+                BeanProvider.class, BeanWildProvider.class, 
+                Bean2Provider.class,
+                Bean2WildProvider.class, 
+                Bean2WildResource.class);
         
         Bean2 b = new Bean2("bean", 123, 3.1415f);
         
@@ -296,7 +321,11 @@ public class BeanStreamingTest extends AbstractResourceTester {
     }
     
     public void testBean2WildUsingBean() throws Exception {
-        initiateWebApplication(BeanWildResource.class);
+        initiateWebApplication(
+                BeanProvider.class, BeanWildProvider.class, 
+                Bean2Provider.class,
+                Bean2WildProvider.class, 
+                BeanWildResource.class);
         
         Bean2 b = new Bean2("bean", 123, 3.1415f);
         

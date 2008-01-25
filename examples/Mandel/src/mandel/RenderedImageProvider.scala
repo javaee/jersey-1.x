@@ -7,6 +7,7 @@ import javax.ws.rs._
 import javax.ws.rs.core._
 import javax.ws.rs.ext._
 
+@Provider
 class RenderedImageProvider extends MessageBodyWriter {
     def isWriteable(t: Class) : boolean = {
         classOf[RenderedImage].isAssignableFrom(t)

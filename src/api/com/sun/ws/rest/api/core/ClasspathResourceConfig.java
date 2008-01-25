@@ -92,14 +92,15 @@ public final class ClasspathResourceConfig extends DefaultResourceConfig {
 
         if (LOGGER.isLoggable(Level.INFO)) {
             StringBuilder b = new StringBuilder();
-            b.append("Scanning for root resource classes in the paths:");
+            b.append("Scanning for root resource and provider classes in the paths:");
             for (String p : paths)
                 b.append('\n').append("  ").append(p);
             
-            LOGGER.log(Level.INFO, b.toString());
+            LOGGER.log(Level.INFO, b.toString());            
         }
         
-        AnnotatedClassScanner scanner = new AnnotatedClassScanner(Path.class);
+        AnnotatedClassScanner scanner = new AnnotatedClassScanner(
+                Path.class, Provider.class);
         scanner.scan(roots);
 
         getResourceClasses().addAll(scanner.getMatchingClasses(Path.class));
@@ -112,6 +113,13 @@ public final class ClasspathResourceConfig extends DefaultResourceConfig {
                 b.append('\n').append("  ").append(c);
             
             LOGGER.log(Level.INFO, b.toString());
+            
+            b = new StringBuilder();
+            b.append("Provider classes found:");
+            for (Class c : getProviderClasses())
+                b.append('\n').append("  ").append(c);
+            
+            LOGGER.log(Level.INFO, b.toString());            
         }
     }
     

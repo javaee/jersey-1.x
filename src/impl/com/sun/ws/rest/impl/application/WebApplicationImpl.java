@@ -66,6 +66,7 @@ import java.net.URI;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -81,6 +82,7 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 import javax.ws.rs.ext.MessageBodyReader;
 import javax.ws.rs.ext.MessageBodyWriter;
+import javax.ws.rs.ext.Provider;
 
 /**
  * A Web application that contains a set of resources, each referenced by 
@@ -212,7 +214,7 @@ public final class WebApplicationImpl implements ComponentProvider, WebApplicati
     
     // ComponentProvider
     
-    public Object provide(Class<?> c) throws InstantiationException, IllegalAccessException {
+    public Object provide(Class c) throws InstantiationException, IllegalAccessException {
         Object o = c.newInstance();
         injectResources(o);
         return o;
@@ -229,13 +231,16 @@ public final class WebApplicationImpl implements ComponentProvider, WebApplicati
         this.initiated = true;
         
         this.resourceConfig = resourceConfig;
-                
+        verifyResourceConfig();
+
         this.containerMomento = containerMomento;
         
         this.rootsRule = new RootResourceClassesRule(
             processRootResources(resourceConfig.getResourceClasses()));
         
-        this.bodyContext = new MessageBodyFactory(this);
+        ComponentProviderCache cpc = new ComponentProviderCache(this, 
+                resourceConfig.getProviderClasses());
+        this.bodyContext = new MessageBodyFactory(cpc);
     }
 
     public void handleRequest(ContainerRequest request, ContainerResponse response) {
@@ -300,6 +305,19 @@ public final class WebApplicationImpl implements ComponentProvider, WebApplicati
     
     // 
 
+    private void verifyResourceConfig() {
+        Iterator<Class> i = resourceConfig.getProviderClasses().iterator();
+        while (i.hasNext()) {
+            Class<?> pc = i.next();
+            if (!pc.isAnnotationPresent(Provider.class)) {
+                LOGGER.warning("The class, " + pc + ", registered as a provider class " + 
+                        "of the ResourceConfig is not annotationed with " + Provider.class +  
+                        ". This class will be ignored");
+                i.remove();
+            }
+        }
+    }
+    
     private RulesMap<UriRule> processRootResources(Set<Class> classes) {
         if (classes.isEmpty()) {
             LOGGER.severe(ImplMessages.NO_ROOT_RES_IN_RES_CFG());
@@ -312,7 +330,9 @@ public final class WebApplicationImpl implements ComponentProvider, WebApplicati
         for (Class<?> c : classes) {
             AbstractResource ar = getAbstractResource(c);
             if (!ar.isRootResource()) {
-                // TODO log warning
+                LOGGER.warning("The class, " + c + ", registered as a root resource class " + 
+                        "of the ResourceConfig is not a root resource class" +  
+                        ". This class will be ignored");
                 continue;   
             }
             

@@ -38,6 +38,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
+import javax.ws.rs.ext.Provider;
 
 /**
  *
@@ -58,6 +59,7 @@ public class InjectedProviderTest extends AbstractResourceTester {
         public void setString(String string) { this.string = string; }
     }
 
+    @Provider
     public static class InjectedBeanProvider extends AbstractTypeEntityProvider<Bean> {
         @HttpContext UriInfo uriInfo;
         
@@ -99,7 +101,7 @@ public class InjectedProviderTest extends AbstractResourceTester {
     }
     
     public void testBean() throws Exception {
-        initiateWebApplication(BeanResource.class);
+        initiateWebApplication(BeanResource.class, InjectedBeanProvider.class);
                 
         ResourceProxy r = resourceProxy("/one/two/three");
         Bean b = r.get(Bean.class);
