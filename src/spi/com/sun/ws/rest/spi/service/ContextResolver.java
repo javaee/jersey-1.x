@@ -19,13 +19,12 @@
  * enclosed by brackets [] replaced by your own identifying information:
  *     "Portions Copyrighted [year] [name of copyright owner]"
  */
-
 package com.sun.ws.rest.spi.service;
 
 /**
  *
  * @author Paul.Sandoz@Sun.Com
  */
-public interface ComponentProvider {
-    Object provide(Class c) throws InstantiationException, IllegalAccessException;
+public interface ContextResolver<T> {
+    T getContext(Class<?> objectType);
 }

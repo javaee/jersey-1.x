@@ -25,6 +25,7 @@ package com.sun.ws.rest.spi.container;
 import com.sun.ws.rest.api.container.ContainerException;
 import com.sun.ws.rest.api.core.ResourceConfig;
 import com.sun.ws.rest.spi.resource.Injectable;
+import java.lang.reflect.Type;
 
 /**
  * A Web application that manages a set of Web resource.
@@ -65,8 +66,8 @@ public interface WebApplication extends MessageBodyContext {
      * Add an injectable resource to the set maintained by the application.
      * The fieldType is used as a unique key and therefore adding an injectable
      * for a type already supported will override the existing one.
-     * @param fieldType the class of the field that will be injected
+     * @param fieldType the type of the field that will be injected
      * @param injectable the injectable for the field
      */
-    void addInjectable(Class fieldType, Injectable injectable);
+    void addInjectable(Type fieldType, Injectable injectable);
 }

@@ -62,6 +62,7 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.lang.reflect.Field;
 import java.lang.reflect.Proxy;
+import java.lang.reflect.Type;
 import java.net.URI;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -106,7 +107,7 @@ public final class WebApplicationImpl implements ComponentProvider, WebApplicati
     
     private final Request requestProxy;
     
-    private final Map<Class<?>, Injectable> injectables;
+    private final Map<Type, Injectable> injectables;
             
     private boolean initiated;
     
@@ -203,7 +204,7 @@ public final class WebApplicationImpl implements ComponentProvider, WebApplicati
     private void injectResources(Class oClass, Object o) {
         while (oClass != null) {
             for (Field f : oClass.getDeclaredFields()) {            
-                Injectable i = injectables.get(f.getType());
+                Injectable i = injectables.get(f.getGenericType());
                 if (i != null)
                     i.inject(o, f);
             }
@@ -279,7 +280,7 @@ public final class WebApplicationImpl implements ComponentProvider, WebApplicati
         }
     }
     
-    public void addInjectable(Class fieldType, Injectable injectable) {
+    public void addInjectable(Type fieldType, Injectable injectable) {
         injectables.put(fieldType, injectable);
     }
     
@@ -415,8 +416,8 @@ public final class WebApplicationImpl implements ComponentProvider, WebApplicati
         }
     }
     
-    private Map<Class<?>, Injectable> createInjectables() {
-        Map<Class<?>, Injectable> injectables = new HashMap<Class<?>, Injectable>();
+    private Map<Type, Injectable> createInjectables() {
+        Map<Type, Injectable> injectables = new HashMap<Type, Injectable>();
                 
         injectables.put(HttpContextAccess.class,
                 new HttpContextInjectable<HttpContextAccess>() {
