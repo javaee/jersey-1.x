@@ -23,7 +23,6 @@
 package com.sun.ws.rest.samples.storageservice;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.ListIterator;
 import javax.xml.bind.annotation.XmlRootElement;

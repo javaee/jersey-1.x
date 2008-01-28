@@ -422,9 +422,17 @@ public final class WebApplicationImpl implements ComponentProvider, WebApplicati
     }
     
     private Map<Type, Injectable> createInjectables() {
-        Map<Type, Injectable> injectables = new HashMap<Type, Injectable>();
+        Map<Type, Injectable> is = new HashMap<Type, Injectable>();
                 
-        injectables.put(HttpContextAccess.class,
+        is.put(MessageBodyContext.class,
+                new HttpContextInjectable<MessageBodyContext>() {
+                    public MessageBodyContext getInjectableValue(HttpContext c) {
+                        return bodyContext;
+                    }
+                }
+            );
+            
+        is.put(HttpContextAccess.class,
                 new HttpContextInjectable<HttpContextAccess>() {
                     public HttpContextAccess getInjectableValue(HttpContext c) {
                         return context;
@@ -432,7 +440,7 @@ public final class WebApplicationImpl implements ComponentProvider, WebApplicati
                 }
             );
         
-        injectables.put(HttpHeaders.class,
+        is.put(HttpHeaders.class,
                 new HttpContextInjectable<HttpHeaders>() {
                     public HttpHeaders getInjectableValue(HttpContext c) {
                         return httpHeadersProxy;
@@ -440,7 +448,7 @@ public final class WebApplicationImpl implements ComponentProvider, WebApplicati
                 }
             );
             
-        injectables.put(UriInfo.class,
+        is.put(UriInfo.class,
                 new HttpContextInjectable<UriInfo>() {
                     public UriInfo getInjectableValue(HttpContext c) {
                         return uriInfoProxy;
@@ -448,7 +456,7 @@ public final class WebApplicationImpl implements ComponentProvider, WebApplicati
                 }
             );
             
-        injectables.put(Request.class,
+        is.put(Request.class,
                 new HttpContextInjectable<Request>() {
                     public Request getInjectableValue(HttpContext c) {
                         return requestProxy;
@@ -456,7 +464,7 @@ public final class WebApplicationImpl implements ComponentProvider, WebApplicati
                 }
             );
 
-        return injectables;
+        return is;
     }
 
 

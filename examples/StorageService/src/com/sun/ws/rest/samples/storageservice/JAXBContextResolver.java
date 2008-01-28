@@ -22,25 +22,33 @@
 
 package com.sun.ws.rest.samples.storageservice;
 
-import java.util.List;
-import javax.xml.bind.annotation.XmlRootElement;
+import com.sun.ws.rest.spi.service.ContextResolver;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
+import javax.ws.rs.ext.Provider;
+import javax.xml.bind.JAXBContext;
 
-@XmlRootElement
-public class Containers {
-    private List<Container> container;
+/**
+ *
+ * @author Paul.Sandoz@Sun.Com
+ */
+@Provider
+public final class JAXBContextResolver implements ContextResolver<JAXBContext> {
     
-    public Containers() {
+    private final JAXBContext context;
+    
+    private final Set<Class> types;
+    
+    private final Class[] cTypes = {Containers.class, Container.class, 
+                Item.class};
+    
+    public JAXBContextResolver() throws Exception {
+        this.types = new HashSet(Arrays.asList(cTypes));
+        this.context = JAXBContext.newInstance(cTypes);
     }
     
-    public Containers(List<Container> container) {
-        setContainer(container);
-    }
-
-    public List<Container> getContainer() {
-        return container;
-    }
-
-    public void setContainer(List<Container> container) {
-        this.container = container;
+    public JAXBContext getContext(Class<?> objectType) {
+        return (types.contains(objectType)) ? context : null;
     }
 }

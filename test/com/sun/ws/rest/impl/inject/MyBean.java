@@ -20,27 +20,30 @@
  *     "Portions Copyrighted [year] [name of copyright owner]"
  */
 
-package com.sun.ws.rest.samples.storageservice;
+package com.sun.ws.rest.impl.inject;
 
-import java.util.List;
 import javax.xml.bind.annotation.XmlRootElement;
 
+/**
+ *
+ * @author Doug Kohlert
+ */
 @XmlRootElement
-public class Containers {
-    private List<Container> container;
+public class MyBean {
     
-    public Containers() {
+    public String value; 
+    public MyBean() {}
+    public MyBean(String str) {
+        value = str;
     }
     
-    public Containers(List<Container> container) {
-        setContainer(container);
+    public boolean equals(Object o) {
+        if (!(o instanceof MyBean)) 
+            return false;
+        return ((MyBean) o).value.equals(value);
     }
-
-    public List<Container> getContainer() {
-        return container;
-    }
-
-    public void setContainer(List<Container> container) {
-        this.container = container;
+    
+    public String toString() {
+        return "JAXBClass: "+value;
     }
 }

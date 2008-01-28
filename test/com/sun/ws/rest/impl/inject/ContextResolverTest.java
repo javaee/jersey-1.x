@@ -67,7 +67,17 @@ public class ContextResolverTest extends AbstractResourceTester {
     }
     
     @Path("/")
-    public static class WebResource {
+    public static class NullContextResource {
+        @HttpContext ContextResolver<String> cr;
+        
+        @GET
+        public String get() {
+            return (cr == null) ? "null" : "value";
+        }   
+    }
+    
+    @Path("/")
+    public static class ContextResource {
         
         @HttpContext ContextResolver<String> cr;
         
@@ -88,9 +98,15 @@ public class ContextResolverTest extends AbstractResourceTester {
         }        
     }
     
-    public void _testOne() throws IOException {
-        initiateWebApplication(WebResource.class, IntegerContextResolver.class);
+    public void testZero() throws IOException {
+        initiateWebApplication(NullContextResource.class);
         ResourceProxy r = resourceProxy("/");
+        
+        assertEquals("null", resourceProxy("/").get(String.class));
+    }
+    
+    public void testOne() throws IOException {
+        initiateWebApplication(ContextResource.class, IntegerContextResolver.class);
         
         assertEquals("java.lang.Integer", resourceProxy("/").get(String.class));        
         
@@ -98,7 +114,7 @@ public class ContextResolverTest extends AbstractResourceTester {
     }   
     
     public void testTwo() throws IOException {
-        initiateWebApplication(WebResource.class, IntegerContextResolver.class, 
+        initiateWebApplication(ContextResource.class, IntegerContextResolver.class, 
                 BigIntegerContextResolver.class);
         
         assertEquals("java.lang.Integer", resourceProxy("/").get(String.class));        

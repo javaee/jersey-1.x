@@ -27,12 +27,15 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.logging.Logger;
 
 /**
  *
  * @author Paul.Sandoz@Sun.Com
  */
 public class ComponentProviderCache {
+    private static final Logger LOGGER = Logger.getLogger(ComponentProviderCache.class.getName());
+    
     private final ComponentProvider componentProvider;
     
     private final Set<Class> providers;

@@ -23,7 +23,6 @@
 package com.sun.ws.rest.samples.storageservice;
 
 import java.util.GregorianCalendar;
-import javax.ws.rs.core.MediaType;
 import javax.xml.bind.annotation.XmlRootElement;
 
 @XmlRootElement
