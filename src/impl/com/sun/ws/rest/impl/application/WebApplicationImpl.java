@@ -236,15 +236,28 @@ public final class WebApplicationImpl implements ComponentProvider, WebApplicati
 
         this.containerMomento = containerMomento;
 
-                
+        
+        // Allow injection of resource config
+        this.injectables.put(ResourceConfig.class,
+                new HttpContextInjectable<ResourceConfig>() {
+                    public ResourceConfig getInjectableValue(HttpContext c) {
+                        return WebApplicationImpl.this.resourceConfig;
+                    }
+                }
+            );            
+
+        // Create the component provider cache
         ComponentProviderCache cpc = new ComponentProviderCache(this, 
                 resourceConfig.getProviderClasses());
 
+        // Obtain all context resolvers
         ContextResolverFactory crf = new ContextResolverFactory(cpc);
         this.injectables.putAll(crf.getInjectables());
-        
+
+        // Obtain all message body readers/writers
         this.bodyContext = new MessageBodyFactory(cpc);
         
+        // Obtain all root resources
         this.rootsRule = new RootResourceClassesRule(
             processRootResources(resourceConfig.getResourceClasses()));        
     }

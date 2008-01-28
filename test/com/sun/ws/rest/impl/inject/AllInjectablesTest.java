@@ -23,6 +23,7 @@
 package com.sun.ws.rest.impl.inject;
 
 import com.sun.ws.rest.api.core.HttpContextAccess;
+import com.sun.ws.rest.api.core.ResourceConfig;
 import com.sun.ws.rest.impl.AbstractResourceTester;
 import com.sun.ws.rest.spi.container.MessageBodyContext;
 import java.io.IOException;
@@ -45,6 +46,8 @@ public class AllInjectablesTest extends AbstractResourceTester {
 
     @Path("/")
     public static class ContextResource {
+        @HttpContext ResourceConfig rc;
+        
         @HttpContext MessageBodyContext mbc;
         
         @HttpContext HttpContextAccess hca;
@@ -57,6 +60,7 @@ public class AllInjectablesTest extends AbstractResourceTester {
         
         @GET
         public String get() {
+            assertNotNull(rc);
             assertNotNull(mbc);
             assertNotNull(hca);
             assertNotNull(hs);
