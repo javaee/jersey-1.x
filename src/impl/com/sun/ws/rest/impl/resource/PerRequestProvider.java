@@ -20,15 +20,6 @@
  *     "Portions Copyrighted [year] [name of copyright owner]"
  */
 
-/*
- * PerRequestProvider.java
- *
- * Created on August 2, 2007, 12:50 PM
- *
- * To change this template, choose Tools | Template Manager
- * and open the template in the editor.
- */
-
 package com.sun.ws.rest.impl.resource;
 
 import com.sun.ws.rest.api.container.ContainerException;
@@ -36,7 +27,6 @@ import com.sun.ws.rest.api.model.AbstractResource;
 import com.sun.ws.rest.api.model.AbstractResourceConstructor;
 import com.sun.ws.rest.spi.resource.ResourceProvider;
 import com.sun.ws.rest.spi.resource.ResourceProviderContext;
-import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Map;
 
@@ -44,31 +34,32 @@ import java.util.Map;
  *
  * @author mh124079
  */
-public class PerRequestProvider  implements ResourceProvider {
+public final class PerRequestProvider  implements ResourceProvider {
 
-    private AbstractResource abstractResource;
+    private Class c;
+    private AbstractResourceConstructor ctor;
     
     public void init(AbstractResource abstractResource,
             Map<String, Boolean> resourceFeatures,
             Map<String, Object> resourceProperties) {
-        this.abstractResource = abstractResource;
+        this.c = abstractResource.getResourceClass();
+        // TODO select the most appropriate constructor 
+        // instead of just picking up the first one
+        this.ctor = (abstractResource.getConstructors().isEmpty()) 
+                ? null : abstractResource.getConstructors().get(0);
     }
 
     public Object getInstance(ResourceProviderContext context) {
+        final Object resource = getResource(context);
+        context.injectDependencies(resource);
+        return resource;
+    }
+    
+    private Object getResource(ResourceProviderContext context) {
         try {
-            Object resource = null;
-            // TODO select the most appropriate constructor instead of just picking up the first one
-            
-            if ((null == abstractResource.getConstructors()) || abstractResource.getConstructors().isEmpty())
-                resource = abstractResource.getResourceClass().newInstance();
-            else {
-                // take the first constructor
-                AbstractResourceConstructor arCtor = this.abstractResource.getConstructors().get(0);
-                Object[] params = context.getParameterValues(arCtor);
-                resource = arCtor.getCtor().newInstance(params);
-            }
-            context.injectDependencies(resource);
-            return resource;
+            return (ctor == null)
+                ? c.newInstance()
+                : ctor.getCtor().newInstance(context.getParameterValues(ctor));
         } catch (InstantiationException ex) {
             throw new ContainerException("Unable to create resource", ex);
         } catch (IllegalAccessException ex) {
@@ -83,6 +74,6 @@ public class PerRequestProvider  implements ResourceProvider {
                 // WebApplicationException ?
                 throw new ContainerException("Unable to create resource", t);
             }
-        }
+        }        
     }
 }

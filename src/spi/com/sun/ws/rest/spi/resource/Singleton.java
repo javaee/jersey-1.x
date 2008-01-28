@@ -20,13 +20,6 @@
  *     "Portions Copyrighted [year] [name of copyright owner]"
  */
 
-/*
- * Singleton.java
- *
- * Created on August 3, 2007, 3:01 PM
- *
- */
-
 package com.sun.ws.rest.spi.resource;
 
 import com.sun.ws.rest.impl.resource.SingletonProvider;

@@ -33,10 +33,10 @@ import com.sun.ws.rest.api.model.AbstractResourceConstructor;
 public interface ResourceProviderContext {
     /**
      * Inject dependencies into a newly instantiated resource class instance.
-     * Only dependencies defined by JAX-RS will be injected, unknown
-     * dependencies will be ignored.
+     * Only dependencies defined by JAX-RS implementation and that of the 
+     * application and will be injected, unknown dependencies will be ignored.
      * 
-     * @param resource the  newly instantiated resource class instance
+     * @param resource the newly instantiated resource class instance
      * @throws ContainerException if an error occurs during dependency injection.
      */
     void injectDependencies(Object resource) throws ContainerException;

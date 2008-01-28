@@ -238,13 +238,13 @@ public final class WebApplicationImpl implements ComponentProvider, WebApplicati
 
         
         // Allow injection of resource config
-        this.injectables.put(ResourceConfig.class,
+        addInjectable(ResourceConfig.class,
                 new HttpContextInjectable<ResourceConfig>() {
                     public ResourceConfig getInjectableValue(HttpContext c) {
                         return WebApplicationImpl.this.resourceConfig;
                     }
                 }
-            );            
+            );
 
         // Create the component provider cache
         ComponentProviderCache cpc = new ComponentProviderCache(this, 
@@ -259,7 +259,7 @@ public final class WebApplicationImpl implements ComponentProvider, WebApplicati
         
         // Obtain all root resources
         this.rootsRule = new RootResourceClassesRule(
-            processRootResources(resourceConfig.getResourceClasses()));        
+            processRootResources(resourceConfig.getResourceClasses()));
     }
 
     public void handleRequest(ContainerRequest request, ContainerResponse response) {

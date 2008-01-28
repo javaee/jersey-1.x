@@ -20,13 +20,6 @@
  *     "Portions Copyrighted [year] [name of copyright owner]"
  */
 
-/*
- * PerRequest.java
- *
- * Created on August 3, 2007, 3:09 PM
- *
- */
-
 package com.sun.ws.rest.spi.resource;
 
 import com.sun.ws.rest.impl.resource.PerRequestProvider;

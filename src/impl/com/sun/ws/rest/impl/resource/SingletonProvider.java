@@ -31,16 +31,16 @@ import java.util.Map;
 /**
  * A simple provider that maintains a singleton resource class instance
  */
-public class SingletonProvider implements ResourceProvider {
+public final class SingletonProvider implements ResourceProvider {
 
-    private AbstractResource abstractResource;
+    private Class c;
     
     private Object resource;
     
     public void init(AbstractResource abstractResource,
             Map<String, Boolean> resourceFeatures,
             Map<String, Object> resourceProperties) {
-        this.abstractResource = abstractResource;
+        this.c = abstractResource.getResourceClass();
     }
 
     public Object getInstance(ResourceProviderContext context) {
@@ -48,7 +48,7 @@ public class SingletonProvider implements ResourceProvider {
             return resource;
 
         try {
-            resource = abstractResource.getResourceClass().newInstance();
+            resource = c.newInstance();
             context.injectDependencies(resource);
             return resource;
         } catch (InstantiationException ex) {

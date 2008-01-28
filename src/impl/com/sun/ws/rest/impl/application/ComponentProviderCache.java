@@ -67,7 +67,7 @@ public class ComponentProviderCache {
             o = componentProvider.provide(provider);
         } catch (Exception ex) {
             // TODO message
-            throw new IllegalArgumentException("The provide class, " + provider + 
+            throw new IllegalArgumentException("The provider class, " + provider + 
                     ", could not be instantiated", 
                     ex);
         }

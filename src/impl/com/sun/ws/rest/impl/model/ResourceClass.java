@@ -79,7 +79,8 @@ public final class ResourceClass {
 
         this.config = config;
 
-        this.resolver = resolverFactory.createProvider(resource, config.getFeatures(), config.getProperties());
+        this.resolver = resolverFactory.createProvider(resource, 
+                config.getFeatures(), config.getProperties());
 
         boolean hasSubResourcesAux = false;
 
