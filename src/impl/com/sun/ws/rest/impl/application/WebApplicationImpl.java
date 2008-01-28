@@ -235,13 +235,18 @@ public final class WebApplicationImpl implements ComponentProvider, WebApplicati
         verifyResourceConfig();
 
         this.containerMomento = containerMomento;
-        
-        this.rootsRule = new RootResourceClassesRule(
-            processRootResources(resourceConfig.getResourceClasses()));
-        
+
+                
         ComponentProviderCache cpc = new ComponentProviderCache(this, 
                 resourceConfig.getProviderClasses());
+
+        ContextResolverFactory crf = new ContextResolverFactory(cpc);
+        this.injectables.putAll(crf.getInjectables());
+        
         this.bodyContext = new MessageBodyFactory(cpc);
+        
+        this.rootsRule = new RootResourceClassesRule(
+            processRootResources(resourceConfig.getResourceClasses()));        
     }
 
     public void handleRequest(ContainerRequest request, ContainerResponse response) {
