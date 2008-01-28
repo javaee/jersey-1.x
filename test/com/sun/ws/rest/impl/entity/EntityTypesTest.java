@@ -144,7 +144,7 @@ public class EntityTypesTest extends AbstractTypeTester {
     @Path("/")
     public static class JSONOArrayResource extends AResource<JSONArray> {}
     
-    public void tesJSONArrayRepresentation() throws Exception {
+    public void testJSONArrayRepresentation() throws Exception {
         JSONArray array = new JSONArray();
         array.put("One").put("Two").put("Three").put(1).put(2.0);
         
