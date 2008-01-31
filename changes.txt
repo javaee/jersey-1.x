@@ -1,6 +1,8 @@
 release 0.6 (2008-03-07)
 - When utilizing the ClasspathResourceConfig include files ending
-  in .zip and treat them as jar files. 
+  in .zip and treat them as jar files.
+- Fixed NPE for PackagesResourceConfig when scanning directories that
+  contain characters such as space (that are percent-encoded in URLs).
 - Partially integrated JSR 311 API 0.6
   - java.ws.rs.ext.ProviderFactory replaced with java.ws.rs.ext.RuntimeDelegate.
   - java.ws.rs.ext.HeaderProvider is removed. This is replaced with

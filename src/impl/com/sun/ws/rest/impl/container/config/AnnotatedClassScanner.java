@@ -26,6 +26,7 @@ import java.io.File;
 import java.io.IOException;
 import java.lang.annotation.Annotation;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Enumeration;
 import java.util.HashSet;
@@ -106,7 +107,15 @@ public final class AnnotatedClassScanner {
                 String fileP = p.replace('.', '/');
                 Enumeration<URL> urls = classloader.getResources(fileP);
                 while (urls.hasMoreElements()) {
-                    index(urls.nextElement(), fileP);
+                    URL url = urls.nextElement();
+                    try {
+                        URI uri = url.toURI();
+                        index(uri, fileP);
+                    } catch (URISyntaxException e) {
+                        LOGGER.warning("URL, " + 
+                                url + 
+                                "cannot be converted to a URI");                        
+                    }
                 }
             } catch (IOException ex) {
                 String s = "The resources for the package" + 
@@ -178,19 +187,28 @@ public final class AnnotatedClassScanner {
         }
     }
     
-    private void index(URL u, String filePackageName) {
-        String protocol = u.getProtocol();
-        if (protocol.equals("file")) {
-            indexDir(new File(u.getPath()), false);
-        } else if (protocol.equals("jar") || protocol.equals("zip")) {
-            URI jarUri = URI.create(u.getPath());
+    private void index(URI u, String filePackageName) {
+        String scheme = u.getScheme();
+        if (scheme.equals("file")) {
+            File f = new File(u.getPath());
+            if (f.isDirectory()) {
+                indexDir(f, false);
+            } else {
+                LOGGER.warning("URL, " + 
+                        u + 
+                        ", is ignored. The path, " + 
+                        f.getPath() +
+                        ", is not a directory");                
+            }
+        } else if (scheme.equals("jar") || scheme.equals("zip")) {
+            URI jarUri = URI.create(u.getSchemeSpecificPart());
             String jarFile = jarUri.getPath();
             jarFile = jarFile.substring(0, jarFile.indexOf('!'));            
             indexJar(new File(jarFile), filePackageName);
         } else {
             LOGGER.warning("URL, " + 
                     u + 
-                    ", is ignored, it not a file or a jar file");            
+                    ", is ignored, it not a file or a jar file URL");            
         }
     }
     
