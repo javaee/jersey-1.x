@@ -1,4 +1,6 @@
 release 0.6 (2008-03-07)
+- Fixed issue 35: Cryptic error message for invalid media type of response
+  https://jersey.dev.java.net/issues/show_bug.cgi?id=35
 - When utilizing the ClasspathResourceConfig include files ending
   in .zip and treat them as jar files.
 - Fixed NPE for PackagesResourceConfig when scanning directories that
