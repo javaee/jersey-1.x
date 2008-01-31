@@ -23,6 +23,7 @@
 package com.sun.ws.rest.impl.application;
 
 import com.sun.ws.rest.spi.service.ComponentProvider;
+import com.sun.ws.rest.spi.service.ComponentProvider.Scope;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -64,7 +65,7 @@ public class ComponentProviderCache {
         if (o != null) return o;
             
         try {
-            o = componentProvider.provide(provider);
+            o = componentProvider.getInstance(Scope.WebApplication, provider);
         } catch (Exception ex) {
             // TODO message
             throw new IllegalArgumentException("The provider class, " + provider + 

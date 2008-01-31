@@ -22,8 +22,9 @@
 
 package com.sun.ws.rest.spi.resource;
 
+import com.sun.ws.rest.api.core.HttpRequestContext;
 import com.sun.ws.rest.api.model.AbstractResource;
-import java.util.Map;
+import com.sun.ws.rest.spi.service.ComponentProvider;
 
 /**
  * A provider that manages the creation of resource class instances. A provider
@@ -35,21 +36,17 @@ public interface ResourceProvider {
      * Specifies the class of the resource that the provider
      * instance will manage access to.
      *
+     * @param provider the component provider
      * @param resource the abstract resource
-     * @param resourceFeatures the resource features
-     * @param resourceProperties the resource properties
      */
-    void init(AbstractResource resource,
-            Map<String, Boolean> resourceFeatures,
-            Map<String, Object> resourceProperties);
+    void init(ComponentProvider provider, AbstractResource resource);
     
     /**
      * Called to obtain an instance of a resource class.
      * 
-     * @param context a context for resource providers, used to perform
-     * resource injection on new instances and obtain values for constructor
-     * parameters
+     * @param provider the component provider
+     * @param request the HTTP request
      * @return an initialized instance of the supplied class
      */
-    Object getInstance(ResourceProviderContext context);
+    Object getInstance(ComponentProvider provider, HttpRequestContext request);
 }

@@ -23,38 +23,34 @@
 package com.sun.ws.rest.impl.resource;
 
 import com.sun.ws.rest.api.container.ContainerException;
+import com.sun.ws.rest.api.core.HttpRequestContext;
 import com.sun.ws.rest.api.model.AbstractResource;
-import com.sun.ws.rest.spi.resource.ResourceProviderContext;
 import com.sun.ws.rest.spi.resource.ResourceProvider;
-import java.util.Map;
+import com.sun.ws.rest.spi.service.ComponentProvider;
+import com.sun.ws.rest.spi.service.ComponentProvider.Scope;
 
 /**
  * A simple provider that maintains a singleton resource class instance
  */
 public final class SingletonProvider implements ResourceProvider {
-
-    private Class c;
     
     private Object resource;
     
-    public void init(AbstractResource abstractResource,
-            Map<String, Boolean> resourceFeatures,
-            Map<String, Object> resourceProperties) {
-        this.c = abstractResource.getResourceClass();
-    }
-
-    public Object getInstance(ResourceProviderContext context) {
-        if (resource != null)
-            return resource;
-
+    public void init(ComponentProvider provider,
+            AbstractResource abstractResource) {
+        Class c = abstractResource.getResourceClass();
+        
         try {
-            resource = c.newInstance();
-            context.injectDependencies(resource);
-            return resource;
+            this.resource = provider.getInstance(Scope.WebApplication, c);
         } catch (InstantiationException ex) {
             throw new ContainerException("Unable to create resource", ex);
         } catch (IllegalAccessException ex) {
             throw new ContainerException("Unable to create resource", ex);
         }
+    }
+
+    public Object getInstance(ComponentProvider provider, 
+            HttpRequestContext request) {
+        return resource;
     }
 }

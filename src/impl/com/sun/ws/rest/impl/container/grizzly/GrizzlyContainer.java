@@ -46,9 +46,12 @@ public class GrizzlyContainer implements Adapter {
 
     public void service(Request request, Response response) throws Exception {
         GrizzlyRequestAdaptor requestAdaptor = 
-                new GrizzlyRequestAdaptor(application, request);
+                new GrizzlyRequestAdaptor(application.getMessageBodyContext(), 
+                request);
         GrizzlyResponseAdaptor responseAdaptor = 
-                new GrizzlyResponseAdaptor(response, application, requestAdaptor);
+                new GrizzlyResponseAdaptor(response, 
+                application.getMessageBodyContext(), 
+                requestAdaptor);
         
         try {
             application.handleRequest(requestAdaptor, responseAdaptor);

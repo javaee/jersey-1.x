@@ -68,9 +68,13 @@ public class ProviderContainer implements Provider<DataSource> {
         MessageContext msgContext = wsContext.getMessageContext();
         try {
             MessageContextRequestAdaptor requestAdaptor = 
-                    new MessageContextRequestAdaptor(application, request, msgContext);
+                    new MessageContextRequestAdaptor(
+                    application.getMessageBodyContext(), 
+                    request, msgContext);
             MessageContextResponseAdaptor responseAdaptor = 
-                    new MessageContextResponseAdaptor(msgContext, application, requestAdaptor);
+                    new MessageContextResponseAdaptor(msgContext, 
+                    application.getMessageBodyContext(), 
+                    requestAdaptor);
 
             application.handleRequest(requestAdaptor, responseAdaptor);
             

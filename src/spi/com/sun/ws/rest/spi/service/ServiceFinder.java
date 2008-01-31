@@ -27,6 +27,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.lang.reflect.Array;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Enumeration;
@@ -131,8 +133,15 @@ public final class ServiceFinder<T> implements Iterable<T> {
     private static final String prefix = "META-INF/services/";
     
     private static final ComponentProvider DEFAULT_COMPONENT_PROVIDER = new ComponentProvider() {
-        public Object provide(Class c) throws InstantiationException, IllegalAccessException {
+        public Object getInstance(Scope scope, Class c) 
+                throws InstantiationException, IllegalAccessException {
             return c.newInstance();
+        }
+
+        public Object getInstance(Scope scope, Constructor contructor, Object[] parameters) 
+                throws InstantiationException, IllegalArgumentException, 
+                IllegalAccessException, InvocationTargetException {
+            throw new UnsupportedOperationException("");
         }
     };
             
@@ -581,7 +590,8 @@ public final class ServiceFinder<T> implements Iterable<T> {
             String cn = nextName;
             nextName = null;
             try {
-                return service.cast(componentProvider.provide(Class.forName(cn, true, loader)));
+                return service.cast(componentProvider.getInstance(null, 
+                        Class.forName(cn, true, loader)));
             } catch (ClassNotFoundException x) {
                 fail(service, 
                         SpiMessages.PROVIDER_NOT_FOUND(cn, service));

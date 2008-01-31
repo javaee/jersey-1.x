@@ -47,6 +47,7 @@ import com.sun.ws.rest.impl.view.ViewFactory;
 import com.sun.ws.rest.impl.wadl.WadlFactory;
 import com.sun.ws.rest.spi.resource.ResourceProvider;
 import com.sun.ws.rest.spi.resource.ResourceProviderFactory;
+import com.sun.ws.rest.spi.service.ComponentProvider;
 import com.sun.ws.rest.spi.uri.rules.UriRule;
 import com.sun.ws.rest.spi.uri.rules.UriRules;
 import com.sun.ws.rest.spi.view.View;
@@ -73,13 +74,17 @@ public final class ResourceClass {
     public final ResourceProvider resolver;
     public final boolean hasSubResources;
 
-    public ResourceClass(Object containerMemento, ResourceConfig config,
-            ResourceProviderFactory resolverFactory, AbstractResource resource) {
+    public ResourceClass(Object containerMemento, 
+            ResourceConfig config,
+            ComponentProvider provider,
+            ResourceProviderFactory resolverFactory, 
+            AbstractResource resource) {
         this.resource = resource;
 
         this.config = config;
 
-        this.resolver = resolverFactory.createProvider(resource, 
+        this.resolver = resolverFactory.createProvider(
+                provider, resource, 
                 config.getFeatures(), config.getProperties());
 
         boolean hasSubResourcesAux = false;

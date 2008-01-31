@@ -22,10 +22,67 @@
 
 package com.sun.ws.rest.spi.service;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
+
 /**
  *
  * @author Paul.Sandoz@Sun.Com
  */
 public interface ComponentProvider {
-    Object provide(Class c) throws InstantiationException, IllegalAccessException;
+    /**
+     * The scope contract for the instantiation of a component.
+     */
+    public enum Scope {
+        /**
+         * Declares that only one instance of a component shall exist 
+         * per-web application instance. The runtime will manage the component
+         * in the scope of the web application.
+         */
+        WebApplication,
+        
+        /**
+         * Declares that the scope is application defined and instances will 
+         * be managed by the runtime according to this scope. This requires 
+         * that a new instance be created for each invocation of 
+         * <code>getInstance</code>.
+         */
+        ApplicationDefined,
+    }
+    
+    /**
+     * Get the instance of a class.
+     * 
+     * @param scope the scope of the instance
+     * @param c the class
+     * @return the instance
+     * 
+     * @throws java.lang.InstantiationException
+     * @throws java.lang.IllegalAccessException
+     */
+    Object getInstance(Scope scope, Class c) 
+            throws InstantiationException, IllegalAccessException;
+    
+    /**
+     * Get the instance of a class using a constructor and a corresponding
+     * array of parameter values.
+     * <p>
+     * The array of parameter values must be the same length as that required
+     * by the constructor. Some parameter values may be null, indicating that
+     * the values are not set and must be set by the component provider before
+     * construction occurs.
+     * 
+     * @param scope the scope of the instance
+     * @param contructor the constructor to instantiate the class
+     * @param parameters the array parameter values passed to the constructor
+     * @return the instance
+     * 
+     * @throws java.lang.InstantiationException
+     * @throws java.lang.IllegalArgumentException 
+     * @throws java.lang.IllegalAccessException
+     * @throws java.lang.reflect.InvocationTargetException
+     */
+    Object getInstance(Scope scope, Constructor contructor, Object[] parameters) 
+            throws InstantiationException, IllegalArgumentException, 
+            IllegalAccessException, InvocationTargetException;
 }

@@ -34,7 +34,6 @@ import com.sun.ws.rest.impl.view.ViewFactory;
 import com.sun.ws.rest.impl.view.ViewType;
 import com.sun.ws.rest.spi.container.ContainerRequest;
 import com.sun.ws.rest.spi.container.ContainerResponse;
-import com.sun.ws.rest.spi.resource.ResourceProviderContext;
 import com.sun.ws.rest.spi.uri.rules.UriRule;
 import com.sun.ws.rest.spi.uri.rules.UriRuleContext;
 import com.sun.ws.rest.spi.uri.rules.UriRules;
@@ -48,9 +47,7 @@ import javax.ws.rs.core.Response;
  *
  * @author Paul.Sandoz@Sun.Com
  */
-final class WebApplicationContext implements 
-        HttpContextAccess, ResourceProviderContext, 
-        UriRuleContext {
+final class WebApplicationContext implements HttpContextAccess, UriRuleContext {
     private final ContainerRequest request;
     
     private final ContainerResponse response;
@@ -91,29 +88,6 @@ final class WebApplicationContext implements
     }
 
     
-    // ResourceProviderContext
-            
-    public void injectDependencies(Object resource) {
-        app.injectResources(resource);
-        
-        // TODO defer to other injection providers
-    }    
-
-    public Object[] getParameterValues(AbstractResourceConstructor abstractResourceConstructor) {
-        // TODO the extractors can be pre-calculated and associated with
-        // the the resource class
-        ParameterExtractor[] extractors = ParameterExtractorFactory.
-                createExtractorsForConstructor(abstractResourceConstructor);
-        Object[] values = new Object[extractors.length];
-        for (int i = 0; i < extractors.length; i++) {
-            if (extractors[i] == null)
-                values[i] = null;
-            else
-                values[i] = extractors[i].extract(getHttpRequestContext());
-        }
-        return values;
-    }
-
     // UriRuleContext
 
     private Object it;
@@ -126,7 +100,7 @@ final class WebApplicationContext implements
 
     public Object getResource(Class resourceClass) {
         final ResourceClass rc = app.getResourceClass(resourceClass);
-        return it = rc.resolver.getInstance(this);
+        return it = rc.resolver.getInstance(app, request);
     }
 
     public UriRules<UriRule> getRules(Class resourceClass) {

@@ -60,7 +60,9 @@ import com.sun.ws.rest.spi.service.ComponentProvider;
 import com.sun.ws.rest.spi.uri.rules.UriRule;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Proxy;
 import java.lang.reflect.Type;
 import java.net.URI;
@@ -91,7 +93,7 @@ import javax.ws.rs.ext.Provider;
  * 
  * @author Paul.Sandoz@Sun.Com
  */
-public final class WebApplicationImpl implements ComponentProvider, WebApplication, MessageBodyContext {
+public final class WebApplicationImpl implements ComponentProvider, WebApplication {
     private static final Logger LOGGER = Logger.getLogger(WebApplicationImpl.class.getName());
 
     private final ConcurrentMap<Class, ResourceClass> metaClassMap = 
@@ -185,7 +187,8 @@ public final class WebApplicationImpl implements ComponentProvider, WebApplicati
             LOGGER.severe(ImplMessages.FATAL_ISSUES_FOUND_AT_RES_CLASS(ar.getResourceClass().getName()));
             throw new ContainerException(ImplMessages.FATAL_ISSUES_FOUND_AT_RES_CLASS(ar.getResourceClass().getName()));
         }
-        return new ResourceClass(containerMomento, resourceConfig, resolverFactory, ar);
+        return new ResourceClass(containerMomento, resourceConfig, 
+                getComponentProvider(), resolverFactory, ar);
     }
     
     private AbstractResource getAbstractResource(Class c) {
@@ -215,8 +218,15 @@ public final class WebApplicationImpl implements ComponentProvider, WebApplicati
     
     // ComponentProvider
     
-    public Object provide(Class c) throws InstantiationException, IllegalAccessException {
-        Object o = c.newInstance();
+    public Object getInstance(Scope scope, Class c) throws InstantiationException, IllegalAccessException {
+        final Object o = c.newInstance();
+        injectResources(o);
+        return o;
+    }
+    
+    public Object getInstance(Scope scope, Constructor contructor, Object[] parameters) 
+            throws InstantiationException, IllegalArgumentException, IllegalAccessException, InvocationTargetException {
+        final Object o = contructor.newInstance(parameters);
         injectResources(o);
         return o;
     }
@@ -262,6 +272,15 @@ public final class WebApplicationImpl implements ComponentProvider, WebApplicati
             processRootResources(resourceConfig.getResourceClasses()));
     }
 
+    
+    public MessageBodyContext getMessageBodyContext() {
+        return bodyContext;
+    }
+
+    public ComponentProvider getComponentProvider() {
+        return this;
+    }
+    
     public void handleRequest(ContainerRequest request, ContainerResponse response) {
         final WebApplicationContext localContext = new WebApplicationContext(this, request, response);        
         context.set(localContext);
@@ -302,25 +321,6 @@ public final class WebApplicationImpl implements ComponentProvider, WebApplicati
         injectables.put(fieldType, injectable);
     }
     
-    
-    // MessageBodyContext    
-
-    public <T> MessageBodyReader<T> getMessageBodyReader(Class<T> type, MediaType mediaType) {
-        return bodyContext.getMessageBodyReader(type, mediaType);
-    }
-
-    public <T> MessageBodyWriter<T> getMessageBodyWriter(Class<T> type, MediaType mediaType) {
-        return bodyContext.getMessageBodyWriter(type, mediaType);
-    }
-
-    private List<MediaType> createSearchList(MediaType mediaType) {
-        if (mediaType==null)
-            return Arrays.asList(MediaTypeHelper.GENERAL_MEDIA_TYPE);
-        else
-            return Arrays.asList(mediaType, 
-                    new MediaType(mediaType.getType(), MediaType.MEDIA_TYPE_WILDCARD), 
-                    MediaTypeHelper.GENERAL_MEDIA_TYPE);
-    }
     
     // 
 

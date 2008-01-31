@@ -23,43 +23,65 @@
 package com.sun.ws.rest.impl.resource;
 
 import com.sun.ws.rest.api.container.ContainerException;
+import com.sun.ws.rest.api.core.HttpRequestContext;
 import com.sun.ws.rest.api.model.AbstractResource;
 import com.sun.ws.rest.api.model.AbstractResourceConstructor;
+import com.sun.ws.rest.impl.model.parameter.ParameterExtractor;
+import com.sun.ws.rest.impl.model.parameter.ParameterExtractorFactory;
 import com.sun.ws.rest.spi.resource.ResourceProvider;
-import com.sun.ws.rest.spi.resource.ResourceProviderContext;
+import com.sun.ws.rest.spi.service.ComponentProvider;
+import com.sun.ws.rest.spi.service.ComponentProvider.Scope;
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
-import java.util.Map;
 
 /**
  *
  * @author mh124079
  */
-public final class PerRequestProvider  implements ResourceProvider {
+public final class PerRequestProvider implements ResourceProvider {
 
     private Class c;
-    private AbstractResourceConstructor ctor;
     
-    public void init(AbstractResource abstractResource,
-            Map<String, Boolean> resourceFeatures,
-            Map<String, Object> resourceProperties) {
+    private Constructor constructor;
+    
+    private ParameterExtractor[] extractors;
+    
+    public void init(ComponentProvider provider,
+            AbstractResource abstractResource) {
         this.c = abstractResource.getResourceClass();
+        
         // TODO select the most appropriate constructor 
         // instead of just picking up the first one
-        this.ctor = (abstractResource.getConstructors().isEmpty()) 
-                ? null : abstractResource.getConstructors().get(0);
+        if (abstractResource.getConstructors().isEmpty()) {
+            this.constructor = null;
+            this.extractors = null;
+        } else {
+            AbstractResourceConstructor abstractConstructor = 
+                    abstractResource.getConstructors().get(0);
+            
+            this.constructor = abstractConstructor.getCtor();
+            
+            this.extractors = ParameterExtractorFactory.
+                    createExtractorsForConstructor(abstractConstructor);
+        }
     }
 
-    public Object getInstance(ResourceProviderContext context) {
-        final Object resource = getResource(context);
-        context.injectDependencies(resource);
-        return resource;
-    }
-    
-    private Object getResource(ResourceProviderContext context) {
+    public Object getInstance(ComponentProvider provider, 
+            HttpRequestContext request) {
         try {
-            return (ctor == null)
-                ? c.newInstance()
-                : ctor.getCtor().newInstance(context.getParameterValues(ctor));
+            if (constructor == null) {
+                return provider.getInstance(Scope.ApplicationDefined, c);
+            } else {
+                Object[] values = new Object[extractors.length];
+                for (int i = 0; i < extractors.length; i++) {
+                    if (extractors[i] == null)
+                        values[i] = null;
+                    else
+                        values[i] = extractors[i].extract(request);
+                }
+                return provider.getInstance(Scope.ApplicationDefined, 
+                    constructor, values);
+            }
         } catch (InstantiationException ex) {
             throw new ContainerException("Unable to create resource", ex);
         } catch (IllegalAccessException ex) {

@@ -26,6 +26,7 @@ import com.sun.ws.rest.api.container.ContainerException;
 import com.sun.ws.rest.api.core.ResourceConfig;
 import com.sun.ws.rest.api.model.AbstractResource;
 import com.sun.ws.rest.impl.resource.PerRequestProvider;
+import com.sun.ws.rest.spi.service.ComponentProvider;
 import java.lang.annotation.Annotation;
 import java.util.Map;
 
@@ -57,6 +58,7 @@ public class ResourceProviderFactory {
      * If there is no such property then the per-request resource provider
      * will be chosen.
      * 
+     * @param provider the component provider
      * @param resource the abstract resource for the provider.
      * @param resourceFeatures the resource features
      * @param resourceProperties the resource properties
@@ -64,7 +66,9 @@ public class ResourceProviderFactory {
      * @throws IllegalArgumentException if the Java type of resource provider
      *         property is not Class<? extends ResourceProvider>.
      */
-    public ResourceProvider createProvider(AbstractResource resource,
+    public ResourceProvider createProvider(
+            ComponentProvider provider,
+            AbstractResource resource,
             Map<String, Boolean> resourceFeatures,
             Map<String, Object> resourceProperties) {
         Class<? extends ResourceProvider> providerClass = null;
@@ -106,8 +110,9 @@ public class ResourceProviderFactory {
         }
         
         try {
-            ResourceProvider r = providerClass.newInstance();
-            r.init(resource, resourceFeatures, resourceProperties);
+            ResourceProvider r = (ResourceProvider)provider.
+                    getInstance(ComponentProvider.Scope.WebApplication, providerClass);
+            r.init(provider, resource);
             return r;
         } catch (IllegalAccessException ex) {
             throw new ContainerException("Unable to create resource provider", ex);

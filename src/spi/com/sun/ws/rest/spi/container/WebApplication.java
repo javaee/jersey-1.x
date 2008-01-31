@@ -25,6 +25,7 @@ package com.sun.ws.rest.spi.container;
 import com.sun.ws.rest.api.container.ContainerException;
 import com.sun.ws.rest.api.core.ResourceConfig;
 import com.sun.ws.rest.spi.resource.Injectable;
+import com.sun.ws.rest.spi.service.ComponentProvider;
 import java.lang.reflect.Type;
 
 /**
@@ -32,7 +33,7 @@ import java.lang.reflect.Type;
  *
  * @author Paul.Sandoz@Sun.Com
  */
-public interface WebApplication extends MessageBodyContext {
+public interface WebApplication {
     /**
      * Initiate the Web application.
      * <p>
@@ -48,6 +49,24 @@ public interface WebApplication extends MessageBodyContext {
     void initiate(Object containerMemento,
             ResourceConfig resourceConfig) 
             throws IllegalArgumentException, ContainerException;
+    
+    /**
+     * Get the message body context that can be used for getting
+     * message body readers and writers. 
+     * 
+     * @return the message body context. The return value is 
+     * undefined before the web applicaiton is initialized.
+     */
+    MessageBodyContext getMessageBodyContext();
+
+    /**
+     * Get the component provider that can be used for instantiating
+     * components.
+     * 
+     * @return the component provider. The return value is 
+     * undefined before the web applicaiton is initialized.
+     */
+    ComponentProvider getComponentProvider();
     
     /**
      * Handle an HTTP request by dispatching the request to the appropriate

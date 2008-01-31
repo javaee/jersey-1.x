@@ -107,13 +107,17 @@ public class TestResourceProxy extends ResourceProxy {
         byte[] requestEntity = writeEntity(clientRequest.getMetadata(), 
                 clientRequest.getEntity());
         final AbstractContainerRequest serverRequest = new TestHttpRequestContext(
-                w, method, new ByteArrayInputStream(requestEntity),
-                u, baseUri);
+                w.getMessageBodyContext(), 
+                method, 
+                new ByteArrayInputStream(requestEntity),
+                u, 
+                baseUri);
         
         writeHeaders(clientRequest.getMetadata(), serverRequest.getRequestHeaders());
 
-        final TestHttpResponseContext serverResponse = 
-                new TestHttpResponseContext(w, serverRequest);
+        final TestHttpResponseContext serverResponse = new TestHttpResponseContext(
+                w.getMessageBodyContext(), 
+                serverRequest);
         
         w.handleRequest(serverRequest, serverResponse);
         try {

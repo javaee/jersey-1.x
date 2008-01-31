@@ -47,9 +47,13 @@ public class HttpHandlerContainer implements HttpHandler {
     
     public void handle(HttpExchange httpExchange) throws IOException {
         HttpServerRequestAdaptor requestAdaptor = 
-                new HttpServerRequestAdaptor(application, httpExchange);
+                new HttpServerRequestAdaptor(
+                application.getMessageBodyContext(), 
+                httpExchange);
         HttpServerResponseAdaptor responseAdaptor = 
-                new HttpServerResponseAdaptor(httpExchange, application, requestAdaptor);
+                new HttpServerResponseAdaptor(httpExchange,
+                application.getMessageBodyContext(), 
+                requestAdaptor);
         
         try {
             application.handleRequest(requestAdaptor, responseAdaptor);

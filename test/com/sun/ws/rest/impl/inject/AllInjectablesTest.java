@@ -26,6 +26,7 @@ import com.sun.ws.rest.api.core.HttpContextAccess;
 import com.sun.ws.rest.api.core.ResourceConfig;
 import com.sun.ws.rest.impl.AbstractResourceTester;
 import com.sun.ws.rest.spi.container.MessageBodyContext;
+import com.sun.ws.rest.spi.resource.Singleton;
 import java.io.IOException;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -45,7 +46,7 @@ public class AllInjectablesTest extends AbstractResourceTester {
     }
 
     @Path("/")
-    public static class ContextResource {
+    public static class PerRequestContextResource {
         @HttpContext ResourceConfig rc;
         
         @HttpContext MessageBodyContext mbc;
@@ -70,8 +71,41 @@ public class AllInjectablesTest extends AbstractResourceTester {
         }                
     }
     
-    public void testInjected() throws IOException {
-        initiateWebApplication(ContextResource.class);
+    @Path("/")
+    @Singleton
+    public static class SingletonContextResource {
+        @HttpContext ResourceConfig rc;
+        
+        @HttpContext MessageBodyContext mbc;
+        
+        @HttpContext HttpContextAccess hca;
+        
+        @HttpContext HttpHeaders hs;
+        
+        @HttpContext UriInfo ui;
+        
+        @HttpContext Request r;
+        
+        @GET
+        public String get() {
+            assertNotNull(rc);
+            assertNotNull(mbc);
+            assertNotNull(hca);
+            assertNotNull(hs);
+            assertNotNull(ui);
+            assertNotNull(r);
+            return "GET";
+        }                
+    }
+    
+    public void testPerRequestInjected() throws IOException {
+        initiateWebApplication(PerRequestContextResource.class);
+        
+        assertEquals("GET", resourceProxy("/").get(String.class));        
+    }       
+    
+    public void testSingletonInjected() throws IOException {
+        initiateWebApplication(SingletonContextResource.class);
         
         assertEquals("GET", resourceProxy("/").get(String.class));        
     }       
