@@ -51,7 +51,8 @@ public interface ComponentProvider {
     }
     
     /**
-     * Get the instance of a class.
+     * Get the instance of a class. Injection will be performed on the
+     * instance.
      * 
      * @param scope the scope of the instance
      * @param c the class
@@ -65,7 +66,7 @@ public interface ComponentProvider {
     
     /**
      * Get the instance of a class using a constructor and a corresponding
-     * array of parameter values.
+     * array of parameter values. Injection will be performed on the instance.
      * <p>
      * The array of parameter values must be the same length as that required
      * by the constructor. Some parameter values may be null, indicating that
@@ -85,4 +86,13 @@ public interface ComponentProvider {
     Object getInstance(Scope scope, Constructor contructor, Object[] parameters) 
             throws InstantiationException, IllegalArgumentException, 
             IllegalAccessException, InvocationTargetException;
+
+    /**
+     * Perform injection on a an instance. This may be used when a
+     * component is instantiated by means other than the component
+     * provider.
+     * 
+     * @param instance the instance to perform injection on.
+     */
+    void inject(Object instance);
 }

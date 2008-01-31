@@ -231,6 +231,10 @@ public final class WebApplicationImpl implements ComponentProvider, WebApplicati
         return o;
     }
     
+    public void inject(Object instance) {
+        injectResources(instance);
+    }
+        
     // WebApplication
             
     public void initiate(Object containerMomento, ResourceConfig resourceConfig) {
