@@ -49,6 +49,22 @@ public interface WebApplication {
             throws IllegalArgumentException, ContainerException;
     
     /**
+     * Initiate the Web application.
+     * <p>
+     * This method can only be called once. Further calls will result in an
+     * exception.
+     * @param resourceConfig the resource configuration containing the set
+     *        of Web resources to be managed by the Web application.
+     * @param provider the component provider to use, if null the default
+     *        component provider will be used.
+     * @throws IllegalArgumentException if resourceConfig is null.
+     * @throws ContainerException if a second or further call to the method 
+     *         is invoked.
+     */
+    void initiate(ResourceConfig resourceConfig, ComponentProvider provider) 
+            throws IllegalArgumentException, ContainerException;
+    
+    /**
      * Get the message body context that can be used for getting
      * message body readers and writers. 
      * 

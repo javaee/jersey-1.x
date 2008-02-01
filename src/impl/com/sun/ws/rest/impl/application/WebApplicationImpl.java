@@ -87,7 +87,7 @@ import javax.ws.rs.ext.Provider;
  * 
  * @author Paul.Sandoz@Sun.Com
  */
-public final class WebApplicationImpl implements ComponentProvider, WebApplication {
+public final class WebApplicationImpl implements WebApplication {
     private static final Logger LOGGER = Logger.getLogger(WebApplicationImpl.class.getName());
 
     private final ConcurrentMap<Class, ResourceClass> metaClassMap = 
@@ -112,6 +112,8 @@ public final class WebApplicationImpl implements ComponentProvider, WebApplicati
     private RootResourceClassesRule rootsRule;
             
     private MessageBodyContext bodyContext;
+    
+    private ComponentProvider provider;
     
     public WebApplicationImpl() {
         this.resolverFactory = ResourceProviderFactory.getInstance();
@@ -187,12 +189,11 @@ public final class WebApplicationImpl implements ComponentProvider, WebApplicati
         return IntrospectionModeller.createResource(c);
     }
     
-
     /**
      * Inject resources onto fields of an object.
      * @param o the object
      */
-    public void injectResources(Object o) {
+    private void injectResources(Object o) {
         injectResources(o.getClass(), o);
     }
     
@@ -208,28 +209,66 @@ public final class WebApplicationImpl implements ComponentProvider, WebApplicati
     }
 
     
-    // ComponentProvider
-    
-    public Object getInstance(Scope scope, Class c) throws InstantiationException, IllegalAccessException {
-        final Object o = c.newInstance();
-        injectResources(o);
-        return o;
-    }
-    
-    public Object getInstance(Scope scope, Constructor contructor, Object[] parameters) 
-            throws InstantiationException, IllegalArgumentException, IllegalAccessException, InvocationTargetException {
-        final Object o = contructor.newInstance(parameters);
-        injectResources(o);
-        return o;
-    }
-    
-    public void inject(Object instance) {
-        injectResources(instance);
-    }
+    private final class AdaptingComponentProvider implements ComponentProvider {
+        private final ComponentProvider cp;
         
+        AdaptingComponentProvider(ComponentProvider cp) {
+            this.cp = cp;
+        }
+
+        public Object getInstance(Scope scope, Class c) 
+                throws InstantiationException, IllegalAccessException {
+            Object o = cp.getInstance(scope,c);
+            if (o == null)
+                o = c.newInstance();
+            injectResources(o);
+            return o;
+        }
+
+        public Object getInstance(Scope scope, Constructor contructor, Object[] parameters) 
+                throws InstantiationException, IllegalArgumentException, 
+                IllegalAccessException, InvocationTargetException {
+            Object o = cp.getInstance(scope, contructor, parameters);
+            if (o == null)
+                o = contructor.newInstance(parameters);
+            injectResources(o);
+            return o;
+        }
+
+        public void inject(Object instance) {
+            cp.inject(instance);
+            injectResources(instance);
+        }
+    }
+    
+    private final class DefaultComponentProvider implements ComponentProvider {
+        public Object getInstance(Scope scope, Class c) 
+                throws InstantiationException, IllegalAccessException {
+            final Object o = c.newInstance();
+            injectResources(o);
+            return o;
+        }
+
+        public Object getInstance(Scope scope, Constructor contructor, Object[] parameters) 
+                throws InstantiationException, IllegalArgumentException, 
+                IllegalAccessException, InvocationTargetException {
+            final Object o = contructor.newInstance(parameters);
+            injectResources(o);
+            return o;
+        }
+
+        public void inject(Object instance) {
+            injectResources(instance);
+        }
+    }
+    
     // WebApplication
             
     public void initiate(ResourceConfig resourceConfig) {
+        initiate(resourceConfig, null);
+    }
+    
+    public void initiate(ResourceConfig resourceConfig, ComponentProvider provider) {
         if (resourceConfig == null)
             throw new IllegalArgumentException("ResourceConfig instance MUST NOT be null");
         
@@ -250,8 +289,13 @@ public final class WebApplicationImpl implements ComponentProvider, WebApplicati
                 }
             );
 
+        // Set up the component provider
+        this.provider = (provider == null)
+            ? new DefaultComponentProvider()
+            : new AdaptingComponentProvider(provider);
+            
         // Create the component provider cache
-        ComponentProviderCache cpc = new ComponentProviderCache(this, 
+        ComponentProviderCache cpc = new ComponentProviderCache(this.provider, 
                 resourceConfig.getProviderClasses());
 
         // Obtain all context resolvers
@@ -272,7 +316,7 @@ public final class WebApplicationImpl implements ComponentProvider, WebApplicati
     }
 
     public ComponentProvider getComponentProvider() {
-        return this;
+        return provider;
     }
     
     public void handleRequest(ContainerRequest request, ContainerResponse response) {

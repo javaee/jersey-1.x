@@ -100,7 +100,7 @@ import javax.ws.rs.core.Response;
 
     public Object getResource(Class resourceClass) {
         final ResourceClass rc = app.getResourceClass(resourceClass);
-        return it = rc.resolver.getInstance(app, request);
+        return it = rc.resolver.getInstance(app.getComponentProvider(), request);
     }
 
     public UriRules<UriRule> getRules(Class resourceClass) {
