@@ -22,7 +22,6 @@
 
 package com.sun.ws.rest.impl;
 
-import java.io.CharArrayReader;
 import junit.framework.*;
 
 /**
