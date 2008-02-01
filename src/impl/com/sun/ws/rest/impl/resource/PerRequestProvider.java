@@ -60,9 +60,13 @@ public final class PerRequestProvider implements ResourceProvider {
                     abstractResource.getConstructors().get(0);
             
             this.constructor = abstractConstructor.getCtor();
-            
-            this.extractors = ParameterExtractorFactory.
-                    createExtractorsForConstructor(abstractConstructor);
+            if (this.constructor.getParameterTypes().length > 0) {
+                this.extractors = ParameterExtractorFactory.
+                        createExtractorsForConstructor(abstractConstructor);
+            } else {
+                this.constructor = null;
+                this.extractors = null;                
+            }
         }
     }
 
