@@ -111,7 +111,7 @@ public class ResourceProviderFactory {
         
         try {
             ResourceProvider r = (ResourceProvider)provider.
-                    getInstance(ComponentProvider.Scope.WebApplication, providerClass);
+                    getInstance(ComponentProvider.Scope.ApplicationDefined, providerClass);
             r.init(provider, resource);
             return r;
         } catch (IllegalAccessException ex) {
