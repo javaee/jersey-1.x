@@ -69,13 +69,16 @@ public final class ResourceClass {
     private static final Logger LOGGER = Logger.getLogger(ResourceClass.class.getName());
     
     private final UriRules<UriRule> rules;
+    
     private final ResourceConfig config;
+    
     public final AbstractResource resource;
+    
     public final ResourceProvider resolver;
+    
     public final boolean hasSubResources;
 
-    public ResourceClass(Object containerMemento, 
-            ResourceConfig config,
+    public ResourceClass(ResourceConfig config,
             ComponentProvider provider,
             ResourceProviderFactory resolverFactory, 
             AbstractResource resource) {
@@ -98,7 +101,7 @@ public final class ResourceClass {
 
         final ResourceMethodMap methodMap = processMethods();
 
-        processViews(containerMemento, methodMap, patternMethodMap);
+        processViews(provider, methodMap, patternMethodMap);
 
         // Create the rules for the sub-resource HTTP methods
         for (Map.Entry<PathPattern, ResourceMethodMap> e : patternMethodMap.entrySet()) {
@@ -268,7 +271,7 @@ public final class ResourceClass {
         methodMap.put(optionsMethod);
     }
 
-    private void processViews(Object containerMemento,
+    private void processViews(ComponentProvider provider,
             ResourceMethodMap methodMap,
             Map<PathPattern, ResourceMethodMap> patternMethodMap) {
 
@@ -284,7 +287,7 @@ public final class ResourceClass {
 
             String pathPattern = getPathPatternOfView(resourceClass, viewName);
 
-            View v = ViewFactory.createView(containerMemento, path);
+            View v = ViewFactory.createView(provider, path);
             if (v == null) {
                 continue;
             }

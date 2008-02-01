@@ -39,15 +39,13 @@ public interface WebApplication {
      * <p>
      * This method can only be called once. Further calls will result in an
      * exception.
-     * @param containerMemento the object representing the container
      * @param resourceConfig the resource configuration containing the set
      *        of Web resources to be managed by the Web application.
      * @throws IllegalArgumentException if resourceConfig is null.
      * @throws ContainerException if a second or further call to the method 
      *         is invoked.
      */
-    void initiate(Object containerMemento,
-            ResourceConfig resourceConfig) 
+    void initiate(ResourceConfig resourceConfig) 
             throws IllegalArgumentException, ContainerException;
     
     /**

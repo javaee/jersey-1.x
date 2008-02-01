@@ -111,8 +111,6 @@ public final class WebApplicationImpl implements ComponentProvider, WebApplicati
     
     private RootResourceClassesRule rootsRule;
             
-    /* package */ Object containerMomento;
-    
     private MessageBodyContext bodyContext;
     
     public WebApplicationImpl() {
@@ -181,7 +179,7 @@ public final class WebApplicationImpl implements ComponentProvider, WebApplicati
             LOGGER.severe(ImplMessages.FATAL_ISSUES_FOUND_AT_RES_CLASS(ar.getResourceClass().getName()));
             throw new ContainerException(ImplMessages.FATAL_ISSUES_FOUND_AT_RES_CLASS(ar.getResourceClass().getName()));
         }
-        return new ResourceClass(containerMomento, resourceConfig, 
+        return new ResourceClass(resourceConfig, 
                 getComponentProvider(), resolverFactory, ar);
     }
     
@@ -231,7 +229,7 @@ public final class WebApplicationImpl implements ComponentProvider, WebApplicati
         
     // WebApplication
             
-    public void initiate(Object containerMomento, ResourceConfig resourceConfig) {
+    public void initiate(ResourceConfig resourceConfig) {
         if (resourceConfig == null)
             throw new IllegalArgumentException("ResourceConfig instance MUST NOT be null");
         
@@ -241,8 +239,6 @@ public final class WebApplicationImpl implements ComponentProvider, WebApplicati
         
         this.resourceConfig = resourceConfig;
         verifyResourceConfig();
-
-        this.containerMomento = containerMomento;
 
         
         // Allow injection of resource config

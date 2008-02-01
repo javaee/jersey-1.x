@@ -41,7 +41,7 @@ public final class ProviderContainerProvider implements ContainerProvider<Provid
             return null;
         
         ProviderContainer c = new ProviderContainer(application);        
-        application.initiate(c, resourceConfig);
+        application.initiate(resourceConfig);
         return c;        
     }
 }

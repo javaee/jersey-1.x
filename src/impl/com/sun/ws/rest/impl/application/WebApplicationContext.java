@@ -47,7 +47,7 @@ import javax.ws.rs.core.Response;
  *
  * @author Paul.Sandoz@Sun.Com
  */
-final class WebApplicationContext implements HttpContextAccess, UriRuleContext {
+/* package */ final class WebApplicationContext implements HttpContextAccess, UriRuleContext {
     private final ContainerRequest request;
     
     private final ContainerResponse response;
@@ -73,7 +73,7 @@ final class WebApplicationContext implements HttpContextAccess, UriRuleContext {
     }
     
     public Response createLocalForward(String path) throws ContainerException {
-        final View v = ViewFactory.createView(app.containerMomento, path);
+        final View v = ViewFactory.createView(app.getComponentProvider(), path);
         if (v == null) {
             throw new ContainerException("No view for \"" + path + "\"");
         }

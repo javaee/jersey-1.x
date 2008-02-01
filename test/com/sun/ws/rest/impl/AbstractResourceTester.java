@@ -75,7 +75,7 @@ public abstract class AbstractResourceTester extends TestCase {
     
     private WebApplication createWebApplication(ResourceConfig c) {
         WebApplicationImpl a = new WebApplicationImpl();
-        a.initiate(null, c);
+        a.initiate(c);
         return a;
     }
 

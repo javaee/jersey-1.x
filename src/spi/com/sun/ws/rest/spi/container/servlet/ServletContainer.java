@@ -84,16 +84,15 @@ public class ServletContainer extends HttpServlet {
     private static final String RESOURCE_CONFIG_CLASS = 
             "com.sun.ws.rest.config.property.resourceConfigClass";
     
-    private WebApplication application;
-    
-    private ServletContext context;
-    
-    private ThreadLocalInvoker<HttpServletRequest> requestInvoker =
+    private final ThreadLocalInvoker<HttpServletRequest> requestInvoker =
             new ThreadLocalInvoker<HttpServletRequest>();
     
-    private ThreadLocalInvoker<HttpServletResponse> responseInvoker =
+    private final ThreadLocalInvoker<HttpServletResponse> responseInvoker =
             new ThreadLocalInvoker<HttpServletResponse>();
     
+    private ServletContext context;
+        
+    private WebApplication application;
     
     @Override
     public final void init(ServletConfig servletConfig) throws ServletException {
@@ -105,7 +104,9 @@ public class ServletContainer extends HttpServlet {
         initResourceConfigFeatures(servletConfig, resourceConfig);
         
         this.application = create();
+        
         configure(servletConfig, resourceConfig, this.application);
+        
         initiate(resourceConfig, this.application);
     }
     
@@ -254,6 +255,12 @@ public class ServletContainer extends HttpServlet {
         return WebApplicationFactory.createWebApplication();
     }
     
+    private abstract class ResourceInjectable<V> extends Injectable<Resource, V> {
+        public Class<Resource> getAnnotationClass() {
+            return Resource.class;
+        }
+    }
+    
     /**
      * Configure the {@link WebApplication}.
      * <p>
@@ -275,13 +282,9 @@ public class ServletContainer extends HttpServlet {
      * @param rc the Resource configuration
      * @param wa the Web application
      */
-    protected void configure(ServletConfig sc, ResourceConfig rc, WebApplication wa) {
+    protected void configure(final ServletConfig sc, ResourceConfig rc, WebApplication wa) {
         wa.addInjectable(HttpServletRequest.class,
-                new Injectable<Resource, HttpServletRequest>() {
-            public Class<Resource> getAnnotationClass() {
-                return Resource.class;
-            }
-
+                new ResourceInjectable<HttpServletRequest>() {
             public HttpServletRequest getInjectableValue(Resource r) {
                 HttpServletRequest servletRequest = (HttpServletRequest)Proxy.newProxyInstance(
                         HttpServletRequest.class.getClassLoader(),
@@ -292,11 +295,7 @@ public class ServletContainer extends HttpServlet {
         }
         );
         wa.addInjectable(HttpServletResponse.class,
-                new Injectable<Resource, HttpServletResponse>() {
-            public Class<Resource> getAnnotationClass() {
-                return Resource.class;
-            }
-
+                new ResourceInjectable<HttpServletResponse>() {
             public HttpServletResponse getInjectableValue(Resource r) {
                 HttpServletResponse servletResponse = (HttpServletResponse)Proxy.newProxyInstance(
                         HttpServletResponse.class.getClassLoader(),
@@ -307,24 +306,16 @@ public class ServletContainer extends HttpServlet {
         }
         );
         wa.addInjectable(ServletConfig.class,
-                new Injectable<Resource, ServletConfig>() {
-            public Class<Resource> getAnnotationClass() {
-                return Resource.class;
-            }
-
+                new ResourceInjectable<ServletConfig>() {
             public ServletConfig getInjectableValue(Resource r) {
-                return getServletConfig();
+                return sc;
             }
         }
         );
         wa.addInjectable(ServletContext.class,
-                new Injectable<Resource, ServletContext>() {
-            public Class<Resource> getAnnotationClass() {
-                return Resource.class;
-            }
-
+                new ResourceInjectable<ServletContext>() {
             public ServletContext getInjectableValue(Resource r) {
-                return (null != getServletConfig()) ? getServletConfig().getServletContext() : null;
+                return sc.getServletContext();
             }
         }
         );
@@ -337,6 +328,6 @@ public class ServletContainer extends HttpServlet {
      * @param wa the Web application
      */
     protected void initiate(ResourceConfig rc, WebApplication wa) {
-        wa.initiate(this, rc);
+        wa.initiate(rc);
     }    
 }

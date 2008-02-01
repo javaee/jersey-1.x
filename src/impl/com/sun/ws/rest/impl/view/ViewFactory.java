@@ -23,6 +23,7 @@
 package com.sun.ws.rest.impl.view;
 
 import com.sun.ws.rest.api.container.ContainerException;
+import com.sun.ws.rest.spi.service.ComponentProvider;
 import com.sun.ws.rest.spi.service.ServiceFinder;
 import com.sun.ws.rest.spi.view.ViewProvider;
 import com.sun.ws.rest.spi.view.ViewProvider;
@@ -37,26 +38,13 @@ public final class ViewFactory {
     private ViewFactory() {
     }
     
-    /**
-     * Create a view from a resource.
-     * 
-     * @param request the HTTP request
-     * @param resource the URL to the resource from which the view shall
-     *        be created.
-     * @return the view.
-     */
-    public static View createView(Object containerMemento, String absolutePath) throws ContainerException {
-        for (ViewProvider vp : ServiceFinder.find(ViewProvider.class)) {
-            System.out.println(vp);
-        }
-        
-        for (ViewProvider vp : ServiceFinder.find(ViewProvider.class)) {
-            View v = vp.createView(containerMemento, absolutePath);
+    public static View createView(ComponentProvider provider, String absolutePath) throws ContainerException {
+        for (ViewProvider vp : ServiceFinder.find(ViewProvider.class, true, provider)) {
+            View v = vp.createView(absolutePath);
             if (v != null)
                 return v;
         }
 
         return null;
     }
-    
 }

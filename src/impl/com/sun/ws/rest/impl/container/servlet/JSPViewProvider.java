@@ -28,6 +28,8 @@ import com.sun.ws.rest.api.core.HttpResponseContext;
 import com.sun.ws.rest.spi.view.ViewProvider;
 import com.sun.ws.rest.spi.view.View;
 import java.net.MalformedURLException;
+import javax.annotation.Resource;
+import javax.servlet.ServletContext;
 import javax.ws.rs.core.MediaType;
 
 /**
@@ -35,6 +37,8 @@ import javax.ws.rs.core.MediaType;
  * @author Paul.Sandoz@Sun.Com
  */
 public class JSPViewProvider implements ViewProvider {
+    
+    @Resource ServletContext servletContext;
     
     static final class JSPView implements View {
         private final String path;
@@ -55,17 +59,16 @@ public class JSPViewProvider implements ViewProvider {
         }
     }
     
-    public View createView(Object containerMemento, String absolutePath) throws ContainerException {
+    public View createView(String absolutePath) throws ContainerException {
         if (!absolutePath.endsWith(".jsp"))
             return null;
         
-        if (!(containerMemento instanceof ServletAdaptor)) {
+        if (servletContext == null) {
             throw new ContainerException("Java Server Pages not supported by the container");
         }
         
-        ServletAdaptor a = (ServletAdaptor)containerMemento;
         try {
-            if (a.getServletContext().getResource(absolutePath) == null) {
+            if (servletContext.getResource(absolutePath) == null) {
                 // TODO log
                 return null;
             }

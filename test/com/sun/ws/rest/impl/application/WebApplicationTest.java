@@ -141,7 +141,7 @@ public class WebApplicationTest extends TestCase {
         
         WebApplicationImpl a = new WebApplicationImpl();
         ResourceConfig c = new DefaultResourceConfig(s);
-        a.initiate(null, c);
+        a.initiate(c);
         return a;
     }
     

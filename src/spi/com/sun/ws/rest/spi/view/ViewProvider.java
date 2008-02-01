@@ -34,10 +34,9 @@ public interface ViewProvider {
     /**
      * Create a view.
      * 
-     * @param containerMemento the container memento
      * @param absolutePath the absolute path to the view resource from which the 
      *        view shall be created.
      * @return the view.
      */
-    View createView(Object containerMemento, String absolutePath) throws ContainerException;
+    View createView(String absolutePath) throws ContainerException;
 }
