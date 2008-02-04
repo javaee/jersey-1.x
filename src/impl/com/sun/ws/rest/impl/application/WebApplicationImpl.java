@@ -62,6 +62,7 @@ import java.io.StringWriter;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Modifier;
 import java.lang.reflect.Proxy;
 import java.lang.reflect.Type;
 import java.net.URI;
@@ -391,6 +392,20 @@ public final class WebApplicationImpl implements WebApplication {
                         "of the ResourceConfig is not a root resource class" +  
                         ". This class will be ignored");
                 continue;   
+            }            
+            // TODO this should be moved to the validation
+            // as such classes are not root resource classes
+            int modifiers = c.getModifiers();
+            if (Modifier.isAbstract(modifiers)) {
+                LOGGER.warning("The abstract class, " + c + ", registered as a root resource class " + 
+                        "of the ResourceConfig cannot be instantiated" +  
+                        ". This class will be ignored");
+                continue;                   
+            } else if (Modifier.isInterface(modifiers)) {
+                LOGGER.warning("The interface, " + c + ", registered as a root resource class " + 
+                        "of the ResourceConfig cannot be instantiated" +  
+                        ". This interface will be ignored");
+                continue;                                   
             }
             
             ResourceClass r = getResourceClass(ar);
