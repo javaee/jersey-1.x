@@ -23,7 +23,7 @@
 package com.sun.ws.rest.impl.resource;
 
 import com.sun.ws.rest.impl.AbstractResourceTester;
-import com.sun.ws.rest.impl.client.ResponseInBound;
+import com.sun.ws.rest.impl.client.ClientResponse;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.core.Response;
@@ -50,8 +50,8 @@ public class ReturnResponseHeadersTest extends AbstractResourceTester {
     public void testRepresentationHeaders() throws Exception {
         initiateWebApplication(TestRepresentationBean.class);
         
-        ResponseInBound response = resourceProxy("/").content("content").
-                accept("text/plain").post(ResponseInBound.class);
+        ClientResponse response = resourceProxy("/").entity("content").
+                accept("text/plain").post(ClientResponse.class);
         assertEquals("content", response.getEntity(String.class));
         assertEquals("en", response.getLangauge());
     }

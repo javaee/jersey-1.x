@@ -22,7 +22,6 @@
 
 package com.sun.ws.rest.impl.client;
 
-import com.sun.ws.rest.impl.client.RequestOutBound.Builder;
 import com.sun.ws.rest.impl.ResponseHttpHeadersImpl;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
@@ -31,55 +30,59 @@ import javax.ws.rs.core.MultivaluedMap;
  *
  * @author Paul.Sandoz@Sun.Com
  */
-public class RequestOutBoundBuilder extends RequestOutBound.Builder {
+public abstract class BaseClientRequestBuilder<T extends ClientRequestBuilder<T>> 
+        implements ClientRequestBuilder<T> {
+
+    protected Object entity;
     
-    private Object entity;
+    protected MultivaluedMap<String, Object> metadata;
     
-    private MultivaluedMap<String, Object> metadata;
-    
-    RequestOutBoundBuilder() {
+    protected BaseClientRequestBuilder() {
         metadata = new ResponseHttpHeadersImpl();
     }
     
-    public RequestOutBound build() {
-        RequestOutBoundImpl ro = new RequestOutBoundImpl(entity, metadata);
-        entity = null;
-        metadata = null;
-        return ro;
-    }
-
-    public Builder entity(Object entity) {
+    public T entity(Object entity) {
         this.entity = entity;
-        return this;
+        return (T)this;
     }
 
-    public Builder entity(Object entity, MediaType type) {
+    public T entity(Object entity, MediaType type) {
         entity(entity);
-        getMetadata().putSingle("Content-Type", type);
-        return this;
+        type(type);
+        return (T)this;
     }
 
-    public Builder entity(Object entity, String type) {
+    public T entity(Object entity, String type) {
         entity(entity);
-        getMetadata().putSingle("Content-Type", type);
-        return this;
+        type(type);
+        return (T)this;
     }
     
-    public Builder accept(MediaType... types) {
+    public T type(MediaType type) {
+        getMetadata().putSingle("Content-Type", type);        
+        return (T)this;
+    }
+        
+    public T type(String type) {
+        getMetadata().putSingle("Content-Type", type);        
+        return (T)this;
+    }
+        
+    public T accept(MediaType... types) {
         for (MediaType type : types)
             getMetadata().add("Accept", type);
-        return this;
+        return (T)this;
     }
     
-    public Builder accept(String... types) {
+    public T accept(String... types) {
         for (String type : types)
             getMetadata().add("Accept", type);
-        return this;
+        return (T)this;
     }
     
-    public Builder header(String name, Object value) {
+    public T header(String name, Object value) {
         getMetadata().add(name, value);
-        return this;
+        return (T)this;
     }
     
     private MultivaluedMap<String, Object> getMetadata() {

@@ -23,12 +23,12 @@
 package com.sun.ws.rest.impl.container.httpserver;
 
 import com.sun.net.httpserver.HttpHandler;
-import com.sun.ws.rest.impl.client.RequestOutBound;
-import com.sun.ws.rest.impl.client.ResponseInBound;
+import com.sun.ws.rest.impl.client.ClientRequest;
+import com.sun.ws.rest.impl.client.ClientResponse;
 import java.net.URI;
 import javax.ws.rs.Path;
 import com.sun.ws.rest.impl.client.ResourceProxy;
-import com.sun.ws.rest.impl.client.ResourceProxyFilter;
+import com.sun.ws.rest.impl.client.ClientFilter;
 import javax.ws.rs.GET;
 import javax.ws.rs.ProduceMime;
 import javax.xml.bind.annotation.XmlRootElement;
@@ -78,34 +78,34 @@ public class AcceptableXMLorJSONTest extends AbstractHttpServerTester {
         startServer(HttpHandler.class, WebResource.class);
 
         ResourceProxy r = ResourceProxy.create(getUri().path("resource").build());
-        r.addFilter(new ResourceProxyFilter() {
-            public ResponseInBound invoke(URI u, String method, RequestOutBound ro) {
-                ResponseInBound ri = getNext().invoke(u, method, ro);
+        r.addFilter(new ClientFilter() {
+            public ClientResponse handle(ClientRequest ro) {
+                ClientResponse ri = getNext().handle(ro);
                 
                 assertEquals(200, ri.getStatus());
                 assertEquals("application/xml", ri.getMetadata().getFirst("Content-Type"));
                 return ri;
             }
         });        
-        String content = r.acceptable("application/xml").get(String.class);
+        String content = r.accept("application/xml").get(String.class);
         assertTrue(content.contains("<jaxbBean><value>test</value></jaxbBean>"));
-        content = r.acceptable("application/*").get(String.class);
+        content = r.accept("application/*").get(String.class);
         assertTrue(content.contains("<jaxbBean><value>test</value></jaxbBean>"));
-        content = r.acceptable("*/*").get(String.class);
+        content = r.accept("*/*").get(String.class);
         assertTrue(content.contains("<jaxbBean><value>test</value></jaxbBean>"));
 
         
         r.removeAllFilters();
-        r.addFilter(new ResourceProxyFilter() {
-            public ResponseInBound invoke(URI u, String method, RequestOutBound ro) {
-                ResponseInBound ri = getNext().invoke(u, method, ro);
+        r.addFilter(new ClientFilter() {
+            public ClientResponse handle(ClientRequest ro) {
+                ClientResponse ri = getNext().handle(ro);
                 
                 assertEquals(200, ri.getStatus());
                 assertEquals("application/json", ri.getMetadata().getFirst("Content-Type"));
                 return ri;
             }
         });
-        content = r.acceptable("application/json").get(String.class);
+        content = r.accept("application/json").get(String.class);
         assertTrue(content.contains("{\"jaxbBean\":{\"value\":{\"$\":\"test\"}}}"));
     }
 }

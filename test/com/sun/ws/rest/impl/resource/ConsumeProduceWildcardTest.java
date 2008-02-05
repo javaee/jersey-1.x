@@ -64,7 +64,7 @@ public class ConsumeProduceWildcardTest extends AbstractResourceTester {
         initiateWebApplication(ConsumeWildCardBean.class);
         ResourceProxy r = resourceProxy("/a/b");
         
-        assertEquals("HTML", r.content("", "text/html").post(String.class));
-        assertEquals("XHTML", r.content("", "text/xhtml").post(String.class));
+        assertEquals("HTML", r.entity("", "text/html").post(String.class));
+        assertEquals("XHTML", r.entity("", "text/xhtml").post(String.class));
     }    
 }

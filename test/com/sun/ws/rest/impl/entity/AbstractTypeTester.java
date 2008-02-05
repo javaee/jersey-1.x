@@ -24,7 +24,7 @@ package com.sun.ws.rest.impl.entity;
 
 import com.sun.ws.rest.impl.AbstractResourceTester;
 import com.sun.ws.rest.impl.client.ResourceProxy;
-import com.sun.ws.rest.impl.client.ResponseInBound;
+import com.sun.ws.rest.impl.client.ClientResponse;
 import javax.ws.rs.POST;
 
 /**
@@ -52,7 +52,7 @@ public abstract class AbstractTypeTester extends AbstractResourceTester {
         initiateWebApplication(resource);
         ResourceProxy r = resourceProxy("/");
 
-        ResponseInBound rib = r.post(ResponseInBound.class, in);
+        ClientResponse rib = r.post(ClientResponse.class, in);
         
         byte[] inBytes = (byte[])
                 rib.getProperties().get("request.entity");

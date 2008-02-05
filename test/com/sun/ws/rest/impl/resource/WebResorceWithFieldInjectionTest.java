@@ -128,6 +128,6 @@ public class WebResorceWithFieldInjectionTest extends AbstractResourceTester {
         initiateWebApplication(TestFieldInjectedHttpHeaders.class);
         
         assertEquals("GET", resourceProxy("a/b").
-                request("X-TEST", "TEST").get(String.class));
+                header("X-TEST", "TEST").get(String.class));
     }
 }

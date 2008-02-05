@@ -24,7 +24,7 @@ package com.sun.ws.rest.impl.http.header.provider;
 
 import javax.ws.rs.Path;
 import com.sun.ws.rest.impl.AbstractResourceTester;
-import com.sun.ws.rest.impl.client.ResponseInBound;
+import com.sun.ws.rest.impl.client.ClientResponse;
 import java.net.URI;
 import java.util.GregorianCalendar;
 import javax.ws.rs.GET;
@@ -58,7 +58,7 @@ public class BeanTest extends AbstractResourceTester {
     public void testHeaders() {
         initiateWebApplication(TestResource.class);
         
-        ResponseInBound response = resourceProxy("/").get(ResponseInBound.class);
+        ClientResponse response = resourceProxy("/").get(ClientResponse.class);
         
         assertEquals(new GregorianCalendar(2007, 0, 0, 0, 0, 0).getTime(),
                 response.getLastModified());

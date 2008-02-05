@@ -24,7 +24,7 @@ package com.sun.ws.rest.impl.resource;
 
 import com.sun.ws.rest.impl.AbstractResourceTester;
 import com.sun.ws.rest.api.container.ContainerException;
-import com.sun.ws.rest.impl.client.ResponseInBound;
+import com.sun.ws.rest.impl.client.ClientResponse;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 
@@ -57,7 +57,7 @@ public class ExceptionTest extends AbstractResourceTester {
         
         boolean caught = false;
         try {
-            resourceProxy("/exception/checked").get(ResponseInBound.class);
+            resourceProxy("/exception/checked").get(ClientResponse.class);
         } catch (ContainerException e) {
             caught = true;
             assertEquals(CheckedException.class, e.getCause().getClass());
@@ -77,7 +77,7 @@ public class ExceptionTest extends AbstractResourceTester {
         
         boolean caught = false;
         try {
-            resourceProxy("/exception/runtime").get(ResponseInBound.class);
+            resourceProxy("/exception/runtime").get(ClientResponse.class);
         } catch (UnsupportedOperationException e) {
             caught = true;
         }

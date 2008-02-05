@@ -123,25 +123,25 @@ public class ConsumeProduceSimpleTest extends AbstractResourceTester {
         initiateWebApplication(ConsumeSimpleBean.class);
         ResourceProxy r = resourceProxy("/a/b");
         
-        assertEquals("HTML", r.content("", "text/html").post(String.class));
-        assertEquals("XHTML", r.content("", "text/xhtml").post(String.class));
+        assertEquals("HTML", r.entity("", "text/html").post(String.class));
+        assertEquals("XHTML", r.entity("", "text/xhtml").post(String.class));
     }
     
     public void testProduceSimpleBean() {
         initiateWebApplication(ProduceSimpleBean.class);
         ResourceProxy r = resourceProxy("/a/b");
 
-        assertEquals("HTML", r.acceptable("text/html").get(String.class));
-        assertEquals("XHTML", r.acceptable("text/xhtml").get(String.class));
+        assertEquals("HTML", r.accept("text/html").get(String.class));
+        assertEquals("XHTML", r.accept("text/xhtml").get(String.class));
     }
     
     public void testConsumeProduceSimpleBean() {
         initiateWebApplication(ConsumeProduceSimpleBean.class);
         ResourceProxy r = resourceProxy("/a/b");
         
-        assertEquals("HTML", r.content("", "text/html").accept("text/html").post(String.class));
-        assertEquals("XHTML", r.content("", "text/xhtml").accept("text/xhtml").post(String.class));
-        assertEquals("HTML", r.acceptable("text/html").get(String.class));
-        assertEquals("XHTML", r.acceptable("text/xhtml").get(String.class));
+        assertEquals("HTML", r.entity("", "text/html").accept("text/html").post(String.class));
+        assertEquals("XHTML", r.entity("", "text/xhtml").accept("text/xhtml").post(String.class));
+        assertEquals("HTML", r.accept("text/html").get(String.class));
+        assertEquals("XHTML", r.accept("text/xhtml").get(String.class));
     }
 }

@@ -23,12 +23,12 @@
 package com.sun.ws.rest.impl;
 
 import com.sun.ws.rest.api.core.ResourceConfig;
-import com.sun.ws.rest.impl.client.RequestOutBound;
-import com.sun.ws.rest.impl.client.ResponseInBound;
+import com.sun.ws.rest.impl.client.ClientRequest;
+import com.sun.ws.rest.impl.client.ClientResponse;
 import com.sun.ws.rest.impl.application.WebApplicationImpl;
 import com.sun.ws.rest.api.core.DefaultResourceConfig;
 import com.sun.ws.rest.impl.client.ResourceProxy;
-import com.sun.ws.rest.impl.client.ResourceProxyFilter;
+import com.sun.ws.rest.impl.client.ClientFilter;
 import com.sun.ws.rest.spi.container.WebApplication;
 import java.lang.annotation.Annotation;
 import java.net.URI;
@@ -88,9 +88,9 @@ public abstract class AbstractResourceTester extends TestCase {
                 createCompleteUri(BASE_URI, relativeUri), BASE_URI, 
                 w);
         if (checkStatus) {
-            r.addFilter(new ResourceProxyFilter() {
-                public ResponseInBound invoke(URI u, String method, RequestOutBound ro) {
-                    ResponseInBound r = getNext().invoke(u, method, ro);
+            r.addFilter(new ClientFilter() {
+                public ClientResponse handle(ClientRequest ro) {
+                    ClientResponse r = getNext().handle(ro);
                     if (r.hasEntity()) {
                         assertEquals(200, r.getStatus());
                     } else {

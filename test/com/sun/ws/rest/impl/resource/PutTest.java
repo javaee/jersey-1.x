@@ -23,7 +23,7 @@
 package com.sun.ws.rest.impl.resource;
 
 import com.sun.ws.rest.impl.AbstractResourceTester;
-import com.sun.ws.rest.impl.client.ResponseInBound;
+import com.sun.ws.rest.impl.client.ClientResponse;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 
@@ -75,12 +75,12 @@ public class PutTest extends AbstractResourceTester {
                 PutNoInputResource.class,
                 PutResource.class);
 
-        ResponseInBound response = resourceProxy("/PutNoInputNoReturnResource").
-                put(ResponseInBound.class);
+        ClientResponse response = resourceProxy("/PutNoInputNoReturnResource").
+                put(ClientResponse.class);
         assertEquals(204, response.getStatus());
         
         response = resourceProxy("/PutNoReturnResource").
-                put(ResponseInBound.class, "PutNoReturnResource");
+                put(ClientResponse.class, "PutNoReturnResource");
         assertEquals(204, response.getStatus());
         
         String s = resourceProxy("/PutNoInputResource").put(String.class);

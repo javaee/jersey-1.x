@@ -25,7 +25,7 @@ package com.sun.ws.rest.impl.resource;
 import javax.ws.rs.ProduceMime;
 import javax.ws.rs.Path;
 import com.sun.ws.rest.impl.AbstractResourceTester;
-import com.sun.ws.rest.impl.client.ResponseInBound;
+import com.sun.ws.rest.impl.client.ClientResponse;
 import javax.ws.rs.GET;
 import javax.ws.rs.core.MediaType;
 
@@ -60,7 +60,7 @@ public class TypeReturnTest extends AbstractResourceTester {
     public void testReturnType() {
         initiateWebApplication(Resource.class);
         
-        ResponseInBound response = resourceProxy("/", false).get(ResponseInBound.class);                
+        ClientResponse response = resourceProxy("/", false).get(ClientResponse.class);                
         assertEquals("CONTENT", response.getEntity(String.class));
         assertEquals(MediaType.parse("application/octet-stream"), 
                 response.getContentType());
@@ -70,7 +70,7 @@ public class TypeReturnTest extends AbstractResourceTester {
     public void testReturnHttpTypeWithSingleProduceMime() {
         initiateWebApplication(ResourceWithSingleProduceMime.class);
         
-        ResponseInBound response = resourceProxy("/", false).get(ResponseInBound.class);                
+        ClientResponse response = resourceProxy("/", false).get(ClientResponse.class);                
         assertEquals("CONTENT", response.getEntity(String.class));
         assertEquals(MediaType.parse("text/plain"), 
                 response.getContentType());

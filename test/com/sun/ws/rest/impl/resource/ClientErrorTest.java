@@ -27,7 +27,7 @@ import javax.ws.rs.ConsumeMime;
 import javax.ws.rs.ProduceMime;
 import javax.ws.rs.Path;
 import com.sun.ws.rest.impl.client.ResourceProxy;
-import com.sun.ws.rest.impl.client.ResponseInBound;
+import com.sun.ws.rest.impl.client.ClientResponse;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 
@@ -64,7 +64,7 @@ public class ClientErrorTest extends AbstractResourceTester {
         initiateWebApplication(WebResourceNotFoundMethodNotAllowed.class);
         ResourceProxy r = resourceProxy("/foo", false);
 
-        ResponseInBound response = r.acceptable("application/foo").get(ResponseInBound.class);
+        ClientResponse response = r.accept("application/foo").get(ClientResponse.class);
         assertEquals(404, response.getStatus());
     }
     
@@ -72,8 +72,8 @@ public class ClientErrorTest extends AbstractResourceTester {
         initiateWebApplication(WebResourceNotFoundMethodNotAllowed.class);
         ResourceProxy r = resourceProxy("/", false);
         
-        ResponseInBound response = r.content("content", "application/foo").
-                accept("application/foo").post(ResponseInBound.class);
+        ClientResponse response = r.entity("content", "application/foo").
+                accept("application/foo").post(ClientResponse.class);
         assertEquals(405, response.getStatus());
         String allow = response.getMetadata().getFirst("Allow").toString();
         assertTrue(allow.contains("GET"));
@@ -83,8 +83,8 @@ public class ClientErrorTest extends AbstractResourceTester {
         initiateWebApplication(WebResourceUnsupportedMediaType.class);
         ResourceProxy r = resourceProxy("/", false);
         
-        ResponseInBound response = r.content("content", "application/foo").
-                accept("application/foo").post(ResponseInBound.class);
+        ClientResponse response = r.entity("content", "application/foo").
+                accept("application/foo").post(ClientResponse.class);
         assertEquals(415, response.getStatus());
     }
     
@@ -92,8 +92,8 @@ public class ClientErrorTest extends AbstractResourceTester {
         initiateWebApplication(WebResourceUnsupportedMediaType.class);
         ResourceProxy r = resourceProxy("/", false);
         
-        ResponseInBound response = r.content("content", "application/bar").
-                accept("application/bar").post(ResponseInBound.class);
+        ClientResponse response = r.entity("content", "application/bar").
+                accept("application/bar").post(ClientResponse.class);
         assertEquals(406, response.getStatus());
     }    
 }

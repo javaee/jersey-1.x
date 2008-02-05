@@ -151,7 +151,7 @@ public class WadlResourceTest extends AbstractResourceTester {
         ResourceProxy r = resourceProxy("/widgets");
         
         // test WidgetsResource
-        File tmpFile = r.acceptable(MediaTypes.WADL).get(File.class);
+        File tmpFile = r.accept(MediaTypes.WADL).get(File.class);
         DocumentBuilderFactory bf = DocumentBuilderFactory.newInstance();
         bf.setNamespaceAware(true);
         bf.setValidating(false);
@@ -196,7 +196,7 @@ public class WadlResourceTest extends AbstractResourceTester {
         // test ExtraResource
         r = resourceProxy("/foo");
         
-        tmpFile = r.acceptable(MediaTypes.WADL).get(File.class);
+        tmpFile = r.accept(MediaTypes.WADL).get(File.class);
         b = bf.newDocumentBuilder();
         d = b.parse(tmpFile);
         printSource(new DOMSource(d));
@@ -287,7 +287,7 @@ public class WadlResourceTest extends AbstractResourceTester {
         ResourceProxy r = resourceProxy("/widgets/3/verbose");
         
         // test WidgetsResource
-        File tmpFile = r.acceptable(MediaTypes.WADL).get(File.class);
+        File tmpFile = r.accept(MediaTypes.WADL).get(File.class);
         DocumentBuilderFactory bf = DocumentBuilderFactory.newInstance();
         bf.setNamespaceAware(true);
         bf.setValidating(false);
@@ -316,7 +316,7 @@ public class WadlResourceTest extends AbstractResourceTester {
         ResourceProxy r = resourceProxy("/widgets/3");
         
         // test WidgetsResource
-        File tmpFile = r.acceptable(MediaTypes.WADL).get(File.class);
+        File tmpFile = r.accept(MediaTypes.WADL).get(File.class);
         DocumentBuilderFactory bf = DocumentBuilderFactory.newInstance();
         bf.setNamespaceAware(true);
         bf.setValidating(false);
@@ -372,7 +372,7 @@ public class WadlResourceTest extends AbstractResourceTester {
         ResourceProxy r = resourceProxy("/root/loc");
         
         // test WidgetsResource
-        File tmpFile = r.acceptable(MediaTypes.WADL).get(File.class);
+        File tmpFile = r.accept(MediaTypes.WADL).get(File.class);
         DocumentBuilderFactory bf = DocumentBuilderFactory.newInstance();
         bf.setNamespaceAware(true);
         bf.setValidating(false);
@@ -391,7 +391,7 @@ public class WadlResourceTest extends AbstractResourceTester {
         r = resourceProxy("/root/loc/loc");
         
         // test WidgetsResource
-        tmpFile = r.acceptable(MediaTypes.WADL).get(File.class);
+        tmpFile = r.accept(MediaTypes.WADL).get(File.class);
         bf = DocumentBuilderFactory.newInstance();
         bf.setNamespaceAware(true);
         bf.setValidating(false);

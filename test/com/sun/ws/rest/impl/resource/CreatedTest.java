@@ -24,7 +24,7 @@ package com.sun.ws.rest.impl.resource;
 
 import com.sun.ws.rest.impl.AbstractResourceTester;
 import com.sun.ws.rest.impl.client.ResourceProxy;
-import com.sun.ws.rest.impl.client.ResponseInBound;
+import com.sun.ws.rest.impl.client.ClientResponse;
 import java.net.URI;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -54,7 +54,7 @@ public class CreatedTest extends AbstractResourceTester {
         initiateWebApplication(Resource.class);
         ResourceProxy r = resourceProxy("/", false);
 
-        ResponseInBound response = r.post(ResponseInBound.class);        
+        ClientResponse response = r.post(ClientResponse.class);        
         assertEquals(201, response.getStatus());
         
         URI l = UriBuilder.fromUri(BASE_URI).path("subpath").build();

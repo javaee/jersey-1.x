@@ -89,13 +89,13 @@ public class WebResorceWithParameterInjectionTest extends AbstractResourceTester
         initiateWebApplication(TestParameterInjectedHttpHeaders.class);
         
         assertEquals("GET", resourceProxy("a/b").
-                request("X-TEST", "TEST").get(String.class));
+                header("X-TEST", "TEST").get(String.class));
     }
     
     public void testParameterInjectedUriInfoHttpHeaders() {
         initiateWebApplication(TestParameterInjectedUriInfoHttpHeaders.class);
         
         assertEquals("GET", resourceProxy("a/b").
-                request("X-TEST", "TEST").get(String.class));
+                header("X-TEST", "TEST").get(String.class));
     }
 }

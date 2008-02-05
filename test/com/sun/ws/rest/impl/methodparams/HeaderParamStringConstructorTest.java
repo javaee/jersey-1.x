@@ -27,7 +27,7 @@ import javax.ws.rs.DefaultValue;
 import javax.ws.rs.HeaderParam;
 import javax.ws.rs.Path;
 import com.sun.ws.rest.impl.AbstractResourceTester;
-import com.sun.ws.rest.impl.client.ResponseInBound;
+import com.sun.ws.rest.impl.client.ClientResponse;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.net.URI;
@@ -153,7 +153,7 @@ public class HeaderParamStringConstructorTest extends AbstractResourceTester {
         initiateWebApplication(ResourceString.class);
         
         resourceProxy("/").
-                request("arg1", "3.145").
+                header("arg1", "3.145").
                 header("arg2", "3145").
                 header("arg3", "http://test").
                 get(String.class);
@@ -163,7 +163,7 @@ public class HeaderParamStringConstructorTest extends AbstractResourceTester {
         initiateWebApplication(ResourceStringList.class);
         
         resourceProxy("/").
-                acceptable("application/stringlist").
+                accept("application/stringlist").
                 header("args", "3.145").
                 header("args", "2.718").
                 header("args", "1.618").
@@ -174,7 +174,7 @@ public class HeaderParamStringConstructorTest extends AbstractResourceTester {
         initiateWebApplication(ResourceStringListEmpty.class);
         
         resourceProxy("/").
-                acceptable("application/stringlist").
+                accept("application/stringlist").
                 header("args", "").
                 header("args", "").
                 header("args", "").
@@ -185,7 +185,7 @@ public class HeaderParamStringConstructorTest extends AbstractResourceTester {
         initiateWebApplication(ResourceStringListAbsent.class);
         
         resourceProxy("/").
-            acceptable("application/stringlist").
+            accept("application/stringlist").
             get(String.class);
     }
     
@@ -205,7 +205,7 @@ public class HeaderParamStringConstructorTest extends AbstractResourceTester {
         initiateWebApplication(ResourceStringDefault.class);
         
         resourceProxy("/").
-                request("args", "2.718").
+                header("args", "2.718").
                 get(String.class);
     }
     
@@ -225,18 +225,18 @@ public class HeaderParamStringConstructorTest extends AbstractResourceTester {
         initiateWebApplication(ResourceStringListDefaultOverride.class);
         
         resourceProxy("/").
-                request("args", "2.718").
+                header("args", "2.718").
                 get(String.class);
     }
     
     public void testBadStringConstructorValue() {
         initiateWebApplication(ResourceString.class);
         
-        ResponseInBound response = resourceProxy("/", false).
-                request("arg1", "ABCDEF").
+        ClientResponse response = resourceProxy("/", false).
+                header("arg1", "ABCDEF").
                 header("arg2", "3145").
                 header("arg3", "http://test").
-                get(ResponseInBound.class);
+                get(ClientResponse.class);
         assertEquals(400, response.getStatus());
     }
 }

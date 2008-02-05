@@ -27,7 +27,7 @@ import javax.ws.rs.DefaultValue;
 import javax.ws.rs.MatrixParam;
 import javax.ws.rs.Path;
 import com.sun.ws.rest.impl.AbstractResourceTester;
-import com.sun.ws.rest.impl.client.ResponseInBound;
+import com.sun.ws.rest.impl.client.ClientResponse;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.net.URI;
@@ -160,7 +160,7 @@ public class MatrixParamStringConstructorTest extends AbstractResourceTester {
         initiateWebApplication(ResourceStringList.class);
         
         resourceProxy("/;args=3.145;args=2.718;args=1.618").
-                acceptable("application/stringlist").
+                accept("application/stringlist").
                 get(String.class);
     }
     
@@ -168,7 +168,7 @@ public class MatrixParamStringConstructorTest extends AbstractResourceTester {
         initiateWebApplication(ResourceStringListEmpty.class);
         
         resourceProxy("/;args;args;args").
-                acceptable("application/stringlist").
+                accept("application/stringlist").
                 get(String.class);
     }
     
@@ -176,7 +176,7 @@ public class MatrixParamStringConstructorTest extends AbstractResourceTester {
         initiateWebApplication(ResourceStringListAbsent.class);
         
         resourceProxy("/").
-            acceptable("application/stringlist").
+            accept("application/stringlist").
             get(String.class);
     }
     
@@ -221,8 +221,8 @@ public class MatrixParamStringConstructorTest extends AbstractResourceTester {
     public void testBadStringConstructorValue() {
         initiateWebApplication(ResourceString.class);
         
-        ResponseInBound response = resourceProxy("/;arg1=ABCDEF;arg2=3145;arg3=http:%2F%2Ftest", false).
-                get(ResponseInBound.class);
+        ClientResponse response = resourceProxy("/;arg1=ABCDEF;arg2=3145;arg3=http:%2F%2Ftest", false).
+                get(ClientResponse.class);
         assertEquals(400, response.getStatus());
     }
 }

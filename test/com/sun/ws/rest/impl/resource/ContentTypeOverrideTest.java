@@ -25,7 +25,7 @@ package com.sun.ws.rest.impl.resource;
 import com.sun.ws.rest.impl.AbstractResourceTester;
 import com.sun.ws.rest.api.core.HttpContextAccess;
 import com.sun.ws.rest.impl.client.ResourceProxy;
-import com.sun.ws.rest.impl.client.ResponseInBound;
+import com.sun.ws.rest.impl.client.ClientResponse;
 import javax.ws.rs.GET;
 import javax.ws.rs.ProduceMime;
 import javax.ws.rs.Path;
@@ -58,8 +58,8 @@ public class ContentTypeOverrideTest extends AbstractResourceTester {
         initiateWebApplication(WebResourceOverride.class);
         ResourceProxy r = resourceProxy("/");
         
-        ResponseInBound response = r.acceptable("application/foo", "application/bar").
-                get(ResponseInBound.class);
+        ClientResponse response = r.accept("application/foo", "application/bar").
+                get(ClientResponse.class);
 
         assertEquals(MediaType.parse("application/foo"), response.getContentType());
     }

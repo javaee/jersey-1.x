@@ -26,7 +26,7 @@ import com.sun.ws.rest.impl.AbstractResourceTester;
 import javax.ws.rs.ProduceMime;
 import javax.ws.rs.Path;
 import com.sun.ws.rest.impl.client.ResourceProxy;
-import com.sun.ws.rest.impl.client.ResponseInBound;
+import com.sun.ws.rest.impl.client.ClientResponse;
 import java.io.IOException;
 import javax.ws.rs.GET;
 import javax.ws.rs.core.MediaType;
@@ -74,21 +74,21 @@ public class AcceptTest extends AbstractResourceTester {
         initiateWebApplication(WebResource.class);
         ResourceProxy r = resourceProxy("/");
         
-        String s = r.acceptable("application/foo").get(String.class);
+        String s = r.accept("application/foo").get(String.class);
         assertEquals("foo", s);
         
-        s = r.acceptable("application/foo;q=0.1").get(String.class);
+        s = r.accept("application/foo;q=0.1").get(String.class);
         assertEquals("foo", s);
 
-        s = r.acceptable("application/foo", "application/bar;q=0.4", "application/baz;q=0.2").
+        s = r.accept("application/foo", "application/bar;q=0.4", "application/baz;q=0.2").
                 get(String.class);
         assertEquals("foo", s);
         
-        s = r.acceptable("application/foo;q=0.4", "application/bar", "application/baz;q=0.2").
+        s = r.accept("application/foo;q=0.4", "application/bar", "application/baz;q=0.2").
                 get(String.class);
         assertEquals("bar", s);
         
-        s = r.acceptable("application/foo;q=0.4", "application/bar;q=0.2", "application/baz").
+        s = r.accept("application/foo;q=0.4", "application/bar;q=0.2", "application/baz").
                 get(String.class);
         assertEquals("baz", s);
     }   
@@ -97,7 +97,7 @@ public class AcceptTest extends AbstractResourceTester {
         initiateWebApplication(WebResource.class);
         ResourceProxy r = resourceProxy("/");
         
-        String s = r.acceptable("application/wildcard", "application/foo;q=0.6", 
+        String s = r.accept("application/wildcard", "application/foo;q=0.6", 
                 "application/bar;q=0.4", "application/baz;q=0.2").
                 get(String.class);
         assertEquals("wildcard", s);
@@ -107,7 +107,7 @@ public class AcceptTest extends AbstractResourceTester {
         initiateWebApplication(WebResource.class);
         ResourceProxy r = resourceProxy("/", false);
 
-        ResponseInBound response = r.acceptable("application/foo;q=1.1").get(ResponseInBound.class);
+        ClientResponse response = r.accept("application/foo;q=1.1").get(ClientResponse.class);
         assertEquals(400, response.getStatus());        
     }
     
@@ -115,7 +115,7 @@ public class AcceptTest extends AbstractResourceTester {
         initiateWebApplication(WebResource.class);
         ResourceProxy r = resourceProxy("/", false);
         
-        ResponseInBound response = r.acceptable("application/foo;q=0.1234").get(ResponseInBound.class);
+        ClientResponse response = r.accept("application/foo;q=0.1234").get(ClientResponse.class);
         assertEquals(400, response.getStatus());
     }
     
@@ -135,19 +135,19 @@ public class AcceptTest extends AbstractResourceTester {
         MediaType foo = MediaType.parse("application/foo");
         MediaType bar = MediaType.parse("application/bar");
         
-        ResponseInBound response = r.acceptable(foo).get(ResponseInBound.class);
+        ClientResponse response = r.accept(foo).get(ClientResponse.class);
         assertEquals("GET", response.getEntity(String.class));
         assertEquals(foo, response.getContentType());
         
-        response = r.acceptable(bar).get(ResponseInBound.class);
+        response = r.accept(bar).get(ClientResponse.class);
         assertEquals("GET", response.getEntity(String.class));
         assertEquals(bar, response.getContentType());
 
-        response = r.acceptable("*/*").get(ResponseInBound.class);
+        response = r.accept("*/*").get(ClientResponse.class);
         assertEquals("GET", response.getEntity(String.class));
         assertEquals(foo, response.getContentType());
 
-        response = r.acceptable("application/*").get(ResponseInBound.class);
+        response = r.accept("application/*").get(ClientResponse.class);
         assertEquals("GET", response.getEntity(String.class));
         assertEquals(foo, response.getContentType());
     }   

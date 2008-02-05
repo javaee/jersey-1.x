@@ -23,7 +23,7 @@
 package com.sun.ws.rest.impl.resource;
 
 import com.sun.ws.rest.impl.AbstractResourceTester;
-import com.sun.ws.rest.impl.client.ResponseInBound;
+import com.sun.ws.rest.impl.client.ClientResponse;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -87,8 +87,8 @@ public class OptionsTest extends AbstractResourceTester {
     public void testNoOptions() {
         initiateWebApplication(ResourceNoOptions.class);
 
-        ResponseInBound response = resourceProxy("/").invoke("OPTIONS", 
-                ResponseInBound.class);
+        ClientResponse response = resourceProxy("/").options(
+                ClientResponse.class);
         String allow = response.getMetadata().getFirst("Allow").toString();
         assertTrue(allow.contains("GET"));
         assertTrue(allow.contains("PUT"));
@@ -134,8 +134,8 @@ public class OptionsTest extends AbstractResourceTester {
     public void testWithOptions() {
         initiateWebApplication(ResourceWithOptions.class);
 
-        ResponseInBound response = resourceProxy("/").invoke("OPTIONS", 
-                ResponseInBound.class);
+        ClientResponse response = resourceProxy("/").options(
+                ClientResponse.class);
         String allow = response.getMetadata().getFirst("Allow").toString();
         assertTrue(allow.contains("GET"));
         assertTrue(allow.contains("PUT"));

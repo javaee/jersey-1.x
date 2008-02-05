@@ -24,7 +24,7 @@ package com.sun.ws.rest.impl.resource;
 
 import javax.ws.rs.Path;
 import com.sun.ws.rest.impl.AbstractResourceTester;
-import com.sun.ws.rest.impl.client.ResponseInBound;
+import com.sun.ws.rest.impl.client.ClientResponse;
 import java.net.URI;
 import javax.ws.rs.GET;
 import javax.ws.rs.core.Response;
@@ -51,7 +51,7 @@ public class TempRedirectTest extends AbstractResourceTester {
     public void testReturnType() {
         initiateWebApplication(Resource.class);
         
-        ResponseInBound response = resourceProxy("/", false).get(ResponseInBound.class);        
+        ClientResponse response = resourceProxy("/", false).get(ClientResponse.class);        
         assertEquals(307, response.getStatus());
         assertEquals(UriBuilder.fromUri(BASE_URI).path("subpath").build(), 
                 response.getLocation());

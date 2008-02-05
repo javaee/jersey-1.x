@@ -127,9 +127,9 @@ public class BeanWithWebResourceTest extends AbstractResourceTester {
         initiateWebApplication(BeanWithWebResource.class);
         ResourceProxy r = resourceProxy("/a/b");
         
-        r.acceptable("text/html").get(String.class);
-        r.acceptable("text/xhtml").post();
-        r.acceptable("text/xhtml").put();
+        r.accept("text/html").get(String.class);
+        r.accept("text/xhtml").post();
+        r.accept("text/xhtml").put();
         r.delete();
     }
     
@@ -137,9 +137,9 @@ public class BeanWithWebResourceTest extends AbstractResourceTester {
         initiateWebApplication(BeanProduceWithWebResource.class);
         ResourceProxy r = resourceProxy("/a/b");
         
-        r.acceptable("text/html").get(String.class);
-        r.acceptable("text/xhtml").post();
-        r.acceptable("text/xhtml").put();
+        r.accept("text/html").get(String.class);
+        r.accept("text/xhtml").post();
+        r.accept("text/xhtml").put();
         r.delete();
     }
 }

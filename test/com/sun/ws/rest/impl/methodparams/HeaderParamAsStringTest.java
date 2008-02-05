@@ -234,7 +234,7 @@ public class HeaderParamAsStringTest extends AbstractResourceTester {
         initiateWebApplication(ResourceString.class);
         
         resourceProxy("/").
-            request("arg1", "a").
+            header("arg1", "a").
             header("arg2", "b").
             header("arg3", "c").
             get(String.class);
@@ -244,7 +244,7 @@ public class HeaderParamAsStringTest extends AbstractResourceTester {
         initiateWebApplication(ResourceStringEmpty.class);
         
         resourceProxy("/").
-            request("arg1", "").
+            header("arg1", "").
             get(String.class);
     }
     
@@ -259,7 +259,7 @@ public class HeaderParamAsStringTest extends AbstractResourceTester {
         initiateWebApplication(ResourceString.class);
         
         String s = resourceProxy("/").
-            content("content").
+            entity("content").
             header("arg1", "a").
             header("arg2", "b").
             header("arg3", "c").
@@ -272,7 +272,7 @@ public class HeaderParamAsStringTest extends AbstractResourceTester {
         initiateWebApplication(ResourceStringList.class);
         
         resourceProxy("/").
-            acceptable("application/stringlist").
+            accept("application/stringlist").
             header("args", "a").
             header("args", "b").
             header("args", "c").
@@ -283,7 +283,7 @@ public class HeaderParamAsStringTest extends AbstractResourceTester {
         initiateWebApplication(ResourceStringListEmpty.class);
         
         resourceProxy("/").
-            acceptable("application/stringlist").
+            accept("application/stringlist").
             header("args", "").
             header("args", "").
             header("args", "").
@@ -294,7 +294,7 @@ public class HeaderParamAsStringTest extends AbstractResourceTester {
         initiateWebApplication(ResourceStringListAbsent.class);
         
         resourceProxy("/").
-            acceptable("application/stringlist").
+            accept("application/stringlist").
             get(String.class);
     }
     
@@ -302,7 +302,7 @@ public class HeaderParamAsStringTest extends AbstractResourceTester {
         initiateWebApplication(ResourceStringList.class);
         
         resourceProxy("/").
-            acceptable("application/list").
+            accept("application/list").
             header("args", "a").
             header("args", "b").
             header("args", "c").
@@ -325,7 +325,7 @@ public class HeaderParamAsStringTest extends AbstractResourceTester {
         initiateWebApplication(ResourceStringDefaultOverride.class);
         
         resourceProxy("/").
-            request("arg1", "d").
+            header("arg1", "d").
             header("arg2", "e").
             header("arg3", "f").
             get(String.class);
@@ -335,7 +335,7 @@ public class HeaderParamAsStringTest extends AbstractResourceTester {
         initiateWebApplication(ResourceStringListNullDefault.class);
         
         resourceProxy("/").
-            acceptable("application/stringlist").
+            accept("application/stringlist").
             get(String.class);
     }
     
@@ -343,7 +343,7 @@ public class HeaderParamAsStringTest extends AbstractResourceTester {
         initiateWebApplication(ResourceStringListNullDefault.class);
         
         resourceProxy("/").
-            acceptable("application/list").
+            accept("application/list").
             get(String.class);
     }
     
@@ -351,7 +351,7 @@ public class HeaderParamAsStringTest extends AbstractResourceTester {
         initiateWebApplication(ResourceStringListDefault.class);
         
         resourceProxy("/").
-            acceptable("application/stringlist").
+            accept("application/stringlist").
             get(String.class);
     }
     
@@ -359,7 +359,7 @@ public class HeaderParamAsStringTest extends AbstractResourceTester {
         initiateWebApplication(ResourceStringListDefault.class);
         
         resourceProxy("/").
-            acceptable("application/list").
+            accept("application/list").
             get(String.class);
     }
     
@@ -367,7 +367,7 @@ public class HeaderParamAsStringTest extends AbstractResourceTester {
         initiateWebApplication(ResourceStringListDefaultOverride.class);
         
         resourceProxy("/").
-            acceptable("application/list").
+            accept("application/list").
             header("args", "b").
             get(String.class);
     }

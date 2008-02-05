@@ -20,33 +20,39 @@
  *     "Portions Copyrighted [year] [name of copyright owner]"
  */
 
-package com.sun.ws.rest.impl.resource;
+package com.sun.ws.rest.impl.client;
 
-import com.sun.ws.rest.impl.AbstractResourceTester;
-import javax.ws.rs.Path;
-import com.sun.ws.rest.impl.client.ResourceProxy;
-import com.sun.ws.rest.impl.client.ClientResponse;
-import java.io.IOException;
+import java.net.URI;
+import java.util.Date;
+import java.util.Map;
+import javax.ws.rs.core.EntityTag;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.MultivaluedMap;
 
 /**
  *
  * @author Paul.Sandoz@Sun.Com
  */
-public class EmptyRootResource extends AbstractResourceTester {
+public interface ClientResponse {
+    Map<String, Object> getProperties();
     
-    public EmptyRootResource(String testName) {
-        super(testName);
-    }
-
-    @Path("/")
-    public static class EmptyResource {
-    }
+    int getStatus();
     
-    public void testGet() throws IOException {
-        initiateWebApplication(EmptyResource.class);
-
-        ResourceProxy r = resourceProxy("/", false);
-        ClientResponse rib = r.get(ClientResponse.class);
-        assertEquals(405, rib.getStatus());
-    }
+    MultivaluedMap<String, String> getMetadata();
+    
+    MediaType getContentType();
+    
+    URI getLocation();
+    
+    EntityTag getEntityTag();
+    
+    Date getLastModified();
+    
+    String getLangauge();
+    
+    boolean hasEntity();
+    
+    <T> T getEntity(Class<T> c) throws IllegalArgumentException;
+    
+    <T> T getEntity(Class<T> c, boolean successful) throws IllegalArgumentException;
 }

@@ -24,7 +24,7 @@ package com.sun.ws.rest.impl.container.httpserver;
 
 import javax.ws.rs.Path;
 import com.sun.ws.rest.impl.client.ResourceProxy;
-import com.sun.ws.rest.impl.client.ResponseInBound;
+import com.sun.ws.rest.impl.client.ClientResponse;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -120,18 +120,18 @@ public class HttpMethodTest extends AbstractHttpServerTester {
     public void testPutNoArguments() {
         startServer(HttpMethodResourceNoContent.class);
         ResourceProxy r = ResourceProxy.create(getUri().path("test").build());
-        assertEquals(204, r.put(ResponseInBound.class).getStatus());
+        assertEquals(204, r.put(ClientResponse.class).getStatus());
     }    
     
     public void testPostNoArguments() {
         startServer(HttpMethodResourceNoContent.class);
         ResourceProxy r = ResourceProxy.create(getUri().path("test").build());
-        assertEquals(204, r.post(ResponseInBound.class).getStatus());
+        assertEquals(204, r.post(ClientResponse.class).getStatus());
     }    
     
     public void testDeleteNoArguments() {
         startServer(HttpMethodResourceNoContent.class);
         ResourceProxy r = ResourceProxy.create(getUri().path("test").build());
-        assertEquals(204, r.delete(ResponseInBound.class).getStatus());
+        assertEquals(204, r.delete(ClientResponse.class).getStatus());
     }    
 }

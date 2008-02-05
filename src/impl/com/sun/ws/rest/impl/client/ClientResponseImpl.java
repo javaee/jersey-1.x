@@ -35,7 +35,7 @@ import javax.ws.rs.ext.RuntimeDelegate.HeaderDelegate;
  *
  * @author Paul.Sandoz@Sun.Com
  */
-public abstract class ResponseInBoundImpl implements ResponseInBound {
+public abstract class ClientResponseImpl implements ClientResponse {
     private static final HeaderDelegate<EntityTag> entityTagDelegate = 
             RuntimeDelegate.getInstance().createHeaderDelegate(EntityTag.class);
     

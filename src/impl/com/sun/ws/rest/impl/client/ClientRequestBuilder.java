@@ -20,33 +20,29 @@
  *     "Portions Copyrighted [year] [name of copyright owner]"
  */
 
-package com.sun.ws.rest.impl.resource;
+package com.sun.ws.rest.impl.client;
 
-import com.sun.ws.rest.impl.AbstractResourceTester;
-import javax.ws.rs.Path;
-import com.sun.ws.rest.impl.client.ResourceProxy;
-import com.sun.ws.rest.impl.client.ClientResponse;
-import java.io.IOException;
+import javax.ws.rs.core.MediaType;
 
 /**
  *
  * @author Paul.Sandoz@Sun.Com
  */
-public class EmptyRootResource extends AbstractResourceTester {
-    
-    public EmptyRootResource(String testName) {
-        super(testName);
-    }
+public interface ClientRequestBuilder<T extends ClientRequestBuilder<T>> {
 
-    @Path("/")
-    public static class EmptyResource {
-    }
-    
-    public void testGet() throws IOException {
-        initiateWebApplication(EmptyResource.class);
+    T entity(Object entity);
 
-        ResourceProxy r = resourceProxy("/", false);
-        ClientResponse rib = r.get(ClientResponse.class);
-        assertEquals(405, rib.getStatus());
-    }
+    T entity(Object entity, MediaType type);
+
+    T entity(Object entity, String type);
+    
+    T type(MediaType type);
+        
+    T type(String type);
+        
+    T accept(MediaType... types);
+    
+    T accept(String... types);
+    
+    T header(String name, Object value);   
 }

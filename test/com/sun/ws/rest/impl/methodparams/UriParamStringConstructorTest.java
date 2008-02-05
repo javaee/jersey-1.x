@@ -26,7 +26,7 @@ import com.sun.ws.rest.impl.AbstractResourceTester;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Path;
 import com.sun.ws.rest.impl.AbstractResourceTester;
-import com.sun.ws.rest.impl.client.ResponseInBound;
+import com.sun.ws.rest.impl.client.ClientResponse;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import javax.ws.rs.GET;
@@ -60,8 +60,8 @@ public class UriParamStringConstructorTest extends AbstractResourceTester {
     }
     
     public void testBadStringConstructorValue() {
-        ResponseInBound response = resourceProxy("/ABCDE/ABCDE", false).
-                get(ResponseInBound.class);
+        ClientResponse response = resourceProxy("/ABCDE/ABCDE", false).
+                get(ClientResponse.class);
         assertEquals(400, response.getStatus());
     }
 }

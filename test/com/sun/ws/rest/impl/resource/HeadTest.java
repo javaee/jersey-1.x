@@ -24,7 +24,7 @@ package com.sun.ws.rest.impl.resource;
 
 import com.sun.ws.rest.impl.AbstractResourceTester;
 import com.sun.ws.rest.impl.client.ResourceProxy;
-import com.sun.ws.rest.impl.client.ResponseInBound;
+import com.sun.ws.rest.impl.client.ClientResponse;
 import javax.ws.rs.GET;
 import javax.ws.rs.HEAD;
 import javax.ws.rs.ProduceMime;
@@ -53,7 +53,7 @@ public class HeadTest extends AbstractResourceTester {
     public void testGetNoHead() {
         initiateWebApplication(ResourceGetNoHead.class);
         
-        ResponseInBound response = resourceProxy("/", false).
+        ClientResponse response = resourceProxy("/", false).
                 head();
         assertEquals(200, response.getStatus());
         assertFalse(response.hasEntity());
@@ -75,7 +75,7 @@ public class HeadTest extends AbstractResourceTester {
     public void testGetWithHead() {
         initiateWebApplication(ResourceGetWithHead.class);
         
-        ResponseInBound response = resourceProxy("/", false).
+        ClientResponse response = resourceProxy("/", false).
                 head();
         assertEquals(200, response.getStatus());
         assertFalse(response.hasEntity());
@@ -102,13 +102,13 @@ public class HeadTest extends AbstractResourceTester {
         ResourceProxy r = resourceProxy("/", false);
         
         MediaType foo = MediaType.parse("application/foo");
-        ResponseInBound response = r.acceptable(foo).head();
+        ClientResponse response = r.accept(foo).head();
         assertEquals(200, response.getStatus());
         assertFalse(response.hasEntity());
         assertEquals(foo, response.getContentType());
         
         MediaType bar = MediaType.parse("application/bar");
-        response = r.acceptable(bar).head();
+        response = r.accept(bar).head();
         assertEquals(200, response.getStatus());
         assertFalse(response.hasEntity());
         assertEquals(bar, response.getContentType());
@@ -147,14 +147,14 @@ public class HeadTest extends AbstractResourceTester {
         ResourceProxy r = resourceProxy("/", false);
         
         MediaType foo = MediaType.parse("application/foo");
-        ResponseInBound response = r.acceptable(foo).head();
+        ClientResponse response = r.accept(foo).head();
         assertEquals(200, response.getStatus());
         assertFalse(response.hasEntity());
         assertEquals(foo, response.getContentType());
         assertEquals("FOO-HEAD", response.getMetadata().getFirst("X-TEST").toString());
         
         MediaType bar = MediaType.parse("application/bar");
-        response = r.acceptable(bar).head();
+        response = r.accept(bar).head();
         assertEquals(200, response.getStatus());
         assertFalse(response.hasEntity());
         assertEquals(bar, response.getContentType());        

@@ -28,7 +28,7 @@ import javax.ws.rs.ProduceMime;
 import javax.ws.rs.MatrixParam;
 import javax.ws.rs.Path;
 import com.sun.ws.rest.impl.AbstractResourceTester;
-import com.sun.ws.rest.impl.client.ResponseInBound;
+import com.sun.ws.rest.impl.client.ClientResponse;
 import java.util.List;
 import javax.ws.rs.GET;
 
@@ -698,25 +698,25 @@ public class MatrixParamAsPrimitiveTest extends AbstractResourceTester {
     public void _test(String type, String value) {
         String param = ";" + type + "=" + value;
         
-        resourceProxy("/" + param).acceptable("application/" + type).
+        resourceProxy("/" + param).accept("application/" + type).
                 get(String.class);
         
-        resourceProxy("/wrappers" + param).acceptable("application/" + type).
+        resourceProxy("/wrappers" + param).accept("application/" + type).
                 get(String.class);    
         
-        resourceProxy("/list" + param + param + param).acceptable("application/" + type).
+        resourceProxy("/list" + param + param + param).accept("application/" + type).
                 get(String.class);
     }
 
      public void _testDefault(String base, String type, String value) {
-        resourceProxy(base + "default/null").acceptable("application/" + type).
+        resourceProxy(base + "default/null").accept("application/" + type).
                 get(String.class);
         
-        resourceProxy(base + "default").acceptable("application/" + type).
+        resourceProxy(base + "default").accept("application/" + type).
                 get(String.class);
         
         String param = ";" + type + "=" + value;
-        resourceProxy(base + "default/override" + param).acceptable("application/" + type).
+        resourceProxy(base + "default/override" + param).accept("application/" + type).
                 get(String.class);        
     }
      
@@ -845,25 +845,25 @@ public class MatrixParamAsPrimitiveTest extends AbstractResourceTester {
     }
     
     public void testBadPrimitiveValue() {
-        ResponseInBound response = resourceProxy("/;int=abcdef", false).
-                acceptable("application/int").
-                get(ResponseInBound.class);
+        ClientResponse response = resourceProxy("/;int=abcdef", false).
+                accept("application/int").
+                get(ClientResponse.class);
         
         assertEquals(400, response.getStatus());
     }
     
     public void testBadPrimitiveWrapperValue() {
-        ResponseInBound response = resourceProxy("/wrappers;int=abcdef", false).
-                acceptable("application/int").
-                get(ResponseInBound.class);
+        ClientResponse response = resourceProxy("/wrappers;int=abcdef", false).
+                accept("application/int").
+                get(ClientResponse.class);
         
         assertEquals(400, response.getStatus());
     }
     
     public void testBadPrimitiveListValue() {
-        ResponseInBound response = resourceProxy("/list;int=abcdef;int=abcdef", false).
-                acceptable("application/int").
-                get(ResponseInBound.class);
+        ClientResponse response = resourceProxy("/list;int=abcdef;int=abcdef", false).
+                accept("application/int").
+                get(ClientResponse.class);
         
         assertEquals(400, response.getStatus());
     }

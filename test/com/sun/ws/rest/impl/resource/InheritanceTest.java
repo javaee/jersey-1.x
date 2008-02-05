@@ -23,7 +23,7 @@
 package com.sun.ws.rest.impl.resource;
 
 import com.sun.ws.rest.impl.AbstractResourceTester;
-import com.sun.ws.rest.impl.client.ResponseInBound;
+import com.sun.ws.rest.impl.client.ClientResponse;
 import javax.ws.rs.GET;
 import javax.ws.rs.ProduceMime;
 import javax.ws.rs.Path;
@@ -76,26 +76,26 @@ public class InheritanceTest extends AbstractResourceTester {
 
     public void testSuperResourceGet() {
         initiateWebApplication(SubResource.class);
-        String s = resourceProxy("/").acceptable("application/super").get(String.class);
+        String s = resourceProxy("/").accept("application/super").get(String.class);
         assertEquals("super", s);
     }
     
     public void testSubResourceGet() {
         initiateWebApplication(SubResource.class);
-        String s = resourceProxy("/").acceptable("application/sub").get(String.class);
+        String s = resourceProxy("/").accept("application/sub").get(String.class);
         assertEquals("sub", s);
     }
     
     public void testSuperResourceOverrideGet() {
         initiateWebApplication(SubResourceOverride.class);
-        ResponseInBound response = resourceProxy("/", false).acceptable("application/super").
-                get(ResponseInBound.class);
+        ClientResponse response = resourceProxy("/", false).accept("application/super").
+                get(ClientResponse.class);
         assertEquals(406, response.getStatus());
     }
     
     public void testSubResourceOverrideGet() {
         initiateWebApplication(SubResourceOverride.class);
-        String s = resourceProxy("/").acceptable("application/sub").get(String.class);
+        String s = resourceProxy("/").accept("application/sub").get(String.class);
         assertEquals("suboverride", s);
     }
 
@@ -127,26 +127,26 @@ public class InheritanceTest extends AbstractResourceTester {
     
     public void testSuperResourceWithProduceGet() {
         initiateWebApplication(SubResourceWithProduce.class);
-        String s = resourceProxy("/").acceptable("application/super").get(String.class);
+        String s = resourceProxy("/").accept("application/super").get(String.class);
         assertEquals("super", s);
     }
     
     public void testSubResourceWithProduceGet() {
         initiateWebApplication(SubResourceWithProduce.class);
-        String s = resourceProxy("/").acceptable("application/default").get(String.class);
+        String s = resourceProxy("/").accept("application/default").get(String.class);
         assertEquals("sub", s);
     }
     
     public void testSuperResourceOverrideWithProduceGet() {
         initiateWebApplication(SubResourceWithProduceOverride.class);
-        ResponseInBound response = resourceProxy("/", false).acceptable("application/super").
-                get(ResponseInBound.class);
+        ClientResponse response = resourceProxy("/", false).accept("application/super").
+                get(ClientResponse.class);
         assertEquals(406, response.getStatus());
     }
     
     public void testSubResourceOverrideWithProduceGet() {
         initiateWebApplication(SubResourceWithProduceOverride.class);
-        String s = resourceProxy("/").acceptable("application/default").get(String.class);
+        String s = resourceProxy("/").accept("application/default").get(String.class);
         assertEquals("suboverride", s);
     }        
 }

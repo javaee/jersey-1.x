@@ -25,7 +25,7 @@ package com.sun.ws.rest.impl.resource;
 import com.sun.ws.rest.impl.AbstractResourceTester;
 import javax.ws.rs.Path;
 import com.sun.ws.rest.impl.client.ResourceProxy;
-import com.sun.ws.rest.impl.client.ResponseInBound;
+import com.sun.ws.rest.impl.client.ClientResponse;
 import java.io.IOException;
 import java.util.List;
 import javax.ws.rs.GET;
@@ -69,7 +69,7 @@ public class VariantsTest extends AbstractResourceTester {
         initiateWebApplication(WebResource.class);
         ResourceProxy rp = resourceProxy("/");
         
-        ResponseInBound r = rp.acceptable("text/xml",
+        ClientResponse r = rp.accept("text/xml",
                 "application/xml",
                 "application/xhtml+xml",
                 "image/png",
@@ -77,7 +77,7 @@ public class VariantsTest extends AbstractResourceTester {
                 "text/plain;q=0.8",
                 "*/*;q=0.5").
                 header("Accept-Language", "en-us,en;q=0.5").
-                get(ResponseInBound.class);
+                get(ClientResponse.class);
         assertEquals("GET", r.getEntity(String.class));
         assertEquals(MediaType.parse("text/xml"), r.getContentType());
         assertEquals("en-us", r.getLangauge());
@@ -87,7 +87,7 @@ public class VariantsTest extends AbstractResourceTester {
         initiateWebApplication(WebResource.class);
         ResourceProxy rp = resourceProxy("/");
         
-        ResponseInBound r = rp.acceptable("text/xml",
+        ClientResponse r = rp.accept("text/xml",
                 "application/xml",
                 "application/xhtml+xml",
                 "image/png",
@@ -95,7 +95,7 @@ public class VariantsTest extends AbstractResourceTester {
                 "text/plain;q=0.8",
                 "*/*;q=0.5").
                 header("Accept-Language", "en,en-us").
-                get(ResponseInBound.class);
+                get(ClientResponse.class);
         assertEquals("GET", r.getEntity(String.class));
         assertEquals(MediaType.parse("text/xml"), r.getContentType());
         assertEquals("en", r.getLangauge());
@@ -105,7 +105,7 @@ public class VariantsTest extends AbstractResourceTester {
         initiateWebApplication(WebResource.class);
         ResourceProxy rp = resourceProxy("/");
         
-        ResponseInBound r = rp.acceptable("application/xml",
+        ClientResponse r = rp.accept("application/xml",
                 "text/xml",
                 "application/xhtml+xml",
                 "image/png",
@@ -113,7 +113,7 @@ public class VariantsTest extends AbstractResourceTester {
                 "text/plain;q=0.8",
                 "*/*;q=0.5").
                 header("Accept-Language", "en-us,en;q=0.5").
-                get(ResponseInBound.class);
+                get(ClientResponse.class);
         assertEquals("GET", r.getEntity(String.class));
         assertEquals(MediaType.parse("application/xml"), r.getContentType());
         assertEquals("en-us", r.getLangauge());
@@ -123,18 +123,18 @@ public class VariantsTest extends AbstractResourceTester {
         initiateWebApplication(WebResource.class);
         ResourceProxy rp = resourceProxy("/", false);
         
-        ResponseInBound r = rp.acceptable("application/atom+xml").
+        ClientResponse r = rp.accept("application/atom+xml").
                 header("Accept-Language", "en-us,en").
-                get(ResponseInBound.class);
+                get(ClientResponse.class);
         String vary = r.getMetadata().getFirst("Vary");
         assertNotNull(vary);
         assertTrue(contains(vary, "Accept"));
         assertTrue(contains(vary, "Accept-Language"));
         assertEquals(406, r.getStatus());
         
-        r = rp.acceptable("application/xml").
+        r = rp.accept("application/xml").
                 header("Accept-Language", "fr").
-                get(ResponseInBound.class);
+                get(ClientResponse.class);
         assertTrue(contains(vary, "Accept"));
         assertTrue(contains(vary, "Accept-Language"));
         assertEquals(406, r.getStatus());

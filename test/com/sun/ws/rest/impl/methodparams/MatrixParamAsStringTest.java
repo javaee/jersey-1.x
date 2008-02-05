@@ -255,7 +255,7 @@ public class MatrixParamAsStringTest extends AbstractResourceTester {
          initiateWebApplication(ResourceString.class);
         
         String s = resourceProxy("/;arg1=a;arg2=b;arg3=c").
-            content("content").
+            entity("content").
             post(String.class);
         
         assertEquals("content", s);
@@ -265,7 +265,7 @@ public class MatrixParamAsStringTest extends AbstractResourceTester {
         initiateWebApplication(ResourceStringList.class);
         
         resourceProxy("/;args=a;args=b;args=c").
-            acceptable("application/stringlist").
+            accept("application/stringlist").
             get(String.class);
     }
     
@@ -273,7 +273,7 @@ public class MatrixParamAsStringTest extends AbstractResourceTester {
         initiateWebApplication(ResourceStringListEmpty.class);
         
         resourceProxy("/;args;args;args").
-            acceptable("application/stringlist").
+            accept("application/stringlist").
             get(String.class);
     }
     
@@ -281,7 +281,7 @@ public class MatrixParamAsStringTest extends AbstractResourceTester {
         initiateWebApplication(ResourceStringListAbsent.class);
         
         resourceProxy("/").
-            acceptable("application/stringlist").
+            accept("application/stringlist").
             get(String.class);
     }
     
@@ -289,7 +289,7 @@ public class MatrixParamAsStringTest extends AbstractResourceTester {
          initiateWebApplication(ResourceStringList.class);
         
         resourceProxy("/;args=a;args=b;args=c").
-            acceptable("application/list").
+            accept("application/list").
             get(String.class);
    }
     
@@ -316,7 +316,7 @@ public class MatrixParamAsStringTest extends AbstractResourceTester {
         initiateWebApplication(ResourceStringListNullDefault.class);
         
         resourceProxy("/").
-            acceptable("application/stringlist").
+            accept("application/stringlist").
             get(String.class);
     }
     
@@ -324,7 +324,7 @@ public class MatrixParamAsStringTest extends AbstractResourceTester {
         initiateWebApplication(ResourceStringListNullDefault.class);
         
         resourceProxy("/").
-            acceptable("application/list").
+            accept("application/list").
             get(String.class);
     }
     
@@ -332,7 +332,7 @@ public class MatrixParamAsStringTest extends AbstractResourceTester {
         initiateWebApplication(ResourceStringListDefault.class);
         
         resourceProxy("/").
-            acceptable("application/stringlist").
+            accept("application/stringlist").
             get(String.class);
     }
     
@@ -340,7 +340,7 @@ public class MatrixParamAsStringTest extends AbstractResourceTester {
         initiateWebApplication(ResourceStringListDefault.class);
         
         resourceProxy("/").
-            acceptable("application/list").
+            accept("application/list").
             get(String.class);
     }
     
@@ -348,7 +348,7 @@ public class MatrixParamAsStringTest extends AbstractResourceTester {
         initiateWebApplication(ResourceStringListDefaultOverride.class);
         
         resourceProxy("/;args=b").
-            acceptable("application/list").
+            accept("application/list").
             get(String.class);
     }
 }

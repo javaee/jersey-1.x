@@ -23,7 +23,7 @@
 package com.sun.ws.rest.impl.resource;
 
 import com.sun.ws.rest.impl.AbstractResourceTester;
-import com.sun.ws.rest.impl.client.ResponseInBound;
+import com.sun.ws.rest.impl.client.ClientResponse;
 import javax.ws.rs.GET;
 import javax.ws.rs.ProduceMime;
 import javax.ws.rs.Path;
@@ -51,14 +51,14 @@ public class ProduceMimeAcceptableTest extends AbstractResourceTester {
     public void testAcceptable() {
         initiateWebApplication(WebResource.class);
         
-        resourceProxy("/").acceptable("application/foo", "application/bar").get(String.class);
+        resourceProxy("/").accept("application/foo", "application/bar").get(String.class);
     }
     
     public void testNotAcceptable() {
         initiateWebApplication(WebResource.class);
         
-        ResponseInBound response = resourceProxy("/", false).
-                acceptable("application/foo").get(ResponseInBound.class);
+        ClientResponse response = resourceProxy("/", false).
+                accept("application/foo").get(ClientResponse.class);
         assertEquals(500, response.getStatus());
     }
 
@@ -75,7 +75,7 @@ public class ProduceMimeAcceptableTest extends AbstractResourceTester {
     public void testProduceGeneric() {
         initiateWebApplication(WebResourceProduceGeneric.class);
         
-        resourceProxy("/").acceptable("application/bar").get(String.class);
+        resourceProxy("/").accept("application/bar").get(String.class);
     }
     
 }

@@ -26,7 +26,7 @@ import com.sun.ws.rest.impl.AbstractResourceTester;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Path;
 import com.sun.ws.rest.impl.AbstractResourceTester;
-import com.sun.ws.rest.impl.client.ResponseInBound;
+import com.sun.ws.rest.impl.client.ClientResponse;
 import javax.ws.rs.GET;
 
 /**
@@ -219,15 +219,15 @@ public class UriParamAsPrimitiveTest extends AbstractResourceTester {
     }
     
     public void testBadPrimitiveValue() {
-        ResponseInBound response = resourceProxy("/int/abcdef", false).
-                get(ResponseInBound.class);
+        ClientResponse response = resourceProxy("/int/abcdef", false).
+                get(ClientResponse.class);
         
         assertEquals(400, response.getStatus());
     }
     
     public void testBadPrimitiveWrapperValue() {
-        ResponseInBound response = resourceProxy("/int/wrapper/abcdef", false).
-                get(ResponseInBound.class);
+        ClientResponse response = resourceProxy("/int/wrapper/abcdef", false).
+                get(ClientResponse.class);
         
         assertEquals(400, response.getStatus());
     }    

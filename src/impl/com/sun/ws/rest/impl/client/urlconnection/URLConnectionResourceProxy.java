@@ -23,11 +23,11 @@
 package com.sun.ws.rest.impl.client.urlconnection;
 
 import com.sun.ws.rest.impl.RequestHttpHeadersImpl;
-import com.sun.ws.rest.impl.client.RequestOutBound;
+import com.sun.ws.rest.impl.client.ClientRequest;
 import com.sun.ws.rest.impl.client.ResourceProxy;
 import com.sun.ws.rest.impl.client.ResourceProxyException;
-import com.sun.ws.rest.impl.client.ResponseInBound;
-import com.sun.ws.rest.impl.client.ResponseInBoundImpl;
+import com.sun.ws.rest.impl.client.ClientResponse;
+import com.sun.ws.rest.impl.client.ClientResponseImpl;
 import com.sun.ws.rest.impl.provider.ProviderFactory;
 import java.io.IOException;
 import java.io.InputStream;
@@ -36,7 +36,6 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.ProtocolException;
 import java.net.URI;
-import java.net.URL;
 import java.util.List;
 import java.util.Map;
 import javax.ws.rs.core.MediaType;
@@ -50,7 +49,7 @@ import javax.ws.rs.ext.RuntimeDelegate.HeaderDelegate;
  * @author Paul.Sandoz@Sun.Com
  */
 public final class URLConnectionResourceProxy extends ResourceProxy {
-    private final static class URLConnectionResponse extends ResponseInBoundImpl {
+    private final static class URLConnectionResponse extends ClientResponseImpl {
         private final int status;
         private final HttpURLConnection uc;
         private final MultivaluedMap<String, String> metadata;
@@ -108,22 +107,22 @@ public final class URLConnectionResourceProxy extends ResourceProxy {
         super(u);
     }
     
-    public ResponseInBound invoke(URI u, String method, RequestOutBound ro) {
+    public ClientResponse handle(ClientRequest ro) {
         try {
-            return _invoke(u.toURL(), method, ro);
+            return _invoke(ro);
         } catch (Exception ex) {
             throw new ResourceProxyException(ex);
         }
     }
 
-    private ResponseInBound _invoke(URL u, String method, RequestOutBound ro) 
+    private ClientResponse _invoke(ClientRequest ro) 
             throws ProtocolException, IOException {
-        HttpURLConnection uc = (HttpURLConnection)u.openConnection();
+        HttpURLConnection uc = (HttpURLConnection)ro.getURI().toURL().openConnection();
 
         // uc.setReadTimeout(5000);
         
         // Set the request method
-        uc.setRequestMethod(method);
+        uc.setRequestMethod(ro.getMethod());
 
         // Write the request headers
         writeHeaders(ro.getMetadata(), uc);

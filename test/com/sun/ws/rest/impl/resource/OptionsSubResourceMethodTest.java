@@ -23,7 +23,7 @@
 package com.sun.ws.rest.impl.resource;
 
 import com.sun.ws.rest.impl.AbstractResourceTester;
-import com.sun.ws.rest.impl.client.ResponseInBound;
+import com.sun.ws.rest.impl.client.ClientResponse;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -92,8 +92,8 @@ public class OptionsSubResourceMethodTest extends AbstractResourceTester {
     public void testNoOptions() {
         initiateWebApplication(ResourceNoOptions.class);
 
-        ResponseInBound response = resourceProxy("/sub").invoke("OPTIONS", 
-                ResponseInBound.class);
+        ClientResponse response = resourceProxy("/sub").options(
+                ClientResponse.class);
         String allow = response.getMetadata().getFirst("Allow").toString();
         assertTrue(allow.contains("GET"));
         assertTrue(allow.contains("PUT"));
@@ -145,8 +145,8 @@ public class OptionsSubResourceMethodTest extends AbstractResourceTester {
     public void testWithOptions() {
         initiateWebApplication(ResourceWithOptions.class);
 
-        ResponseInBound response = resourceProxy("/sub").invoke("OPTIONS", 
-                ResponseInBound.class);
+        ClientResponse response = resourceProxy("/sub").options(
+                ClientResponse.class);
         String allow = response.getMetadata().getFirst("Allow").toString();
         assertTrue(allow.contains("GET"));
         assertTrue(allow.contains("PUT"));
@@ -173,14 +173,13 @@ public class OptionsSubResourceMethodTest extends AbstractResourceTester {
     public void testNoOptionsDifferentSub() {
         initiateWebApplication(ResourceNoOptionsDifferentSub.class);
 
-        ResponseInBound response = resourceProxy("/sub1").invoke("OPTIONS", 
-                ResponseInBound.class);
+        ClientResponse response = resourceProxy("/sub1").options( 
+                ClientResponse.class);
         String allow = response.getMetadata().getFirst("Allow").toString();
         assertTrue(allow.contains("GET"));
         assertFalse(allow.contains("PUT"));
         
-        response = resourceProxy("/sub2").invoke("OPTIONS", 
-                ResponseInBound.class);
+        response = resourceProxy("/sub2").options(ClientResponse.class);
         allow = response.getMetadata().getFirst("Allow").toString();
         assertTrue(allow.contains("PUT"));
         assertFalse(allow.contains("GET"));

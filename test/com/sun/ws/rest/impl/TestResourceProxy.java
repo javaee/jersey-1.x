@@ -23,11 +23,11 @@
 package com.sun.ws.rest.impl;
 
 import com.sun.ws.rest.api.container.ContainerException;
-import com.sun.ws.rest.impl.client.RequestOutBound;
+import com.sun.ws.rest.impl.client.ClientRequest;
 import com.sun.ws.rest.impl.client.ResourceProxy;
 import com.sun.ws.rest.impl.client.ResourceProxyException;
-import com.sun.ws.rest.impl.client.ResponseInBound;
-import com.sun.ws.rest.impl.client.ResponseInBoundImpl;
+import com.sun.ws.rest.impl.client.ClientResponse;
+import com.sun.ws.rest.impl.client.ClientResponseImpl;
 import com.sun.ws.rest.impl.provider.ProviderFactory;
 import com.sun.ws.rest.spi.container.AbstractContainerRequest;
 import com.sun.ws.rest.spi.container.AbstractContainerResponse;
@@ -61,7 +61,7 @@ public class TestResourceProxy extends ResourceProxy {
         this.w = w;
     }
     
-    private final static class Response extends ResponseInBoundImpl {
+    private final static class Response extends ClientResponseImpl {
         private final InputStream responseEntity;
         private final AbstractContainerResponse response;
         private final MultivaluedMap<String, String> metadata;
@@ -103,14 +103,14 @@ public class TestResourceProxy extends ResourceProxy {
         }
     }
 
-    public ResponseInBound invoke(URI u, String method, RequestOutBound clientRequest) {
+    public ClientResponse handle(ClientRequest clientRequest) {
         byte[] requestEntity = writeEntity(clientRequest.getMetadata(), 
                 clientRequest.getEntity());
         final AbstractContainerRequest serverRequest = new TestHttpRequestContext(
                 w.getMessageBodyContext(), 
-                method, 
+                clientRequest.getMethod(), 
                 new ByteArrayInputStream(requestEntity),
-                u, 
+                clientRequest.getURI(),
                 baseUri);
         
         writeHeaders(clientRequest.getMetadata(), serverRequest.getRequestHeaders());

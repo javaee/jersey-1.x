@@ -23,29 +23,45 @@
 package com.sun.ws.rest.impl.client;
 
 import com.sun.ws.rest.impl.ResponseHttpHeadersImpl;
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import javax.ws.rs.core.MultivaluedMap;
 
-final class RequestOutBoundImpl implements RequestOutBound {
+final class ClientRequestImpl extends ClientRequest {
+    private final URI uri;
+    
+    private final String method;
+    
     private final Object entity;
     
     private final MultivaluedMap<String, Object> metadata;
 
-    /* package */ RequestOutBoundImpl() {
-        this(null, null);
+    /* package */ ClientRequestImpl(URI uri, String method) {
+        this(uri, method, null, null);
     }
     
-    /* package */ RequestOutBoundImpl(Object entity) {
-        this(entity, null);
+    /* package */ ClientRequestImpl(URI uri, String method, Object entity) {
+        this(uri, method, entity, null);
     }
     
-    /* package */ RequestOutBoundImpl(Object entity, MultivaluedMap<String, Object> metadata) {
+    /* package */ ClientRequestImpl(URI uri, String method, 
+            Object entity, MultivaluedMap<String, Object> metadata) {
+        this.uri = uri;
+        this.method = method;
         this.entity = entity;
         this.metadata = (metadata != null) ? metadata : new ResponseHttpHeadersImpl();
     }
 
+    public URI getURI() {
+        return uri;
+    }
+
+    public String getMethod() {
+        return method;
+    }
+    
     public Object getEntity() {
         return entity;
     }
@@ -55,8 +71,9 @@ final class RequestOutBoundImpl implements RequestOutBound {
     }
     
     @Override
-    public RequestOutBound clone() {
-        return new RequestOutBoundImpl(this.entity, clone(this.metadata));
+    public ClientRequest clone() {
+        return new ClientRequestImpl(this.uri, this.method, 
+                this.entity, clone(this.metadata));
     }
     
     private static MultivaluedMap<String, Object> clone(MultivaluedMap<String, Object> md) {

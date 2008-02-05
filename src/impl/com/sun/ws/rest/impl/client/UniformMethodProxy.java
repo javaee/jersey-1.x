@@ -22,37 +22,38 @@
 
 package com.sun.ws.rest.impl.client;
 
-import java.net.URI;
-import java.util.Date;
-import java.util.Map;
-import javax.ws.rs.core.EntityTag;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.MultivaluedMap;
-
 /**
  *
  * @author Paul.Sandoz@Sun.Com
  */
-public interface ResponseInBound {
-    Map<String, Object> getProperties();
+interface UniformMethodProxy {
+    ClientResponse head();
+        
+    <T> T options(Class<T> c);
+        
+    <T> T get(Class<T> c);
+            
+    void put();
     
-    int getStatus();
+    void put(Object requestEntity);
     
-    MultivaluedMap<String, String> getMetadata();
+    <T> T put(Class<T> c);
+
+    <T> T put(Class<T> c, Object requestEntity);
+            
+    void post();
     
-    MediaType getContentType();
+    void post(Object requestEntity);
     
-    URI getLocation();
+    <T> T post(Class<T> c);
+
+    <T> T post(Class<T> c, Object requestEntity);
+            
+    void delete();
     
-    EntityTag getEntityTag();
+    void delete(Object requestEntity);
     
-    Date getLastModified();
-    
-    String getLangauge();
-    
-    boolean hasEntity();
-    
-    <T> T getEntity(Class<T> c) throws IllegalArgumentException;
-    
-    <T> T getEntity(Class<T> c, boolean successful) throws IllegalArgumentException;
+    <T> T delete(Class<T> c);
+
+    <T> T delete(Class<T> c, Object requestEntity);
 }
