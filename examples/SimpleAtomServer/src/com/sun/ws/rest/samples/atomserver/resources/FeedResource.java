@@ -26,6 +26,7 @@ import com.sun.syndication.feed.atom.Content;
 import com.sun.syndication.feed.atom.Entry;
 import com.sun.syndication.feed.atom.Feed;
 import com.sun.syndication.io.FeedException;
+import com.sun.ws.rest.spi.container.MessageBodyContext;
 import java.io.IOException;
 import java.net.URI;
 import javax.ws.rs.ConsumeMime;
@@ -49,6 +50,7 @@ import javax.ws.rs.core.UriInfo;
 public class FeedResource {
     @HttpContext UriInfo uriInfo;
 
+    @HttpContext MessageBodyContext bodyContext;
     
     @Path("{entry}")
     public EntryResource getEntryResource(@PathParam("entry") String entryId) {
@@ -57,7 +59,7 @@ public class FeedResource {
     
     @Path("edit/{entry}")
     public EntryResource getEditEntryResource(@PathParam("entry") String entryId) {
-        return new EditEntryResource(entryId, uriInfo);
+        return new EditEntryResource(entryId, uriInfo, bodyContext);
     }
         
     private UriBuilder getEditUriBuilder() {
@@ -71,7 +73,8 @@ public class FeedResource {
 //    public EntryResource getEditEntryResource(
 //            @PathParam("entry") String entryId,
 //            @PathParam("version") int version) throws FeedException {
-//        return new EditOptimisiticEntryResource(entryId, version, uriInfo);
+//        return new EditOptimisiticEntryResource(entryId, version, 
+//                uriInfo, bodyContext);
 //    }
 //    
 //    private UriBuilder getEditUriBuilder() {
@@ -81,7 +84,7 @@ public class FeedResource {
     
     @GET
     public Feed getFeed() throws IOException, FeedException {
-        return AtomStore.getFeedDocument(uriInfo.getAbsolutePath());
+        return AtomStore.getFeedDocument(bodyContext, uriInfo.getAbsolutePath());
     }
 
     @POST
@@ -104,11 +107,11 @@ public class FeedResource {
         e.setId(entryId);
                 
         // Store the entry document 
-        AtomStore.createEntryDocument(entryId, e);
+        AtomStore.createEntryDocument(bodyContext, entryId, e);
 
         // Update the feed document with the entry
-        Feed f = AtomStore.getFeedDocument(uriInfo.getAbsolutePath());
-        AtomStore.updateFeedDocumentWithNewEntry(f, e);
+        Feed f = AtomStore.getFeedDocument(bodyContext, uriInfo.getAbsolutePath());
+        AtomStore.updateFeedDocumentWithNewEntry(bodyContext, f, e);
         
         // Return 201 Created
         return Response.created(entryUri).entity(e).build();
@@ -153,13 +156,13 @@ public class FeedResource {
         e.getContents().add(c);
         
         // Store entry document 
-        AtomStore.createEntryDocument(entryId, e);
+        AtomStore.createEntryDocument(bodyContext, entryId, e);
         // Store the media
         AtomStore.createMediaDocument(entryId, entry);
         
         // Update the feed document with the entry
-        Feed f = AtomStore.getFeedDocument(uriInfo.getAbsolutePath());
-        AtomStore.updateFeedDocumentWithNewEntry(f, e);
+        Feed f = AtomStore.getFeedDocument(bodyContext, uriInfo.getAbsolutePath());
+        AtomStore.updateFeedDocumentWithNewEntry(bodyContext, f, e);
         
         // Return 201 Created
         return Response.created(entryUri).entity(e).build();

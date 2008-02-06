@@ -25,6 +25,7 @@ package com.sun.ws.rest.samples.atomserver.resources;
 import com.sun.syndication.feed.atom.Entry;
 import com.sun.syndication.feed.atom.Feed;
 import com.sun.syndication.io.FeedException;
+import com.sun.ws.rest.spi.container.MessageBodyContext;
 import java.io.IOException;
 import java.net.URI;
 import java.util.Date;
@@ -43,10 +44,14 @@ import javax.ws.rs.core.UriInfo;
  */
 public class EditEntryResource extends EntryResource {
     protected UriInfo uriInfo;
-
-    public EditEntryResource(String entryId, UriInfo uriInfo) {
+    
+    protected MessageBodyContext bodyContext;
+    
+    public EditEntryResource(String entryId, UriInfo uriInfo, 
+            MessageBodyContext bodyContext) {
         super(entryId);
         this.uriInfo = uriInfo;
+        this.bodyContext = bodyContext;
     }
     
     @PUT
@@ -70,11 +75,11 @@ public class EditEntryResource extends EntryResource {
         e.setForeignMarkup(null);
 
         // Write out the entry document 
-        AtomStore.createEntryDocument(entryId, e);
+        AtomStore.createEntryDocument(bodyContext,  entryId, e);
 
         // Update the feed document with the entry
         Feed f = AtomStore.getFeedDocument();
-        AtomStore.updateFeedDocumentWithExistingEntry(f, e);
+        AtomStore.updateFeedDocumentWithExistingEntry(bodyContext, f, e);
         
         return e;
     }
@@ -85,7 +90,7 @@ public class EditEntryResource extends EntryResource {
         AtomStore.deleteEntry(entryId);
         
         Feed f = AtomStore.getFeedDocument();
-        AtomStore.updateFeedDocumentRemovingEntry(f, entryId);
+        AtomStore.updateFeedDocumentRemovingEntry(bodyContext, f, entryId);
     }
     
     
@@ -114,9 +119,9 @@ public class EditEntryResource extends EntryResource {
         // TODO update the content type
         
         // Write out the feed document
-        AtomStore.updateFeedDocument(f);
+        AtomStore.updateFeedDocument(bodyContext, f);
         // Write out the entry document
-        AtomStore.createEntryDocument(entryId, e);
+        AtomStore.createEntryDocument(bodyContext, entryId, e);
         // Write out the media
         AtomStore.createMediaDocument(entryId, update);
     }

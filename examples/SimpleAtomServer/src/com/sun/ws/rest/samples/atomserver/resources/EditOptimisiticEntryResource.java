@@ -26,6 +26,7 @@ import com.sun.syndication.feed.atom.Entry;
 import com.sun.syndication.feed.atom.Feed;
 import com.sun.syndication.io.FeedException;
 import com.sun.ws.rest.api.ConflictException;
+import com.sun.ws.rest.spi.container.MessageBodyContext;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
 
@@ -36,8 +37,9 @@ import javax.ws.rs.core.UriInfo;
 public class EditOptimisiticEntryResource extends EditEntryResource {
     private final UriBuilder editUriBuilder;
     
-    public EditOptimisiticEntryResource(String entryId, int version, UriInfo uriInfo) throws FeedException {
-        super(entryId, uriInfo);
+    public EditOptimisiticEntryResource(String entryId, int version, 
+            UriInfo uriInfo, MessageBodyContext bodyContext) throws FeedException {
+        super(entryId, uriInfo, bodyContext);
         
         // Get the edit link in the entry
         Feed f = AtomStore.getFeedDocument();

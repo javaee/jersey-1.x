@@ -29,7 +29,7 @@ import com.sun.syndication.feed.atom.Link;
 import com.sun.syndication.io.FeedException;
 import com.sun.syndication.io.WireFeedInput;
 import com.sun.ws.rest.api.NotFoundException;
-import com.sun.ws.rest.impl.provider.ProviderFactory;
+import com.sun.ws.rest.spi.container.MessageBodyContext;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -89,13 +89,13 @@ class AtomStore {
         return (Feed)wireFeed;
     }
     
-    static Feed getFeedDocument(URI feedUri) throws IOException, FeedException {
+    static Feed getFeedDocument(MessageBodyContext bodyContext, URI feedUri) throws IOException, FeedException {
         InputStream in = null;
         
         synchronized(FileStore.FS) {
             in = FileStore.FS.getFileContents(AtomStore.getFeedPath());
             if (in == null) {
-                in = createDefaultFeedDocument(feedUri.toString());
+                in = createDefaultFeedDocument(bodyContext, feedUri.toString());
             }
         }
         
@@ -104,24 +104,27 @@ class AtomStore {
         return (Feed)wireFeed;
     }
         
-    static void updateFeedDocumentWithNewEntry(Feed f, Entry e) throws IOException {
+    static void updateFeedDocumentWithNewEntry(MessageBodyContext bodyContext, 
+            Feed f, Entry e) throws IOException {
         f.getEntries().add(e);
-        updateFeedDocument(f);
+        updateFeedDocument(bodyContext, f);
     }
         
-    static void updateFeedDocumentRemovingEntry(Feed f, String id) throws IOException {
+    static void updateFeedDocumentRemovingEntry(MessageBodyContext bodyContext, 
+            Feed f, String id) throws IOException {
         Entry e = findEntry(id, f);
         f.getEntries().remove(e);
 
-        updateFeedDocument(f);
+        updateFeedDocument(bodyContext, f);
     }
     
-    static void updateFeedDocumentWithExistingEntry(Feed f, Entry e) throws IOException {
+    static void updateFeedDocumentWithExistingEntry(MessageBodyContext bodyContext, 
+            Feed f, Entry e) throws IOException {
         Entry old = findEntry(e.getId(), f);
         f.getEntries().remove(old);
         f.getEntries().add(0, e);
 
-        updateFeedDocument(f);
+        updateFeedDocument(bodyContext, f);
     }
         
     static Entry findEntry(String id, Feed f) {
@@ -173,15 +176,15 @@ class AtomStore {
         links.add(l);
     }    
     
-    static void updateFeedDocument(Feed f) throws IOException {
-        MessageBodyWriter<Feed> ep = ProviderFactory.getInstance().createMessageBodyWriter(Feed.class, atomMediaType);
+    static void updateFeedDocument(MessageBodyContext bodyContext, Feed f) throws IOException {
+        MessageBodyWriter<Feed> ep = bodyContext.getMessageBodyWriter(Feed.class, atomMediaType);
         synchronized(FileStore.FS) {
             ep.writeTo(f, atomMediaType, null, FileStore.FS.getFileOutputStream(AtomStore.getFeedPath()));
         }
     }
             
-    static void createEntryDocument(String id, Entry e) throws IOException {
-        MessageBodyWriter<Entry> ep = ProviderFactory.getInstance().createMessageBodyWriter(Entry.class, atomMediaType);
+    static void createEntryDocument(MessageBodyContext bodyContext, String id, Entry e) throws IOException {
+        MessageBodyWriter<Entry> ep = bodyContext.getMessageBodyWriter(Entry.class, atomMediaType);
         String path = AtomStore.getEntryPath(id);
         ep.writeTo(e, atomMediaType, null, FileStore.FS.getFileOutputStream(path));
     }
@@ -197,7 +200,8 @@ class AtomStore {
         FileStore.FS.deleteDirectory(getPath(entryId));
     }
     
-    static InputStream createDefaultFeedDocument(String uri) throws IOException {
+    static InputStream createDefaultFeedDocument(MessageBodyContext bodyContext,
+            String uri) throws IOException {
         Feed f = new Feed();
         f.setTitle("Feed");
         
@@ -206,7 +210,7 @@ class AtomStore {
         selfLink.setHref(uri);
         f.getOtherLinks().add(selfLink);
         
-        MessageBodyWriter<Feed> ep = ProviderFactory.getInstance().createMessageBodyWriter(Feed.class, atomMediaType);
+        MessageBodyWriter<Feed> ep = bodyContext.getMessageBodyWriter(Feed.class, atomMediaType);
         ep.writeTo(f, atomMediaType, null, FileStore.FS.getFileOutputStream(AtomStore.getFeedPath()));
         
         return FileStore.FS.getFileContents(AtomStore.getFeedPath());
