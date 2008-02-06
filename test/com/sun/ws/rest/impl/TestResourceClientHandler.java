@@ -27,9 +27,9 @@ import com.sun.ws.rest.impl.client.ClientHandler;
 import com.sun.ws.rest.impl.client.ClientHandlerException;
 import com.sun.ws.rest.impl.client.ClientRequest;
 import com.sun.ws.rest.impl.client.ClientResponse;
-import com.sun.ws.rest.impl.provider.ProviderFactory;
 import com.sun.ws.rest.spi.container.AbstractContainerRequest;
 import com.sun.ws.rest.spi.container.AbstractContainerResponse;
+import com.sun.ws.rest.spi.container.MessageBodyContext;
 import com.sun.ws.rest.spi.container.WebApplication;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -40,6 +40,7 @@ import java.net.URI;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import javax.ws.rs.core.HttpContext;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.ext.MessageBodyWriter;
@@ -51,6 +52,8 @@ import javax.ws.rs.ext.RuntimeDelegate.HeaderDelegate;
  * @author Paul.Sandoz@Sun.Com
  */
 public class TestResourceClientHandler implements ClientHandler {
+    @HttpContext private MessageBodyContext bodyContext;
+    
     private final WebApplication w;
     
     private final URI baseUri;
@@ -60,7 +63,7 @@ public class TestResourceClientHandler implements ClientHandler {
         this.w = w;
     }
     
-    private final static class Response extends ClientResponse {
+    private final class Response extends ClientResponse {
         private final InputStream responseEntity;
         private final AbstractContainerResponse response;
         private final MultivaluedMap<String, String> metadata;
@@ -91,7 +94,7 @@ public class TestResourceClientHandler implements ClientHandler {
             
             try {
                 MediaType mediaType = getContentType();
-                return ProviderFactory.getInstance().createMessageBodyReader(c, mediaType).
+                return bodyContext.getMessageBodyReader(c, mediaType).
                         readFrom(c, mediaType, metadata, responseEntity);
             } catch (IOException ex) {
                 throw new ClientHandlerException(ex);
@@ -153,20 +156,14 @@ public class TestResourceClientHandler implements ClientHandler {
         return hp.toString(headerValue);
     }
     
-//    private static ByteArrayInputStream writeEntity(MultivaluedMap<String, Object> metadata, Object entity) {
-//        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-//        writeEntity(metadata, entity, baos);
-//        return new ByteArrayInputStream(baos.toByteArray());        
-//    }
-    
-    private static byte[] writeEntity(MultivaluedMap<String, Object> metadata, Object entity) {
+    private byte[] writeEntity(MultivaluedMap<String, Object> metadata, Object entity) {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         writeEntity(metadata, entity, baos);
         return baos.toByteArray();        
     }
     
     @SuppressWarnings("unchecked")
-    private static void writeEntity(MultivaluedMap<String, Object> metadata, Object entity, 
+    private void writeEntity(MultivaluedMap<String, Object> metadata, Object entity, 
             OutputStream out) {
         if (entity == null) return;
                 
@@ -182,8 +179,8 @@ public class TestResourceClientHandler implements ClientHandler {
                     mediaType = new MediaType("application", "octet-stream");
                 }
             }
-            final MessageBodyWriter p = ProviderFactory.getInstance().
-                    createMessageBodyWriter(entity.getClass(), mediaType);
+            final MessageBodyWriter p = bodyContext.
+                    getMessageBodyWriter(entity.getClass(), mediaType);
             p.writeTo(entity, (MediaType)mediaType, metadata, out);
             out.flush();
             out.close();

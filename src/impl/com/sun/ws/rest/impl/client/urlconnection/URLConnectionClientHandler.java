@@ -27,7 +27,7 @@ import com.sun.ws.rest.impl.client.ClientHandler;
 import com.sun.ws.rest.impl.client.ClientHandlerException;
 import com.sun.ws.rest.impl.client.ClientRequest;
 import com.sun.ws.rest.impl.client.ClientResponse;
-import com.sun.ws.rest.impl.provider.ProviderFactory;
+import com.sun.ws.rest.spi.container.MessageBodyContext;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -36,6 +36,7 @@ import java.net.ProtocolException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import javax.ws.rs.core.HttpContext;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.ext.MessageBodyWriter;
@@ -47,7 +48,7 @@ import javax.ws.rs.ext.RuntimeDelegate.HeaderDelegate;
  * @author Paul.Sandoz@Sun.Com
  */
 public final class URLConnectionClientHandler implements ClientHandler {
-    private final static class URLConnectionResponse extends ClientResponse {
+    private final class URLConnectionResponse extends ClientResponse {
         private final int status;
         private final HttpURLConnection uc;
         private final MultivaluedMap<String, String> metadata;
@@ -80,7 +81,7 @@ public final class URLConnectionClientHandler implements ClientHandler {
         public <T> T getEntity(Class<T> c) {
             try {
                 MediaType mediaType = getContentType();
-                return ProviderFactory.getInstance().createMessageBodyReader(c, mediaType).
+                return bodyContext.getMessageBodyReader(c, mediaType).
                         readFrom(c, mediaType, metadata, getInputStream());
             } catch (IOException ex) {
                 throw new IllegalArgumentException(ex);
@@ -102,6 +103,8 @@ public final class URLConnectionClientHandler implements ClientHandler {
         }
     }
 
+    @HttpContext private MessageBodyContext bodyContext;
+    
     // ClientHandler
     
     public ClientResponse handle(ClientRequest ro) {
@@ -176,8 +179,8 @@ public final class URLConnectionClientHandler implements ClientHandler {
             }
         }
                 
-        final MessageBodyWriter p = ProviderFactory.getInstance().
-                createMessageBodyWriter(entity.getClass(), mediaType);
+        final MessageBodyWriter p = bodyContext.
+                getMessageBodyWriter(entity.getClass(), mediaType);
         p.writeTo(entity, mediaType, metadata, out);
         
         out.flush();
