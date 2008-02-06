@@ -23,7 +23,7 @@
 package com.sun.ws.rest.impl;
 
 import com.sun.ws.rest.api.container.ContainerException;
-import com.sun.ws.rest.impl.client.Client;
+import com.sun.ws.rest.impl.client.ClientHandler;
 import com.sun.ws.rest.impl.client.ClientHandlerException;
 import com.sun.ws.rest.impl.client.ClientRequest;
 import com.sun.ws.rest.impl.client.ClientResponse;
@@ -50,12 +50,12 @@ import javax.ws.rs.ext.RuntimeDelegate.HeaderDelegate;
  *
  * @author Paul.Sandoz@Sun.Com
  */
-public class TestResourceClient extends Client {
+public class TestResourceClientHandler implements ClientHandler {
     private final WebApplication w;
     
     private final URI baseUri;
     
-    public TestResourceClient(URI baseUri, WebApplication w) {
+    public TestResourceClientHandler(URI baseUri, WebApplication w) {
         this.baseUri = baseUri;
         this.w = w;
     }

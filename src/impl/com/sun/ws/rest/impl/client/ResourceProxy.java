@@ -30,17 +30,14 @@ import javax.ws.rs.core.UriBuilder;
  *
  * @author Paul.Sandoz@Sun.Com
  */
-public final class ResourceProxy implements RequestBuilder<ResourceProxy.Builder>,
-        UniformInterface {
-    private final ClientHandler root;
-    
+public final class ResourceProxy extends Filterable implements 
+        RequestBuilder<ResourceProxy.Builder>,
+        UniformInterface {    
     private final URI u;
     
-    private ClientHandler head;
-    
-    protected ResourceProxy(ClientHandler c, URI u) {
+    /* package */ ResourceProxy(ClientHandler c, URI u) {
+        super(c);
         this.u = u;
-        this.root = this.head = c;
     }
     
     public URI getURI() {
@@ -50,35 +47,11 @@ public final class ResourceProxy implements RequestBuilder<ResourceProxy.Builder
     public UriBuilder getBuilder() {
         return UriBuilder.fromUri(u);
     }
-    
-    public void addFilter(ClientFilter f) {
-        f.setNext(head);
-        this.head = f;
-    }
-
-    public void removeFilter(ClientFilter f) {
-        if (head == root) return;
         
-        if (head == f) head = f.getNext();
-
-        ClientFilter e = (ClientFilter)head;
-        while (e.getNext() != f) {
-            if (e.getNext() == root) return;
-            
-            e = (ClientFilter)e.getNext();
-        }
-        
-        e.setNext(f.getNext());
-    }
-    
-    public void removeAllFilters() {
-        this.head = root;
-    }
-    
     // UniformInterface
     
     public ClientResponse head() {
-        return handle(new ClientRequestImpl(u, "HEAD"));
+        return getHeadHandler().handle(new ClientRequestImpl(u, "HEAD"));
     }
         
     public <T> T options(Class<T> c) {
@@ -222,7 +195,7 @@ public final class ResourceProxy implements RequestBuilder<ResourceProxy.Builder
         // UniformInterface
         
         public ClientResponse head() {
-            return handle(build("HEAD"));
+            return getHeadHandler().handle(build("HEAD"));
         }
         
         public <T> T options(Class<T> c) {
@@ -283,8 +256,8 @@ public final class ResourceProxy implements RequestBuilder<ResourceProxy.Builder
     }
     
     
-    public <T> T handle(Class<T> c, ClientRequest ro) {
-        ClientResponse r = handle(ro);
+    private <T> T handle(Class<T> c, ClientRequest ro) {
+        ClientResponse r = getHeadHandler().handle(ro);
         
         if (c == ClientResponse.class) return c.cast(r);
         
@@ -294,12 +267,8 @@ public final class ResourceProxy implements RequestBuilder<ResourceProxy.Builder
     }
     
     private void voidHandle(ClientRequest ro) {
-        ClientResponse r = handle(ro);
+        ClientResponse r = getHeadHandler().handle(ro);
         
         if (r.getStatus() >= 300) throw new ResourceProxyException(r);
     }
-    
-    private ClientResponse handle(ClientRequest ro) {
-        return head.handle(ro);
-    }    
 }

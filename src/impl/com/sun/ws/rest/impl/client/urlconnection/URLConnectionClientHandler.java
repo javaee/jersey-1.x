@@ -23,7 +23,7 @@
 package com.sun.ws.rest.impl.client.urlconnection;
 
 import com.sun.ws.rest.impl.RequestHttpHeadersImpl;
-import com.sun.ws.rest.impl.client.Client;
+import com.sun.ws.rest.impl.client.ClientHandler;
 import com.sun.ws.rest.impl.client.ClientHandlerException;
 import com.sun.ws.rest.impl.client.ClientRequest;
 import com.sun.ws.rest.impl.client.ClientResponse;
@@ -46,7 +46,7 @@ import javax.ws.rs.ext.RuntimeDelegate.HeaderDelegate;
  *
  * @author Paul.Sandoz@Sun.Com
  */
-public final class URLConnectionClient extends Client {
+public final class URLConnectionClientHandler implements ClientHandler {
     private final static class URLConnectionResponse extends ClientResponse {
         private final int status;
         private final HttpURLConnection uc;

@@ -26,16 +26,40 @@ package com.sun.ws.rest.impl.client;
  *
  * @author Paul.Sandoz@Sun.Com
  */
-public abstract class ClientFilter implements ClientHandler {
-    private ClientHandler next;
+public abstract class Filterable {
+    private final ClientHandler root;
     
-    /* package */ final void setNext(ClientHandler next) {
-        this.next = next;
+    private ClientHandler head;
+    
+    protected Filterable(ClientHandler root) {
+        this.root = this.head = root;
     }
     
-    public final ClientHandler getNext() {
-        return next;
+    public void addFilter(ClientFilter f) {
+        f.setNext(head);
+        this.head = f;
+    }
+
+    public void removeFilter(ClientFilter f) {
+        if (head == root) return;
+        
+        if (head == f) head = f.getNext();
+
+        ClientFilter e = (ClientFilter)head;
+        while (e.getNext() != f) {
+            if (e.getNext() == root) return;
+            
+            e = (ClientFilter)e.getNext();
+        }
+        
+        e.setNext(f.getNext());
     }
     
-    public abstract ClientResponse handle(ClientRequest ro);
+    public void removeAllFilters() {
+        this.head = root;
+    }
+    
+    protected ClientHandler getHeadHandler() {
+        return head;
+    }
 }

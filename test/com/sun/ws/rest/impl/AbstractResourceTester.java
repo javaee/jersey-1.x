@@ -85,10 +85,9 @@ public abstract class AbstractResourceTester extends TestCase {
     }
     
     protected ResourceProxy resourceProxy(String relativeUri, boolean checkStatus) {
-        Client c = new TestResourceClient(BASE_URI, w);
-        ResourceProxy r = c.proxy(createCompleteUri(BASE_URI, relativeUri));
+        Client c = new Client(new TestResourceClientHandler(BASE_URI, w));
         if (checkStatus) {
-            r.addFilter(new ClientFilter() {
+            c.addFilter(new ClientFilter() {
                 public ClientResponse handle(ClientRequest ro) {
                     ClientResponse r = getNext().handle(ro);
                     if (r.hasEntity()) {
@@ -100,6 +99,7 @@ public abstract class AbstractResourceTester extends TestCase {
                 }
             });
         }
+        ResourceProxy r = c.proxy(createCompleteUri(BASE_URI, relativeUri));
         
         return r;
     }
