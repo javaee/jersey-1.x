@@ -23,9 +23,9 @@
 package com.sun.ws.rest.impl.container.httpserver;
 
 import com.sun.net.httpserver.HttpHandler;
+import com.sun.ws.rest.impl.client.Client;
 import com.sun.ws.rest.impl.client.ClientRequest;
 import com.sun.ws.rest.impl.client.ClientResponse;
-import java.net.URI;
 import javax.ws.rs.Path;
 import com.sun.ws.rest.impl.client.ResourceProxy;
 import com.sun.ws.rest.impl.client.ClientFilter;
@@ -77,7 +77,7 @@ public class AcceptableXMLorJSONTest extends AbstractHttpServerTester {
     public void testExpliciWebResourceReference() {
         startServer(HttpHandler.class, WebResource.class);
 
-        ResourceProxy r = ResourceProxy.create(getUri().path("resource").build());
+        ResourceProxy r = Client.create().proxy(getUri().path("resource").build());
         r.addFilter(new ClientFilter() {
             public ClientResponse handle(ClientRequest ro) {
                 ClientResponse ri = getNext().handle(ro);

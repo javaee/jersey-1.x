@@ -22,6 +22,7 @@
 
 package com.sun.ws.rest.impl.container.grizzly;
 
+import com.sun.ws.rest.impl.client.Client;
 import javax.ws.rs.Path;
 import com.sun.ws.rest.impl.client.ResourceProxy;
 import javax.ws.rs.GET;
@@ -51,15 +52,15 @@ public class MatrixParamTest extends AbstractGrizzlyServerTester {
 
         UriBuilder base = getUri().path("test");
             
-        ResourceProxy r = ResourceProxy.create(base.clone().matrixParam("y", "1").build());
+        ResourceProxy r = Client.create().proxy(base.clone().matrixParam("y", "1").build());
         assertEquals("1", r.get(String.class));
-        r = ResourceProxy.create(base.clone().
+        r = Client.create().proxy(base.clone().
                 matrixParam("x", "1").encode(false).matrixParam("y", "1%20%2B%202").build());
         assertEquals("1 + 2", r.get(String.class));
-        r = ResourceProxy.create(base.clone().
+        r = Client.create().proxy(base.clone().
                 matrixParam("x", "1").encode(false).matrixParam("y", "1%20%26%202").build());
         assertEquals("1 & 2", r.get(String.class));
-        r = ResourceProxy.create(base.clone().
+        r = Client.create().proxy(base.clone().
                 matrixParam("x", "1").encode(false).matrixParam("y", "1%20%7C%7C%202").build());
         assertEquals("1 || 2", r.get(String.class));
     }

@@ -25,6 +25,7 @@ package com.sun.ws.rest.impl.container.httpserver;
 import javax.ws.rs.Path;
 import com.sun.ws.rest.api.core.HttpRequestContext;
 import com.sun.ws.rest.api.core.HttpResponseContext;
+import com.sun.ws.rest.impl.client.Client;
 import com.sun.ws.rest.impl.client.ResourceProxy;
 import javax.ws.rs.POST;
 import javax.ws.rs.core.Response;
@@ -73,20 +74,20 @@ public class HttpServerAdaptorTest extends AbstractHttpServerTester {
     public void testExplicitWebResourceReference() {
         startServer(TestOneWebResource.class, TestTwoWebResource.class);
         
-        ResourceProxy r = ResourceProxy.create(getUri().path("a").build());
+        ResourceProxy r = Client.create().proxy(getUri().path("a").build());
         assertEquals("RESOURCE-TWO", r.post(String.class, "RESOURCE-TWO"));
 
-        r = ResourceProxy.create(UriBuilder.fromUri(r.getURI()).path("b/c").build());
+        r = Client.create().proxy(UriBuilder.fromUri(r.getURI()).path("b/c").build());
         assertEquals("RESOURCE-ONE", r.post(String.class, "RESOURCE-ONE"));
     }
     
     public void testPackageReference() {
         startServer(this.getClass().getPackage().getName());
         
-        ResourceProxy r = ResourceProxy.create(getUri().path("a").build());
+        ResourceProxy r = Client.create().proxy(getUri().path("a").build());
         assertEquals("RESOURCE-TWO", r.post(String.class, "RESOURCE-TWO"));
 
-        r = ResourceProxy.create(UriBuilder.fromUri(r.getURI()).path("b/c").build());
+        r = Client.create().proxy(UriBuilder.fromUri(r.getURI()).path("b/c").build());
         assertEquals("RESOURCE-ONE", r.post(String.class, "RESOURCE-ONE"));
     }
 }

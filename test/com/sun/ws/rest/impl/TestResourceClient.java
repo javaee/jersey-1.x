@@ -23,11 +23,10 @@
 package com.sun.ws.rest.impl;
 
 import com.sun.ws.rest.api.container.ContainerException;
+import com.sun.ws.rest.impl.client.Client;
+import com.sun.ws.rest.impl.client.ClientHandlerException;
 import com.sun.ws.rest.impl.client.ClientRequest;
-import com.sun.ws.rest.impl.client.ResourceProxy;
-import com.sun.ws.rest.impl.client.ResourceProxyException;
 import com.sun.ws.rest.impl.client.ClientResponse;
-import com.sun.ws.rest.impl.client.ClientResponseImpl;
 import com.sun.ws.rest.impl.provider.ProviderFactory;
 import com.sun.ws.rest.spi.container.AbstractContainerRequest;
 import com.sun.ws.rest.spi.container.AbstractContainerResponse;
@@ -38,6 +37,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URI;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import javax.ws.rs.core.MediaType;
@@ -50,21 +50,21 @@ import javax.ws.rs.ext.RuntimeDelegate.HeaderDelegate;
  *
  * @author Paul.Sandoz@Sun.Com
  */
-public class TestResourceProxy extends ResourceProxy {
+public class TestResourceClient extends Client {
     private final WebApplication w;
     
     private final URI baseUri;
     
-    public TestResourceProxy(URI completeUri, URI baseUri, WebApplication w) {
-        super(completeUri);
+    public TestResourceClient(URI baseUri, WebApplication w) {
         this.baseUri = baseUri;
         this.w = w;
     }
     
-    private final static class Response extends ClientResponseImpl {
+    private final static class Response extends ClientResponse {
         private final InputStream responseEntity;
         private final AbstractContainerResponse response;
         private final MultivaluedMap<String, String> metadata;
+        private Map<String, Object> properties;
         
        Response(InputStream responseEntity, AbstractContainerResponse response) {
             this.responseEntity = responseEntity;
@@ -87,10 +87,6 @@ public class TestResourceProxy extends ResourceProxy {
         }
         
         public <T> T getEntity(Class<T> c) {
-            return getEntity(c, false);
-        }
-        
-        public <T> T getEntity(Class<T> c, boolean successful) {
             if (response.getEntity() == null) return null;
             
             try {
@@ -98,8 +94,14 @@ public class TestResourceProxy extends ResourceProxy {
                 return ProviderFactory.getInstance().createMessageBodyReader(c, mediaType).
                         readFrom(c, mediaType, metadata, responseEntity);
             } catch (IOException ex) {
-                throw new ResourceProxyException(ex);
+                throw new ClientHandlerException(ex);
             }
+        }
+        
+        public Map<String, Object> getProperties() {
+            if (properties != null) return properties;
+
+            return properties = new HashMap<String, Object>();
         }
     }
 
@@ -186,7 +188,7 @@ public class TestResourceProxy extends ResourceProxy {
             out.flush();
             out.close();
         } catch (IOException ex) {
-            throw new ResourceProxyException(ex);
+            throw new ClientHandlerException(ex);
         }
     }
 }

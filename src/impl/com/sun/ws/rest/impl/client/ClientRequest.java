@@ -23,7 +23,6 @@
 package com.sun.ws.rest.impl.client;
 
 import java.net.URI;
-import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 
 /**
@@ -43,40 +42,11 @@ public abstract class ClientRequest {
     @Override
     public abstract ClientRequest clone();
 
-    
-    public static final ClientRequest.Builder entity(Object entity) {
-        return new Builder().entity(entity);
+    public static final ClientRequest.Builder create() {
+        return new Builder();
     }
-
-    public static final ClientRequest.Builder entity(Object entity, MediaType type) {
-        return new Builder().entity(entity, type);
-    }
-
-    public static final Builder entity(Object entity, String type) {
-        return new Builder().entity(entity, type);
-    }
-
-    public static final Builder type(MediaType type) {
-        return new Builder().type(type);
-    }
-        
-    public static final Builder type(String type) {
-        return new Builder().type(type);
-    }
-    
-    public static final Builder accept(MediaType... types) {
-        return new Builder().accept(types);
-    }
-
-    public static final Builder accept(String... types) {
-        return new Builder().accept(types);            
-    }
-
-    public static final Builder header(String name, Object value) {
-        return new Builder().header(name, value);
-    }
-        
-    public static final class Builder extends BaseClientRequestBuilder<Builder> {
+            
+    public static final class Builder extends ClientRequestBuilder<Builder> {
         public ClientRequest build(URI uri, String method) {
             ClientRequest ro = new ClientRequestImpl(uri, method, entity, metadata);
             entity = null;

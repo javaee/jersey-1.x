@@ -22,6 +22,7 @@
 
 package com.sun.ws.rest.impl.container.grizzly;
 
+import com.sun.ws.rest.impl.client.Client;
 import javax.ws.rs.Path;
 import com.sun.ws.rest.impl.client.ResourceProxy;
 import javax.ws.rs.GET;
@@ -53,7 +54,7 @@ public class EscapedURITest extends AbstractGrizzlyServerTester {
     public void testExpliciWebResourceReference() {
         startServer(EscapedURIResource.class);
                 
-        ResourceProxy r = ResourceProxy.create(getUri().
+        ResourceProxy r = Client.create().proxy(getUri().
                 userInfo("x.y").encode(false).path("x%20y").build());
         assertEquals("CONTENT", r.get(String.class));
     } 

@@ -22,8 +22,10 @@
 
 package com.sun.ws.rest.impl.container.grizzly;
 
+import com.sun.ws.rest.impl.client.Client;
 import javax.ws.rs.Path;
 import com.sun.ws.rest.impl.client.ResourceProxy;
+import java.net.URI;
 import javax.ws.rs.GET;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.UriBuilder;
@@ -48,16 +50,26 @@ public class QueryParamTest extends AbstractGrizzlyServerTester {
     public void testQueryParam() {
         startServer(QueryParamResource.class);
                 
-        UriBuilder base = getUri().path("test");
-            
-        ResourceProxy r = ResourceProxy.create(base.clone().
-                queryParam("x", "1").encode(false).queryParam("y", "1+%2B+2").build());
-        assertEquals("1 + 2", r.get(String.class));
-        r = ResourceProxy.create(base.clone().
-                queryParam("x", "1").encode(false).queryParam("y", "1+%26+2").build());
-        assertEquals("1 & 2", r.get(String.class));
-        r = ResourceProxy.create(base.clone().
-                queryParam("x", "1").encode(false).queryParam("y", "1+%7C%7C+2").build());
-        assertEquals("1 || 2", r.get(String.class));
+        ResourceProxy r = Client.create().proxy(
+                getUri().path("test").build());
+        
+        URI u = UriBuilder.fromPath("").encode(false).
+                queryParam("y", "1+%2B+2").build();
+        assertEquals("1 + 2", r.uri(u).get(String.class));
+        
+        u = UriBuilder.fromPath("").
+                queryParam("x", "1").encode(false).
+                queryParam("y", "1+%2B+2").build();        
+        assertEquals("1 + 2", r.uri(u).get(String.class));
+        
+        u = UriBuilder.fromPath("").
+                queryParam("x", "1").encode(false).
+                queryParam("y", "1+%26+2").build();
+        assertEquals("1 & 2", r.uri(u).get(String.class));
+        
+        u = UriBuilder.fromPath("").
+                queryParam("x", "1").encode(false).
+                queryParam("y", "1+%7C%7C+2").build();
+        assertEquals("1 || 2", r.uri(u).get(String.class));
     }
 }

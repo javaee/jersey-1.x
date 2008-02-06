@@ -26,7 +26,7 @@ package com.sun.ws.rest.impl.client;
  *
  * @author Paul.Sandoz@Sun.Com
  */
-interface UniformMethodProxy {
+interface UniformInterface {
     ClientResponse head();
         
     <T> T options(Class<T> c);

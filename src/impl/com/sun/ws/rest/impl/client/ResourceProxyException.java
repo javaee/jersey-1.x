@@ -27,20 +27,18 @@ package com.sun.ws.rest.impl.client;
  * @author Paul.Sandoz@Sun.Com
  */
 public class ResourceProxyException extends RuntimeException {
-
-    public ResourceProxyException() {
-        super();
+    private final ClientResponse r;
+    
+    public ResourceProxyException(ClientResponse r) {
+        this.r = r;
     }    
     
-    public ResourceProxyException(String message) {
+    public ResourceProxyException(String message, ClientResponse r) {
 	super(message);
+        this.r = r;
     }
     
-    public ResourceProxyException(String message, Throwable cause) {
-        super(message, cause);
+    ClientResponse getResponse() {
+        return r;
     }
-    
-    public ResourceProxyException(Throwable cause) {
-        super(cause);
-    }    
 }

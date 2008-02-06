@@ -20,42 +20,26 @@
  *     "Portions Copyrighted [year] [name of copyright owner]"
  */
 
-package com.sun.ws.rest.impl.container.httpserver;
-
-import com.sun.ws.rest.impl.client.Client;
-import javax.ws.rs.Path;
-import com.sun.ws.rest.impl.client.ResourceProxy;
-import javax.ws.rs.GET;
-import junit.framework.*;
+package com.sun.ws.rest.impl.client;
 
 /**
  *
  * @author Paul.Sandoz@Sun.Com
  */
-public class HandlerContextTest extends AbstractHttpServerTester {
-    @Path("/")
-    public static class Resource {
-        @GET
-        public String get() {
-            return "CONTENT";
-        }
-    }
-        
-    public HandlerContextTest(String testName) {
-        super(testName);
+public class ClientHandlerException extends RuntimeException {
+    public ClientHandlerException() {
+        super();
     }
     
-    public void setUp() {
-        startServer(Resource.class);        
+    public ClientHandlerException(String message) {
+        super(message);
     }
     
-    public void testRequestWithTerminatingSlash() {
-        ResourceProxy r = Client.create().proxy(getUri().path("/").build());
-        assertEquals("CONTENT", r.get(String.class));
-    } 
+    public ClientHandlerException(String message, Throwable cause) {
+        super(message, cause);
+    }
     
-    public void testRequestWithoutTerminatingSlash() {
-        ResourceProxy r = Client.create().proxy(getUri().build());
-        assertEquals("CONTENT", r.get(String.class));
+    public ClientHandlerException(Throwable cause) {
+        super(cause);
     }
 }

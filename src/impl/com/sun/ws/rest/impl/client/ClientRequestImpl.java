@@ -29,7 +29,7 @@ import java.util.List;
 import java.util.Map;
 import javax.ws.rs.core.MultivaluedMap;
 
-final class ClientRequestImpl extends ClientRequest {
+/* package */ final class ClientRequestImpl extends ClientRequest {
     private final URI uri;
     
     private final String method;

@@ -22,27 +22,72 @@
 
 package com.sun.ws.rest.impl.client;
 
+import com.sun.ws.rest.impl.ResponseHttpHeadersImpl;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.MultivaluedMap;
 
 /**
  *
  * @author Paul.Sandoz@Sun.Com
  */
-public interface ClientRequestBuilder<T extends ClientRequestBuilder<T>> {
+public abstract class ClientRequestBuilder<T extends RequestBuilder<T>> 
+        implements RequestBuilder<T> {
 
-    T entity(Object entity);
-
-    T entity(Object entity, MediaType type);
-
-    T entity(Object entity, String type);
+    protected Object entity;
     
-    T type(MediaType type);
+    protected MultivaluedMap<String, Object> metadata;
+    
+    protected ClientRequestBuilder() {
+        metadata = new ResponseHttpHeadersImpl();
+    }
+    
+    public T entity(Object entity) {
+        this.entity = entity;
+        return (T)this;
+    }
+
+    public T entity(Object entity, MediaType type) {
+        entity(entity);
+        type(type);
+        return (T)this;
+    }
+
+    public T entity(Object entity, String type) {
+        entity(entity);
+        type(type);
+        return (T)this;
+    }
+    
+    public T type(MediaType type) {
+        getMetadata().putSingle("Content-Type", type);        
+        return (T)this;
+    }
         
-    T type(String type);
+    public T type(String type) {
+        getMetadata().putSingle("Content-Type", type);        
+        return (T)this;
+    }
         
-    T accept(MediaType... types);
+    public T accept(MediaType... types) {
+        for (MediaType type : types)
+            getMetadata().add("Accept", type);
+        return (T)this;
+    }
     
-    T accept(String... types);
+    public T accept(String... types) {
+        for (String type : types)
+            getMetadata().add("Accept", type);
+        return (T)this;
+    }
     
-    T header(String name, Object value);   
+    public T header(String name, Object value) {
+        getMetadata().add(name, value);
+        return (T)this;
+    }
+    
+    private MultivaluedMap<String, Object> getMetadata() {
+        if (metadata != null) return metadata;
+        
+        return metadata = new ResponseHttpHeadersImpl();
+    }
 }

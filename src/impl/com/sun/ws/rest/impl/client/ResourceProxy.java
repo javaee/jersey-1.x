@@ -22,7 +22,6 @@
 
 package com.sun.ws.rest.impl.client;
 
-import com.sun.ws.rest.impl.client.urlconnection.URLConnectionResourceProxy;
 import java.net.URI;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.UriBuilder;
@@ -31,39 +30,40 @@ import javax.ws.rs.core.UriBuilder;
  *
  * @author Paul.Sandoz@Sun.Com
  */
-public abstract class ResourceProxy implements ClientHandler, 
-        ClientRequestBuilder<ResourceProxy.Builder>,
-        UniformMethodProxy {
+public final class ResourceProxy implements RequestBuilder<ResourceProxy.Builder>,
+        UniformInterface {
+    private final ClientHandler root;
+    
     private final URI u;
     
     private ClientHandler head;
     
-    protected ResourceProxy(URI u) {
+    protected ResourceProxy(ClientHandler c, URI u) {
         this.u = u;
-        this.head = this;
+        this.root = this.head = c;
     }
     
-    public final URI getURI() {
+    public URI getURI() {
         return u;
     }
     
-    public final UriBuilder getBuilder() {
+    public UriBuilder getBuilder() {
         return UriBuilder.fromUri(u);
     }
     
-    public final void addFilter(ClientFilter f) {
+    public void addFilter(ClientFilter f) {
         f.setNext(head);
         this.head = f;
     }
 
-    public final void removeFilter(ClientFilter f) {
-        if (head == this) return;
+    public void removeFilter(ClientFilter f) {
+        if (head == root) return;
         
         if (head == f) head = f.getNext();
 
         ClientFilter e = (ClientFilter)head;
         while (e.getNext() != f) {
-            if (e.getNext() == this) return;
+            if (e.getNext() == root) return;
             
             e = (ClientFilter)e.getNext();
         }
@@ -71,223 +71,235 @@ public abstract class ResourceProxy implements ClientHandler,
         e.setNext(f.getNext());
     }
     
-    public final void removeAllFilters() {
-        this.head = this;
+    public void removeAllFilters() {
+        this.head = root;
     }
     
-    // UniformMethodProxy
+    // UniformInterface
     
-    public final ClientResponse head() {
-        return _handle(new ClientRequestImpl(u, "HEAD"));
+    public ClientResponse head() {
+        return handle(new ClientRequestImpl(u, "HEAD"));
     }
         
-    public final <T> T options(Class<T> c) {
+    public <T> T options(Class<T> c) {
         return handle(c, new ClientRequestImpl(u, "OPTIONS"));
     }
         
-    public final <T> T get(Class<T> c) {
+    public <T> T get(Class<T> c) {
         return handle(c, new ClientRequestImpl(u, "GET"));
     }
             
-    public final void put() {
+    public void put() {
         voidHandle(new ClientRequestImpl(u, "PUT", null));
     }
     
-    public final void put(Object requestEntity) {
+    public void put(Object requestEntity) {
         voidHandle(new ClientRequestImpl(u, "PUT", requestEntity));
     }
     
-    public final <T> T put(Class<T> c) {
+    public <T> T put(Class<T> c) {
         return handle(c, new ClientRequestImpl(u, "PUT"));
     }
 
-    public final <T> T put(Class<T> c, Object requestEntity) {
+    public <T> T put(Class<T> c, Object requestEntity) {
         return handle(c, new ClientRequestImpl(u, "PUT", requestEntity));
     }
             
-    public final void post() {
+    public void post() {
         voidHandle(new ClientRequestImpl(u, "POST"));
     }
     
-    public final void post(Object requestEntity) {
+    public void post(Object requestEntity) {
         voidHandle(new ClientRequestImpl(u, "POST", requestEntity));
     }
     
-    public final <T> T post(Class<T> c) {
+    public <T> T post(Class<T> c) {
         return handle(c, new ClientRequestImpl(u, "POST"));
     }
 
-    public final <T> T post(Class<T> c, Object requestEntity) {
+    public <T> T post(Class<T> c, Object requestEntity) {
         return handle(c, new ClientRequestImpl(u, "POST", requestEntity));
     }
             
-    public final void delete() {
+    public void delete() {
         voidHandle(new ClientRequestImpl(u, "DELETE"));
     }
     
-    public final void delete(Object requestEntity) {
+    public void delete(Object requestEntity) {
         voidHandle(new ClientRequestImpl(u, "DELETE", requestEntity));
     }
     
-    public final <T> T delete(Class<T> c) {
+    public <T> T delete(Class<T> c) {
         return handle(c, new ClientRequestImpl(u, "DELETE"));    
     }
 
-    public final <T> T delete(Class<T> c, Object requestEntity) {
+    public <T> T delete(Class<T> c, Object requestEntity) {
         return handle(c, new ClientRequestImpl(u, "DELETE", requestEntity));
     }
         
+    // RequestBuilder<ResourceProxy.Builder>
     
-    public final class Builder extends BaseClientRequestBuilder<Builder> 
-            implements UniformMethodProxy {  
-        
-        private Builder() {}
-        
-        private ClientRequest build(URI uri, String method) {
-            ClientRequest ro = new ClientRequestImpl(uri, method, entity, metadata);
-            entity = null;
-            metadata = null;
-            return ro;
-        }
-        
-        private ClientRequest build(URI uri, String method, Object e) {
-            ClientRequest ro = new ClientRequestImpl(uri, method, e, metadata);
-            entity = null;
-            metadata = null;
-            return ro;
-        }
-        
-        // UniformMethodProxy
-        
-        public final ClientResponse head() {
-            return _handle(build(u, "HEAD"));
-        }
-        
-        public final <T> T options(Class<T> c) {
-            return handle(c, build(u, "OPTIONS"));
-        }
-                
-        public final <T> T get(Class<T> c) {
-            return handle(c, build(u, "GET"));
-        }
-                
-        public final void put() {
-            voidHandle(build(u, "PUT"));
-        }
+    public Builder entity(Object entity) {
+        return new Builder(u).entity(entity);
+    }
 
-        public final void put(Object requestEntity) {
-            voidHandle(build(u, "PUT", requestEntity));
-        }
-        
-        public final <T> T put(Class<T> c) {
-            return handle(c, build(u, "PUT"));
-        }
-        
-        public final <T> T put(Class<T> c, Object requestEntity) {
-            return handle(c, build(u, "PUT", requestEntity));
-        }
-        
-        public final void post() {
-            voidHandle(build(u, "POST"));
-        }
+    public Builder entity(Object entity, MediaType type) {
+        return new Builder(u).entity(entity, type);
+    }
 
-        public final void post(Object requestEntity) {
-            voidHandle(build(u, "POST", requestEntity));
-        }
+    public Builder entity(Object entity, String type) {
+        return new Builder(u).entity(entity, type);
+    }
 
-        public final <T> T post(Class<T> c) {
-            return handle(c, build(u, "POST"));
-        }
-                
-        public final <T> T post(Class<T> c, Object requestEntity) {
-            return handle(c, build(u, "POST", requestEntity));
-        }
+    public Builder type(MediaType type) {
+        return new Builder(u).type(type);
+    }
         
-        public final void delete() {
-            voidHandle(build(u, "DELETE"));
-        }
-
-        public final void delete(Object requestEntity) {
-            voidHandle(build(u, "DELETE", requestEntity));
-        }
-        
-        public final <T> T delete(Class<T> c) {
-            return handle(c, build(u, "DELETE"));
-        }
-        
-        public final <T> T delete(Class<T> c, Object requestEntity) {
-            return handle(c, build(u, "DELETE", requestEntity));
-        }
+    public Builder type(String type) {
+        return new Builder(u).type(type);
     }
     
-    // ClientRequestBuilder<ResourceProxy.Builder>
-    
-    public final Builder entity(Object entity) {
-        return new Builder().entity(entity);
+    public Builder accept(MediaType... types) {
+        return new Builder(u).accept(types);
     }
 
-    public final Builder entity(Object entity, MediaType type) {
-        return new Builder().entity(entity, type);
-    }
-
-    public final Builder entity(Object entity, String type) {
-        return new Builder().entity(entity, type);
-    }
-
-    public final Builder type(MediaType type) {
-        return new Builder().type(type);
-    }
-        
-    public final Builder type(String type) {
-        return new Builder().type(type);
-    }
-    
-    public final Builder accept(MediaType... types) {
-        return new Builder().accept(types);
-    }
-
-    public final Builder accept(String... types) {
-        return new Builder().accept(types);
+    public Builder accept(String... types) {
+        return new Builder(u).accept(types);
     }    
     
-    public final Builder header(String name, Object value) {
-        return new Builder().header(name, value);
+    public Builder header(String name, Object value) {
+        return new Builder(u).header(name, value);
     }
 
+    // URI specific building
     
-    
-    private final void voidHandle(ClientRequest ro) {
-        ClientResponse r = _handle(ro);
-        if (r.getStatus() >= 300)
-            throw new ResourceProxyException();
+    public Builder path(String path) {
+        return new Builder(UriBuilder.fromUri(u).path(path).build());
     }
     
-    private final ClientResponse _handle(ClientRequest ro) {
-        return head.handle(ro);
-    }
-    
-    public final <T> T handle(Class<T> c, ClientRequest ro) {
-        ClientResponse r = _handle(ro);
-        return (c == ClientResponse.class) ? c.cast(r) : r.getEntity(c, true);        
-    }
-    
-    public abstract ClientResponse handle(ClientRequest ro);
-    
-    
-    
-    public static ResourceProxy create(String u) {
-        return create(URI.create(u));
-    }
-    
-    public static ResourceProxy create(URI u) {
-        if (u.getScheme().equals("http") || u.getScheme().equals("https")) {
-            try {
-                return new URLConnectionResourceProxy(u);
-            } catch (Exception ex) {
-                throw new IllegalArgumentException(ex);
+    public Builder uri(URI uri) {
+        UriBuilder b = UriBuilder.fromUri(u).encode(false);
+        String path = uri.getRawPath();
+        if (path != null && path.length() > 0) {
+            if (path.startsWith("/")) {
+                b.replacePath(path);
+            } else {
+                b.path(path);
             }
         }
-        
-        throw new IllegalArgumentException();
+        String query = uri.getRawQuery();
+        if (query != null && query.length() > 0) {
+            b.replaceQueryParams(query);        
+        }
+        return new Builder(b.build());
     }
+    
+    // Builder that builds client request and handles it
+    
+    public final class Builder extends ClientRequestBuilder<Builder> 
+            implements UniformInterface {  
+        
+        private final URI u;
+        
+        private Builder(URI u) {
+            this.u = u;
+        }
+        
+        private ClientRequest build(String method) {
+            ClientRequest ro = new ClientRequestImpl(u, method, entity, metadata);
+            entity = null;
+            metadata = null;
+            return ro;
+        }
+        
+        private ClientRequest build(String method, Object e) {
+            ClientRequest ro = new ClientRequestImpl(u, method, e, metadata);
+            entity = null;
+            metadata = null;
+            return ro;
+        }
+        
+        // UniformInterface
+        
+        public ClientResponse head() {
+            return handle(build("HEAD"));
+        }
+        
+        public <T> T options(Class<T> c) {
+            return handle(c, build("OPTIONS"));
+        }
+                
+        public <T> T get(Class<T> c) {
+            return handle(c, build("GET"));
+        }
+                
+        public void put() {
+            voidHandle(build("PUT"));
+        }
+
+        public void put(Object requestEntity) {
+            voidHandle(build("PUT", requestEntity));
+        }
+        
+        public <T> T put(Class<T> c) {
+            return handle(c, build("PUT"));
+        }
+        
+        public <T> T put(Class<T> c, Object requestEntity) {
+            return handle(c, build("PUT", requestEntity));
+        }
+        
+        public void post() {
+            voidHandle(build("POST"));
+        }
+
+        public void post(Object requestEntity) {
+            voidHandle(build("POST", requestEntity));
+        }
+
+        public <T> T post(Class<T> c) {
+            return handle(c, build("POST"));
+        }
+                
+        public <T> T post(Class<T> c, Object requestEntity) {
+            return handle(c, build("POST", requestEntity));
+        }
+        
+        public void delete() {
+            voidHandle(build("DELETE"));
+        }
+
+        public void delete(Object requestEntity) {
+            voidHandle(build("DELETE", requestEntity));
+        }
+        
+        public <T> T delete(Class<T> c) {
+            return handle(c, build("DELETE"));
+        }
+        
+        public <T> T delete(Class<T> c, Object requestEntity) {
+            return handle(c, build("DELETE", requestEntity));
+        }
+    }
+    
+    
+    public <T> T handle(Class<T> c, ClientRequest ro) {
+        ClientResponse r = handle(ro);
+        
+        if (c == ClientResponse.class) return c.cast(r);
+        
+        if (r.getStatus() < 300) return r.getEntity(c);
+        
+        throw new ResourceProxyException(r);
+    }
+    
+    private void voidHandle(ClientRequest ro) {
+        ClientResponse r = handle(ro);
+        
+        if (r.getStatus() >= 300) throw new ResourceProxyException(r);
+    }
+    
+    private ClientResponse handle(ClientRequest ro) {
+        return head.handle(ro);
+    }    
 }

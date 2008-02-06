@@ -23,19 +23,17 @@
 package com.sun.ws.rest.impl.client.urlconnection;
 
 import com.sun.ws.rest.impl.RequestHttpHeadersImpl;
+import com.sun.ws.rest.impl.client.Client;
+import com.sun.ws.rest.impl.client.ClientHandlerException;
 import com.sun.ws.rest.impl.client.ClientRequest;
-import com.sun.ws.rest.impl.client.ResourceProxy;
-import com.sun.ws.rest.impl.client.ResourceProxyException;
 import com.sun.ws.rest.impl.client.ClientResponse;
-import com.sun.ws.rest.impl.client.ClientResponseImpl;
 import com.sun.ws.rest.impl.provider.ProviderFactory;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
 import java.net.ProtocolException;
-import java.net.URI;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import javax.ws.rs.core.MediaType;
@@ -48,11 +46,12 @@ import javax.ws.rs.ext.RuntimeDelegate.HeaderDelegate;
  *
  * @author Paul.Sandoz@Sun.Com
  */
-public final class URLConnectionResourceProxy extends ResourceProxy {
-    private final static class URLConnectionResponse extends ClientResponseImpl {
+public final class URLConnectionClient extends Client {
+    private final static class URLConnectionResponse extends ClientResponse {
         private final int status;
         private final HttpURLConnection uc;
         private final MultivaluedMap<String, String> metadata;
+        private Map<String, Object> properties;
         
         URLConnectionResponse(int status, HttpURLConnection uc) {
             this.status = status;
@@ -79,39 +78,37 @@ public final class URLConnectionResourceProxy extends ResourceProxy {
         }
         
         public <T> T getEntity(Class<T> c) {
-            return getEntity(c, false);
-        }
-        
-        public <T> T getEntity(Class<T> c, boolean successful) {
             try {
                 MediaType mediaType = getContentType();
                 return ProviderFactory.getInstance().createMessageBodyReader(c, mediaType).
-                        readFrom(c, mediaType, metadata, getInputStream(successful));
+                        readFrom(c, mediaType, metadata, getInputStream());
             } catch (IOException ex) {
                 throw new IllegalArgumentException(ex);
             }
         }
 
-        private InputStream getInputStream(boolean successful) throws IOException {
-            if (successful) {
-                return uc.getInputStream();
-            } else if (status < 300) {
+        public Map<String, Object> getProperties() {
+            if (properties != null) return properties;
+
+            return properties = new HashMap<String, Object>();
+        }
+        
+        private InputStream getInputStream() throws IOException {
+            if (status < 300) {
                 return uc.getInputStream();
             } else {
                 return uc.getErrorStream();
             }
         }
     }
-    
-    public URLConnectionResourceProxy(URI u) throws MalformedURLException, IOException {
-        super(u);
-    }
+
+    // ClientHandler
     
     public ClientResponse handle(ClientRequest ro) {
         try {
             return _invoke(ro);
         } catch (Exception ex) {
-            throw new ResourceProxyException(ex);
+            throw new ClientHandlerException(ex);
         }
     }
 
@@ -159,7 +156,8 @@ public final class URLConnectionResourceProxy extends ResourceProxy {
     
     @SuppressWarnings("unchecked")
     private String getHeaderValue(Object headerValue) {
-        HeaderDelegate hp = RuntimeDelegate.getInstance().createHeaderDelegate(headerValue.getClass());
+        HeaderDelegate hp = RuntimeDelegate.getInstance().
+                createHeaderDelegate(headerValue.getClass());
         return hp.toString(headerValue);
     }
     
@@ -178,7 +176,8 @@ public final class URLConnectionResourceProxy extends ResourceProxy {
             }
         }
                 
-        final MessageBodyWriter p = ProviderFactory.getInstance().createMessageBodyWriter(entity.getClass(), mediaType);
+        final MessageBodyWriter p = ProviderFactory.getInstance().
+                createMessageBodyWriter(entity.getClass(), mediaType);
         p.writeTo(entity, mediaType, metadata, out);
         
         out.flush();

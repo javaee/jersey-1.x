@@ -22,12 +22,29 @@
 
 package com.sun.ws.rest.impl.client;
 
+import com.sun.ws.rest.impl.client.urlconnection.URLConnectionClient;
+import java.net.URI;
+
 /**
  *
  * @author Paul.Sandoz@Sun.Com
  */
 public abstract class Client implements ClientHandler {
-
+    
+    public ResourceProxy proxy(String u) {
+        return proxy(URI.create(u));
+    }
+    
+    public ResourceProxy proxy(URI u) {
+        return new ResourceProxy(this, u);
+    }
+    
+    // ClientHandler
+    
     public abstract ClientResponse handle(ClientRequest ro);
 
+    
+    public static Client create() {
+        return new URLConnectionClient();
+    }
 }

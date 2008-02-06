@@ -27,6 +27,7 @@ import com.sun.ws.rest.impl.client.ClientRequest;
 import com.sun.ws.rest.impl.client.ClientResponse;
 import com.sun.ws.rest.impl.application.WebApplicationImpl;
 import com.sun.ws.rest.api.core.DefaultResourceConfig;
+import com.sun.ws.rest.impl.client.Client;
 import com.sun.ws.rest.impl.client.ResourceProxy;
 import com.sun.ws.rest.impl.client.ClientFilter;
 import com.sun.ws.rest.spi.container.WebApplication;
@@ -84,9 +85,8 @@ public abstract class AbstractResourceTester extends TestCase {
     }
     
     protected ResourceProxy resourceProxy(String relativeUri, boolean checkStatus) {
-        ResourceProxy r = new TestResourceProxy(
-                createCompleteUri(BASE_URI, relativeUri), BASE_URI, 
-                w);
+        Client c = new TestResourceClient(BASE_URI, w);
+        ResourceProxy r = c.proxy(createCompleteUri(BASE_URI, relativeUri));
         if (checkStatus) {
             r.addFilter(new ClientFilter() {
                 public ClientResponse handle(ClientRequest ro) {

@@ -28,31 +28,60 @@ import java.util.Map;
 import javax.ws.rs.core.EntityTag;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
+import javax.ws.rs.ext.RuntimeDelegate;
+import javax.ws.rs.ext.RuntimeDelegate.HeaderDelegate;
 
 /**
  *
  * @author Paul.Sandoz@Sun.Com
  */
-public interface ClientResponse {
-    Map<String, Object> getProperties();
+public abstract class ClientResponse {
+    protected static final HeaderDelegate<EntityTag> entityTagDelegate = 
+            RuntimeDelegate.getInstance().createHeaderDelegate(EntityTag.class);
     
-    int getStatus();
+    protected static final HeaderDelegate<Date> dateDelegate = 
+            RuntimeDelegate.getInstance().createHeaderDelegate(Date.class);
+        
+    public abstract int getStatus();
     
-    MultivaluedMap<String, String> getMetadata();
+    public abstract MultivaluedMap<String, String> getMetadata();
     
-    MediaType getContentType();
+    public abstract boolean hasEntity();
     
-    URI getLocation();
+    public abstract <T> T getEntity(Class<T> c) throws IllegalArgumentException;
+        
+    public abstract Map<String, Object> getProperties();
+    /*
+    {
+        if (properties != null) return properties;
+        
+        return properties = new HashMap<String, Object>();
+    }
+    */
     
-    EntityTag getEntityTag();
+    public MediaType getContentType() {
+        String ct = getMetadata().getFirst("Content-Type");
+        return (ct != null) ? MediaType.parse(ct) : null;
+    }
     
-    Date getLastModified();
+    public URI getLocation() {
+        String l = getMetadata().getFirst("Location");        
+        return (l != null) ? URI.create(l) : null;
+    }
     
-    String getLangauge();
+    public EntityTag getEntityTag() {
+        String t = getMetadata().getFirst("ETag");
+        
+        return (t != null) ? entityTagDelegate.fromString(t) : null;
+    }
     
-    boolean hasEntity();
-    
-    <T> T getEntity(Class<T> c) throws IllegalArgumentException;
-    
-    <T> T getEntity(Class<T> c, boolean successful) throws IllegalArgumentException;
+    public Date getLastModified() {
+        String d = getMetadata().getFirst("Last-Modified");
+        
+        return (d != null) ? dateDelegate.fromString(d) : null;
+    }
+
+    public String getLangauge() {
+        return getMetadata().getFirst("Content-Language");
+    }
 }

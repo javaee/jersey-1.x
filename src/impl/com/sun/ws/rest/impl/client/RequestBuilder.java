@@ -20,42 +20,29 @@
  *     "Portions Copyrighted [year] [name of copyright owner]"
  */
 
-package com.sun.ws.rest.impl.container.httpserver;
+package com.sun.ws.rest.impl.client;
 
-import com.sun.ws.rest.impl.client.Client;
-import javax.ws.rs.Path;
-import com.sun.ws.rest.impl.client.ResourceProxy;
-import javax.ws.rs.GET;
-import junit.framework.*;
+import javax.ws.rs.core.MediaType;
 
 /**
  *
  * @author Paul.Sandoz@Sun.Com
  */
-public class HandlerContextTest extends AbstractHttpServerTester {
-    @Path("/")
-    public static class Resource {
-        @GET
-        public String get() {
-            return "CONTENT";
-        }
-    }
+public interface RequestBuilder<T extends RequestBuilder<T>> {
+
+    T entity(Object entity);
+
+    T entity(Object entity, MediaType type);
+
+    T entity(Object entity, String type);
+    
+    T type(MediaType type);
         
-    public HandlerContextTest(String testName) {
-        super(testName);
-    }
+    T type(String type);
+        
+    T accept(MediaType... types);
     
-    public void setUp() {
-        startServer(Resource.class);        
-    }
+    T accept(String... types);
     
-    public void testRequestWithTerminatingSlash() {
-        ResourceProxy r = Client.create().proxy(getUri().path("/").build());
-        assertEquals("CONTENT", r.get(String.class));
-    } 
-    
-    public void testRequestWithoutTerminatingSlash() {
-        ResourceProxy r = Client.create().proxy(getUri().build());
-        assertEquals("CONTENT", r.get(String.class));
-    }
+    T header(String name, Object value);   
 }
