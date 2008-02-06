@@ -30,7 +30,7 @@ import javax.ws.rs.core.MultivaluedMap;
  *
  * @author Paul.Sandoz@Sun.Com
  */
-public abstract class ClientRequestBuilder<T extends RequestBuilder<T>> 
+public abstract class ClientRequestBuilder<T extends RequestBuilder> 
         implements RequestBuilder<T> {
 
     protected Object entity;

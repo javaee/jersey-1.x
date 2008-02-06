@@ -28,7 +28,7 @@ import javax.ws.rs.core.MediaType;
  *
  * @author Paul.Sandoz@Sun.Com
  */
-public interface RequestBuilder<T extends RequestBuilder<T>> {
+public interface RequestBuilder<T extends RequestBuilder> {
 
     T entity(Object entity);
 
