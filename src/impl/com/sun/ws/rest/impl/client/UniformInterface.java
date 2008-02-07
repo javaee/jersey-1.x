@@ -27,12 +27,16 @@ package com.sun.ws.rest.impl.client;
  * @author Paul.Sandoz@Sun.Com
  */
 interface UniformInterface {
+    
     ClientResponse head();
-        
+    
+    
     <T> T options(Class<T> c);
-        
+    
+    
     <T> T get(Class<T> c);
             
+    
     void put();
     
     void put(Object requestEntity);
@@ -40,7 +44,8 @@ interface UniformInterface {
     <T> T put(Class<T> c);
 
     <T> T put(Class<T> c, Object requestEntity);
-            
+    
+    
     void post();
     
     void post(Object requestEntity);
@@ -49,6 +54,7 @@ interface UniformInterface {
 
     <T> T post(Class<T> c, Object requestEntity);
             
+    
     void delete();
     
     void delete(Object requestEntity);
@@ -56,4 +62,14 @@ interface UniformInterface {
     <T> T delete(Class<T> c);
 
     <T> T delete(Class<T> c, Object requestEntity);
+
+    
+    void method(String method);
+    
+    void method(String method, Object requestEntity);
+    
+    <T> T method(String method, Class<T> c);
+
+    <T> T method(String method, Class<T> c, Object requestEntity);
+    
 }

@@ -109,7 +109,23 @@ public final class ResourceProxy extends Filterable implements
     public <T> T delete(Class<T> c, Object requestEntity) {
         return handle(c, new ClientRequestImpl(u, "DELETE", requestEntity));
     }
-        
+      
+    public void method(String method) {
+        voidHandle(new ClientRequestImpl(u, method));        
+    }
+    
+    public void method(String method, Object requestEntity) {
+        voidHandle(new ClientRequestImpl(u, method, requestEntity));        
+    }
+    
+    public <T> T method(String method, Class<T> c) {
+        return handle(c, new ClientRequestImpl(u, method));            
+    }
+    
+    public <T> T method(String method, Class<T> c, Object requestEntity) {
+        return handle(c, new ClientRequestImpl(u, method, requestEntity));        
+    }
+    
     // RequestBuilder<ResourceProxy.Builder>
     
     public Builder entity(Object entity) {
@@ -253,6 +269,22 @@ public final class ResourceProxy extends Filterable implements
         public <T> T delete(Class<T> c, Object requestEntity) {
             return handle(c, build("DELETE", requestEntity));
         }
+        
+        public void method(String method) {
+            voidHandle(build(method));
+        }
+
+        public void method(String method, Object requestEntity) {
+            voidHandle(build(method, requestEntity));
+        }
+
+        public <T> T method(String method, Class<T> c) {
+            return handle(c, build(method));
+        }
+
+        public <T> T method(String method, Class<T> c, Object requestEntity) {
+            return handle(c, build(method, requestEntity));
+        }        
     }
     
     
