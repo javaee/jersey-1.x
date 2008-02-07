@@ -23,7 +23,7 @@
 package com.sun.ws.rest.impl.inject;
 
 import com.sun.ws.rest.impl.AbstractResourceTester;
-import com.sun.ws.rest.impl.client.ResourceProxy;
+import com.sun.ws.rest.api.client.ResourceProxy;
 import com.sun.ws.rest.spi.service.ContextResolver;
 import java.io.IOException;
 import java.math.BigInteger;

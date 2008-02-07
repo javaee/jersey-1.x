@@ -26,7 +26,7 @@ import com.sun.ws.rest.impl.AbstractResourceTester;
 import com.sun.ws.rest.api.core.ResourceConfig;
 import com.sun.ws.rest.impl.application.WebApplicationImpl;
 import com.sun.ws.rest.api.core.DefaultResourceConfig;
-import com.sun.ws.rest.impl.client.ResourceProxy;
+import com.sun.ws.rest.api.client.ResourceProxy;
 import com.sun.ws.rest.spi.resource.PerRequest;
 import com.sun.ws.rest.spi.resource.Singleton;
 import java.util.HashSet;

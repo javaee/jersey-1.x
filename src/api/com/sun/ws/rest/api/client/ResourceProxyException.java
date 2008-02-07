@@ -20,26 +20,27 @@
  *     "Portions Copyrighted [year] [name of copyright owner]"
  */
 
-package com.sun.ws.rest.impl.client;
+package com.sun.ws.rest.api.client;
+
+import com.sun.ws.rest.impl.client.*;
 
 /**
  *
  * @author Paul.Sandoz@Sun.Com
  */
-public class ClientHandlerException extends RuntimeException {
-    public ClientHandlerException() {
-        super();
+public class ResourceProxyException extends RuntimeException {
+    private final ClientResponse r;
+    
+    public ResourceProxyException(ClientResponse r) {
+        this.r = r;
+    }    
+    
+    public ResourceProxyException(String message, ClientResponse r) {
+	super(message);
+        this.r = r;
     }
     
-    public ClientHandlerException(String message) {
-        super(message);
-    }
-    
-    public ClientHandlerException(String message, Throwable cause) {
-        super(message, cause);
-    }
-    
-    public ClientHandlerException(Throwable cause) {
-        super(cause);
+    ClientResponse getResponse() {
+        return r;
     }
 }

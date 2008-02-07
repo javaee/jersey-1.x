@@ -20,33 +20,79 @@
  *     "Portions Copyrighted [year] [name of copyright owner]"
  */
 
-package com.sun.ws.rest.impl.client;
+package com.sun.ws.rest.api.client;
 
+import com.sun.ws.rest.impl.client.*;
 import java.net.URI;
 import javax.ws.rs.core.MultivaluedMap;
 
 /**
- *
+ * A client (outbound) HTTP request.
+ * <p>
+ * Instances may be created by using the static method {@link #create} and
+ * methods on {@link ClientRequest.Builder}.
+ * 
  * @author Paul.Sandoz@Sun.Com
  */
 public abstract class ClientRequest {
     
+    /**
+     * Get the URI of the request. The URI shall contain sufficient
+     * components to correctly dispatch a request
+     * 
+     * @return the URI of the request.
+     */
     public abstract URI getURI();
     
+    /**
+     * Get the HTTP method.
+     * 
+     * @return the HTTP method.
+     */
     public abstract String getMethod();
     
+    /**
+     * Get the entity of the request.
+     * 
+     * @return the entity of the request.
+     */
     public abstract Object getEntity();
     
+    /**
+     * Get the HTTP headers of the request.
+     * 
+     * @return the HTTP headers of the request.
+     */
     public abstract MultivaluedMap<String, Object> getMetadata();
 
+    /**
+     * Clone the request.
+     * 
+     * @return the cloned request.
+     */
     @Override
     public abstract ClientRequest clone();
 
+    /**
+     * Create a builder for building a new {@link ClientRequest}instance.
+     * 
+     * @return the builder.
+     */
     public static final ClientRequest.Builder create() {
         return new Builder();
     }
             
-    public static final class Builder extends ClientRequestBuilder<Builder> {
+    /**
+     * The builder for building a {@link ClientRequest}instance.
+     */
+    public static final class Builder extends PartialRequestBuilder<Builder> {
+        /**
+         * Build the {@link ClientRequest}instance.
+         * 
+         * @param uri the URI of the request.
+         * @param method the HTTP method.
+         * @return the client request.
+         */
         public ClientRequest build(URI uri, String method) {
             ClientRequest ro = new ClientRequestImpl(uri, method, entity, metadata);
             entity = null;

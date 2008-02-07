@@ -20,25 +20,22 @@
  *     "Portions Copyrighted [year] [name of copyright owner]"
  */
 
-package com.sun.ws.rest.impl.client;
+package com.sun.ws.rest.api.client;
 
 /**
- *
+ * A client handler that handles a HTTP request and returns the HTTP response.
+ * 
  * @author Paul.Sandoz@Sun.Com
  */
-public class ResourceProxyException extends RuntimeException {
-    private final ClientResponse r;
-    
-    public ResourceProxyException(ClientResponse r) {
-        this.r = r;
-    }    
-    
-    public ResourceProxyException(String message, ClientResponse r) {
-	super(message);
-        this.r = r;
-    }
-    
-    ClientResponse getResponse() {
-        return r;
-    }
+public interface ClientHandler {
+    /**
+     * Handle a HTTP request as a {@link ClientRequest} and return the HTTP
+     * response as a {@link ClientResponse}.
+     * 
+     * @param cr the HTTP request.
+     * @return the HTTP response.
+     * @throws com.sun.ws.rest.api.client.ClientHandlerException if the client
+     * handler fails to process the request or response.
+     */
+    ClientResponse handle(ClientRequest cr) throws ClientHandlerException;
 }

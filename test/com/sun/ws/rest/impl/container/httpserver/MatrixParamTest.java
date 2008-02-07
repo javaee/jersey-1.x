@@ -22,9 +22,9 @@
 
 package com.sun.ws.rest.impl.container.httpserver;
 
-import com.sun.ws.rest.impl.client.Client;
+import com.sun.ws.rest.api.client.Client;
 import javax.ws.rs.Path;
-import com.sun.ws.rest.impl.client.ResourceProxy;
+import com.sun.ws.rest.api.client.ResourceProxy;
 import javax.ws.rs.GET;
 import javax.ws.rs.MatrixParam;
 import javax.ws.rs.core.UriBuilder;

@@ -20,46 +20,56 @@
  *     "Portions Copyrighted [year] [name of copyright owner]"
  */
 
-package com.sun.ws.rest.impl.client;
+package com.sun.ws.rest.api.client;
 
 /**
  *
  * @author Paul.Sandoz@Sun.Com
  */
-public abstract class Filterable {
-    private final ClientHandler root;
+interface UniformInterface {
     
-    private ClientHandler head;
+    ClientResponse head();
     
-    protected Filterable(ClientHandler root) {
-        this.root = this.head = root;
-    }
     
-    public void addFilter(ClientFilter f) {
-        f.setNext(head);
-        this.head = f;
-    }
-
-    public void removeFilter(ClientFilter f) {
-        if (head == root) return;
-        
-        if (head == f) head = f.getNext();
-
-        ClientFilter e = (ClientFilter)head;
-        while (e.getNext() != f) {
-            if (e.getNext() == root) return;
+    <T> T options(Class<T> c);
+    
+    
+    <T> T get(Class<T> c);
             
-            e = (ClientFilter)e.getNext();
-        }
-        
-        e.setNext(f.getNext());
-    }
     
-    public void removeAllFilters() {
-        this.head = root;
-    }
+    void put();
     
-    protected ClientHandler getHeadHandler() {
-        return head;
-    }
+    void put(Object requestEntity);
+    
+    <T> T put(Class<T> c);
+
+    <T> T put(Class<T> c, Object requestEntity);
+    
+    
+    void post();
+    
+    void post(Object requestEntity);
+    
+    <T> T post(Class<T> c);
+
+    <T> T post(Class<T> c, Object requestEntity);
+            
+    
+    void delete();
+    
+    void delete(Object requestEntity);
+    
+    <T> T delete(Class<T> c);
+
+    <T> T delete(Class<T> c, Object requestEntity);
+
+    
+    void method(String method);
+    
+    void method(String method, Object requestEntity);
+    
+    <T> T method(String method, Class<T> c);
+
+    <T> T method(String method, Class<T> c, Object requestEntity);
+    
 }

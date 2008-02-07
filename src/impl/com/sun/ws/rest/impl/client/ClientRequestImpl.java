@@ -22,6 +22,7 @@
 
 package com.sun.ws.rest.impl.client;
 
+import com.sun.ws.rest.api.client.ClientRequest;
 import com.sun.ws.rest.impl.ResponseHttpHeadersImpl;
 import java.net.URI;
 import java.util.ArrayList;
@@ -29,7 +30,7 @@ import java.util.List;
 import java.util.Map;
 import javax.ws.rs.core.MultivaluedMap;
 
-/* package */ final class ClientRequestImpl extends ClientRequest {
+public final class ClientRequestImpl extends ClientRequest {
     private final URI uri;
     
     private final String method;
@@ -38,15 +39,15 @@ import javax.ws.rs.core.MultivaluedMap;
     
     private final MultivaluedMap<String, Object> metadata;
 
-    /* package */ ClientRequestImpl(URI uri, String method) {
+    public ClientRequestImpl(URI uri, String method) {
         this(uri, method, null, null);
     }
     
-    /* package */ ClientRequestImpl(URI uri, String method, Object entity) {
+    public ClientRequestImpl(URI uri, String method, Object entity) {
         this(uri, method, entity, null);
     }
     
-    /* package */ ClientRequestImpl(URI uri, String method, 
+    public ClientRequestImpl(URI uri, String method, 
             Object entity, MultivaluedMap<String, Object> metadata) {
         this.uri = uri;
         this.method = method;

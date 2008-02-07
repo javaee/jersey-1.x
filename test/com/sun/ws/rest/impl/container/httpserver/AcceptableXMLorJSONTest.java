@@ -23,12 +23,12 @@
 package com.sun.ws.rest.impl.container.httpserver;
 
 import com.sun.net.httpserver.HttpHandler;
-import com.sun.ws.rest.impl.client.Client;
-import com.sun.ws.rest.impl.client.ClientRequest;
-import com.sun.ws.rest.impl.client.ClientResponse;
+import com.sun.ws.rest.api.client.Client;
+import com.sun.ws.rest.api.client.ClientRequest;
+import com.sun.ws.rest.api.client.ClientResponse;
 import javax.ws.rs.Path;
-import com.sun.ws.rest.impl.client.ResourceProxy;
-import com.sun.ws.rest.impl.client.ClientFilter;
+import com.sun.ws.rest.api.client.ResourceProxy;
+import com.sun.ws.rest.api.client.ClientFilter;
 import javax.ws.rs.GET;
 import javax.ws.rs.ProduceMime;
 import javax.xml.bind.annotation.XmlRootElement;

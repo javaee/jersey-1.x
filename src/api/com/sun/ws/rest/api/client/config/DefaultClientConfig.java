@@ -20,29 +20,42 @@
  *     "Portions Copyrighted [year] [name of copyright owner]"
  */
 
-package com.sun.ws.rest.impl.client;
+package com.sun.ws.rest.api.client.config;
 
-import javax.ws.rs.core.MediaType;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 /**
  *
  * @author Paul.Sandoz@Sun.Com
  */
-public interface RequestBuilder<T extends RequestBuilder> {
-
-    T entity(Object entity);
-
-    T entity(Object entity, MediaType type);
-
-    T entity(Object entity, String type);
+public class DefaultClientConfig implements ClientConfig {
+    private final Set<Class> providers = new HashSet<Class>();
     
-    T type(MediaType type);
-        
-    T type(String type);
-        
-    T accept(MediaType... types);
+    private final Map<String, Boolean> features = new HashMap<String, Boolean>();
     
-    T accept(String... types);
+    private final Map<String, Object> properties = new HashMap<String, Object>();
     
-    T header(String name, Object value);   
+    public Set<Class> getProviderClasses() {
+        return providers;
+    }
+    
+    public Map<String, Boolean> getFeatures() {
+        return features;
+    }
+    
+    public boolean getFeature(String featureName) {
+        final Boolean v = features.get(featureName);
+        return (v != null) ? v : false;
+    }
+    
+    public Map<String, Object> getProperties() {
+        return properties;
+    }
+
+    public Object getProperty(String propertyName) {
+        return properties.get(propertyName);
+    }
 }

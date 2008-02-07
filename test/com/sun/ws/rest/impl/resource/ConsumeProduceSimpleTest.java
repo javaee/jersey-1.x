@@ -25,7 +25,7 @@ package com.sun.ws.rest.impl.resource;
 import com.sun.ws.rest.impl.AbstractResourceTester;
 import com.sun.ws.rest.api.core.HttpRequestContext;
 import com.sun.ws.rest.api.core.HttpResponseContext;
-import com.sun.ws.rest.impl.client.ResourceProxy;
+import com.sun.ws.rest.api.client.ResourceProxy;
 import javax.ws.rs.Path;
 import javax.ws.rs.ConsumeMime;
 import javax.ws.rs.GET;

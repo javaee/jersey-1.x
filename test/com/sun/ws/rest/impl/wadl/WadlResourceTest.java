@@ -7,7 +7,7 @@ package com.sun.ws.rest.impl.wadl;
 
 import com.sun.ws.rest.api.MediaTypes;
 import com.sun.ws.rest.impl.AbstractResourceTester;
-import com.sun.ws.rest.impl.client.ResourceProxy;
+import com.sun.ws.rest.api.client.ResourceProxy;
 import java.io.File;
 import java.io.IOException;
 import java.util.Iterator;

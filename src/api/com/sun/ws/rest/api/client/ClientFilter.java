@@ -20,10 +20,36 @@
  *     "Portions Copyrighted [year] [name of copyright owner]"
  */
 
-package com.sun.ws.rest.impl.client;
+package com.sun.ws.rest.api.client;
 
 /**
+ * A client filter capable of modifing the outbound HTTP request or 
+ * the inbound HTTP response. 
+ * <p>
+ * An application-based filter extends this class and implements the 
+ * {@link ClientHandler#handle} method. The general implementation pattern
+ * is as follows:
+ * <blockquote><pre>
+ *     class AppClientFilter extends ClientFilter {
  *
+ *         public ClientResponse handle(ClientRequest cr) {
+ *             // Modify the request
+ *             ClientRequest mcr = modifyRequest(cr);
+ * 
+ *             // Call the next client handler in the filter chain
+ *             ClientResponse resp = getNext(mcr);
+ * 
+ *             // Modify the response
+ *             return modifyResponse(resp);
+ *         }
+ *
+ *         private byte[] loadClassData(String name) {
+ *             // load the class data from the connection
+ *             &nbsp;.&nbsp;.&nbsp;.
+ *         }
+ *     }
+ * </pre></blockquote>
+ * 
  * @author Paul.Sandoz@Sun.Com
  */
 public abstract class ClientFilter implements ClientHandler {
@@ -32,10 +58,17 @@ public abstract class ClientFilter implements ClientHandler {
     /* package */ final void setNext(ClientHandler next) {
         this.next = next;
     }
-    
+   
+    /**
+     * Get the next client handler to invoke in the chain
+     * of filters.
+     * 
+     * @return the next client handler.
+     */
     public final ClientHandler getNext() {
         return next;
     }
     
-    public abstract ClientResponse handle(ClientRequest ro);
+    public abstract ClientResponse handle(ClientRequest cr) 
+            throws ClientHandlerException;
 }

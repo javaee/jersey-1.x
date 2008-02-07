@@ -23,7 +23,7 @@
 package com.sun.ws.rest.impl.entity;
 
 import com.sun.ws.rest.impl.AbstractResourceTester;
-import com.sun.ws.rest.impl.client.ResourceProxy;
+import com.sun.ws.rest.api.client.ResourceProxy;
 import com.sun.ws.rest.impl.provider.entity.AbstractTypeEntityProvider;
 import java.io.IOException;
 import java.io.InputStream;

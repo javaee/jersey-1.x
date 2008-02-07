@@ -20,24 +20,28 @@
  *     "Portions Copyrighted [year] [name of copyright owner]"
  */
 
-package com.sun.ws.rest.impl.client;
+package com.sun.ws.rest.api.client;
 
 import com.sun.ws.rest.impl.ResponseHttpHeadersImpl;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 
 /**
- *
+ * A partial implementation of {@link RequestBuilder} that implementations
+ * the addition of the HTTP request entity and HTTP request headers
+ * but leaves undefined the build methods for constructing the request.
+ * 
+ * @param T the type than implements {@link RequestBuilder}.
  * @author Paul.Sandoz@Sun.Com
  */
-public abstract class ClientRequestBuilder<T extends RequestBuilder> 
+public abstract class PartialRequestBuilder<T extends RequestBuilder> 
         implements RequestBuilder<T> {
 
     protected Object entity;
     
     protected MultivaluedMap<String, Object> metadata;
     
-    protected ClientRequestBuilder() {
+    protected PartialRequestBuilder() {
         metadata = new ResponseHttpHeadersImpl();
     }
     

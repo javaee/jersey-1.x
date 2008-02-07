@@ -23,10 +23,10 @@
 package com.sun.ws.rest.impl;
 
 import com.sun.ws.rest.api.container.ContainerException;
-import com.sun.ws.rest.impl.client.ClientHandler;
-import com.sun.ws.rest.impl.client.ClientHandlerException;
-import com.sun.ws.rest.impl.client.ClientRequest;
-import com.sun.ws.rest.impl.client.ClientResponse;
+import com.sun.ws.rest.api.client.ClientHandler;
+import com.sun.ws.rest.api.client.ClientHandlerException;
+import com.sun.ws.rest.api.client.ClientRequest;
+import com.sun.ws.rest.api.client.ClientResponse;
 import com.sun.ws.rest.spi.container.AbstractContainerRequest;
 import com.sun.ws.rest.spi.container.AbstractContainerResponse;
 import com.sun.ws.rest.spi.container.MessageBodyContext;

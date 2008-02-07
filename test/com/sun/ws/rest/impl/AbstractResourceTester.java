@@ -23,13 +23,13 @@
 package com.sun.ws.rest.impl;
 
 import com.sun.ws.rest.api.core.ResourceConfig;
-import com.sun.ws.rest.impl.client.ClientRequest;
-import com.sun.ws.rest.impl.client.ClientResponse;
+import com.sun.ws.rest.api.client.ClientRequest;
+import com.sun.ws.rest.api.client.ClientResponse;
 import com.sun.ws.rest.impl.application.WebApplicationImpl;
 import com.sun.ws.rest.api.core.DefaultResourceConfig;
-import com.sun.ws.rest.impl.client.Client;
-import com.sun.ws.rest.impl.client.ResourceProxy;
-import com.sun.ws.rest.impl.client.ClientFilter;
+import com.sun.ws.rest.api.client.Client;
+import com.sun.ws.rest.api.client.ResourceProxy;
+import com.sun.ws.rest.api.client.ClientFilter;
 import com.sun.ws.rest.spi.container.WebApplication;
 import java.lang.annotation.Annotation;
 import java.net.URI;

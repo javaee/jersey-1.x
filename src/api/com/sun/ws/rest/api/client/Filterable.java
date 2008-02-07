@@ -20,42 +20,46 @@
  *     "Portions Copyrighted [year] [name of copyright owner]"
  */
 
-package com.sun.ws.rest.impl.client;
-
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+package com.sun.ws.rest.api.client;
 
 /**
  *
  * @author Paul.Sandoz@Sun.Com
  */
-public class DefaultClientConfig implements ClientConfig {
-    private final Set<Class> providers = new HashSet<Class>();
+public abstract class Filterable {
+    private final ClientHandler root;
     
-    private final Map<String, Boolean> features = new HashMap<String, Boolean>();
+    private ClientHandler head;
     
-    private final Map<String, Object> properties = new HashMap<String, Object>();
-    
-    public Set<Class> getProviderClasses() {
-        return providers;
+    protected Filterable(ClientHandler root) {
+        this.root = this.head = root;
     }
     
-    public Map<String, Boolean> getFeatures() {
-        return features;
-    }
-    
-    public boolean getFeature(String featureName) {
-        final Boolean v = features.get(featureName);
-        return (v != null) ? v : false;
-    }
-    
-    public Map<String, Object> getProperties() {
-        return properties;
+    public void addFilter(ClientFilter f) {
+        f.setNext(head);
+        this.head = f;
     }
 
-    public Object getProperty(String propertyName) {
-        return properties.get(propertyName);
+    public void removeFilter(ClientFilter f) {
+        if (head == root) return;
+        
+        if (head == f) head = f.getNext();
+
+        ClientFilter e = (ClientFilter)head;
+        while (e.getNext() != f) {
+            if (e.getNext() == root) return;
+            
+            e = (ClientFilter)e.getNext();
+        }
+        
+        e.setNext(f.getNext());
+    }
+    
+    public void removeAllFilters() {
+        this.head = root;
+    }
+    
+    protected ClientHandler getHeadHandler() {
+        return head;
     }
 }

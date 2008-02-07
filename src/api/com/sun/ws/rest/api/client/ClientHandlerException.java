@@ -20,56 +20,28 @@
  *     "Portions Copyrighted [year] [name of copyright owner]"
  */
 
-package com.sun.ws.rest.impl.client;
+package com.sun.ws.rest.api.client;
 
 /**
- *
+ * A runtime exception thrown by a client handler that singles a
+ * failure to process the HTTP request or HTTP response.
+ * 
  * @author Paul.Sandoz@Sun.Com
  */
-interface UniformInterface {
+public class ClientHandlerException extends RuntimeException {
+    public ClientHandlerException() {
+        super();
+    }
     
-    ClientResponse head();
+    public ClientHandlerException(String message) {
+        super(message);
+    }
     
+    public ClientHandlerException(String message, Throwable cause) {
+        super(message, cause);
+    }
     
-    <T> T options(Class<T> c);
-    
-    
-    <T> T get(Class<T> c);
-            
-    
-    void put();
-    
-    void put(Object requestEntity);
-    
-    <T> T put(Class<T> c);
-
-    <T> T put(Class<T> c, Object requestEntity);
-    
-    
-    void post();
-    
-    void post(Object requestEntity);
-    
-    <T> T post(Class<T> c);
-
-    <T> T post(Class<T> c, Object requestEntity);
-            
-    
-    void delete();
-    
-    void delete(Object requestEntity);
-    
-    <T> T delete(Class<T> c);
-
-    <T> T delete(Class<T> c, Object requestEntity);
-
-    
-    void method(String method);
-    
-    void method(String method, Object requestEntity);
-    
-    <T> T method(String method, Class<T> c);
-
-    <T> T method(String method, Class<T> c, Object requestEntity);
-    
+    public ClientHandlerException(Throwable cause) {
+        super(cause);
+    }
 }

@@ -20,8 +20,10 @@
  *     "Portions Copyrighted [year] [name of copyright owner]"
  */
 
-package com.sun.ws.rest.impl.client;
+package com.sun.ws.rest.api.client;
 
+import com.sun.ws.rest.api.client.config.DefaultClientConfig;
+import com.sun.ws.rest.api.client.config.ClientConfig;
 import com.sun.ws.rest.api.core.ResourceConfig;
 import com.sun.ws.rest.impl.application.ComponentProviderCache;
 import com.sun.ws.rest.impl.application.ContextResolverFactory;
@@ -40,7 +42,19 @@ import java.util.Map;
 import javax.ws.rs.core.HttpContext;
 
 /**
- *
+ * The HTTP client class for handling requests and responses specified by 
+ * {@link ClientHandler} or for creating {@link ResourceProxy} instances.
+ * <p>
+ * {@link ClientFilter} instances may be added to the client for filtering
+ * requests and responses (including those of {@link ResourceProxy} instances
+ * created from the client).
+ * <p>
+ * A client may be configured by passing a {@link ClientConfig} instance to
+ * the appropriate construtor.
+ * <p>
+ * A client may integrate with an IoC framework by passing a 
+ * {@link ComponentProvider} instance to the appropriate constructor.
+ * 
  * @author Paul.Sandoz@Sun.Com
  */
 public class Client extends Filterable implements ClientHandler {
@@ -111,15 +125,36 @@ public class Client extends Filterable implements ClientHandler {
         }
     }
     
-    
+    /**
+     * Create a new client instance.
+     * 
+     * @param root the root client handler for dispatching a request and
+     *        returning a response.
+     */
     public Client(ClientHandler root) {
         this(root, new DefaultClientConfig(), null);
     }
     
+    /**
+     * Create a new client instance with a client configuration.
+     * 
+     * @param root the root client handler for dispatching a request and
+     *        returning a response.
+     * @param config the client configuration.
+     */
     public Client(ClientHandler root, ClientConfig config) {
         this(root, config, null);
     }
-    
+
+    /**
+     * Create a new instance with a client configuration and a 
+     * compoenent provider.
+     * 
+     * @param root the root client handler for dispatching a request and
+     *        returning a response.
+     * @param config the client configuration.
+     * @param provider the component provider.
+     */
     public Client(ClientHandler root, ClientConfig config, 
             ComponentProvider provider) {
         // Defer instantiation of root to component provider
@@ -165,22 +200,42 @@ public class Client extends Filterable implements ClientHandler {
         injectResources(root);
     }
         
+    /**
+     * Add an injectable resource to the set maintained by the client.
+     * The fieldType is used as a unique key and therefore adding an injectable
+     * for a type already supported will override the existing one.
+     * 
+     * @param fieldType the type of the field that will be injected.
+     * @param injectable the injectable for the field.
+     */
     public final void addInjectable(Type fieldType, Injectable injectable) {
         injectables.put(fieldType, injectable);
     }
     
+    /**
+     * Create a resource proxy from the client.
+     * 
+     * @param u the URI of the resource.
+     * @return the resource proxy.
+     */
     public final ResourceProxy proxy(String u) {
         return proxy(URI.create(u));
     }
     
+    /**
+     * Create a resource proxy from the client.
+     * 
+     * @param u the URI of the resource.
+     * @return the resource proxy.
+     */
     public final ResourceProxy proxy(URI u) {
         return new ResourceProxy(this, u);
     }
     
     // ClientHandler
     
-    public ClientResponse handle(ClientRequest ro) {
-        return getHeadHandler().handle(ro);
+    public ClientResponse handle(ClientRequest cr) throws ClientHandlerException {
+        return getHeadHandler().handle(cr);
     }
 
     //
@@ -200,7 +255,11 @@ public class Client extends Filterable implements ClientHandler {
         }
     }
     
-    
+    /**
+     * Create a default client.
+     * 
+     * @return a default client.
+     */
     public static Client create() {
         return new Client(new URLConnectionClientHandler());
     }

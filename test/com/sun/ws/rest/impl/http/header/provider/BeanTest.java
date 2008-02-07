@@ -24,7 +24,7 @@ package com.sun.ws.rest.impl.http.header.provider;
 
 import javax.ws.rs.Path;
 import com.sun.ws.rest.impl.AbstractResourceTester;
-import com.sun.ws.rest.impl.client.ClientResponse;
+import com.sun.ws.rest.api.client.ClientResponse;
 import java.net.URI;
 import java.util.GregorianCalendar;
 import javax.ws.rs.GET;

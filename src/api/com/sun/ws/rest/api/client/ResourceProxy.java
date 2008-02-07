@@ -20,8 +20,9 @@
  *     "Portions Copyrighted [year] [name of copyright owner]"
  */
 
-package com.sun.ws.rest.impl.client;
+package com.sun.ws.rest.api.client;
 
+import com.sun.ws.rest.impl.client.ClientRequestImpl;
 import java.net.URI;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.UriBuilder;
@@ -185,7 +186,7 @@ public final class ResourceProxy extends Filterable implements
     
     // Builder that builds client request and handles it
     
-    public final class Builder extends ClientRequestBuilder<Builder> 
+    public final class Builder extends PartialRequestBuilder<Builder> 
             implements UniformInterface {  
         
         private final URI u;
