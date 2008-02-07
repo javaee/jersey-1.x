@@ -63,7 +63,7 @@ public class TypeReturnTest extends AbstractResourceTester {
         ClientResponse response = resourceProxy("/", false).get(ClientResponse.class);                
         assertEquals("CONTENT", response.getEntity(String.class));
         assertEquals(MediaType.parse("application/octet-stream"), 
-                response.getContentType());
+                response.getType());
     }
     
     @SuppressWarnings("unchecked")
@@ -73,6 +73,6 @@ public class TypeReturnTest extends AbstractResourceTester {
         ClientResponse response = resourceProxy("/", false).get(ClientResponse.class);                
         assertEquals("CONTENT", response.getEntity(String.class));
         assertEquals(MediaType.parse("text/plain"), 
-                response.getContentType());
+                response.getType());
     }
 }

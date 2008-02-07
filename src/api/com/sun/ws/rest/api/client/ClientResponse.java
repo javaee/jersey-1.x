@@ -32,7 +32,8 @@ import javax.ws.rs.ext.RuntimeDelegate;
 import javax.ws.rs.ext.RuntimeDelegate.HeaderDelegate;
 
 /**
- *
+ * A client (inbound) HTTP response.
+ * 
  * @author Paul.Sandoz@Sun.Com
  */
 public abstract class ClientResponse {
@@ -51,36 +52,54 @@ public abstract class ClientResponse {
     public abstract <T> T getEntity(Class<T> c) throws IllegalArgumentException;
         
     public abstract Map<String, Object> getProperties();
-    /*
-    {
-        if (properties != null) return properties;
-        
-        return properties = new HashMap<String, Object>();
-    }
-    */
     
-    public MediaType getContentType() {
+    /**
+     * Get the media type of the response
+     * 
+     * @return the media type.
+     */
+    public MediaType getType() {
         String ct = getMetadata().getFirst("Content-Type");
         return (ct != null) ? MediaType.parse(ct) : null;
     }
     
+    /**
+     * Get the location.
+     * 
+     * @return the location.
+     */
     public URI getLocation() {
         String l = getMetadata().getFirst("Location");        
         return (l != null) ? URI.create(l) : null;
     }
     
+    /**
+     * Get the entity tag.
+     * 
+     * @return the entity tag.
+     */
     public EntityTag getEntityTag() {
         String t = getMetadata().getFirst("ETag");
         
         return (t != null) ? entityTagDelegate.fromString(t) : null;
     }
-    
+
+    /**
+     * Get the last modified date.
+     * 
+     * @return the last modified date.
+     */
     public Date getLastModified() {
         String d = getMetadata().getFirst("Last-Modified");
         
         return (d != null) ? dateDelegate.fromString(d) : null;
     }
 
+    /**
+     * Get the language.
+     * 
+     * @return the language.
+     */
     public String getLangauge() {
         return getMetadata().getFirst("Content-Language");
     }

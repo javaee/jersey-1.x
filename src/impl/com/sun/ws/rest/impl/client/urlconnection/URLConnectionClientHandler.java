@@ -80,7 +80,7 @@ public final class URLConnectionClientHandler implements ClientHandler {
         
         public <T> T getEntity(Class<T> c) {
             try {
-                MediaType mediaType = getContentType();
+                MediaType mediaType = getType();
                 return bodyContext.getMessageBodyReader(c, mediaType).
                         readFrom(c, mediaType, metadata, getInputStream());
             } catch (IOException ex) {

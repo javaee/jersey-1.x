@@ -34,19 +34,70 @@ import javax.ws.rs.core.MediaType;
  */
 public interface RequestBuilder<T extends RequestBuilder> {
 
+    /**
+     * Set the request entity.
+     * 
+     * @param entity the request entity
+     * @return the builder.
+     */
     T entity(Object entity);
 
+    /**
+     * Set the request entity it's media type.
+     * 
+     * @param entity the request entity
+     * @param type the media type
+     * @return the builder.
+     */
     T entity(Object entity, MediaType type);
 
+    /**
+     * Set the request entity it's media type.
+     * 
+     * @param entity the request entity
+     * @param type the media type
+     * @return the builder.
+     */
     T entity(Object entity, String type);
     
+    /**
+     * Set the media type.
+     * 
+     * @param type the media type
+     * @return the builder.
+     */
     T type(MediaType type);
         
+    /**
+     * Set the media type.
+     * 
+     * @param type the media type
+     * @return the builder.
+     */
     T type(String type);
         
+    /**
+     * Add acceptable media types.
+     * 
+     * @param types an array of the acceptable media types
+     * @return the builder.
+     */
     T accept(MediaType... types);
     
+    /**
+     * Add acceptable media types.
+     * 
+     * @param types an array of the acceptable media types
+     * @return the builder.
+     */
     T accept(String... types);
     
+    /**
+     * Add an HTTP header and value.
+     * 
+     * @param name the HTTP header name.
+     * @param value the HTTP header value.
+     * @return the builder.
+     */
     T header(String name, Object value);   
 }

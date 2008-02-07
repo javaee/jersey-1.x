@@ -93,7 +93,7 @@ public class TestResourceClientHandler implements ClientHandler {
             if (response.getEntity() == null) return null;
             
             try {
-                MediaType mediaType = getContentType();
+                MediaType mediaType = getType();
                 return bodyContext.getMessageBodyReader(c, mediaType).
                         readFrom(c, mediaType, metadata, responseEntity);
             } catch (IOException ex) {

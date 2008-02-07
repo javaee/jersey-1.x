@@ -23,7 +23,7 @@
 package com.sun.ws.rest.api.client;
 
 /**
- * A client filter capable of modifing the outbound HTTP request or 
+ * A client filter capable of modifying the outbound HTTP request or 
  * the inbound HTTP response. 
  * <p>
  * An application-based filter extends this class and implements the 

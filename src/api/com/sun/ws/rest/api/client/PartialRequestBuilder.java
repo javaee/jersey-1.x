@@ -27,9 +27,9 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 
 /**
- * A partial implementation of {@link RequestBuilder} that implementations
- * the addition of the HTTP request entity and HTTP request headers
- * but leaves undefined the build methods for constructing the request.
+ * A partial implementation of {@link RequestBuilder} that implements
+ * the methods on {@link RequestBuilder} but leaves undefined the build 
+ * methods for constructing the request.
  * 
  * @param T the type than implements {@link RequestBuilder}.
  * @author Paul.Sandoz@Sun.Com

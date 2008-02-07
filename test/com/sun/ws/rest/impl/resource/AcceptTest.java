@@ -137,18 +137,18 @@ public class AcceptTest extends AbstractResourceTester {
         
         ClientResponse response = r.accept(foo).get(ClientResponse.class);
         assertEquals("GET", response.getEntity(String.class));
-        assertEquals(foo, response.getContentType());
+        assertEquals(foo, response.getType());
         
         response = r.accept(bar).get(ClientResponse.class);
         assertEquals("GET", response.getEntity(String.class));
-        assertEquals(bar, response.getContentType());
+        assertEquals(bar, response.getType());
 
         response = r.accept("*/*").get(ClientResponse.class);
         assertEquals("GET", response.getEntity(String.class));
-        assertEquals(foo, response.getContentType());
+        assertEquals(foo, response.getType());
 
         response = r.accept("application/*").get(ClientResponse.class);
         assertEquals("GET", response.getEntity(String.class));
-        assertEquals(foo, response.getContentType());
+        assertEquals(foo, response.getType());
     }   
 }

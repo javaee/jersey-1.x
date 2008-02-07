@@ -23,7 +23,7 @@
 package com.sun.ws.rest.api.client;
 
 /**
- * A runtime exception thrown by a client handler that singles a
+ * A runtime exception thrown by a client handler that signals a
  * failure to process the HTTP request or HTTP response.
  * 
  * @author Paul.Sandoz@Sun.Com

@@ -83,7 +83,7 @@ public abstract class ClientRequest {
     }
             
     /**
-     * The builder for building a {@link ClientRequest}instance.
+     * The builder for building a {@link ClientRequest} instance.
      */
     public static final class Builder extends PartialRequestBuilder<Builder> {
         /**

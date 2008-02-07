@@ -105,13 +105,13 @@ public class HeadTest extends AbstractResourceTester {
         ClientResponse response = r.accept(foo).head();
         assertEquals(200, response.getStatus());
         assertFalse(response.hasEntity());
-        assertEquals(foo, response.getContentType());
+        assertEquals(foo, response.getType());
         
         MediaType bar = MediaType.parse("application/bar");
         response = r.accept(bar).head();
         assertEquals(200, response.getStatus());
         assertFalse(response.hasEntity());
-        assertEquals(bar, response.getContentType());
+        assertEquals(bar, response.getType());
     }
     
     @Path("/")
@@ -150,14 +150,14 @@ public class HeadTest extends AbstractResourceTester {
         ClientResponse response = r.accept(foo).head();
         assertEquals(200, response.getStatus());
         assertFalse(response.hasEntity());
-        assertEquals(foo, response.getContentType());
+        assertEquals(foo, response.getType());
         assertEquals("FOO-HEAD", response.getMetadata().getFirst("X-TEST").toString());
         
         MediaType bar = MediaType.parse("application/bar");
         response = r.accept(bar).head();
         assertEquals(200, response.getStatus());
         assertFalse(response.hasEntity());
-        assertEquals(bar, response.getContentType());        
+        assertEquals(bar, response.getType());        
         assertEquals("BAR-HEAD", response.getMetadata().getFirst("X-TEST").toString());
     }
 }

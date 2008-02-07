@@ -22,20 +22,21 @@
 
 package com.sun.ws.rest.api.client;
 
-import com.sun.ws.rest.impl.client.*;
-
 /**
- *
+ * A runtime exception thrown by a method on the {@link UniformInterface} when
+ * the status code of the HTTP response indicates a response that is not
+ * expected by the method invoker.
+ * 
  * @author Paul.Sandoz@Sun.Com
  */
-public class ResourceProxyException extends RuntimeException {
+public class UniformInterfaceException extends RuntimeException {
     private final ClientResponse r;
     
-    public ResourceProxyException(ClientResponse r) {
+    public UniformInterfaceException(ClientResponse r) {
         this.r = r;
     }    
     
-    public ResourceProxyException(String message, ClientResponse r) {
+    public UniformInterfaceException(String message, ClientResponse r) {
 	super(message);
         this.r = r;
     }

@@ -28,7 +28,12 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.UriBuilder;
 
 /**
- *
+ * A proxy to a resource.
+ * <p>
+ * The proxy implements the {@link UniformInterface} to invoke the HTTP methods
+ * on the proxied resource. A client request may be built before invocation
+ * on the uniform interface.
+ * 
  * @author Paul.Sandoz@Sun.Com
  */
 public final class ResourceProxy extends Filterable implements 
@@ -41,10 +46,20 @@ public final class ResourceProxy extends Filterable implements
         this.u = u;
     }
     
+    /**
+     * Get the URI to the resource.
+     * 
+     * @return the URI.
+     */
     public URI getURI() {
         return u;
     }
     
+    /**
+     * Get the URI builder to the resource.
+     * 
+     * @return the URI builder.
+     */
     public UriBuilder getBuilder() {
         return UriBuilder.fromUri(u);
     }
@@ -163,10 +178,30 @@ public final class ResourceProxy extends Filterable implements
 
     // URI specific building
     
+    /**
+     * Start building from an additional path from the URI to the resource
+     * 
+     * @param path the additional path.
+     * 
+     * @return the builder.
+     */
     public Builder path(String path) {
         return new Builder(UriBuilder.fromUri(u).path(path).build());
     }
-    
+
+    /**
+     * Start building from a URI.
+     * <p>
+     * If the URI contains a path component and the path starts with a '/' then
+     * the path of the resource proxy URI is replaced. Otherise the path is 
+     * appended to the path of the resource proxy URI.
+     * <p>
+     * If the URI contains query parameters then those query parameters will
+     * replace the query parameters (if any) of the resource proxy URI.
+     * 
+     * @param uri the URI.
+     * @return the builder.
+     */
     public Builder uri(URI uri) {
         UriBuilder b = UriBuilder.fromUri(u).encode(false);
         String path = uri.getRawPath();
@@ -186,6 +221,11 @@ public final class ResourceProxy extends Filterable implements
     
     // Builder that builds client request and handles it
     
+    /**
+     * The builder for building a {@link ClientRequest} instance and 
+     * handling the request using the {@link UniformInterface}. The methods
+     * of the {@link UniformInterface} are the build methods of the builder.
+     */
     public final class Builder extends PartialRequestBuilder<Builder> 
             implements UniformInterface {  
         
@@ -296,12 +336,12 @@ public final class ResourceProxy extends Filterable implements
         
         if (r.getStatus() < 300) return r.getEntity(c);
         
-        throw new ResourceProxyException(r);
+        throw new UniformInterfaceException(r);
     }
     
     private void voidHandle(ClientRequest ro) {
         ClientResponse r = getHeadHandler().handle(ro);
         
-        if (r.getStatus() >= 300) throw new ResourceProxyException(r);
+        if (r.getStatus() >= 300) throw new UniformInterfaceException(r);
     }
 }

@@ -23,23 +23,38 @@
 package com.sun.ws.rest.api.client;
 
 /**
- *
+ * An abstract class providing support for registering and managing a chain
+ * of {@link ClientFilter} instances.
+ * 
  * @author Paul.Sandoz@Sun.Com
  */
 public abstract class Filterable {
     private final ClientHandler root;
     
     private ClientHandler head;
-    
+   
+    /**
+     * @param root the root handler to handle the request and return a response.
+     */
     protected Filterable(ClientHandler root) {
         this.root = this.head = root;
     }
     
+    /**
+     * Add a filter to the filter chain.
+     * 
+     * @param f the filter to add.
+     */
     public void addFilter(ClientFilter f) {
         f.setNext(head);
         this.head = f;
     }
 
+    /**
+     * Remove a filter from the chain.
+     * 
+     * @param f the filter to remove.
+     */
     public void removeFilter(ClientFilter f) {
         if (head == root) return;
         
@@ -55,10 +70,18 @@ public abstract class Filterable {
         e.setNext(f.getNext());
     }
     
+    /**
+     * Remove all filters from the filter chain.
+     */
     public void removeAllFilters() {
         this.head = root;
     }
     
+    /**
+     * Get the head client handler of the filter chain.
+     * 
+     * @return the head client handler of the filter chain.
+     */
     protected ClientHandler getHeadHandler() {
         return head;
     }

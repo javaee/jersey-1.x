@@ -79,7 +79,7 @@ public class VariantsTest extends AbstractResourceTester {
                 header("Accept-Language", "en-us,en;q=0.5").
                 get(ClientResponse.class);
         assertEquals("GET", r.getEntity(String.class));
-        assertEquals(MediaType.parse("text/xml"), r.getContentType());
+        assertEquals(MediaType.parse("text/xml"), r.getType());
         assertEquals("en-us", r.getLangauge());
     }   
     
@@ -97,7 +97,7 @@ public class VariantsTest extends AbstractResourceTester {
                 header("Accept-Language", "en,en-us").
                 get(ClientResponse.class);
         assertEquals("GET", r.getEntity(String.class));
-        assertEquals(MediaType.parse("text/xml"), r.getContentType());
+        assertEquals(MediaType.parse("text/xml"), r.getType());
         assertEquals("en", r.getLangauge());
     }
     
@@ -115,7 +115,7 @@ public class VariantsTest extends AbstractResourceTester {
                 header("Accept-Language", "en-us,en;q=0.5").
                 get(ClientResponse.class);
         assertEquals("GET", r.getEntity(String.class));
-        assertEquals(MediaType.parse("application/xml"), r.getContentType());
+        assertEquals(MediaType.parse("application/xml"), r.getType());
         assertEquals("en-us", r.getLangauge());
     }   
     
