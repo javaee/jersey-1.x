@@ -263,4 +263,25 @@ public class Client extends Filterable implements ClientHandler {
     public static Client create() {
         return new Client(new URLConnectionClientHandler());
     }
+    
+    /**
+     * Create a default client with client configuration.
+     * 
+     * @param cc the client configuration.
+     * @return a default client.
+     */
+    public static Client create(ClientConfig cc) {
+        return new Client(new URLConnectionClientHandler(), cc);
+    }
+    
+    /**
+     * Create a default client with client configuration and component provider.
+     * 
+     * @param cc the client configuration.
+     * @param cp the component provider.
+     * @return a default client.
+     */
+    public static Client create(ClientConfig cc, ComponentProvider cp) {
+        return new Client(new URLConnectionClientHandler(), cc, cp);
+    }
 }

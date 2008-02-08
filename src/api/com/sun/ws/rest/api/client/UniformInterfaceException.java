@@ -41,7 +41,12 @@ public class UniformInterfaceException extends RuntimeException {
         this.r = r;
     }
     
-    ClientResponse getResponse() {
+    /**
+     * Get the client response assocatiated with the exception.
+
+     * @return the client response.
+     */
+    public ClientResponse getResponse() {
         return r;
     }
 }
