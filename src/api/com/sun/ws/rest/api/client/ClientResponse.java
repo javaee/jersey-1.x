@@ -43,14 +43,41 @@ public abstract class ClientResponse {
     protected static final HeaderDelegate<Date> dateDelegate = 
             RuntimeDelegate.getInstance().createHeaderDelegate(Date.class);
         
+    /**
+     * Get the status code.
+     * 
+     * @return the status code.
+     */
     public abstract int getStatus();
     
+    /**
+     * Get the HTTP metadata
+     * 
+     * @return the HTTP metadata.
+     */
     public abstract MultivaluedMap<String, String> getMetadata();
-    
+
+    /**
+     * 
+     * @return true if there is an entity present in the response.
+     */
     public abstract boolean hasEntity();
-    
+
+    /**
+     * Get the entity of the response.
+     * 
+     * @param c the type of the entity.
+     * @return an instance of the type <code>c</code>.
+     * 
+     * @throws java.lang.IllegalArgumentException
+     */
     public abstract <T> T getEntity(Class<T> c) throws IllegalArgumentException;
-        
+
+    /**
+     * Get a list of response properties.
+     * 
+     * @return the list of response properties.
+     */
     public abstract Map<String, Object> getProperties();
     
     /**

@@ -22,7 +22,7 @@
 
 package com.sun.ws.rest.api.client;
 
-import com.sun.ws.rest.impl.client.*;
+import com.sun.ws.rest.impl.client.ClientRequestImpl;
 import java.net.URI;
 import javax.ws.rs.core.MultivaluedMap;
 

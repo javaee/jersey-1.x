@@ -40,7 +40,7 @@ public final class HttpServerFactory {
     private HttpServerFactory() {}
     
     /**
-     * Create a {@link HtppServer} that registers a HttpHandler that in turn
+     * Create a {@link HttpServer} that registers a HttpHandler that in turn
      * manages all root resource classes found by searching the classes
      * referenced in the java classpath.
      * <p>
@@ -65,7 +65,7 @@ public final class HttpServerFactory {
     }
     
     /**
-     * Create a {@link HtppServer} that registers a HttpHandler that in turn
+     * Create a {@link HttpServer} that registers a HttpHandler that in turn
      * manages all root resource classes found by searching the classes
      * referenced in the java classath.
      * <p>
@@ -87,7 +87,7 @@ public final class HttpServerFactory {
     }
     
     /**
-     * Create a {@link HtppServer} that registers a HttpHandler that in turn
+     * Create a {@link HttpServer} that registers a HttpHandler that in turn
      * manages all root resource classes found by searching the classes
      * referenced in the java classath.
      *
@@ -109,7 +109,7 @@ public final class HttpServerFactory {
     }
     
     /**
-     * Create a {@link HtppServer} that registers a HttpHandler that in turn
+     * Create a {@link HttpServer} that registers a HttpHandler that in turn
      * manages all root resource classes found by searching the classes
      * referenced in the java classath.
      *

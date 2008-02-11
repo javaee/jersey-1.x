@@ -27,7 +27,7 @@ package com.sun.ws.rest.api.client;
  * 
  * @author Paul.Sandoz@Sun.Com
  */
-interface UniformInterface {
+public interface UniformInterface {
     
     /**
      * Invoke the HEAD method.
