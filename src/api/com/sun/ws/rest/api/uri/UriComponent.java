@@ -21,12 +21,17 @@
  */
 package com.sun.ws.rest.api.uri;
 
+import com.sun.ws.rest.impl.MultivaluedMapImpl;
+import java.io.UnsupportedEncodingException;
+import java.net.URI;
+import java.net.URLDecoder;
 import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import javax.ws.rs.core.MultivaluedMap;
 
 /**
  * Utility class for validating, encoding and decoding components
@@ -287,6 +292,58 @@ public final class UriComponent {
         return (t != Type.HOST) ? decode(s, n) : decodeHost(s, n);
     }
         
+    /**
+     * Decode the query component of a URI.
+     * 
+     * @param u the URI.
+     * @param decode true of the query parameters of the query component
+     *        should be in decoded form.
+     * @return the multivalued map of query parameters.
+     */
+    public static MultivaluedMap<String, String> decodeQuery(URI u, boolean decode) {
+        return decodeQuery(u.getRawQuery(), decode);
+    }
+    
+    /**
+     * Decode the query component of a URI.
+     * <p>
+     * TODO the implementation is not very efficient.
+     * 
+     * @param q the query component in encoded form.
+     * @param decode true of the query parameters of the query component
+     *        should be in decoded form.
+     * @return the multivalued map of query parameters.
+     */
+    public static MultivaluedMap<String, String> decodeQuery(String q, boolean decode) {
+        MultivaluedMap<String, String> queryParameters = new MultivaluedMapImpl();
+        
+        if (q == null || q.length() == 0)
+            return queryParameters;
+
+        for (String s : q.split("&")) {
+            if (s.length() == 0)
+                continue;
+            
+            String[] keyVal = s.split("=");
+            try {
+                String key = (decode) ? URLDecoder.decode(keyVal[0], "UTF-8") : keyVal[0];
+                if (key.length() == 0)
+                    continue;
+                
+                // Query parameter may not have a value, if so default to "";
+                String val = (keyVal.length == 2) ?
+                    (decode) ? URLDecoder.decode(keyVal[1], "UTF-8") : keyVal[1] : "";
+                
+                queryParameters.add(key, val);
+            } catch (UnsupportedEncodingException ex) {
+                // This should never occur
+                throw new IllegalArgumentException(ex);
+            }
+        }
+        
+        return queryParameters;
+    }
+            
     private static String decode(String s, int n) {
 	final StringBuilder sb = new StringBuilder(n);
 	ByteBuffer bb = ByteBuffer.allocate(1);

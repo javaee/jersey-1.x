@@ -31,9 +31,7 @@ import com.sun.ws.rest.impl.http.header.reader.HttpHeaderReader;
 import com.sun.ws.rest.impl.model.HttpHelper;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
 import java.net.URI;
-import java.net.URLDecoder;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Date;
@@ -327,14 +325,14 @@ public abstract class AbstractContainerRequest implements ContainerRequest {
             if (decodedQueryParameters != null)
                 return decodedQueryParameters;
             
-            return decodedQueryParameters = extractQueryParameters(
-                    getRequestUri().getRawQuery(), true);
+            return decodedQueryParameters = UriComponent.decodeQuery(
+                    getRequestUri(), true);
         } else {
             if (encodedQueryParameters != null)
                 return encodedQueryParameters;
             
-            return encodedQueryParameters = extractQueryParameters(
-                    getRequestUri().getRawQuery(), false);
+            return encodedQueryParameters = UriComponent.decodeQuery(
+                    getRequestUri(), false);
         }
     }
     
@@ -459,52 +457,6 @@ public abstract class AbstractContainerRequest implements ContainerRequest {
                 map.put(key, list);
             }
             list.add(val);
-        }
-    }
-    
-    /**
-     * Extract the query parameters from a string and add
-     * them to the query parameters map.
-     * TODO: This is not very efficient
-     */
-    private MultivaluedMap<String, String> extractQueryParameters(String queryString, boolean decode) {
-        MultivaluedMap<String, String> queryParameters = new MultivaluedMapImpl();
-        
-        if (queryString == null || queryString.length() == 0)
-            return queryParameters;
-        
-        extractQueryParameters(queryString, "&", queryParameters, decode);
-        return queryParameters;
-    }
-    
-    /**
-     * TODO: This is not very efficient
-     */
-    private void extractQueryParameters(String parameters, String deliminator,
-            MultivaluedMap<String, String> map, boolean decode) {
-        for (String s : parameters.split(deliminator)) {
-            if (s.length() == 0)
-                continue;
-            
-            String[] keyVal = s.split("=");
-            try {
-                String key = (decode) ? URLDecoder.decode(keyVal[0], "UTF-8") : keyVal[0];
-                if (key.length() == 0)
-                    continue;
-                
-                // Query parameter may not have a value, if so default to "";
-                String val = (keyVal.length == 2) ?
-                    (decode) ? URLDecoder.decode(keyVal[1], "UTF-8") : keyVal[1] : "";
-                
-                List<String> list = map.get(key);
-                if (map.get(key) == null) {
-                    list = new LinkedList<String>();
-                    map.put(key, list);
-                }
-                list.add(val);
-            } catch (UnsupportedEncodingException ex) {
-                ex.printStackTrace();
-            }
         }
     }
     
