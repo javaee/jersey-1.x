@@ -24,6 +24,8 @@ package com.sun.ws.rest.impl.resource;
 
 import com.sun.ws.rest.impl.AbstractResourceTester;
 import com.sun.ws.rest.api.client.ClientResponse;
+import com.sun.ws.rest.api.core.DefaultResourceConfig;
+import com.sun.ws.rest.api.core.ResourceConfig;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.core.Response;
@@ -48,7 +50,9 @@ public class RedirectToPathWithSlashTest extends AbstractResourceTester {
     }
     
     public void testRedirect() {
-        initiateWebApplication(Project.class);
+        ResourceConfig rc = new DefaultResourceConfig(Project.class);
+        rc.getFeatures().put(ResourceConfig.FEATURE_REDIRECT, true);
+        initiateWebApplication(rc);
         
         ClientResponse response = resourceProxy("/project", false).get(ClientResponse.class);
         assertEquals(Response.temporaryRedirect(null).build().getStatus(), 
@@ -81,7 +85,9 @@ public class RedirectToPathWithSlashTest extends AbstractResourceTester {
     }
     
     public void testRedirectWithSubMethods() {
-        initiateWebApplication(ProjectWithSubMethods.class);
+        ResourceConfig rc = new DefaultResourceConfig(ProjectWithSubMethods.class);
+        rc.getFeatures().put(ResourceConfig.FEATURE_REDIRECT, true);
+        initiateWebApplication(rc);
         
         ClientResponse response = resourceProxy("/project", false).get(ClientResponse.class);
         assertEquals(Response.temporaryRedirect(null).build().getStatus(), 
@@ -154,8 +160,10 @@ public class RedirectToPathWithSlashTest extends AbstractResourceTester {
     }
     
     public void testRedirectWithSubResource() {
-        initiateWebApplication(ProjectWithSubResource.class);
-        
+        ResourceConfig rc = new DefaultResourceConfig(ProjectWithSubResource.class);
+        rc.getFeatures().put(ResourceConfig.FEATURE_REDIRECT, true);
+        initiateWebApplication(rc);
+                
         ClientResponse response = resourceProxy("/project", false).get(ClientResponse.class);
         assertEquals(Response.temporaryRedirect(null).build().getStatus(), 
                 response.getStatus());

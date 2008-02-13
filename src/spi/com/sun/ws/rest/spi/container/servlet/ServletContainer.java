@@ -235,7 +235,7 @@ public class ServletContainer extends HttpServlet {
         setResourceConfigFeature(servletConfig, rc, 
                 ResourceConfig.FEATURE_CANONICALIZE_URI_PATH);
         setResourceConfigFeature(servletConfig, rc, 
-                ResourceConfig.FEATURE_IGNORE_MATRIX_PARAMS);
+                ResourceConfig.FEATURE_MATCH_MATRIX_PARAMS);
         setResourceConfigFeature(servletConfig, rc, 
                 ResourceConfig.FEATURE_NORMALIZE_URI);
         setResourceConfigFeature(servletConfig, rc, 

@@ -326,9 +326,11 @@ public final class WebApplicationImpl implements WebApplication {
         
         if (resourceConfig.getFeature(ResourceConfig.FEATURE_NORMALIZE_URI)) {
             final URI uri = request.getRequestUri();
-            final URI normalizedUri = UriHelper.normalize(uri, !resourceConfig.getFeature(ResourceConfig.FEATURE_CANONICALIZE_URI_PATH));
+            final URI normalizedUri = UriHelper.normalize(uri, 
+                    !resourceConfig.getFeature(ResourceConfig.FEATURE_CANONICALIZE_URI_PATH));
 
-            if (uri != normalizedUri) {
+            if (uri != normalizedUri && 
+                    resourceConfig.getFeature(ResourceConfig.FEATURE_REDIRECT)) {
                 response.setResponse(Response.temporaryRedirect(normalizedUri).build());
                 return;
             }
@@ -341,9 +343,7 @@ public final class WebApplicationImpl implements WebApplication {
         StringBuilder path = new StringBuilder();
         path.append("/").append(request.getPath(false));
 
-        if (resourceConfig.getFeature(ResourceConfig.FEATURE_IGNORE_MATRIX_PARAMS))
-            // TODO check for annotation on resource
-            // Need to support overriding functionality on resource        
+        if (!resourceConfig.getFeature(ResourceConfig.FEATURE_MATCH_MATRIX_PARAMS))
             path = stripMatrixParams(path);
 
         try {
@@ -417,7 +417,9 @@ public final class WebApplicationImpl implements WebApplication {
             
             PathPattern p = new PathPattern(t, r.hasSubResources);
                     
-            rulesMap.put(p, new RightHandPathRule(t.endsWithSlash(),
+            rulesMap.put(p, new RightHandPathRule(
+                    resourceConfig.getFeature(ResourceConfig.FEATURE_REDIRECT),
+                    t.endsWithSlash(),
                     new ResourceClassRule(t.getTemplateVariables(), c)));
         }
         
@@ -439,7 +441,9 @@ public final class WebApplicationImpl implements WebApplication {
                 false);
         PathPattern p = new PathPattern(t, r.hasSubResources);
         
-        rulesMap.put(p, new RightHandPathRule(false,
+        rulesMap.put(p, new RightHandPathRule(
+                resourceConfig.getFeature(ResourceConfig.FEATURE_REDIRECT),                
+                false,
                 new ResourceObjectRule(t.getTemplateVariables(), wr)));        
     }
         

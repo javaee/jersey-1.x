@@ -63,10 +63,10 @@ public class DefaultResourceConfig implements ResourceConfig {
      * @param resources the initial set of root resource classes
      */
     public DefaultResourceConfig(Set<Class> resources) {
-        this.features.put(ResourceConfig.FEATURE_CANONICALIZE_URI_PATH, true);
-        this.features.put(ResourceConfig.FEATURE_IGNORE_MATRIX_PARAMS, true);
-        this.features.put(ResourceConfig.FEATURE_NORMALIZE_URI, true);
-        this.features.put(ResourceConfig.FEATURE_REDIRECT, true);
+        this.features.put(ResourceConfig.FEATURE_CANONICALIZE_URI_PATH, false);
+        this.features.put(ResourceConfig.FEATURE_MATCH_MATRIX_PARAMS, false);
+        this.features.put(ResourceConfig.FEATURE_NORMALIZE_URI, false);
+        this.features.put(ResourceConfig.FEATURE_REDIRECT, false);
         if (null != resources) {
             this.resources.addAll(resources);
         }

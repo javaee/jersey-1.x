@@ -113,7 +113,9 @@ public final class ResourceClass {
             rmm.sort();
             processWadl(resource, p, rmm);        
             rulesMap.put(p,
-                    new RightHandPathRule(p.getTemplate().endsWithSlash(),
+                    new RightHandPathRule(
+                    config.getFeature(ResourceConfig.FEATURE_REDIRECT),                    
+                    p.getTemplate().endsWithSlash(),
                     new HttpMethodRule(rmm)));
         }
 
@@ -177,7 +179,11 @@ public final class ResourceClass {
                     locator.getMethod(),
                     ParameterExtractorFactory.createExtractorsForSublocator(locator));
 
-            rulesMap.put(p, new RightHandPathRule(t.endsWithSlash(), r));
+            rulesMap.put(p, 
+                    new RightHandPathRule(
+                    config.getFeature(ResourceConfig.FEATURE_REDIRECT),
+                    t.endsWithSlash(), 
+                    r));
         }
         return hasSubResources;
     }

@@ -46,18 +46,23 @@ import javax.ws.rs.core.UriBuilder;
  * @author Paul.Sandoz@Sun.Com
  */
 public class RightHandPathRule implements UriRule {
+    private final boolean redirect;
+    
     private final boolean patternEndsInSlash;
 
     private final UriRule rule;
     
     /**
+     * @param redirect if true return a temporary redirect response if the
+     *        path does not end in '/' and the pattern ends in '/'.
      * @param patternEndsInSlash true if the pattern used to match with rule
      *        end in a '/', otherwise false.
      * @param rule the URI rule that is adapted.
      */
-    public RightHandPathRule(boolean patternEndsInSlash, UriRule rule) {
+    public RightHandPathRule(boolean redirect, boolean patternEndsInSlash, UriRule rule) {
         assert rule != null;
         
+        this.redirect = redirect;
         this.patternEndsInSlash = patternEndsInSlash;
         this.rule = rule;
     }
@@ -67,9 +72,9 @@ public class RightHandPathRule implements UriRule {
         path = getRightHandPath(context.getGroupValues());
         if (path.length() == 0) {
             // Redirect to path ending with a '/' if pattern
-            // ends in '/'
+            // ends in '/' and redirect is true
             if (patternEndsInSlash)
-                return redirect(context);
+                return (redirect) ? redirect(context) : false;
         } else if (path.length() == 1) {
             // Path is '/', no match if pattern does not end in a '/'
             if (!patternEndsInSlash)

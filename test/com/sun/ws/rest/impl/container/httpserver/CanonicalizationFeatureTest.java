@@ -79,7 +79,9 @@ public class CanonicalizationFeatureTest extends AbstractHttpServerTester {
     
     public void testContdSlashesProtection() {        
         ResourceConfig rc = new DefaultResourceConfig(TestWebResource.class);
+        rc.getFeatures().put(ResourceConfig.FEATURE_NORMALIZE_URI, true);
         rc.getFeatures().put(ResourceConfig.FEATURE_CANONICALIZE_URI_PATH, false);
+        rc.getFeatures().put(ResourceConfig.FEATURE_REDIRECT, true);
         
         startServer(rc);
         
@@ -90,7 +92,10 @@ public class CanonicalizationFeatureTest extends AbstractHttpServerTester {
                 r.path("uri/http://jersey.dev.java.net").get(String.class));
         assertEquals("customers", 
                 r.path("dblslashes//customers//").get(String.class));
+
+        stopServer();
         
+        startServer(rc);
         rc.getFeatures().
                 put(ResourceConfig.FEATURE_CANONICALIZE_URI_PATH, true);
         

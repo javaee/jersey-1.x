@@ -45,7 +45,7 @@ import javax.ws.rs.core.UriInfo;
  *
  * @author Paul.Sandoz@Sun.Com
  */
-@Path("/collection/")
+@Path("/collection")
 @ProduceMime("application/atom+xml")
 public class FeedResource {
     @HttpContext UriInfo uriInfo;

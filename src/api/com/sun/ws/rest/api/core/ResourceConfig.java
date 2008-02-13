@@ -33,6 +33,8 @@ public interface ResourceConfig {
      * If true the request URI will be normalized as specified by 
      * {@link java.net.URI#normalize}. If not true the request URI is not
      * modified.
+     * <p>
+     * The default value is false.
      */
     public static final String FEATURE_NORMALIZE_URI 
             = "com.sun.ws.rest.config.feature.NormalizeURI";
@@ -41,6 +43,8 @@ public interface ResourceConfig {
      * If true the request URI path component will be canonicalized by removing 
      * contiguous slashes (i.e. all /+ will be replaced by /). If not true the
      * request URI path component is mot modified.
+     * <p>
+     * The default value is false.
      */
     public static final String FEATURE_CANONICALIZE_URI_PATH 
             = "com.sun.ws.rest.config.feature.CanonicalizeURIPath";
@@ -51,6 +55,14 @@ public interface ResourceConfig {
      * request URI result in a new URI that is not equal to the request URI,
      * then the client is (temporarily) redirected to the new URI. Otherwise
      * the request URI is set to be the new URI.
+     * <p>
+     * If true, and the path value of a {@link javax.ws.rs.Path} annotation ends 
+     * in a slash, the request URI path does not end in a '/' and would otherwise
+     * match the path value if it did, then the client is (temporarily) 
+     * redirected to a new URI that is the request URI with a '/' appended to the
+     * the end of the path.
+     * <p>
+     * The default value is false.
      */
     public static final String FEATURE_REDIRECT 
             = "com.sun.ws.rest.config.feature.Redirect";
@@ -59,8 +71,10 @@ public interface ResourceConfig {
      * If true matrix parameters (if present) in the request URI path component
      * will be ignored when matching the path to URI templates declared by
      * resource classes.
+     * <p>
+     * The default value is false.
      */
-    public static final String FEATURE_IGNORE_MATRIX_PARAMS 
+    public static final String FEATURE_MATCH_MATRIX_PARAMS 
             = "com.sun.ws.rest.config.feature.IgnoreMatrixParams";
     
     /**

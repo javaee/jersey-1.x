@@ -1,4 +1,9 @@
 release 0.6 (2008-03-07)
+- The default values for the following resource configuration features are
+  now false: URI normalization, URI path canonicalization and URI redirection.
+  This means by default no automatic redirection will be performed.
+- The resource configuration feature FEATURE_IGNORE_MATRIX_PARAMS is
+  renamed to FEATURE_MATCH_MATRIX_PARAMS and the default value is now false.
 - Fixed issue 35: Cryptic error message for invalid media type of response
   https://jersey.dev.java.net/issues/show_bug.cgi?id=35
 - When utilizing the ClasspathResourceConfig include files ending
