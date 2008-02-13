@@ -15,6 +15,7 @@ release 0.6 (2008-03-07)
   - java.ws.rs.ext.HeaderProvider is removed. This is replaced with
     java.ws.rs.ext.RuntimeDelegate.HeaderDelegate.
   - java.ws.rs.UriParam renamed to java.ws.rs.PathParam
+  - java.ws.rs.core.HttpContext renamed to java.ws.rs.Context
   - javax.ws.rs.core.Response.Builder renamed to 
     javax.ws.rs.core.Response.ResponseBuilder
   - The charset parameter is removed from javax.ws.rs.core.Variant
@@ -29,6 +30,9 @@ release 0.6 (2008-03-07)
   - javax.ws.rs.core.HttpHeaders.getCookies now returns a type of 
     Map<String, Cookie>, instead of a type List<Cookie>, where the key
     is the name of the cookie.
+  - The return type of the javax.ws.rs.core.Request.evaluatePreconditions 
+    methods has changed from javax.ws.rs.core.Response to 
+    javax.ws.rs.core.Response.ResponseBuilder.
 
 release 0.5 (2008-01-18)
 - WADL ant task for generating a WADL document of the root resources present

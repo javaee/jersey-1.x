@@ -27,7 +27,7 @@ import com.sun.ws.rest.samples.optimisticconcurrency.ItemData;
 import javax.ws.rs.GET;
 import javax.ws.rs.ProduceMime;
 import javax.ws.rs.Path;
-import javax.ws.rs.core.HttpContext;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
@@ -38,7 +38,7 @@ import javax.ws.rs.core.UriInfo;
  */
 @Path("/item")
 public class ItemResource {
-    @HttpContext UriInfo uriInfo;
+    @Context UriInfo uriInfo;
     
     @Path("content")
     public ItemContentResource getItemContentResource() {

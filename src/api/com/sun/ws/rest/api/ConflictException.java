@@ -36,7 +36,7 @@ public class ConflictException extends WebApplicationException {
      * Create a HTTP 409 (Conflict) exception.
      */
     public ConflictException() {
-        super(Responses.conflict());
+        super(Responses.conflict().build());
     }
     
     /**

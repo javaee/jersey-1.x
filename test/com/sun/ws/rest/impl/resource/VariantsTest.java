@@ -29,7 +29,7 @@ import com.sun.ws.rest.api.client.ClientResponse;
 import java.io.IOException;
 import java.util.List;
 import javax.ws.rs.GET;
-import javax.ws.rs.core.HttpContext;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Request;
 import javax.ws.rs.core.Response;
@@ -49,7 +49,7 @@ public class VariantsTest extends AbstractResourceTester {
     @Path("/")
     public static class WebResource {
         @GET
-        public Response doGet(@HttpContext Request r) {
+        public Response doGet(@Context Request r) {
             List<Variant> vs = Variant.VariantListBuilder.newInstance().
                     mediaTypes(MediaType.parse("image/jpeg")).add().
                     mediaTypes(MediaType.parse("application/xml")).languages("en-us").add().

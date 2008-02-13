@@ -28,7 +28,7 @@ import javax.ws.rs.GET;
 import javax.ws.rs.ProduceMime;
 import javax.ws.rs.Path;
 import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.core.HttpContext;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.UriInfo;
 import org.jdom.Document;
 import org.jdom.Element;
@@ -65,7 +65,7 @@ public class ServiceResource {
         }
     }
     
-    @HttpContext UriInfo uriInfo;
+    @Context UriInfo uriInfo;
     
     private String getCollectionUri() {
         return uriInfo.getBaseUriBuilder().path(FeedResource.class).

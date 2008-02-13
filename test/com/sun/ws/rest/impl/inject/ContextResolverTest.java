@@ -29,7 +29,7 @@ import java.io.IOException;
 import java.math.BigInteger;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
-import javax.ws.rs.core.HttpContext;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.ext.Provider;
 
 /**
@@ -68,7 +68,7 @@ public class ContextResolverTest extends AbstractResourceTester {
     
     @Path("/")
     public static class NullContextResource {
-        @HttpContext ContextResolver<String> cr;
+        @Context ContextResolver<String> cr;
         
         @GET
         public String get() {
@@ -79,7 +79,7 @@ public class ContextResolverTest extends AbstractResourceTester {
     @Path("/")
     public static class ContextResource {
         
-        @HttpContext ContextResolver<String> cr;
+        @Context ContextResolver<String> cr;
         
         @GET
         public String get() {

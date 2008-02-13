@@ -28,7 +28,7 @@ import java.io.IOException;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
-import javax.ws.rs.core.HttpContext;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.ext.Provider;
 import javax.xml.bind.JAXBContext;
 
@@ -57,7 +57,7 @@ public class JAXBContextResolverTest extends AbstractResourceTester {
     
     @Path("/")
     public static class ContextResource {
-        @HttpContext ContextResolver<JAXBContext> cr;
+        @Context ContextResolver<JAXBContext> cr;
         
         @GET
         public MyBean get() {

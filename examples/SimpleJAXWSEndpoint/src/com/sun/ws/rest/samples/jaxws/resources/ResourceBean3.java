@@ -31,14 +31,14 @@ import javax.ws.rs.POST;
 import javax.ws.rs.ProduceMime;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
-import javax.ws.rs.core.HttpContext;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 
 @Path("/resource3/{arg1}/{arg2}")
 public class ResourceBean3  {    
-    @HttpContext UriInfo uriInfo;
+    @Context UriInfo uriInfo;
     
     int count =0;
     

@@ -25,7 +25,7 @@ package com.sun.ws.rest.impl.provider.entity;
 import com.sun.ws.rest.spi.service.ContextResolver;
 import java.util.Map;
 import java.util.WeakHashMap;
-import javax.ws.rs.core.HttpContext;
+import javax.ws.rs.core.Context;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.annotation.XmlRootElement;
@@ -38,7 +38,7 @@ public abstract class AbstractJAXBElementProvider extends AbstractTypeEntityProv
     private static Map<Class, JAXBContext> jaxbContexts = 
             new WeakHashMap<Class, JAXBContext>();
 
-    @HttpContext private ContextResolver<JAXBContext> cr;
+    @Context private ContextResolver<JAXBContext> cr;
     
     public final boolean supports(Class<?> type) {
         return type.getAnnotation(XmlRootElement.class) != null;

@@ -45,6 +45,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.PathSegment;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.ResponseBuilder;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.Variant;
 
@@ -472,25 +473,25 @@ public abstract class AbstractContainerRequest implements ContainerRequest {
         return VariantSelector.selectVariant(this, variants);
     }
     
-    public Response evaluatePreconditions(EntityTag eTag) {
-        Response r = evaluateIfMatch(eTag);
+    public ResponseBuilder evaluatePreconditions(EntityTag eTag) {
+        ResponseBuilder r = evaluateIfMatch(eTag);
         if (r == null)
             r = evaluateIfNoneMatch(eTag);
         
         return r;        
     }
 
-    public Response evaluatePreconditions(Date lastModified) {
+    public ResponseBuilder evaluatePreconditions(Date lastModified) {
         long lastModifiedTime = lastModified.getTime();
-        Response r = evaluateIfUnmodifiedSince(lastModifiedTime);
+        ResponseBuilder r = evaluateIfUnmodifiedSince(lastModifiedTime);
         if (r == null)
             r = evaluateIfModifiedSince(lastModifiedTime);
         
         return r;        
     }
     
-    public Response evaluatePreconditions(Date lastModified, EntityTag eTag) {
-        Response r = evaluateIfMatch(eTag);
+    public ResponseBuilder evaluatePreconditions(Date lastModified, EntityTag eTag) {
+        ResponseBuilder r = evaluateIfMatch(eTag);
         if (r == null) {
             long lastModifiedTime = lastModified.getTime();
             r = evaluateIfUnmodifiedSince(lastModifiedTime);
@@ -503,7 +504,7 @@ public abstract class AbstractContainerRequest implements ContainerRequest {
         return r;        
     }
         
-    private Response evaluateIfMatch(EntityTag eTag) {
+    private ResponseBuilder evaluateIfMatch(EntityTag eTag) {
         String ifMatchHeader = getRequestHeaders().getFirst("If-Match");
         // TODO require support for eTag types
         // Strong comparison of entity tags is required
@@ -517,7 +518,7 @@ public abstract class AbstractContainerRequest implements ContainerRequest {
         return null;
     }
     
-    private Response evaluateIfNoneMatch(EntityTag eTag) {
+    private ResponseBuilder evaluateIfNoneMatch(EntityTag eTag) {
         String ifNoneMatchHeader = getRequestHeaders().getFirst("If-None-Match");
         if (ifNoneMatchHeader != null) {
             // TODO require support for eTag types
@@ -530,7 +531,7 @@ public abstract class AbstractContainerRequest implements ContainerRequest {
                     // TODO
                     // Include cache related header fields
                     // such as ETag
-                    return Response.notModified(eTag).build();
+                    return Response.notModified(eTag);
                 } else {
                     // 412 Precondition Failed
                     return Responses.preconditionFailed();
@@ -541,7 +542,7 @@ public abstract class AbstractContainerRequest implements ContainerRequest {
         return null;
     }
     
-    private Response evaluateIfUnmodifiedSince(long lastModified) {
+    private ResponseBuilder evaluateIfUnmodifiedSince(long lastModified) {
         String ifUnmodifiedSinceHeader = getRequestHeaders().getFirst("If-Unmodified-Since");
         if (ifUnmodifiedSinceHeader != null) {
             try {
@@ -559,7 +560,7 @@ public abstract class AbstractContainerRequest implements ContainerRequest {
         return null;
     }
     
-    private Response evaluateIfModifiedSince(long lastModified) {
+    private ResponseBuilder evaluateIfModifiedSince(long lastModified) {
         String ifModifiedSinceHeader = getRequestHeaders().getFirst("If-Modified-Since");
         if (ifModifiedSinceHeader != null) {
             try {

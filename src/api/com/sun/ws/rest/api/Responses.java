@@ -23,6 +23,7 @@
 package com.sun.ws.rest.api;
 
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.ResponseBuilder;
 
 /**
  * Common status codes and responses.
@@ -46,39 +47,39 @@ public final class Responses {
     
     public static final int UNSUPPORTED_MEDIA_TYPE = 415;
     
-    public static Response noContent() {
+    public static ResponseBuilder noContent() {
         return status(NO_CONTENT);
     }
     
-    public static Response notModified() {
+    public static ResponseBuilder notModified() {
         return status(NOT_MODIFIED);
     }
     
-    public static Response notFound() {
+    public static ResponseBuilder notFound() {
         return status(NOT_FOUND);
     }
     
-    public static Response methodNotAllowed() {
+    public static ResponseBuilder methodNotAllowed() {
         return status(METHOD_NOT_ALLOWED);
     }
     
-    public static Response notAcceptable() {
+    public static ResponseBuilder notAcceptable() {
         return status(NOT_ACCEPTABLE);
     }
     
-    public static Response conflict() {
+    public static ResponseBuilder conflict() {
         return status(CONFLICT);        
     }
     
-    public static Response preconditionFailed() {
+    public static ResponseBuilder preconditionFailed() {
         return status(PRECONDITION_FAILED);
     }
     
-    public static Response unsupportedMediaType() {
+    public static ResponseBuilder unsupportedMediaType() {
         return status(UNSUPPORTED_MEDIA_TYPE);
     }
     
-    private static Response status(int status) {
-        return Response.status(status).build();                
+    private static ResponseBuilder status(int status) {
+        return Response.status(status);                
     }
 }

@@ -39,7 +39,7 @@ import java.lang.reflect.Type;
 import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
-import javax.ws.rs.core.HttpContext;
+import javax.ws.rs.core.Context;
 
 /**
  * The HTTP client class for handling requests and responses specified by 
@@ -119,9 +119,9 @@ public class Client extends Filterable implements ClientHandler {
         }
     }
     
-    private abstract class HttpContextInjectable<V> extends Injectable<HttpContext, V> {
-        public Class<HttpContext> getAnnotationClass() {
-            return HttpContext.class;
+    private abstract class HttpContextInjectable<V> extends Injectable<Context, V> {
+        public Class<Context> getAnnotationClass() {
+            return Context.class;
         }
     }
     
@@ -166,7 +166,7 @@ public class Client extends Filterable implements ClientHandler {
         // Allow injection of client config
         addInjectable(ResourceConfig.class,
                 new HttpContextInjectable<ClientConfig>() {
-                    public ClientConfig getInjectableValue(HttpContext c) {
+                    public ClientConfig getInjectableValue(Context c) {
                         return Client.this.config;
                     }
                 }
@@ -190,7 +190,7 @@ public class Client extends Filterable implements ClientHandler {
         // Allow injection of message body context
         addInjectable(MessageBodyContext.class,
                 new HttpContextInjectable<MessageBodyContext>() {
-                    public MessageBodyContext getInjectableValue(HttpContext c) {
+                    public MessageBodyContext getInjectableValue(Context c) {
                         return bodyContext;
                     }
                 }

@@ -161,7 +161,7 @@ public abstract class AbstractContainerResponse implements ContainerResponse {
         if (contentType == null)
             contentType = APPLICATION_OCTET_STREAM;
         
-        response = (response != null) ? response : Responses.noContent();
+        response = (response != null) ? response : Responses.noContent().build();
         
         this.status = response.getStatus();
         this.entity = response.getEntity();

@@ -53,8 +53,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.ProduceMime;
 import javax.ws.rs.QueryParam;
-import javax.ws.rs.core.HttpContext;
-import javax.ws.rs.core.HttpContext;
+import javax.ws.rs.core.Context;
 
 /**
  *
@@ -251,7 +250,7 @@ public class IntrospectionModeller {
 
     private static Map<Class, ParamAnnotationHelper> createParamAnotHelperMap() {
         Map<Class, ParamAnnotationHelper> m = new WeakHashMap<Class, ParamAnnotationHelper>();
-        m.put(HttpContext.class, new ParamAnnotationHelper() {
+        m.put(Context.class, new ParamAnnotationHelper() {
 
             public String getValueOf(Annotation a) {
                 return null;

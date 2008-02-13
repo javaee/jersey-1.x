@@ -5,7 +5,7 @@ import com.sun.ws.rest.api.model.AbstractResource;
 import java.util.Set;
 import javax.ws.rs.GET;
 import javax.ws.rs.ProduceMime;
-import javax.ws.rs.core.HttpContext;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.UriInfo;
 
 /**
@@ -22,7 +22,7 @@ public final class WadlResource {
         this.a = WadlGenerator.generate(rootResources);
     }
     
-    public synchronized @GET Application getWadl(@HttpContext UriInfo uriInfo) {
+    public synchronized @GET Application getWadl(@Context UriInfo uriInfo) {
         if (a.getResources().getBase()==null)
             a.getResources().setBase(uriInfo.getBaseUri().toString());
         return a;

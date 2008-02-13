@@ -35,7 +35,7 @@ import javax.ws.rs.POST;
 import javax.ws.rs.ProduceMime;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
-import javax.ws.rs.core.HttpContext;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
@@ -48,9 +48,9 @@ import javax.ws.rs.core.UriInfo;
 @Path("/collection")
 @ProduceMime("application/atom+xml")
 public class FeedResource {
-    @HttpContext UriInfo uriInfo;
+    @Context UriInfo uriInfo;
 
-    @HttpContext MessageBodyContext bodyContext;
+    @Context MessageBodyContext bodyContext;
     
     @Path("{entry}")
     public EntryResource getEntryResource(@PathParam("entry") String entryId) {
@@ -119,7 +119,7 @@ public class FeedResource {
 
     @POST
     public Response postMediaEntry(
-            @HttpContext HttpHeaders headers,
+            @Context HttpHeaders headers,
             byte[] entry) throws IOException, FeedException {
         // Get the next unique name of the entry
         String entryId = FileStore.FS.getNextId();

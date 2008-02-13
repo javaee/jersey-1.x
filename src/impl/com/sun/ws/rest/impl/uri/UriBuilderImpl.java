@@ -77,6 +77,10 @@ public final class UriBuilderImpl extends UriBuilder {
         return new UriBuilderImpl(this);
     }
     
+    public boolean isEncode() {
+        return encode;
+    }
+    
     public UriBuilder encode(boolean enable) {
         encode = enable;
         return this;
@@ -135,13 +139,13 @@ public final class UriBuilderImpl extends UriBuilder {
         return this;
     }
 
-    public UriBuilder replacePath(String path) {
+    public UriBuilder replacePath(String... segments) {
         this.path.setLength(0);
-        this.path.append(encode(path, UriComponent.Type.PATH));
+        path(segments);
         return this;
     }
 
-    public UriBuilder path(String... segments) {
+    public UriBuilder path(String... segments) {        
         for (String segment : segments)
             appendPath(segment);
         

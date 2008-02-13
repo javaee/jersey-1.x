@@ -31,12 +31,12 @@ import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
-import javax.ws.rs.core.HttpContext;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MultivaluedMap;
 
 @Path("/test2/{arg1}/{arg2}")
 public class MyWebResourceBean  {
-    @HttpContext HttpContextAccess context;
+    @Context HttpContextAccess context;
     
     int count =0;
     

@@ -33,7 +33,7 @@ import java.io.OutputStream;
 import java.io.Serializable;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
-import javax.ws.rs.core.HttpContext;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.UriBuilder;
@@ -61,7 +61,7 @@ public class InjectedProviderTest extends AbstractResourceTester {
 
     @Provider
     public static class InjectedBeanProvider extends AbstractTypeEntityProvider<Bean> {
-        @HttpContext UriInfo uriInfo;
+        @Context UriInfo uriInfo;
         
         public boolean supports(Class type) {
             return type == Bean.class;

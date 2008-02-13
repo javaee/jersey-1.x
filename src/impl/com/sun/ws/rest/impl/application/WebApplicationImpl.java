@@ -75,7 +75,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.ws.rs.core.HttpContext;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.Request;
 import javax.ws.rs.core.Response;
@@ -284,7 +284,7 @@ public final class WebApplicationImpl implements WebApplication {
         // Allow injection of resource config
         addInjectable(ResourceConfig.class,
                 new HttpContextInjectable<ResourceConfig>() {
-                    public ResourceConfig getInjectableValue(HttpContext c) {
+                    public ResourceConfig getInjectableValue(Context c) {
                         return WebApplicationImpl.this.resourceConfig;
                     }
                 }
@@ -349,7 +349,7 @@ public final class WebApplicationImpl implements WebApplication {
         try {
             if (!rootsRule.accept(path, null, localContext)) {
                 // Resource was not found
-                response.setResponse(Responses.notFound());                
+                response.setResponse(Responses.notFound().build());                
             }
         } catch (WebApplicationException e) {
             onExceptionWithWebApplication(e, response);
@@ -485,9 +485,9 @@ public final class WebApplicationImpl implements WebApplication {
             i);
     }
     
-    private abstract class HttpContextInjectable<V> extends Injectable<HttpContext, V> {
-        public Class<HttpContext> getAnnotationClass() {
-            return HttpContext.class;
+    private abstract class HttpContextInjectable<V> extends Injectable<Context, V> {
+        public Class<Context> getAnnotationClass() {
+            return Context.class;
         }
     }
     
@@ -496,7 +496,7 @@ public final class WebApplicationImpl implements WebApplication {
                 
         is.put(MessageBodyContext.class,
                 new HttpContextInjectable<MessageBodyContext>() {
-                    public MessageBodyContext getInjectableValue(HttpContext c) {
+                    public MessageBodyContext getInjectableValue(Context c) {
                         return bodyContext;
                     }
                 }
@@ -504,7 +504,7 @@ public final class WebApplicationImpl implements WebApplication {
             
         is.put(HttpContextAccess.class,
                 new HttpContextInjectable<HttpContextAccess>() {
-                    public HttpContextAccess getInjectableValue(HttpContext c) {
+                    public HttpContextAccess getInjectableValue(Context c) {
                         return context;
                     }
                 }
@@ -512,7 +512,7 @@ public final class WebApplicationImpl implements WebApplication {
         
         is.put(HttpHeaders.class,
                 new HttpContextInjectable<HttpHeaders>() {
-                    public HttpHeaders getInjectableValue(HttpContext c) {
+                    public HttpHeaders getInjectableValue(Context c) {
                         return httpHeadersProxy;
                     }
                 }
@@ -520,7 +520,7 @@ public final class WebApplicationImpl implements WebApplication {
             
         is.put(UriInfo.class,
                 new HttpContextInjectable<UriInfo>() {
-                    public UriInfo getInjectableValue(HttpContext c) {
+                    public UriInfo getInjectableValue(Context c) {
                         return uriInfoProxy;
                     }
                 }
@@ -528,7 +528,7 @@ public final class WebApplicationImpl implements WebApplication {
             
         is.put(Request.class,
                 new HttpContextInjectable<Request>() {
-                    public Request getInjectableValue(HttpContext c) {
+                    public Request getInjectableValue(Context c) {
                         return requestProxy;
                     }
                 }

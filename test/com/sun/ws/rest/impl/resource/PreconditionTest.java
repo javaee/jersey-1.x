@@ -28,9 +28,10 @@ import com.sun.ws.rest.api.client.ClientResponse;
 import java.util.GregorianCalendar;
 import javax.ws.rs.GET;
 import javax.ws.rs.core.EntityTag;
-import javax.ws.rs.core.HttpContext;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Request;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.ResponseBuilder;
 
 /**
  *
@@ -45,14 +46,14 @@ public class PreconditionTest extends AbstractResourceTester {
 
     @Path("/")
     public static class LastModifiedResource {
-        @HttpContext Request request;
+        @Context Request request;
 
         @GET
         public Response doGet() {
             GregorianCalendar lastModified = new GregorianCalendar(2007, 0, 0, 0, 0, 0);
-            Response r = request.evaluatePreconditions(lastModified.getTime());
-            if (r != null)
-                return r;
+            ResponseBuilder rb = request.evaluatePreconditions(lastModified.getTime());
+            if (rb != null)
+                return rb.build();
             
             return Response.ok("foo", "text/plain").build();
         }
@@ -126,13 +127,13 @@ public class PreconditionTest extends AbstractResourceTester {
     
     @Path("/")
     public static class EtagResource {
-        @HttpContext Request request;
+        @Context Request request;
 
         @GET
         public Response doGet() {
-            Response r = request.evaluatePreconditions(new EntityTag("1"));
-            if (r != null)
-                return r;
+            ResponseBuilder rb = request.evaluatePreconditions(new EntityTag("1"));
+            if (rb != null)
+                return rb.build();
             
             return Response.ok("foo", "text/plain").build();
         }

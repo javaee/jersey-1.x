@@ -27,7 +27,7 @@ import com.sun.ws.rest.api.client.ClientResponse;
 import javax.ws.rs.GET;
 import javax.ws.rs.ProduceMime;
 import javax.ws.rs.Path;
-import javax.ws.rs.core.HttpContext;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Request;
 import javax.ws.rs.core.UriInfo;
 
@@ -43,7 +43,7 @@ public class InheritanceTest extends AbstractResourceTester {
     }
 
     static public abstract class SuperResource {
-        @HttpContext UriInfo info;
+        @Context UriInfo info;
         
         @GET
         @ProduceMime("application/super")
@@ -55,7 +55,7 @@ public class InheritanceTest extends AbstractResourceTester {
     
     @Path("/")
     static public class SubResource extends SuperResource { 
-        @HttpContext Request request;
+        @Context Request request;
         
         @GET
         @ProduceMime("application/sub")

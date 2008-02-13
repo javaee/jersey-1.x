@@ -26,7 +26,7 @@ import com.sun.ws.rest.impl.AbstractResourceTester;
 import java.net.URI;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
-import javax.ws.rs.core.HttpContext;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
@@ -44,7 +44,7 @@ public class WebResorceWithParameterInjectionTest extends AbstractResourceTester
     @Path("/{arg1}/{arg2}")
     public static class TestParameterInjectedUriInfo {
         @GET
-        public String doGet(@HttpContext UriInfo uriInfo) {
+        public String doGet(@Context UriInfo uriInfo) {
             URI baseUri = uriInfo.getBaseUri();
             URI uri = uriInfo.getAbsolutePath();
             assertEquals(BASE_URI, baseUri);
@@ -57,7 +57,7 @@ public class WebResorceWithParameterInjectionTest extends AbstractResourceTester
     @Path("/{arg1}/{arg2}")
     public static class TestParameterInjectedHttpHeaders {
         @GET
-        public String doGet(@HttpContext HttpHeaders httpHeaders) {
+        public String doGet(@Context HttpHeaders httpHeaders) {
             String value = httpHeaders.getRequestHeaders().getFirst("X-TEST");
             assertEquals("TEST", value);
             return "GET";
@@ -67,7 +67,7 @@ public class WebResorceWithParameterInjectionTest extends AbstractResourceTester
     @Path("/{arg1}/{arg2}")
     public static class TestParameterInjectedUriInfoHttpHeaders {
         @GET
-        public String doGet(@HttpContext UriInfo uriInfo, @HttpContext HttpHeaders httpHeaders) {
+        public String doGet(@Context UriInfo uriInfo, @Context HttpHeaders httpHeaders) {
             String value = httpHeaders.getRequestHeaders().getFirst("X-TEST");
             assertEquals("TEST", value);
             

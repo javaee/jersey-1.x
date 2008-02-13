@@ -36,7 +36,7 @@ public class NotFoundException extends WebApplicationException {
      * Create a HTTP 404 (Not Found) exception.
      */
     public NotFoundException() {
-        super(Responses.notFound());
+        super(Responses.notFound().build());
     }
     
     /**

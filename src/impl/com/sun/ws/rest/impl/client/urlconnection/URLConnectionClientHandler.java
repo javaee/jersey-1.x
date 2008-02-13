@@ -36,7 +36,7 @@ import java.net.ProtocolException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import javax.ws.rs.core.HttpContext;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.ext.MessageBodyWriter;
@@ -103,7 +103,7 @@ public final class URLConnectionClientHandler implements ClientHandler {
         }
     }
 
-    @HttpContext private MessageBodyContext bodyContext;
+    @Context private MessageBodyContext bodyContext;
     
     // ClientHandler
     

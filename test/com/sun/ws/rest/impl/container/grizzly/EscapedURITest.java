@@ -26,7 +26,7 @@ import com.sun.ws.rest.api.client.Client;
 import javax.ws.rs.Path;
 import com.sun.ws.rest.api.client.ResourceProxy;
 import javax.ws.rs.GET;
-import javax.ws.rs.core.HttpContext;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.UriInfo;
 import junit.framework.*;
 
@@ -38,7 +38,7 @@ public class EscapedURITest extends AbstractGrizzlyServerTester {
     @Path(value="x%20y", encode=false)
     public static class EscapedURIResource {
         @GET
-        public String get(@HttpContext UriInfo info) {
+        public String get(@Context UriInfo info) {
             assertEquals(CONTEXT + "/x%20y", info.getAbsolutePath().getRawPath());
             assertEquals(CONTEXT + "/", info.getBaseUri().getRawPath());
             assertEquals("x y", info.getPath());

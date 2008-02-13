@@ -40,7 +40,7 @@ import java.net.URI;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import javax.ws.rs.core.HttpContext;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.ext.MessageBodyWriter;
@@ -52,7 +52,7 @@ import javax.ws.rs.ext.RuntimeDelegate.HeaderDelegate;
  * @author Paul.Sandoz@Sun.Com
  */
 public class TestResourceClientHandler implements ClientHandler {
-    @HttpContext private MessageBodyContext bodyContext;
+    @Context private MessageBodyContext bodyContext;
     
     private final WebApplication w;
     

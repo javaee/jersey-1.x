@@ -26,7 +26,7 @@ import com.sun.ws.rest.impl.AbstractResourceTester;
 import javax.ws.rs.GET;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Path;
-import javax.ws.rs.core.HttpContext;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.UriInfo;
 
 /**
@@ -45,7 +45,7 @@ public class ConstructorParamsTest extends AbstractResourceTester {
         private String id;
         private UriInfo info;
         
-        public TestOneWebResourceBean(@PathParam("id") String id, @HttpContext UriInfo info) {
+        public TestOneWebResourceBean(@PathParam("id") String id, @Context UriInfo info) {
             this.id = id;
             this.info = info;
         }

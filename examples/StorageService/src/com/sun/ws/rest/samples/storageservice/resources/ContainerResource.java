@@ -35,7 +35,7 @@ import javax.ws.rs.ProduceMime;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
-import javax.ws.rs.core.HttpContext;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Request;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
@@ -46,8 +46,8 @@ import javax.ws.rs.core.UriInfo;
  */
 @ProduceMime("application/xml")
 public class ContainerResource {
-    @HttpContext UriInfo uriInfo;
-    @HttpContext Request request;
+    @Context UriInfo uriInfo;
+    @Context Request request;
     String container;
     
     ContainerResource(UriInfo uriInfo, Request request, String container) {

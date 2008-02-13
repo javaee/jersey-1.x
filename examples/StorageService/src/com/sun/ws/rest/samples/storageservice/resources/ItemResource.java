@@ -35,11 +35,12 @@ import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.PUT;
 import javax.ws.rs.core.EntityTag;
-import javax.ws.rs.core.HttpContext;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Request;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.ResponseBuilder;
 import javax.ws.rs.core.UriInfo;
 
 /**
@@ -69,9 +70,9 @@ public class ItemResource {
             throw new NotFoundException("Item not found");
         Date lastModified = i.getLastModified().getTime();
         EntityTag et = new EntityTag(i.getDigest());
-        Response r = request.evaluatePreconditions(lastModified, et);
-        if (r != null)
-            return r;
+        ResponseBuilder rb = request.evaluatePreconditions(lastModified, et);
+        if (rb != null)
+            return rb.build();
             
         byte[] b = MemoryStore.MS.getItemData(container, item);
         return Response.ok(b, i.getMimeType()).
@@ -80,7 +81,7 @@ public class ItemResource {
     
     @PUT
     public Response putItem(
-            @HttpContext HttpHeaders headers,
+            @Context HttpHeaders headers,
             byte[] data) {
         System.out.println("PUT ITEM " + container + " " + item);
         

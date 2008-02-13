@@ -31,7 +31,7 @@ import javax.ws.rs.GET;
 import javax.ws.rs.ProduceMime;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
-import javax.ws.rs.core.HttpContext;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
 import org.codehaus.jettison.json.JSONArray;
@@ -45,7 +45,7 @@ import org.codehaus.jettison.json.JSONArray;
 //@Views({"index.jsp"})
 public class UsersResource {
     
-    @HttpContext UriInfo uriInfo;    
+    @Context UriInfo uriInfo;    
 
     @PersistenceUnit(unitName = "BookmarkPU")
     EntityManagerFactory emf;

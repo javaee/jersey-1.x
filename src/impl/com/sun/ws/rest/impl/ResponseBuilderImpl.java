@@ -35,6 +35,7 @@ import javax.ws.rs.core.EntityTag;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.NewCookie;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.ResponseBuilder;
 import javax.ws.rs.core.Variant;
 
 /**
@@ -96,8 +97,15 @@ public final class ResponseBuilderImpl extends Response.ResponseBuilder {
 
     // Response.Builder
     
-    // public ResponseBuilderImpl() { }
+    public ResponseBuilderImpl() { }
         
+    private ResponseBuilderImpl(ResponseBuilderImpl that) {
+        this.entity = that.entity;
+        this.values = that.values.clone();
+        if (that.nameValuePairs != null)
+            this.nameValuePairs = new ArrayList<Object>(that.nameValuePairs);    
+    }
+    
     public Response build() {
         Response r = new ResponseImpl(status, entity, 
                 (values != null) ? values : EMPTY_VALUES, 
@@ -113,6 +121,10 @@ public final class ResponseBuilderImpl extends Response.ResponseBuilder {
         nameValuePairs = null;
     }
 
+    @Override
+    public ResponseBuilder clone() {
+        return new ResponseBuilderImpl(this);
+    }
     
     public Response.ResponseBuilder status(int status) {
         this.status = status;

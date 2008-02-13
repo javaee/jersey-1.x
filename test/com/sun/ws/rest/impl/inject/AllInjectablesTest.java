@@ -30,7 +30,7 @@ import com.sun.ws.rest.spi.resource.Singleton;
 import java.io.IOException;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
-import javax.ws.rs.core.HttpContext;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.Request;
 import javax.ws.rs.core.UriInfo;
@@ -47,17 +47,17 @@ public class AllInjectablesTest extends AbstractResourceTester {
 
     @Path("/")
     public static class PerRequestContextResource {
-        @HttpContext ResourceConfig rc;
+        @Context ResourceConfig rc;
         
-        @HttpContext MessageBodyContext mbc;
+        @Context MessageBodyContext mbc;
         
-        @HttpContext HttpContextAccess hca;
+        @Context HttpContextAccess hca;
         
-        @HttpContext HttpHeaders hs;
+        @Context HttpHeaders hs;
         
-        @HttpContext UriInfo ui;
+        @Context UriInfo ui;
         
-        @HttpContext Request r;
+        @Context Request r;
         
         @GET
         public String get() {
@@ -74,17 +74,17 @@ public class AllInjectablesTest extends AbstractResourceTester {
     @Path("/")
     @Singleton
     public static class SingletonContextResource {
-        @HttpContext ResourceConfig rc;
+        @Context ResourceConfig rc;
         
-        @HttpContext MessageBodyContext mbc;
+        @Context MessageBodyContext mbc;
         
-        @HttpContext HttpContextAccess hca;
+        @Context HttpContextAccess hca;
         
-        @HttpContext HttpHeaders hs;
+        @Context HttpHeaders hs;
         
-        @HttpContext UriInfo ui;
+        @Context UriInfo ui;
         
-        @HttpContext Request r;
+        @Context Request r;
         
         @GET
         public String get() {

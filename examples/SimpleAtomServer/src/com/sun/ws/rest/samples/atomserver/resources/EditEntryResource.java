@@ -33,7 +33,7 @@ import javax.ws.rs.ConsumeMime;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
-import javax.ws.rs.core.HttpContext;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
@@ -97,7 +97,7 @@ public class EditEntryResource extends EntryResource {
     @PUT
     @Path("media")
     @ConsumeMime("*/*")
-    public void putMedia(@HttpContext HttpHeaders headers,
+    public void putMedia(@Context HttpHeaders headers,
             byte[] update) throws IOException, FeedException {
         // Check if media exists, otherwise 404
         String mediaPath = AtomStore.getMediaPath(entryId);

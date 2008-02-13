@@ -108,9 +108,9 @@ public final class HttpMethodRule implements UriRule {
             if (!httpMethod.equals("HEAD"))
                 verifyResponse(method, accept, response);                        
         } else if (s == MatchStatus.NO_MATCH_FOR_CONSUME) {
-            response.setResponse(Responses.unsupportedMediaType());
+            response.setResponse(Responses.unsupportedMediaType().build());
         } else if (s == MatchStatus.NO_MATCH_FOR_PRODUCE) {
-            response.setResponse(Responses.notAcceptable());
+            response.setResponse(Responses.notAcceptable().build());
         }
         
         return true;

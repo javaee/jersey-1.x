@@ -27,7 +27,7 @@ import javax.ws.rs.Path;
 import com.sun.ws.rest.api.client.ResourceProxy;
 import java.io.IOException;
 import javax.ws.rs.GET;
-import javax.ws.rs.core.HttpContext;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.UriInfo;
 
 /**
@@ -42,7 +42,7 @@ public class EmptyRootResourcePath extends AbstractResourceTester {
 
     @Path("")
     public static class VirtualResource {
-        @HttpContext UriInfo uriInfo;
+        @Context UriInfo uriInfo;
         
         public @Path("one") Object getOne() {
             return new SubResource(uriInfo.getPath());
@@ -67,7 +67,7 @@ public class EmptyRootResourcePath extends AbstractResourceTester {
     
     @Path("absolute")
     public static class AbsoluteResource {
-        @HttpContext UriInfo uriInfo;
+        @Context UriInfo uriInfo;
         
         public @GET String get() {
             return uriInfo.getPath();

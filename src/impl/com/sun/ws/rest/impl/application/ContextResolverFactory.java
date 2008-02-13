@@ -33,7 +33,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.logging.Logger;
-import javax.ws.rs.core.HttpContext;
+import javax.ws.rs.core.Context;
 
 /**
  *
@@ -43,7 +43,7 @@ public final class ContextResolverFactory {
     private static final Logger LOGGER = Logger.getLogger(ContextResolverFactory.class.getName());
     
     private static final class ContextResolverInjectable 
-            extends Injectable<HttpContext, ContextResolver> {
+            extends Injectable<Context, ContextResolver> {
         
         private final ContextResolver cr;
                 
@@ -51,17 +51,17 @@ public final class ContextResolverFactory {
             this.cr = cr;
         }
         
-        public Class<HttpContext> getAnnotationClass() {
-            return HttpContext.class;
+        public Class<Context> getAnnotationClass() {
+            return Context.class;
         }
 
-        public ContextResolver getInjectableValue(HttpContext a) {
+        public ContextResolver getInjectableValue(Context a) {
             return cr;
         }
     }
     
-    private final Map<Type, Injectable<HttpContext, ContextResolver>> injectables = 
-                new HashMap<Type, Injectable<HttpContext, ContextResolver>>();
+    private final Map<Type, Injectable<Context, ContextResolver>> injectables = 
+                new HashMap<Type, Injectable<Context, ContextResolver>>();
     
     public ContextResolverFactory(ComponentProviderCache componentProviderCache) {
         // Get the application-defined provider classes that implement ContextResolver
@@ -83,7 +83,7 @@ public final class ContextResolverFactory {
     }
 
     
-    public Map<Type, Injectable<HttpContext, ContextResolver>> getInjectables() {
+    public Map<Type, Injectable<Context, ContextResolver>> getInjectables() {
         return injectables;
     }
     

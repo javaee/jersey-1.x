@@ -31,7 +31,7 @@ import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
-import javax.ws.rs.core.HttpContext;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
@@ -48,7 +48,7 @@ public class WebResorceWithFieldInjectionTest extends AbstractResourceTester {
     
     @Path("/{arg1}/{arg2}")
     public static class TestFieldInjectedHttpContextAccess {
-        private @HttpContext HttpContextAccess context;
+        private @Context HttpContextAccess context;
         
         @POST
         public String doPost(String in) {
@@ -83,7 +83,7 @@ public class WebResorceWithFieldInjectionTest extends AbstractResourceTester {
     
     @Path("/{arg1}/{arg2}")
     public static class TestFieldInjectedUriInfo {
-        private @HttpContext UriInfo uriInfo;
+        private @Context UriInfo uriInfo;
         
         @GET
         public String doGet() {
@@ -97,7 +97,7 @@ public class WebResorceWithFieldInjectionTest extends AbstractResourceTester {
     
     @Path("/{arg1}/{arg2}")
     public static class TestFieldInjectedHttpHeaders {
-        private @HttpContext HttpHeaders httpHeaders;
+        private @Context HttpHeaders httpHeaders;
         
         @GET
         public String doGet() {
