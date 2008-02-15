@@ -40,7 +40,7 @@ import javax.ws.rs.core.MultivaluedMap;
 public final class FileProvider extends AbstractTypeEntityProvider<File> {
     
     public boolean supports(Class type) {
-        return type == File.class;
+        return File.class.isAssignableFrom(type);
     }
 
     public File readFrom(Class<File> type, MediaType mediaType,
