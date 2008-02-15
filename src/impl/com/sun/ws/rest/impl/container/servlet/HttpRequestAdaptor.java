@@ -27,6 +27,7 @@ import com.sun.ws.rest.api.uri.UriComponent;
 import com.sun.ws.rest.spi.container.AbstractContainerRequest;
 import com.sun.ws.rest.spi.container.MessageBodyContext;
 import java.io.IOException;
+import java.security.Principal;
 import java.util.Enumeration;
 import java.util.LinkedList;
 import java.util.List;
@@ -43,7 +44,6 @@ public final class HttpRequestAdaptor extends AbstractContainerRequest {
     
     private final HttpServletRequest request;
     
-    /** Creates a new instance of HttpRequestAdaptor */
     public HttpRequestAdaptor(MessageBodyContext bodyContext, 
             HttpServletRequest request) throws IOException {
         super(bodyContext, request.getMethod(), request.getInputStream());
@@ -75,10 +75,12 @@ public final class HttpRequestAdaptor extends AbstractContainerRequest {
             ? request.getContextPath() + request.getServletPath() + "/"
             : request.getContextPath() + "/";
         
-        final String encodedBasePath = UriComponent.encode(decodedBasePath, UriComponent.Type.PATH);
+        final String encodedBasePath = UriComponent.encode(decodedBasePath, 
+                UriComponent.Type.PATH);
         
         if (!decodedBasePath.equals(encodedBasePath)) {
-            throw new ContainerException("The servlet context path and or the servlet path contain characters that are percent enocded");
+            throw new ContainerException("The servlet context path and/or the " +
+                    "servlet path contain characters that are percent enocded");
         }
         
         String queryParameters = request.getQueryString();
@@ -114,5 +116,27 @@ public final class HttpRequestAdaptor extends AbstractContainerRequest {
                 cookies.put(c.getName(), _c);
             }
         }
+    }
+
+    // SecurityContext
+    
+    @Override
+    public Principal getUserPrincipal() {
+        return request.getUserPrincipal();
+    }
+    
+    @Override
+    public boolean isUserInRole(String role) {
+        return request.isUserInRole(role);
+    }
+    
+    @Override
+    public boolean isSecure() {
+        return request.isSecure();
+    }
+    
+    @Override
+    public String getAuthenticationScheme() {
+        return request.getAuthType();
     }
 }

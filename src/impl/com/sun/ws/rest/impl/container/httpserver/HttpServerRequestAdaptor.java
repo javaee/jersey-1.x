@@ -25,6 +25,7 @@ package com.sun.ws.rest.impl.container.httpserver;
 import com.sun.net.httpserver.Headers;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpServer;
+import com.sun.net.httpserver.HttpsExchange;
 import com.sun.net.httpserver.HttpsServer;
 import com.sun.ws.rest.spi.container.AbstractContainerRequest;
 import com.sun.ws.rest.impl.http.header.HttpHeaderFactory;
@@ -33,6 +34,7 @@ import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.security.Principal;
 import java.util.List;
 import java.util.Map.Entry;
 import javax.ws.rs.core.MultivaluedMap;
@@ -118,5 +120,30 @@ public final class HttpServerRequestAdaptor extends AbstractContainerRequest {
                 }
             }
         }
+    }    
+    
+    // SecurityContext
+    
+    @Override
+    public Principal getUserPrincipal() {
+        return exchange.getPrincipal();
+    }
+    
+    @Override
+    public boolean isUserInRole(String role) {
+        // TODO how to support roles with LW HTTP server?
+        // This most likely requires specialized container support
+        return false;
+    }
+    
+    @Override
+    public boolean isSecure() {
+        return exchange instanceof HttpsExchange;
+    }
+    
+    @Override
+    public String getAuthenticationScheme() {
+        // TODO the authentication scheme cannot be obtained
+        return null;
     }    
 }

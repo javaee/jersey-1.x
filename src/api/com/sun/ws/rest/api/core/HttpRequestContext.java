@@ -26,12 +26,14 @@ import java.util.List;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Request;
+import javax.ws.rs.core.SecurityContext;
 import javax.ws.rs.core.UriInfo;
 
 /**
  * An abstraction for a HTTP request
  */
-public interface HttpRequestContext extends HttpHeaders, UriInfo, Request {
+public interface HttpRequestContext extends HttpHeaders, UriInfo, 
+        Request, SecurityContext {
     
     /**
      * Get a HTTP header value.

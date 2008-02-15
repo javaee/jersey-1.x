@@ -33,6 +33,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.Request;
+import javax.ws.rs.core.SecurityContext;
 import javax.ws.rs.core.UriInfo;
 
 /**
@@ -59,6 +60,8 @@ public class AllInjectablesTest extends AbstractResourceTester {
         
         @Context Request r;
         
+        @Context SecurityContext sc;
+        
         @GET
         public String get() {
             assertNotNull(rc);
@@ -67,6 +70,7 @@ public class AllInjectablesTest extends AbstractResourceTester {
             assertNotNull(hs);
             assertNotNull(ui);
             assertNotNull(r);
+            assertNotNull(sc);
             return "GET";
         }                
     }

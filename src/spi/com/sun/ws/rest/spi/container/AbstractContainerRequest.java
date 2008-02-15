@@ -32,6 +32,7 @@ import com.sun.ws.rest.impl.model.HttpHelper;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
+import java.security.Principal;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Date;
@@ -578,4 +579,23 @@ public abstract class AbstractContainerRequest implements ContainerRequest {
         
         return null;
     }
+    
+    // SecurityContext
+    
+    public Principal getUserPrincipal() {
+        throw new UnsupportedOperationException();
+    }
+    
+    public boolean isUserInRole(String role) {
+        throw new UnsupportedOperationException();
+    }
+    
+    public boolean isSecure() {
+        throw new UnsupportedOperationException();
+    }
+    
+    public String getAuthenticationScheme() {
+        throw new UnsupportedOperationException();
+    }
+    
 }

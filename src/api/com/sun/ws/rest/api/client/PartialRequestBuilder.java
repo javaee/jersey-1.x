@@ -34,6 +34,7 @@ import javax.ws.rs.core.MultivaluedMap;
  * @param T the type than implements {@link RequestBuilder}.
  * @author Paul.Sandoz@Sun.Com
  */
+@SuppressWarnings("unchecked")
 public abstract class PartialRequestBuilder<T extends RequestBuilder> 
         implements RequestBuilder<T> {
 

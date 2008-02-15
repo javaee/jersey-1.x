@@ -79,6 +79,7 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.Request;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.SecurityContext;
 import javax.ws.rs.core.UriInfo;
 import javax.ws.rs.ext.Provider;
 
@@ -103,6 +104,8 @@ public final class WebApplicationImpl implements WebApplication {
     private final UriInfo uriInfoProxy;
     
     private final Request requestProxy;
+    
+    private final SecurityContext securityContextProxy; 
     
     private final Map<Type, Injectable> injectables;
             
@@ -129,6 +132,7 @@ public final class WebApplicationImpl implements WebApplication {
         this.httpHeadersProxy = createProxy(HttpHeaders.class, i);
         this.uriInfoProxy = createProxy(UriInfo.class, i);
         this.requestProxy = createProxy(Request.class, i);
+        this.securityContextProxy = createProxy(SecurityContext.class, i);
         
         this.injectables = createInjectables();
     }
@@ -534,6 +538,14 @@ public final class WebApplicationImpl implements WebApplication {
                 }
             );
 
+        is.put(SecurityContext.class,
+                new HttpContextInjectable<SecurityContext>() {
+                    public SecurityContext getInjectableValue(Context c) {
+                        return securityContextProxy;
+                    }
+                }
+            );
+            
         return is;
     }
 
