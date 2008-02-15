@@ -553,7 +553,8 @@ public final class WebApplicationImpl implements WebApplication {
             e.printStackTrace(pw);
             pw.flush();
 
-            r = Response.ok(sw.toString(), "text/plain").build();
+            r = Response.status(r.getStatus()).entity(sw.toString()).
+                    type("text/plain").build();
         }
         response.setResponse(r);
     }

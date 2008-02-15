@@ -27,6 +27,8 @@ import com.sun.ws.rest.api.container.ContainerException;
 import com.sun.ws.rest.api.client.ClientResponse;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.WebApplicationException;
 
 /**
  *
@@ -83,4 +85,28 @@ public class ExceptionTest extends AbstractResourceTester {
         }
         assertEquals(true, caught);
     }
+    
+    @Path("/exception/webapplication/{status}")
+    static public class ExceptionWebApplicationResource { 
+        @GET
+        public String get(@PathParam("status") int status) {
+            throw new WebApplicationException(status);
+        }
+    }
+    
+    public void test400StatusCode() {
+        initiateWebApplication(ExceptionWebApplicationResource.class);
+
+        ClientResponse cr = resourceProxy("/exception/webapplication/400", false).
+                get(ClientResponse.class);        
+        assertEquals(400, cr.getStatus());
+    }
+    
+    public void test500StatusCode() {
+        initiateWebApplication(ExceptionWebApplicationResource.class);
+
+        ClientResponse cr = resourceProxy("/exception/webapplication/500", false).
+                get(ClientResponse.class);        
+        assertEquals(500, cr.getStatus());
+    }   
 }
