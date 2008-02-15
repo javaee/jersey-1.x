@@ -1,4 +1,6 @@
 release 0.6 (2008-03-07)
+- Fixed issue 41: WebApplicationException(500) returning response code 2
+  https://jersey.dev.java.net/issues/show_bug.cgi?id=41
 - The default values for the following resource configuration features are
   now false: URI normalization, URI path canonicalization and URI redirection.
   This means by default no automatic redirection will be performed.
