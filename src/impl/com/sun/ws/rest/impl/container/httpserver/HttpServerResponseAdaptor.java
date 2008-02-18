@@ -73,6 +73,8 @@ public final class HttpServerResponseAdaptor extends AbstractContainerResponse {
     
     /* package */ void commitAll() throws IOException {
         if (isCommitted()) {
+            exchange.getResponseBody().flush();
+            exchange.getResponseBody().close();
             exchange.close();        
             return;
         }
@@ -88,6 +90,7 @@ public final class HttpServerResponseAdaptor extends AbstractContainerResponse {
         }
         // This is required for the LW HTTP server shipped with Java SE 6
         // exchange.close() does not work as documented
+        exchange.getResponseBody().flush();
         exchange.getResponseBody().close();
         exchange.close();        
     }

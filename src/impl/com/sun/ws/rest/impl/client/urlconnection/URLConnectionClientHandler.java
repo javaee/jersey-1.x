@@ -118,8 +118,6 @@ public final class URLConnectionClientHandler implements ClientHandler {
     private ClientResponse _invoke(ClientRequest ro) 
             throws ProtocolException, IOException {
         HttpURLConnection uc = (HttpURLConnection)ro.getURI().toURL().openConnection();
-
-        // uc.setReadTimeout(5000);
         
         // Set the request method
         uc.setRequestMethod(ro.getMethod());
@@ -131,7 +129,7 @@ public final class URLConnectionClientHandler implements ClientHandler {
         Object entity = ro.getEntity();
         if (entity != null) {
             uc.setDoOutput(true);
-            writeEntity(ro.getMetadata(), entity, uc.getOutputStream());
+            writeEntity(uc, ro.getMetadata(), entity);
         }
         
         // Return the in-bound response
@@ -165,8 +163,8 @@ public final class URLConnectionClientHandler implements ClientHandler {
     }
     
     @SuppressWarnings("unchecked")
-    private void writeEntity(MultivaluedMap<String, Object> metadata, Object entity, 
-            OutputStream out) throws IOException {
+    private void writeEntity(HttpURLConnection uc, 
+            MultivaluedMap<String, Object> metadata, Object entity) throws IOException {
         MediaType mediaType = null;
         final Object mediaTypeHeader = metadata.getFirst("Content-Type");
         if (mediaTypeHeader instanceof MediaType) {
@@ -181,8 +179,19 @@ public final class URLConnectionClientHandler implements ClientHandler {
                 
         final MessageBodyWriter p = bodyContext.
                 getMessageBodyWriter(entity.getClass(), mediaType);
-        p.writeTo(entity, mediaType, metadata, out);
         
+        final long size = p.getSize(entity);
+        if (size != -1 && size < Integer.MAX_VALUE) {
+            // HttpURLConnection uses the int type for content length
+            uc.setFixedLengthStreamingMode((int)size);
+        } else {
+            // TODO it appears HttpURLConnection has some bugs in
+            // chunked encoding
+            // uc.setChunkedStreamingMode(0);
+        }
+        
+        final OutputStream out = uc.getOutputStream();
+        p.writeTo(entity, mediaType, metadata, out);        
         out.flush();
         out.close();
     }
