@@ -1,4 +1,9 @@
 release 0.6 (2008-03-07)
+- A sub-resource locator can now return a Class instance, that will be
+  instantiated using a ComponentProvider, using the life-cycle rules for
+  resource classes.
+- The HttpURLConnection client implementation sets the content
+  length (if known) when sending a request so as to avoid buffering.
 - Fixed issue 41: WebApplicationException(500) returning response code 2
   https://jersey.dev.java.net/issues/show_bug.cgi?id=41
 - The default values for the following resource configuration features are
