@@ -22,6 +22,7 @@
 
 package com.sun.ws.rest.spi.service;
 
+import com.sun.ws.rest.spi.SpiMessages;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -39,9 +40,6 @@ import java.util.Set;
 import java.util.TreeSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import com.sun.ws.rest.spi.SpiMessages;
-import com.sun.ws.rest.spi.Constants;
 
 
 /**
@@ -129,8 +127,9 @@ import com.sun.ws.rest.spi.Constants;
  * @since 1.3
  */
 public final class ServiceFinder<T> implements Iterable<T> {
+    private static final Logger LOGGER = Logger.getLogger(ServiceFinder.class.getName());
     
-    private static final String prefix = "META-INF/services/";
+    private static final String PREFIX = "META-INF/services/";
     
     private static final ComponentProvider DEFAULT_COMPONENT_PROVIDER = new ComponentProvider() {
         public Object getInstance(Scope scope, Class c) 
@@ -154,7 +153,6 @@ public final class ServiceFinder<T> implements Iterable<T> {
     private final boolean ignoreOnClassNotFound;
     private final ComponentProvider componentProvider;
     
-    private static final Logger logger = Logger.getLogger(Constants.SPI_LOGGER_ID);
     
     /**
      * Locates and incrementally instantiates the available providers of a
@@ -496,7 +494,7 @@ public final class ServiceFinder<T> implements Iterable<T> {
             }
             if (configs == null) {
                 try {
-                    String fullName = prefix + service.getName();
+                    String fullName = PREFIX + service.getName();
                     if (loader == null)
                         configs = ClassLoader.getSystemResources(fullName);
                     else
@@ -519,17 +517,17 @@ public final class ServiceFinder<T> implements Iterable<T> {
                         Class.forName(nextName, true, loader);
                     } catch (ClassNotFoundException ex) {
                         // Provider implementation not found
-                        if(logger.isLoggable(Level.WARNING)) {
-                            logger.log(Level.WARNING, 
+                        if(LOGGER.isLoggable(Level.WARNING)) {
+                            LOGGER.log(Level.WARNING, 
                                     SpiMessages.PROVIDER_NOT_FOUND(nextName, service));
                         }
                         nextName = null;
                     } catch (NoClassDefFoundError ex) {
                         // Dependent class of provider not found
-                        if(logger.isLoggable(Level.WARNING)) {
+                        if(LOGGER.isLoggable(Level.WARNING)) {
                             // This assumes that ex.getLocalizedMessage() returns
                             // the name of a dependent class that is not found
-                            logger.log(Level.WARNING , 
+                            LOGGER.log(Level.WARNING , 
                                     SpiMessages.DEPENDENT_CLASS_OF_PROVIDER_NOT_FOUND(
                                     ex.getLocalizedMessage(), nextName, service));
                         }
