@@ -26,7 +26,25 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 
 /**
- *
+ * A provider for the instantiation and management of components.
+ * <p>
+ * The runtime will defer to a registered component provider (if present)
+ * for every component (application-defined or infrastructure-defined) that
+ * needs to be instantiated. If the component provider does
+ * not support the requested component it should return a null value and the
+ * runtime will attempt to directly instantiate and manage the component.
+ * <p>
+ * A {@link ComponentProvider} instance may be registed by passing the 
+ * instance to the 
+ * {@link com.sun.ws.rest.spi.container.WebApplication#initiate(com.sun.ws.rest.api.core.ResourceConfig, ComponentProvider)}
+ * method.
+ * <p>
+ * Applications may extend the {@link com.sun.ws.rest.spi.container.servlet.ServletContainer}
+ * and override the method {@link com.sun.ws.rest.spi.container.servlet.ServletContainer#initiate(ResourceConfig, WebApplication)}
+ * to initiate the {@link com.sun.ws.rest.spi.container.WebApplication} with the {@link ComponentProvider} instance.
+ * 
+ * @see com.sun.ws.rest.spi.container.WebApplication
+ * @see com.sun.ws.rest.spi.container.servlet.ServletContainer
  * @author Paul.Sandoz@Sun.Com
  */
 public interface ComponentProvider {
@@ -56,7 +74,8 @@ public interface ComponentProvider {
      * 
      * @param scope the scope of the instance
      * @param c the class
-     * @return the instance
+     * @return the instance, or null if the component cannot be instantaited
+     *         and managed.
      * 
      * @throws java.lang.InstantiationException
      * @throws java.lang.IllegalAccessException
@@ -76,7 +95,8 @@ public interface ComponentProvider {
      * @param scope the scope of the instance
      * @param contructor the constructor to instantiate the class
      * @param parameters the array parameter values passed to the constructor
-     * @return the instance
+     * @return the instance, or null if the component cannot be instantaited
+     *         and managed.
      * 
      * @throws java.lang.InstantiationException
      * @throws java.lang.IllegalArgumentException 
@@ -88,7 +108,7 @@ public interface ComponentProvider {
             IllegalAccessException, InvocationTargetException;
 
     /**
-     * Perform injection on a an instance. This may be used when a
+     * Perform injection on an instance. This may be used when a
      * component is instantiated by means other than the component
      * provider.
      * 
