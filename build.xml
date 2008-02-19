@@ -241,7 +241,6 @@
             <sourcepath>
                 <pathelement location="${src.api.dir}"/>
                 <pathelement location="${src.spi.dir}"/>
-                <pathelement location="build/gen-src"/>
             </sourcepath>
             <packageset dir="${src.api.dir}" includes="*/**"/>
             <packageset dir="${src.spi.dir}" includes="*/**"/>
