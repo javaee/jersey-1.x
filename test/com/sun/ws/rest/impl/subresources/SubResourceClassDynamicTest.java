@@ -26,6 +26,7 @@ import com.sun.ws.rest.impl.AbstractResourceTester;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Path;
 import com.sun.ws.rest.impl.AbstractResourceTester;
+import com.sun.ws.rest.spi.resource.Singleton;
 import javax.ws.rs.GET;
 
 /**
@@ -93,36 +94,57 @@ public class SubResourceClassDynamicTest extends AbstractResourceTester {
     }    
     
     @Path("/{p}")
-    static public class ParentWithTemplatesConstructor { 
+    static public class ParentWithTemplatesLifecycle { 
         @GET
         public String getMe(@PathParam("p") String p) {
             return p;
         }
         
         @Path("child/{c}")
-        public Class<ChildWithTemplatesConstructor> getChildWithTemplates() {
-            return ChildWithTemplatesConstructor.class;
+        public Class<ChildWithTemplatesPerRequest> getChildWithTemplates() {
+            return ChildWithTemplatesPerRequest.class;
+        }
+        
+        @Path("child/singleton/{c}")
+        public Class<ChildWithTemplatesSingleton> getChildWithTemplatesSingleton() {
+            return ChildWithTemplatesSingleton.class;
         }
     }
     
-    static public class ChildWithTemplatesConstructor {
+    static public class ChildWithTemplatesPerRequest {
+        private int i = 0;
         private String c;
         
-        public ChildWithTemplatesConstructor(@PathParam("c") String c) {
+        public ChildWithTemplatesPerRequest(@PathParam("c") String c) {
             this.c = c;
         }
         
         @GET
         public String getMe() {
-            return c;
+            i++;
+            return c + i;
         }
     }
     
-    public void testSubResourceDynamicWithTemplatesConstructor() {
-        initiateWebApplication(ParentWithTemplatesConstructor.class);
+    @Singleton
+    static public class ChildWithTemplatesSingleton {
+        private int i = 0;
+        
+        @GET
+        public String getMe(@PathParam("c") String c) {
+            i++;
+            return c + i;
+        }
+    }
+    
+    public void testSubResourceDynamicWithTemplatesLifecycle() {
+        initiateWebApplication(ParentWithTemplatesLifecycle.class);
         
         assertEquals("parent", resourceProxy("/parent").get(String.class));
-        assertEquals("first", resourceProxy("/parent/child/first").get(String.class));
+        assertEquals("x1", resourceProxy("/parent/child/x").get(String.class));
+        assertEquals("x1", resourceProxy("/parent/child/x").get(String.class));
+        assertEquals("x1", resourceProxy("/parent/child/singleton/x").get(String.class));
+        assertEquals("x2", resourceProxy("/parent/child/singleton/x").get(String.class));
     }    
     
 }
