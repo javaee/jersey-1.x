@@ -23,9 +23,15 @@
 package com.sun.ws.rest.impl.provider.entity;
 
 import com.sun.ws.rest.impl.ImplMessages;
+import com.sun.ws.rest.impl.json.JSONJAXBContext;
+import com.sun.ws.rest.impl.json.JSONMarshaller;
+import com.sun.ws.rest.impl.json.JSONUnmarshaller;
+import com.sun.ws.rest.impl.json.reader.JsonXmlStreamReader;
+import com.sun.ws.rest.impl.json.writer.JsonXmlStreamWriter;
 import com.sun.ws.rest.impl.util.ThrowHelper;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import javax.ws.rs.ConsumeMime;
@@ -33,14 +39,10 @@ import javax.ws.rs.ProduceMime;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
-import javax.xml.stream.XMLStreamException;
-import org.codehaus.jettison.badgerfish.BadgerFishXMLStreamReader;
-import org.codehaus.jettison.badgerfish.BadgerFishXMLStreamWriter;
-import org.codehaus.jettison.json.JSONException;
-import org.codehaus.jettison.json.JSONObject;
 
 /**
  *
@@ -55,20 +57,18 @@ public final class JSONJAXBElementProvider extends AbstractJAXBElementProvider {
         try {
             JAXBContext context = getJAXBContext(type);
             Unmarshaller unmarshaller = context.createUnmarshaller();
-            return unmarshaller.unmarshal(
-                    new BadgerFishXMLStreamReader(
-                    new JSONObject(readFromAsString(entityStream))));
+            if (unmarshaller instanceof JSONUnmarshaller) {
+                unmarshaller.setProperty(JSONJAXBContext.JSON_ENABLED, Boolean.TRUE);
+                JAXBElement jaxbElem = (JAXBElement)((JSONUnmarshaller)unmarshaller).unmarshal(entityStream, type);
+                return jaxbElem.getValue();
+            } else {
+                return unmarshaller.unmarshal(new JsonXmlStreamReader(new InputStreamReader(entityStream)));
+//                return unmarshaller.unmarshal(new MappedXMLStreamReader(                                                      
+//                            new JSONObject(readFromAsString(entityStream))));
+            }
         } catch (JAXBException cause) {
             throw ThrowHelper.withInitCause(cause,
                     new IOException(ImplMessages.ERROR_MARSHALLING_JAXB(type))
-                    );
-        } catch (XMLStreamException xmlStreamException) {
-            throw ThrowHelper.withInitCause(xmlStreamException,
-                    new IOException(ImplMessages.ERROR_PARSING_JSON_OBJECT())
-                    );
-        } catch (JSONException jsonException) {
-            throw ThrowHelper.withInitCause(jsonException,
-                    new IOException(ImplMessages.ERROR_PARSING_JSON_OBJECT())
                     );
         }
     }
@@ -78,9 +78,14 @@ public final class JSONJAXBElementProvider extends AbstractJAXBElementProvider {
         try {
             JAXBContext context = getJAXBContext(t.getClass());
             Marshaller marshaller = context.createMarshaller();
-            marshaller.marshal(t, 
-                    new BadgerFishXMLStreamWriter(
-                    new OutputStreamWriter(entityStream)));
+            if (marshaller instanceof JSONMarshaller) {
+                marshaller.setProperty(JSONJAXBContext.JSON_ENABLED, Boolean.TRUE);
+                marshaller.marshal(t, entityStream);
+            } else {
+                marshaller.marshal(t, new JsonXmlStreamWriter(new OutputStreamWriter(entityStream)));
+//                marshaller.marshal(t,new MappedXMLStreamWriter(new MappedNamespaceConvention(),                      
+//                            new OutputStreamWriter(entityStream)) );
+            }
         } catch (JAXBException cause) {
             throw ThrowHelper.withInitCause(cause,
                     new IOException(ImplMessages.ERROR_MARSHALLING_JAXB(t.getClass()))

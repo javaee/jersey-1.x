@@ -411,4 +411,30 @@
          </maven-repository-importer>
      </target>
 
+    <!-- JSON lexical analyzer related tasks -->
+
+    <target name="-check-jflex-exists">
+	<available file="lib/aux/JFlex.jar" property="jflexAvailable"/>
+    </target>
+
+    <target name="-get-jflex" depends="-check-jflex-exists" unless="jflexAvailable">
+      <mkdir dir="lib/aux"/>
+      <get src="http://jflex.de/jflex-1.4.1.zip" dest="lib/aux/jflex.zip"/>
+      <unzip src="lib/aux/jflex.zip" dest="lib/aux">
+        <patternset>
+         <include name="jflex-1.4.1/lib/JFlex.jar"/>
+        </patternset>
+      </unzip>
+      <move file="lib/aux/jflex-1.4.1/lib/JFlex.jar" todir="lib/aux"/>
+      <delete dir="lib/aux/jflex-1.4.1" file="lib/aux/jflex.zip"/>
+    </target>
+
+    <target name="regenerate-json-lexer" depends="-get-jflex">
+      <java jar="lib/aux/JFlex.jar" fork="true">
+        <arg value="--nobak"/>
+        <arg value="-d"/>
+        <arg path="src/impl/com/sun/ws/rest/impl/json/reader"/>
+        <arg value="etc/json.flex"/>
+      </java>
+    </target>
 </project>
