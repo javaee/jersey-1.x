@@ -60,6 +60,7 @@ import javax.xml.bind.annotation.XmlType;
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "flightType", propOrder = {
+    "flightId",
     "company",
     "number",
     "aircraft"
@@ -71,7 +72,7 @@ public class FlightType {
     protected long number;
     @XmlElement(required = true)
     protected String aircraft;
-    @XmlAttribute
+    @XmlElement(required = true)
     protected String flightId;
 
     /**
