@@ -113,5 +113,8 @@
         <antcall target="convert-property">
             <param name="example" value="StorageService"/>
         </antcall>
+        <antcall target="convert-property">
+            <param name="example" value="jMakiBackend"/>
+        </antcall>
     </target>
 </project>
