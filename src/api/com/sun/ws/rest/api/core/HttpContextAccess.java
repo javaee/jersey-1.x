@@ -45,6 +45,11 @@ public interface HttpContextAccess {
     HttpResponseContext getHttpResponseContext();
     
     /**
+     * Get the current resource.
+     */
+    Object getCurrentResource();
+    
+    /**
      * Create a response that will forward the HTTP request to another component
      * within the same container for further processing.
      * @param path the path that identifies the component. The path may be relative or absolute,

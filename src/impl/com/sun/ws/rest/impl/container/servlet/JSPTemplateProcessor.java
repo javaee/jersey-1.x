@@ -22,53 +22,32 @@
 
 package com.sun.ws.rest.impl.container.servlet;
 
-import com.sun.ws.rest.api.container.ContainerException;
-import com.sun.ws.rest.api.core.HttpRequestContext;
+import com.sun.ws.rest.api.core.HttpContextAccess;
 import com.sun.ws.rest.api.core.HttpResponseContext;
-import com.sun.ws.rest.spi.view.ViewProvider;
-import com.sun.ws.rest.spi.view.View;
+import com.sun.ws.rest.spi.template.TemplateProcessor;
+import java.io.IOException;
+import java.io.OutputStream;
 import java.net.MalformedURLException;
 import javax.annotation.Resource;
 import javax.servlet.ServletContext;
-import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.ext.Provider;
 
 /**
- *
+ * A JSP template processor.
+ * 
  * @author Paul.Sandoz@Sun.Com
  */
-public class JSPViewProvider implements ViewProvider {
-    
+@Provider
+public class JSPTemplateProcessor implements TemplateProcessor {
     @Resource ServletContext servletContext;
-    
-    static final class JSPView implements View {
-        private final String path;
-        private final MediaType mediaType;
-        
-        JSPView(String path) {
-            this.path = path;
-            this.mediaType = new MediaType("text", "html");
-        }
-                
-        public void dispatch(Object it, 
-                HttpRequestContext request, HttpResponseContext response) {
-            ((HttpResponseAdaptor)response).forwardTo(path, it);                
-        }
 
-        public MediaType getProduceMime() {
-            return mediaType;
-        }
-    }
-    
-    public View createView(String absolutePath) throws ContainerException {
-        if (!absolutePath.endsWith(".jsp"))
-            return null;
-        
-        if (servletContext == null) {
-            throw new ContainerException("Java Server Pages not supported by the container");
-        }
-        
+    public String resolve(String path) {
+        if (!path.endsWith(".jsp"))
+            path = path + ".jsp";
+
         try {
-            if (servletContext.getResource(absolutePath) == null) {
+            if (servletContext.getResource(path) == null) {
                 // TODO log
                 return null;
             }
@@ -77,6 +56,13 @@ public class JSPViewProvider implements ViewProvider {
             return null;
         }
         
-        return new JSPView(absolutePath);
+        return path;        
+    }
+
+    @Context HttpContextAccess hca;
+    
+    public void writeTo(String resolvedPath, Object model, OutputStream out) throws IOException {
+        HttpResponseContext response = hca.getHttpResponseContext();
+        ((HttpResponseAdaptor)response).forwardTo(resolvedPath, model);
     }
 }

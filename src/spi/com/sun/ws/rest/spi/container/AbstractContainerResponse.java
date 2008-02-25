@@ -68,6 +68,8 @@ public abstract class AbstractContainerResponse implements ContainerResponse {
     
     private final ContainerRequest request;
     
+    private boolean responseSet;
+    
     private int status;
     
     private MultivaluedMap<String, Object> headers;
@@ -158,6 +160,8 @@ public abstract class AbstractContainerResponse implements ContainerResponse {
     }
     
     public final void setResponse(Response response, MediaType contentType) {
+        responseSet = true;
+        
         if (contentType == null)
             contentType = APPLICATION_OCTET_STREAM;
         
@@ -181,6 +185,10 @@ public abstract class AbstractContainerResponse implements ContainerResponse {
         } else {
             this.headers = setResponseNonOptimal(response, contentType);
         }
+    }
+    
+    public final boolean isResponseSet() {
+        return responseSet;
     }
     
     public final int getStatus() {

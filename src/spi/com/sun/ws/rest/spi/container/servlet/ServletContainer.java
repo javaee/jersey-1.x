@@ -240,6 +240,8 @@ public class ServletContainer extends HttpServlet {
                 ResourceConfig.FEATURE_NORMALIZE_URI);
         setResourceConfigFeature(servletConfig, rc, 
                 ResourceConfig.FEATURE_REDIRECT);
+        setResourceConfigFeature(servletConfig, rc, 
+                ResourceConfig.FEATURE_IMPLICIT_VIEWABLES);
     }
     
     private void setResourceConfigFeature(ServletConfig servletConfig, ResourceConfig rc, String feature) {

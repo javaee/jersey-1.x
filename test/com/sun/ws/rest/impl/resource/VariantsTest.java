@@ -47,7 +47,58 @@ public class VariantsTest extends AbstractResourceTester {
     }
 
     @Path("/")
-    public static class WebResource {
+    public static class LanguageVariantResource {
+        @GET
+        public Response doGet(@Context Request r) {
+            List<Variant> vs = Variant.VariantListBuilder.newInstance().
+                    languages("zh").
+                    languages("fr").
+                    languages("en").add().
+                    build();
+            
+            Variant v = r.selectVariant(vs);
+            if (v == null)
+                return Response.notAcceptable(vs).build();
+            else 
+                return Response.ok(v.getLanguage(), v).build();
+        }
+    }
+    
+    public void testGetLanguageEn() throws IOException {
+        initiateWebApplication(LanguageVariantResource.class);
+        ResourceProxy rp = resourceProxy("/");
+        
+        ClientResponse r = rp.
+                header("Accept-Language", "en").
+                get(ClientResponse.class);
+        assertEquals("en", r.getEntity(String.class));
+        assertEquals("en", r.getLangauge());
+    }
+    
+    public void testGetLanguageZh() throws IOException {
+        initiateWebApplication(LanguageVariantResource.class);
+        ResourceProxy rp = resourceProxy("/");
+        
+        ClientResponse r = rp.
+                header("Accept-Language", "zh").
+                get(ClientResponse.class);
+        assertEquals("zh", r.getEntity(String.class));
+        assertEquals("zh", r.getLangauge());
+    }
+    
+    public void testGetLanguageMultiple() throws IOException {
+        initiateWebApplication(LanguageVariantResource.class);
+        ResourceProxy rp = resourceProxy("/");
+        
+        ClientResponse r = rp.
+                header("Accept-Language", "en;q=0.3, zh;q=0.4, fr").
+                get(ClientResponse.class);
+        assertEquals("fr", r.getEntity(String.class));
+        assertEquals("fr", r.getLangauge());
+    }
+    
+    @Path("/")
+    public static class ComplexVariantResource {
         @GET
         public Response doGet(@Context Request r) {
             List<Variant> vs = Variant.VariantListBuilder.newInstance().
@@ -65,8 +116,8 @@ public class VariantsTest extends AbstractResourceTester {
         }
     }
     
-    public void testGet1() throws IOException {
-        initiateWebApplication(WebResource.class);
+    public void testGetComplex1() throws IOException {
+        initiateWebApplication(ComplexVariantResource.class);
         ResourceProxy rp = resourceProxy("/");
         
         ClientResponse r = rp.accept("text/xml",
@@ -83,8 +134,8 @@ public class VariantsTest extends AbstractResourceTester {
         assertEquals("en-us", r.getLangauge());
     }   
     
-    public void testGet2() throws IOException {
-        initiateWebApplication(WebResource.class);
+    public void testGetComplex2() throws IOException {
+        initiateWebApplication(ComplexVariantResource.class);
         ResourceProxy rp = resourceProxy("/");
         
         ClientResponse r = rp.accept("text/xml",
@@ -101,8 +152,8 @@ public class VariantsTest extends AbstractResourceTester {
         assertEquals("en", r.getLangauge());
     }
     
-    public void testGet3() throws IOException {
-        initiateWebApplication(WebResource.class);
+    public void testGetComplex3() throws IOException {
+        initiateWebApplication(ComplexVariantResource.class);
         ResourceProxy rp = resourceProxy("/");
         
         ClientResponse r = rp.accept("application/xml",
@@ -119,8 +170,8 @@ public class VariantsTest extends AbstractResourceTester {
         assertEquals("en-us", r.getLangauge());
     }   
     
-    public void testGetNotAcceptable() throws IOException {
-        initiateWebApplication(WebResource.class);
+    public void testGetComplexNotAcceptable() throws IOException {
+        initiateWebApplication(ComplexVariantResource.class);
         ResourceProxy rp = resourceProxy("/", false);
         
         ClientResponse r = rp.accept("application/atom+xml").

@@ -44,7 +44,7 @@ public class LinearMatchingTest extends AbstractMatchingTester {
             List<PatternRulePair<String>> l = new ArrayList<PatternRulePair<String>>();
             for (Map.Entry<PathPattern, String> e : rulesMap.entrySet())
                 l.add(new PatternRulePair<String>(e.getKey(), e.getValue()));            
-            return new LinearMatchingUriTemplateRules<String>(l);
+            return new AtomicMatchingPatterns<String>(l);
         }
     }
     

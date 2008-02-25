@@ -26,19 +26,12 @@ import com.sun.ws.rest.api.container.ContainerException;
 import com.sun.ws.rest.api.core.HttpContextAccess;
 import com.sun.ws.rest.api.core.HttpRequestContext;
 import com.sun.ws.rest.api.core.HttpResponseContext;
-import com.sun.ws.rest.api.model.AbstractResourceConstructor;
 import com.sun.ws.rest.impl.model.ResourceClass;
-import com.sun.ws.rest.impl.model.parameter.ParameterExtractor;
-import com.sun.ws.rest.impl.model.parameter.ParameterExtractorFactory;
-import com.sun.ws.rest.impl.view.ViewFactory;
-import com.sun.ws.rest.impl.view.ViewType;
 import com.sun.ws.rest.spi.container.ContainerRequest;
 import com.sun.ws.rest.spi.container.ContainerResponse;
 import com.sun.ws.rest.spi.uri.rules.UriRule;
 import com.sun.ws.rest.spi.uri.rules.UriRuleContext;
 import com.sun.ws.rest.spi.uri.rules.UriRules;
-import com.sun.ws.rest.spi.view.View;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import javax.ws.rs.core.Response;
@@ -72,19 +65,12 @@ import javax.ws.rs.core.Response;
         return response;
     }
     
+    public Object getCurrentResource() {
+        return it;
+    }
+    
     public Response createLocalForward(String path) throws ContainerException {
-        final View v = ViewFactory.createView(app.getComponentProvider(), path);
-        if (v == null) {
-            throw new ContainerException("No view for \"" + path + "\"");
-        }
-
-        ViewType vt = new ViewType() {
-            public void process() throws IOException, ContainerException {
-                v.dispatch(it, request, response);
-            }
-        };
-        
-        return Response.ok(vt, v.getProduceMime()).build();
+        throw new UnsupportedOperationException();
     }
 
     

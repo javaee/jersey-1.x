@@ -78,6 +78,19 @@ public interface ResourceConfig {
             = "com.sun.ws.rest.config.feature.IgnoreMatrixParams";
     
     /**
+     * If true then the matching algorithm will attempt to match and accept
+     * any static content or templates associated with a resource that were
+     * not explicitly decared by that resource.
+     * <p>
+     * If a template is matched then the model for the viewable will be the
+     * resource instance associated with the template.
+     * <p>
+     * The default value is false.
+     */
+    public static final String FEATURE_IMPLICIT_VIEWABLES 
+            = "com.sun.ws.rest.config.feature.ImplicitViewables";
+    
+    /**
      * If set the default resource provider to be used by the 
      * {@link com.sun.ws.rest.spi.resource.ResourceProviderFactory}.
      * <p>

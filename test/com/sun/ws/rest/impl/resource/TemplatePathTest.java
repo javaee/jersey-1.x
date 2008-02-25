@@ -74,7 +74,6 @@ public class TemplatePathTest extends AbstractResourceTester {
         initiateWebApplication(ResourceA.class, ResourceAB.class);
         
         assertEquals("A", resourceProxy("/a/a").get(String.class));
-        assertEquals("A", resourceProxy("/a/a/a").get(String.class));
         assertEquals("AB", resourceProxy("/a/b/ab").get(String.class));
     }
     
@@ -82,7 +81,6 @@ public class TemplatePathTest extends AbstractResourceTester {
         initiateWebApplication(ResourceA.class, ResourceAArg1B.class);
         
         assertEquals("A", resourceProxy("/a/a").get(String.class));
-        assertEquals("A", resourceProxy("/a/a/a").get(String.class));
         assertEquals("AArg1B", resourceProxy("/a/infix/b").get(String.class));
     }    
     

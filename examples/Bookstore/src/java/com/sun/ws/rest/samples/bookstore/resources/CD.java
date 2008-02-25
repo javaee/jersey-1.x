@@ -23,11 +23,9 @@
 package com.sun.ws.rest.samples.bookstore.resources;
 
 import com.sun.ws.rest.api.NotFoundException;
-import com.sun.ws.rest.api.view.Views;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 
-@Views({"index.jsp"})
 public class CD extends Item {
     
     private final Track[] tracks;

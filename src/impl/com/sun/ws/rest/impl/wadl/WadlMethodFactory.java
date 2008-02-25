@@ -44,46 +44,6 @@ import javax.ws.rs.core.UriInfo;
  */
 /* package */ final class WadlMethodFactory {
 
-    public static final class WadlGetMethod extends ResourceMethod {
-        public WadlGetMethod(AbstractResource resource, String path) {
-            super("GET",
-                    null,
-                    MediaTypeHelper.GENERAL_MEDIA_TYPE_LIST,
-                    Arrays.asList(MediaTypes.WADL),
-                    new WadlGetMethodDispatcher(resource, path));        
-        }
-
-        @Override
-        public String toString() {
-            return "WADL GET method" ;
-        }        
-    }
-    
-    private static final class WadlGetMethodDispatcher implements RequestDispatcher {
-        private final AbstractResource resource;
-        private final String path;
-        
-        WadlGetMethodDispatcher(AbstractResource resource, String path) {
-            this.resource = resource;
-            this.path = path;
-        }
-            
-        public void dispatch(final Object o, 
-                final HttpRequestContext requestContext, 
-                final HttpResponseContext responseContext) {            
-            final Application a = genatateApplication(requestContext, 
-                    resource, path);
-            responseContext.setResponse(
-                    Response.ok(a, MediaTypes.WADL).build());
-        }
-        
-        private Application generate() {
-            return path == null ? WadlGenerator.generate(resource) : 
-                WadlGenerator.generate(resource, path);
-        }
-    }
-
-    
     public static final class WadlOptionsMethod extends ResourceMethod {
         public WadlOptionsMethod(Map<String, List<ResourceMethod>> methods, 
                 AbstractResource resource, String path) {

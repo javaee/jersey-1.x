@@ -22,13 +22,10 @@
 
 package com.sun.ws.rest.samples.bookstore.resources;
 
-import com.sun.ws.rest.api.view.Views;
-
 /**
  *
  * @author japod
  */
-@Views({"index.jsp"})
 public class Track {
     
     private String name;

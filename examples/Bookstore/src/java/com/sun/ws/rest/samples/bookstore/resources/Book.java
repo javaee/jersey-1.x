@@ -22,9 +22,6 @@
 
 package com.sun.ws.rest.samples.bookstore.resources;
 
-import com.sun.ws.rest.api.view.Views;
-
-@Views({"index.jsp"})
 public class Book extends Item {
     
     public Book(final String title, final String author) {

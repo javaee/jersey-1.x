@@ -29,15 +29,18 @@ import java.util.List;
 import java.util.NoSuchElementException;
 
 /**
- * Rules associated with instances of {@link UriTemplateType) and matched 
- * using a linear matching algorithm that matches at most one rule.
+ * Rules associated with instances of {@link UriPattern) and matched 
+ * to return at most one match.
+ * <p>
+ * The class will iterate through the collection of {@link UriPattern) until
+ * a match is found. Note that this does not scale.
  * 
  * @author Paul.Sandoz@Sun.Com
  */
-public final class LinearMatchingUriTemplateRules<R> implements UriRules<R> {
+public final class AtomicMatchingPatterns<R> implements UriRules<R> {
     private final Collection<PatternRulePair<R>> rules;
 
-    public LinearMatchingUriTemplateRules(Collection<PatternRulePair<R>> rules) {
+    public AtomicMatchingPatterns(Collection<PatternRulePair<R>> rules) {
         this.rules = rules;
     }
     

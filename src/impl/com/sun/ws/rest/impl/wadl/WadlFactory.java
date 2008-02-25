@@ -62,32 +62,6 @@ public final class WadlFactory {
     }
     
     /**
-     * Create the WADL resource method for GET.
-     * <p>
-     * This is created using reflection so that there is no runtime
-     * dependency on JAXB. If the JAXB jars are not in the class path
-     * then WADL generation will not be supported.
-     * 
-     * @param resource the resource model
-     * @return the WADL resource method
-     */
-    public static ResourceMethod createWadlGetMethod(AbstractResource resource, PathPattern p) {
-        try {
-            checkForJAXB();
-        } catch(ClassNotFoundException e) {
-            return null;
-        }
-        
-        if (p == null) {
-            return new WadlMethodFactory.WadlGetMethod(resource, null);
-        } else {
-            // Remove the '/' from the beginning
-            String path = p.getTemplate().getTemplate().substring(1);
-            return new WadlMethodFactory.WadlGetMethod(resource, path);
-        }        
-    }    
-    
-    /**
      * Create the WADL resource method for OPTIONS.
      * <p>
      * This is created using reflection so that there is no runtime

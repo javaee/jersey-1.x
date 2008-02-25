@@ -79,15 +79,17 @@ public final class MessageBodyFactory implements MessageBodyContext {
                         
         Map<MediaType, List<T>> s = new HashMap<MediaType, List<T>>();
         for (Class providerClass : pcs) {
-            T provider = serviceClass.cast(componentProviderCache.getComponent(providerClass));
+            Object o = componentProviderCache.getComponent(providerClass);
+            if (o == null) continue;
+            
+            T provider = serviceClass.cast(o);
             
             String values[] = getAnnotationValues(providerClass, annotationClass);
             if (values==null)
                 getClassCapability(s, provider, MediaTypeHelper.GENERAL_MEDIA_TYPE);
             else
                 for (String type: values)
-                    getClassCapability(s, provider, MediaType.parse(type));
-            
+                    getClassCapability(s, provider, MediaType.parse(type));            
         }
         
         return s;

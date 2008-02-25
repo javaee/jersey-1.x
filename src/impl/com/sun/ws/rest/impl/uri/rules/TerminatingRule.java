@@ -20,32 +20,25 @@
  *     "Portions Copyrighted [year] [name of copyright owner]"
  */
 
-package com.sun.ws.rest.impl.provider.entity;
+package com.sun.ws.rest.impl.uri.rules;
 
-import com.sun.ws.rest.impl.view.ViewType;
-import java.io.OutputStream;
-import javax.ws.rs.ext.MessageBodyWriter;
-import java.io.IOException;
-import java.io.InputStream;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.MultivaluedMap;
+import com.sun.ws.rest.api.core.HttpResponseContext;
+import com.sun.ws.rest.spi.uri.rules.UriRule;
+import com.sun.ws.rest.spi.uri.rules.UriRuleContext;
 
 /**
- *
+ * A terminating rule that checks to see if the response has been
+ * set by the runtime. If a response has been set then the rule is accepted
+ * otherwise it is not.
+ * 
  * @author Paul.Sandoz@Sun.Com
  */
-public final class ViewTypeProvider implements MessageBodyWriter<ViewType> {
-    
-    public void writeTo(ViewType t, MediaType mediaType,
-            MultivaluedMap<String, Object> httpHeaders, OutputStream entityStream) throws IOException {
-        t.process();
-    }
+public class TerminatingRule implements UriRule {
+   
+    public final boolean accept(CharSequence path, Object resource, UriRuleContext context) {
+        final HttpResponseContext response = context.getHttpContext().
+            getHttpResponseContext();
 
-    public boolean isWriteable(Class<?> type) {
-        return ViewType.class.isAssignableFrom(type);
-    }
-
-    public long getSize(ViewType t) {
-        return -1;
-    }
+        return response.isResponseSet();
+    }    
 }

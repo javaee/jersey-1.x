@@ -39,16 +39,23 @@ public final class UriRulesFactory {
     private UriRulesFactory() {}
     
     public static UriRules<UriRule> create(Map<PathPattern, UriRule> rulesMap) {
+        return create(rulesMap, null);
+    }
+    
+    public static UriRules<UriRule> create(Map<PathPattern, UriRule> rulesMap,
+            List<PatternRulePair<UriRule>> rules) {
         List<PatternRulePair<UriRule>> l = new ArrayList<PatternRulePair<UriRule>>();
         for (Map.Entry<PathPattern, UriRule> e : rulesMap.entrySet())
             l.add(new PatternRulePair<UriRule>(e.getKey(), e.getValue()));
 
+        if (rules != null) l.addAll(rules);
+        
         return create(l);
     }
     
     public static UriRules<UriRule> create(List<PatternRulePair<UriRule>> rules) {
         if (rules.size() < 8) {
-            return new LinearMatchingUriTemplateRules<UriRule>(rules);
+            return new AtomicMatchingPatterns<UriRule>(rules);
         } else {
             return new AutomataMatchingUriTemplateRules<UriRule>(rules);
         }

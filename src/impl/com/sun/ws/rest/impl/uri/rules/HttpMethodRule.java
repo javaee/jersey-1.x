@@ -73,6 +73,9 @@ public final class HttpMethodRule implements UriRule {
     }
 
     public boolean accept(CharSequence path, Object resource, UriRuleContext context) {
+        // If the path is not empty then do not accept
+        if (path.length() > 0) return false;
+        
         final HttpRequestContext request = context.getHttpContext().
                 getHttpRequestContext();
         final HttpResponseContext response = context.getHttpContext().
@@ -86,7 +89,8 @@ public final class HttpMethodRule implements UriRule {
             // No resource methods are found
             response.setResponse(Response.status(Responses.METHOD_NOT_ALLOWED).
                     header("Allow", allow).build());
-            return true;
+            // Allow any further matching rules to be processed
+            return false;
         }
 
         // Get the list of matching methods
@@ -106,7 +110,8 @@ public final class HttpMethodRule implements UriRule {
             // Verify the response
             // TODO verification for HEAD
             if (!httpMethod.equals("HEAD"))
-                verifyResponse(method, accept, response);                        
+                verifyResponse(method, accept, response);  
+            return true;
         } else if (s == MatchStatus.NO_MATCH_FOR_CONSUME) {
             response.setResponse(Responses.unsupportedMediaType().build());
         } else if (s == MatchStatus.NO_MATCH_FOR_PRODUCE) {

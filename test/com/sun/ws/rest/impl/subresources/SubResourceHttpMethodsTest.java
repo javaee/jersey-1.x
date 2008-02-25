@@ -85,14 +85,30 @@ public class SubResourceHttpMethodsTest extends AbstractResourceTester {
         public String getMeSubSub(@PathParam("t") String t) {
             return t;
         }
+        
+        @Path(value = "subunlimited{t}", limited=false)
+        @GET
+        public String getMeSubUnlimited(@PathParam("t") String t) {
+            return t;
+        }
+        
+        @Path(value = "subunlimited/{t}", limited=false)
+        @GET
+        public String getMeSubSubUnlimited(@PathParam("t") String t) {
+            return t;
+        }
     }
     
     public void testSubResourceMethodsWithTemplates() {
         initiateWebApplication(SubResourceMethodsWithTemplates.class);
         
         assertEquals("/", resourceProxy("/").get(String.class));
-        assertEquals("value/a", resourceProxy("/subvalue/a").get(String.class));
-        assertEquals("a/b/c/d", resourceProxy("/sub/a/b/c/d").get(String.class));
+        
+        assertEquals("value", resourceProxy("/subvalue").get(String.class));
+        assertEquals("a", resourceProxy("/sub/a").get(String.class));
+        
+        assertEquals("value/a", resourceProxy("/subunlimitedvalue/a").get(String.class));
+        assertEquals("a/b/c/d", resourceProxy("/subunlimited/a/b/c/d").get(String.class));
     }
     
     @Path("/")

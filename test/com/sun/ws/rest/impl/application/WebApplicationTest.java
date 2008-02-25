@@ -54,7 +54,7 @@ public class WebApplicationTest extends TestCase {
             assertEquals("GET", request.getHttpMethod());
             
             assertEquals("a", request.getTemplateParameters().getFirst("arg1"));
-            assertEquals("b/c", request.getTemplateParameters().getFirst("arg2"));
+            assertEquals("b", request.getTemplateParameters().getFirst("arg2"));
             
             String s = request.getEntity(String.class);
             assertEquals("RESOURCE-ONE", s);
@@ -95,7 +95,7 @@ public class WebApplicationTest extends TestCase {
         WebApplicationImpl a = createWebApplication(
                 TestOneWebResource.class);
         
-        call(a, "GET", "/a/b/c", "RESOURCE-ONE");
+        call(a, "GET", "/a/b", "RESOURCE-ONE");
     }
     
     public void testTwoResource() {
@@ -103,7 +103,7 @@ public class WebApplicationTest extends TestCase {
                 TestOneWebResource.class, 
                 TestTwoWebResource.class);
         
-        call(a, "GET", "/a/b/c", "RESOURCE-ONE");
+        call(a, "GET", "/a/b", "RESOURCE-ONE");
         call(a, "GET", "/a", "RESOURCE-TWO");
     }
     
@@ -113,7 +113,7 @@ public class WebApplicationTest extends TestCase {
                 TestTwoWebResource.class,
                 TestThreeWebResource.class);
         
-        call(a, "GET", "/a/b/c", "RESOURCE-ONE");
+        call(a, "GET", "/a/b", "RESOURCE-ONE");
         call(a, "GET", "/a", "RESOURCE-TWO");
         call(a, "GET", "/a.foo", "RESOURCE-TWO");
         call(a, "GET", "/a.xml", "RESOURCE-THREE");

@@ -63,18 +63,13 @@ public final class ContextResolverFactory {
     private final Map<Type, Injectable<Context, ContextResolver>> injectables = 
                 new HashMap<Type, Injectable<Context, ContextResolver>>();
     
-    public ContextResolverFactory(ComponentProviderCache componentProviderCache) {
-        // Get the application-defined provider classes that implement ContextResolver
-        Set<Class> providerClasses = componentProviderCache.
-                getProviderClasses(ContextResolver.class);
-                
+    public ContextResolverFactory(ComponentProviderCache componentProviderCache) {        
+        Set<ContextResolver> providers = 
+                componentProviderCache.getProviders(ContextResolver.class);
         Map<ParameterizedType, List<ContextResolver<?>>> typeMap = 
                 new HashMap<ParameterizedType, List<ContextResolver<?>>>();
-        for (Class providerClass : providerClasses) {
-            Set<ParameterizedType> types = getTypes(providerClass);
-            
-            ContextResolver<?> provider = ContextResolver.class.cast(
-                    componentProviderCache.getComponent(providerClass));
+        for (ContextResolver provider : providers) {
+            Set<ParameterizedType> types = getTypes(provider.getClass());
             
             addTypes(typeMap, types, provider);
         }

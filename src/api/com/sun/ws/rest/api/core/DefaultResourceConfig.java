@@ -67,6 +67,7 @@ public class DefaultResourceConfig implements ResourceConfig {
         this.features.put(ResourceConfig.FEATURE_MATCH_MATRIX_PARAMS, false);
         this.features.put(ResourceConfig.FEATURE_NORMALIZE_URI, false);
         this.features.put(ResourceConfig.FEATURE_REDIRECT, false);
+        this.features.put(ResourceConfig.FEATURE_IMPLICIT_VIEWABLES, false);
         if (null != resources) {
             this.resources.addAll(resources);
         }

@@ -43,6 +43,8 @@ import com.sun.ws.rest.api.uri.UriTemplate;
 import com.sun.ws.rest.impl.ImplMessages;
 import com.sun.ws.rest.impl.modelapi.annotation.IntrospectionModeller;
 import com.sun.ws.rest.impl.modelapi.validation.BasicValidator;
+import com.sun.ws.rest.spi.template.TemplateContext;
+import com.sun.ws.rest.impl.template.TemplateFactory;
 import com.sun.ws.rest.impl.uri.rules.ResourceClassRule;
 import com.sun.ws.rest.impl.uri.rules.RightHandPathRule;
 import com.sun.ws.rest.impl.uri.rules.RootResourceClassesRule;
@@ -118,6 +120,8 @@ public final class WebApplicationImpl implements WebApplication {
     private MessageBodyContext bodyContext;
     
     private ComponentProvider provider;
+    
+    private TemplateContext templateContext;
     
     public WebApplicationImpl() {
         this.resolverFactory = ResourceProviderFactory.getInstance();
@@ -307,6 +311,17 @@ public final class WebApplicationImpl implements WebApplication {
         ContextResolverFactory crf = new ContextResolverFactory(cpc);
         this.injectables.putAll(crf.getInjectables());
 
+        // Obtain all the templates
+        this.templateContext = new TemplateFactory(cpc);
+        // Allow injection of template context
+        addInjectable(TemplateContext.class,
+                new HttpContextInjectable<TemplateContext>() {
+                    public TemplateContext getInjectableValue(Context c) {
+                        return templateContext;
+                    }
+                }
+            );
+                    
         // Obtain all message body readers/writers
         this.bodyContext = new MessageBodyFactory(cpc);
         
@@ -419,7 +434,7 @@ public final class WebApplicationImpl implements WebApplication {
                     r.resource.getUriPath().getValue(),
                     r.resource.getUriPath().isEncode());
             
-            PathPattern p = new PathPattern(t, r.hasSubResources);
+            PathPattern p = new PathPattern(t, r.resource.getUriPath().isLimited());
                     
             rulesMap.put(p, new RightHandPathRule(
                     resourceConfig.getFeature(ResourceConfig.FEATURE_REDIRECT),
@@ -443,7 +458,7 @@ public final class WebApplicationImpl implements WebApplication {
         UriTemplate t = new PathTemplate(
                 "application.wadl",
                 false);
-        PathPattern p = new PathPattern(t, r.hasSubResources);
+        PathPattern p = new PathPattern(t, false);
         
         rulesMap.put(p, new RightHandPathRule(
                 resourceConfig.getFeature(ResourceConfig.FEATURE_REDIRECT),                

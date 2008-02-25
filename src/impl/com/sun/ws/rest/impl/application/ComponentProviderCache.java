@@ -28,10 +28,13 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
  *
+ * TODO also use service finder and combine.
+ * 
  * @author Paul.Sandoz@Sun.Com
  */
 public class ComponentProviderCache {
@@ -60,17 +63,48 @@ public class ComponentProviderCache {
         return sp;
     }
     
+    public <T> Set<T> getProviders(Class<T> provider) {
+        Set<Class> pcs = new HashSet<Class>();
+        for (Class p : providers) {
+            if (provider.isAssignableFrom(p))
+                pcs.add(p);
+        }
+        
+        Set<T> ps = new HashSet<T>();
+        for (Class pc : pcs) {
+            Object o = getComponent(pc);
+            if (o != null) {
+                ps.add(provider.cast(o));
+            }
+        }
+        
+        return ps;
+    }
+    
     public Object getComponent(Class provider) {
         Object o = cache.get(provider);
         if (o != null) return o;
             
         try {
             o = componentProvider.getInstance(Scope.WebApplication, provider);
+        } catch (NoClassDefFoundError ex) {
+            // Dependent class of provider not found
+            if(LOGGER.isLoggable(Level.WARNING)) {
+                // This assumes that ex.getLocalizedMessage() returns
+                // the name of a dependent class that is not found
+//                LOGGER.log(Level.WARNING, 
+//                        SpiMessages.DEPENDENT_CLASS_OF_PROVIDER_NOT_FOUND(
+//                        ex.getLocalizedMessage(), nextName, service));
+            }
+            LOGGER.log(Level.WARNING,
+                    "The provider class, " + provider + 
+                    ", could not be instantiated");
+            return null;
         } catch (Exception ex) {
-            // TODO message
-            throw new IllegalArgumentException("The provider class, " + provider + 
-                    ", could not be instantiated", 
-                    ex);
+            LOGGER.log(Level.WARNING,
+                    "The provider class, " + provider + 
+                    ", could not be instantiated");
+            return null;
         }
         
         cache.put(provider, o);

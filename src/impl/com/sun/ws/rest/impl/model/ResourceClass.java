@@ -28,35 +28,35 @@ import com.sun.ws.rest.api.model.AbstractResource;
 import com.sun.ws.rest.api.model.AbstractResourceMethod;
 import com.sun.ws.rest.api.model.AbstractSubResourceLocator;
 import com.sun.ws.rest.api.model.AbstractSubResourceMethod;
-import com.sun.ws.rest.api.view.Views;
+import com.sun.ws.rest.api.uri.UriPattern;
 import com.sun.ws.rest.impl.model.method.ResourceHeadWrapperMethod;
 import com.sun.ws.rest.impl.model.method.ResourceHttpMethod;
 import com.sun.ws.rest.impl.model.method.ResourceHttpOptionsMethod;
 import com.sun.ws.rest.impl.model.method.ResourceMethod;
-import com.sun.ws.rest.impl.model.method.ResourceViewMethod;
 import com.sun.ws.rest.impl.model.parameter.ParameterExtractorFactory;
 import com.sun.ws.rest.impl.uri.rules.HttpMethodRule;
 import com.sun.ws.rest.impl.uri.rules.SubLocatorRule;
-import com.sun.ws.rest.impl.view.ViewFactory;
 import com.sun.ws.rest.impl.uri.PathPattern;
 import com.sun.ws.rest.impl.uri.PathTemplate;
 import com.sun.ws.rest.api.uri.UriTemplate;
+import com.sun.ws.rest.impl.template.ViewableRule;
+import com.sun.ws.rest.impl.uri.rules.CombiningMatchingPatterns;
+import com.sun.ws.rest.impl.uri.rules.PatternRulePair;
 import com.sun.ws.rest.impl.uri.rules.RightHandPathRule;
+import com.sun.ws.rest.impl.uri.rules.SequentialMatchingPatterns;
+import com.sun.ws.rest.impl.uri.rules.TerminatingRule;
 import com.sun.ws.rest.impl.uri.rules.UriRulesFactory;
-import com.sun.ws.rest.impl.view.ViewFactory;
 import com.sun.ws.rest.impl.wadl.WadlFactory;
 import com.sun.ws.rest.spi.resource.ResourceProvider;
 import com.sun.ws.rest.spi.resource.ResourceProviderFactory;
 import com.sun.ws.rest.spi.service.ComponentProvider;
 import com.sun.ws.rest.spi.uri.rules.UriRule;
 import com.sun.ws.rest.spi.uri.rules.UriRules;
-import com.sun.ws.rest.spi.view.View;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.logging.Logger;
 import javax.ws.rs.HttpMethod;
 import javax.ws.rs.core.MediaType;
@@ -76,8 +76,6 @@ public final class ResourceClass {
     
     public final ResourceProvider resolver;
     
-    public final boolean hasSubResources;
-
     public ResourceClass(ResourceConfig config,
             ComponentProvider provider,
             ResourceProviderFactory resolverFactory, 
@@ -90,28 +88,21 @@ public final class ResourceClass {
                 provider, resource, 
                 config.getFeatures(), config.getProperties());
 
-        boolean hasSubResourcesAux = false;
-
         RulesMap<UriRule> rulesMap = new RulesMap<UriRule>();
 
-        hasSubResourcesAux = processSubResourceLocators(rulesMap);
+        processSubResourceLocators(rulesMap);
 
         final Map<PathPattern, ResourceMethodMap> patternMethodMap =
                 processSubResourceMethods();
 
         final ResourceMethodMap methodMap = processMethods();
 
-        processViews(provider, methodMap, patternMethodMap);
-
         // Create the rules for the sub-resource HTTP methods
         for (Map.Entry<PathPattern, ResourceMethodMap> e : patternMethodMap.entrySet()) {
-            hasSubResourcesAux = true;
-
             final PathPattern p = e.getKey();
             final ResourceMethodMap rmm = e.getValue();
             
             rmm.sort();
-            processWadl(resource, p, rmm);        
             rulesMap.put(p,
                     new RightHandPathRule(
                     config.getFeature(ResourceConfig.FEATURE_REDIRECT),                    
@@ -121,30 +112,49 @@ public final class ResourceClass {
 
         // Create the rules for the HTTP methods
         methodMap.sort();
-        /**
-         * Add WADL GET method after method map has been sorted.
-         * This ensures that application specific methods get priority
-         * but it means if a method produces a wild card like "*\/*"
-         * then that method will consume the request even if the client
-         * explicitly accepts the WADL media type.
-         * 
-         * WADL will not be created if there are no sub-resource methods,
-         * sub-resource locators present and no resource methods present
-         * or only the HTTP OPTIONS resource method is present.
-         */
-        if (!rulesMap.isEmpty() || methodMap.size() > 1)
-            processWadl(resource, methodMap);        
         if (!methodMap.isEmpty()) {
             // No need to adapt with the RightHandPathRule as the URI path
             // will be consumed when such a rule is accepted
             rulesMap.put(PathPattern.EMPTY_PATH, new HttpMethodRule(methodMap));
         }
 
-        this.hasSubResources = hasSubResourcesAux;
-
-        this.rules = UriRulesFactory.create(rulesMap);
+        
+        // Create the atomic rules, at most only one will be matched
+        UriRules<UriRule> atomicRules = UriRulesFactory.create(rulesMap);
+        
+        // Create the end sequential rules, zero or more may be matched
+        List<PatternRulePair<UriRule>> patterns = new ArrayList<PatternRulePair<UriRule>>();
+        if (config.getFeature(ResourceConfig.FEATURE_IMPLICIT_VIEWABLES)) {
+            UriRule r = new ViewableRule();
+            provider.inject(r);
+            // The matching rule for a sub-resource template
+            patterns.add(new PatternRulePair<UriRule>(
+                    new UriPattern("/([^/]+)"), r));        
+            // The matching rule for an index template
+            patterns.add(new PatternRulePair<UriRule>(
+                    new UriPattern(null), r));                    
+        }         
+        // The terminating rule when the path is not fully consumed and accepted
+        patterns.add(new PatternRulePair<UriRule>(
+                new UriPattern(".*"), new TerminatingRule()));
+        // The terminating rule when the path is fully consumed and accepted
+        patterns.add(new PatternRulePair<UriRule>(
+                new UriPattern(null), new TerminatingRule()));        
+        // Create the sequential rules
+        UriRules<UriRule> sequentialRules = 
+                new SequentialMatchingPatterns<UriRule>(patterns);
+        
+        // Combined the atomic and sequential rules, the former will be matched
+        // first
+        @SuppressWarnings("unchecked")
+        UriRules<UriRule> combiningRules = 
+                new CombiningMatchingPatterns<UriRule>(
+                Arrays.asList(atomicRules, sequentialRules));
+        
+        // this.rules = UriRulesFactory.create(rulesMap);
+        this.rules = combiningRules;
     }
-
+        
     public UriRules<UriRule> getRules() {
         return rules;
     }
@@ -161,11 +171,8 @@ public final class ResourceClass {
         rmm.put(rm);
     }
 
-    private boolean processSubResourceLocators(RulesMap<UriRule> rulesMap) {
-        boolean hasSubResources = false;
+    private void processSubResourceLocators(RulesMap<UriRule> rulesMap) {
         for (final AbstractSubResourceLocator locator : resource.getSubResourceLocators()) {
-            hasSubResources = true;
-
             UriTemplate t = new PathTemplate(
                     locator.getUriPath().getValue(),
                     locator.getUriPath().isEncode());
@@ -185,7 +192,6 @@ public final class ResourceClass {
                     t.endsWithSlash(), 
                     r));
         }
-        return hasSubResources;
     }
 
     private Map<PathPattern, ResourceMethodMap> processSubResourceMethods() {
@@ -197,8 +203,7 @@ public final class ResourceClass {
                     method.getUriPath().getValue(),
                     method.getUriPath().isEncode());
 
-            // TODO what does it mean to support limited=false
-            PathPattern p = new PathPattern(t, false);
+            PathPattern p = new PathPattern(t,  method.getUriPath().isLimited());
 
             ResourceMethod rm = new ResourceHttpMethod(t.getTemplateVariables(), method);
             addToPatternMethodMap(patternMethodMap, p, rm);
@@ -275,118 +280,5 @@ public final class ResourceClass {
         if (optionsMethod == null)
             optionsMethod = new ResourceHttpOptionsMethod(methodMap);
         methodMap.put(optionsMethod);
-    }
-
-    private void processViews(ComponentProvider provider,
-            ResourceMethodMap methodMap,
-            Map<PathPattern, ResourceMethodMap> patternMethodMap) {
-
-        // Get all the view names
-        Map<String, Class<?>> viewMap = getViews();
-
-        // Create the views
-        for (Map.Entry<String, Class<?>> view : viewMap.entrySet()) {
-            final Class<?> resourceClass = view.getValue();
-            final String viewName = view.getKey();
-
-            String path = getAbsolutePathOfView(resourceClass, viewName);
-
-            String pathPattern = getPathPatternOfView(resourceClass, viewName);
-
-            View v = ViewFactory.createView(provider, path);
-            if (v == null) {
-                continue;
-            }
-
-            ResourceMethod rm = new ResourceViewMethod(v);
-            if (pathPattern.length() == 0) {
-                methodMap.put(rm);
-            } else {
-                UriTemplate t = new PathTemplate(pathPattern, true);
-                PathPattern p = new PathPattern(t, false);
-                addToPatternMethodMap(patternMethodMap, p, rm);
-            }
-        }
-    }
-
-    private Map<String, Class<?>> getViews() {
-        // Find all the view names
-        Class<?> resourceClass = this.resource.getResourceClass();
-        Map<String, Class<?>> viewMap = new HashMap<String, Class<?>>();
-        Set<String> views = new HashSet<String>();
-        for (; resourceClass != null; resourceClass = resourceClass.getSuperclass()) {
-            Views vAnnotation = resourceClass.getAnnotation(Views.class);
-            if (vAnnotation == null) {
-                continue;
-            }
-
-            for (String name : vAnnotation.value()) {
-                if (views.contains(name)) {
-                    continue;
-                }
-
-                if (!name.startsWith("/") && name.contains("/")) {
-                    continue;
-                }
-
-                views.add(name);
-                viewMap.put(name, resourceClass);
-            }
-        }
-
-        return viewMap;
-    }
-
-    private String getPathPatternOfView(Class<?> resourceClass, String path) {
-        if (path.startsWith("/")) {
-            throw new IllegalArgumentException();
-        // TODO get the name of the leaf node of the path
-        // and use that for the URI template
-        }
-
-        if (path.matches("index\\.[^/]*")) {
-            return "";
-        } else {
-            // Remove the type of view from the URI template
-            int i = path.lastIndexOf('.');
-            if (i > 0) {
-                path = path.substring(0, i);
-            }
-
-            return path;
-        }
-    }
-
-    private String getAbsolutePathOfView(Class<?> resourceClass, String path) {
-        if (path.startsWith("/")) {
-            // TODO get the name of the leaf node of the path
-            // and use that for the URI template
-            return null;
-        }
-
-        return getAbsolutePathOfClass(resourceClass) + '/' + path;
-    }
-
-    private String getAbsolutePathOfClass(Class<?> resourceClass) {
-        return "/" + resourceClass.getName().replace('.', '/').replace('$', '/');
-    }
-    
-    private void processWadl(AbstractResource resource, ResourceMethodMap methodMap) {
-        processWadl(resource, null, methodMap);
-    }
-    
-    private void processWadl(AbstractResource resource, PathPattern p, ResourceMethodMap methodMap) {
-        // Check if there is already a method that explicitly produces WADL
-        // If so do not override that method
-        if (methodMap.get("GET") != null) {
-            for (ResourceMethod getMethod : methodMap.get("GET")) {
-                for (MediaType m : getMethod.getProduceMime())
-                    if (m.equals(MediaTypes.WADL))
-                        return;
-            }
-        }
-        
-        ResourceMethod wadlMethod = WadlFactory.createWadlGetMethod(resource, p);
-        if (wadlMethod != null) methodMap.put(wadlMethod);
     }
 }

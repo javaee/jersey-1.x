@@ -23,7 +23,6 @@
 package com.sun.ws.rest.samples.bookstore.resources;
 
 import com.sun.ws.rest.api.NotFoundException;
-import com.sun.ws.rest.api.view.Views;
 import com.sun.ws.rest.spi.resource.Singleton;
 import java.util.Map;
 import java.util.TreeMap;
@@ -31,7 +30,6 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 
 @Path("/")
-@Views({"index.jsp", "count.jsp", "time.jsp"})
 @Singleton
 public class Bookstore {    
     private final Map<String, Item> items = new TreeMap<String, Item>();

@@ -60,6 +60,13 @@ public interface HttpResponseContext {
     void setResponse(Response response, MediaType contentType);
 
     /**
+     * Check if the response has been set using the setReponse methods.
+     * 
+     * @return true if the response has been set.
+     */
+    boolean isResponseSet();
+    
+    /**
      * Get the status of the response.
      */
     int getStatus();

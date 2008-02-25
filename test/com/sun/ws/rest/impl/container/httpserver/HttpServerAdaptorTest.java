@@ -43,7 +43,7 @@ public class HttpServerAdaptorTest extends AbstractHttpServerTester {
             assertEquals("POST", request.getHttpMethod());
             
             assertEquals("a", request.getTemplateParameters().getFirst("arg1"));
-            assertEquals("b/c", request.getTemplateParameters().getFirst("arg2"));
+            assertEquals("b", request.getTemplateParameters().getFirst("arg2"));
             
             String s = request.getEntity(String.class);
             assertEquals("RESOURCE-ONE", s);
@@ -77,7 +77,7 @@ public class HttpServerAdaptorTest extends AbstractHttpServerTester {
         ResourceProxy r = Client.create().proxy(getUri().path("a").build());
         assertEquals("RESOURCE-TWO", r.post(String.class, "RESOURCE-TWO"));
 
-        r = Client.create().proxy(UriBuilder.fromUri(r.getURI()).path("b/c").build());
+        r = Client.create().proxy(UriBuilder.fromUri(r.getURI()).path("b").build());
         assertEquals("RESOURCE-ONE", r.post(String.class, "RESOURCE-ONE"));
     }
     
@@ -87,7 +87,7 @@ public class HttpServerAdaptorTest extends AbstractHttpServerTester {
         ResourceProxy r = Client.create().proxy(getUri().path("a").build());
         assertEquals("RESOURCE-TWO", r.post(String.class, "RESOURCE-TWO"));
 
-        r = Client.create().proxy(UriBuilder.fromUri(r.getURI()).path("b/c").build());
+        r = Client.create().proxy(UriBuilder.fromUri(r.getURI()).path("b").build());
         assertEquals("RESOURCE-ONE", r.post(String.class, "RESOURCE-ONE"));
     }
 }
