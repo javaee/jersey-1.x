@@ -36,7 +36,13 @@ import java.util.List;
  */
 public class MultivaluedDefaultListParameterProcessor {
     
-    public static MultivaluedParameterExtractor process(String defaultValue, Class<?> parameter, Type parameterType, String parameterName) {
+    public static MultivaluedParameterExtractor process(Class<?> parameter, 
+            Type parameterType, String parameterName) {
+        return process(null, parameter, parameterType, parameterName);
+    }
+    
+    public static MultivaluedParameterExtractor process(String defaultValue, 
+            Class<?> parameter, Type parameterType, String parameterName) {
        
         if (parameter == List.class) {
             // Get the generic type of the list
