@@ -52,8 +52,10 @@ public final class UriParameterProcessor implements ParameterProcessor {
             return null;
         }
         
-        MultivaluedParameterExtractor e = MultivaluedParameterProcessor.
-                process(parameter.getParameterClass(), parameter.getParameterType(), parameterName);
+        MultivaluedParameterExtractor e =  MultivaluedDefaultListParameterProcessor.
+                process(null, parameter.getParameterClass(), parameter.getParameterType(), parameterName);
+//        MultivaluedParameterExtractor e = MultivaluedParameterProcessor.
+//                process(parameter.getParameterClass(), parameter.getParameterType(), parameterName);
         
         if (e == null)
             return null;

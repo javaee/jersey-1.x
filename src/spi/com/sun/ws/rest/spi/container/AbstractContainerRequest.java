@@ -135,8 +135,8 @@ public abstract class AbstractContainerRequest implements ContainerRequest {
     private MultivaluedMap<String, String> decodedQueryParameters;
     private MultivaluedMap<String, String> encodedQueryParameters;
     
-    private MultivaluedMap<String, String> encodedTemplateValues;
-    private MultivaluedMap<String, String> decodedTemplateValues;
+    private MultivaluedMapImpl encodedTemplateValues;
+    private MultivaluedMapImpl decodedTemplateValues;
     
     
     private MultivaluedMap<String, String> headers;
@@ -165,10 +165,10 @@ public abstract class AbstractContainerRequest implements ContainerRequest {
         int i = 0;
         for (String name : names) {
             final String value = values.get(i++);
-            encodedTemplateValues.putSingle(name, value);
+            encodedTemplateValues.addFirst(name, value);
             
             if (decodedTemplateValues != null) {
-                decodedTemplateValues.putSingle(
+                decodedTemplateValues.addFirst(
                         UriComponent.decode(name, UriComponent.Type.PATH_SEGMENT),
                         UriComponent.decode(value, UriComponent.Type.PATH));                
             }

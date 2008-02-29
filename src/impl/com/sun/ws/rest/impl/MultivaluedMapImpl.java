@@ -78,6 +78,15 @@ public final class MultivaluedMapImpl
     
     // 
     
+    public void addFirst(String key, String value) {
+        List<String> l = getList(key);
+        
+        if (value != null)
+            l.add(0, value);
+        else 
+            l.add(0, "");
+    }
+    
     public <A> List<A> get(String key, Class<A> type) {
         Constructor<A> c = null;
         try {
