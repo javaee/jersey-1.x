@@ -30,6 +30,7 @@ import java.util.GregorianCalendar;
 import javax.ws.rs.GET;
 import javax.ws.rs.core.EntityTag;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.UriBuilder;
 
 /**
  *
@@ -66,7 +67,7 @@ public class BeanTest extends AbstractResourceTester {
         assertEquals(new EntityTag("TAG"),
                 response.getEntityTag());
         
-        assertEquals(URI.create("/location"),
+        assertEquals(UriBuilder.fromUri(BASE_URI).path("location").build(),
                 response.getLocation());
 
         assertEquals("en",

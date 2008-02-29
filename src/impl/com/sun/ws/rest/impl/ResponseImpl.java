@@ -100,8 +100,15 @@ public final class ResponseImpl extends Response {
                     Object location = values[i];
                     if (location != null) {
                         if (location instanceof URI) {
-                            if (!((URI)location).isAbsolute())
-                                location = requestContext.getBaseUri().resolve((URI)location);
+                            if (!((URI)location).isAbsolute()) {
+                                String path = ((URI)location).getRawPath();
+                                if (status == 201)
+                                    location = requestContext.getAbsolutePathBuilder().
+                                            encode(false).path(path).build();
+                                else
+                                    location = requestContext.getBaseUriBuilder().
+                                            encode(false).path(path).build();
+                            }
                         }
                         headers.putSingle(ResponseBuilderImpl.getHeader(i), location);
                     }

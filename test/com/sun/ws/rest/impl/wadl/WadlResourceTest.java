@@ -116,7 +116,7 @@ public class WadlResourceTest extends AbstractResourceTester {
         xp.setNamespaceContext(new NSResolver("wadl", "http://research.sun.com/wadl/2006/10"));
         // check base URI
         String val = (String)xp.evaluate("/wadl:application/wadl:resources/@base", d, XPathConstants.STRING);
-        assertEquals(val,"/base/");
+        assertEquals(val,BASE_URI.toString());
         // check total number of resources is 4
         val = (String)xp.evaluate("count(//wadl:resource)", d, XPathConstants.STRING);
         assertEquals(val,"4");
@@ -164,7 +164,7 @@ public class WadlResourceTest extends AbstractResourceTester {
 
         // check base URI
         String val = (String)xp.evaluate("/wadl:application/wadl:resources/@base", d, XPathConstants.STRING);
-        assertEquals(val,"/base/");
+        assertEquals(val,BASE_URI.toString());
         // check total number of resources is 3 (no ExtraResource details included)
         val = (String)xp.evaluate("count(//wadl:resource)", d, XPathConstants.STRING);
         assertEquals(val,"3");
@@ -202,7 +202,7 @@ public class WadlResourceTest extends AbstractResourceTester {
         printSource(new DOMSource(d));
         // check base URI
         val = (String)xp.evaluate("/wadl:application/wadl:resources/@base", d, XPathConstants.STRING);
-        assertEquals(val,"/base/");
+        assertEquals(val,BASE_URI.toString());
         // check total number of resources is 1 (no ExtraResource details included)
         val = (String)xp.evaluate("count(//wadl:resource)", d, XPathConstants.STRING);
         assertEquals(val,"1");
@@ -231,7 +231,7 @@ public class WadlResourceTest extends AbstractResourceTester {
         xp.setNamespaceContext(new NSResolver("wadl", "http://research.sun.com/wadl/2006/10"));
         // check base URI
         String val = (String)xp.evaluate("/wadl:application/wadl:resources/@base", d, XPathConstants.STRING);
-        assertEquals(val,"/base/");
+        assertEquals(val,BASE_URI.toString());
         // check total number of resources is 1 (no ExtraResource details included)
         val = (String)xp.evaluate("count(//wadl:resource)", d, XPathConstants.STRING);
         assertEquals(val,"1");
@@ -259,7 +259,7 @@ public class WadlResourceTest extends AbstractResourceTester {
         XPath xp = XPathFactory.newInstance().newXPath();
         xp.setNamespaceContext(new NSResolver("wadl", "http://research.sun.com/wadl/2006/10"));
         String val = (String)xp.evaluate("/wadl:application/wadl:resources/@base", d, XPathConstants.STRING);
-        assertEquals(val,"/base/");
+        assertEquals(val,BASE_URI.toString());
         // check total number of resources is 1
         val = (String)xp.evaluate("count(//wadl:resource)", d, XPathConstants.STRING);
         assertEquals(val,"1");
@@ -315,7 +315,7 @@ public class WadlResourceTest extends AbstractResourceTester {
         XPath xp = XPathFactory.newInstance().newXPath();
         xp.setNamespaceContext(new NSResolver("wadl", "http://research.sun.com/wadl/2006/10"));
         String val = (String)xp.evaluate("/wadl:application/wadl:resources/@base", d, XPathConstants.STRING);
-        assertEquals(val,"/base/");
+        assertEquals(val,BASE_URI.toString());
         // check only one resource with for 'root/loc'
         val = (String)xp.evaluate("count(//wadl:resource[@path='root/loc'])", d, XPathConstants.STRING);
         assertEquals(val,"1");
@@ -334,7 +334,7 @@ public class WadlResourceTest extends AbstractResourceTester {
         xp = XPathFactory.newInstance().newXPath();
         xp.setNamespaceContext(new NSResolver("wadl", "http://research.sun.com/wadl/2006/10"));
         val = (String)xp.evaluate("/wadl:application/wadl:resources/@base", d, XPathConstants.STRING);
-        assertEquals(val,"/base/");
+        assertEquals(val,BASE_URI.toString());
         // check only one resource with for 'root/loc'
         val = (String)xp.evaluate("count(//wadl:resource[@path='root/loc/loc'])", d, XPathConstants.STRING);
         assertEquals(val,"1");
