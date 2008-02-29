@@ -26,6 +26,7 @@ import com.sun.ws.rest.impl.AbstractResourceTester;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Path;
 import com.sun.ws.rest.impl.AbstractResourceTester;
+import java.util.List;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 
@@ -38,7 +39,6 @@ public class UriParamAsStringTest extends AbstractResourceTester {
 
     public UriParamAsStringTest(String testName) {
         super(testName);
-        initiateWebApplication(Resource.class);
     }
 
     @Path("/{arg1}/{arg2}/{arg3}")
@@ -65,14 +65,59 @@ public class UriParamAsStringTest extends AbstractResourceTester {
     }
     
     public void testStringArgsGet() {
+        initiateWebApplication(Resource.class);
         resourceProxy("/a/b/c").
                 get(String.class);
     }
     
     public void testStringArgsPost() {
+        initiateWebApplication(Resource.class);
         String s = resourceProxy("/a/b/c").
                 post(String.class, "content");
 
         assertEquals("content", s);
+    }
+    
+    @Path("/{id}")
+    public static class Duplicate {
+        @GET
+        public String get(@PathParam("id") String id) {
+            return id;
+        }
+        
+        @GET
+        @Path("/{id}")
+        public String getSub(@PathParam("id") String id) {
+            return id;
+        }
+    }
+    
+    public void testDuplicate() {
+        initiateWebApplication(Duplicate.class);
+        
+        assertEquals("foo", resourceProxy("/foo").get(String.class));
+        assertEquals("bar", resourceProxy("/foo/bar").get(String.class));
+    }
+    
+    @Path("/{id}")
+    public static class DuplicateList {
+        @GET
+        public String get(@PathParam("id") String id) {
+            return id;
+        }
+        
+        @GET
+        @Path("/{id}")
+        public String getSub(@PathParam("id") List<String> id) {
+            assertEquals(2, id.size());
+            return id.get(0) + id.get(1);
+        }
+    }
+    
+    public void testDuplicateList() {
+        initiateWebApplication(DuplicateList.class);
+        
+        assertEquals("foo", resourceProxy("/foo").get(String.class));
+        assertEquals("barfoo", resourceProxy("/foo/bar").get(String.class));
     }
 }
