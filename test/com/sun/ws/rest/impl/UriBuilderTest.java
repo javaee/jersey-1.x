@@ -129,7 +129,19 @@ public class UriBuilderTest extends TestCase {
     }
 
     public void testAppendPath() {
-        URI bu = UriBuilder.fromUri("http://localhost:8080/a/b/c/").
+        URI bu = UriBuilder.fromUri("http://localhost:8080").
+                path("a/b/c").build();
+        assertEquals(URI.create("http://localhost:8080/a/b/c"), bu);
+        
+        bu = UriBuilder.fromUri("http://localhost:8080/").
+                path("a/b/c").build();
+        assertEquals(URI.create("http://localhost:8080/a/b/c"), bu);
+        
+        bu = UriBuilder.fromUri("http://localhost:8080").
+                path("/a/b/c").build();
+        assertEquals(URI.create("http://localhost:8080/a/b/c"), bu);
+        
+        bu = UriBuilder.fromUri("http://localhost:8080/a/b/c/").
                 path("/").build();
         assertEquals(URI.create("http://localhost:8080/a/b/c/"), bu);
 
@@ -158,6 +170,59 @@ public class UriBuilderTest extends TestCase {
         assertEquals(URI.create("http://localhost:8080/a%20/b%20/c%20/x%20/y%20/z%20"), bu);
     }
 
+    public void testRelativefromUri() {
+        URI bu = UriBuilder.fromUri("a/b/c").
+            build();
+        assertEquals(URI.create("a/b/c"), bu);
+
+        bu = UriBuilder.fromUri("a/b/c").path("d").
+            build();
+        assertEquals(URI.create("a/b/c/d"), bu);
+        
+        bu = UriBuilder.fromUri("a/b/c/").path("d").
+            build();
+        assertEquals(URI.create("a/b/c/d"), bu);
+        
+        bu = UriBuilder.fromUri("a/b/c").path("/d").
+            build();
+        assertEquals(URI.create("a/b/c/d"), bu);
+        
+        bu = UriBuilder.fromUri("a/b/c/").path("/d").
+            build();
+        assertEquals(URI.create("a/b/c/d"), bu);
+        
+        bu = UriBuilder.fromUri("").queryParam("x", "y").
+            build();
+        assertEquals(URI.create("?x=y"), bu);
+        
+    }
+    
+    public void testRelativefromPath() {
+        URI bu = UriBuilder.fromPath("a/b/c").
+            build();
+        assertEquals(URI.create("a/b/c"), bu);
+
+        bu = UriBuilder.fromPath("a/b/c").path("d").
+            build();
+        assertEquals(URI.create("a/b/c/d"), bu);
+        
+        bu = UriBuilder.fromPath("a/b/c/").path("d").
+            build();
+        assertEquals(URI.create("a/b/c/d"), bu);
+        
+        bu = UriBuilder.fromPath("a/b/c").path("/d").
+            build();
+        assertEquals(URI.create("a/b/c/d"), bu);
+        
+        bu = UriBuilder.fromPath("a/b/c/").path("/d").
+            build();
+        assertEquals(URI.create("a/b/c/d"), bu);
+        
+        bu = UriBuilder.fromPath("").queryParam("x", "y").
+            build();
+        assertEquals(URI.create("?x=y"), bu);        
+    }
+    
     public void testAppendQueryParams() {
         URI bu = UriBuilder.fromUri("http://localhost:8080/a/b/c?a=x&b=y").
                 queryParam("c", "z").build();

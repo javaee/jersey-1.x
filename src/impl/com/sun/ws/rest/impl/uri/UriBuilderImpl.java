@@ -243,7 +243,7 @@ public final class UriBuilderImpl extends UriBuilder {
         final boolean pathEndsInSlash = path.length() > 0 && path.charAt(path.length() - 1) == '/';
         final boolean segmentStartsWithSlash = segment.charAt(0) == '/';
         
-        if (!pathEndsInSlash && !segmentStartsWithSlash) {
+        if (path.length() > 0 && !pathEndsInSlash && !segmentStartsWithSlash) {
             path.append('/');
         } else if (pathEndsInSlash && segmentStartsWithSlash) {
             segment = segment.substring(1);
@@ -313,7 +313,10 @@ public final class UriBuilderImpl extends UriBuilder {
             if (port != -1) sb.append(':').append(port);
         }
 
-        if (path.length() > 0) sb.append(path);
+        if (path.length() > 0) {
+            if (sb.length() > 0 && path.charAt(0) != '/') sb.append("/");
+            sb.append(path);
+        }
         
         if (query.length() > 0) sb.append('?').append(query);
         
