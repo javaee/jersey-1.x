@@ -40,9 +40,9 @@ import java.lang.reflect.InvocationTargetException;
  */
 public final class PerRequestProvider implements ResourceProvider {
 
-    private Class c;
+    private Class<?> c;
     
-    private Constructor constructor;
+    private Constructor<?> constructor;
     
     private ParameterExtractor[] extractors;
     

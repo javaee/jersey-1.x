@@ -225,19 +225,19 @@ public final class WebApplicationImpl implements WebApplication {
             this.cp = cp;
         }
 
-        public Object getInstance(Scope scope, Class c) 
+        public <T> T getInstance(Scope scope, Class<T> c) 
                 throws InstantiationException, IllegalAccessException {
-            Object o = cp.getInstance(scope,c);
+            T o = cp.getInstance(scope,c);
             if (o == null)
                 o = c.newInstance();
             injectResources(o);
             return o;
         }
 
-        public Object getInstance(Scope scope, Constructor contructor, Object[] parameters) 
+        public <T> T getInstance(Scope scope, Constructor<T> contructor, Object[] parameters) 
                 throws InstantiationException, IllegalArgumentException, 
                 IllegalAccessException, InvocationTargetException {
-            Object o = cp.getInstance(scope, contructor, parameters);
+            T o = cp.getInstance(scope, contructor, parameters);
             if (o == null)
                 o = contructor.newInstance(parameters);
             injectResources(o);
@@ -251,17 +251,17 @@ public final class WebApplicationImpl implements WebApplication {
     }
     
     private final class DefaultComponentProvider implements ComponentProvider {
-        public Object getInstance(Scope scope, Class c) 
+        public <T> T getInstance(Scope scope, Class<T> c) 
                 throws InstantiationException, IllegalAccessException {
-            final Object o = c.newInstance();
+            final T o = c.newInstance();
             injectResources(o);
             return o;
         }
 
-        public Object getInstance(Scope scope, Constructor contructor, Object[] parameters) 
+        public <T> T getInstance(Scope scope, Constructor<T> contructor, Object[] parameters) 
                 throws InstantiationException, IllegalArgumentException, 
                 IllegalAccessException, InvocationTargetException {
-            final Object o = contructor.newInstance(parameters);
+            final T o = contructor.newInstance(parameters);
             injectResources(o);
             return o;
         }

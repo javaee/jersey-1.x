@@ -80,7 +80,7 @@ public interface ComponentProvider {
      * @throws java.lang.InstantiationException
      * @throws java.lang.IllegalAccessException
      */
-    Object getInstance(Scope scope, Class c) 
+    <T> T getInstance(Scope scope, Class<T> c) 
             throws InstantiationException, IllegalAccessException;
     
     /**
@@ -103,7 +103,7 @@ public interface ComponentProvider {
      * @throws java.lang.IllegalAccessException
      * @throws java.lang.reflect.InvocationTargetException
      */
-    Object getInstance(Scope scope, Constructor contructor, Object[] parameters) 
+    <T> T getInstance(Scope scope, Constructor<T> contructor, Object[] parameters) 
             throws InstantiationException, IllegalArgumentException, 
             IllegalAccessException, InvocationTargetException;
 

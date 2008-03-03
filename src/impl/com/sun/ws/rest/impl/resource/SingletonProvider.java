@@ -38,7 +38,7 @@ public final class SingletonProvider implements ResourceProvider {
     
     public void init(ComponentProvider provider,
             AbstractResource abstractResource) {
-        Class c = abstractResource.getResourceClass();
+        Class<?> c = abstractResource.getResourceClass();
         
         try {
             this.resource = provider.getInstance(Scope.WebApplication, c);

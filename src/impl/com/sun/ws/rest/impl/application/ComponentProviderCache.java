@@ -81,7 +81,7 @@ public class ComponentProviderCache {
         return ps;
     }
     
-    public Object getComponent(Class provider) {
+    public Object getComponent(Class<?> provider) {
         Object o = cache.get(provider);
         if (o != null) return o;
             

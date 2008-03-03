@@ -132,12 +132,12 @@ public final class ServiceFinder<T> implements Iterable<T> {
     private static final String PREFIX = "META-INF/services/";
     
     private static final ComponentProvider DEFAULT_COMPONENT_PROVIDER = new ComponentProvider() {
-        public Object getInstance(Scope scope, Class c) 
+        public <T> T getInstance(Scope scope, Class<T> c) 
                 throws InstantiationException, IllegalAccessException {
             return c.newInstance();
         }
 
-        public Object getInstance(Scope scope, Constructor contructor, Object[] parameters) 
+        public <T> T getInstance(Scope scope, Constructor<T> contructor, Object[] parameters) 
                 throws InstantiationException, IllegalArgumentException, 
                 IllegalAccessException, InvocationTargetException {
             throw new UnsupportedOperationException("");
