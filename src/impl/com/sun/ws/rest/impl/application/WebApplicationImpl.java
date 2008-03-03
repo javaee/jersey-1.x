@@ -379,6 +379,9 @@ public final class WebApplicationImpl implements WebApplication {
         injectables.put(fieldType, injectable);
     }
     
+    public HttpContextAccess getThreadLocalHttpContext() {
+        return context;
+    }
     
     // 
 

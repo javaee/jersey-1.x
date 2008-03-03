@@ -22,14 +22,11 @@
 
 package com.sun.ws.rest.api.core;
 
-import com.sun.ws.rest.api.container.ContainerException;
-import javax.ws.rs.core.Response;
-
 /**
  * A HttpContextAccess makes it possible for a web resource implementation class to 
  * access and manipulate HTTP request and response information directly. Typically
  * a HttpContextAccess is injected into web resource implementation class using the 
- * Resource annotation.
+ * Context annotation.
  */
 public interface HttpContextAccess {
     /**
@@ -46,18 +43,8 @@ public interface HttpContextAccess {
     
     /**
      * Get the current resource.
+     * 
+     * @return the current resource.
      */
-    Object getCurrentResource();
-    
-    /**
-     * Create a response that will forward the HTTP request to another component
-     * within the same container for further processing.
-     * @param path the path that identifies the component. The path may be relative or absolute,
-     * relative paths are relative to the request URI.
-     * @return a response object that, when returned, will cause the container to forward
-     * the request to another component.
-     * @throws ContainerException if the path cannot be reached by a local forward
-     * @throws UnsupportedOperationException if the current container does not support local forwards
-     */
-    Response createLocalForward(String path) throws ContainerException, UnsupportedOperationException;    
+    Object getCurrentResource();    
 }

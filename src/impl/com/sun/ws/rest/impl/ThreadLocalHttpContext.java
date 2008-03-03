@@ -57,8 +57,4 @@ public final class ThreadLocalHttpContext implements HttpContextAccess {
     public Object getCurrentResource() {
         return context.get().getCurrentResource();        
     }
-
-    public Response createLocalForward(String path) throws ContainerException {
-        return context.get().createLocalForward(path);
-    }
 }

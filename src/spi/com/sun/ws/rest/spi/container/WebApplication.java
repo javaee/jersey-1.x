@@ -23,6 +23,7 @@
 package com.sun.ws.rest.spi.container;
 
 import com.sun.ws.rest.api.container.ContainerException;
+import com.sun.ws.rest.api.core.HttpContextAccess;
 import com.sun.ws.rest.api.core.ResourceConfig;
 import com.sun.ws.rest.spi.resource.Injectable;
 import com.sun.ws.rest.spi.service.ComponentProvider;
@@ -83,6 +84,23 @@ public interface WebApplication {
     ComponentProvider getComponentProvider();
     
     /**
+     * Add an injectable resource to the set maintained by the application.
+     * The fieldType is used as a unique key and therefore adding an injectable
+     * for a type already supported will override the existing one.
+     * 
+     * @param fieldType the type of the field that will be injected
+     * @param injectable the injectable for the field
+     */
+    void addInjectable(Type fieldType, Injectable injectable);
+    
+    /**
+     * Get the thread local instance of HttpContextAccess.
+     * 
+     * @return the thread local instance of HttpContextAccess.
+     */
+    HttpContextAccess getThreadLocalHttpContext();
+    
+    /**
      * Handle an HTTP request by dispatching the request to the appropriate
      * matching Web resource that produces the response or otherwise producing 
      * the appropriate HTTP error response.
@@ -93,14 +111,5 @@ public interface WebApplication {
      * should manage.
      */
     void handleRequest(ContainerRequest request, ContainerResponse response)
-    throws ContainerException;
-    
-    /**
-     * Add an injectable resource to the set maintained by the application.
-     * The fieldType is used as a unique key and therefore adding an injectable
-     * for a type already supported will override the existing one.
-     * @param fieldType the type of the field that will be injected
-     * @param injectable the injectable for the field
-     */
-    void addInjectable(Type fieldType, Injectable injectable);
+    throws ContainerException;    
 }

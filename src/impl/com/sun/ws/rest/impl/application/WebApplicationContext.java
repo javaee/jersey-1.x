@@ -69,11 +69,6 @@ import javax.ws.rs.core.Response;
         return it;
     }
     
-    public Response createLocalForward(String path) throws ContainerException {
-        throw new UnsupportedOperationException();
-    }
-
-    
     // UriRuleContext
 
     private Object it;
