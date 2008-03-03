@@ -22,15 +22,11 @@
 
 package com.sun.ws.rest.impl.container.grizzly;
 
-import com.sun.grizzly.tcp.Request;
-import com.sun.grizzly.util.buf.ByteChunk;
-import com.sun.grizzly.util.http.MimeHeaders;
+import com.sun.grizzly.tcp.http11.GrizzlyRequest;
 import com.sun.ws.rest.spi.container.AbstractContainerRequest;
 import com.sun.ws.rest.impl.http.header.HttpHeaderFactory;
 import com.sun.ws.rest.spi.container.MessageBodyContext;
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Enumeration;
@@ -42,11 +38,12 @@ import javax.ws.rs.core.MultivaluedMap;
  */
 public final class GrizzlyRequestAdaptor  extends AbstractContainerRequest {
     
-    private final Request request;
+    private final GrizzlyRequest request;
     
     /** Creates a new instance of GrizzlyRequestAdaptor */
-    public GrizzlyRequestAdaptor(MessageBodyContext bodyContext, Request request) {
-        super(bodyContext, request.method().toString(), new GrizzlyRequestInputStream(request));
+    public GrizzlyRequestAdaptor(MessageBodyContext bodyContext, GrizzlyRequest request) 
+            throws IOException {
+        super(bodyContext, request.getMethod(), request.getInputStream());
         this.request = request;
         
         initiateUriInfo();
@@ -56,9 +53,9 @@ public final class GrizzlyRequestAdaptor  extends AbstractContainerRequest {
     private void initiateUriInfo() {
         try {
             this.baseUri = new URI(
-                    request.scheme().toString(), 
+                    request.getScheme(),
                     null,
-                    request.serverName().toString(), 
+                    request.getServerName(), 
                     request.getServerPort(),
                     "/", 
                     null, 
@@ -68,7 +65,8 @@ public final class GrizzlyRequestAdaptor  extends AbstractContainerRequest {
              * request.unparsedURI() is a URI in encoded form that contains
              * the URI path and URI query components.
              */
-            this.completeUri = baseUri.resolve(request.unparsedURI().toString());
+            this.completeUri = baseUri.resolve(
+                    request.getRequest().unparsedURI().toString());
         } catch (URISyntaxException ex) {
             ex.printStackTrace();
             throw new IllegalArgumentException(ex);
@@ -78,45 +76,13 @@ public final class GrizzlyRequestAdaptor  extends AbstractContainerRequest {
     private void copyHttpHeaders() {
         MultivaluedMap<String, String> headers = getRequestHeaders();
         
-        MimeHeaders mh = request.getMimeHeaders();
-        Enumeration names = mh.names();
+        Enumeration names = request.getHeaderNames();
         while (names.hasMoreElements()) {
             String name = (String)names.nextElement();
-            String value = mh.getHeader(name);
+            String value = request.getHeader(name);
             headers.add(name, value);
             if (name.equalsIgnoreCase("cookie")) {
                 getCookies().putAll(HttpHeaderFactory.createCookies(value));
-            }
-        }
-    }
-    
-    private static final class GrizzlyRequestInputStream extends InputStream {
-        
-        private final Request request;
-        private final ByteChunk chunk;
-        private ByteArrayInputStream stream;
-        
-        public GrizzlyRequestInputStream(Request request) {
-            this.request = request;
-            this.chunk = new ByteChunk();
-        }
-
-        public int read() throws IOException {
-            refillIfRequired();
-            return stream.read();
-        }
-        
-        public int read(byte[] b) throws IOException {
-            refillIfRequired();
-            return stream.read(b);
-        }
-        
-        private void refillIfRequired() throws IOException {
-            if (stream==null || stream.available()==0) {
-                //chunk.recycle();
-                request.doRead(chunk);
-                if (chunk.getLength() > 0)
-                    stream = new ByteArrayInputStream(chunk.getBytes(), chunk.getStart(), chunk.getLength());
             }
         }
     }

@@ -27,10 +27,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.util.List;
 import java.util.Map;
-import com.sun.grizzly.tcp.Response;
-import com.sun.grizzly.util.buf.ByteChunk;
-import com.sun.grizzly.util.buf.MessageBytes;
-import com.sun.grizzly.util.http.MimeHeaders;
+import com.sun.grizzly.tcp.http11.GrizzlyResponse;
 import com.sun.ws.rest.spi.container.MessageBodyContext;
 
 /**
@@ -39,43 +36,29 @@ import com.sun.ws.rest.spi.container.MessageBodyContext;
  */
 public final class GrizzlyResponseAdaptor extends AbstractContainerResponse {
     
-    private final Response response;
+    private final GrizzlyResponse response;
     
-    private OutputStream output;
-
-    
-    /* package */ GrizzlyResponseAdaptor(Response response, MessageBodyContext bodyContext, GrizzlyRequestAdaptor requestContext) {
+    /* package */ GrizzlyResponseAdaptor(GrizzlyResponse response, 
+            MessageBodyContext bodyContext, GrizzlyRequestAdaptor requestContext) {
         super(bodyContext, requestContext);
         this.response = response;
     }
     
     
-    // HttpResponseContextImpl
-
-    protected OutputStream getUnderlyingOutputStream() throws IOException {
-        if (output != null)
-            return output;
-        
-        return output = new GrizzlyResponseOutputStream();
-    }
-    
     protected void commitStatusAndHeaders() throws IOException {
         response.setStatus(this.getStatus());
         
-        MimeHeaders mh = response.getMimeHeaders();
         for (Map.Entry<String, List<Object>> e : this.getHttpHeaders().entrySet()) {
             String key = e.getKey();
             for (Object value: e.getValue()) {
-                MessageBytes mb = mh.addValue(key);
-                mb.setString(getHeaderValue(value));
+                response.addHeader(key,value.toString());
             }
         }
 
-        if (mh.getValue("Content-Type") != null) {
-            response.setContentType(mh.getValue("Content-Type").getString());
+        String contentType = response.getHeader("Content-Type");
+        if (contentType != null) {
+            response.setContentType(contentType);
         }
-        
-        response.sendHeaders();
     }    
     
     /* package */ void commitAll() throws IOException {
@@ -86,46 +69,12 @@ public final class GrizzlyResponseAdaptor extends AbstractContainerResponse {
         
         commitStatusAndHeaders();
         
-        final OutputStream out = getUnderlyingOutputStream();
+        final OutputStream out = response.getOutputStream();
         writeEntity(out);
         out.close();
     }
-        
-    private final class GrizzlyResponseOutputStream extends OutputStream {
-        public final static int BUFFER_SIZE = 4096;
-        
-        final ByteChunk chunk;
-        
-        public GrizzlyResponseOutputStream() {
-            chunk = new ByteChunk(BUFFER_SIZE);
-        }
-        
-        public void write(int b) throws IOException {
-            if (chunk.getLength() > BUFFER_SIZE)
-                flush();
-            chunk.append((byte)b);
-        }
-        
-        public void write(byte[] b) throws IOException {
-            if (chunk.getLength() > BUFFER_SIZE)
-                flush();
-            chunk.append(b, 0, b.length);
-        }
-        
-        public void write(byte[] b, int off, int len) throws IOException {
-            if (chunk.getLength() > BUFFER_SIZE)
-                flush();
-            chunk.append(b, off, len);
-        }
-        
-        public void flush() throws IOException {
-            response.doWrite(chunk);
-            chunk.reset();
-        }
-        
-        public void close() throws IOException {
-            flush();
-            chunk.recycle();
-        }
+
+    protected OutputStream getUnderlyingOutputStream() throws IOException {
+        return response.getOutputStream();
     }
 }

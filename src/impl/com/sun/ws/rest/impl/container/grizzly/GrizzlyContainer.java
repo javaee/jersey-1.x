@@ -22,21 +22,21 @@
 
 package com.sun.ws.rest.impl.container.grizzly;
 
+import com.sun.grizzly.tcp.http11.GrizzlyRequest;
+import com.sun.grizzly.tcp.http11.GrizzlyResponse;
 import com.sun.ws.rest.api.container.ContainerException;
 import com.sun.ws.rest.api.core.HttpResponseContext;
 import com.sun.ws.rest.spi.container.WebApplication;
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import com.sun.grizzly.tcp.ActionCode;
-import com.sun.grizzly.tcp.Adapter;
-import com.sun.grizzly.tcp.Request;
-import com.sun.grizzly.tcp.Response;
+import com.sun.grizzly.tcp.http11.GrizzlyAdapter;
+import java.io.IOException;
 
 /**
  *
  * @author Marc.Hadley@Sun.Com
  */
-public class GrizzlyContainer implements Adapter {
+public class GrizzlyContainer extends GrizzlyAdapter {
     
     private WebApplication application;
     
@@ -44,17 +44,20 @@ public class GrizzlyContainer implements Adapter {
         this.application = app;
     }
 
-    public void service(Request request, Response response) throws Exception {
-        GrizzlyRequestAdaptor requestAdaptor = 
-                new GrizzlyRequestAdaptor(application.getMessageBodyContext(), 
-                request);
-        GrizzlyResponseAdaptor responseAdaptor = 
-                new GrizzlyResponseAdaptor(response, 
-                application.getMessageBodyContext(), 
-                requestAdaptor);
-        
+    public void service(GrizzlyRequest request, GrizzlyResponse response) {
+        GrizzlyResponseAdaptor responseAdaptor = null;
         try {
+            GrizzlyRequestAdaptor requestAdaptor = 
+                    new GrizzlyRequestAdaptor(application.getMessageBodyContext(), 
+                    request);
+            responseAdaptor = 
+                    new GrizzlyResponseAdaptor(response, 
+                    application.getMessageBodyContext(), 
+                    requestAdaptor);
+        
             application.handleRequest(requestAdaptor, responseAdaptor);
+        } catch (IOException ex){
+            throw new RuntimeException(ex);
         } catch (ContainerException e) {
             onException(e, responseAdaptor);
         } catch (RuntimeException e) {
@@ -65,23 +68,16 @@ public class GrizzlyContainer implements Adapter {
         
         try {
             responseAdaptor.commitAll();
-            request.action( ActionCode.ACTION_POST_REQUEST , null);
         } catch (Exception e) {
-            // TODO
-            e.printStackTrace();
-        } finally {
-            response.finish();
+            throw new RuntimeException(e);
         }
     }
-    
-    public void afterService(Request request, Response response) throws Exception {
-        request.recycle();
-        response.recycle();          
+
+    public void afterService(GrizzlyRequest request, GrizzlyResponse response) 
+            throws Exception {
+        ;
     }
 
-    public void fireAdapterEvent(String string, Object object) {
-        // Not used.
-    }
     
     private static void onException(Exception e, HttpResponseContext response) {
         // Log the stack trace
@@ -96,4 +92,5 @@ public class GrizzlyContainer implements Adapter {
         response.setResponse(javax.ws.rs.core.Response.serverError().
                 entity(sw.toString()).type("text/plain").build());
     }
+
 }

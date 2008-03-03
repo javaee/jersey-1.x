@@ -1,4 +1,5 @@
 release 0.6 (2008-03-07)
+- Grizzly support is upgraded to 1.7.2.
 - A sub-resource locator can now return a Class instance, that will be
   instantiated using a ComponentProvider, using the life-cycle rules for
   resource classes.
