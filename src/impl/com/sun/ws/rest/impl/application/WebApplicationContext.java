@@ -22,7 +22,6 @@
 
 package com.sun.ws.rest.impl.application;
 
-import com.sun.ws.rest.api.container.ContainerException;
 import com.sun.ws.rest.api.core.HttpContextAccess;
 import com.sun.ws.rest.api.core.HttpRequestContext;
 import com.sun.ws.rest.api.core.HttpResponseContext;
@@ -34,7 +33,6 @@ import com.sun.ws.rest.spi.uri.rules.UriRuleContext;
 import com.sun.ws.rest.spi.uri.rules.UriRules;
 import java.util.ArrayList;
 import java.util.List;
-import javax.ws.rs.core.Response;
 
 /**
  *
