@@ -43,6 +43,8 @@ public class JSONJAXBContext extends JAXBContext {
     public static final String JSON_NOTATION = NAMESPACE + "notation";
     public static final String JSON_ENABLED = NAMESPACE + "enabled";
     public static final String JSON_ROOT_UNWRAPPING = NAMESPACE + "root.unwrapping";
+    public static final String JSON_ARRAYS = NAMESPACE + "arrays";
+    public static final String JSON_NON_STRINGS = NAMESPACE + "non.strings";
     
     // TODO: if need to replace jettison due to legal reasons, still want the badgerfish supported?
     public enum JSONNotation { MAPPED, MAPPED_JETTISON, BADGERFISH };

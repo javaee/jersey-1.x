@@ -121,25 +121,26 @@ public class JsonXmlStreamWriter implements XMLStreamWriter {
     List<ProcessingState> processingStack;
     int depth;
     
-    Collection<String> arrayElementNames;
-    Collection<String> nonStringElementNames;
-    
-    {
-        arrayElementNames = new LinkedList<String>();
-        arrayElementNames.add("rows");
-        arrayElementNames.add("cols");
-        arrayElementNames.add("children");
-        nonStringElementNames = new LinkedList<String>();
-        nonStringElementNames.add("expanded");
-    }
+    final Collection<String> arrayElementNames = new LinkedList<String>();
+    final Collection<String> nonStringElementNames = new LinkedList<String>();
 
     public JsonXmlStreamWriter(Writer writer) {
-        this(writer, false);
+        this(writer, false, null, null);
     }
-        
+
     public JsonXmlStreamWriter(Writer writer, boolean stripRoot) {
+        this(writer, stripRoot, null, null);
+    }
+    
+    public JsonXmlStreamWriter(Writer writer, boolean stripRoot, Collection<String> arrays, Collection<String> nonStrings) {
         this.mainWriter = writer;
         this.stripRoot = stripRoot;
+        if (null != arrays) {
+            this.arrayElementNames.addAll(arrays);
+        }
+        if (null != nonStrings) {
+            this.nonStringElementNames.addAll(nonStrings);
+        }
     }
 
     public void close() throws XMLStreamException {

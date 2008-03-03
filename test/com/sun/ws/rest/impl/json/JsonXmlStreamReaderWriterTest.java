@@ -27,8 +27,10 @@ import com.sun.ws.rest.impl.test.util.TestHelper;
 import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
+import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.StringTokenizer;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
@@ -66,7 +68,7 @@ public class JsonXmlStreamReaderWriterTest extends TestCase {
     public void testjMakiTableOneUser() throws JAXBException, IOException {
         List<User> users = new LinkedList<User>();
         users.add(john);
-        tryBean(new UserTable(users), "userTableWrappedWithOneUser.json", false);
+        tryBean(new UserTable(users), "userTableWrappedWithOneUser.json", false, "rows", null);
     }
     
     
@@ -96,20 +98,41 @@ public class JsonXmlStreamReaderWriterTest extends TestCase {
 //    }
 
     public void tryBean(Object jaxbBean, String filename, boolean stripRoot) throws JAXBException, IOException {
-        tryWritingBean(jaxbBean, filename, stripRoot);
-        tryReadingBean(filename, jaxbBean, stripRoot);
+        tryBean(jaxbBean, filename, stripRoot, null, null);
     }
 
-    public void tryWritingBean(Object jaxbBean, String expectedJsonExprFilename, boolean stripRoot) throws JAXBException, IOException {
+    private void addStringsToCollection(String strings, Collection<String> collection) {
+        if ((null == strings) || (null == collection)) {
+            return;
+        }
+        StringTokenizer stringTokenizer = new StringTokenizer(strings);
+        while (stringTokenizer.hasMoreElements()) {
+            collection.add(stringTokenizer.nextToken());
+        }
+    }
+    
+    public void tryBean(Object jaxbBean, String filename, 
+            boolean stripRoot, String arrays, String nonStrings) throws JAXBException, IOException {
+        Collection<String> arrayElements = new LinkedList<String>();
+        Collection<String> nonStringElements = new LinkedList<String>();
+        addStringsToCollection(arrays, arrayElements);
+        addStringsToCollection(nonStrings, nonStringElements);
+        tryWritingBean(jaxbBean, filename, stripRoot, arrayElements, nonStringElements);
+        tryReadingBean(filename, jaxbBean, stripRoot, arrayElements, nonStringElements);
+    }
+
+    public void tryWritingBean(Object jaxbBean, String expectedJsonExprFilename, 
+            boolean stripRoot, Collection<String> arrays, Collection<String> nonStrings) throws JAXBException, IOException {
         String expectedJsonExpr = TestHelper.getResourceAsString(PKG_NAME, expectedJsonExprFilename);
         Marshaller marshaller = jaxbContext.createMarshaller();
         StringWriter resultWriter = new StringWriter();
-        marshaller.marshal(jaxbBean, new JsonXmlStreamWriter(resultWriter, stripRoot));
+        marshaller.marshal(jaxbBean, new JsonXmlStreamWriter(resultWriter, stripRoot, arrays, nonStrings));
         assertEquals("MISMATCH:\n" + expectedJsonExpr + "\n" + resultWriter.toString() + "\n", 
                 expectedJsonExpr, resultWriter.toString());
     }
 
-    public void tryReadingBean(String jsonExprFilename, Object expectedJaxbBean, boolean stripRoot) throws JAXBException, IOException {
+    public void tryReadingBean(String jsonExprFilename, Object expectedJaxbBean, 
+            boolean stripRoot, Collection<String> arrays, Collection<String> nonStrings) throws JAXBException, IOException {
         Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
         JAXBElement jaxbElement = unmarshaller.unmarshal(
                 new JsonXmlStreamReader(

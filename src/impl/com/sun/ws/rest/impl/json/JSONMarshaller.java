@@ -28,6 +28,8 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
+import java.util.Collection;
+import java.util.LinkedList;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.logging.Level;
@@ -44,6 +46,8 @@ import javax.xml.stream.XMLStreamWriter;
 import javax.xml.transform.Result;
 import javax.xml.validation.Schema;
 import org.codehaus.jettison.badgerfish.BadgerFishXMLStreamWriter;
+import org.codehaus.jettison.json.JSONArray;
+import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.mapped.Configuration;
 import org.codehaus.jettison.mapped.MappedNamespaceConvention;
 import org.codehaus.jettison.mapped.MappedXMLStreamWriter;
@@ -61,6 +65,8 @@ public class JSONMarshaller implements Marshaller {
     private JSONJAXBContext.JSONNotation jsonNotation;
     private boolean jsonEnabled;
     private boolean jsonRootUnwrapping;
+    private Collection<String> arrays;
+    private Collection<String> nonStrings;
 
     public JSONMarshaller(JAXBContext jaxbContext, Map<String, Object> properties) throws JAXBException {
         try {
@@ -125,6 +131,16 @@ public class JSONMarshaller implements Marshaller {
     public Node getNode(Object jaxbObject) throws JAXBException {
         return jaxbMarshaller.getNode(jaxbObject);
     }
+    
+    private void setArrayProperty(Collection<String> arrayProperty, String jsonArrayVal) throws JSONException {
+        if (null == jsonArrayVal) {
+            return;
+        }
+        JSONArray arrayVal = new JSONArray((String) jsonArrayVal);
+        for (int i = 0; i < arrayVal.length(); i++) {
+            arrayProperty.add(arrayVal.getString(i));
+        }
+    }
 
     public void setProperty(String key, Object value) throws PropertyException {
         if (JSONJAXBContext.JSON_ENABLED.equals(key)) {
@@ -133,11 +149,33 @@ public class JSONMarshaller implements Marshaller {
             this.jsonNotation = JSONJAXBContext.JSONNotation.valueOf((String) value);
         } else if (JSONJAXBContext.JSON_ROOT_UNWRAPPING.equals(key)) {
             this.jsonRootUnwrapping = (Boolean) value;
+        } else if (JSONJAXBContext.JSON_ARRAYS.equals(key)) {
+            if (null == this.arrays) {
+                this.arrays = new LinkedList<String>();
+            }
+            try {
+                setArrayProperty(this.arrays, (String) value);
+            } catch (JSONException e) {
+                throw new PropertyException("JSON exception when trying to set " + JSONJAXBContext.JSON_ARRAYS + " property.", e);
+            }
+        } else if (JSONJAXBContext.JSON_NON_STRINGS.equals(key)) {
+            if (null == this.nonStrings) {
+                this.nonStrings = new LinkedList<String>();
+            }
+            try {
+                setArrayProperty(this.nonStrings, (String) value);
+            } catch (JSONException e) {
+                throw new PropertyException("JSON exception when trying to set " + JSONJAXBContext.JSON_NON_STRINGS + " property.", e);
+            }
         } else {
             jaxbMarshaller.setProperty(key, value);
         }
     }
 
+    private String asJsonArray(Collection<String> collection) {
+        return (null == collection) ? "[]" : (new JSONArray(collection)).toString();
+    }
+    
     public Object getProperty(String key) throws PropertyException {
         if (JSONJAXBContext.JSON_ENABLED.equals(key)) {
             return this.jsonEnabled;
@@ -145,6 +183,10 @@ public class JSONMarshaller implements Marshaller {
             return this.jsonNotation.name();
         } else if (JSONJAXBContext.JSON_ROOT_UNWRAPPING.equals(key)) {
             return this.jsonRootUnwrapping;
+        } else if (JSONJAXBContext.JSON_ARRAYS.equals(key)) {
+            return asJsonArray(this.arrays);
+        } else if (JSONJAXBContext.JSON_NON_STRINGS.equals(key)) {
+            return asJsonArray(this.nonStrings);
         } else {
             return jaxbMarshaller.getProperty(key);
         }
@@ -205,7 +247,7 @@ public class JSONMarshaller implements Marshaller {
     XMLStreamWriter createXmlStreamWriter(Writer writer) {
         XMLStreamWriter xmlStreamWriter;
         if (JSONJAXBContext.JSONNotation.MAPPED == this.jsonNotation) {
-            xmlStreamWriter = new JsonXmlStreamWriter(writer, this.jsonRootUnwrapping);
+            xmlStreamWriter = new JsonXmlStreamWriter(writer, this.jsonRootUnwrapping, this.arrays, this.nonStrings);
         } else if (JSONJAXBContext.JSONNotation.MAPPED_JETTISON == this.jsonNotation) {
             xmlStreamWriter = new MappedXMLStreamWriter(
                     new MappedNamespaceConvention(new Configuration()), writer);
