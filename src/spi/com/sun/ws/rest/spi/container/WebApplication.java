@@ -94,7 +94,8 @@ public interface WebApplication {
     void addInjectable(Type fieldType, Injectable injectable);
     
     /**
-     * Get the thread local instance of HttpContextAccess.
+     * Get an instance of {@link HttpContextAccess} that is a proxy to
+     * a thread local instance of {@link HttpContextAccess}.
      * 
      * @return the thread local instance of HttpContextAccess.
      */
