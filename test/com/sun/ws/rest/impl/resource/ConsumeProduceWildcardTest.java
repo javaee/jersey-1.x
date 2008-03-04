@@ -25,7 +25,7 @@ package com.sun.ws.rest.impl.resource;
 import com.sun.ws.rest.impl.AbstractResourceTester;
 import com.sun.ws.rest.api.core.HttpRequestContext;
 import com.sun.ws.rest.api.core.HttpResponseContext;
-import com.sun.ws.rest.api.client.ResourceProxy;
+import com.sun.ws.rest.api.client.WebResource;
 import javax.ws.rs.Path;
 import javax.ws.rs.ConsumeMime;
 import javax.ws.rs.POST;
@@ -62,7 +62,7 @@ public class ConsumeProduceWildcardTest extends AbstractResourceTester {
         
     public void testConsumeWildCardBean() {
         initiateWebApplication(ConsumeWildCardBean.class);
-        ResourceProxy r = resourceProxy("/a/b");
+        WebResource r = resource("/a/b");
         
         assertEquals("HTML", r.entity("", "text/html").post(String.class));
         assertEquals("XHTML", r.entity("", "text/xhtml").post(String.class));

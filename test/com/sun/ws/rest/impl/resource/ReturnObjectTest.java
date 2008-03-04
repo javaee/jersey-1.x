@@ -56,12 +56,12 @@ public class ReturnObjectTest extends AbstractResourceTester {
     public void testMethodType() {
         initiateWebApplication(ResourceType.class);
         
-        assertEquals("TYPE", resourceProxy("/").get(String.class));
+        assertEquals("TYPE", resource("/").get(String.class));
     }
         
     public void testMethoResponse() {        
         initiateWebApplication(ResourceHttpResponse.class);
         
-        assertEquals("HTTP_RESPONSE", resourceProxy("/").get(String.class));
+        assertEquals("HTTP_RESPONSE", resource("/").get(String.class));
     }
 }

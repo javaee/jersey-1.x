@@ -698,25 +698,25 @@ public class MatrixParamAsPrimitiveTest extends AbstractResourceTester {
     public void _test(String type, String value) {
         String param = ";" + type + "=" + value;
         
-        resourceProxy("/" + param).accept("application/" + type).
+        resource("/" + param).accept("application/" + type).
                 get(String.class);
         
-        resourceProxy("/wrappers" + param).accept("application/" + type).
+        resource("/wrappers" + param).accept("application/" + type).
                 get(String.class);    
         
-        resourceProxy("/list" + param + param + param).accept("application/" + type).
+        resource("/list" + param + param + param).accept("application/" + type).
                 get(String.class);
     }
 
      public void _testDefault(String base, String type, String value) {
-        resourceProxy(base + "default/null").accept("application/" + type).
+        resource(base + "default/null").accept("application/" + type).
                 get(String.class);
         
-        resourceProxy(base + "default").accept("application/" + type).
+        resource(base + "default").accept("application/" + type).
                 get(String.class);
         
         String param = ";" + type + "=" + value;
-        resourceProxy(base + "default/override" + param).accept("application/" + type).
+        resource(base + "default/override" + param).accept("application/" + type).
                 get(String.class);        
     }
      
@@ -845,7 +845,7 @@ public class MatrixParamAsPrimitiveTest extends AbstractResourceTester {
     }
     
     public void testBadPrimitiveValue() {
-        ClientResponse response = resourceProxy("/;int=abcdef", false).
+        ClientResponse response = resource("/;int=abcdef", false).
                 accept("application/int").
                 get(ClientResponse.class);
         
@@ -853,7 +853,7 @@ public class MatrixParamAsPrimitiveTest extends AbstractResourceTester {
     }
     
     public void testBadPrimitiveWrapperValue() {
-        ClientResponse response = resourceProxy("/wrappers;int=abcdef", false).
+        ClientResponse response = resource("/wrappers;int=abcdef", false).
                 accept("application/int").
                 get(ClientResponse.class);
         
@@ -861,7 +861,7 @@ public class MatrixParamAsPrimitiveTest extends AbstractResourceTester {
     }
     
     public void testBadPrimitiveListValue() {
-        ClientResponse response = resourceProxy("/list;int=abcdef;int=abcdef", false).
+        ClientResponse response = resource("/list;int=abcdef;int=abcdef", false).
                 accept("application/int").
                 get(ClientResponse.class);
         

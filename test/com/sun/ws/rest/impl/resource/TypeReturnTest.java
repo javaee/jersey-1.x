@@ -60,7 +60,7 @@ public class TypeReturnTest extends AbstractResourceTester {
     public void testReturnType() {
         initiateWebApplication(Resource.class);
         
-        ClientResponse response = resourceProxy("/", false).get(ClientResponse.class);                
+        ClientResponse response = resource("/", false).get(ClientResponse.class);                
         assertEquals("CONTENT", response.getEntity(String.class));
         assertEquals(MediaType.parse("application/octet-stream"), 
                 response.getType());
@@ -70,7 +70,7 @@ public class TypeReturnTest extends AbstractResourceTester {
     public void testReturnHttpTypeWithSingleProduceMime() {
         initiateWebApplication(ResourceWithSingleProduceMime.class);
         
-        ClientResponse response = resourceProxy("/", false).get(ClientResponse.class);                
+        ClientResponse response = resource("/", false).get(ClientResponse.class);                
         assertEquals("CONTENT", response.getEntity(String.class));
         assertEquals(MediaType.parse("text/plain"), 
                 response.getType());

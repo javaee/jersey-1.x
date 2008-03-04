@@ -49,6 +49,6 @@ public class HttpResponseReturnTest extends AbstractResourceTester {
     public void testReturnHttpResponse() {
         initiateWebApplication(Resource.class);
         
-        assertEquals("CONTENT", resourceProxy("/").get(String.class));
+        assertEquals("CONTENT", resource("/").get(String.class));
     }
 }

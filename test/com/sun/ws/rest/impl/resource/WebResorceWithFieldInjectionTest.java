@@ -24,7 +24,7 @@ package com.sun.ws.rest.impl.resource;
 
 import com.sun.ws.rest.impl.AbstractResourceTester;
 import com.sun.ws.rest.api.core.HttpContextAccess;
-import com.sun.ws.rest.api.client.ResourceProxy;
+import com.sun.ws.rest.api.client.WebResource;
 import java.net.URI;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
@@ -110,7 +110,7 @@ public class WebResorceWithFieldInjectionTest extends AbstractResourceTester {
     public void testFieldInjectedHttpContextAccess() {
         initiateWebApplication(TestFieldInjectedHttpContextAccess.class);
         
-        ResourceProxy r = resourceProxy("a/b");
+        WebResource r = resource("a/b");
         
         assertEquals("POST", r.post(String.class, "BEAN-ONE"));
         assertEquals("GET", r.get(String.class));
@@ -121,13 +121,13 @@ public class WebResorceWithFieldInjectionTest extends AbstractResourceTester {
     public void testFieldInjectedUriInfo() {
         initiateWebApplication(TestFieldInjectedUriInfo.class);
         
-        assertEquals("GET", resourceProxy("a/b").get(String.class));
+        assertEquals("GET", resource("a/b").get(String.class));
     }
     
     public void testFieldInjectedHttpHeaders() {
         initiateWebApplication(TestFieldInjectedHttpHeaders.class);
         
-        assertEquals("GET", resourceProxy("a/b").
+        assertEquals("GET", resource("a/b").
                 header("X-TEST", "TEST").get(String.class));
     }
 }

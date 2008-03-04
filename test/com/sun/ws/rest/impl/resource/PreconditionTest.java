@@ -61,7 +61,7 @@ public class PreconditionTest extends AbstractResourceTester {
     
     public void testIfUnmodifiedSinceBeforeLastModified() {
         initiateWebApplication(LastModifiedResource.class);
-        ClientResponse response = resourceProxy("/", false).
+        ClientResponse response = resource("/", false).
                 header("If-Unmodified-Since", "Sat, 30 Dec 2006 00:00:00 GMT").
                 get(ClientResponse.class);
         assertEquals(412, response.getStatus());
@@ -69,21 +69,21 @@ public class PreconditionTest extends AbstractResourceTester {
 
     public void testIfUnmodifiedSinceAfterLastModified() {
         initiateWebApplication(LastModifiedResource.class);
-        resourceProxy("/").
+        resource("/").
                 header("If-Unmodified-Since", "Tue, 2 Jan 2007 00:00:00 GMT").
                 get(ClientResponse.class);
     }    
 
     public void testIfModifiedSinceBeforeLastModified() {
         initiateWebApplication(LastModifiedResource.class);
-        resourceProxy("/").
+        resource("/").
                 header("If-Modified-Since", "Sat, 30 Dec 2006 00:00:00 GMT").
                 get(ClientResponse.class);
     }    
 
     public void testIfModifiedSinceAfterLastModified() {
         initiateWebApplication(LastModifiedResource.class);
-        ClientResponse response = resourceProxy("/", false).
+        ClientResponse response = resource("/", false).
                 header("If-Modified-Since", "Tue, 2 Jan 2007 00:00:00 GMT").
                 get(ClientResponse.class);
         assertEquals(304, response.getStatus());
@@ -91,7 +91,7 @@ public class PreconditionTest extends AbstractResourceTester {
 
     public void testIfUnmodifiedSinceBeforeLastModified_IfModifiedSinceBeforeLastModified() {
         initiateWebApplication(LastModifiedResource.class);
-        ClientResponse response = resourceProxy("/", false).
+        ClientResponse response = resource("/", false).
                 header("If-Unmodified-Since", "Sat, 30 Dec 2006 00:00:00 GMT").
                 header("If-Modified-Since", "Sat, 30 Dec 2006 00:00:00 GMT").
                 get(ClientResponse.class);
@@ -100,7 +100,7 @@ public class PreconditionTest extends AbstractResourceTester {
 
     public void testIfUnmodifiedSinceBeforeLastModified_IfModifiedSinceAfterLastModified() {
         initiateWebApplication(LastModifiedResource.class);
-        ClientResponse response = resourceProxy("/", false).
+        ClientResponse response = resource("/", false).
                 header("If-Unmodified-Since", "Sat, 30 Dec 2006 00:00:00 GMT").
                 header("If-Modified-Since", "Tue, 2 Jan 2007 00:00:00 GMT").
                 get(ClientResponse.class);
@@ -109,7 +109,7 @@ public class PreconditionTest extends AbstractResourceTester {
     
     public void testIfUnmodifiedSinceAfterLastModified_IfModifiedSinceAfterLastModified() {
         initiateWebApplication(LastModifiedResource.class);
-        ClientResponse response = resourceProxy("/", false).
+        ClientResponse response = resource("/", false).
                 header("If-Unmodified-Since", "Tue, 2 Jan 2007 00:00:00 GMT").
                 header("If-Modified-Since", "Tue, 2 Jan 2007 00:00:00 GMT").
                 get(ClientResponse.class);
@@ -118,7 +118,7 @@ public class PreconditionTest extends AbstractResourceTester {
 
     public void testIfUnmodifiedSinceAfterLastModified_IfModifiedSinceBeforeLastModified() {
         initiateWebApplication(LastModifiedResource.class);
-        resourceProxy("/").
+        resource("/").
                 header("If-Unmodified-Since", "Tue, 2 Jan 2007 00:00:00 GMT").
                 header("If-Modified-Since", "Sat, 30 Dec 2006 00:00:00 GMT").
                 get(ClientResponse.class);
@@ -141,14 +141,14 @@ public class PreconditionTest extends AbstractResourceTester {
 
     public void testIfMatchWithMatchingETag() {
         initiateWebApplication(EtagResource.class);
-        resourceProxy("/").
+        resource("/").
                 header("If-Match", "\"1\"").
                 get(ClientResponse.class);
     }
     
     public void testIfMatchWithoutMatchingETag() {
         initiateWebApplication(EtagResource.class);
-        ClientResponse response = resourceProxy("/", false).
+        ClientResponse response = resource("/", false).
                 header("If-Match", "\"2\"").
                 get(ClientResponse.class);
         assertEquals(412, response.getStatus());        
@@ -156,14 +156,14 @@ public class PreconditionTest extends AbstractResourceTester {
     
     public void testIfMatchWildCard() {
         initiateWebApplication(EtagResource.class);
-        resourceProxy("/").
+        resource("/").
                 header("If-Match", "*").
                 get(ClientResponse.class);
     }
     
     public void testIfNonMatchWithMatchingETag() {
         initiateWebApplication(EtagResource.class);
-        ClientResponse response = resourceProxy("/", false).
+        ClientResponse response = resource("/", false).
                 header("If-None-Match", "\"1\"").
                 get(ClientResponse.class);
         assertEquals(304, response.getStatus());
@@ -172,14 +172,14 @@ public class PreconditionTest extends AbstractResourceTester {
     
     public void testIfNonMatchWithoutMatchingETag() {
         initiateWebApplication(EtagResource.class);
-        resourceProxy("/").
+        resource("/").
                 header("If-None-Match", "\"2\"").
                 get(ClientResponse.class);
     }
     
     public void testIfNonMatchWildCard() {
         initiateWebApplication(EtagResource.class);
-        ClientResponse response = resourceProxy("/", false).
+        ClientResponse response = resource("/", false).
                 header("If-None-Match", "*").
                 get(ClientResponse.class);
         assertEquals(304, response.getStatus());
@@ -189,7 +189,7 @@ public class PreconditionTest extends AbstractResourceTester {
     
     public void testIfMatchWithMatchingETag_IfNonMatchWithMatchingETag() {
         initiateWebApplication(EtagResource.class);
-        ClientResponse response = resourceProxy("/", false).
+        ClientResponse response = resource("/", false).
                 header("If-Match", "\"1\"").
                 header("If-None-Match", "\"1\"").
                 get(ClientResponse.class);
@@ -199,7 +199,7 @@ public class PreconditionTest extends AbstractResourceTester {
     
     public void testIfMatchWithMatchingETag_IfNonMatchWithoutMatchingETag() {
         initiateWebApplication(EtagResource.class);
-        resourceProxy("/").
+        resource("/").
                 header("If-Match", "\"1\"").
                 header("If-None-Match", "\"2\"").
                 get(ClientResponse.class);
@@ -207,7 +207,7 @@ public class PreconditionTest extends AbstractResourceTester {
     
     public void testIfMatchWithoutMatchingETag_IfNonMatchWithMatchingETag() {
         initiateWebApplication(EtagResource.class);
-        ClientResponse response = resourceProxy("/", false).
+        ClientResponse response = resource("/", false).
                 header("If-Match", "\"2\"").
                 header("If-None-Match", "\"1\"").
                 get(ClientResponse.class);
@@ -216,7 +216,7 @@ public class PreconditionTest extends AbstractResourceTester {
     
     public void testIfMatchWithoutMatchingETag_IfNonMatchWithoutMatchingETag() {
         initiateWebApplication(EtagResource.class);
-        ClientResponse response = resourceProxy("/", false).
+        ClientResponse response = resource("/", false).
                 header("If-Match", "\"2\"").
                 header("If-None-Match", "\"2\"").
                 get(ClientResponse.class);

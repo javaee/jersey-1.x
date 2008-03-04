@@ -68,7 +68,7 @@ public class EncodedParamsTest extends AbstractResourceTester {
     public void testEncodedOnClass() {
         initiateWebApplication(EncodedOnClass.class);
         
-        resourceProxy("/%20u;m=%20m?q=%20q").get(String.class);
+        resource("/%20u;m=%20m?q=%20q").get(String.class);
     }
     
     @Path("/{u}")
@@ -99,7 +99,7 @@ public class EncodedParamsTest extends AbstractResourceTester {
     public void testEncodedOnAccessibleObject() {
         initiateWebApplication(EncodedOnAccessibleObject.class);
         
-        resourceProxy("/%20u;m=%20m?q=%20q").get(String.class);
+        resource("/%20u;m=%20m?q=%20q").get(String.class);
     }
     
     @Path("/{u}")
@@ -128,7 +128,7 @@ public class EncodedParamsTest extends AbstractResourceTester {
     public void testEncodedOnParameters() {
         initiateWebApplication(EncodedOnParameters.class);
         
-        resourceProxy("/%20u;m=%20m?q=%20q").get(String.class);
+        resource("/%20u;m=%20m?q=%20q").get(String.class);
     }
 
     @Path("/{u}")
@@ -169,6 +169,6 @@ public class EncodedParamsTest extends AbstractResourceTester {
     public void testMixedEncodedOnParameters() {
         initiateWebApplication(MixedEncodedOnParameters.class);
         
-        resourceProxy("/%20u;m=%20m?q=%20q").get(String.class);
+        resource("/%20u;m=%20m?q=%20q").get(String.class);
     }
 }

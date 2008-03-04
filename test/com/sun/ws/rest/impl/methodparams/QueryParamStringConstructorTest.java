@@ -152,14 +152,14 @@ public class QueryParamStringConstructorTest extends AbstractResourceTester {
     public void testStringConstructorGet() {
         initiateWebApplication(ResourceString.class);
         
-        resourceProxy("/?arg1=3.145&arg2=3145&arg3=http:%2F%2Ftest").
+        resource("/?arg1=3.145&arg2=3145&arg3=http:%2F%2Ftest").
                 get(String.class);
     }
     
     public void testStringConstructorListGet() {
         initiateWebApplication(ResourceStringList.class);
         
-        resourceProxy("/?args=3.145&args=2.718&args=1.618").
+        resource("/?args=3.145&args=2.718&args=1.618").
                 accept("application/stringlist").
                 get(String.class);
     }
@@ -167,7 +167,7 @@ public class QueryParamStringConstructorTest extends AbstractResourceTester {
     public void testStringConstructorListEmptyGet() {
         initiateWebApplication(ResourceStringListEmpty.class);
         
-        resourceProxy("/?args&args&args").
+        resource("/?args&args&args").
                 accept("application/stringlist").
                 get(String.class);
     }
@@ -175,7 +175,7 @@ public class QueryParamStringConstructorTest extends AbstractResourceTester {
     public void testStringConstructorListAbsentGet() {
         initiateWebApplication(ResourceStringListAbsent.class);
         
-        resourceProxy("/").
+        resource("/").
             accept("application/stringlist").
             get(String.class);
     }
@@ -183,45 +183,45 @@ public class QueryParamStringConstructorTest extends AbstractResourceTester {
     public void testStringConstructorNullDefault() {
         initiateWebApplication(ResourceStringNullDefault.class);
         
-        resourceProxy("/").get(String.class);
+        resource("/").get(String.class);
     }
     
     public void testStringConstructorDefault() {
         initiateWebApplication(ResourceStringDefault.class);
         
-        resourceProxy("/").get(String.class);
+        resource("/").get(String.class);
     }
     
     public void testStringConstructorDefaultOverride() {
         initiateWebApplication(ResourceStringDefault.class);
         
-        resourceProxy("/?args=2.718").
+        resource("/?args=2.718").
                 get(String.class);
     }
     
     public void testStringConstructorListNullDefault() {
         initiateWebApplication(ResourceStringListNullDefault.class);
         
-        resourceProxy("/").get(String.class);
+        resource("/").get(String.class);
     }
     
     public void testStringConstructorListDefault() {
         initiateWebApplication(ResourceStringListDefault.class);
         
-        resourceProxy("/").get(String.class);
+        resource("/").get(String.class);
     }
     
     public void testStringConstructorListDefaultOverride() {
         initiateWebApplication(ResourceStringListDefaultOverride.class);
         
-        resourceProxy("/?args=2.718").
+        resource("/?args=2.718").
                 get(String.class);
     }
     
     public void testBadStringConstructorValue() {
         initiateWebApplication(ResourceString.class);
         
-        ClientResponse response = resourceProxy("/?arg1=ABCDEF&arg2=3145&arg3=http:%2F%2Ftest", false).
+        ClientResponse response = resource("/?arg1=ABCDEF&arg2=3145&arg3=http:%2F%2Ftest", false).
                 get(ClientResponse.class);
         assertEquals(400, response.getStatus());
     }

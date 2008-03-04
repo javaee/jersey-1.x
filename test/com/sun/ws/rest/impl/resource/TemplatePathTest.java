@@ -73,21 +73,21 @@ public class TemplatePathTest extends AbstractResourceTester {
     public void testTemplateAtEnd() {
         initiateWebApplication(ResourceA.class, ResourceAB.class);
         
-        assertEquals("A", resourceProxy("/a/a").get(String.class));
-        assertEquals("AB", resourceProxy("/a/b/ab").get(String.class));
+        assertEquals("A", resource("/a/a").get(String.class));
+        assertEquals("AB", resource("/a/b/ab").get(String.class));
     }
     
     public void testTemplateInMiddle() {
         initiateWebApplication(ResourceA.class, ResourceAArg1B.class);
         
-        assertEquals("A", resourceProxy("/a/a").get(String.class));
-        assertEquals("AArg1B", resourceProxy("/a/infix/b").get(String.class));
+        assertEquals("A", resource("/a/a").get(String.class));
+        assertEquals("AArg1B", resource("/a/infix/b").get(String.class));
     }    
     
     public void testTwoTemplatesInMiddle() {
         initiateWebApplication(ResourceAArg1B.class, ResourceAArg1C.class);
         
-        assertEquals("AArg1B", resourceProxy("/a/infix/b").get(String.class));
-        assertEquals("AArg1C", resourceProxy("/a/infix/c").get(String.class));
+        assertEquals("AArg1B", resource("/a/infix/b").get(String.class));
+        assertEquals("AArg1C", resource("/a/infix/c").get(String.class));
     }    
 }

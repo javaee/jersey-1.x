@@ -27,7 +27,7 @@ import com.sun.ws.rest.api.core.HttpRequestContext;
 import com.sun.ws.rest.api.core.HttpResponseContext;
 import javax.ws.rs.ProduceMime;
 import javax.ws.rs.Path;
-import com.sun.ws.rest.api.client.ResourceProxy;
+import com.sun.ws.rest.api.client.WebResource;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -125,7 +125,7 @@ public class BeanWithWebResourceTest extends AbstractResourceTester {
     
     public void testBeanWithWebResource() {
         initiateWebApplication(BeanWithWebResource.class);
-        ResourceProxy r = resourceProxy("/a/b");
+        WebResource r = resource("/a/b");
         
         r.accept("text/html").get(String.class);
         r.accept("text/xhtml").post();
@@ -135,7 +135,7 @@ public class BeanWithWebResourceTest extends AbstractResourceTester {
     
     public void testBeanProduceWithWebResource() {
         initiateWebApplication(BeanProduceWithWebResource.class);
-        ResourceProxy r = resourceProxy("/a/b");
+        WebResource r = resource("/a/b");
         
         r.accept("text/html").get(String.class);
         r.accept("text/xhtml").post();

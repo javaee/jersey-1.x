@@ -28,20 +28,22 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.UriBuilder;
 
 /**
- * A proxy to a resource.
+ * An encapsulation of a Web resource capable of building requests
+ * to send to the Web resource and processing responses returned from the Web
+ * resource.
  * <p>
- * The proxy implements the {@link UniformInterface} to invoke the HTTP methods
- * on the proxied resource. A client request may be built before invocation
+ * The Web resource implements the {@link UniformInterface} to invoke the HTTP 
+ * method on the Web resource. A client request may be built before invocation
  * on the uniform interface.
  * 
  * @author Paul.Sandoz@Sun.Com
  */
-public final class ResourceProxy extends Filterable implements 
-        RequestBuilder<ResourceProxy.Builder>,
+public final class WebResource extends Filterable implements 
+        RequestBuilder<WebResource.Builder>,
         UniformInterface {    
     private final URI u;
     
-    /* package */ ResourceProxy(ClientHandler c, URI u) {
+    /* package */ WebResource(ClientHandler c, URI u) {
         super(c);
         this.u = u;
     }
@@ -142,7 +144,7 @@ public final class ResourceProxy extends Filterable implements
         return handle(c, new ClientRequestImpl(u, method, requestEntity));        
     }
     
-    // RequestBuilder<ResourceProxy.Builder>
+    // RequestBuilder<WebResource.Builder>
     
     public Builder entity(Object entity) {
         return new Builder(u).entity(entity);

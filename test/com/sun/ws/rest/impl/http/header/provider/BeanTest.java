@@ -59,7 +59,7 @@ public class BeanTest extends AbstractResourceTester {
     public void testHeaders() {
         initiateWebApplication(TestResource.class);
         
-        ClientResponse response = resourceProxy("/").get(ClientResponse.class);
+        ClientResponse response = resource("/").get(ClientResponse.class);
         
         assertEquals(new GregorianCalendar(2007, 0, 0, 0, 0, 0).getTime(),
                 response.getLastModified());

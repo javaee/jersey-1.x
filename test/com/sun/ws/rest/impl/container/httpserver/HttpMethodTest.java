@@ -24,7 +24,7 @@ package com.sun.ws.rest.impl.container.httpserver;
 
 import com.sun.ws.rest.api.client.Client;
 import javax.ws.rs.Path;
-import com.sun.ws.rest.api.client.ResourceProxy;
+import com.sun.ws.rest.api.client.WebResource;
 import com.sun.ws.rest.api.client.ClientResponse;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
@@ -66,40 +66,40 @@ public class HttpMethodTest extends AbstractHttpServerTester {
     
     public void testGet() {
         startServer(HttpMethodResource.class);
-        ResourceProxy r = Client.create().proxy(getUri().path("test").build());
+        WebResource r = Client.create().resource(getUri().path("test").build());
         assertEquals("GET", r.get(String.class));
     }
     
     public void testPost() {
         startServer(HttpMethodResource.class);
-        ResourceProxy r = Client.create().proxy(getUri().path("test").build());
+        WebResource r = Client.create().resource(getUri().path("test").build());
         assertEquals("POST", r.post(String.class, "POST"));
     }    
     
     public void testPut() {
         startServer(HttpMethodResource.class);
-        ResourceProxy r = Client.create().proxy(getUri().path("test").build());
+        WebResource r = Client.create().resource(getUri().path("test").build());
         assertEquals("PUT", r.post(String.class, "PUT"));
     }
     
     public void testDelete() {
         startServer(HttpMethodResource.class);
-        ResourceProxy r = Client.create().proxy(getUri().path("test").build());
+        WebResource r = Client.create().resource(getUri().path("test").build());
         assertEquals("DELETE", r.delete(String.class));
     }
     
     public void testAll() {
         startServer(HttpMethodResource.class);
-        ResourceProxy r = Client.create().proxy(getUri().path("test").build());
+        WebResource r = Client.create().resource(getUri().path("test").build());
         assertEquals("GET", r.get(String.class));
 
-        r = Client.create().proxy(getUri().path("test").build());
+        r = Client.create().resource(getUri().path("test").build());
         assertEquals("POST", r.post(String.class, "POST"));
         
-        r = Client.create().proxy(getUri().path("test").build());
+        r = Client.create().resource(getUri().path("test").build());
         assertEquals("PUT", r.post(String.class, "PUT"));
         
-        r = Client.create().proxy(getUri().path("test").build());
+        r = Client.create().resource(getUri().path("test").build());
         assertEquals("DELETE", r.delete(String.class));
     }
     
@@ -120,19 +120,19 @@ public class HttpMethodTest extends AbstractHttpServerTester {
     
     public void testPutNoArguments() {
         startServer(HttpMethodResourceNoContent.class);
-        ResourceProxy r = Client.create().proxy(getUri().path("test").build());
+        WebResource r = Client.create().resource(getUri().path("test").build());
         assertEquals(204, r.put(ClientResponse.class).getStatus());
     }    
     
     public void testPostNoArguments() {
         startServer(HttpMethodResourceNoContent.class);
-        ResourceProxy r = Client.create().proxy(getUri().path("test").build());
+        WebResource r = Client.create().resource(getUri().path("test").build());
         assertEquals(204, r.post(ClientResponse.class).getStatus());
     }    
     
     public void testDeleteNoArguments() {
         startServer(HttpMethodResourceNoContent.class);
-        ResourceProxy r = Client.create().proxy(getUri().path("test").build());
+        WebResource r = Client.create().resource(getUri().path("test").build());
         assertEquals(204, r.delete(ClientResponse.class).getStatus());
     }    
 }

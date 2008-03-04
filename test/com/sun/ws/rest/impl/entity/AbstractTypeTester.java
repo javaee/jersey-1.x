@@ -23,7 +23,7 @@
 package com.sun.ws.rest.impl.entity;
 
 import com.sun.ws.rest.impl.AbstractResourceTester;
-import com.sun.ws.rest.api.client.ResourceProxy;
+import com.sun.ws.rest.api.client.WebResource;
 import com.sun.ws.rest.api.client.ClientResponse;
 import javax.ws.rs.POST;
 
@@ -50,7 +50,7 @@ public abstract class AbstractTypeTester extends AbstractResourceTester {
     
     protected <T> void _test(Class<T> typeT, T in, Class resource, boolean verify) {
         initiateWebApplication(resource);
-        ResourceProxy r = resourceProxy("/");
+        WebResource r = resource("/");
 
         ClientResponse rib = r.post(ClientResponse.class, in);
         

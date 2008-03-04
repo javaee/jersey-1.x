@@ -90,14 +90,14 @@ public class SubResourceDynamicWithParametersTest extends AbstractResourceTester
     public void testSubResourceDynamicWithTemplates() {
         initiateWebApplication(ParentWithTemplates.class);
         
-        assertEquals("parent", resourceProxy("/parent").get(String.class));
-        assertEquals("first", resourceProxy("/parent/child/first?a=1&b=2").get(String.class));
+        assertEquals("parent", resource("/parent").get(String.class));
+        assertEquals("first", resource("/parent/child/first?a=1&b=2").get(String.class));
     }
     
     public void testSubResourceDynamicWithUnmatchedPath() {
         initiateWebApplication(ParentWithTemplates.class);
         
-        assertEquals("", resourceProxy("/parent/unmatchedPath/").get(String.class));
-        assertEquals("a/b/c/d", resourceProxy("/parent/unmatchedPath/a/b/c/d").get(String.class));
+        assertEquals("", resource("/parent/unmatchedPath/").get(String.class));
+        assertEquals("a/b/c/d", resource("/parent/unmatchedPath/a/b/c/d").get(String.class));
     }
 }

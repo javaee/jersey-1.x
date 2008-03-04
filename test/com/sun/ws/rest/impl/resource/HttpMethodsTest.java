@@ -23,7 +23,7 @@
 package com.sun.ws.rest.impl.resource;
 
 import com.sun.ws.rest.impl.AbstractResourceTester;
-import com.sun.ws.rest.api.client.ResourceProxy;
+import com.sun.ws.rest.api.client.WebResource;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.HEAD;
@@ -72,7 +72,7 @@ public class HttpMethodsTest extends AbstractResourceTester {
     
     public void testMethod() {
         initiateWebApplication(Resource.class);
-        ResourceProxy r = resourceProxy("/");
+        WebResource r = resource("/");
         
         r.head();
         assertEquals("getMe", r.get(String.class));

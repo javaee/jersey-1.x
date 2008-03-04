@@ -26,7 +26,7 @@ import com.sun.ws.rest.impl.AbstractResourceTester;
 import javax.ws.rs.ConsumeMime;
 import javax.ws.rs.ProduceMime;
 import javax.ws.rs.Path;
-import com.sun.ws.rest.api.client.ResourceProxy;
+import com.sun.ws.rest.api.client.WebResource;
 import com.sun.ws.rest.api.client.ClientResponse;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -62,7 +62,7 @@ public class ClientErrorTest extends AbstractResourceTester {
     
     public void testNotFound() {
         initiateWebApplication(WebResourceNotFoundMethodNotAllowed.class);
-        ResourceProxy r = resourceProxy("/foo", false);
+        WebResource r = resource("/foo", false);
 
         ClientResponse response = r.accept("application/foo").get(ClientResponse.class);
         assertEquals(404, response.getStatus());
@@ -70,7 +70,7 @@ public class ClientErrorTest extends AbstractResourceTester {
     
     public void testMethodNotAllowed() {
         initiateWebApplication(WebResourceNotFoundMethodNotAllowed.class);
-        ResourceProxy r = resourceProxy("/", false);
+        WebResource r = resource("/", false);
         
         ClientResponse response = r.entity("content", "application/foo").
                 accept("application/foo").post(ClientResponse.class);
@@ -81,7 +81,7 @@ public class ClientErrorTest extends AbstractResourceTester {
     
     public void testUnsupportedMediaType() {
         initiateWebApplication(WebResourceUnsupportedMediaType.class);
-        ResourceProxy r = resourceProxy("/", false);
+        WebResource r = resource("/", false);
         
         ClientResponse response = r.entity("content", "application/foo").
                 accept("application/foo").post(ClientResponse.class);
@@ -90,7 +90,7 @@ public class ClientErrorTest extends AbstractResourceTester {
     
     public void testNotAcceptable() {
         initiateWebApplication(WebResourceUnsupportedMediaType.class);
-        ResourceProxy r = resourceProxy("/", false);
+        WebResource r = resource("/", false);
         
         ClientResponse response = r.entity("content", "application/bar").
                 accept("application/bar").post(ClientResponse.class);

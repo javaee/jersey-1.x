@@ -23,7 +23,7 @@
 package com.sun.ws.rest.impl.entity;
 
 import com.sun.ws.rest.impl.AbstractResourceTester;
-import com.sun.ws.rest.api.client.ResourceProxy;
+import com.sun.ws.rest.api.client.WebResource;
 import com.sun.ws.rest.impl.provider.entity.AbstractTypeEntityProvider;
 import java.io.IOException;
 import java.io.InputStream;
@@ -233,11 +233,11 @@ public class BeanStreamingTest extends AbstractResourceTester {
         
         // the following should work using BeanProvider which
         // supports Bean.class for type application/bean
-        ResourceProxy r = resourceProxy("/bean");
+        WebResource r = resource("/bean");
         r.entity(b, "application/bean").post(Bean.class);
 
         try {
-            r = resourceProxy("/plain");
+            r = resource("/plain");
             r.entity(b, "text/plain").post(Bean.class);
             assertFalse(false);
         } catch (IllegalArgumentException ex) {
@@ -256,7 +256,7 @@ public class BeanStreamingTest extends AbstractResourceTester {
         
         // the following should work using BeanWildProvider which
         // supports Bean.class for type application/*
-        ResourceProxy r = resourceProxy("/wild");
+        WebResource r = resource("/wild");
         r.entity(b, "application/wild-bean").post(Bean.class);
     }
     
@@ -270,11 +270,11 @@ public class BeanStreamingTest extends AbstractResourceTester {
                 
         Bean2 b = new Bean2("bean", 123, 3.1415f);        
         
-        ResourceProxy r = resourceProxy("/bean");
+        WebResource r = resource("/bean");
         r.entity(b, "application/bean").post(Bean2.class);
 
         try {
-            r = resourceProxy("/plain");
+            r = resource("/plain");
             r.entity(b, "text/plain").post(Bean2.class);
             assertFalse(false);
         } catch (IllegalArgumentException ex) {
@@ -293,11 +293,11 @@ public class BeanStreamingTest extends AbstractResourceTester {
         
         // the following should work using BeanProvider which
         // supports Bean.class for type application/bean
-        ResourceProxy r = resourceProxy("/bean");
+        WebResource r = resource("/bean");
         r.entity(b, "application/bean").post(Bean2.class);
 
         try {
-            r = resourceProxy("/plain");
+            r = resource("/plain");
             r.entity(b, "text/plain").post(Bean2.class);
             assertFalse(false);
         } catch (IllegalArgumentException ex) {
@@ -316,7 +316,7 @@ public class BeanStreamingTest extends AbstractResourceTester {
         
         // the following should work using BeanWildProvider which
         // supports Bean.class for type application/*
-        ResourceProxy r = resourceProxy("/wild");
+        WebResource r = resource("/wild");
         r.entity(b, "application/wild-bean").post(Bean2.class);
     }
     
@@ -331,7 +331,7 @@ public class BeanStreamingTest extends AbstractResourceTester {
         
         // the following should work using BeanWildProvider which
         // supports Bean.class for type application/*
-        ResourceProxy r = resourceProxy("/wild");
+        WebResource r = resource("/wild");
         r.entity(b, "application/wild-bean").post(Bean2.class);
     }    
 }

@@ -61,6 +61,6 @@ public class ConstructorParamsTest extends AbstractResourceTester {
     
     public void testOneWebResource() {
         initiateWebApplication(TestOneWebResourceBean.class);
-        resourceProxy("/foo").get(String.class);
+        resource("/foo").get(String.class);
     }    
 }

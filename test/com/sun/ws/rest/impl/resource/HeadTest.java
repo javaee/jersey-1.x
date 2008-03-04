@@ -23,7 +23,7 @@
 package com.sun.ws.rest.impl.resource;
 
 import com.sun.ws.rest.impl.AbstractResourceTester;
-import com.sun.ws.rest.api.client.ResourceProxy;
+import com.sun.ws.rest.api.client.WebResource;
 import com.sun.ws.rest.api.client.ClientResponse;
 import javax.ws.rs.GET;
 import javax.ws.rs.HEAD;
@@ -53,7 +53,7 @@ public class HeadTest extends AbstractResourceTester {
     public void testGetNoHead() {
         initiateWebApplication(ResourceGetNoHead.class);
         
-        ClientResponse response = resourceProxy("/", false).
+        ClientResponse response = resource("/", false).
                 head();
         assertEquals(200, response.getStatus());
         assertFalse(response.hasEntity());
@@ -75,7 +75,7 @@ public class HeadTest extends AbstractResourceTester {
     public void testGetWithHead() {
         initiateWebApplication(ResourceGetWithHead.class);
         
-        ClientResponse response = resourceProxy("/", false).
+        ClientResponse response = resource("/", false).
                 head();
         assertEquals(200, response.getStatus());
         assertFalse(response.hasEntity());
@@ -99,7 +99,7 @@ public class HeadTest extends AbstractResourceTester {
     
     public void testGetWithProduceNoHead() {
         initiateWebApplication(ResourceGetWithProduceNoHead.class);
-        ResourceProxy r = resourceProxy("/", false);
+        WebResource r = resource("/", false);
         
         MediaType foo = MediaType.parse("application/foo");
         ClientResponse response = r.accept(foo).head();
@@ -144,7 +144,7 @@ public class HeadTest extends AbstractResourceTester {
     
     public void testGetWithProduceWithHead() {
         initiateWebApplication(ResourceGetWithProduceWithHead.class);
-        ResourceProxy r = resourceProxy("/", false);
+        WebResource r = resource("/", false);
         
         MediaType foo = MediaType.parse("application/foo");
         ClientResponse response = r.accept(foo).head();

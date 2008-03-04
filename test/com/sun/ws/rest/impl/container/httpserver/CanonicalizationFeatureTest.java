@@ -25,7 +25,7 @@ package com.sun.ws.rest.impl.container.httpserver;
 import com.sun.ws.rest.api.core.DefaultResourceConfig;
 import com.sun.ws.rest.api.core.ResourceConfig;
 import com.sun.ws.rest.api.client.Client;
-import com.sun.ws.rest.api.client.ResourceProxy;
+import com.sun.ws.rest.api.client.WebResource;
 import java.net.URI;
 import javax.ws.rs.GET;
 import javax.ws.rs.ProduceMime;
@@ -85,7 +85,7 @@ public class CanonicalizationFeatureTest extends AbstractHttpServerTester {
         
         startServer(rc);
         
-        ResourceProxy r = Client.create().proxy(getUri().
+        WebResource r = Client.create().resource(getUri().
                 path("/test").build());
         
         assertEquals("http://jersey.dev.java.net", 

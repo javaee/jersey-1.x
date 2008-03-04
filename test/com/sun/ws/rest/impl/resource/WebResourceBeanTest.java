@@ -26,7 +26,7 @@ import com.sun.ws.rest.impl.AbstractResourceTester;
 import javax.ws.rs.Path;
 import com.sun.ws.rest.api.core.HttpRequestContext;
 import com.sun.ws.rest.api.core.HttpResponseContext;
-import com.sun.ws.rest.api.client.ResourceProxy;
+import com.sun.ws.rest.api.client.WebResource;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -72,7 +72,7 @@ public class WebResourceBeanTest extends AbstractResourceTester {
     public void testOneWebResource() {
         initiateWebApplication(TestOneWebResourceBean.class);
         
-        ResourceProxy r = resourceProxy("a/b");
+        WebResource r = resource("a/b");
         
         assertEquals("POST", r.post(String.class));
         assertEquals("GET", r.get(String.class));

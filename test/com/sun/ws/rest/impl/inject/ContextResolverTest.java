@@ -23,7 +23,7 @@
 package com.sun.ws.rest.impl.inject;
 
 import com.sun.ws.rest.impl.AbstractResourceTester;
-import com.sun.ws.rest.api.client.ResourceProxy;
+import com.sun.ws.rest.api.client.WebResource;
 import com.sun.ws.rest.spi.service.ContextResolver;
 import java.io.IOException;
 import java.math.BigInteger;
@@ -100,27 +100,27 @@ public class ContextResolverTest extends AbstractResourceTester {
     
     public void testZero() throws IOException {
         initiateWebApplication(NullContextResource.class);
-        ResourceProxy r = resourceProxy("/");
+        WebResource r = resource("/");
         
-        assertEquals("null", resourceProxy("/").get(String.class));
+        assertEquals("null", resource("/").get(String.class));
     }
     
     public void testOne() throws IOException {
         initiateWebApplication(ContextResource.class, IntegerContextResolver.class);
         
-        assertEquals("java.lang.Integer", resourceProxy("/").get(String.class));        
+        assertEquals("java.lang.Integer", resource("/").get(String.class));        
         
-        assertEquals("null", resourceProxy("/null").get(String.class));        
+        assertEquals("null", resource("/null").get(String.class));        
     }   
     
     public void testTwo() throws IOException {
         initiateWebApplication(ContextResource.class, IntegerContextResolver.class, 
                 BigIntegerContextResolver.class);
         
-        assertEquals("java.lang.Integer", resourceProxy("/").get(String.class));        
+        assertEquals("java.lang.Integer", resource("/").get(String.class));        
         
-        assertEquals("java.math.BigInteger", resourceProxy("/big").get(String.class));        
+        assertEquals("java.math.BigInteger", resource("/big").get(String.class));        
         
-        assertEquals("null", resourceProxy("/null").get(String.class));        
+        assertEquals("null", resource("/null").get(String.class));        
     }   
 }

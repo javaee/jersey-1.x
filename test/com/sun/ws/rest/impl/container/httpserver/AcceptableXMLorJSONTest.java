@@ -24,11 +24,11 @@ package com.sun.ws.rest.impl.container.httpserver;
 
 import com.sun.net.httpserver.HttpHandler;
 import com.sun.ws.rest.api.client.Client;
+import com.sun.ws.rest.api.client.ClientFilter;
 import com.sun.ws.rest.api.client.ClientRequest;
 import com.sun.ws.rest.api.client.ClientResponse;
+import com.sun.ws.rest.api.client.WebResource;
 import javax.ws.rs.Path;
-import com.sun.ws.rest.api.client.ResourceProxy;
-import com.sun.ws.rest.api.client.ClientFilter;
 import javax.ws.rs.GET;
 import javax.ws.rs.ProduceMime;
 import javax.xml.bind.annotation.XmlRootElement;
@@ -62,7 +62,7 @@ public class AcceptableXMLorJSONTest extends AbstractHttpServerTester {
     }
     
     @Path("/resource")
-    public static class WebResource {
+    public static class Resource {
         @GET
         @ProduceMime({"application/xml", "application/json"})
         public JAXBBean get() {
@@ -75,9 +75,9 @@ public class AcceptableXMLorJSONTest extends AbstractHttpServerTester {
     }
     
     public void testExpliciWebResourceReference() {
-        startServer(HttpHandler.class, WebResource.class);
+        startServer(HttpHandler.class, Resource.class);
 
-        ResourceProxy r = Client.create().proxy(getUri().path("resource").build());
+        WebResource r = Client.create().resource(getUri().path("resource").build());
         r.addFilter(new ClientFilter() {
             public ClientResponse handle(ClientRequest ro) {
                 ClientResponse ri = getNext().handle(ro);

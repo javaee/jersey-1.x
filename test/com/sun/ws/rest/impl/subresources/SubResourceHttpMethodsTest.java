@@ -62,9 +62,9 @@ public class SubResourceHttpMethodsTest extends AbstractResourceTester {
     public void testSubResourceMethods() {
         initiateWebApplication(SubResourceMethods.class);
         
-        assertEquals("/", resourceProxy("/").get(String.class));
-        assertEquals("/sub", resourceProxy("/sub").get(String.class));
-        assertEquals("/sub/sub", resourceProxy("/sub/sub").get(String.class));
+        assertEquals("/", resource("/").get(String.class));
+        assertEquals("/sub", resource("/sub").get(String.class));
+        assertEquals("/sub/sub", resource("/sub/sub").get(String.class));
     }
     
     @Path("/")
@@ -102,13 +102,13 @@ public class SubResourceHttpMethodsTest extends AbstractResourceTester {
     public void testSubResourceMethodsWithTemplates() {
         initiateWebApplication(SubResourceMethodsWithTemplates.class);
         
-        assertEquals("/", resourceProxy("/").get(String.class));
+        assertEquals("/", resource("/").get(String.class));
         
-        assertEquals("value", resourceProxy("/subvalue").get(String.class));
-        assertEquals("a", resourceProxy("/sub/a").get(String.class));
+        assertEquals("value", resource("/subvalue").get(String.class));
+        assertEquals("a", resource("/sub/a").get(String.class));
         
-        assertEquals("value/a", resourceProxy("/subunlimitedvalue/a").get(String.class));
-        assertEquals("a/b/c/d", resourceProxy("/subunlimited/a/b/c/d").get(String.class));
+        assertEquals("value/a", resource("/subunlimitedvalue/a").get(String.class));
+        assertEquals("a/b/c/d", resource("/subunlimited/a/b/c/d").get(String.class));
     }
     
     @Path("/")
@@ -129,7 +129,7 @@ public class SubResourceHttpMethodsTest extends AbstractResourceTester {
     public void testSubResourceMethodsWithDifferentTemplates() {
         initiateWebApplication(SubResourceMethodsWithDifferentTemplates.class);
         
-        assertEquals("foo", resourceProxy("/foo").get(String.class));
-        assertEquals("bar", resourceProxy("/bar").post(String.class));
+        assertEquals("foo", resource("/foo").get(String.class));
+        assertEquals("bar", resource("/bar").post(String.class));
     }
 }

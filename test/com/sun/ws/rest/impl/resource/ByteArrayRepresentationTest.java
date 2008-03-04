@@ -23,7 +23,7 @@
 package com.sun.ws.rest.impl.resource;
 
 import com.sun.ws.rest.impl.AbstractResourceTester;
-import com.sun.ws.rest.api.client.ResourceProxy;
+import com.sun.ws.rest.api.client.WebResource;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 
@@ -49,7 +49,7 @@ public class ByteArrayRepresentationTest extends AbstractResourceTester {
     
     public void testPut() {
         initiateWebApplication(Resource.class);
-        ResourceProxy r = resourceProxy("/");
+        WebResource r = resource("/");
         
         assertEquals("CONTENT", r.post(String.class, "CONTENT"));
     }

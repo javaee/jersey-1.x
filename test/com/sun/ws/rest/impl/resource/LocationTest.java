@@ -23,7 +23,7 @@
 package com.sun.ws.rest.impl.resource;
 
 import com.sun.ws.rest.impl.AbstractResourceTester;
-import com.sun.ws.rest.api.client.ResourceProxy;
+import com.sun.ws.rest.api.client.WebResource;
 import com.sun.ws.rest.api.client.ClientResponse;
 import java.net.URI;
 import javax.ws.rs.POST;
@@ -64,7 +64,7 @@ public class LocationTest extends AbstractResourceTester {
     
     public void testCreated() {
         initiateWebApplication(Created.class);
-        ResourceProxy r = resourceProxy("/", false);
+        WebResource r = resource("/", false);
 
         ClientResponse response = r.path("rel-path").post(ClientResponse.class);        
         assertEquals(201, response.getStatus());        
@@ -107,7 +107,7 @@ public class LocationTest extends AbstractResourceTester {
     
     public void testSeeOther() {
         initiateWebApplication(SeeOther.class);
-        ResourceProxy r = resourceProxy("/", false);
+        WebResource r = resource("/", false);
 
         ClientResponse response = r.path("rel-path").post(ClientResponse.class);        
         assertEquals(303, response.getStatus());        
@@ -147,7 +147,7 @@ public class LocationTest extends AbstractResourceTester {
     
     public void testTemporaryRedirect() {
         initiateWebApplication(TemporaryRedirect.class);
-        ResourceProxy r = resourceProxy("/", false);
+        WebResource r = resource("/", false);
 
         ClientResponse response = r.path("rel-path").post(ClientResponse.class);        
         assertEquals(307, response.getStatus());        

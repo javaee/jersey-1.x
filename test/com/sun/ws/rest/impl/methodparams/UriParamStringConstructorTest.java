@@ -55,12 +55,12 @@ public class UriParamStringConstructorTest extends AbstractResourceTester {
     }
         
     public void testStringConstructorGet() {
-        resourceProxy("/3.145/3145").
+        resource("/3.145/3145").
                 get(String.class);
     }
     
     public void testBadStringConstructorValue() {
-        ClientResponse response = resourceProxy("/ABCDE/ABCDE", false).
+        ClientResponse response = resource("/ABCDE/ABCDE", false).
                 get(ClientResponse.class);
         assertEquals(400, response.getStatus());
     }

@@ -22,12 +22,12 @@
 
 package com.sun.ws.rest.impl.resource;
 
+import com.sun.ws.rest.api.client.ClientResponse;
+import com.sun.ws.rest.api.client.WebResource;
 import com.sun.ws.rest.impl.AbstractResourceTester;
+import java.io.IOException;
 import javax.ws.rs.ProduceMime;
 import javax.ws.rs.Path;
-import com.sun.ws.rest.api.client.ResourceProxy;
-import com.sun.ws.rest.api.client.ClientResponse;
-import java.io.IOException;
 import javax.ws.rs.GET;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -44,7 +44,7 @@ public class AcceptTest extends AbstractResourceTester {
     }
 
     @Path("/")
-    public static class WebResource {
+    public static class Resource {
         @ProduceMime("application/foo")
         @GET
         public String doGetFoo() {
@@ -71,8 +71,8 @@ public class AcceptTest extends AbstractResourceTester {
     }
     
     public void testAcceptGet() throws IOException {
-        initiateWebApplication(WebResource.class);
-        ResourceProxy r = resourceProxy("/");
+        initiateWebApplication(Resource.class);
+        WebResource r = resource("/");
         
         String s = r.accept("application/foo").get(String.class);
         assertEquals("foo", s);
@@ -94,8 +94,8 @@ public class AcceptTest extends AbstractResourceTester {
     }   
     
     public void testAcceptGetWildCard() {
-        initiateWebApplication(WebResource.class);
-        ResourceProxy r = resourceProxy("/");
+        initiateWebApplication(Resource.class);
+        WebResource r = resource("/");
         
         String s = r.accept("application/wildcard", "application/foo;q=0.6", 
                 "application/bar;q=0.4", "application/baz;q=0.2").
@@ -104,16 +104,16 @@ public class AcceptTest extends AbstractResourceTester {
     }   
     
     public void testQualityErrorGreaterThanOne() {
-        initiateWebApplication(WebResource.class);
-        ResourceProxy r = resourceProxy("/", false);
+        initiateWebApplication(Resource.class);
+        WebResource r = resource("/", false);
 
         ClientResponse response = r.accept("application/foo;q=1.1").get(ClientResponse.class);
         assertEquals(400, response.getStatus());        
     }
     
     public void testQualityErrorMoreThanThreeDigits() {
-        initiateWebApplication(WebResource.class);
-        ResourceProxy r = resourceProxy("/", false);
+        initiateWebApplication(Resource.class);
+        WebResource r = resource("/", false);
         
         ClientResponse response = r.accept("application/foo;q=0.1234").get(ClientResponse.class);
         assertEquals(400, response.getStatus());
@@ -130,7 +130,7 @@ public class AcceptTest extends AbstractResourceTester {
     
     public void testAcceptMultiple() {
         initiateWebApplication(MultipleResource.class);
-        ResourceProxy r = resourceProxy("/");
+        WebResource r = resource("/");
 
         MediaType foo = MediaType.parse("application/foo");
         MediaType bar = MediaType.parse("application/bar");

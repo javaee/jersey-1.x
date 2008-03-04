@@ -92,7 +92,7 @@ public class OptionsSubResourceMethodTest extends AbstractResourceTester {
     public void testNoOptions() {
         initiateWebApplication(ResourceNoOptions.class);
 
-        ClientResponse response = resourceProxy("/sub").options(
+        ClientResponse response = resource("/sub").options(
                 ClientResponse.class);
         String allow = response.getMetadata().getFirst("Allow").toString();
         assertTrue(allow.contains("GET"));
@@ -145,7 +145,7 @@ public class OptionsSubResourceMethodTest extends AbstractResourceTester {
     public void testWithOptions() {
         initiateWebApplication(ResourceWithOptions.class);
 
-        ClientResponse response = resourceProxy("/sub").options(
+        ClientResponse response = resource("/sub").options(
                 ClientResponse.class);
         String allow = response.getMetadata().getFirst("Allow").toString();
         assertTrue(allow.contains("GET"));
@@ -173,13 +173,13 @@ public class OptionsSubResourceMethodTest extends AbstractResourceTester {
     public void testNoOptionsDifferentSub() {
         initiateWebApplication(ResourceNoOptionsDifferentSub.class);
 
-        ClientResponse response = resourceProxy("/sub1").options( 
+        ClientResponse response = resource("/sub1").options( 
                 ClientResponse.class);
         String allow = response.getMetadata().getFirst("Allow").toString();
         assertTrue(allow.contains("GET"));
         assertFalse(allow.contains("PUT"));
         
-        response = resourceProxy("/sub2").options(ClientResponse.class);
+        response = resource("/sub2").options(ClientResponse.class);
         allow = response.getMetadata().getFirst("Allow").toString();
         assertTrue(allow.contains("PUT"));
         assertFalse(allow.contains("GET"));

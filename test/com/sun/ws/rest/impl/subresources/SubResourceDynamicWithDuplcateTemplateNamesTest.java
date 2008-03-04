@@ -61,6 +61,6 @@ public class SubResourceDynamicWithDuplcateTemplateNamesTest extends AbstractRes
     public void testSubResourceDynamicWithTemplates() {
         initiateWebApplication(ParentWithTemplates.class);
         
-        assertEquals("first", resourceProxy("/parent/child/child/first").get(String.class));
+        assertEquals("first", resource("/parent/child/child/first").get(String.class));
     }    
 }

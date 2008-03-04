@@ -24,7 +24,7 @@ package com.sun.ws.rest.impl.container.grizzly;
 
 import com.sun.ws.rest.api.client.Client;
 import javax.ws.rs.Path;
-import com.sun.ws.rest.api.client.ResourceProxy;
+import com.sun.ws.rest.api.client.WebResource;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -65,40 +65,40 @@ public class HttpMethodTest extends AbstractGrizzlyServerTester {
     
     public void testGet() {
         startServer(HttpMethodResource.class);
-        ResourceProxy r = Client.create().proxy(getUri().path("test").build());
+        WebResource r = Client.create().resource(getUri().path("test").build());
         assertEquals("GET", r.get(String.class));
     }
     
     public void testPost() {
         startServer(HttpMethodResource.class);
-        ResourceProxy r = Client.create().proxy(getUri().path("test").build());
+        WebResource r = Client.create().resource(getUri().path("test").build());
         assertEquals("POST", r.post(String.class, "POST"));
     }    
     
     public void testPut() {
         startServer(HttpMethodResource.class);
-        ResourceProxy r = Client.create().proxy(getUri().path("test").build());
+        WebResource r = Client.create().resource(getUri().path("test").build());
         assertEquals("PUT", r.post(String.class, "PUT"));
     }
     
     public void testDelete() {
         startServer(HttpMethodResource.class);
-        ResourceProxy r = Client.create().proxy(getUri().path("test").build());
+        WebResource r = Client.create().resource(getUri().path("test").build());
         assertEquals("DELETE", r.delete(String.class));
     }
     
     public void testAll() {
         startServer(HttpMethodResource.class);
-        ResourceProxy r = Client.create().proxy(getUri().path("test").build());
+        WebResource r = Client.create().resource(getUri().path("test").build());
         assertEquals("GET", r.get(String.class));
 
-        r = Client.create().proxy(getUri().path("test").build());
+        r = Client.create().resource(getUri().path("test").build());
         assertEquals("POST", r.post(String.class, "POST"));
         
-        r = Client.create().proxy(getUri().path("test").build());
+        r = Client.create().resource(getUri().path("test").build());
         assertEquals("PUT", r.post(String.class, "PUT"));
         
-        r = Client.create().proxy(getUri().path("test").build());
+        r = Client.create().resource(getUri().path("test").build());
         assertEquals("DELETE", r.delete(String.class));
     }
 }

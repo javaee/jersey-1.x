@@ -24,7 +24,7 @@ package com.sun.ws.rest.impl.container.grizzly;
 
 import com.sun.ws.rest.api.client.Client;
 import javax.ws.rs.Path;
-import com.sun.ws.rest.api.client.ResourceProxy;
+import com.sun.ws.rest.api.client.WebResource;
 import javax.ws.rs.GET;
 import javax.ws.rs.MatrixParam;
 import javax.ws.rs.core.UriBuilder;
@@ -52,15 +52,15 @@ public class MatrixParamTest extends AbstractGrizzlyServerTester {
 
         UriBuilder base = getUri().path("test");
             
-        ResourceProxy r = Client.create().proxy(base.clone().matrixParam("y", "1").build());
+        WebResource r = Client.create().resource(base.clone().matrixParam("y", "1").build());
         assertEquals("1", r.get(String.class));
-        r = Client.create().proxy(base.clone().
+        r = Client.create().resource(base.clone().
                 matrixParam("x", "1").encode(false).matrixParam("y", "1%20%2B%202").build());
         assertEquals("1 + 2", r.get(String.class));
-        r = Client.create().proxy(base.clone().
+        r = Client.create().resource(base.clone().
                 matrixParam("x", "1").encode(false).matrixParam("y", "1%20%26%202").build());
         assertEquals("1 & 2", r.get(String.class));
-        r = Client.create().proxy(base.clone().
+        r = Client.create().resource(base.clone().
                 matrixParam("x", "1").encode(false).matrixParam("y", "1%20%7C%7C%202").build());
         assertEquals("1 || 2", r.get(String.class));
     }

@@ -59,7 +59,7 @@ public class ExceptionTest extends AbstractResourceTester {
         
         boolean caught = false;
         try {
-            resourceProxy("/exception/checked").get(ClientResponse.class);
+            resource("/exception/checked").get(ClientResponse.class);
         } catch (ContainerException e) {
             caught = true;
             assertEquals(CheckedException.class, e.getCause().getClass());
@@ -79,7 +79,7 @@ public class ExceptionTest extends AbstractResourceTester {
         
         boolean caught = false;
         try {
-            resourceProxy("/exception/runtime").get(ClientResponse.class);
+            resource("/exception/runtime").get(ClientResponse.class);
         } catch (UnsupportedOperationException e) {
             caught = true;
         }
@@ -97,7 +97,7 @@ public class ExceptionTest extends AbstractResourceTester {
     public void test400StatusCode() {
         initiateWebApplication(ExceptionWebApplicationResource.class);
 
-        ClientResponse cr = resourceProxy("/exception/webapplication/400", false).
+        ClientResponse cr = resource("/exception/webapplication/400", false).
                 get(ClientResponse.class);        
         assertEquals(400, cr.getStatus());
     }
@@ -105,7 +105,7 @@ public class ExceptionTest extends AbstractResourceTester {
     public void test500StatusCode() {
         initiateWebApplication(ExceptionWebApplicationResource.class);
 
-        ClientResponse cr = resourceProxy("/exception/webapplication/500", false).
+        ClientResponse cr = resource("/exception/webapplication/500", false).
                 get(ClientResponse.class);        
         assertEquals(500, cr.getStatus());
     }   

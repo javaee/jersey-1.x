@@ -26,7 +26,7 @@ import com.sun.ws.rest.impl.AbstractResourceTester;
 import com.sun.ws.rest.api.core.ResourceConfig;
 import com.sun.ws.rest.impl.application.WebApplicationImpl;
 import com.sun.ws.rest.api.core.DefaultResourceConfig;
-import com.sun.ws.rest.api.client.ResourceProxy;
+import com.sun.ws.rest.api.client.WebResource;
 import com.sun.ws.rest.spi.resource.PerRequest;
 import com.sun.ws.rest.spi.resource.Singleton;
 import java.util.HashSet;
@@ -164,17 +164,17 @@ public class ResourceLifecycleTest extends AbstractResourceTester {
     }
     
     private void _test() {
-        ResourceProxy r = resourceProxy("/foo");        
+        WebResource r = resource("/foo");        
         assertEquals("1", r.get(String.class));
         assertEquals("2", r.get(String.class));
         assertEquals("3", r.get(String.class));
         
-        r = resourceProxy("/bar");        
+        r = resource("/bar");        
         assertEquals("1", r.get(String.class));
         assertEquals("1", r.get(String.class));
         assertEquals("1", r.get(String.class));
         
-        r = resourceProxy("/baz");        
+        r = resource("/baz");        
         assertEquals("1", r.get(String.class));
         assertEquals("1", r.get(String.class));
         assertEquals("1", r.get(String.class));

@@ -233,28 +233,28 @@ public class QueryParamAsStringTest extends AbstractResourceTester {
     public void testStringGet() {
         initiateWebApplication(ResourceString.class);
         
-        resourceProxy("/?arg1=a&arg2=b&arg3=c").
+        resource("/?arg1=a&arg2=b&arg3=c").
             get(String.class);
     }
     
     public void testStringEmptyGet() {
         initiateWebApplication(ResourceStringEmpty.class);
         
-        resourceProxy("/?arg1").
+        resource("/?arg1").
             get(String.class);
     }
     
     public void testStringAbsentGet() {
         initiateWebApplication(ResourceStringAbsent.class);
         
-        resourceProxy("/").
+        resource("/").
             get(String.class);
     }
     
     public void testStringPost() {
          initiateWebApplication(ResourceString.class);
         
-        String s = resourceProxy("/?arg1=a&arg2=b&arg3=c").
+        String s = resource("/?arg1=a&arg2=b&arg3=c").
             entity("content").
             post(String.class);
         
@@ -264,7 +264,7 @@ public class QueryParamAsStringTest extends AbstractResourceTester {
     public void testStringListGet() {
         initiateWebApplication(ResourceStringList.class);
         
-        resourceProxy("/?args=a&args=b&args=c").
+        resource("/?args=a&args=b&args=c").
             accept("application/stringlist").
             get(String.class);
     }
@@ -272,7 +272,7 @@ public class QueryParamAsStringTest extends AbstractResourceTester {
     public void testStringListEmptyGet() {
         initiateWebApplication(ResourceStringListEmpty.class);
         
-        resourceProxy("/?args&args&args").
+        resource("/?args&args&args").
             accept("application/stringlist").
             get(String.class);
     }
@@ -280,7 +280,7 @@ public class QueryParamAsStringTest extends AbstractResourceTester {
     public void testStringListAbsentGet() {
         initiateWebApplication(ResourceStringListAbsent.class);
         
-        resourceProxy("/").
+        resource("/").
             accept("application/stringlist").
             get(String.class);
     }
@@ -288,7 +288,7 @@ public class QueryParamAsStringTest extends AbstractResourceTester {
     public void testListGet() {
          initiateWebApplication(ResourceStringList.class);
         
-        resourceProxy("/?args=a&args=b&args=c").
+        resource("/?args=a&args=b&args=c").
             accept("application/list").
             get(String.class);
    }
@@ -296,26 +296,26 @@ public class QueryParamAsStringTest extends AbstractResourceTester {
     public void testStringNullDefault() {
         initiateWebApplication(ResourceStringNullDefault.class);
         
-        resourceProxy("/").get(String.class);
+        resource("/").get(String.class);
     }
     
     public void testStringDefault() {
         initiateWebApplication(ResourceStringDefault.class);
         
-        resourceProxy("/").get(String.class);
+        resource("/").get(String.class);
     }
     
     public void testStringDefaultOverride() {
         initiateWebApplication(ResourceStringDefaultOverride.class);
         
-        resourceProxy("/?arg1=d&arg2=e&arg3=f").
+        resource("/?arg1=d&arg2=e&arg3=f").
             get(String.class);
     }
     
     public void testStringListNullDefault() {
         initiateWebApplication(ResourceStringListNullDefault.class);
         
-        resourceProxy("/").
+        resource("/").
             accept("application/stringlist").
             get(String.class);
     }
@@ -323,7 +323,7 @@ public class QueryParamAsStringTest extends AbstractResourceTester {
     public void testListNullDefault() {
         initiateWebApplication(ResourceStringListNullDefault.class);
         
-        resourceProxy("/").
+        resource("/").
             accept("application/list").
             get(String.class);
     }
@@ -331,7 +331,7 @@ public class QueryParamAsStringTest extends AbstractResourceTester {
     public void testStringListDefault() {
         initiateWebApplication(ResourceStringListDefault.class);
         
-        resourceProxy("/").
+        resource("/").
             accept("application/stringlist").
             get(String.class);
     }
@@ -339,7 +339,7 @@ public class QueryParamAsStringTest extends AbstractResourceTester {
     public void testListDefault() {
         initiateWebApplication(ResourceStringListDefault.class);
         
-        resourceProxy("/").
+        resource("/").
             accept("application/list").
             get(String.class);
     }
@@ -347,7 +347,7 @@ public class QueryParamAsStringTest extends AbstractResourceTester {
     public void testListDefaultOverride() {
         initiateWebApplication(ResourceStringListDefaultOverride.class);
         
-        resourceProxy("/?args=b").
+        resource("/?args=b").
             accept("application/list").
             get(String.class);
     }

@@ -62,8 +62,8 @@ public class SubResourceClassDynamicTest extends AbstractResourceTester {
     public void testSubResourceDynamic() {
         initiateWebApplication(Parent.class);
         
-        assertEquals("parent", resourceProxy("/parent").get(String.class));
-        assertEquals("child", resourceProxy("/parent/child").get(String.class));
+        assertEquals("parent", resource("/parent").get(String.class));
+        assertEquals("child", resource("/parent/child").get(String.class));
     }    
     
     @Path("/{p}")
@@ -89,8 +89,8 @@ public class SubResourceClassDynamicTest extends AbstractResourceTester {
     public void testSubResourceDynamicWithTemplates() {
         initiateWebApplication(ParentWithTemplates.class);
         
-        assertEquals("parent", resourceProxy("/parent").get(String.class));
-        assertEquals("first", resourceProxy("/parent/child/first").get(String.class));
+        assertEquals("parent", resource("/parent").get(String.class));
+        assertEquals("first", resource("/parent/child/first").get(String.class));
     }    
     
     @Path("/{p}")
@@ -140,11 +140,11 @@ public class SubResourceClassDynamicTest extends AbstractResourceTester {
     public void testSubResourceDynamicWithTemplatesLifecycle() {
         initiateWebApplication(ParentWithTemplatesLifecycle.class);
         
-        assertEquals("parent", resourceProxy("/parent").get(String.class));
-        assertEquals("x1", resourceProxy("/parent/child/x").get(String.class));
-        assertEquals("x1", resourceProxy("/parent/child/x").get(String.class));
-        assertEquals("x1", resourceProxy("/parent/child/singleton/x").get(String.class));
-        assertEquals("x2", resourceProxy("/parent/child/singleton/x").get(String.class));
+        assertEquals("parent", resource("/parent").get(String.class));
+        assertEquals("x1", resource("/parent/child/x").get(String.class));
+        assertEquals("x1", resource("/parent/child/x").get(String.class));
+        assertEquals("x1", resource("/parent/child/singleton/x").get(String.class));
+        assertEquals("x2", resource("/parent/child/singleton/x").get(String.class));
     }    
     
 }

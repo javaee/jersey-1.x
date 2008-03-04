@@ -696,13 +696,13 @@ public class HeaderParamAsPrimitiveTest extends AbstractResourceTester {
     
     
     public void _test(String type, String value) {
-        resourceProxy("/").accept("application/" + type).
+        resource("/").accept("application/" + type).
                 header(type, value).get(String.class);
         
-        resourceProxy("/wrappers").accept("application/" + type).
+        resource("/wrappers").accept("application/" + type).
                 header(type, value).get(String.class);    
         
-        resourceProxy("/list").accept("application/" + type).
+        resource("/list").accept("application/" + type).
                 header(type, value).
                 header(type, value).
                 header(type, value).
@@ -710,13 +710,13 @@ public class HeaderParamAsPrimitiveTest extends AbstractResourceTester {
     }
     
     public void _testDefault(String base, String type, String value) {
-        resourceProxy(base + "default/null").accept("application/" + type).
+        resource(base + "default/null").accept("application/" + type).
                 get(String.class);
         
-        resourceProxy(base + "default").accept("application/" + type).
+        resource(base + "default").accept("application/" + type).
                 get(String.class);
         
-        resourceProxy(base + "default/override").accept("application/" + type).
+        resource(base + "default/override").accept("application/" + type).
                 header(type, value).get(String.class);        
     }
     
@@ -845,21 +845,21 @@ public class HeaderParamAsPrimitiveTest extends AbstractResourceTester {
     }
     
     public void testBadPrimitiveValue() {
-        ClientResponse response = resourceProxy("/", false).accept("application/int").
+        ClientResponse response = resource("/", false).accept("application/int").
                 header("int", "abcdef").get(ClientResponse.class);
         
         assertEquals(400, response.getStatus());
     }
     
     public void testBadPrimitiveWrapperValue() {
-        ClientResponse response = resourceProxy("/wrappers", false).accept("application/int").
+        ClientResponse response = resource("/wrappers", false).accept("application/int").
                 header("int", "abcdef").get(ClientResponse.class);
         
         assertEquals(400, response.getStatus());
     }
     
     public void testBadPrimitiveListValue() {
-        ClientResponse response = resourceProxy("/wrappers", false).accept("application/int").
+        ClientResponse response = resource("/wrappers", false).accept("application/int").
                 header("int", "abcdef").
                 header("int", "abcdef").
                 header("int", "abcdef").

@@ -24,7 +24,7 @@ package com.sun.ws.rest.impl.container.httpserver;
 
 import com.sun.ws.rest.api.client.Client;
 import com.sun.ws.rest.api.client.ClientResponse;
-import com.sun.ws.rest.api.client.ResourceProxy;
+import com.sun.ws.rest.api.client.WebResource;
 import javax.ws.rs.Path;
 import javax.ws.rs.GET;
 import javax.ws.rs.PathParam;
@@ -52,14 +52,14 @@ public class ExceptionTest extends AbstractHttpServerTester {
     public void test400StatusCode() {
         startServer(ExceptionResource.class);
 
-        ResourceProxy r = Client.create().proxy(getUri().path("400").build());
+        WebResource r = Client.create().resource(getUri().path("400").build());
         assertEquals(400, r.get(ClientResponse.class).getStatus());
     }
     
     public void test500StatusCode() {
         startServer(ExceptionResource.class);
 
-        ResourceProxy r = Client.create().proxy(getUri().path("500").build());
+        WebResource r = Client.create().resource(getUri().path("500").build());
         assertEquals(500, r.get(ClientResponse.class).getStatus());
     }
 }

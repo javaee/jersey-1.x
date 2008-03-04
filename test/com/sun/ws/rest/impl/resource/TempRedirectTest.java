@@ -51,7 +51,7 @@ public class TempRedirectTest extends AbstractResourceTester {
     public void testReturnType() {
         initiateWebApplication(Resource.class);
         
-        ClientResponse response = resourceProxy("/", false).get(ClientResponse.class);        
+        ClientResponse response = resource("/", false).get(ClientResponse.class);        
         assertEquals(307, response.getStatus());
         assertEquals(UriBuilder.fromUri(BASE_URI).path("subpath").build(), 
                 response.getLocation());

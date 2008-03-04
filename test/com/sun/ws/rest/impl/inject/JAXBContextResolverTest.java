@@ -92,22 +92,22 @@ public class JAXBContextResolverTest extends AbstractResourceTester {
         // TODO need to determine if the JAXBContext returned from 
         // MyJAXBContextResolver is used by JAXB message body readers/writers
         
-        MyBean b = resourceProxy("/").get(MyBean.class);
+        MyBean b = resource("/").get(MyBean.class);
         assertEquals("GET-WITH-CONTEXT", b.value);
         
         b = new MyBean("POST");
-        b = resourceProxy("/").post(MyBean.class, b);
+        b = resource("/").post(MyBean.class, b);
         assertEquals("POST-WITH-CONTEXT", b.value);
     }
     
     public void testWithoutContextResolver() throws IOException {
         initiateWebApplication(ContextResource.class);
         
-        MyBean b = resourceProxy("/").get(MyBean.class);
+        MyBean b = resource("/").get(MyBean.class);
         assertEquals("GET-WITHOUT-CONTEXT", b.value);
         
         b = new MyBean("POST");
-        b = resourceProxy("/").post(MyBean.class, b);
+        b = resource("/").post(MyBean.class, b);
         assertEquals("POST-WITHOUT-CONTEXT", b.value);
     }
 }

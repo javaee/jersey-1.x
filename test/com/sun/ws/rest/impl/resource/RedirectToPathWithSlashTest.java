@@ -54,13 +54,13 @@ public class RedirectToPathWithSlashTest extends AbstractResourceTester {
         rc.getFeatures().put(ResourceConfig.FEATURE_REDIRECT, true);
         initiateWebApplication(rc);
         
-        ClientResponse response = resourceProxy("/project", false).get(ClientResponse.class);
+        ClientResponse response = resource("/project", false).get(ClientResponse.class);
         assertEquals(Response.temporaryRedirect(null).build().getStatus(), 
                 response.getStatus());
         assertEquals(UriBuilder.fromUri(BASE_URI).path("project/").build(), 
                 response.getLocation());
 
-        String s = resourceProxy("/project/", false).get(String.class);
+        String s = resource("/project/", false).get(String.class);
         assertEquals("project", s);
     }    
     
@@ -89,28 +89,28 @@ public class RedirectToPathWithSlashTest extends AbstractResourceTester {
         rc.getFeatures().put(ResourceConfig.FEATURE_REDIRECT, true);
         initiateWebApplication(rc);
         
-        ClientResponse response = resourceProxy("/project", false).get(ClientResponse.class);
+        ClientResponse response = resource("/project", false).get(ClientResponse.class);
         assertEquals(Response.temporaryRedirect(null).build().getStatus(), 
                 response.getStatus());
         assertEquals(UriBuilder.fromUri(BASE_URI).path("project/").build(), 
                 response.getLocation());        
         
-        String s = resourceProxy("/project/", false).get(String.class);
+        String s = resource("/project/", false).get(String.class);
         assertEquals("project", s);        
         
-        s = resourceProxy("/project/details", false).get(String.class);
+        s = resource("/project/details", false).get(String.class);
         assertEquals("details", s);
         
-        response = resourceProxy("/project/details/", false).get(ClientResponse.class);
+        response = resource("/project/details/", false).get(ClientResponse.class);
         assertEquals(404, response.getStatus());
         
-        response = resourceProxy("/project/moreDetails", false).get(ClientResponse.class);
+        response = resource("/project/moreDetails", false).get(ClientResponse.class);
         assertEquals(Response.temporaryRedirect(null).build().getStatus(), 
                 response.getStatus());
         assertEquals(UriBuilder.fromUri(BASE_URI).path("project/moreDetails/").build(), 
                 response.getLocation());        
 
-        s = resourceProxy("/project/moreDetails/", false).get(String.class);
+        s = resource("/project/moreDetails/", false).get(String.class);
         assertEquals("moreDetails", s);
     }    
     
@@ -164,53 +164,53 @@ public class RedirectToPathWithSlashTest extends AbstractResourceTester {
         rc.getFeatures().put(ResourceConfig.FEATURE_REDIRECT, true);
         initiateWebApplication(rc);
                 
-        ClientResponse response = resourceProxy("/project", false).get(ClientResponse.class);
+        ClientResponse response = resource("/project", false).get(ClientResponse.class);
         assertEquals(Response.temporaryRedirect(null).build().getStatus(), 
                 response.getStatus());
         assertEquals(UriBuilder.fromUri(BASE_URI).path("project/").build(), 
                 response.getLocation());        
         
-        String s = resourceProxy("/project/", false).get(String.class);
+        String s = resource("/project/", false).get(String.class);
         assertEquals("project", s);        
         
-        s = resourceProxy("/project/details", false).get(String.class);
+        s = resource("/project/details", false).get(String.class);
         assertEquals("details", s);
         
-        response = resourceProxy("/project/details/", false).get(ClientResponse.class);
+        response = resource("/project/details/", false).get(ClientResponse.class);
         assertEquals(404, response.getStatus());
         
-        response = resourceProxy("/project/moreDetails", false).get(ClientResponse.class);
+        response = resource("/project/moreDetails", false).get(ClientResponse.class);
         assertEquals(Response.temporaryRedirect(null).build().getStatus(), 
                 response.getStatus());
         assertEquals(UriBuilder.fromUri(BASE_URI).path("project/moreDetails/").build(), 
                 response.getLocation());        
 
-        s = resourceProxy("/project/moreDetails/", false).get(String.class);
+        s = resource("/project/moreDetails/", false).get(String.class);
         assertEquals("moreDetails", s);        
 
         
-        response = resourceProxy("/project/build", false).get(ClientResponse.class);
+        response = resource("/project/build", false).get(ClientResponse.class);
         assertEquals(Response.temporaryRedirect(null).build().getStatus(), 
                 response.getStatus());
         assertEquals(UriBuilder.fromUri(BASE_URI).path("/project/build/").build(), 
                 response.getLocation());        
         
-        s = resourceProxy("/project/build/", false).get(String.class);
+        s = resource("/project/build/", false).get(String.class);
         assertEquals("build", s);        
         
-        s = resourceProxy("/project/build/details", false).get(String.class);
+        s = resource("/project/build/details", false).get(String.class);
         assertEquals("details", s);
         
-        response = resourceProxy("/project/build/details/", false).get(ClientResponse.class);
+        response = resource("/project/build/details/", false).get(ClientResponse.class);
         assertEquals(404, response.getStatus());
         
-        response = resourceProxy("/project/build/moreDetails", false).get(ClientResponse.class);
+        response = resource("/project/build/moreDetails", false).get(ClientResponse.class);
         assertEquals(Response.temporaryRedirect(null).build().getStatus(), 
                 response.getStatus());
         assertEquals(UriBuilder.fromUri(BASE_URI).path("project/build/moreDetails/").build(), 
                 response.getLocation());        
 
-        s = resourceProxy("/project/build/moreDetails/", false).get(String.class);
+        s = resource("/project/build/moreDetails/", false).get(String.class);
         assertEquals("moreDetails", s);
     }    
 }

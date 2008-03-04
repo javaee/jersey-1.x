@@ -58,6 +58,6 @@ public class EncodedUriTemplateValuesTest extends AbstractResourceTester {
         
     public void testEncodedTemplateValues() {
         initiateWebApplication(Resource.class);
-        resourceProxy("/a%20b/x%20y").get(String.class);
+        resource("/a%20b/x%20y").get(String.class);
     }
 }

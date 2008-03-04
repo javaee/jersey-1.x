@@ -28,7 +28,7 @@ import com.sun.ws.rest.api.client.ClientResponse;
 import com.sun.ws.rest.impl.application.WebApplicationImpl;
 import com.sun.ws.rest.api.core.DefaultResourceConfig;
 import com.sun.ws.rest.api.client.Client;
-import com.sun.ws.rest.api.client.ResourceProxy;
+import com.sun.ws.rest.api.client.WebResource;
 import com.sun.ws.rest.api.client.ClientFilter;
 import com.sun.ws.rest.spi.container.WebApplication;
 import java.lang.annotation.Annotation;
@@ -80,11 +80,11 @@ public abstract class AbstractResourceTester extends TestCase {
         return a;
     }
 
-    protected ResourceProxy resourceProxy(String relativeUri) {
-        return resourceProxy(relativeUri, true);
+    protected WebResource resource(String relativeUri) {
+        return resource(relativeUri, true);
     }
     
-    protected ResourceProxy resourceProxy(String relativeUri, boolean checkStatus) {
+    protected WebResource resource(String relativeUri, boolean checkStatus) {
         Client c = new Client(new TestResourceClientHandler(BASE_URI, w));
         if (checkStatus) {
             c.addFilter(new ClientFilter() {
@@ -99,7 +99,7 @@ public abstract class AbstractResourceTester extends TestCase {
                 }
             });
         }
-        ResourceProxy r = c.proxy(createCompleteUri(BASE_URI, relativeUri));
+        WebResource r = c.resource(createCompleteUri(BASE_URI, relativeUri));
         
         return r;
     }

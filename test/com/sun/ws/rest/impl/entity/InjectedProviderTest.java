@@ -23,7 +23,7 @@
 package com.sun.ws.rest.impl.entity;
 
 import com.sun.ws.rest.impl.AbstractResourceTester;
-import com.sun.ws.rest.api.client.ResourceProxy;
+import com.sun.ws.rest.api.client.WebResource;
 import com.sun.ws.rest.impl.provider.entity.AbstractTypeEntityProvider;
 import java.io.IOException;
 import java.io.InputStream;
@@ -103,7 +103,7 @@ public class InjectedProviderTest extends AbstractResourceTester {
     public void testBean() throws Exception {
         initiateWebApplication(BeanResource.class, InjectedBeanProvider.class);
                 
-        ResourceProxy r = resourceProxy("/one/two/three");
+        WebResource r = resource("/one/two/three");
         Bean b = r.get(Bean.class);
         String requestUri = UriBuilder.fromUri(BASE_URI).
                 path(BeanResource.class).build().toString();

@@ -7,7 +7,7 @@ package com.sun.ws.rest.impl.wadl;
 
 import com.sun.ws.rest.api.MediaTypes;
 import com.sun.ws.rest.impl.AbstractResourceTester;
-import com.sun.ws.rest.api.client.ResourceProxy;
+import com.sun.ws.rest.api.client.WebResource;
 import java.io.File;
 import java.io.IOException;
 import java.util.Iterator;
@@ -102,7 +102,7 @@ public class WadlResourceTest extends AbstractResourceTester {
      */
     public void testGetWadl() throws ParserConfigurationException, SAXException, IOException, XPathExpressionException {
         initiateWebApplication(WidgetsResource.class, ExtraResource.class);
-        ResourceProxy r = resourceProxy("/application.wadl");
+        WebResource r = resource("/application.wadl");
         
         File tmpFile = r.get(File.class);
         DocumentBuilderFactory bf = DocumentBuilderFactory.newInstance();
@@ -148,7 +148,7 @@ public class WadlResourceTest extends AbstractResourceTester {
     
     public void testOptionsResourceWadl() throws ParserConfigurationException, SAXException, IOException, XPathExpressionException {
         initiateWebApplication(WidgetsResource.class, ExtraResource.class);
-        ResourceProxy r = resourceProxy("/widgets");
+        WebResource r = resource("/widgets");
         
         // test WidgetsResource
         File tmpFile = r.options(File.class);
@@ -194,7 +194,7 @@ public class WadlResourceTest extends AbstractResourceTester {
         assertEquals(val,"1");
 
         // test ExtraResource
-        r = resourceProxy("/foo");
+        r = resource("/foo");
         
         tmpFile = r.options(File.class);
         b = bf.newDocumentBuilder();
@@ -216,7 +216,7 @@ public class WadlResourceTest extends AbstractResourceTester {
     
     public void testOptionsLocatorWadl() throws ParserConfigurationException, SAXException, IOException, XPathExpressionException {
         initiateWebApplication(WidgetsResource.class, ExtraResource.class);
-        ResourceProxy r = resourceProxy("/widgets/3/verbose");
+        WebResource r = resource("/widgets/3/verbose");
         
         // test WidgetsResource
         File tmpFile = r.accept(MediaTypes.WADL).options(File.class);
@@ -245,7 +245,7 @@ public class WadlResourceTest extends AbstractResourceTester {
     
     public void testOptionsSubResourceWadl() throws ParserConfigurationException, SAXException, IOException, XPathExpressionException {
         initiateWebApplication(WidgetsResource.class, ExtraResource.class);
-        ResourceProxy r = resourceProxy("/widgets/3");
+        WebResource r = resource("/widgets/3");
         
         // test WidgetsResource
         File tmpFile = r.accept(MediaTypes.WADL).options(File.class);
@@ -301,7 +301,7 @@ public class WadlResourceTest extends AbstractResourceTester {
     
     public void testRecursive() throws ParserConfigurationException, SAXException, IOException, XPathExpressionException {
         initiateWebApplication(RootResource.class);
-        ResourceProxy r = resourceProxy("/root/loc");
+        WebResource r = resource("/root/loc");
         
         // test WidgetsResource
         File tmpFile = r.accept(MediaTypes.WADL).options(File.class);
@@ -320,7 +320,7 @@ public class WadlResourceTest extends AbstractResourceTester {
         val = (String)xp.evaluate("count(//wadl:resource[@path='root/loc'])", d, XPathConstants.STRING);
         assertEquals(val,"1");
         
-        r = resourceProxy("/root/loc/loc");
+        r = resource("/root/loc/loc");
         
         // test WidgetsResource
         tmpFile = r.accept(MediaTypes.WADL).options(File.class);

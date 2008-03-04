@@ -66,7 +66,7 @@ public class UriPattern {
      *        empty string then the pattern will only match a null or empty
      *        URI path.
      * 
-     * @throw {@link java.util.regex.PatternSyntaxException} if the specific
+     * @throws {@link java.util.regex.PatternSyntaxException} if the specific
      *         regular expression could not be generated
      */
     public UriPattern(String regex) {
@@ -100,7 +100,7 @@ public class UriPattern {
      *        in the same order as the pattern's capturing groups. The list
      *        is cleared before values are added.
      * @return true if the URI matches the pattern, otherwise false.
-     * @throw {@link IllegalArgumentException} if the uri or 
+     * @throws {@link IllegalArgumentException} if the uri or 
      *         capturingGroupValues is null.
      */
     public final boolean match(CharSequence uri, List<String> groupValues) {
@@ -145,7 +145,7 @@ public class UriPattern {
      *        into the map using the group name associated with the 
      *        capturing group. The map is cleared before values are added.
      * @return true if the URI matches the pattern, otherwise false.
-     * @throw {@link IllegalArgumentException} if the uri or 
+     * @throws {@link IllegalArgumentException} if the uri or 
      *         capturingGroupValues is null.
      */
     public final boolean match(CharSequence uri, 

@@ -26,7 +26,7 @@ import javax.ws.rs.Path;
 import com.sun.ws.rest.api.core.HttpRequestContext;
 import com.sun.ws.rest.api.core.HttpResponseContext;
 import com.sun.ws.rest.api.client.Client;
-import com.sun.ws.rest.api.client.ResourceProxy;
+import com.sun.ws.rest.api.client.WebResource;
 import java.io.IOException;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -72,24 +72,24 @@ public class OutputStreamTest extends AbstractHttpServerTester {
     public void testGet() {
         startServer(TestResource.class);
                 
-        ResourceProxy r = Client.create().proxy(getUri().path("output").build());
+        WebResource r = Client.create().resource(getUri().path("output").build());
         assertEquals("RESOURCE", r.get(String.class));
     }
     
     public void testPost() {
         startServer(TestResource.class);
                 
-        ResourceProxy r = Client.create().proxy(getUri().path("output").build());
+        WebResource r = Client.create().resource(getUri().path("output").build());
         assertEquals("RESOURCE", r.post(String.class, "RESOURCE"));
     }
     
     public void testAll() {
         startServer(TestResource.class);
                 
-        ResourceProxy r = Client.create().proxy(getUri().path("output").build());
+        WebResource r = Client.create().resource(getUri().path("output").build());
         assertEquals("RESOURCE", r.get(String.class));        
         
-        r = Client.create().proxy(getUri().path("output").build());
+        r = Client.create().resource(getUri().path("output").build());
         assertEquals("RESOURCE", r.post(String.class, "RESOURCE"));
     }
 }

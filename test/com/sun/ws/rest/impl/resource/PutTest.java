@@ -75,18 +75,18 @@ public class PutTest extends AbstractResourceTester {
                 PutNoInputResource.class,
                 PutResource.class);
 
-        ClientResponse response = resourceProxy("/PutNoInputNoReturnResource").
+        ClientResponse response = resource("/PutNoInputNoReturnResource").
                 put(ClientResponse.class);
         assertEquals(204, response.getStatus());
         
-        response = resourceProxy("/PutNoReturnResource").
+        response = resource("/PutNoReturnResource").
                 put(ClientResponse.class, "PutNoReturnResource");
         assertEquals(204, response.getStatus());
         
-        String s = resourceProxy("/PutNoInputResource").put(String.class);
+        String s = resource("/PutNoInputResource").put(String.class);
         assertEquals(s, "PutNoInputResource");
         
-        s = resourceProxy("/PutResource").put(String.class, "PutResource");
+        s = resource("/PutResource").put(String.class, "PutResource");
         assertEquals(s, "PutResource");
     }
 }

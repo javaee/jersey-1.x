@@ -184,9 +184,9 @@ public class UriParamAsPrimitiveTest extends AbstractResourceTester {
     
     
     void _test(String type, String value) {
-        resourceProxy("/"+ type + "/" + value).
+        resource("/"+ type + "/" + value).
                 get(String.class);
-        resourceProxy("/"+ type + "/wrapper/" + value).
+        resource("/"+ type + "/wrapper/" + value).
                 get(String.class);
     }
     
@@ -219,14 +219,14 @@ public class UriParamAsPrimitiveTest extends AbstractResourceTester {
     }
     
     public void testBadPrimitiveValue() {
-        ClientResponse response = resourceProxy("/int/abcdef", false).
+        ClientResponse response = resource("/int/abcdef", false).
                 get(ClientResponse.class);
         
         assertEquals(400, response.getStatus());
     }
     
     public void testBadPrimitiveWrapperValue() {
-        ClientResponse response = resourceProxy("/int/wrapper/abcdef", false).
+        ClientResponse response = resource("/int/wrapper/abcdef", false).
                 get(ClientResponse.class);
         
         assertEquals(400, response.getStatus());

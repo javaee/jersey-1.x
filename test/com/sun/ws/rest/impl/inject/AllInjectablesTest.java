@@ -105,12 +105,12 @@ public class AllInjectablesTest extends AbstractResourceTester {
     public void testPerRequestInjected() throws IOException {
         initiateWebApplication(PerRequestContextResource.class);
         
-        assertEquals("GET", resourceProxy("/").get(String.class));        
+        assertEquals("GET", resource("/").get(String.class));        
     }       
     
     public void testSingletonInjected() throws IOException {
         initiateWebApplication(SingletonContextResource.class);
         
-        assertEquals("GET", resourceProxy("/").get(String.class));        
+        assertEquals("GET", resource("/").get(String.class));        
     }       
 }

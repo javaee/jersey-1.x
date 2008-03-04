@@ -87,7 +87,7 @@ public class OptionsTest extends AbstractResourceTester {
     public void testNoOptions() {
         initiateWebApplication(ResourceNoOptions.class);
 
-        ClientResponse response = resourceProxy("/").options(
+        ClientResponse response = resource("/").options(
                 ClientResponse.class);
         String allow = response.getMetadata().getFirst("Allow").toString();
         assertTrue(allow.contains("GET"));
@@ -134,7 +134,7 @@ public class OptionsTest extends AbstractResourceTester {
     public void testWithOptions() {
         initiateWebApplication(ResourceWithOptions.class);
 
-        ClientResponse response = resourceProxy("/").options(
+        ClientResponse response = resource("/").options(
                 ClientResponse.class);
         String allow = response.getMetadata().getFirst("Allow").toString();
         assertTrue(allow.contains("GET"));

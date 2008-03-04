@@ -43,10 +43,10 @@ import javax.ws.rs.core.Context;
 
 /**
  * The HTTP client class for handling requests and responses specified by 
- * {@link ClientHandler} or for creating {@link ResourceProxy} instances.
+ * {@link ClientHandler} or for creating {@link WebResource} instances.
  * <p>
  * {@link ClientFilter} instances may be added to the client for filtering
- * requests and responses (including those of {@link ResourceProxy} instances
+ * requests and responses (including those of {@link WebResource} instances
  * created from the client).
  * <p>
  * A client may be configured by passing a {@link ClientConfig} instance to
@@ -213,23 +213,23 @@ public class Client extends Filterable implements ClientHandler {
     }
     
     /**
-     * Create a resource proxy from the client.
+     * Create a Web resource from the client.
      * 
      * @param u the URI of the resource.
-     * @return the resource proxy.
+     * @return the Web resource.
      */
-    public final ResourceProxy proxy(String u) {
-        return proxy(URI.create(u));
+    public final WebResource resource(String u) {
+        return resource(URI.create(u));
     }
     
     /**
-     * Create a resource proxy from the client.
+     * Create a Web resource from the client.
      * 
      * @param u the URI of the resource.
-     * @return the resource proxy.
+     * @return the Web resource.
      */
-    public final ResourceProxy proxy(URI u) {
-        return new ResourceProxy(this, u);
+    public final WebResource resource(URI u) {
+        return new WebResource(this, u);
     }
     
     // ClientHandler

@@ -62,11 +62,11 @@ public class GenericInheritanceTest extends AbstractResourceTester {
     
     public void testStringSubResource() {
         initiateWebApplication(StringSubResource.class);
-        assertEquals("java.lang.String", resourceProxy("/").put(String.class, "string"));
+        assertEquals("java.lang.String", resource("/").put(String.class, "string"));
     }
     
     public void testByteArraySubResource() {
         initiateWebApplication(ByteArraySubResource.class);
-        assertEquals("[B", resourceProxy("/").put(String.class, "bytes"));
+        assertEquals("[B", resource("/").put(String.class, "bytes"));
     }    
 }

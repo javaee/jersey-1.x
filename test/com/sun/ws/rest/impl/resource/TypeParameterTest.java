@@ -60,7 +60,7 @@ public class TypeParameterTest extends AbstractResourceTester {
     public void testMethod() {
         initiateWebApplication(Resource.class);
         
-        assertEquals("putMe", resourceProxy("/?a=a&b=b").put(String.class, "putMe"));
-        assertEquals("postMe", resourceProxy("/?a=a&b=b").post(String.class, "postMe"));
+        assertEquals("putMe", resource("/?a=a&b=b").put(String.class, "putMe"));
+        assertEquals("postMe", resource("/?a=a&b=b").post(String.class, "postMe"));
     }
 }

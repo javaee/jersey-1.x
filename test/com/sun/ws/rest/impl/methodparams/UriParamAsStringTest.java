@@ -66,13 +66,13 @@ public class UriParamAsStringTest extends AbstractResourceTester {
     
     public void testStringArgsGet() {
         initiateWebApplication(Resource.class);
-        resourceProxy("/a/b/c").
+        resource("/a/b/c").
                 get(String.class);
     }
     
     public void testStringArgsPost() {
         initiateWebApplication(Resource.class);
-        String s = resourceProxy("/a/b/c").
+        String s = resource("/a/b/c").
                 post(String.class, "content");
 
         assertEquals("content", s);
@@ -95,8 +95,8 @@ public class UriParamAsStringTest extends AbstractResourceTester {
     public void testDuplicate() {
         initiateWebApplication(Duplicate.class);
         
-        assertEquals("foo", resourceProxy("/foo").get(String.class));
-        assertEquals("bar", resourceProxy("/foo/bar").get(String.class));
+        assertEquals("foo", resource("/foo").get(String.class));
+        assertEquals("bar", resource("/foo/bar").get(String.class));
     }
     
     @Path("/{id}")
@@ -117,7 +117,7 @@ public class UriParamAsStringTest extends AbstractResourceTester {
     public void testDuplicateList() {
         initiateWebApplication(DuplicateList.class);
         
-        assertEquals("foo", resourceProxy("/foo").get(String.class));
-        assertEquals("barfoo", resourceProxy("/foo/bar").get(String.class));
+        assertEquals("foo", resource("/foo").get(String.class));
+        assertEquals("barfoo", resource("/foo/bar").get(String.class));
     }
 }

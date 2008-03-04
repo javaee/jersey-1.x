@@ -51,13 +51,13 @@ public class ProduceMimeAcceptableTest extends AbstractResourceTester {
     public void testAcceptable() {
         initiateWebApplication(WebResource.class);
         
-        resourceProxy("/").accept("application/foo", "application/bar").get(String.class);
+        resource("/").accept("application/foo", "application/bar").get(String.class);
     }
     
     public void testNotAcceptable() {
         initiateWebApplication(WebResource.class);
         
-        ClientResponse response = resourceProxy("/", false).
+        ClientResponse response = resource("/", false).
                 accept("application/foo").get(ClientResponse.class);
         assertEquals(500, response.getStatus());
     }
@@ -75,7 +75,7 @@ public class ProduceMimeAcceptableTest extends AbstractResourceTester {
     public void testProduceGeneric() {
         initiateWebApplication(WebResourceProduceGeneric.class);
         
-        resourceProxy("/").accept("application/bar").get(String.class);
+        resource("/").accept("application/bar").get(String.class);
     }
     
 }

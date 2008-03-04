@@ -24,7 +24,7 @@ package com.sun.ws.rest.impl.container.httpserver;
 
 import com.sun.ws.rest.api.client.Client;
 import javax.ws.rs.Path;
-import com.sun.ws.rest.api.client.ResourceProxy;
+import com.sun.ws.rest.api.client.WebResource;
 import java.net.URI;
 import javax.ws.rs.GET;
 import javax.ws.rs.QueryParam;
@@ -51,7 +51,7 @@ public class QueryParamTest extends AbstractHttpServerTester {
     public void testQueryParam() {
         startServer(QueryParamResource.class);
                 
-        ResourceProxy r = Client.create().proxy(
+        WebResource r = Client.create().resource(
                 getUri().path("test").build());
         
         URI u = UriBuilder.fromPath("").encode(false).

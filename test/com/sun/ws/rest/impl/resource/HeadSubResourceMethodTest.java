@@ -23,7 +23,7 @@
 package com.sun.ws.rest.impl.resource;
 
 import com.sun.ws.rest.impl.AbstractResourceTester;
-import com.sun.ws.rest.api.client.ResourceProxy;
+import com.sun.ws.rest.api.client.WebResource;
 import com.sun.ws.rest.api.client.ClientResponse;
 import javax.ws.rs.GET;
 import javax.ws.rs.HEAD;
@@ -54,7 +54,7 @@ public class HeadSubResourceMethodTest extends AbstractResourceTester {
     public void testGetNoHead() {
         initiateWebApplication(ResourceGetNoHead.class);
         
-        ClientResponse response = resourceProxy("/sub", false).
+        ClientResponse response = resource("/sub", false).
                 head();
         assertEquals(200, response.getStatus());
         assertFalse(response.hasEntity());
@@ -78,7 +78,7 @@ public class HeadSubResourceMethodTest extends AbstractResourceTester {
     public void testGetWithHead() {
         initiateWebApplication(ResourceGetWithHead.class);
         
-        ClientResponse response = resourceProxy("/sub", false).
+        ClientResponse response = resource("/sub", false).
                 head();
         assertEquals(200, response.getStatus());
         assertFalse(response.hasEntity());
@@ -104,7 +104,7 @@ public class HeadSubResourceMethodTest extends AbstractResourceTester {
     
     public void testGetWithProduceNoHead() {
         initiateWebApplication(ResourceGetWithProduceNoHead.class);
-        ResourceProxy r = resourceProxy("/sub", false);
+        WebResource r = resource("/sub", false);
         
         MediaType foo = MediaType.parse("application/foo");
         ClientResponse response = r.accept(foo).head();
@@ -153,7 +153,7 @@ public class HeadSubResourceMethodTest extends AbstractResourceTester {
     
     public void testGetWithProduceWithHead() {
         initiateWebApplication(ResourceGetWithProduceWithHead.class);
-        ResourceProxy r = resourceProxy("/sub", false);
+        WebResource r = resource("/sub", false);
         
         MediaType foo = MediaType.parse("application/foo");
         ClientResponse response = r.accept(foo).head();
@@ -191,13 +191,13 @@ public class HeadSubResourceMethodTest extends AbstractResourceTester {
         initiateWebApplication(ResourceGetWithProduceNoHeadDifferentSub.class);
         
         MediaType foo = MediaType.parse("application/foo");
-        ClientResponse response = resourceProxy("/sub1", false).accept(foo).head();
+        ClientResponse response = resource("/sub1", false).accept(foo).head();
         assertEquals(200, response.getStatus());
         assertFalse(response.hasEntity());
         assertEquals(foo, response.getType());
         
         MediaType bar = MediaType.parse("application/bar");
-        response = resourceProxy("/sub2", false).accept(bar).head();
+        response = resource("/sub2", false).accept(bar).head();
         assertEquals(200, response.getStatus());
         assertFalse(response.hasEntity());
         assertEquals(bar, response.getType());

@@ -61,8 +61,8 @@ public class SubResourceDynamicTest extends AbstractResourceTester {
     public void testSubResourceDynamic() {
         initiateWebApplication(Parent.class);
         
-        assertEquals("parent", resourceProxy("/parent").get(String.class));
-        assertEquals("child", resourceProxy("/parent/child").get(String.class));
+        assertEquals("parent", resource("/parent").get(String.class));
+        assertEquals("child", resource("/parent/child").get(String.class));
     }    
     
     @Path("/{p}")
@@ -88,7 +88,7 @@ public class SubResourceDynamicTest extends AbstractResourceTester {
     public void testSubResourceDynamicWithTemplates() {
         initiateWebApplication(ParentWithTemplates.class);
         
-        assertEquals("parent", resourceProxy("/parent").get(String.class));
-        assertEquals("first", resourceProxy("/parent/child/first").get(String.class));
+        assertEquals("parent", resource("/parent").get(String.class));
+        assertEquals("first", resource("/parent/child/first").get(String.class));
     }    
 }

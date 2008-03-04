@@ -24,7 +24,7 @@ package com.sun.ws.rest.impl.container.httpserver;
 
 import com.sun.ws.rest.api.client.Client;
 import javax.ws.rs.Path;
-import com.sun.ws.rest.api.client.ResourceProxy;
+import com.sun.ws.rest.api.client.WebResource;
 import javax.ws.rs.GET;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.UriInfo;
@@ -54,7 +54,7 @@ public class EscapedURITest extends AbstractHttpServerTester {
     public void testExpliciWebResourceReference() {
         startServer(EscapedURIResource.class);
                 
-        ResourceProxy r = Client.create().proxy(getUri().
+        WebResource r = Client.create().resource(getUri().
                 userInfo("x.y").encode(false).path("x%20y").build());
         assertEquals("CONTENT", r.get(String.class));
     } 

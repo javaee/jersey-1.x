@@ -23,7 +23,7 @@
 package com.sun.ws.rest.impl.resource;
 
 import com.sun.ws.rest.impl.AbstractResourceTester;
-import com.sun.ws.rest.api.client.ResourceProxy;
+import com.sun.ws.rest.api.client.WebResource;
 import com.sun.ws.rest.api.client.ClientResponse;
 import javax.ws.rs.Path;
 import java.io.IOException;
@@ -51,7 +51,7 @@ public class RootResourceTest extends AbstractResourceTester {
     
     public void testAbstractResource() throws IOException {
         initiateWebApplication(AbstractResource.class);
-        ResourceProxy r = resourceProxy("/", false);
+        WebResource r = resource("/", false);
         
         ClientResponse res = r.get(ClientResponse.class);
         assertEquals(404, res.getStatus());
@@ -65,7 +65,7 @@ public class RootResourceTest extends AbstractResourceTester {
     
     public void testInterfaceResource() throws IOException {
         initiateWebApplication(InterfaceResource.class);
-        ResourceProxy r = resourceProxy("/", false);
+        WebResource r = resource("/", false);
         
         ClientResponse res = r.get(ClientResponse.class);
         assertEquals(404, res.getStatus());

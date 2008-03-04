@@ -24,7 +24,7 @@ package com.sun.ws.rest.impl.container.httpserver;
 
 import com.sun.ws.rest.api.client.Client;
 import javax.ws.rs.Path;
-import com.sun.ws.rest.api.client.ResourceProxy;
+import com.sun.ws.rest.api.client.WebResource;
 import javax.ws.rs.GET;
 import junit.framework.*;
 
@@ -50,12 +50,12 @@ public class HandlerContextTest extends AbstractHttpServerTester {
     }
     
     public void testRequestWithTerminatingSlash() {
-        ResourceProxy r = Client.create().proxy(getUri().path("/").build());
+        WebResource r = Client.create().resource(getUri().path("/").build());
         assertEquals("CONTENT", r.get(String.class));
     } 
     
     public void testRequestWithoutTerminatingSlash() {
-        ResourceProxy r = Client.create().proxy(getUri().build());
+        WebResource r = Client.create().resource(getUri().build());
         assertEquals("CONTENT", r.get(String.class));
     }
 }

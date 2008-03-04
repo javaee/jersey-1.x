@@ -24,7 +24,7 @@ package com.sun.ws.rest.impl.resource;
 
 import com.sun.ws.rest.impl.AbstractResourceTester;
 import javax.ws.rs.Path;
-import com.sun.ws.rest.api.client.ResourceProxy;
+import com.sun.ws.rest.api.client.WebResource;
 import java.io.IOException;
 import javax.ws.rs.GET;
 import javax.ws.rs.core.Context;
@@ -77,13 +77,13 @@ public class EmptyRootResourcePath extends AbstractResourceTester {
     public void testGet() throws IOException {
         initiateWebApplication(VirtualResource.class, AbsoluteResource.class);
 
-        ResourceProxy r = resourceProxy("/one");
+        WebResource r = resource("/one");
         assertEquals("one", r.get(String.class));
         
-        r = resourceProxy("/two");
+        r = resource("/two");
         assertEquals("two", r.get(String.class));
         
-        r = resourceProxy("/absolute");
+        r = resource("/absolute");
         assertEquals("absolute", r.get(String.class));
     }
 }

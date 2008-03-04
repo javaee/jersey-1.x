@@ -24,7 +24,7 @@ package com.sun.ws.rest.impl.resource;
 
 import com.sun.ws.rest.impl.AbstractResourceTester;
 import javax.ws.rs.Path;
-import com.sun.ws.rest.api.client.ResourceProxy;
+import com.sun.ws.rest.api.client.WebResource;
 import com.sun.ws.rest.api.client.ClientResponse;
 import java.io.IOException;
 import java.util.List;
@@ -66,7 +66,7 @@ public class VariantsTest extends AbstractResourceTester {
     
     public void testGetLanguageEn() throws IOException {
         initiateWebApplication(LanguageVariantResource.class);
-        ResourceProxy rp = resourceProxy("/");
+        WebResource rp = resource("/");
         
         ClientResponse r = rp.
                 header("Accept-Language", "en").
@@ -77,7 +77,7 @@ public class VariantsTest extends AbstractResourceTester {
     
     public void testGetLanguageZh() throws IOException {
         initiateWebApplication(LanguageVariantResource.class);
-        ResourceProxy rp = resourceProxy("/");
+        WebResource rp = resource("/");
         
         ClientResponse r = rp.
                 header("Accept-Language", "zh").
@@ -88,7 +88,7 @@ public class VariantsTest extends AbstractResourceTester {
     
     public void testGetLanguageMultiple() throws IOException {
         initiateWebApplication(LanguageVariantResource.class);
-        ResourceProxy rp = resourceProxy("/");
+        WebResource rp = resource("/");
         
         ClientResponse r = rp.
                 header("Accept-Language", "en;q=0.3, zh;q=0.4, fr").
@@ -118,7 +118,7 @@ public class VariantsTest extends AbstractResourceTester {
     
     public void testGetComplex1() throws IOException {
         initiateWebApplication(ComplexVariantResource.class);
-        ResourceProxy rp = resourceProxy("/");
+        WebResource rp = resource("/");
         
         ClientResponse r = rp.accept("text/xml",
                 "application/xml",
@@ -136,7 +136,7 @@ public class VariantsTest extends AbstractResourceTester {
     
     public void testGetComplex2() throws IOException {
         initiateWebApplication(ComplexVariantResource.class);
-        ResourceProxy rp = resourceProxy("/");
+        WebResource rp = resource("/");
         
         ClientResponse r = rp.accept("text/xml",
                 "application/xml",
@@ -154,7 +154,7 @@ public class VariantsTest extends AbstractResourceTester {
     
     public void testGetComplex3() throws IOException {
         initiateWebApplication(ComplexVariantResource.class);
-        ResourceProxy rp = resourceProxy("/");
+        WebResource rp = resource("/");
         
         ClientResponse r = rp.accept("application/xml",
                 "text/xml",
@@ -172,7 +172,7 @@ public class VariantsTest extends AbstractResourceTester {
     
     public void testGetComplexNotAcceptable() throws IOException {
         initiateWebApplication(ComplexVariantResource.class);
-        ResourceProxy rp = resourceProxy("/", false);
+        WebResource rp = resource("/", false);
         
         ClientResponse r = rp.accept("application/atom+xml").
                 header("Accept-Language", "en-us,en").

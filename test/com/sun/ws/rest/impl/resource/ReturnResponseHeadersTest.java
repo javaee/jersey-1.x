@@ -50,7 +50,7 @@ public class ReturnResponseHeadersTest extends AbstractResourceTester {
     public void testRepresentationHeaders() throws Exception {
         initiateWebApplication(TestRepresentationBean.class);
         
-        ClientResponse response = resourceProxy("/").entity("content").
+        ClientResponse response = resource("/").entity("content").
                 accept("text/plain").post(ClientResponse.class);
         assertEquals("content", response.getEntity(String.class));
         assertEquals("en", response.getLangauge());
