@@ -429,7 +429,7 @@
       <delete dir="lib/aux/jflex-1.4.1" file="lib/aux/jflex.zip"/>
     </target>
 
-    <target name="regenerate-json-lexer" depends="-get-jflex">
+    <target name="regenerate-json-lexer" depends="-get-jflex" description="Regenerates JSON lexer from it's jflex definition in etc/json.flex">
       <java jar="lib/aux/JFlex.jar" fork="true">
         <arg value="--nobak"/>
         <arg value="-d"/>

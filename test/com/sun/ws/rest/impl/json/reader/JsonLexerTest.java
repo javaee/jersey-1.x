@@ -35,17 +35,81 @@ public class JsonLexerTest extends TestCase {
         super(testName);
     }            
 
-    @Override
-    protected void setUp() throws Exception {
-        super.setUp();
+    public void testNumbers() throws Exception {
+        String testInput = "1 -45 12.355 0.123 -0.14 10e91 0e-12 0.12E14 -123.88E+34";
+        JsonLexer lexer = new JsonLexer(new StringReader(testInput));
+        JsonToken token;
+        token = lexer.yylex();
+        assertEquals(JsonToken.NUMBER, token.tokenType);
+        assertEquals("1", token.tokenText);
+        token = lexer.yylex();
+        assertEquals(JsonToken.NUMBER, token.tokenType);
+        assertEquals("-45", token.tokenText);
+        token = lexer.yylex();
+        assertEquals(JsonToken.NUMBER, token.tokenType);
+        assertEquals("12.355", token.tokenText);
+        token = lexer.yylex();
+        assertEquals(JsonToken.NUMBER, token.tokenType);
+        assertEquals("0.123", token.tokenText);
+        token = lexer.yylex();
+        assertEquals(JsonToken.NUMBER, token.tokenType);
+        assertEquals("-0.14", token.tokenText);
+        token = lexer.yylex();
+        assertEquals(JsonToken.NUMBER, token.tokenType);
+        assertEquals("10e91", token.tokenText);
+        token = lexer.yylex();
+        assertEquals(JsonToken.NUMBER, token.tokenType);
+        assertEquals("0e-12", token.tokenText);
+        token = lexer.yylex();
+        assertEquals(JsonToken.NUMBER, token.tokenType);
+        assertEquals("0.12E14", token.tokenText);
+        token = lexer.yylex();
+        assertEquals(JsonToken.NUMBER, token.tokenType);
+        assertEquals("-123.88E+34", token.tokenText);
+    }
+    
+    public void testBooleans() throws Exception {
+        String testInput = "true false";
+        JsonLexer lexer = new JsonLexer(new StringReader(testInput));
+        JsonToken token;
+        token = lexer.yylex();
+        assertEquals(JsonToken.TRUE, token.tokenType);
+        token = lexer.yylex();
+        assertEquals(JsonToken.FALSE, token.tokenType);
     }
 
-    /**
-     * Test of yylex method, of class JsonLexer.
-     */
-    public void testJsonWithoutWhitespace() throws Exception {
-        System.out.println("yylex");
-        String testInput = "[{\"name\":\"jakub\",\"age\":\"12\"}]";
+    public void testNull() throws Exception {
+        String testInput = "null";
+        JsonLexer lexer = new JsonLexer(new StringReader(testInput));
+        JsonToken token;
+        token = lexer.yylex();
+        assertEquals(JsonToken.NULL, token.tokenType);
+    }
+    
+    public void testStrings() throws Exception {
+        String testInput = "\"one\" \"one big\" \"one big \\n tower\" \"\\/ is slash\" \"other \\\" \\u0065 \\\\ symbols \\b\\f\\n\\r\\t\"";
+        JsonLexer lexer = new JsonLexer(new StringReader(testInput));
+        JsonToken token;
+        token = lexer.yylex();
+        assertEquals(JsonToken.STRING, token.tokenType);
+        assertEquals("one", token.tokenText);
+        token = lexer.yylex();
+        assertEquals(JsonToken.STRING, token.tokenType);
+        assertEquals("one big", token.tokenText);
+        token = lexer.yylex();
+        assertEquals(JsonToken.STRING, token.tokenType);
+        assertEquals("one big \n tower", token.tokenText);
+        token = lexer.yylex();
+        assertEquals(JsonToken.STRING, token.tokenType);
+        assertEquals("/ is slash", token.tokenText);
+        token = lexer.yylex();
+        assertEquals(JsonToken.STRING, token.tokenType);
+        assertEquals("other \" \u0065 \\ symbols \b\f\n\r\t", token.tokenText);
+    }
+    
+
+    public void testJsonExprWithoutWhitespace() throws Exception {
+        String testInput = "[{\"name\":\"jakub\",\"age\":12}]";
         JsonLexer lexer = new JsonLexer(new StringReader(testInput));
         JsonToken token;
         token = lexer.yylex();
@@ -65,16 +129,15 @@ public class JsonLexerTest extends TestCase {
         token = lexer.yylex();
         assertEquals(JsonToken.COLON, token.tokenType);
         token = lexer.yylex();
-        assertEquals(JsonToken.STRING, token.tokenType);
+        assertEquals(JsonToken.NUMBER, token.tokenType);
         token = lexer.yylex();
         assertEquals(JsonToken.END_OBJECT, token.tokenType);
         token = lexer.yylex();
         assertEquals(JsonToken.END_ARRAY, token.tokenType);
     }
     
-    public void testJsonWithWhitespace() throws Exception {
-        System.out.println("yylex");
-        String testInput = "[{ \"name\" : \"jakub\" ,\n\"age\" : \"12\"}]";
+    public void testJsonExprWithWhitespace() throws Exception {
+        String testInput = "[{ \"name\" : \"jakub\" ,\n\"age\" : 12}]";
         JsonLexer lexer = new JsonLexer(new StringReader(testInput));
         JsonToken token;
         token = lexer.yylex();
@@ -94,7 +157,7 @@ public class JsonLexerTest extends TestCase {
         token = lexer.yylex();
         assertEquals(JsonToken.COLON, token.tokenType);
         token = lexer.yylex();
-        assertEquals(JsonToken.STRING, token.tokenType);
+        assertEquals(JsonToken.NUMBER, token.tokenType);
         token = lexer.yylex();
         assertEquals(JsonToken.END_OBJECT, token.tokenType);
         token = lexer.yylex();
