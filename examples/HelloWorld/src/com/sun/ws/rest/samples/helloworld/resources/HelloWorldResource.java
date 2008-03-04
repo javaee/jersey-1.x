@@ -22,50 +22,14 @@
 
 package com.sun.ws.rest.samples.helloworld.resources;
 
-import com.sun.ws.rest.impl.json.JSONJAXBContext;
-import com.sun.ws.rest.spi.service.ContextResolver;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
 import javax.ws.rs.GET;
 import javax.ws.rs.ProduceMime;
 import javax.ws.rs.Path;
 
 // The Java class will be hosted at the URI path "/helloworld"
-import javax.ws.rs.ext.Provider;
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.annotation.XmlRootElement;
 @Path("/helloworld")
 public class HelloWorldResource {
     
-   /*@Provider
-   public static final class JAXBContextResolver implements ContextResolver<JAXBContext> {
-    
-    private final JAXBContext context;
-    static Class[] beans = {MyBean.class};
-    
-    public JAXBContextResolver() throws Exception {
-        Map<String, Object> props = new HashMap<String, Object>();
-        props.put(JSONJAXBContext.JSON_NOTATION, "MAPPED");
-        props.put(JSONJAXBContext.JSON_ROOT_UNWRAPPING, Boolean.FALSE);
-        this.context = new JSONJAXBContext(beans, props);
-    }
-    
-    public JAXBContext getContext(Class<?> objectType) {
-        return context;
-    }
-} */
-    
-    @XmlRootElement
-    public static class MyBean {
-        public String greeting;
-        public MyBean() {
-            greeting = "Hi";
-        }
-    }
-
     // The Java method will process HTTP GET requests
     @GET 
     // The Java method will produce content identified by the MIME Media
@@ -74,12 +38,5 @@ public class HelloWorldResource {
     public String getClichedMessage() {
         // Return some cliched textual content
         return "Hello World";
-    }
-    
-    @GET
-    @ProduceMime({"application/xml", "application/json"}) 
-    @Path("xml")
-    public MyBean getXml() {
-        return new MyBean();
     }
 }
