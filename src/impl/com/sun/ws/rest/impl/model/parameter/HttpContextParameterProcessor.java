@@ -28,6 +28,7 @@ import java.util.HashMap;
 import java.util.Map;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.Request;
+import javax.ws.rs.core.SecurityContext;
 import javax.ws.rs.core.UriInfo;
 
 /**
@@ -54,6 +55,7 @@ public final class HttpContextParameterProcessor implements ParameterProcessor {
         extractors.put(HttpHeaders.class, extractor);
         extractors.put(UriInfo.class, extractor);
         extractors.put(Request.class, extractor);
+        extractors.put(SecurityContext.class, extractor);
     }
     
     public ParameterExtractor process(Parameter parameter) {

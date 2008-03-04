@@ -76,6 +76,39 @@ public class AllInjectablesTest extends AbstractResourceTester {
     }
     
     @Path("/")
+    public static class PerRequestContextConstructorParameterResource {
+        public PerRequestContextConstructorParameterResource(
+                @Context HttpHeaders hs, 
+                @Context UriInfo ui, 
+                @Context Request r, 
+                @Context SecurityContext sc) {
+            assertNotNull(hs);
+            assertNotNull(ui);
+            assertNotNull(r);
+            assertNotNull(sc);
+        }                
+        
+        @GET
+        public String get() { return "GET"; }
+    }
+    
+    @Path("/")
+    public static class PerRequestContextMethodParameterResource {
+        @GET
+        public String get(
+                @Context HttpHeaders hs, 
+                @Context UriInfo ui, 
+                @Context Request r, 
+                @Context SecurityContext sc) {
+            assertNotNull(hs);
+            assertNotNull(ui);
+            assertNotNull(r);
+            assertNotNull(sc);
+            return "GET";
+        }                
+    }
+    
+    @Path("/")
     @Singleton
     public static class SingletonContextResource {
         @Context ResourceConfig rc;
@@ -104,6 +137,18 @@ public class AllInjectablesTest extends AbstractResourceTester {
     
     public void testPerRequestInjected() throws IOException {
         initiateWebApplication(PerRequestContextResource.class);
+        
+        assertEquals("GET", resource("/").get(String.class));        
+    }       
+    
+    public void testPerRequestConstructorParameterInjected() throws IOException {
+        initiateWebApplication(PerRequestContextConstructorParameterResource.class);
+        
+        assertEquals("GET", resource("/").get(String.class));        
+    }       
+    
+    public void testPerRequestMethodParameterInjected() throws IOException {
+        initiateWebApplication(PerRequestContextMethodParameterResource.class);
         
         assertEquals("GET", resource("/").get(String.class));        
     }       
