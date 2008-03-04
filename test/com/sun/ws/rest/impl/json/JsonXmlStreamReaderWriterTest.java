@@ -86,16 +86,15 @@ public class JsonXmlStreamReaderWriterTest extends TestCase {
         tryBean(new UserTable(users),"userTableUnwrappedWithTwoUsers.json", true);
     }
 
-// TODO: this one is failing: need to add numbers/tru/false/null to the lexer
-//    public void testTreeModel() throws JAXBException, IOException {
-//        TreeModel treeModel = new TreeModel(new TreeModel.Node("node1"));
-//        treeModel.root.children = new LinkedList<TreeModel.Node>();
-//        treeModel.root.expanded = true;
-//        treeModel.root.children.add(new TreeModel.Node("child1"));
-//        treeModel.root.children.add(new TreeModel.Node("child2"));
-//        treeModel.root.children.add(new TreeModel.Node("child3"));
-//        tryBean(treeModel, "oneLevelTree.json", true);
-//    }
+    public void testTreeModel() throws JAXBException, IOException {
+        TreeModel treeModel = new TreeModel(new TreeModel.Node("node1"));
+        treeModel.root.children = new LinkedList<TreeModel.Node>();
+        treeModel.root.expanded = true;
+        treeModel.root.children.add(new TreeModel.Node("child1"));
+        treeModel.root.children.add(new TreeModel.Node("child2"));
+        treeModel.root.children.add(new TreeModel.Node("child3"));
+        tryBean(treeModel, "oneLevelTree.json", true, null, "expanded");
+    }
 
     public void tryBean(Object jaxbBean, String filename, boolean stripRoot) throws JAXBException, IOException {
         tryBean(jaxbBean, filename, stripRoot, null, null);

@@ -209,10 +209,13 @@ public class JsonXmlStreamReader implements XMLStreamReader {
                             depth++;
                             break;
                         case JsonToken.STRING :
+                        case JsonToken.NUMBER :
+                        case JsonToken.TRUE :
+                        case JsonToken.FALSE :
+                        case JsonToken.NULL :
                             eventQueue.add(new CharactersEvent(lastToken.tokenText));
                             processingStack.get(depth).state = LaState.O5;
                             break;
-                        // TODO: could be also number, false, true, null !
                         default:
                             // TODO: handle problem
                     }
