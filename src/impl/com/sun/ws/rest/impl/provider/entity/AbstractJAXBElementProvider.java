@@ -23,7 +23,6 @@
 package com.sun.ws.rest.impl.provider.entity;
 
 import com.sun.ws.rest.spi.service.ContextResolver;
-import com.sun.ws.rest.impl.json.JSONJAXBContext;
 import java.util.Map;
 import java.util.WeakHashMap;
 import javax.ws.rs.core.Context;
@@ -54,7 +53,7 @@ public abstract class AbstractJAXBElementProvider extends AbstractTypeEntityProv
         synchronized (jaxbContexts) {
             JAXBContext context = jaxbContexts.get(type);
             if (context == null) {
-                context = new JSONJAXBContext(type);
+                context = JAXBContext.newInstance(type);
                 jaxbContexts.put(type, context);
             }
             return context;
