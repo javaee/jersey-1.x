@@ -91,7 +91,7 @@ public final class GrizzlyServerFactory {
         if (u == null)
             throw new IllegalArgumentException("The URI must not be null");
 
-        return create(URI.create(u));
+        return create(URI.create(u), adapter);
     }
     
     /**
