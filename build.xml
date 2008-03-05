@@ -136,6 +136,8 @@
         <!-- license -->
         <copy file="${basedir}/license.txt" 
               todir="${release.impl.dir}"/>
+        <copy file="${basedir}/thirdparty_license.txt" 
+              todir="${release.impl.dir}"/>
         
         <!-- create jersey docs -->
         <copy todir="${release.impl.dir}/docs/jersey-api">
