@@ -53,6 +53,6 @@ public class ReturnResponseHeadersTest extends AbstractResourceTester {
         ClientResponse response = resource("/").entity("content").
                 accept("text/plain").post(ClientResponse.class);
         assertEquals("content", response.getEntity(String.class));
-        assertEquals("en", response.getLangauge());
+        assertEquals("en", response.getLanguage());
     }
 }

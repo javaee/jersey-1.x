@@ -72,7 +72,7 @@ public class VariantsTest extends AbstractResourceTester {
                 header("Accept-Language", "en").
                 get(ClientResponse.class);
         assertEquals("en", r.getEntity(String.class));
-        assertEquals("en", r.getLangauge());
+        assertEquals("en", r.getLanguage());
     }
     
     public void testGetLanguageZh() throws IOException {
@@ -83,7 +83,7 @@ public class VariantsTest extends AbstractResourceTester {
                 header("Accept-Language", "zh").
                 get(ClientResponse.class);
         assertEquals("zh", r.getEntity(String.class));
-        assertEquals("zh", r.getLangauge());
+        assertEquals("zh", r.getLanguage());
     }
     
     public void testGetLanguageMultiple() throws IOException {
@@ -94,7 +94,7 @@ public class VariantsTest extends AbstractResourceTester {
                 header("Accept-Language", "en;q=0.3, zh;q=0.4, fr").
                 get(ClientResponse.class);
         assertEquals("fr", r.getEntity(String.class));
-        assertEquals("fr", r.getLangauge());
+        assertEquals("fr", r.getLanguage());
     }
     
     @Path("/")
@@ -131,7 +131,7 @@ public class VariantsTest extends AbstractResourceTester {
                 get(ClientResponse.class);
         assertEquals("GET", r.getEntity(String.class));
         assertEquals(MediaType.parse("text/xml"), r.getType());
-        assertEquals("en-us", r.getLangauge());
+        assertEquals("en-us", r.getLanguage());
     }   
     
     public void testGetComplex2() throws IOException {
@@ -149,7 +149,7 @@ public class VariantsTest extends AbstractResourceTester {
                 get(ClientResponse.class);
         assertEquals("GET", r.getEntity(String.class));
         assertEquals(MediaType.parse("text/xml"), r.getType());
-        assertEquals("en", r.getLangauge());
+        assertEquals("en", r.getLanguage());
     }
     
     public void testGetComplex3() throws IOException {
@@ -167,7 +167,7 @@ public class VariantsTest extends AbstractResourceTester {
                 get(ClientResponse.class);
         assertEquals("GET", r.getEntity(String.class));
         assertEquals(MediaType.parse("application/xml"), r.getType());
-        assertEquals("en-us", r.getLangauge());
+        assertEquals("en-us", r.getLanguage());
     }   
     
     public void testGetComplexNotAcceptable() throws IOException {

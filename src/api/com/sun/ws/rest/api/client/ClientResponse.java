@@ -127,7 +127,7 @@ public abstract class ClientResponse {
      * 
      * @return the language.
      */
-    public String getLangauge() {
+    public String getLanguage() {
         return getMetadata().getFirst("Content-Language");
     }
 }

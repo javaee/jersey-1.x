@@ -71,6 +71,6 @@ public class BeanTest extends AbstractResourceTester {
                 response.getLocation());
 
         assertEquals("en",
-                response.getLangauge());
+                response.getLanguage());
     }
 }
