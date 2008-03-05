@@ -52,7 +52,7 @@
         <replace file="@{nb.prop.file}">
           <replacefilter token="../../lib" value="${ashome.jersey.lib.dir}"/>
           <replacefilter token="/jaxb-api.jar" value="/webservices-rt.jar"/>
-          <replacefilter token="/jaxb-impl.jar" value="/webservices-rt.jar"/>
+          <replacefilter token="/jaxb-impl.jar" value="/webservices-tools.jar"/>
           <replacefilter token="/jaxb-xjc.jar" value="/webservices-tools.jar"/>
           <replacefilter token="/jaxws-api.jar" value="/webservices-rt.jar"/>
         </replace>
