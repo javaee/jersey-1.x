@@ -97,6 +97,8 @@ echo "I could be bounded in a nutshell" | java -jar dist/StorageService.jar PUT 
 echo "catch the conscience of the king" | java -jar dist/StorageService.jar PUT http://127.0.0.1:9998/storage/containers/quotes/3 text/plain
 echo "Get thee to a nunnery" | java -jar dist/StorageService.jar PUT http://127.0.0.1:9998/storage/containers/quotes/4 text/plain</pre></blockquote>
     <p>The 'quotes' container has four items associated with keys 1, 2, 3, and 4 when GETing the quotes container:</p>
+     <blockquote><pre>java -jar dist/StorageService.jar GET http://127.0.0.1:9998/storage/containers/quotes</pre></blockquote>
+    <p>it returns:
     <blockquote><pre>&lt;container&gt;
     &lt;item&gt;
         &lt;digest&gt;7a54c57975de11bffcda5bc6bd92a0460d17ad03&lt;/digest&gt;
