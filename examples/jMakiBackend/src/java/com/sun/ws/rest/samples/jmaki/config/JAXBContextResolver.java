@@ -25,6 +25,7 @@ import com.sun.ws.rest.impl.json.JSONJAXBContext;
 import com.sun.ws.rest.samples.jmaki.beans.Printer;
 import com.sun.ws.rest.samples.jmaki.beans.PrinterTableModel;
 import com.sun.ws.rest.samples.jmaki.beans.TreeModel;
+import com.sun.ws.rest.samples.jmaki.beans.WebResourceList;
 import com.sun.ws.rest.spi.service.ContextResolver;
 import java.util.HashMap;
 import java.util.Map;
@@ -39,13 +40,13 @@ import javax.xml.bind.JAXBContext;
 public class JAXBContextResolver implements ContextResolver<JAXBContext> {
 
     private JAXBContext context;
-    private Class[] types = {Printer.class, PrinterTableModel.class, TreeModel.class};
+    private Class[] types = {Printer.class, PrinterTableModel.class, TreeModel.class, WebResourceList.class};
 
     public JAXBContextResolver() throws Exception {
         Map<String, Object> props = new HashMap<String, Object>();
         props.put(JSONJAXBContext.JSON_NOTATION, "MAPPED");
         props.put(JSONJAXBContext.JSON_ROOT_UNWRAPPING, Boolean.TRUE);
-        props.put(JSONJAXBContext.JSON_ARRAYS, "[\"rows\", \"cols\", \"children\"]");
+        props.put(JSONJAXBContext.JSON_ARRAYS, "[\"rows\", \"cols\", \"children\", \"resources\"]");
         props.put(JSONJAXBContext.JSON_NON_STRINGS, "[\"expanded\"]");
         this.context = new JSONJAXBContext(types, props);
     }

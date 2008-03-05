@@ -24,7 +24,9 @@ package com.sun.ws.rest.samples.jmaki.resources;
 import com.sun.ws.rest.samples.jmaki.beans.Printer;
 import com.sun.ws.rest.samples.jmaki.beans.PrinterTableModel;
 import com.sun.ws.rest.samples.jmaki.beans.TreeModel;
+import com.sun.ws.rest.samples.jmaki.beans.WebResourceList;
 import com.sun.ws.rest.spi.resource.Singleton;
+import java.util.Formatter;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
@@ -35,6 +37,8 @@ import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.ProduceMime;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.UriInfo;
 
 /**
  *
@@ -45,16 +49,46 @@ import javax.ws.rs.ProduceMime;
 public class PrintersResource {
 
     Map<String, Printer> printers;
+    static WebResourceList myResources;
+    @Context
+    UriInfo uriInfo;
 
-    @Path("/jMakiTable")
     @GET
+    @ProduceMime({"application/json", "application/xml"})
+    public WebResourceList getMyResources() {
+        if (null == myResources) {
+            myResources = new WebResourceList();
+            myResources.items = new LinkedList<WebResourceList.Item>();
+            myResources.items.add(new WebResourceList.Item(
+                    "list of printers", uriInfo.getBaseUriBuilder().path(this.getClass()).path("list").build().toString()));
+            myResources.items.add(new WebResourceList.Item(
+                    "jMaki table model", uriInfo.getBaseUriBuilder().path(this.getClass()).path("jMakiTable").build().toString()));
+            myResources.items.add(new WebResourceList.Item(
+                    "jMaki tree model", uriInfo.getBaseUriBuilder().path(this.getClass()).path("jMakiTree").build().toString()));
+        }
+        return myResources;
+    }
+    
+    @GET @Path("/list")
+    @ProduceMime({"application/json", "application/xml"})
+    public WebResourceList getListOfPrinters() {
+        WebResourceList result = new WebResourceList();
+        result.items = new LinkedList<WebResourceList.Item>();
+        for (Printer p : getPrinters().values()) {
+            result.items.add(new WebResourceList.Item(
+                    (new Formatter()).format("%s (%s)", p.id, p.model).toString(), 
+                    uriInfo.getBaseUriBuilder().path(this.getClass()).path("ids").path(p.id).build().toString()));
+        }
+        return result;
+    }
+
+    @GET @Path("/jMakiTable")
     @ProduceMime("application/json")
     public PrinterTableModel getTable() {
         return new PrinterTableModel(getPrinters().values());
     }
 
-    @Path("/jMakiTree")
-    @GET
+    @GET @Path("/jMakiTree")
     @ProduceMime("application/json")
     public TreeModel getTree() {
         TreeModel model = new TreeModel();
@@ -79,25 +113,25 @@ public class PrintersResource {
         return model;
     }
 
-    @Path("/ids/{printerid}")
-    @GET
+    @GET @Path("/ids/{printerid}")
     @ProduceMime({"application/json", "application/xml"})
     public Printer getPrinter(
+            
             @PathParam("printerid") String printerId) {
         return getPrinters().get(printerId);
     }
 
-    @Path("/ids/{printerid}")
-    @PUT
+    @PUT @Path("/ids/{printerid}")
     @ConsumeMime({"application/json", "application/xml"})
     public void putPrinter(
+            
             @PathParam("printerid") String printerId,  Printer printer) {
         getPrinters().put(printerId, printer);
     }
 
-    @Path("/ids/{printerid}")
-    @DELETE
+    @DELETE @Path("/ids/{printerid}")
     public void deletePrinter(
+            
             @PathParam("printerid") String printerId) {
         getPrinters().remove(printerId);
     }
