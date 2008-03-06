@@ -108,6 +108,8 @@
      <update-nb-prop nb.prop.file="${gf.home}/jersey/examples/HelloWorld/nbproject/project.properties"/>
      <copy-example example.name="HelloWorldWebApp"/>
      <update-nb-prop nb.prop.file="${gf.home}/jersey/examples/HelloWorldWebApp/nbproject/project.properties"/>
+     <copy-example example.name="jMakiBackend"/>
+     <update-nb-prop nb.prop.file="${gf.home}/jersey/examples/jMakiBackend/nbproject/project.properties"/>
      <copy-example example.name="JsonFromJaxb"/>
      <update-nb-prop nb.prop.file="${gf.home}/jersey/examples/JsonFromJaxb/nbproject/project.properties"/>
      <copy-example example.name="OptimisticConcurrency"/>
