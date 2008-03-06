@@ -28,4 +28,10 @@
     <property name="javac.target"  value="1.5"/>
     
     <target name="default" depends="dist"/>
+
+   <target name="-pre-dist"> <!-- to fix an issue related to GF -->
+      <delete file="${build.web.dir}/WEB-INF/lib/webservices-rt.jar" quiet="true"/>
+      <delete file="${build.web.dir}/WEB-INF/lib/webservices-tools.jar" quiet="true"/>
+    </target>
+
 </project>
