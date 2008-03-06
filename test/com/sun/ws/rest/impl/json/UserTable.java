@@ -21,8 +21,6 @@
  */
 package com.sun.ws.rest.impl.json;
 
-import com.sun.ws.rest.impl.json.User;
-import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import javax.xml.bind.annotation.XmlRootElement;
@@ -83,7 +81,10 @@ public class UserTable {
         return headers;
     }
     
-    public UserTable() {}
+    public UserTable() {
+        this.rows = new LinkedList<User>();
+        this.rows.add(new User());
+    }
     
     public UserTable(List<User> users) {
         this.rows = new LinkedList<User>();

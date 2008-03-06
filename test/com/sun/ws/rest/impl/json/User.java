@@ -38,7 +38,9 @@ public class User {
     @XmlTransient
     public String password;
     
-    public User(){}
+    public User() {
+        this("1621", "Grotefend", "Persepolis");
+    }
     
     public User(String id, String name, String password) {
         this.id = id;

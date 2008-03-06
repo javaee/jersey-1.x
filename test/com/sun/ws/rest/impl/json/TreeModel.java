@@ -40,7 +40,9 @@ public class TreeModel {
         @XmlElement public boolean expanded;        
         @XmlElement public List<Node> children;
         
-        public Node(){}
+        public Node() {
+            this("dummy node", null);
+        }
 
         public Node(String label){
             this(label, null);
@@ -98,7 +100,9 @@ public class TreeModel {
     
     @XmlElement public Node root;
     
-    public TreeModel() {}
+    public TreeModel() {
+        this(new Node());
+    }
     
     public TreeModel(Node root) {
         this.root = root;
