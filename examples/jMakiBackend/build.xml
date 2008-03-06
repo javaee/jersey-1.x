@@ -63,4 +63,10 @@
     nbproject/build-impl.xml file. 
 
     -->
+
+   <target name="-pre-dist"> <!-- to fix an issue related to GF UC module -->
+      <delete file="${build.web.dir}/WEB-INF/lib/webservices-rt.jar" quiet="true"/>
+      <delete file="${build.web.dir}/WEB-INF/lib/webservices-tools.jar" quiet="true"/>
+    </target>
+
 </project>
