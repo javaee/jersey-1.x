@@ -1,10 +1,14 @@
 release 0.6 (2008-03-07)
+- Support for a Model View Controller abstraction and plugging in templates
+  processors that process models that produce views. See classes in the package:
+    com.sun.ws.rest.spi.template
+- Consumable and configuration JSON support with JAXB
 - Grizzly support is upgraded to 1.7.2.
 - A sub-resource locator can now return a Class instance, that will be
   instantiated using a ComponentProvider, using the life-cycle rules for
   resource classes.
-- The HttpURLConnection client implementation sets the content
-  length (if known) when sending a request so as to avoid buffering.
+- Removed support for using the GET to return WADL of resources, only the
+  OPTIONS method is supported. The application.wadl is still obtained using GET.
 - Fixed issue 41: WebApplicationException(500) returning response code 2
   https://jersey.dev.java.net/issues/show_bug.cgi?id=41
 - The default values for the following resource configuration features are
@@ -18,7 +22,18 @@ release 0.6 (2008-03-07)
   in .zip and treat them as jar files.
 - Fixed NPE for PackagesResourceConfig when scanning directories that
   contain characters such as space (that are percent-encoded in URLs).
-- Partially integrated JSR 311 API 0.6
+- Unified component instantation and injection. 
+  Included an SPI for plugging in IoC frameworks.
+  Life-cycle of resource classes is now independent of the IoC framework.
+  Many Jersey components may now particpate in an IoC 'session'.
+- MessageBodyReader and MessageBodyWriter implementations are searched for
+  dynamically using the same class scanning techniques as for resource classes.
+- User-defined JAXB contexts may be specified using an implementation of
+  ContextResolver<JAXBContext> that is annotated with @Provider.
+- Included Client API that focuses on the uniform interface, see classes in 
+  package:
+    com.sun.ws.rest.api.client  
+- Integrated JSR 311 API 0.6
   - java.ws.rs.ext.ProviderFactory replaced with java.ws.rs.ext.RuntimeDelegate.
   - java.ws.rs.ext.HeaderProvider is removed. This is replaced with
     java.ws.rs.ext.RuntimeDelegate.HeaderDelegate.
