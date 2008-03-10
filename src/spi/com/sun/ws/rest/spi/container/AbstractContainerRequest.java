@@ -359,7 +359,7 @@ public abstract class AbstractContainerRequest implements ContainerRequest {
     }
     
     public String getLanguage() {
-        return this.getRequestHeaders().getFirst("Langauge");
+        return this.getRequestHeaders().getFirst("Content-Langauge");
     }
     
     public Map<String, Cookie> getCookies() {
