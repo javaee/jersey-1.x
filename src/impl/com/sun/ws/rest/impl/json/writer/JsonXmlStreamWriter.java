@@ -221,7 +221,7 @@ public class JsonXmlStreamWriter implements XMLStreamWriter {
 
     public void writeCharacters(String text) throws XMLStreamException {
         try {
-            //TODO: what about encoding, numbers, booleans, nulls ?
+            //TODO: what about encoding?
             if (isNonString(processingStack.get(depth - 1).currentName)) {
                 processingStack.get(depth).writer.write(text);
             } else {
@@ -285,7 +285,7 @@ public class JsonXmlStreamWriter implements XMLStreamWriter {
     }
 
     public void writeAttribute(String localName, String value) throws XMLStreamException {
-        throw new UnsupportedOperationException("Not supported yet.");
+        writeAttribute(null, null, localName, value);
     }
 
     public void writeEmptyElement(String namespaceURI, String localName) throws XMLStreamException {
@@ -309,7 +309,7 @@ public class JsonXmlStreamWriter implements XMLStreamWriter {
     }
 
     public void writeAttribute(String namespaceURI, String localName, String value) throws XMLStreamException {
-        throw new UnsupportedOperationException("Not supported yet.");
+        writeAttribute(null, namespaceURI, localName, value);
     }
 
     public void writeEmptyElement(String prefix, String localName, String namespaceURI) throws XMLStreamException {
@@ -391,7 +391,9 @@ public class JsonXmlStreamWriter implements XMLStreamWriter {
     }
 
     public void writeAttribute(String prefix, String namespaceURI, String localName, String value) throws XMLStreamException {
-        throw new UnsupportedOperationException("Not supported yet.");
+        writeStartElement(prefix, "@" + localName, namespaceURI);
+        writeCharacters(value);
+        writeEndElement();
     }
     
     private ProcessingState createProcessingState() {

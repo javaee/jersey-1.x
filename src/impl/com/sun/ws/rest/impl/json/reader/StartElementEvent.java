@@ -23,6 +23,7 @@
 package com.sun.ws.rest.impl.json.reader;
 
 import javax.xml.namespace.QName;
+import javax.xml.stream.Location;
 import javax.xml.stream.XMLStreamConstants;
 
 /**
@@ -31,8 +32,9 @@ import javax.xml.stream.XMLStreamConstants;
  */
 public class StartElementEvent extends JsonReaderXmlEvent {
     
-    public StartElementEvent(String name) {
+    public StartElementEvent(String name, Location location) {
         this.name = new QName(name);
+        this.location = location;
     }
     
     @Override

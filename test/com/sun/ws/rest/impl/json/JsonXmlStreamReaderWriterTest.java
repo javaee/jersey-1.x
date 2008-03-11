@@ -95,7 +95,28 @@ public class JsonXmlStreamReaderWriterTest extends TestCase {
         treeModel.root.children.add(new TreeModel.Node("child3"));
         tryBean(treeModel, "oneLevelTree.json", true, null, "expanded");
     }
+    
+    public void testSimpleBeanWithAttributes() throws JAXBException, IOException {
+        SimpleBeanWithAttributes bean = (SimpleBeanWithAttributes)SimpleBeanWithAttributes.createTestInstance();
+        tryBean(bean, "simpleBeanWithAttributes.json", true, null, null);
+    }
 
+    public void testComplexBeanWithAttributes() throws JAXBException, IOException {
+        ComplexBeanWithAttributes bean = (ComplexBeanWithAttributes)ComplexBeanWithAttributes.createTestInstance();
+        tryBean(bean, "complexBeanWithAttributes.json", true, null, null);
+    }
+    
+//    public void testWrittingAttrs() throws Exception {
+//        SimpleBeanWithAttributes bean = (SimpleBeanWithAttributes)SimpleBeanWithAttributes.createTestInstance();
+//        tryWritingBean(bean, "simpleBeanWithAttributes.json", true, null, null);
+//    }
+//
+//    public void testReadingAttrs() throws Exception {
+//        SimpleBeanWithAttributes bean = (SimpleBeanWithAttributes)SimpleBeanWithAttributes.createTestInstance();
+//        System.out.println("testing: " + bean.toString());
+//        tryReadingBean("simpleBeanWithAttributes.json", bean, true, null, null);
+//    }
+    
     public void tryBean(Object jaxbBean, String filename, boolean stripRoot) throws JAXBException, IOException {
         tryBean(jaxbBean, filename, stripRoot, null, null);
     }
@@ -137,6 +158,7 @@ public class JsonXmlStreamReaderWriterTest extends TestCase {
                 new JsonXmlStreamReader(
                     new StringReader(TestHelper.getResourceAsString(PKG_NAME, jsonExprFilename)), stripRoot),
                 expectedJaxbBean.getClass());
+        System.out.println("unmarshalled: " + jaxbElement.getValue().toString());
         assertEquals("MISMATCH:\n" + expectedJaxbBean + "\n" + jaxbElement.getValue() + "\n", 
                 expectedJaxbBean, jaxbElement.getValue());
     }

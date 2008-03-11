@@ -100,12 +100,16 @@ public class TreeModel {
     
     @XmlElement public Node root;
     
-    public TreeModel() {
-        this(new Node());
-    }
+    public TreeModel() {}
     
     public TreeModel(Node root) {
         this.root = root;
+    }
+    
+    public static Object createTestInstance() {
+        TreeModel instance = new TreeModel();
+        instance.root = new Node();
+        return instance;
     }
     
     @Override

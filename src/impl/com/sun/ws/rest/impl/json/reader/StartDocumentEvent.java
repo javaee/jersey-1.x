@@ -22,6 +22,7 @@
 
 package com.sun.ws.rest.impl.json.reader;
 
+import javax.xml.stream.Location;
 import javax.xml.stream.XMLStreamConstants;
 
 /**
@@ -30,6 +31,10 @@ import javax.xml.stream.XMLStreamConstants;
  */
 public class StartDocumentEvent extends JsonReaderXmlEvent {
 
+    public StartDocumentEvent(Location location) {
+        this.location = location;
+    }
+    
     @Override
     public boolean isStartDocument() {
         return true;

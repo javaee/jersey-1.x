@@ -48,6 +48,13 @@ public class UserTable {
     public List<JMakiTableHeader> columns = initHeaders();
     public List<User> rows;
 
+    public UserTable() {}
+    
+    public UserTable(List<User> users) {
+        this.rows = new LinkedList<User>();
+        this.rows.addAll(users);
+    }
+
     @Override
     public boolean equals(Object obj) {
         if (!(obj instanceof UserTable)) {
@@ -73,22 +80,20 @@ public class UserTable {
         }
         return hash;
     }
+    
+    
+    public static Object createTestInstance() {
+        UserTable instance = new UserTable();
+        instance.rows = new LinkedList<User>();
+        instance.rows.add((User)User.createTestInstance());
+        return instance;
+    }
 
     static List<JMakiTableHeader> initHeaders() {
         List<JMakiTableHeader> headers = new LinkedList<JMakiTableHeader>();
         headers.add(new JMakiTableHeader("userid", "UserID"));
         headers.add(new JMakiTableHeader("name", "User Name"));
         return headers;
-    }
-    
-    public UserTable() {
-        this.rows = new LinkedList<User>();
-        this.rows.add(new User());
-    }
-    
-    public UserTable(List<User> users) {
-        this.rows = new LinkedList<User>();
-        this.rows.addAll(users);
     }
 
     @Override

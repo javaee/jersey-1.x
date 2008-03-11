@@ -22,6 +22,9 @@
 
 package com.sun.ws.rest.impl.json.reader;
 
+import java.util.LinkedList;
+import java.util.List;
+import java.util.NoSuchElementException;
 import javax.xml.namespace.QName;
 import javax.xml.stream.Location;
 import javax.xml.stream.XMLStreamException;
@@ -33,10 +36,21 @@ import javax.xml.stream.XMLStreamException;
  */
 public abstract class JsonReaderXmlEvent {
     
+    public static class Attribute {
+        String name;
+        String value;
+        
+        public Attribute(String name, String value) {
+            this.name = name;
+            this.value = value;
+        }
+    }
+
     Location location;
     QName name;
     String text;
-
+    List<Attribute> attributes;
+    
     public abstract int getEventType();
 
     public boolean isAttribute() {
@@ -76,39 +90,56 @@ public abstract class JsonReaderXmlEvent {
     }
 
     public int getAttributeCount() {
-        return 0;
+        return (null != attributes) ? attributes.size() : 0;
     }
     
     public String getAttributeLocalName(int index) {
-        throw new IndexOutOfBoundsException();
+        if ((null == attributes) || (index >= attributes.size())) {
+            throw new IndexOutOfBoundsException();
+        }
+        return attributes.get(index).name;
     }
     
     public QName getAttributeName(int index) {
-        throw new IndexOutOfBoundsException();
+        return new QName(null, getAttributeLocalName(index));
     }    
 
     public String getAttributePrefix(int index) {
-        throw new IndexOutOfBoundsException();
+        if ((null == attributes) || (index >= attributes.size())) {
+            throw new IndexOutOfBoundsException();
+        }
+        return null;
     }
 
     public String getAttributeType(int index) {
-        throw new IndexOutOfBoundsException();
+        return null;
     }
 
     public String getAttributeNamespace(int index) {
-        throw new IndexOutOfBoundsException();
+        return null;
     }
     
     public String getAttributeValue(int index) {
-        throw new IndexOutOfBoundsException();
+        if ((null == attributes) || (index >= attributes.size())) {
+            throw new IndexOutOfBoundsException();
+        }
+        return attributes.get(index).value;
     }
     
     public String getAttributeValue(String namespaceURI, String localName) {
-        throw new IndexOutOfBoundsException();
+        if ((null == attributes) || (null == localName) || ("".equals(localName))) {
+            throw new NoSuchElementException();
+        }
+        for (Attribute a : attributes) {
+            if (localName.equals(a.name)) {
+                return a.value;
+            }
+        }
+        throw new NoSuchElementException();
     }
     
-    public boolean isAttributeSpecified(int attribute) {
-        return false;
+    public boolean isAttributeSpecified(int index) {
+        return (null != attributes) && (attributes.size() >= index);
     }
     
     public String getText() {
@@ -182,5 +213,12 @@ public abstract class JsonReaderXmlEvent {
     
     public Location getLocation() {
         return location;
+    }
+    
+    public void addAttribute(String name, String value) {
+        if (null == attributes) {
+            attributes = new LinkedList<JsonReaderXmlEvent.Attribute>();
+        }
+        attributes.add(new Attribute(name, value));
     }
 }

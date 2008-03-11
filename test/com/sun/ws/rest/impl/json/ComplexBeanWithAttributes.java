@@ -22,70 +22,62 @@
 
 package com.sun.ws.rest.impl.json;
 
+import java.util.Formatter;
+import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.XmlTransient;
 
 /**
  *
  * @author japod
  */
 @XmlRootElement
-public class User {
-    @XmlElement(name="userid")
-    public String id;
-    public String name;
-    @XmlTransient
-    public String password;
-    
-    public User() {}
-    
-    public User(String id, String name, String password) {
-        this.id = id;
-        this.name = name;
-        this.password = password;
-    }
+public class ComplexBeanWithAttributes {
 
+    @XmlAttribute
+    public String a1;
+    @XmlAttribute
+    public int a2;
+    @XmlElement
+    SimpleBeanWithAttributes b;
+
+    public static Object createTestInstance() {
+        ComplexBeanWithAttributes instance = new ComplexBeanWithAttributes();
+        instance.a1 = "hello dolly";
+        instance.a2 = 31415926;
+        instance.b = (SimpleBeanWithAttributes)SimpleBeanWithAttributes.createTestInstance();
+        return instance;
+    }
+    
     @Override
     public boolean equals(Object obj) {
-        if (!(obj instanceof User)) {
+        if (!(obj instanceof ComplexBeanWithAttributes)) {
             return false;
         }
-        final User other = (User) obj;
-        if (this.id != other.id && (this.id == null || !this.id.equals(other.id))) {
+        final ComplexBeanWithAttributes other = (ComplexBeanWithAttributes) obj;
+        if (this.a1 != other.a1 && (this.a1 == null || !this.a1.equals(other.a1))) {
             return false;
         }
-        if (this.name != other.name && (this.name == null || !this.name.equals(other.name))) {
+        if (this.a2 != other.a2) {
             return false;
         }
-//        if (this.password != other.password && (this.password == null || !this.password.equals(other.password))) {
-//            return false;
-//        }
+        if (this.b != other.b && (this.b == null || !this.b.equals(other.b))) {
+            return false;
+        }
         return true;
     }
 
     @Override
     public int hashCode() {
         int hash = 3;
-        if (null != id) {
-            hash = 17 * hash + id.hashCode();
-        }
-        if (null != name) {
-            hash = 17 * hash + name.hashCode();
-        }
-//        if (null != password) {
-//            hash = 17 * hash + password.hashCode();
-//        }
+        hash = 19 * hash + (this.a1 != null ? this.a1.hashCode() : 0);
+        hash = 19 * hash + this.a2;
+        hash = 19 * hash + (this.b != null ? this.b.hashCode() : 0);
         return hash;
     }
     
     @Override
     public String toString() {
-        return "User(" + id + ", " + name + ")";
+        return (new Formatter()).format("CBWA(%s,%d,%s)", a1, a2, b).toString();
     }
-    
-    public static Object createTestInstance() {
-        return new User("1621", "Grotefend", "Persepolis");
-    }
-    
 }

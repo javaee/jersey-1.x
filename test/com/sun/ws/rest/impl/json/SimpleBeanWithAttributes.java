@@ -22,70 +22,68 @@
 
 package com.sun.ws.rest.impl.json;
 
-import javax.xml.bind.annotation.XmlElement;
+import java.util.Formatter;
+import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.XmlTransient;
 
 /**
  *
  * @author japod
  */
 @XmlRootElement
-public class User {
-    @XmlElement(name="userid")
-    public String id;
-    public String name;
-    @XmlTransient
-    public String password;
+public class SimpleBeanWithAttributes {
+    public String s1;
+    @XmlAttribute
+    public int i;
+    @XmlAttribute
+    public String j;
     
-    public User() {}
+    public SimpleBeanWithAttributes() {}
     
-    public User(String id, String name, String password) {
-        this.id = id;
-        this.name = name;
-        this.password = password;
+    public static Object createTestInstance() {
+        SimpleBeanWithAttributes instance = new SimpleBeanWithAttributes();
+        instance.s1 = "hi there";
+        instance.i = 312;
+        instance.j = "bumper";
+        return instance;
     }
 
     @Override
     public boolean equals(Object obj) {
-        if (!(obj instanceof User)) {
+        if (obj == null) {
             return false;
         }
-        final User other = (User) obj;
-        if (this.id != other.id && (this.id == null || !this.id.equals(other.id))) {
+        if (getClass() != obj.getClass()) {
             return false;
         }
-        if (this.name != other.name && (this.name == null || !this.name.equals(other.name))) {
+        final SimpleBeanWithAttributes other = (SimpleBeanWithAttributes) obj;
+        if (this.s1 != other.s1 && (this.s1 == null || !this.s1.equals(other.s1))) {
             return false;
         }
-//        if (this.password != other.password && (this.password == null || !this.password.equals(other.password))) {
-//            return false;
-//        }
+        if (this.j != other.j && (this.j == null || !this.j.equals(other.j))) {
+            return false;
+        }
+        if (this.i != other.i) {
+            return false;
+        }
         return true;
     }
 
     @Override
     public int hashCode() {
-        int hash = 3;
-        if (null != id) {
-            hash = 17 * hash + id.hashCode();
+        int hash = 7;
+        if (null != s1) {
+            hash += 17 * s1.hashCode();
         }
-        if (null != name) {
-            hash = 17 * hash + name.hashCode();
+        if (null != j) {
+            hash += 17 * j.hashCode();
         }
-//        if (null != password) {
-//            hash = 17 * hash + password.hashCode();
-//        }
+        hash += 13 * i;
         return hash;
     }
     
     @Override
     public String toString() {
-        return "User(" + id + ", " + name + ")";
+        return (new Formatter()).format("SBWA(%s,%d,%s)", s1, i, j).toString();
     }
-    
-    public static Object createTestInstance() {
-        return new User("1621", "Grotefend", "Persepolis");
-    }
-    
 }

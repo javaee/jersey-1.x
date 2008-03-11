@@ -27,7 +27,10 @@ package com.sun.ws.rest.impl.json.reader;
 %char
 %type JsonToken
 %{
- StringBuffer string = new StringBuffer();
+   StringBuffer string = new StringBuffer();
+   public int getCharOffset() { return yychar; }
+   public int getLineNumber() { return yyline; }
+   public int getColumn() { return yycolumn; }
 %}
 %state STRING
 WHITE_SPACE_CHAR=[\n\r\ \t\b\012]
