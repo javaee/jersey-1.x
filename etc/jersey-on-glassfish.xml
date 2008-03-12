@@ -37,26 +37,35 @@
     </sequential>
   </macrodef>
 
-    <macrodef name="copy-example">
-      <attribute name="example.name"/>
-      <sequential>
-        <copy todir="${gf.home}/jersey/examples/@{example.name}">
-          <fileset dir="examples/@{example.name}" includes="**/*"/>
-        </copy>
-      </sequential>
-    </macrodef>
+  <target name="-check-example-dir-present">
+        <condition property="example.dir.present">
+          <available file="examples/${example.name}"/>
+        </condition>
+  </target>
 
-    <macrodef name="update-nb-prop">
-      <attribute name="nb.prop.file"/>
-      <sequential>
-        <replace file="@{nb.prop.file}">
+  <target name="-check-nb-prop-file-present">
+        <condition property="nb.prop.file.present">
+          <available file="${nb.prop.file}"/>
+        </condition>
+  </target>
+
+  <target name="do-copy-example" depends="-check-example-dir-present" if="example.dir.present">
+    <echo message="example ${example.name} present"/>
+        <copy todir="${gf.home}/jersey/examples/${example.name}">
+          <fileset dir="examples/${example.name}" includes="**/*"/>
+        </copy>
+  </target>
+
+
+  <target name="do-update-nb-prop" depends="-check-nb-prop-file-present" if="nb.prop.file.present">
+        <replace file="${nb.prop.file}">
           <replacefilter token="../../lib" value="${ashome.jersey.lib.dir}"/>
           <replacefilter token="/jaxb-api.jar" value="/webservices-rt.jar"/>
           <replacefilter token="/jaxb-impl.jar" value="/webservices-tools.jar"/>
           <replacefilter token="/jaxb-xjc.jar" value="/webservices-tools.jar"/>
           <replacefilter token="/jaxws-api.jar" value="/webservices-rt.jar"/>
         </replace>
-        <replace file="@{nb.prop.file}">
+        <replace file="${nb.prop.file}">
           <replacefilter token="${ashome.jersey.lib.dir}/mail.jar" value="${ashome.lib.dir}/mail.jar"/>
           <replacefilter token="lib/javaee.jar" value="${ashome.lib.dir}/javaee.jar"/>
           <replacefilter token="${ashome.jersey.lib.dir}/activation.jar" value="${ashome.lib.dir}/activation.jar"/>
@@ -68,9 +77,28 @@
           <header trimleading="yes">ashome.jersey.lib.dir=../../lib
                                     ashome.lib.dir=../../../lib
           </header>
-          <fileset file="@{nb.prop.file}"/>
+          <fileset file="${nb.prop.file}"/>
         </concat>
-        <move file="${nb.prop.temp.file}" tofile="@{nb.prop.file}"/>
+        <move file="${nb.prop.temp.file}" tofile="${nb.prop.file}"/>
+   </target>
+
+    <macrodef name="copy-example">
+      <attribute name="example.name"/>
+      <sequential>
+        <antcall target="do-copy-example" inheritAll="false">
+          <param name="example.name" value="@{example.name}"/>
+        </antcall>
+      </sequential>
+    </macrodef>
+
+    <macrodef name="update-nb-prop">
+      <attribute name="nb.prop.file"/>
+      <sequential>
+        <antcall target="do-update-nb-prop" inheritAll="false">
+          <param name="nb.prop.file" value="@{nb.prop.file}"/>
+          <param name="ashome.jersey.lib.dir" value="${ashome.jersey.lib.dir}"/>
+          <param name="ashome.lib.dir" value="${ashome.lib.dir}"/>
+        </antcall>
       </sequential>
     </macrodef>
 
