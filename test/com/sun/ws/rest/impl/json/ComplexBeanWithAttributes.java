@@ -34,17 +34,18 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlRootElement
 public class ComplexBeanWithAttributes {
 
-    @XmlAttribute
-    public String a1;
-    @XmlAttribute
-    public int a2;
-    @XmlElement
-    SimpleBeanWithAttributes b;
+    @XmlAttribute public String a1;
+    @XmlAttribute public int a2;
+    @XmlElement public String filler1;
+    @XmlElement public String filler2;
+    @XmlElement SimpleBeanWithAttributes b;
 
     public static Object createTestInstance() {
         ComplexBeanWithAttributes instance = new ComplexBeanWithAttributes();
         instance.a1 = "hello dolly";
         instance.a2 = 31415926;
+        instance.filler1 = "111";
+        instance.filler2 = "222";
         instance.b = (SimpleBeanWithAttributes)SimpleBeanWithAttributes.createTestInstance();
         return instance;
     }
@@ -64,6 +65,12 @@ public class ComplexBeanWithAttributes {
         if (this.b != other.b && (this.b == null || !this.b.equals(other.b))) {
             return false;
         }
+        if (this.filler1 != other.filler1 && (this.filler1 == null || !this.filler1.equals(other.filler1))) {
+            return false;
+        }
+        if (this.filler2 != other.filler2 && (this.filler2 == null || !this.filler2.equals(other.filler2))) {
+            return false;
+        }
         return true;
     }
 
@@ -73,6 +80,8 @@ public class ComplexBeanWithAttributes {
         hash = 19 * hash + (this.a1 != null ? this.a1.hashCode() : 0);
         hash = 19 * hash + this.a2;
         hash = 19 * hash + (this.b != null ? this.b.hashCode() : 0);
+        hash = 19 * hash + (this.filler1 != null ? this.filler1.hashCode() : 0);
+        hash = 19 * hash + (this.filler2 != null ? this.filler2.hashCode() : 0);
         return hash;
     }
     

@@ -19,10 +19,13 @@
  * enclosed by brackets [] replaced by your own identifying information:
  *     "Portions Copyrighted [year] [name of copyright owner]"
  */
-
 package com.sun.ws.rest.impl.json;
 
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.Formatter;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlRootElement;
 
@@ -32,19 +35,26 @@ import javax.xml.bind.annotation.XmlRootElement;
  */
 @XmlRootElement
 public class SimpleBeanWithAttributes {
+
+    @XmlAttribute public URI uri;
     public String s1;
-    @XmlAttribute
-    public int i;
-    @XmlAttribute
-    public String j;
-    
-    public SimpleBeanWithAttributes() {}
-    
+    @XmlAttribute public int i;
+    @XmlAttribute public String j;
+
+    public SimpleBeanWithAttributes() {
+    }
+
     public static Object createTestInstance() {
         SimpleBeanWithAttributes instance = new SimpleBeanWithAttributes();
         instance.s1 = "hi there";
         instance.i = 312;
         instance.j = "bumper";
+        try {
+            instance.uri = new URI("http://localhost:8080/jedna/bedna/");
+
+        } catch (URISyntaxException ex) {
+            Logger.getLogger(SimpleBeanWithAttributes.class.getName()).log(Level.SEVERE, null, ex);
+        }
         return instance;
     }
 
@@ -63,6 +73,9 @@ public class SimpleBeanWithAttributes {
         if (this.j != other.j && (this.j == null || !this.j.equals(other.j))) {
             return false;
         }
+        if (this.uri != other.uri && (this.uri == null || !this.uri.equals(other.uri))) {
+            return false;
+        }
         if (this.i != other.i) {
             return false;
         }
@@ -78,12 +91,15 @@ public class SimpleBeanWithAttributes {
         if (null != j) {
             hash += 17 * j.hashCode();
         }
+        if (null != uri) {
+            hash += 17 * uri.hashCode();
+        }
         hash += 13 * i;
         return hash;
     }
-    
+
     @Override
     public String toString() {
-        return (new Formatter()).format("SBWA(%s,%d,%s)", s1, i, j).toString();
+        return (new Formatter()).format("SBWA(%s,%d,%s,%s)", s1, i, j, uri).toString();
     }
 }

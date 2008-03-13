@@ -50,6 +50,7 @@ public abstract class JsonReaderXmlEvent {
     QName name;
     String text;
     List<Attribute> attributes;
+    boolean attributesChecked;
     
     public abstract int getEventType();
 

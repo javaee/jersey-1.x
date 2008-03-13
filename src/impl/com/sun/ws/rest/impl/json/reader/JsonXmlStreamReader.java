@@ -253,7 +253,10 @@ public class JsonXmlStreamReader implements XMLStreamReader {
                 case BEFORE_OBJ_NEXT_KV_PAIR :
                     switch (lastToken.tokenType) {
                         case JsonToken.STRING :
-                            eventQueue.add(new StartElementEvent(lastToken.tokenText, new MyLocation(lexer)));
+                            StartElementEvent event = 
+                                    new StartElementEvent(lastToken.tokenText, new MyLocation(lexer));
+                            eventQueue.add(event);
+                            processingStack.get(depth).eventToReadAttributesFor = event;
                             processingStack.get(depth).lastName = lastToken.tokenText;
                             colon();
                             processingStack.get(depth).state = LaState.BEFORE_VALUE_IN_KV_PAIR;
@@ -369,10 +372,13 @@ public class JsonXmlStreamReader implements XMLStreamReader {
     public int getAttributeCount() {
         LOGGER.entering(JsonXmlStreamReader.class.getName(), "getAttributeCount");
         assert !eventQueue.isEmpty();
-        try {
-            readNext(true);
-        } catch (IOException e) {
+        if (!eventQueue.peek().attributesChecked) {
+            try {
+                readNext(true);
+            } catch (IOException e) {
             // TODO: handle it!!!
+            }
+            eventQueue.peek().attributesChecked = true;
         }
         int result = eventQueue.peek().getAttributeCount();
         LOGGER.exiting(JsonXmlStreamReader.class.getName(), "getAttributeCount", result);
