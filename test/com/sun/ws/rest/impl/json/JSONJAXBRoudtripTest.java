@@ -78,7 +78,7 @@ public class JSONJAXBRoudtripTest extends TestCase {
         System.out.println("INTERNAL NOTATION");
         Map<String, Object> props = new HashMap<String, Object>();
         props.put(JSONJAXBContext.JSON_NOTATION, "MAPPED");
-        props.put(JSONJAXBContext.JSON_ROOT_UNWRAPPING, Boolean.FALSE);        
+        props.put(JSONJAXBContext.JSON_ROOT_UNWRAPPING, Boolean.FALSE);
         allBeansTest(new JSONJAXBContext(classes, props), beans);
     }
 
@@ -99,8 +99,9 @@ public class JSONJAXBRoudtripTest extends TestCase {
 //    }
     
     public synchronized void allBeansTest(JSONJAXBContext context, Collection<Object> beans) throws Exception {
-        Marshaller marshaller = context.createMarshaller();
+        JSONMarshaller marshaller = (JSONMarshaller)context.createMarshaller();
         marshaller.setProperty(JSONJAXBContext.JSON_ENABLED, Boolean.TRUE);
+        marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
         JSONUnmarshaller unmarshaller = (JSONUnmarshaller)context.createUnmarshaller();
         unmarshaller.setProperty(JSONJAXBContext.JSON_ENABLED, Boolean.TRUE);
         for (Object originalBean : beans) {

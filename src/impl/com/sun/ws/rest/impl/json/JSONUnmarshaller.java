@@ -48,8 +48,11 @@ import javax.xml.stream.XMLStreamReader;
 import javax.xml.transform.Source;
 import javax.xml.validation.Schema;
 import org.codehaus.jettison.badgerfish.BadgerFishXMLStreamReader;
+import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 import org.codehaus.jettison.json.JSONTokener;
+import org.codehaus.jettison.mapped.Configuration;
+import org.codehaus.jettison.mapped.MappedNamespaceConvention;
 import org.codehaus.jettison.mapped.MappedXMLStreamReader;
 import org.w3c.dom.Node;
 import org.xml.sax.InputSource;
@@ -65,6 +68,7 @@ public class JSONUnmarshaller implements Unmarshaller {
     private JSONJAXBContext.JSONNotation jsonNotation;
     private boolean jsonEnabled;
     private boolean jsonRootUnwrapping;
+    private Map<String, String> xml2jsonNamespace;
 
     public JSONUnmarshaller(JAXBContext jaxbContext, Map<String, Object> properties) throws JAXBException {
         try {
@@ -230,8 +234,16 @@ public class JSONUnmarshaller implements Unmarshaller {
             this.jsonNotation = JSONJAXBContext.JSONNotation.valueOf((String) value);
         } else if (JSONJAXBContext.JSON_ROOT_UNWRAPPING.equals(key)) {
             this.jsonRootUnwrapping = (Boolean) value;
+        } else if (JSONJAXBContext.JSON_XML2JSON_NS.equals(key)) {
+            try {
+                this.xml2jsonNamespace = JSONJAXBContext.asMap((String) value);
+            } catch (JSONException e) {
+                throw new PropertyException("JSON exception when trying to set " + JSONJAXBContext.JSON_XML2JSON_NS + " property.", e);
+            }
         } else {
-            this.jaxbUnmarshaller.setProperty(key, value);
+            if (!key.startsWith(JSONJAXBContext.NAMESPACE)) {
+                this.jaxbUnmarshaller.setProperty(key, value);
+            }
         }
     }
 
@@ -242,8 +254,14 @@ public class JSONUnmarshaller implements Unmarshaller {
             return this.jsonNotation.name();
         } else if (JSONJAXBContext.JSON_ROOT_UNWRAPPING.equals(key)) {
             return this.jsonRootUnwrapping;
+        } else if (JSONJAXBContext.JSON_XML2JSON_NS.equals(key)) {
+            return JSONJAXBContext.asJsonObject(this.xml2jsonNamespace);
         } else {
-            return this.jaxbUnmarshaller.getProperty(key);
+            if (key.startsWith(JSONJAXBContext.NAMESPACE)) {
+                return null;
+            } else {
+                return this.jaxbUnmarshaller.getProperty(key);
+            }
         }
     }
 
@@ -299,7 +317,15 @@ public class JSONUnmarshaller implements Unmarshaller {
             }
         } else if (JSONJAXBContext.JSONNotation.MAPPED_JETTISON == this.jsonNotation) {
             try {
-                return new MappedXMLStreamReader(new JSONObject(new JSONTokener(readFromAsString(reader))));
+                Configuration jmConfig;
+                if (null == this.xml2jsonNamespace) {
+                    jmConfig = new Configuration();
+                } else {
+                    jmConfig = new Configuration(this.xml2jsonNamespace);
+                }
+                return new MappedXMLStreamReader(
+                        new JSONObject(new JSONTokener(readFromAsString(reader))), 
+                        new MappedNamespaceConvention(jmConfig));
             } catch (Exception ex) {
                 Logger.getLogger(JSONUnmarshaller.class.getName()).log(Level.SEVERE, null, ex);
             }

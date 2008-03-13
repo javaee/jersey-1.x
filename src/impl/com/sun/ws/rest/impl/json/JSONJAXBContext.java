@@ -22,8 +22,11 @@
 
 package com.sun.ws.rest.impl.json;
 
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.Map;
 import java.util.Map.Entry;
 import javax.xml.bind.JAXBContext;
@@ -31,6 +34,9 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.Validator;
+import org.codehaus.jettison.json.JSONArray;
+import org.codehaus.jettison.json.JSONException;
+import org.codehaus.jettison.json.JSONObject;
 
 /**
  *
@@ -45,6 +51,7 @@ public class JSONJAXBContext extends JAXBContext {
     public static final String JSON_ROOT_UNWRAPPING = NAMESPACE + "root.unwrapping";
     public static final String JSON_ARRAYS = NAMESPACE + "arrays";
     public static final String JSON_NON_STRINGS = NAMESPACE + "non.strings";
+    public static final String JSON_XML2JSON_NS = NAMESPACE + "xml.to.json.ns";
     
     // TODO: if need to replace jettison due to legal reasons, still want the badgerfish supported?
     public enum JSONNotation { MAPPED, MAPPED_JETTISON, BADGERFISH };
@@ -104,5 +111,44 @@ public class JSONJAXBContext extends JAXBContext {
             this.jsonProperties = new HashMap<String, Object>();
         }
         return this.jsonProperties;
+    }
+    
+    @SuppressWarnings("unchecked")
+    static <T> Map<String, T> asMap(String jsonObjectVal) throws JSONException {
+        if (null == jsonObjectVal) {
+            return null;
+        }
+        Map<String, T> result = new HashMap<String, T>();
+
+        JSONObject sourceMap = new JSONObject(jsonObjectVal);
+        Iterator<String> keyIterator = sourceMap.keys();
+        while (keyIterator.hasNext()) {
+            String key = keyIterator.next();
+            result.put(key, (T)sourceMap.get(key));
+        }
+        return result;
+    }
+    
+    
+    @SuppressWarnings("unchecked")
+    static <T> Collection<T> asCollection(String jsonArrayVal) throws JSONException {
+        if (null == jsonArrayVal) {
+            return null;
+        }
+        Collection<T> result = new LinkedList<T>();
+
+        JSONArray arrayVal = new JSONArray(jsonArrayVal);
+        for (int i = 0; i < arrayVal.length(); i++) {
+            result.add((T)arrayVal.get(i));
+        }
+        return result;
+    }
+    
+    static String asJsonArray(Collection<? extends Object> collection) {
+        return (null == collection) ? "[]" : (new JSONArray(collection)).toString();
+    }
+    
+    static String asJsonObject(Map map) {
+        return (null == map) ? "{}" : (new JSONObject(map)).toString();
     }
 }
