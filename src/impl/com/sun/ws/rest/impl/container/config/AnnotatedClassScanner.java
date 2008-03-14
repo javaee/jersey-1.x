@@ -202,7 +202,7 @@ public final class AnnotatedClassScanner {
                         ", is not a directory");                
             }
         } else if (scheme.equals("jar") || scheme.equals("zip")) {
-            URI jarUri = URI.create(u.getSchemeSpecificPart());
+            URI jarUri = URI.create(u.getRawSchemeSpecificPart());
             String jarFile = jarUri.getPath();
             jarFile = jarFile.substring(0, jarFile.indexOf('!'));            
             indexJar(new File(jarFile), filePackageName);
@@ -265,9 +265,8 @@ public final class AnnotatedClassScanner {
             is.close();
             return cr;
         } catch (IOException ex) {
-            String s = "The input stream of the class file URI, " + 
-                    classFileUri + 
-                    ", could not be obtained";
+            String s = "Error accessing input stream of the class file URI, " + 
+                    classFileUri;
             LOGGER.severe(s);
             throw new RuntimeException(s, ex);
         }
