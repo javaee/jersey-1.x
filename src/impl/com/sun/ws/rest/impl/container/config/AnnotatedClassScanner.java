@@ -24,6 +24,7 @@ package com.sun.ws.rest.impl.container.config;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.lang.annotation.Annotation;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -259,7 +260,10 @@ public final class AnnotatedClassScanner {
     
     private ClassReader getClassReader(URI classFileUri) {
         try {
-            return new ClassReader(classFileUri.toURL().openStream());
+            InputStream is = classFileUri.toURL().openStream();
+            ClassReader cr = new ClassReader(is);
+            is.close();
+            return cr;
         } catch (IOException ex) {
             String s = "The input stream of the class file URI, " + 
                     classFileUri + 
