@@ -23,6 +23,7 @@
 package com.sun.ws.rest.impl.provider.header;
 
 import com.sun.ws.rest.spi.HeaderDelegateProvider;
+import java.text.ParseException;
 import javax.ws.rs.core.Cookie;
 
 public class CookieProvider implements HeaderDelegateProvider<Cookie> {
@@ -32,10 +33,11 @@ public class CookieProvider implements HeaderDelegateProvider<Cookie> {
     }
 
     public String toString(Cookie cookie) {
-        return cookie.toString();
+        throw new UnsupportedOperationException();
     }
 
     public Cookie fromString(String header) {
-        return Cookie.parse(header);
+        throw new UnsupportedOperationException();
     }
+
 }
