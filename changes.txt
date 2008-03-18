@@ -1,3 +1,10 @@
+release 0.6.1 (2008-03-18)
+- Support for xml attributes serialization/deserialization in JSON added
+  (as a fix for 43)
+  https://jersey.dev.java.net/issues/show_bug.cgi?id=43
+- Fixed issue 45: Jersey leaves stream open; locks JAR file on Windows
+  https://jersey.dev.java.net/issues/show_bug.cgi?id=45
+
 release 0.6 (2008-03-07)
 - Support for a Model View Controller abstraction and plugging in templates
   processors that process models that produce views. See classes in the package:
