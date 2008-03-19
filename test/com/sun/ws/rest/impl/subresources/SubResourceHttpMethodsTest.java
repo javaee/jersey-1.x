@@ -22,12 +22,14 @@
 
 package com.sun.ws.rest.impl.subresources;
 
+import com.sun.ws.rest.api.client.ClientResponse;
 import com.sun.ws.rest.impl.AbstractResourceTester;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Path;
 import com.sun.ws.rest.impl.AbstractResourceTester;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
+import javax.ws.rs.QueryParam;
 
 /**
  *
@@ -131,5 +133,81 @@ public class SubResourceHttpMethodsTest extends AbstractResourceTester {
         
         assertEquals("foo", resource("/foo").get(String.class));
         assertEquals("bar", resource("/bar").post(String.class));
+    }
+    
+    @Path("/{p}/")
+    static public class SubResourceMethodWithLimitedTemplate { 
+        @GET
+        public String getMe(@PathParam("p") String p, @QueryParam("id") String id) {
+            return p + id;
+        }
+        
+        @GET
+        @Path(value="{id}", limited=false)
+        public String getUnmatchedPath(
+                @PathParam("p") String p,
+                @PathParam("id") String path) {
+          return path;
+        }
+    }
+    
+    public void testSubResourceMethodWithLimitedTemplate() {
+        initiateWebApplication(SubResourceMethodWithLimitedTemplate.class);
+        
+        assertEquals("topone", resource("/top/?id=one").get(String.class));
+        assertEquals("a/b/c/d", resource("/top/a/b/c/d").get(String.class));
+    }
+    
+    @Path("/{p}")
+    static public class SubResourceNoSlashMethodWithLimitedTemplate { 
+        @GET
+        public String getMe(@PathParam("p") String p, @QueryParam("id") String id) {
+            System.out.println(id);
+            return p + id;
+        }
+        
+        @GET
+        @Path(value="{id}", limited=false)
+        public String getUnmatchedPath(
+                @PathParam("p") String p,
+                @PathParam("id") String path) {
+          return path;
+        }
+    }
+    
+    public void testSubResourceNoSlashMethodWithLimitedTemplate() {
+        initiateWebApplication(SubResourceNoSlashMethodWithLimitedTemplate.class);
+        
+        assertEquals("topone", resource("/top?id=one").get(String.class));
+        assertEquals("a/b/c/d", resource("/top/a/b/c/d").get(String.class));
+    }
+    
+    @Path("/")
+    static public class SubResourceWithSameTemplate { 
+        public static class SubResource {
+            @GET
+            @Path("bar")
+            public String get() {
+                return "BAR";
+            }
+        }
+        
+        @GET
+        @Path("foo")
+        public String get() {
+            return "FOO";
+        }
+        
+        @Path("foo")
+        public SubResource getUnmatchedPath() {
+            return new SubResource();
+        }        
+    }
+    
+    public void testSubResourceMethodWithSameTemplate() {
+        initiateWebApplication(SubResourceWithSameTemplate.class);
+        
+        assertEquals("FOO", resource("/foo").get(String.class));        
+        assertEquals(404, resource("/foo/bar", false).get(ClientResponse.class).getStatus());
     }
 }
