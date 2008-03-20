@@ -1,4 +1,7 @@
 release 0.7 (2008-04-18)
+- Fixed issue 44: Support dependency injection of proxied resources
+  https://jersey.dev.java.net/issues/show_bug.cgi?id=44
+  Added method ComponentProvider.getInjectableInstance
 - Partially Integrated JSR 311 API 0.7
   - Use @Context to inject HttpServletRequest, HttpServletResponse, 
     ServletConfig and ServletContext instances on JAX-RS/Jersey-based 

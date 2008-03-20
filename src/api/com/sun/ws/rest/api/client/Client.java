@@ -76,9 +76,12 @@ public class Client extends Filterable implements ClientHandler {
         public <T> T getInstance(Scope scope, Class<T> c) 
                 throws InstantiationException, IllegalAccessException {
             T o = cp.getInstance(scope,c);
-            if (o == null)
+            if (o == null) {
                 o = c.newInstance();
-            injectResources(o);
+                injectResources(o);
+            } else {
+                injectResources(cp.getInjectableInstance(o));
+            }
             return o;
         }
 
@@ -86,15 +89,22 @@ public class Client extends Filterable implements ClientHandler {
                 throws InstantiationException, IllegalArgumentException, 
                 IllegalAccessException, InvocationTargetException {
             T o = cp.getInstance(scope, contructor, parameters);
-            if (o == null)
+            if (o == null) {
                 o = contructor.newInstance(parameters);
-            injectResources(o);
+                injectResources(o);                
+            } else {
+                injectResources(cp.getInjectableInstance(o));
+            }
             return o;
         }
 
+        public <T> T getInjectableInstance(T instance) {
+            return cp.getInjectableInstance(instance);
+        }
+        
         public void inject(Object instance) {
             cp.inject(instance);
-            injectResources(instance);
+            injectResources(cp.getInjectableInstance(instance));
         }
     }
     
@@ -114,6 +124,10 @@ public class Client extends Filterable implements ClientHandler {
             return o;
         }
 
+        public <T> T getInjectableInstance(T instance) {
+            return instance;
+        }
+        
         public void inject(Object instance) {
             injectResources(instance);
         }

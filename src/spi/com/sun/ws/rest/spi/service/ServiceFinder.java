@@ -143,6 +143,10 @@ public final class ServiceFinder<T> implements Iterable<T> {
             throw new UnsupportedOperationException("");
         }
 
+        public <T> T getInjectableInstance(T instance) {
+            return instance;
+        }
+        
         public void inject(Object instance) {
             throw new UnsupportedOperationException("");
         }

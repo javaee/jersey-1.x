@@ -108,6 +108,18 @@ public interface ComponentProvider {
             IllegalAccessException, InvocationTargetException;
 
     /**
+     * Get the injectable instance to inject JAX-RS and Jersey specific
+     * instances on to fields.
+     * <p>
+     * If the injectable instance is the same as the instance that was passed in
+     * then the provider MUST return that instance.
+     * 
+     * @param instance the instance returned by one of the getInstance methods.
+     * @return the injectable instance.
+     */
+    <T> T getInjectableInstance(T instance);
+    
+    /**
      * Perform injection on an instance. This may be used when a
      * component is instantiated by means other than the component
      * provider.
