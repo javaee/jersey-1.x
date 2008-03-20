@@ -1,3 +1,9 @@
+release 0.7 (2008-04-18)
+- Partially Integrated JSR 311 API 0.7
+  - Use @Context to inject HttpServletRequest, HttpServletResponse, 
+    ServletConfig and ServletContext instances on JAX-RS/Jersey-based 
+    components deployed in Servlet container.
+
 release 0.6.1 (2008-03-18)
 - Support for xml attributes serialization/deserialization in JSON added
   (as a fix for 43)

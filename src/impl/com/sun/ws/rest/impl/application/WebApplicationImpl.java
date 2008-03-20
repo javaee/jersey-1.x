@@ -291,7 +291,7 @@ public final class WebApplicationImpl implements WebApplication {
         
         // Allow injection of resource config
         addInjectable(ResourceConfig.class,
-                new HttpContextInjectable<ResourceConfig>() {
+                new ContextInjectable<ResourceConfig>() {
                     public ResourceConfig getInjectableValue(Context c) {
                         return WebApplicationImpl.this.resourceConfig;
                     }
@@ -315,7 +315,7 @@ public final class WebApplicationImpl implements WebApplication {
         this.templateContext = new TemplateFactory(cpc);
         // Allow injection of template context
         addInjectable(TemplateContext.class,
-                new HttpContextInjectable<TemplateContext>() {
+                new ContextInjectable<TemplateContext>() {
                     public TemplateContext getInjectableValue(Context c) {
                         return templateContext;
                     }
@@ -507,7 +507,7 @@ public final class WebApplicationImpl implements WebApplication {
             i);
     }
     
-    private abstract class HttpContextInjectable<V> extends Injectable<Context, V> {
+    private abstract class ContextInjectable<V> extends Injectable<Context, V> {
         public Class<Context> getAnnotationClass() {
             return Context.class;
         }
@@ -517,7 +517,7 @@ public final class WebApplicationImpl implements WebApplication {
         Map<Type, Injectable> is = new HashMap<Type, Injectable>();
                 
         is.put(MessageBodyContext.class,
-                new HttpContextInjectable<MessageBodyContext>() {
+                new ContextInjectable<MessageBodyContext>() {
                     public MessageBodyContext getInjectableValue(Context c) {
                         return bodyContext;
                     }
@@ -525,7 +525,7 @@ public final class WebApplicationImpl implements WebApplication {
             );
             
         is.put(HttpContextAccess.class,
-                new HttpContextInjectable<HttpContextAccess>() {
+                new ContextInjectable<HttpContextAccess>() {
                     public HttpContextAccess getInjectableValue(Context c) {
                         return context;
                     }
@@ -533,7 +533,7 @@ public final class WebApplicationImpl implements WebApplication {
             );
         
         is.put(HttpHeaders.class,
-                new HttpContextInjectable<HttpHeaders>() {
+                new ContextInjectable<HttpHeaders>() {
                     public HttpHeaders getInjectableValue(Context c) {
                         return httpHeadersProxy;
                     }
@@ -541,7 +541,7 @@ public final class WebApplicationImpl implements WebApplication {
             );
             
         is.put(UriInfo.class,
-                new HttpContextInjectable<UriInfo>() {
+                new ContextInjectable<UriInfo>() {
                     public UriInfo getInjectableValue(Context c) {
                         return uriInfoProxy;
                     }
@@ -549,7 +549,7 @@ public final class WebApplicationImpl implements WebApplication {
             );
             
         is.put(Request.class,
-                new HttpContextInjectable<Request>() {
+                new ContextInjectable<Request>() {
                     public Request getInjectableValue(Context c) {
                         return requestProxy;
                     }
@@ -557,7 +557,7 @@ public final class WebApplicationImpl implements WebApplication {
             );
 
         is.put(SecurityContext.class,
-                new HttpContextInjectable<SecurityContext>() {
+                new ContextInjectable<SecurityContext>() {
                     public SecurityContext getInjectableValue(Context c) {
                         return securityContextProxy;
                     }

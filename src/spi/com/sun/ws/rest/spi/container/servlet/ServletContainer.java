@@ -39,13 +39,13 @@ import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import javax.annotation.Resource;
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.ws.rs.core.Context;
 
 
 /**
@@ -252,14 +252,16 @@ public class ServletContainer extends HttpServlet {
     
     /**
      * Create a new instance of a {@link WebApplication}.
+     * 
+     * @return the {@link WebApplication} instance.
      */
     protected WebApplication create() {
         return WebApplicationFactory.createWebApplication();
     }
     
-    private abstract class ResourceInjectable<V> extends Injectable<Resource, V> {
-        public Class<Resource> getAnnotationClass() {
-            return Resource.class;
+    private abstract class ContextInjectable<V> extends Injectable<Context, V> {
+        public Class<Context> getAnnotationClass() {
+            return Context.class;
         }
     }
     
@@ -286,8 +288,8 @@ public class ServletContainer extends HttpServlet {
      */
     protected void configure(final ServletConfig sc, ResourceConfig rc, WebApplication wa) {
         wa.addInjectable(HttpServletRequest.class,
-                new ResourceInjectable<HttpServletRequest>() {
-            public HttpServletRequest getInjectableValue(Resource r) {
+                new ContextInjectable<HttpServletRequest>() {
+            public HttpServletRequest getInjectableValue(Context r) {
                 HttpServletRequest servletRequest = (HttpServletRequest)Proxy.newProxyInstance(
                         HttpServletRequest.class.getClassLoader(),
                         new Class[] { HttpServletRequest.class },
@@ -297,8 +299,8 @@ public class ServletContainer extends HttpServlet {
         }
         );
         wa.addInjectable(HttpServletResponse.class,
-                new ResourceInjectable<HttpServletResponse>() {
-            public HttpServletResponse getInjectableValue(Resource r) {
+                new ContextInjectable<HttpServletResponse>() {
+            public HttpServletResponse getInjectableValue(Context r) {
                 HttpServletResponse servletResponse = (HttpServletResponse)Proxy.newProxyInstance(
                         HttpServletResponse.class.getClassLoader(),
                         new Class[] { HttpServletResponse.class },
@@ -308,15 +310,15 @@ public class ServletContainer extends HttpServlet {
         }
         );
         wa.addInjectable(ServletConfig.class,
-                new ResourceInjectable<ServletConfig>() {
-            public ServletConfig getInjectableValue(Resource r) {
+                new ContextInjectable<ServletConfig>() {
+            public ServletConfig getInjectableValue(Context r) {
                 return sc;
             }
         }
         );
         wa.addInjectable(ServletContext.class,
-                new ResourceInjectable<ServletContext>() {
-            public ServletContext getInjectableValue(Resource r) {
+                new ContextInjectable<ServletContext>() {
+            public ServletContext getInjectableValue(Context r) {
                 return sc.getServletContext();
             }
         }

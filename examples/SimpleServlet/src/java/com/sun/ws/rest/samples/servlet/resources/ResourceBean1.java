@@ -22,20 +22,20 @@
 
 package com.sun.ws.rest.samples.servlet.resources;
 
-import javax.annotation.Resource;
 import javax.servlet.ServletConfig;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.GET;
 import javax.ws.rs.ProduceMime;
 import javax.ws.rs.Path;
+import javax.ws.rs.core.Context;
 
 @Path("/resource1")
 public class ResourceBean1 {
     
-    @Resource
+    @Context
     HttpServletRequest servletRequest;
     
-    @Resource
+    @Context
     ServletConfig servletConfig;
         
     @GET

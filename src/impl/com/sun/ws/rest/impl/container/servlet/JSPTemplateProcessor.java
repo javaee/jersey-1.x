@@ -28,7 +28,6 @@ import com.sun.ws.rest.spi.template.TemplateProcessor;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.MalformedURLException;
-import javax.annotation.Resource;
 import javax.servlet.ServletContext;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.ext.Provider;
@@ -40,7 +39,7 @@ import javax.ws.rs.ext.Provider;
  */
 @Provider
 public class JSPTemplateProcessor implements TemplateProcessor {
-    @Resource ServletContext servletContext;
+    @Context ServletContext servletContext;
 
     public String resolve(String path) {
         if (!path.endsWith(".jsp"))
