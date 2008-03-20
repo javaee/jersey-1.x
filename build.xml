@@ -174,9 +174,38 @@
 
     <!-- GlassFish Update Center Tasks -->
 
-    <target name="create-uc-module" depends="clean-uc-module, dist" description="Generate GlassFish Update Center Module"> 
+    <target name="create-uc-module" depends="clean-uc-module" description="Generate GlassFish Update Center Module"> 
+      <antcall target="try-create-ucm-from-curdir"/>
+      <antcall target="try-create-ucm-from-zip"/>
+    </target>
+
+    <target name="try-create-ucm-from-zip" if="uc.base.zip">
+      <echo message="Creating GF UC module from ${uc.base.zip} file..."/>
+      <delete dir="${basedir}/tmp"/>
+      <mkdir dir="${basedir}/tmp"/>
+      <unzip src="${uc.base.zip}" dest="${basedir}/tmp"/>
+      <move todir="${basedir}/tmp">
+        <fileset dir="${basedir}/tmp"/>
+        <mapper type="regexp" from="jersey[^/]*(.*)" to="jersey-ucm-base\1"/>
+      </move>
+      <antcall target="do-create-ucm-from-dir">
+        <param name="uc.base.dir" value="${basedir}/tmp/jersey-ucm-base"/>
+      </antcall>
+      <delete dir="${basedir}/tmp"/>
+    </target>
+
+    <target name="try-create-ucm-from-curdir" unless="uc.base.zip">
+      <echo message="Creating GF UC module from current directory..."/>
+      <!--antcall target="clean"/-->
+      <!--antcall target="dist"/-->
+      <antcall target="do-create-ucm-from-dir">
+        <param name="uc.base.dir" value="${basedir}/dist/${release.impl.name}"/>
+      </antcall>
+    </target>
+
+    <target name="do-create-ucm-from-dir" if="uc.base.dir"> 
       <mkdir dir="${basedir}/gf-uc/as-home"/>
-      <ant dir="${basedir}/dist/${release.impl.name}" 
+      <ant dir="${uc.base.dir}" 
            antfile="jersey-on-glassfish.xml" 
            target="install" inheritAll="false">
         <property name="gf.home" value="${basedir}/gf-uc/as-home"/>
