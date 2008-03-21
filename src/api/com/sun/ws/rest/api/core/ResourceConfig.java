@@ -23,12 +23,12 @@
 package com.sun.ws.rest.api.core;
 
 import java.util.Map;
-import java.util.Set;
+import javax.ws.rs.core.ApplicationConfig;
 
 /**
- * The resource configuration interface for configuring a web application.
+ * The resource configuration for configuring a web application.
  */
-public interface ResourceConfig {
+public abstract class ResourceConfig extends ApplicationConfig {
     /**
      * If true the request URI will be normalized as specified by 
      * {@link java.net.URI#normalize}. If not true the request URI is not
@@ -102,31 +102,6 @@ public interface ResourceConfig {
      */
     public static final String PROPERTY_DEFAULT_RESOURCE_PROVIDER_CLASS
             = "com.sun.ws.rest.config.property.DefaultResourceProviderClass";
-
-    /**
-     * Get the set of root resource classes to be deployed by the Web
-     * application.
-     * <p>
-     * A root resource class is a Java class with a {@link javax.ws.rs.Path} 
-     * annotation declared on the class.
-     * 
-     * @return the set of root resource classes. 
-     *         The returned value shall never be null.
-     */
-    Set<Class<?>> getResourceClasses();
-    
-    /**
-     * Get the set of provider classes to be instantiated in the scope
-     * of the Web application.
-     * <p>
-     * A provider class is a Java class with a {@link javax.ws.rs.ext.Provider} 
-     * annotation declared on the class that implements a specific service 
-     * interface.
-     * 
-     * @return the set of provider classes. 
-     *         The returned value shall never be null.
-     */
-    Set<Class<?>> getProviderClasses();
     
     /**
      * Get the map of features associated with the Web application.
@@ -134,7 +109,7 @@ public interface ResourceConfig {
      * @return the features.
      *         The returned value shall never be null.
      */
-    Map<String, Boolean> getFeatures();
+    public abstract Map<String, Boolean> getFeatures();
     
     /**
      * Get the value of a feature.
@@ -144,7 +119,7 @@ public interface ResourceConfig {
      *         if the feature is present and set to false or the feature is not 
      *         present.
      */
-    boolean getFeature(String featureName);
+    public abstract boolean getFeature(String featureName);
     
     /**
      * Get the map of properties associated with the Web application.
@@ -152,7 +127,7 @@ public interface ResourceConfig {
      * @return the properties.
      *         The returned value shall never be null.
      */
-    Map<String, Object> getProperties();
+    public abstract Map<String, Object> getProperties();
 
     /**
      * Get the value of a property.
@@ -161,6 +136,5 @@ public interface ResourceConfig {
      * @return the property, or null if there is no property present for the
      *         given property name.
      */
-    Object getProperty(String propertyName);
-    
+    public abstract Object getProperty(String propertyName);   
 }

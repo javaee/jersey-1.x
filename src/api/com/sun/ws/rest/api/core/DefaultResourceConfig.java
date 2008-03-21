@@ -27,6 +27,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import javax.ws.rs.core.MediaType;
 
 /**
  * A mutable implementation of {@link ResourceConfig} that declares
@@ -36,11 +37,15 @@ import java.util.Set;
  * returned from the methods {@link ResourceConfig#getFeatures} and 
  * {@link ResourceConfig#getProperties} respectively.
  */
-public class DefaultResourceConfig implements ResourceConfig {
+public class DefaultResourceConfig extends ResourceConfig {
     
     private final Set<Class<?>> resources = new HashSet<Class<?>>();
     
     private final Set<Class<?>> providers = new HashSet<Class<?>>();
+    
+    private final Map<String, MediaType> mediaExtentions = new HashMap<String, MediaType>();
+    
+    private final Map<String, String> languageExtentions = new HashMap<String, String>();
     
     private final Map<String, Boolean> features = new HashMap<String, Boolean>();
     
@@ -77,8 +82,19 @@ public class DefaultResourceConfig implements ResourceConfig {
         return resources;
     }
 
+    @Override
     public Set<Class<?>> getProviderClasses() {
         return providers;
+    }
+    
+    @Override
+    public Map<String, MediaType> getExtensionMappings() {
+        return mediaExtentions;
+    }
+
+    @Override
+    public Map<String, String> getLanguageMappings() {
+        return languageExtentions;
     }
     
     public Map<String, Boolean> getFeatures() {
@@ -97,5 +113,4 @@ public class DefaultResourceConfig implements ResourceConfig {
     public Object getProperty(String propertyName) {
         return properties.get(propertyName);
     }
-
 }
