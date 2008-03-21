@@ -10,25 +10,25 @@ import javax.ws.rs.core._
 import javax.ws.rs.ext._
 
 @Provider
-class RenderedImageProvider extends MessageBodyWriter {
-    def isWriteable(c: Class, gt: Type, annotations: Array[Annotation]) : boolean = {
+class RenderedImageProvider extends MessageBodyWriter[RenderedImage] {
+    def isWriteable(c: Class[_], gt: Type, annotations: Array[Annotation]) : boolean = {
         classOf[RenderedImage].isAssignableFrom(c)
     }
 
-    def writeTo(t: Any,
-            c: Class,
+    def writeTo(t: RenderedImage,
+            c: Class[_],
             gt: Type,
             annotations: Array[Annotation],
             mediaType: MediaType,
-            httpHeaders: MultivaluedMap,
+            httpHeaders: MultivaluedMap[String, Object],
             entityStream: OutputStream) : unit = {
         val formatName = RenderedImageProvider.formatName(mediaType)
         if (formatName == null) throw new IOException("Media type " + 
             mediaType + "not supported")
-        ImageIO.write(t.asInstanceOf[RenderedImage], formatName, entityStream)
+        ImageIO.write(t, formatName, entityStream)
     }
 
-    def getSize(t: Any) : long = {
+    def getSize(t: RenderedImage) : long = {
         -1
     }
 }
@@ -45,5 +45,5 @@ object RenderedImageProvider {
         i.next.asInstanceOf[ImageWriter].getOriginatingProvider.getFormatNames()(0)
     }
 
-    def isSupported(t: MediaType) =  ImageIO.getImageWritersByMIMEType(t.toString()).hasNext()
+    def isSupported(t: MediaType) = ImageIO.getImageWritersByMIMEType(t.toString()).hasNext()
 }
