@@ -24,6 +24,7 @@ package com.sun.ws.rest.impl.entity;
 
 import com.sun.syndication.feed.atom.Entry;
 import com.sun.syndication.feed.atom.Feed;
+import com.sun.ws.rest.api.client.WebResource;
 import com.sun.ws.rest.api.representation.FormURLEncodedProperties;
 import com.sun.ws.rest.impl.provider.entity.AtomEntryProvider;
 import com.sun.ws.rest.impl.provider.entity.AtomFeedProvider;
@@ -33,10 +34,15 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.Reader;
+import java.io.StringReader;
 import javax.mail.internet.InternetHeaders;
 import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMultipart;
+import javax.ws.rs.GET;
 import javax.ws.rs.Path;
+import javax.ws.rs.core.StreamingOutput;
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONObject;
 
@@ -173,4 +179,27 @@ public class EntityTypesTest extends AbstractTypeTester {
         _test(Entry.class, e, EntryResource.class);
     }
     
+    @Path("/")
+    public static class ReaderResource extends AResource<Reader> {}
+    
+    public void testReaderRepresentation() throws Exception {        
+        _test(Reader.class, new StringReader("CONTENT"), ReaderResource.class);
+    }
+    
+    @Path("/")
+    public static class StreamingOutputResource {
+        @GET public StreamingOutput get() {
+            return new StreamingOutput() {
+                public void write(OutputStream entity) throws IOException {
+                    entity.write(new String("CONTENT").getBytes());
+                }
+            };
+        }
+    }
+    
+    public void testStreamingOutputRepresentation() throws Exception {
+        initiateWebApplication(StreamingOutputResource.class);
+        WebResource r = resource("/");
+        assertEquals("CONTENT", r.get(String.class));
+    }
 }

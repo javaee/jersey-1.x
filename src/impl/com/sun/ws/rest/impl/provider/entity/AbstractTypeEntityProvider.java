@@ -29,6 +29,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.Reader;
+import java.io.Writer;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 import javax.ws.rs.core.MediaType;
@@ -44,6 +45,13 @@ public abstract class AbstractTypeEntityProvider<T> implements
     public final void writeTo(InputStream in, OutputStream out) throws IOException {
         int read;
         final byte[] data = new byte[2048];
+        while ((read = in.read(data)) != -1)
+            out.write(data, 0, read);
+    }
+    
+    public final void writeTo(Reader in, Writer out) throws IOException {
+        int read;
+        final char[] data = new char[2048];
         while ((read = in.read(data)) != -1)
             out.write(data, 0, read);
     }
