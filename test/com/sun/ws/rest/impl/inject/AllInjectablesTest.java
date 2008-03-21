@@ -35,6 +35,7 @@ import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.Request;
 import javax.ws.rs.core.SecurityContext;
 import javax.ws.rs.core.UriInfo;
+import javax.ws.rs.ext.MessageBodyWorkers;
 
 /**
  *
@@ -52,6 +53,8 @@ public class AllInjectablesTest extends AbstractResourceTester {
         
         @Context MessageBodyContext mbc;
         
+        @Context MessageBodyWorkers mbw;
+        
         @Context HttpContextAccess hca;
         
         @Context HttpHeaders hs;
@@ -66,6 +69,7 @@ public class AllInjectablesTest extends AbstractResourceTester {
         public String get() {
             assertNotNull(rc);
             assertNotNull(mbc);
+            assertNotNull(mbw);
             assertNotNull(hca);
             assertNotNull(hs);
             assertNotNull(ui);
@@ -115,6 +119,8 @@ public class AllInjectablesTest extends AbstractResourceTester {
         
         @Context MessageBodyContext mbc;
         
+        @Context MessageBodyWorkers mbw;
+        
         @Context HttpContextAccess hca;
         
         @Context HttpHeaders hs;
@@ -127,6 +133,7 @@ public class AllInjectablesTest extends AbstractResourceTester {
         public String get() {
             assertNotNull(rc);
             assertNotNull(mbc);
+            assertNotNull(mbw);
             assertNotNull(hca);
             assertNotNull(hs);
             assertNotNull(ui);

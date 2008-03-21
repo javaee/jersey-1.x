@@ -11,15 +11,19 @@ release 0.7 (2008-04-18)
     UriBuilder.build(Map<String, String> values) changed to 
     UriBuilder.build(Map<String, Object> values).
     The Object instances must support the toString method.
-  - Support message body writer for javax.ws.rs.core.StreamingOutput.
-  - Support message body reader/writer for java.io.Reader.
-  - Support message body reader/writer for javax.xml.transform.Source
+  - Message body writer for javax.ws.rs.core.StreamingOutput.
+  - Message body reader/writer for java.io.Reader.
+  - Message body reader/writer for javax.xml.transform.Source
     Only the following Java types are supported for reading:
       - javax.xml.transform.stream.StreamSource
       - javax.xml.transform.sax.SAXSource
       - javax.xml.transform.dom.DOMSource
-  - Support message body reader/writer MultivaluedMap<String, String>
+  - Message body reader/writer MultivaluedMap<String, String>
     with the media type "application/x-www-form-urlencoded".
+  - Injection of javax.ws.rs.ext.MessageBodyWorkers to get message body
+    readers and writers. Note this is very similar to
+    com.sun.ws.rest.spi.container.MessageBodyContext, which will be removed
+    if/when MessageBodyWorkers supports the same functionality.
 
 release 0.6.1 (2008-03-18)
 - Support for xml attributes serialization/deserialization in JSON added

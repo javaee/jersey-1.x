@@ -25,8 +25,11 @@ package com.sun.ws.rest.impl.application;
 import com.sun.ws.rest.impl.model.MediaTypeHelper;
 import com.sun.ws.rest.spi.container.MessageBodyContext;
 import com.sun.ws.rest.spi.service.ServiceFinder;
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -38,13 +41,14 @@ import javax.ws.rs.ConsumeMime;
 import javax.ws.rs.ProduceMime;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.ext.MessageBodyReader;
+import javax.ws.rs.ext.MessageBodyWorkers;
 import javax.ws.rs.ext.MessageBodyWriter;
 
 /**
  *
  * @author Paul.Sandoz@Sun.Com
  */
-public final class MessageBodyFactory implements MessageBodyContext {
+public final class MessageBodyFactory implements MessageBodyContext, MessageBodyWorkers {
     private static final Logger LOGGER = Logger.getLogger(MessageBodyFactory.class.getName());
     
     private final ComponentProviderCache componentProviderCache;
@@ -161,5 +165,17 @@ public final class MessageBodyFactory implements MessageBodyContext {
             return Arrays.asList(mediaType, 
                     new MediaType(mediaType.getType(), MediaType.MEDIA_TYPE_WILDCARD), 
                     MediaTypeHelper.GENERAL_MEDIA_TYPE);
-    }   
+    }
+
+    // MessageBodyWorkers
+    
+    public <T> List<MessageBodyReader<T>> getMessageBodyReaders(
+            MediaType mediaType, Class<T> type, Type genericType, Annotation annotations[]) {
+        return Collections.singletonList(getMessageBodyReader(type, mediaType));
+    }
+
+    public <T> List<MessageBodyWriter<T>> getMessageBodyWriters(
+            MediaType mediaType, Class<T> type, Type genericType, Annotation annotations[]) {
+        return Collections.singletonList(getMessageBodyWriter(type, mediaType));
+    }
 }

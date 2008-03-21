@@ -83,6 +83,7 @@ import javax.ws.rs.core.Request;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.SecurityContext;
 import javax.ws.rs.core.UriInfo;
+import javax.ws.rs.ext.MessageBodyWorkers;
 import javax.ws.rs.ext.Provider;
 
 /**
@@ -117,7 +118,7 @@ public final class WebApplicationImpl implements WebApplication {
     
     private RootResourceClassesRule rootsRule;
             
-    private MessageBodyContext bodyContext;
+    private MessageBodyFactory bodyFactory;
     
     private ComponentProvider provider;
     
@@ -337,7 +338,7 @@ public final class WebApplicationImpl implements WebApplication {
             );
                     
         // Obtain all message body readers/writers
-        this.bodyContext = new MessageBodyFactory(cpc);
+        this.bodyFactory = new MessageBodyFactory(cpc);
         
         // Obtain all root resources
         this.rootsRule = new RootResourceClassesRule(
@@ -346,7 +347,7 @@ public final class WebApplicationImpl implements WebApplication {
 
     
     public MessageBodyContext getMessageBodyContext() {
-        return bodyContext;
+        return bodyFactory;
     }
 
     public ComponentProvider getComponentProvider() {
@@ -533,7 +534,15 @@ public final class WebApplicationImpl implements WebApplication {
         is.put(MessageBodyContext.class,
                 new ContextInjectable<MessageBodyContext>() {
                     public MessageBodyContext getInjectableValue(Context c) {
-                        return bodyContext;
+                        return bodyFactory;
+                    }
+                }
+            );
+            
+        is.put(MessageBodyWorkers.class,
+                new ContextInjectable<MessageBodyWorkers>() {
+                    public MessageBodyWorkers getInjectableValue(Context c) {
+                        return bodyFactory;
                     }
                 }
             );
