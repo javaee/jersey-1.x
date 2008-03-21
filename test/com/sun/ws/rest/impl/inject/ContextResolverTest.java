@@ -24,12 +24,12 @@ package com.sun.ws.rest.impl.inject;
 
 import com.sun.ws.rest.impl.AbstractResourceTester;
 import com.sun.ws.rest.api.client.WebResource;
-import com.sun.ws.rest.spi.service.ContextResolver;
 import java.io.IOException;
 import java.math.BigInteger;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.core.Context;
+import javax.ws.rs.ext.ContextResolver;
 import javax.ws.rs.ext.Provider;
 
 /**

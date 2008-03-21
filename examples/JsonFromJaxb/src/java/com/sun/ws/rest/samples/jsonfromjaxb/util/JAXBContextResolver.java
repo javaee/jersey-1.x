@@ -25,12 +25,12 @@ package com.sun.ws.rest.samples.jsonfromjaxb.util;
 import com.sun.ws.rest.impl.json.JSONJAXBContext;
 import com.sun.ws.rest.samples.jsonfromjaxb.jaxb.FlightType;
 import com.sun.ws.rest.samples.jsonfromjaxb.jaxb.Flights;
-import com.sun.ws.rest.spi.service.ContextResolver;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import javax.ws.rs.ext.ContextResolver;
 import javax.ws.rs.ext.Provider;
 import javax.xml.bind.JAXBContext;
 

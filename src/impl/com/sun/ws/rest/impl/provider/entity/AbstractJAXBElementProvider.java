@@ -22,10 +22,10 @@
 
 package com.sun.ws.rest.impl.provider.entity;
 
-import com.sun.ws.rest.spi.service.ContextResolver;
 import java.util.Map;
 import java.util.WeakHashMap;
 import javax.ws.rs.core.Context;
+import javax.ws.rs.ext.ContextResolver;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.annotation.XmlRootElement;

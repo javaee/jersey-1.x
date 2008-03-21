@@ -22,10 +22,10 @@
 
 package com.sun.ws.rest.samples.storageservice;
 
-import com.sun.ws.rest.spi.service.ContextResolver;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
+import javax.ws.rs.ext.ContextResolver;
 import javax.ws.rs.ext.Provider;
 import javax.xml.bind.JAXBContext;
 

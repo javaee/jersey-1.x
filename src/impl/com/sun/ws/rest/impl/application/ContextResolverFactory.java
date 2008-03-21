@@ -23,7 +23,6 @@
 package com.sun.ws.rest.impl.application;
 
 import com.sun.ws.rest.spi.resource.Injectable;
-import com.sun.ws.rest.spi.service.ContextResolver;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
@@ -34,6 +33,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.logging.Logger;
 import javax.ws.rs.core.Context;
+import javax.ws.rs.ext.ContextResolver;
 
 /**
  *
