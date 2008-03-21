@@ -128,7 +128,7 @@ public final class MessageBodyFactory implements MessageBodyContext {
             if (readers==null)
                 continue;
             for (MessageBodyReader p: readers) {
-                if (p.isReadable(type))
+                if (p.isReadable(type, null, null))
                     return p;
             }
         }
@@ -145,7 +145,7 @@ public final class MessageBodyFactory implements MessageBodyContext {
             if (writers==null)
                 continue;
             for (MessageBodyWriter p: writers) {
-                if (p.isWriteable(type))
+                if (p.isWriteable(type, null, null))
                     return p;
             }
         }

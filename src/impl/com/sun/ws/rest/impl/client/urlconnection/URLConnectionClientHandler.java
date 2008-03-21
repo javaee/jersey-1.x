@@ -82,7 +82,7 @@ public final class URLConnectionClientHandler implements ClientHandler {
             try {
                 MediaType mediaType = getType();
                 return bodyContext.getMessageBodyReader(c, mediaType).
-                        readFrom(c, mediaType, metadata, getInputStream());
+                        readFrom(c, null, mediaType, null, metadata, getInputStream());
             } catch (IOException ex) {
                 throw new IllegalArgumentException(ex);
             }
@@ -191,7 +191,7 @@ public final class URLConnectionClientHandler implements ClientHandler {
         }
         
         final OutputStream out = uc.getOutputStream();
-        p.writeTo(entity, mediaType, metadata, out);        
+        p.writeTo(entity, entity.getClass(), null, null, mediaType, metadata, out);        
         out.flush();
         out.close();
     }

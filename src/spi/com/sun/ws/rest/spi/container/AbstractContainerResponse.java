@@ -255,7 +255,7 @@ public abstract class AbstractContainerResponse implements ContainerResponse {
         }
         
         final MessageBodyWriter p = bodyContext.getMessageBodyWriter(entity.getClass(), mediaType);
-        p.writeTo(entity, mediaType, getHttpHeaders(), out);
+        p.writeTo(entity, entity.getClass(), null, null, mediaType, getHttpHeaders(), out);
     }
     
     private void checkStatusAndEntity() {

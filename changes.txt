@@ -6,6 +6,11 @@ release 0.7 (2008-04-18)
   - Use @Context to inject HttpServletRequest, HttpServletResponse, 
     ServletConfig and ServletContext instances on JAX-RS/Jersey-based 
     components deployed in Servlet container.
+  - UriBuilder.build(String... values) changed to 
+    UriBuilder.build(Object... values). 
+    UriBuilder.build(Map<String, String> values) changed to 
+    UriBuilder.build(Map<String, Object> values).
+    The Object instances must support the toString method.
 
 release 0.6.1 (2008-03-18)
 - Support for xml attributes serialization/deserialization in JSON added

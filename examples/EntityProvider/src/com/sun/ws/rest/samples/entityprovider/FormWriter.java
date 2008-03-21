@@ -21,6 +21,8 @@ package com.sun.ws.rest.samples.entityprovider;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Type;
 import java.util.Hashtable;
 import javax.ws.rs.ProduceMime;
 import javax.ws.rs.core.MediaType;
@@ -36,7 +38,7 @@ import javax.ws.rs.ext.Provider;
 @Provider
 public class FormWriter implements MessageBodyWriter<Hashtable<String, String>> {
 
-    public boolean isWriteable(Class<?> type) {
+    public boolean isWriteable(Class<?> type, Type genericType, Annotation[] annotations) {
         return Hashtable.class.isAssignableFrom(type);
     }
 
@@ -44,8 +46,10 @@ public class FormWriter implements MessageBodyWriter<Hashtable<String, String>> 
         return -1;
     }
 
-    public void writeTo(Hashtable<String,String> data, MediaType mediaType, 
-            MultivaluedMap<String, Object> headers, OutputStream out) throws IOException {
+    public void writeTo(Hashtable<String,String> data, 
+            Class<?> type, Type genericType, Annotation[] annotations,
+            MediaType mediaType, MultivaluedMap<String, Object> headers, 
+            OutputStream out) throws IOException {
         out.write(preamble.getBytes());
         for (String name: data.keySet()) {
             out.write("<tr><td>".getBytes());

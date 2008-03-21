@@ -73,6 +73,7 @@ public class CanonicalizationFeatureTest extends AbstractGrizzlyServerTester {
         @GET
         @ProduceMime("text/plain")
         public String getQParam(@QueryParam("qParam") String param) {
+            assertNotNull(param);
             return param;
         }
     }

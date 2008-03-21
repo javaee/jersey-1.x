@@ -73,6 +73,7 @@ public class CanonicalizationFeatureTest extends AbstractHttpServerTester {
         @GET
         @ProduceMime("text/plain")
         public String getQParam(@QueryParam("qParam") String param) {
+            assertNotNull(param);            
             return param;
         }
     }
@@ -105,6 +106,5 @@ public class CanonicalizationFeatureTest extends AbstractHttpServerTester {
         URI u = UriBuilder.fromPath("qparam//a")
                 .queryParam("qParam", "val").build();
         assertEquals("val", r.uri(u).get(String.class));
-    }
-    
+    }   
 }

@@ -199,7 +199,7 @@ public abstract class AbstractContainerRequest implements ContainerRequest {
         try {
             MediaType mediaType = getMediaType();
             return bodyContext.getMessageBodyReader(type, mediaType).
-                    readFrom(type, mediaType, headers, entity);
+                    readFrom(type, null, mediaType, null, headers, entity);
         } catch (IOException e) {
             throw new IllegalArgumentException(e);
         }
@@ -336,6 +336,14 @@ public abstract class AbstractContainerRequest implements ContainerRequest {
             return encodedQueryParameters = UriComponent.decodeQuery(
                     getRequestUri(), false);
         }
+    }
+
+    public List<String> getAncestorResourceURIs() {
+        throw new UnsupportedOperationException();
+    }
+    
+    public List<Object> getAncestorResources() {
+        throw new UnsupportedOperationException();        
     }
     
     // HttpHeaders

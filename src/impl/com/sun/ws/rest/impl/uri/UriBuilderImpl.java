@@ -279,14 +279,14 @@ public final class UriBuilderImpl extends UriBuilder {
         return createURI(create());
     }
 
-    public URI build(Map<String, String> values) {
+    public URI build(Map<String, Object> values) {
         String uri = UriTemplate.createURI(scheme, 
                 userInfo, host, String.valueOf(port), 
                 path.toString(), query.toString(), fragment, values, encode);
         return createURI(uri);
     }
 
-    public URI build(String... values) {
+    public URI build(Object... values) {
         String uri = UriTemplate.createURI(scheme, 
                 userInfo, host, String.valueOf(port), 
                 path.toString(), query.toString(), fragment, values, encode);

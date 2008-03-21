@@ -3,17 +3,22 @@ package mandel
 import java.awt.image._
 import java.io._
 import javax.imageio._
+import java.lang.annotation.Annotation
+import java.lang.reflect.Type
 import javax.ws.rs._
 import javax.ws.rs.core._
 import javax.ws.rs.ext._
 
 @Provider
 class RenderedImageProvider extends MessageBodyWriter {
-    def isWriteable(t: Class) : boolean = {
-        classOf[RenderedImage].isAssignableFrom(t)
+    def isWriteable(c: Class, gt: Type, annotations: Array[Annotation]) : boolean = {
+        classOf[RenderedImage].isAssignableFrom(c)
     }
 
     def writeTo(t: Any,
+            c: Class,
+            gt: Type,
+            annotations: Array[Annotation],
             mediaType: MediaType,
             httpHeaders: MultivaluedMap,
             entityStream: OutputStream) : unit = {

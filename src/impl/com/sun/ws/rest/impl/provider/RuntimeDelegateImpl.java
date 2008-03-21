@@ -13,6 +13,7 @@ import com.sun.ws.rest.spi.service.ServiceFinder;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
+import javax.ws.rs.core.ApplicationConfig;
 import javax.ws.rs.core.Response.ResponseBuilder;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.Variant.VariantListBuilder;
@@ -40,7 +41,13 @@ public class RuntimeDelegateImpl extends RuntimeDelegate {
     public VariantListBuilder createVariantListBuilder() {
         return new VariantListBuilderImpl();
     }
-
+    
+    @Override
+    public <T> T createEndpoint(ApplicationConfig applicationConfig, 
+            Class<T> endpointType) 
+            throws IllegalArgumentException, UnsupportedOperationException {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
     
     private AtomicReference<Set<HeaderDelegateProvider>> atomicHeaderDelegates = 
             new AtomicReference<Set<HeaderDelegateProvider>>();
@@ -76,5 +83,4 @@ public class RuntimeDelegateImpl extends RuntimeDelegate {
             return s;
         }
     }
-
 }

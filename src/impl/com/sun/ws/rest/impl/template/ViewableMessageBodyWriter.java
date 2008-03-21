@@ -28,6 +28,8 @@ import com.sun.ws.rest.api.view.Viewable;
 import com.sun.ws.rest.api.core.HttpContextAccess;
 import com.sun.ws.rest.api.core.ResourceConfig;
 import java.io.OutputStream;
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Type;
 import javax.ws.rs.ext.MessageBodyWriter;
 import java.io.IOException;
 import javax.ws.rs.core.Context;
@@ -46,12 +48,14 @@ public final class ViewableMessageBodyWriter implements MessageBodyWriter<Viewab
     
     @Context ResourceConfig rc;
     
-    public boolean isWriteable(Class<?> type) {
+    public boolean isWriteable(Class<?> type, Type genericType, Annotation[] annotations) {
         return Viewable.class.isAssignableFrom(type);
     }
 
-    public void writeTo(Viewable v, MediaType mediaType,
-            MultivaluedMap<String, Object> httpHeaders, OutputStream entityStream) throws IOException {
+    public void writeTo(Viewable v, 
+            Class<?> type, Type genericType, Annotation[] annotations, 
+            MediaType mediaType, MultivaluedMap<String, Object> httpHeaders, 
+            OutputStream entityStream) throws IOException {
         if (v instanceof ResolvedViewable) {
             ResolvedViewable rv = (ResolvedViewable)v;
             rv.getTemplate().writeTo(v.getTemplateName(), v.getModel(), entityStream);
@@ -93,5 +97,6 @@ public final class ViewableMessageBodyWriter implements MessageBodyWriter<Viewab
 
     private String getAbsolutePath(Class<?> resourceClass) {
         return "/" + resourceClass.getName().replace('.', '/').replace('$', '/');
-    }    
+    }
+
 }

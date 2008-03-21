@@ -29,12 +29,17 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.Reader;
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Type;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.MultivaluedMap;
 
 /**
  *
  * @author Paul.Sandoz@Sun.Com
  */
-public abstract class AbstractTypeEntityProvider<T> implements MessageBodyReader<T>, MessageBodyWriter<T> {
+public abstract class AbstractTypeEntityProvider<T> implements 
+        MessageBodyReader<T>, MessageBodyWriter<T> {
 
     public final void writeTo(InputStream in, OutputStream out) throws IOException {
         int read;
@@ -54,18 +59,37 @@ public abstract class AbstractTypeEntityProvider<T> implements MessageBodyReader
         return sb.toString();
     }
     
-    public boolean isReadable(Class<?> type) {
+    public boolean isReadable(Class<?> type, Type genericType, Annotation annotations[]) {
         return supports(type);
     }
     
-    public boolean isWriteable(Class<?> type) {
+    public T readFrom(Class<T> type, Type genericType, MediaType mediaType, 
+            Annotation annotations[],
+            MultivaluedMap<String, String> httpHeaders, 
+            InputStream entityStream) throws IOException {        
+        return readFrom(type, mediaType, httpHeaders, entityStream);
+    }
+    
+    public boolean isWriteable(Class<?> type, Type genericType, Annotation annotations[]) {
         return supports(type);
     }
     
+    public void writeTo(T t, Class<?> type, Type genericType, Annotation annotations[], 
+            MediaType mediaType, 
+            MultivaluedMap<String, Object> httpHeaders,
+            OutputStream entityStream) throws IOException {
+        writeTo(t, mediaType, httpHeaders, entityStream);
+    }    
+     
     public long getSize(T t) {
         return -1;
     }
-
     
     public abstract boolean supports(Class<?> type);
+    
+    public abstract T readFrom(Class<T> type, MediaType mediaType, 
+            MultivaluedMap<String, String> headers, InputStream entityStream) throws IOException;
+
+    public abstract void writeTo(T t, MediaType mediaType,
+            MultivaluedMap<String, Object> headers, OutputStream entityStream) throws IOException;        
 }

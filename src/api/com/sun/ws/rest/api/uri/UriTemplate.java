@@ -458,6 +458,9 @@ public class UriTemplate {
     /**
      * Construct a URI from the component parts each of which may contain 
      * template variables.
+     * <p>
+     * A template values is an Object instance MUST support the toString() 
+     * method to convert the template value to a String instance.
      *
      * @param scheme the URI scheme component
      * @param userInfo the URI user info component
@@ -473,6 +476,37 @@ public class UriTemplate {
      * @return a URI
      */
     public final static String createURI(final String scheme, 
+            final String userInfo, final String host, final String port, 
+            final String path, final String query, final String fragment,
+            final Map<String, Object> values, final boolean encode) {
+        Map<String, String> stringValues = new HashMap<String, String>();
+        for (Map.Entry<String, Object> e : values.entrySet()) {
+            if (e.getValue() != null)
+                stringValues.put(e.getKey(), e.getValue().toString());
+        }
+        
+        return createURIWithStringValues(scheme, userInfo, host, port, path, query, fragment, 
+                stringValues, encode);
+    }
+    
+    /**
+     * Construct a URI from the component parts each of which may contain 
+     * template variables.
+     *
+     * @param scheme the URI scheme component
+     * @param userInfo the URI user info component
+     * @param host the URI host component
+     * @param port the URI port component
+     * @param path the URI path component
+     * @param query the URI query componnet
+     * @param fragment the URI fragment component
+     * @param values the template variable to value map
+     * @param encode if true encode a template value according to the correspond
+     *        component type of the associated template variable, otherwise
+     *        validate the template value
+     * @return a URI
+     */
+    public final static String createURIWithStringValues(final String scheme, 
             final String userInfo, final String host, final String port, 
             final String path, final String query, final String fragment,
             final Map<String, String> values, final boolean encode) {
@@ -548,7 +582,11 @@ public class UriTemplate {
     /**
      * Construct a URI from the component parts each of which may contain 
      * template variables.
-     *
+     * <p>
+     * The template values are an array of Object and each Object instance
+     * MUST support the toString() method to convert the template value to
+     * a String instance.
+     * 
      * @param scheme the URI scheme component
      * @param userInfo the URI user info component
      * @param host the URI host component
@@ -563,6 +601,38 @@ public class UriTemplate {
      * @return a URI
      */
     public final static String createURI(final String scheme, 
+            final String userInfo, final String host, final String port, 
+            final String path, final String query, final String fragment,
+            final Object[] values, final boolean encode) {
+        
+        String[] stringValues = new String[values.length];
+        for (int i = 0; i < values.length; i++) {
+            if (values[i] != null)
+                stringValues[i] = values[i].toString();
+        }
+        
+        return createURIWithStringValues(scheme, userInfo, host, port, path, query, fragment,
+                stringValues, encode);
+    }
+    
+    /**
+     * Construct a URI from the component parts each of which may contain 
+     * template variables.
+     *
+     * @param scheme the URI scheme component
+     * @param userInfo the URI user info component
+     * @param host the URI host component
+     * @param port the URI port component
+     * @param path the URI path component
+     * @param query the URI query componnet
+     * @param fragment the URI fragment component
+     * @param values the array of template values
+     * @param encode if true encode a template value according to the correspond
+     *        component type of the associated template variable, otherwise
+     *        validate the template value
+     * @return a URI
+     */
+    public final static String createURIWithStringValues(final String scheme, 
             final String userInfo, final String host, final String port, 
             final String path, final String query, final String fragment,
             final String[] values, final boolean encode) {

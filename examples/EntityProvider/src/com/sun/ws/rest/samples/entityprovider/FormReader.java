@@ -24,6 +24,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Type;
 import java.net.URLDecoder;
 import java.util.HashMap;
 import java.util.Map;
@@ -42,11 +44,13 @@ import javax.ws.rs.ext.Provider;
 @Provider
 public class FormReader implements MessageBodyReader<NameValuePair> {
     
-    public boolean isReadable(Class<?> type) {
+    public boolean isReadable(Class<?> type, Type genericType, Annotation[] annotations) {
         return type.equals(NameValuePair.class);
     }
 
-    public NameValuePair readFrom(Class<NameValuePair> type, MediaType mediaType, MultivaluedMap<String, String> headers, InputStream in) throws IOException {
+    public NameValuePair readFrom(Class<NameValuePair> type, Type genericType,
+            MediaType mediaType, Annotation[] annotations, MultivaluedMap<String, String> headers, 
+            InputStream in) throws IOException {
         String formData = readAsString(in);
 
         Map<String, String> map = new HashMap<String, String>();

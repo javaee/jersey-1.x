@@ -95,7 +95,7 @@ public class TestResourceClientHandler implements ClientHandler {
             try {
                 MediaType mediaType = getType();
                 return bodyContext.getMessageBodyReader(c, mediaType).
-                        readFrom(c, mediaType, metadata, responseEntity);
+                        readFrom(c, null, mediaType, null, metadata, responseEntity);
             } catch (IOException ex) {
                 throw new ClientHandlerException(ex);
             }
@@ -181,7 +181,7 @@ public class TestResourceClientHandler implements ClientHandler {
             }
             final MessageBodyWriter p = bodyContext.
                     getMessageBodyWriter(entity.getClass(), mediaType);
-            p.writeTo(entity, (MediaType)mediaType, metadata, out);
+            p.writeTo(entity, entity.getClass(), null, null, (MediaType)mediaType, metadata, out);
             out.flush();
             out.close();
         } catch (IOException ex) {

@@ -24,6 +24,8 @@ package com.sun.ws.rest.samples.entityprovider;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Type;
 import java.util.Properties;
 import javax.ws.rs.ProduceMime;
 import javax.ws.rs.core.MediaType;
@@ -40,13 +42,15 @@ import javax.ws.rs.ext.Provider;
 @Provider
 public class PropertiesProvider implements MessageBodyWriter<Properties> {
     
-    public void writeTo(Properties p, MediaType mediaType,
-            MultivaluedMap<String, Object> headers, OutputStream out) throws IOException {
+    public void writeTo(Properties p, 
+            Class<?> type, Type genericType, Annotation annotations[],
+            MediaType mediaType, MultivaluedMap<String, Object> headers, 
+            OutputStream out) throws IOException {
         // Store the Properties instance using the key/value pair format
         p.store(out, null);
     }
 
-    public boolean isWriteable(Class<?> type) {
+    public boolean isWriteable(Class<?> type, Type genericType, Annotation annotations[]) {
         // Only support the Properties class and inherited classes of
         return Properties.class.isAssignableFrom(type);
     }
