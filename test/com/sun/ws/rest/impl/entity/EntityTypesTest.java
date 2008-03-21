@@ -43,6 +43,9 @@ import javax.mail.internet.MimeMultipart;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.core.StreamingOutput;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.sax.SAXSource;
+import javax.xml.transform.stream.StreamSource;
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONObject;
 
@@ -184,6 +187,35 @@ public class EntityTypesTest extends AbstractTypeTester {
     
     public void testReaderRepresentation() throws Exception {        
         _test(Reader.class, new StringReader("CONTENT"), ReaderResource.class);
+    }
+    
+    private final static String XML_DOCUMENT="<n:x xmlns:n=\"urn:n\"><n:e>CONTNET</n:e></n:x>";
+    
+    @Path("/")
+    public static class StreamSourceResource extends AResource<StreamSource> {}
+    
+    public void testStreamSourceRepresentation() throws Exception {
+        StreamSource ss = new StreamSource(
+                new ByteArrayInputStream(XML_DOCUMENT.getBytes()));
+        _test(StreamSource.class, ss, StreamSourceResource.class);
+    }
+    
+    @Path("/")
+    public static class SAXSourceResource extends AResource<SAXSource> {}
+    
+    public void testSAXSourceRepresentation() throws Exception {
+        StreamSource ss = new StreamSource(
+                new ByteArrayInputStream(XML_DOCUMENT.getBytes()));
+        _test(StreamSource.class, ss, SAXSourceResource.class);
+    }
+    
+    @Path("/")
+    public static class DOMSourceResource extends AResource<DOMSource> {}
+    
+    public void testDOMSourceRepresentation() throws Exception {
+        StreamSource ss = new StreamSource(
+                new ByteArrayInputStream(XML_DOCUMENT.getBytes()));
+        _test(StreamSource.class, ss, DOMSourceResource.class);
     }
     
     @Path("/")

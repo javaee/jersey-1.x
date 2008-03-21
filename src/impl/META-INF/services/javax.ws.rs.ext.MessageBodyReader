@@ -12,3 +12,6 @@ com.sun.ws.rest.impl.provider.entity.JSONJAXBElementProvider
 com.sun.ws.rest.impl.provider.entity.JSONArrayProvider
 com.sun.ws.rest.impl.provider.entity.JSONObjectProvider
 com.sun.ws.rest.impl.provider.entity.ReaderProvider
+com.sun.ws.rest.impl.provider.entity.SourceProvider$StreamSourceReader
+com.sun.ws.rest.impl.provider.entity.SourceProvider$SAXSourceReader
+com.sun.ws.rest.impl.provider.entity.SourceProvider$DOMSourceReader

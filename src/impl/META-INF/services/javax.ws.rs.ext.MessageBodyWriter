@@ -13,4 +13,5 @@ com.sun.ws.rest.impl.provider.entity.JSONArrayProvider
 com.sun.ws.rest.impl.provider.entity.JSONObjectProvider
 com.sun.ws.rest.impl.provider.entity.ReaderProvider
 com.sun.ws.rest.impl.provider.entity.StreamingOutputProvider
+com.sun.ws.rest.impl.provider.entity.SourceProvider$SourceWriter
 com.sun.ws.rest.impl.template.ViewableMessageBodyWriter
