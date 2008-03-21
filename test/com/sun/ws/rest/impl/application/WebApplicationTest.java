@@ -135,7 +135,7 @@ public class WebApplicationTest extends TestCase {
     }
     
     public WebApplicationImpl createWebApplication(Class... resources) {
-        final Set<Class> s = new HashSet<Class>();
+        final Set<Class<?>> s = new HashSet<Class<?>>();
         for (Class resource : resources)
             s.add(resource);
         

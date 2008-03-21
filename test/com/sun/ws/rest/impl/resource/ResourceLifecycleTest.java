@@ -105,7 +105,7 @@ public class ResourceLifecycleTest extends AbstractResourceTester {
     }
     
     private ResourceConfig getResourceConfig() {
-        final Set<Class> r = new HashSet<Class>();
+        final Set<Class<?>> r = new HashSet<Class<?>>();
         r.add(TestFooBean.class);
         r.add(TestBarBean.class);
         r.add(TestBazBean.class);

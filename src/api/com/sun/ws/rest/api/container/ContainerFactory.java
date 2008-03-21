@@ -31,9 +31,7 @@ import com.sun.ws.rest.spi.container.WebApplicationFactory;
 import com.sun.ws.rest.spi.service.ServiceFinder;
 import java.io.File;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 
 /**
@@ -61,9 +59,9 @@ public final class ContainerFactory {
      * @throws IllegalArgumentException if no container provider supports the type.
      */
     @SuppressWarnings("unchecked")
-    public static <A> A createContainer(Class<A> type, Class... resourceClasses)
+    public static <A> A createContainer(Class<A> type, Class<?>... resourceClasses)
     throws ContainerException, IllegalArgumentException {
-        Set<Class> resourceClassesSet = new HashSet<Class>(
+        Set<Class<?>> resourceClassesSet = new HashSet<Class<?>>(
                 Arrays.asList(resourceClasses));
         
         return createContainer(type, new DefaultResourceConfig(resourceClassesSet));
@@ -84,7 +82,7 @@ public final class ContainerFactory {
      * @throws IllegalArgumentException if no container provider supports the type.
      */
     @SuppressWarnings("unchecked")
-    public static <A> A createContainer(Class<A> type, Set<Class> resourceClasses)
+    public static <A> A createContainer(Class<A> type, Set<Class<?>> resourceClasses)
     throws ContainerException, IllegalArgumentException {
         return createContainer(type, new DefaultResourceConfig(resourceClasses));
     }

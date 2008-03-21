@@ -111,8 +111,8 @@ public abstract class AbstractResourceTester extends TestCase {
         return URI.create(baseUri.toString() + relativeUri);
     }
     
-    private static Set<Class> getMatchingClasses(Set<Class> classes, Class... annotations) {
-        Set<Class> s = new HashSet<Class>();
+    private static Set<Class<?>> getMatchingClasses(Set<Class> classes, Class... annotations) {
+        Set<Class<?>> s = new HashSet<Class<?>>();
         for (Class c : classes) {
             if (hasAnnotations(c, annotations))
                 s.add(c);

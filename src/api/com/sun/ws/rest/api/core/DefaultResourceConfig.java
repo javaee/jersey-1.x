@@ -38,9 +38,9 @@ import java.util.Set;
  */
 public class DefaultResourceConfig implements ResourceConfig {
     
-    private final Set<Class> resources = new HashSet<Class>();
+    private final Set<Class<?>> resources = new HashSet<Class<?>>();
     
-    private final Set<Class> providers = new HashSet<Class>();
+    private final Set<Class<?>> providers = new HashSet<Class<?>>();
     
     private final Map<String, Boolean> features = new HashMap<String, Boolean>();
     
@@ -49,20 +49,20 @@ public class DefaultResourceConfig implements ResourceConfig {
     /**
      */
     public DefaultResourceConfig() {
-        this((Set<Class>)null);
+        this((Set<Class<?>>)null);
     }
     
     /**
      * @param resources the initial set of root resource classes
      */
-    public DefaultResourceConfig(Class... resources) {
-        this(new HashSet<Class>(Arrays.asList(resources)));
+    public DefaultResourceConfig(Class<?>... resources) {
+        this(new HashSet<Class<?>>(Arrays.asList(resources)));
     }
     
     /**
      * @param resources the initial set of root resource classes
      */
-    public DefaultResourceConfig(Set<Class> resources) {
+    public DefaultResourceConfig(Set<Class<?>> resources) {
         this.features.put(ResourceConfig.FEATURE_CANONICALIZE_URI_PATH, false);
         this.features.put(ResourceConfig.FEATURE_MATCH_MATRIX_PARAMS, false);
         this.features.put(ResourceConfig.FEATURE_NORMALIZE_URI, false);
@@ -73,11 +73,11 @@ public class DefaultResourceConfig implements ResourceConfig {
         }
     }
 
-    public Set<Class> getResourceClasses() {
+    public Set<Class<?>> getResourceClasses() {
         return resources;
     }
 
-    public Set<Class> getProviderClasses() {
+    public Set<Class<?>> getProviderClasses() {
         return providers;
     }
     

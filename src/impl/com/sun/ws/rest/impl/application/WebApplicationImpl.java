@@ -401,7 +401,7 @@ public final class WebApplicationImpl implements WebApplication {
     // 
 
     private void verifyResourceConfig() {
-        Iterator<Class> i = resourceConfig.getProviderClasses().iterator();
+        Iterator<Class<?>> i = resourceConfig.getProviderClasses().iterator();
         while (i.hasNext()) {
             Class<?> pc = i.next();
             if (!pc.isAnnotationPresent(Provider.class)) {
@@ -413,7 +413,7 @@ public final class WebApplicationImpl implements WebApplication {
         }
     }
     
-    private RulesMap<UriRule> processRootResources(Set<Class> classes) {
+    private RulesMap<UriRule> processRootResources(Set<Class<?>> classes) {
         if (classes.isEmpty()) {
             LOGGER.severe(ImplMessages.NO_ROOT_RES_IN_RES_CFG());
             throw new ContainerException(ImplMessages.NO_ROOT_RES_IN_RES_CFG());            

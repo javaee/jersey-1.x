@@ -147,9 +147,9 @@ public final class AnnotatedClassScanner {
      * @return The set of matching classes that are annotated with one or more of
      *         the specified annotations.
      */
-    public Set<Class> getMatchingClasses(Class... annotations) {
-        Set<Class> s = new HashSet<Class>();
-        for (Class c : classes) {
+    public Set<Class<?>> getMatchingClasses(Class... annotations) {
+        Set<Class<?>> s = new HashSet<Class<?>>();
+        for (Class<?> c : classes) {
             if (hasAnnotations(c, annotations))
                 s.add(c);
         }

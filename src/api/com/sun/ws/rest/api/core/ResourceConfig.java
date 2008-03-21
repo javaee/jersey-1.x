@@ -113,7 +113,7 @@ public interface ResourceConfig {
      * @return the set of root resource classes. 
      *         The returned value shall never be null.
      */
-    Set<Class> getResourceClasses();
+    Set<Class<?>> getResourceClasses();
     
     /**
      * Get the set of provider classes to be instantiated in the scope
@@ -126,7 +126,7 @@ public interface ResourceConfig {
      * @return the set of provider classes. 
      *         The returned value shall never be null.
      */
-    Set<Class> getProviderClasses();
+    Set<Class<?>> getProviderClasses();
     
     /**
      * Get the map of features associated with the Web application.

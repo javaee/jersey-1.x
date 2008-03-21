@@ -41,7 +41,7 @@ public interface ClientConfig {
      * @return the set of provider classes. 
      *         The returned value shall never be null.
      */
-    Set<Class> getProviderClasses();
+    Set<Class<?>> getProviderClasses();
     
     /**
      * Get the map of features associated with the Web application.

@@ -42,12 +42,12 @@ public class ComponentProviderCache {
     
     private final ComponentProvider componentProvider;
     
-    private final Set<Class> providers;
+    private final Set<Class<?>> providers;
     
     private final Map<Class, Object> cache;
     
     public ComponentProviderCache(ComponentProvider componentProvider, 
-            Set<Class> providers) {
+            Set<Class<?>> providers) {
         this.componentProvider = componentProvider;
         this.providers = providers;
         this.cache = new HashMap<Class, Object>();

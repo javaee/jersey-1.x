@@ -32,13 +32,13 @@ import java.util.Set;
  * @author Paul.Sandoz@Sun.Com
  */
 public class DefaultClientConfig implements ClientConfig {
-    private final Set<Class> providers = new HashSet<Class>();
+    private final Set<Class<?>> providers = new HashSet<Class<?>>();
     
     private final Map<String, Boolean> features = new HashMap<String, Boolean>();
     
     private final Map<String, Object> properties = new HashMap<String, Object>();
     
-    public Set<Class> getProviderClasses() {
+    public Set<Class<?>> getProviderClasses() {
         return providers;
     }
     
