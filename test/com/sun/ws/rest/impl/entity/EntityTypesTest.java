@@ -26,6 +26,7 @@ import com.sun.syndication.feed.atom.Entry;
 import com.sun.syndication.feed.atom.Feed;
 import com.sun.ws.rest.api.client.WebResource;
 import com.sun.ws.rest.api.representation.FormURLEncodedProperties;
+import com.sun.ws.rest.impl.MultivaluedMapImpl;
 import com.sun.ws.rest.impl.provider.entity.AtomEntryProvider;
 import com.sun.ws.rest.impl.provider.entity.AtomFeedProvider;
 import com.sun.ws.rest.impl.provider.entity.FileProvider;
@@ -40,8 +41,12 @@ import java.io.StringReader;
 import javax.mail.internet.InternetHeaders;
 import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMultipart;
+import javax.ws.rs.ConsumeMime;
 import javax.ws.rs.GET;
+import javax.ws.rs.POST;
 import javax.ws.rs.Path;
+import javax.ws.rs.ProduceMime;
+import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.StreamingOutput;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.sax.SAXSource;
@@ -216,6 +221,32 @@ public class EntityTypesTest extends AbstractTypeTester {
         StreamSource ss = new StreamSource(
                 new ByteArrayInputStream(XML_DOCUMENT.getBytes()));
         _test(StreamSource.class, ss, DOMSourceResource.class);
+    }
+    
+    @Path("/")
+    @ProduceMime("application/x-www-form-urlencoded")
+    @ConsumeMime("application/x-www-form-urlencoded")
+    public static class FormMultivaluedMapResource {
+        @POST
+        public MultivaluedMap<String, String> post(MultivaluedMap<String, String> t) {
+            return t;
+        }
+    }
+    
+    public void testFormMultivaluedMapRepresentation() {
+        MultivaluedMap<String, String> fp = new MultivaluedMapImpl();
+        fp.add("Email", "johndoe@gmail.com");
+        fp.add("Passwd", "north 23AZ");
+        fp.add("service", "cl");
+        fp.add("source", "Gulp-CalGul-1.05");
+        fp.add("source", "foo.java");
+        fp.add("source", "bar.java");
+        
+        initiateWebApplication(FormMultivaluedMapResource.class);
+        WebResource r = resource("/");
+        MultivaluedMap _fp = r.entity(fp, "application/x-www-form-urlencoded").
+                post(MultivaluedMap.class);
+        assertEquals(fp, _fp);
     }
     
     @Path("/")
