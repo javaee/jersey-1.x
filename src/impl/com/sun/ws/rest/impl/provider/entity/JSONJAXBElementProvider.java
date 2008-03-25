@@ -59,12 +59,12 @@ public final class JSONJAXBElementProvider extends AbstractJAXBElementProvider {
             Unmarshaller unmarshaller = context.createUnmarshaller();
             if (unmarshaller instanceof JSONUnmarshaller) {
                 unmarshaller.setProperty(JSONJAXBContext.JSON_ENABLED, Boolean.TRUE);
-                JAXBElement jaxbElem = (JAXBElement)((JSONUnmarshaller)unmarshaller).unmarshal(entityStream, type);
+                JAXBElement jaxbElem = (JAXBElement)((JSONUnmarshaller)unmarshaller).
+                        unmarshal(entityStream, type);
                 return jaxbElem.getValue();
             } else {
-                return unmarshaller.unmarshal(new JsonXmlStreamReader(new InputStreamReader(entityStream)));
-//                return unmarshaller.unmarshal(new MappedXMLStreamReader(                                                      
-//                            new JSONObject(readFromAsString(entityStream))));
+                return unmarshaller.unmarshal(new JsonXmlStreamReader(
+                        new InputStreamReader(entityStream, getCharset(mediaType))));
             }
         } catch (JAXBException cause) {
             throw ThrowHelper.withInitCause(cause,
@@ -82,9 +82,8 @@ public final class JSONJAXBElementProvider extends AbstractJAXBElementProvider {
                 marshaller.setProperty(JSONJAXBContext.JSON_ENABLED, Boolean.TRUE);
                 marshaller.marshal(t, entityStream);
             } else {
-                marshaller.marshal(t, new JsonXmlStreamWriter(new OutputStreamWriter(entityStream)));
-//                marshaller.marshal(t,new MappedXMLStreamWriter(new MappedNamespaceConvention(),                      
-//                            new OutputStreamWriter(entityStream)) );
+                marshaller.marshal(t, new JsonXmlStreamWriter(
+                        new OutputStreamWriter(entityStream, getCharset(mediaType, UTF8))));
             }
         } catch (JAXBException cause) {
             throw ThrowHelper.withInitCause(cause,

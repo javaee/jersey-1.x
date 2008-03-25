@@ -43,7 +43,7 @@ public final class FormURLEncodedProvider extends AbstractTypeEntityProvider<For
 
     public FormURLEncodedProperties readFrom(Class<FormURLEncodedProperties> type, MediaType mediaType,
             MultivaluedMap<String, String> headers, InputStream entityStream) throws IOException {
-        String encoded = readFromAsString(entityStream);
+        String encoded = readFromAsString(entityStream, mediaType);
     
         FormURLEncodedProperties map = new FormURLEncodedProperties();
         StringTokenizer tokenizer = new StringTokenizer(encoded, "&");
@@ -75,6 +75,6 @@ public final class FormURLEncodedProvider extends AbstractTypeEntityProvider<For
             }
         }
         
-        entityStream.write(sb.toString().getBytes());
+        writeToAsString(sb.toString(), entityStream, mediaType);
     }    
 }

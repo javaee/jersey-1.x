@@ -22,16 +22,19 @@
 
 package com.sun.ws.rest.impl.provider.entity;
 
+import java.io.BufferedWriter;
 import javax.ws.rs.ext.MessageBodyReader;
 import javax.ws.rs.ext.MessageBodyWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 import java.io.Reader;
 import java.io.Writer;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
+import java.nio.charset.Charset;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 
@@ -42,6 +45,22 @@ import javax.ws.rs.core.MultivaluedMap;
 public abstract class AbstractTypeEntityProvider<T> implements 
         MessageBodyReader<T>, MessageBodyWriter<T> {
 
+    public static final Charset UTF8 = Charset.forName("UTF-8");
+                  
+    public static final Charset getCharset(MediaType m) {
+        String name = (m == null) ? null : m.getParameters().get("charset");
+        return (name == null) ? UTF8 : Charset.forName(name);
+    }
+        
+    public static final Charset getCharset(MediaType m, Charset def) {
+        String name = (m == null) ? null : m.getParameters().get("charset");
+        try {
+            return (name == null) ? UTF8 : Charset.forName(name);
+        } catch (RuntimeException e) {
+            return UTF8;
+        }
+    }
+    
     public final void writeTo(InputStream in, OutputStream out) throws IOException {
         int read;
         final byte[] data = new byte[2048];
@@ -56,8 +75,8 @@ public abstract class AbstractTypeEntityProvider<T> implements
             out.write(data, 0, read);
     }
     
-    public final String readFromAsString(InputStream in) throws IOException {
-        Reader reader = new InputStreamReader(in);
+    public final String readFromAsString(InputStream in, MediaType type) throws IOException {
+        Reader reader = new InputStreamReader(in, getCharset(type));
         StringBuilder sb = new StringBuilder();
         char[] c = new char[1024];
         int l;
@@ -65,6 +84,13 @@ public abstract class AbstractTypeEntityProvider<T> implements
             sb.append(c, 0, l);
         } 
         return sb.toString();
+    }
+    
+    public final void writeToAsString(String s, OutputStream out, MediaType type) throws IOException {
+        Writer osw = new BufferedWriter(new OutputStreamWriter(out, 
+                getCharset(type, UTF8)));        
+        osw.write(s);
+        osw.flush();        
     }
     
     public boolean isReadable(Class<?> type, Type genericType, Annotation annotations[]) {

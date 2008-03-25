@@ -52,7 +52,7 @@ public final class FormMultivaluedMapProvider extends
     public MultivaluedMap<String, String> readFrom(Class<MultivaluedMap<String, String>> type, 
             MediaType mediaType, MultivaluedMap<String, String> headers, 
             InputStream entityStream) throws IOException {
-        String encoded = readFromAsString(entityStream);
+        String encoded = readFromAsString(entityStream, mediaType);
     
         MultivaluedMap<String, String> map = new MultivaluedMapImpl();
         StringTokenizer tokenizer = new StringTokenizer(encoded, "&");
@@ -85,6 +85,6 @@ public final class FormMultivaluedMapProvider extends
             }
         }
                 
-        entityStream.write(sb.toString().getBytes());
+        writeToAsString(sb.toString(), entityStream, mediaType);
     }    
 }

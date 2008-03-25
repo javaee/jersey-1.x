@@ -47,7 +47,7 @@ public class JSONObjectProvider  extends AbstractTypeEntityProvider<JSONObject>{
     public JSONObject readFrom(Class<JSONObject> o, MediaType mediaType, 
             MultivaluedMap<String, String> headers, InputStream is) throws IOException {
         try {
-            return new JSONObject(readFromAsString(is));
+            return new JSONObject(readFromAsString(is, mediaType));
         } catch (JSONException je) {
             throw ThrowHelper.withInitCause(je, new IOException(ImplMessages.ERROR_PARSING_JSON_OBJECT()));
         }
@@ -56,7 +56,8 @@ public class JSONObjectProvider  extends AbstractTypeEntityProvider<JSONObject>{
     public void writeTo(JSONObject jsonObject, MediaType mediaType,
             MultivaluedMap<String, Object> httpHeaders, OutputStream entityStream) throws IOException {
         try {
-            OutputStreamWriter writer = new OutputStreamWriter(entityStream);
+            OutputStreamWriter writer = new OutputStreamWriter(entityStream, 
+                    getCharset(mediaType, UTF8));
             jsonObject.write(writer);
             writer.write("\n");
             writer.flush();

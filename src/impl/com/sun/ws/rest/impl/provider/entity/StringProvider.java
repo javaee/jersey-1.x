@@ -40,11 +40,11 @@ public final class StringProvider extends AbstractTypeEntityProvider<String> {
 
     public String readFrom(Class<String> type, MediaType mediaType,
             MultivaluedMap<String, String> headers, InputStream entityStream) throws IOException {
-        return readFromAsString(entityStream);
+        return readFromAsString(entityStream, mediaType);
     }
 
     public void writeTo(String t, MediaType mediaType,
             MultivaluedMap<String, Object> headers, OutputStream entityStream) throws IOException {
-        entityStream.write(t.getBytes());
+        writeToAsString(t, entityStream, mediaType);
     }
 }

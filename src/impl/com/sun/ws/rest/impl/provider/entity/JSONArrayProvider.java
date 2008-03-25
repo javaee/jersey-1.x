@@ -46,7 +46,7 @@ public class JSONArrayProvider  extends AbstractTypeEntityProvider<JSONArray>{
     public JSONArray readFrom(Class<JSONArray> o, MediaType mediaType,
             MultivaluedMap<String, String> headers, InputStream is) throws IOException {
         try {
-            return new JSONArray(readFromAsString(is));
+            return new JSONArray(readFromAsString(is, mediaType));
         } catch (JSONException je) {
             throw ThrowHelper.withInitCause(je, new IOException(ImplMessages.ERROR_PARSING_JSON_ARRAY()));
         }
@@ -55,7 +55,8 @@ public class JSONArrayProvider  extends AbstractTypeEntityProvider<JSONArray>{
     public void writeTo(JSONArray jsonArray, MediaType mediaType,
             MultivaluedMap<String, Object> httpHeaders, OutputStream entityStream) throws IOException {
         try {
-            OutputStreamWriter writer = new OutputStreamWriter(entityStream);
+            OutputStreamWriter writer = new OutputStreamWriter(entityStream, 
+                    getCharset(mediaType, UTF8));
             jsonArray.write(writer);
             writer.write("\n");
             writer.flush();

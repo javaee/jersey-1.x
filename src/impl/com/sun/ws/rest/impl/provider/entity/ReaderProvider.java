@@ -44,13 +44,14 @@ public final class ReaderProvider extends AbstractTypeEntityProvider<Reader> {
 
     public Reader readFrom(Class<Reader> type, MediaType mediaType,
             MultivaluedMap<String, String> headers, InputStream entityStream) throws IOException {
-        return new BufferedReader(new InputStreamReader(entityStream));
+        return new BufferedReader(new InputStreamReader(entityStream, getCharset(mediaType)));
     }
 
     public void writeTo(Reader t, MediaType mediaType,
             MultivaluedMap<String, Object> headers, OutputStream entityStream) throws IOException {
         try {
-            writeTo(t, new OutputStreamWriter(entityStream));
+            writeTo(t, new OutputStreamWriter(entityStream, 
+                    getCharset(mediaType, UTF8)));
         } finally {
             t.close();
         }

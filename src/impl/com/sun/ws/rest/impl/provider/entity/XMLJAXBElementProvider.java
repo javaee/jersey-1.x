@@ -53,11 +53,19 @@ public final class XMLJAXBElementProvider extends AbstractJAXBElementProvider {
         }
     }
     
+    public static final String getCharsetAsString(MediaType m) {
+        return (m == null) ? null : m.getParameters().get("charset");
+    }
+    
     public void writeTo(Object t, MediaType mediaType,
             MultivaluedMap<String, Object> headers, OutputStream entityStream) throws IOException {
         try {
-            JAXBContext context = getJAXBContext(t.getClass());
+            JAXBContext context = getJAXBContext(t.getClass());            
             Marshaller marshaller = context.createMarshaller();
+            String name = getCharsetAsString(mediaType);
+            if (name != null) {
+                marshaller.setProperty(Marshaller.JAXB_ENCODING, name);
+            }
             marshaller.marshal(t, entityStream);
         } catch (JAXBException cause) {
             throw ThrowHelper.withInitCause(cause,
