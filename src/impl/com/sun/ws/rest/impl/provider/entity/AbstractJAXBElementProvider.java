@@ -25,6 +25,7 @@ package com.sun.ws.rest.impl.provider.entity;
 import java.util.Map;
 import java.util.WeakHashMap;
 import javax.ws.rs.core.Context;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.ext.ContextResolver;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -59,4 +60,8 @@ public abstract class AbstractJAXBElementProvider extends AbstractTypeEntityProv
             return context;
         }
     }
+    
+    public static final String getCharsetAsString(MediaType m) {
+        return (m == null) ? null : m.getParameters().get("charset");
+    }    
 }

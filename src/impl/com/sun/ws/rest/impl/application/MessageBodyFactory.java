@@ -23,6 +23,8 @@
 package com.sun.ws.rest.impl.application;
 
 import com.sun.ws.rest.impl.model.MediaTypeHelper;
+import com.sun.ws.rest.impl.util.KeyComparator;
+import com.sun.ws.rest.impl.util.KeyComparatorHashMap;
 import com.sun.ws.rest.spi.container.MessageBodyContext;
 import com.sun.ws.rest.spi.service.ServiceFinder;
 import java.lang.annotation.Annotation;
@@ -50,6 +52,22 @@ import javax.ws.rs.ext.MessageBodyWriter;
  */
 public final class MessageBodyFactory implements MessageBodyContext, MessageBodyWorkers {
     private static final Logger LOGGER = Logger.getLogger(MessageBodyFactory.class.getName());
+    
+    private static final KeyComparator<MediaType> MEDIA_TYPE_COMPARATOR = 
+            new KeyComparator<MediaType>() {
+        public boolean equals(MediaType x, MediaType y) {
+            return (x.getType().equalsIgnoreCase(y.getType())
+                    && x.getSubtype().equalsIgnoreCase(y.getSubtype()));
+        }
+
+        public int hash(MediaType k) {
+            return k.hashCode();
+        }
+
+        public int compare(MediaType o1, MediaType o2) {
+            throw new UnsupportedOperationException("Not supported yet.");
+        }        
+    };
     
     private final ComponentProviderCache componentProviderCache;
     
@@ -81,7 +99,9 @@ public final class MessageBodyFactory implements MessageBodyContext, MessageBody
         for (Class pc : pca)
             pcs.add(pc);
                         
-        Map<MediaType, List<T>> s = new HashMap<MediaType, List<T>>();
+        Map<MediaType, List<T>> s = new KeyComparatorHashMap<MediaType, List<T>>(
+                MEDIA_TYPE_COMPARATOR);
+        
         for (Class providerClass : pcs) {
             Object o = componentProviderCache.getComponent(providerClass);
             if (o == null) continue;

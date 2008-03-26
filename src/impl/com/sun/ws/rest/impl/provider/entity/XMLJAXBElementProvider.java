@@ -53,10 +53,6 @@ public final class XMLJAXBElementProvider extends AbstractJAXBElementProvider {
         }
     }
     
-    public static final String getCharsetAsString(MediaType m) {
-        return (m == null) ? null : m.getParameters().get("charset");
-    }
-    
     public void writeTo(Object t, MediaType mediaType,
             MultivaluedMap<String, Object> headers, OutputStream entityStream) throws IOException {
         try {

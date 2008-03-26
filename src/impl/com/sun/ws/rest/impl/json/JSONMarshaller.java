@@ -23,11 +23,12 @@ package com.sun.ws.rest.impl.json;
 
 import com.sun.ws.rest.impl.json.writer.JsonXmlStreamWriter;
 import java.io.File;
-import java.io.FileWriter;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
+import java.nio.charset.Charset;
 import java.util.Collection;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -56,10 +57,10 @@ import org.xml.sax.ContentHandler;
  *
  * @author japod
  */
-public class JSONMarshaller implements Marshaller {
+public final class JSONMarshaller implements Marshaller {
 
-    private JAXBContext jaxbContext;
-    private Marshaller jaxbMarshaller;
+    private final JAXBContext jaxbContext;
+    private final Marshaller jaxbMarshaller;
     private JSONJAXBContext.JSONNotation jsonNotation;
     private boolean jsonEnabled;
     private boolean jsonRootUnwrapping;
@@ -74,6 +75,7 @@ public class JSONMarshaller implements Marshaller {
             setProperties(properties);
         } catch (PropertyException ex) {
             Logger.getLogger(JSONMarshaller.class.getName()).log(Level.SEVERE, null, ex);
+            throw new JAXBException(ex);
         }
     }
 
@@ -83,7 +85,8 @@ public class JSONMarshaller implements Marshaller {
 
     public void marshal(Object jaxbObject, OutputStream os) throws JAXBException {
         if (jsonEnabled) {
-            jaxbMarshaller.marshal(jaxbObject, createXmlStreamWriter(new OutputStreamWriter(os)));
+            jaxbMarshaller.marshal(jaxbObject, 
+                    createXmlStreamWriter(new OutputStreamWriter(os, getCharset())));
         } else {
             jaxbMarshaller.marshal(jaxbObject, os);
         }
@@ -92,7 +95,8 @@ public class JSONMarshaller implements Marshaller {
     public void marshal(Object jaxbObject, File file) throws JAXBException {
         if (jsonEnabled) {
             try {
-                jaxbMarshaller.marshal(jaxbObject, createXmlStreamWriter(new FileWriter(file)));
+                jaxbMarshaller.marshal(jaxbObject, createXmlStreamWriter(
+                        new OutputStreamWriter(new FileOutputStream(file), getCharset())));
             } catch (IOException ex) {
                 Logger.getLogger(JSONMarshaller.class.getName()).log(
                         Level.SEVERE, "IOException caught when marshalling into a file.", ex);
@@ -238,7 +242,7 @@ public class JSONMarshaller implements Marshaller {
         }
     }
 
-    XMLStreamWriter createXmlStreamWriter(Writer writer) {
+    private XMLStreamWriter createXmlStreamWriter(Writer writer) {
         XMLStreamWriter xmlStreamWriter;
         if (JSONJAXBContext.JSONNotation.MAPPED == this.jsonNotation) {
             xmlStreamWriter = new JsonXmlStreamWriter(writer, this.jsonRootUnwrapping, this.arrays, this.nonStrings);
@@ -255,5 +259,10 @@ public class JSONMarshaller implements Marshaller {
             xmlStreamWriter = new BadgerFishXMLStreamWriter(writer);
         }
         return xmlStreamWriter;
+    }
+    
+    private Charset getCharset() throws JAXBException {
+        String charset = (String)jaxbMarshaller.getProperty(Marshaller.JAXB_ENCODING);
+        return (charset == null) ? Charset.forName("UTF-8") : Charset.forName(charset);
     }
 }

@@ -42,7 +42,7 @@ import org.codehaus.jettison.json.JSONObject;
  *
  * @author japod
  */
-public class JSONJAXBContext extends JAXBContext {
+public final class JSONJAXBContext extends JAXBContext {
     
     public static final String NAMESPACE = "com.sun.ws.rest.impl.json.";
     
@@ -56,8 +56,6 @@ public class JSONJAXBContext extends JAXBContext {
     // TODO: if need to replace jettison due to legal reasons, still want the badgerfish supported?
     public enum JSONNotation { MAPPED, MAPPED_JETTISON, BADGERFISH };
     
-    private Map<String, Object> jsonProperties;
-    
     private static final Map<String, Object> defaultJsonProperties = new HashMap<String, Object>();
     
     static {
@@ -65,7 +63,9 @@ public class JSONJAXBContext extends JAXBContext {
         defaultJsonProperties.put(JSON_ROOT_UNWRAPPING, Boolean.TRUE);
     }
     
-    JAXBContext jaxbContext;
+    private final Map<String, Object> jsonProperties = new HashMap<String, Object>();
+        
+    private final JAXBContext jaxbContext;
     
     public JSONJAXBContext(Class... classesToBeBound) throws JAXBException {
         this(classesToBeBound, Collections.unmodifiableMap(defaultJsonProperties));
@@ -107,10 +107,7 @@ public class JSONJAXBContext extends JAXBContext {
     }
     
     private Map<String, Object> getJsonProperties() {
-        if (null == this.jsonProperties) {
-            this.jsonProperties = new HashMap<String, Object>();
-        }
-        return this.jsonProperties;
+        return jsonProperties;
     }
     
     @SuppressWarnings("unchecked")

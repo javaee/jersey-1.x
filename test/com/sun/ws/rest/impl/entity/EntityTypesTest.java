@@ -68,21 +68,21 @@ public class EntityTypesTest extends AbstractTypeTester {
     public static class StringResource extends AResource<String> {}
     
     public void testString() {
-        _test(String.class, "CONTENT", StringResource.class);
+        _test("CONTENT", StringResource.class);
     }
 
     @Path("/")
     public static class ByteArrayResource extends AResource<byte[]> {}
     
     public void testByteArrayRepresentation() {
-        _test(byte[].class, "CONTENT".getBytes(), ByteArrayResource.class);
+        _test("CONTENT".getBytes(), ByteArrayResource.class);
     }
     
     @Path("/")
     public static class JAXBBeanResource extends AResource<JAXBBean> {}
     
     public void testJAXBBeanRepresentation() {
-        _test(JAXBBean.class, new JAXBBean("CONTENT"), JAXBBeanResource.class);
+        _test(new JAXBBean("CONTENT"), JAXBBeanResource.class);
     }
     
     @Path("/")
@@ -92,7 +92,7 @@ public class EntityTypesTest extends AbstractTypeTester {
         FileProvider fp = new FileProvider();
         File in = fp.readFrom(File.class, null, null, new ByteArrayInputStream("CONTENT".getBytes()));
         
-        _test(File.class, in, FileResource.class);
+        _test(in, FileResource.class);
     }
     
     @Path("/")
@@ -126,7 +126,7 @@ public class EntityTypesTest extends AbstractTypeTester {
         
         bp = new MimeBodyPart(headers3, outputStream.toByteArray());
         mmIn.addBodyPart(bp);
-        _test(MimeMultipart.class, mmIn, MimeMultipartBeanResource.class, false);
+        _test(mmIn, MimeMultipartBeanResource.class, false);
     }
     
     @Path("/")
@@ -139,7 +139,7 @@ public class EntityTypesTest extends AbstractTypeTester {
         fp.put("service", "cl");
         fp.put("source", "Gulp-CalGul-1.05");
         
-        _test(FormURLEncodedProperties.class, fp, FormResource.class);
+        _test(fp, FormResource.class);
     }
     
     @Path("/")
@@ -152,7 +152,7 @@ public class EntityTypesTest extends AbstractTypeTester {
         put("email", "a@b").
         put("password", "****");
         
-        _test(JSONObject.class, object, JSONObjectResource.class);
+        _test(object, JSONObjectResource.class);
     }
 
     @Path("/")
@@ -162,7 +162,7 @@ public class EntityTypesTest extends AbstractTypeTester {
         JSONArray array = new JSONArray();
         array.put("One").put("Two").put("Three").put(1).put(2.0);
         
-        _test(JSONArray.class, array, JSONOArrayResource.class);
+        _test(array, JSONOArrayResource.class);
     }
     
     @Path("/")
@@ -173,7 +173,7 @@ public class EntityTypesTest extends AbstractTypeTester {
         AtomFeedProvider afp = new AtomFeedProvider();
         Feed f = afp.readFrom(Feed.class, null, null, in);
         
-        _test(Feed.class, f, FeedResource.class);
+        _test(f, FeedResource.class);
     }
     
     @Path("/")
@@ -184,14 +184,14 @@ public class EntityTypesTest extends AbstractTypeTester {
         AtomEntryProvider afp = new AtomEntryProvider();
         Entry e = afp.readFrom(Entry.class, null, null, in);
         
-        _test(Entry.class, e, EntryResource.class);
+        _test(e, EntryResource.class);
     }
     
     @Path("/")
     public static class ReaderResource extends AResource<Reader> {}
     
     public void testReaderRepresentation() throws Exception {        
-        _test(Reader.class, new StringReader("CONTENT"), ReaderResource.class);
+        _test(new StringReader("CONTENT"), ReaderResource.class);
     }
     
     private final static String XML_DOCUMENT="<n:x xmlns:n=\"urn:n\"><n:e>CONTNET</n:e></n:x>";
@@ -202,7 +202,7 @@ public class EntityTypesTest extends AbstractTypeTester {
     public void testStreamSourceRepresentation() throws Exception {
         StreamSource ss = new StreamSource(
                 new ByteArrayInputStream(XML_DOCUMENT.getBytes()));
-        _test(StreamSource.class, ss, StreamSourceResource.class);
+        _test(ss, StreamSourceResource.class);
     }
     
     @Path("/")
@@ -211,7 +211,7 @@ public class EntityTypesTest extends AbstractTypeTester {
     public void testSAXSourceRepresentation() throws Exception {
         StreamSource ss = new StreamSource(
                 new ByteArrayInputStream(XML_DOCUMENT.getBytes()));
-        _test(StreamSource.class, ss, SAXSourceResource.class);
+        _test(ss, SAXSourceResource.class);
     }
     
     @Path("/")
@@ -220,7 +220,7 @@ public class EntityTypesTest extends AbstractTypeTester {
     public void testDOMSourceRepresentation() throws Exception {
         StreamSource ss = new StreamSource(
                 new ByteArrayInputStream(XML_DOCUMENT.getBytes()));
-        _test(StreamSource.class, ss, DOMSourceResource.class);
+        _test(ss, DOMSourceResource.class);
     }
     
     @Path("/")

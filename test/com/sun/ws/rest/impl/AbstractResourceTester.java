@@ -30,6 +30,7 @@ import com.sun.ws.rest.api.core.DefaultResourceConfig;
 import com.sun.ws.rest.api.client.Client;
 import com.sun.ws.rest.api.client.WebResource;
 import com.sun.ws.rest.api.client.ClientFilter;
+import com.sun.ws.rest.api.client.config.ClientConfig;
 import com.sun.ws.rest.spi.container.WebApplication;
 import java.lang.annotation.Annotation;
 import java.net.URI;
@@ -84,8 +85,20 @@ public abstract class AbstractResourceTester extends TestCase {
         return resource(relativeUri, true);
     }
     
+    protected WebResource resource(String relativeUri, ClientConfig clientConfig) {
+        return resource(relativeUri, true, clientConfig);
+    }
+    
     protected WebResource resource(String relativeUri, boolean checkStatus) {
-        Client c = new Client(new TestResourceClientHandler(BASE_URI, w));
+        return resource(relativeUri, checkStatus, null);        
+    }
+    
+    protected WebResource resource(String relativeUri, boolean checkStatus, 
+            ClientConfig clientConfig) {
+        Client c = (clientConfig == null) 
+            ? new Client(new TestResourceClientHandler(BASE_URI, w))
+            : new Client(new TestResourceClientHandler(BASE_URI, w), clientConfig);
+
         if (checkStatus) {
             c.addFilter(new ClientFilter() {
                 public ClientResponse handle(ClientRequest ro) {

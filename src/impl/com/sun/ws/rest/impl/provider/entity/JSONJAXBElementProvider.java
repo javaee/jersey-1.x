@@ -60,7 +60,8 @@ public final class JSONJAXBElementProvider extends AbstractJAXBElementProvider {
             if (unmarshaller instanceof JSONUnmarshaller) {
                 unmarshaller.setProperty(JSONJAXBContext.JSON_ENABLED, Boolean.TRUE);
                 JAXBElement jaxbElem = (JAXBElement)((JSONUnmarshaller)unmarshaller).
-                        unmarshal(entityStream, type);
+                        unmarshal(new InputStreamReader(entityStream, getCharset(mediaType)),
+                        type);
                 return jaxbElem.getValue();
             } else {
                 return unmarshaller.unmarshal(new JsonXmlStreamReader(
@@ -80,7 +81,8 @@ public final class JSONJAXBElementProvider extends AbstractJAXBElementProvider {
             Marshaller marshaller = context.createMarshaller();
             if (marshaller instanceof JSONMarshaller) {
                 marshaller.setProperty(JSONJAXBContext.JSON_ENABLED, Boolean.TRUE);
-                marshaller.marshal(t, entityStream);
+                marshaller.marshal(t, 
+                        new OutputStreamWriter(entityStream, getCharset(mediaType, UTF8)));
             } else {
                 marshaller.marshal(t, new JsonXmlStreamWriter(
                         new OutputStreamWriter(entityStream, getCharset(mediaType, UTF8))));

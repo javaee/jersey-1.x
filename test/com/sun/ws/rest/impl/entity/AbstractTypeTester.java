@@ -44,11 +44,11 @@ public abstract class AbstractTypeTester extends AbstractResourceTester {
         }
     }
 
-    protected <T> void _test(Class<T> typeT, T in, Class resource) {
-        _test(typeT, in, resource, true);
+    protected <T> void _test(T in, Class resource) {
+        _test(in, resource, true);
     }
     
-    protected <T> void _test(Class<T> typeT, T in, Class resource, boolean verify) {
+    protected <T> void _test(T in, Class resource, boolean verify) {
         initiateWebApplication(resource);
         WebResource r = resource("/");
 
