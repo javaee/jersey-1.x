@@ -249,8 +249,6 @@ public class CharsetTest extends AbstractTypeTester {
                     rib.getProperties().get("request.entity");            
             byte[] outBytes = (byte[])
                     rib.getProperties().get("response.entity");
-            System.out.println(new String(inBytes));
-            System.out.println(new String(outBytes));
             _verify(inBytes, outBytes);            
         }
     }

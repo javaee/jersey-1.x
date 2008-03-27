@@ -40,6 +40,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Cookie;
 import javax.ws.rs.core.EntityTag;
 import javax.ws.rs.core.MediaType;
@@ -49,6 +50,7 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.ResponseBuilder;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.Variant;
+import javax.ws.rs.ext.MessageBodyReader;
 
 /**
  * An abstract implementation of {@link ContainerRequest}.
@@ -198,8 +200,13 @@ public abstract class AbstractContainerRequest implements ContainerRequest {
     public <T> T getEntity(Class<T> type) {
         try {
             MediaType mediaType = getMediaType();
-            return bodyContext.getMessageBodyReader(type, mediaType).
-                    readFrom(type, null, mediaType, null, headers, entity);
+            MessageBodyReader<T> bw = bodyContext.getMessageBodyReader(type, 
+                    mediaType);
+            if (bw == null) {
+                throw new WebApplicationException(
+                        Responses.unsupportedMediaType().build());
+            }
+            return bw.readFrom(type, null, mediaType, null, headers, entity);
         } catch (IOException e) {
             throw new IllegalArgumentException(e);
         }

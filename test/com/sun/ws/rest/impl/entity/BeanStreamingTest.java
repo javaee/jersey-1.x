@@ -22,6 +22,7 @@
 
 package com.sun.ws.rest.impl.entity;
 
+import com.sun.ws.rest.api.client.ClientHandlerException;
 import com.sun.ws.rest.impl.AbstractResourceTester;
 import com.sun.ws.rest.api.client.WebResource;
 import com.sun.ws.rest.impl.provider.entity.AbstractTypeEntityProvider;
@@ -240,7 +241,7 @@ public class BeanStreamingTest extends AbstractResourceTester {
             r = resource("/plain");
             r.entity(b, "text/plain").post(Bean.class);
             assertFalse(false);
-        } catch (IllegalArgumentException ex) {
+        } catch (ClientHandlerException ex) {
             assertTrue(true);
         }
     }
@@ -277,7 +278,7 @@ public class BeanStreamingTest extends AbstractResourceTester {
             r = resource("/plain");
             r.entity(b, "text/plain").post(Bean2.class);
             assertFalse(false);
-        } catch (IllegalArgumentException ex) {
+        } catch (ClientHandlerException ex) {
             assertTrue(true);
         }
     }
@@ -300,7 +301,7 @@ public class BeanStreamingTest extends AbstractResourceTester {
             r = resource("/plain");
             r.entity(b, "text/plain").post(Bean2.class);
             assertFalse(false);
-        } catch (IllegalArgumentException ex) {
+        } catch (ClientHandlerException ex) {
             assertTrue(true);
         }
     }

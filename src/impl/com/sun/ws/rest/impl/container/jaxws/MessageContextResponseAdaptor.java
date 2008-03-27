@@ -74,7 +74,9 @@ public final class MessageContextResponseAdaptor extends AbstractContainerRespon
         }
 
         public InputStream getInputStream() throws IOException {
-            writeEntity(out);
+            if (!isCommitted()) {
+                writeEntity();
+            }
             return new ByteArrayInputStream(out.toByteArray());
         }
 
@@ -84,9 +86,6 @@ public final class MessageContextResponseAdaptor extends AbstractContainerRespon
     } 
 
     /* package */ DataSource getResultDataSource() throws IOException {
-        if (!isCommitted())
-            commitStatusAndHeaders();
-        
         return new HttpResponseDataSource();
     }
 
@@ -97,7 +96,7 @@ public final class MessageContextResponseAdaptor extends AbstractContainerRespon
         return out;
     }
     
-    protected void commitStatusAndHeaders() throws IOException {
+    protected void commitStatusAndHeaders(long contentLength) throws IOException {
         // If JAX-WS is deployed using servlet
         if (response != null) {
             response.setStatus(getStatus());

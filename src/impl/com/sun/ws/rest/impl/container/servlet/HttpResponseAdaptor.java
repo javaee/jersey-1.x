@@ -105,8 +105,10 @@ public final class HttpResponseAdaptor extends AbstractContainerResponse {
         return out;
     }
 
-    protected void commitStatusAndHeaders() throws IOException {
+    protected void commitStatusAndHeaders(long contentLength) throws IOException {
         response.setStatus(this.getStatus());
+        if (contentLength != -1 && contentLength < Integer.MAX_VALUE) 
+            response.setContentLength((int)contentLength);
         
         MultivaluedMap<String, Object> headers = this.getHttpHeaders();
         for (Map.Entry<String, List<Object>> e : headers.entrySet()) {
@@ -121,10 +123,8 @@ public final class HttpResponseAdaptor extends AbstractContainerResponse {
         if (isCommitted()) return;
         
         if (response.isCommitted()) return;
-        
-        commitStatusAndHeaders();
     
-        writeEntity(getUnderlyingOutputStream());
+        writeEntity();
     }    
     
     public  RequestDispatcher getRequestDispatcher() {

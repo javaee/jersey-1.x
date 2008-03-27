@@ -43,6 +43,7 @@ import java.util.Map;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
+import javax.ws.rs.ext.MessageBodyReader;
 import javax.ws.rs.ext.MessageBodyWriter;
 import javax.ws.rs.ext.RuntimeDelegate;
 import javax.ws.rs.ext.RuntimeDelegate.HeaderDelegate;
@@ -94,8 +95,13 @@ public class TestResourceClientHandler implements ClientHandler {
             
             try {
                 MediaType mediaType = getType();
-                return bodyContext.getMessageBodyReader(c, mediaType).
-                        readFrom(c, null, mediaType, null, metadata, responseEntity);
+                final MessageBodyReader<T> br = bodyContext.getMessageBodyReader(c, mediaType);
+                if (br == null) {
+                    throw new ClientHandlerException(
+                            "A message body reader for Java type, " + c + 
+                            ", and MIME media type, " + mediaType + ", was not found");
+                }
+                return br.readFrom(c, null, mediaType, null, metadata, responseEntity);
             } catch (IOException ex) {
                 throw new ClientHandlerException(ex);
             }
@@ -179,9 +185,14 @@ public class TestResourceClientHandler implements ClientHandler {
                     mediaType = new MediaType("application", "octet-stream");
                 }
             }
-            final MessageBodyWriter p = bodyContext.
+            final MessageBodyWriter bw = bodyContext.
                     getMessageBodyWriter(entity.getClass(), mediaType);
-            p.writeTo(entity, entity.getClass(), null, null, (MediaType)mediaType, metadata, out);
+            if (bw == null) {
+                throw new ClientHandlerException(
+                        "A message body writer for Java type, " + entity.getClass() + 
+                        ", and MIME media type, " + mediaType + ", was not found");
+            }
+            bw.writeTo(entity, entity.getClass(), null, null, (MediaType)mediaType, metadata, out);
             out.flush();
             out.close();
         } catch (IOException ex) {

@@ -116,14 +116,14 @@ public abstract class AbstractContainerResponse implements ContainerResponse {
                 if (getStatus() == 204)
                     setStatus(200);
                 isCommitted = true;
-                commitStatusAndHeaders();
+                commitStatusAndHeaders(-1);
             }
         }
         
         private void commitClose() throws IOException {
             if (!isCommitted) {
                 isCommitted = true;
-                commitStatusAndHeaders();
+                commitStatusAndHeaders(-1);
             }
         }
     };
@@ -143,14 +143,21 @@ public abstract class AbstractContainerResponse implements ContainerResponse {
      * Get the OutputStream provided by the underlying container response.
      *
      * @return the OutputStream of the underlying container response.
+     * @throws java.io.IOException if there is an error obtaining the 
+     *         underlying OutputStream.
      */
     abstract protected OutputStream getUnderlyingOutputStream() throws IOException;
     
     /**
      * Commit the status code and headers (if any) to the underlying
      * container response.
+     * 
+     * @param contentLength the length, bytes, of the entity to be written,
+     *        otherwise -1 if the length is unknown.
+     * @throws java.io.IOException if an error commiting status and headers 
+     *         occurs.
      */
-    abstract protected void commitStatusAndHeaders() throws IOException;
+    abstract protected void commitStatusAndHeaders(long contentLength) throws IOException;
     
     
     // HttpResponseContext
@@ -227,35 +234,57 @@ public abstract class AbstractContainerResponse implements ContainerResponse {
     }
     
     /**
-     * Write the entity to the output stream
-     */
-    protected final void writeEntity(OutputStream out) throws IOException {
-        final Object entity = this.getEntity();
-        if (entity != null) {
-            writeEntity(entity, out);
-        }
-    }
-    
-    /**
-     * Write the entity to the output stream
+     * Write the entity (if any) to the underlying output stream.
+     * <p>
+     * The status and headers will be committed by calling the method
+     * {@link #commitStatusAndHeaders}. The output stream will be obtained
+     * by calling the method {@link #getUnderlyingOutputStream}
+     * <p>
+     * If a {@link MessageBodyReader} cannot be found for the entity
+     * then a 406 (Not Acceptable) response is returned.
+     * 
+     * @throws java.io.IOException if there is an error writing the entity
      */
     @SuppressWarnings("unchecked")
-    protected final void writeEntity(Object entity, OutputStream out) throws IOException {
-        MediaType mediaType = null;
+    protected final void writeEntity() throws IOException {
+        if (isCommitted)
+            return;
         
-        final Object mediaTypeHeader = getHttpHeaders().getFirst("Content-Type");
-        if (mediaTypeHeader instanceof MediaType) {
-            mediaType = (MediaType)mediaTypeHeader;
-        } else {
-            if (mediaTypeHeader != null) {
-                mediaType = MediaType.parse(mediaTypeHeader.toString());
-            } else {
-                mediaType = APPLICATION_OCTET_STREAM;
-            }
+        if (entity == null) {
+            commitStatusAndHeaders(-1);
+            return;
         }
         
-        final MessageBodyWriter p = bodyContext.getMessageBodyWriter(entity.getClass(), mediaType);
-        p.writeTo(entity, entity.getClass(), null, null, mediaType, getHttpHeaders(), out);
+        final MediaType contentType = getContentType();
+        final MessageBodyWriter p = bodyContext.getMessageBodyWriter(
+                entity.getClass(), contentType);
+        // If there is no message body writer return a Not Acceptable response
+        if (p == null) {
+            setResponse(Responses.notAcceptable().build());
+            commitStatusAndHeaders(-1);
+            return;
+        }
+        
+        commitStatusAndHeaders(p.getSize(entity));
+        p.writeTo(entity, entity.getClass(), null, null, 
+                contentType, getHttpHeaders(), getUnderlyingOutputStream());
+    }
+    
+    private MessageBodyWriter getMessageBodyWriter(Object entity) {
+        return bodyContext.getMessageBodyWriter(entity.getClass(), getContentType());        
+    }
+    
+    private MediaType getContentType() {        
+        final Object mediaTypeHeader = getHttpHeaders().getFirst("Content-Type");
+        if (mediaTypeHeader instanceof MediaType) {
+            return (MediaType)mediaTypeHeader;
+        } else {
+            if (mediaTypeHeader != null) {
+                return MediaType.parse(mediaTypeHeader.toString());
+            } else {
+                return APPLICATION_OCTET_STREAM;
+            }
+        }
     }
     
     private void checkStatusAndEntity() {

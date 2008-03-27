@@ -39,6 +39,7 @@ import java.util.Map;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
+import javax.ws.rs.ext.MessageBodyReader;
 import javax.ws.rs.ext.MessageBodyWriter;
 import javax.ws.rs.ext.RuntimeDelegate;
 import javax.ws.rs.ext.RuntimeDelegate.HeaderDelegate;
@@ -81,8 +82,13 @@ public final class URLConnectionClientHandler implements ClientHandler {
         public <T> T getEntity(Class<T> c) {
             try {
                 MediaType mediaType = getType();
-                return bodyContext.getMessageBodyReader(c, mediaType).
-                        readFrom(c, null, mediaType, null, metadata, getInputStream());
+                final MessageBodyReader<T> br = bodyContext.getMessageBodyReader(c, mediaType);
+                if (br == null) {
+                    throw new ClientHandlerException(
+                            "A message body reader for Java type, " + c + 
+                            ", and MIME media type, " + mediaType + ", was not found");
+                }
+                return br.readFrom(c, null, mediaType, null, metadata, getInputStream());
             } catch (IOException ex) {
                 throw new IllegalArgumentException(ex);
             }
@@ -177,10 +183,14 @@ public final class URLConnectionClientHandler implements ClientHandler {
             }
         }
                 
-        final MessageBodyWriter p = bodyContext.
+        final MessageBodyWriter bw = bodyContext.
                 getMessageBodyWriter(entity.getClass(), mediaType);
-        
-        final long size = p.getSize(entity);
+        if (bw == null) {
+            throw new ClientHandlerException(
+                    "A message body writer for Java type, " + entity.getClass() + 
+                    ", and MIME media type, " + mediaType + ", was not found");
+        }
+        final long size = bw.getSize(entity);
         if (size != -1 && size < Integer.MAX_VALUE) {
             // HttpURLConnection uses the int type for content length
             uc.setFixedLengthStreamingMode((int)size);
@@ -191,7 +201,7 @@ public final class URLConnectionClientHandler implements ClientHandler {
         }
         
         final OutputStream out = uc.getOutputStream();
-        p.writeTo(entity, entity.getClass(), null, null, mediaType, metadata, out);        
+        bw.writeTo(entity, entity.getClass(), null, null, mediaType, metadata, out);        
         out.flush();
         out.close();
     }

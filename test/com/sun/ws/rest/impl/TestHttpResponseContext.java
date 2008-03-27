@@ -46,15 +46,13 @@ public class TestHttpResponseContext extends AbstractContainerResponse {
         return baos;
     }
 
-    protected void commitStatusAndHeaders() throws IOException {
+    protected void commitStatusAndHeaders(long contentLength) throws IOException {
     }
     
     public void commitAll() throws IOException {
         if (isCommitted()) return;
         
-        commitStatusAndHeaders();
-    
-        writeEntity(getUnderlyingOutputStream());
+        writeEntity();
     }
 
     public ByteArrayOutputStream getUnderlyingByteArrayOutputStream() {

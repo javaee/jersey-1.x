@@ -156,9 +156,9 @@ public final class MessageBodyFactory implements MessageBodyContext, MessageBody
                     return p;
             }
         }
-        
-        throw new IllegalArgumentException("A message body reader for Java type, " + type + 
+        LOGGER.severe("A message body reader for Java type, " + type + 
                 ", and MIME media type, " + mediaType + ", was not found");    
+        return null;
     }
 
     @SuppressWarnings("unchecked")
@@ -174,8 +174,9 @@ public final class MessageBodyFactory implements MessageBodyContext, MessageBody
             }
         }
         
-        throw new IllegalArgumentException("A message body writer for Java type, " + type + 
+        LOGGER.severe("A message body writer for Java type, " + type + 
                 ", and MIME media type, " + mediaType + ", was not found");
+        return null;
     }
 
     private List<MediaType> createSearchList(MediaType mediaType) {

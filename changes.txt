@@ -2,6 +2,14 @@ release 0.7 (2008-04-18)
 - Fixed issue 44: Support dependency injection of proxied resources
   https://jersey.dev.java.net/issues/show_bug.cgi?id=44
   Added method ComponentProvider.getInjectableInstance
+- The AbstractContainerResponse.writeEntity methods are reduced to one
+  method that takes no arguments. This is responsible for committing the
+  status, headers and writing out the entity (if any), and returning a 406
+  (Not Acceptable) if a message body reader could not be found to serialize
+  the entity for the required media type.
+- The AbstractContainerResponse.commitStatusAndHeaders was modified to take
+  a parameter that is the known length in bytes of the entity to be written
+  as the representation of a response.
 - Partially Integrated JSR 311 API 0.7
   - Use @Context to inject HttpServletRequest, HttpServletResponse, 
     ServletConfig and ServletContext instances on JAX-RS/Jersey-based 
@@ -29,7 +37,14 @@ release 0.7 (2008-04-18)
   - javax.ws.rs.core.ApplicationConfig is the abstract base class of
     com.sun.ws.rest.api.core.ResourceConfig.
     ResourceConfig has changed from an interface to an abstract class.
+  - Media type charset parameter is recognized for reading/writing
+    Java types for text-based content. Default charset is UTF-8 if charset 
+    parameter is absent.
+  - If a message body reader cannot be found return 415 (Unsupported Media Type)
+  - if a message body writer cannot be found return 406 (Not Acceptable)
 
+Support media type charset parameter when reading/writing Java types
+    for text-based
 release 0.6.1 (2008-03-18)
 - Support for xml attributes serialization/deserialization in JSON added
   (as a fix for 43)

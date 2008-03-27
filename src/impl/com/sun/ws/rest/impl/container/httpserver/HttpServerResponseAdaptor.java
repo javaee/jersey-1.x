@@ -53,10 +53,10 @@ public final class HttpServerResponseAdaptor extends AbstractContainerResponse {
         return exchange.getResponseBody();
     }
 
-    protected void commitStatusAndHeaders() throws IOException {
+    protected void commitStatusAndHeaders(long contentLength) throws IOException {
         commitHeaders();
-        
-        exchange.sendResponseHeaders(this.getStatus(), 0);
+        exchange.sendResponseHeaders(this.getStatus(), 
+                contentLength == -1 ? 0 : contentLength);
     }
     
     //
@@ -79,20 +79,17 @@ public final class HttpServerResponseAdaptor extends AbstractContainerResponse {
             return;
         }
         
-        commitHeaders();
-        
-        Object entity = this.getEntity();
-        if (entity != null) {
-            exchange.sendResponseHeaders(this.getStatus(), 0);
-            writeEntity(entity, getUnderlyingOutputStream());
+        if (this.getEntity() != null) {
+            writeEntity();
         } else {
+            commitHeaders();
             exchange.sendResponseHeaders(this.getStatus(), -1);
         }
+        
         // This is required for the LW HTTP server shipped with Java SE 6
         // exchange.close() does not work as documented
         exchange.getResponseBody().flush();
         exchange.getResponseBody().close();
         exchange.close();        
     }
-
 }
