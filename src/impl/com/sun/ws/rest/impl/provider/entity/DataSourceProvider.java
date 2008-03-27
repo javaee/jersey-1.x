@@ -40,8 +40,9 @@ public class DataSourceProvider extends AbstractTypeEntityProvider<DataSource> {
     }
 
     public DataSource readFrom(Class<DataSource> type, MediaType mediaType,
-            MultivaluedMap<String, String> headers, InputStream entityStream) throws IOException {
-        ByteArrayDataSource ds = new ByteArrayDataSource(entityStream, mediaType.toString());
+            MultivaluedMap<String, String> headers, InputStream entityStream) throws IOException {        
+        ByteArrayDataSource ds = new ByteArrayDataSource(entityStream, 
+                (mediaType == null) ? null : mediaType.toString());
         return ds;
     }
 

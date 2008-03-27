@@ -38,9 +38,11 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.Reader;
 import java.io.StringReader;
+import javax.activation.DataSource;
 import javax.mail.internet.InternetHeaders;
 import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMultipart;
+import javax.mail.util.ByteArrayDataSource;
 import javax.ws.rs.ConsumeMime;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -65,12 +67,40 @@ public class EntityTypesTest extends AbstractTypeTester {
     }
     
     @Path("/")
+    public static class InputStreamResource {
+        @POST
+        public InputStream post(InputStream in) throws IOException {
+            ByteArrayOutputStream out = new ByteArrayOutputStream();
+            int read;
+            final byte[] data = new byte[2048];
+            while ((read = in.read(data)) != -1)
+                out.write(data, 0, read);
+            
+            return new ByteArrayInputStream(out.toByteArray());
+        }                
+    }
+    
+    public void testInputStream() {
+        ByteArrayInputStream in = new ByteArrayInputStream("CONTENT".getBytes());
+        _test(in, InputStreamResource.class);
+    }
+    
+    @Path("/")
     public static class StringResource extends AResource<String> {}
     
     public void testString() {
         _test("CONTENT", StringResource.class);
     }
 
+    @Path("/")
+    public static class DataSourceResource extends AResource<DataSource> {}
+    
+    public void testDataSource() throws Exception {
+        ByteArrayInputStream bais = new ByteArrayInputStream("CONTENT".getBytes());
+        ByteArrayDataSource ds = new ByteArrayDataSource(bais, "text/plain");        
+        _test(ds, DataSourceResource.class);
+    }
+    
     @Path("/")
     public static class ByteArrayResource extends AResource<byte[]> {}
     
