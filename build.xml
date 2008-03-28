@@ -315,8 +315,8 @@
                 instrpath="${build.classes.dir}"
                 mode="overwrite" 
                 metadatafile="build/emma/metadata.emma">
-            <!-- ignore WADL generated JAXB classes -->
-            <filter excludes="com.sun.research.*" />
+            <!-- ignore WADL generated JAXB classes and l18n helper -->
+            <filter excludes="com.sun.research.*, com.sun.localization.*" />
           </instr>
         </emma>
         
