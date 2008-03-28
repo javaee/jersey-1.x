@@ -22,7 +22,7 @@
 
 package com.sun.ws.rest.impl.model.parameter;
 
-import com.sun.ws.rest.api.core.HttpRequestContext;
+import com.sun.ws.rest.api.core.HttpContext;
 import com.sun.ws.rest.api.model.Parameter;
 import java.util.HashMap;
 import java.util.Map;
@@ -38,24 +38,29 @@ import javax.ws.rs.core.UriInfo;
 public final class HttpContextParameterProcessor implements ParameterProcessor {
         
     private static final class HttpRequestContextExtractor implements ParameterExtractor {
-        public Object extract(HttpRequestContext request) {
-            return request;
+        public Object extract(HttpContext context) {
+            return context.getRequest();
+        }
+    }
+    
+    private static final class UriInfoExtractor implements ParameterExtractor {
+        public Object extract(HttpContext context) {
+            return context.getUriInfo();
         }
     }
     
     private final Map<Class<?>, ParameterExtractor> extractors;
     
-    private final HttpRequestContextExtractor extractor;
-    
-    public HttpContextParameterProcessor() {
-        extractor = new HttpRequestContextExtractor();
-        
+    public HttpContextParameterProcessor() {        
         extractors = new HashMap<Class<?>, ParameterExtractor>();
         
-        extractors.put(HttpHeaders.class, extractor);
-        extractors.put(UriInfo.class, extractor);
-        extractors.put(Request.class, extractor);
-        extractors.put(SecurityContext.class, extractor);
+        HttpRequestContextExtractor re = new HttpRequestContextExtractor();
+        extractors.put(HttpHeaders.class, re);
+        extractors.put(Request.class, re);
+        extractors.put(SecurityContext.class, re);
+        
+        UriInfoExtractor ue = new UriInfoExtractor();
+        extractors.put(UriInfo.class, ue);
     }
     
     public ParameterExtractor process(Parameter parameter) {

@@ -22,6 +22,7 @@
 
 package com.sun.ws.rest.impl.model.method.dispatch;
 
+import com.sun.ws.rest.api.core.HttpContext;
 import com.sun.ws.rest.api.core.HttpRequestContext;
 import com.sun.ws.rest.api.core.HttpResponseContext;
 import com.sun.ws.rest.api.model.AbstractResourceMethod;
@@ -40,11 +41,13 @@ public class HttpReqResDispatchProvider implements ResourceMethodDispatchProvide
             super(abstractResourceMethod);
         }
 
-        public void _dispatch(Object resource, HttpRequestContext request, HttpResponseContext response) 
+        public void _dispatch(Object resource, HttpContext context) 
         throws IllegalAccessException, InvocationTargetException {
-            method.invoke(resource, request, response);
-            MediaType m = getAcceptableMediaType(request);
-            if (m != null) response.getHttpHeaders().putSingle("Content-Type", m);
+            method.invoke(resource, context.getRequest(), context.getResponse());
+            MediaType m = getAcceptableMediaType(context.getRequest());
+            if (m != null) 
+                context.getResponse().
+                        getHttpHeaders().putSingle("Content-Type", m);
         }
     }
 

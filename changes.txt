@@ -1,4 +1,10 @@
 release 0.7 (2008-04-18)
+- Renamed HttpContextAccess to HttpContext. Changed getHttpRequestContext
+  and getHttpResponseContext methods to getRequest and getResponse respectively.
+- UriRuleContext extends HttpContext. Removed UriRuleContext.getHttpContext()
+  method.
+- UriInfo interface is removed from HttpRequestContext. UriInfo is now
+  accessible from HttpContext.getUriInfo()
 - Fixed issue 44: Support dependency injection of proxied resources
   https://jersey.dev.java.net/issues/show_bug.cgi?id=44
   Added method ComponentProvider.getInjectableInstance

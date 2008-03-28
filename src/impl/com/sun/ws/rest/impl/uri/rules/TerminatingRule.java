@@ -22,7 +22,6 @@
 
 package com.sun.ws.rest.impl.uri.rules;
 
-import com.sun.ws.rest.api.core.HttpResponseContext;
 import com.sun.ws.rest.spi.uri.rules.UriRule;
 import com.sun.ws.rest.spi.uri.rules.UriRuleContext;
 
@@ -36,9 +35,6 @@ import com.sun.ws.rest.spi.uri.rules.UriRuleContext;
 public class TerminatingRule implements UriRule {
    
     public final boolean accept(CharSequence path, Object resource, UriRuleContext context) {
-        final HttpResponseContext response = context.getHttpContext().
-            getHttpResponseContext();
-
-        return response.isResponseSet();
+        return context.getResponse().isResponseSet();
     }    
 }

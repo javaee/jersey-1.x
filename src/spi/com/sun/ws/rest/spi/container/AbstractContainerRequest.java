@@ -23,8 +23,6 @@
 package com.sun.ws.rest.spi.container;
 
 import com.sun.ws.rest.api.Responses;
-import com.sun.ws.rest.api.uri.UriComponent;
-import com.sun.ws.rest.impl.MultivaluedMapImpl;
 import com.sun.ws.rest.impl.RequestHttpHeadersImpl;
 import com.sun.ws.rest.impl.VariantSelector;
 import com.sun.ws.rest.impl.http.header.reader.HttpHeaderReader;
@@ -37,7 +35,6 @@ import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import javax.ws.rs.WebApplicationException;
@@ -45,7 +42,6 @@ import javax.ws.rs.core.Cookie;
 import javax.ws.rs.core.EntityTag;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
-import javax.ws.rs.core.PathSegment;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.ResponseBuilder;
 import javax.ws.rs.core.UriBuilder;
@@ -104,46 +100,14 @@ public abstract class AbstractContainerRequest implements ContainerRequest {
      */
     protected URI completeUri;
     
-    /**
-     * The absolute URI of a request that is equivalent to the complete URI
-     * minus the query and fragment components.
-     * <p>
-     * The absolute URI must be equivalent to the following:
-     *
-     *   UriBuilder.fromUri(completeUri).
-     *       replaceQuery(null).fragment(null).build();
-     *
-     *   UriBuilder.fromUri(baseUri).encode(false).
-     *       append(encodedPath).build();
-     */
-    private URI absoluteUri;
-    
-    /**
-     * The percent-encoded path component.
-     *
-     * The path is relative to the path component of the base URI. The path
-     * must not start with a '/'.
-     */
-    private String encodedPath;
-    
-    /**
-     * The decoded path component.
-     */
-    private String decodedPath;
-    
-    private List<PathSegment> decodedPathSegments;
-    private List<PathSegment> encodedPathSegments;
-    
-    private MultivaluedMap<String, String> decodedQueryParameters;
-    private MultivaluedMap<String, String> encodedQueryParameters;
-    
-    private MultivaluedMapImpl encodedTemplateValues;
-    private MultivaluedMapImpl decodedTemplateValues;
-    
+    private URI absolutePathUri;
     
     private MultivaluedMap<String, String> headers;
+
     private MediaType contentType;
+    
     private List<MediaType> accept;
+    
     private Map<String, Cookie> cookies;
     
     /**
@@ -157,27 +121,26 @@ public abstract class AbstractContainerRequest implements ContainerRequest {
         this.bodyContext = bodyContext;
         this.method = method;
         this.headers = new RequestHttpHeadersImpl();
-        this.encodedTemplateValues = new MultivaluedMapImpl();
         this.entity = entity;
     }
     
-    // ContainerRequest
+    // HttpRequestContext
     
-    public void addTemplateValues(List<String> names, List<String> values) {
-        int i = 0;
-        for (String name : names) {
-            final String value = values.get(i++);
-            encodedTemplateValues.addFirst(name, value);
-            
-            if (decodedTemplateValues != null) {
-                decodedTemplateValues.addFirst(
-                        UriComponent.decode(name, UriComponent.Type.PATH_SEGMENT),
-                        UriComponent.decode(value, UriComponent.Type.PATH));                
-            }
-        }
+    public URI getBaseUri() {
+        return baseUri;
+    }
+       
+    public URI getRequestUri() {
+        return completeUri;
     }
     
-    // HttpRequestContext
+    public URI getAbsolutePath() {
+        if (absolutePathUri != null) return absolutePathUri;
+        
+        return absolutePathUri = UriBuilder.fromUri(completeUri).encode(false).
+                replaceQueryParams("").fragment("").
+                build();        
+    }
     
     public String getHeaderValue(String name) {
         final List<String> v = getRequestHeaders().get(name);
@@ -227,131 +190,7 @@ public abstract class AbstractContainerRequest implements ContainerRequest {
         
         return null;
     }
-    
-    // UriInfo
-    
-    public String getPath() {
-        return getPath(true);
-    }
-    
-    public String getPath(boolean decode) {
-        if (decode) {
-            if (decodedPath != null) return decodedPath;
-            
-            return decodedPath = UriComponent.decode(
-                    getEncodedPath(),
-                    UriComponent.Type.PATH);
-        } else {
-            return getEncodedPath();
-        }
-    }
-    
-    private String getEncodedPath() {
-        if (encodedPath != null) return encodedPath;
-        
-        return encodedPath  = completeUri.getRawPath().substring(
-                baseUri.getRawPath().length());
-    }
-    
-    public List<PathSegment> getPathSegments() {
-        return getPathSegments(true);
-    }
-    
-    public List<PathSegment> getPathSegments(boolean decode) {
-        if (decode) {
-            if (decodedPathSegments != null)
-                return decodedPathSegments;
-            
-            return decodedPathSegments = extractPathSegments(getPath(false), true);
-        } else {
-            if (encodedPathSegments != null)
-                return encodedPathSegments;
-            
-            return encodedPathSegments = extractPathSegments(getPath(false), false);
-        }
-    }
-    
-    public URI getBaseUri() {
-        return baseUri;
-    }
-    
-    public UriBuilder getBaseUriBuilder() {
-        return UriBuilder.fromUri(getBaseUri());
-    }
-    
-    public URI getAbsolutePath() {
-        if (absoluteUri != null) return absoluteUri;
-        
-        return absoluteUri = getRequestUriBuilder().encode(false).
-                replaceQueryParams("").fragment("").
-                build();
-    }
-    
-    public UriBuilder getAbsolutePathBuilder() {
-        return UriBuilder.fromUri(getAbsolutePath());
-    }
-    
-    public URI getRequestUri() {
-        return completeUri;
-    }
-    
-    public UriBuilder getRequestUriBuilder() {
-        return UriBuilder.fromUri(getRequestUri());
-    }
-    
-    public MultivaluedMap<String, String> getTemplateParameters() {
-        return getTemplateParameters(true);
-    }
-    
-    public MultivaluedMap<String, String> getTemplateParameters(boolean decode) {
-        if (decode) {
-            if (decodedTemplateValues != null)
-                return decodedTemplateValues;
-            
-            decodedTemplateValues = new MultivaluedMapImpl();
-            for (Map.Entry<String, List<String>> e : encodedTemplateValues.entrySet()) {
-                List<String> l = new ArrayList<String>();
-                for (String v : e.getValue()) {
-                    l.add(UriComponent.decode(v, UriComponent.Type.PATH));
-                }
-                decodedTemplateValues.put(
-                        UriComponent.decode(e.getKey(), UriComponent.Type.PATH_SEGMENT),
-                        l);
-            }
-            
-            return decodedTemplateValues;
-        } else {
-            return encodedTemplateValues;
-        }
-    }
-    
-    public MultivaluedMap<String, String> getQueryParameters() {
-        return getQueryParameters(true);
-    }
-    
-    public MultivaluedMap<String, String> getQueryParameters(boolean decode) {
-        if (decode) {
-            if (decodedQueryParameters != null)
-                return decodedQueryParameters;
-            
-            return decodedQueryParameters = UriComponent.decodeQuery(
-                    getRequestUri(), true);
-        } else {
-            if (encodedQueryParameters != null)
-                return encodedQueryParameters;
-            
-            return encodedQueryParameters = UriComponent.decodeQuery(
-                    getRequestUri(), false);
-        }
-    }
 
-    public List<String> getAncestorResourceURIs() {
-        throw new UnsupportedOperationException();
-    }
-    
-    public List<Object> getAncestorResources() {
-        throw new UnsupportedOperationException();        
-    }
     
     // HttpHeaders
     
@@ -382,99 +221,6 @@ public abstract class AbstractContainerRequest implements ContainerRequest {
             cookies = new HashMap<String, Cookie>();
         
         return cookies;
-    }
-    
-    
-    private static final class PathSegmentImpl implements PathSegment {
-        private String path;
-        
-        private MultivaluedMap<String, String> matrixParameters;
-        
-        PathSegmentImpl(String path, MultivaluedMap<String, String> matrixParameters) {
-            this.path = path;
-            this.matrixParameters = matrixParameters;
-        }
-        
-        public String getPath() {
-            return path;
-        }
-        
-        public MultivaluedMap<String, String> getMatrixParameters() {
-            return matrixParameters;
-        }
-    }
-    
-    /**
-     * Extract the path segments from the path
-     * TODO: This is not very efficient
-     */
-    private List<PathSegment> extractPathSegments(String path, boolean decode) {
-        List<PathSegment> pathSegments = new LinkedList<PathSegment>();
-        
-        if (path == null)
-            return pathSegments;
-        
-        // TODO the extraction algorithm requires an absolute path
-        if (!path.startsWith("/")) {
-            path = "/" + path;
-        }
-        
-        String[] subPaths = path.split("/");
-        if (subPaths.length == 0) {
-            PathSegment pathSegment = new PathSegmentImpl("", new MultivaluedMapImpl());
-            pathSegments.add(pathSegment);
-            return pathSegments;
-        }
-        
-        for (String subPath : subPaths) {
-            if (subPath.length() == 0)
-                continue;
-            
-            MultivaluedMap<String, String> matrixMap = new MultivaluedMapImpl();
-            int colon = subPath.indexOf(';');
-            if (colon != -1) {
-                String matrixParameters = subPath.substring(colon + 1);
-                subPath = (colon == 0) ? "" : subPath.substring(0, colon);
-                extractPathParameters(matrixParameters, ";", matrixMap, decode);
-            }
-            
-            if (decode)
-                subPath = UriComponent.decode(subPath, UriComponent.Type.PATH_SEGMENT);
-            
-            PathSegment pathSegment = new PathSegmentImpl(subPath, matrixMap);
-            pathSegments.add(pathSegment);
-        }
-        
-        return pathSegments;
-    }
-    
-    /**
-     * TODO: This is not very efficient
-     */
-    private void extractPathParameters(String parameters, String deliminator,
-            MultivaluedMap<String, String> map, boolean decode) {
-        for (String s : parameters.split(deliminator)) {
-            if (s.length() == 0)
-                continue;
-            
-            String[] keyVal = s.split("=");
-            String key = (decode)
-            ? UriComponent.decode(keyVal[0], UriComponent.Type.PATH_SEGMENT)
-            : keyVal[0];
-            if (key.length() == 0)
-                continue;
-            
-            // parameter may not have a value, if so default to "";
-            String val = (keyVal.length == 2) ?
-                (decode) ? UriComponent.decode(keyVal[1], UriComponent.Type.PATH_SEGMENT) : keyVal[1] : "";
-            
-            List<String> list = map.get(key);
-            if (map.get(key) == null) {
-                list = new LinkedList<String>();
-                map.put(key, list);
-            }
-            list.add(val);
-        }
     }
     
     
@@ -612,5 +358,4 @@ public abstract class AbstractContainerRequest implements ContainerRequest {
     public String getAuthenticationScheme() {
         throw new UnsupportedOperationException();
     }
-    
 }

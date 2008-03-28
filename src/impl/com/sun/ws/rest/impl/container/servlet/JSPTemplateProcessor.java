@@ -22,7 +22,7 @@
 
 package com.sun.ws.rest.impl.container.servlet;
 
-import com.sun.ws.rest.api.core.HttpContextAccess;
+import com.sun.ws.rest.api.core.HttpContext;
 import com.sun.ws.rest.api.core.HttpResponseContext;
 import com.sun.ws.rest.spi.template.TemplateProcessor;
 import java.io.IOException;
@@ -58,10 +58,10 @@ public class JSPTemplateProcessor implements TemplateProcessor {
         return path;        
     }
 
-    @Context HttpContextAccess hca;
+    @Context HttpContext hca;
     
     public void writeTo(String resolvedPath, Object model, OutputStream out) throws IOException {
-        HttpResponseContext response = hca.getHttpResponseContext();
+        HttpResponseContext response = hca.getResponse();
         ((HttpResponseAdaptor)response).forwardTo(resolvedPath, model);
     }
 }

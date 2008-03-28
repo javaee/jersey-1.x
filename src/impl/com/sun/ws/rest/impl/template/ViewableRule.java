@@ -46,8 +46,7 @@ public class ViewableRule implements UriRule {
     }
     
     public final boolean accept(CharSequence path, Object resource, UriRuleContext context) {
-        final HttpRequestContext request = context.getHttpContext().
-                getHttpRequestContext();
+        final HttpRequestContext request = context.getRequest();
         // Only accept GET requests
         if (!request.getHttpMethod().equals("GET"))
             return false;
@@ -63,8 +62,7 @@ public class ViewableRule implements UriRule {
         for (TemplateProcessor t : tc.getTemplateProcessors()) {
             String resolvedPath = t.resolve(absoluteTemplatePath);
             if (resolvedPath != null) {
-                 final HttpResponseContext response = context.getHttpContext().
-                        getHttpResponseContext();
+                 final HttpResponseContext response = context.getResponse();
                
                 response.setResponse(
                     Response.ok(new ResolvedViewable(t, resolvedPath, resource)).
@@ -96,14 +94,13 @@ public class ViewableRule implements UriRule {
      * TODO use the complete URI.
      */
     private boolean redirect(UriRuleContext context) {
-        final HttpRequestContext request = context.getHttpContext().
-                getHttpRequestContext();
-        final HttpResponseContext response = context.getHttpContext().
-                getHttpResponseContext();
+        final HttpRequestContext request = context.getRequest();
+        final HttpResponseContext response = context.getResponse();
         
         response.setResponse(
                 Response.temporaryRedirect(
-                    UriBuilder.fromUri(request.getAbsolutePath()).path("/").build()
+                    UriBuilder.fromUri(context.getUriInfo().
+                    getAbsolutePath()).path("/").build()
                 ).build()
                 );
         return true;

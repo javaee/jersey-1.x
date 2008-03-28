@@ -23,7 +23,7 @@
 package com.sun.ws.rest.impl.resource;
 
 import com.sun.ws.rest.api.container.ContainerException;
-import com.sun.ws.rest.api.core.HttpRequestContext;
+import com.sun.ws.rest.api.core.HttpContext;
 import com.sun.ws.rest.api.model.AbstractResource;
 import com.sun.ws.rest.api.model.AbstractResourceConstructor;
 import com.sun.ws.rest.impl.model.parameter.ParameterExtractor;
@@ -70,8 +70,7 @@ public final class PerRequestProvider implements ResourceProvider {
         }
     }
 
-    public Object getInstance(ComponentProvider provider, 
-            HttpRequestContext request) {
+    public Object getInstance(ComponentProvider provider, HttpContext context) {
         try {
             if (constructor == null) {
                 return provider.getInstance(Scope.ApplicationDefined, c);
@@ -81,7 +80,7 @@ public final class PerRequestProvider implements ResourceProvider {
                     if (extractors[i] == null)
                         values[i] = null;
                     else
-                        values[i] = extractors[i].extract(request);
+                        values[i] = extractors[i].extract(context);
                 }
                 return provider.getInstance(Scope.ApplicationDefined, 
                     constructor, values);

@@ -76,10 +76,8 @@ public final class HttpMethodRule implements UriRule {
         // If the path is not empty then do not accept
         if (path.length() > 0) return false;
         
-        final HttpRequestContext request = context.getHttpContext().
-                getHttpRequestContext();
-        final HttpResponseContext response = context.getHttpContext().
-                getHttpResponseContext();
+        final HttpRequestContext request = context.getRequest();
+        final HttpResponseContext response = context.getResponse();
         final String httpMethod = request.getHttpMethod();
         final MediaType contentType = HttpHelper.getContentType(request);
         
@@ -105,7 +103,7 @@ public final class HttpMethodRule implements UriRule {
             // Set the template values
             context.setTemplateValues(method.getTemplateVariables());
             
-            method.getDispatcher().dispatch(resource, request, response);
+            method.getDispatcher().dispatch(resource, context);
 
             // Verify the response
             // TODO verification for HEAD

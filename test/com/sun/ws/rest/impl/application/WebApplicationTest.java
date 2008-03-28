@@ -35,6 +35,8 @@ import java.util.HashSet;
 import java.util.Set;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.UriInfo;
 import junit.framework.*;
 
 /**
@@ -49,12 +51,14 @@ public class WebApplicationTest extends TestCase {
     
     @Path("/{arg1}/{arg2}")
     public static class TestOneWebResource {
+        @Context UriInfo info;
+        
         @GET
         public void handleRequest(HttpRequestContext request, HttpResponseContext response) {
             assertEquals("GET", request.getHttpMethod());
             
-            assertEquals("a", request.getTemplateParameters().getFirst("arg1"));
-            assertEquals("b", request.getTemplateParameters().getFirst("arg2"));
+            assertEquals("a", info.getTemplateParameters().getFirst("arg1"));
+            assertEquals("b", info.getTemplateParameters().getFirst("arg2"));
             
             String s = request.getEntity(String.class);
             assertEquals("RESOURCE-ONE", s);
@@ -63,12 +67,14 @@ public class WebApplicationTest extends TestCase {
     
     @Path("/{arg1}")
     public static class TestTwoWebResource {
+        @Context UriInfo info;
+        
         @GET
         public void handleRequest(HttpRequestContext request, HttpResponseContext response) {
             assertEquals("GET", request.getHttpMethod());
             
-            System.out.println(request.getPath());
-            String v = request.getTemplateParameters().getFirst("arg1");
+            System.out.println(info.getPath());
+            String v = info.getTemplateParameters().getFirst("arg1");
             boolean b = v.equals("a") || v.equals("a.foo");
             assertTrue(b);
             
@@ -79,12 +85,14 @@ public class WebApplicationTest extends TestCase {
     
     @Path("/{arg1}.xml")
     public static class TestThreeWebResource {
+        @Context UriInfo info;
+        
         @GET
         public void handleRequest(HttpRequestContext request, HttpResponseContext response) {
             assertEquals("GET", request.getHttpMethod());
             
-            System.out.println(request.getPath());
-            assertEquals("a", request.getTemplateParameters().getFirst("arg1"));
+            System.out.println(info.getPath());
+            assertEquals("a", info.getTemplateParameters().getFirst("arg1"));
             
             String s = request.getEntity(String.class);
             assertEquals("RESOURCE-THREE", s);

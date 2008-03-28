@@ -22,8 +22,7 @@
 
 package com.sun.ws.rest.impl.model.method.dispatch;
 
-import com.sun.ws.rest.api.core.HttpRequestContext;
-import com.sun.ws.rest.api.core.HttpResponseContext;
+import com.sun.ws.rest.api.core.HttpContext;
 import com.sun.ws.rest.api.model.AbstractResourceMethod;
 import com.sun.ws.rest.spi.dispatch.RequestDispatcher;
 import java.lang.reflect.InvocationTargetException;
@@ -39,7 +38,7 @@ public class VoidVoidDispatchProvider implements ResourceMethodDispatchProvider 
             super(abstractResourceMethod);
         }
 
-        public void _dispatch(Object resource, HttpRequestContext request, HttpResponseContext response) 
+        public void _dispatch(Object resource, HttpContext context) 
         throws IllegalAccessException, InvocationTargetException {
             method.invoke(resource);
         }

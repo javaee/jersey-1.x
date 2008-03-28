@@ -22,8 +22,7 @@
 
 package com.sun.ws.rest.impl.model.method;
 
-import com.sun.ws.rest.api.core.HttpRequestContext;
-import com.sun.ws.rest.api.core.HttpResponseContext;
+import com.sun.ws.rest.api.core.HttpContext;
 import com.sun.ws.rest.spi.dispatch.RequestDispatcher;
 import com.sun.ws.rest.impl.model.MediaTypeHelper;
 import java.util.List;
@@ -56,11 +55,9 @@ public final class ResourceHttpOptionsMethod extends ResourceMethod {
             return s.toString();
         }
     
-        public void dispatch(Object resource, 
-                HttpRequestContext requestContext, 
-                HttpResponseContext responseContext) {
+        public void dispatch(Object resource, HttpContext context) {
             Response r = Response.noContent().header("Allow", allow).build();
-            responseContext.setResponse(r, null);
+            context.getResponse().setResponse(r, null);
         }
     }
     

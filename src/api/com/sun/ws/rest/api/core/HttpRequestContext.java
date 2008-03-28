@@ -22,18 +22,41 @@
 
 package com.sun.ws.rest.api.core;
 
+import java.net.URI;
 import java.util.List;
+import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Request;
 import javax.ws.rs.core.SecurityContext;
-import javax.ws.rs.core.UriInfo;
+import javax.ws.rs.core.UriBuilder;
 
 /**
  * An abstraction for a HTTP request
  */
-public interface HttpRequestContext extends HttpHeaders, UriInfo, 
+public interface HttpRequestContext extends HttpHeaders,
         Request, SecurityContext {
+    
+    /**
+     * Get the base URI of the request.
+     * 
+     * @return the base URI.
+     */
+    URI getBaseUri();
+       
+    /**
+     * Get the (complete) request URI.
+     * 
+     * @return the request URI.
+     */
+    URI getRequestUri();
+    
+    /**
+     * Get the absolute path URI of the request.
+     * 
+     * @return the absolute URI.
+     */
+    URI getAbsolutePath();
     
     /**
      * Get a HTTP header value.
@@ -44,7 +67,7 @@ public interface HttpRequestContext extends HttpHeaders, UriInfo,
      * the empty string is returned. If the HTTP header is present more than
      * once then the values of joined together and separated by a ',' character.
      */
-    public String getHeaderValue(String name);
+    String getHeaderValue(String name);
 
     /**
      * Select the first media type, from a list of media types, that is most
@@ -54,22 +77,22 @@ public interface HttpRequestContext extends HttpHeaders, UriInfo,
      * @return the most acceptable media type, or null if no media type
      *         was found to be acceptable.
      */
-    public MediaType getAcceptableMediaType(List<MediaType> mediaTypes);
+    MediaType getAcceptableMediaType(List<MediaType> mediaTypes);
     
     /**
      * Get the request entity, returns null if the request does not
      * contain an entity body.
+     * 
      * @return the request entity or null
      * @param type the type of entity
-     * @throws java.lang.IllegalArgumentException if the content of the request
+     * @throws WebApplicationException if the content of the request
      * cannot be mapped to an entity of the requested type
      */
-    public <T> T getEntity(Class<T> type) 
-      throws IllegalArgumentException;
+    <T> T getEntity(Class<T> type) throws WebApplicationException;
         
     /**
      * Get the HTTP method name
      * @return the method name as a String
      */
-    public String getHttpMethod();
+    String getHttpMethod();
 }

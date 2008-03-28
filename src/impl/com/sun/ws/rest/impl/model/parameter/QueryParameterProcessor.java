@@ -22,7 +22,7 @@
 
 package com.sun.ws.rest.impl.model.parameter;
 
-import com.sun.ws.rest.api.core.HttpRequestContext;
+import com.sun.ws.rest.api.core.HttpContext;
 import com.sun.ws.rest.api.model.Parameter;
 
 /**
@@ -40,8 +40,8 @@ public final class QueryParameterProcessor implements ParameterProcessor {
             this.decode = decode;
         }
         
-        public Object extract(HttpRequestContext request) {
-            return extractor.extract(request.getQueryParameters(decode));
+        public Object extract(HttpContext context) {
+            return extractor.extract(context.getUriInfo().getQueryParameters(decode));
         }
     }
     
@@ -53,7 +53,8 @@ public final class QueryParameterProcessor implements ParameterProcessor {
         }
         
         MultivaluedParameterExtractor e = MultivaluedDefaultListParameterProcessor.
-                process(parameter.getDefaultValue(), parameter.getParameterClass(), parameter.getParameterType(), parameterName);
+                process(parameter.getDefaultValue(), parameter.getParameterClass(), 
+                parameter.getParameterType(), parameterName);
         
         if (e == null)
             return null;

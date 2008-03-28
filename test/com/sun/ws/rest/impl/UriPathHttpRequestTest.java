@@ -22,7 +22,9 @@
 
 package com.sun.ws.rest.impl;
 
-import com.sun.ws.rest.api.core.HttpRequestContext;
+import com.sun.ws.rest.impl.application.WebApplicationContext;
+import com.sun.ws.rest.spi.container.ContainerRequest;
+import javax.ws.rs.core.UriInfo;
 import junit.framework.*;
 
 /**
@@ -36,18 +38,20 @@ public class UriPathHttpRequestTest extends TestCase {
     }
     
     public void testGeneral() throws Exception {
-        HttpRequestContext r = new TestHttpRequestContext(null, "GET", null,
+        ContainerRequest r = new TestHttpRequestContext(null, "GET", null,
                 "/context/widgets/10", "/context/");
-        assertEquals("widgets/10", r.getPath());
-        assertEquals("widgets/10", r.getPath(true));
-        assertEquals("widgets/10", r.getPath(false));
+        UriInfo ui = new WebApplicationContext(null, r, null);
+        assertEquals("widgets/10", ui.getPath());
+        assertEquals("widgets/10", ui.getPath(true));
+        assertEquals("widgets/10", ui.getPath(false));
     }    
     
     public void testEncoded() throws Exception {
-        HttpRequestContext r = new TestHttpRequestContext(null, "GET", null,
+        ContainerRequest r = new TestHttpRequestContext(null, "GET", null,
                 "/context/widgets%20/%2010", "/context/");
-        assertEquals("widgets / 10", r.getPath());
-        assertEquals("widgets / 10", r.getPath(true));
-        assertEquals("widgets%20/%2010", r.getPath(false));
+        UriInfo ui = new WebApplicationContext(null, r, null);
+        assertEquals("widgets / 10", ui.getPath());
+        assertEquals("widgets / 10", ui.getPath(true));
+        assertEquals("widgets%20/%2010", ui.getPath(false));
     }    
 }

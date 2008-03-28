@@ -27,7 +27,7 @@ import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import javax.ws.rs.WebApplicationException;
 import com.sun.ws.rest.api.container.ContainerException;
-import com.sun.ws.rest.api.core.HttpContextAccess;
+import com.sun.ws.rest.api.core.HttpContext;
 import com.sun.ws.rest.api.core.HttpResponseContext;
 import com.sun.ws.rest.api.core.ResourceConfig;
 import com.sun.ws.rest.api.model.AbstractResource;
@@ -129,15 +129,20 @@ public final class WebApplicationImpl implements WebApplication {
 
         this.context = new ThreadLocalHttpContext();
         
-        InvocationHandler i = new InvocationHandler() {
+        InvocationHandler requestHandler = new InvocationHandler() {
             public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-                return method.invoke(context.getHttpRequestContext(), args);
+                return method.invoke(context.getRequest(), args);
             }
         };
-        this.httpHeadersProxy = createProxy(HttpHeaders.class, i);
-        this.uriInfoProxy = createProxy(UriInfo.class, i);
-        this.requestProxy = createProxy(Request.class, i);
-        this.securityContextProxy = createProxy(SecurityContext.class, i);
+        this.httpHeadersProxy = createProxy(HttpHeaders.class, requestHandler);
+        this.requestProxy = createProxy(Request.class, requestHandler);
+        this.securityContextProxy = createProxy(SecurityContext.class, requestHandler);        
+        InvocationHandler uriInfoHandler = new InvocationHandler() {
+            public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+                return method.invoke(context.getUriInfo(), args);
+            }
+        };
+        this.uriInfoProxy = createProxy(UriInfo.class, uriInfoHandler);
         
         this.injectables = createInjectables();
     }
@@ -375,7 +380,7 @@ public final class WebApplicationImpl implements WebApplication {
          * The path is required to be in encoded form.
          */
         StringBuilder path = new StringBuilder();
-        path.append("/").append(request.getPath(false));
+        path.append("/").append(localContext.getPath(false));
 
         if (!resourceConfig.getFeature(ResourceConfig.FEATURE_MATCH_MATRIX_PARAMS))
             path = stripMatrixParams(path);
@@ -394,7 +399,7 @@ public final class WebApplicationImpl implements WebApplication {
         injectables.put(fieldType, injectable);
     }
     
-    public HttpContextAccess getThreadLocalHttpContext() {
+    public HttpContext getThreadLocalHttpContext() {
         return context;
     }
     
@@ -547,9 +552,9 @@ public final class WebApplicationImpl implements WebApplication {
                 }
             );
             
-        is.put(HttpContextAccess.class,
-                new ContextInjectable<HttpContextAccess>() {
-                    public HttpContextAccess getInjectableValue(Context c) {
+        is.put(HttpContext.class,
+                new ContextInjectable<HttpContext>() {
+                    public HttpContext getInjectableValue(Context c) {
                         return context;
                     }
                 }

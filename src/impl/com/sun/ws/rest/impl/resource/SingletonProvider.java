@@ -23,7 +23,7 @@
 package com.sun.ws.rest.impl.resource;
 
 import com.sun.ws.rest.api.container.ContainerException;
-import com.sun.ws.rest.api.core.HttpRequestContext;
+import com.sun.ws.rest.api.core.HttpContext;
 import com.sun.ws.rest.api.model.AbstractResource;
 import com.sun.ws.rest.spi.resource.ResourceProvider;
 import com.sun.ws.rest.spi.service.ComponentProvider;
@@ -49,8 +49,7 @@ public final class SingletonProvider implements ResourceProvider {
         }
     }
 
-    public Object getInstance(ComponentProvider provider, 
-            HttpRequestContext request) {
+    public Object getInstance(ComponentProvider provider, HttpContext context) {
         return resource;
     }
 }

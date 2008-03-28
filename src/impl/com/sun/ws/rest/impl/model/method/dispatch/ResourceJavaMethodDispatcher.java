@@ -23,8 +23,8 @@
 package com.sun.ws.rest.impl.model.method.dispatch;
 
 import com.sun.ws.rest.api.container.ContainerException;
+import com.sun.ws.rest.api.core.HttpContext;
 import com.sun.ws.rest.api.core.HttpRequestContext;
-import com.sun.ws.rest.api.core.HttpResponseContext;
 import com.sun.ws.rest.api.model.AbstractResourceMethod;
 import com.sun.ws.rest.spi.dispatch.RequestDispatcher;
 import java.lang.reflect.InvocationTargetException;
@@ -59,11 +59,10 @@ public abstract class ResourceJavaMethodDispatcher implements RequestDispatcher 
         }        
     }    
     
-    public final void dispatch(Object resource, 
-            HttpRequestContext request, HttpResponseContext response) {
+    public final void dispatch(Object resource, HttpContext context) {
         // Invoke the method on the resource
         try {
-            _dispatch(resource, request, response);
+            _dispatch(resource, context);
         } catch (InvocationTargetException e) {
             Throwable t = e.getTargetException();
             if (t instanceof RuntimeException) {
@@ -94,7 +93,6 @@ public abstract class ResourceJavaMethodDispatcher implements RequestDispatcher 
         }
     }
     
-    protected abstract void _dispatch(Object resource, 
-            HttpRequestContext request, HttpResponseContext response) 
+    protected abstract void _dispatch(Object resource, HttpContext context)
             throws IllegalAccessException, InvocationTargetException;
 }

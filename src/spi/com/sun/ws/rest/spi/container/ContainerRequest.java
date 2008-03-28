@@ -34,14 +34,4 @@ import java.util.List;
  * @author Paul.Sandoz@Sun.Com
  */
 public interface ContainerRequest extends HttpRequestContext {
-    
-    /**
-     * Add templates values to the HTTP request.
-     * <p>
-     * The template names and values must be in encoded form.
-     *
-     * @param names the list of template names.
-     * @param values the list of template values.
-     */
-    public void addTemplateValues(List<String> names, List<String> values);
 }

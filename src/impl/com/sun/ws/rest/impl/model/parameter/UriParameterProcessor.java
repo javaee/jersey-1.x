@@ -22,7 +22,7 @@
 
 package com.sun.ws.rest.impl.model.parameter;
 
-import com.sun.ws.rest.api.core.HttpRequestContext;
+import com.sun.ws.rest.api.core.HttpContext;
 import com.sun.ws.rest.api.model.Parameter;
 
 /**
@@ -40,8 +40,8 @@ public final class UriParameterProcessor implements ParameterProcessor {
             this.decode = decode;
         }
         
-        public Object extract(HttpRequestContext request) {
-            return extractor.extract(request.getTemplateParameters(decode));
+        public Object extract(HttpContext context) {
+            return extractor.extract(context.getUriInfo().getTemplateParameters(decode));
         }
     }
     

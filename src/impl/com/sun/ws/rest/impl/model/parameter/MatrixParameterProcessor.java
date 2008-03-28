@@ -22,7 +22,7 @@
 
 package com.sun.ws.rest.impl.model.parameter;
 
-import com.sun.ws.rest.api.core.HttpRequestContext;
+import com.sun.ws.rest.api.core.HttpContext;
 import com.sun.ws.rest.api.model.Parameter;
 import java.util.List;
 import javax.ws.rs.core.PathSegment;
@@ -46,8 +46,8 @@ public final class MatrixParameterProcessor implements ParameterProcessor {
             this.decode = decode;
         }
         
-        public Object extract(HttpRequestContext request) {
-            List<PathSegment> l = request.getPathSegments(decode);
+        public Object extract(HttpContext context) {
+            List<PathSegment> l = context.getUriInfo().getPathSegments(decode);
             PathSegment p = l.get(l.size() - 1);
             return extractor.extract(p.getMatrixParameters());
         }

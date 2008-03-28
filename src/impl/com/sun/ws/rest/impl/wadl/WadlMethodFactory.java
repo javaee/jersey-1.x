@@ -25,14 +25,11 @@ package com.sun.ws.rest.impl.wadl;
 import com.sun.research.ws.wadl.Application;
 import com.sun.research.ws.wadl.Resource;
 import com.sun.ws.rest.api.MediaTypes;
-import com.sun.ws.rest.api.core.HttpRequestContext;
-import com.sun.ws.rest.api.core.HttpResponseContext;
+import com.sun.ws.rest.api.core.HttpContext;
 import com.sun.ws.rest.api.model.AbstractResource;
 import com.sun.ws.rest.impl.model.MediaTypeHelper;
 import com.sun.ws.rest.impl.model.method.ResourceHttpOptionsMethod;
 import com.sun.ws.rest.impl.model.method.ResourceMethod;
-import com.sun.ws.rest.spi.dispatch.RequestDispatcher;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import javax.ws.rs.core.Response;
@@ -73,13 +70,11 @@ import javax.ws.rs.core.UriInfo;
         }
             
         @Override
-        public void dispatch(final Object o, 
-                final HttpRequestContext requestContext, 
-                final HttpResponseContext responseContext) {            
-            final Application a = genatateApplication(requestContext, 
+        public void dispatch(final Object o, final HttpContext context) {            
+            final Application a = genatateApplication(context.getUriInfo(), 
                     resource, path);
             
-            responseContext.setResponse(
+            context.getResponse().setResponse(
                     Response.ok(a, MediaTypes.WADL).header("Allow", allow).build());
         }
         

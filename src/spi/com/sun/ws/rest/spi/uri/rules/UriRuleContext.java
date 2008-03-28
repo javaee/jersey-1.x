@@ -22,22 +22,15 @@
 
 package com.sun.ws.rest.spi.uri.rules;
 
-import com.sun.ws.rest.api.core.HttpContextAccess;
+import com.sun.ws.rest.api.core.HttpContext;
 import java.util.List;
 
 /**
  *
  * @author Paul.Sandoz@Sun.Com
  */
-public interface UriRuleContext {
+public interface UriRuleContext extends HttpContext {
     
-    /**
-     * Get the HTTP context.
-     * 
-     * @return the HTTP context
-     */
-    HttpContextAccess getHttpContext();
-
     /**
      * Get the resource instance from a resource class.
      * 
@@ -57,6 +50,8 @@ public interface UriRuleContext {
     /**
      * Get the list to store the values of a pattern's 
      * capturing groups.
+     * 
+     * @return the list to store capturing group values.
      */
     List<String> getGroupValues();
         

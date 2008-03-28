@@ -22,36 +22,39 @@
 
 package com.sun.ws.rest.impl;
 
-import com.sun.ws.rest.api.container.ContainerException;
-import com.sun.ws.rest.api.core.HttpContextAccess;
+import com.sun.ws.rest.api.core.HttpContext;
 import com.sun.ws.rest.api.core.HttpRequestContext;
 import com.sun.ws.rest.api.core.HttpResponseContext;
-import javax.ws.rs.core.Response;
+import javax.ws.rs.core.UriInfo;
 
 /**
- * Implementation of {@link HttpContextAccess} using {@link ThreadLocal}
+ * Implementation of {@link HttpContext} using {@link ThreadLocal}
  * to store {@link HttpRequestContext} and {@link HttpResponseContext} instances
  * associated with threads.
  * 
  * @author Paul.Sandoz@Sun.Com
  */
-public final class ThreadLocalHttpContext implements HttpContextAccess {
-    private ThreadLocal<HttpContextAccess> context = new ThreadLocal<HttpContextAccess>();
+public final class ThreadLocalHttpContext implements HttpContext {
+    private ThreadLocal<HttpContext> context = new ThreadLocal<HttpContext>();
 
     /**
      * Set the {@link HttpRequestContext} and {@link HttpResponseContext} instances
      * for the current thread.
      */
-    public void set(HttpContextAccess context) {
+    public void set(HttpContext context) {
         this.context.set(context);
     }
 
-    public HttpRequestContext getHttpRequestContext() {
-        return context.get().getHttpRequestContext();
+    public UriInfo getUriInfo() {
+        return context.get().getUriInfo();
+    }
+    
+    public HttpRequestContext getRequest() {
+        return context.get().getRequest();
     }
 
-    public HttpResponseContext getHttpResponseContext() {
-        return context.get().getHttpResponseContext();
+    public HttpResponseContext getResponse() {
+        return context.get().getResponse();
     }
 
     public Object getCurrentResource() {

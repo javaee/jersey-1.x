@@ -24,6 +24,7 @@ package com.sun.ws.rest.impl.model.method.dispatch;
 
 import javax.ws.rs.WebApplicationException;
 import com.sun.ws.rest.api.container.ContainerException;
+import com.sun.ws.rest.api.core.HttpContext;
 import com.sun.ws.rest.api.core.HttpRequestContext;
 import com.sun.ws.rest.api.core.HttpResponseContext;
 import com.sun.ws.rest.api.model.AbstractResourceMethod;
@@ -53,8 +54,8 @@ public class EntityParamDispatchProvider implements ResourceMethodDispatchProvid
         }
         
         @SuppressWarnings("unchecked")
-        public Object extract(HttpRequestContext request) {
-            return request.getEntity(parameterEntityType);
+        public Object extract(HttpContext context) {
+            return context.getRequest().getEntity(parameterEntityType);
         }
     }
     
@@ -66,11 +67,11 @@ public class EntityParamDispatchProvider implements ResourceMethodDispatchProvid
             this.injectors = injectors;
         }
 
-        protected final Object[] getParams(HttpRequestContext request) {
+        protected final Object[] getParams(HttpContext context) {
             final Object[] params = new Object[injectors.length];
             try {
                 for (int i = 0; i < injectors.length; i++)
-                    params[i] = injectors[i].extract(request);
+                    params[i] = injectors[i].extract(context);
                 
                 return params;
             } catch (WebApplicationException e) {
@@ -87,9 +88,9 @@ public class EntityParamDispatchProvider implements ResourceMethodDispatchProvid
         }
 
         @SuppressWarnings("unchecked")
-        public void _dispatch(Object resource, HttpRequestContext requestContext, HttpResponseContext responseContext) 
+        public void _dispatch(Object resource, HttpContext context) 
         throws IllegalAccessException, InvocationTargetException {
-            final Object[] params = getParams(requestContext);
+            final Object[] params = getParams(context);
             method.invoke(resource, params);
         }
     }
@@ -100,14 +101,14 @@ public class EntityParamDispatchProvider implements ResourceMethodDispatchProvid
         }
 
         @SuppressWarnings("unchecked")
-        public void _dispatch(Object resource, HttpRequestContext requestContext, HttpResponseContext responseContext)
+        public void _dispatch(Object resource, HttpContext context)
         throws IllegalAccessException, InvocationTargetException {
-            final Object[] params = getParams(requestContext);
+            final Object[] params = getParams(context);
             
             Object o = method.invoke(resource, params);
-            MediaType mediaType = getAcceptableMediaType(requestContext);
+            MediaType mediaType = getAcceptableMediaType(context.getRequest());
             Response r = new ResponseBuilderImpl().status(200).entity(o).type(mediaType).build();
-            responseContext.setResponse(r);
+            context.getResponse().setResponse(r);
         }
     }
     
@@ -117,13 +118,13 @@ public class EntityParamDispatchProvider implements ResourceMethodDispatchProvid
         }
 
         @SuppressWarnings("unchecked")
-        public void _dispatch(Object resource, HttpRequestContext requestContext, HttpResponseContext responseContext)
+        public void _dispatch(Object resource, HttpContext context)
         throws IllegalAccessException, InvocationTargetException {
-            final Object[] params = getParams(requestContext);
+            final Object[] params = getParams(context);
 
             Response r = (Response)method.invoke(resource, params);
-            MediaType mediaType = getAcceptableMediaType(requestContext);
-            responseContext.setResponse(r, mediaType);
+            MediaType mediaType = getAcceptableMediaType(context.getRequest());
+            context.getResponse().setResponse(r, mediaType);
         }
     }
     
@@ -133,19 +134,19 @@ public class EntityParamDispatchProvider implements ResourceMethodDispatchProvid
         }
 
         @SuppressWarnings("unchecked")
-        public void _dispatch(Object resource, HttpRequestContext requestContext, HttpResponseContext responseContext)
+        public void _dispatch(Object resource, HttpContext context)
         throws IllegalAccessException, InvocationTargetException {
-            final Object[] params = getParams(requestContext);
+            final Object[] params = getParams(context);
             
             Object o = method.invoke(resource, params);
             
-            MediaType mediaType = getAcceptableMediaType(requestContext);
+            MediaType mediaType = getAcceptableMediaType(context.getRequest());
             if (o instanceof Response) {
                 Response r = (Response)o;
-                responseContext.setResponse(r, mediaType);
+                context.getResponse().setResponse(r, mediaType);
             } else {
                 Response r = new ResponseBuilderImpl().status(200).entity(o).type(mediaType).build();
-                responseContext.setResponse(r);
+                context.getResponse().setResponse(r);
             }            
         }
     }

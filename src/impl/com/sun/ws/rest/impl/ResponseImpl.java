@@ -29,6 +29,7 @@ import java.util.List;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.UriBuilder;
 
 /**
  *
@@ -79,7 +80,7 @@ public final class ResponseImpl extends Response {
     }
     
     public MultivaluedMap<String, Object> getMetadataOptimal(
-            HttpRequestContext requestContext, MediaType contentType) {
+            HttpRequestContext request, MediaType contentType) {
         if (headers == null)
             headers = new ResponseHttpHeadersImpl();
 
@@ -103,10 +104,10 @@ public final class ResponseImpl extends Response {
                             if (!((URI)location).isAbsolute()) {
                                 String path = ((URI)location).getRawPath();
                                 if (status == 201)
-                                    location = requestContext.getAbsolutePathBuilder().
+                                    location = UriBuilder.fromUri(request.getAbsolutePath()).
                                             encode(false).path(path).build();
                                 else
-                                    location = requestContext.getBaseUriBuilder().
+                                    location = UriBuilder.fromUri(request.getBaseUri()).
                                             encode(false).path(path).build();
                             }
                         }

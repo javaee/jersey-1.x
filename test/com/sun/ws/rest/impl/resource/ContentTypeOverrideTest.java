@@ -23,7 +23,7 @@
 package com.sun.ws.rest.impl.resource;
 
 import com.sun.ws.rest.impl.AbstractResourceTester;
-import com.sun.ws.rest.api.core.HttpContextAccess;
+import com.sun.ws.rest.api.core.HttpContext;
 import com.sun.ws.rest.api.client.WebResource;
 import com.sun.ws.rest.api.client.ClientResponse;
 import javax.ws.rs.GET;
@@ -45,7 +45,7 @@ public class ContentTypeOverrideTest extends AbstractResourceTester {
         
     @Path("/")
     public static class WebResourceOverride {
-        @Context HttpContextAccess context;
+        @Context HttpContext context;
         
         @ProduceMime({"application/foo", "application/bar"})
         @GET

@@ -22,6 +22,7 @@
 
 package com.sun.ws.rest.impl.container.servlet;
 
+import com.sun.ws.rest.impl.application.WebApplicationContext;
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.security.Principal;
@@ -41,6 +42,7 @@ import java.util.List;
 import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.core.MultivaluedMap;
+import javax.ws.rs.core.UriInfo;
 
 /**
  *
@@ -82,7 +84,8 @@ public class HttpRequestAdaptorTest extends TestCase {
             fail("Unable to initialize adaptor");
         }
         
-        MultivaluedMap<String, String> p = a.getQueryParameters();
+        UriInfo ui = new WebApplicationContext(null, a, null);
+        MultivaluedMap<String, String> p = ui.getQueryParameters();
         assertEquals(p.get("verbose").size(), 1);
         assertEquals(p.getFirst("verbose"),"true");
         assertEquals(p.get("item").size(), 2);

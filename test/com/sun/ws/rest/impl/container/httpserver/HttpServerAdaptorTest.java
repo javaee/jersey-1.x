@@ -28,8 +28,10 @@ import com.sun.ws.rest.api.core.HttpResponseContext;
 import com.sun.ws.rest.api.client.Client;
 import com.sun.ws.rest.api.client.WebResource;
 import javax.ws.rs.POST;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
+import javax.ws.rs.core.UriInfo;
 
 /**
  *
@@ -38,12 +40,14 @@ import javax.ws.rs.core.UriBuilder;
 public class HttpServerAdaptorTest extends AbstractHttpServerTester {
     @Path("/{arg1}/{arg2}")
     public static class TestOneWebResource {
+        @Context UriInfo info;
+        
         @POST
         public void handleRequest(HttpRequestContext request, HttpResponseContext response) {
             assertEquals("POST", request.getHttpMethod());
             
-            assertEquals("a", request.getTemplateParameters().getFirst("arg1"));
-            assertEquals("b", request.getTemplateParameters().getFirst("arg2"));
+            assertEquals("a", info.getTemplateParameters().getFirst("arg1"));
+            assertEquals("b", info.getTemplateParameters().getFirst("arg2"));
             
             String s = request.getEntity(String.class);
             assertEquals("RESOURCE-ONE", s);
@@ -54,11 +58,13 @@ public class HttpServerAdaptorTest extends AbstractHttpServerTester {
     
     @Path("/{arg1}")
     public static class TestTwoWebResource {
+        @Context UriInfo info;
+        
         @POST
         public void handleRequest(HttpRequestContext request, HttpResponseContext response) {
             assertEquals("POST", request.getHttpMethod());
             
-            assertEquals("a", request.getTemplateParameters().getFirst("arg1"));
+            assertEquals("a", info.getTemplateParameters().getFirst("arg1"));
             
             String s = request.getEntity(String.class);
             assertEquals("RESOURCE-TWO", s);

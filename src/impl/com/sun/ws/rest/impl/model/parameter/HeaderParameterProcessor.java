@@ -22,7 +22,7 @@
 
 package com.sun.ws.rest.impl.model.parameter;
 
-import com.sun.ws.rest.api.core.HttpRequestContext;
+import com.sun.ws.rest.api.core.HttpContext;
 import com.sun.ws.rest.api.model.Parameter;
 
 /**
@@ -38,8 +38,8 @@ public final class HeaderParameterProcessor implements ParameterProcessor {
             this.extractor = extractor;
         }
         
-        public Object extract(HttpRequestContext request) {
-            return extractor.extract(request.getRequestHeaders());
+        public Object extract(HttpContext context) {
+            return extractor.extract(context.getRequest().getRequestHeaders());
         }
     }
     

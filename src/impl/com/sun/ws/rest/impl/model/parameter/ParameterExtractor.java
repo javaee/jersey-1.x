@@ -22,12 +22,12 @@
 
 package com.sun.ws.rest.impl.model.parameter;
 
-import com.sun.ws.rest.api.core.HttpRequestContext;
+import com.sun.ws.rest.api.core.HttpContext;
 
 /**
  *
  * @author Paul.Sandoz@Sun.Com
  */
 public interface ParameterExtractor {
-    Object extract(HttpRequestContext request);
+    Object extract(HttpContext context);
 }

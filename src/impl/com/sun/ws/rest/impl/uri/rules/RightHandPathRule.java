@@ -109,14 +109,13 @@ public class RightHandPathRule implements UriRule {
      * TODO use the complete URI.
      */
     private boolean redirect(UriRuleContext context) {
-        final HttpRequestContext request = context.getHttpContext().
-                getHttpRequestContext();
-        final HttpResponseContext response = context.getHttpContext().
-                getHttpResponseContext();
+        final HttpRequestContext request = context.getRequest();
+        final HttpResponseContext response = context.getResponse();
         
         response.setResponse(
                 Response.temporaryRedirect(
-                    UriBuilder.fromUri(request.getAbsolutePath()).path("/").build()
+                    UriBuilder.fromUri(context.getUriInfo().
+                    getAbsolutePath()).path("/").build()
                 ).build()
                 );
         return true;

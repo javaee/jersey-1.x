@@ -23,7 +23,7 @@
 package com.sun.ws.rest.impl.container.servlet;
 
 import javax.ws.rs.Path;
-import com.sun.ws.rest.api.core.HttpContextAccess;
+import com.sun.ws.rest.api.core.HttpContext;
 import com.sun.ws.rest.api.core.HttpRequestContext;
 import com.sun.ws.rest.api.representation.FormURLEncodedProperties;
 import java.util.List;
@@ -36,23 +36,23 @@ import javax.ws.rs.core.MultivaluedMap;
 
 @Path("/test2/{arg1}/{arg2}")
 public class MyWebResourceBean  {
-    @Context HttpContextAccess context;
+    @Context HttpContext context;
     
     int count =0;
     
     @POST
     public void doPost() {
         System.out.println("MyWebResourceBean POST: " + 
-                context.getHttpRequestContext().getHttpMethod());
+                context.getRequest().getHttpMethod());
     }
     
     @GET
     public Object doGet() {
-        HttpRequestContext request = context.getHttpRequestContext();
+        HttpRequestContext request = context.getRequest();
         System.out.println("MyWebResourceBean GET: "+ request.getHttpMethod());
         
-        List<String> reps = request.getQueryParameters().get("rep");
-        MultivaluedMap<String, String> params = request.getTemplateParameters();
+        List<String> reps = context.getUriInfo().getQueryParameters().get("rep");
+        MultivaluedMap<String, String> params = context.getUriInfo().getTemplateParameters();
         String arg1 = params.getFirst("arg1");
         String arg2 = params.getFirst("arg2");
         
@@ -96,12 +96,12 @@ public class MyWebResourceBean  {
     @PUT
     public void doPut() {
         System.out.println("MyWebResourceBean PUT: " +
-                context.getHttpRequestContext().getHttpMethod());
+                context.getRequest().getHttpMethod());
     }
     
     @DELETE
     public void doDelete() {
         System.out.println("MyWebResourceBean DELETE: " +
-                context.getHttpRequestContext().getHttpMethod());
+                context.getRequest().getHttpMethod());
     }
 }

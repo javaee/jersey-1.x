@@ -22,25 +22,33 @@
 
 package com.sun.ws.rest.api.core;
 
+import javax.ws.rs.core.UriInfo;
+
 /**
- * A HttpContextAccess makes it possible for a web resource implementation class to 
+ * A HttpContext makes it possible for a web resource implementation class to 
  * access and manipulate HTTP request and response information directly. Typically
- * a HttpContextAccess is injected into web resource implementation class using the 
+ * a HttpContext is injected into web resource implementation class using the 
  * Context annotation.
  */
-public interface HttpContextAccess {
+public interface HttpContext {
+    /**
+     * Get the URI information.
+     * @return the URI information.
+     */
+    UriInfo getUriInfo();
+    
     /**
      * Get the HTTP request information.
      * @return the HTTP request information
      */
-    HttpRequestContext getHttpRequestContext();
+    HttpRequestContext getRequest();
 
     /**
      * Get the HTTP response information.
      * @return the HTTP response information
      */
-    HttpResponseContext getHttpResponseContext();
-    
+    HttpResponseContext getResponse();
+   
     /**
      * Get the current resource.
      * 

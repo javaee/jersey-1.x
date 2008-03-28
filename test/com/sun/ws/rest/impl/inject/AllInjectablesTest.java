@@ -22,7 +22,7 @@
 
 package com.sun.ws.rest.impl.inject;
 
-import com.sun.ws.rest.api.core.HttpContextAccess;
+import com.sun.ws.rest.api.core.HttpContext;
 import com.sun.ws.rest.api.core.ResourceConfig;
 import com.sun.ws.rest.impl.AbstractResourceTester;
 import com.sun.ws.rest.spi.container.MessageBodyContext;
@@ -55,7 +55,7 @@ public class AllInjectablesTest extends AbstractResourceTester {
         
         @Context MessageBodyWorkers mbw;
         
-        @Context HttpContextAccess hca;
+        @Context HttpContext hca;
         
         @Context HttpHeaders hs;
         
@@ -121,7 +121,7 @@ public class AllInjectablesTest extends AbstractResourceTester {
         
         @Context MessageBodyWorkers mbw;
         
-        @Context HttpContextAccess hca;
+        @Context HttpContext hca;
         
         @Context HttpHeaders hs;
         

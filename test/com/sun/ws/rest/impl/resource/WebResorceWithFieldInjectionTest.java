@@ -23,7 +23,7 @@
 package com.sun.ws.rest.impl.resource;
 
 import com.sun.ws.rest.impl.AbstractResourceTester;
-import com.sun.ws.rest.api.core.HttpContextAccess;
+import com.sun.ws.rest.api.core.HttpContext;
 import com.sun.ws.rest.api.client.WebResource;
 import java.net.URI;
 import javax.ws.rs.DELETE;
@@ -48,19 +48,19 @@ public class WebResorceWithFieldInjectionTest extends AbstractResourceTester {
     
     @Path("/{arg1}/{arg2}")
     public static class TestFieldInjectedHttpContextAccess {
-        private @Context HttpContextAccess context;
+        private @Context HttpContext context;
         
         @POST
         public String doPost(String in) {
             assertEquals("BEAN-ONE", in);
-            String method = context.getHttpRequestContext().getHttpMethod();
+            String method = context.getRequest().getHttpMethod();
             assertEquals("POST", method);
             return "POST";
         }
         
         @GET
         public String doGet() {
-            String method = context.getHttpRequestContext().getHttpMethod();
+            String method = context.getRequest().getHttpMethod();
             assertEquals("GET", method);
             return "GET";
         }
@@ -68,14 +68,14 @@ public class WebResorceWithFieldInjectionTest extends AbstractResourceTester {
         @PUT
         public String doPut(String in) {
             assertEquals("BEAN-ONE", in);
-            String method = context.getHttpRequestContext().getHttpMethod();
+            String method = context.getRequest().getHttpMethod();
             assertEquals("PUT", method);
             return "PUT";
         }
         
         @DELETE
         public String doDelete() {
-            String method = context.getHttpRequestContext().getHttpMethod();
+            String method = context.getRequest().getHttpMethod();
             assertEquals("DELETE", method);
             return "DELETE";
         }

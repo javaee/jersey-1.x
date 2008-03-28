@@ -23,7 +23,7 @@
 package com.sun.ws.rest.spi.container;
 
 import com.sun.ws.rest.api.container.ContainerException;
-import com.sun.ws.rest.api.core.HttpContextAccess;
+import com.sun.ws.rest.api.core.HttpContext;
 import com.sun.ws.rest.api.core.ResourceConfig;
 import com.sun.ws.rest.spi.resource.Injectable;
 import com.sun.ws.rest.spi.service.ComponentProvider;
@@ -94,12 +94,12 @@ public interface WebApplication {
     void addInjectable(Type fieldType, Injectable injectable);
     
     /**
-     * Get an instance of {@link HttpContextAccess} that is a proxy to
-     * a thread local instance of {@link HttpContextAccess}.
+     * Get an instance of {@link HttpContext} that is a proxy to
+     * a thread local instance of {@link HttpContext}.
      * 
-     * @return the thread local instance of HttpContextAccess.
+     * @return the thread local instance of HttpContext.
      */
-    HttpContextAccess getThreadLocalHttpContext();
+    HttpContext getThreadLocalHttpContext();
     
     /**
      * Handle an HTTP request by dispatching the request to the appropriate

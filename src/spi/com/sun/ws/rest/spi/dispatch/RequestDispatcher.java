@@ -22,14 +22,12 @@
 
 package com.sun.ws.rest.spi.dispatch;
 
-import com.sun.ws.rest.api.core.HttpRequestContext;
-import com.sun.ws.rest.api.core.HttpResponseContext;
+import com.sun.ws.rest.api.core.HttpContext;
 
 /**
  *
  * @author Paul.Sandoz@Sun.Com
  */
 public interface RequestDispatcher {
-    public void dispatch(Object resource, 
-            HttpRequestContext requestContext, HttpResponseContext responseContext);    
+    public void dispatch(Object resource, HttpContext context);
 }

@@ -22,7 +22,7 @@
 
 package com.sun.ws.rest.spi.resource;
 
-import com.sun.ws.rest.api.core.HttpRequestContext;
+import com.sun.ws.rest.api.core.HttpContext;
 import com.sun.ws.rest.api.model.AbstractResource;
 import com.sun.ws.rest.spi.service.ComponentProvider;
 
@@ -45,8 +45,8 @@ public interface ResourceProvider {
      * Called to obtain an instance of a resource class.
      * 
      * @param provider the component provider
-     * @param request the HTTP request
+     * @param context the HTTP context
      * @return an initialized instance of the supplied class
      */
-    Object getInstance(ComponentProvider provider, HttpRequestContext request);
+    Object getInstance(ComponentProvider provider, HttpContext context);
 }

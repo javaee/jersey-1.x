@@ -25,7 +25,7 @@ package com.sun.ws.rest.impl.template;
 import com.sun.ws.rest.spi.template.TemplateProcessor;
 import com.sun.ws.rest.spi.template.TemplateContext;
 import com.sun.ws.rest.api.view.Viewable;
-import com.sun.ws.rest.api.core.HttpContextAccess;
+import com.sun.ws.rest.api.core.HttpContext;
 import com.sun.ws.rest.api.core.ResourceConfig;
 import java.io.OutputStream;
 import java.lang.annotation.Annotation;
@@ -42,7 +42,7 @@ import javax.ws.rs.core.MultivaluedMap;
  */
 public final class ViewableMessageBodyWriter implements MessageBodyWriter<Viewable> {
     
-    @Context HttpContextAccess hca;
+    @Context HttpContext hca;
     
     @Context TemplateContext tc;
     

@@ -23,7 +23,6 @@
 package com.sun.ws.rest.impl.uri.rules;
 
 import com.sun.ws.rest.api.container.ContainerException;
-import com.sun.ws.rest.api.core.HttpRequestContext;
 import com.sun.ws.rest.impl.model.parameter.ParameterExtractor;
 import com.sun.ws.rest.spi.uri.rules.UriRule;
 import com.sun.ws.rest.spi.uri.rules.UriRuleContext;
@@ -80,11 +79,9 @@ public final class SubLocatorRule extends BaseRule {
             if (extractors == null) {
                 return m.invoke(resource);
             } else {
-                final HttpRequestContext request = context.getHttpContext().
-                        getHttpRequestContext();
                 final Object[] params = new Object[extractors.length];
                 for (int i = 0; i < extractors.length; i++)
-                    params[i] = extractors[i].extract(request);
+                    params[i] = extractors[i].extract(context);
                 
                 return m.invoke(resource, params);
             }
