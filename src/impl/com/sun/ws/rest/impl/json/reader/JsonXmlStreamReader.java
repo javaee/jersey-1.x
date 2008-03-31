@@ -228,7 +228,7 @@ public class JsonXmlStreamReader implements XMLStreamReader {
                                     default :
                                         throw new IOException("\'\"\', or \'}\' expected instead of \"" + lastToken.tokenText + "\"");
                                 }
-                            } else {
+                            } else { // non attribute
                                 StartElementEvent event = 
                                         new StartElementEvent(lastToken.tokenText, new MyLocation(lexer));
                                 eventQueue.add(event);
@@ -309,6 +309,7 @@ public class JsonXmlStreamReader implements XMLStreamReader {
                     switch (lastToken.tokenType) {
                         case JsonToken.START_OBJECT :
                             processingStack.add(new ProcessingState(LaState.AFTER_OBJ_START_BRACE));
+                            processingStack.get(depth).eventToReadAttributesFor = processingStack.get(depth-1).eventToReadAttributesFor;
                             depth++;
                             break;
                         case JsonToken.START_ARRAY :
@@ -329,11 +330,13 @@ public class JsonXmlStreamReader implements XMLStreamReader {
                     }                
                     break; // AFTER_ARRAY_ELEM
                 case BEFORE_NEXT_ARRAY_ELEM :
-                    eventQueue.add(
-                            new StartElementEvent(processingStack.get(depth-1).lastName, new MyLocation(lexer)));
+                    StartElementEvent event = 
+                            new StartElementEvent(processingStack.get(depth-1).lastName, new MyLocation(lexer));
+                    eventQueue.add(event);
                     switch (lastToken.tokenType) {
                         case JsonToken.START_OBJECT :
                             processingStack.add(new ProcessingState(LaState.AFTER_OBJ_START_BRACE));
+                            processingStack.get(depth).eventToReadAttributesFor = event;
                             depth++;
                             break;
                         case JsonToken.START_ARRAY :

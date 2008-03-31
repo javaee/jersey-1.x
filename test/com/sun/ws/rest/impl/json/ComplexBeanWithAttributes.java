@@ -23,6 +23,8 @@
 package com.sun.ws.rest.impl.json;
 
 import java.util.Formatter;
+import java.util.LinkedList;
+import java.util.List;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
@@ -37,6 +39,7 @@ public class ComplexBeanWithAttributes {
     @XmlAttribute public String a1;
     @XmlAttribute public int a2;
     @XmlElement public String filler1;
+    @XmlElement public List<SimpleBeanWithAttributes> list;
     @XmlElement public String filler2;
     @XmlElement SimpleBeanWithAttributes b;
 
@@ -47,6 +50,9 @@ public class ComplexBeanWithAttributes {
         instance.filler1 = "111";
         instance.filler2 = "222";
         instance.b = (SimpleBeanWithAttributes)SimpleBeanWithAttributes.createTestInstance();
+        instance.list = new LinkedList<SimpleBeanWithAttributes>();
+        instance.list.add((SimpleBeanWithAttributes)SimpleBeanWithAttributes.createTestInstance());
+        instance.list.add((SimpleBeanWithAttributes)SimpleBeanWithAttributes.createTestInstance());
         return instance;
     }
     
@@ -71,6 +77,9 @@ public class ComplexBeanWithAttributes {
         if (this.filler2 != other.filler2 && (this.filler2 == null || !this.filler2.equals(other.filler2))) {
             return false;
         }
+        if (this.list != other.list && (this.list == null || !this.list.equals(other.list))) {
+            return false;
+        }
         return true;
     }
 
@@ -82,6 +91,7 @@ public class ComplexBeanWithAttributes {
         hash = 19 * hash + (this.b != null ? this.b.hashCode() : 0);
         hash = 19 * hash + (this.filler1 != null ? this.filler1.hashCode() : 0);
         hash = 19 * hash + (this.filler2 != null ? this.filler2.hashCode() : 0);
+        hash = 19 * hash + (this.list != null ? this.list.hashCode() : 0);
         return hash;
     }
     

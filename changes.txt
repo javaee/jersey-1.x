@@ -48,9 +48,13 @@ release 0.7 (2008-04-18)
     parameter is absent.
   - If a message body reader cannot be found return 415 (Unsupported Media Type)
   - if a message body writer cannot be found return 406 (Not Acceptable)
-
 Support media type charset parameter when reading/writing Java types
     for text-based
+
+release 0.6.2 (2008-03-27)
+- Fixed issue 52: xml attrs in JSON representation deserialization
+  https://jersey.dev.java.net/issues/show_bug.cgi?id=52
+
 release 0.6.1 (2008-03-18)
 - Support for xml attributes serialization/deserialization in JSON added
   (as a fix for 43)
