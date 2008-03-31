@@ -107,7 +107,7 @@ public final class ResourceClass {
                     new RightHandPathRule(
                     config.getFeature(ResourceConfig.FEATURE_REDIRECT),                    
                     p.getTemplate().endsWithSlash(),
-                    new HttpMethodRule(rmm)));
+                    new HttpMethodRule(rmm, true)));
         }
 
         // Create the rules for the HTTP methods

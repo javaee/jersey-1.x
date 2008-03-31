@@ -25,7 +25,6 @@ package com.sun.ws.rest.impl.template;
 import com.sun.ws.rest.spi.template.TemplateProcessor;
 import com.sun.ws.rest.spi.template.TemplateContext;
 import com.sun.ws.rest.api.view.Viewable;
-import com.sun.ws.rest.api.core.HttpContext;
 import com.sun.ws.rest.api.core.ResourceConfig;
 import java.io.OutputStream;
 import java.lang.annotation.Annotation;
@@ -35,6 +34,7 @@ import java.io.IOException;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
+import javax.ws.rs.core.UriInfo;
 
 /**
  *
@@ -42,11 +42,9 @@ import javax.ws.rs.core.MultivaluedMap;
  */
 public final class ViewableMessageBodyWriter implements MessageBodyWriter<Viewable> {
     
-    @Context HttpContext hca;
+    @Context UriInfo ui;
     
     @Context TemplateContext tc;
-    
-    @Context ResourceConfig rc;
     
     public boolean isWriteable(Class<?> type, Type genericType, Annotation[] annotations) {
         return Viewable.class.isAssignableFrom(type);
@@ -60,7 +58,7 @@ public final class ViewableMessageBodyWriter implements MessageBodyWriter<Viewab
             ResolvedViewable rv = (ResolvedViewable)v;
             rv.getTemplate().writeTo(v.getTemplateName(), v.getModel(), entityStream);
         } else {
-            String absolutePath = getAbsolutePath(hca.getCurrentResource().getClass(), 
+            String absolutePath = getAbsolutePath(ui.getAncestorResources().get(0).getClass(), 
                     v.getTemplateName());
 
             boolean resolved = false;

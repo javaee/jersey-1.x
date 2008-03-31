@@ -48,8 +48,10 @@ release 0.7 (2008-04-18)
     parameter is absent.
   - If a message body reader cannot be found return 415 (Unsupported Media Type)
   - if a message body writer cannot be found return 406 (Not Acceptable)
-Support media type charset parameter when reading/writing Java types
-    for text-based
+  - The list of ancestor resource classes and URI paths are available
+    via UriInfo.getAncestorResources() and UriInfo.getAncestorResourceURIs()
+    respectively. Such information can be used for "breadcrumb" support or
+    aiding construction of URIs that are hyperlinks in representations.
 
 release 0.6.2 (2008-03-27)
 - Fixed issue 52: xml attrs in JSON representation deserialization

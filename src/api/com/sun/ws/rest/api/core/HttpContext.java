@@ -48,11 +48,4 @@ public interface HttpContext {
      * @return the HTTP response information
      */
     HttpResponseContext getResponse();
-   
-    /**
-     * Get the current resource.
-     * 
-     * @return the current resource.
-     */
-    Object getCurrentResource();    
 }

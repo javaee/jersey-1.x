@@ -77,23 +77,17 @@ public final class WebApplicationContext implements UriRuleContext, UriInfo {
         return this;
     }
     
-    public Object getCurrentResource() {
-        return it;
-    }
-    
     // UriRuleContext
 
-    private Object it;
+    private final LinkedList<Object> resources = new LinkedList<Object>();
+    
+    private final LinkedList<String> paths = new LinkedList<String>();
     
     private final List<String> capturingGroupValues = new ArrayList<String>();
         
-    public HttpContext getHttpContext() {
-        return this;
-    }
-
     public Object getResource(Class resourceClass) {
         final ResourceClass rc = app.getResourceClass(resourceClass);
-        return it = rc.resolver.getInstance(app.getComponentProvider(), this);
+        return rc.resolver.getInstance(app.getComponentProvider(), this);
     }
 
     public UriRules<UriRule> getRules(Class resourceClass) {
@@ -122,6 +116,15 @@ public final class WebApplicationContext implements UriRuleContext, UriInfo {
         }
     }
     
+    public void pushResource(Object resource) {
+         resources.addFirst(resource);
+    }
+    
+    public void pushRightHandPathLength(int rhpathlen) {
+        paths.addFirst(getEncodedPath().substring(0, 
+                getEncodedPath().length() - rhpathlen));
+    }
+        
     // UriInfo
     
     /**
@@ -272,11 +275,11 @@ public final class WebApplicationContext implements UriRuleContext, UriInfo {
     }
 
     public List<String> getAncestorResourceURIs() {
-        throw new UnsupportedOperationException();
+        return paths;
     }
     
     public List<Object> getAncestorResources() {
-        throw new UnsupportedOperationException();        
+        return resources;
     }    
     
     private static final class PathSegmentImpl implements PathSegment {

@@ -30,7 +30,7 @@ import java.util.List;
  * @author Paul.Sandoz@Sun.Com
  */
 public interface UriRuleContext extends HttpContext {
-    
+
     /**
      * Get the resource instance from a resource class.
      * 
@@ -54,7 +54,7 @@ public interface UriRuleContext extends HttpContext {
      * @return the list to store capturing group values.
      */
     List<String> getGroupValues();
-        
+    
     /**
      *  Set template values that are the values of a pattern's
      *  capturing groups.
@@ -63,4 +63,19 @@ public interface UriRuleContext extends HttpContext {
      *         values.
      */
     void setTemplateValues(List<String> names);
+    
+    /**
+     * Push the resource onto the list if matching (ancestor) resources
+     * 
+     * @param resource
+     */
+    void pushResource(Object resource);
+
+    /**
+     * Push the right hand path length to calculate the entry for
+     * the list of matching (ancestor) URI paths.
+     * 
+     * @param rhpathlen the right hand length
+     */
+    void pushRightHandPathLength(int rhpathlen);
 }

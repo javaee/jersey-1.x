@@ -68,24 +68,32 @@ public class RightHandPathRule implements UriRule {
     }
     
     public final boolean accept(CharSequence path, Object resource, UriRuleContext context) {
-        // Extract right hand path
-        path = getRightHandPath(context.getGroupValues());
-        if (path.length() == 0) {
+        String rhpath = getRightHandPath(context.getGroupValues());
+        if (rhpath.length() == 0) {
             // Redirect to path ending with a '/' if pattern
             // ends in '/' and redirect is true
             if (patternEndsInSlash)
                 return (redirect) ? redirect(context) : false;
-        } else if (path.length() == 1) {
+            
+            context.pushRightHandPathLength(0);
+        } else if (rhpath.length() == 1) {
             // Path is '/', no match if pattern does not end in a '/'
             if (!patternEndsInSlash)
                 return false;
 
             // Consume the '/'
-            path = "";
+            rhpath = "";
+            context.pushRightHandPathLength(0);
+        } else {
+            if (patternEndsInSlash) {
+                context.pushRightHandPathLength(rhpath.length() - 1);
+            } else {
+                context.pushRightHandPathLength(rhpath.length());
+            }
         }
         
         // Accept using the right hand path
-        return rule.accept(path, resource, context);
+        return rule.accept(rhpath, resource, context);
     }
     
     /**

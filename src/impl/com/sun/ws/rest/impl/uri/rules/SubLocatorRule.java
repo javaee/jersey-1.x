@@ -62,6 +62,7 @@ public final class SubLocatorRule extends BaseRule {
             // If so then get the instance of that class
             resource = context.getResource((Class)resource);
         }
+        context.pushResource(resource);
         
         // Match sub-rules on the returned resource class
         final Iterator<UriRule> matches = context.getRules(resource.getClass()).

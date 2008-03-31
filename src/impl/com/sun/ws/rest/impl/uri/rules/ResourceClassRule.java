@@ -47,6 +47,7 @@ public final class ResourceClassRule extends BaseRule {
 
         // Get the resource instance from the resource class
         resource = context.getResource(resourceClass);
+        context.pushResource(resource);
         
         // Match sub-rules on the resource class
         final Iterator<UriRule> matches = context.getRules(resourceClass).

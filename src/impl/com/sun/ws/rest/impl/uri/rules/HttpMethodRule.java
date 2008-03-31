@@ -54,11 +54,18 @@ public final class HttpMethodRule implements UriRule {
     
     private final String allow;
             
+    private final boolean isSubResource;
+    
     public HttpMethodRule(Map<String, List<ResourceMethod>> methods) {
-        this.map = methods;
-        this.allow = getAllow(methods);
+        this(methods, false);
     }
           
+    public HttpMethodRule(Map<String, List<ResourceMethod>> methods, boolean isSubResource) {
+        this.map = methods;
+        this.isSubResource = isSubResource;
+        this.allow = getAllow(methods);
+    }
+    
     private String getAllow(Map<String, List<ResourceMethod>> methods) {
         StringBuilder s = new StringBuilder();
         boolean first = true;
@@ -72,7 +79,7 @@ public final class HttpMethodRule implements UriRule {
         return s.toString();
     }
 
-    public boolean accept(CharSequence path, Object resource, UriRuleContext context) {
+    public boolean accept(CharSequence path, Object resource, UriRuleContext context) {        
         // If the path is not empty then do not accept
         if (path.length() > 0) return false;
         
@@ -91,6 +98,11 @@ public final class HttpMethodRule implements UriRule {
             return false;
         }
 
+        // If a sub-resource method then need to push the resource
+        // (again) as as to keep in sync with the ancestor URIs
+        if (isSubResource)
+            context.pushResource(resource);
+        
         // Get the list of matching methods
         List<MediaType> accept = request.getAcceptableMediaTypes();
         LinkedList<ResourceMethod> matches = 

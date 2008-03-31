@@ -56,8 +56,4 @@ public final class ThreadLocalHttpContext implements HttpContext {
     public HttpResponseContext getResponse() {
         return context.get().getResponse();
     }
-
-    public Object getCurrentResource() {
-        return context.get().getCurrentResource();        
-    }
 }
