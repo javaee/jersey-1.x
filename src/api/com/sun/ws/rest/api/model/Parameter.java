@@ -26,7 +26,7 @@ import java.lang.reflect.Type;
  */
 public class Parameter {
     
-    public enum Source {ENTITY, QUERY, MATRIX, URI, HEADER, CONTEXT};
+    public enum Source {ENTITY, QUERY, MATRIX, URI, COOKIE, HEADER, CONTEXT};
     
     private Parameter.Source source;
     private String sourceName;
@@ -35,7 +35,6 @@ public class Parameter {
     private Type type;
     private Class<?> clazz;
     
-    /** Creates a new instance of Parameter */
     public Parameter(Source source, String sourceName, Type type, Class<?> clazz) {
         this(source, sourceName, type, clazz, false, null);
     }

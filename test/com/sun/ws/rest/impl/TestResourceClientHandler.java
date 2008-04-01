@@ -27,6 +27,7 @@ import com.sun.ws.rest.api.client.ClientHandler;
 import com.sun.ws.rest.api.client.ClientHandlerException;
 import com.sun.ws.rest.api.client.ClientRequest;
 import com.sun.ws.rest.api.client.ClientResponse;
+import com.sun.ws.rest.impl.http.header.HttpHeaderFactory;
 import com.sun.ws.rest.spi.container.AbstractContainerRequest;
 import com.sun.ws.rest.spi.container.AbstractContainerResponse;
 import com.sun.ws.rest.spi.container.MessageBodyContext;
@@ -125,7 +126,15 @@ public class TestResourceClientHandler implements ClientHandler {
                 baseUri);
         
         writeHeaders(clientRequest.getMetadata(), serverRequest.getRequestHeaders());
-
+        List<String> cookies = serverRequest.getRequestHeaders().get("Cookie");
+        if (cookies != null) {
+            for (String cookie : cookies) {
+                if (cookie != null)
+                    serverRequest.getCookies().putAll(
+                            HttpHeaderFactory.createCookies(cookie));
+            }
+        }
+        
         final TestHttpResponseContext serverResponse = new TestHttpResponseContext(
                 w.getMessageBodyContext(), 
                 serverRequest);

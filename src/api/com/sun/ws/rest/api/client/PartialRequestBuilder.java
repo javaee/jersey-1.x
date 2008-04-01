@@ -23,6 +23,7 @@
 package com.sun.ws.rest.api.client;
 
 import com.sun.ws.rest.impl.ResponseHttpHeadersImpl;
+import javax.ws.rs.core.Cookie;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 
@@ -82,6 +83,11 @@ public abstract class PartialRequestBuilder<T extends RequestBuilder>
     public T accept(String... types) {
         for (String type : types)
             getMetadata().add("Accept", type);
+        return (T)this;
+    }
+    
+    public T cookie(Cookie cookie) {
+        getMetadata().add("Cookie", cookie);
         return (T)this;
     }
     

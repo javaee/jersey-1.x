@@ -24,6 +24,7 @@ package com.sun.ws.rest.api.client;
 
 import com.sun.ws.rest.impl.client.ClientRequestImpl;
 import java.net.URI;
+import javax.ws.rs.core.Cookie;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.UriBuilder;
 
@@ -173,6 +174,10 @@ public final class WebResource extends Filterable implements
     public Builder accept(String... types) {
         return new Builder(u).accept(types);
     }    
+    
+    public Builder cookie(Cookie cookie) {
+        return new Builder(u).cookie(cookie);
+    }
     
     public Builder header(String name, Object value) {
         return new Builder(u).header(name, value);

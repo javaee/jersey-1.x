@@ -42,8 +42,6 @@ public class CookieImplTest extends TestCase {
      * Test of createCookies method, of class com.sun.ws.rest.impl.http.header.CookiesParser.
      */
     public void testCreateCookies() {
-        System.out.println("createCookies");
-        
         String cookieHeader = "fred=flintstone";
         Map<String, Cookie> cookies = CookiesParser.createCookies(cookieHeader);
         assertEquals(cookies.size(), 1);
@@ -126,19 +124,19 @@ public class CookieImplTest extends TestCase {
         
         NewCookie cookie = new NewCookie("fred", "flintstone");
         
-        String expResult = "fred=flintstone;Version=1";
+        String expResult = "$Version=1;fred=flintstone";
         String result = ncp.toString(cookie);
         assertEquals(expResult, result);
         
         cookie = new NewCookie("fred", "flintstone", null, null, 
                 null, 60, false);
-        expResult = "fred=flintstone;Version=1;Max-Age=60";
+        expResult = "$Version=1;fred=flintstone;Max-Age=60";
         result = ncp.toString(cookie);
         assertEquals(expResult, result);
         
         cookie = new NewCookie("fred", "flintstone", null, null, 
                 "a modern stonage family", 60, false);
-        expResult = "fred=flintstone;Version=1;Comment=\"a modern stonage family\";Max-Age=60";
+        expResult = "$Version=1;fred=flintstone;Comment=\"a modern stonage family\";Max-Age=60";
         result = ncp.toString(cookie);
         assertEquals(expResult, result);
     }

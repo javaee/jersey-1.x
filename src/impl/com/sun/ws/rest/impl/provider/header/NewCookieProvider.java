@@ -34,11 +34,12 @@ public class NewCookieProvider implements HeaderDelegateProvider<NewCookie> {
 
     public String toString(NewCookie cookie) {
         StringBuilder b = new StringBuilder();
-        b.append(cookie.getName());
-        b.append('=');
+        
+        b.append("$Version=").append(cookie.getVersion()).append(';');
+        
+        b.append(cookie.getName()).append('=');
         WriterUtil.appendQuotedIfWhitespace(b, cookie.getValue());
-        b.append(";Version=");
-        b.append(cookie.getVersion());
+        
         if (cookie.getComment() != null) {
             b.append(";Comment=");
             WriterUtil.appendQuotedIfWhitespace(b, cookie.getComment());

@@ -39,6 +39,7 @@ public final class ParameterProcessorFactory {
         Map<Parameter.Source, ParameterProcessor> map = new HashMap<Parameter.Source, ParameterProcessor>();
         map.put(Parameter.Source.CONTEXT, new HttpContextParameterProcessor());
         map.put(Parameter.Source.HEADER, new HeaderParameterProcessor());
+        map.put(Parameter.Source.COOKIE, new CookieParameterProcessor());
         map.put(Parameter.Source.QUERY, new QueryParameterProcessor());
         map.put(Parameter.Source.MATRIX, new MatrixParameterProcessor());
         map.put(Parameter.Source.URI, new UriParameterProcessor());

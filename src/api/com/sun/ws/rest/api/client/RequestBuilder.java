@@ -22,6 +22,7 @@
 
 package com.sun.ws.rest.api.client;
 
+import javax.ws.rs.core.Cookie;
 import javax.ws.rs.core.MediaType;
 
 /**
@@ -91,6 +92,14 @@ public interface RequestBuilder<T extends RequestBuilder> {
      * @return the builder.
      */
     T accept(String... types);
+    
+    /**
+     * Add a cookie to be set.
+     * 
+     * @param cookie to be set.
+     * @return the builder
+     */
+    T cookie(Cookie cookie);
     
     /**
      * Add an HTTP header and value.

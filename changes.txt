@@ -1,4 +1,6 @@
 release 0.7 (2008-04-18)
+- Client API supports the addition of cookies that are instances of
+  javax.ws.rs.core.Cookie.
 - Renamed HttpContextAccess to HttpContext. Changed getHttpRequestContext
   and getHttpResponseContext methods to getRequest and getResponse respectively.
 - UriRuleContext extends HttpContext. Removed UriRuleContext.getHttpContext()
@@ -52,6 +54,8 @@ release 0.7 (2008-04-18)
     via UriInfo.getAncestorResources() and UriInfo.getAncestorResourceURIs()
     respectively. Such information can be used for "breadcrumb" support or
     aiding construction of URIs that are hyperlinks in representations.
+  - Parameters can be annotated with @CookieParam for the type 
+    javax.ws.rs.core.Cookie and types conforming to the standard rules.
 
 release 0.6.2 (2008-03-27)
 - Fixed issue 52: xml attrs in JSON representation deserialization

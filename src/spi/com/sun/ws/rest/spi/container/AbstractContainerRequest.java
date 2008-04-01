@@ -23,6 +23,7 @@
 package com.sun.ws.rest.spi.container;
 
 import com.sun.ws.rest.api.Responses;
+import com.sun.ws.rest.impl.MultivaluedMapImpl;
 import com.sun.ws.rest.impl.RequestHttpHeadersImpl;
 import com.sun.ws.rest.impl.VariantSelector;
 import com.sun.ws.rest.impl.http.header.reader.HttpHeaderReader;
@@ -110,6 +111,8 @@ public abstract class AbstractContainerRequest implements ContainerRequest {
     
     private Map<String, Cookie> cookies;
     
+    private MultivaluedMap<String, String> cookieNames;
+    
     /**
      *
      * @param bodyContext the message body context
@@ -191,6 +194,16 @@ public abstract class AbstractContainerRequest implements ContainerRequest {
         return null;
     }
 
+    public MultivaluedMap<String, String> getCookieNameValueMap() {
+        if (cookieNames == null) {
+            cookieNames = new MultivaluedMapImpl();
+            for (Map.Entry<String, Cookie> e : getCookies().entrySet()) {
+                cookieNames.putSingle(e.getKey(), e.getValue().getValue());
+            }
+        }
+        
+        return cookieNames;
+    }
     
     // HttpHeaders
     

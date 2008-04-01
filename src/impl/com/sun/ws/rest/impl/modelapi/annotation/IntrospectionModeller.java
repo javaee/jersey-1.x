@@ -44,6 +44,7 @@ import java.util.WeakHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.ws.rs.ConsumeMime;
+import javax.ws.rs.CookieParam;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.Encoded;
 import javax.ws.rs.HeaderParam;
@@ -241,18 +242,18 @@ public class IntrospectionModeller {
         }
     }
 
-    private static interface ParamAnnotationHelper {
+    private static interface ParamAnnotationHelper<T extends Annotation> {
 
-        public String getValueOf(Annotation a);
+        public String getValueOf(T a);
 
         public Parameter.Source getSource();
     }
 
     private static Map<Class, ParamAnnotationHelper> createParamAnotHelperMap() {
         Map<Class, ParamAnnotationHelper> m = new WeakHashMap<Class, ParamAnnotationHelper>();
-        m.put(Context.class, new ParamAnnotationHelper() {
+        m.put(Context.class, new ParamAnnotationHelper<Context>() {
 
-            public String getValueOf(Annotation a) {
+            public String getValueOf(Context a) {
                 return null;
             }
 
@@ -260,40 +261,50 @@ public class IntrospectionModeller {
                 return Parameter.Source.CONTEXT;
             }
         });
-        m.put(HeaderParam.class, new ParamAnnotationHelper() {
+        m.put(HeaderParam.class, new ParamAnnotationHelper<HeaderParam>() {
 
-            public String getValueOf(Annotation a) {
-                return ((HeaderParam) a).value();
+            public String getValueOf(HeaderParam a) {
+                return a.value();
             }
 
             public Parameter.Source getSource() {
                 return Parameter.Source.HEADER;
             }
         });
-        m.put(MatrixParam.class, new ParamAnnotationHelper() {
+        m.put(CookieParam.class, new ParamAnnotationHelper<CookieParam>() {
 
-            public String getValueOf(Annotation a) {
-                return ((MatrixParam) a).value();
+            public String getValueOf(CookieParam a) {
+                return a.value();
+            }
+
+            public Parameter.Source getSource() {
+                return Parameter.Source.COOKIE;
+            }
+        });
+        m.put(MatrixParam.class, new ParamAnnotationHelper<MatrixParam>() {
+
+            public String getValueOf(MatrixParam a) {
+                return a.value();
             }
 
             public Parameter.Source getSource() {
                 return Parameter.Source.MATRIX;
             }
         });
-        m.put(QueryParam.class, new ParamAnnotationHelper() {
+        m.put(QueryParam.class, new ParamAnnotationHelper<QueryParam>() {
 
-            public String getValueOf(Annotation a) {
-                return ((QueryParam) a).value();
+            public String getValueOf(QueryParam a) {
+                return a.value();
             }
 
             public Parameter.Source getSource() {
                 return Parameter.Source.QUERY;
             }
         });
-        m.put(PathParam.class, new ParamAnnotationHelper() {
+        m.put(PathParam.class, new ParamAnnotationHelper<PathParam>() {
 
-            public String getValueOf(Annotation a) {
-                return ((PathParam) a).value();
+            public String getValueOf(PathParam a) {
+                return a.value();
             }
 
             public Parameter.Source getSource() {
@@ -304,6 +315,7 @@ public class IntrospectionModeller {
     }
     private final static Map<Class, ParamAnnotationHelper> ANOT_HELPER_MAP = createParamAnotHelperMap();
 
+    @SuppressWarnings("unchecked")
     private static final Parameter createParameter(
             String nameForLogging, int order,
             boolean isEncoded, Class<?> paramClass, Type paramType, Annotation[] annotations) {

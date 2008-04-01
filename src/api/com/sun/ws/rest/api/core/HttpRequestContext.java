@@ -27,9 +27,9 @@ import java.util.List;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Request;
 import javax.ws.rs.core.SecurityContext;
-import javax.ws.rs.core.UriBuilder;
 
 /**
  * An abstraction for a HTTP request
@@ -95,4 +95,10 @@ public interface HttpRequestContext extends HttpHeaders,
      * @return the method name as a String
      */
     String getHttpMethod();
+    
+    /**
+     * Get the cookie name value map.
+     * @return the cookie bame value map.
+     */
+    MultivaluedMap<String, String> getCookieNameValueMap();
 }
