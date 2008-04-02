@@ -55,6 +55,26 @@ public class CookieImplTest extends TestCase {
         assertEquals(expResult, cookie.toString());
     }
     
+    public void testCookieValueOf() {
+        Cookie cookie = Cookie.parse("$Version=2;fred=flintstone");
+        assertEquals("fred", cookie.getName());
+        assertEquals("flintstone", cookie.getValue());
+        assertEquals(2, cookie.getVersion());    
+        
+        cookie = Cookie.parse("$Version=1;fred=flintstone;$Path=/path");
+        assertEquals("fred", cookie.getName());
+        assertEquals("flintstone", cookie.getValue());
+        assertEquals(1, cookie.getVersion());    
+        assertEquals("/path", cookie.getPath());    
+        
+        cookie = Cookie.parse("$Version=1;fred=flintstone;$Domain=.sun.com;$Path=/path");
+        assertEquals("fred", cookie.getName());
+        assertEquals("flintstone", cookie.getValue());
+        assertEquals(1, cookie.getVersion());    
+        assertEquals(".sun.com", cookie.getDomain());    
+        assertEquals("/path", cookie.getPath());    
+    }
+    
     public void testCreateCookies() {
         String cookieHeader = "fred=flintstone";
         Map<String, Cookie> cookies = CookiesParser.parseCookies(cookieHeader);

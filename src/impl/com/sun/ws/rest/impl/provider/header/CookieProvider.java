@@ -22,6 +22,7 @@
 
 package com.sun.ws.rest.impl.provider.header;
 
+import com.sun.ws.rest.impl.http.header.HttpHeaderFactory;
 import com.sun.ws.rest.impl.http.header.writer.WriterUtil;
 import com.sun.ws.rest.spi.HeaderDelegateProvider;
 import javax.ws.rs.core.Cookie;
@@ -52,6 +53,6 @@ public class CookieProvider implements HeaderDelegateProvider<Cookie> {
     }
 
     public Cookie fromString(String header) {
-        throw new UnsupportedOperationException();
+        return HttpHeaderFactory.createCookie(header);
     }
 }

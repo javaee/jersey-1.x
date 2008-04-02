@@ -90,6 +90,10 @@ public final class HttpHeaderFactory {
         return CookiesParser.parseCookies(header);
     }
     
+    public static Cookie createCookie(String header) {
+        return CookiesParser.parseCookie(header);
+    }
+    
     public static NewCookie createNewCookie(String header) {
         return CookiesParser.parseNewCookie(header);
     }

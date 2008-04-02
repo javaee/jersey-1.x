@@ -22,7 +22,7 @@
 
 package com.sun.ws.rest.impl.http.header;
 
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import javax.ws.rs.core.Cookie;
 import javax.ws.rs.core.NewCookie;
@@ -52,7 +52,7 @@ import javax.ws.rs.core.NewCookie;
     
     public static Map<String, Cookie> parseCookies(String header) {
         String bites[] = header.split("[;,]");
-        Map<String, Cookie> cookies = new HashMap<String, Cookie>();
+        Map<String, Cookie> cookies = new LinkedHashMap<String, Cookie>();
         int version = 0;
         MutableCookie cookie = null;
         for (String bite: bites) {
@@ -79,7 +79,11 @@ import javax.ws.rs.core.NewCookie;
             cookies.put(cookie.name, cookie.getImmutableCookie());
         return cookies;
     }
-
+    
+    public static Cookie parseCookie(String header) {
+        Map<String, Cookie> cookies = parseCookies(header);
+        return cookies.entrySet().iterator().next().getValue();
+    }
     
     private static class MutableNewCookie {
         String name = null;
