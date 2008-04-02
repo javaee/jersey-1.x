@@ -44,6 +44,7 @@ public class JsonXmlStreamWriter implements XMLStreamWriter {
     private static class WriterAdapter {
 
         Writer writer;
+        boolean isEmpty = true;
 
         WriterAdapter() {
         }
@@ -55,6 +56,7 @@ public class JsonXmlStreamWriter implements XMLStreamWriter {
         void write(String s) throws IOException {
             assert null != writer;
             writer.write(s);
+            isEmpty = false;
         }
 
         String getContent() {
@@ -97,6 +99,7 @@ public class JsonXmlStreamWriter implements XMLStreamWriter {
         Boolean lastWasPrimitive;
         boolean lastIsArray;
         WriterAdapter writer;
+        boolean hasNoElement = true;
 
         ProcessingState() {
             writer = new StringWriterAdapter();
@@ -172,6 +175,7 @@ public class JsonXmlStreamWriter implements XMLStreamWriter {
 
     public void writeEndElement() throws XMLStreamException {
         try {
+
             if (null != processingStack.get(depth).lastElementWriter) {
                 if (processingStack.get(depth).lastIsArray) {
                     processingStack.get(depth).writer.write(",");
@@ -188,7 +192,9 @@ public class JsonXmlStreamWriter implements XMLStreamWriter {
                     }
                 }
             }
-            if ((null == processingStack.get(depth).lastWasPrimitive) || !processingStack.get(depth).lastWasPrimitive) {
+            if (processingStack.get (depth).writer.isEmpty)
+                processingStack.get (depth).writer.write ("null");
+            else if ((null == processingStack.get(depth).lastWasPrimitive) || !processingStack.get(depth).lastWasPrimitive) {
                 processingStack.get(depth).writer.write("}");
             }
             processingStack.get(depth - 1).lastName = processingStack.get(depth - 1).currentName;
@@ -348,7 +354,7 @@ public class JsonXmlStreamWriter implements XMLStreamWriter {
             boolean isNextArrayElement = processingStack.get(depth).currentName.equals(processingStack.get(depth).lastName);
                     //"rows".equals(processingStack.get(depth).currentName);
             if (!isNextArrayElement) {
-                if (isArrayElement(processingStack.get(depth).lastName)) { // one elem array
+                if (isArrayElement(processingStack.get(depth).lastName) && processingStack.get (depth).hasNoElement) { // one elem array
                     processingStack.get(depth).writer.write("[");
                     processingStack.get(depth).lastIsArray = true;
                     processingStack.get(depth).writer.write(processingStack.get(depth).lastElementWriter.getContent());
@@ -378,6 +384,7 @@ public class JsonXmlStreamWriter implements XMLStreamWriter {
                     processingStack.get(depth).writer.write("\"" + localName + "\":");
                 }
             } else { // next array element
+                processingStack.get (depth).hasNoElement = false;
                 processingStack.get(depth).writer.write(processingStack.get(depth).lastIsArray ? "," : "[");  // next element at the same level
                 processingStack.get(depth).lastIsArray = true;
                 processingStack.get(depth).writer.write(processingStack.get(depth).lastElementWriter.getContent());
