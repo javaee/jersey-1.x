@@ -23,6 +23,7 @@
 package com.sun.ws.rest.spi.container.servlet;
 
 import com.sun.ws.rest.api.container.ContainerException;
+import com.sun.ws.rest.api.core.ApplicationConfigAdapter;
 import com.sun.ws.rest.api.core.ResourceConfig;
 import com.sun.ws.rest.impl.ThreadLocalInvoker;
 import com.sun.ws.rest.api.core.ClasspathResourceConfig;
@@ -45,6 +46,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.ws.rs.core.ApplicationConfig;
 import javax.ws.rs.core.Context;
 
 
@@ -81,6 +83,9 @@ import javax.ws.rs.core.Context;
  * {@link HttpServletResponse} and {@link ServletConfig}.
  */
 public class ServletContainer extends HttpServlet {
+    private static final String APPLICATION_CONFIG_CLASS =
+            "javax.ws.rs.ApplicationConfig";
+    
     private static final String RESOURCE_CONFIG_CLASS = 
             "com.sun.ws.rest.config.property.resourceConfigClass";
     
@@ -152,8 +157,15 @@ public class ServletContainer extends HttpServlet {
             throws ServletException {        
         Map<String, Object> props = getInitParams(servletConfig);
         
+        // Check if the resource config class property is present
         String resourceConfigClassName = servletConfig.getInitParameter(RESOURCE_CONFIG_CLASS);
-        if (resourceConfigClassName == null) {
+        // Otherwise check if the JAX-RS applicaion config class property is
+        // present
+        if (resourceConfigClassName == null)
+            resourceConfigClassName = servletConfig.getInitParameter(APPLICATION_CONFIG_CLASS);
+        
+        // If no property is present use the default class scanning property
+        if (resourceConfigClassName == null) {            
             String[] paths = getPaths(servletConfig.getInitParameter(
                     ClasspathResourceConfig.PROPERTY_CLASSPATH));
             props.put(ClasspathResourceConfig.PROPERTY_CLASSPATH, paths);
@@ -182,6 +194,15 @@ public class ServletContainer extends HttpServlet {
                 try {
                     return (ResourceConfig)resourceConfigClass.newInstance();
                 } catch(Exception e) {                    
+                    throw new ServletException(e);
+                }
+            } else if (ApplicationConfig.class.isAssignableFrom(resourceConfigClass)) {
+                try {
+                    ResourceConfig rc = new ApplicationConfigAdapter(
+                            (ApplicationConfig)resourceConfigClass.newInstance());
+                    rc.getProperties().putAll(props);
+                    return rc;
+                } catch(Exception e) {
                     throw new ServletException(e);
                 }
             } else {

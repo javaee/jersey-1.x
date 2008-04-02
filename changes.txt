@@ -1,4 +1,7 @@
 release 0.7 (2008-04-18)
+- The class com.sun.ws.rest.api.core.ApplicationConfigAdapter can be
+  used to adapt an instance of javax.ws.rs.core.ApplicationConfig to an
+  instance of com.sun.ws.rest.api.core.ResourceConfig.
 - Client API request building supports the addition of cookies that are 
   instances of javax.ws.rs.core.Cookie. Client API response supports obtaining
   the list of cookies returned by the server as instances of 
@@ -58,6 +61,17 @@ release 0.7 (2008-04-18)
     aiding construction of URIs that are hyperlinks in representations.
   - Parameters can be annotated with @CookieParam for the type 
     javax.ws.rs.core.Cookie and types conforming to the standard rules.
+  - RuntimeDelegate.getInstance().createEndpoint() can be used to create
+    a container artifact. This is an alternative to the Jersey specific 
+    ContainerFactory.createContainer().
+  - The web.xml may specify the javax.ws.rs.core.ApplicationConfig class using 
+    the init-param name "javax.ws.rs.ApplicationConfig" with a value that is 
+    the class name of a class that extends (directly or indirectly) 
+    ApplicationConfig.
+    Note that the existing Jersey mechanism using ResourceConfig will take
+    precendence if both ApplicationConfig and ResourceConfig classes names are
+    declared as init-params.
+
 
 release 0.6.2 (2008-03-27)
 - Fixed issue 52: xml attrs in JSON representation deserialization
