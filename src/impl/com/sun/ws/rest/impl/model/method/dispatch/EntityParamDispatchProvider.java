@@ -47,13 +47,12 @@ import javax.ws.rs.core.Response;
 public class EntityParamDispatchProvider implements ResourceMethodDispatchProvider {
                 
     static final class EntityExtractor implements ParameterExtractor {
-        final Class parameterEntityType;
+        final Class<?> parameterEntityType;
         
         EntityExtractor(Class parameterEntityType) {
             this.parameterEntityType = parameterEntityType;
         }
         
-        @SuppressWarnings("unchecked")
         public Object extract(HttpContext context) {
             return context.getRequest().getEntity(parameterEntityType);
         }
@@ -133,7 +132,6 @@ public class EntityParamDispatchProvider implements ResourceMethodDispatchProvid
             super(abstractResourceMethod, injectors);
         }
 
-        @SuppressWarnings("unchecked")
         public void _dispatch(Object resource, HttpContext context)
         throws IllegalAccessException, InvocationTargetException {
             final Object[] params = getParams(context);
@@ -208,7 +206,6 @@ public class EntityParamDispatchProvider implements ResourceMethodDispatchProvid
         return extractors;
     }
 
-    @SuppressWarnings("unchecked")
     private ParameterExtractor processParameter(
             AbstractResourceMethod method,
             Parameter parameter, 
