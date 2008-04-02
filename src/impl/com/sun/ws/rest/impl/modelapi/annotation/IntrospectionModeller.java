@@ -74,19 +74,25 @@ public class IntrospectionModeller {
 
         if (isRootResourceClass) {
             resource = new AbstractResource(resourceClass,
-                    new UriPathValue(rPathAnnotation.value(), rPathAnnotation.encode(), rPathAnnotation.limited()));
+                    new UriPathValue(rPathAnnotation.value(), rPathAnnotation.encode(), 
+                    rPathAnnotation.limited()));
         } else { // just a subresource class
             resource = new AbstractResource(resourceClass);
         }
 
-        workOutConstructorsList(resource, resourceClass.getConstructors(), isEncodedAnotOnClass);
+        workOutConstructorsList(resource, resourceClass.getConstructors(), 
+                isEncodedAnotOnClass);
 
         final MethodList methodList = new MethodList(resourceClass);
 
-        final ConsumeMime classScopeConsumeMimeAnnotation = resourceClass.getAnnotation(ConsumeMime.class);
-        final ProduceMime classScopeProduceMimeAnnotation = resourceClass.getAnnotation(ProduceMime.class);
-        workOutResourceMethodsList(resource, methodList, isEncodedAnotOnClass, classScopeConsumeMimeAnnotation, classScopeProduceMimeAnnotation);
-        workOutSubResourceMethodsList(resource, methodList, isEncodedAnotOnClass, classScopeConsumeMimeAnnotation, classScopeProduceMimeAnnotation);
+        final ConsumeMime classScopeConsumeMimeAnnotation = 
+                resourceClass.getAnnotation(ConsumeMime.class);
+        final ProduceMime classScopeProduceMimeAnnotation = 
+                resourceClass.getAnnotation(ProduceMime.class);
+        workOutResourceMethodsList(resource, methodList, isEncodedAnotOnClass, 
+                classScopeConsumeMimeAnnotation, classScopeProduceMimeAnnotation);
+        workOutSubResourceMethodsList(resource, methodList, isEncodedAnotOnClass, 
+                classScopeConsumeMimeAnnotation, classScopeProduceMimeAnnotation);
         workOutSubResourceLocatorsList(resource, methodList, isEncodedAnotOnClass);
         
         logNonPublicMethods(resourceClass);
@@ -99,31 +105,43 @@ public class IntrospectionModeller {
     }
     
     private static final void findOutConsumeMimeTypes(
-            AbstractResourceMethod resourceMethod, ConsumeMime classScopeConsumeMimeAnnotation) {
+            AbstractResourceMethod resourceMethod, 
+            ConsumeMime classScopeConsumeMimeAnnotation) {
 
         if (resourceMethod.getMethod().isAnnotationPresent(ConsumeMime.class)) {
-            final ConsumeMime consumeMimeAnnotation = resourceMethod.getMethod().getAnnotation(ConsumeMime.class);
-            resourceMethod.getSupportedInputTypes().addAll(MediaTypeHelper.createMediaTypes(consumeMimeAnnotation));
+            final ConsumeMime consumeMimeAnnotation = resourceMethod.getMethod().
+                    getAnnotation(ConsumeMime.class);
+            resourceMethod.getSupportedInputTypes().addAll(
+                    MediaTypeHelper.createMediaTypes(consumeMimeAnnotation));
         } else { // have to use the annotation from class
-            resourceMethod.getSupportedInputTypes().addAll(MediaTypeHelper.createMediaTypes(classScopeConsumeMimeAnnotation));
+            resourceMethod.getSupportedInputTypes().addAll(
+                    MediaTypeHelper.createMediaTypes(classScopeConsumeMimeAnnotation));
         }
     }
 
     private static final void findOutProduceMimeTypes(
-            AbstractResourceMethod resourceMethod, ProduceMime classScopeProduceMimeAnnotation) {
+            AbstractResourceMethod resourceMethod, 
+            ProduceMime classScopeProduceMimeAnnotation) {
 
         if (resourceMethod.getMethod().isAnnotationPresent(ProduceMime.class)) {
-            final ProduceMime produceMimeAnnotation = resourceMethod.getMethod().getAnnotation(ProduceMime.class);
-            resourceMethod.getSupportedOutputTypes().addAll(MediaTypeHelper.createMediaTypes(produceMimeAnnotation));
+            final ProduceMime produceMimeAnnotation = resourceMethod.getMethod().
+                    getAnnotation(ProduceMime.class);
+            resourceMethod.getSupportedOutputTypes().addAll(
+                    MediaTypeHelper.createMediaTypes(produceMimeAnnotation));
         } else { // have to use the annotation from class
-            resourceMethod.getSupportedOutputTypes().addAll(MediaTypeHelper.createMediaTypes(classScopeProduceMimeAnnotation));
+            resourceMethod.getSupportedOutputTypes().addAll(
+                    MediaTypeHelper.createMediaTypes(classScopeProduceMimeAnnotation));
         }
     }
 
-    private static final void workOutConstructorsList(AbstractResource resource, Constructor[] ctorArray, boolean isEncoded) {
+    private static final void workOutConstructorsList(
+            AbstractResource resource, 
+            Constructor[] ctorArray, 
+            boolean isEncoded) {
         if (null != ctorArray) {
             for (Constructor ctor : ctorArray) {
-                final AbstractResourceConstructor aCtor = new AbstractResourceConstructor(ctor);
+                final AbstractResourceConstructor aCtor = 
+                        new AbstractResourceConstructor(ctor);
                 processParameters(aCtor, ctor, isEncoded);
                 resource.getConstructors().add(aCtor);
             }
@@ -131,13 +149,17 @@ public class IntrospectionModeller {
     }
 
     private static final void workOutResourceMethodsList(
-            AbstractResource resource, MethodList methodList, boolean isEncoded,
-            ConsumeMime classScopeConsumeMimeAnnotation, ProduceMime classScopeProduceMimeAnnotation) {
+            AbstractResource resource, 
+            MethodList methodList, 
+            boolean isEncoded,
+            ConsumeMime classScopeConsumeMimeAnnotation, 
+            ProduceMime classScopeProduceMimeAnnotation) {
 
         // TODO what to do about multiple meta HttpMethod annotations?
         // Should the method be added more than once to the model and
         // then validation could reject?
-        for (Method method : methodList.hasMetaAnnotation(HttpMethod.class).hasNotAnnotation(Path.class)) {
+        for (Method method : methodList.hasMetaAnnotation(HttpMethod.class).
+                hasNotAnnotation(Path.class)) {
             final AbstractResourceMethod resourceMethod = new AbstractResourceMethod(
                     resource,
                     method, 
@@ -152,18 +174,25 @@ public class IntrospectionModeller {
     }
     
     private static final void workOutSubResourceMethodsList(
-            AbstractResource resource, MethodList methodList, boolean isEncoded,
-            ConsumeMime classScopeConsumeMimeAnnotation, ProduceMime classScopeProduceMimeAnnotation) {
+            AbstractResource resource, 
+            MethodList methodList, 
+            boolean isEncoded,
+            ConsumeMime classScopeConsumeMimeAnnotation, 
+            ProduceMime classScopeProduceMimeAnnotation) {
 
         // TODO what to do about multiple meta HttpMethod annotations?
         // Should the method be added more than once to the model and
         // then validation could reject?
-        for (Method method : methodList.hasMetaAnnotation(HttpMethod.class).hasAnnotation(Path.class)) {
+        for (Method method : methodList.hasMetaAnnotation(HttpMethod.class).
+                hasAnnotation(Path.class)) {
             final Path mPathAnnotation = method.getAnnotation(Path.class);
             final AbstractSubResourceMethod subResourceMethod = new AbstractSubResourceMethod(
                     resource,
                     method,
-                    new UriPathValue(mPathAnnotation.value(), mPathAnnotation.encode(), mPathAnnotation.limited()),
+                    new UriPathValue(
+                        mPathAnnotation.value(), 
+                        mPathAnnotation.encode(),
+                        mPathAnnotation.limited()),
                     getMetaAnnotations(method, HttpMethod.class).get(0).value());
        
             findOutConsumeMimeTypes(subResourceMethod, classScopeConsumeMimeAnnotation);
@@ -190,34 +219,52 @@ public class IntrospectionModeller {
         return ma;
     }
     
-    private static final void workOutSubResourceLocatorsList(AbstractResource resource, MethodList methodList, boolean isEncoded) {
+    private static final void workOutSubResourceLocatorsList(
+            AbstractResource resource, 
+            MethodList methodList, 
+            boolean isEncoded) {
 
-        for (Method method : methodList.hasNotMetaAnnotation(HttpMethod.class).hasAnnotation(Path.class)) {
+        for (Method method : methodList.hasNotMetaAnnotation(HttpMethod.class).
+                hasAnnotation(Path.class)) {
             final Path mPathAnnotation = method.getAnnotation(Path.class);
             final AbstractSubResourceLocator subResourceLocator = new AbstractSubResourceLocator(
                     method,
-                    new UriPathValue(mPathAnnotation.value(), mPathAnnotation.encode(), mPathAnnotation.limited()));
+                    new UriPathValue(
+                        mPathAnnotation.value(), 
+                        mPathAnnotation.encode(), 
+                        mPathAnnotation.limited()));
 
-            processParameters(subResourceLocator, subResourceLocator.getMethod(), isEncoded);
+            processParameters(subResourceLocator, subResourceLocator.getMethod(), 
+                    isEncoded);
 
             resource.getSubResourceLocators().add(subResourceLocator);
         }
     }
 
-    private static final void processParameters(Parameterized parametrized, Constructor ctor, boolean isEncoded) {
+    private static final void processParameters(
+            Parameterized parametrized, 
+            Constructor ctor, 
+            boolean isEncoded) {
         processParameters(
                 ctor.toString(),
                 parametrized,
                 ((null != ctor.getAnnotation(Encoded.class)) || isEncoded),
-                ctor.getParameterTypes(), ctor.getGenericParameterTypes(), ctor.getParameterAnnotations());
+                ctor.getParameterTypes(), 
+                ctor.getGenericParameterTypes(),
+                ctor.getParameterAnnotations());
     }
 
-    private static final void processParameters(Parameterized parametrized, Method method, boolean isEncoded) {
+    private static final void processParameters(
+            Parameterized parametrized, 
+            Method method, 
+            boolean isEncoded) {
         processParameters(
                 method.toString(),
                 parametrized,
                 ((null != method.getAnnotation(Encoded.class)) || isEncoded),
-                method.getParameterTypes(), method.getGenericParameterTypes(), method.getParameterAnnotations());
+                method.getParameterTypes(), 
+                method.getGenericParameterTypes(), 
+                method.getParameterAnnotations());
     }
 
     private static final void processParameters(
@@ -231,7 +278,8 @@ public class IntrospectionModeller {
         for (int i = 0; i < parameterTypes.length; i++) {
             Parameter parameter = createParameter(
                     nameForLogging, i + 1,
-                    isEncoded, parameterTypes[i], genericParameterTypes[i], parameterAnnotations[i]);
+                    isEncoded, parameterTypes[i], genericParameterTypes[i], 
+                    parameterAnnotations[i]);
             if (null != parameter) {
                 parametrized.getParameters().add(parameter);
             } else {
@@ -313,12 +361,14 @@ public class IntrospectionModeller {
         });
         return Collections.unmodifiableMap(m);
     }
-    private final static Map<Class, ParamAnnotationHelper> ANOT_HELPER_MAP = createParamAnotHelperMap();
+    private final static Map<Class, ParamAnnotationHelper> ANOT_HELPER_MAP = 
+            createParamAnotHelperMap();
 
     @SuppressWarnings("unchecked")
     private static final Parameter createParameter(
             String nameForLogging, int order,
-            boolean isEncoded, Class<?> paramClass, Type paramType, Annotation[] annotations) {
+            boolean isEncoded, Class<?> paramClass, Type paramType, 
+            Annotation[] annotations) {
 
         if (null == annotations) {
             return null;
@@ -335,7 +385,8 @@ public class IntrospectionModeller {
                 ParamAnnotationHelper helper = ANOT_HELPER_MAP.get(annotation.annotationType());
                 if (null != paramSource) {
                     if (LOGGER.isLoggable(Level.WARNING)) {
-                        LOGGER.warning(ImplMessages.AMBIGUOUS_PARAMETER(nameForLogging, Integer.toString(order)));
+                        LOGGER.warning(ImplMessages.AMBIGUOUS_PARAMETER(nameForLogging, 
+                                Integer.toString(order)));
                     }
                 // TODO: throw an exception ?
                 }
@@ -352,7 +403,8 @@ public class IntrospectionModeller {
             paramSource = Parameter.Source.ENTITY;
         }
 
-        return new Parameter(paramSource, paramName, paramType, paramClass, paramEncoded, paramDefault);
+        return new Parameter(paramSource, paramName, paramType, paramClass, 
+                paramEncoded, paramDefault);
     }
 
     private static final boolean isNotPublic(Method method) {
@@ -369,19 +421,22 @@ public class IntrospectionModeller {
         
         final MethodList declaredMethods = new MethodList(resourceClass.getDeclaredMethods());
         // non-public resource methods
-        for (Method method : declaredMethods.hasMetaAnnotation(HttpMethod.class).hasNotAnnotation(Path.class)) {
+        for (Method method : declaredMethods.hasMetaAnnotation(HttpMethod.class).
+                hasNotAnnotation(Path.class)) {
             if (isNotPublic(method)) {
                 LOGGER.warning(ImplMessages.NON_PUB_RES_METHOD(method.toGenericString()));
             }
         }
         // non-public subres methods
-        for (Method method : declaredMethods.hasMetaAnnotation(HttpMethod.class).hasAnnotation(Path.class)) {
+        for (Method method : declaredMethods.hasMetaAnnotation(HttpMethod.class).
+                hasAnnotation(Path.class)) {
             if (isNotPublic(method)) {
                 LOGGER.warning(ImplMessages.NON_PUB_SUB_RES_METHOD(method.toGenericString()));
             }
         }
         // non-public subres locators
-        for (Method method : declaredMethods.hasNotMetaAnnotation(HttpMethod.class).hasAnnotation(Path.class)) {
+        for (Method method : declaredMethods.hasNotMetaAnnotation(HttpMethod.class).
+                hasAnnotation(Path.class)) {
             if (isNotPublic(method)) {
                 LOGGER.warning(ImplMessages.NON_PUB_SUB_RES_LOC(method.toGenericString()));
             }
