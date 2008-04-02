@@ -22,7 +22,6 @@
 
 package com.sun.ws.rest.impl.http.header;
 
-import com.sun.ws.rest.impl.provider.header.NewCookieProvider;
 import java.util.Map;
 import junit.framework.*;
 import javax.ws.rs.core.Cookie;
@@ -38,12 +37,27 @@ public class CookieImplTest extends TestCase {
         super(testName);
     }
 
-    /**
-     * Test of createCookies method, of class com.sun.ws.rest.impl.http.header.CookiesParser.
-     */
+    public void testCookieToString() {
+        Cookie cookie = new Cookie("fred", "flintstone");        
+        String expResult = "$Version=1;fred=flintstone";
+        assertEquals(expResult, cookie.toString());
+        
+        cookie = new Cookie("fred", "flintstone", "/path", null);        
+        expResult = "$Version=1;fred=flintstone;$Path=/path";
+        assertEquals(expResult, cookie.toString());
+        
+        cookie = new Cookie("fred", "flintstone", "/path", ".sun.com");        
+        expResult = "$Version=1;fred=flintstone;$Domain=.sun.com;$Path=/path";
+        assertEquals(expResult, cookie.toString());
+        
+        cookie = new Cookie("fred", "flintstone", "/path", ".sun.com", 2);        
+        expResult = "$Version=2;fred=flintstone;$Domain=.sun.com;$Path=/path";
+        assertEquals(expResult, cookie.toString());
+    }
+    
     public void testCreateCookies() {
         String cookieHeader = "fred=flintstone";
-        Map<String, Cookie> cookies = CookiesParser.createCookies(cookieHeader);
+        Map<String, Cookie> cookies = CookiesParser.parseCookies(cookieHeader);
         assertEquals(cookies.size(), 1);
         Cookie c = cookies.get("fred");
         assertEquals(c.getVersion(), 0);
@@ -51,7 +65,7 @@ public class CookieImplTest extends TestCase {
         assertTrue(c.getValue().equals("flintstone"));
         
         cookieHeader = "fred=flintstone,barney=rubble";
-        cookies = CookiesParser.createCookies(cookieHeader);
+        cookies = CookiesParser.parseCookies(cookieHeader);
         assertEquals(cookies.size(), 2);
         c = cookies.get("fred");
         assertEquals(c.getVersion(), 0);
@@ -63,7 +77,7 @@ public class CookieImplTest extends TestCase {
         assertTrue(c.getValue().equals("rubble"));
 
         cookieHeader = "fred=flintstone;barney=rubble";
-        cookies = CookiesParser.createCookies(cookieHeader);
+        cookies = CookiesParser.parseCookies(cookieHeader);
         assertEquals(cookies.size(), 2);
         c = cookies.get("fred");
         assertEquals(c.getVersion(), 0);
@@ -75,7 +89,7 @@ public class CookieImplTest extends TestCase {
         assertTrue(c.getValue().equals("rubble"));
     
         cookieHeader = "$Version=1;fred=flintstone;$Path=/path;barney=rubble";
-        cookies = CookiesParser.createCookies(cookieHeader);
+        cookies = CookiesParser.parseCookies(cookieHeader);
         assertEquals(cookies.size(), 2);
         c = cookies.get("fred");
         assertEquals(c.getVersion(), 1);
@@ -88,7 +102,7 @@ public class CookieImplTest extends TestCase {
         assertTrue(c.getValue().equals("rubble"));
 
         cookieHeader = "$Version=1;fred=flintstone;$Path=/path,barney=rubble;$Domain=.sun.com";
-        cookies = CookiesParser.createCookies(cookieHeader);
+        cookies = CookiesParser.parseCookies(cookieHeader);
         assertEquals(cookies.size(), 2);
         c = cookies.get("fred");
         assertEquals(c.getVersion(), 1);
@@ -102,7 +116,7 @@ public class CookieImplTest extends TestCase {
         assertTrue(c.getDomain().equals(".sun.com"));
 
         cookieHeader = "$Version=1; fred = flintstone ; $Path=/path, barney=rubble ;$Domain=.sun.com";
-        cookies = CookiesParser.createCookies(cookieHeader);
+        cookies = CookiesParser.parseCookies(cookieHeader);
         assertEquals(cookies.size(), 2);
         c = cookies.get("fred");
         assertEquals(c.getVersion(), 1);
@@ -116,28 +130,40 @@ public class CookieImplTest extends TestCase {
         assertTrue(c.getDomain().equals(".sun.com"));
     }
     
-    /**
-     * Test of toString method, of class com.sun.ws.rest.impl.http.header.CookiesParser.
-     */
-    public void testToStringWithProvider() {
-        NewCookieProvider ncp = new NewCookieProvider();
-        
-        NewCookie cookie = new NewCookie("fred", "flintstone");
-        
-        String expResult = "$Version=1;fred=flintstone";
-        String result = ncp.toString(cookie);
-        assertEquals(expResult, result);
+    public void testNewCookieToString() {
+        NewCookie cookie = new NewCookie("fred", "flintstone");        
+        String expResult = "fred=flintstone;Version=1";
+        assertEquals(expResult, cookie.toString());
         
         cookie = new NewCookie("fred", "flintstone", null, null, 
                 null, 60, false);
-        expResult = "$Version=1;fred=flintstone;Max-Age=60";
-        result = ncp.toString(cookie);
-        assertEquals(expResult, result);
+        expResult = "fred=flintstone;Version=1;Max-Age=60";
+        assertEquals(expResult, cookie.toString());
         
         cookie = new NewCookie("fred", "flintstone", null, null, 
                 "a modern stonage family", 60, false);
-        expResult = "$Version=1;fred=flintstone;Comment=\"a modern stonage family\";Max-Age=60";
-        result = ncp.toString(cookie);
-        assertEquals(expResult, result);
+        expResult = "fred=flintstone;Version=1;Comment=\"a modern stonage family\";Max-Age=60";
+        assertEquals(expResult, cookie.toString());
+    }
+    
+    public void testNewCookieValueOf() {
+        NewCookie cookie = NewCookie.parse("fred=flintstone;Version=2");
+        assertEquals("fred", cookie.getName());
+        assertEquals("flintstone", cookie.getValue());
+        assertEquals(2, cookie.getVersion());    
+        
+        cookie = NewCookie.parse("fred=flintstone;Version=1;Max-Age=60");
+        assertEquals("fred", cookie.getName());
+        assertEquals("flintstone", cookie.getValue());
+        assertEquals(1, cookie.getVersion());    
+        assertEquals(60, cookie.getMaxAge());    
+        
+        cookie = NewCookie.parse("fred=flintstone;Version=1;Comment=\"a modern stonage family\";Max-Age=60;Secure");
+        assertEquals("fred", cookie.getName());
+        assertEquals("flintstone", cookie.getValue());
+        assertEquals("a modern stonage family", cookie.getComment());
+        assertEquals(1, cookie.getVersion());    
+        assertEquals(60, cookie.getMaxAge());    
+        assertTrue(cookie.isSecure());
     }
 }

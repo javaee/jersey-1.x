@@ -41,11 +41,11 @@ public class CookieProvider implements HeaderDelegateProvider<Cookie> {
         WriterUtil.appendQuotedIfWhitespace(b, cookie.getValue());
         
         if (cookie.getDomain() != null) {
-            b.append(";Domain=");
+            b.append(";$Domain=");
             WriterUtil.appendQuotedIfWhitespace(b, cookie.getDomain());
         }
         if (cookie.getPath() != null) {
-            b.append(";Path=");
+            b.append(";$Path=");
             WriterUtil.appendQuotedIfWhitespace(b, cookie.getPath());
         }
         return b.toString();
@@ -54,5 +54,4 @@ public class CookieProvider implements HeaderDelegateProvider<Cookie> {
     public Cookie fromString(String header) {
         throw new UnsupportedOperationException();
     }
-
 }

@@ -1,6 +1,8 @@
 release 0.7 (2008-04-18)
-- Client API supports the addition of cookies that are instances of
-  javax.ws.rs.core.Cookie.
+- Client API request building supports the addition of cookies that are 
+  instances of javax.ws.rs.core.Cookie. Client API response supports obtaining
+  the list of cookies returned by the server as instances of 
+  javax.ws.rs.NewCookie.
 - Renamed HttpContextAccess to HttpContext. Changed getHttpRequestContext
   and getHttpResponseContext methods to getRequest and getResponse respectively.
 - UriRuleContext extends HttpContext. Removed UriRuleContext.getHttpContext()

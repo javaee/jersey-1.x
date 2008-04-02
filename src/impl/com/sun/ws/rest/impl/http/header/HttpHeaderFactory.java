@@ -35,6 +35,7 @@ import java.util.Map;
 import javax.ws.rs.core.Cookie;
 import javax.ws.rs.core.EntityTag;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.NewCookie;
 
 /**
  *
@@ -86,7 +87,11 @@ public final class HttpHeaderFactory {
     }
 
     public static Map<String, Cookie> createCookies(String header) {
-        return CookiesParser.createCookies(header);
+        return CookiesParser.parseCookies(header);
+    }
+    
+    public static NewCookie createNewCookie(String header) {
+        return CookiesParser.parseNewCookie(header);
     }
     
     public static void createAllow(String header) {

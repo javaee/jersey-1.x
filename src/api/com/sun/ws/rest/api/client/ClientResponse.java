@@ -23,11 +23,15 @@
 package com.sun.ws.rest.api.client;
 
 import java.net.URI;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 import javax.ws.rs.core.EntityTag;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
+import javax.ws.rs.core.NewCookie;
 import javax.ws.rs.ext.RuntimeDelegate;
 import javax.ws.rs.ext.RuntimeDelegate.HeaderDelegate;
 
@@ -129,5 +133,16 @@ public abstract class ClientResponse {
      */
     public String getLanguage() {
         return getMetadata().getFirst("Content-Language");
+    }
+    
+    public List<NewCookie> getCookies() {
+        List<String> hs = getMetadata().get("Set-Cookie");
+        if (hs == null) return Collections.emptyList();
+        
+        List<NewCookie> cs = new ArrayList<NewCookie>();
+        for (String h : hs) {
+            cs.add(NewCookie.parse(h));
+        }
+        return cs;
     }
 }

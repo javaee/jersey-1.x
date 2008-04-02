@@ -22,6 +22,7 @@
 
 package com.sun.ws.rest.impl.provider.header;
 
+import com.sun.ws.rest.impl.http.header.HttpHeaderFactory;
 import com.sun.ws.rest.impl.http.header.writer.WriterUtil;
 import com.sun.ws.rest.spi.HeaderDelegateProvider;
 import javax.ws.rs.core.NewCookie;
@@ -34,11 +35,11 @@ public class NewCookieProvider implements HeaderDelegateProvider<NewCookie> {
 
     public String toString(NewCookie cookie) {
         StringBuilder b = new StringBuilder();
-        
-        b.append("$Version=").append(cookie.getVersion()).append(';');
-        
+                
         b.append(cookie.getName()).append('=');
         WriterUtil.appendQuotedIfWhitespace(b, cookie.getValue());
+        
+        b.append(";").append("Version=").append(cookie.getVersion());
         
         if (cookie.getComment() != null) {
             b.append(";Comment=");
@@ -62,7 +63,6 @@ public class NewCookieProvider implements HeaderDelegateProvider<NewCookie> {
     }
 
     public NewCookie fromString(String header) {
-        throw new UnsupportedOperationException();
+        return HttpHeaderFactory.createNewCookie(header);
     }
-
 }

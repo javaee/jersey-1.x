@@ -25,6 +25,7 @@ package com.sun.ws.rest.impl.http.header;
 import java.util.HashMap;
 import java.util.Map;
 import javax.ws.rs.core.Cookie;
+import javax.ws.rs.core.NewCookie;
 
 /**
  * TODO use the HttpHeaderReader
@@ -33,11 +34,11 @@ import javax.ws.rs.core.Cookie;
  */
 /* protected */ class CookiesParser {
     private static class MutableCookie {
-        private String name;
-        private String value;
-        private int version = -1;
-        private String path = null;
-        private String domain = null;
+        String name;
+        String value;
+        int version = Cookie.DEFAULT_VERSION;
+        String path = null;
+        String domain = null;
 
         public MutableCookie(String name, String value) {
             this.name = name;
@@ -46,53 +47,10 @@ import javax.ws.rs.core.Cookie;
 
         public Cookie getImmutableCookie() {
             return new Cookie(name, value, path, domain, version);
-        }
-        public String getName() {
-            return name;
-        }
-
-        public void setName(String name) {
-            this.name = name;
-        }
-
-
-        public String getValue() {
-            return value;
-        }
-
-        public void setValue(String value) {
-            this.value = value;
-        }
-
-
-        public int getVersion() {
-            return version;
-        }
-
-        public void setVersion(int version) {
-            this.version = version;
-        }
-
-
-        public String getPath() {
-            return path;
-        }
-
-        public void setPath(String path) {
-            this.path = path;
-        }
-
-
-        public String getDomain() {
-            return domain;
-        }
-
-        public void setDomain(String domain) {
-            this.domain = domain;
-        }
+        }        
     }
     
-    public static Map<String, Cookie> createCookies(String header) {
+    public static Map<String, Cookie> parseCookies(String header) {
         String bites[] = header.split("[;,]");
         Map<String, Cookie> cookies = new HashMap<String, Cookie>();
         int version = 0;
@@ -105,21 +63,73 @@ import javax.ws.rs.core.Cookie;
                 value = value.substring(1,value.length()-1);
             if (!name.startsWith("$")) {
                 if (cookie != null)
-                    cookies.put(cookie.getName(), cookie.getImmutableCookie());
+                    cookies.put(cookie.name, cookie.getImmutableCookie());
                 
                 cookie = new MutableCookie(name, value);
-                cookie.setVersion(version);
+                cookie.version = version;
             }
             else if (name.startsWith("$Version"))
                 version = Integer.parseInt(value);
             else if (name.startsWith("$Path") && cookie!=null)
-                cookie.setPath(value);
+                cookie.path = value;
             else if (name.startsWith("$Domain") && cookie!=null)
-                cookie.setDomain(value);
+                cookie.domain = value;
         }
         if (cookie != null)
-            cookies.put(cookie.getName(), cookie.getImmutableCookie());
+            cookies.put(cookie.name, cookie.getImmutableCookie());
         return cookies;
     }
 
+    
+    private static class MutableNewCookie {
+        String name = null;
+        String value = null;
+        String path = null;
+        String domain = null;
+        int version = Cookie.DEFAULT_VERSION;
+        String comment = null;
+        int maxAge = NewCookie.DEFAULT_MAX_AGE;
+        boolean secure = false;
+
+        public MutableNewCookie(String name, String value) {
+            this.name = name;
+            this.value = value;
+        }
+
+        public NewCookie getImmutableNewCookie() {
+            return new NewCookie(name, value, path, domain, version, comment, maxAge, secure);
+        }        
+    }
+    
+    public static NewCookie parseNewCookie(String header) {
+        String bites[] = header.split("[;,]");
+        
+        MutableNewCookie cookie = null;
+        for (String bite: bites) {
+            String crumbs[] = bite.split("=", 2);
+            String name = crumbs.length>0 ? crumbs[0].trim() : "";
+            String value = crumbs.length>1 ? crumbs[1].trim() : "";
+            if (value.startsWith("\"") && value.endsWith("\"") && value.length()>1)
+                value = value.substring(1,value.length()-1);
+            
+            if (cookie == null)
+                cookie = new MutableNewCookie(name, value);
+            else if (name.startsWith("Comment"))
+                cookie.comment = value;
+            else if (name.startsWith("Domain"))
+                cookie.domain = value;
+            else if (name.startsWith("Max-Age"))
+                cookie.maxAge = Integer.parseInt(value);
+            else if (name.startsWith("Path"))
+                cookie.path = value;
+            else if (name.startsWith("Secure"))
+                cookie.secure = true;
+            else if (name.startsWith("Version"))
+                cookie.version = Integer.parseInt(value);
+            else if (name.startsWith("Domain"))
+                cookie.domain = value;
+        }
+        
+        return cookie.getImmutableNewCookie();
+    }
 }
