@@ -71,7 +71,10 @@ release 0.7 (2008-04-18)
     Note that the existing Jersey mechanism using ResourceConfig will take
     precendence if both ApplicationConfig and ResourceConfig classes names are
     declared as init-params.
-
+  - Concrete methods implementing methods on interfaces or overriding methods on
+    super classes (abstract or otherwise) may inherit JAX-RS annotations on such
+    inheriting methods if and only if there are no JAX-RS annotations on the 
+    concrete method or it's parameters.
 
 release 0.6.2 (2008-03-27)
 - Fixed issue 52: xml attrs in JSON representation deserialization

@@ -24,6 +24,7 @@ package com.sun.ws.rest.impl.modelapi.annotation;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
@@ -33,25 +34,45 @@ import java.util.List;
  *
  * @author Paul.Sandoz@Sun.Com
  */
-class MethodList implements Iterable<Method> {
+class MethodList implements Iterable<AnnotatedMethod> {
 
-    Method[] methods;
+    private AnnotatedMethod[] methods;
     
-    MethodList(Class c) {
+    public MethodList(Class c) {
         this(c.getMethods());
     }
     
-    MethodList(Method... methods) {
+    public MethodList(List<Method> methods) {
+        this.methods = new AnnotatedMethod[methods.size()];
+        for (int i = 0; i < methods.size(); i++)
+            this.methods[i] = new AnnotatedMethod(methods.get(i));        
+    }
+    
+    public MethodList(Method... methods) {
+        this.methods = new AnnotatedMethod[methods.length];
+        for (int i = 0; i < methods.length; i++)
+            this.methods[i] = new AnnotatedMethod(methods[i]);
+    }
+    
+    public MethodList(AnnotatedMethod... methods) {        
         this.methods = methods;
     }
 
-    public Iterator<Method> iterator() {
+    public Iterator<AnnotatedMethod> iterator() {
       return Arrays.asList(methods).iterator();
+    }
+    
+    <T extends Annotation> MethodList isNotPublic() {
+        return filter(new Filter() {
+            public boolean keep(AnnotatedMethod m) {
+                return !Modifier.isPublic(m.getMethod().getModifiers());
+            }
+        });
     }
     
     <T extends Annotation> MethodList hasAnnotation(final Class<T> annotation) {
         return filter(new Filter() {
-            public boolean keep(Method m) {
+            public boolean keep(AnnotatedMethod m) {
                 return m.getAnnotation(annotation) != null;
             }
         });
@@ -59,7 +80,7 @@ class MethodList implements Iterable<Method> {
     
     <T extends Annotation> MethodList hasMetaAnnotation(final Class<T> annotation) {
         return filter(new Filter() {
-            public boolean keep(Method m) {
+            public boolean keep(AnnotatedMethod m) {
                 for (Annotation a : m.getAnnotations()) {
                     if (a.annotationType().getAnnotation(annotation) != null)
                         return true;
@@ -71,7 +92,7 @@ class MethodList implements Iterable<Method> {
     
     <T extends Annotation> MethodList hasNotAnnotation(final Class<T> annotation) {
         return filter(new Filter() {
-            public boolean keep(Method m) {
+            public boolean keep(AnnotatedMethod m) {
                 return m.getAnnotation(annotation) == null;
             }
         });
@@ -79,7 +100,7 @@ class MethodList implements Iterable<Method> {
     
     <T extends Annotation> MethodList hasNotMetaAnnotation(final Class<T> annotation) {
         return filter(new Filter() {
-            public boolean keep(Method m) {
+            public boolean keep(AnnotatedMethod m) {
                 for (Annotation a : m.getAnnotations()) {
                     if (a.annotationType().getAnnotation(annotation) != null)
                         return false;
@@ -90,14 +111,14 @@ class MethodList implements Iterable<Method> {
     }
     
     private interface Filter {
-        boolean keep(Method m);
+        boolean keep(AnnotatedMethod m);
     }
     
     private MethodList filter(Filter f) {
-        List<Method> r = new ArrayList<Method>();
-        for (Method m : methods)
+        List<AnnotatedMethod> r = new ArrayList<AnnotatedMethod>();
+        for (AnnotatedMethod m : methods)
             if (f.keep(m))
                 r.add(m);
-        return new MethodList(r.toArray(new Method[0]));
+        return new MethodList(r.toArray(new AnnotatedMethod[0]));
     }
 }
