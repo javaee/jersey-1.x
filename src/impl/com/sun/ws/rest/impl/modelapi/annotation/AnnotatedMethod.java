@@ -205,6 +205,9 @@ public final class AnnotatedMethod implements AnnotatedElement {
     }
     
     private static Method findAnnotatedMethod(Class<?> c, Method m) {
+        if (c == Object.class)
+            return null;
+        
         try {
             m = c.getMethod(m.getName(), m.getParameterTypes());
         } catch (NoSuchMethodException ex) {
@@ -213,15 +216,16 @@ public final class AnnotatedMethod implements AnnotatedElement {
 
         if (hasAnnotations(m)) return m;
         
+        // Super classes take precendence over interfaces
+        Class<?> sc = c.getSuperclass();
+        if (sc != null && sc != Object.class) {
+            Method sm = findAnnotatedMethod(sc, m);
+            if (sm != null) return sm;
+        }
+        
         for (Class<?> ic : c.getInterfaces()) {
             Method im = findAnnotatedMethod(ic, m);
             if (im != null) return im;
-        }
-
-        Class<?> sc = c.getSuperclass();
-        if (sc != null) {
-            Method sm = findAnnotatedMethod(sc, m);
-            if (sm != null) return sm;
         }
 
         return null;
