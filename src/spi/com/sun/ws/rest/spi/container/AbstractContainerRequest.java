@@ -169,8 +169,9 @@ public abstract class AbstractContainerRequest implements ContainerRequest {
     public <T> T getEntity(Class<T> type, Type genericType, Annotation[] as) {
         try {
             MediaType mediaType = getMediaType();
-            MessageBodyReader<T> bw = bodyContext.getMessageBodyReader(type, 
-                    mediaType);
+            MessageBodyReader<T> bw = bodyContext.getMessageBodyReader(
+                    type, genericType, 
+                    as, mediaType);
             if (bw == null) {
                 throw new WebApplicationException(
                         Responses.unsupportedMediaType().build());

@@ -96,7 +96,9 @@ public class TestResourceClientHandler implements ClientHandler {
             
             try {
                 MediaType mediaType = getType();
-                final MessageBodyReader<T> br = bodyContext.getMessageBodyReader(c, mediaType);
+                final MessageBodyReader<T> br = bodyContext.getMessageBodyReader(
+                        c, null,
+                        null, mediaType);
                 if (br == null) {
                     throw new ClientHandlerException(
                             "A message body reader for Java type, " + c + 
@@ -194,8 +196,9 @@ public class TestResourceClientHandler implements ClientHandler {
                     mediaType = new MediaType("application", "octet-stream");
                 }
             }
-            final MessageBodyWriter bw = bodyContext.
-                    getMessageBodyWriter(entity.getClass(), mediaType);
+            final MessageBodyWriter bw = bodyContext.getMessageBodyWriter(
+                    entity.getClass(), null,
+                    null, mediaType);
             if (bw == null) {
                 throw new ClientHandlerException(
                         "A message body writer for Java type, " + entity.getClass() + 

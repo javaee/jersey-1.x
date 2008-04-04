@@ -22,6 +22,8 @@
 
 package com.sun.ws.rest.spi.container;
 
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Type;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.ext.MessageBodyReader;
 import javax.ws.rs.ext.MessageBodyWriter;
@@ -30,24 +32,26 @@ import javax.ws.rs.ext.MessageBodyWriter;
  * An injectable context class to obtain a message body reader
  * or writer given a Java type and a media type.
  * 
+ * This will be replaced by MessageBodyWorkers for the 0.8 API.
+ * 
  * @author Paul.Sandoz@Sun.Com
  */
 public interface MessageBodyContext {
+    
     /**
-     * Get a MessageBodyReader for the specified class and media type.
+     * Get a MessageBodyReader. This is a place holder method equivalent
+     * to the on the MesageBodyWorkers of the 0.8 API.
      * 
-     * @param type the type of value class used to represent the message body
-     * @param mediaType the media type to be read
-     * @return a message body reader
      */
-    <T> MessageBodyReader<T> getMessageBodyReader(Class<T> type, MediaType mediaType);
-
+    <T> MessageBodyReader<T> getMessageBodyReader(Class<T> type, Type genericType, 
+            Annotation annotations[], MediaType mediaType);    
+    
+    
     /**
-     * Get a MessageBodyWriter for the specified class and media type.
+     * Get a MessageBodyWriter. This is a place holder method equivalent
+     * to the on the MesageBodyWorkers of the 0.8 API.
      * 
-     * @param type the type of value class used to represent the message body
-     * @param mediaType the media type to be written
-     * @return a message body writer
      */
-    <T> MessageBodyWriter<T> getMessageBodyWriter(Class<T> type, MediaType mediaType);
+    <T> MessageBodyWriter<T> getMessageBodyWriter(Class<T> type, Type genericType, 
+            Annotation annotations[],MediaType mediaType);
 }

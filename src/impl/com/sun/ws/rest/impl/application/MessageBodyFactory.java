@@ -145,40 +145,45 @@ public final class MessageBodyFactory implements MessageBodyContext, MessageBody
     // MessageBodyContext
     
     @SuppressWarnings("unchecked")
-    public <T> MessageBodyReader<T> getMessageBodyReader(Class<T> type, MediaType mediaType) {
+    public <T> MessageBodyReader<T> getMessageBodyReader(Class<T> c, Type t, 
+            Annotation[] as, 
+            MediaType mediaType) {
+        
         List<MediaType> searchTypes = createSearchList(mediaType);
-        for (MediaType t: searchTypes) {
-            List<MessageBodyReader> readers = readerProviders.get(t);
+        for (MediaType mt: searchTypes) {
+            List<MessageBodyReader> readers = readerProviders.get(mt);
             if (readers==null)
                 continue;
             for (MessageBodyReader p: readers) {
-                if (p.isReadable(type, null, null))
+                if (p.isReadable(c, t, as))
                     return p;
             }
         }
-        LOGGER.severe("A message body reader for Java type, " + type + 
+        LOGGER.severe("A message body reader for Java type, " + c + 
                 ", and MIME media type, " + mediaType + ", was not found");    
-        return null;
+        return null;        
     }
-
+    
     @SuppressWarnings("unchecked")
-    public <T> MessageBodyWriter<T> getMessageBodyWriter(Class<T> type, MediaType mediaType) {
+    public <T> MessageBodyWriter<T> getMessageBodyWriter(Class<T> c, Type t,
+            Annotation[] as,
+            MediaType mediaType) {
         List<MediaType> searchTypes = createSearchList(mediaType);
-        for (MediaType t: searchTypes) {
-            List<MessageBodyWriter> writers = writerProviders.get(t);
+        for (MediaType mt: searchTypes) {
+            List<MessageBodyWriter> writers = writerProviders.get(mt);
             if (writers==null)
                 continue;
             for (MessageBodyWriter p: writers) {
-                if (p.isWriteable(type, null, null))
+                if (p.isWriteable(c, t, as))
                     return p;
             }
         }
         
-        LOGGER.severe("A message body writer for Java type, " + type + 
+        LOGGER.severe("A message body writer for Java type, " + c + 
                 ", and MIME media type, " + mediaType + ", was not found");
-        return null;
+        return null;        
     }
-
+    
     private List<MediaType> createSearchList(MediaType mediaType) {
         if (mediaType==null)
             return Arrays.asList(MediaTypeHelper.GENERAL_MEDIA_TYPE);
@@ -192,11 +197,13 @@ public final class MessageBodyFactory implements MessageBodyContext, MessageBody
     
     public <T> List<MessageBodyReader<T>> getMessageBodyReaders(
             MediaType mediaType, Class<T> type, Type genericType, Annotation annotations[]) {
-        return Collections.singletonList(getMessageBodyReader(type, mediaType));
+        return Collections.singletonList(getMessageBodyReader(type, genericType, 
+                annotations, mediaType));
     }
 
     public <T> List<MessageBodyWriter<T>> getMessageBodyWriters(
             MediaType mediaType, Class<T> type, Type genericType, Annotation annotations[]) {
-        return Collections.singletonList(getMessageBodyWriter(type, mediaType));
+        return Collections.singletonList(getMessageBodyWriter(type, genericType,
+                annotations, mediaType));
     }
 }

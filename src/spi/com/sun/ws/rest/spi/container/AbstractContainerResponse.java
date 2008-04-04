@@ -257,7 +257,8 @@ public abstract class AbstractContainerResponse implements ContainerResponse {
         
         final MediaType contentType = getContentType();
         final MessageBodyWriter p = bodyContext.getMessageBodyWriter(
-                entity.getClass(), contentType);
+                entity.getClass(), null, 
+                null, contentType);
         // If there is no message body writer return a Not Acceptable response
         if (p == null) {
             setResponse(Responses.notAcceptable().build());
@@ -271,7 +272,9 @@ public abstract class AbstractContainerResponse implements ContainerResponse {
     }
     
     private MessageBodyWriter getMessageBodyWriter(Object entity) {
-        return bodyContext.getMessageBodyWriter(entity.getClass(), getContentType());        
+        return bodyContext.getMessageBodyWriter(
+                entity.getClass(), null, 
+                null, getContentType());        
     }
     
     private MediaType getContentType() {        

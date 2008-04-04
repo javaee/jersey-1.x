@@ -82,7 +82,9 @@ public final class URLConnectionClientHandler implements ClientHandler {
         public <T> T getEntity(Class<T> c) {
             try {
                 MediaType mediaType = getType();
-                final MessageBodyReader<T> br = bodyContext.getMessageBodyReader(c, mediaType);
+                final MessageBodyReader<T> br = bodyContext.getMessageBodyReader(
+                        c, null,
+                        null, mediaType);
                 if (br == null) {
                     throw new ClientHandlerException(
                             "A message body reader for Java type, " + c + 
@@ -183,8 +185,9 @@ public final class URLConnectionClientHandler implements ClientHandler {
             }
         }
                 
-        final MessageBodyWriter bw = bodyContext.
-                getMessageBodyWriter(entity.getClass(), mediaType);
+        final MessageBodyWriter bw = bodyContext.getMessageBodyWriter(
+                entity.getClass(), null,
+                null, mediaType);
         if (bw == null) {
             throw new ClientHandlerException(
                     "A message body writer for Java type, " + entity.getClass() + 
