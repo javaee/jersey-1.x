@@ -23,7 +23,6 @@
 package com.sun.ws.rest.spi.container;
 
 import com.sun.ws.rest.api.core.HttpRequestContext;
-import java.util.List;
 
 /**
  * The HTTP request context supplied by the container.

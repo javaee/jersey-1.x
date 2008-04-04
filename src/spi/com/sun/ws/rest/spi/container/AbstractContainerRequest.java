@@ -30,6 +30,8 @@ import com.sun.ws.rest.impl.http.header.reader.HttpHeaderReader;
 import com.sun.ws.rest.impl.model.HttpHelper;
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Type;
 import java.net.URI;
 import java.security.Principal;
 import java.text.ParseException;
@@ -67,6 +69,7 @@ import javax.ws.rs.ext.MessageBodyReader;
  * @author Paul.Sandoz@Sun.Com
  */
 public abstract class AbstractContainerRequest implements ContainerRequest {
+    private static final Annotation[] EMTPTY_ANNOTATIONS = new Annotation[0];
     
     private final MessageBodyContext bodyContext;
     
@@ -162,8 +165,8 @@ public abstract class AbstractContainerRequest implements ContainerRequest {
         }
         return sb.toString();
     }
-    
-    public <T> T getEntity(Class<T> type) {
+
+    public <T> T getEntity(Class<T> type, Type genericType, Annotation[] as) {
         try {
             MediaType mediaType = getMediaType();
             MessageBodyReader<T> bw = bodyContext.getMessageBodyReader(type, 
@@ -176,6 +179,10 @@ public abstract class AbstractContainerRequest implements ContainerRequest {
         } catch (IOException e) {
             throw new IllegalArgumentException(e);
         }
+    }
+    
+    public <T> T getEntity(Class<T> type) {
+        return getEntity(type, type, EMTPTY_ANNOTATIONS);
     }
     
     public String getHttpMethod() {

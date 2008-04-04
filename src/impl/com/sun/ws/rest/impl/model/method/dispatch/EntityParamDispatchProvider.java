@@ -33,7 +33,9 @@ import com.sun.ws.rest.spi.dispatch.RequestDispatcher;
 import com.sun.ws.rest.impl.model.parameter.ParameterExtractor;
 import com.sun.ws.rest.impl.model.parameter.ParameterProcessor;
 import com.sun.ws.rest.impl.model.parameter.ParameterProcessorFactory;
+import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -45,14 +47,18 @@ import javax.ws.rs.core.Response;
 public class EntityParamDispatchProvider implements ResourceMethodDispatchProvider {
                 
     static final class EntityExtractor implements ParameterExtractor {
-        final Class<?> parameterEntityType;
+        final Class<?> c;
+        final Type t;
+        final Annotation[] as;
         
-        EntityExtractor(Class parameterEntityType) {
-            this.parameterEntityType = parameterEntityType;
+        EntityExtractor(Class c, Type t, Annotation[] as) {
+            this.c = c;
+            this.t = t;
+            this.as = as;
         }
         
         public Object extract(HttpContext context) {
-            return context.getRequest().getEntity(parameterEntityType);
+            return context.getRequest().getEntity(c, t, as);
         }
     }
     
@@ -195,6 +201,7 @@ public class EntityParamDispatchProvider implements ResourceMethodDispatchProvid
             extractors[i] = processParameter(
                     method,
                     method.getParameters().get(i),
+                    method.getMethod().getParameterAnnotations()[i],
                     requireNoEntityParameter);
             
             if (extractors[i] == null)
@@ -207,6 +214,7 @@ public class EntityParamDispatchProvider implements ResourceMethodDispatchProvid
     private ParameterExtractor processParameter(
             AbstractResourceMethod method,
             Parameter parameter, 
+            Annotation[] annotations,
             boolean requireNoEntityParameter) {
 
         if (Parameter.Source.ENTITY == parameter.getSource()) {
@@ -221,9 +229,10 @@ public class EntityParamDispatchProvider implements ResourceMethodDispatchProvid
                         method.getMethod().getDeclaringClass(),
                         (TypeVariable)parameter.getParameterType());
                 
-                return (c != null) ? new EntityExtractor(c) : null;
+                return (c != null) ? new EntityExtractor(c, c, annotations) : null;
             } else {
-                return new EntityExtractor(parameter.getParameterClass());
+                return new EntityExtractor(parameter.getParameterClass(), 
+                        parameter.getParameterType(), annotations);
             }
         }
 

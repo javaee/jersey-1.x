@@ -22,6 +22,8 @@
 
 package com.sun.ws.rest.api.core;
 
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Type;
 import java.net.URI;
 import java.util.List;
 import javax.ws.rs.WebApplicationException;
@@ -83,13 +85,30 @@ public interface HttpRequestContext extends HttpHeaders,
      * Get the request entity, returns null if the request does not
      * contain an entity body.
      * 
-     * @return the request entity or null
      * @param type the type of entity
+     * @return the request entity or null
      * @throws WebApplicationException if the content of the request
      * cannot be mapped to an entity of the requested type
      */
-    <T> T getEntity(Class<T> type) throws WebApplicationException;
+    <T> T getEntity(Class<T> type) 
+            throws WebApplicationException;
         
+    /**
+     * Get the request entity, returns null if the request does not
+     * contain an entity body.
+     * 
+     * @param type the type of entity
+     * @param generic type the generic type of entity, it is the responsibility
+     *        of the callee to ensure that the type and generic type are
+     *        consistent otherwise the behvaiour of this method is undefned.
+     * @param as the annoations associated with the type 
+     * @return the request entity or null
+     * @throws WebApplicationException if the content of the request
+     * cannot be mapped to an entity of the requested type
+     */
+    <T> T getEntity(Class<T> type, Type genericType, Annotation[] as) 
+            throws WebApplicationException;
+    
     /**
      * Get the HTTP method name
      * @return the method name as a String

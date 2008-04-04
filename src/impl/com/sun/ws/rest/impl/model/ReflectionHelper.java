@@ -189,6 +189,10 @@ public final class ReflectionHelper {
                 } else {
                     return null;
                 }
+            } else if (t instanceof ParameterizedType) {
+                pt = (ParameterizedType)t;
+                // TODO support parameterized type whose raw type is a class
+                return null;
             } else {
                 return null;
             }
