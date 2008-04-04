@@ -177,14 +177,18 @@ class AtomStore {
     }    
     
     static void updateFeedDocument(MessageBodyContext bodyContext, Feed f) throws IOException {
-        MessageBodyWriter<Feed> ep = bodyContext.getMessageBodyWriter(Feed.class, atomMediaType);
+        MessageBodyWriter<Feed> ep = bodyContext.getMessageBodyWriter(
+                Feed.class, null,
+                null, atomMediaType);
         synchronized(FileStore.FS) {
             ep.writeTo(f, f.getClass(), null, null, atomMediaType, null, FileStore.FS.getFileOutputStream(AtomStore.getFeedPath()));
         }
     }
             
     static void createEntryDocument(MessageBodyContext bodyContext, String id, Entry e) throws IOException {
-        MessageBodyWriter<Entry> ep = bodyContext.getMessageBodyWriter(Entry.class, atomMediaType);
+        MessageBodyWriter<Entry> ep = bodyContext.getMessageBodyWriter(
+                Entry.class, null,
+                null, atomMediaType);
         String path = AtomStore.getEntryPath(id);
         ep.writeTo(e, e.getClass(), null, null, atomMediaType, null, FileStore.FS.getFileOutputStream(path));
     }
@@ -210,7 +214,9 @@ class AtomStore {
         selfLink.setHref(uri);
         f.getOtherLinks().add(selfLink);
         
-        MessageBodyWriter<Feed> ep = bodyContext.getMessageBodyWriter(Feed.class, atomMediaType);
+        MessageBodyWriter<Feed> ep = bodyContext.getMessageBodyWriter(
+                Feed.class, null,
+                null, atomMediaType);
         ep.writeTo(f, f.getClass(), null, null, atomMediaType, null, FileStore.FS.getFileOutputStream(AtomStore.getFeedPath()));
         
         return FileStore.FS.getFileContents(AtomStore.getFeedPath());
