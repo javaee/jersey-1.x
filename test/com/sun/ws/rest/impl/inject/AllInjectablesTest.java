@@ -27,6 +27,7 @@ import com.sun.ws.rest.api.core.ResourceConfig;
 import com.sun.ws.rest.impl.AbstractResourceTester;
 import com.sun.ws.rest.spi.container.MessageBodyContext;
 import com.sun.ws.rest.spi.resource.Singleton;
+import com.sun.ws.rest.spi.template.TemplateContext;
 import java.io.IOException;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -55,6 +56,8 @@ public class AllInjectablesTest extends AbstractResourceTester {
         
         @Context MessageBodyWorkers mbw;
         
+        @Context TemplateContext tc;
+        
         @Context HttpContext hca;
         
         @Context HttpHeaders hs;
@@ -70,6 +73,7 @@ public class AllInjectablesTest extends AbstractResourceTester {
             assertNotNull(rc);
             assertNotNull(mbc);
             assertNotNull(mbw);
+            assertNotNull(tc);
             assertNotNull(hca);
             assertNotNull(hs);
             assertNotNull(ui);
@@ -121,6 +125,8 @@ public class AllInjectablesTest extends AbstractResourceTester {
         
         @Context MessageBodyWorkers mbw;
         
+        @Context TemplateContext tc;
+        
         @Context HttpContext hca;
         
         @Context HttpHeaders hs;
@@ -134,6 +140,7 @@ public class AllInjectablesTest extends AbstractResourceTester {
             assertNotNull(rc);
             assertNotNull(mbc);
             assertNotNull(mbw);
+            assertNotNull(tc);
             assertNotNull(hca);
             assertNotNull(hs);
             assertNotNull(ui);
