@@ -106,10 +106,10 @@ public class JsonXmlStreamReaderWriterTest extends TestCase {
         tryBean(bean, "complexBeanWithAttributes.json", true, null, null);
     }
 
-//    public void testEmptyListWrapper() throws JAXBException, IOException {
-//        ListWrapperBean bean = (ListWrapperBean)ListWrapperBean.createTestInstance();
-//        tryBean(bean, "emptyListWrapper.json", false, null, null);
-//    }
+    public void testEmptyListWrapper() throws JAXBException, IOException {
+        ListWrapperBean bean = (ListWrapperBean)ListWrapperBean.createTestInstance();
+        tryBean(bean, "emptyListWrapper.json", false, null, null);
+    }
     
     public void testTwoListsWrapper() throws JAXBException, IOException {
         TwoListsWrapperBean bean = (TwoListsWrapperBean)TwoListsWrapperBean.createTestInstance();

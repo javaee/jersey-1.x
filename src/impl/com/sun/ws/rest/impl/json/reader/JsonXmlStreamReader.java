@@ -194,8 +194,10 @@ public class JsonXmlStreamReader implements XMLStreamReader {
                             eventQueue.add(event);
                             processingStack.get(depth).eventToReadAttributesFor = event;
                         }
-                        processingStack.add(new ProcessingState());
-                        depth++;
+                        if (JsonToken.NULL != lastToken.tokenType) {
+                            processingStack.add(new ProcessingState());
+                            depth++;
+                        }
                     }
                     // TODO: if JsonToken.START_OBJECT != lastToken then problem
                     processingStack.get(depth).state = LaState.AFTER_OBJ_START_BRACE;

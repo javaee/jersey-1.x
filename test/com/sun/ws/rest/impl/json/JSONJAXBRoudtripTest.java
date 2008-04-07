@@ -31,6 +31,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
 import java.util.StringTokenizer;
+import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.Marshaller;
 import junit.framework.TestCase;
@@ -106,6 +107,10 @@ public class JSONJAXBRoudtripTest extends TestCase {
         unmarshaller.setProperty(JSONJAXBContext.JSON_ENABLED, Boolean.TRUE);
         for (Object originalBean : beans) {
             System.out.println("Checking " + originalBean.toString());
+//            JAXBContext ctx = JAXBContext.newInstance(originalBean.getClass());
+//            Marshaller m = ctx.createMarshaller();
+//            m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
+//            m.marshal(originalBean, System.out);
             StringWriter sWriter = new StringWriter();
             marshaller.marshal(originalBean, sWriter);
             System.out.println(sWriter.toString());
