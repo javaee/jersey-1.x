@@ -32,6 +32,7 @@ import com.sun.ws.rest.spi.service.ServiceFinder;
 import java.io.File;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.Set;
 
 /**
@@ -106,10 +107,15 @@ public final class ContainerFactory {
     throws ContainerException, IllegalArgumentException {
         WebApplication wa = WebApplicationFactory.createWebApplication();
         
-        for (ContainerProvider<A> rp : ServiceFinder.find(ContainerProvider.class, true)) {
-            A r = rp.createContainer(type, resourceConfig, wa);
-            if (r != null) {
-                return r;
+        // Revese the order so that applications may override
+        LinkedList<ContainerProvider> cps = new LinkedList<ContainerProvider>();
+        for (ContainerProvider cp : ServiceFinder.find(ContainerProvider.class, true))
+            cps.addFirst(cp);
+        
+        for (ContainerProvider<A> cp : cps) {
+            A c = cp.createContainer(type, resourceConfig, wa);
+            if (c != null) {
+                return c;
             }
         }
         
