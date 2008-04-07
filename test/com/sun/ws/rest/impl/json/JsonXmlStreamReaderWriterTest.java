@@ -116,6 +116,11 @@ public class JsonXmlStreamReaderWriterTest extends TestCase {
         tryBean(bean, "twoListsWrapper.json", false, "property1, property2", null);
     }
 
+    public void testListAndNonList() throws JAXBException, IOException {
+        ListAndNonListBean bean = (ListAndNonListBean)ListAndNonListBean.createTestInstance();
+        tryBean(bean, "listAndNonList.json", true, "a", null);
+    }
+    
 //    public void testWrittingAttrs() throws Exception {
 //        SimpleBeanWithAttributes bean = (SimpleBeanWithAttributes)SimpleBeanWithAttributes.createTestInstance();
 //        tryWritingBean(bean, "simpleBeanWithAttributes.json", true, null, null);

@@ -98,8 +98,8 @@ public class JsonXmlStreamWriter implements XMLStreamWriter {
         WriterAdapter lastElementWriter;
         Boolean lastWasPrimitive;
         boolean lastIsArray;
+        boolean hasNoElements = true;
         WriterAdapter writer;
-        boolean hasNoElement = true;
 
         ProcessingState() {
             writer = new StringWriterAdapter();
@@ -349,12 +349,13 @@ public class JsonXmlStreamWriter implements XMLStreamWriter {
     }
     
     public void writeStartElement(String prefix, String localName, String namespaceURI) throws XMLStreamException {
+
         processingStack.get(depth).currentName = localName;
         try {
             boolean isNextArrayElement = processingStack.get(depth).currentName.equals(processingStack.get(depth).lastName);
                     //"rows".equals(processingStack.get(depth).currentName);
             if (!isNextArrayElement) {
-                if (isArrayElement(processingStack.get(depth).lastName) && processingStack.get (depth).hasNoElement) { // one elem array
+                if (isArrayElement(processingStack.get(depth).lastName) && processingStack.get (depth).hasNoElements) { // one elem array
                     processingStack.get(depth).writer.write("[");
                     processingStack.get(depth).lastIsArray = true;
                     processingStack.get(depth).writer.write(processingStack.get(depth).lastElementWriter.getContent());
@@ -365,29 +366,30 @@ public class JsonXmlStreamWriter implements XMLStreamWriter {
                             processingStack.get(depth).writer.write(",");
                             processingStack.get(depth).writer.write(processingStack.get(depth).lastElementWriter.getContent());
                             processingStack.get(depth).writer.write("]");
+                            processingStack.get(depth).hasNoElements = false;
                         } else {
                             processingStack.get(depth).writer.write(processingStack.get(depth).lastElementWriter.getContent());
                         }
                     }
 
                     processingStack.get(depth).lastIsArray = false;
-                    if (null != processingStack.get(depth).lastName) {
-                        if (processingStack.get(depth).lastIsArray) {
-                            processingStack.get(depth).writer.write("]");
-                            processingStack.get(depth).lastIsArray = false;
-                        }
-                        processingStack.get(depth).writer.write(",");  // next element at the same level
-                    }
-                    if (null == processingStack.get(depth).lastWasPrimitive) {
-                        processingStack.get(depth).writer.write("{"); // first sub-element
-                    }
-                    processingStack.get(depth).writer.write("\"" + localName + "\":");
                 }
+                if (null != processingStack.get(depth).lastName) {
+                    if (processingStack.get(depth).lastIsArray) {
+                        processingStack.get(depth).writer.write("]");
+                        processingStack.get(depth).lastIsArray = false;
+                    }
+                    processingStack.get(depth).writer.write(",");  // next element at the same level
+                }
+                if (null == processingStack.get(depth).lastWasPrimitive) {
+                    processingStack.get(depth).writer.write("{"); // first sub-element
+                }
+                processingStack.get(depth).writer.write("\"" + localName + "\":");
             } else { // next array element
-                processingStack.get (depth).hasNoElement = false;
                 processingStack.get(depth).writer.write(processingStack.get(depth).lastIsArray ? "," : "[");  // next element at the same level
                 processingStack.get(depth).lastIsArray = true;
                 processingStack.get(depth).writer.write(processingStack.get(depth).lastElementWriter.getContent());
+                processingStack.get(depth).hasNoElements = false;
             }
 
             depth++;
