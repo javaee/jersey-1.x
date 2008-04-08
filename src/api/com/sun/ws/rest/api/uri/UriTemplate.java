@@ -572,6 +572,9 @@ public class UriTemplate {
                 else
                     UriComponent.validate(tValue, t);
                 b.append(tValue);
+            } else {
+                throw new IllegalArgumentException("The template variable, " + 
+                        m.group(1) + ", has no value");
             }
             i = m.end();
         }
@@ -716,6 +719,9 @@ public class UriTemplate {
                         else
                             UriComponent.validate(tValue, t);
                         b.append(tValue);
+                    } else {
+                        throw new IllegalArgumentException("The template variable, " + 
+                                tVariable + ", has no value");                        
                     }
                 }
             }

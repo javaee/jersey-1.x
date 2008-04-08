@@ -87,6 +87,9 @@ public final class UriBuilderImpl extends UriBuilder {
     }
     
     public UriBuilder uri(URI uri) {
+        if (uri == null) 
+            throw new IllegalArgumentException("URI parameter is null");
+        
         if (uri.getScheme() != null) scheme = uri.getScheme();
         if (uri.getRawUserInfo() != null) userInfo = uri.getRawUserInfo();
         if (uri.getHost() != null) host = uri.getHost();
@@ -105,12 +108,19 @@ public final class UriBuilderImpl extends UriBuilder {
     }
 
     public UriBuilder scheme(String scheme) {
-        this.scheme = scheme;
-        UriComponent.validate(scheme, UriComponent.Type.SCHEME, true);
+        if (scheme != null) {
+            this.scheme = scheme;
+            UriComponent.validate(scheme, UriComponent.Type.SCHEME, true);
+        } else {
+            this.scheme = null;
+        }
         return this;
     }
 
     public UriBuilder schemeSpecificPart(String ssp) {
+        if (ssp == null)
+            throw new IllegalArgumentException("Scheme specific part parameter is null");
+        
         // TODO This is buggy because the spp is percent-encoded
         // Any template present variables will result in an exception
         URI uri = createURI(null, ssp, null);
@@ -125,12 +135,14 @@ public final class UriBuilderImpl extends UriBuilder {
     }
 
     public UriBuilder userInfo(String ui) {
-        this.userInfo = encode(ui, UriComponent.Type.USER_INFO);
+        this.userInfo = (ui != null) ?
+            encode(ui, UriComponent.Type.USER_INFO) : null;
         return this;
     }
 
     public UriBuilder host(String host) {
-        this.host = encode(host, UriComponent.Type.HOST);
+        this.host = (host != null) ?
+            encode(host, UriComponent.Type.HOST) : null;
         return this;
     }
 
@@ -153,14 +165,20 @@ public final class UriBuilderImpl extends UriBuilder {
     }
 
     public UriBuilder path(Class resource) {
-        @SuppressWarnings("unchecked")
-        javax.ws.rs.Path ut = (javax.ws.rs.Path)
-                resource.getAnnotation(Path.class);
-        appendPath(ut);
+        if (resource == null) 
+            throw new IllegalArgumentException("Resource parameter is null");
+
+        Class<?> c = resource; 
+        appendPath(c.getAnnotation(Path.class));
         return this;
     }
 
     public UriBuilder path(Class resource, String methodName) {
+        if (resource == null) 
+            throw new IllegalArgumentException("Resource parameter is null");
+        if (methodName == null) 
+            throw new IllegalArgumentException("MethodName parameter is null");
+        
         Method[] methods = resource.getDeclaredMethods();
         Method found = null;
         for (Method m : methods) {
@@ -180,9 +198,11 @@ public final class UriBuilderImpl extends UriBuilder {
     }
 
     public UriBuilder path(Method... methods) {
-        for (Method m : methods)
+        for (Method m : methods) {
+            if (m == null)
+                throw new IllegalArgumentException("Method is null");
             appendPath(m.getAnnotation(Path.class));
-
+        }
         return this;
     }
     
@@ -192,41 +212,55 @@ public final class UriBuilderImpl extends UriBuilder {
         i = path.indexOf(";", i);
         if (i != -1) path.setLength(i + 1);
         
-        path.append(encode(matrix, UriComponent.Type.PATH));
+        if (matrix != null)
+            path.append(encode(matrix, UriComponent.Type.PATH));
         return this;
     }
 
     public UriBuilder matrixParam(String name, String value) {
+        if (name == null)
+            throw new IllegalArgumentException("Name parameter is null");
+        if (value == null)
+            throw new IllegalArgumentException("Value parameter is null");
+        
         if (path.length() > 0) path.append(';');
         path.append(encode(name, UriComponent.Type.PATH));
-        if (value != null && value.length() > 0) 
+        if (value.length() > 0) 
             path.append('=').append(encode(value, UriComponent.Type.PATH));
         return this;
     }
 
     public UriBuilder replaceQueryParams(String query) {
         this.query.setLength(0);
-        this.query.append(encode(query, UriComponent.Type.QUERY));
+        if (query != null)
+            this.query.append(encode(query, UriComponent.Type.QUERY));
         return this;
     }
 
     public UriBuilder queryParam(String name, String value) {
+        if (name == null)
+            throw new IllegalArgumentException("Name parameter is null");
+        if (value == null)
+            throw new IllegalArgumentException("Value parameter is null");
+        
         if (query.length() > 0) query.append('&');
         query.append(encodeQuery(name));
 
-        if (value != null && value.length() > 0)
+        if (value.length() > 0)
             query.append('=').append(encodeQuery(value));
         return this;
     }
 
     public UriBuilder fragment(String fragment) {
-        this.fragment = encode(fragment, UriComponent.Type.FRAGMENT);
+        this.fragment = (fragment != null) ? 
+            encode(fragment, UriComponent.Type.FRAGMENT) :
+            null;
         return this;
     }
 
     private void appendPath(Path t) {
         if (t == null)
-            throw new IllegalArgumentException();
+            throw new IllegalArgumentException("Path is null");
         
         boolean _encode = encode;
         encode = t.encode();
@@ -235,7 +269,9 @@ public final class UriBuilderImpl extends UriBuilder {
     }
     
     private void appendPath(String segment) {
-        if (segment == null || segment.length() == 0)
+        if (segment == null)
+            throw new IllegalArgumentException("Path segment is null");
+        if (segment.length() == 0)
             return;
 
         segment = encode(segment, UriComponent.Type.PATH);
