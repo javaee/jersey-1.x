@@ -227,11 +227,10 @@ public class JsonXmlStreamWriter implements XMLStreamWriter {
 
     public void writeCharacters(String text) throws XMLStreamException {
         try {
-            //TODO: what about encoding?
             if (isNonString(processingStack.get(depth - 1).currentName)) {
-                processingStack.get(depth).writer.write(text);
+                processingStack.get(depth).writer.write(JsonEncoder.encode(text));
             } else {
-                processingStack.get(depth).writer.write("\"" + text + "\"");
+                processingStack.get(depth).writer.write("\"" + JsonEncoder.encode(text) + "\"");
             }
             processingStack.get(depth).lastWasPrimitive = true;
         } catch (IOException ex) {
