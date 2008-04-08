@@ -121,6 +121,16 @@ public class JsonXmlStreamReaderWriterTest extends TestCase {
         tryBean(bean, "listAndNonList.json", true, "a", null);
     }
     
+    public void testPureCharDataValue() throws JAXBException, IOException {
+        PureCharDataBean bean = (PureCharDataBean)PureCharDataBean.createTestInstance();
+        tryBean(bean, "pureCharDataValue.json", true, null, null);
+    }
+
+    public void testAttrAndCharDataValue() throws JAXBException, IOException {
+        AttrAndCharDataBean bean = (AttrAndCharDataBean)AttrAndCharDataBean.createTestInstance();
+        tryBean(bean, "attrAndCharDataValue.json", true, null, null);
+    }
+    
 //    public void testWrittingAttrs() throws Exception {
 //        SimpleBeanWithAttributes bean = (SimpleBeanWithAttributes)SimpleBeanWithAttributes.createTestInstance();
 //        tryWritingBean(bean, "simpleBeanWithAttributes.json", true, null, null);

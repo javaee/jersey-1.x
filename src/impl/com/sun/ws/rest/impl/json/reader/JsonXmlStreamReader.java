@@ -174,37 +174,50 @@ public class JsonXmlStreamReader implements XMLStreamReader {
         //boolean attributesStarted = false;
         while (eventQueue.isEmpty() || checkAttributesOnly) {
             lastToken = nextToken();
-            if (null == lastToken) {
+            if ((null == lastToken) || (LaState.END == processingStack.get(depth).state)){
                 if (jsonRootUnwrapping) {
-                    eventQueue.add(new EndElementEvent(processingStack.get(depth).lastName, new MyLocation(lexer)));
+                    generateEEEvent(processingStack.get(depth).lastName);
                 }
                 eventQueue.add(new EndDocumentEvent(new MyLocation(lexer)));
                 break;
             }
             switch (processingStack.get(depth).state) {
-                case START :
+                case START:
                     if (0 == depth) {
                         eventQueue.add(new StartDocumentEvent(new MyLocation(lexer)));
                         processingStack.get(depth).state = LaState.AFTER_OBJ_START_BRACE;
                         if (jsonRootUnwrapping) {
                             processingStack.get(depth).lastName = "rootObject";
-                            StartElementEvent event = new StartElementEvent(
-                                    processingStack.get(depth).lastName, 
-                                    new MyLocation(lexer));
-                            eventQueue.add(event);
+                            StartElementEvent event = generateSEEvent(processingStack.get(depth).lastName);
                             processingStack.get(depth).eventToReadAttributesFor = event;
                         }
-                        if (JsonToken.NULL != lastToken.tokenType) {
-                            processingStack.add(new ProcessingState());
-                            depth++;
+                        switch (lastToken.tokenType) {
+                            case JsonToken.START_OBJECT:
+                                processingStack.add(new ProcessingState(LaState.AFTER_OBJ_START_BRACE));
+                                depth++;
+                                break;
+                            case JsonToken.START_ARRAY:
+                                processingStack.add(new ProcessingState(LaState.AFTER_ARRAY_START_BRACE));
+                                depth++;
+                                break;
+                            case JsonToken.STRING:
+                            case JsonToken.NUMBER:
+                            case JsonToken.TRUE:
+                            case JsonToken.FALSE:
+                            case JsonToken.NULL:
+                                eventQueue.add(new CharactersEvent(lastToken.tokenText, new MyLocation(lexer)));
+                                processingStack.get(depth).state = LaState.END;
+                                break;
+                            default:
+                            // TODO: handle problem
                         }
                     }
                     // TODO: if JsonToken.START_OBJECT != lastToken then problem
                     processingStack.get(depth).state = LaState.AFTER_OBJ_START_BRACE;
                     break;
-                case AFTER_OBJ_START_BRACE :
+                case AFTER_OBJ_START_BRACE:
                     switch (lastToken.tokenType) {
-                        case JsonToken.STRING :
+                        case JsonToken.STRING:
                             if (lastToken.tokenText.startsWith("@")) { // eat attributes
                                 //attributesStarted = true;
                                 String attrName = lastToken.tokenText;
@@ -220,20 +233,19 @@ public class JsonXmlStreamReader implements XMLStreamReader {
                                 }
                                 lastToken = nextToken();
                                 switch (lastToken.tokenType) {
-                                    case JsonToken.END_OBJECT :
-                                        eventQueue.add(new EndElementEvent(processingStack.get(depth).lastName, new MyLocation(lexer)));
+                                    case JsonToken.END_OBJECT:
+                                        generateEEEvent(processingStack.get(depth).lastName);
                                         processingStack.remove(depth);
                                         depth--;
                                         break;
-                                    case JsonToken.COMMA :
+                                    case JsonToken.COMMA:
                                         break;
-                                    default :
+                                    default:
                                         throw new IOException("\'\"\', or \'}\' expected instead of \"" + lastToken.tokenText + "\"");
                                 }
                             } else { // non attribute
-                                StartElementEvent event = 
-                                        new StartElementEvent(lastToken.tokenText, new MyLocation(lexer));
-                                eventQueue.add(event);
+                                StartElementEvent event =
+                                        generateSEEvent(lastToken.tokenText);
                                 processingStack.get(depth).eventToReadAttributesFor = event;
                                 checkAttributesOnly = false;
                                 processingStack.get(depth).lastName = lastToken.tokenText;
@@ -241,137 +253,131 @@ public class JsonXmlStreamReader implements XMLStreamReader {
                                 processingStack.get(depth).state = LaState.BEFORE_VALUE_IN_KV_PAIR;
                             }
                             break;
-                        case JsonToken.END_OBJECT : // empty object/element
-                            eventQueue.add(
-                                    new EndElementEvent(processingStack.get(depth).lastName, new MyLocation(lexer)));
+                        case JsonToken.END_OBJECT: // empty object/element
+                            generateEEEvent(processingStack.get(depth).lastName);
                             checkAttributesOnly = false;
                             processingStack.remove(depth);
                             depth--;
                             break;
                         default:
-                            // TODO: handle problem
+                        // TODO: handle problem
                     }
                     break;
-                case BEFORE_OBJ_NEXT_KV_PAIR :
+                case BEFORE_OBJ_NEXT_KV_PAIR:
                     switch (lastToken.tokenType) {
-                        case JsonToken.STRING :
-                            StartElementEvent event = 
-                                    new StartElementEvent(lastToken.tokenText, new MyLocation(lexer));
-                            eventQueue.add(event);
+                        case JsonToken.STRING:
+                            StartElementEvent event =
+                                    generateSEEvent(lastToken.tokenText);
                             processingStack.get(depth).eventToReadAttributesFor = event;
                             processingStack.get(depth).lastName = lastToken.tokenText;
                             colon();
                             processingStack.get(depth).state = LaState.BEFORE_VALUE_IN_KV_PAIR;
                             break;
                         default:
-                            // TODO: handle problem
+                        // TODO: handle problem
                     }
                     break;
-                case BEFORE_VALUE_IN_KV_PAIR :
+                case BEFORE_VALUE_IN_KV_PAIR:
                     switch (lastToken.tokenType) {
-                        case JsonToken.START_OBJECT :
+                        case JsonToken.START_OBJECT:
                             processingStack.add(new ProcessingState(LaState.AFTER_OBJ_START_BRACE));
                             depth++;
                             break;
-                        case JsonToken.START_ARRAY :
+                        case JsonToken.START_ARRAY:
                             processingStack.add(new ProcessingState(LaState.AFTER_ARRAY_START_BRACE));
                             depth++;
                             break;
-                        case JsonToken.STRING :
-                        case JsonToken.NUMBER :
-                        case JsonToken.TRUE :
-                        case JsonToken.FALSE :
-                        case JsonToken.NULL :
+                        case JsonToken.STRING:
+                        case JsonToken.NUMBER:
+                        case JsonToken.TRUE:
+                        case JsonToken.FALSE:
+                        case JsonToken.NULL:
                             eventQueue.add(new CharactersEvent(lastToken.tokenText, new MyLocation(lexer)));
                             processingStack.get(depth).state = LaState.AFTER_OBJ_KV_PAIR;
                             break;
                         default:
-                            // TODO: handle problem
+                        // TODO: handle problem
                     }
                     break; // AFTER_ARRAY_ELEM
-                case AFTER_OBJ_KV_PAIR :
+                case AFTER_OBJ_KV_PAIR:
                     switch (lastToken.tokenType) {
-                        case JsonToken.COMMA :
+                        case JsonToken.COMMA:
                             processingStack.get(depth).state = LaState.BEFORE_OBJ_NEXT_KV_PAIR;
-                            eventQueue.add(
-                                    new EndElementEvent(processingStack.get(depth).lastName, new MyLocation(lexer)));
+                            generateEEEvent(processingStack.get(depth).lastName);
                             break; // STRING
-                        case JsonToken.END_OBJECT : // empty object/element
-                            eventQueue.add(
-                                    new EndElementEvent(processingStack.get(depth).lastName, new MyLocation(lexer)));
+                        case JsonToken.END_OBJECT: // empty object/element
+                            generateEEEvent(processingStack.get(depth).lastName);
                             processingStack.remove(depth);
                             depth--;
                             valueRead();
                             break; // END_OBJECT
                         default:
-                            // TODO: handle problem
+                        // TODO: handle problem
                     }
                     break; // AFTER_OBJ_KV_PAIR
-                case AFTER_ARRAY_START_BRACE :
+                case AFTER_ARRAY_START_BRACE:
                     switch (lastToken.tokenType) {
-                        case JsonToken.START_OBJECT :
+                        case JsonToken.START_OBJECT:
                             processingStack.add(new ProcessingState(LaState.AFTER_OBJ_START_BRACE));
-                            processingStack.get(depth).eventToReadAttributesFor = processingStack.get(depth-1).eventToReadAttributesFor;
+                            processingStack.get(depth).eventToReadAttributesFor = processingStack.get(depth - 1).eventToReadAttributesFor;
                             depth++;
                             break;
-                        case JsonToken.START_ARRAY :
+                        case JsonToken.START_ARRAY:
                             processingStack.add(new ProcessingState(LaState.AFTER_ARRAY_START_BRACE));
                             depth++;
                             break;
-                        case JsonToken.END_ARRAY :
+                        case JsonToken.END_ARRAY:
                             processingStack.remove(depth);
                             depth--;
                             valueRead();
                             break;
-                        case JsonToken.STRING :
+                        case JsonToken.STRING:
                             eventQueue.add(new CharactersEvent(lastToken.tokenText, new MyLocation(lexer)));
                             processingStack.get(depth).state = LaState.AFTER_ARRAY_ELEM;
                             break;
                         default:
-                            // TODO: handle problem
-                    }                
+                        // TODO: handle problem
+                    }
                     break; // AFTER_ARRAY_ELEM
-                case BEFORE_NEXT_ARRAY_ELEM :
-                    StartElementEvent event = 
-                            new StartElementEvent(processingStack.get(depth-1).lastName, new MyLocation(lexer));
-                    eventQueue.add(event);
+                case BEFORE_NEXT_ARRAY_ELEM:
+                    StartElementEvent event =
+                            generateSEEvent(processingStack.get(depth - 1).lastName);
                     switch (lastToken.tokenType) {
-                        case JsonToken.START_OBJECT :
+                        case JsonToken.START_OBJECT:
                             processingStack.add(new ProcessingState(LaState.AFTER_OBJ_START_BRACE));
                             processingStack.get(depth).eventToReadAttributesFor = event;
                             depth++;
                             break;
-                        case JsonToken.START_ARRAY :
+                        case JsonToken.START_ARRAY:
                             processingStack.add(new ProcessingState(LaState.AFTER_ARRAY_START_BRACE));
                             depth++;
                             break;
-                        case JsonToken.STRING :
+                        case JsonToken.STRING:
                             eventQueue.add(new CharactersEvent(lastToken.tokenText, new MyLocation(lexer)));
                             processingStack.get(depth).state = LaState.AFTER_ARRAY_ELEM;
                             break;
                         default:
-                            // TODO: handle problem
+                        // TODO: handle problem
                     }
                     break; // BEFORE_NEXT_ARRAY_ELEM
-                case AFTER_ARRAY_ELEM :
+                case AFTER_ARRAY_ELEM:
                     switch (lastToken.tokenType) {
-                        case JsonToken.END_ARRAY :
+                        case JsonToken.END_ARRAY:
                             processingStack.remove(depth);
                             depth--;
                             valueRead();
                             break;
-                        case JsonToken.COMMA :
+                        case JsonToken.COMMA:
                             processingStack.get(depth).state = LaState.BEFORE_NEXT_ARRAY_ELEM;
-                            eventQueue.add(
-                                    new EndElementEvent(processingStack.get(depth-1).lastName, new MyLocation(lexer)));
+                            generateEEEvent(processingStack.get(depth - 1).lastName);
                             break;
                         default:
-                            // TODO: handle problem
-                    }                
+                        // TODO: handle problem
+                    }
                     break; // AFTER_ARRAY_ELEM
-             }
+            }
         } // end while lastEvent null
-        //System.out.println("Next event = " + eventQueue.peek());
+    //System.out.println("Next event = " + eventQueue.peek());
     }
 
     public int getAttributeCount() {
@@ -666,4 +672,19 @@ public class JsonXmlStreamReader implements XMLStreamReader {
     public String getNamespaceURI(String arg0) {
         throw new UnsupportedOperationException("Not supported yet.");
     }
+    
+    private StartElementEvent generateSEEvent(String name) {
+        StartElementEvent event = null;
+        if (!"$".equals(name)) {
+           event = new StartElementEvent(name, new MyLocation(lexer));
+           eventQueue.add(event);
+        }
+        return event;
+    }
+
+    private void generateEEEvent(String name) {
+       if (!"$".equals(name)) {
+           eventQueue.add(new EndElementEvent(name, new MyLocation(lexer)));
+       }
+    }    
 }

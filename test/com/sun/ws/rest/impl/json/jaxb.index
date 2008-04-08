@@ -7,3 +7,6 @@ TwoListsWrapperBean
 ListAndNonListBean
 ListWrapperBean
 EncodedContentBean
+SimpleBean
+PureCharDataBean
+AttrAndCharDataBean

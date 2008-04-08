@@ -99,6 +99,7 @@ public class JsonXmlStreamWriter implements XMLStreamWriter {
         Boolean lastWasPrimitive;
         boolean lastIsArray;
         boolean hasNoElements = true;
+        boolean hasAttributes = false;
         WriterAdapter writer;
 
         ProcessingState() {
@@ -175,7 +176,6 @@ public class JsonXmlStreamWriter implements XMLStreamWriter {
 
     public void writeEndElement() throws XMLStreamException {
         try {
-
             if (null != processingStack.get(depth).lastElementWriter) {
                 if (processingStack.get(depth).lastIsArray) {
                     processingStack.get(depth).writer.write(",");
@@ -192,9 +192,9 @@ public class JsonXmlStreamWriter implements XMLStreamWriter {
                     }
                 }
             }
-            if (processingStack.get (depth).writer.isEmpty)
+            if (processingStack.get (depth).writer.isEmpty) {
                 processingStack.get (depth).writer.write ("null");
-            else if ((null == processingStack.get(depth).lastWasPrimitive) || !processingStack.get(depth).lastWasPrimitive) {
+            } else if ((null == processingStack.get(depth).lastWasPrimitive) || !processingStack.get(depth).lastWasPrimitive) {
                 processingStack.get(depth).writer.write("}");
             }
             processingStack.get(depth - 1).lastName = processingStack.get(depth - 1).currentName;
@@ -226,15 +226,21 @@ public class JsonXmlStreamWriter implements XMLStreamWriter {
     }
 
     public void writeCharacters(String text) throws XMLStreamException {
-        try {
-            if (isNonString(processingStack.get(depth - 1).currentName)) {
-                processingStack.get(depth).writer.write(JsonEncoder.encode(text));
-            } else {
-                processingStack.get(depth).writer.write("\"" + JsonEncoder.encode(text) + "\"");
+        if (processingStack.get(depth).hasAttributes) {
+            writeStartElement(null, "$", null);
+            writeCharacters(text);
+            writeEndElement();
+        } else {
+            try {
+                if (isNonString(processingStack.get(depth - 1).currentName)) {
+                    processingStack.get(depth).writer.write(JsonEncoder.encode(text));
+                } else {
+                    processingStack.get(depth).writer.write("\"" + JsonEncoder.encode(text) + "\"");
+                }
+                processingStack.get(depth).lastWasPrimitive = true;
+            } catch (IOException ex) {
+                Logger.getLogger(JsonXmlStreamWriter.class.getName()).log(Level.SEVERE, null, ex);
             }
-            processingStack.get(depth).lastWasPrimitive = true;
-        } catch (IOException ex) {
-            Logger.getLogger(JsonXmlStreamWriter.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 
@@ -352,9 +358,8 @@ public class JsonXmlStreamWriter implements XMLStreamWriter {
         processingStack.get(depth).currentName = localName;
         try {
             boolean isNextArrayElement = processingStack.get(depth).currentName.equals(processingStack.get(depth).lastName);
-                    //"rows".equals(processingStack.get(depth).currentName);
             if (!isNextArrayElement) {
-                if (isArrayElement(processingStack.get(depth).lastName) && processingStack.get (depth).hasNoElements) { // one elem array
+                if (isArrayElement(processingStack.get(depth).lastName) && processingStack.get(depth).hasNoElements) { // one elem array
                     processingStack.get(depth).writer.write("[");
                     processingStack.get(depth).lastIsArray = true;
                     processingStack.get(depth).writer.write(processingStack.get(depth).lastElementWriter.getContent());
@@ -399,6 +404,7 @@ public class JsonXmlStreamWriter implements XMLStreamWriter {
     }
 
     public void writeAttribute(String prefix, String namespaceURI, String localName, String value) throws XMLStreamException {
+        processingStack.get(depth).hasAttributes = true;
         writeStartElement(prefix, "@" + localName, namespaceURI);
         writeCharacters(value);
         writeEndElement();
