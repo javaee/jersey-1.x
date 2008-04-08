@@ -60,7 +60,7 @@ public class JsonEncoder {
                     result.append("\\t");
                     break;
                 default:
-                    if ((c < ' ') || (255 < c)) {
+                    if (c < ' ') { // TODO: what about c > 255 ???
                         result.append(formatter.format("\\u%04X", (int)c));
                     } else {
                         result.append(c);
