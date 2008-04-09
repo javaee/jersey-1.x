@@ -79,6 +79,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Request;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.SecurityContext;
@@ -385,6 +387,12 @@ public final class WebApplicationImpl implements WebApplication {
         if (!resourceConfig.getFeature(ResourceConfig.FEATURE_MATCH_MATRIX_PARAMS))
             path = stripMatrixParams(path);
 
+        // If there are URI conneg extensions for media and language
+        if (!resourceConfig.getExtensionMappings().isEmpty() || 
+                !resourceConfig.getLanguageMappings().isEmpty()) {
+            uriConneg(path, request);
+        }
+        
         try {
             if (!rootsRule.accept(path, null, localContext)) {
                 // Resource was not found
@@ -519,6 +527,48 @@ public final class WebApplicationImpl implements WebApplication {
         return sb;
     }  
         
+    /**
+     * 
+     */
+    private void uriConneg(StringBuilder path, ContainerRequest request) {
+        int si = path.lastIndexOf("/");
+        // Path ends in slash
+        if (si == path.length() - 1) {
+            // Find the next slash
+            si = path.lastIndexOf("/", si - 1);
+        }
+        // If no slash that set to start of path
+        if (si == -1) si = 0;
+        
+        MediaType accept = null;
+        for (Map.Entry<String, MediaType> e : resourceConfig.getExtensionMappings().entrySet()) {
+            int i = path.indexOf(e.getKey(), si);
+            if (i > 0 && path.charAt(i - 1) == '.') {
+                accept = e.getValue();
+                path.delete(i - 1, i + e.getKey().length());
+            }
+        }
+        if (accept != null) {
+            // TODO do not modify request headers
+            MultivaluedMap<String, String> h = request.getRequestHeaders();            
+            h.putSingle("Accept", accept.toString());
+        }
+        
+        String acceptLanguage = null;
+        for (Map.Entry<String, String> e : resourceConfig.getLanguageMappings().entrySet()) {
+            int i = path.indexOf(e.getKey(), si);
+            if (i > 0 && path.charAt(i - 1) == '.') {
+                acceptLanguage = e.getValue();
+                path.delete(i - 1, i + e.getKey().length());
+            }
+        }
+        if (acceptLanguage != null) {
+            // TODO do not modify request headers
+            MultivaluedMap<String, String> h = request.getRequestHeaders();            
+            h.putSingle("Accept-Language", acceptLanguage);
+        }        
+    }
+    
     @SuppressWarnings("unchecked")
     private <T> T createProxy(Class<T> c, InvocationHandler i) {
         return (T)Proxy.newProxyInstance(
