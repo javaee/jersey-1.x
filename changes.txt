@@ -1,4 +1,8 @@
 release 0.7 (2008-04-18)
+- The com.sun.ws.rest.spi.container.servlet.ServletContainer class has
+  a public load() method that can be invoked to dynamically reload the web
+  web application if, for example, resource classes have been modified,
+  added or removed.
 - The class com.sun.ws.rest.api.core.ApplicationConfigAdapter can be
   used to adapt an instance of javax.ws.rs.core.ApplicationConfig to an
   instance of com.sun.ws.rest.api.core.ResourceConfig.

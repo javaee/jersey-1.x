@@ -95,44 +95,51 @@ public class ServletContainer extends HttpServlet {
     private final ThreadLocalInvoker<HttpServletResponse> responseInvoker =
             new ThreadLocalInvoker<HttpServletResponse>();
     
+    private ServletConfig config;
+    
     private ServletContext context;
-        
+
+    private ResourceConfig resourceConfig;
+    
     private WebApplication application;
     
     @Override
     public final void init(ServletConfig servletConfig) throws ServletException {
         super.init(servletConfig);
+    
+        config = servletConfig;
         
-        this.context = servletConfig.getServletContext();
+        context = config.getServletContext();
         
-        ResourceConfig resourceConfig = createResourceConfig(servletConfig);
+        resourceConfig = createResourceConfig(config);
         initResourceConfigFeatures(servletConfig, resourceConfig);
         
-        this.application = create();
-        
-        configure(servletConfig, resourceConfig, this.application);
-        
-        initiate(resourceConfig, this.application);
+        load();
     }
     
     @Override
     public final void service(HttpServletRequest req, HttpServletResponse resp)
     throws ServletException, IOException {
+        // Copy the application field to local instance to ensure that the 
+        // currently loaded web application is used to process
+        // request
+        final WebApplication _application = application;
+        
         HttpRequestAdaptor requestAdaptor = new HttpRequestAdaptor(
-                application.getMessageBodyContext(), 
+                _application.getMessageBodyContext(), 
                 req);
         HttpResponseAdaptor responseAdaptor = new HttpResponseAdaptor(
                 context, 
                 resp, 
                 req, 
-                application.getMessageBodyContext(), 
+                _application.getMessageBodyContext(), 
                 requestAdaptor);
         
         try {
             // save thread locals for use in injection
             requestInvoker.set(req);
             responseInvoker.set(resp);
-            application.handleRequest(requestAdaptor, responseAdaptor);
+            _application.handleRequest(requestAdaptor, responseAdaptor);
         } catch (ContainerException e) {
             throw new ServletException(e);
         } finally {
@@ -269,6 +276,26 @@ public class ServletContainer extends HttpServlet {
         String value = servletConfig.getInitParameter(feature);
         if (value != null)
             rc.getFeatures().put(feature, Boolean.valueOf(value));
+    }
+    
+    /**
+     * Load the Web application. This will create, configure and initiate
+     * the web application.
+     * <p>
+     * This method may be called at runtime, more than once, to reload the 
+     * Web application. For example, if a {@link ResourceConfig} implementation 
+     * is capable of detecting changes to resource classes (addition or removal)
+     * or providers then this method may be invoked to reload the web 
+     * application for such changes to take effect.
+     * <p>
+     * If this method is called when there are pending requests then such
+     * requests will be processed using the previously loaded web application.
+     */
+    public final void load() {
+        WebApplication _application = create();        
+        configure(config, resourceConfig, _application);        
+        initiate(resourceConfig, _application);
+        application = _application;
     }
     
     /**
