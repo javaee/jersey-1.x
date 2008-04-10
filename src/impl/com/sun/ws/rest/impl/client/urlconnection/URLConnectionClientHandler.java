@@ -28,6 +28,7 @@ import com.sun.ws.rest.api.client.ClientHandlerException;
 import com.sun.ws.rest.api.client.ClientRequest;
 import com.sun.ws.rest.api.client.ClientResponse;
 import com.sun.ws.rest.spi.container.MessageBodyContext;
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -106,7 +107,9 @@ public final class URLConnectionClientHandler implements ClientHandler {
             if (status < 300) {
                 return uc.getInputStream();
             } else {
-                return uc.getErrorStream();
+                InputStream in = uc.getErrorStream();
+                return (in != null) 
+                        ? in : new ByteArrayInputStream(new byte[0]);
             }
         }
     }
