@@ -66,6 +66,17 @@ public interface WebApplication {
             throws IllegalArgumentException, ContainerException;
     
     /**
+     * Clone the WebApplication instance.
+     * <p>
+     * A new WebApplication instance will be created that is initiated with
+     * the {@link ResourceConfig} and {@link ComponentProvider} instances
+     * that were used to initiate this WebApplication instance.
+     *
+     * @return the cloned instance.
+     */
+    WebApplication clone();
+            
+    /**
      * Get the message body context that can be used for getting
      * message body readers and writers. 
      * 

@@ -149,6 +149,19 @@ public final class WebApplicationImpl implements WebApplication {
         this.injectables = createInjectables();
     }
     
+    @Override
+    public WebApplication clone() {
+        WebApplicationImpl wa = new WebApplicationImpl();
+        if (provider instanceof DefaultComponentProvider) {
+            wa.initiate(resourceConfig, null);
+        } else {
+            AdaptingComponentProvider acp = (AdaptingComponentProvider)provider;
+            wa.initiate(resourceConfig, acp.getAdaptedComponentProvider());            
+        }
+        
+        return wa;
+    }
+    
     public ResourceClass getResourceClass(Class c) {
         assert c != null;
         
@@ -233,6 +246,12 @@ public final class WebApplicationImpl implements WebApplication {
             this.cp = cp;
         }
 
+        public ComponentProvider getAdaptedComponentProvider() {
+            return cp;
+        }
+        
+        //
+        
         public <T> T getInstance(Scope scope, Class<T> c) 
                 throws InstantiationException, IllegalAccessException {
             T o = cp.getInstance(scope,c);
