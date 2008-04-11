@@ -40,6 +40,10 @@ import javax.xml.bind.Unmarshaller;
  */
 public final class XMLJAXBElementProvider extends AbstractJAXBElementProvider {
     
+    public XMLJAXBElementProvider() {
+        Class<?> c = JAXBContext.class;
+    }
+    
     public Object readFrom(Class<Object> type, MediaType mediaType,
             MultivaluedMap<String, String> headers, InputStream entityStream) throws IOException {
         try {

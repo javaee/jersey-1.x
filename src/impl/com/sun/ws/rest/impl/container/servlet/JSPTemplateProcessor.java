@@ -30,18 +30,23 @@ import java.io.OutputStream;
 import java.net.MalformedURLException;
 import javax.servlet.ServletContext;
 import javax.ws.rs.core.Context;
-import javax.ws.rs.ext.Provider;
 
 /**
  * A JSP template processor.
  * 
  * @author Paul.Sandoz@Sun.Com
  */
-@Provider
 public class JSPTemplateProcessor implements TemplateProcessor {
     @Context ServletContext servletContext;
 
+    public JSPTemplateProcessor() {
+        Class<?> c = ServletContext.class;
+    }
+    
     public String resolve(String path) {
+        if (servletContext == null)
+            return null;
+        
         if (!path.endsWith(".jsp"))
             path = path + ".jsp";
 

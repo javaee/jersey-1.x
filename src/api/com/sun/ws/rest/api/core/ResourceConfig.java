@@ -104,6 +104,16 @@ public abstract class ResourceConfig extends ApplicationConfig {
             = "com.sun.ws.rest.config.property.DefaultResourceProviderClass";
     
     /**
+     * If set the instance of {@link ContainerNotifier} to register
+     * {@link ContainerListener} instances.
+     * <p>
+     * If the instance does not implement the {@link ContainerNotifier}
+     * then the property is ignored.
+     */
+    public static final String PROPERTY_CONTAINER_NOTIFIER = 
+            "com.sun.ws.rest.spi.container.ContainerNotifier";
+    
+    /**
      * Get the map of features associated with the Web application.
      *
      * @return the features.

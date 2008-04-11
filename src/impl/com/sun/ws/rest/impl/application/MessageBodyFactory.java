@@ -26,18 +26,13 @@ import com.sun.ws.rest.impl.model.MediaTypeHelper;
 import com.sun.ws.rest.impl.util.KeyComparator;
 import com.sun.ws.rest.impl.util.KeyComparatorHashMap;
 import com.sun.ws.rest.spi.container.MessageBodyContext;
-import com.sun.ws.rest.spi.service.ServiceFinder;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashMap;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.ws.rs.ConsumeMime;
 import javax.ws.rs.ProduceMime;
@@ -84,39 +79,20 @@ public final class MessageBodyFactory implements MessageBodyContext, MessageBody
     private <T> Map<MediaType, List<T>> getProviderMap(
             Class<T> serviceClass,
             Class<?> annotationClass) {
-
-        // Get the application-defined provider classes that implement serviceClass
-        Set<Class> pcs =new LinkedHashSet<Class>(
-                componentProviderCache.getProviderClasses(serviceClass)); 
-        
-        // Get the service-defined provider classes that implement serviceClass
-        LOGGER.log(Level.CONFIG, "Searching for providers that implement: " + serviceClass);
-        Class<T>[] pca = ServiceFinder.find(serviceClass, true).toClassArray();
-        for (Class pc : pca)
-            LOGGER.log(Level.CONFIG, "    Provider found: " + pc);
-        
-        // Add service-defined providers to the set after application-defined
-        for (Class pc : pca)
-            pcs.add(pc);
-                        
         Map<MediaType, List<T>> s = new KeyComparatorHashMap<MediaType, List<T>>(
                 MEDIA_TYPE_COMPARATOR);
         
-        for (Class providerClass : pcs) {
-            Object o = componentProviderCache.getComponent(providerClass);
-            if (o == null) continue;
-            
-            T provider = serviceClass.cast(o);
-            
-            String values[] = getAnnotationValues(providerClass, annotationClass);
+        for (T provider : componentProviderCache.getProvidersAndServices(serviceClass)) {
+            String values[] = getAnnotationValues(provider.getClass(), annotationClass);
             if (values==null)
                 getClassCapability(s, provider, MediaTypeHelper.GENERAL_MEDIA_TYPE);
             else
                 for (String type: values)
                     getClassCapability(s, provider, MediaType.parse(type));            
-        }
+            
+        }   
         
-        return s;
+        return s;        
     }
 
     private <T> void getClassCapability(Map<MediaType, List<T>> capabilities, 

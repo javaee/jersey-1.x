@@ -30,13 +30,14 @@ import com.sun.ws.rest.spi.container.WebApplication;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import com.sun.grizzly.tcp.http11.GrizzlyAdapter;
+import com.sun.ws.rest.spi.container.ContainerListener;
 import java.io.IOException;
 
 /**
  *
  * @author Marc.Hadley@Sun.Com
  */
-public class GrizzlyContainer extends GrizzlyAdapter {
+public class GrizzlyContainer extends GrizzlyAdapter implements ContainerListener {
     
     private WebApplication application;
     
@@ -46,16 +47,18 @@ public class GrizzlyContainer extends GrizzlyAdapter {
 
     public void service(GrizzlyRequest request, GrizzlyResponse response) {
         GrizzlyResponseAdaptor responseAdaptor = null;
+        WebApplication _application = application;
+        
         try {
             GrizzlyRequestAdaptor requestAdaptor = 
-                    new GrizzlyRequestAdaptor(application.getMessageBodyContext(), 
+                    new GrizzlyRequestAdaptor(_application.getMessageBodyContext(), 
                     request);
             responseAdaptor = 
                     new GrizzlyResponseAdaptor(response, 
-                    application.getMessageBodyContext(), 
+                    _application.getMessageBodyContext(), 
                     requestAdaptor);
         
-            application.handleRequest(requestAdaptor, responseAdaptor);
+            _application.handleRequest(requestAdaptor, responseAdaptor);
         } catch (IOException ex){
             throw new RuntimeException(ex);
         } catch (ContainerException e) {
@@ -75,7 +78,6 @@ public class GrizzlyContainer extends GrizzlyAdapter {
 
     public void afterService(GrizzlyRequest request, GrizzlyResponse response) 
             throws Exception {
-        ;
     }
 
     
@@ -93,4 +95,9 @@ public class GrizzlyContainer extends GrizzlyAdapter {
                 entity(sw.toString()).type("text/plain").build());
     }
 
+    // ContainerListener
+    
+    public void onReload() {
+        application = application.clone();
+    }    
 }

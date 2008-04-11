@@ -40,6 +40,10 @@ import org.codehaus.jettison.json.JSONObject;
  */
 public class JSONObjectProvider  extends AbstractTypeEntityProvider<JSONObject>{
     
+    public JSONObjectProvider() {
+        Class<?> c = JSONObject.class;
+    }
+    
     public boolean supports(Class<?> type) {
         return type == JSONObject.class;
     }

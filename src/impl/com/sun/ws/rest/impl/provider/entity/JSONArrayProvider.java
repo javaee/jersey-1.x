@@ -39,6 +39,10 @@ import org.codehaus.jettison.json.JSONException;
  */
 public class JSONArrayProvider  extends AbstractTypeEntityProvider<JSONArray>{
     
+    public JSONArrayProvider() {
+        Class<?> c = JSONArray.class;
+    }
+    
     public boolean supports(Class<?> type) {
         return type == JSONArray.class;
     }

@@ -45,6 +45,10 @@ import org.jdom.output.XMLOutputter;
 public final class AtomFeedProvider extends AbstractTypeEntityProvider<Feed> {
     private static final String FEED_TYPE = "atom_1.0";
     
+    public AtomFeedProvider() {
+        Class<?> c = Feed.class;        
+    }
+    
     public boolean supports(Class type) {
         return type == Feed.class;
     }

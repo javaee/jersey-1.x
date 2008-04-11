@@ -34,6 +34,9 @@ import javax.xml.ws.Provider;
  * @author Paul.Sandoz@Sun.Com
  */
 public final class ProviderContainerProvider implements ContainerProvider<Provider> {
+    public ProviderContainerProvider() {
+        Class<?> c = Provider.class;
+    }
     
     public Provider createContainer(Class<Provider> type, 
             ResourceConfig resourceConfig, WebApplication application) throws ContainerException {

@@ -20,31 +20,22 @@
  *     "Portions Copyrighted [year] [name of copyright owner]"
  */
 
-package com.sun.ws.rest.impl.container.grizzly;
-
-import com.sun.ws.rest.api.container.ContainerException;
-import com.sun.ws.rest.api.core.ResourceConfig;
-import com.sun.ws.rest.spi.container.ContainerProvider;
-import com.sun.ws.rest.spi.container.WebApplication;
-import com.sun.grizzly.tcp.Adapter;
+package com.sun.ws.rest.spi.container;
 
 /**
- *
- * @author Marc.Hadley@Sun.Com
+ * A container notifier that is used to register container listeners.
+ * <p>
+ * An implementation may be registered in a {@link ResourceConfig} using the
+ * property (@link ResourceConfig#PROPERTY_CONTAINER_NOTIFIER}.
+ * 
+ * @author Paul.Sandoz@Sun.Com
  */
-public class GrizzlyContainerProvider implements ContainerProvider<Adapter> {
-    
-    public GrizzlyContainerProvider() {
-        Class<?> c = Adapter.class;
-    }
-    
-    public Adapter createContainer(Class<Adapter> type, 
-            ResourceConfig resourceConfig, WebApplication application) throws ContainerException {
-        if (type != Adapter.class)
-            return null;
-        
-        GrizzlyContainer c = new GrizzlyContainer(application);
-        application.initiate(resourceConfig);
-        return c;
-    }
+public interface ContainerNotifier {
+    /**
+     * Add a container listener to be notified when the container
+     * events occur.
+     * 
+     * @param l the listener.
+     */
+    void addListener(ContainerListener l);
 }

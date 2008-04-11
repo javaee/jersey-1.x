@@ -35,11 +35,10 @@ import javax.ws.rs.ext.Provider;
 
 /**
  * A mutable implementation of {@link DefaultResourceConfig} that dynamically 
- * searches for root resource classes in the paths declared by the property 
- * {@link ClasspathResourceConfig#PROPERTY_CLASSPATH}. That property MUST be 
- * included in the map of initial properties passed to the constructor.
- * <p>
- * Root resource classes MUST be present in the java class path.
+ * searches for root resource classes and providers in the paths declared by 
+ * the property {@link ClasspathResourceConfig#PROPERTY_CLASSPATH}. 
+ * That property MUST be included in the map of initial properties passed to 
+ * the constructor.
  * 
  * @author Frank D. Martinez. fmartinez@asimovt.com
  */
@@ -60,18 +59,10 @@ public final class ClasspathResourceConfig extends DefaultResourceConfig {
     private static final Logger LOGGER = 
             Logger.getLogger(ClasspathResourceConfig.class.getName());
 
-    /**
-     * @param paths the array paths consisting of either jar files or
-     *        directories containing jar files for class files.
-     */
-    public ClasspathResourceConfig(String[] paths) {
-        super();
-        
-        if (paths == null || paths.length == 0)
-            throw new IllegalArgumentException(
-                    "Array of paths must not be null or empty");
-        
-        init(paths);
+    private final String[] paths;
+    
+    public ClasspathResourceConfig() {
+        this(getPaths());
     }
     
     /**
@@ -84,6 +75,31 @@ public final class ClasspathResourceConfig extends DefaultResourceConfig {
         getProperties().putAll(props);
     }
 
+    /**
+     * @param paths the array paths consisting of either jar files or
+     *        directories containing jar files for class files.
+     */
+    public ClasspathResourceConfig(String[] paths) {
+        super();
+        
+        if (paths == null || paths.length == 0)
+            throw new IllegalArgumentException(
+                    "Array of paths must not be null or empty");
+
+        this.paths = paths;
+        
+        init(paths);
+    }
+    
+    /**
+     * Perform a new search for resource classes and provider classes.
+     */
+    public void reload() {
+        getResourceClasses().clear();
+        getProviderClasses().clear();
+        init(paths);
+    }
+    
     private void init(String[] paths) {    
         File[] roots = new File[paths.length];
         for (int i = 0;  i< paths.length; i++) {
@@ -121,6 +137,11 @@ public final class ClasspathResourceConfig extends DefaultResourceConfig {
             
             LOGGER.log(Level.INFO, b.toString());            
         }
+    }
+    
+    private static String[] getPaths() {
+        String classPath = System.getProperty("java.class.path");
+        return classPath.split(File.pathSeparator);                
     }
     
     private static String[] getPaths(Map<String, Object> props) {

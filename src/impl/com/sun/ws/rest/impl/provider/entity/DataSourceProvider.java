@@ -35,6 +35,11 @@ import javax.ws.rs.core.MultivaluedMap;
  * @author Paul.Sandoz@Sun.Com
  */
 public class DataSourceProvider extends AbstractTypeEntityProvider<DataSource> {
+    
+    public DataSourceProvider() {
+        Class<?> c = DataSource.class;
+    }
+    
     public boolean supports(Class type) {
         return DataSource.class.isAssignableFrom(type);
     }

@@ -24,8 +24,9 @@ package com.sun.ws.rest.impl.application;
 
 import com.sun.ws.rest.spi.service.ComponentProvider;
 import com.sun.ws.rest.spi.service.ComponentProvider.Scope;
+import com.sun.ws.rest.spi.service.ServiceFinder;
 import java.util.HashMap;
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
@@ -37,7 +38,7 @@ import java.util.logging.Logger;
  * 
  * @author Paul.Sandoz@Sun.Com
  */
-public class ComponentProviderCache {
+public final class ComponentProviderCache {
     private static final Logger LOGGER = Logger.getLogger(ComponentProviderCache.class.getName());
     
     private final ComponentProvider componentProvider;
@@ -53,25 +54,9 @@ public class ComponentProviderCache {
         this.cache = new HashMap<Class, Object>();
     }
     
-    public Set<Class> getProviderClasses(Class<?> service) {
-        Set<Class> sp = new HashSet<Class>();
-        for (Class p : providers) {
-            if (service.isAssignableFrom(p))
-                sp.add(p);
-        }
-        
-        return sp;
-    }
-    
     public <T> Set<T> getProviders(Class<T> provider) {
-        Set<Class> pcs = new HashSet<Class>();
-        for (Class p : providers) {
-            if (provider.isAssignableFrom(p))
-                pcs.add(p);
-        }
-        
-        Set<T> ps = new HashSet<T>();
-        for (Class pc : pcs) {
+        Set<T> ps = new LinkedHashSet<T>();
+        for (Class pc : getProviderClasses(provider)) {
             Object o = getComponent(pc);
             if (o != null) {
                 ps.add(provider.cast(o));
@@ -81,7 +66,19 @@ public class ComponentProviderCache {
         return ps;
     }
     
-    public Object getComponent(Class<?> provider) {
+    public <T> Set<T> getProvidersAndServices(Class<T> provider) {
+        Set<T> ps = new LinkedHashSet<T>();
+        for (Class pc : getProviderAndServiceClasses(provider)) {
+            Object o = getComponent(pc);
+            if (o != null) {
+                ps.add(provider.cast(o));
+            }
+        }
+        
+        return ps;        
+    }
+    
+    private Object getComponent(Class<?> provider) {
         Object o = cache.get(provider);
         if (o != null) return o;
             
@@ -89,18 +86,15 @@ public class ComponentProviderCache {
             o = componentProvider.getInstance(Scope.WebApplication, provider);
         } catch (NoClassDefFoundError ex) {
             // Dependent class of provider not found
-            if(LOGGER.isLoggable(Level.WARNING)) {
-                // This assumes that ex.getLocalizedMessage() returns
-                // the name of a dependent class that is not found
-//                LOGGER.log(Level.WARNING, 
-//                        SpiMessages.DEPENDENT_CLASS_OF_PROVIDER_NOT_FOUND(
-//                        ex.getLocalizedMessage(), nextName, service));
-            }
+            // This assumes that ex.getLocalizedMessage() returns
+            // the name of a dependent class that is not found
             LOGGER.log(Level.WARNING,
-                    "The provider class, " + provider + 
-                    ", could not be instantiated");
+                    "A dependent class, " + ex.getLocalizedMessage() + 
+                    ", of the component " + provider + " is not found." +
+                    " The component is ignored.");
             return null;
         } catch (Exception ex) {
+            System.out.println(ex.getLocalizedMessage());
             LOGGER.log(Level.WARNING,
                     "The provider class, " + provider + 
                     ", could not be instantiated");
@@ -110,4 +104,30 @@ public class ComponentProviderCache {
         cache.put(provider, o);
         return o;
     }
+    
+    private Set<Class> getProviderClasses(Class<?> service) {
+        Set<Class> sp = new LinkedHashSet<Class>();
+        for (Class p : providers) {
+            if (service.isAssignableFrom(p))
+                sp.add(p);
+        }
+        
+        return sp;
+    }
+    
+    private Set<Class> getProviderAndServiceClasses(Class<?> service) {
+        Set<Class> sp = new LinkedHashSet<Class>(getProviderClasses(service)); 
+        
+        // Get the service-defined provider classes that implement serviceClass
+        LOGGER.log(Level.CONFIG, "Searching for providers that implement: " + service);
+        Class<?>[] pca = ServiceFinder.find(service, true).toClassArray();
+        for (Class pc : pca)
+            LOGGER.log(Level.CONFIG, "    Provider found: " + pc);
+        
+        // Add service-defined providers to the set after application-defined
+        for (Class pc : pca)
+            sp.add(pc);
+        
+        return sp;
+    }    
 }

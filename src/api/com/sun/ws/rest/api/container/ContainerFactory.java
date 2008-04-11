@@ -26,6 +26,8 @@ import com.sun.ws.rest.api.core.DefaultResourceConfig;
 import com.sun.ws.rest.api.core.ResourceConfig;
 import com.sun.ws.rest.api.core.ClasspathResourceConfig;
 import com.sun.ws.rest.spi.container.ContainerProvider;
+import com.sun.ws.rest.spi.container.ContainerListener;
+import com.sun.ws.rest.spi.container.ContainerNotifier;
 import com.sun.ws.rest.spi.container.WebApplication;
 import com.sun.ws.rest.spi.container.WebApplicationFactory;
 import com.sun.ws.rest.spi.service.ServiceFinder;
@@ -114,7 +116,14 @@ public final class ContainerFactory {
         
         for (ContainerProvider<A> cp : cps) {
             A c = cp.createContainer(type, resourceConfig, wa);
-            if (c != null) {
+            if (c != null) {        
+                Object o = resourceConfig.getProperties().get(
+                        ResourceConfig.PROPERTY_CONTAINER_NOTIFIER);
+                if (o instanceof ContainerNotifier && 
+                        c instanceof ContainerListener) {
+                    ContainerNotifier crf = (ContainerNotifier)o;
+                    crf.addListener((ContainerListener)c);
+                }                
                 return c;
             }
         }

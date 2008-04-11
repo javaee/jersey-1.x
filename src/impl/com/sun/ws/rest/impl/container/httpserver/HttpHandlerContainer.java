@@ -26,6 +26,7 @@ import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import com.sun.ws.rest.api.container.ContainerException;
 import com.sun.ws.rest.api.core.HttpResponseContext;
+import com.sun.ws.rest.spi.container.ContainerListener;
 import com.sun.ws.rest.spi.container.WebApplication;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -37,7 +38,7 @@ import javax.ws.rs.core.Response;
  * 
  * @author Paul.Sandoz@Sun.Com
  */
-public class HttpHandlerContainer implements HttpHandler {
+public class HttpHandlerContainer implements HttpHandler, ContainerListener {
     
     private WebApplication application;
     
@@ -46,17 +47,19 @@ public class HttpHandlerContainer implements HttpHandler {
     }
     
     public void handle(HttpExchange httpExchange) throws IOException {
+        WebApplication _application = application;
+        
         HttpServerRequestAdaptor requestAdaptor = 
                 new HttpServerRequestAdaptor(
-                application.getMessageBodyContext(), 
+                _application.getMessageBodyContext(), 
                 httpExchange);
         HttpServerResponseAdaptor responseAdaptor = 
                 new HttpServerResponseAdaptor(httpExchange,
-                application.getMessageBodyContext(), 
+                _application.getMessageBodyContext(), 
                 requestAdaptor);
         
         try {
-            application.handleRequest(requestAdaptor, responseAdaptor);
+            _application.handleRequest(requestAdaptor, responseAdaptor);
         } catch (ContainerException e) {
             onException(e, responseAdaptor);
         } catch (RuntimeException e) {
@@ -85,5 +88,11 @@ public class HttpHandlerContainer implements HttpHandler {
 
         response.setResponse(Response.serverError().
                 entity(sw.toString()).type("text/plain").build());
-    }    
+    }
+
+    // ContainerListener
+    
+    public void onReload() {
+        application = application.clone();
+    }
 }

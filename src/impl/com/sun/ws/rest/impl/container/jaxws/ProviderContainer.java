@@ -24,6 +24,7 @@ package com.sun.ws.rest.impl.container.jaxws;
 
 import com.sun.ws.rest.api.container.ContainerException;
 import com.sun.ws.rest.impl.ImplMessages;
+import com.sun.ws.rest.spi.container.ContainerListener;
 import com.sun.ws.rest.spi.container.WebApplication;
 import java.io.IOException;
 import javax.activation.DataSource;
@@ -46,7 +47,7 @@ import javax.xml.ws.http.HTTPBinding;
 @BindingType(HTTPBinding.HTTP_BINDING)
 @WebServiceProvider
 @ServiceMode(value=Service.Mode.MESSAGE)
-public class ProviderContainer implements Provider<DataSource> {
+public class ProviderContainer implements Provider<DataSource>, ContainerListener {
     
     @Resource
     WebServiceContext wsContext;
@@ -64,19 +65,21 @@ public class ProviderContainer implements Provider<DataSource> {
     }
     
     public DataSource invoke(DataSource request) {
+        WebApplication _application = application;
+        
         DataSource result = null;
         MessageContext msgContext = wsContext.getMessageContext();
         try {
             MessageContextRequestAdaptor requestAdaptor = 
                     new MessageContextRequestAdaptor(
-                    application.getMessageBodyContext(), 
+                    _application.getMessageBodyContext(), 
                     request, msgContext);
             MessageContextResponseAdaptor responseAdaptor = 
                     new MessageContextResponseAdaptor(msgContext, 
-                    application.getMessageBodyContext(), 
+                    _application.getMessageBodyContext(), 
                     requestAdaptor);
 
-            application.handleRequest(requestAdaptor, responseAdaptor);
+            _application.handleRequest(requestAdaptor, responseAdaptor);
             
             result = responseAdaptor.getResultDataSource();
         } catch(ContainerException e) {
@@ -91,5 +94,11 @@ public class ProviderContainer implements Provider<DataSource> {
         }
         
         return result;
+    }
+
+    // ContainerListener
+    
+    public void onReload() {
+        application = application.clone();
     }
 }

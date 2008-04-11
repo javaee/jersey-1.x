@@ -29,6 +29,8 @@ import com.sun.ws.rest.impl.ThreadLocalInvoker;
 import com.sun.ws.rest.api.core.ClasspathResourceConfig;
 import com.sun.ws.rest.impl.container.servlet.HttpRequestAdaptor;
 import com.sun.ws.rest.impl.container.servlet.HttpResponseAdaptor;
+import com.sun.ws.rest.spi.container.ContainerListener;
+import com.sun.ws.rest.spi.container.ContainerNotifier;
 import com.sun.ws.rest.spi.container.WebApplication;
 import com.sun.ws.rest.spi.container.WebApplicationFactory;
 import com.sun.ws.rest.spi.resource.Injectable;
@@ -82,7 +84,7 @@ import javax.ws.rs.core.Context;
  * annotated with {@link Resource}: @{link HttpServletRequest}, 
  * {@link HttpServletResponse} and {@link ServletConfig}.
  */
-public class ServletContainer extends HttpServlet {
+public class ServletContainer extends HttpServlet implements ContainerListener {
     private static final String APPLICATION_CONFIG_CLASS =
             "javax.ws.rs.ApplicationConfig";
     
@@ -115,6 +117,13 @@ public class ServletContainer extends HttpServlet {
         initResourceConfigFeatures(servletConfig, resourceConfig);
         
         load();
+        
+        Object o = resourceConfig.getProperties().get(
+                ResourceConfig.PROPERTY_CONTAINER_NOTIFIER);
+        if (o instanceof ContainerNotifier) {
+            ContainerNotifier crf = (ContainerNotifier)o;
+            crf.addListener(this);
+        }        
     }
     
     @Override
@@ -380,6 +389,12 @@ public class ServletContainer extends HttpServlet {
      * @param wa the Web application
      */
     protected void initiate(ResourceConfig rc, WebApplication wa) {
-        wa.initiate(rc);
-    }    
+        wa.initiate(rc);        
+    }
+
+    // ContainerListener
+    
+    public void onReload() {
+        load();
+    }
 }

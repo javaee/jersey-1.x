@@ -1,4 +1,13 @@
 release 0.7 (2008-04-18)
+- Containers can be informed when they are required to reload, for example
+  if new root resource classes have been added to removed, or class file
+  definitions have changed while a VM is running.
+  A com.sun.ws.rest.spi.container.ContainerNotifier instance may be 
+  registered by adding a property to the ResourceConfig with the property name
+  "com.sun.ws.rest.spi.container.ContainerNotifier" and a property value
+  that is the instance of the ContainerNotifier.
+  The ContainerNotifier instance may then notifier registered listeners
+  when reloading is required.
 - The com.sun.ws.rest.spi.container.servlet.ServletContainer class has
   a public load() method that can be invoked to dynamically reload the web
   web application if, for example, resource classes have been modified,

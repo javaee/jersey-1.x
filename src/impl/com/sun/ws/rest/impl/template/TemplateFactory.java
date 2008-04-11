@@ -26,16 +26,20 @@ import com.sun.ws.rest.spi.template.TemplateProcessor;
 import com.sun.ws.rest.spi.template.TemplateContext;
 import com.sun.ws.rest.impl.application.ComponentProviderCache;
 import java.util.Set;
+import java.util.logging.Logger;
 
 /**
  *
  * @author Paul.Sandoz@Sun.Com
  */
 public final class TemplateFactory implements TemplateContext {
+    private static final Logger LOGGER = Logger.getLogger(TemplateFactory.class.getName());
+    
     private final Set<TemplateProcessor> templates;
     
     public TemplateFactory(ComponentProviderCache componentProviderCache) {
-        this.templates = componentProviderCache.getProviders(TemplateProcessor.class);
+        templates = componentProviderCache.getProvidersAndServices(
+                TemplateProcessor.class);
     }
 
     // TemplateContext

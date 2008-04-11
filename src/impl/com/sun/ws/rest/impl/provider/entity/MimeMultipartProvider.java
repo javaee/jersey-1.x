@@ -37,6 +37,10 @@ import javax.ws.rs.core.MultivaluedMap;
  */
 public final class MimeMultipartProvider extends AbstractTypeEntityProvider<MimeMultipart> {
     
+    public MimeMultipartProvider() {
+        Class<?> c = MimeMultipart.class;
+    }
+    
     public boolean supports(Class type) {
         return type == MimeMultipart.class;
     }

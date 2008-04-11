@@ -52,6 +52,10 @@ import javax.xml.bind.Unmarshaller;
 @ConsumeMime("application/json")
 public final class JSONJAXBElementProvider extends AbstractJAXBElementProvider {
     
+    public JSONJAXBElementProvider() {
+        Class<?> c = JAXBContext.class;
+    }
+    
     public Object readFrom(Class<Object> type, MediaType mediaType,
             MultivaluedMap<String, String> headers, InputStream entityStream) throws IOException {
         try {

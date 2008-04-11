@@ -584,9 +584,73 @@ public final class ServiceFinder<T> implements Iterable<T> {
     private static final class LazyObjectIterator<T> extends AbstractLazyIterator<T> 
             implements Iterator<T> {
 
+        private T t;
+        
         private LazyObjectIterator(Class<T> service, ClassLoader loader, 
                 boolean ignoreOnClassNotFound, ComponentProvider componentProvider) {
             super(service, loader, ignoreOnClassNotFound, componentProvider);
+        }
+        
+        public boolean hasNext() throws ServiceConfigurationError {
+            if (nextName != null) {
+                return true;
+            }
+            if (configs == null) {
+                try {
+                    String fullName = PREFIX + service.getName();
+                    if (loader == null)
+                        configs = ClassLoader.getSystemResources(fullName);
+                    else
+                        configs = loader.getResources(fullName);
+                } catch (IOException x) {
+                    fail(service, ": " + x);
+                }
+            }
+            
+            while (nextName == null) {
+                while ((pending == null) || !pending.hasNext()) {
+                    if (!configs.hasMoreElements()) {
+                        return false;
+                    }
+                    pending = parse(service, configs.nextElement(), returned);
+                }
+                nextName = pending.next();
+                try {
+                    t = service.cast(componentProvider.getInstance(null, 
+                            Class.forName(nextName, true, loader)));
+                } catch (ClassNotFoundException ex) {
+                    if (ignoreOnClassNotFound) {
+                        // Provider implementation not found
+                        if(LOGGER.isLoggable(Level.WARNING)) {
+                            LOGGER.log(Level.WARNING, 
+                                    SpiMessages.PROVIDER_NOT_FOUND(nextName, service));
+                        }                    
+                        nextName = null;
+                    } else
+                        fail(service, 
+                                SpiMessages.PROVIDER_NOT_FOUND(nextName, service));
+                } catch (NoClassDefFoundError ex) {
+                    // Dependent class of provider not found
+                    if (ignoreOnClassNotFound) {
+                        if(LOGGER.isLoggable(Level.WARNING)) {
+                            // This assumes that ex.getLocalizedMessage() returns
+                            // the name of a dependent class that is not found
+                            LOGGER.log(Level.WARNING , 
+                                    SpiMessages.DEPENDENT_CLASS_OF_PROVIDER_NOT_FOUND(
+                                    ex.getLocalizedMessage(), nextName, service));
+                        }
+                        nextName = null; 
+                    } else
+                        fail(service,
+                                SpiMessages.PROVIDER_COULD_NOT_BE_CREATED(nextName, service, ex.getLocalizedMessage()),
+                                ex);
+                } catch(Exception ex) {
+                    fail(service,
+                            SpiMessages.PROVIDER_COULD_NOT_BE_CREATED(nextName, service, ex.getLocalizedMessage()),
+                            ex);                    
+                }
+            }
+            return true;
         }
         
         public T next() {
@@ -595,18 +659,7 @@ public final class ServiceFinder<T> implements Iterable<T> {
             }
             String cn = nextName;
             nextName = null;
-            try {
-                return service.cast(componentProvider.getInstance(null, 
-                        Class.forName(cn, true, loader)));
-            } catch (ClassNotFoundException x) {
-                fail(service, 
-                        SpiMessages.PROVIDER_NOT_FOUND(cn, service));
-            } catch (Exception x) {
-                fail(service,
-                        SpiMessages.PROVIDER_COULD_NOT_BE_CREATED(cn, service, x.getLocalizedMessage()),
-                        x);
-            }
-            return null;    /* This cannot happen */
+            return t;
         }
     }
 }
