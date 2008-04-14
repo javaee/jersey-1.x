@@ -23,6 +23,7 @@
 package com.sun.ws.rest.spi.uri.rules;
 
 import com.sun.ws.rest.api.core.HttpContext;
+import com.sun.ws.rest.api.uri.UriTemplate;
 import java.util.List;
 
 /**
@@ -65,11 +66,11 @@ public interface UriRuleContext extends HttpContext {
     void setTemplateValues(List<String> names);
     
     /**
-     * Push the resource onto the list if matching (ancestor) resources
+     * Push the resource and matching URI template associated with the resource.
      * 
      * @param resource
      */
-    void pushResource(Object resource);
+    void pushResource(Object resource, UriTemplate template);
 
     /**
      * Push the right hand path length to calculate the entry for

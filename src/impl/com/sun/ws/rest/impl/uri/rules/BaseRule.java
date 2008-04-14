@@ -22,9 +22,9 @@
 
 package com.sun.ws.rest.impl.uri.rules;
 
+import com.sun.ws.rest.api.uri.UriTemplate;
 import com.sun.ws.rest.spi.uri.rules.UriRule;
 import com.sun.ws.rest.spi.uri.rules.UriRuleContext;
-import java.util.List;
 
 /**
  * Abstract class for a rule that manages capturing group names.
@@ -32,18 +32,22 @@ import java.util.List;
  * @author Paul.Sandoz@Sun.Com
  */
 public abstract class BaseRule implements UriRule {
-    private final List<String> groupNames;
+    private final UriTemplate template;
     
-    public BaseRule(List<String> groupNames) {
-        assert groupNames != null;
+    public BaseRule(UriTemplate template) {
+        assert template != template;
         
-        this.groupNames = groupNames;
+        this.template = template;
     }
     
     /**
      * Set the URI temaplte values.
      */
     protected final void setTemplateValues(UriRuleContext context) {
-        context.setTemplateValues(groupNames);
+        context.setTemplateValues(template.getTemplateVariables());
+    }
+    
+    protected final UriTemplate getTemplate() {
+        return template;
     }
 }

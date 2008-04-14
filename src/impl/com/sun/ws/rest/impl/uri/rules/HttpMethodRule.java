@@ -98,11 +98,6 @@ public final class HttpMethodRule implements UriRule {
             return false;
         }
 
-        // If a sub-resource method then need to push the resource
-        // (again) as as to keep in sync with the ancestor URIs
-        if (isSubResource)
-            context.pushResource(resource);
-        
         // Get the list of matching methods
         List<MediaType> accept = request.getAcceptableMediaTypes();
         LinkedList<ResourceMethod> matches = 
@@ -112,8 +107,13 @@ public final class HttpMethodRule implements UriRule {
             // If there is a match choose the first method
             ResourceMethod method = matches.get(0);
 
-            // Set the template values
-            context.setTemplateValues(method.getTemplateVariables());
+            // If a sub-resource method then need to push the resource
+            // (again) as as to keep in sync with the ancestor URIs
+            if (isSubResource) {
+                context.pushResource(resource, method.getTemplate());        
+                // Set the template values
+                context.setTemplateValues(method.getTemplate().getTemplateVariables());
+            }
             
             method.getDispatcher().dispatch(resource, context);
 

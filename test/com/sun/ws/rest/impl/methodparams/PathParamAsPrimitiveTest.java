@@ -33,9 +33,9 @@ import javax.ws.rs.GET;
  *
  * @author Paul.Sandoz@Sun.Com
  */
-public class UriParamAsPrimitiveTest extends AbstractResourceTester {
+public class PathParamAsPrimitiveTest extends AbstractResourceTester {
 
-    public UriParamAsPrimitiveTest(String testName) {
+    public PathParamAsPrimitiveTest(String testName) {
         super(testName);
         initiateWebApplication(
                 ResourceUriBoolean.class,

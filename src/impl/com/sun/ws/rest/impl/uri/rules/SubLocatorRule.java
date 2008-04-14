@@ -23,13 +23,13 @@
 package com.sun.ws.rest.impl.uri.rules;
 
 import com.sun.ws.rest.api.container.ContainerException;
+import com.sun.ws.rest.api.uri.UriTemplate;
 import com.sun.ws.rest.impl.model.parameter.ParameterExtractor;
 import com.sun.ws.rest.spi.uri.rules.UriRule;
 import com.sun.ws.rest.spi.uri.rules.UriRuleContext;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Iterator;
-import java.util.List;
 import javax.ws.rs.WebApplicationException;
 
 /**
@@ -43,9 +43,9 @@ public final class SubLocatorRule extends BaseRule {
     
     private final Method m;
 
-    public SubLocatorRule(List<String> groupNames,
+    public SubLocatorRule(UriTemplate template,
             Method m, ParameterExtractor[] extractors) {
-        super(groupNames);
+        super(template);
         this.m = m;
         this.extractors = extractors;
     }
@@ -62,7 +62,7 @@ public final class SubLocatorRule extends BaseRule {
             // If so then get the instance of that class
             resource = context.getResource((Class)resource);
         }
-        context.pushResource(resource);
+        context.pushResource(resource, getTemplate());
         
         // Match sub-rules on the returned resource class
         final Iterator<UriRule> matches = context.getRules(resource.getClass()).

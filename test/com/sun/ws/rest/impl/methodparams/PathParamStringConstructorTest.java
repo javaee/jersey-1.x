@@ -35,9 +35,9 @@ import javax.ws.rs.GET;
  *
  * @author Paul.Sandoz@Sun.Com
  */
-public class UriParamStringConstructorTest extends AbstractResourceTester {
+public class PathParamStringConstructorTest extends AbstractResourceTester {
 
-    public UriParamStringConstructorTest(String testName) {
+    public PathParamStringConstructorTest(String testName) {
         super(testName);
         initiateWebApplication(Resource.class);
     }

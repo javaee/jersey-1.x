@@ -224,4 +224,28 @@ public class UriTemplateTest extends TestCase {
         
         System.out.println(t.createURI(variableMap));
     } 
+    
+    public void testPathIndex() {
+        UriTemplate t = new UriTemplate("{v}");
+        assertEquals(0, t.getPathSegmentIndex("v"));
+        
+        t = new UriTemplate("{v1}/{v2}");
+        assertEquals(0, t.getPathSegmentIndex("v1"));
+        assertEquals(1, t.getPathSegmentIndex("v2"));
+        
+        t = new UriTemplate("{v1}-{v2}");
+        assertEquals(0, t.getPathSegmentIndex("v1"));
+        assertEquals(0, t.getPathSegmentIndex("v2"));
+        
+        t = new UriTemplate("xxxx{v1}xxxx/xxxx{v2}xxxx");
+        assertEquals(0, t.getPathSegmentIndex("v1"));
+        assertEquals(1, t.getPathSegmentIndex("v2"));
+        
+        t = new UriTemplate("{v1}/{v1}");
+        assertEquals(1, t.getPathSegmentIndex("v1"));
+        
+        t = new UriTemplate("///{v1}///{v2}///");
+        assertEquals(0, t.getPathSegmentIndex("v1"));
+        assertEquals(1, t.getPathSegmentIndex("v2"));        
+    }   
 }

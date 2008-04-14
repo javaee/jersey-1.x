@@ -25,7 +25,7 @@ package com.sun.ws.rest.impl;
 import com.sun.ws.rest.api.core.HttpContext;
 import com.sun.ws.rest.api.core.HttpRequestContext;
 import com.sun.ws.rest.api.core.HttpResponseContext;
-import javax.ws.rs.core.UriInfo;
+import com.sun.ws.rest.api.uri.ExtendedUriInfo;
 
 /**
  * Implementation of {@link HttpContext} using {@link ThreadLocal}
@@ -45,7 +45,7 @@ public final class ThreadLocalHttpContext implements HttpContext {
         this.context.set(context);
     }
 
-    public UriInfo getUriInfo() {
+    public ExtendedUriInfo getUriInfo() {
         return context.get().getUriInfo();
     }
     

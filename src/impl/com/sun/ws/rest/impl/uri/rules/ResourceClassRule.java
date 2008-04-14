@@ -22,10 +22,10 @@
 
 package com.sun.ws.rest.impl.uri.rules;
 
+import com.sun.ws.rest.api.uri.UriTemplate;
 import com.sun.ws.rest.spi.uri.rules.UriRule;
 import com.sun.ws.rest.spi.uri.rules.UriRuleContext;
 import java.util.Iterator;
-import java.util.List;
 
 /**
  * The rule for accepting a resource class.
@@ -36,8 +36,8 @@ public final class ResourceClassRule extends BaseRule {
 
     private final Class resourceClass;
     
-    public ResourceClassRule(List<String> groupNames, Class resourceClass) {
-        super(groupNames);
+    public ResourceClassRule(UriTemplate template, Class resourceClass) {
+        super(template);
         this.resourceClass = resourceClass;
     }
     
@@ -47,7 +47,7 @@ public final class ResourceClassRule extends BaseRule {
 
         // Get the resource instance from the resource class
         resource = context.getResource(resourceClass);
-        context.pushResource(resource);
+        context.pushResource(resource, getTemplate());
         
         // Match sub-rules on the resource class
         final Iterator<UriRule> matches = context.getRules(resourceClass).

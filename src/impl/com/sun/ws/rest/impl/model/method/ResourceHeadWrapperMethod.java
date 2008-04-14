@@ -33,7 +33,7 @@ public final class ResourceHeadWrapperMethod extends ResourceMethod {
     
     public ResourceHeadWrapperMethod(ResourceMethod m) {
         super("HEAD",
-                m.getTemplateVariables(),
+                m.getTemplate(),
                 m.getConsumeMime(), 
                 m.getProduceMime(),
                 m.getDispatcher());

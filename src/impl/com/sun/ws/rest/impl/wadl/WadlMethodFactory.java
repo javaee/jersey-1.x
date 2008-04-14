@@ -27,6 +27,7 @@ import com.sun.research.ws.wadl.Resource;
 import com.sun.ws.rest.api.MediaTypes;
 import com.sun.ws.rest.api.core.HttpContext;
 import com.sun.ws.rest.api.model.AbstractResource;
+import com.sun.ws.rest.api.uri.UriTemplate;
 import com.sun.ws.rest.impl.model.MediaTypeHelper;
 import com.sun.ws.rest.impl.model.method.ResourceHttpOptionsMethod;
 import com.sun.ws.rest.impl.model.method.ResourceMethod;
@@ -45,7 +46,7 @@ import javax.ws.rs.core.UriInfo;
         public WadlOptionsMethod(Map<String, List<ResourceMethod>> methods, 
                 AbstractResource resource, String path) {
             super("OPTIONS",
-                    null,
+                    UriTemplate.EMPTY,
                     MediaTypeHelper.GENERAL_MEDIA_TYPE_LIST, 
                     MediaTypeHelper.GENERAL_MEDIA_TYPE_LIST,
                     new WadlOptionsMethodDispatcher(methods, resource, path));        

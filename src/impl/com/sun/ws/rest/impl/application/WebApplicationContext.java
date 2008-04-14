@@ -22,10 +22,11 @@
 
 package com.sun.ws.rest.impl.application;
 
-import com.sun.ws.rest.api.core.HttpContext;
 import com.sun.ws.rest.api.core.HttpRequestContext;
 import com.sun.ws.rest.api.core.HttpResponseContext;
+import com.sun.ws.rest.api.uri.ExtendedUriInfo;
 import com.sun.ws.rest.api.uri.UriComponent;
+import com.sun.ws.rest.api.uri.UriTemplate;
 import com.sun.ws.rest.impl.MultivaluedMapImpl;
 import com.sun.ws.rest.impl.model.ResourceClass;
 import com.sun.ws.rest.spi.container.ContainerRequest;
@@ -47,7 +48,7 @@ import javax.ws.rs.core.UriInfo;
  *
  * @author Paul.Sandoz@Sun.Com
  */
-public final class WebApplicationContext implements UriRuleContext, UriInfo {
+public final class WebApplicationContext implements UriRuleContext, ExtendedUriInfo {
     
     private final ContainerRequest request;
     
@@ -73,7 +74,7 @@ public final class WebApplicationContext implements UriRuleContext, UriInfo {
         return response;
     }
     
-    public UriInfo getUriInfo() {
+    public ExtendedUriInfo getUriInfo() {
         return this;
     }
     
@@ -82,6 +83,8 @@ public final class WebApplicationContext implements UriRuleContext, UriInfo {
     private final LinkedList<Object> resources = new LinkedList<Object>();
     
     private final LinkedList<String> paths = new LinkedList<String>();
+    
+    private final LinkedList<UriTemplate> templates = new LinkedList<UriTemplate>();
     
     private final List<String> capturingGroupValues = new ArrayList<String>();
         
@@ -116,8 +119,9 @@ public final class WebApplicationContext implements UriRuleContext, UriInfo {
         }
     }
     
-    public void pushResource(Object resource) {
+    public void pushResource(Object resource, UriTemplate template) {
          resources.addFirst(resource);
+         templates.addFirst(template);
     }
     
     public void pushRightHandPathLength(int rhpathlen) {
@@ -126,20 +130,6 @@ public final class WebApplicationContext implements UriRuleContext, UriInfo {
     }
         
     // UriInfo
-    
-    /**
-     * The absolute URI of a request that is equivalent to the complete URI
-     * minus the query and fragment components.
-     * <p>
-     * The absolute URI must be equivalent to the following:
-     *
-     *   UriBuilder.fromUri(completeUri).
-     *       replaceQuery(null).fragment(null).build();
-     *
-     *   UriBuilder.fromUri(baseUri).encode(false).
-     *       append(encodedPath).build();
-     */
-    private URI absoluteUri;
     
     /**
      * The percent-encoded path component.
@@ -281,6 +271,35 @@ public final class WebApplicationContext implements UriRuleContext, UriInfo {
     public List<Object> getAncestorResources() {
         return resources;
     }    
+    
+    
+    //
+    
+    public List<UriTemplate> getAncestorTemplates() {
+        return templates;
+    }    
+    
+    public PathSegment getPathSegment(String name) {
+        return getPathSegment(name, true);
+    }
+    
+    public PathSegment getPathSegment(String name, boolean decode) {
+        int index = 0;
+        
+        int i = -1;
+        for (UriTemplate t : templates) {
+            if (i == -1)
+                i = t.getPathSegmentIndex(name);
+            else
+                i += t.getNumberOfPathSegments();
+        }
+        
+        return (i != -1) ? getPathSegments(decode).get(i) : null;
+    }
+    
+    
+    //
+    
     
     private static final class PathSegmentImpl implements PathSegment {
         private String path;

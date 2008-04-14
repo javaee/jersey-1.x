@@ -24,10 +24,10 @@ package com.sun.ws.rest.impl.model.method;
 
 import com.sun.ws.rest.api.container.ContainerException;
 import com.sun.ws.rest.api.model.AbstractResourceMethod;
+import com.sun.ws.rest.api.uri.UriTemplate;
 import com.sun.ws.rest.impl.ImplMessages;
 import com.sun.ws.rest.impl.model.method.dispatch.ResourceMethodDispatcherFactory;
 import java.lang.reflect.Method;
-import java.util.List;
 
 /**
  *
@@ -37,13 +37,13 @@ public final class ResourceHttpMethod extends ResourceMethod {
     private final Method m;
 
     public ResourceHttpMethod(AbstractResourceMethod method) {
-        this(null, method);
+        this(UriTemplate.EMPTY, method);
     }
     
-    public ResourceHttpMethod(List<String> templateVariables,
+    public ResourceHttpMethod(UriTemplate template,
             AbstractResourceMethod method) {
         super(method.getHttpMethod(),
-                templateVariables,
+                template,
                 method.getSupportedInputTypes(), 
                 method.getSupportedOutputTypes(),
                 ResourceMethodDispatcherFactory.create(method));

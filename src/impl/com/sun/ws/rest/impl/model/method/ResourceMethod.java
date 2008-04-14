@@ -22,6 +22,7 @@
 
 package com.sun.ws.rest.impl.model.method;
 
+import com.sun.ws.rest.api.uri.UriTemplate;
 import com.sun.ws.rest.spi.dispatch.RequestDispatcher;
 import com.sun.ws.rest.impl.http.header.AcceptableMediaType;
 import com.sun.ws.rest.impl.model.MediaTypeHelper;
@@ -62,7 +63,7 @@ public abstract class ResourceMethod {
     
     private final String httpMethod;
     
-    private final List<String> templateVariables;
+    private final UriTemplate template;
     
     private final List<MediaType> consumeMime;
     
@@ -71,13 +72,12 @@ public abstract class ResourceMethod {
     private final RequestDispatcher dispatcher;
     
     public ResourceMethod(String httpMethod,
-            List<String> templateVariables,
+            UriTemplate template,
             List<MediaType> consumeMime, 
             List<MediaType> produceMime,
             RequestDispatcher dispatcher) {
         this.httpMethod = httpMethod;
-        this.templateVariables = (templateVariables != null)
-                ? templateVariables : EMPTY_LIST;
+        this.template = template;
         this.consumeMime = consumeMime;
         this.produceMime = produceMime;
         this.dispatcher = dispatcher;
@@ -87,8 +87,8 @@ public abstract class ResourceMethod {
         return httpMethod;
     }
     
-    public final List<String> getTemplateVariables() {
-        return templateVariables;
+    public final UriTemplate getTemplate() {
+        return template;
     }
     
     public final List<MediaType> getConsumeMime() {

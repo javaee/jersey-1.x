@@ -23,6 +23,7 @@
 package com.sun.ws.rest.impl.model.method;
 
 import com.sun.ws.rest.api.core.HttpContext;
+import com.sun.ws.rest.api.uri.UriTemplate;
 import com.sun.ws.rest.spi.dispatch.RequestDispatcher;
 import com.sun.ws.rest.impl.model.MediaTypeHelper;
 import java.util.List;
@@ -63,7 +64,7 @@ public final class ResourceHttpOptionsMethod extends ResourceMethod {
     
     public ResourceHttpOptionsMethod(Map<String, List<ResourceMethod>> methods) {
         super("OPTIONS",
-                null,
+                UriTemplate.EMPTY,
                 MediaTypeHelper.GENERAL_MEDIA_TYPE_LIST, 
                 MediaTypeHelper.GENERAL_MEDIA_TYPE_LIST,
                 new OptionsRequestDispatcher(methods));

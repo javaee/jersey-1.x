@@ -22,7 +22,7 @@
 
 package com.sun.ws.rest.api.core;
 
-import javax.ws.rs.core.UriInfo;
+import com.sun.ws.rest.api.uri.ExtendedUriInfo;
 
 /**
  * A HttpContext makes it possible for a web resource implementation class to 
@@ -32,10 +32,10 @@ import javax.ws.rs.core.UriInfo;
  */
 public interface HttpContext {
     /**
-     * Get the URI information.
-     * @return the URI information.
+     * Get the extended URI information.
+     * @return the extended URI information.
      */
-    UriInfo getUriInfo();
+    ExtendedUriInfo getUriInfo();
     
     /**
      * Get the HTTP request information.

@@ -489,7 +489,7 @@ public final class WebApplicationImpl implements WebApplication {
             rulesMap.put(p, new RightHandPathRule(
                     resourceConfig.getFeature(ResourceConfig.FEATURE_REDIRECT),
                     t.endsWithSlash(),
-                    new ResourceClassRule(t.getTemplateVariables(), c)));
+                    new ResourceClassRule(t, c)));
         }
         
         createWadlResource(rootResources, rulesMap);
@@ -513,7 +513,7 @@ public final class WebApplicationImpl implements WebApplication {
         rulesMap.put(p, new RightHandPathRule(
                 resourceConfig.getFeature(ResourceConfig.FEATURE_REDIRECT),                
                 false,
-                new ResourceObjectRule(t.getTemplateVariables(), wr)));        
+                new ResourceObjectRule(t, wr)));        
     }
         
     /**

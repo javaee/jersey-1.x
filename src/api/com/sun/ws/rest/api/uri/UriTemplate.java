@@ -295,6 +295,53 @@ public class UriTemplate {
     public final int getNumberOfTemplateVariables() {
         return templateVariables.size();
     }
+
+    private int numberOfPathSegments;
+    
+    private Map<String, Integer> pathSegmentIndex;
+    
+    /**
+     * Get the number of path segments in the template.
+     * 
+     * @return the number of path segments
+     */
+    public final int getNumberOfPathSegments() {
+        initPathSegments();
+        
+        return numberOfPathSegments;
+    }
+    
+    /**
+     * Get the path segment index of a path segment that contains a
+     * template variable.
+     * 
+     * @param variable the template variable
+     * @return the path segment index, otherise -1 if the template variable is
+     *         not present
+     */
+    public final int getPathSegmentIndex(String variable) {
+        initPathSegments();
+        
+        Integer i = pathSegmentIndex.get(variable);
+        return (i != null) ? i : -1;
+    }
+    
+    private final void initPathSegments() {
+        if (pathSegmentIndex == null) {
+            pathSegmentIndex = new HashMap<String, Integer>();
+            
+            numberOfPathSegments = 0;
+            for (String subPath : getTemplate().split("/")) {
+                if (subPath.length() == 0)
+                    continue;
+                
+                for (String v : getTemplateVariables())
+                    if (subPath.contains('{' + v + '}'))
+                        pathSegmentIndex.put(v, numberOfPathSegments);
+                numberOfPathSegments++;
+            }
+        }        
+    }
     
     /**
      * Match a URI against the template.

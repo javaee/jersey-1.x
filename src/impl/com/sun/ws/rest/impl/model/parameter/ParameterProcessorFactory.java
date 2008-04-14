@@ -42,7 +42,7 @@ public final class ParameterProcessorFactory {
         map.put(Parameter.Source.COOKIE, new CookieParameterProcessor());
         map.put(Parameter.Source.QUERY, new QueryParameterProcessor());
         map.put(Parameter.Source.MATRIX, new MatrixParameterProcessor());
-        map.put(Parameter.Source.URI, new UriParameterProcessor());
+        map.put(Parameter.Source.URI, new PathParameterProcessor());
         return Collections.unmodifiableMap(map);
     }
     

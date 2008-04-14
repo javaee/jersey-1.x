@@ -22,10 +22,10 @@
 
 package com.sun.ws.rest.impl.uri.rules;
 
+import com.sun.ws.rest.api.uri.UriTemplate;
 import com.sun.ws.rest.spi.uri.rules.UriRule;
 import com.sun.ws.rest.spi.uri.rules.UriRuleContext;
 import java.util.Iterator;
-import java.util.List;
 
 /**
  * The rule for accepting a resource object.
@@ -36,8 +36,8 @@ public final class ResourceObjectRule extends BaseRule {
 
     private final Object resourceObject;
     
-    public ResourceObjectRule(List<String> groupNames, Object resourceObject) {
-        super(groupNames);
+    public ResourceObjectRule(UriTemplate template, Object resourceObject) {
+        super(template);
         this.resourceObject = resourceObject;
     }
     

@@ -22,7 +22,6 @@
 
 package com.sun.ws.rest.impl.model;
 
-import com.sun.ws.rest.api.MediaTypes;
 import com.sun.ws.rest.api.core.ResourceConfig;
 import com.sun.ws.rest.api.model.AbstractResource;
 import com.sun.ws.rest.api.model.AbstractResourceMethod;
@@ -59,7 +58,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 import javax.ws.rs.HttpMethod;
-import javax.ws.rs.core.MediaType;
 
 /**
  *
@@ -182,7 +180,7 @@ public final class ResourceClass {
                     locator.getUriPath().isLimited());
 
             UriRule r = new SubLocatorRule(
-                    t.getTemplateVariables(),
+                    t,
                     locator.getMethod(),
                     ParameterExtractorFactory.createExtractorsForSublocator(locator));
 
@@ -205,7 +203,7 @@ public final class ResourceClass {
 
             PathPattern p = new PathPattern(t,  method.getUriPath().isLimited());
 
-            ResourceMethod rm = new ResourceHttpMethod(t.getTemplateVariables(), method);
+            ResourceMethod rm = new ResourceHttpMethod(t, method);
             addToPatternMethodMap(patternMethodMap, p, rm);
         }
 

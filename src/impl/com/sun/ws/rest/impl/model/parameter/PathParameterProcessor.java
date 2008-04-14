@@ -24,24 +24,39 @@ package com.sun.ws.rest.impl.model.parameter;
 
 import com.sun.ws.rest.api.core.HttpContext;
 import com.sun.ws.rest.api.model.Parameter;
+import javax.ws.rs.core.PathSegment;
 
 /**
  *
  * @author Paul.Sandoz@Sun.Com
  */
-public final class UriParameterProcessor implements ParameterProcessor {
+public final class PathParameterProcessor implements ParameterProcessor {
     
-    private static final class UriParameterExtractor implements ParameterExtractor {
+    private static final class PathParameterExtractor implements ParameterExtractor {
         private final MultivaluedParameterExtractor extractor;
         private final boolean decode;
         
-        UriParameterExtractor(MultivaluedParameterExtractor extractor, boolean decode) {
+        PathParameterExtractor(MultivaluedParameterExtractor extractor, boolean decode) {
             this.extractor = extractor;
             this.decode = decode;
         }
         
         public Object extract(HttpContext context) {
             return extractor.extract(context.getUriInfo().getTemplateParameters(decode));
+        }
+    }
+    
+    private static final class PathParameterSegmentExtractor implements ParameterExtractor {
+        private final String name;
+        private final boolean decode;
+        
+        PathParameterSegmentExtractor(String name, boolean decode) {
+            this.name = name;
+            this.decode = decode;
+        }
+        
+        public Object extract(HttpContext context) {
+            return context.getUriInfo().getPathSegment(name, decode);
         }
     }
     
@@ -52,11 +67,19 @@ public final class UriParameterProcessor implements ParameterProcessor {
             return null;
         }
         
-        MultivaluedParameterExtractor e =  MultivaluedDefaultListParameterProcessor.
-                process(parameter.getParameterClass(), parameter.getParameterType(), parameterName);        
-        if (e == null)
-            return null;
         
-        return new UriParameterExtractor(e, !parameter.isEncoded());
+        if (parameter.getParameterClass() == PathSegment.class) {
+            return new PathParameterSegmentExtractor(parameterName, 
+                    !parameter.isEncoded());
+        } else {
+            MultivaluedParameterExtractor e =  MultivaluedDefaultListParameterProcessor.
+                    process(parameter.getParameterClass(), 
+                    parameter.getParameterType(), 
+                    parameterName);        
+            if (e == null)
+                return null;
+
+            return new PathParameterExtractor(e, !parameter.isEncoded());
+        }
     }
 }
