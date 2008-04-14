@@ -34,6 +34,7 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.objectweb.asm.AnnotationVisitor;
 import org.objectweb.asm.Attribute;
@@ -232,13 +233,20 @@ public final class AnnotatedClassScanner {
     private void indexJar(File file, String parent) {
         final JarFile jar = getJarFile(file);
         final Enumeration<JarEntry> entries = jar.entries();
-        final String jarBase = "jar:" + file.toURI() + "!/";
+//        final String jarBase = "jar:" + file.toURI() + "!/";
         while (entries.hasMoreElements()) {
             JarEntry e = entries.nextElement();
             if (!e.isDirectory() && e.getName().startsWith(parent) && 
                     e.getName().endsWith(".class")) {
-                analyzeClassFile(URI.create(jarBase + e.getName()));
+                analyzeClassFile(jar, e);
             }
+        }
+        try {
+            jar.close();
+        } catch (IOException ex) {
+            String s = "Error closing jar file, " + 
+                    jar.getName();
+            LOGGER.severe(s);
         }
     }
     
@@ -258,17 +266,53 @@ public final class AnnotatedClassScanner {
         getClassReader(classFileUri).accept(classVisitor, 0);
     }
     
-    private ClassReader getClassReader(URI classFileUri) {
+    private void analyzeClassFile(JarFile jarFile, JarEntry entry) {        
+        getClassReader(jarFile, entry).accept(classVisitor, 0);
+    }
+    
+    
+    private ClassReader getClassReader(JarFile jarFile, JarEntry entry) {
+        InputStream is = null;
         try {
-            InputStream is = classFileUri.toURL().openStream();
+            is = jarFile.getInputStream(entry); // will get closed via JarFile.close()
             ClassReader cr = new ClassReader(is);
-            is.close();
+            return cr;
+        } catch (IOException ex) {
+            String s = "Error accessing input stream of the jar file, " + 
+                    jarFile.getName() + ", entry, " + entry.getName();
+            LOGGER.severe(s);
+            throw new RuntimeException(s, ex);
+        } finally {
+            try {
+                is.close();
+            } catch (IOException ex) {
+                String s = "Error closing input stream of the jar file, " + 
+                    jarFile.getName() + ", entry, " + entry.getName() + ", closed.";
+                LOGGER.severe(s);
+            }
+        }
+    }
+
+    
+    private ClassReader getClassReader(URI classFileUri) {
+        InputStream is = null;
+        try {
+            is = classFileUri.toURL().openStream();
+            ClassReader cr = new ClassReader(is);
             return cr;
         } catch (IOException ex) {
             String s = "Error accessing input stream of the class file URI, " + 
                     classFileUri;
             LOGGER.severe(s);
             throw new RuntimeException(s, ex);
+        } finally {
+            try {
+                is.close();
+            } catch (IOException ex) {
+            String s = "Error closing input stream of the class file URI, " + 
+                    classFileUri;
+            LOGGER.severe(s);
+            }
         }
     }
     

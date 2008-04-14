@@ -31,6 +31,7 @@ import java.lang.reflect.Array;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
+import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.Iterator;
@@ -456,7 +457,9 @@ public final class ServiceFinder<T> implements Iterable<T> {
         BufferedReader r = null;
         ArrayList<String> names = new ArrayList<String>();
         try {
-            in = u.openStream();
+            URLConnection uConn = u.openConnection();
+            uConn.setDefaultUseCaches(false);
+            in = uConn.getInputStream();
             r = new BufferedReader(new InputStreamReader(in, "utf-8"));
             int lc = 1;
             while ((lc = parseLine(service, u, r, lc, names, returned)) >= 0) ;
