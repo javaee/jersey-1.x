@@ -176,7 +176,7 @@ public abstract class AbstractContainerRequest implements ContainerRequest {
                 throw new WebApplicationException(
                         Responses.unsupportedMediaType().build());
             }
-            return bw.readFrom(type, null, mediaType, null, headers, entity);
+            return bw.readFrom(type, genericType, mediaType, as, headers, entity);
         } catch (IOException e) {
             throw new IllegalArgumentException(e);
         }

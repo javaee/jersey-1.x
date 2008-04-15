@@ -50,6 +50,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.ProduceMime;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.StreamingOutput;
+import javax.xml.bind.JAXBElement;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.sax.SAXSource;
 import javax.xml.transform.stream.StreamSource;
@@ -113,6 +114,18 @@ public class EntityTypesTest extends AbstractTypeTester {
     
     public void testJAXBBeanRepresentation() {
         _test(new JAXBBean("CONTENT"), JAXBBeanResource.class);
+    }
+    
+    @Path("/")
+    public static class JAXBElementBeanResource {
+        @POST
+        public JAXBElement<JAXBBeanType> post(JAXBElement<JAXBBeanType> t) {
+            return t;
+        }
+    }
+    
+    public void testJAXBElementBeanRepresentation() {
+        _test(new JAXBBean("CONTENT"), JAXBElementBeanResource.class);
     }
     
     @Path("/")

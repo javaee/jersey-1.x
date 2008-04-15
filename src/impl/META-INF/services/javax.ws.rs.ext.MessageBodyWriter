@@ -9,6 +9,7 @@ com.sun.ws.rest.impl.provider.entity.AtomEntryProvider
 com.sun.ws.rest.impl.provider.entity.FormProvider
 com.sun.ws.rest.impl.provider.entity.FormMultivaluedMapProvider
 com.sun.ws.rest.impl.provider.entity.XMLRootElementProvider
+com.sun.ws.rest.impl.provider.entity.XMLJAXBElementProvider
 com.sun.ws.rest.impl.provider.entity.JSONRootElementProvider
 com.sun.ws.rest.impl.provider.entity.JSONArrayProvider
 com.sun.ws.rest.impl.provider.entity.JSONObjectProvider
