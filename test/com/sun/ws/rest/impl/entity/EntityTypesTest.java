@@ -25,7 +25,7 @@ package com.sun.ws.rest.impl.entity;
 import com.sun.syndication.feed.atom.Entry;
 import com.sun.syndication.feed.atom.Feed;
 import com.sun.ws.rest.api.client.WebResource;
-import com.sun.ws.rest.api.representation.FormURLEncodedProperties;
+import com.sun.ws.rest.api.representation.Form;
 import com.sun.ws.rest.impl.MultivaluedMapImpl;
 import com.sun.ws.rest.impl.provider.entity.AtomEntryProvider;
 import com.sun.ws.rest.impl.provider.entity.AtomFeedProvider;
@@ -159,15 +159,17 @@ public class EntityTypesTest extends AbstractTypeTester {
         _test(mmIn, MimeMultipartBeanResource.class, false);
     }
     
+    @ProduceMime("application/x-www-form-urlencoded")
+    @ConsumeMime("application/x-www-form-urlencoded")
     @Path("/")
-    public static class FormResource extends AResource<FormURLEncodedProperties> {}
+    public static class FormResource extends AResource<Form> {}
     
     public void testFormRepresentation() {
-        FormURLEncodedProperties fp = new FormURLEncodedProperties();
-        fp.put("Email", "johndoe@gmail.com");
-        fp.put("Passwd", "north 23AZ");
-        fp.put("service", "cl");
-        fp.put("source", "Gulp-CalGul-1.05");
+        Form fp = new Form();
+        fp.add("Email", "johndoe@gmail.com");
+        fp.add("Passwd", "north 23AZ");
+        fp.add("service", "cl");
+        fp.add("source", "Gulp-CalGul-1.05");
         
         _test(fp, FormResource.class);
     }

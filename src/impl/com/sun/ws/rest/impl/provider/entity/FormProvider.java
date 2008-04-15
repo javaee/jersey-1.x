@@ -22,12 +22,14 @@
 
 package com.sun.ws.rest.impl.provider.entity;
 
-import com.sun.ws.rest.api.representation.FormURLEncodedProperties;
+import com.sun.ws.rest.api.representation.Form;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
+import java.util.List;
+import java.util.Map;
 import java.util.StringTokenizer;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
@@ -36,45 +38,46 @@ import javax.ws.rs.core.MultivaluedMap;
  *
  * @author Paul.Sandoz@Sun.Com
  */
-public final class FormURLEncodedProvider extends AbstractTypeEntityProvider<FormURLEncodedProperties> {
+public final class FormProvider extends AbstractTypeEntityProvider<Form> {
     public boolean supports(Class type) {
-        return type == FormURLEncodedProperties.class;
+        return type == Form.class;
     }
 
-    public FormURLEncodedProperties readFrom(Class<FormURLEncodedProperties> type, MediaType mediaType,
+    public Form readFrom(Class<Form> type, MediaType mediaType,
             MultivaluedMap<String, String> headers, InputStream entityStream) throws IOException {
         String encoded = readFromAsString(entityStream, mediaType);
     
-        FormURLEncodedProperties map = new FormURLEncodedProperties();
+        Form map = new Form();
         StringTokenizer tokenizer = new StringTokenizer(encoded, "&");
         String token;
         while (tokenizer.hasMoreTokens()) {
             token = tokenizer.nextToken();
             int idx = token.indexOf('=');
             if (idx < 0) {
-                map.put(URLDecoder.decode(token,"UTF-8"), null);
+                map.add(URLDecoder.decode(token,"UTF-8"), null);
             } else if (idx > 0) {
-                map.put(URLDecoder.decode(token.substring(0, idx),"UTF-8"), URLDecoder.decode(token.substring(idx+1),"UTF-8"));
+                map.add(URLDecoder.decode(token.substring(0, idx),"UTF-8"), 
+                        URLDecoder.decode(token.substring(idx+1),"UTF-8"));
             }
         }
         return map;
     }
 
-    public void writeTo(FormURLEncodedProperties t, MediaType mediaType,
+    public void writeTo(Form t, MediaType mediaType,
             MultivaluedMap<String, Object> headers, OutputStream entityStream) throws IOException {
         StringBuilder sb = new StringBuilder();
-        int cnt = 0;
-        for (String key: t.keySet()) {
-            if (cnt++ > 0)
-                sb.append('&');
-            sb.append(URLEncoder.encode(key, "UTF-8"));
-            String value = t.get(key);
-            if (value != null) {
-                sb.append('=');
-                sb.append(URLEncoder.encode(value, "UTF-8"));
+        for (Map.Entry<String, List<String>> e : t.entrySet()) {
+            for (String value : e.getValue()) {
+                if (sb.length() > 0)
+                    sb.append('&');
+                sb.append(URLEncoder.encode(e.getKey(), "UTF-8"));
+                if (value != null) {
+                    sb.append('=');
+                    sb.append(URLEncoder.encode(value, "UTF-8"));
+                }
             }
         }
-        
+                
         writeToAsString(sb.toString(), entityStream, mediaType);
     }    
 }

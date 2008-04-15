@@ -33,21 +33,15 @@ import javax.ws.rs.core.MultivaluedMap;
  *
  * @author Paul.Sandoz@Sun.Com
  */
-public final class MultivaluedMapImpl 
+public class MultivaluedMapImpl 
         extends HashMap<String, List<String>> 
         implements MultivaluedMap<String, String> {
     
     static final long serialVersionUID = -6052320403766368902L;
     
-    /**
-     * Creates a new instance of MultivaluedMapImpl
-     */
-    public MultivaluedMapImpl() {
-    }
-
     // MultivaluedMap
     
-    public void putSingle(String key, String value) {
+    public final void putSingle(String key, String value) {
         List<String> l = getList(key);
                 
         l.clear();
@@ -57,7 +51,7 @@ public final class MultivaluedMapImpl
             l.add("");
     }
     
-    public void add(String key, String value) {
+    public final void add(String key, String value) {
         List<String> l = getList(key);
         
         if (value != null)
@@ -66,19 +60,17 @@ public final class MultivaluedMapImpl
             l.add("");
     }
     
-    public String getFirst(String key) {
+    public final String getFirst(String key) {
         List<String> values = get(key);
         if (values != null && values.size() > 0)
             return values.get(0);
         else
             return null;
     }
-
-    
     
     // 
     
-    public void addFirst(String key, String value) {
+    public final void addFirst(String key, String value) {
         List<String> l = getList(key);
         
         if (value != null)
@@ -87,7 +79,7 @@ public final class MultivaluedMapImpl
             l.add(0, "");
     }
     
-    public <A> List<A> get(String key, Class<A> type) {
+    public final <A> List<A> get(String key, Class<A> type) {
         Constructor<A> c = null;
         try {
             c = type.getConstructor(String.class);
@@ -110,7 +102,7 @@ public final class MultivaluedMapImpl
         return l;
     }
 
-    public void putSingle(String key, Object value) {
+    public final void putSingle(String key, Object value) {
         List<String> l = getList(key);
                 
         l.clear();
@@ -120,7 +112,7 @@ public final class MultivaluedMapImpl
             l.add("");
     }
     
-    public void add(String key, Object value) {
+    public final void add(String key, Object value) {
         List<String> l = getList(key);
         
         if (value != null)
@@ -129,7 +121,7 @@ public final class MultivaluedMapImpl
             l.add("");
     }
 
-    private List<String> getList(String key) {
+    private final List<String> getList(String key) {
         List<String> l = get(key);
         if (l == null) {
             l = new LinkedList<String>();
@@ -138,7 +130,7 @@ public final class MultivaluedMapImpl
         return l;
     }
     
-    public <A> A getFirst(String key, Class<A> type) {
+    public final <A> A getFirst(String key, Class<A> type) {
         String value = getFirst(key);
         if (value == null)
             return null;
@@ -157,7 +149,7 @@ public final class MultivaluedMapImpl
     }
     
     @SuppressWarnings("unchecked")
-    public <A> A getFirst(String key, A defaultValue) {
+    public final <A> A getFirst(String key, A defaultValue) {
         String value = getFirst(key);
         if (value == null)
             return defaultValue;

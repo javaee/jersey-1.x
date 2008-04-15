@@ -25,7 +25,7 @@ package com.sun.ws.rest.impl.container.servlet;
 import javax.ws.rs.Path;
 import com.sun.ws.rest.api.core.HttpContext;
 import com.sun.ws.rest.api.core.HttpRequestContext;
-import com.sun.ws.rest.api.representation.FormURLEncodedProperties;
+import com.sun.ws.rest.api.representation.Form;
 import java.util.List;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
@@ -78,12 +78,12 @@ public class MyWebResourceBean  {
                         +arg1+" arg2: "+arg2+"\n\n";
                 break;
             case 2:
-                FormURLEncodedProperties urlProps = new FormURLEncodedProperties();
-                urlProps.put("representation", "FormURLEncodedRepresentation");
-                urlProps.put("name", "Doug Kohlert");
-                urlProps.put("sex", "male");
-                urlProps.put("arg1", arg1);
-                urlProps.put("arg2", arg2);
+                Form urlProps = new Form();
+                urlProps.add("representation", "FormURLEncodedRepresentation");
+                urlProps.add("name", "Doug Kohlert");
+                urlProps.add("sex", "male");
+                urlProps.add("arg1", arg1);
+                urlProps.add("arg2", arg2);
                 representation = urlProps;
                 break;
             case 3:

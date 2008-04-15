@@ -26,6 +26,8 @@ import com.sun.ws.rest.impl.MultivaluedMapImpl;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Type;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.util.List;
@@ -49,6 +51,11 @@ public final class FormMultivaluedMapProvider extends
         return MultivaluedMap.class.isAssignableFrom(type);
     }
 
+    @Override
+    public boolean isReadable(Class<?> type, Type genericType, Annotation annotations[]) {
+        return type == MultivaluedMap.class;
+    }
+    
     public MultivaluedMap<String, String> readFrom(Class<MultivaluedMap<String, String>> type, 
             MediaType mediaType, MultivaluedMap<String, String> headers, 
             InputStream entityStream) throws IOException {
@@ -70,6 +77,11 @@ public final class FormMultivaluedMapProvider extends
         return map;
     }
 
+    @Override
+    public boolean isWriteable(Class<?> type, Type genericType, Annotation annotations[]) {
+        return MultivaluedMap.class.isAssignableFrom(type);
+    }
+    
     public void writeTo(MultivaluedMap<String, String> t, MediaType mediaType,
             MultivaluedMap<String, Object> headers, OutputStream entityStream) throws IOException {
         StringBuilder sb = new StringBuilder();

@@ -1,4 +1,6 @@
 release 0.7 (2008-04-18)
+- Renamed FormURLEncodedProperties to Form and changed the class to implement 
+  javax.ws.rs.core.MultivaluedMap.
 - Containers can be informed when they are required to reload, for example
   if new root resource classes have been added to removed, or class file
   definitions have changed while a VM is running.

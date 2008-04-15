@@ -22,7 +22,7 @@
 
 package com.sun.ws.rest.samples.console.resources;
 
-import com.sun.ws.rest.api.representation.FormURLEncodedProperties;
+import com.sun.ws.rest.api.representation.Form;
 import java.io.InputStream;
 import java.util.Date;
 import javax.ws.rs.ConsumeMime;
@@ -43,7 +43,7 @@ import javax.ws.rs.core.Response;
  */
 @Path("/form")
 @ProduceMime("text/html")
-public class Form {
+public class FormResource {
     
     private static final Colours coloursResource = new Colours();
     
@@ -76,7 +76,7 @@ public class Form {
      */
     @POST
     @ConsumeMime("application/x-www-form-urlencoded")
-    public String processForm(FormURLEncodedProperties formData) {
+    public String processForm(Form formData) {
         StringBuffer buf = new StringBuffer();
         buf.append("<html><head><title>Form results</title></head><body>");
         buf.append("<p>Hello, you entered the following information: </p><table border='1'>");
@@ -86,7 +86,7 @@ public class Form {
             buf.append("<tr><td>");
             buf.append(key);
             buf.append("</td><td>");
-            buf.append(formData.get(key));
+            buf.append(formData.getFirst(key));
             buf.append("</td></tr>");
         }
         for (Cookie c : headers.getCookies().values()) {

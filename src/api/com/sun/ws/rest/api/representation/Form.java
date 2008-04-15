@@ -22,14 +22,14 @@
 
 package com.sun.ws.rest.api.representation;
 
-import java.util.LinkedHashMap;
+import com.sun.ws.rest.impl.MultivaluedMapImpl;
 
 /**
- * A strongly typed <code>Map<String, String></code> to store form properties.
+ * An implementation of {@link javax.ws.rs.core.MultivaluedMap} that may be
+ * used for reading/writing String-based form parameters.
  *
  * @author Doug Kohlert
  */
-public class FormURLEncodedProperties extends LinkedHashMap<String, String> {
-    static final long serialVersionUID = 2572713614319991270L;
-    
+public class Form extends MultivaluedMapImpl {
+    static final long serialVersionUID = 2572713614319991270L;    
 }

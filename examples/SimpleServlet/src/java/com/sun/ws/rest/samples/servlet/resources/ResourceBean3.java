@@ -22,7 +22,7 @@
 
 package com.sun.ws.rest.samples.servlet.resources;
 
-import com.sun.ws.rest.api.representation.FormURLEncodedProperties;
+import com.sun.ws.rest.api.representation.Form;
 import java.net.URL;
 import javax.activation.DataSource;
 import javax.activation.FileDataSource;
@@ -102,15 +102,15 @@ public class ResourceBean3  {
     
     @ProduceMime("application/x-www-form-urlencoded")
     @GET
-    public FormURLEncodedProperties  getFormURLEncodedRep(
+    public Form getFormURLEncodedRep(
             @PathParam("arg1")String arg1, 
             @PathParam("arg2")String arg2) {
-        FormURLEncodedProperties urlProps = new FormURLEncodedProperties();
-        urlProps.put("representation", "FormURLEncodedRepresentation");
-        urlProps.put("name", "Master Duke");
-        urlProps.put("sex", "male");
-        urlProps.put("arg1", arg1);
-        urlProps.put("arg2", arg2);
+        Form urlProps = new Form();
+        urlProps.add("representation", "FormURLEncodedRepresentation");
+        urlProps.add("name", "Master Duke");
+        urlProps.add("sex", "male");
+        urlProps.add("arg1", arg1);
+        urlProps.add("arg2", arg2);
         return urlProps;        
     }
 
