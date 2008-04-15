@@ -38,9 +38,9 @@ import javax.xml.bind.Unmarshaller;
  *
  * @author Paul.Sandoz@Sun.Com
  */
-public final class XMLJAXBElementProvider extends AbstractJAXBElementProvider {
+public final class XMLRootElementProvider extends AbstractRootElementProvider {
     
-    public XMLJAXBElementProvider() {
+    public XMLRootElementProvider() {
         Class<?> c = JAXBContext.class;
     }
     

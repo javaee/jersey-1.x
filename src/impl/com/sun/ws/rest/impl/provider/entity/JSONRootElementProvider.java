@@ -50,9 +50,9 @@ import javax.xml.bind.Unmarshaller;
  */
 @ProduceMime("application/json")
 @ConsumeMime("application/json")
-public final class JSONJAXBElementProvider extends AbstractJAXBElementProvider {
+public final class JSONRootElementProvider extends AbstractRootElementProvider {
     
-    public JSONJAXBElementProvider() {
+    public JSONRootElementProvider() {
         Class<?> c = JAXBContext.class;
     }
     

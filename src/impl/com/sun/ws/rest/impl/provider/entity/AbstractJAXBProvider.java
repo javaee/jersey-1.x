@@ -29,21 +29,16 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.ext.ContextResolver;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
-import javax.xml.bind.annotation.XmlRootElement;
 
 /**
  *
  * @author Paul.Sandoz@Sun.Com
  */
-public abstract class AbstractJAXBElementProvider extends AbstractTypeEntityProvider<Object> {    
+public abstract class AbstractJAXBProvider<T> extends AbstractTypeEntityProvider<T> {    
     private static Map<Class, JAXBContext> jaxbContexts = 
             new WeakHashMap<Class, JAXBContext>();
 
     @Context private ContextResolver<JAXBContext> cr;
-    
-    public final boolean supports(Class<?> type) {
-        return type.getAnnotation(XmlRootElement.class) != null;
-    }
     
     protected final JAXBContext getJAXBContext(Class type) throws JAXBException {
         if (cr != null) {
