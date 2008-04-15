@@ -458,7 +458,7 @@ public final class ServiceFinder<T> implements Iterable<T> {
         ArrayList<String> names = new ArrayList<String>();
         try {
             URLConnection uConn = u.openConnection();
-            uConn.setDefaultUseCaches(false);
+            uConn.setUseCaches(false);
             in = uConn.getInputStream();
             r = new BufferedReader(new InputStreamReader(in, "utf-8"));
             int lc = 1;

@@ -232,25 +232,34 @@ public final class AnnotatedClassScanner {
 
     private void indexJar(File file, String parent) {
         final JarFile jar = getJarFile(file);
-        final Enumeration<JarEntry> entries = jar.entries();
-//        final String jarBase = "jar:" + file.toURI() + "!/";
-        while (entries.hasMoreElements()) {
-            JarEntry e = entries.nextElement();
-            if (!e.isDirectory() && e.getName().startsWith(parent) && 
-                    e.getName().endsWith(".class")) {
-                analyzeClassFile(jar, e);
-            }
-        }
         try {
-            jar.close();
-        } catch (IOException ex) {
-            String s = "Error closing jar file, " + 
-                    jar.getName();
-            LOGGER.severe(s);
+            final Enumeration<JarEntry> entries = jar.entries();
+            while (entries.hasMoreElements()) {
+                JarEntry e = entries.nextElement();
+                if (!e.isDirectory() && e.getName().startsWith(parent) &&
+                        e.getName().endsWith(".class")) {
+                    analyzeClassFile(jar, e);
+                }
+            }
+        } catch (Exception e) {
+            LOGGER.log(Level.SEVERE, "Exception while processing file, " + file, e);
+        } finally {
+            try {
+                if (jar != null) {
+                    jar.close();
+                }
+            } catch (IOException ex) {
+                String s = "Error closing jar file, " +
+                        jar.getName();
+                LOGGER.severe(s);
+            }
         }
     }
     
     private JarFile getJarFile(File file) {
+        if (file == null) {
+            return null;
+        }
         try {
             return new JarFile(file);
         } catch (IOException ex) {
@@ -274,7 +283,7 @@ public final class AnnotatedClassScanner {
     private ClassReader getClassReader(JarFile jarFile, JarEntry entry) {
         InputStream is = null;
         try {
-            is = jarFile.getInputStream(entry); // will get closed via JarFile.close()
+            is = jarFile.getInputStream(entry);
             ClassReader cr = new ClassReader(is);
             return cr;
         } catch (IOException ex) {
@@ -284,7 +293,9 @@ public final class AnnotatedClassScanner {
             throw new RuntimeException(s, ex);
         } finally {
             try {
-                is.close();
+                if (is != null) {
+                   is.close();
+                }
             } catch (IOException ex) {
                 String s = "Error closing input stream of the jar file, " + 
                     jarFile.getName() + ", entry, " + entry.getName() + ", closed.";
@@ -307,7 +318,9 @@ public final class AnnotatedClassScanner {
             throw new RuntimeException(s, ex);
         } finally {
             try {
-                is.close();
+                if (is != null) {
+                   is.close();
+                }
             } catch (IOException ex) {
             String s = "Error closing input stream of the class file URI, " + 
                     classFileUri;
