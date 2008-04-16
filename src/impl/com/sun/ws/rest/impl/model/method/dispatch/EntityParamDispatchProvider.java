@@ -224,12 +224,12 @@ public class EntityParamDispatchProvider implements ResourceMethodDispatchProvid
             }
             
             if (parameter.getParameterType() instanceof TypeVariable) {
-                Class c = ReflectionHelper.resolveTypeVariable(
+                ReflectionHelper.ClassTypePair ct = ReflectionHelper.resolveTypeVariable(
                         method.getDeclaringResource().getResourceClass(), 
                         method.getMethod().getDeclaringClass(),
                         (TypeVariable)parameter.getParameterType());
                 
-                return (c != null) ? new EntityExtractor(c, c, annotations) : null;
+                return (ct != null) ? new EntityExtractor(ct.c, ct.t, annotations) : null;
             } else {
                 return new EntityExtractor(parameter.getParameterClass(), 
                         parameter.getParameterType(), annotations);

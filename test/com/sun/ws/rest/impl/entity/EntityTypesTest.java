@@ -117,12 +117,7 @@ public class EntityTypesTest extends AbstractTypeTester {
     }
     
     @Path("/")
-    public static class JAXBElementBeanResource {
-        @POST
-        public JAXBElement<JAXBBeanType> post(JAXBElement<JAXBBeanType> t) {
-            return t;
-        }
-    }
+    public static class JAXBElementBeanResource extends AResource<JAXBElement<JAXBBeanType>> {}
     
     public void testJAXBElementBeanRepresentation() {
         _test(new JAXBBean("CONTENT"), JAXBElementBeanResource.class);

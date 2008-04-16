@@ -138,20 +138,33 @@ public final class ReflectionHelper {
         }
     }    
     
+    public static class ClassTypePair {
+        public final Class c;
+        public final Type t;
+        
+        ClassTypePair(Class c) {
+            this(c, c);
+        }
+        
+        ClassTypePair(Class c, Type t) {
+            this.c = c;
+            this.t = t;
+        }
+    }
     /**
      * Given a type variable resolve the Java class of that variable.
      * 
      * @param c the concrete class from which all type variables are resolved
      * @param dc the declaring class where the type variable was defined
      * @param tv the type variable
-     * @return the resolved Java class, otherwise null if the type variable
+     * @return the resolved Java class and type, otherwise null if the type variable
      *         could not be resolved
      */
-    public static Class resolveTypeVariable(Class c, Class dc, TypeVariable tv) {
+    public static ClassTypePair resolveTypeVariable(Class c, Class dc, TypeVariable tv) {
         return resolveTypeVariable(c, dc, tv, new HashMap<TypeVariable, Type>());
     }
     
-    private static Class resolveTypeVariable(Class c, Class dc, TypeVariable tv, 
+    private static ClassTypePair resolveTypeVariable(Class c, Class dc, TypeVariable tv, 
             Map<TypeVariable, Type> map) {
         ParameterizedType pt = (ParameterizedType)c.getGenericSuperclass();
         Type[] typeArguments = pt.getActualTypeArguments();
@@ -173,7 +186,7 @@ public final class ReflectionHelper {
         if (sc == dc) {
             Type t = submap.get(tv);
             if (t instanceof Class) {
-                return (Class)t;
+                return new ClassTypePair((Class)t);
             } else if (t instanceof GenericArrayType) {
                 t = ((GenericArrayType)t).getGenericComponentType();
                 if (t instanceof Class) {
@@ -182,7 +195,7 @@ public final class ReflectionHelper {
                         // TODO is there a better way to get the Class object 
                         // representing an array
                         Object o = Array.newInstance(c, 0);
-                        return o.getClass();
+                        return new ClassTypePair(o.getClass());
                     } catch (Exception e) {
                     } 
                     return null;
@@ -191,14 +204,15 @@ public final class ReflectionHelper {
                 }
             } else if (t instanceof ParameterizedType) {
                 pt = (ParameterizedType)t;
-                // TODO support parameterized type whose raw type is a class
-                return null;
+                if (pt.getRawType() instanceof Class) {
+                    return new ClassTypePair((Class)pt.getRawType(), pt);
+                } else 
+                    return null;
             } else {
                 return null;
             }
         } else {    
             return resolveTypeVariable(sc, dc, tv, submap);
         }
-    }
-    
+    }    
 }
