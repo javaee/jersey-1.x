@@ -25,6 +25,7 @@
 	http://ant-contrib.sourceforge.net/tasks/tasks/for.html
     -->
     <target name="delegate-target">
+	<ant dir="jMakiBackend" target="${target}" inheritAll="false"/>
 	<ant dir="Mandel" target="${target}" inheritAll="false"/>
 	<ant dir="Bookmark" target="${target}" inheritAll="false"/>
 	<ant dir="Bookstore" target="${target}" inheritAll="false"/>
