@@ -1,4 +1,7 @@
 release 0.7 (2008-04-18)
+- The type javax.xml.bind.JAXBElement<T> can be used for reading and writing
+  JAXB types that a not XML root elements from and to XML. TODO:JSON
+  serialization.
 - Renamed FormURLEncodedProperties to Form and changed the class to implement 
   javax.ws.rs.core.MultivaluedMap.
 - Containers can be informed when they are required to reload, for example
