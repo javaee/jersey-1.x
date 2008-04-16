@@ -108,7 +108,8 @@ Just click on <code>Regenerate</code> button.
 Click on <code>Close</code> button and resolve the problem as follows.
 Make a right-click on the <b>Bookmark</b> project:
 <div class="figure"><img src="img/ResolveDSProblemMenu.png"/></div>
-Then you click on <code>Resolve Data Source Problem...</code> item,
+Then you click on <code>Resolve Data Source Problem...</code> item, on the next pop-up window
+click on the <code>Add Connection...</code> button,
 which will bring you to:
 <div class="figure"><img src="img/ResolveDSProblemDialog.png"/></div>
 Here you add <code>;create=true</code> parameter to <code>Database URL</code> field as 
@@ -133,24 +134,25 @@ your glassfish installation directory.
 <p>If <code>.asadminpass</code> file is missing at your home directory, you
 will need to run the following command to get it created:
 <pre class="cliSample">
-% $AS_HOME/bin/asadmin login
+$AS_HOME/bin/asadmin start-domain
+$AS_HOME/bin/asadmin login
 </pre>
 
 <p>You then build and run the example in just one shot from <code>Bookmark</code> directory by
 <pre class="cliSample">
-% $AS_HOME/lib/ant/bin/ant run-on-glassfish
+$AS_HOME/lib/ant/bin/ant run-on-glassfish
 </pre>
 
 <p><b>Notice:</b> You might need to change access rights for the ant command before running it:
 <pre class="cliSample">
-% chmod +x $AS_HOME/lib/ant/bin/ant 
+chmod +x $AS_HOME/lib/ant/bin/ant 
 </pre>
 
 <h4>Test Client Running</h4>
 
 <pre class="cliSample">
-% cd TestClient
-% $AS_HOME/lib/ant/bin/ant run
+cd TestClient
+$AS_HOME/lib/ant/bin/ant run
 </pre>
 
 <h2>TODOs</h2>

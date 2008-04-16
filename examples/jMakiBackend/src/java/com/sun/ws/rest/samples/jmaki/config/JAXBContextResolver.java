@@ -26,9 +26,9 @@ import com.sun.ws.rest.samples.jmaki.beans.Printer;
 import com.sun.ws.rest.samples.jmaki.beans.PrinterTableModel;
 import com.sun.ws.rest.samples.jmaki.beans.TreeModel;
 import com.sun.ws.rest.samples.jmaki.beans.WebResourceList;
-import com.sun.ws.rest.spi.service.ContextResolver;
 import java.util.HashMap;
 import java.util.Map;
+import javax.ws.rs.ext.ContextResolver;
 import javax.ws.rs.ext.Provider;
 import javax.xml.bind.JAXBContext;
 
