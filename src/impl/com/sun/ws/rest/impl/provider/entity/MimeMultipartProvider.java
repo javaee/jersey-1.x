@@ -25,6 +25,8 @@ package com.sun.ws.rest.impl.provider.entity;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Type;
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMultipart;
 import javax.mail.util.ByteArrayDataSource;
@@ -35,18 +37,23 @@ import javax.ws.rs.core.MultivaluedMap;
  *
  * @author Paul.Sandoz@Sun.Com
  */
-public final class MimeMultipartProvider extends AbstractTypeEntityProvider<MimeMultipart> {
+public final class MimeMultipartProvider extends AbstractMessageReaderWriterProvider<MimeMultipart> {
     
     public MimeMultipartProvider() {
         Class<?> c = MimeMultipart.class;
     }
     
-    public boolean supports(Class type) {
-        return type == MimeMultipart.class;
+    public boolean isReadable(Class<?> type, Type genericType, Annotation annotations[]) {
+        return type == MimeMultipart.class;        
     }
-
-    public MimeMultipart readFrom(Class<MimeMultipart> type, MediaType mediaType,
-            MultivaluedMap<String, String> headers, InputStream entityStream) throws IOException {
+    
+    public MimeMultipart readFrom(
+            Class<MimeMultipart> type, 
+            Type genericType, 
+            MediaType mediaType, 
+            Annotation annotations[],
+            MultivaluedMap<String, String> httpHeaders, 
+            InputStream entityStream) throws IOException {
         if (mediaType == null)
             mediaType = new MediaType("multipart", "form-data");
         ByteArrayDataSource ds = new ByteArrayDataSource(entityStream, mediaType.toString());
@@ -59,8 +66,19 @@ public final class MimeMultipartProvider extends AbstractTypeEntityProvider<Mime
         }
     }
 
-    public void writeTo(MimeMultipart t, MediaType mediaType,
-            MultivaluedMap<String, Object> headers, OutputStream entityStream) throws IOException {
+    public boolean isWriteable(Class<?> type, Type genericType, Annotation annotations[]) {
+        return type == MimeMultipart.class;        
+    }
+    
+    
+    public void writeTo(
+            MimeMultipart t, 
+            Class<?> type, 
+            Type genericType, 
+            Annotation annotations[], 
+            MediaType mediaType, 
+            MultivaluedMap<String, Object> httpHeaders,
+            OutputStream entityStream) throws IOException {
         try {
             // TODO put boundary string as parameter of media type?
             t.writeTo(entityStream);

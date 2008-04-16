@@ -133,7 +133,8 @@ public class EntityTypesTest extends AbstractTypeTester {
     
     public void testFileRepresentation() throws IOException {
         FileProvider fp = new FileProvider();
-        File in = fp.readFrom(File.class, null, null, new ByteArrayInputStream("CONTENT".getBytes()));
+        File in = fp.readFrom(File.class, File.class, null, null, null, 
+                new ByteArrayInputStream("CONTENT".getBytes()));
         
         _test(in, FileResource.class);
     }
@@ -216,7 +217,7 @@ public class EntityTypesTest extends AbstractTypeTester {
     public void testFeedRepresentation() throws Exception {
         InputStream in = this.getClass().getResourceAsStream("feed.xml");
         AtomFeedProvider afp = new AtomFeedProvider();
-        Feed f = afp.readFrom(Feed.class, null, null, in);
+        Feed f = afp.readFrom(Feed.class, Feed.class, null, null, null, in);
         
         _test(f, FeedResource.class);
     }
@@ -227,7 +228,7 @@ public class EntityTypesTest extends AbstractTypeTester {
     public void testEntryRepresentation() throws Exception {
         InputStream in = this.getClass().getResourceAsStream("entry.xml");        
         AtomEntryProvider afp = new AtomEntryProvider();
-        Entry e = afp.readFrom(Entry.class, null, null, in);
+        Entry e = afp.readFrom(Entry.class, Entry.class, null, null, null, in);
         
         _test(e, EntryResource.class);
     }

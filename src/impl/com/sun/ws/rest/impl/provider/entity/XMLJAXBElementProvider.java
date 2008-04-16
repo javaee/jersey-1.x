@@ -49,16 +49,6 @@ public final class XMLJAXBElementProvider extends AbstractJAXBElementProvider {
         Class<?> c = JAXBContext.class;
     }
     
-    @Override
-    public JAXBElement<?> readFrom(
-            Class<JAXBElement<?>> type, 
-            MediaType mediaType, 
-            MultivaluedMap<String, String> headers, 
-            InputStream entityStream) throws IOException {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
-    
-    @Override
     @SuppressWarnings("unchecked")
     public JAXBElement<?> readFrom(
             Class<JAXBElement<?>> type, 
@@ -79,12 +69,16 @@ public final class XMLJAXBElementProvider extends AbstractJAXBElementProvider {
             throw ThrowHelper.withInitCause(cause,
                     new IOException(ImplMessages.ERROR_MARSHALLING_JAXB(type))
                     );
-        }    }
+        }    
+    }
     
     public void writeTo(
             JAXBElement<?> t, 
-            MediaType mediaType,
-            MultivaluedMap<String, Object> headers, 
+            Class<?> type, 
+            Type genericType, 
+            Annotation annotations[], 
+            MediaType mediaType, 
+            MultivaluedMap<String, Object> httpHeaders,
             OutputStream entityStream) throws IOException {
         try {
             JAXBContext context = getJAXBContext(t.getDeclaredType());            

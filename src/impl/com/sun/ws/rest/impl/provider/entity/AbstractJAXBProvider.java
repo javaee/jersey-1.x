@@ -34,7 +34,7 @@ import javax.xml.bind.JAXBException;
  *
  * @author Paul.Sandoz@Sun.Com
  */
-public abstract class AbstractJAXBProvider<T> extends AbstractTypeEntityProvider<T> {    
+public abstract class AbstractJAXBProvider<T> extends AbstractMessageReaderWriterProvider<T> {    
     private static Map<Class, JAXBContext> jaxbContexts = 
             new WeakHashMap<Class, JAXBContext>();
 

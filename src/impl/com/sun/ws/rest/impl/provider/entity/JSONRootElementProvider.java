@@ -34,6 +34,8 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Type;
 import javax.ws.rs.ConsumeMime;
 import javax.ws.rs.ProduceMime;
 import javax.ws.rs.core.MediaType;
@@ -56,8 +58,13 @@ public final class JSONRootElementProvider extends AbstractRootElementProvider {
         Class<?> c = JAXBContext.class;
     }
     
-    public Object readFrom(Class<Object> type, MediaType mediaType,
-            MultivaluedMap<String, String> headers, InputStream entityStream) throws IOException {
+    public Object readFrom(
+            Class<Object> type, 
+            Type genericType, 
+            MediaType mediaType, 
+            Annotation annotations[],
+            MultivaluedMap<String, String> httpHeaders, 
+            InputStream entityStream) throws IOException {
         try {
             JAXBContext context = getJAXBContext(type);
             Unmarshaller unmarshaller = context.createUnmarshaller();
@@ -78,8 +85,14 @@ public final class JSONRootElementProvider extends AbstractRootElementProvider {
         }
     }
     
-    public void writeTo(Object t, MediaType mediaType,
-            MultivaluedMap<String, Object> headers, OutputStream entityStream) throws IOException {
+    public void writeTo(
+            Object t, 
+            Class<?> type, 
+            Type genericType, 
+            Annotation annotations[], 
+            MediaType mediaType, 
+            MultivaluedMap<String, Object> httpHeaders,
+            OutputStream entityStream) throws IOException {
         try {
             JAXBContext context = getJAXBContext(t.getClass());
             Marshaller marshaller = context.createMarshaller();

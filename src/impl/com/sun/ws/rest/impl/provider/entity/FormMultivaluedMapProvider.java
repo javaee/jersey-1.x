@@ -27,6 +27,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.lang.annotation.Annotation;
+import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
@@ -45,19 +46,27 @@ import javax.ws.rs.core.MultivaluedMap;
 @ProduceMime("application/x-www-form-urlencoded")
 @ConsumeMime("application/x-www-form-urlencoded")
 public final class FormMultivaluedMapProvider extends 
-        AbstractTypeEntityProvider<MultivaluedMap<String, String>> {
+        AbstractMessageReaderWriterProvider<MultivaluedMap<String, String>> {
     
-    public boolean supports(Class type) {
-        return MultivaluedMap.class.isAssignableFrom(type);
+    private final Type mapType;
+    
+    public FormMultivaluedMapProvider() {
+        ParameterizedType iface = (ParameterizedType)this.getClass().getGenericSuperclass();
+        mapType = iface.getActualTypeArguments()[0];
     }
-
-    @Override
+    
     public boolean isReadable(Class<?> type, Type genericType, Annotation annotations[]) {
-        return type == MultivaluedMap.class;
+        // Only allow types MultivaluedMap<String, String> and MultivaluedMap.
+        return type == MultivaluedMap.class && 
+                (type == genericType || mapType.equals(genericType));
     }
     
-    public MultivaluedMap<String, String> readFrom(Class<MultivaluedMap<String, String>> type, 
-            MediaType mediaType, MultivaluedMap<String, String> headers, 
+    public MultivaluedMap<String, String> readFrom(
+            Class<MultivaluedMap<String, String>> type, 
+            Type genericType, 
+            MediaType mediaType, 
+            Annotation annotations[],
+            MultivaluedMap<String, String> httpHeaders, 
             InputStream entityStream) throws IOException {
         String encoded = readFromAsString(entityStream, mediaType);
     
@@ -77,13 +86,18 @@ public final class FormMultivaluedMapProvider extends
         return map;
     }
 
-    @Override
     public boolean isWriteable(Class<?> type, Type genericType, Annotation annotations[]) {
         return MultivaluedMap.class.isAssignableFrom(type);
     }
     
-    public void writeTo(MultivaluedMap<String, String> t, MediaType mediaType,
-            MultivaluedMap<String, Object> headers, OutputStream entityStream) throws IOException {
+    public void writeTo(
+            MultivaluedMap<String, String> t, 
+            Class<?> type, 
+            Type genericType, 
+            Annotation annotations[], 
+            MediaType mediaType, 
+            MultivaluedMap<String, Object> httpHeaders,
+            OutputStream entityStream) throws IOException {
         StringBuilder sb = new StringBuilder();
         for (Map.Entry<String, List<String>> e : t.entrySet()) {
             for (String value : e.getValue()) {

@@ -80,6 +80,35 @@ public class JSONUnmarshaller implements Unmarshaller {
         }
     }
     
+    public Object unmarshal(InputStream inputStream, Class<Object> type) throws JAXBException {
+        if (jsonEnabled) {
+            if (null != type) {
+                return this.jaxbUnmarshaller.unmarshal(
+                    createXmlStreamReader(new InputStreamReader(inputStream)), type);
+            } else {
+                return this.jaxbUnmarshaller.unmarshal(
+                    createXmlStreamReader(new InputStreamReader(inputStream)));                
+            }
+        } else {
+            return this.jaxbUnmarshaller.unmarshal(inputStream);
+        }
+    }
+
+    public Object unmarshal(Reader reader, Class<Object> type) throws JAXBException {
+        if (jsonEnabled) {
+            if (null != type) {
+                return this.jaxbUnmarshaller.unmarshal(createXmlStreamReader(reader), type);
+            } else {
+                return this.jaxbUnmarshaller.unmarshal(createXmlStreamReader(reader));
+            }
+        } else {
+            return this.jaxbUnmarshaller.unmarshal(reader);
+        }
+    }
+
+    
+    // Unmarshaller
+    
     public Object unmarshal(File file) throws JAXBException {
         if (jsonEnabled) {
             try {
@@ -97,34 +126,8 @@ public class JSONUnmarshaller implements Unmarshaller {
         return unmarshal(inputStream, null);
     }
     
-    public Object unmarshal(InputStream inputStream, Class<Object> type) throws JAXBException {
-        if (jsonEnabled) {
-            if (null != type) {
-                return this.jaxbUnmarshaller.unmarshal(
-                    createXmlStreamReader(new InputStreamReader(inputStream)), type);
-            } else {
-                return this.jaxbUnmarshaller.unmarshal(
-                    createXmlStreamReader(new InputStreamReader(inputStream)));                
-            }
-        } else {
-            return this.jaxbUnmarshaller.unmarshal(inputStream);
-        }
-    }
-
     public Object unmarshal(Reader reader) throws JAXBException {
         return unmarshal(reader, null);
-    }
-
-    public Object unmarshal(Reader reader, Class<Object> type) throws JAXBException {
-        if (jsonEnabled) {
-            if (null != type) {
-                return this.jaxbUnmarshaller.unmarshal(createXmlStreamReader(reader), type);
-            } else {
-                return this.jaxbUnmarshaller.unmarshal(createXmlStreamReader(reader));
-            }
-        } else {
-            return this.jaxbUnmarshaller.unmarshal(reader);
-        }
     }
 
     public Object unmarshal(URL url) throws JAXBException {
@@ -308,7 +311,8 @@ public class JSONUnmarshaller implements Unmarshaller {
             }
         }
     }
-    XMLStreamReader createXmlStreamReader(Reader reader) {
+    
+    private XMLStreamReader createXmlStreamReader(Reader reader) {
         if (JSONJAXBContext.JSONNotation.MAPPED == this.jsonNotation) {
             try {
                 return new JsonXmlStreamReader(reader, this.jsonRootUnwrapping);
@@ -339,7 +343,7 @@ public class JSONUnmarshaller implements Unmarshaller {
         return null;
     }
     
-    public final String readFromAsString(Reader reader) throws IOException {
+    private String readFromAsString(Reader reader) throws IOException {
         StringBuilder sb = new StringBuilder();
         char[] c = new char[1024];
         int l;

@@ -26,6 +26,8 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Type;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 
@@ -33,21 +35,40 @@ import javax.ws.rs.core.MultivaluedMap;
  *
  * @author Paul.Sandoz@Sun.Com
  */
-public final class ByteArrayProvider extends AbstractTypeEntityProvider<byte[]> {
+public final class ByteArrayProvider extends AbstractMessageReaderWriterProvider<byte[]> {
     
     public boolean supports(Class type) {
         return type == byte[].class;
     }
 
-    public byte[] readFrom(Class<byte[]> type, MediaType mediaType,
-            MultivaluedMap<String, String> headers, InputStream entityStream) throws IOException {
+    public boolean isReadable(Class<?> type, Type genericType, Annotation annotations[]) {
+        return type == byte[].class;        
+    }
+    
+    public byte[] readFrom(
+            Class<byte[]> type, 
+            Type genericType, 
+            MediaType mediaType, 
+            Annotation annotations[],
+            MultivaluedMap<String, String> httpHeaders, 
+            InputStream entityStream) throws IOException {
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         writeTo(entityStream, out);
         return out.toByteArray();
     }
 
-    public void writeTo(byte[] t, MediaType mediaType,
-            MultivaluedMap<String, Object> headers, OutputStream entityStream) throws IOException {
+    public boolean isWriteable(Class<?> type, Type genericType, Annotation annotations[]) {
+        return type == byte[].class;        
+    }
+    
+    public void writeTo(
+            byte[] t, 
+            Class<?> type, 
+            Type genericType, 
+            Annotation annotations[], 
+            MediaType mediaType, 
+            MultivaluedMap<String, Object> httpHeaders,
+            OutputStream entityStream) throws IOException {
         entityStream.write(t);
     }
     

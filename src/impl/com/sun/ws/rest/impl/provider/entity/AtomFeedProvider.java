@@ -32,6 +32,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Type;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import org.jdom.Document;
@@ -42,19 +44,24 @@ import org.jdom.output.XMLOutputter;
  *
  * @author Paul.Sandoz@Sun.Com
  */
-public final class AtomFeedProvider extends AbstractTypeEntityProvider<Feed> {
+public final class AtomFeedProvider extends AbstractMessageReaderWriterProvider<Feed> {
     private static final String FEED_TYPE = "atom_1.0";
     
     public AtomFeedProvider() {
         Class<?> c = Feed.class;        
     }
     
-    public boolean supports(Class type) {
+    public boolean isReadable(Class<?> type, Type genericType, Annotation annotations[]) {
         return type == Feed.class;
     }
 
-    public Feed readFrom(Class<Feed> type, MediaType mediaType, 
-            MultivaluedMap<String, String> headers, InputStream entityStream) throws IOException {
+    public Feed readFrom(
+            Class<Feed> type, 
+            Type genericType, 
+            MediaType mediaType, 
+            Annotation annotations[],
+            MultivaluedMap<String, String> httpHeaders, 
+            InputStream entityStream) throws IOException {
         try {
             WireFeedInput input = new WireFeedInput();                      
             WireFeed wireFeed = input.build(new InputStreamReader(entityStream));    
@@ -69,8 +76,18 @@ public final class AtomFeedProvider extends AbstractTypeEntityProvider<Feed> {
         }
     }
 
-    public void writeTo(Feed t, MediaType mediaType,
-            MultivaluedMap<String, Object> headers, OutputStream entityStream) throws IOException {
+    public boolean isWriteable(Class<?> type, Type genericType, Annotation annotations[]) {
+        return type == Feed.class;
+    }
+    
+    public void writeTo(
+            Feed t, 
+            Class<?> type, 
+            Type genericType, 
+            Annotation annotations[], 
+            MediaType mediaType, 
+            MultivaluedMap<String, Object> httpHeaders,
+            OutputStream entityStream) throws IOException {
         try {
             t.setFeedType(FEED_TYPE);
             WireFeedOutput wireFeedOutput = new WireFeedOutput();

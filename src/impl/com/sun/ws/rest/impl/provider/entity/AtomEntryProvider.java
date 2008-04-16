@@ -31,6 +31,8 @@ import com.sun.ws.rest.impl.ImplMessages;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 import javax.ws.rs.core.MediaType;
@@ -46,19 +48,24 @@ import org.jdom.output.XMLOutputter;
  *
  * @author Paul.Sandoz@Sun.Com
  */
-public final class AtomEntryProvider extends AbstractTypeEntityProvider<Entry> {
+public final class AtomEntryProvider extends AbstractMessageReaderWriterProvider<Entry> {
     private static final String FEED_TYPE = "atom_1.0";
     
     public AtomEntryProvider() {
         Class<?> c = Entry.class;        
     }
     
-    public boolean supports(Class type) {
+    public boolean isReadable(Class<?> type, Type genericType, Annotation annotations[]) {
         return type == Entry.class;
     }
 
-    public Entry readFrom(Class<Entry> type, MediaType mediaType, 
-            MultivaluedMap<String, String> headers, InputStream entityStream) throws IOException {
+    public Entry readFrom(
+            Class<Entry> type, 
+            Type genericType, 
+            MediaType mediaType, 
+            Annotation annotations[],
+            MultivaluedMap<String, String> httpHeaders, 
+            InputStream entityStream) throws IOException {
         try {
             return parseEntry(entityStream);
         } catch (FeedException cause) {
@@ -72,8 +79,18 @@ public final class AtomEntryProvider extends AbstractTypeEntityProvider<Entry> {
         }
     }
 
-    public void writeTo(Entry t, MediaType mediaType,
-            MultivaluedMap<String, Object> headers, OutputStream entityStream) throws IOException {
+    public boolean isWriteable(Class<?> type, Type genericType, Annotation annotations[]) {
+        return type == Entry.class;        
+    }
+    
+    public void writeTo(
+            Entry t, 
+            Class<?> type, 
+            Type genericType, 
+            Annotation annotations[], 
+            MediaType mediaType, 
+            MultivaluedMap<String, Object> httpHeaders,
+            OutputStream entityStream) throws IOException {
         try {
             serializeEntry(t, entityStream);
         } catch (FeedException cause) {

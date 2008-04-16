@@ -25,13 +25,15 @@ package com.sun.ws.rest.impl.entity;
 import com.sun.ws.rest.api.client.ClientHandlerException;
 import com.sun.ws.rest.impl.AbstractResourceTester;
 import com.sun.ws.rest.api.client.WebResource;
-import com.sun.ws.rest.impl.provider.entity.AbstractTypeEntityProvider;
+import com.sun.ws.rest.impl.provider.entity.AbstractMessageReaderWriterProvider;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 import java.io.Serializable;
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Type;
 import javax.ws.rs.ConsumeMime;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -74,14 +76,19 @@ public class BeanStreamingTest extends AbstractResourceTester {
     @Provider
     @ProduceMime("application/bean")
     @ConsumeMime("application/bean")
-    public static class BeanProvider extends AbstractTypeEntityProvider<Bean> {
+    public static class BeanProvider extends AbstractMessageReaderWriterProvider<Bean> {
 
-        public boolean supports(Class type) {
+        public boolean isReadable(Class<?> type, Type genericType, Annotation annotations[]) {
             return type == Bean.class;
         }
 
-        public Bean readFrom(Class<Bean> type, MediaType mediaType, 
-                MultivaluedMap<String, String> headers, InputStream entityStream) throws IOException {
+        public Bean readFrom(
+                Class<Bean> type, 
+                Type genericType, 
+                MediaType mediaType, 
+                Annotation annotations[],
+                MultivaluedMap<String, String> httpHeaders, 
+                InputStream entityStream) throws IOException {
             ObjectInputStream oin = new ObjectInputStream(entityStream);
             try {
                 return (Bean)oin.readObject();
@@ -92,8 +99,18 @@ public class BeanStreamingTest extends AbstractResourceTester {
             }
         }
 
-        public void writeTo(Bean t, MediaType mediaType,
-                MultivaluedMap<String, Object> headers, OutputStream entityStream) throws IOException {
+        public boolean isWriteable(Class<?> type, Type genericType, Annotation annotations[]) {
+            return type == Bean.class;
+        }
+
+        public void writeTo(
+                Bean t, 
+                Class<?> type, 
+                Type genericType, 
+                Annotation annotations[], 
+                MediaType mediaType, 
+                MultivaluedMap<String, Object> httpHeaders,
+                OutputStream entityStream) throws IOException {
             ObjectOutputStream out = new ObjectOutputStream(entityStream);
             out.writeObject(t);
             out.flush();
@@ -105,7 +122,12 @@ public class BeanStreamingTest extends AbstractResourceTester {
     @ConsumeMime("application/*")
     public static class BeanWildProvider extends BeanProvider {
         @Override
-        public boolean supports(Class type) {
+        public boolean isReadable(Class<?> type, Type genericType, Annotation annotations[]) {
+            return type == Bean.class;
+        }
+        
+        @Override
+        public boolean isWriteable(Class<?> type, Type genericType, Annotation annotations[]) {
             return type == Bean.class;
         }
     }
@@ -113,14 +135,19 @@ public class BeanStreamingTest extends AbstractResourceTester {
     @Provider
     @ProduceMime("application/bean")
     @ConsumeMime("application/bean")
-    public static class Bean2Provider extends AbstractTypeEntityProvider<Bean2> {
+    public static class Bean2Provider extends AbstractMessageReaderWriterProvider<Bean2> {
 
-        public boolean supports(Class type) {
+        public boolean isReadable(Class<?> type, Type genericType, Annotation annotations[]) {
             return type == Bean2.class;
         }
 
-        public Bean2 readFrom(Class<Bean2> type, MediaType mediaType, 
-                MultivaluedMap<String, String> headers, InputStream entityStream) throws IOException {
+        public Bean2 readFrom(
+                Class<Bean2> type, 
+                Type genericType, 
+                MediaType mediaType, 
+                Annotation annotations[],
+                MultivaluedMap<String, String> httpHeaders, 
+                InputStream entityStream) throws IOException {
             ObjectInputStream oin = new ObjectInputStream(entityStream);
             try {
                 return (Bean2)oin.readObject();
@@ -131,8 +158,18 @@ public class BeanStreamingTest extends AbstractResourceTester {
             }
         }
 
-        public void writeTo(Bean2 t, MediaType mediaType,
-                MultivaluedMap<String, Object> headers, OutputStream entityStream) throws IOException {
+        public boolean isWriteable(Class<?> type, Type genericType, Annotation annotations[]) {
+            return type == Bean2.class;
+        }
+        
+        public void writeTo(
+                Bean2 t, 
+                Class<?> type, 
+                Type genericType, 
+                Annotation annotations[], 
+                MediaType mediaType, 
+                MultivaluedMap<String, Object> httpHeaders,
+                OutputStream entityStream) throws IOException {
             ObjectOutputStream out = new ObjectOutputStream(entityStream);
             out.writeObject(t);
             out.flush();
@@ -144,7 +181,12 @@ public class BeanStreamingTest extends AbstractResourceTester {
     @ConsumeMime("application/*")
     public static class Bean2WildProvider extends Bean2Provider {
         @Override
-        public boolean supports(Class type) {
+        public boolean isReadable(Class<?> type, Type genericType, Annotation annotations[]) {
+            return type == Bean2.class;
+        }
+        
+        @Override
+        public boolean isWriteable(Class<?> type, Type genericType, Annotation annotations[]) {
             return type == Bean2.class;
         }
     }

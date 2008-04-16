@@ -22,6 +22,8 @@
 
 package com.sun.ws.rest.impl.provider.entity;
 
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Type;
 import javax.xml.bind.annotation.XmlRootElement;
 
 /**
@@ -29,7 +31,11 @@ import javax.xml.bind.annotation.XmlRootElement;
  * @author Paul.Sandoz@Sun.Com
  */
 public abstract class AbstractRootElementProvider extends AbstractJAXBProvider<Object> {    
-    public boolean supports(Class<?> type) {
+    public boolean isReadable(Class<?> type, Type genericType, Annotation annotations[]) {
+        return type.getAnnotation(XmlRootElement.class) != null;
+    }
+    
+    public boolean isWriteable(Class<?> type, Type genericType, Annotation annotations[]) {
         return type.getAnnotation(XmlRootElement.class) != null;
     }
 }

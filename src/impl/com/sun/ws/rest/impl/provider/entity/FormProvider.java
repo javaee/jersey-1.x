@@ -26,6 +26,8 @@ import com.sun.ws.rest.api.representation.Form;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Type;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.util.List;
@@ -38,13 +40,18 @@ import javax.ws.rs.core.MultivaluedMap;
  *
  * @author Paul.Sandoz@Sun.Com
  */
-public final class FormProvider extends AbstractTypeEntityProvider<Form> {
-    public boolean supports(Class type) {
+public final class FormProvider extends AbstractMessageReaderWriterProvider<Form> {
+    public boolean isReadable(Class<?> type, Type genericType, Annotation annotations[]) {
         return type == Form.class;
     }
-
-    public Form readFrom(Class<Form> type, MediaType mediaType,
-            MultivaluedMap<String, String> headers, InputStream entityStream) throws IOException {
+    
+    public Form readFrom(
+            Class<Form> type, 
+            Type genericType, 
+            MediaType mediaType, 
+            Annotation annotations[],
+            MultivaluedMap<String, String> httpHeaders, 
+            InputStream entityStream) throws IOException {
         String encoded = readFromAsString(entityStream, mediaType);
     
         Form map = new Form();
@@ -63,8 +70,18 @@ public final class FormProvider extends AbstractTypeEntityProvider<Form> {
         return map;
     }
 
-    public void writeTo(Form t, MediaType mediaType,
-            MultivaluedMap<String, Object> headers, OutputStream entityStream) throws IOException {
+    public boolean isWriteable(Class<?> type, Type genericType, Annotation annotations[]) {
+        return type == Form.class;
+    }
+    
+    public void writeTo(
+            Form t,
+            Class<?> type, 
+            Type genericType, 
+            Annotation annotations[], 
+            MediaType mediaType, 
+            MultivaluedMap<String, Object> httpHeaders,
+            OutputStream entityStream) throws IOException {
         StringBuilder sb = new StringBuilder();
         for (Map.Entry<String, List<String>> e : t.entrySet()) {
             for (String value : e.getValue()) {

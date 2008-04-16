@@ -28,6 +28,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Type;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import org.codehaus.jettison.json.JSONArray;
@@ -37,36 +39,50 @@ import org.codehaus.jettison.json.JSONException;
  *
  * @author japod
  */
-public class JSONArrayProvider  extends AbstractTypeEntityProvider<JSONArray>{
+public class JSONArrayProvider  extends AbstractMessageReaderWriterProvider<JSONArray>{
     
     public JSONArrayProvider() {
         Class<?> c = JSONArray.class;
     }
     
-    public boolean supports(Class<?> type) {
-        return type == JSONArray.class;
+    public boolean isReadable(Class<?> type, Type genericType, Annotation annotations[]) {
+        return type == JSONArray.class;        
     }
-        
-    public JSONArray readFrom(Class<JSONArray> o, MediaType mediaType,
-            MultivaluedMap<String, String> headers, InputStream is) throws IOException {
+    
+    public JSONArray readFrom(
+            Class<JSONArray> type, 
+            Type genericType, 
+            MediaType mediaType, 
+            Annotation annotations[],
+            MultivaluedMap<String, String> httpHeaders, 
+            InputStream entityStream) throws IOException {
         try {
-            return new JSONArray(readFromAsString(is, mediaType));
+            return new JSONArray(readFromAsString(entityStream, mediaType));
         } catch (JSONException je) {
             throw ThrowHelper.withInitCause(je, new IOException(ImplMessages.ERROR_PARSING_JSON_ARRAY()));
         }
     }
     
-    public void writeTo(JSONArray jsonArray, MediaType mediaType,
-            MultivaluedMap<String, Object> httpHeaders, OutputStream entityStream) throws IOException {
+    public boolean isWriteable(Class<?> type, Type genericType, Annotation annotations[]) {
+        return type == JSONArray.class;        
+    }
+    
+    public void writeTo(
+            JSONArray t, 
+            Class<?> type, 
+            Type genericType, 
+            Annotation annotations[], 
+            MediaType mediaType, 
+            MultivaluedMap<String, Object> httpHeaders,
+            OutputStream entityStream) throws IOException {
         try {
             OutputStreamWriter writer = new OutputStreamWriter(entityStream, 
                     getCharset(mediaType, UTF8));
-            jsonArray.write(writer);
+            t.write(writer);
             writer.write("\n");
             writer.flush();
         } catch (JSONException je) {
             throw ThrowHelper.withInitCause(je, new IOException(ImplMessages.ERROR_WRITING_JSON_ARRAY()));
         }
-    }
-    
+    }    
 }

@@ -29,6 +29,8 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Reader;
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Type;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 
@@ -36,19 +38,38 @@ import javax.ws.rs.core.MultivaluedMap;
  *
  * @author Paul.Sandoz@Sun.Com
  */
-public final class ReaderProvider extends AbstractTypeEntityProvider<Reader> {
+public final class ReaderProvider extends AbstractMessageReaderWriterProvider<Reader> {
     
     public boolean supports(Class type) {
         return Reader.class.isAssignableFrom(type);
     }
 
-    public Reader readFrom(Class<Reader> type, MediaType mediaType,
-            MultivaluedMap<String, String> headers, InputStream entityStream) throws IOException {
+    public boolean isReadable(Class<?> type, Type genericType, Annotation annotations[]) {
+        return Reader.class == type;
+    }
+    
+    public Reader readFrom(
+            Class<Reader> type, 
+            Type genericType, 
+            MediaType mediaType, 
+            Annotation annotations[],
+            MultivaluedMap<String, String> httpHeaders, 
+            InputStream entityStream) throws IOException {
         return new BufferedReader(new InputStreamReader(entityStream, getCharset(mediaType)));
     }
 
-    public void writeTo(Reader t, MediaType mediaType,
-            MultivaluedMap<String, Object> headers, OutputStream entityStream) throws IOException {
+    public boolean isWriteable(Class<?> type, Type genericType, Annotation annotations[]) {
+        return Reader.class.isAssignableFrom(type);
+    }
+    
+    public void writeTo(
+            Reader t, 
+            Class<?> type, 
+            Type genericType, 
+            Annotation annotations[], 
+            MediaType mediaType, 
+            MultivaluedMap<String, Object> httpHeaders,
+            OutputStream entityStream) throws IOException {
         try {
             writeTo(t, new OutputStreamWriter(entityStream, 
                     getCharset(mediaType, UTF8)));

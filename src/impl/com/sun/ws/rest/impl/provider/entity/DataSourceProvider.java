@@ -25,6 +25,8 @@ package com.sun.ws.rest.impl.provider.entity;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Type;
 import javax.activation.DataSource;
 import javax.mail.util.ByteArrayDataSource;
 import javax.ws.rs.core.MediaType;
@@ -34,25 +36,40 @@ import javax.ws.rs.core.MultivaluedMap;
  *
  * @author Paul.Sandoz@Sun.Com
  */
-public class DataSourceProvider extends AbstractTypeEntityProvider<DataSource> {
+public class DataSourceProvider extends AbstractMessageReaderWriterProvider<DataSource> {
     
     public DataSourceProvider() {
         Class<?> c = DataSource.class;
     }
     
-    public boolean supports(Class type) {
-        return DataSource.class.isAssignableFrom(type);
+    public boolean isReadable(Class<?> type, Type genericType, Annotation annotations[]) {
+        return DataSource.class == type;
     }
-
-    public DataSource readFrom(Class<DataSource> type, MediaType mediaType,
-            MultivaluedMap<String, String> headers, InputStream entityStream) throws IOException {        
+    
+    public DataSource readFrom(
+            Class<DataSource> type, 
+            Type genericType, 
+            MediaType mediaType, 
+            Annotation annotations[],
+            MultivaluedMap<String, String> httpHeaders, 
+            InputStream entityStream) throws IOException {
         ByteArrayDataSource ds = new ByteArrayDataSource(entityStream, 
                 (mediaType == null) ? null : mediaType.toString());
         return ds;
     }
 
-    public void writeTo(DataSource t, MediaType mediaType,
-            MultivaluedMap<String, Object> headers, OutputStream entityStream) throws IOException {
+    public boolean isWriteable(Class<?> type, Type genericType, Annotation annotations[]) {
+        return DataSource.class.isAssignableFrom(type);        
+    }
+    
+    public void writeTo(
+            DataSource t, 
+            Class<?> type, 
+            Type genericType, 
+            Annotation annotations[], 
+            MediaType mediaType, 
+            MultivaluedMap<String, Object> httpHeaders,
+            OutputStream entityStream) throws IOException {
         InputStream in = t.getInputStream();
         try {
             writeTo(in, entityStream);

@@ -25,6 +25,8 @@ package com.sun.ws.rest.impl.provider.entity;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Type;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 
@@ -32,19 +34,34 @@ import javax.ws.rs.core.MultivaluedMap;
  *
  * @author Paul.Sandoz@Sun.Com
  */
-public final class InputStreamProvider extends AbstractTypeEntityProvider<InputStream> {
+public final class InputStreamProvider extends AbstractMessageReaderWriterProvider<InputStream> {
     
-    public boolean supports(Class type) {
-        return InputStream.class.isAssignableFrom(type);
+    public boolean isReadable(Class<?> type, Type genericType, Annotation annotations[]) {
+        return InputStream.class == type;
     }
-
-    public InputStream readFrom(Class<InputStream> type, MediaType mediaType,
-            MultivaluedMap<String, String> headers, InputStream entityStream) throws IOException {
+    
+    public InputStream readFrom(
+            Class<InputStream> type, 
+            Type genericType, 
+            MediaType mediaType, 
+            Annotation annotations[],
+            MultivaluedMap<String, String> httpHeaders, 
+            InputStream entityStream) throws IOException {
         return entityStream;
     }
 
-    public void writeTo(InputStream t, MediaType mediaType,
-            MultivaluedMap<String, Object> headers, OutputStream entityStream) throws IOException {
+    public boolean isWriteable(Class<?> type, Type genericType, Annotation annotations[]) {
+        return InputStream.class.isAssignableFrom(type);        
+    }
+    
+    public void writeTo(
+            InputStream t, 
+            Class<?> type, 
+            Type genericType, 
+            Annotation annotations[], 
+            MediaType mediaType, 
+            MultivaluedMap<String, Object> httpHeaders,
+            OutputStream entityStream) throws IOException {
         try {
             writeTo(t, entityStream);
         } finally {

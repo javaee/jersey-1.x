@@ -29,6 +29,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Type;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import org.codehaus.jettison.json.JSONException;
@@ -38,36 +40,50 @@ import org.codehaus.jettison.json.JSONObject;
  *
  * @author japod
  */
-public class JSONObjectProvider  extends AbstractTypeEntityProvider<JSONObject>{
+public class JSONObjectProvider  extends AbstractMessageReaderWriterProvider<JSONObject>{
     
     public JSONObjectProvider() {
         Class<?> c = JSONObject.class;
     }
     
-    public boolean supports(Class<?> type) {
-        return type == JSONObject.class;
+    public boolean isReadable(Class<?> type, Type genericType, Annotation annotations[]) {
+        return type == JSONObject.class;        
     }
     
-    public JSONObject readFrom(Class<JSONObject> o, MediaType mediaType, 
-            MultivaluedMap<String, String> headers, InputStream is) throws IOException {
+    public JSONObject readFrom(
+            Class<JSONObject> type, 
+            Type genericType, 
+            MediaType mediaType, 
+            Annotation annotations[],
+            MultivaluedMap<String, String> httpHeaders, 
+            InputStream entityStream) throws IOException {
         try {
-            return new JSONObject(readFromAsString(is, mediaType));
+            return new JSONObject(readFromAsString(entityStream, mediaType));
         } catch (JSONException je) {
             throw ThrowHelper.withInitCause(je, new IOException(ImplMessages.ERROR_PARSING_JSON_OBJECT()));
         }
     }
     
-    public void writeTo(JSONObject jsonObject, MediaType mediaType,
-            MultivaluedMap<String, Object> httpHeaders, OutputStream entityStream) throws IOException {
+    public boolean isWriteable(Class<?> type, Type genericType, Annotation annotations[]) {
+        return type == JSONObject.class;        
+    }
+    
+    public void writeTo(
+            JSONObject t, 
+            Class<?> type, 
+            Type genericType, 
+            Annotation annotations[], 
+            MediaType mediaType, 
+            MultivaluedMap<String, Object> httpHeaders,
+            OutputStream entityStream) throws IOException {
         try {
             OutputStreamWriter writer = new OutputStreamWriter(entityStream, 
                     getCharset(mediaType, UTF8));
-            jsonObject.write(writer);
+            t.write(writer);
             writer.write("\n");
             writer.flush();
         } catch (JSONException je) {
             throw ThrowHelper.withInitCause(je, new IOException(ImplMessages.ERROR_WRITING_JSON_OBJECT()));
         }
     }
-    
 }

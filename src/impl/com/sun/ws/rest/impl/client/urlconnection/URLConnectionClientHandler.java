@@ -32,6 +32,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.lang.annotation.Annotation;
 import java.net.HttpURLConnection;
 import java.net.ProtocolException;
 import java.util.HashMap;
@@ -50,6 +51,8 @@ import javax.ws.rs.ext.RuntimeDelegate.HeaderDelegate;
  * @author Paul.Sandoz@Sun.Com
  */
 public final class URLConnectionClientHandler implements ClientHandler {
+    private static final Annotation[] EMPTY_ANNOTATIONS = new Annotation[0];
+    
     private final class URLConnectionResponse extends ClientResponse {
         private final int status;
         private final HttpURLConnection uc;
@@ -84,8 +87,8 @@ public final class URLConnectionClientHandler implements ClientHandler {
             try {
                 MediaType mediaType = getType();
                 final MessageBodyReader<T> br = bodyContext.getMessageBodyReader(
-                        c, null,
-                        null, mediaType);
+                        c, c,
+                        EMPTY_ANNOTATIONS, mediaType);
                 if (br == null) {
                     throw new ClientHandlerException(
                             "A message body reader for Java type, " + c + 
@@ -207,7 +210,8 @@ public final class URLConnectionClientHandler implements ClientHandler {
         }
         
         final OutputStream out = uc.getOutputStream();
-        bw.writeTo(entity, entity.getClass(), null, null, mediaType, metadata, out);        
+        bw.writeTo(entity, entity.getClass(), entity.getClass(), 
+                EMPTY_ANNOTATIONS, mediaType, metadata, out);        
         out.flush();
         out.close();
     }

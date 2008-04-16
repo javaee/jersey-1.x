@@ -22,6 +22,9 @@
 
 package com.sun.ws.rest.impl.provider.entity;
 
+import java.lang.annotation.Annotation;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
 import javax.xml.bind.JAXBElement;
 
 /**
@@ -29,7 +32,11 @@ import javax.xml.bind.JAXBElement;
  * @author Paul.Sandoz@Sun.Com
  */
 public abstract class AbstractJAXBElementProvider extends AbstractJAXBProvider<JAXBElement<?>> {    
-    public boolean supports(Class<?> type) {
+    public boolean isReadable(Class<?> type, Type genericType, Annotation annotations[]) {
+        return type == JAXBElement.class && genericType instanceof ParameterizedType;
+    }
+    
+    public boolean isWriteable(Class<?> type, Type genericType, Annotation annotations[]) {
         return JAXBElement.class.isAssignableFrom(type);
     }
 }

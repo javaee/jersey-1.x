@@ -24,13 +24,15 @@ package com.sun.ws.rest.impl.entity;
 
 import com.sun.ws.rest.impl.AbstractResourceTester;
 import com.sun.ws.rest.api.client.WebResource;
-import com.sun.ws.rest.impl.provider.entity.AbstractTypeEntityProvider;
+import com.sun.ws.rest.impl.provider.entity.AbstractMessageReaderWriterProvider;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 import java.io.Serializable;
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Type;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.core.Context;
@@ -60,15 +62,20 @@ public class InjectedProviderTest extends AbstractResourceTester {
     }
 
     @Provider
-    public static class InjectedBeanProvider extends AbstractTypeEntityProvider<Bean> {
+    public static class InjectedBeanProvider extends AbstractMessageReaderWriterProvider<Bean> {
         @Context UriInfo uriInfo;
         
-        public boolean supports(Class type) {
+        public boolean isReadable(Class<?> type, Type genericType, Annotation annotations[]) {
             return type == Bean.class;
         }
 
-        public Bean readFrom(Class<Bean> type, MediaType mediaType, 
-                MultivaluedMap<String, String> headers, InputStream entityStream) throws IOException {
+        public Bean readFrom(
+                Class<Bean> type, 
+                Type genericType, 
+                MediaType mediaType, 
+                Annotation annotations[],
+                MultivaluedMap<String, String> httpHeaders, 
+                InputStream entityStream) throws IOException {
             ObjectInputStream oin = new ObjectInputStream(entityStream);
             try {
                 return (Bean)oin.readObject();
@@ -79,8 +86,18 @@ public class InjectedProviderTest extends AbstractResourceTester {
             }
         }
 
-        public void writeTo(Bean t, MediaType mediaType,
-                MultivaluedMap<String, Object> headers, OutputStream entityStream) throws IOException {
+        public boolean isWriteable(Class<?> type, Type genericType, Annotation annotations[]) {
+            return type == Bean.class;
+        }
+    
+        public void writeTo(
+                Bean t, 
+                Class<?> type, 
+                Type genericType, 
+                Annotation annotations[], 
+                MediaType mediaType, 
+                MultivaluedMap<String, Object> httpHeaders,
+                OutputStream entityStream) throws IOException {
             t.setString(uriInfo.getRequestUri().toString());
             ObjectOutputStream out = new ObjectOutputStream(entityStream);
             out.writeObject(t);

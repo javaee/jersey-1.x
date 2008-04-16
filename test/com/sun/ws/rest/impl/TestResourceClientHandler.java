@@ -37,6 +37,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.lang.annotation.Annotation;
 import java.net.URI;
 import java.util.HashMap;
 import java.util.List;
@@ -54,6 +55,8 @@ import javax.ws.rs.ext.RuntimeDelegate.HeaderDelegate;
  * @author Paul.Sandoz@Sun.Com
  */
 public class TestResourceClientHandler implements ClientHandler {
+    private static final Annotation[] EMPTY_ANNOTATIONS = new Annotation[0];
+    
     @Context private MessageBodyContext bodyContext;
     
     private final WebApplication w;
@@ -97,8 +100,8 @@ public class TestResourceClientHandler implements ClientHandler {
             try {
                 MediaType mediaType = getType();
                 final MessageBodyReader<T> br = bodyContext.getMessageBodyReader(
-                        c, null,
-                        null, mediaType);
+                        c, c,
+                        EMPTY_ANNOTATIONS, mediaType);
                 if (br == null) {
                     throw new ClientHandlerException(
                             "A message body reader for Java type, " + c + 
@@ -197,14 +200,15 @@ public class TestResourceClientHandler implements ClientHandler {
                 }
             }
             final MessageBodyWriter bw = bodyContext.getMessageBodyWriter(
-                    entity.getClass(), null,
+                    entity.getClass(), entity.getClass(),
                     null, mediaType);
             if (bw == null) {
                 throw new ClientHandlerException(
                         "A message body writer for Java type, " + entity.getClass() + 
                         ", and MIME media type, " + mediaType + ", was not found");
             }
-            bw.writeTo(entity, entity.getClass(), null, null, (MediaType)mediaType, metadata, out);
+            bw.writeTo(entity, entity.getClass(), entity.getClass(), 
+                    EMPTY_ANNOTATIONS, (MediaType)mediaType, metadata, out);
             out.flush();
             out.close();
         } catch (IOException ex) {

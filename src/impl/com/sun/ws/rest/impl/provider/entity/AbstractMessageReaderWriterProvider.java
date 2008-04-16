@@ -32,17 +32,14 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Reader;
 import java.io.Writer;
-import java.lang.annotation.Annotation;
-import java.lang.reflect.Type;
 import java.nio.charset.Charset;
 import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.MultivaluedMap;
 
 /**
  *
  * @author Paul.Sandoz@Sun.Com
  */
-public abstract class AbstractTypeEntityProvider<T> implements 
+public abstract class AbstractMessageReaderWriterProvider<T> implements 
         MessageBodyReader<T>, MessageBodyWriter<T> {
 
     public static final Charset UTF8 = Charset.forName("UTF-8");
@@ -61,21 +58,22 @@ public abstract class AbstractTypeEntityProvider<T> implements
         }
     }
     
-    public final void writeTo(InputStream in, OutputStream out) throws IOException {
+    public static final void writeTo(InputStream in, OutputStream out) throws IOException {
         int read;
         final byte[] data = new byte[2048];
         while ((read = in.read(data)) != -1)
             out.write(data, 0, read);
     }
     
-    public final void writeTo(Reader in, Writer out) throws IOException {
+    public static final void writeTo(Reader in, Writer out) throws IOException {
         int read;
         final char[] data = new char[2048];
         while ((read = in.read(data)) != -1)
             out.write(data, 0, read);
     }
     
-    public final String readFromAsString(InputStream in, MediaType type) throws IOException {
+    public static final String readFromAsString(InputStream in, 
+            MediaType type) throws IOException {
         Reader reader = new InputStreamReader(in, getCharset(type));
         StringBuilder sb = new StringBuilder();
         char[] c = new char[1024];
@@ -86,44 +84,17 @@ public abstract class AbstractTypeEntityProvider<T> implements
         return sb.toString();
     }
     
-    public final void writeToAsString(String s, OutputStream out, MediaType type) throws IOException {
+    public static final void writeToAsString(String s, OutputStream out, 
+            MediaType type) throws IOException {
         Writer osw = new BufferedWriter(new OutputStreamWriter(out, 
                 getCharset(type, UTF8)));        
         osw.write(s);
         osw.flush();        
     }
     
-    public boolean isReadable(Class<?> type, Type genericType, Annotation annotations[]) {
-        return supports(type);
-    }
+    // MessageBodyWriter
     
-    public T readFrom(Class<T> type, Type genericType, MediaType mediaType, 
-            Annotation annotations[],
-            MultivaluedMap<String, String> httpHeaders, 
-            InputStream entityStream) throws IOException {        
-        return readFrom(type, mediaType, httpHeaders, entityStream);
-    }
-    
-    public boolean isWriteable(Class<?> type, Type genericType, Annotation annotations[]) {
-        return supports(type);
-    }
-    
-    public void writeTo(T t, Class<?> type, Type genericType, Annotation annotations[], 
-            MediaType mediaType, 
-            MultivaluedMap<String, Object> httpHeaders,
-            OutputStream entityStream) throws IOException {
-        writeTo(t, mediaType, httpHeaders, entityStream);
-    }    
-     
     public long getSize(T t) {
         return -1;
     }
-    
-    public abstract boolean supports(Class<?> type);
-    
-    public abstract T readFrom(Class<T> type, MediaType mediaType, 
-            MultivaluedMap<String, String> headers, InputStream entityStream) throws IOException;
-
-    public abstract void writeTo(T t, MediaType mediaType,
-            MultivaluedMap<String, Object> headers, OutputStream entityStream) throws IOException;        
 }
