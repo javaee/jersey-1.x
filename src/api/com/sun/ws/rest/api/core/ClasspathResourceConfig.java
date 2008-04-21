@@ -42,7 +42,7 @@ import javax.ws.rs.ext.Provider;
  * 
  * @author Frank D. Martinez. fmartinez@asimovt.com
  */
-public final class ClasspathResourceConfig extends DefaultResourceConfig {
+public class ClasspathResourceConfig extends DefaultResourceConfig {
     /**
      * The property value MUST be an instance String or String[]. Each String
      * instance represents one or more paths that MUST be separated by ';'. 

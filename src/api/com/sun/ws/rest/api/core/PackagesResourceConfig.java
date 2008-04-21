@@ -38,7 +38,7 @@ import javax.ws.rs.ext.Provider;
  * 
  * @author Paul.Sandoz@Sun.Com
  */
-public final class PackagesResourceConfig extends DefaultResourceConfig {
+public class PackagesResourceConfig extends DefaultResourceConfig {
     /**
      * The property value MUST be an instance String or String[]. Each String
      * instance represents one or more paths that MUST be separated by ';'. 
@@ -55,6 +55,8 @@ public final class PackagesResourceConfig extends DefaultResourceConfig {
     private static final Logger LOGGER = 
             Logger.getLogger(PackagesResourceConfig.class.getName());
 
+    private final String[] packages;
+    
     /**
      * @param packages the array packages
      */
@@ -62,6 +64,7 @@ public final class PackagesResourceConfig extends DefaultResourceConfig {
         if (packages == null || packages.length == 0)
             throw new IllegalArgumentException("Array of packages must not be null or empty");
         
+        this.packages = packages;
         init(packages);
     }
 
@@ -73,6 +76,15 @@ public final class PackagesResourceConfig extends DefaultResourceConfig {
         this(getPackages(props));
         
         getProperties().putAll(props);
+    }
+    
+    /**
+     * Perform a new search for resource classes and provider classes.
+     */
+    public void reload() {
+        getResourceClasses().clear();
+        getProviderClasses().clear();
+        init(packages);
     }
     
     private void init(String[] packages) {

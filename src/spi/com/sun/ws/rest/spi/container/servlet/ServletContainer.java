@@ -199,7 +199,12 @@ public class ServletContainer extends HttpServlet implements ContainerListener {
                 return new ClasspathResourceConfig(props);
             } else if (ResourceConfig.class.isAssignableFrom(resourceConfigClass)) {
                 try {                    
-                    Constructor constructor = resourceConfigClass.getConstructor(Map.class);
+                    Constructor constructor = resourceConfigClass.getConstructor(Map.class);                    
+                    if (ClasspathResourceConfig.class.isAssignableFrom(resourceConfigClass)) {
+                        String[] paths = getPaths(servletConfig.getInitParameter(
+                                ClasspathResourceConfig.PROPERTY_CLASSPATH));
+                        props.put(ClasspathResourceConfig.PROPERTY_CLASSPATH, paths);                        
+                    }
                     return (ResourceConfig)constructor.newInstance(props);
                 } catch (NoSuchMethodException ex) {
                     // Pass through and try the default constructor
