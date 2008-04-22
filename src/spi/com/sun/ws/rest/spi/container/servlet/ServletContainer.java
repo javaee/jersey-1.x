@@ -127,7 +127,7 @@ public class ServletContainer extends HttpServlet implements ContainerListener {
     }
     
     @Override
-    public final void service(HttpServletRequest req, HttpServletResponse resp)
+    public void service(HttpServletRequest req, HttpServletResponse resp)
     throws ServletException, IOException {
         // Copy the application field to local instance to ensure that the 
         // currently loaded web application is used to process
