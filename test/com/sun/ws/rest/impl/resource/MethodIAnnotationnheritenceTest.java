@@ -143,7 +143,7 @@ public class MethodIAnnotationnheritenceTest extends AbstractResourceTester {
                 accept("application/xml").
                 post(ClientResponse.class, "content");
         assertEquals("<root>content</root>", cr.getEntity(String.class));
-        assertEquals(MediaType.parse("application/xml"), cr.getType());
+        assertEquals(MediaType.valueOf("application/xml"), cr.getType());
         
         s = resource("/a/sub?q=b").
                 header("h", "c").
@@ -398,7 +398,7 @@ public class MethodIAnnotationnheritenceTest extends AbstractResourceTester {
                 accept("application/xhtml").
                 post(ClientResponse.class, "content");
         assertEquals("<root>content</root>", cr.getEntity(String.class));
-        assertEquals(MediaType.parse("application/xhtml"), cr.getType());
+        assertEquals(MediaType.valueOf("application/xhtml"), cr.getType());
         
         s = resource("/a/suboverride?_q=b").
                 header("_h", "c").

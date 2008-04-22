@@ -407,7 +407,7 @@ public final class WebApplicationImpl implements WebApplication {
             path = stripMatrixParams(path);
 
         // If there are URI conneg extensions for media and language
-        if (!resourceConfig.getExtensionMappings().isEmpty() || 
+        if (!resourceConfig.getMediaTypeMappings().isEmpty() || 
                 !resourceConfig.getLanguageMappings().isEmpty()) {
             uriConneg(path, request);
         }
@@ -560,7 +560,7 @@ public final class WebApplicationImpl implements WebApplication {
         if (si == -1) si = 0;
         
         MediaType accept = null;
-        for (Map.Entry<String, MediaType> e : resourceConfig.getExtensionMappings().entrySet()) {
+        for (Map.Entry<String, MediaType> e : resourceConfig.getMediaTypeMappings().entrySet()) {
             int i = path.indexOf(e.getKey(), si);
             if (i > 0 && path.charAt(i - 1) == '.') {
                 accept = e.getValue();

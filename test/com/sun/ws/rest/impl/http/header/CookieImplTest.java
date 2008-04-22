@@ -56,18 +56,18 @@ public class CookieImplTest extends TestCase {
     }
     
     public void testCookieValueOf() {
-        Cookie cookie = Cookie.parse("$Version=2;fred=flintstone");
+        Cookie cookie = Cookie.valueOf("$Version=2;fred=flintstone");
         assertEquals("fred", cookie.getName());
         assertEquals("flintstone", cookie.getValue());
         assertEquals(2, cookie.getVersion());    
         
-        cookie = Cookie.parse("$Version=1;fred=flintstone;$Path=/path");
+        cookie = Cookie.valueOf("$Version=1;fred=flintstone;$Path=/path");
         assertEquals("fred", cookie.getName());
         assertEquals("flintstone", cookie.getValue());
         assertEquals(1, cookie.getVersion());    
         assertEquals("/path", cookie.getPath());    
         
-        cookie = Cookie.parse("$Version=1;fred=flintstone;$Domain=.sun.com;$Path=/path");
+        cookie = Cookie.valueOf("$Version=1;fred=flintstone;$Domain=.sun.com;$Path=/path");
         assertEquals("fred", cookie.getName());
         assertEquals("flintstone", cookie.getValue());
         assertEquals(1, cookie.getVersion());    
@@ -167,18 +167,18 @@ public class CookieImplTest extends TestCase {
     }
     
     public void testNewCookieValueOf() {
-        NewCookie cookie = NewCookie.parse("fred=flintstone;Version=2");
+        NewCookie cookie = NewCookie.valueOf("fred=flintstone;Version=2");
         assertEquals("fred", cookie.getName());
         assertEquals("flintstone", cookie.getValue());
         assertEquals(2, cookie.getVersion());    
         
-        cookie = NewCookie.parse("fred=flintstone;Version=1;Max-Age=60");
+        cookie = NewCookie.valueOf("fred=flintstone;Version=1;Max-Age=60");
         assertEquals("fred", cookie.getName());
         assertEquals("flintstone", cookie.getValue());
         assertEquals(1, cookie.getVersion());    
         assertEquals(60, cookie.getMaxAge());    
         
-        cookie = NewCookie.parse("fred=flintstone;Version=1;Comment=\"a modern stonage family\";Max-Age=60;Secure");
+        cookie = NewCookie.valueOf("fred=flintstone;Version=1;Comment=\"a modern stonage family\";Max-Age=60;Secure");
         assertEquals("fred", cookie.getName());
         assertEquals("flintstone", cookie.getValue());
         assertEquals("a modern stonage family", cookie.getComment());

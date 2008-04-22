@@ -57,8 +57,8 @@ public class WebApplicationTest extends TestCase {
         public void handleRequest(HttpRequestContext request, HttpResponseContext response) {
             assertEquals("GET", request.getHttpMethod());
             
-            assertEquals("a", info.getTemplateParameters().getFirst("arg1"));
-            assertEquals("b", info.getTemplateParameters().getFirst("arg2"));
+            assertEquals("a", info.getPathParameters().getFirst("arg1"));
+            assertEquals("b", info.getPathParameters().getFirst("arg2"));
             
             String s = request.getEntity(String.class);
             assertEquals("RESOURCE-ONE", s);
@@ -74,7 +74,7 @@ public class WebApplicationTest extends TestCase {
             assertEquals("GET", request.getHttpMethod());
             
             System.out.println(info.getPath());
-            String v = info.getTemplateParameters().getFirst("arg1");
+            String v = info.getPathParameters().getFirst("arg1");
             boolean b = v.equals("a") || v.equals("a.foo");
             assertTrue(b);
             
@@ -92,7 +92,7 @@ public class WebApplicationTest extends TestCase {
             assertEquals("GET", request.getHttpMethod());
             
             System.out.println(info.getPath());
-            assertEquals("a", info.getTemplateParameters().getFirst("arg1"));
+            assertEquals("a", info.getPathParameters().getFirst("arg1"));
             
             String s = request.getEntity(String.class);
             assertEquals("RESOURCE-THREE", s);

@@ -48,8 +48,8 @@ public final class ByteArrayProvider extends AbstractMessageReaderWriterProvider
     public byte[] readFrom(
             Class<byte[]> type, 
             Type genericType, 
-            MediaType mediaType, 
             Annotation annotations[],
+            MediaType mediaType, 
             MultivaluedMap<String, String> httpHeaders, 
             InputStream entityStream) throws IOException {
         ByteArrayOutputStream out = new ByteArrayOutputStream();

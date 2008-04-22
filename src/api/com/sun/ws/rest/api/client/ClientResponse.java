@@ -91,7 +91,7 @@ public abstract class ClientResponse {
      */
     public MediaType getType() {
         String ct = getMetadata().getFirst("Content-Type");
-        return (ct != null) ? MediaType.parse(ct) : null;
+        return (ct != null) ? MediaType.valueOf(ct) : null;
     }
     
     /**
@@ -141,7 +141,7 @@ public abstract class ClientResponse {
         
         List<NewCookie> cs = new ArrayList<NewCookie>();
         for (String h : hs) {
-            cs.add(NewCookie.parse(h));
+            cs.add(NewCookie.valueOf(h));
         }
         return cs;
     }

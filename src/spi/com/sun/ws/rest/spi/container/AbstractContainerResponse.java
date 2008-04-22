@@ -283,7 +283,7 @@ public abstract class AbstractContainerResponse implements ContainerResponse {
             return (MediaType)mediaTypeHeader;
         } else {
             if (mediaTypeHeader != null) {
-                return MediaType.parse(mediaTypeHeader.toString());
+                return MediaType.valueOf(mediaTypeHeader.toString());
             } else {
                 return APPLICATION_OCTET_STREAM;
             }

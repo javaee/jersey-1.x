@@ -107,7 +107,7 @@ public class TestResourceClientHandler implements ClientHandler {
                             "A message body reader for Java type, " + c + 
                             ", and MIME media type, " + mediaType + ", was not found");
                 }
-                return br.readFrom(c, null, mediaType, null, metadata, responseEntity);
+                return br.readFrom(c, null, null, mediaType, metadata, responseEntity);
             } catch (IOException ex) {
                 throw new ClientHandlerException(ex);
             }
@@ -194,7 +194,7 @@ public class TestResourceClientHandler implements ClientHandler {
                 mediaType = (MediaType)mediaType;
             } else {
                 if (mediaTypeHeader != null) {
-                    mediaType = MediaType.parse(mediaTypeHeader.toString());
+                    mediaType = MediaType.valueOf(mediaTypeHeader.toString());
                 } else {
                     mediaType = new MediaType("application", "octet-stream");
                 }

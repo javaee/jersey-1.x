@@ -42,7 +42,6 @@ import java.util.Map;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.PathSegment;
 import javax.ws.rs.core.UriBuilder;
-import javax.ws.rs.core.UriInfo;
 
 /**
  *
@@ -194,6 +193,10 @@ public final class WebApplicationContext implements UriRuleContext, ExtendedUriI
         }
     }
     
+    public String getPathExtension() {
+        throw new UnsupportedOperationException();
+    }
+    
     public URI getBaseUri() {
         return request.getBaseUri();
     }
@@ -218,11 +221,15 @@ public final class WebApplicationContext implements UriRuleContext, ExtendedUriI
         return UriBuilder.fromUri(getRequestUri());
     }
     
-    public MultivaluedMap<String, String> getTemplateParameters() {
-        return getTemplateParameters(true);
+    public UriBuilder getPlatonicRequestUriBuilder() {
+        throw new UnsupportedOperationException();
     }
     
-    public MultivaluedMap<String, String> getTemplateParameters(boolean decode) {
+    public MultivaluedMap<String, String> getPathParameters() {
+        return getPathParameters(true);
+    }
+    
+    public MultivaluedMap<String, String> getPathParameters(boolean decode) {
         if (decode) {
             if (decodedTemplateValues != null)
                 return decodedTemplateValues;
@@ -272,6 +279,9 @@ public final class WebApplicationContext implements UriRuleContext, ExtendedUriI
         return resources;
     }    
     
+    public List<String> getAncestorResourceURIs(boolean decode) {
+        throw new UnsupportedOperationException();
+    }    
     
     //
     

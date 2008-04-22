@@ -157,6 +157,10 @@ public final class UriBuilderImpl extends UriBuilder {
         return this;
     }
 
+    public UriBuilder extension(String extension) {
+        throw new UnsupportedOperationException();
+    }
+    
     public UriBuilder path(String... segments) {        
         for (String segment : segments)
             appendPath(segment);

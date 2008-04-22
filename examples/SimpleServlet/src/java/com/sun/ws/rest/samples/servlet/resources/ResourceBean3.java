@@ -49,7 +49,7 @@ public class ResourceBean3  {
     
     @GET
     public Response doGet() {
-        MultivaluedMap<String, String> params = uriInfo.getTemplateParameters();
+        MultivaluedMap<String, String> params = uriInfo.getPathParameters();
         String arg1 = params.getFirst("arg1");
         String arg2 = params.getFirst("arg2");
         for (String key : uriInfo.getQueryParameters().keySet())

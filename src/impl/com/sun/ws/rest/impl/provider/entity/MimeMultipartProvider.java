@@ -50,8 +50,8 @@ public final class MimeMultipartProvider extends AbstractMessageReaderWriterProv
     public MimeMultipart readFrom(
             Class<MimeMultipart> type, 
             Type genericType, 
-            MediaType mediaType, 
             Annotation annotations[],
+            MediaType mediaType, 
             MultivaluedMap<String, String> httpHeaders, 
             InputStream entityStream) throws IOException {
         if (mediaType == null)

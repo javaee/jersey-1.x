@@ -49,7 +49,7 @@ public class FormReader implements MessageBodyReader<NameValuePair> {
     }
 
     public NameValuePair readFrom(Class<NameValuePair> type, Type genericType,
-            MediaType mediaType, Annotation[] annotations, MultivaluedMap<String, String> headers, 
+            Annotation[] annotations, MediaType mediaType, MultivaluedMap<String, String> headers, 
             InputStream in) throws IOException {
         String formData = readAsString(in);
 

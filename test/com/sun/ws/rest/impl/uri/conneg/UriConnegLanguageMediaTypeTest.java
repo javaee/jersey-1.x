@@ -52,9 +52,9 @@ public class UriConnegLanguageMediaTypeTest extends AbstractResourceTester {
         @GET
         public Response doGet(@Context Request r) {
             List<Variant> vs = Variant.VariantListBuilder.newInstance().
-                    mediaTypes(MediaType.parse("application/foo")).
+                    mediaTypes(MediaType.valueOf("application/foo")).
                     languages("en").languages("fr").add().
-                    mediaTypes(MediaType.parse("application/bar")).
+                    mediaTypes(MediaType.valueOf("application/bar")).
                     languages("en").languages("fr").add().
                     build();            
             
@@ -69,8 +69,8 @@ public class UriConnegLanguageMediaTypeTest extends AbstractResourceTester {
     
     public void testLanguages() {
         ResourceConfig rc = new DefaultResourceConfig(LanguageVariantResource.class);
-        rc.getExtensionMappings().put("foo", MediaType.parse("application/foo"));
-        rc.getExtensionMappings().put("bar", MediaType.parse("application/bar"));
+        rc.getMediaTypeMappings().put("foo", MediaType.valueOf("application/foo"));
+        rc.getMediaTypeMappings().put("bar", MediaType.valueOf("application/bar"));
         rc.getLanguageMappings().put("english", "en");
         rc.getLanguageMappings().put("french", "fr");
         initiateWebApplication(rc);        

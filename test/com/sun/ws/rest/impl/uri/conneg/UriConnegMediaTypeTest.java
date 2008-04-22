@@ -144,8 +144,8 @@ public class UriConnegMediaTypeTest extends AbstractResourceTester {
     
     private void _init(Class<?> r) {
         ResourceConfig rc = new DefaultResourceConfig(r);
-        rc.getExtensionMappings().put("foo", MediaType.parse("application/foo"));
-        rc.getExtensionMappings().put("bar", MediaType.parse("application/bar"));
+        rc.getMediaTypeMappings().put("foo", MediaType.valueOf("application/foo"));
+        rc.getMediaTypeMappings().put("bar", MediaType.valueOf("application/bar"));
         initiateWebApplication(rc);        
     }
     

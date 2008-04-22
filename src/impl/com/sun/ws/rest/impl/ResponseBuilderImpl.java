@@ -142,7 +142,7 @@ public final class ResponseBuilderImpl extends Response.ResponseBuilder {
     }
 
     public Response.ResponseBuilder type(String type) {
-        set(CONTENT_TYPE, MediaType.parse(type));
+        set(CONTENT_TYPE, MediaType.valueOf(type));
         return this;
     }
 

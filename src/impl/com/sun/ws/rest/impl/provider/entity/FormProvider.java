@@ -48,8 +48,8 @@ public final class FormProvider extends AbstractMessageReaderWriterProvider<Form
     public Form readFrom(
             Class<Form> type, 
             Type genericType, 
-            MediaType mediaType, 
             Annotation annotations[],
+            MediaType mediaType, 
             MultivaluedMap<String, String> httpHeaders, 
             InputStream entityStream) throws IOException {
         String encoded = readFromAsString(entityStream, mediaType);

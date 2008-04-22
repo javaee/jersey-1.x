@@ -56,8 +56,11 @@ public final class SourceProvider {
             return StreamSource.class == t;
         }
 
-        public StreamSource readFrom(Class<StreamSource> t, Type gt, 
-                MediaType mediaType, Annotation[] as, 
+        public StreamSource readFrom(
+                Class<StreamSource> t, 
+                Type gt, 
+                Annotation[] as, 
+                MediaType mediaType, 
                 MultivaluedMap<String, String> httpHeaders,
                 InputStream entityStream) throws IOException {
             return new StreamSource(entityStream);
@@ -70,8 +73,11 @@ public final class SourceProvider {
             return SAXSource.class == t;
         }
 
-        public SAXSource readFrom(Class<SAXSource> t, Type gt, 
-                MediaType mediaType, Annotation[] as, 
+        public SAXSource readFrom(
+                Class<SAXSource> t, 
+                Type gt, 
+                Annotation[] as, 
+                MediaType mediaType, 
                 MultivaluedMap<String, String> httpHeaders,
                 InputStream entityStream) throws IOException {
             return new SAXSource(new InputSource(entityStream));
@@ -91,8 +97,11 @@ public final class SourceProvider {
             return DOMSource.class == t;
         }
 
-        public DOMSource readFrom(Class<DOMSource> t, Type gt, 
-                MediaType mediaType, Annotation[] as, 
+        public DOMSource readFrom(
+                Class<DOMSource> t, 
+                Type gt, 
+                Annotation[] as, 
+                MediaType mediaType, 
                 MultivaluedMap<String, String> httpHeaders,
                 InputStream entityStream) throws IOException {
             try {

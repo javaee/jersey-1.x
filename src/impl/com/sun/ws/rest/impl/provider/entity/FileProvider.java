@@ -48,8 +48,8 @@ public final class FileProvider extends AbstractMessageReaderWriterProvider<File
     public File readFrom(
             Class<File> type, 
             Type genericType, 
-            MediaType mediaType, 
             Annotation annotations[],
+            MediaType mediaType, 
             MultivaluedMap<String, String> httpHeaders, 
             InputStream entityStream) throws IOException {
         File f = File.createTempFile("rep","tmp");        

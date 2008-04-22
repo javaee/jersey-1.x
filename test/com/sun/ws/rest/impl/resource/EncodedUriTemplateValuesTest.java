@@ -48,10 +48,10 @@ public class EncodedUriTemplateValuesTest extends AbstractResourceTester {
                 @Context UriInfo info) {
             assertEquals("a b", a);
             assertEquals("x y", b);
-            assertEquals("a b", info.getTemplateParameters().getFirst("a"));
-            assertEquals("x y", info.getTemplateParameters().getFirst("b"));
-            assertEquals("a%20b", info.getTemplateParameters(false).getFirst("a"));
-            assertEquals("x%20y", info.getTemplateParameters(false).getFirst("b"));
+            assertEquals("a b", info.getPathParameters().getFirst("a"));
+            assertEquals("x y", info.getPathParameters().getFirst("b"));
+            assertEquals("a%20b", info.getPathParameters(false).getFirst("a"));
+            assertEquals("x%20y", info.getPathParameters(false).getFirst("b"));
             return "content";
         }
     }

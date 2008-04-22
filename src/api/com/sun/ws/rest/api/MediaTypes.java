@@ -33,5 +33,5 @@ public final class MediaTypes {
     private MediaTypes() { }
     
     public final static MediaType WADL = 
-            MediaType.parse("application/vnd.sun.wadl+xml");
+            MediaType.valueOf("application/vnd.sun.wadl+xml");
 }

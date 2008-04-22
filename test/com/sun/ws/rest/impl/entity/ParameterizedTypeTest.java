@@ -62,8 +62,11 @@ public class ParameterizedTypeTest extends AbstractResourceTester {
             return List.class == c && listStringType.equals(t);
         }
 
-        public List<String> readFrom(Class<List<String>> c, Type t, 
-                MediaType mt, Annotation[] as, 
+        public List<String> readFrom(
+                Class<List<String>> c, 
+                Type t, 
+                Annotation[] as, 
+                MediaType mt, 
                 MultivaluedMap<String, String> headers, InputStream in) throws IOException {
             return Arrays.asList(readFromAsString(in).split(","));            
         }

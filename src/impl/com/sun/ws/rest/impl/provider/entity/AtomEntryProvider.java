@@ -35,6 +35,7 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
+import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import org.jdom.Document;
@@ -62,8 +63,8 @@ public final class AtomEntryProvider extends AbstractMessageReaderWriterProvider
     public Entry readFrom(
             Class<Entry> type, 
             Type genericType, 
-            MediaType mediaType, 
             Annotation annotations[],
+            MediaType mediaType, 
             MultivaluedMap<String, String> httpHeaders, 
             InputStream entityStream) throws IOException {
         try {

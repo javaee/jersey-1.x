@@ -176,7 +176,7 @@ public abstract class AbstractContainerRequest implements ContainerRequest {
                 throw new WebApplicationException(
                         Responses.unsupportedMediaType().build());
             }
-            return bw.readFrom(type, genericType, mediaType, as, headers, entity);
+            return bw.readFrom(type, genericType, as, mediaType, headers, entity);
         } catch (IOException e) {
             throw new IllegalArgumentException(e);
         }
@@ -218,12 +218,20 @@ public abstract class AbstractContainerRequest implements ContainerRequest {
     public MultivaluedMap<String, String> getRequestHeaders() {
         return headers;
     }
+
+    public List<String> getRequestHeader(String name) {
+        throw new UnsupportedOperationException();        
+    }
     
     public List<MediaType> getAcceptableMediaTypes() {
         if (accept == null)
             accept = new ArrayList<MediaType>(HttpHelper.getAccept(this));            
         
         return accept;
+    }
+    
+    public List<String> getAcceptableLanguages() {
+        throw new UnsupportedOperationException();
     }
     
     public MediaType getMediaType() {

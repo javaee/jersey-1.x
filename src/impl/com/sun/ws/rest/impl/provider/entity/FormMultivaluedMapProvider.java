@@ -64,8 +64,8 @@ public final class FormMultivaluedMapProvider extends
     public MultivaluedMap<String, String> readFrom(
             Class<MultivaluedMap<String, String>> type, 
             Type genericType, 
-            MediaType mediaType, 
             Annotation annotations[],
+            MediaType mediaType, 
             MultivaluedMap<String, String> httpHeaders, 
             InputStream entityStream) throws IOException {
         String encoded = readFromAsString(entityStream, mediaType);

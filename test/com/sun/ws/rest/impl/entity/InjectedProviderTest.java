@@ -72,8 +72,8 @@ public class InjectedProviderTest extends AbstractResourceTester {
         public Bean readFrom(
                 Class<Bean> type, 
                 Type genericType, 
-                MediaType mediaType, 
                 Annotation annotations[],
+                MediaType mediaType, 
                 MultivaluedMap<String, String> httpHeaders, 
                 InputStream entityStream) throws IOException {
             ObjectInputStream oin = new ObjectInputStream(entityStream);

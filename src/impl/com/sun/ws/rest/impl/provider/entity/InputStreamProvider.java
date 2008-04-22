@@ -43,8 +43,8 @@ public final class InputStreamProvider extends AbstractMessageReaderWriterProvid
     public InputStream readFrom(
             Class<InputStream> type, 
             Type genericType, 
-            MediaType mediaType, 
             Annotation annotations[],
+            MediaType mediaType, 
             MultivaluedMap<String, String> httpHeaders, 
             InputStream entityStream) throws IOException {
         return entityStream;

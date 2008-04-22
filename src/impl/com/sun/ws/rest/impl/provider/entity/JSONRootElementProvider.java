@@ -61,8 +61,8 @@ public final class JSONRootElementProvider extends AbstractRootElementProvider {
     public Object readFrom(
             Class<Object> type, 
             Type genericType, 
-            MediaType mediaType, 
             Annotation annotations[],
+            MediaType mediaType, 
             MultivaluedMap<String, String> httpHeaders, 
             InputStream entityStream) throws IOException {
         try {

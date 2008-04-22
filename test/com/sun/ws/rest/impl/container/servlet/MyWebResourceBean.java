@@ -52,7 +52,7 @@ public class MyWebResourceBean  {
         System.out.println("MyWebResourceBean GET: "+ request.getHttpMethod());
         
         List<String> reps = context.getUriInfo().getQueryParameters().get("rep");
-        MultivaluedMap<String, String> params = context.getUriInfo().getTemplateParameters();
+        MultivaluedMap<String, String> params = context.getUriInfo().getPathParameters();
         String arg1 = params.getFirst("arg1");
         String arg2 = params.getFirst("arg2");
         

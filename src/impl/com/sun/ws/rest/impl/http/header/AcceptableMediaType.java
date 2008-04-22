@@ -44,7 +44,7 @@ public final class AcceptableMediaType extends MediaType implements QualityFacto
         return q;
     }
     
-    public static AcceptableMediaType parse(HttpHeaderReader reader) throws ParseException {
+    public static AcceptableMediaType valueOf(HttpHeaderReader reader) throws ParseException {
         // Skip any white space
         reader.hasNext();
         

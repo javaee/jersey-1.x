@@ -64,8 +64,8 @@ public final class JSONJAXBElementProvider extends AbstractJAXBElementProvider {
     public JAXBElement<?> readFrom(
             Class<JAXBElement<?>> type, 
             Type genericType, 
-            MediaType mediaType, 
             Annotation annotations[],
+            MediaType mediaType, 
             MultivaluedMap<String, String> httpHeaders, 
             InputStream entityStream) throws IOException {
         ParameterizedType pt = (ParameterizedType)genericType;

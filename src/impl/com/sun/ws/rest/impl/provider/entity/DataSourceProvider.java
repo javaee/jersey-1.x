@@ -49,8 +49,8 @@ public class DataSourceProvider extends AbstractMessageReaderWriterProvider<Data
     public DataSource readFrom(
             Class<DataSource> type, 
             Type genericType, 
-            MediaType mediaType, 
             Annotation annotations[],
+            MediaType mediaType, 
             MultivaluedMap<String, String> httpHeaders, 
             InputStream entityStream) throws IOException {
         ByteArrayDataSource ds = new ByteArrayDataSource(entityStream, 

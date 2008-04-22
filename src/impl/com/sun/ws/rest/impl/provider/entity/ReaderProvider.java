@@ -51,8 +51,8 @@ public final class ReaderProvider extends AbstractMessageReaderWriterProvider<Re
     public Reader readFrom(
             Class<Reader> type, 
             Type genericType, 
-            MediaType mediaType, 
             Annotation annotations[],
+            MediaType mediaType, 
             MultivaluedMap<String, String> httpHeaders, 
             InputStream entityStream) throws IOException {
         return new BufferedReader(new InputStreamReader(entityStream, getCharset(mediaType)));

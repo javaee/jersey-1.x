@@ -58,8 +58,8 @@ public final class AtomFeedProvider extends AbstractMessageReaderWriterProvider<
     public Feed readFrom(
             Class<Feed> type, 
             Type genericType, 
-            MediaType mediaType, 
             Annotation annotations[],
+            MediaType mediaType, 
             MultivaluedMap<String, String> httpHeaders, 
             InputStream entityStream) throws IOException {
         try {

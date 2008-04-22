@@ -60,7 +60,7 @@ public final class HttpHelper {
      *         returned.
      */
     public static MediaType getContentType(String contentTypeString) {
-        return (contentTypeString != null) ? MediaType.parse(contentTypeString) : null;
+        return (contentTypeString != null) ? MediaType.valueOf(contentTypeString) : null;
     }
     
     /**
@@ -77,7 +77,7 @@ public final class HttpHelper {
         if (contentType instanceof MediaType)
             return (MediaType)contentType;
         else 
-            return MediaType.parse(contentType.toString());
+            return MediaType.valueOf(contentType.toString());
     }
     
     /**

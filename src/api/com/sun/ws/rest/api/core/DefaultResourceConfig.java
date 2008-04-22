@@ -88,7 +88,7 @@ public class DefaultResourceConfig extends ResourceConfig {
     }
     
     @Override
-    public Map<String, MediaType> getExtensionMappings() {
+    public Map<String, MediaType> getMediaTypeMappings() {
         return mediaExtentions;
     }
 

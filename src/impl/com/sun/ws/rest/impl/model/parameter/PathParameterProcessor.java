@@ -42,7 +42,7 @@ public final class PathParameterProcessor implements ParameterProcessor {
         }
         
         public Object extract(HttpContext context) {
-            return extractor.extract(context.getUriInfo().getTemplateParameters(decode));
+            return extractor.extract(context.getUriInfo().getPathParameters(decode));
         }
     }
     

@@ -146,7 +146,7 @@ public final class MediaTypeHelper {
     public static List<MediaType> createMediaTypes(String[] mediaTypes) {
         List<MediaType> l = new ArrayList<MediaType>();
         for (String mediaType : mediaTypes) {
-            l.add(MediaType.parse(mediaType));
+            l.add(MediaType.valueOf(mediaType));
         }
         
         Collections.sort(l, MEDIA_TYPE_COMPARATOR);

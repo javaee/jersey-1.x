@@ -102,10 +102,10 @@ public class VariantsTest extends AbstractResourceTester {
         @GET
         public Response doGet(@Context Request r) {
             List<Variant> vs = Variant.VariantListBuilder.newInstance().
-                    mediaTypes(MediaType.parse("image/jpeg")).add().
-                    mediaTypes(MediaType.parse("application/xml")).languages("en-us").add().
-                    mediaTypes(MediaType.parse("text/xml")).languages("en").add().
-                    mediaTypes(MediaType.parse("text/xml")).languages("en-us").add().
+                    mediaTypes(MediaType.valueOf("image/jpeg")).add().
+                    mediaTypes(MediaType.valueOf("application/xml")).languages("en-us").add().
+                    mediaTypes(MediaType.valueOf("text/xml")).languages("en").add().
+                    mediaTypes(MediaType.valueOf("text/xml")).languages("en-us").add().
                     build();
                     
             Variant v = r.selectVariant(vs);
@@ -130,7 +130,7 @@ public class VariantsTest extends AbstractResourceTester {
                 header("Accept-Language", "en-us,en;q=0.5").
                 get(ClientResponse.class);
         assertEquals("GET", r.getEntity(String.class));
-        assertEquals(MediaType.parse("text/xml"), r.getType());
+        assertEquals(MediaType.valueOf("text/xml"), r.getType());
         assertEquals("en-us", r.getLanguage());
     }   
     
@@ -148,7 +148,7 @@ public class VariantsTest extends AbstractResourceTester {
                 header("Accept-Language", "en,en-us").
                 get(ClientResponse.class);
         assertEquals("GET", r.getEntity(String.class));
-        assertEquals(MediaType.parse("text/xml"), r.getType());
+        assertEquals(MediaType.valueOf("text/xml"), r.getType());
         assertEquals("en", r.getLanguage());
     }
     
@@ -166,7 +166,7 @@ public class VariantsTest extends AbstractResourceTester {
                 header("Accept-Language", "en-us,en;q=0.5").
                 get(ClientResponse.class);
         assertEquals("GET", r.getEntity(String.class));
-        assertEquals(MediaType.parse("application/xml"), r.getType());
+        assertEquals(MediaType.valueOf("application/xml"), r.getType());
         assertEquals("en-us", r.getLanguage());
     }   
     

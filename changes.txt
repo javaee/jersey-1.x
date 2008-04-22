@@ -1,6 +1,17 @@
 release 0.8 (2008-06-20 or 2008-07-25)
 - The type javax.xml.bind.JAXBElement<T> can be used for XML and JSON
   serialization.
+- Partially Integrated JSR 311 API 0.8
+  - MediaType.parse renamed to MediaType.valueOf
+  - NewCookie.parse renamed to NewCookie.valueOf
+  - Cookie.parse renamed to Cookie.valueOf
+  - CacheControl.parse renamed to CacheControl.valueOf
+  - EntityTag.parse renamed to EntityTag.valueOf
+  - UriInfo.getTemplateParameters renamed to UriInfo.getPathParameters
+  - ApplicationConfig.getExtensibleMapping renamed to 
+    ApplicationConfig.getMediaTypeMappings
+  - Method parameter order of MessageBodyReader.readFrom has changed to be
+    consistent with the method parameter order of MessageBodyWriter.writerTo.
 
 release 0.7 (2008-04-18)
 - The type javax.xml.bind.JAXBElement<T> can be used for reading and writing

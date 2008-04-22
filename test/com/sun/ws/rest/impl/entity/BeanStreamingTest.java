@@ -85,8 +85,8 @@ public class BeanStreamingTest extends AbstractResourceTester {
         public Bean readFrom(
                 Class<Bean> type, 
                 Type genericType, 
-                MediaType mediaType, 
                 Annotation annotations[],
+                MediaType mediaType, 
                 MultivaluedMap<String, String> httpHeaders, 
                 InputStream entityStream) throws IOException {
             ObjectInputStream oin = new ObjectInputStream(entityStream);
@@ -144,8 +144,8 @@ public class BeanStreamingTest extends AbstractResourceTester {
         public Bean2 readFrom(
                 Class<Bean2> type, 
                 Type genericType, 
-                MediaType mediaType, 
                 Annotation annotations[],
+                MediaType mediaType, 
                 MultivaluedMap<String, String> httpHeaders, 
                 InputStream entityStream) throws IOException {
             ObjectInputStream oin = new ObjectInputStream(entityStream);

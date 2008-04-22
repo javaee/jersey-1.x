@@ -45,7 +45,7 @@ public final class HttpHeaderFactory {
     private static final ListElementCreator<AcceptableMediaType> ACCEPTABLE_MEDIA_TYPE_CREATOR = 
             new ListElementCreator<AcceptableMediaType>() {
         public AcceptableMediaType create(HttpHeaderReader reader) throws ParseException {
-            return AcceptableMediaType.parse(reader);
+            return AcceptableMediaType.valueOf(reader);
         }
     };
     
@@ -123,7 +123,7 @@ public final class HttpHeaderFactory {
     }
     
     public static MediaType createContentType(String header) throws ParseException {
-        return MediaType.parse(header);
+        return MediaType.valueOf(header);
     }
     
     public static Date createDate(String header) throws ParseException {

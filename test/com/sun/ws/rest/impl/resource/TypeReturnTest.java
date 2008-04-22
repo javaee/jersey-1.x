@@ -62,7 +62,7 @@ public class TypeReturnTest extends AbstractResourceTester {
         
         ClientResponse response = resource("/", false).get(ClientResponse.class);                
         assertEquals("CONTENT", response.getEntity(String.class));
-        assertEquals(MediaType.parse("application/octet-stream"), 
+        assertEquals(MediaType.valueOf("application/octet-stream"), 
                 response.getType());
     }
     
@@ -72,7 +72,7 @@ public class TypeReturnTest extends AbstractResourceTester {
         
         ClientResponse response = resource("/", false).get(ClientResponse.class);                
         assertEquals("CONTENT", response.getEntity(String.class));
-        assertEquals(MediaType.parse("text/plain"), 
+        assertEquals(MediaType.valueOf("text/plain"), 
                 response.getType());
     }
 }

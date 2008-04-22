@@ -189,8 +189,8 @@ public class IntrospectionModellerTest extends TestCase {
         assertEquals("POST", resourceMethod.getHttpMethod());
         assertEquals(0, resourceMethod.getParameters().size());
         assertEquals(2, resourceMethod.getSupportedInputTypes().size());
-        assertTrue(resourceMethod.getSupportedInputTypes().contains(MediaType.parse("application/json")));
-        assertTrue(resourceMethod.getSupportedInputTypes().contains(MediaType.parse("application/xml")));
+        assertTrue(resourceMethod.getSupportedInputTypes().contains(MediaType.valueOf("application/json")));
+        assertTrue(resourceMethod.getSupportedInputTypes().contains(MediaType.valueOf("application/xml")));
         assertEquals(1, resourceMethod.getSupportedOutputTypes().size());
         assertEquals("*/*", resourceMethod.getSupportedOutputTypes().get(0).toString());
         

@@ -106,13 +106,13 @@ public class HeadSubResourceMethodTest extends AbstractResourceTester {
         initiateWebApplication(ResourceGetWithProduceNoHead.class);
         WebResource r = resource("/sub", false);
         
-        MediaType foo = MediaType.parse("application/foo");
+        MediaType foo = MediaType.valueOf("application/foo");
         ClientResponse response = r.accept(foo).head();
         assertEquals(200, response.getStatus());
         assertFalse(response.hasEntity());
         assertEquals(foo, response.getType());
         
-        MediaType bar = MediaType.parse("application/bar");
+        MediaType bar = MediaType.valueOf("application/bar");
         response = r.accept(bar).head();
         assertEquals(200, response.getStatus());
         assertFalse(response.hasEntity());
@@ -155,14 +155,14 @@ public class HeadSubResourceMethodTest extends AbstractResourceTester {
         initiateWebApplication(ResourceGetWithProduceWithHead.class);
         WebResource r = resource("/sub", false);
         
-        MediaType foo = MediaType.parse("application/foo");
+        MediaType foo = MediaType.valueOf("application/foo");
         ClientResponse response = r.accept(foo).head();
         assertEquals(200, response.getStatus());
         assertFalse(response.hasEntity());
         assertEquals(foo, response.getType());
         assertEquals("FOO-HEAD", response.getMetadata().getFirst("X-TEST").toString());
         
-        MediaType bar = MediaType.parse("application/bar");
+        MediaType bar = MediaType.valueOf("application/bar");
         response = r.accept(bar).head();
         assertEquals(200, response.getStatus());
         assertFalse(response.hasEntity());
@@ -190,13 +190,13 @@ public class HeadSubResourceMethodTest extends AbstractResourceTester {
     public void testGetWithProduceNoHeadDifferentSub() {
         initiateWebApplication(ResourceGetWithProduceNoHeadDifferentSub.class);
         
-        MediaType foo = MediaType.parse("application/foo");
+        MediaType foo = MediaType.valueOf("application/foo");
         ClientResponse response = resource("/sub1", false).accept(foo).head();
         assertEquals(200, response.getStatus());
         assertFalse(response.hasEntity());
         assertEquals(foo, response.getType());
         
-        MediaType bar = MediaType.parse("application/bar");
+        MediaType bar = MediaType.valueOf("application/bar");
         response = resource("/sub2", false).accept(bar).head();
         assertEquals(200, response.getStatus());
         assertFalse(response.hasEntity());

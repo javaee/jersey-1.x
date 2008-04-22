@@ -54,8 +54,8 @@ public final class ApplicationConfigAdapter extends DefaultResourceConfig {
     }
     
     @Override
-    public Map<String, MediaType> getExtensionMappings() {
-        return ac.getExtensionMappings();
+    public Map<String, MediaType> getMediaTypeMappings() {
+        return ac.getMediaTypeMappings();
     }
 
     @Override

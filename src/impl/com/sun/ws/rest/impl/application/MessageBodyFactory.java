@@ -88,7 +88,7 @@ public final class MessageBodyFactory implements MessageBodyContext, MessageBody
                 getClassCapability(s, provider, MediaTypeHelper.GENERAL_MEDIA_TYPE);
             else
                 for (String type: values)
-                    getClassCapability(s, provider, MediaType.parse(type));            
+                    getClassCapability(s, provider, MediaType.valueOf(type));            
             
         }   
         
