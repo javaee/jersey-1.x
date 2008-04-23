@@ -35,7 +35,7 @@ public abstract class BaseRule implements UriRule {
     private final UriTemplate template;
     
     public BaseRule(UriTemplate template) {
-        assert template != template;
+        assert template != null;
         
         this.template = template;
     }
