@@ -85,10 +85,10 @@ import javax.ws.rs.core.Context;
  * {@link HttpServletResponse} and {@link ServletConfig}.
  */
 public class ServletContainer extends HttpServlet implements ContainerListener {
-    private static final String APPLICATION_CONFIG_CLASS =
+    public static final String APPLICATION_CONFIG_CLASS =
             "javax.ws.rs.ApplicationConfig";
     
-    private static final String RESOURCE_CONFIG_CLASS = 
+    public static final String RESOURCE_CONFIG_CLASS = 
             "com.sun.ws.rest.config.property.resourceConfigClass";
     
     private final ThreadLocalInvoker<HttpServletRequest> requestInvoker =
