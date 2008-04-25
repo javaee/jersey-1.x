@@ -33,8 +33,7 @@
 	<ant dir="GlassfishDB" target="${target}" inheritAll="false"/> 
 	<ant dir="HelloWorld" target="${target}" inheritAll="false"/>
 	<ant dir="HelloWorldWebApp" target="${target}" inheritAll="false"/>
-	<!--ant dir="JsonFromJaxb/JsonFromJaxbBeans" target="${target}" inheritAll="false"/-->
-	<!--<ant dir="JsonFromJaxb" target="${target}" inheritAll="false"/-->
+	<ant dir="JsonFromJaxb" target="${target}" inheritAll="false"/>
 	<ant dir="OptimisticConcurrency" target="${target}" inheritAll="false"/>
 	<ant dir="SimpleAtomServer" target="${target}" inheritAll="false"/>
 	<ant dir="SimpleConsole" target="${target}" inheritAll="false"/>
@@ -67,7 +66,7 @@
 	<mkdir dir="${release.impl.dir}/examples"/>
 	<copy todir="${release.impl.dir}/examples">
             <!-- ignore any private directories for NB projects -->
-	    <fileset dir="." excludes="build.xml, **/nbproject/private/, Mandel/scala/**, GlassfishDB/**, JsonFromJaxb/**"/>
+	    <fileset dir="." excludes="build.xml, **/nbproject/private/, Mandel/scala/**, GlassfishDB/**"/>
 	</copy>
 
 	<!-- replace property for jersey in NB projects -->
@@ -94,12 +93,9 @@
         <antcall target="convert-property">
             <param name="example" value="HelloWorldWebApp"/>
         </antcall>
-	<!--
-        <antcall target="convert-property">
         <antcall target="convert-property">
             <param name="example" value="JsonFromJaxb"/>
         </antcall>
-        -->
         <antcall target="convert-property">
             <param name="example" value="OptimisticConcurrency"/>
         </antcall>
