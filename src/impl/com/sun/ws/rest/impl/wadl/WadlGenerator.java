@@ -225,8 +225,9 @@ public final class WadlGenerator {
             wadlSubResource.getMethodOrResource().add(wadlMethod);
         }
         // add parameters that are associated with each sub-resource method URI template
-        for (String template : wadlSubResources.keySet()) {
-            Resource wadlSubResource = wadlSubResources.get(template);
+        for (Map.Entry<String, Resource> e : wadlSubResources.entrySet()) {
+            String template = e.getKey();
+            Resource wadlSubResource = e.getValue();
             Map<String, Param> wadlSubResourceParams = wadlSubResourcesParams.get(template);
             for (Param wadlParam : wadlSubResourceParams.values()) {
                 wadlSubResource.getParam().add(wadlParam);

@@ -63,7 +63,6 @@ import org.xml.sax.InputSource;
  */
 public class JSONUnmarshaller implements Unmarshaller {
 
-    private JAXBContext jaxbContext;
     private Unmarshaller jaxbUnmarshaller;
     private JSONJAXBContext.JSONNotation jsonNotation;
     private boolean jsonEnabled;
@@ -72,7 +71,6 @@ public class JSONUnmarshaller implements Unmarshaller {
 
     public JSONUnmarshaller(JAXBContext jaxbContext, Map<String, Object> properties) throws JAXBException {
         try {
-            this.jaxbContext = jaxbContext;
             this.jaxbUnmarshaller = jaxbContext.createUnmarshaller();
             setProperties(properties);
         } catch (PropertyException ex) {

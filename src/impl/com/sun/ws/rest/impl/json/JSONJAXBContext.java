@@ -96,9 +96,9 @@ public final class JSONJAXBContext extends JAXBContext {
     }
     
     private final void processProperties(Map<String, Object> properties) {
-        for (String k : properties.keySet()) {
-            if (k.startsWith(NAMESPACE)) {
-                getJsonProperties().put(k, properties.get(k));
+        for (Map.Entry<String, Object> e : properties.entrySet()) {
+            if (e.getKey().startsWith(NAMESPACE)) {
+                getJsonProperties().put(e.getKey(), e.getValue());
             }
         }
         for (String k : getJsonProperties().keySet()) {

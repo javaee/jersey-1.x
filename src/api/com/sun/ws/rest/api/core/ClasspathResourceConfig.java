@@ -86,7 +86,7 @@ public class ClasspathResourceConfig extends DefaultResourceConfig {
             throw new IllegalArgumentException(
                     "Array of paths must not be null or empty");
 
-        this.paths = paths;
+        this.paths = paths.clone();
         
         init(paths);
     }

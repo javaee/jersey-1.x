@@ -64,7 +64,7 @@ public class PackagesResourceConfig extends DefaultResourceConfig {
         if (packages == null || packages.length == 0)
             throw new IllegalArgumentException("Array of packages must not be null or empty");
         
-        this.packages = packages;
+        this.packages = packages.clone();
         init(packages);
     }
 

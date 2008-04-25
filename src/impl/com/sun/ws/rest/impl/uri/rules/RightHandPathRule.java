@@ -117,7 +117,6 @@ public class RightHandPathRule implements UriRule {
      * TODO use the complete URI.
      */
     private boolean redirect(UriRuleContext context) {
-        final HttpRequestContext request = context.getRequest();
         final HttpResponseContext response = context.getResponse();
         
         response.setResponse(

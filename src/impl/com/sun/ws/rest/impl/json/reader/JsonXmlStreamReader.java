@@ -96,7 +96,6 @@ public class JsonXmlStreamReader implements XMLStreamReader {
     
     private static final Logger LOGGER = Logger.getLogger(JsonXmlStreamReader.class.getName());   
     
-    Reader reader;
     boolean jsonRootUnwrapping;
 
     JsonLexer lexer;
@@ -131,7 +130,6 @@ public class JsonXmlStreamReader implements XMLStreamReader {
     }
     
     public JsonXmlStreamReader(Reader reader, boolean jsonRootUnwrapping) throws IOException {
-        this.reader = reader;
         this.jsonRootUnwrapping = jsonRootUnwrapping;
         lexer = new JsonLexer(reader); 
         depth = 0;

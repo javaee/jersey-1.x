@@ -95,6 +95,6 @@ public final class WadlFactory {
      * @throws java.lang.ClassNotFoundException
      */
     private static void checkForJAXB() throws ClassNotFoundException {
-        Class<?> c = Class.forName("javax.xml.bind.JAXBElement");
+        Class.forName("javax.xml.bind.JAXBElement");
     }
 }

@@ -561,7 +561,8 @@ public final class WebApplicationImpl implements WebApplication {
         Object wr = WadlFactory.createWadlResource(rootResources);
         if (wr == null) return;
         
-        ResourceClass r = getResourceClass(WadlResource.class);
+        // Preload wadl resource runtime meta data
+        getResourceClass(WadlResource.class);
         UriTemplate t = new PathTemplate(
                 "application.wadl",
                 false);
