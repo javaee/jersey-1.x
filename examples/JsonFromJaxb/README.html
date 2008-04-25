@@ -54,8 +54,8 @@ build and deploy the project by pressing <b>F6</b> (Run Main Project)
 
 <h4>Test Client Running</h4>
 
-<p>Open <b>JsonFromJaxb Test Client</b> project located in <code>JsonFromJaxbTestClient</code> subdirecory.
-Then press <code>F6</code> (Run Main Project).
+<p>Still in <b>JsonFromJaxb</b> project: right-click on <b>build.xml</b> file at <b>Files</b> view.
+Then select <b>Run Target...</b>, <b>Other Targets...</b> and finally <b>run-test-client</b> target.
 
 
 <h3>Running Without Netbeans 6.0</h3>
@@ -67,7 +67,7 @@ your glassfish installation directory.
 
 You make it from <code>JsonFromJaxb</code> directory by
 <pre class="cliSample">
-$AS_HOME/lib/ant/bin/ant 
+ant 
 $AS_HOME/bin/asadmin start-domain
 $AS_HOME/bin/asadmin deploy dist/JsonFromJaxb.war
 </pre>
@@ -75,8 +75,7 @@ $AS_HOME/bin/asadmin deploy dist/JsonFromJaxb.war
 <h4>Test Client Running</h4>
 
 <pre class="cliSample">
-cd JsonFromJaxbTestClient
-$AS_HOME/lib/ant/bin/ant run
+ant run-test-client
 </pre>
 
   </body>
