@@ -20,7 +20,7 @@
  *     "Portions Copyrighted [year] [name of copyright owner]"
  */
 
-package com.sun.ws.rest.samples.jsonfromjaxb.util;
+package com.sun.ws.rest.samples.jsonfromjaxb.config;
 
 import com.sun.ws.rest.impl.json.JSONJAXBContext;
 import com.sun.ws.rest.samples.jsonfromjaxb.jaxb.FlightType;
@@ -49,8 +49,9 @@ public final class JAXBContextResolver implements ContextResolver<JAXBContext> {
     
     public JAXBContextResolver() throws Exception {
         Map<String, Object> props = new HashMap<String, Object>();
-        props.put(JSONJAXBContext.JSON_NOTATION, "BADGERFISH");
-        props.put(JSONJAXBContext.JSON_ROOT_UNWRAPPING, Boolean.FALSE);
+        props.put(JSONJAXBContext.JSON_NOTATION, "MAPPED");
+        props.put(JSONJAXBContext.JSON_ROOT_UNWRAPPING, Boolean.TRUE);
+        props.put(JSONJAXBContext.JSON_NON_STRINGS, "[\"number\"]");
         this.types = new HashSet(Arrays.asList(cTypes));
         this.context = new JSONJAXBContext(cTypes, props);
     }

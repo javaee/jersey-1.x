@@ -29,6 +29,7 @@
 
 package com.sun.ws.rest.samples.jsonfromjaxb.jaxb;
 
+import java.util.Formatter;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
@@ -160,6 +161,13 @@ public class FlightType {
      */
     public void setFlightId(String value) {
         this.flightId = value;
+    }
+    
+    @Override
+    public String toString() {
+        return (new Formatter()).format(
+                "{\"fligthId\":\"%s\",\"company\":\"%s\",\"number\":%d,\"aircraft\":\"%s\"}", 
+                this.flightId, this.company, this.number, this.aircraft).toString();
     }
 
 }

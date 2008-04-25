@@ -95,5 +95,10 @@ public class Flights {
         }
         return this.flight;
     }
+    
+    @Override
+    public String toString() {
+        return (this.flight != null) ? "{\"flight\": " + this.flight.toString() + "}" : "{flight:[]}";
+    }
 
 }

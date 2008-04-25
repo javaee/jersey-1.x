@@ -19,19 +19,15 @@
  * enclosed by brackets [] replaced by your own identifying information:
  *     "Portions Copyrighted [year] [name of copyright owner]"
  */
-
-
 package com.sun.ws.rest.samples.jsonfromjaxbtestclient;
 
-import com.sun.ws.rest.samples.jsonfromjaxbtestclient.util.MyContentHandlerFactory;
-import java.io.ByteArrayInputStream;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.net.HttpURLConnection;
-import java.net.URL;
+import com.sun.ws.rest.api.client.Client;
+import com.sun.ws.rest.api.client.WebResource;
+import com.sun.ws.rest.api.client.config.ClientConfig;
+import com.sun.ws.rest.api.client.config.DefaultClientConfig;
+import com.sun.ws.rest.samples.jsonfromjaxb.config.JAXBContextResolver;
+import com.sun.ws.rest.samples.jsonfromjaxb.jaxb.Flights;
 import java.util.Formatter;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  *
@@ -41,98 +37,51 @@ public class Main {
 
     static final String UrlBase = "http://localhost:8080/JsonFromJaxb/resources/";
 
-    static final class HttpResponse {
-
-        Object content;
-        int code;
-        String message;
-    }
-
-    static HttpResponse makeHttpRequest(String method, String url, Map<String, String> headers, InputStream is) throws Exception {
-        HttpResponse response = new HttpResponse();
-        URL urlAddress = new URL(url);
-        HttpURLConnection huc = (HttpURLConnection) urlAddress.openConnection();
-        huc.setRequestMethod(method);
-        if (null != is) {
-            huc.setDoOutput(true);
-            for (String key : headers.keySet()) {
-                huc.setRequestProperty(key, headers.get(key));
-            }
-            //huc.setRequestProperty("Content-Type", contentType);
-            //huc.setRequestProperty("Accept", accept);
-            OutputStream os = huc.getOutputStream();
-            byte[] buf = new byte[1024];
-            int read;
-            while ((read = is.read(buf)) != -1) {
-                os.write(buf, 0, read);
-            }
-        }
-        response.code = huc.getResponseCode();
-        response.message = huc.getResponseMessage();
-        if (HttpURLConnection.HTTP_NO_CONTENT != response.code) {
-            response.content = huc.getContent();
-        }
-        return response;
-    }
-
-    static HttpResponse makeHttpRequest(String method, String url, String contentType, String content) throws Exception {
-        Map<String, String> headers = new HashMap<String, String>();
-        headers.put("Content-Type", contentType);
-        return makeHttpRequest(method, url, headers, new ByteArrayInputStream(content.getBytes("UTF-8")));
-    }
-
-    static HttpResponse makeHttpRequest(String method, String url) throws Exception {
-        return makeHttpRequest(method, url, null, (InputStream) null);
-    }
-
     /**
      * @param args the command line arguments
      */
     public static void main(String[] args) {
-        
-        HttpURLConnection.setContentHandlerFactory(new MyContentHandlerFactory());
-        
-        Map<String, String> acceptXmlHeaders = new HashMap<String, String>();
-        acceptXmlHeaders.put("Accept", "application/xml");
-        
-        HttpResponse response;
 
         try {
-            System.out.println("Getting list of flights:");
-            response = makeHttpRequest("GET", UrlBase + "flights/");
-            System.out.println(new Formatter().format("List of flights found:\n%s", response.content));
-            System.out.println("-----");
+            // create a client:
             
-//            String updatedList = "{\"flights\":{\"flight\":[{\"@flightId\":\"OK125\",\"aircraft\":{\"$\":\"B737\"},\"company\":{\"$\":\"Czech Airlines\"},\"number\":{\"$\":\"125\"}},{\"@flightId\":\"OK126\",\"aircraft\":{\"$\":\"AB115\"},\"company\":{\"$\":\"Czech Airlines\"},\"number\":{\"$\":\"126\"}}]}}";
-            String updatedListJson = "{\"flights\":{\"flight\":[{\"@flightId\":\"OK125\",\"aircraft\":{\"$\":\"B737\"},\"company\":{\"$\":\"Czech Airlines\"},\"number\":{\"$\":\"125\"}}]}}";
-            System.out.println("Updating list of flights (JSON):");
-            response = makeHttpRequest(
-                    "PUT",
-                    UrlBase + "flights/",
-                    "application/json",
-                    updatedListJson);
-            System.out.println(new Formatter().format("Response code: %d \n%s", response.code, response.message));
-            System.out.println("-----");
-
-            System.out.println("Getting list of updated flights:");
-            response = makeHttpRequest("GET", UrlBase + "flights/");
-            System.out.println(new Formatter().format("List of flights found:\n%s", response.content));
-            System.out.println("-----");
+            ClientConfig cc = new DefaultClientConfig();
+            // use the following jaxb context resolver
+            cc.getProviderClasses().add(JAXBContextResolver.class);
+            Client c = Client.create(cc);
             
-            String updatedListXml = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?><flights><flight flightId=\"OK126\"><company>Czech Airlines</company><number>126</number><aircraft>B737</aircraft></flight></flights>";
-            System.out.println("Updating list of flights (XML):");
-            response = makeHttpRequest(
-                    "PUT",
-                    UrlBase + "flights/",
-                    "application/xml",
-                    updatedListXml);
-            System.out.println(new Formatter().format("Response code: %d \n%s", response.code, response.message));
-            System.out.println("-----");
+            WebResource wr = c.resource(UrlBase);
+            
+            
+            // get the initial representation
+            
+            Flights flights = wr.path("flights/").accept("application/json").get(Flights.class);
+            
+            // and print it out
+            
+            System.out.println(new Formatter().format("List of flights found:\n%s", flights.toString()));
+            
+            // update the list:
+                        
+            // remove the second row
+            if (flights.getFlight().size() > 1) {
+                flights.getFlight().remove(1);
+            }
+            
+            // update the first one
+            flights.getFlight().get(0).setNumber(125);
+            flights.getFlight().get(0).setFlightId("OK125");
+            
+            
+            // and send the updated list back to the server
+            wr.path("flights/").type("application/json").put(flights);
+            
 
-            System.out.println("Getting list of updated flights:");
-            response = makeHttpRequest("GET", UrlBase + "flights/", acceptXmlHeaders, null);
-            System.out.println(new Formatter().format("List of flights found:\n%s", response.content));
-            System.out.println("-----");
+            // get the updated list out from the server:
+            Flights updatedFlights = wr.path("flights/").accept("application/json").get(Flights.class);
+            // and print it out:
+            System.out.println(new Formatter().format("List of updated flights:\n%s", updatedFlights.toString()));
+            
         } catch (Exception e) {
             System.out.println("TEST FAILED! :-(");
             e.printStackTrace(System.out);
