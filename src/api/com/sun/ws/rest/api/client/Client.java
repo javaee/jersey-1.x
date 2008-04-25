@@ -30,7 +30,7 @@ import com.sun.ws.rest.impl.application.ContextResolverFactory;
 import com.sun.ws.rest.impl.application.MessageBodyFactory;
 import com.sun.ws.rest.impl.client.urlconnection.URLConnectionClientHandler;
 import com.sun.ws.rest.spi.container.MessageBodyContext;
-import com.sun.ws.rest.spi.resource.Injectable;
+import com.sun.ws.rest.spi.resource.TypeInjectable;
 import com.sun.ws.rest.spi.service.ComponentProvider;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
@@ -58,7 +58,7 @@ import javax.ws.rs.core.Context;
  * @author Paul.Sandoz@Sun.Com
  */
 public class Client extends Filterable implements ClientHandler {
-    private final Map<Type, Injectable> injectables;
+    private final Map<Type, TypeInjectable> injectables;
 
     private final ClientConfig config;
     
@@ -133,7 +133,7 @@ public class Client extends Filterable implements ClientHandler {
         }
     }
     
-    private abstract class HttpContextInjectable<V> extends Injectable<Context, V> {
+    private abstract class HttpContextInjectable<V> extends TypeInjectable<Context, V> {
         public Class<Context> getAnnotationClass() {
             return Context.class;
         }
@@ -174,7 +174,7 @@ public class Client extends Filterable implements ClientHandler {
         // Defer instantiation of root to component provider
         super(root);
     
-        this.injectables = new HashMap<Type, Injectable>();
+        this.injectables = new HashMap<Type, TypeInjectable>();
         
         this.config = config;
         // Allow injection of client config
@@ -222,7 +222,7 @@ public class Client extends Filterable implements ClientHandler {
      * @param fieldType the type of the field that will be injected.
      * @param injectable the injectable for the field.
      */
-    public final void addInjectable(Type fieldType, Injectable injectable) {
+    public final void addInjectable(Type fieldType, TypeInjectable injectable) {
         injectables.put(fieldType, injectable);
     }
     
@@ -261,7 +261,7 @@ public class Client extends Filterable implements ClientHandler {
     private void injectResources(Class oClass, Object o) {
         while (oClass != null) {
             for (Field f : oClass.getDeclaredFields()) {            
-                Injectable i = injectables.get(f.getGenericType());
+                TypeInjectable i = injectables.get(f.getGenericType());
                 if (i != null)
                     i.inject(o, f);
             }

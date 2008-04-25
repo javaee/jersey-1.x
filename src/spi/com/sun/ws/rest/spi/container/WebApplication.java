@@ -22,12 +22,15 @@
 
 package com.sun.ws.rest.spi.container;
 
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Type;
+
 import com.sun.ws.rest.api.container.ContainerException;
 import com.sun.ws.rest.api.core.HttpContext;
 import com.sun.ws.rest.api.core.ResourceConfig;
-import com.sun.ws.rest.spi.resource.Injectable;
+import com.sun.ws.rest.spi.resource.AnnotationInjectable;
+import com.sun.ws.rest.spi.resource.TypeInjectable;
 import com.sun.ws.rest.spi.service.ComponentProvider;
-import java.lang.reflect.Type;
 
 /**
  * A Web application that manages a set of Web resource.
@@ -95,14 +98,26 @@ public interface WebApplication {
     ComponentProvider getComponentProvider();
     
     /**
-     * Add an injectable resource to the set maintained by the application.
+     * Add an injectable resource for a known type (fieldType) to the set maintained by the application.
      * The fieldType is used as a unique key and therefore adding an injectable
      * for a type already supported will override the existing one.
      * 
      * @param fieldType the type of the field that will be injected
      * @param injectable the injectable for the field
      */
-    void addInjectable(Type fieldType, Injectable injectable);
+    void addInjectable(Type fieldType, TypeInjectable injectable);
+    
+    /**
+     * Add an injectable resource for a specific annotation to the set maintained by the application.
+     * The annotation class of the injectable ({@link AnnotationInjectable#getAnnotationClass()})
+     * is used as a unique key and therefore adding an injectable
+     * for an annotation already supported will override the existing one.
+     * 
+     * @param injectable the injectable for the field
+     * 
+     * @param <T> 
+     */
+    <T extends Annotation> void addInjectable(AnnotationInjectable<T> injectable);
     
     /**
      * Get an instance of {@link HttpContext} that is a proxy to

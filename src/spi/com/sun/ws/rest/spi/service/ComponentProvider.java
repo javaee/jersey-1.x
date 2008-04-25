@@ -66,6 +66,13 @@ public interface ComponentProvider {
          * <code>getInstance</code>.
          */
         ApplicationDefined,
+        
+        /**
+         * The JAX-RS application (jersey) does not care what the scope is,
+         * the component provider can decide which to choose - the component
+         * provider is responsible for managing instances of a type.
+         */
+        Undefined
     }
     
     /**

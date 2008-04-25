@@ -33,7 +33,7 @@ import com.sun.ws.rest.spi.container.ContainerListener;
 import com.sun.ws.rest.spi.container.ContainerNotifier;
 import com.sun.ws.rest.spi.container.WebApplication;
 import com.sun.ws.rest.spi.container.WebApplicationFactory;
-import com.sun.ws.rest.spi.resource.Injectable;
+import com.sun.ws.rest.spi.resource.TypeInjectable;
 import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Proxy;
@@ -321,7 +321,7 @@ public class ServletContainer extends HttpServlet implements ContainerListener {
         return WebApplicationFactory.createWebApplication();
     }
     
-    private abstract class ContextInjectable<V> extends Injectable<Context, V> {
+    private abstract class ContextInjectable<V> extends TypeInjectable<Context, V> {
         public Class<Context> getAnnotationClass() {
             return Context.class;
         }

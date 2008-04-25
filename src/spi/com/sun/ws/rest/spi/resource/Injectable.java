@@ -20,13 +20,6 @@
  *     "Portions Copyrighted [year] [name of copyright owner]"
  */
 
-/*
- * Injectable.java
- *
- * Created on August 2, 2007, 3:59 PM
- *
- */
-
 package com.sun.ws.rest.spi.resource;
 
 import com.sun.ws.rest.api.container.ContainerException;
@@ -36,11 +29,18 @@ import java.security.AccessController;
 import java.security.PrivilegedAction;
 
 /**
- * A utility base class for implementing injectable resources.
+ * A base class for implementing injectable functionality to a field that
+ * is annotated with a particular annotation and (optionally)
+ * the field is of a particular type.
  * 
+ * @param <T> the type of the annotation class.
+ * @param <V> the type of the injectable value.
  */
 public abstract class Injectable<T extends Annotation, V> {
+    
     public abstract Class<T> getAnnotationClass();
+    
+    public abstract V getInjectableValue(Object o, Field f, T a);
     
     public void inject(Object resource, Field f) {
         if (getFieldValue(resource, f) != null) {
@@ -55,12 +55,10 @@ public abstract class Injectable<T extends Annotation, V> {
             return;
         }
         
-        V value = getInjectableValue(a);
+        V value = getInjectableValue(resource, f, a);
         if (value != null)
             setFieldValue(resource, f, value);
     }
-    
-    public abstract V getInjectableValue(T a);
     
     private void setFieldValue(final Object resource, final Field f, final Object value) {
         AccessController.doPrivileged(new PrivilegedAction<Object>() {

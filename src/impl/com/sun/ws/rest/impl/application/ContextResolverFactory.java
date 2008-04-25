@@ -22,7 +22,7 @@
 
 package com.sun.ws.rest.impl.application;
 
-import com.sun.ws.rest.spi.resource.Injectable;
+import com.sun.ws.rest.spi.resource.TypeInjectable;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
@@ -43,7 +43,7 @@ public final class ContextResolverFactory {
     private static final Logger LOGGER = Logger.getLogger(ContextResolverFactory.class.getName());
     
     private static final class ContextResolverInjectable 
-            extends Injectable<Context, ContextResolver> {
+            extends TypeInjectable<Context, ContextResolver> {
         
         private final ContextResolver cr;
                 
@@ -60,8 +60,8 @@ public final class ContextResolverFactory {
         }
     }
     
-    private final Map<Type, Injectable<Context, ContextResolver>> injectables = 
-                new HashMap<Type, Injectable<Context, ContextResolver>>();
+    private final Map<Type, TypeInjectable<Context, ContextResolver>> injectables = 
+                new HashMap<Type, TypeInjectable<Context, ContextResolver>>();
     
     public ContextResolverFactory(ComponentProviderCache componentProviderCache) {        
         Set<ContextResolver> providers = 
@@ -78,7 +78,7 @@ public final class ContextResolverFactory {
     }
 
     
-    public Map<Type, Injectable<Context, ContextResolver>> getInjectables() {
+    public Map<Type, TypeInjectable<Context, ContextResolver>> getInjectables() {
         return injectables;
     }
     

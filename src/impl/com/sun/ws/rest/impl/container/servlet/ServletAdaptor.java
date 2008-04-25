@@ -26,7 +26,7 @@ import com.sun.ws.rest.api.container.ContainerException;
 import com.sun.ws.rest.api.core.ResourceConfig;
 import com.sun.ws.rest.spi.container.WebApplication;
 import com.sun.ws.rest.spi.container.servlet.ServletContainer;
-import com.sun.ws.rest.spi.resource.Injectable;
+import com.sun.ws.rest.spi.resource.TypeInjectable;
 import java.lang.reflect.Proxy;
 import java.util.Enumeration;
 import java.util.HashMap;
@@ -80,7 +80,7 @@ public class ServletAdaptor extends ServletContainer {
         }
         
         wa.addInjectable(EntityManagerFactory.class,
-                new Injectable<PersistenceUnit, EntityManagerFactory>() {
+                new TypeInjectable<PersistenceUnit, EntityManagerFactory>() {
             public Class<PersistenceUnit> getAnnotationClass() {
                 return PersistenceUnit.class;
             }

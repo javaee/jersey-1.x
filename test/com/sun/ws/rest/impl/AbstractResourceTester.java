@@ -22,24 +22,28 @@
 
 package com.sun.ws.rest.impl;
 
-import com.sun.ws.rest.api.core.ResourceConfig;
-import com.sun.ws.rest.api.client.ClientRequest;
-import com.sun.ws.rest.api.client.ClientResponse;
-import com.sun.ws.rest.impl.application.WebApplicationImpl;
-import com.sun.ws.rest.api.core.DefaultResourceConfig;
-import com.sun.ws.rest.api.client.Client;
-import com.sun.ws.rest.api.client.WebResource;
-import com.sun.ws.rest.api.client.ClientFilter;
-import com.sun.ws.rest.api.client.config.ClientConfig;
-import com.sun.ws.rest.spi.container.WebApplication;
 import java.lang.annotation.Annotation;
 import java.net.URI;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
+
 import javax.ws.rs.Path;
 import javax.ws.rs.ext.Provider;
+
 import junit.framework.TestCase;
+
+import com.sun.ws.rest.api.client.Client;
+import com.sun.ws.rest.api.client.ClientFilter;
+import com.sun.ws.rest.api.client.ClientRequest;
+import com.sun.ws.rest.api.client.ClientResponse;
+import com.sun.ws.rest.api.client.WebResource;
+import com.sun.ws.rest.api.client.config.ClientConfig;
+import com.sun.ws.rest.api.core.DefaultResourceConfig;
+import com.sun.ws.rest.api.core.ResourceConfig;
+import com.sun.ws.rest.impl.application.WebApplicationImpl;
+import com.sun.ws.rest.spi.container.WebApplication;
+import com.sun.ws.rest.spi.service.ComponentProvider;
 
 /**
  *
@@ -54,6 +58,10 @@ public abstract class AbstractResourceTester extends TestCase {
         super(testName);
     }
     
+    protected void initiateWebApplication(ComponentProvider cp, Class... classes) {
+        w = createWebApplication(cp, classes);
+    }
+    
     protected void initiateWebApplication(Class... classes) {
         w = createWebApplication(classes);
     }
@@ -63,21 +71,29 @@ public abstract class AbstractResourceTester extends TestCase {
     }
     
     private WebApplication createWebApplication(Class... classes) {
-        return createWebApplication(new HashSet<Class>(Arrays.asList(classes)));
+        return createWebApplication(null, classes);
     }
     
-    private WebApplication createWebApplication(Set<Class> classes) {
+    private WebApplication createWebApplication(ComponentProvider cp, Class... classes) {
+        return createWebApplication(cp, new HashSet<Class>(Arrays.asList(classes)));
+    }
+    
+    private WebApplication createWebApplication(ComponentProvider cp, Set<Class> classes) {
         ResourceConfig rc = new DefaultResourceConfig(
                 getMatchingClasses(classes, Path.class));
         rc.getProviderClasses().addAll(
                 getMatchingClasses(classes, Provider.class));
         
-        return createWebApplication(rc);
+        return createWebApplication(rc, cp);
     }
     
     private WebApplication createWebApplication(ResourceConfig c) {
+        return createWebApplication(c, null);
+    }
+    
+    private WebApplication createWebApplication(ResourceConfig c, ComponentProvider cp) {
         WebApplicationImpl a = new WebApplicationImpl();
-        a.initiate(c);
+        a.initiate(c, cp);
         return a;
     }
 

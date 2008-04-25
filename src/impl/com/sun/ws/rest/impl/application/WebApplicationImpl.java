@@ -22,48 +22,14 @@
 
 package com.sun.ws.rest.impl.application;
 
-import com.sun.ws.rest.spi.resource.Injectable;
-import java.lang.reflect.InvocationHandler;
-import java.lang.reflect.Method;
-import javax.ws.rs.WebApplicationException;
-import com.sun.ws.rest.api.container.ContainerException;
-import com.sun.ws.rest.api.core.HttpContext;
-import com.sun.ws.rest.api.core.HttpResponseContext;
-import com.sun.ws.rest.api.core.ResourceConfig;
-import com.sun.ws.rest.api.model.AbstractResource;
-import com.sun.ws.rest.impl.ThreadLocalHttpContext;
-import com.sun.ws.rest.impl.model.ResourceClass;
-import com.sun.ws.rest.impl.model.RulesMap;
-import com.sun.ws.rest.api.Responses;
-import com.sun.ws.rest.api.model.AbstractResource;
-import com.sun.ws.rest.api.model.ResourceModelIssue;
-import com.sun.ws.rest.impl.uri.PathPattern;
-import com.sun.ws.rest.impl.uri.PathTemplate;
-import com.sun.ws.rest.api.uri.UriTemplate;
-import com.sun.ws.rest.impl.ImplMessages;
-import com.sun.ws.rest.impl.modelapi.annotation.IntrospectionModeller;
-import com.sun.ws.rest.impl.modelapi.validation.BasicValidator;
-import com.sun.ws.rest.spi.template.TemplateContext;
-import com.sun.ws.rest.impl.template.TemplateFactory;
-import com.sun.ws.rest.impl.uri.rules.ResourceClassRule;
-import com.sun.ws.rest.impl.uri.rules.RightHandPathRule;
-import com.sun.ws.rest.impl.uri.rules.RootResourceClassesRule;
-import com.sun.ws.rest.impl.uri.UriHelper;
-import com.sun.ws.rest.impl.uri.rules.ResourceObjectRule;
-import com.sun.ws.rest.impl.wadl.WadlFactory;
-import com.sun.ws.rest.impl.wadl.WadlResource;
-import com.sun.ws.rest.spi.container.ContainerRequest;
-import com.sun.ws.rest.spi.container.ContainerResponse;
-import com.sun.ws.rest.spi.container.MessageBodyContext;
-import com.sun.ws.rest.spi.container.WebApplication;
-import com.sun.ws.rest.spi.resource.ResourceProviderFactory;
-import com.sun.ws.rest.spi.service.ComponentProvider;
-import com.sun.ws.rest.spi.uri.rules.UriRule;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.Proxy;
 import java.lang.reflect.Type;
@@ -77,6 +43,8 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
@@ -87,6 +55,44 @@ import javax.ws.rs.core.SecurityContext;
 import javax.ws.rs.core.UriInfo;
 import javax.ws.rs.ext.MessageBodyWorkers;
 import javax.ws.rs.ext.Provider;
+
+import com.sun.ws.rest.api.Responses;
+import com.sun.ws.rest.api.container.ContainerException;
+import com.sun.ws.rest.api.core.HttpContext;
+import com.sun.ws.rest.api.core.HttpResponseContext;
+import com.sun.ws.rest.api.core.ResourceConfig;
+import com.sun.ws.rest.api.core.ResourceContext;
+import com.sun.ws.rest.api.model.AbstractResource;
+import com.sun.ws.rest.api.model.ResourceModelIssue;
+import com.sun.ws.rest.api.uri.UriTemplate;
+import com.sun.ws.rest.impl.ImplMessages;
+import com.sun.ws.rest.impl.ThreadLocalHttpContext;
+import com.sun.ws.rest.impl.model.ResourceClass;
+import com.sun.ws.rest.impl.model.RulesMap;
+import com.sun.ws.rest.impl.modelapi.annotation.IntrospectionModeller;
+import com.sun.ws.rest.impl.modelapi.validation.BasicValidator;
+import com.sun.ws.rest.impl.template.TemplateFactory;
+import com.sun.ws.rest.impl.uri.PathPattern;
+import com.sun.ws.rest.impl.uri.PathTemplate;
+import com.sun.ws.rest.impl.uri.UriHelper;
+import com.sun.ws.rest.impl.uri.rules.ResourceClassRule;
+import com.sun.ws.rest.impl.uri.rules.ResourceObjectRule;
+import com.sun.ws.rest.impl.uri.rules.RightHandPathRule;
+import com.sun.ws.rest.impl.uri.rules.RootResourceClassesRule;
+import com.sun.ws.rest.impl.wadl.WadlFactory;
+import com.sun.ws.rest.impl.wadl.WadlResource;
+import com.sun.ws.rest.spi.container.ContainerRequest;
+import com.sun.ws.rest.spi.container.ContainerResponse;
+import com.sun.ws.rest.spi.container.MessageBodyContext;
+import com.sun.ws.rest.spi.container.WebApplication;
+import com.sun.ws.rest.spi.resource.AnnotationInjectable;
+import com.sun.ws.rest.spi.resource.Inject;
+import com.sun.ws.rest.spi.resource.ResourceProviderFactory;
+import com.sun.ws.rest.spi.resource.TypeInjectable;
+import com.sun.ws.rest.spi.service.ComponentProvider;
+import com.sun.ws.rest.spi.service.ComponentProvider.Scope;
+import com.sun.ws.rest.spi.template.TemplateContext;
+import com.sun.ws.rest.spi.uri.rules.UriRule;
 
 /**
  * A Web application that contains a set of resources, each referenced by 
@@ -111,8 +117,10 @@ public final class WebApplicationImpl implements WebApplication {
     private final Request requestProxy;
     
     private final SecurityContext securityContextProxy; 
+
+    private final Map<Class<? extends Annotation>, AnnotationInjectable> annotationInjectables;
     
-    private final Map<Type, Injectable> injectables;
+    private final Map<Type, TypeInjectable> typeInjectables;
             
     private boolean initiated;
     
@@ -125,6 +133,8 @@ public final class WebApplicationImpl implements WebApplication {
     private ComponentProvider provider;
     
     private TemplateContext templateContext;
+
+    private ResourceContext resourceContext;
     
     public WebApplicationImpl() {
         this.resolverFactory = ResourceProviderFactory.getInstance();
@@ -146,7 +156,8 @@ public final class WebApplicationImpl implements WebApplication {
         };
         this.uriInfoProxy = createProxy(UriInfo.class, uriInfoHandler);
         
-        this.injectables = createInjectables();
+        this.annotationInjectables = createAnnotationInjectables();
+        this.typeInjectables = createTypeInjectables();
     }
     
     @Override
@@ -227,12 +238,29 @@ public final class WebApplicationImpl implements WebApplication {
         injectResources(o.getClass(), o);
     }
     
-    private void injectResources(Class oClass, Object o) {
+    private void injectResources(Class oClass, final Object o) {
         while (oClass != null) {
-            for (Field f : oClass.getDeclaredFields()) {            
-                Injectable i = injectables.get(f.getGenericType());
-                if (i != null)
+            for (final Field f : oClass.getDeclaredFields()) {    
+                /* first try to inject using type injectables
+                 */
+                final TypeInjectable i = typeInjectables.get(f.getGenericType());
+                if (i != null) {
                     i.inject(o, f);
+                }
+                else {
+                    /* if there was no injectable registered for the field type try
+                     * annotation based injection
+                     */
+                    final Annotation[] annotations = f.getAnnotations();
+                    if ( annotations != null && annotations.length > 0 ) {
+                        for ( Annotation annotation : annotations ) {
+                            final AnnotationInjectable injectable = annotationInjectables.get( annotation.annotationType() );
+                            if ( injectable != null ) {
+                                injectable.inject( o, f );
+                            }
+                        }
+                    }
+                }
             }
             oClass = oClass.getSuperclass();
         }
@@ -328,7 +356,6 @@ public final class WebApplicationImpl implements WebApplication {
         
         this.resourceConfig = resourceConfig;
         verifyResourceConfig();
-
         
         // Allow injection of resource config
         addInjectable(ResourceConfig.class,
@@ -338,6 +365,27 @@ public final class WebApplicationImpl implements WebApplication {
                     }
                 }
             );
+
+        this.resourceContext = new ResourceContext() {
+            public <T> T getResource(Class<T> c) {
+                final ResourceClass rc = getResourceClass(c);
+                if (rc == null) {
+                    LOGGER.severe("No resource class found for class " + c.getName());
+                    throw new ContainerException("No resource class found for class " + c.getName());
+                }
+                final Object instance = rc.resolver.getInstance(
+                        WebApplicationImpl.this.provider, context);
+                return instance != null ? c.cast(instance) : null;
+            }            
+        };
+        
+        // Allow injection of resource context
+        addInjectable(ResourceContext.class, new ContextInjectable<ResourceContext>() {
+            @Override
+            public ResourceContext getInjectableValue(Context a) {
+                return WebApplicationImpl.this.resourceContext;
+            }            
+        });
 
         // Set up the component provider
         this.provider = (provider == null)
@@ -350,7 +398,7 @@ public final class WebApplicationImpl implements WebApplication {
 
         // Obtain all context resolvers
         ContextResolverFactory crf = new ContextResolverFactory(cpc);
-        this.injectables.putAll(crf.getInjectables());
+        this.typeInjectables.putAll(crf.getInjectables());
 
         // Obtain all the templates
         this.templateContext = new TemplateFactory(cpc);
@@ -422,8 +470,15 @@ public final class WebApplicationImpl implements WebApplication {
         }
     }
     
-    public void addInjectable(Type fieldType, Injectable injectable) {
-        injectables.put(fieldType, injectable);
+    public void addInjectable(Type fieldType, TypeInjectable injectable) {
+        typeInjectables.put(fieldType, injectable);
+    }
+
+    public <T extends Annotation> void addInjectable(AnnotationInjectable<T> injectable) {
+        if ( injectable.getAnnotationClass() == null ) {
+            throw new IllegalArgumentException( "The annotation class must not be null." );
+        }
+        annotationInjectables.put( injectable.getAnnotationClass(), injectable );
     }
     
     public HttpContext getThreadLocalHttpContext() {
@@ -596,14 +651,45 @@ public final class WebApplicationImpl implements WebApplication {
             i);
     }
     
-    private abstract class ContextInjectable<V> extends Injectable<Context, V> {
+    private Map<Class<? extends Annotation>, AnnotationInjectable> createAnnotationInjectables() {
+        final Map<Class<? extends Annotation>, AnnotationInjectable> result = 
+                new HashMap<Class<? extends Annotation>, AnnotationInjectable>();
+        
+        /* create an injectable for @Inject, that injects instances
+         * pulled from the component provider
+         */
+        result.put(Inject.class, new AnnotationInjectable<Inject>() {
+            @Override
+            public Object getInjectableValue(Object o, Field f) {
+                try {
+                    return WebApplicationImpl.this.provider.getInstance(
+                            Scope.Undefined, f.getType());
+                } catch (Exception e) {
+                    LOGGER.log(Level.SEVERE, "Could not get instance from component provider for type " + 
+                            f.getType() +
+                            " when trying to inject this on " + o.getClass().getName(), e);
+                    throw new ContainerException("Could not get instance from component provider for type " + 
+                            f.getType(), e );
+                }
+            }
+
+            @Override
+            public Class<Inject> getAnnotationClass() {
+                return Inject.class;
+            }            
+        });
+        
+        return result;
+    }
+    
+    private abstract class ContextInjectable<V> extends TypeInjectable<Context, V> {
         public Class<Context> getAnnotationClass() {
             return Context.class;
         }
     }
     
-    private Map<Type, Injectable> createInjectables() {
-        Map<Type, Injectable> is = new HashMap<Type, Injectable>();
+    private Map<Type, TypeInjectable> createTypeInjectables() {
+        Map<Type, TypeInjectable> is = new HashMap<Type, TypeInjectable>();
                 
         is.put(MessageBodyContext.class,
                 new ContextInjectable<MessageBodyContext>() {
