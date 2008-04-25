@@ -30,13 +30,13 @@ import java.io.IOException;
 import java.lang.annotation.Documented;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
-import java.lang.reflect.Field;
 
+import java.lang.reflect.Field;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 
 import com.sun.ws.rest.impl.AbstractResourceTester;
-import com.sun.ws.rest.spi.resource.AnnotationInjectable;
+import com.sun.ws.rest.spi.resource.Injectable;
 
 /**
  * TODO: DESCRIBE ME<br>
@@ -68,10 +68,9 @@ public class AnnotationInjectableTest extends AbstractResourceTester {
         final String value = "foo";
         
         initiateWebApplication(MyResource.class);
-        super.w.addInjectable( new AnnotationInjectable<MyAnnotation>() {
-
+        super.w.addInjectable(new Injectable<MyAnnotation, String>() {
             @Override
-            public Object getInjectableValue( Object o, Field f ) {
+            public String getInjectableValue(Object o, Field f, MyAnnotation a) {
                 return value;
             }
 
@@ -79,7 +78,6 @@ public class AnnotationInjectableTest extends AbstractResourceTester {
             public Class<MyAnnotation> getAnnotationClass() {
                 return MyAnnotation.class;
             }
-            
         });
         
         assertEquals( value, resource("/").get(String.class) );   

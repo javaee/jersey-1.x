@@ -28,7 +28,7 @@ import java.lang.reflect.Type;
 import com.sun.ws.rest.api.container.ContainerException;
 import com.sun.ws.rest.api.core.HttpContext;
 import com.sun.ws.rest.api.core.ResourceConfig;
-import com.sun.ws.rest.spi.resource.AnnotationInjectable;
+import com.sun.ws.rest.spi.resource.Injectable;
 import com.sun.ws.rest.spi.resource.TypeInjectable;
 import com.sun.ws.rest.spi.service.ComponentProvider;
 
@@ -115,9 +115,10 @@ public interface WebApplication {
      * 
      * @param injectable the injectable for the field
      * 
-     * @param <T> 
+     * @param <T> the annotation type
+     * @param <V> the field type 
      */
-    <T extends Annotation> void addInjectable(AnnotationInjectable<T> injectable);
+    <T extends Annotation, V> void addInjectable(Injectable<T, V> injectable);
     
     /**
      * Get an instance of {@link HttpContext} that is a proxy to

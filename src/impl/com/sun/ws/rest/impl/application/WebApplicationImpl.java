@@ -85,7 +85,7 @@ import com.sun.ws.rest.spi.container.ContainerRequest;
 import com.sun.ws.rest.spi.container.ContainerResponse;
 import com.sun.ws.rest.spi.container.MessageBodyContext;
 import com.sun.ws.rest.spi.container.WebApplication;
-import com.sun.ws.rest.spi.resource.AnnotationInjectable;
+import com.sun.ws.rest.spi.resource.Injectable;
 import com.sun.ws.rest.spi.resource.Inject;
 import com.sun.ws.rest.spi.resource.ResourceProviderFactory;
 import com.sun.ws.rest.spi.resource.TypeInjectable;
@@ -118,7 +118,8 @@ public final class WebApplicationImpl implements WebApplication {
     
     private final SecurityContext securityContextProxy; 
 
-    private final Map<Class<? extends Annotation>, AnnotationInjectable> annotationInjectables;
+    private final Map<Class<? extends Annotation>, Injectable<? extends Annotation, ?>> 
+            annotationInjectables;
     
     private final Map<Type, TypeInjectable> typeInjectables;
             
@@ -254,9 +255,10 @@ public final class WebApplicationImpl implements WebApplication {
                     final Annotation[] annotations = f.getAnnotations();
                     if ( annotations != null && annotations.length > 0 ) {
                         for ( Annotation annotation : annotations ) {
-                            final AnnotationInjectable injectable = annotationInjectables.get( annotation.annotationType() );
-                            if ( injectable != null ) {
-                                injectable.inject( o, f );
+                            final Injectable injectable = annotationInjectables.get(
+                                    annotation.annotationType());
+                            if (injectable != null) {
+                                injectable.inject(o, f);
                             }
                         }
                     }
@@ -474,11 +476,11 @@ public final class WebApplicationImpl implements WebApplication {
         typeInjectables.put(fieldType, injectable);
     }
 
-    public <T extends Annotation> void addInjectable(AnnotationInjectable<T> injectable) {
-        if ( injectable.getAnnotationClass() == null ) {
-            throw new IllegalArgumentException( "The annotation class must not be null." );
+    public <T extends Annotation, V> void addInjectable(Injectable<T, V> injectable) {
+        if (injectable.getAnnotationClass() == null) {
+            throw new IllegalArgumentException("The annotation class must not be null.");
         }
-        annotationInjectables.put( injectable.getAnnotationClass(), injectable );
+        annotationInjectables.put(injectable.getAnnotationClass(), injectable);
     }
     
     public HttpContext getThreadLocalHttpContext() {
@@ -651,16 +653,17 @@ public final class WebApplicationImpl implements WebApplication {
             i);
     }
     
-    private Map<Class<? extends Annotation>, AnnotationInjectable> createAnnotationInjectables() {
-        final Map<Class<? extends Annotation>, AnnotationInjectable> result = 
-                new HashMap<Class<? extends Annotation>, AnnotationInjectable>();
+    private Map<Class<? extends Annotation>, Injectable<? extends Annotation, ?>>
+            createAnnotationInjectables() {
+        final Map<Class<? extends Annotation>, Injectable<? extends Annotation, ?>> result = 
+                new HashMap<Class<? extends Annotation>, Injectable<? extends Annotation, ?>>();
         
         /* create an injectable for @Inject, that injects instances
          * pulled from the component provider
          */
-        result.put(Inject.class, new AnnotationInjectable<Inject>() {
+        result.put(Inject.class, new Injectable<Inject, Object>() {
             @Override
-            public Object getInjectableValue(Object o, Field f) {
+            public Object getInjectableValue(Object o, Field f, Inject a) {
                 try {
                     return WebApplicationImpl.this.provider.getInstance(
                             Scope.Undefined, f.getType());
@@ -676,7 +679,7 @@ public final class WebApplicationImpl implements WebApplication {
             @Override
             public Class<Inject> getAnnotationClass() {
                 return Inject.class;
-            }            
+            }
         });
         
         return result;

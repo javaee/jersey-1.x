@@ -29,9 +29,9 @@ import java.security.AccessController;
 import java.security.PrivilegedAction;
 
 /**
- * A base class for implementing injectable functionality to a field that
- * is annotated with a particular annotation and (optionally)
- * the field is of a particular type.
+ * Injectable functionality to a field that is annotated with a particular 
+ * annotation. The annotation and field types supported are determined by 
+ * implementations of this class.
  * 
  * @param <T> the type of the annotation class.
  * @param <V> the type of the injectable value.
