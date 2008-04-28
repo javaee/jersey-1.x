@@ -28,7 +28,8 @@
     
     <target name="run-server" depends="jar">
         <property file="nbproject/project.properties"/>
-        <java fork="true" classname="com.sun.ws.rest.samples.optimisticconcurrency.Server" classpath="${run.classpath}">
+        <java fork="true" classname="com.sun.jersey.samples.optimisticconcurrency.Server" 
+        classpath="${run.classpath}">
         </java>
     </target>    
 </project>

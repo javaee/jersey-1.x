@@ -32,7 +32,7 @@
     </target>
     
     <target name="run" depends="compile">
-        <java fork="true" classname="mandel.MandelServer"
+        <java fork="true" classname="com.sun.jersey.samples.mandel.MandelServer"
             classpath="${run.classpath}">
         </java>
     </target>

@@ -20,13 +20,13 @@
     <h2>Contents</h2>
     <p>The example consists of two web resources implemented by the following:
         </p><dl>
-            <dt><code>com.sun.ws.rest.samples.optimisticconcurrency.resources.ItemResource</code></dt>
+            <dt><code>com.sun.jersey.samples.optimisticconcurrency.resources.ItemResource</code></dt>
             <dd>This resource class provides meta-data information on the URIs to content resources 
                 that can be read and updated. JAXB is used to represent the meta-data as an XML document.
                 The resource references the ItemContentResource resource using the 
                 Path annotation declared on the ItemResource.getItemContentResource method.
             </dd>
-            <dt><code>com.sun.ws.rest.samples.optimisticconcurrency.resources.ItemContentResource</code></dt>
+            <dt><code>com.sun.jersey.samples.optimisticconcurrency.resources.ItemContentResource</code></dt>
             <dd>This resource class provides read and update ccess to the content. In this example, the
                 content is stored in memory as a byte array and is not persisted to a 
                 file system or database.

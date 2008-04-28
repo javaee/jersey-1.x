@@ -21,18 +21,18 @@
     <h2>Contents</h2>
     <p>The example consists of three web resources implemented by the following:
         </p><dl>
-            <dt><code>com.sun.ws.rest.samples.storageservice.resources.ContainersResource</code></dt>
+            <dt><code>com.sun.jersey.samples.storageservice.resources.ContainersResource</code></dt>
             <dd>This Java class provides meta-data information on the containers.
                 The resource references the ContainerResource resource using the 
                 Path annotation declared on the ContainersResource.getContainerResource method.
             </dd>
-            <dt><code>com.sun.ws.rest.samples.storageservice.resources.ContainerResource</code></dt>
+            <dt><code>com.sun.jersey.samples.storageservice.resources.ContainerResource</code></dt>
             <dd>This Java class provides read, create and delete of a container.
                 Searching of items is supported using a URI query parameter.
                 The resource dynamically references the ItemResource resource using the 
                 getItemResource method that is annotated with Path.
             </dd>
-            <dt><code>com.sun.ws.rest.samples.storageservice.resources.ItemResource</code></dt>
+            <dt><code>com.sun.jersey.samples.storageservice.resources.ItemResource</code></dt>
             <dd>This Java class provides read, create, update, and delete of an item.
                 The last modified time and entity tag are supported such that 
                 it conditionally returns content only if the browser
