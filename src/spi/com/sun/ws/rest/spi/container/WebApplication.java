@@ -109,7 +109,7 @@ public interface WebApplication {
     
     /**
      * Add an injectable resource for a specific annotation to the set maintained by the application.
-     * The annotation class of the injectable ({@link AnnotationInjectable#getAnnotationClass()})
+     * The annotation class of the injectable ({@link Injectable#getAnnotationClass()})
      * is used as a unique key and therefore adding an injectable
      * for an annotation already supported will override the existing one.
      * 
