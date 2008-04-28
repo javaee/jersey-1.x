@@ -22,7 +22,7 @@
 
 package com.sun.ws.rest.impl.uri;
 
-import com.sun.ws.rest.api.uri.UriTemplate;
+import com.sun.jersey.api.uri.UriTemplate;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;

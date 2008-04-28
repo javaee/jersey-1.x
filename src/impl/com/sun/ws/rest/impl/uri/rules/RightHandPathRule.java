@@ -22,10 +22,10 @@
 
 package com.sun.ws.rest.impl.uri.rules;
 
-import com.sun.ws.rest.api.core.HttpRequestContext;
-import com.sun.ws.rest.api.core.HttpResponseContext;
-import com.sun.ws.rest.spi.uri.rules.UriRule;
-import com.sun.ws.rest.spi.uri.rules.UriRuleContext;
+import com.sun.jersey.api.core.HttpRequestContext;
+import com.sun.jersey.api.core.HttpResponseContext;
+import com.sun.jersey.spi.uri.rules.UriRule;
+import com.sun.jersey.spi.uri.rules.UriRuleContext;
 import java.util.List;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;

@@ -22,8 +22,8 @@
 
 package com.sun.ws.rest.impl.uri.rules.automata;
 
-import com.sun.ws.rest.api.uri.UriPattern;
-import com.sun.ws.rest.api.uri.UriTemplate;
+import com.sun.jersey.api.uri.UriPattern;
+import com.sun.jersey.api.uri.UriTemplate;
 import java.util.Iterator;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;

@@ -22,16 +22,16 @@
 
 package com.sun.ws.rest.impl;
 
-import com.sun.ws.rest.api.container.ContainerException;
-import com.sun.ws.rest.api.client.ClientHandler;
-import com.sun.ws.rest.api.client.ClientHandlerException;
-import com.sun.ws.rest.api.client.ClientRequest;
-import com.sun.ws.rest.api.client.ClientResponse;
+import com.sun.jersey.api.container.ContainerException;
+import com.sun.jersey.api.client.ClientHandler;
+import com.sun.jersey.api.client.ClientHandlerException;
+import com.sun.jersey.api.client.ClientRequest;
+import com.sun.jersey.api.client.ClientResponse;
 import com.sun.ws.rest.impl.http.header.HttpHeaderFactory;
-import com.sun.ws.rest.spi.container.AbstractContainerRequest;
-import com.sun.ws.rest.spi.container.AbstractContainerResponse;
-import com.sun.ws.rest.spi.container.MessageBodyContext;
-import com.sun.ws.rest.spi.container.WebApplication;
+import com.sun.jersey.spi.container.AbstractContainerRequest;
+import com.sun.jersey.spi.container.AbstractContainerResponse;
+import com.sun.jersey.spi.container.MessageBodyContext;
+import com.sun.jersey.spi.container.WebApplication;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;

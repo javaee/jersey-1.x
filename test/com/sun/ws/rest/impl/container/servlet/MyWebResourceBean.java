@@ -23,9 +23,9 @@
 package com.sun.ws.rest.impl.container.servlet;
 
 import javax.ws.rs.Path;
-import com.sun.ws.rest.api.core.HttpContext;
-import com.sun.ws.rest.api.core.HttpRequestContext;
-import com.sun.ws.rest.api.representation.Form;
+import com.sun.jersey.api.core.HttpContext;
+import com.sun.jersey.api.core.HttpRequestContext;
+import com.sun.jersey.api.representation.Form;
 import java.util.List;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;

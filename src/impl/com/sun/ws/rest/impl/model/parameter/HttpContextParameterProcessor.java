@@ -22,8 +22,8 @@
 
 package com.sun.ws.rest.impl.model.parameter;
 
-import com.sun.ws.rest.api.core.HttpContext;
-import com.sun.ws.rest.api.model.Parameter;
+import com.sun.jersey.api.core.HttpContext;
+import com.sun.jersey.api.model.Parameter;
 import java.util.HashMap;
 import java.util.Map;
 import javax.ws.rs.core.HttpHeaders;

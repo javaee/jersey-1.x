@@ -22,7 +22,7 @@
 
 package com.sun.ws.rest.samples.bookmark.resources;
 
-import com.sun.ws.rest.api.NotFoundException;
+import com.sun.jersey.api.NotFoundException;
 import com.sun.ws.rest.samples.bookmark.entities.BookmarkEntity;
 import com.sun.ws.rest.samples.bookmark.entities.BookmarkEntityPK;
 import com.sun.ws.rest.samples.bookmark.entities.UserEntity;

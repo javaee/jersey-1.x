@@ -23,7 +23,7 @@
 package com.sun.ws.rest.impl;
 
 import com.sun.ws.rest.impl.application.WebApplicationContext;
-import com.sun.ws.rest.spi.container.ContainerRequest;
+import com.sun.jersey.spi.container.ContainerRequest;
 import javax.ws.rs.core.UriInfo;
 import junit.framework.*;
 

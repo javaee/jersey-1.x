@@ -25,7 +25,7 @@ package com.sun.ws.rest.samples.atomserver.resources;
 import com.sun.syndication.feed.atom.Entry;
 import com.sun.syndication.feed.atom.Feed;
 import com.sun.syndication.io.FeedException;
-import com.sun.ws.rest.spi.container.MessageBodyContext;
+import com.sun.jersey.spi.container.MessageBodyContext;
 import java.io.IOException;
 import java.net.URI;
 import java.util.Date;

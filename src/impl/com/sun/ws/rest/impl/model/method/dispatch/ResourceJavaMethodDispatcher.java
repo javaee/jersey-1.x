@@ -22,11 +22,11 @@
 
 package com.sun.ws.rest.impl.model.method.dispatch;
 
-import com.sun.ws.rest.api.container.ContainerException;
-import com.sun.ws.rest.api.core.HttpContext;
-import com.sun.ws.rest.api.core.HttpRequestContext;
-import com.sun.ws.rest.api.model.AbstractResourceMethod;
-import com.sun.ws.rest.spi.dispatch.RequestDispatcher;
+import com.sun.jersey.api.container.ContainerException;
+import com.sun.jersey.api.core.HttpContext;
+import com.sun.jersey.api.core.HttpRequestContext;
+import com.sun.jersey.api.model.AbstractResourceMethod;
+import com.sun.jersey.spi.dispatch.RequestDispatcher;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.List;

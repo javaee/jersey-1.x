@@ -22,11 +22,11 @@
 
 package com.sun.ws.rest.impl.uri.rules;
 
-import com.sun.ws.rest.api.container.ContainerException;
-import com.sun.ws.rest.api.uri.UriTemplate;
+import com.sun.jersey.api.container.ContainerException;
+import com.sun.jersey.api.uri.UriTemplate;
 import com.sun.ws.rest.impl.model.parameter.ParameterExtractor;
-import com.sun.ws.rest.spi.uri.rules.UriRule;
-import com.sun.ws.rest.spi.uri.rules.UriRuleContext;
+import com.sun.jersey.spi.uri.rules.UriRule;
+import com.sun.jersey.spi.uri.rules.UriRuleContext;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Iterator;

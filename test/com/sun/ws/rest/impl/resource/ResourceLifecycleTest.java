@@ -23,12 +23,12 @@
 package com.sun.ws.rest.impl.resource;
 
 import com.sun.ws.rest.impl.AbstractResourceTester;
-import com.sun.ws.rest.api.core.ResourceConfig;
+import com.sun.jersey.api.core.ResourceConfig;
 import com.sun.ws.rest.impl.application.WebApplicationImpl;
-import com.sun.ws.rest.api.core.DefaultResourceConfig;
-import com.sun.ws.rest.api.client.WebResource;
-import com.sun.ws.rest.spi.resource.PerRequest;
-import com.sun.ws.rest.spi.resource.Singleton;
+import com.sun.jersey.api.core.DefaultResourceConfig;
+import com.sun.jersey.api.client.WebResource;
+import com.sun.jersey.spi.resource.PerRequest;
+import com.sun.jersey.spi.resource.Singleton;
 import java.util.HashSet;
 import java.util.Set;
 import javax.ws.rs.GET;

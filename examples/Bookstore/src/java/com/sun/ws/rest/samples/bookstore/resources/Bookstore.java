@@ -22,8 +22,8 @@
 
 package com.sun.ws.rest.samples.bookstore.resources;
 
-import com.sun.ws.rest.api.NotFoundException;
-import com.sun.ws.rest.spi.resource.Singleton;
+import com.sun.jersey.api.NotFoundException;
+import com.sun.jersey.spi.resource.Singleton;
 import java.util.Map;
 import java.util.TreeMap;
 import javax.ws.rs.Path;

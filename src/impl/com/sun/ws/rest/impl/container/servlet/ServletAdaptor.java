@@ -22,11 +22,11 @@
 
 package com.sun.ws.rest.impl.container.servlet;
 
-import com.sun.ws.rest.api.container.ContainerException;
-import com.sun.ws.rest.api.core.ResourceConfig;
-import com.sun.ws.rest.spi.container.WebApplication;
-import com.sun.ws.rest.spi.container.servlet.ServletContainer;
-import com.sun.ws.rest.spi.resource.TypeInjectable;
+import com.sun.jersey.api.container.ContainerException;
+import com.sun.jersey.api.core.ResourceConfig;
+import com.sun.jersey.spi.container.WebApplication;
+import com.sun.jersey.spi.container.servlet.ServletContainer;
+import com.sun.jersey.spi.resource.TypeInjectable;
 import java.lang.reflect.Proxy;
 import java.util.Enumeration;
 import java.util.HashMap;

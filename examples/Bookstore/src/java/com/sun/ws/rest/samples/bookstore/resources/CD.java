@@ -22,7 +22,7 @@
 
 package com.sun.ws.rest.samples.bookstore.resources;
 
-import com.sun.ws.rest.api.NotFoundException;
+import com.sun.jersey.api.NotFoundException;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 

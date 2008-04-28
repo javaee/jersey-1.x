@@ -1,6 +1,6 @@
 package com.sun.ws.rest.impl.container.grizzly.web;
 
-import com.sun.ws.rest.api.core.DefaultResourceConfig;
+import com.sun.jersey.api.core.DefaultResourceConfig;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -18,7 +18,7 @@ import java.util.Set;
  */
 public class ClassNameResourceConfig extends DefaultResourceConfig {
 
-    public static final String PROPERTY_CLASSNAMES = "com.sun.ws.rest.config.property.classnames";
+    public static final String PROPERTY_CLASSNAMES = "com.sun.jersey.config.property.classnames";
 
     public ClassNameResourceConfig(Class... classes) {
         super();

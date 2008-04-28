@@ -23,10 +23,10 @@
 package com.sun.ws.rest.impl.container.httpserver;
 
 import javax.ws.rs.Path;
-import com.sun.ws.rest.api.core.HttpRequestContext;
-import com.sun.ws.rest.api.core.HttpResponseContext;
-import com.sun.ws.rest.api.client.Client;
-import com.sun.ws.rest.api.client.WebResource;
+import com.sun.jersey.api.core.HttpRequestContext;
+import com.sun.jersey.api.core.HttpResponseContext;
+import com.sun.jersey.api.client.Client;
+import com.sun.jersey.api.client.WebResource;
 import javax.ws.rs.POST;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;

@@ -12,12 +12,12 @@
 
 package com.sun.ws.rest.impl.modelapi.validation;
 
-import com.sun.ws.rest.api.model.AbstractResource;
-import com.sun.ws.rest.api.model.AbstractResourceMethod;
-import com.sun.ws.rest.api.model.AbstractSubResourceLocator;
-import com.sun.ws.rest.api.model.AbstractSubResourceMethod;
-import com.sun.ws.rest.api.model.ResourceModelIssue;
-import com.sun.ws.rest.api.model.UriPathValue;
+import com.sun.jersey.api.model.AbstractResource;
+import com.sun.jersey.api.model.AbstractResourceMethod;
+import com.sun.jersey.api.model.AbstractSubResourceLocator;
+import com.sun.jersey.api.model.AbstractSubResourceMethod;
+import com.sun.jersey.api.model.ResourceModelIssue;
+import com.sun.jersey.api.model.UriPathValue;
 import junit.framework.TestCase;
 
 /**

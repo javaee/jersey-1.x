@@ -22,9 +22,9 @@
 
 package com.sun.ws.rest.impl.model.method.dispatch;
 
-import com.sun.ws.rest.api.container.ContainerException;
-import com.sun.ws.rest.api.model.AbstractResourceMethod;
-import com.sun.ws.rest.spi.dispatch.RequestDispatcher;
+import com.sun.jersey.api.container.ContainerException;
+import com.sun.jersey.api.model.AbstractResourceMethod;
+import com.sun.jersey.spi.dispatch.RequestDispatcher;
 
 /**
  * Service-provider interface for creating {@link RequestDispatcher} instances.

@@ -22,7 +22,7 @@
 
 package com.sun.ws.rest.impl.client;
 
-import com.sun.ws.rest.api.client.ClientRequest;
+import com.sun.jersey.api.client.ClientRequest;
 import com.sun.ws.rest.impl.ResponseHttpHeadersImpl;
 import java.net.URI;
 import java.util.ArrayList;

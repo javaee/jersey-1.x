@@ -11,14 +11,14 @@
  */
 package com.sun.ws.rest.impl.modelapi.validation;
 
-import com.sun.ws.rest.api.core.HttpRequestContext;
-import com.sun.ws.rest.api.core.HttpResponseContext;
-import com.sun.ws.rest.api.model.AbstractResource;
-import com.sun.ws.rest.api.model.AbstractResourceConstructor;
-import com.sun.ws.rest.api.model.AbstractResourceMethod;
-import com.sun.ws.rest.api.model.AbstractSubResourceLocator;
-import com.sun.ws.rest.api.model.AbstractSubResourceMethod;
-import com.sun.ws.rest.api.model.ResourceModelIssue;
+import com.sun.jersey.api.core.HttpRequestContext;
+import com.sun.jersey.api.core.HttpResponseContext;
+import com.sun.jersey.api.model.AbstractResource;
+import com.sun.jersey.api.model.AbstractResourceConstructor;
+import com.sun.jersey.api.model.AbstractResourceMethod;
+import com.sun.jersey.api.model.AbstractSubResourceLocator;
+import com.sun.jersey.api.model.AbstractSubResourceMethod;
+import com.sun.jersey.api.model.ResourceModelIssue;
 import com.sun.ws.rest.impl.ImplMessages;
 
 /**

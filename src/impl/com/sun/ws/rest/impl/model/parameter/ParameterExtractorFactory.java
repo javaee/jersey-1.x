@@ -22,10 +22,10 @@
 
 package com.sun.ws.rest.impl.model.parameter;
 
-import com.sun.ws.rest.api.container.ContainerException;
-import com.sun.ws.rest.api.model.AbstractResourceConstructor;
-import com.sun.ws.rest.api.model.AbstractSubResourceLocator;
-import com.sun.ws.rest.api.model.Parameter;
+import com.sun.jersey.api.container.ContainerException;
+import com.sun.jersey.api.model.AbstractResourceConstructor;
+import com.sun.jersey.api.model.AbstractSubResourceLocator;
+import com.sun.jersey.api.model.Parameter;
 import com.sun.ws.rest.impl.ImplMessages;
 import java.util.List;
 

@@ -22,7 +22,7 @@
 
 package com.sun.ws.rest.impl.resource;
 
-import com.sun.ws.rest.api.client.ClientResponse;
+import com.sun.jersey.api.client.ClientResponse;
 import com.sun.ws.rest.impl.AbstractResourceTester;
 import javax.ws.rs.ConsumeMime;
 import javax.ws.rs.GET;

@@ -22,7 +22,7 @@
 
 package com.sun.ws.rest.impl.uri.rules;
 
-import com.sun.ws.rest.api.uri.UriPattern;
+import com.sun.jersey.api.uri.UriPattern;
 
 /**
  * A tuple of a {@link UriPattern} and a generic rule.

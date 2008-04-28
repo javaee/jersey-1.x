@@ -22,7 +22,7 @@
 
 package com.sun.ws.rest.impl.model;
 
-import com.sun.ws.rest.api.core.HttpRequestContext;
+import com.sun.jersey.api.core.HttpRequestContext;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import com.sun.ws.rest.impl.ImplMessages;

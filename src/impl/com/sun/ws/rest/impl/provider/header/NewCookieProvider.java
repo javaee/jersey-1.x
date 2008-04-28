@@ -24,7 +24,7 @@ package com.sun.ws.rest.impl.provider.header;
 
 import com.sun.ws.rest.impl.http.header.HttpHeaderFactory;
 import com.sun.ws.rest.impl.http.header.writer.WriterUtil;
-import com.sun.ws.rest.spi.HeaderDelegateProvider;
+import com.sun.jersey.spi.HeaderDelegateProvider;
 import javax.ws.rs.core.NewCookie;
 
 public class NewCookieProvider implements HeaderDelegateProvider<NewCookie> {

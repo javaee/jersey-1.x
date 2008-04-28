@@ -1,6 +1,6 @@
 package com.sun.ws.rest.impl.template;
 
-import com.sun.ws.rest.spi.template.TemplateProcessor;
+import com.sun.jersey.spi.template.TemplateProcessor;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintStream;

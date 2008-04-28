@@ -22,7 +22,7 @@
 
 package com.sun.ws.rest.impl.model.parameter;
 
-import com.sun.ws.rest.api.core.HttpContext;
+import com.sun.jersey.api.core.HttpContext;
 
 /**
  *

@@ -23,7 +23,7 @@
 package com.sun.ws.rest.impl.inject;
 
 import com.sun.ws.rest.impl.AbstractResourceTester;
-import com.sun.ws.rest.api.client.WebResource;
+import com.sun.jersey.api.client.WebResource;
 import java.io.IOException;
 import java.math.BigInteger;
 import javax.ws.rs.GET;

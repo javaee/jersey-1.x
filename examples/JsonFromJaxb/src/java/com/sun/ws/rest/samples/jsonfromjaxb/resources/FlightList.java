@@ -25,7 +25,7 @@ package com.sun.ws.rest.samples.jsonfromjaxb.resources;
 
 import com.sun.ws.rest.samples.jsonfromjaxb.jaxb.FlightType;
 import com.sun.ws.rest.samples.jsonfromjaxb.jaxb.Flights;
-import com.sun.ws.rest.spi.resource.Singleton;
+import com.sun.jersey.spi.resource.Singleton;
 import javax.ws.rs.ConsumeMime;
 import javax.ws.rs.GET;
 import javax.ws.rs.PUT;

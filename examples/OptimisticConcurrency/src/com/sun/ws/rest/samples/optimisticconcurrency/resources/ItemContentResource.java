@@ -22,7 +22,7 @@
 
 package com.sun.ws.rest.samples.optimisticconcurrency.resources;
 
-import com.sun.ws.rest.api.ConflictException;
+import com.sun.jersey.api.ConflictException;
 import com.sun.ws.rest.samples.optimisticconcurrency.ItemData;
 import javax.ws.rs.GET;
 import javax.ws.rs.PUT;

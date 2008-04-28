@@ -24,9 +24,9 @@ package com.sun.ws.rest.impl.container.grizzly.web;
 
 import com.sun.ws.rest.impl.container.grizzly.web.ClassNameResourceConfig;
 import com.sun.grizzly.http.SelectorThread;
-import com.sun.ws.rest.api.container.grizzly.GrizzlyWebContainerFactory;
+import com.sun.jersey.api.container.grizzly.GrizzlyWebContainerFactory;
 import com.sun.ws.rest.impl.test.util.TestHelper;
-import com.sun.ws.rest.spi.container.servlet.ServletContainer;
+import com.sun.jersey.spi.container.servlet.ServletContainer;
 import java.io.IOException;
 import java.net.URI;
 import java.util.HashMap;

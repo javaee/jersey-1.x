@@ -19,7 +19,7 @@
 
 package com.sun.ws.rest.samples.entityprovider.resources;
 
-import com.sun.ws.rest.spi.resource.Singleton;
+import com.sun.jersey.spi.resource.Singleton;
 import java.util.Hashtable;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;

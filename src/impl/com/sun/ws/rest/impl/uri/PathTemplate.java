@@ -22,8 +22,8 @@
 
 package com.sun.ws.rest.impl.uri;
 
-import com.sun.ws.rest.api.uri.UriTemplate;
-import com.sun.ws.rest.api.uri.UriComponent;
+import com.sun.jersey.api.uri.UriTemplate;
+import com.sun.jersey.api.uri.UriComponent;
 
 /**
  * A URI template for a URI path.

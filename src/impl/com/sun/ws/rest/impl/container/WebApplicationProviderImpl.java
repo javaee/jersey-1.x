@@ -22,10 +22,10 @@
 
 package com.sun.ws.rest.impl.container;
 
-import com.sun.ws.rest.api.container.ContainerException;
+import com.sun.jersey.api.container.ContainerException;
 import com.sun.ws.rest.impl.application.WebApplicationImpl;
-import com.sun.ws.rest.spi.container.WebApplication;
-import com.sun.ws.rest.spi.container.WebApplicationProvider;
+import com.sun.jersey.spi.container.WebApplication;
+import com.sun.jersey.spi.container.WebApplicationProvider;
 
 /**
  *

@@ -22,9 +22,9 @@
 
 package com.sun.ws.rest.impl.application;
 
-import com.sun.ws.rest.spi.service.ComponentProvider;
-import com.sun.ws.rest.spi.service.ComponentProvider.Scope;
-import com.sun.ws.rest.spi.service.ServiceFinder;
+import com.sun.jersey.spi.service.ComponentProvider;
+import com.sun.jersey.spi.service.ComponentProvider.Scope;
+import com.sun.jersey.spi.service.ServiceFinder;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.Map;

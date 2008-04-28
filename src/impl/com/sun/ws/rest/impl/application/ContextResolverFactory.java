@@ -22,7 +22,7 @@
 
 package com.sun.ws.rest.impl.application;
 
-import com.sun.ws.rest.spi.resource.TypeInjectable;
+import com.sun.jersey.spi.resource.TypeInjectable;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.ArrayList;

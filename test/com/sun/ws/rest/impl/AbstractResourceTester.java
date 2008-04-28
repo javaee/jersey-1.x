@@ -33,17 +33,17 @@ import javax.ws.rs.ext.Provider;
 
 import junit.framework.TestCase;
 
-import com.sun.ws.rest.api.client.Client;
-import com.sun.ws.rest.api.client.ClientFilter;
-import com.sun.ws.rest.api.client.ClientRequest;
-import com.sun.ws.rest.api.client.ClientResponse;
-import com.sun.ws.rest.api.client.WebResource;
-import com.sun.ws.rest.api.client.config.ClientConfig;
-import com.sun.ws.rest.api.core.DefaultResourceConfig;
-import com.sun.ws.rest.api.core.ResourceConfig;
+import com.sun.jersey.api.client.Client;
+import com.sun.jersey.api.client.ClientFilter;
+import com.sun.jersey.api.client.ClientRequest;
+import com.sun.jersey.api.client.ClientResponse;
+import com.sun.jersey.api.client.WebResource;
+import com.sun.jersey.api.client.config.ClientConfig;
+import com.sun.jersey.api.core.DefaultResourceConfig;
+import com.sun.jersey.api.core.ResourceConfig;
 import com.sun.ws.rest.impl.application.WebApplicationImpl;
-import com.sun.ws.rest.spi.container.WebApplication;
-import com.sun.ws.rest.spi.service.ComponentProvider;
+import com.sun.jersey.spi.container.WebApplication;
+import com.sun.jersey.spi.service.ComponentProvider;
 
 /**
  *

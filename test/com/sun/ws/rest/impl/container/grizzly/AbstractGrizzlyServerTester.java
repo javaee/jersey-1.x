@@ -24,9 +24,9 @@ package com.sun.ws.rest.impl.container.grizzly;
 
 import com.sun.grizzly.http.SelectorThread;
 import com.sun.grizzly.tcp.Adapter;
-import com.sun.ws.rest.api.container.ContainerFactory;
-import com.sun.ws.rest.api.container.grizzly.GrizzlyServerFactory;
-import com.sun.ws.rest.api.core.ResourceConfig;
+import com.sun.jersey.api.container.ContainerFactory;
+import com.sun.jersey.api.container.grizzly.GrizzlyServerFactory;
+import com.sun.jersey.api.core.ResourceConfig;
 import com.sun.ws.rest.impl.test.util.TestHelper;
 import java.io.IOException;
 import java.net.URI;

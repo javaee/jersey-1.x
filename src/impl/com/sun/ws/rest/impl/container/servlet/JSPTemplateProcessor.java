@@ -22,9 +22,9 @@
 
 package com.sun.ws.rest.impl.container.servlet;
 
-import com.sun.ws.rest.api.core.HttpContext;
-import com.sun.ws.rest.api.core.HttpResponseContext;
-import com.sun.ws.rest.spi.template.TemplateProcessor;
+import com.sun.jersey.api.core.HttpContext;
+import com.sun.jersey.api.core.HttpResponseContext;
+import com.sun.jersey.spi.template.TemplateProcessor;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.MalformedURLException;

@@ -22,7 +22,7 @@
 
 package com.sun.ws.rest.samples.console.resources;
 
-import com.sun.ws.rest.api.representation.Form;
+import com.sun.jersey.api.representation.Form;
 import java.io.InputStream;
 import java.util.Date;
 import javax.ws.rs.ConsumeMime;

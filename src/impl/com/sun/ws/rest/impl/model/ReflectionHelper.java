@@ -22,7 +22,7 @@
 
 package com.sun.ws.rest.impl.model;
 
-import com.sun.ws.rest.api.container.ContainerException;
+import com.sun.jersey.api.container.ContainerException;
 import com.sun.ws.rest.impl.ImplMessages;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.AccessibleObject;

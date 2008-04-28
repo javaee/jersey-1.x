@@ -22,10 +22,10 @@
 
 package com.sun.ws.rest.impl.container.httpserver;
 
-import com.sun.ws.rest.api.core.DefaultResourceConfig;
-import com.sun.ws.rest.api.core.ResourceConfig;
-import com.sun.ws.rest.api.client.Client;
-import com.sun.ws.rest.api.client.WebResource;
+import com.sun.jersey.api.core.DefaultResourceConfig;
+import com.sun.jersey.api.core.ResourceConfig;
+import com.sun.jersey.api.client.Client;
+import com.sun.jersey.api.client.WebResource;
 import java.net.URI;
 import javax.ws.rs.GET;
 import javax.ws.rs.ProduceMime;

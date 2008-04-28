@@ -1,4 +1,8 @@
 release 0.8 (2008-06-20 or 2008-07-25)
+- Packages "com.sun.ws.rest.api.*" renamed to "com.sun.jersey.api.*"
+- Packages "com.sun.ws.rest.spi.*" renamed to "com.sun.jersey.spi.*"
+- The property/feature name space "com.sun.ws.rest.config" renamed to 
+  "com.sun.jersey.config".
 - The type javax.xml.bind.JAXBElement<T> can be used for XML and JSON
   serialization.
 - Partially Integrated JSR 311 API 0.8

@@ -22,7 +22,7 @@
 
 package com.sun.ws.rest.samples.storageservice.resources;
 
-import com.sun.ws.rest.api.NotFoundException;
+import com.sun.jersey.api.NotFoundException;
 import com.sun.ws.rest.samples.storageservice.Container;
 import com.sun.ws.rest.samples.storageservice.Item;
 import com.sun.ws.rest.samples.storageservice.MemoryStore;

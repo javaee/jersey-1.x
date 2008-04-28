@@ -26,7 +26,7 @@ import com.sun.ws.rest.impl.AbstractResourceTester;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Path;
 import com.sun.ws.rest.impl.AbstractResourceTester;
-import com.sun.ws.rest.spi.resource.Singleton;
+import com.sun.jersey.spi.resource.Singleton;
 import javax.ws.rs.GET;
 
 /**

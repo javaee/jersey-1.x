@@ -26,7 +26,7 @@ import javax.ws.rs.core.MediaType;
 import com.sun.ws.rest.impl.http.header.reader.HttpHeaderReader;
 import com.sun.ws.rest.impl.http.header.reader.HttpHeaderReaderImpl;
 import com.sun.ws.rest.impl.http.header.writer.WriterUtil;
-import com.sun.ws.rest.spi.HeaderDelegateProvider;
+import com.sun.jersey.spi.HeaderDelegateProvider;
 import java.text.ParseException;
 import java.util.Map;
 

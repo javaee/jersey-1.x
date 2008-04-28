@@ -22,10 +22,10 @@
 
 package com.sun.ws.rest.impl.template;
 
-import com.sun.ws.rest.spi.template.TemplateProcessor;
-import com.sun.ws.rest.spi.template.TemplateContext;
-import com.sun.ws.rest.api.view.Viewable;
-import com.sun.ws.rest.api.core.ResourceConfig;
+import com.sun.jersey.spi.template.TemplateProcessor;
+import com.sun.jersey.spi.template.TemplateContext;
+import com.sun.jersey.api.view.Viewable;
+import com.sun.jersey.api.core.ResourceConfig;
 import java.io.OutputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;

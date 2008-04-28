@@ -22,8 +22,8 @@
 
 package com.sun.ws.rest.impl.template;
 
-import com.sun.ws.rest.spi.template.TemplateProcessor;
-import com.sun.ws.rest.api.view.Viewable;
+import com.sun.jersey.spi.template.TemplateProcessor;
+import com.sun.jersey.api.view.Viewable;
 
 /**
  *

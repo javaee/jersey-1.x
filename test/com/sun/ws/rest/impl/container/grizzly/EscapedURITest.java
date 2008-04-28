@@ -22,9 +22,9 @@
 
 package com.sun.ws.rest.impl.container.grizzly;
 
-import com.sun.ws.rest.api.client.Client;
+import com.sun.jersey.api.client.Client;
 import javax.ws.rs.Path;
-import com.sun.ws.rest.api.client.WebResource;
+import com.sun.jersey.api.client.WebResource;
 import javax.ws.rs.GET;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.UriInfo;

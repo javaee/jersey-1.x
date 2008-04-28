@@ -29,8 +29,8 @@ import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 
 import com.sun.ws.rest.impl.AbstractResourceTester;
-import com.sun.ws.rest.spi.resource.Inject;
-import com.sun.ws.rest.spi.service.ComponentProvider;
+import com.sun.jersey.spi.resource.Inject;
+import com.sun.jersey.spi.service.ComponentProvider;
 
 /**
  * TODO: DESCRIBE ME<br>

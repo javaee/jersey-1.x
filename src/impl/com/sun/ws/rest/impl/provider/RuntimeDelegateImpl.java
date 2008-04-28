@@ -22,13 +22,13 @@
 
 package com.sun.ws.rest.impl.provider;
 
-import com.sun.ws.rest.api.container.ContainerFactory;
-import com.sun.ws.rest.api.core.ApplicationConfigAdapter;
+import com.sun.jersey.api.container.ContainerFactory;
+import com.sun.jersey.api.core.ApplicationConfigAdapter;
 import com.sun.ws.rest.impl.ResponseBuilderImpl;
 import com.sun.ws.rest.impl.VariantListBuilderImpl;
 import com.sun.ws.rest.impl.uri.UriBuilderImpl;
-import com.sun.ws.rest.spi.HeaderDelegateProvider;
-import com.sun.ws.rest.spi.service.ServiceFinder;
+import com.sun.jersey.spi.HeaderDelegateProvider;
+import com.sun.jersey.spi.service.ServiceFinder;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;

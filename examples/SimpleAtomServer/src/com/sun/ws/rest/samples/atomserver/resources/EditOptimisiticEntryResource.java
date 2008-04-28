@@ -25,8 +25,8 @@ package com.sun.ws.rest.samples.atomserver.resources;
 import com.sun.syndication.feed.atom.Entry;
 import com.sun.syndication.feed.atom.Feed;
 import com.sun.syndication.io.FeedException;
-import com.sun.ws.rest.api.ConflictException;
-import com.sun.ws.rest.spi.container.MessageBodyContext;
+import com.sun.jersey.api.ConflictException;
+import com.sun.jersey.spi.container.MessageBodyContext;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
 

@@ -26,7 +26,7 @@ import com.sun.ws.rest.impl.AbstractResourceTester;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Path;
 import com.sun.ws.rest.impl.AbstractResourceTester;
-import com.sun.ws.rest.api.client.ClientResponse;
+import com.sun.jersey.api.client.ClientResponse;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import javax.ws.rs.GET;

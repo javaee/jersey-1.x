@@ -23,7 +23,7 @@
 package com.sun.ws.rest.samples.entityprovider;
 
 import com.sun.net.httpserver.HttpServer;
-import com.sun.ws.rest.api.container.httpserver.HttpServerFactory;
+import com.sun.jersey.api.container.httpserver.HttpServerFactory;
 import java.io.IOException;
 
 public class Main {

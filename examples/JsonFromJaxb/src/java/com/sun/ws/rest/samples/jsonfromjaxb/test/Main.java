@@ -21,10 +21,10 @@
  */
 package com.sun.ws.rest.samples.jsonfromjaxb.test;
 
-import com.sun.ws.rest.api.client.Client;
-import com.sun.ws.rest.api.client.WebResource;
-import com.sun.ws.rest.api.client.config.ClientConfig;
-import com.sun.ws.rest.api.client.config.DefaultClientConfig;
+import com.sun.jersey.api.client.Client;
+import com.sun.jersey.api.client.WebResource;
+import com.sun.jersey.api.client.config.ClientConfig;
+import com.sun.jersey.api.client.config.DefaultClientConfig;
 import com.sun.ws.rest.samples.jsonfromjaxb.config.JAXBContextResolver;
 import com.sun.ws.rest.samples.jsonfromjaxb.jaxb.Flights;
 import java.util.Formatter;

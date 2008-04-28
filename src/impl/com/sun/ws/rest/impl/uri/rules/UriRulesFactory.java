@@ -25,8 +25,8 @@ package com.sun.ws.rest.impl.uri.rules;
 
 import com.sun.ws.rest.impl.uri.PathPattern;
 import com.sun.ws.rest.impl.uri.rules.automata.AutomataMatchingUriTemplateRules;
-import com.sun.ws.rest.spi.uri.rules.UriRule;
-import com.sun.ws.rest.spi.uri.rules.UriRules;
+import com.sun.jersey.spi.uri.rules.UriRule;
+import com.sun.jersey.spi.uri.rules.UriRules;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;

@@ -21,7 +21,7 @@
  */
 package com.sun.ws.rest.impl.uri.rules;
 
-import com.sun.ws.rest.spi.uri.rules.UriRules;
+import com.sun.jersey.spi.uri.rules.UriRules;
 import java.util.Iterator;
 import java.util.List;
 import java.util.NoSuchElementException;

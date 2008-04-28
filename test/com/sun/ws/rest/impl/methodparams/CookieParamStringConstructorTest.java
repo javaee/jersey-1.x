@@ -27,7 +27,7 @@ import javax.ws.rs.DefaultValue;
 import javax.ws.rs.CookieParam;
 import javax.ws.rs.Path;
 import com.sun.ws.rest.impl.AbstractResourceTester;
-import com.sun.ws.rest.api.client.ClientResponse;
+import com.sun.jersey.api.client.ClientResponse;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.net.URI;

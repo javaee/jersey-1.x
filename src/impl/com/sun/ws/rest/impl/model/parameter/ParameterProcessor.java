@@ -22,7 +22,7 @@
 
 package com.sun.ws.rest.impl.model.parameter;
 
-import com.sun.ws.rest.api.model.Parameter;
+import com.sun.jersey.api.model.Parameter;
 
 
 /**

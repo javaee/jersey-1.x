@@ -22,7 +22,7 @@
 
 package com.sun.ws.rest.samples.jaxws.resources;
 
-import com.sun.ws.rest.api.representation.Form;
+import com.sun.jersey.api.representation.Form;
 import java.net.URL;
 import javax.activation.DataSource;
 import javax.activation.FileDataSource;

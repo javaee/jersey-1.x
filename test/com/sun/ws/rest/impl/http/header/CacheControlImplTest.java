@@ -43,7 +43,7 @@ public class CacheControlImplTest extends TestCase {
     }
 
     /**
-     * Test of toString method, of class com.sun.ws.rest.api.response.CacheControl.
+     * Test of toString method, of class com.sun.jersey.api.response.CacheControl.
      */
     public void testToString() {
         System.out.println("toString");

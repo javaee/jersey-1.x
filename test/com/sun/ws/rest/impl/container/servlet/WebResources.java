@@ -22,8 +22,8 @@
 
 package com.sun.ws.rest.impl.container.servlet;
 
-import com.sun.ws.rest.api.core.ResourceConfig;
-import com.sun.ws.rest.api.core.DefaultResourceConfig;
+import com.sun.jersey.api.core.ResourceConfig;
+import com.sun.jersey.api.core.DefaultResourceConfig;
 import java.util.Map;
 import java.util.Set;
 

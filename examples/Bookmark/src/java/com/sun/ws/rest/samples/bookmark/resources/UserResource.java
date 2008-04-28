@@ -22,7 +22,7 @@
 
 package com.sun.ws.rest.samples.bookmark.resources;
 
-import com.sun.ws.rest.api.NotFoundException;
+import com.sun.jersey.api.NotFoundException;
 import com.sun.ws.rest.samples.bookmark.entities.UserEntity;
 import com.sun.ws.rest.samples.bookmark.util.tx.TransactionManager;
 import com.sun.ws.rest.samples.bookmark.util.tx.Transactional;

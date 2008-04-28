@@ -22,7 +22,7 @@
 
 package com.sun.ws.rest.impl.model.parameter;
 
-import com.sun.ws.rest.api.container.ContainerException;
+import com.sun.jersey.api.container.ContainerException;
 import com.sun.ws.rest.impl.ImplMessages;
 import com.sun.ws.rest.impl.model.ReflectionHelper;
 import java.lang.reflect.Constructor;

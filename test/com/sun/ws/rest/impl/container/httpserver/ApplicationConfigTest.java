@@ -23,8 +23,8 @@
 package com.sun.ws.rest.impl.container.httpserver;
 
 import com.sun.net.httpserver.HttpHandler;
-import com.sun.ws.rest.api.client.Client;
-import com.sun.ws.rest.api.client.WebResource;
+import com.sun.jersey.api.client.Client;
+import com.sun.jersey.api.client.WebResource;
 import java.util.HashSet;
 import java.util.Set;
 import javax.ws.rs.Path;

@@ -22,7 +22,7 @@
 
 package com.sun.ws.rest.impl.provider.header;
 
-import com.sun.ws.rest.spi.HeaderDelegateProvider;
+import com.sun.jersey.spi.HeaderDelegateProvider;
 import java.text.ParseException;
 import java.util.List;
 import java.util.Map;

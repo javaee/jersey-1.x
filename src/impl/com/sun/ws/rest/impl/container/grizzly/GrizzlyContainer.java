@@ -24,13 +24,13 @@ package com.sun.ws.rest.impl.container.grizzly;
 
 import com.sun.grizzly.tcp.http11.GrizzlyRequest;
 import com.sun.grizzly.tcp.http11.GrizzlyResponse;
-import com.sun.ws.rest.api.container.ContainerException;
-import com.sun.ws.rest.api.core.HttpResponseContext;
-import com.sun.ws.rest.spi.container.WebApplication;
+import com.sun.jersey.api.container.ContainerException;
+import com.sun.jersey.api.core.HttpResponseContext;
+import com.sun.jersey.spi.container.WebApplication;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import com.sun.grizzly.tcp.http11.GrizzlyAdapter;
-import com.sun.ws.rest.spi.container.ContainerListener;
+import com.sun.jersey.spi.container.ContainerListener;
 import java.io.IOException;
 
 /**

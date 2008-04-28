@@ -22,12 +22,12 @@
 
 package com.sun.ws.rest.impl.template;
 
-import com.sun.ws.rest.spi.template.TemplateProcessor;
-import com.sun.ws.rest.spi.template.TemplateContext;
-import com.sun.ws.rest.api.core.HttpRequestContext;
-import com.sun.ws.rest.api.core.HttpResponseContext;
-import com.sun.ws.rest.spi.uri.rules.UriRule;
-import com.sun.ws.rest.spi.uri.rules.UriRuleContext;
+import com.sun.jersey.spi.template.TemplateProcessor;
+import com.sun.jersey.spi.template.TemplateContext;
+import com.sun.jersey.api.core.HttpRequestContext;
+import com.sun.jersey.api.core.HttpResponseContext;
+import com.sun.jersey.spi.uri.rules.UriRule;
+import com.sun.jersey.spi.uri.rules.UriRuleContext;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;

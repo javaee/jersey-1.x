@@ -23,10 +23,10 @@
 package com.sun.ws.rest.impl.container.httpserver;
 
 import com.sun.net.httpserver.HttpHandler;
-import com.sun.ws.rest.api.container.ContainerException;
-import com.sun.ws.rest.api.core.ResourceConfig;
-import com.sun.ws.rest.spi.container.ContainerProvider;
-import com.sun.ws.rest.spi.container.WebApplication;
+import com.sun.jersey.api.container.ContainerException;
+import com.sun.jersey.api.core.ResourceConfig;
+import com.sun.jersey.spi.container.ContainerProvider;
+import com.sun.jersey.spi.container.WebApplication;
 
 /**
  * HTTP handler container provider.

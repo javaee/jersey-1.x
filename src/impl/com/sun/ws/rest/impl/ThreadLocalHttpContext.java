@@ -22,10 +22,10 @@
 
 package com.sun.ws.rest.impl;
 
-import com.sun.ws.rest.api.core.HttpContext;
-import com.sun.ws.rest.api.core.HttpRequestContext;
-import com.sun.ws.rest.api.core.HttpResponseContext;
-import com.sun.ws.rest.api.uri.ExtendedUriInfo;
+import com.sun.jersey.api.core.HttpContext;
+import com.sun.jersey.api.core.HttpRequestContext;
+import com.sun.jersey.api.core.HttpResponseContext;
+import com.sun.jersey.api.uri.ExtendedUriInfo;
 
 /**
  * Implementation of {@link HttpContext} using {@link ThreadLocal}

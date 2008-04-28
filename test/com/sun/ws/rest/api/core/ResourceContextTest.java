@@ -21,6 +21,7 @@
  */
 package com.sun.ws.rest.api.core;
 
+import com.sun.jersey.api.core.ResourceContext;
 import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
@@ -31,7 +32,7 @@ import javax.ws.rs.core.Context;
 import javax.xml.bind.annotation.XmlRootElement;
 
 import com.sun.ws.rest.impl.AbstractResourceTester;
-import com.sun.ws.rest.spi.service.ComponentProvider;
+import com.sun.jersey.spi.service.ComponentProvider;
 
 /**
  * Test {@link ResourceContext}: resource context must provide access to

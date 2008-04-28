@@ -22,7 +22,7 @@
 
 package com.sun.ws.rest.impl.methodparams;
 
-import com.sun.ws.rest.api.client.WebResource;
+import com.sun.jersey.api.client.WebResource;
 import com.sun.ws.rest.impl.AbstractResourceTester;
 import com.sun.ws.rest.impl.AbstractResourceTester;
 import java.util.Map;

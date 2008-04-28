@@ -25,7 +25,7 @@ import com.sun.ws.rest.samples.jmaki.beans.Printer;
 import com.sun.ws.rest.samples.jmaki.beans.PrinterTableModel;
 import com.sun.ws.rest.samples.jmaki.beans.TreeModel;
 import com.sun.ws.rest.samples.jmaki.beans.WebResourceList;
-import com.sun.ws.rest.spi.resource.Singleton;
+import com.sun.jersey.spi.resource.Singleton;
 import java.util.Formatter;
 import java.util.HashMap;
 import java.util.LinkedList;

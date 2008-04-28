@@ -5,9 +5,9 @@
 
 package com.sun.ws.rest.impl.wadl;
 
-import com.sun.ws.rest.api.MediaTypes;
+import com.sun.jersey.api.MediaTypes;
 import com.sun.ws.rest.impl.AbstractResourceTester;
-import com.sun.ws.rest.api.client.WebResource;
+import com.sun.jersey.api.client.WebResource;
 import java.io.File;
 import java.io.IOException;
 import java.util.Iterator;

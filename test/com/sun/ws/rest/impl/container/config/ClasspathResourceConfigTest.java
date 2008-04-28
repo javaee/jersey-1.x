@@ -22,8 +22,8 @@
 
 package com.sun.ws.rest.impl.container.config;
 
-import com.sun.ws.rest.api.core.ClasspathResourceConfig;
-import com.sun.ws.rest.api.core.ResourceConfig;
+import com.sun.jersey.api.core.ClasspathResourceConfig;
+import com.sun.jersey.api.core.ResourceConfig;
 import com.sun.ws.rest.impl.container.config.innerstatic.InnerStaticClass;
 import com.sun.ws.rest.impl.container.config.toplevel.PublicRootResourceClass;
 import com.sun.ws.rest.impl.container.config.toplevelinnerstatic.PublicRootResourceInnerStaticClass;

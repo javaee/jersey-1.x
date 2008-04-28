@@ -36,7 +36,7 @@ import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 
 import com.sun.ws.rest.impl.AbstractResourceTester;
-import com.sun.ws.rest.spi.resource.Injectable;
+import com.sun.jersey.spi.resource.Injectable;
 
 /**
  * TODO: DESCRIBE ME<br>

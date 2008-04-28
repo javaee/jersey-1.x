@@ -22,9 +22,9 @@
 
 package com.sun.ws.rest.impl.model.method;
 
-import com.sun.ws.rest.api.container.ContainerException;
-import com.sun.ws.rest.api.model.AbstractResourceMethod;
-import com.sun.ws.rest.api.uri.UriTemplate;
+import com.sun.jersey.api.container.ContainerException;
+import com.sun.jersey.api.model.AbstractResourceMethod;
+import com.sun.jersey.api.uri.UriTemplate;
 import com.sun.ws.rest.impl.ImplMessages;
 import com.sun.ws.rest.impl.model.method.dispatch.ResourceMethodDispatcherFactory;
 import java.lang.reflect.Method;

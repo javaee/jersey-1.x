@@ -22,7 +22,7 @@
 
 package com.sun.ws.rest.impl.container.servlet;
 
-import com.sun.ws.rest.api.core.ClasspathResourceConfig;
+import com.sun.jersey.api.core.ClasspathResourceConfig;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;

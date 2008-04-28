@@ -24,7 +24,7 @@ package com.sun.ws.rest.impl.resource;
 
 import com.sun.ws.rest.impl.AbstractResourceTester;
 import javax.ws.rs.Path;
-import com.sun.ws.rest.api.client.WebResource;
+import com.sun.jersey.api.client.WebResource;
 import java.io.IOException;
 import javax.ws.rs.GET;
 import javax.ws.rs.core.Context;

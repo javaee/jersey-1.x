@@ -24,10 +24,10 @@ package com.sun.ws.rest.impl.wadl;
 
 import com.sun.research.ws.wadl.Application;
 import com.sun.research.ws.wadl.Resource;
-import com.sun.ws.rest.api.MediaTypes;
-import com.sun.ws.rest.api.core.HttpContext;
-import com.sun.ws.rest.api.model.AbstractResource;
-import com.sun.ws.rest.api.uri.UriTemplate;
+import com.sun.jersey.api.MediaTypes;
+import com.sun.jersey.api.core.HttpContext;
+import com.sun.jersey.api.model.AbstractResource;
+import com.sun.jersey.api.uri.UriTemplate;
 import com.sun.ws.rest.impl.model.MediaTypeHelper;
 import com.sun.ws.rest.impl.model.method.ResourceHttpOptionsMethod;
 import com.sun.ws.rest.impl.model.method.ResourceMethod;

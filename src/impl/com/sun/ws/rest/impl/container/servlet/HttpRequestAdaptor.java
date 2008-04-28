@@ -22,10 +22,10 @@
 
 package com.sun.ws.rest.impl.container.servlet;
 
-import com.sun.ws.rest.api.container.ContainerException;
-import com.sun.ws.rest.api.uri.UriComponent;
-import com.sun.ws.rest.spi.container.AbstractContainerRequest;
-import com.sun.ws.rest.spi.container.MessageBodyContext;
+import com.sun.jersey.api.container.ContainerException;
+import com.sun.jersey.api.uri.UriComponent;
+import com.sun.jersey.spi.container.AbstractContainerRequest;
+import com.sun.jersey.spi.container.MessageBodyContext;
 import java.io.IOException;
 import java.security.Principal;
 import java.util.Enumeration;

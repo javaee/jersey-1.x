@@ -24,10 +24,10 @@ package com.sun.ws.rest.impl.container.httpserver;
 
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
-import com.sun.ws.rest.api.container.ContainerException;
-import com.sun.ws.rest.api.core.HttpResponseContext;
-import com.sun.ws.rest.spi.container.ContainerListener;
-import com.sun.ws.rest.spi.container.WebApplication;
+import com.sun.jersey.api.container.ContainerException;
+import com.sun.jersey.api.core.HttpResponseContext;
+import com.sun.jersey.spi.container.ContainerListener;
+import com.sun.jersey.spi.container.WebApplication;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;

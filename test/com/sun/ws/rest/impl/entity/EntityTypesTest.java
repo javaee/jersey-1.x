@@ -24,8 +24,8 @@ package com.sun.ws.rest.impl.entity;
 
 import com.sun.syndication.feed.atom.Entry;
 import com.sun.syndication.feed.atom.Feed;
-import com.sun.ws.rest.api.client.WebResource;
-import com.sun.ws.rest.api.representation.Form;
+import com.sun.jersey.api.client.WebResource;
+import com.sun.jersey.api.representation.Form;
 import com.sun.ws.rest.impl.MultivaluedMapImpl;
 import com.sun.ws.rest.impl.provider.entity.AtomEntryProvider;
 import com.sun.ws.rest.impl.provider.entity.AtomFeedProvider;

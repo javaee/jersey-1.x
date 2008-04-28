@@ -23,9 +23,9 @@
 package com.sun.ws.rest.impl.container.grizzly;
 
 import com.sun.grizzly.tcp.http11.GrizzlyRequest;
-import com.sun.ws.rest.spi.container.AbstractContainerRequest;
+import com.sun.jersey.spi.container.AbstractContainerRequest;
 import com.sun.ws.rest.impl.http.header.HttpHeaderFactory;
-import com.sun.ws.rest.spi.container.MessageBodyContext;
+import com.sun.jersey.spi.container.MessageBodyContext;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;

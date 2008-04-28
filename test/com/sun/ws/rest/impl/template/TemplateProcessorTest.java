@@ -22,10 +22,10 @@
 
 package com.sun.ws.rest.impl.template;
 
-import com.sun.ws.rest.api.client.WebResource;
-import com.sun.ws.rest.api.core.DefaultResourceConfig;
-import com.sun.ws.rest.api.core.ResourceConfig;
-import com.sun.ws.rest.api.view.Viewable;
+import com.sun.jersey.api.client.WebResource;
+import com.sun.jersey.api.core.DefaultResourceConfig;
+import com.sun.jersey.api.core.ResourceConfig;
+import com.sun.jersey.api.view.Viewable;
 import com.sun.ws.rest.impl.AbstractResourceTester;
 import java.io.IOException;
 import java.io.InputStream;

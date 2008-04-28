@@ -26,7 +26,7 @@ import com.sun.ws.rest.impl.ImplMessages;
 import javax.ws.rs.ConsumeMime;
 import javax.ws.rs.ProduceMime;
 import javax.ws.rs.HttpMethod;
-import com.sun.ws.rest.api.container.ContainerException;
+import com.sun.jersey.api.container.ContainerException;
 import java.lang.reflect.Method;
 
 /**

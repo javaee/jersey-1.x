@@ -22,15 +22,15 @@
 
 package com.sun.ws.rest.impl.uri.rules;
 
-import com.sun.ws.rest.api.core.HttpRequestContext;
-import com.sun.ws.rest.api.core.HttpResponseContext;
+import com.sun.jersey.api.core.HttpRequestContext;
+import com.sun.jersey.api.core.HttpResponseContext;
 import com.sun.ws.rest.impl.ImplMessages;
 import com.sun.ws.rest.impl.http.header.AcceptableMediaType;
 import com.sun.ws.rest.impl.model.HttpHelper;
 import com.sun.ws.rest.impl.model.method.ResourceMethod;
-import com.sun.ws.rest.api.Responses;
-import com.sun.ws.rest.spi.uri.rules.UriRule;
-import com.sun.ws.rest.spi.uri.rules.UriRuleContext;
+import com.sun.jersey.api.Responses;
+import com.sun.jersey.spi.uri.rules.UriRule;
+import com.sun.jersey.spi.uri.rules.UriRuleContext;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;

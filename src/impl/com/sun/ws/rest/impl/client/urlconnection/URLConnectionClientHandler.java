@@ -23,11 +23,11 @@
 package com.sun.ws.rest.impl.client.urlconnection;
 
 import com.sun.ws.rest.impl.RequestHttpHeadersImpl;
-import com.sun.ws.rest.api.client.ClientHandler;
-import com.sun.ws.rest.api.client.ClientHandlerException;
-import com.sun.ws.rest.api.client.ClientRequest;
-import com.sun.ws.rest.api.client.ClientResponse;
-import com.sun.ws.rest.spi.container.MessageBodyContext;
+import com.sun.jersey.api.client.ClientHandler;
+import com.sun.jersey.api.client.ClientHandlerException;
+import com.sun.jersey.api.client.ClientRequest;
+import com.sun.jersey.api.client.ClientResponse;
+import com.sun.jersey.spi.container.MessageBodyContext;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;

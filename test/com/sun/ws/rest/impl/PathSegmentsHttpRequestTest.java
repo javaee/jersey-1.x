@@ -22,9 +22,9 @@
 
 package com.sun.ws.rest.impl;
 
-import com.sun.ws.rest.api.core.HttpRequestContext;
+import com.sun.jersey.api.core.HttpRequestContext;
 import com.sun.ws.rest.impl.application.WebApplicationContext;
-import com.sun.ws.rest.spi.container.ContainerRequest;
+import com.sun.jersey.spi.container.ContainerRequest;
 import java.util.List;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.PathSegment;

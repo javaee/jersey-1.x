@@ -22,7 +22,7 @@
 
 package com.sun.ws.rest.impl.provider.entity;
 
-import com.sun.ws.rest.api.representation.Form;
+import com.sun.jersey.api.representation.Form;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;

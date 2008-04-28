@@ -22,14 +22,14 @@
 
 package com.sun.ws.rest.impl.application;
 
-import com.sun.ws.rest.api.core.HttpResponseContext;
-import com.sun.ws.rest.api.core.HttpRequestContext;
-import com.sun.ws.rest.api.core.ResourceConfig;
-import com.sun.ws.rest.spi.container.AbstractContainerRequest;
-import com.sun.ws.rest.spi.container.AbstractContainerResponse;
+import com.sun.jersey.api.core.HttpResponseContext;
+import com.sun.jersey.api.core.HttpRequestContext;
+import com.sun.jersey.api.core.ResourceConfig;
+import com.sun.jersey.spi.container.AbstractContainerRequest;
+import com.sun.jersey.spi.container.AbstractContainerResponse;
 import com.sun.ws.rest.impl.TestHttpRequestContext;
 import com.sun.ws.rest.impl.TestHttpResponseContext;
-import com.sun.ws.rest.api.core.DefaultResourceConfig;
+import com.sun.jersey.api.core.DefaultResourceConfig;
 import java.io.ByteArrayInputStream;
 import java.util.HashSet;
 import java.util.Set;

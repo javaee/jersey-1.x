@@ -2,7 +2,7 @@ package mandel
 
 object MandelServer {
     import com.sun.net.httpserver.HttpServer
-    import com.sun.ws.rest.api.container.httpserver.HttpServerFactory
+    import com.sun.jersey.api.container.httpserver.HttpServerFactory
 
     def run() {
         val server = HttpServerFactory.create("http://localhost:9998/mandelbrot");

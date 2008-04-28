@@ -22,8 +22,8 @@
 
 package com.sun.ws.rest.impl.container.config;
 
-import com.sun.ws.rest.api.core.PackagesResourceConfig;
-import com.sun.ws.rest.api.core.ResourceConfig;
+import com.sun.jersey.api.core.PackagesResourceConfig;
+import com.sun.jersey.api.core.ResourceConfig;
 import com.sun.ws.rest.impl.container.config.innerstatic.InnerStaticClass;
 import com.sun.ws.rest.impl.container.config.toplevel.PublicRootResourceClass;
 import com.sun.ws.rest.impl.container.config.toplevelinnerstatic.PublicRootResourceInnerStaticClass;
@@ -154,7 +154,7 @@ public class PackageResourceConfigTest extends AbstractResourceConfigTester {
         ClassLoader ocl = Thread.currentThread().getContextClassLoader();
         Thread.currentThread().setContextClassLoader(cl);
         try {
-            Class prc = cl.loadClass("com.sun.ws.rest.api.core.PackagesResourceConfig");
+            Class prc = cl.loadClass("com.sun.jersey.api.core.PackagesResourceConfig");
             Constructor c = prc.getConstructor(String[].class);
             return (ResourceConfig)c.newInstance((Object)packages);
             // return new PackagesResourceConfig(packages);

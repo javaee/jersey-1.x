@@ -22,7 +22,7 @@
 
 package com.sun.ws.rest.impl;
 
-import com.sun.ws.rest.api.core.HttpRequestContext;
+import com.sun.jersey.api.core.HttpRequestContext;
 import java.net.URI;
 import java.util.Iterator;
 import java.util.List;

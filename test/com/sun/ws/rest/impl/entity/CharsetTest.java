@@ -22,10 +22,10 @@
 
 package com.sun.ws.rest.impl.entity;
 
-import com.sun.ws.rest.api.client.ClientResponse;
-import com.sun.ws.rest.api.client.WebResource;
-import com.sun.ws.rest.api.client.config.ClientConfig;
-import com.sun.ws.rest.api.client.config.DefaultClientConfig;
+import com.sun.jersey.api.client.ClientResponse;
+import com.sun.jersey.api.client.WebResource;
+import com.sun.jersey.api.client.config.ClientConfig;
+import com.sun.jersey.api.client.config.DefaultClientConfig;
 import com.sun.ws.rest.impl.json.JSONJAXBContext;
 import java.io.Reader;
 import java.io.StringReader;

@@ -15,6 +15,7 @@
  */
 package com.sun.ws.rest.api.model;
 
+import com.sun.jersey.api.model.AbstractResourceMethod;
 import junit.framework.TestCase;
 
 /**

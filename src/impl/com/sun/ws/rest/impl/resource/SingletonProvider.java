@@ -22,12 +22,12 @@
 
 package com.sun.ws.rest.impl.resource;
 
-import com.sun.ws.rest.api.container.ContainerException;
-import com.sun.ws.rest.api.core.HttpContext;
-import com.sun.ws.rest.api.model.AbstractResource;
-import com.sun.ws.rest.spi.resource.ResourceProvider;
-import com.sun.ws.rest.spi.service.ComponentProvider;
-import com.sun.ws.rest.spi.service.ComponentProvider.Scope;
+import com.sun.jersey.api.container.ContainerException;
+import com.sun.jersey.api.core.HttpContext;
+import com.sun.jersey.api.model.AbstractResource;
+import com.sun.jersey.spi.resource.ResourceProvider;
+import com.sun.jersey.spi.service.ComponentProvider;
+import com.sun.jersey.spi.service.ComponentProvider.Scope;
 
 /**
  * A simple provider that maintains a singleton resource class instance

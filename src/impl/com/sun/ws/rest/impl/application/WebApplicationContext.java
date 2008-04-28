@@ -22,18 +22,18 @@
 
 package com.sun.ws.rest.impl.application;
 
-import com.sun.ws.rest.api.core.HttpRequestContext;
-import com.sun.ws.rest.api.core.HttpResponseContext;
-import com.sun.ws.rest.api.uri.ExtendedUriInfo;
-import com.sun.ws.rest.api.uri.UriComponent;
-import com.sun.ws.rest.api.uri.UriTemplate;
+import com.sun.jersey.api.core.HttpRequestContext;
+import com.sun.jersey.api.core.HttpResponseContext;
+import com.sun.jersey.api.uri.ExtendedUriInfo;
+import com.sun.jersey.api.uri.UriComponent;
+import com.sun.jersey.api.uri.UriTemplate;
 import com.sun.ws.rest.impl.MultivaluedMapImpl;
 import com.sun.ws.rest.impl.model.ResourceClass;
-import com.sun.ws.rest.spi.container.ContainerRequest;
-import com.sun.ws.rest.spi.container.ContainerResponse;
-import com.sun.ws.rest.spi.uri.rules.UriRule;
-import com.sun.ws.rest.spi.uri.rules.UriRuleContext;
-import com.sun.ws.rest.spi.uri.rules.UriRules;
+import com.sun.jersey.spi.container.ContainerRequest;
+import com.sun.jersey.spi.container.ContainerResponse;
+import com.sun.jersey.spi.uri.rules.UriRule;
+import com.sun.jersey.spi.uri.rules.UriRuleContext;
+import com.sun.jersey.spi.uri.rules.UriRules;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.LinkedList;

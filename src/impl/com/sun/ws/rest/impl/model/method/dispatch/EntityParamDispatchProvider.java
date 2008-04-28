@@ -23,13 +23,13 @@
 package com.sun.ws.rest.impl.model.method.dispatch;
 
 import javax.ws.rs.WebApplicationException;
-import com.sun.ws.rest.api.container.ContainerException;
-import com.sun.ws.rest.api.core.HttpContext;
-import com.sun.ws.rest.api.model.AbstractResourceMethod;
-import com.sun.ws.rest.api.model.Parameter;
+import com.sun.jersey.api.container.ContainerException;
+import com.sun.jersey.api.core.HttpContext;
+import com.sun.jersey.api.model.AbstractResourceMethod;
+import com.sun.jersey.api.model.Parameter;
 import com.sun.ws.rest.impl.ResponseBuilderImpl;
 import com.sun.ws.rest.impl.model.ReflectionHelper;
-import com.sun.ws.rest.spi.dispatch.RequestDispatcher;
+import com.sun.jersey.spi.dispatch.RequestDispatcher;
 import com.sun.ws.rest.impl.model.parameter.ParameterExtractor;
 import com.sun.ws.rest.impl.model.parameter.ParameterProcessor;
 import com.sun.ws.rest.impl.model.parameter.ParameterProcessorFactory;

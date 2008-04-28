@@ -11,9 +11,9 @@
  */
 package com.sun.ws.rest.impl.modelapi.validation;
 
-import com.sun.ws.rest.api.model.AbstractModelComponent;
-import com.sun.ws.rest.api.model.AbstractModelVisitor;
-import com.sun.ws.rest.api.model.ResourceModelIssue;
+import com.sun.jersey.api.model.AbstractModelComponent;
+import com.sun.jersey.api.model.AbstractModelVisitor;
+import com.sun.jersey.api.model.ResourceModelIssue;
 import java.util.LinkedList;
 import java.util.List;
 

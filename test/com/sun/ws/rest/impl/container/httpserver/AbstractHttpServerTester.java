@@ -23,9 +23,9 @@ package com.sun.ws.rest.impl.container.httpserver;
 
 import com.sun.net.httpserver.HttpHandler;
 import com.sun.net.httpserver.HttpServer;
-import com.sun.ws.rest.api.container.ContainerFactory;
-import com.sun.ws.rest.api.container.httpserver.HttpServerFactory;
-import com.sun.ws.rest.api.core.ResourceConfig;
+import com.sun.jersey.api.container.ContainerFactory;
+import com.sun.jersey.api.container.httpserver.HttpServerFactory;
+import com.sun.jersey.api.core.ResourceConfig;
 import com.sun.ws.rest.impl.test.util.TestHelper;
 import java.io.IOException;
 import java.net.URI;

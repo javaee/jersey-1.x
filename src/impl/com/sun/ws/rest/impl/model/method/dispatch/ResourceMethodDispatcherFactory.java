@@ -22,10 +22,10 @@
 
 package com.sun.ws.rest.impl.model.method.dispatch;
 
-import com.sun.ws.rest.api.model.AbstractResourceMethod;
+import com.sun.jersey.api.model.AbstractResourceMethod;
 import com.sun.ws.rest.impl.ImplMessages;
-import com.sun.ws.rest.spi.dispatch.RequestDispatcher;
-import com.sun.ws.rest.spi.service.ServiceFinder;
+import com.sun.jersey.spi.dispatch.RequestDispatcher;
+import com.sun.jersey.spi.service.ServiceFinder;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.LinkedList;

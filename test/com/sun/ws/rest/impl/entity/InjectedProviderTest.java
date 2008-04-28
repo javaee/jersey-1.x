@@ -23,7 +23,7 @@
 package com.sun.ws.rest.impl.entity;
 
 import com.sun.ws.rest.impl.AbstractResourceTester;
-import com.sun.ws.rest.api.client.WebResource;
+import com.sun.jersey.api.client.WebResource;
 import com.sun.ws.rest.impl.provider.entity.AbstractMessageReaderWriterProvider;
 import java.io.IOException;
 import java.io.InputStream;

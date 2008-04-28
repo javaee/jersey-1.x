@@ -23,8 +23,8 @@
 package com.sun.ws.rest.impl.resource;
 
 import com.sun.ws.rest.impl.AbstractResourceTester;
-import com.sun.ws.rest.api.core.HttpContext;
-import com.sun.ws.rest.api.client.WebResource;
+import com.sun.jersey.api.core.HttpContext;
+import com.sun.jersey.api.client.WebResource;
 import java.net.URI;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;

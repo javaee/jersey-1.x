@@ -25,7 +25,7 @@ package com.sun.ws.rest.impl.application;
 import com.sun.ws.rest.impl.model.MediaTypeHelper;
 import com.sun.ws.rest.impl.util.KeyComparator;
 import com.sun.ws.rest.impl.util.KeyComparatorHashMap;
-import com.sun.ws.rest.spi.container.MessageBodyContext;
+import com.sun.jersey.spi.container.MessageBodyContext;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 import java.util.ArrayList;

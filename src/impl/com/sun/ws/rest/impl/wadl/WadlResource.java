@@ -1,7 +1,7 @@
 package com.sun.ws.rest.impl.wadl;
 
 import com.sun.research.ws.wadl.Application;
-import com.sun.ws.rest.api.model.AbstractResource;
+import com.sun.jersey.api.model.AbstractResource;
 import java.util.Set;
 import javax.ws.rs.GET;
 import javax.ws.rs.ProduceMime;

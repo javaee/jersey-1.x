@@ -22,13 +22,13 @@
 
 package com.sun.ws.rest.impl.modelapi.annotation;
 
-import com.sun.ws.rest.api.model.AbstractResource;
-import com.sun.ws.rest.api.model.AbstractResourceMethod;
-import com.sun.ws.rest.api.model.AbstractSubResourceLocator;
-import com.sun.ws.rest.api.model.AbstractSubResourceMethod;
+import com.sun.jersey.api.model.AbstractResource;
+import com.sun.jersey.api.model.AbstractResourceMethod;
+import com.sun.jersey.api.model.AbstractSubResourceLocator;
+import com.sun.jersey.api.model.AbstractSubResourceMethod;
 import java.util.logging.LogRecord;
 import junit.framework.*;
-import com.sun.ws.rest.api.model.Parameter;
+import com.sun.jersey.api.model.Parameter;
 import com.sun.ws.rest.impl.modelapi.annotation.IntrospectionModellerTest.TestSubResourceOne;
 import java.util.logging.Handler;
 import java.util.logging.Level;

@@ -22,7 +22,7 @@
 
 package com.sun.ws.rest.impl.wadl;
 
-import com.sun.ws.rest.api.model.AbstractResource;
+import com.sun.jersey.api.model.AbstractResource;
 import com.sun.ws.rest.impl.model.method.ResourceMethod;
 import com.sun.ws.rest.impl.uri.PathPattern;
 import java.util.List;

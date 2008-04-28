@@ -25,7 +25,7 @@ package com.sun.ws.rest.impl.provider.header;
 import com.sun.ws.rest.impl.http.header.reader.HttpHeaderReader;
 import com.sun.ws.rest.impl.http.header.reader.HttpHeaderReaderImpl;
 import com.sun.ws.rest.impl.http.header.writer.WriterUtil;
-import com.sun.ws.rest.spi.HeaderDelegateProvider;
+import com.sun.jersey.spi.HeaderDelegateProvider;
 import java.text.ParseException;
 import javax.ws.rs.core.EntityTag;
 

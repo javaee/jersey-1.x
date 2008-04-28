@@ -24,7 +24,7 @@
 
 package com.sun.ws.rest.samples.jaxws;
 
-import com.sun.ws.rest.api.container.ContainerFactory;
+import com.sun.jersey.api.container.ContainerFactory;
 import javax.xml.ws.Endpoint;
 import javax.xml.ws.Provider;
 import javax.xml.ws.http.HTTPBinding;

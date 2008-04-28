@@ -22,8 +22,8 @@
 
 package com.sun.ws.rest.impl;
 
-import com.sun.ws.rest.spi.container.AbstractContainerRequest;
-import com.sun.ws.rest.spi.container.MessageBodyContext;
+import com.sun.jersey.spi.container.AbstractContainerRequest;
+import com.sun.jersey.spi.container.MessageBodyContext;
 import java.io.InputStream;
 import java.net.URI;
 

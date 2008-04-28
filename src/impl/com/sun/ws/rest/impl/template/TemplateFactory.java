@@ -22,8 +22,8 @@
 
 package com.sun.ws.rest.impl.template;
 
-import com.sun.ws.rest.spi.template.TemplateProcessor;
-import com.sun.ws.rest.spi.template.TemplateContext;
+import com.sun.jersey.spi.template.TemplateProcessor;
+import com.sun.jersey.spi.template.TemplateContext;
 import com.sun.ws.rest.impl.application.ComponentProviderCache;
 import java.util.Set;
 import java.util.logging.Logger;

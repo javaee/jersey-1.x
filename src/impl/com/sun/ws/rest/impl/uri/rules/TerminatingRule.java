@@ -22,8 +22,8 @@
 
 package com.sun.ws.rest.impl.uri.rules;
 
-import com.sun.ws.rest.spi.uri.rules.UriRule;
-import com.sun.ws.rest.spi.uri.rules.UriRuleContext;
+import com.sun.jersey.spi.uri.rules.UriRule;
+import com.sun.jersey.spi.uri.rules.UriRuleContext;
 
 /**
  * A terminating rule that checks to see if the response has been

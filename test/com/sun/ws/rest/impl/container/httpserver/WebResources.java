@@ -22,7 +22,7 @@
 
 package com.sun.ws.rest.impl.container.httpserver;
 
-import com.sun.ws.rest.api.core.DefaultResourceConfig;
+import com.sun.jersey.api.core.DefaultResourceConfig;
 
 public class WebResources extends DefaultResourceConfig {
     

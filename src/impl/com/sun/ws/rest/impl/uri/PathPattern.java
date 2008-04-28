@@ -22,8 +22,8 @@
 
 package com.sun.ws.rest.impl.uri;
 
-import com.sun.ws.rest.api.uri.UriPattern;
-import com.sun.ws.rest.api.uri.UriTemplate;
+import com.sun.jersey.api.uri.UriPattern;
+import com.sun.jersey.api.uri.UriTemplate;
 import java.util.Comparator;
 
 /**

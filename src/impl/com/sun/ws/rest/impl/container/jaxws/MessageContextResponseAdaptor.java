@@ -22,8 +22,8 @@
 
 package com.sun.ws.rest.impl.container.jaxws;
 
-import com.sun.ws.rest.spi.container.AbstractContainerResponse;
-import com.sun.ws.rest.spi.container.MessageBodyContext;
+import com.sun.jersey.spi.container.AbstractContainerResponse;
+import com.sun.jersey.spi.container.MessageBodyContext;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;

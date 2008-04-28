@@ -23,11 +23,11 @@
 package com.sun.ws.rest.impl.container.httpserver;
 
 import com.sun.net.httpserver.HttpHandler;
-import com.sun.ws.rest.api.client.Client;
-import com.sun.ws.rest.api.client.ClientFilter;
-import com.sun.ws.rest.api.client.ClientRequest;
-import com.sun.ws.rest.api.client.ClientResponse;
-import com.sun.ws.rest.api.client.WebResource;
+import com.sun.jersey.api.client.Client;
+import com.sun.jersey.api.client.ClientFilter;
+import com.sun.jersey.api.client.ClientRequest;
+import com.sun.jersey.api.client.ClientResponse;
+import com.sun.jersey.api.client.WebResource;
 import javax.ws.rs.Path;
 import javax.ws.rs.GET;
 import javax.ws.rs.ProduceMime;

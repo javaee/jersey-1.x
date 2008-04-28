@@ -22,10 +22,10 @@
 
 package com.sun.ws.rest.impl.container.jaxws;
 
-import com.sun.ws.rest.api.container.ContainerException;
+import com.sun.jersey.api.container.ContainerException;
 import com.sun.ws.rest.impl.ImplMessages;
-import com.sun.ws.rest.spi.container.ContainerListener;
-import com.sun.ws.rest.spi.container.WebApplication;
+import com.sun.jersey.spi.container.ContainerListener;
+import com.sun.jersey.spi.container.WebApplication;
 import java.io.IOException;
 import javax.activation.DataSource;
 import javax.annotation.Resource;

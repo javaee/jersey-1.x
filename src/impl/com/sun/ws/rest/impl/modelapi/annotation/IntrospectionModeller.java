@@ -21,14 +21,14 @@
  */
 package com.sun.ws.rest.impl.modelapi.annotation;
 
-import com.sun.ws.rest.api.model.AbstractResource;
-import com.sun.ws.rest.api.model.AbstractResourceConstructor;
-import com.sun.ws.rest.api.model.AbstractResourceMethod;
-import com.sun.ws.rest.api.model.AbstractSubResourceLocator;
-import com.sun.ws.rest.api.model.AbstractSubResourceMethod;
-import com.sun.ws.rest.api.model.Parameter;
-import com.sun.ws.rest.api.model.Parameterized;
-import com.sun.ws.rest.api.model.UriPathValue;
+import com.sun.jersey.api.model.AbstractResource;
+import com.sun.jersey.api.model.AbstractResourceConstructor;
+import com.sun.jersey.api.model.AbstractResourceMethod;
+import com.sun.jersey.api.model.AbstractSubResourceLocator;
+import com.sun.jersey.api.model.AbstractSubResourceMethod;
+import com.sun.jersey.api.model.Parameter;
+import com.sun.jersey.api.model.Parameterized;
+import com.sun.jersey.api.model.UriPathValue;
 import com.sun.ws.rest.impl.ImplMessages;
 import com.sun.ws.rest.impl.model.MediaTypeHelper;
 import java.lang.annotation.Annotation;

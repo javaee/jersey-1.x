@@ -21,7 +21,7 @@
  */
 package com.sun.ws.rest.impl;
 
-import com.sun.ws.rest.api.uri.UriComponent;
+import com.sun.jersey.api.uri.UriComponent;
 import junit.framework.*;
 
 /**

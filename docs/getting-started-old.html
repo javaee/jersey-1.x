@@ -178,7 +178,7 @@ data.
 <p>
 The API provides support for a number of useful formats:</p>
 <dl>
-<dt><a href="api/com/sun/ws/rest/api/representation/package-summary.html"><code>com.sun.ws.rest.api.representation</code></a></dt>
+<dt><a href="api/com/sun/ws/rest/api/representation/package-summary.html"><code>com.sun.jersey.api.representation</code></a></dt>
 <dd>This package contains a set of classes that implement <code>Representation&lt;T&gt;</code> for
 a variety of <code>T</code>. You can use these classes for returning data from
 a method, or develop your own custom class that implements <code>Representation&lt;T&gt;</code>
@@ -191,7 +191,7 @@ is provided to simplify the implementation of a custom representation.
 <code>FormURLEncodedProperties</code>, <code>Entry</code> (ROME library), <code>Feed</code> (ROME library) and JAXB classes</dt>
 <dd>These classes can all be used as the <code>T</code> for a return type or a method parameter,
 <code>Representation&lt;T&gt;</code> for a return type, or <code>Entity&lt;T&gt;</code> for a method parameter. 
-See <a href="api/com/sun/ws/rest/spi/streaming/TypeStreamingProvider.html"><code>com.sun.ws.rest.spi.streaming.TypeStreamingProvider</code></a> for documentation
+See <a href="api/com/sun/ws/rest/spi/streaming/TypeStreamingProvider.html"><code>com.sun.jersey.spi.streaming.TypeStreamingProvider</code></a> for documentation
 that describes how to add your own custom streaming provider to API.</dd>
 </dl>
 
@@ -586,7 +586,7 @@ to publish the endpoint.  The following is the Main class taken from the
 <a href="../examples/SimpleJAXWSEndpoint/README.html">SimpleJAXWSEndpoint</a>
 example.</p>
 <pre>
-import com.sun.ws.rest.api.container.ContainerFactory;
+import com.sun.jersey.api.container.ContainerFactory;
 import javax.xml.ws.Endpoint;
 import javax.xml.ws.Provider;
 import javax.xml.ws.http.HTTPBinding;

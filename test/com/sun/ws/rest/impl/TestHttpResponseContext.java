@@ -22,9 +22,9 @@
 
 package com.sun.ws.rest.impl;
 
-import com.sun.ws.rest.spi.container.AbstractContainerResponse;
-import com.sun.ws.rest.spi.container.ContainerRequest;
-import com.sun.ws.rest.spi.container.MessageBodyContext;
+import com.sun.jersey.spi.container.AbstractContainerResponse;
+import com.sun.jersey.spi.container.ContainerRequest;
+import com.sun.jersey.spi.container.MessageBodyContext;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
