@@ -182,7 +182,7 @@
                             <goal>install-file</goal>
                         </goals>
                         <configuration>
-                            <groupId>jersey</groupId>
+                            <groupId>com.sun.jersey</groupId>
                             <artifactId>jersey</artifactId>
                             <version>
                                 ${release.impl.version}-${release.impl.version.suffix}-SNAPSHOT
