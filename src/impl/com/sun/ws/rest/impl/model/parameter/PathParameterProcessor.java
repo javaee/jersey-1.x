@@ -22,6 +22,8 @@
 
 package com.sun.ws.rest.impl.model.parameter;
 
+import com.sun.ws.rest.impl.model.parameter.multivalued.MultivaluedParameterExtractor;
+import com.sun.ws.rest.impl.model.parameter.multivalued.MultivaluedParameterProcessor;
 import com.sun.jersey.api.core.HttpContext;
 import com.sun.jersey.api.model.Parameter;
 import javax.ws.rs.core.PathSegment;
@@ -72,7 +74,7 @@ public final class PathParameterProcessor implements ParameterProcessor {
             return new PathParameterSegmentExtractor(parameterName, 
                     !parameter.isEncoded());
         } else {
-            MultivaluedParameterExtractor e =  MultivaluedDefaultListParameterProcessor.
+            MultivaluedParameterExtractor e =  MultivaluedParameterProcessor.
                     process(parameter.getParameterClass(), 
                     parameter.getParameterType(), 
                     parameterName);        

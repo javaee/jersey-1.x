@@ -22,6 +22,8 @@
 
 package com.sun.ws.rest.impl.model.parameter;
 
+import com.sun.ws.rest.impl.model.parameter.multivalued.MultivaluedParameterExtractor;
+import com.sun.ws.rest.impl.model.parameter.multivalued.MultivaluedParameterProcessor;
 import com.sun.jersey.api.core.HttpContext;
 import com.sun.jersey.api.model.Parameter;
 import javax.ws.rs.core.Cookie;
@@ -66,7 +68,7 @@ public final class CookieParameterProcessor implements ParameterProcessor {
         if (parameter.getParameterClass() == Cookie.class) {
             return new CookieTypeParameterExtractor(parameterName);
         } else {
-            MultivaluedParameterExtractor e = MultivaluedDefaultListParameterProcessor.
+            MultivaluedParameterExtractor e = MultivaluedParameterProcessor.
                     process(parameter.getDefaultValue(), parameter.getParameterClass(), 
                     parameter.getParameterType(), parameterName);
 

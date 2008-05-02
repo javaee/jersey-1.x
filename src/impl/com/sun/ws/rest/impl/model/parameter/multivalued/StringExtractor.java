@@ -20,7 +20,7 @@
  *     "Portions Copyrighted [year] [name of copyright owner]"
  */
 
-package com.sun.ws.rest.impl.model.parameter;
+package com.sun.ws.rest.impl.model.parameter.multivalued;
 
 import javax.ws.rs.core.MultivaluedMap;
 
@@ -29,15 +29,15 @@ import javax.ws.rs.core.MultivaluedMap;
  *
  * @author Paul.Sandoz@Sun.Com
  */
-public final class MultivaluedDefaultStringExtractor implements MultivaluedParameterExtractor {
+final class StringExtractor implements MultivaluedParameterExtractor {
     final String parameter;
     final String defaultValue;
 
-    public MultivaluedDefaultStringExtractor(String parameter) {
+    public StringExtractor(String parameter) {
         this(parameter, null);
     }
     
-    public MultivaluedDefaultStringExtractor(String parameter, String defaultValue) {
+    public StringExtractor(String parameter, String defaultValue) {
         this.parameter = parameter;
         this.defaultValue = defaultValue;
     }

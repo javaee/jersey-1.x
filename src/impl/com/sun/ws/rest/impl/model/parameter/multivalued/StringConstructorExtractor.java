@@ -20,51 +20,48 @@
  *     "Portions Copyrighted [year] [name of copyright owner]"
  */
 
-package com.sun.ws.rest.impl.model.parameter;
+package com.sun.ws.rest.impl.model.parameter.multivalued;
 
 import javax.ws.rs.WebApplicationException;
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.List;
 import javax.ws.rs.core.MultivaluedMap;
 
 /**
  *
  * @author Paul.Sandoz@Sun.Com
  */
-public final class MultivaluedDefaultValueOfListExtractor 
-        extends ValueOfExtractor implements MultivaluedParameterExtractor {
+final class StringConstructorExtractor 
+        extends BaseStringConstructorExtractor 
+        implements MultivaluedParameterExtractor {
     final String parameter;
     final Object defaultValue;
 
-    public MultivaluedDefaultValueOfListExtractor(Method valueOf, String parameter, String defaultValueString) 
-    throws IllegalAccessException, InvocationTargetException {
-        super(valueOf);
+    public StringConstructorExtractor(Constructor c, String parameter) {
+        super(c);
+        this.parameter = parameter;
+        this.defaultValue = null;
+    }
+    
+    public StringConstructorExtractor(Constructor c, String parameter, String defaultValueString) 
+    throws InstantiationException, IllegalAccessException, InvocationTargetException {
+        super(c);
         this.parameter = parameter;
         this.defaultValue = (defaultValueString != null) ? 
             getValue(defaultValueString) : null;
     }
 
-    @SuppressWarnings("unchecked")
     public Object extract(MultivaluedMap<String, String> parameters) {
-        List<String> stringList = parameters.get(parameter);
-        if (stringList != null) {            
-            List valueList = new ArrayList();
-            for (String v : stringList) {
-                try {
-                    valueList.add(getValue(v));
-                } catch (Exception e) {
-                    throw new WebApplicationException(e, 400);
-                }
+        String v = parameters.getFirst(parameter);
+        if (v != null) {
+            try {
+                return getValue(v);
+            } catch (Exception e) {
+                throw new WebApplicationException(e, 400);
             }
-
-            return valueList;
         } else if (defaultValue != null) {
-            List valueList = new ArrayList();
             // TODO do we need to clone the default value
-            valueList.add(defaultValue);
-            return valueList;
+            return defaultValue;
         }
 
         return null;

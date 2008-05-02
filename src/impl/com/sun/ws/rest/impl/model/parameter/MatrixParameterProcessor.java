@@ -22,6 +22,8 @@
 
 package com.sun.ws.rest.impl.model.parameter;
 
+import com.sun.ws.rest.impl.model.parameter.multivalued.MultivaluedParameterExtractor;
+import com.sun.ws.rest.impl.model.parameter.multivalued.MultivaluedParameterProcessor;
 import com.sun.jersey.api.core.HttpContext;
 import com.sun.jersey.api.model.Parameter;
 import java.util.List;
@@ -60,7 +62,7 @@ public final class MatrixParameterProcessor implements ParameterProcessor {
             return null;
         }
         
-        MultivaluedParameterExtractor e =  MultivaluedDefaultListParameterProcessor.
+        MultivaluedParameterExtractor e =  MultivaluedParameterProcessor.
                 process(parameter.getDefaultValue(), parameter.getParameterClass(), parameter.getParameterType(), parameterName);
         
         if (e == null)

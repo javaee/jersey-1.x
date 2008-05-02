@@ -20,7 +20,7 @@
  *     "Portions Copyrighted [year] [name of copyright owner]"
  */
 
-package com.sun.ws.rest.impl.model.parameter;
+package com.sun.ws.rest.impl.model.parameter.multivalued;
 
 import javax.ws.rs.WebApplicationException;
 import java.lang.reflect.InvocationTargetException;
@@ -31,23 +31,21 @@ import javax.ws.rs.core.MultivaluedMap;
  *
  * @author Paul.Sandoz@Sun.Com
  */
-public final class MultivaluedDefaultValueOfExtractor 
-        extends ValueOfExtractor implements MultivaluedParameterExtractor {
+final class PrimitiveValueOfExtractor 
+        extends BaseValueOfExtractor 
+        implements MultivaluedParameterExtractor {
     final String parameter;
     final Object defaultValue;
+    final Object defaultDefaultValue;
 
-    public MultivaluedDefaultValueOfExtractor(Method valueOf, String parameter) {
-        super(valueOf);
-        this.parameter = parameter;
-        this.defaultValue = null;
-    }
-    
-    public MultivaluedDefaultValueOfExtractor(Method valueOf, String parameter, String defaultValueString) 
+    public PrimitiveValueOfExtractor(Method valueOf, String parameter, 
+            String defaultValueString, Object defaultDefaultValue) 
     throws IllegalAccessException, InvocationTargetException {
         super(valueOf);
         this.parameter = parameter;
         this.defaultValue = (defaultValueString != null) ? 
             getValue(defaultValueString) : null;
+        this.defaultDefaultValue = defaultDefaultValue;
     }
 
     public Object extract(MultivaluedMap<String, String> parameters) {
@@ -63,6 +61,6 @@ public final class MultivaluedDefaultValueOfExtractor
             return defaultValue;
         }
 
-        return null;
+        return defaultDefaultValue;
     }
 }

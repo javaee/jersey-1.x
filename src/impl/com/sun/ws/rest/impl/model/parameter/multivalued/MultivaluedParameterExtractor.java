@@ -20,28 +20,14 @@
  *     "Portions Copyrighted [year] [name of copyright owner]"
  */
 
-package com.sun.ws.rest.impl.model.parameter;
+package com.sun.ws.rest.impl.model.parameter.multivalued;
 
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
+import javax.ws.rs.core.MultivaluedMap;
 
 /**
  *
  * @author Paul.Sandoz@Sun.Com
  */
-public abstract class StringConstructorExtractor {
-    final Constructor c;
-
-    protected StringConstructorExtractor(Constructor c) {
-        this.c = c;
-    }
-
-    protected final Object getValue(String v) 
-            throws InstantiationException, IllegalAccessException, InvocationTargetException {
-        if (v == null || v.length() == 0) 
-            return null;
-        
-        return c.newInstance(v);
-    }
+public interface MultivaluedParameterExtractor {
+    Object extract(MultivaluedMap<String, String> parameters);
 }
-    

@@ -20,24 +20,27 @@
  *     "Portions Copyrighted [year] [name of copyright owner]"
  */
 
-package com.sun.ws.rest.impl.model.parameter;
+package com.sun.ws.rest.impl.model.parameter.multivalued;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 
 /**
  *
  * @author Paul.Sandoz@Sun.Com
  */
-public abstract class ValueOfExtractor {
-    final Method valueOf;
+abstract class BaseStringConstructorExtractor {
+    final Constructor c;
 
-    protected ValueOfExtractor(Method valueOf) {
-        this.valueOf = valueOf;
+    protected BaseStringConstructorExtractor(Constructor c) {
+        this.c = c;
     }
 
-    protected final Object getValue(String v)
-            throws IllegalAccessException, InvocationTargetException {
-        return valueOf.invoke(null, v);
+    protected final Object getValue(String v) 
+            throws InstantiationException, IllegalAccessException, InvocationTargetException {
+        if (v == null || v.length() == 0) 
+            return null;
+        
+        return c.newInstance(v);
     }
 }

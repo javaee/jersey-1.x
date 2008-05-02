@@ -20,8 +20,9 @@
  *     "Portions Copyrighted [year] [name of copyright owner]"
  */
 
-package com.sun.ws.rest.impl.model.parameter;
+package com.sun.ws.rest.impl.model.parameter.multivalued;
 
+import com.sun.ws.rest.impl.model.parameter.multivalued.PrimitiveMapper;
 import com.sun.jersey.api.container.ContainerException;
 import com.sun.ws.rest.impl.ImplMessages;
 import com.sun.ws.rest.impl.model.ReflectionHelper;
@@ -29,12 +30,14 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 import java.util.List;
+import java.util.Set;
+import java.util.SortedSet;
 
 /**
  *
  * @author Paul.Sandoz@Sun.Com
  */
-public class MultivaluedDefaultListParameterProcessor {
+public class MultivaluedParameterProcessor {
     
     public static MultivaluedParameterExtractor process(Class<?> parameter, 
             Type parameterType, String parameterName) {
@@ -44,18 +47,22 @@ public class MultivaluedDefaultListParameterProcessor {
     public static MultivaluedParameterExtractor process(String defaultValue, 
             Class<?> parameter, Type parameterType, String parameterName) {
        
-        if (parameter == List.class) {
+        if (parameter == List.class || 
+                parameter == Set.class || 
+                parameter == SortedSet.class) {
             // Get the generic type of the list
             // If none default to String
             Class c = ReflectionHelper.getGenericClass(parameterType);
             if (c == null || c == String.class) {
-                return new MultivaluedDefaultStringListExtractor(parameterName, defaultValue);
+                return CollectionStringExtractor.getInstance(
+                        parameter, parameterName, defaultValue);
             } else {
                 // Check for static valueOf(String )
                 Method valueOf = ReflectionHelper.getValueOfStringMethod(c);
                 if (valueOf != null) {
                     try {
-                        return new MultivaluedDefaultValueOfListExtractor(valueOf, parameterName, defaultValue);
+                        return CollectionValueOfExtractor.getInstance(
+                                parameter, valueOf, parameterName, defaultValue);
                     } catch (Exception e) {
                         throw new ContainerException(ImplMessages.DEFAULT_COULD_NOT_PROCESS_METHOD(defaultValue, valueOf));
                     }
@@ -65,14 +72,15 @@ public class MultivaluedDefaultListParameterProcessor {
                 Constructor constructor = ReflectionHelper.getStringConstructor(c);
                 if (constructor != null) {
                     try {
-                        return new MultivaluedDefaultStringConstructorListExtractor(constructor, parameterName, defaultValue);
+                        return CollectionStringConstructorExtractor.getInstance(
+                                parameter, constructor, parameterName, defaultValue);
                     } catch (Exception e) {
                         throw new ContainerException(ImplMessages.DEFAULT_COULD_NOT_PROCESS_CONSTRUCTOR(defaultValue, constructor));
                     }
                 }
             }
         } else if (parameter == String.class) {
-            return new MultivaluedDefaultStringExtractor(parameterName, defaultValue);            
+            return new StringExtractor(parameterName, defaultValue);            
         } else if (parameter.isPrimitive()) {
             // Convert primitive to wrapper class
             parameter = PrimitiveMapper.primitiveToClassMap.get(parameter);
@@ -86,7 +94,7 @@ public class MultivaluedDefaultListParameterProcessor {
             if (valueOf != null) {
                 try {
                     Object defaultDefaultValue = PrimitiveMapper.primitiveToDefaultValueMap.get(parameter);
-                    return new MultivaluedDefaultPrimitiveValueOfExtractor(valueOf, parameterName, 
+                    return new PrimitiveValueOfExtractor(valueOf, parameterName, 
                             defaultValue, defaultDefaultValue);
                 } catch (Exception e) {
                     throw new ContainerException(ImplMessages.DEFAULT_COULD_NOT_PROCESS_METHOD(defaultValue, valueOf));
@@ -97,7 +105,7 @@ public class MultivaluedDefaultListParameterProcessor {
             Method valueOf = ReflectionHelper.getValueOfStringMethod(parameter);
             if (valueOf != null) {
                 try {
-                    return new MultivaluedDefaultValueOfExtractor(valueOf, parameterName, defaultValue);
+                    return new ValueOfExtractor(valueOf, parameterName, defaultValue);
                 } catch (Exception e) {
                     throw new ContainerException(ImplMessages.DEFAULT_COULD_NOT_PROCESS_METHOD(defaultValue, valueOf));
                 }
@@ -107,7 +115,7 @@ public class MultivaluedDefaultListParameterProcessor {
             Constructor constructor = ReflectionHelper.getStringConstructor(parameter);
             if (constructor != null) {
                 try {
-                    return new MultivaluedDefaultStringConstructorExtractor(constructor, parameterName, defaultValue);
+                    return new StringConstructorExtractor(constructor, parameterName, defaultValue);
                 } catch (Exception e) {
                     throw new ContainerException(ImplMessages.DEFAULT_COULD_NOT_PROCESS_CONSTRUCTOR(defaultValue, constructor));
                 }

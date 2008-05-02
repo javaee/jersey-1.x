@@ -1,4 +1,6 @@
 release 0.8 (2008-06-20 or 2008-07-25)
+- Set<T> and SortedSet<T> can be used in addition to List<T> for the type of
+  @*Param annotation parameters.
 - Packages "com.sun.ws.rest.api.*" renamed to "com.sun.jersey.api.*"
 - Packages "com.sun.ws.rest.spi.*" renamed to "com.sun.jersey.spi.*"
 - The property/feature name space "com.sun.ws.rest.config" renamed to 

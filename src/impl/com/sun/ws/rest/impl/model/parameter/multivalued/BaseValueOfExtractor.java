@@ -20,14 +20,24 @@
  *     "Portions Copyrighted [year] [name of copyright owner]"
  */
 
-package com.sun.ws.rest.impl.model.parameter;
+package com.sun.ws.rest.impl.model.parameter.multivalued;
 
-import javax.ws.rs.core.MultivaluedMap;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 
 /**
  *
  * @author Paul.Sandoz@Sun.Com
  */
-public interface MultivaluedParameterExtractor {
-    Object extract(MultivaluedMap<String, String> parameters);
+abstract class BaseValueOfExtractor {
+    final Method valueOf;
+
+    protected BaseValueOfExtractor(Method valueOf) {
+        this.valueOf = valueOf;
+    }
+
+    protected final Object getValue(String v)
+            throws IllegalAccessException, InvocationTargetException {
+        return valueOf.invoke(null, v);
+    }
 }
