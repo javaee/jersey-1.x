@@ -22,6 +22,8 @@
 
 package com.sun.ws.rest.impl;
 
+import java.util.List;
+import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 import junit.framework.TestCase;
 
@@ -53,5 +55,13 @@ public class ResponseBuilderTest extends TestCase {
         assertTrue(caught);
     }
     
+    public void testMetadata() {
+        Response r = Response.status(500).header(("X-TEST"), "test").build();
+        
+        MultivaluedMap<String, Object> m = r.getMetadata();
+        assertEquals(1, m.size());
+        List<Object> l = m.get("X-TEST");
+        assertEquals(1, l.size());
+    }
     
 }

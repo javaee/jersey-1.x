@@ -64,8 +64,10 @@ public final class ResponseImpl extends Response {
     }
 
     public MultivaluedMap<String, Object> getMetadata() {
-        if (headers == null)
-            headers = new ResponseHttpHeadersImpl();
+        if (headers != null)
+            return headers;
+        
+        headers = new ResponseHttpHeadersImpl();
         
         for (int i = 0; i < values.length; i++)
             if (values[i] != null)
@@ -81,8 +83,10 @@ public final class ResponseImpl extends Response {
     
     public MultivaluedMap<String, Object> getMetadataOptimal(
             HttpRequestContext request, MediaType contentType) {
-        if (headers == null)
-            headers = new ResponseHttpHeadersImpl();
+        if (headers != null)
+            return headers;
+        
+        headers = new ResponseHttpHeadersImpl();
 
         if (values.length == 0 && contentType != null) {
             headers.putSingle(ResponseBuilderImpl.
