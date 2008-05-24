@@ -1,0 +1,161 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head><title>Bookstore Example</title></head>
+
+
+  <body>
+    <h1>Bookstore Example</h1>
+    <p>This example demonstrates how to connect JSP pages to resources. The example is copied from
+       the <a href="https://stapler.dev.java.net/getting-started.html">Bookstore</a> example presented
+       by the <a href="https://stapler.dev.java.net/">Stapler</a> project that provides a way to staple
+       URIs to Java classes to build RESTful Web applications such as <a href="http://hudson.dev.java.net/">Hudson</a>.
+    </p>
+    <p>A bookstore Web application is presented that is capable of presenting books, CDs and tracks of CDs.
+     
+    </p>
+
+    <h2>Contents</h2>
+    <p>The example consists of four web resources implemented by the following:
+        </p><dl>
+            <dt><code>com.sun.jersey.samples.bookstore.resources.Bookstore</code></dt>
+            <dd>The bookstore resource that returns a list of items, either CDs or Books.
+                The resource dynamically references a Book or CD resource using the
+                getItem method that is annotated with Path.
+                The Book and CD resource both inherit from the Item class and thus the
+                resources can be managed ploymorphically.
+            </dd>
+            <dt><code>com.sun.jersey.samples.bookstore.resources.Book</code></dt>
+            <dd>The book resource that has a title and an author.
+            </dd>
+            <dt><code>com.sun.jersey.samples.bookstore.resources.CD</code></dt>
+            <dd>The CD resource that has a title, author and a list of tracks.
+                The resource dynamically references the Track resource using the
+                getTrack method that is annotated with Path.
+            </dd>
+            <dt><code>com.sun.jersey.samples.bookstore.resources.Track</code></dt>
+            <dd>The Tracks resource that has a name and the length of the track.
+            </dd>
+        </dl>
+    <p>The mapping of the URI path space is presented in the following table:</p>
+	<table border="1">
+	<tr>
+	<th>URI path</th>
+	<th>Resource class</th>
+	<th>HTTP methods</th>
+	</tr>
+
+	<tr>
+	<td>/</td>
+	<td>Bookstore</td>
+	<td>GET</td>
+	</tr>
+	<tr>
+
+	<tr>
+	<td>/count</td>
+	<td>Bookstore</td>
+	<td>GET</td>
+	</tr>
+
+	<tr>
+	<td>/time</td>
+	<td>Bookstore</td>
+	<td>GET</td>
+	</tr>
+
+	<tr>
+	<td>/items/{itemid}</td>
+	<td>Book, CD</td>
+	<td>GET</td>
+	</tr>
+
+	<tr>
+	<td>/items/{itemid}/tracks/{num}</td>
+	<td>Track</td>
+	<td>GET</td>
+	</tr>
+
+	</table>
+
+    <p>The mapping of the views to URI paths and JSP pages is presented in the following table:</p>
+	<table border="1">
+	<tr>
+	<th>View</th>
+	<th>URI path</th>
+	<th>JSP page</th>
+	</tr>
+
+	<tr>
+	<td>Bookstore:index.jsp</td>
+	<td>/</td>
+	<td>/com/sun/ws/rest/samples/bookstore/resources/Bookstore/index.jsp</td>
+	</tr>
+	<tr>
+	<td>Bookstore:count.jsp</td>
+	<td>/count</td>
+	<td>/com/sun/ws/rest/samples/bookstore/resources/Bookstore/count.jsp</td>
+	</tr>
+	<tr>
+	<td>Bookstore:time.jsp</td>
+	<td>/time</td>
+	<td>/com/sun/ws/rest/samples/bookstore/resources/Bookstore/time.jsp</td>
+	</tr>
+
+	<tr>
+	<td>Book:index.jsp</td>
+	<td>/items/{itemid}</td>
+	<td>/com/sun/ws/rest/samples/bookstore/resources/Book/index.jsp</td>
+	</tr>
+	<tr>
+	<td>CD:index.jsp</td>
+	<td>/items/{itemid}</td>
+	<td>/com/sun/ws/rest/samples/bookstore/resources/CD/index.jsp</td>
+	</tr>
+	<tr>
+	<td>Track:index.jsp</td>
+	<td>/items/{itemid}/tracks/{num}</td>
+	<td>/com/sun/ws/rest/samples/bookstore/resources/Track/index.jsp</td>
+	</tr>
+
+	</table>
+    <h2>Running the Example</h2>
+
+    
+      <p>Bookmark example runs on Glassfish V2 application server (<a href="http://glassfish.dev.java.net/">http://glassfish.dev.java.net</a>). You will need to have it installed in order to run the example.
+
+      <p>Run the example as follows, having <code>$AS_HOME</code> poining to your Glassfish home directory:</p>
+
+      <p>Build and deploy the project by executing ant from the project directory</p>
+      <blockquote><code>ant run-on-glassfish</code></blockquote>
+
+      <p>Goto the URL:<p>
+      <blockquote><code>http://&lt;host:port&gt;/Bookstore/</code></blockquote>
+
+      <p>For a default glassfish installation will it be:<p>
+      <blockquote><a href="http://localhost:8080/Bookstore/">http://localhost:8080/Bookstore/</a></blockquote>
+
+    <h2>How it works</h2>
+      <p>This example shows how to support polymorphism of resources and JSP pages.
+         Hence it is possible to add another resource, such as a DVD resource with associated JSP pages,
+         which extends Item without having to change the logic of Bookstore or the existing JSP pages.</p>
+      <p>Each relative JSP page referenced using the Views annotation declared on a resource class corresponds to:
+      <ul>
+      <li>a relative URI path (relative to the URI path of the class) that corresponds to the name of the JSP page minus the '.jsp' suffix; or
+      </li>
+      <li>the 'index.jsp" that corresponds to the URI path of the class.
+      </ul>
+      <p>A relative JSP page is resolved by converting the fully qualified class name of the resource class into a path
+         and appending the name of JSP page to that path. For example, when a GET is performed on the URI path "/"
+         then the relative JSP page is "index.jsp" as referenced by the Bookstore resource class. This is resolved
+         to "/com/sun/ws/rest/samples/bookstore/resources/Bookstore/index.jsp" that resides in the Web pages of the WAR.
+         Similarly when a GET is performed on URI path "/count" then the relative JSP page is "count.jsp" as referenced by 
+         Bookstore resource class.
+      </p>
+      <p>The runtime fowards to the absolute JSP page using the servlet RequestDispatcher.forward method. The variable "it"
+         is automatically set to the instance of Bookstore so that the index.jsp, or count.jsp, has access to the Bookstore instance as
+         a Java bean.
+      </p>
+      <p>If a resource class inherits from another resource class then it will automatically inherit the views from the super class.</p>
+      <p>A JSP page may also include views using the inheritance mechanism, for example the index,jsp page associated with the
+         Book resource class includes a footer.jsp page whoose location is specified by the super class, Item.
+      </p>
+  </body></html>

@@ -1,0 +1,699 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<html><head>
+  <meta http-equiv="CONTENT-TYPE" content="text/html; charset=iso-8859-1"><title>Getting started</title>
+  
+<style type="text/css" title="text/css">
+p.note
+{
+	margin-left: 40px;
+}
+pre
+{
+	margin-left: 40px;
+	background-color: silver;
+}
+span.red { color: red; }
+
+</style></head>
+
+<body dir="ltr" lang="en-US">
+
+<h1>Getting Started With RESTful Web Services Development.</h1>
+<p>This document describes an early access implementation of a Java API for 
+RESTful web services development.</p>
+<p>The goal of the API is to provide a programming model that
+enables developers to rapidly build web services in Java (or using
+the Java Virtual Machine) that are characteristic of the best
+designed parts of the web. The API and programming model encourage
+the use of the <a href="http://en.wikipedia.org/wiki/REST">REST architectural style</a> and the correct use of 
+<a href="http://www.w3.org/Protocols/rfc2616/rfc2616.html">HTTP 1.1</a>. </p>
+<p> The implementation of the API is commonly referred to as 
+a 'runtime'. The runtime is responsible for deploying Plain Old Java Objects (POJOs), which conform to the API and programming model, and 
+dispatching HTTP requests to those Java objects.</p>
+<h2>The API</h2>
+<p>The Java documentation for the API can be found <a href="api/index.html">here</a>.</p>
+
+<h2>Creating a RESTful Web Service</h2>
+<p><a href="http://bitworking.org/news/">Joe
+Gregorio</a> in his article <a href="http://www.xml.com/pub/a/2004/12/01/restful-web.html">"How to Create a REST Protocol"</a>
+ presents a
+prescriptive approach for creating a RESTful Web service. This is an
+effective way of tackling the problem, so this section follows suit, using the simple employee service example presented in
+the article to create a RESTful Web service using the API.</p>
+<p>Using the prescribed approach, a set of questions are asked in
+the following order:</p>
+<ol>
+  <li>What are the URIs?</li>
+  <li>What's the format? </li>
+  <li>What methods are supported at each URI?&nbsp;</li>
+  <li>What status codes could be returned? </li>
+</ol>
+
+<h3>What Are the URIs?</h3>
+<p>This question really means: What are the resources that are
+identified by the URIs? Using the API, the question becomes:
+What are the Java classes corresponding to the resources that are
+identified by the URIs? The simple example presents two resources:</p>
+<ol>
+  <li>Employee (one URI per employee)&nbsp;</li>
+  <li>All employees </li>
+</ol>
+<p>Java classes corresponding to resources are annotated with the
+<a href="api/com/sun/ws/rest/api/UriTemplate.html"><code>UriTemplate</code></a>
+annotation. The example below shows the employees and employee resources as two Java classes:<br>
+</p>
+<pre><span class="red">@UriTemplate("/employees")</span>
+public class Employees { ... }<br></pre>
+<pre><span class="red">@UriTemplate("/employee/{id}")</span>
+public class Employee { ... }
+</pre>
+
+<p>The <code>UriTemplate</code> annotation defines a URI template as a
+URI path relative to the base URI of the container. <a href="http://bitworking.org/projects/URI-Templates/">URI
+Template</a> is an Internet-Draft that specifies URI templates to be:<br>
+</p>
+
+<blockquote>"strings that can be transformed into
+URIs after embedded variables are substituted. This document defines
+the structure and syntax of URI Templates."</blockquote>
+
+<p>The API uses URI templates in reverse. Given a set of <code>UriTemplate</code>
+annotated Java classes and a URI of an HTTP request, the
+runtime deploying the Java classes, will, on receiving the HTTP request, find the most specific Java
+class whose URI template matches the URI path of the HTTP request.</p>
+
+<p class="note">NOTE: The matching algorithm of an HTTP
+request to a Java class is more involved than just matching the URI
+template as described in this section. It also matches
+additional properties such as the HTTP method, the media type of the
+HTTP request, and the acceptable media types for the HTTP response.</p>
+
+<p>Assuming that the Java classes are deployed to the base URI <code>http://example.com/</code>
+then the following URIs will match the URI template "/employee/{id}" of
+the <code>Employee</code> class:</p>
+
+<pre>
+http://example.com/employee/1234
+http://example.com/employee/johnDoe
+http://example.com/employee/john/doe
+</pre>
+
+<p>Where the <code>id</code> variable is substituted, respectively,
+with the strings "1234", "johnDoe" and "john/doe". So the <code>Employee</code>
+class matches many URIs, as many as there are employees. Whereas only
+the URI <code>http://example.com/employees</code> will match the URI
+template "/employees" of the <code>Employees</code> class.</p>
+
+
+<h3>What's the Format?</h3>
+<p>This question really means: What does a resource consume in terms of HTTP request entities and 
+produce in terms of HTTP response entities, the latter of which are referred to as representations? 
+Or more simply put: What is the information that can be sent and received?</p>
+<p>HTTP request entities and representations are identified by MIME media types. (Such MIME media types are used for the <code>Content-Type</code> HTTP header request/response field or the <code>Accept</code> 
+HTTP header request field.) The API specifies annotations for declaring what MIME media types may be consumed 
+(from an HTTP request entity) and produced (by a representation).</p>
+<p>The example below shows the <code>Employees</code> and <code>Employee</code> classes annotated with 
+a
+<a href="api/com/sun/ws/rest/api/ConsumeMime.html"><code>ConsumedMime</code></a> and
+<a href="api/com/sun/ws/rest/api/ProduceMime.html"><code>ProduceMime</code></a> annotation:
+</p><pre>@UriTemplate("/employees")
+<span class="red">@ConsumeMime("application/employee+xml")</span>
+<span class="red">@ProduceMime("application/employee+xml")</span>
+public class Employees { ... }
+</pre>
+<pre>@UriTemplate("/employee/{id}")
+<span class="red">@ConsumeMime("application/employee+xml")</span>
+<span class="red">@ProduceMime("application/employee+xml")</span>
+public class Employee { ... }
+</pre>
+
+<p>These annotiations declare that the resources consume and produce information identified by the 
+MIME media type <code>application/employee+xml</code>. Declaring such annotations on the Java class states that 
+by default all HTTP methods (see next section) are declared to consume or produce the MIME media types. 
+More than one MIME media type may be consumed or produced by declaring a comma separated list of MIME media types.
+It is also possible to specify the media type at the method level as <a href="#addformats">shown below</a>.</p>
+
+
+<h3 id="methods">What methods are supported at each URI?</h3>
+
+<p>HTTP methods are mapped to Java class methods using the
+<a href="api/com/sun/ws/rest/api/HttpMethod.html"><code>HttpMethod</code><a/>
+annotation. The Java method arguments are populated with information from the
+HTTP request, and the Java method return value becomes the HTTP response. The example
+below shows the <code>Employees</code> class that supports the HTTP <code>GET</code> method to 
+obtain a list of employees, and the HTTP <code>POST</code> method to add a new employee.</p>
+
+<pre>@UriTemplate("/employees")
+@ConsumeMime("application/employee+xml")
+@ProduceMime("application/employee+xml")
+public class Employees {
+
+  <span class="red">@HttpMethod</span>
+  public <span class="red">Employees</span> getEmployeeList() {
+    Employees es = ...
+    return es;
+  }
+
+  <span class="red">@HttpMethod("POST")</span>
+  public <span class="red">Employee</span> createEmployee(
+      <span class="red">Employee</span> employee) {
+    ...
+    return new employee;        
+  }
+}</pre>
+
+<p>The names of the Java methods annotated with <code>HttpMethod</code>
+are not significant when an argument is supplied with the annotation, otherwise the Java method must begin with a valid and known HTTP method.
+The Java method may return <code>void</code>, <code>T</code>, <code>Representation&lt;T&gt;</code> (or an extension of),
+<code>HttpResponse</code> (or an extension of) or <code>Object</code> that is any type of the former (except void).
+</p>
+<p>
+Methods that 
+expect an HTTP body (usually <code>PUT</code> or <code>POST</code>) should have a method argument of type <code>T</code> or
+<code>Entity&lt;T&gt;</code> to accept the HTTP body content, where 
+<code>T</code> is the desired format. In this example, we are using JAXB
+to convert between the on-the-wire XML data and a Java class representation of the
+data.
+</p>
+<p>
+The API provides support for a number of useful formats:</p>
+<dl>
+<dt><a href="api/com/sun/ws/rest/api/representation/package-summary.html"><code>com.sun.jersey.api.representation</code></a></dt>
+<dd>This package contains a set of classes that implement <code>Representation&lt;T&gt;</code> for
+a variety of <code>T</code>. You can use these classes for returning data from
+a method, or develop your own custom class that implements <code>Representation&lt;T&gt;</code>
+and return an instance of that class instead. The <code>AbstractRepresentation&lt;T&gt;</code> class
+is provided to simplify the implementation of a custom representation.
+</dd>
+<dt><code>InputStream</code>,  
+<code>String</code>,  <code>byte[]</code>,
+<code>DataSource</code>,  <code>File</code>,  <code>MimeMultipart</code>,  
+<code>FormURLEncodedProperties</code>, <code>Entry</code> (ROME library), <code>Feed</code> (ROME library) and JAXB classes</dt>
+<dd>These classes can all be used as the <code>T</code> for a return type or a method parameter,
+<code>Representation&lt;T&gt;</code> for a return type, or <code>Entity&lt;T&gt;</code> for a method parameter. 
+See <a href="api/com/sun/ws/rest/spi/streaming/TypeStreamingProvider.html"><code>com.sun.jersey.spi.streaming.TypeStreamingProvider</code></a> for documentation
+that describes how to add your own custom streaming provider to API.</dd>
+</dl>
+
+<p>The example below shows the <code>Employee</code> class that supports the HTTP <code>GET</code> method to obtain 
+an employee, the HTTP <code>PUT</code> method to update an employee, and the HTTP <code>DELETE</code> method to delete an employee:</p>
+
+<pre>@UriTemplate("/employee/{id}")
+@ConsumeMime("application/employee+xml")
+@ProduceMime("application/employee+xml")
+public class Employee {
+
+  <span class="red">@HttpMethod</span>
+  public <span class="red">Employee</span> getEmployee(
+      <span class="red">@UriParam("id")</span> int id) {
+    Employee e = ...
+    return e;
+  }
+  
+  <span class="red">@HttpMethod</span>
+  public void putEmployee(
+      <span class="red">@UriParam("id")</span> int id,
+      <span class="red">Employee</span> employee) {
+    ...
+  }
+  
+  <span class="red">@HttpMethod</span>
+  public void deleteEmployee(
+      <span class="red">@UriParam("id")</span> int id) {
+    ...
+  }
+}
+</pre>
+
+<p>Other request information can also be consumed by using method arguments. For example, note the use of the
+    <code>UriParam</code> annotation in the example above. Before a method is invoked, the employee ID is extracted
+    from request URI automatically and cast to the Java primitive type <code>int</code>. If the employee ID
+    cannot be cast, then the runtime returns a <code>400 Bad Request</code>. So in this example,
+    the client is restricting employee IDs in the URI to strings that contain only digits. The same technique 
+can be used for URI query parameters by use of the <code>QueryParam</code> annotation.</p>
+
+<p>The following types may be annotated with a
+<a href="api/com/sun/ws/rest/api/UriParam.html"><code>UriParam</code></a>,
+<a href="api/com/sun/ws/rest/api/QueryParam.html"><code>QueryParam</code></a>,
+<a href="api/com/sun/ws/rest/api/HeaderParam.html"><code>HeaderParam</code></a> or a
+<a href="api/com/sun/ws/rest/api/MatrixParam.html"><code>MatrixParam</code></a> annotation: 
+all primitive types (except <code>char</code>), 
+primitive wrapper classes (except <code>Character</code>),
+String,
+any class that has a static method with the signature <code>valueOf(String)</code>, and 
+any class that has a constructor that takes a String parameter.
+In addition, the <code>QueryParam</code> annotation supports <code>List&lt;T&gt;</code>, where <code>T</code> is a supported
+type as previously stated, for the case where multiple values for a query parameter are present.</p>
+
+<p>It is possible to specify at the level of a Java method what MIME media types are consumed and produced. For example, the 
+<code>Employees</code> class may be extended to support additional formats with the following additional methods:</p>
+
+<pre id="addformats">
+  @HttpMethod
+  <span class="red">@ProduceMime("text/xhtml")</span>
+  public <span class="red">DataSource</span> getEmployeeListAsHTML() {
+      ...
+  }
+    
+  @HttpMethod
+  <span class="red">@ConsumeMime("application/x-www-form-urlencoded")</span>
+  public Employee postEmployeeFromForm(
+      <span class="red">FormURLEncodedProperties</span> employee) {
+    ...
+  }
+</pre>
+
+<p>If a client sends an HTTP <code>GET</code> request to the employees URI stating that the MIME media type <code>text/xhtml</code> is 
+preferable over <code>application/employee+xml</code>, then the <code>getEmployeeListAsHTML</code> method is invoked
+(instead of the <code>getEmployee</code> method) and returns a representation of the employees as an XHTML document. 
+If a client sends an HTTP <code>POST</code> request with a HTTP request entity that was produced from an HTML form, then 
+the <code>createEmployeeFromForm</code> method is invoked (instead of the <code>createEmployee</code> method).
+
+</p><p class="note">NOTE: A client declares what MIME media types are preferable using the <code>Accept</code> HTTP request header field. 
+In the above example, the HTTP request may, for example, include <code>Accept: text/html;q=1.0, application/employees+xml;q=0.6</code>
+to indicate that <code>text/html</code> is preferable over <code>application/employees+xml</code>.</p>
+
+<p>An application can also return a specific HTTP response.  Below is an expanded version of
+the <code>Employees</code> class that uses the HTTP <code>201 Created</code> status to indicate that
+a new resource has been created.</p>
+
+<pre>@UriTemplate("/employees")
+@ConsumeMime("application/employee+xml")
+@ProduceMime("application/employee+xml")
+public class Employees {
+
+  @HttpMethod
+  public <span class="red">Created</span> postEmployee(
+      Employee employee) {
+    Employee newEmployee = addEmployee(employee);
+    return new <span class="red">Created</span>(new Representation(newEmployee),  newEmployee.getUri());
+  }
+}</pre>
+
+
+<h3>What Status Codes Could Be Returned?</h3>
+
+<p>The runtime manages the returning of status codes for many
+common errors cases. If a client sends an HTTP <code>POST</code>
+request to the employee resource, the runtime returns a <code>405
+Method Not Allowed</code> response. If a client sends an HTTP <code>PUT</code>
+request to the employee resource where the media type of the request
+entity is anything other than <code>application/employee+xml</code>,
+then the runtime returns a <code>415 Unsupported Media Type</code>
+response.</p>
+<p>Error conditions can be signalled using an exception, for example, the following code can be
+used to inform the client that an employee resource has gone.<br>
+</p>
+<pre>@HttpMethod("GET")
+public Representation&lt;Employee&gt; getEmployee(
+    @UriParam("id") int id) {
+  if (!doesEmployeeExist(id)) {
+    <span class="red">throw new WebApplicationException(410);</span>
+  }
+  ...
+}
+</pre>
+
+
+<h2>Deploying a RESTful Web Service</h2>
+<p>The first step in deploying a RESTful Web Service is to compile
+your Java classes with <a href="http://java.sun.com/j2se/1.5.0/docs/guide/apt/GettingStarted.html">APT</a>.
+When you compile your resources with APT, the <a href="http://java.sun.com/j2se/1.5.0/docs/guide/apt/mirror/com/sun/mirror/apt/AnnotationProcessor.html">Annotation
+Processor</a> is run, which generates some handy artifacts
+that make deploying your application easier. One of the
+artifacts generated is a <code>WebResources</code> class. This
+class is used by the runtime to load your resources into
+the application. The annotation processor can also generate
+a <code>web.xml</code> file that can be used to deploy into a servlet
+container, a <code>application.wadl</code> file, which is a <a href="https://wadl.dev.java.net/">WADL</a>
+description of your resources, and a <code>WadlResource</code> class
+that can be used to access the WADL description.</p>
+
+<p>APT can be invoked through an APT ant task supplied with this release.</p>
+For APT to find the annotation processor, 
+make sure that the <code>jersey.jar</code> is on the
+classpath passed to APT. </p>
+<p>The annotation processor can accept the following
+options:
+<table border="0" cellpadding="2" cellspacing="2" width="90%">
+  <tbody>
+    <tr>
+      <td bgcolor="#ffffcc" width="10%">
+      <p>Option</p>
+      </td>
+      <td bgcolor="#ffffcc" width="45%">
+      <p>Description</p>
+      </td>
+      <td bgcolor="#ffffcc" width="25%">
+      <p>Command-Line Example</p>
+      </td>
+      <td bgcolor="#ffffcc" width="20%">
+      <p>Default Value</p>
+      </td>
+    </tr>
+    <tr>
+      <td width="10%">
+      <p><code>urlpattern</code></p>
+      </td>
+      <td width="45%">
+      <p>Specify the <code>url-pattern</code> to be placed in the
+generated <code>web.xml</code>.</p>
+      </td>
+      <td width="25%">
+      <p><code>-Aurlpattern=/myapp/*</code></p>
+      </td>
+      <td width="20%">
+      <p><code>/resources/*</code></p>
+      </td>
+    </tr>
+    <tr>
+      <td width="10%">
+      <p><code>servletname</code></p>
+      </td>
+      <td width="45%">
+      <p>Specify the <code>servlet-name</code> to be placed in the
+generated <code>web.xml</code>.</p>
+      </td>
+      <td width="25%">
+      <p><code>-Aservletname="My APP"</code></p>
+      </td>
+      <td width="20%">
+      <p><code>Web Application</code></p>
+      </td>
+    </tr>
+    <tr>
+      <td width="10%">
+      <p><code>webresourcespkg</code></p>
+      </td>
+      <td width="45%">
+      <p>Specify the package to generate the <code>WebResources</code>
+class into.</p>
+      </td>
+      <td width="25%">
+      <p><code>-Awebresourcespkg=com.sun.rest.sample</code></p>
+      </td>
+      <td width="20%">
+      <p><code>webresources</code></p>
+      </td>
+    </tr>
+    <tr>
+      <td width="10%">
+      <p><code>noservlet</code></p>
+      </td>
+      <td width="45%">
+      <p>Turn off the generation of <code>web.xml</code>.</p>
+      </td>
+      <td width="25%">
+      <p><code>-Anoservlet</code></p>
+      </td>
+      <td width="20%">
+      <p><code>web.xml</code> is generated.</p>
+      </td>
+    </tr>
+    <tr>
+      <td width="10%">
+      <p><code>nowadl</code></p>
+      </td>
+      <td width="45%">
+      <p>Turn off the generation of the <code>application.wadl</code>
+and the <code>WadlResource</code> class.</p>
+      </td>
+      <td width="25%">
+      <p><code>-Anowadl</code></p>
+      </td>
+      <td width="20%">
+      <p><code>application.wadl</code> and <code>WadlResource</code>
+class are generated.</p>
+      </td>
+    </tr>
+    <tr>
+      <td width="10%">
+      <p><code>webresourcesdestdir</code></p>
+      </td>
+      <td width="45%">
+      <p>Specify the destination directory for the generated <code>/WEB-INF/web.xml</code>
+relative to APT's destination directory.</p>
+      </td>
+      <td width="25%">
+      <p><code>-Awebresourcesdestdir=../..</code></p>
+      </td>
+      <td width="20%">
+      <p><code>APT destination directory</code></p>
+      </td>
+    </tr>
+  </tbody>
+</table>
+</p>
+<p>All of the examples utilize the APT ant task, so you can
+refer to them for concrete examples of how to invoke APT</p>
+
+<p>
+The following is taken from the <a href="../examples/SimpleServlet/README.html">SimpleServlet</a> example.  For the APT ant 
+task to run, it must have the <code>jersey.jar</code> and the <code>tools.jar</code>
+from Java SE 5 or higher. To execute the APT ant task in Java SE 6 requires that the <code>xEnsorsed="true"</code> be set on the task. (Note that if there
+is a runtime dependency on JAXB 2.1 or JAX-WS 2.1 jars then these jars must be placed in the endorsed directory of the Java SE 6 distribution, or by setting the endorsed directory using the system property "java.endorsed.dirs".)
+</p>
+<p>
+    Notice that the options are specified using the <code>&lt;option&gt;</code>
+    element. 
+</p>
+<pre>&lt;taskdef name="rbpt" classname="com.sun.ws.rest.tools.ant.WebResourcesProcessorTask"&gt;
+    &lt;classpath location="${file.reference.jersey.jar}"/&gt;
+&lt;/taskdef&gt;
+
+&lt;target name="-pre-compile"&gt;
+    &lt;echo message="Processing resource classes"/&gt;
+    &lt;rbpt fork="true" debug="true" verbose="false" xEndorsed="true"
+	 nocompile="false"
+	 destdir="${build.classes.dir.real}"
+	 sourcedestdir="gen-src"  
+	 sourcePath="${src.dir}"&gt;
+	&lt;classpath&gt;
+	    &lt;path path="${javac.classpath}"/&gt;
+	    &lt;pathelement location="${build.web.dir}/WEB-INF/classes"/&gt;
+	&lt;/classpath&gt;
+	&lt;option key="webresourcesdestdir" value="../.."/&gt;
+	&lt;option key="webresourcespkg" value="com.sun.ws.rest.samples.servlet.resources"/&gt;
+	&lt;option key="noservlet"/&gt;
+	&lt;source dir="${src.dir}"&gt;
+	    &lt;include name="**/*.java"/&gt;
+	&lt;/source&gt;
+    &lt;/rbpt&gt;    
+    &lt;copy todir="${build.classes.dir}"&gt;
+	&lt;fileset dir="${src.dir}" excludes="**/*.java"/&gt;
+    &lt;/copy&gt;
+&lt;/target&gt;
+</pre>
+
+<h3>Java EE Servlet Container</h3>
+<p>To deploy to a Java EE servlet container, you must make sure that the 
+    <code>jersey.jar</code> and all of the other jars upon which it is
+    dependent are in the servlet container's classpath.  This can be done
+    by either copying the jar files to one of the servlet container's library
+    directories, or by simply WARing the jar files into the application WAR file.
+    The application WAR file should contain your Java classes, 
+    the generated <code>WebResources</code> class,
+    and the generated <code>WEB-INF/web.xml</code> file.  This WAR file can then be
+    deployed to your servlet container.</p>
+<p>
+The following shows the <code>WEB-INF/web.xml</code> file generated for the
+<a href="../examples/SimpleServlet/README.html">SimpleServlet</a> example.  The <code>web.xml</code> specifies the 
+<code>com.sun.ws.rest.impl.container.servlet.ServletAdaptor</code> as the 
+&lt;servlet-class&gt;.  This adapter uses the <code>resourcebean</code>
+&lt;init-param&gt; to get the set of Java classes to include in the application.</p>
+
+
+<pre>&lt;?xml version="1.0" encoding="UTF-8" standalone="yes"?&gt;
+&lt;web-app version="2.4" xmlns="http://java.sun.com/xml/ns/j2ee/web-app_2_4.xsd"&gt;
+  &lt;servlet&gt;
+    &lt;servlet-name&gt;Web Application&lt;/servlet-name&gt;
+    <span class="red">&lt;servlet-class&gt;com.sun.ws.rest.impl.container.servlet.ServletAdaptor&lt;/servlet-class&gt;</span>
+    &lt;init-param&gt;
+      <span class="red">&lt;param-name&gt;resourcebean&lt;/param-name&gt;</span>
+      <span class="red">&lt;param-value&gt;com.sun.ws.rest.samples.servlet.resources.WebResources&lt;/param-value&gt;</span>
+    &lt;/init-param&gt;
+    &lt;load-on-startup&gt;1&lt;/load-on-startup&gt;
+  &lt;/servlet&gt;
+  &lt;servlet-mapping&gt;
+    &lt;servlet-name&gt;Web Application&lt;/servlet-name&gt;
+    &lt;url-pattern&gt;/resources/*&lt;/url-pattern&gt;
+  &lt;/servlet-mapping&gt;
+&lt;/web-app&gt;
+</pre>
+<p>
+The following shows the contents of the <a href="../examples/SimpleServlet/README.html">SimpleServlet</a> sample WAR file.
+</p><pre>META-INF/context.xml
+WEB-INF/classes/com/sun/ws/rest/samples/servlet/resources/MasterResourceBean.class
+WEB-INF/classes/com/sun/ws/rest/samples/servlet/resources/WebResources.class
+WEB-INF/classes/com/sun/ws/rest/samples/servlet/resources/ResourceBean1.class
+WEB-INF/classes/com/sun/ws/rest/samples/servlet/resources/ResourceBean2.class
+WEB-INF/classes/com/sun/ws/rest/samples/servlet/resources/ResourceBean3.class
+WEB-INF/classes/com/sun/ws/rest/samples/servlet/resources/ResourceBean4.class
+WEB-INF/classes/com/sun/ws/rest/samples/servlet/resources/index.html
+WEB-INF/classes/com/sun/ws/rest/samples/servlet/resources/java.jpg
+WEB-INF/classes/com/sun/ws/rest/wadl/resource/WadlResource.class
+WEB-INF/classes/com/sun/ws/rest/wadl/resource/application.wadl
+WEB-INF/lib/activation.jar
+WEB-INF/lib/jaxb-api.jar
+WEB-INF/lib/jaxb-impl.jar
+WEB-INF/lib/jaxws-api.jar
+WEB-INF/lib/jdom-1.0.jar
+WEB-INF/lib/jersey.jar
+WEB-INF/lib/jsr173_api.jar
+WEB-INF/lib/jsr250-api.jar
+WEB-INF/lib/jsr311-api.jar
+WEB-INF/lib/localizer.jar
+WEB-INF/lib/mail.jar
+WEB-INF/lib/persistence-api-1.0.jar
+WEB-INF/lib/rome-0.9.jar
+WEB-INF/web.xml
+index.html
+</pre>
+<br>
+<p></p>
+<h3>JAX-WS Endpoint Container</h3>
+<p>When deploying to a JAX-WS Endpoint container, you do not need the generated
+    <code>WEB-INF/web.xml</code>, because a servlet container is not used.
+    To prevent the generation of this file, you can use the <code>noservlet</code>
+    option for APT.  The following is taken from the <a href="../examples/SimpleJAXWSEndpoint/README.html">SimpleJAXWSEndpoint</a>
+    example.
+    It shows how the APT ant task is used with this option.
+    </p>
+
+<pre>&lt;target name="-pre-compile"&gt;
+    &lt;echo message="Processing resource classes"/&gt;
+    &lt;rbpt fork="true" destdir="${build.classes.dir}" xEndorsed="true"
+	 sourcedestdir="gen-src" sourcePath="${src.dir}"&gt;
+	&lt;classpath&gt;
+	    &lt;path path="${javac.classpath}"/&gt;
+	    &lt;pathelement location="${build.dir}"/&gt;
+	&lt;/classpath&gt;                 
+	&lt;option key="webresourcesdestdir" value="."/&gt;
+	&lt;option key="webresourcespkg" value="com.sun.ws.rest.samples.jaxws.resources"/&gt;
+        <span class="red">&lt;option key="noservlet"/&gt;</span>
+	&lt;source dir="${src.dir}"&gt;
+	    &lt;include name="**/*.java"/&gt;
+	&lt;/source&gt;
+    &lt;/rbpt&gt;    
+    &lt;copy todir="${build.classes.dir}"&gt;
+	&lt;fileset dir="${src.dir}" excludes="**/*.java"/&gt;
+    &lt;/copy&gt;
+&lt;/target&gt;
+</pre>
+    
+<p>To deploy to a JAX-WS endpoint, you must write a simple Main class that can be used 
+to publish the endpoint.  The following is the Main class taken from the
+<a href="../examples/SimpleJAXWSEndpoint/README.html">SimpleJAXWSEndpoint</a>
+example.</p>
+<pre>
+import com.sun.jersey.api.container.ContainerFactory;
+import javax.xml.ws.Endpoint;
+import javax.xml.ws.Provider;
+import javax.xml.ws.http.HTTPBinding;
+
+public class Main {
+    
+    /** Creates a new instance of Main */
+    public Main() {
+    }
+    
+    /**
+     * @param args the command line arguments
+     */
+    public static void main(String[] args) throws Exception {
+        /** Create a JAX-WS Provider */
+        Provider provider = ContainerFactory.createContainer(Provider.class,
+                "com.sun.ws.rest.samples.jaxws.resources");
+        
+        /** Create a JAX-WS Endpoint with the provider */
+        Endpoint endpoint = Endpoint.create(HTTPBinding.HTTP_BINDING,provider);
+        /** publish the endpoint */
+        endpoint.publish("http://localhost:9998/endpoint");
+        
+        System.out.println("JAX-WS endpoint running, visit: http://127.0.0.1:9998/endpoint/start, hit return to stop...");
+        /** wait of for a CR */
+        System.in.read();
+        System.out.println("Stopping JAX-WS endpoint");
+        
+        /* stop the endpoint */
+        endpoint.stop();
+        System.out.println("Server stopped");        
+    }
+    
+}
+</pre>
+
+<p>The following line uses the <code>ProviderFactory</code> to create a JAX-WS <a href="https://jax-ws.dev.java.net/nonav/jax-ws-20-fcs/api/javax/xml/ws/Provider.html">
+<code>Provider</code></a>:</p>
+<pre>Provider provider = ContainerFactory.createContainer(Provider.class,
+                "com.sun.ws.rest.samples.jaxws.resources");</pre>
+
+<p> The <code>ContainerFactory.createContainer</code> method takes two parameters, the
+type of container which to create, and package name that contains the <code>WebResources</code>
+class.  An alternative <code>create</code> is also available that can be passed a <code>ResourceConfig</code>
+should you wish to avoid the apt step.</p>
+
+<p>The following line creates a JAX-WS <a href="https://jax-ws.dev.java.net/nonav/jax-ws-20-fcs/api/javax/xml/ws/Endpoint.html">Endpoint</a>:</p>
+<pre>Endpoint endpoint = Endpoint.create(HTTPBinding.HTTP_BINDING,provider);</pre>
+<p>It is passed the <a href="https://jax-ws.dev.java.net/nonav/jax-ws-20-fcs/api/javax/xml/ws/http/HTTPBinding.html#HTTP_BINDING">HTTPBinding.HTTP_BINDING</a>, which specifies that the XML/HTTP
+binding should be used and the <code>provider</code> created in the previous line.</p>
+
+<p>The following line does the actual publishing of the endpoint:</p>
+<pre>endpoint.publish("http://localhost:9998/endpoint");</pre>
+<p>  It takes one argument, which is the URL
+at which the endpoint should be published.</p>
+
+<p>The following line is simply there to wait for the user to press the Return key: </p>
+<pre>System.in.read();</pre>
+<p>... before stopping
+the endpoint with the following line:</p>
+<pre>endpoint.stop();</pre>
+
+<p>When running a JAX-WS Endpoint-based application, the 
+the API, runtime and dependent jar files, the JAX-WS runtime jar files, the generated <code>WebResources</code>, and your
+Java classes must all be in the classpath.</p>
+
+<h3>Lightweight HTTP Server Container</h3>
+<p>The <a href="../examples/SimpleConsole/README.html">SimpleConsole</a> example application shows how to use
+the API with the lightweight HTTP server. Note in particular the <code>-pre-compile</code> target in the
+<code>build.xml</code> file that generates the classes (primarily <code>WebResources</code>) (as described above). 
+Note also the use of the <code>noservlet</code> option to
+prevent generation of a web.xml file as in the previous example.</p>
+
+
+<h2>Samples</h2>
+<p>The distribution contains the following examples that utilize the features of the 
+RESTful API (some of which have been described in this document):
+</p><ul>
+    <li><a href="../examples/OptimisticConcurrency/README.html">OptimisticConcurrency</a> - 
+        Demonstrates the application of optimistic concurrency to a web resource.</li>
+    <li><a href="../examples/SimpleAtomServer/README.html">SimpleAtomServer</a> - 
+        Demonstrates a simple Atom server that partially conforms to the 
+        <a href="http://www.ietf.org/html.charters/atompub-charter.html">Atom Publishing Format and Protocol</a>.</li>
+    <li><a href="../examples/SimpleConsole/README.html">SimpleConsole</a> - Demonstrates how to use the 
+        <a href="http://java.sun.com/javase/6/docs/jre/api/net/httpserver/spec/index.html">Lightweight HTTP Server</a> 
+        included in Sun's Java SE 6.0 release.</li>
+    <li><a href="../examples/SimpleJAXWSEndpoint/README.html">SimpleJAXWSEndpoint</a> - Demonstrates how to use a JAX-WS 
+        <a href="https://jax-ws.dev.java.net/nonav/jax-ws-20-fcs/api/javax/xml/ws/Endpoint.html">Endpoint</a>.</li>
+    <li><a href="../examples/SimpleServlet/README.html">SimpleServlet</a> - Demonstrates how to use a Servlet container.</li>
+    <li><a href="../examples/StorageService/README.html">StorageService</a> - Demonstrates a basic in-memory web storage service.</li>
+    <li><a href="../examples/Bookstore/README.html">Bookstore</a> - Demonstrates how to use ploymorphism with resources and views that are JSP pages.</li>
+</ul>
+<p></p>
+
+
+<h2 id="contacts">Contacts</h2>
+<p>In the process of designing and implementing the API, 
+the development team has identified a number of enhancements, planned
+for future versions of the API, that
+will improve ease of use and provide new features. In the meantime, we
+hope that developers will play with the API, build example programs
+and provide feedback that we may incorporate in future versions. 
+Additional information can be found on the following team members weblogs:</p>
+<dl>
+<dt>Paul Sandoz</dt>
+<dd><a href="http://blogs.sun.com/sandoz/">http://blogs.sun.com/sandoz/</a></dd>
+<dt>Marc Hadley</dt>
+<dd><a href="http://weblogs.java.net/blog/mhadley">http://weblogs.java.net/blog/mhadley</a></dd>
+
+</dl></body></html>

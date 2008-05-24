@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+   DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+
+   Copyright 2007 Sun Microsystems, Inc. All rights reserved. 
+
+   The contents of this file are subject to the terms of the Common Development
+   and Distribution License("CDDL") (the "License").  You may not use this file
+   except in compliance with the License. 
+
+   You can obtain a copy of the License at:
+       https://jersey.dev.java.net/license.txt
+   See the License for the specific language governing permissions and
+   limitations under the License.
+
+   When distributing the Covered Code, include this CDDL Header Notice in each
+   file and include the License file at:
+       https://jersey.dev.java.net/license.txt
+   If applicable, add the following below this CDDL Header, with the fields
+   enclosed by brackets [] replaced by your own identifying information:
+       "Portions Copyrighted [year] [name of copyright owner]"
+-->
+<project name="Jersey on GlassFish V2" default="help" basedir=".">
+
+  <target name="help" description="Provides help on script usage">
+    <echo message="The script expects you provide GlassFish home directory"/>
+    <echo message="via gf.home parameter: ant -Dgf.home=$AS_HOME ..."/>
+    <echo message=""/>
+    <echo message="install: creates a new $AS_HOME/jersey subdirectory"/>
+    <echo message="         containing Jersey docs, jars and examples"/>
+    <echo message="uninstall: removes $AS_HOME/jersey subdirectory"/>
+  </target>
+
+  <macrodef name="ensure-gf-home-set">
+    <sequential>
+      <fail message="GlassFish home dir unknown. You must set [gf.home] property!" unless="gf.home"/> 
+    </sequential>
+  </macrodef>
+
+  <target name="-check-example-dir-present">
+        <condition property="example.dir.present">
+          <available file="examples/${example.name}"/>
+        </condition>
+  </target>
+
+  <target name="-check-nb-prop-file-present">
+        <condition property="nb.prop.file.present">
+          <available file="${nb.prop.file}"/>
+        </condition>
+  </target>
+
+  <target name="do-copy-example" depends="-check-example-dir-present" if="example.dir.present">
+    <echo message="example ${example.name} present"/>
+        <copy todir="${gf.home}/jersey/examples/${example.name}">
+          <fileset dir="examples/${example.name}" includes="**/*"/>
+        </copy>
+  </target>
+
+
+  <target name="do-update-nb-prop" depends="-check-nb-prop-file-present" if="nb.prop.file.present">
+        <replace file="${nb.prop.file}">
+          <replacefilter token="../../lib" value="${ashome.jersey.lib.dir}"/>
+          <replacefilter token="/jaxb-api.jar" value="/webservices-rt.jar"/>
+          <replacefilter token="/jaxb-impl.jar" value="/webservices-tools.jar"/>
+          <replacefilter token="/jaxb-xjc.jar" value="/webservices-tools.jar"/>
+          <replacefilter token="/jaxws-api.jar" value="/webservices-rt.jar"/>
+        </replace>
+        <replace file="${nb.prop.file}">
+          <replacefilter token="${ashome.jersey.lib.dir}/mail.jar" value="${ashome.lib.dir}/mail.jar"/>
+          <replacefilter token="lib/javaee.jar" value="${ashome.lib.dir}/javaee.jar"/>
+          <replacefilter token="${ashome.jersey.lib.dir}/activation.jar" value="${ashome.lib.dir}/activation.jar"/>
+          <replacefilter token="${ashome.jersey.lib.dir}/webservices-tools.jar" value="${ashome.lib.dir}/webservices-tools.jar"/>
+          <replacefilter token="${ashome.jersey.lib.dir}/webservices-rt.jar" value="${ashome.lib.dir}/webservices-rt.jar"/>
+        </replace>
+        <tempfile property="nb.prop.temp.file"/>
+        <concat destfile="${nb.prop.temp.file}">
+          <header trimleading="yes">ashome.jersey.lib.dir=../../lib
+                                    ashome.lib.dir=../../../lib
+          </header>
+          <fileset file="${nb.prop.file}"/>
+        </concat>
+        <move file="${nb.prop.temp.file}" tofile="${nb.prop.file}"/>
+   </target>
+
+    <macrodef name="copy-example">
+      <attribute name="example.name"/>
+      <sequential>
+        <antcall target="do-copy-example" inheritAll="false">
+          <param name="example.name" value="@{example.name}"/>
+        </antcall>
+      </sequential>
+    </macrodef>
+
+    <macrodef name="update-nb-prop">
+      <attribute name="nb.prop.file"/>
+      <sequential>
+        <antcall target="do-update-nb-prop" inheritAll="false">
+          <param name="nb.prop.file" value="@{nb.prop.file}"/>
+          <param name="ashome.jersey.lib.dir" value="${ashome.jersey.lib.dir}"/>
+          <param name="ashome.lib.dir" value="${ashome.lib.dir}"/>
+        </antcall>
+      </sequential>
+    </macrodef>
+
+  <target name="install" description="Installs Jersey on GlassFish V2">
+     <ensure-gf-home-set/>
+     <mkdir dir="${gf.home}/jersey"/>
+     <!-- copy libraries -->
+     <mkdir dir="${gf.home}/jersey/lib"/>
+     <copy todir="${gf.home}/jersey/lib">
+       <fileset dir="lib">
+          <include name="*.jar"/>
+          <exclude name="activation.jar"/>
+          <exclude name="mail.jar"/>
+          <exclude name="jaxb-*.jar"/>
+          <exclude name="jaxws-*.jar"/>
+          <exclude name="ant.jar"/>
+          <exclude name="grizzly*jar"/>
+       </fileset>
+     </copy>
+     <!-- copy docs -->
+     <copy todir="${gf.home}/jersey/docs"><fileset dir="docs" includes="**/*"/></copy>
+     <!-- copy examples -->
+     <mkdir dir="${gf.home}/jersey/examples"/>
+     <copy-example example.name="Bookmark"/>
+     <update-nb-prop nb.prop.file="${gf.home}/jersey/examples/Bookmark/nbproject/project.properties"/>
+     <copy-example example.name="Bookstore"/>
+     <update-nb-prop nb.prop.file="${gf.home}/jersey/examples/Bookstore/nbproject/project.properties"/>
+     <copy-example example.name="EntityProvider"/>
+     <update-nb-prop nb.prop.file="${gf.home}/jersey/examples/EntityProvider/nbproject/project.properties"/>
+<!--
+     <copy-example example.name="GlassfishDB"/>
+     <update-nb-prop nb.prop.file="${gf.home}/jersey/examples/GlassfishDB/nbproject/project.properties"/>
+-->
+     <copy-example example.name="HelloWorld"/>
+     <update-nb-prop nb.prop.file="${gf.home}/jersey/examples/HelloWorld/nbproject/project.properties"/>
+     <copy-example example.name="HelloWorldWebApp"/>
+     <update-nb-prop nb.prop.file="${gf.home}/jersey/examples/HelloWorldWebApp/nbproject/project.properties"/>
+     <copy-example example.name="jMakiBackend"/>
+     <update-nb-prop nb.prop.file="${gf.home}/jersey/examples/jMakiBackend/nbproject/project.properties"/>
+     <copy-example example.name="JsonFromJaxb"/>
+     <update-nb-prop nb.prop.file="${gf.home}/jersey/examples/JsonFromJaxb/nbproject/project.properties"/>
+     <copy-example example.name="OptimisticConcurrency"/>
+     <update-nb-prop nb.prop.file="${gf.home}/jersey/examples/OptimisticConcurrency/nbproject/project.properties"/>
+     <copy-example example.name="SimpleAtomServer"/>
+     <update-nb-prop nb.prop.file="${gf.home}/jersey/examples/SimpleAtomServer/nbproject/project.properties"/>
+     <copy-example example.name="SimpleConsole"/>
+     <update-nb-prop nb.prop.file="${gf.home}/jersey/examples/SimpleConsole/nbproject/project.properties"/>
+     <copy-example example.name="SimpleJAXWSEndpoint"/>
+     <update-nb-prop nb.prop.file="${gf.home}/jersey/examples/SimpleJAXWSEndpoint/nbproject/project.properties"/>
+     <copy-example example.name="SimpleServlet"/>
+     <update-nb-prop nb.prop.file="${gf.home}/jersey/examples/SimpleServlet/nbproject/project.properties"/>
+     <copy-example example.name="StorageService"/>
+     <update-nb-prop nb.prop.file="${gf.home}/jersey/examples/StorageService/nbproject/project.properties"/>
+  </target>
+
+  <target name="uninstall" description="Uninstalls Jersey from GlassFish V2">
+     <ensure-gf-home-set/>
+     <delete dir="${gf.home}/jersey"/>
+  </target>
+
+</project>
+

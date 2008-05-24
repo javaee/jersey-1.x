@@ -1,0 +1,62 @@
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:util="http://www.springframework.org/schema/util"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xmlns:tx="http://www.springframework.org/schema/tx"
+       xsi:schemaLocation="
+http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd
+http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-2.5.xsd
+http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd
+http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd">
+
+    <!--  Autowiring support (spring 2.5)  -->
+    <!--
+        The AutowiredAnnotationBeanPostProcessor and CommonAnnotationBeanPostProcessor are both
+        included implicitly when using the component-scan element.
+        That means that the two components are autodetected and  wired together
+    -->
+    <context:component-scan base-package="com.sun.jersey.spring25"/>
+     
+    <bean id="managedSingletonResource" class="com.sun.jersey.spring.SpringManagedSingletonResource"
+        scope="singleton">
+        <property name="name">
+            <util:constant static-field="com.sun.jersey.spring.TestData.MANAGED" />
+        </property>
+        <property name="item" ref="singletonItem" />
+    </bean>
+
+    <bean id="managedSingletonResourceWithConstructor" class="com.sun.jersey.spring.SpringManagedSingletonResourceWithConstructor"
+        scope="singleton">
+        <constructor-arg>
+            <util:constant static-field="com.sun.jersey.spring.TestData.MANAGED" />
+        </constructor-arg>
+        <constructor-arg ref="singletonItem" />
+    </bean>
+
+    <bean id="managedPerRequestResource" class="com.sun.jersey.spring.SpringManagedPerRequestResource"
+        scope="prototype">
+        <property name="singletonItem" ref="singletonItem" />
+        <property name="prototypeItem" ref="prototypeItem" />
+    </bean>
+
+    <bean id="managedPerRequestResourceWithConstructor" class="com.sun.jersey.spring.SpringManagedPerRequestResourceWithConstructor"
+        scope="prototype">
+        <constructor-arg ref="singletonItem" />
+        <constructor-arg ref="prototypeItem" />
+    </bean>
+    
+    <bean id="singletonItem" class="com.sun.jersey.spring.Item" scope="singleton">
+        <property name="value">
+            <util:constant static-field="com.sun.jersey.spring.TestData.MANAGED" />
+        </property>
+    </bean>
+    
+    <bean id="prototypeItem" class="com.sun.jersey.spring.Item2" scope="prototype">
+        <property name="value">
+            <util:constant static-field="com.sun.jersey.spring.TestData.MANAGED" />
+        </property>
+    </bean>
+
+</beans>

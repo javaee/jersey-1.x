@@ -1,0 +1,125 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<html><head><title>Mandel Service Example</title></head>
+
+<body>
+<h1>Mandel Service Example</h1>
+<p>This example demonstrates a service,
+implemented in <A HREF="http://www.scala-lang.org/">Scala</A>, that
+calculates the <A HREF="http://en.wikipedia.org/wiki/Mandelbrot_set">Mandelbrot</A>
+set over a specified area (of the complex plane) and returns an image
+of that area that represents the set.</p>
+<p>The example depends on Scala
+<a href="http://www.scala-lang.org/downloads/distrib/files/scala-2.6.1-final.zip">2.6.1</a>.
+The Scala distribution is automatically downloaded.
+Due to minor incompatibilities introduced into the actors library of 2.6.1 the example compiled
+using 2.6.1 will not run on 2.6.0.</p>
+<h2>Contents</h2>
+<p>The example consists of one web resource implemented by the
+following: 
+</p>
+    <dl>
+	<dt><code>mandel.MandelService</code></dt>
+	<dd>This Scala class returns the a PNG image of a Mandelbrot set
+	calculated over a specified area.</dd>
+    </dl>
+<p>
+The mapping of the URI path space is presented in the following
+table:</p>
+<TABLE WIDTH=419 BORDER=1 CELLPADDING=2 CELLSPACING=3>
+	<COL WIDTH=177>
+	<COL WIDTH=115>
+	<COL WIDTH=102>
+	<TR>
+		<TH WIDTH=177>
+			<P>URI path</TH>
+		<TH WIDTH=115>
+			<P>Resource class</TH>
+		<TH WIDTH=102>
+			<P>HTTP methods</TH>
+	</TR>
+	<TR>
+		<TD WIDTH=177>
+			<P>({lx},{ly}),({ux},{uy})</TD>
+		<TD WIDTH=115>
+			<P>MandelResource</TD>
+		<TD WIDTH=102>
+			<P>GET</TD>
+	</TR>
+</TABLE>
+<P>The URI template, &ldquo;({lx},{ly}),({ux},{uy})&rdquo;, embeds
+the bottom left had corner and the top right hand corner of the area
+to calculate as template variables. The following query parameters
+are supported by MandelResource:</P>
+<TABLE WIDTH=419 BORDER=1 CELLPADDING=2 CELLSPACING=3>
+	<COL WIDTH=127>
+	<COL WIDTH=104>
+	<COL WIDTH=162>
+	<TR>
+		<TH WIDTH=127>
+			<P>Query parameter</TH>
+		<TH WIDTH=104>
+			<P>Default Value</TH>
+		<TH WIDTH=162>
+			<P>Description</TH>
+	</TR>
+	<TR>
+		<TD WIDTH=127>
+			<P>imageSize</TD>
+		<TD WIDTH=104>
+			<P>512</TD>
+		<TD WIDTH=162>
+			<P>The maximum size of the image in width or height</TD>
+	</TR>
+	<TR>
+		<TD WIDTH=127>
+			<P>limit 
+		</TD>
+		<TD WIDTH=104>
+			<P>512</TD>
+		<TD WIDTH=162>
+			<P>The limit on the number of iterations to determine if a point
+			on the complex   plane belongs to the Mandelbrot set.</TD>
+	</TR>
+	<TR>
+		<TD WIDTH=127>
+			<P>workers</TD>
+		<TD WIDTH=104>
+			<P>8</TD>
+		<TD WIDTH=162>
+			<P>The number of Scala actors instantiated to 
+		</TD>
+	</TR>
+</TABLE>
+<P>The URI template, &ldquo;({lx},{ly}),({ux},{uy})&rdquo;, embeds
+the bottom left had corner and the top right hand corner of the area
+to calculate.</P>
+<H2>Scaling up</H2>
+<P>The implementation utilizes Scala actors to calculate the set
+concurrently. If a system can avail of many hardware threads of
+multiple cores in a single chip then the Mandelbrot set can be
+calculated in parallel. The number of concurrent actors can be
+modified by the query parameter &ldquo;workers&rdquo;. Such a
+parameter should not really be required as Scala's event-based actors
+are cheap to construct  and in theory the runtime should utilize has
+many threads as the hardware and configuration allows to concurrently
+process actors. However, it is useful for testing and verifying
+performance increases (yet to be verified with this implementation!).</P>
+<h2>Running the Example</h2>
+<P>Run the example as follows:</P>
+<dl>
+	<dd><pre>cd examples/Mandel
+ant run</pre></dd></dl>
+<p>
+then go to the URL 
+<a href="http://localhost:9998/mandelbrot/(-2.2,-1.2),(0.8,1.2)">http://localhost:9998/mandelbrot/(-2.2,-1.2),(0.8,1.2)</a>.</p>
+<h2>TODO</h2>
+    <ul>
+	<li><p>Test on multi-core machine to see of performance is improved.</p>
+	<li><p>Assign Etags based on the area to calculate the image size
+	and the limit.</p>
+	<li><p>A client that enables one to zoom into the set</p>
+	<li><p>A client that enables one to browse the set a bit like the
+	way Google maps works. This would be an example of scaling out.</p>
+    </ul>
+</body>
+</html>

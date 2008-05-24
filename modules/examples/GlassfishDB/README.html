@@ -1,0 +1,45 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head><title>GlassfishDB Example</title></head>
+
+
+  <body>
+      <h1>GlassfishDB Example</h1>
+      <p>This example demonstrates how to use JAX-RS with Glassfish and the Java Persistence API to expose the contents of a Derby database table as a RESTful resource.</p>
+      
+      <h2>Contents</h2>
+      <p>The example consists of two Java classes:</p>
+      <dl>
+          <dt><code>com.example.resources.WidgetsResource</code></dt>
+          <dd>A JAX-RS resource class that implements the HTTP GET method and creates a representation by querying the database.</dd>
+          <dt><code>com.example.Persistence.Widget</code></dt>
+          <dd>A Java Persistence API entity class that is used to interact with the database.          
+          </dd>
+      </dl>
+      
+      <h2>Running the Example</h2>
+      <p>The example uses <code>sun-appserv-samples</code> database, which comes along with <code>Java EE 5 Samples</code> GlassFish update center module. In order to install the module you need to run update center client:
+<blockquote><pre>$AS_HOME/updatecenter/bin/updatetool</pre></blockquote>
+And then install <code>Java EE 5 Samples</code> module from <code>Available Software</code> list.
+      <p>Then run the example as follows. First start Glassfish:</p>
+      <blockquote><pre>$AS_HOME/bin/asadmin start-domain
+$AS_HOME/bin/asadmin start-database</pre></blockquote>
+	<p>Build the example via ant, it will create <code>dist/GlassfishDB.war</code> archive.
+      <p>Deploy GlassfishDB.war using the <a href="http://localhost:4848/">admin console</a> or via
+<blockquote><pre>$AS_HOME/bin/asadmin deploy dist/GlassfishDB.war</pre></blockquote> and then using a web browser, visit:</p>
+      <blockquote><code><a href="http://localhost:8080/GlassfishDB/resources/widgets">http://localhost:8080/GlassfishDB/resources/widgets</a></code></blockquote>
+      
+      <p>If this is the first time running this example you will likely see an empty window. In order to get some content you have to add some rows to the database as follows:</p>
+      
+      <ul>
+      <li>Run NetBeans and open the "Services" window</li>
+      <li>If required add a new connection for the Glassfish Derby database using the JDBC connection string "jdbc:derby://localhost:1527/sun-appserv-samples" and  username/password=APP/APP</li>
+      <li>Connect to the database, right click on the connection and select "Execute Command..."</li>
+      <li>Add some data using SQL, e.g. "insert into "APP"."WIDGET" values (1, 'thang', 'thang type thang')"
+      </ul>
+      
+      <p>Refresh the web page to see the newly added data:</p>      
+      
+      <p>A <a href="http://wadl.dev.java.net/#spec">WADL description</a> may be accessed at the URL:</p>
+      <blockquote><code><a href="http://localhost:8080/GlassfishDB/resources/application.wadl">http://localhost:8080/GlassfishDB/resources/application.wadl</a></code></blockquote>
+      
+  </body></html>

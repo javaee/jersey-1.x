@@ -1,0 +1,2 @@
+com.sun.jersey.impl.container.httpserver.HttpHandlerContainerProvider
+com.sun.jersey.impl.container.grizzly.GrizzlyContainerProvider

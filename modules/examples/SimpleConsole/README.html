@@ -1,0 +1,68 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head><title>Simple Console Example</title></head>
+
+
+  <body>
+      <h1>Simple Console Example</h1>
+      <p>This example demonstrates how to develop RESTful web services with the 
+      <a href="http://java.sun.com/javase/6/docs/jre/api/net/httpserver/spec/index.html">Lightweight HTTP Server</a>
+      included in Sun's Java Platform, Standard Edition 6 (Java SE 6)
+ release.</p>
+      
+      <h2>Contents</h2>
+      <p>The example consists of three Java classes and one HTML file:</p>
+      <dl>
+          <dt><code>com.sun.ws.rest.sample.console.Main</code></dt>
+          <dd>Contains the main function which starts and stops the HTTP server.</dd>
+          <dt><code>com.sun.jersey.samples.console.resource.Colours</code></dt>
+          <dd>A resource class that can produce two different representations of a 
+          list of colors. The list can be filtered by a client-supplied query 
+          parameter.
+          The resource references the Form resource using the 
+          Path annotation declared on the Colours.getColours method.          
+          </dd>
+          <dt><code>com.sun.jersey.samples.console.resource.Form</code></dt>
+          <dd>A resource class that produces a form in response to an HTTP GET,
+          processes the content of the form when submitted, and produces a
+          table of the submitted values in respose to the form being posted.</dd>
+          <dt><code>form.html</code></dt>
+          <dd>A static HTML file that is returned by the Form resource.</dd>
+      </dl>
+    <p>The mapping of the URI path space is presented in the following table:</p>
+	<table border="1">
+	<tr>
+	<th>URI path</th>
+	<th>Resource class</th>
+	<th>HTTP methods</th>
+	</tr>
+	<tr>
+	<td>/form</td>
+	<td>Form</td>
+	<td>GET, POST</td>
+	</tr>
+	<tr>
+	<td>/form/colours</td>
+	<td>Colours</td>
+	<td>GET</td>
+	</tr>
+	</table>
+      
+      <h2>Running the Example</h2>
+      <p>Run the example as follows:</p>
+      <blockquote><pre>cd examples/SimpleConsole
+ant run</pre></blockquote>
+
+      <p>From a web browser, visit:</p>
+      <blockquote><code><a href="http://127.0.0.1:9998/resources/form">http://127.0.0.1:9998/resources/form</a></code></blockquote>
+      <p>Fill in the form and submit it. Note that the pull-down list of colors
+      is populated dynamically. Enter part of a color name in the hint box
+      to see a filtered list of colors containing the hint.</p>
+      <p>You can see the complete list of colors at:</p>
+      <blockquote><code><a href="http://127.0.0.1:9998/resources/form/colours">http://127.0.0.1:9998/resources/form/colours</a></code></blockquote>
+<p>Or see only those colors containing the letter 'r':</p>
+ 
+      <blockquote><code><a href="http://127.0.0.1:9998/resources/form/colours?match=r">http://127.0.0.1:9998/resources/form/colours?match=r</a></code></blockquote>
+      <p>A <a href="http://wadl.dev.java.net/#spec">WADL description</a> may be accessed at the URL:</p>
+      <blockquote><code><a href="http://127.0.0.1:9998/resources/application.wadl">http://127.0.0.1:9998/resources/application.wadl</a></code></blockquote>
+      
+  </body></html>

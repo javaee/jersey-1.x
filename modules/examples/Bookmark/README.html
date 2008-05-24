@@ -1,0 +1,169 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<title>Bookmark Example</title>
+<style type="text/css"><!--
+  .figure { text-align:center;
+            margin: 20px}
+  .cliSample { background-color:lightgray }
+--></style>
+</head>
+
+
+  <body>
+    <h1>Bookmark Example</h1>
+    <p>This example demonstrates how to use JPA in the backend. The example is based on bookmark example
+       from the <a href="http://www.oreilly.com/catalog/9780596529260/">RESTful Web Services</a> book,
+which was inspired by the <a href="http://del.icio.us/v1">http://del.icio.us/</a> web service.
+    </p>
+    <p>A bookmark web application is presented that is capable of maintaining users and their bookmarks.
+     
+
+    <h2>Contents</h2>
+    <p>The example consists of four web resources implemented by the following:
+        </p><dl>
+            <dt><code>com.sun.jersey.samples.bookmark.resources.UsersResource</code></dt>
+            <dd>
+            	The users resource that returns a list of users.
+            </dd>
+            <dt><code>com.sun.jersey.samples.bookmark.resources.UserResource</code></dt>
+            <dd>
+		The user resource that has userid, username, e-mail and password.
+            </dd>
+            <dt><code>com.sun.jersey.samples.bookstore.resources.BookmarksResource</code></dt>
+            <dd>
+                The bookmarks resource that returns a list of bookmarks for actuall user resource.
+            </dd>
+            <dt><code>com.sun.jersey.samples.bookstore.resources.BookmarkResource</code></dt>
+            <dd>
+                The bookmark resource that has a bookmark uri and a long and short description.
+            </dd>
+        </dl>
+    <p>The mapping of the URI path space is presented in the following table:</p>
+	<table border="1">
+	<tr>
+	<th>URI path</th>
+	<th>Resource class</th>
+	<th>HTTP methods</th>
+	</tr>
+
+	<tr>
+	<td>/users/</td>
+	<td>UsersResource</td>
+	<td>GET</td>
+	</tr>
+	<tr>
+
+	<tr>
+	<td>/users/{userid}</td>
+	<td>UserResource</td>
+	<td>GET, PUT (used also for creating new users), DELETE</td>
+	</tr>
+
+	<tr>
+	<td>/users/{userid}/bookmarks</td>
+	<td>BookmarksResource</td>
+	<td>GET, POST</td>
+	</tr>
+
+
+	<tr>
+	<td>/users/{userid}/bookmarks/{bmid}</td>
+	<td>BookmarkResource</td>
+	<td>GET, PUT, DELETE</td>
+	</tr>
+
+	</table>
+
+    <h2>Running the Example</h2>
+
+<p>Bookmark example runs on Glassfish application server (<a href="http://glassfish.dev.java.net/">http://glassfish.dev.java.net</a>)
+and needs a running JavaDB (<a href="http://developers.sun.com/javadb/">http://developers.sun.com/javadb/</a>)
+instance for underlying data. 
+
+<p>You have two natural options, which JavaDB installation to use.
+<ul>
+<li>JavaDB bundled with Netbeans 6.0
+<li>JavaDB bundled with Glassfish V2
+</ul>
+
+<p>The example comes along with 
+Netbeans 6.0 (open source IDE, <a href="http://www.netbeans.org">http://www.netbeans.org/</a>) project files,
+so the first option is convenient for people running on Netbeans.
+
+<h3>Running on Netbeans 6.0</h3>
+
+<p>Presuming, you have installed Netbeans 6.0 with bundled Glassfish V2 server. 
+
+<h4>Building And Starting The Bookmark Service</h4>
+
+<p>Open <b>Bookmark</b> project in Netbeans IDE. 
+
+<p>The following pop-up might get displayed:
+<div class="figure"><img src="img/EditObjectProperties.png"/></div>
+Just click on <code>Regenerate</code> button. 
+
+<p>Another pop-up will get displayed then, saying there is unregistered database connection:
+<div class="figure"><img src="img/ResolveDSProblem.png"/></div>
+Click on <code>Close</code> button and resolve the problem as follows.
+Make a right-click on the <b>Bookmark</b> project:
+<div class="figure"><img src="img/ResolveDSProblemMenu.png"/></div>
+Then you click on <code>Resolve Data Source Problem...</code> item, on the next pop-up window
+click on the <code>Add Connection...</code> button,
+which will bring you to:
+<div class="figure"><img src="img/ResolveDSProblemDialog.png"/></div>
+Here you add <code>;create=true</code> parameter to <code>Database URL</code> field as 
+shown at the screenshot above and click on <code>OK</code> button. 
+On the following tab, you just confirm the selected <code>APP</code> schema:
+<div class="figure"><img src="img/ResolveDSProblemSchemaDialog.png"/></div>
+<p>You can now build and deploy the project by pressing <b>F6</b> (Run Main Project)
+
+
+<h4>Test Client Running</h4>
+
+<p>Open <b>Bookmark Sample Test Client</b> project located in <code>TestClient</code> subdirecory.
+Then press <code>F6</code> (Run Main Project).
+
+<h3>Running Without Netbeans 6.0</h3>
+
+<p>Presuming, you have installed Glassfish v2. <code>AS_HOME</code> variable should point to
+your glassfish installation directory.
+
+<h4>Building And Starting The Bookmark Service</h4>
+
+<p>If <code>.asadminpass</code> file is missing at your home directory, you
+will need to run the following command to get it created:
+<pre class="cliSample">
+$AS_HOME/bin/asadmin start-domain
+$AS_HOME/bin/asadmin login
+</pre>
+
+<p>You then build and run the example in just one shot from <code>Bookmark</code> directory by
+<pre class="cliSample">
+$AS_HOME/lib/ant/bin/ant run-on-glassfish
+</pre>
+
+<p><b>Notice:</b> You might need to change access rights for the ant command before running it:
+<pre class="cliSample">
+chmod +x $AS_HOME/lib/ant/bin/ant 
+</pre>
+
+<h4>Test Client Running</h4>
+
+<pre class="cliSample">
+cd TestClient
+$AS_HOME/lib/ant/bin/ant run
+</pre>
+
+<h2>TODOs</h2>
+<ul>
+  <li>add tags</li>                                                                                                 
+</ul>
+
+<h2>Links</h2>
+
+<a href="https://blueprints.dev.java.net/bpcatalog/ee5/persistence/webonlyapp.html">https://blueprints.dev.java.net/bpcatalog/ee5/persistence/webonlyapp.html</a>
+
+
+  </body>
+</html>

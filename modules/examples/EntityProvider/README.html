@@ -1,0 +1,84 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head><title>Entity Provider Example</title></head>
+
+
+  <body>
+      <h1>Entity Provider Example</h1>
+      <p>This example demonstrates how to add support for custom
+      Java types as resource class method parameters.</p>
+      
+      <h2>Contents</h2>
+      <p>The example consists of seven Java classes:</p>
+      <dl>
+          <dt><code>com.sun.jersey.samples.entityprovider.Main</code></dt>
+          <dd>Contains the main function which starts and stops the HTTP server.</dd>
+          <dt><code>com.sun.jersey.samples.entityprovider.resources.MapResource</code></dt>
+          <dd>A resource class that provides read and write access to a 
+          <code>Hashtable</code>.</dd>
+          <dt><code>com.sun.jersey.samples.entityprovider.resources.PropertiesResource</code></dt>
+          <dd>A resource class that provides read access to the system properties as plain text.</dd>
+          <dt><code>com.sun.jersey.samples.entityprovider.resources.NameValuePair</code></dt>
+          <dd>A utility class used to update <code>MapResource</code>. The input HTML form
+          data is converted into an instance of this class by <code>FormReader</code>.</dd>
+          <dt><code>com.sun.jersey.samples.entityprovider.FormReader</code></dt>
+          <dd>A message body reader that can read HTML form data and produce an
+          instance of <code>NameValuePair</code>. This class is used to instantiate the
+          <code>NameValuePair</code> parameter of <code>MapResource.updateDataItem()</code>.</dd>
+          <dt><code>com.sun.jersey.samples.entityprovider.FormWriter</code></dt>
+          <dd>A message body writer that can write an HTML page that contains
+          the contents of a <code>Hashtable</code> along with a HTML form
+          for modifying the contents. This class is used to render the
+          output of <code>MapResource.getData()</code> and <code>MapResource.updateDataItem()</code>.</dd>
+          <dt><code>com.sun.jersey.samples.entityprovider.PropertiesProvider</code></dt>
+          <dd>A message body writer that can write a plain text representation of
+          a <code>Properties</code> instance. This class is used to render the
+          output of <code>PropertiesResource.getSystemProperties()</code>.</dd>
+      </dl>
+      
+      <p>Jersey uses the following files to find the message body readers and writers 
+      (<code>FormReader</code>, <code>FormWriter</code> and <code>PropertiesProvider</code>):</p>
+      <dl>
+        <dt><code>META-INF/services/javax.ws.rs.ext.MessageBodyReader</code></dt>
+        <dd>Lists each class that implements <code>MessageBodyReader</code> 
+        (<code>FormReader</code>).</dd>
+        <dt><code>META-INF/services/javax.ws.rs.ext.MessageBodyWriter</code></dt>
+        <dd>Lists each class that implements <code>MessageBodyWriter</code> 
+        (<code>FormWriter</code> and <code>PropertiesProvider</code>).</dd>
+      </dl>
+      <p>Annotations on each message body reader and writer indicate the supported
+      media types.</p>
+    <p>The mapping of the URI path space is presented in the following table:</p>
+	<table border="1">
+	<tr>
+	<th>URI path</th>
+	<th>Resource class</th>
+	<th>HTTP methods</th>
+	</tr>
+	<tr>
+	<td>/data</td>
+	<td>MapResource</td>
+	<td>GET, POST</td>
+	</tr>
+	<tr>
+	<td>/properties</td>
+	<td>PropertiesResource</td>
+	<td>GET</td>
+	</tr>
+	</table>
+      
+      <h2>Running the Example</h2>
+      <p>Run the example as follows:</p>
+      <blockquote><pre>cd examples/EntityProvider
+ant run</pre></blockquote>
+
+      <p>From a web browser, visit:</p>
+      <blockquote><code><a href="http://127.0.0.1:9998/properties">http://127.0.0.1:9998/properties</a></code></blockquote>
+      <p>From a web browser, visit:</p>
+      <blockquote><code><a href="http://127.0.0.1:9998/data">http://127.0.0.1:9998/data</a></code></blockquote>
+      <p>Fill in the form and submit it. Note that the list below the form is
+      updated each time the form is submitted.</p>
+ 
+      <p>A <a href="http://wadl.dev.java.net/#spec">WADL description</a> may be accessed at the URL:</p>
+      <blockquote><code><a href="http://127.0.0.1:9998/application.wadl">http://127.0.0.1:9998/application.wadl</a></code></blockquote>
+      
+  </body></html>

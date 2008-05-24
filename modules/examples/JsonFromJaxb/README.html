@@ -1,0 +1,82 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<title>JsonFromJaxb Example</title>
+<style type="text/css"><!--
+  .figure { text-align:center;
+            margin: 20px}
+  .cliSample { background-color:lightgray }
+--></style>
+</head>
+
+
+  <body>
+    <h1>JsonFromJaxb Example</h1>
+    <p>This example demonstrates how to use JSON representation of JAXB based resources. 
+    <p>A simple web application is presented with just one resource: flight list. A client can obtain
+the list or update it using XML or JSON representation of the list. 
+     
+
+    <h2>Contents</h2>
+    <p>The flight list web resource is implemented by <code>com.sun.jersey.samples.jsonfromjaxb.resources.FlightList</code> class.
+    <p>The mapping of the URI path space is presented in the following table:</p>
+	<table border="1">
+	<tr>
+	<th>URI path</th>
+	<th>Resource class</th>
+	<th>HTTP methods</th>
+	</tr>
+
+	<tr>
+	<td>/flights/</td>
+	<td>FlightList</td>
+	<td>GET, PUT</td>
+	</tr>
+	<tr>
+
+	</table>
+
+    <h2>Running the Example</h2>
+
+<p>JsonFromJaxb example runs on Glassfish application server (<a href="http://glassfish.dev.java.net/">http://glassfish.dev.java.net</a>) and comes along with 
+Netbeans (open source IDE, <a href="http://www.netbeans.org">http://www.netbeans.org/</a>) project files.
+So it is easy to run it from Netbeans IDE.
+
+<h3>Running on Netbeans 6.0</h3>
+
+<p>Presuming, you have installed Netbeans 6.0 bundled with Glassfish V2.
+
+<h4>Building And Starting The JsonFromJaxb Service</h4>
+
+<p>Open <b>JsonFromJaxb</b> project in Netbeans IDE, then 
+build and deploy the project by pressing <b>F6</b> (Run Main Project)
+
+
+<h4>Test Client Running</h4>
+
+<p>Still in <b>JsonFromJaxb</b> project: right-click on <b>build.xml</b> file at <b>Files</b> view.
+Then select <b>Run Target...</b>, <b>Other Targets...</b> and finally <b>run-test-client</b> target.
+
+
+<h3>Running Without Netbeans 6.0</h3>
+
+<p>Presuming, you have installed Glassfish v2. <code>AS_HOME</code> variable should point to
+your glassfish installation directory.
+
+<h4>Building And Starting The JsonFromJaxb Service</h4>
+
+You make it from <code>JsonFromJaxb</code> directory by
+<pre class="cliSample">
+ant 
+$AS_HOME/bin/asadmin start-domain
+$AS_HOME/bin/asadmin deploy dist/JsonFromJaxb.war
+</pre>
+
+<h4>Test Client Running</h4>
+
+<pre class="cliSample">
+ant run-test-client
+</pre>
+
+  </body>
+</html>
