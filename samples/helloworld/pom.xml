@@ -23,14 +23,13 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
     <parent>
-        <artifactId>samples</artifactId>
-        <groupId>com.sun.jersey</groupId>
-        <version>0.8-SNAPSHOT</version>
+        <groupId>com.sun.jersey.samples</groupId>
+        <artifactId>jersey-samples</artifactId>
+        <version>0.8-ea-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
-    <modelVersion>4.0.0</modelVersion>
-    <groupId>com.sun.jersey.samples</groupId>
     <artifactId>helloworld</artifactId>
     <name>helloworld</name>
     <dependencies>

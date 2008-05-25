@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+   DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+
+   Copyright 2007 Sun Microsystems, Inc. All rights reserved. 
+
+   The contents of this file are subject to the terms of the Common Development
+   and Distribution License("CDDL") (the "License").  You may not use this file
+   except in compliance with the License. 
+
+   You can obtain a copy of the License at:
+       https://jersey.dev.java.net/license.txt
+   See the License for the specific language governing permissions and
+   limitations under the License.
+
+   When distributing the Covered Code, include this CDDL Header Notice in each
+   file and include the License file at:
+       https://jersey.dev.java.net/license.txt
+   If applicable, add the following below this CDDL Header, with the fields
+   enclosed by brackets [] replaced by your own identifying information:
+       "Portions Copyrighted [year] [name of copyright owner]"
+-->
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>com.sun.jersey</groupId>
+    <artifactId>jersey-project</artifactId>
+    <version>0.8-ea-SNAPSHOT</version>
+    <packaging>pom</packaging>
+    <name>jersey-project</name>
+    
+    <url>https://jersey.dev.java.net/</url>
+    
+    <organization>
+        <name>Sun Microsystems, Inc</name>
+        <url>http://www.sun.com/</url>
+    </organization>
+
+    <issueManagement>
+        <system>bugzilla</system>
+        <url>https://jersey.dev.java.net/servlets/ProjectIssues</url>
+    </issueManagement>
+    
+    <mailingLists>
+        <mailingList>
+            <name>Jersey Dev List</name>
+            <archive>dev@jersey.dev.java.net</archive>
+        </mailingList>
+        <mailingList>
+            <name>Jersey Support List</name>
+            <archive>users@jersey.dev.java.net</archive>
+        </mailingList>
+        <mailingList>
+            <name>Jersey Announce List</name>
+            <archive>announces@jersey.dev.java.net</archive>
+        </mailingList>
+    </mailingLists>
+    
+    <licenses>
+        <license>
+            <name>
+                COMMON DEVELOPMENT AND DISTRIBUTION LICENSE (CDDL) Version 1.0
+            </name>
+            <url>http://www.opensource.org/licenses/cddl1.php</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
+    
+    <modules>
+        <module>contribs</module>
+        <module>samples</module>
+        <module>jersey/maven</module>
+    </modules>
+
+    <build>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-compiler-plugin</artifactId>
+                    <inherited>true</inherited>
+                    <configuration>
+                        <source>1.5</source>
+                        <target>1.5</target>
+                    </configuration>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+    </build>
+    
+    <repositories>
+        <repository>
+            <id>java.net</id>
+            <url>http://download.java.net/maven/1</url>
+            <layout>legacy</layout>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </repository>
+    </repositories>
+    
+    <properties>
+        <jersey-version>0.8-ea-SNAPSHOT</jersey-version>
+    </properties>
+
+</project>
