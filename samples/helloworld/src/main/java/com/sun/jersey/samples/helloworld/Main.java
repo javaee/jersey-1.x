@@ -22,14 +22,24 @@
 
 package com.sun.jersey.samples.helloworld;
 
-import com.sun.net.httpserver.HttpServer;
-import com.sun.jersey.api.container.httpserver.HttpServerFactory;
 import java.io.IOException;
+
+import com.sun.jersey.api.container.ContainerFactory;
+import com.sun.jersey.api.container.httpserver.HttpServerFactory;
+import com.sun.jersey.api.core.PackagesResourceConfig;
+import com.sun.jersey.api.core.ResourceConfig;
+import com.sun.jersey.samples.helloworld.resources.HelloWorldResource;
+import com.sun.net.httpserver.HttpHandler;
+import com.sun.net.httpserver.HttpServer;
 
 public class Main {
     
     public static void main(String[] args) throws IOException {
-        HttpServer server = HttpServerFactory.create("http://localhost:9998/");
+        
+        final ResourceConfig resourceConfig = new PackagesResourceConfig( new String[] { HelloWorldResource.class.getPackage().getName() } );
+        final HttpHandler container = ContainerFactory.createContainer( HttpHandler.class, resourceConfig );
+        
+        final HttpServer server = HttpServerFactory.create( "http://localhost:9998/", container );
         server.start();
         
         System.out.println("Server running");

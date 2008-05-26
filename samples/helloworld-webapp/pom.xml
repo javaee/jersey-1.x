@@ -30,49 +30,39 @@
         <version>0.8-ea-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
-    <artifactId>helloworld</artifactId>
-    <name>helloworld</name>
-    <packaging>jar</packaging>
-    <dependencies>
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <version>3.8.1</version>
-            <scope>test</scope>
-        </dependency>
-    </dependencies>
-    
+    <groupId>com.sun.jersey.samples</groupId>
+    <artifactId>helloworld-webapp</artifactId>
+    <packaging>war</packaging>
+    <name>helloworld-webapp Maven Webapp</name>
     <build>
+        <finalName>helloworld-webapp</finalName>
+        
+
         <plugins>
-            <!--  Maven Exec Plug-In: http://mojo.codehaus.org/exec-maven-plugin/  -->
+        
+            <!-- Run the application using "mvn jetty:run" -->
             <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>exec-maven-plugin</artifactId>
-                <version>1.1</version>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>java</goal>
-                        </goals>
-                    </execution>
-                </executions>
-                <configuration>
-                    <mainClass>com.sun.jersey.samples.helloworld.Main</mainClass>
+                <groupId>org.mortbay.jetty</groupId>
+                <artifactId>maven-jetty-plugin</artifactId>
+                <configuration> 
+                    <contextPath>/</contextPath>
+                    <connectors>
+                        <connector
+                            implementation="org.mortbay.jetty.nio.SelectChannelConnector">
+                            <port>8080</port>
+                            <maxIdleTime>3600000</maxIdleTime>
+                        </connector>
+                    </connectors>
+
+                    <!-- Log to the console. -->
+                    <requestLog implementation="org.mortbay.jetty.NCSARequestLog">
+                        <!-- This doesn't do anything for Jetty, but is a workaround for a Maven bug
+                             that prevents the requestLog from being set. -->
+                        <append>true</append>
+                    </requestLog>
                 </configuration>
             </plugin>
+            
         </plugins>
     </build>
-
-    <pluginRepositories>
-        <pluginRepository>
-            <id>codehaus</id>
-            <url>http://repository.codehaus.org</url>
-        </pluginRepository>
-        <pluginRepository>
-            <id>java.net</id>
-            <url>http://download.java.net/maven/1</url>
-            <layout>legacy</layout>
-        </pluginRepository>
-    </pluginRepositories>
-    
 </project>
