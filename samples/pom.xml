@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+   DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+
+   Copyright 2007 Sun Microsystems, Inc. All rights reserved. 
+
+   The contents of this file are subject to the terms of the Common Development
+   and Distribution License("CDDL") (the "License").  You may not use this file
+   except in compliance with the License. 
+
+   You can obtain a copy of the License at:
+       https://jersey.dev.java.net/license.txt
+   See the License for the specific language governing permissions and
+   limitations under the License.
+
+   When distributing the Covered Code, include this CDDL Header Notice in each
+   file and include the License file at:
+       https://jersey.dev.java.net/license.txt
+   If applicable, add the following below this CDDL Header, with the fields
+   enclosed by brackets [] replaced by your own identifying information:
+       "Portions Copyrighted [year] [name of copyright owner]"
+--><project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>com.sun.jersey</groupId>
+        <artifactId>jersey-project</artifactId>
+        <version>0.8-ea-SNAPSHOT</version>
+        <relativePath>../pom.xml</relativePath>
+    </parent>
+    <groupId>com.sun.jersey.samples</groupId>
+    <artifactId>jersey-samples</artifactId>
+    <packaging>pom</packaging>
+    
+    <name>Jersey examples</name>
+    
+    <description>
+        Examples that show how to use jersey.
+    </description>
+    
+    <modules>
+        <module>helloworld</module>
+        <module>helloworld-webapp</module>
+    </modules>
+
+    <!-- Minimal dependencies for all jersey sample modules -->
+    <dependencies>
+
+        <dependency>
+            <groupId>com.sun.jersey</groupId>
+            <artifactId>jersey</artifactId>
+            <version>${jersey-version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>javax.servlet</groupId>
+            <artifactId>servlet-api</artifactId>
+            <version>2.5</version>
+            <scope>compile</scope>
+        </dependency>
+        
+    </dependencies>
+    
+</project>

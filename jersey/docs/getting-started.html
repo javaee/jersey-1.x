@@ -1,0 +1,74 @@
+<html>
+    <head>
+        <title>Getting Started</title>
+    </head>
+    
+    <body>
+    <h1>Getting Started</h1>
+    <p>Getting started with Jersey is very easy. First, <a href="https://jersey.dev.java.net/servlets/ProjectDocumentList">download</a> the latest distribution of Jersey and unzip it. Then, create a new project (using your favourite IDE or just ant/maven) and add the jar files in the Jersey distribution lib directory as compile time and run time dependencies of your project. (For those who want to skip the creation of their own project take a look at the last <a href="#created">section</a> of this document.)</p>
+
+    <h1>Creating a Web resource</h1>
+    <p>Create the following Java class in your project:</p>
+    <pre>
+ 1    // The Java class will be hosted at the URI path "/helloworld"
+ 2    @Path("/helloworld")
+ 3    public class HelloWorldResource {
+ 4    
+ 5        // The Java method will process HTTP GET requests
+ 6        @GET 
+ 7        // The Java method will produce content identified by the MIME Media
+ 8        // type "text/plain"
+ 9        @ProduceMime("text/plain")
+10        public String getClichedMessage() {
+11            // Return some cliched textual content
+12            return "Hello World";
+13        }
+14    }</pre>
+    <p>The <code>HelloWorldResource</code> class is a very simple Web resource. The URI path of the resource is "/helloworld" (line 2), it supports the HTTP GET method (line 6) and produces cliched textual content (line 12) of the MIME media type "text/plain" (line 9).<p>
+    <p>Notice the use of Java annotations to declare the URI path, the HTTP method and the MIME media type. This is a key feature of JSR 311.</p>
+
+    <h1>Deploying the Web resource</h1>
+    <p>The Web resource will be deployed using the Lightweight HTTP Server included in the Jersey distribution and in Sun's Java Platform, Standard Edition 6 (Java SE 6) release.</p>
+    <p>Create the following Java class in your project:</p>
+    <pre>
+ 1    public class Main {
+ 2    
+ 3        public static void main(String[] args) throws IOException {
+ 4            // Create the HttpHandler
+ 5            // Pass in the HelloWorldResource class
+ 6            HttpHandler handler = ContainerFactory.createContainer(
+ 7                    HttpHandler.class,
+ 8                    HelloWorldResource.class);
+ 9
+10            // Create the HTTP server using the HttpHandler
+11            HttpServer server = HttpServer.create(
+12                    new InetSocketAddress(9998),
+13                    0);
+14            server.createContext("/", handler);
+15            server.setExecutor(null);
+16            server.start();
+17        
+18            System.out.println("Server running");
+19            System.out.println("Visit: http://localhost:9998/helloworld");
+20            System.out.println("Hit return to stop...");
+21            System.in.read();
+22            System.out.println("Stopping server");   
+23            server.stop(0);
+24            System.out.println("Server stopped");
+25        }    
+26    }</pre>
+    <p>The <code>Main</code> class deploys the <code>HelloWorldResource</code> using the Lightweight HTTP Server.</p>
+    <p>Lines 6 to 8 use the Jersey container API to create a <code>HttpHandler</code> that manages the dispatching of HTTP requests to the Jersey runtime, which in turn manages the dispatching (if the request matches) to an instance of the <code>HelloWorldResource</code> class.</p>
+    <p>Lines 11 to 13 sets up the HTTP server with the host address ("http://localhost:9998"). Line 14 sets the base URI of the <code>HttpHandler</code> ("/"). The complete URI of the Hello World Web resource is "http://localhost:9998/helloworld". Line 16 starts the HTTP server.</p>
+    <p>Notice that no deployment descriptors were needed and the Web resource was setup in just one statement of Java code. The container API enables multiple HTTP containers to be supported based on the Java type passed as the first parameter of the <code>ContainerFactory.createContainer</code> method. There is an SPI that enables developers to develop and register their own containers.</p>
+
+    <h1>Testing the Web resource</h1>
+    <p>Goto the URI <a href="http://localhost:9998/helloworld">http://localhost:9998/helloworld</a> in your favourite browser.</p>
+    <p>Or, from the command line use <code>curl<code>:<p>
+    <pre>
+    > curl http://localhost:9998/helloworld</pre>
+
+    <a name="created"><h1>Here's one I created earlier</h1></a>
+    <p>The example code presented above is shipped as the HelloWorld project in the Jersey distribution (see the examples directory, or <a href="https://jersey.dev.java.net/source/browse/jersey/trunk/jersey/examples/HelloWorld/">browse</a> the project source). The example may be opened using NetBeans or may be run from the command line by typing <code>ant run</code> from the project directory.</p>
+    </body>
+</html>

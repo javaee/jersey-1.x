@@ -1,0 +1,97 @@
+/*
+ * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+ * 
+ * Copyright 2007 Sun Microsystems, Inc. All rights reserved. 
+ * 
+ * The contents of this file are subject to the terms of the Common Development
+ * and Distribution License("CDDL") (the "License").  You may not use this file
+ * except in compliance with the License. 
+ * 
+ * You can obtain a copy of the License at:
+ *     https://jersey.dev.java.net/license.txt
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ * When distributing the Covered Code, include this CDDL Header Notice in each
+ * file and include the License file at:
+ *     https://jersey.dev.java.net/license.txt
+ * If applicable, add the following below this CDDL Header, with the fields
+ * enclosed by brackets [] replaced by your own identifying information:
+ *     "Portions Copyrighted [year] [name of copyright owner]"
+ */
+package com.sun.jersey.impl.inject;
+
+import com.sun.jersey.api.core.HttpContext;
+import com.sun.jersey.api.model.Parameter;
+import com.sun.jersey.spi.inject.InjectableContext;
+import static java.lang.annotation.ElementType.CONSTRUCTOR;
+import static java.lang.annotation.ElementType.FIELD;
+import static java.lang.annotation.ElementType.PARAMETER;
+import static java.lang.annotation.RetentionPolicy.RUNTIME;
+
+import java.io.IOException;
+
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+
+import com.sun.jersey.impl.AbstractResourceTester;
+import com.sun.jersey.spi.inject.InjectableProvider;
+import com.sun.jersey.spi.inject.PerRequestInjectable;
+import java.net.URI;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.UriBuilder;
+import javax.ws.rs.ext.Provider;
+
+public class OverrideInjectableTest extends AbstractResourceTester {
+    
+    public OverrideInjectableTest(String testName) {
+        super( testName );
+    }
+    
+    @Provider
+    public static class QueryParamInjectableProvider implements 
+            InjectableProvider<QueryParam, Parameter, PerRequestInjectable<Map<String, String>>> {        
+        public PerRequestInjectable<Map<String, String>> getInjectable(InjectableContext ic, 
+                QueryParam a, Parameter c) {
+            if (Map.class != c.getParameterClass())
+                return null;
+            
+            final String name = c.getSourceName();
+            return new PerRequestInjectable<Map<String, String>>() {
+                public Map<String, String> getValue(HttpContext c) {
+                    String value = c.getUriInfo().getQueryParameters().getFirst(name);
+
+                    Map<String, String> m = new LinkedHashMap<String, String>();
+                    String[] kvs = value.split(",");
+                    for (String kv : kvs) {
+                        String[] nv = kv.split("=");
+                        m.put(nv[0].trim(), nv[1].trim());
+                    }
+                    
+                    return m;
+                }
+            };
+        }
+    }
+        
+    @Path("/")
+    public static class MethodInjected {
+        @GET
+        public String get(@QueryParam("l") Map<String, String> kv) throws Exception {
+            String v = "";
+            for (Map.Entry<String, String> e : kv.entrySet())
+                v += e.getKey() + e.getValue();
+            return v;
+        }                
+    }
+    
+    public void testMethodInjected() throws IOException {                
+        initiateWebApplication(MethodInjected.class, QueryParamInjectableProvider.class);
+                
+        URI u = UriBuilder.fromPath("").
+                        queryParam("l", "1=2, 3=4, 5=6").build();
+        assertEquals("123456", resource("/").uri(u).get(String.class));   
+    }
+}
