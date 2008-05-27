@@ -37,7 +37,7 @@ import com.sun.jersey.impl.uri.rules.SubLocatorRule;
 import com.sun.jersey.impl.uri.PathPattern;
 import com.sun.jersey.impl.uri.PathTemplate;
 import com.sun.jersey.api.uri.UriTemplate;
-import com.sun.jersey.impl.application.InjectableProviderContext;
+import com.sun.jersey.spi.resource.InjectableProviderContext;
 import com.sun.jersey.impl.application.ResourceMethodDispatcherFactory;
 import com.sun.jersey.impl.template.ViewableRule;
 import com.sun.jersey.impl.uri.rules.CombiningMatchingPatterns;
@@ -73,15 +73,11 @@ public final class ResourceClass {
     
     public final AbstractResource resource;
     
-    public final ResourceClassInjector injector;
-    
     public ResourceProvider provider;
     
     public ResourceClass(
             ResourceConfig config,
             ComponentProvider provider,
-            ComponentProvider resourceProvider,
-            ResourceProviderFactory providerFactory, 
             ResourceMethodDispatcherFactory df,
             InjectableProviderContext injectableContext,
             AbstractResource resource) {
@@ -89,8 +85,6 @@ public final class ResourceClass {
 
         this.config = config;
 
-        this.injector = new ResourceClassInjector(injectableContext, resource);
-        
         RulesMap<UriRule> rulesMap = new RulesMap<UriRule>();
 
         processSubResourceLocators(injectableContext, rulesMap);

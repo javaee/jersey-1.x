@@ -26,9 +26,10 @@ import com.sun.jersey.impl.model.parameter.multivalued.MultivaluedParameterExtra
 import com.sun.jersey.impl.model.parameter.multivalued.MultivaluedParameterProcessor;
 import com.sun.jersey.api.core.HttpContext;
 import com.sun.jersey.api.model.Parameter;
+import com.sun.jersey.spi.inject.Injectable;
 import com.sun.jersey.spi.inject.InjectableContext;
 import com.sun.jersey.spi.inject.InjectableProvider;
-import com.sun.jersey.spi.inject.PerRequestInjectable;
+import com.sun.jersey.spi.service.ComponentProvider.Scope;
 import javax.ws.rs.QueryParam;
 
 /**
@@ -36,9 +37,9 @@ import javax.ws.rs.QueryParam;
  * @author Paul.Sandoz@Sun.Com
  */
 public final class QueryParamInjectableProvider implements 
-        InjectableProvider<QueryParam, Parameter, PerRequestInjectable> {
+        InjectableProvider<QueryParam, Parameter> {
     
-    private static final class QueryParamInjectable implements PerRequestInjectable<Object> {
+    private static final class QueryParamInjectable implements Injectable<Object> {
         private final MultivaluedParameterExtractor extractor;
         private final boolean decode;
         
@@ -52,7 +53,11 @@ public final class QueryParamInjectableProvider implements
         }
     }
         
-    public PerRequestInjectable getInjectable(InjectableContext ic, QueryParam a, Parameter c) {
+    public Scope getScope() {
+        return Scope.PerRequest;
+    }
+    
+    public Injectable getInjectable(InjectableContext ic, QueryParam a, Parameter c) {
         String parameterName = c.getSourceName();
         if (parameterName == null || parameterName.length() == 0) {
             // Invalid query parameter name

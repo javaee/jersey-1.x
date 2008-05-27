@@ -26,9 +26,10 @@ import com.sun.jersey.impl.model.parameter.multivalued.MultivaluedParameterExtra
 import com.sun.jersey.impl.model.parameter.multivalued.MultivaluedParameterProcessor;
 import com.sun.jersey.api.core.HttpContext;
 import com.sun.jersey.api.model.Parameter;
+import com.sun.jersey.spi.inject.Injectable;
 import com.sun.jersey.spi.inject.InjectableContext;
 import com.sun.jersey.spi.inject.InjectableProvider;
-import com.sun.jersey.spi.inject.PerRequestInjectable;
+import com.sun.jersey.spi.service.ComponentProvider.Scope;
 import javax.ws.rs.HeaderParam;
 
 /**
@@ -36,9 +37,9 @@ import javax.ws.rs.HeaderParam;
  * @author Paul.Sandoz@Sun.Com
  */
 public final class HeaderParamInjectableProvider implements 
-        InjectableProvider<HeaderParam, Parameter, PerRequestInjectable> {
+        InjectableProvider<HeaderParam, Parameter> {
 
-    private static final class HeaderParamInjectable implements PerRequestInjectable<Object> {
+    private static final class HeaderParamInjectable implements Injectable<Object> {
         private MultivaluedParameterExtractor extractor;
         
         HeaderParamInjectable(MultivaluedParameterExtractor extractor) {
@@ -50,7 +51,11 @@ public final class HeaderParamInjectableProvider implements
         }
     }
     
-    public PerRequestInjectable getInjectable(InjectableContext ic, HeaderParam a, Parameter c) {
+    public Scope getScope() {
+        return Scope.PerRequest;
+    }
+    
+    public Injectable getInjectable(InjectableContext ic, HeaderParam a, Parameter c) {
         String parameterName = c.getSourceName();
         if (parameterName == null || parameterName.length() == 0) {
             // Invalid header parameter name

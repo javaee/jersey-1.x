@@ -26,9 +26,10 @@ import com.sun.jersey.impl.model.parameter.multivalued.MultivaluedParameterExtra
 import com.sun.jersey.impl.model.parameter.multivalued.MultivaluedParameterProcessor;
 import com.sun.jersey.api.core.HttpContext;
 import com.sun.jersey.api.model.Parameter;
+import com.sun.jersey.spi.inject.Injectable;
 import com.sun.jersey.spi.inject.InjectableContext;
 import com.sun.jersey.spi.inject.InjectableProvider;
-import com.sun.jersey.spi.inject.PerRequestInjectable;
+import com.sun.jersey.spi.service.ComponentProvider.Scope;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.core.PathSegment;
 
@@ -37,10 +38,9 @@ import javax.ws.rs.core.PathSegment;
  * @author Paul.Sandoz@Sun.Com
  */
 public final class PathParamInjectableProvider implements 
-        InjectableProvider<PathParam, Parameter, PerRequestInjectable> {
+        InjectableProvider<PathParam, Parameter> {
     
-    private static final class PathParamInjectable implements 
-            PerRequestInjectable<Object> {
+    private static final class PathParamInjectable implements Injectable<Object> {
         private final MultivaluedParameterExtractor extractor;
         private final boolean decode;
         
@@ -54,8 +54,7 @@ public final class PathParamInjectableProvider implements
         }
     }
     
-    private static final class PathParamSegmentInjectable implements 
-            PerRequestInjectable<PathSegment> {
+    private static final class PathParamSegmentInjectable implements Injectable<PathSegment> {
         private final String name;
         private final boolean decode;
         
@@ -69,7 +68,11 @@ public final class PathParamInjectableProvider implements
         }
     }
     
-    public PerRequestInjectable<?> getInjectable(InjectableContext ic, PathParam a, Parameter c) {
+    public Scope getScope() {
+        return Scope.PerRequest;
+    }
+    
+    public Injectable<?> getInjectable(InjectableContext ic, PathParam a, Parameter c) {
         String parameterName = c.getSourceName();
         if (parameterName == null || parameterName.length() == 0) {
             // Invalid URI parameter name

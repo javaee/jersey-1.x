@@ -108,7 +108,7 @@ public interface WebApplication {
      * 
      * @param ip the injectable provider
      */
-    void addInjectable(InjectableProvider<?, ?, ?> ip);
+    void addInjectable(InjectableProvider<?, ?> ip);
         
     /**
      * Get an instance of {@link HttpContext} that is a proxy to

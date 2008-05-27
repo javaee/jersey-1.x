@@ -24,6 +24,7 @@ package com.sun.jersey.impl.inject;
 import com.sun.jersey.api.core.HttpContext;
 import com.sun.jersey.api.model.Parameter;
 import com.sun.jersey.spi.inject.InjectableContext;
+import com.sun.jersey.spi.service.ComponentProvider.Scope;
 import static java.lang.annotation.ElementType.CONSTRUCTOR;
 import static java.lang.annotation.ElementType.FIELD;
 import static java.lang.annotation.ElementType.PARAMETER;
@@ -35,8 +36,8 @@ import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 
 import com.sun.jersey.impl.AbstractResourceTester;
+import com.sun.jersey.spi.inject.Injectable;
 import com.sun.jersey.spi.inject.InjectableProvider;
-import com.sun.jersey.spi.inject.PerRequestInjectable;
 import java.net.URI;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -52,14 +53,18 @@ public class OverrideInjectableTest extends AbstractResourceTester {
     
     @Provider
     public static class QueryParamInjectableProvider implements 
-            InjectableProvider<QueryParam, Parameter, PerRequestInjectable<Map<String, String>>> {        
-        public PerRequestInjectable<Map<String, String>> getInjectable(InjectableContext ic, 
+            InjectableProvider<QueryParam, Parameter> {        
+        public Scope getScope() {
+            return Scope.PerRequest;
+        }
+        
+        public Injectable<Map<String, String>> getInjectable(InjectableContext ic, 
                 QueryParam a, Parameter c) {
             if (Map.class != c.getParameterClass())
                 return null;
             
             final String name = c.getSourceName();
-            return new PerRequestInjectable<Map<String, String>>() {
+            return new Injectable<Map<String, String>>() {
                 public Map<String, String> getValue(HttpContext c) {
                     String value = c.getUriInfo().getQueryParameters().getFirst(name);
 

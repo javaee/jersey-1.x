@@ -21,6 +21,9 @@
  */
 package com.sun.jersey.impl.application;
 
+import com.sun.jersey.spi.resource.InjectableProviderContext;
+import com.sun.jersey.spi.inject.Injectable;
+import com.sun.jersey.spi.inject.InjectableContext;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.lang.reflect.Constructor;
@@ -87,11 +90,7 @@ import com.sun.jersey.spi.container.ContainerRequest;
 import com.sun.jersey.spi.container.ContainerResponse;
 import com.sun.jersey.spi.container.MessageBodyContext;
 import com.sun.jersey.spi.container.WebApplication;
-import com.sun.jersey.spi.inject.InjectableContext;
 import com.sun.jersey.spi.inject.InjectableProvider;
-import com.sun.jersey.spi.inject.SingletonInjectable;
-import com.sun.jersey.spi.inject.SingletonInjectable;
-import com.sun.jersey.spi.inject.SingletonInjectable;
 import com.sun.jersey.spi.inject.SingletonTypeInjectableProvider;
 import com.sun.jersey.spi.inject.Inject;
 import com.sun.jersey.spi.resource.ResourceProviderFactory;
@@ -178,18 +177,22 @@ public final class WebApplicationImpl implements WebApplication {
         m.put(UriInfo.class, uriInfoProxy);
         m.put(Request.class, requestProxy);
         m.put(SecurityContext.class, securityContextProxy);        
-        injectableFactory.add(new InjectableProvider<Context, Type, SingletonInjectable>() {
-            public SingletonInjectable getInjectable(InjectableContext ic, Context a, Type c) {
+        injectableFactory.add(new InjectableProvider<Context, Type>() {
+            public Scope getScope() {
+                return Scope.Singleton;
+            }
+            
+            public Injectable getInjectable(InjectableContext ic, Context a, Type c) {
                 final Object o = m.get(c);
                 if (o != null) {
-                    return new SingletonInjectable() {
+                    return new Injectable() {
                         public Object getValue(HttpContext c) {
                             return o;
                         }
                     };
                 } else
                     return null;
-            }            
+            }
         });
     }
  
@@ -229,7 +232,8 @@ public final class WebApplicationImpl implements WebApplication {
             rc = newResourceClass(getAbstractResource(c));
             metaClassMap.put(c, rc);
         }
-        rc.init(getComponentProvider(), getResourceComponentProvider(), 
+        rc.init(getComponentProvider(), 
+                getResourceComponentProvider(), 
                 resolverFactory);
         return rc;
     }
@@ -237,7 +241,8 @@ public final class WebApplicationImpl implements WebApplication {
     private ResourceClass getResourceClass(AbstractResource ar) {
         ResourceClass rc = newResourceClass(ar);
         metaClassMap.put(ar.getResourceClass(), rc);
-        rc.init(getComponentProvider(), getResourceComponentProvider(), 
+        rc.init(getComponentProvider(), 
+                getResourceComponentProvider(), 
                 resolverFactory);
         return rc;
     }
@@ -263,10 +268,12 @@ public final class WebApplicationImpl implements WebApplication {
             LOGGER.severe(ImplMessages.FATAL_ISSUES_FOUND_AT_RES_CLASS(ar.getResourceClass().getName()));
             throw new ContainerException(ImplMessages.FATAL_ISSUES_FOUND_AT_RES_CLASS(ar.getResourceClass().getName()));
         }
-        return new ResourceClass(resourceConfig,
-                getComponentProvider(), getResourceComponentProvider(), 
-                resolverFactory, dispatcherFactory,
-                injectableFactory, ar);
+        return new ResourceClass(
+                resourceConfig,
+                getComponentProvider(), 
+                dispatcherFactory,
+                injectableFactory, 
+                ar);
     }
 
     private AbstractResource getAbstractResource(Class c) {
@@ -281,11 +288,6 @@ public final class WebApplicationImpl implements WebApplication {
         injectableFactory.injectResources(o);
     }
 
-    private void injectResourcesForResourceClass(Object o) {
-        ResourceClass rc = getResourceClass(o.getClass());
-        rc.injector.injectSingleton(o);
-    }
-    
     private final class AdaptingComponentProvider implements ComponentProvider {
 
         private final ComponentProvider cp;
@@ -352,9 +354,6 @@ public final class WebApplicationImpl implements WebApplication {
             T o = cp.getInstance(scope, c);
             if (o == null) {
                 o = c.newInstance();
-                injectResourcesForResourceClass(o);
-            } else {
-                injectResourcesForResourceClass(cp.getInjectableInstance(o));
             }
             return o;
         }
@@ -365,9 +364,6 @@ public final class WebApplicationImpl implements WebApplication {
             T o = cp.getInstance(scope, contructor, parameters);
             if (o == null) {
                 o = contructor.newInstance(parameters);
-                injectResourcesForResourceClass(o);
-            } else {
-                injectResourcesForResourceClass(cp.getInjectableInstance(o));
             }
             return o;
         }
@@ -378,7 +374,6 @@ public final class WebApplicationImpl implements WebApplication {
 
         public void inject(Object instance) {
             cp.inject(instance);
-            injectResourcesForResourceClass(cp.getInjectableInstance(instance));
         }
     }
     
@@ -413,7 +408,6 @@ public final class WebApplicationImpl implements WebApplication {
         public <T> T getInstance(Scope scope, Class<T> c)
                 throws InstantiationException, IllegalAccessException {
             final T o = c.newInstance();
-            injectResourcesForResourceClass(o);
             return o;
         }
 
@@ -421,7 +415,6 @@ public final class WebApplicationImpl implements WebApplication {
                 throws InstantiationException, IllegalArgumentException,
                 IllegalAccessException, InvocationTargetException {
             final T o = contructor.newInstance(parameters);
-            injectResourcesForResourceClass(o);
             return o;
         }
 
@@ -430,11 +423,10 @@ public final class WebApplicationImpl implements WebApplication {
         }
 
         public void inject(Object instance) {
-            injectResourcesForResourceClass(instance);
         }
     }
     
-    // WebApplication
+    // Singleton
     
     public void initiate(ResourceConfig resourceConfig) {
         initiate(resourceConfig, null);
@@ -491,13 +483,17 @@ public final class WebApplicationImpl implements WebApplication {
 
         // Add injectable provider for @Inject
         injectableFactory.add(
-            new InjectableProvider<Inject, Type, SingletonInjectable>() {
+            new InjectableProvider<Inject, Type>() {
+                    public Scope getScope() {
+                        return Scope.Undefined;
+                    }
+
                     @SuppressWarnings("unchecked")
-                    public SingletonInjectable<Object> getInjectable(InjectableContext ic, Inject a, final Type c) {
+                    public Injectable<Object> getInjectable(InjectableContext ic, Inject a, final Type c) {
                         if (!(c instanceof Class))
                             return null;
                         
-                        return new SingletonInjectable<Object>() {
+                        return new Injectable<Object>() {
                             public Object getValue(HttpContext context) {
                                 try {
                                     return provider.getInstance(Scope.Undefined, (Class)c);
@@ -510,6 +506,7 @@ public final class WebApplicationImpl implements WebApplication {
                             }
                         };
                     }
+
                 });
         
         // Allow injection of resource config
@@ -619,7 +616,7 @@ public final class WebApplicationImpl implements WebApplication {
         }
     }
 
-    public void addInjectable(InjectableProvider<?, ?, ?> ip) {
+    public void addInjectable(InjectableProvider<?, ?> ip) {
         injectableFactory.add(ip);
     }
     

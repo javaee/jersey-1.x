@@ -83,8 +83,8 @@ import javax.ws.rs.core.Context;
  * A new {@link WebApplication} instance will be created and configured such
  * that the following classes may be injected onto the field of a root 
  * resource class or a parameter of a method of root resource class that is 
- * annotated with {@link Resource}: @{link HttpServletRequest}, 
- * {@link HttpServletResponse} and {@link ServletConfig}.
+ * annotated with {@link javax.ws.rs.core.Context}: {@link HttpServletRequest}, 
+ * {@link HttpServletResponse}, {@link ServletContext}, and {@link ServletConfig}.
  */
 public class ServletContainer extends HttpServlet implements ContainerListener {
     public static final String APPLICATION_CONFIG_CLASS =
@@ -337,8 +337,8 @@ public class ServletContainer extends HttpServlet implements ContainerListener {
      * The {@link WebApplication} is configured such that the following classes 
      * may be injected onto the field of a root resource class or a parameter 
      * of a method of root resource class that is annotated with 
-     * {@link Resource}: @{link HttpServletRequest}, @{link HttpServletResponse}
-     * and {@link ServletConfig}.
+     * {@link javax.ws.rs.core.Context}: {@link HttpServletRequest}, {@link HttpServletResponse}
+     * , {@link ServletContext}, and {@link ServletConfig}.
      * <p>
      * An inheriting class may override this method to configure the 
      * {@link WebApplication} to provide alternative or additional instance

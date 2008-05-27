@@ -22,6 +22,7 @@
 
 package com.sun.jersey.spi.inject;
 
+import com.sun.jersey.spi.service.ComponentProvider;
 import java.lang.annotation.Annotation;
 
 /**
@@ -33,11 +34,11 @@ import java.lang.annotation.Annotation;
  * @param C the context type. Types of the {@link java.lang.reflect.Type} and 
  *        {@link com.sun.jersey.api.model.Parameter} are the only types that
  *        are supported.
- * @param I the injectable type. The types, or subtypes of, {@link PerRequestInjectable} 
- *        and {@link SingletonInjectable} are the only types that are supported.
  * @author Paul.Sandoz@Sun.Com
  */
-public interface InjectableProvider<A extends Annotation, C, I extends Injectable> {
+public interface InjectableProvider<A extends Annotation, C> {
+    
+    ComponentProvider.Scope getScope();
     
     /**
      * Get an injectable.
@@ -48,5 +49,5 @@ public interface InjectableProvider<A extends Annotation, C, I extends Injectabl
      * @return an Injectable instance, otherwise null if an instance cannot
      *         be created.
      */
-    I getInjectable(InjectableContext ic, A a, C c);
+    Injectable getInjectable(InjectableContext ic, A a, C c);
 }

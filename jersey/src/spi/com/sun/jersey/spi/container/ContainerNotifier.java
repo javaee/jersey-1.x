@@ -22,6 +22,8 @@
 
 package com.sun.jersey.spi.container;
 
+import com.sun.jersey.api.core.ResourceConfig;
+
 /**
  * A container notifier that is used to register container listeners.
  * <p>

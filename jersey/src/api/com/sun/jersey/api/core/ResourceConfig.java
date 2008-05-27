@@ -24,6 +24,8 @@ package com.sun.jersey.api.core;
 
 import java.util.Map;
 import javax.ws.rs.core.ApplicationConfig;
+import com.sun.jersey.spi.container.ContainerNotifier;
+import com.sun.jersey.spi.container.ContainerListener;
 
 /**
  * The resource configuration for configuring a web application.

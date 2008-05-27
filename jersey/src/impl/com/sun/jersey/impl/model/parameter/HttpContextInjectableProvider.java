@@ -23,9 +23,10 @@
 package com.sun.jersey.impl.model.parameter;
 
 import com.sun.jersey.api.core.HttpContext;
+import com.sun.jersey.spi.inject.Injectable;
 import com.sun.jersey.spi.inject.InjectableContext;
 import com.sun.jersey.spi.inject.InjectableProvider;
-import com.sun.jersey.spi.inject.PerRequestInjectable;
+import com.sun.jersey.spi.service.ComponentProvider.Scope;
 import java.lang.reflect.Type;
 import java.util.HashMap;
 import java.util.Map;
@@ -40,35 +41,46 @@ import javax.ws.rs.core.UriInfo;
  * @author Paul.Sandoz@Sun.Com
  */
 public final class HttpContextInjectableProvider implements 
-        InjectableProvider<Context, Type, PerRequestInjectable> {
+        InjectableProvider<Context, Type> {
         
-    private static final class HttpContextInjectable implements PerRequestInjectable<Object> {
+    private static final class HttpContextInjectable implements Injectable<Object> {
+        public Object getValue(HttpContext context) {
+            return context;
+        }
+    }
+    
+    private static final class HttpContextRequestInjectable implements Injectable<Object> {
         public Object getValue(HttpContext context) {
             return context.getRequest();
         }
     }
     
-    private static final class UriInfoInjectable implements PerRequestInjectable<UriInfo> {
+    private static final class UriInfoInjectable implements Injectable<UriInfo> {
         public UriInfo getValue(HttpContext context) {
             return context.getUriInfo();
         }
     }
     
-    private final Map<Type, PerRequestInjectable> injectables;
+    private final Map<Type, Injectable> injectables;
     
     public HttpContextInjectableProvider() {        
-        injectables = new HashMap<Type, PerRequestInjectable>();
+        injectables = new HashMap<Type, Injectable>();
         
-        HttpContextInjectable re = new HttpContextInjectable();
+        HttpContextRequestInjectable re = new HttpContextRequestInjectable();
         injectables.put(HttpHeaders.class, re);
         injectables.put(Request.class, re);
         injectables.put(SecurityContext.class, re);
         
-        UriInfoInjectable ue = new UriInfoInjectable();
-        injectables.put(UriInfo.class, ue);
+        injectables.put(HttpContext.class, new HttpContextInjectable());
+        
+        injectables.put(UriInfo.class, new UriInfoInjectable());
     }
     
-    public PerRequestInjectable getInjectable(InjectableContext ic, Context a, Type c) {
+    public Scope getScope() {
+        return Scope.PerRequest;
+    }
+        
+    public Injectable getInjectable(InjectableContext ic, Context a, Type c) {
         return injectables.get(c);
     }
 }

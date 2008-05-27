@@ -23,6 +23,7 @@
 package com.sun.jersey.spi.inject;
 
 import com.sun.jersey.api.core.HttpContext;
+import com.sun.jersey.spi.service.ComponentProvider.Scope;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 
@@ -31,7 +32,7 @@ import java.lang.reflect.Type;
  * @author Paul.Sandoz@Sun.Com
  */
 public abstract class SingletonTypeInjectableProvider<A extends Annotation, T> 
-    implements InjectableProvider<A, Type, SingletonInjectable>, SingletonInjectable<T> {
+    implements InjectableProvider<A, Type>, Injectable<T> {
 
     private final Type t;
     private final T instance;
@@ -41,7 +42,11 @@ public abstract class SingletonTypeInjectableProvider<A extends Annotation, T>
         this.instance = instance;
     }
     
-    public SingletonInjectable getInjectable(InjectableContext ic, A a, Type c) {
+    public Scope getScope() {
+        return Scope.Singleton;
+    }
+    
+    public Injectable getInjectable(InjectableContext ic, A a, Type c) {
         if (c.equals(t)) {
             return this;
         } else
@@ -50,5 +55,6 @@ public abstract class SingletonTypeInjectableProvider<A extends Annotation, T>
 
     public T getValue(HttpContext c) {
         return instance;
-    }        
+    }
+
 }

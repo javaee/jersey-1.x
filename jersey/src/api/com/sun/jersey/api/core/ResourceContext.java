@@ -22,6 +22,7 @@
 package com.sun.jersey.api.core;
 
 import com.sun.jersey.api.container.ContainerException;
+import javax.ws.rs.core.Context;
 
 /**
  * The resource context provides access to instances of specified 

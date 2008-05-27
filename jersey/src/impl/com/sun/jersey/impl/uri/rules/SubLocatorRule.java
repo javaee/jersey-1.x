@@ -25,8 +25,6 @@ package com.sun.jersey.impl.uri.rules;
 import com.sun.jersey.api.container.ContainerException;
 import com.sun.jersey.api.uri.UriTemplate;
 import com.sun.jersey.spi.inject.Injectable;
-import com.sun.jersey.spi.inject.PerRequestInjectable;
-import com.sun.jersey.spi.inject.SingletonInjectable;
 import com.sun.jersey.spi.uri.rules.UriRule;
 import com.sun.jersey.spi.uri.rules.UriRuleContext;
 import java.lang.reflect.InvocationTargetException;

@@ -26,9 +26,10 @@ import com.sun.jersey.impl.model.parameter.multivalued.MultivaluedParameterExtra
 import com.sun.jersey.impl.model.parameter.multivalued.MultivaluedParameterProcessor;
 import com.sun.jersey.api.core.HttpContext;
 import com.sun.jersey.api.model.Parameter;
+import com.sun.jersey.spi.inject.Injectable;
 import com.sun.jersey.spi.inject.InjectableContext;
 import com.sun.jersey.spi.inject.InjectableProvider;
-import com.sun.jersey.spi.inject.PerRequestInjectable;
+import com.sun.jersey.spi.service.ComponentProvider.Scope;
 import javax.ws.rs.CookieParam;
 import javax.ws.rs.core.Cookie;
 
@@ -37,9 +38,9 @@ import javax.ws.rs.core.Cookie;
  * @author Paul.Sandoz@Sun.Com
  */
 public final class CookieParamInjectableProvider implements 
-        InjectableProvider<CookieParam, Parameter, PerRequestInjectable> {
+        InjectableProvider<CookieParam, Parameter> {
     
-    private static final class CookieParamInjectable implements PerRequestInjectable<Object> {
+    private static final class CookieParamInjectable implements Injectable<Object> {
         private final MultivaluedParameterExtractor extractor;
         
         CookieParamInjectable(MultivaluedParameterExtractor extractor) {
@@ -51,7 +52,7 @@ public final class CookieParamInjectableProvider implements
         }
     }
     
-    private static final class CookieTypeParamInjectable implements PerRequestInjectable<Cookie> {
+    private static final class CookieTypeParamInjectable implements Injectable<Cookie> {
         private final String name;
         
         CookieTypeParamInjectable(String name) {
@@ -63,7 +64,11 @@ public final class CookieParamInjectableProvider implements
         }
     }
     
-    public PerRequestInjectable getInjectable(InjectableContext ic, CookieParam a, Parameter c) {
+    public Scope getScope() {
+        return Scope.PerRequest;
+    }
+    
+    public Injectable getInjectable(InjectableContext ic, CookieParam a, Parameter c) {
         String parameterName = c.getSourceName();
         if (parameterName == null || parameterName.length() == 0) {
             // Invalid cookie parameter name

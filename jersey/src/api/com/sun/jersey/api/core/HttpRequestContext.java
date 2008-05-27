@@ -98,7 +98,7 @@ public interface HttpRequestContext extends HttpHeaders,
      * contain an entity body.
      * 
      * @param type the type of entity
-     * @param generic type the generic type of entity, it is the responsibility
+     * @param genericType type the generic type of entity, it is the responsibility
      *        of the callee to ensure that the type and generic type are
      *        consistent otherwise the behvaiour of this method is undefned.
      * @param as the annoations associated with the type 

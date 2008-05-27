@@ -83,7 +83,7 @@ public final class ComponentProviderCache {
         if (o != null) return o;
             
         try {
-            o = componentProvider.getInstance(Scope.WebApplication, provider);
+            o = componentProvider.getInstance(Scope.Singleton, provider);
         } catch (NoClassDefFoundError ex) {
             // Dependent class of provider not found
             // This assumes that ex.getLocalizedMessage() returns

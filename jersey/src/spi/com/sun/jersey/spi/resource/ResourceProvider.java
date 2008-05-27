@@ -29,6 +29,13 @@ import com.sun.jersey.spi.service.ComponentProvider;
 /**
  * A provider that manages the creation of resource class instances. A provider
  * instance is specific to a particular class of resource.
+ * <p>
+ * It is the responsibility of a ResourceProvider to perform injection onto
+ * the properties of a resource. If injection is required then declare an 
+ * injectable field of the type {@link InjectableProviderContext} annotated 
+ * with {@link javax.ws.rs.core.Context} and create a 
+ * {@link ResourceClassInjector} instance to be used to perform injection onto
+ * the provided resource. This may be performed in the init method.
  */
 public interface ResourceProvider {
 

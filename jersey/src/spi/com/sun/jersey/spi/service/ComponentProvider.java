@@ -57,7 +57,7 @@ public interface ComponentProvider {
          * per-web application instance. The runtime will manage the component
          * in the scope of the web application.
          */
-        WebApplication,
+        Singleton,
         
         /**
          * Declares that the scope is application defined and instances will 
@@ -65,14 +65,14 @@ public interface ComponentProvider {
          * that a new instance be created for each invocation of 
          * <code>getInstance</code>.
          */
-        ApplicationDefined,
+        PerRequest,
         
         /**
          * The JAX-RS application (jersey) does not care what the scope is,
          * the component provider can decide which to choose - the component
          * provider is responsible for managing instances of a type.
          */
-        Undefined
+        Undefined    
     }
     
     /**

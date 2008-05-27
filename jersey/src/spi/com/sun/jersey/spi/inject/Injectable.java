@@ -25,7 +25,7 @@ package com.sun.jersey.spi.inject;
 import com.sun.jersey.api.core.HttpContext;
 
 /**
- * The base interface for something that is injectable.
+ * The type of something that is injectable.
  * 
  * @param T the type of the value to be injected
  * @author Paul.Sandoz@Sun.Com

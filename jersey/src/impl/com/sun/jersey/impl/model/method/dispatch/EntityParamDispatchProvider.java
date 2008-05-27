@@ -28,12 +28,10 @@ import com.sun.jersey.api.core.HttpContext;
 import com.sun.jersey.api.model.AbstractResourceMethod;
 import com.sun.jersey.api.model.Parameter;
 import com.sun.jersey.impl.ResponseBuilderImpl;
-import com.sun.jersey.impl.application.InjectableProviderContext;
+import com.sun.jersey.spi.resource.InjectableProviderContext;
 import com.sun.jersey.impl.model.ReflectionHelper;
 import com.sun.jersey.spi.dispatch.RequestDispatcher;
 import com.sun.jersey.spi.inject.Injectable;
-import com.sun.jersey.spi.inject.PerRequestInjectable;
-import com.sun.jersey.spi.inject.SingletonInjectable;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Type;
@@ -55,7 +53,7 @@ public class EntityParamDispatchProvider implements ResourceMethodDispatchProvid
         int i = 0;
     }
     
-    static final class EntityInjectable implements PerRequestInjectable<Object> {
+    static final class EntityInjectable implements Injectable<Object> {
         final Class<?> c;
         final Type t;
         final Annotation[] as;

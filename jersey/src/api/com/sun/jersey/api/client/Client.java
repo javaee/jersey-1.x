@@ -208,7 +208,7 @@ public class Client extends Filterable implements ClientHandler {
      * 
      * @param ip the injectable provider
      */
-    void addInjectable(InjectableProvider<?, ?, ?> ip) {
+    void addInjectable(InjectableProvider<?, ?> ip) {
         injectableFactory.add(ip);        
     }
     

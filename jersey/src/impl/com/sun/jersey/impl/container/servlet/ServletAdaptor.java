@@ -27,9 +27,10 @@ import com.sun.jersey.api.core.HttpContext;
 import com.sun.jersey.api.core.ResourceConfig;
 import com.sun.jersey.spi.container.WebApplication;
 import com.sun.jersey.spi.container.servlet.ServletContainer;
+import com.sun.jersey.spi.inject.Injectable;
 import com.sun.jersey.spi.inject.InjectableContext;
 import com.sun.jersey.spi.inject.InjectableProvider;
-import com.sun.jersey.spi.inject.SingletonInjectable;
+import com.sun.jersey.spi.service.ComponentProvider.Scope;
 import java.lang.reflect.Proxy;
 import java.lang.reflect.Type;
 import java.util.Enumeration;
@@ -83,8 +84,12 @@ public class ServletAdaptor extends ServletContainer {
             }
         }
         
-        wa.addInjectable(new InjectableProvider<PersistenceUnit, Type, SingletonInjectable>() {
-            public SingletonInjectable<EntityManagerFactory> getInjectable(InjectableContext ic, PersistenceUnit pu, Type c) {
+        wa.addInjectable(new InjectableProvider<PersistenceUnit, Type>() {
+            public Scope getScope() {
+                return Scope.Singleton;
+            }
+            
+            public Injectable<EntityManagerFactory> getInjectable(InjectableContext ic, PersistenceUnit pu, Type c) {
                 if (!c.equals(EntityManagerFactory.class))
                     return null;
                 
@@ -101,12 +106,12 @@ public class ServletAdaptor extends ServletContainer {
                         new Class[] {EntityManagerFactory.class },
                         emfHandler);
                 
-                return new SingletonInjectable<EntityManagerFactory>() {
+                return new Injectable<EntityManagerFactory>() {
                     public EntityManagerFactory getValue(HttpContext c) {
                         return emf;
                     }                    
                 };
-            }            
+            }
         });        
     }    
 }

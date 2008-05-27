@@ -58,9 +58,9 @@ public interface ExtendedUriInfo extends UriInfo {
     /**
      * Get a path segment that contains a template variable.
      * 
+     * @param name the template variable name
      * @param decode controls whether sequences of escaped octets are decoded
      * (true) or not (false).
-     * @param templateVariable
      * @return the path segment or null if a there the matching path does not 
      *         contain the template
      */

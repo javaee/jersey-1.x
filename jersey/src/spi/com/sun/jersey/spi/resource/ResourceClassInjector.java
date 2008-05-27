@@ -19,59 +19,83 @@
  * enclosed by brackets [] replaced by your own identifying information:
  *     "Portions Copyrighted [year] [name of copyright owner]"
  */
-package com.sun.jersey.impl.model;
+package com.sun.jersey.spi.resource;
 
 import com.sun.jersey.api.container.ContainerException;
 import com.sun.jersey.api.core.HttpContext;
 import com.sun.jersey.api.model.AbstractResource;
-import com.sun.jersey.impl.application.InjectableProviderContext;
+import com.sun.jersey.spi.resource.InjectableProviderContext;
 import com.sun.jersey.spi.inject.Injectable;
-import com.sun.jersey.spi.inject.PerRequestInjectable;
-import com.sun.jersey.spi.inject.SingletonInjectable;
+import com.sun.jersey.spi.service.ComponentProvider.Scope;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
 /**
- *
+ * An injector that injects onto properties of a resource.
+ * 
+ * Analysis of the class will be performed using reflection to find 
+ * {@link Injectable} instances and as a result the use of reflection is 
+ * minimized when performing injection (to that of getting and setting
+ * field values).
+ * 
  * @author Paul.Sandoz@Sun.Com
  */
 public final class ResourceClassInjector {
     private Field[] singletonFields;    
     private Object[] singletonValues;
-    private SingletonInjectable<?>[] singletonInjectables;
     
     private Field[] perRequestFields;
-    private PerRequestInjectable<?>[] perRequestInjectables;
-    
-    public ResourceClassInjector(InjectableProviderContext ipc, AbstractResource resource) {
-        processFields(ipc, resource.getResourceClass());
+    private Injectable<?>[] perRequestInjectables;
+   
+    /**
+     * Create a new resource class injector.
+     * 
+     * @param ipc the injectable provider context to obtain injectables
+     * @param s the scope underwhich injection will be performed
+     * @param resource the abstract resource model
+     */
+    public ResourceClassInjector(InjectableProviderContext ipc, Scope s, AbstractResource resource) {
+        processFields(ipc, s, resource.getResourceClass());
     }
 
-    private void processFields(InjectableProviderContext ipc, Class c) {        
-        Map<Field, SingletonInjectable<?>> singletons = new HashMap<Field, SingletonInjectable<?>>();
-        Map<Field, PerRequestInjectable<?>> perRequest = new HashMap<Field, PerRequestInjectable<?>>();
+    private void processFields(InjectableProviderContext ipc, Scope s, Class c) {
+        Map<Field, Injectable<?>> singletons = new HashMap<Field, Injectable<?>>();
+        Map<Field, Injectable<?>> perRequest = new HashMap<Field, Injectable<?>>();
         
         while (c != Object.class) {
             for (final Field f : c.getDeclaredFields()) {
                 final Annotation[] as = f.getAnnotations();
                 for (Annotation a : as) {
-                    final Injectable i = ipc.getInjectable(
-                            a.annotationType(), null, a, f.getGenericType());
-                    if (i == null)
-                        continue;
-                    
-                    configureField(f);
-                    if (i instanceof SingletonInjectable) {
-                        SingletonInjectable si = (SingletonInjectable)i;
-                        singletons.put(f, si);
-                    } else if (i instanceof PerRequestInjectable) {
-                        PerRequestInjectable pri = (PerRequestInjectable)i;
-                        perRequest.put(f, pri);
-                    }
+                    if (s == Scope.PerRequest) {
+                        Injectable i = ipc.getInjectable(
+                                a.annotationType(), null, a, f.getGenericType(), 
+                                Arrays.asList(Scope.PerRequest, Scope.Undefined));
+                        if (i != null) {
+                            configureField(f);
+                            perRequest.put(f, i);
+                        } else {
+                            i = ipc.getInjectable(
+                                    a.annotationType(), null, a, f.getGenericType(), 
+                                    Scope.Singleton);
+                            if (i != null) {
+                                configureField(f);
+                                singletons.put(f, i);
+                            }   
+                        }                       
+                    } else {
+                        Injectable i = ipc.getInjectable(
+                                a.annotationType(), null, a, f.getGenericType(), 
+                                Arrays.asList(Scope.Undefined, Scope.Singleton));
+                        if (i != null) {
+                            configureField(f);
+                            singletons.put(f, i);
+                        }
+                    }                                        
                 }
             }
             c = c.getSuperclass();
@@ -79,20 +103,18 @@ public final class ResourceClassInjector {
         
         int size = singletons.entrySet().size();
         singletonFields = new Field[size];
-        singletonInjectables = new SingletonInjectable<?>[size];
         singletonValues = new Object[size];        
         int i = 0;
-        for (Map.Entry<Field, SingletonInjectable<?>> e : singletons.entrySet()) {
+        for (Map.Entry<Field, Injectable<?>> e : singletons.entrySet()) {
             singletonFields[i] = e.getKey();
-            singletonInjectables[i] = e.getValue();
             singletonValues[i++] = e.getValue().getValue(null);
         }
         
         size = perRequest.entrySet().size();
         perRequestFields = new Field[size];
-        perRequestInjectables = new PerRequestInjectable<?>[size];        
+        perRequestInjectables = new Injectable<?>[size];        
         i = 0;
-        for (Map.Entry<Field, PerRequestInjectable<?>> e : perRequest.entrySet()) {
+        for (Map.Entry<Field, Injectable<?>> e : perRequest.entrySet()) {
             perRequestFields[i] = e.getKey();
             perRequestInjectables[i++] = e.getValue();
         }        
@@ -109,28 +131,27 @@ public final class ResourceClassInjector {
         }
     }
     
-    public void injectSingleton(Object o) {
+    /**
+     * Inject onto an instance of a resource class.
+     * 
+     * @param c the HTTP context, may be set to null if not available for the
+     *        current scope.
+     * @param o the resource.
+     */
+    public void inject(HttpContext c, Object o) {
         int i = 0;
         for (Field f : singletonFields) {
             try {
                 if (f.get(o) == null) {
-                    f.set(o, singletonInjectables[i].getValue(null));
-                    // TODO use constant values when fully supporting
-                    // injection on per-request resources
-                    // especially with @Inject
-                    // f.set(o, singletonValues[i]);
+                    f.set(o, singletonValues[i]);
                 }
                 i++;
             } catch (IllegalAccessException ex) {
                 throw new ContainerException(ex);
             }
         }
-    }
-    
-    public void injectPerRequest(HttpContext c, Object o) {
-        injectSingleton(o);
         
-        int i = 0;
+        i = 0;
         for (Field f : perRequestFields) {
             try {
                 if (f.get(o) == null) {

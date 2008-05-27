@@ -237,7 +237,7 @@ public abstract class AbstractContainerResponse implements ContainerResponse {
      * {@link #commitStatusAndHeaders}. The output stream will be obtained
      * by calling the method {@link #getUnderlyingOutputStream}
      * <p>
-     * If a {@link MessageBodyReader} cannot be found for the entity
+     * If a {@link MessageBodyWriter} cannot be found for the entity
      * then a 406 (Not Acceptable) response is returned.
      * 
      * @throws java.io.IOException if there is an error writing the entity

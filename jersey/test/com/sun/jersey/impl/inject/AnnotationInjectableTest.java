@@ -23,6 +23,7 @@ package com.sun.jersey.impl.inject;
 
 import com.sun.jersey.api.core.HttpContext;
 import com.sun.jersey.spi.inject.InjectableContext;
+import com.sun.jersey.spi.service.ComponentProvider.Scope;
 import static java.lang.annotation.ElementType.CONSTRUCTOR;
 import static java.lang.annotation.ElementType.FIELD;
 import static java.lang.annotation.ElementType.PARAMETER;
@@ -38,8 +39,8 @@ import javax.ws.rs.Path;
 
 import com.sun.jersey.impl.AbstractResourceTester;
 import com.sun.jersey.spi.container.WebApplication;
+import com.sun.jersey.spi.inject.Injectable;
 import com.sun.jersey.spi.inject.InjectableProvider;
-import com.sun.jersey.spi.inject.SingletonInjectable;
 import java.lang.reflect.Type;
 
 /**
@@ -62,20 +63,24 @@ public class AnnotationInjectableTest extends AbstractResourceTester {
     }
     
     public static class MyAnnotationInjectableProvider implements 
-            InjectableProvider<MyAnnotation, Type, SingletonInjectable<String>> {        
+            InjectableProvider<MyAnnotation, Type> {        
         final String value;
         
         public MyAnnotationInjectableProvider(String value) {
             this.value = value;
         }
         
-        public SingletonInjectable<String> getInjectable(InjectableContext ic, MyAnnotation a, Type c) {
-            return new SingletonInjectable<String>() {
+        public Scope getScope() {
+            return Scope.Singleton;
+        }
+        
+        public Injectable<String> getInjectable(InjectableContext ic, MyAnnotation a, Type c) {
+            return new Injectable<String>() {
                 public String getValue(HttpContext c) {
                     return value;
                 }                    
             };
-        }        
+        }
     }
     
     @Path("/")

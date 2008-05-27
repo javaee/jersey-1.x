@@ -26,10 +26,9 @@ import com.sun.jersey.api.container.ContainerException;
 import com.sun.jersey.api.core.HttpContext;
 import com.sun.jersey.api.model.AbstractResource;
 import com.sun.jersey.api.model.AbstractResourceConstructor;
-import com.sun.jersey.impl.application.InjectableProviderContext;
+import com.sun.jersey.spi.resource.InjectableProviderContext;
+import com.sun.jersey.spi.resource.ResourceClassInjector;
 import com.sun.jersey.spi.inject.Injectable;
-import com.sun.jersey.spi.inject.PerRequestInjectable;
-import com.sun.jersey.spi.inject.SingletonInjectable;
 import com.sun.jersey.spi.resource.ResourceProvider;
 import com.sun.jersey.spi.service.ComponentProvider;
 import com.sun.jersey.spi.service.ComponentProvider.Scope;
@@ -47,47 +46,56 @@ public final class PerRequestProvider implements ResourceProvider {
 
     private Class<?> c;
     
+    private ResourceClassInjector rci;
+    
     private Constructor<?> constructor;
     
-    private List<Injectable> is;
+    private List<Injectable> constructorInjectableParams;
     
     public void init(ComponentProvider provider,
             AbstractResource abstractResource) {
         this.c = abstractResource.getResourceClass();
         
+        this.rci = new ResourceClassInjector(ipc, Scope.PerRequest, 
+                abstractResource);
+                
         // TODO select the most appropriate constructor 
         // instead of just picking up the first one
         if (abstractResource.getConstructors().isEmpty()) {
             this.constructor = null;
-            this.is = null;
+            this.constructorInjectableParams = null;
         } else {
             AbstractResourceConstructor abstractConstructor = 
                     abstractResource.getConstructors().get(0);
             
             this.constructor = abstractConstructor.getCtor();
             if (this.constructor.getParameterTypes().length > 0) {
-                this.is = ipc.getInjectable(abstractConstructor.getParameters());
+                this.constructorInjectableParams = ipc.getInjectable(
+                        abstractConstructor.getParameters());
             } else {
                 this.constructor = null;
-                this.is = null;                
+                this.constructorInjectableParams = null;                
             }
         }
     }
 
     public Object getInstance(ComponentProvider provider, HttpContext context) {
         try {
+            Object o = null;
             if (constructor == null) {
-                return provider.getInstance(Scope.ApplicationDefined, c);
+                o = provider.getInstance(Scope.PerRequest, c);
             } else {
-                final Object[] params = new Object[is.size()];
+                final Object[] params = new Object[constructorInjectableParams.size()];
                 int index = 0;
-                for (Injectable i : is) {
+                for (Injectable i : constructorInjectableParams) {
                     params[index++] = (i != null) ? i.getValue(context) : null;
                 }
                 
-                return provider.getInstance(Scope.ApplicationDefined, 
+                o = provider.getInstance(Scope.PerRequest, 
                     constructor, params);
             }
+            rci.inject(context, provider.getInjectableInstance(o));
+            return o;
         } catch (InstantiationException ex) {
             throw new ContainerException("Unable to create resource", ex);
         } catch (IllegalAccessException ex) {
