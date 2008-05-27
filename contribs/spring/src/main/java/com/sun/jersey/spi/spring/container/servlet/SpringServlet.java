@@ -113,8 +113,8 @@ public class SpringServlet extends ServletContainer {
              * the scope of this dependency, so it's left to the application...
              */
             if ( scope == Scope.Undefined
-                    || scope == Scope.WebApplication && springContext.isSingleton(beanName)
-                    || scope == Scope.ApplicationDefined && springContext.isPrototype( beanName ) ) {
+                    || scope == Scope.Singleton && springContext.isSingleton(beanName)
+                    || scope == Scope.PerRequest && springContext.isPrototype( beanName ) ) {
                 if ( LOG.isDebugEnabled() ) {
                     LOG.debug( "Retrieving bean '"+ beanName +"' for resource class "+ clazz.getSimpleName() +" from spring." );
                 }
