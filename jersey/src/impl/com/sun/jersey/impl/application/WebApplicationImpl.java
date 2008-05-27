@@ -69,6 +69,7 @@ import com.sun.jersey.impl.ThreadLocalHttpContext;
 import com.sun.jersey.impl.model.ResourceClass;
 import com.sun.jersey.impl.model.RulesMap;
 import com.sun.jersey.impl.model.parameter.CookieParamInjectableProvider;
+import com.sun.jersey.impl.model.parameter.FormParamInjectableProvider;
 import com.sun.jersey.impl.model.parameter.HeaderParamInjectableProvider;
 import com.sun.jersey.impl.model.parameter.HttpContextInjectableProvider;
 import com.sun.jersey.impl.model.parameter.MatrixParamInjectableProvider;
@@ -526,6 +527,7 @@ public final class WebApplicationImpl implements WebApplication {
         injectableFactory.add(new MatrixParamInjectableProvider());
         injectableFactory.add(new PathParamInjectableProvider());
         injectableFactory.add(new QueryParamInjectableProvider());
+        injectableFactory.add(new FormParamInjectableProvider());
 
         // Obtain all context resolvers
         new ContextResolverFactory(cpc, injectableFactory);

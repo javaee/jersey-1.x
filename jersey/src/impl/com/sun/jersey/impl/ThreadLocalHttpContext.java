@@ -26,6 +26,7 @@ import com.sun.jersey.api.core.HttpContext;
 import com.sun.jersey.api.core.HttpRequestContext;
 import com.sun.jersey.api.core.HttpResponseContext;
 import com.sun.jersey.api.uri.ExtendedUriInfo;
+import java.util.Map;
 
 /**
  * Implementation of {@link HttpContext} using {@link ThreadLocal}
@@ -55,5 +56,9 @@ public final class ThreadLocalHttpContext implements HttpContext {
 
     public HttpResponseContext getResponse() {
         return context.get().getResponse();
+    }
+    
+    public Map<String, Object> getProperties() {
+        return context.get().getProperties();
     }
 }

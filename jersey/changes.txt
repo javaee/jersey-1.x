@@ -1,4 +1,9 @@
 release 0.8 (2008-06-20 or 2008-07-25)
+- The annotation com.sun.jersey.api.representation.FormParam can be used
+  to access form-based parameters using the same rules as other parameter-based
+  annotatons.
+  Form-based resource methods MUST contain only annotated method parameters
+  and at least one parameter MUST be annotated with FormParam.  
 - Renamed com.sun.jersey.spi.service.Component.Scope enums from->to:
   WebApplication -> Singleton; and ApplicationDefined -> PerRequest
 - Unified injection interfaces so that they are independent of where 

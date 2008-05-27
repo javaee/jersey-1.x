@@ -23,12 +23,13 @@
 package com.sun.jersey.api.core;
 
 import com.sun.jersey.api.uri.ExtendedUriInfo;
+import java.util.Map;
 
 /**
  * A HttpContext makes it possible for a web resource implementation class to 
  * access and manipulate HTTP request and response information directly. Typically
- * a HttpContext is injected into web resource implementation class using the 
- * Context annotation.
+ * a HttpContext is injected on to a resource class using the 
+ * annotation {@link javax.ws.rs.core.Context}.
  */
 public interface HttpContext {
     /**
@@ -48,4 +49,11 @@ public interface HttpContext {
      * @return the HTTP response information
      */
     HttpResponseContext getResponse();
+    
+    /**
+     * Get the mutable propertiee.
+     * 
+     * @return the properties.
+     */
+    Map<String, Object> getProperties();
 }

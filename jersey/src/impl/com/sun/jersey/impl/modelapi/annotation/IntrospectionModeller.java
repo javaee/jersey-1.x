@@ -404,8 +404,9 @@ public class IntrospectionModeller {
             } else if (DefaultValue.class == annotation.annotationType()) {
                 paramDefault = ((DefaultValue) annotation).value();
             } else {
+                paramAnnotation = annotation; 
                 paramSource = Source.UNKNOWN;
-                paramAnnotation = annotation;               
+                paramName = getValue(annotation);
             }
         }
 
@@ -417,6 +418,17 @@ public class IntrospectionModeller {
                 paramClass, paramEncoded, paramDefault);
     }
 
+    private static final String getValue(Annotation a) {
+        try {
+            Method m = a.annotationType().getMethod("value");
+            if (m.getReturnType() != String.class)
+                return null;
+            return (String)m.invoke(a);
+        } catch (Exception ex) {
+        }
+        return null;
+    }
+    
     private static void logNonPublicMethods(final Class resourceClass) {
         assert null != resourceClass;
         

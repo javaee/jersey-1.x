@@ -36,6 +36,7 @@ import com.sun.jersey.spi.uri.rules.UriRuleContext;
 import com.sun.jersey.spi.uri.rules.UriRules;
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -55,6 +56,8 @@ public final class WebApplicationContext implements UriRuleContext, ExtendedUriI
     
     private final WebApplicationImpl app;
 
+    private Map<String, Object> properties;
+    
     public WebApplicationContext(WebApplicationImpl app, 
             ContainerRequest request, ContainerResponse response) {
         this.app = app;
@@ -75,6 +78,13 @@ public final class WebApplicationContext implements UriRuleContext, ExtendedUriI
     
     public ExtendedUriInfo getUriInfo() {
         return this;
+    }
+    
+    public Map<String, Object> getProperties() {
+        if (properties != null)
+            return properties;
+        
+        return properties = new HashMap<String, Object>();
     }
     
     // UriRuleContext
