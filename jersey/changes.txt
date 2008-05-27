@@ -1,4 +1,6 @@
 release 0.8 (2008-06-20 or 2008-07-25)
+- Renamed com.sun.jersey.spi.service.Component.Scope enums from->to:
+  WebApplication -> Singleton; and ApplicationDefined -> PerRequest
 - Unified injection interfaces so that they are independent of where 
   injection occurs. See the package com.sun.jersey.spi.inject.
   - com.sun.jersey.spi.resource.Inject moved to com.sun.jersey.spi.inject.Inject
