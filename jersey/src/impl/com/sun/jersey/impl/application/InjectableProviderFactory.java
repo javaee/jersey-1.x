@@ -251,14 +251,8 @@ public final class InjectableProviderFactory implements InjectableProviderContex
                 final Annotation[] as = f.getAnnotations();
                 for (Annotation a : as) {
                     Injectable i = getInjectable(
-                            a.annotationType(), null, a, f.getGenericType(), Scope.Singleton);
-                    if (i != null) {
-                        setFieldValue(o, f, i.getValue(null));
-                        continue;
-                    }
-                    
-                    i = getInjectable(
-                            a.annotationType(), null, a, f.getGenericType(), Scope.Undefined);
+                            a.annotationType(), null, a, f.getGenericType(), 
+                            Arrays.asList(Scope.Singleton, Scope.Undefined));
                     if (i != null) {
                         setFieldValue(o, f, i.getValue(null));
                     }
