@@ -62,7 +62,7 @@ public class Client extends Filterable implements ClientHandler {
     
     private final ComponentProvider provider;
     
-    private final MessageBodyContext bodyContext;
+    private final MessageBodyFactory bodyContext;
     
     private final class AdaptingComponentProvider implements ComponentProvider {
         private final ComponentProvider cp;
@@ -198,7 +198,8 @@ public class Client extends Filterable implements ClientHandler {
         // Allow injection of message body context
         injectableFactory.add(new ContextInjectableProvider<MessageBodyContext>(
                 MessageBodyContext.class, bodyContext));
-            
+        bodyContext.init();
+        
         // Inject resources on root client handler
         injectResources(root);
     }

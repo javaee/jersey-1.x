@@ -29,14 +29,22 @@ import com.sun.jersey.spi.container.MessageBodyContext;
 import com.sun.jersey.spi.resource.Singleton;
 import com.sun.jersey.spi.template.TemplateContext;
 import java.io.IOException;
+import java.io.OutputStream;
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Type;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
+import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Request;
 import javax.ws.rs.core.SecurityContext;
 import javax.ws.rs.core.UriInfo;
 import javax.ws.rs.ext.MessageBodyWorkers;
+import javax.ws.rs.ext.MessageBodyWriter;
+import javax.ws.rs.ext.Provider;
 
 /**
  *
@@ -192,4 +200,57 @@ public class AllInjectablesTest extends AbstractResourceTester {
         
         assertEquals("GET", resource("/").get(String.class));        
     }       
+    
+    
+    @Provider
+    public static class StringWriter implements MessageBodyWriter<String> {
+        
+        public boolean isWriteable(Class<?> arg0, Type arg1, Annotation[] arg2) {
+            return arg0 == String.class;
+        }
+
+        public long getSize(String arg0) {
+            return -1;
+        }
+
+        public void writeTo(String arg0, Class<?> arg1, Type arg2, Annotation[] arg3, MediaType arg4, MultivaluedMap<String, Object> arg5, OutputStream arg6) throws IOException, WebApplicationException {
+            assertNotNull(rc);
+            assertNotNull(mbc);
+            assertNotNull(mbw);
+            assertNotNull(tc);
+            assertNotNull(hca);
+            assertNotNull(hs);
+            assertNotNull(ui);
+            assertNotNull(r);
+            arg6.write(arg0.getBytes());
+        }
+        
+        @Context ResourceConfig rc;
+        
+        @Context MessageBodyContext mbc;
+        
+        @Context MessageBodyWorkers mbw;
+        
+        @Context TemplateContext tc;
+        
+        @Context HttpContext hca;
+        
+        @Context HttpHeaders hs;
+        
+        @Context UriInfo ui;
+        
+        @Context Request r;        
+    }
+    
+    @Path("/")
+    public static class StringWriterResource {
+        @GET
+        public String get() { return "GET"; }
+    }
+    
+    public void testProvider() throws IOException {
+        initiateWebApplication(StringWriterResource.class, StringWriter.class);
+        
+        assertEquals("GET", resource("/").get(String.class));        
+    }           
 }

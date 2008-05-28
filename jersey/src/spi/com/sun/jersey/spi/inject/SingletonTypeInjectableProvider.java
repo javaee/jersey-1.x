@@ -28,7 +28,12 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 
 /**
- *
+ * A utility class that may implemented to support an singleton injectable 
+ * provider for a specific type T, and an instance of type T, that is to be 
+ * injected.
+ * 
+ * @param A the annotation type
+ * @param T the type returned by {@link Injectable#getValue}
  * @author Paul.Sandoz@Sun.Com
  */
 public abstract class SingletonTypeInjectableProvider<A extends Annotation, T> 
@@ -37,6 +42,12 @@ public abstract class SingletonTypeInjectableProvider<A extends Annotation, T>
     private final Type t;
     private final T instance;
         
+    /**
+     * Construct a new instance with the Type and the instance.
+     * 
+     * @param t the type of T.
+     * @param instance the instance.
+     */
     public SingletonTypeInjectableProvider(Type t, T instance) {
         this.t = t;
         this.instance = instance;

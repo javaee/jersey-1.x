@@ -25,6 +25,8 @@ import com.sun.jersey.spi.resource.InjectableProviderContext;
 import com.sun.jersey.api.container.ContainerException;
 import com.sun.jersey.api.model.Parameter;
 import com.sun.jersey.impl.model.ReflectionHelper;
+import com.sun.jersey.impl.modelapi.annotation.AnnotatedMethod;
+import com.sun.jersey.impl.modelapi.annotation.MethodList;
 import com.sun.jersey.spi.inject.Injectable;
 import com.sun.jersey.spi.inject.InjectableContext;
 import com.sun.jersey.spi.inject.InjectableProvider;
@@ -43,6 +45,8 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import javax.ws.rs.HttpMethod;
+import javax.ws.rs.Path;
 
 /**
  *
@@ -242,6 +246,11 @@ public final class InjectableProviderFactory implements InjectableProviderContex
     
     //
     
+    /**
+     * Inject onto a singleton provider.
+     * 
+     * @param o the singleton instance
+     */
     public void injectResources(final Object o) {
         Class oClass = o.getClass();
         while (oClass != Object.class) {
@@ -261,6 +270,26 @@ public final class InjectableProviderFactory implements InjectableProviderContex
             }
             oClass = oClass.getSuperclass();
         }
+        
+        MethodList ml = new MethodList(o.getClass().getMethods());
+        for (AnnotatedMethod m : ml.
+                hasNotMetaAnnotation(HttpMethod.class).
+                hasNotAnnotation(Path.class).
+                hasNumParams(1).
+                hasReturnType(void.class).
+                nameStartsWith("set")) {
+            final Annotation[] as = m.getAnnotations();
+            final Type t = m.getGenericParameterTypes()[0];
+            for (Annotation a : as) {
+                Injectable i = getInjectable(
+                        a.annotationType(), null, a, t, 
+                        Arrays.asList(Scope.Singleton, Scope.Undefined));
+                if (i != null) {
+                    setMethodValue(o, m, i.getValue(null));
+                }
+            }
+        }
+        
     }
     
     private void setFieldValue(final Object resource, final Field f, final Object value) {
@@ -292,5 +321,13 @@ public final class InjectableProviderFactory implements InjectableProviderContex
                 }
             }
         });
+    }
+
+    private void setMethodValue(Object o, AnnotatedMethod m, Object value) {
+        try {
+            m.getMethod().invoke(o, value);
+        } catch (Exception ex) {
+            throw new ContainerException(ex);
+        }
     }
 }

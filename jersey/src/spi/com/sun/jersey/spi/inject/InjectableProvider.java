@@ -38,6 +38,11 @@ import java.lang.annotation.Annotation;
  */
 public interface InjectableProvider<A extends Annotation, C> {
     
+    /**
+     * Get the scope of the injectable provider.
+     * 
+     * @return the scope.
+     */
     ComponentProvider.Scope getScope();
     
     /**

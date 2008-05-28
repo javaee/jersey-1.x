@@ -34,7 +34,7 @@ import java.util.List;
  *
  * @author Paul.Sandoz@Sun.Com
  */
-class MethodList implements Iterable<AnnotatedMethod> {
+public class MethodList implements Iterable<AnnotatedMethod> {
 
     private AnnotatedMethod[] methods;
     
@@ -62,7 +62,7 @@ class MethodList implements Iterable<AnnotatedMethod> {
       return Arrays.asList(methods).iterator();
     }
     
-    <T extends Annotation> MethodList isNotPublic() {
+    public <T extends Annotation> MethodList isNotPublic() {
         return filter(new Filter() {
             public boolean keep(AnnotatedMethod m) {
                 return !Modifier.isPublic(m.getMethod().getModifiers());
@@ -70,7 +70,31 @@ class MethodList implements Iterable<AnnotatedMethod> {
         });
     }
     
-    <T extends Annotation> MethodList hasAnnotation(final Class<T> annotation) {
+    public <T extends Annotation> MethodList hasNumParams(final int i) {
+        return filter(new Filter() {
+            public boolean keep(AnnotatedMethod m) {
+                return m.getParameterTypes().length == i;
+            }
+        });
+    }
+    
+    public <T extends Annotation> MethodList hasReturnType(final Class<?> r) {
+        return filter(new Filter() {
+            public boolean keep(AnnotatedMethod m) {
+                return m.getMethod().getReturnType() == r;
+            }
+        });
+    }
+    
+    public <T extends Annotation> MethodList nameStartsWith(final String s) {
+        return filter(new Filter() {
+            public boolean keep(AnnotatedMethod m) {
+                return m.getMethod().getName().startsWith(s);
+            }
+        });
+    }
+    
+    public <T extends Annotation> MethodList hasAnnotation(final Class<T> annotation) {
         return filter(new Filter() {
             public boolean keep(AnnotatedMethod m) {
                 return m.getAnnotation(annotation) != null;
@@ -78,7 +102,7 @@ class MethodList implements Iterable<AnnotatedMethod> {
         });
     }
     
-    <T extends Annotation> MethodList hasMetaAnnotation(final Class<T> annotation) {
+    public <T extends Annotation> MethodList hasMetaAnnotation(final Class<T> annotation) {
         return filter(new Filter() {
             public boolean keep(AnnotatedMethod m) {
                 for (Annotation a : m.getAnnotations()) {
@@ -90,7 +114,7 @@ class MethodList implements Iterable<AnnotatedMethod> {
         });
     }
     
-    <T extends Annotation> MethodList hasNotAnnotation(final Class<T> annotation) {
+    public <T extends Annotation> MethodList hasNotAnnotation(final Class<T> annotation) {
         return filter(new Filter() {
             public boolean keep(AnnotatedMethod m) {
                 return m.getAnnotation(annotation) == null;
@@ -98,7 +122,7 @@ class MethodList implements Iterable<AnnotatedMethod> {
         });
     }
     
-    <T extends Annotation> MethodList hasNotMetaAnnotation(final Class<T> annotation) {
+    public <T extends Annotation> MethodList hasNotMetaAnnotation(final Class<T> annotation) {
         return filter(new Filter() {
             public boolean keep(AnnotatedMethod m) {
                 for (Annotation a : m.getAnnotations()) {

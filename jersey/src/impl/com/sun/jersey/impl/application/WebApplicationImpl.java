@@ -549,7 +549,8 @@ public final class WebApplicationImpl implements WebApplication {
         injectableFactory.add(
                 new ContextInjectableProvider<MessageBodyWorkers>(
                 MessageBodyWorkers.class, bodyFactory));
-
+        bodyFactory.init();
+        
         // Add per-request-based injectable providers
         injectableFactory.add(new CookieParamInjectableProvider());
         injectableFactory.add(new HeaderParamInjectableProvider());

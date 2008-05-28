@@ -66,16 +66,19 @@ public final class MessageBodyFactory implements MessageBodyContext, MessageBody
     
     private final ComponentProviderCache componentProviderCache;
     
-    private final Map<MediaType, List<MessageBodyReader>> readerProviders;
+    private Map<MediaType, List<MessageBodyReader>> readerProviders;
     
-    private final Map<MediaType, List<MessageBodyWriter>> writerProviders;
+    private Map<MediaType, List<MessageBodyWriter>> writerProviders;
     
     public MessageBodyFactory(ComponentProviderCache componentProviderCache) {
         this.componentProviderCache = componentProviderCache;
-        this.readerProviders = getProviderMap(MessageBodyReader.class, ConsumeMime.class);    
-        this.writerProviders = getProviderMap(MessageBodyWriter.class, ProduceMime.class);
     }
-                
+     
+    public void init() {
+        this.readerProviders = getProviderMap(MessageBodyReader.class, ConsumeMime.class);    
+        this.writerProviders = getProviderMap(MessageBodyWriter.class, ProduceMime.class);        
+    }
+    
     private <T> Map<MediaType, List<T>> getProviderMap(
             Class<T> serviceClass,
             Class<?> annotationClass) {
