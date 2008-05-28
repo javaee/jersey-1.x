@@ -75,7 +75,7 @@ public class AcceptableXMLorJSONTest extends AbstractHttpServerTester {
     }
     
     public void testExpliciWebResourceReference() {
-        startServer(HttpHandler.class, Resource.class);
+        startServer(Resource.class);
 
         WebResource r = Client.create().resource(getUri().path("resource").build());
         r.addFilter(new ClientFilter() {

@@ -21,9 +21,11 @@
  */
 package com.sun.jersey.impl.modelapi.annotation;
 
+import com.sun.jersey.api.model.AbstractField;
 import com.sun.jersey.api.model.AbstractResource;
 import com.sun.jersey.api.model.AbstractResourceConstructor;
 import com.sun.jersey.api.model.AbstractResourceMethod;
+import com.sun.jersey.api.model.AbstractSetterMethod;
 import com.sun.jersey.api.model.AbstractSubResourceLocator;
 import com.sun.jersey.api.model.AbstractSubResourceMethod;
 import com.sun.jersey.api.model.Parameter;
@@ -34,6 +36,7 @@ import com.sun.jersey.impl.ImplMessages;
 import com.sun.jersey.impl.model.MediaTypeHelper;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
@@ -85,8 +88,12 @@ public class IntrospectionModeller {
         workOutConstructorsList(resource, resourceClass.getConstructors(), 
                 isEncodedAnotOnClass);
 
+        workOutFieldsList(resource, isEncodedAnotOnClass);
+        
         final MethodList methodList = new MethodList(resourceClass);
 
+        workOutSetterMethodsList(resource, methodList, isEncodedAnotOnClass);
+        
         final ConsumeMime classScopeConsumeMimeAnnotation = 
                 resourceClass.getAnnotation(ConsumeMime.class);
         final ProduceMime classScopeProduceMimeAnnotation = 
@@ -145,6 +152,52 @@ public class IntrospectionModeller {
         }
     }
 
+    private static final void workOutFieldsList(
+            AbstractResource resource, 
+            boolean isEncoded) {        
+        Class c = resource.getResourceClass();
+        if (c.isInterface())
+            return;
+        
+        while (c != Object.class) {
+             for (final Field f : c.getDeclaredFields()) {
+                    final AbstractField af = new AbstractField(f);
+                    Parameter p = createParameter(f.toString(), 1, isEncoded, 
+                            f.getType(),
+                            f.getGenericType(),
+                            f.getAnnotations());
+                    if (null != p) {
+                        af.getParameters().add(p);
+                        resource.getFields().add(af);
+                    }
+             }
+             c = c.getSuperclass();
+        }
+    }
+    
+    private static final void workOutSetterMethodsList(
+            AbstractResource resource, 
+            MethodList methodList,
+            boolean isEncoded) {
+        for (AnnotatedMethod m : methodList.
+                hasNotMetaAnnotation(HttpMethod.class).
+                hasNotAnnotation(Path.class).
+                hasNumParams(1).
+                hasReturnType(void.class).
+                nameStartsWith("set")) {
+            
+            final AbstractSetterMethod asm = new AbstractSetterMethod(m.getMethod());
+            Parameter p = createParameter(m.toString(), 1, isEncoded, 
+                    m.getParameterTypes()[0],
+                    m.getGenericParameterTypes()[0],
+                    m.getAnnotations());
+            if (null != p) {
+                asm.getParameters().add(p);
+                resource.getSetterMethods().add(asm);
+            }
+        }        
+    }
+    
     private static final void workOutResourceMethodsList(
             AbstractResource resource, 
             MethodList methodList, 

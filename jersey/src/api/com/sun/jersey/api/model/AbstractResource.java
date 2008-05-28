@@ -1,20 +1,23 @@
 /*
- * The contents of this file are subject to the terms
- * of the Common Development and Distribution License
- * (the "License").  You may not use this file except
- * in compliance with the License.
+ * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * You can obtain a copy of the license at
- * http://www.opensource.org/licenses/cddl1.php
- * See the License for the specific language governing
- * permissions and limitations under the License.
- */
-
-/*
- * AbstractResource.java
+ * Copyright 2007 Sun Microsystems, Inc. All rights reserved.
  *
- * Created on October 5, 2007, 11:34 AM
+ * The contents of this file are subject to the terms of the Common Development
+ * and Distribution License("CDDL") (the "License").  You may not use this file
+ * except in compliance with the License.
  *
+ * You can obtain a copy of the License at:
+ *     https://jersey.dev.java.net/license.txt
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ * When distributing the Covered Code, include this CDDL Header Notice in each
+ * file and include the License file at:
+ *     https://jersey.dev.java.net/license.txt
+ * If applicable, add the following below this CDDL Header, with the fields
+ * enclosed by brackets [] replaced by your own identifying information:
+ *     "Portions Copyrighted [year] [name of copyright owner]"
  */
 package com.sun.jersey.api.model;
 
@@ -27,12 +30,14 @@ import java.util.List;
  */
 public class AbstractResource implements UriPathAnnotated, AbstractModelComponent {
 
-    private Class<?> resourceClass;
-    private UriPathValue uriPath;
-    private List<AbstractResourceMethod> resourceMethods;
-    private List<AbstractSubResourceMethod> subResourceMethods;
-    private List<AbstractSubResourceLocator> subResourceLocators;
-    private List<AbstractResourceConstructor> constructors;
+    private final Class<?> resourceClass;
+    private final UriPathValue uriPath;
+    private final List<AbstractResourceConstructor> constructors;
+    private final List<AbstractField> fields;
+    private final List<AbstractSetterMethod> setterMethods;
+    private final List<AbstractResourceMethod> resourceMethods;
+    private final List<AbstractSubResourceMethod> subResourceMethods;
+    private final List<AbstractSubResourceLocator> subResourceLocators;
 
     /**
      * Creates a new instance of AbstractResource
@@ -48,6 +53,8 @@ public class AbstractResource implements UriPathAnnotated, AbstractModelComponen
         this.resourceClass = resourceClass;
         this.uriPath = uriPath;
         this.constructors = new ArrayList<AbstractResourceConstructor>();
+        this.fields = new ArrayList<AbstractField>();
+        this.setterMethods = new ArrayList<AbstractSetterMethod>();
         this.resourceMethods = new ArrayList<AbstractResourceMethod>();
         this.subResourceLocators = new ArrayList<AbstractSubResourceLocator>();
         this.subResourceMethods = new ArrayList<AbstractSubResourceMethod>();
@@ -69,6 +76,18 @@ public class AbstractResource implements UriPathAnnotated, AbstractModelComponen
         return uriPath;
     }
 
+    public List<AbstractResourceConstructor> getConstructors() {
+        return constructors;
+    }
+    
+    public List<AbstractField> getFields() {
+        return fields;
+    }
+    
+    public List<AbstractSetterMethod> getSetterMethods() {
+        return setterMethods;
+    }
+    
     /**
      * Provides a non-null list of resource methods available on the resource
      * 
@@ -96,10 +115,6 @@ public class AbstractResource implements UriPathAnnotated, AbstractModelComponen
         return subResourceLocators;
     }
 
-    public List<AbstractResourceConstructor> getConstructors() {
-        return constructors;
-    }
-    
     public void accept(AbstractModelVisitor visitor) {
         visitor.visitAbstractResource(this);
     }
@@ -109,6 +124,9 @@ public class AbstractResource implements UriPathAnnotated, AbstractModelComponen
         return "AbstractResource(" 
                 + ((null == getUriPath()) ? "" : ("\"" + getUriPath().getValue() + "\", - ")) 
                 + getResourceClass().getSimpleName() + ": " 
+                + getConstructors().size() + " constructors, " 
+                + getFields().size() + " fields, " 
+                + getSetterMethods().size() + " setter methods, " 
                 + getResourceMethods().size() + " res methods, " 
                 + getSubResourceMethods().size() + " subres methods, " 
                 + getSubResourceLocators().size() + " subres locators " + ")";
@@ -117,6 +135,7 @@ public class AbstractResource implements UriPathAnnotated, AbstractModelComponen
     public List<AbstractModelComponent> getComponents() {
         List<AbstractModelComponent> components = new LinkedList<AbstractModelComponent>();
         components.addAll(getConstructors());
+        components.addAll(getSetterMethods());
         components.addAll(getResourceMethods());
         components.addAll(getSubResourceMethods());
         components.addAll(getSubResourceLocators());

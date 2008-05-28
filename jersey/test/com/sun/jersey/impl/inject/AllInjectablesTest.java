@@ -34,6 +34,8 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
@@ -163,6 +165,8 @@ public class AllInjectablesTest extends AbstractResourceTester {
         
         @Context Request r;
         
+        @Context SecurityContext sc;
+        
         @GET
         public String get() {
             assertNotNull(rc);
@@ -173,6 +177,7 @@ public class AllInjectablesTest extends AbstractResourceTester {
             assertNotNull(hs);
             assertNotNull(ui);
             assertNotNull(r);
+            assertNotNull(sc);
             return "GET";
         }                
     }
@@ -253,4 +258,24 @@ public class AllInjectablesTest extends AbstractResourceTester {
         
         assertEquals("GET", resource("/").get(String.class));        
     }           
+    
+    
+    @Path("/{p}")
+    public static class PerRequestFieldResource {        
+        @PathParam("p") String p;
+        
+        @QueryParam("q") String q;        
+        
+        @GET
+        public String get() {
+            return p+q;
+        }                
+    }
+    
+    public void testPerRequestParamInjected() throws IOException {
+        initiateWebApplication(PerRequestFieldResource.class);
+        
+        assertEquals("foobar", resource("/foo?q=bar").get(String.class));        
+    }           
+    
 }

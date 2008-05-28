@@ -1,21 +1,33 @@
 /*
- * The contents of this file are subject to the terms
- * of the Common Development and Distribution License
- * (the "License").  You may not use this file except
- * in compliance with the License.
- * 
- * You can obtain a copy of the license at
- * http://www.opensource.org/licenses/cddl1.php
- * See the License for the specific language governing
- * permissions and limitations under the License.
+ * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+ *
+ * Copyright 2007 Sun Microsystems, Inc. All rights reserved.
+ *
+ * The contents of this file are subject to the terms of the Common Development
+ * and Distribution License("CDDL") (the "License").  You may not use this file
+ * except in compliance with the License.
+ *
+ * You can obtain a copy of the License at:
+ *     https://jersey.dev.java.net/license.txt
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ * When distributing the Covered Code, include this CDDL Header Notice in each
+ * file and include the License file at:
+ *     https://jersey.dev.java.net/license.txt
+ * If applicable, add the following below this CDDL Header, with the fields
+ * enclosed by brackets [] replaced by your own identifying information:
+ *     "Portions Copyrighted [year] [name of copyright owner]"
  */
 package com.sun.jersey.impl.modelapi.validation;
 
 import com.sun.jersey.api.core.HttpRequestContext;
 import com.sun.jersey.api.core.HttpResponseContext;
+import com.sun.jersey.api.model.AbstractField;
 import com.sun.jersey.api.model.AbstractResource;
 import com.sun.jersey.api.model.AbstractResourceConstructor;
 import com.sun.jersey.api.model.AbstractResourceMethod;
+import com.sun.jersey.api.model.AbstractSetterMethod;
 import com.sun.jersey.api.model.AbstractSubResourceLocator;
 import com.sun.jersey.api.model.AbstractSubResourceMethod;
 import com.sun.jersey.api.model.ResourceModelIssue;
@@ -44,6 +56,15 @@ public class BasicValidator extends AbstractModelValidator {
         }
     }
 
+    public void visitAbstractResourceConstructor(AbstractResourceConstructor constructor) {
+    }
+
+    public void visitAbstractField(AbstractField field) {
+    }
+    
+    public void visitAbstractSetterMethod(AbstractSetterMethod setterMethod) {
+    }
+    
     public void visitAbstractResourceMethod(AbstractResourceMethod method) {
         // TODO: check in req/resp case the method has both req and resp params
         if (!isRequestResponseMethod(method) && ("GET".equals(method.getHttpMethod()) && (void.class == method.getMethod().getReturnType()))) {
@@ -78,9 +99,6 @@ public class BasicValidator extends AbstractModelValidator {
                     ImplMessages.ERROR_SUBRES_LOC_URI_PATH_INVALID(locator.getMethod(), locator.getUriPath()),
                     true));
         }
-    }
-
-    public void visitAbstractResourceConstructor(AbstractResourceConstructor constructor) {
     }
 
     // TODO: the method could probably have more then 2 params...

@@ -22,6 +22,10 @@ public interface AbstractModelVisitor {
 
     void visitAbstractResource(AbstractResource resource);
 
+    void visitAbstractField(AbstractField field);
+    
+    void visitAbstractSetterMethod(AbstractSetterMethod setterMethod);
+    
     void visitAbstractResourceMethod(AbstractResourceMethod method);
 
     void visitAbstractSubResourceMethod(AbstractSubResourceMethod method);

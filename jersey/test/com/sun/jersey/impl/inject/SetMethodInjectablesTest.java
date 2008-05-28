@@ -34,6 +34,8 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
@@ -126,6 +128,12 @@ public class SetMethodInjectablesTest extends AbstractResourceTester {
         public void setr(Request r) {   
             this.r = r;
         }        
+        
+        SecurityContext sc;
+        @Context
+        public void sesc(SecurityContext sc) {   
+            this.sc = sc;
+        }        
     }
     
     @Path("/")
@@ -139,4 +147,188 @@ public class SetMethodInjectablesTest extends AbstractResourceTester {
         
         assertEquals("GET", resource("/").get(String.class));        
     }               
+    
+    
+    @Path("/")
+    public static class PerRequestContextResource {
+        ResourceConfig rc;
+        @Context
+        public void setrc(ResourceConfig rc) {   
+            this.rc = rc;
+        }
+        
+        MessageBodyContext mbc;
+        @Context
+        public void setmbc(MessageBodyContext mbc) {   
+            this.mbc = mbc;
+        }
+        
+        MessageBodyWorkers mbw;
+        @Context
+        public void set(MessageBodyWorkers mbw) {   
+            this.mbw = mbw;
+        }
+        
+        TemplateContext tc;
+        @Context
+        public void set(TemplateContext tc) {   
+            this.tc = tc;
+        }
+        
+        HttpContext hca;
+        @Context
+        public void set(HttpContext hca) {   
+            this.hca = hca;
+        }
+        
+        HttpHeaders hs;
+        @Context
+        public void set(HttpHeaders hs) {   
+            this.hs = hs;
+        }
+        
+        UriInfo ui;
+        @Context
+        public void set(UriInfo ui) {   
+            this.ui = ui;
+        }
+        
+        Request r;
+        @Context
+        public void setr(Request r) {   
+            this.r = r;
+        }        
+        
+        SecurityContext sc;
+        @Context
+        public void setsc(SecurityContext sc) {   
+            this.sc = sc;
+        }        
+        
+        @GET
+        public String get() {
+            assertNotNull(rc);
+            assertNotNull(mbc);
+            assertNotNull(mbw);
+            assertNotNull(tc);
+            assertNotNull(hca);
+            assertNotNull(hs);
+            assertNotNull(ui);
+            assertNotNull(r);
+            assertNotNull(sc);
+            return "GET";
+        }                
+    }
+    
+    public void testPerRequestInjected() throws IOException {
+        initiateWebApplication(PerRequestContextResource.class);
+        
+        assertEquals("GET", resource("/").get(String.class));        
+    }       
+    
+    
+    @Path("/")
+    @Singleton
+    public static class SingletonContextResource {
+        ResourceConfig rc;
+        @Context
+        public void setrc(ResourceConfig rc) {   
+            this.rc = rc;
+        }
+        
+        MessageBodyContext mbc;
+        @Context
+        public void setmbc(MessageBodyContext mbc) {   
+            this.mbc = mbc;
+        }
+        
+        MessageBodyWorkers mbw;
+        @Context
+        public void set(MessageBodyWorkers mbw) {   
+            this.mbw = mbw;
+        }
+        
+        TemplateContext tc;
+        @Context
+        public void set(TemplateContext tc) {   
+            this.tc = tc;
+        }
+        
+        HttpContext hca;
+        @Context
+        public void set(HttpContext hca) {   
+            this.hca = hca;
+        }
+        
+        HttpHeaders hs;
+        @Context
+        public void set(HttpHeaders hs) {   
+            this.hs = hs;
+        }
+        
+        UriInfo ui;
+        @Context
+        public void set(UriInfo ui) {   
+            this.ui = ui;
+        }
+        
+        Request r;
+        @Context
+        public void setr(Request r) {   
+            this.r = r;
+        }        
+        
+        SecurityContext sc;
+        @Context
+        public void setsc(SecurityContext sc) {   
+            this.sc = sc;
+        }        
+        
+        @GET
+        public String get() {
+            assertNotNull(rc);
+            assertNotNull(mbc);
+            assertNotNull(mbw);
+            assertNotNull(tc);
+            assertNotNull(hca);
+            assertNotNull(hs);
+            assertNotNull(ui);
+            assertNotNull(r);
+            assertNotNull(sc);
+            return "GET";
+        }                
+    }
+    
+    public void testSingletonInjected() throws IOException {
+        initiateWebApplication(SingletonContextResource.class);
+        
+        assertEquals("GET", resource("/").get(String.class));        
+    }
+    
+    @Path("/{p}")
+    public static class PerRequestParamResource {
+        String p;        
+        @PathParam("p")
+        public void setP(String p) {
+            this.p = p;
+        }
+        
+        String q;        
+        @QueryParam("q")
+        public void setA(String q) {
+            this.q = q;
+        }
+        
+        @GET
+        public String get() {
+            return p+q;
+        }                
+    }
+    
+    public void testPerRequestParamInjected() throws IOException {
+        initiateWebApplication(PerRequestParamResource.class);
+        
+        assertEquals("foobar", resource("/foo?q=bar").get(String.class));        
+    }           
+    
 }
