@@ -20,7 +20,7 @@
    enclosed by brackets [] replaced by your own identifying information:
        "Portions Copyrighted [year] [name of copyright owner]"
 -->
-<project name="Jersey-Maintenance" default="jar" basedir=".">
+<project name="Jersey-Licence-Maintenance" default="jar" basedir=".">
 
  <taskdef name="licensetool" classname="org.jvnet.licensetool.LicenseToolTask">
         <classpath>
@@ -29,20 +29,20 @@
   </taskdef>
 
   <target name="check-copyright" description="Checks all source files has proper licence boilerplate">
-    <licensetool srcDir=".."
+    <licensetool srcDir="../../jersey"
         validate="true"
         skipdirs=".svn"
         copyright="copyright.txt"
-        includes="src/**,test/**">
+        includes="src/**/*.java test/**/*.java build.xml examples/**/*.java maven/*">
     </licensetool>
   </target>
 
   <target name="fix-copyright" description="Fixes licence boilerplate at all source files">
-    <licensetool srcDir=".."
+    <licensetool srcDir="../../jersey/"
         validate="false"
         skipdirs=".svn"
         copyright="copyright.txt"
-        includes="src/**,test/**">
+        includes="src/**/*.java test/**/*.java build.xml examples/**/*.java maven/*">
     </licensetool>
   </target>
 
