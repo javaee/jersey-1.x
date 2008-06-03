@@ -39,6 +39,7 @@ package com.sun.jersey.impl.inject;
 
 import com.sun.jersey.api.core.HttpContext;
 import com.sun.jersey.api.core.ResourceConfig;
+import com.sun.jersey.api.uri.ExtendedUriInfo;
 import com.sun.jersey.impl.AbstractResourceTester;
 import com.sun.jersey.spi.container.MessageBodyContext;
 import com.sun.jersey.spi.resource.Singleton;
@@ -89,6 +90,8 @@ public class AllInjectablesTest extends AbstractResourceTester {
         
         @Context UriInfo ui;
         
+        @Context ExtendedUriInfo eui;
+        
         @Context Request r;
         
         @Context SecurityContext sc;
@@ -102,6 +105,7 @@ public class AllInjectablesTest extends AbstractResourceTester {
             assertNotNull(hca);
             assertNotNull(hs);
             assertNotNull(ui);
+            assertNotNull(eui);
             assertNotNull(r);
             assertNotNull(sc);
             return "GET";
@@ -118,6 +122,7 @@ public class AllInjectablesTest extends AbstractResourceTester {
                 @Context HttpContext hca,
                 @Context HttpHeaders hs,
                 @Context UriInfo ui,
+                @Context ExtendedUriInfo eui,
                 @Context Request r,
                 @Context SecurityContext sc) {
             assertNotNull(rc);
@@ -127,6 +132,7 @@ public class AllInjectablesTest extends AbstractResourceTester {
             assertNotNull(hca);
             assertNotNull(hs);
             assertNotNull(ui);
+            assertNotNull(eui);
             assertNotNull(r);
             assertNotNull(sc);
         }                
@@ -146,6 +152,7 @@ public class AllInjectablesTest extends AbstractResourceTester {
                 @Context HttpContext hca,
                 @Context HttpHeaders hs,
                 @Context UriInfo ui,
+                @Context ExtendedUriInfo eui,
                 @Context Request r,
                 @Context SecurityContext sc) {
             assertNotNull(rc);
@@ -155,6 +162,7 @@ public class AllInjectablesTest extends AbstractResourceTester {
             assertNotNull(hca);
             assertNotNull(hs);
             assertNotNull(ui);
+            assertNotNull(eui);
             assertNotNull(r);
             assertNotNull(sc);
             return "GET";
@@ -178,6 +186,8 @@ public class AllInjectablesTest extends AbstractResourceTester {
         
         @Context UriInfo ui;
         
+        @Context ExtendedUriInfo eui;
+        
         @Context Request r;
         
         @Context SecurityContext sc;
@@ -191,6 +201,7 @@ public class AllInjectablesTest extends AbstractResourceTester {
             assertNotNull(hca);
             assertNotNull(hs);
             assertNotNull(ui);
+            assertNotNull(eui);
             assertNotNull(r);
             assertNotNull(sc);
             return "GET";
@@ -241,6 +252,7 @@ public class AllInjectablesTest extends AbstractResourceTester {
             assertNotNull(hca);
             assertNotNull(hs);
             assertNotNull(ui);
+            assertNotNull(eui);
             assertNotNull(r);
             arg6.write(arg0.getBytes());
         }
@@ -258,6 +270,8 @@ public class AllInjectablesTest extends AbstractResourceTester {
         @Context HttpHeaders hs;
         
         @Context UriInfo ui;
+        
+        @Context ExtendedUriInfo eui;
         
         @Context Request r;        
     }

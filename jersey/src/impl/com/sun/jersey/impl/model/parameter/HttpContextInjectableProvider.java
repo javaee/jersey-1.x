@@ -38,6 +38,7 @@
 package com.sun.jersey.impl.model.parameter;
 
 import com.sun.jersey.api.core.HttpContext;
+import com.sun.jersey.api.uri.ExtendedUriInfo;
 import com.sun.jersey.spi.inject.Injectable;
 import com.sun.jersey.spi.inject.InjectableContext;
 import com.sun.jersey.spi.inject.InjectableProvider;
@@ -89,6 +90,7 @@ public final class HttpContextInjectableProvider implements
         injectables.put(HttpContext.class, new HttpContextInjectable());
         
         injectables.put(UriInfo.class, new UriInfoInjectable());
+        injectables.put(ExtendedUriInfo.class, new UriInfoInjectable());
     }
     
     public Scope getScope() {

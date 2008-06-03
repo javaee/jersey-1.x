@@ -88,77 +88,11 @@ public final class ResourceClassInjector {
      */
     public ResourceClassInjector(InjectableProviderContext ipc, Scope s, AbstractResource resource) {
         // processFields(ipc, s, resource.getResourceClass());
-        processFields2(ipc, s, resource.getFields());
+        processFields(ipc, s, resource.getFields());
         processSetters(ipc, s, resource.getSetterMethods());
     }
 
-    private void processFields(InjectableProviderContext ipc, Scope s, Class c) {
-        Map<Field, Injectable<?>> singletons = new HashMap<Field, Injectable<?>>();
-        Map<Field, Injectable<?>> perRequest = new HashMap<Field, Injectable<?>>();
-        
-        while (c != Object.class) {
-            for (final Field f : c.getDeclaredFields()) {
-                final Annotation[] as = f.getAnnotations();
-                for (Annotation a : as) {
-                    if (s == Scope.PerRequest) {
-                        Injectable i = ipc.getInjectable(
-                                a.annotationType(), 
-                                null, 
-                                a, 
-                                f.getGenericType(), 
-                                Arrays.asList(Scope.PerRequest, Scope.Undefined));
-                        if (i != null) {
-                            configureField(f);
-                            perRequest.put(f, i);
-                        } else {
-                            i = ipc.getInjectable(
-                                    a.annotationType(), 
-                                    null, 
-                                    a, 
-                                    f.getGenericType(), 
-                                    Scope.Singleton);
-                            if (i != null) {
-                                configureField(f);
-                                singletons.put(f, i);
-                            }   
-                        }                       
-                    } else {
-                        Injectable i = ipc.getInjectable(
-                                a.annotationType(), 
-                                null, 
-                                a, 
-                                f.getGenericType(), 
-                                Arrays.asList(Scope.Undefined, Scope.Singleton));
-                        if (i != null) {
-                            configureField(f);
-                            singletons.put(f, i);
-                        }
-                    }                                        
-                }
-            }
-            c = c.getSuperclass();
-        }
-        
-        int size = singletons.entrySet().size();
-        singletonFields = new Field[size];
-        singletonFieldValues = new Object[size];        
-        int i = 0;
-        for (Map.Entry<Field, Injectable<?>> e : singletons.entrySet()) {
-            singletonFields[i] = e.getKey();
-            singletonFieldValues[i++] = e.getValue().getValue(null);
-        }
-        
-        size = perRequest.entrySet().size();
-        perRequestFields = new Field[size];
-        perRequestFieldInjectables = new Injectable<?>[size];        
-        i = 0;
-        for (Map.Entry<Field, Injectable<?>> e : perRequest.entrySet()) {
-            perRequestFields[i] = e.getKey();
-            perRequestFieldInjectables[i++] = e.getValue();
-        }        
-    }
-
-    private void processFields2(InjectableProviderContext ipc, Scope s, 
+    private void processFields(InjectableProviderContext ipc, Scope s, 
             List<AbstractField> fields) {
         Map<Field, Injectable<?>> singletons = new HashMap<Field, Injectable<?>>();
         Map<Field, Injectable<?>> perRequest = new HashMap<Field, Injectable<?>>();

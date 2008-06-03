@@ -78,6 +78,7 @@ import com.sun.jersey.api.core.ResourceConfig;
 import com.sun.jersey.api.core.ResourceContext;
 import com.sun.jersey.api.model.AbstractResource;
 import com.sun.jersey.api.model.ResourceModelIssue;
+import com.sun.jersey.api.uri.ExtendedUriInfo;
 import com.sun.jersey.api.uri.UriTemplate;
 import com.sun.jersey.impl.ImplMessages;
 import com.sun.jersey.impl.ThreadLocalHttpContext;
@@ -133,14 +134,6 @@ public final class WebApplicationImpl implements WebApplication {
     
     private final ThreadLocalHttpContext context;
     
-    private final HttpHeaders httpHeadersProxy;
-    
-    private final UriInfo uriInfoProxy;
-    
-    private final Request requestProxy;
-    
-    private final SecurityContext securityContextProxy;
-    
     private boolean initiated;
     
     private ResourceConfig resourceConfig;
@@ -171,15 +164,11 @@ public final class WebApplicationImpl implements WebApplication {
                 return method.invoke(context.getRequest(), args);
             }
         };
-        this.httpHeadersProxy = createProxy(HttpHeaders.class, requestHandler);
-        this.requestProxy = createProxy(Request.class, requestHandler);
-        this.securityContextProxy = createProxy(SecurityContext.class, requestHandler);
         InvocationHandler uriInfoHandler = new InvocationHandler() {
             public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
                 return method.invoke(context.getUriInfo(), args);
             }
         };
-        this.uriInfoProxy = createProxy(UriInfo.class, uriInfoHandler);
         
         // Create injectable provider factory
         this.injectableFactory = new InjectableProviderFactory(); 
@@ -189,10 +178,11 @@ public final class WebApplicationImpl implements WebApplication {
         // Add proxied injectables
         final Map<Type, Object> m = new HashMap<Type, Object>();
         m.put(HttpContext.class, context);
-        m.put(HttpHeaders.class, httpHeadersProxy);
-        m.put(UriInfo.class, uriInfoProxy);
-        m.put(Request.class, requestProxy);
-        m.put(SecurityContext.class, securityContextProxy);        
+        m.put(HttpHeaders.class, createProxy(HttpHeaders.class, requestHandler));
+        m.put(UriInfo.class, createProxy(UriInfo.class, uriInfoHandler));
+        m.put(ExtendedUriInfo.class, createProxy(ExtendedUriInfo.class, uriInfoHandler));
+        m.put(Request.class, createProxy(Request.class, requestHandler));
+        m.put(SecurityContext.class, createProxy(SecurityContext.class, requestHandler));        
         injectableFactory.add(new InjectableProvider<Context, Type>() {
             public Scope getScope() {
                 return Scope.Singleton;
