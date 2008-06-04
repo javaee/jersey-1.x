@@ -68,7 +68,7 @@ public abstract class ResourceJavaMethodDispatcher implements RequestDispatcher 
             if (c.getType().equals("*") || c.getSubtype().equals("*")) 
                 mediaType = null;
             else
-                mediaType = this.produceMime.get(0);
+                mediaType = c;
         } else {
             mediaType = null;
         }        

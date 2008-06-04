@@ -198,7 +198,8 @@ public abstract class AbstractContainerResponse implements ContainerResponse {
         // Otherwise if there is no entity then there should be no content type
         else if (this.entity == null) {
             contentType = null;
-        }        
+        }
+ 
         if (response instanceof ResponseImpl) {
             this.headers = setResponseOptimal((ResponseImpl)response, contentType);
         } else {
@@ -281,12 +282,6 @@ public abstract class AbstractContainerResponse implements ContainerResponse {
         commitStatusAndHeaders(p.getSize(entity));
         p.writeTo(entity, entity.getClass(), null, null, 
                 contentType, getHttpHeaders(), getUnderlyingOutputStream());
-    }
-    
-    private MessageBodyWriter getMessageBodyWriter(Object entity) {
-        return bodyContext.getMessageBodyWriter(
-                entity.getClass(), null, 
-                null, getContentType());        
     }
     
     private MediaType getContentType() {        

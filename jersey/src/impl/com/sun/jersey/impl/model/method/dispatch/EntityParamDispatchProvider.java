@@ -129,9 +129,11 @@ public class EntityParamDispatchProvider implements ResourceMethodDispatchProvid
             final Object[] params = getParams(context);
             
             Object o = method.invoke(resource, params);
-            MediaType mediaType = getAcceptableMediaType(context.getRequest());
-            Response r = new ResponseBuilderImpl().status(200).entity(o).type(mediaType).build();
-            context.getResponse().setResponse(r);
+            if (o != null) {
+                MediaType mediaType = getAcceptableMediaType(context.getRequest());
+                Response r = new ResponseBuilderImpl().status(200).entity(o).type(mediaType).build();
+                context.getResponse().setResponse(r);
+            }
         }
     }
     
@@ -146,8 +148,10 @@ public class EntityParamDispatchProvider implements ResourceMethodDispatchProvid
             final Object[] params = getParams(context);
 
             Response r = (Response)method.invoke(resource, params);
-            MediaType mediaType = getAcceptableMediaType(context.getRequest());
-            context.getResponse().setResponse(r, mediaType);
+            if (r != null) {
+                MediaType mediaType = getAcceptableMediaType(context.getRequest());
+                context.getResponse().setResponse(r, mediaType);
+            }
         }
     }
     
@@ -166,7 +170,7 @@ public class EntityParamDispatchProvider implements ResourceMethodDispatchProvid
             if (o instanceof Response) {
                 Response r = (Response)o;
                 context.getResponse().setResponse(r, mediaType);
-            } else {
+            } else if (o != null) {
                 Response r = new ResponseBuilderImpl().status(200).entity(o).type(mediaType).build();
                 context.getResponse().setResponse(r);
             }            

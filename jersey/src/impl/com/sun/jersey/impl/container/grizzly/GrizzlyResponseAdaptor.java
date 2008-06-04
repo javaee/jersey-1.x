@@ -58,16 +58,15 @@ public final class GrizzlyResponseAdaptor extends AbstractContainerResponse {
         super(bodyContext, requestContext);
         this.response = response;
     }
-    
-    
+        
     protected void commitStatusAndHeaders(long contentLength) throws IOException {
         response.setStatus(this.getStatus());
         if (contentLength != -1 && contentLength < Integer.MAX_VALUE) 
             response.setContentLength((int)contentLength);
         for (Map.Entry<String, List<Object>> e : this.getHttpHeaders().entrySet()) {
             String key = e.getKey();
-            for (Object value: e.getValue()) {
-                response.addHeader(key,value.toString());
+            for (Object value : e.getValue()) {
+                response.addHeader(key, value.toString());
             }
         }
 
