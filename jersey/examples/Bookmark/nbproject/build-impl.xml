@@ -455,8 +455,6 @@
     <target depends="init" if="dist.ear.dir" name="library-inclusion-in-manifest">
         <basename file="${file.reference.jettison-1.0-RC1.jar}" property="included.lib.file.reference.jettison-1.0-RC1.jar"/>
         <copy-ear-war file="${file.reference.jettison-1.0-RC1.jar}" propname="included.lib.file.reference.jettison-1.0-RC1.jar.X"/>
-        <basename file="${file.reference.jsr250-api.jar-1}" property="included.lib.file.reference.jsr250-api.jar-1"/>
-        <copy-ear-war file="${file.reference.jsr250-api.jar-1}" propname="included.lib.file.reference.jsr250-api.jar-1.X"/>
         <basename file="${file.reference.persistence-api-1.0.jar-1}" property="included.lib.file.reference.persistence-api-1.0.jar-1"/>
         <copy-ear-war file="${file.reference.persistence-api-1.0.jar-1}" propname="included.lib.file.reference.persistence-api-1.0.jar-1.X"/>
         <basename file="${file.reference.asm-3.1.jar}" property="included.lib.file.reference.asm-3.1.jar"/>
@@ -467,13 +465,12 @@
         <copy-ear-war file="${file.reference.jsr311-api.jar}" propname="included.lib.file.reference.jsr311-api.jar.X"/>
         <mkdir dir="${build.web.dir}/META-INF"/>
         <manifest file="${build.web.dir}/META-INF/MANIFEST.MF" mode="update">
-            <attribute name="Class-Path" value="${included.lib.file.reference.jettison-1.0-RC1.jar} ${included.lib.file.reference.jsr250-api.jar-1} ${included.lib.file.reference.persistence-api-1.0.jar-1} ${included.lib.file.reference.asm-3.1.jar} ${included.lib.file.reference.jersey.jar} ${included.lib.file.reference.jsr311-api.jar} "/>
+            <attribute name="Class-Path" value="${included.lib.file.reference.jettison-1.0-RC1.jar} ${included.lib.file.reference.persistence-api-1.0.jar-1} ${included.lib.file.reference.asm-3.1.jar} ${included.lib.file.reference.jersey.jar} ${included.lib.file.reference.jsr311-api.jar} "/>
         </manifest>
         <delete dir="${dist.ear.dir}/temp"/>
     </target>
     <target depends="init" name="library-inclusion-in-archive" unless="dist.ear.dir">
         <copy file="${file.reference.jettison-1.0-RC1.jar}" todir="${build.web.dir}/WEB-INF/lib"/>
-        <copy file="${file.reference.jsr250-api.jar-1}" todir="${build.web.dir}/WEB-INF/lib"/>
         <copy file="${file.reference.persistence-api-1.0.jar-1}" todir="${build.web.dir}/WEB-INF/lib"/>
         <copy file="${file.reference.asm-3.1.jar}" todir="${build.web.dir}/WEB-INF/lib"/>
         <copy file="${file.reference.jersey.jar}" todir="${build.web.dir}/WEB-INF/lib"/>

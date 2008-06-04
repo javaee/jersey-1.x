@@ -3,7 +3,7 @@
     <!-- comment -->
     <servlet>
         <servlet-name>Jersey Web Application</servlet-name>
-        <servlet-class>com.sun.ws.rest.impl.container.servlet.ServletAdaptor</servlet-class>
+        <servlet-class>com.sun.jersey.impl.container.servlet.ServletAdaptor</servlet-class>
         <load-on-startup>1</load-on-startup>
     </servlet>
     <servlet-mapping>

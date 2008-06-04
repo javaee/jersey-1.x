@@ -461,8 +461,6 @@
         <copy-ear-war file="${file.reference.jaxb-impl.jar}" propname="included.lib.file.reference.jaxb-impl.jar.X"/>
         <basename file="${file.reference.jettison-1.0-RC1.jar}" property="included.lib.file.reference.jettison-1.0-RC1.jar"/>
         <copy-ear-war file="${file.reference.jettison-1.0-RC1.jar}" propname="included.lib.file.reference.jettison-1.0-RC1.jar.X"/>
-        <basename file="${file.reference.jsr250-api.jar}" property="included.lib.file.reference.jsr250-api.jar"/>
-        <copy-ear-war file="${file.reference.jsr250-api.jar}" propname="included.lib.file.reference.jsr250-api.jar.X"/>
         <basename file="${file.reference.persistence-api-1.0.jar}" property="included.lib.file.reference.persistence-api-1.0.jar"/>
         <copy-ear-war file="${file.reference.persistence-api-1.0.jar}" propname="included.lib.file.reference.persistence-api-1.0.jar.X"/>
         <basename file="${file.reference.asm-3.1.jar}" property="included.lib.file.reference.asm-3.1.jar"/>
@@ -473,7 +471,7 @@
         <copy-ear-war file="${file.reference.jersey.jar}" propname="included.lib.file.reference.jersey.jar.X"/>
         <mkdir dir="${build.web.dir}/META-INF"/>
         <manifest file="${build.web.dir}/META-INF/MANIFEST.MF" mode="update">
-            <attribute name="Class-Path" value="${included.lib.file.reference.jsr173_api.jar} ${included.lib.file.reference.jaxb-api.jar} ${included.lib.file.reference.jaxb-impl.jar} ${included.lib.file.reference.jettison-1.0-RC1.jar} ${included.lib.file.reference.jsr250-api.jar} ${included.lib.file.reference.persistence-api-1.0.jar} ${included.lib.file.reference.asm-3.1.jar} ${included.lib.file.reference.jsr311-api.jar} ${included.lib.file.reference.jersey.jar} "/>
+            <attribute name="Class-Path" value="${included.lib.file.reference.jsr173_api.jar} ${included.lib.file.reference.jaxb-api.jar} ${included.lib.file.reference.jaxb-impl.jar} ${included.lib.file.reference.jettison-1.0-RC1.jar} ${included.lib.file.reference.persistence-api-1.0.jar} ${included.lib.file.reference.asm-3.1.jar} ${included.lib.file.reference.jsr311-api.jar} ${included.lib.file.reference.jersey.jar} "/>
         </manifest>
         <delete dir="${dist.ear.dir}/temp"/>
     </target>
@@ -482,7 +480,6 @@
         <copy file="${file.reference.jaxb-api.jar}" todir="${build.web.dir}/WEB-INF/lib"/>
         <copy file="${file.reference.jaxb-impl.jar}" todir="${build.web.dir}/WEB-INF/lib"/>
         <copy file="${file.reference.jettison-1.0-RC1.jar}" todir="${build.web.dir}/WEB-INF/lib"/>
-        <copy file="${file.reference.jsr250-api.jar}" todir="${build.web.dir}/WEB-INF/lib"/>
         <copy file="${file.reference.persistence-api-1.0.jar}" todir="${build.web.dir}/WEB-INF/lib"/>
         <copy file="${file.reference.asm-3.1.jar}" todir="${build.web.dir}/WEB-INF/lib"/>
         <copy file="${file.reference.jsr311-api.jar}" todir="${build.web.dir}/WEB-INF/lib"/>
