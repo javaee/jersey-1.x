@@ -146,6 +146,17 @@ public class ServletContainer extends HttpServlet implements ContainerListener {
     @Override
     public void service(HttpServletRequest req, HttpServletResponse resp)
     throws ServletException, IOException {
+        /**
+         * There is an annoying edge case where the service method is
+         * invoked for the case when the URI is equal to the deployment URL
+         * minus the '/', for example http://locahost:8080/HelloWorldWebApp
+         */
+        if (req.getPathInfo() != null && 
+                req.getPathInfo().equals("/") && !req.getRequestURI().endsWith("/")) {
+            resp.setStatus(404);
+            return;            
+        }
+        
         // Copy the application field to local instance to ensure that the 
         // currently loaded web application is used to process
         // request
@@ -154,6 +165,7 @@ public class ServletContainer extends HttpServlet implements ContainerListener {
         HttpRequestAdaptor requestAdaptor = new HttpRequestAdaptor(
                 _application.getMessageBodyContext(), 
                 req);
+        
         HttpResponseAdaptor responseAdaptor = new HttpResponseAdaptor(
                 context, 
                 resp, 
