@@ -40,7 +40,7 @@ package com.sun.jersey.impl.container.servlet;
 import com.sun.jersey.api.container.ContainerException;
 import com.sun.jersey.api.uri.UriComponent;
 import com.sun.jersey.spi.container.AbstractContainerRequest;
-import com.sun.jersey.spi.container.MessageBodyContext;
+import com.sun.jersey.spi.container.WebApplication;
 import java.io.IOException;
 import java.security.Principal;
 import java.util.Enumeration;
@@ -59,9 +59,9 @@ public final class HttpRequestAdaptor extends AbstractContainerRequest {
     
     private final HttpServletRequest request;
     
-    public HttpRequestAdaptor(MessageBodyContext bodyContext, 
+    public HttpRequestAdaptor(WebApplication wa, 
             HttpServletRequest request) throws IOException {
-        super(bodyContext, request.getMethod(), request.getInputStream());
+        super(wa, request.getMethod(), request.getInputStream());
         this.request = request;
         
         initiateUriInfo();

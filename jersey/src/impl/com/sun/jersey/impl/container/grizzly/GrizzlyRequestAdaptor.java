@@ -40,7 +40,7 @@ package com.sun.jersey.impl.container.grizzly;
 import com.sun.grizzly.tcp.http11.GrizzlyRequest;
 import com.sun.jersey.spi.container.AbstractContainerRequest;
 import com.sun.jersey.impl.http.header.HttpHeaderFactory;
-import com.sun.jersey.spi.container.MessageBodyContext;
+import com.sun.jersey.spi.container.WebApplication;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -55,10 +55,9 @@ public final class GrizzlyRequestAdaptor  extends AbstractContainerRequest {
     
     private final GrizzlyRequest request;
     
-    /** Creates a new instance of GrizzlyRequestAdaptor */
-    public GrizzlyRequestAdaptor(MessageBodyContext bodyContext, GrizzlyRequest request) 
+    public GrizzlyRequestAdaptor(WebApplication wa, GrizzlyRequest request) 
             throws IOException {
-        super(bodyContext, request.getMethod(), request.getInputStream());
+        super(wa, request.getMethod(), request.getInputStream());
         this.request = request;
         
         initiateUriInfo();

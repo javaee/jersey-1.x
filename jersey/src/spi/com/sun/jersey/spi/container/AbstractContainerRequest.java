@@ -65,6 +65,7 @@ import javax.ws.rs.core.Response.ResponseBuilder;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.Variant;
 import javax.ws.rs.ext.MessageBodyReader;
+import javax.ws.rs.ext.MessageBodyWorkers;
 
 /**
  * An abstract implementation of {@link ContainerRequest}.
@@ -86,7 +87,7 @@ import javax.ws.rs.ext.MessageBodyReader;
 public abstract class AbstractContainerRequest implements ContainerRequest {
     private static final Annotation[] EMTPTY_ANNOTATIONS = new Annotation[0];
     
-    private final MessageBodyContext bodyContext;
+    private final MessageBodyWorkers bodyContext;
     
     /**
      * The HTTP method
@@ -133,13 +134,13 @@ public abstract class AbstractContainerRequest implements ContainerRequest {
     
     /**
      *
-     * @param bodyContext the message body context
+     * @param wa the web application
      * @param method the HTTP method
      * @param entity the InputStream of the request entity
      */
-    protected AbstractContainerRequest(MessageBodyContext bodyContext,
+    protected AbstractContainerRequest(WebApplication wa,
             String method, InputStream entity) {
-        this.bodyContext = bodyContext;
+        this.bodyContext = wa.getMessageBodyWorkers();
         this.method = method;
         this.headers = new RequestHttpHeadersImpl();
         this.entity = entity;

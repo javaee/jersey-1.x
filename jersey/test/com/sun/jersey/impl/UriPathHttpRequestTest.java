@@ -53,7 +53,8 @@ public class UriPathHttpRequestTest extends TestCase {
     }
     
     public void testGeneral() throws Exception {
-        ContainerRequest r = new TestHttpRequestContext(null, "GET", null,
+        ContainerRequest r = new TestHttpRequestContext(new DummyWebApplication(),
+                "GET", null,
                 "/context/widgets/10", "/context/");
         UriInfo ui = new WebApplicationContext(null, r, null);
         assertEquals("widgets/10", ui.getPath());
@@ -62,7 +63,8 @@ public class UriPathHttpRequestTest extends TestCase {
     }    
     
     public void testEncoded() throws Exception {
-        ContainerRequest r = new TestHttpRequestContext(null, "GET", null,
+        ContainerRequest r = new TestHttpRequestContext(new DummyWebApplication(),
+                "GET", null,
                 "/context/widgets%20/%2010", "/context/");
         UriInfo ui = new WebApplicationContext(null, r, null);
         assertEquals("widgets / 10", ui.getPath());

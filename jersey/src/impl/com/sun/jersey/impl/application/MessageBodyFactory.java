@@ -40,7 +40,6 @@ package com.sun.jersey.impl.application;
 import com.sun.jersey.impl.model.MediaTypeHelper;
 import com.sun.jersey.impl.util.KeyComparator;
 import com.sun.jersey.impl.util.KeyComparatorHashMap;
-import com.sun.jersey.spi.container.MessageBodyContext;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
@@ -60,7 +59,7 @@ import javax.ws.rs.ext.MessageBodyWriter;
  *
  * @author Paul.Sandoz@Sun.Com
  */
-public final class MessageBodyFactory implements MessageBodyContext, MessageBodyWorkers {
+public final class MessageBodyFactory implements MessageBodyWorkers {
     private static final Logger LOGGER = Logger.getLogger(MessageBodyFactory.class.getName());
     
     private static final KeyComparator<MediaType> MEDIA_TYPE_COMPARATOR = 
@@ -136,7 +135,7 @@ public final class MessageBodyFactory implements MessageBodyContext, MessageBody
         return values;
     }
     
-    // MessageBodyContext
+    // MessageBodyWorkers
     
     @SuppressWarnings("unchecked")
     public <T> MessageBodyReader<T> getMessageBodyReader(Class<T> c, Type t, 
@@ -185,19 +184,5 @@ public final class MessageBodyFactory implements MessageBodyContext, MessageBody
             return Arrays.asList(mediaType, 
                     new MediaType(mediaType.getType(), MediaType.MEDIA_TYPE_WILDCARD), 
                     MediaTypeHelper.GENERAL_MEDIA_TYPE);
-    }
-
-    // MessageBodyWorkers
-    
-    public <T> List<MessageBodyReader<T>> getMessageBodyReaders(
-            MediaType mediaType, Class<T> type, Type genericType, Annotation annotations[]) {
-        return Collections.singletonList(getMessageBodyReader(type, genericType, 
-                annotations, mediaType));
-    }
-
-    public <T> List<MessageBodyWriter<T>> getMessageBodyWriters(
-            MediaType mediaType, Class<T> type, Type genericType, Annotation annotations[]) {
-        return Collections.singletonList(getMessageBodyWriter(type, genericType,
-                annotations, mediaType));
     }
 }

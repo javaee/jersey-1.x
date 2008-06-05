@@ -163,14 +163,14 @@ public class ServletContainer extends HttpServlet implements ContainerListener {
         final WebApplication _application = application;
         
         HttpRequestAdaptor requestAdaptor = new HttpRequestAdaptor(
-                _application.getMessageBodyContext(), 
+                _application, 
                 req);
         
         HttpResponseAdaptor responseAdaptor = new HttpResponseAdaptor(
                 context, 
                 resp, 
                 req, 
-                _application.getMessageBodyContext(), 
+                _application, 
                 requestAdaptor);
         
         try {

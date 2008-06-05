@@ -176,13 +176,13 @@ public class WebApplicationTest extends TestCase {
 
         ByteArrayInputStream e = new ByteArrayInputStream(content.getBytes());
         AbstractContainerRequest request = new TestHttpRequestContext(
-                a.getMessageBodyContext(), 
+                a, 
                 method, 
                 e, 
                 path, 
                 "/");
         AbstractContainerResponse response = new TestHttpResponseContext(
-                a.getMessageBodyContext(), 
+                a, 
                 request);
 
         a.handleRequest(request, response);

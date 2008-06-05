@@ -39,7 +39,7 @@ package com.sun.jersey.impl.container.servlet;
 
 import com.sun.jersey.api.container.ContainerException;
 import com.sun.jersey.spi.container.AbstractContainerResponse;
-import com.sun.jersey.spi.container.MessageBodyContext;
+import com.sun.jersey.spi.container.WebApplication;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.List;
@@ -68,9 +68,9 @@ public final class HttpResponseAdaptor extends AbstractContainerResponse {
     public HttpResponseAdaptor(ServletContext context, 
             HttpServletResponse response, 
             HttpServletRequest request, 
-            MessageBodyContext bodyContext,
+            WebApplication wa,
             HttpRequestAdaptor requestContext) {
-        super(bodyContext, requestContext);
+        super(wa, requestContext);
         this.context = context;
         this.response = response;
         this.request = request;

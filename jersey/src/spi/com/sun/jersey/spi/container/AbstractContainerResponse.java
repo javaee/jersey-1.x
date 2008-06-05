@@ -46,6 +46,7 @@ import java.net.URI;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.ext.MessageBodyWorkers;
 import javax.ws.rs.ext.MessageBodyWriter;
 import javax.ws.rs.ext.RuntimeDelegate;
 import javax.ws.rs.ext.RuntimeDelegate.HeaderDelegate;
@@ -79,7 +80,7 @@ public abstract class AbstractContainerResponse implements ContainerResponse {
     private static final MediaType APPLICATION_OCTET_STREAM
             = new MediaType("application", "octet-stream");
     
-    private final MessageBodyContext bodyContext;
+    private final MessageBodyWorkers bodyContext;
     
     private final ContainerRequest request;
     
@@ -102,11 +103,13 @@ public abstract class AbstractContainerResponse implements ContainerResponse {
             this.o = o;
         }
         
+        @Override
         public void write(byte b[]) throws IOException {
             commitWrite();
             o.write(b);
         }
         
+        @Override
         public void write(byte b[], int off, int len) throws IOException {
             commitWrite();
             o.write(b, off, len);
@@ -117,10 +120,12 @@ public abstract class AbstractContainerResponse implements ContainerResponse {
             o.write(b);
         }
         
+        @Override
         public void flush() throws IOException {
             o.flush();
         }
         
+        @Override
         public void close() throws IOException {
             commitClose();
             o.close();
@@ -145,11 +150,11 @@ public abstract class AbstractContainerResponse implements ContainerResponse {
     
     /**
      *
-     * @param bodyContext the message body context.
+     * @param wa the web application.
      * @param request the container request associated with this response.
      */
-    protected AbstractContainerResponse(MessageBodyContext bodyContext, ContainerRequest request) {
-        this.bodyContext = bodyContext;
+    protected AbstractContainerResponse(WebApplication wa, ContainerRequest request) {
+        this.bodyContext = wa.getMessageBodyWorkers();
         this.request = request;
         this.status = Responses.NO_CONTENT;
     }
@@ -307,21 +312,21 @@ public abstract class AbstractContainerResponse implements ContainerResponse {
     }
     
     private MultivaluedMap<String, Object> setResponseNonOptimal(Response r, MediaType contentType) {
-        MultivaluedMap<String, Object> headers = r.getMetadata();
+        MultivaluedMap<String, Object> _headers = r.getMetadata();
         
-        if (headers.getFirst("Content-Type") == null && contentType != null) {
-            headers.putSingle("Content-Type", contentType);
+        if (_headers.getFirst("Content-Type") == null && contentType != null) {
+            _headers.putSingle("Content-Type", contentType);
         }
         
-        Object location = headers.getFirst("Location");
+        Object location = _headers.getFirst("Location");
         if (location != null) {
             if (location instanceof URI) {
                 URI absoluteLocation = request.getBaseUri().resolve((URI)location);
-                headers.putSingle("Location", absoluteLocation);
+                _headers.putSingle("Location", absoluteLocation);
             }
         }
         
-        return headers;
+        return _headers;
     }
     
     @SuppressWarnings("unchecked")

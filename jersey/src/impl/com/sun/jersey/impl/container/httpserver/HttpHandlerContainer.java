@@ -66,11 +66,11 @@ public class HttpHandlerContainer implements HttpHandler, ContainerListener {
         
         HttpServerRequestAdaptor requestAdaptor = 
                 new HttpServerRequestAdaptor(
-                _application.getMessageBodyContext(), 
+                _application, 
                 httpExchange);
         HttpServerResponseAdaptor responseAdaptor = 
                 new HttpServerResponseAdaptor(httpExchange,
-                _application.getMessageBodyContext(), 
+                _application, 
                 requestAdaptor);
         
         try {

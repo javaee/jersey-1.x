@@ -57,7 +57,8 @@ public class PathSegmentsHttpRequestTest extends TestCase {
     }
     
     public void testGeneral() throws Exception {
-        ContainerRequest r = new TestHttpRequestContext(null, "GET", null,
+        ContainerRequest r = new TestHttpRequestContext(new DummyWebApplication(), 
+                "GET", null,
                 "/context/p1;x=1;y=1/p2;x=2;y=2/p3;x=3;y=3", "/context");
         UriInfo ui = new WebApplicationContext(null, r, null);
         List<PathSegment> segments = ui.getPathSegments();
@@ -84,7 +85,8 @@ public class PathSegmentsHttpRequestTest extends TestCase {
     }
     
     public void testMultipleSlash() throws Exception {
-        ContainerRequest r = new TestHttpRequestContext(null, "GET", null,
+        ContainerRequest r = new TestHttpRequestContext(new DummyWebApplication(),
+                "GET", null,
                 "/context/p//p//p//", "/context");
         UriInfo ui = new WebApplicationContext(null, r, null);
         List<PathSegment> segments = ui.getPathSegments();
@@ -97,7 +99,8 @@ public class PathSegmentsHttpRequestTest extends TestCase {
     }
     
     public void testMultipleMatrixParams() throws Exception {
-        ContainerRequest r = new TestHttpRequestContext(null, "GET", null,
+        ContainerRequest r = new TestHttpRequestContext(new DummyWebApplication(),
+                "GET", null,
                 "/context/p;x=1;x=2;x=3", "/context");
         UriInfo ui = new WebApplicationContext(null, r, null);
         List<PathSegment> segments = ui.getPathSegments();
@@ -111,7 +114,8 @@ public class PathSegmentsHttpRequestTest extends TestCase {
     }
 
     public void testEmptyPathSegmentsWithMultipleMatrixParams() throws Exception {
-        ContainerRequest r = new TestHttpRequestContext(null, "GET", null,
+        ContainerRequest r = new TestHttpRequestContext(new DummyWebApplication(),
+                "GET", null,
                 "/context/;x=1;y=1/;x=2;y=2/;x=3;y=3", "/context");
         UriInfo ui = new WebApplicationContext(null, r, null);
         List<PathSegment> segments = ui.getPathSegments();

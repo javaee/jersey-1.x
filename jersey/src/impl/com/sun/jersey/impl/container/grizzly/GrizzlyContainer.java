@@ -66,11 +66,10 @@ public class GrizzlyContainer extends GrizzlyAdapter implements ContainerListene
         
         try {
             GrizzlyRequestAdaptor requestAdaptor = 
-                    new GrizzlyRequestAdaptor(_application.getMessageBodyContext(), 
-                    request);
+                    new GrizzlyRequestAdaptor(_application, request);
             responseAdaptor = 
                     new GrizzlyResponseAdaptor(response, 
-                    _application.getMessageBodyContext(), 
+                    _application, 
                     requestAdaptor);
         
             _application.handleRequest(requestAdaptor, responseAdaptor);

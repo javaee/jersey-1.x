@@ -44,7 +44,7 @@ import com.sun.net.httpserver.HttpsExchange;
 import com.sun.net.httpserver.HttpsServer;
 import com.sun.jersey.spi.container.AbstractContainerRequest;
 import com.sun.jersey.impl.http.header.HttpHeaderFactory;
-import com.sun.jersey.spi.container.MessageBodyContext;
+import com.sun.jersey.spi.container.WebApplication;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.URI;
@@ -64,8 +64,8 @@ public final class HttpServerRequestAdaptor extends AbstractContainerRequest {
     
     private final HttpExchange exchange;
     
-    public HttpServerRequestAdaptor(MessageBodyContext bodyContext, HttpExchange exchange) throws IOException {
-        super(bodyContext, exchange.getRequestMethod(), exchange.getRequestBody());
+    public HttpServerRequestAdaptor(WebApplication wa, HttpExchange exchange) throws IOException {
+        super(wa, exchange.getRequestMethod(), exchange.getRequestBody());
         this.exchange = exchange;
         
         initiateUriInfo();

@@ -105,7 +105,6 @@ import com.sun.jersey.impl.wadl.WadlFactory;
 import com.sun.jersey.impl.wadl.WadlResource;
 import com.sun.jersey.spi.container.ContainerRequest;
 import com.sun.jersey.spi.container.ContainerResponse;
-import com.sun.jersey.spi.container.MessageBodyContext;
 import com.sun.jersey.spi.container.WebApplication;
 import com.sun.jersey.spi.inject.InjectableProvider;
 import com.sun.jersey.spi.inject.SingletonTypeInjectableProvider;
@@ -549,9 +548,6 @@ public final class WebApplicationImpl implements WebApplication {
         // Obtain all message body readers/writers
         this.bodyFactory = new MessageBodyFactory(cpc);
         injectableFactory.add(
-                new ContextInjectableProvider<MessageBodyContext>(
-                MessageBodyContext.class, bodyFactory));
-        injectableFactory.add(
                 new ContextInjectableProvider<MessageBodyWorkers>(
                 MessageBodyWorkers.class, bodyFactory));
         bodyFactory.init();
@@ -569,7 +565,7 @@ public final class WebApplicationImpl implements WebApplication {
                 processRootResources(resourceConfig.getResourceClasses()));       
     }
 
-    public MessageBodyContext getMessageBodyContext() {
+    public MessageBodyWorkers getMessageBodyWorkers() {
         return bodyFactory;
     }
 

@@ -39,7 +39,7 @@ package com.sun.jersey.impl;
 
 import com.sun.jersey.spi.container.AbstractContainerResponse;
 import com.sun.jersey.spi.container.ContainerRequest;
-import com.sun.jersey.spi.container.MessageBodyContext;
+import com.sun.jersey.spi.container.WebApplication;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -52,9 +52,9 @@ public class TestHttpResponseContext extends AbstractContainerResponse {
 
     private ByteArrayOutputStream baos = new ByteArrayOutputStream();
     
-    public TestHttpResponseContext(MessageBodyContext bodyContext, 
+    public TestHttpResponseContext(WebApplication wa, 
             ContainerRequest requestContext) {
-        super(bodyContext, requestContext);
+        super(wa, requestContext);
     }
     
     protected OutputStream getUnderlyingOutputStream() throws IOException {

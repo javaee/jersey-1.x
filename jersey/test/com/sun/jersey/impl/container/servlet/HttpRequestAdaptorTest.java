@@ -37,6 +37,7 @@
 
 package com.sun.jersey.impl.container.servlet;
 
+import com.sun.jersey.impl.DummyWebApplication;
 import com.sun.jersey.impl.container.servlet.HttpRequestAdaptor;
 import com.sun.jersey.impl.application.WebApplicationContext;
 import java.io.BufferedReader;
@@ -77,7 +78,7 @@ public class HttpRequestAdaptorTest extends TestCase {
                 "verbose=true&item=1&item=2", "<hello>world</hello>");
         HttpRequestAdaptor a = null;
         try {
-            a = new HttpRequestAdaptor(null, impl);
+            a = new HttpRequestAdaptor(new DummyWebApplication(), impl);
         } catch (IOException ex) {
             fail("Unable to initialize adaptor");
         }
@@ -95,7 +96,7 @@ public class HttpRequestAdaptorTest extends TestCase {
                 "verbose=true&item=1&item=2", "<hello>world</hello>");
         HttpRequestAdaptor a = null;
         try {
-            a = new HttpRequestAdaptor(null, impl);
+            a = new HttpRequestAdaptor(new DummyWebApplication(), impl);
         } catch (IOException ex) {
             fail("Unable to initialize adaptor");
         }

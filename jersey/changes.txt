@@ -1,4 +1,9 @@
 release 0.8 (2008-06-20 or 2008-07-25)
+- Modified com.sun.jersey.spi.container.{AbstractContainerRequest, 
+  AbstractContainerResponse} to take WebApplication as an input parameter
+  as opposed to previously taking MessageBodyContext.
+- Removed com.sun.jersey.spi.container.MessageBodyContext, this is replaced
+  by javax.ws.rs.ext.MessageBodyWorkers.
 - com.sun.jersey.api.uri.ExtendedUriInfo can be injected.
 - The annotation com.sun.jersey.api.representation.FormParam can be used
   to access form-based parameters using the same rules as other parameter-based

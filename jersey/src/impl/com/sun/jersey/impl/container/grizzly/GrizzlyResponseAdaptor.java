@@ -43,7 +43,7 @@ import java.io.OutputStream;
 import java.util.List;
 import java.util.Map;
 import com.sun.grizzly.tcp.http11.GrizzlyResponse;
-import com.sun.jersey.spi.container.MessageBodyContext;
+import com.sun.jersey.spi.container.WebApplication;
 
 /**
  *
@@ -54,8 +54,8 @@ public final class GrizzlyResponseAdaptor extends AbstractContainerResponse {
     private final GrizzlyResponse response;
     
     /* package */ GrizzlyResponseAdaptor(GrizzlyResponse response, 
-            MessageBodyContext bodyContext, GrizzlyRequestAdaptor requestContext) {
-        super(bodyContext, requestContext);
+            WebApplication wa, GrizzlyRequestAdaptor requestContext) {
+        super(wa, requestContext);
         this.response = response;
     }
         

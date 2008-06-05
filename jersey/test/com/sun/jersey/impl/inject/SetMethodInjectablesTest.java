@@ -40,7 +40,6 @@ package com.sun.jersey.impl.inject;
 import com.sun.jersey.api.core.HttpContext;
 import com.sun.jersey.api.core.ResourceConfig;
 import com.sun.jersey.impl.AbstractResourceTester;
-import com.sun.jersey.spi.container.MessageBodyContext;
 import com.sun.jersey.spi.resource.Singleton;
 import com.sun.jersey.spi.template.TemplateContext;
 import java.io.IOException;
@@ -86,7 +85,6 @@ public class SetMethodInjectablesTest extends AbstractResourceTester {
 
         public void writeTo(String arg0, Class<?> arg1, Type arg2, Annotation[] arg3, MediaType arg4, MultivaluedMap<String, Object> arg5, OutputStream arg6) throws IOException, WebApplicationException {
             assertNotNull(rc);
-            assertNotNull(mbc);
             assertNotNull(mbw);
             assertNotNull(tc);
             assertNotNull(hca);
@@ -100,12 +98,6 @@ public class SetMethodInjectablesTest extends AbstractResourceTester {
         @Context
         public void setrc(ResourceConfig rc) {   
             this.rc = rc;
-        }
-        
-        MessageBodyContext mbc;
-        @Context
-        public void setmbc(MessageBodyContext mbc) {   
-            this.mbc = mbc;
         }
         
         MessageBodyWorkers mbw;
@@ -171,13 +163,7 @@ public class SetMethodInjectablesTest extends AbstractResourceTester {
         public void setrc(ResourceConfig rc) {   
             this.rc = rc;
         }
-        
-        MessageBodyContext mbc;
-        @Context
-        public void setmbc(MessageBodyContext mbc) {   
-            this.mbc = mbc;
-        }
-        
+                
         MessageBodyWorkers mbw;
         @Context
         public void set(MessageBodyWorkers mbw) {   
@@ -223,7 +209,6 @@ public class SetMethodInjectablesTest extends AbstractResourceTester {
         @GET
         public String get() {
             assertNotNull(rc);
-            assertNotNull(mbc);
             assertNotNull(mbw);
             assertNotNull(tc);
             assertNotNull(hca);
@@ -251,12 +236,6 @@ public class SetMethodInjectablesTest extends AbstractResourceTester {
             this.rc = rc;
         }
         
-        MessageBodyContext mbc;
-        @Context
-        public void setmbc(MessageBodyContext mbc) {   
-            this.mbc = mbc;
-        }
-        
         MessageBodyWorkers mbw;
         @Context
         public void set(MessageBodyWorkers mbw) {   
@@ -302,7 +281,6 @@ public class SetMethodInjectablesTest extends AbstractResourceTester {
         @GET
         public String get() {
             assertNotNull(rc);
-            assertNotNull(mbc);
             assertNotNull(mbw);
             assertNotNull(tc);
             assertNotNull(hca);

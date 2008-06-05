@@ -43,6 +43,7 @@ import com.sun.jersey.api.core.HttpContext;
 import com.sun.jersey.api.core.ResourceConfig;
 import com.sun.jersey.spi.inject.InjectableProvider;
 import com.sun.jersey.spi.service.ComponentProvider;
+import javax.ws.rs.ext.MessageBodyWorkers;
 
 /**
  * A Web application that manages a set of Web resource.
@@ -92,13 +93,13 @@ public interface WebApplication {
     WebApplication clone();
             
     /**
-     * Get the message body context that can be used for getting
+     * Get the message body workers that can be used for getting
      * message body readers and writers. 
      * 
-     * @return the message body context. The return value is 
+     * @return the message body workers. The return value is 
      * undefined before the web applicaiton is initialized.
      */
-    MessageBodyContext getMessageBodyContext();
+    MessageBodyWorkers getMessageBodyWorkers();
 
     /**
      * Get the component provider that can be used for instantiating

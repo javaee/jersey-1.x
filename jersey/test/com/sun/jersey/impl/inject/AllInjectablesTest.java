@@ -41,7 +41,6 @@ import com.sun.jersey.api.core.HttpContext;
 import com.sun.jersey.api.core.ResourceConfig;
 import com.sun.jersey.api.uri.ExtendedUriInfo;
 import com.sun.jersey.impl.AbstractResourceTester;
-import com.sun.jersey.spi.container.MessageBodyContext;
 import com.sun.jersey.spi.resource.Singleton;
 import com.sun.jersey.spi.template.TemplateContext;
 import java.io.IOException;
@@ -78,8 +77,6 @@ public class AllInjectablesTest extends AbstractResourceTester {
     public static class PerRequestContextResource {
         @Context ResourceConfig rc;
         
-        @Context MessageBodyContext mbc;
-        
         @Context MessageBodyWorkers mbw;
         
         @Context TemplateContext tc;
@@ -99,7 +96,6 @@ public class AllInjectablesTest extends AbstractResourceTester {
         @GET
         public String get() {
             assertNotNull(rc);
-            assertNotNull(mbc);
             assertNotNull(mbw);
             assertNotNull(tc);
             assertNotNull(hca);
@@ -116,7 +112,6 @@ public class AllInjectablesTest extends AbstractResourceTester {
     public static class PerRequestContextConstructorParameterResource {
         public PerRequestContextConstructorParameterResource(
                 @Context ResourceConfig rc,
-                @Context MessageBodyContext mbc,
                 @Context MessageBodyWorkers mbw,
                 @Context TemplateContext tc,
                 @Context HttpContext hca,
@@ -126,7 +121,6 @@ public class AllInjectablesTest extends AbstractResourceTester {
                 @Context Request r,
                 @Context SecurityContext sc) {
             assertNotNull(rc);
-            assertNotNull(mbc);
             assertNotNull(mbw);
             assertNotNull(tc);
             assertNotNull(hca);
@@ -146,7 +140,6 @@ public class AllInjectablesTest extends AbstractResourceTester {
         @GET
         public String get(
                 @Context ResourceConfig rc,
-                @Context MessageBodyContext mbc,
                 @Context MessageBodyWorkers mbw,
                 @Context TemplateContext tc,
                 @Context HttpContext hca,
@@ -156,7 +149,6 @@ public class AllInjectablesTest extends AbstractResourceTester {
                 @Context Request r,
                 @Context SecurityContext sc) {
             assertNotNull(rc);
-            assertNotNull(mbc);
             assertNotNull(mbw);
             assertNotNull(tc);
             assertNotNull(hca);
@@ -173,9 +165,7 @@ public class AllInjectablesTest extends AbstractResourceTester {
     @Singleton
     public static class SingletonContextResource {
         @Context ResourceConfig rc;
-        
-        @Context MessageBodyContext mbc;
-        
+                
         @Context MessageBodyWorkers mbw;
         
         @Context TemplateContext tc;
@@ -195,7 +185,6 @@ public class AllInjectablesTest extends AbstractResourceTester {
         @GET
         public String get() {
             assertNotNull(rc);
-            assertNotNull(mbc);
             assertNotNull(mbw);
             assertNotNull(tc);
             assertNotNull(hca);
@@ -246,7 +235,6 @@ public class AllInjectablesTest extends AbstractResourceTester {
 
         public void writeTo(String arg0, Class<?> arg1, Type arg2, Annotation[] arg3, MediaType arg4, MultivaluedMap<String, Object> arg5, OutputStream arg6) throws IOException, WebApplicationException {
             assertNotNull(rc);
-            assertNotNull(mbc);
             assertNotNull(mbw);
             assertNotNull(tc);
             assertNotNull(hca);
@@ -258,8 +246,6 @@ public class AllInjectablesTest extends AbstractResourceTester {
         }
         
         @Context ResourceConfig rc;
-        
-        @Context MessageBodyContext mbc;
         
         @Context MessageBodyWorkers mbw;
         

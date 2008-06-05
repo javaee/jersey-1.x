@@ -46,7 +46,6 @@ import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.impl.http.header.HttpHeaderFactory;
 import com.sun.jersey.spi.container.AbstractContainerRequest;
 import com.sun.jersey.spi.container.AbstractContainerResponse;
-import com.sun.jersey.spi.container.MessageBodyContext;
 import com.sun.jersey.spi.container.WebApplication;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -62,6 +61,7 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.ext.MessageBodyReader;
+import javax.ws.rs.ext.MessageBodyWorkers;
 import javax.ws.rs.ext.MessageBodyWriter;
 import javax.ws.rs.ext.RuntimeDelegate;
 import javax.ws.rs.ext.RuntimeDelegate.HeaderDelegate;
@@ -73,7 +73,7 @@ import javax.ws.rs.ext.RuntimeDelegate.HeaderDelegate;
 public class TestResourceClientHandler implements ClientHandler {
     private static final Annotation[] EMPTY_ANNOTATIONS = new Annotation[0];
     
-    @Context private MessageBodyContext bodyContext;
+    @Context private MessageBodyWorkers bodyContext;
     
     private final WebApplication w;
     
@@ -140,7 +140,7 @@ public class TestResourceClientHandler implements ClientHandler {
         byte[] requestEntity = writeEntity(clientRequest.getMetadata(), 
                 clientRequest.getEntity());
         final AbstractContainerRequest serverRequest = new TestHttpRequestContext(
-                w.getMessageBodyContext(), 
+                w, 
                 clientRequest.getMethod(), 
                 new ByteArrayInputStream(requestEntity),
                 clientRequest.getURI(),
@@ -157,7 +157,7 @@ public class TestResourceClientHandler implements ClientHandler {
         }
         
         final TestHttpResponseContext serverResponse = new TestHttpResponseContext(
-                w.getMessageBodyContext(), 
+                w, 
                 serverRequest);
         
         w.handleRequest(serverRequest, serverResponse);

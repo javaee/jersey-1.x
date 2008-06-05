@@ -44,7 +44,6 @@ import com.sun.jersey.impl.application.ContextResolverFactory;
 import com.sun.jersey.impl.application.InjectableProviderFactory;
 import com.sun.jersey.impl.application.MessageBodyFactory;
 import com.sun.jersey.impl.client.urlconnection.URLConnectionClientHandler;
-import com.sun.jersey.spi.container.MessageBodyContext;
 import com.sun.jersey.spi.inject.InjectableProvider;
 import com.sun.jersey.spi.inject.SingletonTypeInjectableProvider;
 import com.sun.jersey.spi.service.ComponentProvider;
@@ -53,6 +52,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Type;
 import java.net.URI;
 import javax.ws.rs.core.Context;
+import javax.ws.rs.ext.MessageBodyWorkers;
 
 /**
  * The HTTP client class for handling requests and responses specified by 
@@ -211,8 +211,8 @@ public class Client extends Filterable implements ClientHandler {
         // Obtain all message body readers/writers
         this.bodyContext = new MessageBodyFactory(cpc);
         // Allow injection of message body context
-        injectableFactory.add(new ContextInjectableProvider<MessageBodyContext>(
-                MessageBodyContext.class, bodyContext));
+        injectableFactory.add(new ContextInjectableProvider<MessageBodyWorkers>(
+                MessageBodyWorkers.class, bodyContext));
         bodyContext.init();
         
         // Inject resources on root client handler

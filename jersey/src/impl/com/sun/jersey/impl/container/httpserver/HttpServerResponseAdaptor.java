@@ -40,7 +40,7 @@ package com.sun.jersey.impl.container.httpserver;
 import com.sun.net.httpserver.Headers;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.jersey.spi.container.AbstractContainerResponse;
-import com.sun.jersey.spi.container.MessageBodyContext;
+import com.sun.jersey.spi.container.WebApplication;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ArrayList;
@@ -56,9 +56,9 @@ public final class HttpServerResponseAdaptor extends AbstractContainerResponse {
     
     private final HttpExchange exchange;
     
-    /* package */ HttpServerResponseAdaptor(HttpExchange exchange, MessageBodyContext bodyContext,
+    /* package */ HttpServerResponseAdaptor(HttpExchange exchange, WebApplication wa,
             HttpServerRequestAdaptor requestContext) {
-        super(bodyContext, requestContext);
+        super(wa, requestContext);
         this.exchange = exchange;
     }
 
