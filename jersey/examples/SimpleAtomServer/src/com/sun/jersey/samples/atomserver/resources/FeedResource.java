@@ -41,7 +41,6 @@ import com.sun.syndication.feed.atom.Content;
 import com.sun.syndication.feed.atom.Entry;
 import com.sun.syndication.feed.atom.Feed;
 import com.sun.syndication.io.FeedException;
-import com.sun.jersey.spi.container.MessageBodyContext;
 import java.io.IOException;
 import java.net.URI;
 import javax.ws.rs.ConsumeMime;
@@ -55,6 +54,7 @@ import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
+import javax.ws.rs.ext.MessageBodyWorkers;
 
 /**
  *
@@ -65,7 +65,7 @@ import javax.ws.rs.core.UriInfo;
 public class FeedResource {
     @Context UriInfo uriInfo;
 
-    @Context MessageBodyContext bodyContext;
+    @Context MessageBodyWorkers bodyContext;
     
     @Path("{entry}")
     public EntryResource getEntryResource(@PathParam("entry") String entryId) {

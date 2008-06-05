@@ -44,7 +44,6 @@ import com.sun.syndication.feed.atom.Link;
 import com.sun.syndication.io.FeedException;
 import com.sun.syndication.io.WireFeedInput;
 import com.sun.jersey.api.NotFoundException;
-import com.sun.jersey.spi.container.MessageBodyContext;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -53,6 +52,7 @@ import java.net.URI;
 import java.util.Date;
 import java.util.List;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.ext.MessageBodyWorkers;
 import javax.ws.rs.ext.MessageBodyWriter;
 
 /**
@@ -104,7 +104,7 @@ class AtomStore {
         return (Feed)wireFeed;
     }
     
-    static Feed getFeedDocument(MessageBodyContext bodyContext, URI feedUri) throws IOException, FeedException {
+    static Feed getFeedDocument(MessageBodyWorkers bodyContext, URI feedUri) throws IOException, FeedException {
         InputStream in = null;
         
         synchronized(FileStore.FS) {
@@ -119,13 +119,13 @@ class AtomStore {
         return (Feed)wireFeed;
     }
         
-    static void updateFeedDocumentWithNewEntry(MessageBodyContext bodyContext, 
+    static void updateFeedDocumentWithNewEntry(MessageBodyWorkers bodyContext, 
             Feed f, Entry e) throws IOException {
         f.getEntries().add(e);
         updateFeedDocument(bodyContext, f);
     }
         
-    static void updateFeedDocumentRemovingEntry(MessageBodyContext bodyContext, 
+    static void updateFeedDocumentRemovingEntry(MessageBodyWorkers bodyContext, 
             Feed f, String id) throws IOException {
         Entry e = findEntry(id, f);
         f.getEntries().remove(e);
@@ -133,7 +133,7 @@ class AtomStore {
         updateFeedDocument(bodyContext, f);
     }
     
-    static void updateFeedDocumentWithExistingEntry(MessageBodyContext bodyContext, 
+    static void updateFeedDocumentWithExistingEntry(MessageBodyWorkers bodyContext, 
             Feed f, Entry e) throws IOException {
         Entry old = findEntry(e.getId(), f);
         f.getEntries().remove(old);
@@ -191,7 +191,7 @@ class AtomStore {
         links.add(l);
     }    
     
-    static void updateFeedDocument(MessageBodyContext bodyContext, Feed f) throws IOException {
+    static void updateFeedDocument(MessageBodyWorkers bodyContext, Feed f) throws IOException {
         MessageBodyWriter<Feed> ep = bodyContext.getMessageBodyWriter(
                 Feed.class, null,
                 null, atomMediaType);
@@ -200,7 +200,7 @@ class AtomStore {
         }
     }
             
-    static void createEntryDocument(MessageBodyContext bodyContext, String id, Entry e) throws IOException {
+    static void createEntryDocument(MessageBodyWorkers bodyContext, String id, Entry e) throws IOException {
         MessageBodyWriter<Entry> ep = bodyContext.getMessageBodyWriter(
                 Entry.class, null,
                 null, atomMediaType);
@@ -219,7 +219,7 @@ class AtomStore {
         FileStore.FS.deleteDirectory(getPath(entryId));
     }
     
-    static InputStream createDefaultFeedDocument(MessageBodyContext bodyContext,
+    static InputStream createDefaultFeedDocument(MessageBodyWorkers bodyContext,
             String uri) throws IOException {
         Feed f = new Feed();
         f.setTitle("Feed");

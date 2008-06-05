@@ -40,7 +40,6 @@ package com.sun.jersey.samples.atomserver.resources;
 import com.sun.syndication.feed.atom.Entry;
 import com.sun.syndication.feed.atom.Feed;
 import com.sun.syndication.io.FeedException;
-import com.sun.jersey.spi.container.MessageBodyContext;
 import java.io.IOException;
 import java.net.URI;
 import java.util.Date;
@@ -52,6 +51,7 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
+import javax.ws.rs.ext.MessageBodyWorkers;
 
 /**
  *
@@ -60,10 +60,10 @@ import javax.ws.rs.core.UriInfo;
 public class EditEntryResource extends EntryResource {
     protected UriInfo uriInfo;
     
-    protected MessageBodyContext bodyContext;
+    protected MessageBodyWorkers bodyContext;
     
     public EditEntryResource(String entryId, UriInfo uriInfo, 
-            MessageBodyContext bodyContext) {
+            MessageBodyWorkers bodyContext) {
         super(entryId);
         this.uriInfo = uriInfo;
         this.bodyContext = bodyContext;
