@@ -80,6 +80,8 @@ public abstract class AbstractContainerResponse implements ContainerResponse {
     private static final MediaType APPLICATION_OCTET_STREAM
             = new MediaType("application", "octet-stream");
     
+    private static final RuntimeDelegate rd = RuntimeDelegate.getInstance();
+    
     private final MessageBodyWorkers bodyContext;
     
     private final ContainerRequest request;
@@ -331,9 +333,7 @@ public abstract class AbstractContainerResponse implements ContainerResponse {
     
     @SuppressWarnings("unchecked")
     public String getHeaderValue(Object headerValue) {
-        // TODO: performance, this is very slow
-        HeaderDelegate hp = RuntimeDelegate.getInstance().
-                createHeaderDelegate(headerValue.getClass());
+        HeaderDelegate hp = rd.createHeaderDelegate(headerValue.getClass());
         return hp.toString(headerValue);
     }
 }

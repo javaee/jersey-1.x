@@ -44,10 +44,18 @@ import com.sun.jersey.impl.VariantListBuilderImpl;
 import com.sun.jersey.impl.uri.UriBuilderImpl;
 import com.sun.jersey.spi.HeaderDelegateProvider;
 import com.sun.jersey.spi.service.ServiceFinder;
+import java.net.URI;
+import java.util.Date;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.atomic.AtomicReference;
+import java.util.WeakHashMap;
 import javax.ws.rs.core.ApplicationConfig;
+import javax.ws.rs.core.CacheControl;
+import javax.ws.rs.core.Cookie;
+import javax.ws.rs.core.EntityTag;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.NewCookie;
 import javax.ws.rs.core.Response.ResponseBuilder;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.Variant.VariantListBuilder;
@@ -61,6 +69,29 @@ import javax.ws.rs.ext.RuntimeDelegate.HeaderDelegate;
  */
 public class RuntimeDelegateImpl extends RuntimeDelegate {
 
+    final Set<HeaderDelegateProvider> hps = 
+            new HashSet<HeaderDelegateProvider>();
+    
+    final private Map<Class<?>, HeaderDelegate> map = 
+            new WeakHashMap<Class<?>, HeaderDelegate>();
+    
+    public RuntimeDelegateImpl() {
+        for (HeaderDelegateProvider p : ServiceFinder.find(HeaderDelegateProvider.class, true))
+            hps.add(p);
+        
+        /**
+         * Construct a map for quick look up of known header classes
+         */
+        map.put(EntityTag.class, _createHeaderDelegate(EntityTag.class));
+        map.put(MediaType.class, _createHeaderDelegate(MediaType.class));
+        map.put(CacheControl.class, _createHeaderDelegate(CacheControl.class));
+        map.put(NewCookie.class, _createHeaderDelegate(NewCookie.class));
+        map.put(Cookie.class, _createHeaderDelegate(Cookie.class));
+        map.put(URI.class, _createHeaderDelegate(URI.class));
+        map.put(Date.class, _createHeaderDelegate(Date.class));
+        map.put(String.class, _createHeaderDelegate(String.class));        
+    }
+    
     @Override
     public UriBuilder createUriBuilder() {
         return new UriBuilderImpl();
@@ -84,38 +115,22 @@ public class RuntimeDelegateImpl extends RuntimeDelegate {
                 new ApplicationConfigAdapter(applicationConfig));
     }
     
-    private AtomicReference<Set<HeaderDelegateProvider>> atomicHeaderDelegates = 
-            new AtomicReference<Set<HeaderDelegateProvider>>();
-    
     @Override
     @SuppressWarnings("unchecked")
     public <T> HeaderDelegate<T> createHeaderDelegate(Class<T> type) {
-        Set<HeaderDelegateProvider> headerDelegates = atomicHeaderDelegates.get();
-        if (headerDelegates == null) {
-            headerDelegates = cacheProviderList(atomicHeaderDelegates, 
-                    HeaderDelegateProvider.class);
-        }
+        HeaderDelegate h = map.get(type);
+        if (h != null) return h;
         
-        for (HeaderDelegateProvider p: headerDelegates) 
-            if (p.supports(type))
-                return p;
+        return _createHeaderDelegate(type);
+    }
+
+    @SuppressWarnings("unchecked")
+    private <T> HeaderDelegate<T> _createHeaderDelegate(Class<T> type) {
+        for (HeaderDelegateProvider hp: hps) 
+            if (hp.supports(type))
+                return hp;
 
         throw new IllegalArgumentException("A header delegate provider for type, " + type + 
                 ", is not supported");
-    }
-    
-    private <T> Set<T> cacheProviderList(AtomicReference<Set<T>> atomicSet, 
-            Class<T> c) {
-        synchronized(atomicSet) {
-            Set<T> s = atomicSet.get();
-            if (s == null) {
-                s = new HashSet<T>();
-                for (T p : ServiceFinder.find(c, true)) {
-                    s.add(p);
-                }     
-                atomicSet.set(s);
-            }
-            return s;
-        }
     }
 }

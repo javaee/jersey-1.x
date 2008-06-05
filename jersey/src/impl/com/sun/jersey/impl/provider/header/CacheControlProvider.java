@@ -38,7 +38,6 @@
 package com.sun.jersey.impl.provider.header;
 
 import com.sun.jersey.spi.HeaderDelegateProvider;
-import java.text.ParseException;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
