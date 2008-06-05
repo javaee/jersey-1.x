@@ -198,7 +198,7 @@ public final class UriBuilderImpl extends UriBuilder {
         if (methodName == null) 
             throw new IllegalArgumentException("MethodName parameter is null");
         
-        Method[] methods = resource.getDeclaredMethods();
+        Method[] methods = resource.getMethods();
         Method found = null;
         for (Method m : methods) {
             if (methodName.equals(m.getName())) {

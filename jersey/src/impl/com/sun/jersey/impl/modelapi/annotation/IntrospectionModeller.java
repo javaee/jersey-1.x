@@ -54,6 +54,8 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -504,14 +506,9 @@ public class IntrospectionModeller {
             return; // does not make sense to check when logging is disabled anyway
         }
         
-        List<Method> ml = new ArrayList<Method>();
-        Class c = resourceClass;
-        while (c != null) {
-            for (Method m : c.getDeclaredMethods()) ml.add(m);
-            c = c.getSuperclass();
-        }
+        final MethodList declaredMethods = new MethodList(
+                getDeclaredMethods(resourceClass));
         
-        final MethodList declaredMethods = new MethodList(ml);
         // non-public resource methods
         for (AnnotatedMethod m : declaredMethods.hasMetaAnnotation(HttpMethod.class).
                 hasNotAnnotation(Path.class).isNotPublic()) {
@@ -527,5 +524,22 @@ public class IntrospectionModeller {
                 hasAnnotation(Path.class).isNotPublic()) {
             LOGGER.warning(ImplMessages.NON_PUB_SUB_RES_LOC(m.getMethod().toGenericString()));
         }
+    }
+    
+    private static List<Method> getDeclaredMethods(final Class _c) {
+        final List<Method> ml = new ArrayList<Method>();
+        
+        AccessController.doPrivileged(new PrivilegedAction<Object>() {
+            Class c = _c;
+            public Object run() {
+                while (c != Object.class && c != null) {
+                    for (Method m : c.getDeclaredMethods()) ml.add(m);
+                    c = c.getSuperclass();
+                }
+                return null;
+            }
+        });
+                
+        return ml;
     }
 }
