@@ -202,7 +202,9 @@ public class Client extends Filterable implements ClientHandler {
             : new AdaptingComponentProvider(provider);
             
         // Create the component provider cache
-        ComponentProviderCache cpc = new ComponentProviderCache(this.provider, 
+        ComponentProviderCache cpc = new ComponentProviderCache(
+                this.injectableFactory,
+                this.provider, 
                 config.getProviderClasses());
 
         // Obtain all context resolvers

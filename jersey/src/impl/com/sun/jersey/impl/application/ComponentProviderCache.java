@@ -37,6 +37,8 @@
 
 package com.sun.jersey.impl.application;
 
+import com.sun.jersey.impl.application.InjectableProviderFactory.ConstructorInjectablePair;
+import com.sun.jersey.spi.inject.Injectable;
 import com.sun.jersey.spi.service.ComponentProvider;
 import com.sun.jersey.spi.service.ComponentProvider.Scope;
 import com.sun.jersey.spi.service.ServiceFinder;
@@ -56,14 +58,19 @@ import java.util.logging.Logger;
 public final class ComponentProviderCache {
     private static final Logger LOGGER = Logger.getLogger(ComponentProviderCache.class.getName());
     
+    private final InjectableProviderFactory injectableFactory;
+    
     private final ComponentProvider componentProvider;
     
     private final Set<Class<?>> providers;
     
     private final Map<Class, Object> cache;
     
-    public ComponentProviderCache(ComponentProvider componentProvider, 
+    public ComponentProviderCache(
+            InjectableProviderFactory injectableFactory,
+            ComponentProvider componentProvider, 
             Set<Class<?>> providers) {
+        this.injectableFactory = injectableFactory;
         this.componentProvider = componentProvider;
         this.providers = providers;
         this.cache = new HashMap<Class, Object>();
@@ -98,7 +105,17 @@ public final class ComponentProviderCache {
         if (o != null) return o;
             
         try {
-            o = componentProvider.getInstance(Scope.Singleton, provider);
+            ConstructorInjectablePair<?> cip = injectableFactory.getConstructor(provider);
+            if (cip == null) {
+                o = componentProvider.getInstance(Scope.Singleton, provider);
+            } else {
+                Object[] params = new Object[cip.is.size()];
+                int i = 0;
+                for (Injectable injectable : cip.is) {
+                    params[i++] = injectable.getValue(null);
+                }
+                o = componentProvider.getInstance(Scope.Singleton, cip.con, params);
+            }
         } catch (NoClassDefFoundError ex) {
             // Dependent class of provider not found
             // This assumes that ex.getLocalizedMessage() returns

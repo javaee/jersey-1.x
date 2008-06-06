@@ -47,6 +47,7 @@ import com.sun.jersey.spi.inject.InjectableContext;
 import com.sun.jersey.spi.inject.InjectableProvider;
 import com.sun.jersey.spi.service.ComponentProvider.Scope;
 import java.lang.annotation.Annotation;
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
@@ -56,10 +57,13 @@ import java.security.PrivilegedAction;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.SortedSet;
+import java.util.TreeSet;
 import javax.ws.rs.HttpMethod;
 import javax.ws.rs.Path;
 
@@ -344,5 +348,61 @@ public final class InjectableProviderFactory implements InjectableProviderContex
         } catch (Exception ex) {
             throw new ContainerException(ex);
         }
+    }
+    
+    public static class ConstructorInjectablePair<T> {
+        Constructor<T> con;
+        List<Injectable> is;
+        
+        ConstructorInjectablePair(Constructor<T> con, List<Injectable> is) {
+            this.con = con;
+            this.is = is;
+        }
+    }
+    
+    /**
+     * Get the most suitable constructor. The constructor with the most
+     * parameters and that has the most parameters associated with 
+     * Injectable instances will be chosen.
+     * 
+     * @param c the class to instantiate
+     * @return a constructor and list of injectables for the constructor 
+     *         parameters.
+     */
+    @SuppressWarnings("unchecked")
+    public <T> ConstructorInjectablePair<T> getConstructor(Class<T> c) {
+        if (c.getConstructors().length == 0)
+            return null;
+        
+        SortedSet<ConstructorInjectablePair<T>> cs = new TreeSet<ConstructorInjectablePair<T>>(
+                new Comparator<ConstructorInjectablePair<T>>() {
+            public int compare(ConstructorInjectablePair<T> o1, ConstructorInjectablePair<T> o2) {
+                int p = o2.con.getParameterTypes().length - o1.con.getParameterTypes().length;
+                if (p != 0)
+                    return p;
+                
+                return Collections.frequency(o2.is, null) - Collections.frequency(o1.is, null);
+            }
+        });
+        
+        for (Constructor<T> con : c.getConstructors()) {
+            List<Injectable> is = new ArrayList<Injectable>();
+            int ps = con.getParameterTypes().length;
+            for (int p = 0; p < ps; p++) {
+                Type pgtype = con.getGenericParameterTypes()[p];
+                Annotation[] as = con.getParameterAnnotations()[p];
+                
+                Injectable i = null;
+                for (Annotation a : as) {
+                    i = getInjectable(
+                            a.annotationType(), null, a, pgtype, 
+                            Arrays.asList(Scope.Singleton, Scope.Undefined));
+                }
+                is.add(i);
+            }
+            cs.add(new ConstructorInjectablePair<T>(con, is));
+        }
+                
+        return cs.first();
     }
 }

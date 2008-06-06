@@ -483,7 +483,9 @@ public final class WebApplicationImpl implements WebApplication {
         };
 
         // Create the component provider cache
-        ComponentProviderCache cpc = new ComponentProviderCache(this.provider,
+        ComponentProviderCache cpc = new ComponentProviderCache(
+                this.injectableFactory,
+                this.provider,
                 resourceConfig.getProviderClasses());
 
         // Add injectable provider for @Inject

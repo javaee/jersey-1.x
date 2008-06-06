@@ -222,8 +222,14 @@ public class AllInjectablesTest extends AbstractResourceTester {
     }       
     
     
+    @Path("/")
+    public static class StringWriterResource {
+        @GET
+        public String get() { return "GET"; }
+    }
+        
     @Provider
-    public static class StringWriter implements MessageBodyWriter<String> {
+    public static class StringWriterField implements MessageBodyWriter<String> {
         
         public boolean isWriteable(Class<?> arg0, Type arg1, Annotation[] arg2) {
             return arg0 == String.class;
@@ -242,6 +248,7 @@ public class AllInjectablesTest extends AbstractResourceTester {
             assertNotNull(ui);
             assertNotNull(eui);
             assertNotNull(r);
+            assertNotNull(sc);
             arg6.write(arg0.getBytes());
         }
         
@@ -260,20 +267,161 @@ public class AllInjectablesTest extends AbstractResourceTester {
         @Context ExtendedUriInfo eui;
         
         @Context Request r;        
+        
+        @Context SecurityContext sc;
     }
     
-    @Path("/")
-    public static class StringWriterResource {
-        @GET
-        public String get() { return "GET"; }
+    @Provider
+    public static class StringWriterConstructor implements MessageBodyWriter<String> {
+        public StringWriterConstructor(
+                @Context ResourceConfig rc,
+                @Context MessageBodyWorkers mbw,
+                @Context TemplateContext tc,
+                @Context HttpContext hca,
+                @Context HttpHeaders hs,
+                @Context UriInfo ui,
+                @Context ExtendedUriInfo eui,
+                @Context Request r,
+                @Context SecurityContext sc) {
+            assertNotNull(rc);
+            assertNotNull(mbw);
+            assertNotNull(tc);
+            assertNotNull(hca);
+            assertNotNull(hs);
+            assertNotNull(ui);
+            assertNotNull(eui);
+            assertNotNull(r);
+            assertNotNull(sc);
+        }                
+        
+        public boolean isWriteable(Class<?> arg0, Type arg1, Annotation[] arg2) {
+            return arg0 == String.class;
+        }
+
+        public long getSize(String arg0) {
+            return -1;
+        }
+
+        public void writeTo(String arg0, Class<?> arg1, Type arg2, Annotation[] arg3, MediaType arg4, MultivaluedMap<String, Object> arg5, OutputStream arg6) throws IOException, WebApplicationException {
+            arg6.write(arg0.getBytes());
+        }        
     }
     
-    public void testProvider() throws IOException {
-        initiateWebApplication(StringWriterResource.class, StringWriter.class);
+    @Provider
+    public static class StringWriterMutlipleConstructor implements MessageBodyWriter<String> {
+        public StringWriterMutlipleConstructor(
+                @Context ResourceConfig rc,
+                @Context MessageBodyWorkers mbw,
+                @Context TemplateContext tc,
+                @Context HttpContext hca,
+                @Context HttpHeaders hs,
+                @Context UriInfo ui,
+                @Context ExtendedUriInfo eui,
+                @Context Request r,
+                @Context SecurityContext sc) {
+            assertNotNull(rc);
+            assertNotNull(mbw);
+            assertNotNull(tc);
+            assertNotNull(hca);
+            assertNotNull(hs);
+            assertNotNull(ui);
+            assertNotNull(eui);
+            assertNotNull(r);
+            assertNotNull(sc);
+        }                
+        
+        public StringWriterMutlipleConstructor(
+                @Context ResourceConfig rc,
+                @Context MessageBodyWorkers mbw,
+                @Context TemplateContext tc) {
+            assertTrue(false);
+        }                
+        
+        public boolean isWriteable(Class<?> arg0, Type arg1, Annotation[] arg2) {
+            return arg0 == String.class;
+        }
+
+        public long getSize(String arg0) {
+            return -1;
+        }
+
+        public void writeTo(String arg0, Class<?> arg1, Type arg2, Annotation[] arg3, MediaType arg4, MultivaluedMap<String, Object> arg5, OutputStream arg6) throws IOException, WebApplicationException {
+            arg6.write(arg0.getBytes());
+        }        
+    }
+    
+    @Provider
+    public static class StringWriterMutliplePartialConstructor implements MessageBodyWriter<String> {
+        public StringWriterMutliplePartialConstructor(
+                @Context ResourceConfig rc,
+                @Context MessageBodyWorkers mbw,
+                @Context TemplateContext tc,
+                @Context HttpContext hca,
+                @Context HttpHeaders hs,
+                @Context UriInfo ui,
+                @Context ExtendedUriInfo eui,
+                @Context Request r,
+                @Context SecurityContext sc) {
+            assertNotNull(rc);
+            assertNotNull(mbw);
+            assertNotNull(tc);
+            assertNotNull(hca);
+            assertNotNull(hs);
+            assertNotNull(ui);
+            assertNotNull(eui);
+            assertNotNull(r);
+            assertNotNull(sc);
+        }                
+        
+        public StringWriterMutliplePartialConstructor(
+                String rc,
+                @Context MessageBodyWorkers mbw,
+                @Context TemplateContext tc,
+                @Context HttpContext hca,
+                @Context HttpHeaders hs,
+                @Context UriInfo ui,
+                @Context ExtendedUriInfo eui,
+                @Context Request r,
+                @Context SecurityContext sc) {
+            assertTrue(false);
+        }                
+        
+        public boolean isWriteable(Class<?> arg0, Type arg1, Annotation[] arg2) {
+            return arg0 == String.class;
+        }
+
+        public long getSize(String arg0) {
+            return -1;
+        }
+
+        public void writeTo(String arg0, Class<?> arg1, Type arg2, Annotation[] arg3, MediaType arg4, MultivaluedMap<String, Object> arg5, OutputStream arg6) throws IOException, WebApplicationException {
+            arg6.write(arg0.getBytes());
+        }        
+    }
+    
+    public void testProviderField() throws IOException {
+        initiateWebApplication(StringWriterResource.class, StringWriterField.class);
         
         assertEquals("GET", resource("/").get(String.class));        
     }           
     
+    public void testProviderConstructor() throws IOException {
+        initiateWebApplication(StringWriterResource.class, StringWriterConstructor.class);
+        
+        assertEquals("GET", resource("/").get(String.class));        
+    }           
+    
+    public void testProviderMultipleConstructor() throws IOException {
+        initiateWebApplication(StringWriterResource.class, StringWriterMutlipleConstructor.class);
+        
+        assertEquals("GET", resource("/").get(String.class));        
+    }           
+    
+    public void testProviderMultiplePartialConstructor() throws IOException {
+        initiateWebApplication(StringWriterResource.class, StringWriterMutliplePartialConstructor.class);
+        
+        assertEquals("GET", resource("/").get(String.class));        
+    }           
     
     @Path("/{p}")
     public static class PerRequestFieldResource {        
