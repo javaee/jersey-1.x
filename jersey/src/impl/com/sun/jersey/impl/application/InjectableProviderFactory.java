@@ -120,7 +120,7 @@ public final class InjectableProviderFactory implements InjectableProviderContex
         return l;
     }
     
-    private Type[] getMetaArguments(Class<?> c) {
+    private Type[] getMetaArguments(Class<? extends InjectableProvider> c) {
         Class _c = c;
         while (_c != Object.class) {
             Type[] ts = _c.getGenericInterfaces();

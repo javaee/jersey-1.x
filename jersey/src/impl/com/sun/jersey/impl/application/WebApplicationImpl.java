@@ -84,6 +84,7 @@ import com.sun.jersey.impl.ImplMessages;
 import com.sun.jersey.impl.ThreadLocalHttpContext;
 import com.sun.jersey.impl.model.ResourceClass;
 import com.sun.jersey.impl.model.RulesMap;
+import com.sun.jersey.api.container.ContainerCheckedException;
 import com.sun.jersey.impl.model.parameter.CookieParamInjectableProvider;
 import com.sun.jersey.impl.model.parameter.FormParamInjectableProvider;
 import com.sun.jersey.impl.model.parameter.HeaderParamInjectableProvider;
@@ -115,6 +116,7 @@ import com.sun.jersey.spi.service.ComponentProvider.Scope;
 import com.sun.jersey.spi.template.TemplateContext;
 import com.sun.jersey.spi.uri.rules.UriRule;
 import java.util.HashMap;
+import javax.ws.rs.ext.ExceptionMapper;
 
 /**
  * A Web application that contains a set of resources, each referenced by 
@@ -148,6 +150,8 @@ public final class WebApplicationImpl implements WebApplication {
     private ComponentProvider resourceProvider;
     
     private TemplateContext templateContext;
+    
+    private ExceptionMapperFactory exceptionFactory;
     
     private ResourceMethodDispatcherFactory dispatcherFactory;
     
@@ -544,6 +548,9 @@ public final class WebApplicationImpl implements WebApplication {
         injectableFactory.add(new ContextInjectableProvider<TemplateContext>(
                 TemplateContext.class, templateContext));
 
+        // Obtain all the exception mappers
+        this.exceptionFactory = new ExceptionMapperFactory(cpc);
+        
         // Obtain all resource method dispatchers
         this.dispatcherFactory = new ResourceMethodDispatcherFactory(cpc);
         
@@ -618,7 +625,17 @@ public final class WebApplicationImpl implements WebApplication {
                 response.setResponse(Responses.notFound().build());
             }
         } catch (WebApplicationException e) {
-            onExceptionWithWebApplication(e, response);
+            if (e.getResponse().getEntity() != null) {
+                onException(e, e.getResponse(), response);
+            } else {
+                if (!mapException(e, response)) {
+                    onException(e, e.getResponse(), response);                    
+                }
+            }
+        } catch (ContainerCheckedException e) {
+            if (!mapException(e.getCause(), response)) throw e;
+        } catch (RuntimeException e) {
+            if (!mapException(e, response)) throw e;
         }
     }
 
@@ -810,10 +827,25 @@ public final class WebApplicationImpl implements WebApplication {
                 i);
     }
 
-    private static void onExceptionWithWebApplication(WebApplicationException e,
+    @SuppressWarnings("unchecked")
+    private boolean mapException(Throwable e,
             HttpResponseContext response) {
-        Response r = e.getResponse();
-
+        ExceptionMapper em = exceptionFactory.find(e.getClass());
+        if (em == null) return false;
+        
+        Response r = em.toResponse(e);
+        if (r == null)
+            return false;
+        
+        onException(e, r, response);
+        return true;
+    }
+    
+    private static void onException(Throwable e,
+            Response r,
+            HttpResponseContext response) {
+        response.setResponse(r);
+        
         // Log the stack trace
         if (r.getStatus() >= 500) {
             e.printStackTrace();
@@ -829,6 +861,5 @@ public final class WebApplicationImpl implements WebApplication {
             r = Response.status(r.getStatus()).entity(sw.toString()).
                     type("text/plain").build();
         }
-        response.setResponse(r);
     }
 }

@@ -37,6 +37,7 @@
 
 package com.sun.jersey.impl.model.method.dispatch;
 
+import com.sun.jersey.api.container.ContainerCheckedException;
 import com.sun.jersey.api.container.ContainerException;
 import com.sun.jersey.api.core.HttpContext;
 import com.sun.jersey.api.core.HttpRequestContext;
@@ -81,13 +82,13 @@ public abstract class ResourceJavaMethodDispatcher implements RequestDispatcher 
         } catch (InvocationTargetException e) {
             Throwable t = e.getTargetException();
             if (t instanceof RuntimeException) {
-                // Rethrow the runtime exception
+                // Propagate runtime exception
                 throw (RuntimeException)t;
-            } else {
-                // TODO should a checked exception be wrapped in 
-                // WebApplicationException ?
+            } else if (t instanceof Exception) {
+                // Propagate checked exception wrapping around runtime exception
+                throw new ContainerCheckedException((Exception)t);
+            } else
                 throw new ContainerException(t);
-            }
         } catch (IllegalAccessException e) {
             throw new ContainerException(e);
         }

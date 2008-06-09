@@ -37,13 +37,18 @@
 
 package com.sun.jersey.impl.resource;
 
+import com.sun.jersey.api.NotFoundException;
 import com.sun.jersey.impl.AbstractResourceTester;
 import com.sun.jersey.api.container.ContainerException;
 import com.sun.jersey.api.client.ClientResponse;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.ext.ExceptionMapper;
+import javax.ws.rs.ext.Provider;
 
 /**
  *
@@ -79,6 +84,7 @@ public class ExceptionTest extends AbstractResourceTester {
             caught = true;
             assertEquals(CheckedException.class, e.getCause().getClass());
         }
+        assertTrue(caught);
     }
     
     @Path("/exception/runtime")
@@ -98,14 +104,18 @@ public class ExceptionTest extends AbstractResourceTester {
         } catch (UnsupportedOperationException e) {
             caught = true;
         }
-        assertEquals(true, caught);
+        assertTrue(caught);
     }
     
     @Path("/exception/webapplication/{status}")
     static public class ExceptionWebApplicationResource { 
         @GET
-        public String get(@PathParam("status") int status) {
-            throw new WebApplicationException(status);
+        public String get(@PathParam("status") int status, @QueryParam("content") boolean content) {
+            if (!content) {
+                throw new WebApplicationException(status);
+            } else
+                throw new WebApplicationException(Response.status(status).
+                        entity(Integer.toString(status)).build());
         }
     }
     
@@ -123,5 +133,122 @@ public class ExceptionTest extends AbstractResourceTester {
         ClientResponse cr = resource("/exception/webapplication/500", false).
                 get(ClientResponse.class);        
         assertEquals(500, cr.getStatus());
-    }   
+    }
+    
+    @Provider
+    public static class ExceptionMapper404 implements ExceptionMapper<WebApplicationException> {
+        public Response toResponse(WebApplicationException we) {
+            if (we.getResponse().getStatus() == 404) {
+                return Response.status(404).entity("NOT FOUND").build();
+            } else
+                return null;
+        }        
+    }
+    
+    public void test404WithWebApplicationExceptionMapper() {
+        initiateWebApplication(ExceptionMapper404.class, ExceptionWebApplicationResource.class);
+
+        ClientResponse cr = resource("/exception/webapplication/400", false).
+                get(ClientResponse.class);        
+        assertEquals(400, cr.getStatus());
+        
+        cr = resource("/exception/webapplication/404", false).
+                get(ClientResponse.class);        
+        assertEquals(404, cr.getStatus());
+        assertEquals("NOT FOUND", cr.getEntity(String.class));
+        
+        cr = resource("/exception/webapplication/404?content=true", false).
+                get(ClientResponse.class);        
+        assertEquals(404, cr.getStatus());
+        assertEquals("404", cr.getEntity(String.class));
+    }
+    
+    
+    @Path("/exception/webapplication")
+    static public class NotFoundWebApplicationResource { 
+        @GET
+        public String get() {
+            throw new NotFoundException();
+        }
+    }
+    
+    public void testNotFoundExceptionMapper() {
+        initiateWebApplication(ExceptionMapper404.class, NotFoundWebApplicationResource.class);
+
+        ClientResponse cr = resource("/exception/webapplication", false).
+                get(ClientResponse.class);        
+        assertEquals(404, cr.getStatus());
+        assertEquals("NOT FOUND", cr.getEntity(String.class));
+    }
+    
+    
+    @Provider
+    public static class CheckedExceptionMapper404 implements ExceptionMapper<CheckedException> {
+        public Response toResponse(CheckedException we) {
+            return Response.status(404).entity("CheckedException").build();
+        }        
+    }
+    
+    public void testCheckedExceptionMapper404() {
+        initiateWebApplication(CheckedExceptionMapper404.class, ExceptionCheckedResource.class);
+
+        ClientResponse cr = resource("/exception/checked", false).
+                get(ClientResponse.class);        
+        assertEquals(404, cr.getStatus());
+        assertEquals("CheckedException", cr.getEntity(String.class));
+    }
+    
+    static public class SubCheckedException extends CheckedException {
+        public SubCheckedException() {
+            super();
+        }
+    }
+    
+    @Provider
+    public static class SubCheckedExceptionMapper404 implements ExceptionMapper<SubCheckedException> {
+        public Response toResponse(SubCheckedException we) {
+            return Response.status(404).entity("SubCheckedException").build();
+        }        
+    }
+    
+    @Path("/exception/subchecked")
+    static public class ExceptionSubCheckedResource { 
+        @GET
+        public String get() throws CheckedException {
+            throw new SubCheckedException();
+        }
+    }
+    
+    public void testSubCheckedExceptionMapper404() {
+        initiateWebApplication(CheckedExceptionMapper404.class, 
+                SubCheckedExceptionMapper404.class, 
+                ExceptionCheckedResource.class,
+                ExceptionSubCheckedResource.class);
+
+        ClientResponse cr = resource("/exception/checked", false).
+                get(ClientResponse.class);        
+        assertEquals(404, cr.getStatus());
+        assertEquals("CheckedException", cr.getEntity(String.class));
+        
+        cr = resource("/exception/subchecked", false).
+                get(ClientResponse.class);        
+        assertEquals(404, cr.getStatus());
+        assertEquals("SubCheckedException", cr.getEntity(String.class));
+    }
+    
+    public void testNoSubCheckedExceptionMapper404() {
+        initiateWebApplication(CheckedExceptionMapper404.class,
+                ExceptionCheckedResource.class,
+                ExceptionSubCheckedResource.class);
+
+        ClientResponse cr = resource("/exception/checked", false).
+                get(ClientResponse.class);        
+        assertEquals(404, cr.getStatus());
+        assertEquals("CheckedException", cr.getEntity(String.class));
+        
+        cr = resource("/exception/subchecked", false).
+                get(ClientResponse.class);        
+        assertEquals(404, cr.getStatus());
+        assertEquals("CheckedException", cr.getEntity(String.class));
+    }
 }

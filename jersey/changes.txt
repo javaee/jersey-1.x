@@ -39,6 +39,8 @@ release 0.8 (2008-06-20 or 2008-07-25)
     ApplicationConfig.getMediaTypeMappings
   - Method parameter order of MessageBodyReader.readFrom has changed to be
     consistent with the method parameter order of MessageBodyWriter.writerTo.
+  - javax.ws.rs.ext.ExceptionMapper<T> may be used to map a runtime or 
+    checked exception to a javax.ws.rs.core.Response instance.
 
 release 0.7 (2008-04-18)
 - The type javax.xml.bind.JAXBElement<T> can be used for reading and writing
