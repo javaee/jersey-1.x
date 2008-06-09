@@ -356,6 +356,6 @@ public class QueryParamAsSortedSetPrimitiveTest extends AbstractResourceTester {
                 accept("application/int").
                 get(ClientResponse.class);
         
-        assertEquals(400, response.getStatus());
+        assertEquals(404, response.getStatus());
     }
 }

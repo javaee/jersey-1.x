@@ -864,7 +864,7 @@ public class MatrixParamAsPrimitiveTest extends AbstractResourceTester {
                 accept("application/int").
                 get(ClientResponse.class);
         
-        assertEquals(400, response.getStatus());
+        assertEquals(404, response.getStatus());
     }
     
     public void testBadPrimitiveWrapperValue() {
@@ -872,7 +872,7 @@ public class MatrixParamAsPrimitiveTest extends AbstractResourceTester {
                 accept("application/int").
                 get(ClientResponse.class);
         
-        assertEquals(400, response.getStatus());
+        assertEquals(404, response.getStatus());
     }
     
     public void testBadPrimitiveListValue() {
@@ -880,6 +880,6 @@ public class MatrixParamAsPrimitiveTest extends AbstractResourceTester {
                 accept("application/int").
                 get(ClientResponse.class);
         
-        assertEquals(400, response.getStatus());
+        assertEquals(404, response.getStatus());
     }
 }

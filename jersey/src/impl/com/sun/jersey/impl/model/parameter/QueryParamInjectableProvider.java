@@ -37,6 +37,7 @@
 
 package com.sun.jersey.impl.model.parameter;
 
+import com.sun.jersey.api.container.ContainerException;
 import com.sun.jersey.impl.model.parameter.multivalued.MultivaluedParameterExtractor;
 import com.sun.jersey.impl.model.parameter.multivalued.MultivaluedParameterProcessor;
 import com.sun.jersey.api.core.HttpContext;
@@ -46,6 +47,7 @@ import com.sun.jersey.spi.inject.InjectableContext;
 import com.sun.jersey.spi.inject.InjectableProvider;
 import com.sun.jersey.spi.service.ComponentProvider.Scope;
 import javax.ws.rs.QueryParam;
+import javax.ws.rs.WebApplicationException;
 
 /**
  *
@@ -64,7 +66,11 @@ public final class QueryParamInjectableProvider implements
         }
         
         public Object getValue(HttpContext context) {
-            return extractor.extract(context.getUriInfo().getQueryParameters(decode));
+            try {
+                return extractor.extract(context.getUriInfo().getQueryParameters(decode));
+            } catch (ContainerException e) {
+                throw new WebApplicationException(e.getCause(), 404);
+            }
         }
     }
         

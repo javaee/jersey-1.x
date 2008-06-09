@@ -863,7 +863,7 @@ public class QueryParamAsPrimitiveTest extends AbstractResourceTester {
                 accept("application/int").
                 get(ClientResponse.class);
         
-        assertEquals(400, response.getStatus());
+        assertEquals(404, response.getStatus());
     }
     
     public void testBadPrimitiveWrapperValue() {
@@ -871,7 +871,7 @@ public class QueryParamAsPrimitiveTest extends AbstractResourceTester {
                 accept("application/int").
                 get(ClientResponse.class);
         
-        assertEquals(400, response.getStatus());
+        assertEquals(404, response.getStatus());
     }
     
     public void testBadPrimitiveListValue() {
@@ -879,6 +879,6 @@ public class QueryParamAsPrimitiveTest extends AbstractResourceTester {
                 accept("application/int").
                 get(ClientResponse.class);
         
-        assertEquals(400, response.getStatus());
+        assertEquals(404, response.getStatus());
     }
 }

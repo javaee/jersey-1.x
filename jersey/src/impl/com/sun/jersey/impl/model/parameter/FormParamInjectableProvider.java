@@ -48,6 +48,7 @@ import com.sun.jersey.spi.inject.Injectable;
 import com.sun.jersey.spi.inject.InjectableContext;
 import com.sun.jersey.spi.inject.InjectableProvider;
 import com.sun.jersey.spi.service.ComponentProvider.Scope;
+import javax.ws.rs.WebApplicationException;
 
 /**
  *
@@ -73,7 +74,11 @@ public final class FormParamInjectableProvider implements
                         "An @FormParam parameter is being used in a context" +
                         "where no form representation is available");
             }
-            return extractor.extract(form);
+            try {
+                return extractor.extract(form);
+            } catch (ContainerException e) {
+                throw new WebApplicationException(e.getCause(), 400);
+            }
         }
     }
         

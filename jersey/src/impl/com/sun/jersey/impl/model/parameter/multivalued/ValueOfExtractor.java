@@ -37,7 +37,7 @@
 
 package com.sun.jersey.impl.model.parameter.multivalued;
 
-import javax.ws.rs.WebApplicationException;
+import com.sun.jersey.api.container.ContainerException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import javax.ws.rs.core.MultivaluedMap;
@@ -72,7 +72,7 @@ final class ValueOfExtractor
             try {
                 return getValue(v);
             } catch (Exception e) {
-                throw new WebApplicationException(e, 400);
+                throw new ContainerException(e);
             }
         } else if (defaultValue != null) {
             // TODO do we need to clone the default value

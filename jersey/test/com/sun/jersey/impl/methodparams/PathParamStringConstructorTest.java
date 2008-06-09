@@ -77,6 +77,6 @@ public class PathParamStringConstructorTest extends AbstractResourceTester {
     public void testBadStringConstructorValue() {
         ClientResponse response = resource("/ABCDE/ABCDE", false).
                 get(ClientResponse.class);
-        assertEquals(400, response.getStatus());
+        assertEquals(404, response.getStatus());
     }
 }

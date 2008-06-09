@@ -37,7 +37,7 @@
 
 package com.sun.jersey.impl.model.parameter.multivalued;
 
-import javax.ws.rs.WebApplicationException;
+import com.sun.jersey.api.container.ContainerException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
@@ -76,7 +76,7 @@ abstract class CollectionStringConstructorExtractor<V extends Collection>
                 try {
                     valueList.add(getValue(v));
                 } catch (Exception e) {
-                    throw new WebApplicationException(e, 400);
+                    throw new ContainerException(e);
                 }
             }
 

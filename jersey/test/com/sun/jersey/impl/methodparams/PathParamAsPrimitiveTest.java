@@ -237,13 +237,13 @@ public class PathParamAsPrimitiveTest extends AbstractResourceTester {
         ClientResponse response = resource("/int/abcdef", false).
                 get(ClientResponse.class);
         
-        assertEquals(400, response.getStatus());
+        assertEquals(404, response.getStatus());
     }
     
     public void testBadPrimitiveWrapperValue() {
         ClientResponse response = resource("/int/wrapper/abcdef", false).
                 get(ClientResponse.class);
         
-        assertEquals(400, response.getStatus());
+        assertEquals(404, response.getStatus());
     }    
 }

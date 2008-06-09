@@ -238,6 +238,6 @@ public class QueryParamStringConstructorTest extends AbstractResourceTester {
         
         ClientResponse response = resource("/?arg1=ABCDEF&arg2=3145&arg3=http:%2F%2Ftest", false).
                 get(ClientResponse.class);
-        assertEquals(400, response.getStatus());
+        assertEquals(404, response.getStatus());
     }
 }
