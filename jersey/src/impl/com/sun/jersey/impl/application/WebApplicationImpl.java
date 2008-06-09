@@ -844,8 +844,6 @@ public final class WebApplicationImpl implements WebApplication {
     private static void onException(Throwable e,
             Response r,
             HttpResponseContext response) {
-        response.setResponse(r);
-        
         // Log the stack trace
         if (r.getStatus() >= 500) {
             e.printStackTrace();
@@ -861,5 +859,7 @@ public final class WebApplicationImpl implements WebApplication {
             r = Response.status(r.getStatus()).entity(sw.toString()).
                     type("text/plain").build();
         }
+        
+        response.setResponse(r);        
     }
 }
