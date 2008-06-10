@@ -55,6 +55,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Logger;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Cookie;
 import javax.ws.rs.core.EntityTag;
@@ -85,6 +86,8 @@ import javax.ws.rs.ext.MessageBodyWorkers;
  * @author Paul.Sandoz@Sun.Com
  */
 public abstract class AbstractContainerRequest implements ContainerRequest {
+    private static final Logger LOGGER = Logger.getLogger(AbstractContainerRequest.class.getName());
+    
     private static final Annotation[] EMTPTY_ANNOTATIONS = new Annotation[0];
     
     private final MessageBodyWorkers bodyContext;
@@ -189,6 +192,9 @@ public abstract class AbstractContainerRequest implements ContainerRequest {
                     type, genericType, 
                     as, mediaType);
             if (bw == null) {
+                LOGGER.severe("A message body reader for Java type, " + type + 
+                        ", and MIME media type, " + mediaType + ", was not found");    
+                
                 throw new WebApplicationException(
                         Responses.unsupportedMediaType().build());
             }
@@ -207,6 +213,9 @@ public abstract class AbstractContainerRequest implements ContainerRequest {
     }
     
     public MediaType getAcceptableMediaType(List<MediaType> mediaTypes) {
+        if (mediaTypes.isEmpty())
+            return getAcceptableMediaTypes().get(0);
+        
         for (MediaType a : getAcceptableMediaTypes()) {
             if (a.getType().equals(MediaType.MEDIA_TYPE_WILDCARD))
                 return mediaTypes.get(0);

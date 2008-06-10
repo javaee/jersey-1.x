@@ -41,10 +41,10 @@ import com.sun.jersey.api.core.HttpContext;
 import com.sun.jersey.api.core.ResourceConfig;
 import com.sun.jersey.spi.container.ContainerRequest;
 import com.sun.jersey.spi.container.ContainerResponse;
+import com.sun.jersey.spi.container.ExtendedMessageBodyWorkers;
 import com.sun.jersey.spi.container.WebApplication;
 import com.sun.jersey.spi.inject.InjectableProvider;
 import com.sun.jersey.spi.service.ComponentProvider;
-import javax.ws.rs.ext.MessageBodyWorkers;
 
 /**
  *
@@ -63,7 +63,7 @@ public class DummyWebApplication implements WebApplication {
         return null;
     }
 
-    public MessageBodyWorkers getMessageBodyWorkers() {
+    public ExtendedMessageBodyWorkers getMessageBodyWorkers() {
         return null;
     }
 

@@ -34,60 +34,40 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
+package com.sun.jersey.spi.container;
 
-package com.sun.jersey.impl.resource;
-
-import javax.ws.rs.ProduceMime;
-import javax.ws.rs.Path;
-import com.sun.jersey.impl.AbstractResourceTester;
-import com.sun.jersey.api.client.ClientResponse;
-import javax.ws.rs.GET;
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Type;
+import java.util.List;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.ext.MessageBodyWorkers;
 
 /**
  *
  * @author Paul.Sandoz@Sun.Com
  */
-public class TypeReturnTest extends AbstractResourceTester {
-    
-    public TypeReturnTest(String testName) {
-        super(testName);
-    }
-    
-    @Path("/")
-    static public class Resource { 
-        @GET
-        public String doGet() {
-            return "CONTENT";
-        }
-    }
-    
-    @Path("/")
-    static public class ResourceWithSingleProduceMime { 
-        @GET
-        @ProduceMime("text/plain")
-        public String doGet() {
-            return "CONTENT";
-        }
-    }
-    
-    @SuppressWarnings("unchecked")
-    public void testReturnType() {
-        initiateWebApplication(Resource.class);
-        
-        ClientResponse response = resource("/", false).get(ClientResponse.class);                
-        assertEquals("CONTENT", response.getEntity(String.class));
-        assertEquals(MediaType.valueOf("text/plain"), 
-                response.getType());
-    }
-    
-    @SuppressWarnings("unchecked")
-    public void testReturnHttpTypeWithSingleProduceMime() {
-        initiateWebApplication(ResourceWithSingleProduceMime.class);
-        
-        ClientResponse response = resource("/", false).get(ClientResponse.class);                
-        assertEquals("CONTENT", response.getEntity(String.class));
-        assertEquals(MediaType.valueOf("text/plain"), 
-                response.getType());
-    }
+public interface ExtendedMessageBodyWorkers extends MessageBodyWorkers {
+    /**
+     * Get the list of media types supported for a Java type.
+     * 
+     * @param type the class of object that is to be written.
+     * 
+     * @param genericType the type of object to be written. E.g. if the 
+     * message body is to be produced from a field, this will be
+     * the declared type of the field as returned by 
+     * <code>Field.getGenericType</code>.
+     * 
+     * @param annotations an array of the annotations on the declaration of the
+     * artifact that will be written. E.g. if the 
+     * message body is to be produced from a field, this will be
+     * the annotations on that field returned by 
+     * <code>Field.getDeclaredAnnotations</code>.
+     * 
+     * @return the list of supported media types, the list is ordered as
+     * follows: a/b &lt a/* &lt *\\/*
+     */
+    <T> List<MediaType> getMessageBodyWriterMediaTypes(
+            Class<T> type, 
+            Type genericType,
+            Annotation[] annotations);
 }

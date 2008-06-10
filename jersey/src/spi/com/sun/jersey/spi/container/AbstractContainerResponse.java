@@ -43,10 +43,11 @@ import com.sun.jersey.impl.ResponseImpl;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.URI;
+import java.util.List;
+import java.util.logging.Logger;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
-import javax.ws.rs.ext.MessageBodyWorkers;
 import javax.ws.rs.ext.MessageBodyWriter;
 import javax.ws.rs.ext.RuntimeDelegate;
 import javax.ws.rs.ext.RuntimeDelegate.HeaderDelegate;
@@ -77,12 +78,11 @@ import javax.ws.rs.ext.RuntimeDelegate.HeaderDelegate;
  * @author Paul.Sandoz@Sun.Com
  */
 public abstract class AbstractContainerResponse implements ContainerResponse {
-    private static final MediaType APPLICATION_OCTET_STREAM
-            = new MediaType("application", "octet-stream");
+    private static final Logger LOGGER = Logger.getLogger(AbstractContainerResponse.class.getName());
     
     private static final RuntimeDelegate rd = RuntimeDelegate.getInstance();
     
-    private final MessageBodyWorkers bodyContext;
+    private final ExtendedMessageBodyWorkers bodyContext;
     
     private final ContainerRequest request;
     
@@ -189,13 +189,10 @@ public abstract class AbstractContainerResponse implements ContainerResponse {
     }
     
     public final void setResponse(Response response) {
-        setResponse(response, APPLICATION_OCTET_STREAM);
+        setResponse(response, null);
     }
     
     public final void setResponse(Response r, MediaType contentType) {
-        if (contentType == null)
-            contentType = APPLICATION_OCTET_STREAM;
-        
         this.response = r = (r != null) ? r : Responses.noContent().build();
         
         this.status = r.getStatus();
@@ -277,12 +274,25 @@ public abstract class AbstractContainerResponse implements ContainerResponse {
             return;
         }
         
-        final MediaType contentType = getContentType();
+        MediaType contentType = getContentType();
+        if (contentType == null) {
+            List<MediaType> mts = bodyContext.getMessageBodyWriterMediaTypes(
+                    entity.getClass(), null, null);
+            contentType = request.getAcceptableMediaType(mts);
+            if (contentType.isWildcardType() || contentType.isWildcardSubtype())
+                contentType = MediaType.APPLICATION_OCTET_STREAM_TYPE;
+            
+            getHttpHeaders().putSingle("Content-Type", contentType);
+        }
+        
         final MessageBodyWriter p = bodyContext.getMessageBodyWriter(
                 entity.getClass(), null, 
                 null, contentType);
         // If there is no message body writer return a Not Acceptable response
         if (p == null) {
+            LOGGER.severe("A message body reader for Java type, " + entity.getClass() + 
+                    ", and MIME media type, " + contentType + ", was not found");    
+            
             setResponse(Responses.notAcceptable().build());
             commitStatusAndHeaders(-1);
             return;
@@ -297,13 +307,11 @@ public abstract class AbstractContainerResponse implements ContainerResponse {
         final Object mediaTypeHeader = getHttpHeaders().getFirst("Content-Type");
         if (mediaTypeHeader instanceof MediaType) {
             return (MediaType)mediaTypeHeader;
-        } else {
-            if (mediaTypeHeader != null) {
-                return MediaType.valueOf(mediaTypeHeader.toString());
-            } else {
-                return APPLICATION_OCTET_STREAM;
-            }
+        } else if (mediaTypeHeader != null) {
+            return MediaType.valueOf(mediaTypeHeader.toString());
         }
+    
+        return null;
     }
     
     private void checkStatusAndEntity() {

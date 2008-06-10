@@ -105,6 +105,7 @@ import com.sun.jersey.impl.uri.rules.RightHandPathRule;
 import com.sun.jersey.impl.uri.rules.RootResourceClassesRule;
 import com.sun.jersey.impl.wadl.WadlFactory;
 import com.sun.jersey.impl.wadl.WadlResource;
+import com.sun.jersey.spi.container.ExtendedMessageBodyWorkers;
 import com.sun.jersey.spi.container.ContainerRequest;
 import com.sun.jersey.spi.container.ContainerResponse;
 import com.sun.jersey.spi.container.WebApplication;
@@ -575,7 +576,7 @@ public final class WebApplicationImpl implements WebApplication {
                 processRootResources(resourceConfig.getResourceClasses()));       
     }
 
-    public MessageBodyWorkers getMessageBodyWorkers() {
+    public ExtendedMessageBodyWorkers getMessageBodyWorkers() {
         return bodyFactory;
     }
 

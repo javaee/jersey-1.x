@@ -42,6 +42,8 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
+import javax.ws.rs.ConsumeMime;
+import javax.ws.rs.ProduceMime;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 
@@ -49,6 +51,8 @@ import javax.ws.rs.core.MultivaluedMap;
  *
  * @author Paul.Sandoz@Sun.Com
  */
+@ProduceMime({"text/plain", "*/*"})
+@ConsumeMime({"text/plain", "*/*"})
 public final class StringProvider extends AbstractMessageReaderWriterProvider<String> {
     
     public boolean supports(Class type) {

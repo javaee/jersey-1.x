@@ -93,13 +93,13 @@ public interface WebApplication {
     WebApplication clone();
             
     /**
-     * Get the message body workers that can be used for getting
+     * Get the extended message body workers that can be used for getting
      * message body readers and writers. 
      * 
-     * @return the message body workers. The return value is 
+     * @return the extended message body workers. The return value is 
      * undefined before the web applicaiton is initialized.
      */
-    MessageBodyWorkers getMessageBodyWorkers();
+    ExtendedMessageBodyWorkers getMessageBodyWorkers();
 
     /**
      * Get the component provider that can be used for instantiating
