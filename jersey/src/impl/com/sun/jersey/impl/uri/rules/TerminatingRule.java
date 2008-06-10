@@ -39,6 +39,7 @@ package com.sun.jersey.impl.uri.rules;
 
 import com.sun.jersey.spi.uri.rules.UriRule;
 import com.sun.jersey.spi.uri.rules.UriRuleContext;
+import javax.ws.rs.WebApplicationException;
 
 /**
  * A terminating rule that checks to see if the response has been
@@ -50,6 +51,9 @@ import com.sun.jersey.spi.uri.rules.UriRuleContext;
 public class TerminatingRule implements UriRule {
    
     public final boolean accept(CharSequence path, Object resource, UriRuleContext context) {
-        return context.getResponse().isResponseSet();
+        if (context.getResponse().isResponseSet())
+            throw new WebApplicationException(context.getResponse().getResponse());
+        else
+            return false;
     }    
 }

@@ -107,7 +107,7 @@ public final class HttpMethodRule implements UriRule {
         List<ResourceMethod> methods = map.get(httpMethod);
         if (methods == null) {
             // No resource methods are found
-            response.setResponse(Response.status(Responses.METHOD_NOT_ALLOWED).
+            response.setResponse(Responses.methodNotAllowed().
                     header("Allow", allow).build());
             // Allow any further matching rules to be processed
             return false;
@@ -138,9 +138,9 @@ public final class HttpMethodRule implements UriRule {
                 verifyResponse(method, accept, response);  
             return true;
         } else if (s == MatchStatus.NO_MATCH_FOR_CONSUME) {
-            response.setResponse(Responses.unsupportedMediaType().build());
+            throw new WebApplicationException(Responses.unsupportedMediaType().build());
         } else if (s == MatchStatus.NO_MATCH_FOR_PRODUCE) {
-            response.setResponse(Responses.notAcceptable().build());
+            throw new WebApplicationException(Responses.notAcceptable().build());
         }
         
         return true;

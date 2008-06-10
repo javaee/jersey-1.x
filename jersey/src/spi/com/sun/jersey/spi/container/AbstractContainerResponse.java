@@ -86,7 +86,7 @@ public abstract class AbstractContainerResponse implements ContainerResponse {
     
     private final ContainerRequest request;
     
-    private boolean responseSet;
+    private Response response;
     
     private int status;
     
@@ -184,20 +184,22 @@ public abstract class AbstractContainerResponse implements ContainerResponse {
     
     // HttpResponseContext
     
+    public final Response getResponse() {
+        return response;
+    }
+    
     public final void setResponse(Response response) {
         setResponse(response, APPLICATION_OCTET_STREAM);
     }
     
-    public final void setResponse(Response response, MediaType contentType) {
-        responseSet = true;
-        
+    public final void setResponse(Response r, MediaType contentType) {
         if (contentType == null)
             contentType = APPLICATION_OCTET_STREAM;
         
-        response = (response != null) ? response : Responses.noContent().build();
+        this.response = r = (r != null) ? r : Responses.noContent().build();
         
-        this.status = response.getStatus();
-        this.entity = response.getEntity();
+        this.status = r.getStatus();
+        this.entity = r.getEntity();
         
         // If HTTP method is HEAD then there should be no entity
         if (request.getHttpMethod().equals("HEAD"))
@@ -207,15 +209,15 @@ public abstract class AbstractContainerResponse implements ContainerResponse {
             contentType = null;
         }
  
-        if (response instanceof ResponseImpl) {
-            this.headers = setResponseOptimal((ResponseImpl)response, contentType);
+        if (r instanceof ResponseImpl) {
+            this.headers = setResponseOptimal((ResponseImpl)r, contentType);
         } else {
-            this.headers = setResponseNonOptimal(response, contentType);
+            this.headers = setResponseNonOptimal(r, contentType);
         }
     }
     
     public final boolean isResponseSet() {
-        return responseSet;
+        return response != null;
     }
     
     public final int getStatus() {

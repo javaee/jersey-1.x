@@ -36,6 +36,7 @@
  */
 package com.sun.jersey.impl.application;
 
+import com.sun.jersey.api.NotFoundException;
 import com.sun.jersey.spi.resource.InjectableProviderContext;
 import com.sun.jersey.spi.inject.Injectable;
 import com.sun.jersey.spi.inject.InjectableContext;
@@ -621,8 +622,7 @@ public final class WebApplicationImpl implements WebApplication {
 
         try {
             if (!rootsRule.accept(path, null, localContext)) {
-                // Resource was not found
-                response.setResponse(Responses.notFound().build());
+                throw new NotFoundException();
             }
         } catch (WebApplicationException e) {
             if (e.getResponse().getEntity() != null) {

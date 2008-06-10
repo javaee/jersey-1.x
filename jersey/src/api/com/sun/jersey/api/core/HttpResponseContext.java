@@ -50,6 +50,13 @@ import javax.ws.rs.core.Response;
  * (OK) with no HTTP response headers and no entity.
  */
 public interface HttpResponseContext {
+
+    /**
+     * Get the response that was set.
+     * 
+     * @return the response.
+     */
+    Response getResponse();
     
     /**
      * Set the response state from a Response instance. This replaces a 
