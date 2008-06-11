@@ -37,6 +37,7 @@
 
 package com.sun.jersey.impl.inject;
 
+import com.sun.jersey.api.core.DefaultResourceConfig;
 import com.sun.jersey.api.core.HttpContext;
 import com.sun.jersey.api.core.ResourceConfig;
 import com.sun.jersey.api.uri.ExtendedUriInfo;
@@ -47,9 +48,13 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
+import java.util.Collections;
+import java.util.Set;
+import javax.ws.rs.ConsumeMime;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
+import javax.ws.rs.ProduceMime;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
@@ -229,7 +234,12 @@ public class AllInjectablesTest extends AbstractResourceTester {
     }
         
     @Provider
+    @ConsumeMime({"text/plain", "*/*"})
+    @ProduceMime({"text/plain", "*/*"})
     public static class StringWriterField implements MessageBodyWriter<String> {
+        public StringWriterField() {
+            int i = 0;
+        }
         
         public boolean isWriteable(Class<?> arg0, Type arg1, Annotation[] arg2) {
             return arg0 == String.class;
@@ -272,6 +282,8 @@ public class AllInjectablesTest extends AbstractResourceTester {
     }
     
     @Provider
+    @ConsumeMime({"text/plain", "*/*"})
+    @ProduceMime({"text/plain", "*/*"})
     public static class StringWriterConstructor implements MessageBodyWriter<String> {
         public StringWriterConstructor(
                 @Context ResourceConfig rc,
@@ -308,6 +320,8 @@ public class AllInjectablesTest extends AbstractResourceTester {
     }
     
     @Provider
+    @ConsumeMime({"text/plain", "*/*"})
+    @ProduceMime({"text/plain", "*/*"})
     public static class StringWriterMutlipleConstructor implements MessageBodyWriter<String> {
         public StringWriterMutlipleConstructor(
                 @Context ResourceConfig rc,
@@ -351,6 +365,8 @@ public class AllInjectablesTest extends AbstractResourceTester {
     }
     
     @Provider
+    @ConsumeMime({"text/plain", "*/*"})
+    @ProduceMime({"text/plain", "*/*"})
     public static class StringWriterMutliplePartialConstructor implements MessageBodyWriter<String> {
         public StringWriterMutliplePartialConstructor(
                 @Context ResourceConfig rc,
@@ -399,8 +415,61 @@ public class AllInjectablesTest extends AbstractResourceTester {
         }        
     }
     
+    @Provider
+    @ConsumeMime({"text/plain", "*/*"})
+    @ProduceMime({"text/plain", "*/*"})
+    public static class StringWriterMutliplePartialConstructor2 implements MessageBodyWriter<String> {
+        public StringWriterMutliplePartialConstructor2(
+                @Context HttpContext hca,
+                @Context HttpHeaders hs,
+                @Context UriInfo ui,
+                @Context ExtendedUriInfo eui,
+                @Context Request r,
+                @Context SecurityContext sc) {
+            assertNotNull(hca);
+            assertNotNull(hs);
+            assertNotNull(ui);
+            assertNotNull(eui);
+            assertNotNull(r);
+            assertNotNull(sc);
+        }                
+        
+        public StringWriterMutliplePartialConstructor2(
+                String rc,
+                @Context MessageBodyWorkers mbw,
+                @Context TemplateContext tc,
+                @Context HttpContext hca,
+                @Context HttpHeaders hs,
+                @Context UriInfo ui,
+                @Context ExtendedUriInfo eui,
+                @Context Request r,
+                @Context SecurityContext sc) {
+            assertTrue(false);
+        }                
+        
+        public boolean isWriteable(Class<?> arg0, Type arg1, Annotation[] arg2) {
+            return arg0 == String.class;
+        }
+
+        public long getSize(String arg0) {
+            return -1;
+        }
+
+        public void writeTo(String arg0, Class<?> arg1, Type arg2, Annotation[] arg3, MediaType arg4, MultivaluedMap<String, Object> arg5, OutputStream arg6) throws IOException, WebApplicationException {
+            arg6.write(arg0.getBytes());
+        }        
+    }
+    
     public void testProviderField() throws IOException {
         initiateWebApplication(StringWriterResource.class, StringWriterField.class);
+        
+        assertEquals("GET", resource("/").get(String.class));        
+    }           
+    
+    public void testProviderInstanceField() throws IOException {
+        ResourceConfig rc = new DefaultResourceConfig(StringWriterResource.class);
+        rc.getProviderInstances().add(new StringWriterField());
+        initiateWebApplication(rc);
         
         assertEquals("GET", resource("/").get(String.class));        
     }           
@@ -419,6 +488,12 @@ public class AllInjectablesTest extends AbstractResourceTester {
     
     public void testProviderMultiplePartialConstructor() throws IOException {
         initiateWebApplication(StringWriterResource.class, StringWriterMutliplePartialConstructor.class);
+        
+        assertEquals("GET", resource("/").get(String.class));        
+    }           
+    
+    public void testProviderMultiplePartialConstructor2() throws IOException {
+        initiateWebApplication(StringWriterResource.class, StringWriterMutliplePartialConstructor2.class);
         
         assertEquals("GET", resource("/").get(String.class));        
     }           

@@ -85,6 +85,7 @@ public class ServletAdaptor extends ServletContainer {
     private Map<String, String> persistenceUnits =
             new HashMap<String, String>();
         
+    @Override
     protected void configure(ServletConfig servletConfig, ResourceConfig rc, WebApplication wa) {
         super.configure(servletConfig, rc, wa);
 
@@ -99,7 +100,7 @@ public class ServletAdaptor extends ServletContainer {
             }
         }
         
-        wa.addInjectable(new InjectableProvider<PersistenceUnit, Type>() {
+        rc.getProviderInstances().add(new InjectableProvider<PersistenceUnit, Type>() {
             public Scope getScope() {
                 return Scope.Singleton;
             }

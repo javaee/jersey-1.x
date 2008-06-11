@@ -49,12 +49,18 @@ import java.util.Set;
 public class DefaultClientConfig implements ClientConfig {
     private final Set<Class<?>> providers = new HashSet<Class<?>>();
     
+    private final Set<Object> providerInstances = new HashSet<Object>();
+    
     private final Map<String, Boolean> features = new HashMap<String, Boolean>();
     
     private final Map<String, Object> properties = new HashMap<String, Object>();
     
     public Set<Class<?>> getProviderClasses() {
         return providers;
+    }
+    
+    public Set<Object> getProviderInstances() {
+        return providerInstances;
     }
     
     public Map<String, Boolean> getFeatures() {

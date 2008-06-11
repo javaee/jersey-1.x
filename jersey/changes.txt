@@ -1,4 +1,9 @@
 release 0.8 (2008-06-20 or 2008-07-25)
+- Removed WebApplication.addInjectable, use the following instead:
+    ResourceConfig.getProviderInstances().add()
+- Instances of provider classes can be declared by the application by adding
+  provider instances to the Set returned by the method:
+    ResourceConfig.getProviderInstances()
 - Modified com.sun.jersey.spi.container.{AbstractContainerRequest, 
   AbstractContainerResponse} to take WebApplication as an input parameter
   as opposed to previously taking MessageBodyContext.
@@ -15,6 +20,8 @@ release 0.8 (2008-06-20 or 2008-07-25)
 - Unified injection interfaces so that they are independent of where 
   injection occurs. See the package com.sun.jersey.spi.inject.
   - com.sun.jersey.spi.resource.Inject moved to com.sun.jersey.spi.inject.Inject
+  - the com.sun.jersey.spi.inject.InjectableProvider behaves as a provider 
+    class and may be annotated with @Provider.   
 - Simple asynchronous client API returning Future<T>. Current implementation
   utilizes one thread per-request.
 - Moved com.sun.ws.rest.impl.json.JSONJAXBContext to

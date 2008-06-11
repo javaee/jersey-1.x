@@ -380,24 +380,24 @@ public class ServletContainer extends HttpServlet implements ContainerListener {
      * @param wa the Web application
      */
     protected void configure(final ServletConfig sc, ResourceConfig rc, WebApplication wa) {
-        wa.addInjectable(new ContextInjectableProvider<HttpServletRequest>(
+        rc.getProviderInstances().add(new ContextInjectableProvider<HttpServletRequest>(
                 HttpServletRequest.class,
                 (HttpServletRequest)Proxy.newProxyInstance(
                         HttpServletRequest.class.getClassLoader(),
                         new Class[] { HttpServletRequest.class },
                         requestInvoker)));
         
-        wa.addInjectable(new ContextInjectableProvider<HttpServletResponse>(
+        rc.getProviderInstances().add(new ContextInjectableProvider<HttpServletResponse>(
                 HttpServletResponse.class,
                 (HttpServletResponse)Proxy.newProxyInstance(
                         HttpServletResponse.class.getClassLoader(),
                         new Class[] { HttpServletResponse.class },
                         responseInvoker)));
         
-        wa.addInjectable(new ContextInjectableProvider<ServletConfig>(
+        rc.getProviderInstances().add(new ContextInjectableProvider<ServletConfig>(
                 ServletConfig.class, sc));
         
-        wa.addInjectable(new ContextInjectableProvider<ServletContext>(
+        rc.getProviderInstances().add(new ContextInjectableProvider<ServletContext>(
                 ServletContext.class, 
                 sc.getServletContext()));
     }

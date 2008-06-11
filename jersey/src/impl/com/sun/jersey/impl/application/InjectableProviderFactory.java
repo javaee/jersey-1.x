@@ -377,15 +377,15 @@ public final class InjectableProviderFactory implements InjectableProviderContex
         SortedSet<ConstructorInjectablePair<T>> cs = new TreeSet<ConstructorInjectablePair<T>>(
                 new Comparator<ConstructorInjectablePair<T>>() {
             public int compare(ConstructorInjectablePair<T> o1, ConstructorInjectablePair<T> o2) {
-                int p = o2.con.getParameterTypes().length - o1.con.getParameterTypes().length;
+                int p = Collections.frequency(o1.is, null) - Collections.frequency(o2.is, null);
                 if (p != 0)
                     return p;
                 
-                return Collections.frequency(o2.is, null) - Collections.frequency(o1.is, null);
+                return o2.con.getParameterTypes().length - o1.con.getParameterTypes().length;
             }
         });
         
-        for (Constructor<T> con : c.getConstructors()) {
+        for (Constructor con : c.getConstructors()) {
             List<Injectable> is = new ArrayList<Injectable>();
             int ps = con.getParameterTypes().length;
             for (int p = 0; p < ps; p++) {

@@ -39,12 +39,16 @@ package com.sun.jersey.impl.entity;
 
 import com.sun.jersey.impl.AbstractResourceTester;
 import com.sun.jersey.api.client.WebResource;
+import com.sun.jersey.api.core.DefaultResourceConfig;
+import com.sun.jersey.api.core.ResourceConfig;
 import com.sun.jersey.impl.provider.entity.AbstractMessageReaderWriterProvider;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
+import java.util.Collections;
+import java.util.Set;
 import javax.ws.rs.ConsumeMime;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -157,6 +161,15 @@ public class OverrideProviderTest extends AbstractResourceTester {
     
     public void testJAXBBean() throws Exception {
         initiateWebApplication(JAXBBeanResource.class, JAXBBeanProvider.class);
+                
+        WebResource r = resource("/");
+        assertEquals("foo", r.get(String.class));
+    }    
+    
+    public void testJAXBBeanWithProviderInstance() throws Exception {
+        ResourceConfig rc = new DefaultResourceConfig(JAXBBeanResource.class);
+        rc.getProviderInstances().add(new JAXBBeanProvider());
+        initiateWebApplication(rc);
                 
         WebResource r = resource("/");
         assertEquals("foo", r.get(String.class));

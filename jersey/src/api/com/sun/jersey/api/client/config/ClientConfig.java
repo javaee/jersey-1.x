@@ -59,6 +59,18 @@ public interface ClientConfig {
     Set<Class<?>> getProviderClasses();
     
     /**
+     * Get the provider instances to be utilized by the client.
+     * <p>
+     * When the client is initialized the set of provider instances
+     * will be combined and take precendence over the instances of provider 
+     * classes. 
+     * 
+     * @return a mutable set of provider instances. After intialization of
+     * the client modification of this value will have no effect.
+     */
+    public Set<Object> getProviderInstances();
+    
+    /**
      * Get the map of features associated with the Web application.
      *
      * @return the features.

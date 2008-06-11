@@ -38,9 +38,8 @@
 package com.sun.jersey.api.core;
 
 import java.util.Map;
+import java.util.Set;
 import javax.ws.rs.core.ApplicationConfig;
-import com.sun.jersey.spi.container.ContainerNotifier;
-import com.sun.jersey.spi.container.ContainerListener;
 
 /**
  * The resource configuration for configuring a web application.
@@ -163,5 +162,17 @@ public abstract class ResourceConfig extends ApplicationConfig {
      * @return the property, or null if there is no property present for the
      *         given property name.
      */
-    public abstract Object getProperty(String propertyName);   
+    public abstract Object getProperty(String propertyName);
+    
+    /**
+     * Get the provider instances to be utilized by the web application.
+     * <p>
+     * When the web application is initialized the set of provider instances
+     * will be combined and take precendence over the instances of provider 
+     * classes declared by {@link ApplicationConfig}. 
+     * 
+     * @return a mutable set of provider instances. After intialization of
+     * the Web application modification of this value will have no effect.
+     */
+    public abstract Set<Object> getProviderInstances();
 }

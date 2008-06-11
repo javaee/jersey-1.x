@@ -64,20 +64,28 @@ public final class ComponentProviderCache {
     
     private final Set<Class<?>> providers;
     
+    private final Set<?> providerInstances;
+    
     private final Map<Class, Object> cache;
     
     public ComponentProviderCache(
             InjectableProviderFactory injectableFactory,
             ComponentProvider componentProvider, 
-            Set<Class<?>> providers) {
+            Set<Class<?>> providers,
+            Set<?> providerInstances) {
         this.injectableFactory = injectableFactory;
         this.componentProvider = componentProvider;
         this.providers = providers;
+        this.providerInstances = providerInstances;
         this.cache = new HashMap<Class, Object>();
+        
+        for (Object p : providerInstances)
+            cache.put(p.getClass(), p);        
     }
     
     public <T> Set<T> getProviders(Class<T> provider) {
         Set<T> ps = new LinkedHashSet<T>();
+        ps.addAll(getProviderInstances(provider));
         for (Class pc : getProviderClasses(provider)) {
             Object o = getComponent(pc);
             if (o != null) {
@@ -90,6 +98,7 @@ public final class ComponentProviderCache {
     
     public <T> Set<T> getProvidersAndServices(Class<T> provider) {
         Set<T> ps = new LinkedHashSet<T>();
+        ps.addAll(getProviderInstances(provider));
         for (Class pc : getProviderAndServiceClasses(provider)) {
             Object o = getComponent(pc);
             if (o != null) {
@@ -100,19 +109,26 @@ public final class ComponentProviderCache {
         return ps;        
     }
     
+    public void injectOnComponents() {
+        for (Object v : cache.values()) {
+            componentProvider.inject(v);
+        }
+    }
+    
     private Object getComponent(Class<?> provider) {
         Object o = cache.get(provider);
         if (o != null) return o;
             
         try {
             ConstructorInjectablePair<?> cip = injectableFactory.getConstructor(provider);
-            if (cip == null) {
+            if (cip == null || cip.is.size() == 0) {
                 o = componentProvider.getInstance(Scope.Singleton, provider);
             } else {
                 Object[] params = new Object[cip.is.size()];
                 int i = 0;
                 for (Injectable injectable : cip.is) {
-                    params[i++] = injectable.getValue(null);
+                    if (injectable != null)
+                        params[i++] = injectable.getValue(null);
                 }
                 o = componentProvider.getInstance(Scope.Singleton, cip.con, params);
             }
@@ -126,6 +142,7 @@ public final class ComponentProviderCache {
                     " The component is ignored.");
             return null;
         } catch (Exception ex) {
+            ex.printStackTrace();
             System.out.println(ex.getLocalizedMessage());
             LOGGER.log(Level.CONFIG,
                     "The provider class, " + provider + 
@@ -135,6 +152,16 @@ public final class ComponentProviderCache {
         
         cache.put(provider, o);
         return o;
+    }
+    
+    private <T> Set<T> getProviderInstances(Class<T> service) {
+        Set<T> sp = new LinkedHashSet<T>();
+        for (Object p : providerInstances) {
+            if (service.isInstance(p))
+                sp.add(service.cast(p));
+        }
+        
+        return sp;
     }
     
     private Set<Class> getProviderClasses(Class<?> service) {

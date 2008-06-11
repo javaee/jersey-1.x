@@ -71,7 +71,6 @@ import javax.ws.rs.core.UriInfo;
 import javax.ws.rs.ext.MessageBodyWorkers;
 import javax.ws.rs.ext.Provider;
 
-import com.sun.jersey.api.Responses;
 import com.sun.jersey.api.container.ContainerException;
 import com.sun.jersey.api.core.HttpContext;
 import com.sun.jersey.api.core.HttpResponseContext;
@@ -488,12 +487,12 @@ public final class WebApplicationImpl implements WebApplication {
             }
         };
 
-        // Create the component provider cache
         ComponentProviderCache cpc = new ComponentProviderCache(
-                this.injectableFactory,
-                this.provider,
-                resourceConfig.getProviderClasses());
-
+                    this.injectableFactory,
+                    this.provider,
+                    resourceConfig.getProviderClasses(),
+                    resourceConfig.getProviderInstances());
+        
         // Add injectable provider for @Inject
         injectableFactory.add(
             new InjectableProvider<Inject, Type>() {
@@ -571,6 +570,9 @@ public final class WebApplicationImpl implements WebApplication {
         injectableFactory.add(new PathParamInjectableProvider());
         injectableFactory.add(new QueryParamInjectableProvider());
         
+        // Inject on all components
+        cpc.injectOnComponents();
+        
         // Obtain all root resources
         this.rootsRule = new RootResourceClassesRule(
                 processRootResources(resourceConfig.getResourceClasses()));       
@@ -640,10 +642,6 @@ public final class WebApplicationImpl implements WebApplication {
         }
     }
 
-    public void addInjectable(InjectableProvider<?, ?> ip) {
-        injectableFactory.add(ip);
-    }
-    
     public HttpContext getThreadLocalHttpContext() {
         return context;
     }

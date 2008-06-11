@@ -66,6 +66,8 @@ public class DefaultResourceConfig extends ResourceConfig {
     
     private final Map<String, Object> properties = new HashMap<String, Object>();
     
+    private final Set<Object> providerInstances = new HashSet<Object>();
+    
     /**
      */
     public DefaultResourceConfig() {
@@ -127,5 +129,9 @@ public class DefaultResourceConfig extends ResourceConfig {
 
     public Object getProperty(String propertyName) {
         return properties.get(propertyName);
+    }
+    
+    public Set<Object> getProviderInstances() {
+        return providerInstances;
     }
 }

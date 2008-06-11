@@ -37,6 +37,7 @@
 package com.sun.jersey.impl.inject;
 
 import com.sun.jersey.api.core.HttpContext;
+import com.sun.jersey.api.core.ResourceConfig;
 import com.sun.jersey.spi.inject.InjectableContext;
 import com.sun.jersey.spi.service.ComponentProvider.Scope;
 import static java.lang.annotation.ElementType.CONSTRUCTOR;
@@ -109,8 +110,8 @@ public class AnnotationInjectableTest extends AbstractResourceTester {
     }
     
     @Override
-    protected void initiate(WebApplication a) {
-        a.addInjectable(new MyAnnotationInjectableProvider("foo"));        
+    protected void initiate(ResourceConfig c, WebApplication a) {
+        c.getProviderInstances().add(new MyAnnotationInjectableProvider("foo"));        
     }
     
     public void testFieldInjected() throws IOException {                

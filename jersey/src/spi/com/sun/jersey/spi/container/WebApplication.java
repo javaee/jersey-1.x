@@ -41,9 +41,7 @@ package com.sun.jersey.spi.container;
 import com.sun.jersey.api.container.ContainerException;
 import com.sun.jersey.api.core.HttpContext;
 import com.sun.jersey.api.core.ResourceConfig;
-import com.sun.jersey.spi.inject.InjectableProvider;
 import com.sun.jersey.spi.service.ComponentProvider;
-import javax.ws.rs.ext.MessageBodyWorkers;
 
 /**
  * A Web application that manages a set of Web resource.
@@ -119,13 +117,6 @@ public interface WebApplication {
      */
     ComponentProvider getResourceComponentProvider();
     
-    /**
-     * Add an injectable provider that provides injectable values.
-     * 
-     * @param ip the injectable provider
-     */
-    void addInjectable(InjectableProvider<?, ?> ip);
-        
     /**
      * Get an instance of {@link HttpContext} that is a proxy to
      * a thread local instance of {@link HttpContext}.

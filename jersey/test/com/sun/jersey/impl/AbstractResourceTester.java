@@ -108,12 +108,12 @@ public abstract class AbstractResourceTester extends TestCase {
     
     private WebApplication createWebApplication(ResourceConfig c, ComponentProvider cp) {
         WebApplicationImpl a = new WebApplicationImpl();
-        initiate(a);
+        initiate(c, a);
         a.initiate(c, cp);
         return a;
     }
 
-    protected void initiate(WebApplication a) {}
+    protected void initiate(ResourceConfig c, WebApplication a) {}
     
     protected WebResource resource(String relativeUri) {
         return resource(relativeUri, true);
