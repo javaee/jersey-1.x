@@ -346,7 +346,7 @@ public final class WebApplicationImpl implements WebApplication {
         }
     }
 
-    private final class AdaptingResourceComponentProvider implements ComponentProvider {
+    private final static class AdaptingResourceComponentProvider implements ComponentProvider {
 
         private final ComponentProvider cp;
 
@@ -413,7 +413,7 @@ public final class WebApplicationImpl implements WebApplication {
         }
     }
 
-    private final class DefaultResourceComponentProvider implements ComponentProvider {
+    private final static class DefaultResourceComponentProvider implements ComponentProvider {
 
         public <T> T getInstance(Scope scope, Class<T> c)
                 throws InstantiationException, IllegalAccessException {
