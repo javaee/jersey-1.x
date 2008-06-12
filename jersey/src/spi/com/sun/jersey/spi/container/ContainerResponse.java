@@ -228,6 +228,22 @@ public class ContainerResponse implements HttpResponseContext {
         setResponse(Responses.noContent().build());
     }
     
+    /**
+     * 
+     * @return the container response writer
+     */
+    public ContainerResponseWriter getContainerResponseWriter() {
+        return responseWriter; 
+    }
+    
+    /**
+     * Set the container response writer.
+     * @param responseWriter the container response writer
+     */
+    public void setContainerResponseWriter(ContainerResponseWriter responseWriter) {
+        this.responseWriter = responseWriter; 
+    }
+    
     // HttpResponseContext
     
     public Response getResponse() {
