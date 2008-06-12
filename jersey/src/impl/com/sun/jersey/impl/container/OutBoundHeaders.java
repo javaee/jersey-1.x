@@ -35,7 +35,7 @@
  * holder.
  */
 
-package com.sun.jersey.impl;
+package com.sun.jersey.impl.container;
 
 import com.sun.jersey.impl.util.KeyComparatorHashMap;
 import com.sun.jersey.impl.util.StringIgnoreCaseKeyComparator;
@@ -48,7 +48,7 @@ import javax.ws.rs.core.MultivaluedMap;
  *
  * @author Paul.Sandoz@Sun.Com
  */
-public class ResponseHttpHeadersImpl 
+public class OutBoundHeaders 
         extends KeyComparatorHashMap<String, List<Object>> 
         implements MultivaluedMap<String, Object> {
     
@@ -57,7 +57,7 @@ public class ResponseHttpHeadersImpl
     /**
      * Creates a new instance of MultivaluedMapImpl
      */
-    public ResponseHttpHeadersImpl() {
+    public OutBoundHeaders() {
         super(StringIgnoreCaseKeyComparator.SINGLETON);
     }
 

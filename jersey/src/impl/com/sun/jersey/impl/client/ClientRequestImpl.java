@@ -38,7 +38,7 @@
 package com.sun.jersey.impl.client;
 
 import com.sun.jersey.api.client.ClientRequest;
-import com.sun.jersey.impl.ResponseHttpHeadersImpl;
+import com.sun.jersey.impl.container.OutBoundHeaders;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
@@ -67,7 +67,7 @@ public final class ClientRequestImpl extends ClientRequest {
         this.uri = uri;
         this.method = method;
         this.entity = entity;
-        this.metadata = (metadata != null) ? metadata : new ResponseHttpHeadersImpl();
+        this.metadata = (metadata != null) ? metadata : new OutBoundHeaders();
     }
 
     public URI getURI() {
@@ -93,7 +93,7 @@ public final class ClientRequestImpl extends ClientRequest {
     }
     
     private static MultivaluedMap<String, Object> clone(MultivaluedMap<String, Object> md) {
-        MultivaluedMap<String, Object> clone = new ResponseHttpHeadersImpl();
+        MultivaluedMap<String, Object> clone = new OutBoundHeaders();
         for (Map.Entry<String, List<Object>> e : md.entrySet()) {
             clone.put(e.getKey(), new ArrayList<Object>(e.getValue()));
         }

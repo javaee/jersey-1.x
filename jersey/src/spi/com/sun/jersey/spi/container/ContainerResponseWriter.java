@@ -34,60 +34,33 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
+package com.sun.jersey.spi.container;
 
-package com.sun.jersey.impl.container.grizzly;
-
-import com.sun.jersey.spi.container.AbstractContainerResponse;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.util.List;
-import java.util.Map;
-import com.sun.grizzly.tcp.http11.GrizzlyResponse;
-import com.sun.jersey.spi.container.WebApplication;
 
 /**
- *
- * @author Marc.Hadley@Sun.Com
+ * Containers implement this interface and provide an instance to the
+ * {@link WebApplication} or {@link ContainerResponse}.
+ * 
+ * @author Paul.Sandoz@Sun.Com
  */
-public final class GrizzlyResponseAdaptor extends AbstractContainerResponse {
-    
-    private final GrizzlyResponse response;
-    
-    /* package */ GrizzlyResponseAdaptor(GrizzlyResponse response, 
-            WebApplication wa, GrizzlyRequestAdaptor requestContext) {
-        super(wa, requestContext);
-        this.response = response;
-    }
-        
-    protected void commitStatusAndHeaders(long contentLength) throws IOException {
-        response.setStatus(this.getStatus());
-        
-        if (contentLength != -1 && contentLength < Integer.MAX_VALUE) 
-            response.setContentLength((int)contentLength);
-        
-        for (Map.Entry<String, List<Object>> e : this.getHttpHeaders().entrySet()) {
-            for (Object value : e.getValue()) {
-                response.addHeader(e.getKey(), getHeaderValue(value));
-            }
-        }
-
-        String contentType = response.getHeader("Content-Type");
-        if (contentType != null) {
-            response.setContentType(contentType);
-        }
-    }    
-    
-    /* package */ void commitAll() throws IOException {
-        if (isCommitted()) {
-            getUnderlyingOutputStream().close();
-            return;
-        }
-        
-        writeEntity();
-        getUnderlyingOutputStream().close();
-    }
-
-    protected OutputStream getUnderlyingOutputStream() throws IOException {
-        return response.getOutputStream();
-    }
+public interface ContainerResponseWriter {
+    /**
+     * Write the status and headers of the response and return an output stream 
+     * for the web application to write the entity of the response.
+     * 
+     * @param contentLength >=0 if the content length in bytes of the
+     *        entity to be written is known, otherwise -1. Containers
+     *        may use this value to determine whether the "Content-Length"
+     *        header can be set or utilize chunked transfer encoding.
+     * @param response the container response. The status and headers are
+     *        obtained from the response.
+     * @return the output stream to write the entity (if any).
+     * @throws java.io.IOException if an error occured when writing out the
+     *         status and headers or obtaining the output stream.
+     */
+    OutputStream writeStatusAndHeaders(
+            long contentLength,
+            ContainerResponse response) throws IOException;
 }

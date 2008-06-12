@@ -37,7 +37,7 @@
 
 package com.sun.jersey.api.client;
 
-import com.sun.jersey.impl.ResponseHttpHeadersImpl;
+import com.sun.jersey.impl.container.OutBoundHeaders;
 import javax.ws.rs.core.Cookie;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
@@ -59,7 +59,7 @@ public abstract class PartialRequestBuilder<T extends RequestBuilder>
     protected MultivaluedMap<String, Object> metadata;
     
     protected PartialRequestBuilder() {
-        metadata = new ResponseHttpHeadersImpl();
+        metadata = new OutBoundHeaders();
     }
     
     public T entity(Object entity) {
@@ -114,6 +114,6 @@ public abstract class PartialRequestBuilder<T extends RequestBuilder>
     private MultivaluedMap<String, Object> getMetadata() {
         if (metadata != null) return metadata;
         
-        return metadata = new ResponseHttpHeadersImpl();
+        return metadata = new OutBoundHeaders();
     }
 }

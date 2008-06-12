@@ -49,10 +49,15 @@ import javax.ws.rs.core.Request;
 import javax.ws.rs.core.SecurityContext;
 
 /**
- * An abstraction for a HTTP request
+ * An abstraction of a HTTP request.
  */
-public interface HttpRequestContext extends HttpHeaders,
-        Request, SecurityContext {
+public interface HttpRequestContext extends HttpHeaders, Request, SecurityContext {    
+    /**
+     * Get the HTTP method name.
+     * 
+     * @return the method name as a String
+     */
+    String getHttpMethod();
     
     /**
      * Get the base URI of the request.
@@ -95,6 +100,13 @@ public interface HttpRequestContext extends HttpHeaders,
      *         was found to be acceptable.
      */
     MediaType getAcceptableMediaType(List<MediaType> mediaTypes);
+        
+    /**
+     * Get the cookie name value map.
+     * 
+     * @return the cookie bame value map.
+     */
+    MultivaluedMap<String, String> getCookieNameValueMap();
     
     /**
      * Get the request entity, returns null if the request does not
@@ -105,8 +117,7 @@ public interface HttpRequestContext extends HttpHeaders,
      * @throws WebApplicationException if the content of the request
      * cannot be mapped to an entity of the requested type
      */
-    <T> T getEntity(Class<T> type) 
-            throws WebApplicationException;
+    <T> T getEntity(Class<T> type) throws WebApplicationException;
         
     /**
      * Get the request entity, returns null if the request does not
@@ -123,16 +134,4 @@ public interface HttpRequestContext extends HttpHeaders,
      */
     <T> T getEntity(Class<T> type, Type genericType, Annotation[] as) 
             throws WebApplicationException;
-    
-    /**
-     * Get the HTTP method name
-     * @return the method name as a String
-     */
-    String getHttpMethod();
-    
-    /**
-     * Get the cookie name value map.
-     * @return the cookie bame value map.
-     */
-    MultivaluedMap<String, String> getCookieNameValueMap();
 }

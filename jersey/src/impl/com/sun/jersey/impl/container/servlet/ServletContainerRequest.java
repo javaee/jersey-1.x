@@ -37,15 +37,52 @@
 
 package com.sun.jersey.impl.container.servlet;
 
-import com.sun.jersey.api.core.ResourceConfig;
-import com.sun.jersey.api.core.DefaultResourceConfig;
-import java.util.Map;
-import java.util.Set;
+import com.sun.jersey.spi.container.ContainerRequest;
+import com.sun.jersey.spi.container.InBoundHeaders;
+import com.sun.jersey.spi.container.WebApplication;
+import java.io.InputStream;
+import java.net.URI;
+import java.security.Principal;
+import javax.servlet.http.HttpServletRequest;
 
-public class WebResources extends DefaultResourceConfig {
+/**
+ * Adapts a HttpServletRequest to provide the methods of HttpRequest
+ */
+public final class ServletContainerRequest extends ContainerRequest {
     
-    public WebResources() {
-        getResourceClasses().add(
-                com.sun.jersey.impl.container.servlet.MyWebResourceBean.class);
+    private final HttpServletRequest request;
+    
+    public ServletContainerRequest(
+            HttpServletRequest request,
+            WebApplication wa,
+            String method,
+            URI baseUri,
+            URI requestUri,
+            InBoundHeaders headers,
+            InputStream entity) {
+        super(wa, method, baseUri, requestUri, headers, entity);
+        this.request = request;
+    }
+    
+    // SecurityContext
+    
+    @Override
+    public Principal getUserPrincipal() {
+        return request.getUserPrincipal();
+    }
+    
+    @Override
+    public boolean isUserInRole(String role) {
+        return request.isUserInRole(role);
+    }
+    
+    @Override
+    public boolean isSecure() {
+        return request.isSecure();
+    }
+    
+    @Override
+    public String getAuthenticationScheme() {
+        return request.getAuthType();
     }
 }

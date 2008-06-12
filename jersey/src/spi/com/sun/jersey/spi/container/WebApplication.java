@@ -42,6 +42,7 @@ import com.sun.jersey.api.container.ContainerException;
 import com.sun.jersey.api.core.HttpContext;
 import com.sun.jersey.api.core.ResourceConfig;
 import com.sun.jersey.spi.service.ComponentProvider;
+import java.io.IOException;
 
 /**
  * A Web application that manages a set of Web resource.
@@ -131,10 +132,19 @@ public interface WebApplication {
      * the appropriate HTTP error response.
      * <p>
      * @param request the HTTP container request.
-     * @param response the HTTP container response.
-     * @throws ContainerException if there is an error that the container 
-     * should manage.
+     * @param responseWriter the HTTP container response writer.
      */
-    void handleRequest(ContainerRequest request, ContainerResponse response)
-    throws ContainerException;    
+    void handleRequest(ContainerRequest request, ContainerResponseWriter responseWriter) 
+            throws IOException;
+    
+    /**
+     * Handle an HTTP request by dispatching the request to the appropriate
+     * matching Web resource that produces the response or otherwise producing 
+     * the appropriate HTTP error response.
+     * <p>
+     * @param request the HTTP container request.
+     * @param response the HTTP container response.
+     */
+    void handleRequest(ContainerRequest request, ContainerResponse response) 
+            throws IOException;
 }

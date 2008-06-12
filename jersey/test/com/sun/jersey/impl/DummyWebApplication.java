@@ -41,10 +41,12 @@ import com.sun.jersey.api.core.HttpContext;
 import com.sun.jersey.api.core.ResourceConfig;
 import com.sun.jersey.spi.container.ContainerRequest;
 import com.sun.jersey.spi.container.ContainerResponse;
+import com.sun.jersey.spi.container.ContainerResponseWriter;
 import com.sun.jersey.spi.container.ExtendedMessageBodyWorkers;
 import com.sun.jersey.spi.container.WebApplication;
 import com.sun.jersey.spi.inject.InjectableProvider;
 import com.sun.jersey.spi.service.ComponentProvider;
+import java.io.IOException;
 
 /**
  *
@@ -82,6 +84,9 @@ public class DummyWebApplication implements WebApplication {
         return null;
     }
 
-    public void handleRequest(ContainerRequest request, ContainerResponse response) throws ContainerException {
+    public void handleRequest(ContainerRequest request, ContainerResponseWriter responseWriter) throws IOException {
+    }
+
+    public void handleRequest(ContainerRequest request, ContainerResponse response) throws IOException {
     }
 }

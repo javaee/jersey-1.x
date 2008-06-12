@@ -34,16 +34,310 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-
 package com.sun.jersey.spi.container;
 
+import com.sun.jersey.impl.container.OutBoundHeaders;
+import com.sun.jersey.api.Responses;
+import com.sun.jersey.api.core.HttpResponseContext;
+import com.sun.jersey.impl.ResponseImpl;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.net.URI;
+import java.util.List;
+import java.util.logging.Logger;
+import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.MultivaluedMap;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.ext.MessageBodyWriter;
+import javax.ws.rs.ext.RuntimeDelegate;
+import javax.ws.rs.ext.RuntimeDelegate.HeaderDelegate;
+
 /**
- * The HTTP response context supplied by the container.
- * <p>
- * This interface is a place for holder for any container specific HTTP response 
- * functionality that may be required in the future.
+ * Containers instantiate, or inherit, and provide an instance to the 
+ * {@link WebApplication}.
  *
  * @author Paul.Sandoz@Sun.Com
  */
-public interface ContainerResponse extends com.sun.jersey.api.core.HttpResponseContext {
+public class ContainerResponse implements HttpResponseContext {
+    private static final Logger LOGGER = Logger.getLogger(ContainerResponse.class.getName());
+    
+    private static final RuntimeDelegate rd = RuntimeDelegate.getInstance();
+    
+    private ExtendedMessageBodyWorkers bodyContext;
+    
+    private ContainerRequest request;
+    
+    private ContainerResponseWriter responseWriter;
+    
+    private Response response;
+    
+    private int status;
+    
+    private MultivaluedMap<String, Object> headers;
+    
+    private Object entity;
+    
+    private boolean isCommitted;
+    
+    private CommittingOutputStream out;
+    
+    private final class CommittingOutputStream extends OutputStream {
+        private OutputStream o;
+        
+        @Override
+        public void write(byte b[]) throws IOException {
+            commitWrite();
+            o.write(b);
+        }
+        
+        @Override
+        public void write(byte b[], int off, int len) throws IOException {
+            commitWrite();
+            o.write(b, off, len);
+        }
+        
+        public void write(int b) throws IOException {
+            commitWrite();
+            o.write(b);
+        }
+        
+        @Override
+        public void flush() throws IOException {
+            o.flush();
+        }
+        
+        @Override
+        public void close() throws IOException {
+            commitClose();
+            o.close();
+        }
+        
+        private void commitWrite() throws IOException {
+            if (!isCommitted) {
+                if (getStatus() == 204)
+                    setStatus(200);
+                isCommitted = true;
+                o = responseWriter.writeStatusAndHeaders(-1, ContainerResponse.this);
+            }
+        }
+        
+        private void commitClose() throws IOException {
+            if (!isCommitted) {
+                isCommitted = true;
+                o = responseWriter.writeStatusAndHeaders(-1, ContainerResponse.this);
+            }
+        }
+    };
+    
+    /**
+     * Instantate a new ContainerResponse.
+     * 
+     * @param wa the web application.
+     * @param request the container request associated with this response.
+     * @param responseWriter the response writer
+     */
+    public ContainerResponse(
+            WebApplication wa, 
+            ContainerRequest request,
+            ContainerResponseWriter responseWriter) {
+        this.bodyContext = wa.getMessageBodyWorkers();
+        this.request = request;
+        this.responseWriter = responseWriter;
+        this.status = Responses.NO_CONTENT;
+    }
+    
+    // ContainerResponse
+        
+    /**
+     * Convert a header value, represented as a general object, to the 
+     * string value.
+     * <p>
+     * This method defers to {@link RuntimeDelegate#createHeaderDelegate} to
+     * obtain a {@link HeaderDelegate} to convert the value to a string.
+     * <p>
+     * Containers may use this method to convert the header values obtained
+     * from the {@link #getHttpHeaders}
+     * 
+     * @param headerValue the header value as an object
+     * @return the string value
+     */
+    @SuppressWarnings("unchecked")
+    public static String getHeaderValue(Object headerValue) {
+        HeaderDelegate hp = rd.createHeaderDelegate(headerValue.getClass());
+        return hp.toString(headerValue);
+    }
+    
+    /**
+     * Write the response.
+     * <p>
+     * The status and headers will be written by calling the method
+     * {@link ContainerResponseWriter#writeStatusAndHeaders} on the provided
+     * {@link ContainerResponseWriter} instance. The {@link OutputStream}
+     * returned from that method call is used to write the entity (if any)
+     * to that {@link OutputStream}. An appropriate {@link MessageBodyWriter}
+     * will be found to write the entity.
+     * 
+     * @throws WebApplicationException if {@link MessageBodyWriter} cannot be 
+     *         found for the entity with a 406 (Not Acceptable) response.
+     * @throws java.io.IOException if there is an error writing the entity
+     */
+    @SuppressWarnings("unchecked")
+    public void write() throws IOException {
+        if (isCommitted)
+            return;
+        
+        if (entity == null) {
+            responseWriter.writeStatusAndHeaders(-1, this);
+            return;
+        }
+        
+        MediaType contentType = getContentType();
+        if (contentType == null) {
+            List<MediaType> mts = bodyContext.getMessageBodyWriterMediaTypes(
+                    entity.getClass(), null, null);
+            contentType = request.getAcceptableMediaType(mts);
+            if (contentType.isWildcardType() || contentType.isWildcardSubtype())
+                contentType = MediaType.APPLICATION_OCTET_STREAM_TYPE;
+            
+            getHttpHeaders().putSingle("Content-Type", contentType);
+        }
+        
+        final MessageBodyWriter p = bodyContext.getMessageBodyWriter(
+                entity.getClass(), null, 
+                null, contentType);
+        // If there is no message body writer return a Not Acceptable response
+        if (p == null) {
+            LOGGER.severe("A message body reader for Java type, " + entity.getClass() + 
+                    ", and MIME media type, " + contentType + ", was not found");    
+            
+            throw new WebApplicationException(
+                    Responses.notAcceptable().build());
+        }
+        
+        isCommitted = true;
+        OutputStream os = responseWriter.writeStatusAndHeaders(-1, this);        
+        p.writeTo(entity, entity.getClass(), null, null, 
+                contentType, getHttpHeaders(), os);
+    }
+
+    /**
+     * Reset the response to 204 (No content) with no headers.
+     */
+    public void reset() {
+        setResponse(Responses.noContent().build());
+    }
+    
+    // HttpResponseContext
+    
+    public Response getResponse() {
+        return response;
+    }
+    
+    public void setResponse(Response response) {
+        setResponse(response, null);
+    }
+    
+    public void setResponse(Response r, MediaType contentType) {
+        this.isCommitted = false;
+        this.out = null;
+        this.response = r = (r != null) ? r : Responses.noContent().build();
+        
+        this.status = r.getStatus();
+        this.entity = r.getEntity();
+        
+        // If HTTP method is HEAD then there should be no entity
+        if (request.getHttpMethod().equals("HEAD"))
+            this.entity = null;
+        // Otherwise if there is no entity then there should be no content type
+        else if (this.entity == null) {
+            contentType = null;
+        }
+ 
+        if (r instanceof ResponseImpl) {
+            this.headers = setResponseOptimal((ResponseImpl)r, contentType);
+        } else {
+            this.headers = setResponseNonOptimal(r, contentType);
+        }
+    }
+    
+    public boolean isResponseSet() {
+        return response != null;
+    }
+    
+    public int getStatus() {
+        return status;
+    }
+    
+    public void setStatus(int status) {
+        this.status = status;
+    }
+    
+    public Object getEntity() {
+        return entity;
+    }
+    
+    public void setEntity(Object entity) {
+        this.entity = entity;
+        checkStatusAndEntity();
+    }
+    
+    public MultivaluedMap<String, Object> getHttpHeaders() {
+        if (headers == null)
+            headers = new OutBoundHeaders();
+        return headers;
+    }
+    
+    public OutputStream getOutputStream() throws IOException {
+        if (out == null)
+            out = new CommittingOutputStream();
+        
+        return out;
+    }
+    
+    public boolean isCommitted() {
+        return isCommitted;
+    }
+    
+    
+    //
+    
+    
+    private MediaType getContentType() {        
+        final Object mediaTypeHeader = getHttpHeaders().getFirst("Content-Type");
+        if (mediaTypeHeader instanceof MediaType) {
+            return (MediaType)mediaTypeHeader;
+        } else if (mediaTypeHeader != null) {
+            return MediaType.valueOf(mediaTypeHeader.toString());
+        }
+    
+        return null;
+    }
+    
+    private void checkStatusAndEntity() {
+        if (status == 204 && entity != null) status = 200;
+        else if (status == 200 && entity == null) status = 204;
+    }
+    
+    private MultivaluedMap<String, Object> setResponseOptimal(ResponseImpl r, MediaType contentType) {
+        return r.getMetadataOptimal(request, contentType);
+    }
+    
+    private MultivaluedMap<String, Object> setResponseNonOptimal(Response r, MediaType contentType) {
+        MultivaluedMap<String, Object> _headers = r.getMetadata();
+        
+        if (_headers.getFirst("Content-Type") == null && contentType != null) {
+            _headers.putSingle("Content-Type", contentType);
+        }
+        
+        Object location = _headers.getFirst("Location");
+        if (location != null) {
+            if (location instanceof URI) {
+                URI absoluteLocation = request.getBaseUri().resolve((URI)location);
+                _headers.putSingle("Location", absoluteLocation);
+            }
+        }
+        
+        return _headers;
+    }
 }

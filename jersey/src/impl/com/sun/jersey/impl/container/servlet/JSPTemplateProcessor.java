@@ -37,14 +37,15 @@
 
 package com.sun.jersey.impl.container.servlet;
 
-import com.sun.jersey.impl.container.servlet.HttpResponseAdaptor;
-import com.sun.jersey.api.core.HttpContext;
-import com.sun.jersey.api.core.HttpResponseContext;
+import com.sun.jersey.api.container.ContainerException;
 import com.sun.jersey.spi.template.TemplateProcessor;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.MalformedURLException;
+import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletContext;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.core.Context;
 
 /**
@@ -55,8 +56,14 @@ import javax.ws.rs.core.Context;
 public class JSPTemplateProcessor implements TemplateProcessor {
     @Context ServletContext servletContext;
 
-    public JSPTemplateProcessor() {
-        Class<?> c = ServletContext.class;
+    private final ThreadLocal<HttpServletRequest> requestInvoker;
+    
+    private final ThreadLocal<HttpServletResponse> responseInvoker;
+    
+    public JSPTemplateProcessor(ThreadLocal<HttpServletRequest> requestInvoker,
+            ThreadLocal<HttpServletResponse> responseInvoker) {
+        this.requestInvoker = requestInvoker;
+        this.responseInvoker = responseInvoker;
     }
     
     public String resolve(String path) {
@@ -79,10 +86,19 @@ public class JSPTemplateProcessor implements TemplateProcessor {
         return path;        
     }
 
-    @Context HttpContext hca;
-    
     public void writeTo(String resolvedPath, Object model, OutputStream out) throws IOException {
-        HttpResponseContext response = hca.getResponse();
-        ((HttpResponseAdaptor)response).forwardTo(resolvedPath, model);
+        RequestDispatcher d = servletContext.getRequestDispatcher(resolvedPath);
+        if (d == null) {
+            throw new ContainerException("No request dispatcher for: " + resolvedPath);
+        }
+        
+        d = new RequestDispatcherWrapper(d, model);
+        
+        try {
+            d.forward(requestInvoker.get(), responseInvoker.get());
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new ContainerException(e);
+        }
     }
 }

@@ -56,6 +56,10 @@ public class ThreadLocalInvoker<T> implements InvocationHandler {
         return this.threadLocalInstance.get();
     }
     
+    public ThreadLocal<T> getThreadLocal() {
+        return threadLocalInstance;
+    }
+    
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
         if (threadLocalInstance.get() == null)
             return null;

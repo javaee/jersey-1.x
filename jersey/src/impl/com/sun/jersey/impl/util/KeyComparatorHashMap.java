@@ -185,6 +185,20 @@ public class KeyComparatorHashMap<K,V>
         putAllForCreate(m);
     }
 
+    //
+    
+    /**
+     * Get the number of times this HashMap has been structurally modified
+     * Structural modifications are those that change the number of mappings in
+     * the HashMap or otherwise modify its internal structure (e.g.,
+     * rehash).
+     * 
+     * @return return the modification count.
+     */
+    public int getModCount() {
+        return modCount;
+    }    
+    
     // internal utilities
 
     /**

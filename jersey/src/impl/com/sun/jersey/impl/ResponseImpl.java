@@ -38,6 +38,7 @@
 package com.sun.jersey.impl;
 
 import com.sun.jersey.api.core.HttpRequestContext;
+import com.sun.jersey.impl.container.OutBoundHeaders;
 import java.net.URI;
 import java.util.Iterator;
 import java.util.List;
@@ -82,7 +83,7 @@ public final class ResponseImpl extends Response {
         if (headers != null)
             return headers;
         
-        headers = new ResponseHttpHeadersImpl();
+        headers = new OutBoundHeaders();
         
         for (int i = 0; i < values.length; i++)
             if (values[i] != null)
@@ -101,7 +102,7 @@ public final class ResponseImpl extends Response {
         if (headers != null)
             return headers;
         
-        headers = new ResponseHttpHeadersImpl();
+        headers = new OutBoundHeaders();
 
         if (values.length == 0 && contentType != null) {
             headers.putSingle(ResponseBuilderImpl.

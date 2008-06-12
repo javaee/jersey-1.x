@@ -34,7 +34,6 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-
 package com.sun.jersey.api.core;
 
 import java.io.IOException;
@@ -44,10 +43,10 @@ import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 
 /**
- * Encapsulates the response to a HTTP request.
+ * An abstraction of a HTTP response.
  * <p>
- * The default state of a response is a HTTP response with a status code of 204 
- * (OK) with no HTTP response headers and no entity.
+ * The default state is a HTTP response with a status code of 204 
+ * (No Content) with no headers and entity.
  */
 public interface HttpResponseContext {
 
@@ -61,23 +60,18 @@ public interface HttpResponseContext {
     /**
      * Set the response state from a Response instance. This replaces a 
      * pre-existing response state.
-     * <p>
-     * If an entity is set but there is no MIME media type declared for the 
-     * Content-Type response header then the MIME media type will be set to 
-     * "application/octet-stream".
      *
      * @param response the response.
      */
     void setResponse(Response response);
     
     /**
-     * Set the response state from a Response instance. This replaces a 
+     * Set the response state from a Response instance. This replaces any 
      * pre-existing response state.
      *
      * @param response the response.
-     * @param contentType the MIME media type to use fot the Content-Type response
-     *        header if the header is not set by the response. If null then
-     *        "application/octet-stream" will be used.
+     * @param contentType the MIME media type to use for the Content-Type response
+     *        header if the header is not set by the response.
      */
     void setResponse(Response response, MediaType contentType);
 
@@ -89,41 +83,41 @@ public interface HttpResponseContext {
     boolean isResponseSet();
     
     /**
-     * Get the status of the response.
+     * @return the status of the response
      */
     int getStatus();
     
     /**
      * Set the status of the response.
+     * @param status the status.
      */
     void setStatus(int status);
     
     /**
-     * Get the entity of the response
+     * @return the entity of the response.
      */
     Object getEntity();
     
     /**
      * Set the entity of the response
+     * @param entity the entity.
      */
     void setEntity(Object entity);
     
     /**
-     * Get the HTTP response headers. The returned map is case-insensitive wrt
-     * keys. Note that <code>setHttpResponse</code> can change the HTTP response
-     * headers and may overwrite headers set previously.
+     * Get the HTTP response headers. The returned map is case-insensitive
+     * with respect to the keys (header values). The method {@link #setResponse} 
+     * will replace any headers previously set.
      *
-     * @return a mutable map of HTTP header names and values that will be
-     * included in the response. Any headers explicitly set will override
-     * automatically generated values.
+     * @return a mutable map of headerd.
      */
     MultivaluedMap<String, Object> getHttpHeaders();
     
     /**
-     * Get an OutputStream to which an entity may be written.
+     * Get an {@link OutputStream} to which an entity may be written.
      * <p>
-     * The first byte written will cause the status code and headers 
-     * (if any) to be committed to the underlying container.
+     * The first byte written will result in the writing of thethe status code 
+     * and headers.
      *
      * @return the output stream
      * @throws java.io.IOException if an IO error occurs
@@ -131,10 +125,10 @@ public interface HttpResponseContext {
     OutputStream getOutputStream() throws IOException;
     
     /**
-     * Ascertain if a response has been committed to an underlying container.
+     * Ascertain if a response has been committed to the container.
      * <p>
-     * A response is committed if the status code, headers (if any) have been
-     * committed to the underlying container.
+     * A response is committed if the status code, headers have been
+     * written to the container.
      *  
      * @return true if the response has been committed.
      */

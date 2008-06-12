@@ -42,20 +42,28 @@ import com.sun.jersey.api.core.ApplicationConfigAdapter;
 import com.sun.jersey.api.core.ResourceConfig;
 import com.sun.jersey.impl.ThreadLocalInvoker;
 import com.sun.jersey.api.core.ClasspathResourceConfig;
-import com.sun.jersey.impl.container.servlet.HttpRequestAdaptor;
-import com.sun.jersey.impl.container.servlet.HttpResponseAdaptor;
+import com.sun.jersey.api.uri.UriComponent;
+import com.sun.jersey.impl.container.servlet.JSPTemplateProcessor;
+import com.sun.jersey.impl.container.servlet.ServletContainerRequest;
 import com.sun.jersey.spi.container.ContainerListener;
 import com.sun.jersey.spi.container.ContainerNotifier;
+import com.sun.jersey.spi.container.ContainerRequest;
+import com.sun.jersey.spi.container.ContainerResponse;
+import com.sun.jersey.spi.container.ContainerResponseWriter;
+import com.sun.jersey.spi.container.InBoundHeaders;
 import com.sun.jersey.spi.container.WebApplication;
 import com.sun.jersey.spi.container.WebApplicationFactory;
 import com.sun.jersey.spi.inject.SingletonTypeInjectableProvider;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Proxy;
 import java.lang.reflect.Type;
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import javax.servlet.ServletConfig;
@@ -67,6 +75,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.core.ApplicationConfig;
 import javax.ws.rs.core.Context;
+import javax.ws.rs.core.MultivaluedMap;
+import javax.ws.rs.core.UriBuilder;
 
 
 /**
@@ -143,17 +153,77 @@ public class ServletContainer extends HttpServlet implements ContainerListener {
         }        
     }
     
+    private final static class Writer extends OutputStream implements ContainerResponseWriter {
+        final HttpServletResponse response;
+        
+        Writer(HttpServletResponse response) {
+            this.response = response;
+        }
+
+        public OutputStream writeStatusAndHeaders(long contentLength, 
+                ContainerResponse cResponse) throws IOException {
+            response.setStatus(cResponse.getStatus());
+            if (contentLength != -1 && contentLength < Integer.MAX_VALUE) 
+                response.setContentLength((int)contentLength);
+        
+            MultivaluedMap<String, Object> headers = cResponse.getHttpHeaders();
+            for (Map.Entry<String, List<Object>> e : headers.entrySet()) {
+                for (Object v : e.getValue()) {
+                    response.addHeader(e.getKey(), ContainerResponse.getHeaderValue(v));
+                }
+            }
+            
+            return this;
+        }
+        
+        OutputStream out;
+        
+        public void write(int b) throws IOException {
+            initiate();
+            out.write(b);
+        }
+
+        @Override
+        public void write(byte b[]) throws IOException {
+            initiate();
+            out.write(b);
+        }
+
+        @Override
+        public void write(byte b[], int off, int len) throws IOException {
+            initiate();
+            out.write(b, off, len);
+        }
+
+        @Override
+        public void flush() throws IOException {
+            initiate();
+            out.flush();
+        }
+
+        @Override
+        public void close() throws IOException {
+            initiate();
+            out.close();
+        }
+        
+        void initiate() throws IOException {
+            if (out == null)
+                out = response.getOutputStream();
+        }        
+    }
+    
     @Override
-    public void service(HttpServletRequest req, HttpServletResponse resp)
+    public void service(HttpServletRequest request, HttpServletResponse response)
     throws ServletException, IOException {
         /**
          * There is an annoying edge case where the service method is
          * invoked for the case when the URI is equal to the deployment URL
          * minus the '/', for example http://locahost:8080/HelloWorldWebApp
          */
-        if (req.getPathInfo() != null && 
-                req.getPathInfo().equals("/") && !req.getRequestURI().endsWith("/")) {
-            resp.setStatus(404);
+        if (request.getPathInfo() != null && 
+                request.getPathInfo().equals("/") && !request.getRequestURI().endsWith("/")) {
+            response.setStatus(404);
             return;            
         }
         
@@ -162,41 +232,85 @@ public class ServletContainer extends HttpServlet implements ContainerListener {
         // request
         final WebApplication _application = application;
         
-        HttpRequestAdaptor requestAdaptor = new HttpRequestAdaptor(
-                _application, 
-                req);
         
-        HttpResponseAdaptor responseAdaptor = new HttpResponseAdaptor(
-                context, 
-                resp, 
-                req, 
-                _application, 
-                requestAdaptor);
+        /**
+         * The HttpServletRequest.getRequestURL() contains the complete URI
+         * minus the query and fragment components.
+         */
+        UriBuilder absoluteUriBuilder = UriBuilder.fromUri(
+                request.getRequestURL().toString());
+        
+        /**
+         * The HttpServletRequest.getPathInfo() and 
+         * HttpServletRequest.getServletPath() are in decoded form.
+         *
+         * On some servlet implementations the getPathInfo() removed
+         * contiguous '/' characters. This is problematic if URIs
+         * are embedded, for example as the last path segment.
+         * We need to work around this and not use getPathInfo
+         * for the decodedPath.
+         */
+        final String decodedBasePath = (request.getPathInfo() != null)
+            ? request.getContextPath() + request.getServletPath() + "/"
+            : request.getContextPath() + "/";
+        
+        final String encodedBasePath = UriComponent.encode(decodedBasePath, 
+                UriComponent.Type.PATH);
+        
+        if (!decodedBasePath.equals(encodedBasePath)) {
+            throw new ContainerException("The servlet context path and/or the " +
+                    "servlet path contain characters that are percent enocded");
+        }
+        
+        final URI baseUri = absoluteUriBuilder.encode(false).
+                replacePath(encodedBasePath).
+                build();
+        
+        String queryParameters = request.getQueryString();
+        if (queryParameters == null) queryParameters = "";
+        
+        final URI requestUri = absoluteUriBuilder.encode(false).
+                replacePath(request.getRequestURI()).
+                replaceQueryParams(queryParameters).
+                build();
+        
+        final ContainerRequest cRequest = new ServletContainerRequest(
+                request,
+                _application,
+                request.getMethod(),
+                baseUri,
+                requestUri,
+                getHeaders(request),
+                request.getInputStream());
         
         try {
-            // save thread locals for use in injection
-            requestInvoker.set(req);
-            responseInvoker.set(resp);
-            _application.handleRequest(requestAdaptor, responseAdaptor);
+            requestInvoker.set(request);
+            responseInvoker.set(response);
+            
+            _application.handleRequest(cRequest, new Writer(response));
         } catch (ContainerException e) {
             throw new ServletException(e);
         } finally {
             requestInvoker.set(null);
             responseInvoker.set(null);
-        }
-        
-        // Let all other runtime exceptions be handled by the servlet container
-        // Those exceptions will be bugs
-        
-        responseAdaptor.commitAll();
-        
-        if (responseAdaptor.getRequestDispatcher() != null) {
-            // For some odd reason forward can only be called from the
-            // same class as the servlet
-            responseAdaptor.getRequestDispatcher().forward(req, resp);
-        }
+        }        
     }
     
+    @SuppressWarnings("unchecked")
+    private InBoundHeaders getHeaders(HttpServletRequest request) {
+        InBoundHeaders rh = new InBoundHeaders();   
+        
+        for (Enumeration<String> names = request.getHeaderNames() ; names.hasMoreElements() ;) {
+            String name = names.nextElement();
+            List<String> valueList = new LinkedList<String>();
+            for (Enumeration<String> values = request.getHeaders(name); values.hasMoreElements() ;) {
+                valueList.add(values.nextElement());
+            }
+            rh.put(name, valueList);
+        }
+        
+        return rh;
+    }
     
     private ResourceConfig createResourceConfig(ServletConfig servletConfig) 
             throws ServletException {        
@@ -400,6 +514,10 @@ public class ServletContainer extends HttpServlet implements ContainerListener {
         rc.getProviderInstances().add(new ContextInjectableProvider<ServletContext>(
                 ServletContext.class, 
                 sc.getServletContext()));
+        
+        rc.getProviderInstances().add(new JSPTemplateProcessor(
+                requestInvoker.getThreadLocal(), 
+                responseInvoker.getThreadLocal()));
     }
     
     /**

@@ -37,7 +37,7 @@
 
 package com.sun.jersey.impl.client.urlconnection;
 
-import com.sun.jersey.impl.RequestHttpHeadersImpl;
+import com.sun.jersey.spi.container.InBoundHeaders;
 import com.sun.jersey.api.client.ClientHandler;
 import com.sun.jersey.api.client.ClientHandlerException;
 import com.sun.jersey.api.client.ClientRequest;
@@ -77,7 +77,7 @@ public final class URLConnectionClientHandler implements ClientHandler {
         URLConnectionResponse(int status, HttpURLConnection uc) {
             this.status = status;
             this.uc = uc;
-            this.metadata = new RequestHttpHeadersImpl();
+            this.metadata = new InBoundHeaders();
             
             for (Map.Entry<String, List<String>> e : uc.getHeaderFields().entrySet()) {
                 if (e.getKey() != null)

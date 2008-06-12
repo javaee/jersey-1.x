@@ -35,46 +35,35 @@
  * holder.
  */
 
-package com.sun.jersey.impl;
+package com.sun.jersey.impl.container.servlet;
 
-import com.sun.jersey.spi.container.AbstractContainerResponse;
-import com.sun.jersey.spi.container.ContainerRequest;
-import com.sun.jersey.spi.container.WebApplication;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
+import javax.servlet.RequestDispatcher;
+import javax.servlet.ServletException;
+import javax.servlet.ServletRequest;
+import javax.servlet.ServletResponse;
 
 /**
  *
  * @author Paul.Sandoz@Sun.Com
  */
-public class TestHttpResponseContext extends AbstractContainerResponse {
+public final class RequestDispatcherWrapper implements RequestDispatcher {
+    private final RequestDispatcher d;
+    private final Object it;
 
-    private ByteArrayOutputStream baos = new ByteArrayOutputStream();
-    
-    public TestHttpResponseContext(WebApplication wa, 
-            ContainerRequest requestContext) {
-        super(wa, requestContext);
-    }
-    
-    protected OutputStream getUnderlyingOutputStream() throws IOException {
-        return baos;
+    public RequestDispatcherWrapper(RequestDispatcher d, Object it) {
+        this.d = d;
+        this.it = it;
     }
 
-    protected void commitStatusAndHeaders(long contentLength) throws IOException {
-    }
-    
-    public void commitAll() throws IOException {
-        if (isCommitted()) return;
-        
-        writeEntity();
+    public void forward(ServletRequest req, ServletResponse rsp) throws ServletException, IOException {
+        req.setAttribute("it", it);
+        req.setAttribute("_request", req);
+        req.setAttribute("_response", rsp);
+        d.forward(req,rsp);
     }
 
-    public ByteArrayOutputStream getUnderlyingByteArrayOutputStream() {
-        return baos;
-    }
-    
-    public byte[] getEntityAsByteArray() {
-        return baos.toByteArray();
+    public void include(ServletRequest req, ServletResponse rsp) throws ServletException, IOException {
+        throw new UnsupportedOperationException();
     }
 }

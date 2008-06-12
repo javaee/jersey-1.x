@@ -40,6 +40,7 @@ import com.sun.jersey.api.NotFoundException;
 import com.sun.jersey.spi.resource.InjectableProviderContext;
 import com.sun.jersey.spi.inject.Injectable;
 import com.sun.jersey.spi.inject.InjectableContext;
+import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.lang.reflect.Constructor;
@@ -107,6 +108,7 @@ import com.sun.jersey.impl.wadl.WadlResource;
 import com.sun.jersey.spi.container.ExtendedMessageBodyWorkers;
 import com.sun.jersey.spi.container.ContainerRequest;
 import com.sun.jersey.spi.container.ContainerResponse;
+import com.sun.jersey.spi.container.ContainerResponseWriter;
 import com.sun.jersey.spi.container.WebApplication;
 import com.sun.jersey.spi.inject.InjectableProvider;
 import com.sun.jersey.spi.inject.SingletonTypeInjectableProvider;
@@ -590,7 +592,16 @@ public final class WebApplicationImpl implements WebApplication {
         return resourceProvider;
     }
     
-    public void handleRequest(ContainerRequest request, ContainerResponse response) {
+    public void handleRequest(ContainerRequest request, ContainerResponseWriter responseWriter) 
+            throws IOException {
+        final ContainerResponse response = new ContainerResponse(
+                this,
+                request,
+                responseWriter);
+        handleRequest(request, response);
+    }
+    
+    public void handleRequest(ContainerRequest request, ContainerResponse response) throws IOException {
         final WebApplicationContext localContext = new WebApplicationContext(this, request, response);
         context.set(localContext);
 
@@ -602,6 +613,7 @@ public final class WebApplicationImpl implements WebApplication {
             if (uri != normalizedUri &&
                     resourceConfig.getFeature(ResourceConfig.FEATURE_REDIRECT)) {
                 response.setResponse(Response.temporaryRedirect(normalizedUri).build());
+                response.write();
                 return;
             }
         }
@@ -628,17 +640,22 @@ public final class WebApplicationImpl implements WebApplication {
                 throw new NotFoundException();
             }
         } catch (WebApplicationException e) {
-            if (e.getResponse().getEntity() != null) {
-                onException(e, e.getResponse(), response);
-            } else {
-                if (!mapException(e, response)) {
-                    onException(e, e.getResponse(), response);                    
-                }
-            }
+            mapWebApplicationException(e, response);
         } catch (ContainerCheckedException e) {
             if (!mapException(e.getCause(), response)) throw e;
         } catch (RuntimeException e) {
             if (!mapException(e, response)) throw e;
+        }
+     
+        try {
+            response.write();
+        } catch (WebApplicationException e) {
+            if (response.isCommitted()) {
+                throw e;
+            } else {
+                mapWebApplicationException(e, response);
+                response.write();
+            }
         }
     }
 
@@ -826,6 +843,17 @@ public final class WebApplicationImpl implements WebApplication {
                 i);
     }
 
+    private void mapWebApplicationException(WebApplicationException e, 
+            HttpResponseContext response) {
+        if (e.getResponse().getEntity() != null) {
+            onException(e, e.getResponse(), response);
+        } else {
+            if (!mapException(e, response)) {
+                onException(e, e.getResponse(), response);                    
+            }
+        }
+    }
+    
     @SuppressWarnings("unchecked")
     private boolean mapException(Throwable e,
             HttpResponseContext response) {

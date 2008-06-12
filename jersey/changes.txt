@@ -1,4 +1,9 @@
 release 0.8 (2008-06-20 or 2008-07-25)
+- The container SPI is improved and simplified, see JavaDoc of:
+    com.sun.jersey.spi.container.ContainerRequest
+    com.sun.jersey.spi.container.InBoundHeaders
+    com.sun.jersey.spi.container.ContainerResponse
+    com.sun.jersey.spi.container.ContainerWriter
 - Removed WebApplication.addInjectable, use the following instead:
     ResourceConfig.getProviderInstances().add()
 - Instances of provider classes can be declared by the application by adding

@@ -40,13 +40,25 @@ package com.sun.jersey.impl.container.httpserver;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import com.sun.jersey.api.container.ContainerException;
-import com.sun.jersey.api.core.HttpResponseContext;
 import com.sun.jersey.spi.container.ContainerListener;
+import com.sun.jersey.spi.container.ContainerRequest;
+import com.sun.jersey.spi.container.ContainerResponse;
+import com.sun.jersey.spi.container.ContainerResponseWriter;
+import com.sun.jersey.spi.container.InBoundHeaders;
 import com.sun.jersey.spi.container.WebApplication;
+import com.sun.net.httpserver.Headers;
+import com.sun.net.httpserver.HttpServer;
+import com.sun.net.httpserver.HttpsServer;
 import java.io.IOException;
-import java.io.PrintWriter;
-import java.io.StringWriter;
-import javax.ws.rs.core.Response;
+import java.io.OutputStream;
+import java.net.InetSocketAddress;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import javax.ws.rs.core.UriBuilder;
 
 /**
  * A {@link HttpHandler} for a {@link WebApplicationImpl}.
@@ -61,50 +73,114 @@ public class HttpHandlerContainer implements HttpHandler, ContainerListener {
         this.application = app;
     }
     
-    public void handle(HttpExchange httpExchange) throws IOException {
-        WebApplication _application = application;
+    private final static class Writer implements ContainerResponseWriter {
+        final HttpExchange exchange;
         
-        HttpServerRequestAdaptor requestAdaptor = 
-                new HttpServerRequestAdaptor(
-                _application, 
-                httpExchange);
-        HttpServerResponseAdaptor responseAdaptor = 
-                new HttpServerResponseAdaptor(httpExchange,
-                _application, 
-                requestAdaptor);
-        
-        try {
-            _application.handleRequest(requestAdaptor, responseAdaptor);
-        } catch (ContainerException e) {
-            onException(e, responseAdaptor);
-        } catch (RuntimeException e) {
-            // Unexpected error associated with the runtime
-            // This is a bug
-            onException(e, responseAdaptor);            
+        Writer(HttpExchange exchange) {
+            this.exchange = exchange;
         }
         
-        try {
-            responseAdaptor.commitAll();
-        } catch (RuntimeException e) {
-            e.printStackTrace();
-            throw e;
+        public OutputStream writeStatusAndHeaders(long contentLength, 
+                ContainerResponse cResponse) throws IOException {
+            Headers eh = exchange.getResponseHeaders();
+            for (Map.Entry<String, List<Object>> e : cResponse.getHttpHeaders().entrySet()) {
+                List<String> values = new ArrayList<String>();
+                for (Object v : e.getValue())
+                    values.add(ContainerResponse.getHeaderValue(v));
+                eh.put(e.getKey(), values);
+            }
+            
+            if (cResponse.getEntity() == null && !cResponse.isCommitted()) {
+                exchange.sendResponseHeaders(cResponse.getStatus(), -1);                
+            } else {
+                exchange.sendResponseHeaders(cResponse.getStatus(), 
+                        contentLength == -1 ? 0 : contentLength);                
+            }
+            
+            return exchange.getResponseBody();
         }
     }
     
-    private static void onException(Exception e, HttpResponseContext response) {
-        // Log the stack trace
-        e.printStackTrace();
+    public void handle(HttpExchange exchange) throws IOException {
+        WebApplication _application = application;
+                
+        /**
+         * This is a URI that contains the path, query and
+         * fragment components.
+         */
+        URI exchangeUri = exchange.getRequestURI();
+        
+        /**
+         * The base path specified by the HTTP context of the HTTP handler.
+         * It is in decoded form.
+         */
+        String decodedBasePath = exchange.getHttpContext().getPath();
+        
+        // Ensure that the base path ends with a '/'
+        if (!decodedBasePath.endsWith("/")) {
+            if (decodedBasePath.equals(exchangeUri.getPath())) {
+                /**
+                 * This is an edge case where the request path
+                 * does not end in a '/' and is equal to the context 
+                 * path of the HTTP handler.
+                 * Both the request path and base path need to end in a '/'
+                 * Currently the request path is modified.
+                 * TODO support redirection in accordance with resource
+                 * configuration feature.
+                 */
+                exchangeUri = UriBuilder.fromUri(exchangeUri).
+                        path("/").build();
+            }
+            decodedBasePath += "/";                
+        }
 
-        // Write out the exception to a string
-        StringWriter sw = new StringWriter();
-        PrintWriter pw = new PrintWriter(sw);
-        e.printStackTrace(pw);
-        pw.flush();
-
-        response.setResponse(Response.serverError().
-                entity(sw.toString()).type("text/plain").build());
+        /*
+         * The following is madness, there is no easy way to get 
+         * the complete URI of the HTTP request!!
+         *
+         * TODO this is missing the user information component, how
+         * can this be obtained?
+         */
+        HttpServer server = exchange.getHttpContext().getServer();
+        String scheme = (server instanceof HttpsServer) ? "https" : "http";
+        InetSocketAddress addr = exchange.getLocalAddress();
+        URI baseUri = null;
+        try {
+            baseUri = new URI(scheme, null, addr.getHostName(), addr.getPort(), 
+                    decodedBasePath, null, null);
+        } catch (URISyntaxException ex) {
+            throw new IllegalArgumentException(ex);
+        }
+            
+        final URI requestUri = baseUri.resolve(exchangeUri);
+                        
+        final ContainerRequest cRequest = new ContainerRequest(
+                _application,
+                exchange.getRequestMethod(),
+                baseUri,
+                requestUri,
+                getHeaders(exchange),
+                exchange.getRequestBody()
+                );
+        
+        _application.handleRequest(cRequest, new Writer(exchange));
+                
+        exchange.getResponseBody().flush();
+        exchange.getResponseBody().close();
+        exchange.close();                    
     }
-
+    
+    private InBoundHeaders getHeaders(HttpExchange exchange) {
+        InBoundHeaders rh = new InBoundHeaders();
+        
+        Headers eh = exchange.getRequestHeaders();
+        for (Entry<String, List<String>> e : eh.entrySet()) {
+            rh.put(e.getKey(), e.getValue());
+        }
+        
+        return rh;
+    }
+    
     // ContainerListener
     
     public void onReload() {

@@ -37,7 +37,7 @@
 
 package com.sun.jersey.impl;
 
-import com.sun.jersey.impl.RequestHttpHeadersImpl;
+import com.sun.jersey.spi.container.InBoundHeaders;
 import junit.framework.*;
 
 /**
@@ -52,7 +52,7 @@ public class HttpHeadersTest extends TestCase {
     
     
     public void testGet() {
-        RequestHttpHeadersImpl h = new RequestHttpHeadersImpl();
+        InBoundHeaders h = new InBoundHeaders();
         
         h.add("Content-Type", "value");
         
@@ -63,7 +63,7 @@ public class HttpHeadersTest extends TestCase {
     }
     
     public void testPut() {
-        RequestHttpHeadersImpl h = new RequestHttpHeadersImpl();
+        InBoundHeaders h = new InBoundHeaders();
         
         h.add("Content-Type", "value");
 
@@ -76,7 +76,7 @@ public class HttpHeadersTest extends TestCase {
     }
     
     public void testMoreGet() {
-        RequestHttpHeadersImpl h = new RequestHttpHeadersImpl();
+        InBoundHeaders h = new InBoundHeaders();
         
         for (int i = 0; i < 100; i++) {
             String key = generate(i);

@@ -40,19 +40,26 @@ package com.sun.jersey.impl.container.grizzly;
 import com.sun.grizzly.tcp.http11.GrizzlyRequest;
 import com.sun.grizzly.tcp.http11.GrizzlyResponse;
 import com.sun.jersey.api.container.ContainerException;
-import com.sun.jersey.api.core.HttpResponseContext;
 import com.sun.jersey.spi.container.WebApplication;
-import java.io.PrintWriter;
-import java.io.StringWriter;
+import java.io.OutputStream;
 import com.sun.grizzly.tcp.http11.GrizzlyAdapter;
 import com.sun.jersey.spi.container.ContainerListener;
+import com.sun.jersey.spi.container.ContainerRequest;
+import com.sun.jersey.spi.container.ContainerResponse;
+import com.sun.jersey.spi.container.ContainerResponseWriter;
+import com.sun.jersey.spi.container.InBoundHeaders;
 import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.Enumeration;
+import java.util.List;
+import java.util.Map;
 
 /**
  *
  * @author Marc.Hadley@Sun.Com
  */
-public class GrizzlyContainer extends GrizzlyAdapter implements ContainerListener {
+public final class GrizzlyContainer extends GrizzlyAdapter implements ContainerListener {
     
     private WebApplication application;
     
@@ -60,33 +67,58 @@ public class GrizzlyContainer extends GrizzlyAdapter implements ContainerListene
         this.application = app;
     }
 
-    public void service(GrizzlyRequest request, GrizzlyResponse response) {
-        GrizzlyResponseAdaptor responseAdaptor = null;
-        WebApplication _application = application;
+    private final static class Writer implements ContainerResponseWriter {
+        final GrizzlyResponse response;
         
-        try {
-            GrizzlyRequestAdaptor requestAdaptor = 
-                    new GrizzlyRequestAdaptor(_application, request);
-            responseAdaptor = 
-                    new GrizzlyResponseAdaptor(response, 
-                    _application, 
-                    requestAdaptor);
-        
-            _application.handleRequest(requestAdaptor, responseAdaptor);
-        } catch (IOException ex){
-            throw new RuntimeException(ex);
-        } catch (ContainerException e) {
-            onException(e, responseAdaptor);
-        } catch (RuntimeException e) {
-            // Unexpected error associated with the runtime
-            // This is a bug
-            onException(e, responseAdaptor);
+        Writer(GrizzlyResponse response) {
+            this.response = response;
         }
         
+        public OutputStream writeStatusAndHeaders(long contentLength, 
+                ContainerResponse cResponse) throws IOException {
+            response.setStatus(cResponse.getStatus());
+
+            if (contentLength != -1 && contentLength < Integer.MAX_VALUE) 
+                response.setContentLength((int)contentLength);
+
+            for (Map.Entry<String, List<Object>> e : cResponse.getHttpHeaders().entrySet()) {
+                for (Object value : e.getValue()) {
+                    response.addHeader(e.getKey(), ContainerResponse.getHeaderValue(value));
+                }
+            }
+
+            String contentType = response.getHeader("Content-Type");
+            if (contentType != null) {
+                response.setContentType(contentType);
+            }
+                
+            return response.getOutputStream();
+        }
+    }
+    
+    public void service(GrizzlyRequest request, GrizzlyResponse response) {
+        WebApplication _application = application;
+        
+        final URI baseUri = getBaseUri(request);
+        /*
+         * request.unparsedURI() is a URI in encoded form that contains
+         * the URI path and URI query components.
+         */
+        final URI requestUri = baseUri.resolve(
+                request.getRequest().unparsedURI().toString());
+        
         try {
-            responseAdaptor.commitAll();
-        } catch (Exception e) {
-            throw new RuntimeException(e);
+            final ContainerRequest cRequest = new ContainerRequest(
+                    _application, 
+                    request.getMethod(), 
+                    baseUri, 
+                    requestUri, 
+                    getHeaders(request), 
+                    request.getInputStream());
+            
+            _application.handleRequest(cRequest, new Writer(response));
+        } catch (IOException ex) {
+            throw new RuntimeException(ex);
         }
     }
 
@@ -94,21 +126,33 @@ public class GrizzlyContainer extends GrizzlyAdapter implements ContainerListene
             throws Exception {
     }
 
-    
-    private static void onException(Exception e, HttpResponseContext response) {
-        // Log the stack trace
-        e.printStackTrace();
-
-        // Write out the exception to a string
-        StringWriter sw = new StringWriter();
-        PrintWriter pw = new PrintWriter(sw);
-        e.printStackTrace(pw);
-        pw.flush();
-
-        response.setResponse(javax.ws.rs.core.Response.serverError().
-                entity(sw.toString()).type("text/plain").build());
+    private URI getBaseUri(GrizzlyRequest request) {
+        try {
+            return new URI(
+                    request.getScheme(), 
+                    null, 
+                    request.getServerName(), 
+                    request.getServerPort(), 
+                    "/", 
+                    null, null);
+        } catch (URISyntaxException ex) {
+            throw new IllegalArgumentException(ex);
+        }
     }
-
+    
+    private InBoundHeaders getHeaders(GrizzlyRequest request) {
+        InBoundHeaders rh = new InBoundHeaders();
+        
+        Enumeration names = request.getHeaderNames();
+        while (names.hasMoreElements()) {
+            String name = (String)names.nextElement();
+            String value = request.getHeader(name);
+            rh.add(name, value);
+        }
+        
+        return rh;
+    }
+    
     // ContainerListener
     
     public void onReload() {

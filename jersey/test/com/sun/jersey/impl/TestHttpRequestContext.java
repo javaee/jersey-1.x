@@ -37,7 +37,8 @@
 
 package com.sun.jersey.impl;
 
-import com.sun.jersey.spi.container.AbstractContainerRequest;
+import com.sun.jersey.spi.container.ContainerRequest;
+import com.sun.jersey.spi.container.InBoundHeaders;
 import com.sun.jersey.spi.container.WebApplication;
 import java.io.InputStream;
 import java.net.URI;
@@ -46,20 +47,15 @@ import java.net.URI;
  *
  * @author Paul.Sandoz@Sun.Com
  */
-public class TestHttpRequestContext extends AbstractContainerRequest {
+public class TestHttpRequestContext extends ContainerRequest {
     
-    public TestHttpRequestContext(WebApplication wa, 
-            String method, InputStream entity, 
-            String completeUri, String baseUri)  {
-        this(wa, method, entity, 
-                URI.create(completeUri), URI.create(baseUri));
-    }
-    
-    public TestHttpRequestContext(WebApplication wa,
-            String method, InputStream entity, 
-            URI completeUri, URI baseUri)  {
-        super(wa, method, entity);
-        this.completeUri = completeUri;
-        this.baseUri = baseUri;
+    public TestHttpRequestContext(
+            WebApplication wa, 
+            String method, 
+            InputStream entity, 
+            String completeUri, 
+            String baseUri)  {
+        
+        super(wa, method, URI.create(baseUri), URI.create(completeUri), new InBoundHeaders(), entity);
     }
 }

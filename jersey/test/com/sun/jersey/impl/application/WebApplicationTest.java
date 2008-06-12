@@ -37,16 +37,20 @@
 
 package com.sun.jersey.impl.application;
 
-import com.sun.jersey.impl.application.WebApplicationImpl;
+import com.sun.jersey.api.container.ContainerException;
 import com.sun.jersey.api.core.HttpResponseContext;
 import com.sun.jersey.api.core.HttpRequestContext;
 import com.sun.jersey.api.core.ResourceConfig;
-import com.sun.jersey.spi.container.AbstractContainerRequest;
-import com.sun.jersey.spi.container.AbstractContainerResponse;
-import com.sun.jersey.impl.TestHttpRequestContext;
-import com.sun.jersey.impl.TestHttpResponseContext;
 import com.sun.jersey.api.core.DefaultResourceConfig;
+import com.sun.jersey.spi.container.ContainerRequest;
+import com.sun.jersey.spi.container.ContainerResponse;
+import com.sun.jersey.spi.container.ContainerResponseWriter;
+import com.sun.jersey.spi.container.InBoundHeaders;
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.net.URI;
 import java.util.HashSet;
 import java.util.Set;
 import javax.ws.rs.GET;
@@ -170,22 +174,32 @@ public class WebApplicationTest extends TestCase {
     }
     
     public void call(WebApplicationImpl a, String method, String path, String content) {
-        // Make the path relative to the base URI
-        String relativePath = (path.length() > 0 && path.charAt(0) == '/') 
-            ? path.substring(1) : path;
-
         ByteArrayInputStream e = new ByteArrayInputStream(content.getBytes());
-        AbstractContainerRequest request = new TestHttpRequestContext(
+        final ContainerRequest request = new ContainerRequest(
                 a, 
                 method, 
-                e, 
-                path, 
-                "/");
-        AbstractContainerResponse response = new TestHttpResponseContext(
-                a, 
-                request);
+                URI.create("/"),
+                URI.create(path),
+                new InBoundHeaders(),
+                e
+                );
+        
+        final ContainerResponse response = new ContainerResponse(
+                a,
+                request,
+                new ContainerResponseWriter() {
+                    public OutputStream writeStatusAndHeaders(long contentLength, 
+                            ContainerResponse response) throws IOException {
+                        return new ByteArrayOutputStream();
+                    }
+                });
+        
+        try { 
+            a.handleRequest(request, response);
+        } catch (IOException ex) {
+            throw new ContainerException(ex);
+        }
 
-        a.handleRequest(request, response);
         if (response.getEntity() != null) {
             assertEquals(200, response.getStatus());        
         } else {            

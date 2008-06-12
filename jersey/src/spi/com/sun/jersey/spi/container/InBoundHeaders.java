@@ -35,7 +35,7 @@
  * holder.
  */
 
-package com.sun.jersey.impl;
+package com.sun.jersey.spi.container;
 
 import com.sun.jersey.impl.util.KeyComparatorHashMap;
 import com.sun.jersey.impl.util.StringIgnoreCaseKeyComparator;
@@ -46,17 +46,16 @@ import java.util.List;
 import javax.ws.rs.core.MultivaluedMap;
 
 /**
- *
+ * Containers instantiate, populate with request headers/values, and provide 
+ * the instance to the {@link ContainerRequest}.
+
  * @author Paul.Sandoz@Sun.Com
  */
-public final class RequestHttpHeadersImpl 
+public final class InBoundHeaders 
         extends KeyComparatorHashMap<String, List<String>> 
         implements MultivaluedMap<String, String> {
         
-    /**
-     * Creates a new instance of MultivaluedMapImpl
-     */
-    public RequestHttpHeadersImpl() {
+    public InBoundHeaders() {
         super(StringIgnoreCaseKeyComparator.SINGLETON);
     }
 
@@ -85,9 +84,7 @@ public final class RequestHttpHeadersImpl
             return values.get(0);
         else
             return null;
-    }
-
-    
+    }    
     
     // 
     

@@ -37,15 +37,16 @@
 
 package com.sun.jersey.impl;
 
-import com.sun.jersey.impl.RequestHttpHeadersImpl;
+import com.sun.jersey.spi.container.InBoundHeaders;
 import com.sun.jersey.api.container.ContainerException;
 import com.sun.jersey.api.client.ClientHandler;
 import com.sun.jersey.api.client.ClientHandlerException;
 import com.sun.jersey.api.client.ClientRequest;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.impl.http.header.HttpHeaderFactory;
-import com.sun.jersey.spi.container.AbstractContainerRequest;
-import com.sun.jersey.spi.container.AbstractContainerResponse;
+import com.sun.jersey.spi.container.ContainerRequest;
+import com.sun.jersey.spi.container.ContainerResponse;
+import com.sun.jersey.spi.container.ContainerResponseWriter;
 import com.sun.jersey.spi.container.WebApplication;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -86,14 +87,14 @@ public class TestResourceClientHandler implements ClientHandler {
     
     private final class Response extends ClientResponse {
         private final InputStream responseEntity;
-        private final AbstractContainerResponse response;
+        private final ContainerResponse response;
         private final MultivaluedMap<String, String> metadata;
         private Map<String, Object> properties;
         
-       Response(InputStream responseEntity, AbstractContainerResponse response) {
+       Response(InputStream responseEntity, ContainerResponse response) {
             this.responseEntity = responseEntity;
             this.response = response;
-            this.metadata = new RequestHttpHeadersImpl();
+            this.metadata = new InBoundHeaders();
             
             writeHeaders(response.getHttpHeaders(), metadata);
         }
@@ -136,41 +137,56 @@ public class TestResourceClientHandler implements ClientHandler {
         }
     }
 
+    private static class TestContainerResponseWriter implements ContainerResponseWriter {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        
+        public OutputStream writeStatusAndHeaders(long contentLength, 
+                ContainerResponse response) throws IOException {
+            return baos;
+        }        
+    }
+    
     public ClientResponse handle(ClientRequest clientRequest) {
         byte[] requestEntity = writeEntity(clientRequest.getMetadata(), 
                 clientRequest.getEntity());
-        final AbstractContainerRequest serverRequest = new TestHttpRequestContext(
+        
+        InBoundHeaders rh = new InBoundHeaders();
+        writeHeaders(clientRequest.getMetadata(), rh);
+        
+        final ContainerRequest cRequest = new ContainerRequest(
                 w, 
                 clientRequest.getMethod(), 
-                new ByteArrayInputStream(requestEntity),
+                baseUri,
                 clientRequest.getURI(),
-                baseUri);
-        
-        writeHeaders(clientRequest.getMetadata(), serverRequest.getRequestHeaders());
-        List<String> cookies = serverRequest.getRequestHeaders().get("Cookie");
+                rh,
+                new ByteArrayInputStream(requestEntity)
+                );
+
+        // TODO this is a hack
+        List<String> cookies = cRequest.getRequestHeaders().get("Cookie");
         if (cookies != null) {
             for (String cookie : cookies) {
                 if (cookie != null)
-                    serverRequest.getCookies().putAll(
+                    cRequest.getCookies().putAll(
                             HttpHeaderFactory.createCookies(cookie));
             }
         }
         
-        final TestHttpResponseContext serverResponse = new TestHttpResponseContext(
-                w, 
-                serverRequest);
+        final TestContainerResponseWriter writer = new TestContainerResponseWriter();
+        final ContainerResponse cResponse = new ContainerResponse(
+                w,
+                cRequest,
+                writer);
         
-        w.handleRequest(serverRequest, serverResponse);
         try {
-            serverResponse.commitAll();
+            w.handleRequest(cRequest, cResponse);
         } catch (IOException e) {
             throw new ContainerException(e);
         }
         
-        byte[] responseEntity = serverResponse.
-                getUnderlyingByteArrayOutputStream().toByteArray();        
+        byte[] responseEntity = writer.baos.toByteArray();
         Response clientResponse = new Response(
-                new ByteArrayInputStream(responseEntity), serverResponse);
+                new ByteArrayInputStream(responseEntity), cResponse);
         
         clientResponse.getProperties().put("request.entity", requestEntity);
         clientResponse.getProperties().put("response.entity", responseEntity);
