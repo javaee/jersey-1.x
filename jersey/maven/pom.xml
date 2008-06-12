@@ -146,7 +146,7 @@
                                         <filter token="VERSION"
                                             value="${release.impl.version}-${release.impl.version.suffix}-SNAPSHOT" />
                                         <filter token="JSR311_VERSION"
-                                            value="${release.spec.version}-SNAPSHOT" />
+                                            value="${release.spec.version}" />
                                     </filterset>
                                 </copy>
                             </tasks>
