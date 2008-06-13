@@ -42,6 +42,7 @@ import com.sun.jersey.api.client.ClientHandler;
 import com.sun.jersey.api.client.ClientHandlerException;
 import com.sun.jersey.api.client.ClientRequest;
 import com.sun.jersey.api.client.ClientResponse;
+import com.sun.jersey.api.client.config.ClientConfig;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -151,6 +152,24 @@ public final class URLConnectionClientHandler implements ClientHandler {
             throws ProtocolException, IOException {
         HttpURLConnection uc = (HttpURLConnection)ro.getURI().toURL().openConnection();
         
+        Integer readTimeout = (Integer)ro.getProperties().get(
+                ClientConfig.PROPERTY_READ_TIMEOUT);
+        if (readTimeout != null) {
+            uc.setReadTimeout(readTimeout);
+        }
+        
+        Integer connectTimeout = (Integer)ro.getProperties().get(
+                ClientConfig.PROPERTY_CONNECT_TIMEOUT);
+        if (connectTimeout != null) {
+            uc.setConnectTimeout(connectTimeout);
+        }
+        
+        Boolean followRedirects = (Boolean)ro.getProperties().get(
+                ClientConfig.PROPERTY_FOLLOW_REDIRECTS);
+        if (followRedirects != null) {
+            uc.setInstanceFollowRedirects(followRedirects);
+        }        
+        
         // Set the request method
         uc.setRequestMethod(ro.getMethod());
 
@@ -161,7 +180,7 @@ public final class URLConnectionClientHandler implements ClientHandler {
         Object entity = ro.getEntity();
         if (entity != null) {
             uc.setDoOutput(true);
-            writeEntity(uc, ro.getMetadata(), entity);
+            writeEntity(uc, ro, entity);
         }
         
         // Return the in-bound response
@@ -196,7 +215,8 @@ public final class URLConnectionClientHandler implements ClientHandler {
     
     @SuppressWarnings("unchecked")
     private void writeEntity(HttpURLConnection uc, 
-            MultivaluedMap<String, Object> metadata, Object entity) throws IOException {
+            ClientRequest ro, Object entity) throws IOException {
+        MultivaluedMap<String, Object> metadata = ro.getMetadata();
         MediaType mediaType = null;
         final Object mediaTypeHeader = metadata.getFirst("Content-Type");
         if (mediaTypeHeader instanceof MediaType) {
@@ -225,11 +245,16 @@ public final class URLConnectionClientHandler implements ClientHandler {
             // TODO it appears HttpURLConnection has some bugs in
             // chunked encoding
             // uc.setChunkedStreamingMode(0);
+            Integer chunkedEncodingSize = (Integer)ro.getProperties().get(
+                    ClientConfig.PROPERTY_CHUNKED_ENCODING_SIZE);
+            if (chunkedEncodingSize != null) {
+                uc.setChunkedStreamingMode(chunkedEncodingSize);
+            }
         }
         
         final OutputStream out = uc.getOutputStream();
-        bw.writeTo(entity, entity.getClass(), entity.getClass(), 
-                EMPTY_ANNOTATIONS, mediaType, metadata, out);        
+        bw.writeTo(entity, entity.getClass(), entity.getClass(),
+                EMPTY_ANNOTATIONS, mediaType, metadata, out);
         out.flush();
         out.close();
     }

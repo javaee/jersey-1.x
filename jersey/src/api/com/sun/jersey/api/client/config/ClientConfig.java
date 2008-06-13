@@ -45,6 +45,18 @@ import java.util.Set;
  * @author Paul.Sandoz@Sun.Com
  */
 public interface ClientConfig {
+    public static final String PROPERTY_FOLLOW_REDIRECTS = 
+            "com.sun.jersey.client.property.followRedirects";
+    
+    public static final String PROPERTY_READ_TIMEOUT = 
+            "com.sun.jersey.client.property.readTimeout";
+    
+    public static final String PROPERTY_CONNECT_TIMEOUT = 
+            "com.sun.jersey.client.property.connectTimeout";
+    
+    public static final String PROPERTY_CHUNKED_ENCODING_SIZE = 
+            "com.sun.jersey.client.property.chunkedEncodingSize";
+    
     /**
      * Get the set of provider classes to be instantiated in the scope
      * of the Client

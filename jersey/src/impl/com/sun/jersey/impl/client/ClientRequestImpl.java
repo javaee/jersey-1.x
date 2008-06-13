@@ -41,11 +41,14 @@ import com.sun.jersey.api.client.ClientRequest;
 import com.sun.jersey.impl.container.OutBoundHeaders;
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import javax.ws.rs.core.MultivaluedMap;
 
 public final class ClientRequestImpl extends ClientRequest {
+    private Map<String, Object> properties;
+    
     private final URI uri;
     
     private final String method;
@@ -70,6 +73,13 @@ public final class ClientRequestImpl extends ClientRequest {
         this.metadata = (metadata != null) ? metadata : new OutBoundHeaders();
     }
 
+    public Map<String, Object> getProperties() {
+        if (properties == null)
+            properties = new HashMap<String, Object>();
+        
+        return properties;
+    }
+            
     public URI getURI() {
         return uri;
     }

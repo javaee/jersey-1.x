@@ -39,6 +39,7 @@ package com.sun.jersey.api.client;
 
 import com.sun.jersey.impl.client.ClientRequestImpl;
 import java.net.URI;
+import java.util.Map;
 import javax.ws.rs.core.MultivaluedMap;
 
 /**
@@ -50,6 +51,13 @@ import javax.ws.rs.core.MultivaluedMap;
  * @author Paul.Sandoz@Sun.Com
  */
 public abstract class ClientRequest {
+
+    /**
+     * Get the mutable property bag.
+     * 
+     * @return the property bag.
+     */
+    public abstract Map<String, Object> getProperties();
     
     /**
      * Get the URI of the request. The URI shall contain sufficient

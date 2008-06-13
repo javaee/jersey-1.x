@@ -51,6 +51,8 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Type;
 import java.net.URI;
+import java.util.HashMap;
+import java.util.Map;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.ext.MessageBodyWorkers;
 
@@ -70,7 +72,7 @@ import javax.ws.rs.ext.MessageBodyWorkers;
  * 
  * @author Paul.Sandoz@Sun.Com
  */
-public class Client extends Filterable implements ClientHandler {
+public final class Client extends Filterable implements ClientHandler {
     private InjectableProviderFactory injectableFactory;
     
     private final ClientConfig config;
@@ -78,6 +80,8 @@ public class Client extends Filterable implements ClientHandler {
     private final ComponentProvider provider;
     
     private final MessageBodyFactory bodyContext;
+    
+    private Map<String, Object> properties;
     
     private final class AdaptingComponentProvider implements ComponentProvider {
         private final ComponentProvider cp;
@@ -192,6 +196,9 @@ public class Client extends Filterable implements ClientHandler {
         this.injectableFactory = new InjectableProviderFactory();
 
         this.config = config;
+        
+        getProperties().putAll(config.getProperties());
+        
         // Allow injection of resource config
         injectableFactory.add(new ContextInjectableProvider<ClientConfig>(
                 ClientConfig.class, config));
@@ -238,7 +245,7 @@ public class Client extends Filterable implements ClientHandler {
      * @param u the URI of the resource.
      * @return the Web resource.
      */
-    public final WebResource resource(String u) {
+    public WebResource resource(String u) {
         return resource(URI.create(u));
     }
     
@@ -248,7 +255,7 @@ public class Client extends Filterable implements ClientHandler {
      * @param u the URI of the resource.
      * @return the Web resource.
      */
-    public final WebResource resource(URI u) {
+    public WebResource resource(URI u) {
         return new WebResource(this, u);
     }
     
@@ -258,8 +265,60 @@ public class Client extends Filterable implements ClientHandler {
      * @param u the URI of the resource.
      * @return the Web resource.
      */
-    public final AsyncWebResource asyncResource(String u) {
+    public AsyncWebResource asyncResource(String u) {
         return asyncResource(URI.create(u));
+    }
+
+    /**
+     * Get the mutable property bag.
+     * 
+     * @return the property bag.
+     */
+    public Map<String, Object> getProperties() {
+        if (properties == null)
+            properties = new HashMap<String, Object>();
+        
+        return properties;
+    }
+    
+    /**
+     * Set if redirection should be performed or not.
+     * 
+     * @param redirect if true then the client will automatically redirect
+     *        to the URI declared in 3xx responses.
+     */
+    public void setFollowRedirects(Boolean redirect) {
+        getProperties().put(ClientConfig.PROPERTY_FOLLOW_REDIRECTS, redirect);
+    }
+
+    /**
+     * Set the read timeout interval.
+     * 
+     * @param interval the read timeout interval.
+     */
+    public void setReadTimeout(Integer interval) {
+        getProperties().put(ClientConfig.PROPERTY_READ_TIMEOUT, interval);  
+    }
+    
+    /**
+     * Set the connect timeout interval.
+     * 
+     * @param interval the connect timeout interval.
+     */
+    public void setConnectTimeout(Integer interval) {
+        getProperties().put(ClientConfig.PROPERTY_CONNECT_TIMEOUT, interval);
+    }
+
+    /**
+     * Set the client to send request entities using chunked encoding
+     * with a particular chunk size.
+     * 
+     * @param chunkSize the chunked encoding size. If &lt= 0 then the default
+     *        size will be used. If null then chunked encoding will not be
+     *        utilized.
+     */
+    public void setChunkedEncodingSize(Integer chunkSize) {
+        getProperties().put(ClientConfig.PROPERTY_CHUNKED_ENCODING_SIZE, chunkSize);        
     }
     
     /**
@@ -268,13 +327,14 @@ public class Client extends Filterable implements ClientHandler {
      * @param u the URI of the resource.
      * @return the Web resource.
      */
-    public final AsyncWebResource asyncResource(URI u) {
+    public AsyncWebResource asyncResource(URI u) {
         return new AsyncWebResource(this, u);
     }
     
     // ClientHandler
     
     public ClientResponse handle(ClientRequest cr) throws ClientHandlerException {
+        cr.getProperties().putAll(properties);
         return getHeadHandler().handle(cr);
     }
 
