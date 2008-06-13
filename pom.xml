@@ -69,8 +69,9 @@
     
     <modules>
         <module>contribs</module>
-        <module>samples</module>
-        <module>jersey/maven</module>
+        <!-- to be switched on later -->
+        <!--module>samples</module-->
+        <!--module>jersey/maven</module-->
     </modules>
 
     <build>
@@ -87,6 +88,13 @@
                 </plugin>
             </plugins>
         </pluginManagement>
+        <extensions>
+          <extension>
+            <groupId>org.jvnet.wagon-svn</groupId>
+              <artifactId>wagon-svn</artifactId>
+              <version>1.8</version>
+          </extension>
+        </extensions>
     </build>
     
     <repositories>
@@ -103,8 +111,19 @@
         </repository>
     </repositories>
     
+    <!-- i believe this is not necessary -->
+    <!--
     <properties>
         <jersey-version>0.8-ea-SNAPSHOT</jersey-version>
-    </properties>
+    </properties> 
+    -->
+
+    <distributionManagement>
+      <snapshotRepository>
+        <uniqueVersion>false</uniqueVersion>
+        <id>java.net-m2-repository</id>
+        <url>java-net:/maven2-repository/trunk/www/repository/</url> 
+      </snapshotRepository>
+    </distributionManagement>
 
 </project>

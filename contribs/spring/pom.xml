@@ -11,7 +11,6 @@
     <groupId>com.sun.jersey</groupId>
     <artifactId>jersey-spring</artifactId>
     <packaging>jar</packaging>
-    <version>${jersey-version}</version>
     <name>jersey-spring</name>
     <url>http://maven.apache.org</url>
     <dependencies>
@@ -19,7 +18,7 @@
         <dependency>
             <groupId>com.sun.jersey</groupId>
             <artifactId>jersey</artifactId>
-            <version>${jersey-version}</version>
+            <version>${project.version}</version>
         </dependency>
 
         <dependency>
