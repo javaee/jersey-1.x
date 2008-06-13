@@ -109,7 +109,10 @@ public final class URLConnectionClientHandler implements ClientHandler {
                             "A message body reader for Java type, " + c + 
                             ", and MIME media type, " + mediaType + ", was not found");
                 }
-                return br.readFrom(c, null, null, mediaType, metadata, getInputStream());
+                InputStream in = getInputStream();
+                T t = br.readFrom(c, null, null, mediaType, metadata, getInputStream());
+                if (!(t instanceof InputStream)) in.close();
+                return t;
             } catch (IOException ex) {
                 throw new IllegalArgumentException(ex);
             }
