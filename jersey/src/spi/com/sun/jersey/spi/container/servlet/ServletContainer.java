@@ -42,6 +42,7 @@ import com.sun.jersey.api.core.ApplicationConfigAdapter;
 import com.sun.jersey.api.core.ResourceConfig;
 import com.sun.jersey.impl.ThreadLocalInvoker;
 import com.sun.jersey.api.core.ClasspathResourceConfig;
+import com.sun.jersey.api.core.PackagesResourceConfig;
 import com.sun.jersey.api.uri.UriComponent;
 import com.sun.jersey.impl.container.servlet.JSPTemplateProcessor;
 import com.sun.jersey.impl.container.servlet.ServletContainerRequest;
@@ -323,8 +324,18 @@ public class ServletContainer extends HttpServlet implements ContainerListener {
         if (resourceConfigClassName == null)
             resourceConfigClassName = servletConfig.getInitParameter(APPLICATION_CONFIG_CLASS);
         
-        // If no property is present use the default class scanning property
-        if (resourceConfigClassName == null) {            
+        // If no resource config class property is present 
+        if (resourceConfigClassName == null) {
+            // If the packages property is present then
+            // use the packages resource config
+            String packages = servletConfig.getInitParameter(
+                    PackagesResourceConfig.PROPERTY_PACKAGES);
+            if (packages != null) {
+                props.put(PackagesResourceConfig.PROPERTY_PACKAGES, packages);
+                return new PackagesResourceConfig(props);                    
+            }
+            
+            // Default to using class path resource config
             String[] paths = getPaths(servletConfig.getInitParameter(
                     ClasspathResourceConfig.PROPERTY_CLASSPATH));
             props.put(ClasspathResourceConfig.PROPERTY_CLASSPATH, paths);
