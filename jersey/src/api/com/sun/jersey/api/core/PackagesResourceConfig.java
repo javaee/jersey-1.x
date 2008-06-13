@@ -49,20 +49,15 @@ import javax.ws.rs.ext.Provider;
 
 /**
  * A mutable implementation of {@link DefaultResourceConfig} that dynamically 
- * searches for root resource classes given a set of package names.
+ * searches for root resource classes in a given a set of delcared packages and
+ * in all (if any) sub-packages of those declared packages.
  * 
  * @author Paul.Sandoz@Sun.Com
  */
 public class PackagesResourceConfig extends DefaultResourceConfig {
     /**
      * The property value MUST be an instance String or String[]. Each String
-     * instance represents one or more paths that MUST be separated by ';'. 
-     * Each path MUST be an absolute or relative directory, or a Jar file. 
-     * The contents of a directory, including Java class files, jars files 
-     * and sub-directories (recusively) are scanned. The Java class files of 
-     * a jar file are scanned.
-     * <p>
-     * Root resource clases MUST be present in the Java class path.
+     * instance represents one or more package names that MUST be separated by ';'.
      */
     public static final String PROPERTY_PACKAGES
             = "com.sun.jersey.config.property.packages";
@@ -73,9 +68,12 @@ public class PackagesResourceConfig extends DefaultResourceConfig {
     private final String[] packages;
     
     /**
-     * @param packages the array packages
+     * Search for root resource classes declaring the packages as an 
+     * array of package names.
+     * 
+     * @param packages the array package names.
      */
-    public PackagesResourceConfig(String[] packages) {
+    public PackagesResourceConfig(String... packages) {
         if (packages == null || packages.length == 0)
             throw new IllegalArgumentException("Array of packages must not be null or empty");
         
@@ -84,6 +82,9 @@ public class PackagesResourceConfig extends DefaultResourceConfig {
     }
 
     /**
+     * Search for root resource classes declaring the packages as a
+     * property of {@link ResourceConfig}.
+     * 
      * @param props the property bag that contains the property 
      *        {@link PackagesResourceConfig#PROPERTY_PACKAGES}. 
      */
