@@ -66,7 +66,11 @@ import javax.ws.rs.Path;
 import javax.ws.rs.ProduceMime;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.StreamingOutput;
+import javax.ws.rs.ext.ContextResolver;
+import javax.ws.rs.ext.Provider;
+import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
+import javax.xml.bind.JAXBException;
 import javax.xml.namespace.QName;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.sax.SAXSource;
@@ -138,6 +142,39 @@ public class EntityTypesTest extends AbstractTypeTester {
     
     public void testJAXBElementBeanRepresentation() {
         _test(new JAXBBean("CONTENT"), JAXBElementBeanResource.class);
+    }
+    
+    
+    @Path("/")
+    @ProduceMime("application/xml")
+    @ConsumeMime("application/xml")
+    public static class JAXBObjectResource {
+        @POST
+        public Object post(Object o) {
+            return o;
+        }
+    }
+    
+    @Provider
+    public static class JAXBObjectResolver implements  ContextResolver<JAXBContext> {
+        public JAXBContext getContext(Class<?> c) {
+            if (Object.class == c) {
+                try {
+                    return JAXBContext.newInstance(JAXBBean.class);
+                } catch (JAXBException ex) {
+                }
+            }
+            return null;
+        }
+    }
+    
+    public void testJAXBObjectRepresentation() {
+        initiateWebApplication(JAXBObjectResolver.class, JAXBObjectResource.class);
+        WebResource r = resource("/");
+        Object in = new JAXBBean("CONTENT");
+        JAXBBean out = r.entity(in, "application/xml").
+                post(JAXBBean.class);
+        assertEquals(in, out);
     }
     
     @Path("/")

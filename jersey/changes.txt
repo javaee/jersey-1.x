@@ -1,4 +1,7 @@
 release 0.8 (2008-06-20 or 2008-07-25)
+- Support the reading of an entity delcared as the type Object using JAXB
+  unmarshalling. It is required that there be a ContextResolver<JAXBContext>
+  that supports a JAXBContext for the Object type.
 - The following properties can be set on the client:
     Read timeout, connection timeout, chunked encoding length and 
     following redirections.

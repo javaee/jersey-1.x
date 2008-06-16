@@ -18,3 +18,4 @@ com.sun.jersey.impl.provider.entity.ReaderProvider
 com.sun.jersey.impl.provider.entity.SourceProvider$StreamSourceReader
 com.sun.jersey.impl.provider.entity.SourceProvider$SAXSourceReader
 com.sun.jersey.impl.provider.entity.SourceProvider$DOMSourceReader
+com.sun.jersey.impl.provider.entity.XMLRootObjectProvider
