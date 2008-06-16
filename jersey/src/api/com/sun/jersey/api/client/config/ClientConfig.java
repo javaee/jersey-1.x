@@ -45,15 +45,50 @@ import java.util.Set;
  * @author Paul.Sandoz@Sun.Com
  */
 public interface ClientConfig {
+    /**
+     * Redirection property. A value of "true" declares that the client will 
+     * automatically redirect to the URI declared in 3xx responses.
+     * 
+     * The value MUST be an instance of {@link java.lang.Boolean}.
+     * If the property is absent then the default value is "true".
+     */
     public static final String PROPERTY_FOLLOW_REDIRECTS = 
             "com.sun.jersey.client.property.followRedirects";
     
+    /**
+     * Read timeout interval property.
+     * 
+     * The value MUST be an instance of {@link java.lang.Integer}.
+     * 
+     * If the property is absent then the default value is an interval of
+     * infinity. A value of zero 0 is equivalent to an interval of
+     * infinity
+     */
     public static final String PROPERTY_READ_TIMEOUT = 
             "com.sun.jersey.client.property.readTimeout";
     
+    /**
+     * Connect timeout interval property.
+     * 
+     * The value MUST be an instance of {@link java.lang.Integer}.
+     * 
+     * If the property is absent then the default value is an interval of
+     * infinity. A value of  0 is equivalent to an interval of
+     * infinity
+     */
     public static final String PROPERTY_CONNECT_TIMEOUT = 
             "com.sun.jersey.client.property.connectTimeout";
     
+    /**
+     * Chunked encoding property.
+     * 
+     * The value MUST be an instance of {@link java.lang.Integer}.
+     * 
+     * If the property is absent then chunked encoding will not be used.
+     * A value &lt = 0 declares that chunked encoding will be used with 
+     * the a chunk size. A value &gt 0 declares that chunked encoding will be 
+     * used with the value as the declared chunk size.
+     */
     public static final String PROPERTY_CHUNKED_ENCODING_SIZE = 
             "com.sun.jersey.client.property.chunkedEncodingSize";
     

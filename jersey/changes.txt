@@ -1,4 +1,9 @@
 release 0.8 (2008-06-20 or 2008-07-25)
+- The following properties can be set on the client:
+    Read timeout, connection timeout, chunked encoding length and 
+    following redirections.
+  See setter methods on com.sun.jersey.api.client.ClientConfig and
+  properties on com.sun.jersey.api.client.config.ClientConfig.
 - Simplified web.xml configuration when using package scanning for root
   resource classes. For package scanning the web.xml need only contain the 
   following:

@@ -34,7 +34,6 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-
 package com.sun.jersey.api.client;
 
 import com.sun.jersey.api.client.config.DefaultClientConfig;
@@ -44,7 +43,6 @@ import com.sun.jersey.impl.application.ContextResolverFactory;
 import com.sun.jersey.impl.application.InjectableProviderFactory;
 import com.sun.jersey.impl.application.MessageBodyFactory;
 import com.sun.jersey.impl.client.urlconnection.URLConnectionClientHandler;
-import com.sun.jersey.spi.inject.InjectableProvider;
 import com.sun.jersey.spi.inject.SingletonTypeInjectableProvider;
 import com.sun.jersey.spi.service.ComponentProvider;
 import java.lang.reflect.Constructor;
@@ -231,15 +229,6 @@ public final class Client extends Filterable implements ClientHandler {
     }
         
     /**
-     * Add an injectable provider that provides injectable values.
-     * 
-     * @param ip the injectable provider
-     */
-    void addInjectable(InjectableProvider<?, ?> ip) {
-        injectableFactory.add(ip);        
-    }
-    
-    /**
      * Create a Web resource from the client.
      * 
      * @param u the URI of the resource.
@@ -282,7 +271,11 @@ public final class Client extends Filterable implements ClientHandler {
     }
     
     /**
-     * Set if redirection should be performed or not.
+     * Set if redirection should be performed or not. 
+     * 
+     * This method is the functional equivalent to setting the property 
+     * {@link ClientConfig.PROPERTY_FOLLOW_REDIRECTS} on the property bag 
+     * returned from {@link #getProperties}
      * 
      * @param redirect if true then the client will automatically redirect
      *        to the URI declared in 3xx responses.
@@ -292,9 +285,14 @@ public final class Client extends Filterable implements ClientHandler {
     }
 
     /**
-     * Set the read timeout interval.
+     * Set the read timeout interval. 
      * 
-     * @param interval the read timeout interval.
+     * This method is the functional equivalent to setting the property 
+     * {@link ClientConfig.PROPERTY_READ_TIMEOUT} on the property bag 
+     * returned from {@link #getProperties}
+     * 
+     * @param interval the read timeout interval. If null or 0 then
+     * an interval of infinity is declared.
      */
     public void setReadTimeout(Integer interval) {
         getProperties().put(ClientConfig.PROPERTY_READ_TIMEOUT, interval);  
@@ -303,7 +301,12 @@ public final class Client extends Filterable implements ClientHandler {
     /**
      * Set the connect timeout interval.
      * 
-     * @param interval the connect timeout interval.
+     * This method is the functional equivalent to setting the property 
+     * {@link ClientConfig.PROPERTY_CONNECT_TIMEOUT} on the property bag 
+     * returned from {@link #getProperties}
+     * 
+     * @param interval the connect timeout interval. If null or 0 then
+     * an interval of infinity is declared.
      */
     public void setConnectTimeout(Integer interval) {
         getProperties().put(ClientConfig.PROPERTY_CONNECT_TIMEOUT, interval);
@@ -312,6 +315,10 @@ public final class Client extends Filterable implements ClientHandler {
     /**
      * Set the client to send request entities using chunked encoding
      * with a particular chunk size.
+     * 
+     * This method is the functional equivalent to setting the property 
+     * {@link ClientConfig.PROPERTY_CHUNKED_ENCODING_SIZE} on the property bag 
+     * returned from {@link #getProperties}
      * 
      * @param chunkSize the chunked encoding size. If &lt= 0 then the default
      *        size will be used. If null then chunked encoding will not be
