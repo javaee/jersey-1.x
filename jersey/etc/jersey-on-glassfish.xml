@@ -63,7 +63,6 @@
           <replacefilter token="/jaxb-api.jar" value="/webservices-rt.jar"/>
           <replacefilter token="/jaxb-impl.jar" value="/webservices-tools.jar"/>
           <replacefilter token="/jaxb-xjc.jar" value="/webservices-tools.jar"/>
-          <replacefilter token="/jaxws-api.jar" value="/webservices-rt.jar"/>
         </replace>
         <replace file="${nb.prop.file}">
           <replacefilter token="${ashome.jersey.lib.dir}/mail.jar" value="${ashome.lib.dir}/mail.jar"/>
@@ -113,7 +112,6 @@
           <exclude name="activation.jar"/>
           <exclude name="mail.jar"/>
           <exclude name="jaxb-*.jar"/>
-          <exclude name="jaxws-*.jar"/>
           <exclude name="ant.jar"/>
           <exclude name="grizzly*jar"/>
        </fileset>
@@ -146,8 +144,6 @@
      <update-nb-prop nb.prop.file="${gf.home}/jersey/examples/SimpleAtomServer/nbproject/project.properties"/>
      <copy-example example.name="SimpleConsole"/>
      <update-nb-prop nb.prop.file="${gf.home}/jersey/examples/SimpleConsole/nbproject/project.properties"/>
-     <copy-example example.name="SimpleJAXWSEndpoint"/>
-     <update-nb-prop nb.prop.file="${gf.home}/jersey/examples/SimpleJAXWSEndpoint/nbproject/project.properties"/>
      <copy-example example.name="SimpleServlet"/>
      <update-nb-prop nb.prop.file="${gf.home}/jersey/examples/SimpleServlet/nbproject/project.properties"/>
      <copy-example example.name="StorageService"/>
