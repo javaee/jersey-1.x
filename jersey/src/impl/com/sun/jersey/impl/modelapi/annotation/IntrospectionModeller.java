@@ -484,7 +484,7 @@ public class IntrospectionModeller {
             paramSource = Parameter.Source.ENTITY;
         }
 
-        return new Parameter(paramAnnotation, paramSource, paramName, paramType, 
+        return new Parameter(annotations, paramAnnotation, paramSource, paramName, paramType, 
                 paramClass, paramEncoded, paramDefault);
     }
 

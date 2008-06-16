@@ -159,6 +159,11 @@ public final class ServiceFinder<T> implements Iterable<T> {
             throw new UnsupportedOperationException("");
         }
 
+        public <T> T getInstance(ComponentContext cc, Scope scope, Class<T> c) 
+                throws InstantiationException, IllegalAccessException {
+            return getInstance(scope, c);
+        }
+        
         public <T> T getInjectableInstance(T instance) {
             return instance;
         }

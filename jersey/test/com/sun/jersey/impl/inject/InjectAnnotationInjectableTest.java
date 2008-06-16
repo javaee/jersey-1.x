@@ -45,6 +45,7 @@ import javax.ws.rs.Path;
 
 import com.sun.jersey.impl.AbstractResourceTester;
 import com.sun.jersey.spi.inject.Inject;
+import com.sun.jersey.spi.service.ComponentContext;
 import com.sun.jersey.spi.service.ComponentProvider;
 
 /**
@@ -95,9 +96,6 @@ public class InjectAnnotationInjectableTest extends AbstractResourceTester {
         }
 
         public <T> T getInstance( Scope scope, Class<T> c ) throws InstantiationException, IllegalAccessException {
-            if ( MyBean.class.equals( c ) ) {
-                return c.cast( new MyBean( _valueToSet ) );
-            }
             return null;
         }
 
@@ -105,9 +103,14 @@ public class InjectAnnotationInjectableTest extends AbstractResourceTester {
             return getInstance( scope, constructor.getDeclaringClass() );
         }
 
-        public void inject( Object instance ) {
+        public <T> T getInstance( ComponentContext cc, Scope scope, Class<T> c ) throws InstantiationException, IllegalAccessException {
+            if ( MyBean.class.equals( c ) ) {                
+                return c.cast( new MyBean( _valueToSet ) );
+            }
+            return null;
         }
         
+        public void inject( Object instance ) {
+        }   
     }
-
 }

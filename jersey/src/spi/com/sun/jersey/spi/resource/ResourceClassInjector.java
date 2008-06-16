@@ -42,6 +42,7 @@ import com.sun.jersey.api.model.AbstractField;
 import com.sun.jersey.api.model.AbstractResource;
 import com.sun.jersey.api.model.AbstractSetterMethod;
 import com.sun.jersey.api.model.Parameter;
+import com.sun.jersey.impl.application.InjectableProviderFactory.AccessibleObjectContext;
 import com.sun.jersey.spi.inject.Injectable;
 import com.sun.jersey.spi.service.ComponentProvider.Scope;
 import java.lang.reflect.Field;
@@ -94,7 +95,9 @@ public final class ResourceClassInjector {
         Map<Field, Injectable<?>> singletons = new HashMap<Field, Injectable<?>>();
         Map<Field, Injectable<?>> perRequest = new HashMap<Field, Injectable<?>>();
         
+        AccessibleObjectContext aoc = new AccessibleObjectContext();
         for (AbstractField af : fields) {
+            aoc.setAccesibleObject(af.getField());
             Parameter p = af.getParameters().get(0);
             
             if (p.getAnnotation() == null) continue;
@@ -103,7 +106,7 @@ public final class ResourceClassInjector {
                 // Find a per request injectable with Parameter
                 Injectable i = ipc.getInjectable(
                         p.getAnnotation().annotationType(), 
-                        null, 
+                        aoc, 
                         p.getAnnotation(), 
                         p, 
                         Scope.PerRequest);
@@ -113,7 +116,7 @@ public final class ResourceClassInjector {
                 } else {
                     i = ipc.getInjectable(
                             p.getAnnotation().annotationType(), 
-                            null, 
+                            aoc, 
                             p.getAnnotation(), 
                             p.getParameterType(),
                             Arrays.asList(Scope.PerRequest, Scope.Undefined)
@@ -124,7 +127,7 @@ public final class ResourceClassInjector {
                     } else {
                         i = ipc.getInjectable(
                                 p.getAnnotation().annotationType(), 
-                                null, 
+                                aoc, 
                                 p.getAnnotation(), 
                                 p.getParameterType(),
                                 Scope.Singleton
@@ -138,7 +141,7 @@ public final class ResourceClassInjector {
             } else {
                 Injectable i = ipc.getInjectable(
                         p.getAnnotation().annotationType(), 
-                        null, 
+                        aoc, 
                         p.getAnnotation(), 
                         p.getParameterType(),
                         Arrays.asList(Scope.Undefined, Scope.Singleton)
@@ -185,8 +188,10 @@ public final class ResourceClassInjector {
         Map<Method, Injectable<?>> singletons = new HashMap<Method, Injectable<?>>();
         Map<Method, Injectable<?>> perRequest = new HashMap<Method, Injectable<?>>();
         
+        AccessibleObjectContext aoc = new AccessibleObjectContext();
         for (AbstractSetterMethod sm : setterMethods) {
             Parameter p = sm.getParameters().get(0);
+            aoc.setAccesibleObject(sm.getMethod(), p.getAnnotations());
             
             if (p.getAnnotation() == null) continue;
 
@@ -194,7 +199,7 @@ public final class ResourceClassInjector {
                 // Find a per request injectable with Parameter
                 Injectable i = ipc.getInjectable(
                         p.getAnnotation().annotationType(), 
-                        null, 
+                        aoc, 
                         p.getAnnotation(), 
                         p, 
                         Scope.PerRequest);
@@ -203,7 +208,7 @@ public final class ResourceClassInjector {
                 } else {
                     i = ipc.getInjectable(
                             p.getAnnotation().annotationType(), 
-                            null, 
+                            aoc, 
                             p.getAnnotation(), 
                             p.getParameterType(),
                             Arrays.asList(Scope.PerRequest, Scope.Undefined)
@@ -213,7 +218,7 @@ public final class ResourceClassInjector {
                     } else {
                         i = ipc.getInjectable(
                                 p.getAnnotation().annotationType(), 
-                                null, 
+                                aoc, 
                                 p.getAnnotation(), 
                                 p.getParameterType(),
                                 Scope.Singleton
@@ -226,7 +231,7 @@ public final class ResourceClassInjector {
             } else {
                 Injectable i = ipc.getInjectable(
                         p.getAnnotation().annotationType(), 
-                        null, 
+                        aoc, 
                         p.getAnnotation(), 
                         p.getParameterType(),
                         Arrays.asList(Scope.Undefined, Scope.Singleton)

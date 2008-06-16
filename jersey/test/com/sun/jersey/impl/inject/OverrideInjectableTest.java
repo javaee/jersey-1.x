@@ -38,7 +38,7 @@ package com.sun.jersey.impl.inject;
 
 import com.sun.jersey.api.core.HttpContext;
 import com.sun.jersey.api.model.Parameter;
-import com.sun.jersey.spi.inject.InjectableContext;
+import com.sun.jersey.spi.service.ComponentContext;
 import com.sun.jersey.spi.service.ComponentProvider.Scope;
 import static java.lang.annotation.ElementType.CONSTRUCTOR;
 import static java.lang.annotation.ElementType.FIELD;
@@ -73,7 +73,7 @@ public class OverrideInjectableTest extends AbstractResourceTester {
             return Scope.PerRequest;
         }
         
-        public Injectable<Map<String, String>> getInjectable(InjectableContext ic, 
+        public Injectable<Map<String, String>> getInjectable(ComponentContext ic, 
                 QueryParam a, Parameter c) {
             if (Map.class != c.getParameterClass())
                 return null;

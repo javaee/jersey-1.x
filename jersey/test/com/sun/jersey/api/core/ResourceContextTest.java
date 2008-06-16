@@ -46,6 +46,7 @@ import javax.ws.rs.core.Context;
 import javax.xml.bind.annotation.XmlRootElement;
 
 import com.sun.jersey.impl.AbstractResourceTester;
+import com.sun.jersey.spi.service.ComponentContext;
 import com.sun.jersey.spi.service.ComponentProvider;
 
 /**
@@ -126,6 +127,10 @@ public class ResourceContextTest extends AbstractResourceTester {
             return getInstance( scope, constructor.getDeclaringClass() );
         }
 
+        public <T> T getInstance(ComponentContext cc, Scope scope, Class<T> c ) throws InstantiationException, IllegalAccessException {
+            return getInstance(scope, c);
+        }
+        
         public void inject( Object instance ) {
         }
         

@@ -47,6 +47,7 @@ public class Parameter {
     
     public enum Source {ENTITY, QUERY, MATRIX, PATH, COOKIE, HEADER, CONTEXT, UNKNOWN};
     
+    private final Annotation[] annotations;
     private final Annotation annotation;
     private final Parameter.Source source;
     private final String sourceName;
@@ -55,19 +56,20 @@ public class Parameter {
     private final Type type;
     private final Class<?> clazz;
     
-    public Parameter(Annotation a, Source source, String sourceName, Type type, Class<?> clazz) {
-        this(a, source, sourceName, type, clazz, false, null);
+    public Parameter(Annotation[] as, Annotation a, Source source, String sourceName, Type type, Class<?> clazz) {
+        this(as, a, source, sourceName, type, clazz, false, null);
     }
 
-    public Parameter(Annotation a, Source source, String sourceName, Type type, Class<?> clazz, boolean encoded) {
-        this(a, source, sourceName, type, clazz, encoded, null);
+    public Parameter(Annotation[] as, Annotation a, Source source, String sourceName, Type type, Class<?> clazz, boolean encoded) {
+        this(as, a, source, sourceName, type, clazz, encoded, null);
     }
 
-    public Parameter(Annotation a, Source source, String sourceName, Type type, Class<?> clazz, String defaultValue) {
-        this(a, source, sourceName, type, clazz, false, defaultValue);
+    public Parameter(Annotation[] as, Annotation a, Source source, String sourceName, Type type, Class<?> clazz, String defaultValue) {
+        this(as, a, source, sourceName, type, clazz, false, defaultValue);
     }
     
-    public Parameter(Annotation a, Source source, String sourceName, Type type, Class<?> clazz, boolean encoded, String defaultValue) {
+    public Parameter(Annotation[] as, Annotation a, Source source, String sourceName, Type type, Class<?> clazz, boolean encoded, String defaultValue) {
+        this.annotations = as;
         this.annotation = a;
         this.source = source;
         this.sourceName = sourceName;
@@ -77,6 +79,10 @@ public class Parameter {
         this.defaultValue = defaultValue;
     }
 
+    public Annotation[] getAnnotations() {
+        return annotations;
+    }
+    
     public Annotation getAnnotation() {
         return annotation;
     }

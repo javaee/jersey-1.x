@@ -39,7 +39,7 @@ package com.sun.jersey.spi.resource;
 
 import com.sun.jersey.api.model.Parameter;
 import com.sun.jersey.spi.inject.Injectable;
-import com.sun.jersey.spi.inject.InjectableContext;
+import com.sun.jersey.spi.service.ComponentContext;
 import com.sun.jersey.spi.service.ComponentProvider.Scope;
 import java.lang.annotation.Annotation;
 import java.util.List;
@@ -63,7 +63,7 @@ public interface InjectableProviderContext {
      */
     <A extends Annotation, C> Injectable getInjectable(
             Class<? extends Annotation> ac,             
-            InjectableContext ic,
+            ComponentContext ic,
             A a,
             C c,
             Scope s);
@@ -81,7 +81,7 @@ public interface InjectableProviderContext {
      */
     <A extends Annotation, C> Injectable getInjectable(
             Class<? extends Annotation> ac,             
-            InjectableContext ic,
+            ComponentContext ic,
             A a,
             C c,
             List<Scope> s);

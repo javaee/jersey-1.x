@@ -39,7 +39,7 @@ package com.sun.jersey.impl.application;
 import com.sun.jersey.api.NotFoundException;
 import com.sun.jersey.spi.resource.InjectableProviderContext;
 import com.sun.jersey.spi.inject.Injectable;
-import com.sun.jersey.spi.inject.InjectableContext;
+import com.sun.jersey.spi.service.ComponentContext;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -194,7 +194,7 @@ public final class WebApplicationImpl implements WebApplication {
                 return Scope.Singleton;
             }
             
-            public Injectable getInjectable(InjectableContext ic, Context a, Type c) {
+            public Injectable getInjectable(ComponentContext ic, Context a, Type c) {
                 final Object o = m.get(c);
                 if (o != null) {
                     return new Injectable() {
@@ -338,6 +338,18 @@ public final class WebApplicationImpl implements WebApplication {
             return o;
         }
 
+        public <T> T getInstance(ComponentContext cc, Scope scope, Class<T> c) 
+                throws InstantiationException, IllegalAccessException {
+            T o = cp.getInstance(cc, scope, c);
+            if (o == null) {
+                o = c.newInstance();
+                injectResources(o);
+            } else {
+                injectResources(cp.getInjectableInstance(o));
+            }
+            return o;
+        }
+        
         public <T> T getInjectableInstance(T instance) {
             return cp.getInjectableInstance(instance);
         }
@@ -364,9 +376,8 @@ public final class WebApplicationImpl implements WebApplication {
         public <T> T getInstance(Scope scope, Class<T> c)
                 throws InstantiationException, IllegalAccessException {
             T o = cp.getInstance(scope, c);
-            if (o == null) {
+            if (o == null)
                 o = c.newInstance();
-            }
             return o;
         }
 
@@ -380,6 +391,14 @@ public final class WebApplicationImpl implements WebApplication {
             return o;
         }
 
+        public <T> T getInstance(ComponentContext cc, Scope scope, Class<T> c) 
+                throws InstantiationException, IllegalAccessException {
+            T o = cp. getInstance(cc, scope, c);
+            if (o == null)
+                o = c.newInstance();            
+            return o;
+        }
+        
         public <T> T getInjectableInstance(T instance) {
             return cp.getInjectableInstance(instance);
         }
@@ -406,6 +425,11 @@ public final class WebApplicationImpl implements WebApplication {
             return o;
         }
 
+        public <T> T getInstance(ComponentContext cc, Scope scope, Class<T> c) 
+                throws InstantiationException, IllegalAccessException {
+            return getInstance(scope, c);
+        }
+        
         public <T> T getInjectableInstance(T instance) {
             return instance;
         }
@@ -430,6 +454,11 @@ public final class WebApplicationImpl implements WebApplication {
             return o;
         }
 
+        public <T> T getInstance(ComponentContext cc, Scope scope, Class<T> c) 
+                throws InstantiationException, IllegalAccessException {
+            return getInstance(scope, c);
+        }
+        
         public <T> T getInjectableInstance(T instance) {
             return instance;
         }
@@ -494,7 +523,7 @@ public final class WebApplicationImpl implements WebApplication {
                     this.provider,
                     resourceConfig.getProviderClasses(),
                     resourceConfig.getProviderInstances());
-        
+
         // Add injectable provider for @Inject
         injectableFactory.add(
             new InjectableProvider<Inject, Type>() {
@@ -503,14 +532,17 @@ public final class WebApplicationImpl implements WebApplication {
                     }
 
                     @SuppressWarnings("unchecked")
-                    public Injectable<Object> getInjectable(InjectableContext ic, Inject a, final Type c) {
+                    public Injectable<Object> getInjectable(ComponentContext ic, Inject a, final Type c) {
                         if (!(c instanceof Class))
                             return null;
                         
+                        final InjectableProviderFactory.AccessibleObjectContext aic = 
+                                new InjectableProviderFactory.AccessibleObjectContext(
+                                ic.getAccesibleObject(), ic.getAnnotations());
                         return new Injectable<Object>() {
                             public Object getValue(HttpContext context) {
                                 try {
-                                    return provider.getInstance(Scope.Undefined, (Class)c);
+                                    return provider.getInstance(aic, Scope.Undefined, (Class)c);
                                 } catch (Exception e) {
                                     LOGGER.log(Level.SEVERE, "Could not get instance from component provider for type " +
                                             c, e);

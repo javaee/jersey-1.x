@@ -43,10 +43,11 @@ import com.sun.jersey.impl.model.ReflectionHelper;
 import com.sun.jersey.impl.modelapi.annotation.AnnotatedMethod;
 import com.sun.jersey.impl.modelapi.annotation.MethodList;
 import com.sun.jersey.spi.inject.Injectable;
-import com.sun.jersey.spi.inject.InjectableContext;
+import com.sun.jersey.spi.service.ComponentContext;
 import com.sun.jersey.spi.inject.InjectableProvider;
 import com.sun.jersey.spi.service.ComponentProvider.Scope;
 import java.lang.annotation.Annotation;
+import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
@@ -64,6 +65,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.SortedSet;
 import java.util.TreeSet;
+import java.util.logging.Logger;
 import javax.ws.rs.HttpMethod;
 import javax.ws.rs.Path;
 
@@ -72,6 +74,9 @@ import javax.ws.rs.Path;
  * @author Paul.Sandoz@Sun.Com
  */
 public final class InjectableProviderFactory implements InjectableProviderContext {
+    
+    private static final Logger LOGGER = Logger.getLogger(InjectableProviderFactory.class.getName());    
+    
     private static final class MetaInjectableProvider {
         final InjectableProvider ip;
         final Class<? extends Annotation> ac;
@@ -183,7 +188,7 @@ public final class InjectableProviderFactory implements InjectableProviderContex
 
     public <A extends Annotation, C> Injectable getInjectable(
             Class<? extends Annotation> ac,             
-            InjectableContext ic,
+            ComponentContext ic,
             A a,
             C c,
             Scope s) {
@@ -192,7 +197,7 @@ public final class InjectableProviderFactory implements InjectableProviderContex
     
     public <A extends Annotation, C> Injectable getInjectable(
             Class<? extends Annotation> ac,             
-            InjectableContext ic,
+            ComponentContext ic,
             A a,
             C c,
             List<Scope> ls) {
@@ -200,6 +205,13 @@ public final class InjectableProviderFactory implements InjectableProviderContex
             Injectable i = _getInjectable(ac, ic, a, c, s);
             if (i != null)
                 return i;
+            else {
+                // TODO log warnings if injection cannot be performed
+                // This is a little tricky for injection of 
+                // ContextResolver<JAXBContext> as it is meant to be null 
+                // or an aggregation.
+                // LOGGER.warning(ic.getAccesibleObject().toString());
+            }
         }
         
         return null;
@@ -208,7 +220,7 @@ public final class InjectableProviderFactory implements InjectableProviderContex
     @SuppressWarnings("unchecked")
     private <A extends Annotation, C> Injectable _getInjectable(
             Class<? extends Annotation> ac,             
-            InjectableContext ic,
+            ComponentContext ic,
             A a,
             C c,
             Scope s) {
@@ -223,7 +235,7 @@ public final class InjectableProviderFactory implements InjectableProviderContex
     public Injectable getInjectable(Parameter p) {
         if (p.getAnnotation() == null) return null;
         
-        InjectableContext ic = new ParameterIC(p);
+        ComponentContext ic = new AnnotationObjectContext(p.getAnnotations());
         
         // Find a per request injectable with Parameter
         Injectable i = getInjectable(p.getAnnotation().annotationType(), ic, p.getAnnotation(), 
@@ -247,19 +259,64 @@ public final class InjectableProviderFactory implements InjectableProviderContex
         return is;
     }
         
-    private static final class ParameterIC implements InjectableContext {
-        private final Parameter p;
-
-        ParameterIC(Parameter p) {
-            this.p = p;
+    public static final class AccessibleObjectContext implements ComponentContext {
+        private AccessibleObject accesibleObject;
+        
+        private Annotation[] annotations;
+        
+        public AccessibleObjectContext() { }
+        
+        public AccessibleObjectContext(AccessibleObject ao) {
+            this.accesibleObject = ao;
         }
         
-        public <A extends Annotation> A getAnnotation(Class<A> ca) {
-            return p.getParameterClass().getAnnotation(ca);
+        public AccessibleObjectContext(AccessibleObject ao, Annotation[] annotations) {
+            this.accesibleObject = ao;
+            this.annotations = annotations;
         }
-
+        
+        public void setAccesibleObject(AccessibleObject ao) {
+            this.accesibleObject = ao;
+        }
+        
+        public void setAccesibleObject(AccessibleObject ao, Annotation[] annotations) {
+            this.accesibleObject = ao;
+            this.annotations = annotations;
+        }
+        
+        // ComponentContext
+        
+        public AccessibleObject getAccesibleObject() {
+            return accesibleObject;
+        }
+    
         public Annotation[] getAnnotations() {
-            return p.getClass().getAnnotations();
+            if (annotations != null) return annotations;
+            return accesibleObject.getAnnotations();
+        }
+    }
+    
+    public static final class AnnotationObjectContext implements ComponentContext {
+        private Annotation[] annotations;
+        
+        public AnnotationObjectContext() { }
+        
+        public AnnotationObjectContext(Annotation[] annotations) {
+            this.annotations = annotations;            
+        }
+        
+        public void setAnnotations(Annotation[] annotations) {
+            this.annotations = annotations;
+        }
+        
+        // ComponentContext
+        
+        public AccessibleObject getAccesibleObject() {
+            return null;
+        }
+    
+        public Annotation[] getAnnotations() {
+            return annotations;
         }
     }
     
@@ -271,15 +328,18 @@ public final class InjectableProviderFactory implements InjectableProviderContex
      * @param o the singleton instance
      */
     public void injectResources(final Object o) {
+        AccessibleObjectContext aoc = new AccessibleObjectContext();
+        
         Class oClass = o.getClass();
         while (oClass != Object.class) {
-            for (final Field f : oClass.getDeclaredFields()) {                
+            for (final Field f : oClass.getDeclaredFields()) {
                 if (getFieldValue(o, f) != null) continue;
                 
+                aoc.setAccesibleObject(f);
                 final Annotation[] as = f.getAnnotations();
                 for (Annotation a : as) {
                     Injectable i = getInjectable(
-                            a.annotationType(), null, a, f.getGenericType(), 
+                            a.annotationType(), aoc, a, f.getGenericType(), 
                             Arrays.asList(Scope.Singleton, Scope.Undefined));
                     if (i != null) {
                         setFieldValue(o, f, i.getValue(null));
@@ -298,10 +358,11 @@ public final class InjectableProviderFactory implements InjectableProviderContex
                 hasReturnType(void.class).
                 nameStartsWith("set")) {
             final Annotation[] as = m.getAnnotations();
+            aoc.setAccesibleObject(m.getMethod(), as);
             final Type t = m.getGenericParameterTypes()[0];
             for (Annotation a : as) {
                 Injectable i = getInjectable(
-                        a.annotationType(), null, a, t, 
+                        a.annotationType(), aoc, a, t, 
                         Arrays.asList(Scope.Singleton, Scope.Undefined));
                 if (i != null) {
                     setMethodValue(o, m, i.getValue(null));
@@ -385,17 +446,18 @@ public final class InjectableProviderFactory implements InjectableProviderContex
             }
         });
         
+        AnnotationObjectContext aoc = new AnnotationObjectContext();
         for (Constructor con : c.getConstructors()) {
             List<Injectable> is = new ArrayList<Injectable>();
             int ps = con.getParameterTypes().length;
             for (int p = 0; p < ps; p++) {
                 Type pgtype = con.getGenericParameterTypes()[p];
                 Annotation[] as = con.getParameterAnnotations()[p];
-                
+                aoc.setAnnotations(as);
                 Injectable i = null;
                 for (Annotation a : as) {
                     i = getInjectable(
-                            a.annotationType(), null, a, pgtype, 
+                            a.annotationType(), aoc, a, pgtype, 
                             Arrays.asList(Scope.Singleton, Scope.Undefined));
                 }
                 is.add(i);

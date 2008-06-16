@@ -130,6 +130,26 @@ public interface ComponentProvider {
             IllegalAccessException, InvocationTargetException;
 
     /**
+     * Get the instance of a class. Injection will be performed on the
+     * instance. Additional context is provided that may be used to determine
+     * the instance to return.
+     * <p>
+     * Implementations wishing to ignore the component context may defer 
+     * to the implemented method {@link #getInstance(Scope, Class<T>).
+     * 
+     * @param cc the component context
+     * @param scope the scope of the instance
+     * @param c the class
+     * @return the instance, or null if the component cannot be instantaited
+     *         and managed.
+     * 
+     * @throws java.lang.InstantiationException
+     * @throws java.lang.IllegalAccessException
+     */
+    <T> T getInstance(ComponentContext cc, Scope scope, Class<T> c) 
+            throws InstantiationException, IllegalAccessException;
+    
+    /**
      * Get the injectable instance to inject JAX-RS and Jersey specific
      * instances on to fields.
      * <p>

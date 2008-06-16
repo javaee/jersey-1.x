@@ -57,5 +57,5 @@ import java.lang.annotation.Target;
 @Retention(RUNTIME)
 @Documented
 public @interface Inject {
-
+    String value() default "";
 }

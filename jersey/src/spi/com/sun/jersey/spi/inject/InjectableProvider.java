@@ -37,6 +37,7 @@
 
 package com.sun.jersey.spi.inject;
 
+import com.sun.jersey.spi.service.ComponentContext;
 import com.sun.jersey.spi.service.ComponentProvider;
 import java.lang.annotation.Annotation;
 
@@ -69,5 +70,5 @@ public interface InjectableProvider<A extends Annotation, C> {
      * @return an Injectable instance, otherwise null if an instance cannot
      *         be created.
      */
-    Injectable getInjectable(InjectableContext ic, A a, C c);
+    Injectable getInjectable(ComponentContext ic, A a, C c);
 }

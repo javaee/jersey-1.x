@@ -43,7 +43,7 @@ import com.sun.jersey.impl.model.parameter.multivalued.MultivaluedParameterProce
 import com.sun.jersey.api.core.HttpContext;
 import com.sun.jersey.api.model.Parameter;
 import com.sun.jersey.spi.inject.Injectable;
-import com.sun.jersey.spi.inject.InjectableContext;
+import com.sun.jersey.spi.service.ComponentContext;
 import com.sun.jersey.spi.inject.InjectableProvider;
 import com.sun.jersey.spi.service.ComponentProvider.Scope;
 import javax.ws.rs.QueryParam;
@@ -78,7 +78,7 @@ public final class QueryParamInjectableProvider implements
         return Scope.PerRequest;
     }
     
-    public Injectable getInjectable(InjectableContext ic, QueryParam a, Parameter c) {
+    public Injectable getInjectable(ComponentContext ic, QueryParam a, Parameter c) {
         String parameterName = c.getSourceName();
         if (parameterName == null || parameterName.length() == 0) {
             // Invalid query parameter name

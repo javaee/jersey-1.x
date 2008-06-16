@@ -45,8 +45,8 @@ import com.sun.jersey.api.model.Parameter;
 import com.sun.jersey.api.representation.Form;
 import com.sun.jersey.api.representation.FormParam;
 import com.sun.jersey.spi.inject.Injectable;
-import com.sun.jersey.spi.inject.InjectableContext;
 import com.sun.jersey.spi.inject.InjectableProvider;
+import com.sun.jersey.spi.service.ComponentContext;
 import com.sun.jersey.spi.service.ComponentProvider.Scope;
 import javax.ws.rs.WebApplicationException;
 
@@ -86,7 +86,7 @@ public final class FormParamInjectableProvider implements
         return Scope.PerRequest;
     }
     
-    public Injectable getInjectable(InjectableContext ic, FormParam a, Parameter c) {
+    public Injectable getInjectable(ComponentContext ic, FormParam a, Parameter c) {
         String parameterName = c.getSourceName();
         if (parameterName == null || parameterName.length() == 0) {
             // Invalid query parameter name

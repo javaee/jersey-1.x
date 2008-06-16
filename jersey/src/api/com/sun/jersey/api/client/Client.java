@@ -44,6 +44,7 @@ import com.sun.jersey.impl.application.InjectableProviderFactory;
 import com.sun.jersey.impl.application.MessageBodyFactory;
 import com.sun.jersey.impl.client.urlconnection.URLConnectionClientHandler;
 import com.sun.jersey.spi.inject.SingletonTypeInjectableProvider;
+import com.sun.jersey.spi.service.ComponentContext;
 import com.sun.jersey.spi.service.ComponentProvider;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
@@ -113,6 +114,18 @@ public final class Client extends Filterable implements ClientHandler {
             return o;
         }
 
+        public <T> T getInstance(ComponentContext cc, Scope scope, Class<T> c) 
+                throws InstantiationException, IllegalAccessException {
+            T o = cp.getInstance(cc, scope,c);
+            if (o == null) {
+                o = c.newInstance();
+                injectResources(o);
+            } else {
+                injectResources(cp.getInjectableInstance(o));
+            }
+            return o;
+        }
+        
         public <T> T getInjectableInstance(T instance) {
             return cp.getInjectableInstance(instance);
         }
@@ -121,6 +134,7 @@ public final class Client extends Filterable implements ClientHandler {
             cp.inject(instance);
             injectResources(cp.getInjectableInstance(instance));
         }
+
     }
     
     private final class DefaultComponentProvider implements ComponentProvider {
@@ -139,6 +153,11 @@ public final class Client extends Filterable implements ClientHandler {
             return o;
         }
 
+        public <T> T getInstance(ComponentContext cc, Scope scope, Class<T> c) 
+                throws InstantiationException, IllegalAccessException {
+            return getInstance(scope, c);
+        }
+        
         public <T> T getInjectableInstance(T instance) {
             return instance;
         }

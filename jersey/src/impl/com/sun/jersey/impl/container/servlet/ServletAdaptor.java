@@ -43,8 +43,8 @@ import com.sun.jersey.api.core.ResourceConfig;
 import com.sun.jersey.spi.container.WebApplication;
 import com.sun.jersey.spi.container.servlet.ServletContainer;
 import com.sun.jersey.spi.inject.Injectable;
-import com.sun.jersey.spi.inject.InjectableContext;
 import com.sun.jersey.spi.inject.InjectableProvider;
+import com.sun.jersey.spi.service.ComponentContext;
 import com.sun.jersey.spi.service.ComponentProvider.Scope;
 import java.lang.reflect.Proxy;
 import java.lang.reflect.Type;
@@ -105,7 +105,7 @@ public class ServletAdaptor extends ServletContainer {
                 return Scope.Singleton;
             }
             
-            public Injectable<EntityManagerFactory> getInjectable(InjectableContext ic, PersistenceUnit pu, Type c) {
+            public Injectable<EntityManagerFactory> getInjectable(ComponentContext ic, PersistenceUnit pu, Type c) {
                 if (!c.equals(EntityManagerFactory.class))
                     return null;
                 

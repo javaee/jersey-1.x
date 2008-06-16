@@ -21,6 +21,7 @@
  */
 package com.sun.jersey.spi.spring.container.servlet;
 
+import com.sun.jersey.spi.service.ComponentContext;
 import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
@@ -136,8 +137,14 @@ public class SpringServlet extends ServletContainer {
             
         }
 
+        public <T> T getInstance(ComponentContext cc, Scope scope, Class<T> clazz) 
+                throws InstantiationException, IllegalAccessException {
+            return getInstance(scope, clazz);
+        }
+        
         public void inject(Object instance) {
-        }        
+        }
+
     };
     
     @Override

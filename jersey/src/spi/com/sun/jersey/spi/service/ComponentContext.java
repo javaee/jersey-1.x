@@ -35,26 +35,31 @@
  * holder.
  */
 
-package com.sun.jersey.spi.inject;
+package com.sun.jersey.spi.service;
 
 import java.lang.annotation.Annotation;
+import java.lang.reflect.AccessibleObject;
 
 /**
- * An injectable context providing more information for a injectable provider
- * to determin if can create an injectable.
+ * A component context providing information to {@link ComponentProvider}
+ * and {@link InjectableProvider} instances on the accessible object and list of
+ * annotations associated with component instance to be obtained and/or 
+ * injected.
  * 
  * @author Paul.Sandoz@Sun.Com
  */
-public interface InjectableContext {
+public interface ComponentContext {
+    
     /**
-     * Get paritcular annoations associated with the value to be injected.
-     * @param ca the class of the annotation.
-     * @return the annotatation.
+     * Get the accessible object.
+     * 
+     * @return the accessible object, may be null.
      */
-    <A extends Annotation> A getAnnotation(Class<A> ca);
-
+    AccessibleObject getAccesibleObject();
+    
     /**
-     * Get all the annotation sassociated with the value to be injected.
+     * Get the array of annotations.
+     * 
      * @return the array of annotations.
      */
     Annotation[] getAnnotations();    
