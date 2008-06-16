@@ -20,6 +20,8 @@ release 0.8 (2008-06-20 or 2008-07-25)
     com.sun.jersey.spi.container.InBoundHeaders
     com.sun.jersey.spi.container.ContainerResponse
     com.sun.jersey.spi.container.ContainerWriter
+- Removed Client.addInjectable, use the following instead:
+    ClientConfig.getProviderInstances().add()
 - Removed WebApplication.addInjectable, use the following instead:
     ResourceConfig.getProviderInstances().add()
 - Instances of provider classes can be declared by the application by adding
