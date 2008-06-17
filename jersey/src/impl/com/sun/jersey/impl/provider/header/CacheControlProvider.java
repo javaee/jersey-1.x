@@ -84,7 +84,10 @@ public final class CacheControlProvider implements HeaderDelegateProvider<CacheC
     }
 
     public CacheControl fromString(String header) {
-        throw new UnsupportedOperationException();
+        throw new UnsupportedOperationException(
+                "The CacheControl type is designed only for Cache-Control response headers. " +
+                "It is not required that such a header be parsed by an end-user application " +
+                "to an instance of CacheControl");
     }
     
     private void appendWithSeparator(StringBuffer b, String field) {
