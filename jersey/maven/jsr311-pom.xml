@@ -56,9 +56,9 @@
     <licenses>
         <license>
             <name>
-                COMMON DEVELOPMENT AND DISTRIBUTION LICENSE (CDDL) Version 1.0
+                CDDL+GPL License
             </name>
-            <url>http://www.opensource.org/licenses/cddl1.php</url>
+            <url>https://jersey.dev.java.net/CDDL+GPL.html</url>
             <distribution>repo</distribution>
         </license>
     </licenses>
