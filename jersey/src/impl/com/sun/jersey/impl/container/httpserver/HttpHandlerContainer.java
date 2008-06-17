@@ -163,8 +163,13 @@ public class HttpHandlerContainer implements HttpHandler, ContainerListener {
                 exchange.getRequestBody()
                 );
         
-        _application.handleRequest(cRequest, new Writer(exchange));
-                
+        try {
+            _application.handleRequest(cRequest, new Writer(exchange));
+        } catch (RuntimeException e) {
+            e.printStackTrace();
+            exchange.getResponseHeaders().clear();
+            exchange.sendResponseHeaders(500, -1);
+        }   
         exchange.getResponseBody().flush();
         exchange.getResponseBody().close();
         exchange.close();                    
