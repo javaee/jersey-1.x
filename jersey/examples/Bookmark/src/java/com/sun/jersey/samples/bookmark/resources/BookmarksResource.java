@@ -96,7 +96,7 @@ public class BookmarksResource {
             URI bookmarkUri = ub.
                     path(bookmarkEntity.getBookmarkEntityPK().getBmid()).
                     build();
-            uriArray.put(bookmarkUri.toString());
+            uriArray.put(bookmarkUri.toASCIIString());
         }
         return uriArray;
     }

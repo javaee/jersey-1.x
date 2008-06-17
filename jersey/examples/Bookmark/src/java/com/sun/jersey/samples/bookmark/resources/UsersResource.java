@@ -88,7 +88,7 @@ public class UsersResource {
             URI userUri = ub.
                     path(userEntity.getUserid()).
                     build();
-            uriArray.put(userUri.toString());
+            uriArray.put(userUri.toASCIIString());
         }
         return uriArray;
     }
