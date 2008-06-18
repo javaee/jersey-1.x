@@ -42,7 +42,11 @@ release 0.8 (2008-06-20 or 2008-07-25)
   Form-based resource methods MUST contain only annotated method parameters
   and at least one parameter MUST be annotated with FormParam.
   This works for the two media types "application/x-www-form-urlencoded" and
-  "multipart/form-data".
+  "multipart/form-data". For the latter this will only work if the a resource 
+  declares that it consumes "multipart/form-data" using @ConsumeMime. In this
+  case message body readers will be used to obtain the instances of the
+  @FormParam annotated parameters, as opposed to applying the rules for other
+  @*Param annotated parameters.
 - Renamed com.sun.jersey.spi.service.Component.Scope enums from->to:
   WebApplication -> Singleton; and ApplicationDefined -> PerRequest
 - Unified injection interfaces so that they are independent of where 
