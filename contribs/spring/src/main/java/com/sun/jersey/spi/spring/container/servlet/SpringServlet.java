@@ -23,6 +23,7 @@ package com.sun.jersey.spi.spring.container.servlet;
 
 import com.sun.jersey.spi.service.ComponentContext;
 import java.io.IOException;
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
@@ -46,6 +47,7 @@ import com.sun.jersey.api.core.ResourceConfig;
 import com.sun.jersey.api.spring.Autowire;
 import com.sun.jersey.spi.container.WebApplication;
 import com.sun.jersey.spi.container.servlet.ServletContainer;
+import com.sun.jersey.spi.inject.Inject;
 import com.sun.jersey.spi.service.ComponentProvider;
 
 /**
@@ -91,6 +93,21 @@ public class SpringServlet extends ServletContainer {
         
         public <T> T getInstance( Scope scope, Class<T> clazz ) 
                 throws InstantiationException, IllegalAccessException {
+            return getInstance( null, scope, clazz );
+        }
+
+        public <T> T getInstance(Scope scope, Constructor<T> constructor, 
+                Object[] parameters) 
+                throws InstantiationException, IllegalArgumentException, 
+                IllegalAccessException, InvocationTargetException {
+            
+            return getInstance( null, scope, constructor.getDeclaringClass() );
+            
+        }
+
+        public <T> T getInstance( ComponentContext cc, Scope scope, Class<T> clazz ) 
+                throws InstantiationException, IllegalAccessException {
+
             
             final Autowire autowire = clazz.getAnnotation( Autowire.class );
             if ( autowire != null ) {
@@ -105,7 +122,7 @@ public class SpringServlet extends ServletContainer {
                 return clazz.cast( result );
             }
             
-            final String beanName = getBeanName( clazz, springContext );
+            final String beanName = getBeanName( cc, clazz, springContext );
             if ( beanName == null ) {
                 return null;
             }
@@ -126,20 +143,6 @@ public class SpringServlet extends ServletContainer {
                 return null;
             }
             
-        }
-
-        public <T> T getInstance(Scope scope, Constructor<T> constructor, 
-                Object[] parameters) 
-                throws InstantiationException, IllegalArgumentException, 
-                IllegalAccessException, InvocationTargetException {
-            
-            return getInstance( scope, constructor.getDeclaringClass() );
-            
-        }
-
-        public <T> T getInstance(ComponentContext cc, Scope scope, Class<T> clazz) 
-                throws InstantiationException, IllegalAccessException {
-            return getInstance(scope, clazz);
         }
         
         public void inject(Object instance) {
@@ -174,8 +177,21 @@ public class SpringServlet extends ServletContainer {
         LOG.debug( "Finished." );
     }
     
-    private static String getBeanName(Class c, ApplicationContext springContext) {
-        String names[] = springContext.getBeanNamesForType( c );
+    private static String getBeanName( ComponentContext cc, Class<?> c, ApplicationContext springContext ) {
+
+        boolean annotatedWithInject = false;
+        if ( cc != null ) {
+            final Inject inject = getAnnotation( cc.getAnnotations(), Inject.class );
+            if ( inject != null ) {
+                annotatedWithInject = true;
+                if ( inject.value() != null && !inject.value().equals( "" ) ) {
+                    return inject.value();
+                }
+                
+            }
+        }
+        
+        final String names[] = springContext.getBeanNamesForType( c );
         
         if (names.length == 0) {
             return null;
@@ -184,20 +200,35 @@ public class SpringServlet extends ServletContainer {
             return names[0];
         }
         else {
-            if ( LOG.isDebugEnabled() ) {
-                LOG.debug( "Multiple configured beans found for class " + c.getName() +
-                        " (" + toCSV( names ) + "), trying to find best match." );
+            
+            final StringBuilder sb = new StringBuilder();
+            sb.append( "There are multiple beans configured in spring for the type " ).append( c.getName() ).append( "." );
+            
+
+            if ( annotatedWithInject ) {
+                sb.append( "\nYou should specify the name of the preferred bean at @Inject: Inject(\"yourBean\")." );
             }
-            /* try to find the bean based on the best name match
-             */
-            for ( String name : names ) {
-                if ( name.equalsIgnoreCase( c.getSimpleName() ) ) {
-                    return name;
+            else {
+                sb.append( "\nAnnotation information was not available, the reason might be because you're not using " +
+                "@Inject. You should use @Inject and specifiy the bean name via Inject(\"yourBean\")." );
+            }
+            
+            sb.append( "Available bean names: " ).append( toCSV( names ) );
+
+            throw new RuntimeException( sb.toString() );
+        }
+    }
+
+    private static <T extends Annotation> T getAnnotation( Annotation[] annotations,
+            Class<T> clazz ) {
+        if ( annotations != null ) {
+            for ( Annotation annotation : annotations ) {
+                if ( annotation.annotationType().equals( clazz ) ) {
+                    return clazz.cast( annotation );
                 }
             }
-            throw new RuntimeException("Multiple configured beans for " + c.getName() + ", name based matching was not possible." +
-                    "\nAvailable bean names: " + toCSV( names ) );
         }
+        return null;
     }
 
     static <T> String toCSV( T[] items ) {
