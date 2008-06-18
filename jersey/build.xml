@@ -460,7 +460,7 @@
          <maven-repository-importer destdir="build/maven-repo" version="${release.impl.version}-${release.impl.version.suffix}">
              <artifact jar="dist/jersey.jar" pom="maven/jersey-pom.xml" srczip="dist/jersey.src.zip" />
              <filterset>
-                 <filter token="JSR311_VERSION" value="${release.spec.version}" />
+                 <filter token="JSR311_VERSION" value="0.8" />
              </filterset>
          </maven-repository-importer>
      </target>
