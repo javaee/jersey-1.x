@@ -45,6 +45,8 @@ import com.sun.jersey.api.model.Parameter;
 import com.sun.jersey.api.representation.Form;
 import com.sun.jersey.api.representation.FormParam;
 import com.sun.jersey.impl.ResponseBuilderImpl;
+import com.sun.jersey.impl.model.parameter.multivalued.MultivaluedParameterExtractor;
+import com.sun.jersey.impl.model.parameter.multivalued.MultivaluedParameterProcessor;
 import com.sun.jersey.spi.resource.InjectableProviderContext;
 import com.sun.jersey.spi.dispatch.RequestDispatcher;
 import com.sun.jersey.spi.inject.Injectable;
@@ -54,6 +56,7 @@ import java.util.List;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.ext.MessageBodyWorkers;
 
 /**
  *
@@ -61,7 +64,12 @@ import javax.ws.rs.core.Response;
  */
 public class FormDispatchProvider implements ResourceMethodDispatchProvider {
                 
-    static abstract class FormParamInInvoker extends ResourceJavaMethodDispatcher {        
+    protected void processForm(HttpContext context) {
+        Form form = context.getRequest().getEntity(Form.class);
+        context.getProperties().put("com.sun.jersey.api.representation.form", form);        
+    }
+    
+    abstract class FormParamInInvoker extends ResourceJavaMethodDispatcher {        
         final private List<Injectable> is;
         
         FormParamInInvoker(AbstractResourceMethod abstractResourceMethod, 
@@ -71,8 +79,7 @@ public class FormDispatchProvider implements ResourceMethodDispatchProvider {
         }
 
         protected final Object[] getParams(HttpContext context) {
-            Form form = context.getRequest().getEntity(Form.class);
-            context.getProperties().put("com.sun.jersey.api.representation.form", form);
+            processForm(context);
             
             final Object[] params = new Object[is.size()];
             try {
@@ -89,7 +96,7 @@ public class FormDispatchProvider implements ResourceMethodDispatchProvider {
         }        
     }
     
-    static final class VoidOutInvoker extends FormParamInInvoker {
+    final class VoidOutInvoker extends FormParamInInvoker {
         VoidOutInvoker(AbstractResourceMethod abstractResourceMethod, List<Injectable> is) {
             super(abstractResourceMethod, is);
         }
@@ -102,7 +109,7 @@ public class FormDispatchProvider implements ResourceMethodDispatchProvider {
         }
     }
     
-    static final class TypeOutInvoker extends FormParamInInvoker {
+    final class TypeOutInvoker extends FormParamInInvoker {
         TypeOutInvoker(AbstractResourceMethod abstractResourceMethod, List<Injectable> is) {
             super(abstractResourceMethod, is);
         }
@@ -121,7 +128,7 @@ public class FormDispatchProvider implements ResourceMethodDispatchProvider {
         }
     }
     
-    static final class ResponseOutInvoker extends FormParamInInvoker {
+    final class ResponseOutInvoker extends FormParamInInvoker {
         ResponseOutInvoker(AbstractResourceMethod abstractResourceMethod, List<Injectable> is) {
             super(abstractResourceMethod, is);
         }
@@ -139,7 +146,7 @@ public class FormDispatchProvider implements ResourceMethodDispatchProvider {
         }
     }
     
-    static final class ObjectOutInvoker extends FormParamInInvoker {
+    final class ObjectOutInvoker extends FormParamInInvoker {
         ObjectOutInvoker(AbstractResourceMethod abstractResourceMethod, List<Injectable> is) {
             super(abstractResourceMethod, is);
         }
@@ -161,8 +168,6 @@ public class FormDispatchProvider implements ResourceMethodDispatchProvider {
         }
     }
 
-    @Context InjectableProviderContext ipc;
-    
     public RequestDispatcher create(AbstractResourceMethod abstractResourceMethod) {
         if ("GET".equals(abstractResourceMethod.getHttpMethod())) {
             return null;
@@ -186,6 +191,30 @@ public class FormDispatchProvider implements ResourceMethodDispatchProvider {
         }
     }
     
+    private static final class FormParamInjectable implements Injectable<Object> {
+        private final MultivaluedParameterExtractor extractor;
+        private final boolean decode;
+        
+        FormParamInjectable(MultivaluedParameterExtractor extractor, boolean decode) {
+            this.extractor = extractor;
+            this.decode = decode;
+        }
+        
+        public Object getValue(HttpContext context) {
+            Form form = (Form)
+                    context.getProperties().get("com.sun.jersey.api.representation.form");
+            try {
+                return extractor.extract(form);
+            } catch (ContainerException e) {
+                throw new WebApplicationException(e.getCause(), 400);
+            }
+        }
+    }
+        
+    @Context InjectableProviderContext ipc;
+
+    @Context MessageBodyWorkers mbw;
+    
     private List<Injectable> processParameters(AbstractResourceMethod method) {        
         if (method.getParameters().isEmpty()) {
             return null;
@@ -200,21 +229,33 @@ public class FormDispatchProvider implements ResourceMethodDispatchProvider {
         if (!hasFormParam)
             return null;
         
+        return getInjectables(method);
+    }
+    
+    protected List<Injectable> getInjectables(AbstractResourceMethod method) {
         List<Injectable> is = new ArrayList<Injectable>(method.getParameters().size());
         for (int i = 0; i < method.getParameters().size(); i++) {
-            Parameter parameter = method.getParameters().get(i);
+            Parameter p = method.getParameters().get(i);
             
-            if (Parameter.Source.ENTITY == parameter.getSource()) {
+            if (Parameter.Source.ENTITY == p.getSource()) {
                 return null;
             }
             
-            Injectable injectable = ipc.getInjectable(parameter);
-            if (injectable == null)
-                return null;
-            
-            is.add(injectable);
+            if (p.getAnnotation().annotationType() == FormParam.class) {
+                MultivaluedParameterExtractor e = MultivaluedParameterProcessor.
+                        process(p.getDefaultValue(), p.getParameterClass(), 
+                        p.getParameterType(), p.getSourceName());    
+                if (e == null)
+                    return null;
+                is.add(new FormParamInjectable(e, !p.isEncoded()));
+                
+            } else {
+                Injectable injectable = ipc.getInjectable(p);
+                if (injectable == null)
+                    return null;
+                is.add(injectable);
+            }
         }
-        
         return is;
     }
 }
