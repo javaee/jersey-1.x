@@ -121,8 +121,8 @@ On the following tab, you just confirm the selected <code>APP</code> schema:
 
 <h4>Test Client Running</h4>
 
-<p>Open <b>Bookmark Sample Test Client</b> project located in <code>TestClient</code> subdirecory.
-Then press <code>F6</code> (Run Main Project).
+<p>Still in <b>Bookmark</b> project: right-click on <b>build.xml</b> file at <b>Files</b> view.
+Then select <b>Run Target...</b>, <b>Other Targets...</b> and finally <b>run-test-client</b> target.
 
 <h3>Running Without Netbeans 6.0</h3>
 
@@ -151,8 +151,7 @@ chmod +x $AS_HOME/lib/ant/bin/ant
 <h4>Test Client Running</h4>
 
 <pre class="cliSample">
-cd TestClient
-$AS_HOME/lib/ant/bin/ant run
+ant run-test-client
 </pre>
 
 <h2>TODOs</h2>

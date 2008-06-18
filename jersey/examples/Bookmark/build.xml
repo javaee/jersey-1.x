@@ -41,5 +41,10 @@
         </exec>
     </target>
     
+    <target name="run-test-client" depends="dist">
+        <java classname="com.sun.jersey.samples.bookmark.test.Main" 
+        classpath="${javac.test.classpath}"/>
+    </target>    
+    
     <target name="default" depends="dist"/>
 </project>
