@@ -60,6 +60,8 @@ public final class UriBuilderImpl extends UriBuilder {
     
     private String scheme;
     
+    private String ssp;
+    
     private String userInfo;
     
     private String host;
@@ -80,6 +82,7 @@ public final class UriBuilderImpl extends UriBuilder {
     private UriBuilderImpl(UriBuilderImpl that) {
         this.encode = that.encode;
         this.scheme = that.scheme;
+        this.ssp = that.ssp;
         this.userInfo = that.userInfo;
         this.host = that.host;
         this.port = that.port;
@@ -106,17 +109,22 @@ public final class UriBuilderImpl extends UriBuilder {
             throw new IllegalArgumentException("URI parameter is null");
         
         if (uri.getScheme() != null) scheme = uri.getScheme();
-        if (uri.getRawUserInfo() != null) userInfo = uri.getRawUserInfo();
-        if (uri.getHost() != null) host = uri.getHost();
-        if (uri.getPort() != -1) port = uri.getPort();
-        if (uri.getRawPath() != null && uri.getRawPath().length() > 0) {
-            path.setLength(0);
-            path.append(uri.getRawPath());
-        }
-        if (uri.getRawQuery() != null && uri.getRawQuery().length() > 0) {
-            query.setLength(0);
-            query.append(uri.getRawQuery());
-            
+        if (uri.getRawSchemeSpecificPart() != null && uri.getRawPath() == null) {
+            ssp = uri.getRawSchemeSpecificPart();
+        } else {
+            ssp = null;
+            if (uri.getRawUserInfo() != null) userInfo = uri.getRawUserInfo();
+            if (uri.getHost() != null) host = uri.getHost();
+            if (uri.getPort() != -1) port = uri.getPort();
+            if (uri.getRawPath() != null && uri.getRawPath().length() > 0) {
+                path.setLength(0);
+                path.append(uri.getRawPath());
+            }
+            if (uri.getRawQuery() != null && uri.getRawQuery().length() > 0) {
+                query.setLength(0);
+                query.append(uri.getRawQuery());
+
+            }
         }
         if (uri.getRawFragment() != null) fragment = uri.getRawFragment();
         return this;
@@ -136,47 +144,64 @@ public final class UriBuilderImpl extends UriBuilder {
         if (ssp == null)
             throw new IllegalArgumentException("Scheme specific part parameter is null");
         
-        // TODO This is buggy because the spp is percent-encoded
-        // Any template present variables will result in an exception
-        URI uri = createURI(null, ssp, null);
-        userInfo = uri.getRawUserInfo();
-        host = uri.getHost();
-        port = uri.getPort();
-        path.setLength(0);
-        path.append(replaceNull(uri.getRawPath()));
-        query.setLength(0);
-        query.append(replaceNull(uri.getRawQuery()));
+        // TODO encode or validate scheme specific part
+        // This will not work for template variables present in the spp
+        StringBuilder sb = new StringBuilder();        
+        if (scheme != null) sb.append(scheme).append(':');
+        if (ssp != null)
+            sb.append(ssp);
+        if (fragment != null && fragment.length() > 0) sb.append('#').append(fragment);
+        URI uri = createURI(sb.toString());
+        
+        if (uri.getRawSchemeSpecificPart() != null && uri.getRawPath() == null) {
+            this.ssp = uri.getRawSchemeSpecificPart();
+        } else {
+            this.ssp = null;
+            userInfo = uri.getRawUserInfo();
+            host = uri.getHost();
+            port = uri.getPort();
+            path.setLength(0);
+            path.append(replaceNull(uri.getRawPath()));
+            query.setLength(0);
+            query.append(replaceNull(uri.getRawQuery()));
+        }
         return this;
     }
 
     public UriBuilder userInfo(String ui) {
+        checkSsp();
         this.userInfo = (ui != null) ?
             encode(ui, UriComponent.Type.USER_INFO) : null;
         return this;
     }
 
     public UriBuilder host(String host) {
+        checkSsp();
         this.host = (host != null) ?
             encode(host, UriComponent.Type.HOST) : null;
         return this;
     }
 
     public UriBuilder port(int port) {
+        checkSsp();
         this.port = port;
         return this;
     }
 
     public UriBuilder replacePath(String... segments) {
+        checkSsp();
         this.path.setLength(0);
         path(segments);
         return this;
     }
 
     public UriBuilder extension(String extension) {
+        checkSsp();
         throw new UnsupportedOperationException();
     }
     
     public UriBuilder path(String... segments) {        
+        checkSsp();
         for (String segment : segments)
             appendPath(segment);
         
@@ -184,6 +209,7 @@ public final class UriBuilderImpl extends UriBuilder {
     }
 
     public UriBuilder path(Class resource) {
+        checkSsp();
         if (resource == null) 
             throw new IllegalArgumentException("Resource parameter is null");
 
@@ -193,6 +219,7 @@ public final class UriBuilderImpl extends UriBuilder {
     }
 
     public UriBuilder path(Class resource, String methodName) {
+        checkSsp();
         if (resource == null) 
             throw new IllegalArgumentException("Resource parameter is null");
         if (methodName == null) 
@@ -217,6 +244,7 @@ public final class UriBuilderImpl extends UriBuilder {
     }
 
     public UriBuilder path(Method... methods) {
+        checkSsp();
         for (Method m : methods) {
             if (m == null)
                 throw new IllegalArgumentException("Method is null");
@@ -226,6 +254,7 @@ public final class UriBuilderImpl extends UriBuilder {
     }
     
     public UriBuilder replaceMatrixParams(String matrix) {
+        checkSsp();
         int i = path.lastIndexOf("/");
         if (i != -1) i = 0;
         i = path.indexOf(";", i);
@@ -237,6 +266,7 @@ public final class UriBuilderImpl extends UriBuilder {
     }
 
     public UriBuilder matrixParam(String name, String value) {
+        checkSsp();
         if (name == null)
             throw new IllegalArgumentException("Name parameter is null");
         if (value == null)
@@ -250,6 +280,7 @@ public final class UriBuilderImpl extends UriBuilder {
     }
 
     public UriBuilder replaceQueryParams(String query) {
+        checkSsp();
         this.query.setLength(0);
         if (query != null)
             this.query.append(encode(query, UriComponent.Type.QUERY));
@@ -257,6 +288,7 @@ public final class UriBuilderImpl extends UriBuilder {
     }
 
     public UriBuilder queryParam(String name, String value) {
+        checkSsp();
         if (name == null)
             throw new IllegalArgumentException("Name parameter is null");
         if (value == null)
@@ -277,6 +309,11 @@ public final class UriBuilderImpl extends UriBuilder {
         return this;
     }
 
+    private void checkSsp() {
+        if (ssp != null) 
+            throw new IllegalArgumentException("Schema specific part is opaque");                
+    }
+    
     private void appendPath(Path t) {
         if (t == null)
             throw new IllegalArgumentException("Path is null");
@@ -335,6 +372,8 @@ public final class UriBuilderImpl extends UriBuilder {
     }
 
     public URI build(Map<String, Object> values) {
+        if (ssp != null) 
+            throw new IllegalArgumentException("Schema specific part is opaque");                
         String uri = UriTemplate.createURI(scheme, 
                 userInfo, host, String.valueOf(port), 
                 path.toString(), query.toString(), fragment, values, encode);
@@ -342,6 +381,8 @@ public final class UriBuilderImpl extends UriBuilder {
     }
 
     public URI build(Object... values) {
+        if (ssp != null) 
+            throw new IllegalArgumentException("Schema specific part is opaque");                
         String uri = UriTemplate.createURI(scheme, 
                 userInfo, host, String.valueOf(port), 
                 path.toString(), query.toString(), fragment, values, encode);
@@ -354,26 +395,30 @@ public final class UriBuilderImpl extends UriBuilder {
         
         if (scheme != null) sb.append(scheme).append(':');
 
-        if (userInfo != null || host != null || port != -1) {
-            sb.append("//");
-            
-            if (userInfo != null && userInfo.length() > 0) 
-                sb.append(userInfo).append('@');
-            
-            if (host != null) {
-                // TODO check IPv6 address
-                sb.append(host);
-            }
-            
-            if (port != -1) sb.append(':').append(port);
-        }
+        if (ssp != null) {
+            sb.append(ssp);
+        } else {        
+            if (userInfo != null || host != null || port != -1) {
+                sb.append("//");
 
-        if (path.length() > 0) {
-            if (sb.length() > 0 && path.charAt(0) != '/') sb.append("/");
-            sb.append(path);
+                if (userInfo != null && userInfo.length() > 0) 
+                    sb.append(userInfo).append('@');
+
+                if (host != null) {
+                    // TODO check IPv6 address
+                    sb.append(host);
+                }
+
+                if (port != -1) sb.append(':').append(port);
+            }
+
+            if (path.length() > 0) {
+                if (sb.length() > 0 && path.charAt(0) != '/') sb.append("/");
+                sb.append(path);
+            }
+
+            if (query.length() > 0) sb.append('?').append(query);
         }
-        
-        if (query.length() > 0) sb.append('?').append(query);
         
         if (fragment != null && fragment.length() > 0) sb.append('#').append(fragment);
         

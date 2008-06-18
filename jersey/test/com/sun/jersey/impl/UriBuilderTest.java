@@ -55,12 +55,28 @@ public class UriBuilderTest extends TestCase {
         super(testName);
     }
 
+    public void testOpaqueUri() {
+        URI bu = UriBuilder.fromUri("mailto:a@b").build();
+        assertEquals(URI.create("mailto:a@b"), bu);
+    }
+    
+    public void testOpaqueUriReplaceSchemeSpecificPart() {
+        URI bu = UriBuilder.fromUri("mailto:a@b").schemeSpecificPart("c@d").build();
+        assertEquals(URI.create("mailto:c@d"), bu);
+    }
+    
     public void testReplaceScheme() {
         URI bu = UriBuilder.fromUri("http://localhost:8080/a/b/c").
                 scheme("https").build();
         assertEquals(URI.create("https://localhost:8080/a/b/c"), bu);
     }
 
+    public void testReplaceSchemeSpecificPart() {
+        URI bu = UriBuilder.fromUri("http://localhost:8080/a/b/c").
+                schemeSpecificPart("//localhost:8080/a/b/c/d").build();
+        assertEquals(URI.create("http://localhost:8080/a/b/c/d"), bu);
+    }
+    
     public void testReplaceUserInfo() {
         URI bu = UriBuilder.fromUri("http://bob@localhost:8080/a/b/c").
                 userInfo("sue").build();
@@ -304,4 +320,5 @@ public class UriBuilderTest extends TestCase {
         assertEquals(URI.create("http://user@localhost:8080/a?query#fragment"), base);
         assertEquals(URI.create("http://user@localhost:8080/a/b?query#fragment"), full);
     }
+    
 }

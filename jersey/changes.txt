@@ -1,4 +1,5 @@
 release 0.8 (2008-06-20 or 2008-07-25)
+- UriBuilder supports opaque URIs such as "mailto:p@c".
 - Support the reading of an entity delcared as the type Object using JAXB
   unmarshalling. It is required that there be a ContextResolver<JAXBContext>
   that supports a JAXBContext for the Object type.
