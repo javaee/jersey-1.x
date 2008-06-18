@@ -30,8 +30,10 @@
     <target name="default" depends="dist"/>
     
     <target name="run-test-client" depends="dist">
-        <java classname="com.sun.jersey.samples.jsonfromjaxb.test.Main" 
-        classpath="${javac.test.classpath}"/>
+        <java fork="true" classname="com.sun.jersey.samples.jsonfromjaxb.test.Main" 
+        classpath="${javac.test.classpath}">
+          <!--jvmarg value="-Djaxp.debug=1"/-->
+        </java>
     </target>
 
    <target name="-pre-dist"> <!-- to fix an issue related to GF UC module -->

@@ -42,7 +42,7 @@
     </target>
     
     <target name="run-test-client" depends="dist">
-        <java classname="com.sun.jersey.samples.bookmark.test.Main" 
+        <java fork="true" classname="com.sun.jersey.samples.bookmark.test.Main" 
         classpath="${javac.test.classpath}"/>
     </target>    
     
