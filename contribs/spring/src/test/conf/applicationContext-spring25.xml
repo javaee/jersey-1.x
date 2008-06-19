@@ -58,5 +58,17 @@ http://www.springframework.org/schema/tx http://www.springframework.org/schema/t
             <util:constant static-field="com.sun.jersey.spring.TestData.MANAGED" />
         </property>
     </bean>
+    
+    <bean id="namedItem3_1" class="com.sun.jersey.spring.Item3" scope="singleton">
+        <property name="value">
+            <util:constant static-field="com.sun.jersey.spring.TestData.VAL_1" />
+        </property>
+    </bean>
+    
+    <bean id="namedItem3_2" class="com.sun.jersey.spring.Item3" scope="singleton">
+        <property name="value">
+            <util:constant static-field="com.sun.jersey.spring.TestData.VAL_2" />
+        </property>
+    </bean>
 
 </beans>

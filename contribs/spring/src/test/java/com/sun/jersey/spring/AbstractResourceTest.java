@@ -48,17 +48,20 @@ import com.sun.jersey.spi.spring.container.servlet.SpringServlet;
  */
 public class AbstractResourceTest {
     
+    public static final String APPLICATION_CONTEXT_SPRING20_XML = "applicationContext-spring20.xml";
+    public static final String APPLICATION_CONTEXT_SPRING25_XML = "applicationContext-spring25.xml";
+
     private static final Log LOG = LogFactory.getLog( AbstractResourceTest.class );
 
-    private final String _springConfig;
-    private final String _resourcePackages;
+    protected String _springConfig;
+    protected String _resourcePackages;
     private final int _port;
     private final String _servletPath;
     
     private Server _server;
     
     public AbstractResourceTest() {
-        _springConfig = System.getProperty( "applicationContext", "applicationContext-spring25.xml" );
+        _springConfig = System.getProperty( "applicationContext", APPLICATION_CONTEXT_SPRING25_XML );
         _resourcePackages = System.getProperty( "resourcePackages", "com.sun.jersey.spring;com.sun.jersey.spring25" );
         _port = 9999;
         _servletPath = "/jersey-spring";

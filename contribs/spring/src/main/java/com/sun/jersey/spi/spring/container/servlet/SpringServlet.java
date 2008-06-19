@@ -213,7 +213,7 @@ public class SpringServlet extends ServletContainer {
                 "@Inject. You should use @Inject and specifiy the bean name via Inject(\"yourBean\")." );
             }
             
-            sb.append( "Available bean names: " ).append( toCSV( names ) );
+            sb.append( "\nAvailable bean names: " ).append( toCSV( names ) );
 
             throw new RuntimeException( sb.toString() );
         }

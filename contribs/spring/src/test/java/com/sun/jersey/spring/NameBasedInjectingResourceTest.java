@@ -21,18 +21,39 @@
  */
 package com.sun.jersey.spring;
 
+import org.testng.Assert;
+import org.testng.annotations.Test;
+
+import com.sun.jersey.api.client.WebResource;
+
 /**
- * TODO: DESCRIBE ME<br>
+ * Test prototype resources that are not managed by spring (but jersey).<br>
  * Created on: Apr 10, 2008<br>
  * 
  * @author <a href="mailto:martin.grotzke@freiheit.com">Martin Grotzke</a>
  * @version $Id$
  */
-public class TestData {
+public class NameBasedInjectingResourceTest extends AbstractResourceTest {
     
-    public static final String MANAGED = "managed";
-    
-    public static final String VAL_1 = "foo";
-    public static final String VAL_2 = "bar";
+    @Test
+    public void testGetInjectedItems() {
+        
+        /* Get the first item
+         */
+        final WebResource item1Resource = resource( NameBasedInjectingResource.PATH + "/" + TestData.VAL_1 );
+        
+        final Item3 actualItem1 = item1Resource.get( Item3.class );
+        Assert.assertNotNull( actualItem1 );
+        Assert.assertEquals( actualItem1.getValue(), TestData.VAL_1 );
+
+        /* Get the second item
+         */
+        final WebResource item2Resource = resource( NameBasedInjectingResource.PATH + "/" + TestData.VAL_2 );
+        
+        final Item3 actualItem2 = item2Resource.get( Item3.class );
+        Assert.assertNotNull( actualItem2 );
+        Assert.assertEquals( actualItem2.getValue(), TestData.VAL_2 );
+        
+    }
 
 }
