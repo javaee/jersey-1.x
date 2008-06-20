@@ -41,7 +41,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.sun.jersey</groupId>
     <artifactId>jersey-project</artifactId>
-    <version>0.8-ea-SNAPSHOT</version>
+    <version>0.9-ea-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>jersey-project</name>
     
@@ -129,7 +129,7 @@
     <!-- i believe this is not necessary -->
     <!--
     <properties>
-        <jersey-version>0.8-ea-SNAPSHOT</jersey-version>
+        <jersey-version>0.9-ea-SNAPSHOT</jersey-version>
     </properties> 
     -->
 

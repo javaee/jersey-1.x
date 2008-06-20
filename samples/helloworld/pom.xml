@@ -42,7 +42,7 @@
     <parent>
         <groupId>com.sun.jersey.samples</groupId>
         <artifactId>jersey-samples</artifactId>
-        <version>0.8-ea-SNAPSHOT</version>
+        <version>0.9-ea-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
     <artifactId>helloworld</artifactId>

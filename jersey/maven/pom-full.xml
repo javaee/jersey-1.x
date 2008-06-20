@@ -40,14 +40,14 @@
   <groupId>com.sun.jersey</groupId>
   <artifactId>jersey</artifactId>
   <packaging>jar</packaging>
-  <version>0.8-SNAPSHOT</version>
+  <version>0.9-SNAPSHOT</version>
   <name>jersey</name>
   <url>http://jersey.dev.java.net</url>
 
   <properties>
-    <release.impl.version>0.7</release.impl.version>
+    <release.impl.version>0.9</release.impl.version>
     <release.impl.version.suffix>ea</release.impl.version.suffix>
-    <release.spec.version>0.7</release.spec.version>
+    <release.spec.version>0.9</release.spec.version>
     <!-- jar manifest template -->
     <manifest.root>${basedir}/docs/manifest</manifest.root>
     <build.id>${now}(${user.name}</build.id>

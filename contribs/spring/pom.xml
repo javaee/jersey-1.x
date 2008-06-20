@@ -41,7 +41,7 @@
     <parent>
         <groupId>com.sun.jersey</groupId>
         <artifactId>jersey-contribs</artifactId>
-        <version>0.8-ea-SNAPSHOT</version>
+        <version>0.9-ea-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
     <groupId>com.sun.jersey</groupId>
@@ -160,11 +160,11 @@
 
     <repositories>
         <repository>
-            <id>maven</id>
-            <url>http://repo1.maven.org/maven2</url>
+            <id>java.net</id>
+            <url>http://download.java.net/maven/2</url>
+            <layout>default</layout>
         </repository>
         <repository>
-            <!--  found at https://maven-repository.dev.java.net  -->
             <id>java.net</id>
             <url>http://download.java.net/maven/1</url>
             <layout>legacy</layout>
