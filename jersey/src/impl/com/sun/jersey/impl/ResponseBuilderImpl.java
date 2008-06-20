@@ -172,7 +172,6 @@ public final class ResponseBuilderImpl extends Response.ResponseBuilder {
     }
     
     public Response.ResponseBuilder variants(List<Variant> variants) {
-        status(406);
         if (variants.isEmpty())
             return this;
 
