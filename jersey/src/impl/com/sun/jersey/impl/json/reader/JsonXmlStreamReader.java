@@ -133,6 +133,11 @@ public class JsonXmlStreamReader implements XMLStreamReader {
             this.state = state;
             this.lastName = name;
         }
+        
+        @Override
+        public String toString() {
+            return String.format("{lastName:%s,laState:%s}", lastName, state);
+        }
     }
     
     final Queue<JsonReaderXmlEvent> eventQueue = new LinkedList<JsonReaderXmlEvent>();
@@ -162,7 +167,6 @@ public class JsonXmlStreamReader implements XMLStreamReader {
     
     JsonToken nextToken() throws IOException {
         JsonToken result = lexer.yylex();
-        //System.out.println("token=" + result + " depth=" + depth + " state=" + processingStack.elementAt(depth).state);
         return result;
     }
     
@@ -232,7 +236,6 @@ public class JsonXmlStreamReader implements XMLStreamReader {
                     switch (lastToken.tokenType) {
                         case JsonToken.STRING:
                             if (lastToken.tokenText.startsWith("@")) { // eat attributes
-                                //attributesStarted = true;
                                 String attrName = lastToken.tokenText;
                                 colon();
                                 lastToken = nextToken();
@@ -247,9 +250,10 @@ public class JsonXmlStreamReader implements XMLStreamReader {
                                 lastToken = nextToken();
                                 switch (lastToken.tokenType) {
                                     case JsonToken.END_OBJECT:
-                                        generateEEEvent(processingStack.get(depth).lastName);
                                         processingStack.remove(depth);
                                         depth--;
+                                        valueRead();
+                                        checkAttributesOnly = false;
                                         break;
                                     case JsonToken.COMMA:
                                         break;
@@ -390,7 +394,6 @@ public class JsonXmlStreamReader implements XMLStreamReader {
                     break; // AFTER_ARRAY_ELEM
             }
         } // end while lastEvent null
-    //System.out.println("Next event = " + eventQueue.peek());
     }
 
     public int getAttributeCount() {
