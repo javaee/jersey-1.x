@@ -79,4 +79,26 @@ public class ResponseBuilderTest extends TestCase {
         assertEquals(1, l.size());
     }
     
+    public void testCloneStatus() {
+        Response.ResponseBuilder rb1 = Response.status(300);
+        Response.ResponseBuilder rb2 = rb1.clone();
+        
+        assertEquals(rb1.build().getStatus(), rb2.build().getStatus());
+    }
+    
+    public void testCloneHeaderEntity() {
+        Response.ResponseBuilder rb1 = Response.status(200).
+                type("text/plain").header("X", "Y").
+                entity("foo");
+        Response.ResponseBuilder rb2 = rb1.clone();
+        Response r1 = rb1.build();
+        Response r2 = rb2.build();
+        
+        assertEquals(r1.getStatus(), r2.getStatus());
+        assertEquals(r1.getMetadata().getFirst("Content-Type"), 
+                r2.getMetadata().getFirst("Content-Type"));
+        assertEquals(r1.getMetadata().getFirst("X"), 
+                r2.getMetadata().getFirst("X"));
+        assertEquals(r1.getEntity(), r2.getEntity());
+    }
 }

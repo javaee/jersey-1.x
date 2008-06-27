@@ -115,8 +115,10 @@ public final class ResponseBuilderImpl extends Response.ResponseBuilder {
     public ResponseBuilderImpl() { }
         
     private ResponseBuilderImpl(ResponseBuilderImpl that) {
+        this.status = that.status;
         this.entity = that.entity;
-        this.values = that.values.clone();
+        if (that.values != null)
+            this.values = that.values.clone();
         if (that.nameValuePairs != null)
             this.nameValuePairs = new ArrayList<Object>(that.nameValuePairs);    
     }
