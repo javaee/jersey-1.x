@@ -100,8 +100,7 @@ public abstract class ResourceJavaMethodDispatcher implements RequestDispatcher 
         } else {
             MediaType m = requestContext.getAcceptableMediaType(produceMime);
             if (m != null) {
-                if (m.getType().equals(MediaType.MEDIA_TYPE_WILDCARD) ||
-                        m.getSubtype().equals(MediaType.MEDIA_TYPE_WILDCARD))
+                if (m.isWildcardType() || m.isWildcardSubtype())
                     return null;
             }
 

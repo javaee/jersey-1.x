@@ -197,7 +197,8 @@ public class ContainerResponse implements HttpResponseContext {
             List<MediaType> mts = bodyContext.getMessageBodyWriterMediaTypes(
                     entity.getClass(), null, null);
             contentType = request.getAcceptableMediaType(mts);
-            if (contentType.isWildcardType() || contentType.isWildcardSubtype())
+            if (contentType == null || 
+                    contentType.isWildcardType() || contentType.isWildcardSubtype())
                 contentType = MediaType.APPLICATION_OCTET_STREAM_TYPE;
             
             getHttpHeaders().putSingle("Content-Type", contentType);

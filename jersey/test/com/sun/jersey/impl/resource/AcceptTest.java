@@ -51,7 +51,6 @@ import javax.ws.rs.core.Response;
  *
  * @author Paul.Sandoz@Sun.Com
  */
-@SuppressWarnings("unchecked")
 public class AcceptTest extends AbstractResourceTester {
     
     public AcceptTest(String testName) {
@@ -163,6 +162,16 @@ public class AcceptTest extends AbstractResourceTester {
         assertEquals(foo, response.getType());
 
         response = r.accept("application/*").get(ClientResponse.class);
+        assertEquals("GET", response.getEntity(String.class));
+        assertEquals(foo, response.getType());
+        
+        response = r.accept("application/foo;q=0.1").
+                accept("application/bar").get(ClientResponse.class);
+        assertEquals("GET", response.getEntity(String.class));
+        assertEquals(bar, response.getType());
+        
+        response = r.accept("application/foo;q=0.5").
+                accept("application/bar;q=0.1").get(ClientResponse.class);
         assertEquals("GET", response.getEntity(String.class));
         assertEquals(foo, response.getType());
     }   

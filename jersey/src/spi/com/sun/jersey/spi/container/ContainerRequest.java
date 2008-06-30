@@ -257,9 +257,9 @@ public class ContainerRequest implements HttpRequestContext {
                 return mediaTypes.get(0);
             
             for (MediaType m : mediaTypes)
-                if (m.isCompatible(a)) return m;
-        }
-        
+                if (m.isCompatible(a) && !m.isWildcardType() && !m.isWildcardSubtype()) 
+                    return m;
+        }        
         return null;
     }
 
