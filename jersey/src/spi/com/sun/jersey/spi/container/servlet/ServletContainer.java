@@ -72,7 +72,6 @@ import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.core.ApplicationConfig;
 import javax.ws.rs.core.Context;
@@ -88,23 +87,42 @@ import javax.ws.rs.core.UriBuilder;
  * fully qualified name of a class that implements {@link ResourceConfig}. 
  * If the concrete class has a constructor that takes a single parameter of the 
  * type Map then the class is instantiated with that constructor and an instance 
- * of Map that contains all the initialization parameters is passed as the parameter.
- * Otherwise the default contructor is used to instantate the class.
+ * of Map that contains all the initialization parameters is passed as the 
+ * parameter. Otherwise the default contructor is used to instantate the class.
+ * 
  * <p>
  * If the initialization parameter 
- * "com.sun.jersey.config.property.resourceConfigClass" is not present a new 
+ * "com.sun.jersey.config.property.resourceConfigClass" is not present and a
+ * initialization parameter "com.sun.jersey.config.property.packages" is present 
+ * (see {@link PackagesResourceConfig.PROPERTY_PACKAGES}) a new instance of
+ * {@link PackagesResourceConfig} is created. The initialization parameter 
+ * "com.sun.jersey.config.property.packages" MUST be set to provide one or
+ * more package names. Each package name MUST be separated by ';'.
+ * 
+ * The package names are added as a property value to a Map instance using 
+ * the property name (@link PackagesResourceConfig.PROPERTY_PACKAGES}. Any 
+ * additional initialization parameters are then added to the Map instance. 
+ * Then that Map instance is passed to the constructor of 
+ * {@link PackagesResourceConfig}.
+ * 
+ * <p>
+ * If none of the above initialization parameters are present a new 
  * instance of {@link ClasspathResourceConfig} is created. The initialization 
  * parameter "com.sun.jersey.config.property.classpath" MAY be set to provide 
  * one or more paths. Each path MUST be separated by ';'. Each path MUST
- * be a virtual path as specified by the {@link ServletContext#getRealPath} method,
- * and each path is transformed by that method. The transformed paths are
- * added as a property value to a Map instance using the property name 
- * (@link ClasspathResourceConfig.PROPERTY_CLASSPATH}. Any additional 
- * initialization parameters are then added to the Map instance. Then that Map
- * instance is passe to the constructor of {@link ClasspathResourceConfig}.
- * If this parameter is not set then the 
- * default value is set to the following virtual paths: 
+ * be a virtual path as specified by the {@link ServletContext#getRealPath} 
+ * method, and each path is transformed by that method. 
+ * 
+ * The transformed paths are added as a property value to a Map instance using 
+ * the property name (@link ClasspathResourceConfig.PROPERTY_CLASSPATH}. Any 
+ * additional initialization parameters are then added to the Map instance. 
+ * Then that Map instance is passed to the constructor of 
+ * {@link ClasspathResourceConfig}.
+ * 
+ * If this parameter is not set then the default value is set to the following 
+ * virtual paths: 
  * "/WEB-INF/lib;/WEB-INF/classes".
+ * 
  * <p>
  * A new {@link WebApplication} instance will be created and configured such
  * that the following classes may be injected onto the field of a root 
