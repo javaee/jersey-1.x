@@ -38,7 +38,9 @@
 package com.sun.jersey.impl;
 
 import java.util.List;
+import javax.ws.rs.core.Cookie;
 import javax.ws.rs.core.MultivaluedMap;
+import javax.ws.rs.core.NewCookie;
 import javax.ws.rs.core.Response;
 import junit.framework.TestCase;
 
@@ -101,4 +103,26 @@ public class ResponseBuilderTest extends TestCase {
                 r2.getMetadata().getFirst("X"));
         assertEquals(r1.getEntity(), r2.getEntity());
     }
+    
+    public void testCloneTwoHeaders() {
+        Response.ResponseBuilder rb1 = Response.status(200).
+                header("Set-Cookie", "name_1=value_1;version=1");
+        Response.ResponseBuilder rb2 = rb1.clone();
+
+        Response r2 = rb2.build();
+
+        Response r1 = rb1.entity("content").header("Set-Cookie",
+                "name_1=value_2;version=1").build();
+        
+        assertEquals(2, r1.getMetadata().get("Set-Cookie").size());
+        assertEquals(1, r2.getMetadata().get("Set-Cookie").size());
+    }
+    
+    public void testCloneCookie() {
+        NewCookie nck1 = new NewCookie(new Cookie("a", "1"));        
+        NewCookie nck2 = new NewCookie(new Cookie("b", "2"));        
+        Response.ResponseBuilder rb = Response.status(200).cookie(nck1);
+        Response r = rb.cookie(nck2).build();
+        assertEquals(2, r.getMetadata().get("Set-Cookie").size());
+    }    
 }

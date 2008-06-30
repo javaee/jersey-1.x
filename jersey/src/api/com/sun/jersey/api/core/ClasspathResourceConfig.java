@@ -175,25 +175,12 @@ public class ClasspathResourceConfig extends DefaultResourceConfig {
     
     private static String[] getPaths(Object param) {
         if (param instanceof String) {
-            return getPaths((String)param);
+            return getElements(new String[] { (String)param });
         } else if (param instanceof String[]) {
-            return getPaths((String[])param);
+            return getElements((String[])param);
         } else {
             throw new IllegalArgumentException(PROPERTY_CLASSPATH + " must " +
                     "have a property value of type String or String[]");
         }
     }
-    
-    private static String[] getPaths(String[] elements) {
-        List<String> paths = new LinkedList<String>();
-        for (String element : elements) {
-            if (element == null || element.length() == 0) continue;
-            Collections.addAll(paths, getPaths(element));
-        }
-        return paths.toArray(new String[paths.size()]);
-    }
-    
-    private static String[] getPaths(String paths) {
-        return paths.split(";");
-    } 
 }

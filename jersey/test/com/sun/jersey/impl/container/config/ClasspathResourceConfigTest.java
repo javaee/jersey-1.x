@@ -118,6 +118,22 @@ public class ClasspathResourceConfigTest extends AbstractResourceConfigTester {
         assertEquals(4, rc.getResourceClasses().size());
     }
     
+    public void testAllWithOnePathWithSpacesAndEmptyElements() {
+        Map<String, Object> p = new HashMap<String, Object>();
+        String paths = 
+                "  build/test/classes/com/sun/jersey/impl/container/config/toplevel  ;" +
+                "  build/test/classes/com/sun/jersey/impl/container/config/innerstatic  ;" +
+                "  build/test/classes/com/sun/jersey/impl/container/config/toplevelinnerstatic; ;; ; ";
+        p.put(ClasspathResourceConfig.PROPERTY_CLASSPATH, paths);
+        ResourceConfig rc = new ClasspathResourceConfig(p);
+        
+        assertTrue(rc.getResourceClasses().contains(PublicRootResourceClass.class));
+        assertTrue(rc.getResourceClasses().contains(InnerStaticClass.PublicClass.class));
+        assertTrue(rc.getResourceClasses().contains(PublicRootResourceInnerStaticClass.class));
+        assertTrue(rc.getResourceClasses().contains(PublicRootResourceInnerStaticClass.PublicClass.class));
+        assertEquals(4, rc.getResourceClasses().size());
+    }
+    
     public void testJarTopLevel() throws IOException {
         File jarFile = createJarFile("build/test/classes/",
                 "com/sun/jersey/impl/container/config/toplevel/PublicRootResourceClass.class",

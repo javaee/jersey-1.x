@@ -153,25 +153,12 @@ public class PackagesResourceConfig extends DefaultResourceConfig {
     
     private static String[] getPackages(Object param) {
         if (param instanceof String) {
-            return getPackages((String)param);
+            return getElements(new String[] { (String)param });
         } else if (param instanceof String[]) {
-            return getPackages((String[])param);
+            return getElements((String[])param);
         } else {
             throw new IllegalArgumentException(PROPERTY_PACKAGES + " must " +
                     "have a property value of type String or String[]");
         }
     }
-    
-    private static String[] getPackages(String[] elements) {
-        List<String> paths = new LinkedList<String>();
-        for (String element : elements) {
-            if (element == null || element.length() == 0) continue;
-            Collections.addAll(paths, element);
-        }
-        return paths.toArray(new String[paths.size()]);
-    }
-    
-    private static String[] getPackages(String paths) {
-        return paths.split(";");
-    }     
 }

@@ -46,7 +46,8 @@ import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.net.URL;
 import java.net.URLClassLoader;
-import junit.framework.*;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  *
@@ -94,6 +95,20 @@ public class PackageResourceConfigTest extends AbstractResourceConfigTester {
         assertEquals(4, rc.getResourceClasses().size());
     }
     
+    public void testAllWithSpacesAndEmptyElements() {
+        Map<String, Object> m = new HashMap<String, Object>();
+        m.put(PackagesResourceConfig.PROPERTY_PACKAGES, 
+                "  com.sun.jersey.impl.container.config.toplevel; " +
+                "  com.sun.jersey.impl.container.config.innerstatic; " + 
+                "  com.sun.jersey.impl.container.config.toplevelinnerstatic; ;; ; ");
+        ResourceConfig rc = new PackagesResourceConfig(m);
+        
+        assertTrue(rc.getResourceClasses().contains(PublicRootResourceClass.class));
+        assertTrue(rc.getResourceClasses().contains(InnerStaticClass.PublicClass.class));
+        assertTrue(rc.getResourceClasses().contains(PublicRootResourceInnerStaticClass.class));
+        assertTrue(rc.getResourceClasses().contains(PublicRootResourceInnerStaticClass.PublicClass.class));
+        assertEquals(4, rc.getResourceClasses().size());
+    }
     
     public void testJarTopLevel() throws Exception {
         ClassLoader cl = createClassLoader("build/test/classes/",
@@ -137,6 +152,27 @@ public class PackageResourceConfigTest extends AbstractResourceConfigTester {
                 );
         ResourceConfig rc = createConfig(cl, 
                 "com.sun.jersey.impl.container.config");
+
+        assertTrue(rc.getResourceClasses().contains(
+                cl.loadClass("com.sun.jersey.impl.container.config.toplevel.PublicRootResourceClass")));
+        assertTrue(rc.getResourceClasses().contains(
+                cl.loadClass("com.sun.jersey.impl.container.config.innerstatic.InnerStaticClass$PublicClass")));
+        assertEquals(2, rc.getResourceClasses().size());
+    }
+    
+    public void testJarBothWithSeparatePackages() throws Exception {
+        ClassLoader cl = createClassLoader("build/test/classes/",
+                "com/sun/jersey/impl/container/config/toplevel/PublicRootResourceClass.class",
+                "com/sun/jersey/impl/container/config/toplevel/PackageRootResourceClass.class",
+                "com/sun/jersey/impl/container/config/innerstatic/InnerStaticClass.class",
+                "com/sun/jersey/impl/container/config/innerstatic/InnerStaticClass$PublicClass.class",
+                "com/sun/jersey/impl/container/config/innerstatic/InnerStaticClass$PackageClass.class",
+                "com/sun/jersey/impl/container/config/innerstatic/InnerStaticClass$ProtectedClass.class",
+                "com/sun/jersey/impl/container/config/innerstatic/InnerStaticClass$PrivateClass.class"
+                );
+        ResourceConfig rc = createConfig(cl, 
+                "com.sun.jersey.impl.container.config.toplevel", 
+                "com.sun.jersey.impl.container.config.innerstatic");
 
         assertTrue(rc.getResourceClasses().contains(
                 cl.loadClass("com.sun.jersey.impl.container.config.toplevel.PublicRootResourceClass")));

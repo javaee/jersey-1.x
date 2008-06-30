@@ -38,8 +38,11 @@
 package com.sun.jersey.api.core;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import javax.ws.rs.core.MediaType;
@@ -134,4 +137,42 @@ public class DefaultResourceConfig extends ResourceConfig {
     public Set<Object> getProviderInstances() {
         return providerInstances;
     }
+    
+    
+    /**
+     * Get a cannonical array of String elements from a String array
+     * where each entry may contain zero or more elements separated by ';'.
+     * 
+     * @param elements an array where each String entry may contain zero or more
+     *        ';' separated elements.
+     * @return the array of elements, each element is trimmed.
+     */
+    protected static String[] getElements(String[] elements) {
+        List<String> es = new LinkedList<String>();
+        for (String element : elements) {
+            element = element.trim();
+            if (element == null || element.length() == 0) continue;
+            for (String subElement : getElements(element)) {
+                if (subElement == null || subElement.length() == 0) continue;
+                es.add(subElement);
+            }
+        }
+        return es.toArray(new String[es.size()]);
+    }
+    
+    /**
+     * Get a cannonical array of String elements from a String
+     * that may contain zero or more elements separated by ';'.
+     * 
+     * @param elements a String that may contain zero or more
+     *        ';' separated elements.
+     * @return the array of elements, each element is trimmed.
+     */
+    private static String[] getElements(String elements) {
+        String[] es = elements.split(";");
+        for (int i = 0; i < es.length; i++) {
+            es[i] = es[i].trim();
+        }
+        return es;
+    }     
 }
