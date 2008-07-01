@@ -136,4 +136,22 @@ public class ResponseBuilderTest extends TestCase {
         Response r = rb.cookie(nck2).build();
         assertEquals(2, r.getMetadata().get("Set-Cookie").size());
     }    
+    
+    public void testCloneCookie2() {
+        Response.ResponseBuilder respb1 = Response.status(200).
+               header("Set-Cookie", "name_1=value_1;version=1");
+        Response.ResponseBuilder respb2 = respb1.clone();
+
+        Response resp2 = respb2.build();
+
+        Response resp1 = respb1.entity("content").cookie((NewCookie[])null).build();         
+        
+        assertEquals(200, resp1.getStatus());
+        assertEquals("content", resp1.getEntity());
+        assertEquals(null, resp1.getMetadata().get("Set-Cookie"));
+
+        assertEquals(200, resp2.getStatus());
+        assertEquals(null, resp2.getEntity());
+        assertEquals(1, resp2.getMetadata().get("Set-Cookie").size());
+    }    
 }
