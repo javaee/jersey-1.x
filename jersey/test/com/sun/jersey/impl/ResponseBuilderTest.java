@@ -81,6 +81,17 @@ public class ResponseBuilderTest extends TestCase {
         assertEquals(1, l.size());
     }
     
+    public void testRemovedCookie() {
+        Response.ResponseBuilder rb = Response.status(200).
+                cookie(new NewCookie(new Cookie("a", "1"))).
+                header("set-cookie", "name_1=value_2;version=2").
+                header("X-TEST", "test");
+        
+        Response r = rb.cookie((NewCookie[])null).build();
+        assertEquals(null, r.getMetadata().get("Set-Cookie"));
+        assertEquals(1, r.getMetadata().get("X-TEST").size());
+    }
+    
     public void testCloneStatus() {
         Response.ResponseBuilder rb1 = Response.status(300);
         Response.ResponseBuilder rb2 = rb1.clone();

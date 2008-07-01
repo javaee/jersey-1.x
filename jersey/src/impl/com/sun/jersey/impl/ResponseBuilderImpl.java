@@ -43,10 +43,12 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import javax.ws.rs.core.CacheControl;
 import javax.ws.rs.core.EntityTag;
+import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.NewCookie;
 import javax.ws.rs.core.Response;
@@ -168,7 +170,7 @@ public final class ResponseBuilderImpl extends Response.ResponseBuilder {
         // TODO set charset
         language(variant.getLanguage());
         if (variant.getEncoding() != null)
-            header("Content-Encoding", variant.getEncoding());
+            header(HttpHeaders.CONTENT_ENCODING, variant.getEncoding());
         
         return this;
     }
@@ -193,12 +195,12 @@ public final class ResponseBuilderImpl extends Response.ResponseBuilder {
         }
         
         StringBuilder vary = new StringBuilder();
-        append(vary, vAccept, "Accept");
-        append(vary, vAcceptLanguage, "Accept-Language");
-        append(vary, vAcceptEncoding, "Accept-Encoding");
+        append(vary, vAccept, HttpHeaders.ACCEPT);
+        append(vary, vAcceptLanguage, HttpHeaders.ACCEPT_LANGUAGE);
+        append(vary, vAcceptEncoding, HttpHeaders.ACCEPT_ENCODING);
         
         if (vary.length() > 0)
-            header("Vary", vary.toString());
+            header(HttpHeaders.VARY, vary.toString());
         return this;
     }
         
@@ -254,8 +256,12 @@ public final class ResponseBuilderImpl extends Response.ResponseBuilder {
     }
 
     public Response.ResponseBuilder cookie(NewCookie... cookies) {
-        for (NewCookie cookie : cookies)
-            add("Set-Cookie", cookie);
+        if (cookies != null) {
+            for (NewCookie cookie : cookies)
+                add(HttpHeaders.SET_COOKIE, cookie);
+        } else {
+            remove(HttpHeaders.SET_COOKIE);
+        }
         return this;
     }
     
@@ -275,6 +281,21 @@ public final class ResponseBuilderImpl extends Response.ResponseBuilder {
 
         nameValuePairs.add(name);
         nameValuePairs.add(value);
+    }
+    
+    private void remove(String name) {
+        if (nameValuePairs == null) return;
+        
+        Iterator<Object> i = nameValuePairs.iterator();
+        while(i.hasNext()) {
+            if (i.next().toString().equalsIgnoreCase(name)) {
+                i.remove();
+                i.next();
+                i.remove();
+            } else {
+                i.next();
+            }
+        }
     }
     
     private void set(int id, Object value) {
