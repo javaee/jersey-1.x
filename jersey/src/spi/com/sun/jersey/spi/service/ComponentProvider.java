@@ -39,6 +39,9 @@ package com.sun.jersey.spi.service;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * A provider for the instantiation and management of components.
@@ -87,9 +90,31 @@ public interface ComponentProvider {
          * the component provider can decide which to choose - the component
          * provider is responsible for managing instances of a type.
          */
-        Undefined    
+        Undefined;
+
+        /**
+         * A immutable lit comprising of the scopes Undefined and
+         * Singleton, in that order.
+         */
+        public static final List<Scope> UNDEFINED_SINGLETON = Collections.unmodifiableList(
+                Arrays.asList(Scope.Undefined, Scope.Singleton));
+        
+        /**
+         * A immutable lit comprising of the scopes PerRequest, Undefined and
+         * Singleton, in that order.
+         */
+        public static final List<Scope> PERREQUEST_UNDEFINED_SINGLETON = Collections.unmodifiableList(
+                Arrays.asList(Scope.PerRequest, Scope.Undefined, Scope.Singleton));
+        
+        /**
+         * A immutable lit comprising of the scopes PerRequest and  
+         * Undefined, in that order.
+         */
+        public static final List<Scope> PERREQUEST_UNDEFINED = Collections.unmodifiableList(
+                Arrays.asList(Scope.PerRequest, Scope.Undefined));
     }
     
+        
     /**
      * Get the instance of a class. Injection will be performed on the
      * instance.

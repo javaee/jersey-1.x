@@ -34,76 +34,51 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-
 package com.sun.jersey.spi.resource;
 
-import com.sun.jersey.api.model.Parameter;
+import com.sun.jersey.api.model.AbstractResource;
+import com.sun.jersey.api.model.AbstractResourceConstructor;
 import com.sun.jersey.spi.inject.Injectable;
-import com.sun.jersey.spi.service.ComponentContext;
+import com.sun.jersey.spi.service.ComponentConstructor;
 import com.sun.jersey.spi.service.ComponentProvider.Scope;
-import java.lang.annotation.Annotation;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 /**
- * The context to obtain {@link Injectable} instances.
- * 
- * @author Paul.Sandoz@Sun.Com
+ *
+ * @author ps23762
  */
-public interface InjectableProviderContext {
+public class ResourceConstructor extends ComponentConstructor {
+    public ResourceConstructor(InjectableProviderContext ipc) {
+        super(ipc);
+    }
+
     /**
-     * Get an injectable.
+     * Get the most suitable constructor. The constructor with the most
+     * parameters and that has the most parameters associated with 
+     * Injectable instances will be chosen.
      * 
-     * @param ac the annotation class.
-     * @param ic the injectable context.
-     * @param a the annotation instance.
-     * @param c the context type.
-     * @param s the scope.
-     * @return the injectable, otherwise null if an injectable could 
-     *         not be found.
+     * @param c the class to instantiate
+     * @param ar the abstract resource
+     * @param s the scope for which the injectables will be used
+     * @return a list constructor and list of injectables for the constructor
+     *         parameters.
      */
-    <A extends Annotation, C> Injectable getInjectable(
-            Class<? extends Annotation> ac,             
-            ComponentContext ic,
-            A a,
-            C c,
-            Scope s);
-    
-    /**
-     * Get an injectable.
-     * 
-     * @param ac the annotation class.
-     * @param ic the injectable context.
-     * @param a the annotation instance.
-     * @param c the context type.
-     * @param s the list of scope, ordered by preference.
-     * @return the injectable, otherwise null if an injectable could 
-     *         not be found.
-     */
-    <A extends Annotation, C> Injectable getInjectable(
-            Class<? extends Annotation> ac,             
-            ComponentContext ic,
-            A a,
-            C c,
-            List<Scope> s);
-    
-    /**
-     * Get an injectable given a parameter.
-     * 
-     * @param p the parameter.
-     * @param s the scope for which the injectable will be used
-     * @return the injectable, otherwise null if an injectable could
-     *         not be found.
-     */
-    Injectable getInjectable(Parameter p, Scope s);
-    
-    /**
-     * Get a list of injectable given a list of parameter.
-     * 
-     * @param ps the list of parameter.
-     * @param s the scope for which the injectable will be used
-     * @return the list of injectable, if an injectable for a parameter
-     *         could not be found the corresponding element in the 
-     *         list will be null.
-     */
-    List<Injectable> getInjectable(List<Parameter> ps, Scope s);
-}
+    @SuppressWarnings("unchecked")
+    public <T> ConstructorInjectablePair<T> getConstructor(Class<T> c, AbstractResource ar,
+            Scope s) {
+        if (ar.getConstructors().isEmpty())
+            return null;
+        
+        SortedSet<ConstructorInjectablePair<T>> cs = new TreeSet<ConstructorInjectablePair<T>>(
+                new ConstructorComparator());        
+        for (AbstractResourceConstructor arc : ar.getConstructors()) {
+            List<Injectable> is = ipc.getInjectable(arc.getParameters(), s);
+            cs.add(new ConstructorInjectablePair<T>(arc.getCtor(), is));
+        }
+                
+        return cs.first();        
+    }
+ }

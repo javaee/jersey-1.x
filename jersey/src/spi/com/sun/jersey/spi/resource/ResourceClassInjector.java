@@ -49,7 +49,6 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -119,7 +118,7 @@ public final class ResourceClassInjector {
                             aoc, 
                             p.getAnnotation(), 
                             p.getParameterType(),
-                            Arrays.asList(Scope.PerRequest, Scope.Undefined)
+                            Scope.PERREQUEST_UNDEFINED
                             );
                     if (i != null) {
                         configureField(af.getField());
@@ -144,7 +143,7 @@ public final class ResourceClassInjector {
                         aoc, 
                         p.getAnnotation(), 
                         p.getParameterType(),
-                        Arrays.asList(Scope.Undefined, Scope.Singleton)
+                        Scope.UNDEFINED_SINGLETON
                         );            
                 if (i != null) {
                     configureField(af.getField());
@@ -211,7 +210,7 @@ public final class ResourceClassInjector {
                             aoc, 
                             p.getAnnotation(), 
                             p.getParameterType(),
-                            Arrays.asList(Scope.PerRequest, Scope.Undefined)
+                            Scope.PERREQUEST_UNDEFINED
                             );
                     if (i != null) {
                         perRequest.put(sm.getMethod(), i);                        
@@ -234,7 +233,7 @@ public final class ResourceClassInjector {
                         aoc, 
                         p.getAnnotation(), 
                         p.getParameterType(),
-                        Arrays.asList(Scope.Undefined, Scope.Singleton)
+                        Scope.UNDEFINED_SINGLETON
                         );            
                 if (i != null) {
                     singletons.put(sm.getMethod(), i);                        

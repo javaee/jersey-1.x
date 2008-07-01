@@ -44,7 +44,9 @@ import com.sun.jersey.api.model.AbstractResourceConstructor;
 import com.sun.jersey.spi.resource.InjectableProviderContext;
 import com.sun.jersey.spi.resource.ResourceClassInjector;
 import com.sun.jersey.spi.inject.Injectable;
+import com.sun.jersey.spi.resource.ResourceConstructor;
 import com.sun.jersey.spi.resource.ResourceProvider;
+import com.sun.jersey.spi.service.ComponentConstructor.ConstructorInjectablePair;
 import com.sun.jersey.spi.service.ComponentProvider;
 import com.sun.jersey.spi.service.ComponentProvider.Scope;
 import java.lang.reflect.Constructor;
@@ -74,23 +76,15 @@ public final class PerRequestProvider implements ResourceProvider {
         this.rci = new ResourceClassInjector(ipc, Scope.PerRequest, 
                 abstractResource);
                 
-        // TODO select the most appropriate constructor 
-        // instead of just picking up the first one
-        if (abstractResource.getConstructors().isEmpty()) {
+        ResourceConstructor rc = new ResourceConstructor(ipc);
+        ConstructorInjectablePair<?> cip = rc.getConstructor(c, abstractResource, 
+                Scope.PerRequest);
+        if (cip == null || cip.is.size() == 0) {
             this.constructor = null;
             this.constructorInjectableParams = null;
         } else {
-            AbstractResourceConstructor abstractConstructor = 
-                    abstractResource.getConstructors().get(0);
-            
-            this.constructor = abstractConstructor.getCtor();
-            if (this.constructor.getParameterTypes().length > 0) {
-                this.constructorInjectableParams = ipc.getInjectable(
-                        abstractConstructor.getParameters());
-            } else {
-                this.constructor = null;
-                this.constructorInjectableParams = null;                
-            }
+            this.constructor = cip.con;
+            this.constructorInjectableParams = cip.is;
         }
     }
 

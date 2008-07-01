@@ -40,11 +40,15 @@ package com.sun.jersey.impl.resource;
 import com.sun.jersey.api.container.ContainerException;
 import com.sun.jersey.api.core.HttpContext;
 import com.sun.jersey.api.model.AbstractResource;
+import com.sun.jersey.spi.inject.Injectable;
 import com.sun.jersey.spi.resource.InjectableProviderContext;
 import com.sun.jersey.spi.resource.ResourceClassInjector;
+import com.sun.jersey.spi.resource.ResourceConstructor;
 import com.sun.jersey.spi.resource.ResourceProvider;
+import com.sun.jersey.spi.service.ComponentConstructor.ConstructorInjectablePair;
 import com.sun.jersey.spi.service.ComponentProvider;
 import com.sun.jersey.spi.service.ComponentProvider.Scope;
+import java.lang.reflect.InvocationTargetException;
 import javax.ws.rs.core.Context;
 
 /**
@@ -64,9 +68,24 @@ public final class SingletonProvider implements ResourceProvider {
                 Scope.Singleton, 
                 abstractResource);
         
+        ResourceConstructor rc = new ResourceConstructor(ipc);
+        ConstructorInjectablePair<?> cip = rc.getConstructor(c, abstractResource, 
+                Scope.Singleton);
         try {
-            resource = provider.getInstance(Scope.Singleton, c);
+            if (cip == null || cip.is.size() == 0) {
+                resource = provider.getInstance(Scope.Singleton, c);
+            } else {
+                Object[] params = new Object[cip.is.size()];
+                int i = 0;
+                for (Injectable injectable : cip.is) {
+                    if (injectable != null)
+                        params[i++] = injectable.getValue(null);
+                }
+                resource = provider.getInstance(Scope.Singleton, cip.con, params);
+            }
             rci.inject(null, provider.getInjectableInstance(resource));
+        } catch (InvocationTargetException ex) {
+            throw new ContainerException("Unable to create resource", ex);
         } catch (InstantiationException ex) {
             throw new ContainerException("Unable to create resource", ex);
         } catch (IllegalAccessException ex) {

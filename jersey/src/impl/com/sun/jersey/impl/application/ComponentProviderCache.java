@@ -37,8 +37,9 @@
 
 package com.sun.jersey.impl.application;
 
-import com.sun.jersey.impl.application.InjectableProviderFactory.ConstructorInjectablePair;
 import com.sun.jersey.spi.inject.Injectable;
+import com.sun.jersey.spi.service.ComponentConstructor;
+import com.sun.jersey.spi.service.ComponentConstructor.ConstructorInjectablePair;
 import com.sun.jersey.spi.service.ComponentProvider;
 import com.sun.jersey.spi.service.ComponentProvider.Scope;
 import com.sun.jersey.spi.service.ServiceFinder;
@@ -120,7 +121,8 @@ public final class ComponentProviderCache {
         if (o != null) return o;
             
         try {
-            ConstructorInjectablePair<?> cip = injectableFactory.getConstructor(provider);
+            ComponentConstructor cc = new ComponentConstructor(injectableFactory);
+            ConstructorInjectablePair<?> cip = cc.getConstructor(provider);
             if (cip == null || cip.is.size() == 0) {
                 o = componentProvider.getInstance(Scope.Singleton, provider);
             } else {

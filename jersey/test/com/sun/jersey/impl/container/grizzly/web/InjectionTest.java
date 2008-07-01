@@ -72,12 +72,38 @@ public class InjectionTest extends AbstractGrizzlyWebContainerTester {
         }               
     }
         
+    @Path("/test")
+    public static class HttpMethodConstructorResource {
+        
+        public HttpMethodConstructorResource(
+                @Context HttpServletRequest req,
+                @Context HttpServletResponse res, 
+                @Context ServletConfig sconf,
+                @Context ServletContext scont) {
+            assertNotNull(req);
+            assertNotNull(res);
+            assertNotNull(sconf);
+            assertNotNull(scont);            
+        }
+        
+        @GET
+        public String get() {
+            return "GET";
+        }               
+    }
+    
     public InjectionTest(String testName) {
         super(testName);
     }
     
     public void testInject() {
         startServer(HttpMethodResource.class);
+        WebResource r = Client.create().resource(getUri().path("test").build());
+        assertEquals("GET", r.get(String.class));
+    }    
+    
+    public void testInjectConstructor() {
+        startServer(HttpMethodConstructorResource.class);
         WebResource r = Client.create().resource(getUri().path("test").build());
         assertEquals("GET", r.get(String.class));
     }    

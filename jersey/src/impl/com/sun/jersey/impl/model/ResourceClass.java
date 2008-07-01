@@ -65,6 +65,7 @@ import com.sun.jersey.impl.wadl.WadlFactory;
 import com.sun.jersey.spi.resource.ResourceProvider;
 import com.sun.jersey.spi.resource.ResourceProviderFactory;
 import com.sun.jersey.spi.service.ComponentProvider;
+import com.sun.jersey.spi.service.ComponentProvider.Scope;
 import com.sun.jersey.spi.uri.rules.UriRule;
 import com.sun.jersey.spi.uri.rules.UriRules;
 import java.util.ArrayList;
@@ -206,7 +207,7 @@ public final class ResourceClass {
             UriRule r = new SubLocatorRule(
                     t,
                     locator.getMethod(),
-                    injectableContext.getInjectable(locator.getParameters()));
+                    injectableContext.getInjectable(locator.getParameters(), Scope.PerRequest));
 
             rulesMap.put(p, 
                     new RightHandPathRule(

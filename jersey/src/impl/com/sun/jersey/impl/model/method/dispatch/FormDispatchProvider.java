@@ -50,6 +50,7 @@ import com.sun.jersey.impl.model.parameter.multivalued.MultivaluedParameterProce
 import com.sun.jersey.spi.resource.InjectableProviderContext;
 import com.sun.jersey.spi.dispatch.RequestDispatcher;
 import com.sun.jersey.spi.inject.Injectable;
+import com.sun.jersey.spi.service.ComponentProvider.Scope;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
@@ -250,7 +251,7 @@ public class FormDispatchProvider implements ResourceMethodDispatchProvider {
                 is.add(new FormParamInjectable(e, !p.isEncoded()));
                 
             } else {
-                Injectable injectable = ipc.getInjectable(p);
+                Injectable injectable = ipc.getInjectable(p, Scope.PerRequest);
                 if (injectable == null)
                     return null;
                 is.add(injectable);

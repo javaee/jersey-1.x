@@ -202,6 +202,33 @@ public class AllInjectablesTest extends AbstractResourceTester {
         }                
     }
     
+    @Path("/")
+    public static class SingletonContextConstructorParameterResource {
+        public SingletonContextConstructorParameterResource(
+                @Context ResourceConfig rc,
+                @Context MessageBodyWorkers mbw,
+                @Context TemplateContext tc,
+                @Context HttpContext hca,
+                @Context HttpHeaders hs,
+                @Context UriInfo ui,
+                @Context ExtendedUriInfo eui,
+                @Context Request r,
+                @Context SecurityContext sc) {
+            assertNotNull(rc);
+            assertNotNull(mbw);
+            assertNotNull(tc);
+            assertNotNull(hca);
+            assertNotNull(hs);
+            assertNotNull(ui);
+            assertNotNull(eui);
+            assertNotNull(r);
+            assertNotNull(sc);
+        }                
+        
+        @GET
+        public String get() { return "GET"; }
+    }
+    
     public void testPerRequestInjected() throws IOException {
         initiateWebApplication(PerRequestContextResource.class);
         
@@ -226,6 +253,11 @@ public class AllInjectablesTest extends AbstractResourceTester {
         assertEquals("GET", resource("/").get(String.class));        
     }       
     
+    public void testSingletonConstructorParameterInjected() throws IOException {
+        initiateWebApplication(SingletonContextConstructorParameterResource.class);
+        
+        assertEquals("GET", resource("/").get(String.class));        
+    }
     
     @Path("/")
     public static class StringWriterResource {

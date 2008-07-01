@@ -56,7 +56,6 @@ import java.lang.reflect.TypeVariable;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -232,30 +231,41 @@ public final class InjectableProviderFactory implements InjectableProviderContex
         return null;
     }
     
-    public Injectable getInjectable(Parameter p) {
+    public Injectable getInjectable(Parameter p, Scope s) {
         if (p.getAnnotation() == null) return null;
         
         ComponentContext ic = new AnnotationObjectContext(p.getAnnotations());
         
-        // Find a per request injectable with Parameter
-        Injectable i = getInjectable(p.getAnnotation().annotationType(), ic, p.getAnnotation(), 
-                p, Scope.PerRequest);
-        if (i != null) return i;
-        
-        // Find a per request, undefined or singleton injectable with parameter Type
-        return getInjectable(
-                p.getAnnotation().annotationType(), 
-                ic, 
-                p.getAnnotation(), 
-                p.getParameterType(),
-                Arrays.asList(Scope.PerRequest, Scope.Undefined, Scope.Singleton)
-                );
+        if (s == Scope.PerRequest) {
+            // Find a per request injectable with Parameter
+            Injectable i = getInjectable(p.getAnnotation().annotationType(), ic, p.getAnnotation(), 
+                    p, Scope.PerRequest);
+            if (i != null) return i;
+
+            // Find a per request, undefined or singleton injectable with parameter Type
+            return getInjectable(
+                    p.getAnnotation().annotationType(), 
+                    ic, 
+                    p.getAnnotation(), 
+                    p.getParameterType(),
+                    Scope.PERREQUEST_UNDEFINED_SINGLETON
+                    );
+        } else {
+            // Find a undefined or singleton injectable with parameter Type
+            return getInjectable(
+                    p.getAnnotation().annotationType(), 
+                    ic, 
+                    p.getAnnotation(), 
+                    p.getParameterType(),
+                    Scope.UNDEFINED_SINGLETON
+                    );            
+        }
     }
     
-    public List<Injectable> getInjectable(List<Parameter> ps) {
+    public List<Injectable> getInjectable(List<Parameter> ps, Scope s) {
         List<Injectable> is = new ArrayList<Injectable>();
         for (Parameter p : ps)
-            is.add(getInjectable(p));        
+            is.add(getInjectable(p, s));
         return is;
     }
         
@@ -340,7 +350,7 @@ public final class InjectableProviderFactory implements InjectableProviderContex
                 for (Annotation a : as) {
                     Injectable i = getInjectable(
                             a.annotationType(), aoc, a, f.getGenericType(), 
-                            Arrays.asList(Scope.Singleton, Scope.Undefined));
+                            Scope.UNDEFINED_SINGLETON);
                     if (i != null) {
                         setFieldValue(o, f, i.getValue(null));
                     }
@@ -363,7 +373,7 @@ public final class InjectableProviderFactory implements InjectableProviderContex
             for (Annotation a : as) {
                 Injectable i = getInjectable(
                         a.annotationType(), aoc, a, t, 
-                        Arrays.asList(Scope.Singleton, Scope.Undefined));
+                        Scope.UNDEFINED_SINGLETON);
                 if (i != null) {
                     setMethodValue(o, m, i.getValue(null));
                 }
@@ -409,62 +419,5 @@ public final class InjectableProviderFactory implements InjectableProviderContex
         } catch (Exception ex) {
             throw new ContainerException(ex);
         }
-    }
-    
-    public static class ConstructorInjectablePair<T> {
-        Constructor<T> con;
-        List<Injectable> is;
-        
-        ConstructorInjectablePair(Constructor<T> con, List<Injectable> is) {
-            this.con = con;
-            this.is = is;
-        }
-    }
-    
-    /**
-     * Get the most suitable constructor. The constructor with the most
-     * parameters and that has the most parameters associated with 
-     * Injectable instances will be chosen.
-     * 
-     * @param c the class to instantiate
-     * @return a constructor and list of injectables for the constructor 
-     *         parameters.
-     */
-    @SuppressWarnings("unchecked")
-    public <T> ConstructorInjectablePair<T> getConstructor(Class<T> c) {
-        if (c.getConstructors().length == 0)
-            return null;
-        
-        SortedSet<ConstructorInjectablePair<T>> cs = new TreeSet<ConstructorInjectablePair<T>>(
-                new Comparator<ConstructorInjectablePair<T>>() {
-            public int compare(ConstructorInjectablePair<T> o1, ConstructorInjectablePair<T> o2) {
-                int p = Collections.frequency(o1.is, null) - Collections.frequency(o2.is, null);
-                if (p != 0)
-                    return p;
-                
-                return o2.con.getParameterTypes().length - o1.con.getParameterTypes().length;
-            }
-        });
-        
-        AnnotationObjectContext aoc = new AnnotationObjectContext();
-        for (Constructor con : c.getConstructors()) {
-            List<Injectable> is = new ArrayList<Injectable>();
-            int ps = con.getParameterTypes().length;
-            for (int p = 0; p < ps; p++) {
-                Type pgtype = con.getGenericParameterTypes()[p];
-                Annotation[] as = con.getParameterAnnotations()[p];
-                aoc.setAnnotations(as);
-                Injectable i = null;
-                for (Annotation a : as) {
-                    i = getInjectable(
-                            a.annotationType(), aoc, a, pgtype, 
-                            Arrays.asList(Scope.Singleton, Scope.Undefined));
-                }
-                is.add(i);
-            }
-            cs.add(new ConstructorInjectablePair<T>(con, is));
-        }
-                
-        return cs.first();
     }
 }
