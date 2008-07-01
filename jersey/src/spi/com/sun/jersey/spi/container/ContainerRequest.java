@@ -59,6 +59,7 @@ import java.util.logging.Logger;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Cookie;
 import javax.ws.rs.core.EntityTag;
+import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
@@ -303,14 +304,14 @@ public class ContainerRequest implements HttpRequestContext {
     }
     
     public String getLanguage() {
-        return this.getRequestHeaders().getFirst("Content-Langauge");
+        return this.getRequestHeaders().getFirst(HttpHeaders.CONTENT_LANGUAGE);
     }
     
     public Map<String, Cookie> getCookies() {
         if (cookies == null || headersModCount != headers.getModCount()) {
             cookies = new HashMap<String, Cookie>();
             
-            List<String> cl = getRequestHeaders().get("Cookie");
+            List<String> cl = getRequestHeaders().get(HttpHeaders.COOKIE);
             if (cl != null) {
                 for (String cookie : cl) {
                     if (cookie != null)
