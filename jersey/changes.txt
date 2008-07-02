@@ -1,4 +1,14 @@
 release 0.9 (2008-08-15)
+- Servler-side request filter to HTTP POST method replacing for proxies and
+  servers that block methods other than GET/POST.
+  See JavaDoc of:
+  com.sun.jersey.api.container.filter.PostReplaceFilter
+- Support server side request/response filters
+  See JavaDoc of:
+  com.sun.jersey.spi.container.ContainerRequestFilter
+  com.sun.jersey.spi.container.ContainerResponseFilter
+  ResourceConfig.PROPERTY_CONTAINER_REQUEST_FILTERS
+  ResourceConfig.PROPERTY_CONTAINER_RESPONSE_FILTERS
 - Select the constructor for a resource classe that has the most parameters
   that has the most instances are available for those parameters.
 - Support constructors with parameters on singleton resource classes.

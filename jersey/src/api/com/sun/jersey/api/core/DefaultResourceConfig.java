@@ -38,7 +38,6 @@
 package com.sun.jersey.api.core;
 
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -147,7 +146,7 @@ public class DefaultResourceConfig extends ResourceConfig {
      *        ';' separated elements.
      * @return the array of elements, each element is trimmed.
      */
-    protected static String[] getElements(String[] elements) {
+    public static String[] getElements(String[] elements) {
         List<String> es = new LinkedList<String>();
         for (String element : elements) {
             element = element.trim();

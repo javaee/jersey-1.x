@@ -45,6 +45,8 @@ import com.sun.jersey.spi.service.ComponentProvider.Scope;
 import com.sun.jersey.spi.service.ServiceFinder;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
@@ -84,6 +86,10 @@ public final class ComponentProviderCache {
             cache.put(p.getClass(), p);        
     }
     
+    public ComponentProvider getComponentProvider() {
+        return componentProvider;
+    }
+    
     public <T> Set<T> getProviders(Class<T> provider) {
         Set<T> ps = new LinkedHashSet<T>();
         ps.addAll(getProviderInstances(provider));
@@ -95,6 +101,18 @@ public final class ComponentProviderCache {
         }
         
         return ps;
+    }
+    
+    public <T> Set<T> getServices(Class<T> provider) {
+        Set<T> ps = new LinkedHashSet<T>();
+        for (Class pc : getServiceClasses(provider)) {
+            Object o = getComponent(pc);
+            if (o != null) {
+                ps.add(provider.cast(o));
+            }
+        }
+        
+        return ps;        
     }
     
     public <T> Set<T> getProvidersAndServices(Class<T> provider) {
@@ -110,10 +128,44 @@ public final class ComponentProviderCache {
         return ps;        
     }
     
+    public <T> List<T> getInstances(Class<T> provider, String[] classNames) {
+        List<T> ps = new LinkedList<T>();
+        for (String className : classNames) {
+            try {
+               Class<?> c = Class.forName(className, true, getClassLoader());
+               if (provider.isAssignableFrom(c)) {
+                   Object o = getComponent(c);
+                   if (o != null)
+                       ps.add(provider.cast(o));
+               } else {
+                   LOGGER.severe("The class " + 
+                           className +
+                           " is not assignable to the class " +
+                           provider.getName() + 
+                           ". This class is ignored.");
+               }
+            } catch (ClassNotFoundException e) {
+               LOGGER.severe("The class " + 
+                       className +
+                       " could not be found" +
+                       ". This class is ignored.");                
+            }
+        }
+        
+        return ps;
+    }
+    
     public void injectOnComponents() {
         for (Object v : cache.values()) {
             componentProvider.inject(v);
         }
+    }
+    
+    private ClassLoader getClassLoader() {
+        ClassLoader l = Thread.currentThread().getContextClassLoader();
+        if (l == null)
+            l = ClassLoader.getSystemClassLoader();
+        return l;
     }
     
     private Object getComponent(Class<?> provider) {
@@ -177,8 +229,18 @@ public final class ComponentProviderCache {
     }
     
     private Set<Class> getProviderAndServiceClasses(Class<?> service) {
-        Set<Class> sp = new LinkedHashSet<Class>(getProviderClasses(service)); 
-        
+        Set<Class> sp = new LinkedHashSet<Class>(getProviderClasses(service));         
+        getServiceClasses(service, sp);
+        return sp;
+    }    
+    
+    private Set<Class> getServiceClasses(Class<?> service) {
+        Set<Class> sp = new LinkedHashSet<Class>(); 
+        getServiceClasses(service, sp);
+        return sp;
+    }    
+    
+    private void getServiceClasses(Class<?> service, Set<Class> sp) {
         // Get the service-defined provider classes that implement serviceClass
         LOGGER.log(Level.CONFIG, "Searching for providers that implement: " + service);
         Class<?>[] pca = ServiceFinder.find(service, true).toClassArray();
@@ -188,7 +250,5 @@ public final class ComponentProviderCache {
         // Add service-defined providers to the set after application-defined
         for (Class pc : pca)
             sp.add(pc);
-        
-        return sp;
-    }    
+    }
 }

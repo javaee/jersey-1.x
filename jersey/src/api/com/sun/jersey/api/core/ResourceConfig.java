@@ -130,6 +130,30 @@ public abstract class ResourceConfig extends ApplicationConfig {
             "com.sun.jersey.spi.container.ContainerNotifier";
     
     /**
+     * If set the list of {@link ContainerRequestFilter} that are applied
+     * to filter the request. The filters are applied in order form 
+     * first to last as declared.
+     * <p>
+     * The instance may be a String[] or String that contains one or more fully 
+     * qualified class name of a request filter class separeted by ';'.
+     * Otherwise the instance may be List&ltContainerRequestFilter&gt.
+     */
+    public static final String PROPERTY_CONTAINER_REQUEST_FILTERS = 
+            "com.sun.jersey.spi.container.ContainerRequestFilters";
+    
+    /**
+     * If set the list of {@link ContainerResponseFilter} that are applied
+     * to filter the response. The filters are applied in order form 
+     * first to last as declared.
+     * <p>
+     * The instance may be a String[] or String that contains one or more fully 
+     * qualified class name of a response filter class separeted by ';'.
+     * Otherwise the instance may be List&ltContainerResponseFilter&gt.
+     */
+    public static final String PROPERTY_CONTAINER_RESPONSE_FILTERS = 
+            "com.sun.jersey.spi.container.ContainerResponseFilters";
+    
+    /**
      * Get the map of features associated with the Web application.
      *
      * @return the features.

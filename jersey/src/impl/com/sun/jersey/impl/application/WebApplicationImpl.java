@@ -50,7 +50,6 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.Proxy;
 import java.lang.reflect.Type;
-import java.net.URI;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
@@ -97,7 +96,6 @@ import com.sun.jersey.impl.modelapi.validation.BasicValidator;
 import com.sun.jersey.impl.template.TemplateFactory;
 import com.sun.jersey.impl.uri.PathPattern;
 import com.sun.jersey.impl.uri.PathTemplate;
-import com.sun.jersey.impl.uri.UriHelper;
 import com.sun.jersey.impl.uri.rules.ResourceClassRule;
 import com.sun.jersey.impl.uri.rules.ResourceObjectRule;
 import com.sun.jersey.impl.uri.rules.RightHandPathRule;
@@ -106,7 +104,9 @@ import com.sun.jersey.impl.wadl.WadlFactory;
 import com.sun.jersey.impl.wadl.WadlResource;
 import com.sun.jersey.spi.container.ExtendedMessageBodyWorkers;
 import com.sun.jersey.spi.container.ContainerRequest;
+import com.sun.jersey.spi.container.ContainerRequestFilter;
 import com.sun.jersey.spi.container.ContainerResponse;
+import com.sun.jersey.spi.container.ContainerResponseFilter;
 import com.sun.jersey.spi.container.ContainerResponseWriter;
 import com.sun.jersey.spi.container.WebApplication;
 import com.sun.jersey.spi.inject.InjectableProvider;
@@ -118,6 +118,8 @@ import com.sun.jersey.spi.service.ComponentProvider.Scope;
 import com.sun.jersey.spi.template.TemplateContext;
 import com.sun.jersey.spi.uri.rules.UriRule;
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 import javax.ws.rs.ext.ExceptionMapper;
 
 /**
@@ -159,6 +161,10 @@ public final class WebApplicationImpl implements WebApplication {
     
     private ResourceContext resourceContext;
         
+    private List<ContainerRequestFilter> requestFilters = new LinkedList<ContainerRequestFilter>();
+    
+    private List<ContainerResponseFilter> responseFilters = new LinkedList<ContainerResponseFilter>();
+    
     public WebApplicationImpl() {
         this.resolverFactory = ResourceProviderFactory.getInstance();
 
@@ -601,6 +607,19 @@ public final class WebApplicationImpl implements WebApplication {
         injectableFactory.add(new MatrixParamInjectableProvider());
         injectableFactory.add(new PathParamInjectableProvider());
         injectableFactory.add(new QueryParamInjectableProvider());
+
+        // Intiate filters
+        FilterFactory ff = new FilterFactory(cpc);
+        // Initiate request filters
+        requestFilters.addAll(ff.getRequestFilters(
+                resourceConfig.getProperty(
+                    ResourceConfig.PROPERTY_CONTAINER_REQUEST_FILTERS)));
+        requestFilters.addAll(cpc.getServices(ContainerRequestFilter.class));        
+        // Initiate response filters
+        responseFilters.addAll(ff.getResponseFilters(
+                resourceConfig.getProperty(
+                    ResourceConfig.PROPERTY_CONTAINER_RESPONSE_FILTERS)));
+        responseFilters.addAll(cpc.getServices(ContainerResponseFilter.class));        
         
         // Inject on all components
         cpc.injectOnComponents();
@@ -632,43 +651,38 @@ public final class WebApplicationImpl implements WebApplication {
     }
     
     public void handleRequest(ContainerRequest request, ContainerResponse response) throws IOException {
-        final WebApplicationContext localContext = new WebApplicationContext(this, request, response);
-        context.set(localContext);
-
-        if (resourceConfig.getFeature(ResourceConfig.FEATURE_NORMALIZE_URI)) {
-            final URI uri = request.getRequestUri();
-            final URI normalizedUri = UriHelper.normalize(uri,
-                    !resourceConfig.getFeature(ResourceConfig.FEATURE_CANONICALIZE_URI_PATH));
-
-            if (uri != normalizedUri &&
-                    resourceConfig.getFeature(ResourceConfig.FEATURE_REDIRECT)) {
-                response.setResponse(Response.temporaryRedirect(normalizedUri).build());
-                response.write();
-                return;
-            }
-        }
-
-        /**
-         * The matching algorithm currently works from an absolute path.
-         * The path is required to be in encoded form.
-         */
-        StringBuilder path = new StringBuilder();
-        path.append("/").append(localContext.getPath(false));
-
-        if (!resourceConfig.getFeature(ResourceConfig.FEATURE_MATCH_MATRIX_PARAMS)) {
-            path = stripMatrixParams(path);
-        }
-
-        // If there are URI conneg extensions for media and language
-        if (!resourceConfig.getMediaTypeMappings().isEmpty() ||
-                !resourceConfig.getLanguageMappings().isEmpty()) {
-            uriConneg(path, request);
-        }
-
         try {
+            final WebApplicationContext localContext = new 
+                    WebApplicationContext(this, request, response);
+            context.set(localContext);
+
+            /**
+             * The matching algorithm currently works from an absolute path.
+             * The path is required to be in encoded form.
+             */
+            StringBuilder path = new StringBuilder();
+            path.append("/").append(localContext.getPath(false));
+
+            if (!resourceConfig.getFeature(ResourceConfig.FEATURE_MATCH_MATRIX_PARAMS)) {
+                path = stripMatrixParams(path);
+            }
+
+            // TODO convert to filter
+            // If there are URI conneg extensions for media and language
+            if (!resourceConfig.getMediaTypeMappings().isEmpty() ||
+                    !resourceConfig.getLanguageMappings().isEmpty()) {
+                uriConneg(path, request);
+            }
+        
+            for (ContainerRequestFilter f : requestFilters)
+                request = f.filter(request);
+            
             if (!rootsRule.accept(path, null, localContext)) {
                 throw new NotFoundException();
             }
+            
+            for (ContainerResponseFilter f : responseFilters)
+                response = f.filter(response);
         } catch (WebApplicationException e) {
             mapWebApplicationException(e, response);
         } catch (ContainerCheckedException e) {
