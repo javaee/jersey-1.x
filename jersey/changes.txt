@@ -1,5 +1,5 @@
 release 0.9 (2008-08-15)
-- Servler-side request filter to HTTP POST method replacing for proxies and
+- Server-side request filter for HTTP POST method replacing for proxies and
   servers that block methods other than GET/POST.
   See JavaDoc of:
   com.sun.jersey.api.container.filter.PostReplaceFilter
