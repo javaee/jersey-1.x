@@ -21,18 +21,12 @@
  */
 package com.sun.jersey.spi.spring.container.servlet;
 
-import com.sun.jersey.spi.service.ComponentContext;
-import java.io.IOException;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
-
-import javax.servlet.ServletException;
-import javax.servlet.ServletRequest;
-import javax.servlet.ServletResponse;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -48,6 +42,7 @@ import com.sun.jersey.api.spring.Autowire;
 import com.sun.jersey.spi.container.WebApplication;
 import com.sun.jersey.spi.container.servlet.ServletContainer;
 import com.sun.jersey.spi.inject.Inject;
+import com.sun.jersey.spi.service.ComponentContext;
 import com.sun.jersey.spi.service.ComponentProvider;
 
 /**
@@ -161,20 +156,6 @@ public class SpringServlet extends ServletContainer {
             LOG.error( "Got exception while trying to initialize", e );
             throw e;
         }
-    }
-    
-    /* (non-Javadoc)
-     * @see javax.servlet.http.HttpServlet#service(javax.servlet.ServletRequest, javax.servlet.ServletResponse)
-     */
-    @Override
-    public void service( ServletRequest req, ServletResponse res ) throws ServletException, IOException {
-        LOG.debug( "Starting..." );
-        try {
-            super.service( req, res );
-        } catch( RuntimeException e ) {
-            LOG.error( "Caught exception.", e );
-        }
-        LOG.debug( "Finished." );
     }
     
     private static String getBeanName( ComponentContext cc, Class<?> c, ApplicationContext springContext ) {
