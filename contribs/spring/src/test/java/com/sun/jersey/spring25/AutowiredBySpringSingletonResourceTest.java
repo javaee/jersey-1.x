@@ -21,7 +21,6 @@
  */
 package com.sun.jersey.spring25;
 
-import org.springframework.web.context.support.WebApplicationContextUtils;
 import org.testng.annotations.Test;
 
 import com.sun.jersey.spring.AutowiredSingletonResourceTestBase;
