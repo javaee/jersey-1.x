@@ -60,15 +60,18 @@
     <mailingLists>
         <mailingList>
             <name>Jersey Dev List</name>
-            <archive>dev@jersey.dev.java.net</archive>
+            <archive>https://jersey.dev.java.net/servlets/SummarizeList?listName=dev</archive>
+            <post>dev@jersey.dev.java.net</post>
         </mailingList>
         <mailingList>
             <name>Jersey Support List</name>
-            <archive>users@jersey.dev.java.net</archive>
+            <archive>https://jersey.dev.java.net/servlets/SummarizeList?listName=users</archive>
+            <post>users@jersey.dev.java.net</post>
         </mailingList>
         <mailingList>
             <name>Jersey Announce List</name>
-            <archive>announces@jersey.dev.java.net</archive>
+            <archive>https://jersey.dev.java.net/servlets/SummarizeList?listName=announce</archive>
+            <post>announces@jersey.dev.java.net</post>
         </mailingList>
     </mailingLists>
     
