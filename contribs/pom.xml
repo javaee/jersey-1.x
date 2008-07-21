@@ -66,6 +66,7 @@
     
     <modules>
         <module>spring</module>
+        <module>maven-wadl-plugin</module>
     </modules>
 
   <build>

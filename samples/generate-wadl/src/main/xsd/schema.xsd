@@ -1,0 +1,23 @@
+<schema
+    xmlns="http://www.w3.org/2001/XMLSchema"
+    xmlns:example="http://www.example.com"
+    targetNamespace="http://www.example.com"
+    >
+    
+    <element name="items" type="example:items" />
+    
+    <complexType name="items">
+        <sequence>
+            <element name="item" type="string" minOccurs="0" maxOccurs="unbounded" />
+        </sequence>
+    </complexType>
+    
+    <element name="item">
+        <complexType>
+            <simpleContent>
+                <extension base="string"></extension>
+            </simpleContent>
+        </complexType>
+    </element>
+    
+</schema>

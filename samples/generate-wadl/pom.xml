@@ -1,0 +1,219 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+
+ DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+ 
+ Copyright 1997-2007 Sun Microsystems, Inc. All rights reserved.
+ 
+ The contents of this file are subject to the terms of either the GNU
+ General Public License Version 2 only ("GPL") or the Common Development
+ and Distribution License("CDDL") (collectively, the "License").  You
+ may not use this file except in compliance with the License. You can obtain
+ a copy of the License at https://jersey.dev.java.net/CDDL+GPL.html
+ or jersey/legal/LICENSE.txt.  See the License for the specific
+ language governing permissions and limitations under the License.
+ 
+ When distributing the software, include this License Header Notice in each
+ file and include the License file at jersey/legal/LICENSE.txt.
+ Sun designates this particular file as subject to the "Classpath" exception
+ as provided by Sun in the GPL Version 2 section of the License file that
+ accompanied this code.  If applicable, add the following below the License
+ Header, with the fields enclosed by brackets [] replaced by your own
+ identifying information: "Portions Copyrighted [year]
+ [name of copyright owner]"
+ 
+ Contributor(s):
+ 
+ If you wish your version of this file to be governed by only the CDDL or
+ only the GPL Version 2, indicate your decision by adding "[Contributor]
+ elects to include this software in this distribution under the [CDDL or GPL
+ Version 2] license."  If you don't indicate a single choice of license, a
+ recipient has the option to distribute your version of this file under
+ either the CDDL, the GPL Version 2 or to extend the choice of license to
+ its licensees as provided above.  However, if you add GPL Version 2 code
+ and therefore, elected the GPL Version 2 license, then the option applies
+ only if the new code is made subject to such option by the copyright
+ holder.
+-->
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>com.sun.jersey.samples</groupId>
+        <artifactId>jersey-samples</artifactId>
+        <version>0.9-ea-SNAPSHOT</version>
+        <relativePath>../pom.xml</relativePath>
+    </parent>
+    <artifactId>generate-wadl</artifactId>
+    <name>generate-wadl</name>
+    <packaging>jar</packaging>
+    
+    <dependencies>
+    
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>3.8.1</version>
+            <scope>test</scope>
+        </dependency>
+        
+        <dependency>
+            <groupId>com.sun.jersey</groupId>
+            <artifactId>maven-wadl-plugin</artifactId>
+            <version>${jersey-release-version}</version>
+        </dependency>
+        
+    </dependencies>
+    
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>com.sun.tools.xjc.maven2</groupId>
+                <artifactId>maven-jaxb-plugin</artifactId>
+                <version>1.1</version>
+                <executions>
+                    <execution>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>generate</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <generatePackage>com.sun.jersey.samples.generatewadl.model</generatePackage>
+                    <schemaDirectory>src/main/xsd</schemaDirectory>
+                    <includeSchemas>
+                        <includeSchema>**/*.xsd</includeSchema>
+                    </includeSchemas>
+                    <extension>true</extension>
+                    <strict>false</strict>
+                    <verbose>true</verbose>
+                </configuration>
+            </plugin>
+            
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>javadoc</goal>
+                        </goals>
+                        <phase>package</phase> 
+                    </execution>
+                </executions>
+
+                <configuration>
+                
+                    <encoding>UTF-8</encoding>
+                    <verbose>false</verbose>
+                    <show>public</show>
+                    <subpackages>com.sun.jersey.samples.generatewadl.resources</subpackages>
+
+                    <doclet>com.sun.jersey.wadl.resourcedoc.ResourceDoclet</doclet>
+                    <docletArtifacts>
+                        <docletArtifact>
+                            <groupId>com.sun.jersey</groupId>
+                            <artifactId>maven-wadl-plugin</artifactId>
+                            <version>${jersey-release-version}</version>
+                        </docletArtifact>
+                        <!--
+                            Also specify jersey and xerces as doclet artifacts as the ResourceDoclet
+                            uses classes provided by them to generate the resourcedoc.
+                         -->
+                        <docletArtifact>
+                            <groupId>com.sun.jersey</groupId>
+                            <artifactId>jersey</artifactId>
+                            <version>${jersey-release-version}</version>
+                        </docletArtifact>
+                        <docletArtifact>
+                            <groupId>xerces</groupId>
+                            <artifactId>xercesImpl</artifactId>
+                            <version>2.6.1</version>
+                        </docletArtifact>
+                    </docletArtifacts>
+                    <additionalparam>-output ${project.build.outputDirectory}/resourcedoc.xml -processors com.sun.jersey.samples.generatewadl.util.ExampleDocProcessor</additionalparam>
+                    
+                </configuration>
+            </plugin>
+            
+            <plugin>
+                <groupId>com.sun.jersey</groupId>
+                <artifactId>maven-wadl-plugin</artifactId>
+                <version>${jersey-release-version}</version>
+                <executions>
+                    <execution>
+                        <id>generate</id>
+                        <goals>
+                            <goal>generate</goal>
+                        </goals>
+                        <phase>package</phase> 
+                    </execution>
+                </executions>
+                
+                <configuration>
+                
+                    <wadlFile>${project.build.outputDirectory}/application.wadl</wadlFile>
+                    <formatWadlFile>true</formatWadlFile>
+                    <baseUri>http://www.example.com/api</baseUri>
+                    <packagesResourceConfig>
+                        <param>com.sun.jersey.samples.generatewadl.resources</param>
+                    </packagesResourceConfig>
+                    <wadlGenerators>
+                        <wadlGeneratorDescription>
+                            <className>com.sun.jersey.impl.wadl.generators.WadlGeneratorApplicationDoc</className>
+                            <properties>
+                                <property>
+                                    <name>applicationDocsFile</name>
+                                    <value>${basedir}/src/main/doc/application-doc.xml</value>
+                                </property>
+                            </properties>
+                        </wadlGeneratorDescription>
+                        <wadlGeneratorDescription>
+                            <className>com.sun.jersey.impl.wadl.generators.WadlGeneratorGrammarsSupport</className>
+                            <properties>
+                                <property>
+                                    <name>grammarsFile</name>
+                                    <value>${basedir}/src/main/doc/application-grammars.xml</value>
+                                </property>
+                            </properties>
+                        </wadlGeneratorDescription>
+                        <wadlGeneratorDescription>
+                            <className>com.sun.jersey.impl.wadl.generators.resourcedoc.WadlGeneratorResourceDocSupport</className>
+                            <properties>
+                                <property>
+                                    <name>resourceDocFile</name>
+                                    <value>${project.build.outputDirectory}/resourcedoc.xml</value>
+                                </property>
+                            </properties>
+                        </wadlGeneratorDescription>
+                        <wadlGeneratorDescription>
+                            <className>com.sun.jersey.samples.generatewadl.util.ExampleWadlGenerator</className>
+                            <properties>
+                                <property>
+                                    <name>resourceDocFile</name>
+                                    <value>${project.build.outputDirectory}/resourcedoc.xml</value>
+                                </property>
+                            </properties>
+                        </wadlGeneratorDescription>
+                    </wadlGenerators>
+                </configuration>
+                
+            </plugin>
+        </plugins>
+    </build>
+
+    <pluginRepositories>
+        <pluginRepository>
+            <id>java.net</id>
+            <url>http://download.java.net/maven/1</url>
+            <layout>legacy</layout>
+        </pluginRepository>
+    </pluginRepositories>
+    
+    <properties>
+        <jersey-release-version>0.9-ea-SNAPSHOT</jersey-release-version>
+    </properties>
+    
+</project>

@@ -1,0 +1,111 @@
+<?xml version="1.0"?>
+<project>
+    <parent>
+        <artifactId>jersey-contribs</artifactId>
+        <groupId>com.sun.jersey</groupId>
+        <version>0.9-ea-SNAPSHOT</version>
+        <relativePath>../pom.xml</relativePath>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>com.sun.jersey</groupId>
+    <artifactId>maven-wadl-plugin</artifactId>
+    <packaging>maven-plugin</packaging>
+    <name>maven-wadl-plugin Maven Mojo</name>
+    
+    <dependencies>
+    
+        <dependency>
+            <groupId>com.sun.jersey</groupId>
+            <artifactId>jersey</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        
+        <dependency>
+            <groupId>org.apache.maven</groupId>
+            <artifactId>apache-maven</artifactId>
+            <version>2.0.9</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.maven</groupId>
+            <artifactId>maven-artifact</artifactId>
+            <version>2.0.9</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.maven</groupId>
+            <artifactId>maven-plugin-api</artifactId>
+            <version>2.0</version>
+        </dependency>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>3.8.1</version>
+            <scope>test</scope>
+        </dependency>
+        
+        <dependency>
+            <groupId>xerces</groupId>
+            <artifactId>xercesImpl</artifactId>
+            <version>2.6.1</version>
+        </dependency>
+        
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>2.0</version>
+                <configuration>
+                    <source>1.5</source>
+                    <target>1.5</target>
+                    <encoding>utf-8</encoding>
+                    <optimize>true</optimize>
+                </configuration>
+            </plugin>
+            
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+            </plugin>
+            
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-plugin-plugin</artifactId>
+                <version>2.4-SNAPSHOT</version>
+                <!-- configuration>
+                    <goalPrefix>plugin</goalPrefix>
+                    <outputDirectory>${basedir}/target/dir</outputDirectory>
+                    <extractors/>
+                </configuration -->
+            </plugin>
+            
+        </plugins>
+    </build>
+
+    <profiles>
+        <profile>
+            <id>tools.jar</id>
+            <activation>
+                <!-- Activation should be done with <file>${java.home}/../lib/tools.jar</file
+                    But this is not working with maven as the property is not expansed.
+                -->
+                <property>
+                    <name>java.vendor</name>
+                    <value>Sun Microsystems Inc.</value>
+                </property>
+            </activation>
+            <dependencies>
+                <dependency>
+                    <groupId>com.sun</groupId>
+                    <artifactId>tools</artifactId>
+                    <version>1.5</version>
+                    <scope>system</scope>
+                    <systemPath>${java.home}/../lib/tools.jar</systemPath>
+                </dependency>
+            </dependencies>
+        </profile>
+    </profiles>
+    
+</project>

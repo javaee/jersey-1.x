@@ -37,8 +37,12 @@
 
 package com.sun.jersey.impl.wadl;
 
-import com.sun.research.ws.wadl.Application;
-import com.sun.research.ws.wadl.Resource;
+import java.util.List;
+import java.util.Map;
+
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.UriInfo;
+
 import com.sun.jersey.api.MediaTypes;
 import com.sun.jersey.api.core.HttpContext;
 import com.sun.jersey.api.model.AbstractResource;
@@ -46,10 +50,8 @@ import com.sun.jersey.api.uri.UriTemplate;
 import com.sun.jersey.impl.model.MediaTypeHelper;
 import com.sun.jersey.impl.model.method.ResourceHttpOptionsMethod;
 import com.sun.jersey.impl.model.method.ResourceMethod;
-import java.util.List;
-import java.util.Map;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.UriInfo;
+import com.sun.research.ws.wadl.Application;
+import com.sun.research.ws.wadl.Resource;
 
 /**
  *
@@ -95,15 +97,15 @@ import javax.ws.rs.core.UriInfo;
         }
         
         private Application generate() {
-            return path == null ? WadlGenerator.generate(resource) : 
-                WadlGenerator.generate(resource, path);
+            return path == null ? new WadlBuilder().generate(resource) : 
+                new WadlBuilder().generate(resource, path);
         }
     }
     
     private static Application genatateApplication(UriInfo info, 
             AbstractResource resource, String path) {   
-        Application a = path == null ? WadlGenerator.generate(resource) : 
-                WadlGenerator.generate(resource, path);
+        Application a = path == null ? new WadlBuilder().generate(resource) : 
+            new WadlBuilder().generate(resource, path);
         
         a.getResources().setBase(info.getBaseUri().toString());
                 

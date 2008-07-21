@@ -1,0 +1,19 @@
+Build the project, generate the resourcedoc.xml with javadoc and generate the wadl file:
+$ mvn compile javadoc:javadoc com.sun.jersey:maven-wadl-plugin:generate
+
+Afterwards have a look at the target/classes/application.wadl.
+
+Have a look at these artifacts:
+- pom.xml:
+  How all this wadl generation stuff is configured
+
+- src/main/java/com/sun/jersey/samples/generatewadl/resources/ItemsResource.java:
+  Shows how custom javadoc tags can be used to extend the generated wadl documentation
+  
+- src/main/java/com/sun/jersey/samples/generatewadl/util/ExampleDocProcessor.java:
+  Shows how you can process your custom tags and add them to the generated resourcedoc.xml.
+  An "@example.tag" can be found at ItemsResource.createItem.
+  
+- src/main/java/com/sun/jersey/samples/generatewadl/util/ExampleWadlGenerator:
+  Shows how the custom information added by the ExampleDocProcessor to the resourcedoc.xml
+  can be processed by this WadlGenerator and used to extend the generated application.wadl

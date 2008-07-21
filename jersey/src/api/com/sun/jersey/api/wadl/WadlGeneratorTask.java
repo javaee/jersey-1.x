@@ -41,7 +41,7 @@ import com.sun.jersey.api.core.ClasspathResourceConfig;
 import com.sun.jersey.api.core.ResourceConfig;
 import com.sun.jersey.api.model.AbstractResource;
 import com.sun.jersey.impl.modelapi.annotation.IntrospectionModeller;
-import com.sun.jersey.impl.wadl.WadlGenerator;
+import com.sun.jersey.impl.wadl.WadlBuilder;
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -157,7 +157,7 @@ public class WadlGeneratorTask extends Task {
             for (Class c : rc.getResourceClasses()) {
                 s.add(IntrospectionModeller.createResource(c));
             }
-            return WadlGenerator.generate(s);
+            return new WadlBuilder().generate(s);
         } catch(Exception e) {
             throw new BuildException(e);
         } finally {

@@ -36,13 +36,33 @@
  */
 package com.sun.jersey.impl.wadl;
 
-import com.sun.research.ws.wadl.Application;
-import com.sun.jersey.api.model.AbstractResource;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import javax.ws.rs.GET;
 import javax.ws.rs.ProduceMime;
 import javax.ws.rs.core.Context;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
+import javax.ws.rs.core.Response.ResponseBuilder;
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Marshaller;
+import javax.xml.bind.Unmarshaller;
+
+import com.sun.jersey.api.MediaTypes;
+import com.sun.jersey.api.model.AbstractResource;
+import com.sun.jersey.impl.wadl.generators.resourcedoc.WadlGeneratorResourceDocSupport;
+import com.sun.jersey.impl.wadl.generators.resourcedoc.model.ResourceDocType;
+import com.sun.research.ws.wadl.Application;
 
 /**
  *
@@ -50,17 +70,61 @@ import javax.ws.rs.core.UriInfo;
  */
 @ProduceMime({"application/vnd.sun.wadl+xml", "application/xml"})
 public final class WadlResource {
-    private final Application a;
+    
+    private static final Logger LOGGER = Logger.getLogger( WadlResource.class.getName() );
+    
+    private @Context UriInfo uriInfo;
+    
+    private byte[] bytes;
     
     public WadlResource(Set<AbstractResource> rootResources) {
         // TODO serialize JAXB bean to byte[]
         // no need to serilize WADL every time it is requested
-        this.a = WadlGenerator.generate(rootResources);
+        
+        WadlGenerator wadlGenerator = new WadlGeneratorImpl();
+        
+        final URL resource = getClass().getResource( "/" + WadlGeneratorResourceDocSupport.RESOURCE_DOC_FILE );
+        if ( resource != null ) {
+            try {
+                final File file = new File( resource.getFile() );
+                final ResourceDocType resourceDoc = loadFile( file, ResourceDocType.class );
+                wadlGenerator = new WadlGeneratorResourceDocSupport( wadlGenerator, resourceDoc );
+            } catch ( Exception e ) {
+                LOGGER.warning( "Could not load resourcedoc file " +
+                        WadlGeneratorResourceDocSupport.RESOURCE_DOC_FILE + 
+                        " from classpath: " + e );
+            }
+        }
+        final Application a = new WadlBuilder( wadlGenerator ).generate(rootResources);
+        
+        // TODO the uriInfo seems not to be set...
+//        if ( a.getResources().getBase() == null ) {
+//            a.getResources().setBase( uriInfo.getBaseUri().toString() );
+//        }
+        try {
+            final JAXBContext jaxbContext = JAXBContext.newInstance( wadlGenerator.getRequiredJaxbContextPath(),
+                    getClass().getClassLoader() );
+            final Marshaller marshaller = jaxbContext.createMarshaller();
+            marshaller.setProperty( Marshaller.JAXB_FORMATTED_OUTPUT, true );
+            final ByteArrayOutputStream os = new ByteArrayOutputStream();
+            marshaller.marshal( a, os );
+            this.bytes = os.toByteArray();
+            os.close();
+        } catch ( Exception e ) {
+            LOGGER.log( Level.WARNING, "Could not marshal wadl Application.", e );
+        }
     }
     
-    public synchronized @GET Application getWadl(@Context UriInfo uriInfo) {
-        if (a.getResources().getBase()==null)
-            a.getResources().setBase(uriInfo.getBaseUri().toString());
-        return a;
+    private <T> T loadFile( File fileToLoad, Class<T> targetClass ) throws JAXBException {
+        final JAXBContext c = JAXBContext.newInstance( targetClass );
+        final Unmarshaller m = c.createUnmarshaller();
+        return targetClass.cast( m.unmarshal( fileToLoad ) );
+    }
+    
+    public synchronized @GET Response getWadl() {
+        if ( this.bytes == null ) {
+            return Response.noContent().build();
+        }
+        return Response.ok( new ByteArrayInputStream( this.bytes ) ).build();
     }
 }
