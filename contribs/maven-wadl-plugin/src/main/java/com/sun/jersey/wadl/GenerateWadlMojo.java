@@ -70,8 +70,8 @@ import com.sun.research.ws.wadl.Application;
 
 /**
  * This mojo generates a wadl file, using an option resourcedoc file created
- * by the {@link ResourceDoclet} and an applicationdoc file.<br>
- * Created on: Jun 18, 2008<br>
+ * by the {@link ResourceDoclet} and an applicationdoc file.<br />
+ * Created on: Jun 18, 2008<br />
  * 
  * @author <a href="mailto:martin.grotzke@freiheit.com">Martin Grotzke</a>
  * @version $Id$
