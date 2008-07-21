@@ -39,6 +39,8 @@ package com.sun.jersey.impl.wadl.generators.resourcedoc;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 
+import javax.ws.rs.MatrixParam;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.QueryParam;
 
 import com.sun.jersey.api.model.Parameter;
@@ -149,7 +151,9 @@ public class ResourceDocAccessor {
     
     enum ParameterAnnotationMapping {
         
-        QUERY_PARAM( QueryParam.class, Source.QUERY );
+        QUERY_PARAM( QueryParam.class, Source.QUERY ),
+        MATRIX_PARAM( MatrixParam.class, Source.MATRIX ),
+        PATH_PARAM( PathParam.class, Source.PATH );
         
         private final Class<? extends Annotation> _jaxRsParamAnnotationType;
         private final Parameter.Source _parameterSource;
