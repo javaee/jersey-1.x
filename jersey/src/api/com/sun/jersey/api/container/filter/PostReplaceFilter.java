@@ -64,7 +64,7 @@ public class PostReplaceFilter implements ContainerRequestFilter {
         String override = request.getRequestHeaders().getFirst("X-HTTP-Method-Override");
         if (override == null)
             return request;        
-        override.trim();
+        override = override.trim();
         if (override.length() == 0)
             return request;
         
