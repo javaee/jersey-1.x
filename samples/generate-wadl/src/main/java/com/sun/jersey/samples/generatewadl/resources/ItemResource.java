@@ -47,8 +47,8 @@ import com.sun.jersey.samples.generatewadl.model.Item;
 import com.sun.jersey.samples.generatewadl.util.Examples;
 
 /**
- * TODO: DESCRIBE ME<br>
- * Created on: Jul 20, 2008<br>
+ * This resource is used to manage a single item.<br />
+ * Created on: Jul 20, 2008<br />
  * 
  * @author <a href="mailto:martin.grotzke@freiheit.com">Martin Grotzke</a>
  * @version $Id$

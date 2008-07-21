@@ -54,14 +54,14 @@ import com.sun.jersey.samples.generatewadl.util.Examples;
 import com.sun.jersey.spi.resource.Singleton;
 
 /**
- * TODO: DESCRIBE ME<br>
- * Created on: Jul 20, 2008<br>
+ * This is the root resource for managing items.<br />
+ * Created on: Jul 20, 2008<br />
  * 
  * @author <a href="mailto:martin.grotzke@freiheit.com">Martin Grotzke</a>
  * @version $Id$
  */
 @Singleton
-@Path("/wadlexample")
+@Path("items")
 public class ItemsResource {
     
     @Context UriInfo _uriInfo;
@@ -84,7 +84,8 @@ public class ItemsResource {
     }
 
     /**
-     * Simply returns some greeting...
+     * Add a new item to the list of managed items. The item will get assigned an id,
+     * the resource where the item is available will be returned in the location header.
      * 
      * @param item The item to create.
      * 
