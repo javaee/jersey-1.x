@@ -211,15 +211,6 @@ public class WadlGeneratorResourceDocSupport implements WadlGenerator {
         if ( responseDoc != null && responseDoc.hasRepresentations() ) {
             response = new Response();
             
-            for ( WadlParamType wadlParamType : responseDoc.getWadlParams() ) {
-                final Param param = new Param();
-                param.setName( wadlParamType.getName() );
-                param.setStyle( ParamStyle.fromValue( wadlParamType.getStyle() ) );
-                param.setType( wadlParamType.getType() );
-                addDoc( param.getDoc(), wadlParamType.getDoc() );
-                response.getParam().add( param );
-            }
-            
             for ( RepresentationDocType representationDoc : responseDoc.getRepresentations() ) {
                 
                 final RepresentationType wadlRepresentation = new RepresentationType();
@@ -241,6 +232,19 @@ public class WadlGeneratorResourceDocSupport implements WadlGenerator {
         }
         else {
             response = _delegate.createResponse( r, m );
+        }
+        
+        /* add response params from resourcedoc
+         */
+        if ( responseDoc != null && !responseDoc.getWadlParams().isEmpty() ) {
+            for ( WadlParamType wadlParamType : responseDoc.getWadlParams() ) {
+                final Param param = new Param();
+                param.setName( wadlParamType.getName() );
+                param.setStyle( ParamStyle.fromValue( wadlParamType.getStyle() ) );
+                param.setType( wadlParamType.getType() );
+                addDoc( param.getDoc(), wadlParamType.getDoc() );
+                response.getParam().add( param );
+            }
         }
         
         if ( responseDoc != null && !isEmpty( responseDoc.getReturnDoc() ) ) {
