@@ -121,14 +121,17 @@ public final class ResponseImpl extends Response {
                     Object location = values[i];
                     if (location != null) {
                         if (location instanceof URI) {
-                            if (!((URI)location).isAbsolute()) {
-                                String path = ((URI)location).getRawPath();
-                                if (status == 201)
-                                    location = UriBuilder.fromUri(request.getAbsolutePath()).
-                                            encode(false).path(path).build();
-                                else
-                                    location = UriBuilder.fromUri(request.getBaseUri()).
-                                            encode(false).path(path).build();
+                            final URI locationUri = (URI)location;
+                            if (!locationUri.isAbsolute()) {
+                                final URI base = (status == 201) 
+                                        ? request.getAbsolutePath() 
+                                        : request.getBaseUri();
+                                location = UriBuilder.fromUri(base).
+                                        encode(false).
+                                        path(locationUri.getRawPath()).
+                                        replaceQueryParams(locationUri.getRawQuery()).
+                                        fragment(locationUri.getRawFragment()).
+                                        build();
                             }
                         }
                         headers.putSingle(ResponseBuilderImpl.getHeader(i), location);

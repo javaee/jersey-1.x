@@ -75,6 +75,24 @@ public class LocationTest extends AbstractResourceTester {
         public Response abs() {
             return Response.created(URI.create("http://host:8888/subpath")).entity("CONTENT").build();
         }
+        
+        @Path("rel-path-query")
+        @POST
+        public Response relPathQuery() {
+            return Response.created(URI.create("subpath?a=b")).entity("CONTENT").build();
+        }
+        
+        @Path("abs-path-query")
+        @POST
+        public Response absPathQuery() {
+            return Response.created(URI.create("/subpath?a=b")).entity("CONTENT").build();
+        }
+        
+        @Path("abs-query")
+        @POST
+        public Response absQuery() {
+            return Response.created(URI.create("http://host:8888/subpath?a=b")).entity("CONTENT").build();
+        }
     }
     
     public void testCreated() {
@@ -99,6 +117,28 @@ public class LocationTest extends AbstractResourceTester {
         assertEquals("CONTENT", response.getEntity(String.class));        
     }
     
+    public void testCreatedQuery() {
+        initiateWebApplication(Created.class);
+        WebResource r = resource("/", false);
+
+        ClientResponse response = r.path("rel-path-query").post(ClientResponse.class);        
+        assertEquals(201, response.getStatus());        
+        URI l = UriBuilder.fromUri(BASE_URI).path("rel-path-query", "subpath").queryParam("a", "b").build();
+        assertEquals(l, response.getLocation());        
+        assertEquals("CONTENT", response.getEntity(String.class));
+        
+        response = r.path("abs-path-query").post(ClientResponse.class);        
+        assertEquals(201, response.getStatus());        
+        l = UriBuilder.fromUri(BASE_URI).path("abs-path-query", "subpath").queryParam("a", "b").build();
+        assertEquals(l, response.getLocation());        
+        assertEquals("CONTENT", response.getEntity(String.class));        
+        
+        response = r.path("abs-query").post(ClientResponse.class);        
+        assertEquals(201, response.getStatus());        
+        assertEquals(URI.create("http://host:8888/subpath?a=b"), response.getLocation());        
+        assertEquals("CONTENT", response.getEntity(String.class));        
+    }
+    
     @Path("/")
     static public class SeeOther {
         @Path("rel-path")
@@ -117,6 +157,24 @@ public class LocationTest extends AbstractResourceTester {
         @POST
         public Response abs() {
             return Response.seeOther(URI.create("http://host:8888/subpath")).build();
+        }
+        
+        @Path("rel-path-query")
+        @POST
+        public Response relPathQuery() {
+            return Response.seeOther(URI.create("subpath?a=b")).build();
+        }
+        
+        @Path("abs-path-query")
+        @POST
+        public Response absPathQuery() {
+            return Response.seeOther(URI.create("/subpath?a=b")).build();
+        }
+        
+        @Path("abs-query")
+        @POST
+        public Response absQuery() {
+            return Response.seeOther(URI.create("http://host:8888/subpath?a=b")).build();
         }
     }
     
@@ -137,6 +195,25 @@ public class LocationTest extends AbstractResourceTester {
         response = r.path("abs").post(ClientResponse.class);        
         assertEquals(303, response.getStatus());        
         assertEquals(URI.create("http://host:8888/subpath"), response.getLocation());        
+    }
+    
+    public void testSeeOtherQuery() {
+        initiateWebApplication(SeeOther.class);
+        WebResource r = resource("/", false);
+
+        ClientResponse response = r.path("rel-path-query").post(ClientResponse.class);        
+        assertEquals(303, response.getStatus());        
+        URI l = UriBuilder.fromUri(BASE_URI).path("subpath").queryParam("a", "b").build();
+        assertEquals(l, response.getLocation());        
+        
+        response = r.path("abs-path-query").post(ClientResponse.class);        
+        assertEquals(303, response.getStatus());        
+        l = UriBuilder.fromUri(BASE_URI).path("subpath").queryParam("a", "b").build();
+        assertEquals(l, response.getLocation());        
+        
+        response = r.path("abs-query").post(ClientResponse.class);        
+        assertEquals(303, response.getStatus());        
+        assertEquals(URI.create("http://host:8888/subpath?a=b"), response.getLocation());        
     }
     
     @Path("/")
