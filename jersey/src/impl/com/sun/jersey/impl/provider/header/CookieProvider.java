@@ -68,6 +68,9 @@ public class CookieProvider implements HeaderDelegateProvider<Cookie> {
     }
 
     public Cookie fromString(String header) {
+        if (header == null)
+            throw new IllegalArgumentException();
+        
         return HttpHeaderFactory.createCookie(header);
     }
 }

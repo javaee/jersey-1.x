@@ -70,9 +70,10 @@ public class MediaTypeProvider implements HeaderDelegateProvider<MediaType> {
     }
 
     public MediaType fromString(String header) {
+        if (header == null)
+            throw new IllegalArgumentException();
+        
         try {
-            if (header==null)
-                return new MediaType();
             HttpHeaderReader reader = new HttpHeaderReaderImpl(header);
             // Skip any white space
             reader.hasNext();

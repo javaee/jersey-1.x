@@ -44,6 +44,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import javax.ws.rs.core.CacheControl;
@@ -276,11 +277,15 @@ public final class ResponseBuilderImpl extends Response.ResponseBuilder {
 
     
     private void add(String name, Object value) {
-        if (nameValuePairs == null)
-            nameValuePairs = new ArrayList<Object>();
-
-        nameValuePairs.add(name);
-        nameValuePairs.add(value);
+        if (value != null) {
+            if (nameValuePairs == null)
+                nameValuePairs = new LinkedList<Object>();
+            
+            nameValuePairs.add(name);
+            nameValuePairs.add(value);
+        } else {
+            remove(name);
+        }
     }
     
     private void remove(String name) {

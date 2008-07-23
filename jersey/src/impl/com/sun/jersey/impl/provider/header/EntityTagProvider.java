@@ -63,6 +63,9 @@ public class EntityTagProvider implements HeaderDelegateProvider<EntityTag> {
     }
 
     public EntityTag fromString(String header) {
+        if (header == null)
+            throw new IllegalArgumentException();
+        
         boolean weak = false;
         if (header.startsWith("W/")) {
             header = header.substring(2);

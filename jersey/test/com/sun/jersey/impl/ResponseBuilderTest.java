@@ -92,6 +92,15 @@ public class ResponseBuilderTest extends TestCase {
         assertEquals(1, r.getMetadata().get("X-TEST").size());
     }
     
+    public void testRemovedHeaders() {
+        Response.ResponseBuilder rb = Response.status(200).
+                header("X-TEXT", "1").
+                header("X-TEST", "2");
+        
+        Response r = rb.header("X-TEST", null).build();
+        assertEquals(null, r.getMetadata().get("X-TEST"));
+    }
+    
     public void testCloneStatus() {
         Response.ResponseBuilder rb1 = Response.status(300);
         Response.ResponseBuilder rb2 = rb1.clone();
