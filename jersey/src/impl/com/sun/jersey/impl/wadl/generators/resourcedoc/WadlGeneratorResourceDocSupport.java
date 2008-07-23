@@ -80,7 +80,7 @@ import com.sun.research.ws.wadl.Response;
 public class WadlGeneratorResourceDocSupport implements WadlGenerator {
 
     private static final Logger LOG = Logger.getLogger( WadlGeneratorResourceDocSupport.class.getName() );
-    public static String RESOURCE_DOC_FILE = "resourcedoc.xml";
+    public static final String RESOURCE_DOC_FILE = "resourcedoc.xml";
 
     private WadlGenerator _delegate;
     private File _resourceDocFile;
