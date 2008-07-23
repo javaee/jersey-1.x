@@ -350,7 +350,7 @@ public class MethodIAnnotationnheritenceTest extends AbstractResourceTester {
         _test();
     }
 
-    @Path("/{_p}")
+    @Path("/{x_p}")
     public static class InterfaceImplementationOverride implements Interface {
         
         @GET
@@ -363,7 +363,7 @@ public class MethodIAnnotationnheritenceTest extends AbstractResourceTester {
         @ProduceMime("application/getParamsoverride")
         public String getParams(
                 @Context UriInfo ui,
-                @PathParam("_p") String p,
+                @PathParam("x_p") String p,
                 @QueryParam("_q") String q, 
                 @HeaderParam("_h") String h) {
             return p + q + h;
@@ -379,7 +379,7 @@ public class MethodIAnnotationnheritenceTest extends AbstractResourceTester {
         @Path("suboverride")
         public SubResource subResource(
                 @Context UriInfo ui,
-                @PathParam("_p") String p,
+                @PathParam("x_p") String p,
                 @QueryParam("_q") String q, 
                 @HeaderParam("_h") String h) {
             return new SubResource(ui, p, q, h);            
@@ -389,7 +389,7 @@ public class MethodIAnnotationnheritenceTest extends AbstractResourceTester {
         @Path("submethodoverride")
         public String subMethod(
                 @Context UriInfo ui,
-                @PathParam("_p") String p,
+                @PathParam("x_p") String p,
                 @QueryParam("_q") String q, 
                 @HeaderParam("_h") String h) {
             return p + q + h;            

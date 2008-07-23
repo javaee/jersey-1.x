@@ -63,8 +63,8 @@ public class UriTemplateTest extends TestCase {
                 "a");
         _testTemplateNames("{scheme}://{20}.example.org?date={wilma}&option={a}",
                 "scheme", "20", "wilma", "a");
-        _testTemplateNames("http://example.org/{a~b}",
-                "a~b");
+        _testTemplateNames("http://example.org/{a-b}",
+                "a-b");
         _testTemplateNames("http://example.org?{p}",
                 "p");
         _testTemplateNames("http://example.com/order/{c}/{c}/{c}/",
@@ -93,9 +93,9 @@ public class UriTemplateTest extends TestCase {
                 "http://example.org/page1#fred",
                 "fred");
         _testMatching("{scheme}://{20}.example.org?date={wilma}&option={a}",
-                "https://this-is-spinal-tap.example.org?date=&option=fred",
-                "https", "this-is-spinal-tap", "", "fred");
-        _testMatching("http://example.org/{a~b}",
+                "https://this-is-spinal-tap.example.org?date=2008&option=fred",
+                "https", "this-is-spinal-tap", "2008", "fred");
+        _testMatching("http://example.org/{a-b}",
                 "http://example.org/none%20of%20the%20above",
                 "none%20of%20the%20above");
         _testMatching("http://example.org?{p}",
@@ -108,12 +108,22 @@ public class UriTemplateTest extends TestCase {
                 "http://example.com/hullo#world",
                 "hullo#world");
         _testMatching("http://example.com/{e}/",
-                "http://example.com//",
-                "");
+                "http://example.com/xxx/",
+                "xxx");
+    }
+    
+    public void testUnlimtedMatching() {
+        _testMatching("http://example.org/{a}/{b}", false,
+                "http://example.org/fred/barney/x/y/z",
+                "fred", "barney/x/y/z");        
     }
     
     void _testMatching(String template, String uri, String... values) {
-        UriTemplate t = new UriTemplate(template);
+        _testMatching(template, true, uri, values);
+    }
+    
+    void _testMatching(String template, boolean limited, String uri, String... values) {
+        UriTemplate t = new UriTemplate(template, limited);
         Map<String, String> m = new HashMap<String, String>();
         
         System.out.println("TEMPLATE: " + template);
@@ -176,7 +186,7 @@ public class UriTemplateTest extends TestCase {
         _testSubstitutionArray("{scheme}://{20}.example.org?date={wilma}&option={a}",
                 "https://this-is-spinal-tap.example.org?date=&option=fred",
                 "https", "this-is-spinal-tap", "", "fred");
-        _testSubstitutionArray("http://example.org/{a~b}",
+        _testSubstitutionArray("http://example.org/{a-b}",
                 "http://example.org/none%20of%20the%20above",
                 "none%20of%20the%20above");
         _testSubstitutionArray("http://example.org?{p}",
@@ -213,9 +223,9 @@ public class UriTemplateTest extends TestCase {
                 "20", "this-is-spinal-tap", 
                 "wilma", "", 
                 "a", "fred");
-        _testSubstitutionMap("http://example.org/{a~b}",
+        _testSubstitutionMap("http://example.org/{a-b}",
                 "http://example.org/none%20of%20the%20above",
-                "a~b", "none%20of%20the%20above");
+                "a-b", "none%20of%20the%20above");
         _testSubstitutionMap("http://example.org?{p}",
                 "http://example.org?quote=to+bo+or+not+to+be",
                 "p", "quote=to+bo+or+not+to+be");

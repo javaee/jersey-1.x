@@ -107,14 +107,15 @@ public class UriTemplate {
     /**
      * The regular expression for matching URI templates and names.
      */
-    private static final Pattern TEMPLATE_NAMES_PATTERN = Pattern.compile("\\{([\\w-\\._~]+?)\\}");
+    private static final Pattern TEMPLATE_NAMES_PATTERN = Pattern.compile("\\{([a-zA-Z0-9][-\\w\\.]*)\\}");
     
     /**
      * This uses a reluctant (non-greedy qualifier) to ensure that
      * expresions to the right of an expression will be matched.
      */
-    private static final String TEMPLATE_VALUE_REGEX = "(.*?)";
+    private static final String TEMPLATE_VALUE_LIMITED_REGEX = "([^/]+?)";
     
+    private static final String TEMPLATE_VALUE_UNLIMITED_REGEX = "(.*?)";
     
     /**
      * The empty URI template that matches the null or empty URI path
@@ -168,12 +169,31 @@ public class UriTemplate {
      * template values.
      * <p>
      * @param template the template.
-     * @throws {@link java.util.regex.PatternSyntaxException} if the specific
+     * @throw {@link java.util.regex.PatternSyntaxException} if the specific
      *         regular expression could not be generated
-     * @throws {@link IllegalArgumentException} if the template is null or
+     * @throw {@link IllegalArgumentException} if the template is null or
      *         an empty string.
      */
     public UriTemplate(String template) {
+        this(template, true);
+    }
+    
+    /**
+     * Construct a new URI template.
+     * <p>
+     * The template will be parsed to extract template variables.
+     * <p>
+     * A specific regular expression will be generated from the template
+     * to match URIs according to the template and map template variables to
+     * template values.
+     * <p>
+     * @param template the template.
+     * @throw {@link java.util.regex.PatternSyntaxException} if the specific
+     *         regular expression could not be generated
+     * @throw {@link IllegalArgumentException} if the template is null or
+     *         an empty string.
+     */
+    public UriTemplate(String template, boolean limited) {    
         if (template == null || template.length() == 0)
             throw new IllegalArgumentException();
         
@@ -183,14 +203,27 @@ public class UriTemplate {
         List<String> names = new ArrayList<String>();
         
         // Find all template variables
-        // Create regular expression for template matching
         Matcher m = TEMPLATE_NAMES_PATTERN.matcher(template);
+        
+        // Count the template variables
+        int nTemplateVariables = 0;
+        while(m.find()) {
+            nTemplateVariables++;
+        }        
+        
+        // Create regular expression for template matching
+        m.reset();
         int i = 0;
         int c = 0;
+        int n = 0;
         while(m.find()) {
+            n++;
             c += m.start() - i;
             copyURITemplateCharacters(template, i, m.start(), b);
-            b.append(TEMPLATE_VALUE_REGEX);
+            if (!limited && nTemplateVariables == n)
+                b.append(TEMPLATE_VALUE_UNLIMITED_REGEX);
+            else 
+                b.append(TEMPLATE_VALUE_LIMITED_REGEX);
             names.add(m.group(1));
             i = m.end();
         }
@@ -371,7 +404,7 @@ public class UriTemplate {
      *        and template values (as values). The map is cleared before any
      *        entries are put.
      * @return true if the URI matches the template, otherwise false.
-     * @throws {@link IllegalArgumentException} if the uri or 
+     * @throw {@link IllegalArgumentException} if the uri or 
      *         templateVariableToValue is null.
      */
     public final boolean match(CharSequence uri, Map<String, String> templateVariableToValue) {
@@ -394,7 +427,7 @@ public class UriTemplate {
      *        capturing groups is matching is successful. The values are stored 
      *        in the same order as the pattern's capturing groups.
      * @return true if the URI matches the template, otherwise false.
-     * @throws {@link IllegalArgumentException} if the uri or 
+     * @throw {@link IllegalArgumentException} if the uri or 
      *         templateVariableToValue is null.
      */
     public final boolean match(CharSequence uri, List<String> groupValues) {

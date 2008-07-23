@@ -69,7 +69,7 @@ public final class UriRulesFactory {
     }
     
     public static UriRules<UriRule> create(List<PatternRulePair<UriRule>> rules) {
-        if (rules.size() < 8) {
+        if (rules.size() < Integer.MAX_VALUE) {
             return new AtomicMatchingPatterns<UriRule>(rules);
         } else {
             return new AutomataMatchingUriTemplateRules<UriRule>(rules);

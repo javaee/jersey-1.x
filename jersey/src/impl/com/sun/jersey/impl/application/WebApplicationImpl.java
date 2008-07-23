@@ -758,7 +758,8 @@ public final class WebApplicationImpl implements WebApplication {
 
             UriTemplate t = new PathTemplate(
                     r.resource.getUriPath().getValue(),
-                    r.resource.getUriPath().isEncode());
+                    r.resource.getUriPath().isEncode(),
+                    r.resource.getUriPath().isLimited());
 
             PathPattern p = new PathPattern(t, r.resource.getUriPath().isLimited());
 

@@ -269,9 +269,9 @@ public abstract class AbstractMatchingTester extends TestCase {
         assertEquals(null, groupValues.get(1));
                 
         s = match("/edit/a");
-        assertEquals("/edit/a{p1}", s);
+        assertEquals("/edit/{p1}", s);
         assertEquals(2, groupValues.size());
-        assertEquals("", groupValues.get(0));
+        assertEquals("a", groupValues.get(0));
         assertEquals(null, groupValues.get(1));
         
         s = match("/edit/a_one");

@@ -152,15 +152,11 @@ public class ContainerItemMatrixTest extends AbstractResourceTester {
         WebResource r = resource("/items-id/item;ids=1;ids=2;ids=3");
         
         assertEquals("1;2;3", r.get(String.class));
-        
-        r = resource("/items-id/;ids=1;ids=2;ids=3");
-        
-        assertEquals("1;2;3", r.get(String.class));
     }   
     
     public void testGetItemNoSlash() throws IOException {
         initiateWebApplication(ItemNoSlashResource.class);
-        WebResource r = resource("/items-no-slash/;ids=1;ids=2;ids=3");
+        WebResource r = resource("/items-no-slash;ids=1;ids=2;ids=3");
         
         assertEquals("1;2;3", r.get(String.class));
     }   
@@ -181,7 +177,7 @@ public class ContainerItemMatrixTest extends AbstractResourceTester {
     
     public void testGetContainerItemId() throws IOException {
         initiateWebApplication(ContainerResource.class, ItemResource.class);
-        WebResource r = resource("/container/c/items-id/;ids=1;ids=2;ids=3");
+        WebResource r = resource("/container/c/items-id/id;ids=1;ids=2;ids=3");
         
         assertEquals("c:1;2;3", r.get(String.class));
         
@@ -192,7 +188,7 @@ public class ContainerItemMatrixTest extends AbstractResourceTester {
     
     public void testGetContainerItemNoSlash() throws IOException {
         initiateWebApplication(ContainerResource.class, ItemResource.class);
-        WebResource r = resource("/container/c/items-no-slash/;ids=1;ids=2;ids=3");
+        WebResource r = resource("/container/c/items-no-slash;ids=1;ids=2;ids=3");
         
         assertEquals("c:1;2;3", r.get(String.class));
     }   

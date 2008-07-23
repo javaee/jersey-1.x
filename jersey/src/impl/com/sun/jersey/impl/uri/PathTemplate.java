@@ -54,7 +54,7 @@ public final class PathTemplate extends UriTemplate {
      * @param template the URI path template
      */
     public PathTemplate(String template) {
-        this(template, false);
+        this(template, false, true);
     }
     
     /**
@@ -70,7 +70,11 @@ public final class PathTemplate extends UriTemplate {
      *         contains illegal characters. 
      */
     public PathTemplate(String template, boolean encode) {
-        super(encodeOrValidate(prefixWithSlash(template), encode));
+        this(template, encode, true);
+    }
+    
+    public PathTemplate(String template, boolean encode, boolean limited) {
+        super(encodeOrValidate(prefixWithSlash(template), encode), limited);
     }
     
     private static String encodeOrValidate(String path, boolean encode) {

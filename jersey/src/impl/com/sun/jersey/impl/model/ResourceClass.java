@@ -198,7 +198,8 @@ public final class ResourceClass {
         for (final AbstractSubResourceLocator locator : resource.getSubResourceLocators()) {
             UriTemplate t = new PathTemplate(
                     locator.getUriPath().getValue(),
-                    locator.getUriPath().isEncode());
+                    locator.getUriPath().isEncode(),
+                    locator.getUriPath().isLimited());
 
             PathPattern p = new PathPattern(
                     t,
@@ -225,7 +226,8 @@ public final class ResourceClass {
 
             UriTemplate t = new PathTemplate(
                     method.getUriPath().getValue(),
-                    method.getUriPath().isEncode());
+                    method.getUriPath().isEncode(),
+                    method.getUriPath().isLimited());
 
             PathPattern p = new PathPattern(t,  method.getUriPath().isLimited());
 
