@@ -321,4 +321,29 @@ public class UriBuilderTest extends TestCase {
         assertEquals(URI.create("http://user@localhost:8080/a/b?query#fragment"), full);
     }
     
+    public void testIllegalArgumentException() {
+        boolean caught = false;
+        try {
+            UriBuilder.fromPath(null);
+        } catch(IllegalArgumentException e) {
+            caught = true;
+        }
+        assertTrue(caught);
+        
+        caught = false;
+        try {
+            UriBuilder.fromUri((URI)null);
+        } catch(IllegalArgumentException e) {
+            caught = true;
+        }
+        assertTrue(caught);
+        
+        caught = false;
+        try {
+            UriBuilder.fromUri((String)null);
+        } catch(IllegalArgumentException e) {
+            caught = true;
+        }
+        assertTrue(caught);
+    }
 }
