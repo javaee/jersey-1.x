@@ -64,7 +64,7 @@ public class OptionsTest extends AbstractResourceTester {
     
     @Target({ElementType.METHOD})
     @Retention(RetentionPolicy.RUNTIME)
-    @HttpMethod("PATCH")
+    @HttpMethod("OPTIONS")
     public @interface OPTIONS { 
     }
     
@@ -118,7 +118,8 @@ public class OptionsTest extends AbstractResourceTester {
         @OPTIONS
         public Response options() {
             return Response.ok("OPTIONS").
-                    header("Allow", "GET, PUT, POST, DELETE, PATCH").build();
+                    header("Allow", "GET, PUT, POST, DELETE, PATCH").
+                    header("X-TEST", "OVERRIDE").build();
         }
         
         @GET
@@ -157,5 +158,7 @@ public class OptionsTest extends AbstractResourceTester {
         assertTrue(allow.contains("POST"));
         assertTrue(allow.contains("DELETE"));
         assertTrue(allow.contains("PATCH"));
+        
+        assertEquals("OVERRIDE", response.getMetadata().getFirst("X-TEST"));
     }
 }
