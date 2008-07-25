@@ -1,0 +1,14 @@
+com.sun.jersey.impl.provider.entity.StringProvider
+com.sun.jersey.impl.provider.entity.ByteArrayProvider
+com.sun.jersey.impl.provider.entity.FileProvider
+com.sun.jersey.impl.provider.entity.InputStreamProvider
+com.sun.jersey.impl.provider.entity.DataSourceProvider
+com.sun.jersey.impl.provider.entity.MimeMultipartProvider
+com.sun.jersey.impl.provider.entity.FormProvider
+com.sun.jersey.impl.provider.entity.FormMultivaluedMapProvider
+com.sun.jersey.impl.provider.entity.XMLRootElementProvider
+com.sun.jersey.impl.provider.entity.XMLJAXBElementProvider
+com.sun.jersey.impl.provider.entity.ReaderProvider
+com.sun.jersey.impl.provider.entity.StreamingOutputProvider
+com.sun.jersey.impl.provider.entity.SourceProvider$SourceWriter
+com.sun.jersey.impl.template.ViewableMessageBodyWriter

@@ -34,13 +34,14 @@
  and therefore, elected the GPL Version 2 license, then the option applies
  only if the new code is made subject to such option by the copyright
  holder.
---><project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+-->
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>com.sun.jersey</groupId>
         <artifactId>jersey-project</artifactId>
         <version>0.9-ea-SNAPSHOT</version>
-        <relativePath>../pom.xml</relativePath>
+        <!--relativePath>../pom.xml</relativePath-->
     </parent>
     <groupId>com.sun.jersey.samples</groupId>
     <artifactId>jersey-samples</artifactId>
@@ -55,15 +56,17 @@
     <modules>
         <module>helloworld</module>
         <module>helloworld-webapp</module>
+        <!--
         <module>generate-wadl</module>
-  </modules>
+        -->
+    </modules>
 
     <!-- Minimal dependencies for all jersey sample modules -->
     <dependencies>
 
         <dependency>
             <groupId>com.sun.jersey</groupId>
-            <artifactId>jersey</artifactId>
+            <artifactId>jersey-server</artifactId>
             <version>${project.version}</version>
         </dependency>
 

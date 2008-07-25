@@ -124,7 +124,7 @@
                          -->
                         <docletArtifact>
                             <groupId>com.sun.jersey</groupId>
-                            <artifactId>jersey</artifactId>
+                            <artifactId>jersey-project</artifactId>
                             <version>${jersey-release-version}</version>
                         </docletArtifact>
                         <docletArtifact>

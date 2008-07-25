@@ -53,8 +53,15 @@
 
         <dependency>
             <groupId>com.sun.jersey</groupId>
-            <artifactId>jersey</artifactId>
+            <artifactId>jersey-server</artifactId>
             <version>${project.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.sun.jersey</groupId>
+            <artifactId>jersey-client</artifactId>
+            <version>${project.version}</version>
+            <scope>test</scope>
         </dependency>
 
         <dependency>

@@ -24,30 +24,29 @@ package com.sun.jersey.samples.helloworld;
 
 import java.io.IOException;
 
-import com.sun.jersey.api.container.ContainerFactory;
-import com.sun.jersey.api.container.httpserver.HttpServerFactory;
-import com.sun.jersey.api.core.PackagesResourceConfig;
-import com.sun.jersey.api.core.ResourceConfig;
-import com.sun.jersey.samples.helloworld.resources.HelloWorldResource;
-import com.sun.net.httpserver.HttpHandler;
-import com.sun.net.httpserver.HttpServer;
+import com.sun.grizzly.http.SelectorThread;
+import com.sun.jersey.api.container.grizzly.*;
+import com.sun.jersey.impl.container.grizzly.*;
+import java.util.*;
+//import com.sun.net.httpserver.HttpHandler;
+//import com.sun.net.httpserver.HttpServer;
 
 public class Main {
     
     public static void main(String[] args) throws IOException {
         
-        final ResourceConfig resourceConfig = new PackagesResourceConfig( new String[] { HelloWorldResource.class.getPackage().getName() } );
-        final HttpHandler container = ContainerFactory.createContainer( HttpHandler.class, resourceConfig );
-        
-        final HttpServer server = HttpServerFactory.create( "http://localhost:9998/", container );
-        server.start();
-        
-        System.out.println("Server running");
-        System.out.println("Visit: http://localhost:9998/helloworld");
-        System.out.println("Hit return to stop...");
+        final String baseUri = "http://localhost:9998/";
+        final Map<String, String> initParams = new HashMap<String, String>();
+
+        initParams.put("com.sun.jersey.config.property.resourceConfigClass", "com.sun.jersey.api.core.PackagesResourceConfig");
+        initParams.put("com.sun.jersey.config.property.packages", "com.sun.jersey.samples.helloworld.resources");
+
+        System.out.println("Starting grizzly...");
+        SelectorThread threadSelector = GrizzlyWebContainerFactory.create(baseUri, initParams);
+        System.out.println(String.format("Jersey app started at %s", baseUri));
+        System.out.println(String.format("Try out %shelloworld", baseUri, baseUri));
         System.in.read();
-        System.out.println("Stopping server");   
-        server.stop(0);
-        System.out.println("Server stopped");
+        threadSelector.stop();
+        System.exit(0);
     }    
 }

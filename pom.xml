@@ -87,9 +87,13 @@
     
     <modules>
         <module>contribs</module>
-        <!-- to be switched on later -->
-        <!--module>samples</module-->
-        <!--module>jersey/maven</module-->
+        <module>samples</module>
+        <module>jersey-core</module>
+        <module>jersey-server</module>
+        <module>jersey-client</module>
+        <module>jersey-json</module>
+        <module>jersey-atom</module>
+        <module>jersey-tests</module>
     </modules>
 
     <build>
@@ -117,7 +121,7 @@
     
     <repositories>
         <repository>
-            <id>java.net</id>
+            <id>m1.dev.java.net</id>
             <url>http://download.java.net/maven/1</url>
             <layout>legacy</layout>
             <releases>
@@ -126,6 +130,11 @@
             <snapshots>
                 <enabled>false</enabled>
             </snapshots>
+        </repository>
+         <repository>
+            <id>m2.dev.java.net</id>
+            <url>http://download.java.net/maven/2</url>
+            <layout>default</layout>
         </repository>
     </repositories>
     
