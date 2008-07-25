@@ -50,24 +50,16 @@
     <packaging>jar</packaging>
     <dependencies>
         <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <version>3.8.1</version>
-            <scope>test</scope>
+            <groupId>com.sun.jersey</groupId>
+            <artifactId>jersey-server</artifactId>
+            <version>${project.version}</version>
         </dependency>
         <dependency>
-          <groupId>com.sun.grizzly</groupId>
-          <artifactId>grizzly-servlet-webserver</artifactId>
-          <version>1.8.3</version>
-          <scope>compile</scope>
-        </dependency>
-        <dependency>
-          <groupId>com.sun.jersey</groupId>
-          <artifactId>jersey-server</artifactId>
-          <version>${project.version}</version>
+            <groupId>com.sun.grizzly</groupId>
+            <artifactId>grizzly-servlet-webserver</artifactId>
+            <version>1.8.3</version>
         </dependency>
     </dependencies>
-    
     <build>
         <plugins>
             <!--  Maven Exec Plug-In: http://mojo.codehaus.org/exec-maven-plugin/  -->
@@ -88,17 +80,4 @@
             </plugin>
         </plugins>
     </build>
-
-    <pluginRepositories>
-        <pluginRepository>
-            <id>codehaus</id>
-            <url>http://repository.codehaus.org</url>
-        </pluginRepository>
-        <pluginRepository>
-            <id>java.net</id>
-            <url>http://download.java.net/maven/1</url>
-            <layout>legacy</layout>
-        </pluginRepository>
-    </pluginRepositories>
-    
 </project>

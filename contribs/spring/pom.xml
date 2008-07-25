@@ -50,27 +50,23 @@
     <name>jersey-spring</name>
     <url>http://maven.apache.org</url>
     <dependencies>
-
         <dependency>
             <groupId>com.sun.jersey</groupId>
             <artifactId>jersey-server</artifactId>
             <version>${project.version}</version>
         </dependency>
-
         <dependency>
             <groupId>com.sun.jersey</groupId>
             <artifactId>jersey-client</artifactId>
             <version>${project.version}</version>
             <scope>test</scope>
         </dependency>
-
         <dependency>
             <groupId>javax.servlet</groupId>
             <artifactId>servlet-api</artifactId>
             <version>2.5</version>
             <scope>provided</scope>
         </dependency>
-        
         <dependency>
             <groupId>commons-logging</groupId>
             <artifactId>commons-logging</artifactId>
@@ -85,14 +81,12 @@
             <version>6.1.3</version>
             <scope>test</scope>
         </dependency>
-        
         <dependency>
             <groupId>org.mortbay.jetty</groupId>
             <artifactId>jetty-util</artifactId>
             <version>6.1.3</version>
             <scope>test</scope>
         </dependency>
-
         <dependency>
             <groupId>org.testng</groupId>
             <artifactId>testng</artifactId>
@@ -100,21 +94,18 @@
             <classifier>jdk15</classifier>
             <scope>test</scope>
         </dependency>
-
-      	<dependency>
+        <dependency>
             <groupId>com.sun.xml.bind</groupId>
             <artifactId>jaxb-impl</artifactId>
             <version>2.1</version>
             <scope>test</scope>
-      	</dependency>
-
-      	<dependency>
+        </dependency>
+        <dependency>
             <groupId>javax.annotation</groupId>
             <artifactId>jsr250-api</artifactId>
             <version>1.0</version>
             <scope>test</scope>
-      	</dependency>
- 
+        </dependency>
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
@@ -122,7 +113,6 @@
             <scope>test</scope>
         </dependency>
     </dependencies>
-
     <build>
         <resources>
             <resource>
@@ -143,17 +133,17 @@
                 </configuration>
             </plugin>
             <plugin>
-              <groupId>org.apache.maven.plugins</groupId>
-              <artifactId>maven-source-plugin</artifactId>
-              <executions>
-                <execution>
-                  <id>attach-sources</id>
-                  <phase>validate</phase>
-                  <goals>
-                    <goal>jar</goal>
-                  </goals>
-                </execution>
-              </executions>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-source-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>attach-sources</id>
+                        <phase>validate</phase>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -161,7 +151,7 @@
                 <version>2.4.2</version>
                 <configuration>
                     <skip>${maven.test.skip}</skip>
-                    <useFile>false</useFile>     
+                    <useFile>false</useFile>
                 </configuration>
                 <executions>
                     <execution>
@@ -177,25 +167,10 @@
             </plugin>
         </plugins>
     </build>
-
-    <repositories>
-        <repository>
-            <id>java.net.m2</id>
-            <url>http://download.java.net/maven/2</url>
-            <layout>default</layout>
-        </repository>
-        <repository>
-            <id>java.net.m1</id>
-            <url>http://download.java.net/maven/1</url>
-            <layout>legacy</layout>
-        </repository>
-    </repositories>
-
     <properties>
         <spring20-release-version>2.0.5</spring20-release-version>
         <spring25-release-version>[2.5.2,)</spring25-release-version>
     </properties>
-    
     <profiles>
         <profile>
             <id>spring25</id>
@@ -284,5 +259,4 @@
             </build>
         </profile>
     </profiles>
-
 </project>

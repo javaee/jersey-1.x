@@ -46,13 +46,10 @@
     <groupId>com.sun.jersey.samples</groupId>
     <artifactId>jersey-samples</artifactId>
     <packaging>pom</packaging>
-    
-    <name>Jersey examples</name>
-    
+    <name>Jersey samples</name>
     <description>
-        Examples that show how to use jersey.
+        Samples that show how to use jersey.
     </description>
-    
     <modules>
         <module>helloworld</module>
         <module>helloworld-webapp</module>
@@ -60,23 +57,4 @@
         <module>generate-wadl</module>
         -->
     </modules>
-
-    <!-- Minimal dependencies for all jersey sample modules -->
-    <dependencies>
-
-        <dependency>
-            <groupId>com.sun.jersey</groupId>
-            <artifactId>jersey-server</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>javax.servlet</groupId>
-            <artifactId>servlet-api</artifactId>
-            <version>2.5</version>
-            <scope>compile</scope>
-        </dependency>
-        
-    </dependencies>
-    
 </project>

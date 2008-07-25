@@ -44,19 +44,15 @@
     <version>0.9-ea-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>jersey-project</name>
-    
     <url>https://jersey.dev.java.net/</url>
-    
     <organization>
         <name>Sun Microsystems, Inc</name>
         <url>http://www.sun.com/</url>
     </organization>
-
     <issueManagement>
         <system>bugzilla</system>
         <url>https://jersey.dev.java.net/servlets/ProjectIssues</url>
     </issueManagement>
-    
     <mailingLists>
         <mailingList>
             <name>Jersey Dev List</name>
@@ -74,7 +70,6 @@
             <post>announces@jersey.dev.java.net</post>
         </mailingList>
     </mailingLists>
-    
     <licenses>
         <license>
             <name>
@@ -84,7 +79,6 @@
             <distribution>repo</distribution>
         </license>
     </licenses>
-    
     <modules>
         <module>contribs</module>
         <module>samples</module>
@@ -96,80 +90,72 @@
         <module>jersey-tests</module>
         <module>jersey-bundle</module>
     </modules>
-
     <build>
-
-       <plugins>
-          <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-compiler-plugin</artifactId>
-          <inherited>true</inherited>
-          <configuration>
-            <source>1.5</source>
-            <target>1.5</target>
-          </configuration>
-        </plugin>
-
-        <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-source-plugin</artifactId>
-          <executions>
-            <execution>
-              <id>attach-sources</id>
-              <phase>verify</phase>
-              <goals>
-                <goal>jar</goal>
-              </goals>
-            </execution>
-          </executions>
-        </plugin>
-
+        <plugins>
             <plugin>
-              <groupId>org.apache.maven.plugins</groupId>
-              <artifactId>maven-javadoc-plugin</artifactId>
-              <executions>
-                <execution>
-                  <id>attach-javadocs</id>
-                  <goals>
-                    <goal>jar</goal>
-                </goals>
-              </execution>
-            </executions>
-          </plugin>
-
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <inherited>true</inherited>
+                <configuration>
+                    <source>1.5</source>
+                    <target>1.5</target>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-source-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>attach-sources</id>
+                        <phase>verify</phase>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>attach-javadocs</id>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
         </plugins>
-
         <extensions>
-          <extension>
-            <groupId>org.jvnet.wagon-svn</groupId>
-              <artifactId>wagon-svn</artifactId>
-              <version>1.8</version>
-          </extension>
+            <extension>
+                <groupId>org.jvnet.wagon-svn</groupId>
+                <artifactId>wagon-svn</artifactId>
+                <version>1.8</version>
+            </extension>
         </extensions>
     </build>
-    
-  <pluginRepositories>
-    <pluginRepository>
-      <id>maven2-repository.dev.java.net</id>
-      <name>Java.net Repository for Maven</name>
-      <url>http://download.java.net/maven/2/</url>
-      <layout>default</layout>
-    </pluginRepository>
-    <pluginRepository>
-      <id>maven-repository.dev.java.net</id>
-      <name>Java.net Maven 1 Repository (legacy)</name>
-      <url>http://download.java.net/maven/1</url>
-      <layout>legacy</layout>
-    </pluginRepository>
-  </pluginRepositories>
-
+    <pluginRepositories>
+        <pluginRepository>
+            <id>maven2-repository.dev.java.net</id>
+            <name>Java.net Repository for Maven</name>
+            <url>http://download.java.net/maven/2/</url>
+            <layout>default</layout>
+        </pluginRepository>
+        <pluginRepository>
+            <id>maven-repository.dev.java.net</id>
+            <name>Java.net Maven 1 Repository (legacy)</name>
+            <url>http://download.java.net/maven/1</url>
+            <layout>legacy</layout>
+        </pluginRepository>
+    </pluginRepositories>
     <repositories>
         <repository>
             <id>m1.dev.java.net</id>
             <url>http://download.java.net/maven/1</url>
             <layout>legacy</layout>
         </repository>
-         <repository>
+        <repository>
             <id>m2.dev.java.net</id>
             <url>http://download.java.net/maven/2</url>
             <layout>default</layout>
@@ -182,14 +168,12 @@
         <jersey-version>0.9-ea-SNAPSHOT</jersey-version>
     </properties> 
     -->
-
     <distributionManagement>
-      <repository>
-        <uniqueVersion>false</uniqueVersion>
-        <id>java.net-m2-dist-repository</id>
-        <name>java.net-m2-repository</name>
-        <url>java-net:/maven2-repository/trunk/www/repository/</url> 
-      </repository>
+        <repository>
+            <uniqueVersion>false</uniqueVersion>
+            <id>java.net-m2-dist-repository</id>
+            <name>java.net-m2-repository</name>
+            <url>java-net:/maven2-repository/trunk/www/repository/</url>
+        </repository>
     </distributionManagement>
-
 </project>

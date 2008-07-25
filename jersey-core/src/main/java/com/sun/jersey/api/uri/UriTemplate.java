@@ -107,7 +107,7 @@ public class UriTemplate {
     /**
      * The regular expression for matching URI templates and names.
      */
-    private static final Pattern TEMPLATE_NAMES_PATTERN = Pattern.compile("\\{([a-zA-Z0-9][-\\w\\.]*)\\}");
+    private static final Pattern TEMPLATE_NAMES_PATTERN = Pattern.compile("\\{(\\w[-\\w\\.]*)\\}");
     
     /**
      * This uses a reluctant (non-greedy qualifier) to ensure that
