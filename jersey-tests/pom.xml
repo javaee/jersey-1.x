@@ -90,6 +90,7 @@
               </excludes-->
               <forkMode>always</forkMode>
               <enableAssertions>false</enableAssertions>
+              <!--skipTests>true</skipTests-->
             </configuration>
             <executions>
               <execution>

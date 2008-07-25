@@ -1,0 +1,95 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+      <groupId>com.sun.jersey</groupId>
+      <artifactId>jersey-project</artifactId>
+      <version>0.9-ea-SNAPSHOT</version>
+      <!--relativePath>../pom.xml</relativePath-->
+  </parent>
+  <artifactId>jersey-bundle</artifactId>
+  <packaging>jar</packaging>
+  <name>jersey-bundle</name>
+
+  <dependencies>
+    <dependency>
+       <groupId>com.sun.jersey</groupId>
+       <artifactId>jersey-server</artifactId>
+       <version>${project.version}</version>
+    </dependency>
+     <dependency>
+       <groupId>com.sun.jersey</groupId>
+       <artifactId>jersey-client</artifactId>
+       <version>${project.version}</version>
+    </dependency>
+     <dependency>
+       <groupId>com.sun.jersey</groupId>
+       <artifactId>jersey-json</artifactId>
+       <version>${project.version}</version>
+    </dependency>
+      <dependency>
+       <groupId>com.sun.jersey</groupId>
+       <artifactId>jersey-atom</artifactId>
+       <version>${project.version}</version>
+    </dependency>
+  </dependencies>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-shade-plugin</artifactId>
+        <executions>
+          <execution>
+            <phase>package</phase>
+            <goals>
+              <goal>shade</goal>
+            </goals>
+            <configuration>
+              <shadedGroupFilter>com.sun.jersey</shadedGroupFilter>
+              <shadedArtifactAttached>false</shadedArtifactAttached>
+              <promoteTransitiveDependencies>false</promoteTransitiveDependencies>
+              <createDependencyReducedPom>true</createDependencyReducedPom>
+              <transformers>
+                <transformer implementation="org.apache.maven.plugins.shade.resource.AppendingTransformer">
+                  <resource>META-INF/services/com.sun.jersey.spi.container.ContainerProvider</resource>
+                </transformer>
+                 <transformer implementation="org.apache.maven.plugins.shade.resource.AppendingTransformer">
+                  <resource>META-INF/services/com.sun.jersey.spi.container.ContainerRequestFilter</resource>
+                </transformer>
+                 <transformer implementation="org.apache.maven.plugins.shade.resource.AppendingTransformer">
+                  <resource>META-INF/services/com.sun.jersey.impl.model.method.dispatch.ResourceMethodDispatchProvider</resource>
+                </transformer>
+                 <transformer implementation="org.apache.maven.plugins.shade.resource.AppendingTransformer">
+                  <resource>META-INF/services/com.sun.jersey.spi.container.WebApplicationProvider</resource>
+                </transformer>
+                 <transformer implementation="org.apache.maven.plugins.shade.resource.AppendingTransformer">
+                  <resource>META-INF/services/com.sun.jersey.spi.HeaderDelegateProvider</resource>
+                </transformer>
+                 <transformer implementation="org.apache.maven.plugins.shade.resource.AppendingTransformer">
+                  <resource>META-INF/services/javax.ws.rs.core.Response$ResponseBuilder</resource>
+                </transformer>
+                 <transformer implementation="org.apache.maven.plugins.shade.resource.AppendingTransformer">
+                  <resource>META-INF/services/javax.ws.rs.core.UriBuilder</resource>
+                </transformer>
+                 <transformer implementation="org.apache.maven.plugins.shade.resource.AppendingTransformer">
+                  <resource>META-INF/services/javax.ws.rs.core.Variant$VariantListBuilder</resource>
+                </transformer>
+                 <transformer implementation="org.apache.maven.plugins.shade.resource.AppendingTransformer">
+                  <resource>META-INF/services/javax.ws.rs.ext.MessageBodyReader</resource>
+                </transformer>
+                 <transformer implementation="org.apache.maven.plugins.shade.resource.AppendingTransformer">
+                  <resource>META-INF/services/javax.ws.rs.ext.MessageBodyWriter</resource>
+                </transformer>
+                 <transformer implementation="org.apache.maven.plugins.shade.resource.AppendingTransformer">
+                  <resource>META-INF/services/javax.ws.rs.ext.RuntimeDelegate</resource>
+                </transformer>
+             </transformers>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+
+</project>

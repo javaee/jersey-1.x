@@ -94,6 +94,7 @@
         <module>jersey-json</module>
         <module>jersey-atom</module>
         <module>jersey-tests</module>
+        <module>jersey-bundle</module>
     </modules>
 
     <build>
@@ -122,22 +123,7 @@
             </execution>
           </executions>
         </plugin>
-       </plugins>
 
-        <extensions>
-          <extension>
-            <groupId>org.jvnet.wagon-svn</groupId>
-              <artifactId>wagon-svn</artifactId>
-              <version>1.8</version>
-          </extension>
-        </extensions>
-    </build>
-    
-    <profiles>
-      <profile>
-        <id>release</id>
-        <build>
-          <plugins>
             <plugin>
               <groupId>org.apache.maven.plugins</groupId>
               <artifactId>maven-javadoc-plugin</artifactId>
@@ -150,11 +136,18 @@
               </execution>
             </executions>
           </plugin>
-        </plugins>
-      </build>
-    </profile>
-  </profiles>
 
+        </plugins>
+
+        <extensions>
+          <extension>
+            <groupId>org.jvnet.wagon-svn</groupId>
+              <artifactId>wagon-svn</artifactId>
+              <version>1.8</version>
+          </extension>
+        </extensions>
+    </build>
+    
   <pluginRepositories>
     <pluginRepository>
       <id>maven2-repository.dev.java.net</id>
