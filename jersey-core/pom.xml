@@ -1,12 +1,15 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
-  <groupId>com.sun.jersey</groupId>
+  <parent>
+      <groupId>com.sun.jersey</groupId>
+      <artifactId>jersey-project</artifactId>
+      <version>0.9-ea-SNAPSHOT</version>
+      <!--relativePath>../pom.xml</relativePath-->
+  </parent>
   <artifactId>jersey-core</artifactId>
   <packaging>jar</packaging>
-  <version>0.9-ea-SNAPSHOT</version>
   <name>jersey-core</name>
-  <url>http://maven.apache.org</url>
 
   <dependencies>
       <dependency>
@@ -15,12 +18,6 @@
         <version>0.8</version>
       </dependency>
      <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
-      <version>3.8.1</version>
-      <scope>test</scope>
-    </dependency>
-   <dependency>
       <groupId>javax.mail</groupId>
       <artifactId>mail</artifactId>
       <version>1.4</version>
@@ -61,15 +58,7 @@
       </resource>
      </resources>
 
-      <plugins>
-
-        <plugin>
-            <artifactId>maven-compiler-plugin</artifactId>
-            <configuration>
-              <source>1.5</source>
-              <target>1.5</target>
-            </configuration>
-        </plugin>
+    <plugins>
 
       <plugin>
         <groupId>org.jvnet.jaxb2.maven2</groupId>
@@ -133,35 +122,5 @@
         </plugin>
       </plugins>
   </build>
-
-  <pluginRepositories>
-    <pluginRepository>
-      <id>maven2-repository.dev.java.net</id>
-      <name>Java.net Repository for Maven</name>
-      <url>http://download.java.net/maven/2/</url>
-      <layout>default</layout>
-    </pluginRepository>
-    <pluginRepository>
-      <id>maven-repository.dev.java.net</id>
-      <name>Java.net Maven 1 Repository (legacy)</name>
-      <url>http://download.java.net/maven/1</url>
-      <layout>legacy</layout>
-    </pluginRepository>
-  </pluginRepositories>
-
-
-  <repositories>
-    <repository>
-      <id>maven2-repository.dev.java.net</id>
-      <name>Java.net Repository for Maven</name>
-      <url>http://download.java.net/maven/2/</url>
-      <layout>default</layout>
-    </repository>
-    <repository>
-      <id>maven-repository.dev.java.net</id>
-      <url>http://download.java.net/maven/1</url>
-      <layout>legacy</layout>
-    </repository>
-  </repositories>
 
 </project>
