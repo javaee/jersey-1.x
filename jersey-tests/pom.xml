@@ -85,9 +85,9 @@
          <plugin>
             <artifactId>maven-surefire-plugin</artifactId>
             <configuration>
-              <!--excludes>
+              <excludes>
                 <exclude>com/sun/jersey/impl/container/httpserver/*Test.java</exclude>
-              </excludes-->
+              </excludes>
               <forkMode>always</forkMode>
               <enableAssertions>false</enableAssertions>
               <!--skipTests>true</skipTests-->
