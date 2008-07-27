@@ -136,7 +136,7 @@ public class WadlResourceTest extends AbstractResourceTester {
     /**
      * Test WADL generation
      */
-    public void ignoredTestGetWadl() throws ParserConfigurationException, SAXException, IOException, XPathExpressionException {
+    public void testGetWadl() throws ParserConfigurationException, SAXException, IOException, XPathExpressionException {
         initiateWebApplication(WidgetsResource.class, ExtraResource.class);
         WebResource r = resource("/application.wadl");
         

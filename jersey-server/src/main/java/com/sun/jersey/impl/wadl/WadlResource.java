@@ -39,8 +39,6 @@ package com.sun.jersey.impl.wadl;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
 import java.net.URL;
 import java.util.Set;
 import java.util.logging.Level;
@@ -49,16 +47,13 @@ import java.util.logging.Logger;
 import javax.ws.rs.GET;
 import javax.ws.rs.ProduceMime;
 import javax.ws.rs.core.Context;
-import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
-import javax.ws.rs.core.Response.ResponseBuilder;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 
-import com.sun.jersey.api.MediaTypes;
 import com.sun.jersey.api.model.AbstractResource;
 import com.sun.jersey.impl.wadl.generators.resourcedoc.WadlGeneratorResourceDocSupport;
 import com.sun.jersey.impl.wadl.generators.resourcedoc.model.ResourceDocType;
@@ -72,14 +67,12 @@ import com.sun.research.ws.wadl.Application;
 public final class WadlResource {
     
     private static final Logger LOGGER = Logger.getLogger( WadlResource.class.getName() );
-    
-    private @Context UriInfo uriInfo;
-    
-    private byte[] bytes;
+
+    private Application _a;
+    private String _requiredJaxbContextPath;
+    private byte[] _bytes;
     
     public WadlResource(Set<AbstractResource> rootResources) {
-        // TODO serialize JAXB bean to byte[]
-        // no need to serilize WADL every time it is requested
         
         WadlGenerator wadlGenerator = new WadlGeneratorImpl();
         
@@ -95,24 +88,9 @@ public final class WadlResource {
                         " from classpath: " + e );
             }
         }
-        final Application a = new WadlBuilder( wadlGenerator ).generate(rootResources);
+        _a = new WadlBuilder( wadlGenerator ).generate(rootResources);
+        _requiredJaxbContextPath = wadlGenerator.getRequiredJaxbContextPath();
         
-        // TODO the uriInfo seems not to be set...
-//        if ( a.getResources().getBase() == null ) {
-//            a.getResources().setBase( uriInfo.getBaseUri().toString() );
-//        }
-        try {
-            final JAXBContext jaxbContext = JAXBContext.newInstance( wadlGenerator.getRequiredJaxbContextPath(),
-                    getClass().getClassLoader() );
-            final Marshaller marshaller = jaxbContext.createMarshaller();
-            marshaller.setProperty( Marshaller.JAXB_FORMATTED_OUTPUT, true );
-            final ByteArrayOutputStream os = new ByteArrayOutputStream();
-            marshaller.marshal( a, os );
-            this.bytes = os.toByteArray();
-            os.close();
-        } catch ( Exception e ) {
-            LOGGER.log( Level.WARNING, "Could not marshal wadl Application.", e );
-        }
     }
     
     private <T> T loadFile( File fileToLoad, Class<T> targetClass ) throws JAXBException {
@@ -121,10 +99,27 @@ public final class WadlResource {
         return targetClass.cast( m.unmarshal( fileToLoad ) );
     }
     
-    public synchronized @GET Response getWadl() {
-        if ( this.bytes == null ) {
-            return Response.noContent().build();
+    public synchronized @GET Response getWadl(@Context UriInfo uriInfo) {
+        
+        if ( _bytes == null ) {
+            if ( _a.getResources().getBase() == null ) {
+                _a.getResources().setBase( uriInfo.getBaseUri().toString() );
+            }
+            try {
+                final JAXBContext jaxbContext = JAXBContext.newInstance( _requiredJaxbContextPath,
+                        getClass().getClassLoader() );
+                final Marshaller marshaller = jaxbContext.createMarshaller();
+                marshaller.setProperty( Marshaller.JAXB_FORMATTED_OUTPUT, true );
+                final ByteArrayOutputStream os = new ByteArrayOutputStream();
+                marshaller.marshal( _a, os );
+                _bytes = os.toByteArray();
+                os.close();
+            } catch ( Exception e ) {
+                LOGGER.log( Level.WARNING, "Could not marshal wadl Application.", e );
+                return Response.ok( _a ).build();
+            }
         }
-        return Response.ok( new ByteArrayInputStream( this.bytes ) ).build();
+        
+        return Response.ok( new ByteArrayInputStream( _bytes ) ).build();
     }
 }
