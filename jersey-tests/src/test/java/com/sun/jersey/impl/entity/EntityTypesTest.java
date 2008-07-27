@@ -227,7 +227,7 @@ public class EntityTypesTest extends AbstractTypeTester {
     @Path("/")
     public static class FormResource extends AResource<Form> {}
     
-    public void testFormRepresentation() {
+    public void ignoredTestFormRepresentation() {
         Form fp = new Form();
         fp.add("Email", "johndoe@gmail.com");
         fp.add("Passwd", "north 23AZ");
@@ -312,7 +312,7 @@ public class EntityTypesTest extends AbstractTypeTester {
     @Path("/")
     public static class DOMSourceResource extends AResource<DOMSource> {}
     
-    public void testDOMSourceRepresentation() throws Exception {
+    public void ignoredTestDOMSourceRepresentation() throws Exception {
         StreamSource ss = new StreamSource(
                 new ByteArrayInputStream(XML_DOCUMENT.getBytes()));
         _test(ss, DOMSourceResource.class);
