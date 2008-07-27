@@ -63,6 +63,12 @@
             <artifactId>maven-wadl-plugin</artifactId>
             <version>${jersey-release-version}</version>
         </dependency>
+
+        <dependency>
+            <groupId>org.codehaus.jettison</groupId>
+            <artifactId>jettison</artifactId>
+            <version>1.0.1</version>
+        </dependency>
         
     </dependencies>
     
@@ -124,7 +130,7 @@
                          -->
                         <docletArtifact>
                             <groupId>com.sun.jersey</groupId>
-                            <artifactId>jersey-project</artifactId>
+                            <artifactId>jersey-server</artifactId>
                             <version>${jersey-release-version}</version>
                         </docletArtifact>
                         <docletArtifact>
@@ -201,19 +207,73 @@
                 </configuration>
                 
             </plugin>
+            
+            <!--  Maven Exec Plug-In: http://mojo.codehaus.org/exec-maven-plugin/  -->
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>exec-maven-plugin</artifactId>
+                <version>1.1</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>java</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <mainClass>com.sun.jersey.samples.generatewadl.Main</mainClass>
+                </configuration>
+            </plugin>
         </plugins>
     </build>
-
-    <pluginRepositories>
-        <pluginRepository>
-            <id>java.net</id>
-            <url>http://download.java.net/maven/1</url>
-            <layout>legacy</layout>
-        </pluginRepository>
-    </pluginRepositories>
     
     <properties>
         <jersey-release-version>0.9-ea-SNAPSHOT</jersey-release-version>
     </properties>
+    
+    <profiles>
+        <profile>
+            <id>xsltproc</id>
+            <activation>
+                <file>
+                    <exists>/usr/bin/xsltproc</exists>
+                </file>
+            </activation>
+            <build>
+                <plugins>
+                    <!--  Create/generate the application.html using xsltproc  -->
+                    <plugin>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>exec-maven-plugin</artifactId>
+                        <version>1.1</version>
+                        <executions>
+                            <execution>
+                                <id>prepare-xsltproc</id>
+                                <goals>
+                                    <goal>exec</goal>
+                                </goals>
+                                <phase>package</phase>
+                                <configuration>
+                                    <executable>cp</executable>
+                                    <commandlineArgs>src/main/xsd/schema.xsd target/classes/</commandlineArgs>
+                                </configuration>
+                            </execution>
+                            <execution>
+                                <id>exec-xsltproc: target/application.html</id>
+                                <goals>
+                                    <goal>exec</goal>
+                                </goals>
+                                <phase>package</phase>
+                                <configuration>
+                                    <executable>xsltproc</executable>
+                                    <commandlineArgs>-o target/application.html src/main/doc/wadl_documentation.xsl target/classes/application.wadl</commandlineArgs>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
     
 </project>

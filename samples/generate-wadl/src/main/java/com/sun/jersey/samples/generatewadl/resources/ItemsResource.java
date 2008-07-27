@@ -96,11 +96,11 @@ public class ItemsResource {
      * @request.representation.mediaType application/xml
      * @request.representation.example {@link Examples#SAMPLE_ITEM}
      * 
-     * @response.param  {@name Location}
+     * @response.param {@name Location}
      *                  {@style header}
      *                  {@type {http://www.w3.org/2001/XMLSchema}anyURI}
      *                  {@doc The URI where the created item is accessable.}
-     *                  
+     * 
      * @return The response with the status code and the location header.
      * 
      */

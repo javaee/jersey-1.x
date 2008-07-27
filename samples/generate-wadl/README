@@ -1,7 +1,8 @@
+= Generate the application.wadl =
 Build the project, generate the resourcedoc.xml with javadoc and generate the wadl file:
 $ mvn compile javadoc:javadoc com.sun.jersey:maven-wadl-plugin:generate
 
-Afterwards have a look at the target/classes/application.wadl.
+Afterwards have a look at the target/classes/application.wadl
 
 Have a look at these artifacts:
 - pom.xml:
@@ -17,3 +18,16 @@ Have a look at these artifacts:
 - src/main/java/com/sun/jersey/samples/generatewadl/util/ExampleWadlGenerator:
   Shows how the custom information added by the ExampleDocProcessor to the resourcedoc.xml
   can be processed by this WadlGenerator and used to extend the generated application.wadl
+
+
+= Generate a complete application.html =
+If you're on unix and have xsltproc installed you can simply run mvn package
+$ mvn package
+
+and afterwards hava a look at the generated target/application.html
+
+
+= Start jersey with the ItemsResource =
+If you want to start jersey with the resource classes of this application
+so that you can add, read and update items just run mvn exec:java:
+$ mvn compile exec:java

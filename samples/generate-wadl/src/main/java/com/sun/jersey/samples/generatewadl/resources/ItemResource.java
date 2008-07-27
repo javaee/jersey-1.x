@@ -43,6 +43,8 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.ProduceMime;
 
+import org.codehaus.jettison.json.JSONArray;
+
 import com.sun.jersey.samples.generatewadl.model.Item;
 import com.sun.jersey.samples.generatewadl.util.Examples;
 
@@ -74,6 +76,22 @@ public class ItemResource {
     @ProduceMime({ "application/xml" })
     public Item getItem() {
         return _item;
+    }
+    
+    /**
+     * Returns the item if existing.
+     * 
+     * @response.representation.200.mediaType application/json
+     * @response.representation.200.example ["myValue"]
+     * 
+     * @return the requested item.
+     */
+    @GET
+    @ProduceMime({ "application/json" })
+    public JSONArray getItemAsJSON() {
+        final JSONArray result = new JSONArray();
+        result.put( _item.getValue() );
+        return result;
     }
     
     /**
