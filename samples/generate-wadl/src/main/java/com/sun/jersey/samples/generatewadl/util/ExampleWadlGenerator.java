@@ -81,7 +81,6 @@ public class ExampleWadlGenerator implements WadlGenerator {
     /* (non-Javadoc)
      * @see com.sun.jersey.impl.wadl.WadlGenerator#setWadlGeneratorDelegate(com.sun.jersey.impl.wadl.WadlGenerator)
      */
-    @Override
     public void setWadlGeneratorDelegate( WadlGenerator delegate ) {
         _delegate = delegate;
     }
@@ -89,7 +88,6 @@ public class ExampleWadlGenerator implements WadlGenerator {
     /* (non-Javadoc)
      * @see com.sun.jersey.impl.wadl.WadlGenerator#getRequiredJaxbContextPath()
      */
-    @Override
     public String getRequiredJaxbContextPath() {
         return _delegate.getRequiredJaxbContextPath();
     }

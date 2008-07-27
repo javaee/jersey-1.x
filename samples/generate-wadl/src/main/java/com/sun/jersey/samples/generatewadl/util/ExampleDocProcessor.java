@@ -57,13 +57,11 @@ import com.sun.jersey.wadl.resourcedoc.DocProcessor;
 public class ExampleDocProcessor implements DocProcessor {
 
     protected static final String EXAMPLE_TAG = "exampletag";
-
-    @Override
+    
     public Class<?>[] getRequiredJaxbContextClasses() {
         return new Class[] { MyNamedValueType.class };
     }
-
-    @Override
+    
     public void processMethodDoc( MethodDoc methodDoc, MethodDocType methodDocType ) {
         final String tagName = "@example.tag";
         final Tag exampleTag = getTag( methodDoc, tagName );
@@ -83,12 +81,10 @@ public class ExampleDocProcessor implements DocProcessor {
         }
         return null;
     }
-
-    @Override
+    
     public void processClassDoc( ClassDoc arg0, ClassDocType arg1 ) {
     }
-
-    @Override
+    
     public void processParamTag( ParamTag arg0, Parameter arg1,
             ParamDocType arg2 ) {
     }
