@@ -40,6 +40,7 @@ import java.io.BufferedOutputStream;
 import java.io.FileOutputStream;
 import java.io.OutputStream;
 import java.io.StringWriter;
+import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -124,12 +125,12 @@ public class ResourceDoclet {
         
         final String docProcessorOption = getOptionArg( root.options(), OPTION_DOC_PROCESSORS );
         final String[] docProcessors = docProcessorOption != null ? docProcessorOption.split( ":" ) : null;
-        DocProcessor docProcessor = null;
+        final DocProcessorWrapper docProcessor = new DocProcessorWrapper();
         try {
             if ( docProcessors != null && docProcessors.length > 0 ) {
                 final Class<?> clazz = Class.forName( docProcessors[0], true, Thread.currentThread().getContextClassLoader() );
                 final Class<? extends DocProcessor> dpClazz = clazz.asSubclass( DocProcessor.class );
-                docProcessor = dpClazz.newInstance();
+                docProcessor.add( dpClazz.newInstance() );
             }
         } catch ( Exception e ) {
             LOG.log( Level.SEVERE, "Could not load docProcessors " + docProcessorOption, e );
@@ -171,8 +172,10 @@ public class ResourceDoclet {
                 final Marshaller m = c.createMarshaller();
                 m.setProperty( Marshaller.JAXB_FORMATTED_OUTPUT, true );
                 final OutputStream out = new BufferedOutputStream( new FileOutputStream( output ) );
-
-                final XMLSerializer serializer = getXMLSerializer( out );
+                
+                
+                final String[] cdataElements = getCDataElements( docProcessor );
+                final XMLSerializer serializer = getXMLSerializer( out, cdataElements );
                 
                 m.marshal( result, serializer );
                 out.close();
@@ -190,6 +193,37 @@ public class ResourceDoclet {
         return true;
     }
 
+    private static String[] getCDataElements( DocProcessor docProcessor ) {
+        final String[] original = new String[] { "ns1^commentText", "ns2^commentText", "^commentText" };
+        if ( docProcessor == null ) {
+            return original;
+        }
+        else {
+            final String[] cdataElements = docProcessor.getCDataElements();
+            if ( cdataElements == null || cdataElements.length == 0 ) {
+                return original;
+            }
+            else {
+                
+                final String[] result = copyOf( original, original.length + cdataElements.length );
+                for ( int i = 0; i < cdataElements.length; i++ ) {
+                    result[ original.length + i ] = cdataElements[i];
+                }
+                return result;
+            }
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    private static <T,U> T[] copyOf( U[] original, int newLength ) {
+        final T[] copy = ((Object)original.getClass() == (Object)Object[].class)
+            ? (T[]) new Object[newLength]
+            : (T[]) Array.newInstance(original.getClass().getComponentType(), newLength);
+        System.arraycopy(original, 0, copy, 0,
+                         Math.min(original.length, newLength));
+        return copy;
+    }
+
     private static Class<?>[] getJAXBContextClasses(
             final ResourceDocType result, DocProcessor docProcessor ) {
         final Class<?>[] clazzes;
@@ -197,8 +231,8 @@ public class ResourceDoclet {
             clazzes = new Class<?>[1];
         }
         else {
-            clazzes = new Class<?>[1 + docProcessor.getRequiredJaxbContextClasses().length ];
             final Class<?>[] requiredJaxbContextClasses = docProcessor.getRequiredJaxbContextClasses();
+            clazzes = new Class<?>[1 + requiredJaxbContextClasses.length ];
             for ( int i = 0; i < requiredJaxbContextClasses.length; i++ ) {
                 clazzes[i + 1] = requiredJaxbContextClasses[i];
             }
@@ -208,7 +242,7 @@ public class ResourceDoclet {
         return clazzes;
     }
     
-    private static XMLSerializer getXMLSerializer( OutputStream os ) throws InstantiationException, IllegalAccessException, ClassNotFoundException {
+    private static XMLSerializer getXMLSerializer( OutputStream os, String[] cdataElements ) throws InstantiationException, IllegalAccessException, ClassNotFoundException {
         // configure an OutputFormat to handle CDATA
         OutputFormat of = new OutputFormat();
 
@@ -217,10 +251,7 @@ public class ResourceDoclet {
         // seems to be an implementation detail of the xerces code.
         // When processing xml that doesn't use namespaces, simply omit the
         // namespace prefix as shown in the third CDataElement below.
-        of.setCDataElements(
-                new String[] { "ns1^commentText",   // <ns1:foo>
-                       "ns2^commentText",   // <ns2:bar>
-                       "^commentText" } );   // <baz>
+        of.setCDataElements( cdataElements );
 
         // set any other options you'd like
         of.setPreserveSpace(true);
@@ -294,6 +325,9 @@ public class ResourceDoclet {
                 }
                 else if ( tag.name().endsWith( ".example" ) ) {
                     representationDoc.setExample( getSerializedExample( tag ) );
+                }
+                else if ( tag.name().endsWith( ".doc" ) ) {
+                    representationDoc.setDoc( tag.text() );
                 }
                 else {
                     LOG.warning( "Unknown response representation tag " + tag.name() );
@@ -415,6 +449,11 @@ public class ResourceDoclet {
             
             for ( int i = 0; i < parameters.length; i++ ) {
                 final Parameter parameter = parameters[i];
+                
+                /* TODO: this only works if the params and tags are in the same
+                 * order. If the param tags are mixed up, the comments for parameters
+                 * will be wrong.
+                 */
                 final ParamTag paramTag = paramTags[i];
                 
                 final ParamDocType paramDocType = new ParamDocType();

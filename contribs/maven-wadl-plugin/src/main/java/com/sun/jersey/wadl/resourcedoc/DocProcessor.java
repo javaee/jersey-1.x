@@ -57,6 +57,18 @@ public interface DocProcessor {
     
     Class<?>[] getRequiredJaxbContextClasses();
 
+    /**
+     * specify which of your elements you want to be handled as CDATA.
+     * The use of the '^' between the namespaceURI and the localname
+     * seems to be an implementation detail of the xerces code.
+     * When processing xml that doesn't use namespaces, simply omit the
+     * namespace prefix as shown in the third CDataElement below.
+     * 
+     * @return an Array of element descriptors or <code>null</code>
+     * 
+     */
+    String[] getCDataElements();
+
     void processClassDoc( ClassDoc classDoc, ClassDocType classDocType );
 
     /**

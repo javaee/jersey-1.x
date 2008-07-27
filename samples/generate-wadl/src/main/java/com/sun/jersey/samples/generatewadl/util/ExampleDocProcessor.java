@@ -61,6 +61,10 @@ public class ExampleDocProcessor implements DocProcessor {
     public Class<?>[] getRequiredJaxbContextClasses() {
         return new Class[] { MyNamedValueType.class };
     }
+
+    public String[] getCDataElements() {
+        return null;
+    }
     
     public void processMethodDoc( MethodDoc methodDoc, MethodDocType methodDocType ) {
         final String tagName = "@example.tag";
