@@ -246,23 +246,36 @@ public class ResourceDoclet {
         
         final Tag[] responseParamTags = methodDoc.tags( "response.param" );
         for ( Tag responseParamTag : responseParamTags ) {
-            LOG.info( "Have responseparam tag: " + print( responseParamTag ) );
+            // LOG.info( "Have responseparam tag: " + print( responseParamTag ) );
             final WadlParamType wadlParam = new WadlParamType();
             for ( Tag inlineTag : responseParamTag.inlineTags() ) {
-                if ( "@name".equals( inlineTag.name() ) ) {
-                    wadlParam.setName( inlineTag.text() );
+                final String tagName = inlineTag.name();
+                final String tagText = inlineTag.text();
+                /* skip empty tags
+                 */
+                if ( isEmpty( tagText ) ) {
+                    if ( LOG.isLoggable( Level.FINE ) ) {
+                        LOG.fine( "Skipping empty inline tag of @response.param in method " +
+                            methodDoc.qualifiedName() + ": " + tagName  );
+                    }
+                    continue;
                 }
-                else if ( "@style".equals( inlineTag.name() ) ) {
-                    wadlParam.setStyle( inlineTag.text() );
+                if ( "@name".equals( tagName ) ) {
+                    wadlParam.setName( tagText );
                 }
-                else if ( "@type".equals( inlineTag.name() ) ) {
-                    wadlParam.setType( QName.valueOf( inlineTag.text() ) );
+                else if ( "@style".equals( tagName ) ) {
+                    wadlParam.setStyle( tagText );
                 }
-                else if ( "@doc".equals( inlineTag.name() ) ) {
-                    wadlParam.setDoc( inlineTag.text() );
+                else if ( "@type".equals( tagName ) ) {
+                    wadlParam.setType( QName.valueOf( tagText ) );
+                }
+                else if ( "@doc".equals( tagName ) ) {
+                    wadlParam.setDoc( tagText );
                 }
                 else {
-                    LOG.warning( "Unknown inline tag of @response.param in method " + methodDoc.qualifiedName() + ": " + inlineTag.name() );
+                    LOG.warning( "Unknown inline tag of @response.param in method " +
+                            methodDoc.qualifiedName() + ": " + tagName +
+                            " (value: " + tagText + ")" );
                 }
             }
             responseDoc.getWadlParams().add( wadlParam );
@@ -292,6 +305,10 @@ public class ResourceDoclet {
         methodDocType.setResponseDoc( responseDoc );
     }
 
+    private static boolean isEmpty( String value ) {
+        return value == null || value.length() == 0 || value.trim().length() == 0 ? true : false;
+    }
+
     private static void addRequestRepresentationDoc( MethodDoc methodDoc,
             final MethodDocType methodDocType ) {
         final Tag requestElement = getSingleTagOrNull( methodDoc, "request.representation.qname" );
@@ -299,16 +316,25 @@ public class ResourceDoclet {
         if ( requestElement != null || requestExample != null ) {
             final RequestDocType requestDoc = new RequestDocType();
             final RepresentationDocType representationDoc = new RepresentationDocType();
+            
+            /* requestElement exists
+             */
             if ( requestElement != null ) {
                 representationDoc.setElement( QName.valueOf( requestElement.text() ) );
             }
-            final String example = getSerializedExample( requestExample );
-            if ( example != null ) {
-                representationDoc.setExample( example );
+            
+            /* requestExample exists
+             */
+            if ( requestExample != null ) {
+                final String example = getSerializedExample( requestExample );
+                if ( !isEmpty( example ) ) {
+                    representationDoc.setExample( example );
+                }
+                else {
+                    LOG.warning( "Could not get serialized example for method " + methodDoc.qualifiedName() );
+                }
             }
-            else {
-                LOG.warning( "Could not get serialized example for method " + methodDoc.qualifiedName() );
-            }
+            
             requestDoc.setRepresentationDoc( representationDoc );
             methodDocType.setRequestDoc( requestDoc );
         }
@@ -344,13 +370,17 @@ public class ResourceDoclet {
             final Tag[] inlineTags = tag.inlineTags();
             if ( inlineTags != null && inlineTags.length > 0 ) {
                 for ( Tag inlineTag : inlineTags ) {
-                    LOG.fine( "Have inline tag: " + print( inlineTag ) );
+                    if ( LOG.isLoggable( Level.FINE ) ) {
+                        LOG.fine( "Have inline tag: " + print( inlineTag ) );
+                    }
                     if ( "@link".equals( inlineTag.name() ) ) {
-                        LOG.fine( "Have link: " + print( inlineTag ) );
+                        if ( LOG.isLoggable( Level.FINE ) ) {
+                            LOG.fine( "Have link: " + print( inlineTag ) );
+                        }
                         final SeeTag linkTag = (SeeTag) inlineTag;
                         return getSerializedLinkFromTag( linkTag );
                     }
-                    else {
+                    else if ( !isEmpty( inlineTag.text() ) ) {
                         return inlineTag.text();
                     }
                 }
