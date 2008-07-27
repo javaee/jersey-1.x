@@ -122,7 +122,7 @@ public class SpringServlet extends ServletContainer {
                 return null;
             }
             
-            /* if the scope is null, this means that jersey simply doesn't know what's
+            /* if the scope is Undefined, this means that jersey simply doesn't know what's
              * the scope of this dependency, so it's left to the application...
              */
             if ( scope == Scope.Undefined
@@ -135,6 +135,16 @@ public class SpringServlet extends ServletContainer {
                 return clazz.cast( result );
             }
             else {
+                
+                /* detect conflicts and raise them...
+                 */
+                if ( scope == Scope.Singleton && !springContext.isSingleton(beanName)
+                        || scope == Scope.PerRequest && !springContext.isPrototype( beanName ) ) {
+                    throw new RuntimeException( "The scopes defined for jersey and spring do" +
+                    		" not match for the resource class "+ clazz.getName() +
+                    		" and bean with name "+ beanName +"!" );
+                }
+                
                 return null;
             }
             
