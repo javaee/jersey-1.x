@@ -42,7 +42,7 @@ import com.sun.jersey.api.core.HttpRequestContext;
 import com.sun.jersey.api.core.HttpResponseContext;
 import com.sun.jersey.api.client.WebResource;
 import javax.ws.rs.Path;
-import javax.ws.rs.ConsumeMime;
+import javax.ws.rs.Consumes;
 import javax.ws.rs.POST;
 import javax.ws.rs.core.Response;
 
@@ -57,19 +57,19 @@ public class ConsumeProduceWildcardTest extends AbstractResourceTester {
     }
     
     @Path("/{arg1}/{arg2}")
-    @ConsumeMime("text/*")
+    @Consumes("text/*")
     public static class ConsumeWildCardBean {
         @POST
         public void doPostHtml(HttpRequestContext request, HttpResponseContext response) {
-            assertEquals("POST", request.getHttpMethod());
+            assertEquals("POST", request.getMethod());
             assertEquals("text/html", request.getRequestHeaders().getFirst("Content-Type"));
             response.setResponse(Response.ok("HTML").build());
         }
         
         @POST
-        @ConsumeMime("text/xhtml")
+        @Consumes("text/xhtml")
         public void doPostXHtml(HttpRequestContext request, HttpResponseContext response) {
-            assertEquals("POST", request.getHttpMethod());
+            assertEquals("POST", request.getMethod());
             assertEquals("text/xhtml", request.getRequestHeaders().getFirst("Content-Type"));
             response.setResponse(Response.ok("XHTML").build());
         }

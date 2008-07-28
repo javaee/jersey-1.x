@@ -40,7 +40,7 @@ package com.sun.jersey.samples.console.resources;
 import java.util.ArrayList;
 import java.util.List;
 import javax.ws.rs.GET;
-import javax.ws.rs.ProduceMime;
+import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 
 /**
@@ -57,7 +57,7 @@ public class Colours {
      * @return the list of colours matching the filter
      */
     @GET
-    @ProduceMime("text/plain")
+    @Produces("text/plain")
     public String getColourListAsText(@QueryParam("match") String filter) {
         StringBuffer buf = new StringBuffer();
         for (String colour: getMatchingColours(filter)) {
@@ -74,7 +74,7 @@ public class Colours {
      * @return the list of colours matching the filter
      */
     @GET
-    @ProduceMime("application/json")
+    @Produces("application/json")
     public String getColourListAsJSON(@QueryParam("match") String filter) {
         StringBuffer buf = new StringBuffer();
         buf.append('[');

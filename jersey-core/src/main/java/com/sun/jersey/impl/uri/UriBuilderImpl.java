@@ -265,20 +265,32 @@ public final class UriBuilderImpl extends UriBuilder {
         return this;
     }
 
-    public UriBuilder matrixParam(String name, String value) {
+    @Override
+    public UriBuilder matrixParam(String name, Object... values) {
         checkSsp();
         if (name == null)
             throw new IllegalArgumentException("Name parameter is null");
-        if (value == null)
+        if (values == null)
             throw new IllegalArgumentException("Value parameter is null");
+        if (values.length == 0)
+            return this;
         
         if (path.length() > 0) path.append(';');
-        path.append(encode(name, UriComponent.Type.PATH));
-        if (value.length() > 0) 
-            path.append('=').append(encode(value, UriComponent.Type.PATH));
+        for (Object value : values) {
+            path.append(encode(name, UriComponent.Type.PATH));
+            
+            final String stringValue = value.toString();
+            if (stringValue.length() > 0)
+                path.append('=').append(encode(stringValue, UriComponent.Type.PATH));
+        }
         return this;
     }
 
+    @Override
+    public UriBuilder replaceMatrixParam(String name, Object... values) {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+    
     public UriBuilder replaceQueryParams(String query) {
         checkSsp();
         this.query.setLength(0);
@@ -287,21 +299,32 @@ public final class UriBuilderImpl extends UriBuilder {
         return this;
     }
 
-    public UriBuilder queryParam(String name, String value) {
+    @Override
+    public UriBuilder queryParam(String name, Object... values) {
         checkSsp();
         if (name == null)
             throw new IllegalArgumentException("Name parameter is null");
-        if (value == null)
+        if (values == null)
             throw new IllegalArgumentException("Value parameter is null");
-        
-        if (query.length() > 0) query.append('&');
-        query.append(encodeQuery(name));
+        if (values.length == 0)
+            return this;
 
-        if (value.length() > 0)
-            query.append('=').append(encodeQuery(value));
+        if (query.length() > 0) query.append('&');
+        for (Object value : values) {
+            query.append(encodeQuery(name));
+
+            final String stringValue = value.toString();
+            if (stringValue.length() > 0)
+                query.append('=').append(encodeQuery(stringValue));
+        }
         return this;
     }
 
+    @Override
+    public UriBuilder replaceQueryParam(String name, Object... values) {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+    
     public UriBuilder fragment(String fragment) {
         this.fragment = (fragment != null) ? 
             encode(fragment, UriComponent.Type.FRAGMENT) :
@@ -433,18 +456,13 @@ public final class UriBuilderImpl extends UriBuilder {
         }
     }
     
-    private URI createURI(String scheme,
-           String ssp,
-           String fragment) {
-        try {
-            return new URI(scheme, ssp, fragment);
-        } catch (URISyntaxException ex) {
-            throw new IllegalArgumentException(ex);
-        }                
-    }
-    
     private String replaceNull(String s) {
         return (s != null) ? s : "";
     }
+
     
+    @Override
+    public String getExtension() {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
 }

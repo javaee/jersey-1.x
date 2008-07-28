@@ -43,7 +43,7 @@ import java.util.List;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.PersistenceUnit;
 import javax.ws.rs.GET;
-import javax.ws.rs.ProduceMime;
+import javax.ws.rs.Produces;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.core.Context;
@@ -79,7 +79,7 @@ public class UsersResource {
     }
 
     @GET
-    @ProduceMime("application/json")
+    @Produces("application/json")
     public JSONArray getUsersAsJsonArray() {
         JSONArray uriArray = new JSONArray();
         UriBuilder ub = null;

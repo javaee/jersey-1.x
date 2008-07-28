@@ -43,6 +43,7 @@ import com.sun.jersey.api.core.DefaultResourceConfig;
 import com.sun.jersey.api.core.ResourceConfig;
 import com.sun.jersey.impl.AbstractResourceTester;
 import java.util.List;
+import java.util.Locale;
 import javax.ws.rs.Path;
 import javax.ws.rs.GET;
 import javax.ws.rs.core.Context;
@@ -68,9 +69,9 @@ public class UriConnegLanguageMediaTypeTest extends AbstractResourceTester {
         public Response doGet(@Context Request r) {
             List<Variant> vs = Variant.VariantListBuilder.newInstance().
                     mediaTypes(MediaType.valueOf("application/foo")).
-                    languages("en").languages("fr").add().
+                    languages(new Locale("en")).languages(new Locale("fr")).add().
                     mediaTypes(MediaType.valueOf("application/bar")).
-                    languages("en").languages("fr").add().
+                    languages(new Locale("en")).languages(new Locale("fr")).add().
                     build();            
             
             Variant v = r.selectVariant(vs);

@@ -37,8 +37,8 @@
 
 package com.sun.jersey.impl.http.header;
 
-import javax.ws.rs.ConsumeMime;
-import javax.ws.rs.ProduceMime;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.Produces;
 import com.sun.jersey.impl.model.MediaTypeHelper;
 import java.util.List;
 import javax.ws.rs.core.MediaType;
@@ -54,26 +54,26 @@ public class ConsumeProduceTest extends TestCase {
         super(testName);
     }
     
-    @ConsumeMime({"*/*", "a/*", "b/*", "a/b", "c/d"})
-    class ConsumeMimeClass {
+    @Consumes({"*/*", "a/*", "b/*", "a/b", "c/d"})
+    class ConsumesClass {
     }
     
-    @ProduceMime({"*/*", "a/*", "b/*", "a/b", "c/d"})
-    class ProduceMimeClass {
+    @Produces({"*/*", "a/*", "b/*", "a/b", "c/d"})
+    class ProducesClass {
     }
     
     /** Creates a new instance of ConsumeProduceTest */
     public ConsumeProduceTest() {
     }
     
-    public void testConsumeMime() {
-        ConsumeMime c = ConsumeMimeClass.class.getAnnotation(ConsumeMime.class);
+    public void testConsumes() {
+        Consumes c = ConsumesClass.class.getAnnotation(Consumes.class);
         List<MediaType> l = MediaTypeHelper.createMediaTypes(c);
         checkMediaTypes(l);
     }
     
-    public void testProduceMime() {
-        ProduceMime p = ProduceMimeClass.class.getAnnotation(ProduceMime.class);
+    public void testProduces() {
+        Produces p = ProducesClass.class.getAnnotation(Produces.class);
         List<MediaType> l = MediaTypeHelper.createMediaTypes(p);
         checkMediaTypes(l);
     }

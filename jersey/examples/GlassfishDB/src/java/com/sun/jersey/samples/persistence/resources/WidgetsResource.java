@@ -51,7 +51,7 @@ import javax.persistence.EntityManagerFactory;
 import javax.persistence.PersistenceUnit;
 import javax.persistence.Query;
 import javax.ws.rs.GET;
-import javax.ws.rs.ProduceMime;
+import javax.ws.rs.Produces;
 import javax.ws.rs.Path;
 
 @Path("/widgets")
@@ -64,7 +64,7 @@ public class WidgetsResource {
     public WidgetsResource() {
     }
     
-    @ProduceMime("text/plain")
+    @Produces("text/plain")
     @GET
     public String getListOfWidgets() {
         StringBuilder b = new StringBuilder();

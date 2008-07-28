@@ -40,10 +40,10 @@ package com.sun.jersey.samples.console.resources;
 import com.sun.jersey.api.representation.Form;
 import java.io.InputStream;
 import java.util.Date;
-import javax.ws.rs.ConsumeMime;
+import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
-import javax.ws.rs.ProduceMime;
+import javax.ws.rs.Produces;
 import javax.ws.rs.Path;
 import javax.ws.rs.core.Cookie;
 import javax.ws.rs.core.Context;
@@ -57,7 +57,7 @@ import javax.ws.rs.core.Response;
  * 
  */
 @Path("/form")
-@ProduceMime("text/html")
+@Produces("text/html")
 public class FormResource {
     
     private static final Colours coloursResource = new Colours();
@@ -90,7 +90,7 @@ public class FormResource {
      * @param formData the data from the form submission
      */
     @POST
-    @ConsumeMime("application/x-www-form-urlencoded")
+    @Consumes("application/x-www-form-urlencoded")
     public String processForm(Form formData) {
         StringBuffer buf = new StringBuffer();
         buf.append("<html><head><title>Form results</title></head><body>");

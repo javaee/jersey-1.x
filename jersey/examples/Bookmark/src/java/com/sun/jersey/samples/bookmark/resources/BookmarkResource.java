@@ -45,11 +45,11 @@ import com.sun.jersey.samples.bookmark.util.tx.TransactionManager;
 import com.sun.jersey.samples.bookmark.util.tx.Transactional;
 import java.util.Date;
 import javax.persistence.EntityManager;
-import javax.ws.rs.ConsumeMime;
+import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.PUT;
-import javax.ws.rs.ProduceMime;
+import javax.ws.rs.Produces;
 import javax.ws.rs.core.UriInfo;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
@@ -81,13 +81,13 @@ public class BookmarkResource {
     }
     
     @GET
-    @ProduceMime("application/json")
+    @Produces("application/json")
     public JSONObject getBookmark() {
         return asJson();
     }
     
     @PUT
-    @ConsumeMime("application/json")
+    @Consumes("application/json")
     public void putBookmark(JSONObject jsonEntity) throws JSONException {
 
         bookmarkEntity.setLdesc(jsonEntity.getString("ldesc"));

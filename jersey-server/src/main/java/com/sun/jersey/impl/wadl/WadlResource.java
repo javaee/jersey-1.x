@@ -45,7 +45,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.ws.rs.GET;
-import javax.ws.rs.ProduceMime;
+import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
@@ -63,7 +63,7 @@ import com.sun.research.ws.wadl.Application;
  *
  * @author Paul.Sandoz@Sun.Com
  */
-@ProduceMime({"application/vnd.sun.wadl+xml", "application/xml"})
+@Produces({"application/vnd.sun.wadl+xml", "application/xml"})
 public final class WadlResource {
     
     private static final Logger LOGGER = Logger.getLogger( WadlResource.class.getName() );

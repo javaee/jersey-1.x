@@ -38,9 +38,9 @@
 package com.sun.jersey.samples.atomserver.resources;
 
 import java.io.InputStream;
-import javax.ws.rs.ConsumeMime;
+import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
-import javax.ws.rs.ProduceMime;
+import javax.ws.rs.Produces;
 import javax.ws.rs.Path;
 import javax.ws.rs.core.Response;
 
@@ -48,8 +48,8 @@ import javax.ws.rs.core.Response;
  *
  * @author Paul.Sandoz@Sun.Com
  */
-@ConsumeMime("application/atom+xml")
-@ProduceMime("application/atom+xml")
+@Consumes("application/atom+xml")
+@Produces("application/atom+xml")
 public class EntryResource {
     protected String entryId;
     protected String entryPath;
@@ -69,7 +69,7 @@ public class EntryResource {
     
     @GET
     @Path("media")
-    @ProduceMime("*/*")
+    @Produces("*/*")
     public Response getMedia() {
         // Check that the media exists, otherwise 404
         String mediaPath = AtomStore.getMediaPath(entryId);

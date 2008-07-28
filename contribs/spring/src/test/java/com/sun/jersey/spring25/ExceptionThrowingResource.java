@@ -23,7 +23,7 @@ package com.sun.jersey.spring25;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
-import javax.ws.rs.ProduceMime;
+import javax.ws.rs.Produces;
 import javax.ws.rs.core.Response;
 
 import com.sun.jersey.spi.resource.Singleton;
@@ -44,7 +44,7 @@ public class ExceptionThrowingResource {
     }
 
     @GET
-    @ProduceMime( "application/xml" )
+    @Produces( "application/xml" )
     public Response getItem() {
         if ( true ) {
             throw new RuntimeException( "this exception should be visible in the logs and MUST result in status 500 on the client side." );

@@ -43,6 +43,7 @@ import com.sun.jersey.api.client.WebResource;
 import com.sun.jersey.api.client.ClientResponse;
 import java.io.IOException;
 import java.util.List;
+import java.util.Locale;
 import javax.ws.rs.GET;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
@@ -66,16 +67,16 @@ public class VariantsTest extends AbstractResourceTester {
         @GET
         public Response doGet(@Context Request r) {
             List<Variant> vs = Variant.VariantListBuilder.newInstance().
-                    languages("zh").
-                    languages("fr").
-                    languages("en").add().
+                    languages(new Locale("zh")).
+                    languages(new Locale("fr")).
+                    languages(new Locale("en")).add().
                     build();
             
             Variant v = r.selectVariant(vs);
             if (v == null)
                 return Response.notAcceptable(vs).build();
             else 
-                return Response.ok(v.getLanguage(), v).build();
+                return Response.ok(v.getLanguage().toString(), v).build();
         }
     }
     
@@ -118,9 +119,12 @@ public class VariantsTest extends AbstractResourceTester {
         public Response doGet(@Context Request r) {
             List<Variant> vs = Variant.VariantListBuilder.newInstance().
                     mediaTypes(MediaType.valueOf("image/jpeg")).add().
-                    mediaTypes(MediaType.valueOf("application/xml")).languages("en-us").add().
-                    mediaTypes(MediaType.valueOf("text/xml")).languages("en").add().
-                    mediaTypes(MediaType.valueOf("text/xml")).languages("en-us").add().
+                    mediaTypes(MediaType.valueOf("application/xml")).
+                    languages(new Locale("en-us")).add().
+                    mediaTypes(MediaType.valueOf("text/xml")).
+                    languages(new Locale("en")).add().
+                    mediaTypes(MediaType.valueOf("text/xml")).
+                    languages(new Locale("en-us")).add().
                     build();
                     
             Variant v = r.selectVariant(vs);

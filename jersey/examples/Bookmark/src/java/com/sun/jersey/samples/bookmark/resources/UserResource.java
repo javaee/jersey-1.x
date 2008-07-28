@@ -42,11 +42,11 @@ import com.sun.jersey.samples.bookmark.entities.UserEntity;
 import com.sun.jersey.samples.bookmark.util.tx.TransactionManager;
 import com.sun.jersey.samples.bookmark.util.tx.Transactional;
 import javax.persistence.EntityManager;
-import javax.ws.rs.ConsumeMime;
+import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.PUT;
-import javax.ws.rs.ProduceMime;
+import javax.ws.rs.Produces;
 import javax.ws.rs.Path;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
@@ -83,7 +83,7 @@ public class UserResource {
     
     
     @GET
-    @ProduceMime("application/json")
+    @Produces("application/json")
     public JSONObject getUser() throws JSONException {
         if (null == userEntity) {
             throw new NotFoundException("userid " + userid + "does not exist!");
@@ -97,7 +97,7 @@ public class UserResource {
     }
     
     @PUT
-    @ConsumeMime("application/json")
+    @Consumes("application/json")
     public Response putUser(JSONObject jsonEntity) throws JSONException {
         
         String jsonUserid = jsonEntity.getString("userid");

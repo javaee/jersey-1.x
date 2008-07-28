@@ -43,6 +43,7 @@ import com.sun.jersey.impl.application.ContextResolverFactory;
 import com.sun.jersey.impl.application.InjectableProviderFactory;
 import com.sun.jersey.impl.application.MessageBodyFactory;
 import com.sun.jersey.impl.client.urlconnection.URLConnectionClientHandler;
+import com.sun.jersey.spi.container.MessageBodyWorkers;
 import com.sun.jersey.spi.inject.SingletonTypeInjectableProvider;
 import com.sun.jersey.spi.service.ComponentContext;
 import com.sun.jersey.spi.service.ComponentProvider;
@@ -53,7 +54,6 @@ import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
 import javax.ws.rs.core.Context;
-import javax.ws.rs.ext.MessageBodyWorkers;
 
 /**
  * The HTTP client class for handling requests and responses specified by 

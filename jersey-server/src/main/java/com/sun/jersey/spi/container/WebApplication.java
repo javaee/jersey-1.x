@@ -98,7 +98,7 @@ public interface WebApplication {
      * @return the extended message body workers. The return value is 
      * undefined before the web applicaiton is initialized.
      */
-    ExtendedMessageBodyWorkers getMessageBodyWorkers();
+    MessageBodyWorkers getMessageBodyWorkers();
 
     /**
      * Get the component provider that can be used for instantiating

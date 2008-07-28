@@ -49,10 +49,10 @@ import java.io.OutputStream;
 import java.io.Serializable;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
-import javax.ws.rs.ConsumeMime;
+import javax.ws.rs.Consumes;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
-import javax.ws.rs.ProduceMime;
+import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.ext.Provider;
@@ -89,8 +89,8 @@ public class BeanStreamingTest extends AbstractResourceTester {
     }
 
     @Provider
-    @ProduceMime("application/bean")
-    @ConsumeMime("application/bean")
+    @Produces("application/bean")
+    @Consumes("application/bean")
     public static class BeanProvider extends AbstractMessageReaderWriterProvider<Bean> {
 
         public boolean isReadable(Class<?> type, Type genericType, Annotation annotations[]) {
@@ -133,8 +133,8 @@ public class BeanStreamingTest extends AbstractResourceTester {
     }
     
     @Provider
-    @ProduceMime("application/*")
-    @ConsumeMime("application/*")
+    @Produces("application/*")
+    @Consumes("application/*")
     public static class BeanWildProvider extends BeanProvider {
         @Override
         public boolean isReadable(Class<?> type, Type genericType, Annotation annotations[]) {
@@ -148,8 +148,8 @@ public class BeanStreamingTest extends AbstractResourceTester {
     }
     
     @Provider
-    @ProduceMime("application/bean")
-    @ConsumeMime("application/bean")
+    @Produces("application/bean")
+    @Consumes("application/bean")
     public static class Bean2Provider extends AbstractMessageReaderWriterProvider<Bean2> {
 
         public boolean isReadable(Class<?> type, Type genericType, Annotation annotations[]) {
@@ -192,8 +192,8 @@ public class BeanStreamingTest extends AbstractResourceTester {
     }
     
     @Provider
-    @ProduceMime("application/*")
-    @ConsumeMime("application/*")
+    @Produces("application/*")
+    @Consumes("application/*")
     public static class Bean2WildProvider extends Bean2Provider {
         @Override
         public boolean isReadable(Class<?> type, Type genericType, Annotation annotations[]) {
@@ -223,8 +223,8 @@ public class BeanStreamingTest extends AbstractResourceTester {
     @Path("/bean")
     public static class BeanResource {
         @POST
-        @ConsumeMime("application/bean")
-        @ProduceMime("application/bean")
+        @Consumes("application/bean")
+        @Produces("application/bean")
         public Bean post(Bean t) {
             return t;
         }
@@ -233,8 +233,8 @@ public class BeanStreamingTest extends AbstractResourceTester {
     @Path("/bean")
     public static class Bean2Resource {
         @POST
-        @ConsumeMime("application/bean")
-        @ProduceMime("application/bean")
+        @Consumes("application/bean")
+        @Produces("application/bean")
         public Bean2 post(Bean2 t) {
             return t;
         }
@@ -243,8 +243,8 @@ public class BeanStreamingTest extends AbstractResourceTester {
     @Path("/plain")
     public static class BeanTextPlainResource {
         @POST
-        @ConsumeMime("text/plain")
-        @ProduceMime("text/plain")
+        @Consumes("text/plain")
+        @Produces("text/plain")
         public Bean post(Bean t) {
             return t;
         }
@@ -253,8 +253,8 @@ public class BeanStreamingTest extends AbstractResourceTester {
     @Path("/plain")
     public static class Bean2TextPlainResource {
         @POST
-        @ConsumeMime("text/plain")
-        @ProduceMime("text/plain")
+        @Consumes("text/plain")
+        @Produces("text/plain")
         public Bean2 post(Bean2 t) {
             return t;
         }
@@ -263,8 +263,8 @@ public class BeanStreamingTest extends AbstractResourceTester {
     @Path("/wild")
     public static class BeanWildResource {
         @POST
-        @ConsumeMime("application/*")
-        @ProduceMime("application/*")
+        @Consumes("application/*")
+        @Produces("application/*")
         public Bean post(Bean t) {
             return t;
         }
@@ -273,8 +273,8 @@ public class BeanStreamingTest extends AbstractResourceTester {
     @Path("/wild")
     public static class Bean2WildResource {
         @POST
-        @ConsumeMime("application/*")
-        @ProduceMime("application/*")
+        @Consumes("application/*")
+        @Produces("application/*")
         public Bean2 post(Bean2 t) {
             return t;
         }

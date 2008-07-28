@@ -43,6 +43,7 @@ import com.sun.jersey.api.core.DefaultResourceConfig;
 import com.sun.jersey.api.core.ResourceConfig;
 import com.sun.jersey.impl.AbstractResourceTester;
 import java.util.List;
+import java.util.Locale;
 import javax.ws.rs.Path;
 import javax.ws.rs.GET;
 import javax.ws.rs.core.Context;
@@ -66,16 +67,16 @@ public class UriConnegLanguageTest extends AbstractResourceTester {
         @GET
         public Response doGet(@Context Request r) {
             List<Variant> vs = Variant.VariantListBuilder.newInstance().
-                    languages("zh").
-                    languages("fr").
-                    languages("en").add().
+                    languages(new Locale("zh")).
+                    languages(new Locale("fr")).
+                    languages(new Locale("en")).add().
                     build();
             
             Variant v = r.selectVariant(vs);
             if (v == null)
                 return Response.notAcceptable(vs).build();
             else 
-                return Response.ok(v.getLanguage(), v).build();
+                return Response.ok(v.getLanguage().toString(), v).build();
         }
     }
     

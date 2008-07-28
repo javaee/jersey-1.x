@@ -26,7 +26,7 @@ import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
-import javax.ws.rs.ProduceMime;
+import javax.ws.rs.Produces;
 
 /**
  * TODO: DESCRIBE ME<br>
@@ -55,7 +55,7 @@ public class SpringManagedPerRequestResourceBase {
 
     @GET
     @Path( "singletonitem" )
-    @ProduceMime( "application/xml" )
+    @Produces( "application/xml" )
     public Item getSingletonItem() {
         return getSingletonItemInstance();
     }
@@ -68,7 +68,7 @@ public class SpringManagedPerRequestResourceBase {
 
     @GET
     @Path( "prototypeitem" )
-    @ProduceMime( "application/xml" )
+    @Produces( "application/xml" )
     public Item2 getPrototypeItem() {
         return getPrototypeItemInstance();
     }
@@ -81,7 +81,7 @@ public class SpringManagedPerRequestResourceBase {
     
     @GET
     @Path( "count" )
-    @ProduceMime("text/plain")
+    @Produces("text/plain")
     public String getCount() {
         return String.valueOf( _count );
     }

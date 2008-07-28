@@ -40,13 +40,71 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 import java.util.List;
 import javax.ws.rs.core.MediaType;
-import javax.ws.rs.ext.MessageBodyWorkers;
-
+import javax.ws.rs.ext.MessageBodyReader;
+import javax.ws.rs.ext.MessageBodyWriter;
+        
 /**
- *
+ * An injectable interface providing lookup of {@link MessageBodyReader} and
+ * {@link MessageBodyWriter} instances. 
+ * 
+ * @see javax.ws.rs.core.Context
+ * @see MessageBodyReader
+ * @see MessageBodyWriter
  * @author Paul.Sandoz@Sun.Com
  */
-public interface ExtendedMessageBodyWorkers extends MessageBodyWorkers {
+public interface MessageBodyWorkers {
+    /**
+     * Get a message body reader that matches a set of criteria.
+     * 
+     * @param mediaType the media type of the data that will be read, this will
+     * be compared to the values of {@link javax.ws.rs.Consumes} for
+     * each candidate reader and only matching readers will be queried.
+     * 
+     * @param type the class of object to be produced.
+     * 
+     * @param genericType the type of object to be produced. E.g. if the 
+     * message body is to be converted into a method parameter, this will be
+     * the formal type of the method parameter as returned by 
+     * <code>Class.getGenericParameterTypes</code>.
+     * 
+     * @param annotations an array of the annotations on the declaration of the
+     * artifact that will be initialized with the produced instance. E.g. if the 
+     * message body is to be converted into a method parameter, this will be
+     * the annotations on that parameter returned by 
+     * <code>Class.getParameterAnnotations</code>.
+     * 
+     * @return a MessageBodyReader that matches the supplied criteria or null
+     * if none is found.
+     */
+    <T> MessageBodyReader<T> getMessageBodyReader(Class<T> type, Type genericType, 
+            Annotation annotations[], MediaType mediaType);
+    
+    /**
+     * Get a message body writer that matches a set of criteria.
+     * 
+     * @param mediaType the media type of the data that will be written, this will
+     * be compared to the values of {@link javax.ws.rs.Produces} for
+     * each candidate writer and only matching writers will be queried.
+     * 
+     * @param type the class of object that is to be written.
+     * 
+     * @param genericType the type of object to be written. E.g. if the 
+     * message body is to be produced from a field, this will be
+     * the declared type of the field as returned by 
+     * <code>Field.getGenericType</code>.
+     * 
+     * @param annotations an array of the annotations on the declaration of the
+     * artifact that will be written. E.g. if the 
+     * message body is to be produced from a field, this will be
+     * the annotations on that field returned by 
+     * <code>Field.getDeclaredAnnotations</code>.
+     * 
+     * @return a MessageBodyReader that matches the supplied criteria or null
+     * if none is found.
+     */
+    <T> MessageBodyWriter<T> getMessageBodyWriter(Class<T> type, Type genericType, 
+            Annotation annotations[], MediaType mediaType);
+    
     /**
      * Get the list of media types supported for a Java type.
      * 

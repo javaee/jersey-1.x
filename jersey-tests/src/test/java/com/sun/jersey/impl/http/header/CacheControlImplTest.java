@@ -67,47 +67,47 @@ public class CacheControlImplTest extends TestCase {
         CacheControl instance = new CacheControl();
         
         instance.setNoCache(true);
-        String expResult = "public, no-cache, no-transform";
+        String expResult = "no-cache, no-transform";
         String result = p.toString(instance);
         assertEquals(expResult, result);
         
         instance.setNoStore(true);
-        expResult = "public, no-cache, no-store, no-transform";
+        expResult = "no-cache, no-store, no-transform";
         result = p.toString(instance);
         assertEquals(expResult, result);
 
         instance.setPrivate(true);
-        expResult = "public, private, no-cache, no-store, no-transform";
+        expResult = "private, no-cache, no-store, no-transform";
         result = p.toString(instance);
         assertEquals(expResult, result);
 
         instance.getPrivateFields().add("Fred");
-        expResult = "public, private=\"Fred\", no-cache, no-store, no-transform";
+        expResult = "private=\"Fred\", no-cache, no-store, no-transform";
         result = p.toString(instance);
         assertEquals(expResult, result);
         instance.getPrivateFields().add("Bob");
-        expResult = "public, private=\"Fred, Bob\", no-cache, no-store, no-transform";
+        expResult = "private=\"Fred, Bob\", no-cache, no-store, no-transform";
         result = p.toString(instance);
         assertEquals(expResult, result);
         
         instance = new CacheControl();
         instance.getCacheExtension().put("key1","value1");
-        expResult = "public, no-transform, key1=value1";
+        expResult = "no-transform, key1=value1";
         result = p.toString(instance);
         assertEquals(expResult, result);
         instance.getCacheExtension().put("key1","value1 with spaces");
-        expResult = "public, no-transform, key1=\"value1 with spaces\"";
+        expResult = "no-transform, key1=\"value1 with spaces\"";
         result = p.toString(instance);
         assertEquals(expResult, result);
         
         instance.setNoStore(true);
-        expResult = "public, no-store, no-transform, key1=\"value1 with spaces\"";
+        expResult = "no-store, no-transform, key1=\"value1 with spaces\"";
         result = p.toString(instance);
         assertEquals(expResult, result);
 
         instance = new CacheControl();
         instance.getCacheExtension().put("key1",null);
-        expResult = "public, no-transform, key1";
+        expResult = "no-transform, key1";
         result = p.toString(instance);
         assertEquals(expResult, result);
         

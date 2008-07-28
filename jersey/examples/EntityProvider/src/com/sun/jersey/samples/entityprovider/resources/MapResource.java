@@ -59,7 +59,7 @@ import com.sun.jersey.spi.resource.Singleton;
 import java.util.Hashtable;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
-import javax.ws.rs.ProduceMime;
+import javax.ws.rs.Produces;
 import javax.ws.rs.Path;
 
 /**
@@ -77,13 +77,13 @@ public class MapResource {
     }
     
     @GET
-    @ProduceMime("text/html")
+    @Produces("text/html")
     public Hashtable<String, String> getData() {
         return data;
     }
     
     @POST
-    @ProduceMime("text/html")
+    @Produces("text/html")
     public Hashtable<String, String> updateDataItem(NameValuePair item) {
         if (item.getName()!=null) {
             if (item.getValue()==null || item.getValue().length()==0)

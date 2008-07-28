@@ -40,6 +40,7 @@ package com.sun.jersey.impl.inject;
 import com.sun.jersey.api.core.HttpContext;
 import com.sun.jersey.api.core.ResourceConfig;
 import com.sun.jersey.impl.AbstractResourceTester;
+import com.sun.jersey.spi.container.MessageBodyWorkers;
 import com.sun.jersey.spi.resource.Singleton;
 import com.sun.jersey.spi.template.TemplateContext;
 import java.io.IOException;
@@ -58,7 +59,6 @@ import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Request;
 import javax.ws.rs.core.SecurityContext;
 import javax.ws.rs.core.UriInfo;
-import javax.ws.rs.ext.MessageBodyWorkers;
 import javax.ws.rs.ext.MessageBodyWriter;
 import javax.ws.rs.ext.Provider;
 

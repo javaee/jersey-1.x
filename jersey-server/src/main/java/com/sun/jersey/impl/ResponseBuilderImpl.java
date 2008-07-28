@@ -46,6 +46,7 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import javax.ws.rs.core.CacheControl;
 import javax.ws.rs.core.EntityTag;
@@ -183,7 +184,7 @@ public final class ResponseBuilderImpl extends Response.ResponseBuilder {
         MediaType accept = variants.get(0).getMediaType();
         boolean vAccept = false;
         
-        String acceptLanguage = variants.get(0).getLanguage();
+        Locale acceptLanguage = variants.get(0).getLanguage();
         boolean vAcceptLanguage = false;
         
         String acceptEncoding = variants.get(0).getEncoding();
@@ -209,6 +210,10 @@ public final class ResponseBuilderImpl extends Response.ResponseBuilder {
         return v != null && !v.equals(vary);
     }
     
+    private boolean vary(Locale v, Locale vary) {
+        return v != null && !v.equals(vary);
+    }
+    
     private boolean vary(String v, String vary) {
         return v != null && !v.equalsIgnoreCase(vary);
     }
@@ -223,6 +228,11 @@ public final class ResponseBuilderImpl extends Response.ResponseBuilder {
     
     public Response.ResponseBuilder language(String language) {
         set(CONTENT_LANGUAGE, language);
+        return this;
+    }
+    
+    public Response.ResponseBuilder language(Locale language) {
+        set(CONTENT_LANGUAGE, language.toString());
         return this;
     }
 

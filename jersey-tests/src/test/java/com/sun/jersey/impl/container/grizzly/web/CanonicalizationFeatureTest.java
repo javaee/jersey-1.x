@@ -44,7 +44,7 @@ import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
 import javax.ws.rs.GET;
-import javax.ws.rs.ProduceMime;
+import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Path;
@@ -65,28 +65,28 @@ public class CanonicalizationFeatureTest extends AbstractGrizzlyWebContainerTest
         
         @Path(value = "uri/{uriParam}", limited = false)
         @GET
-        @ProduceMime("text/plain")
+        @Produces("text/plain")
         public String getUri(@PathParam("uriParam") String uri) {
             return uri;
         }
 
         @Path("slashes/{uriParam}/")
         @GET
-        @ProduceMime("text/plain")
+        @Produces("text/plain")
         public String getSlashes(@PathParam("uriParam") String param) {
             return param;
         }
 
         @Path("dblslashes//{uriParam}//")
         @GET
-        @ProduceMime("text/plain")
+        @Produces("text/plain")
         public String getDblSlashes(@PathParam("uriParam") String param) {
             return param;
         }
         
         @Path("qparam/a")
         @GET
-        @ProduceMime("text/plain")
+        @Produces("text/plain")
         public String getQParam(@QueryParam("qParam") String param) {
             assertNotNull(param);
             return param;

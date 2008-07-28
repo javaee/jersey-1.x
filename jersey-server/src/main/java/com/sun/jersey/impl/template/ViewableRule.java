@@ -63,7 +63,7 @@ public class ViewableRule implements UriRule {
     public final boolean accept(CharSequence path, Object resource, UriRuleContext context) {
         final HttpRequestContext request = context.getRequest();
         // Only accept GET requests
-        if (!request.getHttpMethod().equals("GET"))
+        if (!request.getMethod().equals("GET"))
             return false;
         
         // Obtain the template path

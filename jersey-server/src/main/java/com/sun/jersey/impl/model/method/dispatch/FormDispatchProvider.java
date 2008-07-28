@@ -47,6 +47,7 @@ import com.sun.jersey.api.representation.FormParam;
 import com.sun.jersey.impl.ResponseBuilderImpl;
 import com.sun.jersey.impl.model.parameter.multivalued.MultivaluedParameterExtractor;
 import com.sun.jersey.impl.model.parameter.multivalued.MultivaluedParameterProcessor;
+import com.sun.jersey.spi.container.MessageBodyWorkers;
 import com.sun.jersey.spi.resource.InjectableProviderContext;
 import com.sun.jersey.spi.dispatch.RequestDispatcher;
 import com.sun.jersey.spi.inject.Injectable;
@@ -57,7 +58,6 @@ import java.util.List;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import javax.ws.rs.ext.MessageBodyWorkers;
 
 /**
  *

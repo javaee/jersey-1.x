@@ -64,7 +64,7 @@ public class ContainerResponse implements HttpResponseContext {
     
     private static final RuntimeDelegate rd = RuntimeDelegate.getInstance();
     
-    private ExtendedMessageBodyWorkers bodyContext;
+    private MessageBodyWorkers bodyContext;
     
     private ContainerRequest request;
     
@@ -264,7 +264,7 @@ public class ContainerResponse implements HttpResponseContext {
         this.entity = r.getEntity();
         
         // If HTTP method is HEAD then there should be no entity
-        if (request.getHttpMethod().equals("HEAD"))
+        if (request.getMethod().equals("HEAD"))
             this.entity = null;
         // Otherwise if there is no entity then there should be no content type
         else if (this.entity == null) {

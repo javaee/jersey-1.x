@@ -100,7 +100,7 @@ public final class HttpMethodRule implements UriRule {
         
         final HttpRequestContext request = context.getRequest();
         final HttpResponseContext response = context.getResponse();
-        final String httpMethod = request.getHttpMethod();
+        final String httpMethod = request.getMethod();
         final MediaType contentType = HttpHelper.getContentType(request);
         
         // Get the list of resource methods for the HTTP method
@@ -234,9 +234,9 @@ public final class HttpMethodRule implements UriRule {
             throw new WebApplicationException(Response.serverError().
                     entity(error).type("text/plain").build());            
         } else if (contentType != null && !method.produces(contentType)) {
-            // Check if 'Content-Type' of the responseContext is a member of @ProduceMime
-            // The resource is not honoring the @ProduceMime contract
-            // The 'Content-Type' is not a member of @ProduceMime.
+            // Check if 'Content-Type' of the responseContext is a member of @Produces
+            // The resource is not honoring the @Produces contract
+            // The 'Content-Type' is not a member of @Produces.
             // Check if the 'Content-Type' is acceptable
             if (!HttpHelper.produces(contentType, accept)) {
                 String error = ImplMessages.RESOURCE_NOT_ACCEPTABLE(
@@ -253,7 +253,7 @@ public final class HttpMethodRule implements UriRule {
                 String error = ImplMessages.RESOURCE_MIMETYPE_NOT_IN_PRODUCE_MIME(
                         method,
                         contentType,
-                        method.getProduceMime());
+                        method.getProduces());
                 LOGGER.warning(error);
             }
         }   

@@ -38,8 +38,8 @@
 package com.sun.jersey.impl.resource;
 
 import com.sun.jersey.impl.AbstractResourceTester;
-import javax.ws.rs.ConsumeMime;
-import javax.ws.rs.ProduceMime;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.Produces;
 import javax.ws.rs.Path;
 import com.sun.jersey.api.client.WebResource;
 import com.sun.jersey.api.client.ClientResponse;
@@ -58,7 +58,7 @@ public class ClientErrorTest extends AbstractResourceTester {
 
     @Path("/")
     public static class WebResourceNotFoundMethodNotAllowed {
-        @ProduceMime("application/foo")
+        @Produces("application/foo")
         @GET
         public String doGet() {
             return "content";
@@ -67,8 +67,8 @@ public class ClientErrorTest extends AbstractResourceTester {
         
     @Path("/")
     public static class WebResourceUnsupportedMediaType {
-        @ConsumeMime("application/bar")
-        @ProduceMime("application/foo")
+        @Consumes("application/bar")
+        @Produces("application/foo")
         @POST
         public String doPost(String entity) {
             return "content";

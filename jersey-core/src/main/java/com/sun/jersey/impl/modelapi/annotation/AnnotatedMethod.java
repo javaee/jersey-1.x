@@ -46,7 +46,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import javax.ws.rs.ConsumeMime;
+import javax.ws.rs.Consumes;
 import javax.ws.rs.CookieParam;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.Encoded;
@@ -54,7 +54,7 @@ import javax.ws.rs.HeaderParam;
 import javax.ws.rs.HttpMethod;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
-import javax.ws.rs.ProduceMime;
+import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 
@@ -72,8 +72,8 @@ public final class AnnotatedMethod implements AnnotatedElement {
     private static final Set<Class<? extends Annotation>> 
             METHOD_ANNOTATIONS = getSet(
                 Path.class, 
-                ProduceMime.class, 
-                ConsumeMime.class);
+                Produces.class, 
+                Consumes.class);
         
     @SuppressWarnings("unchecked")
     private static final Set<Class<? extends Annotation>> 

@@ -45,6 +45,7 @@ import com.sun.jersey.impl.http.header.QualityFactor;
 import com.sun.jersey.impl.model.HttpHelper;
 import java.util.Collection;
 import java.util.List;
+import java.util.Locale;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Variant;
 
@@ -157,13 +158,13 @@ public final class VariantSelector {
         }        
     };
     
-    private static final DimensionChecker<AcceptableLanguageTag, String> LANGUAGE_TAG_DC = 
-            new DimensionChecker<AcceptableLanguageTag, String>() {
-        public String getDimension(Variant v) {
+    private static final DimensionChecker<AcceptableLanguageTag, Locale> LANGUAGE_TAG_DC = 
+            new DimensionChecker<AcceptableLanguageTag, Locale>() {
+        public Locale getDimension(Variant v) {
             return v.getLanguage();
         }
 
-        public boolean isCompatible(AcceptableLanguageTag t, String u) {
+        public boolean isCompatible(AcceptableLanguageTag t, Locale u) {
             return t.isCompatible(u);
         }        
     };

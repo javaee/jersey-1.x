@@ -43,7 +43,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
-import javax.ws.rs.ConsumeMime;
+import javax.ws.rs.Consumes;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
@@ -57,7 +57,7 @@ import javax.xml.bind.Unmarshaller;
  *
  * @author Paul.Sandoz@Sun.Com
  */
-@ConsumeMime({"application/xml", "text/xml", "*/*"})
+@Consumes({"application/xml", "text/xml", "*/*"})
 public final class XMLRootObjectProvider implements MessageBodyReader<Object> {
     
     public XMLRootObjectProvider() {

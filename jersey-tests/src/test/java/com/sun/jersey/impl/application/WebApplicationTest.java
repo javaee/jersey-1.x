@@ -75,7 +75,7 @@ public class WebApplicationTest extends TestCase {
         
         @GET
         public void handleRequest(HttpRequestContext request, HttpResponseContext response) {
-            assertEquals("GET", request.getHttpMethod());
+            assertEquals("GET", request.getMethod());
             
             assertEquals("a", info.getPathParameters().getFirst("arg1"));
             assertEquals("b", info.getPathParameters().getFirst("arg2"));
@@ -91,7 +91,7 @@ public class WebApplicationTest extends TestCase {
         
         @GET
         public void handleRequest(HttpRequestContext request, HttpResponseContext response) {
-            assertEquals("GET", request.getHttpMethod());
+            assertEquals("GET", request.getMethod());
             
             System.out.println(info.getPath());
             String v = info.getPathParameters().getFirst("arg1");
@@ -109,7 +109,7 @@ public class WebApplicationTest extends TestCase {
         
         @GET
         public void handleRequest(HttpRequestContext request, HttpResponseContext response) {
-            assertEquals("GET", request.getHttpMethod());
+            assertEquals("GET", request.getMethod());
             
             System.out.println(info.getPath());
             assertEquals("a", info.getPathParameters().getFirst("arg1"));

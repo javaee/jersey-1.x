@@ -26,7 +26,7 @@ import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
-import javax.ws.rs.ProduceMime;
+import javax.ws.rs.Produces;
 
 /**
  * A singleton resource class that is not managed by spring (but jersey)<br>
@@ -45,7 +45,7 @@ public class AutowiredSingletonResourceBase {
 
     @GET
     @Path( "item" )
-    @ProduceMime( "application/xml" )
+    @Produces( "application/xml" )
     public Item getItem() {
         return _item;
     }
@@ -66,7 +66,7 @@ public class AutowiredSingletonResourceBase {
     
     @GET
     @Path( "countusage" )
-    @ProduceMime("text/plain")
+    @Produces("text/plain")
     public String getCountUsage() {
         return String.valueOf( _countUsage );
     }

@@ -45,13 +45,13 @@ import java.util.Formatter;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
-import javax.ws.rs.ConsumeMime;
+import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
-import javax.ws.rs.ProduceMime;
+import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.UriInfo;
 
@@ -69,7 +69,7 @@ public class PrintersResource {
     UriInfo uriInfo;
 
     @GET
-    @ProduceMime({"application/json", "application/xml"})
+    @Produces({"application/json", "application/xml"})
     public WebResourceList getMyResources() {
         if (null == myResources) {
             myResources = new WebResourceList();
@@ -85,7 +85,7 @@ public class PrintersResource {
     }
     
     @GET @Path("/list")
-    @ProduceMime({"application/json", "application/xml"})
+    @Produces({"application/json", "application/xml"})
     public WebResourceList getListOfPrinters() {
         WebResourceList result = new WebResourceList();
         result.items = new LinkedList<WebResourceList.Item>();
@@ -98,13 +98,13 @@ public class PrintersResource {
     }
 
     @GET @Path("/jMakiTable")
-    @ProduceMime("application/json")
+    @Produces("application/json")
     public PrinterTableModel getTable() {
         return new PrinterTableModel(getPrinters().values());
     }
 
     @GET @Path("/jMakiTree")
-    @ProduceMime("application/json")
+    @Produces("application/json")
     public TreeModel getTree() {
         TreeModel model = new TreeModel();
         model.root = new TreeModel.Node("printers");
@@ -129,7 +129,7 @@ public class PrintersResource {
     }
 
     @GET @Path("/ids/{printerid}")
-    @ProduceMime({"application/json", "application/xml"})
+    @Produces({"application/json", "application/xml"})
     public Printer getPrinter(
             
             @PathParam("printerid") String printerId) {
@@ -137,7 +137,7 @@ public class PrintersResource {
     }
 
     @PUT @Path("/ids/{printerid}")
-    @ConsumeMime({"application/json", "application/xml"})
+    @Consumes({"application/json", "application/xml"})
     public void putPrinter(
             
             @PathParam("printerid") String printerId,  Printer printer) {

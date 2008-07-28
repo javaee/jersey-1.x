@@ -68,14 +68,14 @@ public class WebResorceWithFieldInjectionTest extends AbstractResourceTester {
         @POST
         public String doPost(String in) {
             assertEquals("BEAN-ONE", in);
-            String method = context.getRequest().getHttpMethod();
+            String method = context.getRequest().getMethod();
             assertEquals("POST", method);
             return "POST";
         }
         
         @GET
         public String doGet() {
-            String method = context.getRequest().getHttpMethod();
+            String method = context.getRequest().getMethod();
             assertEquals("GET", method);
             return "GET";
         }
@@ -83,14 +83,14 @@ public class WebResorceWithFieldInjectionTest extends AbstractResourceTester {
         @PUT
         public String doPut(String in) {
             assertEquals("BEAN-ONE", in);
-            String method = context.getRequest().getHttpMethod();
+            String method = context.getRequest().getMethod();
             assertEquals("PUT", method);
             return "PUT";
         }
         
         @DELETE
         public String doDelete() {
-            String method = context.getRequest().getHttpMethod();
+            String method = context.getRequest().getMethod();
             assertEquals("DELETE", method);
             return "DELETE";
         }

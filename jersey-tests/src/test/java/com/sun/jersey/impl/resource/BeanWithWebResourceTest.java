@@ -40,7 +40,7 @@ package com.sun.jersey.impl.resource;
 import com.sun.jersey.impl.AbstractResourceTester;
 import com.sun.jersey.api.core.HttpRequestContext;
 import com.sun.jersey.api.core.HttpResponseContext;
-import javax.ws.rs.ProduceMime;
+import javax.ws.rs.Produces;
 import javax.ws.rs.Path;
 import com.sun.jersey.api.client.WebResource;
 import javax.ws.rs.DELETE;
@@ -63,7 +63,7 @@ public class BeanWithWebResourceTest extends AbstractResourceTester {
     public static class BeanWithWebResource{
         @GET
         public void doGet(HttpRequestContext request, HttpResponseContext response) {
-            assertEquals("GET", request.getHttpMethod());
+            assertEquals("GET", request.getMethod());
             
             response.setResponse(Response.ok("RESPONSE").build());
         }
@@ -84,7 +84,7 @@ public class BeanWithWebResourceTest extends AbstractResourceTester {
         }
         
         public void handleRequest(HttpRequestContext request, HttpResponseContext response) {
-            String method = request.getHttpMethod();
+            String method = request.getMethod();
             
             boolean match = "POST".equals(method) | "DELETE".equals(method) |
                     "PUT".equals(method);
@@ -97,35 +97,35 @@ public class BeanWithWebResourceTest extends AbstractResourceTester {
     @Path("/{arg1}/{arg2}")
     public static class BeanProduceWithWebResource {
         @GET
-        @ProduceMime("text/html")
+        @Produces("text/html")
         public void doGet(HttpRequestContext request, HttpResponseContext response) {
-            assertEquals("GET", request.getHttpMethod());
+            assertEquals("GET", request.getMethod());
             assertEquals("text/html", request.getRequestHeaders().getFirst("Accept"));
             
             response.setResponse(Response.ok("RESPONSE").build());
         }
         
         //TODO: reunify the following 3 methods once PUT, POST, DELETE annotations are available
-        @ProduceMime("text/xhtml")
+        @Produces("text/xhtml")
         @PUT
         public void putRequestWrapper(HttpRequestContext request, HttpResponseContext response) {
             handleRequest(request, response);
         }
         
-        @ProduceMime("text/xhtml")
+        @Produces("text/xhtml")
         @POST
         public void postRequestWrapper(HttpRequestContext request, HttpResponseContext response) {
             handleRequest(request, response);
         }
         
-        @ProduceMime("text/xhtml")
+        @Produces("text/xhtml")
         @DELETE
         public void deleteRequestWrapper(HttpRequestContext request, HttpResponseContext response) {
             handleRequest(request, response);
         }
         
         public void handleRequest(HttpRequestContext request, HttpResponseContext response) {
-            String method = request.getHttpMethod();
+            String method = request.getMethod();
             boolean match = "POST".equals(method) | "DELETE".equals(method) |
                     "PUT".equals(method);
             assertTrue(match);

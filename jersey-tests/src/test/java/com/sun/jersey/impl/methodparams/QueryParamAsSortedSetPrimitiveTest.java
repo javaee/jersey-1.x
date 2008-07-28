@@ -39,7 +39,7 @@ package com.sun.jersey.impl.methodparams;
 
 import com.sun.jersey.impl.AbstractResourceTester;
 import javax.ws.rs.DefaultValue;
-import javax.ws.rs.ProduceMime;
+import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.Path;
 import com.sun.jersey.impl.AbstractResourceTester;
@@ -67,49 +67,49 @@ public class QueryParamAsSortedSetPrimitiveTest extends AbstractResourceTester {
     @Path("/SortedSet")
     public static class ResourceQueryPrimitiveSortedSet {
         @GET
-        @ProduceMime("application/boolean")
+        @Produces("application/boolean")
         public String doGetBoolean(@QueryParam("boolean") SortedSet<Boolean> v) {
             assertTrue(v.contains(true));
             return "content";
         }        
         
         @GET
-        @ProduceMime("application/byte")
+        @Produces("application/byte")
         public String doGetByte(@QueryParam("byte") SortedSet<Byte> v) {
             assertTrue(v.contains((byte)127));
             return "content";
         }        
         
         @GET
-        @ProduceMime("application/short")
+        @Produces("application/short")
         public String doGetShort(@QueryParam("short") SortedSet<Short> v) {
             assertTrue(v.contains((short)32767));
             return "content";
         }        
         
         @GET
-        @ProduceMime("application/int")
+        @Produces("application/int")
         public String doGetInteger(@QueryParam("int") SortedSet<Integer> v) {
             assertTrue(v.contains(2147483647));
             return "content";
         }        
         
         @GET
-        @ProduceMime("application/long")
+        @Produces("application/long")
         public String doGetLong(@QueryParam("long") SortedSet<Long> v) {
             assertTrue(v.contains(9223372036854775807L));
             return "content";
         }        
         
         @GET
-        @ProduceMime("application/float")
+        @Produces("application/float")
         public String doGetFloat(@QueryParam("float") SortedSet<Float> v) {
             assertTrue(v.contains(3.14159265f));
             return "content";
         }        
         
         @GET
-        @ProduceMime("application/double")
+        @Produces("application/double")
         public String doGetDouble(@QueryParam("double") SortedSet<Double> v) {
             assertTrue(v.contains(3.14159265358979d));
             return "content";
@@ -119,49 +119,49 @@ public class QueryParamAsSortedSetPrimitiveTest extends AbstractResourceTester {
     @Path("/SortedSet/default/null")
     public static class ResourceQueryPrimitiveSortedSetDefaultNull {
         @GET
-        @ProduceMime("application/boolean")
+        @Produces("application/boolean")
         public String doGetBoolean(@QueryParam("boolean") SortedSet<Boolean> v) {
             assertEquals(null, v);
             return "content";
         }        
         
         @GET
-        @ProduceMime("application/byte")
+        @Produces("application/byte")
         public String doGetByte(@QueryParam("byte") SortedSet<Byte> v) {
             assertEquals(null, v);
             return "content";
         }        
         
         @GET
-        @ProduceMime("application/short")
+        @Produces("application/short")
         public String doGetShort(@QueryParam("short") SortedSet<Short> v) {
             assertEquals(null, v);
             return "content";
         }        
         
         @GET
-        @ProduceMime("application/int")
+        @Produces("application/int")
         public String doGetInteger(@QueryParam("int") SortedSet<Integer> v) {
             assertEquals(null, v);
             return "content";
         }        
         
         @GET
-        @ProduceMime("application/long")
+        @Produces("application/long")
         public String doGetLong(@QueryParam("long") SortedSet<Long> v) {
             assertEquals(null, v);
             return "content";
         }        
         
         @GET
-        @ProduceMime("application/float")
+        @Produces("application/float")
         public String doGetFloat(@QueryParam("float") SortedSet<Float> v) {
             assertEquals(null, v);
             return "content";
         }        
         
         @GET
-        @ProduceMime("application/double")
+        @Produces("application/double")
         public String doGetDouble(@QueryParam("double") SortedSet<Double> v) {
             assertEquals(null, v);
             return "content";
@@ -171,49 +171,49 @@ public class QueryParamAsSortedSetPrimitiveTest extends AbstractResourceTester {
     @Path("/SortedSet/default")
     public static class ResourceQueryPrimitiveSortedSetDefault {
         @GET
-        @ProduceMime("application/boolean")
+        @Produces("application/boolean")
         public String doGetBoolean(@QueryParam("boolean") @DefaultValue("true") SortedSet<Boolean> v) {
             assertTrue(v.contains(true));
             return "content";
         }        
         
         @GET
-        @ProduceMime("application/byte")
+        @Produces("application/byte")
         public String doGetByte(@QueryParam("byte") @DefaultValue("127") SortedSet<Byte> v) {
             assertTrue(v.contains((byte)127));
             return "content";
         }        
         
         @GET
-        @ProduceMime("application/short")
+        @Produces("application/short")
         public String doGetShort(@QueryParam("short") @DefaultValue("32767") SortedSet<Short> v) {
             assertTrue(v.contains((short)32767));
             return "content";
         }        
         
         @GET
-        @ProduceMime("application/int")
+        @Produces("application/int")
         public String doGetInteger(@QueryParam("int") @DefaultValue("2147483647") SortedSet<Integer> v) {
             assertTrue(v.contains(2147483647));
             return "content";
         }        
         
         @GET
-        @ProduceMime("application/long")
+        @Produces("application/long")
         public String doGetLong(@QueryParam("long") @DefaultValue("9223372036854775807") SortedSet<Long> v) {
             assertTrue(v.contains(9223372036854775807L));
             return "content";
         }        
         
         @GET
-        @ProduceMime("application/float")
+        @Produces("application/float")
         public String doGetFloat(@QueryParam("float") @DefaultValue("3.14159265") SortedSet<Float> v) {
             assertTrue(v.contains(3.14159265f));
             return "content";
         }        
         
         @GET
-        @ProduceMime("application/double")
+        @Produces("application/double")
         public String doGetDouble(@QueryParam("double") @DefaultValue("3.14159265358979") SortedSet<Double> v) {
             assertTrue(v.contains(3.14159265358979d));
             return "content";
@@ -223,49 +223,49 @@ public class QueryParamAsSortedSetPrimitiveTest extends AbstractResourceTester {
     @Path("/SortedSet/default/override")
     public static class ResourceQueryPrimitiveSortedSetDefaultOverride {
         @GET
-        @ProduceMime("application/boolean")
+        @Produces("application/boolean")
         public String doGetBoolean(@QueryParam("boolean") @DefaultValue("false") SortedSet<Boolean> v) {
             assertTrue(v.contains(true));
             return "content";
         }        
         
         @GET
-        @ProduceMime("application/byte")
+        @Produces("application/byte")
         public String doGetByte(@QueryParam("byte") @DefaultValue("0") SortedSet<Byte> v) {
             assertTrue(v.contains((byte)127));
             return "content";
         }        
         
         @GET
-        @ProduceMime("application/short")
+        @Produces("application/short")
         public String doGetShort(@QueryParam("short") @DefaultValue("0") SortedSet<Short> v) {
             assertTrue(v.contains((short)32767));
             return "content";
         }        
         
         @GET
-        @ProduceMime("application/int")
+        @Produces("application/int")
         public String doGetInteger(@QueryParam("int") @DefaultValue("0") SortedSet<Integer> v) {
             assertTrue(v.contains(2147483647));
             return "content";
         }        
         
         @GET
-        @ProduceMime("application/long")
+        @Produces("application/long")
         public String doGetLong(@QueryParam("long") @DefaultValue("0") SortedSet<Long> v) {
             assertTrue(v.contains(9223372036854775807L));
             return "content";
         }        
         
         @GET
-        @ProduceMime("application/float")
+        @Produces("application/float")
         public String doGetFloat(@QueryParam("float") @DefaultValue("0.0") SortedSet<Float> v) {
             assertTrue(v.contains(3.14159265f));
             return "content";
         }        
         
         @GET
-        @ProduceMime("application/double")
+        @Produces("application/double")
         public String doGetDouble(@QueryParam("double") @DefaultValue("0.0") SortedSet<Double> v) {
             assertTrue(v.contains(3.14159265358979d));
             return "content";

@@ -39,7 +39,7 @@ package com.sun.jersey.impl.methodparams;
 
 import com.sun.jersey.impl.AbstractResourceTester;
 import javax.ws.rs.DefaultValue;
-import javax.ws.rs.ProduceMime;
+import javax.ws.rs.Produces;
 import javax.ws.rs.CookieParam;
 import javax.ws.rs.Path;
 import com.sun.jersey.impl.AbstractResourceTester;
@@ -103,14 +103,14 @@ public class CookieParamAsStringTest extends AbstractResourceTester {
     @Path("/")
     public static class ResourceStringList {
         @GET
-        @ProduceMime("application/stringlist")
+        @Produces("application/stringlist")
         public String doGetString(@CookieParam("args") List<String> args) {
             assertEquals("a", args.get(0));
             return "content";
         }
         
         @GET
-        @ProduceMime("application/list")
+        @Produces("application/list")
         public String doGet(@CookieParam("args") List args) {
             assertEquals(String.class, args.get(0).getClass());
             assertEquals("a", args.get(0));
@@ -121,7 +121,7 @@ public class CookieParamAsStringTest extends AbstractResourceTester {
     @Path("/")
     public static class ResourceStringListEmpty {
         @GET
-        @ProduceMime("application/stringlist")
+        @Produces("application/stringlist")
         public String doGetString(@CookieParam("args") List<String> args) {
             assertEquals(1, args.size());
             assertEquals("", args.get(0));
@@ -132,7 +132,7 @@ public class CookieParamAsStringTest extends AbstractResourceTester {
     @Path("/")
     public static class ResourceStringListAbsent {
         @GET
-        @ProduceMime("application/stringlist")
+        @Produces("application/stringlist")
         public String doGetString(@CookieParam("args") List<String> args) {
             assertEquals(null, args);
             return "content";
@@ -182,7 +182,7 @@ public class CookieParamAsStringTest extends AbstractResourceTester {
     @Path("/")
     public static class ResourceStringListNullDefault {
         @GET
-        @ProduceMime("application/stringlist")
+        @Produces("application/stringlist")
         public String doGetString(
                 @CookieParam("args") List<String> args) {
             assertEquals(null, args);
@@ -190,7 +190,7 @@ public class CookieParamAsStringTest extends AbstractResourceTester {
         }
         
         @GET
-        @ProduceMime("application/list")
+        @Produces("application/list")
         public String doGet(
                 @CookieParam("args") List args) {
             assertEquals(null, args);
@@ -201,7 +201,7 @@ public class CookieParamAsStringTest extends AbstractResourceTester {
     @Path("/")
     public static class ResourceStringListDefault {
         @GET
-        @ProduceMime("application/stringlist")
+        @Produces("application/stringlist")
         public String doGetString(
                 @CookieParam("args") @DefaultValue("a") List<String> args) {
             assertEquals("a", args.get(0));
@@ -209,7 +209,7 @@ public class CookieParamAsStringTest extends AbstractResourceTester {
         }
         
         @GET
-        @ProduceMime("application/list")
+        @Produces("application/list")
         public String doGet(
                 @CookieParam("args") @DefaultValue("a") List args) {
             assertEquals(String.class, args.get(0).getClass());
@@ -221,7 +221,7 @@ public class CookieParamAsStringTest extends AbstractResourceTester {
     @Path("/")
     public static class ResourceStringListDefaultOverride {
         @GET
-        @ProduceMime("application/stringlist")
+        @Produces("application/stringlist")
         public String doGetString(
                 @CookieParam("args") @DefaultValue("a") List<String> args) {
             assertEquals("b", args.get(0));
@@ -229,7 +229,7 @@ public class CookieParamAsStringTest extends AbstractResourceTester {
         }
         
         @GET
-        @ProduceMime("application/list")
+        @Produces("application/list")
         public String doGet(
                 @CookieParam("args") @DefaultValue("a") List args) {
             assertEquals(String.class, args.get(0).getClass());

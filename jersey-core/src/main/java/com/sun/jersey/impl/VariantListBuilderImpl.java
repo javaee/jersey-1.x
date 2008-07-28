@@ -39,6 +39,7 @@ package com.sun.jersey.impl;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Variant;
 import javax.ws.rs.core.Variant.VariantListBuilder;
@@ -53,7 +54,7 @@ public class VariantListBuilderImpl extends Variant.VariantListBuilder {
     
     private final List<MediaType> mediaTypes = new ArrayList<MediaType>();
     
-    private final List<String> languages = new ArrayList<String>();
+    private final List<Locale> languages = new ArrayList<Locale>();
    
     private final List<String> charsets = new ArrayList<String>();
     
@@ -89,21 +90,21 @@ public class VariantListBuilderImpl extends Variant.VariantListBuilder {
     
     private void addLanguages(MediaType mediaType) {
         if (languages.isEmpty()) addEncodings(mediaType, null);
-        else for (String language : languages) addEncodings(mediaType, language);        
+        else for (Locale language : languages) addEncodings(mediaType, language);        
     }
     
-    private void addEncodings(MediaType mediaType, String language) {
+    private void addEncodings(MediaType mediaType, Locale language) {
         if (encodings.isEmpty()) addVariant(mediaType, language, null);
         else for (String encoding : encodings) addVariant(mediaType, language, encoding);        
     }
 
-    private void addVariant(MediaType mediaType, String language, String encoding) {
+    private void addVariant(MediaType mediaType, Locale language, String encoding) {
         variants.add(new Variant(mediaType, language, encoding));
     }
     
     @Override
-    public VariantListBuilder languages(String... languages) {
-        for (String language : languages) this.languages.add(language);
+    public VariantListBuilder languages(Locale... languages) {
+        for (Locale language : languages) this.languages.add(language);
         return this;
     }
 

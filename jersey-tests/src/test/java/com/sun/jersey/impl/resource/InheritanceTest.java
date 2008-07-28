@@ -40,7 +40,7 @@ package com.sun.jersey.impl.resource;
 import com.sun.jersey.impl.AbstractResourceTester;
 import com.sun.jersey.api.client.ClientResponse;
 import javax.ws.rs.GET;
-import javax.ws.rs.ProduceMime;
+import javax.ws.rs.Produces;
 import javax.ws.rs.Path;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Request;
@@ -61,7 +61,7 @@ public class InheritanceTest extends AbstractResourceTester {
         @Context UriInfo info;
         
         @GET
-        @ProduceMime("application/super")
+        @Produces("application/super")
         public String doGet() {
             assertNotNull(info);
             return "super";
@@ -73,7 +73,7 @@ public class InheritanceTest extends AbstractResourceTester {
         @Context Request request;
         
         @GET
-        @ProduceMime("application/sub")
+        @Produces("application/sub")
         public String doGetSub() {
             assertNotNull(request);
             return "sub";
@@ -83,7 +83,7 @@ public class InheritanceTest extends AbstractResourceTester {
     @Path("/")
     static public class SubResourceOverride extends SuperResource { 
         @GET
-        @ProduceMime("application/sub")
+        @Produces("application/sub")
         public String doGet() {
             return "suboverride";
         }
@@ -115,10 +115,10 @@ public class InheritanceTest extends AbstractResourceTester {
     }
 
     
-    @ProduceMime("application/default")
+    @Produces("application/default")
     static public abstract class SuperResourceWithProduce { 
         @GET
-        @ProduceMime("application/super")
+        @Produces("application/super")
         public String doGet() {
             return "super";
         }

@@ -106,11 +106,11 @@ public abstract class ResourceMethod {
         return template;
     }
     
-    public final List<MediaType> getConsumeMime() {
+    public final List<MediaType> getConsumes() {
         return produceMime;
     }
     
-    public final List<MediaType> getProduceMime() {
+    public final List<MediaType> getProduces() {
         return produceMime;
     }
     

@@ -41,7 +41,7 @@ import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.WebResource;
 import com.sun.jersey.impl.AbstractResourceTester;
 import java.io.IOException;
-import javax.ws.rs.ProduceMime;
+import javax.ws.rs.Produces;
 import javax.ws.rs.Path;
 import javax.ws.rs.GET;
 import javax.ws.rs.core.MediaType;
@@ -59,25 +59,25 @@ public class AcceptTest extends AbstractResourceTester {
 
     @Path("/")
     public static class Resource {
-        @ProduceMime("application/foo")
+        @Produces("application/foo")
         @GET
         public String doGetFoo() {
             return "foo";
         }
         
-        @ProduceMime("application/bar")
+        @Produces("application/bar")
         @GET
         public String doGetBar() {
             return "bar";
         }
         
-        @ProduceMime("application/baz")
+        @Produces("application/baz")
         @GET
         public String doGetBaz() {
             return "baz";
         }
         
-        @ProduceMime("*/*")
+        @Produces("*/*")
         @GET
         public Response doGetWildCard() {
             return Response.ok("wildcard", "application/wildcard").build();
@@ -135,7 +135,7 @@ public class AcceptTest extends AbstractResourceTester {
     
     @Path("/")
     public static class MultipleResource {
-        @ProduceMime({"application/foo", "application/bar"})
+        @Produces({"application/foo", "application/bar"})
         @GET
         public String get() {
             return "GET";

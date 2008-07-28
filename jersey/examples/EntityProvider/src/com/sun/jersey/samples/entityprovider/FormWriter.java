@@ -60,7 +60,7 @@ import java.io.OutputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 import java.util.Hashtable;
-import javax.ws.rs.ProduceMime;
+import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.ext.MessageBodyWriter;
@@ -70,7 +70,7 @@ import javax.ws.rs.ext.Provider;
  *
  * @author mh124079
  */
-@ProduceMime("text/html")
+@Produces("text/html")
 @Provider
 public class FormWriter implements MessageBodyWriter<Hashtable<String, String>> {
 

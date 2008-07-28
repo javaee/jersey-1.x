@@ -42,10 +42,10 @@ import com.sun.jersey.api.core.HttpRequestContext;
 import com.sun.jersey.api.core.HttpResponseContext;
 import com.sun.jersey.api.client.WebResource;
 import javax.ws.rs.Path;
-import javax.ws.rs.ConsumeMime;
+import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
-import javax.ws.rs.ProduceMime;
+import javax.ws.rs.Produces;
 import javax.ws.rs.core.Response;
 
 /**
@@ -59,75 +59,75 @@ public class ConsumeProduceSimpleTest extends AbstractResourceTester {
     }
     
     @Path("/{arg1}/{arg2}")
-    @ConsumeMime("text/html")
+    @Consumes("text/html")
     public static class ConsumeSimpleBean {
         @POST
         public void doPostHtml(HttpRequestContext request, HttpResponseContext response) {
-            assertEquals("POST", request.getHttpMethod());
+            assertEquals("POST", request.getMethod());
             assertEquals("text/html", request.getRequestHeaders().getFirst("Content-Type"));
             response.setResponse(Response.ok("HTML").build());
         }
         
         @POST
-        @ConsumeMime("text/xhtml")
+        @Consumes("text/xhtml")
         public void doPostXHtml(HttpRequestContext request, HttpResponseContext response) {
-            assertEquals("POST", request.getHttpMethod());            
+            assertEquals("POST", request.getMethod());            
             assertEquals("text/xhtml", request.getRequestHeaders().getFirst("Content-Type"));
             response.setResponse(Response.ok("XHTML").build());
         }
     }
         
     @Path("/{arg1}/{arg2}")
-    @ProduceMime("text/html")
+    @Produces("text/html")
     public static class ProduceSimpleBean {
         @GET
         public void doGetHtml(HttpRequestContext request, HttpResponseContext response) {
-            assertEquals("GET", request.getHttpMethod());
+            assertEquals("GET", request.getMethod());
             assertEquals("text/html", request.getRequestHeaders().getFirst("Accept"));
             response.setResponse(Response.ok("HTML").build());
         }
         
         @GET
-        @ProduceMime("text/xhtml")
+        @Produces("text/xhtml")
         public void doGetXhtml(HttpRequestContext request, HttpResponseContext response) {
-            assertEquals("GET", request.getHttpMethod());            
+            assertEquals("GET", request.getMethod());            
             assertEquals("text/xhtml", request.getRequestHeaders().getFirst("Accept"));
             response.setResponse(Response.ok("XHTML").build());
         }
     }
     
     @Path("/{arg1}/{arg2}")
-    @ConsumeMime("text/html")
-    @ProduceMime("text/html")
+    @Consumes("text/html")
+    @Produces("text/html")
     public static class ConsumeProduceSimpleBean {
         @GET
         public void doGetHtml(HttpRequestContext request, HttpResponseContext response) {
-            assertEquals("GET", request.getHttpMethod());
+            assertEquals("GET", request.getMethod());
             assertEquals("text/html", request.getRequestHeaders().getFirst("Accept"));
             response.setResponse(Response.ok("HTML").build());
         }
         
         @GET
-        @ProduceMime("text/xhtml")
+        @Produces("text/xhtml")
         public void doGetXhtml(HttpRequestContext request, HttpResponseContext response) {
-            assertEquals("GET", request.getHttpMethod());            
+            assertEquals("GET", request.getMethod());            
             assertEquals("text/xhtml", request.getRequestHeaders().getFirst("Accept"));
             response.setResponse(Response.ok("XHTML").build());
         }
         
         @POST
         public void doPostHtml(HttpRequestContext request, HttpResponseContext response) {
-            assertEquals("POST", request.getHttpMethod());
+            assertEquals("POST", request.getMethod());
             assertEquals("text/html", request.getRequestHeaders().getFirst("Content-Type"));
             assertEquals("text/html", request.getRequestHeaders().getFirst("Accept"));
             response.setResponse(Response.ok("HTML").build());
         }
         
         @POST
-        @ConsumeMime("text/xhtml")
-        @ProduceMime("text/xhtml")
+        @Consumes("text/xhtml")
+        @Produces("text/xhtml")
         public void doPostXHtml(HttpRequestContext request, HttpResponseContext response) {
-            assertEquals("POST", request.getHttpMethod());            
+            assertEquals("POST", request.getMethod());            
             assertEquals("text/xhtml", request.getRequestHeaders().getFirst("Content-Type"));
             assertEquals("text/xhtml", request.getRequestHeaders().getFirst("Accept"));
             response.setResponse(Response.ok("XHTML").build());

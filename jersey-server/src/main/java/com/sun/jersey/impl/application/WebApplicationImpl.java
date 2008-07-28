@@ -68,7 +68,6 @@ import javax.ws.rs.core.Request;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.SecurityContext;
 import javax.ws.rs.core.UriInfo;
-import javax.ws.rs.ext.MessageBodyWorkers;
 import javax.ws.rs.ext.Provider;
 
 import com.sun.jersey.api.container.ContainerException;
@@ -102,7 +101,7 @@ import com.sun.jersey.impl.uri.rules.RightHandPathRule;
 import com.sun.jersey.impl.uri.rules.RootResourceClassesRule;
 import com.sun.jersey.impl.wadl.WadlFactory;
 import com.sun.jersey.impl.wadl.WadlResource;
-import com.sun.jersey.spi.container.ExtendedMessageBodyWorkers;
+import com.sun.jersey.spi.container.MessageBodyWorkers;
 import com.sun.jersey.spi.container.ContainerRequest;
 import com.sun.jersey.spi.container.ContainerRequestFilter;
 import com.sun.jersey.spi.container.ContainerResponse;
@@ -629,7 +628,7 @@ public final class WebApplicationImpl implements WebApplication {
                 processRootResources(resourceConfig.getResourceClasses()));       
     }
 
-    public ExtendedMessageBodyWorkers getMessageBodyWorkers() {
+    public MessageBodyWorkers getMessageBodyWorkers() {
         return bodyFactory;
     }
 

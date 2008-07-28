@@ -43,7 +43,7 @@ import com.sun.syndication.io.FeedException;
 import java.io.IOException;
 import java.net.URI;
 import java.util.Date;
-import javax.ws.rs.ConsumeMime;
+import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
@@ -111,7 +111,7 @@ public class EditEntryResource extends EntryResource {
     
     @PUT
     @Path("media")
-    @ConsumeMime("*/*")
+    @Consumes("*/*")
     public void putMedia(@Context HttpHeaders headers,
             byte[] update) throws IOException, FeedException {
         // Check if media exists, otherwise 404

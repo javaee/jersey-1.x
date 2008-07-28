@@ -38,7 +38,7 @@
 package com.sun.jersey.impl.methodparams;
 
 import javax.ws.rs.DefaultValue;
-import javax.ws.rs.ProduceMime;
+import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.Path;
 import com.sun.jersey.impl.AbstractResourceTester;
@@ -59,7 +59,7 @@ public class QueryParamAsSortedSetStringTest extends AbstractResourceTester {
     @Path("/")
     public static class ResourceStringSortedSet {
         @GET
-        @ProduceMime("application/stringSortedSet")
+        @Produces("application/stringSortedSet")
         public String doGetString(@QueryParam("args") SortedSet<String> args) {
             assertTrue(args.contains("a"));
             assertTrue(args.contains("b"));
@@ -68,7 +68,7 @@ public class QueryParamAsSortedSetStringTest extends AbstractResourceTester {
         }
         
         @GET
-        @ProduceMime("application/SortedSet")
+        @Produces("application/SortedSet")
         public String doGet(@QueryParam("args") SortedSet args) {
             assertTrue(args.contains("a"));
             assertTrue(args.contains("b"));
@@ -80,7 +80,7 @@ public class QueryParamAsSortedSetStringTest extends AbstractResourceTester {
     @Path("/")
     public static class ResourceStringSortedSetEmpty {
         @GET
-        @ProduceMime("application/stringSortedSet")
+        @Produces("application/stringSortedSet")
         public String doGetString(@QueryParam("args") SortedSet<String> args) {
             assertEquals(1, args.size());
             assertTrue(args.contains(""));
@@ -91,7 +91,7 @@ public class QueryParamAsSortedSetStringTest extends AbstractResourceTester {
     @Path("/")
     public static class ResourceStringSortedSetAbsent {
         @GET
-        @ProduceMime("application/stringSortedSet")
+        @Produces("application/stringSortedSet")
         public String doGetString(@QueryParam("args") SortedSet<String> args) {
             assertEquals(null, args);
             return "content";
@@ -101,7 +101,7 @@ public class QueryParamAsSortedSetStringTest extends AbstractResourceTester {
     @Path("/")
     public static class ResourceStringSortedSetNullDefault {
         @GET
-        @ProduceMime("application/stringSortedSet")
+        @Produces("application/stringSortedSet")
         public String doGetString(
                 @QueryParam("args") SortedSet<String> args) {
             assertEquals(null, args);
@@ -109,7 +109,7 @@ public class QueryParamAsSortedSetStringTest extends AbstractResourceTester {
         }
         
         @GET
-        @ProduceMime("application/SortedSet")
+        @Produces("application/SortedSet")
         public String doGet(
                 @QueryParam("args") SortedSet args) {
             assertEquals(null, args);
@@ -120,7 +120,7 @@ public class QueryParamAsSortedSetStringTest extends AbstractResourceTester {
     @Path("/")
     public static class ResourceStringSortedSetDefault {
         @GET
-        @ProduceMime("application/stringSortedSet")
+        @Produces("application/stringSortedSet")
         public String doGetString(
                 @QueryParam("args") @DefaultValue("a") SortedSet<String> args) {
             assertTrue(args.contains("a"));
@@ -128,7 +128,7 @@ public class QueryParamAsSortedSetStringTest extends AbstractResourceTester {
         }
         
         @GET
-        @ProduceMime("application/SortedSet")
+        @Produces("application/SortedSet")
         public String doGet(
                 @QueryParam("args") @DefaultValue("a") SortedSet args) {
             assertTrue(args.contains("a"));
@@ -139,7 +139,7 @@ public class QueryParamAsSortedSetStringTest extends AbstractResourceTester {
     @Path("/")
     public static class ResourceStringSortedSetDefaultOverride {
         @GET
-        @ProduceMime("application/stringSortedSet")
+        @Produces("application/stringSortedSet")
         public String doGetString(
                 @QueryParam("args") @DefaultValue("a") SortedSet<String> args) {
             assertTrue(args.contains("b"));
@@ -147,7 +147,7 @@ public class QueryParamAsSortedSetStringTest extends AbstractResourceTester {
         }
         
         @GET
-        @ProduceMime("application/SortedSet")
+        @Produces("application/SortedSet")
         public String doGet(
                 @QueryParam("args") @DefaultValue("a") SortedSet args) {
             assertTrue(args.contains("b"));

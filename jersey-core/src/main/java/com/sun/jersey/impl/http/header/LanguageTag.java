@@ -40,6 +40,7 @@ package com.sun.jersey.impl.http.header;
 import com.sun.jersey.impl.http.header.reader.HttpHeaderReader;
 import com.sun.jersey.impl.http.header.reader.HttpHeaderReaderImpl;
 import java.text.ParseException;
+import java.util.Locale;
 
 /**
  *
@@ -82,11 +83,11 @@ public class LanguageTag {
         parse(tag);
     }
     
-    public final boolean isCompatible(String tag) {
+    public final boolean isCompatible(Locale tag) {
         if (this.tag.equals("*"))
             return true;
         
-        return this.tag.equals(tag);
+        return this.tag.equalsIgnoreCase(tag.toString());
     }
     
     protected final void parse(String languageTag) throws ParseException {

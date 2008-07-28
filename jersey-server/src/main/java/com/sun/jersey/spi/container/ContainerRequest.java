@@ -54,6 +54,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.logging.Logger;
 import javax.ws.rs.WebApplicationException;
@@ -67,7 +68,6 @@ import javax.ws.rs.core.Response.ResponseBuilder;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.Variant;
 import javax.ws.rs.ext.MessageBodyReader;
-import javax.ws.rs.ext.MessageBodyWorkers;
 
 /**
  * Containers instantiate, or inherit, and provide an instance to the 
@@ -245,10 +245,6 @@ public class ContainerRequest implements HttpRequestContext {
         return getEntity(type, type, EMTPTY_ANNOTATIONS);
     }
     
-    public String getHttpMethod() {
-        return method;
-    }
-    
     public MediaType getAcceptableMediaType(List<MediaType> mediaTypes) {
         if (mediaTypes.isEmpty())
             return getAcceptableMediaTypes().get(0);
@@ -292,7 +288,7 @@ public class ContainerRequest implements HttpRequestContext {
         return accept;
     }
     
-    public List<String> getAcceptableLanguages() {
+    public List<Locale> getAcceptableLanguages() {
         throw new UnsupportedOperationException();
     }
     
@@ -303,8 +299,12 @@ public class ContainerRequest implements HttpRequestContext {
         return contentType;
     }
     
-    public String getLanguage() {
-        return this.getRequestHeaders().getFirst(HttpHeaders.CONTENT_LANGUAGE);
+    public Locale getLanguage() {
+        final String localeString = this.getRequestHeaders().
+                getFirst(HttpHeaders.CONTENT_LANGUAGE);
+        if (localeString == null)
+            return null;
+        return new Locale(localeString);
     }
     
     public Map<String, Cookie> getCookies() {
@@ -326,6 +326,10 @@ public class ContainerRequest implements HttpRequestContext {
     
     
     // Request
+    
+    public String getMethod() {
+        return method;
+    }
 
     public Variant selectVariant(List<Variant> variants) {
         if (variants == null || variants.isEmpty()) 
@@ -388,7 +392,7 @@ public class ContainerRequest implements HttpRequestContext {
             // Weak entity tag comparisons can only be used
             // with GET/HEAD
             if (ifNoneMatchHeader.trim().equals("*") || ifNoneMatchHeader.contains(eTag.getValue())) {
-                String httpMethod = getHttpMethod();
+                String httpMethod = getMethod();
                 if (httpMethod.equals("GET") || httpMethod.equals("HEAD")) {
                     // 304 Not modified
                     // TODO
@@ -458,5 +462,9 @@ public class ContainerRequest implements HttpRequestContext {
     
     public String getAuthenticationScheme() {
         throw new UnsupportedOperationException();
+    }
+
+    public MultivaluedMap<String, String> getFormParameters() {
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 }

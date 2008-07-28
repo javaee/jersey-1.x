@@ -39,11 +39,11 @@ package com.sun.jersey.impl.resource;
 
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.impl.AbstractResourceTester;
-import javax.ws.rs.ConsumeMime;
+import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.HeaderParam;
 import javax.ws.rs.POST;
-import javax.ws.rs.ProduceMime;
+import javax.ws.rs.Produces;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.QueryParam;
@@ -82,11 +82,11 @@ public class MethodIAnnotationnheritenceTest extends AbstractResourceTester {
     }
     public static interface Interface {
         @GET
-        @ProduceMime("application/get")
+        @Produces("application/get")
         String get();
         
         @GET
-        @ProduceMime("application/getParams")
+        @Produces("application/getParams")
         String getParams(
                 @Context UriInfo ui,
                 @PathParam("p") String p,
@@ -94,8 +94,8 @@ public class MethodIAnnotationnheritenceTest extends AbstractResourceTester {
                 @HeaderParam("h") String h);
         
         @POST
-        @ProduceMime("application/xml")
-        @ConsumeMime("text/plain")
+        @Produces("application/xml")
+        @Consumes("text/plain")
         String post(String s);
         
         @Path("sub")
@@ -173,11 +173,11 @@ public class MethodIAnnotationnheritenceTest extends AbstractResourceTester {
     
     public static abstract class AbstractClass {
         @GET
-        @ProduceMime("application/get")
+        @Produces("application/get")
         public abstract String get();
         
         @GET
-        @ProduceMime("application/getParams")
+        @Produces("application/getParams")
         public abstract String getParams(
                 @Context UriInfo ui,
                 @PathParam("p") String p,
@@ -185,8 +185,8 @@ public class MethodIAnnotationnheritenceTest extends AbstractResourceTester {
                 @HeaderParam("h") String h);
         
         @POST
-        @ProduceMime("application/xml")
-        @ConsumeMime("text/plain")
+        @Produces("application/xml")
+        @Consumes("text/plain")
         public abstract String post(String s);
         
         @Path("sub")
@@ -237,13 +237,13 @@ public class MethodIAnnotationnheritenceTest extends AbstractResourceTester {
     
     public static class ConcreteClass {
         @GET
-        @ProduceMime("application/get")
+        @Produces("application/get")
         public String get() {
             return "void";
         }
         
         @GET
-        @ProduceMime("application/getParams")
+        @Produces("application/getParams")
         public String getParams(
                 @Context UriInfo ui,
                 @PathParam("p") String p,
@@ -253,8 +253,8 @@ public class MethodIAnnotationnheritenceTest extends AbstractResourceTester {
         }
         
         @POST
-        @ProduceMime("application/xml")
-        @ConsumeMime("text/plain")
+        @Produces("application/xml")
+        @Consumes("text/plain")
         public String post(String s) {
             return "void";
         }
@@ -354,13 +354,13 @@ public class MethodIAnnotationnheritenceTest extends AbstractResourceTester {
     public static class InterfaceImplementationOverride implements Interface {
         
         @GET
-        @ProduceMime("application/getoverride")
+        @Produces("application/getoverride")
         public String get() {
             return "override";
         }
         
         @GET
-        @ProduceMime("application/getParamsoverride")
+        @Produces("application/getParamsoverride")
         public String getParams(
                 @Context UriInfo ui,
                 @PathParam("x_p") String p,
@@ -370,8 +370,8 @@ public class MethodIAnnotationnheritenceTest extends AbstractResourceTester {
         }
         
         @POST
-        @ProduceMime("application/xhtml")
-        @ConsumeMime("application/octet-stream")
+        @Produces("application/xhtml")
+        @Consumes("application/octet-stream")
         public String post(String s) {
             return "<root>" + s + "</root>";
         }  

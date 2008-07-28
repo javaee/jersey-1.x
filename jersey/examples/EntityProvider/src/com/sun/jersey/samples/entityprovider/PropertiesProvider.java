@@ -42,7 +42,7 @@ import java.io.OutputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 import java.util.Properties;
-import javax.ws.rs.ProduceMime;
+import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.ext.MessageBodyWriter;
@@ -53,7 +53,7 @@ import javax.ws.rs.ext.Provider;
  *
  * @author Paul.Sandoz@Sun.Com
  */
-@ProduceMime("text/plain")
+@Produces("text/plain")
 @Provider
 public class PropertiesProvider implements MessageBodyWriter<Properties> {
     

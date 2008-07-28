@@ -40,7 +40,7 @@ package com.sun.jersey.samples.optimisticconcurrency.resources;
 import com.sun.jersey.samples.optimisticconcurrency.Item;
 import com.sun.jersey.samples.optimisticconcurrency.ItemData;
 import javax.ws.rs.GET;
-import javax.ws.rs.ProduceMime;
+import javax.ws.rs.Produces;
 import javax.ws.rs.Path;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
@@ -61,7 +61,7 @@ public class ItemResource {
     }
     
     @GET
-    @ProduceMime("application/xml")
+    @Produces("application/xml")
     public Item get() {
         ItemData id = ItemData.ITEM;
         String version = null;

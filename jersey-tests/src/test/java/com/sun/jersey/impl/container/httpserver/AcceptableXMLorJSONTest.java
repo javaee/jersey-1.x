@@ -45,7 +45,7 @@ import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.WebResource;
 import javax.ws.rs.Path;
 import javax.ws.rs.GET;
-import javax.ws.rs.ProduceMime;
+import javax.ws.rs.Produces;
 import javax.xml.bind.annotation.XmlRootElement;
 import junit.framework.*;
 
@@ -79,7 +79,7 @@ public class AcceptableXMLorJSONTest extends AbstractHttpServerTester {
     @Path("/resource")
     public static class Resource {
         @GET
-        @ProduceMime({"application/xml", "application/json"})
+        @Produces({"application/xml", "application/json"})
         public JAXBBean get() {
             return new JAXBBean("test");
         }

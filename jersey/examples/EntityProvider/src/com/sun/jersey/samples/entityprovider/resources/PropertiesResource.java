@@ -39,11 +39,11 @@ package com.sun.jersey.samples.entityprovider.resources;
 
 import java.util.Properties;
 import javax.ws.rs.GET;
-import javax.ws.rs.ProduceMime;
+import javax.ws.rs.Produces;
 import javax.ws.rs.Path;
 
 @Path("/properties")
-@ProduceMime("text/plain")
+@Produces("text/plain")
 public class PropertiesResource {
 
     // Get the current system properties of the JVM

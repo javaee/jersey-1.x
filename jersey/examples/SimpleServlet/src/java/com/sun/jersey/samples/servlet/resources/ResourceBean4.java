@@ -37,47 +37,47 @@
 
 package com.sun.jersey.samples.servlet.resources;
 
-import javax.ws.rs.ConsumeMime;
+import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
-import javax.ws.rs.ProduceMime;
+import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.Path;
 import javax.ws.rs.core.Response;
 
 @Path("/resource4")
-@ConsumeMime("text/plain")
+@Consumes("text/plain")
 public class ResourceBean4 {
     
     public ResourceBean4() {
     }
     
     @GET
-    @ProduceMime("text/html")
+    @Produces("text/html")
     public String getAsHtml() {
         return "<html><head></head><body><p>Hello World</p></body></html>";
     }
 
     @GET
-    @ProduceMime("application/xml")
+    @Produces("application/xml")
     public String getAsXml() {
         return "<response>Hello World</response>";
     }
     
     @GET
-    @ProduceMime("text/plain")
+    @Produces("text/plain")
     public String getAsText() {
         return "Hello World";
     }
     
     @GET
-    @ProduceMime("*/*")
+    @Produces("*/*")
     public Response get(@QueryParam("format") String format) {
         return Response.ok("Hello World", format).build();
     }
     
     @POST
-    @ProduceMime("text/plain")
+    @Produces("text/plain")
     public String postText(String input) {
         return input;
     }

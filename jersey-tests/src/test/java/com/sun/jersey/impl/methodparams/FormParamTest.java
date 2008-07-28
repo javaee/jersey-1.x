@@ -44,7 +44,7 @@ import com.sun.jersey.impl.entity.JAXBBean;
 import javax.mail.internet.InternetHeaders;
 import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMultipart;
-import javax.ws.rs.ConsumeMime;
+import javax.ws.rs.Consumes;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.core.MediaType;
@@ -62,7 +62,7 @@ public class FormParamTest extends AbstractResourceTester {
     @Path("/")
     public class FormResource {
         @POST
-        @ConsumeMime(MediaType.APPLICATION_FORM_URLENCODED)
+        @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
         public String post(@FormParam("a") String a, @FormParam("b") String b) {
             return a + b;
         }
@@ -84,7 +84,7 @@ public class FormParamTest extends AbstractResourceTester {
     @Path("/")
     public class MultipartFormResource {
         @POST
-        @ConsumeMime({"multipart/form-data", MediaType.APPLICATION_FORM_URLENCODED})
+        @Consumes({"multipart/form-data", MediaType.APPLICATION_FORM_URLENCODED})
         public String post(
                 @FormParam("a") String a, 
                 @FormParam("b") String b,

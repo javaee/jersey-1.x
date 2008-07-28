@@ -40,15 +40,15 @@ package com.sun.jersey.impl.application;
 import com.sun.jersey.impl.model.MediaTypeHelper;
 import com.sun.jersey.impl.util.KeyComparator;
 import com.sun.jersey.impl.util.KeyComparatorHashMap;
-import com.sun.jersey.spi.container.ExtendedMessageBodyWorkers;
+import com.sun.jersey.spi.container.MessageBodyWorkers;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import javax.ws.rs.ConsumeMime;
-import javax.ws.rs.ProduceMime;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.ext.MessageBodyReader;
 import javax.ws.rs.ext.MessageBodyWriter;
@@ -57,7 +57,7 @@ import javax.ws.rs.ext.MessageBodyWriter;
  *
  * @author Paul.Sandoz@Sun.Com
  */
-public final class MessageBodyFactory implements ExtendedMessageBodyWorkers {
+public final class MessageBodyFactory implements MessageBodyWorkers {
     private static final KeyComparator<MediaType> MEDIA_TYPE_COMPARATOR = 
             new KeyComparator<MediaType>() {
         public boolean equals(MediaType x, MediaType y) {
@@ -103,7 +103,7 @@ public final class MessageBodyFactory implements ExtendedMessageBodyWorkers {
     }
     
     private void initReaders() {
-        this.readerProviders = getProviderMap(MessageBodyReader.class, ConsumeMime.class);            
+        this.readerProviders = getProviderMap(MessageBodyReader.class, Consumes.class);            
     }
     
     private void initWriters() {
@@ -112,7 +112,7 @@ public final class MessageBodyFactory implements ExtendedMessageBodyWorkers {
         this.writerListProviders = new ArrayList<MessageBodyWriterPair>();
         
         for (MessageBodyWriter provider : componentProviderCache.getProvidersAndServices(MessageBodyWriter.class)) {
-            MediaType values[] = getAnnotationValues(provider.getClass(), ProduceMime.class);
+            MediaType values[] = getAnnotationValues(provider.getClass(), Produces.class);
             if (values == null)
                 getClassCapability(writerProviders, provider, MediaTypeHelper.GENERAL_MEDIA_TYPE);
             else
@@ -167,12 +167,12 @@ public final class MessageBodyFactory implements ExtendedMessageBodyWorkers {
     
     private String[] _getAnnotationValues(Class<?> clazz, Class<?> annotationClass) {
         String values[] = null;
-        if (annotationClass.equals(ConsumeMime.class)) {
-            ConsumeMime consumes = clazz.getAnnotation(ConsumeMime.class);
+        if (annotationClass.equals(Consumes.class)) {
+            Consumes consumes = clazz.getAnnotation(Consumes.class);
             if (consumes != null)
                 values = consumes.value();
-        } else if (annotationClass.equals(ProduceMime.class)) {
-            ProduceMime produces = clazz.getAnnotation(ProduceMime.class);
+        } else if (annotationClass.equals(Produces.class)) {
+            Produces produces = clazz.getAnnotation(Produces.class);
             if (produces != null)
                 values = produces.value();
         }

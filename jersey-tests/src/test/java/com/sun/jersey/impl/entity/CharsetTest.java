@@ -46,7 +46,7 @@ import java.io.Reader;
 import java.io.StringReader;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
-import javax.ws.rs.ProduceMime;
+import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.Response;
@@ -81,42 +81,42 @@ public class CharsetTest extends AbstractTypeTester {
     public static class StringCharsetResource {
         @Path("US-ASCII")
         @POST
-        @ProduceMime("text/plain;charset=US-ASCII")
+        @Produces("text/plain;charset=US-ASCII")
         public String postUs_Ascii(String t) {
             return t;
         }
         
         @Path("ISO-8859-1")
         @POST
-        @ProduceMime("text/plain;charset=ISO-8859-1")
+        @Produces("text/plain;charset=ISO-8859-1")
         public String postIso_8859_1(String t) {
             return t;
         }
         
         @Path("UTF-8")
         @POST
-        @ProduceMime("text/plain;charset=UTF-8")
+        @Produces("text/plain;charset=UTF-8")
         public String postUtf_8(String t) {
             return t;
         }
         
         @Path("UTF-16BE")
         @POST
-        @ProduceMime("text/plain;charset=UTF-16BE")
+        @Produces("text/plain;charset=UTF-16BE")
         public String postUtf_16be(String t) {
             return t;
         }
         
         @Path("UTF-16LE")
         @POST
-        @ProduceMime("text/plain;charset=UTF-16LE")
+        @Produces("text/plain;charset=UTF-16LE")
         public String postUtf_16le(String t) {
             return t;
         }
         
         @Path("UTF-16")
         @POST
-        @ProduceMime("text/plain;charset=UTF-16")
+        @Produces("text/plain;charset=UTF-16")
         public String postUtf_16(String t) {
             return t;
         }        

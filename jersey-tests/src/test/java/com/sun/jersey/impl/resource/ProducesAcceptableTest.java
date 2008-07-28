@@ -40,7 +40,7 @@ package com.sun.jersey.impl.resource;
 import com.sun.jersey.impl.AbstractResourceTester;
 import com.sun.jersey.api.client.ClientResponse;
 import javax.ws.rs.GET;
-import javax.ws.rs.ProduceMime;
+import javax.ws.rs.Produces;
 import javax.ws.rs.Path;
 import javax.ws.rs.core.Response;
 
@@ -48,15 +48,15 @@ import javax.ws.rs.core.Response;
  *
  * @author Paul.Sandoz@Sun.Com
  */
-public class ProduceMimeAcceptableTest extends AbstractResourceTester {
+public class ProducesAcceptableTest extends AbstractResourceTester {
     
-    public ProduceMimeAcceptableTest(String testName) {
+    public ProducesAcceptableTest(String testName) {
         super(testName);
     }
 
     @Path("/")
     public static class WebResource {
-        @ProduceMime("application/foo")
+        @Produces("application/foo")
         @GET
         public Response doGet() {
             return Response.ok("content", "application/bar").build();
@@ -80,7 +80,7 @@ public class ProduceMimeAcceptableTest extends AbstractResourceTester {
     
     @Path("/")
     public static class WebResourceProduceGeneric {
-        @ProduceMime("*/*")
+        @Produces("*/*")
         @GET
         public Response doGet() {
             return Response.ok("content", "application/bar").build();

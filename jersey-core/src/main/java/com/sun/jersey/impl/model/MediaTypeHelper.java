@@ -37,8 +37,8 @@
 
 package com.sun.jersey.impl.model;
 
-import javax.ws.rs.ConsumeMime;
-import javax.ws.rs.ProduceMime;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import com.sun.jersey.impl.http.header.AcceptableMediaType;
 import java.util.ArrayList;
@@ -125,12 +125,12 @@ public final class MediaTypeHelper {
     }    
     
     /**
-     * Create a list of content type from the ConsumeMime annotation.
+     * Create a list of content type from the Consumes annotation.
      * <p>
-     * @param mime the ConsumeMime annotation.
+     * @param mime the Consumes annotation.
      * @return the list of MediaType, ordered according to {@link #MEDIA_TYPE_COMPARATOR}.
      */
-    public static List<MediaType> createMediaTypes(ConsumeMime mime) {
+    public static List<MediaType> createMediaTypes(Consumes mime) {
         if (mime == null) {
             return GENERAL_MEDIA_TYPE_LIST;
         }
@@ -139,12 +139,12 @@ public final class MediaTypeHelper {
     }
         
     /**
-     * Create a list of content type from the ProduceMime annotation.
+     * Create a list of content type from the Produces annotation.
      * <p>
-     * @param mime the ProduceMime annotation.
+     * @param mime the Produces annotation.
      * @return the list of MediaType, ordered according to {@link #MEDIA_TYPE_COMPARATOR}.
      */
-    public static List<MediaType> createMediaTypes(ProduceMime mime) {
+    public static List<MediaType> createMediaTypes(Produces mime) {
         if (mime == null) {
             return GENERAL_MEDIA_TYPE_LIST;
         }

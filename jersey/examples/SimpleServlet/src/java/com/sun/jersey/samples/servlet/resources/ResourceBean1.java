@@ -40,7 +40,7 @@ package com.sun.jersey.samples.servlet.resources;
 import javax.servlet.ServletConfig;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.GET;
-import javax.ws.rs.ProduceMime;
+import javax.ws.rs.Produces;
 import javax.ws.rs.Path;
 import javax.ws.rs.core.Context;
 
@@ -54,7 +54,7 @@ public class ResourceBean1 {
     ServletConfig servletConfig;
         
     @GET
-    @ProduceMime("text/plain")
+    @Produces("text/plain")
     public String describe() {
         return "Hello World from resource 1 in servlet: '" +
                 servletConfig.getServletName() +

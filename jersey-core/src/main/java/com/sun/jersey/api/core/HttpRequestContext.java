@@ -53,13 +53,6 @@ import javax.ws.rs.core.SecurityContext;
  */
 public interface HttpRequestContext extends HttpHeaders, Request, SecurityContext {    
     /**
-     * Get the HTTP method name.
-     * 
-     * @return the method name as a String
-     */
-    String getHttpMethod();
-    
-    /**
      * Get the base URI of the request.
      * 
      * @return the base URI.

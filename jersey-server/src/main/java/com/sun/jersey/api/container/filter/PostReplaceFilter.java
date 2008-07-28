@@ -58,7 +58,7 @@ import com.sun.jersey.spi.container.ContainerRequestFilter;
 public class PostReplaceFilter implements ContainerRequestFilter {
 
     public ContainerRequest filter(ContainerRequest request) {
-        if (!request.getHttpMethod().equalsIgnoreCase("POST"))
+        if (!request.getMethod().equalsIgnoreCase("POST"))
             return request;
         
         String override = request.getRequestHeaders().getFirst("X-HTTP-Method-Override");

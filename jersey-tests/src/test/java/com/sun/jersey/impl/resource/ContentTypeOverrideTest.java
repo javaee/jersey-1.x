@@ -42,7 +42,7 @@ import com.sun.jersey.api.core.HttpContext;
 import com.sun.jersey.api.client.WebResource;
 import com.sun.jersey.api.client.ClientResponse;
 import javax.ws.rs.GET;
-import javax.ws.rs.ProduceMime;
+import javax.ws.rs.Produces;
 import javax.ws.rs.Path;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
@@ -62,7 +62,7 @@ public class ContentTypeOverrideTest extends AbstractResourceTester {
     public static class WebResourceOverride {
         @Context HttpContext context;
         
-        @ProduceMime({"application/foo", "application/bar"})
+        @Produces({"application/foo", "application/bar"})
         @GET
         public Response doGet() {
             return Response.ok("content", "application/foo").build();

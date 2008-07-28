@@ -40,7 +40,7 @@ package com.sun.jersey.samples.storageservice.resources;
 import com.sun.jersey.samples.storageservice.Containers;
 import com.sun.jersey.samples.storageservice.MemoryStore;
 import javax.ws.rs.GET;
-import javax.ws.rs.ProduceMime;
+import javax.ws.rs.Produces;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.core.Context;
@@ -52,7 +52,7 @@ import javax.ws.rs.core.UriInfo;
  * @author Paul.Sandoz@Sun.Com
  */
 @Path("/containers")
-@ProduceMime("application/xml")
+@Produces("application/xml")
 public class ContainersResource {
     @Context UriInfo uriInfo;
     @Context Request request;

@@ -57,8 +57,6 @@ public final class CacheControlProvider implements HeaderDelegateProvider<CacheC
 
     public String toString(CacheControl header) {
         StringBuffer b = new StringBuffer();
-        if (header.isPublic())
-            appendWithSeparator(b, "public");
         if (header.isPrivate())
             appendQuotedWithSeparator(b, "private", buildListValue(header.getPrivateFields()));
         if (header.isNoCache())

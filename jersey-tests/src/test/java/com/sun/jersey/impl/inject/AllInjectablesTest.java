@@ -42,19 +42,18 @@ import com.sun.jersey.api.core.HttpContext;
 import com.sun.jersey.api.core.ResourceConfig;
 import com.sun.jersey.api.uri.ExtendedUriInfo;
 import com.sun.jersey.impl.AbstractResourceTester;
+import com.sun.jersey.spi.container.MessageBodyWorkers;
 import com.sun.jersey.spi.resource.Singleton;
 import com.sun.jersey.spi.template.TemplateContext;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
-import java.util.Collections;
-import java.util.Set;
-import javax.ws.rs.ConsumeMime;
+import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
-import javax.ws.rs.ProduceMime;
+import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
@@ -64,7 +63,6 @@ import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Request;
 import javax.ws.rs.core.SecurityContext;
 import javax.ws.rs.core.UriInfo;
-import javax.ws.rs.ext.MessageBodyWorkers;
 import javax.ws.rs.ext.MessageBodyWriter;
 import javax.ws.rs.ext.Provider;
 
@@ -266,8 +264,8 @@ public class AllInjectablesTest extends AbstractResourceTester {
     }
         
     @Provider
-    @ConsumeMime({"text/plain", "*/*"})
-    @ProduceMime({"text/plain", "*/*"})
+    @Consumes({"text/plain", "*/*"})
+    @Produces({"text/plain", "*/*"})
     public static class StringWriterField implements MessageBodyWriter<String> {
         public StringWriterField() {
             int i = 0;
@@ -314,8 +312,8 @@ public class AllInjectablesTest extends AbstractResourceTester {
     }
     
     @Provider
-    @ConsumeMime({"text/plain", "*/*"})
-    @ProduceMime({"text/plain", "*/*"})
+    @Consumes({"text/plain", "*/*"})
+    @Produces({"text/plain", "*/*"})
     public static class StringWriterConstructor implements MessageBodyWriter<String> {
         public StringWriterConstructor(
                 @Context ResourceConfig rc,
@@ -352,8 +350,8 @@ public class AllInjectablesTest extends AbstractResourceTester {
     }
     
     @Provider
-    @ConsumeMime({"text/plain", "*/*"})
-    @ProduceMime({"text/plain", "*/*"})
+    @Consumes({"text/plain", "*/*"})
+    @Produces({"text/plain", "*/*"})
     public static class StringWriterMutlipleConstructor implements MessageBodyWriter<String> {
         public StringWriterMutlipleConstructor(
                 @Context ResourceConfig rc,
@@ -397,8 +395,8 @@ public class AllInjectablesTest extends AbstractResourceTester {
     }
     
     @Provider
-    @ConsumeMime({"text/plain", "*/*"})
-    @ProduceMime({"text/plain", "*/*"})
+    @Consumes({"text/plain", "*/*"})
+    @Produces({"text/plain", "*/*"})
     public static class StringWriterMutliplePartialConstructor implements MessageBodyWriter<String> {
         public StringWriterMutliplePartialConstructor(
                 @Context ResourceConfig rc,
@@ -448,8 +446,8 @@ public class AllInjectablesTest extends AbstractResourceTester {
     }
     
     @Provider
-    @ConsumeMime({"text/plain", "*/*"})
-    @ProduceMime({"text/plain", "*/*"})
+    @Consumes({"text/plain", "*/*"})
+    @Produces({"text/plain", "*/*"})
     public static class StringWriterMutliplePartialConstructor2 implements MessageBodyWriter<String> {
         public StringWriterMutliplePartialConstructor2(
                 @Context HttpContext hca,

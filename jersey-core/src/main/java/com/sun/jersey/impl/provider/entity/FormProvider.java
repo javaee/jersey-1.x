@@ -48,8 +48,8 @@ import java.net.URLEncoder;
 import java.util.List;
 import java.util.Map;
 import java.util.StringTokenizer;
-import javax.ws.rs.ConsumeMime;
-import javax.ws.rs.ProduceMime;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 
@@ -57,8 +57,8 @@ import javax.ws.rs.core.MultivaluedMap;
  *
  * @author Paul.Sandoz@Sun.Com
  */
-@ProduceMime({"application/x-www-form-urlencoded", "*/*"})
-@ConsumeMime({"application/x-www-form-urlencoded", "*/*"})
+@Produces({"application/x-www-form-urlencoded", "*/*"})
+@Consumes({"application/x-www-form-urlencoded", "*/*"})
 public final class FormProvider extends AbstractMessageReaderWriterProvider<Form> {
     public boolean isReadable(Class<?> type, Type genericType, Annotation annotations[]) {
         return type == Form.class;

@@ -45,7 +45,7 @@ import com.sun.jersey.api.client.WebResource;
 import java.io.IOException;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
-import javax.ws.rs.ProduceMime;
+import javax.ws.rs.Produces;
 
 /**
  *
@@ -55,21 +55,21 @@ public class OutputStreamTest extends AbstractGrizzlyWebContainerTester {
     @Path("/output")
     public static class TestResource { // implements WebResource {
 
-        @ProduceMime("text/plain")
+        @Produces("text/plain")
         @GET
         public void get(HttpRequestContext requestContext, 
                 HttpResponseContext responseContext) throws IOException {
-            assertEquals("GET", requestContext.getHttpMethod());
+            assertEquals("GET", requestContext.getMethod());
             
             responseContext.getOutputStream().
                     write("RESOURCE".getBytes());
         }
         
-        @ProduceMime("text/plain")
+        @Produces("text/plain")
         @POST
         public void post(HttpRequestContext requestContext, 
                 HttpResponseContext responseContext) throws IOException {
-            assertEquals("POST", requestContext.getHttpMethod());
+            assertEquals("POST", requestContext.getMethod());
             
             String s = requestContext.getEntity(String.class);
             assertEquals("RESOURCE", s);

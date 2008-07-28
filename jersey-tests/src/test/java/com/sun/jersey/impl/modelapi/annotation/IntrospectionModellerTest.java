@@ -49,13 +49,13 @@ import com.sun.jersey.impl.modelapi.annotation.IntrospectionModellerTest.TestSub
 import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.ws.rs.ConsumeMime;
+import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.HeaderParam;
 import javax.ws.rs.MatrixParam;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
-import javax.ws.rs.ProduceMime;
+import javax.ws.rs.Produces;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Path;
 import javax.ws.rs.core.MediaType;
@@ -74,7 +74,7 @@ public class IntrospectionModellerTest extends TestCase {
         }
         
         @POST
-        @ConsumeMime({"application/json", "application/xml"})
+        @Consumes({"application/json", "application/xml"})
         public String postResourceMethodTester() {
             return "Hi there, here is a resource method.";
         }
@@ -92,7 +92,7 @@ public class IntrospectionModellerTest extends TestCase {
         }
         
         @GET
-        @ProduceMime("text/plain")
+        @Produces("text/plain")
         @Path("/with-params/{one}")
         public String getSubResourceMethodWithParams(@PathParam("one") String paramOne) {
             return "Hi there, here is a subresource method!";
@@ -112,7 +112,7 @@ public class IntrospectionModellerTest extends TestCase {
         }
         
         @PUT
-        @ConsumeMime("text/plain")
+        @Consumes("text/plain")
         public String putResourceMethodTester() {
             return "hi, here is a put resource method of TestSubResourceOne";
         }
@@ -198,7 +198,7 @@ public class IntrospectionModellerTest extends TestCase {
         
         AbstractResourceMethod resourceMethod = rootResource.getResourceMethods().get(0);
 //        @HttpMethod
-//        @ConsumeMime({"application/json", "application/xml"})
+//        @Consumes({"application/json", "application/xml"})
 //        public String postResourceMethodTester() {
 //            return "Hi there, here is a resource method.";
 //        }
@@ -248,7 +248,7 @@ public class IntrospectionModellerTest extends TestCase {
         assertEquals(Parameter.Source.ENTITY, subResMethod1.getParameters().get(0).getSource());
 //        @HttpMethod
 //        @Path("/with-params/{one}")
-//        @ProduceMime("text/plain")
+//        @Produces("text/plain")
 //        public String getSubResourceMethodWithParams(@PathParam("one") String paramOne) {
 //            return "Hi there, here is a subresource method!";
 //        }

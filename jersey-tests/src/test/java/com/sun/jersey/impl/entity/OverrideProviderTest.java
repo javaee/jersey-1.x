@@ -49,10 +49,10 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 import java.util.Collections;
 import java.util.Set;
-import javax.ws.rs.ConsumeMime;
+import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
-import javax.ws.rs.ProduceMime;
+import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.ext.Provider;
@@ -67,8 +67,8 @@ public class OverrideProviderTest extends AbstractResourceTester {
     }
     
     @Provider
-    @ProduceMime({"text/plain", "*/*"})
-    @ConsumeMime({"text/plain", "*/*"})    
+    @Produces({"text/plain", "*/*"})
+    @Consumes({"text/plain", "*/*"})    
     public static class StringProvider extends AbstractMessageReaderWriterProvider<String> {
         public boolean isReadable(Class<?> type, Type genericType, Annotation annotations[]) {
             return type == String.class;
@@ -117,8 +117,8 @@ public class OverrideProviderTest extends AbstractResourceTester {
     }    
     
     @Provider
-    @ProduceMime({"application/xml", "*/*"})
-    @ConsumeMime({"application/xml", "*/*"})
+    @Produces({"application/xml", "*/*"})
+    @Consumes({"application/xml", "*/*"})
     public static class JAXBBeanProvider extends AbstractMessageReaderWriterProvider<JAXBBean> {
         public boolean isReadable(Class<?> type, Type genericType, Annotation annotations[]) {
             return JAXBBean.class.isAssignableFrom(type);

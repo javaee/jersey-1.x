@@ -40,7 +40,7 @@ package com.sun.jersey.samples.servlet.resources;
 import java.io.InputStream;
 import javax.servlet.ServletContext;
 import javax.ws.rs.GET;
-import javax.ws.rs.ProduceMime;
+import javax.ws.rs.Produces;
 import javax.ws.rs.Path;
 import javax.ws.rs.core.Context;
 
@@ -50,7 +50,7 @@ public class MasterResourceBean  {
     @Context ServletContext sc;
     
     @GET
-    @ProduceMime("text/html")
+    @Produces("text/html")
     public InputStream doGet() {
         return sc.getResourceAsStream("/index.html");
     }    

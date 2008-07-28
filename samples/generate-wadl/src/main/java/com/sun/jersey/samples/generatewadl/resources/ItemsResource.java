@@ -40,7 +40,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import javax.ws.rs.ConsumeMime;
+import javax.ws.rs.Consumes;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
@@ -105,7 +105,7 @@ public class ItemsResource {
      * 
      */
     @POST
-    @ConsumeMime( { "application/xml" } )
+    @Consumes( { "application/xml" } )
     public Response createItem( Item item ) {
         final Integer id = _sequence.incrementAndGet();
         _repository.put( id, item );

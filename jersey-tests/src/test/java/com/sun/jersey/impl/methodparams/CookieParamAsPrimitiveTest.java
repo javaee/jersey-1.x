@@ -43,7 +43,7 @@ import com.sun.jersey.api.client.ClientResponse;
 import java.util.List;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
-import javax.ws.rs.ProduceMime;
+import javax.ws.rs.Produces;
 import javax.ws.rs.CookieParam;
 import javax.ws.rs.Path;
 import javax.ws.rs.core.Cookie;
@@ -75,49 +75,49 @@ public class CookieParamAsPrimitiveTest extends AbstractResourceTester {
     @Path("/")
     public static class ResourceHeaderPrimitives {
         @GET
-        @ProduceMime("application/boolean")
+        @Produces("application/boolean")
         public String doGet(@CookieParam("boolean") boolean v) {
             assertEquals(true, v);
             return "content";
         }        
         
         @GET
-        @ProduceMime("application/byte")
+        @Produces("application/byte")
         public String doGet(@CookieParam("byte") byte v) {
             assertEquals(127, v);
             return "content";
         }        
         
         @GET
-        @ProduceMime("application/short")
+        @Produces("application/short")
         public String doGet(@CookieParam("short") short v) {
             assertEquals(32767, v);
             return "content";
         }        
         
         @GET
-        @ProduceMime("application/int")
+        @Produces("application/int")
         public String doGet(@CookieParam("int") int v) {
             assertEquals(2147483647, v);
             return "content";
         }        
         
         @GET
-        @ProduceMime("application/long")
+        @Produces("application/long")
         public String doGet(@CookieParam("long") long v) {
             assertEquals(9223372036854775807L, v);
             return "content";
         }        
         
         @GET
-        @ProduceMime("application/float")
+        @Produces("application/float")
         public String doGet(@CookieParam("float") float v) {
             assertEquals(3.14159265f, v);
             return "content";
         }        
         
         @GET
-        @ProduceMime("application/double")
+        @Produces("application/double")
         public String doGet(@CookieParam("double") double v) {
             assertEquals(3.14159265358979d, v);
             return "content";
@@ -127,49 +127,49 @@ public class CookieParamAsPrimitiveTest extends AbstractResourceTester {
     @Path("/default/null")
     public static class ResourceHeaderPrimitivesDefaultNull {
         @GET
-        @ProduceMime("application/boolean")
+        @Produces("application/boolean")
         public String doGet(@CookieParam("boolean") boolean v) {
             assertEquals(false, v);
             return "content";
         }        
         
         @GET
-        @ProduceMime("application/byte")
+        @Produces("application/byte")
         public String doGet(@CookieParam("byte") byte v) {
             assertEquals(0, v);
             return "content";
         }        
         
         @GET
-        @ProduceMime("application/short")
+        @Produces("application/short")
         public String doGet(@CookieParam("short") short v) {
             assertEquals(0, v);
             return "content";
         }        
         
         @GET
-        @ProduceMime("application/int")
+        @Produces("application/int")
         public String doGet(@CookieParam("int") int v) {
             assertEquals(0, v);
             return "content";
         }        
         
         @GET
-        @ProduceMime("application/long")
+        @Produces("application/long")
         public String doGet(@CookieParam("long") long v) {
             assertEquals(0l, v);
             return "content";
         }        
         
         @GET
-        @ProduceMime("application/float")
+        @Produces("application/float")
         public String doGet(@CookieParam("float") float v) {
             assertEquals(0.0f, v);
             return "content";
         }        
         
         @GET
-        @ProduceMime("application/double")
+        @Produces("application/double")
         public String doGet(@CookieParam("double") double v) {
             assertEquals(0.0d, v);
             return "content";
@@ -179,49 +179,49 @@ public class CookieParamAsPrimitiveTest extends AbstractResourceTester {
     @Path("/default")
     public static class ResourceHeaderPrimitivesDefault {
         @GET
-        @ProduceMime("application/boolean")
+        @Produces("application/boolean")
         public String doGet(@CookieParam("boolean") @DefaultValue("true") boolean v) {
             assertEquals(true, v);
             return "content";
         }        
         
         @GET
-        @ProduceMime("application/byte")
+        @Produces("application/byte")
         public String doGet(@CookieParam("byte") @DefaultValue("127") byte v) {
             assertEquals(127, v);
             return "content";
         }        
         
         @GET
-        @ProduceMime("application/short")
+        @Produces("application/short")
         public String doGet(@CookieParam("short") @DefaultValue("32767") short v) {
             assertEquals(32767, v);
             return "content";
         }        
         
         @GET
-        @ProduceMime("application/int")
+        @Produces("application/int")
         public String doGet(@CookieParam("int") @DefaultValue("2147483647") int v) {
             assertEquals(2147483647, v);
             return "content";
         }        
         
         @GET
-        @ProduceMime("application/long")
+        @Produces("application/long")
         public String doGet(@CookieParam("long") @DefaultValue("9223372036854775807") long v) {
             assertEquals(9223372036854775807L, v);
             return "content";
         }        
         
         @GET
-        @ProduceMime("application/float")
+        @Produces("application/float")
         public String doGet(@CookieParam("float") @DefaultValue("3.14159265") float v) {
             assertEquals(3.14159265f, v);
             return "content";
         }        
         
         @GET
-        @ProduceMime("application/double")
+        @Produces("application/double")
         public String doGet(@CookieParam("double") @DefaultValue("3.14159265358979") double v) {
             assertEquals(3.14159265358979d, v);
             return "content";
@@ -231,49 +231,49 @@ public class CookieParamAsPrimitiveTest extends AbstractResourceTester {
     @Path("/default/override")
     public static class ResourceHeaderPrimitivesDefaultOverride {
         @GET
-        @ProduceMime("application/boolean")
+        @Produces("application/boolean")
         public String doGet(@CookieParam("boolean") @DefaultValue("false") boolean v) {
             assertEquals(true, v);
             return "content";
         }        
         
         @GET
-        @ProduceMime("application/byte")
+        @Produces("application/byte")
         public String doGet(@CookieParam("byte") @DefaultValue("1") byte v) {
             assertEquals(127, v);
             return "content";
         }        
         
         @GET
-        @ProduceMime("application/short")
+        @Produces("application/short")
         public String doGet(@CookieParam("short") @DefaultValue("1") short v) {
             assertEquals(32767, v);
             return "content";
         }        
         
         @GET
-        @ProduceMime("application/int")
+        @Produces("application/int")
         public String doGet(@CookieParam("int") @DefaultValue("1") int v) {
             assertEquals(2147483647, v);
             return "content";
         }        
         
         @GET
-        @ProduceMime("application/long")
+        @Produces("application/long")
         public String doGet(@CookieParam("long") @DefaultValue("1") long v) {
             assertEquals(9223372036854775807L, v);
             return "content";
         }        
         
         @GET
-        @ProduceMime("application/float")
+        @Produces("application/float")
         public String doGet(@CookieParam("float") @DefaultValue("0.0") float v) {
             assertEquals(3.14159265f, v);
             return "content";
         }        
         
         @GET
-        @ProduceMime("application/double")
+        @Produces("application/double")
         public String doGet(@CookieParam("double") @DefaultValue("0.0") double v) {
             assertEquals(3.14159265358979d, v);
             return "content";
@@ -283,49 +283,49 @@ public class CookieParamAsPrimitiveTest extends AbstractResourceTester {
     @Path("/wrappers")
     public static class ResourceHeaderPrimitiveWrappers {
         @GET
-        @ProduceMime("application/boolean")
+        @Produces("application/boolean")
         public String doGet(@CookieParam("boolean") Boolean v) {
             assertEquals(true, v.booleanValue());
             return "content";
         }        
         
         @GET
-        @ProduceMime("application/byte")
+        @Produces("application/byte")
         public String doGet(@CookieParam("byte") Byte v) {
             assertEquals(127, v.byteValue());
             return "content";
         }        
         
         @GET
-        @ProduceMime("application/short")
+        @Produces("application/short")
         public String doGet(@CookieParam("short") Short v) {
             assertEquals(32767, v.shortValue());
             return "content";
         }        
         
         @GET
-        @ProduceMime("application/int")
+        @Produces("application/int")
         public String doGet(@CookieParam("int") Integer v) {
             assertEquals(2147483647, v.intValue());
             return "content";
         }        
         
         @GET
-        @ProduceMime("application/long")
+        @Produces("application/long")
         public String doGet(@CookieParam("long") Long v) {
             assertEquals(9223372036854775807L, v.longValue());
             return "content";
         }        
         
         @GET
-        @ProduceMime("application/float")
+        @Produces("application/float")
         public String doGet(@CookieParam("float") Float v) {
             assertEquals(3.14159265f, v.floatValue());
             return "content";
         }        
         
         @GET
-        @ProduceMime("application/double")
+        @Produces("application/double")
         public String doGet(@CookieParam("double") Double v) {
             assertEquals(3.14159265358979d, v.doubleValue());
             return "content";
@@ -335,49 +335,49 @@ public class CookieParamAsPrimitiveTest extends AbstractResourceTester {
     @Path("/wrappers/default/null")
     public static class ResourceHeaderPrimitiveWrappersDefaultNull {
         @GET
-        @ProduceMime("application/boolean")
+        @Produces("application/boolean")
         public String doGet(@CookieParam("boolean") Boolean v) {
             assertEquals(null, v);
             return "content";
         }        
         
         @GET
-        @ProduceMime("application/byte")
+        @Produces("application/byte")
         public String doGet(@CookieParam("byte") Byte v) {
             assertEquals(null, v);
             return "content";
         }        
         
         @GET
-        @ProduceMime("application/short")
+        @Produces("application/short")
         public String doGet(@CookieParam("short") Short v) {
             assertEquals(null, v);
             return "content";
         }        
         
         @GET
-        @ProduceMime("application/int")
+        @Produces("application/int")
         public String doGet(@CookieParam("int") Integer v) {
             assertEquals(null, v);
             return "content";
         }        
         
         @GET
-        @ProduceMime("application/long")
+        @Produces("application/long")
         public String doGet(@CookieParam("long") Long v) {
             assertEquals(null, v);
             return "content";
         }        
         
         @GET
-        @ProduceMime("application/float")
+        @Produces("application/float")
         public String doGet(@CookieParam("float") Float v) {
             assertEquals(null, v);
             return "content";
         }        
         
         @GET
-        @ProduceMime("application/double")
+        @Produces("application/double")
         public String doGet(@CookieParam("double") Double v) {
             assertEquals(null, v);
             return "content";
@@ -387,49 +387,49 @@ public class CookieParamAsPrimitiveTest extends AbstractResourceTester {
     @Path("/wrappers/default")
     public static class ResourceHeaderPrimitiveWrappersDefault {
         @GET
-        @ProduceMime("application/boolean")
+        @Produces("application/boolean")
         public String doGet(@CookieParam("boolean") @DefaultValue("true") Boolean v) {
             assertEquals(true, v.booleanValue());
             return "content";
         }        
         
         @GET
-        @ProduceMime("application/byte")
+        @Produces("application/byte")
         public String doGet(@CookieParam("byte") @DefaultValue("127") Byte v) {
             assertEquals(127, v.byteValue());
             return "content";
         }        
         
         @GET
-        @ProduceMime("application/short")
+        @Produces("application/short")
         public String doGet(@CookieParam("short") @DefaultValue("32767") Short v) {
             assertEquals(32767, v.shortValue());
             return "content";
         }        
         
         @GET
-        @ProduceMime("application/int")
+        @Produces("application/int")
         public String doGet(@CookieParam("int") @DefaultValue("2147483647") Integer v) {
             assertEquals(2147483647, v.intValue());
             return "content";
         }        
         
         @GET
-        @ProduceMime("application/long")
+        @Produces("application/long")
         public String doGet(@CookieParam("long") @DefaultValue("9223372036854775807") Long v) {
             assertEquals(9223372036854775807L, v.longValue());
             return "content";
         }        
         
         @GET
-        @ProduceMime("application/float")
+        @Produces("application/float")
         public String doGet(@CookieParam("float") @DefaultValue("3.14159265") Float v) {
             assertEquals(3.14159265f, v.floatValue());
             return "content";
         }        
         
         @GET
-        @ProduceMime("application/double")
+        @Produces("application/double")
         public String doGet(@CookieParam("double") @DefaultValue("3.14159265358979") Double v) {
             assertEquals(3.14159265358979d, v.doubleValue());
             return "content";
@@ -439,49 +439,49 @@ public class CookieParamAsPrimitiveTest extends AbstractResourceTester {
     @Path("/wrappers/default/override")
     public static class ResourceHeaderPrimitiveWrappersDefaultOverride {
         @GET
-        @ProduceMime("application/boolean")
+        @Produces("application/boolean")
         public String doGet(@CookieParam("boolean") @DefaultValue("false") Boolean v) {
             assertEquals(true, v.booleanValue());
             return "content";
         }        
         
         @GET
-        @ProduceMime("application/byte")
+        @Produces("application/byte")
         public String doGet(@CookieParam("byte") @DefaultValue("1") Byte v) {
             assertEquals(127, v.byteValue());
             return "content";
         }        
         
         @GET
-        @ProduceMime("application/short")
+        @Produces("application/short")
         public String doGet(@CookieParam("short") @DefaultValue("1") Short v) {
             assertEquals(32767, v.shortValue());
             return "content";
         }        
         
         @GET
-        @ProduceMime("application/int")
+        @Produces("application/int")
         public String doGet(@CookieParam("int") @DefaultValue("1") Integer v) {
             assertEquals(2147483647, v.intValue());
             return "content";
         }        
         
         @GET
-        @ProduceMime("application/long")
+        @Produces("application/long")
         public String doGet(@CookieParam("long") @DefaultValue("1") Long v) {
             assertEquals(9223372036854775807L, v.longValue());
             return "content";
         }        
         
         @GET
-        @ProduceMime("application/float")
+        @Produces("application/float")
         public String doGet(@CookieParam("float") @DefaultValue("0.0") Float v) {
             assertEquals(3.14159265f, v.floatValue());
             return "content";
         }        
         
         @GET
-        @ProduceMime("application/double")
+        @Produces("application/double")
         public String doGet(@CookieParam("double") @DefaultValue("0.0") Double v) {
             assertEquals(3.14159265358979d, v.doubleValue());
             return "content";
@@ -491,49 +491,49 @@ public class CookieParamAsPrimitiveTest extends AbstractResourceTester {
     @Path("/list")
     public static class ResourceHeaderPrimitiveList {
         @GET
-        @ProduceMime("application/boolean")
+        @Produces("application/boolean")
         public String doGetBoolean(@CookieParam("boolean") List<Boolean> v) {
             assertEquals(true, v.get(0).booleanValue());
             return "content";
         }        
         
         @GET
-        @ProduceMime("application/byte")
+        @Produces("application/byte")
         public String doGetByte(@CookieParam("byte") List<Byte> v) {
             assertEquals(127, v.get(0).byteValue());
             return "content";
         }        
         
         @GET
-        @ProduceMime("application/short")
+        @Produces("application/short")
         public String doGetShort(@CookieParam("short") List<Short> v) {
             assertEquals(32767, v.get(0).shortValue());
             return "content";
         }        
         
         @GET
-        @ProduceMime("application/int")
+        @Produces("application/int")
         public String doGetInteger(@CookieParam("int") List<Integer> v) {
             assertEquals(2147483647, v.get(0).intValue());
             return "content";
         }        
         
         @GET
-        @ProduceMime("application/long")
+        @Produces("application/long")
         public String doGetLong(@CookieParam("long") List<Long> v) {
             assertEquals(9223372036854775807L, v.get(0).longValue());
             return "content";
         }        
         
         @GET
-        @ProduceMime("application/float")
+        @Produces("application/float")
         public String doGetFloat(@CookieParam("float") List<Float> v) {
             assertEquals(3.14159265f, v.get(0).floatValue());
             return "content";
         }        
         
         @GET
-        @ProduceMime("application/double")
+        @Produces("application/double")
         public String doGetDouble(@CookieParam("double") List<Double> v) {
             assertEquals(3.14159265358979d, v.get(0).doubleValue());
             return "content";
@@ -543,49 +543,49 @@ public class CookieParamAsPrimitiveTest extends AbstractResourceTester {
     @Path("/list/default/null")
     public static class ResourceHeaderPrimitiveListDefaultNull {
         @GET
-        @ProduceMime("application/boolean")
+        @Produces("application/boolean")
         public String doGetBoolean(@CookieParam("boolean") List<Boolean> v) {
             assertEquals(null, v);
             return "content";
         }        
         
         @GET
-        @ProduceMime("application/byte")
+        @Produces("application/byte")
         public String doGetByte(@CookieParam("byte") List<Byte> v) {
             assertEquals(null, v);
             return "content";
         }        
         
         @GET
-        @ProduceMime("application/short")
+        @Produces("application/short")
         public String doGetShort(@CookieParam("short") List<Short> v) {
             assertEquals(null, v);
             return "content";
         }        
         
         @GET
-        @ProduceMime("application/int")
+        @Produces("application/int")
         public String doGetInteger(@CookieParam("int") List<Integer> v) {
             assertEquals(null, v);
             return "content";
         }        
         
         @GET
-        @ProduceMime("application/long")
+        @Produces("application/long")
         public String doGetLong(@CookieParam("long") List<Long> v) {
             assertEquals(null, v);
             return "content";
         }        
         
         @GET
-        @ProduceMime("application/float")
+        @Produces("application/float")
         public String doGetFloat(@CookieParam("float") List<Float> v) {
             assertEquals(null, v);
             return "content";
         }        
         
         @GET
-        @ProduceMime("application/double")
+        @Produces("application/double")
         public String doGetDouble(@CookieParam("double") List<Double> v) {
             assertEquals(null, v);
             return "content";
@@ -595,49 +595,49 @@ public class CookieParamAsPrimitiveTest extends AbstractResourceTester {
     @Path("/list/default")
     public static class ResourceHeaderPrimitiveListDefault {
         @GET
-        @ProduceMime("application/boolean")
+        @Produces("application/boolean")
         public String doGetBoolean(@CookieParam("boolean") @DefaultValue("true") List<Boolean> v) {
             assertEquals(true, v.get(0).booleanValue());
             return "content";
         }        
         
         @GET
-        @ProduceMime("application/byte")
+        @Produces("application/byte")
         public String doGetByte(@CookieParam("byte") @DefaultValue("127") List<Byte> v) {
             assertEquals(127, v.get(0).byteValue());
             return "content";
         }        
         
         @GET
-        @ProduceMime("application/short")
+        @Produces("application/short")
         public String doGetShort(@CookieParam("short") @DefaultValue("32767") List<Short> v) {
             assertEquals(32767, v.get(0).shortValue());
             return "content";
         }        
         
         @GET
-        @ProduceMime("application/int")
+        @Produces("application/int")
         public String doGetInteger(@CookieParam("int") @DefaultValue("2147483647") List<Integer> v) {
             assertEquals(2147483647, v.get(0).intValue());
             return "content";
         }        
         
         @GET
-        @ProduceMime("application/long")
+        @Produces("application/long")
         public String doGetLong(@CookieParam("long") @DefaultValue("9223372036854775807") List<Long> v) {
             assertEquals(9223372036854775807L, v.get(0).longValue());
             return "content";
         }        
         
         @GET
-        @ProduceMime("application/float")
+        @Produces("application/float")
         public String doGetFloat(@CookieParam("float") @DefaultValue("3.14159265") List<Float> v) {
             assertEquals(3.14159265f, v.get(0).floatValue());
             return "content";
         }        
         
         @GET
-        @ProduceMime("application/double")
+        @Produces("application/double")
         public String doGetDouble(@CookieParam("double") @DefaultValue("3.14159265358979") List<Double> v) {
             assertEquals(3.14159265358979d, v.get(0).doubleValue());
             return "content";
@@ -647,49 +647,49 @@ public class CookieParamAsPrimitiveTest extends AbstractResourceTester {
     @Path("/list/default/override")
     public static class ResourceHeaderPrimitiveListDefaultOverride {
         @GET
-        @ProduceMime("application/boolean")
+        @Produces("application/boolean")
         public String doGetBoolean(@CookieParam("boolean") @DefaultValue("false") List<Boolean> v) {
             assertEquals(true, v.get(0).booleanValue());
             return "content";
         }        
         
         @GET
-        @ProduceMime("application/byte")
+        @Produces("application/byte")
         public String doGetByte(@CookieParam("byte") @DefaultValue("0") List<Byte> v) {
             assertEquals(127, v.get(0).byteValue());
             return "content";
         }        
         
         @GET
-        @ProduceMime("application/short")
+        @Produces("application/short")
         public String doGetShort(@CookieParam("short") @DefaultValue("0") List<Short> v) {
             assertEquals(32767, v.get(0).shortValue());
             return "content";
         }        
         
         @GET
-        @ProduceMime("application/int")
+        @Produces("application/int")
         public String doGetInteger(@CookieParam("int") @DefaultValue("0") List<Integer> v) {
             assertEquals(2147483647, v.get(0).intValue());
             return "content";
         }        
         
         @GET
-        @ProduceMime("application/long")
+        @Produces("application/long")
         public String doGetLong(@CookieParam("long") @DefaultValue("0") List<Long> v) {
             assertEquals(9223372036854775807L, v.get(0).longValue());
             return "content";
         }        
         
         @GET
-        @ProduceMime("application/float")
+        @Produces("application/float")
         public String doGetFloat(@CookieParam("float") @DefaultValue("0.0") List<Float> v) {
             assertEquals(3.14159265f, v.get(0).floatValue());
             return "content";
         }        
         
         @GET
-        @ProduceMime("application/double")
+        @Produces("application/double")
         public String doGetDouble(@CookieParam("double") @DefaultValue("0.0") List<Double> v) {
             assertEquals(3.14159265358979d, v.get(0).doubleValue());
             return "content";

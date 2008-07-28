@@ -36,12 +36,12 @@
  */
 package com.sun.jersey.samples.generatewadl.resources;
 
-import javax.ws.rs.ConsumeMime;
+import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
-import javax.ws.rs.ProduceMime;
+import javax.ws.rs.Produces;
 
 import org.codehaus.jettison.json.JSONArray;
 
@@ -73,7 +73,7 @@ public class ItemResource {
      * @return the requested item.
      */
     @GET
-    @ProduceMime({ "application/xml" })
+    @Produces({ "application/xml" })
     public Item getItem() {
         return _item;
     }
@@ -87,7 +87,7 @@ public class ItemResource {
      * @return the requested item.
      */
     @GET
-    @ProduceMime({ "application/json" })
+    @Produces({ "application/json" })
     public JSONArray getItemAsJSON() {
         final JSONArray result = new JSONArray();
         result.put( _item.getValue() );
@@ -101,7 +101,7 @@ public class ItemResource {
      */
     @Path( "value/{value}" )
     @PUT
-    @ConsumeMime({ "application/xml" })
+    @Consumes({ "application/xml" })
     public void updateItemValue( @PathParam( "value" ) String value ) {
         _item.setValue( value );
     }

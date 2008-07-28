@@ -48,7 +48,7 @@ public class ResourceTwo {
     
     @GET
     public void handleRequest(HttpRequestContext request, HttpResponseContext response) {
-        if (!request.getHttpMethod().equals("GET"))
+        if (!request.getMethod().equals("GET"))
             throw new RuntimeException("Method didn't match");
         
         String s = request.getEntity(String.class);

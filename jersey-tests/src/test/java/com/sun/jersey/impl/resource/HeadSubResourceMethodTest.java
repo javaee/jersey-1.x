@@ -42,7 +42,7 @@ import com.sun.jersey.api.client.WebResource;
 import com.sun.jersey.api.client.ClientResponse;
 import javax.ws.rs.GET;
 import javax.ws.rs.HEAD;
-import javax.ws.rs.ProduceMime;
+import javax.ws.rs.Produces;
 import javax.ws.rs.Path;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -104,14 +104,14 @@ public class HeadSubResourceMethodTest extends AbstractResourceTester {
     static public class ResourceGetWithProduceNoHead { 
         @Path("sub")
         @GET
-        @ProduceMime("application/foo")
+        @Produces("application/foo")
         public String getFoo() {
             return "FOO";
         }
         
         @Path("sub")
         @GET
-        @ProduceMime("application/bar")
+        @Produces("application/bar")
         public String getBar() {
             return "BAR";
         }
@@ -139,28 +139,28 @@ public class HeadSubResourceMethodTest extends AbstractResourceTester {
         
         @Path("sub")
         @HEAD
-        @ProduceMime("application/foo")
+        @Produces("application/foo")
         public Response headFoo() {
             return Response.ok().header("X-TEST", "FOO-HEAD").build();
         }
         
         @Path("sub")
         @GET
-        @ProduceMime("application/foo")
+        @Produces("application/foo")
         public Response getFoo() {
             return Response.ok("GET", "application/foo").header("X-TEST", "FOO-GET").build();
         }
                 
         @Path("sub")
         @HEAD
-        @ProduceMime("application/bar")
+        @Produces("application/bar")
         public Response headBar() {
             return Response.ok().header("X-TEST", "BAR-HEAD").build();
         }
         
         @Path("sub")
         @GET
-        @ProduceMime("application/bar")
+        @Produces("application/bar")
         public Response getBar() {
             return Response.ok("GET").header("X-TEST", "BAR-GET").build();
         }
@@ -189,14 +189,14 @@ public class HeadSubResourceMethodTest extends AbstractResourceTester {
     static public class ResourceGetWithProduceNoHeadDifferentSub { 
         @Path("sub1")
         @GET
-        @ProduceMime("application/foo")
+        @Produces("application/foo")
         public String getFoo() {
             return "FOO";
         }
         
         @Path("sub2")
         @GET
-        @ProduceMime("application/bar")
+        @Produces("application/bar")
         public String getBar() {
             return "BAR";
         }

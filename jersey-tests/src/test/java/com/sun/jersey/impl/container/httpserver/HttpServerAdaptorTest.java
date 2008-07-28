@@ -59,7 +59,7 @@ public class HttpServerAdaptorTest extends AbstractHttpServerTester {
         
         @POST
         public void handleRequest(HttpRequestContext request, HttpResponseContext response) {
-            assertEquals("POST", request.getHttpMethod());
+            assertEquals("POST", request.getMethod());
             
             assertEquals("a", info.getPathParameters().getFirst("arg1"));
             assertEquals("b", info.getPathParameters().getFirst("arg2"));
@@ -77,7 +77,7 @@ public class HttpServerAdaptorTest extends AbstractHttpServerTester {
         
         @POST
         public void handleRequest(HttpRequestContext request, HttpResponseContext response) {
-            assertEquals("POST", request.getHttpMethod());
+            assertEquals("POST", request.getMethod());
             
             assertEquals("a", info.getPathParameters().getFirst("arg1"));
             

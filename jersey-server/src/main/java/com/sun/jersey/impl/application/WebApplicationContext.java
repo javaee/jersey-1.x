@@ -426,5 +426,9 @@ public final class WebApplicationContext implements UriRuleContext, ExtendedUriI
             }
             list.add(val);
         }
-    }    
+    }
+
+    public String getConnegExtension() {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
 }

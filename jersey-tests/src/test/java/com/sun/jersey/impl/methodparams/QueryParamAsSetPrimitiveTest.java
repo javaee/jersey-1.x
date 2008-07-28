@@ -39,7 +39,7 @@ package com.sun.jersey.impl.methodparams;
 
 import com.sun.jersey.impl.AbstractResourceTester;
 import javax.ws.rs.DefaultValue;
-import javax.ws.rs.ProduceMime;
+import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.Path;
 import com.sun.jersey.impl.AbstractResourceTester;
@@ -67,49 +67,49 @@ public class QueryParamAsSetPrimitiveTest extends AbstractResourceTester {
     @Path("/Set")
     public static class ResourceQueryPrimitiveSet {
         @GET
-        @ProduceMime("application/boolean")
+        @Produces("application/boolean")
         public String doGetBoolean(@QueryParam("boolean") Set<Boolean> v) {
             assertTrue(v.contains(true));
             return "content";
         }        
         
         @GET
-        @ProduceMime("application/byte")
+        @Produces("application/byte")
         public String doGetByte(@QueryParam("byte") Set<Byte> v) {
             assertTrue(v.contains((byte)127));
             return "content";
         }        
         
         @GET
-        @ProduceMime("application/short")
+        @Produces("application/short")
         public String doGetShort(@QueryParam("short") Set<Short> v) {
             assertTrue(v.contains((short)32767));
             return "content";
         }        
         
         @GET
-        @ProduceMime("application/int")
+        @Produces("application/int")
         public String doGetInteger(@QueryParam("int") Set<Integer> v) {
             assertTrue(v.contains(2147483647));
             return "content";
         }        
         
         @GET
-        @ProduceMime("application/long")
+        @Produces("application/long")
         public String doGetLong(@QueryParam("long") Set<Long> v) {
             assertTrue(v.contains(9223372036854775807L));
             return "content";
         }        
         
         @GET
-        @ProduceMime("application/float")
+        @Produces("application/float")
         public String doGetFloat(@QueryParam("float") Set<Float> v) {
             assertTrue(v.contains(3.14159265f));
             return "content";
         }        
         
         @GET
-        @ProduceMime("application/double")
+        @Produces("application/double")
         public String doGetDouble(@QueryParam("double") Set<Double> v) {
             assertTrue(v.contains(3.14159265358979d));
             return "content";
@@ -119,49 +119,49 @@ public class QueryParamAsSetPrimitiveTest extends AbstractResourceTester {
     @Path("/Set/default/null")
     public static class ResourceQueryPrimitiveSetDefaultNull {
         @GET
-        @ProduceMime("application/boolean")
+        @Produces("application/boolean")
         public String doGetBoolean(@QueryParam("boolean") Set<Boolean> v) {
             assertEquals(null, v);
             return "content";
         }        
         
         @GET
-        @ProduceMime("application/byte")
+        @Produces("application/byte")
         public String doGetByte(@QueryParam("byte") Set<Byte> v) {
             assertEquals(null, v);
             return "content";
         }        
         
         @GET
-        @ProduceMime("application/short")
+        @Produces("application/short")
         public String doGetShort(@QueryParam("short") Set<Short> v) {
             assertEquals(null, v);
             return "content";
         }        
         
         @GET
-        @ProduceMime("application/int")
+        @Produces("application/int")
         public String doGetInteger(@QueryParam("int") Set<Integer> v) {
             assertEquals(null, v);
             return "content";
         }        
         
         @GET
-        @ProduceMime("application/long")
+        @Produces("application/long")
         public String doGetLong(@QueryParam("long") Set<Long> v) {
             assertEquals(null, v);
             return "content";
         }        
         
         @GET
-        @ProduceMime("application/float")
+        @Produces("application/float")
         public String doGetFloat(@QueryParam("float") Set<Float> v) {
             assertEquals(null, v);
             return "content";
         }        
         
         @GET
-        @ProduceMime("application/double")
+        @Produces("application/double")
         public String doGetDouble(@QueryParam("double") Set<Double> v) {
             assertEquals(null, v);
             return "content";
@@ -171,49 +171,49 @@ public class QueryParamAsSetPrimitiveTest extends AbstractResourceTester {
     @Path("/Set/default")
     public static class ResourceQueryPrimitiveSetDefault {
         @GET
-        @ProduceMime("application/boolean")
+        @Produces("application/boolean")
         public String doGetBoolean(@QueryParam("boolean") @DefaultValue("true") Set<Boolean> v) {
             assertTrue(v.contains(true));
             return "content";
         }        
         
         @GET
-        @ProduceMime("application/byte")
+        @Produces("application/byte")
         public String doGetByte(@QueryParam("byte") @DefaultValue("127") Set<Byte> v) {
             assertTrue(v.contains((byte)127));
             return "content";
         }        
         
         @GET
-        @ProduceMime("application/short")
+        @Produces("application/short")
         public String doGetShort(@QueryParam("short") @DefaultValue("32767") Set<Short> v) {
             assertTrue(v.contains((short)32767));
             return "content";
         }        
         
         @GET
-        @ProduceMime("application/int")
+        @Produces("application/int")
         public String doGetInteger(@QueryParam("int") @DefaultValue("2147483647") Set<Integer> v) {
             assertTrue(v.contains(2147483647));
             return "content";
         }        
         
         @GET
-        @ProduceMime("application/long")
+        @Produces("application/long")
         public String doGetLong(@QueryParam("long") @DefaultValue("9223372036854775807") Set<Long> v) {
             assertTrue(v.contains(9223372036854775807L));
             return "content";
         }        
         
         @GET
-        @ProduceMime("application/float")
+        @Produces("application/float")
         public String doGetFloat(@QueryParam("float") @DefaultValue("3.14159265") Set<Float> v) {
             assertTrue(v.contains(3.14159265f));
             return "content";
         }        
         
         @GET
-        @ProduceMime("application/double")
+        @Produces("application/double")
         public String doGetDouble(@QueryParam("double") @DefaultValue("3.14159265358979") Set<Double> v) {
             assertTrue(v.contains(3.14159265358979d));
             return "content";
@@ -223,49 +223,49 @@ public class QueryParamAsSetPrimitiveTest extends AbstractResourceTester {
     @Path("/Set/default/override")
     public static class ResourceQueryPrimitiveSetDefaultOverride {
         @GET
-        @ProduceMime("application/boolean")
+        @Produces("application/boolean")
         public String doGetBoolean(@QueryParam("boolean") @DefaultValue("false") Set<Boolean> v) {
             assertTrue(v.contains(true));
             return "content";
         }        
         
         @GET
-        @ProduceMime("application/byte")
+        @Produces("application/byte")
         public String doGetByte(@QueryParam("byte") @DefaultValue("0") Set<Byte> v) {
             assertTrue(v.contains((byte)127));
             return "content";
         }        
         
         @GET
-        @ProduceMime("application/short")
+        @Produces("application/short")
         public String doGetShort(@QueryParam("short") @DefaultValue("0") Set<Short> v) {
             assertTrue(v.contains((short)32767));
             return "content";
         }        
         
         @GET
-        @ProduceMime("application/int")
+        @Produces("application/int")
         public String doGetInteger(@QueryParam("int") @DefaultValue("0") Set<Integer> v) {
             assertTrue(v.contains(2147483647));
             return "content";
         }        
         
         @GET
-        @ProduceMime("application/long")
+        @Produces("application/long")
         public String doGetLong(@QueryParam("long") @DefaultValue("0") Set<Long> v) {
             assertTrue(v.contains(9223372036854775807L));
             return "content";
         }        
         
         @GET
-        @ProduceMime("application/float")
+        @Produces("application/float")
         public String doGetFloat(@QueryParam("float") @DefaultValue("0.0") Set<Float> v) {
             assertTrue(v.contains(3.14159265f));
             return "content";
         }        
         
         @GET
-        @ProduceMime("application/double")
+        @Produces("application/double")
         public String doGetDouble(@QueryParam("double") @DefaultValue("0.0") Set<Double> v) {
             assertTrue(v.contains(3.14159265358979d));
             return "content";

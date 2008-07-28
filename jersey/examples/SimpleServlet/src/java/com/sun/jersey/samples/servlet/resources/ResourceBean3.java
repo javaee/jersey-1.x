@@ -43,7 +43,7 @@ import javax.activation.DataSource;
 import javax.activation.FileDataSource;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
-import javax.ws.rs.ProduceMime;
+import javax.ws.rs.Produces;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.core.Context;
@@ -107,7 +107,7 @@ public class ResourceBean3  {
         return r;
     }
     
-    @ProduceMime("text/plain")
+    @Produces("text/plain")
     @GET
     public String getStringRep(@PathParam("arg1")String arg1, 
             @PathParam("arg2")String arg2) {
@@ -115,7 +115,7 @@ public class ResourceBean3  {
                         +arg1+" arg2: "+arg2+"\n\n";
     }    
     
-    @ProduceMime("application/x-www-form-urlencoded")
+    @Produces("application/x-www-form-urlencoded")
     @GET
     public Form getFormURLEncodedRep(
             @PathParam("arg1")String arg1, 
@@ -129,7 +129,7 @@ public class ResourceBean3  {
         return urlProps;        
     }
 
-    @ProduceMime("image/jpg")
+    @Produces("image/jpg")
     @GET
     public DataSource getImageRep() {
         URL jpgURL = this.getClass().getResource("java.jpg");

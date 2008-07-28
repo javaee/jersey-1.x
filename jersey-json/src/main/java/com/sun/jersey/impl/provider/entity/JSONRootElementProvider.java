@@ -51,8 +51,8 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
-import javax.ws.rs.ConsumeMime;
-import javax.ws.rs.ProduceMime;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.xml.bind.JAXBContext;
@@ -65,8 +65,8 @@ import javax.xml.bind.Unmarshaller;
  *
  * @author Paul.Sandoz@Sun.Com
  */
-@ProduceMime("application/json")
-@ConsumeMime("application/json")
+@Produces("application/json")
+@Consumes("application/json")
 public final class JSONRootElementProvider extends AbstractRootElementProvider {
     
     public JSONRootElementProvider() {

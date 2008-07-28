@@ -45,8 +45,8 @@ import java.io.OutputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
-import javax.ws.rs.ConsumeMime;
-import javax.ws.rs.ProduceMime;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.xml.bind.JAXBContext;
@@ -60,8 +60,8 @@ import javax.xml.transform.stream.StreamSource;
  *
  * @author Paul.Sandoz@Sun.Com
  */
-@ProduceMime({"application/xml", "text/xml", "*/*"})
-@ConsumeMime({"application/xml", "text/xml", "*/*"})
+@Produces({"application/xml", "text/xml", "*/*"})
+@Consumes({"application/xml", "text/xml", "*/*"})
 public final class XMLJAXBElementProvider extends AbstractJAXBElementProvider {
     
     public XMLJAXBElementProvider() {

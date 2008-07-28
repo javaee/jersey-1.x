@@ -24,7 +24,7 @@ package com.sun.jersey.spring;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
-import javax.ws.rs.ProduceMime;
+import javax.ws.rs.Produces;
 
 import com.sun.jersey.api.NotFoundException;
 import com.sun.jersey.spi.inject.Inject;
@@ -54,7 +54,7 @@ public class NameBasedInjectingResource {
 
     @GET
     @Path( "{value}" )
-    @ProduceMime( "application/xml" )
+    @Produces( "application/xml" )
     public Item3 getItemByValue( @PathParam( "value" ) String value ) {
         if ( value.equals( _item1.getValue() ) ) {
             return _item1;

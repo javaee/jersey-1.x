@@ -44,10 +44,10 @@ import java.net.URI;
 import java.util.Collection;
 import java.util.Date;
 import javax.persistence.EntityManager;
-import javax.ws.rs.ConsumeMime;
+import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
-import javax.ws.rs.ProduceMime;
+import javax.ws.rs.Produces;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.core.Response;
@@ -87,7 +87,7 @@ public class BookmarksResource {
     }
     
     @GET
-    @ProduceMime("application/json")
+    @Produces("application/json")
     public JSONArray getBookmarksAsJsonArray() {
         JSONArray uriArray = new JSONArray();
         UriBuilder ub = null;
@@ -102,7 +102,7 @@ public class BookmarksResource {
     }
     
     @POST
-    @ConsumeMime("application/json")
+    @Consumes("application/json")
     public Response postForm(JSONObject bookmark) throws JSONException {
         final BookmarkEntity bookmarkEntity = new BookmarkEntity(
                 getBookmarkId(bookmark.getString("uri")), 

@@ -37,7 +37,7 @@
 
 package com.sun.jersey.impl.resource;
 
-import javax.ws.rs.ProduceMime;
+import javax.ws.rs.Produces;
 import javax.ws.rs.Path;
 import com.sun.jersey.impl.AbstractResourceTester;
 import com.sun.jersey.api.client.ClientResponse;
@@ -63,9 +63,9 @@ public class TypeReturnTest extends AbstractResourceTester {
     }
     
     @Path("/")
-    static public class ResourceWithSingleProduceMime { 
+    static public class ResourceWithSingleProduces { 
         @GET
-        @ProduceMime("text/plain")
+        @Produces("text/plain")
         public String doGet() {
             return "CONTENT";
         }
@@ -82,8 +82,8 @@ public class TypeReturnTest extends AbstractResourceTester {
     }
     
     @SuppressWarnings("unchecked")
-    public void testReturnHttpTypeWithSingleProduceMime() {
-        initiateWebApplication(ResourceWithSingleProduceMime.class);
+    public void testReturnHttpTypeWithSingleProduces() {
+        initiateWebApplication(ResourceWithSingleProduces.class);
         
         ClientResponse response = resource("/", false).get(ClientResponse.class);                
         assertEquals("CONTENT", response.getEntity(String.class));

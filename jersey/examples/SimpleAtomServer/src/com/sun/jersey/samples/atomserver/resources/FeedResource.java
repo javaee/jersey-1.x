@@ -43,10 +43,10 @@ import com.sun.syndication.feed.atom.Feed;
 import com.sun.syndication.io.FeedException;
 import java.io.IOException;
 import java.net.URI;
-import javax.ws.rs.ConsumeMime;
+import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
-import javax.ws.rs.ProduceMime;
+import javax.ws.rs.Produces;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.core.Context;
@@ -61,7 +61,7 @@ import javax.ws.rs.ext.MessageBodyWorkers;
  * @author Paul.Sandoz@Sun.Com
  */
 @Path("/collection")
-@ProduceMime("application/atom+xml")
+@Produces("application/atom+xml")
 public class FeedResource {
     @Context UriInfo uriInfo;
 
@@ -103,7 +103,7 @@ public class FeedResource {
     }
 
     @POST
-    @ConsumeMime("application/atom+xml")
+    @Consumes("application/atom+xml")
     public Response postEntry(Entry e) throws IOException, FeedException {
         // Get the next unique name of the entry
         String entryId = FileStore.FS.getNextId();

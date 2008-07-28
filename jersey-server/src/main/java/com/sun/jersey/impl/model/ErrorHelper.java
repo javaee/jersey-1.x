@@ -38,8 +38,8 @@
 package com.sun.jersey.impl.model;
 
 import com.sun.jersey.impl.ImplMessages;
-import javax.ws.rs.ConsumeMime;
-import javax.ws.rs.ProduceMime;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.Produces;
 import javax.ws.rs.HttpMethod;
 import com.sun.jersey.api.container.ContainerException;
 import java.lang.reflect.Method;
@@ -55,12 +55,12 @@ public final class ErrorHelper {
         return new ContainerException(ImplMessages.OBJECT_NOT_A_WEB_RESOURCE(resourceClass.getName()));
     }
     
-    public static ContainerException badClassConsumeMime(Exception e, Class resourceClass, ConsumeMime c) {
+    public static ContainerException badClassConsumes(Exception e, Class resourceClass, Consumes c) {
         return new ContainerException(ImplMessages.BAD_CLASS_CONSUMEMIME(resourceClass,
                                                                                            c.value()), e);
     }
     
-    public static ContainerException badClassProduceMime(Exception e, Class resourceClass, ProduceMime p) {
+    public static ContainerException badClassProduces(Exception e, Class resourceClass, Produces p) {
         return new ContainerException(ImplMessages.BAD_CLASS_PRODUCEMIME(resourceClass,
                                                                                            p.value()), e);
     }
@@ -71,13 +71,13 @@ public final class ErrorHelper {
                                                                                            m.toString()));
     }
     
-    public static ContainerException badMethodConsumeMime(Exception e, Class resourceClass, Method m, ConsumeMime c) {
+    public static ContainerException badMethodConsumes(Exception e, Class resourceClass, Method m, Consumes c) {
         return new ContainerException(ImplMessages.BAD_METHOD_CONSUMEMIME(resourceClass,
                                                                                    c.value(),
                                                                                    m.toString()), e);
     }
     
-    public static ContainerException badMethodProduceMime(Exception e, Class resourceClass, Method m, ProduceMime p) {
+    public static ContainerException badMethodProduces(Exception e, Class resourceClass, Method m, Produces p) {
         return new ContainerException(ImplMessages.BAD_METHOD_PRODUCEMIME(resourceClass,
                                                                                    p.value(),
                                                                                    m.toString()), e);

@@ -66,7 +66,7 @@ import java.net.URLDecoder;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.StringTokenizer;
-import javax.ws.rs.ConsumeMime;
+import javax.ws.rs.Consumes;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.ext.MessageBodyReader;
@@ -76,7 +76,7 @@ import javax.ws.rs.ext.Provider;
  *
  * @author mh124079
  */
-@ConsumeMime("application/x-www-form-urlencoded")
+@Consumes("application/x-www-form-urlencoded")
 @Provider
 public class FormReader implements MessageBodyReader<NameValuePair> {
     

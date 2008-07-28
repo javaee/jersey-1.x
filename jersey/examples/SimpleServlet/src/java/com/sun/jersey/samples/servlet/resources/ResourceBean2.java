@@ -38,7 +38,7 @@
 package com.sun.jersey.samples.servlet.resources;
 
 import javax.ws.rs.GET;
-import javax.ws.rs.ProduceMime;
+import javax.ws.rs.Produces;
 import javax.ws.rs.Path;
 
 @Path("/resource2")
@@ -46,7 +46,7 @@ public class ResourceBean2 {
     
     
     @GET
-    @ProduceMime("text/plain")
+    @Produces("text/plain")
     public String describe() {
         return "Hello World from resource 2";
     }

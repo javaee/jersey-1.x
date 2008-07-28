@@ -42,7 +42,7 @@ import com.sun.jersey.api.core.DefaultResourceConfig;
 import com.sun.jersey.api.core.ResourceConfig;
 import com.sun.jersey.impl.AbstractResourceTester;
 import java.io.IOException;
-import javax.ws.rs.ProduceMime;
+import javax.ws.rs.Produces;
 import javax.ws.rs.Path;
 import javax.ws.rs.GET;
 import javax.ws.rs.core.MediaType;
@@ -60,19 +60,19 @@ public class UriConnegMediaTypeTest extends AbstractResourceTester {
 
     public static abstract class Base {
         @GET
-        @ProduceMime("application/foo")
+        @Produces("application/foo")
         public String doGetFoo() {
             return "foo";
         }
         
         @GET
-        @ProduceMime("application/foot")
+        @Produces("application/foot")
         public String doGetFoot() {
             return "foot";
         }
 
         @GET
-        @ProduceMime("application/bar")
+        @Produces("application/bar")
         public String doGetBar() {
             return "bar";
         }
@@ -144,21 +144,21 @@ public class UriConnegMediaTypeTest extends AbstractResourceTester {
     public static class SubResourceMethods {
         @Path("abc")
         @GET
-        @ProduceMime("application/foo")
+        @Produces("application/foo")
         public String doGetFoo() {
             return "foo";
         }
         
         @Path("abc")
         @GET
-        @ProduceMime("application/foot")
+        @Produces("application/foot")
         public String doGetFoot() {
             return "foot";
         }
 
         @Path("abc")
         @GET
-        @ProduceMime("application/bar")
+        @Produces("application/bar")
         public String doGetBar() {
             return "bar";
         }

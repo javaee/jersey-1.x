@@ -49,8 +49,8 @@ public final class ResourceHeadWrapperMethod extends ResourceMethod {
     public ResourceHeadWrapperMethod(ResourceMethod m) {
         super("HEAD",
                 m.getTemplate(),
-                m.getConsumeMime(), 
-                m.getProduceMime(),
+                m.getConsumes(), 
+                m.getProduces(),
                 m.getDispatcher());
         
         if (!m.getHttpMethod().equals("GET")) {

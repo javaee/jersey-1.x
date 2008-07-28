@@ -24,7 +24,7 @@ package com.sun.jersey.spring25;
 import javax.annotation.Resource;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
-import javax.ws.rs.ProduceMime;
+import javax.ws.rs.Produces;
 
 import org.springframework.stereotype.Component;
 
@@ -57,14 +57,14 @@ public class AnnotatedSingletonResource {
 
     @GET
     @Path( "definedsingletonitem" )
-    @ProduceMime( "application/xml" )
+    @Produces( "application/xml" )
     public Item getSingletonItem() {
         return _definedSingletonItem;
     }
 
     @GET
     @Path( "annotatedspringcomponent" )
-    @ProduceMime( "application/xml" )
+    @Produces( "application/xml" )
     public SpringComponent getAnnotatedSpringComponent() {
         return _annotatedSpringComponent;
     }

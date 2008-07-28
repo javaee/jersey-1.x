@@ -63,7 +63,7 @@ import java.util.Map;
 import java.util.WeakHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.ws.rs.ConsumeMime;
+import javax.ws.rs.Consumes;
 import javax.ws.rs.CookieParam;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.Encoded;
@@ -72,7 +72,7 @@ import javax.ws.rs.HttpMethod;
 import javax.ws.rs.MatrixParam;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
-import javax.ws.rs.ProduceMime;
+import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 
@@ -111,14 +111,14 @@ public class IntrospectionModeller {
 
         workOutSetterMethodsList(resource, methodList, isEncodedAnotOnClass);
         
-        final ConsumeMime classScopeConsumeMimeAnnotation = 
-                resourceClass.getAnnotation(ConsumeMime.class);
-        final ProduceMime classScopeProduceMimeAnnotation = 
-                resourceClass.getAnnotation(ProduceMime.class);
+        final Consumes classScopeConsumesAnnotation = 
+                resourceClass.getAnnotation(Consumes.class);
+        final Produces classScopeProducesAnnotation = 
+                resourceClass.getAnnotation(Produces.class);
         workOutResourceMethodsList(resource, methodList, isEncodedAnotOnClass, 
-                classScopeConsumeMimeAnnotation, classScopeProduceMimeAnnotation);
+                classScopeConsumesAnnotation, classScopeProducesAnnotation);
         workOutSubResourceMethodsList(resource, methodList, isEncodedAnotOnClass, 
-                classScopeConsumeMimeAnnotation, classScopeProduceMimeAnnotation);
+                classScopeConsumesAnnotation, classScopeProducesAnnotation);
         workOutSubResourceLocatorsList(resource, methodList, isEncodedAnotOnClass);
         
         logNonPublicMethods(resourceClass);
@@ -131,25 +131,25 @@ public class IntrospectionModeller {
         return resource;
     }
     
-    private static final void addConsumeMime(
+    private static final void addConsumes(
             AnnotatedMethod am,            
             AbstractResourceMethod resourceMethod, 
-            ConsumeMime consumeMimeAnnotation) {
+            Consumes consumeMimeAnnotation) {
         // Override annotation is present in method
-        if (am.isAnnotationPresent(ConsumeMime.class))
-            consumeMimeAnnotation = am.getAnnotation(ConsumeMime.class);
+        if (am.isAnnotationPresent(Consumes.class))
+            consumeMimeAnnotation = am.getAnnotation(Consumes.class);
         
         resourceMethod.getSupportedInputTypes().addAll(
                 MediaTypeHelper.createMediaTypes(consumeMimeAnnotation));
     }
 
-    private static final void addProduceMime(
+    private static final void addProduces(
             AnnotatedMethod am,
             AbstractResourceMethod resourceMethod, 
-            ProduceMime produceMimeAnnotation) {
+            Produces produceMimeAnnotation) {
         // Override annotation is present in method
-        if (am.isAnnotationPresent(ProduceMime.class))
-            produceMimeAnnotation = am.getAnnotation(ProduceMime.class);
+        if (am.isAnnotationPresent(Produces.class))
+            produceMimeAnnotation = am.getAnnotation(Produces.class);
 
         resourceMethod.getSupportedOutputTypes().addAll(
                 MediaTypeHelper.createMediaTypes(produceMimeAnnotation));
@@ -219,8 +219,8 @@ public class IntrospectionModeller {
             AbstractResource resource, 
             MethodList methodList, 
             boolean isEncoded,
-            ConsumeMime classScopeConsumeMimeAnnotation, 
-            ProduceMime classScopeProduceMimeAnnotation) {
+            Consumes classScopeConsumesAnnotation, 
+            Produces classScopeProducesAnnotation) {
 
         // TODO what to do about multiple meta HttpMethod annotations?
         // Should the method be added more than once to the model and
@@ -232,8 +232,8 @@ public class IntrospectionModeller {
                     m.getMethod(), 
                     m.getMetaMethodAnnotations(HttpMethod.class).get(0).value());
 
-            addConsumeMime(m, resourceMethod, classScopeConsumeMimeAnnotation);
-            addProduceMime(m, resourceMethod, classScopeProduceMimeAnnotation);
+            addConsumes(m, resourceMethod, classScopeConsumesAnnotation);
+            addProduces(m, resourceMethod, classScopeProducesAnnotation);
             processParameters(resourceMethod, m, isEncoded);
 
             resource.getResourceMethods().add(resourceMethod);
@@ -244,8 +244,8 @@ public class IntrospectionModeller {
             AbstractResource resource, 
             MethodList methodList, 
             boolean isEncoded,
-            ConsumeMime classScopeConsumeMimeAnnotation, 
-            ProduceMime classScopeProduceMimeAnnotation) {
+            Consumes classScopeConsumesAnnotation, 
+            Produces classScopeProducesAnnotation) {
 
         // TODO what to do about multiple meta HttpMethod annotations?
         // Should the method be added more than once to the model and
@@ -262,8 +262,8 @@ public class IntrospectionModeller {
                         mPathAnnotation.limited()),
                     m.getMetaMethodAnnotations(HttpMethod.class).get(0).value());
        
-            addConsumeMime(m, subResourceMethod, classScopeConsumeMimeAnnotation);
-            addProduceMime(m, subResourceMethod, classScopeProduceMimeAnnotation);
+            addConsumes(m, subResourceMethod, classScopeConsumesAnnotation);
+            addProduces(m, subResourceMethod, classScopeProducesAnnotation);
             processParameters(subResourceMethod, m, isEncoded);
 
             resource.getSubResourceMethods().add(subResourceMethod);

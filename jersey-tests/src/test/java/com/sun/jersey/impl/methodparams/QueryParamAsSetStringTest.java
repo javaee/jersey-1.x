@@ -38,7 +38,7 @@
 package com.sun.jersey.impl.methodparams;
 
 import javax.ws.rs.DefaultValue;
-import javax.ws.rs.ProduceMime;
+import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.Path;
 import com.sun.jersey.impl.AbstractResourceTester;
@@ -59,7 +59,7 @@ public class QueryParamAsSetStringTest extends AbstractResourceTester {
     @Path("/")
     public static class ResourceStringSet {
         @GET
-        @ProduceMime("application/stringSet")
+        @Produces("application/stringSet")
         public String doGetString(@QueryParam("args") Set<String> args) {
             assertTrue(args.contains("a"));
             assertTrue(args.contains("b"));
@@ -68,7 +68,7 @@ public class QueryParamAsSetStringTest extends AbstractResourceTester {
         }
         
         @GET
-        @ProduceMime("application/Set")
+        @Produces("application/Set")
         public String doGet(@QueryParam("args") Set args) {
             assertTrue(args.contains("a"));
             assertTrue(args.contains("b"));
@@ -80,7 +80,7 @@ public class QueryParamAsSetStringTest extends AbstractResourceTester {
     @Path("/")
     public static class ResourceStringSetEmpty {
         @GET
-        @ProduceMime("application/stringSet")
+        @Produces("application/stringSet")
         public String doGetString(@QueryParam("args") Set<String> args) {
             assertEquals(1, args.size());
             assertTrue(args.contains(""));
@@ -91,7 +91,7 @@ public class QueryParamAsSetStringTest extends AbstractResourceTester {
     @Path("/")
     public static class ResourceStringSetAbsent {
         @GET
-        @ProduceMime("application/stringSet")
+        @Produces("application/stringSet")
         public String doGetString(@QueryParam("args") Set<String> args) {
             assertEquals(null, args);
             return "content";
@@ -101,7 +101,7 @@ public class QueryParamAsSetStringTest extends AbstractResourceTester {
     @Path("/")
     public static class ResourceStringSetNullDefault {
         @GET
-        @ProduceMime("application/stringSet")
+        @Produces("application/stringSet")
         public String doGetString(
                 @QueryParam("args") Set<String> args) {
             assertEquals(null, args);
@@ -109,7 +109,7 @@ public class QueryParamAsSetStringTest extends AbstractResourceTester {
         }
         
         @GET
-        @ProduceMime("application/Set")
+        @Produces("application/Set")
         public String doGet(
                 @QueryParam("args") Set args) {
             assertEquals(null, args);
@@ -120,7 +120,7 @@ public class QueryParamAsSetStringTest extends AbstractResourceTester {
     @Path("/")
     public static class ResourceStringSetDefault {
         @GET
-        @ProduceMime("application/stringSet")
+        @Produces("application/stringSet")
         public String doGetString(
                 @QueryParam("args") @DefaultValue("a") Set<String> args) {
             assertTrue(args.contains("a"));
@@ -128,7 +128,7 @@ public class QueryParamAsSetStringTest extends AbstractResourceTester {
         }
         
         @GET
-        @ProduceMime("application/Set")
+        @Produces("application/Set")
         public String doGet(
                 @QueryParam("args") @DefaultValue("a") Set args) {
             assertTrue(args.contains("a"));
@@ -139,7 +139,7 @@ public class QueryParamAsSetStringTest extends AbstractResourceTester {
     @Path("/")
     public static class ResourceStringSetDefaultOverride {
         @GET
-        @ProduceMime("application/stringSet")
+        @Produces("application/stringSet")
         public String doGetString(
                 @QueryParam("args") @DefaultValue("a") Set<String> args) {
             assertTrue(args.contains("b"));
@@ -147,7 +147,7 @@ public class QueryParamAsSetStringTest extends AbstractResourceTester {
         }
         
         @GET
-        @ProduceMime("application/Set")
+        @Produces("application/Set")
         public String doGet(
                 @QueryParam("args") @DefaultValue("a") Set args) {
             assertTrue(args.contains("b"));

@@ -41,11 +41,11 @@ package com.sun.jersey.samples.jsonfromjaxb.resources;
 import com.sun.jersey.samples.jsonfromjaxb.jaxb.FlightType;
 import com.sun.jersey.samples.jsonfromjaxb.jaxb.Flights;
 import com.sun.jersey.spi.resource.Singleton;
-import javax.ws.rs.ConsumeMime;
+import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
-import javax.ws.rs.ProduceMime;
+import javax.ws.rs.Produces;
 
 /**
  * @author Jakub Podlesak
@@ -81,13 +81,13 @@ public class FlightList {
     }
 
     @GET
-    @ProduceMime({"application/json", "application/xml"})
+    @Produces({"application/json", "application/xml"})
     public synchronized Flights getFlightList() {
         return myFlights;
     }
 
     @PUT
-    @ConsumeMime({"application/json", "application/xml"})
+    @Consumes({"application/json", "application/xml"})
     public synchronized void putFlightList(Flights flights) {
         myFlights = flights;
     }

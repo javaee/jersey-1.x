@@ -61,25 +61,25 @@ public class WebResourceBeanTest extends AbstractResourceTester {
     public static class TestOneWebResourceBean {
         @POST
         public void doPost(HttpRequestContext request, HttpResponseContext response) {
-            assertEquals("POST", request.getHttpMethod());
+            assertEquals("POST", request.getMethod());
             response.setEntity("POST");
         }
         
         @GET
         public void doGet(HttpRequestContext request, HttpResponseContext response) {
-            assertEquals("GET", request.getHttpMethod());            
+            assertEquals("GET", request.getMethod());            
             response.setEntity("GET");
         }
         
         @PUT
         public void doPut(HttpRequestContext request, HttpResponseContext response) {
-            assertEquals("PUT", request.getHttpMethod());            
+            assertEquals("PUT", request.getMethod());            
             response.setEntity("PUT");
         }
         
         @DELETE
         public void doDelete(HttpRequestContext request, HttpResponseContext response) {
-            assertEquals("DELETE", request.getHttpMethod());            
+            assertEquals("DELETE", request.getMethod());            
             response.setEntity("DELETE");
         }
     }

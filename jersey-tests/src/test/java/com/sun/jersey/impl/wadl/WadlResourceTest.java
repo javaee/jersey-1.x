@@ -48,13 +48,13 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Iterator;
 import java.util.Properties;
-import javax.ws.rs.ConsumeMime;
+import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
-import javax.ws.rs.ProduceMime;
+import javax.ws.rs.Produces;
 import javax.ws.rs.PathParam;
 import javax.xml.XMLConstants;
 import javax.xml.namespace.NamespaceContext;
@@ -87,7 +87,7 @@ public class WadlResourceTest extends AbstractResourceTester {
     @Path("foo")
     public static class ExtraResource {
         @GET
-        @ProduceMime("application/xml")
+        @Produces("application/xml")
         public String getRep() {
             return null;
         }
@@ -97,27 +97,27 @@ public class WadlResourceTest extends AbstractResourceTester {
     public static class WidgetsResource {
 
         @GET
-        @ProduceMime({"application/xml", "application/json"})
+        @Produces({"application/xml", "application/json"})
         public String getWidgets() {
             return null;
         }
 
         @POST
-        @ConsumeMime({"application/xml"})
-        @ProduceMime({"application/xml", "application/json"})
+        @Consumes({"application/xml"})
+        @Produces({"application/xml", "application/json"})
         public String createWidget(String bar) {
             return bar;
         }
 
         @PUT
         @Path("{id}")
-        @ConsumeMime("application/xml")
+        @Consumes("application/xml")
         public void updateWidget(String bar, @PathParam("id")int id) {
         }
 
         @GET
         @Path("{id}")
-        @ProduceMime({"application/xml", "application/json"})
+        @Produces({"application/xml", "application/json"})
         public String getWidget(@PathParam("id")int id) {
             return null;
         }
@@ -322,14 +322,14 @@ public class WadlResourceTest extends AbstractResourceTester {
         }
         
         @GET
-        @ProduceMime("text/plain")
+        @Produces("text/plain")
         public String hello() {
             return "Hello World !";
         }
         
         @GET
         @Path("sub")
-        @ProduceMime("text/plain")
+        @Produces("text/plain")
         public String helloSub() {
             return "Hello World !";
         }

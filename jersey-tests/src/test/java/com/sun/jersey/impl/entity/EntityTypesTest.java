@@ -59,11 +59,11 @@ import javax.mail.internet.InternetHeaders;
 import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMultipart;
 import javax.mail.util.ByteArrayDataSource;
-import javax.ws.rs.ConsumeMime;
+import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
-import javax.ws.rs.ProduceMime;
+import javax.ws.rs.Produces;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.StreamingOutput;
 import javax.ws.rs.ext.ContextResolver;
@@ -146,8 +146,8 @@ public class EntityTypesTest extends AbstractTypeTester {
     
     
     @Path("/")
-    @ProduceMime("application/xml")
-    @ConsumeMime("application/xml")
+    @Produces("application/xml")
+    @Consumes("application/xml")
     public static class JAXBObjectResource {
         @POST
         public Object post(Object o) {
@@ -222,8 +222,8 @@ public class EntityTypesTest extends AbstractTypeTester {
         _test(mmIn, MimeMultipartBeanResource.class, false);
     }
     
-    @ProduceMime("application/x-www-form-urlencoded")
-    @ConsumeMime("application/x-www-form-urlencoded")
+    @Produces("application/x-www-form-urlencoded")
+    @Consumes("application/x-www-form-urlencoded")
     @Path("/")
     public static class FormResource extends AResource<Form> {}
     
@@ -319,8 +319,8 @@ public class EntityTypesTest extends AbstractTypeTester {
     }
     
     @Path("/")
-    @ProduceMime("application/x-www-form-urlencoded")
-    @ConsumeMime("application/x-www-form-urlencoded")
+    @Produces("application/x-www-form-urlencoded")
+    @Consumes("application/x-www-form-urlencoded")
     public static class FormMultivaluedMapResource {
         @POST
         public MultivaluedMap<String, String> post(MultivaluedMap<String, String> t) {
@@ -362,8 +362,8 @@ public class EntityTypesTest extends AbstractTypeTester {
     }
     
     @Path("/")
-    @ConsumeMime("application/json")
-    @ProduceMime("application/json")
+    @Consumes("application/json")
+    @Produces("application/json")
     public static class JAXBElementBeanJSONResource extends AResource<JAXBElement<String>> {}
     
     public void testJAXBElementBeanJSONRepresentation() {
