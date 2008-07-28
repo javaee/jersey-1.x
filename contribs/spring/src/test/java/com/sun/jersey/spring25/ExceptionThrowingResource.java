@@ -47,7 +47,7 @@ public class ExceptionThrowingResource {
     @ProduceMime( "application/xml" )
     public Response getItem() {
         if ( true ) {
-            throw new RuntimeException( "foo" );
+            throw new RuntimeException( "this exception should be visible in the logs and MUST result in status 500 on the client side." );
         }
         return null;
     }
