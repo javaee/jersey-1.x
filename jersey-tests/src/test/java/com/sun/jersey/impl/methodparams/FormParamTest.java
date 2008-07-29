@@ -38,13 +38,13 @@ package com.sun.jersey.impl.methodparams;
 
 import com.sun.jersey.api.client.WebResource;
 import com.sun.jersey.api.representation.Form;
-import com.sun.jersey.api.representation.FormParam;
 import com.sun.jersey.impl.AbstractResourceTester;
 import com.sun.jersey.impl.entity.JAXBBean;
 import javax.mail.internet.InternetHeaders;
 import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMultipart;
 import javax.ws.rs.Consumes;
+import javax.ws.rs.FormParam;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.core.MediaType;
