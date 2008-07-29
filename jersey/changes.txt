@@ -22,6 +22,10 @@ release 0.9 (2008-08-15)
      parameter is unlimited, in which case it is the same as before.
   - Path parameter names are matching with the following regex:
       "\{([\w[-\w\.]*)\}"
+  - com.sun.jersey.api.representation.FormParam has been deleted. Use
+    javax.ws.rs.FormParam instead.
+  - javax.ws.rs.ConsumeMime and javax.ws.rs.ProduceMime have been renamed
+    to javax.ws.rs.Consumes and javax.ws.rs.Produces respectively.
 
 release 0.8 (2008-06-20)
 - UriBuilder supports opaque URIs such as "mailto:p@c".
