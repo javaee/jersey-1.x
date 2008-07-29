@@ -59,13 +59,9 @@ public final class ResourceHttpOptionsMethod extends ResourceMethod {
         }
         
         private String getAllow(Map<String, List<ResourceMethod>> methods) {
-            StringBuilder s = new StringBuilder();
-            boolean first = true;
+            StringBuilder s = new StringBuilder("OPTIONS");
             for (String method : methods.keySet()) {
-                if (!first) s.append(",");
-                first = false;
-
-                s.append(method);
+                s.append(',').append(method);
             }
 
             return s.toString();

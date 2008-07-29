@@ -77,7 +77,7 @@ public class AbstractResourceMethod implements Parameterized, AbstractModelCompo
 
         this.resource = resource;
         this.method = method;
-        this.httpMethod = httpMethod;
+        this.httpMethod = httpMethod.toUpperCase();
         this.consumeMimeList = new ArrayList<MediaType>();
         this.produceMimeList = new ArrayList<MediaType>();
         this.parameters = new ArrayList<Parameter>();
