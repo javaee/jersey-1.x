@@ -96,7 +96,7 @@ public class WadlGeneratorApplicationDoc implements WadlGenerator {
     }
     
     private <T> T loadFile( File fileToLoad, Class<T> targetClass ) throws JAXBException {
-        final JAXBContext c = JAXBContext.newInstance( targetClass );
+        final JAXBContext c = JAXBContext.newInstance( targetClass.getPackage().getName(), Thread.currentThread().getContextClassLoader() );
         final Unmarshaller m = c.createUnmarshaller();
         return targetClass.cast( m.unmarshal( fileToLoad ) );
     }
