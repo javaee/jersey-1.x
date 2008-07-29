@@ -48,6 +48,7 @@ import javax.ws.rs.FormParam;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.MultivaluedMap;
 
 /**
  *
@@ -60,16 +61,44 @@ public class FormParamTest extends AbstractResourceTester {
     }
     
     @Path("/")
-    public class FormResource {
+    public class FormResourceX {
         @POST
         @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-        public String post(@FormParam("a") String a, @FormParam("b") String b) {
+        public String post(@FormParam("a") String a, @FormParam("b") String b,
+                MultivaluedMap<String, String> form) {
+            assertEquals(a, form.getFirst("a"));
+            assertEquals(b, form.getFirst("b"));
             return a + b;
         }
     }
     
-    public void testFormParam() {
-        initiateWebApplication(FormResource.class);
+    @Path("/")
+    public class FormResourceY {
+        @POST
+        @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+        public String post(@FormParam("a") String a, @FormParam("b") String b,
+                Form form) {
+            assertEquals(a, form.getFirst("a"));
+            assertEquals(b, form.getFirst("b"));
+            return a + b;
+        }
+    }
+    
+    public void testFormParamX() {
+        initiateWebApplication(FormResourceX.class);
+        
+        WebResource r = resource("/");
+        
+        Form form = new Form();
+        form.add("a", "foo");
+        form.add("b", "bar");        
+        
+        String s = r.post(String.class, form);
+        assertEquals("foobar", s);
+    }    
+    
+    public void testFormParamY() {
+        initiateWebApplication(FormResourceY.class);
         
         WebResource r = resource("/");
         
@@ -82,19 +111,36 @@ public class FormParamTest extends AbstractResourceTester {
     }    
     
     @Path("/")
-    public class MultipartFormResource {
+    public class MultipartFormResourceX {
         @POST
         @Consumes({"multipart/form-data", MediaType.APPLICATION_FORM_URLENCODED})
         public String post(
                 @FormParam("a") String a, 
                 @FormParam("b") String b,
-                @FormParam("c") JAXBBean c) {
+                @FormParam("c") JAXBBean c,
+                MimeMultipart m) throws Exception {
+            assertEquals(3, m.getCount());
+            return a + b;
+        }
+    }
+    
+    @Path("/")
+    public class MultipartFormResourceY {
+        @POST
+        @Consumes({"multipart/form-data", MediaType.APPLICATION_FORM_URLENCODED})
+        public String post(
+                @FormParam("a") String a, 
+                @FormParam("b") String b,
+                @FormParam("c") JAXBBean c,
+                Form form) throws Exception {
+            assertEquals(a, form.getFirst("a"));
+            assertEquals(b, form.getFirst("b"));
             return a + b;
         }
     }
     
     public void testMultipartFormParam() throws Exception {
-        initiateWebApplication(MultipartFormResource.class);
+        initiateWebApplication(MultipartFormResourceX.class);
         
         WebResource r = resource("/");
                 
@@ -121,7 +167,7 @@ public class FormParamTest extends AbstractResourceTester {
     }
     
     public void testMultipartFormParamWithForm() {
-        initiateWebApplication(MultipartFormResource.class);
+        initiateWebApplication(MultipartFormResourceY.class);
         
         WebResource r = resource("/");
         

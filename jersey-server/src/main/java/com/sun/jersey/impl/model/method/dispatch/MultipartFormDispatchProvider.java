@@ -50,6 +50,8 @@ import com.sun.jersey.spi.inject.Injectable;
 import com.sun.jersey.spi.service.ComponentProvider.Scope;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Type;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -60,6 +62,7 @@ import javax.mail.internet.MimeMultipart;
 import javax.ws.rs.FormParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.ext.MessageBodyReader;
 
 /**
@@ -77,6 +80,7 @@ public class MultipartFormDispatchProvider extends FormDispatchProvider {
             try {
                 Map<String, BodyPart> formMap = getFormData(form);
                 context.getProperties().put("com.sun.jersey.api.representation.form", formMap);
+                context.getProperties().put("com.sun.jersey.api.representation.form.multipart", form);
             } catch(Exception e) {
                 throw new ContainerException(e);
             }
@@ -100,6 +104,24 @@ public class MultipartFormDispatchProvider extends FormDispatchProvider {
     }
         
     @Context MessageBodyWorkers mbws;
+    
+    private final class MultipartFormInjectable implements Injectable<Object> {
+        final Class<?> c;
+        final Type t;
+        final Annotation[] as;
+        
+        MultipartFormInjectable(Class c, Type t, Annotation[] as) {
+            this.c = c;
+            this.t = t;
+            this.as = as;
+        }
+
+        public Object getValue(HttpContext context) {
+            Object o = context.getProperties().get("com.sun.jersey.api.representation.form.multipart");
+            if (o != null) return o;
+            return context.getProperties().get("com.sun.jersey.api.representation.form");
+        }        
+    }
     
     private static final class MultipartFormParamInjectable implements Injectable<Object> {
         private final MessageBodyWorkers mbws;
@@ -177,7 +199,13 @@ public class MultipartFormDispatchProvider extends FormDispatchProvider {
             Parameter p = method.getParameters().get(i);
             
             if (Parameter.Source.ENTITY == p.getSource()) {
-                is.add(null);
+                if (MimeMultipart.class.isAssignableFrom(p.getParameterClass()) ||
+                        MultivaluedMap.class.isAssignableFrom(p.getParameterClass())) {
+                    is.add(new MultipartFormInjectable(p.getParameterClass(),
+                            p.getParameterType(), p.getAnnotations()));
+                } else {
+                    is.add(null);                    
+                }
             } else if (p.getAnnotation().annotationType() == FormParam.class) {
                 is.add(new MultipartFormParamInjectable(mbws, p));
             } else {

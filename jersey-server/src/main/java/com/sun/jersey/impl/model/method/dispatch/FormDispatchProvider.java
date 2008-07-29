@@ -44,6 +44,7 @@ import com.sun.jersey.api.model.AbstractResourceMethod;
 import com.sun.jersey.api.model.Parameter;
 import com.sun.jersey.api.representation.Form;
 import com.sun.jersey.impl.ResponseBuilderImpl;
+import com.sun.jersey.impl.model.method.dispatch.EntityParamDispatchProvider.EntityInjectable;
 import com.sun.jersey.impl.model.parameter.multivalued.MultivaluedParameterExtractor;
 import com.sun.jersey.impl.model.parameter.multivalued.MultivaluedParameterProcessor;
 import com.sun.jersey.spi.container.MessageBodyWorkers;
@@ -51,12 +52,15 @@ import com.sun.jersey.spi.resource.InjectableProviderContext;
 import com.sun.jersey.spi.dispatch.RequestDispatcher;
 import com.sun.jersey.spi.inject.Injectable;
 import com.sun.jersey.spi.service.ComponentProvider.Scope;
+import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 import javax.ws.rs.FormParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 
 /**
@@ -192,6 +196,22 @@ public class FormDispatchProvider implements ResourceMethodDispatchProvider {
         }
     }
     
+    private final class FormEntityInjectable implements Injectable<Object> {
+        final Class<?> c;
+        final Type t;
+        final Annotation[] as;
+        
+        FormEntityInjectable(Class c, Type t, Annotation[] as) {
+            this.c = c;
+            this.t = t;
+            this.as = as;
+        }
+
+        public Object getValue(HttpContext context) {
+            return context.getProperties().get("com.sun.jersey.api.representation.form");
+        }        
+    }
+    
     private static final class FormParamInjectable implements Injectable<Object> {
         private final MultivaluedParameterExtractor extractor;
         private final boolean decode;
@@ -239,10 +259,12 @@ public class FormDispatchProvider implements ResourceMethodDispatchProvider {
             Parameter p = method.getParameters().get(i);
             
             if (Parameter.Source.ENTITY == p.getSource()) {
-                return null;
-            }
-            
-            if (p.getAnnotation().annotationType() == FormParam.class) {
+                if (MultivaluedMap.class.isAssignableFrom(p.getParameterClass())) {
+                    is.add(new FormEntityInjectable(p.getParameterClass(),
+                            p.getParameterType(), p.getAnnotations()));
+                } else
+                    return null;
+            } else if (p.getAnnotation().annotationType() == FormParam.class) {
                 MultivaluedParameterExtractor e = MultivaluedParameterProcessor.
                         process(p.getDefaultValue(), p.getParameterClass(), 
                         p.getParameterType(), p.getSourceName());    
