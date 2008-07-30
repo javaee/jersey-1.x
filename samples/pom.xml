@@ -53,8 +53,6 @@
     <modules>
         <module>helloworld</module>
         <module>helloworld-webapp</module>
-	<!-- commenting out until JDK 1.5 issues are resolved
         <module>generate-wadl</module>
-	-->
     </modules>
 </project>
