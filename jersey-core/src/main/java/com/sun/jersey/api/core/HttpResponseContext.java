@@ -38,6 +38,7 @@ package com.sun.jersey.api.core;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.lang.reflect.Type;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
@@ -99,8 +100,17 @@ public interface HttpResponseContext {
     Object getEntity();
     
     /**
-     * Set the entity of the response
-     * @param entity the entity.
+     * 
+     * @return the type of the entity.
+     */
+    Type getEntityType();
+    
+    /**
+     * Set the entity of the response.
+     * 
+     * @param entity the entity. If the entity is an instance of 
+     *        {@link GenericEntity} then the entity and entity type are
+     *        set from the entity and type of that {@link GenericEntity}.
      */
     void setEntity(Object entity);
     

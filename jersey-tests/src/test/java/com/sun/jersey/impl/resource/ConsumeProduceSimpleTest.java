@@ -37,6 +37,7 @@
 
 package com.sun.jersey.impl.resource;
 
+import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.impl.AbstractResourceTester;
 import com.sun.jersey.api.core.HttpRequestContext;
 import com.sun.jersey.api.core.HttpResponseContext;
@@ -46,6 +47,8 @@ import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Produces;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.Response;
 
 /**
@@ -159,4 +162,23 @@ public class ConsumeProduceSimpleTest extends AbstractResourceTester {
         assertEquals("HTML", r.accept("text/html").get(String.class));
         assertEquals("XHTML", r.accept("text/xhtml").get(String.class));
     }
+    
+    @Path("/")
+    @Consumes("text/html")
+    @Produces("text/plain")
+    public static class ConsumeProduceWithParameters {
+        @POST
+        public String post(String in, @Context HttpHeaders h) {
+            return h.getMediaType().getParameters().toString();
+        }
+    }
+    
+    public void testProduceWithParameters() {
+        initiateWebApplication(ConsumeProduceWithParameters.class);
+        WebResource r = resource("/",false);
+
+        assertEquals("{a=b, c=d}", r.type("text/html;a=b;c=d").
+                post(String.class, "<html>content</html>"));
+    }
+    
 }

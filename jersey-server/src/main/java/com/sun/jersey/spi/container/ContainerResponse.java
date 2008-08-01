@@ -42,10 +42,12 @@ import com.sun.jersey.api.core.HttpResponseContext;
 import com.sun.jersey.impl.ResponseImpl;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.lang.reflect.Type;
 import java.net.URI;
 import java.util.List;
 import java.util.logging.Logger;
 import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.GenericEntity;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
@@ -77,6 +79,8 @@ public class ContainerResponse implements HttpResponseContext {
     private MultivaluedMap<String, Object> headers;
     
     private Object entity;
+    
+    private Type entityType;
     
     private boolean isCommitted;
     
@@ -261,7 +265,12 @@ public class ContainerResponse implements HttpResponseContext {
         this.response = r = (r != null) ? r : Responses.noContent().build();
         
         this.status = r.getStatus();
-        this.entity = r.getEntity();
+        
+        if (r instanceof ResponseImpl) {
+            this.headers = setResponseOptimal((ResponseImpl)r, contentType);
+        } else {
+            this.headers = setResponseNonOptimal(r, contentType);
+        }
         
         // If HTTP method is HEAD then there should be no entity
         if (request.getMethod().equals("HEAD"))
@@ -271,11 +280,6 @@ public class ContainerResponse implements HttpResponseContext {
             contentType = null;
         }
  
-        if (r instanceof ResponseImpl) {
-            this.headers = setResponseOptimal((ResponseImpl)r, contentType);
-        } else {
-            this.headers = setResponseNonOptimal(r, contentType);
-        }
     }
     
     public boolean isResponseSet() {
@@ -294,8 +298,20 @@ public class ContainerResponse implements HttpResponseContext {
         return entity;
     }
     
+    public Type getEntityType() {
+        return entityType;
+    }
+    
     public void setEntity(Object entity) {
-        this.entity = entity;
+        this.entity = entity;        
+        if (this.entity instanceof GenericEntity) {
+            final GenericEntity ge = (GenericEntity)this.entity;
+            this.entityType = ge.getType();                
+            this.entity = ge.getEntity();            
+        } else {
+            this.entityType = this.entity.getClass();
+        }        
+        
         checkStatusAndEntity();
     }
     
@@ -337,10 +353,20 @@ public class ContainerResponse implements HttpResponseContext {
     }
     
     private MultivaluedMap<String, Object> setResponseOptimal(ResponseImpl r, MediaType contentType) {
+        this.entityType = r.getEntityType();
+        this.entity = r.getEntity();        
+        if (GenericEntity.class == this.entityType) {
+            final GenericEntity ge = (GenericEntity)this.entity;
+            this.entityType = ge.getType();                
+            this.entity = ge.getEntity();
+        }
+        
         return r.getMetadataOptimal(request, contentType);
     }
     
     private MultivaluedMap<String, Object> setResponseNonOptimal(Response r, MediaType contentType) {
+        setEntity(r.getEntity());
+        
         MultivaluedMap<String, Object> _headers = r.getMetadata();
         
         if (_headers.getFirst("Content-Type") == null && contentType != null) {

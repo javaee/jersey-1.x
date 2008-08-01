@@ -39,6 +39,7 @@ package com.sun.jersey.impl;
 
 import com.sun.jersey.api.core.HttpRequestContext;
 import com.sun.jersey.impl.container.OutBoundHeaders;
+import java.lang.reflect.Type;
 import java.net.URI;
 import java.util.Iterator;
 import java.util.List;
@@ -56,19 +57,27 @@ public final class ResponseImpl extends Response {
 
     private final Object entity;
 
+    private final Type entityType;
+    
     private final Object[] values;
     
     private final List<Object> nameValuePairs;
     
     private MultivaluedMap<String, Object> headers;
     
-    ResponseImpl(int status, Object entity, Object[] values, List<Object> nameValuePairs) {
+    ResponseImpl(int status, Object entity, Type entityType,
+            Object[] values, List<Object> nameValuePairs) {
         this.status = status;
         this.entity = entity;
+        this.entityType = entityType;
         this.values = values;
         this.nameValuePairs = nameValuePairs;
     }
 
+    public Type getEntityType() {
+        return entityType;
+    }
+    
     // Response 
     
     public Object getEntity() {

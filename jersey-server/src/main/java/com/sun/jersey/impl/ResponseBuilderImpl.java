@@ -39,6 +39,7 @@ package com.sun.jersey.impl;
 
 import com.sun.jersey.impl.util.KeyComparatorHashMap;
 import com.sun.jersey.impl.util.StringIgnoreCaseKeyComparator;
+import java.lang.reflect.Type;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -110,25 +111,34 @@ public final class ResponseBuilderImpl extends Response.ResponseBuilder {
 
     private Object entity;
     
+    private Type entityType;
+    
     private Object[] values;
     
     private List<Object> nameValuePairs;
 
-    // Response.Builder
-    
     public ResponseBuilderImpl() { }
         
     private ResponseBuilderImpl(ResponseBuilderImpl that) {
         this.status = that.status;
         this.entity = that.entity;
+        this.entityType = that.entityType;
         if (that.values != null)
             this.values = that.values.clone();
         if (that.nameValuePairs != null)
             this.nameValuePairs = new ArrayList<Object>(that.nameValuePairs);    
     }
+
+    public Response.ResponseBuilder entityWithType(Object entity, Type entityType) {
+        this.entity = entity;
+        this.entityType = entityType;
+        return this;
+    }
+   
+    // Response.Builder
     
     public Response build() {
-        Response r = new ResponseImpl(status, entity, 
+        Response r = new ResponseImpl(status, entity, entityType,
                 (values != null) ? values : EMPTY_VALUES, 
                 (nameValuePairs != null) ? nameValuePairs : Collections.emptyList());
         reset();
@@ -154,6 +164,7 @@ public final class ResponseBuilderImpl extends Response.ResponseBuilder {
 
     public Response.ResponseBuilder entity(Object entity) {
         this.entity = entity;
+        this.entityType = (entity != null) ? entity.getClass() : null;
         return this;
     }
 

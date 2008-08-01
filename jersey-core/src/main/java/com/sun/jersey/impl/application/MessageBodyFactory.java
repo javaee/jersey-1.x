@@ -61,12 +61,13 @@ public final class MessageBodyFactory implements MessageBodyWorkers {
     private static final KeyComparator<MediaType> MEDIA_TYPE_COMPARATOR = 
             new KeyComparator<MediaType>() {
         public boolean equals(MediaType x, MediaType y) {
-            return (x.getType().equalsIgnoreCase(y.getType())
-                    && x.getSubtype().equalsIgnoreCase(y.getSubtype()));
+            return x.getType().equalsIgnoreCase(y.getType())
+                    && x.getSubtype().equalsIgnoreCase(y.getSubtype());
         }
 
         public int hash(MediaType k) {
-            return k.hashCode();
+            return k.getType().toLowerCase().hashCode() + 
+                    k.getSubtype().toLowerCase().hashCode();
         }
 
         public int compare(MediaType o1, MediaType o2) {
