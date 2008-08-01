@@ -56,6 +56,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import javax.ws.rs.core.Context;
+import javax.ws.rs.core.GenericEntity;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
@@ -120,8 +121,11 @@ public class EntityParamDispatchProvider implements ResourceMethodDispatchProvid
     }
     
     static final class TypeOutInvoker extends EntityParamInInvoker {
+        private final Type t;
+        
         TypeOutInvoker(AbstractResourceMethod abstractResourceMethod, List<Injectable> is) {
             super(abstractResourceMethod, is);
+            this.t = abstractResourceMethod.getMethod().getGenericReturnType();
         }
 
         @SuppressWarnings("unchecked")
@@ -132,7 +136,8 @@ public class EntityParamDispatchProvider implements ResourceMethodDispatchProvid
             Object o = method.invoke(resource, params);
             if (o != null) {
                 MediaType mediaType = getAcceptableMediaType(context.getRequest());
-                Response r = new ResponseBuilderImpl().status(200).entity(o).type(mediaType).build();
+                Response r = new ResponseBuilderImpl().
+                        entityWithType(o, t).type(mediaType).status(200).build();
                 context.getResponse().setResponse(r);
             }
         }
@@ -204,7 +209,7 @@ public class EntityParamDispatchProvider implements ResourceMethodDispatchProvid
         if (Response.class.isAssignableFrom(returnType)) {
             return new ResponseOutInvoker(abstractResourceMethod, is);                
         } else if (returnType != void.class) {
-            if (returnType == Object.class) {
+            if (returnType == Object.class || GenericEntity.class.isAssignableFrom(returnType)) {
                 return new ObjectOutInvoker(abstractResourceMethod, is);
             } else {
                 return new TypeOutInvoker(abstractResourceMethod, is);

@@ -44,7 +44,6 @@ import com.sun.jersey.api.model.AbstractResourceMethod;
 import com.sun.jersey.api.model.Parameter;
 import com.sun.jersey.api.representation.Form;
 import com.sun.jersey.impl.ResponseBuilderImpl;
-import com.sun.jersey.impl.model.method.dispatch.EntityParamDispatchProvider.EntityInjectable;
 import com.sun.jersey.impl.model.parameter.multivalued.MultivaluedParameterExtractor;
 import com.sun.jersey.impl.model.parameter.multivalued.MultivaluedParameterProcessor;
 import com.sun.jersey.spi.container.MessageBodyWorkers;
@@ -59,6 +58,7 @@ import java.util.ArrayList;
 import java.util.List;
 import javax.ws.rs.FormParam;
 import javax.ws.rs.core.Context;
+import javax.ws.rs.core.GenericEntity;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
@@ -115,8 +115,11 @@ public class FormDispatchProvider implements ResourceMethodDispatchProvider {
     }
     
     final class TypeOutInvoker extends FormParamInInvoker {
+        private final Type t;
+        
         TypeOutInvoker(AbstractResourceMethod abstractResourceMethod, List<Injectable> is) {
             super(abstractResourceMethod, is);
+            this.t = abstractResourceMethod.getMethod().getGenericReturnType();
         }
 
         @SuppressWarnings("unchecked")
@@ -127,7 +130,8 @@ public class FormDispatchProvider implements ResourceMethodDispatchProvider {
             Object o = method.invoke(resource, params);
             if (o != null) {
                 MediaType mediaType = getAcceptableMediaType(context.getRequest());
-                Response r = new ResponseBuilderImpl().status(200).entity(o).type(mediaType).build();
+                Response r = new ResponseBuilderImpl().
+                        entityWithType(o, t).type(mediaType).status(200).build();
                 context.getResponse().setResponse(r);
             }
         }
@@ -186,7 +190,7 @@ public class FormDispatchProvider implements ResourceMethodDispatchProvider {
         if (Response.class.isAssignableFrom(returnType)) {
             return new ResponseOutInvoker(abstractResourceMethod, is);                
         } else if (returnType != void.class) {
-            if (returnType == Object.class) {
+            if (returnType == Object.class || GenericEntity.class.isAssignableFrom(returnType)) {
                 return new ObjectOutInvoker(abstractResourceMethod, is);
             } else {
                 return new TypeOutInvoker(abstractResourceMethod, is);

@@ -246,9 +246,6 @@ public final class MessageBodyFactory implements MessageBodyWorkers {
         return null;
     }
     
-    
-    // ExtendedMessageBodyWorkers
-    
     @SuppressWarnings("unchecked")
     public <T> List<MediaType> getMessageBodyWriterMediaTypes(Class<T> c, Type t,
             Annotation[] as) {

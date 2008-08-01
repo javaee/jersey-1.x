@@ -28,6 +28,10 @@ release 0.9 (2008-08-15)
     javax.ws.rs.FormParam instead.
   - javax.ws.rs.ConsumeMime and javax.ws.rs.ProduceMime have been renamed
     to javax.ws.rs.Consumes and javax.ws.rs.Produces respectively.
+  - Resource methods may return generic types, such as List<String>, and
+    an appropriate MessageBodyWriter, for that generic type may be selected.
+    - When using Response.Builder an instance of javax.ws.rs.core.GenericEntity
+      may be set as the entity to preserve the generic type.
 
 release 0.8 (2008-06-20)
 - UriBuilder supports opaque URIs such as "mailto:p@c".

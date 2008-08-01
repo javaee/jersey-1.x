@@ -199,7 +199,7 @@ public class ContainerResponse implements HttpResponseContext {
         MediaType contentType = getContentType();
         if (contentType == null) {
             List<MediaType> mts = bodyContext.getMessageBodyWriterMediaTypes(
-                    entity.getClass(), null, null);
+                    entity.getClass(), entityType, null);
             contentType = request.getAcceptableMediaType(mts);
             if (contentType == null || 
                     contentType.isWildcardType() || contentType.isWildcardSubtype())
@@ -209,7 +209,7 @@ public class ContainerResponse implements HttpResponseContext {
         }
         
         final MessageBodyWriter p = bodyContext.getMessageBodyWriter(
-                entity.getClass(), null, 
+                entity.getClass(), entityType, 
                 null, contentType);
         // If there is no message body writer return a Not Acceptable response
         if (p == null) {
@@ -222,7 +222,7 @@ public class ContainerResponse implements HttpResponseContext {
         
         isCommitted = true;
         OutputStream os = responseWriter.writeStatusAndHeaders(-1, this);        
-        p.writeTo(entity, entity.getClass(), null, null, 
+        p.writeTo(entity, entity.getClass(), entityType, null, 
                 contentType, getHttpHeaders(), os);
     }
 
@@ -355,7 +355,7 @@ public class ContainerResponse implements HttpResponseContext {
     private MultivaluedMap<String, Object> setResponseOptimal(ResponseImpl r, MediaType contentType) {
         this.entityType = r.getEntityType();
         this.entity = r.getEntity();        
-        if (GenericEntity.class == this.entityType) {
+        if (entity instanceof GenericEntity) {
             final GenericEntity ge = (GenericEntity)this.entity;
             this.entityType = ge.getType();                
             this.entity = ge.getEntity();
