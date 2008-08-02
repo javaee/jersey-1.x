@@ -36,10 +36,6 @@
  */
 package com.sun.jersey.impl.application;
 
-import com.sun.jersey.api.NotFoundException;
-import com.sun.jersey.spi.resource.InjectableProviderContext;
-import com.sun.jersey.spi.inject.Injectable;
-import com.sun.jersey.spi.service.ComponentContext;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -50,8 +46,11 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.Proxy;
 import java.lang.reflect.Type;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -68,8 +67,11 @@ import javax.ws.rs.core.Request;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.SecurityContext;
 import javax.ws.rs.core.UriInfo;
+import javax.ws.rs.ext.ExceptionMapper;
 import javax.ws.rs.ext.Provider;
 
+import com.sun.jersey.api.NotFoundException;
+import com.sun.jersey.api.container.ContainerCheckedException;
 import com.sun.jersey.api.container.ContainerException;
 import com.sun.jersey.api.core.HttpContext;
 import com.sun.jersey.api.core.HttpResponseContext;
@@ -83,7 +85,6 @@ import com.sun.jersey.impl.ImplMessages;
 import com.sun.jersey.impl.ThreadLocalHttpContext;
 import com.sun.jersey.impl.model.ResourceClass;
 import com.sun.jersey.impl.model.RulesMap;
-import com.sun.jersey.api.container.ContainerCheckedException;
 import com.sun.jersey.impl.model.parameter.CookieParamInjectableProvider;
 import com.sun.jersey.impl.model.parameter.HeaderParamInjectableProvider;
 import com.sun.jersey.impl.model.parameter.HttpContextInjectableProvider;
@@ -101,25 +102,24 @@ import com.sun.jersey.impl.uri.rules.RightHandPathRule;
 import com.sun.jersey.impl.uri.rules.RootResourceClassesRule;
 import com.sun.jersey.impl.wadl.WadlFactory;
 import com.sun.jersey.impl.wadl.WadlResource;
-import com.sun.jersey.spi.container.MessageBodyWorkers;
 import com.sun.jersey.spi.container.ContainerRequest;
 import com.sun.jersey.spi.container.ContainerRequestFilter;
 import com.sun.jersey.spi.container.ContainerResponse;
 import com.sun.jersey.spi.container.ContainerResponseFilter;
 import com.sun.jersey.spi.container.ContainerResponseWriter;
+import com.sun.jersey.spi.container.MessageBodyWorkers;
 import com.sun.jersey.spi.container.WebApplication;
+import com.sun.jersey.spi.inject.Inject;
+import com.sun.jersey.spi.inject.Injectable;
 import com.sun.jersey.spi.inject.InjectableProvider;
 import com.sun.jersey.spi.inject.SingletonTypeInjectableProvider;
-import com.sun.jersey.spi.inject.Inject;
+import com.sun.jersey.spi.resource.InjectableProviderContext;
 import com.sun.jersey.spi.resource.ResourceProviderFactory;
+import com.sun.jersey.spi.service.ComponentContext;
 import com.sun.jersey.spi.service.ComponentProvider;
 import com.sun.jersey.spi.service.ComponentProvider.Scope;
 import com.sun.jersey.spi.template.TemplateContext;
 import com.sun.jersey.spi.uri.rules.UriRule;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import javax.ws.rs.ext.ExceptionMapper;
 
 /**
  * A Web application that contains a set of resources, each referenced by 
@@ -163,6 +163,8 @@ public final class WebApplicationImpl implements WebApplication {
     private List<ContainerRequestFilter> requestFilters = new LinkedList<ContainerRequestFilter>();
     
     private List<ContainerResponseFilter> responseFilters = new LinkedList<ContainerResponseFilter>();
+
+    private WadlFactory wadlFactory;
     
     public WebApplicationImpl() {
         this.resolverFactory = ResourceProviderFactory.getInstance();
@@ -289,7 +291,8 @@ public final class WebApplicationImpl implements WebApplication {
                 getComponentProvider(), 
                 dispatcherFactory,
                 injectableFactory, 
-                ar);
+                ar,
+                this.wadlFactory);
     }
 
     private AbstractResource getAbstractResource(Class c) {
@@ -623,9 +626,11 @@ public final class WebApplicationImpl implements WebApplication {
         // Inject on all components
         cpc.injectOnComponents();
         
+        this.wadlFactory = new WadlFactory( resourceConfig );
+        
         // Obtain all root resources
         this.rootsRule = new RootResourceClassesRule(
-                processRootResources(resourceConfig.getResourceClasses()));       
+                processRootResources(resourceConfig.getResourceClasses(), wadlFactory));       
     }
 
     public MessageBodyWorkers getMessageBodyWorkers() {
@@ -720,7 +725,7 @@ public final class WebApplicationImpl implements WebApplication {
         }
     }
 
-    private RulesMap<UriRule> processRootResources(Set<Class<?>> classes) {
+    private RulesMap<UriRule> processRootResources(Set<Class<?>> classes, WadlFactory wadlFactory) {
         if (classes.isEmpty()) {
             LOGGER.severe(ImplMessages.NO_ROOT_RES_IN_RES_CFG());
             throw new ContainerException(ImplMessages.NO_ROOT_RES_IN_RES_CFG());
@@ -768,16 +773,19 @@ public final class WebApplicationImpl implements WebApplication {
                     new ResourceClassRule(t, c)));
         }
 
-        createWadlResource(rootResources, rulesMap);
+        createWadlResource(rootResources, rulesMap, wadlFactory);
 
         return rulesMap;
     }
 
     private void createWadlResource(Set<AbstractResource> rootResources,
-            RulesMap<UriRule> rulesMap) {
+            RulesMap<UriRule> rulesMap,
+            WadlFactory wadlFactory) {
         // TODO get ResourceConfig to check the WADL generation feature
-
-        Object wr = WadlFactory.createWadlResource(rootResources);
+        
+        
+        
+        Object wr = wadlFactory.createWadlResource(rootResources);
         if (wr == null) {
             return;
         }

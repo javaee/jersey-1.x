@@ -12,6 +12,8 @@
 package com.sun.jersey.samples.generatewadl;
 
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 import com.sun.jersey.api.container.ContainerFactory;
 import com.sun.jersey.api.container.httpserver.HttpServerFactory;
@@ -32,7 +34,25 @@ public class Main {
     
     public static void main(String[] args) throws IOException {
         
-        final ResourceConfig resourceConfig = new PackagesResourceConfig( new String[] { ItemsResource.class.getPackage().getName() } );
+        final Map<String, Object> props = new HashMap<String, Object>();
+        props.put( PackagesResourceConfig.PROPERTY_PACKAGES, ItemsResource.class.getPackage().getName() );
+        
+//        final WadlGeneratorConfig config = WadlGeneratorConfig
+//            .generator( WadlGeneratorApplicationDoc.class.getName() )
+//            .prop( "applicationDocsFile", "classpath:/application-doc.xml" )
+//            .add()
+//            .generator( WadlGeneratorGrammarsSupport.class.getName() )
+//            .prop( "grammarsFile", "classpath:/application-grammars.xml" )
+//            .add()
+//            .generator( WadlGeneratorResourceDocSupport.class.getName() )
+//            .prop( "resourceDocFile", "classpath:/resourcedoc.xml" )
+//            .add()
+//            .build();
+//        
+//        props.put( ResourceConfig.PROPERTY_WADL_GENERATOR_CONFIG, config );
+        
+        final ResourceConfig resourceConfig = new PackagesResourceConfig( props );
+        
         final HttpHandler container = ContainerFactory.createContainer( HttpHandler.class, resourceConfig );
         
         final HttpServer server = HttpServerFactory.create( "http://localhost:9998/", container );
@@ -45,5 +65,6 @@ public class Main {
         System.out.println("Stopping server");   
         server.stop(0);
         System.out.println("Server stopped");
-    }    
+    }
+    
 }

@@ -61,12 +61,12 @@ import com.sun.research.ws.wadl.Resource;
 
     public static final class WadlOptionsMethod extends ResourceMethod {
         public WadlOptionsMethod(Map<String, List<ResourceMethod>> methods, 
-                AbstractResource resource, String path) {
+                AbstractResource resource, String path, WadlGenerator wadlGenerator) {
             super("OPTIONS",
                     UriTemplate.EMPTY,
                     MediaTypeHelper.GENERAL_MEDIA_TYPE_LIST, 
                     MediaTypeHelper.GENERAL_MEDIA_TYPE_LIST,
-                    new WadlOptionsMethodDispatcher(methods, resource, path));        
+                    new WadlOptionsMethodDispatcher(methods, resource, path, wadlGenerator));        
         }
 
         @Override
@@ -79,33 +79,30 @@ import com.sun.research.ws.wadl.Resource;
             ResourceHttpOptionsMethod.OptionsRequestDispatcher {
         private final AbstractResource resource;
         private final String path;
+        private final WadlGenerator wadlGenerator;
         
         WadlOptionsMethodDispatcher(Map<String, List<ResourceMethod>> methods,
-                AbstractResource resource, String path) {
+                AbstractResource resource, String path, WadlGenerator wadlGenerator) {
             super(methods);
             this.resource = resource;
             this.path = path;
+            this.wadlGenerator = wadlGenerator;
         }
             
         @Override
         public void dispatch(final Object o, final HttpContext context) {            
-            final Application a = genatateApplication(context.getUriInfo(), 
-                    resource, path);
+            final Application a = generateApplication(context.getUriInfo(), 
+                    resource, path, wadlGenerator);
             
             context.getResponse().setResponse(
                     Response.ok(a, MediaTypes.WADL).header("Allow", allow).build());
         }
-        
-        private Application generate() {
-            return path == null ? new WadlBuilder().generate(resource) : 
-                new WadlBuilder().generate(resource, path);
-        }
     }
     
-    private static Application genatateApplication(UriInfo info, 
-            AbstractResource resource, String path) {   
-        Application a = path == null ? new WadlBuilder().generate(resource) : 
-            new WadlBuilder().generate(resource, path);
+    private static Application generateApplication(UriInfo info, 
+            AbstractResource resource, String path, WadlGenerator wadlGenerator) {   
+        Application a = path == null ? new WadlBuilder( wadlGenerator ).generate(resource) : 
+            new WadlBuilder( wadlGenerator ).generate(resource, path);
         
         a.getResources().setBase(info.getBaseUri().toString());
                 

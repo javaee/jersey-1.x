@@ -37,21 +37,39 @@
 
 package com.sun.jersey.impl.wadl;
 
-import com.sun.jersey.api.model.AbstractResource;
-import com.sun.jersey.impl.model.method.ResourceMethod;
-import com.sun.jersey.impl.uri.PathPattern;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.logging.Logger;
+
+import com.sun.jersey.api.core.ResourceConfig;
+import com.sun.jersey.api.model.AbstractResource;
+import com.sun.jersey.impl.model.method.ResourceMethod;
+import com.sun.jersey.impl.uri.PathPattern;
+import com.sun.jersey.impl.wadl.config.WadlGeneratorConfigurationLoader;
 
 /**
  *
  * @author Paul.Sandoz@Sun.Com
  */
 public final class WadlFactory {
-    private static final Logger LOGGER = Logger.getLogger(WadlFactory.class.getName());
     
+    private static final Logger LOGGER = Logger.getLogger(WadlFactory.class.getName());
+
+    private final boolean _jaxb;
+    private final WadlGenerator _wadlGenerator;
+    
+    public WadlFactory(ResourceConfig resourceConfig) {
+        _jaxb = checkForJAXB();
+        
+        if ( _jaxb ) {
+            _wadlGenerator = WadlGeneratorConfigurationLoader.loadWadlGeneratorsFromConfig( resourceConfig );
+        }
+        else {
+            _wadlGenerator = null;
+        }
+    }
+
     /**
      * Create the WADL resource object.
      * <p>
@@ -62,18 +80,9 @@ public final class WadlFactory {
      * @param rootResources the set of root resources
      * @return the WADL resource object
      */
-    public static Object createWadlResource(Set<AbstractResource> rootResources) {
-        try {
-            checkForJAXB();
-        } catch(ClassNotFoundException e) {
-            LOGGER.warning("WADL generation is disabled " +
-                    "because JAXB jars are not " + 
-                    "included in the java class path. " +
-                    "To enable WADL include JAXB 2.x jars in the java class path."); 
-            return null;
-        }
-        
-        return new WadlResource(rootResources);
+    public Object createWadlResource(Set<AbstractResource> rootResources) {
+        if ( !_jaxb ) return null;
+        return new WadlResource( rootResources, _wadlGenerator );
     }
     
     /**
@@ -86,30 +95,36 @@ public final class WadlFactory {
      * @param resource the resource model
      * @return the WADL resource OPTIONS method
      */
-    public static ResourceMethod createWadlOptionsMethod(
+    public ResourceMethod createWadlOptionsMethod(
             Map<String, List<ResourceMethod>> methods, 
             AbstractResource resource, PathPattern p) {
-        try {
-            checkForJAXB();
-        } catch(ClassNotFoundException e) {
-            return null;
-        }
+        if ( !_jaxb ) return null;
         
         if (p == null) {
-            return new WadlMethodFactory.WadlOptionsMethod(methods, resource, null);
+            return new WadlMethodFactory.WadlOptionsMethod(methods, resource, null, _wadlGenerator);
         } else {
             // Remove the '/' from the beginning
             String path = p.getTemplate().getTemplate().substring(1);
-            return new WadlMethodFactory.WadlOptionsMethod(methods, resource, path);
+            return new WadlMethodFactory.WadlOptionsMethod(methods, resource, path, _wadlGenerator);
         }
     }        
     
     /**
      * Check if JAXB is present in the class path
+     * @return 
      * 
      * @throws java.lang.ClassNotFoundException
      */
-    private static void checkForJAXB() throws ClassNotFoundException {
-        Class.forName("javax.xml.bind.JAXBElement");
+    private static boolean checkForJAXB() {
+        try {
+            Class.forName("javax.xml.bind.JAXBElement");
+            return true;
+        } catch(ClassNotFoundException e) {
+            LOGGER.warning("WADL generation is disabled " +
+                    "because JAXB jars are not " + 
+                    "included in the java class path. " +
+                    "To enable WADL include JAXB 2.x jars in the java class path.");
+            return false;
+        }
     }
 }

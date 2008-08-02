@@ -72,31 +72,10 @@ public final class WadlResource {
     private String _requiredJaxbContextPath;
     private byte[] _bytes;
     
-    public WadlResource(Set<AbstractResource> rootResources) {
-        
-        WadlGenerator wadlGenerator = new WadlGeneratorImpl();
-        
-        final URL resource = getClass().getResource( "/" + WadlGeneratorResourceDocSupport.RESOURCE_DOC_FILE );
-        if ( resource != null ) {
-            try {
-                final File file = new File( resource.getFile() );
-                final ResourceDocType resourceDoc = loadFile( file, ResourceDocType.class );
-                wadlGenerator = new WadlGeneratorResourceDocSupport( wadlGenerator, resourceDoc );
-            } catch ( Exception e ) {
-                LOGGER.warning( "Could not load resourcedoc file " +
-                        WadlGeneratorResourceDocSupport.RESOURCE_DOC_FILE + 
-                        " from classpath: " + e );
-            }
-        }
+    public WadlResource(Set<AbstractResource> rootResources,
+            WadlGenerator wadlGenerator) {
         _a = new WadlBuilder( wadlGenerator ).generate(rootResources);
         _requiredJaxbContextPath = wadlGenerator.getRequiredJaxbContextPath();
-        
-    }
-    
-    private <T> T loadFile( File fileToLoad, Class<T> targetClass ) throws JAXBException {
-        final JAXBContext c = JAXBContext.newInstance( targetClass );
-        final Unmarshaller m = c.createUnmarshaller();
-        return targetClass.cast( m.unmarshal( fileToLoad ) );
     }
     
     public synchronized @GET Response getWadl(@Context UriInfo uriInfo) {

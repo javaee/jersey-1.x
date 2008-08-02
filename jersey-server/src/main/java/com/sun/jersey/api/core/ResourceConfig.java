@@ -41,6 +41,8 @@ import java.util.Map;
 import java.util.Set;
 import javax.ws.rs.core.ApplicationConfig;
 
+import com.sun.jersey.impl.wadl.WadlGenerator;
+
 /**
  * The resource configuration for configuring a web application.
  */
@@ -152,6 +154,23 @@ public abstract class ResourceConfig extends ApplicationConfig {
      */
     public static final String PROPERTY_CONTAINER_RESPONSE_FILTERS = 
             "com.sun.jersey.spi.container.ContainerResponseFilters";
+
+    /**
+     * If set the wadl generator configuration that provides that {@link WadlGenerator}
+     * to be used by the {@link com.sun.jersey.impl.wadl.WadlFactory}.
+     * <p>
+     * The type of this property must be a Java class that implements
+     * {@link com.sun.jersey.impl.wadl.config.WadlGeneratorConfiguration}
+     * or an instance of {@link com.sun.jersey.impl.wadl.config.WadlGeneratorConfiguration}.
+     * </p>
+     * A useful implementation of {@link com.sun.jersey.impl.wadl.config.WadlGeneratorConfiguration}
+     * is {@link com.sun.jersey.impl.wadl.config.WadlGeneratorConfig}.
+     * <p>
+     * If this property is not set the default wadl generator will be used for generating wadl.
+     * </p>
+     */
+    public static final String PROPERTY_WADL_GENERATOR_CONFIG = 
+            "com.sun.jersey.config.property.WadlGeneratorConfig";
     
     /**
      * Get the map of features associated with the Web application.

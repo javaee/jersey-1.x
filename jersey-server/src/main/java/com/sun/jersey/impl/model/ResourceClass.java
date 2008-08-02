@@ -86,6 +86,8 @@ public final class ResourceClass {
     private final UriRules<UriRule> rules;
     
     private final ResourceConfig config;
+
+    private final WadlFactory wadlFactory;
     
     public final AbstractResource resource;
     
@@ -96,10 +98,13 @@ public final class ResourceClass {
             ComponentProvider provider,
             ResourceMethodDispatcherFactory df,
             InjectableProviderContext injectableContext,
-            AbstractResource resource) {
+            AbstractResource resource,
+            WadlFactory wadlFactory) {
         this.resource = resource;
 
         this.config = config;
+        
+        this.wadlFactory = wadlFactory;
 
         RulesMap<UriRule> rulesMap = new RulesMap<UriRule>();
 
@@ -302,7 +307,7 @@ public final class ResourceClass {
             return;
         }
 
-        ResourceMethod optionsMethod = WadlFactory.createWadlOptionsMethod(methodMap, resource, p);
+        ResourceMethod optionsMethod = this.wadlFactory.createWadlOptionsMethod(methodMap, resource, p);
         if (optionsMethod == null)
             optionsMethod = new ResourceHttpOptionsMethod(methodMap);
         methodMap.put(optionsMethod);

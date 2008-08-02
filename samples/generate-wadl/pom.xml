@@ -106,7 +106,7 @@
                         <goals>
                             <goal>javadoc</goal>
                         </goals>
-                        <phase>package</phase> 
+                        <phase>compile</phase> 
                     </execution>
                 </executions>
 
@@ -154,7 +154,7 @@
                         <goals>
                             <goal>generate</goal>
                         </goals>
-                        <phase>package</phase> 
+                        <phase>compile</phase> 
                     </execution>
                 </executions>
                 
@@ -311,6 +311,17 @@
                         <artifactId>exec-maven-plugin</artifactId>
                         <version>1.1</version>
                         <executions>
+                            <execution>
+                                <id>copy-docs-to-builddir</id>
+                                <goals>
+                                    <goal>exec</goal>
+                                </goals>
+                                <phase>compile</phase>
+                                <configuration>
+                                    <executable>cp</executable>
+                                    <commandlineArgs>src/main/doc/*.xml target/classes/</commandlineArgs>
+                                </configuration>
+                            </execution>
                             <execution>
                                 <id>prepare-xsltproc</id>
                                 <goals>
