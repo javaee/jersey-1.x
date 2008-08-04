@@ -91,7 +91,7 @@ public class PackagesResourceConfig extends DefaultResourceConfig {
     public PackagesResourceConfig(Map<String, Object> props) {
         this(getPackages(props));
         
-        getProperties().putAll(props);
+        setPropertiesAndFeatures(props);
     }
     
     /**

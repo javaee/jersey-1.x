@@ -87,7 +87,7 @@ public class ClasspathResourceConfig extends DefaultResourceConfig {
     public ClasspathResourceConfig(Map<String, Object> props) {
         this(getPaths(props));
         
-        getProperties().putAll(props);
+        setPropertiesAndFeatures(props);
     }
 
     /**
