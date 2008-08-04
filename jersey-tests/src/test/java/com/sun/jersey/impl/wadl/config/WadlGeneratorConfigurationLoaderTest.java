@@ -116,62 +116,51 @@ public class WadlGeneratorConfigurationLoaderTest extends AbstractResourceTester
             _foo = foo;
         }
 
-        @Override
         public Application createApplication() {
             return null;
         }
 
-        @Override
         public Method createMethod( AbstractResource r, AbstractResourceMethod m ) {
             return null;
         }
 
-        @Override
         public Request createRequest( AbstractResource r,
                 AbstractResourceMethod m ) {
             return null;
         }
 
-        @Override
         public Param createRequestParam( AbstractResource r,
                 AbstractResourceMethod m, Parameter p ) {
             return null;
         }
 
-        @Override
         public RepresentationType createRequestRepresentation(
                 AbstractResource r, AbstractResourceMethod m,
                 MediaType mediaType ) {
             return null;
         }
 
-        @Override
         public Resource createResource( AbstractResource r, String path ) {
             return null;
         }
 
-        @Override
         public Resources createResources() {
             return null;
         }
 
-        @Override
         public Response createResponse( AbstractResource r,
                 AbstractResourceMethod m ) {
             return null;
         }
 
-        @Override
         public String getRequiredJaxbContextPath() {
             return null;
         }
 
-        @Override
         public void init() throws Exception {
             
         }
 
-        @Override
         public void setWadlGeneratorDelegate( WadlGenerator delegate ) {
         }
         

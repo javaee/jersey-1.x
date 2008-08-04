@@ -63,7 +63,7 @@
             <artifactId>maven-wadl-plugin</artifactId>
             <version>${jersey-release-version}</version>
         </dependency>
-
+        
         <dependency>
             <groupId>org.codehaus.jettison</groupId>
             <artifactId>jettison</artifactId>
@@ -243,6 +243,11 @@
                     <artifactId>jaxb-impl</artifactId>
                     <version>2.1</version>
                 </dependency>
+                <dependency>
+                    <groupId>com.sun.net.httpserver</groupId>
+                    <artifactId>http</artifactId>
+                    <version>20070405</version>
+                </dependency>                
             </dependencies>
             <build>
                 <plugins>
