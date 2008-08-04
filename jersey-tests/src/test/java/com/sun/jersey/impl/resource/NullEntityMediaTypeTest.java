@@ -40,20 +40,22 @@ import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.WebResource;
 import com.sun.jersey.api.representation.Form;
 import com.sun.jersey.impl.AbstractResourceTester;
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import javax.ws.rs.FormParam;
 import javax.ws.rs.Path;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 /**
  *
  * @author Paul.Sandoz@Sun.Com
  */
-public class NullEntityTest extends AbstractResourceTester {
+public class NullEntityMediaTypeTest extends AbstractResourceTester {
     
-    public NullEntityTest(String testName) {
+    public NullEntityMediaTypeTest(String testName) {
         super(testName);
     }
 
@@ -139,5 +141,44 @@ public class NullEntityTest extends AbstractResourceTester {
                 getStatus());
         assertEquals(200, r.path("response-entity").post(ClientResponse.class, f).
                 getStatus());
+    }
+    
+    @Path("/")
+    public static class NullMediaTypeResource {
+        @GET
+        @Path("byte")
+        public Response getByte() {
+            byte[] b = new byte[1];
+            b[0] = 65;
+            return Response.ok(b, (MediaType)null).build();
+        }
+        
+        @GET
+        @Path("ByteArrayInputStream")
+        public Response getByteArrayInputStream() {
+            byte[] b = new byte[1];
+            b[0] = 65;
+            return Response.ok(new ByteArrayInputStream(b), (MediaType)null).build();
+        }
+        
+        @GET
+        @Path("String")
+        public Response getString() {
+            return Response.ok("content", (MediaType)null).build();
+        }
+    }
+    
+    public void testNullMediaType() throws IOException {
+        initiateWebApplication(NullMediaTypeResource.class);
+        WebResource r = resource("/");
+        
+        ClientResponse cr = r.path("byte").get(ClientResponse.class);
+        assertEquals(MediaType.APPLICATION_OCTET_STREAM_TYPE, cr.getType());        
+        
+        cr = r.path("ByteArrayInputStream").get(ClientResponse.class);
+        assertEquals(MediaType.APPLICATION_OCTET_STREAM_TYPE, cr.getType());        
+        
+        cr = r.path("String").get(ClientResponse.class);
+        assertEquals(MediaType.TEXT_PLAIN_TYPE, cr.getType());        
     }
 }
