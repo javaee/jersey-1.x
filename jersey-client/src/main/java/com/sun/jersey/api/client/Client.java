@@ -47,6 +47,7 @@ import com.sun.jersey.spi.container.MessageBodyWorkers;
 import com.sun.jersey.spi.inject.SingletonTypeInjectableProvider;
 import com.sun.jersey.spi.service.ComponentContext;
 import com.sun.jersey.spi.service.ComponentProvider;
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Type;
@@ -54,6 +55,12 @@ import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
 import javax.ws.rs.core.Context;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.ext.ContextResolver;
+import javax.ws.rs.ext.ExceptionMapper;
+import javax.ws.rs.ext.MessageBodyReader;
+import javax.ws.rs.ext.MessageBodyWriter;
+import javax.ws.rs.ext.Providers;
 
 /**
  * The HTTP client class for handling requests and responses specified by 
@@ -243,7 +250,31 @@ public final class Client extends Filterable implements ClientHandler {
                 MessageBodyWorkers.class, bodyContext));
         bodyContext.init();
         
-        // Inject resources on root client handler
+        Providers p = new Providers() {
+            public <T> MessageBodyReader<T> getMessageBodyReader(Class<T> c, Type t, 
+                    Annotation[] as, MediaType m) {
+                return bodyContext.getMessageBodyReader(c, t, as, m);
+            }
+
+            public <T> MessageBodyWriter<T> getMessageBodyWriter(Class<T> c, Type t, 
+                    Annotation[] as, MediaType m) {
+                return bodyContext.getMessageBodyWriter(c, t, as, m);
+            }
+
+            public <T> ExceptionMapper<T> getExceptionMapper(Class<T> c) {
+                throw new IllegalArgumentException("This method is not supported on the client side");
+            }
+
+            public <T> ContextResolver<T> getContextResolver(Class<T> ct, 
+                    Class<?> ot, MediaType m) {
+                throw new UnsupportedOperationException("Not supported yet.");
+            }
+        };
+        injectableFactory.add(
+                new ContextInjectableProvider<Providers>(
+                Providers.class, p));
+        
+        // Inject on root client handler
         injectResources(root);
     }
         

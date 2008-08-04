@@ -120,6 +120,11 @@ import com.sun.jersey.spi.service.ComponentProvider;
 import com.sun.jersey.spi.service.ComponentProvider.Scope;
 import com.sun.jersey.spi.template.TemplateContext;
 import com.sun.jersey.spi.uri.rules.UriRule;
+import java.lang.annotation.Annotation;
+import javax.ws.rs.ext.ContextResolver;
+import javax.ws.rs.ext.MessageBodyReader;
+import javax.ws.rs.ext.MessageBodyWriter;
+import javax.ws.rs.ext.Providers;
 
 /**
  * A Web application that contains a set of resources, each referenced by 
@@ -601,6 +606,33 @@ public final class WebApplicationImpl implements WebApplication {
                 new ContextInjectableProvider<MessageBodyWorkers>(
                 MessageBodyWorkers.class, bodyFactory));
         bodyFactory.init();
+        
+        Providers p = new Providers() {
+            public <T> MessageBodyReader<T> getMessageBodyReader(Class<T> c, Type t, 
+                    Annotation[] as, MediaType m) {
+                return bodyFactory.getMessageBodyReader(c, t, as, m);
+            }
+
+            public <T> MessageBodyWriter<T> getMessageBodyWriter(Class<T> c, Type t, 
+                    Annotation[] as, MediaType m) {
+                return bodyFactory.getMessageBodyWriter(c, t, as, m);
+            }
+
+            public <T> ExceptionMapper<T> getExceptionMapper(Class<T> c) {
+                if (Throwable.class.isAssignableFrom(c)) 
+                   return exceptionFactory.find((Class<Throwable>)c);
+                else
+                    return null;
+            }
+
+            public <T> ContextResolver<T> getContextResolver(Class<T> ct, 
+                    Class<?> ot, MediaType m) {
+                throw new UnsupportedOperationException("Not supported yet.");
+            }    
+        };
+        injectableFactory.add(
+                new ContextInjectableProvider<Providers>(
+                Providers.class, p));
         
         // Add per-request-based injectable providers
         injectableFactory.add(new CookieParamInjectableProvider());

@@ -65,6 +65,7 @@ import javax.ws.rs.core.SecurityContext;
 import javax.ws.rs.core.UriInfo;
 import javax.ws.rs.ext.MessageBodyWriter;
 import javax.ws.rs.ext.Provider;
+import javax.ws.rs.ext.Providers;
 
 /**
  *
@@ -96,6 +97,8 @@ public class AllInjectablesTest extends AbstractResourceTester {
         
         @Context SecurityContext sc;
         
+        @Context Providers p;
+        
         @GET
         public String get() {
             assertNotNull(rc);
@@ -107,6 +110,7 @@ public class AllInjectablesTest extends AbstractResourceTester {
             assertNotNull(eui);
             assertNotNull(r);
             assertNotNull(sc);
+            assertNotNull(p);
             return "GET";
         }                
     }
@@ -122,7 +126,8 @@ public class AllInjectablesTest extends AbstractResourceTester {
                 @Context UriInfo ui,
                 @Context ExtendedUriInfo eui,
                 @Context Request r,
-                @Context SecurityContext sc) {
+                @Context SecurityContext sc,
+                @Context Providers p) {
             assertNotNull(rc);
             assertNotNull(mbw);
             assertNotNull(tc);
@@ -132,6 +137,7 @@ public class AllInjectablesTest extends AbstractResourceTester {
             assertNotNull(eui);
             assertNotNull(r);
             assertNotNull(sc);
+            assertNotNull(p);
         }                
         
         @GET
@@ -150,7 +156,8 @@ public class AllInjectablesTest extends AbstractResourceTester {
                 @Context UriInfo ui,
                 @Context ExtendedUriInfo eui,
                 @Context Request r,
-                @Context SecurityContext sc) {
+                @Context SecurityContext sc,
+                @Context Providers p) {
             assertNotNull(rc);
             assertNotNull(mbw);
             assertNotNull(tc);
@@ -160,6 +167,7 @@ public class AllInjectablesTest extends AbstractResourceTester {
             assertNotNull(eui);
             assertNotNull(r);
             assertNotNull(sc);
+            assertNotNull(p);
             return "GET";
         }                
     }
@@ -185,6 +193,8 @@ public class AllInjectablesTest extends AbstractResourceTester {
         
         @Context SecurityContext sc;
         
+        @Context Providers p;
+        
         @GET
         public String get() {
             assertNotNull(rc);
@@ -196,6 +206,7 @@ public class AllInjectablesTest extends AbstractResourceTester {
             assertNotNull(eui);
             assertNotNull(r);
             assertNotNull(sc);
+            assertNotNull(p);
             return "GET";
         }                
     }
@@ -211,7 +222,8 @@ public class AllInjectablesTest extends AbstractResourceTester {
                 @Context UriInfo ui,
                 @Context ExtendedUriInfo eui,
                 @Context Request r,
-                @Context SecurityContext sc) {
+                @Context SecurityContext sc,
+                @Context Providers p) {
             assertNotNull(rc);
             assertNotNull(mbw);
             assertNotNull(tc);
@@ -221,6 +233,7 @@ public class AllInjectablesTest extends AbstractResourceTester {
             assertNotNull(eui);
             assertNotNull(r);
             assertNotNull(sc);
+            assertNotNull(p);
         }                
         
         @GET
@@ -289,6 +302,7 @@ public class AllInjectablesTest extends AbstractResourceTester {
             assertNotNull(eui);
             assertNotNull(r);
             assertNotNull(sc);
+            assertNotNull(p);
             arg6.write(arg0.getBytes());
         }
         
@@ -309,6 +323,8 @@ public class AllInjectablesTest extends AbstractResourceTester {
         @Context Request r;        
         
         @Context SecurityContext sc;
+        
+        @Context Providers p;
     }
     
     @Provider
@@ -324,7 +340,8 @@ public class AllInjectablesTest extends AbstractResourceTester {
                 @Context UriInfo ui,
                 @Context ExtendedUriInfo eui,
                 @Context Request r,
-                @Context SecurityContext sc) {
+                @Context SecurityContext sc,
+                @Context Providers p) {
             assertNotNull(rc);
             assertNotNull(mbw);
             assertNotNull(tc);
@@ -334,6 +351,7 @@ public class AllInjectablesTest extends AbstractResourceTester {
             assertNotNull(eui);
             assertNotNull(r);
             assertNotNull(sc);
+            assertNotNull(p);
         }                
         
         public boolean isWriteable(Class<?> arg0, Type arg1, Annotation[] arg2) {
@@ -362,7 +380,8 @@ public class AllInjectablesTest extends AbstractResourceTester {
                 @Context UriInfo ui,
                 @Context ExtendedUriInfo eui,
                 @Context Request r,
-                @Context SecurityContext sc) {
+                @Context SecurityContext sc,
+                @Context Providers p) {
             assertNotNull(rc);
             assertNotNull(mbw);
             assertNotNull(tc);
@@ -372,6 +391,7 @@ public class AllInjectablesTest extends AbstractResourceTester {
             assertNotNull(eui);
             assertNotNull(r);
             assertNotNull(sc);
+            assertNotNull(p);
         }                
         
         public StringWriterMutlipleConstructor(
@@ -407,7 +427,8 @@ public class AllInjectablesTest extends AbstractResourceTester {
                 @Context UriInfo ui,
                 @Context ExtendedUriInfo eui,
                 @Context Request r,
-                @Context SecurityContext sc) {
+                @Context SecurityContext sc,
+                @Context Providers p) {
             assertNotNull(rc);
             assertNotNull(mbw);
             assertNotNull(tc);
@@ -417,6 +438,7 @@ public class AllInjectablesTest extends AbstractResourceTester {
             assertNotNull(eui);
             assertNotNull(r);
             assertNotNull(sc);
+            assertNotNull(p);
         }                
         
         public StringWriterMutliplePartialConstructor(
@@ -428,7 +450,8 @@ public class AllInjectablesTest extends AbstractResourceTester {
                 @Context UriInfo ui,
                 @Context ExtendedUriInfo eui,
                 @Context Request r,
-                @Context SecurityContext sc) {
+                @Context SecurityContext sc,
+                @Context Providers p) {
             assertTrue(false);
         }                
         
