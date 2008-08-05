@@ -34,7 +34,6 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-
 package com.sun.jersey.impl.inject;
 
 import com.sun.jersey.impl.AbstractResourceTester;
@@ -43,9 +42,12 @@ import java.io.IOException;
 import java.math.BigInteger;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.ext.ContextResolver;
 import javax.ws.rs.ext.Provider;
+import javax.ws.rs.ext.Providers;
 
 /**
  *
@@ -59,26 +61,22 @@ public class ContextResolverTest extends AbstractResourceTester {
 
     @Provider
     public static class IntegerContextResolver implements ContextResolver<String> {
-
         public String getContext(Class<?> objectType) {
             if (Integer.class == objectType)
                 return objectType.getName();
             else 
                 return null;
         }
-        
     }
     
     @Provider
     public static class BigIntegerContextResolver implements ContextResolver<String> {
-
         public String getContext(Class<?> objectType) {
             if (BigInteger.class == objectType)
                 return objectType.getName();
             else 
                 return null;
         }
-        
     }
     
     @Path("/")
@@ -93,11 +91,14 @@ public class ContextResolverTest extends AbstractResourceTester {
     
     @Path("/")
     public static class ContextResource {
+        @Context Providers p;
         
         @Context ContextResolver<String> cr;
         
         @GET
         public String get() {
+            ContextResolver<String> _cr = p.getContextResolver(String.class, null, null);
+            assertEquals(_cr, cr);
             return cr.getContext(Integer.class);
         }        
         
@@ -138,4 +139,83 @@ public class ContextResolverTest extends AbstractResourceTester {
         
         assertEquals("null", resource("/null").get(String.class));        
     }   
+    
+    
+    @Provider
+    @Produces("application/one")
+    public static class IntegerContextResolverMediaOne implements ContextResolver<String> {
+        public String getContext(Class<?> objectType) {
+            if (Integer.class == objectType)
+                return objectType.getName();
+            else 
+                return null;
+        }
+    }
+    
+    @Provider
+    @Produces("application/one")
+    public static class ByteContextResolverMediaOne implements ContextResolver<String> {
+        public String getContext(Class<?> objectType) {
+            if (Byte.class == objectType)
+                return objectType.getName();
+            else 
+                return null;
+        }        
+    }
+    
+    @Provider
+    @Produces("application/two")
+    public static class BigIntegerContextResolverMediaTwo implements ContextResolver<String> {
+        public String getContext(Class<?> objectType) {
+            if (BigInteger.class == objectType)
+                return objectType.getName();
+            else 
+                return null;
+        }
+    }
+        
+    @Path("/")
+    public static class ContextMediaResource {        
+        ContextResolver<String> crOne;
+        ContextResolver<String> crTwo;
+
+        public ContextMediaResource(@Context Providers p) {
+            crOne = p.getContextResolver(String.class, null, MediaType.valueOf("application/one"));
+            assertNotNull(crOne);
+            crTwo = p.getContextResolver(String.class, null, MediaType.valueOf("application/two"));
+            assertNotNull(crTwo);            
+        }
+        
+        @GET
+        public String get() {
+            assertNull(crOne.getContext(BigInteger.class));
+            return crOne.getContext(Integer.class);
+        }        
+        
+        @GET @Path("byte")
+        public String getByte() {
+            assertNull(crOne.getContext(BigInteger.class));
+            return crOne.getContext(Byte.class);
+        }
+        
+        @GET @Path("big")
+        public String getBig() {
+            assertNull(crTwo.getContext(Integer.class));
+            assertNull(crTwo.getContext(Byte.class));
+            return crTwo.getContext(BigInteger.class);
+        }
+    }
+    
+    public void testMedia() throws IOException {
+        initiateWebApplication(ContextMediaResource.class,
+                ByteContextResolverMediaOne.class, 
+                IntegerContextResolverMediaOne.class, 
+                BigIntegerContextResolverMediaTwo.class);
+        
+        assertEquals("java.lang.Integer", resource("/").get(String.class));        
+        
+        assertEquals("java.lang.Byte", resource("/byte").get(String.class));
+        
+        assertEquals("java.math.BigInteger", resource("/big").get(String.class));        
+    }    
 }

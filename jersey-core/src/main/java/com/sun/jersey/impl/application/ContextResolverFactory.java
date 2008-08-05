@@ -34,20 +34,25 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-
 package com.sun.jersey.impl.application;
 
-import com.sun.jersey.spi.inject.SingletonTypeInjectableProvider;
+import com.sun.jersey.api.core.HttpContext;
+import com.sun.jersey.impl.model.MediaTypeHelper;
+import com.sun.jersey.spi.inject.Injectable;
+import com.sun.jersey.spi.inject.InjectableProvider;
+import com.sun.jersey.spi.service.ComponentContext;
+import com.sun.jersey.spi.service.ComponentProvider.Scope;
+import java.lang.annotation.Annotation;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.logging.Logger;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.ext.ContextResolver;
 
 /**
@@ -55,88 +60,172 @@ import javax.ws.rs.ext.ContextResolver;
  * @author Paul.Sandoz@Sun.Com
  */
 public final class ContextResolverFactory {
-    private static final Logger LOGGER = Logger.getLogger(ContextResolverFactory.class.getName());
-    
-    private static final class ContextResolverInjectableProvider
-            extends SingletonTypeInjectableProvider<Context, ContextResolver> {
-        ContextResolverInjectableProvider(Type t, ContextResolver instance) {
-            super(t, instance);
-        }
-    }
-    
-    private final List<ContextResolverInjectableProvider> injectables = 
-            new ArrayList<ContextResolverInjectableProvider>();
+    private final Map<Type, Map<MediaType, ContextResolver>> resolver;
     
     public ContextResolverFactory(ComponentProviderCache componentProviderCache,
-            InjectableProviderFactory ipf) {        
+            InjectableProviderFactory ipf) {
+        Map<Type, Map<MediaType, Set<ContextResolver>>> rs = 
+                new HashMap<Type, Map<MediaType, Set<ContextResolver>>>();
+        
         Set<ContextResolver> providers = 
                 componentProviderCache.getProviders(ContextResolver.class);
-        Map<ParameterizedType, List<ContextResolver<?>>> typeMap = 
-                new HashMap<ParameterizedType, List<ContextResolver<?>>>();
         for (ContextResolver provider : providers) {
-            Set<ParameterizedType> types = getTypes(provider.getClass());
+            MediaType[] ms = getAnnotationValues(provider.getClass(), Produces.class);
+            ParameterizedType pType = getType(provider.getClass());
+            Type type = pType.getActualTypeArguments()[0];
+            // TODO check if concrete type
             
-            addTypes(typeMap, types, provider);
+            Map<MediaType, Set<ContextResolver>> mr = rs.get(type);
+            if (mr == null) {
+                mr = new HashMap<MediaType, Set<ContextResolver>>();
+                rs.put(type, mr);
+            }
+            for (MediaType m : ms) {
+                Set<ContextResolver> sr = mr.get(m);
+                if (sr == null) {
+                    sr = new HashSet<ContextResolver>();
+                    mr.put(m, sr);
+                }
+                sr.add(provider);                
+            }
         }
         
-        reduceToInjectables(typeMap);
+        // Reduce set of two or more context resolvers for same type and
+        // media type
         
-        for (ContextResolverInjectableProvider i : injectables) {
-            ipf.add(i);
+        this.resolver = new HashMap<Type, Map<MediaType, ContextResolver>>(4);
+        for (Map.Entry<Type, Map<MediaType, Set<ContextResolver>>> e : rs.entrySet()) {
+            Map<MediaType, ContextResolver> mr = new HashMap<MediaType, ContextResolver>(4);
+            resolver.put(e.getKey(), mr);
+            
+            for (Map.Entry<MediaType, Set<ContextResolver>> f : e.getValue().entrySet()) {
+                mr.put(f.getKey(), reduce(f.getValue()));
+            }
         }
+        
+        // Add injectable
+        
+        ipf.add(new InjectableProvider<Context, Type>() {
+            public Scope getScope() {
+                return Scope.Singleton;
+            }
+
+            public Injectable getInjectable(ComponentContext ic, Context ac, Type c) {
+                if (!(c instanceof ParameterizedType))
+                    return null;                
+                ParameterizedType pType = (ParameterizedType)c;
+                if (pType.getRawType() != ContextResolver.class)
+                    return null;
+                Type type = pType.getActualTypeArguments()[0];
+                // TODO check if concrete type
+                
+                final ContextResolver cr = getResolver(ic, type);
+                if (cr == null) return null;
+                
+                return new Injectable() {
+                    public Object getValue(HttpContext context) {
+                        return cr;
+                    }
+                };
+            }
+            
+            ContextResolver getResolver(ComponentContext ic, Type type) {
+                ContextResolver cr = null;
+                MediaType[] ms = getMediaTypes(ic);
+                if (ms.length == 1) {
+                    cr = resolve(type, ms[0]);
+                    if (cr == null)
+                        return null;
+                } else {
+                    Set<ContextResolver> scr = new HashSet<ContextResolver>();
+                    for (MediaType m : ms) {
+                        cr = resolve(type, ms[0]);
+                        if (cr != null) scr.add(cr);
+                    }
+                    if (scr.isEmpty())
+                        return null;
+                    cr = new ContextResolverAdapter(scr);
+                }        
+                return cr;
+            }
+            
+            MediaType[] getMediaTypes(ComponentContext ic) {
+                String[] mts = null;
+                for (Annotation a : ic.getAnnotations()) {
+                    if (a instanceof Produces) {
+                        Produces p = (Produces)a;
+                        mts = p.value();
+                    }
+                }
+                
+                MediaType[] mt = null;
+                if (mts == null) {
+                    mt = new MediaType[1];
+                    mt[0] = MediaTypeHelper.GENERAL_ACCEPT_MEDIA_TYPE;
+                } else {
+                    mt = new MediaType[mts.length];
+                    for (int i = 0; i < mts.length; i++)
+                        mt[i] = MediaType.valueOf(mts[i]);
+                }
+                return mt;
+            }            
+        });
     }
     
-    private Set<ParameterizedType> getTypes(Class providerClass) {
-        Set<ParameterizedType> types = new HashSet<ParameterizedType>();
-        
-        outer: while (providerClass != null) {
+    private ParameterizedType getType(Class providerClass) {
+        while (providerClass != null) {
             for (Type type : providerClass.getGenericInterfaces()) {
                 if (type instanceof ParameterizedType) {
                     ParameterizedType pType = (ParameterizedType)type;
                     if (pType.getRawType() == ContextResolver.class) {
-                        // TODO check if type argument is concrete 
-                        types.add(pType);
-                        break outer;
+                        return pType;
                     }
                 }
             }
             providerClass = providerClass.getSuperclass();
         }
         
-        return types;
+        throw new IllegalArgumentException();
     }
     
-    private void addTypes(
-            Map<ParameterizedType, List<ContextResolver<?>>> typeMap,
-            Set<ParameterizedType> types, 
-            ContextResolver<?> provider) {
-        for (ParameterizedType type : types) {
-            List<ContextResolver<?>> l = typeMap.get(type);
-            if (l == null) {
-                l = new ArrayList<ContextResolver<?>>();
-                typeMap.put(type, l);
-            }
-            l.add(provider);
+    private MediaType[] getAnnotationValues(Class<?> clazz, Class<?> annotationClass) {
+        String[] mts = _getAnnotationValues(clazz, annotationClass);
+        if (mts == null) {
+            MediaType[] mt = new MediaType[1];
+            mt[0] = MediaTypeHelper.GENERAL_ACCEPT_MEDIA_TYPE;
+            return mt;
         }
+        
+        MediaType[] mt = new MediaType[mts.length];
+        for (int i = 0; i < mts.length; i++)
+            mt[i] = MediaType.valueOf(mts[i]);
+        
+        return mt;
     }
     
-    private void reduceToInjectables(Map<ParameterizedType, List<ContextResolver<?>>> typeMap) {
-        for (Map.Entry<ParameterizedType, List<ContextResolver<?>>> e : typeMap.entrySet()) {            
-            injectables.add(
-                    new ContextResolverInjectableProvider(e.getKey(), reduce(e.getValue())));
+    private String[] _getAnnotationValues(Class<?> clazz, Class<?> annotationClass) {
+        String values[] = null;
+        if (annotationClass.equals(Consumes.class)) {
+            Consumes consumes = clazz.getAnnotation(Consumes.class);
+            if (consumes != null)
+                values = consumes.value();
+        } else if (annotationClass.equals(Produces.class)) {
+            Produces produces = clazz.getAnnotation(Produces.class);
+            if (produces != null)
+                values = produces.value();
         }
+        return values;
     }
     
     private static final class ContextResolverAdapter implements ContextResolver {
-
-        private final List<ContextResolver<?>> crs;
+        private final Set<ContextResolver> crs;
         
-        ContextResolverAdapter(List<ContextResolver<?>> crs) {
+        ContextResolverAdapter(Set<ContextResolver> crs) {
             this.crs = crs;
         }
         
         public Object getContext(Class objectType) {
-            for (ContextResolver<?> cr : crs) {
+            for (ContextResolver cr : crs) {
                 Object c = cr.getContext(objectType);
                 if (c != null) return c;
             }
@@ -144,11 +233,19 @@ public final class ContextResolverFactory {
         }        
     }
     
-    private ContextResolver reduce(List<ContextResolver<?>> crs) {
-        if (crs.size() == 1) {
-            return crs.get(0);
+    private ContextResolver reduce(Set<ContextResolver> r) {
+        if (r.size() == 1) {
+            return r.iterator().next();
         } else {
-            return new ContextResolverAdapter(crs);                
-        }        
+            return new ContextResolverAdapter(r);                
+        }                
     }
+
+    
+    public <T> ContextResolver<T> resolve(Type t, MediaType m) {
+        Map<MediaType, ContextResolver> x = resolver.get(t);
+        if (x == null) return null;
+        if (m == null) m = MediaTypeHelper.GENERAL_ACCEPT_MEDIA_TYPE;
+        return x.get(m);
+    }    
 }

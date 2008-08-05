@@ -241,8 +241,9 @@ public final class Client extends Filterable implements ClientHandler {
 
 
         // Obtain all context resolvers
-        new ContextResolverFactory(cpc, injectableFactory);
-
+        final ContextResolverFactory crf = new ContextResolverFactory(cpc, 
+                injectableFactory);
+        
         // Obtain all message body readers/writers
         this.bodyContext = new MessageBodyFactory(cpc);
         // Allow injection of message body context
@@ -267,7 +268,7 @@ public final class Client extends Filterable implements ClientHandler {
 
             public <T> ContextResolver<T> getContextResolver(Class<T> ct, 
                     Class<?> ot, MediaType m) {
-                throw new UnsupportedOperationException("Not supported yet.");
+                return crf.resolve(ct, m);
             }
         };
         injectableFactory.add(

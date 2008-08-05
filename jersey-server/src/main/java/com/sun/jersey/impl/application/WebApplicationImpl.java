@@ -586,8 +586,9 @@ public final class WebApplicationImpl implements WebApplication {
         injectableFactory.add(new QueryParamInjectableProvider());
 
         // Obtain all context resolvers
-        new ContextResolverFactory(cpc, injectableFactory);
-
+        final ContextResolverFactory crf = new ContextResolverFactory(cpc, 
+                injectableFactory);
+        
         // Obtain all the templates
         this.templateContext = new TemplateFactory(cpc);
         // Allow injection of template context
@@ -627,8 +628,8 @@ public final class WebApplicationImpl implements WebApplication {
 
             public <T> ContextResolver<T> getContextResolver(Class<T> ct, 
                     Class<?> ot, MediaType m) {
-                throw new UnsupportedOperationException("Not supported yet.");
-            }    
+                return crf.resolve(ct, m);
+            }
         };
         injectableFactory.add(
                 new ContextInjectableProvider<Providers>(
