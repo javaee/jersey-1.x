@@ -74,6 +74,8 @@ public abstract class AbstractTypeTester extends AbstractResourceTester {
         byte[] outBytes = (byte[])
                 rib.getProperties().get("response.entity");
         
+        System.out.println("request.entity: \"" + new String(inBytes) + "\"");
+        System.out.println("response.entity: \"" + new String(outBytes) + "\"");
         if (verify) _verify(inBytes, outBytes);
     }
     
