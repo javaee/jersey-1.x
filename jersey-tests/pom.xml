@@ -46,6 +46,9 @@
     <artifactId>jersey-tests</artifactId>
     <packaging>pom</packaging>
     <name>jersey-tests</name>
+    <description>
+        Functional tests using JUnit.
+    </description>
     <dependencies>
         <dependency>
             <groupId>junit</groupId>

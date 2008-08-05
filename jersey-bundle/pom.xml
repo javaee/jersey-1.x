@@ -47,6 +47,12 @@
     <artifactId>jersey-bundle</artifactId>
     <packaging>jar</packaging>
     <name>jersey-bundle</name>
+    <description>
+        A bundle containing code of all jar-based modules that provide 
+        JAX-RS and Jersey-related features. Such a bundle is useful for
+        developers that do not use Maven's dependency system.
+        The bundle does not include code for contributes, tests and samples.
+    </description>
     <dependencies>
         <dependency>
             <groupId>com.sun.jersey</groupId>

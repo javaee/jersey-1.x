@@ -49,7 +49,7 @@
     <packaging>pom</packaging>
     <name>Contributions to Jersey</name>
     <description>
-        Projects the provide additional functionality to jersey, like integration
+        Projects that provide additional functionality to jersey, like integration
         with other projects/frameworks.
     </description>
     <modules>
