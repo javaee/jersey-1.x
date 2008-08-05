@@ -53,6 +53,8 @@
     <modules>
         <module>helloworld</module>
         <module>helloworld-webapp</module>
+        <!--
         <module>generate-wadl</module>
+        -->
     </modules>
 </project>
