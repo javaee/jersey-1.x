@@ -131,6 +131,8 @@ public class EntityTypesTest extends AbstractTypeTester {
     }
     
     @Path("/")
+    @Produces("application/xml")
+    @Consumes("application/xml")
     public static class JAXBBeanResource extends AResource<JAXBBean> {}
     
     public void testJAXBBeanRepresentation() {
@@ -138,6 +140,8 @@ public class EntityTypesTest extends AbstractTypeTester {
     }
     
     @Path("/")
+    @Produces("application/xml")
+    @Consumes("application/xml")
     public static class JAXBElementBeanResource extends AResource<JAXBElement<JAXBBeanType>> {}
     
     public void testJAXBElementBeanRepresentation() {
