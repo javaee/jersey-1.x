@@ -67,8 +67,8 @@ public class OverrideProviderTest extends AbstractResourceTester {
     }
     
     @Provider
-    @Produces({"text/plain", "*/*"})
-    @Consumes({"text/plain", "*/*"})    
+    @Produces("text/plain")
+    @Consumes("text/plain")    
     public static class StringProvider extends AbstractMessageReaderWriterProvider<String> {
         public boolean isReadable(Class<?> type, Type genericType, Annotation annotations[]) {
             return type == String.class;
@@ -117,8 +117,8 @@ public class OverrideProviderTest extends AbstractResourceTester {
     }    
     
     @Provider
-    @Produces({"application/xml", "*/*"})
-    @Consumes({"application/xml", "*/*"})
+    @Produces("application/xml")
+    @Consumes("application/xml")
     public static class JAXBBeanProvider extends AbstractMessageReaderWriterProvider<JAXBBean> {
         public boolean isReadable(Class<?> type, Type genericType, Annotation annotations[]) {
             return JAXBBean.class.isAssignableFrom(type);
