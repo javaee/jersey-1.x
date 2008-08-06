@@ -303,47 +303,5 @@ public abstract class WadlGeneratorConfig {
         }
         
     }
-    
-//    public static void main( String[] args ) {
-//        test1();
-//    }
-//
-//    private static void test3() {
-//        final Pattern pattern = Pattern.compile( "((\\w+)=([^,]+))" );
-//        final Matcher matcher = pattern.matcher( "test11=foo11,test12=foo12" );
-//        // System.out.println( matcher.matches() );
-//
-//        while( matcher.find() ) {
-//            System.out.println( matcher.group(2) );
-//            System.out.println( matcher.group(3) );
-//        }
-//    }
-//
-//    private static void test2() {
-//        final Pattern pattern = Pattern.compile( "((\\w+)\\[([^]]+)\\])" );
-//        final Matcher matcher = pattern.matcher( "test[test11=foo11,test12=foo12];test2[test21]" );
-//        // System.out.println( matcher.matches() );
-//        
-//        while( matcher.find() ) {
-//            System.out.println( matcher.groupCount() );
-//            System.out.println( matcher.group( 1 ) );
-//            System.out.println( matcher.group( 2 ) );
-//            System.out.println( matcher.group( 3 ) );
-//        }
-//    }
-//
-//    private static void test1() {
-//        final Pattern pattern = Pattern.compile( "[\\w.]+\\[\\w+=[^,\\]]+(,\\w+=[^,\\]]+)*\\](?:\\s*;\\s*(?:[\\w.]+\\[\\w+=[^,\\]]+(,\\w+=[^,\\]]+)*\\]))*" );
-//        // final Pattern pattern = Pattern.compile( "[\\w.]+\\[\\w+=[^,\\]]+\\]" );
-//        // final Pattern pattern = Pattern.compile( "\\w+\\[\\w+=[^,\\]]+(,\\w+=[^,]]+)*\\](?:\\s*;\\s*(?:\\w+\\[[^]]+\\]))*" );
-//        final Matcher matcher = pattern.matcher( "test[test=foo,test1=foo1] ; test2[test2=bar]; test3[test3=baz,test31=baz31]" );
-//        System.out.println( matcher.matches() );
-//
-//        final Matcher matcher2 = pattern.matcher( "com.sun.jersey.impl.wadl.generators.WadlGeneratorApplicationDoc" +
-//        		"[applicationDocsFile=classpath:/src/main/api-doc/application-doc.xml]" );
-//        System.out.println( matcher2.matches() );
-//        
-//    }
-    
 
 }
