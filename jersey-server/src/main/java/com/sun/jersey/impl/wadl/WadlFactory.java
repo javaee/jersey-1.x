@@ -44,9 +44,9 @@ import java.util.logging.Logger;
 
 import com.sun.jersey.api.core.ResourceConfig;
 import com.sun.jersey.api.model.AbstractResource;
+import com.sun.jersey.api.wadl.config.WadlGeneratorConfigLoader;
 import com.sun.jersey.impl.model.method.ResourceMethod;
 import com.sun.jersey.impl.uri.PathPattern;
-import com.sun.jersey.impl.wadl.config.WadlGeneratorConfigLoader;
 
 /**
  *

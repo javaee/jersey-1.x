@@ -34,7 +34,7 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-package com.sun.jersey.impl.wadl.config;
+package com.sun.jersey.api.wadl.config;
 
 import java.util.logging.Logger;
 

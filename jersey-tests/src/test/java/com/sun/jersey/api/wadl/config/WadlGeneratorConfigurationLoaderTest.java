@@ -39,17 +39,21 @@
  * and open the template in the editor.
  */
 
-package com.sun.jersey.impl.wadl.config;
+package com.sun.jersey.api.wadl.config;
 
-import java.io.File;
-import java.net.URL;
-import java.util.Properties;
+import java.net.URISyntaxException;
+import java.util.List;
 
 import javax.ws.rs.core.MediaType;
 
+import com.sun.jersey.api.core.DefaultResourceConfig;
+import com.sun.jersey.api.core.ResourceConfig;
 import com.sun.jersey.api.model.AbstractResource;
 import com.sun.jersey.api.model.AbstractResourceMethod;
 import com.sun.jersey.api.model.Parameter;
+import com.sun.jersey.api.wadl.config.WadlGeneratorConfig;
+import com.sun.jersey.api.wadl.config.WadlGeneratorConfigLoader;
+import com.sun.jersey.api.wadl.config.WadlGeneratorDescription;
 import com.sun.jersey.impl.AbstractResourceTester;
 import com.sun.jersey.impl.wadl.WadlGenerator;
 import com.sun.research.ws.wadl.Application;
@@ -68,87 +72,49 @@ import com.sun.research.ws.wadl.Response;
  * @author <a href="mailto:martin.grotzke@freiheit.com">Martin Grotzke</a>
  * @version $Id$
  */
-public class WadlGeneratorLoaderTest extends AbstractResourceTester {
+public class WadlGeneratorConfigurationLoaderTest extends AbstractResourceTester {
     
-    public WadlGeneratorLoaderTest(String testName) {
+    public WadlGeneratorConfigurationLoaderTest(String testName) {
         super(testName);
     }
     
-    public void testLoadFileFromClasspathRelative() throws Exception {
+    public void testLoadConfigClass() throws URISyntaxException {
         
-        final Properties props = new Properties();
-        props.put( "testFile", "classpath:testfile.xml" );
-        final WadlGeneratorDescription description = new WadlGeneratorDescription( MyWadlGenerator2.class, props );
+        final ResourceConfig resourceConfig = new DefaultResourceConfig();
+        resourceConfig.getProperties().put( ResourceConfig.PROPERTY_WADL_GENERATOR_CONFIG, MyWadlGeneratorConfig.class.getName() );
         
-        final WadlGenerator wadlGenerator = WadlGeneratorLoader.loadWadlGeneratorDescriptions( description );
-        assertEquals( MyWadlGenerator2.class, wadlGenerator.getClass() );
+        final WadlGenerator wadlGenerator = WadlGeneratorConfigLoader.loadWadlGeneratorsFromConfig( resourceConfig );
+        assertEquals( MyWadlGenerator.class, wadlGenerator.getClass() );
 
-        final URL resource = getClass().getResource( "testfile.xml" );
-        assertEquals( new File( resource.toURI() ).getAbsolutePath(), ((MyWadlGenerator2)wadlGenerator).getTestFile().getAbsolutePath() );
-        
     }
     
-    public void testLoadFileFromClasspathAbsolute() throws Exception {
+    public void testLoadConfigInstance() {
         
-        final Properties props = new Properties();
-        final String path = "classpath:/" + getClass().getPackage().getName().replaceAll( "\\.", "/" ) + "/testfile.xml";
-        props.put( "testFile", path );
-        final WadlGeneratorDescription description = new WadlGeneratorDescription( MyWadlGenerator2.class, props );
+        final WadlGeneratorConfig config = WadlGeneratorConfig.generator( new MyWadlGenerator() ).build();
         
-        final WadlGenerator wadlGenerator = WadlGeneratorLoader.loadWadlGeneratorDescriptions( description );
-        assertEquals( MyWadlGenerator2.class, wadlGenerator.getClass() );
-
-        final URL resource = getClass().getResource( "testfile.xml" );
-        assertEquals( new File( resource.toURI() ).getAbsolutePath(), ((MyWadlGenerator2)wadlGenerator).getTestFile().getAbsolutePath() );
+        final ResourceConfig resourceConfig = new DefaultResourceConfig();
+        resourceConfig.getProperties().put( ResourceConfig.PROPERTY_WADL_GENERATOR_CONFIG, config );
         
+        final WadlGenerator wadlGenerator = WadlGeneratorConfigLoader.loadWadlGeneratorsFromConfig( resourceConfig );
+        assertEquals( config.getWadlGenerator(), wadlGenerator );
     }
     
-    public void testLoadFileFromAbsolutePath() throws Exception {
+    static class MyWadlGenerator implements WadlGenerator {
         
-        final URL resource = getClass().getResource( "testfile.xml" );
-        
-        final Properties props = new Properties();
-        final String path = new File( resource.toURI() ).getAbsolutePath();
-        props.put( "testFile", path );
-        final WadlGeneratorDescription description = new WadlGeneratorDescription( MyWadlGenerator2.class, props );
-        
-        final WadlGenerator wadlGenerator = WadlGeneratorLoader.loadWadlGeneratorDescriptions( description );
-        assertEquals( MyWadlGenerator2.class, wadlGenerator.getClass() );
-
-        assertEquals( new File( resource.toURI() ).getAbsolutePath(), ((MyWadlGenerator2)wadlGenerator).getTestFile().getAbsolutePath() );
-        
-    }
-    
-    static class MyWadlGenerator2 implements WadlGenerator {
-
-        
-        private File _testFile;
-        private WadlGenerator _delegate;
+        private String _foo;
 
         /**
-         * @param testFile the testFile to set
+         * @return the foo
          */
-        public void setTestFile( File testFile ) {
-            _testFile = testFile;
-        }
-        
-        public File getTestFile() {
-            return _testFile;
-        }
-
-        public void init() throws Exception {
-            
-        }
-
-        public void setWadlGeneratorDelegate( WadlGenerator delegate ) {
-            _delegate = delegate;
+        public String getFoo() {
+            return _foo;
         }
 
         /**
-         * @return the delegate
+         * @param foo the foo to set
          */
-        public WadlGenerator getDelegate() {
-            return _delegate;
+        public void setFoo( String foo ) {
+            _foo = foo;
         }
 
         public Application createApplication() {
@@ -191,7 +157,25 @@ public class WadlGeneratorLoaderTest extends AbstractResourceTester {
         public String getRequiredJaxbContextPath() {
             return null;
         }
+
+        public void init() throws Exception {
+            
+        }
+
+        public void setWadlGeneratorDelegate( WadlGenerator delegate ) {
+        }
         
+    }
+
+    
+    static class MyWadlGeneratorConfig extends WadlGeneratorConfig {
+
+        @Override
+        public List<WadlGeneratorDescription> configure() {
+            return generator( MyWadlGenerator.class )
+            .prop( "foo", "bar" )
+            .descriptions();
+        }
     }
     
 }

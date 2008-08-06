@@ -160,7 +160,7 @@ public abstract class ResourceConfig extends ApplicationConfig {
      * to be used by the {@link com.sun.jersey.impl.wadl.WadlFactory}.
      * <p>
      * The type of this property must be a subclass or an instance of a subclass of
-     * {@link com.sun.jersey.impl.wadl.config.WadlGeneratorConfig}.
+     * {@link com.sun.jersey.api.wadl.config.WadlGeneratorConfig}.
      * </p>
      * <p>
      * If this property is not set the default wadl generator will be used for generating wadl.

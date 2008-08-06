@@ -19,7 +19,7 @@ import com.sun.jersey.api.container.ContainerFactory;
 import com.sun.jersey.api.container.httpserver.HttpServerFactory;
 import com.sun.jersey.api.core.PackagesResourceConfig;
 import com.sun.jersey.api.core.ResourceConfig;
-import com.sun.jersey.impl.wadl.config.WadlGeneratorConfig;
+import com.sun.jersey.api.wadl.config.WadlGeneratorConfig;
 import com.sun.jersey.impl.wadl.generators.WadlGeneratorApplicationDoc;
 import com.sun.jersey.impl.wadl.generators.WadlGeneratorGrammarsSupport;
 import com.sun.jersey.impl.wadl.generators.resourcedoc.WadlGeneratorResourceDocSupport;

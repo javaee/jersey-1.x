@@ -39,7 +39,7 @@
  * and open the template in the editor.
  */
 
-package com.sun.jersey.impl.wadl.config;
+package com.sun.jersey.api.wadl.config;
 
 import java.util.List;
 
@@ -50,6 +50,8 @@ import junit.framework.TestCase;
 import com.sun.jersey.api.model.AbstractResource;
 import com.sun.jersey.api.model.AbstractResourceMethod;
 import com.sun.jersey.api.model.Parameter;
+import com.sun.jersey.api.wadl.config.WadlGeneratorConfig;
+import com.sun.jersey.api.wadl.config.WadlGeneratorDescription;
 import com.sun.jersey.impl.wadl.WadlGenerator;
 import com.sun.research.ws.wadl.Application;
 import com.sun.research.ws.wadl.Method;
