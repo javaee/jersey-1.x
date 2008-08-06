@@ -19,6 +19,10 @@ import com.sun.jersey.api.container.ContainerFactory;
 import com.sun.jersey.api.container.httpserver.HttpServerFactory;
 import com.sun.jersey.api.core.PackagesResourceConfig;
 import com.sun.jersey.api.core.ResourceConfig;
+import com.sun.jersey.impl.wadl.config.WadlGeneratorConfig;
+import com.sun.jersey.impl.wadl.generators.WadlGeneratorApplicationDoc;
+import com.sun.jersey.impl.wadl.generators.WadlGeneratorGrammarsSupport;
+import com.sun.jersey.impl.wadl.generators.resourcedoc.WadlGeneratorResourceDocSupport;
 import com.sun.jersey.samples.generatewadl.resources.ItemsResource;
 import com.sun.net.httpserver.HttpHandler;
 import com.sun.net.httpserver.HttpServer;
@@ -37,19 +41,16 @@ public class Main {
         final Map<String, Object> props = new HashMap<String, Object>();
         props.put( PackagesResourceConfig.PROPERTY_PACKAGES, ItemsResource.class.getPackage().getName() );
         
-//        final WadlGeneratorConfig config = WadlGeneratorConfig
-//            .generator( WadlGeneratorApplicationDoc.class.getName() )
-//            .prop( "applicationDocsFile", "classpath:/application-doc.xml" )
-//            .add()
-//            .generator( WadlGeneratorGrammarsSupport.class.getName() )
-//            .prop( "grammarsFile", "classpath:/application-grammars.xml" )
-//            .add()
-//            .generator( WadlGeneratorResourceDocSupport.class.getName() )
-//            .prop( "resourceDocFile", "classpath:/resourcedoc.xml" )
-//            .add()
-//            .build();
-//        
-//        props.put( ResourceConfig.PROPERTY_WADL_GENERATOR_CONFIG, config );
+        final WadlGeneratorConfig config = WadlGeneratorConfig
+            .generator( WadlGeneratorApplicationDoc.class )
+            .prop( "applicationDocsFile", "classpath:/application-doc.xml" )
+            .generator( WadlGeneratorGrammarsSupport.class )
+            .prop( "grammarsFile", "classpath:/application-grammars.xml" )
+            .generator( WadlGeneratorResourceDocSupport.class )
+            .prop( "resourceDocFile", "classpath:/resourcedoc.xml" )
+            .build();
+        
+        props.put( ResourceConfig.PROPERTY_WADL_GENERATOR_CONFIG, config );
         
         final ResourceConfig resourceConfig = new PackagesResourceConfig( props );
         

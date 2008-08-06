@@ -159,12 +159,9 @@ public abstract class ResourceConfig extends ApplicationConfig {
      * If set the wadl generator configuration that provides that {@link WadlGenerator}
      * to be used by the {@link com.sun.jersey.impl.wadl.WadlFactory}.
      * <p>
-     * The type of this property must be a Java class that implements
-     * {@link com.sun.jersey.impl.wadl.config.WadlGeneratorConfiguration}
-     * or an instance of {@link com.sun.jersey.impl.wadl.config.WadlGeneratorConfiguration}.
+     * The type of this property must be a subclass or an instance of a subclass of
+     * {@link com.sun.jersey.impl.wadl.config.WadlGeneratorConfig}.
      * </p>
-     * A useful implementation of {@link com.sun.jersey.impl.wadl.config.WadlGeneratorConfiguration}
-     * is {@link com.sun.jersey.impl.wadl.config.WadlGeneratorConfig}.
      * <p>
      * If this property is not set the default wadl generator will be used for generating wadl.
      * </p>

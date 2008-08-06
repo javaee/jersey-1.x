@@ -104,9 +104,8 @@ class WadlGeneratorLoader {
     private static WadlGenerator loadWadlGenerator(
             WadlGeneratorDescription wadlGeneratorDescription,
             com.sun.jersey.impl.wadl.WadlGenerator wadlGeneratorDelegate ) throws Exception {
-        LOGGER.info( "Loading wadlGenerator " + wadlGeneratorDescription.getClassName() );
-        final Class<?> clazz = Class.forName( wadlGeneratorDescription.getClassName(), true, Thread.currentThread().getContextClassLoader() );
-        final WadlGenerator generator = clazz.asSubclass( WadlGenerator.class ).newInstance();
+        LOGGER.info( "Loading wadlGenerator " + wadlGeneratorDescription.getGeneratorClass().getName() );
+        final WadlGenerator generator = wadlGeneratorDescription.getGeneratorClass().newInstance();
         generator.setWadlGeneratorDelegate( wadlGeneratorDelegate );
         if ( wadlGeneratorDescription.getProperties() != null
                 && !wadlGeneratorDescription.getProperties().isEmpty() ) {

@@ -36,8 +36,6 @@
  */
 package com.sun.jersey.impl.wadl.config;
 
-import java.lang.reflect.Constructor;
-import java.util.Map;
 import java.util.logging.Logger;
 
 import com.sun.jersey.api.core.ResourceConfig;
@@ -45,17 +43,17 @@ import com.sun.jersey.impl.wadl.WadlGenerator;
 import com.sun.jersey.impl.wadl.WadlGeneratorImpl;
 
 /**
- * Loads a {@link WadlGeneratorConfiguration} and provides access to the {@link WadlGenerator}
- * provides by the loaded {@link WadlGeneratorConfiguration}.<br/>
- * If no {@link WadlGeneratorConfiguration} is provided, the default {@link WadlGenerator}
+ * Loads a {@link WadlGeneratorConfig} and provides access to the {@link WadlGenerator}
+ * provided by the loaded {@link WadlGeneratorConfig}.<br/>
+ * If no {@link WadlGeneratorConfig} is provided, the default {@link WadlGenerator}
  * will be loaded.<br />
  * 
  * @author <a href="mailto:martin.grotzke@freiheit.com">Martin Grotzke</a>
  * @version $Id$
  */
-public class WadlGeneratorConfigurationLoader {
+public class WadlGeneratorConfigLoader {
 
-    private static final Logger LOGGER = Logger.getLogger( WadlGeneratorConfigurationLoader.class.getName() );
+    private static final Logger LOGGER = Logger.getLogger( WadlGeneratorConfigLoader.class.getName() );
 
     public static WadlGenerator loadWadlGeneratorsFromConfig( ResourceConfig resourceConfig ) {
         final Object wadlGeneratorConfigProperty = resourceConfig.getProperty(
@@ -73,16 +71,16 @@ public class WadlGeneratorConfigurationLoader {
 
             try {
                 
-                if ( wadlGeneratorConfigProperty instanceof WadlGeneratorConfiguration ) {
-                    return ( (WadlGeneratorConfiguration)wadlGeneratorConfigProperty ).getWadlGenerator();
+                if ( wadlGeneratorConfigProperty instanceof WadlGeneratorConfig ) {
+                    return ( (WadlGeneratorConfig)wadlGeneratorConfigProperty ).getWadlGenerator();
                 }
 
-                final Class<? extends WadlGeneratorConfiguration> configClazz;
+                final Class<? extends WadlGeneratorConfig> configClazz;
                 if ( wadlGeneratorConfigProperty instanceof Class ) {
-                    configClazz = ( (Class<?>)wadlGeneratorConfigProperty ).asSubclass( WadlGeneratorConfiguration.class );
+                    configClazz = ( (Class<?>)wadlGeneratorConfigProperty ).asSubclass( WadlGeneratorConfig.class );
                 }
                 else if ( wadlGeneratorConfigProperty instanceof String ) {
-                    configClazz = Class.forName( (String) wadlGeneratorConfigProperty ).asSubclass( WadlGeneratorConfiguration.class );
+                    configClazz = Class.forName( (String) wadlGeneratorConfigProperty ).asSubclass( WadlGeneratorConfig.class );
                 }
                 else {
                     throw new RuntimeException( "The property " + ResourceConfig.PROPERTY_WADL_GENERATOR_CONFIG + 
@@ -91,15 +89,7 @@ public class WadlGeneratorConfigurationLoader {
                             " WadlGeneratorConfiguration)" );
                 }
                 
-                final Constructor<? extends WadlGeneratorConfiguration> mapConstructor = configClazz.getConstructor( Map.class );
-                
-                final WadlGeneratorConfiguration config;
-                if ( mapConstructor != null ) {
-                    config = mapConstructor.newInstance( resourceConfig.getProperties() );
-                }
-                else  {
-                    config = configClazz.newInstance();
-                }
+                final WadlGeneratorConfig config = configClazz.newInstance();
                 
                 return config.getWadlGenerator();
                 

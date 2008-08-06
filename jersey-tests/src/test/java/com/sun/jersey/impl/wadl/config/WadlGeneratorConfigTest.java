@@ -41,9 +41,7 @@
 
 package com.sun.jersey.impl.wadl.config;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import javax.ws.rs.core.MediaType;
 
@@ -92,21 +90,19 @@ public class WadlGeneratorConfigTest extends TestCase {
     public void testBuildWadlGeneratorFromDescriptions() {
         final String propValue = "bar";
         WadlGeneratorConfig config = WadlGeneratorConfig
-            .generator( MyWadlGenerator.class.getName() )
+            .generator( MyWadlGenerator.class )
             .prop( "foo", propValue )
-            .add().build();
+            .build();
         WadlGenerator wadlGenerator = config.getWadlGenerator();
         assertEquals( MyWadlGenerator.class, wadlGenerator.getClass() );
         assertEquals( ((MyWadlGenerator)wadlGenerator).getFoo(), propValue );
 
         final String propValue2 = "baz";
         config = WadlGeneratorConfig
-            .generator( MyWadlGenerator.class.getName() )
+            .generator( MyWadlGenerator.class )
             .prop( "foo", propValue )
-            .add()
-            .generator( MyWadlGenerator2.class.getName() )
+            .generator( MyWadlGenerator2.class )
             .prop( "bar", propValue2 )
-            .add()
             .build();
         wadlGenerator = config.getWadlGenerator();
         assertEquals( MyWadlGenerator2.class, wadlGenerator.getClass() );
@@ -118,51 +114,32 @@ public class WadlGeneratorConfigTest extends TestCase {
         
     }
     
-    public void testLoadWadlGeneratorDescriptionsFromConfigString() {
-        
-        final String descriptionString = "com.sun.jersey.impl.wadl.generators.WadlGeneratorApplicationDoc" +
-        		    "[applicationDocsFile=classpath:/application-doc.xml];\n" +
-        		"com.sun.jersey.impl.wadl.generators.WadlGeneratorGrammarsSupport" +
-        		    "[grammarsFile=classpath:/application-grammars.xml," +
-        		    "foo=bar]";
-        
-        final Map<String, Object> props = new HashMap<String, Object>();
-        props.put( WadlGeneratorConfig.PROPERTY_WADL_GENERATOR_DESCRIPTIONS, descriptionString );
-        
-        final List<WadlGeneratorDescription> descriptions = WadlGeneratorConfig.loadWadlGeneratorDescriptions( props );
-        assertEquals( 2, descriptions.size() );
-        
-        WadlGeneratorDescription description = descriptions.get( 0 );
-        assertEquals( "com.sun.jersey.impl.wadl.generators.WadlGeneratorApplicationDoc", description.getClassName() );
-        assertEquals( 1, description.getProperties().size() );
-        assertEquals( description.getProperties().getProperty( "applicationDocsFile" ), "classpath:/application-doc.xml" );
+    public void testCustomWadlGeneratorConfig() {
 
-        description = descriptions.get( 1 );
-        assertEquals( "com.sun.jersey.impl.wadl.generators.WadlGeneratorGrammarsSupport", description.getClassName() );
-        assertEquals( 2, description.getProperties().size() );
-        assertEquals( description.getProperties().getProperty( "grammarsFile" ), "classpath:/application-grammars.xml" );
-        assertEquals( description.getProperties().getProperty( "foo" ), "bar" );
-        
-    }
-    
-    public void testLoadWadlGeneratorDescriptionsFromConfigStringWithoutProperties() {
-        
-        final String descriptionString = MyWadlGenerator.class.getName() + "[];\n" +
-                    MyWadlGenerator2.class.getName() + "[]";
-        
-        final Map<String, Object> props = new HashMap<String, Object>();
-        props.put( WadlGeneratorConfig.PROPERTY_WADL_GENERATOR_DESCRIPTIONS, descriptionString );
-        
-        final List<WadlGeneratorDescription> descriptions = WadlGeneratorConfig.loadWadlGeneratorDescriptions( props );
-        assertEquals( 2, descriptions.size() );
-        
-        WadlGeneratorDescription description = descriptions.get( 0 );
-        assertEquals( MyWadlGenerator.class.getName(), description.getClassName() );
-        assertEquals( 0, description.getProperties().size() );
+        final String propValue = "someValue";
+        final String propValue2 = "baz";
+        class MyWadlGeneratorConfig extends WadlGeneratorConfig {
 
-        description = descriptions.get( 1 );
-        assertEquals( MyWadlGenerator2.class.getName(), description.getClassName() );
-        assertEquals( 0, description.getProperties().size() );
+            @Override
+            public List<WadlGeneratorDescription> configure() {
+                return generator( MyWadlGenerator.class )
+                .prop( "foo", propValue )
+                .generator( MyWadlGenerator2.class )
+                .prop( "bar", propValue2 )
+                .descriptions();
+            }
+            
+        }
+        
+        WadlGeneratorConfig config = new MyWadlGeneratorConfig();
+        WadlGenerator wadlGenerator = config.getWadlGenerator();
+        
+        assertEquals( MyWadlGenerator2.class, wadlGenerator.getClass() );
+        final MyWadlGenerator2 wadlGenerator2 = (MyWadlGenerator2)wadlGenerator;
+        assertEquals( wadlGenerator2.getBar(), propValue2 );
+        
+        assertEquals( MyWadlGenerator.class, wadlGenerator2.getDelegate().getClass() );
+        assertEquals( ((MyWadlGenerator)wadlGenerator2.getDelegate()).getFoo(), propValue );
         
     }
     

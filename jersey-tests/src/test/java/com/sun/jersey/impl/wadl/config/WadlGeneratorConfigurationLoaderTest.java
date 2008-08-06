@@ -42,6 +42,7 @@
 package com.sun.jersey.impl.wadl.config;
 
 import java.net.URISyntaxException;
+import java.util.List;
 
 import javax.ws.rs.core.MediaType;
 
@@ -77,12 +78,9 @@ public class WadlGeneratorConfigurationLoaderTest extends AbstractResourceTester
     public void testLoadConfigClass() throws URISyntaxException {
         
         final ResourceConfig resourceConfig = new DefaultResourceConfig();
-        resourceConfig.getProperties().put( ResourceConfig.PROPERTY_WADL_GENERATOR_CONFIG, WadlGeneratorConfig.class.getName() );
+        resourceConfig.getProperties().put( ResourceConfig.PROPERTY_WADL_GENERATOR_CONFIG, MyWadlGeneratorConfig.class.getName() );
         
-        final String descriptionString = MyWadlGenerator.class.getName() + "[]";
-        resourceConfig.getProperties().put( WadlGeneratorConfig.PROPERTY_WADL_GENERATOR_DESCRIPTIONS, descriptionString );
-        
-        final WadlGenerator wadlGenerator = WadlGeneratorConfigurationLoader.loadWadlGeneratorsFromConfig( resourceConfig );
+        final WadlGenerator wadlGenerator = WadlGeneratorConfigLoader.loadWadlGeneratorsFromConfig( resourceConfig );
         assertEquals( MyWadlGenerator.class, wadlGenerator.getClass() );
 
     }
@@ -94,7 +92,7 @@ public class WadlGeneratorConfigurationLoaderTest extends AbstractResourceTester
         final ResourceConfig resourceConfig = new DefaultResourceConfig();
         resourceConfig.getProperties().put( ResourceConfig.PROPERTY_WADL_GENERATOR_CONFIG, config );
         
-        final WadlGenerator wadlGenerator = WadlGeneratorConfigurationLoader.loadWadlGeneratorsFromConfig( resourceConfig );
+        final WadlGenerator wadlGenerator = WadlGeneratorConfigLoader.loadWadlGeneratorsFromConfig( resourceConfig );
         assertEquals( config.getWadlGenerator(), wadlGenerator );
     }
     
@@ -164,6 +162,17 @@ public class WadlGeneratorConfigurationLoaderTest extends AbstractResourceTester
         public void setWadlGeneratorDelegate( WadlGenerator delegate ) {
         }
         
+    }
+
+    
+    static class MyWadlGeneratorConfig extends WadlGeneratorConfig {
+
+        @Override
+        public List<WadlGeneratorDescription> configure() {
+            return generator( MyWadlGenerator.class )
+            .prop( "foo", "bar" )
+            .descriptions();
+        }
     }
     
 }

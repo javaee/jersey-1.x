@@ -44,7 +44,7 @@ import com.sun.jersey.impl.wadl.WadlGenerator;
 /**
  * This is the model for the definition of wadl generators via configuration properties.<br />
  * The properties refer to the properties of the {@link WadlGenerator} implementation with
- * the specified {@link WadlGeneratorDescription#getClassName()}. The {@link WadlGenerator} properties
+ * the specified {@link WadlGeneratorDescription#getGeneratorClass()}. The {@link WadlGenerator} properties
  * are populated with the provided properties like this:
  * <ul>
  * <li>The types match exactly:<br/>if the WadlGenerator property is of type <code>org.example.Foo</code> and the
@@ -55,7 +55,7 @@ import com.sun.jersey.impl.wadl.WadlGenerator;
  * the prefix <em>classpath:</em> and the {@link File} is created via
  * <pre><code>new File( generator.getClass().getResource( strippedFilename ).toURI() )</code></pre>
  * Notice that the filename is loaded from the classpath in this case, e.g. <em>classpath:test.xml</em>
- * refers to a file in the package of the class ({@link WadlGeneratorDescription#getClassName()}). The
+ * refers to a file in the package of the class ({@link WadlGeneratorDescription#getGeneratorClass()}). The
  * file reference <em>classpath:/test.xml</em> refers to a file that is in the root of the classpath.
  * </li>
  * </ul>
@@ -65,30 +65,30 @@ import com.sun.jersey.impl.wadl.WadlGenerator;
  */
 public class WadlGeneratorDescription {
     
-    private String _className;
+    private Class<? extends WadlGenerator> _generatorClass;
     private Properties _properties;
     
     public WadlGeneratorDescription() {
     }
     
-    public WadlGeneratorDescription( String className, Properties properties ) {
-        _className = className;
+    public WadlGeneratorDescription( Class<? extends WadlGenerator> generatorClass, Properties properties ) {
+        _generatorClass = generatorClass;
         _properties = properties;
     }
     
     /**
-     * @return the className
+     * @return the generatorClass
      * @author Martin Grotzke
      */
-    public String getClassName() {
-        return _className;
+    public Class<? extends WadlGenerator> getGeneratorClass() {
+        return _generatorClass;
     }
     /**
-     * @param className the className to set
+     * @param generatorClass the generatorClass to set
      * @author Martin Grotzke
      */
-    public void setClassName( String className ) {
-        _className = className;
+    public void setGeneratorClass( Class<? extends WadlGenerator> generatorClass ) {
+        _generatorClass = generatorClass;
     }
     /**
      * @return the properties

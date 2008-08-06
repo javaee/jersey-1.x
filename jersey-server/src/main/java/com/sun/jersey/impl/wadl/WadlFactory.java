@@ -46,7 +46,7 @@ import com.sun.jersey.api.core.ResourceConfig;
 import com.sun.jersey.api.model.AbstractResource;
 import com.sun.jersey.impl.model.method.ResourceMethod;
 import com.sun.jersey.impl.uri.PathPattern;
-import com.sun.jersey.impl.wadl.config.WadlGeneratorConfigurationLoader;
+import com.sun.jersey.impl.wadl.config.WadlGeneratorConfigLoader;
 
 /**
  *
@@ -63,7 +63,7 @@ public final class WadlFactory {
         _jaxb = checkForJAXB();
         
         if ( _jaxb ) {
-            _wadlGenerator = WadlGeneratorConfigurationLoader.loadWadlGeneratorsFromConfig( resourceConfig );
+            _wadlGenerator = WadlGeneratorConfigLoader.loadWadlGeneratorsFromConfig( resourceConfig );
         }
         else {
             _wadlGenerator = null;

@@ -78,7 +78,7 @@ public class WadlGeneratorLoaderTest extends AbstractResourceTester {
         
         final Properties props = new Properties();
         props.put( "testFile", "classpath:testfile.xml" );
-        final WadlGeneratorDescription description = new WadlGeneratorDescription( MyWadlGenerator2.class.getName(), props );
+        final WadlGeneratorDescription description = new WadlGeneratorDescription( MyWadlGenerator2.class, props );
         
         final WadlGenerator wadlGenerator = WadlGeneratorLoader.loadWadlGeneratorDescriptions( description );
         assertEquals( MyWadlGenerator2.class, wadlGenerator.getClass() );
@@ -93,7 +93,7 @@ public class WadlGeneratorLoaderTest extends AbstractResourceTester {
         final Properties props = new Properties();
         final String path = "classpath:/" + getClass().getPackage().getName().replaceAll( "\\.", "/" ) + "/testfile.xml";
         props.put( "testFile", path );
-        final WadlGeneratorDescription description = new WadlGeneratorDescription( MyWadlGenerator2.class.getName(), props );
+        final WadlGeneratorDescription description = new WadlGeneratorDescription( MyWadlGenerator2.class, props );
         
         final WadlGenerator wadlGenerator = WadlGeneratorLoader.loadWadlGeneratorDescriptions( description );
         assertEquals( MyWadlGenerator2.class, wadlGenerator.getClass() );
@@ -110,7 +110,7 @@ public class WadlGeneratorLoaderTest extends AbstractResourceTester {
         final Properties props = new Properties();
         final String path = new File( resource.toURI() ).getAbsolutePath();
         props.put( "testFile", path );
-        final WadlGeneratorDescription description = new WadlGeneratorDescription( MyWadlGenerator2.class.getName(), props );
+        final WadlGeneratorDescription description = new WadlGeneratorDescription( MyWadlGenerator2.class, props );
         
         final WadlGenerator wadlGenerator = WadlGeneratorLoader.loadWadlGeneratorDescriptions( description );
         assertEquals( MyWadlGenerator2.class, wadlGenerator.getClass() );
