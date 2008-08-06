@@ -72,6 +72,7 @@ public class HeadSubResourceMethodTest extends AbstractResourceTester {
         ClientResponse response = resource("/sub", false).
                 head();
         assertEquals(200, response.getStatus());
+        assertEquals(MediaType.TEXT_PLAIN_TYPE, response.getType());
         assertFalse(response.hasEntity());
     }
     

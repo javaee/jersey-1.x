@@ -70,16 +70,18 @@ public final class URLConnectionClientHandler implements ClientHandler {
     private static final Annotation[] EMPTY_ANNOTATIONS = new Annotation[0];
     
     private final class URLConnectionResponse extends ClientResponse {
+        private final String method;
         private final int status;
         private final HttpURLConnection uc;
         private final MultivaluedMap<String, String> metadata;
         private Map<String, Object> properties;
         
-        URLConnectionResponse(int status, HttpURLConnection uc) {
+        URLConnectionResponse(String method, int status, HttpURLConnection uc) {
+            this.method = method;
             this.status = status;
             this.uc = uc;
-            this.metadata = new InBoundHeaders();
             
+            this.metadata = new InBoundHeaders();            
             for (Map.Entry<String, List<String>> e : uc.getHeaderFields().entrySet()) {
                 if (e.getKey() != null)
                     metadata.put(e.getKey(), e.getValue());
@@ -95,6 +97,9 @@ public final class URLConnectionClientHandler implements ClientHandler {
         }
 
         public boolean hasEntity() {
+            if (method.equals("HEAD"))
+                return false;
+            
             int l = uc.getContentLength();
             return l > 0 || l == -1;
         }
@@ -184,7 +189,7 @@ public final class URLConnectionClientHandler implements ClientHandler {
         }
         
         // Return the in-bound response
-        return new URLConnectionResponse(uc.getResponseCode(), uc);        
+        return new URLConnectionResponse(ro.getMethod(), uc.getResponseCode(), uc);        
     }
     
     private void writeHeaders(MultivaluedMap<String, Object> metadata, HttpURLConnection uc) {

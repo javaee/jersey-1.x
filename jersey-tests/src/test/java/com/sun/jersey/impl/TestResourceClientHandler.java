@@ -108,7 +108,11 @@ public class TestResourceClientHandler implements ClientHandler {
         }
 
         public boolean hasEntity() {
-            return response.getEntity() != null;
+            try {
+                return responseEntity.available() > 0;
+            } catch (IOException ex) {
+                throw new ClientHandlerException(ex);                
+            }
         }
         
         public <T> T getEntity(Class<T> c) {

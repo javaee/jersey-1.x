@@ -1,4 +1,6 @@
 release 0.9 (2008-08-15)
+- Set the Content-Length, if known, in automatic response to a HEAD request 
+  that defers to the @GET annotated resource method.
 - Fixed issue where a message body reader is not correctly selected for 
   a media type that contains parameters.
 - Server-side request filter for HTTP POST method replacing for proxies and

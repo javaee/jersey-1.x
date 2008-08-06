@@ -71,6 +71,8 @@ public class HeadTest extends AbstractResourceTester {
         ClientResponse response = resource("/", false).
                 head();
         assertEquals(200, response.getStatus());
+        assertNull(response.getMetadata().getFirst("Content-Length"));
+        assertEquals(MediaType.TEXT_PLAIN_TYPE, response.getType());
         assertFalse(response.hasEntity());
     }
     
@@ -175,4 +177,26 @@ public class HeadTest extends AbstractResourceTester {
         assertEquals(bar, response.getType());        
         assertEquals("BAR-HEAD", response.getMetadata().getFirst("X-TEST").toString());
     }
+    
+    @Path("/")
+    static public class ResourceGetByteNoHead { 
+        @GET
+        public byte[] get() {
+            return "GET".getBytes();
+        }
+    }
+        
+    public void testGetByteNoHead() {
+        initiateWebApplication(ResourceGetByteNoHead.class);
+        
+        ClientResponse response = resource("/", false).
+                head();
+        assertEquals(200, response.getStatus());
+        String length = response.getMetadata().getFirst("Content-Length");
+        assertNotNull(length);
+        assertEquals(3, Integer.parseInt(length));
+        assertEquals(MediaType.APPLICATION_OCTET_STREAM_TYPE, response.getType());
+        assertFalse(response.hasEntity());
+    }
+    
 }

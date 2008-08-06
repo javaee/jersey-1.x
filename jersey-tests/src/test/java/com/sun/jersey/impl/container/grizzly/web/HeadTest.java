@@ -34,62 +34,71 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
+package com.sun.jersey.impl.container.grizzly.web;
 
-package com.sun.jersey.impl.provider.entity;
-
+import com.sun.jersey.api.client.Client;
+import com.sun.jersey.api.client.ClientResponse;
+import com.sun.jersey.api.client.WebResource;
 import java.io.ByteArrayInputStream;
-import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
-import java.lang.annotation.Annotation;
-import java.lang.reflect.Type;
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
 import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.MultivaluedMap;
 
 /**
  *
  * @author Paul.Sandoz@Sun.Com
  */
-public final class InputStreamProvider extends AbstractMessageReaderWriterProvider<InputStream> {
-    
-    public boolean isReadable(Class<?> type, Type genericType, Annotation annotations[]) {
-        return InputStream.class == type;
+public class HeadTest extends AbstractGrizzlyWebContainerTester {
+    public HeadTest(String testName) {
+        super(testName);
     }
     
-    public InputStream readFrom(
-            Class<InputStream> type, 
-            Type genericType, 
-            Annotation annotations[],
-            MediaType mediaType, 
-            MultivaluedMap<String, String> httpHeaders, 
-            InputStream entityStream) throws IOException {
-        return entityStream;
+    @Path("/")
+    public static class Resource {
+        @Path("string")
+        @GET
+        public String getString() {
+            return "GET";
+        }               
+        
+        @Path("byte")
+        @GET
+        public byte[] getByte() {
+            return "GET".getBytes();
+        }               
+        
+        @Path("ByteArrayInputStream")
+        @GET
+        public InputStream getInputStream() {
+            return new ByteArrayInputStream("GET".getBytes());
+        }               
     }
-
-    public boolean isWriteable(Class<?> type, Type genericType, Annotation annotations[]) {
-        return InputStream.class.isAssignableFrom(type);        
-    }
-    
-    @Override
-    public long getSize(InputStream t) {
-        if (t instanceof ByteArrayInputStream)
-            return ((ByteArrayInputStream)t).available();
-        else 
-            return -1;
-    }
-    
-    public void writeTo(
-            InputStream t, 
-            Class<?> type, 
-            Type genericType, 
-            Annotation annotations[], 
-            MediaType mediaType, 
-            MultivaluedMap<String, Object> httpHeaders,
-            OutputStream entityStream) throws IOException {
-        try {
-            writeTo(t, entityStream);
-        } finally {
-            t.close();
-        }
+        
+    public void testHead() throws Exception {
+        startServer(Resource.class);
+        
+        WebResource r = Client.create().resource(getUri().path("/").build());
+        
+        ClientResponse cr = r.path("string").head();
+        assertEquals(200, cr.getStatus());
+        assertEquals(MediaType.TEXT_PLAIN_TYPE, cr.getType());
+        assertFalse(cr.hasEntity());
+        
+        cr = r.path("byte").head();
+        assertEquals(200, cr.getStatus());
+        String length = cr.getMetadata().getFirst("Content-Length");
+        assertNotNull(length);
+        assertEquals(3, Integer.parseInt(length));
+        assertEquals(MediaType.APPLICATION_OCTET_STREAM_TYPE, cr.getType());
+        assertFalse(cr.hasEntity());
+        
+        cr = r.path("ByteArrayInputStream").head();
+        assertEquals(200, cr.getStatus());
+        length = cr.getMetadata().getFirst("Content-Length");
+        assertNotNull(length);
+        assertEquals(3, Integer.parseInt(length));
+        assertEquals(MediaType.APPLICATION_OCTET_STREAM_TYPE, cr.getType());
+        assertFalse(cr.hasEntity());        
     }
 }

@@ -189,7 +189,7 @@ public class ContainerResponse implements HttpResponseContext {
     @SuppressWarnings("unchecked")
     public void write() throws IOException {
         if (isCommitted)
-            return;
+            return;        
         
         if (entity == null) {
             responseWriter.writeStatusAndHeaders(-1, this);
@@ -214,16 +214,25 @@ public class ContainerResponse implements HttpResponseContext {
         // If there is no message body writer return a Not Acceptable response
         if (p == null) {
             LOGGER.severe("A message body reader for Java type, " + entity.getClass() + 
-                    ", and MIME media type, " + contentType + ", was not found");    
-            
-            throw new WebApplicationException(
-                    Responses.notAcceptable().build());
+                    ", and MIME media type, " + contentType + ", was not found");            
+            if (request.getMethod().equals("HEAD")) {
+                responseWriter.writeStatusAndHeaders(-1, this);
+                return;                
+            } else 
+                throw new WebApplicationException(Responses.notAcceptable().build());
         }
-        
+
         isCommitted = true;
-        OutputStream os = responseWriter.writeStatusAndHeaders(-1, this);        
-        p.writeTo(entity, entity.getClass(), entityType, null, 
-                contentType, getHttpHeaders(), os);
+        final long size = p.getSize(entity);
+        if (request.getMethod().equals("HEAD")) {
+            if (size != -1)
+                getHttpHeaders().putSingle("Content-Length", Long.toString(size));
+            responseWriter.writeStatusAndHeaders(-1, this);
+        } else {
+            OutputStream os = responseWriter.writeStatusAndHeaders(size, this);        
+            p.writeTo(entity, entity.getClass(), entityType, null, 
+                    contentType, getHttpHeaders(), os);
+        }
     }
 
     /**
@@ -271,15 +280,15 @@ public class ContainerResponse implements HttpResponseContext {
         } else {
             this.headers = setResponseNonOptimal(r, contentType);
         }
-        
-        // If HTTP method is HEAD then there should be no entity
-        if (request.getMethod().equals("HEAD"))
-            this.entity = null;
-        // Otherwise if there is no entity then there should be no content type
-        else if (this.entity == null) {
-            contentType = null;
-        }
- 
+//        
+//        // If HTTP method is HEAD then there should be no entity
+//        if (request.getMethod().equals("HEAD"))
+//            this.entity = null;
+//        // Otherwise if there is no entity then there should be no content type
+//        else if (this.entity == null) {
+//            contentType = null;
+//        }
+// 
     }
     
     public boolean isResponseSet() {
