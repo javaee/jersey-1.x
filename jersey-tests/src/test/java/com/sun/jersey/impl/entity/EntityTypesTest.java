@@ -140,6 +140,15 @@ public class EntityTypesTest extends AbstractTypeTester {
     }
     
     @Path("/")
+    @Produces("text/xml")
+    @Consumes("text/xml")
+    public static class JAXBBeanTextResource extends AResource<JAXBBean> {}
+    
+    public void testJAXBBeanTextRepresentation() {
+        _test(new JAXBBean("CONTENT"), JAXBBeanTextResource.class);
+    }
+    
+    @Path("/")
     @Produces("application/xml")
     @Consumes("application/xml")
     public static class JAXBElementBeanResource extends AResource<JAXBElement<JAXBBeanType>> {}
@@ -148,6 +157,14 @@ public class EntityTypesTest extends AbstractTypeTester {
         _test(new JAXBBean("CONTENT"), JAXBElementBeanResource.class);
     }
     
+    @Path("/")
+    @Produces("text/xml")
+    @Consumes("text/xml")
+    public static class JAXBElementBeanTextResource extends AResource<JAXBElement<JAXBBeanType>> {}
+    
+    public void testJAXBElementBeanTextRepresentation() {
+        _test(new JAXBBean("CONTENT"), JAXBElementBeanTextResource.class);
+    }
     
     @Path("/")
     @Produces("application/xml")

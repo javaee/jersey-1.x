@@ -50,8 +50,6 @@ import javax.ws.rs.core.MediaType;
 import com.sun.jersey.api.model.AbstractResource;
 import com.sun.jersey.api.model.AbstractResourceMethod;
 import com.sun.jersey.api.model.Parameter;
-import com.sun.jersey.api.wadl.config.WadlGeneratorDescription;
-import com.sun.jersey.api.wadl.config.WadlGeneratorLoader;
 import com.sun.jersey.impl.AbstractResourceTester;
 import com.sun.jersey.impl.wadl.WadlGenerator;
 import com.sun.research.ws.wadl.Application;
