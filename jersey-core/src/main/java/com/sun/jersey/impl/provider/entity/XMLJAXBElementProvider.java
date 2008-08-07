@@ -47,25 +47,45 @@ import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.Produces;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
-import javax.xml.bind.JAXBContext;
+import javax.ws.rs.ext.Providers;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
-import javax.xml.bind.Unmarshaller;
 import javax.xml.transform.stream.StreamSource;
 
 /**
  *
  * @author Paul.Sandoz@Sun.Com
  */
-@Produces({"application/xml", "text/xml", "*/*"})
-@Consumes({"application/xml", "text/xml", "*/*"})
-public final class XMLJAXBElementProvider extends AbstractJAXBElementProvider {
+public class XMLJAXBElementProvider extends AbstractJAXBElementProvider {
     
-    public XMLJAXBElementProvider() {
-        Class<?> c = JAXBContext.class;
+    public XMLJAXBElementProvider(Providers ps) {
+        super(ps);
+    }
+    
+    public XMLJAXBElementProvider(Providers ps, MediaType mt) {
+        super(ps, mt);        
+    }
+    
+    @Produces("application/xml")
+    @Consumes("application/xml")
+    public static final class App extends XMLJAXBElementProvider {
+        public App(@Context Providers ps) { super(ps , MediaType.APPLICATION_XML_TYPE); }
+    }
+    
+    @Produces("text/xml")
+    @Consumes("text/xml")
+    public static final class Text extends XMLJAXBElementProvider {
+        public Text(@Context Providers ps) { super(ps , MediaType.TEXT_XML_TYPE); }
+    }
+    
+    @Produces("*/*")
+    @Consumes("*/*")
+    public static final class General extends XMLJAXBElementProvider {
+        public General(@Context Providers ps) { super(ps); }
     }
     
     @SuppressWarnings("unchecked")
@@ -81,9 +101,7 @@ public final class XMLJAXBElementProvider extends AbstractJAXBElementProvider {
         
         try {
             StreamSource source = new StreamSource(entityStream);
-            JAXBContext context = getJAXBContext(ta);
-            Unmarshaller unmarshaller = context.createUnmarshaller();
-            return unmarshaller.unmarshal(source, ta);
+            return getUnmarshaller(ta, mediaType).unmarshal(source, ta);
         } catch (JAXBException cause) {
             throw ThrowHelper.withInitCause(cause,
                     new IOException(ImplMessages.ERROR_MARSHALLING_JAXB(type))
@@ -100,9 +118,8 @@ public final class XMLJAXBElementProvider extends AbstractJAXBElementProvider {
             MultivaluedMap<String, Object> httpHeaders,
             OutputStream entityStream) throws IOException {
         try {
-            JAXBContext context = getJAXBContext(t.getDeclaredType());            
-            Marshaller marshaller = context.createMarshaller();
-            String name = getCharsetAsString(mediaType);
+            final Marshaller marshaller = getMarshaller(t.getDeclaredType(), mediaType);
+            final String name = getCharsetAsString(mediaType);
             if (name != null) {
                 marshaller.setProperty(Marshaller.JAXB_ENCODING, name);
             }

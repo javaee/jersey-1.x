@@ -53,9 +53,10 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.Produces;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
-import javax.xml.bind.JAXBContext;
+import javax.ws.rs.ext.Providers;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
@@ -69,8 +70,8 @@ import javax.xml.bind.Unmarshaller;
 @Consumes("application/json")
 public final class JSONRootElementProvider extends AbstractRootElementProvider {
     
-    public JSONRootElementProvider() {
-        Class<?> c = JAXBContext.class;
+    public JSONRootElementProvider(@Context Providers ps) {
+        super(ps, MediaType.APPLICATION_JSON_TYPE);
     }
     
     public Object readFrom(
@@ -81,8 +82,7 @@ public final class JSONRootElementProvider extends AbstractRootElementProvider {
             MultivaluedMap<String, String> httpHeaders, 
             InputStream entityStream) throws IOException {
         try {
-            JAXBContext context = getJAXBContext(type);
-            Unmarshaller unmarshaller = context.createUnmarshaller();
+            Unmarshaller unmarshaller = getUnmarshaller(type, mediaType);
             if (unmarshaller instanceof JSONUnmarshaller) {
                 unmarshaller.setProperty(JSONJAXBContext.JSON_ENABLED, Boolean.TRUE);
                 JAXBElement jaxbElem = (JAXBElement)((JSONUnmarshaller)unmarshaller).
@@ -109,8 +109,7 @@ public final class JSONRootElementProvider extends AbstractRootElementProvider {
             MultivaluedMap<String, Object> httpHeaders,
             OutputStream entityStream) throws IOException {
         try {
-            JAXBContext context = getJAXBContext(t.getClass());
-            Marshaller marshaller = context.createMarshaller();
+            Marshaller marshaller = getMarshaller(t.getClass(), mediaType);
             if (marshaller instanceof JSONMarshaller) {
                 marshaller.setProperty(JSONJAXBContext.JSON_ENABLED, Boolean.TRUE);
                 marshaller.marshal(t, 

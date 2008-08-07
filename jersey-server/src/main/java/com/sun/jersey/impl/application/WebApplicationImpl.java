@@ -606,8 +606,8 @@ public final class WebApplicationImpl implements WebApplication {
         injectableFactory.add(
                 new ContextInjectableProvider<MessageBodyWorkers>(
                 MessageBodyWorkers.class, bodyFactory));
-        bodyFactory.init();
         
+        // Injection of Providers
         Providers p = new Providers() {
             public <T> MessageBodyReader<T> getMessageBodyReader(Class<T> c, Type t, 
                     Annotation[] as, MediaType m) {
@@ -634,6 +634,9 @@ public final class WebApplicationImpl implements WebApplication {
         injectableFactory.add(
                 new ContextInjectableProvider<Providers>(
                 Providers.class, p));
+        
+        // Initiate message body readers/writers
+        bodyFactory.init();
         
         // Add per-request-based injectable providers
         injectableFactory.add(new CookieParamInjectableProvider());

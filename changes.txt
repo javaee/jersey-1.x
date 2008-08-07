@@ -1,4 +1,8 @@
 release 0.9 (2008-08-15)
+- JAXB un/marshalling will use any ContextResolver<Un/Marshaller>
+  instances, if present, otherwise, if not present un/marshalling will use
+  ContextResolver<JAXBContext>, if present. The @Produces scope will be
+  taken into account.
 - Set the Content-Length, if known, in automatic response to a HEAD request 
   that defers to the @GET annotated resource method.
 - Fixed issue where a message body reader is not correctly selected for 
@@ -34,6 +38,10 @@ release 0.9 (2008-08-15)
     an appropriate MessageBodyWriter, for that generic type may be selected.
     - When using Response.Builder an instance of javax.ws.rs.core.GenericEntity
       may be set as the entity to preserve the generic type.
+  - ContextResolver can be scoped per @Produces annotated on a
+    implementation.
+    - Scope ContextResolver instances are accessible via the 
+      javax.ws.rs.ext.Providers interface.
 
 release 0.8 (2008-06-20)
 - UriBuilder supports opaque URIs such as "mailto:p@c".

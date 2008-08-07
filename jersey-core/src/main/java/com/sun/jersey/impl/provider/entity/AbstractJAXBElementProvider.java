@@ -40,6 +40,8 @@ package com.sun.jersey.impl.provider.entity;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.ext.Providers;
 import javax.xml.bind.JAXBElement;
 
 /**
@@ -47,6 +49,14 @@ import javax.xml.bind.JAXBElement;
  * @author Paul.Sandoz@Sun.Com
  */
 public abstract class AbstractJAXBElementProvider extends AbstractJAXBProvider<JAXBElement<?>> {    
+    public AbstractJAXBElementProvider(Providers ps) {
+        super(ps);
+    }
+    
+    public AbstractJAXBElementProvider(Providers ps, MediaType mt) {
+        super(ps, mt);        
+    }
+    
     public boolean isReadable(Class<?> type, Type genericType, Annotation annotations[]) {
         return type == JAXBElement.class && genericType instanceof ParameterizedType;
     }

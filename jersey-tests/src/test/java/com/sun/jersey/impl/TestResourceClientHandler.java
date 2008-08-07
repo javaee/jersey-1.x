@@ -232,7 +232,7 @@ public class TestResourceClientHandler implements ClientHandler {
                 if (mediaTypeHeader != null) {
                     mediaType = MediaType.valueOf(mediaTypeHeader.toString());
                 } else {
-                    mediaType = new MediaType("application", "octet-stream");
+                    mediaType = MediaType.APPLICATION_OCTET_STREAM_TYPE;
                 }
             }
             final MessageBodyWriter bw = bodyContext.getMessageBodyWriter(

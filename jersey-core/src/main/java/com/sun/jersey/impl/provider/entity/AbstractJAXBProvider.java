@@ -39,11 +39,13 @@ package com.sun.jersey.impl.provider.entity;
 
 import java.util.Map;
 import java.util.WeakHashMap;
-import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.ext.ContextResolver;
+import javax.ws.rs.ext.Providers;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
+import javax.xml.bind.Marshaller;
+import javax.xml.bind.Unmarshaller;
 
 /**
  *
@@ -53,22 +55,147 @@ public abstract class AbstractJAXBProvider<T> extends AbstractMessageReaderWrite
     private static Map<Class, JAXBContext> jaxbContexts = 
             new WeakHashMap<Class, JAXBContext>();
 
-    @Context private ContextResolver<JAXBContext> cr;
+    private final Providers ps;
     
-    protected final JAXBContext getJAXBContext(Class type) throws JAXBException {
+    private final boolean fixedMediaType;
+    
+    private final ContextResolver<JAXBContext> context;
+
+    private final ContextResolver<Unmarshaller> unmarshaller;
+    
+    private final ContextResolver<Marshaller> marshaller;
+    
+    private final ContextResolver<JAXBContext> mtContext;
+
+    private final ContextResolver<Unmarshaller> mtUnmarshaller;
+    
+    private final ContextResolver<Marshaller> mtMarshaller;
+        
+    public AbstractJAXBProvider(Providers ps) {
+        this(ps, null);
+    }
+    
+    public AbstractJAXBProvider(Providers ps, MediaType mt) {
+        this.ps = ps;
+        
+        this.context = ps.getContextResolver(JAXBContext.class, null, null);
+        this.unmarshaller = ps.getContextResolver(Unmarshaller.class, null, null);
+        this.marshaller = ps.getContextResolver(Marshaller.class, null, null);
+        
+        fixedMediaType = mt != null;
+        if (mt != null) {
+            this.mtContext = ps.getContextResolver(JAXBContext.class, null, mt);
+            this.mtUnmarshaller = ps.getContextResolver(Unmarshaller.class, null, mt);
+            this.mtMarshaller = ps.getContextResolver(Marshaller.class, null, mt);            
+        } else {
+            this.mtContext = null;
+            this.mtUnmarshaller = null;
+            this.mtMarshaller = null;
+        }
+    }
+    
+    protected final Unmarshaller getUnmarshaller(Class type, MediaType mt) throws JAXBException {
+        if (fixedMediaType)
+            return getUnmarshaller(type);
+        
+        final ContextResolver<Unmarshaller> uncr = ps.getContextResolver(Unmarshaller.class, null, mt);            
+        if (uncr != null) {
+            Unmarshaller u = uncr.getContext(type);
+            if (u != null) return u;
+        }
+
+        if (unmarshaller != null) {
+            Unmarshaller u = unmarshaller.getContext(type);
+            if (u != null) return u;
+        }
+        
+        return getJAXBContext(type, mt).createUnmarshaller();
+    }
+    
+    protected final Unmarshaller getUnmarshaller(Class type) throws JAXBException {
+        if (mtUnmarshaller != null) {
+            Unmarshaller u = mtUnmarshaller.getContext(type);
+            if (u != null) return u;
+        }
+
+        if (unmarshaller != null) {
+            Unmarshaller u = unmarshaller.getContext(type);
+            if (u != null) return u;
+        }
+        
+        return getJAXBContext(type).createUnmarshaller();
+    }
+    
+    protected final Marshaller getMarshaller(Class type, MediaType mt) throws JAXBException {
+        if (fixedMediaType)
+            return getMarshaller(type);
+        
+        final ContextResolver<Marshaller> mcr = ps.getContextResolver(Marshaller.class, null, mt);            
+        if (mcr != null) {
+            Marshaller u = mcr.getContext(type);
+            if (u != null) return u;
+        }
+
+        if (marshaller != null) {
+            Marshaller u = marshaller.getContext(type);
+            if (u != null) return u;
+        }
+        
+        return getJAXBContext(type, mt).createMarshaller();
+    }
+    
+    protected final Marshaller getMarshaller(Class type) throws JAXBException {
+        if (mtMarshaller != null) {
+            Marshaller u = mtMarshaller.getContext(type);
+            if (u != null) return u;
+        }
+
+        if (marshaller != null) {
+            Marshaller u = marshaller.getContext(type);
+            if (u != null) return u;
+        }
+        
+        return getJAXBContext(type).createMarshaller();
+    }
+    
+    private final JAXBContext getJAXBContext(Class type) throws JAXBException {
+        if (mtContext != null) {
+            JAXBContext c = mtContext.getContext(type);
+            if (c != null) return c;
+        }
+        
+        if (context != null) {
+            JAXBContext c = context.getContext(type);
+            if (c != null) return c;
+        }
+        
+        return getStoredJAXBContext(type);
+    }
+    
+    private final JAXBContext getJAXBContext(Class type, MediaType mt) throws JAXBException {
+        final ContextResolver<JAXBContext> cr = ps.getContextResolver(JAXBContext.class, null, mt);        
         if (cr != null) {
             JAXBContext c = cr.getContext(type);
             if (c != null) return c;
         }
         
-        synchronized (jaxbContexts) {
-            JAXBContext context = jaxbContexts.get(type);
-            if (context == null) {
-                context = JAXBContext.newInstance(type);
-                jaxbContexts.put(type, context);
-            }
-            return context;
+        if (context != null) {
+            JAXBContext c = context.getContext(type);
+            if (c != null) return c;
         }
+        
+        return getStoredJAXBContext(type);
+    }
+    
+    protected JAXBContext getStoredJAXBContext(Class type) throws JAXBException {
+        synchronized (jaxbContexts) {
+            JAXBContext c = jaxbContexts.get(type);
+            if (c == null) {
+                c = JAXBContext.newInstance(type);
+                jaxbContexts.put(type, c);
+            }
+            return c;
+        }        
     }
     
     public static final String getCharsetAsString(MediaType m) {

@@ -39,6 +39,8 @@ package com.sun.jersey.impl.provider.entity;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.ext.Providers;
 import javax.xml.bind.annotation.XmlRootElement;
 
 /**
@@ -46,6 +48,14 @@ import javax.xml.bind.annotation.XmlRootElement;
  * @author Paul.Sandoz@Sun.Com
  */
 public abstract class AbstractRootElementProvider extends AbstractJAXBProvider<Object> {    
+    public AbstractRootElementProvider(Providers ps) {
+        super(ps);
+    }
+    
+    public AbstractRootElementProvider(Providers ps, MediaType mt) {
+        super(ps, mt);        
+    }
+    
     public boolean isReadable(Class<?> type, Type genericType, Annotation annotations[]) {
         return type.getAnnotation(XmlRootElement.class) != null;
     }

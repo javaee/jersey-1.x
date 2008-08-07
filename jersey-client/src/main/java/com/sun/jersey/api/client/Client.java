@@ -249,8 +249,8 @@ public final class Client extends Filterable implements ClientHandler {
         // Allow injection of message body context
         injectableFactory.add(new ContextInjectableProvider<MessageBodyWorkers>(
                 MessageBodyWorkers.class, bodyContext));
-        bodyContext.init();
         
+        // Injection of Providers
         Providers p = new Providers() {
             public <T> MessageBodyReader<T> getMessageBodyReader(Class<T> c, Type t, 
                     Annotation[] as, MediaType m) {
@@ -274,6 +274,9 @@ public final class Client extends Filterable implements ClientHandler {
         injectableFactory.add(
                 new ContextInjectableProvider<Providers>(
                 Providers.class, p));
+
+        // Initiate message body readers/writers
+        bodyContext.init();
         
         // Inject on root client handler
         injectResources(root);

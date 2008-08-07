@@ -38,6 +38,8 @@ package com.sun.jersey.impl.application;
 
 import com.sun.jersey.api.core.HttpContext;
 import com.sun.jersey.impl.model.MediaTypeHelper;
+import com.sun.jersey.impl.util.KeyComparator;
+import com.sun.jersey.impl.util.KeyComparatorHashMap;
 import com.sun.jersey.spi.inject.Injectable;
 import com.sun.jersey.spi.inject.InjectableProvider;
 import com.sun.jersey.spi.service.ComponentContext;
@@ -60,6 +62,23 @@ import javax.ws.rs.ext.ContextResolver;
  * @author Paul.Sandoz@Sun.Com
  */
 public final class ContextResolverFactory {
+    private static final KeyComparator<MediaType> MEDIA_TYPE_COMPARATOR = 
+            new KeyComparator<MediaType>() {
+        public boolean equals(MediaType x, MediaType y) {
+            return x.getType().equalsIgnoreCase(y.getType())
+                    && x.getSubtype().equalsIgnoreCase(y.getSubtype());
+        }
+
+        public int hash(MediaType k) {
+            return k.getType().toLowerCase().hashCode() + 
+                    k.getSubtype().toLowerCase().hashCode();
+        }
+
+        public int compare(MediaType o1, MediaType o2) {
+            throw new UnsupportedOperationException("Not supported yet.");
+        }        
+    };
+    
     private final Map<Type, Map<MediaType, ContextResolver>> resolver;
     
     public ContextResolverFactory(ComponentProviderCache componentProviderCache,
@@ -95,7 +114,9 @@ public final class ContextResolverFactory {
         
         this.resolver = new HashMap<Type, Map<MediaType, ContextResolver>>(4);
         for (Map.Entry<Type, Map<MediaType, Set<ContextResolver>>> e : rs.entrySet()) {
-            Map<MediaType, ContextResolver> mr = new HashMap<MediaType, ContextResolver>(4);
+//            Map<MediaType, ContextResolver> mr = new HashMap<MediaType, ContextResolver>(4);            
+            Map<MediaType, ContextResolver> mr = new KeyComparatorHashMap<MediaType, ContextResolver>(
+                    4, MEDIA_TYPE_COMPARATOR);
             resolver.put(e.getKey(), mr);
             
             for (Map.Entry<MediaType, Set<ContextResolver>> f : e.getValue().entrySet()) {

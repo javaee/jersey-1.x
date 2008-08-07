@@ -54,9 +54,10 @@ import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.Produces;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
-import javax.xml.bind.JAXBContext;
+import javax.ws.rs.ext.Providers;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
@@ -71,8 +72,8 @@ import javax.xml.transform.stream.StreamSource;
 @Consumes("application/json")
 public final class JSONJAXBElementProvider extends AbstractJAXBElementProvider {
     
-    public JSONJAXBElementProvider() {
-        Class<?> c = JAXBContext.class;
+    public JSONJAXBElementProvider(@Context Providers ps) {
+        super(ps, MediaType.APPLICATION_JSON_TYPE);
     }
     
     @SuppressWarnings("unchecked")
@@ -88,8 +89,7 @@ public final class JSONJAXBElementProvider extends AbstractJAXBElementProvider {
         
         try {
             StreamSource source = new StreamSource(entityStream);
-            JAXBContext context = getJAXBContext(ta);
-            Unmarshaller unmarshaller = context.createUnmarshaller();
+            Unmarshaller unmarshaller = getUnmarshaller(ta, mediaType);
             if (unmarshaller instanceof JSONUnmarshaller) {
                 unmarshaller.setProperty(JSONJAXBContext.JSON_ENABLED, Boolean.TRUE);
                 return unmarshaller.unmarshal(source, ta);
@@ -113,8 +113,7 @@ public final class JSONJAXBElementProvider extends AbstractJAXBElementProvider {
             MultivaluedMap<String, Object> httpHeaders,
             OutputStream entityStream) throws IOException {
         try {
-            JAXBContext context = getJAXBContext(t.getDeclaredType());            
-            Marshaller marshaller = context.createMarshaller();
+            Marshaller marshaller = getMarshaller(t.getDeclaredType(), mediaType);
             if (marshaller instanceof JSONMarshaller) {
                 marshaller.setProperty(JSONJAXBContext.JSON_ENABLED, Boolean.TRUE);
                 marshaller.marshal(t, 
