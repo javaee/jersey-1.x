@@ -69,7 +69,8 @@ public final class ResourceClassInjector {
     
     private Field[] perRequestFields;
     private Injectable<?>[] perRequestFieldInjectables;
-   
+    private boolean[] perRequestPrimitive;
+    
     private Method[] singletonSetters;    
     private Object[] singletonSetterValues;
     
@@ -163,11 +164,13 @@ public final class ResourceClassInjector {
         
         size = perRequest.entrySet().size();
         perRequestFields = new Field[size];
-        perRequestFieldInjectables = new Injectable<?>[size];        
+        perRequestFieldInjectables = new Injectable<?>[size];
+        perRequestPrimitive = new boolean[size];
         i = 0;
         for (Map.Entry<Field, Injectable<?>> e : perRequest.entrySet()) {
             perRequestFields[i] = e.getKey();
-            perRequestFieldInjectables[i++] = e.getValue();
+            perRequestFieldInjectables[i] = e.getValue();
+            perRequestPrimitive[i++] = e.getKey().getType().isPrimitive();
         }        
     }
     
@@ -283,7 +286,7 @@ public final class ResourceClassInjector {
         i = 0;
         for (Field f : perRequestFields) {
             try {
-                if (f.get(o) == null) {
+                if (perRequestPrimitive[i] || f.get(o) == null) {
                     f.set(o, perRequestFieldInjectables[i].getValue(c));
                 }
                 i++;
