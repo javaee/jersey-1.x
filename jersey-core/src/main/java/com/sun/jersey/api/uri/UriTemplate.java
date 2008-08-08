@@ -44,9 +44,11 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
 
 
 /**
@@ -103,6 +105,206 @@ public class UriTemplate {
             return o2.pattern.getRegex().compareTo(o1.pattern.getRegex());
         }
     };
+    
+    
+    private static class TemplateParser {
+        
+        private static Set<Character> RESERVED_REGEX_CHARACTERS = createReserved();
+
+        private static Set<Character> createReserved() {
+            // TODO need to escape all regex characters present
+            char[] reserved = {
+                '.',
+                '?',
+                '(', 
+                ')'};
+
+            Set<Character> s = new HashSet<Character>(reserved.length);
+            for (char c : reserved) s.add(c);
+            return s;
+        }        
+
+        private static final Pattern P = Pattern.compile("\\{(\\w[-\\w\\.]*)(:.+?)?\\}");
+
+        private static final String TEMPLATE_VALUE = "[^/]+?";
+
+        private static final Pattern TEMPLATE_VALUE_PATTERN = Pattern.compile(TEMPLATE_VALUE);
+
+        private interface CharacterIterator {
+            boolean hasNext();
+            char next();
+            char peek();
+            int pos();
+        }
+
+        private static class StringCharacterIterator implements CharacterIterator {
+            int pos;
+            String s;
+
+            public StringCharacterIterator(String s) {
+                this.s = s;
+            }
+
+            public boolean hasNext() {
+                return pos < s.length();
+            }
+
+            public char next() {
+                if (!hasNext())
+                    throw new NoSuchElementException();
+                return s.charAt(pos++);
+            }
+
+            public char peek() {
+                if (!hasNext())
+                    throw new NoSuchElementException();
+
+                return s.charAt(pos++);
+            }
+
+            public int pos() {
+                if (pos == 0) return 0;
+                return pos - 1;
+            }
+
+        }
+
+        private final StringBuffer regex = new StringBuffer();;
+
+        private final Pattern pattern;
+
+        private final Map<String, Pattern> nameToPattern = new HashMap<String, Pattern>();
+
+        public TemplateParser(String s) {
+            parse(new StringCharacterIterator(s));
+            try {
+                pattern = Pattern.compile(regex.toString());
+            } catch (PatternSyntaxException ex) {
+                throw new IllegalArgumentException("Invalid syntax for the template expression '" + 
+                        regex + "'", 
+                        ex);            
+            }
+        }
+
+        public Pattern getPattern() {
+            return pattern;
+        }
+
+        public Map<String, Pattern> getNameToPattern() {
+            return nameToPattern;
+        }
+
+        private void parse(CharacterIterator ci) {
+            while (ci.hasNext()) {
+                char c = ci.next();
+                if (c == '{') {                
+                    parseName(ci);
+                } else {
+                    // Literal character
+                    // Transform
+                    if (RESERVED_REGEX_CHARACTERS.contains(c))
+                        regex.append("\\");
+                    regex.append(c);
+                }
+            }
+        }
+
+        private void parseName(CharacterIterator ci) {
+            char c = consumeWhiteSpace(ci);
+
+            StringBuffer nameBuffer = new StringBuffer();        
+            if (Character.isLetterOrDigit(c) || c == '_') {
+                // Template name character
+                nameBuffer.append(c);
+            } else {
+                throw new IllegalArgumentException("Illegal character '" + c + 
+                        "' at position " + ci.pos() + " is not as the start of a name");
+            }
+
+            String nameRegexString = "";
+            while(true) {
+                c = ci.next();
+                // "\\{(\\w[-\\w\\.]*)
+                if (Character.isLetterOrDigit(c) || c == '_' || c == '-' || c == '.') {
+                    // Template name character             
+                    nameBuffer.append(c);
+                } else if (c == ':') {
+                    nameRegexString = parseRegex(ci);
+                    break;
+                } else if (c == '}') {
+                    break;
+                } else if (c == ' ') {
+                    c = consumeWhiteSpace(ci);
+
+                    if (c == ':') {
+                        nameRegexString = parseRegex(ci);
+                        break;
+                    } else if (c == '}') {
+                        break;
+                    } else {
+                        // Error
+                        throw new IllegalArgumentException("Illegal character '" + c + 
+                                "' at position " + ci.pos() + " is not allowed after a name");
+                    }
+                } else {
+                    throw new IllegalArgumentException("Illegal character '" + c + 
+                            "' at position " + ci.pos() + " is not allowed as part of a name");
+                }
+            }        
+            String name = nameBuffer.toString();
+
+            try {
+                Pattern namePattern = (nameRegexString.length() == 0) 
+                        ? TEMPLATE_VALUE_PATTERN : Pattern.compile(nameRegexString);
+                if (nameToPattern.containsKey(name)) {
+                    if (!nameToPattern.get(name).equals(namePattern)) {
+                        throw new IllegalArgumentException("The name '" + name + 
+                                "' is declared " +
+                                "more than once with different regular expressions");
+                    }
+                } else {
+                    nameToPattern.put(name, namePattern);            
+                }
+
+                regex.append('(').
+                        append(namePattern).
+                        append(')');
+            } catch (PatternSyntaxException ex) {
+                throw new IllegalArgumentException("Invalid syntax for the expression '" + nameRegexString + 
+                        "' associated with the name '" + name + "'", 
+                        ex);
+            }
+
+        }
+
+        private String parseRegex(CharacterIterator ci) {
+            StringBuffer regexBuffer = new StringBuffer();
+
+            int braceCount = 1;
+            while (true) {
+                char c = ci.next();
+                if (c == '{') {
+                    braceCount++;
+                } else if (c == '}') {
+                    braceCount--;
+                    if (braceCount == 0)
+                        break;
+                }            
+                regexBuffer.append(c);
+            }
+
+            return regexBuffer.toString().trim();
+        }
+
+        private char consumeWhiteSpace(CharacterIterator ci) {
+            char c = ci.next();
+            // Consume white space;
+            // TODO use correct c
+            while (c == ' ') c = ci.next();
+
+            return c;
+        }
+    }
     
     /**
      * The regular expression for matching URI templates and names.
