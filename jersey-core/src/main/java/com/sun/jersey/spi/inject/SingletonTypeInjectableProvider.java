@@ -69,19 +69,18 @@ public abstract class SingletonTypeInjectableProvider<A extends Annotation, T>
         this.instance = instance;
     }
     
-    public Scope getScope() {
+    public final Scope getScope() {
         return Scope.Singleton;
     }
     
-    public Injectable getInjectable(ComponentContext ic, A a, Type c) {
+    public final Injectable<T> getInjectable(ComponentContext ic, A a, Type c) {
         if (c.equals(t)) {
             return this;
         } else
             return null;
     }
 
-    public T getValue(HttpContext c) {
+    public final T getValue(HttpContext c) {
         return instance;
     }
-
 }
