@@ -38,6 +38,7 @@
 package com.sun.jersey.api.client;
 
 import com.sun.jersey.impl.container.OutBoundHeaders;
+import java.util.Locale;
 import javax.ws.rs.core.Cookie;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
@@ -100,6 +101,18 @@ public abstract class PartialRequestBuilder<T extends RequestBuilder>
             getMetadata().add("Accept", type);
         return (T)this;
     }
+    
+    public T acceptLanguage(Locale... locales) {
+        for (Locale locale : locales)
+            getMetadata().add("Accept-Language", locale);
+        return (T)this;
+    }
+
+    public T acceptLanguage(String... locales) {
+        for (String locale : locales)
+            getMetadata().add("Accept-Language", locale);
+        return (T)this;
+    }    
     
     public T cookie(Cookie cookie) {
         getMetadata().add("Cookie", cookie);

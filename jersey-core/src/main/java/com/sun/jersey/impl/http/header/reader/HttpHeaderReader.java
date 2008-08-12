@@ -191,11 +191,12 @@ public abstract class HttpHeaderReader {
             }
         }
         
-        if (wholeNumber == '1' && value > 0) {
-            throw new ParseException("The Quality value, " + q + ", is greater than 1", index);
-        }
-        
-        return value;
+        if (wholeNumber == '1') {
+            if (value > 0)
+                throw new ParseException("The Quality value, " + q + ", is greater than 1", index);
+            return QualityFactor.DEFAULT_QUALITY_FACTOR;
+        } else
+            return value;
     }
     
     public static int readQualityFactorParameter(HttpHeaderReader reader) throws ParseException {

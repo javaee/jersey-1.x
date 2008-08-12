@@ -39,6 +39,7 @@ package com.sun.jersey.api.client;
 
 import com.sun.jersey.impl.client.ClientRequestImpl;
 import java.net.URI;
+import java.util.Locale;
 import java.util.concurrent.Callable;
 import java.util.concurrent.Future;
 import java.util.concurrent.FutureTask;
@@ -191,6 +192,14 @@ public final class AsyncWebResource extends Filterable implements
 
     public Builder accept(String... types) {
         return new Builder(u).accept(types);
+    }    
+    
+    public Builder acceptLanguage(Locale... locales) {
+        return new Builder(u).acceptLanguage(locales);
+    }
+
+    public Builder acceptLanguage(String... locales) {
+        return new Builder(u).acceptLanguage(locales);
     }    
     
     public Builder cookie(Cookie cookie) {

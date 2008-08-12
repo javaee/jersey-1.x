@@ -39,6 +39,7 @@ package com.sun.jersey.api.client;
 
 import com.sun.jersey.impl.client.ClientRequestImpl;
 import java.net.URI;
+import java.util.Locale;
 import javax.ws.rs.core.Cookie;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.UriBuilder;
@@ -188,6 +189,14 @@ public final class WebResource extends Filterable implements
 
     public Builder accept(String... types) {
         return new Builder(u).accept(types);
+    }    
+    
+    public Builder acceptLanguage(Locale... locales) {
+        return new Builder(u).acceptLanguage(locales);
+    }
+
+    public Builder acceptLanguage(String... locales) {
+        return new Builder(u).acceptLanguage(locales);
     }    
     
     public Builder cookie(Cookie cookie) {

@@ -40,6 +40,7 @@ import com.sun.jersey.api.Responses;
 import com.sun.jersey.api.core.HttpRequestContext;
 import com.sun.jersey.impl.MultivaluedMapImpl;
 import com.sun.jersey.impl.VariantSelector;
+import com.sun.jersey.impl.http.header.AcceptableLanguageTag;
 import com.sun.jersey.impl.http.header.HttpHeaderFactory;
 import com.sun.jersey.impl.http.header.reader.HttpHeaderReader;
 import com.sun.jersey.impl.model.HttpHelper;
@@ -99,6 +100,8 @@ public class ContainerRequest implements HttpRequestContext {
     private MediaType contentType;
     
     private List<MediaType> accept;
+    
+    private List<Locale> acceptLanguages;
     
     private Map<String, Cookie> cookies;
     
@@ -289,7 +292,16 @@ public class ContainerRequest implements HttpRequestContext {
     }
     
     public List<Locale> getAcceptableLanguages() {
-        throw new UnsupportedOperationException();
+        if (acceptLanguages == null || headersModCount != headers.getModCount()) {
+             List<AcceptableLanguageTag> alts = HttpHelper.getAcceptLangauge(this);
+             
+             acceptLanguages = new ArrayList<Locale>(alts.size());
+             for(AcceptableLanguageTag alt : alts) {
+                 acceptLanguages.add(new Locale(alt.getTag()));
+             }
+        }
+        
+        return acceptLanguages;
     }
     
     public MediaType getMediaType() {

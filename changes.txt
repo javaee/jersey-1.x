@@ -24,7 +24,7 @@ release 0.9 (2008-08-15)
   https://jersey.dev.java.net/issues/show_bug.cgi?id=79
   ';' separated package names and classpaths specified in the web.xml are
   trimmed.
-- Partially Integrated JSR 311 API 0.9
+- Integrated JSR 311 API 0.9
   - Path parameters match 1 or more characters that are not '/' 
     (previously it was zero or more of any character), unless the final 
      parameter is unlimited, in which case it is the same as before.

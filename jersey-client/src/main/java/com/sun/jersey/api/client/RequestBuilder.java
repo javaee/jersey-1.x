@@ -37,6 +37,7 @@
 
 package com.sun.jersey.api.client;
 
+import java.util.Locale;
 import javax.ws.rs.core.Cookie;
 import javax.ws.rs.core.MediaType;
 
@@ -107,6 +108,22 @@ public interface RequestBuilder<T extends RequestBuilder> {
      * @return the builder.
      */
     T accept(String... types);
+    
+    /**
+     * Add acceptable languages
+     * 
+     * @param types an array of the acceptable languages
+     * @return the builder.
+     */
+    T acceptLanguage(Locale... locales);
+    
+    /**
+     * Add acceptable languages
+     * 
+     * @param types an array of the acceptable languages
+     * @return the builder.
+     */
+    T acceptLanguage(String... locales);
     
     /**
      * Add a cookie to be set.
