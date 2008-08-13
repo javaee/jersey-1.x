@@ -1,4 +1,8 @@
 release 0.9 (2008-08-15)
+- Fixed issue 96
+  https://jersey.dev.java.net/issues/show_bug.cgi?id=96
+  @PathParam annotated parameters on sub-resource locators are correctly
+  represented as template parameters in WADL
 - Fixed issue 87
   https://jersey.dev.java.net/issues/show_bug.cgi?id=87
   A message body writer may modify the http headers before any bytes

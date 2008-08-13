@@ -36,6 +36,7 @@
  */
 package com.sun.jersey.impl.wadl.generators;
 
+import com.sun.jersey.api.model.AbstractMethod;
 import java.io.File;
 
 import javax.ws.rs.core.MediaType;
@@ -152,11 +153,11 @@ public class WadlGeneratorApplicationDoc implements WadlGenerator {
      * @param m
      * @param p
      * @return
-     * @see com.sun.jersey.impl.wadl.WadlGenerator#createRequestParam(com.sun.jersey.api.model.AbstractResource, com.sun.jersey.api.model.AbstractResourceMethod, com.sun.jersey.api.model.Parameter)
+     * @see com.sun.jersey.impl.wadl.WadlGenerator#createParam(com.sun.jersey.api.model.AbstractResource, com.sun.jersey.api.model.AbstractMethod, com.sun.jersey.api.model.Parameter)
      */
-    public Param createRequestParam( AbstractResource r,
-            AbstractResourceMethod m, Parameter p ) {
-        return _delegate.createRequestParam( r, m, p );
+    public Param createParam( AbstractResource r,
+            AbstractMethod m, Parameter p ) {
+        return _delegate.createParam( r, m, p );
     }
 
     /**
@@ -186,5 +187,4 @@ public class WadlGeneratorApplicationDoc implements WadlGenerator {
     public Resources createResources() {
         return _delegate.createResources();
     }
-
 }

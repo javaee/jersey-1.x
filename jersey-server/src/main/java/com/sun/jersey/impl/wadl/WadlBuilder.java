@@ -37,6 +37,7 @@
 
 package com.sun.jersey.impl.wadl;
 
+import com.sun.jersey.api.model.AbstractMethod;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -173,10 +174,10 @@ public final class WadlBuilder {
             return wadlRequest;
     }
 
-    private Param generateParam(AbstractResource r, AbstractResourceMethod m, final Parameter p) {
+    private Param generateParam(AbstractResource r, AbstractMethod m, final Parameter p) {
         if (p.getSource()==Parameter.Source.ENTITY || p.getSource()==Parameter.Source.CONTEXT)
             return null;
-        Param wadlParam = _wadlGenerator.createRequestParam( r, m, p );
+        Param wadlParam = _wadlGenerator.createParam(r, m, p);
         return wadlParam;
     }
 
@@ -232,9 +233,17 @@ public final class WadlBuilder {
 
         // for each sub resource locator
         for (AbstractSubResourceLocator l : r.getSubResourceLocators()) {
-            AbstractResource subResource = IntrospectionModeller.createResource( l.getMethod().getReturnType() );
-            Resource wadlSubResource = generateResource(subResource, l.getUriPath().getValue(), visitedClasses);
+            AbstractResource subResource = IntrospectionModeller.createResource(
+                    l.getMethod().getReturnType());
+            Resource wadlSubResource = generateResource(subResource, 
+                    l.getUriPath().getValue(), visitedClasses);
             wadlResource.getMethodOrResource().add(wadlSubResource);
+            
+            for (Parameter p : l.getParameters()) {
+                Param wadlParam = generateParam(r, l, p);
+                if (wadlParam != null && wadlParam.getStyle()==ParamStyle.TEMPLATE)
+                    wadlSubResource.getParam().add(wadlParam);
+            }
         }
         return wadlResource;
     }

@@ -34,24 +34,6 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-/*
- * The contents of this file are subject to the terms
- * of the Common Development and Distribution License
- * (the "License").  You may not use this file except
- * in compliance with the License.
- *
- * You can obtain a copy of the license at
- * http://www.opensource.org/licenses/cddl1.php
- * See the License for the specific language governing
- * permissions and limitations under the License.
- */
-
-/*
- * AbstractResourceMethod.java
- *
- * Created on October 5, 2007, 11:46 AM
- *
- */
 package com.sun.jersey.api.model;
 
 import java.lang.reflect.Method;
@@ -62,21 +44,19 @@ import javax.ws.rs.core.MediaType;
 /**
  * Abstraction for a resource method
  */
-public class AbstractResourceMethod implements Parameterized, AbstractModelComponent {
+public class AbstractResourceMethod extends AbstractMethod 
+        implements Parameterized, AbstractModelComponent {
     private AbstractResource resource;
     private List<MediaType> consumeMimeList;
     private List<MediaType> produceMimeList;
     private List<Parameter> parameters;
     private String httpMethod;
-    private Method method;
 
     public AbstractResourceMethod(AbstractResource resource, 
             Method method, String httpMethod) {
-        
-        assert null != method;
+        super(method);
 
         this.resource = resource;
-        this.method = method;
         this.httpMethod = httpMethod.toUpperCase();
         this.consumeMimeList = new ArrayList<MediaType>();
         this.produceMimeList = new ArrayList<MediaType>();
@@ -101,10 +81,6 @@ public class AbstractResourceMethod implements Parameterized, AbstractModelCompo
 
     public List<Parameter> getParameters() {
         return parameters;
-    }
-
-    public Method getMethod() {
-        return method;
     }
     
     public void accept(AbstractModelVisitor visitor) {

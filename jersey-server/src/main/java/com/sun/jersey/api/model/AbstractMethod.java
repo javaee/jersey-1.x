@@ -40,30 +40,17 @@ import java.lang.reflect.Method;
 
 /**
  *
- * @author mh124079
+ * @author Paul.Sandoz@Sun.Com
  */
-public class AbstractSubResourceMethod extends AbstractResourceMethod implements UriPathAnnotated {
+public abstract class AbstractMethod {
+    private Method method;
 
-    private UriPathValue uriPath;
-
-    public AbstractSubResourceMethod(AbstractResource resource,
-            Method method, UriPathValue uriPath, String httpMethod) {
-        super(resource, method, httpMethod);
-        this.uriPath = uriPath;
-    }
-
-    public UriPathValue getUriPath() {
-        return uriPath;
-    }
-
-    @Override
-    public void accept(AbstractModelVisitor visitor) {
-        visitor.visitAbstractSubResourceMethod(this);
+    public AbstractMethod(Method method) { 
+        assert null != method;
+        this.method = method;
     }
     
-    @Override
-    public String toString() {
-        return "AbstractSubResourceMethod(" 
-                + getMethod().getDeclaringClass().getSimpleName() + "#" + getMethod().getName() + ")";
+    public Method getMethod() {
+        return method;
     }
 }

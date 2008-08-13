@@ -128,7 +128,7 @@ public class WadlResourceTest extends AbstractResourceTester {
         }
 
         @Path("{id}/verbose")
-        public Object getVerbose(@PathParam("id")int id) {
+        public ExtraResource getVerbose(@PathParam("id")int id) {
             return new ExtraResource();
         }
     }
@@ -180,6 +180,9 @@ public class WadlResourceTest extends AbstractResourceTester {
         // check number of output representations is one
         val = (String)xp.evaluate("count(//wadl:resource[@path='widgets']/wadl:method[@name='POST']/wadl:request/wadl:representation)", d, XPathConstants.STRING);
         assertEquals(val,"1");
+        // check type of {id}/verbose is int
+        val = (String)xp.evaluate("//wadl:resource[@path='{id}/verbose']/wadl:param[@name='id']/@type", d, XPathConstants.STRING);
+        assertEquals(val,"xs:int");
     }
     
     public void testOptionsResourceWadl() throws ParserConfigurationException, SAXException, IOException, XPathExpressionException {

@@ -41,6 +41,7 @@
 
 package com.sun.jersey.api.wadl.config;
 
+import com.sun.jersey.api.model.AbstractMethod;
 import java.io.File;
 import java.net.URL;
 import java.util.Properties;
@@ -164,8 +165,8 @@ public class WadlGeneratorLoaderTest extends AbstractResourceTester {
             return null;
         }
 
-        public Param createRequestParam( AbstractResource r,
-                AbstractResourceMethod m, Parameter p ) {
+        public Param createParam( AbstractResource r,
+                AbstractMethod m, Parameter p ) {
             return null;
         }
 

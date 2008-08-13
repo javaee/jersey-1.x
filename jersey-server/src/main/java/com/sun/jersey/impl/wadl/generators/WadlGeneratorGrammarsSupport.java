@@ -36,6 +36,7 @@
  */
 package com.sun.jersey.impl.wadl.generators;
 
+import com.sun.jersey.api.model.AbstractMethod;
 import java.io.File;
 import java.util.logging.Logger;
 
@@ -159,11 +160,11 @@ public class WadlGeneratorGrammarsSupport implements WadlGenerator {
      * @param arg1
      * @param arg2
      * @return
-     * @see com.sun.jersey.impl.wadl.WadlGenerator#createRequestParam(com.sun.jersey.api.model.AbstractResource, com.sun.jersey.api.model.AbstractResourceMethod, com.sun.jersey.api.model.Parameter)
+     * @see com.sun.jersey.impl.wadl.WadlGenerator#createParam(com.sun.jersey.api.model.AbstractResource, com.sun.jersey.api.model.AbstractMethod, com.sun.jersey.api.model.Parameter)
      */
-    public Param createRequestParam( AbstractResource arg0,
-            AbstractResourceMethod arg1, Parameter arg2 ) {
-        return _delegate.createRequestParam( arg0, arg1, arg2 );
+    public Param createParam( AbstractResource arg0,
+            AbstractMethod arg1, Parameter arg2 ) {
+        return _delegate.createParam( arg0, arg1, arg2 );
     }
 
     /**

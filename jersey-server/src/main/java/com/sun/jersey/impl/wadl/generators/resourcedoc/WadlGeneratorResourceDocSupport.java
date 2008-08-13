@@ -36,6 +36,7 @@
  */
 package com.sun.jersey.impl.wadl.generators.resourcedoc;
 
+import com.sun.jersey.api.model.AbstractMethod;
 import java.io.File;
 import java.util.List;
 import java.util.logging.Level;
@@ -280,11 +281,11 @@ public class WadlGeneratorResourceDocSupport implements WadlGenerator {
      * @param m
      * @param p
      * @return
-     * @see com.sun.jersey.impl.wadl.WadlGenerator#createRequestParam(com.sun.jersey.api.model.AbstractResource, com.sun.jersey.api.model.AbstractResourceMethod, com.sun.jersey.api.model.Parameter)
+     * @see com.sun.jersey.impl.wadl.WadlGenerator#createParam(com.sun.jersey.api.model.AbstractResource, com.sun.jersey.api.model.AbstractMethod, com.sun.jersey.api.model.Parameter)
      */
-    public Param createRequestParam( AbstractResource r,
-            AbstractResourceMethod m, Parameter p ) {
-        final Param result = _delegate.createRequestParam( r, m, p );
+    public Param createParam( AbstractResource r,
+            AbstractMethod m, Parameter p ) {
+        final Param result = _delegate.createParam( r, m, p );
         final ParamDocType paramDoc = _resourceDoc.getParamDoc( r.getResourceClass(), m.getMethod(), p );
         if ( paramDoc != null && !isEmpty( paramDoc.getCommentText() ) ) {
             final Doc doc = new Doc();

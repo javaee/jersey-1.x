@@ -41,6 +41,7 @@
 
 package com.sun.jersey.api.wadl.config;
 
+import com.sun.jersey.api.model.AbstractMethod;
 import java.util.List;
 
 import javax.ws.rs.core.MediaType;
@@ -176,8 +177,8 @@ public class WadlGeneratorConfigTest extends TestCase {
             return null;
         }
 
-        public Param createRequestParam( AbstractResource r,
-                AbstractResourceMethod m, Parameter p ) {
+        public Param createParam( AbstractResource r,
+                AbstractMethod m, Parameter p ) {
             return null;
         }
 
@@ -260,8 +261,8 @@ public class WadlGeneratorConfigTest extends TestCase {
             return null;
         }
 
-        public Param createRequestParam( AbstractResource r,
-                AbstractResourceMethod m, Parameter p ) {
+        public Param createParam( AbstractResource r,
+                AbstractMethod m, Parameter p ) {
             return null;
         }
 

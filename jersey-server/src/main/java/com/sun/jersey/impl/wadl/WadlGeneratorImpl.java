@@ -37,6 +37,7 @@
 
 package com.sun.jersey.impl.wadl;
 
+import com.sun.jersey.api.model.AbstractMethod;
 import javax.ws.rs.core.MediaType;
 import javax.xml.bind.JAXBElement;
 import javax.xml.namespace.QName;
@@ -100,7 +101,7 @@ public final class WadlGeneratorImpl implements WadlGenerator {
         return new Request();
     }
 
-    public Param createRequestParam( AbstractResource r, AbstractResourceMethod m, final Parameter p ) {
+    public Param createParam( AbstractResource r, AbstractMethod m, final Parameter p ) {
         Param wadlParam = new Param();
         wadlParam.setName(p.getSourceName());
         switch (p.getSource()) {

@@ -37,13 +37,13 @@
 
 package com.sun.jersey.impl.wadl;
 
+import com.sun.jersey.api.model.AbstractMethod;
 import javax.ws.rs.core.MediaType;
 import javax.xml.bind.annotation.XmlRegistry;
 
 import com.sun.jersey.api.model.AbstractResource;
 import com.sun.jersey.api.model.AbstractResourceMethod;
 import com.sun.jersey.api.model.Parameter;
-import com.sun.jersey.impl.wadl.generators.resourcedoc.xhtml.Elements;
 import com.sun.research.ws.wadl.Application;
 import com.sun.research.ws.wadl.Param;
 import com.sun.research.ws.wadl.RepresentationType;
@@ -108,17 +108,23 @@ public interface WadlGenerator {
 
     public Resources createResources();
     
-    public Resource createResource( final AbstractResource r, String path );
+    public Resource createResource(AbstractResource r,
+            String path);
 
-    public com.sun.research.ws.wadl.Method createMethod( final AbstractResource r,
-            final AbstractResourceMethod m );
+    public com.sun.research.ws.wadl.Method createMethod(AbstractResource r, 
+            AbstractResourceMethod m);
 
-    public Request createRequest(AbstractResource r, AbstractResourceMethod m);
+    public Request createRequest(AbstractResource r, 
+            AbstractResourceMethod m);
 
-    public RepresentationType createRequestRepresentation( AbstractResource r, AbstractResourceMethod m, MediaType mediaType );
+    public RepresentationType createRequestRepresentation(AbstractResource r, 
+            AbstractResourceMethod m, 
+            MediaType mediaType);
 
-    public Param createRequestParam( AbstractResource r, AbstractResourceMethod m, final Parameter p );
-
-    public Response createResponse( AbstractResource r, AbstractResourceMethod m );
+    public Response createResponse(AbstractResource r,
+            AbstractResourceMethod m);    
     
+    public Param createParam(AbstractResource r, 
+            AbstractMethod m,
+            Parameter p);
 }

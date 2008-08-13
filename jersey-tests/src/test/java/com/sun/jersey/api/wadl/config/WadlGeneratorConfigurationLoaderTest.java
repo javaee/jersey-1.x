@@ -48,6 +48,7 @@ import javax.ws.rs.core.MediaType;
 
 import com.sun.jersey.api.core.DefaultResourceConfig;
 import com.sun.jersey.api.core.ResourceConfig;
+import com.sun.jersey.api.model.AbstractMethod;
 import com.sun.jersey.api.model.AbstractResource;
 import com.sun.jersey.api.model.AbstractResourceMethod;
 import com.sun.jersey.api.model.Parameter;
@@ -130,8 +131,8 @@ public class WadlGeneratorConfigurationLoaderTest extends AbstractResourceTester
             return null;
         }
 
-        public Param createRequestParam( AbstractResource r,
-                AbstractResourceMethod m, Parameter p ) {
+        public Param createParam( AbstractResource r,
+                AbstractMethod m, Parameter p ) {
             return null;
         }
 
