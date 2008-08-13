@@ -118,6 +118,24 @@
         </resources>
         <plugins>
             <plugin>
+                <groupId>org.jvnet.jaxb2.maven2</groupId>
+                <artifactId>maven-jaxb2-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>generate</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <generatePackage>com.sun.research.ws.wadl</generatePackage>
+                    <schemaDirectory>${basedir}/etc</schemaDirectory>
+                    <schemaIncludes>
+                        <include>wadl.xsd</include>
+                    </schemaIncludes>
+                </configuration>
+            </plugin>
+            <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
                 <configuration>
