@@ -87,7 +87,13 @@ public class ContainerResponse implements HttpResponseContext {
     private CommittingOutputStream out;
     
     private final class CommittingOutputStream extends OutputStream {
+        private final long size;
+        
         private OutputStream o;
+
+        CommittingOutputStream(long size) {
+            this.size = size;
+        }
         
         @Override
         public void write(byte b[]) throws IOException {
@@ -108,7 +114,8 @@ public class ContainerResponse implements HttpResponseContext {
         
         @Override
         public void flush() throws IOException {
-            o.flush();
+            if (isCommitted)
+                o.flush();
         }
         
         @Override
@@ -122,7 +129,7 @@ public class ContainerResponse implements HttpResponseContext {
                 if (getStatus() == 204)
                     setStatus(200);
                 isCommitted = true;
-                o = responseWriter.writeStatusAndHeaders(-1, ContainerResponse.this);
+                o = responseWriter.writeStatusAndHeaders(size, ContainerResponse.this);
             }
         }
         
@@ -222,16 +229,18 @@ public class ContainerResponse implements HttpResponseContext {
                 throw new WebApplicationException(Responses.notAcceptable().build());
         }
 
-        isCommitted = true;
         final long size = p.getSize(entity);
         if (request.getMethod().equals("HEAD")) {
             if (size != -1)
                 getHttpHeaders().putSingle("Content-Length", Long.toString(size));
-            responseWriter.writeStatusAndHeaders(-1, this);
         } else {
-            OutputStream os = responseWriter.writeStatusAndHeaders(size, this);        
             p.writeTo(entity, entity.getClass(), entityType, null, 
-                    contentType, getHttpHeaders(), os);
+                    contentType, getHttpHeaders(), 
+                    new CommittingOutputStream(size));
+        }
+        if (!isCommitted) {
+            responseWriter.writeStatusAndHeaders(-1, this);
+            isCommitted = true;
         }
     }
 
@@ -280,15 +289,6 @@ public class ContainerResponse implements HttpResponseContext {
         } else {
             this.headers = setResponseNonOptimal(r, contentType);
         }
-//        
-//        // If HTTP method is HEAD then there should be no entity
-//        if (request.getMethod().equals("HEAD"))
-//            this.entity = null;
-//        // Otherwise if there is no entity then there should be no content type
-//        else if (this.entity == null) {
-//            contentType = null;
-//        }
-// 
     }
     
     public boolean isResponseSet() {
@@ -332,7 +332,7 @@ public class ContainerResponse implements HttpResponseContext {
     
     public OutputStream getOutputStream() throws IOException {
         if (out == null)
-            out = new CommittingOutputStream();
+            out = new CommittingOutputStream(-1);
         
         return out;
     }
