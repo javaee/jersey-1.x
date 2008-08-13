@@ -89,7 +89,7 @@
                         <configuration>
                             <shadedGroupFilter>com.sun.jersey</shadedGroupFilter>
                             <shadedArtifactAttached>false</shadedArtifactAttached>
-                            <promoteTransitiveDependencies>false</promoteTransitiveDependencies>
+                            <promoteTransitiveDependencies>true</promoteTransitiveDependencies>
                             <createDependencyReducedPom>true</createDependencyReducedPom>
                             <transformers>
                                 <transformer implementation="org.apache.maven.plugins.shade.resource.AppendingTransformer">
