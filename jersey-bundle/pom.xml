@@ -49,9 +49,11 @@
     <name>jersey-bundle</name>
     <description>
         A bundle containing code of all jar-based modules that provide 
-        JAX-RS and Jersey-related features. Such a bundle is useful for
+        JAX-RS and Jersey-related features. Such a bundle is *only intended* for
         developers that do not use Maven's dependency system.
         The bundle does not include code for contributes, tests and samples.
+        For source and javadoc jar files please look at the bellow specified
+        dependencies. 
     </description>
     <dependencies>
         <dependency>
@@ -89,7 +91,7 @@
                         <configuration>
                             <shadedGroupFilter>com.sun.jersey</shadedGroupFilter>
                             <shadedArtifactAttached>false</shadedArtifactAttached>
-                            <promoteTransitiveDependencies>true</promoteTransitiveDependencies>
+                            <promoteTransitiveDependencies>false</promoteTransitiveDependencies>
                             <createDependencyReducedPom>true</createDependencyReducedPom>
                             <!-- createSourcesJar switch is quite unreliable :-(
                             <createSourcesJar>true</createSourcesJar>
