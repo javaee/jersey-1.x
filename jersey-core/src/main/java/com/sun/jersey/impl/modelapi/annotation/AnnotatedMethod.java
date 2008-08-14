@@ -50,6 +50,7 @@ import javax.ws.rs.Consumes;
 import javax.ws.rs.CookieParam;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.Encoded;
+import javax.ws.rs.FormParam;
 import javax.ws.rs.HeaderParam;
 import javax.ws.rs.HttpMethod;
 import javax.ws.rs.Path;
@@ -84,7 +85,8 @@ public final class AnnotatedMethod implements AnnotatedElement {
         QueryParam.class,
         CookieParam.class, 
         HeaderParam.class, 
-        PathParam.class);
+        PathParam.class,
+        FormParam.class);
     
     private static Set<Class<? extends Annotation>> getSet(Class<? extends Annotation>... cs) {
         Set<Class<? extends Annotation>> s = new HashSet<Class<? extends Annotation>>();
@@ -114,27 +116,23 @@ public final class AnnotatedMethod implements AnnotatedElement {
     }
 
     public Method getMethod() {
-        return m;
-    }
-
-    public Method getAnnotatedMethod() {
         return am;
     }
-    
+
     public Annotation[][] getParameterAnnotations() {
         return parameterAnnotations.clone();
     }
     
     public Class<?>[] getParameterTypes() {
-        return m.getParameterTypes();
+        return am.getParameterTypes();
     }
     
     public TypeVariable<Method>[] getTypeParameters() {
-        return m.getTypeParameters();
+        return am.getTypeParameters();
     } 
     
     public Type[] getGenericParameterTypes() {
-        return m.getGenericParameterTypes();
+        return am.getGenericParameterTypes();
     }
                             
     public <T extends Annotation> List<T> getMetaMethodAnnotations(

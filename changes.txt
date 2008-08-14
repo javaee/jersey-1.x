@@ -1,4 +1,9 @@
 release 0.9 (2008-08-15)
+- Fixed issue 97
+  https://jersey.dev.java.net/issues/show_bug.cgi?id=96
+  Methods on JAX-RS conforming annotated interfaces (if present) are used 
+  for invocation as opposed to the concrete methods on the concrete class.
+  This allows for the possibility to proxy an instance using the interface.
 - SpringServlet no longer overrides Servlet.service, which previously 
   caught all RuntimeException and did not re-throw them.
 - Fixed issue 96

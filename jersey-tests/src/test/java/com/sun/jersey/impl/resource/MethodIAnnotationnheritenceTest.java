@@ -39,6 +39,14 @@ package com.sun.jersey.impl.resource;
 
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.impl.AbstractResourceTester;
+import com.sun.jersey.spi.service.ComponentContext;
+import com.sun.jersey.spi.service.ComponentProvider;
+import com.sun.jersey.spi.service.ComponentProvider.Scope;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.lang.reflect.Proxy;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.HeaderParam;
@@ -80,6 +88,7 @@ public class MethodIAnnotationnheritenceTest extends AbstractResourceTester {
             return p + q + h;
         }
     }
+    
     public static interface Interface {
         @GET
         @Produces("application/get")
@@ -139,6 +148,47 @@ public class MethodIAnnotationnheritenceTest extends AbstractResourceTester {
     
     public void testInterfaceImplementation() {
         initiateWebApplication(InterfaceImplementation.class);
+        
+        _test();
+    }
+    
+    
+    static class ProxyComponentProvider implements ComponentProvider {
+        public <T> T getInjectableInstance(T instance) {
+            return instance;
+        }
+
+        public <T> T getInstance(Scope scope, Class<T> c) 
+                throws InstantiationException, IllegalAccessException {
+            if (Interface.class.isAssignableFrom(c)) {
+                final Object o = c.newInstance();
+                return (T) Proxy.newProxyInstance(
+                        this.getClass().getClassLoader(),
+                        new Class[]{Interface.class},
+                        new InvocationHandler() {
+                    public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+                        return method.invoke(o, args);
+                    }
+                });
+            } else return null;
+        }
+
+        public <T> T getInstance(Scope scope, Constructor<T> constructor, Object[] parameters) 
+                throws InstantiationException, IllegalArgumentException, IllegalAccessException, InvocationTargetException {
+            return null;
+        }
+
+        public <T> T getInstance(ComponentContext cc, Scope scope, Class<T> c) 
+                throws InstantiationException, IllegalAccessException {
+            return getInstance(scope, c);
+        }
+        
+        public void inject(Object instance) {
+        }
+    }
+    
+    public void testInterfaceImplementationComponentProviderProxy() {
+        initiateWebApplication(new ProxyComponentProvider(), InterfaceImplementation.class);
         
         _test();
     }
