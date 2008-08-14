@@ -96,7 +96,7 @@ public class XMLRootElementProvider extends AbstractRootElementProvider {
             return getUnmarshaller(type, mediaType).unmarshal(entityStream);
         } catch (JAXBException cause) {
             throw ThrowHelper.withInitCause(cause,
-                    new IOException(ImplMessages.ERROR_MARSHALLING_JAXB(type))
+                    new IOException(ImplMessages.ERROR_UNMARSHALLING_JAXB(type))
                     );
         }
     }

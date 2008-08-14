@@ -97,7 +97,7 @@ public class XMLRootObjectProvider extends AbstractJAXBProvider<Object> {
             return Object.class == type && getUnmarshaller(type) != null;
         } catch (JAXBException cause) {
             throw ThrowHelper.withInitCause(cause,
-                    new ContainerException(ImplMessages.ERROR_MARSHALLING_JAXB(type))
+                    new ContainerException(ImplMessages.ERROR_UNMARSHALLING_JAXB(type))
                     );
         }
     }
@@ -113,7 +113,7 @@ public class XMLRootObjectProvider extends AbstractJAXBProvider<Object> {
             return getUnmarshaller(type, mediaType).unmarshal(entityStream);
         } catch (JAXBException cause) {
             throw ThrowHelper.withInitCause(cause,
-                    new IOException(ImplMessages.ERROR_MARSHALLING_JAXB(type))
+                    new IOException(ImplMessages.ERROR_UNMARSHALLING_JAXB(type))
                     );
         }
     }

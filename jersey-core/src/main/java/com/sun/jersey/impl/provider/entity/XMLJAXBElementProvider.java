@@ -104,7 +104,7 @@ public class XMLJAXBElementProvider extends AbstractJAXBElementProvider {
             return getUnmarshaller(ta, mediaType).unmarshal(source, ta);
         } catch (JAXBException cause) {
             throw ThrowHelper.withInitCause(cause,
-                    new IOException(ImplMessages.ERROR_MARSHALLING_JAXB(type))
+                    new IOException(ImplMessages.ERROR_UNMARSHALLING_JAXB(type))
                     );
         }    
     }

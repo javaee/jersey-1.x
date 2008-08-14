@@ -99,7 +99,7 @@ public final class JSONJAXBElementProvider extends AbstractJAXBElementProvider {
             }
         } catch (JAXBException cause) {
             throw ThrowHelper.withInitCause(cause,
-                    new IOException(ImplMessages.ERROR_MARSHALLING_JAXB(type))
+                    new IOException(ImplMessages.ERROR_UNMARSHALLING_JAXB(type))
                     );
         }    
     }
