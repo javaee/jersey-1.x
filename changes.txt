@@ -1,4 +1,7 @@
 release 0.9 (2008-08-15)
+- Fixed issue 50
+  https://jersey.dev.java.net/issues/show_bug.cgi?id=50
+  Jersey version is included in the WADL as the first doc element.
 - Fixed issue 97
   https://jersey.dev.java.net/issues/show_bug.cgi?id=96
   Methods on JAX-RS conforming annotated interfaces (if present) are used 
