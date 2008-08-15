@@ -50,8 +50,10 @@ import com.sun.jersey.api.model.AbstractResourceMethod;
 import com.sun.jersey.api.model.AbstractSubResourceLocator;
 import com.sun.jersey.api.model.AbstractSubResourceMethod;
 import com.sun.jersey.api.model.Parameter;
+import com.sun.jersey.impl.BuildId;
 import com.sun.jersey.impl.modelapi.annotation.IntrospectionModeller;
 import com.sun.research.ws.wadl.Application;
+import com.sun.research.ws.wadl.Doc;
 import com.sun.research.ws.wadl.Param;
 import com.sun.research.ws.wadl.ParamStyle;
 import com.sun.research.ws.wadl.RepresentationType;
@@ -59,6 +61,8 @@ import com.sun.research.ws.wadl.Request;
 import com.sun.research.ws.wadl.Resource;
 import com.sun.research.ws.wadl.Resources;
 import com.sun.research.ws.wadl.Response;
+import javax.ws.rs.core.UriInfo;
+import javax.xml.namespace.QName;
 
 /**
  * This class implements the algorithm how the wadl is built for one or more
@@ -87,7 +91,7 @@ public final class WadlBuilder {
      * @param resources the set of resources
      * @return the JAXB WADL application bean
      */
-    public Application generate( Set<AbstractResource> resources ) {
+    public Application generate(Set<AbstractResource> resources ) {
         Application wadlApplication = _wadlGenerator.createApplication();
         Resources wadlResources = _wadlGenerator.createResources();
         Set<Class<?>> visitedClasses = new HashSet<Class<?>>();
@@ -98,6 +102,8 @@ public final class WadlBuilder {
             wadlResources.getResource().add(wadlResource);
         }
         wadlApplication.setResources(wadlResources);
+        
+        addVersion(wadlApplication);
         return wadlApplication;
     }
     
@@ -113,6 +119,8 @@ public final class WadlBuilder {
         Resource wadlResource = generateResource(resource, null, visitedClasses);
         wadlResources.getResource().add(wadlResource);
         wadlApplication.setResources(wadlResources);
+        
+        addVersion(wadlApplication);
         return wadlApplication;
     }
 
@@ -129,9 +137,19 @@ public final class WadlBuilder {
         Resource wadlResource = generateSubResource(resource, path);
         wadlResources.getResource().add(wadlResource);
         wadlApplication.setResources(wadlResources);
+        
+        addVersion(wadlApplication);
         return wadlApplication;
     }
 
+    private void addVersion(Application wadlApplication) {
+        // Include Jersey version as doc element with generatedBy attribute
+        Doc d = new Doc();
+        d.getOtherAttributes().put(new QName("http://jersey.dev.java.net/", "generatedBy", "jersey"), 
+                BuildId.getBuildId());
+        wadlApplication.getDoc().add(0, d);                
+    }
+    
     private com.sun.research.ws.wadl.Method generateMethod(AbstractResource r, final Map<String, Param> wadlResourceParams, final AbstractResourceMethod m) {
         com.sun.research.ws.wadl.Method wadlMethod = _wadlGenerator.createMethod( r, m );
         // generate the request part
