@@ -69,12 +69,13 @@ public class ProducesAcceptableTest extends AbstractResourceTester {
         resource("/").accept("application/foo", "application/bar").get(String.class);
     }
     
-    public void testNotAcceptable() {
+    public void testResponseOverride() {
         initiateWebApplication(WebResource.class);
         
         ClientResponse response = resource("/", false).
                 accept("application/foo").get(ClientResponse.class);
-        assertEquals(500, response.getStatus());
+        assertEquals(200, response.getStatus());
+        assertEquals("application/bar", response.getType().toString());
     }
 
     

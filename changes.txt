@@ -40,6 +40,8 @@ release 0.9 (2008-08-15)
   ';' separated package names and classpaths specified in the web.xml are
   trimmed.
 - Integrated JSR 311 API 0.9
+  - Information in a returned Response is not modified and the media type
+    (if set) will override that declared in @Produces.
   - Path parameters match 1 or more characters that are not '/' 
     (previously it was zero or more of any character), unless the final 
      parameter is unlimited, in which case it is the same as before.

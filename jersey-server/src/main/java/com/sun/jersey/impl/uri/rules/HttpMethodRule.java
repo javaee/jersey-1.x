@@ -39,9 +39,7 @@ package com.sun.jersey.impl.uri.rules;
 
 import com.sun.jersey.api.core.HttpRequestContext;
 import com.sun.jersey.api.core.HttpResponseContext;
-import com.sun.jersey.impl.ImplMessages;
 import com.sun.jersey.impl.http.header.AcceptableMediaType;
-import com.sun.jersey.impl.model.HttpHelper;
 import com.sun.jersey.impl.model.method.ResourceMethod;
 import com.sun.jersey.api.Responses;
 import com.sun.jersey.spi.uri.rules.UriRule;
@@ -50,11 +48,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
-import java.util.logging.Logger;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.MultivaluedMap;
-import javax.ws.rs.core.Response;
 
 /**
  * The rule for accepting an HTTP method.
@@ -62,9 +57,6 @@ import javax.ws.rs.core.Response;
  * @author Paul.Sandoz@Sun.Com
  */
 public final class HttpMethodRule implements UriRule {
-    private static final Logger LOGGER = 
-            Logger.getLogger(HttpMethodRule.class.getName());
-
     private final Map<String, List<ResourceMethod>> map;
     
     private final String allow;
@@ -100,11 +92,9 @@ public final class HttpMethodRule implements UriRule {
         
         final HttpRequestContext request = context.getRequest();
         final HttpResponseContext response = context.getResponse();
-        final String httpMethod = request.getMethod();
-        final MediaType contentType = HttpHelper.getContentType(request);
         
         // Get the list of resource methods for the HTTP method
-        List<ResourceMethod> methods = map.get(httpMethod);
+        List<ResourceMethod> methods = map.get(request.getMethod());
         if (methods == null) {
             // No resource methods are found
             response.setResponse(Responses.methodNotAllowed().
@@ -117,10 +107,10 @@ public final class HttpMethodRule implements UriRule {
         List<MediaType> accept = request.getAcceptableMediaTypes();
         LinkedList<ResourceMethod> matches = 
             new LinkedList<ResourceMethod>();
-        MatchStatus s = match(methods, contentType, accept, matches);
+        MatchStatus s = match(methods, request.getMediaType(), accept, matches);
         if (s == MatchStatus.MATCH) {
             // If there is a match choose the first method
-            ResourceMethod method = matches.get(0);
+            final ResourceMethod method = matches.get(0);
 
             // If a sub-resource method then need to push the resource
             // (again) as as to keep in sync with the ancestor URIs
@@ -131,11 +121,6 @@ public final class HttpMethodRule implements UriRule {
             }
             
             method.getDispatcher().dispatch(resource, context);
-
-            // Verify the response
-            // TODO verification for HEAD
-            if (!httpMethod.equals("HEAD"))
-                verifyResponse(method, accept, response);  
             return true;
         } else if (s == MatchStatus.NO_MATCH_FOR_CONSUME) {
             throw new WebApplicationException(Responses.unsupportedMediaType().build());
@@ -146,11 +131,6 @@ public final class HttpMethodRule implements UriRule {
         return true;
     }
 
-    private boolean hasMessageBody(MultivaluedMap<String, String> headers) {
-        return (headers.getFirst("Content-Length") != null || 
-                headers.getFirst("Transfer-Encoding") != null);
-    }
-        
     private enum MatchStatus {
         MATCH, NO_MATCH_FOR_CONSUME, NO_MATCH_FOR_PRODUCE
     }
@@ -218,44 +198,4 @@ public final class HttpMethodRule implements UriRule {
         
         return MatchStatus.MATCH;
     }    
-    
-    private void verifyResponse(ResourceMethod method, 
-            List<MediaType> accept,
-            HttpResponseContext responseContext) {        
-        Object entity = responseContext.getEntity();
-        MediaType contentType = HttpHelper.getContentType(
-                responseContext.getHttpHeaders().getFirst("Content-Type"));
-        
-        if (!responseContext.isCommitted() && contentType != null && entity == null) {
-            String ct = contentType.toString();
-            String error = "The \"Content-Type\" header is set to " + ct + ", but the response has no entity";
-            LOGGER.severe(error);
-            // TODO should this be ContainerException ???
-            throw new WebApplicationException(Response.serverError().
-                    entity(error).type("text/plain").build());            
-        } else if (contentType != null && !method.produces(contentType)) {
-            // Check if 'Content-Type' of the responseContext is a member of @Produces
-            // The resource is not honoring the @Produces contract
-            // The 'Content-Type' is not a member of @Produces.
-            // Check if the 'Content-Type' is acceptable
-            if (!HttpHelper.produces(contentType, accept)) {
-                String error = ImplMessages.RESOURCE_NOT_ACCEPTABLE(
-                        method,
-                        contentType);
-                LOGGER.severe(error);
-                
-                // The resource is returning a MIME type that is not acceptable
-                // Return 500 Internal Server Error
-                // TODO should this be ContainerException ???
-                throw new WebApplicationException(Response.serverError().
-                        entity(error).type("text/plain").build());
-            } else {
-                String error = ImplMessages.RESOURCE_MIMETYPE_NOT_IN_PRODUCE_MIME(
-                        method,
-                        contentType,
-                        method.getProduces());
-                LOGGER.warning(error);
-            }
-        }   
-    }
 }

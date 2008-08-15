@@ -46,6 +46,7 @@ import javax.ws.rs.FormParam;
 import javax.ws.rs.Path;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
+import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
@@ -180,5 +181,23 @@ public class NullEntityMediaTypeTest extends AbstractResourceTester {
         
         cr = r.path("String").get(ClientResponse.class);
         assertEquals(MediaType.TEXT_PLAIN_TYPE, cr.getType());        
+    }
+    
+    @Path("/")
+    @Produces("text/plain")
+    public static class NullWithProducesResource extends NullResource { }
+    
+    public void testNullWithProduces() throws IOException {
+        initiateWebApplication(NullWithProducesResource.class);
+        WebResource r = resource("/");
+
+        assertEquals(204, r.path("string").get(ClientResponse.class).
+                getStatus());
+        assertEquals(204, r.path("object").get(ClientResponse.class).
+                getStatus());
+        assertEquals(204, r.path("response").get(ClientResponse.class).
+                getStatus());
+        assertEquals(200, r.path("response-entity").get(ClientResponse.class).
+                getStatus());
     }
 }
