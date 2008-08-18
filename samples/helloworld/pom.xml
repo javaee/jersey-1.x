@@ -114,4 +114,12 @@
             </plugin>
          </plugins>
     </build>
+    <distributionManagement>
+        <repository>
+            <uniqueVersion>false</uniqueVersion>
+            <id>java.net-m2-dist-repository</id>
+            <name>java.net-m2-repository</name>
+            <url>java-net:/maven2-repository/trunk/www/repository/</url>
+        </repository>
+    </distributionManagement>
 </project>
