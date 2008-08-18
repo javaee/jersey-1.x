@@ -39,13 +39,9 @@
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    <parent>
-        <groupId>com.sun.jersey.samples</groupId>
-        <artifactId>jersey-samples</artifactId>
-        <version>0.9-ea-SNAPSHOT</version>
-        <relativePath>../pom.xml</relativePath>
-    </parent>
+    <groupId>com.sun.jersey.samples</groupId>
     <artifactId>generate-wadl</artifactId>
+    <version>0.9-ea-SNAPSHOT</version>
     <name>generate-wadl</name>
     <packaging>jar</packaging>
     
@@ -74,6 +70,44 @@
     
     <build>
         <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <inherited>true</inherited>
+                <configuration>
+                    <source>1.5</source>
+                    <target>1.5</target>
+                </configuration>
+            </plugin>
+            <plugin>
+              <artifactId>maven-assembly-plugin</artifactId>
+              <configuration>
+                <descriptors>
+                  <descriptor>src/main/assembly/src.xml</descriptor>
+                </descriptors>
+                <outputDirectory>assemblies</outputDirectory>
+              </configuration>
+              <executions>
+                <execution>
+                  <id>make-assembly</id> <!-- this is used for inheritance merges -->
+                  <phase>package</phase> <!-- append to the packaging phase. -->
+                  <goals>
+                    <goal>attached</goal> <!-- goals == mojos -->
+                  </goals>
+                </execution>
+              </executions>
+            </plugin>
+            <plugin>
+              <artifactId>maven-clean-plugin</artifactId>
+              <configuration>
+                <filesets>
+                  <fileset>
+                    <directory>assemblies</directory>
+                    <followSymlinks>false</followSymlinks>
+                  </fileset>
+                </filesets>
+              </configuration>
+            </plugin>
             <plugin>
                 <groupId>com.sun.tools.xjc.maven2</groupId>
                 <artifactId>maven-jaxb-plugin</artifactId>
