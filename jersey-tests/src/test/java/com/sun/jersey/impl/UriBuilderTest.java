@@ -201,6 +201,12 @@ public class UriBuilderTest extends TestCase {
         assertEquals(URI.create("http://localhost:8080/a%20/b%20/c%20/x%20/y%20/z%20"), bu);
     }
 
+    public void testAppendSegment() {
+        URI bu = UriBuilder.fromUri("http://localhost:8080").
+                segment("a/b/c").build();
+        assertEquals(URI.create("http://localhost:8080/a%2Fb%2Fc"), bu);
+    }
+
     public void testRelativefromUri() {
         URI bu = UriBuilder.fromUri("a/b/c").
             build();
@@ -258,12 +264,21 @@ public class UriBuilderTest extends TestCase {
         URI bu = UriBuilder.fromUri("http://localhost:8080/a/b/c?a=x&b=y").
                 queryParam("c", "z").build();
         assertEquals(URI.create("http://localhost:8080/a/b/c?a=x&b=y&c=z"), bu);
+        
+        bu = UriBuilder.fromUri("http://localhost:8080/a/b/c?a=x&b=y").
+                queryParam("c= ", "z= ").build();
+        assertEquals(URI.create("http://localhost:8080/a/b/c?a=x&b=y&c%3D+=z%3D+"), bu);
+        
     }
 
     public void testAppendMatrixParams() {
         URI bu = UriBuilder.fromUri("http://localhost:8080/a/b/c;a=x;b=y").
                 matrixParam("c", "z").build();
         assertEquals(URI.create("http://localhost:8080/a/b/c;a=x;b=y;c=z"), bu);
+        
+        bu = UriBuilder.fromUri("http://localhost:8080/a/b/c;a=x;b=y").
+                matrixParam("c=/ ", "z=/ ").build();
+        assertEquals(URI.create("http://localhost:8080/a/b/c;a=x;b=y;c%3D%2F%20=z%3D%2F%20"), bu);
     }
 
     public void testAppendPathAndMatrixParams() {

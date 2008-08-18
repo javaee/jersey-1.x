@@ -39,11 +39,9 @@ package com.sun.jersey.impl.uri;
 
 import com.sun.jersey.api.uri.UriComponent;
 import com.sun.jersey.api.uri.UriTemplate;
-import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Method;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.net.URLEncoder;
 import java.util.Map;
 import javax.ws.rs.Path;
 import javax.ws.rs.core.UriBuilder;
@@ -281,11 +279,11 @@ public final class UriBuilderImpl extends UriBuilder {
         
         if (path.length() > 0) path.append(';');
         for (Object value : values) {
-            path.append(encode(name, UriComponent.Type.PATH));
+            path.append(encode(name, UriComponent.Type.MATRIX_PARAM));
             
             final String stringValue = value.toString();
             if (stringValue.length() > 0)
-                path.append('=').append(encode(stringValue, UriComponent.Type.PATH));
+                path.append('=').append(encode(stringValue, UriComponent.Type.MATRIX_PARAM));
         }
         return this;
     }
@@ -316,11 +314,11 @@ public final class UriBuilderImpl extends UriBuilder {
 
         if (query.length() > 0) query.append('&');
         for (Object value : values) {
-            query.append(encodeQuery(name));
+            query.append(encode(name, UriComponent.Type.QUERY_PARAM));
 
             final String stringValue = value.toString();
             if (stringValue.length() > 0)
-                query.append('=').append(encodeQuery(stringValue));
+                query.append('=').append(encode(stringValue, UriComponent.Type.QUERY_PARAM));
         }
         return this;
     }
@@ -360,8 +358,8 @@ public final class UriBuilderImpl extends UriBuilder {
         if (segments.length() == 0)
             return;
 
-        // TODO if a segment encode '/' accordingly
-        segments = encode(segments, UriComponent.Type.PATH);
+        segments = encode(segments, 
+                (isSegment) ? UriComponent.Type.PATH_SEGMENT : UriComponent.Type.PATH);
         
         final boolean pathEndsInSlash = path.length() > 0 && path.charAt(path.length() - 1) == '/';
         final boolean segmentStartsWithSlash = segments.charAt(0) == '/';
@@ -379,10 +377,6 @@ public final class UriBuilderImpl extends UriBuilder {
         
     private String encode(String s, UriComponent.Type type) {
         return UriComponent.contextualEncode(s, type, true);
-    }
-    
-    private String encodeQuery(String s) {
-        return UriComponent.contextualEncode(s, UriComponent.Type.QUERY, true);
     }
     
     @Override

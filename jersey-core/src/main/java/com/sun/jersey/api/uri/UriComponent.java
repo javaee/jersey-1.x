@@ -223,7 +223,7 @@ public final class UriComponent {
                 }
 
                 if (c < 0x80) {
-                    if (c == ' ' && t == Type.QUERY)
+                    if (c == ' ' && (t == Type.QUERY || t == Type.QUERY_PARAM))                    
                         sb.append('+');
                     else
                         appendPercentEncodedOctet(sb, c);
@@ -286,6 +286,9 @@ public final class UriComponent {
 
         tables[Type.PATH_SEGMENT.ordinal()] = creatingEncodingTable(l);
         
+        tables[Type.MATRIX_PARAM.ordinal()] = tables[Type.PATH_SEGMENT.ordinal()].clone();
+        tables[Type.MATRIX_PARAM.ordinal()]['='] = false;
+        
         l.add("/");
         
         tables[Type.PATH.ordinal()] = creatingEncodingTable(l);
@@ -293,8 +296,12 @@ public final class UriComponent {
         l.add("?");
         
         tables[Type.QUERY.ordinal()] = creatingEncodingTable(l);
+        
         tables[Type.FRAGMENT.ordinal()] = tables[Type.QUERY.ordinal()];
         
+        tables[Type.QUERY_PARAM.ordinal()] = creatingEncodingTable(l);
+        tables[Type.QUERY_PARAM.ordinal()]['='] = false;
+
         return tables;
     }
     
