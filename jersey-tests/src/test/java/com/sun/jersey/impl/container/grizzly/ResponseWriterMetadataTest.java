@@ -94,8 +94,8 @@ public class ResponseWriterMetadataTest extends AbstractGrizzlyServerTester {
     }
     
     public void testResponse() {
-        ResourceConfig rc = new DefaultResourceConfig(Resource.class);
-        rc.getProviderClasses().add(StringWriter.class);
+        ResourceConfig rc = new DefaultResourceConfig(Resource.class,
+                StringWriter.class);
         startServer(rc);
 
         WebResource r = Client.create().resource(getUri().path("/").build());

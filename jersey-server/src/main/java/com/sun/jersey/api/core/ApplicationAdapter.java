@@ -34,12 +34,32 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-package com.sun.jersey.api.model;
+
+package com.sun.jersey.api.core;
+
+import java.util.Set;
+import javax.ws.rs.core.Application;
 
 /**
- *
- * @author mh124079
+ * An extension of {@link DefaultResourceConfig} that adapts an instance
+ * of {@link Application}.
  */
-public interface UriPathAnnotated {
-    public UriPathValue getUriPath();
+public final class ApplicationAdapter extends DefaultResourceConfig {
+    
+    private final Application ac;
+    
+    /**
+     * @param ac the application
+     */
+    public ApplicationAdapter(Application ac) {
+        this.ac = ac;
+    }
+    
+    public Set<Class<?>> getClasses() {
+        return ac.getClasses();
+    }
+    
+    public Set<Object> getSingletons() {
+        return ac.getSingletons();
+    }
 }

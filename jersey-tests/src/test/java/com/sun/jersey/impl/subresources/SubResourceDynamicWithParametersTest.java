@@ -71,8 +71,10 @@ public class SubResourceDynamicWithParametersTest extends AbstractResourceTester
             assertEquals(2, b);
             return new ChildWithTemplates();
         }
+
         
-        @Path(value="unmatchedPath/{path}", limited=false)
+//        @Path(value="unmatchedPath/{path}", limited=false)
+        @Path(value="unmatchedPath/{path}")
         public UnmatchedPathResource getUnmatchedPath(
                 @PathParam("p") String p,
                 @PathParam("path") String path) {

@@ -106,7 +106,7 @@ public class ReloadTest extends AbstractHttpServerTester {
         assertEquals("one", r.path("one").get(String.class));
         assertEquals(404, r.path("two").get(ClientResponse.class).getStatus());
         
-        rc.getResourceClasses().add(Two.class);
+        rc.getClasses().add(Two.class);
         cr.reload();
         
         assertEquals("one", r.path("one").get(String.class));

@@ -64,14 +64,10 @@ public abstract class AbstractMatchingTester extends TestCase {
         protected RulesMap<String> rulesMap = new RulesMap<String>();
         
         public RulesBuilder add(UriTemplate t, String s) {
-            return add(t, true, s);
-        }
-        
-        public RulesBuilder add(UriTemplate t, boolean limited, String s) {
-            rulesMap.put(new PathPattern(t, limited), s);
+            rulesMap.put(new PathPattern(t), s);
             return this;
         }
-        
+                
         public RulesBuilder add(PathPattern p, String s) {
             rulesMap.put(p, s);
             return this;
@@ -86,10 +82,6 @@ public abstract class AbstractMatchingTester extends TestCase {
     
     public final RulesBuilder add(UriTemplate t, String s) {
         return create().add(t, s);
-    }
-    
-    public final RulesBuilder add(UriTemplate t, boolean limited, String s) {
-        return create().add(t, limited, s);
     }
     
     public final RulesBuilder add(PathPattern p, String s) {
@@ -116,7 +108,7 @@ public abstract class AbstractMatchingTester extends TestCase {
     }
     
     public void testSlash() {
-        add(new UriTemplate("/"), false, "MATCH").
+        add(new UriTemplate("/"), "MATCH").
                 build();
         
         String s = match("/");

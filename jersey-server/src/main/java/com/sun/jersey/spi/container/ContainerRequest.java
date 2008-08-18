@@ -202,8 +202,8 @@ public class ContainerRequest implements HttpRequestContext {
     public URI getAbsolutePath() {
         if (absolutePathUri != null) return absolutePathUri;
         
-        return absolutePathUri = UriBuilder.fromUri(requestUri).encode(false).
-                replaceQueryParams("").fragment("").
+        return absolutePathUri = UriBuilder.fromUri(requestUri).
+                replaceQuery("").fragment("").
                 build();        
     }
     

@@ -43,8 +43,6 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
-import javax.ws.rs.Path;
-import javax.ws.rs.ext.Provider;
 
 import junit.framework.TestCase;
 
@@ -90,14 +88,7 @@ public abstract class AbstractResourceTester extends TestCase {
     }
     
     private WebApplication createWebApplication(ComponentProvider cp, Class... classes) {
-        return createWebApplication(cp, new HashSet<Class>(Arrays.asList(classes)));
-    }
-    
-    private WebApplication createWebApplication(ComponentProvider cp, Set<Class> classes) {
-        ResourceConfig rc = new DefaultResourceConfig(
-                getMatchingClasses(classes, Path.class));
-        rc.getProviderClasses().addAll(
-                getMatchingClasses(classes, Provider.class));
+        ResourceConfig rc = new DefaultResourceConfig(classes);
         
         return createWebApplication(rc, cp);
     }
@@ -153,23 +144,4 @@ public abstract class AbstractResourceTester extends TestCase {
         
         return URI.create(baseUri.toString() + relativeUri);
     }
-    
-    private static Set<Class<?>> getMatchingClasses(Set<Class> classes, Class... annotations) {
-        Set<Class<?>> s = new HashSet<Class<?>>();
-        for (Class c : classes) {
-            if (hasAnnotations(c, annotations))
-                s.add(c);
-        }
-        return s;
-    }
-    
-    @SuppressWarnings("unchecked")
-    private static boolean hasAnnotations(Class c, Class... annotations) {
-        Annotation[] _as = c.getAnnotations();
-        for (Class a : annotations) {
-            if (c.getAnnotation(a) == null) return false;
-        }
-        
-        return true;
-    }    
 }

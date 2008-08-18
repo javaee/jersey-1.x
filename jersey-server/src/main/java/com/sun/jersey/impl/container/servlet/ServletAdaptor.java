@@ -100,7 +100,7 @@ public class ServletAdaptor extends ServletContainer {
             }
         }
         
-        rc.getProviderInstances().add(new InjectableProvider<PersistenceUnit, Type>() {
+        rc.getSingletons().add(new InjectableProvider<PersistenceUnit, Type>() {
             public Scope getScope() {
                 return Scope.Singleton;
             }

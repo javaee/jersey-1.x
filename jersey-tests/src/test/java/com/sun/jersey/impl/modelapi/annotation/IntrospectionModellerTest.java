@@ -191,7 +191,7 @@ public class IntrospectionModellerTest extends TestCase {
     
     public void testRootResource() {
         AbstractResource rootResource = IntrospectionModeller.createResource(TestRootResourceOne.class);
-        assertEquals("/one", rootResource.getUriPath().getValue());
+        assertEquals("/one", rootResource.getPath().getValue());
         assertEquals(1, rootResource.getResourceMethods().size());
         assertEquals(1 ,rootResource.getSubResourceLocators().size());
         assertEquals(2 ,rootResource.getSubResourceMethods().size());
@@ -216,7 +216,7 @@ public class IntrospectionModellerTest extends TestCase {
 //                @PathParam("p1") String pOne, @MatrixParam("p2") int pTwo, @HeaderParam("p3") String pThree) {
 //            return new TestSubResourceOne();
 //        }
-        assertEquals("/subres-locator/{p1}", locator.getUriPath().getValue());
+        assertEquals("/subres-locator/{p1}", locator.getPath().getValue());
         assertEquals(3, locator.getParameters().size());
         assertEquals(Parameter.Source.PATH, locator.getParameters().get(0).getSource());
         assertEquals("p1", locator.getParameters().get(0).getSourceName());
@@ -242,7 +242,7 @@ public class IntrospectionModellerTest extends TestCase {
 //        public String getSubResourceMethod(String entityParam) {
 //            return "Hi there, here is a subresource method!";
 //        }
-        assertEquals("/subres-method", subResMethod1.getUriPath().getValue());
+        assertEquals("/subres-method", subResMethod1.getPath().getValue());
         assertEquals("PUT", subResMethod1.getHttpMethod());
         assertEquals(1, subResMethod1.getParameters().size());
         assertEquals(Parameter.Source.ENTITY, subResMethod1.getParameters().get(0).getSource());
@@ -252,7 +252,7 @@ public class IntrospectionModellerTest extends TestCase {
 //        public String getSubResourceMethodWithParams(@PathParam("one") String paramOne) {
 //            return "Hi there, here is a subresource method!";
 //        }
-        assertEquals("/with-params/{one}", subResMethod2.getUriPath().getValue());
+        assertEquals("/with-params/{one}", subResMethod2.getPath().getValue());
         assertEquals("GET", subResMethod2.getHttpMethod());
         assertEquals(1, subResMethod2.getParameters().size());
         assertEquals(Parameter.Source.PATH, subResMethod2.getParameters().get(0).getSource());
@@ -262,7 +262,7 @@ public class IntrospectionModellerTest extends TestCase {
 
     public void testSubResource() {
         AbstractResource subResource = IntrospectionModeller.createResource(TestSubResourceOne.class);
-        assertEquals(null, subResource.getUriPath());
+        assertEquals(null, subResource.getPath());
         assertEquals(2, subResource.getResourceMethods().size());
         assertEquals(0, subResource.getSubResourceLocators().size());
         assertEquals(0, subResource.getSubResourceMethods().size());

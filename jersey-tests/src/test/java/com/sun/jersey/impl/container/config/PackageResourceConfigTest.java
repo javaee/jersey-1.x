@@ -63,36 +63,36 @@ public class PackageResourceConfigTest extends AbstractResourceConfigTester {
         String[] packages = {"com.sun.jersey.impl.container.config.toplevel"};
         ResourceConfig rc = new PackagesResourceConfig(packages);
         
-        assertTrue(rc.getResourceClasses().contains(PublicRootResourceClass.class));
-        assertEquals(1, rc.getResourceClasses().size());
+        assertTrue(rc.getClasses().contains(PublicRootResourceClass.class));
+        assertEquals(1, rc.getClasses().size());
     }
     
     public void testInnerStatic() {
         String[] packages = {"com.sun.jersey.impl.container.config.innerstatic"};
         ResourceConfig rc = new PackagesResourceConfig(packages);
         
-        assertTrue(rc.getResourceClasses().contains(InnerStaticClass.PublicClass.class));
-        assertEquals(1, rc.getResourceClasses().size());
+        assertTrue(rc.getClasses().contains(InnerStaticClass.PublicClass.class));
+        assertEquals(1, rc.getClasses().size());
     }
     
     public void testTopLevelInnerStatic() {
         String[] packages = {"com.sun.jersey.impl.container.config.toplevelinnerstatic"};
         ResourceConfig rc = new PackagesResourceConfig(packages);
                 
-        assertTrue(rc.getResourceClasses().contains(PublicRootResourceInnerStaticClass.class));
-        assertTrue(rc.getResourceClasses().contains(PublicRootResourceInnerStaticClass.PublicClass.class));
-        assertEquals(2, rc.getResourceClasses().size());
+        assertTrue(rc.getClasses().contains(PublicRootResourceInnerStaticClass.class));
+        assertTrue(rc.getClasses().contains(PublicRootResourceInnerStaticClass.PublicClass.class));
+        assertEquals(2, rc.getClasses().size());
     }
     
     public void testAll() {
         String[] packages = {"com.sun.jersey.impl.container.config"};
         ResourceConfig rc = new PackagesResourceConfig(packages);
         
-        assertTrue(rc.getResourceClasses().contains(PublicRootResourceClass.class));
-        assertTrue(rc.getResourceClasses().contains(InnerStaticClass.PublicClass.class));
-        assertTrue(rc.getResourceClasses().contains(PublicRootResourceInnerStaticClass.class));
-        assertTrue(rc.getResourceClasses().contains(PublicRootResourceInnerStaticClass.PublicClass.class));
-        assertEquals(4, rc.getResourceClasses().size());
+        assertTrue(rc.getClasses().contains(PublicRootResourceClass.class));
+        assertTrue(rc.getClasses().contains(InnerStaticClass.PublicClass.class));
+        assertTrue(rc.getClasses().contains(PublicRootResourceInnerStaticClass.class));
+        assertTrue(rc.getClasses().contains(PublicRootResourceInnerStaticClass.PublicClass.class));
+        assertEquals(4, rc.getClasses().size());
     }
     
     public void testAllWithSpacesAndEmptyElements() {
@@ -103,11 +103,11 @@ public class PackageResourceConfigTest extends AbstractResourceConfigTester {
                 "  com.sun.jersey.impl.container.config.toplevelinnerstatic; ;; ; ");
         ResourceConfig rc = new PackagesResourceConfig(m);
         
-        assertTrue(rc.getResourceClasses().contains(PublicRootResourceClass.class));
-        assertTrue(rc.getResourceClasses().contains(InnerStaticClass.PublicClass.class));
-        assertTrue(rc.getResourceClasses().contains(PublicRootResourceInnerStaticClass.class));
-        assertTrue(rc.getResourceClasses().contains(PublicRootResourceInnerStaticClass.PublicClass.class));
-        assertEquals(4, rc.getResourceClasses().size());
+        assertTrue(rc.getClasses().contains(PublicRootResourceClass.class));
+        assertTrue(rc.getClasses().contains(InnerStaticClass.PublicClass.class));
+        assertTrue(rc.getClasses().contains(PublicRootResourceInnerStaticClass.class));
+        assertTrue(rc.getClasses().contains(PublicRootResourceInnerStaticClass.PublicClass.class));
+        assertEquals(4, rc.getClasses().size());
     }
     
     public void testJarTopLevel() throws Exception {
@@ -119,9 +119,9 @@ public class PackageResourceConfigTest extends AbstractResourceConfigTester {
         ResourceConfig rc = createConfig(cl, 
                 "com.sun.jersey.impl.container.config.toplevel");
 
-        assertTrue(rc.getResourceClasses().contains(
+        assertTrue(rc.getClasses().contains(
                 cl.loadClass("com.sun.jersey.impl.container.config.toplevel.PublicRootResourceClass")));
-        assertEquals(1, rc.getResourceClasses().size());
+        assertEquals(1, rc.getClasses().size());
     }
     
     public void testJarInnerStatic() throws Exception {
@@ -135,9 +135,9 @@ public class PackageResourceConfigTest extends AbstractResourceConfigTester {
         ResourceConfig rc = createConfig(cl, 
                 "com.sun.jersey.impl.container.config.innerstatic");
 
-        assertTrue(rc.getResourceClasses().contains(
+        assertTrue(rc.getClasses().contains(
                 cl.loadClass("com.sun.jersey.impl.container.config.innerstatic.InnerStaticClass$PublicClass")));
-        assertEquals(1, rc.getResourceClasses().size());
+        assertEquals(1, rc.getClasses().size());
     }
     
     public void testJarBoth() throws Exception {
@@ -153,11 +153,11 @@ public class PackageResourceConfigTest extends AbstractResourceConfigTester {
         ResourceConfig rc = createConfig(cl, 
                 "com.sun.jersey.impl.container.config");
 
-        assertTrue(rc.getResourceClasses().contains(
+        assertTrue(rc.getClasses().contains(
                 cl.loadClass("com.sun.jersey.impl.container.config.toplevel.PublicRootResourceClass")));
-        assertTrue(rc.getResourceClasses().contains(
+        assertTrue(rc.getClasses().contains(
                 cl.loadClass("com.sun.jersey.impl.container.config.innerstatic.InnerStaticClass$PublicClass")));
-        assertEquals(2, rc.getResourceClasses().size());
+        assertEquals(2, rc.getClasses().size());
     }
     
     public void testJarBothWithSeparatePackages() throws Exception {
@@ -174,11 +174,11 @@ public class PackageResourceConfigTest extends AbstractResourceConfigTester {
                 "com.sun.jersey.impl.container.config.toplevel", 
                 "com.sun.jersey.impl.container.config.innerstatic");
 
-        assertTrue(rc.getResourceClasses().contains(
+        assertTrue(rc.getClasses().contains(
                 cl.loadClass("com.sun.jersey.impl.container.config.toplevel.PublicRootResourceClass")));
-        assertTrue(rc.getResourceClasses().contains(
+        assertTrue(rc.getClasses().contains(
                 cl.loadClass("com.sun.jersey.impl.container.config.innerstatic.InnerStaticClass$PublicClass")));
-        assertEquals(2, rc.getResourceClasses().size());
+        assertEquals(2, rc.getClasses().size());
     }
     
     public void testJarAsZipBoth() throws Exception {
@@ -194,11 +194,11 @@ public class PackageResourceConfigTest extends AbstractResourceConfigTester {
         ResourceConfig rc = createConfig(cl, 
                 "com.sun.jersey.impl.container.config");
 
-        assertTrue(rc.getResourceClasses().contains(
+        assertTrue(rc.getClasses().contains(
                 cl.loadClass("com.sun.jersey.impl.container.config.toplevel.PublicRootResourceClass")));
-        assertTrue(rc.getResourceClasses().contains(
+        assertTrue(rc.getClasses().contains(
                 cl.loadClass("com.sun.jersey.impl.container.config.innerstatic.InnerStaticClass$PublicClass")));
-        assertEquals(2, rc.getResourceClasses().size());
+        assertEquals(2, rc.getClasses().size());
     }
     
     private ResourceConfig createConfig(ClassLoader cl, String... packages) throws IOException {        

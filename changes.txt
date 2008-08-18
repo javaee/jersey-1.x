@@ -1,3 +1,6 @@
+release 0.10 (2008-09-xx)
+
+
 release 0.9 (2008-08-22)
 - Fixed issue 50
   https://jersey.dev.java.net/issues/show_bug.cgi?id=50

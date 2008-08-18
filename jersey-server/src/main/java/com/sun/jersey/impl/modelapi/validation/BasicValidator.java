@@ -63,10 +63,10 @@ public class BasicValidator extends AbstractModelValidator {
                     false)); // there might still be Views associated with the resource
         }
         // uri template of the resource, if present should not contain null value
-        if (resource.isRootResource() && ((null == resource.getUriPath()) || (null == resource.getUriPath().getValue()))) {
+        if (resource.isRootResource() && ((null == resource.getPath()) || (null == resource.getPath().getValue()))) {
             issueList.add(new ResourceModelIssue(
                     resource,
-                    ImplMessages.ERROR_RES_URI_PATH_INVALID(resource.getResourceClass(), resource.getUriPath()),
+                    ImplMessages.ERROR_RES_URI_PATH_INVALID(resource.getResourceClass(), resource.getPath()),
                     true)); // TODO: is it really a fatal issue?
         }
     }
@@ -93,10 +93,10 @@ public class BasicValidator extends AbstractModelValidator {
 
     public void visitAbstractSubResourceMethod(AbstractSubResourceMethod method) {
         visitAbstractResourceMethod(method);
-        if ((null == method.getUriPath()) || (null == method.getUriPath().getValue()) || (method.getUriPath().getValue().length() == 0)) {
+        if ((null == method.getPath()) || (null == method.getPath().getValue()) || (method.getPath().getValue().length() == 0)) {
             issueList.add(new ResourceModelIssue(
                     method,
-                    ImplMessages.ERROR_SUBRES_METHOD_URI_PATH_INVALID(method.getMethod(), method.getUriPath()),
+                    ImplMessages.ERROR_SUBRES_METHOD_URI_PATH_INVALID(method.getMethod(), method.getPath()),
                     true));
         }
     }
@@ -108,10 +108,10 @@ public class BasicValidator extends AbstractModelValidator {
                     ImplMessages.ERROR_SUBRES_LOC_RETURNS_VOID(locator.getMethod()),
                     true));
         }
-        if ((null == locator.getUriPath()) || (null == locator.getUriPath().getValue()) || (locator.getUriPath().getValue().length() == 0)) {
+        if ((null == locator.getPath()) || (null == locator.getPath().getValue()) || (locator.getPath().getValue().length() == 0)) {
             issueList.add(new ResourceModelIssue(
                     locator,
-                    ImplMessages.ERROR_SUBRES_LOC_URI_PATH_INVALID(locator.getMethod(), locator.getUriPath()),
+                    ImplMessages.ERROR_SUBRES_LOC_URI_PATH_INVALID(locator.getMethod(), locator.getPath()),
                     true));
         }
     }

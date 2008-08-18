@@ -34,47 +34,28 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-
-package com.sun.jersey.api.core;
-
-import java.util.Map;
-import java.util.Set;
-import javax.ws.rs.core.ApplicationConfig;
-import javax.ws.rs.core.MediaType;
+package com.sun.jersey.api.model;
 
 /**
- * An extension of {@link DefaultResourceConfig} that adapts an instance
- * of {@link ApplicationConfig}.
+ * Abstraction for a Path value
  */
-public final class ApplicationConfigAdapter extends DefaultResourceConfig {
+public class PathValue {
     
-    private final ApplicationConfig ac;
+    private String value;
     
-    /**
-     * @param ac the application config
-     */
-    public ApplicationConfigAdapter(ApplicationConfig ac) {
-        this.ac = ac;
+    public PathValue(String path) {
+        this.value = path;
     }
     
-
-    @Override
-    public Set<Class<?>> getResourceClasses() {
-        return ac.getResourceClasses();
-    }
-
-    @Override
-    public Set<Class<?>> getProviderClasses() {
-        return ac.getProviderClasses();
+    public String getValue() {
+        return value;
     }
     
     @Override
-    public Map<String, MediaType> getMediaTypeMappings() {
-        return ac.getMediaTypeMappings();
-    }
-
-    @Override
-    public Map<String, String> getLanguageMappings() {
-        return ac.getLanguageMappings();
+    public String toString() {
+        return this.getClass().getSimpleName() 
+                + "(" 
+                + ((null == getValue())? "null" : ("\"" + getValue() + "\"")) 
+                + ")";
     }
 }

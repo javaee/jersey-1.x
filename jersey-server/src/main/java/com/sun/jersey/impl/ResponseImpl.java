@@ -136,9 +136,8 @@ public final class ResponseImpl extends Response {
                                         ? request.getAbsolutePath() 
                                         : request.getBaseUri();
                                 location = UriBuilder.fromUri(base).
-                                        encode(false).
                                         path(locationUri.getRawPath()).
-                                        replaceQueryParams(locationUri.getRawQuery()).
+                                        replaceQuery(locationUri.getRawQuery()).
                                         fragment(locationUri.getRawFragment()).
                                         build();
                             }

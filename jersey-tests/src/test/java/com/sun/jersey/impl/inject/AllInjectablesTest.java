@@ -521,7 +521,7 @@ public class AllInjectablesTest extends AbstractResourceTester {
     
     public void testProviderInstanceField() throws IOException {
         ResourceConfig rc = new DefaultResourceConfig(StringWriterResource.class);
-        rc.getProviderInstances().add(new StringWriterField());
+        rc.getSingletons().add(new StringWriterField());
         initiateWebApplication(rc);
         
         assertEquals("GET", resource("/").get(String.class));        

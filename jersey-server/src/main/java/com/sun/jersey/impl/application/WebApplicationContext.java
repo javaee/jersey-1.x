@@ -296,21 +296,21 @@ public final class WebApplicationContext implements UriRuleContext, ExtendedUriI
         }
     }
 
-    public List<String> getAncestorResourceURIs() {
+    public List<String> getMatchedURIs() {
         return paths;
     }
     
-    public List<Object> getAncestorResources() {
-        return resources;
+    public List<String> getMatchedURIs(boolean decode) {
+        throw new UnsupportedOperationException();
     }    
     
-    public List<String> getAncestorResourceURIs(boolean decode) {
-        throw new UnsupportedOperationException();
+    public List<Object> getMatchedResources() {
+        return resources;
     }    
     
     //
     
-    public List<UriTemplate> getAncestorTemplates() {
+    public List<UriTemplate> getMatchedTemplates() {
         return templates;
     }    
     

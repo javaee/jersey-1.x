@@ -48,7 +48,7 @@ import javax.ws.rs.core.UriInfo;
  */
 public interface ExtendedUriInfo extends UriInfo {
     /**
-     * Get a read-only list of {@link UriTemplate} for ancestor resources. 
+     * Get a read-only list of {@link UriTemplate} for matched resources. 
      * Each entry is a URI template that is the value of the 
      * {@link javax.ws.rs.Path} that is a partial path that matched a resource 
      * class, a sub-resource method or a sub-resource locator.
@@ -57,7 +57,7 @@ public interface ExtendedUriInfo extends UriInfo {
      * 
      * @return a read-only list of URI templates for ancestor resources.
      */
-    List<UriTemplate> getAncestorTemplates();
+    List<UriTemplate> getMatchedTemplates();
     
     /**
      * Get a path segment that contains a template variable.

@@ -143,6 +143,6 @@ public final class UriHelper {
         }
         
         UriBuilder ub = UriBuilder.fromUri(u);
-        return ub.encode(false).replacePath(np).build();
+        return ub.replacePath(np).build();
     }
 }

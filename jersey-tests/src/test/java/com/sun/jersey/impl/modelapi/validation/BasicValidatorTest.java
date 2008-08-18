@@ -54,7 +54,7 @@ import com.sun.jersey.api.model.AbstractResourceMethod;
 import com.sun.jersey.api.model.AbstractSubResourceLocator;
 import com.sun.jersey.api.model.AbstractSubResourceMethod;
 import com.sun.jersey.api.model.ResourceModelIssue;
-import com.sun.jersey.api.model.UriPathValue;
+import com.sun.jersey.api.model.PathValue;
 import junit.framework.TestCase;
 
 /**
@@ -125,11 +125,11 @@ public class BasicValidatorTest extends TestCase {
         assertTrue(issueCount > 0);
         printIssueList(validator);
         // adding uri template to decrease number of issues
-        locator = new AbstractSubResourceLocator(TestResourceSRL.class.getMethod("subResLocator"), new UriPathValue("/test"));
+        locator = new AbstractSubResourceLocator(TestResourceSRL.class.getMethod("subResLocator"), new PathValue("/test"));
         validator.cleanIssueList();
         validator.validate(locator);
         assertTrue((issueCount - 1) == validator.getIssueList().size());
-        locator = new AbstractSubResourceLocator(TestResourceSRL.class.getMethod("validSubResLocator"), new UriPathValue("/test1"));
+        locator = new AbstractSubResourceLocator(TestResourceSRL.class.getMethod("validSubResLocator"), new PathValue("/test1"));
         validator.cleanIssueList();
         validator.validate(locator);
         assertTrue(0 == validator.getIssueList().size());
@@ -145,18 +145,18 @@ public class BasicValidatorTest extends TestCase {
         assertTrue(issueCount > 0);
         validator.cleanIssueList();
         asrm = new AbstractSubResourceMethod(
-                null, TestResourceASRM.class.getMethod("subResMethod"), new UriPathValue("test"), "GET");
+                null, TestResourceASRM.class.getMethod("subResMethod"), new PathValue("test"), "GET");
         validator.validate(asrm);
         assertTrue((issueCount - 1) == validator.getIssueList().size());
     }
     
     public void testValidateAR() {
         BasicValidator validator = new BasicValidator();
-        AbstractResource ar = new AbstractResource(TestResource.class, new UriPathValue(null));
+        AbstractResource ar = new AbstractResource(TestResource.class, new PathValue(null));
         validator.validate(ar);
         int issueCount = validator.getIssueList().size();
         printIssueList(validator);
-        ar = new AbstractResource(TestResource.class, new UriPathValue("/test"));
+        ar = new AbstractResource(TestResource.class, new PathValue("/test"));
         validator.cleanIssueList();
         validator.validate(ar);
         assertTrue((issueCount - 1) == validator.getIssueList().size());

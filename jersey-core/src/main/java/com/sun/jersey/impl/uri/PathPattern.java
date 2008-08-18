@@ -86,9 +86,9 @@ public final class PathPattern extends UriPattern {
      * @param limited if true than the capturing group '(/.*)?' is appended to
      *        the regex (see above), otherwise '(/)?' is appended.
      */
-    public PathPattern(UriTemplate template, boolean limited) {
+    public PathPattern(UriTemplate template) {
         super(postfixWithCapturingGroup(template.getPattern().getRegex(), 
-                limited));
+                true));
         
         this.template = template;
     }

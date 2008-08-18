@@ -40,10 +40,6 @@ import com.sun.jersey.api.core.HttpContext;
 import com.sun.jersey.api.model.Parameter;
 import com.sun.jersey.spi.service.ComponentContext;
 import com.sun.jersey.spi.service.ComponentProvider.Scope;
-import static java.lang.annotation.ElementType.CONSTRUCTOR;
-import static java.lang.annotation.ElementType.FIELD;
-import static java.lang.annotation.ElementType.PARAMETER;
-import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 import java.io.IOException;
 
@@ -108,7 +104,8 @@ public class OverrideInjectableTest extends AbstractResourceTester {
     }
     
     public void testMethodInjected() throws IOException {                
-        initiateWebApplication(MethodInjected.class, QueryParamInjectableProvider.class);
+        initiateWebApplication(MethodInjected.class,
+                QueryParamInjectableProvider.class);
                 
         URI u = UriBuilder.fromPath("").
                         queryParam("l", "1=2, 3=4, 5=6").build();

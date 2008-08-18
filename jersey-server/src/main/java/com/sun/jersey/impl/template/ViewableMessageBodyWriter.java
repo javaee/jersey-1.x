@@ -73,7 +73,7 @@ public final class ViewableMessageBodyWriter implements MessageBodyWriter<Viewab
             ResolvedViewable rv = (ResolvedViewable)v;
             rv.getTemplate().writeTo(v.getTemplateName(), v.getModel(), entityStream);
         } else {
-            String absolutePath = getAbsolutePath(ui.getAncestorResources().get(0).getClass(), 
+            String absolutePath = getAbsolutePath(ui.getMatchedResources().get(0).getClass(), 
                     v.getTemplateName());
 
             boolean resolved = false;

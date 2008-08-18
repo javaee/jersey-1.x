@@ -70,13 +70,13 @@ public class MatrixParamTest extends AbstractGrizzlyServerTester {
         WebResource r = Client.create().resource(base.clone().matrixParam("y", "1").build());
         assertEquals("1", r.get(String.class));
         r = Client.create().resource(base.clone().
-                matrixParam("x", "1").encode(false).matrixParam("y", "1%20%2B%202").build());
+                matrixParam("x", "1").matrixParam("y", "1%20%2B%202").build());
         assertEquals("1 + 2", r.get(String.class));
         r = Client.create().resource(base.clone().
-                matrixParam("x", "1").encode(false).matrixParam("y", "1%20%26%202").build());
+                matrixParam("x", "1").matrixParam("y", "1%20%26%202").build());
         assertEquals("1 & 2", r.get(String.class));
         r = Client.create().resource(base.clone().
-                matrixParam("x", "1").encode(false).matrixParam("y", "1%20%7C%7C%202").build());
+                matrixParam("x", "1").matrixParam("y", "1%20%7C%7C%202").build());
         assertEquals("1 || 2", r.get(String.class));
     }
 }

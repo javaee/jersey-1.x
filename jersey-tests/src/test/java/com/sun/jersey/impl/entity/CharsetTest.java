@@ -220,7 +220,7 @@ public class CharsetTest extends AbstractTypeTester {
         
         JAXBBean in = new JAXBBean(CONTENT);
         ClientConfig cc = new DefaultClientConfig();
-        cc.getProviderClasses().add(MyJAXBContextResolver.class);
+        cc.getClasses().add(MyJAXBContextResolver.class);
         WebResource r = resource("/", cc);
         for (String charset : CHARSETS) {
             ClientResponse rib = r.type("application/json;charset=" + charset).

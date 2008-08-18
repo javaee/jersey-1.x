@@ -60,7 +60,7 @@ public class ClassNameResourceConfig extends DefaultResourceConfig {
         super();
         
         for (Class c : classes)
-            getResourceClasses().add(c);
+            getClasses().add(c);
     }
     
     public ClassNameResourceConfig(String[] names) {

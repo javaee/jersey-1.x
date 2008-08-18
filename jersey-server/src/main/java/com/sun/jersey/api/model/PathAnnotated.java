@@ -37,48 +37,9 @@
 package com.sun.jersey.api.model;
 
 /**
- * Abstraction for a URI path value
+ *
+ * @author mh124079
  */
-public class UriPathValue {
-    
-    private String value;
-    private boolean encode;
-    private boolean limited;
-    
-    /** Creates a new instance of UriPathValue */
-    public UriPathValue(String path) {
-        this(path, true);
-    }
-    
-    /** Creates a new instance of UriPathValue */
-    public UriPathValue(String path, boolean encode) {
-        this(path, encode, true);
-    }
-
-    /** Creates a new instance of UriPathValue */
-    public UriPathValue(String path, boolean encode, boolean limited) {
-        this.value = path;
-        this.encode = encode;
-        this.limited = limited;
-    }
-
-    public String getValue() {
-        return value;
-    }
-
-    public boolean isEncode() {
-        return encode;
-    }
-
-    public boolean isLimited() {
-        return limited;
-    }
-    
-    @Override
-    public String toString() {
-        return this.getClass().getSimpleName() 
-                + "(" 
-                + ((null == getValue())? "null" : ("\"" + getValue() + "\"")) 
-                + ")";
-    }
+public interface PathAnnotated {
+    public PathValue getPath();
 }

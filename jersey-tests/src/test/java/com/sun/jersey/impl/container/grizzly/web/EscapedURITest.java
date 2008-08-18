@@ -49,7 +49,7 @@ import javax.ws.rs.core.UriInfo;
  * @author Paul.Sandoz@Sun.Com
  */
 public class EscapedURITest extends AbstractGrizzlyWebContainerTester {
-    @Path(value="x%20y", encode=false)
+    @Path("x%20y")
     public static class EscapedURIResource {
         @GET
         public String get(@Context UriInfo info) {
@@ -69,7 +69,7 @@ public class EscapedURITest extends AbstractGrizzlyWebContainerTester {
         startServer(EscapedURIResource.class);
                 
         WebResource r = Client.create().resource(getUri().
-                userInfo("x.y").encode(false).path("x%20y").build());
+                userInfo("x.y").path("x%20y").build());
         assertEquals("CONTENT", r.get(String.class));
     } 
 }

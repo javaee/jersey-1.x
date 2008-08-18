@@ -39,9 +39,6 @@ package com.sun.jersey.api.core;
 
 import com.sun.jersey.impl.container.config.AnnotatedClassScanner;
 import java.io.File;
-import java.util.Collections;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -110,8 +107,7 @@ public class ClasspathResourceConfig extends DefaultResourceConfig {
      * Perform a new search for resource classes and provider classes.
      */
     public void reload() {
-        getResourceClasses().clear();
-        getProviderClasses().clear();
+        getClasses().clear();
         init(paths);
     }
     
@@ -134,21 +130,22 @@ public class ClasspathResourceConfig extends DefaultResourceConfig {
                 Path.class, Provider.class);
         scanner.scan(roots);
 
-        getResourceClasses().addAll(scanner.getMatchingClasses(Path.class));
-        getProviderClasses().addAll(scanner.getMatchingClasses(Provider.class));
+        getClasses().addAll(scanner.getMatchingClasses());
         
-        if (LOGGER.isLoggable(Level.INFO) && !getResourceClasses().isEmpty()) {
+        if (LOGGER.isLoggable(Level.INFO) && !getClasses().isEmpty()) {
             StringBuilder b = new StringBuilder();
             b.append("Root resource classes found:");
-            for (Class c : getResourceClasses())
-                b.append('\n').append("  ").append(c);
+            for (Class c : getClasses())
+                if (c.isAnnotationPresent(Path.class))
+                    b.append('\n').append("  ").append(c);
             
             LOGGER.log(Level.INFO, b.toString());
             
             b = new StringBuilder();
             b.append("Provider classes found:");
-            for (Class c : getProviderClasses())
-                b.append('\n').append("  ").append(c);
+            for (Class c : getClasses())
+                if (c.isAnnotationPresent(Provider.class))
+                    b.append('\n').append("  ").append(c);
             
             LOGGER.log(Level.INFO, b.toString());            
         }

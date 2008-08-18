@@ -234,7 +234,7 @@ public final class WebResource extends Filterable implements
      * @return the builder.
      */
     public Builder uri(URI uri) {
-        UriBuilder b = UriBuilder.fromUri(u).encode(false);
+        UriBuilder b = UriBuilder.fromUri(u);
         String path = uri.getRawPath();
         if (path != null && path.length() > 0) {
             if (path.startsWith("/")) {
@@ -245,7 +245,7 @@ public final class WebResource extends Filterable implements
         }
         String query = uri.getRawQuery();
         if (query != null && query.length() > 0) {
-            b.replaceQueryParams(query);        
+            b.replaceQuery(query);        
         }
         return new Builder(b.build());
     }

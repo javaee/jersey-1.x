@@ -260,7 +260,7 @@ public class GenerateWadlMojo extends AbstractMojoProjectClasspathSupport {
         map.put( PackagesResourceConfig.PROPERTY_PACKAGES, paths );
         final ResourceConfig rc = new PackagesResourceConfig( map );
         final Set<AbstractResource> s = new HashSet<AbstractResource>();
-        for (Class<?> c : rc.getResourceClasses()) {
+        for (Class<?> c : rc.getRootResourceClasses()) {
             getLog().debug( "Adding class " + c.getName() );
             s.add( IntrospectionModeller.createResource(c) );
         }

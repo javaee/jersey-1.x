@@ -56,9 +56,9 @@ import javax.ws.rs.core.MediaType;
  */
 public class DefaultResourceConfig extends ResourceConfig {
     
-    private final Set<Class<?>> resources = new HashSet<Class<?>>();
+    private final Set<Class<?>> classes = new HashSet<Class<?>>();
     
-    private final Set<Class<?>> providers = new HashSet<Class<?>>();
+    private final Set<Object> singletons = new HashSet<Object>();
     
     private final Map<String, MediaType> mediaExtentions = new HashMap<String, MediaType>();
     
@@ -68,8 +68,6 @@ public class DefaultResourceConfig extends ResourceConfig {
     
     private final Map<String, Object> properties = new HashMap<String, Object>();
     
-    private final Set<Object> providerInstances = new HashSet<Object>();
-    
     /**
      */
     public DefaultResourceConfig() {
@@ -77,28 +75,30 @@ public class DefaultResourceConfig extends ResourceConfig {
     }
     
     /**
-     * @param resources the initial set of root resource classes
+     * @param resources the initial set of root resource classes 
+     *        and provider classes
      */
-    public DefaultResourceConfig(Class<?>... resources) {
-        this(new HashSet<Class<?>>(Arrays.asList(resources)));
+    public DefaultResourceConfig(Class<?>... classes) {
+        this(new HashSet<Class<?>>(Arrays.asList(classes)));
     }
     
     /**
-     * @param resources the initial set of root resource classes
+     * @param resources the initial set of root resource classes 
+     *        and provider classes
      */
-    public DefaultResourceConfig(Set<Class<?>> resources) {
-        if (null != resources) {
-            this.resources.addAll(resources);
+    public DefaultResourceConfig(Set<Class<?>> classes) {
+        if (null != classes) {
+            this.classes.addAll(classes);
         }
     }
 
-    public Set<Class<?>> getResourceClasses() {
-        return resources;
+    public Set<Class<?>> getClasses() {
+        return classes;
     }
-
+    
     @Override
-    public Set<Class<?>> getProviderClasses() {
-        return providers;
+    public Set<Object> getSingletons() {
+        return singletons;
     }
     
     @Override
@@ -126,10 +126,6 @@ public class DefaultResourceConfig extends ResourceConfig {
 
     public Object getProperty(String propertyName) {
         return properties.get(propertyName);
-    }
-    
-    public Set<Object> getProviderInstances() {
-        return providerInstances;
     }
     
     /**

@@ -201,14 +201,8 @@ public final class ResourceClass {
     private void processSubResourceLocators(InjectableProviderContext injectableContext,
             RulesMap<UriRule> rulesMap) {
         for (final AbstractSubResourceLocator locator : resource.getSubResourceLocators()) {
-            UriTemplate t = new PathTemplate(
-                    locator.getUriPath().getValue(),
-                    locator.getUriPath().isEncode(),
-                    locator.getUriPath().isLimited());
-
-            PathPattern p = new PathPattern(
-                    t,
-                    locator.getUriPath().isLimited());
+            UriTemplate t = new PathTemplate(locator.getPath().getValue());
+            PathPattern p = new PathPattern(t);
 
             UriRule r = new SubLocatorRule(
                     t,
@@ -229,12 +223,8 @@ public final class ResourceClass {
                 new HashMap<PathPattern, ResourceMethodMap>();
         for (final AbstractSubResourceMethod method : this.resource.getSubResourceMethods()) {
 
-            UriTemplate t = new PathTemplate(
-                    method.getUriPath().getValue(),
-                    method.getUriPath().isEncode(),
-                    method.getUriPath().isLimited());
-
-            PathPattern p = new PathPattern(t,  method.getUriPath().isLimited());
+            UriTemplate t = new PathTemplate(method.getPath().getValue());
+            PathPattern p = new PathPattern(t);
 
             ResourceMethod rm = new ResourceHttpMethod(df, t, method);
             addToPatternMethodMap(patternMethodMap, p, rm);

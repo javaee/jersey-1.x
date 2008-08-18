@@ -59,7 +59,10 @@ import javax.ws.rs.core.MultivaluedMap;
 public final class UriComponent {
 
     public enum Type {
-        SCHEME, USER_INFO, HOST, PORT, PATH, PATH_SEGMENT, QUERY, FRAGMENT,
+        SCHEME, USER_INFO, HOST, PORT,
+        PATH, PATH_SEGMENT, MATRIX_PARAM,
+        QUERY, QUERY_PARAM,
+        FRAGMENT,
     }
     
     private UriComponent() {
@@ -135,6 +138,37 @@ public final class UriComponent {
     }
     
     /**
+     * Contextually encodes the characters of string that are either non-ASCII
+     * characters or are ASCII characters that must be percent-encoded using the
+     * UTF-8 encoding. Percent-encoded characters will be recognized and not
+     * double encoded.
+     *
+     * @param s the string to be encoded.
+     * @param t the URI compontent type identifying the ASCII characters that 
+     *          must be percent-encoded.
+     * @return the encoded string.
+     */
+    public static String contextualEncode(String s, Type t) {
+        return _encode(s, t, false, true);
+    }
+
+    /**
+     * Contextually encodes the characters of string that are either non-ASCII
+     * characters or are ASCII characters that must be percent-encoded using the
+     * UTF-8 encoding. Percent-encoded characters will be recognized and not
+     * double encoded.
+     *
+     * @param s the string to be encoded.
+     * @param t the URI compontent type identifying the ASCII characters that 
+     *          must be percent-encoded.
+     * @param template true if the encoded string contains URI template variables
+     * @return the encoded string.
+     */
+    public static String contextualEncode(String s, Type t, boolean template) {
+        return _encode(s, t, template, true);
+    }
+    
+    /**
      * Encodes the characters of string that are either non-ASCII characters 
      * or are ASCII characters that must be percent-encoded using the 
      * UTF-8 encoding.
@@ -145,7 +179,7 @@ public final class UriComponent {
      * @return the encoded string.
      */
     public static String encode(String s, Type t) {
-        return encode(s, t, false);
+        return _encode(s, t, false, false);
     }
     
     /**
@@ -160,6 +194,10 @@ public final class UriComponent {
      * @return the encoded string.
      */
     public static String encode(String s, Type t, boolean template) {
+        return _encode(s, t, template, false);
+    }
+    
+    private static String _encode(String s, Type t, boolean template, boolean contextualEncode) {
         boolean[] table = ENCODING_TABLES[t.ordinal()];
 
         StringBuilder sb = null;
@@ -171,21 +209,31 @@ public final class UriComponent {
                 if (template && (c == '{' || c == '}')) {
                     if (sb != null) sb.append(c);
                     continue;
+                } else if (contextualEncode && c == '%' && i + 2 < s.length()) {
+                    if (isHexCharacter(s.charAt(i + 1)) &&
+                            isHexCharacter(s.charAt(i + 2))) {
+                        i += 2;
+                        continue;
+                    }
                 }
-
+                
                 if (sb == null) { 
                     sb = new StringBuilder();
                     sb.append(s.substring(0, i));
                 }
 
-                if (c < 0x80)
-                    appendPercentEncodedOctet(sb, c);
-                else 
+                if (c < 0x80) {
+                    if (c == ' ' && t == Type.QUERY)
+                        sb.append('+');
+                    else
+                        appendPercentEncodedOctet(sb, c);
+                } else
                     appendUTF8EncodedCharacter(sb, c);
             }            
         }
         
         return (sb == null) ? s : sb.toString();
+
     }
 
     private final static char[] HEX_DIGITS = {
@@ -479,4 +527,8 @@ public final class UriComponent {
     private static int decodeHex(char c) {
         return (c < 128) ? HEX_TABLE[c] : -1;
     }    
+    
+    private static boolean isHexCharacter(char c) {
+        return c < 128 && HEX_TABLE[c] != -1;
+    }
 }

@@ -46,7 +46,7 @@ import com.sun.jersey.api.model.AbstractSubResourceMethod;
 import com.sun.jersey.api.model.Parameter;
 import com.sun.jersey.api.model.Parameter.Source;
 import com.sun.jersey.api.model.Parameterized;
-import com.sun.jersey.api.model.UriPathValue;
+import com.sun.jersey.api.model.PathValue;
 import com.sun.jersey.impl.ImplMessages;
 import com.sun.jersey.impl.model.MediaTypeHelper;
 import java.lang.annotation.Annotation;
@@ -95,9 +95,7 @@ public class IntrospectionModeller {
 
         if (isRootResourceClass) {
             resource = new AbstractResource(resourceClass,
-                    new UriPathValue(rPathAnnotation.value(), 
-                        rPathAnnotation.encode(), 
-                        rPathAnnotation.limited()));
+                    new PathValue(rPathAnnotation.value()));
         } else { // just a subresource class
             resource = new AbstractResource(resourceClass);
         }
@@ -256,10 +254,8 @@ public class IntrospectionModeller {
             final AbstractSubResourceMethod subResourceMethod = new AbstractSubResourceMethod(
                     resource,
                     m.getMethod(),
-                    new UriPathValue(
-                        mPathAnnotation.value(), 
-                        mPathAnnotation.encode(),
-                        mPathAnnotation.limited()),
+                    new PathValue(
+                        mPathAnnotation.value()),
                     m.getMetaMethodAnnotations(HttpMethod.class).get(0).value());
        
             addConsumes(m, subResourceMethod, classScopeConsumesAnnotation);
@@ -296,10 +292,8 @@ public class IntrospectionModeller {
             final Path mPathAnnotation = m.getAnnotation(Path.class);
             final AbstractSubResourceLocator subResourceLocator = new AbstractSubResourceLocator(
                     m.getMethod(),
-                    new UriPathValue(
-                        mPathAnnotation.value(), 
-                        mPathAnnotation.encode(), 
-                        mPathAnnotation.limited()));
+                    new PathValue(
+                        mPathAnnotation.value()));
 
             processParameters(subResourceLocator, m, isEncoded);
 

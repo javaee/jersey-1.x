@@ -151,7 +151,7 @@ public final class WadlGeneratorImpl implements WadlGenerator {
         if (path != null)
             wadlResource.setPath(path);
         else if (r.isRootResource())
-            wadlResource.setPath(r.getUriPath().getValue());
+            wadlResource.setPath(r.getPath().getValue());
         return wadlResource;
     }
 

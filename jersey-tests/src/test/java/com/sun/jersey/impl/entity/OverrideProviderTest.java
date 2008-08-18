@@ -168,7 +168,7 @@ public class OverrideProviderTest extends AbstractResourceTester {
     
     public void testJAXBBeanWithProviderInstance() throws Exception {
         ResourceConfig rc = new DefaultResourceConfig(JAXBBeanResource.class);
-        rc.getProviderInstances().add(new JAXBBeanProvider());
+        rc.getSingletons().add(new JAXBBeanProvider());
         initiateWebApplication(rc);
                 
         WebResource r = resource("/");

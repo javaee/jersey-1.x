@@ -111,7 +111,7 @@ public class AnnotationInjectableTest extends AbstractResourceTester {
     
     @Override
     protected void initiate(ResourceConfig c, WebApplication a) {
-        c.getProviderInstances().add(new MyAnnotationInjectableProvider("foo"));        
+        c.getSingletons().add(new MyAnnotationInjectableProvider("foo"));        
     }
     
     public void testFieldInjected() throws IOException {                

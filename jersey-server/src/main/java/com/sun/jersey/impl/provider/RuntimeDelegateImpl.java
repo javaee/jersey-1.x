@@ -38,7 +38,7 @@
 package com.sun.jersey.impl.provider;
 
 import com.sun.jersey.api.container.ContainerFactory;
-import com.sun.jersey.api.core.ApplicationConfigAdapter;
+import com.sun.jersey.api.core.ApplicationAdapter;
 import com.sun.jersey.impl.ResponseBuilderImpl;
 import com.sun.jersey.impl.VariantListBuilderImpl;
 import com.sun.jersey.impl.uri.UriBuilderImpl;
@@ -50,7 +50,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.WeakHashMap;
-import javax.ws.rs.core.ApplicationConfig;
+import javax.ws.rs.core.Application;
 import javax.ws.rs.core.CacheControl;
 import javax.ws.rs.core.Cookie;
 import javax.ws.rs.core.EntityTag;
@@ -108,11 +108,11 @@ public class RuntimeDelegateImpl extends RuntimeDelegate {
     }
     
     @Override
-    public <T> T createEndpoint(ApplicationConfig applicationConfig, 
+    public <T> T createEndpoint(Application application, 
             Class<T> endpointType) 
             throws IllegalArgumentException, UnsupportedOperationException {
         return ContainerFactory.createContainer(endpointType, 
-                new ApplicationConfigAdapter(applicationConfig));
+                new ApplicationAdapter(application));
     }
     
     @Override

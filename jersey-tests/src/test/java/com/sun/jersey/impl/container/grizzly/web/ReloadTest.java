@@ -106,7 +106,7 @@ public class ReloadTest extends AbstractGrizzlyWebContainerTester {
             super.service(req, resp);
             
             if (i == 2) {
-                rc.getResourceClasses().add(Two.class);
+                rc.getClasses().add(Two.class);
                 cr.reload();
             }
         }

@@ -40,7 +40,6 @@ package com.sun.jersey.impl.container.config;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.lang.annotation.Annotation;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -73,7 +72,7 @@ public final class AnnotatedClassScanner {
             Logger.getLogger(AnnotatedClassScanner.class.getName());
     
     /** Matching annotated classes. */
-    private Set<Class> classes;
+    private Set<Class<?>> classes;
     
     /** Set of annotations to search for. */
     private final Set<String> annotations;
@@ -89,7 +88,7 @@ public final class AnnotatedClassScanner {
     public AnnotatedClassScanner(Class... annotations) {
         this.classloader = Thread.currentThread().getContextClassLoader();
         this.annotations = getAnnotationSet(annotations);
-        this.classes = new HashSet<Class>();
+        this.classes = new HashSet<Class<?>>();
     }
     
     /**
@@ -99,8 +98,8 @@ public final class AnnotatedClassScanner {
      * @return The set of matching classes that are annotated with one or more of
      *         the specified annotations.
      */
-    public Set<Class> scan(File[] paths) {
-        this.classes = new HashSet<Class>();
+    public Set<Class<?>> scan(File[] paths) {
+        this.classes = new HashSet<Class<?>>();
         
         for (File file : paths) {
             index(file);
@@ -116,8 +115,8 @@ public final class AnnotatedClassScanner {
      * @return The set of matching classes that are annotated with one or more of
      *         the specified annotations.
      */
-    public Set<Class> scan(String[] packages) {
-        this.classes = new HashSet<Class>();
+    public Set<Class<?>> scan(String[] packages) {
+        this.classes = new HashSet<Class<?>>();
         
         for (String p : packages) {
             try {
@@ -152,34 +151,8 @@ public final class AnnotatedClassScanner {
      * @return The set of matching classes that are annotated with one or more of
      *         the specified annotations.
      */
-    public Set<Class> getMatchingClasses() {
+    public Set<Class<?>> getMatchingClasses() {
         return classes;
-    }
-    
-    /**
-     * Get the current set of classes that match a set of annotations.
-     * 
-     * @param annotations the set of matching annotations
-     * @return The set of matching classes that are annotated with one or more of
-     *         the specified annotations.
-     */
-    public Set<Class<?>> getMatchingClasses(Class... annotations) {
-        Set<Class<?>> s = new HashSet<Class<?>>();
-        for (Class<?> c : classes) {
-            if (hasAnnotations(c, annotations))
-                s.add(c);
-        }
-        return s;
-    }
-    
-    @SuppressWarnings("unchecked")
-    private boolean hasAnnotations(Class c, Class... annotations) {
-        Annotation[] _as = c.getAnnotations();
-        for (Class a : annotations) {
-            if (c.getAnnotation(a) == null) return false;
-        }
-        
-        return true;
     }
     
     private Set<String> getAnnotationSet(Class... annotations) {

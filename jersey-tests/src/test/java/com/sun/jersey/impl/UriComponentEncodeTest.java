@@ -49,10 +49,38 @@ public class UriComponentEncodeTest extends TestCase {
         super(testName);
     }
 
-    public void testPath() {
-        assertEquals("/a/b/c", UriComponent.encode("/a/b/c", UriComponent.Type.PATH));
-        assertEquals("/a%20/b%20/c%20", UriComponent.encode("/a /b /c ", UriComponent.Type.PATH));
-        assertEquals("/copyright%C2%A9", UriComponent.encode("/copyright\u00a9", UriComponent.Type.PATH));
+    public void testEncodePath() {
+        assertEquals("/a/b/c", 
+                UriComponent.encode("/a/b/c", UriComponent.Type.PATH));
+        assertEquals("/a%20/b%20/c%20", 
+                UriComponent.encode("/a /b /c ", UriComponent.Type.PATH));
+        assertEquals("/copyright%C2%A9", 
+                UriComponent.encode("/copyright\u00a9", UriComponent.Type.PATH));
     }
     
+    public void testContextualEncodePath() {
+        assertEquals("/a/b/c", 
+                UriComponent.contextualEncode("/a/b/c", UriComponent.Type.PATH));
+        assertEquals("/a%20/b%20/c%20", 
+                UriComponent.contextualEncode("/a /b /c ", UriComponent.Type.PATH));
+        assertEquals("/copyright%C2%A9", 
+                UriComponent.contextualEncode("/copyright\u00a9", UriComponent.Type.PATH));
+        
+        assertEquals("/a%20/b%20/c%20", 
+                UriComponent.contextualEncode("/a%20/b%20/c%20", UriComponent.Type.PATH));
+        assertEquals("/copyright%C2%A9", 
+                UriComponent.contextualEncode("/copyright%C2%A9", UriComponent.Type.PATH));        
+    }
+    
+    public void testEncodeQuery() {
+        assertEquals("a+b+c.-*_",
+                UriComponent.encode("a b c.-*_", UriComponent.Type.QUERY));
+    }
+    
+    public void testContextualEncodeQuery() {
+        assertEquals("a+b+c.-*_",
+                UriComponent.contextualEncode("a b c.-*_", UriComponent.Type.QUERY));
+        assertEquals("a+b+c.-*_",
+                UriComponent.contextualEncode("a+b+c.-*_", UriComponent.Type.QUERY));
+    }
 }

@@ -277,6 +277,11 @@ public final class ResponseBuilderImpl extends Response.ResponseBuilder {
         return this;
     }
 
+    public ResponseBuilder expires(Date expires) {
+        add(HttpHeaders.EXPIRES, expires);
+        return this;
+    }
+    
     public Response.ResponseBuilder cookie(NewCookie... cookies) {
         if (cookies != null) {
             for (NewCookie cookie : cookies)

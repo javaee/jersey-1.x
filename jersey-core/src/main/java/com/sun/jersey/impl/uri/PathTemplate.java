@@ -53,40 +53,15 @@ public final class PathTemplate extends UriTemplate {
      * 
      * @param template the URI path template
      */
-    public PathTemplate(String template) {
-        this(template, false, true);
+    public PathTemplate(String path) {
+        super(encode(prefixWithSlash(path)));
+    }
+        
+    private static String encode(String path) {
+        return UriComponent.contextualEncode(path, UriComponent.Type.PATH, true);
     }
     
-    /**
-     * Create a URI path template and encode (percent escape) any characters 
-     * of the template that are not valid URI characters.
-     * 
-     * @param template the URI path template. The template is prefixed with
-     *        a '/' if the template does not start with a '/'.
-     * @param encode if true encode (percent escape) any characters of the 
-     *       template that are not valid URI path characters (excluding template
-     *       specific characters), otherwise validate the characters.
-     * @throws IllegalArgumentException if the template is validated and it
-     *         contains illegal characters. 
-     */
-    public PathTemplate(String template, boolean encode) {
-        this(template, encode, true);
-    }
-    
-    public PathTemplate(String template, boolean encode, boolean limited) {
-        super(encodeOrValidate(prefixWithSlash(template), encode), limited);
-    }
-    
-    private static String encodeOrValidate(String path, boolean encode) {
-        if (encode) {
-            return UriComponent.encode(path, UriComponent.Type.PATH, true);
-        } else {
-            UriComponent.validate(path, UriComponent.Type.PATH, true);
-            return path;
-        }
-    }
-    
-    private static String prefixWithSlash(String regex) {
-        return (!regex.startsWith("/")) ? "/" + regex : regex;
+    private static String prefixWithSlash(String path) {
+        return (!path.startsWith("/")) ? "/" + path : path;
     }
 }

@@ -50,7 +50,7 @@ import junit.framework.*;
  * @author Paul.Sandoz@Sun.Com
  */
 public class EscapedURITest extends AbstractGrizzlyServerTester {
-    @Path(value="x%20y", encode=false)
+    @Path(value="x%20y")
     public static class EscapedURIResource {
         @GET
         public String get(@Context UriInfo info) {
@@ -70,7 +70,7 @@ public class EscapedURITest extends AbstractGrizzlyServerTester {
         startServer(EscapedURIResource.class);
                 
         WebResource r = Client.create().resource(getUri().
-                userInfo("x.y").encode(false).path("x%20y").build());
+                userInfo("x.y").path("x%20y").build());
         assertEquals("CONTENT", r.get(String.class));
     } 
 }

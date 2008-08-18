@@ -43,10 +43,10 @@ import java.util.List;
 /**
  * Abstraction for resource class
  */
-public class AbstractResource implements UriPathAnnotated, AbstractModelComponent {
+public class AbstractResource implements PathAnnotated, AbstractModelComponent {
 
     private final Class<?> resourceClass;
-    private final UriPathValue uriPath;
+    private final PathValue uriPath;
     private final List<AbstractResourceConstructor> constructors;
     private final List<AbstractField> fields;
     private final List<AbstractSetterMethod> setterMethods;
@@ -64,7 +64,7 @@ public class AbstractResource implements UriPathAnnotated, AbstractModelComponen
     /**
      * Creates a new instance of AbstractResource
      */
-    public AbstractResource(Class<?> resourceClass, UriPathValue uriPath) {
+    public AbstractResource(Class<?> resourceClass, PathValue uriPath) {
         this.resourceClass = resourceClass;
         this.uriPath = uriPath;
         this.constructors = new ArrayList<AbstractResourceConstructor>();
@@ -87,7 +87,7 @@ public class AbstractResource implements UriPathAnnotated, AbstractModelComponen
         return uriPath != null;
     }
 
-    public UriPathValue getUriPath() {
+    public PathValue getPath() {
         return uriPath;
     }
 
@@ -137,7 +137,7 @@ public class AbstractResource implements UriPathAnnotated, AbstractModelComponen
     @Override
     public String toString() {
         return "AbstractResource(" 
-                + ((null == getUriPath()) ? "" : ("\"" + getUriPath().getValue() + "\", - ")) 
+                + ((null == getPath()) ? "" : ("\"" + getPath().getValue() + "\", - "))
                 + getResourceClass().getSimpleName() + ": " 
                 + getConstructors().size() + " constructors, " 
                 + getFields().size() + " fields, " 

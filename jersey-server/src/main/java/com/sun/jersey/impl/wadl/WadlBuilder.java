@@ -225,7 +225,7 @@ public final class WadlBuilder {
                 new HashMap<String, Map<String, Param>>();
         for (AbstractSubResourceMethod m : r.getSubResourceMethods()) {
             // find or create sub resource for uri template
-            String template = m.getUriPath().getValue();
+            String template = m.getPath().getValue();
             Resource wadlSubResource = wadlSubResources.get(template);
             Map<String, Param> wadlSubResourceParams = wadlSubResourcesParams.get(template);
             if (wadlSubResource == null) {
@@ -254,7 +254,7 @@ public final class WadlBuilder {
             AbstractResource subResource = IntrospectionModeller.createResource(
                     l.getMethod().getReturnType());
             Resource wadlSubResource = generateResource(subResource, 
-                    l.getUriPath().getValue(), visitedClasses);
+                    l.getPath().getValue(), visitedClasses);
             wadlResource.getMethodOrResource().add(wadlSubResource);
             
             for (Parameter p : l.getParameters()) {
@@ -269,8 +269,8 @@ public final class WadlBuilder {
     private Resource generateSubResource(AbstractResource r, String path) {
         Resource wadlResource = new Resource();
         if (r.isRootResource()) {
-            StringBuilder b = new StringBuilder(r.getUriPath().getValue());
-            if (!(r.getUriPath().getValue().endsWith("/") || path.startsWith("/")))
+            StringBuilder b = new StringBuilder(r.getPath().getValue());
+            if (!(r.getPath().getValue().endsWith("/") || path.startsWith("/")))
                 b.append("/");
             b.append(path);
             wadlResource.setPath(b.toString());
@@ -279,7 +279,7 @@ public final class WadlBuilder {
         Map<String, Param> wadlSubResourceParams = new HashMap<String, Param>();
         for (AbstractSubResourceMethod m : r.getSubResourceMethods()) {
             // find or create sub resource for uri template
-            String template = m.getUriPath().getValue();
+            String template = m.getPath().getValue();
             if (!template.equals(path))
                 continue;
             com.sun.research.ws.wadl.Method wadlMethod = generateMethod(r, wadlSubResourceParams, m);

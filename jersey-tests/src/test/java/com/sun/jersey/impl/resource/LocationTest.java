@@ -101,13 +101,13 @@ public class LocationTest extends AbstractResourceTester {
 
         ClientResponse response = r.path("rel-path").post(ClientResponse.class);        
         assertEquals(201, response.getStatus());        
-        URI l = UriBuilder.fromUri(BASE_URI).path("rel-path", "subpath").build();
+        URI l = UriBuilder.fromUri(BASE_URI).path("rel-path").path("subpath").build();
         assertEquals(l, response.getLocation());        
         assertEquals("CONTENT", response.getEntity(String.class));
         
         response = r.path("abs-path").post(ClientResponse.class);        
         assertEquals(201, response.getStatus());        
-        l = UriBuilder.fromUri(BASE_URI).path("abs-path", "subpath").build();
+        l = UriBuilder.fromUri(BASE_URI).path("abs-path").path("subpath").build();
         assertEquals(l, response.getLocation());        
         assertEquals("CONTENT", response.getEntity(String.class));        
         
@@ -123,13 +123,13 @@ public class LocationTest extends AbstractResourceTester {
 
         ClientResponse response = r.path("rel-path-query").post(ClientResponse.class);        
         assertEquals(201, response.getStatus());        
-        URI l = UriBuilder.fromUri(BASE_URI).path("rel-path-query", "subpath").queryParam("a", "b").build();
+        URI l = UriBuilder.fromUri(BASE_URI).path("rel-path-query").path("subpath").queryParam("a", "b").build();
         assertEquals(l, response.getLocation());        
         assertEquals("CONTENT", response.getEntity(String.class));
         
         response = r.path("abs-path-query").post(ClientResponse.class);        
         assertEquals(201, response.getStatus());        
-        l = UriBuilder.fromUri(BASE_URI).path("abs-path-query", "subpath").queryParam("a", "b").build();
+        l = UriBuilder.fromUri(BASE_URI).path("abs-path-query").path("subpath").queryParam("a", "b").build();
         assertEquals(l, response.getLocation());        
         assertEquals("CONTENT", response.getEntity(String.class));        
         

@@ -775,9 +775,9 @@ public class UriTemplate {
     public final static String createURI(final String scheme, 
             final String userInfo, final String host, final String port, 
             final String path, final String query, final String fragment,
-            final Map<String, Object> values, final boolean encode) {
+            final Map<String, ? extends Object> values, final boolean encode) {
         Map<String, String> stringValues = new HashMap<String, String>();
-        for (Map.Entry<String, Object> e : values.entrySet()) {
+        for (Map.Entry<String, ? extends Object> e : values.entrySet()) {
             if (e.getValue() != null)
                 stringValues.put(e.getKey(), e.getValue().toString());
         }
@@ -789,6 +789,9 @@ public class UriTemplate {
     /**
      * Construct a URI from the component parts each of which may contain 
      * template variables.
+     * <p>
+     * A template value is an Object instance that MUST support the toString() 
+     * method to convert the template value to a String instance.
      *
      * @param scheme the URI scheme component
      * @param userInfo the URI user info component
@@ -806,7 +809,7 @@ public class UriTemplate {
     public final static String createURIWithStringValues(final String scheme, 
             final String userInfo, final String host, final String port, 
             final String path, final String query, final String fragment,
-            final Map<String, String> values, final boolean encode) {
+            final Map<String, ? extends Object> values, final boolean encode) {
         
         StringBuilder sb = new StringBuilder();
         
@@ -849,7 +852,7 @@ public class UriTemplate {
     
     private static StringBuilder createURIComponent(final UriComponent.Type t, 
             final String template,
-            final Map<String, String> values, 
+            final Map<String, ? extends Object> values, 
             final boolean encode, 
             final StringBuilder b) {
         if (template.indexOf('{') == -1) {
@@ -862,7 +865,7 @@ public class UriTemplate {
         int i = 0;
         while(m.find()) {
             b.append(template, i, m.start());
-            String tValue = values.get(m.group(1));
+            String tValue = values.get(m.group(1)).toString();
             if (tValue != null) {
                 if (encode)
                     tValue = UriComponent.encode(tValue, t);

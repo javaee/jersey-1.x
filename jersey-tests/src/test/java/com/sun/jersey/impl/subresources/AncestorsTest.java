@@ -66,16 +66,16 @@ public class AncestorsTest extends AbstractResourceTester {
         }        
         
         @GET public String get(@Context UriInfo ui) {
-            assertEquals(n + 1, ui.getAncestorResources().size());
-            assertEquals(n + 1, ui.getAncestorResourceURIs().size());
+            assertEquals(n + 1, ui.getMatchedResources().size());
+            assertEquals(n + 1, ui.getMatchedURIs().size());
             
             for (int i = 0; i <= n; i++) {
-                Node node = (Node)ui.getAncestorResources().get(i);
+                Node node = (Node)ui.getMatchedResources().get(i);
                 assertEquals(n - i, node.n);
             }
             
             for (int i = 0; i <= n; i++) {
-                String p = ui.getAncestorResourceURIs().get(i);
+                String p = ui.getMatchedURIs().get(i);
                 assertEquals(getPath(n - i), p);
             }
             
@@ -83,20 +83,20 @@ public class AncestorsTest extends AbstractResourceTester {
         }
         
         @Path("leaf") @GET public String getSub(@Context UriInfo ui) {
-            assertEquals(n + 1 + 1, ui.getAncestorResources().size());
-            assertEquals(n + 1 + 1, ui.getAncestorResourceURIs().size());
+            assertEquals(n + 1 + 1, ui.getMatchedResources().size());
+            assertEquals(n + 1 + 1, ui.getMatchedURIs().size());
             
-            Node node = (Node)ui.getAncestorResources().get(0);
+            Node node = (Node)ui.getMatchedResources().get(0);
             assertEquals(n, node.n);            
             for (int i = 0; i <= n; i++) {
-                node = (Node)ui.getAncestorResources().get(i + 1);
+                node = (Node)ui.getMatchedResources().get(i + 1);
                 assertEquals(n - i, node.n);
             }
             
-            String p = ui.getAncestorResourceURIs().get(0);
+            String p = ui.getMatchedURIs().get(0);
             assertEquals(getPathLeaf(n), p);            
             for (int i = 0; i <= n; i++) {
-                p = ui.getAncestorResourceURIs().get(i + 1);
+                p = ui.getMatchedURIs().get(i + 1);
                 assertEquals(getPath(n - i), p);
             }
             
@@ -147,16 +147,16 @@ public class AncestorsTest extends AbstractResourceTester {
         }
         
         @GET public String get(@Context UriInfo ui) {
-            assertEquals(n + 1, ui.getAncestorResources().size());
-            assertEquals(n + 1, ui.getAncestorResourceURIs().size());
+            assertEquals(n + 1, ui.getMatchedResources().size());
+            assertEquals(n + 1, ui.getMatchedURIs().size());
             
             for (int i = 0; i <= n; i++) {
-                NodeSlash node = (NodeSlash)ui.getAncestorResources().get(i);
+                NodeSlash node = (NodeSlash)ui.getMatchedResources().get(i);
                 assertEquals(n - i, node.n);
             }
             
             for (int i = 0; i <= n; i++) {
-                String p = ui.getAncestorResourceURIs().get(i);
+                String p = ui.getMatchedURIs().get(i);
                 assertEquals(getPath(n - i), p);
             }
             
@@ -164,20 +164,20 @@ public class AncestorsTest extends AbstractResourceTester {
         }
         
         @Path("leaf/") @GET public String getSub(@Context UriInfo ui) {
-            assertEquals(n + 1 + 1, ui.getAncestorResources().size());
-            assertEquals(n + 1 + 1, ui.getAncestorResourceURIs().size());
+            assertEquals(n + 1 + 1, ui.getMatchedResources().size());
+            assertEquals(n + 1 + 1, ui.getMatchedURIs().size());
             
-            NodeSlash node = (NodeSlash)ui.getAncestorResources().get(0);
+            NodeSlash node = (NodeSlash)ui.getMatchedResources().get(0);
             assertEquals(n, node.n);            
             for (int i = 0; i <= n; i++) {
-                node = (NodeSlash)ui.getAncestorResources().get(i + 1);
+                node = (NodeSlash)ui.getMatchedResources().get(i + 1);
                 assertEquals(n - i, node.n);
             }
             
-            String p = ui.getAncestorResourceURIs().get(0);
+            String p = ui.getMatchedURIs().get(0);
             assertEquals(getPathLeaf(n), p);            
             for (int i = 0; i <= n; i++) {
-                p = ui.getAncestorResourceURIs().get(i + 1);
+                p = ui.getMatchedURIs().get(i + 1);
                 assertEquals(getPath(n - i), p);
             }
             

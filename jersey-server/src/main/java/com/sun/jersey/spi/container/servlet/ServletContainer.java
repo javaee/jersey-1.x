@@ -38,7 +38,7 @@
 package com.sun.jersey.spi.container.servlet;
 
 import com.sun.jersey.api.container.ContainerException;
-import com.sun.jersey.api.core.ApplicationConfigAdapter;
+import com.sun.jersey.api.core.ApplicationAdapter;
 import com.sun.jersey.api.core.ResourceConfig;
 import com.sun.jersey.impl.ThreadLocalInvoker;
 import com.sun.jersey.api.core.ClasspathResourceConfig;
@@ -73,7 +73,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.ws.rs.core.ApplicationConfig;
+import javax.ws.rs.core.Application;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.UriBuilder;
@@ -281,16 +281,16 @@ public class ServletContainer extends HttpServlet implements ContainerListener {
                     "servlet path contain characters that are percent enocded");
         }
         
-        final URI baseUri = absoluteUriBuilder.encode(false).
+        final URI baseUri = absoluteUriBuilder.
                 replacePath(encodedBasePath).
                 build();
         
         String queryParameters = request.getQueryString();
         if (queryParameters == null) queryParameters = "";
         
-        final URI requestUri = absoluteUriBuilder.encode(false).
+        final URI requestUri = absoluteUriBuilder.
                 replacePath(request.getRequestURI()).
-                replaceQueryParams(queryParameters).
+                replaceQuery(queryParameters).
                 build();
         
         final ContainerRequest cRequest = new ServletContainerRequest(
@@ -389,10 +389,10 @@ public class ServletContainer extends HttpServlet implements ContainerListener {
                 } catch(Exception e) {                    
                     throw new ServletException(e);
                 }
-            } else if (ApplicationConfig.class.isAssignableFrom(resourceConfigClass)) {
+            } else if (Application.class.isAssignableFrom(resourceConfigClass)) {
                 try {
-                    ResourceConfig rc = new ApplicationConfigAdapter(
-                            (ApplicationConfig)resourceConfigClass.newInstance());
+                    ResourceConfig rc = new ApplicationAdapter(
+                            (Application)resourceConfigClass.newInstance());
                     rc.getProperties().putAll(props);
                     return rc;
                 } catch(Exception e) {
@@ -523,28 +523,28 @@ public class ServletContainer extends HttpServlet implements ContainerListener {
      * @param wa the Web application
      */
     protected void configure(final ServletConfig sc, ResourceConfig rc, WebApplication wa) {
-        rc.getProviderInstances().add(new ContextInjectableProvider<HttpServletRequest>(
+        rc.getSingletons().add(new ContextInjectableProvider<HttpServletRequest>(
                 HttpServletRequest.class,
                 (HttpServletRequest)Proxy.newProxyInstance(
                         HttpServletRequest.class.getClassLoader(),
                         new Class[] { HttpServletRequest.class },
                         requestInvoker)));
         
-        rc.getProviderInstances().add(new ContextInjectableProvider<HttpServletResponse>(
+        rc.getSingletons().add(new ContextInjectableProvider<HttpServletResponse>(
                 HttpServletResponse.class,
                 (HttpServletResponse)Proxy.newProxyInstance(
                         HttpServletResponse.class.getClassLoader(),
                         new Class[] { HttpServletResponse.class },
                         responseInvoker)));
         
-        rc.getProviderInstances().add(new ContextInjectableProvider<ServletConfig>(
+        rc.getSingletons().add(new ContextInjectableProvider<ServletConfig>(
                 ServletConfig.class, sc));
         
-        rc.getProviderInstances().add(new ContextInjectableProvider<ServletContext>(
+        rc.getSingletons().add(new ContextInjectableProvider<ServletContext>(
                 ServletContext.class, 
                 sc.getServletContext()));
         
-        rc.getProviderInstances().add(new JSPTemplateProcessor(
+        rc.getSingletons().add(new JSPTemplateProcessor(
                 requestInvoker.getThreadLocal(), 
                 responseInvoker.getThreadLocal()));
     }

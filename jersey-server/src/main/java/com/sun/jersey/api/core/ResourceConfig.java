@@ -37,16 +37,30 @@
 
 package com.sun.jersey.api.core;
 
+import com.sun.jersey.impl.wadl.WadlGenerator;
+import com.sun.jersey.spi.container.ContainerListener;
+import com.sun.jersey.spi.container.ContainerNotifier;
+import com.sun.jersey.spi.container.ContainerRequestFilter;
+import com.sun.jersey.spi.container.ContainerResponseFilter;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
-import javax.ws.rs.core.ApplicationConfig;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.ws.rs.Path;
+import javax.ws.rs.core.Application;
+import javax.ws.rs.core.MediaType;
 
-import com.sun.jersey.impl.wadl.WadlGenerator;
 
 /**
  * The resource configuration for configuring a web application.
  */
-public abstract class ResourceConfig extends ApplicationConfig {
+public abstract class ResourceConfig extends Application {
+    private static final Logger LOGGER = 
+            Logger.getLogger(ResourceConfig.class.getName());
+    
     /**
      * If true the request URI will be normalized as specified by 
      * {@link java.net.URI#normalize}. If not true the request URI is not
@@ -205,14 +219,156 @@ public abstract class ResourceConfig extends ApplicationConfig {
     public abstract Object getProperty(String propertyName);
     
     /**
-     * Get the provider instances to be utilized by the web application.
-     * <p>
-     * When the web application is initialized the set of provider instances
-     * will be combined and take precendence over the instances of provider 
-     * classes declared by {@link ApplicationConfig}. 
-     * 
-     * @return a mutable set of provider instances. After intialization of
-     * the Web application modification of this value will have no effect.
+     * Get a map of file extension to media type. This is used to drive 
+     * URI-based content negotiation such that, e.g.:
+     * <pre>GET /resource.atom</pre>
+     * <p>is equivalent to:</p>
+     * <pre>GET /resource
+     *Accept: application/atom+xml</pre>
+     * <p>The default implementation returns an empty map.</p>
+     * @return a map of file extension to media type
      */
-    public abstract Set<Object> getProviderInstances();
+    public Map<String, MediaType> getMediaTypeMappings() {
+        return Collections.emptyMap();
+    }
+
+    /**
+     * Get a map of file extension to language. This is used to drive 
+     * URI-based content negotiation such that, e.g.:
+     * <pre>GET /resource.english</pre>
+     * <p>is equivalent to:</p>
+     * <pre>GET /resource
+     *Accept-Language: en</pre>
+     * <p>The default implementation returns an empty map.</p>
+     * @return a map of file extension to language
+     */
+    public Map<String, String> getLanguageMappings() {
+        return Collections.emptyMap();
+    }
+    
+    /**
+     * Validate the set of classes and singletons.
+     * <p>
+     * A registered class is removed from the set of registered classes
+     * if an instance of that class is a member of the set of registered
+     * singletons.
+     * 
+     * @throws IllegalArgumentException if the set of registered singletons 
+     *         contains more than one instance of the same root resource class.
+     */
+    public void validate() {
+        // Remove any registered classes if instances exist in registered 
+        // singletons
+        Iterator<Class<?>> i = getClasses().iterator();
+        while (i.hasNext()) {
+            Class<?> c = i.next();
+            for (Object o : getSingletons()) {
+                if (c.isInstance(o)) {
+                    i.remove();
+                    LOGGER.log(Level.WARNING, 
+                            "Class " + c.getName() + 
+                            " is ignored as an instance is registered in the set of singletons");                    
+                }
+            }            
+        }
+        
+        Set<Class<?>> objectClassSet = new HashSet<Class<?>>();
+        Set<Class<?>> conflictSet = new HashSet<Class<?>>();
+        for (Object o : getSingletons()) {
+            if (o.getClass().isAnnotationPresent(Path.class)) {
+                if (objectClassSet.contains(o.getClass())) {
+                    conflictSet.add(o.getClass());
+                } else {
+                    objectClassSet.add(o.getClass());
+                }
+            }
+        }
+        
+        if (!conflictSet.isEmpty()) {
+            for (Class<?> c : conflictSet) {
+                LOGGER.log(Level.SEVERE, 
+                        "Root resource class " + c.getName() + 
+                        " is instantated more than once in the set of registered singletons");                                    
+            }
+            throw new IllegalArgumentException(
+                    "The set of registered singletons contains " +
+                    "more than one instance of the same root resource class");
+        }
+    }
+    
+    /**
+     * Get the set of root resource classes.
+     * <p>
+     * A root resource class is a registered class that is annotated with
+     * Path.
+     * 
+     * @return the unmodifiable set of root resource classes.
+     */
+    public Set<Class<?>> getRootResourceClasses() {
+        Set<Class<?>> s = new HashSet<Class<?>>();
+        
+        for (Class<?> c : getClasses()) {
+            if (c.isAnnotationPresent(Path.class))
+                s.add(c);
+        }
+        
+        return Collections.unmodifiableSet(s);
+    }
+    
+    /**
+     * Get the set of provider classes.
+     * <p>
+     * A provider class is a registered class that is not annotated with
+     * Path.
+     * 
+     * @return the unmodifiable set of provider classes.
+     */
+    public Set<Class<?>> getProviderClasses() {
+        Set<Class<?>> s = new HashSet<Class<?>>();
+        
+        for (Class<?> c : getClasses()) {
+            if (!c.isAnnotationPresent(Path.class))
+                s.add(c);
+        }
+        
+        return Collections.unmodifiableSet(s);
+    }
+
+    /**
+     * Get the set of root resource singleton instances.
+     * <p>
+     * A root resource singleton instance is a registered instance whose class
+     * is annotated with Path.
+     * 
+     * @return the unmodifiable set of root resource singleton instances.
+     */
+    public Set<Object> getRootResourceSingletons() {
+        Set<Object> s = new HashSet<Object>();
+        
+        for (Object o : getSingletons()) {
+            if (o.getClass().isAnnotationPresent(Path.class))
+                s.add(o);
+        }
+        
+        return Collections.unmodifiableSet(s);
+    }
+    
+    /**
+     * Get the set of provider singleton instances.
+     * <p>
+     * A provider singleton instances is a registered instance whose class
+     * is not annotated with Path.
+     * 
+     * @return the unmodifiable set of provider singleton instances.
+     */
+    public Set<Object> getProviderSingletons() {
+        Set<Object> s = new HashSet<Object>();
+        
+        for (Object o : getSingletons()) {
+            if (!o.getClass().isAnnotationPresent(Path.class))
+                s.add(o);
+        }
+        
+        return Collections.unmodifiableSet(s);
+    }
 }

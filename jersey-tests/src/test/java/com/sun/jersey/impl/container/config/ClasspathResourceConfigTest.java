@@ -64,8 +64,8 @@ public class ClasspathResourceConfigTest extends AbstractResourceConfigTester {
         p.put(ClasspathResourceConfig.PROPERTY_CLASSPATH, paths);
         ResourceConfig rc = new ClasspathResourceConfig(p);
         
-        assertTrue(rc.getResourceClasses().contains(PublicRootResourceClass.class));
-        assertEquals(1, rc.getResourceClasses().size());
+        assertTrue(rc.getClasses().contains(PublicRootResourceClass.class));
+        assertEquals(1, rc.getClasses().size());
     }
     
     public void testInnerStatic() {
@@ -74,8 +74,8 @@ public class ClasspathResourceConfigTest extends AbstractResourceConfigTester {
         p.put(ClasspathResourceConfig.PROPERTY_CLASSPATH, paths);
         ResourceConfig rc = new ClasspathResourceConfig(p);
         
-        assertTrue(rc.getResourceClasses().contains(InnerStaticClass.PublicClass.class));
-        assertEquals(1, rc.getResourceClasses().size());
+        assertTrue(rc.getClasses().contains(InnerStaticClass.PublicClass.class));
+        assertEquals(1, rc.getClasses().size());
     }
     
     public void testTopLevelInnerStatic() {
@@ -84,9 +84,9 @@ public class ClasspathResourceConfigTest extends AbstractResourceConfigTester {
         p.put(ClasspathResourceConfig.PROPERTY_CLASSPATH, paths);
         ResourceConfig rc = new ClasspathResourceConfig(p);
         
-        assertTrue(rc.getResourceClasses().contains(PublicRootResourceInnerStaticClass.class));
-        assertTrue(rc.getResourceClasses().contains(PublicRootResourceInnerStaticClass.PublicClass.class));
-        assertEquals(2, rc.getResourceClasses().size());
+        assertTrue(rc.getClasses().contains(PublicRootResourceInnerStaticClass.class));
+        assertTrue(rc.getClasses().contains(PublicRootResourceInnerStaticClass.PublicClass.class));
+        assertEquals(2, rc.getClasses().size());
     }
     
     public void testAll() {
@@ -95,11 +95,11 @@ public class ClasspathResourceConfigTest extends AbstractResourceConfigTester {
         p.put(ClasspathResourceConfig.PROPERTY_CLASSPATH, paths);
         ResourceConfig rc = new ClasspathResourceConfig(p);
         
-        assertTrue(rc.getResourceClasses().contains(PublicRootResourceClass.class));
-        assertTrue(rc.getResourceClasses().contains(InnerStaticClass.PublicClass.class));
-        assertTrue(rc.getResourceClasses().contains(PublicRootResourceInnerStaticClass.class));
-        assertTrue(rc.getResourceClasses().contains(PublicRootResourceInnerStaticClass.PublicClass.class));
-        assertEquals(4, rc.getResourceClasses().size());
+        assertTrue(rc.getClasses().contains(PublicRootResourceClass.class));
+        assertTrue(rc.getClasses().contains(InnerStaticClass.PublicClass.class));
+        assertTrue(rc.getClasses().contains(PublicRootResourceInnerStaticClass.class));
+        assertTrue(rc.getClasses().contains(PublicRootResourceInnerStaticClass.PublicClass.class));
+        assertEquals(4, rc.getClasses().size());
     }
     
     public void testAllWithOnePath() {
@@ -111,11 +111,11 @@ public class ClasspathResourceConfigTest extends AbstractResourceConfigTester {
         p.put(ClasspathResourceConfig.PROPERTY_CLASSPATH, paths);
         ResourceConfig rc = new ClasspathResourceConfig(p);
         
-        assertTrue(rc.getResourceClasses().contains(PublicRootResourceClass.class));
-        assertTrue(rc.getResourceClasses().contains(InnerStaticClass.PublicClass.class));
-        assertTrue(rc.getResourceClasses().contains(PublicRootResourceInnerStaticClass.class));
-        assertTrue(rc.getResourceClasses().contains(PublicRootResourceInnerStaticClass.PublicClass.class));
-        assertEquals(4, rc.getResourceClasses().size());
+        assertTrue(rc.getClasses().contains(PublicRootResourceClass.class));
+        assertTrue(rc.getClasses().contains(InnerStaticClass.PublicClass.class));
+        assertTrue(rc.getClasses().contains(PublicRootResourceInnerStaticClass.class));
+        assertTrue(rc.getClasses().contains(PublicRootResourceInnerStaticClass.PublicClass.class));
+        assertEquals(4, rc.getClasses().size());
     }
     
     public void testAllWithOnePathWithSpacesAndEmptyElements() {
@@ -127,11 +127,11 @@ public class ClasspathResourceConfigTest extends AbstractResourceConfigTester {
         p.put(ClasspathResourceConfig.PROPERTY_CLASSPATH, paths);
         ResourceConfig rc = new ClasspathResourceConfig(p);
         
-        assertTrue(rc.getResourceClasses().contains(PublicRootResourceClass.class));
-        assertTrue(rc.getResourceClasses().contains(InnerStaticClass.PublicClass.class));
-        assertTrue(rc.getResourceClasses().contains(PublicRootResourceInnerStaticClass.class));
-        assertTrue(rc.getResourceClasses().contains(PublicRootResourceInnerStaticClass.PublicClass.class));
-        assertEquals(4, rc.getResourceClasses().size());
+        assertTrue(rc.getClasses().contains(PublicRootResourceClass.class));
+        assertTrue(rc.getClasses().contains(InnerStaticClass.PublicClass.class));
+        assertTrue(rc.getClasses().contains(PublicRootResourceInnerStaticClass.class));
+        assertTrue(rc.getClasses().contains(PublicRootResourceInnerStaticClass.PublicClass.class));
+        assertEquals(4, rc.getClasses().size());
     }
     
     public void testJarTopLevel() throws IOException {
@@ -141,8 +141,8 @@ public class ClasspathResourceConfigTest extends AbstractResourceConfigTester {
                 );
         ResourceConfig rc = createConfig(jarFile);
 
-        assertTrue(rc.getResourceClasses().contains(PublicRootResourceClass.class));
-        assertEquals(1, rc.getResourceClasses().size());
+        assertTrue(rc.getClasses().contains(PublicRootResourceClass.class));
+        assertEquals(1, rc.getClasses().size());
     }
     
     public void testJarInnerStatic() throws IOException {
@@ -155,8 +155,8 @@ public class ClasspathResourceConfigTest extends AbstractResourceConfigTester {
                 );
         ResourceConfig rc = createConfig(jarFile);
 
-        assertTrue(rc.getResourceClasses().contains(InnerStaticClass.PublicClass.class));
-        assertEquals(1, rc.getResourceClasses().size());
+        assertTrue(rc.getClasses().contains(InnerStaticClass.PublicClass.class));
+        assertEquals(1, rc.getClasses().size());
     }
     
     public void testJarBoth() throws IOException {
@@ -171,9 +171,9 @@ public class ClasspathResourceConfigTest extends AbstractResourceConfigTester {
                 );
         ResourceConfig rc = createConfig(jarFile);
 
-        assertTrue(rc.getResourceClasses().contains(PublicRootResourceClass.class));
-        assertTrue(rc.getResourceClasses().contains(InnerStaticClass.PublicClass.class));
-        assertEquals(2, rc.getResourceClasses().size());
+        assertTrue(rc.getClasses().contains(PublicRootResourceClass.class));
+        assertTrue(rc.getClasses().contains(InnerStaticClass.PublicClass.class));
+        assertEquals(2, rc.getClasses().size());
     }
     
     public void testJarAzZipBoth() throws IOException {
@@ -188,9 +188,9 @@ public class ClasspathResourceConfigTest extends AbstractResourceConfigTester {
                 );
         ResourceConfig rc = createConfig(zipFile);
 
-        assertTrue(rc.getResourceClasses().contains(PublicRootResourceClass.class));
-        assertTrue(rc.getResourceClasses().contains(InnerStaticClass.PublicClass.class));
-        assertEquals(2, rc.getResourceClasses().size());
+        assertTrue(rc.getClasses().contains(PublicRootResourceClass.class));
+        assertTrue(rc.getClasses().contains(InnerStaticClass.PublicClass.class));
+        assertEquals(2, rc.getClasses().size());
     }
     
     private ResourceConfig createConfig(File jarFile) {

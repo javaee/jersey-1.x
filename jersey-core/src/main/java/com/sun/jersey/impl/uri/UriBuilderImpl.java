@@ -56,8 +56,6 @@ public final class UriBuilderImpl extends UriBuilder {
 
     // All fields should be in the percent-encoded form
     
-    private boolean encode = true;
-    
     private String scheme;
     
     private String ssp;
@@ -80,7 +78,6 @@ public final class UriBuilderImpl extends UriBuilder {
     }
 
     private UriBuilderImpl(UriBuilderImpl that) {
-        this.encode = that.encode;
         this.scheme = that.scheme;
         this.ssp = that.ssp;
         this.userInfo = that.userInfo;
@@ -91,19 +88,12 @@ public final class UriBuilderImpl extends UriBuilder {
         this.fragment = that.fragment;
     }
     
+    @Override
     public UriBuilder clone() {
         return new UriBuilderImpl(this);
     }
     
-    public boolean isEncode() {
-        return encode;
-    }
-    
-    public UriBuilder encode(boolean enable) {
-        encode = enable;
-        return this;
-    }
-    
+    @Override
     public UriBuilder uri(URI uri) {
         if (uri == null) 
             throw new IllegalArgumentException("URI parameter is null");
@@ -130,6 +120,7 @@ public final class UriBuilderImpl extends UriBuilder {
         return this;
     }
 
+    @Override
     public UriBuilder scheme(String scheme) {
         if (scheme != null) {
             this.scheme = scheme;
@@ -140,6 +131,7 @@ public final class UriBuilderImpl extends UriBuilder {
         return this;
     }
 
+    @Override
     public UriBuilder schemeSpecificPart(String ssp) {
         if (ssp == null)
             throw new IllegalArgumentException("Scheme specific part parameter is null");
@@ -168,6 +160,7 @@ public final class UriBuilderImpl extends UriBuilder {
         return this;
     }
 
+    @Override
     public UriBuilder userInfo(String ui) {
         checkSsp();
         this.userInfo = (ui != null) ?
@@ -175,6 +168,7 @@ public final class UriBuilderImpl extends UriBuilder {
         return this;
     }
 
+    @Override
     public UriBuilder host(String host) {
         checkSsp();
         this.host = (host != null) ?
@@ -182,32 +176,29 @@ public final class UriBuilderImpl extends UriBuilder {
         return this;
     }
 
+    @Override
     public UriBuilder port(int port) {
         checkSsp();
         this.port = port;
         return this;
     }
 
-    public UriBuilder replacePath(String... segments) {
+    @Override
+    public UriBuilder replacePath(String path) {
         checkSsp();
         this.path.setLength(0);
-        path(segments);
+        appendPath(path);
         return this;
     }
 
-    public UriBuilder extension(String extension) {
+    @Override
+    public UriBuilder path(String path) {        
         checkSsp();
-        throw new UnsupportedOperationException();
-    }
-    
-    public UriBuilder path(String... segments) {        
-        checkSsp();
-        for (String segment : segments)
-            appendPath(segment);
-        
+        appendPath(path);        
         return this;
     }
 
+    @Override
     public UriBuilder path(Class resource) {
         checkSsp();
         if (resource == null) 
@@ -218,6 +209,7 @@ public final class UriBuilderImpl extends UriBuilder {
         return this;
     }
 
+    @Override
     public UriBuilder path(Class resource, String methodName) {
         checkSsp();
         if (resource == null) 
@@ -243,17 +235,29 @@ public final class UriBuilderImpl extends UriBuilder {
         return this;
     }
 
-    public UriBuilder path(Method... methods) {
+    @Override
+    public UriBuilder path(Method method) {
         checkSsp();
-        for (Method m : methods) {
-            if (m == null)
-                throw new IllegalArgumentException("Method is null");
-            appendPath(m.getAnnotation(Path.class));
-        }
+        if (method == null)
+            throw new IllegalArgumentException("Method is null");
+        appendPath(method.getAnnotation(Path.class));
         return this;
     }
     
-    public UriBuilder replaceMatrixParams(String matrix) {
+
+    @Override
+    public UriBuilder segment(String... segments) throws IllegalArgumentException {
+        checkSsp();
+        if (segments == null) 
+            throw new IllegalArgumentException("Segments parameter is null");
+
+        for (String segment: segments)
+            appendPath(segment, true);        
+        return this;
+    }
+    
+    @Override
+    public UriBuilder replaceMatrix(String matrix) {
         checkSsp();
         int i = path.lastIndexOf("/");
         if (i != -1) i = 0;
@@ -291,7 +295,8 @@ public final class UriBuilderImpl extends UriBuilder {
         throw new UnsupportedOperationException("Not supported yet.");
     }
     
-    public UriBuilder replaceQueryParams(String query) {
+    @Override
+    public UriBuilder replaceQuery(String query) {
         checkSsp();
         this.query.setLength(0);
         if (query != null)
@@ -325,6 +330,7 @@ public final class UriBuilderImpl extends UriBuilder {
         throw new UnsupportedOperationException("Not supported yet.");
     }
     
+    @Override
     public UriBuilder fragment(String fragment) {
         this.fragment = (fragment != null) ? 
             encode(fragment, UriComponent.Type.FRAGMENT) :
@@ -341,77 +347,76 @@ public final class UriBuilderImpl extends UriBuilder {
         if (t == null)
             throw new IllegalArgumentException("Path is null");
         
-        boolean _encode = encode;
-        encode = t.encode();
         appendPath(t.value());
-        encode = _encode;
     }
     
-    private void appendPath(String segment) {
-        if (segment == null)
+    private void appendPath(String path) {
+        appendPath(path, false);
+    }
+    
+    private void appendPath(String segments, boolean isSegment) {
+        if (segments == null)
             throw new IllegalArgumentException("Path segment is null");
-        if (segment.length() == 0)
+        if (segments.length() == 0)
             return;
 
-        segment = encode(segment, UriComponent.Type.PATH);
+        // TODO if a segment encode '/' accordingly
+        segments = encode(segments, UriComponent.Type.PATH);
         
         final boolean pathEndsInSlash = path.length() > 0 && path.charAt(path.length() - 1) == '/';
-        final boolean segmentStartsWithSlash = segment.charAt(0) == '/';
+        final boolean segmentStartsWithSlash = segments.charAt(0) == '/';
         
         if (path.length() > 0 && !pathEndsInSlash && !segmentStartsWithSlash) {
             path.append('/');
         } else if (pathEndsInSlash && segmentStartsWithSlash) {
-            segment = segment.substring(1);
-            if (segment.length() == 0)
+            segments = segments.substring(1);
+            if (segments.length() == 0)
                 return;
         }
         
-        path.append(segment);
+        path.append(segments);
     }
         
     private String encode(String s, UriComponent.Type type) {
-        if (encode)
-            return UriComponent.encode(s, type, true);
-        
-        UriComponent.validate(s, type, true);
-        return s;
+        return UriComponent.contextualEncode(s, type, true);
     }
     
     private String encodeQuery(String s) {
-        if (encode) {
-            try {
-                return URLEncoder.encode(s, "UTF-8");
-            } catch (UnsupportedEncodingException ex) {
-                assert false;
-            }
-        }
-        
-        UriComponent.validate(s, UriComponent.Type.QUERY, true);
-        return s;
+        return UriComponent.contextualEncode(s, UriComponent.Type.QUERY, true);
     }
     
-    public URI build() {
-        return createURI(create());
-    }
-
-    public URI build(Map<String, Object> values) {
+    @Override
+    public URI buildFromMap(Map<String, ? extends Object> values, boolean encoded) {
         if (ssp != null) 
             throw new IllegalArgumentException("Schema specific part is opaque");                
         String uri = UriTemplate.createURI(scheme, 
                 userInfo, host, String.valueOf(port), 
-                path.toString(), query.toString(), fragment, values, encode);
+                path.toString(), query.toString(), fragment, values, !encoded);
         return createURI(uri);
     }
 
+    @Override
     public URI build(Object... values) {
+        if (values == null || values.length == 0)
+            return createURI(create());
+
         if (ssp != null) 
             throw new IllegalArgumentException("Schema specific part is opaque");                
         String uri = UriTemplate.createURI(scheme, 
                 userInfo, host, String.valueOf(port), 
-                path.toString(), query.toString(), fragment, values, encode);
+                path.toString(), query.toString(), fragment, values, true);
         return createURI(uri);              
     }
     
+    @Override
+    public URI buildFromEncoded(Object... values) {
+        if (ssp != null) 
+            throw new IllegalArgumentException("Schema specific part is opaque");                
+        String uri = UriTemplate.createURI(scheme, 
+                userInfo, host, String.valueOf(port), 
+                path.toString(), query.toString(), fragment, values, true);
+        return createURI(uri);              
+    }
     
     private String create() {
         StringBuilder sb = new StringBuilder();
@@ -458,11 +463,5 @@ public final class UriBuilderImpl extends UriBuilder {
     
     private String replaceNull(String s) {
         return (s != null) ? s : "";
-    }
-
-    
-    @Override
-    public String getExtension() {
-        throw new UnsupportedOperationException("Not supported yet.");
     }
 }

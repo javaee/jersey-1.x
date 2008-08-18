@@ -501,6 +501,9 @@ public final class WebApplicationImpl implements WebApplication {
             throw new ContainerException(ImplMessages.WEB_APP_ALREADY_INITIATED());
         }
         this.initiated = true;
+        
+        // Validate the resource config
+        resourceConfig.validate();
 
         // Set up the component provider to be
         // used with non-resource class components
@@ -534,7 +537,7 @@ public final class WebApplicationImpl implements WebApplication {
                     this.injectableFactory,
                     this.provider,
                     resourceConfig.getProviderClasses(),
-                    resourceConfig.getProviderInstances());
+                    resourceConfig.getProviderSingletons());
 
         // Add injectable provider for @Inject
         injectableFactory.add(
@@ -666,7 +669,7 @@ public final class WebApplicationImpl implements WebApplication {
         
         // Obtain all root resources
         this.rootsRule = new RootResourceClassesRule(
-                processRootResources(resourceConfig.getResourceClasses(), wadlFactory));       
+                processRootResources(resourceConfig.getRootResourceClasses(), wadlFactory));       
     }
 
     public MessageBodyWorkers getMessageBodyWorkers() {
@@ -796,12 +799,8 @@ public final class WebApplicationImpl implements WebApplication {
             ResourceClass r = getResourceClass(ar);
             rootResources.add(r.resource);
 
-            UriTemplate t = new PathTemplate(
-                    r.resource.getUriPath().getValue(),
-                    r.resource.getUriPath().isEncode(),
-                    r.resource.getUriPath().isLimited());
-
-            PathPattern p = new PathPattern(t, r.resource.getUriPath().isLimited());
+            UriTemplate t = new PathTemplate(r.resource.getPath().getValue());
+            PathPattern p = new PathPattern(t);
 
             rulesMap.put(p, new RightHandPathRule(
                     resourceConfig.getFeature(ResourceConfig.FEATURE_REDIRECT),
@@ -828,10 +827,8 @@ public final class WebApplicationImpl implements WebApplication {
 
         // Preload wadl resource runtime meta data
         getResourceClass(WadlResource.class);
-        UriTemplate t = new PathTemplate(
-                "application.wadl",
-                false);
-        PathPattern p = new PathPattern(t, false);
+        UriTemplate t = new PathTemplate("application.wadl");
+        PathPattern p = new PathPattern(t);
 
         rulesMap.put(p, new RightHandPathRule(
                 resourceConfig.getFeature(ResourceConfig.FEATURE_REDIRECT),

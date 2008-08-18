@@ -44,7 +44,7 @@ import java.util.HashSet;
 import java.util.Set;
 import javax.ws.rs.Path;
 import javax.ws.rs.GET;
-import javax.ws.rs.core.ApplicationConfig;
+import javax.ws.rs.core.Application;
 import javax.ws.rs.ext.RuntimeDelegate;
 import junit.framework.*;
 
@@ -66,9 +66,9 @@ public class ApplicationConfigTest extends AbstractHttpServerTester {
     }
     
     public void testApplicationConfig() {
-        ApplicationConfig ac = new ApplicationConfig() {
+        Application ac = new Application() {
             @Override
-            public Set<Class<?>> getResourceClasses() {
+            public Set<Class<?>> getClasses() {
                 Set<Class<?>> s = new HashSet<Class<?>>();
                 s.add(Resource.class);
                 return s;

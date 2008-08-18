@@ -103,10 +103,10 @@ public interface ClientConfig {
      * @return the set of provider classes. 
      *         The returned value shall never be null.
      */
-    Set<Class<?>> getProviderClasses();
+    Set<Class<?>> getClasses();
     
     /**
-     * Get the provider instances to be utilized by the client.
+     * Get the singleton provider instances to be utilized by the client.
      * <p>
      * When the client is initialized the set of provider instances
      * will be combined and take precendence over the instances of provider 
@@ -115,7 +115,7 @@ public interface ClientConfig {
      * @return a mutable set of provider instances. After intialization of
      * the client modification of this value will have no effect.
      */
-    public Set<Object> getProviderInstances();
+    public Set<Object> getSingletons();
     
     /**
      * Get the map of features associated with the Web application.

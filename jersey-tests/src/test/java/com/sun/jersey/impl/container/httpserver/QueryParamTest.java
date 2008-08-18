@@ -69,22 +69,22 @@ public class QueryParamTest extends AbstractHttpServerTester {
         WebResource r = Client.create().resource(
                 getUri().path("test").build());
         
-        URI u = UriBuilder.fromPath("").encode(false).
+        URI u = UriBuilder.fromPath("").
                 queryParam("y", "1+%2B+2").build();
         assertEquals("1 + 2", r.uri(u).get(String.class));
         
         u = UriBuilder.fromPath("").
-                queryParam("x", "1").encode(false).
+                queryParam("x", "1").
                 queryParam("y", "1+%2B+2").build();        
         assertEquals("1 + 2", r.uri(u).get(String.class));
         
         u = UriBuilder.fromPath("").
-                queryParam("x", "1").encode(false).
+                queryParam("x", "1").
                 queryParam("y", "1+%26+2").build();
         assertEquals("1 & 2", r.uri(u).get(String.class));
         
         u = UriBuilder.fromPath("").
-                queryParam("x", "1").encode(false).
+                queryParam("x", "1").
                 queryParam("y", "1+%7C%7C+2").build();
         assertEquals("1 || 2", r.uri(u).get(String.class));
     }

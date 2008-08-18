@@ -55,11 +55,11 @@ public class DefaultClientConfig implements ClientConfig {
     
     private final Map<String, Object> properties = new HashMap<String, Object>();
     
-    public Set<Class<?>> getProviderClasses() {
+    public Set<Class<?>> getClasses() {
         return providers;
     }
     
-    public Set<Object> getProviderInstances() {
+    public Set<Object> getSingletons() {
         return providerInstances;
     }
     

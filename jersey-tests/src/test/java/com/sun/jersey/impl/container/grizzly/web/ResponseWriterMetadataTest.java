@@ -100,9 +100,9 @@ public class ResponseWriterMetadataTest extends AbstractGrizzlyWebContainerTeste
     public static class ResponseServletContainer extends ServletContainer {
         @Override
         protected void initiate(ResourceConfig rc, WebApplication wa) {
-            rc.getProviderClasses().add(StringWriter.class);
+            rc.getClasses().add(StringWriter.class);
             super.initiate(rc, wa);
-        }        
+        }
     }
     
     public void testResponse() {

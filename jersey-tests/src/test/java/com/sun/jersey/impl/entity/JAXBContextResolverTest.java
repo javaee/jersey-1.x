@@ -156,7 +156,7 @@ public class JAXBContextResolverTest extends AbstractResourceTester {
     public void testJAXBContext() throws Exception {
         JAXBContextResolver cr = new JAXBContextResolver();
         ResourceConfig rc = new DefaultResourceConfig(JAXBBeanResource.class);
-        rc.getProviderInstances().add(cr);
+        rc.getSingletons().add(cr);
         initiateWebApplication(rc);
                 
         WebResource r = resource("/");
@@ -169,9 +169,9 @@ public class JAXBContextResolverTest extends AbstractResourceTester {
         MarshallerResolver mr = new MarshallerResolver();
         UnmarshallerResolver umr = new UnmarshallerResolver();
         ResourceConfig rc = new DefaultResourceConfig(JAXBBeanResource.class);
-        rc.getProviderInstances().add(cr);
-        rc.getProviderInstances().add(mr);
-        rc.getProviderInstances().add(umr);
+        rc.getSingletons().add(cr);
+        rc.getSingletons().add(mr);
+        rc.getSingletons().add(umr);
         initiateWebApplication(rc);
                 
         WebResource r = resource("/");
@@ -202,8 +202,8 @@ public class JAXBContextResolverTest extends AbstractResourceTester {
         JAXBContextResolver cr = new JAXBContextResolver();
         JAXBContextResolverApp crApp = new JAXBContextResolverApp();
         ResourceConfig rc = new DefaultResourceConfig(JAXBBeanResourceApp.class);
-        rc.getProviderInstances().add(cr);
-        rc.getProviderInstances().add(crApp);
+        rc.getSingletons().add(cr);
+        rc.getSingletons().add(crApp);
         initiateWebApplication(rc);
                 
         WebResource r = resource("/");
@@ -219,11 +219,11 @@ public class JAXBContextResolverTest extends AbstractResourceTester {
         MarshallerResolverApp mrApp = new MarshallerResolverApp();
         UnmarshallerResolverApp umrApp = new UnmarshallerResolverApp();
         ResourceConfig rc = new DefaultResourceConfig(JAXBBeanResourceApp.class);
-        rc.getProviderInstances().add(cr);
-        rc.getProviderInstances().add(mr);
-        rc.getProviderInstances().add(umr);
-        rc.getProviderInstances().add(mrApp);
-        rc.getProviderInstances().add(umrApp);
+        rc.getSingletons().add(cr);
+        rc.getSingletons().add(mr);
+        rc.getSingletons().add(umr);
+        rc.getSingletons().add(mrApp);
+        rc.getSingletons().add(umrApp);
         initiateWebApplication(rc);
                 
         WebResource r = resource("/");
@@ -265,8 +265,8 @@ public class JAXBContextResolverTest extends AbstractResourceTester {
         JAXBContextResolver cr = new JAXBContextResolver();
         JAXBContextResolverText crText = new JAXBContextResolverText();
         ResourceConfig rc = new DefaultResourceConfig(JAXBBeanResourceText.class);
-        rc.getProviderInstances().add(cr);
-        rc.getProviderInstances().add(crText);
+        rc.getSingletons().add(cr);
+        rc.getSingletons().add(crText);
         initiateWebApplication(rc);
                 
         WebResource r = resource("/");
@@ -282,11 +282,11 @@ public class JAXBContextResolverTest extends AbstractResourceTester {
         MarshallerResolverText mrText = new MarshallerResolverText();
         UnmarshallerResolverText umrText = new UnmarshallerResolverText();
         ResourceConfig rc = new DefaultResourceConfig(JAXBBeanResourceText.class);
-        rc.getProviderInstances().add(cr);
-        rc.getProviderInstances().add(mr);
-        rc.getProviderInstances().add(umr);
-        rc.getProviderInstances().add(mrText);
-        rc.getProviderInstances().add(umrText);
+        rc.getSingletons().add(cr);
+        rc.getSingletons().add(mr);
+        rc.getSingletons().add(umr);
+        rc.getSingletons().add(mrText);
+        rc.getSingletons().add(umrText);
         initiateWebApplication(rc);
                 
         WebResource r = resource("/");
@@ -319,11 +319,11 @@ public class JAXBContextResolverTest extends AbstractResourceTester {
         MarshallerResolverFoo mrFoo = new MarshallerResolverFoo();
         UnmarshallerResolverFoo umrFoo = new UnmarshallerResolverFoo();
         ResourceConfig rc = new DefaultResourceConfig(JAXBBeanResourceFoo.class);
-        rc.getProviderInstances().add(cr);
-        rc.getProviderInstances().add(mr);
-        rc.getProviderInstances().add(umr);
-        rc.getProviderInstances().add(mrFoo);
-        rc.getProviderInstances().add(umrFoo);
+        rc.getSingletons().add(cr);
+        rc.getSingletons().add(mr);
+        rc.getSingletons().add(umr);
+        rc.getSingletons().add(mrFoo);
+        rc.getSingletons().add(umrFoo);
         initiateWebApplication(rc);
                 
         WebResource r = resource("/");
@@ -371,9 +371,9 @@ public class JAXBContextResolverTest extends AbstractResourceTester {
         JAXBContextResolverApp crApp = new JAXBContextResolverApp();
         JAXBContextResolverText crText = new JAXBContextResolverText();
         ResourceConfig rc = new DefaultResourceConfig(JAXBBeanResourceAll.class);
-        rc.getProviderInstances().add(cr);
-        rc.getProviderInstances().add(crApp);
-        rc.getProviderInstances().add(crText);
+        rc.getSingletons().add(cr);
+        rc.getSingletons().add(crApp);
+        rc.getSingletons().add(crText);
         initiateWebApplication(rc);
                 
         WebResource r = resource("/");
@@ -409,15 +409,15 @@ public class JAXBContextResolverTest extends AbstractResourceTester {
         UnmarshallerResolverText umrText = new UnmarshallerResolverText();        
         
         ResourceConfig rc = new DefaultResourceConfig(JAXBBeanResourceAll.class);
-        rc.getProviderInstances().add(cr);
-        rc.getProviderInstances().add(crApp);
-        rc.getProviderInstances().add(crText);
-        rc.getProviderInstances().add(mr);
-        rc.getProviderInstances().add(umr);
-        rc.getProviderInstances().add(mrApp);
-        rc.getProviderInstances().add(umrApp);
-        rc.getProviderInstances().add(mrText);
-        rc.getProviderInstances().add(umrText);
+        rc.getSingletons().add(cr);
+        rc.getSingletons().add(crApp);
+        rc.getSingletons().add(crText);
+        rc.getSingletons().add(mr);
+        rc.getSingletons().add(umr);
+        rc.getSingletons().add(mrApp);
+        rc.getSingletons().add(umrApp);
+        rc.getSingletons().add(mrText);
+        rc.getSingletons().add(umrText);
         initiateWebApplication(rc);
                 
         WebResource r = resource("/");
@@ -508,9 +508,9 @@ public class JAXBContextResolverTest extends AbstractResourceTester {
         JAXBContextResolverApp crApp = new JAXBContextResolverApp();
         JAXBContextResolverText crText = new JAXBContextResolverText();
         ResourceConfig rc = new DefaultResourceConfig(JAXBBeanResourceAllOtherJAXBBean.class);
-        rc.getProviderInstances().add(cr);
-        rc.getProviderInstances().add(crApp);
-        rc.getProviderInstances().add(crText);
+        rc.getSingletons().add(cr);
+        rc.getSingletons().add(crApp);
+        rc.getSingletons().add(crText);
         initiateWebApplication(rc);
                 
         WebResource r = resource("/");
