@@ -35,20 +35,64 @@
  * holder.
  */
 
-package com.sun.jersey.api.core;
+package com.sun.jersey.impl.container.grizzly.web;
 
+import com.sun.jersey.api.client.Client;
+import com.sun.jersey.api.client.WebResource;
+import com.sun.jersey.spi.container.servlet.ServletContainer;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+import javax.ws.rs.GET;
+import javax.ws.rs.Produces;
+import javax.ws.rs.Path;
 import javax.ws.rs.core.Application;
 
 /**
- * An extension of {@link DefaultResourceConfig} that adapts an instance
- * of {@link Application}.
+ *
+ * @author Jakub Podlesak (japod at sun dot com)
  */
-public final class ApplicationAdapter extends DefaultResourceConfig {
-    /**
-     * @param ac the application
-     */
-    public ApplicationAdapter(Application ac) {
-        getClasses().addAll(ac.getClasses());
-        getSingletons().addAll(ac.getSingletons());
+public class ApplicationTest extends AbstractGrizzlyWebContainerTester {
+    
+    public ApplicationTest(String testName) {
+        super(testName);
+    }
+    
+    public static class App extends Application {
+
+        private Set<Class<?>> classes = new HashSet<Class<?>>();
+
+        public App() {
+            classes.add(Resource.class);
+        }
+
+        @Override
+        public Set<Class<?>> getClasses() {
+            return classes;
+        }
+        
+    }
+    
+    @Path("/")
+    public static class Resource {
+        
+        @GET
+        @Produces("text/plain")
+        public String get() {
+            return "get";
+        }
+    }
+    
+    public void testContdSlashes() {        
+        Map<String, String> initParams = new HashMap<String, String>();
+        initParams.put(ServletContainer.RESOURCE_CONFIG_CLASS, App.class.getName());
+        
+        startServer(initParams);
+        
+        WebResource r = Client.create().resource(getUri().
+                path("/").build());
+        
+        assertEquals("get", r.get(String.class));
     }
 }
