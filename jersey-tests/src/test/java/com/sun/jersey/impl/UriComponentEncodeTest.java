@@ -93,4 +93,15 @@ public class UriComponentEncodeTest extends TestCase {
         assertEquals("a%3Db%20c",
                 UriComponent.contextualEncode("a=b c", UriComponent.Type.MATRIX_PARAM));
     }    
+    
+    public void testContextualEncodePercent() {
+        assertEquals("%25",
+                UriComponent.contextualEncode("%", UriComponent.Type.PATH));
+        assertEquals("a%25",
+                UriComponent.contextualEncode("a%", UriComponent.Type.PATH));
+        assertEquals("a%25x",
+                UriComponent.contextualEncode("a%x", UriComponent.Type.PATH));
+        assertEquals("a%25%20%20",
+                UriComponent.contextualEncode("a%  ", UriComponent.Type.PATH));
+    }
 }
