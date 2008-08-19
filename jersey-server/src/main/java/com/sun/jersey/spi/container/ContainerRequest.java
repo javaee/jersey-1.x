@@ -475,8 +475,4 @@ public class ContainerRequest implements HttpRequestContext {
     public String getAuthenticationScheme() {
         throw new UnsupportedOperationException();
     }
-
-    public MultivaluedMap<String, String> getFormParameters() {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
 }
