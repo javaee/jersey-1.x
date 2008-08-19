@@ -150,7 +150,7 @@ public class ExceptionTest extends AbstractResourceTester {
 
         ClientResponse cr = resource("/exception/webapplication/400", false).
                 get(ClientResponse.class);        
-        assertEquals(400, cr.getStatus());
+        assertEquals(204, cr.getStatus());
         
         cr = resource("/exception/webapplication/404", false).
                 get(ClientResponse.class);        
@@ -250,5 +250,48 @@ public class ExceptionTest extends AbstractResourceTester {
                 get(ClientResponse.class);        
         assertEquals(404, cr.getStatus());
         assertEquals("CheckedException", cr.getEntity(String.class));
+    }
+
+    public static class TestException extends Exception {   
+    }
+
+    @Provider
+    public static class NullTestExceptionMapper implements ExceptionMapper<TestException> {
+        public Response toResponse(TestException we) {
+            return null;
+        }        
+    }
+
+    @Provider
+    public static class RuntimeExceptionTestExceptionMapper implements ExceptionMapper<TestException> {
+        public Response toResponse(TestException we) {
+            throw new RuntimeException();
+        }        
+    }
+
+    @Path("/")
+    static public class TestExceptionResource { 
+        @GET
+        public String get() throws TestException {
+            throw new TestException();
+        }
+    }
+    
+    public void testNullExceptionMapperResponse() {
+        initiateWebApplication(TestExceptionResource.class,
+                NullTestExceptionMapper.class);
+
+        ClientResponse cr = resource("/", false).
+                get(ClientResponse.class);        
+        assertEquals(204, cr.getStatus());
+    }
+    
+    public void testRuntimeExceptionMapperResponse() {
+        initiateWebApplication(TestExceptionResource.class,
+                RuntimeExceptionTestExceptionMapper.class);
+
+        ClientResponse cr = resource("/", false).
+                get(ClientResponse.class);        
+        assertEquals(500, cr.getStatus());
     }
 }

@@ -944,12 +944,20 @@ public final class WebApplicationImpl implements WebApplication {
             HttpResponseContext response) {
         ExceptionMapper em = exceptionFactory.find(e.getClass());
         if (em == null) return false;
-        
-        Response r = em.toResponse(e);
-        if (r == null)
-            return false;
-        
-        onException(e, r, response);
+
+        try {
+            Response r = em.toResponse(e);
+            if (r == null)
+                r = Response.noContent().build();
+            onException(e, r, response);
+        } catch (RuntimeException ex) {
+            LOGGER.severe("Exception mapper " + em +
+                    " for throwable " + e +
+                    " threw a Runtime exception when " +
+                    "attempting to obtain the response");
+            Response r = Response.serverError().build();
+            onException(ex, r, response);
+        }
         return true;
     }
     
