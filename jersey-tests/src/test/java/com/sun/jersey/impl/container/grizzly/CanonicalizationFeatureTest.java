@@ -48,7 +48,6 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Path;
 import javax.ws.rs.core.UriBuilder;
-import junit.framework.*;
 
 /**
  *
@@ -63,8 +62,7 @@ public class CanonicalizationFeatureTest extends AbstractGrizzlyServerTester {
     @Path("test")
     public static class TestWebResource {
         
-//        @Path(value = "uri/{uriParam}", limited = false)
-        @Path(value = "uri/{uriParam}")
+        @Path(value = "uri/{uriParam: .*}")
         @GET
         @Produces("text/plain")
         public String getUri(@PathParam("uriParam") String uri) {

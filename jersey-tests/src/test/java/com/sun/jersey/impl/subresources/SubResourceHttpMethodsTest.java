@@ -103,15 +103,13 @@ public class SubResourceHttpMethodsTest extends AbstractResourceTester {
             return t;
         }
         
-//        @Path(value = "subunlimited{t}", limited=false)
-        @Path(value = "subunlimited{t}")
+        @Path("subunlimited{t: .*}")
         @GET
         public String getMeSubUnlimited(@PathParam("t") String t) {
             return t;
         }
         
-//        @Path(value = "subunlimited/{t}", limited=false)
-        @Path(value = "subunlimited/{t}")
+        @Path("subunlimited/{t: .*}")
         @GET
         public String getMeSubSubUnlimited(@PathParam("t") String t) {
             return t;
@@ -160,8 +158,7 @@ public class SubResourceHttpMethodsTest extends AbstractResourceTester {
         }
         
         @GET
-//        @Path(value="{id}", limited=false)
-        @Path(value="{id}")
+        @Path("{id: .*}")
         public String getUnmatchedPath(
                 @PathParam("p") String p,
                 @PathParam("id") String path) {
@@ -185,8 +182,7 @@ public class SubResourceHttpMethodsTest extends AbstractResourceTester {
         }
         
         @GET
-//        @Path(value="{id}", limited=false)
-        @Path(value="{id}")
+        @Path(value="{id: .*}")
         public String getUnmatchedPath(
                 @PathParam("p") String p,
                 @PathParam("id") String path) {

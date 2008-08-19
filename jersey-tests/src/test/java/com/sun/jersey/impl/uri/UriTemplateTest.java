@@ -86,9 +86,9 @@ public class UriTemplateTest extends TestCase {
     }
     
     public void testMatching() {
-        _testMatching("http://example.org/{a}/{b}/",
-                "http://example.org/fred/barney/",
-                "fred", "barney");
+//        _testMatching("http://example.org/{a}/{b}/",
+//                "http://example.org/fred/barney/",
+//                "fred", "barney");
         _testMatching("http://example.org/page1#{a}",
                 "http://example.org/page1#fred",
                 "fred");
@@ -112,18 +112,22 @@ public class UriTemplateTest extends TestCase {
                 "xxx");
     }
     
-    public void testUnlimtedMatching() {
-        _testMatching("http://example.org/{a}/{b}", false,
+    public void testUnlimtedMatching() {        
+        _testMatching("{b: .+}",
+                "1",
+                "1");
+        
+        _testMatching("{b: .+}",
+                "1/2/3",
+                "1/2/3");
+
+        _testMatching("http://example.org/{a}/{b: .+}",
                 "http://example.org/fred/barney/x/y/z",
-                "fred", "barney/x/y/z");        
+                "fred", "barney/x/y/z");
     }
-    
+
     void _testMatching(String template, String uri, String... values) {
-        _testMatching(template, true, uri, values);
-    }
-    
-    void _testMatching(String template, boolean limited, String uri, String... values) {
-        UriTemplate t = new UriTemplate(template, limited);
+        UriTemplate t = new UriTemplate(template);
         Map<String, String> m = new HashMap<String, String>();
         
         System.out.println("TEMPLATE: " + template);
@@ -247,7 +251,7 @@ public class UriTemplateTest extends TestCase {
         for (int i = 0; i < variablesAndvalues.length; i+=2)
             variableMap.put(variablesAndvalues[i], variablesAndvalues[i+1]);
         
-        System.out.println(t.createURI(variableMap));
+        assertEquals(uri, t.createURI(variableMap));
     } 
     
     public void testPathIndex() {

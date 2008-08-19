@@ -64,14 +64,8 @@ public final class PathPattern extends UriPattern {
      * The regular expression that represents the right hand side of
      * a URI path.
      */
-    private static final String LIMITED = "(/.*)?";
+    private static final String RIGHT_HAND_SIDE = "(/.*)?";
         
-    /**
-     * The regular expression that represents the right hand side of
-     * a URI path that is a '/' or null.
-     */
-    private static final String UNLIMITED = "(/)?";
-
     private final UriTemplate template;
     
     private PathPattern() {
@@ -83,12 +77,9 @@ public final class PathPattern extends UriPattern {
      * Create a path pattern from a regular expression.
      * 
      * @param regex the regular expression for the path.
-     * @param limited if true than the capturing group '(/.*)?' is appended to
-     *        the regex (see above), otherwise '(/)?' is appended.
      */
     public PathPattern(UriTemplate template) {
-        super(postfixWithCapturingGroup(template.getPattern().getRegex(), 
-                true));
+        super(postfixWithCapturingGroup(template.getPattern().getRegex()));
         
         this.template = template;
     }
@@ -97,10 +88,10 @@ public final class PathPattern extends UriPattern {
         return template;
     }
     
-    private static String postfixWithCapturingGroup(String regex, boolean limited) {
+    private static String postfixWithCapturingGroup(String regex) {
         if (regex.endsWith("/"))
             regex = regex.substring(0, regex.length() - 1);
             
-        return regex + ((limited) ? LIMITED : UNLIMITED);
+        return regex + RIGHT_HAND_SIDE;
     }
 }

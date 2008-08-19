@@ -43,7 +43,6 @@ import com.sun.jersey.api.client.WebResource;
 import javax.ws.rs.GET;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.UriInfo;
-import junit.framework.*;
 
 /**
  *
@@ -62,15 +61,26 @@ public class EscapedURITest extends AbstractHttpServerTester {
         }
     }
         
+    @Path("x y")
+    public static class NonEscapedURIResource extends EscapedURIResource {}
+    
     public EscapedURITest(String testName) {
         super(testName);
     }
     
-    public void testExpliciWebResourceReference() {
+    public void testEscaped() {
         startServer(EscapedURIResource.class);
+
+        WebResource r = Client.create().resource(getUri().
+                userInfo("x.y").path("x%20y").build());
+        assertEquals("CONTENT", r.get(String.class));
+    }
+    
+    public void testNonEscaped() {
+        startServer(NonEscapedURIResource.class);
                 
         WebResource r = Client.create().resource(getUri().
                 userInfo("x.y").path("x%20y").build());
         assertEquals("CONTENT", r.get(String.class));
-    } 
+    }
 }

@@ -37,8 +37,9 @@
 
 package com.sun.jersey.impl.uri;
 
-import com.sun.jersey.api.uri.UriTemplate;
 import com.sun.jersey.api.uri.UriComponent;
+import com.sun.jersey.api.uri.UriTemplate;
+import com.sun.jersey.api.uri.UriTemplateParser;
 
 /**
  * A URI template for a URI path.
@@ -46,7 +47,18 @@ import com.sun.jersey.api.uri.UriComponent;
  * @author Paul.Sandoz@Sun.Com
  */
 public final class PathTemplate extends UriTemplate {
-    
+
+    private static final class PathTemplateParser extends UriTemplateParser {
+        PathTemplateParser(String path) {
+            super(path);
+        }
+        
+        @Override
+        protected String encodeLiteralCharacters(String literalCharacters) {
+            return UriComponent.contextualEncode(literalCharacters, UriComponent.Type.PATH);
+        }
+    }
+
     /**
      * Create a URI path template and encode (percent escape) any characters 
      * of the template that are not valid URI characters.
@@ -54,13 +66,9 @@ public final class PathTemplate extends UriTemplate {
      * @param template the URI path template
      */
     public PathTemplate(String path) {
-        super(encode(prefixWithSlash(path)));
+        super(new PathTemplateParser(prefixWithSlash(path)));
     }
         
-    private static String encode(String path) {
-        return UriComponent.contextualEncode(path, UriComponent.Type.PATH, true);
-    }
-    
     private static String prefixWithSlash(String path) {
         return (!path.startsWith("/")) ? "/" + path : path;
     }

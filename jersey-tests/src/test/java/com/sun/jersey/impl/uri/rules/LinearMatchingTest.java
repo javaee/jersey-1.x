@@ -37,14 +37,11 @@
 
 package com.sun.jersey.impl.uri.rules;
 
-import com.sun.jersey.impl.uri.rules.PatternRulePair;
-import com.sun.jersey.impl.uri.rules.AtomicMatchingPatterns;
 import com.sun.jersey.impl.uri.PathPattern;
 import com.sun.jersey.spi.uri.rules.UriRules;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import junit.framework.*;
 
 /**
  *

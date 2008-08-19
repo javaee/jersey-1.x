@@ -37,15 +37,11 @@
 
 package com.sun.jersey.api.uri;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.NoSuchElementException;
-import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
@@ -106,218 +102,10 @@ public class UriTemplate {
         }
     };
     
-    
-    private static class TemplateParser {
-        
-        private static Set<Character> RESERVED_REGEX_CHARACTERS = createReserved();
-
-        private static Set<Character> createReserved() {
-            // TODO need to escape all regex characters present
-            char[] reserved = {
-                '.',
-                '?',
-                '(', 
-                ')'};
-
-            Set<Character> s = new HashSet<Character>(reserved.length);
-            for (char c : reserved) s.add(c);
-            return s;
-        }        
-
-        private static final Pattern P = Pattern.compile("\\{(\\w[-\\w\\.]*)(:.+?)?\\}");
-
-        private static final String TEMPLATE_VALUE = "[^/]+?";
-
-        private static final Pattern TEMPLATE_VALUE_PATTERN = Pattern.compile(TEMPLATE_VALUE);
-
-        private interface CharacterIterator {
-            boolean hasNext();
-            char next();
-            char peek();
-            int pos();
-        }
-
-        private static class StringCharacterIterator implements CharacterIterator {
-            int pos;
-            String s;
-
-            public StringCharacterIterator(String s) {
-                this.s = s;
-            }
-
-            public boolean hasNext() {
-                return pos < s.length();
-            }
-
-            public char next() {
-                if (!hasNext())
-                    throw new NoSuchElementException();
-                return s.charAt(pos++);
-            }
-
-            public char peek() {
-                if (!hasNext())
-                    throw new NoSuchElementException();
-
-                return s.charAt(pos++);
-            }
-
-            public int pos() {
-                if (pos == 0) return 0;
-                return pos - 1;
-            }
-
-        }
-
-        private final StringBuffer regex = new StringBuffer();;
-
-        private final Pattern pattern;
-
-        private final Map<String, Pattern> nameToPattern = new HashMap<String, Pattern>();
-
-        public TemplateParser(String s) {
-            parse(new StringCharacterIterator(s));
-            try {
-                pattern = Pattern.compile(regex.toString());
-            } catch (PatternSyntaxException ex) {
-                throw new IllegalArgumentException("Invalid syntax for the template expression '" + 
-                        regex + "'", 
-                        ex);            
-            }
-        }
-
-        public Pattern getPattern() {
-            return pattern;
-        }
-
-        public Map<String, Pattern> getNameToPattern() {
-            return nameToPattern;
-        }
-
-        private void parse(CharacterIterator ci) {
-            while (ci.hasNext()) {
-                char c = ci.next();
-                if (c == '{') {                
-                    parseName(ci);
-                } else {
-                    // Literal character
-                    // Transform
-                    if (RESERVED_REGEX_CHARACTERS.contains(c))
-                        regex.append("\\");
-                    regex.append(c);
-                }
-            }
-        }
-
-        private void parseName(CharacterIterator ci) {
-            char c = consumeWhiteSpace(ci);
-
-            StringBuffer nameBuffer = new StringBuffer();        
-            if (Character.isLetterOrDigit(c) || c == '_') {
-                // Template name character
-                nameBuffer.append(c);
-            } else {
-                throw new IllegalArgumentException("Illegal character '" + c + 
-                        "' at position " + ci.pos() + " is not as the start of a name");
-            }
-
-            String nameRegexString = "";
-            while(true) {
-                c = ci.next();
-                // "\\{(\\w[-\\w\\.]*)
-                if (Character.isLetterOrDigit(c) || c == '_' || c == '-' || c == '.') {
-                    // Template name character             
-                    nameBuffer.append(c);
-                } else if (c == ':') {
-                    nameRegexString = parseRegex(ci);
-                    break;
-                } else if (c == '}') {
-                    break;
-                } else if (c == ' ') {
-                    c = consumeWhiteSpace(ci);
-
-                    if (c == ':') {
-                        nameRegexString = parseRegex(ci);
-                        break;
-                    } else if (c == '}') {
-                        break;
-                    } else {
-                        // Error
-                        throw new IllegalArgumentException("Illegal character '" + c + 
-                                "' at position " + ci.pos() + " is not allowed after a name");
-                    }
-                } else {
-                    throw new IllegalArgumentException("Illegal character '" + c + 
-                            "' at position " + ci.pos() + " is not allowed as part of a name");
-                }
-            }        
-            String name = nameBuffer.toString();
-
-            try {
-                Pattern namePattern = (nameRegexString.length() == 0) 
-                        ? TEMPLATE_VALUE_PATTERN : Pattern.compile(nameRegexString);
-                if (nameToPattern.containsKey(name)) {
-                    if (!nameToPattern.get(name).equals(namePattern)) {
-                        throw new IllegalArgumentException("The name '" + name + 
-                                "' is declared " +
-                                "more than once with different regular expressions");
-                    }
-                } else {
-                    nameToPattern.put(name, namePattern);            
-                }
-
-                regex.append('(').
-                        append(namePattern).
-                        append(')');
-            } catch (PatternSyntaxException ex) {
-                throw new IllegalArgumentException("Invalid syntax for the expression '" + nameRegexString + 
-                        "' associated with the name '" + name + "'", 
-                        ex);
-            }
-
-        }
-
-        private String parseRegex(CharacterIterator ci) {
-            StringBuffer regexBuffer = new StringBuffer();
-
-            int braceCount = 1;
-            while (true) {
-                char c = ci.next();
-                if (c == '{') {
-                    braceCount++;
-                } else if (c == '}') {
-                    braceCount--;
-                    if (braceCount == 0)
-                        break;
-                }            
-                regexBuffer.append(c);
-            }
-
-            return regexBuffer.toString().trim();
-        }
-
-        private char consumeWhiteSpace(CharacterIterator ci) {
-            char c = ci.next();
-            // Consume white space;
-            // TODO use correct c
-            while (c == ' ') c = ci.next();
-
-            return c;
-        }
-    }
-    
     /**
      * The regular expression for matching URI templates and names.
      */
     private static final Pattern TEMPLATE_NAMES_PATTERN = Pattern.compile("\\{(\\w[-\\w\\.]*)\\}");
-    
-    /**
-     * This uses a reluctant (non-greedy qualifier) to ensure that
-     * expresions to the right of an expression will be matched.
-     */
-    private static final String TEMPLATE_VALUE_LIMITED_REGEX = "([^/]+?)";
-    
-    private static final String TEMPLATE_VALUE_UNLIMITED_REGEX = "(.*?)";
     
     /**
      * The empty URI template that matches the null or empty URI path
@@ -329,6 +117,12 @@ public class UriTemplate {
      */
     private final String template;
         
+    /**
+     * The normalized URI template. Any explicit regex are removed to leave
+     * the template variables.
+     */
+    private final String normalizedTemplate;
+
     /**
      * The pattern generated from the template
      */
@@ -354,7 +148,7 @@ public class UriTemplate {
      * Constructor for NULL template
      */
     private UriTemplate() {
-        this.template = "";
+        this.template = this.normalizedTemplate = "";
         this.pattern = UriPattern.EMPTY;
         this.endsWithSlash = false;
         this.templateVariables = Collections.emptyList();
@@ -377,9 +171,9 @@ public class UriTemplate {
      *         an empty string.
      */
     public UriTemplate(String template) {
-        this(template, true);
+        this(new UriTemplateParser(template));
     }
-    
+        
     /**
      * Construct a new URI template.
      * <p>
@@ -389,98 +183,26 @@ public class UriTemplate {
      * to match URIs according to the template and map template variables to
      * template values.
      * <p>
-     * @param template the template.
+     * @param templateParser the parser to parse the template.
      * @throw {@link java.util.regex.PatternSyntaxException} if the specific
      *         regular expression could not be generated
      * @throw {@link IllegalArgumentException} if the template is null or
      *         an empty string.
      */
-    public UriTemplate(String template, boolean limited) {    
-        if (template == null || template.length() == 0)
-            throw new IllegalArgumentException();
+    protected UriTemplate(UriTemplateParser templateParser) {
+        this.template = templateParser.getTemplate();
         
-        // TODO correctly validate template
+        this.normalizedTemplate = templateParser.getNormalizedTemplate();
+
+        this.pattern = new UriPattern(templateParser.getPattern());
         
-        StringBuilder b = new StringBuilder();
-        List<String> names = new ArrayList<String>();
-        
-        // Find all template variables
-        Matcher m = TEMPLATE_NAMES_PATTERN.matcher(template);
-        
-        // Count the template variables
-        int nTemplateVariables = 0;
-        while(m.find()) {
-            nTemplateVariables++;
-        }        
-        
-        // Create regular expression for template matching
-        m.reset();
-        int i = 0;
-        int c = 0;
-        int n = 0;
-        while(m.find()) {
-            n++;
-            c += m.start() - i;
-            copyURITemplateCharacters(template, i, m.start(), b);
-            if (!limited && nTemplateVariables == n)
-                b.append(TEMPLATE_VALUE_UNLIMITED_REGEX);
-            else 
-                b.append(TEMPLATE_VALUE_LIMITED_REGEX);
-            names.add(m.group(1));
-            i = m.end();
-        }
-        copyURITemplateCharacters(template, i, template.length(), b);
-        c += template.length() - i;
-        
-        this.template = template;
-        
-        this.pattern = new UriPattern(b.toString());
-        
-        this.numOfCharacters = c;
+        this.numOfCharacters = templateParser.getNumberOfLiteralCharacters();
 
         this.endsWithSlash = template.charAt(template.length() - 1) == '/';
-        
-        this.templateVariables = Collections.unmodifiableList(names);
-    }
-    
-    /**
-     * Copy characters from the URI template to a string builder.
-     * Characters that correspond to regular expression
-     * characters will be escaped.
-     * <p>
-     * TODO need to escape all regex characters present
-     *
-     * @param template The URI template.
-     * @param start The start index of characters in template to copy
-     * @param end The end index of characters in template to copy
-     * @param b The string builder to copy the characters.
-     */
-    private static void copyURITemplateCharacters(String template, int start, int end, 
-            StringBuilder b) {
-        for (int i = start; i < end; i++) {
-            char c = template.charAt(i);
-            if (RESERVED_REGEX_CHARACTERS.contains(c))
-                b.append("\\");
-            b.append(c);
-        }
-    }
-    
-    private static Set<Character> RESERVED_REGEX_CHARACTERS = createReserved();
-    
-    private static Set<Character> createReserved() {
-        // TODO need to escape all regex characters present
-        char[] reserved = {
-            '.',
-            '?',
-            '(', 
-            ')'};
-        
-        Set<Character> s = new HashSet<Character>();
-        for (char c : reserved) s.add(c);
-        return s;
-    }        
-            
 
+        this.templateVariables = Collections.unmodifiableList(templateParser.getNames());
+    }
+    
     /**
      * Get the URI template as a String.
      * @return the URI template.
@@ -652,15 +374,15 @@ public class UriTemplate {
     public final String createURI(Map<String, String> values) {
         StringBuilder b = new StringBuilder();
         // Find all template variables
-        Matcher m = TEMPLATE_NAMES_PATTERN.matcher(template);
+        Matcher m = TEMPLATE_NAMES_PATTERN.matcher(normalizedTemplate);
         int i = 0;
         while(m.find()) {
-            b.append(template, i, m.start());
+            b.append(normalizedTemplate, i, m.start());
             String tValue = values.get(m.group(1));
             if (tValue != null) b.append(tValue);
             i = m.end();
         }
-        b.append(template, i, template.length());
+        b.append(normalizedTemplate, i, normalizedTemplate.length());
         return b.toString();
     }
     
@@ -696,12 +418,12 @@ public class UriTemplate {
         Map<String, String> mapValues = new HashMap<String, String>();
         StringBuilder b = new StringBuilder();
         // Find all template variables
-        Matcher m = TEMPLATE_NAMES_PATTERN.matcher(template);
+        Matcher m = TEMPLATE_NAMES_PATTERN.matcher(normalizedTemplate);
         int v = offset;
         length += offset;
         int i = 0;
         while(m.find()) {
-            b.append(template, i, m.start());
+            b.append(normalizedTemplate, i, m.start());
             String tVariable = m.group(1);
             // Check if a template variable has already occurred
             // If so use the value to ensure that two or more declarations of 
@@ -720,7 +442,7 @@ public class UriTemplate {
             }
             i = m.end();
         }
-        b.append(template, i, template.length());
+        b.append(normalizedTemplate, i, normalizedTemplate.length());
         return b.toString();
     }
     
@@ -1029,5 +751,5 @@ public class UriTemplate {
         }
         b.append(template, i, template.length());
         return v;
-    }
+    }    
 }

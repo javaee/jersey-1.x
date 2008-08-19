@@ -63,8 +63,7 @@ public class CanonicalizationFeatureTest extends AbstractGrizzlyWebContainerTest
     @Path("test")
     public static class TestWebResource {
         
-//        @Path(value = "uri/{uriParam}", limited = false)
-        @Path(value = "uri/{uriParam}")
+        @Path(value = "uri/{uriParam: .*}")
         @GET
         @Produces("text/plain")
         public String getUri(@PathParam("uriParam") String uri) {

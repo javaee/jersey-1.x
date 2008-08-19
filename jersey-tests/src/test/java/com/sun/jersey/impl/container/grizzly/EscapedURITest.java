@@ -43,14 +43,13 @@ import com.sun.jersey.api.client.WebResource;
 import javax.ws.rs.GET;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.UriInfo;
-import junit.framework.*;
 
 /**
  *
  * @author Paul.Sandoz@Sun.Com
  */
 public class EscapedURITest extends AbstractGrizzlyServerTester {
-    @Path(value="x%20y")
+    @Path("x%20y")
     public static class EscapedURIResource {
         @GET
         public String get(@Context UriInfo info) {
@@ -62,12 +61,23 @@ public class EscapedURITest extends AbstractGrizzlyServerTester {
         }
     }
         
+    @Path("x y")
+    public static class NonEscapedURIResource extends EscapedURIResource {}
+    
     public EscapedURITest(String testName) {
         super(testName);
     }
     
-    public void testExpliciWebResourceReference() {
+    public void testEscaped() {
         startServer(EscapedURIResource.class);
+                
+        WebResource r = Client.create().resource(getUri().
+                userInfo("x.y").path("x%20y").build());
+        assertEquals("CONTENT", r.get(String.class));
+    } 
+    
+    public void testNonEscaped() {
+        startServer(NonEscapedURIResource.class);
                 
         WebResource r = Client.create().resource(getUri().
                 userInfo("x.y").path("x%20y").build());

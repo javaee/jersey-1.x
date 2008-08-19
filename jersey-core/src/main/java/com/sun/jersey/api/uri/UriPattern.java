@@ -71,7 +71,8 @@ public class UriPattern {
      *  Construct an empty pattern.
      */
     private UriPattern() {
-        this(null);
+        this.regex = "";
+        this.regexPattern = null;
     }
 
     /**
@@ -81,8 +82,8 @@ public class UriPattern {
      *        empty string then the pattern will only match a null or empty
      *        URI path.
      * 
-     * @throws {@link java.util.regex.PatternSyntaxException} if the specific
-     *         regular expression could not be generated
+     * @throws {@link java.util.regex.PatternSyntaxException} if the
+     *         regular expression could not be compiled
      */
     public UriPattern(String regex) {
         if (regex == null || regex.length() == 0) {
@@ -94,6 +95,22 @@ public class UriPattern {
         }
     }
 
+    /**
+     * Construct a new URI pattern.
+     * 
+     * @param regex the regular expression. If the expression is null then
+     *        the pattern will only match a null or empty URI path.
+     */
+    public UriPattern(Pattern regexPattern) {
+        if (regexPattern == null) {
+            this.regex = "";
+            this.regexPattern = null;
+        } else {
+            this.regex = regexPattern.toString();
+            this.regexPattern = regexPattern;
+        }
+    }
+    
     /**
      * Get the regular expression.
      * 

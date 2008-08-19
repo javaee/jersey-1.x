@@ -150,14 +150,14 @@ public final class ResourceClass {
                     new UriPattern("/([^/]+)"), r));        
             // The matching rule for an index template
             patterns.add(new PatternRulePair<UriRule>(
-                    new UriPattern(null), r));                    
+                    UriPattern.EMPTY, r));                    
         }         
         // The terminating rule when the path is not fully consumed and accepted
         patterns.add(new PatternRulePair<UriRule>(
                 new UriPattern(".*"), new TerminatingRule()));
         // The terminating rule when the path is fully consumed and accepted
         patterns.add(new PatternRulePair<UriRule>(
-                new UriPattern(null), new TerminatingRule()));        
+                UriPattern.EMPTY, new TerminatingRule()));        
         // Create the sequential rules
         UriRules<UriRule> sequentialRules = 
                 new SequentialMatchingPatterns<UriRule>(patterns);
