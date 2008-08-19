@@ -57,6 +57,13 @@ public class UriTemplateTest extends TestCase {
     }
     
     public void testTemplateNames() {
+        _testTemplateNames("{a}", "a");
+        _testTemplateNames("{  a}", "a");
+        _testTemplateNames("{  a  }", "a");
+        _testTemplateNames("{a:}", "a");
+        _testTemplateNames("{a :}", "a");
+        _testTemplateNames("{a : }", "a");
+        
         _testTemplateNames("http://example.org/{a}/{b}/",
                 "a", "b");
         _testTemplateNames("http://example.org/page1#{a}",
@@ -86,9 +93,9 @@ public class UriTemplateTest extends TestCase {
     }
     
     public void testMatching() {
-//        _testMatching("http://example.org/{a}/{b}/",
-//                "http://example.org/fred/barney/",
-//                "fred", "barney");
+        _testMatching("http://example.org/{a}/{b}/",
+                "http://example.org/fred/barney/",
+                "fred", "barney");
         _testMatching("http://example.org/page1#{a}",
                 "http://example.org/page1#fred",
                 "fred");
@@ -112,7 +119,20 @@ public class UriTemplateTest extends TestCase {
                 "xxx");
     }
     
-    public void testUnlimtedMatching() {        
+    public void testTemplateRegexes() {
+        _testTemplateRegex("{a:}", "([^/]+?)");
+        _testTemplateRegex("{a:.*}", "(.*)");
+        _testTemplateRegex("{a:  .*}", "(.*)");
+        _testTemplateRegex("{a:  .*  }", "(.*)");
+        _testTemplateRegex("{a :  .*  }", "(.*)");
+    }
+
+    private void _testTemplateRegex(String template, String regex) {
+        UriTemplate t = new UriTemplate(template);
+        assertEquals(regex, t.getPattern().toString());        
+    }
+    
+    public void testRegexMatching() {        
         _testMatching("{b: .+}",
                 "1",
                 "1");
@@ -124,6 +144,18 @@ public class UriTemplateTest extends TestCase {
         _testMatching("http://example.org/{a}/{b: .+}",
                 "http://example.org/fred/barney/x/y/z",
                 "fred", "barney/x/y/z");
+        
+        _testMatching("{b: \\d+}",
+                "1234567890",
+                "1234567890");
+
+        _testMatching("{a}/{b: .+}/{c}{d: (/.*)?}",
+                "1/2/3/4",
+                "1", "2/3", "4", "");
+
+        _testMatching("{a}/{b: .+}/{c}{d: (/.*)?}",
+                "1/2/3/4/",
+                "1", "2/3", "4", "/");
     }
 
     void _testMatching(String template, String uri, String... values) {
