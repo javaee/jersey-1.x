@@ -34,10 +34,10 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-
 package com.sun.jersey.impl.subresources;
 
 import com.sun.jersey.impl.AbstractResourceTester;
+import java.util.List;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.core.Context;
@@ -48,169 +48,239 @@ import javax.ws.rs.core.UriInfo;
  * @author Paul.Sandoz@Sun.Com
  */
 public class AncestorsTest extends AbstractResourceTester {
-    
+
     public AncestorsTest(String testName) {
         super(testName);
     }
-    
+
     @Path("/node")
-    static public class Node { 
+    static public class Node {
+
         int n = 0;
-        
-        public Node() {}
-        
-        private Node(int i) { this.n = i; }
-        
-        @Path("node") public Node getChild() {            
+
+        public Node() {
+        }
+
+        private Node(int i) {
+            this.n = i;
+        }
+
+        @Path("node")
+        public Node getChild() {
             return new Node(n + 1);
-        }        
-        
-        @GET public String get(@Context UriInfo ui) {
+        }
+
+        @GET
+        public String get(@Context UriInfo ui) {
             assertEquals(n + 1, ui.getMatchedResources().size());
             assertEquals(n + 1, ui.getMatchedURIs().size());
-            
+
             for (int i = 0; i <= n; i++) {
-                Node node = (Node)ui.getMatchedResources().get(i);
+                Node node = (Node) ui.getMatchedResources().get(i);
                 assertEquals(n - i, node.n);
             }
-            
+
             for (int i = 0; i <= n; i++) {
                 String p = ui.getMatchedURIs().get(i);
                 assertEquals(getPath(n - i), p);
             }
-            
+
             return Integer.toString(n);
         }
-        
-        @Path("leaf") @GET public String getSub(@Context UriInfo ui) {
+
+        @Path("leaf")
+        @GET
+        public String getSub(@Context UriInfo ui) {
             assertEquals(n + 1 + 1, ui.getMatchedResources().size());
             assertEquals(n + 1 + 1, ui.getMatchedURIs().size());
-            
-            Node node = (Node)ui.getMatchedResources().get(0);
-            assertEquals(n, node.n);            
+
+            Node node = (Node) ui.getMatchedResources().get(0);
+            assertEquals(n, node.n);
             for (int i = 0; i <= n; i++) {
-                node = (Node)ui.getMatchedResources().get(i + 1);
+                node = (Node) ui.getMatchedResources().get(i + 1);
                 assertEquals(n - i, node.n);
             }
-            
+
             String p = ui.getMatchedURIs().get(0);
-            assertEquals(getPathLeaf(n), p);            
+            assertEquals(getPathLeaf(n), p);
             for (int i = 0; i <= n; i++) {
                 p = ui.getMatchedURIs().get(i + 1);
                 assertEquals(getPath(n - i), p);
             }
-            
-            return Integer.toString(n);        
+
+            return Integer.toString(n);
         }
-        
+
         protected String getPath(int n) {
             String p = "node";
-            for (int i = 1; i <= n; i++)
+            for (int i = 1; i <= n; i++) {
                 p += "/node";
+            }
             return p;
         }
-        
+
         protected String getPathLeaf(int n) {
             return getPath(n) + "/leaf";
-        }        
+        }
     }
-    
-    
+
     public void testNode() {
         initiateWebApplication(Node.class);
-        
+
         assertEquals("0", resource("/node").get(String.class));
         assertEquals("1", resource("/node/node").get(String.class));
         assertEquals("2", resource("/node/node/node").get(String.class));
-        assertEquals("3", resource("/node/node/node/node").get(String.class));    
-    }    
-    
+        assertEquals("3", resource("/node/node/node/node").get(String.class));
+    }
+
     public void testNodeLeaf() {
         initiateWebApplication(Node.class);
-        
+
         assertEquals("0", resource("/node/leaf").get(String.class));
         assertEquals("1", resource("/node/node/leaf").get(String.class));
         assertEquals("2", resource("/node/node/node/leaf").get(String.class));
-        assertEquals("3", resource("/node/node/node/node/leaf").get(String.class));    
+        assertEquals("3", resource("/node/node/node/node/leaf").get(String.class));
     }
-    
+
     @Path("/node/")
-    static public class NodeSlash { 
+    static public class NodeSlash {
+
         int n = 0;
-        
-        public NodeSlash() {}
-        
-        private NodeSlash(int i) { this.n = i; }
-        
-        @Path("node/") public NodeSlash getChild() {            
+
+        public NodeSlash() {
+        }
+
+        private NodeSlash(int i) {
+            this.n = i;
+        }
+
+        @Path("node/")
+        public NodeSlash getChild() {
             return new NodeSlash(n + 1);
         }
-        
-        @GET public String get(@Context UriInfo ui) {
+
+        @GET
+        public String get(@Context UriInfo ui) {
             assertEquals(n + 1, ui.getMatchedResources().size());
             assertEquals(n + 1, ui.getMatchedURIs().size());
-            
+
             for (int i = 0; i <= n; i++) {
-                NodeSlash node = (NodeSlash)ui.getMatchedResources().get(i);
+                NodeSlash node = (NodeSlash) ui.getMatchedResources().get(i);
                 assertEquals(n - i, node.n);
             }
-            
+
             for (int i = 0; i <= n; i++) {
                 String p = ui.getMatchedURIs().get(i);
                 assertEquals(getPath(n - i), p);
             }
-            
+
             return Integer.toString(n);
         }
-        
-        @Path("leaf/") @GET public String getSub(@Context UriInfo ui) {
+
+        @Path("leaf/")
+        @GET
+        public String getSub(@Context UriInfo ui) {
             assertEquals(n + 1 + 1, ui.getMatchedResources().size());
             assertEquals(n + 1 + 1, ui.getMatchedURIs().size());
-            
-            NodeSlash node = (NodeSlash)ui.getMatchedResources().get(0);
-            assertEquals(n, node.n);            
+
+            NodeSlash node = (NodeSlash) ui.getMatchedResources().get(0);
+            assertEquals(n, node.n);
             for (int i = 0; i <= n; i++) {
-                node = (NodeSlash)ui.getMatchedResources().get(i + 1);
+                node = (NodeSlash) ui.getMatchedResources().get(i + 1);
                 assertEquals(n - i, node.n);
             }
-            
+
             String p = ui.getMatchedURIs().get(0);
-            assertEquals(getPathLeaf(n), p);            
+            assertEquals(getPathLeaf(n), p);
             for (int i = 0; i <= n; i++) {
                 p = ui.getMatchedURIs().get(i + 1);
                 assertEquals(getPath(n - i), p);
             }
-            
-            return Integer.toString(n);        
+
+            return Integer.toString(n);
         }
-        
+
         protected String getPath(int n) {
             String p = "node/";
-            for (int i = 1; i <= n; i++)
+            for (int i = 1; i <= n; i++) {
                 p += "node/";
+            }
             return p;
         }
-        
+
         protected String getPathLeaf(int n) {
             return getPath(n) + "leaf/";
         }
     }
-    
+
     public void testNodeSlash() {
         initiateWebApplication(NodeSlash.class);
-        
+
         assertEquals("0", resource("/node/").get(String.class));
         assertEquals("1", resource("/node/node/").get(String.class));
         assertEquals("2", resource("/node/node/node/").get(String.class));
-        assertEquals("3", resource("/node/node/node/node/").get(String.class));    
-    }    
-    
+        assertEquals("3", resource("/node/node/node/node/").get(String.class));
+    }
+
     public void testNodeLeafSlash() {
         initiateWebApplication(NodeSlash.class);
-        
+
         assertEquals("0", resource("/node/leaf/").get(String.class));
         assertEquals("1", resource("/node/node/leaf/").get(String.class));
         assertEquals("2", resource("/node/node/node/leaf/").get(String.class));
-        assertEquals("3", resource("/node/node/node/node/leaf/").get(String.class));    
-    }    
+        assertEquals("3", resource("/node/node/node/node/leaf/").get(String.class));
+    }
+
+    @Path("foo")
+    public static class FooResource {
+        @Context
+        UriInfo ui;
+
+        @GET
+        public String getFoo() {
+            assertEquals(1, ui.getMatchedResources().size());
+            assertEquals(this, ui.getMatchedResources().get(0));
+            assertEquals(1, ui.getMatchedURIs().size());
+            assertEquals("foo", ui.getMatchedURIs().get(0));
+            return "foo";
+        }
+
+        @Path("bar")
+        public BarResource getBarResource() {
+            assertEquals(1, ui.getMatchedResources().size());
+            assertEquals(this, ui.getMatchedResources().get(0));
+            assertEquals(2, ui.getMatchedURIs().size());
+            assertEquals("foo/bar", ui.getMatchedURIs().get(0));
+            assertEquals("foo", ui.getMatchedURIs().get(1));
+            return new BarResource(ui, this);
+        }
+    }
+
+    public static class BarResource {
+        UriInfo ui;
+        FooResource f;
+
+        BarResource(UriInfo ui, FooResource f) {
+            this.ui = ui;
+            this.f = f;
+        }
+
+        @GET
+        public String getBar() {
+            assertEquals(2, ui.getMatchedResources().size());
+            assertEquals(this, ui.getMatchedResources().get(0));
+            assertEquals(f, ui.getMatchedResources().get(1));
+            assertEquals(2, ui.getMatchedURIs().size());
+            assertEquals("foo/bar", ui.getMatchedURIs().get(0));
+            assertEquals("foo", ui.getMatchedURIs().get(1));
+            return "bar";
+        }
+    }
+
+    public void testFooBar() {
+        initiateWebApplication(FooResource.class);
+
+        assertEquals("foo", resource("/foo").get(String.class));
+        assertEquals("bar", resource("/foo/bar").get(String.class));
+    }
 }
