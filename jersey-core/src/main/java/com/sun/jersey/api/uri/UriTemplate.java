@@ -94,6 +94,11 @@ public class UriTemplate {
             i = o2.getNumberOfTemplateVariables() - o1.getNumberOfTemplateVariables();
             if (i != 0) return i;
 
+            // If the number of template variables is equal
+            // compare the number of explicit regexes
+            i = o2.getNumberOfExplicitRegexes() - o1.getNumberOfExplicitRegexes();
+            if (i != 0) return i;
+            
             // If the number of explicit characters and template variables
             // are equal then comapre the regexes
             // The order does not matter as long as templates with different
@@ -137,7 +142,13 @@ public class UriTemplate {
      * The template variables in the URI template.
      */
     private final List<String> templateVariables;
-    
+
+    /**
+     * The number of explicit regular expressions declared for template
+     * variables.
+     */
+    private final int numOfExplicitRegexes;
+
     /**
      * The number of characters in the regular expression not resulting
      * from conversion of template variables.
@@ -152,7 +163,7 @@ public class UriTemplate {
         this.pattern = UriPattern.EMPTY;
         this.endsWithSlash = false;
         this.templateVariables = Collections.emptyList();
-        this.numOfCharacters = 0;
+        this.numOfExplicitRegexes = this.numOfCharacters = 0;
     }
     
     /**
@@ -195,6 +206,8 @@ public class UriTemplate {
         this.normalizedTemplate = templateParser.getNormalizedTemplate();
 
         this.pattern = new UriPattern(templateParser.getPattern());
+
+        this.numOfExplicitRegexes = templateParser.getNumberOfExplicitRegexes();
         
         this.numOfCharacters = templateParser.getNumberOfLiteralCharacters();
 
@@ -250,10 +263,20 @@ public class UriTemplate {
         
         return false;
     }
-    
+
+    /**
+     * Get the number of explicit regexes declared in template variables.
+     * 
+     * @return the number of explicit regexes.
+     */
+    public final int getNumberOfExplicitRegexes() {
+        return numOfExplicitRegexes;
+    }
+
     /** 
      * Get the number of characters in the regular expression not resulting
      * from conversion of template variables.
+     * 
      * @return the number of explicit characters
      */
     public final int getNumberOfExplicitCharacters() {

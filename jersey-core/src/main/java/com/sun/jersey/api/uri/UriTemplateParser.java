@@ -116,6 +116,8 @@ public class UriTemplateParser {
 
     private final StringBuffer literalCharactersBuffer = new StringBuffer();;
 
+    private int numOfExplicitRegexes;
+
     private int literalCharacters;
 
     private final Pattern pattern;
@@ -157,6 +159,10 @@ public class UriTemplateParser {
 
     public final List<String> getNames() {
         return names;
+    }
+
+    public final int getNumberOfExplicitRegexes() {
+        return numOfExplicitRegexes;
     }
 
     public final int getNumberOfLiteralCharacters() {
@@ -252,6 +258,8 @@ public class UriTemplateParser {
         names.add(name);
 
         try {
+            if (nameRegexString.length() > 0)
+                numOfExplicitRegexes++;
             Pattern namePattern = (nameRegexString.length() == 0) 
                     ? TEMPLATE_VALUE_PATTERN : Pattern.compile(nameRegexString);
             if (nameToPattern.containsKey(name)) {

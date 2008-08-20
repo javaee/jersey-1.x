@@ -38,7 +38,6 @@
 package com.sun.jersey.impl.subresources;
 
 import com.sun.jersey.api.client.ClientResponse;
-import com.sun.jersey.impl.AbstractResourceTester;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Path;
 import com.sun.jersey.impl.AbstractResourceTester;
@@ -57,7 +56,7 @@ public class SubResourceHttpMethodsTest extends AbstractResourceTester {
     }
 
     @Path("/")
-    static public class SubResourceMethods { 
+    static public class SubResourceMethods {
         @GET
         public String getMe() {
             return "/";
@@ -68,24 +67,24 @@ public class SubResourceHttpMethodsTest extends AbstractResourceTester {
         public String getMeSub() {
             return "/sub";
         }
-        
+
         @Path("sub/sub")
         @GET
         public String getMeSubSub() {
             return "/sub/sub";
         }
     }
-    
+
     public void testSubResourceMethods() {
         initiateWebApplication(SubResourceMethods.class);
-        
+
         assertEquals("/", resource("/").get(String.class));
         assertEquals("/sub", resource("/sub").get(String.class));
         assertEquals("/sub/sub", resource("/sub/sub").get(String.class));
     }
-    
+
     @Path("/")
-    static public class SubResourceMethodsWithTemplates { 
+    static public class SubResourceMethodsWithTemplates {
         @GET
         public String getMe() {
             return "/";
@@ -96,67 +95,67 @@ public class SubResourceHttpMethodsTest extends AbstractResourceTester {
         public String getMeSub(@PathParam("t") String t) {
             return t;
         }
-        
+
         @Path("sub/{t}")
         @GET
         public String getMeSubSub(@PathParam("t") String t) {
             return t;
         }
-        
+
         @Path("subunlimited{t: .*}")
         @GET
         public String getMeSubUnlimited(@PathParam("t") String t) {
             return t;
         }
-        
+
         @Path("subunlimited/{t: .*}")
         @GET
         public String getMeSubSubUnlimited(@PathParam("t") String t) {
             return t;
         }
     }
-    
+
     public void testSubResourceMethodsWithTemplates() {
         initiateWebApplication(SubResourceMethodsWithTemplates.class);
-        
+
         assertEquals("/", resource("/").get(String.class));
-        
+
         assertEquals("value", resource("/subvalue").get(String.class));
         assertEquals("a", resource("/sub/a").get(String.class));
-        
+
         assertEquals("value/a", resource("/subunlimitedvalue/a").get(String.class));
         assertEquals("a/b/c/d", resource("/subunlimited/a/b/c/d").get(String.class));
     }
-    
+
     @Path("/")
-    static public class SubResourceMethodsWithDifferentTemplates { 
+    static public class SubResourceMethodsWithDifferentTemplates {
         @Path("{foo}")
         @GET
         public String getFoo(@PathParam("foo") String foo) {
             return foo;
         }
-        
+
         @Path("{bar}")
         @POST
         public String postBar(@PathParam("bar") String bar) {
             return bar;
         }
     }
-    
+
     public void testSubResourceMethodsWithDifferentTemplates() {
         initiateWebApplication(SubResourceMethodsWithDifferentTemplates.class);
-        
+
         assertEquals("foo", resource("/foo").get(String.class));
         assertEquals("bar", resource("/bar").post(String.class));
     }
-    
+
     @Path("/{p}/")
-    static public class SubResourceMethodWithLimitedTemplate { 
+    static public class SubResourceMethodWithLimitedTemplate {
         @GET
         public String getMe(@PathParam("p") String p, @QueryParam("id") String id) {
             return p + id;
         }
-        
+
         @GET
         @Path("{id: .*}")
         public String getUnmatchedPath(
@@ -165,22 +164,22 @@ public class SubResourceHttpMethodsTest extends AbstractResourceTester {
           return path;
         }
     }
-    
+
     public void testSubResourceMethodWithLimitedTemplate() {
         initiateWebApplication(SubResourceMethodWithLimitedTemplate.class);
-        
+
         assertEquals("topone", resource("/top/?id=one").get(String.class));
         assertEquals("a/b/c/d", resource("/top/a/b/c/d").get(String.class));
     }
-    
+
     @Path("/{p}")
-    static public class SubResourceNoSlashMethodWithLimitedTemplate { 
+    static public class SubResourceNoSlashMethodWithLimitedTemplate {
         @GET
         public String getMe(@PathParam("p") String p, @QueryParam("id") String id) {
             System.out.println(id);
             return p + id;
         }
-        
+
         @GET
         @Path(value="{id: .*}")
         public String getUnmatchedPath(
@@ -189,16 +188,16 @@ public class SubResourceHttpMethodsTest extends AbstractResourceTester {
           return path;
         }
     }
-    
+
     public void testSubResourceNoSlashMethodWithLimitedTemplate() {
         initiateWebApplication(SubResourceNoSlashMethodWithLimitedTemplate.class);
-        
+
         assertEquals("topone", resource("/top?id=one").get(String.class));
         assertEquals("a/b/c/d", resource("/top/a/b/c/d").get(String.class));
     }
-    
+
     @Path("/")
-    static public class SubResourceWithSameTemplate { 
+    static public class SubResourceWithSameTemplate {
         public static class SubResource {
             @GET
             @Path("bar")
@@ -206,23 +205,60 @@ public class SubResourceHttpMethodsTest extends AbstractResourceTester {
                 return "BAR";
             }
         }
-        
+
         @GET
         @Path("foo")
         public String get() {
             return "FOO";
         }
-        
+
         @Path("foo")
         public SubResource getUnmatchedPath() {
             return new SubResource();
+        }
+    }
+
+    public void testSubResourceMethodWithSameTemplate() {
+        initiateWebApplication(SubResourceWithSameTemplate.class);
+
+        assertEquals("FOO", resource("/foo").get(String.class));
+        assertEquals(404, resource("/foo/bar", false).get(ClientResponse.class).getStatus());
+    }
+    
+    @Path("/")
+    static public class SubResourceExplicitRegex { 
+        @GET
+        @Path("{id}")
+        public String getSegment(@PathParam("id") String id) {
+            return "segment: " + id;
+        }
+        
+        @GET
+        @Path("{id: .+}")
+        public String getSegments(@PathParam("id") String id) {
+            return "segments: " + id;
+        }
+
+        @GET
+        @Path("digit/{id: \\d+}")
+        public String getDigit(@PathParam("id") int id) {
+            return "digit: " + id;
+        }
+        
+        @GET
+        @Path("digit/{id}")
+        public String getDigitAnything(@PathParam("id") String id) {
+            return "anything: " + id;
         }        
     }
     
-    public void testSubResourceMethodWithSameTemplate() {
-        initiateWebApplication(SubResourceWithSameTemplate.class);
+    public void testSubResource() {
+        initiateWebApplication(SubResourceExplicitRegex.class);
         
-        assertEquals("FOO", resource("/foo").get(String.class));        
-        assertEquals(404, resource("/foo/bar", false).get(ClientResponse.class).getStatus());
+        assertEquals("segments: foo", resource("/foo").get(String.class));
+        assertEquals("segments: foo/bar", resource("/foo/bar").get(String.class));
+
+        assertEquals("digit: 123", resource("/digit/123").get(String.class));
+        assertEquals("anything: foo", resource("/digit/foo").get(String.class));
     }
 }
