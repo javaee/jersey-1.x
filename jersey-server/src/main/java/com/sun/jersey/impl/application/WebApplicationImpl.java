@@ -300,6 +300,10 @@ public final class WebApplicationImpl implements WebApplication {
                 this.wadlFactory);
     }
 
+    private AbstractResource getAbstractResource(Object o) {
+        return getAbstractResource(o.getClass());
+    }
+    
     private AbstractResource getAbstractResource(Class c) {
         return IntrospectionModeller.createResource(c);
     }
@@ -668,8 +672,7 @@ public final class WebApplicationImpl implements WebApplication {
         this.wadlFactory = new WadlFactory( resourceConfig );
         
         // Obtain all root resources
-        this.rootsRule = new RootResourceClassesRule(
-                processRootResources(resourceConfig.getRootResourceClasses(), wadlFactory));       
+        this.rootsRule = new RootResourceClassesRule(processRootResources());
     }
 
     public MessageBodyWorkers getMessageBodyWorkers() {
@@ -764,8 +767,10 @@ public final class WebApplicationImpl implements WebApplication {
         }
     }
 
-    private RulesMap<UriRule> processRootResources(Set<Class<?>> classes, WadlFactory wadlFactory) {
-        if (classes.isEmpty()) {
+    private RulesMap<UriRule> processRootResources() {
+        Set<Class<?>> classes = resourceConfig.getRootResourceClasses();
+        Set<Object> singletons = resourceConfig.getRootResourceSingletons();
+        if (classes.isEmpty() && singletons.isEmpty()) {
             LOGGER.severe(ImplMessages.NO_ROOT_RES_IN_RES_CFG());
             throw new ContainerException(ImplMessages.NO_ROOT_RES_IN_RES_CFG());
         }
@@ -773,6 +778,27 @@ public final class WebApplicationImpl implements WebApplication {
         RulesMap<UriRule> rulesMap = new RulesMap<UriRule>();
 
         Set<AbstractResource> rootResources = new HashSet<AbstractResource>();
+        for (Object o : singletons) {
+            AbstractResource ar = getAbstractResource(o);
+            if (!ar.isRootResource()) {
+                LOGGER.warning("The singleton, " + o + ", registered as a root resource singleton" +
+                        "of the ResourceConfig is not a root resource singleton" +
+                        ". This singleton will be ignored");
+                continue;
+            }
+            
+            ResourceClass r = getResourceClass(ar);
+            rootResources.add(r.resource);
+
+            UriTemplate t = new PathTemplate(r.resource.getPath().getValue());
+            PathPattern p = new PathPattern(t);
+
+            rulesMap.put(p, new RightHandPathRule(
+                    resourceConfig.getFeature(ResourceConfig.FEATURE_REDIRECT),
+                    t.endsWithSlash(),
+                    new ResourceObjectRule(t, o)));
+        }
+        
         for (Class<?> c : classes) {
             AbstractResource ar = getAbstractResource(c);
             if (!ar.isRootResource()) {

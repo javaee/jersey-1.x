@@ -67,8 +67,8 @@ public final class ResourceClassRule extends BaseRule {
         // Match sub-rules on the resource class
         final Iterator<UriRule> matches = context.getRules(resourceClass).
                 match(path, context.getGroupValues());
-        while(matches.hasNext())
-            if(matches.next().accept(path, resource, context))
+        while (matches.hasNext())
+            if (matches.next().accept(path, resource, context))
                 return true;
         
         return false;

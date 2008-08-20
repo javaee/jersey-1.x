@@ -115,11 +115,6 @@ public class ResourceLifecycleTest extends AbstractResourceTester {
         super(testName);
     }
     
-    private void initiate(ResourceConfig c) {
-        a = new WebApplicationImpl();
-        a.initiate(c);        
-    }
-    
     private ResourceConfig getResourceConfig() {
         final Set<Class<?>> r = new HashSet<Class<?>>();
         r.add(TestFooBean.class);
@@ -194,5 +189,33 @@ public class ResourceLifecycleTest extends AbstractResourceTester {
         assertEquals("1", r.get(String.class));
         assertEquals("1", r.get(String.class));
         assertEquals("1", r.get(String.class));
+    }
+    
+    @Path("foo")
+    public static class TestFooBeanSingleton {
+        
+        private int count;
+        
+        public TestFooBeanSingleton() {
+            this.count = 0;
+        }
+        
+        @GET
+        public String doGet() {
+            count++;
+            return Integer.toString(count);
+        }
+        
+    }
+    
+    public void testSingleton() {
+        ResourceConfig c = new DefaultResourceConfig();
+        c.getSingletons().add(new TestFooBeanSingleton());        
+        initiateWebApplication(c);
+        
+        WebResource r = resource("/foo");        
+        assertEquals("1", r.get(String.class));
+        assertEquals("2", r.get(String.class));
+        assertEquals("3", r.get(String.class));
     }
 }
