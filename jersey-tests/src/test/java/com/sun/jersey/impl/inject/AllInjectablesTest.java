@@ -568,5 +568,88 @@ public class AllInjectablesTest extends AbstractResourceTester {
         
         assertEquals("foobar", resource("/foo?q=bar").get(String.class));        
     }           
+
     
+    @Provider
+    @Consumes({"text/plain", "*/*"})
+    @Produces({"text/plain", "*/*"})
+    public static class StringWriterParamConstructor implements MessageBodyWriter<String> {
+        
+        int illegalStateExceptionCount = 0;
+        int runtimeExceptionCount = 0;
+        
+        public StringWriterParamConstructor(@Context HttpContext hca,
+                @Context HttpHeaders hs,
+                @Context UriInfo ui,
+                @Context ExtendedUriInfo eui,
+                @Context Request r,
+                @Context SecurityContext sc) {
+            try {
+                hca.getRequest();
+            } catch (IllegalStateException ex) {
+                illegalStateExceptionCount++;
+            } catch (RuntimeException ex) {
+                runtimeExceptionCount++;
+            }
+            
+            try {
+                ui.getAbsolutePath();
+            } catch (IllegalStateException ex) {
+                illegalStateExceptionCount++;
+            } catch (RuntimeException ex) {
+                runtimeExceptionCount++;
+            }
+            
+            try {
+                eui.getMatchedTemplates();
+            } catch (IllegalStateException ex) {
+                illegalStateExceptionCount++;
+            } catch (RuntimeException ex) {
+                runtimeExceptionCount++;
+            }
+            
+            try {
+                r.getMethod();
+            } catch (IllegalStateException ex) {
+                illegalStateExceptionCount++;
+            } catch (RuntimeException ex) {
+                runtimeExceptionCount++;
+            }
+            
+            try {
+                sc.getAuthenticationScheme();
+            } catch (IllegalStateException ex) {
+                illegalStateExceptionCount++;
+            } catch (RuntimeException ex) {
+                runtimeExceptionCount++;
+            }
+        }
+        
+        public boolean isWriteable(Class<?> arg0, Type arg1, Annotation[] arg2) {
+            return arg0 == String.class;
+        }
+
+        public long getSize(String arg0) {
+            return -1;
+        }
+
+        public void writeTo(String arg0, Class<?> arg1, Type arg2, Annotation[] arg3, MediaType arg4, MultivaluedMap<String, Object> arg5, OutputStream arg6) throws IOException, WebApplicationException {
+            String s = illegalStateExceptionCount + " " + runtimeExceptionCount + " " + arg0;
+            arg6.write(s.getBytes());
+        }
+    }
+    
+    @Path("/")
+    public static class StringWriterParamConstructorResource {        
+        @GET
+        public String get() {
+            return "GET";
+        }                
+    }
+    
+    public void testStringWriterParamConstructor() throws IOException {
+        initiateWebApplication(StringWriterParamConstructorResource.class, StringWriterParamConstructor.class);
+        
+        assertEquals("5 0 GET", resource("/").get(String.class));
+    }               
 }

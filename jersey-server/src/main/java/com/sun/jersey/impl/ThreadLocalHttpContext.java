@@ -54,26 +54,41 @@ public final class ThreadLocalHttpContext implements HttpContext {
     private ThreadLocal<HttpContext> context = new ThreadLocal<HttpContext>();
 
     /**
-     * Set the {@link HttpRequestContext} and {@link HttpResponseContext} instances
-     * for the current thread.
+     * Set the {@link HttpContext} for the current thread.
      */
     public void set(HttpContext context) {
         this.context.set(context);
     }
 
     public ExtendedUriInfo getUriInfo() {
-        return context.get().getUriInfo();
+        try {
+            return context.get().getUriInfo();
+        } catch (NullPointerException ex) {
+            throw new IllegalStateException();
+        }
     }
     
     public HttpRequestContext getRequest() {
-        return context.get().getRequest();
+        try {
+            return context.get().getRequest();
+        } catch (NullPointerException ex) {
+            throw new IllegalStateException();
+        }
     }
 
     public HttpResponseContext getResponse() {
-        return context.get().getResponse();
+        try {
+            return context.get().getResponse();
+        } catch (NullPointerException ex) {
+            throw new IllegalStateException();
+        }
     }
     
     public Map<String, Object> getProperties() {
-        return context.get().getProperties();
+        try {
+            return context.get().getProperties();
+        } catch (NullPointerException ex) {
+            throw new IllegalStateException();
+        }
     }
 }

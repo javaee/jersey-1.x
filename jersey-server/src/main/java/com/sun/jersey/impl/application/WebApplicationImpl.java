@@ -177,7 +177,7 @@ public final class WebApplicationImpl implements WebApplication {
         this.context = new ThreadLocalHttpContext();
 
         InvocationHandler requestHandler = new InvocationHandler() {
-            public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+            public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {                
                 return method.invoke(context.getRequest(), args);
             }
         };
@@ -732,9 +732,15 @@ public final class WebApplicationImpl implements WebApplication {
         } catch (WebApplicationException e) {
             mapWebApplicationException(e, response);
         } catch (ContainerCheckedException e) {
-            if (!mapException(e.getCause(), response)) throw e;
+            if (!mapException(e.getCause(), response)) {
+                context.set(null);
+                throw e;
+            }
         } catch (RuntimeException e) {
-            if (!mapException(e, response)) throw e;
+            if (!mapException(e, response)) {
+                context.set(null);
+                throw e;
+            }
         }
      
         try {
@@ -746,6 +752,8 @@ public final class WebApplicationImpl implements WebApplication {
                 mapWebApplicationException(e, response);
                 response.write();
             }
+        } finally {
+            context.set(null);
         }
     }
 
