@@ -50,12 +50,10 @@ public final class PathPattern extends UriPattern {
     public static final PathPattern EMPTY_PATH = new PathPattern();
     
     /**
-     * Order the templates according to the string comparison of the
-     * template regular expressions.
+     * Defer to comparing the templates associated with the patterns
      */
     static public final Comparator<PathPattern> COMPARATOR = new Comparator<PathPattern>() {
         public int compare(PathPattern o1, PathPattern o2) {
-            // TODO define order of limited=true and limited=false
             return UriTemplate.COMPARATOR.compare(o1.template, o2.template);
         }
     };
@@ -69,7 +67,7 @@ public final class PathPattern extends UriPattern {
     private final UriTemplate template;
     
     private PathPattern() {
-        super("");
+        super();
         this.template = UriTemplate.EMPTY;
     }
     
@@ -79,7 +77,8 @@ public final class PathPattern extends UriPattern {
      * @param regex the regular expression for the path.
      */
     public PathPattern(UriTemplate template) {
-        super(postfixWithCapturingGroup(template.getPattern().getRegex()));
+        super(postfixWithCapturingGroup(template.getPattern().getRegex()),
+            indexCapturingGroup(template.getPattern().getGroupIndexes()));
         
         this.template = template;
     }
@@ -93,5 +92,15 @@ public final class PathPattern extends UriPattern {
             regex = regex.substring(0, regex.length() - 1);
             
         return regex + RIGHT_HAND_SIDE;
+    }
+
+    private static int[] indexCapturingGroup(int[] indexes) {
+        if (indexes.length == 0) return indexes;
+
+        int[] cgIndexes = new int[indexes.length + 1];
+        System.arraycopy(indexes, 0, cgIndexes, 0, indexes.length);
+        
+        cgIndexes[indexes.length] = cgIndexes[indexes.length - 1] + 1;
+        return cgIndexes;
     }
 }

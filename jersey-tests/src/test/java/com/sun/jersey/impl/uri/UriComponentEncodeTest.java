@@ -34,7 +34,7 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-package com.sun.jersey.impl;
+package com.sun.jersey.impl.uri;
 
 import com.sun.jersey.api.uri.UriComponent;
 import junit.framework.*;

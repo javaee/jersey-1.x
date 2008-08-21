@@ -51,6 +51,8 @@ import java.util.regex.Pattern;
  * @author Paul.Sandoz@Sun.Com
  */
 public class UriPattern {
+    private static final int[] EMPTY_INT_ARRAY = new int[0];
+    
     /**
      * The empty URI pattern that matches the null or empty URI path
      */
@@ -67,12 +69,15 @@ public class UriPattern {
      */
     private final Pattern regexPattern;
     
+    private final int[] groupIndexes;
+    
     /**
      *  Construct an empty pattern.
      */
-    private UriPattern() {
+    protected UriPattern() {
         this.regex = "";
         this.regexPattern = null;
+        this.groupIndexes = null;
     }
 
     /**
@@ -86,31 +91,42 @@ public class UriPattern {
      *         regular expression could not be compiled
      */
     public UriPattern(String regex) {
-        if (regex == null || regex.length() == 0) {
-            this.regex = "";
-            this.regexPattern = null;
-        } else {
-            this.regex = regex;
-            this.regexPattern = Pattern.compile(regex);
-        }
+        this(regex, EMPTY_INT_ARRAY);
     }
 
+    public UriPattern(String regex, int[] groupIndexes) {
+        this(compile(regex), groupIndexes);
+    }
+    
+    private static Pattern compile(String regex) {
+        return (regex == null || regex.length() == 0) ? null : Pattern.compile(regex);
+    }
+
+    /**
+     * Construct a new URI pattern.
+     * 
+     * @param regex the regular expression.
+     * @throws IllegalArgumentException if the regexPattern is null.
+     */
+    public UriPattern(Pattern regexPattern) {
+        this(regexPattern, EMPTY_INT_ARRAY);
+    }
+    
     /**
      * Construct a new URI pattern.
      * 
      * @param regex the regular expression. If the expression is null then
      *        the pattern will only match a null or empty URI path.
      */
-    public UriPattern(Pattern regexPattern) {
-        if (regexPattern == null) {
-            this.regex = "";
-            this.regexPattern = null;
-        } else {
-            this.regex = regexPattern.toString();
-            this.regexPattern = regexPattern;
-        }
+    public UriPattern(Pattern regexPattern, int[] groupIndexes) {
+        if (regexPattern == null)
+            throw new IllegalArgumentException();
+        
+        this.regex = regexPattern.toString();
+        this.regexPattern = regexPattern;
+        this.groupIndexes = groupIndexes;
     }
-    
+
     /**
      * Get the regular expression.
      * 
@@ -118,6 +134,10 @@ public class UriPattern {
      */
     public final String getRegex() {
         return regex;
+    }
+
+    public final int[] getGroupIndexes() {
+        return groupIndexes;
     }
     
     /**
@@ -150,9 +170,15 @@ public class UriPattern {
         if (!m.matches())
             return false;
 
-        groupValues.clear();                
-        for (int i = 1; i <= m.groupCount(); i++) {
-            groupValues.add(m.group(i));
+        groupValues.clear();
+        if (groupIndexes.length > 0) {
+            for (int i = 0; i < groupIndexes.length - 1; i++) {
+                groupValues.add(m.group(groupIndexes[i]));
+            }
+        } else {
+            for (int i = 1; i <= m.groupCount(); i++) {
+                groupValues.add(m.group(i));
+            }
         }
         
         // TODO check for consistency of different capturing groups
@@ -198,13 +224,13 @@ public class UriPattern {
         
         // Assign the matched group values to group names
         groupValues.clear();
-        int i = 1;
-        for (String name : groupNames) {
-            String previousValue = groupValues.get(name);
-            String currentValue = m.group(i++);
+        for (int i = 0; i < groupNames.size(); i++) {
+            String name  = groupNames.get(i);
+            String currentValue = m.group((groupIndexes.length > 0) ? groupIndexes[i] : i + 1);
             
             // Group names can have the same name occuring more than once, 
             // check that groups values are same.
+            String previousValue = groupValues.get(name);
             if (previousValue != null && !previousValue.equals(currentValue))
                 return false;
             

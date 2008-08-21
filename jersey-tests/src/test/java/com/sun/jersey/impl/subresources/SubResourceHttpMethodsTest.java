@@ -261,4 +261,29 @@ public class SubResourceHttpMethodsTest extends AbstractResourceTester {
         assertEquals("digit: 123", resource("/digit/123").get(String.class));
         assertEquals("anything: foo", resource("/digit/foo").get(String.class));
     }
+    
+    @Path("/")
+    static public class SubResourceExplicitRegexCapturingGroups { 
+        @GET
+        @Path("{a: (\\d)(\\d*)}")
+        public String getSingle(@PathParam("a") int a) {
+            return "" + a;
+        }
+        
+        @GET
+        @Path("{a: (\\d)(\\d*)}-{b: (\\d)(\\d*)}-{c: (\\d)(\\d*)}")
+        public String getMultiple(
+                @PathParam("a") int a,
+                @PathParam("b") int b,
+                @PathParam("c") int c) {
+            return "" + a + "-" + b + "-" + c;
+        }        
+    }
+    
+    public void testSubResourceCapturingGroups() {
+        initiateWebApplication(SubResourceExplicitRegexCapturingGroups.class);
+        
+        assertEquals("123", resource("/123").get(String.class));
+        assertEquals("123-456-789", resource("/123-456-789").get(String.class));
+    }    
 }

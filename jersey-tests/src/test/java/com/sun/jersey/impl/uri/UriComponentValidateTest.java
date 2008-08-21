@@ -34,41 +34,24 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
+package com.sun.jersey.impl.uri;
 
-package com.sun.jersey.impl;
-
-import com.sun.jersey.impl.application.WebApplicationContext;
-import com.sun.jersey.spi.container.ContainerRequest;
-import javax.ws.rs.core.UriInfo;
+import com.sun.jersey.api.uri.UriComponent;
 import junit.framework.*;
 
 /**
  *
  * @author Paul.Sandoz@Sun.Com
  */
-public class UriPathHttpRequestTest extends TestCase {
+public class UriComponentValidateTest extends TestCase {
     
-    public UriPathHttpRequestTest(String testName) {
+    public UriComponentValidateTest(String testName) {
         super(testName);
     }
-    
-    public void testGeneral() throws Exception {
-        ContainerRequest r = new TestHttpRequestContext(new DummyWebApplication(),
-                "GET", null,
-                "/context/widgets/10", "/context/");
-        UriInfo ui = new WebApplicationContext(null, r, null);
-        assertEquals("widgets/10", ui.getPath());
-        assertEquals("widgets/10", ui.getPath(true));
-        assertEquals("widgets/10", ui.getPath(false));
-    }    
-    
-    public void testEncoded() throws Exception {
-        ContainerRequest r = new TestHttpRequestContext(new DummyWebApplication(),
-                "GET", null,
-                "/context/widgets%20/%2010", "/context/");
-        UriInfo ui = new WebApplicationContext(null, r, null);
-        assertEquals("widgets / 10", ui.getPath());
-        assertEquals("widgets / 10", ui.getPath(true));
-        assertEquals("widgets%20/%2010", ui.getPath(false));
+
+    public void testPath() {
+        assertEquals(false, UriComponent.valid("/x y", UriComponent.Type.PATH));
+        assertEquals(true, UriComponent.valid("/x20y", UriComponent.Type.PATH));
+        assertEquals(true, UriComponent.valid("/x%20y", UriComponent.Type.PATH));
     }    
 }

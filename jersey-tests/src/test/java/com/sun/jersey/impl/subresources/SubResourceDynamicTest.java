@@ -37,7 +37,6 @@
 
 package com.sun.jersey.impl.subresources;
 
-import com.sun.jersey.impl.AbstractResourceTester;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Path;
 import com.sun.jersey.impl.AbstractResourceTester;
@@ -54,56 +53,79 @@ public class SubResourceDynamicTest extends AbstractResourceTester {
     }
 
     @Path("/parent")
-    static public class Parent { 
+    static public class Parent {
         @GET
         public String getMe() {
             return "parent";
         }
-        
+
         @Path("child")
         public Child getChild() {
             return new Child();
         }
     }
-    
-    static public class Child { 
+
+    static public class Child {
         @GET
         public String getMe() {
             return "child";
         }
     }
-    
+
     public void testSubResourceDynamic() {
         initiateWebApplication(Parent.class);
-        
+
         assertEquals("parent", resource("/parent").get(String.class));
         assertEquals("child", resource("/parent/child").get(String.class));
-    }    
-    
+    }
+
     @Path("/{p}")
-    static public class ParentWithTemplates { 
+    static public class ParentWithTemplates {
         @GET
         public String getMe(@PathParam("p") String p) {
             return p;
         }
-        
+
         @Path("child/{c}")
         public ChildWithTemplates getChildWithTemplates() {
             return new ChildWithTemplates();
         }
     }
-    
-    static public class ChildWithTemplates { 
+
+    static public class ChildWithTemplates {
         @GET
         public String getMe(@PathParam("c") String c) {
             return c;
         }
     }
-    
+
     public void testSubResourceDynamicWithTemplates() {
         initiateWebApplication(ParentWithTemplates.class);
-        
+
         assertEquals("parent", resource("/parent").get(String.class));
         assertEquals("first", resource("/parent/child/first").get(String.class));
+    }
+
+    
+    @Path("/")
+    static public class SubResourceExplicitRegexCapturingGroups { 
+        @Path("{a: (\\d)(\\d*)}-{b: (\\d)(\\d*)}-{c: (\\d)(\\d*)}")
+        public SubResourceExplicitRegexCapturingGroupsSub getMultiple() {
+            return new SubResourceExplicitRegexCapturingGroupsSub();
+        }        
+    }
+    
+    static public class SubResourceExplicitRegexCapturingGroupsSub { 
+        @GET
+        @Path("{d}")
+        public String getMe(@PathParam("d") String d) {
+            return d;
+        }
+    }
+
+    public void testSubResourceCapturingGroups() {
+        initiateWebApplication(SubResourceExplicitRegexCapturingGroups.class);
+        
+        assertEquals("d", resource("/123-456-789/d").get(String.class));
     }    
 }

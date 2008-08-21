@@ -34,7 +34,7 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-package com.sun.jersey.impl;
+package com.sun.jersey.impl.uri;
 
 import java.lang.reflect.Method;
 import java.net.URI;

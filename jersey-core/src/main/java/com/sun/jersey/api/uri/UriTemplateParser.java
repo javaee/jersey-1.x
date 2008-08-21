@@ -43,6 +43,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Set;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
@@ -124,6 +125,8 @@ public class UriTemplateParser {
 
     private final List<String> names = new ArrayList<String>();
 
+    private final List<Integer> groupCounts = new ArrayList<Integer>();
+    
     private final Map<String, Pattern> nameToPattern = new HashMap<String, Pattern>();
 
     public UriTemplateParser(String template) {
@@ -161,6 +164,21 @@ public class UriTemplateParser {
         return names;
     }
 
+    public final List<Integer> getGroupCounts() {
+        return groupCounts;
+    }
+
+    public final int[] getGroupIndexes() {
+        if (names.isEmpty()) return new int[0];
+
+        int[] indexes = new int[names.size() + 1];        
+        indexes[0] = 1;
+        for (int i = 1; i < indexes.length; i++) {
+            indexes[i] = indexes[i - 1] + groupCounts.get(i - 1);
+        }
+        return indexes;
+    }
+    
     public final int getNumberOfExplicitRegexes() {
         return numOfExplicitRegexes;
     }
@@ -271,6 +289,11 @@ public class UriTemplateParser {
             } else {
                 nameToPattern.put(name, namePattern);            
             }
+
+            // Determine group count of pattern
+            Matcher m = namePattern.matcher("");
+            int g = m.groupCount();
+            groupCounts.add(g + 1);
 
             regex.append('(').
                     append(namePattern).

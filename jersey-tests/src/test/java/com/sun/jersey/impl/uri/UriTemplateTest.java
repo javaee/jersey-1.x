@@ -63,7 +63,7 @@ public class UriTemplateTest extends TestCase {
         _testTemplateNames("{a:}", "a");
         _testTemplateNames("{a :}", "a");
         _testTemplateNames("{a : }", "a");
-        
+
         _testTemplateNames("http://example.org/{a}/{b}/",
                 "a", "b");
         _testTemplateNames("http://example.org/page1#{a}",
@@ -77,21 +77,21 @@ public class UriTemplateTest extends TestCase {
         _testTemplateNames("http://example.com/order/{c}/{c}/{c}/",
                 "c", "c", "c");
     }
-    
+
     void _testTemplateNames(String template, String... names) {
         UriTemplate t = new UriTemplate(template);
         _testTemplateNames(t.getTemplateVariables(), names);
     }
-    
+
     void _testTemplateNames(List<String> regexNames, String... names) {
         assertEquals(names.length, regexNames.size());
-        
+
         Iterator<String> i = regexNames.iterator();
         for(String name : names) {
             assertEquals(name, i.next());
         }
     }
-    
+
     public void testMatching() {
         _testMatching("http://example.org/{a}/{b}/",
                 "http://example.org/fred/barney/",
@@ -118,7 +118,7 @@ public class UriTemplateTest extends TestCase {
                 "http://example.com/xxx/",
                 "xxx");
     }
-    
+
     public void testTemplateRegexes() {
         _testTemplateRegex("{a:}", "([^/]+?)");
         _testTemplateRegex("{a:.*}", "(.*)");
@@ -129,14 +129,14 @@ public class UriTemplateTest extends TestCase {
 
     private void _testTemplateRegex(String template, String regex) {
         UriTemplate t = new UriTemplate(template);
-        assertEquals(regex, t.getPattern().toString());        
+        assertEquals(regex, t.getPattern().toString());
     }
-    
-    public void testRegexMatching() {        
+
+    public void testRegexMatching() {
         _testMatching("{b: .+}",
                 "1",
                 "1");
-        
+
         _testMatching("{b: .+}",
                 "1/2/3",
                 "1/2/3");
@@ -144,7 +144,7 @@ public class UriTemplateTest extends TestCase {
         _testMatching("http://example.org/{a}/{b: .+}",
                 "http://example.org/fred/barney/x/y/z",
                 "fred", "barney/x/y/z");
-        
+
         _testMatching("{b: \\d+}",
                 "1234567890",
                 "1234567890");
@@ -156,6 +156,20 @@ public class UriTemplateTest extends TestCase {
         _testMatching("{a}/{b: .+}/{c}{d: (/.*)?}",
                 "1/2/3/4/",
                 "1", "2/3", "4", "/");
+    }
+
+    public void testRegexMatchingWithNestedGroups() {
+        _testMatching("{b: (\\d+)}",
+                "1234567890",
+                "1234567890");
+
+        _testMatching("{b: (\\d+)-(\\d+)-(\\d+)}",
+                "12-34-56",
+                "12-34-56");
+
+        _testMatching("{a: (\\d)(\\d*)}-{b: (\\d)(\\d*)}-{c: (\\d)(\\d*)}",
+                "12-34-56",
+                "12", "34", "56");
     }
 
     void _testMatching(String template, String uri, String... values) {
@@ -177,41 +191,52 @@ public class UriTemplateTest extends TestCase {
             String mapValue = m.get(names.next());
             assertEquals(value, mapValue);
         }
+
+        List<String> matchedValues = new ArrayList<String>();
+        isMatch = t.match(uri, matchedValues);
+        assertTrue(isMatch);
+        assertEquals(values.length, matchedValues.size());
+
+        System.out.println("LIST: " + matchedValues);
+
+        for (int i = 0; i < values.length; i++){
+            assertEquals(values[i], matchedValues.get(i));
+        }
     }
     
     public void testNullMatching() {
         Map<String, String> m = new HashMap<String, String>();
-        
+
         UriTemplate t = UriTemplate.EMPTY;
         assertEquals(false, t.match("/", m));
         assertEquals(true, t.match(null, m));
         assertEquals(true, t.match("", m));
-        
+
         t = new UriTemplate("/{v}");
         assertEquals(false, t.match(null, m));
         assertEquals(true, t.match("/one", m));
     }
-    
+
     public void testOrder() {
         List<UriTemplate> l = new ArrayList<UriTemplate>();
-        
+
         l.add(UriTemplate.EMPTY);
         l.add(new UriTemplate("/{a}"));
         l.add(new UriTemplate("/{a}/{b}"));
         l.add(new UriTemplate("/{a}/one/{b}"));
-        
+
         Collections.sort(l, UriTemplate.COMPARATOR);
-        
-        assertEquals(new UriTemplate("/{a}/one/{b}").getTemplate(), 
+
+        assertEquals(new UriTemplate("/{a}/one/{b}").getTemplate(),
                 l.get(0).getTemplate());
-        assertEquals(new UriTemplate("/{a}/{b}").getTemplate(), 
+        assertEquals(new UriTemplate("/{a}/{b}").getTemplate(),
                 l.get(1).getTemplate());
-        assertEquals(new UriTemplate("/{a}").getTemplate(), 
+        assertEquals(new UriTemplate("/{a}").getTemplate(),
                 l.get(2).getTemplate());
-        assertEquals(UriTemplate.EMPTY.getTemplate(), 
+        assertEquals(UriTemplate.EMPTY.getTemplate(),
                 l.get(3).getTemplate());
     }
-    
+
     public void testSubstitutionArray() {
         _testSubstitutionArray("http://example.org/{a}/{b}/",
                 "http://example.org/fred/barney/",
@@ -238,13 +263,13 @@ public class UriTemplateTest extends TestCase {
                 "http://example.com//",
                 "");
     }
-    
+
     void _testSubstitutionArray(String template, String uri, String... values) {
         UriTemplate t = new UriTemplate(template);
-        
+
         assertEquals(uri, t.createURI(values));
     }
-    
+
     public void testSubstitutionMap() {
         _testSubstitutionMap("http://example.org/{a}/{b}/",
                 "http://example.org/fred/barney/",
@@ -255,9 +280,9 @@ public class UriTemplateTest extends TestCase {
                 "a", "fred");
         _testSubstitutionMap("{scheme}://{20}.example.org?date={wilma}&option={a}",
                 "https://this-is-spinal-tap.example.org?date=&option=fred",
-                "scheme", "https", 
-                "20", "this-is-spinal-tap", 
-                "wilma", "", 
+                "scheme", "https",
+                "20", "this-is-spinal-tap",
+                "wilma", "",
                 "a", "fred");
         _testSubstitutionMap("http://example.org/{a-b}",
                 "http://example.org/none%20of%20the%20above",
@@ -275,38 +300,38 @@ public class UriTemplateTest extends TestCase {
                 "http://example.com//",
                 "e", "");
     }
-    
+
     void _testSubstitutionMap(String template, String uri, String... variablesAndvalues) {
         UriTemplate t = new UriTemplate(template);
-        
+
         Map<String, String> variableMap = new HashMap<String, String>();
         for (int i = 0; i < variablesAndvalues.length; i+=2)
             variableMap.put(variablesAndvalues[i], variablesAndvalues[i+1]);
-        
+
         assertEquals(uri, t.createURI(variableMap));
-    } 
-    
+    }
+
     public void testPathIndex() {
         UriTemplate t = new UriTemplate("{v}");
         assertEquals(0, t.getPathSegmentIndex("v"));
-        
+
         t = new UriTemplate("{v1}/{v2}");
         assertEquals(0, t.getPathSegmentIndex("v1"));
         assertEquals(1, t.getPathSegmentIndex("v2"));
-        
+
         t = new UriTemplate("{v1}-{v2}");
         assertEquals(0, t.getPathSegmentIndex("v1"));
         assertEquals(0, t.getPathSegmentIndex("v2"));
-        
+
         t = new UriTemplate("xxxx{v1}xxxx/xxxx{v2}xxxx");
         assertEquals(0, t.getPathSegmentIndex("v1"));
         assertEquals(1, t.getPathSegmentIndex("v2"));
-        
+
         t = new UriTemplate("{v1}/{v1}");
         assertEquals(1, t.getPathSegmentIndex("v1"));
-        
+
         t = new UriTemplate("///{v1}///{v2}///");
         assertEquals(0, t.getPathSegmentIndex("v1"));
-        assertEquals(1, t.getPathSegmentIndex("v2"));        
-    }   
+        assertEquals(1, t.getPathSegmentIndex("v2"));
+    }
 }

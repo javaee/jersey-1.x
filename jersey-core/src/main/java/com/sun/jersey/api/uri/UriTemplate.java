@@ -205,7 +205,7 @@ public class UriTemplate {
         
         this.normalizedTemplate = templateParser.getNormalizedTemplate();
 
-        this.pattern = new UriPattern(templateParser.getPattern());
+        this.pattern = createUriPattern(templateParser);
 
         this.numOfExplicitRegexes = templateParser.getNumberOfExplicitRegexes();
         
@@ -214,6 +214,10 @@ public class UriTemplate {
         this.endsWithSlash = template.charAt(template.length() - 1) == '/';
 
         this.templateVariables = Collections.unmodifiableList(templateParser.getNames());
+    }
+
+    protected UriPattern createUriPattern(UriTemplateParser templateParser) {
+        return new UriPattern(templateParser.getPattern(), templateParser.getGroupIndexes()); 
     }
     
     /**
