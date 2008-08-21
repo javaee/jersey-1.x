@@ -794,6 +794,9 @@ public final class WebApplicationImpl implements WebApplication {
                         ". This singleton will be ignored");
                 continue;
             }
+
+            // Inject onto the singleton
+            injectResources(o);
             
             ResourceClass r = getResourceClass(ar);
             rootResources.add(r.resource);
