@@ -1,4 +1,7 @@
 release 0.10 (2008-09-xx)
+- Fixed issue with resource methods utilizing @FormParam that could only
+  contain @FormParam annotated method parameters. Now @FormParam annotated
+  parameters may be intermixed with other annotated parameters.
 - Integrated JSR 311 API 0.10
   - java.ws.rs.core.ApplicationConfig renamed to java.ws.rs.core.Application
   - ApplicationConfig.getResourceClasses() and

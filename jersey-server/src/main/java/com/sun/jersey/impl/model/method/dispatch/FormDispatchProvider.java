@@ -249,7 +249,7 @@ public class FormDispatchProvider implements ResourceMethodDispatchProvider {
         for (int i = 0; i < method.getParameters().size(); i++) {
             Parameter parameter = method.getParameters().get(i);
             if (parameter.getAnnotation() != null)
-                hasFormParam = parameter.getAnnotation().annotationType() == FormParam.class;            
+                hasFormParam |= parameter.getAnnotation().annotationType() == FormParam.class;            
         }
         if (!hasFormParam)
             return null;

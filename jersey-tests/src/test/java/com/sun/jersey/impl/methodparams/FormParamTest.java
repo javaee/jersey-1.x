@@ -47,8 +47,11 @@ import javax.ws.rs.Consumes;
 import javax.ws.rs.FormParam;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
+import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
+import javax.ws.rs.core.UriInfo;
 
 /**
  *
@@ -64,8 +67,12 @@ public class FormParamTest extends AbstractResourceTester {
     public class FormResourceX {
         @POST
         @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-        public String post(@FormParam("a") String a, @FormParam("b") String b,
-                MultivaluedMap<String, String> form) {
+        public String post(
+                @FormParam("a") String a, 
+                @FormParam("b") String b,
+                MultivaluedMap<String, String> form,
+                @Context UriInfo ui,
+                @QueryParam("a") String qa) {
             assertEquals(a, form.getFirst("a"));
             assertEquals(b, form.getFirst("b"));
             return a + b;
@@ -76,8 +83,12 @@ public class FormParamTest extends AbstractResourceTester {
     public class FormResourceY {
         @POST
         @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-        public String post(@FormParam("a") String a, @FormParam("b") String b,
-                Form form) {
+        public String post(
+                @FormParam("a") String a, 
+                @FormParam("b") String b,
+                Form form,
+                @Context UriInfo ui,
+                @QueryParam("a") String qa) {
             assertEquals(a, form.getFirst("a"));
             assertEquals(b, form.getFirst("b"));
             return a + b;
@@ -118,7 +129,9 @@ public class FormParamTest extends AbstractResourceTester {
                 @FormParam("a") String a, 
                 @FormParam("b") String b,
                 @FormParam("c") JAXBBean c,
-                MimeMultipart m) throws Exception {
+                MimeMultipart m,
+                @Context UriInfo ui,
+                @QueryParam("a") String qa) throws Exception {
             assertEquals(3, m.getCount());
             return a + b;
         }
@@ -132,13 +145,15 @@ public class FormParamTest extends AbstractResourceTester {
                 @FormParam("a") String a, 
                 @FormParam("b") String b,
                 @FormParam("c") JAXBBean c,
-                Form form) throws Exception {
+                Form form,
+                @Context UriInfo ui,
+                @QueryParam("a") String qa) throws Exception {
             assertEquals(a, form.getFirst("a"));
             assertEquals(b, form.getFirst("b"));
             return a + b;
         }
     }
-    
+        
     public void testMultipartFormParam() throws Exception {
         initiateWebApplication(MultipartFormResourceX.class);
         
