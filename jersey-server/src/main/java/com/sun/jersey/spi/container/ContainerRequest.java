@@ -38,6 +38,7 @@ package com.sun.jersey.spi.container;
 
 import com.sun.jersey.api.Responses;
 import com.sun.jersey.api.core.HttpRequestContext;
+import com.sun.jersey.api.uri.UriComponent;
 import com.sun.jersey.impl.MultivaluedMapImpl;
 import com.sun.jersey.impl.VariantSelector;
 import com.sun.jersey.impl.http.header.AcceptableLanguageTag;
@@ -54,6 +55,7 @@ import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -64,6 +66,7 @@ import javax.ws.rs.core.EntityTag;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
+import javax.ws.rs.core.PathSegment;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.ResponseBuilder;
 import javax.ws.rs.core.UriBuilder;
@@ -92,6 +95,18 @@ public class ContainerRequest implements HttpRequestContext {
     private URI requestUri;
     
     private URI absolutePathUri;
+    
+    private String encodedPath;
+    
+    private String decodedPath;
+
+    private List<PathSegment> decodedPathSegments;
+
+    private List<PathSegment> encodedPathSegments;
+    
+    private MultivaluedMap<String, String> decodedQueryParameters;
+
+    private MultivaluedMap<String, String> encodedQueryParameters;
     
     private InBoundHeaders headers;
 
@@ -163,6 +178,12 @@ public class ContainerRequest implements HttpRequestContext {
         
         // reset state
         absolutePathUri = null;
+        
+        encodedPath = decodedPath = null;
+
+        decodedPathSegments = encodedPathSegments = null;
+        
+        decodedQueryParameters = encodedQueryParameters = null;
     }
     
     /**
@@ -195,8 +216,16 @@ public class ContainerRequest implements HttpRequestContext {
         return baseUri;
     }
        
+    public UriBuilder getBaseUriBuilder() {
+        return UriBuilder.fromUri(getBaseUri());
+    }
+    
     public URI getRequestUri() {
         return requestUri;
+    }
+    
+    public UriBuilder getRequestUriBuilder() {
+        return UriBuilder.fromUri(getRequestUri());
     }
     
     public URI getAbsolutePath() {
@@ -205,6 +234,71 @@ public class ContainerRequest implements HttpRequestContext {
         return absolutePathUri = UriBuilder.fromUri(requestUri).
                 replaceQuery("").fragment("").
                 build();        
+    }
+    
+    public UriBuilder getAbsolutePathBuilder() {
+        return UriBuilder.fromUri(getAbsolutePath());
+    }
+
+    public String getPath() {
+        return getPath(true);
+    }
+    
+    public String getPath(boolean decode) {
+        if (decode) {
+            if (decodedPath != null) return decodedPath;
+            
+            return decodedPath = UriComponent.decode(
+                    getEncodedPath(),
+                    UriComponent.Type.PATH);
+        } else {
+            return getEncodedPath();
+        }
+    }
+    
+    private String getEncodedPath() {
+        if (encodedPath != null) return encodedPath;
+        
+        return encodedPath  = getRequestUri().getRawPath().substring(
+                getBaseUri().getRawPath().length());
+    }
+    
+    public List<PathSegment> getPathSegments() {
+        return getPathSegments(true);
+    }
+    
+    public List<PathSegment> getPathSegments(boolean decode) {
+        if (decode) {
+            if (decodedPathSegments != null)
+                return decodedPathSegments;
+            
+            return decodedPathSegments = extractPathSegments(getPath(false), true);
+        } else {
+            if (encodedPathSegments != null)
+                return encodedPathSegments;
+            
+            return encodedPathSegments = extractPathSegments(getPath(false), false);
+        }
+    }
+    
+    public MultivaluedMap<String, String> getQueryParameters() {
+        return getQueryParameters(true);
+    }
+    
+    public MultivaluedMap<String, String> getQueryParameters(boolean decode) {
+        if (decode) {
+            if (decodedQueryParameters != null)
+                return decodedQueryParameters;
+            
+            return decodedQueryParameters = UriComponent.decodeQuery(
+                    getRequestUri(), true);
+        } else {
+            if (encodedQueryParameters != null)
+                return encodedQueryParameters;
+            
+            return encodedQueryParameters = UriComponent.decodeQuery(
+                    getRequestUri(), false);
+        }
     }
     
     public String getHeaderValue(String name) {
@@ -475,4 +569,98 @@ public class ContainerRequest implements HttpRequestContext {
     public String getAuthenticationScheme() {
         throw new UnsupportedOperationException();
     }
+    
+    //
+    
+    private static final class PathSegmentImpl implements PathSegment {
+        private String path;
+        
+        private MultivaluedMap<String, String> matrixParameters;
+        
+        PathSegmentImpl(String path, MultivaluedMap<String, String> matrixParameters) {
+            this.path = path;
+            this.matrixParameters = matrixParameters;
+        }
+        
+        public String getPath() {
+            return path;
+        }
+        
+        public MultivaluedMap<String, String> getMatrixParameters() {
+            return matrixParameters;
+        }
+    }
+    
+    /**
+     * Extract the path segments from the path
+     * TODO: This is not very efficient
+     */
+    private List<PathSegment> extractPathSegments(String path, boolean decode) {
+        List<PathSegment> pathSegments = new LinkedList<PathSegment>();
+        
+        if (path == null)
+            return pathSegments;
+        
+        // TODO the extraction algorithm requires an absolute path
+        if (!path.startsWith("/")) {
+            path = "/" + path;
+        }
+        
+        String[] subPaths = path.split("/");
+        if (subPaths.length == 0) {
+            PathSegment pathSegment = new PathSegmentImpl("", new MultivaluedMapImpl());
+            pathSegments.add(pathSegment);
+            return pathSegments;
+        }
+        
+        for (String subPath : subPaths) {
+            if (subPath.length() == 0)
+                continue;
+            
+            MultivaluedMap<String, String> matrixMap = new MultivaluedMapImpl();
+            int colon = subPath.indexOf(';');
+            if (colon != -1) {
+                String matrixParameters = subPath.substring(colon + 1);
+                subPath = (colon == 0) ? "" : subPath.substring(0, colon);
+                extractPathParameters(matrixParameters, ";", matrixMap, decode);
+            }
+            
+            if (decode)
+                subPath = UriComponent.decode(subPath, UriComponent.Type.PATH_SEGMENT);
+            
+            PathSegment pathSegment = new PathSegmentImpl(subPath, matrixMap);
+            pathSegments.add(pathSegment);
+        }
+        
+        return pathSegments;
+    }
+    
+    /**
+     * TODO: This is not very efficient
+     */
+    private void extractPathParameters(String parameters, String deliminator,
+            MultivaluedMap<String, String> map, boolean decode) {
+        for (String s : parameters.split(deliminator)) {
+            if (s.length() == 0)
+                continue;
+            
+            String[] keyVal = s.split("=");
+            String key = (decode)
+            ? UriComponent.decode(keyVal[0], UriComponent.Type.PATH_SEGMENT)
+            : keyVal[0];
+            if (key.length() == 0)
+                continue;
+            
+            // parameter may not have a value, if so default to "";
+            String val = (keyVal.length == 2) ?
+                (decode) ? UriComponent.decode(keyVal[1], UriComponent.Type.PATH_SEGMENT) : keyVal[1] : "";
+            
+            List<String> list = map.get(key);
+            if (map.get(key) == null) {
+                list = new LinkedList<String>();
+                map.put(key, list);
+            }
+            list.add(val);
+        }
+    }    
 }

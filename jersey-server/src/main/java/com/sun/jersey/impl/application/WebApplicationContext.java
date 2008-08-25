@@ -149,85 +149,23 @@ public final class WebApplicationContext implements UriRuleContext, ExtendedUriI
     }
     
     public void pushRightHandPathLength(int rhpathlen) {
-        paths.addFirst(getEncodedPath().substring(0, 
-                getEncodedPath().length() - rhpathlen));
+        final String ep = request.getPath(false);
+        paths.addFirst(ep.substring(0,
+                ep.length() - rhpathlen));
     }
         
-    // UriInfo
-    
-    /**
-     * The percent-encoded path component.
-     *
-     * The path is relative to the path component of the base URI. The path
-     * must not start with a '/'.
-     */
-    private String encodedPath;
-    
-    /**
-     * The decoded path component.
-     */
-    private String decodedPath;
-    
-    private List<PathSegment> decodedPathSegments;
-    private List<PathSegment> encodedPathSegments;
-    
-    private MultivaluedMap<String, String> decodedQueryParameters;
-    private MultivaluedMap<String, String> encodedQueryParameters;
+    // UriInfo, defer to HttpRequestContext
     
     private MultivaluedMapImpl encodedTemplateValues;
+    
     private MultivaluedMapImpl decodedTemplateValues;
-    
-    public String getPath() {
-        return getPath(true);
-    }
-    
-    public String getPath(boolean decode) {
-        if (decode) {
-            if (decodedPath != null) return decodedPath;
-            
-            return decodedPath = UriComponent.decode(
-                    getEncodedPath(),
-                    UriComponent.Type.PATH);
-        } else {
-            return getEncodedPath();
-        }
-    }
-    
-    private String getEncodedPath() {
-        if (encodedPath != null) return encodedPath;
-        
-        return encodedPath  = getRequestUri().getRawPath().substring(
-                getBaseUri().getRawPath().length());
-    }
-    
-    public List<PathSegment> getPathSegments() {
-        return getPathSegments(true);
-    }
-    
-    public List<PathSegment> getPathSegments(boolean decode) {
-        if (decode) {
-            if (decodedPathSegments != null)
-                return decodedPathSegments;
-            
-            return decodedPathSegments = extractPathSegments(getPath(false), true);
-        } else {
-            if (encodedPathSegments != null)
-                return encodedPathSegments;
-            
-            return encodedPathSegments = extractPathSegments(getPath(false), false);
-        }
-    }
-    
-    public String getPathExtension() {
-        throw new UnsupportedOperationException();
-    }
     
     public URI getBaseUri() {
         return request.getBaseUri();
     }
     
     public UriBuilder getBaseUriBuilder() {
-        return UriBuilder.fromUri(getBaseUri());
+        return request.getBaseUriBuilder();
     }
     
     public URI getAbsolutePath() {
@@ -235,7 +173,7 @@ public final class WebApplicationContext implements UriRuleContext, ExtendedUriI
     }
     
     public UriBuilder getAbsolutePathBuilder() {
-        return UriBuilder.fromUri(getAbsolutePath());
+        return request.getAbsolutePathBuilder();
     }
     
     public URI getRequestUri() {
@@ -243,12 +181,34 @@ public final class WebApplicationContext implements UriRuleContext, ExtendedUriI
     }
     
     public UriBuilder getRequestUriBuilder() {
-        return UriBuilder.fromUri(getRequestUri());
+        return request.getRequestUriBuilder();
     }
     
-    public UriBuilder getPlatonicRequestUriBuilder() {
-        throw new UnsupportedOperationException();
+    public String getPath() {
+        return request.getPath(true);
     }
+    
+    public String getPath(boolean decode) {
+        return request.getPath(decode);
+    }
+    
+    public List<PathSegment> getPathSegments() {
+        return request.getPathSegments(true);
+    }
+    
+    public List<PathSegment> getPathSegments(boolean decode) {
+        return request.getPathSegments(decode);
+    }
+    
+    public MultivaluedMap<String, String> getQueryParameters() {
+        return request.getQueryParameters(true);
+    }
+    
+    public MultivaluedMap<String, String> getQueryParameters(boolean decode) {
+        return request.getQueryParameters(decode);
+    }
+
+    // UriInfo, matching specific functionality
     
     public MultivaluedMap<String, String> getPathParameters() {
         return getPathParameters(true);
@@ -276,26 +236,6 @@ public final class WebApplicationContext implements UriRuleContext, ExtendedUriI
         }
     }
     
-    public MultivaluedMap<String, String> getQueryParameters() {
-        return getQueryParameters(true);
-    }
-    
-    public MultivaluedMap<String, String> getQueryParameters(boolean decode) {
-        if (decode) {
-            if (decodedQueryParameters != null)
-                return decodedQueryParameters;
-            
-            return decodedQueryParameters = UriComponent.decodeQuery(
-                    getRequestUri(), true);
-        } else {
-            if (encodedQueryParameters != null)
-                return encodedQueryParameters;
-            
-            return encodedQueryParameters = UriComponent.decodeQuery(
-                    getRequestUri(), false);
-        }
-    }
-
     public List<String> getMatchedURIs() {
         return paths;
     }
@@ -308,7 +248,7 @@ public final class WebApplicationContext implements UriRuleContext, ExtendedUriI
         return resources;
     }    
     
-    //
+    // ExtendedUriInfo
     
     public List<UriTemplate> getMatchedTemplates() {
         return templates;
@@ -319,8 +259,6 @@ public final class WebApplicationContext implements UriRuleContext, ExtendedUriI
     }
     
     public PathSegment getPathSegment(String name, boolean decode) {
-        int index = 0;
-        
         int i = -1;
         for (UriTemplate t : templates) {
             if (i == -1)
@@ -330,105 +268,5 @@ public final class WebApplicationContext implements UriRuleContext, ExtendedUriI
         }
         
         return (i != -1) ? getPathSegments(decode).get(i) : null;
-    }
-    
-    
-    //
-    
-    
-    private static final class PathSegmentImpl implements PathSegment {
-        private String path;
-        
-        private MultivaluedMap<String, String> matrixParameters;
-        
-        PathSegmentImpl(String path, MultivaluedMap<String, String> matrixParameters) {
-            this.path = path;
-            this.matrixParameters = matrixParameters;
-        }
-        
-        public String getPath() {
-            return path;
-        }
-        
-        public MultivaluedMap<String, String> getMatrixParameters() {
-            return matrixParameters;
-        }
-    }
-    
-    /**
-     * Extract the path segments from the path
-     * TODO: This is not very efficient
-     */
-    private List<PathSegment> extractPathSegments(String path, boolean decode) {
-        List<PathSegment> pathSegments = new LinkedList<PathSegment>();
-        
-        if (path == null)
-            return pathSegments;
-        
-        // TODO the extraction algorithm requires an absolute path
-        if (!path.startsWith("/")) {
-            path = "/" + path;
-        }
-        
-        String[] subPaths = path.split("/");
-        if (subPaths.length == 0) {
-            PathSegment pathSegment = new PathSegmentImpl("", new MultivaluedMapImpl());
-            pathSegments.add(pathSegment);
-            return pathSegments;
-        }
-        
-        for (String subPath : subPaths) {
-            if (subPath.length() == 0)
-                continue;
-            
-            MultivaluedMap<String, String> matrixMap = new MultivaluedMapImpl();
-            int colon = subPath.indexOf(';');
-            if (colon != -1) {
-                String matrixParameters = subPath.substring(colon + 1);
-                subPath = (colon == 0) ? "" : subPath.substring(0, colon);
-                extractPathParameters(matrixParameters, ";", matrixMap, decode);
-            }
-            
-            if (decode)
-                subPath = UriComponent.decode(subPath, UriComponent.Type.PATH_SEGMENT);
-            
-            PathSegment pathSegment = new PathSegmentImpl(subPath, matrixMap);
-            pathSegments.add(pathSegment);
-        }
-        
-        return pathSegments;
-    }
-    
-    /**
-     * TODO: This is not very efficient
-     */
-    private void extractPathParameters(String parameters, String deliminator,
-            MultivaluedMap<String, String> map, boolean decode) {
-        for (String s : parameters.split(deliminator)) {
-            if (s.length() == 0)
-                continue;
-            
-            String[] keyVal = s.split("=");
-            String key = (decode)
-            ? UriComponent.decode(keyVal[0], UriComponent.Type.PATH_SEGMENT)
-            : keyVal[0];
-            if (key.length() == 0)
-                continue;
-            
-            // parameter may not have a value, if so default to "";
-            String val = (keyVal.length == 2) ?
-                (decode) ? UriComponent.decode(keyVal[1], UriComponent.Type.PATH_SEGMENT) : keyVal[1] : "";
-            
-            List<String> list = map.get(key);
-            if (map.get(key) == null) {
-                list = new LinkedList<String>();
-                map.put(key, list);
-            }
-            list.add(val);
-        }
-    }
-
-    public String getConnegExtension() {
-        throw new UnsupportedOperationException("Not supported yet.");
     }
 }

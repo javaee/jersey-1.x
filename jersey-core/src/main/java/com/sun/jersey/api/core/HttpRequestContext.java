@@ -45,34 +45,131 @@ import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
+import javax.ws.rs.core.PathSegment;
 import javax.ws.rs.core.Request;
 import javax.ws.rs.core.SecurityContext;
+import javax.ws.rs.core.UriBuilder;
 
 /**
  * An abstraction of a HTTP request.
  */
-public interface HttpRequestContext extends HttpHeaders, Request, SecurityContext {    
+public interface HttpRequestContext extends HttpHeaders, Request, SecurityContext {
     /**
-     * Get the base URI of the request.
-     * 
-     * @return the base URI.
+     * Get the base URI of the application. URIs of root resource classes
+     * are all relative to this base URI.
+     * @return the base URI of the application
      */
     URI getBaseUri();
        
     /**
-     * Get the (complete) request URI.
-     * 
-     * @return the request URI.
+     * Get the base URI of the application in the form of a UriBuilder.
+     * @return a UriBuilder initialized with the base URI of the application.
+     */
+    UriBuilder getBaseUriBuilder();
+    
+    /**
+     * Get the absolute request URI. This includes query parameters and
+     * any supplied fragment.
+     * @return the absolute request URI
+     * @throws java.lang.IllegalStateException if called outside the scope of a request
      */
     URI getRequestUri();
     
     /**
-     * Get the absolute path URI of the request.
-     * 
-     * @return the absolute URI.
+     * Get the absolute request URI in the form of a UriBuilder.
+     * @return a UriBuilder initialized with the absolute request URI
+     * @throws java.lang.IllegalStateException if called outside the scope of a request
+     */
+    UriBuilder getRequestUriBuilder();
+    
+    /**
+     * Get the absolute path of the request. This includes everything preceding
+     * the path (host, port etc) but excludes query parameters and fragment.
+     * This is a shortcut for
+     * <code>uriInfo.getBase().resolve(uriInfo.getPath()).</code>
+     * @return the absolute path of the request
+     * @throws java.lang.IllegalStateException if called outside the scope of a request
      */
     URI getAbsolutePath();
     
+    /**
+     * Get the absolute path of the request in the form of a UriBuilder.
+     * This includes everything preceding the path (host, port etc) but excludes
+     * query parameters and fragment.
+     * @return a UriBuilder initialized with the absolute path of the request
+     * @throws java.lang.IllegalStateException if called outside the scope of a request
+     */
+    UriBuilder getAbsolutePathBuilder();
+    
+    /**
+     * Get the path of the current request relative to the base URI as
+     * a string. All sequences of escaped octets are decoded, equivalent to
+     * <code>getPath(true)</code>.
+     * 
+     * @return the relative URI path
+     * @throws java.lang.IllegalStateException if called outside the scope of a request
+     */
+    String getPath();
+    
+    /**
+     * Get the path of the current request relative to the base URI as
+     * a string.
+     *
+     * @param decode controls whether sequences of escaped octets are decoded
+     * (true) or not (false).
+     * @return the relative URI path
+     * @throws java.lang.IllegalStateException if called outside the scope of a request
+     */
+    String getPath(boolean decode);
+
+    /**
+     * Get the path of the current request relative to the base URI as a 
+     * list of {@link PathSegment}. This method is useful when the
+     * path needs to be parsed, particularly when matrix parameters may be
+     * present in the path. All sequences of escaped octets in path segments
+     * and matrix parmeter names and values are decoded,
+     * equivalent to <code>getPathSegments(true)</code>.
+     * @return an unmodifiable list of {@link PathSegment}. The matrix parameter
+     * map of each path segment is also unmodifiable.
+     * @throws java.lang.IllegalStateException if called outside the scope of a request
+     * @see PathSegment
+     * @see <a href="http://www.w3.org/DesignIssues/MatrixURIs.html">Matrix URIs</a>
+     */
+    List<PathSegment> getPathSegments();
+    
+    /**
+     * Get the path of the current request relative to the base URI as a 
+     * list of {@link PathSegment}. This method is useful when the
+     * path needs to be parsed, particularly when matrix parameters may be
+     * present in the path.
+     * @param decode controls whether sequences of escaped octets in path segments
+     * and matrix parameter names and values are decoded (true) or not (false).
+     * @return an unmodifiable list of {@link PathSegment}. The matrix parameter
+     * map of each path segment is also unmodifiable.
+     * @throws java.lang.IllegalStateException if called outside the scope of a request
+     * @see PathSegment
+     * @see <a href="http://www.w3.org/DesignIssues/MatrixURIs.html">Matrix URIs</a>
+     */
+    List<PathSegment> getPathSegments(boolean decode);
+
+    /**
+     * Get the URI query parameters of the current request.
+     * All sequences of escaped octets in parameter names and values are decoded,
+     * equivalent to <code>getQueryParameters(true)</code>.
+     * @return an unmodifiable map of query parameter names and values
+     * @throws java.lang.IllegalStateException if called outside the scope of a request
+     */
+    MultivaluedMap<String, String> getQueryParameters();
+    
+    /**
+     * Get the URI query parameters of the current request.
+     * @param decode controls whether sequences of escaped octets in parameter
+     * names and values are decoded (true) or not (false).
+     * @return an unmodifiable map of query parameter names and values
+     * @throws java.lang.IllegalStateException if called outside the scope of a request
+     */
+    MultivaluedMap<String, String> getQueryParameters(boolean decode);
+
     /**
      * Get a HTTP header value.
      * 
