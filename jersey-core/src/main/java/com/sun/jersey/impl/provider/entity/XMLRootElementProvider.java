@@ -52,6 +52,8 @@ import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.ext.Providers;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
+import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.transform.stream.StreamSource;
 
 /**
  *
@@ -91,13 +93,25 @@ public class XMLRootElementProvider extends AbstractRootElementProvider {
             Annotation annotations[],
             MediaType mediaType, 
             MultivaluedMap<String, String> httpHeaders, 
-            InputStream entityStream) throws IOException {        
-        try {
-            return getUnmarshaller(type, mediaType).unmarshal(entityStream);
-        } catch (JAXBException cause) {
-            throw ThrowHelper.withInitCause(cause,
-                    new IOException(ImplMessages.ERROR_UNMARSHALLING_JAXB(type))
-                    );
+            InputStream entityStream) throws IOException { 
+        
+        if (type.isAnnotationPresent(XmlRootElement.class)) {
+            try {
+                return getUnmarshaller(type, mediaType).unmarshal(entityStream);
+            } catch (JAXBException cause) {
+                throw ThrowHelper.withInitCause(cause,
+                        new IOException(ImplMessages.ERROR_UNMARSHALLING_JAXB(type))
+                        );
+            }
+        } else {
+            try {
+                StreamSource source = new StreamSource(entityStream);
+                return getUnmarshaller(type, mediaType).unmarshal(source, type).getValue();
+            } catch (JAXBException cause) {
+                throw ThrowHelper.withInitCause(cause,
+                        new IOException(ImplMessages.ERROR_UNMARSHALLING_JAXB(type))
+                        );
+            }                
         }
     }
     

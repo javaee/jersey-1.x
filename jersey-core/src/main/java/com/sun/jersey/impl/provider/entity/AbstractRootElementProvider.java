@@ -42,6 +42,7 @@ import java.lang.reflect.Type;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.ext.Providers;
 import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlType;
 
 /**
  *
@@ -57,7 +58,8 @@ public abstract class AbstractRootElementProvider extends AbstractJAXBProvider<O
     }
     
     public boolean isReadable(Class<?> type, Type genericType, Annotation annotations[]) {
-        return type.getAnnotation(XmlRootElement.class) != null;
+        return type.getAnnotation(XmlRootElement.class) != null ||
+                type.getAnnotation(XmlType.class) != null;
     }
     
     public boolean isWriteable(Class<?> type, Type genericType, Annotation annotations[]) {

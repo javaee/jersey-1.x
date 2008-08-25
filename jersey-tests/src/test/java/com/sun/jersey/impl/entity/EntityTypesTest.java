@@ -169,6 +169,27 @@ public class EntityTypesTest extends AbstractTypeTester {
     @Path("/")
     @Produces("application/xml")
     @Consumes("application/xml")
+    public static class JAXBTypeResource {
+        @POST
+        public JAXBBean post(JAXBBeanType t) {
+            return new JAXBBean(t.value);
+        }
+    }
+    
+    public void testJAXBTypeRepresentation() {
+        initiateWebApplication(JAXBTypeResource.class);
+        WebResource r = resource("/");
+        JAXBBean in = new JAXBBean("CONTENT");
+        JAXBBeanType out = r.entity(in, "application/xml").
+                post(JAXBBeanType.class);
+        assertEquals(in.value, out.value);
+    }
+    
+    
+    
+    @Path("/")
+    @Produces("application/xml")
+    @Consumes("application/xml")
     public static class JAXBObjectResource {
         @POST
         public Object post(Object o) {
@@ -409,4 +430,52 @@ public class EntityTypesTest extends AbstractTypeTester {
         }
     }    
 
+    @Path("/")
+    @Produces("application/json")
+    @Consumes("application/json")
+    public static class JAXBBeanResourceJSON extends AResource<JAXBBean> {}
+
+    public void testJAXBBeanRepresentationJSON() {
+        initiateWebApplication(JAXBBeanResourceJSON.class);
+        WebResource r = resource("/");
+        JAXBBean in = new JAXBBean("CONTENT");
+        JAXBBean out = r.entity(in, "application/json").
+                post(JAXBBean.class);
+        assertEquals(in.value, out.value);
+    }
+
+//
+//    @Path("/")
+//    @Produces("application/json")
+//    @Consumes("application/json")
+//    public static class JAXBElementBeanResourceJSON extends AResource<JAXBElement<JAXBBeanType>> {}
+//
+//    public void testJAXBElementBeanRepresentationJSON() {
+//        initiateWebApplication(JAXBElementBeanResourceJSON.class);
+//        WebResource r = resource("/");
+//        JAXBBean in = new JAXBBean("CONTENT");
+//        JAXBBean out = r.entity(in, "application/json").
+//                post(JAXBBean.class);
+//        assertEquals(in.value, out.value);
+//    }
+//
+//    @Path("/")
+//    @Produces("application/json")
+//    @Consumes("application/json")
+//    public static class JAXBTypeResourceJSON {
+//        @POST
+//        public JAXBBean post(JAXBBeanType t) {
+//            return new JAXBBean(t.value);
+//        }
+//    }
+//
+//    public void testJAXBTypeRepresentationJSON() {
+//        initiateWebApplication(JAXBTypeResourceJSON.class);
+//        WebResource r = resource("/");
+//        JAXBBean in = new JAXBBean("CONTENT");
+//        JAXBBeanType out = r.entity(in, "application/json").
+//                post(JAXBBeanType.class);
+//        assertEquals(in.value, out.value);
+//    }
+    
 }

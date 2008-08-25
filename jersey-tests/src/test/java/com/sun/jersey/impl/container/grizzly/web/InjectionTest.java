@@ -40,6 +40,7 @@ package com.sun.jersey.impl.container.grizzly.web;
 import com.sun.jersey.api.client.Client;
 import javax.ws.rs.Path;
 import com.sun.jersey.api.client.WebResource;
+import com.sun.jersey.spi.resource.Singleton;
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
@@ -92,6 +93,48 @@ public class InjectionTest extends AbstractGrizzlyWebContainerTester {
         }               
     }
     
+    @Path("/test")
+    @Singleton
+    public static class HttpMethodSingletonResource {
+        @Context HttpServletRequest req;
+        
+        @Context HttpServletResponse res;
+        
+        @Context ServletConfig sconf;
+        
+        @Context ServletContext scont;
+        
+        @GET
+        public String get() {
+            assertNotNull(req);
+            assertNotNull(res);
+            assertNotNull(sconf);
+            assertNotNull(scont);
+            return "GET";
+        }               
+    }
+        
+    @Path("/test")
+    @Singleton
+    public static class HttpMethodConstructorSingletonResource {
+        
+        public HttpMethodConstructorSingletonResource(
+                @Context HttpServletRequest req,
+                @Context HttpServletResponse res, 
+                @Context ServletConfig sconf,
+                @Context ServletContext scont) {
+            assertNotNull(req);
+            assertNotNull(res);
+            assertNotNull(sconf);
+            assertNotNull(scont);            
+        }
+        
+        @GET
+        public String get() {
+            return "GET";
+        }               
+    }
+    
     public InjectionTest(String testName) {
         super(testName);
     }
@@ -102,8 +145,20 @@ public class InjectionTest extends AbstractGrizzlyWebContainerTester {
         assertEquals("GET", r.get(String.class));
     }    
     
-    public void testInjectConstructor() {
+    public void testInjectConstrauctor() {
         startServer(HttpMethodConstructorResource.class);
+        WebResource r = Client.create().resource(getUri().path("test").build());
+        assertEquals("GET", r.get(String.class));
+    }    
+    
+    public void testInjectSingleton() {
+        startServer(HttpMethodSingletonResource.class);
+        WebResource r = Client.create().resource(getUri().path("test").build());
+        assertEquals("GET", r.get(String.class));
+    }    
+    
+    public void testInjectConstructorSingleton() {
+        startServer(HttpMethodConstructorSingletonResource.class);
         WebResource r = Client.create().resource(getUri().path("test").build());
         assertEquals("GET", r.get(String.class));
     }    

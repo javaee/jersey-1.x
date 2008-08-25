@@ -61,6 +61,7 @@ import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
+import javax.xml.bind.annotation.XmlRootElement;
 
 /**
  *
@@ -81,23 +82,29 @@ public final class JSONRootElementProvider extends AbstractRootElementProvider {
             MediaType mediaType, 
             MultivaluedMap<String, String> httpHeaders, 
             InputStream entityStream) throws IOException {
-        try {
-            Unmarshaller unmarshaller = getUnmarshaller(type, mediaType);
-            if (unmarshaller instanceof JSONUnmarshaller) {
-                unmarshaller.setProperty(JSONJAXBContext.JSON_ENABLED, Boolean.TRUE);
-                JAXBElement jaxbElem = (JAXBElement)((JSONUnmarshaller)unmarshaller).
-                        unmarshal(new InputStreamReader(entityStream, getCharset(mediaType)),
-                        type);
-                return jaxbElem.getValue();
-            } else {
-                return unmarshaller.unmarshal(new JsonXmlStreamReader(
-                        new InputStreamReader(entityStream, getCharset(mediaType))));
+        if (type.isAnnotationPresent(XmlRootElement.class)) {
+            try {
+                Unmarshaller unmarshaller = getUnmarshaller(type, mediaType);
+                if (unmarshaller instanceof JSONUnmarshaller) {
+                    unmarshaller.setProperty(JSONJAXBContext.JSON_ENABLED, Boolean.TRUE);
+                    JAXBElement jaxbElem = (JAXBElement)((JSONUnmarshaller)unmarshaller).
+                            unmarshal(new InputStreamReader(entityStream, getCharset(mediaType)),
+                            type);
+                    return jaxbElem.getValue();
+                } else {
+                    return unmarshaller.unmarshal(new JsonXmlStreamReader(
+                            new InputStreamReader(entityStream, getCharset(mediaType))));
+                }
+            } catch (JAXBException cause) {
+                throw ThrowHelper.withInitCause(cause,
+                        new IOException(ImplMessages.ERROR_UNMARSHALLING_JAXB(type))
+                        );
             }
-        } catch (JAXBException cause) {
-            throw ThrowHelper.withInitCause(cause,
-                    new IOException(ImplMessages.ERROR_UNMARSHALLING_JAXB(type))
-                    );
+        } else {
+            throw new UnsupportedOperationException(
+                    "Classes annotated with @XmlType cannot unmarshalled from JSON documents");
         }
+
     }
     
     public void writeTo(

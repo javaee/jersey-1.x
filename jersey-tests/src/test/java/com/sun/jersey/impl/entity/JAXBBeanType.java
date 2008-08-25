@@ -37,10 +37,13 @@
 
 package com.sun.jersey.impl.entity;
 
+import javax.xml.bind.annotation.XmlType;
+
 /**
  *
  * @author Paul.Sandoz@Sun.Com
  */
+@XmlType
 public class JAXBBeanType {
     
     public String value; 
