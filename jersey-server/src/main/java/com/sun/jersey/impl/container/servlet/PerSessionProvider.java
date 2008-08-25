@@ -35,14 +35,14 @@
  * holder.
  */
 
-package com.sun.jersey.impl.resource;
+package com.sun.jersey.impl.container.servlet;
 
 import com.sun.jersey.api.container.ContainerException;
 import com.sun.jersey.api.core.HttpContext;
 import com.sun.jersey.api.model.AbstractResource;
+import com.sun.jersey.spi.inject.Injectable;
 import com.sun.jersey.spi.resource.InjectableProviderContext;
 import com.sun.jersey.spi.resource.ResourceClassInjector;
-import com.sun.jersey.spi.inject.Injectable;
 import com.sun.jersey.spi.resource.ResourceConstructor;
 import com.sun.jersey.spi.resource.ResourceProvider;
 import com.sun.jersey.spi.service.ComponentConstructor.ConstructorInjectablePair;
@@ -51,13 +51,13 @@ import com.sun.jersey.spi.service.ComponentProvider.Scope;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.List;
+import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.core.Context;
 
 /**
- *
- * @author mh124079
+ * A provider that maintains a per session resource class instance
  */
-public final class PerRequestProvider implements ResourceProvider {
+public final class PerSessionProvider implements ResourceProvider {
     @Context InjectableProviderContext ipc;
 
     private Class<?> c;
@@ -67,6 +67,7 @@ public final class PerRequestProvider implements ResourceProvider {
     private Constructor<?> constructor;
     
     private List<Injectable> constructorInjectableParams;
+
     
     public void init(ComponentProvider provider,
             AbstractResource abstractResource) {
@@ -77,7 +78,7 @@ public final class PerRequestProvider implements ResourceProvider {
                 
         ResourceConstructor rc = new ResourceConstructor(ipc);
         ConstructorInjectablePair<?> cip = rc.getConstructor(c, abstractResource, 
-                Scope.PerRequest);
+                Scope.Singleton);
         if (cip == null || cip.is.size() == 0) {
             this.constructor = null;
             this.constructorInjectableParams = null;
@@ -87,22 +88,27 @@ public final class PerRequestProvider implements ResourceProvider {
         }
     }
 
+    @Context HttpServletRequest hsr;
+    
     public Object getInstance(ComponentProvider provider, HttpContext context) {
+        Object o = hsr.getSession().getAttribute(c.getName());
+        if (o != null) return o;
+
         try {
-            Object o = null;
             if (constructor == null) {
-                o = provider.getInstance(Scope.PerRequest, c);
+                o = provider.getInstance(Scope.Singleton, c);
             } else {
                 final Object[] params = new Object[constructorInjectableParams.size()];
                 int index = 0;
                 for (Injectable i : constructorInjectableParams) {
                     params[index++] = (i != null) ? i.getValue(context) : null;
                 }
-                
-                o = provider.getInstance(Scope.PerRequest, 
+
+                o = provider.getInstance(Scope.Singleton,
                     constructor, params);
             }
             rci.inject(context, provider.getInjectableInstance(o));
+            hsr.getSession().setAttribute(c.getName(), o);
             return o;
         } catch (InstantiationException ex) {
             throw new ContainerException("Unable to create resource", ex);
@@ -114,10 +120,10 @@ public final class PerRequestProvider implements ResourceProvider {
                 // Rethrow the runtime exception
                 throw (RuntimeException)t;
             } else {
-                // TODO should a checked exception be wrapped in 
+                // TODO should a checked exception be wrapped in
                 // WebApplicationException ?
                 throw new ContainerException("Unable to create resource", t);
             }
-        }        
+        }
     }
 }
