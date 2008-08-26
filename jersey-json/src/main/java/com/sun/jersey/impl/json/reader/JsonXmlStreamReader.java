@@ -112,6 +112,7 @@ public class JsonXmlStreamReader implements XMLStreamReader {
     private static final Logger LOGGER = Logger.getLogger(JsonXmlStreamReader.class.getName());   
     
     boolean jsonRootUnwrapping;
+    String rootElementName;
 
     JsonLexer lexer;
     JsonToken lastToken;
@@ -146,18 +147,23 @@ public class JsonXmlStreamReader implements XMLStreamReader {
     int depth;
 
     public JsonXmlStreamReader(Reader reader) throws IOException {
-        this(reader, false);
+        this(reader, null);
+    }
+
+    public JsonXmlStreamReader(Reader reader, boolean stripRoot) throws IOException {
+        this(reader, stripRoot ? "rootElement" : null);
     }
     
-    public JsonXmlStreamReader(Reader reader, boolean jsonRootUnwrapping) throws IOException {
-        this.jsonRootUnwrapping = jsonRootUnwrapping;
+    public JsonXmlStreamReader(Reader reader, String rootElementName) throws IOException {
+        this.jsonRootUnwrapping = (rootElementName != null);
+        this.rootElementName = rootElementName;
         lexer = new JsonLexer(reader); 
         depth = 0;
         processingStack = new ArrayList<ProcessingState>();
         processingStack.add(new ProcessingState());
         readNext();
     }
-    
+
     void colon() throws IOException {
         JsonToken token = nextToken();
         if (token.tokenType != JsonToken.COLON) {
@@ -167,6 +173,7 @@ public class JsonXmlStreamReader implements XMLStreamReader {
     
     JsonToken nextToken() throws IOException {
         JsonToken result = lexer.yylex();
+        System.out.print(result);
         return result;
     }
     
@@ -204,7 +211,7 @@ public class JsonXmlStreamReader implements XMLStreamReader {
                         eventQueue.add(new StartDocumentEvent(new MyLocation(lexer)));
                         processingStack.get(depth).state = LaState.AFTER_OBJ_START_BRACE;
                         if (jsonRootUnwrapping) {
-                            processingStack.get(depth).lastName = "rootObject";
+                            processingStack.get(depth).lastName = this.rootElementName;
                             StartElementEvent event = generateSEEvent(processingStack.get(depth).lastName);
                             processingStack.get(depth).eventToReadAttributesFor = event;
                         }

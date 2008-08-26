@@ -39,6 +39,7 @@ package com.sun.jersey.impl.provider.entity;
 
 import com.sun.jersey.impl.ImplMessages;
 import com.sun.jersey.api.json.JSONJAXBContext;
+import com.sun.jersey.impl.json.JSONHelper;
 import com.sun.jersey.impl.json.JSONMarshaller;
 import com.sun.jersey.impl.json.JSONUnmarshaller;
 import com.sun.jersey.impl.json.reader.JsonXmlStreamReader;
@@ -95,7 +96,7 @@ public final class JSONJAXBElementProvider extends AbstractJAXBElementProvider {
                 return unmarshaller.unmarshal(source, ta);
             } else {
                 return (JAXBElement) unmarshaller.unmarshal(new JsonXmlStreamReader(
-                        new InputStreamReader(entityStream, getCharset(mediaType)), true), ta);
+                        new InputStreamReader(entityStream, getCharset(mediaType)), JSONHelper.getRootElementName(ta.getSimpleName())), ta);
             }
         } catch (JAXBException cause) {
             throw ThrowHelper.withInitCause(cause,

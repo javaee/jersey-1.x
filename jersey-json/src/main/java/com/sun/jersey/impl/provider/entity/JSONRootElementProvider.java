@@ -39,6 +39,7 @@ package com.sun.jersey.impl.provider.entity;
 
 import com.sun.jersey.impl.ImplMessages;
 import com.sun.jersey.api.json.JSONJAXBContext;
+import com.sun.jersey.impl.json.JSONHelper;
 import com.sun.jersey.impl.json.JSONMarshaller;
 import com.sun.jersey.impl.json.JSONUnmarshaller;
 import com.sun.jersey.impl.json.reader.JsonXmlStreamReader;
@@ -62,6 +63,7 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.transform.stream.StreamSource;
 
 /**
  *
@@ -93,7 +95,7 @@ public final class JSONRootElementProvider extends AbstractRootElementProvider {
                     return jaxbElem.getValue();
                 } else {
                     return unmarshaller.unmarshal(new JsonXmlStreamReader(
-                            new InputStreamReader(entityStream, getCharset(mediaType))));
+                            new InputStreamReader(entityStream, getCharset(mediaType)), JSONHelper.getRootElementName(type.getSimpleName())));
                 }
             } catch (JAXBException cause) {
                 throw ThrowHelper.withInitCause(cause,
@@ -101,8 +103,21 @@ public final class JSONRootElementProvider extends AbstractRootElementProvider {
                         );
             }
         } else {
-            throw new UnsupportedOperationException(
-                    "Classes annotated with @XmlType cannot unmarshalled from JSON documents");
+            try {
+                StreamSource source = new StreamSource(entityStream);
+                Unmarshaller unmarshaller = getUnmarshaller(type, mediaType);
+                if (unmarshaller instanceof JSONUnmarshaller) {
+                    unmarshaller.setProperty(JSONJAXBContext.JSON_ENABLED, Boolean.TRUE);
+                    return unmarshaller.unmarshal(source, type).getValue();
+                } else {
+                    return unmarshaller.unmarshal(
+                            new JsonXmlStreamReader(new InputStreamReader(source.getInputStream()), JSONHelper.getRootElementName(type.getSimpleName())), type).getValue();
+                }
+            } catch (JAXBException cause) {
+                throw ThrowHelper.withInitCause(cause,
+                        new IOException(ImplMessages.ERROR_UNMARSHALLING_JAXB(type))
+                        );
+            }                
         }
 
     }
@@ -123,7 +138,7 @@ public final class JSONRootElementProvider extends AbstractRootElementProvider {
                         new OutputStreamWriter(entityStream, getCharset(mediaType, UTF8)));
             } else {
                 marshaller.marshal(t, new JsonXmlStreamWriter(
-                        new OutputStreamWriter(entityStream, getCharset(mediaType, UTF8))));
+                        new OutputStreamWriter(entityStream, getCharset(mediaType, UTF8)), true));
             }
         } catch (JAXBException cause) {
             throw ThrowHelper.withInitCause(cause,

@@ -330,7 +330,7 @@ public class JSONUnmarshaller implements Unmarshaller {
     private XMLStreamReader createXmlStreamReader(Reader reader) {
         if (JSONJAXBContext.JSONNotation.MAPPED == this.jsonNotation) {
             try {
-                return new JsonXmlStreamReader(reader, this.jsonRootUnwrapping);
+                return new JsonXmlStreamReader(reader, this.jsonRootUnwrapping ? "rootElement" : null);
             } catch (IOException ex) {
                 Logger.getLogger(JSONUnmarshaller.class.getName()).log(Level.SEVERE, null, ex);
             }
