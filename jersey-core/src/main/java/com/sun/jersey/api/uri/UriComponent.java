@@ -394,21 +394,18 @@ public final class UriComponent {
         if (q == null || q.length() == 0)
             return queryParameters;
 
-        for (String s : q.split("&")) {
-            if (s.length() == 0)
-                continue;
-            
-            String[] keyVal = s.split("=");
+        for (String keyVal : q.split("&")) {
             try {
-                String key = (decode) ? URLDecoder.decode(keyVal[0], "UTF-8") : keyVal[0];
-                if (key.length() == 0)
-                    continue;
-                
-                // Query parameter may not have a value, if so default to "";
-                String val = (keyVal.length == 2) ?
-                    (decode) ? URLDecoder.decode(keyVal[1], "UTF-8") : keyVal[1] : "";
-                
-                queryParameters.add(key, val);
+                int equals = keyVal.indexOf('=');
+                if (equals > 0) {
+                    queryParameters.add(
+                            (decode) ? URLDecoder.decode(keyVal.substring(0, equals), "UTF-8") : keyVal.substring(0, equals),
+                            (decode) ? URLDecoder.decode(keyVal.substring(equals + 1), "UTF-8") : keyVal.substring(equals + 1));
+                } else if (equals == 0) {
+                    // no key declared, ignore
+                } else if (keyVal.length() > 0) {
+                    queryParameters.add((decode) ? URLDecoder.decode(keyVal, "UTF-8") : keyVal, "");
+                }
             } catch (UnsupportedEncodingException ex) {
                 // This should never occur
                 throw new IllegalArgumentException(ex);
@@ -509,24 +506,21 @@ public final class UriComponent {
     public static MultivaluedMap<String, String> decodeMatrix(String pathSegment, boolean decode) {
         MultivaluedMap<String, String> matrixMap = new MultivaluedMapImpl();
         
-        String[] ms = pathSegment.split(";");
-        for (int i = 1; i < ms.length; i++) {
-            String m = ms[i];
-            if (m.length() == 0)
-                continue;
-            
-            String[] keyVal = m.split("=");
-            String key = (decode)
-            ? UriComponent.decode(keyVal[0], UriComponent.Type.PATH_SEGMENT)
-            : keyVal[0];
-            if (key.length() == 0)
-                continue;
-            
-            // parameter may not have a value, if so default to "";
-            String val = (keyVal.length == 2) ?
-                (decode) ? UriComponent.decode(keyVal[1], UriComponent.Type.PATH_SEGMENT) : keyVal[1] : "";
-
-            matrixMap.add(key, val);
+        String[] keyVals = pathSegment.split(";");
+        for (int i = 1; i < keyVals.length; i++) {
+            String keyVal = keyVals[i];            
+            int equals = keyVal.indexOf('=');
+            if (equals > 0) {
+                matrixMap.add(
+                        (decode) ? UriComponent.decode(keyVal.substring(0, equals), UriComponent.Type.MATRIX_PARAM) : keyVal.substring(0, equals),
+                        (decode) ? UriComponent.decode(keyVal.substring(equals + 1), UriComponent.Type.MATRIX_PARAM) : keyVal.substring(equals + 1));
+            } else if (equals == 0) {
+                // no key declared, ignore
+            } else if (keyVal.length() > 0) {
+                matrixMap.add(
+                        (decode) ? UriComponent.decode(keyVal, UriComponent.Type.MATRIX_PARAM) : keyVal,
+                        "");
+            }
         }
         
         return matrixMap;

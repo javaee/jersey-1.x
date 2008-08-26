@@ -126,11 +126,40 @@ public class UriComponentDecodeTest extends TestCase {
         }
     }
     
-    public void testDecodeMatrix() {
-        _testDecodeMatrix("path;a", "path", "a", "");
+    public void testDecodeQuery() {
+        _testDecodeQuery("");
+        _testDecodeQuery("&");
+        _testDecodeQuery("=");
+        _testDecodeQuery("&=junk");
+        _testDecodeQuery("&&");
+        _testDecodeQuery("a", "a", "");
+        _testDecodeQuery("a&", "a", "");
+        _testDecodeQuery("a&&", "a", "");
+        _testDecodeQuery("a=", "a", "");
+        _testDecodeQuery("a=&", "a", "");
+        _testDecodeQuery("a=&&", "a", "");
+        _testDecodeQuery("a=x", "a", "x");
+        _testDecodeQuery("a==x", "a", "=x");
+        _testDecodeQuery("a=x&", "a", "x");
+        _testDecodeQuery("a=x&&", "a", "x");
+        _testDecodeQuery("a=x&b=y", "a", "x", "b", "y");
+        _testDecodeQuery("a=x&&b=y", "a", "x", "b", "y");
+    }
+    
+    private void _testDecodeQuery(String q, String... query) {
+        MultivaluedMap<String, String> queryParameters = UriComponent.decodeQuery(q, true);
 
+        assertEquals(query.length / 2, queryParameters.size());
+
+        for (int i = 0; i < query.length; i += 2)
+            assertEquals(query[i + 1], queryParameters.getFirst(query[i]));
+    }
+    
+    public void testDecodeMatrix() {
         _testDecodeMatrix("path", "path");
         _testDecodeMatrix("path;", "path");
+        _testDecodeMatrix("path;=", "path");
+        _testDecodeMatrix("path;=junk", "path");
         _testDecodeMatrix("path;;", "path");
         _testDecodeMatrix("path;a", "path", "a", "");
         _testDecodeMatrix("path;a;", "path", "a", "");
@@ -143,9 +172,12 @@ public class UriComponentDecodeTest extends TestCase {
         _testDecodeMatrix("path;a=x;;", "path", "a", "x");
         _testDecodeMatrix("path;a=x;b=y", "path", "a", "x", "b", "y");
         _testDecodeMatrix("path;a=x;;b=y", "path", "a", "x", "b", "y");
+        _testDecodeMatrix("path;a==x;", "path", "a", "=x");
         
         _testDecodeMatrix("", "");
         _testDecodeMatrix(";", "");
+        _testDecodeMatrix(";=", "");
+        _testDecodeMatrix(";=junk", "");
         _testDecodeMatrix(";;", "");
         _testDecodeMatrix(";a", "", "a", "");
         _testDecodeMatrix(";a;", "", "a", "");
@@ -154,6 +186,7 @@ public class UriComponentDecodeTest extends TestCase {
         _testDecodeMatrix(";a=;", "", "a", "");
         _testDecodeMatrix(";a=;;", "", "a", "");
         _testDecodeMatrix(";a=x", "", "a", "x");
+        _testDecodeMatrix(";a==x", "", "a", "=x");
         _testDecodeMatrix(";a=x;", "", "a", "x");
         _testDecodeMatrix(";a=x;;", "", "a", "x");
         _testDecodeMatrix(";a=x;b=y", "", "a", "x", "b", "y");
