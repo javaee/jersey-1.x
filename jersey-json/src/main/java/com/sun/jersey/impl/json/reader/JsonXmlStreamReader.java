@@ -173,7 +173,6 @@ public class JsonXmlStreamReader implements XMLStreamReader {
     
     JsonToken nextToken() throws IOException {
         JsonToken result = lexer.yylex();
-        System.out.print(result);
         return result;
     }
     
