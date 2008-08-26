@@ -55,7 +55,7 @@
             <artifactId>jersey-json</artifactId>
             <version>${project.version}</version>
         </dependency>
-         <dependency>
+        <dependency>
             <groupId>com.sun.grizzly</groupId>
             <artifactId>grizzly-servlet-webserver</artifactId>
             <version>1.8.3</version>
@@ -65,14 +65,14 @@
             <artifactId>jersey-client</artifactId>
             <version>${project.version}</version>
             <scope>test</scope>
-         </dependency>
-         <dependency>
+        </dependency>
+        <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
             <version>3.8.1</version>
             <scope>test</scope>
-          </dependency>
-     </dependencies>
+        </dependency>
+    </dependencies>
     <build>
         <plugins>
            <!--  Maven Exec Plug-In: http://mojo.codehaus.org/exec-maven-plugin/  -->
@@ -101,23 +101,23 @@
                 </configuration>
             </plugin>
             <plugin>
-              <artifactId>maven-assembly-plugin</artifactId>
-              <configuration>
-                <descriptors>
-                  <descriptor>src/main/assembly/src.xml</descriptor>
-                </descriptors>
-              </configuration>
-              <executions>
-                <execution>
-                  <id>make-assembly</id> <!-- this is used for inheritance merges -->
-                  <phase>package</phase> <!-- append to the packaging phase. -->
-                  <goals>
-                    <goal>attached</goal> <!-- goals == mojos -->
-                  </goals>
-                </execution>
-              </executions>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <configuration>
+                    <descriptors>
+                        <descriptor>src/main/assembly/src.xml</descriptor>
+                    </descriptors>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>make-assembly</id> <!-- this is used for inheritance merges -->
+                        <phase>package</phase> <!-- append to the packaging phase. -->
+                        <goals>
+                            <goal>attached</goal> <!-- goals == mojos -->
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
-         </plugins>
+        </plugins>
     </build>
     <repositories>
         <repository>
@@ -133,7 +133,7 @@
             <layout>legacy</layout>
         </repository>
     </repositories>
-     <distributionManagement>
+    <distributionManagement>
         <repository>
             <uniqueVersion>false</uniqueVersion>
             <id>java.net-m2-dist-repository</id>

@@ -45,27 +45,23 @@
     <name>Generate WADL - Jersey sample</name>
     <packaging>jar</packaging>
     
-    <dependencies>
-    
+    <dependencies>    
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
             <version>3.8.1</version>
             <scope>test</scope>
-        </dependency>
-        
+        </dependency>        
         <dependency>
             <groupId>com.sun.jersey</groupId>
             <artifactId>maven-wadl-plugin</artifactId>
             <version>${jersey-release-version}</version>
-        </dependency>
-        
+        </dependency>        
         <dependency>
             <groupId>org.codehaus.jettison</groupId>
             <artifactId>jettison</artifactId>
             <version>1.0.1</version>
         </dependency>
-        
     </dependencies>
     
     <build>
@@ -80,21 +76,21 @@
                 </configuration>
             </plugin>
             <plugin>
-              <artifactId>maven-assembly-plugin</artifactId>
-              <configuration>
-                <descriptors>
-                  <descriptor>src/main/assembly/src.xml</descriptor>
-                </descriptors>
-              </configuration>
-              <executions>
-                <execution>
-                  <id>make-assembly</id> <!-- this is used for inheritance merges -->
-                  <phase>package</phase> <!-- append to the packaging phase. -->
-                  <goals>
-                    <goal>attached</goal> <!-- goals == mojos -->
-                  </goals>
-                </execution>
-              </executions>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <configuration>
+                    <descriptors>
+                        <descriptor>src/main/assembly/src.xml</descriptor>
+                    </descriptors>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>make-assembly</id> <!-- this is used for inheritance merges -->
+                        <phase>package</phase> <!-- append to the packaging phase. -->
+                        <goals>
+                            <goal>attached</goal> <!-- goals == mojos -->
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
             <plugin>
                 <groupId>com.sun.tools.xjc.maven2</groupId>
@@ -119,7 +115,7 @@
                     <verbose>true</verbose>
                 </configuration>
             </plugin>
-            
+
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
@@ -128,12 +124,12 @@
                         <goals>
                             <goal>javadoc</goal>
                         </goals>
-                        <phase>compile</phase> 
+                        <phase>compile</phase>
                     </execution>
                 </executions>
 
                 <configuration>
-                
+
                     <encoding>UTF-8</encoding>
                     <verbose>false</verbose>
                     <show>public</show>
@@ -162,10 +158,10 @@
                         </docletArtifact>
                     </docletArtifacts>
                     <additionalparam>-output ${project.build.outputDirectory}/resourcedoc.xml -processors com.sun.jersey.samples.generatewadl.util.ExampleDocProcessor</additionalparam>
-                    
+
                 </configuration>
             </plugin>
-            
+
             <plugin>
                 <groupId>com.sun.jersey</groupId>
                 <artifactId>maven-wadl-plugin</artifactId>
@@ -176,12 +172,12 @@
                         <goals>
                             <goal>generate</goal>
                         </goals>
-                        <phase>compile</phase> 
+                        <phase>compile</phase>
                     </execution>
                 </executions>
-                
+
                 <configuration>
-                
+
                     <wadlFile>${project.build.outputDirectory}/application.wadl</wadlFile>
                     <formatWadlFile>true</formatWadlFile>
                     <baseUri>http://www.example.com/api</baseUri>
@@ -227,9 +223,9 @@
                         </wadlGeneratorDescription>
                     </wadlGenerators>
                 </configuration>
-                
+
             </plugin>
-            
+
             <!--  Maven Exec Plug-In: http://mojo.codehaus.org/exec-maven-plugin/  -->
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
@@ -248,11 +244,11 @@
             </plugin>
         </plugins>
     </build>
-    
+
     <properties>
         <jersey-release-version>0.10-ea-SNAPSHOT</jersey-release-version>
     </properties>
-    
+
     <profiles>
         <profile>
             <id>jdk15</id>
@@ -269,7 +265,7 @@
                     <groupId>com.sun.net.httpserver</groupId>
                     <artifactId>http</artifactId>
                     <version>20070405</version>
-                </dependency>                
+                </dependency>
             </dependencies>
             <build>
                 <plugins>
@@ -389,7 +385,7 @@
             <layout>legacy</layout>
         </pluginRepository>
     </pluginRepositories>
-     <repositories>
+    <repositories>
         <repository>
             <id>maven2-repository.dev.java.net</id>
             <url>http://download.java.net/maven/2</url>
@@ -401,7 +397,7 @@
             <layout>legacy</layout>
         </repository>
     </repositories>
-     <distributionManagement>
+    <distributionManagement>
         <repository>
             <uniqueVersion>false</uniqueVersion>
             <id>java.net-m2-dist-repository</id>

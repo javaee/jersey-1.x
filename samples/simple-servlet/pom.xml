@@ -34,27 +34,30 @@
  and therefore, elected the GPL Version 2 license, then the option applies
  only if the new code is made subject to such option by the copyright
  holder.
---><project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+-->
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.sun.jersey.samples</groupId>
     <version>0.10-ea-SNAPSHOT</version>
     <artifactId>simple-servlet</artifactId>
-    <packaging>war</packaging>
     <name>Simple Servlet - Jersey sample</name>
+    <packaging>war</packaging>
     <profiles>
-      <profile>
-        <id>jdk-1.5</id>
-        <activation>
-            <jdk>1.5</jdk>
-        </activation>
-        <dependencies>
-          <dependency>
-            <groupId>com.sun.xml.bind</groupId>
-            <artifactId>jaxb-impl</artifactId>
-            <version>2.1</version>
-          </dependency>
-        </dependencies>
-      </profile> 
+        <profile>
+            <id>jdk-1.5</id>
+            <activation>
+                <jdk>1.5</jdk>
+            </activation>
+            <dependencies>
+                <dependency>
+                    <groupId>com.sun.xml.bind</groupId>
+                    <artifactId>jaxb-impl</artifactId>
+                    <version>2.1</version>
+                </dependency>
+            </dependencies>
+        </profile> 
     </profiles>
     <dependencies>
         <dependency>
@@ -63,20 +66,20 @@
             <version>${project.version}</version>
         </dependency>
         <dependency>
-          <groupId>javax.servlet</groupId>
-          <artifactId>servlet-api</artifactId>
-          <version>2.4</version>
-          <scope>provided</scope>
+            <groupId>javax.servlet</groupId>
+            <artifactId>servlet-api</artifactId>
+            <version>2.4</version>
+            <scope>provided</scope>
         </dependency>
     </dependencies>
     <build>
         <finalName>simple-servlet</finalName>
         <resources>
-          <resource>
-            <directory>src/main/java</directory>            
-          </resource>
+            <resource>
+                <directory>src/main/java</directory>            
+            </resource>
         </resources>
-         <plugins>
+        <plugins>
             <plugin>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <inherited>true</inherited>
@@ -91,23 +94,23 @@
                 <artifactId>maven-glassfish-plugin</artifactId>
             </plugin>
             <plugin>
-              <artifactId>maven-assembly-plugin</artifactId>
-              <configuration>
-                <descriptors>
-                  <descriptor>src/main/assembly/src.xml</descriptor>
-                </descriptors>
-              </configuration>
-              <executions>
-                <execution>
-                  <id>make-assembly</id> <!-- this is used for inheritance merges -->
-                  <phase>package</phase> <!-- append to the packaging phase. -->
-                  <goals>
-                    <goal>attached</goal> <!-- goals == mojos -->
-                  </goals>
-                </execution>
-              </executions>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <configuration>
+                    <descriptors>
+                        <descriptor>src/main/assembly/src.xml</descriptor>
+                    </descriptors>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>make-assembly</id> <!-- this is used for inheritance merges -->
+                        <phase>package</phase> <!-- append to the packaging phase. -->
+                        <goals>
+                            <goal>attached</goal> <!-- goals == mojos -->
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
-         </plugins>
+        </plugins>
     </build>
     <pluginRepositories>
         <pluginRepository>
@@ -137,7 +140,7 @@
             <layout>legacy</layout>
         </repository>
     </repositories>
-     <properties>
+    <properties>
         <netbeans.hint.deploy.server>J2EE</netbeans.hint.deploy.server>
     </properties>
     <distributionManagement>

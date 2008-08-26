@@ -55,19 +55,18 @@
     </issueManagement>
     <mailingLists>
         <mailingList>
+            <name>Jersey Users List</name>
+            <archive>https://jersey.dev.java.net/servlets/SummarizeList?listName=users</archive>
+            <post>users@jersey.dev.java.net</post>
+            <otherArchives>
+                <otherArchive>http://markmail.org/search/?q=list%3Anet.java.dev.jersey.users</otherArchive>
+                <otherArchive>http://n2.nabble.com/Jersey-f576304.html</otherArchive>
+            </otherArchives>
+        </mailingList>
+        <mailingList>
             <name>Jersey Dev List</name>
             <archive>https://jersey.dev.java.net/servlets/SummarizeList?listName=dev</archive>
             <post>dev@jersey.dev.java.net</post>
-        </mailingList>
-        <mailingList>
-            <name>Jersey Support List</name>
-            <archive>https://jersey.dev.java.net/servlets/SummarizeList?listName=users</archive>
-            <post>users@jersey.dev.java.net</post>
-        </mailingList>
-        <mailingList>
-            <name>Jersey Announce List</name>
-            <archive>https://jersey.dev.java.net/servlets/SummarizeList?listName=announce</archive>
-            <post>announces@jersey.dev.java.net</post>
         </mailingList>
     </mailingLists>
     <licenses>

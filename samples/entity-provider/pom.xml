@@ -1,4 +1,4 @@
-<?xml version="1.0"?><project>
+<?xml version="1.0" encoding="UTF-8"?>
 <!--
 
  DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
@@ -35,28 +35,30 @@
  only if the new code is made subject to such option by the copyright
  holder.
 -->
-  <modelVersion>4.0.0</modelVersion>
-  <groupId>com.sun.jersey.samples</groupId>
-  <artifactId>entity-provider</artifactId>
-  <version>0.10-ea-SNAPSHOT</version>
-  <name>Entity provider -- Jersey sample</name>
-  <url>http://maven.apache.org</url>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>com.sun.jersey.samples</groupId>
+    <artifactId>entity-provider</artifactId>
+    <version>0.10-ea-SNAPSHOT</version>
+    <name>Entity provider -- Jersey sample</name>
     <profiles>
-      <profile>
-        <id>jdk-1.5</id>
-        <activation>
-            <jdk>1.5</jdk>
-        </activation>
-        <dependencies>
-          <dependency>
-            <groupId>com.sun.xml.bind</groupId>
-            <artifactId>jaxb-impl</artifactId>
-            <version>2.1</version>
-          </dependency>
-        </dependencies>
-      </profile> 
+        <profile>
+            <id>jdk-1.5</id>
+            <activation>
+                <jdk>1.5</jdk>
+            </activation>
+            <dependencies>
+                <dependency>
+                    <groupId>com.sun.xml.bind</groupId>
+                    <artifactId>jaxb-impl</artifactId>
+                    <version>2.1</version>
+                </dependency>
+            </dependencies>
+        </profile> 
     </profiles>
-  <dependencies>
+    <dependencies>
         <dependency>
             <groupId>com.sun.jersey</groupId>
             <artifactId>jersey-server</artifactId>
@@ -67,13 +69,13 @@
             <artifactId>grizzly-servlet-webserver</artifactId>
             <version>1.8.3</version>
         </dependency>
-     <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
-      <version>3.8.1</version>
-      <scope>test</scope>
-    </dependency>
-  </dependencies>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>3.8.1</version>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
     <build>
         <plugins>
            <!--  Maven Exec Plug-In: http://mojo.codehaus.org/exec-maven-plugin/  -->
@@ -102,23 +104,23 @@
                 </configuration>
             </plugin>
             <plugin>
-              <artifactId>maven-assembly-plugin</artifactId>
-              <configuration>
-                <descriptors>
-                  <descriptor>src/main/assembly/src.xml</descriptor>
-                </descriptors>
-              </configuration>
-              <executions>
-                <execution>
-                  <id>make-assembly</id> <!-- this is used for inheritance merges -->
-                  <phase>package</phase> <!-- append to the packaging phase. -->
-                  <goals>
-                    <goal>attached</goal> <!-- goals == mojos -->
-                  </goals>
-                </execution>
-              </executions>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <configuration>
+                    <descriptors>
+                        <descriptor>src/main/assembly/src.xml</descriptor>
+                    </descriptors>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>make-assembly</id> <!-- this is used for inheritance merges -->
+                        <phase>package</phase> <!-- append to the packaging phase. -->
+                        <goals>
+                            <goal>attached</goal> <!-- goals == mojos -->
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
-         </plugins>
+        </plugins>
     </build>
     <repositories>
         <repository>
@@ -134,7 +136,7 @@
             <layout>legacy</layout>
         </repository>
     </repositories>
-     <distributionManagement>
+    <distributionManagement>
         <repository>
             <uniqueVersion>false</uniqueVersion>
             <id>java.net-m2-dist-repository</id>

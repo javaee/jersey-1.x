@@ -68,7 +68,7 @@
             <artifactId>junit</artifactId>
             <version>3.8.1</version>
         </dependency>
-     </dependencies>
+    </dependencies>
     <build>
         <resources>
             <resource>
@@ -123,7 +123,7 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
                 <configuration>
-                  <excludePackageNames>com.sun.jersey.impl</excludePackageNames>
+                    <excludePackageNames>com.sun.jersey.impl</excludePackageNames>
                 </configuration>
                 <executions>
                     <execution>
