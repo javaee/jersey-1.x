@@ -38,7 +38,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.sun.jersey.samples</groupId>
   <artifactId>entity-provider</artifactId>
-  <version>0.9-ea-SNAPSHOT</version>
+  <version>0.10-ea-SNAPSHOT</version>
   <name>Entity provider -- Jersey sample</name>
   <url>http://maven.apache.org</url>
     <profiles>
