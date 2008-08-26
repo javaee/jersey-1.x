@@ -1,6 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<resources>
-  <jdbc-resource enabled="true" jndi-name="jdbc/bookmarkSample" object-type="user" pool-name="bookmarkPool">
-    <description>Bookmark sample jdbc resource</description>
-  </jdbc-resource>
-</resources>

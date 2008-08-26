@@ -41,8 +41,8 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.sun.jersey.samples</groupId>
     <artifactId>generate-wadl</artifactId>
-    <version>0.10-ea-SNAPSHOT</version>
-    <name>generate-wadl</name>
+    <version>0.9-ea-SNAPSHOT</version>
+    <name>Generate WADL - Jersey sample</name>
     <packaging>jar</packaging>
     
     <dependencies>
@@ -85,7 +85,6 @@
                 <descriptors>
                   <descriptor>src/main/assembly/src.xml</descriptor>
                 </descriptors>
-                <outputDirectory>assemblies</outputDirectory>
               </configuration>
               <executions>
                 <execution>
@@ -96,17 +95,6 @@
                   </goals>
                 </execution>
               </executions>
-            </plugin>
-            <plugin>
-              <artifactId>maven-clean-plugin</artifactId>
-              <configuration>
-                <filesets>
-                  <fileset>
-                    <directory>assemblies</directory>
-                    <followSymlinks>false</followSymlinks>
-                  </fileset>
-                </filesets>
-              </configuration>
             </plugin>
             <plugin>
                 <groupId>com.sun.tools.xjc.maven2</groupId>
@@ -262,7 +250,7 @@
     </build>
     
     <properties>
-        <jersey-release-version>0.10-ea-SNAPSHOT</jersey-release-version>
+        <jersey-release-version>0.9-ea-SNAPSHOT</jersey-release-version>
     </properties>
     
     <profiles>
@@ -389,7 +377,6 @@
             </build>
         </profile>
     </profiles>
-    
     <pluginRepositories>
         <pluginRepository>
             <id>maven2-repository.dev.java.net</id>
@@ -414,7 +401,6 @@
             <layout>legacy</layout>
         </repository>
     </repositories>
-
      <distributionManagement>
         <repository>
             <uniqueVersion>false</uniqueVersion>

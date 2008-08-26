@@ -1,0 +1,107 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML>
+<HEAD>
+	<META HTTP-EQUIV="CONTENT-TYPE" CONTENT="text/html; charset=iso-8859-1">
+	<TITLE>Getting Started</TITLE>
+	<META NAME="GENERATOR" CONTENT="StarOffice 8  (Solaris x86)">
+	<META NAME="CREATED" CONTENT="0;0">
+	<META NAME="CHANGED" CONTENT="20080822;14464000">
+</HEAD>
+<BODY LANG="en-US" DIR="LTR">
+<H1>Getting Started</H1>
+<P>Getting started with Jersey is very easy. First, it is necessary
+depend on the correct Jersey artifacts as described in the
+<A HREF="dependencies.html">dependences</A> document.</P>
+<P>Maven developers require a dependency on the <A HREF="http://download.java.net/maven/2/com/sun/jersey/jersey-server/0.9-ea-SNAPSHOT/jersey-server-0.9-ea-SNAPSHOT.pom">jersey-server</A>
+module, the <A HREF="http://download.java.net/maven/2/com/sun/grizzly/grizzly-servlet-webserver/1.8.3/grizzly-servlet-webserver-1.8.3.pom">grizzly-servlet-webserver</A>
+module and optionally for WADL support if using Java SE 5 the
+<A HREF="http://download.java.net/maven/1/com.sun.xml.bind/poms/jaxb-impl-2.1.pom">jaxb-impl</A>
+module.</P>
+<P>Non-maven developers require:</P>
+<BLOCKQUOTE><A HREF="http://download.java.net/maven/2/com/sun/grizzly/grizzly-servlet-webserver/1.8.3/grizzly-servlet-webserver-1.8.3.jar">grizzly-servlet-webserver.jar</A>,
+<A HREF="http://download.java.net/maven/2/com/sun/jersey/jersey-server/0.9-ea-SNAPSHOT/jersey-server-0.9-ea-SNAPSHOT.jar">jersey-server.jar</A>,
+<A HREF="http://download.java.net/maven/2/com/sun/jersey/jersey-core/0.9-ea-SNAPSHOT/jersey-core-0.9-ea-SNAPSHOT.jar">jersey-core.jar</A>,
+<A HREF="http://download.java.net/maven/2/javax/ws/rs/jsr311-api/0.9/jsr311-api-0.9.jar">jsr311-api.jar</A>,
+<A HREF="http://repo1.maven.org/maven2/asm/asm/3.1/asm-3.1.jar">asm.jar</A></BLOCKQUOTE>
+<P>and optionally for WADL support if using Java SE 5:</P>
+<BLOCKQUOTE><A HREF="http://download.java.net/maven/1/com.sun.xml.bind/jars/jaxb-impl-2.1.jar">jaxb-impl.jar</A>,
+<A HREF="http://download.java.net/maven/1/javax.xml.bind/jars/jaxb-api-2.1.jar">jaxb-api.jar</A>,
+<A HREF="http://download.java.net/maven/1/javax.activation/jars/activation-1.1.jar">activation.jar</A>,
+<A HREF="http://download.java.net/maven/1/javax.xml.stream/jars/stax-api-1.0-2.jar">stax-api.jar</A></BLOCKQUOTE>
+<P>Then, create a new project (using your favourite IDE or just
+ant/maven) and add the dependences. (For those who want to skip the
+creation of their own project take a look at the last <A HREF="#created">section</A>
+of this document.)</P>
+<H1>Creating a root resource</H1>
+<P>Create the following Java class in your project:</P>
+<PRE> 1    // The Java class will be hosted at the URI path &quot;/helloworld&quot;
+ 2    @Path(&quot;/helloworld&quot;)
+ 3    public class HelloWorldResource {
+ 4    
+ 5        // The Java method will process HTTP GET requests
+ 6        @GET 
+ 7        // The Java method will produce content identified by the MIME Media
+ 8        // type &quot;text/plain&quot;
+ 9        @Produces(&quot;text/plain&quot;)
+10        public String getClichedMessage() {
+11            // Return some cliched textual content
+12            return &quot;Hello World&quot;;
+13        }
+14    }</PRE><P>
+The <CODE>HelloWorldResource</CODE> class is a very simple Web
+resource. The URI path of the resource is &quot;/helloworld&quot;
+(line 2), it supports the HTTP GET method (line 6) and produces
+cliched textual content (line 12) of the MIME media type &quot;text/plain&quot;
+(line 9).</P>
+<P>Notice the use of Java annotations to declare the URI path, the
+HTTP method and the media type. This is a key feature of JSR 311.</P>
+<H1>Deploying the root resource</H1>
+<P>The root resource will be deployed using the Grizzly Web
+container.</P>
+<P>Create the following Java class in your project:</P>
+<PRE> 1    public class Main {
+ 2         
+ 3        public static void main(String[] args) throws IOException {
+ 4            
+ 5            final String baseUri = &quot;http://localhost:9998/&quot;;
+ 6            final Map&lt;String, String&gt; initParams = new HashMap&lt;String, String&gt;();
+ 7
+ 8            initParams.put(&quot;com.sun.jersey.config.property.packages&quot;, 
+ 9                    &quot;com.sun.jersey.samples.helloworld.resources&quot;);
+
+10
+11            System.out.println(&quot;Starting grizzly...&quot;);
+12            SelectorThread threadSelector = GrizzlyWebContainerFactory.create(
+13                    baseUri, initParams);
+14            System.out.println(String.format(
+15                    &quot;Jersey app started with WADL available at %sapplication.wadl\n&rdquo; + 
+16                    &ldquo;Try out %shelloworld\nHit enter to stop it...&quot;, baseUri, baseUri));
+17            System.in.read();
+18            threadSelector.stopEndpoint();
+19            System.exit(0);
+20        }    
+21    }
+</PRE><P>
+The <CODE>Main</CODE> class deploys the <CODE>HelloWorldResource</CODE>
+using the Grizzly Web container.</P>
+<P>Lines 8 to 9 creates an initialization parameter that informs the
+Jersey runtime where to search for root resource classes to be
+deployed. In this case it assumes the root resource class in the
+package <FONT FACE="Courier New, monospace">com.sun.jersey.samples.helloworld.resources</FONT>
+(or in a sub-package of).</P>
+<P>Lines 12 to 13 deploys the root resource to the base URI
+&ldquo;&quot;<A HREF="http://localhost:9998/">http://localhost:9998/</A>&rdquo;
+and returns a Grizzly SelectorThread. The complete URI of the Hello
+World root resource is &quot;http://localhost:9998/helloworld&quot;.</P>
+<P>Notice that no deployment descriptors were needed and the root
+resource was setup in a few statements of Java code.</P>
+<H1>Testing the root resource</H1>
+<P>Goto the URI <A HREF="http://localhost:9998/helloworld">http://localhost:9998/helloworld</A>
+in your favourite browser.</P>
+<P>Or, from the command line use <CODE>curl:</CODE></P>
+<PRE STYLE="margin-bottom: 0.2in"><CODE>    &gt; curl http://localhost:9998/helloworld</CODE></PRE><H1>
+<A NAME="created"></A>Here's one I created earlier</H1>
+<P>The example code presented above is shipped as the <A HREF="http://download.java.net/maven/2/com/sun/jersey/samples/helloworld/0.9-ea-SNAPSHOT/helloworld-0.9-ea-SNAPSHOT-project.zip">HelloWorld</A>
+sample in the Java.Net maven repo.</P>
+</BODY>
+</HTML>

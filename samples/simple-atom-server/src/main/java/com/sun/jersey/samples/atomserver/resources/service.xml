@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<service xmlns="http://purl.org/atom/app#"
+         xmlns:atom="http://www.w3.org/2005/Atom">
+    <workspace>
+        <atom:title>Service</atom:title>
+        <collection href="REPLACE" >
+            <atom:title>Entries</atom:title>
+            <categories>
+                <atom:category
+                    term="storage" scheme="urn:storage" label="storage"/>
+            </categories>
+        </collection>
+    </workspace>
+</service>

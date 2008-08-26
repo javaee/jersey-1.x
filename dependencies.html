@@ -1,0 +1,208 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML>
+<HEAD>
+	<META HTTP-EQUIV="CONTENT-TYPE" CONTENT="text/html; charset=iso-8859-1">
+	<TITLE>Dependencies</TITLE>
+	<META NAME="GENERATOR" CONTENT="StarOffice 8  (Solaris x86)">
+	<META NAME="CREATED" CONTENT="0;0">
+	<META NAME="CHANGED" CONTENT="20080822;14513500">
+</HEAD>
+<BODY LANG="en-US" DIR="LTR">
+<H1>Dependencies</H1>
+<P>Jersey is built, assembled and installed using Maven. Jersey is
+deployed to the Java.Net maven repo at the following location:</P>
+<BLOCKQUOTE><A HREF="http://download.java.net/maven/2/com/sun/jersey">http://download.java.net/maven/2/com/sun/jersey</A></BLOCKQUOTE>
+<P>Jars, Jar sources and Jar JavaDoc and samples are all at the maven
+repo. A zip file containing all maven-based samples can be obtained
+<A HREF="http://download.java.net/maven/2/com/sun/jersey/samples/jersey-samples/0.9-ea-SNAPSHOT/jersey-samples-0.9-ea-SNAPSHOT-project.zip">here</A>.
+Individual zip files for each sample may be found by browsing the
+<A HREF="http://download.java.net/maven/2/com/sun/jersey/samples/">samples</A>
+directory. For getting started with a simple example please read the
+<A HREF="getting-started.html">getting started</A> document.</P>
+<P>An application depending on Jersey requires that it in turn
+includes the set of jars that Jersey depends on. Jersey has a
+pluggable component architecture so the set of jars required to be
+include in the class path can be different for each application. 
+</P>
+<P>Developers using maven are likely to find it easier to include and
+manage dependencies of their applications than developers using ant
+or other build technologies. This document will explain to both maven
+and non-maven developers how to depend on Jersey for their
+application. For the convenience of non-maven developers a jersey
+bundle is provided to avoid the dependency management of multiple
+jersey-based jars.</P>
+<P>Jersey's runtime dependences are categorized into the following:</P>
+<UL>
+	<LI><P>Core server. The minimum set of dependences that Jersey
+	requires for the server.</P>
+	<LI><P>Core client. The minimum set of dependences that Jersey
+	requires for the client.</P>
+	<LI><P>Container. The set of container dependences. Each container
+	provider has it's own set of dependences.</P>
+	<LI><P>Entity. The set of entity dependencies. Each entity provider
+	has it's own set of dependences.</P>
+	<LI><P>Tools. The set of dependencies required for runtime tooling.</P>
+</UL>
+<P>All dependences are referenced by hyper-links</P>
+<H2>Core server</H2>
+<P>Maven developers require a dependency on the <A HREF="http://download.java.net/maven/2/com/sun/jersey/jersey-server/0.9-ea-SNAPSHOT/jersey-server-0.9-ea-SNAPSHOT.pom">jersey-server</A>
+module.</P>
+<P>Non-maven developers require: 
+</P>
+<BLOCKQUOTE><A HREF="http://download.java.net/maven/2/com/sun/jersey/jersey-server/0.9-ea-SNAPSHOT/jersey-server-0.9-ea-SNAPSHOT.jar">jersey-server.jar</A>,
+<A HREF="http://download.java.net/maven/2/com/sun/jersey/jersey-core/0.9-ea-SNAPSHOT/jersey-core-0.9-ea-SNAPSHOT.jar">jersey-core.jar</A>,
+<A HREF="http://download.java.net/maven/2/javax/ws/rs/jsr311-api/0.9/jsr311-api-0.9.jar">jsr311-api.jar</A>,
+<A HREF="http://repo1.maven.org/maven2/asm/asm/3.1/asm-3.1.jar">asm.jar</A></BLOCKQUOTE>
+<BLOCKQUOTE STYLE="margin-left: 0in; margin-right: 0in">or, if using
+the jersey-bundle:</BLOCKQUOTE>
+<BLOCKQUOTE><A NAME="DDE_LINK2"></A><A HREF="http://download.java.net/maven/2/com/sun/jersey/jersey-bundle/0.9-ea-SNAPSHOT/jersey-bundle-0.9-ea-SNAPSHOT.jar">jersey-bundle.jar</A>,
+<A HREF="http://download.java.net/maven/2/javax/ws/rs/jsr311-api/0.9/jsr311-api-0.9.jar">jsr311-api.jar</A>,
+<A HREF="http://repo1.maven.org/maven2/asm/asm/3.1/asm-3.1.jar">asm.jar</A></BLOCKQUOTE>
+<BLOCKQUOTE STYLE="margin-left: 0in; margin-right: 0in">Specifically
+the <A HREF="http://repo1.maven.org/maven2/asm/asm/3.1/asm-3.1.jar">asm.jar</A>
+dependency is required when either of the following
+<CODE>com.sun.jersey.api.core.ResourceConfig</CODE> implementations
+are utilized: 
+</BLOCKQUOTE>
+<UL>
+	<LI><P><CODE>com.sun.jersey.api.core.ClasspathResourceConfig</CODE>;
+	or</P>
+	<LI><P><CODE>com.sun.jersey.api.core.PackagesResourceConfig</CODE></P>
+</UL>
+<P>By default Jersey will utilize the <CODE>ClasspathResourceConfig</CODE>
+if an alternative is not specified. If an alternative is specified
+that does not depend on asm-3.1.jar then it is no longer necessary to
+include asm-3.1.jar in the minimum set of required jars.</P>
+<H2>Core client</H2>
+<P>Maven developers require a dependency on the <A HREF="http://download.java.net/maven/2/com/sun/jersey/jersey-client/0.9-ea-SNAPSHOT/jersey-client-0.9-ea-SNAPSHOT.pom">jersey-client</A>
+module.</P>
+<P>Non-maven developers require: 
+</P>
+<BLOCKQUOTE><A HREF="http://download.java.net/maven/2/com/sun/jersey/jersey-client/0.9-ea-SNAPSHOT/jersey-client-0.9-ea-SNAPSHOT.jar">jersey-client.jar</A>,
+<A HREF="http://download.java.net/maven/2/com/sun/jersey/jersey-core/0.9-ea-SNAPSHOT/jersey-core-0.9-ea-SNAPSHOT.jar">jersey-core.jar</A>,
+<A HREF="http://download.java.net/maven/2/javax/ws/rs/jsr311-api/0.9/jsr311-api-0.9.jar">jsr311-api.jar</A></BLOCKQUOTE>
+<BLOCKQUOTE STYLE="margin-left: 0in; margin-right: 0in">or, if using
+the jersey-bundle:</BLOCKQUOTE>
+<BLOCKQUOTE><A HREF="http://download.java.net/maven/2/com/sun/jersey/jersey-bundle/0.9-ea-SNAPSHOT/jersey-bundle-0.9-ea-SNAPSHOT.jar">jersey-bundle.jar</A>,
+<A HREF="http://download.java.net/maven/2/javax/ws/rs/jsr311-api/0.9/jsr311-api-0.9.jar">jsr311-api.jar</A></BLOCKQUOTE>
+<H2>Container</H2>
+<H3>Grizzly HTTP Web server</H3>
+<P><A NAME="DDE_LINK1"></A><A NAME="DDE_LINK5"></A>Maven developers,
+deploying an application using the Grizzly HTTP Web server, require a
+dependency on the <A HREF="http://download.java.net/maven/2/com/sun/grizzly/grizzly-servlet-webserver/1.8.3/grizzly-servlet-webserver-1.8.3.pom">grizzly-servlet-webserver</A>
+module.</P>
+<P>Non-maven developers require:</P>
+<BLOCKQUOTE><A NAME="DDE_LINK4"></A><A HREF="http://download.java.net/maven/2/com/sun/grizzly/grizzly-servlet-webserver/1.8.3/grizzly-servlet-webserver-1.8.3.jar">grizzly-servlet-webserver.jar</A></BLOCKQUOTE>
+<H3>Light weight HTTP server</H3>
+<P><A NAME="DDE_LINK3"></A>Maven developers, using Java SE 5 and
+deploying an application using the light weight HTTP server, require
+a dependency on the <A HREF="http://download.java.net/maven/2/com/sun/net/httpserver/http/20070405/http-20070405.pom">http</A>
+module.</P>
+<P>Non-maven developers require:</P>
+<BLOCKQUOTE><A HREF="http://download.java.net/maven/2/com/sun/net/httpserver/http/20070405/http-20070405.jar">http.jar</A></BLOCKQUOTE>
+<P>Deploying an application using the light weight HTTP server with
+Java SE 6 requires no additional dependences.</P>
+<H3>Servlet</H3>
+<P>Deploying an application on a servlet container requires a
+deployment dependency with that container.</P>
+<P>Using servlet:</P>
+<BLOCKQUOTE><FONT FACE="Courier New, monospace">com.sun.jersey.spi.container.servlet.ServletContainer</FONT></BLOCKQUOTE>
+<P>requires no additional dependences.</P>
+<P>Maven developers using servlet:</P>
+<BLOCKQUOTE><FONT FACE="Courier New, monospace">com.sun.ws.rest.impl.container.servlet.ServletAdaptor</FONT></BLOCKQUOTE>
+<P>in a non-EE 5 servlet require a dependency on the <A HREF="http://download.java.net/maven/1/javax.persistence/poms/persistence-api-1.0.2.pom">persistence-api</A>
+module.</P>
+<P>Non-Maven developers require:</P>
+<BLOCKQUOTE><A HREF="http://download.java.net/maven/1/javax.persistence/jars/persistence-api-1.0.2.jar">persistence-api.jar</A></BLOCKQUOTE>
+<H2>Entity</H2>
+<H3>JAXB</H3>
+<P>XML serialization support of Java types that are JAXB beans
+requires a dependency on the JAXB reference implementation version
+2.1.x or higher. Deploying an application for XML serialization
+support using JAXB with Java SE 6 requires no additional dependences.</P>
+<P>Maven developers, using Java SE 5, require a dependency on the
+<A HREF="http://download.java.net/maven/1/com.sun.xml.bind/poms/jaxb-impl-2.1.pom">jaxb-impl</A>
+module.</P>
+<P>Non-maven developers require:</P>
+<BLOCKQUOTE><A HREF="http://download.java.net/maven/1/com.sun.xml.bind/jars/jaxb-impl-2.1.jar">jaxb-impl.jar</A>,
+<A HREF="http://download.java.net/maven/1/javax.xml.bind/jars/jaxb-api-2.1.jar">jaxb-api.jar</A>,
+<A HREF="http://download.java.net/maven/1/javax.activation/jars/activation-1.1.jar">activation.jar</A>,
+<A HREF="http://download.java.net/maven/1/javax.xml.stream/jars/stax-api-1.0-2.jar">stax-api.jar</A></BLOCKQUOTE>
+<P>Maven developers, using JSON serialization support of JAXB beans
+when using the MIME media type &quot;application/json&quot; require a
+dependency on the <A HREF="http://download.java.net/maven/2/com/sun/jersey/jersey-json/0.9-ea-SNAPSHOT/jersey-json-0.9-ea-SNAPSHOT.pom">jersey-json</A>
+module (no dependency on jaxb-impl is required).</P>
+<P>Non-maven developers require:</P>
+<BLOCKQUOTE><A HREF="http://repo1.maven.org/maven2/org/codehaus/jettison/jettison/1.0.1/jettison-1.0.1.jar">jettison.jar</A>,
+<A HREF="http://download.java.net/maven/1/com.sun.xml.bind/jars/jaxb-impl-2.1.jar">jaxb-impl.jar</A>,
+<A HREF="http://download.java.net/maven/1/javax.xml.bind/jars/jaxb-api-2.1.jar">jaxb-api.jar</A>,
+<A HREF="http://download.java.net/maven/1/javax.activation/jars/activation-1.1.jar">activation.jar</A>,
+<A HREF="http://download.java.net/maven/1/javax.xml.stream/jars/stax-api-1.0-2.jar">stax-api.jar</A></BLOCKQUOTE>
+<BLOCKQUOTE STYLE="margin-left: 0in; margin-right: 0in">and
+additionally, if not depending on the <A HREF="http://download.java.net/maven/2/com/sun/jersey/jersey-bundle/0.9-ea-SNAPSHOT/jersey-bundle-0.9-ea-SNAPSHOT.jar">jersey-bundle.jar</A>,
+non-maven developers require:</BLOCKQUOTE>
+<BLOCKQUOTE><A HREF="http://download.java.net/maven/2/com/sun/jersey/jersey-json/0.9-ea-SNAPSHOT/jersey-json-0.9-ea-SNAPSHOT.pom">jersey-json.jar</A></BLOCKQUOTE>
+<H3>Atom</H3>
+<P>The use of the Java types <FONT FACE="Courier New, monospace">com.sun.syndication.feed.atom.Entry</FONT>
+and <FONT FACE="Courier New, monospace">com.sun.syndication.feed.atom.Feed</FONT>
+requires a dependency on ROME version 0.9 or higher.</P>
+<P>Maven developers require a dependency on the <A HREF="http://download.java.net/maven/1/rome/poms/rome-0.9.pom">rome</A>
+module.</P>
+<P>Non-maven developers require:</P>
+<BLOCKQUOTE><A HREF="http://download.java.net/maven/1/rome/jars/rome-0.9.jar">rome.jar</A>,
+<A HREF="http://repo1.maven.org/maven2/jdom/jdom/1.0/jdom-1.0.jar">jdom.jar</A></BLOCKQUOTE>
+<BLOCKQUOTE STYLE="margin-left: 0in; margin-right: 0in">and
+additionally, if not depending on the <A HREF="http://download.java.net/maven/2/com/sun/jersey/jersey-bundle/0.9-ea-SNAPSHOT/jersey-bundle-0.9-ea-SNAPSHOT.jar">jersey-bundle.jar</A>,
+non-maven developers require:</BLOCKQUOTE>
+<BLOCKQUOTE><A HREF="http://download.java.net/maven/2/com/sun/jersey/jersey-atom/0.9-ea-SNAPSHOT/jersey-atom-0.9-ea-SNAPSHOT.jar">jersey-atom.jar</A></BLOCKQUOTE>
+<H3>JSON</H3>
+<P>The use of the Java types <FONT FACE="Courier New, monospace">org.codehaus.jettison.json.JSONObject</FONT>
+and <FONT FACE="Courier New, monospace">org.codehaus.jettison.json.JSONArray</FONT>
+requires Jettison version 1.0 RC1 or higher.</P>
+<P>Maven developers require a dependency on the <A HREF="http://download.java.net/maven/2/com/sun/jersey/jersey-json/0.9-ea-SNAPSHOT/jersey-json-0.9-ea-SNAPSHOT.pom">jersey-json</A>
+module.</P>
+<P>Non-maven developers require:</P>
+<BLOCKQUOTE><A HREF="http://repo1.maven.org/maven2/org/codehaus/jettison/jettison/1.0.1/jettison-1.0.1.jar">jettison.jar</A></BLOCKQUOTE>
+<BLOCKQUOTE STYLE="margin-left: 0in; margin-right: 0in">and
+additionally, if not depending on the <A HREF="http://download.java.net/maven/2/com/sun/jersey/jersey-bundle/0.9-ea-SNAPSHOT/jersey-bundle-0.9-ea-SNAPSHOT.jar">jersey-bundle.jar</A>,
+non-maven developers require:</BLOCKQUOTE>
+<BLOCKQUOTE><A HREF="http://download.java.net/maven/2/com/sun/jersey/jersey-json/0.9-ea-SNAPSHOT/jersey-json-0.9-ea-SNAPSHOT.pom">jersey-json.jar</A></BLOCKQUOTE>
+<H3>Mail</H3>
+<P>The use of the Java type <FONT FACE="Courier New, monospace">javax.mail.internet.MimeMultipart</FONT>
+with Java SE 5 or 6 requires Java Mail version 1.4 or higher.</P>
+<P>Maven developers require a dependency on the <A HREF="http://download.java.net/maven/1/javax.mail/poms/mail-1.4.pom">java-mail</A>
+module.</P>
+<P>Non-maven developers require:</P>
+<BLOCKQUOTE><A NAME="DDE_LINK"></A><A HREF="http://download.java.net/maven/1/javax.mail/jars/mail-1.4.jar">mail.jar</A>,
+<A HREF="http://download.java.net/maven/1/javax.activation/jars/activation-1.1.jar">activation.jar</A></BLOCKQUOTE>
+<P>The use of the Java type <FONT FACE="Courier New, monospace">javax.mail.internet.MimeMultipart</FONT>
+with Java EE 5 requires no additional dependencies.</P>
+<H3>Activation</H3>
+<P>The use of the Java type <FONT FACE="Courier New, monospace">javax.activation.DataSource</FONT>
+with Java SE 5 requires Java Activation 1.1 or higher.</P>
+<P>Maven developers require a dependency on the <A HREF="http://download.java.net/maven/1/javax.activation/poms/activation-1.1.pom">activation</A>
+module.</P>
+<P>Non-maven developers require:</P>
+<BLOCKQUOTE><A HREF="http://download.java.net/maven/1/javax.activation/jars/activation-1.1.jar">activation.jar</A></BLOCKQUOTE>
+<P>The use of the Java type <FONT FACE="Courier New, monospace">javax.activation.DataSource</FONT>
+with Java SE 6 and Java EE 5 requires no additional dependencies.</P>
+<H2>Tools</H2>
+<P>By default WADL for resource classes is generated dynamically at
+runtime. WADL support requires a dependency on the JAXB reference
+implementation version 2.1.x or higher. Deploying an application for
+WADL support with Java SE 6 requires no additional dependences.</P>
+<P>Maven developers, using Java SE 5, require a dependency on the
+<A HREF="http://download.java.net/maven/1/com.sun.xml.bind/poms/jaxb-impl-2.1.pom">jaxb-impl</A>
+module.</P>
+<P>Non-maven developers require:</P>
+<BLOCKQUOTE><A HREF="http://download.java.net/maven/1/com.sun.xml.bind/jars/jaxb-impl-2.1.jar">jaxb-impl.jar</A>,
+<A HREF="http://download.java.net/maven/1/javax.xml.bind/jars/jaxb-api-2.1.jar">jaxb-api.jar</A>,
+<A HREF="http://download.java.net/maven/1/javax.activation/jars/activation-1.1.jar">activation.jar</A>,
+<A HREF="http://download.java.net/maven/1/javax.xml.stream/jars/stax-api-1.0-2.jar">stax-api.jar</A>
+</BLOCKQUOTE>
+<P>If the above dependencies are not present then WADL generation is
+disabled and a warning will be logged.</P>
+<P>The WADL ant task requires the same set of dependences as those
+for runtime WADL support.</P>
+</BODY>
+</HTML>

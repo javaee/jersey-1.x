@@ -22,14 +22,11 @@
 
 package com.sun.jersey.samples.helloworld;
 
-import java.io.IOException;
-
 import com.sun.grizzly.http.SelectorThread;
 import com.sun.jersey.api.container.grizzly.*;
 import com.sun.jersey.impl.container.grizzly.*;
 import java.util.*;
-//import com.sun.net.httpserver.HttpHandler;
-//import com.sun.net.httpserver.HttpServer;
+import java.io.IOException;
 
 public class Main {
     
@@ -43,10 +40,9 @@ public class Main {
 
         System.out.println("Starting grizzly...");
         SelectorThread threadSelector = GrizzlyWebContainerFactory.create(baseUri, initParams);
-        System.out.println(String.format("Jersey app started at %s", baseUri));
-        System.out.println(String.format("Try out %shelloworld", baseUri, baseUri));
+        System.out.println(String.format("Jersey app started with WADL available at %sapplication.wadl\nTry out %shelloworld\nHit enter to stop it...", baseUri, baseUri));
         System.in.read();
-        threadSelector.stop();
+        threadSelector.stopEndpoint();
         System.exit(0);
     }    
 }

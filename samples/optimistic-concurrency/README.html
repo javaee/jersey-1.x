@@ -1,0 +1,110 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head><title>Optimistic Concurrency Example</title></head>
+
+
+  <body>
+    <h1>Optimistic Concurrency Example</h1>
+    <p>This example demonstrates how to apply optimistic concurrency
+        to a web resource. 
+        <a href="http://en.wikipedia.org/wiki/Optimistic_concurrency_control">Optimistic
+        concurrency control</a> prevents the locking of a web resource that will be updated,
+        ensuring that other users can concurrently access or update that web resource. The clients must resolve any conflict 
+        reported by the server. This ensures that clients cannot overwrite
+        each other's changes to that web resource.
+    </p>
+    <p>This example follows a design like the one in the 
+        <a href="http://code.google.com/apis/gdata/reference.html#Optimistic-concurrency">Google Data API</a>
+        for the update of Atom entries.
+    </p>
+    
+    <h2>Contents</h2>
+    <p>The example consists of two web resources implemented by the following:
+        </p><dl>
+            <dt><code>com.sun.jersey.samples.optimisticconcurrency.resources.ItemResource</code></dt>
+            <dd>This resource class provides meta-data information on the URIs to content resources 
+                that can be read and updated. JAXB is used to represent the meta-data as an XML document.
+                The resource references the ItemContentResource resource using the 
+                Path annotation declared on the ItemResource.getItemContentResource method.
+            </dd>
+            <dt><code>com.sun.jersey.samples.optimisticconcurrency.resources.ItemContentResource</code></dt>
+            <dd>This resource class provides read and update ccess to the content. In this example, the
+                content is stored in memory as a byte array and is not persisted to a 
+                file system or database.
+                Update occurs using a sub-resource that implements the PUT method.
+            </dd>
+        </dl>
+    <p>The mapping of the URI path space is presented in the following table:</p>
+	<table border="1">
+	<tr>
+	<th>URI path</th>
+	<th>Resource class</th>
+	<th>HTTP methods</th>
+	</tr>
+	<tr>
+	<td>/item</td>
+	<td>ItemResource</td>
+	<td>GET</td>
+	</tr>
+	<tr>
+	<td>/item/content</td>
+	<td>ItemContentResource</td>
+	<td>GET</td>
+	</tr>
+	<tr>
+	<td>/item/content/{version}</td>
+	<td>ItemContentResource</td>
+	<td>PUT</td>
+	</tr>
+	</table>
+    <h2>Running the Example</h2>
+        <p>Run the example as follows:</p>
+        <blockquote><pre>
+mvn clean compile exec:java</pre></blockquote>
+        <p>This deploys the Optimistic Concurrency example using 
+            <a href="https://grizzly.dev.java.net/">Grizzly</a>
+        </p>
+        <p>A <a href="http://wadl.dev.java.net/#spec">WADL description</a> may be accessed at the URL:</p>
+        <blockquote><code><a href="http://127.0.0.1:9998/occ/application.wadl">http://127.0.0.1:9998/occ/application.wadl</a></code></blockquote>
+       <p>Following steps are using <a href="http://curl.haxx.se/">cURL</a> command line tool: 
+        <p>Get the item meta-data:</p>
+        <blockquote><pre>curl http://127.0.0.1:9998/occ/item</pre></blockquote>
+        <p>This returns the following XML document:</p>
+        <blockquote><pre>&lt;item&gt;
+    &lt;mediaType&gt;text/plain&lt;/mediaType&gt;
+    &lt;updateUri&gt;http://127.0.0.1:9998/occ/item/content/0&lt;/updateUri&gt;
+    &lt;uri&gt;http://127.0.0.1:9998/occ/item/content&lt;/uri&gt;
+&lt;/item&gt;</pre></blockquote>
+        <p>The URI to obtain the content is within the <code>uri</code> element.</p>
+        <p>Get the content:</p>
+        <blockquote><pre>curl http://127.0.0.1:9998/occ/item/content</pre></blockquote>
+        <p>This will return the following text:</p>
+        <blockquote><pre>Today is the first day of the REST of my life</pre></blockquote>
+        <p>Update the content:</p>
+        <blockquote><pre>curl -i -X PUT --data "All play and no REST makes me a dull boy" -HContent-type:text/plain http://127.0.0.1:9998/occ/item/content/0</pre></blockquote>
+        <p>The content is updated by PUTing to the URI within the <code>updateUri</code>
+            element of the XML document.
+        </p>
+        <p>Get the item meta-data:</p>
+        <blockquote><pre>curl http://127.0.0.1:9998/occ/item</pre></blockquote>
+        <p>This returns the following XML document:</p>
+        <blockquote><pre>&lt;?xml version="1.0" encoding="UTF-8" standalone="yes"?&gt;
+&lt;item&gt;
+    &lt;mediaType&gt;text/plain&lt;/mediaType&gt;
+    &lt;updateUri&gt;<b>http://127.0.0.1:9998/occ/item/content/1</b>&lt;/updateUri&gt;
+    &lt;uri&gt;http://127.0.0.1:9998/occ/item/content&lt;/uri&gt;
+&lt;/item&gt;</pre></blockquote>
+        <p>The update URI has now changed. 
+            Clients updating using the previous URI receive a <code>409 Conflict</code> 
+            in response.
+        </p>
+        <p>Repeating the initial update fails:</p>
+        <blockquote><pre>curl -i -X PUT --data "All play and no REST makes me a dull boy" -HContent-type:text/plain http://127.0.0.1:9998/occ/item/content/0</pre></blockquote>
+        <p>With:
+        <blockquote><pre>HTTP/1.1 409 Conflict
+server: grizzly/1.8.1
+Content-Type: text/plain
+Transfer-Encoding: chunked
+Date: Tue, 19 Aug 2008 09:52:51 GMT
+
+Conflict</pre></blockquote>
+  </body></html>

@@ -34,23 +34,54 @@
  and therefore, elected the GPL Version 2 license, then the option applies
  only if the new code is made subject to such option by the copyright
  holder.
--->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+--><project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.sun.jersey.samples</groupId>
     <artifactId>jersey-samples</artifactId>
-    <version>0.10-ea-SNAPSHOT</version>
+    <version>0.9-ea-SNAPSHOT</version>
     <packaging>pom</packaging>
-    <name>Jersey samples</name>
+    <name>All Jersey samples</name>
     <description>
         Samples that show how to use jersey.
     </description>
     <modules>
+        <module>bookstore</module>
+        <module>bookmark</module>
+        <module>entity-provider</module>
+        <module>generate-wadl</module>
         <module>helloworld</module>
         <module>helloworld-webapp</module>
-        <module>generate-wadl</module>
-    </modules>
-    <distributionManagement>
+        <module>jmaki-backend</module>
+        <module>json-from-jaxb</module>
+        <module>mandel</module>
+        <module>optimistic-concurrency</module>
+        <module>simple-atom-server</module>
+        <module>simple-console</module>
+        <module>simple-servlet</module>
+        <module>storage-service</module>
+  </modules>
+  <build>
+    <plugins>
+            <plugin>
+              <artifactId>maven-assembly-plugin</artifactId>
+              <configuration>
+                <descriptors>
+                  <descriptor>assembly.xml</descriptor>
+                </descriptors>
+              </configuration>
+              <executions>
+                <execution>
+                  <id>make-assembly</id> <!-- this is used for inheritance merges -->
+                  <phase>package</phase> <!-- append to the packaging phase. -->
+                  <goals>
+                    <goal>attached</goal> <!-- goals == mojos -->
+                  </goals>
+                </execution>
+              </executions>
+            </plugin>
+         </plugins>
+      </build>
+     <distributionManagement>
         <repository>
             <uniqueVersion>false</uniqueVersion>
             <id>java.net-m2-dist-repository</id>
