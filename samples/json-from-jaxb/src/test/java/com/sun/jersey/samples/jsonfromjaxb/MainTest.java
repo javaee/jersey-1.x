@@ -78,7 +78,7 @@ public class MainTest extends TestCase {
     public void testMain() throws Exception {
             ClientConfig cc = new DefaultClientConfig();
             // use the following jaxb context resolver
-            cc.getProviderClasses().add(JAXBContextResolver.class);
+            cc.getClasses().add(JAXBContextResolver.class);
             Client c = Client.create(cc);
             
             WebResource wr = c.resource(Main.baseUri);

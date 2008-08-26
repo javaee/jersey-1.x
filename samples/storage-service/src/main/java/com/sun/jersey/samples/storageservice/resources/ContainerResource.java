@@ -121,7 +121,7 @@ public class ContainerResource {
     } 
     
     
-    @Path(value="{item}", limited=false)
+    @Path("{item: .+}")
     public ItemResource getItemResource(@PathParam("item") String item) {
         return new ItemResource(uriInfo, request, container, item);
     }

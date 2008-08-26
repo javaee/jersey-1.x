@@ -80,7 +80,7 @@ public class BookmarksResource {
         return userResource.getUserEntity().getBookmarkEntityCollection();
     }
     
-    @Path(value = "{bmid}", limited = false)
+    @Path("{bmid: .+}")
     public BookmarkResource getBookmark(@PathParam("bmid") String bmid) {
         return new BookmarkResource(uriInfo, em, 
                 userResource.getUserEntity(), bmid);
