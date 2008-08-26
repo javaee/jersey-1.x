@@ -37,6 +37,9 @@
 package com.sun.jersey.impl.uri;
 
 import com.sun.jersey.api.uri.UriComponent;
+import java.util.List;
+import javax.ws.rs.core.MultivaluedMap;
+import javax.ws.rs.core.PathSegment;
 import junit.framework.*;
 
 /**
@@ -101,5 +104,70 @@ public class UriComponentDecodeTest extends TestCase {
         } catch (IllegalArgumentException e) {
             return true;
         }
+    }
+
+    public void testDecodePath() {
+        _testDecodePath("", "");
+        _testDecodePath("/", "");
+        _testDecodePath("a", "a");
+        _testDecodePath("/a", "a");
+        _testDecodePath("/a/", "a");
+        
+        _testDecodePath("a/b/c", "a", "b", "c");
+        _testDecodePath("a//b//c//", "a", "b", "c");
+    }
+    
+    private void _testDecodePath(String path, String... segments) {
+        List<PathSegment> ps = UriComponent.decodePath(path, true);
+        assertEquals(segments.length, ps.size());
+
+        for (int i = 0; i < segments.length; i++) {
+            assertEquals(segments[i], ps.get(i).getPath());
+        }
+    }
+    
+    public void testDecodeMatrix() {
+        _testDecodeMatrix("path;a", "path", "a", "");
+
+        _testDecodeMatrix("path", "path");
+        _testDecodeMatrix("path;", "path");
+        _testDecodeMatrix("path;;", "path");
+        _testDecodeMatrix("path;a", "path", "a", "");
+        _testDecodeMatrix("path;a;", "path", "a", "");
+        _testDecodeMatrix("path;a;;", "path", "a", "");
+        _testDecodeMatrix("path;a=", "path", "a", "");
+        _testDecodeMatrix("path;a=;", "path", "a", "");
+        _testDecodeMatrix("path;a=;;", "path", "a", "");
+        _testDecodeMatrix("path;a=x", "path", "a", "x");
+        _testDecodeMatrix("path;a=x;", "path", "a", "x");
+        _testDecodeMatrix("path;a=x;;", "path", "a", "x");
+        _testDecodeMatrix("path;a=x;b=y", "path", "a", "x", "b", "y");
+        _testDecodeMatrix("path;a=x;;b=y", "path", "a", "x", "b", "y");
+        
+        _testDecodeMatrix("", "");
+        _testDecodeMatrix(";", "");
+        _testDecodeMatrix(";;", "");
+        _testDecodeMatrix(";a", "", "a", "");
+        _testDecodeMatrix(";a;", "", "a", "");
+        _testDecodeMatrix(";a;;", "", "a", "");
+        _testDecodeMatrix(";a=", "", "a", "");
+        _testDecodeMatrix(";a=;", "", "a", "");
+        _testDecodeMatrix(";a=;;", "", "a", "");
+        _testDecodeMatrix(";a=x", "", "a", "x");
+        _testDecodeMatrix(";a=x;", "", "a", "x");
+        _testDecodeMatrix(";a=x;;", "", "a", "x");
+        _testDecodeMatrix(";a=x;b=y", "", "a", "x", "b", "y");
+        _testDecodeMatrix(";a=x;;b=y", "", "a", "x", "b", "y");        
+    }
+    
+    private void _testDecodeMatrix(String path, String pathSegment, String... matrix) {
+        List<PathSegment> ps = UriComponent.decodePath(path, true);
+        MultivaluedMap<String, String> matrixParameters = ps.get(0).getMatrixParameters();
+
+        assertEquals(pathSegment, ps.get(0).getPath());
+        assertEquals(matrix.length / 2, matrixParameters.size());
+
+        for (int i = 0; i < matrix.length; i += 2)
+            assertEquals(matrix[i + 1], matrixParameters.getFirst(matrix[i]));
     }
 }

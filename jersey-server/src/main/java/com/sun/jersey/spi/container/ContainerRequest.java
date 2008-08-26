@@ -272,12 +272,12 @@ public class ContainerRequest implements HttpRequestContext {
             if (decodedPathSegments != null)
                 return decodedPathSegments;
             
-            return decodedPathSegments = extractPathSegments(getPath(false), true);
+            return decodedPathSegments = UriComponent.decodePath(getPath(false), true);
         } else {
             if (encodedPathSegments != null)
                 return encodedPathSegments;
             
-            return encodedPathSegments = extractPathSegments(getPath(false), false);
+            return encodedPathSegments = UriComponent.decodePath(getPath(false), false);
         }
     }
     
@@ -569,98 +569,4 @@ public class ContainerRequest implements HttpRequestContext {
     public String getAuthenticationScheme() {
         throw new UnsupportedOperationException();
     }
-    
-    //
-    
-    private static final class PathSegmentImpl implements PathSegment {
-        private String path;
-        
-        private MultivaluedMap<String, String> matrixParameters;
-        
-        PathSegmentImpl(String path, MultivaluedMap<String, String> matrixParameters) {
-            this.path = path;
-            this.matrixParameters = matrixParameters;
-        }
-        
-        public String getPath() {
-            return path;
-        }
-        
-        public MultivaluedMap<String, String> getMatrixParameters() {
-            return matrixParameters;
-        }
-    }
-    
-    /**
-     * Extract the path segments from the path
-     * TODO: This is not very efficient
-     */
-    private List<PathSegment> extractPathSegments(String path, boolean decode) {
-        List<PathSegment> pathSegments = new LinkedList<PathSegment>();
-        
-        if (path == null)
-            return pathSegments;
-        
-        // TODO the extraction algorithm requires an absolute path
-        if (!path.startsWith("/")) {
-            path = "/" + path;
-        }
-        
-        String[] subPaths = path.split("/");
-        if (subPaths.length == 0) {
-            PathSegment pathSegment = new PathSegmentImpl("", new MultivaluedMapImpl());
-            pathSegments.add(pathSegment);
-            return pathSegments;
-        }
-        
-        for (String subPath : subPaths) {
-            if (subPath.length() == 0)
-                continue;
-            
-            MultivaluedMap<String, String> matrixMap = new MultivaluedMapImpl();
-            int colon = subPath.indexOf(';');
-            if (colon != -1) {
-                String matrixParameters = subPath.substring(colon + 1);
-                subPath = (colon == 0) ? "" : subPath.substring(0, colon);
-                extractPathParameters(matrixParameters, ";", matrixMap, decode);
-            }
-            
-            if (decode)
-                subPath = UriComponent.decode(subPath, UriComponent.Type.PATH_SEGMENT);
-            
-            PathSegment pathSegment = new PathSegmentImpl(subPath, matrixMap);
-            pathSegments.add(pathSegment);
-        }
-        
-        return pathSegments;
-    }
-    
-    /**
-     * TODO: This is not very efficient
-     */
-    private void extractPathParameters(String parameters, String deliminator,
-            MultivaluedMap<String, String> map, boolean decode) {
-        for (String s : parameters.split(deliminator)) {
-            if (s.length() == 0)
-                continue;
-            
-            String[] keyVal = s.split("=");
-            String key = (decode)
-            ? UriComponent.decode(keyVal[0], UriComponent.Type.PATH_SEGMENT)
-            : keyVal[0];
-            if (key.length() == 0)
-                continue;
-            
-            // parameter may not have a value, if so default to "";
-            String val = (keyVal.length == 2) ?
-                (decode) ? UriComponent.decode(keyVal[1], UriComponent.Type.PATH_SEGMENT) : keyVal[1] : "";
-            
-            List<String> list = map.get(key);
-            if (map.get(key) == null) {
-                list = new LinkedList<String>();
-                map.put(key, list);
-            }
-            list.add(val);
-        }
-    }    
 }

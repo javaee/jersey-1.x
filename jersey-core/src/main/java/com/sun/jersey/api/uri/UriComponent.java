@@ -45,8 +45,10 @@ import java.nio.CharBuffer;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.List;
 import javax.ws.rs.core.MultivaluedMap;
+import javax.ws.rs.core.PathSegment;
 
 /**
  * Utility class for validating, encoding and decoding components
@@ -364,9 +366,11 @@ public final class UriComponent {
         
     /**
      * Decode the query component of a URI.
+     * <p>
+     * TODO the implementation is not very efficient.
      * 
      * @param u the URI.
-     * @param decode true of the query parameters of the query component
+     * @param decode true if the query parameters of the query component
      *        should be in decoded form.
      * @return the multivalued map of query parameters.
      */
@@ -413,7 +417,121 @@ public final class UriComponent {
         
         return queryParameters;
     }
+     
+    private static final class PathSegmentImpl implements PathSegment {
+        private final String path;
+        
+        private final MultivaluedMap<String, String> matrixParameters;
+        
+        PathSegmentImpl(String path, MultivaluedMap<String, String> matrixParameters) {
+            this.path = path;
+            this.matrixParameters = matrixParameters;
+        }
+        
+        public String getPath() {
+            return path;
+        }
+        
+        public MultivaluedMap<String, String> getMatrixParameters() {
+            return matrixParameters;
+        }
+    }
+    
+    /**
+     * Decode the path component of a URI as path segments.
+     * <p>
+     * TODO the implementation is not very efficient.
+     * 
+     * @param u the URI.
+     * @param decode true if the path segments of the path component
+     *        should be in decoded form.
+     * @return the list of path segments.
+     */
+    public static List<PathSegment> decodePath(URI u, boolean decode) {
+        return decodePath(u.getRawPath(), decode);
+    }
+
+    /**
+     * Decode the path component of a URI as path segments.
+     * <p>
+     * TODO the implementation is not very efficient.
+     * 
+     * @param path the path component in encoded form.
+     * @param decode true if the path segments of the path component
+     *        should be in decoded form.
+     * @return the list of path segments.
+     */
+    public static List<PathSegment> decodePath(String path, boolean decode) {
+        List<PathSegment> pathSegmentsList = new LinkedList<PathSegment>();
+        
+        if (path == null)
+            return pathSegmentsList;
+        
+        String[] pathSegments = path.split("/");
+        if (path.length() == 0 || pathSegments.length == 0) {
+            PathSegment pathSegment = new PathSegmentImpl("", new MultivaluedMapImpl());
+            pathSegmentsList.add(pathSegment);
+            return pathSegmentsList;
+        }
+        
+        for (String pathSegment : pathSegments) {
+            if (pathSegment.length() == 0)
+                continue;
             
+            MultivaluedMap<String, String> matrixMap = null;
+            int colon = pathSegment.indexOf(';');
+            if (colon != -1) {
+                matrixMap = decodeMatrix(pathSegment, decode);
+                pathSegment = (colon == 0) ? "" : pathSegment.substring(0, colon);
+            } else {
+                matrixMap = new MultivaluedMapImpl();                
+            }
+            
+            if (decode)
+                pathSegment = UriComponent.decode(pathSegment, UriComponent.Type.PATH_SEGMENT);
+            
+            pathSegmentsList.add(new PathSegmentImpl(pathSegment, matrixMap));
+        }
+        
+        return pathSegmentsList;
+    }
+    
+    /**
+     * Decode the matrix component of a URI path segment.
+     * <p>
+     * TODO the implementation is not very efficient.
+     * 
+     * @param pathSegment the path segment component in encoded form.
+     * @param decode true if the matrix parameters of the path segment component
+     *        should be in decoded form.
+     * @return the multivalued map of matrix parameters.
+     */
+    public static MultivaluedMap<String, String> decodeMatrix(String pathSegment, boolean decode) {
+        MultivaluedMap<String, String> matrixMap = new MultivaluedMapImpl();
+        
+        String[] ms = pathSegment.split(";");
+        for (int i = 1; i < ms.length; i++) {
+            String m = ms[i];
+            if (m.length() == 0)
+                continue;
+            
+            String[] keyVal = m.split("=");
+            String key = (decode)
+            ? UriComponent.decode(keyVal[0], UriComponent.Type.PATH_SEGMENT)
+            : keyVal[0];
+            if (key.length() == 0)
+                continue;
+            
+            // parameter may not have a value, if so default to "";
+            String val = (keyVal.length == 2) ?
+                (decode) ? UriComponent.decode(keyVal[1], UriComponent.Type.PATH_SEGMENT) : keyVal[1] : "";
+
+            matrixMap.add(key, val);
+        }
+        
+        return matrixMap;
+    }        
+    
     private static String decode(String s, int n) {
 	final StringBuilder sb = new StringBuilder(n);
 	ByteBuffer bb = ByteBuffer.allocate(1);
