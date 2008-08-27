@@ -284,11 +284,11 @@ public class AllInjectablesTest extends AbstractResourceTester {
             int i = 0;
         }
         
-        public boolean isWriteable(Class<?> arg0, Type arg1, Annotation[] arg2) {
+        public boolean isWriteable(Class<?> arg0, Type arg1, Annotation[] arg2, MediaType mediaType) {
             return arg0 == String.class;
         }
 
-        public long getSize(String arg0) {
+        public long getSize(String arg0, Class<?> type, Type genericType, Annotation annotations[], MediaType mediaType) {
             return -1;
         }
 
@@ -354,11 +354,11 @@ public class AllInjectablesTest extends AbstractResourceTester {
             assertNotNull(p);
         }                
         
-        public boolean isWriteable(Class<?> arg0, Type arg1, Annotation[] arg2) {
+        public boolean isWriteable(Class<?> arg0, Type arg1, Annotation[] arg2, MediaType mediaType) {
             return arg0 == String.class;
         }
 
-        public long getSize(String arg0) {
+        public long getSize(String arg0, Class<?> type, Type genericType, Annotation annotations[], MediaType mediaType) {
             return -1;
         }
 
@@ -401,11 +401,11 @@ public class AllInjectablesTest extends AbstractResourceTester {
             assertTrue(false);
         }                
         
-        public boolean isWriteable(Class<?> arg0, Type arg1, Annotation[] arg2) {
+        public boolean isWriteable(Class<?> arg0, Type arg1, Annotation[] arg2, MediaType mediaType) {
             return arg0 == String.class;
         }
 
-        public long getSize(String arg0) {
+        public long getSize(String arg0, Class<?> type, Type genericType, Annotation annotations[], MediaType mediaType) {
             return -1;
         }
 
@@ -455,11 +455,11 @@ public class AllInjectablesTest extends AbstractResourceTester {
             assertTrue(false);
         }                
         
-        public boolean isWriteable(Class<?> arg0, Type arg1, Annotation[] arg2) {
+        public boolean isWriteable(Class<?> arg0, Type arg1, Annotation[] arg2, MediaType mediaType) {
             return arg0 == String.class;
         }
 
-        public long getSize(String arg0) {
+        public long getSize(String arg0, Class<?> type, Type genericType, Annotation annotations[], MediaType mediaType) {
             return -1;
         }
 
@@ -500,11 +500,11 @@ public class AllInjectablesTest extends AbstractResourceTester {
             assertTrue(false);
         }                
         
-        public boolean isWriteable(Class<?> arg0, Type arg1, Annotation[] arg2) {
+        public boolean isWriteable(Class<?> arg0, Type arg1, Annotation[] arg2, MediaType mediaType) {
             return arg0 == String.class;
         }
 
-        public long getSize(String arg0) {
+        public long getSize(String arg0, Class<?> type, Type genericType, Annotation annotations[], MediaType mediaType) {
             return -1;
         }
 
@@ -625,11 +625,11 @@ public class AllInjectablesTest extends AbstractResourceTester {
             }
         }
         
-        public boolean isWriteable(Class<?> arg0, Type arg1, Annotation[] arg2) {
+        public boolean isWriteable(Class<?> arg0, Type arg1, Annotation[] arg2, MediaType mediaType) {
             return arg0 == String.class;
         }
 
-        public long getSize(String arg0) {
+        public long getSize(String arg0, Class<?> type, Type genericType, Annotation annotations[], MediaType mediaType) {
             return -1;
         }
 

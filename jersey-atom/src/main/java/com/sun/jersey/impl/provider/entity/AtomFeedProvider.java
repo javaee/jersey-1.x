@@ -66,7 +66,7 @@ public final class AtomFeedProvider extends AbstractMessageReaderWriterProvider<
         Class<?> c = Feed.class;        
     }
     
-    public boolean isReadable(Class<?> type, Type genericType, Annotation annotations[]) {
+    public boolean isReadable(Class<?> type, Type genericType, Annotation annotations[], MediaType mediaType) {
         return type == Feed.class;
     }
 
@@ -91,7 +91,7 @@ public final class AtomFeedProvider extends AbstractMessageReaderWriterProvider<
         }
     }
 
-    public boolean isWriteable(Class<?> type, Type genericType, Annotation annotations[]) {
+    public boolean isWriteable(Class<?> type, Type genericType, Annotation annotations[], MediaType mediaType) {
         return type == Feed.class;
     }
     

@@ -262,12 +262,11 @@ public final class Client extends Filterable implements ClientHandler {
                 return bodyContext.getMessageBodyWriter(c, t, as, m);
             }
 
-            public <T> ExceptionMapper<T> getExceptionMapper(Class<T> c) {
+            public <T extends Throwable> ExceptionMapper<T> getExceptionMapper(Class<T> c) {
                 throw new IllegalArgumentException("This method is not supported on the client side");
             }
 
-            public <T> ContextResolver<T> getContextResolver(Class<T> ct, 
-                    Class<?> ot, MediaType m) {
+            public <T> ContextResolver<T> getContextResolver(Class<T> ct, MediaType m) {
                 return crf.resolve(ct, m);
             }
         };

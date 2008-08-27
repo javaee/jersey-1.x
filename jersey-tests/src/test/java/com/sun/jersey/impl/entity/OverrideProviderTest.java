@@ -70,7 +70,7 @@ public class OverrideProviderTest extends AbstractResourceTester {
     @Produces("text/plain")
     @Consumes("text/plain")    
     public static class StringProvider extends AbstractMessageReaderWriterProvider<String> {
-        public boolean isReadable(Class<?> type, Type genericType, Annotation annotations[]) {
+        public boolean isReadable(Class<?> type, Type genericType, Annotation annotations[], MediaType mediaType) {
             return type == String.class;
         }
 
@@ -85,7 +85,7 @@ public class OverrideProviderTest extends AbstractResourceTester {
             return s.toUpperCase();
         }
 
-        public boolean isWriteable(Class<?> type, Type genericType, Annotation annotations[]) {
+        public boolean isWriteable(Class<?> type, Type genericType, Annotation annotations[], MediaType mediaType) {
             return type == String.class;
         }
     
@@ -120,7 +120,7 @@ public class OverrideProviderTest extends AbstractResourceTester {
     @Produces("application/xml")
     @Consumes("application/xml")
     public static class JAXBBeanProvider extends AbstractMessageReaderWriterProvider<JAXBBean> {
-        public boolean isReadable(Class<?> type, Type genericType, Annotation annotations[]) {
+        public boolean isReadable(Class<?> type, Type genericType, Annotation annotations[], MediaType mediaType) {
             return JAXBBean.class.isAssignableFrom(type);
         }
 
@@ -135,7 +135,7 @@ public class OverrideProviderTest extends AbstractResourceTester {
             return new JAXBBean(s);
         }
 
-        public boolean isWriteable(Class<?> type, Type genericType, Annotation annotations[]) {
+        public boolean isWriteable(Class<?> type, Type genericType, Annotation annotations[], MediaType mediaType) {
             return JAXBBean.class.isAssignableFrom(type);
         }
     

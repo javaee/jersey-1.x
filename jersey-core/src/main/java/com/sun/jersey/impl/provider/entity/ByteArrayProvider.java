@@ -56,7 +56,7 @@ public final class ByteArrayProvider extends AbstractMessageReaderWriterProvider
         return type == byte[].class;
     }
 
-    public boolean isReadable(Class<?> type, Type genericType, Annotation annotations[]) {
+    public boolean isReadable(Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType) {
         return type == byte[].class;        
     }
     
@@ -72,7 +72,7 @@ public final class ByteArrayProvider extends AbstractMessageReaderWriterProvider
         return out.toByteArray();
     }
 
-    public boolean isWriteable(Class<?> type, Type genericType, Annotation annotations[]) {
+    public boolean isWriteable(Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType) {
         return type == byte[].class;        
     }
     
@@ -88,7 +88,7 @@ public final class ByteArrayProvider extends AbstractMessageReaderWriterProvider
     }
     
     @Override
-    public long getSize(byte[] t) {
+    public long getSize(byte[] t, Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType) {
         return t.length;
     }
 }

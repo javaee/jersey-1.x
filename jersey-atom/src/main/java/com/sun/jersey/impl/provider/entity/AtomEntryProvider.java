@@ -71,7 +71,7 @@ public final class AtomEntryProvider extends AbstractMessageReaderWriterProvider
         Class<?> c = Entry.class;        
     }
     
-    public boolean isReadable(Class<?> type, Type genericType, Annotation annotations[]) {
+    public boolean isReadable(Class<?> type, Type genericType, Annotation annotations[], MediaType mediaType) {
         return type == Entry.class;
     }
 
@@ -95,7 +95,7 @@ public final class AtomEntryProvider extends AbstractMessageReaderWriterProvider
         }
     }
 
-    public boolean isWriteable(Class<?> type, Type genericType, Annotation annotations[]) {
+    public boolean isWriteable(Class<?> type, Type genericType, Annotation annotations[], MediaType mediaType) {
         return type == Entry.class;        
     }
     

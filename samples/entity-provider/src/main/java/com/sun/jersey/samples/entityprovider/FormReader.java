@@ -80,7 +80,7 @@ import javax.ws.rs.ext.Provider;
 @Provider
 public class FormReader implements MessageBodyReader<NameValuePair> {
     
-    public boolean isReadable(Class<?> type, Type genericType, Annotation[] annotations) {
+    public boolean isReadable(Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType) {
         return type.equals(NameValuePair.class);
     }
 

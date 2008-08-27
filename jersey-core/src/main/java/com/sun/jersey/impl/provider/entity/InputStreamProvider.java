@@ -52,7 +52,7 @@ import javax.ws.rs.core.MultivaluedMap;
  */
 public final class InputStreamProvider extends AbstractMessageReaderWriterProvider<InputStream> {
     
-    public boolean isReadable(Class<?> type, Type genericType, Annotation annotations[]) {
+    public boolean isReadable(Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType) {
         return InputStream.class == type;
     }
     
@@ -66,12 +66,12 @@ public final class InputStreamProvider extends AbstractMessageReaderWriterProvid
         return entityStream;
     }
 
-    public boolean isWriteable(Class<?> type, Type genericType, Annotation annotations[]) {
+    public boolean isWriteable(Class<?> type, Type genericType, Annotation annotations[], MediaType mediaType) {
         return InputStream.class.isAssignableFrom(type);        
     }
     
     @Override
-    public long getSize(InputStream t) {
+    public long getSize(InputStream t, Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType) {
         if (t instanceof ByteArrayInputStream)
             return ((ByteArrayInputStream)t).available();
         else 

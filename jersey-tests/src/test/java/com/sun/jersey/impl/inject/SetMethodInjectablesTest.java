@@ -75,11 +75,11 @@ public class SetMethodInjectablesTest extends AbstractResourceTester {
     @Provider
     public static class StringWriter implements MessageBodyWriter<String> {
 
-        public boolean isWriteable(Class<?> arg0, Type arg1, Annotation[] arg2) {
+        public boolean isWriteable(Class<?> arg0, Type arg1, Annotation[] arg2, MediaType mediaType) {
             return arg0 == String.class;
         }
 
-        public long getSize(String arg0) {
+        public long getSize(String arg0, Class<?> type, Type genericType, Annotation annotations[], MediaType mediaType) {
             return -1;
         }
 

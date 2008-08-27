@@ -57,7 +57,7 @@ public class DataSourceProvider extends AbstractMessageReaderWriterProvider<Data
         Class<?> c = DataSource.class;
     }
     
-    public boolean isReadable(Class<?> type, Type genericType, Annotation annotations[]) {
+    public boolean isReadable(Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType) {
         return DataSource.class == type;
     }
     
@@ -73,7 +73,7 @@ public class DataSourceProvider extends AbstractMessageReaderWriterProvider<Data
         return ds;
     }
 
-    public boolean isWriteable(Class<?> type, Type genericType, Annotation annotations[]) {
+    public boolean isWriteable(Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType) {
         return DataSource.class.isAssignableFrom(type);        
     }
     

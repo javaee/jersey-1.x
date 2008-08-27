@@ -58,7 +58,7 @@ public final class MimeMultipartProvider extends AbstractMessageReaderWriterProv
         Class<?> c = MimeMultipart.class;
     }
     
-    public boolean isReadable(Class<?> type, Type genericType, Annotation annotations[]) {
+    public boolean isReadable(Class<?> type, Type genericType, Annotation annotations[], MediaType mediaType) {
         return type == MimeMultipart.class;        
     }
     
@@ -81,7 +81,7 @@ public final class MimeMultipartProvider extends AbstractMessageReaderWriterProv
         }
     }
 
-    public boolean isWriteable(Class<?> type, Type genericType, Annotation annotations[]) {
+    public boolean isWriteable(Class<?> type, Type genericType, Annotation annotations[], MediaType mediaType) {
         return type == MimeMultipart.class;        
     }
     

@@ -52,11 +52,11 @@ import javax.ws.rs.ext.MessageBodyWriter;
  */
 public final class StreamingOutputProvider implements MessageBodyWriter<StreamingOutput> {
 
-    public boolean isWriteable(Class<?> t, Type gt, Annotation[] as) {
+    public boolean isWriteable(Class<?> t, Type gt, Annotation[] as, MediaType mediaType) {
         return StreamingOutput.class.isAssignableFrom(t);
     }
 
-    public long getSize(StreamingOutput o) {
+    public long getSize(StreamingOutput o, Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType) {
         return -1;
     }
 

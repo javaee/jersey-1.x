@@ -60,7 +60,8 @@ import javax.ws.rs.core.MultivaluedMap;
 @Produces({"application/x-www-form-urlencoded", "*/*"})
 @Consumes({"application/x-www-form-urlencoded", "*/*"})
 public final class FormProvider extends AbstractMessageReaderWriterProvider<Form> {
-    public boolean isReadable(Class<?> type, Type genericType, Annotation annotations[]) {
+    
+    public boolean isReadable(Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType) {
         return type == Form.class;
     }
     
@@ -89,7 +90,7 @@ public final class FormProvider extends AbstractMessageReaderWriterProvider<Form
         return map;
     }
 
-    public boolean isWriteable(Class<?> type, Type genericType, Annotation annotations[]) {
+    public boolean isWriteable(Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType) {
         return type == Form.class;
     }
     

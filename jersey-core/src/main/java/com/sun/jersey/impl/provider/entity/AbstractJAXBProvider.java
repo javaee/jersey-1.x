@@ -78,15 +78,15 @@ public abstract class AbstractJAXBProvider<T> extends AbstractMessageReaderWrite
     public AbstractJAXBProvider(Providers ps, MediaType mt) {
         this.ps = ps;
         
-        this.context = ps.getContextResolver(JAXBContext.class, null, null);
-        this.unmarshaller = ps.getContextResolver(Unmarshaller.class, null, null);
-        this.marshaller = ps.getContextResolver(Marshaller.class, null, null);
+        this.context = ps.getContextResolver(JAXBContext.class, null);
+        this.unmarshaller = ps.getContextResolver(Unmarshaller.class, null);
+        this.marshaller = ps.getContextResolver(Marshaller.class, null);
         
         fixedMediaType = mt != null;
         if (mt != null) {
-            this.mtContext = ps.getContextResolver(JAXBContext.class, null, mt);
-            this.mtUnmarshaller = ps.getContextResolver(Unmarshaller.class, null, mt);
-            this.mtMarshaller = ps.getContextResolver(Marshaller.class, null, mt);            
+            this.mtContext = ps.getContextResolver(JAXBContext.class, mt);
+            this.mtUnmarshaller = ps.getContextResolver(Unmarshaller.class, mt);
+            this.mtMarshaller = ps.getContextResolver(Marshaller.class, mt);            
         } else {
             this.mtContext = null;
             this.mtUnmarshaller = null;
@@ -98,7 +98,7 @@ public abstract class AbstractJAXBProvider<T> extends AbstractMessageReaderWrite
         if (fixedMediaType)
             return getUnmarshaller(type);
         
-        final ContextResolver<Unmarshaller> uncr = ps.getContextResolver(Unmarshaller.class, null, mt);            
+        final ContextResolver<Unmarshaller> uncr = ps.getContextResolver(Unmarshaller.class, mt);            
         if (uncr != null) {
             Unmarshaller u = uncr.getContext(type);
             if (u != null) return u;
@@ -130,7 +130,7 @@ public abstract class AbstractJAXBProvider<T> extends AbstractMessageReaderWrite
         if (fixedMediaType)
             return getMarshaller(type);
         
-        final ContextResolver<Marshaller> mcr = ps.getContextResolver(Marshaller.class, null, mt);            
+        final ContextResolver<Marshaller> mcr = ps.getContextResolver(Marshaller.class, mt);            
         if (mcr != null) {
             Marshaller u = mcr.getContext(type);
             if (u != null) return u;
@@ -173,7 +173,7 @@ public abstract class AbstractJAXBProvider<T> extends AbstractMessageReaderWrite
     }
     
     private final JAXBContext getJAXBContext(Class type, MediaType mt) throws JAXBException {
-        final ContextResolver<JAXBContext> cr = ps.getContextResolver(JAXBContext.class, null, mt);        
+        final ContextResolver<JAXBContext> cr = ps.getContextResolver(JAXBContext.class, mt);        
         if (cr != null) {
             JAXBContext c = cr.getContext(type);
             if (c != null) return c;

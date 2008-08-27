@@ -55,11 +55,7 @@ import javax.ws.rs.core.MultivaluedMap;
 @Consumes({"text/plain", "*/*"})
 public final class StringProvider extends AbstractMessageReaderWriterProvider<String> {
     
-    public boolean supports(Class type) {
-        return type == String.class;
-    }
-
-    public boolean isReadable(Class<?> type, Type genericType, Annotation annotations[]) {
+    public boolean isReadable(Class<?> type, Type genericType, Annotation annotations[], MediaType mediaType) {
         return type == String.class;
     }
     
@@ -73,7 +69,7 @@ public final class StringProvider extends AbstractMessageReaderWriterProvider<St
         return readFromAsString(entityStream, mediaType);
     }
 
-    public boolean isWriteable(Class<?> type, Type genericType, Annotation annotations[]) {
+    public boolean isWriteable(Class<?> type, Type genericType, Annotation annotations[], MediaType mediaType) {
         return type == String.class;
     }
     

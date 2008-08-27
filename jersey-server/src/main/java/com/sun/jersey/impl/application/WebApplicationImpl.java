@@ -626,15 +626,14 @@ public final class WebApplicationImpl implements WebApplication {
                 return bodyFactory.getMessageBodyWriter(c, t, as, m);
             }
 
-            public <T> ExceptionMapper<T> getExceptionMapper(Class<T> c) {
+            public <T extends Throwable> ExceptionMapper<T> getExceptionMapper(Class<T> c) {
                 if (Throwable.class.isAssignableFrom(c)) 
                    return exceptionFactory.find((Class<Throwable>)c);
                 else
                     return null;
             }
 
-            public <T> ContextResolver<T> getContextResolver(Class<T> ct, 
-                    Class<?> ot, MediaType m) {
+            public <T> ContextResolver<T> getContextResolver(Class<T> ct, MediaType m) {
                 return crf.resolve(ct, m);
             }
         };

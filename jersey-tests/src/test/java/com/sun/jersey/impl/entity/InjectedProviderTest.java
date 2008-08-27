@@ -80,7 +80,7 @@ public class InjectedProviderTest extends AbstractResourceTester {
     public static class InjectedBeanProvider extends AbstractMessageReaderWriterProvider<Bean> {
         @Context UriInfo uriInfo;
         
-        public boolean isReadable(Class<?> type, Type genericType, Annotation annotations[]) {
+        public boolean isReadable(Class<?> type, Type genericType, Annotation annotations[], MediaType mediaType) {
             return type == Bean.class;
         }
 
@@ -101,7 +101,7 @@ public class InjectedProviderTest extends AbstractResourceTester {
             }
         }
 
-        public boolean isWriteable(Class<?> type, Type genericType, Annotation annotations[]) {
+        public boolean isWriteable(Class<?> type, Type genericType, Annotation annotations[], MediaType mediaType) {
             return type == Bean.class;
         }
     

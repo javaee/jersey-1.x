@@ -97,7 +97,7 @@ public class ContextResolverTest extends AbstractResourceTester {
         
         @GET
         public String get() {
-            ContextResolver<String> _cr = p.getContextResolver(String.class, null, null);
+            ContextResolver<String> _cr = p.getContextResolver(String.class, null);
             assertEquals(_cr, cr);
             return cr.getContext(Integer.class);
         }        
@@ -180,9 +180,9 @@ public class ContextResolverTest extends AbstractResourceTester {
         ContextResolver<String> crTwo;
 
         public ContextMediaResource(@Context Providers p) {
-            crOne = p.getContextResolver(String.class, null, MediaType.valueOf("application/one"));
+            crOne = p.getContextResolver(String.class, MediaType.valueOf("application/one"));
             assertNotNull(crOne);
-            crTwo = p.getContextResolver(String.class, null, MediaType.valueOf("application/two"));
+            crTwo = p.getContextResolver(String.class, MediaType.valueOf("application/two"));
             assertNotNull(crTwo);            
         }
         

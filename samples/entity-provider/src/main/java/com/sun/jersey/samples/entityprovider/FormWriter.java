@@ -74,11 +74,11 @@ import javax.ws.rs.ext.Provider;
 @Provider
 public class FormWriter implements MessageBodyWriter<Hashtable<String, String>> {
 
-    public boolean isWriteable(Class<?> type, Type genericType, Annotation[] annotations) {
+    public boolean isWriteable(Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType) {
         return Hashtable.class.isAssignableFrom(type);
     }
 
-    public long getSize(Hashtable<String,String> data) {
+    public long getSize(Hashtable<String,String> data, Class<?> type, Type genericType, Annotation annotations[], MediaType mediaType) {
         return -1;
     }
 
@@ -115,5 +115,4 @@ public class FormWriter implements MessageBodyWriter<Hashtable<String, String>> 
             "<p>Current Data:</p><table><tr><th>Name</th><th>Value</th></tr>\n";
     
     private static String postamble = "</table></body></html>";
-    
 }

@@ -93,7 +93,7 @@ public class BeanStreamingTest extends AbstractResourceTester {
     @Consumes("application/bean")
     public static class BeanProvider extends AbstractMessageReaderWriterProvider<Bean> {
 
-        public boolean isReadable(Class<?> type, Type genericType, Annotation annotations[]) {
+        public boolean isReadable(Class<?> type, Type genericType, Annotation annotations[], MediaType mt) {
             return type == Bean.class;
         }
 
@@ -114,7 +114,7 @@ public class BeanStreamingTest extends AbstractResourceTester {
             }
         }
 
-        public boolean isWriteable(Class<?> type, Type genericType, Annotation annotations[]) {
+        public boolean isWriteable(Class<?> type, Type genericType, Annotation annotations[], MediaType mt) {
             return type == Bean.class;
         }
 
@@ -137,12 +137,12 @@ public class BeanStreamingTest extends AbstractResourceTester {
     @Consumes("application/*")
     public static class BeanWildProvider extends BeanProvider {
         @Override
-        public boolean isReadable(Class<?> type, Type genericType, Annotation annotations[]) {
+        public boolean isReadable(Class<?> type, Type genericType, Annotation annotations[], MediaType mt) {
             return type == Bean.class;
         }
         
         @Override
-        public boolean isWriteable(Class<?> type, Type genericType, Annotation annotations[]) {
+        public boolean isWriteable(Class<?> type, Type genericType, Annotation annotations[], MediaType mt) {
             return type == Bean.class;
         }
     }
@@ -152,7 +152,7 @@ public class BeanStreamingTest extends AbstractResourceTester {
     @Consumes("application/bean")
     public static class Bean2Provider extends AbstractMessageReaderWriterProvider<Bean2> {
 
-        public boolean isReadable(Class<?> type, Type genericType, Annotation annotations[]) {
+        public boolean isReadable(Class<?> type, Type genericType, Annotation annotations[], MediaType mt) {
             return type == Bean2.class;
         }
 
@@ -173,7 +173,7 @@ public class BeanStreamingTest extends AbstractResourceTester {
             }
         }
 
-        public boolean isWriteable(Class<?> type, Type genericType, Annotation annotations[]) {
+        public boolean isWriteable(Class<?> type, Type genericType, Annotation annotations[], MediaType mt) {
             return type == Bean2.class;
         }
         
@@ -196,12 +196,12 @@ public class BeanStreamingTest extends AbstractResourceTester {
     @Consumes("application/*")
     public static class Bean2WildProvider extends Bean2Provider {
         @Override
-        public boolean isReadable(Class<?> type, Type genericType, Annotation annotations[]) {
+        public boolean isReadable(Class<?> type, Type genericType, Annotation annotations[], MediaType mt) {
             return type == Bean2.class;
         }
         
         @Override
-        public boolean isWriteable(Class<?> type, Type genericType, Annotation annotations[]) {
+        public boolean isWriteable(Class<?> type, Type genericType, Annotation annotations[], MediaType mt) {
             return type == Bean2.class;
         }
     }

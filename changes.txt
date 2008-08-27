@@ -1,4 +1,7 @@
-release 0.10 (2008-09-xx)
+release 0.11 (2008-09-xx)
+- Integrated JSR 311 API 0.11
+
+release 0.10-SNAPSHOT
 - Fixed issue with resource methods utilizing @FormParam that could only
   contain @FormParam annotated method parameters. Now @FormParam annotated
   parameters may be intermixed with other annotated parameters.

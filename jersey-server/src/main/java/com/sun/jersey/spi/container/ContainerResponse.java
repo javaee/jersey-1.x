@@ -229,7 +229,7 @@ public class ContainerResponse implements HttpResponseContext {
                 throw new WebApplicationException(Responses.notAcceptable().build());
         }
 
-        final long size = p.getSize(entity);
+        final long size = p.getSize(entity, entity.getClass(), entityType, null, contentType);
         if (request.getMethod().equals("HEAD")) {
             if (size != -1)
                 getHttpHeaders().putSingle("Content-Length", Long.toString(size));

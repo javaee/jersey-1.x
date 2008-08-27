@@ -11,7 +11,7 @@ package com.sun.jersey.samples.mandel {
 
 @Provider
 class RenderedImageProvider extends MessageBodyWriter[RenderedImage] {
-    def isWriteable(c: Class[_], gt: Type, annotations: Array[Annotation]) : boolean = {
+    def isWriteable(c: Class[_], gt: Type, annotations: Array[Annotation], mediaType: MediaType) : boolean = {
         classOf[RenderedImage].isAssignableFrom(c)
     }
 
@@ -28,7 +28,7 @@ class RenderedImageProvider extends MessageBodyWriter[RenderedImage] {
         ImageIO.write(t, formatName, entityStream)
     }
 
-    def getSize(t: RenderedImage) : long = {
+    def getSize(t: RenderedImage, c: Class[_], gt: Type, annotations: Array[Annotation], mediaType: MediaType) : long = {
         -1
     }
 }

@@ -61,7 +61,7 @@ public final class ViewableMessageBodyWriter implements MessageBodyWriter<Viewab
     
     @Context TemplateContext tc;
     
-    public boolean isWriteable(Class<?> type, Type genericType, Annotation[] annotations) {
+    public boolean isWriteable(Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType) {
         return Viewable.class.isAssignableFrom(type);
     }
 
@@ -93,7 +93,7 @@ public final class ViewableMessageBodyWriter implements MessageBodyWriter<Viewab
         }
     }
 
-    public long getSize(Viewable t) {
+    public long getSize(Viewable t, Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType) {
         return -1;
     }
     

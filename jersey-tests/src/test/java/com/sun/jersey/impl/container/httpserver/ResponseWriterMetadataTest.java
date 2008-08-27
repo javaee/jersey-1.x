@@ -64,11 +64,11 @@ public class ResponseWriterMetadataTest extends AbstractHttpServerTester {
     @Produces("text/plain")
     public static class StringWriter implements MessageBodyWriter<String> {
 
-        public boolean isWriteable(Class<?> c, Type t, Annotation[] as) {
+        public boolean isWriteable(Class<?> c, Type t, Annotation[] as, MediaType mt) {
             return String.class == c;
         }
 
-        public long getSize(String s) {
+        public long getSize(String s, Class<?> type, Type genericType, Annotation annotations[], MediaType mediaType) {
             return -1;
         }
 

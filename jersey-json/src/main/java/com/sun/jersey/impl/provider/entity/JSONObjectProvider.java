@@ -61,7 +61,7 @@ public class JSONObjectProvider  extends AbstractMessageReaderWriterProvider<JSO
         Class<?> c = JSONObject.class;
     }
     
-    public boolean isReadable(Class<?> type, Type genericType, Annotation annotations[]) {
+    public boolean isReadable(Class<?> type, Type genericType, Annotation annotations[], MediaType mediaType) {
         return type == JSONObject.class;        
     }
     
@@ -79,7 +79,7 @@ public class JSONObjectProvider  extends AbstractMessageReaderWriterProvider<JSO
         }
     }
     
-    public boolean isWriteable(Class<?> type, Type genericType, Annotation annotations[]) {
+    public boolean isWriteable(Class<?> type, Type genericType, Annotation annotations[], MediaType mediaType) {
         return type == JSONObject.class;        
     }
     

@@ -208,7 +208,7 @@ public final class MessageBodyFactory implements MessageBodyWorkers {
         if (readers == null)
             return null;
         for (MessageBodyReader p : readers) {
-            if (p.isReadable(c, t, as))
+            if (p.isReadable(c, t, as, mediaType))
                 return p;
         }
         return null;
@@ -239,7 +239,7 @@ public final class MessageBodyFactory implements MessageBodyWorkers {
         if (writers == null)
             return null;
         for (MessageBodyWriter p : writers) {
-            if (p.isWriteable(c, t, as))
+            if (p.isWriteable(c, t, as, mediaType))
                 return p;
         }
 
@@ -251,7 +251,7 @@ public final class MessageBodyFactory implements MessageBodyWorkers {
             Annotation[] as) {
         List<MediaType> mtl = new ArrayList<MediaType>();
         for (MessageBodyWriterPair mbwp : writerListProviders) {
-            if (mbwp.mbw.isWriteable(c, t, as)) {
+            if (mbwp.mbw.isWriteable(c, t, as, null)) {
                 for (MediaType mt : mbwp.types) mtl.add(mt);
             }
         }

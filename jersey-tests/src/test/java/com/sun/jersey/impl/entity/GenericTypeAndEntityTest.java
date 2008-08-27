@@ -76,11 +76,11 @@ public class GenericTypeAndEntityTest extends AbstractResourceTester {
             this.t = ge.getType();
         }
         
-        public boolean isWriteable(Class<?> c, Type t, Annotation[] as) {
+        public boolean isWriteable(Class<?> c, Type t, Annotation[] as, MediaType mt) {
             return this.t.equals(t);
         }
 
-        public long getSize(List<Integer> l) {
+        public long getSize(List<Integer> l, Class<?> type, Type genericType, Annotation annotations[], MediaType mediaType) {
             return -1;
         }
 

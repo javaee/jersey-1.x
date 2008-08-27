@@ -47,6 +47,8 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Reader;
 import java.io.Writer;
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Type;
 import java.nio.charset.Charset;
 import javax.ws.rs.core.MediaType;
 
@@ -109,7 +111,7 @@ public abstract class AbstractMessageReaderWriterProvider<T> implements
     
     // MessageBodyWriter
     
-    public long getSize(T t) {
+    public long getSize(T t, Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType) {
         return -1;
     }
 }

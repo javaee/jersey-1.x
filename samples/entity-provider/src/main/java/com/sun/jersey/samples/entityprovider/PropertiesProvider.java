@@ -65,12 +65,12 @@ public class PropertiesProvider implements MessageBodyWriter<Properties> {
         p.store(out, null);
     }
 
-    public boolean isWriteable(Class<?> type, Type genericType, Annotation annotations[]) {
+    public boolean isWriteable(Class<?> type, Type genericType, Annotation annotations[], MediaType mediaType) {
         // Only support the Properties class and inherited classes of
         return Properties.class.isAssignableFrom(type);
     }
 
-    public long getSize(Properties p) {
+    public long getSize(Properties p, Class<?> type, Type genericType, Annotation annotations[], MediaType mediaType) {
         return -1;
     }
 }

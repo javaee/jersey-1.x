@@ -73,7 +73,7 @@ public class ParameterizedTypeTest extends AbstractResourceTester {
             listStringType = iface.getActualTypeArguments()[0];
         }
         
-        public boolean isReadable(Class<?> c, Type t, Annotation[] as) {
+        public boolean isReadable(Class<?> c, Type t, Annotation[] as, MediaType mt) {
             return List.class == c && listStringType.equals(t);
         }
 

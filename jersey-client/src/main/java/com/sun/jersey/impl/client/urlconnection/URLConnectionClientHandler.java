@@ -242,7 +242,7 @@ public final class URLConnectionClientHandler implements ClientHandler {
                     "A message body writer for Java type, " + entity.getClass() + 
                     ", and MIME media type, " + mediaType + ", was not found");
         }
-        final long size = bw.getSize(entity);
+        final long size = bw.getSize(entity, entity.getClass(), null, null, mediaType);
         if (size != -1 && size < Integer.MAX_VALUE) {
             // HttpURLConnection uses the int type for content length
             uc.setFixedLengthStreamingMode((int)size);

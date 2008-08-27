@@ -56,7 +56,7 @@ import javax.ws.rs.core.MultivaluedMap;
  */
 public final class FileProvider extends AbstractMessageReaderWriterProvider<File> {
     
-    public boolean isReadable(Class<?> type, Type genericType, Annotation annotations[]) {
+    public boolean isReadable(Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType) {
         return File.class == type;
     }
     
@@ -77,7 +77,7 @@ public final class FileProvider extends AbstractMessageReaderWriterProvider<File
         return f;
     }
 
-    public boolean isWriteable(Class<?> type, Type genericType, Annotation annotations[]) {
+    public boolean isWriteable(Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType) {
         return File.class.isAssignableFrom(type);
     }
     
@@ -98,7 +98,7 @@ public final class FileProvider extends AbstractMessageReaderWriterProvider<File
     }
 
     @Override
-    public long getSize(File t) {
+    public long getSize(File t, Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType) {
         return t.length();
     }
 }

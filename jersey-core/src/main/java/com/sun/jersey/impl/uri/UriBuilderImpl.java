@@ -460,8 +460,16 @@ public final class UriBuilderImpl extends UriBuilder {
         return UriComponent.contextualEncode(s, type, true);
     }
     
+    public URI buildFromMap(Map<String, ? extends Object> values) {
+        return _buildFromMap(values, true);
+    }
+
     @Override
-    public URI buildFromMap(Map<String, ? extends Object> values, boolean encoded) {
+    public URI buildFromEncodedMap(Map<String, ? extends Object> values) throws IllegalArgumentException, UriBuilderException {
+        return _buildFromMap(values, false);
+    }
+
+    private URI _buildFromMap(Map<String, ? extends Object> values, boolean encode) {
         if (ssp != null) 
             throw new IllegalArgumentException("Schema specific part is opaque");
         
@@ -470,10 +478,10 @@ public final class UriBuilderImpl extends UriBuilder {
         
         String uri = UriTemplate.createURI(scheme, 
                 userInfo, host, String.valueOf(port), 
-                path.toString(), query.toString(), fragment, values, !encoded);
-        return createURI(uri);
+                path.toString(), query.toString(), fragment, values, encode);
+        return createURI(uri);        
     }
-
+    
     @Override
     public URI build(Object... values) {
         if (values == null || values.length == 0)

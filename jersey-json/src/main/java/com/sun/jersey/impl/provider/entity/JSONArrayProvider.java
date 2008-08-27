@@ -60,7 +60,7 @@ public class JSONArrayProvider  extends AbstractMessageReaderWriterProvider<JSON
         Class<?> c = JSONArray.class;
     }
     
-    public boolean isReadable(Class<?> type, Type genericType, Annotation annotations[]) {
+    public boolean isReadable(Class<?> type, Type genericType, Annotation annotations[], MediaType mediaType) {
         return type == JSONArray.class;        
     }
     
@@ -78,7 +78,7 @@ public class JSONArrayProvider  extends AbstractMessageReaderWriterProvider<JSON
         }
     }
     
-    public boolean isWriteable(Class<?> type, Type genericType, Annotation annotations[]) {
+    public boolean isWriteable(Class<?> type, Type genericType, Annotation annotations[], MediaType mediaType) {
         return type == JSONArray.class;        
     }
     

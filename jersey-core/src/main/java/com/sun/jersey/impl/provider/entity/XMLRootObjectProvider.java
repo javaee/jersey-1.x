@@ -92,7 +92,7 @@ public class XMLRootObjectProvider extends AbstractJAXBProvider<Object> {
         public General(@Context Providers ps) { super(ps); }
     }
     
-    public boolean isReadable(Class<?> type, Type genericType, Annotation annotations[]) {
+    public boolean isReadable(Class<?> type, Type genericType, Annotation annotations[], MediaType mediaType) {
         try {
             return Object.class == type && getUnmarshaller(type) != null;
         } catch (JAXBException cause) {
@@ -118,7 +118,7 @@ public class XMLRootObjectProvider extends AbstractJAXBProvider<Object> {
         }
     }
 
-    public boolean isWriteable(Class<?> arg0, Type arg1, Annotation[] arg2) {
+    public boolean isWriteable(Class<?> arg0, Type arg1, Annotation[] arg2, MediaType mediaType) {
         return false;
     }
 

@@ -71,7 +71,7 @@ public final class SourceProvider {
     @Consumes({"application/xml", "text/xml", "*/*"})
     public static final class StreamSourceReader implements 
             MessageBodyReader<StreamSource> {
-        public boolean isReadable(Class<?> t, Type gt, Annotation[] as) {
+        public boolean isReadable(Class<?> t, Type gt, Annotation[] as, MediaType mediaType) {
             return StreamSource.class == t;
         }
 
@@ -90,7 +90,7 @@ public final class SourceProvider {
     @Consumes({"application/xml", "text/xml", "*/*"})
     public static final class SAXSourceReader implements 
             MessageBodyReader<SAXSource> {
-        public boolean isReadable(Class<?> t, Type gt, Annotation[] as) {
+        public boolean isReadable(Class<?> t, Type gt, Annotation[] as, MediaType mediaType) {
             return SAXSource.class == t;
         }
 
@@ -116,7 +116,7 @@ public final class SourceProvider {
             dbf.setNamespaceAware(true);
         }
         
-        public boolean isReadable(Class<?> t, Type gt, Annotation[] as) {
+        public boolean isReadable(Class<?> t, Type gt, Annotation[] as, MediaType mediaType) {
             return DOMSource.class == t;
         }
 
@@ -149,11 +149,11 @@ public final class SourceProvider {
             tf = TransformerFactory.newInstance();
         }
         
-        public boolean isWriteable(Class<?> t, Type gt, Annotation[] as) {
+        public boolean isWriteable(Class<?> t, Type gt, Annotation[] as, MediaType mediaType) {
             return Source.class.isAssignableFrom(t);
         }
 
-        public long getSize(Source o) {
+        public long getSize(Source o, Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType) {
             return -1;
         }
 

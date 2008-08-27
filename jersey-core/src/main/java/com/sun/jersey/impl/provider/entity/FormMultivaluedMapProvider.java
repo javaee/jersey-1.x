@@ -70,7 +70,7 @@ public final class FormMultivaluedMapProvider extends
         mapType = iface.getActualTypeArguments()[0];
     }
     
-    public boolean isReadable(Class<?> type, Type genericType, Annotation annotations[]) {
+    public boolean isReadable(Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType) {
         // Only allow types MultivaluedMap<String, String> and MultivaluedMap.
         return type == MultivaluedMap.class && 
                 (type == genericType || mapType.equals(genericType));
@@ -101,7 +101,7 @@ public final class FormMultivaluedMapProvider extends
         return map;
     }
 
-    public boolean isWriteable(Class<?> type, Type genericType, Annotation annotations[]) {
+    public boolean isWriteable(Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType) {
         return MultivaluedMap.class.isAssignableFrom(type);
     }
     
