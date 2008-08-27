@@ -373,7 +373,6 @@ public final class AsyncWebResource extends Filterable implements
                 if (r.getStatus() < 300) return r.getEntity(c);
 
                 throw new UniformInterfaceException(r);
-                // throw new UnsupportedOperationException("Not supported yet.");
             }
         });
         new Thread(ft).start();
