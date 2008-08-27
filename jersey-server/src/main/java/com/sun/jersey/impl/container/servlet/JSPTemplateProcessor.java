@@ -47,6 +47,7 @@ import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.core.Context;
+import javax.ws.rs.core.UriInfo;
 
 /**
  * A JSP template processor.
@@ -55,7 +56,8 @@ import javax.ws.rs.core.Context;
  */
 public class JSPTemplateProcessor implements TemplateProcessor {
     @Context ServletContext servletContext;
-
+    @Context UriInfo ui;
+    
     private final ThreadLocal<HttpServletRequest> requestInvoker;
     
     private final ThreadLocal<HttpServletResponse> responseInvoker;
@@ -92,7 +94,7 @@ public class JSPTemplateProcessor implements TemplateProcessor {
             throw new ContainerException("No request dispatcher for: " + resolvedPath);
         }
         
-        d = new RequestDispatcherWrapper(d, model);
+        d = new RequestDispatcherWrapper(d, ui.getMatchedResources().get(0), model);
         
         try {
             d.forward(requestInvoker.get(), responseInvoker.get());

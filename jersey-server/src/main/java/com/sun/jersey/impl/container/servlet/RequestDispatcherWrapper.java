@@ -49,14 +49,17 @@ import javax.servlet.ServletResponse;
  */
 public final class RequestDispatcherWrapper implements RequestDispatcher {
     private final RequestDispatcher d;
+    private final Object resource;
     private final Object it;
 
-    public RequestDispatcherWrapper(RequestDispatcher d, Object it) {
+    public RequestDispatcherWrapper(RequestDispatcher d, Object resource, Object it) {
         this.d = d;
+        this.resource = resource;
         this.it = it;
     }
 
     public void forward(ServletRequest req, ServletResponse rsp) throws ServletException, IOException {
+        req.setAttribute("resource", resource);
         req.setAttribute("it", it);
         req.setAttribute("_request", req);
         req.setAttribute("_response", rsp);

@@ -34,7 +34,6 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-
 package com.sun.jersey.impl.container.servlet;
 
 import javax.servlet.RequestDispatcher;
@@ -84,8 +83,7 @@ import java.io.PrintWriter;
  */
 public class Include extends SimpleTagSupport {
 
-    private Object it;
-
+    private Object resource;
     private String page;
 
     /**
@@ -98,54 +96,55 @@ public class Include extends SimpleTagSupport {
     /**
      * Specifies the object for which JSP will be included.
      */
-    public void setIt(Object it) {
-        this.it = it;
+    public void setResource(Object resource) {
+        this.resource = resource;
     }
 
-    private Object getPageObject( String name ) {
-        return getJspContext().getAttribute(name,PageContext.PAGE_SCOPE);
+    private Object getPageObject(String name) {
+        return getJspContext().getAttribute(name, PageContext.PAGE_SCOPE);
     }
 
     public void doTag() throws JspException, IOException {
-        Object it = getJspContext().getAttribute("it",PageContext.REQUEST_SCOPE);
-        final Object oldIt = it;
-        if(this.it!=null)
-            it = this.it;
+        Object resource = getJspContext().getAttribute("resource", PageContext.REQUEST_SCOPE);
+        final Object oldResource = resource;
+        if (this.resource != null) {
+            resource = this.resource;
+        }
 
         ServletConfig cfg = (ServletConfig) getPageObject(PageContext.CONFIG);
         ServletContext sc = cfg.getServletContext();
 
-        for( Class c = it.getClass(); c!=Object.class; c=c.getSuperclass() ) {
-            String name = "/"+c.getName().replace('.','/')+'/'+page;
-            if(sc.getResource(name)!=null) {
+        for (Class c = resource.getClass(); c != Object.class; c = c.getSuperclass()) {
+            String name = "/" + c.getName().replace('.', '/') + '/' + page;
+            if (sc.getResource(name) != null) {
                 // Tomcat returns a RequestDispatcher even if the JSP file doesn't exist.
                 // so check if the resource exists first.
                 RequestDispatcher disp = sc.getRequestDispatcher(name);
-                if(disp!=null) {
-                    getJspContext().setAttribute("it",it,PageContext.REQUEST_SCOPE);
+                if (disp != null) {
+                    getJspContext().setAttribute("resource", resource, PageContext.REQUEST_SCOPE);
                     try {
                         HttpServletRequest request = (HttpServletRequest) getPageObject(PageContext.REQUEST);
                         disp.include(
-                            request,
-                            new Wrapper(
-                                (HttpServletResponse)getPageObject(PageContext.RESPONSE),
-                                new PrintWriter(getJspContext().getOut()) )
-                        );
+                                request,
+                                new Wrapper(
+                                (HttpServletResponse) getPageObject(PageContext.RESPONSE),
+                                new PrintWriter(getJspContext().getOut())));
                     } catch (ServletException e) {
                         throw new JspException(e);
                     } finally {
-                        getJspContext().setAttribute("it",oldIt,PageContext.REQUEST_SCOPE);
+                        getJspContext().setAttribute("resource", oldResource, PageContext.REQUEST_SCOPE);
                     }
                     return;
                 }
             }
         }
 
-        throw new JspException("Unable to find '"+page+"' for "+it.getClass());
+        throw new JspException("Unable to find '" + page + "' for " + resource.getClass());
     }
 }
 
 class Wrapper extends HttpServletResponseWrapper {
+
     private final PrintWriter pw;
 
     public Wrapper(HttpServletResponse httpServletResponse, PrintWriter w) {
