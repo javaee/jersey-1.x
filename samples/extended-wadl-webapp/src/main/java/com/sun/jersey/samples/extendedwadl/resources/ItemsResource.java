@@ -88,9 +88,6 @@ public class ItemsResource {
      * 
      * @param item The item to create.
      * 
-     * @example.tag This is some example doc that will be processed by the
-     *              ExampleDocProcessor and the ExampleWadlGenerator. 
-     * 
      * @request.representation.qname {http://www.example.com}item
      * @request.representation.mediaType application/xml
      * @request.representation.example {@link Examples#SAMPLE_ITEM}
