@@ -62,7 +62,7 @@ public class ThreadLocalInvoker<T> implements InvocationHandler {
     
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
         if (threadLocalInstance.get() == null)
-            return null;
+            throw new IllegalStateException();
         return method.invoke(threadLocalInstance.get(), args);
     }
 }
