@@ -19,7 +19,7 @@
       <rtexprvalue>yes</rtexprvalue>
     </attribute>
     <attribute>
-      <name>it</name>
+      <name>resource</name>
       <required>no</required>
       <rtexprvalue>yes</rtexprvalue>
     </attribute>
