@@ -109,12 +109,14 @@ public class UriComponentDecodeTest extends TestCase {
     public void testDecodePath() {
         _testDecodePath("", "");
         _testDecodePath("/", "");
+        _testDecodePath("//", "");
         _testDecodePath("a", "a");
         _testDecodePath("/a", "a");
         _testDecodePath("/a/", "a");
         
         _testDecodePath("a/b/c", "a", "b", "c");
         _testDecodePath("a//b//c//", "a", "b", "c");
+        _testDecodePath("//a//b//c//", "a", "b", "c");
     }
     
     private void _testDecodePath(String path, String... segments) {
@@ -134,6 +136,7 @@ public class UriComponentDecodeTest extends TestCase {
         _testDecodeQuery("&&");
         _testDecodeQuery("a", "a", "");
         _testDecodeQuery("a&", "a", "");
+        _testDecodeQuery("&a&", "a", "");
         _testDecodeQuery("a&&", "a", "");
         _testDecodeQuery("a=", "a", "");
         _testDecodeQuery("a=&", "a", "");
@@ -144,10 +147,19 @@ public class UriComponentDecodeTest extends TestCase {
         _testDecodeQuery("a=x&&", "a", "x");
         _testDecodeQuery("a=x&b=y", "a", "x", "b", "y");
         _testDecodeQuery("a=x&&b=y", "a", "x", "b", "y");
+        
+        _testDecodeQuery("+a+=+x+", true, " a ", " x ");
+        _testDecodeQuery("%20a%20=%20x%20", true, " a ", " x ");
+        _testDecodeQuery("+a+=+x+", false, " a ", "+x+");
+        _testDecodeQuery("%20a%20=%20x%20", false, " a ", "%20x%20");        
     }
     
     private void _testDecodeQuery(String q, String... query) {
-        MultivaluedMap<String, String> queryParameters = UriComponent.decodeQuery(q, true);
+        _testDecodeQuery(q, true, query);
+    }
+    
+    private void _testDecodeQuery(String q, boolean decode, String... query) {
+        MultivaluedMap<String, String> queryParameters = UriComponent.decodeQuery(q, decode);
 
         assertEquals(query.length / 2, queryParameters.size());
 
@@ -162,6 +174,7 @@ public class UriComponentDecodeTest extends TestCase {
         _testDecodeMatrix("path;=junk", "path");
         _testDecodeMatrix("path;;", "path");
         _testDecodeMatrix("path;a", "path", "a", "");
+        _testDecodeMatrix("path;;a", "path", "a", "");
         _testDecodeMatrix("path;a;", "path", "a", "");
         _testDecodeMatrix("path;a;;", "path", "a", "");
         _testDecodeMatrix("path;a=", "path", "a", "");
@@ -180,6 +193,7 @@ public class UriComponentDecodeTest extends TestCase {
         _testDecodeMatrix(";=junk", "");
         _testDecodeMatrix(";;", "");
         _testDecodeMatrix(";a", "", "a", "");
+        _testDecodeMatrix(";;a", "", "a", "");
         _testDecodeMatrix(";a;", "", "a", "");
         _testDecodeMatrix(";a;;", "", "a", "");
         _testDecodeMatrix(";a=", "", "a", "");
@@ -190,11 +204,19 @@ public class UriComponentDecodeTest extends TestCase {
         _testDecodeMatrix(";a=x;", "", "a", "x");
         _testDecodeMatrix(";a=x;;", "", "a", "x");
         _testDecodeMatrix(";a=x;b=y", "", "a", "x", "b", "y");
-        _testDecodeMatrix(";a=x;;b=y", "", "a", "x", "b", "y");        
+        _testDecodeMatrix(";a=x;;b=y", "", "a", "x", "b", "y");
+        
+        _testDecodeMatrix(";%20a%20=%20x%20", "", true, " a ", " x ");
+        _testDecodeMatrix(";%20a%20=%20x%20", "", false, " a ", "%20x%20");
+        
     }
     
     private void _testDecodeMatrix(String path, String pathSegment, String... matrix) {
-        List<PathSegment> ps = UriComponent.decodePath(path, true);
+        _testDecodeMatrix(path, pathSegment, true, matrix);
+    }
+    
+    private void _testDecodeMatrix(String path, String pathSegment, boolean decode, String... matrix) {
+        List<PathSegment> ps = UriComponent.decodePath(path, decode);
         MultivaluedMap<String, String> matrixParameters = ps.get(0).getMatrixParameters();
 
         assertEquals(pathSegment, ps.get(0).getPath());

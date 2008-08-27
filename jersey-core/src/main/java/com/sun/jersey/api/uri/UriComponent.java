@@ -235,7 +235,6 @@ public final class UriComponent {
         }
         
         return (sb == null) ? s : sb.toString();
-
     }
 
     private final static char[] HEX_DIGITS = {
@@ -366,8 +365,6 @@ public final class UriComponent {
         
     /**
      * Decode the query component of a URI.
-     * <p>
-     * TODO the implementation is not very efficient.
      * 
      * @param u the URI.
      * @param decode true if the query parameters of the query component
@@ -380,8 +377,6 @@ public final class UriComponent {
     
     /**
      * Decode the query component of a URI.
-     * <p>
-     * TODO the implementation is not very efficient.
      * 
      * @param q the query component in encoded form.
      * @param decode true of the query parameters of the query component
@@ -393,35 +388,54 @@ public final class UriComponent {
         
         if (q == null || q.length() == 0)
             return queryParameters;
+        
+        int s = 0, e = 0;
+        do {
+            e = q.indexOf('&', s);
 
-        for (String keyVal : q.split("&")) {
-            try {
-                int equals = keyVal.indexOf('=');
-                if (equals > 0) {
-                    queryParameters.add(
-                            (decode) ? URLDecoder.decode(keyVal.substring(0, equals), "UTF-8") : keyVal.substring(0, equals),
-                            (decode) ? URLDecoder.decode(keyVal.substring(equals + 1), "UTF-8") : keyVal.substring(equals + 1));
-                } else if (equals == 0) {
-                    // no key declared, ignore
-                } else if (keyVal.length() > 0) {
-                    queryParameters.add((decode) ? URLDecoder.decode(keyVal, "UTF-8") : keyVal, "");
-                }
-            } catch (UnsupportedEncodingException ex) {
-                // This should never occur
-                throw new IllegalArgumentException(ex);
+            if (e == -1) {
+                decodeQueryParam(queryParameters, q.substring(s), decode);
+            } else if (e > s) {
+                decodeQueryParam(queryParameters, q.substring(s, e), decode);
             }
-        }
+            s = e + 1;
+        } while (s > 0 && s < q.length());
         
         return queryParameters;
     }
-     
+
+    private static void decodeQueryParam(MultivaluedMap<String, String> params,
+            String param, boolean decode) {
+        try {
+            int equals = param.indexOf('=');
+            if (equals > 0) {
+                params.add(
+                        URLDecoder.decode(param.substring(0, equals), "UTF-8"),
+                        (decode) ? URLDecoder.decode(param.substring(equals + 1), "UTF-8") : param.substring(equals + 1));
+            } else if (equals == 0) {
+                // no key declared, ignore
+            } else if (param.length() > 0) {
+                params.add(
+                        URLDecoder.decode(param, "UTF-8"),
+                        "");
+            }
+        } catch (UnsupportedEncodingException ex) {
+            // This should never occur
+            throw new IllegalArgumentException(ex);
+        }
+    }
+    
     private static final class PathSegmentImpl implements PathSegment {
         private final String path;
         
         private final MultivaluedMap<String, String> matrixParameters;
         
-        PathSegmentImpl(String path, MultivaluedMap<String, String> matrixParameters) {
-            this.path = path;
+        PathSegmentImpl(String path, boolean decode) {
+            this(path, decode, new MultivaluedMapImpl());
+        }
+        
+        PathSegmentImpl(String path, boolean decode, MultivaluedMap<String, String> matrixParameters) {
+            this.path = (decode) ? UriComponent.decode(path, UriComponent.Type.PATH_SEGMENT) : path;
             this.matrixParameters = matrixParameters;
         }
         
@@ -436,8 +450,6 @@ public final class UriComponent {
     
     /**
      * Decode the path component of a URI as path segments.
-     * <p>
-     * TODO the implementation is not very efficient.
      * 
      * @param u the URI.
      * @param decode true if the path segments of the path component
@@ -450,8 +462,6 @@ public final class UriComponent {
 
     /**
      * Decode the path component of a URI as path segments.
-     * <p>
-     * TODO the implementation is not very efficient.
      * 
      * @param path the path component in encoded form.
      * @param decode true if the path segments of the path component
@@ -459,44 +469,47 @@ public final class UriComponent {
      * @return the list of path segments.
      */
     public static List<PathSegment> decodePath(String path, boolean decode) {
-        List<PathSegment> pathSegmentsList = new LinkedList<PathSegment>();
+        List<PathSegment> segments = new LinkedList<PathSegment>();
         
         if (path == null)
-            return pathSegmentsList;
-        
-        String[] pathSegments = path.split("/");
-        if (path.length() == 0 || pathSegments.length == 0) {
-            PathSegment pathSegment = new PathSegmentImpl("", new MultivaluedMapImpl());
-            pathSegmentsList.add(pathSegment);
-            return pathSegmentsList;
-        }
-        
-        for (String pathSegment : pathSegments) {
-            if (pathSegment.length() == 0)
-                continue;
-            
-            MultivaluedMap<String, String> matrixMap = null;
-            int colon = pathSegment.indexOf(';');
-            if (colon != -1) {
-                matrixMap = decodeMatrix(pathSegment, decode);
-                pathSegment = (colon == 0) ? "" : pathSegment.substring(0, colon);
-            } else {
-                matrixMap = new MultivaluedMapImpl();                
+            return segments;
+                
+        int s = 0, e = 0;
+        do {
+            e = path.indexOf('/', s);
+
+            if (e == -1) {
+                decodePathSegment(segments, path.substring(s), decode);
+            } else if (e > s) {
+                decodePathSegment(segments, path.substring(s, e), decode);
             }
             
-            if (decode)
-                pathSegment = UriComponent.decode(pathSegment, UriComponent.Type.PATH_SEGMENT);
-            
-            pathSegmentsList.add(new PathSegmentImpl(pathSegment, matrixMap));
+            s = e + 1;
+        } while (s > 0 && s < path.length());
+        
+        if (segments.isEmpty()) {
+            segments.add(new PathSegmentImpl("", false));
         }
         
-        return pathSegmentsList;
+        return segments;
+    }
+    
+    public static void decodePathSegment(List<PathSegment> segments, String segment, boolean decode) {
+        int colon = segment.indexOf(';');
+        if (colon != -1) {
+            segments.add(new PathSegmentImpl(
+                    (colon == 0) ? "" : segment.substring(0, colon),
+                    decode,
+                    decodeMatrix(segment, decode)));
+        } else {
+            segments.add(new PathSegmentImpl(
+                    segment,
+                    decode));
+        }
     }
     
     /**
      * Decode the matrix component of a URI path segment.
-     * <p>
-     * TODO the implementation is not very efficient.
      * 
      * @param pathSegment the path segment component in encoded form.
      * @param decode true if the matrix parameters of the path segment component
@@ -505,27 +518,43 @@ public final class UriComponent {
      */
     public static MultivaluedMap<String, String> decodeMatrix(String pathSegment, boolean decode) {
         MultivaluedMap<String, String> matrixMap = new MultivaluedMapImpl();
-        
-        String[] keyVals = pathSegment.split(";");
-        for (int i = 1; i < keyVals.length; i++) {
-            String keyVal = keyVals[i];            
-            int equals = keyVal.indexOf('=');
-            if (equals > 0) {
-                matrixMap.add(
-                        (decode) ? UriComponent.decode(keyVal.substring(0, equals), UriComponent.Type.MATRIX_PARAM) : keyVal.substring(0, equals),
-                        (decode) ? UriComponent.decode(keyVal.substring(equals + 1), UriComponent.Type.MATRIX_PARAM) : keyVal.substring(equals + 1));
-            } else if (equals == 0) {
-                // no key declared, ignore
-            } else if (keyVal.length() > 0) {
-                matrixMap.add(
-                        (decode) ? UriComponent.decode(keyVal, UriComponent.Type.MATRIX_PARAM) : keyVal,
-                        "");
+
+        // Skip over path segment
+        int s = pathSegment.indexOf(';') + 1;
+        if (s == 0 || s == pathSegment.length())
+            return matrixMap;
+
+        int e = 0;
+        do {
+            e = pathSegment.indexOf(';', s);
+
+            if (e == -1) {
+                decodeMatrixParam(matrixMap, pathSegment.substring(s), decode);
+            } else if (e > s) {
+                decodeMatrixParam(matrixMap, pathSegment.substring(s, e), decode);
             }
-        }
+            s = e + 1;
+        } while (s > 0 && s < pathSegment.length());
         
         return matrixMap;
     }        
     
+    private static void decodeMatrixParam(MultivaluedMap<String, String> params,
+            String param, boolean decode) {
+        int equals = param.indexOf('=');
+        if (equals > 0) {
+            params.add(
+                    UriComponent.decode(param.substring(0, equals), UriComponent.Type.MATRIX_PARAM),
+                    (decode) ? UriComponent.decode(param.substring(equals + 1), UriComponent.Type.MATRIX_PARAM) : param.substring(equals + 1));
+        } else if (equals == 0) {
+            // no key declared, ignore
+        } else if (param.length() > 0) {
+            params.add(
+                    UriComponent.decode(param, UriComponent.Type.MATRIX_PARAM),
+                    "");
+        }
+    }
+
     private static String decode(String s, int n) {
 	final StringBuilder sb = new StringBuilder(n);
 	ByteBuffer bb = ByteBuffer.allocate(1);

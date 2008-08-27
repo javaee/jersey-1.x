@@ -175,7 +175,7 @@ public class QueryParametersHttpRequestTest extends TestCase {
                 "/context/widgets/10?x+=+1%20&%20y+=+2", "/context");
         MultivaluedMap<String, String> p = new WebApplicationContext(null, r, null).
                 getQueryParameters(false);
-        assertEquals("+1%20", p.getFirst("x+"));
-        assertEquals("+2", p.getFirst("%20y+"));
+        assertEquals("+1%20", p.getFirst("x "));
+        assertEquals("+2", p.getFirst(" y "));
     }
 }

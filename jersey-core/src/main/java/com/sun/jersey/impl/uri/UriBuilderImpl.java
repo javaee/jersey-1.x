@@ -42,8 +42,10 @@ import com.sun.jersey.api.uri.UriTemplate;
 import java.lang.reflect.Method;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.List;
 import java.util.Map;
 import javax.ws.rs.Path;
+import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriBuilderException;
 
@@ -65,9 +67,13 @@ public final class UriBuilderImpl extends UriBuilder {
     private int port = -1;
     
     private final StringBuilder path;
-    
+
+    private MultivaluedMap<String, String> matrixParams;
+            
     private final StringBuilder query;
     
+    private MultivaluedMap<String, String> queryParams;
+
     private String fragment;
     
     public UriBuilderImpl() {
@@ -277,20 +283,40 @@ public final class UriBuilderImpl extends UriBuilder {
         if (values.length == 0)
             return this;
         
-        if (path.length() > 0) path.append(';');
-        for (Object value : values) {
-            path.append(encode(name, UriComponent.Type.MATRIX_PARAM));
-            
-            final String stringValue = value.toString();
-            if (stringValue.length() > 0)
-                path.append('=').append(encode(stringValue, UriComponent.Type.MATRIX_PARAM));
+        if (matrixParams == null) {
+            name = encode(name, UriComponent.Type.MATRIX_PARAM);
+            for (Object value : values) {
+                path.append(';').append(name);
+
+                final String stringValue = value.toString();
+                if (stringValue.length() > 0)
+                    path.append('=').append(encode(stringValue, UriComponent.Type.MATRIX_PARAM));
+            }
+        } else {
+            for (Object value : values) {
+                matrixParams.add(name, value.toString());
+            }            
         }
         return this;
     }
 
     @Override
     public UriBuilder replaceMatrixParam(String name, Object... values) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        checkSsp();
+        
+        if (matrixParams == null) {
+            int i = path.lastIndexOf("/");
+            if (i != -1) i = 0;
+            i = path.indexOf(";", i);
+            matrixParams = UriComponent.decodeMatrix((i != -1) ? path.substring(i + 1) : "", false);
+            if (i != -1) path.setLength(i);
+        }
+        
+        matrixParams.remove(name);
+        for (Object value : values) {
+            matrixParams.add(name, value.toString());
+        }
+        return this;
     }
     
     @Override
@@ -312,20 +338,38 @@ public final class UriBuilderImpl extends UriBuilder {
         if (values.length == 0)
             return this;
 
-        if (query.length() > 0) query.append('&');
-        for (Object value : values) {
-            query.append(encode(name, UriComponent.Type.QUERY_PARAM));
+        if (queryParams == null) {
+            name = encode(name, UriComponent.Type.QUERY_PARAM);
+            for (Object value : values) {
+                if (query.length() > 0) query.append('&');
+                query.append(name);
 
-            final String stringValue = value.toString();
-            if (stringValue.length() > 0)
-                query.append('=').append(encode(stringValue, UriComponent.Type.QUERY_PARAM));
+                final String stringValue = value.toString();
+                if (stringValue.length() > 0)
+                    query.append('=').append(encode(stringValue, UriComponent.Type.QUERY_PARAM));
+            }
+        } else {
+            for (Object value : values) {
+                queryParams.add(name,  value.toString());
+            }
         }
         return this;
     }
 
     @Override
     public UriBuilder replaceQueryParam(String name, Object... values) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        checkSsp();
+
+        if (queryParams == null) {
+            queryParams = UriComponent.decodeQuery(query.toString(), false);
+            query.setLength(0);
+        }
+
+        queryParams.remove(name);
+        for (Object value : values) {
+            queryParams.add(name, value.toString());
+        }
+        return this;
     }
     
     @Override
@@ -358,6 +402,9 @@ public final class UriBuilderImpl extends UriBuilder {
         if (segments.length() == 0)
             return;
 
+        // Encode matrix parameters on current path segment
+        encodeMatrix();
+
         segments = encode(segments, 
                 (isSegment) ? UriComponent.Type.PATH_SEGMENT : UriComponent.Type.PATH);
         
@@ -374,7 +421,41 @@ public final class UriBuilderImpl extends UriBuilder {
         
         path.append(segments);
     }
-        
+
+    private void encodeMatrix() {
+        if (matrixParams == null || matrixParams.isEmpty())
+            return;
+
+        for (Map.Entry<String, List<String>> e : matrixParams.entrySet()) {
+            String name = encode(e.getKey(), UriComponent.Type.MATRIX_PARAM);
+            
+            for (String value : e.getValue()) {
+                path.append(';').append(name);
+                if (value.length() > 0)
+                    path.append('=').append(encode(value, UriComponent.Type.MATRIX_PARAM));
+            }
+        }
+        matrixParams.clear();
+    }
+
+    private void encodeQuery() {
+        if (queryParams == null || queryParams.isEmpty())
+            return;
+
+        for (Map.Entry<String, List<String>> e : queryParams.entrySet()) {
+            String name = encode(e.getKey(), UriComponent.Type.QUERY_PARAM);
+
+            for (String value : e.getValue()) {
+                if (query.length() > 0) query.append('&');
+                query.append(name);
+
+                if (value.length() > 0)
+                    query.append('=').append(encode(value, UriComponent.Type.QUERY_PARAM));
+            }
+        }
+        queryParams.clear();
+    }
+
     private String encode(String s, UriComponent.Type type) {
         return UriComponent.contextualEncode(s, type, true);
     }
@@ -382,7 +463,11 @@ public final class UriBuilderImpl extends UriBuilder {
     @Override
     public URI buildFromMap(Map<String, ? extends Object> values, boolean encoded) {
         if (ssp != null) 
-            throw new IllegalArgumentException("Schema specific part is opaque");                
+            throw new IllegalArgumentException("Schema specific part is opaque");
+        
+        encodeMatrix();
+        encodeQuery();
+        
         String uri = UriTemplate.createURI(scheme, 
                 userInfo, host, String.valueOf(port), 
                 path.toString(), query.toString(), fragment, values, !encoded);
@@ -395,7 +480,11 @@ public final class UriBuilderImpl extends UriBuilder {
             return createURI(create());
 
         if (ssp != null) 
-            throw new IllegalArgumentException("Schema specific part is opaque");                
+            throw new IllegalArgumentException("Schema specific part is opaque");
+                
+        encodeMatrix();
+        encodeQuery();
+
         String uri = UriTemplate.createURI(scheme, 
                 userInfo, host, String.valueOf(port), 
                 path.toString(), query.toString(), fragment, values, true);
@@ -404,15 +493,25 @@ public final class UriBuilderImpl extends UriBuilder {
     
     @Override
     public URI buildFromEncoded(Object... values) {
+        if (values == null || values.length == 0)
+            return createURI(create());
+        
         if (ssp != null) 
-            throw new IllegalArgumentException("Schema specific part is opaque");                
+            throw new IllegalArgumentException("Schema specific part is opaque");  
+                
+        encodeMatrix();
+        encodeQuery();
+        
         String uri = UriTemplate.createURI(scheme, 
                 userInfo, host, String.valueOf(port), 
-                path.toString(), query.toString(), fragment, values, true);
+                path.toString(), query.toString(), fragment, values, false);
         return createURI(uri);              
     }
     
     private String create() {
+        encodeMatrix();
+        encodeQuery();
+        
         StringBuilder sb = new StringBuilder();
         
         if (scheme != null) sb.append(scheme).append(':');

@@ -36,12 +36,16 @@
  */
 package com.sun.jersey.impl.uri;
 
+import com.sun.jersey.api.uri.UriComponent;
 import java.lang.reflect.Method;
 import java.net.URI;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
+import javax.ws.rs.core.MultivaluedMap;
+import javax.ws.rs.core.PathSegment;
 import javax.ws.rs.core.UriBuilder;
 import junit.framework.*;
 
@@ -105,16 +109,64 @@ public class UriBuilderTest extends TestCase {
         assertEquals(URI.create("http://localhost:8080/x/y/z"), bu);
     }
 
-    public void testReplaceMatrixParam() {
+    public void testReplaceMatrix() {
         URI bu = UriBuilder.fromUri("http://localhost:8080/a/b/c;a=x;b=y").
                 replaceMatrix("x=a;y=b").build();
         assertEquals(URI.create("http://localhost:8080/a/b/c;x=a;y=b"), bu);
     }
 
-    public void testReplaceQueryParams() {
+    public void testReplaceMatrixParams() {
+        URI bu = UriBuilder.fromUri("http://localhost:8080/a/b/c;a=x;b=y").
+                replaceMatrixParam("a", "z", "zz").build();
+        List<PathSegment> ps = UriComponent.decodePath(bu, true);
+        MultivaluedMap<String, String> mps = ps.get(2).getMatrixParameters();
+        List<String> a = mps.get("a");
+        assertEquals(2, a.size());
+        assertEquals("z", a.get(0));
+        assertEquals("zz", a.get(1));
+        List<String> b = mps.get("b");
+        assertEquals(1, b.size());
+        assertEquals("y", b.get(0));
+
+        bu = UriBuilder.fromUri("http://localhost:8080/a/b/c;a=x;b=y").
+                replaceMatrixParam("a", "z", "zz").matrixParam("c", "c").
+                path("d").build();
+
+        ps = UriComponent.decodePath(bu, true);
+        mps = ps.get(2).getMatrixParameters();
+        a = mps.get("a");
+        assertEquals(2, a.size());
+        assertEquals("z", a.get(0));
+        assertEquals("zz", a.get(1));
+        b = mps.get("b");
+        assertEquals(1, b.size());
+        assertEquals("y", b.get(0));
+        List<String> c = mps.get("c");
+        assertEquals(1, c.size());
+        assertEquals("c", c.get(0));
+    }
+
+    public void testReplaceQuery() {
         URI bu = UriBuilder.fromUri("http://localhost:8080/a/b/c?a=x&b=y").
                 replaceQuery("x=a&y=b").build();
         assertEquals(URI.create("http://localhost:8080/a/b/c?x=a&y=b"), bu);
+    }
+
+    public void testReplaceQueryParams() {
+        URI bu = UriBuilder.fromUri("http://localhost:8080/a/b/c?a=x&b=y").
+                replaceQueryParam("a", "z", "zz").queryParam("c", "c").build();
+        
+        MultivaluedMap<String, String> qps = UriComponent.decodeQuery(bu, true);
+        List<String> a = qps.get("a");
+        assertEquals(2, a.size());
+        assertEquals("z", a.get(0));
+        assertEquals("zz", a.get(1));
+        List<String> b = qps.get("b");
+        assertEquals(1, b.size());
+        assertEquals("y", b.get(0));
+        List<String> c = qps.get("c");
+        assertEquals(1, c.size());
+        assertEquals("c", c.get(0));
     }
 
     public void testReplaceFragment() {
