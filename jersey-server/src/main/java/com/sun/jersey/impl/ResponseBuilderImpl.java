@@ -182,8 +182,12 @@ public final class ResponseBuilderImpl extends Response.ResponseBuilder {
     }
 
     public Response.ResponseBuilder variant(Variant variant) {
-        if (variant == null)
-            throw new IllegalArgumentException();
+        if (variant == null) {
+            type((MediaType)null);
+            language((String)null);
+            header(HttpHeaders.CONTENT_ENCODING, null);
+            return this;
+        }
         
         type(variant.getMediaType());
         // TODO set charset
