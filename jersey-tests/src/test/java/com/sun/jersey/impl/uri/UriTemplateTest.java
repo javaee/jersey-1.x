@@ -44,6 +44,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.MatchResult;
 import junit.framework.*;
 
 /**
@@ -192,6 +193,7 @@ public class UriTemplateTest extends TestCase {
             assertEquals(value, mapValue);
         }
 
+
         List<String> matchedValues = new ArrayList<String>();
         isMatch = t.match(uri, matchedValues);
         assertTrue(isMatch);
@@ -201,6 +203,21 @@ public class UriTemplateTest extends TestCase {
 
         for (int i = 0; i < values.length; i++){
             assertEquals(values[i], matchedValues.get(i));
+        }
+
+
+        MatchResult mr = t.getPattern().match(uri);
+        assertNotNull(mr);
+        assertEquals(values.length, mr.groupCount());
+        assertEquals(uri, mr.group());
+        assertEquals(uri, mr.group(0));
+        assertEquals(0, mr.start());
+        assertEquals(uri.length(), mr.end());
+        assertEquals(0, mr.start(0));
+        assertEquals(uri.length(), mr.end(0));
+        for (int i = 1; i <= mr.groupCount(); i++) {
+            assertEquals(values[i - 1], mr.group(i));            
+            assertEquals(values[i - 1], uri.substring(mr.start(i), mr.end(i)));            
         }
     }
     

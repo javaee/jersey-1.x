@@ -39,6 +39,7 @@ package com.sun.jersey.api.uri;
 
 import java.util.List;
 import java.util.Map;
+import java.util.regex.MatchResult;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -138,6 +139,110 @@ public class UriPattern {
 
     public final int[] getGroupIndexes() {
         return groupIndexes;
+    }
+    
+    private static final class EmptyStringMatchResult implements MatchResult {
+        public int start() {
+            return 0;
+        }
+
+        public int start(int group) {
+            if (group != 0)
+                throw new IndexOutOfBoundsException();
+            return start();
+        }
+
+        public int end() {
+            return 0;
+        }
+
+        public int end(int group) {
+            if (group != 0)
+                throw new IndexOutOfBoundsException();
+            return end();
+        }
+
+        public String group() {
+            return "";
+        }
+
+        public String group(int group) {
+            if (group != 0)
+                throw new IndexOutOfBoundsException();
+            return group();
+        }
+
+        public int groupCount() {
+            return 0;
+        }        
+    }
+
+    private static final EmptyStringMatchResult EMPTY_STRING_MATCH_RESULT = new EmptyStringMatchResult();
+    
+    private final class GroupIndexMatchResult implements MatchResult {
+        private final MatchResult r;
+        
+        GroupIndexMatchResult(MatchResult r) {
+            this.r = r;
+        }
+        
+        public int start() {
+            return r.start();
+        }
+
+        public int start(int group) {
+            if (group > groupCount())
+                throw new IndexOutOfBoundsException();
+            
+            return (group > 0) ? r.start(groupIndexes[group - 1]) : r.start();
+        }
+
+        public int end() {
+            return r.end();
+        }
+
+        public int end(int group) {
+            if (group > groupCount())
+                throw new IndexOutOfBoundsException();
+
+            return (group > 0) ? r.end(groupIndexes[group - 1]) : r.end();
+        }
+
+        public String group() {
+            return r.group();
+        }
+
+        public String group(int group) {
+            if (group > groupCount())
+                throw new IndexOutOfBoundsException();
+
+            return (group > 0) ? r.group(groupIndexes[group - 1]) : r.group();
+        }
+
+        public int groupCount() {
+            return groupIndexes.length - 1;
+        }        
+    }
+
+    /**
+     * Match a URI against the pattern.
+     * 
+     * @param uri the uri to match against the template.
+     * @return the match result, otherwise null if no match occurs.
+     */
+    public final MatchResult match(CharSequence uri) {
+        // Check for match against the empty pattern
+        if (uri == null || uri.length() == 0)
+            return (regexPattern == null) ? EMPTY_STRING_MATCH_RESULT : null;
+        else if (regexPattern == null)
+            return null;
+        
+        // Match the URI to the URI template regular expression
+        Matcher m = regexPattern.matcher(uri);
+        if (!m.matches())
+            return null;
+
+        return (groupIndexes.length > 0) ? new GroupIndexMatchResult(m) : m;
     }
     
     /**
