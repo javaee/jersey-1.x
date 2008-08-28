@@ -1,7 +1,20 @@
 release 0.11 (2008-09-xx)
+- Catch a java.lang.ClassFormatError when loading providers. This can occur
+  if a 'stubbed' jar is in the class path that contains classes with no
+  implementation.
 - Integrated JSR 311 API 0.11
+  - Query/Matrix parameter names used as keys in returned
+    MultivaluedMap<String, String> from UriInfo method calls are always in
+    decoded form.
+  - MessageBodyWriter.isWriterable/getSize and MessageBodyWriter.isReadable
+    method signatures now have additional parameters contain the type, generic
+    type, annotations and media type.
 
 release 0.10-SNAPSHOT
+- Per-session life-cycle is supported for Servlet-based Web applications.
+  See com.sun.jersey.spi.container.servlet.PerSession
+- Access to query parameters, path segments and matrix parameters is now
+  possible from com.sun.jersey.api.core.HttpRequestContext
 - Fixed issue with resource methods utilizing @FormParam that could only
   contain @FormParam annotated method parameters. Now @FormParam annotated
   parameters may be intermixed with other annotated parameters.
