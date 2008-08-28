@@ -42,6 +42,9 @@ import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.Status;
 
 import org.codehaus.jettison.json.JSONArray;
 
@@ -63,18 +66,28 @@ public class ItemResource {
     }
     
     /**
-     * Returns the item if existing.
+     * Returns the item if existing. Please be aware that this method is extremely
+     * expensive, so we can't guarantee that getting items is all the time possible.
      * 
      * @response.representation.200.qname {http://www.example.com}item
      * @response.representation.200.mediaType application/xml
      * @response.representation.200.example {@link Examples#SAMPLE_ITEM}
      * 
-     * @return the requested item.
+     * @response.representation.503.mediaType text/plain
+     * @response.representation.503.example You'll get some explanation why this service is not available
+     * 
+     * @return the requested item if this service is available, otherwise a 503.
      */
     @GET
-    @Produces({ "application/xml" })
-    public Item getItem() {
-        return _item;
+    @Produces({ "application/xml", "text/plain" })
+    public Response getItem() {
+        if ( System.currentTimeMillis() % 2 == 0 ) {
+            return Response.status( Status.SERVICE_UNAVAILABLE )
+                .entity( "Sorry, but right now we can't process this request," +
+                		" try again an odd number of milliseconds later, please :)" )
+                		.type( MediaType.TEXT_PLAIN ).build();
+        }
+        return Response.ok( _item ).build();
     }
     
     /**
