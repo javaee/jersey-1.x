@@ -34,7 +34,6 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-
 package com.sun.jersey.impl.entity;
 
 import com.sun.jersey.api.client.ClientResponse;
@@ -78,7 +77,6 @@ public class NoMessageBodyTest extends AbstractResourceTester {
         initiateWebApplication(NoMessageBodyWriterResource.class);        
         
         ClientResponse r = resource("/", false).get(ClientResponse.class);
-        assertEquals(406, r.getStatus());
-    }
-    
+        assertEquals(500, r.getStatus());
+    }   
 }

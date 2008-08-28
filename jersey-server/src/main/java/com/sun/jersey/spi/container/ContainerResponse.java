@@ -220,13 +220,15 @@ public class ContainerResponse implements HttpResponseContext {
                 null, contentType);
         // If there is no message body writer return a Not Acceptable response
         if (p == null) {
-            LOGGER.severe("A message body reader for Java type, " + entity.getClass() + 
-                    ", and MIME media type, " + contentType + ", was not found");            
+            String message = "A message body writer for Java type, " + entity.getClass() + 
+                    ", and MIME media type, " + contentType + ", was not found";
+
+            LOGGER.severe(message);            
             if (request.getMethod().equals("HEAD")) {
                 responseWriter.writeStatusAndHeaders(-1, this);
                 return;                
             } else 
-                throw new WebApplicationException(Responses.notAcceptable().build());
+                throw new WebApplicationException(Response.serverError().entity(message).build());
         }
 
         final long size = p.getSize(entity, entity.getClass(), entityType, null, contentType);
