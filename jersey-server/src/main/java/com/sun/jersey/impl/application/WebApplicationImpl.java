@@ -523,7 +523,6 @@ public final class WebApplicationImpl implements WebApplication {
         
         // Check the resource configuration
         this.resourceConfig = resourceConfig;
-        verifyResourceConfig();
 
         this.resourceContext = new ResourceContext() {
             public <T> T getResource(Class<T> c) {
@@ -758,20 +757,6 @@ public final class WebApplicationImpl implements WebApplication {
 
     public HttpContext getThreadLocalHttpContext() {
         return context;
-    }
-
-    // 
-    private void verifyResourceConfig() {
-        Iterator<Class<?>> i = resourceConfig.getProviderClasses().iterator();
-        while (i.hasNext()) {
-            Class<?> pc = i.next();
-            if (!pc.isAnnotationPresent(Provider.class)) {
-                LOGGER.warning("The class, " + pc + ", registered as a provider class " +
-                        "of the ResourceConfig is not annotationed with " + Provider.class +
-                        ". This class will be ignored");
-                i.remove();
-            }
-        }
     }
 
     private RulesMap<UriRule> processRootResources() {
