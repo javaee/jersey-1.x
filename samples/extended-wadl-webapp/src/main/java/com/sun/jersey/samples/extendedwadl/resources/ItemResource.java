@@ -71,6 +71,8 @@ public class ItemResource {
      * 
      * @response.representation.200.qname {http://www.example.com}item
      * @response.representation.200.mediaType application/xml
+     * @response.representation.200.doc This is the representation returned by default
+     *                                  (if we have an even number of millis since 1970...:) 
      * @response.representation.200.example {@link Examples#SAMPLE_ITEM}
      * 
      * @response.representation.503.mediaType text/plain
