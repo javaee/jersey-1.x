@@ -174,11 +174,17 @@ public final class ResponseBuilderImpl extends Response.ResponseBuilder {
     }
 
     public Response.ResponseBuilder type(String type) {
-        set(CONTENT_TYPE, MediaType.valueOf(type));
+        if (type != null)
+            set(CONTENT_TYPE, MediaType.valueOf(type));
+        else
+            set(CONTENT_TYPE, null);            
         return this;
     }
 
     public Response.ResponseBuilder variant(Variant variant) {
+        if (variant == null)
+            throw new IllegalArgumentException();
+        
         type(variant.getMediaType());
         // TODO set charset
         language(variant.getLanguage());
@@ -189,9 +195,14 @@ public final class ResponseBuilderImpl extends Response.ResponseBuilder {
     }
     
     public Response.ResponseBuilder variants(List<Variant> variants) {
+        if (variants == null) {
+            header(HttpHeaders.VARY, null);
+            return this;
+        }
+
         if (variants.isEmpty())
             return this;
-
+        
         MediaType accept = variants.get(0).getMediaType();
         boolean vAccept = false;
         
@@ -243,7 +254,10 @@ public final class ResponseBuilderImpl extends Response.ResponseBuilder {
     }
     
     public Response.ResponseBuilder language(Locale language) {
-        set(CONTENT_LANGUAGE, language.toString());
+        if (language != null)
+            set(CONTENT_LANGUAGE, language.toString());
+        else
+            set(CONTENT_LANGUAGE, null);
         return this;
     }
 
@@ -263,7 +277,10 @@ public final class ResponseBuilderImpl extends Response.ResponseBuilder {
     }
 
     public Response.ResponseBuilder tag(String tag) {
-        set(ETAG, new EntityTag(tag));
+        if (tag != null)
+            set(ETAG, new EntityTag(tag));
+        else
+            set(ETAG, null);
         return this;
     }
 
