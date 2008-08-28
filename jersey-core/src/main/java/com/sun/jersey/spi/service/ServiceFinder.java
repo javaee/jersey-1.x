@@ -559,6 +559,14 @@ public final class ServiceFinder<T> implements Iterable<T> {
                                     ex.getLocalizedMessage(), nextName, service));
                         }
                         nextName = null; 
+                    } catch(ClassFormatError ex) {
+                        // Dependent class of provider not found
+                        if(LOGGER.isLoggable(Level.CONFIG)) {
+                            LOGGER.log(Level.CONFIG , 
+                                    SpiMessages.DEPENDENT_CLASS_OF_PROVIDER_FORMAT_ERROR(
+                                    ex.getLocalizedMessage(), nextName, service));
+                        }
+                        nextName = null; 
                     }
                 }
             }
@@ -593,6 +601,10 @@ public final class ServiceFinder<T> implements Iterable<T> {
             } catch (NoClassDefFoundError ex) {
                 fail(service,
                         SpiMessages.DEPENDENT_CLASS_OF_PROVIDER_NOT_FOUND(
+                        ex.getLocalizedMessage(), cn, service));
+            } catch (ClassFormatError ex) {
+                fail(service,
+                        SpiMessages.DEPENDENT_CLASS_OF_PROVIDER_FORMAT_ERROR(
                         ex.getLocalizedMessage(), cn, service));
             } catch (Exception x) {
                 fail(service,
@@ -665,7 +677,20 @@ public final class ServiceFinder<T> implements Iterable<T> {
                         nextName = null; 
                     } else
                         fail(service,
-                                SpiMessages.PROVIDER_COULD_NOT_BE_CREATED(nextName, service, ex.getLocalizedMessage()),
+                                SpiMessages.DEPENDENT_CLASS_OF_PROVIDER_NOT_FOUND(ex.getLocalizedMessage(), nextName, service),
+                                ex);
+                } catch (ClassFormatError ex) {
+                    // Dependent class of provider not found
+                    if (ignoreOnClassNotFound) {
+                        if(LOGGER.isLoggable(Level.CONFIG)) {
+                            LOGGER.log(Level.CONFIG , 
+                                    SpiMessages.DEPENDENT_CLASS_OF_PROVIDER_FORMAT_ERROR(
+                                    ex.getLocalizedMessage(), nextName, service));
+                        }
+                        nextName = null; 
+                    } else
+                        fail(service,
+                                SpiMessages.DEPENDENT_CLASS_OF_PROVIDER_FORMAT_ERROR(ex.getLocalizedMessage(), nextName, service),
                                 ex);
                 } catch(Exception ex) {
                     fail(service,
