@@ -608,8 +608,7 @@ public class ResourceDoclet {
      */
     public static boolean validOptions( String[][] options, DocErrorReporter reporter ) {
         return validOption( OPTION_OUTPUT, "<path-to-file>", options, reporter )
-            && validOption( OPTION_CLASSPATH, "<path>", options, reporter )
-            && validOption( OPTION_DOC_PROCESSORS, "<classname>", options, reporter );
+            && validOption( OPTION_CLASSPATH, "<path>", options, reporter );
     }
 
     private static boolean validOption( String optionName,
