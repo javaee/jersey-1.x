@@ -1,4 +1,9 @@
 release 0.11 (2008-09-xx)
+- Fixed issue 106
+  https://jersey.dev.java.net/issues/show_bug.cgi?id=93
+  Improved error message when an invalid media type is declared for the content
+  type of an HTTP request when using the client API. The exception produced 
+  occurs closer to the source of the error.
 - Catch a java.lang.ClassFormatError when loading providers. This can occur
   if a 'stubbed' jar is in the class path that contains classes with no
   implementation.
