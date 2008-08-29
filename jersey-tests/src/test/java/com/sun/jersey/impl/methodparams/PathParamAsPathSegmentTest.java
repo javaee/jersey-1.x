@@ -181,5 +181,22 @@ public class PathParamAsPathSegmentTest extends AbstractResourceTester {
         initiateWebApplication(PathSegs.class);
         
         assertEquals("z-b", resource("/x/y/z/edit/b").get(String.class));
+        assertEquals("z-b", resource("///x/y/z/edit/b").get(String.class));
+    }    
+    
+    @Path("/{a: .+}")
+    public static class PathSegsEnd {
+        @GET
+        public String doGet(
+                @PathParam("a") PathSegment a) {
+            return a.getPath();
+        }
+    }
+    
+    public void testPathSegsEnd() {
+        initiateWebApplication(PathSegsEnd.class);
+        
+        assertEquals("z", resource("/x/y/z").get(String.class));
+        assertEquals("", resource("/x/y/z/").get(String.class));
     }    
 }

@@ -106,17 +106,24 @@ public class UriComponentDecodeTest extends TestCase {
         }
     }
 
-    public void testDecodePath() {
+    public void testDecodePathEmptySlash() {
         _testDecodePath("", "");
-        _testDecodePath("/", "");
-        _testDecodePath("//", "");
+        _testDecodePath("/", "", "");
+        _testDecodePath("//", "", "", "");
+        _testDecodePath("///", "", "", "", "");        
+    }
+    
+    public void testDecodePath() {
         _testDecodePath("a", "a");
-        _testDecodePath("/a", "a");
-        _testDecodePath("/a/", "a");
+        _testDecodePath("/a", "", "a");
+        _testDecodePath("/a/", "", "a", "");
+        _testDecodePath("/a//", "", "a", "", "");
+        _testDecodePath("/a///", "", "a", "", "", "");
         
         _testDecodePath("a/b/c", "a", "b", "c");
-        _testDecodePath("a//b//c//", "a", "b", "c");
-        _testDecodePath("//a//b//c//", "a", "b", "c");
+        _testDecodePath("a//b//c//", "a", "", "b", "", "c", "", "");
+        _testDecodePath("//a//b//c//", "", "", "a", "", "b", "", "c", "", "");
+        _testDecodePath("///a///b///c///", "", "", "", "a", "", "", "b", "", "", "c", "", "", "");
     }
     
     private void _testDecodePath(String path, String... segments) {

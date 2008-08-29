@@ -426,6 +426,8 @@ public final class UriComponent {
     }
     
     private static final class PathSegmentImpl implements PathSegment {
+        private static final PathSegment EMPTY_PATH_SEGMENT = new PathSegmentImpl("", false);
+        
         private final String path;
         
         private final MultivaluedMap<String, String> matrixParameters;
@@ -451,17 +453,29 @@ public final class UriComponent {
     /**
      * Decode the path component of a URI as path segments.
      * 
-     * @param u the URI.
+     * @param u the URI. If the path component is an absolute path component
+     *        then the leading '/' is ignored and is not considered a delimiator
+     *        of a path segment.
      * @param decode true if the path segments of the path component
      *        should be in decoded form.
      * @return the list of path segments.
      */
     public static List<PathSegment> decodePath(URI u, boolean decode) {
-        return decodePath(u.getRawPath(), decode);
+        String rawPath = u.getRawPath();
+        if (rawPath != null && rawPath.length() > 0 && rawPath.charAt(0) == '/')
+                rawPath = rawPath.substring(1);
+        return decodePath(rawPath, decode);
     }
 
     /**
      * Decode the path component of a URI as path segments.
+     * <p>
+     * Any '/' character in the path is considered to be a deliminator
+     * between two path segments. Thus if the path is '/' then the path segment 
+     * list will contain two empty path segments. If the path is "//" then
+     * the path segment list will contain three empty path segments. If the path 
+     * is "/a/" the the path segment list will consist of the following path
+     * segments in order: "", "a" and "".
      * 
      * @param path the path component in encoded form.
      * @param decode true if the path segments of the path component
@@ -473,24 +487,23 @@ public final class UriComponent {
         
         if (path == null)
             return segments;
-                
-        int s = 0, e = 0;
+
+        int s = 0;
+        int e = -1;
         do {
+            s = e + 1;
             e = path.indexOf('/', s);
 
-            if (e == -1) {
-                decodePathSegment(segments, path.substring(s), decode);
-            } else if (e > s) {
+            if (e > s) {
                 decodePathSegment(segments, path.substring(s, e), decode);
+            } else if (e == s) {
+                segments.add(PathSegmentImpl.EMPTY_PATH_SEGMENT);
             }
-            
-            s = e + 1;
-        } while (s > 0 && s < path.length());
-        
-        if (segments.isEmpty()) {
-            segments.add(new PathSegmentImpl("", false));
-        }
-        
+        } while (e != -1);
+        if (s < path.length())
+            decodePathSegment(segments, path.substring(s), decode);
+        else
+            segments.add(PathSegmentImpl.EMPTY_PATH_SEGMENT);
         return segments;
     }
     
