@@ -86,13 +86,14 @@ public class RightHandPathRule implements UriRule {
         if (rhpath.length() == 0) {
             // Redirect to path ending with a '/' if pattern
             // ends in '/' and redirect is true
-            if (patternEndsInSlash)
-                return (redirect) ? redirect(context) : false;
+            if (patternEndsInSlash && redirect)
+                return redirect(context);
             
             context.pushRightHandPathLength(0);
         } else if (rhpath.length() == 1) {
             // Path is '/', no match if pattern does not end in a '/'
-            if (!patternEndsInSlash)
+            // and redirect is true
+            if (!patternEndsInSlash && redirect)
                 return false;
 
             // Consume the '/'
