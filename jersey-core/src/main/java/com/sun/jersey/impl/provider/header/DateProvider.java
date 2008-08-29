@@ -61,7 +61,8 @@ public class DateProvider implements HeaderDelegateProvider<Date> {
         try {
             return HttpHeaderFactory.createDate(header);
         } catch (ParseException ex) {
-            throw new IllegalArgumentException(ex);
+            throw new IllegalArgumentException(
+                    "Error parsing date '" + header + "'", ex);
         }
     }
     

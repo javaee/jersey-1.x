@@ -227,7 +227,7 @@ public class TestResourceClientHandler implements ClientHandler {
             MediaType mediaType = null;
             final Object mediaTypeHeader = metadata.getFirst("Content-Type");
             if (mediaTypeHeader instanceof MediaType) {
-                mediaType = (MediaType)mediaType;
+                mediaType = (MediaType)mediaTypeHeader;
             } else {
                 if (mediaTypeHeader != null) {
                     mediaType = MediaType.valueOf(mediaTypeHeader.toString());

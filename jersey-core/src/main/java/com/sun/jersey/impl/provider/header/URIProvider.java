@@ -59,7 +59,8 @@ public class URIProvider implements HeaderDelegateProvider<URI> {
         try {
             return new URI(header);
         } catch (URISyntaxException e) {
-            throw new IllegalArgumentException(e);
+            throw new IllegalArgumentException(
+                    "Error parsing uri '" + header + "'", e);
         }
     }
     

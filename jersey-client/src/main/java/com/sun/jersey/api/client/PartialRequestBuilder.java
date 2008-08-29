@@ -86,7 +86,7 @@ public abstract class PartialRequestBuilder<T extends RequestBuilder>
     }
         
     public T type(String type) {
-        getMetadata().putSingle("Content-Type", type);        
+        getMetadata().putSingle("Content-Type", MediaType.valueOf(type));        
         return (T)this;
     }
         

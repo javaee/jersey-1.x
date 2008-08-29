@@ -64,7 +64,7 @@ public class EntityTagProvider implements HeaderDelegateProvider<EntityTag> {
 
     public EntityTag fromString(String header) {
         if (header == null)
-            throw new IllegalArgumentException();
+            throw new IllegalArgumentException("Entity tag is null");
         
         boolean weak = false;
         if (header.startsWith("W/")) {
@@ -76,7 +76,8 @@ public class EntityTagProvider implements HeaderDelegateProvider<EntityTag> {
             EntityTag eTag = new EntityTag(reader.nextQuotedString(),weak);
             return eTag;
         } catch (ParseException ex) {
-            throw new IllegalArgumentException(ex);
+            throw new IllegalArgumentException(
+                    "Error parsing entity tag '" + header + "'", ex);
         }
     }    
 }

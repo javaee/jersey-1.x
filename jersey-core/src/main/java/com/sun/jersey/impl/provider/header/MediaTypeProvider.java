@@ -71,7 +71,7 @@ public class MediaTypeProvider implements HeaderDelegateProvider<MediaType> {
 
     public MediaType fromString(String header) {
         if (header == null)
-            throw new IllegalArgumentException();
+            throw new IllegalArgumentException("Media type is null");
         
         try {
             HttpHeaderReader reader = new HttpHeaderReaderImpl(header);
@@ -91,7 +91,8 @@ public class MediaTypeProvider implements HeaderDelegateProvider<MediaType> {
 
             return new MediaType(type, subType, params);
         } catch (ParseException ex) {
-            throw new IllegalArgumentException(ex);
+            throw new IllegalArgumentException(
+                    "Error parsing media type '" + header + "'", ex);
         }
     }
 }

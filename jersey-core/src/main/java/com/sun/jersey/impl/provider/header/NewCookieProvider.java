@@ -79,7 +79,7 @@ public class NewCookieProvider implements HeaderDelegateProvider<NewCookie> {
 
     public NewCookie fromString(String header) {
         if (header == null)
-            throw new IllegalArgumentException();
+            throw new IllegalArgumentException("NewCookie is null");
         
         return HttpHeaderFactory.createNewCookie(header);
     }
