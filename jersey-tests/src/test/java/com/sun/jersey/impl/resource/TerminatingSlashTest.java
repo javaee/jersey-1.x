@@ -57,7 +57,7 @@ public class TerminatingSlashTest extends AbstractResourceTester {
     }
 
     @Path("/")
-    public static class TerminatingSlash {
+    public static class Terminating {
         @Path("abc")
         @GET
         public String get(@Context UriInfo ui) {
@@ -65,7 +65,32 @@ public class TerminatingSlashTest extends AbstractResourceTester {
         }
     }
     
-    public void testNoSlash() throws IOException {
+    public void testTerminatingNoSlash() throws IOException {
+        initiateWebApplication(Terminating.class);
+        WebResource r = resource("/");
+        
+        String s = r.path("abc").get(String.class);
+        assertEquals("abc", s);
+    }
+
+    public void testTerminatingSlash() throws IOException {
+        initiateWebApplication(Terminating.class);
+        WebResource r = resource("/");
+        
+        String s = r.path("abc/").get(String.class);
+        assertEquals("abc/", s);
+    }   
+    
+    @Path("/")
+    public static class TerminatingSlash {
+        @Path("abc/")
+        @GET
+        public String get(@Context UriInfo ui) {
+            return ui.getPath();
+        }
+    }
+
+    public void testTerminatingSlashNoSlash() throws IOException {
         initiateWebApplication(TerminatingSlash.class);
         WebResource r = resource("/");
         
@@ -73,15 +98,14 @@ public class TerminatingSlashTest extends AbstractResourceTester {
         assertEquals("abc", s);
     }
 
-    public void testSlash() throws IOException {
+    public void testTerminatingSlashSlash() throws IOException {
         initiateWebApplication(TerminatingSlash.class);
         WebResource r = resource("/");
         
         String s = r.path("abc/").get(String.class);
         assertEquals("abc/", s);
     }   
-    
-    
+        
     @Path("/")
     public class TerminatingSlashWithParameter {
         @GET
