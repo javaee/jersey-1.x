@@ -90,7 +90,7 @@ public final class PerSessionProvider implements ResourceProvider {
 
     @Context HttpServletRequest hsr;
     
-    public Object getInstance(ComponentProvider provider, HttpContext context) {
+    public synchronized Object getInstance(ComponentProvider provider, HttpContext context) {
         Object o = hsr.getSession().getAttribute(c.getName());
         if (o != null) return o;
 
