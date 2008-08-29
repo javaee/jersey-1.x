@@ -53,6 +53,8 @@ import java.util.regex.PatternSyntaxException;
  * @author Paul.Sandoz@Sun.Com
  */
 public class UriTemplateParser {
+    /* package */ static final int[] EMPTY_INT_ARRAY = new int[0];
+    
     private static Set<Character> RESERVED_REGEX_CHARACTERS = createReserved();
 
     private static Set<Character> createReserved() {
@@ -169,14 +171,18 @@ public class UriTemplateParser {
     }
 
     public final int[] getGroupIndexes() {
-        if (names.isEmpty()) return new int[0];
+        if (names.isEmpty()) return EMPTY_INT_ARRAY;
 
         int[] indexes = new int[names.size() + 1];        
         indexes[0] = 1;
         for (int i = 1; i < indexes.length; i++) {
             indexes[i] = indexes[i - 1] + groupCounts.get(i - 1);
         }
-        return indexes;
+        for (int i = 0; i < indexes.length; i++) {
+            if (indexes[i] != i + 1)
+                return indexes;
+        }
+        return EMPTY_INT_ARRAY;
     }
     
     public final int getNumberOfExplicitRegexes() {

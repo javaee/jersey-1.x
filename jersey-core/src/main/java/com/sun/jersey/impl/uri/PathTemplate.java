@@ -38,7 +38,6 @@
 package com.sun.jersey.impl.uri;
 
 import com.sun.jersey.api.uri.UriComponent;
-import com.sun.jersey.api.uri.UriPattern;
 import com.sun.jersey.api.uri.UriTemplate;
 import com.sun.jersey.api.uri.UriTemplateParser;
 

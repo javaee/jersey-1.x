@@ -52,8 +52,6 @@ import java.util.regex.Pattern;
  * @author Paul.Sandoz@Sun.Com
  */
 public class UriPattern {
-    private static final int[] EMPTY_INT_ARRAY = new int[0];
-    
     /**
      * The empty URI pattern that matches the null or empty URI path
      */
@@ -92,7 +90,7 @@ public class UriPattern {
      *         regular expression could not be compiled
      */
     public UriPattern(String regex) {
-        this(regex, EMPTY_INT_ARRAY);
+        this(regex, UriTemplateParser.EMPTY_INT_ARRAY);
     }
 
     public UriPattern(String regex, int[] groupIndexes) {
@@ -110,7 +108,7 @@ public class UriPattern {
      * @throws IllegalArgumentException if the regexPattern is null.
      */
     public UriPattern(Pattern regexPattern) {
-        this(regexPattern, EMPTY_INT_ARRAY);
+        this(regexPattern, UriTemplateParser.EMPTY_INT_ARRAY);
     }
     
     /**
