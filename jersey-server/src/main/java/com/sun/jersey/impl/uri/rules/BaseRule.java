@@ -34,7 +34,6 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-
 package com.sun.jersey.impl.uri.rules;
 
 import com.sun.jersey.api.uri.UriTemplate;
@@ -55,11 +54,8 @@ public abstract class BaseRule implements UriRule {
         this.template = template;
     }
     
-    /**
-     * Set the URI temaplte values.
-     */
-    protected final void setTemplateValues(UriRuleContext context) {
-        context.setTemplateValues(template.getTemplateVariables());
+    protected final void pushParameterValues(UriRuleContext context) {
+        context.pushParameterValues(template.getTemplateVariables());
     }
     
     protected final UriTemplate getTemplate() {

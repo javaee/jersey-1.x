@@ -39,7 +39,9 @@ package com.sun.jersey.impl.uri.rules.automata;
 
 import com.sun.jersey.impl.uri.PathPattern;
 import com.sun.jersey.impl.uri.rules.PatternRulePair;
+import com.sun.jersey.spi.uri.rules.UriMatchResultContext;
 import com.sun.jersey.spi.uri.rules.UriRules;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -48,9 +50,14 @@ import java.util.Stack;
 
 /**
  * UriRules implementation based on a TRIE/Finite Automata.
+ *
+ * This class has been made abstract because it needs to fixed in terms
+ * of supporting the UriRules interface and matching using more general regular
+ * expressions.
+ * 
  * @author Frank D. Martinez. fmartinez@asimovt.com
  */
-public final class AutomataMatchingUriTemplateRules<R> implements UriRules<R> {
+public class AutomataMatchingUriTemplateRules<R> implements UriRules<R> {
     /** Trie/Automata Index */
     private final TrieNode<R> automata;
 
@@ -58,7 +65,8 @@ public final class AutomataMatchingUriTemplateRules<R> implements UriRules<R> {
         this.automata = initTrie(rules);
     }
     
-    public Iterator<R> match(CharSequence path, List<String> capturingGroupValues) {
+    public Iterator<R> match(CharSequence path, UriMatchResultContext resultContext) {
+        List<String> capturingGroupValues = new ArrayList<String>();
         TrieNode<R> node = find(path, capturingGroupValues);
         if (node != null) {
             return node.getValue();

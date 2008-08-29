@@ -34,7 +34,6 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-
 package com.sun.jersey.impl.application;
 
 import com.sun.jersey.api.core.HttpRequestContext;
@@ -52,9 +51,11 @@ import com.sun.jersey.spi.uri.rules.UriRules;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.MatchResult;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.PathSegment;
 import javax.ws.rs.core.UriBuilder;
@@ -64,25 +65,20 @@ import javax.ws.rs.core.UriBuilder;
  * @author Paul.Sandoz@Sun.Com
  */
 public final class WebApplicationContext implements UriRuleContext, ExtendedUriInfo {
-    
-    private final ContainerRequest request;
-    
-    private final ContainerResponse response;
-    
-    private final WebApplicationImpl app;
 
+    private final ContainerRequest request;
+    private final ContainerResponse response;
+    private final WebApplicationImpl app;
     private Map<String, Object> properties;
-    
-    public WebApplicationContext(WebApplicationImpl app, 
+
+    public WebApplicationContext(WebApplicationImpl app,
             ContainerRequest request, ContainerResponse response) {
         this.app = app;
         this.request = request;
         this.response = response;
     }
 
-    
     // HttpContext
-    
     public HttpRequestContext getRequest() {
         return request;
     }
@@ -90,28 +86,35 @@ public final class WebApplicationContext implements UriRuleContext, ExtendedUriI
     public HttpResponseContext getResponse() {
         return response;
     }
-    
+
     public ExtendedUriInfo getUriInfo() {
         return this;
     }
-    
+
     public Map<String, Object> getProperties() {
-        if (properties != null)
+        if (properties != null) {
             return properties;
-        
+        }
+
         return properties = new HashMap<String, Object>();
     }
-    
-    // UriRuleContext
 
+    // UriMatchResultContext
+    private MatchResult matchResult;
+
+    public MatchResult getMatchResult() {
+        return matchResult;
+    }
+
+    public void setMatchResult(MatchResult matchResult) {
+        this.matchResult = matchResult;
+    }
+    // UriRuleContext
     private final LinkedList<Object> resources = new LinkedList<Object>();
-    
+    private final LinkedList<MatchResult> matchResults = new LinkedList<MatchResult>();
     private final LinkedList<String> paths = new LinkedList<String>();
-    
     private final LinkedList<UriTemplate> templates = new LinkedList<UriTemplate>();
-    
-    private final List<String> capturingGroupValues = new ArrayList<String>();
-        
+
     public Object getResource(Class resourceClass) {
         final ResourceClass rc = app.getResourceClass(resourceClass);
         return rc.provider.getInstance(app.getResourceComponentProvider(), this);
@@ -122,103 +125,99 @@ public final class WebApplicationContext implements UriRuleContext, ExtendedUriI
         return rc.getRules();
     }
 
-    public List<String> getGroupValues() {
-        return capturingGroupValues;
-    }
-    
-    public void setTemplateValues(List<String> names) {
-        if (encodedTemplateValues == null)
+    public void pushParameterValues(List<String> names) {
+        if (encodedTemplateValues == null) {
             encodedTemplateValues = new MultivaluedMapImpl();
-        
-        int i = 0;
+        }
+
+        int i = 1;
         for (String name : names) {
-            final String value = capturingGroupValues.get(i++);
+            final String value = matchResult.group(i++);
             encodedTemplateValues.addFirst(name, value);
-            
+
             if (decodedTemplateValues != null) {
                 decodedTemplateValues.addFirst(
                         UriComponent.decode(name, UriComponent.Type.PATH_SEGMENT),
-                        UriComponent.decode(value, UriComponent.Type.PATH));                
+                        UriComponent.decode(value, UriComponent.Type.PATH));
             }
         }
+
+        matchResults.addFirst(matchResult);
     }
-    
+
     public void pushResource(Object resource, UriTemplate template) {
-         resources.addFirst(resource);
-         templates.addFirst(template);
+        resources.addFirst(resource);
+        templates.addFirst(template);
     }
-    
+
     public void pushRightHandPathLength(int rhpathlen) {
         final String ep = request.getPath(false);
         paths.addFirst(ep.substring(0,
                 ep.length() - rhpathlen));
     }
-        
     // UriInfo, defer to HttpRequestContext
-    
     private MultivaluedMapImpl encodedTemplateValues;
-    
     private MultivaluedMapImpl decodedTemplateValues;
-    
+
     public URI getBaseUri() {
         return request.getBaseUri();
     }
-    
+
     public UriBuilder getBaseUriBuilder() {
         return request.getBaseUriBuilder();
     }
-    
+
     public URI getAbsolutePath() {
         return request.getAbsolutePath();
     }
-    
+
     public UriBuilder getAbsolutePathBuilder() {
         return request.getAbsolutePathBuilder();
     }
-    
+
     public URI getRequestUri() {
         return request.getRequestUri();
     }
-    
+
     public UriBuilder getRequestUriBuilder() {
         return request.getRequestUriBuilder();
     }
-    
+
     public String getPath() {
         return request.getPath(true);
     }
-    
+
     public String getPath(boolean decode) {
         return request.getPath(decode);
     }
-    
+
     public List<PathSegment> getPathSegments() {
         return request.getPathSegments(true);
     }
-    
+
     public List<PathSegment> getPathSegments(boolean decode) {
         return request.getPathSegments(decode);
     }
-    
+
     public MultivaluedMap<String, String> getQueryParameters() {
         return request.getQueryParameters(true);
     }
-    
+
     public MultivaluedMap<String, String> getQueryParameters(boolean decode) {
         return request.getQueryParameters(decode);
     }
 
     // UriInfo, matching specific functionality
-    
     public MultivaluedMap<String, String> getPathParameters() {
         return getPathParameters(true);
     }
-    
+
     public MultivaluedMap<String, String> getPathParameters(boolean decode) {
         if (decode) {
-            if (decodedTemplateValues != null)
+            if (decodedTemplateValues != null) {
                 return decodedTemplateValues;
-            
+            }
+
             decodedTemplateValues = new MultivaluedMapImpl();
             for (Map.Entry<String, List<String>> e : encodedTemplateValues.entrySet()) {
                 List<String> l = new ArrayList<String>();
@@ -229,44 +228,92 @@ public final class WebApplicationContext implements UriRuleContext, ExtendedUriI
                         UriComponent.decode(e.getKey(), UriComponent.Type.PATH_SEGMENT),
                         l);
             }
-            
+
             return decodedTemplateValues;
         } else {
             return encodedTemplateValues;
         }
     }
-    
+
     public List<String> getMatchedURIs() {
         return paths;
     }
-    
+
     public List<String> getMatchedURIs(boolean decode) {
         throw new UnsupportedOperationException();
-    }    
-    
+    }
+
     public List<Object> getMatchedResources() {
         return resources;
-    }    
-    
+    }
+
     // ExtendedUriInfo
     
+    public List<MatchResult> getMatchedResults() {
+        return matchResults;
+    }
+
     public List<UriTemplate> getMatchedTemplates() {
         return templates;
-    }    
-    
+    }
+
     public PathSegment getPathSegment(String name) {
         return getPathSegment(name, true);
     }
-    
+
     public PathSegment getPathSegment(String name, boolean decode) {
-        int i = -1;
-        for (UriTemplate t : templates) {
-            if (i == -1)
-                i = t.getPathSegmentIndex(name);
-            else
-                i += t.getNumberOfPathSegments();
+        int e = getPathParameterEndIndex(name);
+        if (e != -1) {
+            int segments = 0;
+            String path = matchResults.getLast().group();
+            // Work out how many path segments are up to the end position
+            // of the matching path parameter value
+            // This assumes that the path always starts with a '/'
+            // TODO
+            // This currently does not ignore contiguous '/'
+            for (int x = 0; x < e; x++) {
+                if (path.charAt(x) == '/') {
+                    segments++;
+                }
+            }
+            return getPathSegments(decode).get(segments - 1);
+        } else
+            return null;
+    }
+
+    private int getPathParameterEndIndex(String name) {
+        Iterator<UriTemplate> iTemplate = templates.iterator();
+        Iterator<MatchResult> iMatchResult = matchResults.iterator();
+        while (iTemplate.hasNext()) {
+            MatchResult mr = iMatchResult.next();
+            // Find the index of path parameter
+            int pIndex = getLastPathParameterIndex(name, iTemplate.next());
+            if (pIndex != -1) {
+                int pathLength = mr.group().length();
+                int segmentIndex = mr.end(pIndex + 1);
+
+                // Find the absolute position of the end of the
+                // capturing group in the request path
+                while (iMatchResult.hasNext()) {
+                    mr = iMatchResult.next();
+                    segmentIndex += mr.group().length() - pathLength;
+                    pathLength = mr.group().length();
+                }
+                return segmentIndex;
+            }
         }
-        
-        return (i != -1) ? getPathSegments(decode).get(i) : null;
+        return -1;
+    }
+
+    private int getLastPathParameterIndex(String name, UriTemplate t) {
+        int i = 0;
+        int pIndex = -1;
+        for (String parameterName : t.getTemplateVariables()) {
+            if (parameterName.equals(name)) {
+                pIndex = i;
+            }
+            i++;
+        }
+        return pIndex;
     }
 }

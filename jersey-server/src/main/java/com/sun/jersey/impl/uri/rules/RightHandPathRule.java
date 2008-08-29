@@ -37,11 +37,10 @@
 
 package com.sun.jersey.impl.uri.rules;
 
-import com.sun.jersey.api.core.HttpRequestContext;
 import com.sun.jersey.api.core.HttpResponseContext;
 import com.sun.jersey.spi.uri.rules.UriRule;
 import com.sun.jersey.spi.uri.rules.UriRuleContext;
-import java.util.List;
+import java.util.regex.MatchResult;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
 
@@ -83,7 +82,7 @@ public class RightHandPathRule implements UriRule {
     }
     
     public final boolean accept(CharSequence path, Object resource, UriRuleContext context) {
-        String rhpath = getRightHandPath(context.getGroupValues());
+        String rhpath = getRightHandPath(context.getMatchResult());
         if (rhpath.length() == 0) {
             // Redirect to path ending with a '/' if pattern
             // ends in '/' and redirect is true
@@ -112,17 +111,15 @@ public class RightHandPathRule implements UriRule {
     }
     
     /**
-     * Get the right hand path from the list of captured group
-     * values. The right hand path is the last group value (if present)
+     * Get the right hand path from the match result. The right hand path is
+     * the last group (if present).
      * 
-     * @param groupValues the list of captured group values.
-     * @return the right hand path or the empty string if the list of group
-     *         values is empty.
+     * @param mr the match result.
+     * @return the right hand path, or the empty string if there is no last
+     *         group.
      */
-    private String getRightHandPath(List<String> groupValues) {        
-        final String rhp = (!groupValues.isEmpty()) ? 
-            groupValues.get(groupValues.size() - 1) :
-            "";
+    private String getRightHandPath(MatchResult mr) {        
+        final String rhp = (mr.groupCount() > 0) ? mr.group(mr.groupCount()) : "";
         return (rhp != null) ? rhp : "";
     }
 

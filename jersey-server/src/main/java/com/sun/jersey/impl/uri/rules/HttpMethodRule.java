@@ -117,7 +117,7 @@ public final class HttpMethodRule implements UriRule {
             if (isSubResource) {
                 context.pushResource(resource, method.getTemplate());        
                 // Set the template values
-                context.setTemplateValues(method.getTemplate().getTemplateVariables());
+                context.pushParameterValues(method.getTemplate().getTemplateVariables());
             }
             
             method.getDispatcher().dispatch(resource, context);

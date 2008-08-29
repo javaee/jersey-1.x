@@ -37,11 +37,13 @@
 
 package com.sun.jersey.impl.uri.rules;
 
+import com.sun.jersey.api.uri.UriPattern;
+import com.sun.jersey.spi.uri.rules.UriMatchResultContext;
 import com.sun.jersey.spi.uri.rules.UriRules;
 import java.util.Collection;
 import java.util.Iterator;
-import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.regex.MatchResult;
 
 /**
  * Rules associated with instances of {@link UriPattern) and matched 
@@ -59,10 +61,12 @@ public final class AtomicMatchingPatterns<R> implements UriRules<R> {
         this.rules = rules;
     }
     
-    public Iterator<R> match(CharSequence path, List<String> capturingGroupValues) {
+    public Iterator<R> match(CharSequence path, UriMatchResultContext resultContext) {
         for (PatternRulePair<R> prp : rules) {
             // Match each template
-            if (prp.p.match(path, capturingGroupValues)) {
+            final MatchResult mr = prp.p.match(path);
+            if (mr != null) {
+                resultContext.setMatchResult(mr);
                 return new SingleEntryIterator<R>(prp.r);
             }
         }

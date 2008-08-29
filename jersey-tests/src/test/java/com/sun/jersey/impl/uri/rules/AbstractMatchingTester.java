@@ -40,26 +40,34 @@ package com.sun.jersey.impl.uri.rules;
 import com.sun.jersey.impl.model.RulesMap;
 import com.sun.jersey.impl.uri.PathPattern;
 import com.sun.jersey.api.uri.UriTemplate;
+import com.sun.jersey.spi.uri.rules.UriMatchResultContext;
 import com.sun.jersey.spi.uri.rules.UriRules;
-import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.List;
+import java.util.regex.MatchResult;
 import junit.framework.*;
 
 /**
  *
  * @author Paul.Sandoz@Sun.Com
  */
-public abstract class AbstractMatchingTester extends TestCase {
+public abstract class AbstractMatchingTester extends TestCase implements UriMatchResultContext {
     
     protected UriRules<String> rules;
 
-    final List<String> groupValues = new ArrayList<String>();
-    
+    MatchResult matchResult;
+
     public AbstractMatchingTester(String testName) {
         super(testName);
     }
 
+    public MatchResult getMatchResult() {
+        return matchResult;
+    }
+
+    public void setMatchResult(MatchResult matchResult) {
+        this.matchResult = matchResult;
+    }
+    
     protected abstract class RulesBuilder {
         protected RulesMap<String> rulesMap = new RulesMap<String>();
         
@@ -91,7 +99,7 @@ public abstract class AbstractMatchingTester extends TestCase {
     protected abstract RulesBuilder create();
     
     protected String match(CharSequence path) {
-        Iterator<String> i = rules.match(path, groupValues);
+        Iterator<String> i = rules.match(path, this);
         if (!i.hasNext())
             return null;
         return i.next();
@@ -104,7 +112,7 @@ public abstract class AbstractMatchingTester extends TestCase {
         String s = match("");
         
         assertEquals("MATCH", s);
-        assertEquals(0, groupValues.size());
+        assertEquals(0, matchResult.groupCount());
     }
     
     public void testSlash() {
@@ -114,8 +122,8 @@ public abstract class AbstractMatchingTester extends TestCase {
         String s = match("/");
         
         assertEquals("MATCH", s);
-        assertEquals(1, groupValues.size());
-        assertEquals("/", groupValues.get(0));
+        assertEquals(1, matchResult.groupCount());
+        assertEquals("/", matchResult.group(1));
     }
     
     public void testSlashWithMorePath() {
@@ -125,8 +133,8 @@ public abstract class AbstractMatchingTester extends TestCase {
         String s = match("/a/b/c/d");
         
         assertEquals("MATCH", s);
-        assertEquals(1, groupValues.size());
-        assertEquals("/a/b/c/d", groupValues.get(0));
+        assertEquals(1, matchResult.groupCount());
+        assertEquals("/a/b/c/d", matchResult.group(1));
     }
     
     public void testLiteralTemplateWithMorePath() {
@@ -137,8 +145,8 @@ public abstract class AbstractMatchingTester extends TestCase {
         String s = match("/a/b/c/d");
         
         assertEquals("MATCH", s);
-        assertEquals(1, groupValues.size());
-        assertEquals("/b/c/d", groupValues.get(0));
+        assertEquals(1, matchResult.groupCount());
+        assertEquals("/b/c/d", matchResult.group(1));
     }
     
     public void testSingleTemplate() {
@@ -148,9 +156,9 @@ public abstract class AbstractMatchingTester extends TestCase {
         String s = match("/a");
         
         assertEquals("MATCH", s);
-        assertEquals(2, groupValues.size());
-        assertEquals("a", groupValues.get(0));
-        assertEquals(null, groupValues.get(1));
+        assertEquals(2, matchResult.groupCount());
+        assertEquals("a", matchResult.group(1));
+        assertEquals(null, matchResult.group(2));
     }
     
     public void testSingleTemplateWithMorePath() {
@@ -160,9 +168,9 @@ public abstract class AbstractMatchingTester extends TestCase {
         String s = match("/a/b/c/d");
         
         assertEquals("MATCH", s);
-        assertEquals(2, groupValues.size());
-        assertEquals("a", groupValues.get(0));
-        assertEquals("/b/c/d", groupValues.get(1));
+        assertEquals(2, matchResult.groupCount());
+        assertEquals("a", matchResult.group(1));
+        assertEquals("/b/c/d", matchResult.group(2));
     }
     
     public void testMultipleTemplates() {
@@ -174,66 +182,66 @@ public abstract class AbstractMatchingTester extends TestCase {
 
         String s = match("/-a-/-b-/-c-");
         assertEquals("/-{p1}-/-{p2}-/-{p3}-", s);
-        assertEquals(4, groupValues.size());
-        assertEquals("a", groupValues.get(0));
-        assertEquals("b", groupValues.get(1));
-        assertEquals("c", groupValues.get(2));
-        assertEquals(null, groupValues.get(3));
+        assertEquals(4, matchResult.groupCount());
+        assertEquals("a", matchResult.group(1));
+        assertEquals("b", matchResult.group(2));
+        assertEquals("c", matchResult.group(3));
+        assertEquals(null, matchResult.group(4));
         
         s = match("/-a-/-b-/-c-/d");
         assertEquals("/-{p1}-/-{p2}-/-{p3}-", s);
-        assertEquals(4, groupValues.size());
-        assertEquals("a", groupValues.get(0));
-        assertEquals("b", groupValues.get(1));
-        assertEquals("c", groupValues.get(2));
-        assertEquals("/d", groupValues.get(3));
+        assertEquals(4, matchResult.groupCount());
+        assertEquals("a", matchResult.group(1));
+        assertEquals("b", matchResult.group(2));
+        assertEquals("c", matchResult.group(3));
+        assertEquals("/d", matchResult.group(4));
         
         s = match("/-a/b/c/d");
         assertEquals("/{p1}/{p2}/{p3}", s);
-        assertEquals(4, groupValues.size());
-        assertEquals("-a", groupValues.get(0));
-        assertEquals("b", groupValues.get(1));
-        assertEquals("c", groupValues.get(2));
-        assertEquals("/d", groupValues.get(3));
+        assertEquals(4, matchResult.groupCount());
+        assertEquals("-a", matchResult.group(1));
+        assertEquals("b", matchResult.group(2));
+        assertEquals("c", matchResult.group(3));
+        assertEquals("/d", matchResult.group(4));
         
         s = match("/a/b/c/d");
         assertEquals("/{p1}/{p2}/{p3}", s);
-        assertEquals(4, groupValues.size());
-        assertEquals("a", groupValues.get(0));
-        assertEquals("b", groupValues.get(1));
-        assertEquals("c", groupValues.get(2));
-        assertEquals("/d", groupValues.get(3));
+        assertEquals(4, matchResult.groupCount());
+        assertEquals("a", matchResult.group(1));
+        assertEquals("b", matchResult.group(2));
+        assertEquals("c", matchResult.group(3));
+        assertEquals("/d", matchResult.group(4));
         
         s = match("/-a/b/c");
         assertEquals("/{p1}/{p2}/{p3}", s);
-        assertEquals(4, groupValues.size());
-        assertEquals("-a", groupValues.get(0));
-        assertEquals("b", groupValues.get(1));
-        assertEquals("c", groupValues.get(2));
-        assertEquals(null, groupValues.get(3));
+        assertEquals(4, matchResult.groupCount());
+        assertEquals("-a", matchResult.group(1));
+        assertEquals("b", matchResult.group(2));
+        assertEquals("c", matchResult.group(3));
+        assertEquals(null, matchResult.group(4));
         
         s = match("/a/b/c");
         assertEquals("/{p1}/{p2}/{p3}", s);
-        assertEquals(4, groupValues.size());
-        assertEquals("a", groupValues.get(0));
-        assertEquals("b", groupValues.get(1));
-        assertEquals("c", groupValues.get(2));
-        assertEquals(null, groupValues.get(3));
+        assertEquals(4, matchResult.groupCount());
+        assertEquals("a", matchResult.group(1));
+        assertEquals("b", matchResult.group(2));
+        assertEquals("c", matchResult.group(3));
+        assertEquals(null, matchResult.group(4));
 
         
         s = match("/a/b");
         assertEquals("/{p1}/{p2}", s);
-        assertEquals(3, groupValues.size());
-        assertEquals("a", groupValues.get(0));
-        assertEquals("b", groupValues.get(1));
-        assertEquals(null, groupValues.get(2));
+        assertEquals(3, matchResult.groupCount());
+        assertEquals("a", matchResult.group(1));
+        assertEquals("b", matchResult.group(2));
+        assertEquals(null, matchResult.group(3));
 
         
         s = match("/a");
         assertEquals("/{p1}", s);
-        assertEquals(2, groupValues.size());
-        assertEquals("a", groupValues.get(0));
-        assertEquals(null, groupValues.get(1));
+        assertEquals(2, matchResult.groupCount());
+        assertEquals("a", matchResult.group(1));
+        assertEquals(null, matchResult.group(2));
     }
     
     public void testMultipleTemplatesWithExplicitPath() {
@@ -245,32 +253,32 @@ public abstract class AbstractMatchingTester extends TestCase {
         
         String s = match("/a");
         assertEquals("/{p1}", s);
-        assertEquals(2, groupValues.size());
-        assertEquals("a", groupValues.get(0));
-        assertEquals(null, groupValues.get(1));
+        assertEquals(2, matchResult.groupCount());
+        assertEquals("a", matchResult.group(1));
+        assertEquals(null, matchResult.group(2));
         
         s = match("/edit");
         assertEquals("/edit", s);
-        assertEquals(1, groupValues.size());
-        assertEquals(null, groupValues.get(0));
+        assertEquals(1, matchResult.groupCount());
+        assertEquals(null, matchResult.group(1));
         
         s = match("/edit/b");
         assertEquals("/edit/{p1}", s);
-        assertEquals(2, groupValues.size());
-        assertEquals("b", groupValues.get(0));
-        assertEquals(null, groupValues.get(1));
+        assertEquals(2, matchResult.groupCount());
+        assertEquals("b", matchResult.group(1));
+        assertEquals(null, matchResult.group(2));
                 
         s = match("/edit/a");
         assertEquals("/edit/{p1}", s);
-        assertEquals(2, groupValues.size());
-        assertEquals("a", groupValues.get(0));
-        assertEquals(null, groupValues.get(1));
+        assertEquals(2, matchResult.groupCount());
+        assertEquals("a", matchResult.group(1));
+        assertEquals(null, matchResult.group(2));
         
         s = match("/edit/a_one");
         assertEquals("/edit/a{p1}", s);
-        assertEquals(2, groupValues.size());
-        assertEquals("_one", groupValues.get(0));
-        assertEquals(null, groupValues.get(1));
+        assertEquals(2, matchResult.groupCount());
+        assertEquals("_one", matchResult.group(1));
+        assertEquals(null, matchResult.group(2));
     }
     
     public void ignoredTestTemplatesWithSlash() {
@@ -280,13 +288,13 @@ public abstract class AbstractMatchingTester extends TestCase {
         
         String s = match("/edit");
         assertEquals("/edit/", s);
-        assertEquals(1, groupValues.size());
-        assertEquals(null, groupValues.get(0));
+        assertEquals(1, matchResult.groupCount());
+        assertEquals(null, matchResult.group(1));
 
         s = match("/edit/");
         assertEquals("/edit/", s);
-        assertEquals(1, groupValues.size());
-        assertEquals("/", groupValues.get(0));
+        assertEquals(1, matchResult.groupCount());
+        assertEquals("/", matchResult.group(1));
     }
 
     public void testTemplatesWithSameNumOfCharactersAndTemplates() {
@@ -296,14 +304,14 @@ public abstract class AbstractMatchingTester extends TestCase {
       
         String s = match("/a/infix/b");
         assertEquals("/a/{p1}/b", s);
-        assertEquals(2, groupValues.size());
-        assertEquals("infix", groupValues.get(0));
-        assertEquals(null, groupValues.get(1));
+        assertEquals(2, matchResult.groupCount());
+        assertEquals("infix", matchResult.group(1));
+        assertEquals(null, matchResult.group(2));
     
         s = match("/a/infix/c");
         assertEquals("/a/{p1}/c", s);
-        assertEquals(2, groupValues.size());
-        assertEquals("infix", groupValues.get(0));
-        assertEquals(null, groupValues.get(1));    
+        assertEquals(2, matchResult.groupCount());
+        assertEquals("infix", matchResult.group(1));
+        assertEquals(null, matchResult.group(2));
     }
 }

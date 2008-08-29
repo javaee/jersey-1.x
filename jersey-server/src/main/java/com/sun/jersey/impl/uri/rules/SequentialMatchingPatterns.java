@@ -36,10 +36,13 @@
  */
 package com.sun.jersey.impl.uri.rules;
 
+import com.sun.jersey.api.uri.UriPattern;
+import com.sun.jersey.spi.uri.rules.UriMatchResultContext;
 import com.sun.jersey.spi.uri.rules.UriRules;
 import java.util.Iterator;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.regex.MatchResult;
 
 /**
  * Rules associated with instances of {@link UriPattern) and matched 
@@ -55,20 +58,20 @@ public final class SequentialMatchingPatterns<R> implements UriRules<R> {
         this.rules = rules;
     }
     
-    public Iterator<R> match(CharSequence path, List<String> capturingGroupValues) {
-        return new XInterator(path, capturingGroupValues);
+    public Iterator<R> match(CharSequence path, UriMatchResultContext resultContext) {
+        return new XInterator(path, resultContext);
     }
 
     private final class XInterator implements Iterator<R> {
 
         private final CharSequence path;
-        private final List<String> capturingGroupValues;
+        private final UriMatchResultContext resultContext;
         private final Iterator<PatternRulePair<R>> i;
         private R r;
 
-        XInterator(CharSequence path, List<String> capturingGroupValues) {
+        XInterator(CharSequence path, UriMatchResultContext resultContext) {
             this.path = path;
-            this.capturingGroupValues = capturingGroupValues;
+            this.resultContext = resultContext;
             this.i = rules.iterator();
         }
         
@@ -77,7 +80,9 @@ public final class SequentialMatchingPatterns<R> implements UriRules<R> {
             
             while(i.hasNext()) {
                 final PatternRulePair<R> prp = i.next();
-                if (prp.p.match(path, capturingGroupValues)) {
+                final MatchResult mr = prp.p.match(path);
+                if (mr != null) {
+                    resultContext.setMatchResult(mr);
                     r = prp.r;
                     return true;
                 }                

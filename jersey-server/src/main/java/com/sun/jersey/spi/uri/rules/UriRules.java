@@ -38,7 +38,6 @@
 package com.sun.jersey.spi.uri.rules;
 
 import java.util.Iterator;
-import java.util.List;
 
 /**
  * A collection of URI rules that can be matched using associated patterns.
@@ -54,12 +53,12 @@ public interface UriRules<R> {
      * the matching rules.
      *
      * @param path the URI path to be matched
-     * @param capturingGroupValues the list to store the values of a pattern's 
-     *        capturing groups. This list will be cleared and modified each time 
-     *        {@link Iterator#next} is called according to the pattern 
-     *        associated with the returned rule. The values are stored in
-     *        the same order as the pattern's capturing groups.
+     * @param resultContext the context to store the match result.
+     *        The result will be set each time {@link Iterator#next} is called
+     *        according to the pattern associated with the returned rule.
+     *        The matching groups in the result are stored in the same order as
+     *        the pattern's capturing groups.
      * @return an iterator of matching rules
      */
-    Iterator<R> match(CharSequence path, List<String> capturingGroupValues);
+    Iterator<R> match(CharSequence path, UriMatchResultContext resultContext);
 }

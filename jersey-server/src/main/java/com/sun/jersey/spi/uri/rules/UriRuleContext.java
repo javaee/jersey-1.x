@@ -45,7 +45,7 @@ import java.util.List;
  *
  * @author Paul.Sandoz@Sun.Com
  */
-public interface UriRuleContext extends HttpContext {
+public interface UriRuleContext extends HttpContext, UriMatchResultContext {
 
     /**
      * Get the resource instance from a resource class.
@@ -64,21 +64,13 @@ public interface UriRuleContext extends HttpContext {
     UriRules<UriRule> getRules(Class resourceClass);
 
     /**
-     * Get the list to store the values of a pattern's 
-     * capturing groups.
+     *  Push parameter values that are the values of 
+     *  capturing groups in the current match result.
      * 
-     * @return the list to store capturing group values.
-     */
-    List<String> getGroupValues();
-    
-    /**
-     *  Set template values that are the values of a pattern's
-     *  capturing groups.
-     * 
-     *  @param names the template names associated with the capturing group
+     *  @param names the parameter names associated with the capturing group
      *         values.
      */
-    void setTemplateValues(List<String> names);
+    void pushParameterValues(List<String> names);
     
     /**
      * Push the resource and matching URI template associated with the resource.

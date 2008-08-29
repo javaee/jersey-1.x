@@ -68,7 +68,7 @@ public class ViewableRule implements UriRule {
         
         // Obtain the template path
         final String templatePath = (path.length() > 0) ? 
-            context.getGroupValues().get(0) :
+            context.getMatchResult().group(1) :
             "";
         
         final String absoluteTemplatePath = getAbsolutePath(resource.getClass(), 

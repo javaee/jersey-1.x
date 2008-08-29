@@ -58,8 +58,7 @@ public final class RootResourceClassesRule implements UriRule {
     }
     
     public boolean accept(CharSequence path, Object resource, UriRuleContext context) {        
-        final Iterator<UriRule> matches = rules.
-                match(path, context.getGroupValues());
+        final Iterator<UriRule> matches = rules.match(path, context);
         while(matches.hasNext())
             if(matches.next().accept(path, resource, context))
                 return true;

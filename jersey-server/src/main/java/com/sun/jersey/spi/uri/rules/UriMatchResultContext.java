@@ -34,60 +34,26 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
+package com.sun.jersey.spi.uri.rules;
 
-package com.sun.jersey.api.uri;
-
-import java.util.List;
 import java.util.regex.MatchResult;
-import javax.ws.rs.core.PathSegment;
-import javax.ws.rs.core.UriInfo;
 
 /**
- * Extentions to {@link UriInfo}. 
- * 
+ *
  * @author Paul.Sandoz@Sun.Com
  */
-public interface ExtendedUriInfo extends UriInfo {
+public interface UriMatchResultContext {
     /**
-     * Get a read-only list of {@link MatchResult} for matched resources. 
-     * Entries are ordered in reverse request URI matching order, with the 
-     * root resource match result last.
+     * Get the match result
      * 
-     * @return a read-only list of match results for matched resources.
+     * @return the match result.
      */
-    List<MatchResult> getMatchedResults();
-
-    /**
-     * Get a read-only list of {@link UriTemplate} for matched resources. 
-     * Each entry is a URI template that is the value of the 
-     * {@link javax.ws.rs.Path} that is a partial path that matched a resource 
-     * class, a sub-resource method or a sub-resource locator.
-     * Entries are ordered in reverse request URI matching order, with the 
-     * root resource URI template last.
-     * 
-     * @return a read-only list of URI templates for matched resources.
-     */
-    List<UriTemplate> getMatchedTemplates();
+    MatchResult getMatchResult();
     
     /**
-     * Get a path segment that contains a template variable.
-     * All sequences of escaped octets are decoded,
-     * equivalent to <code>getPathSegment(true)</code>.
+     * Set the match result
      * 
-     * @param templateVariable
-     * @return the path segment or null if a there the matching path does not 
-     *         contain the template
+     * @param mr the match result.
      */
-    PathSegment getPathSegment(String templateVariable);
-    
-    /**
-     * Get a path segment that contains a template variable.
-     * 
-     * @param name the template variable name
-     * @param decode controls whether sequences of escaped octets are decoded
-     * (true) or not (false).
-     * @return the path segment or null if a there the matching path does not 
-     *         contain the template
-     */
-    PathSegment getPathSegment(String name, boolean decode);
+    void setMatchResult(MatchResult mr);    
 }

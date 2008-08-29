@@ -36,6 +36,7 @@
  */
 package com.sun.jersey.impl.uri.rules;
 
+import com.sun.jersey.spi.uri.rules.UriMatchResultContext;
 import com.sun.jersey.spi.uri.rules.UriRules;
 import java.util.Iterator;
 import java.util.List;
@@ -54,23 +55,23 @@ public class CombiningMatchingPatterns<R> implements UriRules<R> {
         this.rs = rs;
     }
 
-    public Iterator<R> match(CharSequence path, List<String> capturingGroupValues) {
-        return new XInterator(path, capturingGroupValues);
+    public Iterator<R> match(CharSequence path, UriMatchResultContext resultContext) {
+        return new XInterator(path, resultContext);
     }
 
     private final class XInterator implements Iterator<R> {
 
         private final CharSequence path;
-        private final List<String> capturingGroupValues;
+        private final UriMatchResultContext resultContext;
         private Iterator<R> ruleIterator;
         private Iterator<UriRules<R>> rulesIterator;
         private R r;
 
-        XInterator(CharSequence path, List<String> capturingGroupValues) {
+        XInterator(CharSequence path, UriMatchResultContext resultContext) {
             this.path = path;
-            this.capturingGroupValues = capturingGroupValues;
+            this.resultContext = resultContext;
             this.rulesIterator = rs.iterator();
-            this.ruleIterator = rulesIterator.next().match(path, capturingGroupValues);
+            this.ruleIterator = rulesIterator.next().match(path, resultContext);
         }
         
         public boolean hasNext() {
@@ -82,7 +83,7 @@ public class CombiningMatchingPatterns<R> implements UriRules<R> {
             }
             
             while (rulesIterator.hasNext()) {
-                ruleIterator = rulesIterator.next().match(path, capturingGroupValues);                
+                ruleIterator = rulesIterator.next().match(path, resultContext);                
                 if (ruleIterator.hasNext()) {
                     r = ruleIterator.next();
                     return true;                

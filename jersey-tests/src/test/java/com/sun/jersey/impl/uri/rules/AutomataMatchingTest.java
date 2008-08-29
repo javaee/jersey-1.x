@@ -46,9 +46,13 @@ import java.util.Map;
 
 /**
  *
+ * This class has been made abstract because it needs to fixed in terms
+ * of supporting the UriRules interface and matching using more general regular
+ * expressions.
+ * 
  * @author mnesarco
  */
-public class AutomataMatchingTest extends AbstractMatchingTester {
+public abstract class AutomataMatchingTest extends AbstractMatchingTester {
     
     public AutomataMatchingTest(String testName) {
         super(testName);
