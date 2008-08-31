@@ -1,0 +1,65 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head><title>Spring Annotations Example</title></head>
+
+
+  <body>
+      <h1>Spring Annotations Example</h1>
+      
+      <p>This example demonstrates how to use spring and spring annotations, which requires spring &gt;= 2.5.</p>
+      <p>There's also an example resource (<code>JerseyAutowiredResource</code>) that shows how to use annotation based autowiring with spring &lt; 2.5
+        (via the <code>@Autowire</code> annotation provided by jersey-spring.
+      </p>
+      
+      <h2>Contents</h2>
+      <p>The example consists of three resource classes:</p>
+      <dl>
+          <dt><code>com.sun.jersey.samples.springannotations.resources.SpringResourcedResource</code></dt>
+          <dd>A resource class that demonstrates the usage of the
+            <a href="http://java.sun.com/javase/6/docs/api/javax/annotation/Resource.html">Resource</a> annotation
+            provided/supported since spring-2.5+.</dd>
+          <dt><code>com.sun.jersey.samples.springannotations.resources.SpringAutowiredResource</code></dt>
+          <dd>A resource class that demonstrates the usage of the 
+            <a href="http://static.springframework.org/spring/docs/2.5.x/api/org/springframework/beans/factory/annotation/Autowired.html">Autowired</a>
+            annotation provided by spring-2.5+.</dd>
+          <dt><code>com.sun.jersey.samples.springannotations.resources.JerseyAutowiredResource</code></dt>
+          <dd>A resource class that demonstrates the usage of the 
+            <a href="https://jersey.dev.java.net/source/browse/*checkout*/jersey/trunk/jersey/contribs/spring/src/main/java/com/sun/jersey/api/spring/Autowire.java">Autowire</a>
+            annotation provided by jersey-spring (for users of spring &lt; 2.5).</dd>
+      </dl>
+    <p>The mapping of the URI path space is presented in the following table:</p>
+	<table border="1">
+	<tr>
+	<th>URI path</th>
+	<th>Resource class</th>
+	<th>HTTP methods</th>
+	</tr>
+	<tr>
+	<td>/spring-resourced</td>
+	<td>SpringResourcedResource</td>
+	<td>GET</td>
+	</tr>
+    <tr>
+    <td>/spring-autowired</td>
+    <td>SpringAutowiredResource</td>
+    <td>GET</td>
+    </tr>
+    <tr>
+    <td>/jersey-autowired</td>
+    <td>JerseyAutowiredResource</td>
+    <td>GET</td>
+    </tr>
+	</table>
+
+      <h2>Running the Example</h2>
+      <p>Run the example as follows:</p>
+      <p> run 
+      <blockquote><code>mvn glassfish:run</code><p></blockquote>
+      <p>From a web browser, visit:</p>
+      <blockquote>
+        <code><a href="http://localhost:8080/spring-resourced">http://localhost:8080/spring-resourced</a></code>
+        <br/>
+        <code><a href="http://localhost:8080/spring-autowired">http://localhost:8080/spring-autowired</a></code>
+        <br/>
+        <code><a href="http://localhost:8080/jersey-autowired">http://localhost:8080/jersey-autowired</a></code>
+      </blockquote>
+ </body></html>
