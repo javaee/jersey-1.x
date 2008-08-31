@@ -24,8 +24,8 @@ package com.sun.jersey.api.spring;
 import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
 
 /**
- * TODO: DESCRIBE ME<br>
- * Created on: Apr 3, 2008<br>
+ * This enumerations encapsulates the autowiring modes provided by the
+ * {@link AutowireCapableBeanFactory}.
  * 
  * @author <a href="mailto:martin.grotzke@freiheit.com">Martin Grotzke</a>
  * @version $Id$

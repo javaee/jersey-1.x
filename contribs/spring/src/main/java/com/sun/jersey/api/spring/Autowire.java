@@ -27,9 +27,19 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
+import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
+
 /**
- * TODO: DESCRIBE ME<br>
- * Created on: Apr 3, 2008<br>
+ * This annotation provides autowiring capabilities for users that use spring 2.0
+ * but that want to get their beans autowired.
+ * <p>
+ * Autowiring is performed via {@link AutowireCapableBeanFactory#createBean(Class, int, boolean)}
+ * to have a fully initialized bean, including applied BeanPostProcessors (in contrast to
+ * {@link AutowireCapableBeanFactory#autowire()}).<br/>
+ * The parameters <em>autowiring mode</em> and <em>dependencyCheck</em> when invoking
+ * {@link AutowireCapableBeanFactory#createBean(Class, int, boolean)} are used as specified
+ * with this annotation.
+ * </p>
  * 
  * @author <a href="mailto:martin.grotzke@freiheit.com">Martin Grotzke</a>
  * @version $Id$
