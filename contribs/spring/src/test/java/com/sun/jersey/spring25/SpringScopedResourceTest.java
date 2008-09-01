@@ -34,41 +34,37 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
+package com.sun.jersey.spring25;
 
-package com.sun.jersey.spi.resource;
+import org.springframework.context.annotation.Scope;
+import org.testng.Assert;
+import org.testng.annotations.Test;
 
-import com.sun.jersey.api.core.HttpContext;
-import com.sun.jersey.api.model.AbstractResource;
-import com.sun.jersey.spi.service.ComponentProvider;
+import com.sun.jersey.api.client.WebResource;
+import com.sun.jersey.spring.AbstractResourceTest;
 
 /**
- * A provider that manages the creation of resource class instances. A provider
- * instance is specific to a particular class of resource.
- * <p>
- * It is the responsibility of a ResourceProvider to perform injection onto
- * the properties of a resource. If injection is required then declare an 
- * injectable field of the type {@link InjectableProviderContext} annotated 
- * with {@link javax.ws.rs.core.Context} and create a 
- * {@link ResourceClassInjector} instance to be used to perform injection onto
- * the provided resource. This may be performed in the init method.
+ * Test support for resource classes that are only annotated with a spring
+ * {@link Scope} and no jersey lifecycle annotation.
+ * 
+ * @author <a href="mailto:martin.grotzke@freiheit.com">Martin Grotzke</a>
+ * @version $Id$
  */
-public interface ResourceProvider {
-
-    /**
-     * Specifies the class of the resource that the provider
-     * instance will manage access to.
-     * @param provider the component provider
-     * @param resourceProvider the component provider for resource classes
-     * @param resource the abstract resource
-     */
-    void init(ComponentProvider provider, ComponentProvider resourceProvider, AbstractResource resource);
+@Test
+public class SpringScopedResourceTest extends AbstractResourceTest {
     
-    /**
-     * Called to obtain an instance of a resource class.
-     * 
-     * @param provider the component provider
-     * @param context the HTTP context
-     * @return an initialized instance of the supplied class
-     */
-    Object getInstance(ComponentProvider provider, HttpContext context);
+    private String _resourcePath;
+
+    public SpringScopedResourceTest() {
+        _resourcePath = "SpringScopedResource";
+    }
+    
+    @Test
+    public void testSayHello() {
+        final WebResource itemResource = resource( _resourcePath + "/hello" );
+        final String hello = itemResource.get( String.class );
+        Assert.assertNotNull( hello );
+        
+    }
+
 }

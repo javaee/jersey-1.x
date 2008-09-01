@@ -60,7 +60,7 @@ public final class SingletonProvider implements ResourceProvider {
     private Object resource;
     
     public void init(ComponentProvider provider,
-            AbstractResource abstractResource) {
+            ComponentProvider resourceProvider, AbstractResource abstractResource) {
         Class<?> c = abstractResource.getResourceClass();
         
         ResourceClassInjector rci = new ResourceClassInjector(
@@ -73,7 +73,7 @@ public final class SingletonProvider implements ResourceProvider {
                 Scope.Singleton);
         try {
             if (cip == null || cip.is.size() == 0) {
-                resource = provider.getInstance(Scope.Singleton, c);
+                resource = resourceProvider.getInstance(Scope.Singleton, c);
             } else {
                 Object[] params = new Object[cip.is.size()];
                 int i = 0;
@@ -81,9 +81,9 @@ public final class SingletonProvider implements ResourceProvider {
                     if (injectable != null)
                         params[i++] = injectable.getValue(null);
                 }
-                resource = provider.getInstance(Scope.Singleton, cip.con, params);
+                resource = resourceProvider.getInstance(Scope.Singleton, cip.con, params);
             }
-            rci.inject(null, provider.getInjectableInstance(resource));
+            rci.inject(null, resourceProvider.getInjectableInstance(resource));
         } catch (InvocationTargetException ex) {
             throw new ContainerException("Unable to create resource", ex);
         } catch (InstantiationException ex) {

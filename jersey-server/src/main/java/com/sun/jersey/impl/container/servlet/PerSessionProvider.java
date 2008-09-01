@@ -70,7 +70,7 @@ public final class PerSessionProvider implements ResourceProvider {
 
     
     public void init(ComponentProvider provider,
-            AbstractResource abstractResource) {
+            ComponentProvider resourceProvider, AbstractResource abstractResource) {
         this.c = abstractResource.getResourceClass();
         
         this.rci = new ResourceClassInjector(ipc, Scope.PerRequest, 

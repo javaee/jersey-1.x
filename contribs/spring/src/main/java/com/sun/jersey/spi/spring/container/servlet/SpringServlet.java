@@ -161,6 +161,11 @@ public class SpringServlet extends ServletContainer {
             final WebApplicationContext springContext = WebApplicationContextUtils.
                     getRequiredWebApplicationContext(getServletContext());
             
+            if ( rc.getProperty( ResourceConfig.PROPERTY_DEFAULT_RESOURCE_PROVIDER_CLASS ) == null
+                    && springComponentAnnotationAvailable() ) {
+                rc.getProperties().put( ResourceConfig.PROPERTY_DEFAULT_RESOURCE_PROVIDER_CLASS, SpringResourceProvider.class );
+            }
+            
             wa.initiate(rc, new SpringComponentProvider((ConfigurableApplicationContext) springContext));
         } catch( RuntimeException e ) {
             LOG.error( "Got exception while trying to initialize", e );
@@ -168,6 +173,17 @@ public class SpringServlet extends ServletContainer {
         }
     }
     
+    private boolean springComponentAnnotationAvailable() {
+        try {
+            Class.forName( "org.springframework.stereotype.Component" );
+            LOG.info( "The spring Component annotation is present, we're using spring >= 2.5" );
+            return true;
+        } catch ( ClassNotFoundException e ) {
+            LOG.info( "The spring Component annotation is not present, we're using spring < 2.5" );
+            return false;
+        }
+    }
+
     private static String getBeanName( ComponentContext cc, Class<?> c, ApplicationContext springContext ) {
 
         boolean annotatedWithInject = false;

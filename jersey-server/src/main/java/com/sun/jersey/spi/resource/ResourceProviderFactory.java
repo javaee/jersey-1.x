@@ -129,7 +129,7 @@ public class ResourceProviderFactory {
         try {
             ResourceProvider r = (ResourceProvider)provider.
                     getInstance(ComponentProvider.Scope.PerRequest, providerClass);
-            r.init(resourceProvider, resource);
+            r.init(provider, resourceProvider, resource);
             return r;
         } catch (IllegalAccessException ex) {
             throw new ContainerException("Unable to create resource provider", ex);

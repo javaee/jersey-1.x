@@ -34,41 +34,37 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
+package com.sun.jersey.spring25;
 
-package com.sun.jersey.spi.resource;
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
 
-import com.sun.jersey.api.core.HttpContext;
-import com.sun.jersey.api.model.AbstractResource;
-import com.sun.jersey.spi.service.ComponentProvider;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
+
+import com.sun.jersey.spi.resource.Singleton;
 
 /**
- * A provider that manages the creation of resource class instances. A provider
- * instance is specific to a particular class of resource.
- * <p>
- * It is the responsibility of a ResourceProvider to perform injection onto
- * the properties of a resource. If injection is required then declare an 
- * injectable field of the type {@link InjectableProviderContext} annotated 
- * with {@link javax.ws.rs.core.Context} and create a 
- * {@link ResourceClassInjector} instance to be used to perform injection onto
- * the provided resource. This may be performed in the init method.
+ * A resource class that is only annotated with spring's {@link Scope} annotation
+ * and no jersey lifecycle annotation.
+ * 
+ * @author <a href="mailto:martin.grotzke@freiheit.com">Martin Grotzke</a>
+ * @version $Id$
  */
-public interface ResourceProvider {
-
-    /**
-     * Specifies the class of the resource that the provider
-     * instance will manage access to.
-     * @param provider the component provider
-     * @param resourceProvider the component provider for resource classes
-     * @param resource the abstract resource
-     */
-    void init(ComponentProvider provider, ComponentProvider resourceProvider, AbstractResource resource);
+ @Path( "SpringScopedResource" )
+ @Component
+ @Scope( "singleton" )
+public class SpringScopedResource {
     
-    /**
-     * Called to obtain an instance of a resource class.
-     * 
-     * @param provider the component provider
-     * @param context the HTTP context
-     * @return an initialized instance of the supplied class
-     */
-    Object getInstance(ComponentProvider provider, HttpContext context);
+    public SpringScopedResource() {
+    }
+
+    @GET
+    @Path( "hello" )
+    @Produces( "text/plain" )
+    public String sayHello() {
+        return "hello";
+    }
+    
 }
