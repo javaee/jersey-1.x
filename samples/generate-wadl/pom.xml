@@ -246,7 +246,7 @@
     </build>
 
     <properties>
-        <jersey-release-version>0.11-ea-SNAPSHOT</jersey-release-version>
+        <jersey-release-version>${project.version}</jersey-release-version>
     </properties>
 
     <profiles>

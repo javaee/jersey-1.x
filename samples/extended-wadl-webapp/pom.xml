@@ -40,7 +40,7 @@
     xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.sun.jersey.samples</groupId>
-    <version>0.10-ea-SNAPSHOT</version>
+    <version>0.11-ea-SNAPSHOT</version>
     <artifactId>extended-wadl-webapp</artifactId>
     <name>Extended WADL WebApp - Jersey sample</name>
     <packaging>war</packaging>
@@ -256,7 +256,7 @@
         </repository>
     </repositories>
     <properties>
-        <jersey-release-version>0.10-ea-SNAPSHOT</jersey-release-version>
+        <jersey-release-version>${project.version}</jersey-release-version>
         <netbeans.hint.deploy.server>J2EE</netbeans.hint.deploy.server>
     </properties>
     <distributionManagement>

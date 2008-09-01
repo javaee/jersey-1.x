@@ -52,6 +52,7 @@
         <module>bookmark</module>
         <module>entity-provider</module>
         <module>generate-wadl</module>
+        <module>extended-wadl-webapp</module>
         <module>helloworld</module>
         <module>helloworld-webapp</module>
         <module>jmaki-backend</module>
@@ -62,6 +63,7 @@
         <module>simple-console</module>
         <module>simple-servlet</module>
         <module>storage-service</module>
+        <module>spring-annotations</module>
     </modules>
     <build>
         <plugins>
