@@ -40,6 +40,7 @@ package com.sun.jersey.impl.container.servlet;
 import com.sun.jersey.api.container.ContainerException;
 import com.sun.jersey.spi.template.TemplateProcessor;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.MalformedURLException;
 import javax.servlet.RequestDispatcher;
@@ -71,21 +72,23 @@ public class JSPTemplateProcessor implements TemplateProcessor {
     public String resolve(String path) {
         if (servletContext == null)
             return null;
-        
-        if (!path.endsWith(".jsp"))
-            path = path + ".jsp";
 
         try {
-            if (servletContext.getResource(path) == null) {
-                // TODO log
-                return null;
+            if (servletContext.getResource(path) != null) {
+                return path;
             }
+                
+            if (!path.endsWith(".jsp")) {
+                path = path + ".jsp";
+                if (servletContext.getResource(path) != null) {
+                    return path;
+                }
+            }            
         } catch (MalformedURLException ex) {
             // TODO log
-            return null;
         }
         
-        return path;        
+        return null;
     }
 
     public void writeTo(String resolvedPath, Object model, OutputStream out) throws IOException {
@@ -93,7 +96,7 @@ public class JSPTemplateProcessor implements TemplateProcessor {
         if (d == null) {
             throw new ContainerException("No request dispatcher for: " + resolvedPath);
         }
-        
+                
         d = new RequestDispatcherWrapper(d, ui.getMatchedResources().get(0), model);
         
         try {
