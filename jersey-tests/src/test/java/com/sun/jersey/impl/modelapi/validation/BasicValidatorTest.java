@@ -50,11 +50,17 @@ package com.sun.jersey.impl.modelapi.validation;
 
 import com.sun.jersey.impl.modelapi.validation.BasicValidator;
 import com.sun.jersey.api.model.AbstractResource;
-import com.sun.jersey.api.model.AbstractResourceMethod;
-import com.sun.jersey.api.model.AbstractSubResourceLocator;
-import com.sun.jersey.api.model.AbstractSubResourceMethod;
 import com.sun.jersey.api.model.ResourceModelIssue;
-import com.sun.jersey.api.model.PathValue;
+import com.sun.jersey.impl.modelapi.annotation.IntrospectionModeller;
+import com.sun.jersey.spi.resource.Singleton;
+import javax.ws.rs.CookieParam;
+import javax.ws.rs.GET;
+import javax.ws.rs.HeaderParam;
+import javax.ws.rs.MatrixParam;
+import javax.ws.rs.PUT;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.QueryParam;
 import junit.framework.TestCase;
 
 /**
@@ -63,104 +69,211 @@ import junit.framework.TestCase;
  */
 public class BasicValidatorTest extends TestCase {
     
-    public class TestResource {
-
-        public void getMethod() {
-        }
-    }
-    
-    public class TestResourceARM {
-
-        public void getMethod() {
-        }
-
-        public String getStringMethod() {
-            return "nazdar";
-        }
-    }
-    
-    public class TestResourceASRM {
-        public void subResMethod() {
-        }
-    }
-    
-    public class TestResourceSRL {
-
-        public void subResLocator() {
-        }
+    @Path("rootNoCtor")
+    public static class TestRootResourceWithoutPublicConstructor {
         
-        public Object validSubResLocator() {
-            return "nazdar";
+        private TestRootResourceWithoutPublicConstructor() {};
+
+        @GET
+        public String getIt() {
+            return "it";
         }
     }
-    
-    
-    public BasicValidatorTest(String testName) {
-        super(testName);
-    }
 
-    /**
-     * Test of visit method, of class BasicValidator.
-     */
-    public void testValidateARM() throws NoSuchMethodException {
+    public void ignoredTestRootResourceWithoutPublicConstructor() throws Exception {
+        System.out.println("---\nAn issue should be reported if a public ctor is missing at a root resource:");
+        AbstractResource ar = IntrospectionModeller.createResource(TestRootResourceWithoutPublicConstructor.class);
         BasicValidator validator = new BasicValidator();
-        AbstractResourceMethod arm;
+        validator.validate(ar);
+        assertTrue(!validator.getIssueList().isEmpty());
+        printIssueList(validator);
+    }
 
-        arm = new AbstractResourceMethod(null, TestResourceARM.class.getMethod("getStringMethod"), "GET");
-        assertTrue(validator.getIssueList().isEmpty());
+    @Path("rootAmbigCtors")
+    public static class TestRootResourceAmbigCtors {
         
-        arm = new AbstractResourceMethod(null, TestResourceARM.class.getMethod("getMethod"), "GET");
-        validator.validate(arm);
+        public TestRootResourceAmbigCtors(@QueryParam("s") String p) {};
+
+        public TestRootResourceAmbigCtors(@QueryParam("s") int p) {};
+
+        @GET
+        public String getIt() {
+            return "it";
+        }
+    }
+
+    public void ignoredTestRootResourceAmbigConstructors() throws Exception {
+        System.out.println("---\nAn issue should be reported if more public ctors exists with the same number of params at a root resource:");
+        AbstractResource ar = IntrospectionModeller.createResource(TestRootResourceAmbigCtors.class);
+        BasicValidator validator = new BasicValidator();
+        validator.validate(ar);
         assertTrue(!validator.getIssueList().isEmpty());
         printIssueList(validator);
     }
     
-    public void testValidateSRL() throws NoSuchMethodException {
-        BasicValidator validator = new BasicValidator();
-        AbstractSubResourceLocator locator;
-        locator = new AbstractSubResourceLocator(TestResourceSRL.class.getMethod("subResLocator"), null);
-        validator.validate(locator);
+    @Singleton
+    @Path("rootSingleton/{p}")
+    public static class TestCantInjectFieldsForSingleton {
+        @MatrixParam("m") String matrixParam;
+        @QueryParam("q") String queryParam;
+        @PathParam("p") String pParam;
+        @CookieParam("c") String cParam;
+        @HeaderParam("h") String hParam;
         
-        int issueCount = validator.getIssueList().size();
-        assertTrue(issueCount > 0);
-        printIssueList(validator);
-        // adding uri template to decrease number of issues
-        locator = new AbstractSubResourceLocator(TestResourceSRL.class.getMethod("subResLocator"), new PathValue("/test"));
-        validator.cleanIssueList();
-        validator.validate(locator);
-        assertTrue((issueCount - 1) == validator.getIssueList().size());
-        locator = new AbstractSubResourceLocator(TestResourceSRL.class.getMethod("validSubResLocator"), new PathValue("/test1"));
-        validator.cleanIssueList();
-        validator.validate(locator);
-        assertTrue(0 == validator.getIssueList().size());
+        @GET
+        public String getIt() {
+            return "it";
+        }
     }
     
-    public void testValidateASRM() throws NoSuchMethodException {
+    public void ignoredTestSingletonFieldsInjection() throws Exception {
+        System.out.println("---\nAn issue should be reported if injection is required for a singleton life-cycle:");
+        AbstractResource ar = IntrospectionModeller.createResource(TestCantInjectFieldsForSingleton.class);
         BasicValidator validator = new BasicValidator();
-        AbstractSubResourceMethod asrm = new AbstractSubResourceMethod(
-                null, TestResourceASRM.class.getMethod("subResMethod"), null, "GET");
-        validator.validate(asrm);
-        int issueCount = validator.getIssueList().size();
+        validator.validate(ar);
+        assertTrue(!validator.getIssueList().isEmpty());
+        assertEquals(5, validator.getIssueList().size());
         printIssueList(validator);
-        assertTrue(issueCount > 0);
-        validator.cleanIssueList();
-        asrm = new AbstractSubResourceMethod(
-                null, TestResourceASRM.class.getMethod("subResMethod"), new PathValue("test"), "GET");
-        validator.validate(asrm);
-        assertTrue((issueCount - 1) == validator.getIssueList().size());
+    }
+
+    public static class TestNonPublicRM {
+        @GET
+        private String getIt() {
+            return "this";
+        }
     }
     
-    public void testValidateAR() {
+    public void testNonPublicRM() throws Exception {
+        System.out.println("---\nAn issue should be reported if a resource method is not public:");
+        AbstractResource ar = IntrospectionModeller.createResource(TestNonPublicRM.class);
         BasicValidator validator = new BasicValidator();
-        AbstractResource ar = new AbstractResource(TestResource.class, new PathValue(null));
         validator.validate(ar);
-        int issueCount = validator.getIssueList().size();
+        assertTrue(!validator.getIssueList().isEmpty());
         printIssueList(validator);
-        ar = new AbstractResource(TestResource.class, new PathValue("/test"));
-        validator.cleanIssueList();
+    }
+    
+    public static class TestMoreThanOneEntity {
+        @PUT
+        public void put(String one, String two) {
+        }
+    }
+    
+    public void ignoredTestMoreThanOneEntity() throws Exception {
+        System.out.println("---\nAn issue should be reported if a resource method takes more than one entity params:");
+        AbstractResource ar = IntrospectionModeller.createResource(TestMoreThanOneEntity.class);
+        BasicValidator validator = new BasicValidator();
         validator.validate(ar);
-        assertTrue((issueCount - 1) == validator.getIssueList().size());
-    } 
+        assertTrue(!validator.getIssueList().isEmpty());
+        printIssueList(validator);
+    }
+    
+    
+    public static class TestGetRMReturningVoid {
+        @GET
+        public void getMethod() {
+        }
+    }
+    
+    public void testGetRMReturningVoid() throws Exception {
+        System.out.println("---\nAn issue should be reported if a get method returns void:");
+        AbstractResource ar = IntrospectionModeller.createResource(TestGetRMReturningVoid.class);
+        BasicValidator validator = new BasicValidator();
+        validator.validate(ar);
+        assertTrue(!validator.getIssueList().isEmpty());
+        printIssueList(validator);
+    }
+    
+    public static class TestSRLReturningVoid {
+        @Path("srl")
+        public void srLocator() {
+        }
+    }
+    
+    public void testSRLReturningVoid() throws Exception {
+        System.out.println("---\nAn issue should be reported if a sub-resource locator returns void:");
+        AbstractResource ar = IntrospectionModeller.createResource(TestSRLReturningVoid.class);
+        BasicValidator validator = new BasicValidator();
+        validator.validate(ar);
+        assertTrue(!validator.getIssueList().isEmpty());
+        printIssueList(validator);
+    }
+   
+    public static class TestGetSRMReturningVoid {
+        @GET @Path("srm")
+        public void getSRMethod() {
+        }
+    }
+    
+    public void testGetSRMReturningVoid() throws Exception {
+        System.out.println("---\nAn issue should be reported if a get sub-resource method returns void:");
+        AbstractResource ar = IntrospectionModeller.createResource(TestGetSRMReturningVoid.class);
+        BasicValidator validator = new BasicValidator();
+        validator.validate(ar);
+        assertTrue(!validator.getIssueList().isEmpty());
+        printIssueList(validator);
+    }
+
+    @Path("emptyResource")
+    public static class TestEmptyResource {
+        public void getSRMethod() {
+        }
+    }
+    
+    public void testEmptyResource() throws Exception {
+        System.out.println("---\nAn issue should be reported if a resource does not contain any method neither any locator:");
+        AbstractResource ar = IntrospectionModeller.createResource(TestEmptyResource.class);
+        BasicValidator validator = new BasicValidator();
+        validator.validate(ar);
+        assertTrue(!validator.getIssueList().isEmpty());
+        printIssueList(validator);
+    }
+    
+    @Path("rootAmbigRMethods")
+    public static class TestAmbigRMethods {
+        
+        @GET
+        public String getIt() {
+            return "it";
+        }
+
+        @GET
+        public String getItWithParam(@QueryParam("q") String q) {
+            return String.format("it, q=%s", q);
+        }
+    }
+
+    public void ignoredTestAmbigRMethods() throws Exception {
+        System.out.println("---\nAn issue should be reported if more than one method with same method designator and mime-types exist:");
+        AbstractResource ar = IntrospectionModeller.createResource(TestAmbigRMethods.class);
+        BasicValidator validator = new BasicValidator();
+        validator.validate(ar);
+        assertTrue(!validator.getIssueList().isEmpty());
+        printIssueList(validator);
+    }
+
+    @Path("rootAmbigSRMethods")
+    public static class TestAmbigSRMethods {
+        
+        @GET @Path("path")
+        public String getIt() {
+            return "it";
+        }
+
+        @GET @Path("path")
+        public String getItWithParam(@QueryParam("q") String q) {
+            return String.format("it, q=%s", q);
+        }
+    }
+
+    public void ignoredTestAmbigSRMethods() throws Exception {
+        System.out.println("---\nAn issue should be reported if more than one sub-resource method with same method designator and mime-types exist:");
+        AbstractResource ar = IntrospectionModeller.createResource(TestAmbigSRMethods.class);
+        BasicValidator validator = new BasicValidator();
+        validator.validate(ar);
+        assertTrue(!validator.getIssueList().isEmpty());
+        printIssueList(validator);
+    }
+    
 
     private static void printIssueList(BasicValidator validator) {
         for (ResourceModelIssue issue : validator.getIssueList()) {
