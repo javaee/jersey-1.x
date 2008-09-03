@@ -36,6 +36,8 @@
  */
 package com.sun.jersey.spi.spring.container.servlet;
 
+import java.lang.annotation.Annotation;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.context.annotation.Scope;
@@ -115,6 +117,10 @@ public class SpringResourceProvider implements ResourceProvider {
         public String getSpringScope() {
             return _springScope;
         }
+        
+        public static SupportedSpringScopes defaultSpringScope() {
+            return SINGLETON;
+        }
 
         /**
          * Selects the matching SupportedSpringScopes item or <code>null</code>.
@@ -151,7 +157,7 @@ public class SpringResourceProvider implements ResourceProvider {
          * annotated with @Component, for all other resource classes
          * the default resource provider is used (see ResourceProviderFactory#createProvider)
          */
-        if (resourceClass.getAnnotation(Component.class) == null) {
+        if (!isAutodetectedSpringComponent( resourceClass )) {
             resourceProviderClass = PerRequestProvider.class;
         } else {
             /* This resource provider is only used if the resource class
@@ -170,9 +176,7 @@ public class SpringResourceProvider implements ResourceProvider {
                             " and also no valid spring scope (valid scopes: " + SupportedSpringScopes.getSpringScopesAsCSV() + ")");
                 }
             } else {
-                throw new RuntimeException("No jersey lifecycle annotation specified on" +
-                        " resource class " + resourceClass.getName() +
-                        " and also no spring scope.");
+                resourceProviderClass = SupportedSpringScopes.defaultSpringScope().createResourceProviderClass();
             }
         }
         try {
@@ -188,8 +192,38 @@ public class SpringResourceProvider implements ResourceProvider {
             throw new RuntimeException("Could not initialize resource provider for resource class ", e);
         }
     }
+    
+    /**
+     * Determines, if the given class is an autodetected spring component as described
+     * in http://static.springframework.org/spring/docs/2.5.x/reference/beans.html#beans-stereotype-annotations.
+     * 
+     * @param resourceClass the resource class
+     * @return true if this class is annotated with {@link @Component} or with some other annotation
+     *          that itself is annotated with {@link @Component} (like e.g. {@link @Controller},
+     *          {@link @Service} or {@link @Repository}).
+     */
+    private boolean isAutodetectedSpringComponent( final Class<?> resourceClass ) {
+        
+        final Annotation[] annotations = resourceClass.getAnnotations();
+        if ( annotations != null ) {
+            for ( Annotation annotation : annotations ) {
+                /* spring's specialized component annotations like
+                 * @Service, @Controller or @Repository are all annotated
+                 * with @Component, so we can check this. 
+                 */
+                final Class<? extends Annotation> annotationType = annotation.annotationType();
+                if ( annotationType.equals( Component.class )
+                        || annotationType.getAnnotation( Component.class ) != null ) {
+                    return true;
+                }
+            }
+        }
+        
+        return false;
+    }
 
     public Object getInstance(ComponentProvider provider, HttpContext context) {
         return _resourceProvider.getInstance(provider, context);
     }
+    
 }
