@@ -38,6 +38,7 @@ package com.sun.jersey.impl.wadl.generators;
 
 import com.sun.jersey.api.model.AbstractMethod;
 import java.io.File;
+import java.util.logging.Logger;
 
 import javax.ws.rs.core.MediaType;
 import javax.xml.bind.JAXBContext;
@@ -67,6 +68,8 @@ import com.sun.research.ws.wadl.Response;
  */
 public class WadlGeneratorApplicationDoc implements WadlGenerator {
 
+    private static final Logger LOG = Logger.getLogger( WadlGeneratorApplicationDoc.class.getName() );
+
     private WadlGenerator _delegate;
     private File _applicationDocsFile;
     private ApplicationDocs _applicationDocs;
@@ -89,6 +92,7 @@ public class WadlGeneratorApplicationDoc implements WadlGenerator {
     
     public void setApplicationDocsFile( File applicationDocsFile ) {
         _applicationDocsFile = applicationDocsFile;
+        LOG.info( "Setting grammarsFile " + applicationDocsFile.getAbsolutePath() );
     }
     
     public void init() throws Exception {
