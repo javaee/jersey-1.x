@@ -70,24 +70,24 @@ public interface ExtendedUriInfo extends UriInfo {
     List<UriTemplate> getMatchedTemplates();
     
     /**
-     * Get a path segment that contains a template variable.
+     * Get a path segmenst that contains a template variable.
      * All sequences of escaped octets are decoded,
      * equivalent to <code>getPathSegment(true)</code>.
      * 
-     * @param templateVariable
-     * @return the path segment or null if a there the matching path does not 
-     *         contain the template
+     * @param name the template variable name
+     * @return the path segments, the list will be empty the matching path does
+     *         not contain the template
      */
-    PathSegment getPathSegment(String templateVariable);
+    List<PathSegment> getPathSegments(String name);
     
     /**
-     * Get a path segment that contains a template variable.
+     * Get a path segments that contains a template variable.
      * 
      * @param name the template variable name
      * @param decode controls whether sequences of escaped octets are decoded
      * (true) or not (false).
-     * @return the path segment or null if a there the matching path does not 
-     *         contain the template
+     * @return the path segments, the list will be empty the matching path does
+     *         not contain the template
      */
-    PathSegment getPathSegment(String name, boolean decode);
+    List<PathSegment> getPathSegments(String name, boolean decode);
 }

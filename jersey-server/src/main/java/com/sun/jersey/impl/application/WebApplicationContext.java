@@ -50,6 +50,7 @@ import com.sun.jersey.spi.uri.rules.UriRuleContext;
 import com.sun.jersey.spi.uri.rules.UriRules;
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -257,31 +258,36 @@ public final class WebApplicationContext implements UriRuleContext, ExtendedUriI
         return templates;
     }
 
-    public PathSegment getPathSegment(String name) {
-        return getPathSegment(name, true);
+    public List<PathSegment> getPathSegments(String name) {
+        return getPathSegments(name, true);
     }
 
-    public PathSegment getPathSegment(String name, boolean decode) {
-        int e = getPathParameterEndIndex(name);
-        if (e != -1) {
-            int segments = 0;
+    public List<PathSegment> getPathSegments(String name, boolean decode) {
+        int[] bounds = getPathParameterBounds(name);
+        if (bounds != null) {
             String path = matchResults.getLast().group();
-            // Work out how many path segments are up to the end position
-            // of the matching path parameter value
+            // Work out how many path segments are up to the start
+            // and end position of the matching path parameter value
             // This assumes that the path always starts with a '/'
-            // TODO
-            // This currently does not ignore contiguous '/'
-            for (int x = 0; x < e; x++) {
+            int segmentsStart = 0;
+            for (int x = 0; x < bounds[0]; x++) {
                 if (path.charAt(x) == '/') {
-                    segments++;
+                    segmentsStart++;
+                }
+            }           
+            int segmentsEnd = segmentsStart;
+            for (int x = bounds[0]; x < bounds[1]; x++) {
+                if (path.charAt(x) == '/') {
+                    segmentsEnd++;
                 }
             }
-            return getPathSegments(decode).get(segments - 1);
+
+            return getPathSegments(decode).subList(segmentsStart - 1, segmentsEnd);
         } else
-            return null;
+            return Collections.emptyList();
     }
 
-    private int getPathParameterEndIndex(String name) {
+    private int[] getPathParameterBounds(String name) {
         Iterator<UriTemplate> iTemplate = templates.iterator();
         Iterator<MatchResult> iMatchResult = matchResults.iterator();
         while (iTemplate.hasNext()) {
@@ -291,6 +297,7 @@ public final class WebApplicationContext implements UriRuleContext, ExtendedUriI
             if (pIndex != -1) {
                 int pathLength = mr.group().length();
                 int segmentIndex = mr.end(pIndex + 1);
+                int groupLength = segmentIndex - mr.start(pIndex + 1);
 
                 // Find the absolute position of the end of the
                 // capturing group in the request path
@@ -299,10 +306,11 @@ public final class WebApplicationContext implements UriRuleContext, ExtendedUriI
                     segmentIndex += mr.group().length() - pathLength;
                     pathLength = mr.group().length();
                 }
-                return segmentIndex;
+                int[] bounds = {segmentIndex - groupLength, segmentIndex};
+                return bounds;
             }
         }
-        return -1;
+        return null;
     }
 
     private int getLastPathParameterIndex(String name, UriTemplate t) {

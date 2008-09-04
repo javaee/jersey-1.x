@@ -38,6 +38,7 @@
 package com.sun.jersey.impl.methodparams;
 
 import com.sun.jersey.impl.AbstractResourceTester;
+import java.util.List;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Path;
 import javax.ws.rs.GET;
@@ -198,5 +199,63 @@ public class PathParamAsPathSegmentTest extends AbstractResourceTester {
         
         assertEquals("z", resource("/x/y/z").get(String.class));
         assertEquals("", resource("/x/y/z/").get(String.class));
+    }
+    
+    
+    @Path("/{a: .+}/edit/{b}")
+    public static class PathSegsList {
+        @GET
+        public String doGet(
+                @PathParam("a") List<PathSegment> a,
+                @PathParam("b") List<PathSegment> b) {
+            StringBuilder s = new StringBuilder();
+            for (PathSegment p : a) {
+                if (p.getPath().length() == 0)
+                    s.append('/');
+                else
+                    s.append(p.getPath());
+            }
+            s.append('-');
+            for (PathSegment p : b) {
+                if (p.getPath().length() == 0)
+                    s.append('/');
+                else
+                    s.append(p.getPath());
+            }
+
+            return s.toString();
+        }
+    }
+    
+    public void testPathSegsList() {
+        initiateWebApplication(PathSegsList.class);
+        
+        assertEquals("xyz-b", resource("/x/y/z/edit/b").get(String.class));
+        assertEquals("//xyz-b", resource("///x/y/z/edit/b").get(String.class));
     }    
+
+
+    @Path("/{a: .+}")
+    public static class PathSegsEndList {
+        @GET
+        public String doGet(
+                @PathParam("a") List<PathSegment> a) {
+            StringBuilder s = new StringBuilder();
+            for (PathSegment p : a) {
+                if (p.getPath().length() == 0)
+                    s.append('/');
+                else
+                    s.append(p.getPath());
+            }
+            return s.toString();
+        }
+    }
+    
+    public void testPathSegsEndList() {
+        initiateWebApplication(PathSegsEndList.class);
+        
+        assertEquals("xyz", resource("/x/y/z").get(String.class));
+        assertEquals("xyz/", resource("/x/y/z/").get(String.class));
+    }
+    
 }

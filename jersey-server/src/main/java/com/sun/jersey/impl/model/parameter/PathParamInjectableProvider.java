@@ -46,6 +46,10 @@ import com.sun.jersey.spi.inject.Injectable;
 import com.sun.jersey.spi.inject.InjectableProvider;
 import com.sun.jersey.spi.service.ComponentContext;
 import com.sun.jersey.spi.service.ComponentProvider.Scope;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
+import java.util.Collections;
+import java.util.List;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.PathSegment;
@@ -75,20 +79,37 @@ public final class PathParamInjectableProvider implements
         }
     }
     
-    private static final class PathParamSegmentInjectable implements Injectable<PathSegment> {
+    private static final class PathParamPathSegmentInjectable implements Injectable<PathSegment> {
         private final String name;
         private final boolean decode;
         
-        PathParamSegmentInjectable(String name, boolean decode) {
+        PathParamPathSegmentInjectable(String name, boolean decode) {
             this.name = name;
             this.decode = decode;
         }
         
         public PathSegment getValue(HttpContext context) {
-            return context.getUriInfo().getPathSegment(name, decode);
+            List<PathSegment> ps = context.getUriInfo().getPathSegments(name, decode);
+            if (ps.isEmpty())
+                return null;
+            return ps.get(ps.size() - 1);
         }
     }
     
+    private static final class PathParamListPathSegmentInjectable implements Injectable<List<PathSegment>> {
+        private final String name;
+        private final boolean decode;
+        
+        PathParamListPathSegmentInjectable(String name, boolean decode) {
+            this.name = name;
+            this.decode = decode;
+        }
+        
+        public List<PathSegment> getValue(HttpContext context) {
+            return context.getUriInfo().getPathSegments(name, decode);
+        }
+    }
+
     public Scope getScope() {
         return Scope.PerRequest;
     }
@@ -101,17 +122,25 @@ public final class PathParamInjectableProvider implements
         }
         
         if (c.getParameterClass() == PathSegment.class) {
-            return new PathParamSegmentInjectable(parameterName, 
+            return new PathParamPathSegmentInjectable(parameterName,
                     !c.isEncoded());
-        } else {
-            MultivaluedParameterExtractor e =  MultivaluedParameterProcessor.
-                    process(c.getParameterClass(), 
-                    c.getParameterType(), 
-                    parameterName);        
-            if (e == null)
-                return null;
+        } else if (c.getParameterClass() == List.class &&
+                c.getParameterType() instanceof ParameterizedType) {
+            ParameterizedType pt = (ParameterizedType)c.getParameterType();
+            Type[] targs = pt.getActualTypeArguments();
+            if (targs.length == 1 && targs[0] == PathSegment.class) {
+                return new PathParamListPathSegmentInjectable(
+                        parameterName, !c.isEncoded());
+            }
+        }
+        
+        MultivaluedParameterExtractor e =  MultivaluedParameterProcessor.
+                process(c.getParameterClass(),
+                c.getParameterType(),
+                parameterName);
+        if (e == null)
+            return null;
 
-            return new PathParamInjectable(e, !c.isEncoded());
-        }        
+        return new PathParamInjectable(e, !c.isEncoded());
     }
 }
