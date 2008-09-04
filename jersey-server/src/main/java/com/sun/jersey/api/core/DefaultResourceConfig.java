@@ -167,13 +167,15 @@ public class DefaultResourceConfig extends ResourceConfig {
      * 
      * @param elements an array where each String entry may contain zero or more
      *        ';' separated elements.
-     * @return the array of elements, each element is trimmed.
+     * @return the array of elements, each element is trimmed, the array will
+     *         not contain any empty or null entries.
      */
     public static String[] getElements(String[] elements) {
         List<String> es = new LinkedList<String>();
         for (String element : elements) {
+            if (element == null) continue;
             element = element.trim();
-            if (element == null || element.length() == 0) continue;
+            if (element.length() == 0) continue;
             for (String subElement : getElements(element)) {
                 if (subElement == null || subElement.length() == 0) continue;
                 es.add(subElement);
