@@ -425,22 +425,42 @@ public class ServletContainer extends HttpServlet implements ContainerListener {
         return props;
     }
     
-    private String[] getPaths(String classpath) {
+    private String[] getPaths(String classpath) throws ServletException {
         if (classpath == null) {
-            return new String[] {
+            String[] paths =  {
                 context.getRealPath("/WEB-INF/lib"), 
                 context.getRealPath("/WEB-INF/classes")
             };
+            if (paths[0] == null && paths[1] == null) {
+                String message = "The default deployment configuration that scans for " +
+                        "classes in /WEB-INF/lib and /WEB-INF/classes is not supported " +
+                        "for the application server." +
+                        "Try using the package scanning configuration, see the JavaDoc for " +
+                        PackagesResourceConfig.class.getName() + " and the property " +
+                        PackagesResourceConfig.PROPERTY_PACKAGES + ".";
+                throw new ServletException(message);                        
+            }
+            return paths;
         } else {
             String[] virtualPaths = classpath.split(";");
             List<String> resourcePaths = new ArrayList<String>();
             for (String virtualPath : virtualPaths) {
                 virtualPath = virtualPath.trim();
                 if (virtualPath.length() == 0) continue;
-                
-                resourcePaths.add(context.getRealPath(virtualPath));
+                String path = context.getRealPath(virtualPath);
+                if (path != null) resourcePaths.add(path);
             }
-            
+            if (resourcePaths.isEmpty()) {
+                String message = "None of the declared classpath locations, " +
+                        classpath +
+                        ", could be resolved. " +
+                        "This could be because the default deployment configuration that scans for " +
+                        "classes in classpath locations is not supported. " +
+                        "Try using the package scanning configuration, see the JavaDoc for " +
+                        PackagesResourceConfig.class.getName() + " and the property " +
+                        PackagesResourceConfig.PROPERTY_PACKAGES + ".";
+                throw new ServletException(message);                                        
+            }
             return resourcePaths.toArray(new String[resourcePaths.size()]);
         }        
     }
