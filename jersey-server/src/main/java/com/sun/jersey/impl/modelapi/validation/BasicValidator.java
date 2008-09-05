@@ -145,11 +145,11 @@ public class BasicValidator extends AbstractModelValidator {
                     if ((arm1.getMethod().isAnnotationPresent(Consumes.class)) || (arm1.getMethod().isAnnotationPresent(Consumes.class))) {
                         for (MediaType mt1 : arm1.getSupportedInputTypes()) {
                             for (MediaType mt2 : arm2.getSupportedInputTypes()) {
-                                if (mt1.isCompatible(mt2)) {
+                                if (mt1.isCompatible(mt2) && (!(mt1.isWildcardType() || mt1.isWildcardSubtype() || mt2.isWildcardType() || mt2.isWildcardSubtype()))) {
                                     issueList.add(new ResourceModelIssue(
                                             resource,
                                             ImplMessages.AMBIGUOUS_RMS_IN(resource.getResourceClass(), arm1.getHttpMethod(), mt1, arm1.getMethod().getName(), arm2.getMethod().getName(), arm1.getSupportedInputTypes(), arm2.getSupportedInputTypes()),
-                                            !(mt1.isWildcardType() || mt1.isWildcardSubtype() || mt2.isWildcardType() || mt2.isWildcardSubtype())));
+                                            true));
 
                                 }
                             }
@@ -159,11 +159,11 @@ public class BasicValidator extends AbstractModelValidator {
                     if ((arm1.getMethod().isAnnotationPresent(Produces.class)) || (arm1.getMethod().isAnnotationPresent(Produces.class))) {
                         for (MediaType mt1 : arm1.getSupportedOutputTypes()) {
                             for (MediaType mt2 : arm2.getSupportedOutputTypes()) {
-                                if (mt1.isCompatible(mt2)) {
+                                if (mt1.isCompatible(mt2) && (!(mt1.isWildcardType() || mt1.isWildcardSubtype() || mt2.isWildcardType() || mt2.isWildcardSubtype()))) {
                                     issueList.add(new ResourceModelIssue(
                                             resource,
                                             ImplMessages.AMBIGUOUS_RMS_OUT(resource.getResourceClass(), arm1.getHttpMethod(), mt1, arm1.getMethod().getName(), arm2.getMethod().getName(), arm1.getSupportedOutputTypes(), arm2.getSupportedOutputTypes()),
-                                            !(mt1.isWildcardType() || mt1.isWildcardSubtype() || mt2.isWildcardType() || mt2.isWildcardSubtype())));
+                                            true));
 
                                 }
                             }
