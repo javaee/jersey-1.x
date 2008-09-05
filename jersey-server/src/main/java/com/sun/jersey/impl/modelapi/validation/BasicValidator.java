@@ -45,6 +45,7 @@ import com.sun.jersey.api.model.AbstractResourceMethod;
 import com.sun.jersey.api.model.AbstractSetterMethod;
 import com.sun.jersey.api.model.AbstractSubResourceLocator;
 import com.sun.jersey.api.model.AbstractSubResourceMethod;
+import com.sun.jersey.api.model.Parameter;
 import com.sun.jersey.api.model.ResourceModelIssue;
 import com.sun.jersey.api.uri.UriTemplate;
 import com.sun.jersey.impl.ImplMessages;
@@ -231,12 +232,25 @@ public class BasicValidator extends AbstractModelValidator {
     }
 
     public void visitAbstractResourceMethod(AbstractResourceMethod method) {
+        // ensure GET returns non-void value
         if (!isRequestResponseMethod(method) && ("GET".equals(method.getHttpMethod()) && (void.class == method.getMethod().getReturnType()))) {
             issueList.add(new ResourceModelIssue(
                     method,
                     ImplMessages.ERROR_GET_RETURNS_VOID(method.getMethod()),
                     true));
         }
+        // ensure GET does not consume an entity parameter
+        if (!isRequestResponseMethod(method) && ("GET".equals(method.getHttpMethod()))) {
+            for (Parameter p : method.getParameters()) {
+                if (Parameter.Source.ENTITY == p.getSource()) {
+                issueList.add(new ResourceModelIssue(
+                    method,
+                    ImplMessages.ERROR_GET_CONSUMES_ENTITY(method.getMethod()),
+                    true));
+                }
+            }
+        }
+        // ensure there is not multiple HTTP method designators specified on the method
         List<String> httpAnnotList = new LinkedList<String>();
         for (Annotation a : method.getMethod().getDeclaredAnnotations()) {
             if (null != a.annotationType().getAnnotation(HttpMethod.class)) {

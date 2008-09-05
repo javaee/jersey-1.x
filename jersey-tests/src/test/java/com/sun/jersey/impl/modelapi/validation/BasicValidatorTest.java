@@ -34,17 +34,6 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-/*
- * The contents of this file are subject to the terms
- * of the Common Development and Distribution License
- * (the "License").  You may not use this file except
- * in compliance with the License.
- * 
- * You can obtain a copy of the license at
- * http://www.opensource.org/licenses/cddl1.php
- * See the License for the specific language governing
- * permissions and limitations under the License.
- */
 
 package com.sun.jersey.impl.modelapi.validation;
 
@@ -225,6 +214,23 @@ public class BasicValidatorTest extends TestCase {
         assertTrue(validator.getIssueList().get(0).isFatal());
     }
     
+    public static class TestGetRMConsumingEntity {
+        @GET
+        public String getMethod(Object o) {
+            return "it";
+        }
+    }
+    
+    public void testGetRMConsumingEntity() throws Exception {
+        System.out.println("---\nAn issue should be reported if a get method consumes an entity:");
+        AbstractResource ar = IntrospectionModeller.createResource(TestGetRMConsumingEntity.class);
+        BasicValidator validator = new BasicValidator();
+        validator.validate(ar);
+        printIssueList(validator);
+        assertTrue(!validator.getIssueList().isEmpty());
+        assertTrue(validator.getIssueList().get(0).isFatal());
+    }
+    
     public static class TestSRLReturningVoid {
         @Path("srl")
         public void srLocator() {
@@ -257,6 +263,24 @@ public class BasicValidatorTest extends TestCase {
         assertTrue(validator.getIssueList().get(0).isFatal());
     }
 
+    public static class TestGetSRMConsumingEntity {
+        @Path("p") @GET
+        public String getMethod(Object o) {
+            return "it";
+        }
+    }
+    
+    public void testGetSRMConsumingEntity() throws Exception {
+        System.out.println("---\nAn issue should be reported if a get method consumes an entity:");
+        AbstractResource ar = IntrospectionModeller.createResource(TestGetSRMConsumingEntity.class);
+        BasicValidator validator = new BasicValidator();
+        validator.validate(ar);
+        printIssueList(validator);
+        assertTrue(!validator.getIssueList().isEmpty());
+        assertTrue(validator.getIssueList().get(0).isFatal());
+    }
+    
+
     @Path("emptyResource")
     public static class TestEmptyResource {
         public void getSRMethod() {
@@ -277,17 +301,17 @@ public class BasicValidatorTest extends TestCase {
     public static class TestAmbigResourceMethodsGET {
         
         @GET @Produces("application/xml")
-        public String getJson() {
-            return "{}";
+        public String getXml() {
+            return null;
         }
         
         @GET @Produces("text/plain")
-        public String getIt() {
+        public String getText() {
             return "it";
         }
 
         @GET @Produces("text/plain")
-        public String getItWithParam(@QueryParam("q") String q) {
+        public String getTextWithParam(@QueryParam("q") String q) {
             return String.format("it, q=%s", q);
         }
     }
@@ -307,15 +331,15 @@ public class BasicValidatorTest extends TestCase {
     public static class TestAmbigResourceMethodsPUT {
         
         @PUT @Consumes("application/xml")
-        public void putJson(Object o) {
+        public void putXml(Object o) {
         }
         
-        @PUT @Consumes({"text/plain", "text/xml"})
-        public void putIt(Object o) {
+        @PUT @Consumes({"text/plain", "image/jpeg"})
+        public void putTextOrImg(Object o) {
         }
 
         @PUT @Consumes("text/plain")
-        public void getItWithParam(@QueryParam("q") String q, Object o) {
+        public void putTextWithParam(@QueryParam("q") String q, Object o) {
         }
     }
 
@@ -340,15 +364,15 @@ public class BasicValidatorTest extends TestCase {
     public static class TestAmbigResourceMethodsCUSTOM {
         
         @CUSTOM_HTTP_METHOD @Consumes("application/xml")
-        public void putJson(Object o) {
+        public void customXml(Object o) {
         }
         
-        @CUSTOM_HTTP_METHOD @Consumes({"text/plain", "text/xml"})
-        public void putIt(Object o) {
+        @CUSTOM_HTTP_METHOD @Consumes({"text/plain", "image/jpeg"})
+        public void customTextOrImg(Object o) {
         }
 
         @CUSTOM_HTTP_METHOD @Consumes("text/plain")
-        public void getItWithParam(@QueryParam("q") String q, Object o) {
+        public void customTextWithParam(@QueryParam("q") String q, Object o) {
         }
     }
 
@@ -366,17 +390,17 @@ public class BasicValidatorTest extends TestCase {
     public static class TestAmbigSubResourceMethodsGET {
         
         @Path("{one}") @GET @Produces("application/xml")
-        public String getJson() {
+        public String getXml() {
             return "{}";
         }
         
         @Path("{seven}") @GET @Produces("text/plain")
-        public String getIt() {
+        public String getText() {
             return "it";
         }
 
         @Path("{million}") @GET @Produces("text/plain")
-        public String getItWithParam(@QueryParam("q") String q) {
+        public String getTextWithParam(@QueryParam("q") String q) {
             return String.format("it, q=%s", q);
         }
     }
@@ -396,15 +420,15 @@ public class BasicValidatorTest extends TestCase {
     public static class TestAmbigSubResourceMethodsPUT {
         
         @Path("sub/{one}") @PUT @Consumes("application/xml")
-        public void putJson(Object o) {
+        public void putXml(Object o) {
         }
         
-        @Path("sub/{slash}/") @PUT @Consumes({"text/plain", "text/xml"})
-        public void putIt(Object o) {
+        @Path("sub/{slash}/") @PUT @Consumes({"text/plain", "image/jpeg"})
+        public void putTextOrImg(Object o) {
         }
 
         @Path("sub/{two}") @PUT @Consumes("text/plain")
-        public void getItWithParam(@QueryParam("q") String q, Object o) {
+        public void putTextWithParam(@QueryParam("q") String q, Object o) {
         }
     }
 
@@ -423,15 +447,15 @@ public class BasicValidatorTest extends TestCase {
     public static class TestAmbigSubResourceMethodsCUSTOM {
         
         @Path("sub/{a}") @CUSTOM_HTTP_METHOD @Consumes("application/xml")
-        public void putJson(Object o) {
+        public void customGetXml(Object o) {
         }
         
-        @Path("sub/{b}") @CUSTOM_HTTP_METHOD @Consumes({"text/plain", "text/xml"})
-        public void putIt(Object o) {
+        @Path("sub/{b}") @CUSTOM_HTTP_METHOD @Consumes({"text/plain", "image/jpeg"})
+        public void customGetTextOrImg(Object o) {
         }
 
         @Path("sub/{c}") @CUSTOM_HTTP_METHOD @Consumes("text/plain")
-        public void getItWithParam(@QueryParam("q") String q, Object o) {
+        public void customGetTextWithParam(@QueryParam("q") String q, Object o) {
         }
     }
 
@@ -497,7 +521,7 @@ public class BasicValidatorTest extends TestCase {
     public static class TestMultipleHttpMethodDesignatorsRM {
         
         @GET @PUT
-        public String getIt() {
+        public String getPutIt() {
             return "it";
         }
     }
@@ -516,7 +540,7 @@ public class BasicValidatorTest extends TestCase {
     public static class TestMultipleHttpMethodDesignatorsSRM {
         
         @Path("srm") @POST @PUT
-        public String doIt() {
+        public String postPutIt() {
             return "it";
         }
     }
