@@ -23,10 +23,11 @@
 package com.sun.jersey.samples.helloworld;
 
 import com.sun.grizzly.http.SelectorThread;
-import com.sun.jersey.api.container.grizzly.*;
-import com.sun.jersey.impl.container.grizzly.*;
-import java.util.*;
+import com.sun.jersey.api.container.grizzly.GrizzlyWebContainerFactory;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
+
 
 public class Main {
     
