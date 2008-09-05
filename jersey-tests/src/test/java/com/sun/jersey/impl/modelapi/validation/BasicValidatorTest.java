@@ -53,13 +53,22 @@ import com.sun.jersey.api.model.AbstractResource;
 import com.sun.jersey.api.model.ResourceModelIssue;
 import com.sun.jersey.impl.modelapi.annotation.IntrospectionModeller;
 import com.sun.jersey.spi.resource.Singleton;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
+import javax.ws.rs.Consumes;
 import javax.ws.rs.CookieParam;
+import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.HeaderParam;
+import javax.ws.rs.HttpMethod;
 import javax.ws.rs.MatrixParam;
+import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import junit.framework.TestCase;
 
@@ -80,13 +89,14 @@ public class BasicValidatorTest extends TestCase {
         }
     }
 
-    public void ignoredTestRootResourceWithoutPublicConstructor() throws Exception {
+    public void testRootResourceWithoutPublicConstructor() throws Exception {
         System.out.println("---\nAn issue should be reported if a public ctor is missing at a root resource:");
         AbstractResource ar = IntrospectionModeller.createResource(TestRootResourceWithoutPublicConstructor.class);
         BasicValidator validator = new BasicValidator();
         validator.validate(ar);
-        assertTrue(!validator.getIssueList().isEmpty());
         printIssueList(validator);
+        assertTrue(!validator.getIssueList().isEmpty());
+        assertTrue(validator.getIssueList().get(0).isFatal());
     }
 
     @Path("rootAmbigCtors")
@@ -102,13 +112,41 @@ public class BasicValidatorTest extends TestCase {
         }
     }
 
-    public void ignoredTestRootResourceAmbigConstructors() throws Exception {
+    public void testRootResourceAmbigConstructors() throws Exception {
         System.out.println("---\nAn issue should be reported if more public ctors exists with the same number of params at a root resource:");
         AbstractResource ar = IntrospectionModeller.createResource(TestRootResourceAmbigCtors.class);
         BasicValidator validator = new BasicValidator();
         validator.validate(ar);
-        assertTrue(!validator.getIssueList().isEmpty());
         printIssueList(validator);
+        assertTrue(!validator.getIssueList().isEmpty());
+        assertTrue(!validator.getIssueList().get(0).isFatal());
+    }
+
+    @Path("rootNonAmbigCtors")
+    public static class TestRootResourceNonAmbigCtors {
+        
+        // TODO: hmmm, even if this is not ambiguous, it is strange; shall we warn, the 1st and the 2nd ctor won't be used?
+        public TestRootResourceNonAmbigCtors(@QueryParam("s") String s) {};
+
+        public TestRootResourceNonAmbigCtors(@QueryParam("n") int n) {};
+
+        public TestRootResourceNonAmbigCtors(@QueryParam("s") String s, @QueryParam("n") int n) {};
+
+        @GET
+        public String getIt() {
+            return "it";
+        }
+    }
+
+    public void testRootResourceNonAmbigConstructors() throws Exception {
+        System.out.println(
+                "---\nNo issue should be reported if more public ctors exists with the same number of params, " +
+                "but another just one is presented with more params at a root resource:");
+        AbstractResource ar = IntrospectionModeller.createResource(TestRootResourceNonAmbigCtors.class);
+        BasicValidator validator = new BasicValidator();
+        validator.validate(ar);
+        printIssueList(validator);
+        assertTrue(validator.getIssueList().isEmpty());
     }
     
     @Singleton
@@ -126,14 +164,15 @@ public class BasicValidatorTest extends TestCase {
         }
     }
     
-    public void ignoredTestSingletonFieldsInjection() throws Exception {
+    // this should be sorted out at runtime rather than during validation
+    public void suspendedTestSingletonFieldsInjection() throws Exception {
         System.out.println("---\nAn issue should be reported if injection is required for a singleton life-cycle:");
         AbstractResource ar = IntrospectionModeller.createResource(TestCantInjectFieldsForSingleton.class);
         BasicValidator validator = new BasicValidator();
         validator.validate(ar);
+        printIssueList(validator);
         assertTrue(!validator.getIssueList().isEmpty());
         assertEquals(5, validator.getIssueList().size());
-        printIssueList(validator);
     }
 
     public static class TestNonPublicRM {
@@ -148,8 +187,10 @@ public class BasicValidatorTest extends TestCase {
         AbstractResource ar = IntrospectionModeller.createResource(TestNonPublicRM.class);
         BasicValidator validator = new BasicValidator();
         validator.validate(ar);
-        assertTrue(!validator.getIssueList().isEmpty());
         printIssueList(validator);
+        assertTrue(!validator.getIssueList().isEmpty());
+        // TODO: there might still be an implicit viewable associated with it
+        // assertTrue(validator.getIssueList().get(0).isFatal());
     }
     
     public static class TestMoreThanOneEntity {
@@ -158,13 +199,14 @@ public class BasicValidatorTest extends TestCase {
         }
     }
     
-    public void ignoredTestMoreThanOneEntity() throws Exception {
+    // should be probably validated at runtime rather then at the validation phase
+    public void suspendedTestMoreThanOneEntity() throws Exception {
         System.out.println("---\nAn issue should be reported if a resource method takes more than one entity params:");
         AbstractResource ar = IntrospectionModeller.createResource(TestMoreThanOneEntity.class);
         BasicValidator validator = new BasicValidator();
         validator.validate(ar);
-        assertTrue(!validator.getIssueList().isEmpty());
         printIssueList(validator);
+        assertTrue(!validator.getIssueList().isEmpty());
     }
     
     
@@ -179,8 +221,9 @@ public class BasicValidatorTest extends TestCase {
         AbstractResource ar = IntrospectionModeller.createResource(TestGetRMReturningVoid.class);
         BasicValidator validator = new BasicValidator();
         validator.validate(ar);
-        assertTrue(!validator.getIssueList().isEmpty());
         printIssueList(validator);
+        assertTrue(!validator.getIssueList().isEmpty());
+        assertTrue(validator.getIssueList().get(0).isFatal());
     }
     
     public static class TestSRLReturningVoid {
@@ -194,8 +237,9 @@ public class BasicValidatorTest extends TestCase {
         AbstractResource ar = IntrospectionModeller.createResource(TestSRLReturningVoid.class);
         BasicValidator validator = new BasicValidator();
         validator.validate(ar);
-        assertTrue(!validator.getIssueList().isEmpty());
         printIssueList(validator);
+        assertTrue(!validator.getIssueList().isEmpty());
+        assertTrue(validator.getIssueList().get(0).isFatal());
     }
    
     public static class TestGetSRMReturningVoid {
@@ -209,8 +253,9 @@ public class BasicValidatorTest extends TestCase {
         AbstractResource ar = IntrospectionModeller.createResource(TestGetSRMReturningVoid.class);
         BasicValidator validator = new BasicValidator();
         validator.validate(ar);
-        assertTrue(!validator.getIssueList().isEmpty());
         printIssueList(validator);
+        assertTrue(!validator.getIssueList().isEmpty());
+        assertTrue(validator.getIssueList().get(0).isFatal());
     }
 
     @Path("emptyResource")
@@ -224,56 +269,270 @@ public class BasicValidatorTest extends TestCase {
         AbstractResource ar = IntrospectionModeller.createResource(TestEmptyResource.class);
         BasicValidator validator = new BasicValidator();
         validator.validate(ar);
-        assertTrue(!validator.getIssueList().isEmpty());
         printIssueList(validator);
+        assertTrue(!validator.getIssueList().isEmpty());
+        assertTrue(!validator.getIssueList().get(0).isFatal());
     }
     
-    @Path("rootAmbigRMethods")
-    public static class TestAmbigRMethods {
+    @Path("rootAmbigResourceMethodsGET")
+    public static class TestAmbigResourceMethodsGET {
         
-        @GET
+        @GET @Produces("application/xml")
+        public String getJson() {
+            return "{}";
+        }
+        
+        @GET @Produces("text/plain")
         public String getIt() {
             return "it";
         }
 
-        @GET
+        @GET @Produces("text/plain")
         public String getItWithParam(@QueryParam("q") String q) {
             return String.format("it, q=%s", q);
         }
     }
 
-    public void ignoredTestAmbigRMethods() throws Exception {
-        System.out.println("---\nAn issue should be reported if more than one method with same method designator and mime-types exist:");
-        AbstractResource ar = IntrospectionModeller.createResource(TestAmbigRMethods.class);
+    public void testAmbigResourceMethodsGET() throws Exception {
+        System.out.println("---\nAn issue should be reported if more than one GET method with same output mime-types exist:");
+        AbstractResource ar = IntrospectionModeller.createResource(TestAmbigResourceMethodsGET.class);
         BasicValidator validator = new BasicValidator();
         validator.validate(ar);
-        assertTrue(!validator.getIssueList().isEmpty());
         printIssueList(validator);
+        assertTrue(!validator.getIssueList().isEmpty());
+        assertTrue(validator.getIssueList().get(0).isFatal());
     }
 
-    @Path("rootAmbigSRMethods")
-    public static class TestAmbigSRMethods {
+
+    @Path("rootAmbigResourceMethodsPUT")
+    public static class TestAmbigResourceMethodsPUT {
         
-        @GET @Path("path")
+        @PUT @Consumes("application/xml")
+        public void putJson(Object o) {
+        }
+        
+        @PUT @Consumes({"text/plain", "text/xml"})
+        public void putIt(Object o) {
+        }
+
+        @PUT @Consumes("text/plain")
+        public void getItWithParam(@QueryParam("q") String q, Object o) {
+        }
+    }
+
+    public void testAmbigResourceMethodsPUT() throws Exception {
+        System.out.println("---\nAn issue should be reported if more than one PUT method with same input mime-types exist:");
+        AbstractResource ar = IntrospectionModeller.createResource(TestAmbigResourceMethodsPUT.class);
+        BasicValidator validator = new BasicValidator();
+        validator.validate(ar);
+        printIssueList(validator);
+        assertTrue(!validator.getIssueList().isEmpty());
+        assertTrue(validator.getIssueList().get(0).isFatal());
+    }
+    
+    
+   @Target({ElementType.METHOD})
+   @Retention(RetentionPolicy.RUNTIME)
+   @HttpMethod("CUSTOM_HTTP_METHOD")
+   public @interface CUSTOM_HTTP_METHOD {
+   }
+    
+    @Path("rootAmbigResourceMethodsCUSTOM")
+    public static class TestAmbigResourceMethodsCUSTOM {
+        
+        @CUSTOM_HTTP_METHOD @Consumes("application/xml")
+        public void putJson(Object o) {
+        }
+        
+        @CUSTOM_HTTP_METHOD @Consumes({"text/plain", "text/xml"})
+        public void putIt(Object o) {
+        }
+
+        @CUSTOM_HTTP_METHOD @Consumes("text/plain")
+        public void getItWithParam(@QueryParam("q") String q, Object o) {
+        }
+    }
+
+    public void testAmbigResourceMethodsCUSTOM() throws Exception {
+        System.out.println("---\nAn issue should be reported if more than one CUSTOM_HTTP_METHOD method with same input mime-types exist:");
+        AbstractResource ar = IntrospectionModeller.createResource(TestAmbigResourceMethodsCUSTOM.class);
+        BasicValidator validator = new BasicValidator();
+        validator.validate(ar);
+        printIssueList(validator);
+        assertTrue(!validator.getIssueList().isEmpty());
+        assertTrue(validator.getIssueList().get(0).isFatal());
+    }
+    
+    @Path("rootAmbigSubResourceMethodsGET")
+    public static class TestAmbigSubResourceMethodsGET {
+        
+        @Path("{one}") @GET @Produces("application/xml")
+        public String getJson() {
+            return "{}";
+        }
+        
+        @Path("{seven}") @GET @Produces("text/plain")
         public String getIt() {
             return "it";
         }
 
-        @GET @Path("path")
+        @Path("{million}") @GET @Produces("text/plain")
         public String getItWithParam(@QueryParam("q") String q) {
             return String.format("it, q=%s", q);
         }
     }
 
-    public void ignoredTestAmbigSRMethods() throws Exception {
-        System.out.println("---\nAn issue should be reported if more than one sub-resource method with same method designator and mime-types exist:");
-        AbstractResource ar = IntrospectionModeller.createResource(TestAmbigSRMethods.class);
+    public void ignoredTestAmbigSubResourceMethodsGET() throws Exception {
+        System.out.println("---\nAn issue should be reported if more than one GET method with same output mime-types exist:");
+        AbstractResource ar = IntrospectionModeller.createResource(TestAmbigSubResourceMethodsGET.class);
         BasicValidator validator = new BasicValidator();
         validator.validate(ar);
-        assertTrue(!validator.getIssueList().isEmpty());
         printIssueList(validator);
+        assertTrue(!validator.getIssueList().isEmpty());
+        assertTrue(validator.getIssueList().get(0).isFatal());
+    }
+
+
+    @Path("rootAmbigSubResourceMethodsPUT")
+    public static class TestAmbigSubResourceMethodsPUT {
+        
+        @Path("sub/{one}") @PUT @Consumes("application/xml")
+        public void putJson(Object o) {
+        }
+        
+        @Path("sub/{slash}/") @PUT @Consumes({"text/plain", "text/xml"})
+        public void putIt(Object o) {
+        }
+
+        @Path("sub/{two}") @PUT @Consumes("text/plain")
+        public void getItWithParam(@QueryParam("q") String q, Object o) {
+        }
+    }
+
+    public void ignoredTestAmbigSubResourceMethodsPUT() throws Exception {
+        System.out.println("---\nAn issue should be reported if more than one PUT method with same input mime-types exist:");
+        AbstractResource ar = IntrospectionModeller.createResource(TestAmbigSubResourceMethodsPUT.class);
+        BasicValidator validator = new BasicValidator();
+        validator.validate(ar);
+        printIssueList(validator);
+        assertTrue(!validator.getIssueList().isEmpty());
+        assertTrue(validator.getIssueList().get(0).isFatal());
     }
     
+    
+    @Path("rootAmbigSubResourceMethodsCUSTOM")
+    public static class TestAmbigSubResourceMethodsCUSTOM {
+        
+        @Path("sub/{a}") @CUSTOM_HTTP_METHOD @Consumes("application/xml")
+        public void putJson(Object o) {
+        }
+        
+        @Path("sub/{b}") @CUSTOM_HTTP_METHOD @Consumes({"text/plain", "text/xml"})
+        public void putIt(Object o) {
+        }
+
+        @Path("sub/{c}") @CUSTOM_HTTP_METHOD @Consumes("text/plain")
+        public void getItWithParam(@QueryParam("q") String q, Object o) {
+        }
+    }
+
+    public void ignoredTestAmbigSubResourceMethodsCUSTOM() throws Exception {
+        System.out.println("---\nAn issue should be reported if more than one CUSTOM_HTTP_METHOD method with same input mime-types exist:");
+        AbstractResource ar = IntrospectionModeller.createResource(TestAmbigSubResourceMethodsCUSTOM.class);
+        BasicValidator validator = new BasicValidator();
+        validator.validate(ar);
+        printIssueList(validator);
+        assertTrue(!validator.getIssueList().isEmpty());
+        assertTrue(validator.getIssueList().get(0).isFatal());
+    }
+    
+    @Path("rootAmbigSRLocators")
+    public static class TestAmbigSRLocators {
+        
+        @Path("{one}")
+        public String locatorOne(@PathParam("one") String one) {
+            return "it";
+        }
+
+        @Path("{two}")
+        public String locatorTwo(@PathParam("two") String two, @QueryParam("q") String q) {
+            return String.format("it, q=%s", q);
+        }
+    }
+    
+    public void testAmbigSRLocators() throws Exception {
+        System.out.println("---\nAn issue should be reported if more than one sub-resource locator with the same path exists:");
+        AbstractResource ar = IntrospectionModeller.createResource(TestAmbigSRLocators.class);
+        BasicValidator validator = new BasicValidator();
+        validator.validate(ar);
+        printIssueList(validator);
+        assertTrue(!validator.getIssueList().isEmpty());
+        assertTrue(validator.getIssueList().get(0).isFatal());
+    }
+    
+    @Path("rootAmbigSRLocatorsWithSlash")
+    public static class TestAmbigSRLocatorsWithSlash {
+        
+        @Path("{one}")
+        public String locatorOne(@PathParam("one") String one) {
+            return "it";
+        }
+
+        @Path("{two}/")
+        public String locatorTwo(@PathParam("two") String two, @QueryParam("q") String q) {
+            return String.format("it, q=%s", q);
+        }
+    }
+    
+    public void testAmbigSRLocatorsWithSlash() throws Exception {
+        System.out.println("---\nAn issue should be reported if more than one sub-resource locator with paths differing only in ending slash exist:");
+        AbstractResource ar = IntrospectionModeller.createResource(TestAmbigSRLocatorsWithSlash.class);
+        BasicValidator validator = new BasicValidator();
+        validator.validate(ar);
+        printIssueList(validator);
+        assertTrue(!validator.getIssueList().isEmpty());
+        assertTrue(validator.getIssueList().get(0).isFatal());
+    }
+    
+    @Path("rootMultipleHttpMethodDesignatorsRM")
+    public static class TestMultipleHttpMethodDesignatorsRM {
+        
+        @GET @PUT
+        public String getIt() {
+            return "it";
+        }
+    }
+    
+    public void testMultipleHttpMethodDesignatorsRM() throws Exception {
+        System.out.println("---\nAn issue should be reported if more than one HTTP method designator exist on a resource method:");
+        AbstractResource ar = IntrospectionModeller.createResource(TestMultipleHttpMethodDesignatorsRM.class);
+        BasicValidator validator = new BasicValidator();
+        validator.validate(ar);
+        printIssueList(validator);
+        assertTrue(!validator.getIssueList().isEmpty());
+        assertTrue(validator.getIssueList().get(0).isFatal());
+    }
+
+    @Path("rootMultipleHttpMethodDesignatorsSRM")
+    public static class TestMultipleHttpMethodDesignatorsSRM {
+        
+        @Path("srm") @POST @PUT
+        public String doIt() {
+            return "it";
+        }
+    }
+    
+    public void testMultipleHttpMethodDesignatorsSRM() throws Exception {
+        System.out.println("---\nAn issue should be reported if more than one HTTP method designator exist on a sub-resource method:");
+        AbstractResource ar = IntrospectionModeller.createResource(TestMultipleHttpMethodDesignatorsSRM.class);
+        BasicValidator validator = new BasicValidator();
+        validator.validate(ar);
+        printIssueList(validator);
+        assertTrue(!validator.getIssueList().isEmpty());
+        assertTrue(validator.getIssueList().get(0).isFatal());
+    }
+
+    // TODO: test multiple root resources with the same uriTempl (in WebApplicationImpl.processRootResources ?)
 
     private static void printIssueList(BasicValidator validator) {
         for (ResourceModelIssue issue : validator.getIssueList()) {
