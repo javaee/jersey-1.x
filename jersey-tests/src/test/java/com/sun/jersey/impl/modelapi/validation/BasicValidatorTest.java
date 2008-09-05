@@ -59,7 +59,6 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.CookieParam;
-import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.HeaderParam;
 import javax.ws.rs.HttpMethod;
@@ -294,7 +293,7 @@ public class BasicValidatorTest extends TestCase {
     }
 
     public void testAmbigResourceMethodsGET() throws Exception {
-        System.out.println("---\nAn issue should be reported if more than one GET method with same output mime-types exist:");
+        System.out.println("---\nAn issue should be reported for a resource method, if more than one HTTP method with the same output mime-types exist:");
         AbstractResource ar = IntrospectionModeller.createResource(TestAmbigResourceMethodsGET.class);
         BasicValidator validator = new BasicValidator();
         validator.validate(ar);
@@ -321,7 +320,7 @@ public class BasicValidatorTest extends TestCase {
     }
 
     public void testAmbigResourceMethodsPUT() throws Exception {
-        System.out.println("---\nAn issue should be reported if more than one PUT method with same input mime-types exist:");
+        System.out.println("---\nAn issue should be reported for a resource method, if more than one HTTP method with the same input mime-types exist:");
         AbstractResource ar = IntrospectionModeller.createResource(TestAmbigResourceMethodsPUT.class);
         BasicValidator validator = new BasicValidator();
         validator.validate(ar);
@@ -354,7 +353,7 @@ public class BasicValidatorTest extends TestCase {
     }
 
     public void testAmbigResourceMethodsCUSTOM() throws Exception {
-        System.out.println("---\nAn issue should be reported if more than one CUSTOM_HTTP_METHOD method with same input mime-types exist:");
+        System.out.println("---\nAn issue should be reported for a resource method if more than one HTTP method with the same input mime-types exist:");
         AbstractResource ar = IntrospectionModeller.createResource(TestAmbigResourceMethodsCUSTOM.class);
         BasicValidator validator = new BasicValidator();
         validator.validate(ar);
@@ -382,8 +381,8 @@ public class BasicValidatorTest extends TestCase {
         }
     }
 
-    public void ignoredTestAmbigSubResourceMethodsGET() throws Exception {
-        System.out.println("---\nAn issue should be reported if more than one GET method with same output mime-types exist:");
+    public void testAmbigSubResourceMethodsGET() throws Exception {
+        System.out.println("---\nAn issue should be reported for a sub-resource method, if more than one HTTP method with the same output mime-type and uri path template exist:");
         AbstractResource ar = IntrospectionModeller.createResource(TestAmbigSubResourceMethodsGET.class);
         BasicValidator validator = new BasicValidator();
         validator.validate(ar);
@@ -409,8 +408,8 @@ public class BasicValidatorTest extends TestCase {
         }
     }
 
-    public void ignoredTestAmbigSubResourceMethodsPUT() throws Exception {
-        System.out.println("---\nAn issue should be reported if more than one PUT method with same input mime-types exist:");
+    public void testAmbigSubResourceMethodsPUT() throws Exception {
+        System.out.println("---\nAn issue should be reported for a sub-resource method, if more than one HTTP method with the same input mime-type and uri path template exist:");
         AbstractResource ar = IntrospectionModeller.createResource(TestAmbigSubResourceMethodsPUT.class);
         BasicValidator validator = new BasicValidator();
         validator.validate(ar);
@@ -436,8 +435,8 @@ public class BasicValidatorTest extends TestCase {
         }
     }
 
-    public void ignoredTestAmbigSubResourceMethodsCUSTOM() throws Exception {
-        System.out.println("---\nAn issue should be reported if more than one CUSTOM_HTTP_METHOD method with same input mime-types exist:");
+    public void testAmbigSubResourceMethodsCUSTOM() throws Exception {
+        System.out.println("---\nAn issue should be reported for a sub-resource method, if more than one HTTP method with the same input mime-type and path exist:");
         AbstractResource ar = IntrospectionModeller.createResource(TestAmbigSubResourceMethodsCUSTOM.class);
         BasicValidator validator = new BasicValidator();
         validator.validate(ar);
