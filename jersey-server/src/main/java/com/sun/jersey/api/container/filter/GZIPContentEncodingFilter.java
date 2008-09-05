@@ -51,12 +51,12 @@ import javax.ws.rs.core.HttpHeaders;
 /**
  * A GZIP content encoding filter.
  * <p>
- * If the request contains a Content-Encoding header with a value of "gzip"
+ * If the request contains a Content-Encoding header of "gzip"
  * then the request entity (if any) is uncompressed using gzip.
  * <p>
- * If the request contains a Accept-Encoding header that contains a value of
- * "zip" then the response entity (if any) is compressed using gzip and a
- * Content-Encoding header is added to the response with a value of "gzip".
+ * If the request contains a Accept-Encoding header that contains
+ * "gzip" then the response entity (if any) is compressed using gzip and a
+ * Content-Encoding header of "gzip" is added to the response.
  * 
  * @author Paul.Sandoz@Sun.Com
  */

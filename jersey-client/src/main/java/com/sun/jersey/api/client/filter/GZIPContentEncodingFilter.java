@@ -54,14 +54,14 @@ import javax.ws.rs.core.HttpHeaders;
  * The request will be modified to set the Accept-Encoding header to "gzip"
  * if that header has not already been set by the client.
  * <p>
- * If configured, and the request contains an entity, and the request does
- * not already contain a Content-Encoding header, then a Content-Encoding header
- * will be added with a value of "gzip" and the entity will be compressed using
- * gzip compression.
+ * If the request contains an entity and a Content-Encoding header of "gzip"
+ * then the entity will be compressed using gzip.
+ * If configured, and there does not exist a Content-Encoding header of "gzip"
+ * then such a header is added to the request and the entity will be compressed
+ * using gzip.
  * <p>
- * If the response has a Content-Encoding header whose value is "gzip" then
- * then the response entity will be uncompressed using gzip
- * uncompression.
+ * If the response has a Content-Encoding header of "gzip" then
+ * then the response entity will be uncompressed using gzip.
  * 
  * @author paulsandoz
  */
@@ -92,8 +92,8 @@ public final class GZIPContentEncodingFilter extends ClientFilter {
      * Create a GZIP Content-Encoding filter.
      * 
      * @param compressRequestEntity if true the request entity (if any)
-     *        is compressed, otherwise the request entity is not compressed
-     *        unless there already exists a Content-Encoding header whose
+     *        is always compressed, otherwise the request entity is compressed
+     *        only if there exists a Content-Encoding header whose
      *        value is "gzip".
      */
     public GZIPContentEncodingFilter(boolean compressRequestEntity) {
@@ -107,28 +107,20 @@ public final class GZIPContentEncodingFilter extends ClientFilter {
         }
 
         if (request.getEntity() != null) {
-            if (compressRequestEntity &&
-                    !request.getMetadata().containsKey(HttpHeaders.CONTENT_ENCODING)) {
+            Object o = request.getMetadata().getFirst(HttpHeaders.CONTENT_ENCODING);
+            if (o != null && o.equals("gzip")) {
+                request.setAdapter(new Adapter(request.getAdapter()));
+            } else if (compressRequestEntity) {
                 request.getMetadata().add(HttpHeaders.CONTENT_ENCODING, "gzip");
                 request.setAdapter(new Adapter(request.getAdapter()));
-            } else if (!compressRequestEntity &&
-                    request.getMetadata().containsKey(HttpHeaders.CONTENT_ENCODING)) {
-                Object o = request.getMetadata().getFirst(HttpHeaders.CONTENT_ENCODING);
-                if (o instanceof String) {
-                    String encoding = (String)o;
-                    if (encoding.trim().equals("gzip")) {
-                        request.setAdapter(new Adapter(request.getAdapter()));                        
-                    }
-                }                       
             }
-        }
-        
+        }        
         
         ClientResponse response = getNext().handle(request);
         
         if (response.hasEntity() &&
                 response.getMetadata().containsKey(HttpHeaders.CONTENT_ENCODING)) {
-            String encodings = response.getMetadata().getFirst(HttpHeaders.CONTENT_ENCODING).trim();
+            String encodings = response.getMetadata().getFirst(HttpHeaders.CONTENT_ENCODING);
 
             if (encodings.equals("gzip")) {
                 response.getMetadata().remove(HttpHeaders.CONTENT_ENCODING);
