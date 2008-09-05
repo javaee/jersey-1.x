@@ -79,7 +79,7 @@ public class MultipleFilters extends AbstractResourceTester {
             return request;
         }
 
-        public ContainerResponse filter(ContainerResponse response) {
+        public ContainerResponse filter(ContainerRequest request, ContainerResponse response) {
             response.getHttpHeaders().add("X-TEST", "one");
             return response;
         }        
@@ -91,7 +91,7 @@ public class MultipleFilters extends AbstractResourceTester {
             return request;
         }
 
-        public ContainerResponse filter(ContainerResponse response) {
+        public ContainerResponse filter(ContainerRequest request, ContainerResponse response) {
             response.getHttpHeaders().add("X-TEST", "two");
             return response;
         }        

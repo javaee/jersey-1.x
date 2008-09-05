@@ -34,7 +34,6 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-
 package com.sun.jersey.impl;
 
 import com.sun.jersey.spi.container.InBoundHeaders;
@@ -86,12 +85,14 @@ public class TestResourceClientHandler implements ClientHandler {
     }
     
     private final class Response extends ClientResponse {
-        private final InputStream responseEntity;
+        private Map<String, Object> properties;
+        private int status;
+        private InputStream responseEntity;
         private final ContainerResponse response;
         private final MultivaluedMap<String, String> metadata;
-        private Map<String, Object> properties;
         
        Response(InputStream responseEntity, ContainerResponse response) {
+            this.status = response.getStatus();
             this.responseEntity = responseEntity;
             this.response = response;
             this.metadata = new InBoundHeaders();
@@ -99,8 +100,18 @@ public class TestResourceClientHandler implements ClientHandler {
             writeHeaders(response.getHttpHeaders(), metadata);
         }
         
+        public Map<String, Object> getProperties() {
+            if (properties != null) return properties;
+
+            return properties = new HashMap<String, Object>();
+        }
+        
         public int getStatus() {
-            return response.getStatus();
+            return status;
+        }
+
+        public void setStatus(int status) {
+            this.status = status;
         }
 
         public MultivaluedMap<String, String> getMetadata() {
@@ -108,11 +119,21 @@ public class TestResourceClientHandler implements ClientHandler {
         }
 
         public boolean hasEntity() {
+            if (responseEntity == null) return false;
+            
             try {
                 return responseEntity.available() > 0;
             } catch (IOException ex) {
                 throw new ClientHandlerException(ex);                
             }
+        }
+        
+        public InputStream getEntityInputStream() {
+            return responseEntity;
+        }
+
+        public void setEntityInputStream(InputStream in) {
+            this.responseEntity = in;
         }
         
         public <T> T getEntity(Class<T> c) {
@@ -133,12 +154,7 @@ public class TestResourceClientHandler implements ClientHandler {
                 throw new ClientHandlerException(ex);
             }
         }
-        
-        public Map<String, Object> getProperties() {
-            if (properties != null) return properties;
 
-            return properties = new HashMap<String, Object>();
-        }
     }
 
     private static class TestContainerResponseWriter implements ContainerResponseWriter {
@@ -147,7 +163,10 @@ public class TestResourceClientHandler implements ClientHandler {
         public OutputStream writeStatusAndHeaders(long contentLength, 
                 ContainerResponse response) throws IOException {
             return baos;
-        }        
+        }
+
+        public void finish() throws IOException {
+        }
     }
     
     public ClientResponse handle(ClientRequest clientRequest) {

@@ -94,6 +94,9 @@ public final class GrizzlyContainer extends GrizzlyAdapter implements ContainerL
                 
             return response.getOutputStream();
         }
+        
+        public void finish() throws IOException {            
+        }
     }
     
     public void service(GrizzlyRequest request, GrizzlyResponse response) {

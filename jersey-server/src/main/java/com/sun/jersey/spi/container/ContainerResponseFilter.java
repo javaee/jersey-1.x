@@ -49,8 +49,9 @@ public interface ContainerResponseFilter {
      * An implementation may modify the state of the response or
      * return a new instance.
      * 
-     * @param response
-     * @return the response
+     * @param request the request.
+     * @param response the response.
+     * @return the response.
      */
-    ContainerResponse filter(ContainerResponse response);
+    ContainerResponse filter(ContainerRequest request, ContainerResponse response);
 }

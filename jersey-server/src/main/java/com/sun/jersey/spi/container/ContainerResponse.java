@@ -236,14 +236,17 @@ public class ContainerResponse implements HttpResponseContext {
             if (size != -1)
                 getHttpHeaders().putSingle("Content-Length", Long.toString(size));
         } else {
+            OutputStream o = new CommittingOutputStream(size);
             p.writeTo(entity, entity.getClass(), entityType, null, 
-                    contentType, getHttpHeaders(), 
-                    new CommittingOutputStream(size));
+                    contentType, getHttpHeaders(), o);
+//            o.flush();
+//            o.close();
         }
         if (!isCommitted) {
             responseWriter.writeStatusAndHeaders(-1, this);
             isCommitted = true;
         }
+        responseWriter.finish();
     }
 
     /**

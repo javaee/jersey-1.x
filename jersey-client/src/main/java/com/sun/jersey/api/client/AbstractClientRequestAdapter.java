@@ -34,41 +34,23 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-package com.sun.jersey.spi.container;
-
-import java.io.IOException;
-import java.io.OutputStream;
+package com.sun.jersey.api.client;
 
 /**
- * Containers implement this interface and provide an instance to the
- * {@link WebApplication} or {@link ContainerResponse}.
+ * Abstract implementation of ClientRequestAdapter that helps to adapts an 
+ * existing ClientRequestAdapter instance.
  * 
  * @author Paul.Sandoz@Sun.Com
  */
-public interface ContainerResponseWriter {
-    /**
-     * Write the status and headers of the response and return an output stream 
-     * for the web application to write the entity of the response.
-     * 
-     * @param contentLength >=0 if the content length in bytes of the
-     *        entity to be written is known, otherwise -1. Containers
-     *        may use this value to determine whether the "Content-Length"
-     *        header can be set or utilize chunked transfer encoding.
-     * @param response the container response. The status and headers are
-     *        obtained from the response.
-     * @return the output stream to write the entity (if any).
-     * @throws java.io.IOException if an error occured when writing out the
-     *         status and headers or obtaining the output stream.
-     */
-    OutputStream writeStatusAndHeaders(
-            long contentLength,
-            ContainerResponse response) throws IOException;
+public abstract class AbstractClientRequestAdapter implements ClientRequestAdapter {
 
-    /**
-     * Finish writing the response. This enables the container response
-     * writer to clean up any state or flush any streams.
-     * 
-     * @throws java.io.IOException
-     */
-    void finish() throws IOException;
+    private final ClientRequestAdapter cra;
+    
+    protected AbstractClientRequestAdapter(ClientRequestAdapter cra) {
+        this.cra = cra;        
+    }
+    
+    public ClientRequestAdapter getAdapter() {
+        return cra;        
+    }
 }

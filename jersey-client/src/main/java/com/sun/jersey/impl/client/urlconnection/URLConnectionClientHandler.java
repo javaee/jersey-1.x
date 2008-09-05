@@ -34,7 +34,6 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-
 package com.sun.jersey.impl.client.urlconnection;
 
 import com.sun.jersey.spi.container.InBoundHeaders;
@@ -70,12 +69,13 @@ public final class URLConnectionClientHandler implements ClientHandler {
     private static final Annotation[] EMPTY_ANNOTATIONS = new Annotation[0];
     
     private final class URLConnectionResponse extends ClientResponse {
+        private Map<String, Object> properties;
         private final String method;
-        private final int status;
+        private int status;
         private final HttpURLConnection uc;
         private final MultivaluedMap<String, String> metadata;
-        private Map<String, Object> properties;
-        
+        private InputStream in;
+
         URLConnectionResponse(String method, int status, HttpURLConnection uc) {
             this.method = method;
             this.status = status;
@@ -86,10 +86,20 @@ public final class URLConnectionClientHandler implements ClientHandler {
                 if (e.getKey() != null)
                     metadata.put(e.getKey(), e.getValue());
             }
+            
+            try {
+                this.in = getInputStream();
+            } catch (IOException ex) {
+                throw new IllegalArgumentException(ex);
+            }
         }
         
         public int getStatus() {
             return status;
+        }
+
+        public void setStatus(int status) {
+            this.status = status;
         }
 
         public MultivaluedMap<String, String> getMetadata() {
@@ -97,11 +107,19 @@ public final class URLConnectionClientHandler implements ClientHandler {
         }
 
         public boolean hasEntity() {
-            if (method.equals("HEAD"))
+            if (method.equals("HEAD") || in == null)
                 return false;
-            
+
             int l = uc.getContentLength();
             return l > 0 || l == -1;
+        }
+        
+        public InputStream getEntityInputStream() {
+            return in;
+        }
+
+        public void setEntityInputStream(InputStream in) {
+            this.in = in;
         }
         
         public <T> T getEntity(Class<T> c) {
@@ -115,9 +133,11 @@ public final class URLConnectionClientHandler implements ClientHandler {
                             "A message body reader for Java type, " + c + 
                             ", and MIME media type, " + mediaType + ", was not found");
                 }
-                InputStream in = getInputStream();
-                T t = br.readFrom(c, null, null, mediaType, metadata, getInputStream());
-                if (!(t instanceof InputStream)) in.close();
+                T t = br.readFrom(c, null, null, mediaType, metadata, in);
+                if (!(t instanceof InputStream)) {
+                    in.close();
+                }
+                in = null;
                 return t;
             } catch (IOException ex) {
                 throw new IllegalArgumentException(ex);
@@ -134,11 +154,12 @@ public final class URLConnectionClientHandler implements ClientHandler {
             if (status < 300) {
                 return uc.getInputStream();
             } else {
-                InputStream in = uc.getErrorStream();
-                return (in != null) 
-                        ? in : new ByteArrayInputStream(new byte[0]);
+                InputStream ein = uc.getErrorStream();
+                return (ein != null)
+                        ? ein : new ByteArrayInputStream(new byte[0]);
             }
         }
+
     }
 
     @Context private MessageBodyWorkers bodyContext;
@@ -257,7 +278,7 @@ public final class URLConnectionClientHandler implements ClientHandler {
             }
         }
         
-        final OutputStream out = uc.getOutputStream();
+        final OutputStream out = ro.getAdapter().adapt(ro, uc.getOutputStream());
         bw.writeTo(entity, entity.getClass(), entity.getClass(),
                 EMPTY_ANNOTATIONS, mediaType, metadata, out);
         out.flush();

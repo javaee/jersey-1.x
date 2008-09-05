@@ -186,10 +186,20 @@ public class ContainerRequest implements HttpRequestContext {
     }
     
     /**
+     * Get the input stream of the entity.
+     *
+     * @return the input stream of the entity.
+     */
+    public InputStream getEntityInputStream() {
+        return entity;
+    }
+    
+    /**
      * Set the input stream of the entity.
+     * 
      * @param entity the input stream of the entity.
      */
-    public void setEntity(InputStream entity) {
+    public void setEntityInputStream(InputStream entity) {
         this.entity = entity;
     }
             

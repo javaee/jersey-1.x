@@ -34,73 +34,67 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-package com.sun.jersey.impl.container.filter;
+package com.sun.jersey.impl.container.grizzly.web;
 
-import com.sun.jersey.api.client.ClientResponse;
+import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.WebResource;
-import com.sun.jersey.api.container.filter.PostReplaceFilter;
-import com.sun.jersey.api.core.DefaultResourceConfig;
+import com.sun.jersey.api.container.filter.GZIPContentEncodingFilter;
 import com.sun.jersey.api.core.ResourceConfig;
-import com.sun.jersey.impl.AbstractResourceTester;
-import java.util.Arrays;
-import javax.ws.rs.DELETE;
+import java.util.HashMap;
+import java.util.Map;
+import javax.ws.rs.GET;
 import javax.ws.rs.POST;
-import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 
 /**
  *
  * @author Paul.Sandoz@Sun.Com
  */
-public class PostToPutDeleteTest extends AbstractResourceTester {
+public class GZIPContentEncodingTest extends AbstractGrizzlyWebContainerTester {
     
     @Path("/")
     public static class Resource {
-        @PUT
-        public String put() { return "PUT"; }
-        
-        @DELETE
-        public String delete() { return "DELETE"; }
+        @GET
+        public String get() { return "GET"; }
         
         @POST
-        public String post() { return "POST"; }
+        public String post(String content) { return content; }
     }
     
-    public PostToPutDeleteTest(String testName) {
+    public GZIPContentEncodingTest(String testName) {
         super(testName);
     }
         
     
-    public void testWithInstance() {
-        ResourceConfig rc = new DefaultResourceConfig(Resource.class);
-        rc.getProperties().put(ResourceConfig.PROPERTY_CONTAINER_REQUEST_FILTERS, 
-                Arrays.asList(new PostReplaceFilter()));
-        initiateWebApplication(rc);
-        _test();
-    }
-    
-    public void testWithString() {
-        ResourceConfig rc = new DefaultResourceConfig(Resource.class);
-        rc.getProperties().put(ResourceConfig.PROPERTY_CONTAINER_REQUEST_FILTERS, 
-                PostReplaceFilter.class.getName());
-        initiateWebApplication(rc);
-        _test();
-    }
-    
-    public void _test() {
-        WebResource r = resource("/", false);
-        
-        String s = r.header("X-HTTP-Method-Override", "PUT").post(String.class);
-        assertEquals("PUT", s);
-        
-        s = r.header("X-HTTP-Method-Override", "DELETE").post(String.class);
-        assertEquals("DELETE", s);
-        
-        ClientResponse cr = r.header("X-HTTP-Method-Override", "PATCH").
-                post(ClientResponse.class);
-        assertEquals(405, cr.getStatus());
-        
-        s = r.post(String.class);
-        assertEquals("POST", s);
-    }
+    public void testGet() {        
+        Map<String, String> initParams = new HashMap<String, String>();
+        initParams.put(ResourceConfig.PROPERTY_CONTAINER_REQUEST_FILTERS, 
+                GZIPContentEncodingFilter.class.getName());
+        initParams.put(ResourceConfig.PROPERTY_CONTAINER_RESPONSE_FILTERS,
+                GZIPContentEncodingFilter.class.getName());        
+        startServer(initParams, Resource.class);
+
+
+        Client c = Client.create();
+        c.addFilter(new com.sun.jersey.api.client.filter.GZIPContentEncodingFilter());
+        WebResource r = c.resource(getUri().build());
+
+        assertEquals("GET", r.get(String.class));
+    }    
+
+    public void testPost() {
+        Map<String, String> initParams = new HashMap<String, String>();
+        initParams.put(ResourceConfig.PROPERTY_CONTAINER_REQUEST_FILTERS, 
+                GZIPContentEncodingFilter.class.getName());
+        initParams.put(ResourceConfig.PROPERTY_CONTAINER_RESPONSE_FILTERS,
+                GZIPContentEncodingFilter.class.getName());        
+        startServer(initParams, Resource.class);
+
+
+        Client c = Client.create();
+        c.addFilter(new com.sun.jersey.api.client.filter.GZIPContentEncodingFilter());
+        WebResource r = c.resource(getUri().build());
+
+        assertEquals("POST", r.post(String.class, "POST"));
+    }    
 }

@@ -192,6 +192,9 @@ public class WebApplicationTest extends TestCase {
                             ContainerResponse response) throws IOException {
                         return new ByteArrayOutputStream();
                     }
+
+                    public void finish() throws IOException {
+                    }
                 });
         
         try { 

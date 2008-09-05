@@ -195,6 +195,9 @@ public class ServletContainer extends HttpServlet implements ContainerListener {
             return this;
         }
         
+        public void finish() throws IOException {            
+        }
+
         OutputStream out;
         
         public void write(int b) throws IOException {

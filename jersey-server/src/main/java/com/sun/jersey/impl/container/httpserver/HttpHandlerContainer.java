@@ -99,6 +99,9 @@ public class HttpHandlerContainer implements HttpHandler, ContainerListener {
             
             return exchange.getResponseBody();
         }
+
+        public void finish() throws IOException {            
+        }
     }
     
     public void handle(HttpExchange exchange) throws IOException {

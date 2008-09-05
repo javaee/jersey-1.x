@@ -34,11 +34,13 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-
 package com.sun.jersey.impl.client;
 
 import com.sun.jersey.api.client.ClientRequest;
+import com.sun.jersey.api.client.ClientRequestAdapter;
 import com.sun.jersey.impl.container.OutBoundHeaders;
+import java.io.IOException;
+import java.io.OutputStream;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -46,17 +48,19 @@ import java.util.List;
 import java.util.Map;
 import javax.ws.rs.core.MultivaluedMap;
 
-public final class ClientRequestImpl extends ClientRequest {
+public final class ClientRequestImpl extends ClientRequest implements ClientRequestAdapter {
     private Map<String, Object> properties;
     
-    private final URI uri;
+    private URI uri;
     
-    private final String method;
+    private String method;
     
-    private final Object entity;
+    private Object entity;
     
     private final MultivaluedMap<String, Object> metadata;
 
+    private ClientRequestAdapter adapter;
+    
     public ClientRequestImpl(URI uri, String method) {
         this(uri, method, null, null);
     }
@@ -71,6 +75,7 @@ public final class ClientRequestImpl extends ClientRequest {
         this.method = method;
         this.entity = entity;
         this.metadata = (metadata != null) ? metadata : new OutBoundHeaders();
+        this.adapter = this;
     }
 
     public Map<String, Object> getProperties() {
@@ -84,16 +89,36 @@ public final class ClientRequestImpl extends ClientRequest {
         return uri;
     }
 
+    public void setURI(URI uri) {
+        this.uri = uri;
+    }
+
     public String getMethod() {
         return method;
     }
     
+    public void setMethod(String method) {
+        this.method = method;
+    }
+
     public Object getEntity() {
         return entity;
     }
 
+    public void setEntity(Object entity) {
+        this.entity = entity;
+    }
+
     public MultivaluedMap<String, Object> getMetadata() {
         return metadata;
+    }
+    
+    public ClientRequestAdapter getAdapter() {
+        return adapter;
+    }
+
+    public void setAdapter(ClientRequestAdapter adapter) {
+        this.adapter = (adapter != null) ? adapter : this;
     }
     
     @Override
@@ -108,5 +133,12 @@ public final class ClientRequestImpl extends ClientRequest {
             clone.put(e.getKey(), new ArrayList<Object>(e.getValue()));
         }
         return clone;
+    }
+    
+
+    // ClientRequestAdapeter
+    
+    public OutputStream adapt(ClientRequest request, OutputStream out) throws IOException {
+        return out;
     }
 }

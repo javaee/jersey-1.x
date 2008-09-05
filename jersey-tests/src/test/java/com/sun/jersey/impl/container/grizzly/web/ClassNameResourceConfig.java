@@ -69,6 +69,7 @@ public class ClassNameResourceConfig extends DefaultResourceConfig {
     
     public ClassNameResourceConfig(Map<String, Object> props) {
         super(getClasses(props));
+        setPropertiesAndFeatures(props);
     }
 
     private static Set<Class<?>> getClasses(Map<String, Object> props) {

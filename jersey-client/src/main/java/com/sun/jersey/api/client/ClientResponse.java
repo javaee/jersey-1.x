@@ -34,9 +34,9 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-
 package com.sun.jersey.api.client;
 
+import java.io.InputStream;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -63,12 +63,26 @@ public abstract class ClientResponse {
             RuntimeDelegate.getInstance().createHeaderDelegate(Date.class);
         
     /**
+     * Get a list of response properties.
+     * 
+     * @return the list of response properties.
+     */
+    public abstract Map<String, Object> getProperties();
+    
+    /**
      * Get the status code.
      * 
      * @return the status code.
      */
     public abstract int getStatus();
     
+    /**
+     * Set the status code.
+     * 
+     * @param status the status code.
+     */
+    public abstract void setStatus(int status);
+
     /**
      * Get the HTTP metadata
      * 
@@ -83,6 +97,21 @@ public abstract class ClientResponse {
     public abstract boolean hasEntity();
 
     /**
+     * Get the input stream of the response.
+     * 
+     * @return the input stream of the response, otherwise null if
+     *         no entity is present.
+     */
+    public abstract InputStream getEntityInputStream();
+
+    /**
+     * Set the input stream of the response.
+     * 
+     * @param in the input stream of the response.
+     */
+    public abstract void setEntityInputStream(InputStream in);
+
+    /**
      * Get the entity of the response.
      * 
      * @param c the type of the entity.
@@ -92,13 +121,6 @@ public abstract class ClientResponse {
      */
     public abstract <T> T getEntity(Class<T> c) throws IllegalArgumentException;
 
-    /**
-     * Get a list of response properties.
-     * 
-     * @return the list of response properties.
-     */
-    public abstract Map<String, Object> getProperties();
-    
     /**
      * Get the media type of the response
      * 

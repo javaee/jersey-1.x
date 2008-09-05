@@ -726,7 +726,7 @@ public final class WebApplicationImpl implements WebApplication {
             }
             
             for (ContainerResponseFilter f : responseFilters)
-                response = f.filter(response);
+                response = f.filter(request, response);
         } catch (WebApplicationException e) {
             mapWebApplicationException(e, response);
         } catch (ContainerCheckedException e) {

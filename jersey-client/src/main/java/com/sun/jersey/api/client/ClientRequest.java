@@ -34,7 +34,6 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-
 package com.sun.jersey.api.client;
 
 import com.sun.jersey.impl.client.ClientRequestImpl;
@@ -68,11 +67,26 @@ public abstract class ClientRequest {
     public abstract URI getURI();
     
     /**
-     * Get the HTTP method.
+     * Set the URI of the request. The URI shall contain sufficient
+     * components to correctly dispatch a request
+     *
+     * @param uri the URI of the request.
+     */
+    public abstract void setURI(URI uri);
+    
+    /**
+     * Get the HTTP method of the request.
      * 
      * @return the HTTP method.
      */
     public abstract String getMethod();
+
+    /**
+     * Set the HTTP method of the request.
+     * 
+     * @param method the HTTP method.
+     */
+    public abstract void setMethod(String method);
     
     /**
      * Get the entity of the request.
@@ -80,6 +94,13 @@ public abstract class ClientRequest {
      * @return the entity of the request.
      */
     public abstract Object getEntity();
+
+    /**
+     * Set the entity of the request.
+     * 
+     * @param entity the entity of the request.
+     */
+    public abstract void setEntity(Object entity);
     
     /**
      * Get the HTTP headers of the request.
@@ -88,6 +109,24 @@ public abstract class ClientRequest {
      */
     public abstract MultivaluedMap<String, Object> getMetadata();
 
+    /**
+     * Get the client request adapter.
+     *
+     * @return the client request adapter.
+     */
+    public abstract ClientRequestAdapter getAdapter();
+    
+    /**
+     * Set the client request adapter.
+     * <p>
+     * If an existing adapter is set then usually this adapter wrapped in the
+     * new adapter to be set such that the current adaption behaviour is
+     * retained and augmented with the new adpation behaviour.
+     *
+     * @param adapter the client request adapter.
+     */
+    public abstract void setAdapter(ClientRequestAdapter adapter);
+    
     /**
      * Clone the request.
      * 
