@@ -64,9 +64,14 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.naming.InitialContext;
+import javax.naming.NamingException;
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
@@ -136,6 +141,9 @@ public class ServletContainer extends HttpServlet implements ContainerListener {
     
     public static final String RESOURCE_CONFIG_CLASS = 
             "com.sun.jersey.config.property.resourceConfigClass";
+    
+    private static final Logger LOGGER = 
+            Logger.getLogger(ServletContainer.class.getName());
     
     private final ThreadLocalInvoker<HttpServletRequest> requestInvoker =
             new ThreadLocalInvoker<HttpServletRequest>();
@@ -574,14 +582,57 @@ public class ServletContainer extends HttpServlet implements ContainerListener {
     
     /**
      * Initiate the {@link WebApplication}.
-     *
+     * <p>
+     * Any root resource class in registered in the resource configuration
+     * that is an interface is processed as follows.
+     * If the class is an interface and there exists a JNDI named object
+     * with the fully qualified class name as the JNDI name then that named
+     * object is added as a singleton root resource and the class is removed
+     * from the set of root resource classes.
+     * 
      * @param rc the Resource configuration
      * @param wa the Web application
      */
     protected void initiate(ResourceConfig rc, WebApplication wa) {
-        wa.initiate(rc);        
+        validate(rc);
+        wa.initiate(rc);
     }
 
+    private void validate(ResourceConfig rc) {
+        // Obtain any instances that are registered in JNDI
+        // Assumes such instances are singletons
+        // Registered classes have to be interfaces
+        javax.naming.Context x = getContext();
+        if (context != null) {
+            Iterator<Class<?>> i = rc.getClasses().iterator();
+            while (i.hasNext()) {
+                Class<?> c = i.next();
+                if (!c.isInterface()) continue;
+                
+                try {
+                    Object o = x.lookup(c.getName());
+                    if (o != null) {
+                        i.remove();
+                        rc.getSingletons().add(o);
+                        LOGGER.log(Level.CONFIG,
+                                "An instance of the root resource class " + c.getName() +
+                                " is found by JNDI look up using the class name as the JNDI name. " +
+                                "The instance will be registered as a singleton.");
+                    }
+                } catch (NamingException ex) {
+                }
+            }
+        }
+    }
+    
+    private javax.naming.Context getContext() {
+        try {
+            return new InitialContext();
+        } catch (NamingException ex) {
+            return null;
+        }
+    }
+    
     // ContainerListener
     
     public void onReload() {

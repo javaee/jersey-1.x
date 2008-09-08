@@ -85,11 +85,12 @@ public class IntrospectionModeller {
     private static final Logger LOGGER = Logger.getLogger(IntrospectionModeller.class.getName());
 
     public static final AbstractResource createResource(Class<?> resourceClass) {
-        final Path rPathAnnotation = resourceClass.getAnnotation(Path.class);
+        final Class<?> annotatedResourceClass = getAnnotatedResourceClass(resourceClass);
+        final Path rPathAnnotation = annotatedResourceClass.getAnnotation(Path.class);
         final boolean isRootResourceClass = (null != rPathAnnotation);
 
         final boolean isEncodedAnotOnClass = 
-                (null != resourceClass.getAnnotation(Encoded.class));
+                (null != annotatedResourceClass.getAnnotation(Encoded.class));
 
         AbstractResource resource;
 
@@ -110,9 +111,9 @@ public class IntrospectionModeller {
         workOutSetterMethodsList(resource, methodList, isEncodedAnotOnClass);
         
         final Consumes classScopeConsumesAnnotation = 
-                resourceClass.getAnnotation(Consumes.class);
+                annotatedResourceClass.getAnnotation(Consumes.class);
         final Produces classScopeProducesAnnotation = 
-                resourceClass.getAnnotation(Produces.class);
+                annotatedResourceClass.getAnnotation(Produces.class);
         workOutResourceMethodsList(resource, methodList, isEncodedAnotOnClass, 
                 classScopeConsumesAnnotation, classScopeProducesAnnotation);
         workOutSubResourceMethodsList(resource, methodList, isEncodedAnotOnClass, 
@@ -127,6 +128,19 @@ public class IntrospectionModeller {
         }
 
         return resource;
+    }
+    
+    private static final Class getAnnotatedResourceClass(Class rc) {
+        Class c = rc;
+        while (c != Object.class) {
+            if (c.isAnnotationPresent(Path.class)) return c;
+            
+            for (Class i : c.getInterfaces())
+                if (i.isAnnotationPresent(Path.class)) return i;
+            
+            c = c.getSuperclass();
+        }
+        return rc;
     }
     
     private static final void addConsumes(

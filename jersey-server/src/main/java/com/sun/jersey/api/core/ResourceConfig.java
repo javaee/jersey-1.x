@@ -42,6 +42,7 @@ import com.sun.jersey.spi.container.ContainerListener;
 import com.sun.jersey.spi.container.ContainerNotifier;
 import com.sun.jersey.spi.container.ContainerRequestFilter;
 import com.sun.jersey.spi.container.ContainerResponseFilter;
+import java.lang.reflect.Modifier;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -252,6 +253,8 @@ public abstract class ResourceConfig extends Application {
      * A registered class is removed from the set of registered classes
      * if an instance of that class is a member of the set of registered
      * singletons.
+     * <p>A registered class that is an interface of an abstract class
+     * is removed from the registered classes.
      * 
      * @throws IllegalArgumentException if the set of registered singletons 
      *         contains more than one instance of the same root resource class.
@@ -271,7 +274,27 @@ public abstract class ResourceConfig extends Application {
                 }
             }            
         }
+
+
+        // Remove any classes that cannot be instantiated
+        i = getClasses().iterator();
+        while (i.hasNext()) {
+            Class<?> c = i.next();
+            int modifiers = c.getModifiers();
+            if (Modifier.isAbstract(modifiers) && !Modifier.isInterface(modifiers)) {
+                LOGGER.warning("The abstract " + c + ", registered as a root resource class " +
+                        "of the ResourceConfig cannot be instantiated" +
+                        ". This class will be ignored");
+                i.remove();
+            } else if (Modifier.isInterface(modifiers)) {
+                LOGGER.warning("The " + c + ", registered as a root resource class " +
+                        "of the ResourceConfig cannot be instantiated" +
+                        ". This interface will be ignored");
+                i.remove();
+            }
+        }
         
+        // Find conflicts
         Set<Class<?>> objectClassSet = new HashSet<Class<?>>();
         Set<Class<?>> conflictSet = new HashSet<Class<?>>();
         for (Object o : getSingletons()) {
@@ -308,13 +331,13 @@ public abstract class ResourceConfig extends Application {
         Set<Class<?>> s = new HashSet<Class<?>>();
         
         for (Class<?> c : getClasses()) {
-            if (c.isAnnotationPresent(Path.class))
+            if (isRootResourceClass(c))
                 s.add(c);
         }
         
         return Collections.unmodifiableSet(s);
     }
-    
+
     /**
      * Get the set of provider classes.
      * <p>
@@ -346,7 +369,7 @@ public abstract class ResourceConfig extends Application {
         Set<Object> s = new HashSet<Object>();
         
         for (Object o : getSingletons()) {
-            if (o.getClass().isAnnotationPresent(Path.class))
+            if (isRootResourceClass(o.getClass()))
                 s.add(o);
         }
         
@@ -371,4 +394,17 @@ public abstract class ResourceConfig extends Application {
         
         return Collections.unmodifiableSet(s);
     }
+    
+    private boolean isRootResourceClass(Class<?> c) {
+        do {
+            if (c.isAnnotationPresent(Path.class)) return true;
+            
+            for (Class i : c.getInterfaces())
+                if (i.isAnnotationPresent(Path.class)) return true;
+            
+            c = c.getSuperclass();
+        } while (c != Object.class);
+
+        return false;
+    }    
 }
