@@ -55,32 +55,41 @@ public class RootResourceTest extends AbstractResourceTester {
         super(testName);
     }
 
-    @Path("/")
+    @Path("/concrete")
+    public static class Resource {
+        @GET
+        public String get() {
+            return "get";
+        }
+        
+    }
+
+    @Path("/abstract")
     public static abstract class AbstractResource {
         @GET
         public String get() {
-            return "foo";
+            return "get";
         }
         
     }
     
     public void testAbstractResource() throws IOException {
-        initiateWebApplication(AbstractResource.class);
-        WebResource r = resource("/", false);
+        initiateWebApplication(AbstractResource.class, Resource.class);
+        WebResource r = resource("/abstract", false);
         
         ClientResponse res = r.get(ClientResponse.class);
         assertEquals(404, res.getStatus());
     }   
     
-    @Path("/")
+    @Path("/interface")
     public static interface InterfaceResource {
         @GET
         public String get();        
     }
     
     public void testInterfaceResource() throws IOException {
-        initiateWebApplication(InterfaceResource.class);
-        WebResource r = resource("/", false);
+        initiateWebApplication(InterfaceResource.class, Resource.class);
+        WebResource r = resource("/interface", false);
         
         ClientResponse res = r.get(ClientResponse.class);
         assertEquals(404, res.getStatus());
