@@ -147,7 +147,7 @@ public class BasicValidator extends AbstractModelValidator {
             void generateOutErrMsg(AbstractResource resource, AbstractResourceMethod arm1, AbstractResourceMethod arm2, MediaType mt) {
                 issueList.add(new ResourceModelIssue(
                         resource,
-                        ImplMessages.AMBIGUOUS_RMS_OUT(resource.getResourceClass(), arm1.getHttpMethod(), mt, arm1.getMethod().getName(), arm2.getMethod().getName(), arm1.getSupportedInputTypes(), arm2.getSupportedInputTypes()),
+                        ImplMessages.AMBIGUOUS_RMS_OUT(resource.getResourceClass(), arm1.getHttpMethod(), mt, arm1.getMethod().getName(), arm2.getMethod().getName(), arm1.getSupportedOutputTypes(), arm2.getSupportedOutputTypes()),
                         true));
             };
         });
@@ -179,7 +179,7 @@ public class BasicValidator extends AbstractModelValidator {
                 if (isConflictingPaths(arm1.getPath().getValue(), arm2.getPath().getValue())) {
                     issueList.add(new ResourceModelIssue(
                         resource,
-                        ImplMessages.AMBIGUOUS_SRMS_OUT(resource.getResourceClass(), arm1.getHttpMethod(), arm1.getPath().getValue(), mt, arm1.getMethod().getName(), arm2.getMethod().getName(), arm1.getSupportedInputTypes(), arm2.getSupportedInputTypes()),
+                        ImplMessages.AMBIGUOUS_SRMS_OUT(resource.getResourceClass(), arm1.getHttpMethod(), arm1.getPath().getValue(), mt, arm1.getMethod().getName(), arm2.getMethod().getName(), arm1.getSupportedOutputTypes(), arm2.getSupportedOutputTypes()),
                         true));
                 }
             }
