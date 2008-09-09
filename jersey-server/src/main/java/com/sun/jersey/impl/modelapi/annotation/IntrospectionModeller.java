@@ -131,15 +131,11 @@ public class IntrospectionModeller {
     }
     
     private static final Class getAnnotatedResourceClass(Class rc) {
-        Class c = rc;
-        while (c != Object.class) {
-            if (c.isAnnotationPresent(Path.class)) return c;
-            
-            for (Class i : c.getInterfaces())
-                if (i.isAnnotationPresent(Path.class)) return i;
-            
-            c = c.getSuperclass();
-        }
+        if (rc.isAnnotationPresent(Path.class)) return rc;
+
+        for (Class i : rc.getInterfaces())
+            if (i.isAnnotationPresent(Path.class)) return i;
+
         return rc;
     }
     

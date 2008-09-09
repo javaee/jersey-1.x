@@ -396,14 +396,10 @@ public abstract class ResourceConfig extends Application {
     }
     
     private boolean isRootResourceClass(Class<?> c) {
-        do {
-            if (c.isAnnotationPresent(Path.class)) return true;
-            
-            for (Class i : c.getInterfaces())
-                if (i.isAnnotationPresent(Path.class)) return true;
-            
-            c = c.getSuperclass();
-        } while (c != Object.class);
+        if (c.isAnnotationPresent(Path.class)) return true;
+
+        for (Class i : c.getInterfaces())
+            if (i.isAnnotationPresent(Path.class)) return true;
 
         return false;
     }    
