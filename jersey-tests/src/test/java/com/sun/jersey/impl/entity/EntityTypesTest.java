@@ -478,4 +478,52 @@ public class EntityTypesTest extends AbstractTypeTester {
         assertEquals(in.value, out.value);
     }
     
+    
+    @Path("/")
+    @Produces("application/fastinfoset")
+    @Consumes("application/fastinfoset")
+    public static class JAXBBeanResourceFastInfoset extends AResource<JAXBBean> {}
+    
+    public void testJAXBBeanRepresentationFastInfoset() {
+        initiateWebApplication(JAXBBeanResourceFastInfoset.class);
+        WebResource r = resource("/");
+        JAXBBean in = new JAXBBean("CONTENT");
+        JAXBBean out = r.entity(in, "application/fastinfoset").
+                post(JAXBBean.class);
+        assertEquals(in.value, out.value);
+    }
+    
+    @Path("/")
+    @Produces("application/fastinfoset")
+    @Consumes("application/fastinfoset")
+    public static class JAXBElementBeanResourceFastInfoset extends AResource<JAXBElement<JAXBBeanType>> {}
+
+    public void testJAXBElementBeanRepresentationFastInfoset() {
+        initiateWebApplication(JAXBElementBeanResourceFastInfoset.class);
+        WebResource r = resource("/");
+        JAXBBean in = new JAXBBean("CONTENT");
+        JAXBBean out = r.entity(in, "application/fastinfoset").
+                post(JAXBBean.class);
+        assertEquals(in.value, out.value);
+    }
+    
+    @Path("/")
+    @Produces("application/fastinfoset")
+    @Consumes("application/fastinfoset")
+    public static class JAXBTypeResourceFastInfoset {
+        @POST
+        public JAXBBean post(JAXBBeanType t) {
+            return new JAXBBean(t.value);
+        }
+    }
+
+    public void testJAXBTypeRepresentationFastInfoset() {
+        initiateWebApplication(JAXBTypeResourceFastInfoset.class);
+        WebResource r = resource("/");
+        JAXBBean in = new JAXBBean("CONTENT");
+        JAXBBeanType out = r.entity(in, "application/fastinfoset").
+                post(JAXBBeanType.class);
+        assertEquals(in.value, out.value);
+    }
+    
 }

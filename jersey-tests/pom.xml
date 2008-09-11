@@ -109,6 +109,11 @@
                     <artifactId>jettison</artifactId>
                     <version>1.0.1</version>
                 </dependency>
+                <dependency>
+                    <groupId>com.sun.xml.fastinfoset</groupId>
+                    <artifactId>FastInfoset</artifactId>
+                    <version>1.2.2</version>
+                </dependency>
             </dependencies>
         </profile>
         <profile>
@@ -132,6 +137,12 @@
                 <dependency>
                     <groupId>com.sun.jersey</groupId>
                     <artifactId>jersey-atom</artifactId>
+                    <version>${project.version}</version>
+                    <scope>test</scope>
+                </dependency>
+                <dependency>
+                    <groupId>com.sun.jersey</groupId>
+                    <artifactId>jersey-fastinfoset</artifactId>
                     <version>${project.version}</version>
                     <scope>test</scope>
                 </dependency>
