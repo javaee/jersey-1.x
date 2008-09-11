@@ -54,6 +54,8 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.Reader;
 import java.io.StringReader;
+import java.util.ArrayList;
+import java.util.Collection;
 import javax.activation.DataSource;
 import javax.mail.internet.InternetHeaders;
 import javax.mail.internet.MimeBodyPart;
@@ -524,6 +526,29 @@ public class EntityTypesTest extends AbstractTypeTester {
         JAXBBeanType out = r.entity(in, "application/fastinfoset").
                 post(JAXBBeanType.class);
         assertEquals(in.value, out.value);
+    }
+
+    
+    @Path("/")
+    @Produces("application/xml")
+    @Consumes("application/xml")
+    public static class JAXBListResource {
+        @GET
+        public Collection<JAXBBean> get() {
+            ArrayList<JAXBBean> l = new ArrayList<JAXBBean>();
+            l.add(new JAXBBean("one"));
+            l.add(new JAXBBean("two"));
+            l.add(new JAXBBean("three"));
+            return l;
+        }
+    }
+    
+    public void testJAXBListRepresentation() {
+        initiateWebApplication(JAXBListResource.class);
+        WebResource r = resource("/");
+        JAXBBean in = new JAXBBean("CONTENT");
+        String s = r.get(String.class);
+        System.out.println(s);
     }
     
 }
