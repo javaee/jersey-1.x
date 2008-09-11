@@ -135,6 +135,28 @@
                     </execution>
                 </executions>
             </plugin>
+      <plugin>
+        <groupId>de.jflex.maven.plugin</groupId>
+        <artifactId>maven-jflex-plugin</artifactId>
+        <version>0.2</version>
+        <executions>
+          <execution>
+            <goals>
+              <goal>generate</goal>
+            </goals>
+            <configuration>
+              <outputDirectory>src/main/java</outputDirectory>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
         </plugins>
     </build>
+    <pluginRepositories>
+      <pluginRepository>
+        <id>jflex</id>
+        <name>JFlex repository</name>
+        <url>http://jflex.sourceforge.net/repo/</url>
+      </pluginRepository>
+    </pluginRepositories>
 </project>
