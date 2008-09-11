@@ -49,4 +49,7 @@ public final class MediaTypes {
     
     public final static MediaType WADL = 
             MediaType.valueOf("application/vnd.sun.wadl+xml");
+    
+    public final static MediaType FAST_INFOSET =
+            MediaType.valueOf("application/fastinfoset");
 }
