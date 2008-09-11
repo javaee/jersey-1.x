@@ -87,29 +87,6 @@ public class BasicValidatorTest extends TestCase {
         assertTrue(validator.getIssueList().get(0).isFatal());
     }
 
-    @Path("rootAmbigCtors")
-    public static class TestRootResourceAmbigCtors {
-        
-        public TestRootResourceAmbigCtors(@QueryParam("s") String p) {};
-
-        public TestRootResourceAmbigCtors(@QueryParam("s") int p) {};
-
-        @GET
-        public String getIt() {
-            return "it";
-        }
-    }
-
-    public void testRootResourceAmbigConstructors() throws Exception {
-        System.out.println("---\nAn issue should be reported if more public ctors exists with the same number of params at a root resource:");
-        AbstractResource ar = IntrospectionModeller.createResource(TestRootResourceAmbigCtors.class);
-        BasicValidator validator = new BasicValidator();
-        validator.validate(ar);
-        printIssueList(validator);
-        assertTrue(!validator.getIssueList().isEmpty());
-        assertTrue(!validator.getIssueList().get(0).isFatal());
-    }
-
     @Path("rootNonAmbigCtors")
     public static class TestRootResourceNonAmbigCtors {
         
@@ -211,7 +188,7 @@ public class BasicValidatorTest extends TestCase {
         validator.validate(ar);
         printIssueList(validator);
         assertTrue(!validator.getIssueList().isEmpty());
-        assertTrue(validator.getIssueList().get(0).isFatal());
+        assertTrue(!validator.getIssueList().get(0).isFatal());
     }
     
     public static class TestGetRMConsumingEntity {
@@ -260,7 +237,7 @@ public class BasicValidatorTest extends TestCase {
         validator.validate(ar);
         printIssueList(validator);
         assertTrue(!validator.getIssueList().isEmpty());
-        assertTrue(validator.getIssueList().get(0).isFatal());
+        assertTrue(!validator.getIssueList().get(0).isFatal());
     }
 
     public static class TestGetSRMConsumingEntity {

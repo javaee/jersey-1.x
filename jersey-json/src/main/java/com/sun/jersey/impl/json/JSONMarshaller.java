@@ -82,6 +82,7 @@ public final class JSONMarshaller implements Marshaller {
     private boolean jsonRootUnwrapping;
     private Collection<String> arrays;
     private Collection<String> nonStrings;
+    private Collection<String> attrAsElemNames;
     private Map<String, String> xml2jsonNamespace;
 
     public JSONMarshaller(JAXBContext jaxbContext, Map<String, Object> properties) throws JAXBException {
@@ -176,6 +177,12 @@ public final class JSONMarshaller implements Marshaller {
             } catch (JSONException e) {
                 throw new PropertyException("JSON exception when trying to set " + JSONJAXBContext.JSON_XML2JSON_NS + " property.", e);
             }
+        } else if (JSONJAXBContext.JSON_ATTRS_AS_ELEMS.equals(key)) {
+            try {
+                this.attrAsElemNames = JSONTransformer.asCollection((String) value);
+            } catch (JSONException e) {
+                throw new PropertyException("JSON exception when trying to set " + JSONJAXBContext.JSON_ATTRS_AS_ELEMS + " property.", e);
+            }
         } else {
             if (!key.startsWith(JSONJAXBContext.NAMESPACE)) {
                 jaxbMarshaller.setProperty(key, value);
@@ -197,6 +204,8 @@ public final class JSONMarshaller implements Marshaller {
             return JSONTransformer.asJsonArray(this.nonStrings);
         } else if (JSONJAXBContext.JSON_XML2JSON_NS.equals(key)) {
             return JSONTransformer.asJsonObject(this.xml2jsonNamespace);
+        } else if (JSONJAXBContext.JSON_ATTRS_AS_ELEMS.equals(key)) {
+            return JSONTransformer.asJsonArray(this.attrAsElemNames);
         } else {
             if (key.startsWith(JSONJAXBContext.NAMESPACE)) {
                 return null;
@@ -261,7 +270,7 @@ public final class JSONMarshaller implements Marshaller {
     private XMLStreamWriter createXmlStreamWriter(Writer writer) {
         XMLStreamWriter xmlStreamWriter;
         if (JSONJAXBContext.JSONNotation.MAPPED == this.jsonNotation) {
-            xmlStreamWriter = new JsonXmlStreamWriter(writer, this.jsonRootUnwrapping, this.arrays, this.nonStrings);
+            xmlStreamWriter = JsonXmlStreamWriter.createWriter(writer, this.jsonRootUnwrapping, this.arrays, this.nonStrings, this.attrAsElemNames);
         } else if (JSONJAXBContext.JSONNotation.MAPPED_JETTISON == this.jsonNotation) {
                 Configuration jmConfig;
                 if (null == this.xml2jsonNamespace) {

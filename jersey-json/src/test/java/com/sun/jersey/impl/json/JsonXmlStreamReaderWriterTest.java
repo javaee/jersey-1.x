@@ -38,7 +38,6 @@ package com.sun.jersey.impl.json;
 
 import com.sun.jersey.impl.json.writer.JsonXmlStreamWriter;
 import com.sun.jersey.impl.json.reader.JsonXmlStreamReader;
-import com.sun.jersey.impl.test.util.TestHelper;
 import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
@@ -116,6 +115,41 @@ public class JsonXmlStreamReaderWriterTest extends TestCase {
         tryBean(bean, "simpleBeanWithAttributes.json", true, null, null);
     }
 
+    public void testSimpleBeanWithAttributesAsElems() throws Exception {
+        SimpleBeanWithAttributes bean = (SimpleBeanWithAttributes)SimpleBeanWithAttributes.createTestInstance();
+        Collection<String> attrAsElems = new LinkedList<String>();
+        addStringsToCollection("i", attrAsElems);
+        addStringsToCollection("j", attrAsElems);
+        tryWritingBean(bean, "simpleBeanWithAttributesAsElems.json", true, null, null, attrAsElems);
+        //tryBean(bean, "simpleBeanWithAttributesAsElems.json", true, null, null, "i j");
+    }
+
+    public void testSimpleBeanWithJustOneAttribute() throws JAXBException, IOException {
+        SimpleBeanWithJustOneAttribute bean = (SimpleBeanWithJustOneAttribute)SimpleBeanWithJustOneAttribute.createTestInstance();
+        tryBean(bean, "simpleBeanWithJustOneAttribute.json", true, null, null);
+    }
+
+    public void testSimpleBeanWithJustOneAttributeAsElem() throws JAXBException, IOException {
+        SimpleBeanWithJustOneAttribute bean = (SimpleBeanWithJustOneAttribute)SimpleBeanWithJustOneAttribute.createTestInstance();
+        Collection<String> attrAsElems = new LinkedList<String>();
+        addStringsToCollection("uri", attrAsElems);
+        tryWritingBean(bean, "simpleBeanWithJustOneAttributeAsElem.json", true, null, null, attrAsElems);
+        //tryBean(bean, "simpleBeanWithJustOneAttributeAsElem.json", true, null, null, "uri");
+    }
+
+    public void testSimpleBeanWithJustOneAttributeAndValue() throws JAXBException, IOException {
+        SimpleBeanWithJustOneAttributeAndValue bean = (SimpleBeanWithJustOneAttributeAndValue)SimpleBeanWithJustOneAttributeAndValue.createTestInstance();
+        tryBean(bean, "simpleBeanWithJustOneAttributeAndValue.json", true, null, null);
+    }
+
+    public void testSimpleBeanWithJustOneAttributeAsElemAndValue() throws JAXBException, IOException {
+        SimpleBeanWithJustOneAttributeAndValue bean = (SimpleBeanWithJustOneAttributeAndValue)SimpleBeanWithJustOneAttributeAndValue.createTestInstance();
+        Collection<String> attrAsElems = new LinkedList<String>();
+        addStringsToCollection("uri", attrAsElems);
+        tryWritingBean(bean, "simpleBeanWithJustOneAttributeAsElemAndValue.json", true, null, null, attrAsElems);
+        //tryBean(bean, "simpleBeanWithJustOneAttributeAsElemAndValue.json", true, null, null, "uri");
+    }
+
     public void testComplexBeanWithAttributes() throws JAXBException, IOException {
         ComplexBeanWithAttributes bean = (ComplexBeanWithAttributes)ComplexBeanWithAttributes.createTestInstance();
         tryBean(bean, "complexBeanWithAttributes.json", true, null, null);
@@ -146,17 +180,11 @@ public class JsonXmlStreamReaderWriterTest extends TestCase {
         tryBean(bean, "attrAndCharDataValue.json", true, null, null);
     }
     
-//    public void testWrittingAttrs() throws Exception {
-//        SimpleBeanWithAttributes bean = (SimpleBeanWithAttributes)SimpleBeanWithAttributes.createTestInstance();
-//        tryWritingBean(bean, "simpleBeanWithAttributes.json", true, null, null);
-//    }
-//
-//    public void testReadingAttrs() throws Exception {
-//        SimpleBeanWithAttributes bean = (SimpleBeanWithAttributes)SimpleBeanWithAttributes.createTestInstance();
-//        System.out.println("testing: " + bean.toString());
-//        tryReadingBean("simpleBeanWithAttributes.json", bean, true, null, null);
-//    }
-    
+    public void testAttrAndXmlVal() throws Exception {
+        SimpleBeanWithAttributes bean = (SimpleBeanWithAttributes)SimpleBeanWithAttributes.createTestInstance();
+        tryBean(bean, "simpleBeanWithAttributes.json", true, null, null);
+    }
+
     public void tryBean(Object jaxbBean, String filename, boolean stripRoot) throws JAXBException, IOException {
         tryBean(jaxbBean, filename, stripRoot, null, null);
     }
@@ -173,30 +201,37 @@ public class JsonXmlStreamReaderWriterTest extends TestCase {
     
     public void tryBean(Object jaxbBean, String filename, 
             boolean stripRoot, String arrays, String nonStrings) throws JAXBException, IOException {
+        tryBean(jaxbBean, filename, stripRoot, arrays, nonStrings, null);
+    }
+
+    public void tryBean(Object jaxbBean, String filename,
+            boolean stripRoot, String arrays, String nonStrings, String attrAsElems) throws JAXBException, IOException {
         Collection<String> arrayElements = new LinkedList<String>();
         Collection<String> nonStringElements = new LinkedList<String>();
+        Collection<String> attrAsElements = new LinkedList<String>();
         addStringsToCollection(arrays, arrayElements);
         addStringsToCollection(nonStrings, nonStringElements);
-        tryWritingBean(jaxbBean, filename, stripRoot, arrayElements, nonStringElements);
-        tryReadingBean(filename, jaxbBean, stripRoot, arrayElements, nonStringElements);
+        addStringsToCollection(attrAsElems, attrAsElements);
+        tryWritingBean(jaxbBean, filename, stripRoot, arrayElements, nonStringElements, attrAsElements);
+        tryReadingBean(filename, jaxbBean, stripRoot, arrayElements, nonStringElements, attrAsElements);
     }
 
     public void tryWritingBean(Object jaxbBean, String expectedJsonExprFilename, 
-            boolean stripRoot, Collection<String> arrays, Collection<String> nonStrings) throws JAXBException, IOException {
-        String expectedJsonExpr = TestHelper.getResourceAsString(PKG_NAME, expectedJsonExprFilename);
+            boolean stripRoot, Collection<String> arrays, Collection<String> nonStrings, Collection<String> attrAsElements) throws JAXBException, IOException {
+        String expectedJsonExpr = ResourceHelper.getResourceAsString(PKG_NAME, expectedJsonExprFilename);
         Marshaller marshaller = jaxbContext.createMarshaller();
         StringWriter resultWriter = new StringWriter();
-        marshaller.marshal(jaxbBean, new JsonXmlStreamWriter(resultWriter, stripRoot, arrays, nonStrings));
+        marshaller.marshal(jaxbBean, JsonXmlStreamWriter.createWriter(resultWriter, stripRoot, arrays, nonStrings, attrAsElements));
         assertEquals("MISMATCH:\n" + expectedJsonExpr + "\n" + resultWriter.toString() + "\n", 
                 expectedJsonExpr, resultWriter.toString());
     }
 
     public void tryReadingBean(String jsonExprFilename, Object expectedJaxbBean, 
-            boolean stripRoot, Collection<String> arrays, Collection<String> nonStrings) throws JAXBException, IOException {
+            boolean stripRoot, Collection<String> arrays, Collection<String> nonStrings, Collection<String> attrAsElements) throws JAXBException, IOException {
         Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
         JAXBElement jaxbElement = unmarshaller.unmarshal(
                 new JsonXmlStreamReader(
-                    new StringReader(TestHelper.getResourceAsString(PKG_NAME, jsonExprFilename)), stripRoot),
+                    new StringReader(ResourceHelper.getResourceAsString(PKG_NAME, jsonExprFilename)), stripRoot),
                 expectedJaxbBean.getClass());
         System.out.println("unmarshalled: " + jaxbElement.getValue().toString());
         assertEquals("MISMATCH:\n" + expectedJaxbBean + "\n" + jaxbElement.getValue() + "\n", 

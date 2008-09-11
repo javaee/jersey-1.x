@@ -86,30 +86,6 @@ public class BasicValidator extends AbstractModelValidator {
                     resource,
                     ImplMessages.ROOT_RES_NO_PUBLIC_CTOR(resource.getResourceClass()),
                     true));
-        } else if (1 < resource.getConstructors().size()) { // look for ambiguous ctors:
-            AbstractResourceConstructor c1 = resource.getConstructors().get(0);
-            AbstractResourceConstructor c2 = resource.getConstructors().get(1);
-            if (c1.getParameters().size() < c2.getParameters().size()) {
-                final AbstractResourceConstructor tmp = c2;
-                c2 = c1;
-                c1 = tmp;
-            }
-            for (int i = 2; i < resource.getConstructors().size(); i++) {
-                final AbstractResourceConstructor cur = resource.getConstructors().get(i);
-                if (cur.getParameters().size() >= c2.getParameters().size()) {
-                    if (cur.getParameters().size() > c1.getParameters().size()) {
-                        c1 = cur;
-                    } else {
-                        c2 = cur;
-                    }
-                }
-            }
-            if (c1.getParameters().size() == c2.getParameters().size()) {
-                issueList.add(new ResourceModelIssue(
-                        resource,
-                        ImplMessages.AMBIGUOUS_CTORS(resource.getResourceClass()),
-                        false));
-            }
         }
         // check sub-resource locators for ambiguities
         Map<UriTemplate, String> srlUriTemplates = new HashMap<UriTemplate, String>();
@@ -138,22 +114,27 @@ public class BasicValidator extends AbstractModelValidator {
 
         // check resource methods for ambiguities
         findOutMTAmbiguities(resource, resource.getResourceMethods(), new ResourceMethodAmbiguityErrMsgGenerator<AbstractResourceMethod>() {
+
             void generateInErrMsg(AbstractResource resource, AbstractResourceMethod arm1, AbstractResourceMethod arm2, MediaType mt) {
                 issueList.add(new ResourceModelIssue(
                         resource,
                         ImplMessages.AMBIGUOUS_RMS_IN(resource.getResourceClass(), arm1.getHttpMethod(), mt, arm1.getMethod().getName(), arm2.getMethod().getName(), arm1.getSupportedInputTypes(), arm2.getSupportedInputTypes()),
                         true));
-            };
+            }
+            ;
+
             void generateOutErrMsg(AbstractResource resource, AbstractResourceMethod arm1, AbstractResourceMethod arm2, MediaType mt) {
                 issueList.add(new ResourceModelIssue(
                         resource,
                         ImplMessages.AMBIGUOUS_RMS_OUT(resource.getResourceClass(), arm1.getHttpMethod(), mt, arm1.getMethod().getName(), arm2.getMethod().getName(), arm1.getSupportedOutputTypes(), arm2.getSupportedOutputTypes()),
                         true));
-            };
+            }
+            ;
         });
 
         // check sub-resource methods for ambiguities
         findOutMTAmbiguities(resource, resource.getSubResourceMethods(), new ResourceMethodAmbiguityErrMsgGenerator<AbstractSubResourceMethod>() {
+
             boolean isConflictingPaths(String path1, String path2) {
                 UriTemplate t1 = new UriTemplate(path1);
                 UriTemplate t2 = new UriTemplate(path2);
@@ -166,27 +147,31 @@ public class BasicValidator extends AbstractModelValidator {
                         return t2.endsWithSlash() && t2.equals(new UriTemplate(path1 + "/"));
                     }
                 }
-            };
+            }
+            ;
+
             void generateInErrMsg(AbstractResource resource, AbstractSubResourceMethod arm1, AbstractSubResourceMethod arm2, MediaType mt) {
                 if (isConflictingPaths(arm1.getPath().getValue(), arm2.getPath().getValue())) {
                     issueList.add(new ResourceModelIssue(
-                        resource,
-                        ImplMessages.AMBIGUOUS_SRMS_IN(resource.getResourceClass(), arm1.getHttpMethod(), arm1.getPath().getValue(), mt, arm1.getMethod().getName(), arm2.getMethod().getName(), arm1.getSupportedInputTypes(), arm2.getSupportedInputTypes()),
-                        true));
+                            resource,
+                            ImplMessages.AMBIGUOUS_SRMS_IN(resource.getResourceClass(), arm1.getHttpMethod(), arm1.getPath().getValue(), mt, arm1.getMethod().getName(), arm2.getMethod().getName(), arm1.getSupportedInputTypes(), arm2.getSupportedInputTypes()),
+                            true));
                 }
-            };
+            }
+            ;
+
             void generateOutErrMsg(AbstractResource resource, AbstractSubResourceMethod arm1, AbstractSubResourceMethod arm2, MediaType mt) {
                 if (isConflictingPaths(arm1.getPath().getValue(), arm2.getPath().getValue())) {
                     issueList.add(new ResourceModelIssue(
-                        resource,
-                        ImplMessages.AMBIGUOUS_SRMS_OUT(resource.getResourceClass(), arm1.getHttpMethod(), arm1.getPath().getValue(), mt, arm1.getMethod().getName(), arm2.getMethod().getName(), arm1.getSupportedOutputTypes(), arm2.getSupportedOutputTypes()),
-                        true));
+                            resource,
+                            ImplMessages.AMBIGUOUS_SRMS_OUT(resource.getResourceClass(), arm1.getHttpMethod(), arm1.getPath().getValue(), mt, arm1.getMethod().getName(), arm2.getMethod().getName(), arm1.getSupportedOutputTypes(), arm2.getSupportedOutputTypes()),
+                            true));
                 }
             }
         });
     }
 
-    abstract class ResourceMethodAmbiguityErrMsgGenerator<T extends AbstractResourceMethod> {
+    private abstract class ResourceMethodAmbiguityErrMsgGenerator<T extends AbstractResourceMethod> {
         abstract void generateInErrMsg(AbstractResource resource, T arm1, T arm2, MediaType mt);
         abstract void generateOutErrMsg(AbstractResource resource, T arm1, T arm2, MediaType mt);
     }
@@ -197,8 +182,9 @@ public class BasicValidator extends AbstractModelValidator {
             for (int j = i + 1; j < methods.size(); j++) {
                 T arm2 = methods.get(j);
                 if (arm1.getHttpMethod().equalsIgnoreCase(arm2.getHttpMethod())) {
-                    // check input mime types
-                    if ((arm1.getMethod().isAnnotationPresent(Consumes.class)) || (arm1.getMethod().isAnnotationPresent(Consumes.class))) {
+                    // check input mime types, but only for other then GET methods
+                    // TODO: check only when an entity parameter is present, do not hardcode the http GET method
+                    if (!"GET".equalsIgnoreCase(arm1.getHttpMethod())) {
                         for (MediaType mt1 : arm1.getSupportedInputTypes()) {
                             for (MediaType mt2 : arm2.getSupportedInputTypes()) {
                                 if (mt1.isCompatible(mt2) && (!(mt1.isWildcardType() || mt1.isWildcardSubtype() || mt2.isWildcardType() || mt2.isWildcardSubtype()))) {
@@ -208,12 +194,10 @@ public class BasicValidator extends AbstractModelValidator {
                         }
                     }
                     // check output mime types
-                    if ((arm1.getMethod().isAnnotationPresent(Produces.class)) || (arm1.getMethod().isAnnotationPresent(Produces.class))) {
-                        for (MediaType mt1 : arm1.getSupportedOutputTypes()) {
-                            for (MediaType mt2 : arm2.getSupportedOutputTypes()) {
-                                if (mt1.isCompatible(mt2) && (!(mt1.isWildcardType() || mt1.isWildcardSubtype() || mt2.isWildcardType() || mt2.isWildcardSubtype()))) {
-                                    generator.generateOutErrMsg(resource, arm1, arm2, mt1);
-                                }
+                    for (MediaType mt1 : arm1.getSupportedOutputTypes()) {
+                        for (MediaType mt2 : arm2.getSupportedOutputTypes()) {
+                            if (mt1.isCompatible(mt2) && (!(mt1.isWildcardType() || mt1.isWildcardSubtype() || mt2.isWildcardType() || mt2.isWildcardSubtype()))) {
+                                generator.generateOutErrMsg(resource, arm1, arm2, mt1);
                             }
                         }
                     }
@@ -237,16 +221,16 @@ public class BasicValidator extends AbstractModelValidator {
             issueList.add(new ResourceModelIssue(
                     method,
                     ImplMessages.ERROR_GET_RETURNS_VOID(method.getMethod()),
-                    true));
+                    false));
         }
         // ensure GET does not consume an entity parameter
         if (!isRequestResponseMethod(method) && ("GET".equals(method.getHttpMethod()))) {
             for (Parameter p : method.getParameters()) {
                 if (Parameter.Source.ENTITY == p.getSource()) {
-                issueList.add(new ResourceModelIssue(
-                    method,
-                    ImplMessages.ERROR_GET_CONSUMES_ENTITY(method.getMethod()),
-                    true));
+                    issueList.add(new ResourceModelIssue(
+                            method,
+                            ImplMessages.ERROR_GET_CONSUMES_ENTITY(method.getMethod()),
+                            true));
                 }
             }
         }
@@ -266,7 +250,9 @@ public class BasicValidator extends AbstractModelValidator {
     }
 
     public void visitAbstractSubResourceMethod(AbstractSubResourceMethod method) {
+        // check the same things that are being checked for resource methods
         visitAbstractResourceMethod(method);
+        // and make sure the Path is not null
         if ((null == method.getPath()) || (null == method.getPath().getValue()) || (method.getPath().getValue().length() == 0)) {
             issueList.add(new ResourceModelIssue(
                     method,

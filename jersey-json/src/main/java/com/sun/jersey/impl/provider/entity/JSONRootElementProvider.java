@@ -137,7 +137,7 @@ public final class JSONRootElementProvider extends AbstractRootElementProvider {
                 marshaller.marshal(t, 
                         new OutputStreamWriter(entityStream, getCharset(mediaType, UTF8)));
             } else {
-                marshaller.marshal(t, new JsonXmlStreamWriter(
+                marshaller.marshal(t, JsonXmlStreamWriter.createWriter(
                         new OutputStreamWriter(entityStream, getCharset(mediaType, UTF8)), true));
             }
         } catch (JAXBException cause) {

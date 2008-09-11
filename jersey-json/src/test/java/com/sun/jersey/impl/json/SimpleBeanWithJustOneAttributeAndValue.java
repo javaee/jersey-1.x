@@ -34,27 +34,73 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
+package com.sun.jersey.impl.json;
 
-package com.sun.jersey.impl.test.util;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlValue;
 
 /**
  *
  * @author japod
  */
-public class TestHelper {
-    
-    public static int getEnvVariable(final String varName, int defaultValue) {
-        if (null == varName) {
-            return defaultValue;
+@XmlRootElement
+public class SimpleBeanWithJustOneAttributeAndValue {
+
+    @XmlAttribute public URI uri;
+    @XmlValue public String value;
+
+    public SimpleBeanWithJustOneAttributeAndValue() {
+    }
+
+    public static Object createTestInstance() {
+        SimpleBeanWithJustOneAttributeAndValue instance = new SimpleBeanWithJustOneAttributeAndValue();
+        try {
+            instance.uri = new URI("http://localhost:8080/jedna/bedna/");
+            instance.value = "characters";
+
+        } catch (URISyntaxException ex) {
+            Logger.getLogger(SimpleBeanWithJustOneAttributeAndValue.class.getName()).log(Level.SEVERE, null, ex);
         }
-        String varValue = System.getenv(varName);
-        if (null != varValue) {
-            try {
-                return Integer.parseInt(varValue);
-            }catch (NumberFormatException e) {
-                // will return default value bellow
-            }
+        return instance;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null) {
+            return false;
         }
-        return defaultValue;
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final SimpleBeanWithJustOneAttributeAndValue other = (SimpleBeanWithJustOneAttributeAndValue) obj;
+        if (this.uri != other.uri && (this.uri == null || !this.uri.equals(other.uri))) {
+            return false;
+        }
+        if (this.value != other.value && (this.value == null || !this.value.equals(other.value))) {
+            return false;
+        }
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 7;
+        if (null != uri) {
+            hash += 17 * uri.hashCode();
+        }
+        if (null != value) {
+            hash += 17 * value.hashCode();
+        }
+        return hash;
+    }
+
+    @Override
+    public String toString() {
+        return String.format("SBWJOAV(%s,%s)", uri, value);
     }
 }

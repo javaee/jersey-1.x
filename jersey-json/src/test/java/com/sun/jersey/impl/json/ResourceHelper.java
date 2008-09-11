@@ -35,26 +35,27 @@
  * holder.
  */
 
-package com.sun.jersey.impl.test.util;
+package com.sun.jersey.impl.json;
+
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.Reader;
 
 /**
  *
  * @author japod
  */
-public class TestHelper {
+public class ResourceHelper {
     
-    public static int getEnvVariable(final String varName, int defaultValue) {
-        if (null == varName) {
-            return defaultValue;
-        }
-        String varValue = System.getenv(varName);
-        if (null != varValue) {
-            try {
-                return Integer.parseInt(varValue);
-            }catch (NumberFormatException e) {
-                // will return default value bellow
-            }
-        }
-        return defaultValue;
+    public static String getResourceAsString(String prefix, String resource) throws IOException {
+        Reader reader = new InputStreamReader(
+                Thread.currentThread().getContextClassLoader().getResourceAsStream(prefix + resource));
+        StringBuilder sb = new StringBuilder();
+        char[] c = new char[1024];
+        int l;
+        while ((l = reader.read(c)) != -1) {
+            sb.append(c, 0, l);
+        } 
+        return sb.toString();
     }
 }

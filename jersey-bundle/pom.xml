@@ -95,11 +95,13 @@
                         </goals>
                         <configuration>
                             <shadedGroupFilter>com.sun.jersey</shadedGroupFilter>
-                            <shadedArtifactAttached>false</shadedArtifactAttached>
+                            <!--shadedArtifactAttached>false</shadedArtifactAttached-->
                             <promoteTransitiveDependencies>false</promoteTransitiveDependencies>
                             <createDependencyReducedPom>true</createDependencyReducedPom>
                             <!-- createSourcesJar switch is quite unreliable :-(
+                            -->
                             <createSourcesJar>true</createSourcesJar>
+                            <!-- createSourcesJar switch is quite unreliable :-(
                             -->
                             <transformers>
                                 <transformer implementation="org.apache.maven.plugins.shade.resource.AppendingTransformer">

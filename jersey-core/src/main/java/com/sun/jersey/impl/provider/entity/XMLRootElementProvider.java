@@ -124,6 +124,7 @@ public class XMLRootElementProvider extends AbstractRootElementProvider {
             MultivaluedMap<String, Object> httpHeaders,
             OutputStream entityStream) throws IOException {
         try {
+
             final Marshaller m = getMarshaller(type, mediaType);
             final String name = getCharsetAsString(mediaType);
             if (name != null) {

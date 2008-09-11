@@ -55,7 +55,6 @@ import javax.xml.stream.XMLStreamWriter;
  */
 public class JsonXmlStreamWriter implements XMLStreamWriter {
 
-
     private static class WriterAdapter {
 
         Writer writer;
@@ -77,7 +76,7 @@ public class JsonXmlStreamWriter implements XMLStreamWriter {
         String getContent() {
             return null;
         }
-        }
+    }
 
     private static final class StringWriterAdapter extends WriterAdapter {
 
@@ -97,7 +96,7 @@ public class JsonXmlStreamWriter implements XMLStreamWriter {
         }
 
         @Override
-        void write(String s) throws IOException {
+        void write( String s) throws IOException {
         }
 
         @Override
@@ -114,7 +113,7 @@ public class JsonXmlStreamWriter implements XMLStreamWriter {
         Boolean lastWasPrimitive;
         boolean lastIsArray;
         boolean hasNoElements = true;
-        boolean hasAttributes = false;
+        boolean isNotEmpty = false;
         WriterAdapter writer;
 
         ProcessingState() {
@@ -127,31 +126,26 @@ public class JsonXmlStreamWriter implements XMLStreamWriter {
 
         @Override
         public String toString() {
-            return "PS(" + currentName 
-                    + "|" + ((writer != null) ? writer.getContent() : null) 
-                    + "|" + lastName 
-                    + "|" + ((lastElementWriter != null) ? lastElementWriter.getContent() : null) 
-                    + ")";
+            return "PS(" + currentName + "|" + ((writer != null) ? writer.getContent() : null) + "|" + lastName + "|" + ((lastElementWriter != null) ? lastElementWriter.getContent() : null) + ")";
         }
     }
-    
     Writer mainWriter;
     boolean stripRoot;
     List<ProcessingState> processingStack;
     int depth;
-    
     final Collection<String> arrayElementNames = new LinkedList<String>();
     final Collection<String> nonStringElementNames = new LinkedList<String>();
+    final Collection<String> attrAsElemNames = new LinkedList<String>();
 
-    public JsonXmlStreamWriter(Writer writer) {
+    private JsonXmlStreamWriter(Writer writer) {
         this(writer, false, null, null);
     }
 
-    public JsonXmlStreamWriter(Writer writer, boolean stripRoot) {
+    private JsonXmlStreamWriter(Writer writer, boolean stripRoot) {
         this(writer, stripRoot, null, null);
     }
-    
-    public JsonXmlStreamWriter(Writer writer, boolean stripRoot, Collection<String> arrays, Collection<String> nonStrings) {
+
+    private JsonXmlStreamWriter(Writer writer, boolean stripRoot, Collection<String> arrays, Collection<String> nonStrings) {
         this.mainWriter = writer;
         this.stripRoot = stripRoot;
         if (null != arrays) {
@@ -159,6 +153,19 @@ public class JsonXmlStreamWriter implements XMLStreamWriter {
         }
         if (null != nonStrings) {
             this.nonStringElementNames.addAll(nonStrings);
+        }
+    }
+
+    public static XMLStreamWriter createWriter(Writer writer, boolean stripRoot) {
+        return new JsonXmlStreamWriter(writer, stripRoot);
+    }
+
+    public static XMLStreamWriter createWriter(Writer writer, boolean stripRoot, Collection<String> arrays, Collection<String> nonStrings, Collection<String> attrsAsElems) {
+        if (attrsAsElems != null) {
+            return new A2EXmlStreamWriterProxy(
+                    new JsonXmlStreamWriter(writer, stripRoot, arrays, nonStrings), attrsAsElems);
+        } else {
+            return new JsonXmlStreamWriter(writer, stripRoot, arrays, nonStrings);
         }
     }
 
@@ -207,8 +214,8 @@ public class JsonXmlStreamWriter implements XMLStreamWriter {
                     }
                 }
             }
-            if (processingStack.get (depth).writer.isEmpty) {
-                processingStack.get (depth).writer.write ("null");
+            if (processingStack.get(depth).writer.isEmpty) {
+                processingStack.get(depth).writer.write("null");
             } else if ((null == processingStack.get(depth).lastWasPrimitive) || !processingStack.get(depth).lastWasPrimitive) {
                 processingStack.get(depth).writer.write("}");
             }
@@ -241,7 +248,7 @@ public class JsonXmlStreamWriter implements XMLStreamWriter {
     }
 
     public void writeCharacters(String text) throws XMLStreamException {
-        if (processingStack.get(depth).hasAttributes) {
+        if (processingStack.get(depth).isNotEmpty) {
             writeStartElement(null, "$", null);
             writeCharacters(text);
             writeEndElement();
@@ -354,7 +361,7 @@ public class JsonXmlStreamWriter implements XMLStreamWriter {
             Logger.getLogger(JsonXmlStreamWriter.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
-    
+
     private boolean isArrayElement(String name) {
         if (null == name) {
             return false;
@@ -368,9 +375,9 @@ public class JsonXmlStreamWriter implements XMLStreamWriter {
         }
         return nonStringElementNames.contains(name);
     }
-    
-    public void writeStartElement(String prefix, String localName, String namespaceURI) throws XMLStreamException {
 
+    public void writeStartElement(String prefix, String localName, String namespaceURI) throws XMLStreamException {
+        processingStack.get(depth).isNotEmpty = true;
         processingStack.get(depth).currentName = localName;
         try {
             boolean isNextArrayElement = processingStack.get(depth).currentName.equals(processingStack.get(depth).lastName);
@@ -413,28 +420,26 @@ public class JsonXmlStreamWriter implements XMLStreamWriter {
             }
 
             depth++;
-            processingStack.add(depth,createProcessingState());
+            processingStack.add(depth, createProcessingState());
         } catch (IOException ex) {
             Logger.getLogger(JsonXmlStreamWriter.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 
     public void writeAttribute(String prefix, String namespaceURI, String localName, String value) throws XMLStreamException {
-        processingStack.get(depth).hasAttributes = true;
         writeStartElement(prefix, "@" + localName, namespaceURI);
         writeCharacters(value);
         writeEndElement();
     }
-    
+
     private ProcessingState createProcessingState() {
         switch (depth) {
-            case 0: 
+            case 0:
                 return new ProcessingState(
                         stripRoot ? new DummyWriterAdapter() : new WriterAdapter(mainWriter));
-            case 1: 
-                return stripRoot ? 
-                    new ProcessingState(new WriterAdapter(mainWriter)) : new ProcessingState();
-            default: 
+            case 1:
+                return stripRoot ? new ProcessingState(new WriterAdapter(mainWriter)) : new ProcessingState();
+            default:
                 return new ProcessingState();
         }
     }

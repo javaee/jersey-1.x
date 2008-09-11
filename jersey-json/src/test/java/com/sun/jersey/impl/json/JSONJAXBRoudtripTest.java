@@ -39,7 +39,6 @@ package com.sun.jersey.impl.json;
 import com.sun.jersey.api.json.JSONJAXBContext;
 import com.sun.jersey.impl.json.JSONUnmarshaller;
 import com.sun.jersey.impl.json.JSONMarshaller;
-import com.sun.jersey.impl.test.util.TestHelper;
 import java.io.Reader;
 import java.io.StringReader;
 import java.io.StringWriter;
@@ -70,7 +69,7 @@ public class JSONJAXBRoudtripTest extends TestCase {
     @Override
     @SuppressWarnings("unchecked")
     public void setUp() throws Exception {
-        String beanClasses = TestHelper.getResourceAsString(PKG_NAME, "jaxb.index");
+        String beanClasses = ResourceHelper.getResourceAsString(PKG_NAME, "jaxb.index");
         Collection classCollection = new LinkedList<Class>();
         StringTokenizer tokenizer = new StringTokenizer(beanClasses);
         //StringTokenizer tokenizer = new StringTokenizer("SimpleBeanWithAttributes");//beanClasses);

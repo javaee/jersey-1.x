@@ -43,7 +43,7 @@ import javax.xml.bind.annotation.XmlType;
  *
  * @author Paul.Sandoz@Sun.Com
  */
-@XmlType
+@XmlType(name="dada")
 public class JAXBBeanType {
     
     public String value; 

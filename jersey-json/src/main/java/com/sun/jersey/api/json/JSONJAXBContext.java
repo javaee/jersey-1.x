@@ -61,7 +61,7 @@ public final class JSONJAXBContext extends JAXBContext {
     /**
      * A namespace for JSONJAXBContext related properties names.
      */
-    public static final String NAMESPACE = "com.sun.ws.rest.impl.json.";
+    public static final String NAMESPACE = "com.sun.jersey.impl.json.";
     
     /**
      * Expects a String corresponding to desired JSON notation.
@@ -99,6 +99,16 @@ public final class JSONJAXBContext extends JAXBContext {
      * Related to MAPPED notation only.
      */
     public static final String JSON_NON_STRINGS = NAMESPACE + "non.strings";
+
+    /**
+     * Expects a list of names in JSON format, which represent names of all attributes,
+     * which should be serialized out as elements
+     * I.e. <code>{ ..., "number":"12", ... }</code> would be 
+     * serialized as <code>{ ..., "@number":"12", ... }</code>,
+     * if <code>JSON_ATTRS_AS_ELEMS</code> was not set to <code>"[\"number\"]"</code>
+     * Related to MAPPED notation only.
+     */
+    public static final String JSON_ATTRS_AS_ELEMS = NAMESPACE + "attrs.as.elems";
 
     /**
      * Via this property you can configure namespaces mapping used by 
