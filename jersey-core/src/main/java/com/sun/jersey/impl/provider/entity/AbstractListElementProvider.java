@@ -45,12 +45,16 @@ import java.util.List;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.ext.Providers;
 import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlType;
 
 /**
  *
  * @author Paul.Sandoz@Sun.Com
  */
 public abstract class AbstractListElementProvider extends AbstractJAXBProvider<Collection<?>> {    
+
+    private final Inflector inflector = Inflector.getInstance();
+    
     public AbstractListElementProvider(Providers ps) {
         super(ps);
     }
@@ -74,14 +78,24 @@ public abstract class AbstractListElementProvider extends AbstractJAXBProvider<C
     private boolean verify(Type genericType) {
         if (!(genericType instanceof ParameterizedType)) return false;
 
-        ParameterizedType pt = (ParameterizedType)genericType;
+        final ParameterizedType pt = (ParameterizedType)genericType;
 
         if (pt.getActualTypeArguments().length > 1) return false;
 
         if (!(pt.getActualTypeArguments()[0] instanceof Class)) return false;
 
-        Class listClass = (Class)pt.getActualTypeArguments()[0];
+        final Class listClass = (Class)pt.getActualTypeArguments()[0];
 
-        return listClass.isAnnotationPresent(XmlRootElement.class);        
+        return listClass.isAnnotationPresent(XmlRootElement.class) || 
+                listClass.isAnnotationPresent(XmlType.class);        
     }
+    
+    protected final String getRootElementName(Class<?> type, Type genericType, Class<?> elementType) {
+        return inflector.pluralize(inflector.demodulize(elementType.getName()));        
+    }
+    
+    protected final Class getElementClass(Class<?> type, Type genericType) {
+        ParameterizedType pt = (ParameterizedType)genericType;
+        return (Class)pt.getActualTypeArguments()[0];
+    }    
 }

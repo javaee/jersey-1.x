@@ -43,7 +43,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.lang.annotation.Annotation;
-import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.Collection;
 import java.util.List;
@@ -62,8 +61,6 @@ import javax.xml.bind.Marshaller;
  */
 public class XMLListElementProvider extends AbstractListElementProvider {
 
-    private final Inflector inflector = Inflector.getInstance();
-    
     XMLListElementProvider(Providers ps) {
         super(ps);
     }
@@ -110,9 +107,8 @@ public class XMLListElementProvider extends AbstractListElementProvider {
             MultivaluedMap<String, Object> httpHeaders,
             OutputStream entityStream) throws IOException {
         try {
-            final Class c = getClass(genericType);
-            String rootElement = inflector.demodulize(c.getName());
-            rootElement = inflector.pluralize(rootElement);
+            Class elementType = getElementClass(type, genericType);
+            String rootElement = getRootElementName(type, genericType, elementType);
                 
             String name = getCharsetAsString(mediaType);
             if (name == null) name = "UTF-8";
@@ -122,7 +118,7 @@ public class XMLListElementProvider extends AbstractListElementProvider {
                     .getBytes(name));            
             entityStream.write(String.format("<%s>", rootElement).getBytes(name));
             if (t.size() > 0) {
-                final Marshaller m = getMarshaller(c, mediaType);
+                final Marshaller m = getMarshaller(elementType, mediaType);
                 m.setProperty(Marshaller.JAXB_FRAGMENT, true);
                 m.setProperty(Marshaller.JAXB_ENCODING, name);
                 for (Object o : t)
@@ -134,10 +130,5 @@ public class XMLListElementProvider extends AbstractListElementProvider {
                     new IOException(ImplMessages.ERROR_MARSHALLING_JAXB(t.getClass()))
                     );
         }
-    }
-    
-    private Class getClass(Type genericType) {
-        ParameterizedType pt = (ParameterizedType)genericType;
-        return (Class)pt.getActualTypeArguments()[0];
     }
 }
