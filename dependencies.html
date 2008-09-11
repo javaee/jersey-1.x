@@ -1,11 +1,11 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
 <HTML>
 <HEAD>
-	<META HTTP-EQUIV="CONTENT-TYPE" CONTENT="text/html; charset=iso-8859-1">
+	<META HTTP-EQUIV="CONTENT-TYPE" CONTENT="text/html; charset=utf-8">
 	<TITLE>Dependencies</TITLE>
-	<META NAME="GENERATOR" CONTENT="StarOffice 8  (Solaris x86)">
+	<META NAME="GENERATOR" CONTENT="OpenOffice.org 3.0 Beta (Unix)">
 	<META NAME="CREATED" CONTENT="0;0">
-	<META NAME="CHANGED" CONTENT="20080822;16571500">
+	<META NAME="CHANGED" CONTENT="20080911;11380900">
 </HEAD>
 <BODY LANG="en-US" DIR="LTR">
 <H1>Dependencies</H1>
@@ -143,6 +143,21 @@ module (no dependency on jaxb-impl is required).</P>
 additionally, if not depending on the <A HREF="http://download.java.net/maven/2/com/sun/jersey/jersey-bundle/0.11-ea-SNAPSHOT/jersey-bundle-0.11-ea-SNAPSHOT.jar">jersey-bundle.jar</A>,
 non-maven developers require:</BLOCKQUOTE>
 <BLOCKQUOTE><A HREF="http://download.java.net/maven/2/com/sun/jersey/jersey-json/0.11-ea-SNAPSHOT/jersey-json-0.11-ea-SNAPSHOT.jar">jersey-json.jar</A></BLOCKQUOTE>
+<BLOCKQUOTE STYLE="margin-left: 0in; margin-right: 0in">Maven
+developers, using Fast Infoset serialization support of JAXB beans
+with using the MIME media type &quot;application/fastinfoset&quot;
+require a dependency on the <A HREF="http://download.java.net/maven/2/com/sun/jersey/jersey-fastinfoset/0.11-ea-SNAPSHOT/jersey-fastinfoset-0.11-ea-SNAPSHOT.pom">jersey-fastinfoset</A>
+module (no dependency on jaxb-impl is required).</BLOCKQUOTE>
+<P>Non-maven developers require:</P>
+<BLOCKQUOTE><A HREF="http://download.java.net/maven/1/com.sun.xml.fastinfoset/jars/FastInfoset-1.2.2.jar">FastInfoset.jar</A>,
+<A HREF="http://download.java.net/maven/1/com.sun.xml.bind/jars/jaxb-impl-2.1.jar">jaxb-impl.jar</A>,
+<A HREF="http://download.java.net/maven/1/javax.xml.bind/jars/jaxb-api-2.1.jar">jaxb-api.jar</A>,
+<A HREF="http://download.java.net/maven/1/javax.activation/jars/activation-1.1.jar">activation.jar</A>,
+<A HREF="http://download.java.net/maven/1/javax.xml.stream/jars/stax-api-1.0-2.jar">stax-api.jar</A></BLOCKQUOTE>
+<BLOCKQUOTE STYLE="margin-left: 0in; margin-right: 0in">and
+additionally, if not depending on the <A HREF="http://download.java.net/maven/2/com/sun/jersey/jersey-bundle/0.11-ea-SNAPSHOT/jersey-bundle-0.11-ea-SNAPSHOT.jar">jersey-bundle.jar</A>,
+non-maven developers require:</BLOCKQUOTE>
+<BLOCKQUOTE><A HREF="http://download.java.net/maven/2/com/sun/jersey/jersey-fastinfoset/0.11-ea-SNAPSHOT/jersey-fastinfoset-0.11-ea-SNAPSHOT.jar">jersey-fastinfoset.jar</A></BLOCKQUOTE>
 <H3>Atom</H3>
 <P>The use of the Java types <FONT FACE="Courier New, monospace">com.sun.syndication.feed.atom.Entry</FONT>
 and <FONT FACE="Courier New, monospace">com.sun.syndication.feed.atom.Feed</FONT>
