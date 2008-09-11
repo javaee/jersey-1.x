@@ -86,6 +86,7 @@
         <module>jersey-client</module>
         <module>jersey-json</module>
         <module>jersey-atom</module>
+        <module>jersey-fastinfoset</module>
         <module>jersey-tests</module>
         <module>jersey-bundle</module>
     </modules>
