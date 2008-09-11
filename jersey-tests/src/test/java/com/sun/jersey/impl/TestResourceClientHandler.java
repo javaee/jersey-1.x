@@ -61,6 +61,7 @@ import java.util.Map;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
+import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.MessageBodyReader;
 import javax.ws.rs.ext.MessageBodyWriter;
 import javax.ws.rs.ext.RuntimeDelegate;
@@ -84,14 +85,14 @@ public class TestResourceClientHandler implements ClientHandler {
         this.w = w;
     }
     
-    private final class Response extends ClientResponse {
+    private final class TestResponse extends ClientResponse {
         private Map<String, Object> properties;
         private int status;
         private InputStream responseEntity;
         private final ContainerResponse response;
         private final MultivaluedMap<String, String> metadata;
         
-       Response(InputStream responseEntity, ContainerResponse response) {
+       TestResponse(InputStream responseEntity, ContainerResponse response) {
             this.status = response.getStatus();
             this.responseEntity = responseEntity;
             this.response = response;
@@ -114,6 +115,14 @@ public class TestResourceClientHandler implements ClientHandler {
             this.status = status;
         }
 
+        public Response.Status getResponseStatus() {
+            return Response.Status.fromStatusCode(status);
+        }
+    
+        public void setResponseStatus(Response.Status status) {
+            setStatus(status.getStatusCode());            
+        }
+        
         public MultivaluedMap<String, String> getMetadata() {
             return metadata;
         }
@@ -208,7 +217,7 @@ public class TestResourceClientHandler implements ClientHandler {
         }
         
         byte[] responseEntity = writer.baos.toByteArray();
-        Response clientResponse = new Response(
+        TestResponse clientResponse = new TestResponse(
                 new ByteArrayInputStream(responseEntity), cResponse);
         
         clientResponse.getProperties().put("request.entity", requestEntity);

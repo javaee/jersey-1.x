@@ -47,6 +47,7 @@ import javax.ws.rs.core.EntityTag;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.NewCookie;
+import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.RuntimeDelegate;
 import javax.ws.rs.ext.RuntimeDelegate.HeaderDelegate;
 
@@ -83,6 +84,23 @@ public abstract class ClientResponse {
      */
     public abstract void setStatus(int status);
 
+    /**
+     * Get the status code.
+     * 
+     * @return the status code, or null if the underlying status code was set
+     *         using the method {@link #setStatus(int)} and there is no
+     *         mapping between the the integer value and the Response.Status
+     *         enumeration value.
+     */
+    public abstract Response.Status getResponseStatus();
+    
+    /**
+     * Set the status code.
+     * 
+     * @param status the status code.
+     */
+    public abstract void setResponseStatus(Response.Status status);
+    
     /**
      * Get the HTTP metadata
      * 

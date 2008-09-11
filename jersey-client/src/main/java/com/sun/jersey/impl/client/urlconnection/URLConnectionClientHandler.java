@@ -56,6 +56,7 @@ import java.util.Map;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
+import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.MessageBodyReader;
 import javax.ws.rs.ext.MessageBodyWriter;
 import javax.ws.rs.ext.RuntimeDelegate;
@@ -100,6 +101,14 @@ public final class URLConnectionClientHandler implements ClientHandler {
 
         public void setStatus(int status) {
             this.status = status;
+        }
+
+        public Response.Status getResponseStatus() {
+            return Response.Status.fromStatusCode(status);
+        }
+    
+        public void setResponseStatus(Response.Status status) {
+            setStatus(status.getStatusCode());            
         }
 
         public MultivaluedMap<String, String> getMetadata() {
