@@ -515,21 +515,35 @@ public final class ServiceFinder<T> implements Iterable<T> {
             this.componentProvider = componentProvider;
         }
         
-        public boolean hasNext() throws ServiceConfigurationError {
-            if (nextName != null) {
-                return true;
-            }
+        protected final void setConfigs() {
             if (configs == null) {
                 try {
                     String fullName = PREFIX + service.getName();
                     if (loader == null)
-                        configs = ClassLoader.getSystemResources(fullName);
-                    else
+                        setDefaultConfigs(fullName);
+                    else {
                         configs = loader.getResources(fullName);
+                        if (!configs.hasMoreElements())
+                            setDefaultConfigs(fullName);
+                    }
                 } catch (IOException x) {
                     fail(service, ": " + x);
                 }
+            }            
+        }
+
+        private final void setDefaultConfigs(String fullName) throws IOException {
+            if (ServiceFinder.class.getClassLoader() != null)
+                configs = ServiceFinder.class.getClassLoader().getResources(fullName);
+            else
+                configs = ClassLoader.getSystemResources(fullName);
+        }
+        
+        public boolean hasNext() throws ServiceConfigurationError {
+            if (nextName != null) {
+                return true;
             }
+            setConfigs();
             
             while (nextName == null) {
                 while ((pending == null) || !pending.hasNext()) {
@@ -626,21 +640,12 @@ public final class ServiceFinder<T> implements Iterable<T> {
             super(service, loader, ignoreOnClassNotFound, componentProvider);
         }
         
+        @Override
         public boolean hasNext() throws ServiceConfigurationError {
             if (nextName != null) {
                 return true;
             }
-            if (configs == null) {
-                try {
-                    String fullName = PREFIX + service.getName();
-                    if (loader == null)
-                        configs = ClassLoader.getSystemResources(fullName);
-                    else
-                        configs = loader.getResources(fullName);
-                } catch (IOException x) {
-                    fail(service, ": " + x);
-                }
-            }
+            setConfigs();
             
             while (nextName == null) {
                 while ((pending == null) || !pending.hasNext()) {
