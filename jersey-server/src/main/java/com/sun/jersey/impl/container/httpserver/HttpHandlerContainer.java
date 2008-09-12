@@ -90,17 +90,20 @@ public class HttpHandlerContainer implements HttpHandler, ContainerListener {
                 eh.put(e.getKey(), values);
             }
             
-            if (cResponse.getEntity() == null && !cResponse.isCommitted()) {
-                exchange.sendResponseHeaders(cResponse.getStatus(), -1);                
-            } else {
-                exchange.sendResponseHeaders(cResponse.getStatus(), 
-                        contentLength == -1 ? 0 : contentLength);                
-            }
-            
+            exchange.sendResponseHeaders(cResponse.getStatus(), 
+                    getResponseLength(contentLength));
             return exchange.getResponseBody();
         }
 
         public void finish() throws IOException {            
+        }
+
+        private long getResponseLength(long contentLength) {
+            if (contentLength == 0)
+                return -1;
+            if (contentLength  < 0)
+                return 0;
+            return contentLength;
         }
     }
     

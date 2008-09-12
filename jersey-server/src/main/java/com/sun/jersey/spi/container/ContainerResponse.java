@@ -235,16 +235,16 @@ public class ContainerResponse implements HttpResponseContext {
         if (request.getMethod().equals("HEAD")) {
             if (size != -1)
                 getHttpHeaders().putSingle("Content-Length", Long.toString(size));
+            isCommitted = true;
+            responseWriter.writeStatusAndHeaders(0, this);
         } else {
             OutputStream o = new CommittingOutputStream(size);
             p.writeTo(entity, entity.getClass(), entityType, null, 
-                    contentType, getHttpHeaders(), o);
-//            o.flush();
-//            o.close();
-        }
-        if (!isCommitted) {
-            responseWriter.writeStatusAndHeaders(-1, this);
-            isCommitted = true;
+                    contentType, getHttpHeaders(), o);            
+            if (!isCommitted) {
+                isCommitted = true;
+                responseWriter.writeStatusAndHeaders(-1, this);
+            }
         }
         responseWriter.finish();
     }
@@ -323,7 +323,8 @@ public class ContainerResponse implements HttpResponseContext {
             this.entityType = ge.getType();                
             this.entity = ge.getEntity();            
         } else {
-            this.entityType = this.entity.getClass();
+            if (entity != null)
+                this.entityType = this.entity.getClass();
         }        
         
         checkStatusAndEntity();

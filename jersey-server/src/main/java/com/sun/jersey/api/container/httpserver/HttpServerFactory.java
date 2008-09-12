@@ -44,10 +44,14 @@ import com.sun.jersey.api.container.ContainerFactory;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.URI;
+import java.util.concurrent.Executors;
 
 /**
  * Factory for creating {@link HttpServer} instances.
- * 
+ * <p>
+ * The {@link HttpServer} executor will be configued with instance returned from
+ * {@link Executors#newCachedThreadPool() }. This behaviour may be overridden
+ * before {@link HttpServer#start() } is called.
  * @author Paul.Sandoz@Sun.Com
  */
 public final class HttpServerFactory {
@@ -162,7 +166,8 @@ public final class HttpServerFactory {
         final HttpServer server = (scheme.equalsIgnoreCase("http")) ? 
             HttpServer.create(new InetSocketAddress(port), 0) :
             HttpsServer.create(new InetSocketAddress(port), 0);
-        
+
+        server.setExecutor(Executors.newCachedThreadPool());
         server.createContext(path, handler);        
         return server;
     }
