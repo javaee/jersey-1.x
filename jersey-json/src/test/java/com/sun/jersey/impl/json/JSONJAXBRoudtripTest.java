@@ -100,6 +100,15 @@ public class JSONJAXBRoudtripTest extends TestCase {
         allBeansTest(new JSONJAXBContext(classes, props), beans);
     }
 
+    public void testInternalNotationAttrAsElems() throws Exception {
+        System.out.println("INTERNAL NOTATION WITH SOME ATTR AS ELEMS");
+        Map<String, Object> props = new HashMap<String, Object>();
+        props.put(JSONJAXBContext.JSON_NOTATION, "MAPPED");
+        props.put(JSONJAXBContext.JSON_ROOT_UNWRAPPING, Boolean.TRUE);
+        props.put(JSONJAXBContext.JSON_ATTRS_AS_ELEMS, "[\"i\",\"j\"]");
+        allBeansTest(new JSONJAXBContext(classes, props), beans);
+    }
+
     public void testJettisonBadgerfishNotation() throws Exception {
         System.out.println("BADGERFISH NOTATION");
         Map<String, Object> props = new HashMap<String, Object>();

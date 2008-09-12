@@ -47,6 +47,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.net.URL;
+import java.util.Collection;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.logging.Level;
@@ -84,6 +85,7 @@ public class JSONUnmarshaller implements Unmarshaller {
     private JSONJAXBContext.JSONNotation jsonNotation;
     private boolean jsonEnabled;
     private boolean jsonRootUnwrapping;
+    private Collection<String> attrAsElemNames;
     private Map<String, String> xml2jsonNamespace;
 
     public JSONUnmarshaller(JAXBContext jaxbContext, Map<String, Object> properties) throws JAXBException {
@@ -258,6 +260,12 @@ public class JSONUnmarshaller implements Unmarshaller {
             } catch (JSONException e) {
                 throw new PropertyException("JSON exception when trying to set " + JSONJAXBContext.JSON_XML2JSON_NS + " property.", e);
             }
+        } else if (JSONJAXBContext.JSON_ATTRS_AS_ELEMS.equals(key)) {
+            try {
+                this.attrAsElemNames = JSONTransformer.asCollection((String) value);
+            } catch (JSONException e) {
+                throw new PropertyException("JSON exception when trying to set " + JSONJAXBContext.JSON_ATTRS_AS_ELEMS + " property.", e);
+            }
         } else {
             if (!key.startsWith(JSONJAXBContext.NAMESPACE)) {
                 this.jaxbUnmarshaller.setProperty(key, value);
@@ -274,6 +282,8 @@ public class JSONUnmarshaller implements Unmarshaller {
             return this.jsonRootUnwrapping;
         } else if (JSONJAXBContext.JSON_XML2JSON_NS.equals(key)) {
             return JSONTransformer.asJsonObject(this.xml2jsonNamespace);
+        } else if (JSONJAXBContext.JSON_ATTRS_AS_ELEMS.equals(key)) {
+            return JSONTransformer.asJsonArray(this.attrAsElemNames);
         } else {
             if (key.startsWith(JSONJAXBContext.NAMESPACE)) {
                 return null;
@@ -330,7 +340,7 @@ public class JSONUnmarshaller implements Unmarshaller {
     private XMLStreamReader createXmlStreamReader(Reader reader) {
         if (JSONJAXBContext.JSONNotation.MAPPED == this.jsonNotation) {
             try {
-                return new JsonXmlStreamReader(reader, this.jsonRootUnwrapping ? "rootElement" : null);
+                return new JsonXmlStreamReader(reader, this.jsonRootUnwrapping ? "rootElement" : null, attrAsElemNames);
             } catch (IOException ex) {
                 Logger.getLogger(JSONUnmarshaller.class.getName()).log(Level.SEVERE, null, ex);
             }

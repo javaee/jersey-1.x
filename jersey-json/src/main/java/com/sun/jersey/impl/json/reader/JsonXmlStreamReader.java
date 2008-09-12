@@ -40,6 +40,7 @@ package com.sun.jersey.impl.json.reader;
 import java.io.IOException;
 import java.io.Reader;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
@@ -113,6 +114,7 @@ public class JsonXmlStreamReader implements XMLStreamReader {
     
     boolean jsonRootUnwrapping;
     String rootElementName;
+    final Collection<String> attrAsElemNames = new LinkedList<String>();
 
     JsonLexer lexer;
     JsonToken lastToken;
@@ -151,12 +153,23 @@ public class JsonXmlStreamReader implements XMLStreamReader {
     }
 
     public JsonXmlStreamReader(Reader reader, boolean stripRoot) throws IOException {
-        this(reader, stripRoot ? "rootElement" : null);
+        this(reader, stripRoot, null);
     }
     
+    public JsonXmlStreamReader(Reader reader, boolean stripRoot, Collection<String> attrAsElems) throws IOException {
+        this(reader, stripRoot ? "rootElement" : null, attrAsElems);
+    }
+
     public JsonXmlStreamReader(Reader reader, String rootElementName) throws IOException {
+        this(reader, rootElementName, null);
+    }
+
+    public JsonXmlStreamReader(Reader reader, String rootElementName, Collection<String> attrAsElems) throws IOException {
         this.jsonRootUnwrapping = (rootElementName != null);
         this.rootElementName = rootElementName;
+        if (attrAsElems != null) {
+            this.attrAsElemNames.addAll(attrAsElems);
+        }
         lexer = new JsonLexer(reader); 
         depth = 0;
         processingStack = new ArrayList<ProcessingState>();
@@ -241,8 +254,8 @@ public class JsonXmlStreamReader implements XMLStreamReader {
                 case AFTER_OBJ_START_BRACE:
                     switch (lastToken.tokenType) {
                         case JsonToken.STRING:
-                            if (lastToken.tokenText.startsWith("@")) { // eat attributes
-                                String attrName = lastToken.tokenText;
+                            if (lastToken.tokenText.startsWith("@") || attrAsElemNames.contains(lastToken.tokenText)) { // eat attribute
+                                String attrName = lastToken.tokenText.startsWith("@") ? lastToken.tokenText : ("@" + lastToken.tokenText);
                                 colon();
                                 lastToken = nextToken();
                                 // TODO process attr value

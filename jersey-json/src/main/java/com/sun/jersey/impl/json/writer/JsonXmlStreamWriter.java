@@ -135,7 +135,6 @@ public class JsonXmlStreamWriter implements XMLStreamWriter {
     int depth;
     final Collection<String> arrayElementNames = new LinkedList<String>();
     final Collection<String> nonStringElementNames = new LinkedList<String>();
-    final Collection<String> attrAsElemNames = new LinkedList<String>();
 
     private JsonXmlStreamWriter(Writer writer) {
         this(writer, false, null, null);
