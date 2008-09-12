@@ -92,7 +92,7 @@
                         </goals>
                         <configuration>
                             <sources>
-                                <source>${project.build.directory}/generated-sources/rsrc-gen</source>
+                                <source>${project.build.directory}/generated-sources</source>
                             </sources>
                         </configuration>
                     </execution>
@@ -112,7 +112,7 @@
                                     <include>**/*.properties</include>
                                 </includes>
                             </resources>
-                            <destDir>${project.build.directory}/generated-sources/rsrc-gen</destDir>
+                            <destDir>${project.build.directory}/generated-sources</destDir>
                         </configuration>
                         <goals>
                             <goal>rs-gen</goal>
@@ -135,28 +135,28 @@
                     </execution>
                 </executions>
             </plugin>
-      <plugin>
-        <groupId>de.jflex.maven.plugin</groupId>
-        <artifactId>maven-jflex-plugin</artifactId>
-        <version>0.2</version>
-        <executions>
-          <execution>
-            <goals>
-              <goal>generate</goal>
-            </goals>
-            <configuration>
-              <outputDirectory>src/main/java</outputDirectory>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
+            <plugin>
+                <groupId>de.jflex.maven.plugin</groupId>
+                <artifactId>maven-jflex-plugin</artifactId>
+                <version>0.2</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>generate</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${project.build.directory}/generated-sources</outputDirectory>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
         </plugins>
     </build>
     <pluginRepositories>
-      <pluginRepository>
-        <id>jflex</id>
-        <name>JFlex repository</name>
-        <url>http://jflex.sourceforge.net/repo/</url>
-      </pluginRepository>
+        <pluginRepository>
+            <id>jflex</id>
+            <name>JFlex repository</name>
+            <url>http://jflex.sourceforge.net/repo/</url>
+        </pluginRepository>
     </pluginRepositories>
 </project>
