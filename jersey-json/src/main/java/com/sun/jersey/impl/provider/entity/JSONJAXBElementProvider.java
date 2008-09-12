@@ -37,27 +37,22 @@
 
 package com.sun.jersey.impl.provider.entity;
 
-import com.sun.jersey.impl.ImplMessages;
 import com.sun.jersey.api.json.JSONJAXBContext;
 import com.sun.jersey.impl.json.JSONHelper;
 import com.sun.jersey.impl.json.JSONMarshaller;
 import com.sun.jersey.impl.json.JSONUnmarshaller;
 import com.sun.jersey.impl.json.reader.JsonXmlStreamReader;
 import com.sun.jersey.impl.json.writer.JsonXmlStreamWriter;
-import com.sun.jersey.impl.util.ThrowHelper;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
-import java.lang.annotation.Annotation;
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
+import java.nio.charset.Charset;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.ext.Providers;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
@@ -77,56 +72,30 @@ public final class JSONJAXBElementProvider extends AbstractJAXBElementProvider {
         super(ps, MediaType.APPLICATION_JSON_TYPE);
     }
     
-    @SuppressWarnings("unchecked")
-    public JAXBElement<?> readFrom(
-            Class<JAXBElement<?>> type, 
-            Type genericType, 
-            Annotation annotations[],
-            MediaType mediaType, 
-            MultivaluedMap<String, String> httpHeaders, 
-            InputStream entityStream) throws IOException {
-        ParameterizedType pt = (ParameterizedType)genericType;
-        Class ta = (Class)pt.getActualTypeArguments()[0];
-        
-        try {
-            StreamSource source = new StreamSource(entityStream);
-            Unmarshaller unmarshaller = getUnmarshaller(ta, mediaType);
-            if (unmarshaller instanceof JSONUnmarshaller) {
-                unmarshaller.setProperty(JSONJAXBContext.JSON_ENABLED, Boolean.TRUE);
-                return unmarshaller.unmarshal(source, ta);
-            } else {
-                return (JAXBElement) unmarshaller.unmarshal(new JsonXmlStreamReader(
-                        new InputStreamReader(entityStream, getCharset(mediaType)), JSONHelper.getRootElementName(ta.getSimpleName())), ta);
-            }
-        } catch (JAXBException cause) {
-            throw ThrowHelper.withInitCause(cause,
-                    new IOException(ImplMessages.ERROR_UNMARSHALLING_JAXB(type))
-                    );
-        }    
+    protected final JAXBElement<?> readFrom(Class<?> type, MediaType mediaType,
+            Unmarshaller u, InputStream entityStream)
+            throws JAXBException, IOException {
+        if (u instanceof JSONUnmarshaller) {
+            u.setProperty(JSONJAXBContext.JSON_ENABLED, Boolean.TRUE);
+            return u.unmarshal(new StreamSource(entityStream), type);
+        } else {
+            return (JAXBElement) u.unmarshal(
+                    new JsonXmlStreamReader(
+                        new InputStreamReader(entityStream, getCharset(mediaType)),
+                        JSONHelper.getRootElementName(type.getSimpleName())), type);
+        }
     }
     
-    public void writeTo(
-            JAXBElement<?> t, 
-            Class<?> type, 
-            Type genericType, 
-            Annotation annotations[], 
-            MediaType mediaType, 
-            MultivaluedMap<String, Object> httpHeaders,
-            OutputStream entityStream) throws IOException {
-        try {
-            Marshaller marshaller = getMarshaller(t.getDeclaredType(), mediaType);
-            if (marshaller instanceof JSONMarshaller) {
-                marshaller.setProperty(JSONJAXBContext.JSON_ENABLED, Boolean.TRUE);
-                marshaller.marshal(t, 
-                        new OutputStreamWriter(entityStream, getCharset(mediaType, UTF8)));
-            } else {
-                marshaller.marshal(t, JsonXmlStreamWriter.createWriter(
-                        new OutputStreamWriter(entityStream, getCharset(mediaType, UTF8)), true));
-            }
-        } catch (JAXBException cause) {
-            throw ThrowHelper.withInitCause(cause,
-                    new IOException(ImplMessages.ERROR_MARSHALLING_JAXB(t.getClass()))
-                    );
+    protected final void writeTo(JAXBElement<?> t, MediaType mediaType, Charset c,
+            Marshaller m, OutputStream entityStream)
+            throws JAXBException, IOException {
+        if (m instanceof JSONMarshaller) {
+            m.setProperty(JSONJAXBContext.JSON_ENABLED, Boolean.TRUE);
+            m.marshal(t,
+                    new OutputStreamWriter(entityStream, c));
+        } else {
+            m.marshal(t, JsonXmlStreamWriter.createWriter(
+                    new OutputStreamWriter(entityStream, c), true));
         }
     }
 }

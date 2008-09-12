@@ -37,21 +37,18 @@
 
 package com.sun.jersey.impl.provider.entity;
 
-import com.sun.jersey.impl.ImplMessages;
-import com.sun.jersey.impl.util.ThrowHelper;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.lang.annotation.Annotation;
-import java.lang.reflect.Type;
+import java.nio.charset.Charset;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.ext.Providers;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
+import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.transform.stream.StreamSource;
 
@@ -87,54 +84,20 @@ public class XMLRootElementProvider extends AbstractRootElementProvider {
         public General(@Context Providers ps) { super(ps); }
     }
     
-    public Object readFrom(
-            Class<Object> type, 
-            Type genericType, 
-            Annotation annotations[],
-            MediaType mediaType, 
-            MultivaluedMap<String, String> httpHeaders, 
-            InputStream entityStream) throws IOException { 
-        
-        if (type.isAnnotationPresent(XmlRootElement.class)) {
-            try {
-                return getUnmarshaller(type, mediaType).unmarshal(entityStream);
-            } catch (JAXBException cause) {
-                throw ThrowHelper.withInitCause(cause,
-                        new IOException(ImplMessages.ERROR_UNMARSHALLING_JAXB(type))
-                        );
-            }
-        } else {
-            try {
-                StreamSource source = new StreamSource(entityStream);
-                return getUnmarshaller(type, mediaType).unmarshal(source, type).getValue();
-            } catch (JAXBException cause) {
-                throw ThrowHelper.withInitCause(cause,
-                        new IOException(ImplMessages.ERROR_UNMARSHALLING_JAXB(type))
-                        );
-            }                
-        }
+    @Override
+    protected final Object readFrom(Class<Object> type, MediaType mediaType,
+            Unmarshaller u, InputStream entityStream)
+            throws JAXBException, IOException {
+        if (type.isAnnotationPresent(XmlRootElement.class))
+            return u.unmarshal(entityStream);
+        else
+            return u.unmarshal(new StreamSource(entityStream), type).getValue();
     }
     
-    public void writeTo(
-            Object t, 
-            Class<?> type, 
-            Type genericType, 
-            Annotation annotations[], 
-            MediaType mediaType, 
-            MultivaluedMap<String, Object> httpHeaders,
-            OutputStream entityStream) throws IOException {
-        try {
-
-            final Marshaller m = getMarshaller(type, mediaType);
-            final String name = getCharsetAsString(mediaType);
-            if (name != null) {
-                m.setProperty(Marshaller.JAXB_ENCODING, name);
-            }
-            m.marshal(t, entityStream);
-        } catch (JAXBException cause) {
-            throw ThrowHelper.withInitCause(cause,
-                    new IOException(ImplMessages.ERROR_MARSHALLING_JAXB(t.getClass()))
-                    );
-        }
+    @Override
+    protected void writeTo(Object t, MediaType mediaType, Charset c,
+            Marshaller m, OutputStream entityStream)
+            throws JAXBException, IOException {
+        m.marshal(t, entityStream);
     }
 }

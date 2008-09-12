@@ -37,10 +37,20 @@
 
 package com.sun.jersey.impl.provider.entity;
 
+import com.sun.jersey.impl.ImplMessages;
+import com.sun.jersey.impl.util.ThrowHelper;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
+import java.nio.charset.Charset;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.ext.Providers;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Marshaller;
+import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 
@@ -65,4 +75,52 @@ public abstract class AbstractRootElementProvider extends AbstractJAXBProvider<O
     public boolean isWriteable(Class<?> type, Type genericType, Annotation annotations[], MediaType mediaType) {
         return type.getAnnotation(XmlRootElement.class) != null;
     }
+    
+    
+    public final Object readFrom(
+            Class<Object> type, 
+            Type genericType, 
+            Annotation annotations[],
+            MediaType mediaType, 
+            MultivaluedMap<String, String> httpHeaders, 
+            InputStream entityStream) throws IOException { 
+        
+        try {
+            return readFrom(type, mediaType, getUnmarshaller(type, mediaType), entityStream);
+        } catch (JAXBException cause) {
+            throw ThrowHelper.withInitCause(cause,
+                    new IOException(ImplMessages.ERROR_UNMARSHALLING_JAXB(type))
+                    );
+        }
+    }
+
+    protected abstract Object readFrom(Class<Object> type, MediaType mediaType,
+            Unmarshaller m, InputStream entityStream)
+            throws JAXBException, IOException;
+    
+    public final void writeTo(
+            Object t, 
+            Class<?> type, 
+            Type genericType, 
+            Annotation annotations[], 
+            MediaType mediaType, 
+            MultivaluedMap<String, Object> httpHeaders,
+            OutputStream entityStream) throws IOException {
+        try {
+            final Marshaller m = getMarshaller(type, mediaType);
+            final Charset c = getCharset(mediaType);
+            if (c != UTF8) {
+                m.setProperty(Marshaller.JAXB_ENCODING, c.name());
+            }
+            writeTo(t, mediaType, c, m, entityStream);
+        } catch (JAXBException cause) {
+            throw ThrowHelper.withInitCause(cause,
+                    new IOException(ImplMessages.ERROR_MARSHALLING_JAXB(t.getClass()))
+                    );
+        }
+    }
+    
+    protected abstract void writeTo(Object t, MediaType mediaType, Charset c,
+            Marshaller m, OutputStream entityStream)
+            throws JAXBException, IOException;
 }

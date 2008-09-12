@@ -39,6 +39,7 @@ package com.sun.jersey.impl.provider.entity;
 
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.charset.Charset;
 import java.util.Collection;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.Produces;
@@ -83,13 +84,15 @@ public class XMLListElementProvider extends AbstractListElementProvider {
         public General(@Context Providers ps) { super(ps); }
     }
     
-    protected final XMLStreamReader getXMLStreamReader(InputStream entityStream)
+    protected final XMLStreamReader getXMLStreamReader(MediaType mediaType,
+            InputStream entityStream)
             throws XMLStreamException {
         return XMLInputFactory.newInstance().
                     createXMLStreamReader(entityStream);
     }
     
-    protected final void writeTo(Collection<?> t, Marshaller m, OutputStream entityStream)
+    protected final void writeTo(Collection<?> t, MediaType mediaType, Charset c,
+            Marshaller m, OutputStream entityStream)
             throws JAXBException {
         for (Object o : t)
             m.marshal(o, entityStream);

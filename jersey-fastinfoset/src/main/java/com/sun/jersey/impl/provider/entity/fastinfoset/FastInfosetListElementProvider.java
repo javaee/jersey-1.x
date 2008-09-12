@@ -45,10 +45,12 @@ import com.sun.xml.fastinfoset.stax.StAXDocumentSerializer;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.charset.Charset;
 import java.util.Collection;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.ext.Providers;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
@@ -68,12 +70,14 @@ public class FastInfosetListElementProvider extends AbstractListElementProvider 
         super(ps, MediaTypes.FAST_INFOSET);
     }
         
-    protected final XMLStreamReader getXMLStreamReader(InputStream entityStream)
+    protected final XMLStreamReader getXMLStreamReader(MediaType mediaType,
+            InputStream entityStream)
             throws XMLStreamException {
         return new StAXDocumentParser(entityStream);
     }
     
-    protected final void writeTo(Collection<?> t, Marshaller m, OutputStream entityStream)
+    protected final void writeTo(Collection<?> t, MediaType mediaType, Charset c,
+            Marshaller m, OutputStream entityStream)
             throws JAXBException, IOException {
         final XMLStreamWriter xsw = new StAXDocumentSerializer(entityStream);
         for (Object o : t)

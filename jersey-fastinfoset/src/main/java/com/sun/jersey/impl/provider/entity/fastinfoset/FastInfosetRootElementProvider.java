@@ -38,7 +38,6 @@
 package com.sun.jersey.impl.provider.entity.fastinfoset;
 
 import com.sun.jersey.api.MediaTypes;
-import com.sun.jersey.impl.ImplMessages;
 import com.sun.jersey.impl.provider.entity.AbstractRootElementProvider;
 import com.sun.jersey.impl.util.ThrowHelper;
 import com.sun.xml.fastinfoset.stax.StAXDocumentParser;
@@ -46,17 +45,17 @@ import com.sun.xml.fastinfoset.stax.StAXDocumentSerializer;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.lang.annotation.Annotation;
-import java.lang.reflect.Type;
+import java.nio.charset.Charset;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.ext.Providers;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
+import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 
 /**
@@ -71,46 +70,28 @@ public final class FastInfosetRootElementProvider extends AbstractRootElementPro
         super(ps, MediaTypes.FAST_INFOSET);
     }
     
-    public Object readFrom(
-            Class<Object> type, 
-            Type genericType, 
-            Annotation annotations[],
-            MediaType mediaType, 
-            MultivaluedMap<String, String> httpHeaders, 
-            InputStream entityStream) throws IOException {
-        try {
-            final StAXDocumentParser p = new StAXDocumentParser(entityStream);
-            if (type.isAnnotationPresent(XmlRootElement.class)) {
-                    return getUnmarshaller(type, mediaType).unmarshal(p);
-            } else {
-                    return getUnmarshaller(type, mediaType).unmarshal(p, type).getValue();
-            }
-        } catch (JAXBException cause) {
-            throw ThrowHelper.withInitCause(cause,
-                    new IOException(ImplMessages.ERROR_UNMARSHALLING_JAXB(type))
-                    );
-        }
+    @Override
+    protected final Object readFrom(Class<Object> type, MediaType mediaType,
+            Unmarshaller u, InputStream entityStream)
+            throws JAXBException, IOException {
+        final StAXDocumentParser p = new StAXDocumentParser(entityStream);
+        if (type.isAnnotationPresent(XmlRootElement.class))
+            return u.unmarshal(p);
+        else
+            return u.unmarshal(p, type).getValue();
     }
     
-    public void writeTo(
-            Object t, 
-            Class<?> type, 
-            Type genericType, 
-            Annotation annotations[], 
-            MediaType mediaType, 
-            MultivaluedMap<String, Object> httpHeaders,
-            OutputStream entityStream) throws IOException {
+    @Override
+    protected void writeTo(Object t, MediaType mediaType, Charset c,
+            Marshaller m, OutputStream entityStream)
+            throws JAXBException, IOException {
+        XMLStreamWriter xsw = new StAXDocumentSerializer(entityStream);
+        m.marshal(t, xsw);
         try {
-            final Marshaller m = getMarshaller(type, mediaType);
-            final String name = getCharsetAsString(mediaType);
-            if (name != null) {
-                m.setProperty(Marshaller.JAXB_ENCODING, name);
-            }
-            XMLStreamWriter xsw = new StAXDocumentSerializer(entityStream);
-            m.marshal(t, xsw);
-        } catch (JAXBException cause) {
+            xsw.flush();
+        } catch (XMLStreamException cause) {
             throw ThrowHelper.withInitCause(cause,
-                    new IOException(ImplMessages.ERROR_MARSHALLING_JAXB(t.getClass()))
+                    new IOException()
                     );
         }
     }

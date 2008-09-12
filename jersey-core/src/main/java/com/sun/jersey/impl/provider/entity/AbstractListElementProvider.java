@@ -45,6 +45,7 @@ import java.io.OutputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -111,24 +112,24 @@ public abstract class AbstractListElementProvider extends AbstractJAXBProvider<C
             MultivaluedMap<String, Object> httpHeaders,
             OutputStream entityStream) throws IOException {
         try {
-            Class elementType = getElementClass(type, genericType);
-            String rootElement = getRootElementName(type, genericType, elementType);
+            final Class elementType = getElementClass(type, genericType);
+            final String rootElement = getRootElementName(type, elementType);
                 
-            String name = getCharsetAsString(mediaType);
-            if (name == null) name = "UTF-8";
+            final Charset c = getCharset(mediaType);
+            final String cName = c.name();
             
             entityStream.write(
-                    String.format("<?xml version=\"1.0\" encoding=\"%s\" standalone=\"yes\"?>", name)
-                    .getBytes(name));            
-            entityStream.write(String.format("<%s>", rootElement).getBytes(name));
+                    String.format("<?xml version=\"1.0\" encoding=\"%s\" standalone=\"yes\"?>", cName)
+                    .getBytes(cName));            
+            entityStream.write(String.format("<%s>", rootElement).getBytes(cName));
             if (t.size() > 0) {
                 final Marshaller m = getMarshaller(elementType, mediaType);
                 m.setProperty(Marshaller.JAXB_FRAGMENT, true);
-                if (!name.equals("UTF-8"))
-                    m.setProperty(Marshaller.JAXB_ENCODING, name);
-                writeTo(t, m, entityStream);
+                if (c != UTF8)
+                    m.setProperty(Marshaller.JAXB_ENCODING, cName);
+                writeTo(t, mediaType, c, m, entityStream);
             }
-            entityStream.write(String.format("</%s>", rootElement).getBytes(name));
+            entityStream.write(String.format("</%s>", rootElement).getBytes(cName));
         } catch (JAXBException cause) {
             throw ThrowHelper.withInitCause(cause,
                     new IOException(ImplMessages.ERROR_MARSHALLING_JAXB(t.getClass()))
@@ -140,14 +141,16 @@ public abstract class AbstractListElementProvider extends AbstractJAXBProvider<C
      * Write a collection of JAXB objects as child elements of the root element.
      * 
      * @param t the collecton to marshall
+     * @param mediaType the media type
+     * @param c the charset
      * @param m the marshaller
      * @param entityStream the output stream to marshall the collection
      * @throws javax.xml.bind.JAXBException
      * @throws IOException 
      */
-    protected abstract void writeTo(Collection<?> t, Marshaller m, OutputStream entityStream)
+    protected abstract void writeTo(Collection<?> t, MediaType mediaType, Charset c,
+            Marshaller m, OutputStream entityStream)
             throws JAXBException, IOException;
-    
     
     public final List<?> readFrom(
             Class<Collection<?>> type, 
@@ -161,7 +164,7 @@ public abstract class AbstractListElementProvider extends AbstractJAXBProvider<C
                 
             Unmarshaller u = getUnmarshaller(elementType, mediaType);
             
-            XMLStreamReader r = getXMLStreamReader(entityStream);
+            XMLStreamReader r = getXMLStreamReader(mediaType, entityStream);
             
             List l = new ArrayList();
             
@@ -201,14 +204,16 @@ public abstract class AbstractListElementProvider extends AbstractJAXBProvider<C
     /**
      * Get the XMLStreamReader for unmarshalling.
      *
+     * @param mediaType the media type.
      * @param entityStream the input stream.
      * @return the XMLStreamReader.
      * @throws javax.xml.stream.XMLStreamException
      */
-    protected abstract XMLStreamReader getXMLStreamReader(InputStream entityStream)
+    protected abstract XMLStreamReader getXMLStreamReader(MediaType mediaType,
+            InputStream entityStream)
             throws XMLStreamException;
     
-    private String getRootElementName(Class<?> type, Type genericType, Class<?> elementType) {
+    private String getRootElementName(Class<?> type, Class<?> elementType) {
         return inflector.pluralize(inflector.demodulize(elementType.getName()));        
     }
     
