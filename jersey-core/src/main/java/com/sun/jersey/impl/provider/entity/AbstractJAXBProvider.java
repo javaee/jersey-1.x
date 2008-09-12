@@ -52,7 +52,7 @@ import javax.xml.bind.Unmarshaller;
  * @author Paul.Sandoz@Sun.Com
  */
 public abstract class AbstractJAXBProvider<T> extends AbstractMessageReaderWriterProvider<T> {    
-    private static Map<Class, JAXBContext> jaxbContexts = 
+    private static final Map<Class, JAXBContext> jaxbContexts = 
             new WeakHashMap<Class, JAXBContext>();
 
     private final Providers ps;
@@ -197,8 +197,4 @@ public abstract class AbstractJAXBProvider<T> extends AbstractMessageReaderWrite
             return c;
         }        
     }
-    
-    public static final String getCharsetAsString(MediaType m) {
-        return (m == null) ? null : m.getParameters().get("charset");
-    }    
 }

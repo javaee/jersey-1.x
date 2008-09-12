@@ -87,7 +87,7 @@ public final class ReaderProvider extends AbstractMessageReaderWriterProvider<Re
             OutputStream entityStream) throws IOException {
         try {
             writeTo(t, new OutputStreamWriter(entityStream, 
-                    getCharset(mediaType, UTF8)));
+                    getCharset(mediaType)));
         } finally {
             t.close();
         }

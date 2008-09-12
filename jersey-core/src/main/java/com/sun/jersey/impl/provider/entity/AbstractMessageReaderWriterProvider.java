@@ -66,15 +66,6 @@ public abstract class AbstractMessageReaderWriterProvider<T> implements
         return (name == null) ? UTF8 : Charset.forName(name);
     }
         
-    public static final Charset getCharset(MediaType m, Charset def) {
-        String name = (m == null) ? null : m.getParameters().get("charset");
-        try {
-            return (name == null) ? UTF8 : Charset.forName(name);
-        } catch (RuntimeException e) {
-            return UTF8;
-        }
-    }
-    
     public static final void writeTo(InputStream in, OutputStream out) throws IOException {
         int read;
         final byte[] data = new byte[2048];
@@ -104,7 +95,7 @@ public abstract class AbstractMessageReaderWriterProvider<T> implements
     public static final void writeToAsString(String s, OutputStream out, 
             MediaType type) throws IOException {
         Writer osw = new BufferedWriter(new OutputStreamWriter(out, 
-                getCharset(type, UTF8)));        
+                getCharset(type)));        
         osw.write(s);
         osw.flush();        
     }

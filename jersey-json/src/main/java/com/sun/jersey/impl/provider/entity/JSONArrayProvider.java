@@ -92,7 +92,7 @@ public class JSONArrayProvider  extends AbstractMessageReaderWriterProvider<JSON
             OutputStream entityStream) throws IOException {
         try {
             OutputStreamWriter writer = new OutputStreamWriter(entityStream, 
-                    getCharset(mediaType, UTF8));
+                    getCharset(mediaType));
             t.write(writer);
             writer.write("\n");
             writer.flush();
