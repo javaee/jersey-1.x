@@ -128,7 +128,7 @@ public abstract class AbstractResourceTester extends TestCase {
             c.addFilter(new ClientFilter() {
                 public ClientResponse handle(ClientRequest ro) {
                     ClientResponse r = getNext().handle(ro);
-                    assertTrue(r.getStatus() < 300);
+                    assertTrue("Status: " + r.getStatus(), r.getStatus() < 300);
                     return r;
                 }
             });

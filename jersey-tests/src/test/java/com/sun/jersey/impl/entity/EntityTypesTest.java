@@ -55,7 +55,9 @@ import java.io.OutputStream;
 import java.io.Reader;
 import java.io.StringReader;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
 import javax.activation.DataSource;
 import javax.mail.internet.InternetHeaders;
 import javax.mail.internet.MimeBodyPart;
@@ -533,6 +535,11 @@ public class EntityTypesTest extends AbstractTypeTester {
     @Produces("application/xml")
     @Consumes("application/xml")
     public static class JAXBListResource {
+        @POST
+        public List<JAXBBean> post(List<JAXBBean> l) {
+            return l;            
+        }
+
         @GET
         public Collection<JAXBBean> get() {
             ArrayList<JAXBBean> l = new ArrayList<JAXBBean>();
@@ -541,14 +548,44 @@ public class EntityTypesTest extends AbstractTypeTester {
             l.add(new JAXBBean("three"));
             return l;
         }
+        
+        @POST
+        @Path("type")
+        public List<JAXBBean> postType(Collection<JAXBBeanType> l) {
+            List<JAXBBean> beans = new ArrayList<JAXBBean>();
+            for (JAXBBeanType t : l)
+                beans.add(new JAXBBean(t.value));
+            return beans;            
+        }        
     }
     
     public void testJAXBListRepresentation() {
         initiateWebApplication(JAXBListResource.class);
         WebResource r = resource("/");
-        JAXBBean in = new JAXBBean("CONTENT");
-        String s = r.get(String.class);
-        System.out.println(s);
+
+        String a = r.get(String.class);
+        String b = r.post(String.class, a);
+        assertEquals(a, b);
+        
+        b = r.path("type").post(String.class, a);
+        assertEquals(a, b);
     }
     
+    @Path("/")
+    @Produces("application/fastinfoset")
+    @Consumes("application/fastinfoset")
+    public static class JAXBListResourceFastInfoset extends JAXBListResource {
+    }
+
+    public void testJAXBListRepresentationFastInfoset() {
+        initiateWebApplication(JAXBListResourceFastInfoset.class);
+        WebResource r = resource("/");
+
+        byte[] a = r.get(byte[].class);
+        byte[] b = r.post(byte[].class, a);
+        assertTrue(Arrays.equals(a, b));
+        
+        b = r.path("type").post(byte[].class, a);
+        assertTrue(Arrays.equals(a, b));
+    }
 }

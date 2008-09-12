@@ -35,63 +35,56 @@
  * holder.
  */
 
-package com.sun.jersey.impl.provider.entity;
+package com.sun.jersey.impl.provider.entity.fastinfoset;
 
+import com.sun.jersey.api.MediaTypes;
+import com.sun.jersey.impl.provider.entity.AbstractListElementProvider;
+import com.sun.jersey.impl.util.ThrowHelper;
+import com.sun.xml.fastinfoset.stax.StAXDocumentParser;
+import com.sun.xml.fastinfoset.stax.StAXDocumentSerializer;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Collection;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
-import javax.ws.rs.core.MediaType;
 import javax.ws.rs.ext.Providers;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
-import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
+import javax.xml.stream.XMLStreamWriter;
 
 /**
  *
  * @author Paul.Sandoz@Sun.Com
  */
-public class XMLListElementProvider extends AbstractListElementProvider {
+@Produces("application/fastinfoset")
+@Consumes("application/fastinfoset")
+public class FastInfosetListElementProvider extends AbstractListElementProvider {
 
-    XMLListElementProvider(Providers ps) {
-        super(ps);
+    FastInfosetListElementProvider(@Context Providers ps) {
+        super(ps, MediaTypes.FAST_INFOSET);
     }
-    
-    XMLListElementProvider(Providers ps, MediaType mt) {
-        super(ps, mt);
-    }
-
-    @Produces("application/xml")
-    @Consumes("application/xml")
-    public static final class App extends XMLListElementProvider {
-        public App(@Context Providers ps) { super(ps , MediaType.APPLICATION_XML_TYPE); }
-    }
-    
-    @Produces("text/xml")
-    @Consumes("text/xml")
-    public static final class Text extends XMLListElementProvider {
-        public Text(@Context Providers ps) { super(ps , MediaType.TEXT_XML_TYPE); }
-    }
-    
-    @Produces("*/*")
-    @Consumes("*/*")
-    public static final class General extends XMLListElementProvider {
-        public General(@Context Providers ps) { super(ps); }
-    }
-    
+        
     protected final XMLStreamReader getXMLStreamReader(InputStream entityStream)
             throws XMLStreamException {
-        return XMLInputFactory.newInstance().
-                    createXMLStreamReader(entityStream);
+        return new StAXDocumentParser(entityStream);
     }
     
     protected final void writeTo(Collection<?> t, Marshaller m, OutputStream entityStream)
-            throws JAXBException {
+            throws JAXBException, IOException {
+        final XMLStreamWriter xsw = new StAXDocumentSerializer(entityStream);
         for (Object o : t)
-            m.marshal(o, entityStream);
+            m.marshal(o, xsw);
+        
+        try {
+            xsw.flush();
+        } catch (XMLStreamException cause) {
+            throw ThrowHelper.withInitCause(cause,
+                    new IOException()
+                    );            
+        }     
     }
 }
