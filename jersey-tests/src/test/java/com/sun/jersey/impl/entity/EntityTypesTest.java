@@ -38,6 +38,7 @@
 package com.sun.jersey.impl.entity;
 
 import com.sun.jersey.api.client.ClientResponse;
+import com.sun.jersey.api.client.GenericType;
 import com.sun.syndication.feed.atom.Entry;
 import com.sun.syndication.feed.atom.Feed;
 import com.sun.jersey.api.client.WebResource;
@@ -68,6 +69,7 @@ import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
+import javax.ws.rs.core.GenericEntity;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.StreamingOutput;
 import javax.ws.rs.ext.ContextResolver;
@@ -563,11 +565,16 @@ public class EntityTypesTest extends AbstractTypeTester {
         initiateWebApplication(JAXBListResource.class);
         WebResource r = resource("/");
 
-        String a = r.get(String.class);
-        String b = r.post(String.class, a);
+        
+        Collection<JAXBBean> a = r.get(
+                new GenericType<Collection<JAXBBean>>(){});
+        Collection<JAXBBean> b = r.post(new GenericType<Collection<JAXBBean>>(){}, 
+                new GenericEntity<Collection<JAXBBean>>(a){});
+        
         assertEquals(a, b);
         
-        b = r.path("type").post(String.class, a);
+        b = r.path("type").post(new GenericType<Collection<JAXBBean>>(){},
+                new GenericEntity<Collection<JAXBBean>>(a){});
         assertEquals(a, b);
     }
     
@@ -581,11 +588,15 @@ public class EntityTypesTest extends AbstractTypeTester {
         initiateWebApplication(JAXBListResourceFastInfoset.class);
         WebResource r = resource("/");
 
-        byte[] a = r.get(byte[].class);
-        byte[] b = r.post(byte[].class, a);
-        assertTrue(Arrays.equals(a, b));
+        Collection<JAXBBean> a = r.get(
+                new GenericType<Collection<JAXBBean>>(){});
+        Collection<JAXBBean> b = r.post(new GenericType<Collection<JAXBBean>>(){}, 
+                new GenericEntity<Collection<JAXBBean>>(a){});
         
-        b = r.path("type").post(byte[].class, a);
-        assertTrue(Arrays.equals(a, b));
+        assertEquals(a, b);
+        
+        b = r.path("type").post(new GenericType<Collection<JAXBBean>>(){},
+                new GenericEntity<Collection<JAXBBean>>(a){});
+        assertEquals(a, b);
     }
 }

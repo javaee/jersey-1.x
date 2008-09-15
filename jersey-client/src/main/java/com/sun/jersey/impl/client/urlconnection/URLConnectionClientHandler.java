@@ -41,6 +41,7 @@ import com.sun.jersey.api.client.ClientHandler;
 import com.sun.jersey.api.client.ClientHandlerException;
 import com.sun.jersey.api.client.ClientRequest;
 import com.sun.jersey.api.client.ClientResponse;
+import com.sun.jersey.api.client.GenericType;
 import com.sun.jersey.api.client.config.ClientConfig;
 import com.sun.jersey.spi.container.MessageBodyWorkers;
 import java.io.ByteArrayInputStream;
@@ -48,12 +49,14 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.lang.annotation.Annotation;
+import java.lang.reflect.Type;
 import java.net.HttpURLConnection;
 import java.net.ProtocolException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import javax.ws.rs.core.Context;
+import javax.ws.rs.core.GenericEntity;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
@@ -132,17 +135,25 @@ public final class URLConnectionClientHandler implements ClientHandler {
         }
         
         public <T> T getEntity(Class<T> c) {
+            return getEntity(c, c);
+        }
+
+        public <T> T getEntity(GenericType<T> gt) {
+            return getEntity(gt.getRawClass(), gt.getType());
+        }
+    
+        private <T> T getEntity(Class<T> c, Type type) {
             try {
                 MediaType mediaType = getType();
                 final MessageBodyReader<T> br = bodyContext.getMessageBodyReader(
-                        c, c,
+                        c, type,
                         EMPTY_ANNOTATIONS, mediaType);
                 if (br == null) {
                     throw new ClientHandlerException(
                             "A message body reader for Java type, " + c + 
                             ", and MIME media type, " + mediaType + ", was not found");
                 }
-                T t = br.readFrom(c, null, null, mediaType, metadata, in);
+                T t = br.readFrom(c, type, EMPTY_ANNOTATIONS, mediaType, metadata, in);
                 if (!(t instanceof InputStream)) {
                     in.close();
                 }
@@ -152,7 +163,7 @@ public final class URLConnectionClientHandler implements ClientHandler {
                 throw new IllegalArgumentException(ex);
             }
         }
-
+        
         public Map<String, Object> getProperties() {
             if (properties != null) return properties;
 
@@ -263,16 +274,28 @@ public final class URLConnectionClientHandler implements ClientHandler {
                 mediaType = new MediaType("application", "octet-stream");
             }
         }
-                
+            
+        Type entityType = null;
+        if (entity instanceof GenericEntity) {
+            final GenericEntity ge = (GenericEntity)entity;
+            entityType = ge.getType();                
+            entity = ge.getEntity();            
+        } else {
+            entityType = entity.getClass();
+        }
+        final Class entityClass = entity.getClass();
+        
         final MessageBodyWriter bw = bodyContext.getMessageBodyWriter(
-                entity.getClass(), null,
-                null, mediaType);
+                entityClass, entityType,
+                EMPTY_ANNOTATIONS, mediaType);
         if (bw == null) {
             throw new ClientHandlerException(
                     "A message body writer for Java type, " + entity.getClass() + 
                     ", and MIME media type, " + mediaType + ", was not found");
         }
-        final long size = bw.getSize(entity, entity.getClass(), null, null, mediaType);
+        final long size = bw.getSize(
+                entity, entityClass, entityType,
+                EMPTY_ANNOTATIONS, mediaType);
         if (size != -1 && size < Integer.MAX_VALUE) {
             // HttpURLConnection uses the int type for content length
             uc.setFixedLengthStreamingMode((int)size);
@@ -288,7 +311,7 @@ public final class URLConnectionClientHandler implements ClientHandler {
         }
         
         final OutputStream out = ro.getAdapter().adapt(ro, uc.getOutputStream());
-        bw.writeTo(entity, entity.getClass(), entity.getClass(),
+        bw.writeTo(entity, entityClass, entityType,
                 EMPTY_ANNOTATIONS, mediaType, metadata, out);
         out.flush();
         out.close();

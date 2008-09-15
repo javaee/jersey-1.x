@@ -93,10 +93,18 @@ public final class WebResource extends Filterable implements
         return handle(c, new ClientRequestImpl(u, "OPTIONS"));
     }
         
+    public <T> T options(GenericType<T> gt) {
+        return handle(gt, new ClientRequestImpl(u, "OPTIONS"));            
+    }
+        
     public <T> T get(Class<T> c) {
         return handle(c, new ClientRequestImpl(u, "GET"));
     }
             
+    public <T> T get(GenericType<T> gt) {
+        return handle(gt, new ClientRequestImpl(u, "GET"));            
+    }
+        
     public void put() {
         voidHandle(new ClientRequestImpl(u, "PUT", null));
     }
@@ -109,10 +117,18 @@ public final class WebResource extends Filterable implements
         return handle(c, new ClientRequestImpl(u, "PUT"));
     }
 
+    public <T> T put(GenericType<T> gt) {
+        return handle(gt, new ClientRequestImpl(u, "PUT"));
+    }
+
     public <T> T put(Class<T> c, Object requestEntity) {
         return handle(c, new ClientRequestImpl(u, "PUT", requestEntity));
     }
             
+    public <T> T put(GenericType<T> gt, Object requestEntity) {
+        return handle(gt, new ClientRequestImpl(u, "PUT", requestEntity));
+    }
+
     public void post() {
         voidHandle(new ClientRequestImpl(u, "POST"));
     }
@@ -125,10 +141,18 @@ public final class WebResource extends Filterable implements
         return handle(c, new ClientRequestImpl(u, "POST"));
     }
 
+    public <T> T post(GenericType<T> gt) {
+        return handle(gt, new ClientRequestImpl(u, "POST"));
+    }
+    
     public <T> T post(Class<T> c, Object requestEntity) {
         return handle(c, new ClientRequestImpl(u, "POST", requestEntity));
     }
             
+    public <T> T post(GenericType<T> gt, Object requestEntity) {
+        return handle(gt, new ClientRequestImpl(u, "POST", requestEntity));
+    }
+    
     public void delete() {
         voidHandle(new ClientRequestImpl(u, "DELETE"));
     }
@@ -141,10 +165,18 @@ public final class WebResource extends Filterable implements
         return handle(c, new ClientRequestImpl(u, "DELETE"));    
     }
 
+    public <T> T delete(GenericType<T> gt) {
+        return handle(gt, new ClientRequestImpl(u, "DELETE"));
+    }
+    
     public <T> T delete(Class<T> c, Object requestEntity) {
         return handle(c, new ClientRequestImpl(u, "DELETE", requestEntity));
     }
       
+    public <T> T delete(GenericType<T> gt, Object requestEntity) {
+        return handle(gt, new ClientRequestImpl(u, "DELETE", requestEntity));
+    }
+    
     public void method(String method) {
         voidHandle(new ClientRequestImpl(u, method));        
     }
@@ -157,8 +189,16 @@ public final class WebResource extends Filterable implements
         return handle(c, new ClientRequestImpl(u, method));            
     }
     
+    public <T> T method(String method, GenericType<T> gt) {
+        return handle(gt, new ClientRequestImpl(u, method));            
+    }
+    
     public <T> T method(String method, Class<T> c, Object requestEntity) {
         return handle(c, new ClientRequestImpl(u, method, requestEntity));        
+    }
+    
+    public <T> T method(String method, GenericType<T> gt, Object requestEntity) {
+        return handle(gt, new ClientRequestImpl(u, method, requestEntity));        
     }
     
     // RequestBuilder<WebResource.Builder>
@@ -290,10 +330,18 @@ public final class WebResource extends Filterable implements
             return handle(c, build("OPTIONS"));
         }
                 
+        public <T> T options(GenericType<T> gt) {
+            return handle(gt, build("OPTIONS"));            
+        }
+        
         public <T> T get(Class<T> c) {
             return handle(c, build("GET"));
         }
                 
+        public <T> T get(GenericType<T> gt) {
+            return handle(gt, build("GET"));            
+        }
+        
         public void put() {
             voidHandle(build("PUT"));
         }
@@ -306,10 +354,18 @@ public final class WebResource extends Filterable implements
             return handle(c, build("PUT"));
         }
         
+        public <T> T put(GenericType<T> gt) {
+            return handle(gt, build("PUT"));
+        }
+
         public <T> T put(Class<T> c, Object requestEntity) {
             return handle(c, build("PUT", requestEntity));
         }
         
+        public <T> T put(GenericType<T> gt, Object requestEntity) {
+            return handle(gt, build("PUT", requestEntity));
+        }
+
         public void post() {
             voidHandle(build("POST"));
         }
@@ -322,10 +378,18 @@ public final class WebResource extends Filterable implements
             return handle(c, build("POST"));
         }
                 
+        public <T> T post(GenericType<T> gt) {
+            return handle(gt, build("POST"));
+        }
+
         public <T> T post(Class<T> c, Object requestEntity) {
             return handle(c, build("POST", requestEntity));
         }
         
+        public <T> T post(GenericType<T> gt, Object requestEntity) {
+            return handle(gt, build("POST", requestEntity));
+        }
+    
         public void delete() {
             voidHandle(build("DELETE"));
         }
@@ -338,10 +402,18 @@ public final class WebResource extends Filterable implements
             return handle(c, build("DELETE"));
         }
         
+        public <T> T delete(GenericType<T> gt) {
+            return handle(gt, build("DELETE"));
+        }
+
         public <T> T delete(Class<T> c, Object requestEntity) {
             return handle(c, build("DELETE", requestEntity));
         }
         
+        public <T> T delete(GenericType<T> gt, Object requestEntity) {
+            return handle(gt, build("DELETE", requestEntity));
+        }
+    
         public void method(String method) {
             voidHandle(build(method));
         }
@@ -354,8 +426,16 @@ public final class WebResource extends Filterable implements
             return handle(c, build(method));
         }
 
+        public <T> T method(String method, GenericType<T> gt) {
+            return handle(gt, build(method));
+        }
+
         public <T> T method(String method, Class<T> c, Object requestEntity) {
             return handle(c, build(method, requestEntity));
+        }        
+        
+        public <T> T method(String method, GenericType<T> gt, Object requestEntity) {
+            return handle(gt, build(method, requestEntity));
         }        
     }
     
@@ -366,6 +446,16 @@ public final class WebResource extends Filterable implements
         if (c == ClientResponse.class) return c.cast(r);
         
         if (r.getStatus() < 300) return r.getEntity(c);
+        
+        throw new UniformInterfaceException(r);
+    }
+    
+    private <T> T handle(GenericType<T> gt, ClientRequest ro) {
+        ClientResponse r = getHeadHandler().handle(ro);
+        
+        if (gt.getRawClass() == ClientResponse.class) gt.getRawClass().cast(r);
+        
+        if (r.getStatus() < 300) return r.getEntity(gt);
         
         throw new UniformInterfaceException(r);
     }

@@ -42,6 +42,7 @@ import com.sun.jersey.api.client.ClientHandler;
 import com.sun.jersey.api.client.ClientHandlerException;
 import com.sun.jersey.api.client.ClientRequest;
 import com.sun.jersey.api.client.ClientResponse;
+import com.sun.jersey.api.client.GenericType;
 import com.sun.jersey.impl.http.header.HttpHeaderFactory;
 import com.sun.jersey.spi.container.ContainerRequest;
 import com.sun.jersey.spi.container.ContainerResponse;
@@ -54,11 +55,13 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.lang.annotation.Annotation;
+import java.lang.reflect.Type;
 import java.net.URI;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import javax.ws.rs.core.Context;
+import javax.ws.rs.core.GenericEntity;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
@@ -146,24 +149,32 @@ public class TestResourceClientHandler implements ClientHandler {
         }
         
         public <T> T getEntity(Class<T> c) {
+            return getEntity(c, c);
+        }
+
+        public <T> T getEntity(GenericType<T> gt) {
+            return getEntity(gt.getRawClass(), gt.getType());
+        }
+    
+        private <T> T getEntity(Class<T> c, Type type) {
             if (response.getEntity() == null) return null;
             
             try {
                 MediaType mediaType = getType();
                 final MessageBodyReader<T> br = bodyContext.getMessageBodyReader(
-                        c, c,
+                        c, type,
                         EMPTY_ANNOTATIONS, mediaType);
                 if (br == null) {
                     throw new ClientHandlerException(
                             "A message body reader for Java type, " + c + 
                             ", and MIME media type, " + mediaType + ", was not found");
                 }
-                return br.readFrom(c, null, null, mediaType, metadata, responseEntity);
+                return br.readFrom(c, type,
+                        EMPTY_ANNOTATIONS, mediaType, metadata, responseEntity);
             } catch (IOException ex) {
                 throw new ClientHandlerException(ex);
             }
         }
-
     }
 
     private static class TestContainerResponseWriter implements ContainerResponseWriter {
@@ -263,15 +274,26 @@ public class TestResourceClientHandler implements ClientHandler {
                     mediaType = MediaType.APPLICATION_OCTET_STREAM_TYPE;
                 }
             }
+            
+            Type entityType = null;
+            if (entity instanceof GenericEntity) {
+                final GenericEntity ge = (GenericEntity)entity;
+                entityType = ge.getType();
+                entity = ge.getEntity();
+            } else {
+                entityType = entity.getClass();
+            }
+            final Class entityClass = entity.getClass();            
+            
             final MessageBodyWriter bw = bodyContext.getMessageBodyWriter(
-                    entity.getClass(), entity.getClass(),
-                    null, mediaType);
+                    entityClass, entityType,
+                    EMPTY_ANNOTATIONS, mediaType);
             if (bw == null) {
                 throw new ClientHandlerException(
                         "A message body writer for Java type, " + entity.getClass() + 
                         ", and MIME media type, " + mediaType + ", was not found");
             }
-            bw.writeTo(entity, entity.getClass(), entity.getClass(), 
+            bw.writeTo(entity, entityClass, entityType, 
                     EMPTY_ANNOTATIONS, (MediaType)mediaType, metadata, out);
             out.flush();
             out.close();

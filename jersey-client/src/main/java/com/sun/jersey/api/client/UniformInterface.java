@@ -65,6 +65,17 @@ public interface UniformInterface {
     
     
     /**
+     * Invoke the OPTIONS method.
+     * 
+     * @param gt the generic type of the returned response.
+     * @return an instance of type represented by the generic type.
+     * @throws UniformInterfaceException if the status of the HTTP response is 
+     *         greater than or equal to 300 and <code>gt<code> does not
+     *         represent the type {@link ClientResponse}.
+     */
+    <T> T options(GenericType<T> gt) throws UniformInterfaceException;
+    
+    /**
      * Invoke the GET method.
      * 
      * @param c the type of the returned response.
@@ -75,6 +86,17 @@ public interface UniformInterface {
      */
     <T> T get(Class<T> c) throws UniformInterfaceException;
             
+    /**
+     * Invoke the GET method.
+     * 
+     * @param gt the generic type of the returned response.
+     * @return an instance of type represented by the generic type.
+     * @throws UniformInterfaceException if the status of the HTTP response is 
+     *         greater than or equal to 300 and <code>gt<code> does not
+     *         represent the type {@link ClientResponse}.
+     */
+    <T> T get(GenericType<T> gt) throws UniformInterfaceException;
+
     
     /**
      * Invoke the PUT method with no request entity or response.
@@ -113,6 +135,17 @@ public interface UniformInterface {
     /**
      * Invoke the PUT method with a request entity that returns a response.
      * 
+     * @param gt the generic type of the returned response.
+     * @return an instance of type represented by the generic type.
+     * @throws UniformInterfaceException if the status of the HTTP response is 
+     *         greater than or equal to 300 and <code>gt<code> does not
+     *         represent the type {@link ClientResponse}.
+     */
+    <T> T put(GenericType<T> gt) throws UniformInterfaceException;
+    
+    /**
+     * Invoke the PUT method with a request entity that returns a response.
+     * 
      * @param c the type of the returned response.
      * @param requestEntity the request entity.
      * @return an instance of type <code>c</code>.
@@ -123,6 +156,18 @@ public interface UniformInterface {
     <T> T put(Class<T> c, Object requestEntity) 
             throws UniformInterfaceException;
     
+    /**
+     * Invoke the PUT method with a request entity that returns a response.
+     * 
+     * @param gt the generic type of the returned response.
+     * @param requestEntity the request entity.
+     * @return an instance of type represented by the generic type.
+     * @throws UniformInterfaceException if the status of the HTTP response is 
+     *         greater than or equal to 300 and <code>gt<code> does not
+     *         represent the type {@link ClientResponse}.
+     */
+    <T> T put(GenericType<T> gt, Object requestEntity) 
+            throws UniformInterfaceException;
     
     /**
      * Invoke the POST method with no request entity or response.
@@ -161,6 +206,17 @@ public interface UniformInterface {
     /**
      * Invoke the POST method with a request entity that returns a response.
      * 
+     * @param gt the generic type of the returned response.
+     * @return an instance of type represented by the generic type.
+     * @throws UniformInterfaceException if the status of the HTTP response is 
+     *         greater than or equal to 300 and <code>gt<code> does not
+     *         represent the type {@link ClientResponse}.
+     */
+    <T> T post(GenericType<T> gt) throws UniformInterfaceException;
+    
+    /**
+     * Invoke the POST method with a request entity that returns a response.
+     * 
      * @param c the type of the returned response.
      * @param requestEntity the request entity.
      * @return an instance of type <code>c</code>.
@@ -170,7 +226,19 @@ public interface UniformInterface {
      */
     <T> T post(Class<T> c, Object requestEntity) 
             throws UniformInterfaceException;
-            
+                
+    /**
+     * Invoke the POST method with a request entity that returns a response.
+     * 
+     * @param gt the generic type of the returned response.
+     * @param requestEntity the request entity.
+     * @return an instance of type represented by the generic type.
+     * @throws UniformInterfaceException if the status of the HTTP response is 
+     *         greater than or equal to 300 and <code>gt<code> does not
+     *         represent the type {@link ClientResponse}.
+     */
+    <T> T post(GenericType<T> gt, Object requestEntity)
+            throws UniformInterfaceException;
     
     /**
      * Invoke the DELETE method with no request entity or response.
@@ -209,6 +277,17 @@ public interface UniformInterface {
     /**
      * Invoke the DELETE method with a request entity that returns a response.
      * 
+     * @param gt the generic type of the returned response.
+     * @return an instance of type represented by the generic type.
+     * @throws UniformInterfaceException if the status of the HTTP response is 
+     *         greater than or equal to 300 and <code>gt<code> does not
+     *         represent the type {@link ClientResponse}.
+     */
+    <T> T delete(GenericType<T> gt) throws UniformInterfaceException;
+    
+    /**
+     * Invoke the DELETE method with a request entity that returns a response.
+     * 
      * @param c the type of the returned response.
      * @param requestEntity the request entity.
      * @return an instance of type <code>c</code>.
@@ -219,6 +298,18 @@ public interface UniformInterface {
     <T> T delete(Class<T> c, Object requestEntity) 
             throws UniformInterfaceException;
 
+    /**
+     * Invoke the DELETE method with a request entity that returns a response.
+     * 
+     * @param gt the generic type of the returned response.
+     * @param requestEntity the request entity.
+     * @return an instance of type represented by the generic type.
+     * @throws UniformInterfaceException if the status of the HTTP response is 
+     *         greater than or equal to 300 and <code>gt<code> does not
+     *         represent the type {@link ClientResponse}.
+     */
+    <T> T delete(GenericType<T> gt, Object requestEntity)
+            throws UniformInterfaceException;
     
     /**
      * Invoke a HTTP method with no request entity or response.
@@ -259,6 +350,18 @@ public interface UniformInterface {
     <T> T method(String method, Class<T> c) throws UniformInterfaceException;
 
     /**
+     * Invoke a HTTP method with no request entity that returns a response.
+     * 
+     * @param method the HTTP method.
+     * @param gt the generic type of the returned response.
+     * @return an instance of type represented by the generic type.
+     * @throws UniformInterfaceException if the status of the HTTP response is 
+     *         greater than or equal to 300 and <code>gt<code> does not
+     *         represent the type {@link ClientResponse}.
+     */
+    <T> T method(String method, GenericType<T> gt) throws UniformInterfaceException;
+    
+    /**
      * Invoke a HTTP method with a request entity that returns a response.
      * 
      * @param method the HTTP method.
@@ -270,5 +373,19 @@ public interface UniformInterface {
      *         {@link ClientResponse}.
      */
     <T> T method(String method, Class<T> c, Object requestEntity) 
+            throws UniformInterfaceException;    
+    
+    /**
+     * Invoke a HTTP method with a request entity that returns a response.
+     * 
+     * @param method the HTTP method.
+     * @param gt the generic type of the returned response.
+     * @param requestEntity the request entity.
+     * @return an instance of type represented by the generic type.
+     * @throws UniformInterfaceException if the status of the HTTP response is 
+     *         greater than or equal to 300 and <code>gt<code> does not
+     *         represent the type {@link ClientResponse}.
+     */
+    <T> T method(String method, GenericType<T> gt, Object requestEntity) 
             throws UniformInterfaceException;    
 }

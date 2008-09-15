@@ -140,6 +140,16 @@ public abstract class ClientResponse {
     public abstract <T> T getEntity(Class<T> c) throws IllegalArgumentException;
 
     /**
+     * Get the entity of the response.
+     * 
+     * @param gt the generic type of the entity.
+     * @return an instance of the type represented by the generic type.
+     * 
+     * @throws java.lang.IllegalArgumentException
+     */
+    public abstract <T> T getEntity(GenericType<T> gt) throws IllegalArgumentException;
+
+    /**
      * Get the media type of the response
      * 
      * @return the media type.
@@ -190,6 +200,11 @@ public abstract class ClientResponse {
         return getMetadata().getFirst("Content-Language");
     }
     
+    /**
+     * Get the list of cookies.
+     * 
+     * @return the cookies.
+     */
     public List<NewCookie> getCookies() {
         List<String> hs = getMetadata().get("Set-Cookie");
         if (hs == null) return Collections.emptyList();
