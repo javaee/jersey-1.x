@@ -38,12 +38,12 @@ public class Main {
         initParams.put("com.sun.jersey.config.property.packages",
                 "com.sun.jersey.samples.jsonfromjaxb");
 
-        System.out.println("Starting grizzly...");
         SelectorThread threadSelector = GrizzlyWebContainerFactory.create(baseUri, initParams);
         return threadSelector;
     }
     
     public static void main(String[] args) throws IOException {
+        System.out.println("Starting grizzly...");
         SelectorThread threadSelector = startServer();
         System.out.println(String.format(
                 "Jersey app started with WADL available at %s/application.wadl\n" +
