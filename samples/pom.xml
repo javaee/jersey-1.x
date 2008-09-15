@@ -56,6 +56,7 @@
         <module>helloworld</module>
         <module>helloworld-webapp</module>
         <module>jmaki-backend</module>
+        <module>jaxb</module>
         <module>json-from-jaxb</module>
         <module>mandel</module>
         <module>optimistic-concurrency</module>
