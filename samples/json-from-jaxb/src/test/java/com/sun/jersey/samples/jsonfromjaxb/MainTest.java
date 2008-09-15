@@ -45,7 +45,6 @@ import com.sun.jersey.api.client.config.ClientConfig;
 import com.sun.jersey.api.client.config.DefaultClientConfig;
 import com.sun.jersey.samples.jsonfromjaxb.config.JAXBContextResolver;
 import com.sun.jersey.samples.jsonfromjaxb.jaxb.Flights;
-import java.util.Formatter;
 /**
  *
  * @author japod
@@ -61,7 +60,7 @@ public class MainTest extends TestCase {
     @Override
     protected void setUp() throws Exception {
         super.setUp();
-        threadSelector = Main.startIt();
+        threadSelector = Main.startServer();
     }
 
     @Override
@@ -72,9 +71,7 @@ public class MainTest extends TestCase {
         }
     }
 
-    /**
-     * Test of main method, of class Main.
-     */
+    // TODO Add asserts
     public void testMain() throws Exception {
             ClientConfig cc = new DefaultClientConfig();
             // use the following jaxb context resolver
@@ -83,16 +80,13 @@ public class MainTest extends TestCase {
             
             WebResource wr = c.resource(Main.baseUri);
             
-            // get the initial representation
+            // get the initial representation            
+            Flights flights = wr.path("flights").
+                    accept("application/json").get(Flights.class);
+            System.out.println("List of flights found:\n" +
+                    flights.toString());
             
-            Flights flights = wr.path("flights").accept("application/json").get(Flights.class);
-            
-            // and print it out
-            
-            System.out.println(new Formatter().format("List of flights found:\n%s", flights.toString()));
-            
-            // update the list:
-                        
+            // update the list                        
             // remove the second row
             if (flights.getFlight().size() > 1) {
                 flights.getFlight().remove(1);
@@ -101,15 +95,14 @@ public class MainTest extends TestCase {
             // update the first one
             flights.getFlight().get(0).setNumber(125);
             flights.getFlight().get(0).setFlightId("OK125");
-            
-            
+                        
             // and send the updated list back to the server
             wr.path("flights").type("application/json").put(flights);
             
-
             // get the updated list out from the server:
-            Flights updatedFlights = wr.path("flights").accept("application/json").get(Flights.class);
-            // and print it out:
-            System.out.println(new Formatter().format("List of updated flights:\n%s", updatedFlights.toString()));
+            Flights updatedFlights = wr.path("flights").
+                    accept("application/json").get(Flights.class);
+            System.out.println("List of updated flights:\n" +
+                    updatedFlights.toString());
     }
 }
