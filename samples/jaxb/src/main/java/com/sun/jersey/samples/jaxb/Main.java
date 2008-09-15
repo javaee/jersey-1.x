@@ -58,6 +58,7 @@ public class Main {
         initParams.put("com.sun.jersey.config.property.packages",
                 "com.sun.jersey.samples.jaxb");
 
+        System.out.println("SERVER URI: " + BASE_URI);
         SelectorThread threadSelector = GrizzlyWebContainerFactory.create(BASE_URI, initParams);
         return threadSelector;
     }
