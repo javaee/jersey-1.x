@@ -103,12 +103,6 @@ public final class HttpMethodRule implements UriRule {
             return false;
         }
 
-        if (request.getMethod().equalsIgnoreCase("GET")) {
-            if (request.getMediaType() != null) {
-                System.err.println("MEDIA-TYPE: " + request.getMediaType());
-            }
-        }
-        
         // Get the list of matching methods
         List<MediaType> accept = request.getAcceptableMediaTypes();
         LinkedList<ResourceMethod> matches = 
