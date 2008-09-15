@@ -34,8 +34,8 @@ import javax.xml.namespace.QName;
  * @author Paul.Sandoz@Sun.Com
  */
 @Path("jaxb")
-//@Produces("application/xml")
-//@Consumes("application/xml")
+@Produces("application/xml")
+@Consumes("application/xml")
 public class JAXBResource {
 
     @Path("XmlRootElement")
