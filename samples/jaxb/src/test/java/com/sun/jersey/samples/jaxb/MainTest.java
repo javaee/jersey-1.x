@@ -79,6 +79,9 @@ public class MainTest extends TestCase {
     }
 
     public void testRootElement() {
+        String s = r.path("jaxb/XmlRootElement").
+                get(String.class);
+
         JAXBXmlRootElement e1 = r.path("jaxb/XmlRootElement").
                 get(JAXBXmlRootElement.class);
         
