@@ -47,6 +47,7 @@ import com.sun.jersey.api.model.AbstractResource;
 import com.sun.jersey.api.wadl.config.WadlGeneratorConfigLoader;
 import com.sun.jersey.impl.model.method.ResourceMethod;
 import com.sun.jersey.impl.uri.PathPattern;
+import java.util.logging.Level;
 
 /**
  *
@@ -120,7 +121,8 @@ public final class WadlFactory {
             Class.forName("javax.xml.bind.JAXBElement");
             return true;
         } catch(ClassNotFoundException e) {
-            LOGGER.warning("WADL generation is disabled " +
+            LOGGER.log(Level.CONFIG,
+                    "WADL generation is disabled " +
                     "because JAXB jars are not " + 
                     "included in the java class path. " +
                     "To enable WADL include JAXB 2.x jars in the java class path.");
