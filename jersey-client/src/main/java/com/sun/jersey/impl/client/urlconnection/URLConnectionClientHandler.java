@@ -222,6 +222,12 @@ public final class URLConnectionClientHandler implements ClientHandler {
         // Write the request headers
         writeHeaders(ro.getMetadata(), uc);
         
+        if (ro.getMethod().equalsIgnoreCase("GET")) {
+            if (ro.getMetadata().getFirst("Content-Type") != null) {
+                System.err.println("CONTENT-TYPE: " + ro.getMetadata().getFirst("Content-Type"));
+            }
+        }
+        
         // Write the entity (if any)
         Object entity = ro.getEntity();
         if (entity != null) {
