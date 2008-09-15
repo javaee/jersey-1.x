@@ -447,7 +447,7 @@ public final class WebResource extends Filterable implements
         
         if (r.getStatus() < 300) return r.getEntity(c);
         
-        throw new UniformInterfaceException(r);
+        throw new UniformInterfaceException("Status: " + r.getStatus(), r);
     }
     
     private <T> T handle(GenericType<T> gt, ClientRequest ro) {
@@ -457,7 +457,7 @@ public final class WebResource extends Filterable implements
         
         if (r.getStatus() < 300) return r.getEntity(gt);
         
-        throw new UniformInterfaceException(r);
+        throw new UniformInterfaceException("Status: " + r.getStatus(), r);
     }
     
     private void voidHandle(ClientRequest ro) {
