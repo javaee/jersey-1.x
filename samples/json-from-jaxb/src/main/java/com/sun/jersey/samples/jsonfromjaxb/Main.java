@@ -23,10 +23,10 @@
 package com.sun.jersey.samples.jsonfromjaxb;
 
 import com.sun.grizzly.http.SelectorThread;
-import com.sun.jersey.api.container.grizzly.*;
-import com.sun.jersey.impl.container.grizzly.*;
-import java.util.*;
+import com.sun.jersey.api.container.grizzly.GrizzlyWebContainerFactory;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 public class Main {
     
@@ -35,12 +35,14 @@ public class Main {
     protected static SelectorThread startIt() throws IOException{
         final Map<String, String> initParams = new HashMap<String, String>();
 
-        initParams.put("com.sun.jersey.config.property.resourceConfigClass", "com.sun.jersey.api.core.PackagesResourceConfig");
-        initParams.put("com.sun.jersey.config.property.packages", "com.sun.jersey.samples.jsonfromjaxb");
+        initParams.put("com.sun.jersey.config.property.packages",
+                "com.sun.jersey.samples.jsonfromjaxb");
 
         System.out.println("Starting grizzly...");
         SelectorThread threadSelector = GrizzlyWebContainerFactory.create(baseUri, initParams);
-        System.out.println(String.format("Jersey app started with WADL available at %s/application.wadl\nHit enter to stop it...", baseUri));
+        System.out.println(String.format(
+                "Jersey app started with WADL available at %s/application.wadl\n" +
+                "Hit enter to stop it...", baseUri));
         return threadSelector;
     }
     
