@@ -30,9 +30,21 @@ import java.util.Map;
 
 
 public class Main {
+
+    final static String baseUri = "http://localhost:9998/";
+
+    protected static SelectorThread startServer() throws IOException{
+        final Map<String, String> initParams = new HashMap<String, String>();
+
+        initParams.put("com.sun.jersey.config.property.packages", "com.sun.jersey.samples.helloworld.resources");
+
+        System.out.println("Starting grizzly...");
+        SelectorThread threadSelector = GrizzlyWebContainerFactory.create(baseUri, initParams);     
+        return threadSelector;
+    }
     
     public static void main(String[] args) throws IOException {
-        
+        /*
         final String baseUri = "http://localhost:9998/";
         final Map<String, String> initParams = new HashMap<String, String>();
 
@@ -45,5 +57,14 @@ public class Main {
         System.in.read();
         threadSelector.stopEndpoint();
         System.exit(0);
+        */
+        SelectorThread threadSelector = startServer();
+        System.out.println(String.format("Jersey app started with WADL available at "
+                + "%sapplication.wadl\nTry out %shelloworld\nHit enter to stop it...",
+                baseUri, baseUri));
+        System.in.read();
+        threadSelector.stopEndpoint();
+        System.exit(0);
+
     }    
 }
