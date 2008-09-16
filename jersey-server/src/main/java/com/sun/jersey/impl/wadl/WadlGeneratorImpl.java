@@ -64,7 +64,8 @@ import com.sun.research.ws.wadl.Response;
 public final class WadlGeneratorImpl implements WadlGenerator {
 
     public String getRequiredJaxbContextPath() {
-        return Application.class.getPackage().getName();
+        final String name = Application.class.getName();
+        return name.substring(0, name.lastIndexOf('.'));
     }
 
     public void init() throws Exception {

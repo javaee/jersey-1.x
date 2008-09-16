@@ -68,42 +68,45 @@ import com.sun.research.ws.wadl.Response;
  */
 public class WadlGeneratorApplicationDoc implements WadlGenerator {
 
-    private static final Logger LOG = Logger.getLogger( WadlGeneratorApplicationDoc.class.getName() );
-
+    private static final Logger LOG = Logger.getLogger(WadlGeneratorApplicationDoc.class.getName());
     private WadlGenerator _delegate;
     private File _applicationDocsFile;
     private ApplicationDocs _applicationDocs;
-    
+
     public WadlGeneratorApplicationDoc() {
     }
 
-    public WadlGeneratorApplicationDoc( WadlGenerator wadlGenerator, ApplicationDocs applicationDocs ) {
+    public WadlGeneratorApplicationDoc(WadlGenerator wadlGenerator, ApplicationDocs applicationDocs) {
         _delegate = wadlGenerator;
         _applicationDocs = applicationDocs;
     }
-    
-    public void setWadlGeneratorDelegate( WadlGenerator delegate ) {
+
+    public void setWadlGeneratorDelegate(WadlGenerator delegate) {
         _delegate = delegate;
     }
 
     public String getRequiredJaxbContextPath() {
         return _delegate.getRequiredJaxbContextPath();
     }
-    
-    public void setApplicationDocsFile( File applicationDocsFile ) {
+
+    public void setApplicationDocsFile(File applicationDocsFile) {
         _applicationDocsFile = applicationDocsFile;
-        LOG.info( "Setting grammarsFile " + applicationDocsFile.getAbsolutePath() );
+        LOG.info("Setting grammarsFile " + applicationDocsFile.getAbsolutePath());
     }
-    
+
     public void init() throws Exception {
         _delegate.init();
-        _applicationDocs = loadFile( _applicationDocsFile, ApplicationDocs.class );
+        _applicationDocs = loadFile(_applicationDocsFile, ApplicationDocs.class);
     }
-    
-    private <T> T loadFile( File fileToLoad, Class<T> targetClass ) throws JAXBException {
-        final JAXBContext c = JAXBContext.newInstance( targetClass.getPackage().getName(), Thread.currentThread().getContextClassLoader() );
+
+    private <T> T loadFile(File fileToLoad, Class<T> targetClass) throws JAXBException {
+        String name = targetClass.getName();
+        final int i = name.lastIndexOf('.');
+        name = (i != -1) ? name.substring(0, i) : "";
+        final JAXBContext c = JAXBContext.newInstance(name,
+                Thread.currentThread().getContextClassLoader());
         final Unmarshaller m = c.createUnmarshaller();
-        return targetClass.cast( m.unmarshal( fileToLoad ) );
+        return targetClass.cast(m.unmarshal(fileToLoad));
     }
 
     /**
@@ -112,10 +115,9 @@ public class WadlGeneratorApplicationDoc implements WadlGenerator {
      */
     public Application createApplication() {
         final Application result = _delegate.createApplication();
-        if ( _applicationDocs != null
-                && _applicationDocs.getDocs() != null
-                && !_applicationDocs.getDocs().isEmpty() ) {
-            result.getDoc().addAll( _applicationDocs.getDocs() );
+        if (_applicationDocs != null && _applicationDocs.getDocs() != null &&
+                !_applicationDocs.getDocs().isEmpty()) {
+            result.getDoc().addAll(_applicationDocs.getDocs());
         }
         return result;
     }
@@ -126,8 +128,8 @@ public class WadlGeneratorApplicationDoc implements WadlGenerator {
      * @return the method
      * @see com.sun.jersey.impl.wadl.WadlGenerator#createMethod(com.sun.jersey.api.model.AbstractResource, com.sun.jersey.api.model.AbstractResourceMethod)
      */
-    public Method createMethod( AbstractResource r, AbstractResourceMethod m ) {
-        return _delegate.createMethod( r, m );
+    public Method createMethod(AbstractResource r, AbstractResourceMethod m) {
+        return _delegate.createMethod(r, m);
     }
 
     /**
@@ -137,9 +139,9 @@ public class WadlGeneratorApplicationDoc implements WadlGenerator {
      * @return
      * @see com.sun.jersey.impl.wadl.WadlGenerator#createRequestRepresentation(com.sun.jersey.api.model.AbstractResource, com.sun.jersey.api.model.AbstractResourceMethod, javax.ws.rs.core.MediaType)
      */
-    public RepresentationType createRequestRepresentation( AbstractResource r,
-            AbstractResourceMethod m, MediaType mediaType ) {
-        return _delegate.createRequestRepresentation( r, m, mediaType );
+    public RepresentationType createRequestRepresentation(AbstractResource r,
+            AbstractResourceMethod m, MediaType mediaType) {
+        return _delegate.createRequestRepresentation(r, m, mediaType);
     }
 
     /**
@@ -148,8 +150,8 @@ public class WadlGeneratorApplicationDoc implements WadlGenerator {
      * @return
      * @see com.sun.jersey.impl.wadl.WadlGenerator#createRequest(com.sun.jersey.api.model.AbstractResource, com.sun.jersey.api.model.AbstractResourceMethod)
      */
-    public Request createRequest( AbstractResource r, AbstractResourceMethod m ) {
-        return _delegate.createRequest( r, m );
+    public Request createRequest(AbstractResource r, AbstractResourceMethod m) {
+        return _delegate.createRequest(r, m);
     }
 
     /**
@@ -159,9 +161,9 @@ public class WadlGeneratorApplicationDoc implements WadlGenerator {
      * @return
      * @see com.sun.jersey.impl.wadl.WadlGenerator#createParam(com.sun.jersey.api.model.AbstractResource, com.sun.jersey.api.model.AbstractMethod, com.sun.jersey.api.model.Parameter)
      */
-    public Param createParam( AbstractResource r,
-            AbstractMethod m, Parameter p ) {
-        return _delegate.createParam( r, m, p );
+    public Param createParam(AbstractResource r,
+            AbstractMethod m, Parameter p) {
+        return _delegate.createParam(r, m, p);
     }
 
     /**
@@ -170,8 +172,8 @@ public class WadlGeneratorApplicationDoc implements WadlGenerator {
      * @return
      * @see com.sun.jersey.impl.wadl.WadlGenerator#createResource(com.sun.jersey.api.model.AbstractResource, java.lang.String)
      */
-    public Resource createResource( AbstractResource r, String path ) {
-        return _delegate.createResource( r, path );
+    public Resource createResource(AbstractResource r, String path) {
+        return _delegate.createResource(r, path);
     }
 
     /**
@@ -180,8 +182,8 @@ public class WadlGeneratorApplicationDoc implements WadlGenerator {
      * @return
      * @see com.sun.jersey.impl.wadl.WadlGenerator#createResponse(com.sun.jersey.api.model.AbstractResource, com.sun.jersey.api.model.AbstractResourceMethod)
      */
-    public Response createResponse( AbstractResource r, AbstractResourceMethod m ) {
-        return _delegate.createResponse( r, m );
+    public Response createResponse(AbstractResource r, AbstractResourceMethod m) {
+        return _delegate.createResponse(r, m);
     }
 
     /**

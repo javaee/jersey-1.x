@@ -123,10 +123,12 @@ public class WadlGeneratorResourceDocSupport implements WadlGenerator {
     }
     
     public String getRequiredJaxbContextPath() {
+        String name = Elements.class.getName();
+        name = name.substring(0, name.lastIndexOf('.'));
+        
         return _delegate.getRequiredJaxbContextPath() == null
-            ? Elements.class.getPackage().getName()
-            : _delegate.getRequiredJaxbContextPath() +
-                ":" + Elements.class.getPackage().getName();
+            ? name
+            : _delegate.getRequiredJaxbContextPath() + ":" + name;
     }
 
     /**
