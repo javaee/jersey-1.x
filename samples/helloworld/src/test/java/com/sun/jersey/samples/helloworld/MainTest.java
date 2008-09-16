@@ -38,7 +38,9 @@
 package com.sun.jersey.samples.helloworld;
 
 import com.sun.grizzly.http.SelectorThread;
+import com.sun.jersey.api.MediaTypes;
 import com.sun.jersey.api.client.Client;
+import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.WebResource;
 import junit.framework.TestCase;
 
@@ -51,16 +53,6 @@ public class MainTest extends TestCase {
     SelectorThread threadSelector;
     private Client c;
     private WebResource wr;
-    private final String expectedResponseMsg = "Hello World";
-    private final String expectedWadl = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>"
-            + "<application xmlns=\"http://research.sun.com/wadl/2006/10\">"
-            + "<doc xmlns:jersey=\"http://jersey.dev.java.net/\" jersey:generatedBy=\"Jersey: 0.11-ea-SNAPSHOT 09/15/2008 08:45 PM\"/>"
-            + "<resources base=\"http://localhost:9998/\">" + "<resource path=\"/helloworld\">"
-            + "<method name=\"GET\" id=\"getClichedMessage\"><response>"
-            + "<representation mediaType=\"text/plain\"/></response></method>"
-            + "</resource></resources></application>";
-    private final String expectedWadlStartsWith = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>"
-            + "<application xmlns=\"http://research.sun.com/wadl";
 
     public MainTest(String testName) {
         super(testName);
@@ -87,21 +79,17 @@ public class MainTest extends TestCase {
      */
     public void testHelloWorld() throws Exception {
         String responseMsg = wr.path("helloworld").get(String.class);
-        assertEquals(expectedResponseMsg, responseMsg);
+        assertEquals("Hello World", responseMsg);
     }
 
     /**
-     * Test the request for application.wadl gives a response head with status code
-     * of 200. It also checks that the generated wadl starts with the expected one.
-     * @throws java.lang.Exception
+     * Test if a WADL document is available at the relative path
+     * "application.wadl".
      */
-    public void testApplicationWadl() throws Exception {
-        String serviceWadl = wr.path("application.wadl").get(String.class);
-        int responseStatus = wr.path("application.wadl").head().getStatus();
-        assertEquals(200, responseStatus);
-        //assertEquals(expectedWadl, serviceWadl.replaceAll("\n", "").replaceAll("(\\s\\s)*", ""));
-        /* strip of the newline characters and the intermediate spaces */
-        serviceWadl = serviceWadl.replaceAll("\n", "").replaceAll("(\\s\\s)*", "");
-        assertTrue(serviceWadl.startsWith(expectedWadlStartsWith));
+    public void testApplicationWadl() {
+        String serviceWadl = wr.path("application.wadl").
+                accept(MediaTypes.WADL).get(String.class);
+                
+        assertTrue(serviceWadl.length() > 0);
     }
 }
