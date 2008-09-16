@@ -63,7 +63,7 @@ import javax.ws.rs.core.HttpHeaders;
  * If the response has a Content-Encoding header of "gzip" then
  * then the response entity will be uncompressed using gzip.
  * 
- * @author paulsandoz
+ * @author Paul.Sandoz@Sun.Com
  */
 public final class GZIPContentEncodingFilter extends ClientFilter {
 
