@@ -53,7 +53,7 @@ import java.util.LinkedList;
 import java.util.Set;
 
 /**
- * Factory for creating specific containers.
+ * Factory for creating specific HTTP-based containers.
  *
  * @author Paul.Sandoz@Sun.Com
  */
@@ -69,6 +69,7 @@ public final class ContainerFactory {
      * service-provider will be iterated over until one returns a non-null
      * container instance.
      * <p>
+     * @param <A> the type of the container.
      * @param type the type of the container.
      * @param resourceClasses the list of Web resources to be managed by the
      *        Web application.
@@ -92,6 +93,7 @@ public final class ContainerFactory {
      * service-provider will be iterated over until one returns a non-null
      * container instance.
      * <p>
+     * @param <A> the type of the container.
      * @param type the type of the container.
      * @param resourceClasses the set of Web resources to be managed by the
      *        Web application.
@@ -112,6 +114,7 @@ public final class ContainerFactory {
      * service-provider will be iterated over until one returns a non-null
      * container instance.
      * <p>
+     * @param <A> the type of the container.
      * @param type the type of the container.
      * @param resourceConfig the resource configuration containing the set
      *        of Web resources to be managed by the Web application.
@@ -149,6 +152,7 @@ public final class ContainerFactory {
     /**
      * Create an instance of a container according to the class requested.
      *
+     * @param <A> the type of the container.
      * @param type the type of the container.
      * @param packageName the name of the package where to find the resource configuration
      *        class.
@@ -180,6 +184,7 @@ public final class ContainerFactory {
      * <p>
      * All java classpath will be scanned for Root Resource Classes.
      * </p>
+     * @param <A> the type of the container.
      * @param type the type of the container.
      *
      * @return the HTTP handler, if a handler could not be created then null is
@@ -197,6 +202,7 @@ public final class ContainerFactory {
      * <p>
      * Root Resource Classes will be scanned in paths.
      * </p>
+     * @param <A> the type of the container.
      * @param type the type of the container.
      * @param paths a list of paths to be scanned for resource classes.
      *

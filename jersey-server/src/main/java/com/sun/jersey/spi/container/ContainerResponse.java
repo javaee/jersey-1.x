@@ -56,7 +56,9 @@ import javax.ws.rs.ext.RuntimeDelegate;
 import javax.ws.rs.ext.RuntimeDelegate.HeaderDelegate;
 
 /**
- * Containers instantiate, or inherit, and provide an instance to the 
+ * An out-bound HTTP response to be processed by the web application.
+ * <p>
+ * Containers instantiate, or inherit, and provide an instance to the
  * {@link WebApplication}.
  *
  * @author Paul.Sandoz@Sun.Com
@@ -257,6 +259,7 @@ public class ContainerResponse implements HttpResponseContext {
     }
     
     /**
+     * Get the container response writer.
      * 
      * @return the container response writer
      */
@@ -266,6 +269,7 @@ public class ContainerResponse implements HttpResponseContext {
     
     /**
      * Set the container response writer.
+     * 
      * @param responseWriter the container response writer
      */
     public void setContainerResponseWriter(ContainerResponseWriter responseWriter) {

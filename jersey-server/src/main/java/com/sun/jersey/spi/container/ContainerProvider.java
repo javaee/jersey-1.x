@@ -46,7 +46,7 @@ import com.sun.jersey.api.core.ResourceConfig;
  * A container instance will be created according to the 
  * the supporting generic type of the container.
  * <p>
- * A provider shall support a one-to-one mapping between a type that is is not of 
+ * A provider shall support a one-to-one mapping between a type that is not of 
  * the type Object. A provider may support 
  * more than one one-to-one mapping or a mapping of sub-types of a type
  * (that is not of the type Object). A provider shall not conflict with other
@@ -58,6 +58,7 @@ import com.sun.jersey.api.core.ResourceConfig;
  * resource directory <tt>META-INF/services</tt>, and including the fully qualified
  * service-provider-class of the implementation in the file.
  *
+ * @param <T> the type of the container.
  * @author Paul.Sandoz@Sun.Com
  */
 public interface ContainerProvider<T> {
@@ -73,7 +74,7 @@ public interface ContainerProvider<T> {
      * @param type the type of the container.
      * @param resourceConfig the resource configuration.
      * @param application the Web application the container delegates to for 
-     *         the handling of a HTTP request.
+     *         the handling of HTTP requests.
      * @throws ContainerException if there is an error creating the container.
      */
     T createContainer(Class<T> type, ResourceConfig resourceConfig, WebApplication application) 

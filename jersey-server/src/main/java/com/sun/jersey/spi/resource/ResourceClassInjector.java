@@ -58,8 +58,7 @@ import java.util.Map;
  * 
  * Analysis of the class will be performed using reflection to find 
  * {@link Injectable} instances and as a result the use of reflection is 
- * minimized when performing injection (to that of getting and setting
- * field values).
+ * minimized when performing injection.
  * 
  * @author Paul.Sandoz@Sun.Com
  */
@@ -80,9 +79,9 @@ public final class ResourceClassInjector {
     /**
      * Create a new resource class injector.
      * 
-     * @param ipc the injectable provider context to obtain injectables
-     * @param s the scope underwhich injection will be performed
-     * @param resource the abstract resource model
+     * @param ipc the injectable provider context to obtain injectables.
+     * @param s the scope underwhich injection will be performed.
+     * @param resource the abstract resource model.
      */
     public ResourceClassInjector(InjectableProviderContext ipc, Scope s, AbstractResource resource) {
         // processFields(ipc, s, resource.getResourceClass());

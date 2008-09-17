@@ -40,10 +40,9 @@ import com.sun.jersey.api.container.ContainerException;
 import javax.ws.rs.core.Context;
 
 /**
- * The resource context provides access to instances of specified 
- * resource classes (dependencies).
- * It can be injected into resource and provider classes using the {@link Context} 
- * annotation.
+ * The resource context provides access to instances of root resource classes.
+ * <p>
+ * It can be injected using the {@link Context} annotation.
  * 
  * @author <a href="mailto:martin.grotzke@freiheit.com">Martin Grotzke</a>
  */
@@ -51,6 +50,7 @@ public interface ResourceContext {
     
     /**
      * Provides an instance of the given resource class.
+     * 
      * @param <T> the type of the resource class
      * @param c the resource class
      * @return an instance if it could be resolved, otherwise null.

@@ -43,7 +43,7 @@ import com.sun.jersey.spi.service.ComponentProvider;
 
 /**
  * A provider that manages the creation of resource class instances. A provider
- * instance is specific to a particular class of resource.
+ * instance is specific to a particular class of a resource.
  * <p>
  * It is the responsibility of a ResourceProvider to perform injection onto
  * the properties of a resource. If injection is required then declare an 
@@ -57,6 +57,7 @@ public interface ResourceProvider {
     /**
      * Specifies the class of the resource that the provider
      * instance will manage access to.
+     *
      * @param provider the component provider
      * @param resourceProvider the component provider for resource classes
      * @param resource the abstract resource

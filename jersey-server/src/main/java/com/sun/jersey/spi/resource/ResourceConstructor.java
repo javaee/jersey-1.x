@@ -41,14 +41,15 @@ import com.sun.jersey.api.model.AbstractResourceConstructor;
 import com.sun.jersey.spi.inject.Injectable;
 import com.sun.jersey.spi.service.ComponentConstructor;
 import com.sun.jersey.spi.service.ComponentProvider.Scope;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
 /**
- *
- * @author ps23762
+ * A utility class to obtain the most suitable constructor for a 
+ * resource class.
+ * 
+ * @author Paul.Sandoz@Sun.Com
  */
 public class ResourceConstructor extends ComponentConstructor {
     public ResourceConstructor(InjectableProviderContext ipc) {
@@ -60,9 +61,10 @@ public class ResourceConstructor extends ComponentConstructor {
      * parameters and that has the most parameters associated with 
      * Injectable instances will be chosen.
      * 
-     * @param c the class to instantiate
-     * @param ar the abstract resource
-     * @param s the scope for which the injectables will be used
+     * @param <T> the type of the resource.
+     * @param c the class to instantiate.
+     * @param ar the abstract resource.
+     * @param s the scope for which the injectables will be used.
      * @return a list constructor and list of injectables for the constructor
      *         parameters.
      */

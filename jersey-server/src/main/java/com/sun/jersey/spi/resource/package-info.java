@@ -35,6 +35,6 @@
  * holder.
  */
 /**
- * Classes that define the contract for a resource provider.
+ * Provides support for plugable life-cycle declaration and implementation.
  */
 package com.sun.jersey.spi.resource;

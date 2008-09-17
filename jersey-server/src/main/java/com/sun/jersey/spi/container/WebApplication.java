@@ -45,8 +45,11 @@ import com.sun.jersey.spi.service.ComponentProvider;
 import java.io.IOException;
 
 /**
- * A Web application that manages a set of Web resource.
- *
+ * A Web application that manages a set of resource classes.
+ * <p>
+ * The web application will dispatch HTTP requests to the matching resource
+ * method on the matching resource class.
+ * 
  * @author Paul.Sandoz@Sun.Com
  */
 public interface WebApplication {
@@ -55,6 +58,7 @@ public interface WebApplication {
      * <p>
      * This method can only be called once. Further calls will result in an
      * exception.
+     *
      * @param resourceConfig the resource configuration containing the set
      *        of Web resources to be managed by the Web application.
      * @throws IllegalArgumentException if resourceConfig is null.
@@ -69,6 +73,7 @@ public interface WebApplication {
      * <p>
      * This method can only be called once. Further calls will result in an
      * exception.
+     * 
      * @param resourceConfig the resource configuration containing the set
      *        of Web resources to be managed by the Web application.
      * @param provider the component provider to use, if null the default
@@ -92,11 +97,11 @@ public interface WebApplication {
     WebApplication clone();
             
     /**
-     * Get the extended message body workers that can be used for getting
+     * Get the message body workers that can be used for getting
      * message body readers and writers. 
      * 
-     * @return the extended message body workers. The return value is 
-     * undefined before the web applicaiton is initialized.
+     * @return the message body workers. The return value is 
+     *         undefined before the web applicaiton is initialized.
      */
     MessageBodyWorkers getMessageBodyWorkers();
 
@@ -105,7 +110,7 @@ public interface WebApplication {
      * components other than resource classes.
      * 
      * @return the component provider. The return value is 
-     * undefined before the web applicaiton is initialized.
+     *         undefined before the web applicaiton is initialized.
      */
     ComponentProvider getComponentProvider();
 
@@ -114,7 +119,7 @@ public interface WebApplication {
      * resource classes.
      * 
      * @return the component provider. The return value is 
-     * undefined before the web applicaiton is initialized.
+     *         undefined before the web applicaiton is initialized.
      */
     ComponentProvider getResourceComponentProvider();
     
@@ -133,6 +138,7 @@ public interface WebApplication {
      * <p>
      * @param request the HTTP container request.
      * @param responseWriter the HTTP container response writer.
+     * @throws IOException if there is an IO error handling the request.
      */
     void handleRequest(ContainerRequest request, ContainerResponseWriter responseWriter) 
             throws IOException;
@@ -144,6 +150,7 @@ public interface WebApplication {
      * <p>
      * @param request the HTTP container request.
      * @param response the HTTP container response.
+     * @throws IOException if there is an IO error handling the request.
      */
     void handleRequest(ContainerRequest request, ContainerResponse response) 
             throws IOException;

@@ -54,14 +54,8 @@ public final class GrizzlyServerFactory {
     
     /**
      * Create a {@link SelectorThread} that registers an {@link Adapter} that 
-     * in turn manages all root resource classes found by searching the classes
+     * in turn manages all root resource and provder classes found by searching the classes
      * referenced in the java classath.
-     * <p>
-     * To avoid potential race conditions with the returned 
-     * {@link SelectorThread} instance it is recommended to sleep for a
-     * period of time after this method has been invoked to ensure the 
-     * {@link SelectorThread} has had enough time to intialize to the correct
-     * state.
      * <p>
      * This implementation defers to the 
      * {@link ContainerFactory#createContainer(Class)} method for creating
@@ -72,8 +66,11 @@ public final class GrizzlyServerFactory {
      *        are ignored If the URI port is not present then port 80 will be 
      *        used. The URI path, query and fragment components are ignored.
      * @return the select thread, with the endpoint started
+     * @throws IOException if an error occurs creating the container.
+     * @throws IllegalArgumentException if <code>u</code> is null
      */
-    public static SelectorThread create(String u) throws IOException {
+    public static SelectorThread create(String u)
+            throws IOException, IllegalArgumentException {            
         if (u == null)
             throw new IllegalArgumentException("The URI must not be null");
 
@@ -82,14 +79,8 @@ public final class GrizzlyServerFactory {
     
     /**
      * Create a {@link SelectorThread} that registers an {@link Adapter} that 
-     * in turn manages all root resource classes found by searching the classes
+     * in turn manages all root resource and provder classes found by searching the classes
      * referenced in the java classath.
-     * <p>
-     * To avoid potential race conditions with the returned 
-     * {@link SelectorThread} instance it is recommended to sleep for a
-     * period of time after this method has been invoked to ensure the 
-     * {@link SelectorThread} has had enough time to intialize to the correct
-     * state.
      * <p>
      * This implementation defers to the 
      * {@link ContainerFactory#createContainer(Class)} method for creating
@@ -100,21 +91,18 @@ public final class GrizzlyServerFactory {
      *        are ignored If the URI port is not present then port 80 will be 
      *        used. The URI path, query and fragment components are ignored.
      * @return the select thread, with the endpoint started
+     * @throws IOException if an error occurs creating the container.
+     * @throws IllegalArgumentException if <code>u</code> is null
      */
-    public static SelectorThread create(URI u) throws IOException {
+    public static SelectorThread create(URI u)
+            throws IOException, IllegalArgumentException {            
         return create(u, ContainerFactory.createContainer(Adapter.class));
     }
         
     /**
      * Create a {@link SelectorThread} that registers an {@link Adapter} that 
-     * in turn manages all root resource classes found by searching the classes
+     * in turn manages all root resource and provder classes found by searching the classes
      * referenced in the java classath.
-     * <p>
-     * To avoid potential race conditions with the returned 
-     * {@link SelectorThread} instance it is recommended to sleep for a
-     * period of time after this method has been invoked to ensure the 
-     * {@link SelectorThread} has had enough time to intialize to the correct
-     * state.
      *
      * @param u the URI to create the http server. The URI scheme must be
      *        equal to "http". The URI user information and host
@@ -122,8 +110,11 @@ public final class GrizzlyServerFactory {
      *        used. The URI path, query and fragment components are ignored.
      * @param adapter the Adapter
      * @return the select thread, with the endpoint started
+     * @throws IOException if an error occurs creating the container.
+     * @throws IllegalArgumentException if <code>u</code> is null
      */
-    public static SelectorThread create(String u, Adapter adapter) throws IOException {
+    public static SelectorThread create(String u, Adapter adapter)
+            throws IOException, IllegalArgumentException {
         if (u == null)
             throw new IllegalArgumentException("The URI must not be null");
 
@@ -132,14 +123,8 @@ public final class GrizzlyServerFactory {
     
     /**
      * Create a {@link SelectorThread} that registers an {@link Adapter} that 
-     * in turn manages all root resource classes found by searching the classes
+     * in turn manages all root resource and provder classes found by searching the classes
      * referenced in the java classath.
-     * <p>
-     * To avoid potential race conditions with the returned 
-     * {@link SelectorThread} instance it is recommended to sleep for a
-     * period of time after this method has been invoked to ensure the 
-     * {@link SelectorThread} has had enough time to intialize to the correct
-     * state.
      *
      * @param u the URI to create the http server. The URI scheme must be
      *        equal to "http". The URI user information and host
@@ -147,8 +132,11 @@ public final class GrizzlyServerFactory {
      *        used. The URI path, query and fragment components are ignored.
      * @param adapter the Adapter
      * @return the select thread, with the endpoint started
+     * @throws IOException if an error occurs creating the container.
+     * @throws IllegalArgumentException if <code>u</code> is null
      */
-    public static SelectorThread create(URI u, Adapter adapter) throws IOException {
+    public static SelectorThread create(URI u, Adapter adapter) 
+            throws IOException, IllegalArgumentException {
         if (u == null)
             throw new IllegalArgumentException("The URI must not be null");
             

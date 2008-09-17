@@ -550,8 +550,8 @@ public class ServletContainer extends HttpServlet implements ContainerListener {
      * , {@link ServletContext}, and {@link ServletConfig}.
      * <p>
      * An inheriting class may override this method to configure the 
-     * {@link WebApplication} to provide alternative or additional instance
-     * that may be injected into a root resource class, and may modify the
+     * {@link WebApplication} to provide alternative or additional instances
+     * that are resource or provider classes or instances, and may modify the
      * features and properties of the {@link ResourceConfig}. For an inheriting
      * class to extend configuration behaviour the overriding method MUST call
      * super.configure(servletConfig, rc, wa) as the first statement of that 

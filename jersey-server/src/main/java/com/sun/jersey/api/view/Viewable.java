@@ -39,7 +39,7 @@ package com.sun.jersey.api.view;
 
 /**
  * A viewable type referencing a template by name and a model to be passed
- * to the template. Such a type may be returned by an HTTP method of a 
+ * to the template. Such a type may be returned by a resource method of a 
  * resource class. In this respect the template is the view and the controller 
  * is the resource class in the Model View Controller pattern.
  * <p>

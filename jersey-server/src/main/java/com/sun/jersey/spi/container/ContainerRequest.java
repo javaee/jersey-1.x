@@ -74,7 +74,9 @@ import javax.ws.rs.core.Variant;
 import javax.ws.rs.ext.MessageBodyReader;
 
 /**
- * Containers instantiate, or inherit, and provide an instance to the 
+ * An in-bound HTTP request to be processed by the web application.
+ * <p>
+ * Containers instantiate, or inherit, and provide an instance to the
  * {@link WebApplication}.
  *
  * @author Paul.Sandoz@Sun.Com

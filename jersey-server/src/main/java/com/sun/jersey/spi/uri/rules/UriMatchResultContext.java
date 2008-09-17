@@ -39,7 +39,8 @@ package com.sun.jersey.spi.uri.rules;
 import java.util.regex.MatchResult;
 
 /**
- *
+ * The context for matching URI rules.
+ * 
  * @author Paul.Sandoz@Sun.Com
  */
 public interface UriMatchResultContext {

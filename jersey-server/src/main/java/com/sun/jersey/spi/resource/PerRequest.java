@@ -45,7 +45,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Used to annotate resource classes that require a new instance to be used
+ * Used to annotate resource classes that require a new instance
  * for each request.
  */
 @Target({ElementType.TYPE})

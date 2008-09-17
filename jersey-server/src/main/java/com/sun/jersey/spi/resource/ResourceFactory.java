@@ -34,14 +34,6 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-
-/*
- * ResourceFactory.java
- *
- * Created on July 9, 2007, 2:59 PM
- *
- */
-
 package com.sun.jersey.spi.resource;
 
 import java.lang.annotation.Documented;
@@ -66,6 +58,7 @@ public @interface ResourceFactory {
      * instance of the resource class. The specified class must implement
      * <code>ResourceProvider</code> and be annotated with
      * <code>@Provider</code>.
+     * @return the resource provider class.
      */
     public Class<? extends ResourceProvider> value();
 }

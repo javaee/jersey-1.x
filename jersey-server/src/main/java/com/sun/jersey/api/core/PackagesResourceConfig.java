@@ -46,8 +46,8 @@ import javax.ws.rs.ext.Provider;
 
 /**
  * A mutable implementation of {@link DefaultResourceConfig} that dynamically 
- * searches for root resource classes in a given a set of declared packages and
- * in all (if any) sub-packages of those declared packages.
+ * searches for root resource and provider classes in a given a set of
+ * declared package and in all (if any) sub-packages of those declared packages.
  * 
  * @author Paul.Sandoz@Sun.Com
  */

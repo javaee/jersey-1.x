@@ -52,6 +52,7 @@ import java.util.concurrent.Executors;
  * The {@link HttpServer} executor will be configued with instance returned from
  * {@link Executors#newCachedThreadPool() }. This behaviour may be overridden
  * before {@link HttpServer#start() } is called.
+ * 
  * @author Paul.Sandoz@Sun.Com
  */
 public final class HttpServerFactory {
@@ -75,8 +76,11 @@ public final class HttpServerFactory {
      *        as the context of the HTTP handler (and corresponds to the base 
      *        path). The URI query and fragment components are ignored.
      * @return the http server
+     * @throws IOException if an error occurs creating the container.
+     * @throws IllegalArgumentException if <code>u</code> is null
      */
-    public static HttpServer create(String u) throws IOException {
+    public static HttpServer create(String u) 
+            throws IOException, IllegalArgumentException {
         if (u == null)
             throw new IllegalArgumentException("The URI must not be null");
 
@@ -100,8 +104,11 @@ public final class HttpServerFactory {
      *        as the context of the HTTP handler (and corresponds to the base 
      *        path). The URI query and fragment components are ignored.
      * @return the http server
+     * @throws IOException if an error occurs creating the container.
+     * @throws IllegalArgumentException if <code>u</code> is null
      */
-    public static HttpServer create(URI u) throws IOException {
+    public static HttpServer create(URI u) 
+            throws IOException, IllegalArgumentException {
         return create(u, ContainerFactory.createContainer(HttpHandler.class));
     }
     
@@ -119,8 +126,11 @@ public final class HttpServerFactory {
      *        path). The URI query and fragment components are ignored.
      * @param handler the HTTP handler
      * @return the http server
+     * @throws IOException if an error occurs creating the container.
+     * @throws IllegalArgumentException if <code>u</code> is null
      */
-    public static HttpServer create(String u, HttpHandler handler) throws IOException {
+    public static HttpServer create(String u, HttpHandler handler) 
+            throws IOException, IllegalArgumentException {
         if (u == null)
             throw new IllegalArgumentException("The URI must not be null");
 
@@ -141,8 +151,11 @@ public final class HttpServerFactory {
      *        path). The URI query and fragment components are ignored.
      * @param handler the HTTP handler
      * @return the http server
+     * @throws IOException if an error occurs creating the container.
+     * @throws IllegalArgumentException if <code>u</code> is null
      */
-    public static HttpServer create(URI u, HttpHandler handler) throws IOException {
+    public static HttpServer create(URI u, HttpHandler handler) 
+            throws IOException, IllegalArgumentException {
         if (u == null)
             throw new IllegalArgumentException("The URI must not be null");
             

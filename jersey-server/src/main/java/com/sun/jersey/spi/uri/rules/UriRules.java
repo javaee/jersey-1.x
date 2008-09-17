@@ -40,11 +40,13 @@ package com.sun.jersey.spi.uri.rules;
 import java.util.Iterator;
 
 /**
- * A collection of URI rules that can be matched using associated patterns.
+ * A collection of URI rules that can be matched against a path using
+ * associated patterns.
  * <p>
  * The precedence of the rules and the type of patterns is specified by an 
  * implementation of this interface.
  * 
+ * @param <R> the type of rule.
  * @author Paul.Sandoz@Sun.Com
  */
 public interface UriRules<R> {

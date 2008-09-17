@@ -50,6 +50,12 @@ import javax.servlet.Servlet;
 /**
  * Factory for creating and starting Grizzly {@link SelectorThread} instances
  * for deploying a Servlet.
+ * <p>
+ * The default deployed server is an instance of {@link ServletContainer}. 
+ * <p>
+ * If no initialization parameters are declared (or is null) then root
+ * resource and provider classes will be found by searching the classes
+ * referenced in the java classpath.
  * 
  * @author Paul.Sandoz@Sun.Com
  */
@@ -57,29 +63,91 @@ public final class GrizzlyWebContainerFactory {
     
     private GrizzlyWebContainerFactory() {}
     
-    public static SelectorThread create(String u) throws IOException {
+    /**
+     * Create a {@link SelectorThread} that registers the {@link ServletContainer}.
+     *
+     * @param u the URI to create the http server. The URI scheme must be
+     *        equal to "http". The URI user information and host
+     *        are ignored If the URI port is not present then port 80 will be 
+     *        used. The URI path, query and fragment components are ignored.
+     * @return the select thread, with the endpoint started
+     * @throws IOException if an error occurs creating the container.
+     * @throws IllegalArgumentException if <code>u</code> is null
+     */
+    public static SelectorThread create(String u) 
+            throws IOException, IllegalArgumentException {
         if (u == null)
             throw new IllegalArgumentException("The URI must not be null");
 
         return create(URI.create(u));
     }
     
-    public static SelectorThread create(String u, Map<String, String> initParams) throws IOException {
+    /**
+     * Create a {@link SelectorThread} that registers the {@link ServletContainer}.
+     *
+     * @param u the URI to create the http server. The URI scheme must be
+     *        equal to "http". The URI user information and host
+     *        are ignored If the URI port is not present then port 80 will be 
+     *        used. The URI path, query and fragment components are ignored.
+     * @param initParams the servlet initialization parameters.
+     * @return the select thread, with the endpoint started
+     * @throws IOException if an error occurs creating the container.
+     * @throws IllegalArgumentException if <code>u</code> is null
+     */
+    public static SelectorThread create(String u, Map<String, String> initParams) 
+            throws IOException, IllegalArgumentException {
         if (u == null)
             throw new IllegalArgumentException("The URI must not be null");
         
         return create(URI.create(u), initParams);
     }
     
-    public static SelectorThread create(URI u) throws IOException {
+    /**
+     * Create a {@link SelectorThread} that registers the {@link ServletContainer}.
+     *
+     * @param u the URI to create the http server. The URI scheme must be
+     *        equal to "http". The URI user information and host
+     *        are ignored If the URI port is not present then port 80 will be 
+     *        used. The URI path, query and fragment components are ignored.
+     * @return the select thread, with the endpoint started
+     * @throws IOException if an error occurs creating the container.
+     * @throws IllegalArgumentException if <code>u</code> is null
+     */
+    public static SelectorThread create(URI u) 
+            throws IOException, IllegalArgumentException {
         return create(u, ServletContainer.class);
     }
         
+    /**
+     * Create a {@link SelectorThread} that registers the {@link ServletContainer}.
+     *
+     * @param u the URI to create the http server. The URI scheme must be
+     *        equal to "http". The URI user information and host
+     *        are ignored If the URI port is not present then port 80 will be 
+     *        used. The URI path, query and fragment components are ignored.
+     * @param initParams the servlet initialization parameters.
+     * @return the select thread, with the endpoint started
+     * @throws IOException if an error occurs creating the container.
+     * @throws IllegalArgumentException if <code>u</code> is null
+     */
     public static SelectorThread create(URI u, 
             Map<String, String> initParams) throws IOException {
         return create(u, ServletContainer.class, initParams);
     }
     
+    /**
+     * Create a {@link SelectorThread} that registers the declared
+     * servlet class.
+     *
+     * @param u the URI to create the http server. The URI scheme must be
+     *        equal to "http". The URI user information and host
+     *        are ignored If the URI port is not present then port 80 will be 
+     *        used. The URI path, query and fragment components are ignored.
+     * @param c the servlet class
+     * @return the select thread, with the endpoint started
+     * @throws IOException if an error occurs creating the container.
+     * @throws IllegalArgumentException if <code>u</code> is null
+     */
     public static SelectorThread create(String u, Class<? extends Servlet> c) throws IOException {
         if (u == null)
             throw new IllegalArgumentException("The URI must not be null");
@@ -87,6 +155,20 @@ public final class GrizzlyWebContainerFactory {
         return create(URI.create(u), c);
     }
     
+    /**
+     * Create a {@link SelectorThread} that registers the declared
+     * servlet class.
+     *
+     * @param u the URI to create the http server. The URI scheme must be
+     *        equal to "http". The URI user information and host
+     *        are ignored If the URI port is not present then port 80 will be 
+     *        used. The URI path, query and fragment components are ignored.
+     * @param c the servlet class
+     * @param initParams the servlet initialization parameters.
+     * @return the select thread, with the endpoint started
+     * @throws IOException if an error occurs creating the container.
+     * @throws IllegalArgumentException if <code>u</code> is null
+     */
     public static SelectorThread create(String u, Class<? extends Servlet> c,
             Map<String, String> initParams) throws IOException {
         if (u == null)
@@ -95,13 +177,42 @@ public final class GrizzlyWebContainerFactory {
         return create(URI.create(u), c, initParams);
     }
     
+    /**
+     * Create a {@link SelectorThread} that registers the declared
+     * servlet class.
+     *
+     * @param u the URI to create the http server. The URI scheme must be
+     *        equal to "http". The URI user information and host
+     *        are ignored If the URI port is not present then port 80 will be 
+     *        used. The URI path, query and fragment components are ignored.
+     * @param c the servlet class
+     * @return the select thread, with the endpoint started
+     * @throws IOException if an error occurs creating the container.
+     * @throws IllegalArgumentException if <code>u</code> is null
+     */
     public static SelectorThread create(URI u, Class<? extends Servlet> c) throws IOException {
         return create(u, c, null);
     }
     
+    /**
+     * Create a {@link SelectorThread} that registers the declared
+     * servlet class.
+     *
+     * @param u the URI to create the http server. The URI scheme must be
+     *        equal to "http". The URI user information and host
+     *        are ignored If the URI port is not present then port 80 will be 
+     *        used. The URI path, query and fragment components are ignored.
+     * @param c the servlet class
+     * @param initParams the servlet initialization parameters.
+     * @return the select thread, with the endpoint started
+     * @throws IOException if an error occurs creating the container.
+     * @throws IllegalArgumentException if <code>u</code> is null
+     */
     public static SelectorThread create(URI u, Class<? extends Servlet> c, 
             Map<String, String> initParams) throws IOException {
-        
+        if (u == null)
+            throw new IllegalArgumentException("The URI must not be null");
+
         ServletAdapter adapter = new ServletAdapter();
         if (initParams == null) {
             adapter.addInitParameter(ClasspathResourceConfig.PROPERTY_CLASSPATH, 

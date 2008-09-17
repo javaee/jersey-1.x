@@ -35,7 +35,6 @@
  * holder.
  */
 /**
- * Classes used when creating an instance of a container adaptor
- * that supports the API for a particular container.
+ * Provides support for creating HTTP-based containers.
  */
 package com.sun.jersey.api.container;

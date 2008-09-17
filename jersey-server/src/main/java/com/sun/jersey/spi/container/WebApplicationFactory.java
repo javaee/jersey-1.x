@@ -41,8 +41,8 @@ import com.sun.jersey.api.container.ContainerException;
 import com.sun.jersey.spi.service.ServiceFinder;
 
 /**
- * A factory for WebApplication instances. Container providers use this class
- * to obtain an instance of the API runtime.
+ * A factory for {@link WebApplication} instances. Container providers use this class
+ * to obtain an instance of {@link WebApplication} to initiate.
  *
  * @author Paul.Sandoz@Sun.Com
  */

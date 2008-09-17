@@ -110,6 +110,7 @@ public final class WebApplicationContext implements UriRuleContext, ExtendedUriI
     public void setMatchResult(MatchResult matchResult) {
         this.matchResult = matchResult;
     }
+    
     // UriRuleContext
     private final LinkedList<Object> resources = new LinkedList<Object>();
     private final LinkedList<MatchResult> matchResults = new LinkedList<MatchResult>();

@@ -40,9 +40,16 @@ package com.sun.jersey.spi.dispatch;
 import com.sun.jersey.api.core.HttpContext;
 
 /**
- *
+ * A resource method dispatcher.
+ * 
  * @author Paul.Sandoz@Sun.Com
  */
 public interface RequestDispatcher {
+    /**
+     * Dispatch to the resource method of the resource class instance.
+     *
+     * @param resource the resource class instance.
+     * @param context the HTTP context.
+     */
     public void dispatch(Object resource, HttpContext context);
 }

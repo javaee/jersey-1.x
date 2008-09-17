@@ -42,7 +42,8 @@ import com.sun.jersey.api.uri.UriTemplate;
 import java.util.List;
 
 /**
- *
+ * The context for processing URI rules.
+ * 
  * @author Paul.Sandoz@Sun.Com
  */
 public interface UriRuleContext extends HttpContext, UriMatchResultContext {
@@ -75,7 +76,8 @@ public interface UriRuleContext extends HttpContext, UriMatchResultContext {
     /**
      * Push the resource and matching URI template associated with the resource.
      * 
-     * @param resource
+     * @param resource the resource
+     * @param template the URI template associated with the resource
      */
     void pushResource(Object resource, UriTemplate template);
 

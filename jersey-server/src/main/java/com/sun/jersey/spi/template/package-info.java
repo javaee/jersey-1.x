@@ -34,21 +34,8 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-
-package com.sun.jersey.spi.resource;
-
-import com.sun.jersey.impl.resource.SingletonProvider;
-import java.lang.annotation.Documented;
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
-
 /**
- * Used to annotate resources that require one instance per web application.
+ * Provides support for view aspect of model view controller and templates that
+ * produce views.
  */
-@Target({ElementType.TYPE})
-@Retention(RetentionPolicy.RUNTIME)
-@Documented
-@ResourceFactory(SingletonProvider.class)
-public @interface Singleton {}
+package com.sun.jersey.spi.template;

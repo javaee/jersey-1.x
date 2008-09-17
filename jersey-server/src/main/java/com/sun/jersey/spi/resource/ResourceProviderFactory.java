@@ -64,7 +64,7 @@ public class ResourceProviderFactory {
      * <p>
      * This method will first search for a class that implements 
      * {@link ResourceProvider} that is declared as an annotation on 
-     * resourceClass.
+     * the resource.
      * 
      * If not found the the {@link ResourceProvider} class will be looked up 
      * in the resourceProperties using the property name 

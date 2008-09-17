@@ -38,7 +38,7 @@
 package com.sun.jersey.spi.uri.rules;
 
 /**
- * A URI rule that operates on a URI path.
+ * A URI rule that can accept a URI path.
  *
  * @author Paul.Sandoz@Sun.Com
  */

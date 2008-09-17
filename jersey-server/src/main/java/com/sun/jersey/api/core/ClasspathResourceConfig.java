@@ -47,8 +47,8 @@ import javax.ws.rs.ext.Provider;
 
 /**
  * A mutable implementation of {@link DefaultResourceConfig} that dynamically 
- * searches for root resource classes and providers in the paths declared by 
- * the property {@link ClasspathResourceConfig#PROPERTY_CLASSPATH}. 
+ * searches for root resource and provider classes in the files and directories
+ * declared by the property {@link ClasspathResourceConfig#PROPERTY_CLASSPATH}. 
  * That property MUST be included in the map of initial properties passed to 
  * the constructor.
  * 

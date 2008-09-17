@@ -35,7 +35,7 @@
  * holder.
  */
 /**
- * Classes that define the contract that a container adaptor
- * must implement in order to host API classes.
+ * Provides support for containers and the web application that manages
+ * resource classes.
  */
 package com.sun.jersey.spi.container;
