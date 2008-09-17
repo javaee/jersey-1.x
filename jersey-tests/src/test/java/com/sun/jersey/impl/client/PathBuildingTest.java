@@ -35,74 +35,44 @@
  * holder.
  */
 
-package com.sun.jersey.api.client;
+package com.sun.jersey.impl.client;
+
+import com.sun.jersey.api.client.AsyncWebResource;
+import com.sun.jersey.impl.container.grizzly.*;
+import com.sun.jersey.api.client.Client;
+import com.sun.jersey.api.client.WebResource;
+import java.util.concurrent.Future;
+import javax.ws.rs.Path;
+import javax.ws.rs.GET;
 
 /**
- * An abstract class providing support for registering and managing a chain
- * of {@link ClientFilter} instances.
- * 
+ *
  * @author Paul.Sandoz@Sun.Com
  */
-public abstract class Filterable {
-    private final ClientHandler root;
-    
-    private ClientHandler head;
-   
-    /**
-     * @param root the root handler to handle the request and return a response.
-     */
-    protected Filterable(ClientHandler root) {
-        this.root = this.head = root;
+public class PathBuildingTest extends AbstractGrizzlyServerTester {
+    @Path("/x/y/z")
+    public static class Resource {
+        @GET
+        public String get() {
+            return "GET";
+        }               
+    }
+        
+    public PathBuildingTest(String testName) {
+        super(testName);
     }
     
-    protected Filterable(Filterable that) {
-        this.root = that.root;
-        this.head = that.head;
-    }
-    
-    /**
-     * Add a filter to the filter chain.
-     * 
-     * @param f the filter to add.
-     */
-    public void addFilter(ClientFilter f) {
-        f.setNext(head);
-        this.head = f;
+    public void testGet() throws Exception {
+        startServer(Resource.class);
+        WebResource r = Client.create().resource(getUri().build());
+        String s = r.path("x").path("y").path("z").get(String.class);
+        assertEquals("GET", s);
     }
 
-    /**
-     * Remove a filter from the chain.
-     * 
-     * @param f the filter to remove.
-     */
-    public void removeFilter(ClientFilter f) {
-        if (head == root) return;
-        
-        if (head == f) head = f.getNext();
-
-        ClientFilter e = (ClientFilter)head;
-        while (e.getNext() != f) {
-            if (e.getNext() == root) return;
-            
-            e = (ClientFilter)e.getNext();
-        }
-        
-        e.setNext(f.getNext());
-    }
-    
-    /**
-     * Remove all filters from the filter chain.
-     */
-    public void removeAllFilters() {
-        this.head = root;
-    }
-    
-    /**
-     * Get the head client handler of the filter chain.
-     * 
-     * @return the head client handler of the filter chain.
-     */
-    protected ClientHandler getHeadHandler() {
-        return head;
+    public void testGetAsync() throws Exception {
+        startServer(Resource.class);
+        AsyncWebResource r = Client.create().asyncResource(getUri().build());
+        Future<String> s = r.path("x").path("y").path("z").get(String.class);
+        assertEquals("GET", s.get());
     }
 }

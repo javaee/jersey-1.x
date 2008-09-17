@@ -67,6 +67,17 @@ public interface AsyncUniformInterface {
     
     
     /**
+     * Invoke the OPTIONS method.
+     * 
+     * @param gt the generic type of the returned response.
+     * @return an instance of type represented by the generic type.
+     * @throws UniformInterfaceException if the status of the HTTP response is 
+     *         greater than or equal to 300 and <code>gt<code> does not
+     *         represent the type {@link ClientResponse}.
+     */
+    <T> Future<T> options(GenericType<T> gt) throws UniformInterfaceException;
+
+    /**
      * Invoke the GET method.
      * 
      * @param c the type of the returned response.
@@ -76,6 +87,17 @@ public interface AsyncUniformInterface {
      *         {@link ClientResponse}.
      */
     <T> Future<T> get(Class<T> c) throws UniformInterfaceException;
+
+    /**
+     * Invoke the GET method.
+     * 
+     * @param gt the generic type of the returned response.
+     * @return an instance of type represented by the generic type.
+     * @throws UniformInterfaceException if the status of the HTTP response is 
+     *         greater than or equal to 300 and <code>gt<code> does not
+     *         represent the type {@link ClientResponse}.
+     */
+    <T> Future<T> get(GenericType<T> gt) throws UniformInterfaceException;
             
     
     /**
@@ -115,6 +137,17 @@ public interface AsyncUniformInterface {
     /**
      * Invoke the PUT method with a request entity that returns a response.
      * 
+     * @param gt the generic type of the returned response.
+     * @return an instance of type represented by the generic type.
+     * @throws UniformInterfaceException if the status of the HTTP response is 
+     *         greater than or equal to 300 and <code>gt<code> does not
+     *         represent the type {@link ClientResponse}.
+     */
+    <T> Future<T> put(GenericType<T> gt) throws UniformInterfaceException;
+
+    /**
+     * Invoke the PUT method with a request entity that returns a response.
+     * 
      * @param c the type of the returned response.
      * @param requestEntity the request entity.
      * @return an instance of type <code>c</code>.
@@ -125,6 +158,18 @@ public interface AsyncUniformInterface {
     <T> Future<T> put(Class<T> c, Object requestEntity) 
             throws UniformInterfaceException;
     
+    /**
+     * Invoke the PUT method with a request entity that returns a response.
+     * 
+     * @param gt the generic type of the returned response.
+     * @param requestEntity the request entity.
+     * @return an instance of type represented by the generic type.
+     * @throws UniformInterfaceException if the status of the HTTP response is 
+     *         greater than or equal to 300 and <code>gt<code> does not
+     *         represent the type {@link ClientResponse}.
+     */
+    <T> Future<T> put(GenericType<T> gt, Object requestEntity) 
+            throws UniformInterfaceException;
     
     /**
      * Invoke the POST method with no request entity or response.
@@ -163,6 +208,17 @@ public interface AsyncUniformInterface {
     /**
      * Invoke the POST method with a request entity that returns a response.
      * 
+     * @param gt the generic type of the returned response.
+     * @return an instance of type represented by the generic type.
+     * @throws UniformInterfaceException if the status of the HTTP response is 
+     *         greater than or equal to 300 and <code>gt<code> does not
+     *         represent the type {@link ClientResponse}.
+     */
+    <T> Future<T> post(GenericType<T> gt) throws UniformInterfaceException;
+
+    /**
+     * Invoke the POST method with a request entity that returns a response.
+     * 
      * @param c the type of the returned response.
      * @param requestEntity the request entity.
      * @return an instance of type <code>c</code>.
@@ -171,6 +227,19 @@ public interface AsyncUniformInterface {
      *         {@link ClientResponse}.
      */
     <T> Future<T> post(Class<T> c, Object requestEntity) 
+            throws UniformInterfaceException;
+
+    /**
+     * Invoke the POST method with a request entity that returns a response.
+     * 
+     * @param gt the generic type of the returned response.
+     * @param requestEntity the request entity.
+     * @return an instance of type represented by the generic type.
+     * @throws UniformInterfaceException if the status of the HTTP response is 
+     *         greater than or equal to 300 and <code>gt<code> does not
+     *         represent the type {@link ClientResponse}.
+     */
+    <T> Future<T> post(GenericType<T> gt, Object requestEntity)
             throws UniformInterfaceException;
             
     
@@ -211,6 +280,17 @@ public interface AsyncUniformInterface {
     /**
      * Invoke the DELETE method with a request entity that returns a response.
      * 
+     * @param gt the generic type of the returned response.
+     * @return an instance of type represented by the generic type.
+     * @throws UniformInterfaceException if the status of the HTTP response is 
+     *         greater than or equal to 300 and <code>gt<code> does not
+     *         represent the type {@link ClientResponse}.
+     */
+    <T> Future<T> delete(GenericType<T> gt) throws UniformInterfaceException;
+
+    /**
+     * Invoke the DELETE method with a request entity that returns a response.
+     * 
      * @param c the type of the returned response.
      * @param requestEntity the request entity.
      * @return an instance of type <code>c</code>.
@@ -221,6 +301,18 @@ public interface AsyncUniformInterface {
     <T> Future<T> delete(Class<T> c, Object requestEntity) 
             throws UniformInterfaceException;
 
+    /**
+     * Invoke the DELETE method with a request entity that returns a response.
+     * 
+     * @param gt the generic type of the returned response.
+     * @param requestEntity the request entity.
+     * @return an instance of type represented by the generic type.
+     * @throws UniformInterfaceException if the status of the HTTP response is 
+     *         greater than or equal to 300 and <code>gt<code> does not
+     *         represent the type {@link ClientResponse}.
+     */
+    <T> Future<T> delete(GenericType<T> gt, Object requestEntity)
+            throws UniformInterfaceException;
     
     /**
      * Invoke a HTTP method with no request entity or response.
@@ -261,6 +353,18 @@ public interface AsyncUniformInterface {
     <T> Future<T> method(String method, Class<T> c) throws UniformInterfaceException;
 
     /**
+     * Invoke a HTTP method with no request entity that returns a response.
+     * 
+     * @param method the HTTP method.
+     * @param gt the generic type of the returned response.
+     * @return an instance of type represented by the generic type.
+     * @throws UniformInterfaceException if the status of the HTTP response is 
+     *         greater than or equal to 300 and <code>gt<code> does not
+     *         represent the type {@link ClientResponse}.
+     */
+    <T> Future<T> method(String method, GenericType<T> gt) throws UniformInterfaceException;
+
+    /**
      * Invoke a HTTP method with a request entity that returns a response.
      * 
      * @param method the HTTP method.
@@ -272,5 +376,20 @@ public interface AsyncUniformInterface {
      *         {@link ClientResponse}.
      */
     <T> Future<T> method(String method, Class<T> c, Object requestEntity) 
+            throws UniformInterfaceException;  
+    
+    /**
+     * Invoke a HTTP method with a request entity that returns a response.
+     * 
+     * @param method the HTTP method.
+     * @param gt the generic type of the returned response.
+     * @param requestEntity the request entity.
+     * @return an instance of type represented by the generic type.
+     * @throws UniformInterfaceException if the status of the HTTP response is 
+     *         greater than or equal to 300 and <code>gt<code> does not
+     *         represent the type {@link ClientResponse}.
+     */
+    <T> Future<T> method(String method, GenericType<T> gt, Object requestEntity) 
             throws UniformInterfaceException;    
+    
 }

@@ -59,10 +59,15 @@ public final class WebResource extends Filterable implements
         RequestBuilder<WebResource.Builder>,
         UniformInterface {    
     private final URI u;
-    
+
     /* package */ WebResource(ClientHandler c, URI u) {
         super(c);
         this.u = u;
+    }
+    
+    private WebResource(WebResource that, UriBuilder ub) {
+        super(that);
+        this.u = ub.build();
     }
     
     /**
@@ -86,195 +91,202 @@ public final class WebResource extends Filterable implements
     // UniformInterface
     
     public ClientResponse head() {
-        return getHeadHandler().handle(new ClientRequestImpl(u, "HEAD"));
+        return getHeadHandler().handle(new ClientRequestImpl(getURI(), "HEAD"));
     }
         
     public <T> T options(Class<T> c) {
-        return handle(c, new ClientRequestImpl(u, "OPTIONS"));
+        return handle(c, new ClientRequestImpl(getURI(), "OPTIONS"));
     }
         
     public <T> T options(GenericType<T> gt) {
-        return handle(gt, new ClientRequestImpl(u, "OPTIONS"));            
+        return handle(gt, new ClientRequestImpl(getURI(), "OPTIONS"));            
     }
         
     public <T> T get(Class<T> c) {
-        return handle(c, new ClientRequestImpl(u, "GET"));
+        return handle(c, new ClientRequestImpl(getURI(), "GET"));
     }
             
     public <T> T get(GenericType<T> gt) {
-        return handle(gt, new ClientRequestImpl(u, "GET"));            
+        return handle(gt, new ClientRequestImpl(getURI(), "GET"));            
     }
         
     public void put() {
-        voidHandle(new ClientRequestImpl(u, "PUT", null));
+        voidHandle(new ClientRequestImpl(getURI(), "PUT", null));
     }
     
     public void put(Object requestEntity) {
-        voidHandle(new ClientRequestImpl(u, "PUT", requestEntity));
+        voidHandle(new ClientRequestImpl(getURI(), "PUT", requestEntity));
     }
     
     public <T> T put(Class<T> c) {
-        return handle(c, new ClientRequestImpl(u, "PUT"));
+        return handle(c, new ClientRequestImpl(getURI(), "PUT"));
     }
 
     public <T> T put(GenericType<T> gt) {
-        return handle(gt, new ClientRequestImpl(u, "PUT"));
+        return handle(gt, new ClientRequestImpl(getURI(), "PUT"));
     }
 
     public <T> T put(Class<T> c, Object requestEntity) {
-        return handle(c, new ClientRequestImpl(u, "PUT", requestEntity));
+        return handle(c, new ClientRequestImpl(getURI(), "PUT", requestEntity));
     }
             
     public <T> T put(GenericType<T> gt, Object requestEntity) {
-        return handle(gt, new ClientRequestImpl(u, "PUT", requestEntity));
+        return handle(gt, new ClientRequestImpl(getURI(), "PUT", requestEntity));
     }
 
     public void post() {
-        voidHandle(new ClientRequestImpl(u, "POST"));
+        voidHandle(new ClientRequestImpl(getURI(), "POST"));
     }
     
     public void post(Object requestEntity) {
-        voidHandle(new ClientRequestImpl(u, "POST", requestEntity));
+        voidHandle(new ClientRequestImpl(getURI(), "POST", requestEntity));
     }
     
     public <T> T post(Class<T> c) {
-        return handle(c, new ClientRequestImpl(u, "POST"));
+        return handle(c, new ClientRequestImpl(getURI(), "POST"));
     }
 
     public <T> T post(GenericType<T> gt) {
-        return handle(gt, new ClientRequestImpl(u, "POST"));
+        return handle(gt, new ClientRequestImpl(getURI(), "POST"));
     }
     
     public <T> T post(Class<T> c, Object requestEntity) {
-        return handle(c, new ClientRequestImpl(u, "POST", requestEntity));
+        return handle(c, new ClientRequestImpl(getURI(), "POST", requestEntity));
     }
             
     public <T> T post(GenericType<T> gt, Object requestEntity) {
-        return handle(gt, new ClientRequestImpl(u, "POST", requestEntity));
+        return handle(gt, new ClientRequestImpl(getURI(), "POST", requestEntity));
     }
     
     public void delete() {
-        voidHandle(new ClientRequestImpl(u, "DELETE"));
+        voidHandle(new ClientRequestImpl(getURI(), "DELETE"));
     }
     
     public void delete(Object requestEntity) {
-        voidHandle(new ClientRequestImpl(u, "DELETE", requestEntity));
+        voidHandle(new ClientRequestImpl(getURI(), "DELETE", requestEntity));
     }
     
     public <T> T delete(Class<T> c) {
-        return handle(c, new ClientRequestImpl(u, "DELETE"));    
+        return handle(c, new ClientRequestImpl(getURI(), "DELETE"));    
     }
 
     public <T> T delete(GenericType<T> gt) {
-        return handle(gt, new ClientRequestImpl(u, "DELETE"));
+        return handle(gt, new ClientRequestImpl(getURI(), "DELETE"));
     }
     
     public <T> T delete(Class<T> c, Object requestEntity) {
-        return handle(c, new ClientRequestImpl(u, "DELETE", requestEntity));
+        return handle(c, new ClientRequestImpl(getURI(), "DELETE", requestEntity));
     }
       
     public <T> T delete(GenericType<T> gt, Object requestEntity) {
-        return handle(gt, new ClientRequestImpl(u, "DELETE", requestEntity));
+        return handle(gt, new ClientRequestImpl(getURI(), "DELETE", requestEntity));
     }
     
     public void method(String method) {
-        voidHandle(new ClientRequestImpl(u, method));        
+        voidHandle(new ClientRequestImpl(getURI(), method));        
     }
     
     public void method(String method, Object requestEntity) {
-        voidHandle(new ClientRequestImpl(u, method, requestEntity));        
+        voidHandle(new ClientRequestImpl(getURI(), method, requestEntity));        
     }
     
     public <T> T method(String method, Class<T> c) {
-        return handle(c, new ClientRequestImpl(u, method));            
+        return handle(c, new ClientRequestImpl(getURI(), method));            
     }
     
     public <T> T method(String method, GenericType<T> gt) {
-        return handle(gt, new ClientRequestImpl(u, method));            
+        return handle(gt, new ClientRequestImpl(getURI(), method));            
     }
     
     public <T> T method(String method, Class<T> c, Object requestEntity) {
-        return handle(c, new ClientRequestImpl(u, method, requestEntity));        
+        return handle(c, new ClientRequestImpl(getURI(), method, requestEntity));        
     }
     
     public <T> T method(String method, GenericType<T> gt, Object requestEntity) {
-        return handle(gt, new ClientRequestImpl(u, method, requestEntity));        
+        return handle(gt, new ClientRequestImpl(getURI(), method, requestEntity));        
     }
     
     // RequestBuilder<WebResource.Builder>
     
     public Builder entity(Object entity) {
-        return new Builder(u).entity(entity);
+        return new Builder(getURI()).entity(entity);
     }
 
     public Builder entity(Object entity, MediaType type) {
-        return new Builder(u).entity(entity, type);
+        return new Builder(getURI()).entity(entity, type);
     }
 
     public Builder entity(Object entity, String type) {
-        return new Builder(u).entity(entity, type);
+        return new Builder(getURI()).entity(entity, type);
     }
 
     public Builder type(MediaType type) {
-        return new Builder(u).type(type);
+        return new Builder(getURI()).type(type);
     }
         
     public Builder type(String type) {
-        return new Builder(u).type(type);
+        return new Builder(getURI()).type(type);
     }
     
     public Builder accept(MediaType... types) {
-        return new Builder(u).accept(types);
+        return new Builder(getURI()).accept(types);
     }
 
     public Builder accept(String... types) {
-        return new Builder(u).accept(types);
+        return new Builder(getURI()).accept(types);
     }    
     
     public Builder acceptLanguage(Locale... locales) {
-        return new Builder(u).acceptLanguage(locales);
+        return new Builder(getURI()).acceptLanguage(locales);
     }
 
     public Builder acceptLanguage(String... locales) {
-        return new Builder(u).acceptLanguage(locales);
+        return new Builder(getURI()).acceptLanguage(locales);
     }    
     
     public Builder cookie(Cookie cookie) {
-        return new Builder(u).cookie(cookie);
+        return new Builder(getURI()).cookie(cookie);
     }
     
     public Builder header(String name, Object value) {
-        return new Builder(u).header(name, value);
+        return new Builder(getURI()).header(name, value);
     }
 
     // URI specific building
     
     /**
-     * Start building from an additional path from the URI to the resource
-     * 
+     * Create a new WebResource from this web resource with an additional path
+     * added to the URI of this web resource.
+     * <p>
+     * Any filters on this web resource are inherited. Removal of filters
+     * may cause undefined behaviour.
+     *
      * @param path the additional path.
      * 
-     * @return the builder.
+     * @return the new web resource.
      */
-    public Builder path(String path) {
-        return new Builder(UriBuilder.fromUri(u).path(path).build());
+    public WebResource path(String path) {
+        return new WebResource(this, getBuilder().path(path));
     }
 
     /**
-     * Start building from a URI.
+     * Create a new WebResource from this web resource.
      * <p>
      * If the URI contains a path component and the path starts with a '/' then
-     * the path of the resource proxy URI is replaced. Otherise the path is 
-     * appended to the path of the resource proxy URI.
+     * the path of this web resource URI is replaced. Otherwise the path is
+     * appended.
      * <p>
      * If the URI contains query parameters then those query parameters will
-     * replace the query parameters (if any) of the resource proxy URI.
+     * replace the query parameters (if any) of this web resource.
+     * <p>
+     * Any filters on this web resource are inherited. Removal of filters
+     * may cause undefined behaviour.
      * 
      * @param uri the URI.
-     * @return the builder.
+     * @return the new web resource.
      */
-    public Builder uri(URI uri) {
-        UriBuilder b = UriBuilder.fromUri(u);
+    public WebResource uri(URI uri) {
+        UriBuilder b = getBuilder();
         String path = uri.getRawPath();
         if (path != null && path.length() > 0) {
             if (path.startsWith("/")) {
@@ -287,7 +299,7 @@ public final class WebResource extends Filterable implements
         if (query != null && query.length() > 0) {
             b.replaceQuery(query);        
         }
-        return new Builder(b.build());
+        return new WebResource(this, b);
     }
     
     // Builder that builds client request and handles it
@@ -463,6 +475,7 @@ public final class WebResource extends Filterable implements
     private void voidHandle(ClientRequest ro) {
         ClientResponse r = getHeadHandler().handle(ro);
         
-        if (r.getStatus() >= 300) throw new UniformInterfaceException(r);
+        if (r.getStatus() >= 300) 
+            throw new UniformInterfaceException("Status: " + r.getStatus(), r);
     }
 }
