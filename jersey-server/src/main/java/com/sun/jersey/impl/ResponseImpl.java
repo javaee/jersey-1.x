@@ -38,7 +38,7 @@
 package com.sun.jersey.impl;
 
 import com.sun.jersey.api.core.HttpRequestContext;
-import com.sun.jersey.impl.container.OutBoundHeaders;
+import com.sun.jersey.api.OutBoundHeaders;
 import java.lang.reflect.Type;
 import java.net.URI;
 import java.util.Iterator;

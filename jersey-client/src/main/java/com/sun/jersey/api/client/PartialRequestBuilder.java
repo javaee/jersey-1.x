@@ -37,7 +37,7 @@
 
 package com.sun.jersey.api.client;
 
-import com.sun.jersey.impl.container.OutBoundHeaders;
+import com.sun.jersey.api.OutBoundHeaders;
 import java.util.Locale;
 import javax.ws.rs.core.Cookie;
 import javax.ws.rs.core.MediaType;

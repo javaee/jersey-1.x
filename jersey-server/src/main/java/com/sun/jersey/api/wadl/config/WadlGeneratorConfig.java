@@ -78,7 +78,7 @@ import com.sun.jersey.impl.wadl.WadlGenerator;
  * to the name of your subclass. This class might look like this:
  * <pre><code>class MyWadlGeneratorConfig extends WadlGeneratorConfig {
 
-        @Override
+        &ampOverride
         public List<WadlGeneratorDescription> configure() {
             return generator( MyWadlGenerator.class )
                 .prop( "foo", propValue )

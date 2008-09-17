@@ -38,7 +38,7 @@ package com.sun.jersey.impl.client;
 
 import com.sun.jersey.api.client.ClientRequest;
 import com.sun.jersey.api.client.ClientRequestAdapter;
-import com.sun.jersey.impl.container.OutBoundHeaders;
+import com.sun.jersey.api.OutBoundHeaders;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.URI;

@@ -38,7 +38,7 @@
 package com.sun.jersey.impl.container.servlet;
 
 import com.sun.jersey.spi.container.ContainerRequest;
-import com.sun.jersey.spi.container.InBoundHeaders;
+import com.sun.jersey.api.InBoundHeaders;
 import com.sun.jersey.spi.container.WebApplication;
 import java.io.InputStream;
 import java.net.URI;

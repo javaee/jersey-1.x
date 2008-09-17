@@ -104,7 +104,7 @@ public class UriPattern {
     /**
      * Construct a new URI pattern.
      * 
-     * @param regex the regular expression.
+     * @param regexPattern  the regular expression pattern
      * @throws IllegalArgumentException if the regexPattern is null.
      */
     public UriPattern(Pattern regexPattern) {
@@ -114,8 +114,8 @@ public class UriPattern {
     /**
      * Construct a new URI pattern.
      * 
-     * @param regex the regular expression. If the expression is null then
-     *        the pattern will only match a null or empty URI path.
+     * @param regexPattern the regular expression pattern
+     * @param groupIndexes the array of group indexes to capturing groups.
      */
     public UriPattern(Pattern regexPattern, int[] groupIndexes) {
         if (regexPattern == null)
@@ -135,6 +135,11 @@ public class UriPattern {
         return regex;
     }
 
+    /**
+     * Get the group indexes.
+     *
+     * @return the group indexes.
+     */
     public final int[] getGroupIndexes() {
         return groupIndexes;
     }

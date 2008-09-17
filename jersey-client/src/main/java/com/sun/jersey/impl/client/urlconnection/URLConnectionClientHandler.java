@@ -36,7 +36,7 @@
  */
 package com.sun.jersey.impl.client.urlconnection;
 
-import com.sun.jersey.spi.container.InBoundHeaders;
+import com.sun.jersey.api.InBoundHeaders;
 import com.sun.jersey.api.client.ClientHandler;
 import com.sun.jersey.api.client.ClientHandlerException;
 import com.sun.jersey.api.client.ClientRequest;

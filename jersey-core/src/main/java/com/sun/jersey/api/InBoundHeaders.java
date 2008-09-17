@@ -35,7 +35,7 @@
  * holder.
  */
 
-package com.sun.jersey.spi.container;
+package com.sun.jersey.api;
 
 import com.sun.jersey.impl.util.KeyComparatorHashMap;
 import com.sun.jersey.impl.util.StringIgnoreCaseKeyComparator;
@@ -46,9 +46,11 @@ import java.util.List;
 import javax.ws.rs.core.MultivaluedMap;
 
 /**
- * Containers instantiate, populate with request headers/values, and provide 
- * the instance to the {@link ContainerRequest}.
-
+ * In-bound HTTP headers.
+ * <p>
+ * Such HTTP headers will be associated with the in-bound HTTP request on the
+ * server-side and the in-bound HTTP response on the client-side.
+ *
  * @author Paul.Sandoz@Sun.Com
  */
 public final class InBoundHeaders 

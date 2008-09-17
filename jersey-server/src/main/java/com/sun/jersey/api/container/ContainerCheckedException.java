@@ -41,7 +41,7 @@ package com.sun.jersey.api.container;
  * <p>
  * The runtime will catch such exceptions and attempt to map the checked
  * exception to a registered {@link javax.ws.rs.ext.ExceptionMapper} that may
- * provide an appropriate {@link javax.ws.core.Response} instance.
+ * provide an appropriate {@link javax.ws.rs.core.Response} instance.
  * 
  * @author Paul.Sandoz@Sun.Com
  */

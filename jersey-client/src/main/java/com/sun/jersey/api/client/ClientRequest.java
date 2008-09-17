@@ -175,7 +175,7 @@ public abstract class ClientRequest {
      * obtain a {@link HeaderDelegate} to convert the value to a string.
      * <p>
      * Containers may use this method to convert the header values obtained
-     * from the {@link #getHttpHeaders}
+     * from the {@link #getMetadata()}.
      * 
      * @param headerValue the header value as an object
      * @return the string value

@@ -37,6 +37,7 @@
 
 package com.sun.jersey.spi.service;
 
+import com.sun.jersey.spi.inject.InjectableProvider;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.AccessibleObject;
 

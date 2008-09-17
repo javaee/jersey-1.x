@@ -51,10 +51,11 @@ import com.sun.jersey.spi.container.ContainerNotifier;
 import com.sun.jersey.spi.container.ContainerRequest;
 import com.sun.jersey.spi.container.ContainerResponse;
 import com.sun.jersey.spi.container.ContainerResponseWriter;
-import com.sun.jersey.spi.container.InBoundHeaders;
+import com.sun.jersey.api.InBoundHeaders;
 import com.sun.jersey.spi.container.WebApplication;
 import com.sun.jersey.spi.container.WebApplicationFactory;
 import com.sun.jersey.spi.inject.SingletonTypeInjectableProvider;
+import com.sun.jersey.spi.service.ComponentProvider;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.lang.reflect.Constructor;
@@ -99,13 +100,13 @@ import javax.ws.rs.core.UriBuilder;
  * If the initialization parameter 
  * "com.sun.jersey.config.property.resourceConfigClass" is not present and a
  * initialization parameter "com.sun.jersey.config.property.packages" is present 
- * (see {@link PackagesResourceConfig.PROPERTY_PACKAGES}) a new instance of
+ * (see {@link PackagesResourceConfig#PROPERTY_PACKAGES}) a new instance of
  * {@link PackagesResourceConfig} is created. The initialization parameter 
  * "com.sun.jersey.config.property.packages" MUST be set to provide one or
  * more package names. Each package name MUST be separated by ';'.
  * 
  * The package names are added as a property value to a Map instance using 
- * the property name (@link PackagesResourceConfig.PROPERTY_PACKAGES}. Any 
+ * the property name (@link PackagesResourceConfig#PROPERTY_PACKAGES}. Any
  * additional initialization parameters are then added to the Map instance. 
  * Then that Map instance is passed to the constructor of 
  * {@link PackagesResourceConfig}.
@@ -134,6 +135,13 @@ import javax.ws.rs.core.UriBuilder;
  * resource class or a parameter of a method of root resource class that is 
  * annotated with {@link javax.ws.rs.core.Context}: {@link HttpServletRequest}, 
  * {@link HttpServletResponse}, {@link ServletContext}, and {@link ServletConfig}.
+ * 
+ * <p>
+ * A {@link ComponentProvider} instance may be registered by extending this class
+ * and overriding the method {@link #initiate(ResourceConfig, WebApplication)}
+ * to initiate the {@link WebApplication} with the {@link ComponentProvider} 
+ * instance.
+ * 
  */
 public class ServletContainer extends HttpServlet implements ContainerListener {
     public static final String APPLICATION_CONFIG_CLASS =

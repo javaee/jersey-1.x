@@ -46,7 +46,7 @@ import javax.ws.rs.core.MediaType;
  * the request from the built information are left undefined and 
  * implementations must define such methods.
  * 
- * @param T the type than implements {@link RequestBuilder}.
+ * @param <T> the type than implements {@link RequestBuilder}.
  * @author Paul.Sandoz@Sun.Com
  */
 public interface RequestBuilder<T extends RequestBuilder> {
@@ -112,7 +112,7 @@ public interface RequestBuilder<T extends RequestBuilder> {
     /**
      * Add acceptable languages
      * 
-     * @param types an array of the acceptable languages
+     * @param locales an array of the acceptable languages
      * @return the builder.
      */
     T acceptLanguage(Locale... locales);
@@ -120,7 +120,7 @@ public interface RequestBuilder<T extends RequestBuilder> {
     /**
      * Add acceptable languages
      * 
-     * @param types an array of the acceptable languages
+     * @param locales an array of the acceptable languages
      * @return the builder.
      */
     T acceptLanguage(String... locales);

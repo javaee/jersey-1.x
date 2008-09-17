@@ -51,18 +51,7 @@ import java.util.List;
  * needs to be instantiated. If the component provider does
  * not support the requested component it should return a null value and the
  * runtime will attempt to directly instantiate and manage the component.
- * <p>
- * A {@link ComponentProvider} instance may be registed by passing the 
- * instance to the 
- * {@link com.sun.jersey.spi.container.WebApplication#initiate(com.sun.jersey.api.core.ResourceConfig, ComponentProvider)}
- * method.
- * <p>
- * Applications may extend the {@link com.sun.jersey.spi.container.servlet.ServletContainer}
- * and override the method {@link com.sun.jersey.spi.container.servlet.ServletContainer#initiate(ResourceConfig, WebApplication)}
- * to initiate the {@link com.sun.jersey.spi.container.WebApplication} with the {@link ComponentProvider} instance.
  * 
- * @see com.sun.jersey.spi.container.WebApplication
- * @see com.sun.jersey.spi.container.servlet.ServletContainer
  * @author Paul.Sandoz@Sun.Com
  */
 public interface ComponentProvider {
@@ -119,6 +108,7 @@ public interface ComponentProvider {
      * Get the instance of a class. Injection will be performed on the
      * instance.
      * 
+     * @param <T> the type to inject.
      * @param scope the scope of the instance
      * @param c the class
      * @return the instance, or null if the component cannot be instantaited
@@ -139,6 +129,7 @@ public interface ComponentProvider {
      * the values are not set and must be set by the component provider before
      * construction occurs.
      * 
+     * @param <T> the type to inject.
      * @param scope the scope of the instance
      * @param contructor the constructor to instantiate the class
      * @param parameters the array parameter values passed to the constructor
@@ -160,8 +151,9 @@ public interface ComponentProvider {
      * the instance to return.
      * <p>
      * Implementations wishing to ignore the component context may defer 
-     * to the implemented method {@link #getInstance(Scope, Class<T>).
+     * to the implemented method {@link #getInstance(Scope, Class)}.
      * 
+     * @param <T> the type to inject.
      * @param cc the component context
      * @param scope the scope of the instance
      * @param c the class
@@ -181,6 +173,7 @@ public interface ComponentProvider {
      * If the injectable instance is the same as the instance that was passed in
      * then the provider MUST return that instance.
      * 
+     * @param <T> the type to inject.
      * @param instance the instance returned by one of the getInstance methods.
      * @return the injectable instance.
      */

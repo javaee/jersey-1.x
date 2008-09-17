@@ -44,10 +44,8 @@ import javax.ws.rs.core.Context;
  * resource classes (dependencies).
  * It can be injected into resource and provider classes using the {@link Context} 
  * annotation.
- * <br>Created on: Apr 4, 2008<br>
  * 
  * @author <a href="mailto:martin.grotzke@freiheit.com">Martin Grotzke</a>
- * @version $Id$
  */
 public interface ResourceContext {
     
@@ -58,7 +56,6 @@ public interface ResourceContext {
      * @return an instance if it could be resolved, otherwise null.
      * @throws com.sun.jersey.api.container.ContainerException if the resource
      *         class cannot be found.
-     * @author Martin Grotzke
      */
     <T> T getResource(Class<T> c) throws ContainerException;   
 }

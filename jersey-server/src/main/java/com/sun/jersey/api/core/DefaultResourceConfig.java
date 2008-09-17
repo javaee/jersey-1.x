@@ -75,7 +75,7 @@ public class DefaultResourceConfig extends ResourceConfig {
     }
     
     /**
-     * @param resources the initial set of root resource classes 
+     * @param classes the initial set of root resource classes 
      *        and provider classes
      */
     public DefaultResourceConfig(Class<?>... classes) {
@@ -83,7 +83,7 @@ public class DefaultResourceConfig extends ResourceConfig {
     }
     
     /**
-     * @param resources the initial set of root resource classes 
+     * @param classes the initial set of root resource classes 
      *        and provider classes
      */
     public DefaultResourceConfig(Set<Class<?>> classes) {
@@ -92,6 +92,7 @@ public class DefaultResourceConfig extends ResourceConfig {
         }
     }
 
+    @Override
     public Set<Class<?>> getClasses() {
         return classes;
     }
@@ -111,19 +112,23 @@ public class DefaultResourceConfig extends ResourceConfig {
         return languageExtentions;
     }
     
+    @Override
     public Map<String, Boolean> getFeatures() {
         return features;
     }
     
+    @Override
     public boolean getFeature(String featureName) {
         final Boolean v = features.get(featureName);
         return (v != null) ? v : false;
     }
     
+    @Override
     public Map<String, Object> getProperties() {
         return properties;
     }
 
+    @Override
     public Object getProperty(String propertyName) {
         return properties.get(propertyName);
     }

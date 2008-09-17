@@ -39,6 +39,7 @@ package com.sun.jersey.api.core;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.lang.reflect.Type;
+import javax.ws.rs.core.GenericEntity;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;

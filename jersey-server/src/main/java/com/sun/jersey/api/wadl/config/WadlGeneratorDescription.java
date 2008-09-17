@@ -78,28 +78,24 @@ public class WadlGeneratorDescription {
     
     /**
      * @return the generatorClass
-     * @author Martin Grotzke
      */
     public Class<? extends WadlGenerator> getGeneratorClass() {
         return _generatorClass;
     }
     /**
      * @param generatorClass the generatorClass to set
-     * @author Martin Grotzke
      */
     public void setGeneratorClass( Class<? extends WadlGenerator> generatorClass ) {
         _generatorClass = generatorClass;
     }
     /**
      * @return the properties
-     * @author Martin Grotzke
      */
     public Properties getProperties() {
         return _properties;
     }
     /**
      * @param properties the properties to set
-     * @author Martin Grotzke
      */
     public void setProperties( Properties properties ) {
         _properties = properties;

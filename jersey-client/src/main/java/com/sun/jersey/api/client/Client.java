@@ -327,7 +327,7 @@ public final class Client extends Filterable implements ClientHandler {
      * Set if redirection should be performed or not. 
      * 
      * This method is the functional equivalent to setting the property 
-     * {@link ClientConfig.PROPERTY_FOLLOW_REDIRECTS} on the property bag 
+     * {@link ClientConfig#PROPERTY_FOLLOW_REDIRECTS} on the property bag
      * returned from {@link #getProperties}
      * 
      * @param redirect if true then the client will automatically redirect
@@ -341,7 +341,7 @@ public final class Client extends Filterable implements ClientHandler {
      * Set the read timeout interval. 
      * 
      * This method is the functional equivalent to setting the property 
-     * {@link ClientConfig.PROPERTY_READ_TIMEOUT} on the property bag 
+     * {@link ClientConfig#PROPERTY_READ_TIMEOUT} on the property bag
      * returned from {@link #getProperties}
      * 
      * @param interval the read timeout interval. If null or 0 then
@@ -355,7 +355,7 @@ public final class Client extends Filterable implements ClientHandler {
      * Set the connect timeout interval.
      * 
      * This method is the functional equivalent to setting the property 
-     * {@link ClientConfig.PROPERTY_CONNECT_TIMEOUT} on the property bag 
+     * {@link ClientConfig#PROPERTY_CONNECT_TIMEOUT} on the property bag 
      * returned from {@link #getProperties}
      * 
      * @param interval the connect timeout interval. If null or 0 then
@@ -370,7 +370,7 @@ public final class Client extends Filterable implements ClientHandler {
      * with a particular chunk size.
      * 
      * This method is the functional equivalent to setting the property 
-     * {@link ClientConfig.PROPERTY_CHUNKED_ENCODING_SIZE} on the property bag 
+     * {@link ClientConfig#PROPERTY_CHUNKED_ENCODING_SIZE} on the property bag 
      * returned from {@link #getProperties}
      * 
      * @param chunkSize the chunked encoding size. If &lt= 0 then the default

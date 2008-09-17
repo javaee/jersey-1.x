@@ -176,12 +176,13 @@ public class UriTemplate {
      * template values.
      * <p>
      * @param template the template.
-     * @throw {@link java.util.regex.PatternSyntaxException} if the specific
+     * @throws PatternSyntaxException if the specified
      *         regular expression could not be generated
-     * @throw {@link IllegalArgumentException} if the template is null or
+     * @throws IllegalArgumentException if the template is null or
      *         an empty string.
      */
-    public UriTemplate(String template) {
+    public UriTemplate(String template) throws 
+            PatternSyntaxException, IllegalArgumentException {
         this(new UriTemplateParser(template));
     }
         
@@ -195,12 +196,13 @@ public class UriTemplate {
      * template values.
      * <p>
      * @param templateParser the parser to parse the template.
-     * @throw {@link java.util.regex.PatternSyntaxException} if the specific
+     * @throws PatternSyntaxException if the specified
      *         regular expression could not be generated
-     * @throw {@link IllegalArgumentException} if the template is null or
+     * @throws IllegalArgumentException if the template is null or
      *         an empty string.
      */
-    protected UriTemplate(UriTemplateParser templateParser) {
+    protected UriTemplate(UriTemplateParser templateParser) throws 
+            PatternSyntaxException, IllegalArgumentException {
         this.template = templateParser.getTemplate();
         
         this.normalizedTemplate = templateParser.getNormalizedTemplate();
@@ -238,7 +240,7 @@ public class UriTemplate {
     }
     
     /**
-     * Returns true if the template end in a '/'
+     * @return true if the template ends in a '/', otherwise false.
      */
     public final boolean endsWithSlash() {
         return endsWithSlash;
@@ -308,10 +310,11 @@ public class UriTemplate {
      *        and template values (as values). The map is cleared before any
      *        entries are put.
      * @return true if the URI matches the template, otherwise false.
-     * @throw {@link IllegalArgumentException} if the uri or 
+     * @throws IllegalArgumentException if the uri or
      *         templateVariableToValue is null.
      */
-    public final boolean match(CharSequence uri, Map<String, String> templateVariableToValue) {
+    public final boolean match(CharSequence uri, Map<String, String> templateVariableToValue) throws
+            IllegalArgumentException {
         if (templateVariableToValue == null) 
             throw new IllegalArgumentException();
 
@@ -331,10 +334,11 @@ public class UriTemplate {
      *        capturing groups is matching is successful. The values are stored 
      *        in the same order as the pattern's capturing groups.
      * @return true if the URI matches the template, otherwise false.
-     * @throw {@link IllegalArgumentException} if the uri or 
+     * @throws IllegalArgumentException if the uri or
      *         templateVariableToValue is null.
      */
-    public final boolean match(CharSequence uri, List<String> groupValues) {
+    public final boolean match(CharSequence uri, List<String> groupValues) throws
+            IllegalArgumentException {
         if (groupValues == null) 
             throw new IllegalArgumentException();
 
@@ -434,6 +438,7 @@ public class UriTemplate {
     /**
      * Hashcode is calculated from String of the regular expression 
      * generated from the template.
+     * @return the hash code.
      */
     @Override
     public final int hashCode() {
@@ -443,6 +448,8 @@ public class UriTemplate {
     /**
      * Equality is calculated from the String of the regular expression 
      * generated from the templates.
+     * @param o the reference object with which to compare.
+     * @return true if equals, otherwise false.
      */
     @Override
     public final boolean equals(Object o) {

@@ -35,7 +35,7 @@
  * holder.
  */
 
-package com.sun.jersey.impl.container;
+package com.sun.jersey.api;
 
 import com.sun.jersey.impl.util.KeyComparatorHashMap;
 import com.sun.jersey.impl.util.StringIgnoreCaseKeyComparator;
@@ -45,7 +45,11 @@ import java.util.List;
 import javax.ws.rs.core.MultivaluedMap;
 
 /**
- *
+ * Out-bound HTTP headers.
+ * <p>
+ * Such HTTP headers will be associated with the out-bound HTTP request on the
+ * client-side and the out-bound HTTP response on the server-side.
+ * 
  * @author Paul.Sandoz@Sun.Com
  */
 public class OutBoundHeaders 

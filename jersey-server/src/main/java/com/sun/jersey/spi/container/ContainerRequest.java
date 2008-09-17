@@ -36,6 +36,7 @@
  */
 package com.sun.jersey.spi.container;
 
+import com.sun.jersey.api.InBoundHeaders;
 import com.sun.jersey.api.Responses;
 import com.sun.jersey.api.core.HttpRequestContext;
 import com.sun.jersey.api.uri.UriComponent;
