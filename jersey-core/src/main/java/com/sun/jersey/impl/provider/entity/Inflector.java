@@ -67,7 +67,7 @@ import java.util.regex.Pattern;
  *
  * @author Florian Rosenberg
  */
-class Inflector {
+public class Inflector {
 
 
     // ------------------------------------------------------------ Constructors

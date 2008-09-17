@@ -2,3 +2,4 @@ com.sun.jersey.impl.provider.entity.JSONRootElementProvider
 com.sun.jersey.impl.provider.entity.JSONJAXBElementProvider
 com.sun.jersey.impl.provider.entity.JSONArrayProvider
 com.sun.jersey.impl.provider.entity.JSONObjectProvider
+com.sun.jersey.impl.provider.entity.JSONListElementProvider

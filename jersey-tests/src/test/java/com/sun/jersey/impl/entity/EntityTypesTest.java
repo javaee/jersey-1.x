@@ -599,4 +599,22 @@ public class EntityTypesTest extends AbstractTypeTester {
                 new GenericEntity<Collection<JAXBBean>>(a){});
         assertEquals(a, b);
     }
+
+    @Path("/")
+    @Produces("application/json")
+    @Consumes("application/json")
+    public static class JAXBListResourceJSON extends JAXBListResource {
+    }
+
+
+    // TODO: issue with stripping root element, which is actually a non-root element
+    //       issue with value in JAXBBean being treated as array
+    public void testJAXBListRepresentationJSON() throws Exception {
+        initiateWebApplication(JAXBListResourceJSON.class);
+        WebResource r = resource("/");
+
+        JSONArray a = r.get(JSONArray.class);
+        assertTrue(a.length() == 3);
+    }
+
 }

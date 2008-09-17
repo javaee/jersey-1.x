@@ -131,7 +131,7 @@ public class JsonXmlStreamWriter implements XMLStreamWriter {
     }
     Writer mainWriter;
     boolean stripRoot;
-    List<ProcessingState> processingStack;
+    final List<ProcessingState> processingStack = new ArrayList<ProcessingState>();
     int depth;
     final Collection<String> arrayElementNames = new LinkedList<String>();
     final Collection<String> nonStringElementNames = new LinkedList<String>();
@@ -153,6 +153,8 @@ public class JsonXmlStreamWriter implements XMLStreamWriter {
         if (null != nonStrings) {
             this.nonStringElementNames.addAll(nonStrings);
         }
+        processingStack.add(createProcessingState());
+        depth = 0;
     }
 
     public static XMLStreamWriter createWriter(Writer writer, boolean stripRoot) {
@@ -229,9 +231,6 @@ public class JsonXmlStreamWriter implements XMLStreamWriter {
     }
 
     public void writeStartDocument() throws XMLStreamException {
-        depth = 0;
-        processingStack = new ArrayList<ProcessingState>();
-        processingStack.add(createProcessingState());
     }
 
     public void writeCharacters(char[] text, int start, int length) throws XMLStreamException {

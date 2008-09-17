@@ -49,6 +49,7 @@ import java.util.logging.Logger;
 import javax.xml.namespace.NamespaceContext;
 import javax.xml.namespace.QName;
 import javax.xml.stream.Location;
+import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
@@ -472,7 +473,16 @@ public class JsonXmlStreamReader implements XMLStreamReader {
     }
 
     public int nextTag() throws XMLStreamException {
-        throw new UnsupportedOperationException("Not supported yet.");
+        int eventType = next();
+        while ((eventType == XMLStreamConstants.CHARACTERS && isWhiteSpace()) // skip whitespace
+                || (eventType == XMLStreamConstants.CDATA && isWhiteSpace()) // skip whitespace
+                || eventType == XMLStreamConstants.SPACE || eventType == XMLStreamConstants.PROCESSING_INSTRUCTION || eventType == XMLStreamConstants.COMMENT) {
+            eventType = next();
+        }
+        if (eventType != XMLStreamConstants.START_ELEMENT && eventType != XMLStreamConstants.END_ELEMENT) {
+            throw new XMLStreamException("expected start or end tag", getLocation());
+        }
+        return eventType;
     }
 
     public void close() throws XMLStreamException {

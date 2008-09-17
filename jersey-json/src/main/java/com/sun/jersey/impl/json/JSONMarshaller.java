@@ -58,6 +58,7 @@ import javax.xml.bind.ValidationEventHandler;
 import javax.xml.bind.annotation.adapters.XmlAdapter;
 import javax.xml.bind.attachment.AttachmentMarshaller;
 import javax.xml.stream.XMLEventWriter;
+import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 import javax.xml.transform.Result;
 import javax.xml.validation.Schema;
@@ -102,8 +103,13 @@ public final class JSONMarshaller implements Marshaller {
 
     public void marshal(Object jaxbObject, OutputStream os) throws JAXBException {
         if (jsonEnabled) {
-            jaxbMarshaller.marshal(jaxbObject, 
-                    createXmlStreamWriter(new OutputStreamWriter(os, getCharset())));
+            try {
+                XMLStreamWriter xsw = createXmlStreamWriter(new OutputStreamWriter(os, getCharset()));
+                jaxbMarshaller.marshal(jaxbObject, xsw);
+                xsw.flush();
+            } catch (XMLStreamException ex) {
+                throw new JAXBException(ex.getMessage(), ex);
+            }
         } else {
             jaxbMarshaller.marshal(jaxbObject, os);
         }
@@ -112,9 +118,11 @@ public final class JSONMarshaller implements Marshaller {
     public void marshal(Object jaxbObject, File file) throws JAXBException {
         if (jsonEnabled) {
             try {
-                jaxbMarshaller.marshal(jaxbObject, createXmlStreamWriter(
-                        new OutputStreamWriter(new FileOutputStream(file), getCharset())));
-            } catch (IOException ex) {
+                XMLStreamWriter xsw = createXmlStreamWriter(
+                        new OutputStreamWriter(new FileOutputStream(file), getCharset()));
+                jaxbMarshaller.marshal(jaxbObject, xsw);
+                xsw.flush();
+            } catch (Exception ex) {
                 Logger.getLogger(JSONMarshaller.class.getName()).log(
                         Level.SEVERE, "IOException caught when marshalling into a file.", ex);
                 throw new JAXBException(ex.getMessage(), ex);
@@ -126,7 +134,13 @@ public final class JSONMarshaller implements Marshaller {
 
     public void marshal(Object jaxbObject, Writer writer) throws JAXBException {
         if (jsonEnabled) {
-            jaxbMarshaller.marshal(jaxbObject, createXmlStreamWriter(writer));
+            XMLStreamWriter xsw = createXmlStreamWriter(writer);
+            jaxbMarshaller.marshal(jaxbObject, xsw);
+            try {
+                xsw.flush();
+            } catch (XMLStreamException ex) {
+                throw new JAXBException(ex.getMessage(), ex);
+            }
         } else {
             jaxbMarshaller.marshal(jaxbObject, writer);
         }
