@@ -36,8 +36,10 @@
  */
 package com.sun.jersey.api.client;
 
+import com.sun.jersey.api.client.filter.Filterable;
 import com.sun.jersey.api.client.config.DefaultClientConfig;
 import com.sun.jersey.api.client.config.ClientConfig;
+import com.sun.jersey.api.client.filter.ClientFilter;
 import com.sun.jersey.impl.application.ComponentProviderCache;
 import com.sun.jersey.impl.application.ContextResolverFactory;
 import com.sun.jersey.impl.application.InjectableProviderFactory;
@@ -63,12 +65,12 @@ import javax.ws.rs.ext.MessageBodyWriter;
 import javax.ws.rs.ext.Providers;
 
 /**
- * The HTTP client class for handling requests and responses specified by 
- * {@link ClientHandler} or for creating {@link WebResource} instances.
+ * The main class for creating {@link WebResource} instances and configuring
+ * the properties of connections and requests.
  * <p>
  * {@link ClientFilter} instances may be added to the client for filtering
- * requests and responses (including those of {@link WebResource} instances
- * created from the client).
+ * requests and responses, including those of {@link WebResource} instances
+ * created from the client.
  * <p>
  * A client may be configured by passing a {@link ClientConfig} instance to
  * the appropriate construtor.
@@ -205,7 +207,7 @@ public final class Client extends Filterable implements ClientHandler {
 
     /**
      * Create a new instance with a client configuration and a 
-     * compoenent provider.
+     * component provider.
      * 
      * @param root the root client handler for dispatching a request and
      *        returning a response.
@@ -312,6 +314,16 @@ public final class Client extends Filterable implements ClientHandler {
     }
 
     /**
+     * Create an asynchronous Web resource from the client.
+     * 
+     * @param u the URI of the resource.
+     * @return the Web resource.
+     */
+    public AsyncWebResource asyncResource(URI u) {
+        return new AsyncWebResource(this, u);
+    }
+    
+    /**
      * Get the mutable property bag.
      * 
      * @return the property bag.
@@ -379,16 +391,6 @@ public final class Client extends Filterable implements ClientHandler {
      */
     public void setChunkedEncodingSize(Integer chunkSize) {
         getProperties().put(ClientConfig.PROPERTY_CHUNKED_ENCODING_SIZE, chunkSize);        
-    }
-    
-    /**
-     * Create an asynchronous Web resource from the client.
-     * 
-     * @param u the URI of the resource.
-     * @return the Web resource.
-     */
-    public AsyncWebResource asyncResource(URI u) {
-        return new AsyncWebResource(this, u);
     }
     
     // ClientHandler

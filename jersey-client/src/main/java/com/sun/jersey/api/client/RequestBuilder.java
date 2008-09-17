@@ -42,7 +42,7 @@ import javax.ws.rs.core.Cookie;
 import javax.ws.rs.core.MediaType;
 
 /**
- * An interface for building HTTP requests. The build methods for constructing
+ * An interface for building requests. The build methods for constructing
  * the request from the built information are left undefined and 
  * implementations must define such methods.
  * 
@@ -53,6 +53,11 @@ public interface RequestBuilder<T extends RequestBuilder> {
 
     /**
      * Set the request entity.
+     * <p>
+     * Any Java type instance for a request entity, that is supported by the client
+     * configuration of the client, can be passed. If generic information is
+     * required then an instance of {@link javax.ws.rs.core.GenericEntity} may
+     * be used.
      * 
      * @param entity the request entity
      * @return the builder.
@@ -61,6 +66,11 @@ public interface RequestBuilder<T extends RequestBuilder> {
 
     /**
      * Set the request entity it's media type.
+     * <p>
+     * Any Java type instance for a request entity, that is supported by the client
+     * configuration of the client, can be passed. If generic information is
+     * required then an instance of {@link javax.ws.rs.core.GenericEntity} may
+     * be used.
      * 
      * @param entity the request entity
      * @param type the media type
@@ -70,6 +80,11 @@ public interface RequestBuilder<T extends RequestBuilder> {
 
     /**
      * Set the request entity it's media type.
+     * <p>
+     * Any Java type instance for a request entity, that is supported by the client
+     * configuration of the client, can be passed. If generic information is
+     * required then an instance of {@link javax.ws.rs.core.GenericEntity} may
+     * be used.
      * 
      * @param entity the request entity
      * @param type the media type

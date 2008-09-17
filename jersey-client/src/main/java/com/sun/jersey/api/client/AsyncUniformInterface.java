@@ -42,6 +42,23 @@ import java.util.concurrent.Future;
 /**
  * An asynchronous uniform interface for invoking HTTP requests.
  * 
+ * <p>
+ * Any Java type for a response entity, that is supported by the client
+ * configuration of the client, may be declared using
+ * <code>Class&lt;T&gt;</code> where <code>T</code> is the Java type, or
+ * using {@link GenericType} where the generic parameter is the Java type.
+ * <p>
+ * Any Java type instance for a request entity, that is supported by the client
+ * configuration of the client, can be passed. If generic information is
+ * required then an instance of {@link javax.ws.rs.core.GenericEntity} may
+ * be used.
+ * <p>
+ * A type of {@link ClientResponse} declared for the response entity
+ * may be used to obtain the status, headers and response entity. If any other
+ * type is declared then and the response status is greater than or equal to
+ * 300 then a {@link UniformInterfaceException} exception will be thrown, from 
+ * which the {@link ClientResponse} instance can be accessed.
+ * 
  * @author Paul.Sandoz@Sun.Com
  */
 public interface AsyncUniformInterface {
@@ -57,6 +74,7 @@ public interface AsyncUniformInterface {
     /**
      * Invoke the OPTIONS method.
      * 
+     * @param <T> the type of the response.
      * @param c the type of the returned response.
      * @return an instance of type <code>c</code>.
      * @throws UniformInterfaceException if the status of the HTTP response is 
@@ -69,6 +87,7 @@ public interface AsyncUniformInterface {
     /**
      * Invoke the OPTIONS method.
      * 
+     * @param <T> the type of the response.
      * @param gt the generic type of the returned response.
      * @return an instance of type represented by the generic type.
      * @throws UniformInterfaceException if the status of the HTTP response is 
@@ -80,6 +99,7 @@ public interface AsyncUniformInterface {
     /**
      * Invoke the GET method.
      * 
+     * @param <T> the type of the response.
      * @param c the type of the returned response.
      * @return an instance of type <code>c</code>.
      * @throws UniformInterfaceException if the status of the HTTP response is 
@@ -91,6 +111,7 @@ public interface AsyncUniformInterface {
     /**
      * Invoke the GET method.
      * 
+     * @param <T> the type of the response.
      * @param gt the generic type of the returned response.
      * @return an instance of type represented by the generic type.
      * @throws UniformInterfaceException if the status of the HTTP response is 
@@ -106,7 +127,8 @@ public interface AsyncUniformInterface {
      * If the status code is less than 300 and a representation is present
      * then that representation is ignored.
      * 
-     * @throws UniformInterfaceException if the status of the HTTP response is 
+     * @return a void future.
+     * @throws UniformInterfaceException if the status of the HTTP response is
      *         greater than or equal to 300.
      */
     Future<?> put() throws UniformInterfaceException;
@@ -118,6 +140,7 @@ public interface AsyncUniformInterface {
      * then that representation is ignored.
      * 
      * @param requestEntity the request entity.
+     * @return a void future.
      * @throws UniformInterfaceException if the status of the HTTP response is 
      *         greater than or equal to 300.
      */
@@ -126,6 +149,7 @@ public interface AsyncUniformInterface {
     /**
      * Invoke the PUT method with no request entity that returns a response.
      * 
+     * @param <T> the type of the response.
      * @param c the type of the returned response.
      * @return an instance of type <code>c</code>.
      * @throws UniformInterfaceException if the status of the HTTP response is 
@@ -137,6 +161,7 @@ public interface AsyncUniformInterface {
     /**
      * Invoke the PUT method with a request entity that returns a response.
      * 
+     * @param <T> the type of the response.
      * @param gt the generic type of the returned response.
      * @return an instance of type represented by the generic type.
      * @throws UniformInterfaceException if the status of the HTTP response is 
@@ -148,6 +173,7 @@ public interface AsyncUniformInterface {
     /**
      * Invoke the PUT method with a request entity that returns a response.
      * 
+     * @param <T> the type of the response.
      * @param c the type of the returned response.
      * @param requestEntity the request entity.
      * @return an instance of type <code>c</code>.
@@ -161,6 +187,7 @@ public interface AsyncUniformInterface {
     /**
      * Invoke the PUT method with a request entity that returns a response.
      * 
+     * @param <T> the type of the response.
      * @param gt the generic type of the returned response.
      * @param requestEntity the request entity.
      * @return an instance of type represented by the generic type.
@@ -177,6 +204,7 @@ public interface AsyncUniformInterface {
      * If the status code is less than 300 and a representation is present
      * then that representation is ignored.
      * 
+     * @return a void future.
      * @throws UniformInterfaceException if the status of the HTTP response is 
      *         greater than or equal to 300.
      */
@@ -188,6 +216,7 @@ public interface AsyncUniformInterface {
      * If the status code is less than 300 and a representation is present
      * then that representation is ignored.
      * 
+     * @return a void future.
      * @param requestEntity the request entity.
      * @throws UniformInterfaceException if the status of the HTTP response is 
      *         greater than or equal to 300.
@@ -197,6 +226,7 @@ public interface AsyncUniformInterface {
     /**
      * Invoke the POST method with no request entity that returns a response.
      * 
+     * @param <T> the type of the response.
      * @param c the type of the returned response.
      * @return an instance of type <code>c</code>.
      * @throws UniformInterfaceException if the status of the HTTP response is 
@@ -208,6 +238,7 @@ public interface AsyncUniformInterface {
     /**
      * Invoke the POST method with a request entity that returns a response.
      * 
+     * @param <T> the type of the response.
      * @param gt the generic type of the returned response.
      * @return an instance of type represented by the generic type.
      * @throws UniformInterfaceException if the status of the HTTP response is 
@@ -219,6 +250,7 @@ public interface AsyncUniformInterface {
     /**
      * Invoke the POST method with a request entity that returns a response.
      * 
+     * @param <T> the type of the response.
      * @param c the type of the returned response.
      * @param requestEntity the request entity.
      * @return an instance of type <code>c</code>.
@@ -232,6 +264,7 @@ public interface AsyncUniformInterface {
     /**
      * Invoke the POST method with a request entity that returns a response.
      * 
+     * @param <T> the type of the response.
      * @param gt the generic type of the returned response.
      * @param requestEntity the request entity.
      * @return an instance of type represented by the generic type.
@@ -249,6 +282,7 @@ public interface AsyncUniformInterface {
      * If the status code is less than 300 and a representation is present
      * then that representation is ignored.
      * 
+     * @return a void future.
      * @throws UniformInterfaceException if the status of the HTTP response is 
      *         greater than or equal to 300.
      */
@@ -260,6 +294,7 @@ public interface AsyncUniformInterface {
      * If the status code is less than 300 and a representation is present
      * then that representation is ignored.
      * 
+     * @return a void future.
      * @param requestEntity the request entity.
      * @throws UniformInterfaceException if the status of the HTTP response is 
      *         greater than or equal to 300.
@@ -269,6 +304,7 @@ public interface AsyncUniformInterface {
     /**
      * Invoke the DELETE method with no request entity that returns a response.
      * 
+     * @param <T> the type of the response.
      * @param c the type of the returned response.
      * @return an instance of type <code>c</code>.
      * @throws UniformInterfaceException if the status of the HTTP response is 
@@ -280,6 +316,7 @@ public interface AsyncUniformInterface {
     /**
      * Invoke the DELETE method with a request entity that returns a response.
      * 
+     * @param <T> the type of the response.
      * @param gt the generic type of the returned response.
      * @return an instance of type represented by the generic type.
      * @throws UniformInterfaceException if the status of the HTTP response is 
@@ -291,6 +328,7 @@ public interface AsyncUniformInterface {
     /**
      * Invoke the DELETE method with a request entity that returns a response.
      * 
+     * @param <T> the type of the response.
      * @param c the type of the returned response.
      * @param requestEntity the request entity.
      * @return an instance of type <code>c</code>.
@@ -304,6 +342,7 @@ public interface AsyncUniformInterface {
     /**
      * Invoke the DELETE method with a request entity that returns a response.
      * 
+     * @param <T> the type of the response.
      * @param gt the generic type of the returned response.
      * @param requestEntity the request entity.
      * @return an instance of type represented by the generic type.
@@ -320,6 +359,7 @@ public interface AsyncUniformInterface {
      * If the status code is less than 300 and a representation is present
      * then that representation is ignored.
      * 
+     * @return a void future.
      * @param method the HTTP method.
      * @throws UniformInterfaceException if the status of the HTTP response is 
      *         greater than or equal to 300.
@@ -332,6 +372,7 @@ public interface AsyncUniformInterface {
      * If the status code is less than 300 and a representation is present
      * then that representation is ignored.
      * 
+     * @return a void future.
      * @param method the HTTP method.
      * @param requestEntity the request entity.
      * @throws UniformInterfaceException if the status of the HTTP response is 
@@ -343,6 +384,7 @@ public interface AsyncUniformInterface {
     /**
      * Invoke a HTTP method with no request entity that returns a response.
      * 
+     * @param <T> the type of the response.
      * @param method the HTTP method.
      * @param c the type of the returned response.
      * @return an instance of type <code>c</code>.
@@ -355,6 +397,7 @@ public interface AsyncUniformInterface {
     /**
      * Invoke a HTTP method with no request entity that returns a response.
      * 
+     * @param <T> the type of the response.
      * @param method the HTTP method.
      * @param gt the generic type of the returned response.
      * @return an instance of type represented by the generic type.
@@ -367,6 +410,7 @@ public interface AsyncUniformInterface {
     /**
      * Invoke a HTTP method with a request entity that returns a response.
      * 
+     * @param <T> the type of the response.
      * @param method the HTTP method.
      * @param c the type of the returned response.
      * @param requestEntity the request entity.
@@ -381,6 +425,7 @@ public interface AsyncUniformInterface {
     /**
      * Invoke a HTTP method with a request entity that returns a response.
      * 
+     * @param <T> the type of the response.
      * @param method the HTTP method.
      * @param gt the generic type of the returned response.
      * @param requestEntity the request entity.

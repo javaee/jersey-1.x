@@ -136,7 +136,7 @@ public final class ClientRequestImpl extends ClientRequest implements ClientRequ
     }
     
 
-    // ClientRequestAdapeter
+    // ClientRequestAdapter
     
     public OutputStream adapt(ClientRequest request, OutputStream out) throws IOException {
         return out;

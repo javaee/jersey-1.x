@@ -39,7 +39,7 @@ package com.sun.jersey.impl.container.httpserver;
 
 import com.sun.net.httpserver.HttpHandler;
 import com.sun.jersey.api.client.Client;
-import com.sun.jersey.api.client.ClientFilter;
+import com.sun.jersey.api.client.filter.ClientFilter;
 import com.sun.jersey.api.client.ClientRequest;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.WebResource;

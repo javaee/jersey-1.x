@@ -37,6 +37,7 @@
 
 package com.sun.jersey.api.client;
 
+import com.sun.jersey.api.client.filter.Filterable;
 import com.sun.jersey.impl.client.ClientRequestImpl;
 import java.net.URI;
 import java.util.Locale;
@@ -48,6 +49,8 @@ import javax.ws.rs.core.UriBuilder;
  * An encapsulation of a Web resource capable of building requests
  * to send to the Web resource and processing responses returned from the Web
  * resource.
+ * <p>
+ * A WebResource instance is obtained from the {@link Client}.
  * <p>
  * The Web resource implements the {@link UniformInterface} to invoke the HTTP 
  * method on the Web resource. A client request may be built before invocation

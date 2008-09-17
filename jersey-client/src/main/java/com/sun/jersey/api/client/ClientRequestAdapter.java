@@ -41,7 +41,7 @@ import java.io.OutputStream;
 
 /**
  * Adapter for the client request to adapt the output stream to write the
- * entity. This can enable logging or compressions of the request entity.
+ * entity. This can enable logging or compression of the request entity.
  * 
  * @author Paul.Sandoz@Sun.Com
  */

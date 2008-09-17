@@ -48,7 +48,7 @@ import javax.ws.rs.core.MultivaluedMap;
  * the methods on {@link RequestBuilder} but leaves undefined the build 
  * methods for constructing the request.
  * 
- * @param T the type than implements {@link RequestBuilder}.
+ * @param <T> the type than implements {@link RequestBuilder}.
  * @author Paul.Sandoz@Sun.Com
  */
 @SuppressWarnings("unchecked")

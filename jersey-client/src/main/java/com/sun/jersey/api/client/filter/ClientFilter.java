@@ -35,74 +35,57 @@
  * holder.
  */
 
-package com.sun.jersey.api.client;
+package com.sun.jersey.api.client.filter;
+
+import com.sun.jersey.api.client.ClientHandler;
+import com.sun.jersey.api.client.ClientHandlerException;
+import com.sun.jersey.api.client.ClientRequest;
+import com.sun.jersey.api.client.ClientResponse;
+
 
 /**
- * An abstract class providing support for registering and managing a chain
- * of {@link ClientFilter} instances.
+ * A client filter capable of modifying the outbound HTTP request or 
+ * the inbound HTTP response. 
+ * <p>
+ * An application-based filter extends this class and implements the 
+ * {@link ClientHandler#handle} method. The general implementation pattern
+ * is as follows:
+ * <blockquote><pre>
+ *     class AppClientFilter extends ClientFilter {
+ *
+ *         public ClientResponse handle(ClientRequest cr) {
+ *             // Modify the request
+ *             ClientRequest mcr = modifyRequest(cr);
+ * 
+ *             // Call the next client handler in the filter chain
+ *             ClientResponse resp = getNext(mcr);
+ * 
+ *             // Modify the response
+ *             return modifyResponse(resp);
+ *         }
+ *
+ *     }
+ * </pre></blockquote>
  * 
  * @author Paul.Sandoz@Sun.Com
  */
-public abstract class Filterable {
-    private final ClientHandler root;
+public abstract class ClientFilter implements ClientHandler {
+    private ClientHandler next;
     
-    private ClientHandler head;
+    /* package */ final void setNext(ClientHandler next) {
+        this.next = next;
+    }
    
     /**
-     * @param root the root handler to handle the request and return a response.
-     */
-    protected Filterable(ClientHandler root) {
-        this.root = this.head = root;
-    }
-    
-    protected Filterable(Filterable that) {
-        this.root = that.root;
-        this.head = that.head;
-    }
-    
-    /**
-     * Add a filter to the filter chain.
+     * Get the next client handler to invoke in the chain
+     * of filters.
      * 
-     * @param f the filter to add.
+     * @return the next client handler.
      */
-    public void addFilter(ClientFilter f) {
-        f.setNext(head);
-        this.head = f;
-    }
-
-    /**
-     * Remove a filter from the chain.
-     * 
-     * @param f the filter to remove.
-     */
-    public void removeFilter(ClientFilter f) {
-        if (head == root) return;
-        
-        if (head == f) head = f.getNext();
-
-        ClientFilter e = (ClientFilter)head;
-        while (e.getNext() != f) {
-            if (e.getNext() == root) return;
-            
-            e = (ClientFilter)e.getNext();
-        }
-        
-        e.setNext(f.getNext());
+    public final ClientHandler getNext() {
+        return next;
     }
     
-    /**
-     * Remove all filters from the filter chain.
-     */
-    public void removeAllFilters() {
-        this.head = root;
-    }
-    
-    /**
-     * Get the head client handler of the filter chain.
-     * 
-     * @return the head client handler of the filter chain.
-     */
-    protected ClientHandler getHeadHandler() {
-        return head;
-    }
+    public abstract ClientResponse handle(ClientRequest cr) 
+            throws ClientHandlerException;
 }

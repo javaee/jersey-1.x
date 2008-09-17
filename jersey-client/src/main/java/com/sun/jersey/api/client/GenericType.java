@@ -6,6 +6,7 @@ import java.lang.reflect.Type;
 /**
  * Represents a generic type {@code T}.
  * 
+ * @param <T> the generic type parameter.
  */
 public class GenericType<T> {
 

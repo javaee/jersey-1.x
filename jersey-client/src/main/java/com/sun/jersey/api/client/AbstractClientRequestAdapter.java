@@ -50,6 +50,11 @@ public abstract class AbstractClientRequestAdapter implements ClientRequestAdapt
         this.cra = cra;        
     }
     
+    /**
+     * Get the adapted client request adapter.
+     * 
+     * @return the adapted client request adapter.
+     */
     public ClientRequestAdapter getAdapter() {
         return cra;        
     }

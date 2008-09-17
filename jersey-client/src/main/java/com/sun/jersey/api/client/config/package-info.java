@@ -34,52 +34,9 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-
-package com.sun.jersey.api.client.config;
-
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-
 /**
- * A default client configuration.
+ * Provides support for configuration of a 
+ * {@link com.sun.jersey.api.client.Client}.
  * <p>
- * This class may be extended for specific confguration purposes.
- * 
- * @author Paul.Sandoz@Sun.Com
  */
-public class DefaultClientConfig implements ClientConfig {
-    private final Set<Class<?>> providers = new HashSet<Class<?>>();
-    
-    private final Set<Object> providerInstances = new HashSet<Object>();
-    
-    private final Map<String, Boolean> features = new HashMap<String, Boolean>();
-    
-    private final Map<String, Object> properties = new HashMap<String, Object>();
-    
-    public Set<Class<?>> getClasses() {
-        return providers;
-    }
-    
-    public Set<Object> getSingletons() {
-        return providerInstances;
-    }
-    
-    public Map<String, Boolean> getFeatures() {
-        return features;
-    }
-    
-    public boolean getFeature(String featureName) {
-        final Boolean v = features.get(featureName);
-        return (v != null) ? v : false;
-    }
-    
-    public Map<String, Object> getProperties() {
-        return properties;
-    }
-
-    public Object getProperty(String propertyName) {
-        return properties.get(propertyName);
-    }
-}
+package com.sun.jersey.api.client.config;

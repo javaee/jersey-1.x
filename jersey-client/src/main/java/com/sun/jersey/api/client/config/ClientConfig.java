@@ -37,11 +37,32 @@
 
 package com.sun.jersey.api.client.config;
 
+import com.sun.jersey.api.client.Client;
 import java.util.Map;
 import java.util.Set;
 
 /**
- *
+ * The client configuration that declares common property names,
+ * features, properties, provider classes and singleton instances that
+ * may be used by a {@link Client} instance.
+ * <p>
+ * An instance of this interface may be passed to the {@link Client} when
+ * the client is created as follows:
+ * <p>
+ * <blockquote><pre>
+ *     ClientConfig cc = ...
+ *     Client c = Client.create(cc);
+ * </pre></blockquote>
+ * The client configuration may be used to register provider classes such
+ * as those, for example, that support JAXB with JSON as follows:
+ * <blockquote><pre>
+ *     ClientConfig cc = new DefaultClientConfig();
+ *     cc.getClasses().add(com.sun.jersey.impl.provider.entity.JSONRootElementProvider.class);
+ *     Client c = Client.create(cc);
+ * </pre></blockquote>
+ * Alternatively an implementaton of ClientConfig could perform such
+ * registeration.
+ * 
  * @author Paul.Sandoz@Sun.Com
  */
 public interface ClientConfig {
@@ -86,8 +107,8 @@ public interface ClientConfig {
      * 
      * If the property is absent then chunked encoding will not be used.
      * A value &lt = 0 declares that chunked encoding will be used with 
-     * the a chunk size. A value &gt 0 declares that chunked encoding will be 
-     * used with the value as the declared chunk size.
+     * the default chunk size. A value &gt 0 declares that chunked encoding
+     * will be used with the value as the declared chunk size.
      */
     public static final String PROPERTY_CHUNKED_ENCODING_SIZE = 
             "com.sun.jersey.client.property.chunkedEncodingSize";
@@ -100,7 +121,8 @@ public interface ClientConfig {
      * annotation declared on the class that implements a specific service 
      * interface.
      * 
-     * @return the set of provider classes. 
+     * @return the mutable set of provider classes. After intialization of
+     *         the client modification of this value will have no effect.
      *         The returned value shall never be null.
      */
     Set<Class<?>> getClasses();
@@ -112,13 +134,14 @@ public interface ClientConfig {
      * will be combined and take precendence over the instances of provider 
      * classes. 
      * 
-     * @return a mutable set of provider instances. After intialization of
-     * the client modification of this value will have no effect.
+     * @return the mutable set of provider instances. After intialization of
+     *         the client modification of this value will have no effect.
+     *         The returned value shall never be null.
      */
     public Set<Object> getSingletons();
     
     /**
-     * Get the map of features associated with the Web application.
+     * Get the map of features associated with the client.
      *
      * @return the features.
      *         The returned value shall never be null.
@@ -136,7 +159,7 @@ public interface ClientConfig {
     boolean getFeature(String featureName);
     
     /**
-     * Get the map of properties associated with the Web application.
+     * Get the map of properties associated with the client.
      *
      * @return the properties.
      *         The returned value shall never be null.

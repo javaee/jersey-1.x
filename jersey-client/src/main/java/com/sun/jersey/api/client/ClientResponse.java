@@ -52,7 +52,7 @@ import javax.ws.rs.ext.RuntimeDelegate;
 import javax.ws.rs.ext.RuntimeDelegate.HeaderDelegate;
 
 /**
- * A client (inbound) HTTP response.
+ * A client (in-bound) HTTP response.
  * 
  * @author Paul.Sandoz@Sun.Com
  */
@@ -132,6 +132,7 @@ public abstract class ClientResponse {
     /**
      * Get the entity of the response.
      * 
+     * @param <T> the type of the response.
      * @param c the type of the entity.
      * @return an instance of the type <code>c</code>.
      * 
@@ -142,6 +143,7 @@ public abstract class ClientResponse {
     /**
      * Get the entity of the response.
      * 
+     * @param <T> the type of the response.
      * @param gt the generic type of the entity.
      * @return an instance of the type represented by the generic type.
      * 

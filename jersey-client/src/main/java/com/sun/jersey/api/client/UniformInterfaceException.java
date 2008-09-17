@@ -40,7 +40,7 @@ package com.sun.jersey.api.client;
 /**
  * A runtime exception thrown by a method on the {@link UniformInterface} when
  * the status code of the HTTP response indicates a response that is not
- * expected by the method invoker.
+ * expected by the method invoked.
  * 
  * @author Paul.Sandoz@Sun.Com
  */

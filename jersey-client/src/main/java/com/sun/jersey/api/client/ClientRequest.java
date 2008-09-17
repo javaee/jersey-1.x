@@ -44,7 +44,7 @@ import javax.ws.rs.ext.RuntimeDelegate;
 import javax.ws.rs.ext.RuntimeDelegate.HeaderDelegate;
 
 /**
- * A client (outbound) HTTP request.
+ * A client (out-bound) HTTP request.
  * <p>
  * Instances may be created by using the static method {@link #create} and
  * methods on {@link ClientRequest.Builder}.
@@ -99,6 +99,11 @@ public abstract class ClientRequest {
 
     /**
      * Set the entity of the request.
+     * <p>
+     * Any Java type instance for a request entity, that is supported by the client
+     * configuration of the client, can be passed. If generic information is
+     * required then an instance of {@link javax.ws.rs.core.GenericEntity} may
+     * be used.
      * 
      * @param entity the entity of the request.
      */
@@ -138,7 +143,7 @@ public abstract class ClientRequest {
     public abstract ClientRequest clone();
 
     /**
-     * Create a builder for building a new {@link ClientRequest}instance.
+     * Create a builder for building a new {@link ClientRequest} instance.
      * 
      * @return the builder.
      */
@@ -151,7 +156,7 @@ public abstract class ClientRequest {
      */
     public static final class Builder extends PartialRequestBuilder<Builder> {
         /**
-         * Build the {@link ClientRequest}instance.
+         * Build the {@link ClientRequest} instance.
          * 
          * @param uri the URI of the request.
          * @param method the HTTP method.
