@@ -39,7 +39,6 @@ package com.sun.jersey.impl.provider.entity.fastinfoset;
 
 import com.sun.jersey.api.MediaTypes;
 import com.sun.jersey.impl.provider.entity.AbstractListElementProvider;
-//import com.sun.jersey.impl.provider.entity.Inflector;
 import com.sun.jersey.impl.util.ThrowHelper;
 import com.sun.xml.fastinfoset.stax.StAXDocumentParser;
 import com.sun.xml.fastinfoset.stax.StAXDocumentSerializer;
@@ -67,9 +66,7 @@ import javax.xml.stream.XMLStreamWriter;
 @Consumes("application/fastinfoset")
 public class FastInfosetListElementProvider extends AbstractListElementProvider {
 
-//    private final Inflector inflector = Inflector.getInstance();
-
-    FastInfosetListElementProvider(@Context Providers ps) {
+    public FastInfosetListElementProvider(@Context Providers ps) {
         super(ps, MediaTypes.FAST_INFOSET);
     }
         
@@ -79,43 +76,26 @@ public class FastInfosetListElementProvider extends AbstractListElementProvider 
         return new StAXDocumentParser(entityStream);
     }
     
-    public final void writeListBody(Collection<?> t, MediaType mediaType, Charset c,
+    public final void writeList(Class<?> elementType, Collection<?> t,
+            MediaType mediaType, Charset c,
             Marshaller m, OutputStream entityStream)
             throws JAXBException, IOException {
         final XMLStreamWriter xsw = new StAXDocumentSerializer(entityStream);
-        for (Object o : t)
-            m.marshal(o, xsw);
+        
+        final String rootElement = getRootElementName(elementType);
         
         try {
+            xsw.writeStartDocument();
+            xsw.writeStartElement(rootElement);
+            for (Object o : t)
+                m.marshal(o, xsw);
+            xsw.writeEndElement();
+            xsw.writeEndDocument();
             xsw.flush();
         } catch (XMLStreamException cause) {
             throw ThrowHelper.withInitCause(cause,
                     new IOException()
                     );            
-        }     
+        }
     }
-
-        // TODO: write fastinfoset equivalent of the following if needed:
-//    @Override
-//    public void writeStartList(Class<?> type, Class elementType, MediaType mediaType, Charset c, OutputStream entityStream) throws IOException {
-//        final String rootElement = getRootElementName(type, elementType);
-//
-//        final String cName = c.name();
-//
-//        entityStream.write(
-//                String.format("<?xml version=\"1.0\" encoding=\"%s\" standalone=\"yes\"?>", cName).getBytes(cName));
-//        entityStream.write(String.format("<%s>", rootElement).getBytes(cName));
-//    }
-
-        // TODO: write fastinfoset equivalent of the following if needed:
-//    @Override
-//    public void writeEndList(Class<?> type, Class elementType, MediaType mediaType, Charset c, OutputStream entityStream) throws IOException {
-//        final String rootElement = getRootElementName(type, elementType);
-//        final String cName = c.name();
-//        entityStream.write(String.format("</%s>", rootElement).getBytes(cName));
-//    }
-
-//    private String getRootElementName(Class<?> type, Class<?> elementType) {
-//        return inflector.pluralize(inflector.demodulize(elementType.getName()));
-//    }
 }

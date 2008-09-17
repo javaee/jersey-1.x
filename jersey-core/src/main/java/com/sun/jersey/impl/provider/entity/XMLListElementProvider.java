@@ -40,7 +40,6 @@ package com.sun.jersey.impl.provider.entity;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.lang.reflect.Type;
 import java.nio.charset.Charset;
 import java.util.Collection;
 import javax.ws.rs.Consumes;
@@ -59,8 +58,6 @@ import javax.xml.stream.XMLStreamReader;
  * @author Paul.Sandoz@Sun.Com
  */
 public class XMLListElementProvider extends AbstractListElementProvider {
-
-    private final Inflector inflector = Inflector.getInstance();
 
     XMLListElementProvider(Providers ps) {
         super(ps);
@@ -95,42 +92,20 @@ public class XMLListElementProvider extends AbstractListElementProvider {
                     createXMLStreamReader(entityStream);
     }
     
-    public final void writeListBody(Collection<?> t, MediaType mediaType, Charset c,
+    public final void writeList(Class<?> elementType, Collection<?> t,
+            MediaType mediaType, Charset c,
             Marshaller m, OutputStream entityStream)
-            throws JAXBException {
-        for (Object o : t)
-            m.marshal(o, entityStream);
-    }
-
-    @Override
-    public final void writeStartList(
-            Class<?> type,
-            Class elementType,
-            MediaType mediaType,
-            Charset c,
-            OutputStream entityStream) throws IOException {
-        final String rootElement = getRootElementName(type, elementType);
-
+            throws JAXBException, IOException {
+        final String rootElement = getRootElementName(elementType);
         final String cName = c.name();
 
         entityStream.write(
                 String.format("<?xml version=\"1.0\" encoding=\"%s\" standalone=\"yes\"?>", cName).getBytes(cName));
         entityStream.write(String.format("<%s>", rootElement).getBytes(cName));
-    }
 
-    @Override
-    public final void writeEndList(
-            Class<?> type,
-            Class elementType,
-            MediaType mediaType,
-            Charset c,
-            OutputStream entityStream) throws IOException {
-        final String rootElement = getRootElementName(type, elementType);
-        final String cName = c.name();
-            entityStream.write(String.format("</%s>", rootElement).getBytes(cName));
-    }
+        for (Object o : t)
+            m.marshal(o, entityStream);
 
-    private String getRootElementName(Class<?> type, Class<?> elementType) {
-        return inflector.pluralize(inflector.demodulize(elementType.getName()));
+        entityStream.write(String.format("</%s>", rootElement).getBytes(cName));
     }
 }

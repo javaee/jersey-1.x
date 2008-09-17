@@ -74,18 +74,7 @@ public class JSONListElementProvider extends AbstractListElementProvider {
     }
 
     @Override
-    public final void writeStartList(Class<?> type, Class elementType, MediaType mediaType, Charset c, OutputStream entityStream) throws IOException {
-        entityStream.write("[".getBytes());
-    }
-
-    @Override
-    public final void writeEndList(Class<?> type, Class elementType, MediaType mediaType, Charset c, OutputStream entityStream) throws IOException {
-        entityStream.write("]".getBytes());
-        entityStream.flush();
-    }
-
-    @Override
-    public final void writeListBody(Collection<?> t, MediaType mediaType, Charset c, Marshaller m, OutputStream entityStream) throws JAXBException, IOException {
+    public final void writeList(Class<?> elementType, Collection<?> t, MediaType mediaType, Charset c, Marshaller m, OutputStream entityStream) throws JAXBException, IOException {
         final OutputStreamWriter osw = new OutputStreamWriter(entityStream, c);
         final XMLStreamWriter jxsw = JsonXmlStreamWriter.createWriter(osw, true);
         final boolean isJsonMarshaller = m instanceof JSONMarshaller;
@@ -95,6 +84,8 @@ public class JSONListElementProvider extends AbstractListElementProvider {
                 m.setProperty(JSONJAXBContext.JSON_ENABLED, Boolean.TRUE);
             }
 
+            entityStream.write("[".getBytes());            
+            
             boolean firstElement = true;
             for (Object o : t) {
                 if (!firstElement) {
@@ -113,6 +104,9 @@ public class JSONListElementProvider extends AbstractListElementProvider {
             if (!isJsonMarshaller) {
                 jxsw.flush();
             }
+
+            entityStream.write("]".getBytes());
+            entityStream.flush();            
         } catch (XMLStreamException ex) {
             Logger.getLogger(JSONListElementProvider.class.getName()).log(Level.SEVERE, null, ex);
             throw new JAXBException(ex.getMessage(), ex);
