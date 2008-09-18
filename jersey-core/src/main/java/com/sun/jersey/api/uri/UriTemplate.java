@@ -54,14 +54,13 @@ import java.util.regex.PatternSyntaxException;
  */
 public class UriTemplate {
     /**
-     * Order the templates according to the string comparison of the
-     * template regular expressions.
+     * Order the templates according according to JAX-RS.
      * <p>
-     * The JSR-311 specification states:
-     *     "Sort the set of matching resource classes using the number of 
-     *      characters in the regular expression not resulting from template 
-     *      variables as the primary key and the number of matching groups 
-     *      as a secondary key"
+     * Sort the set of matching resource classes using the number of 
+     * characters in the regular expression not resulting from template 
+     * variables as the primary key, the number of matching groups
+     * as a secondary key, and the number of explicit regular expression
+     * declarations as the tertiary key.
      */
     static public final Comparator<UriTemplate> COMPARATOR = new Comparator<UriTemplate>() {
         public int compare(UriTemplate o1, UriTemplate o2) {
@@ -218,6 +217,12 @@ public class UriTemplate {
         this.templateVariables = Collections.unmodifiableList(templateParser.getNames());
     }
 
+    /**
+     * Create the URI pattern from a URI template parser.
+     *
+     * @param templateParser the URI template parser.
+     * @return the URI pattern.
+     */
     protected UriPattern createUriPattern(UriTemplateParser templateParser) {
         return new UriPattern(templateParser.getPattern(), templateParser.getGroupIndexes()); 
     }

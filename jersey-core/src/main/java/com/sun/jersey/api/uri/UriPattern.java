@@ -85,14 +85,23 @@ public class UriPattern {
      * @param regex the regular expression. If the expression is null or an
      *        empty string then the pattern will only match a null or empty
      *        URI path.
-     * 
-     * @throws {@link java.util.regex.PatternSyntaxException} if the
+     * @throws java.util.regex.PatternSyntaxException if the
      *         regular expression could not be compiled
      */
     public UriPattern(String regex) {
         this(regex, UriTemplateParser.EMPTY_INT_ARRAY);
     }
 
+    /**
+     * Construct a new URI pattern.
+     * 
+     * @param regex the regular expression. If the expression is null or an
+     *        empty string then the pattern will only match a null or empty
+     *        URI path.
+     * @param groupIndexes the array of group indexes to capturing groups.
+     * @throws java.util.regex.PatternSyntaxException if the
+     *         regular expression could not be compiled
+     */
     public UriPattern(String regex, int[] groupIndexes) {
         this(compile(regex), groupIndexes);
     }
@@ -116,6 +125,7 @@ public class UriPattern {
      * 
      * @param regexPattern the regular expression pattern
      * @param groupIndexes the array of group indexes to capturing groups.
+     * @throws IllegalArgumentException if the regexPattern is null.
      */
     public UriPattern(Pattern regexPattern, int[] groupIndexes) {
         if (regexPattern == null)
@@ -260,7 +270,7 @@ public class UriPattern {
      *        in the same order as the pattern's capturing groups. The list
      *        is cleared before values are added.
      * @return true if the URI matches the pattern, otherwise false.
-     * @throws {@link IllegalArgumentException} if the uri or 
+     * @throws IllegalArgumentException if the uri or 
      *         capturingGroupValues is null.
      */
     public final boolean match(CharSequence uri, List<String> groupValues) {
@@ -311,7 +321,7 @@ public class UriPattern {
      *        into the map using the group name associated with the 
      *        capturing group. The map is cleared before values are added.
      * @return true if the URI matches the pattern, otherwise false.
-     * @throws {@link IllegalArgumentException} if the uri or 
+     * @throws IllegalArgumentException if the uri or 
      *         capturingGroupValues is null.
      */
     public final boolean match(CharSequence uri, 

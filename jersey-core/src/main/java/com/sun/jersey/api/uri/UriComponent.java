@@ -54,16 +54,55 @@ import javax.ws.rs.core.PathSegment;
  * Utility class for validating, encoding and decoding components
  * of a URI.
  *
- * TODO rewrite to use masks and not lookup tables
- *
  * @author Paul.Sandoz@Sun.Com
  */
 public final class UriComponent {
 
+    // TODO rewrite to use masks and not lookup tables
+
+    /**
+     * The URI component type.
+     */
     public enum Type {
-        SCHEME, USER_INFO, HOST, PORT,
-        PATH, PATH_SEGMENT, MATRIX_PARAM,
-        QUERY, QUERY_PARAM,
+        /**
+         * The URI scheme component type.
+         */
+        SCHEME,
+        /**
+         * The URI user info component type.
+         */
+        USER_INFO,
+        /**
+         * The URI host component type.
+         */
+        HOST, 
+        /**
+         * The URI port component type.
+         */
+        PORT,
+        /**
+         * The URI path component type.
+         */
+        PATH, 
+        /**
+         * The URI path component type that is a path segment.
+         */
+        PATH_SEGMENT, 
+        /**
+         * The URI path component type that is a matrix parameter.
+         */
+        MATRIX_PARAM,
+        /**
+         * The URI query component type.
+         */
+        QUERY, 
+        /**
+         * The URI query component type that is a query parameter.
+         */
+        QUERY_PARAM,
+        /**
+         * The URI fragment component type.
+         */
         FRAGMENT,
     }
     

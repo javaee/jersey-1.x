@@ -48,7 +48,7 @@ import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
 /**
- * A URI template parser that parses JAX-RS specifide URI templates.
+ * A URI template parser that parses JAX-RS specific URI templates.
  * 
  * @author Paul.Sandoz@Sun.Com
  */
@@ -131,6 +131,13 @@ public class UriTemplateParser {
     
     private final Map<String, Pattern> nameToPattern = new HashMap<String, Pattern>();
 
+    /**
+     * Parse a template.
+     * 
+     * @param template the template.
+     * @throws IllegalArgumentException if the template is null, an empty string
+     *         or does not conform to a JAX-RS URI template.
+     */
     public UriTemplateParser(String template) {
         if (template == null || template.length() == 0)
             throw new IllegalArgumentException();
@@ -146,30 +153,72 @@ public class UriTemplateParser {
         }
     }
 
+    /**
+     * Get the template.
+     * 
+     * @return the template.
+     */
     public final String getTemplate() {
         return template;
     }
 
+    /**
+     * Get the pattern.
+     *
+     * @return the pattern.
+     */
     public final Pattern getPattern() {
         return pattern;
     }
 
+    /**
+     * Get the normalized template.
+     * <p>
+     * A normalized template is a template without any explicit regular
+     * expressions.
+     *
+     * @return the normalized template.
+     */
     public final String getNormalizedTemplate() {
         return normalizedTemplate.toString();
     }
 
+    /**
+     * Get the map of template names to patterns.
+     * 
+     * @return the map of template names to patterns.
+     */
     public final Map<String, Pattern> getNameToPattern() {
         return nameToPattern;
     }
 
+    /**
+     * Get the list of template names.
+     * 
+     * @return the list of template names.
+     */
     public final List<String> getNames() {
         return names;
     }
 
+    /**
+     * Get the capturing group counts for each template variable.
+     * 
+     * @return the capturing group counts.
+     */
     public final List<Integer> getGroupCounts() {
         return groupCounts;
     }
 
+    /**
+     * Get the group indexes to capturing groups.
+     * <p>
+     * Any nested capturing groups will be ignored and the
+     * the group index will refer to the top-level capturing
+     * groups associated with the templates variables.
+     *
+     * @return the group indexes to capturing groups.
+     */
     public final int[] getGroupIndexes() {
         if (names.isEmpty()) return EMPTY_INT_ARRAY;
 
@@ -185,10 +234,20 @@ public class UriTemplateParser {
         return EMPTY_INT_ARRAY;
     }
     
+    /**
+     * Get the number of explicit regular expressions.
+     * 
+     * @return the number of explicit regular expressions.
+     */
     public final int getNumberOfExplicitRegexes() {
         return numOfExplicitRegexes;
     }
 
+    /**
+     * Get the number of literal characters.
+     * 
+     * @return the number of literal characters.
+     */
     public final int getNumberOfLiteralCharacters() {
         return literalCharacters;
     }
