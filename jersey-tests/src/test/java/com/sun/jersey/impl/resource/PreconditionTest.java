@@ -84,16 +84,18 @@ public class PreconditionTest extends AbstractResourceTester {
 
     public void testIfUnmodifiedSinceAfterLastModified() {
         initiateWebApplication(LastModifiedResource.class);
-        resource("/").
+        ClientResponse response = resource("/").
                 header("If-Unmodified-Since", "Tue, 2 Jan 2007 00:00:00 GMT").
                 get(ClientResponse.class);
+        assertEquals(200, response.getStatus());
     }    
 
     public void testIfModifiedSinceBeforeLastModified() {
         initiateWebApplication(LastModifiedResource.class);
-        resource("/").
+        ClientResponse response = resource("/").
                 header("If-Modified-Since", "Sat, 30 Dec 2006 00:00:00 GMT").
                 get(ClientResponse.class);
+        assertEquals(200, response.getStatus());
     }    
 
     public void testIfModifiedSinceAfterLastModified() {
@@ -133,10 +135,11 @@ public class PreconditionTest extends AbstractResourceTester {
 
     public void testIfUnmodifiedSinceAfterLastModified_IfModifiedSinceBeforeLastModified() {
         initiateWebApplication(LastModifiedResource.class);
-        resource("/").
+        ClientResponse response = resource("/").
                 header("If-Unmodified-Since", "Tue, 2 Jan 2007 00:00:00 GMT").
                 header("If-Modified-Since", "Sat, 30 Dec 2006 00:00:00 GMT").
                 get(ClientResponse.class);
+        assertEquals(200, response.getStatus());
     }
         
     
@@ -156,9 +159,10 @@ public class PreconditionTest extends AbstractResourceTester {
 
     public void testIfMatchWithMatchingETag() {
         initiateWebApplication(EtagResource.class);
-        resource("/").
+        ClientResponse response = resource("/").
                 header("If-Match", "\"1\"").
                 get(ClientResponse.class);
+        assertEquals(200, response.getStatus());        
     }
     
     public void testIfMatchWithoutMatchingETag() {
@@ -171,9 +175,10 @@ public class PreconditionTest extends AbstractResourceTester {
     
     public void testIfMatchWildCard() {
         initiateWebApplication(EtagResource.class);
-        resource("/").
+        ClientResponse response = resource("/").
                 header("If-Match", "*").
                 get(ClientResponse.class);
+        assertEquals(200, response.getStatus());        
     }
     
     public void testIfNonMatchWithMatchingETag() {
@@ -187,9 +192,10 @@ public class PreconditionTest extends AbstractResourceTester {
     
     public void testIfNonMatchWithoutMatchingETag() {
         initiateWebApplication(EtagResource.class);
-        resource("/").
+        ClientResponse response = resource("/").
                 header("If-None-Match", "\"2\"").
                 get(ClientResponse.class);
+        assertEquals(200, response.getStatus());
     }
     
     public void testIfNonMatchWildCard() {
@@ -214,10 +220,11 @@ public class PreconditionTest extends AbstractResourceTester {
     
     public void testIfMatchWithMatchingETag_IfNonMatchWithoutMatchingETag() {
         initiateWebApplication(EtagResource.class);
-        resource("/").
+        ClientResponse response = resource("/").
                 header("If-Match", "\"1\"").
                 header("If-None-Match", "\"2\"").
                 get(ClientResponse.class);
+        assertEquals(200, response.getStatus());
     }
     
     public void testIfMatchWithoutMatchingETag_IfNonMatchWithMatchingETag() {
@@ -236,5 +243,58 @@ public class PreconditionTest extends AbstractResourceTester {
                 header("If-None-Match", "\"2\"").
                 get(ClientResponse.class);
         assertEquals(412, response.getStatus());
+    }
+    
+    @Path("/")
+    public static class LastModifiedEtagResource {
+        @Context Request request;
+
+        @GET
+        public Response doGet() {
+            GregorianCalendar lastModified = new GregorianCalendar(2007, 0, 0, 0, 0, 0);
+            ResponseBuilder rb = request.evaluatePreconditions(
+                    lastModified.getTime(),
+                    new EntityTag("1"));
+            if (rb != null)
+                return rb.build();
+            
+            return Response.ok("foo", "text/plain").build();
+        }
+    }
+    
+    public void testIfNonMatchWithMatchingETag_IfModifiedSinceBeforeLastModified() {
+        initiateWebApplication(LastModifiedEtagResource.class);
+        ClientResponse response = resource("/", false).
+                header("If-None-Match", "\"1\"").
+                header("If-Modified-Since", "Sat, 30 Dec 2006 00:00:00 GMT").
+                get(ClientResponse.class);
+        assertEquals(200, response.getStatus());
+    }
+    
+    public void testIfNonMatchWithMatchingETag_IfModifiedSinceAfterLastModified() {
+        initiateWebApplication(LastModifiedEtagResource.class);
+        ClientResponse response = resource("/", false).
+                header("If-None-Match", "\"1\"").
+                header("If-Modified-Since", "Tue, 2 Jan 2007 00:00:00 GMT").
+                get(ClientResponse.class);
+        assertEquals(304, response.getStatus());
+    }
+    
+    public void testIfNonMatchWithoutMatchingETag_IfModifiedSinceBeforeLastModified() {
+        initiateWebApplication(LastModifiedEtagResource.class);
+        ClientResponse response = resource("/", false).
+                header("If-None-Match", "\"2\"").
+                header("If-Modified-Since", "Sat, 30 Dec 2006 00:00:00 GMT").
+                get(ClientResponse.class);
+        assertEquals(200, response.getStatus());
+    }
+    
+    public void testIfNonMatchWithoutMatchingETag_IfModifiedSinceAfterLastModified() {
+        initiateWebApplication(LastModifiedEtagResource.class);
+        ClientResponse response = resource("/", false).
+                header("If-None-Match", "\"2\"").
+                header("If-Modified-Since", "Tue, 2 Jan 2007 00:00:00 GMT").
+                get(ClientResponse.class);
+        assertEquals(200, response.getStatus());
     }
 }

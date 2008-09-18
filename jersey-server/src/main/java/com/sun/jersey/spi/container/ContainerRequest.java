@@ -482,8 +482,14 @@ public class ContainerRequest implements HttpRequestContext {
             r = evaluateIfUnmodifiedSince(lastModifiedTime);
             if (r == null)
                 r = evaluateIfNoneMatch(eTag);
+            // If there is no entity tag match for "If-None-Match" then
+            // the "If-Modified-Since" header should be ignored
+            // so that it is not possible to return a 304 Not Modified response
             if (r == null)
-                r = evaluateIfModifiedSince(lastModifiedTime);
+                return null;
+            r = evaluateIfModifiedSince(lastModifiedTime);
+            if (r != null)
+                r.tag(eTag);
         }
         
         return r;        
