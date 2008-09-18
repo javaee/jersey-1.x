@@ -42,7 +42,7 @@ import com.sun.jersey.api.core.HttpContext;
 import com.sun.jersey.api.core.ResourceConfig;
 import com.sun.jersey.api.uri.ExtendedUriInfo;
 import com.sun.jersey.impl.AbstractResourceTester;
-import com.sun.jersey.spi.container.MessageBodyWorkers;
+import com.sun.jersey.spi.MessageBodyWorkers;
 import com.sun.jersey.spi.resource.Singleton;
 import com.sun.jersey.spi.template.TemplateContext;
 import java.io.IOException;

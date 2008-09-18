@@ -35,10 +35,9 @@
  * holder.
  */
 
-package com.sun.jersey.spi.resource;
+package com.sun.jersey.spi.inject;
 
 import com.sun.jersey.api.model.Parameter;
-import com.sun.jersey.spi.inject.Injectable;
 import com.sun.jersey.spi.service.ComponentContext;
 import com.sun.jersey.spi.service.ComponentProvider.Scope;
 import java.lang.annotation.Annotation;
@@ -53,6 +52,10 @@ public interface InjectableProviderContext {
     /**
      * Get an injectable.
      * 
+     * @param <A> the type of the annotation.
+     * @param <C> the the context type. Types of the {@link java.lang.reflect.Type} and 
+     *        {@link com.sun.jersey.api.model.Parameter} are the only types that
+     *        are supported.
      * @param ac the annotation class.
      * @param ic the injectable context.
      * @param a the annotation instance.
@@ -71,6 +74,10 @@ public interface InjectableProviderContext {
     /**
      * Get an injectable.
      * 
+     * @param <A> the type of the annotation.
+     * @param <C> the the context type. Types of the {@link java.lang.reflect.Type} and 
+     *        {@link com.sun.jersey.api.model.Parameter} are the only types that
+     *        are supported.
      * @param ac the annotation class.
      * @param ic the injectable context.
      * @param a the annotation instance.

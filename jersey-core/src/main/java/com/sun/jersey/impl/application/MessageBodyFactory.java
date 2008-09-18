@@ -40,7 +40,7 @@ package com.sun.jersey.impl.application;
 import com.sun.jersey.impl.model.MediaTypeHelper;
 import com.sun.jersey.impl.util.KeyComparator;
 import com.sun.jersey.impl.util.KeyComparatorHashMap;
-import com.sun.jersey.spi.container.MessageBodyWorkers;
+import com.sun.jersey.spi.MessageBodyWorkers;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 import java.util.ArrayList;

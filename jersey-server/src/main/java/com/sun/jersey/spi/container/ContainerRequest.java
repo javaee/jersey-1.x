@@ -46,6 +46,7 @@ import com.sun.jersey.impl.http.header.AcceptableLanguageTag;
 import com.sun.jersey.impl.http.header.HttpHeaderFactory;
 import com.sun.jersey.impl.http.header.reader.HttpHeaderReader;
 import com.sun.jersey.impl.model.HttpHelper;
+import com.sun.jersey.spi.MessageBodyWorkers;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.annotation.Annotation;

@@ -41,7 +41,7 @@ import com.sun.syndication.feed.atom.Entry;
 import com.sun.syndication.feed.atom.Feed;
 import com.sun.syndication.io.FeedException;
 import com.sun.jersey.api.ConflictException;
-import com.sun.jersey.spi.container.MessageBodyWorkers;
+import com.sun.jersey.spi.MessageBodyWorkers;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
 

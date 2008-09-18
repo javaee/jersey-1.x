@@ -52,7 +52,7 @@ import com.sun.jersey.impl.uri.rules.SubLocatorRule;
 import com.sun.jersey.impl.uri.PathPattern;
 import com.sun.jersey.impl.uri.PathTemplate;
 import com.sun.jersey.api.uri.UriTemplate;
-import com.sun.jersey.spi.resource.InjectableProviderContext;
+import com.sun.jersey.spi.inject.InjectableProviderContext;
 import com.sun.jersey.impl.application.ResourceMethodDispatcherFactory;
 import com.sun.jersey.impl.template.ViewableRule;
 import com.sun.jersey.impl.uri.rules.CombiningMatchingPatterns;

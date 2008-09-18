@@ -36,7 +36,7 @@
  */
 package com.sun.jersey.impl.application;
 
-import com.sun.jersey.spi.resource.InjectableProviderContext;
+import com.sun.jersey.spi.inject.InjectableProviderContext;
 import com.sun.jersey.api.container.ContainerException;
 import com.sun.jersey.api.model.Parameter;
 import com.sun.jersey.impl.model.ReflectionHelper;

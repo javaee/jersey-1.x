@@ -37,7 +37,7 @@
 
 package com.sun.jersey.samples.atomserver.resources;
 
-import com.sun.jersey.spi.container.MessageBodyWorkers;
+import com.sun.jersey.spi.MessageBodyWorkers;
 import com.sun.syndication.feed.atom.Content;
 import com.sun.syndication.feed.atom.Entry;
 import com.sun.syndication.feed.atom.Feed;

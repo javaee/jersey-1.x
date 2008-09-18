@@ -44,7 +44,7 @@ import com.sun.syndication.feed.atom.Link;
 import com.sun.syndication.io.FeedException;
 import com.sun.syndication.io.WireFeedInput;
 import com.sun.jersey.api.NotFoundException;
-import com.sun.jersey.spi.container.MessageBodyWorkers;
+import com.sun.jersey.spi.MessageBodyWorkers;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;

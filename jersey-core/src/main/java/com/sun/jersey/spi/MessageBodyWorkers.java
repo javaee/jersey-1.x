@@ -1,3 +1,5 @@
+package com.sun.jersey.spi;
+
 /*
  *
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
@@ -34,7 +36,7 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-package com.sun.jersey.spi.container;
+
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
@@ -56,11 +58,13 @@ public interface MessageBodyWorkers {
     /**
      * Get a message body reader that matches a set of criteria.
      * 
+     * @param <T> the type of object to be read.
+     *
      * @param mediaType the media type of the data that will be read, this will
      * be compared to the values of {@link javax.ws.rs.Consumes} for
      * each candidate reader and only matching readers will be queried.
      * 
-     * @param type the class of object to be produced.
+     * @param type the class of object to be read.
      * 
      * @param genericType the type of object to be produced. E.g. if the 
      * message body is to be converted into a method parameter, this will be
@@ -81,6 +85,8 @@ public interface MessageBodyWorkers {
     
     /**
      * Get a message body writer that matches a set of criteria.
+     * 
+     * @param <T> the type of the object that is to be written.
      * 
      * @param mediaType the media type of the data that will be written, this will
      * be compared to the values of {@link javax.ws.rs.Produces} for
@@ -107,6 +113,8 @@ public interface MessageBodyWorkers {
     
     /**
      * Get the list of media types supported for a Java type.
+     * 
+     * @param <T> the type of object that is to be written.
      * 
      * @param type the class of object that is to be written.
      * 

@@ -44,7 +44,7 @@ import com.sun.jersey.api.model.Parameter;
 import com.sun.jersey.api.representation.Form;
 import com.sun.jersey.impl.http.header.reader.HttpHeaderReader;
 import com.sun.jersey.impl.http.header.reader.HttpHeaderReaderImpl;
-import com.sun.jersey.spi.container.MessageBodyWorkers;
+import com.sun.jersey.spi.MessageBodyWorkers;
 import com.sun.jersey.spi.dispatch.RequestDispatcher;
 import com.sun.jersey.spi.inject.Injectable;
 import com.sun.jersey.spi.service.ComponentProvider.Scope;

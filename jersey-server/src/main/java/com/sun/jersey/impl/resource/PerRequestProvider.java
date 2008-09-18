@@ -40,7 +40,7 @@ package com.sun.jersey.impl.resource;
 import com.sun.jersey.api.container.ContainerException;
 import com.sun.jersey.api.core.HttpContext;
 import com.sun.jersey.api.model.AbstractResource;
-import com.sun.jersey.spi.resource.InjectableProviderContext;
+import com.sun.jersey.spi.inject.InjectableProviderContext;
 import com.sun.jersey.spi.resource.ResourceClassInjector;
 import com.sun.jersey.spi.inject.Injectable;
 import com.sun.jersey.spi.resource.ResourceConstructor;

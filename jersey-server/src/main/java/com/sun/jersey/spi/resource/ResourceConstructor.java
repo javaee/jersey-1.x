@@ -36,6 +36,7 @@
  */
 package com.sun.jersey.spi.resource;
 
+import com.sun.jersey.spi.inject.InjectableProviderContext;
 import com.sun.jersey.api.model.AbstractResource;
 import com.sun.jersey.api.model.AbstractResourceConstructor;
 import com.sun.jersey.spi.inject.Injectable;

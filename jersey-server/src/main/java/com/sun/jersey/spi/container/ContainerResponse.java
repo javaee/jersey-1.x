@@ -40,6 +40,7 @@ import com.sun.jersey.api.OutBoundHeaders;
 import com.sun.jersey.api.Responses;
 import com.sun.jersey.api.core.HttpResponseContext;
 import com.sun.jersey.impl.ResponseImpl;
+import com.sun.jersey.spi.MessageBodyWorkers;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.lang.annotation.Annotation;

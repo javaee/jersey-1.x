@@ -43,7 +43,7 @@ import com.sun.jersey.api.core.HttpContext;
 import com.sun.jersey.api.model.AbstractResourceMethod;
 import com.sun.jersey.api.model.Parameter;
 import com.sun.jersey.impl.ResponseBuilderImpl;
-import com.sun.jersey.spi.resource.InjectableProviderContext;
+import com.sun.jersey.spi.inject.InjectableProviderContext;
 import com.sun.jersey.impl.model.ReflectionHelper;
 import com.sun.jersey.spi.dispatch.RequestDispatcher;
 import com.sun.jersey.spi.inject.Injectable;

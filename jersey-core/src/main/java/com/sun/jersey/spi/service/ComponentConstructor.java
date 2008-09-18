@@ -38,7 +38,7 @@ package com.sun.jersey.spi.service;
 
 import com.sun.jersey.impl.application.InjectableProviderFactory.AnnotationObjectContext;
 import com.sun.jersey.spi.inject.Injectable;
-import com.sun.jersey.spi.resource.InjectableProviderContext;
+import com.sun.jersey.spi.inject.InjectableProviderContext;
 import com.sun.jersey.spi.service.ComponentProvider.Scope;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
@@ -74,8 +74,14 @@ public class ComponentConstructor {
          * constructor;
          */
         public final List<Injectable> is;
-        
-        private ConstructorInjectablePair(Constructor<T> con, List<Injectable> is) {
+
+        /**
+         * Create a new tuple of a constructor and list of injectables.
+         * 
+         * @param con the constructor
+         * @param is the list of injectables.
+         */
+        public ConstructorInjectablePair(Constructor<T> con, List<Injectable> is) {
             this.con = con;
             this.is = is;
         }

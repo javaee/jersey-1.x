@@ -49,6 +49,7 @@ import javax.ws.rs.ext.RuntimeDelegate.HeaderDelegate;
  * resource directory <tt>META-INF/services</tt>, and including the fully qualified
  * service-provider-class of the implementation in the file.
 
+ * @param <T> the type of the header.
  * @author Paul.Sandoz@Sun.Com
  */
 public interface HeaderDelegateProvider<T> extends HeaderDelegate<T> {

@@ -36,6 +36,7 @@
  */
 package com.sun.jersey.spi.resource;
 
+import com.sun.jersey.spi.inject.InjectableProviderContext;
 import com.sun.jersey.api.container.ContainerException;
 import com.sun.jersey.api.core.HttpContext;
 import com.sun.jersey.api.model.AbstractField;
