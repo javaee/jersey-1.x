@@ -36,6 +36,7 @@
  */
 package com.sun.jersey.api.model;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
@@ -51,9 +52,11 @@ public class AbstractResourceMethod extends AbstractMethod
     private List<MediaType> produceMimeList;
     private List<Parameter> parameters;
     private String httpMethod;
+    private Annotation[] annotations;
 
     public AbstractResourceMethod(AbstractResource resource, 
-            Method method, String httpMethod) {
+            Method method, String httpMethod,
+            Annotation[] annotations) {
         super(method);
 
         this.resource = resource;
@@ -61,6 +64,7 @@ public class AbstractResourceMethod extends AbstractMethod
         this.consumeMimeList = new ArrayList<MediaType>();
         this.produceMimeList = new ArrayList<MediaType>();
         this.parameters = new ArrayList<Parameter>();
+        this.annotations = annotations;
     }
 
     public AbstractResource getDeclaringResource() {
@@ -81,6 +85,10 @@ public class AbstractResourceMethod extends AbstractMethod
 
     public List<Parameter> getParameters() {
         return parameters;
+    }
+
+    public Annotation[] getAnnotations() {
+        return annotations;
     }
     
     public void accept(AbstractModelVisitor visitor) {

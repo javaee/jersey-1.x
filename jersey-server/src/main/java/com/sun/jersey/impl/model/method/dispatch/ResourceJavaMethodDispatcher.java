@@ -43,6 +43,7 @@ import com.sun.jersey.api.core.HttpContext;
 import com.sun.jersey.api.core.HttpRequestContext;
 import com.sun.jersey.api.model.AbstractResourceMethod;
 import com.sun.jersey.spi.dispatch.RequestDispatcher;
+import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.List;
@@ -56,13 +57,16 @@ public abstract class ResourceJavaMethodDispatcher implements RequestDispatcher 
 
     protected final Method method;
     
-    final private List<MediaType> produceMime;
+    private final List<MediaType> produceMime;
+
+    private final Annotation[] annotations;
     
-    final private MediaType mediaType;
+    private final MediaType mediaType;
 
     public ResourceJavaMethodDispatcher(AbstractResourceMethod abstractResourceMethod) {
         this.method = abstractResourceMethod.getMethod();
         this.produceMime = abstractResourceMethod.getSupportedOutputTypes();
+        this.annotations = abstractResourceMethod.getAnnotations();
         
         if (this.produceMime.size() == 1) {
             MediaType c = this.produceMime.get(0);
@@ -79,6 +83,10 @@ public abstract class ResourceJavaMethodDispatcher implements RequestDispatcher 
         // Invoke the method on the resource
         try {
             _dispatch(resource, context);
+            // Set the annotations if no exception is thrown and
+            // there exists an entity
+            if (context.getResponse().getEntity() != null)
+                context.getResponse().setAnnotations(annotations);
         } catch (InvocationTargetException e) {
             Throwable t = e.getTargetException();
             if (t instanceof RuntimeException) {

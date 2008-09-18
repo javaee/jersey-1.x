@@ -229,16 +229,13 @@ public class IntrospectionModeller {
             boolean isEncoded,
             Consumes classScopeConsumesAnnotation, 
             Produces classScopeProducesAnnotation) {
-
-        // TODO what to do about multiple meta HttpMethod annotations?
-        // Should the method be added more than once to the model and
-        // then validation could reject?
         for (AnnotatedMethod m : methodList.hasMetaAnnotation(HttpMethod.class).
                 hasNotAnnotation(Path.class)) {
             final AbstractResourceMethod resourceMethod = new AbstractResourceMethod(
                     resource,
                     m.getMethod(), 
-                    m.getMetaMethodAnnotations(HttpMethod.class).get(0).value());
+                    m.getMetaMethodAnnotations(HttpMethod.class).get(0).value(),
+                    m.getAnnotations());
 
             addConsumes(m, resourceMethod, classScopeConsumesAnnotation);
             addProduces(m, resourceMethod, classScopeProducesAnnotation);
@@ -254,10 +251,6 @@ public class IntrospectionModeller {
             boolean isEncoded,
             Consumes classScopeConsumesAnnotation, 
             Produces classScopeProducesAnnotation) {
-
-        // TODO what to do about multiple meta HttpMethod annotations?
-        // Should the method be added more than once to the model and
-        // then validation could reject?
         for (AnnotatedMethod m : methodList.hasMetaAnnotation(HttpMethod.class).
                 hasAnnotation(Path.class)) {
             final Path mPathAnnotation = m.getAnnotation(Path.class);
@@ -266,7 +259,8 @@ public class IntrospectionModeller {
                     m.getMethod(),
                     new PathValue(
                         mPathAnnotation.value()),
-                    m.getMetaMethodAnnotations(HttpMethod.class).get(0).value());
+                    m.getMetaMethodAnnotations(HttpMethod.class).get(0).value(),
+                    m.getAnnotations());
        
             addConsumes(m, subResourceMethod, classScopeConsumesAnnotation);
             addProduces(m, subResourceMethod, classScopeProducesAnnotation);
@@ -274,22 +268,6 @@ public class IntrospectionModeller {
 
             resource.getSubResourceMethods().add(subResourceMethod);
         }
-    }
-    
-    /**
-     * Return a list of specific meta-annotations decared on annotations of
-     * a method.
-     */
-    private static final <T extends Annotation> List<T> getMetaAnnotations(
-            Method m, Class<T> annotation) {
-        List <T> ma = new ArrayList<T>();
-        for (Annotation a : m.getAnnotations()) {
-            if (a.annotationType().getAnnotation(annotation) != null) {
-                ma.add(a.annotationType().getAnnotation(annotation));
-            }
-        }
-        
-        return ma;
     }
     
     private static final void workOutSubResourceLocatorsList(

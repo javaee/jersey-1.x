@@ -80,7 +80,7 @@ public class AbstractResourceMethodTest extends TestCase {
      */
     public void testGetHttpMethod() throws NoSuchMethodException {
         AbstractResourceMethod arm = new AbstractResourceMethod(
-                null, TestResource.class.getMethod("getMethod"), "PUT");
+                null, TestResource.class.getMethod("getMethod"), "PUT", null);
         assertEquals("PUT", arm.getHttpMethod());
     }
 }

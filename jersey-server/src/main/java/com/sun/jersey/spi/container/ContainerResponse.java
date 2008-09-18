@@ -42,6 +42,7 @@ import com.sun.jersey.api.core.HttpResponseContext;
 import com.sun.jersey.impl.ResponseImpl;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 import java.net.URI;
 import java.util.List;
@@ -64,6 +65,8 @@ import javax.ws.rs.ext.RuntimeDelegate.HeaderDelegate;
  * @author Paul.Sandoz@Sun.Com
  */
 public class ContainerResponse implements HttpResponseContext {
+    private static final Annotation[] EMPTY_ANNOTATIONS = new Annotation[0];
+    
     private static final Logger LOGGER = Logger.getLogger(ContainerResponse.class.getName());
     
     private static final RuntimeDelegate rd = RuntimeDelegate.getInstance();
@@ -87,6 +90,8 @@ public class ContainerResponse implements HttpResponseContext {
     private boolean isCommitted;
     
     private CommittingOutputStream out;
+    
+    private Annotation[] annotations = EMPTY_ANNOTATIONS;
     
     private final class CommittingOutputStream extends OutputStream {
         private final long size;
@@ -219,7 +224,7 @@ public class ContainerResponse implements HttpResponseContext {
         
         final MessageBodyWriter p = bodyContext.getMessageBodyWriter(
                 entity.getClass(), entityType, 
-                null, contentType);
+                annotations, contentType);
         // If there is no message body writer return a Not Acceptable response
         if (p == null) {
             String message = "A message body writer for Java type, " + entity.getClass() + 
@@ -233,7 +238,8 @@ public class ContainerResponse implements HttpResponseContext {
                 throw new WebApplicationException(Response.serverError().entity(message).build());
         }
 
-        final long size = p.getSize(entity, entity.getClass(), entityType, null, contentType);
+        final long size = p.getSize(entity, entity.getClass(), entityType, 
+                annotations, contentType);
         if (request.getMethod().equals("HEAD")) {
             if (size != -1)
                 getHttpHeaders().putSingle("Content-Length", Long.toString(size));
@@ -241,8 +247,9 @@ public class ContainerResponse implements HttpResponseContext {
             responseWriter.writeStatusAndHeaders(0, this);
         } else {
             OutputStream o = new CommittingOutputStream(size);
-            p.writeTo(entity, entity.getClass(), entityType, null, 
-                    contentType, getHttpHeaders(), o);            
+            p.writeTo(entity, entity.getClass(), entityType,
+                    annotations, contentType, getHttpHeaders(),
+                    o);            
             if (!isCommitted) {
                 isCommitted = true;
                 responseWriter.writeStatusAndHeaders(-1, this);
@@ -332,6 +339,14 @@ public class ContainerResponse implements HttpResponseContext {
         }        
         
         checkStatusAndEntity();
+    }
+    
+    public Annotation[] getAnnotations() {
+        return annotations;
+    }
+
+    public void setAnnotations(Annotation[] annotations) {
+        this.annotations = (annotations != null) ? annotations : EMPTY_ANNOTATIONS;
     }
     
     public MultivaluedMap<String, Object> getHttpHeaders() {

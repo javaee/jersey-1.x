@@ -38,6 +38,7 @@ package com.sun.jersey.api.core;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 import javax.ws.rs.core.GenericEntity;
 import javax.ws.rs.core.MediaType;
@@ -115,6 +116,20 @@ public interface HttpResponseContext {
      */
     void setEntity(Object entity);
     
+    /**
+     * Get the annotations associated with the response entity (if any).
+     *
+     * @return the annotations.
+     */
+    Annotation[] getAnnotations();
+
+    /**
+     * Set the annotations associated with the response entity (if any).
+     * 
+     * @param annotations the annotations.
+     */
+    void setAnnotations(Annotation[] annotations);
+
     /**
      * Get the HTTP response headers. The returned map is case-insensitive
      * with respect to the keys (header values). The method {@link #setResponse} 
