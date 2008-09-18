@@ -14,8 +14,8 @@ import java.lang.reflect.Type;
  * A utility class that may implemented to support a per-request injectable 
  * provider for a specific type T.
  * 
- * @param A the annotation type
- * @param T the type returned by {@link Injectable#getValue}
+ * @param <A> the annotation type
+ * @param <T> the type returned by {@link Injectable#getValue}
  * @author Paul.Sandoz@Sun.Com
  */
 public abstract class PerRequestTypeInjectableProvider <A extends Annotation, T> 

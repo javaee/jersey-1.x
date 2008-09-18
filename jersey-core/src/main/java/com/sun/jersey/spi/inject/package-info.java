@@ -34,30 +34,7 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-package com.sun.jersey.spi.inject;
-
-import static java.lang.annotation.ElementType.CONSTRUCTOR;
-import static java.lang.annotation.ElementType.FIELD;
-import static java.lang.annotation.ElementType.PARAMETER;
-import static java.lang.annotation.RetentionPolicy.RUNTIME;
-
-import java.lang.annotation.Documented;
-import java.lang.annotation.Retention;
-import java.lang.annotation.Target;
-
 /**
- * Used to annotate fields that shall be injected with instances obtained
- * from the component provider.
- *
- * @author <a href="mailto:martin.grotzke@freiheit.com">Martin Grotzke</a>
+ * Provides support for injection onto resource and provider classes.
  */
-@Target({FIELD, PARAMETER, CONSTRUCTOR })
-@Retention(RUNTIME)
-@Documented
-public @interface Inject {
-    /**
-     * @return the name of the object to inject, by default the name
-     *         is the class name of the type that is injected.
-     */
-    String value() default "";
-}
+package com.sun.jersey.spi.inject;

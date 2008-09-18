@@ -46,8 +46,8 @@ import java.lang.annotation.Annotation;
  * to obtain the instance to inject onto a field, bean setter method, parameter
  * of a constructor, or parameter of a method.
  * 
- * @param A the annotation type
- * @param C the context type. Types of the {@link java.lang.reflect.Type} and 
+ * @param <A> the annotation type
+ * @param <C> the context type. Types of the {@link java.lang.reflect.Type} and 
  *        {@link com.sun.jersey.api.model.Parameter} are the only types that
  *        are supported.
  * @author Paul.Sandoz@Sun.Com
