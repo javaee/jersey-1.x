@@ -213,7 +213,7 @@ public class ContainerResponse implements HttpResponseContext {
         MediaType contentType = getContentType();
         if (contentType == null) {
             List<MediaType> mts = bodyContext.getMessageBodyWriterMediaTypes(
-                    entity.getClass(), entityType, null);
+                    entity.getClass(), entityType, annotations);
             contentType = request.getAcceptableMediaType(mts);
             if (contentType == null || 
                     contentType.isWildcardType() || contentType.isWildcardSubtype())
