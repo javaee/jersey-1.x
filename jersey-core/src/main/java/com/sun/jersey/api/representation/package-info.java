@@ -35,6 +35,6 @@
  * holder.
  */
 /**
- * Classes to create and tailor resource representations.
+ * Provides support for particular representations.
  */
 package com.sun.jersey.api.representation;

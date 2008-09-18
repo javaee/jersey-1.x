@@ -35,6 +35,6 @@
  * holder.
  */
 /**
- * Provides support for common classes and interfaces.
+ * Provides support for the abstract model of resource classes.
  */
-package com.sun.jersey.api;
+package com.sun.jersey.api.model;

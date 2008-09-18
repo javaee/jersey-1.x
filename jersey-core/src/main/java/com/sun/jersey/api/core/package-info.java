@@ -35,6 +35,6 @@
  * holder.
  */
 /**
- * Provides support for common classes and interfaces.
+ * Provides support for server-side request and response interfaces.
  */
-package com.sun.jersey.api;
+package com.sun.jersey.api.core;
