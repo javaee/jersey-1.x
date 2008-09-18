@@ -37,7 +37,7 @@
 
 package com.sun.jersey.spi.service;
 
-import com.sun.jersey.spi.SpiMessages;
+import com.sun.jersey.impl.SpiMessages;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -203,6 +203,7 @@ public final class ServiceFinder<T> implements Iterable<T> {
      * @throws ServiceConfigurationError If a provider-configuration file violates the specified format
      *                                   or names a provider class that cannot be found and instantiated
      * @see #find(Class)
+     * @param <T> the type of the service instance.
      * @return the service finder
      */
     public static <T> ServiceFinder<T> find(Class<T> service, ClassLoader loader) 
@@ -240,6 +241,7 @@ public final class ServiceFinder<T> implements Iterable<T> {
      * @throws ServiceConfigurationError If a provider-configuration file violates the specified format
      *                                   or names a provider class that cannot be found and instantiated
      * @see #find(Class)
+     * @param <T> the type of the service instance.
      * @return the service finder
      */
     public static <T> ServiceFinder<T> find(Class<T> service, 
@@ -265,6 +267,7 @@ public final class ServiceFinder<T> implements Iterable<T> {
      * @throws ServiceConfigurationError If a provider-configuration file violates the specified format
      *                                   or names a provider class that cannot be found and instantiated
      * @see #find(Class, ClassLoader)
+     * @param <T> the type of the service instance.
      * @return the service finder
      */
     public static <T> ServiceFinder<T> find(Class<T> service) 
@@ -291,6 +294,7 @@ public final class ServiceFinder<T> implements Iterable<T> {
      * @throws ServiceConfigurationError If a provider-configuration file violates the specified format
      *                                   or names a provider class that cannot be found and instantiated
      * @see #find(Class, ClassLoader)
+     * @param <T> the type of the service instance.
      * @return the service finder
      */
     public static <T> ServiceFinder<T> find(Class<T> service, 
@@ -319,6 +323,7 @@ public final class ServiceFinder<T> implements Iterable<T> {
      * @throws ServiceConfigurationError If a provider-configuration file violates the specified format
      *                                   or names a provider class that cannot be found and instantiated
      * @see #find(Class, ClassLoader)
+     * @param <T> the type of the service instance.
      * @return the service finder
      */
     public static <T> ServiceFinder<T> find(Class<T> service, 
