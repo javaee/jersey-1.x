@@ -61,8 +61,7 @@ public interface ComponentProvider {
     public enum Scope {
         /**
          * Declares that only one instance of a component shall exist 
-         * per-web application instance. The runtime will manage the component
-         * in the scope of the web application.
+         * per-runtime instance.
          */
         Singleton,
         
@@ -75,28 +74,28 @@ public interface ComponentProvider {
         PerRequest,
         
         /**
-         * The JAX-RS application (jersey) does not care what the scope is,
+         * The runtime does not care what the scope is,
          * the component provider can decide which to choose - the component
          * provider is responsible for managing instances of a type.
          */
         Undefined;
 
         /**
-         * A immutable lit comprising of the scopes Undefined and
+         * A immutable list comprising of the scopes Undefined and
          * Singleton, in that order.
          */
         public static final List<Scope> UNDEFINED_SINGLETON = Collections.unmodifiableList(
                 Arrays.asList(Scope.Undefined, Scope.Singleton));
         
         /**
-         * A immutable lit comprising of the scopes PerRequest, Undefined and
+         * A immutable list comprising of the scopes PerRequest, Undefined and
          * Singleton, in that order.
          */
         public static final List<Scope> PERREQUEST_UNDEFINED_SINGLETON = Collections.unmodifiableList(
                 Arrays.asList(Scope.PerRequest, Scope.Undefined, Scope.Singleton));
         
         /**
-         * A immutable lit comprising of the scopes PerRequest and  
+         * A immutable list comprising of the scopes PerRequest and  
          * Undefined, in that order.
          */
         public static final List<Scope> PERREQUEST_UNDEFINED = Collections.unmodifiableList(
@@ -114,8 +113,10 @@ public interface ComponentProvider {
      * @return the instance, or null if the component cannot be instantaited
      *         and managed.
      * 
-     * @throws java.lang.InstantiationException
-     * @throws java.lang.IllegalAccessException
+     * @throws java.lang.InstantiationException if the component could not be
+     *         instantiated.
+     * @throws java.lang.IllegalAccessException if there was an error accessing
+     *         the definition of the component class.
      */
     <T> T getInstance(Scope scope, Class<T> c) 
             throws InstantiationException, IllegalAccessException;
@@ -136,9 +137,13 @@ public interface ComponentProvider {
      * @return the instance, or null if the component cannot be instantaited
      *         and managed.
      * 
-     * @throws java.lang.InstantiationException
-     * @throws java.lang.IllegalArgumentException 
-     * @throws java.lang.IllegalAccessException
+     * @throws java.lang.InstantiationException if the component could not be
+     *         instantiated.
+     * @throws java.lang.IllegalAccessException if there was an error accessing
+     *         the definition of the component constructor.
+     * @throws java.lang.IllegalArgumentException if the number of parameters
+     *          differ or a parameter instance does not conform to the
+     *          approprate type.
      * @throws java.lang.reflect.InvocationTargetException
      */
     <T> T getInstance(Scope scope, Constructor<T> contructor, Object[] parameters) 
@@ -160,15 +165,16 @@ public interface ComponentProvider {
      * @return the instance, or null if the component cannot be instantaited
      *         and managed.
      * 
-     * @throws java.lang.InstantiationException
-     * @throws java.lang.IllegalAccessException
+     * @throws java.lang.InstantiationException if the component could not be
+     *         instantiated.
+     * @throws java.lang.IllegalAccessException if there was an error accessing
+     *         the definition of the component class.
      */
     <T> T getInstance(ComponentContext cc, Scope scope, Class<T> c) 
             throws InstantiationException, IllegalAccessException;
     
     /**
-     * Get the injectable instance to inject JAX-RS and Jersey specific
-     * instances on to fields.
+     * Get the injectable instance to inject onto fields of the instance.
      * <p>
      * If the injectable instance is the same as the instance that was passed in
      * then the provider MUST return that instance.

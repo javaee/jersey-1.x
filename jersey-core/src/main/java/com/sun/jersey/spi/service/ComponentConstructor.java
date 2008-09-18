@@ -51,15 +51,31 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 
 /**
+ * A class that may be used to obtain the most appropriate constructor
+ * (with injectables) for a component.
  *
  * @author Paul.Sandoz@Sun.Com
  */
 public class ComponentConstructor {
+    /**
+     * A tuple of a constructor and the list of injectables associated with
+     * the parameters of the constructor.
+     * 
+     * @param <T> the type to construct.
+     */
     public static class ConstructorInjectablePair<T> {
+        /**
+         * The constructor.
+         */
         public final Constructor<T> con;
+
+        /**
+         * The list of injectables associated with the parameters of the
+         * constructor;
+         */
         public final List<Injectable> is;
         
-        public ConstructorInjectablePair(Constructor<T> con, List<Injectable> is) {
+        private ConstructorInjectablePair(Constructor<T> con, List<Injectable> is) {
             this.con = con;
             this.is = is;
         }
@@ -76,7 +92,12 @@ public class ComponentConstructor {
     }
     
     protected final InjectableProviderContext ipc;
-    
+
+    /**
+     * Create a component constructor with the injectable provider context.
+     *
+     * @param ipc the injectable provider context.
+     */
     public ComponentConstructor(InjectableProviderContext ipc) {
         this.ipc = ipc;
     }
@@ -86,7 +107,8 @@ public class ComponentConstructor {
      * parameters and that has the most parameters associated with 
      * Injectable instances will be chosen.
      * 
-     * @param c the class to instantiate
+     * @param <T> The type to construct.
+     * @param c the class to instantiate.
      * @return a list of constructor and list of injectables for the constructor 
      *         parameters.
      */

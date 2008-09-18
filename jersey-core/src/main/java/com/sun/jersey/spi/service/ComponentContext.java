@@ -44,7 +44,7 @@ import java.lang.reflect.AccessibleObject;
 /**
  * A component context providing information to {@link ComponentProvider}
  * and {@link InjectableProvider} instances on the accessible object and list of
- * annotations associated with component instance to be obtained and/or 
+ * annotations associated with the component instance to be obtained and/or
  * injected.
  * 
  * @author Paul.Sandoz@Sun.Com

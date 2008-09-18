@@ -35,6 +35,6 @@
  * holder.
  */
 /**
- * Classes used by the SPIs to support dynamic extensions.
+ * Provides support for services and components.
  */
 package com.sun.jersey.spi.service;

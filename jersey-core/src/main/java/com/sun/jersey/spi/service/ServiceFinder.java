@@ -138,6 +138,7 @@ import java.util.logging.Logger;
  * caller.  Trusted system code should typically invoke the methods in this
  * class from within a privileged security context.
  *
+ * @param <T> the type of the service instance.
  * @author Mark Reinhold
  * @version 1.11, 03/12/19
  * @since 1.3
