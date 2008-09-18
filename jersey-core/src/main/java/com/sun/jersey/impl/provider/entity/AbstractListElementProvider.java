@@ -212,7 +212,18 @@ public abstract class AbstractListElementProvider extends AbstractJAXBProvider<C
     
     private final Inflector inflector = Inflector.getInstance();
 
+    private final String ensureValidXmlName(String name) {
+        if (name == null) {
+            return null;
+        }
+        if (name.contains("$")) {
+            return name.replace("$", "");
+        } else {
+            return name;
+        }
+    }
+
     protected final String getRootElementName(Class<?> elementType) {
-        return inflector.pluralize(inflector.demodulize(elementType.getName()));
+        return ensureValidXmlName(inflector.pluralize(inflector.demodulize(elementType.getName())));
     }    
 }
