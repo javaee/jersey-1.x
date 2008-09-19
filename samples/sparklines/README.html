@@ -1,18 +1,308 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
-<html><head><title>Sparklines Example</title></head>
-
-
-  <body>
-      <h1>Sparklines Example</h1>
-      
-      <p>This example is inspired by Joe Gregorio's sparklines implementation.</p>
-      
-      <h2>Contents</h2>
-      <p>TODO</p>
-      <h2>Running the Example</h2>
-      <p>Run the example as follows:</p>
-      <p> run 
-      <blockquote><code>mvn compile exec:java</code><p></blockquote>
-      <p>From a web browser, visit:</p>
-      <blockquote><code><a href="http://localhost:9998/sparklines/discrete?d=88,84,82,92,82,86,66,82,44,64,66,88,96,80,24,26,14,0,0,26,8,6,6,24,52,66,36,6,10,14,30">http://localhost:9998/sparklines/discrete?d=88,84,82,92,82,86,66,82,44,64,66,88,96,80,24,26,14,0,0,26,8,6,6,24,52,66,36,6,10,14,30</a></code></blockquote>
- </body></html>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML>
+<HEAD>
+	<META HTTP-EQUIV="CONTENT-TYPE" CONTENT="text/html; charset=utf-8">
+	<TITLE>Sparklines Example</TITLE>
+	<META NAME="GENERATOR" CONTENT="OpenOffice.org 3.0 Beta (Unix)">
+	<META NAME="CREATED" CONTENT="0;0">
+	<META NAME="CHANGED" CONTENT="20080919;16520600">
+	<META NAME="Info 1" CONTENT="">
+	<META NAME="Info 2" CONTENT="">
+	<META NAME="Info 3" CONTENT="">
+	<META NAME="Info 4" CONTENT="">
+</HEAD>
+<BODY LANG="en" DIR="LTR">
+<H1>Sparklines Example</H1>
+<P>This example is inspired by Joe Gregorio's S<A HREF="http://bitworking.org/projects/sparklines/">parkline</A>
+Generator Web Application. For more about the concept of sparklines
+read <A HREF="http://en.wikipedia.org/wiki/Sparkline">here</A>.</P>
+<H2>Contents</H2>
+<P>The example consists of one web resource implemented by the
+following: 
+</P>
+<DL>
+	<DT><CODE>com.sun.jersey.samples.sparklines.SparklinesResource</CODE>
+		</DT><DD STYLE="margin-bottom: 0.2in">
+	This Java class returns the a PNG image of a sparkline calculated
+	for a given set of query parameters. 
+	</DD></DL>
+<P>
+The example makes use of classes to parse query parameters, a message
+body writer to write an image in the PNG format, and makes use of
+entity tags and performs precondition checking to support not
+modified responses.</P>
+<P>The mapping of the URI path space is presented in the following
+table:</P>
+<TABLE WIDTH=542 BORDER=1 CELLPADDING=2 CELLSPACING=4>
+	<COL WIDTH=84>
+	<COL WIDTH=143>
+	<COL WIDTH=80>
+	<COL WIDTH=198>
+	<TR>
+		<TH WIDTH=84>
+			<P>URI path</P>
+		</TH>
+		<TH WIDTH=143>
+			<P>Resource class</P>
+		</TH>
+		<TH WIDTH=80>
+			<P>HTTP methods</P>
+		</TH>
+		<TH WIDTH=198>
+			<P>Description</P>
+		</TH>
+	</TR>
+	<TR>
+		<TD WIDTH=84>
+			<P>discrete</P>
+		</TD>
+		<TD WIDTH=143>
+			<P>SparklinesResource</P>
+		</TD>
+		<TD WIDTH=80>
+			<P>GET</P>
+		</TD>
+		<TD WIDTH=198>
+			<P>Plot a sparkline as discrete vertical bars, one per data value.</P>
+		</TD>
+	</TR>
+	<TR>
+		<TD WIDTH=84>
+			<P>smooth</P>
+		</TD>
+		<TD WIDTH=143>
+			<P>SparklinesResource</P>
+		</TD>
+		<TD WIDTH=80>
+			<P>GET</P>
+		</TD>
+		<TD WIDTH=198>
+			<P>Plot a sparkline as continuos line.</P>
+		</TD>
+	</TR>
+</TABLE>
+<P><BR><BR>
+</P>
+<P>For either URI path the following query parameters can be
+declared:</P>
+<TABLE WIDTH=419 BORDER=1 CELLPADDING=2 CELLSPACING=4>
+	<COL WIDTH=126>
+	<COL WIDTH=103>
+	<COL WIDTH=160>
+	<TR>
+		<TH WIDTH=126>
+			<P>Query parameter</P>
+		</TH>
+		<TH WIDTH=103>
+			<P>Default Value</P>
+		</TH>
+		<TH WIDTH=160>
+			<P>Description</P>
+		</TH>
+	</TR>
+	<TR>
+		<TD WIDTH=126>
+			<P>d</P>
+		</TD>
+		<TD WIDTH=103>
+			<P><BR>
+			</P>
+		</TD>
+		<TD WIDTH=160>
+			<P>A comma separated list of integer values that represents the
+			input data to plot as a sparkline.</P>
+		</TD>
+	</TR>
+	<TR>
+		<TD WIDTH=126>
+			<P>limits</P>
+		</TD>
+		<TD WIDTH=103>
+			<P>0,100</P>
+		</TD>
+		<TD WIDTH=160>
+			<P>The valid range of the input data in “d”.</P>
+		</TD>
+	</TR>
+</TABLE>
+<P><BR><BR>
+</P>
+<P>The “smooth” URI path can have following query parameters:</P>
+<TABLE WIDTH=419 BORDER=1 CELLPADDING=2 CELLSPACING=4>
+	<COL WIDTH=126>
+	<COL WIDTH=103>
+	<COL WIDTH=160>
+	<TR>
+		<TH WIDTH=126>
+			<P>Query parameter</P>
+		</TH>
+		<TH WIDTH=103>
+			<P>Default Value</P>
+		</TH>
+		<TH WIDTH=160>
+			<P>Description</P>
+		</TH>
+	</TR>
+	<TR>
+		<TD WIDTH=126>
+			<P>min-m</P>
+		</TD>
+		<TD WIDTH=103>
+			<P>true</P>
+		</TD>
+		<TD WIDTH=160>
+			<P>If true then a marker is placed at the smallest value in the
+			input data.</P>
+		</TD>
+	</TR>
+	<TR>
+		<TD WIDTH=126>
+			<P>max-m 
+			</P>
+		</TD>
+		<TD WIDTH=103>
+			<P>true</P>
+		</TD>
+		<TD WIDTH=160>
+			<P>If true then a marker is placed at the largest value in the
+			input data.</P>
+		</TD>
+	</TR>
+	<TR>
+		<TD WIDTH=126>
+			<P>last-m</P>
+		</TD>
+		<TD WIDTH=103>
+			<P>true</P>
+		</TD>
+		<TD WIDTH=160>
+			<P>If true then a marker is placed at the last value in the input
+			data.</P>
+		</TD>
+	</TR>
+	<TR>
+		<TD WIDTH=126>
+			<P>min-color</P>
+		</TD>
+		<TD WIDTH=103>
+			<P>blue</P>
+		</TD>
+		<TD WIDTH=160>
+			<P>The colour of the marker placed at the smallest value in the
+			input data</P>
+		</TD>
+	</TR>
+	<TR>
+		<TD WIDTH=126>
+			<P>max-color</P>
+		</TD>
+		<TD WIDTH=103>
+			<P>green</P>
+		</TD>
+		<TD WIDTH=160>
+			<P>The colour of the marker placed at the largest value in the
+			input data.</P>
+		</TD>
+	</TR>
+	<TR>
+		<TD WIDTH=126>
+			<P>last-color</P>
+		</TD>
+		<TD WIDTH=103>
+			<P>red</P>
+		</TD>
+		<TD WIDTH=160>
+			<P>The colour of the marker placed at the last value in the input
+			data.</P>
+		</TD>
+	</TR>
+	<TR>
+		<TD WIDTH=126>
+			<P>step</P>
+		</TD>
+		<TD WIDTH=103>
+			<P>2</P>
+		</TD>
+		<TD WIDTH=160>
+			<P>The horizontal distance, in pixels, between each plot of a data
+			value.</P>
+		</TD>
+	</TR>
+</TABLE>
+<P><BR><BR>
+</P>
+<P>The “discrete” URI path can have following query parameters:</P>
+<TABLE WIDTH=419 BORDER=1 CELLPADDING=2 CELLSPACING=4>
+	<COL WIDTH=126>
+	<COL WIDTH=103>
+	<COL WIDTH=160>
+	<TR>
+		<TH WIDTH=126>
+			<P>Query parameter</P>
+		</TH>
+		<TH WIDTH=103>
+			<P>Default Value</P>
+		</TH>
+		<TH WIDTH=160>
+			<P>Description</P>
+		</TH>
+	</TR>
+	<TR>
+		<TD WIDTH=126>
+			<P>width</P>
+		</TD>
+		<TD WIDTH=103>
+			<P>2</P>
+		</TD>
+		<TD WIDTH=160>
+			<P>The width, in pixels, of each plot of a virtual bar for each
+			data value.</P>
+		</TD>
+	</TR>
+	<TR>
+		<TD WIDTH=126>
+			<P>upper 
+			</P>
+		</TD>
+		<TD WIDTH=103>
+			<P>50</P>
+		</TD>
+		<TD WIDTH=160>
+			<P>Data values &gt;= upper will be coloured in “upper-color”
+			otherwse data values will be colured in “lower-color”</P>
+		</TD>
+	</TR>
+	<TR>
+		<TD WIDTH=126>
+			<P>upper-color</P>
+		</TD>
+		<TD WIDTH=103>
+			<P>red</P>
+		</TD>
+		<TD WIDTH=160>
+			<P>The colour for data values &gt;= “upper”</P>
+		</TD>
+	</TR>
+	<TR>
+		<TD WIDTH=126>
+			<P>lower-color</P>
+		</TD>
+		<TD WIDTH=103>
+			<P>gray</P>
+		</TD>
+		<TD WIDTH=160>
+			<P>The colour for data values &lt; upper</P>
+		</TD>
+	</TR>
+</TABLE>
+<P><BR><BR>
+</P>
+<H2>Running the Example</H2>
+<P>Run the example as follows:</P>
+<P>run 
+</P>
+<BLOCKQUOTE><CODE>mvn compile exec:java</CODE></BLOCKQUOTE>
+<P>From a web browser, visit:</P>
+<BLOCKQUOTE><CODE><A HREF="http://localhost:9998/sparklines/discrete?d=88,84,82,92,82,86,66,82,44,64,66,88,96,80,24,26,14,0,0,26,8,6,6,24,52,66,36,6,10,14,30">http://localhost:9998/sparklines/discrete?d=88,84,82,92,82,86,66,82,44,64,66,88,96,80,24,26,14,0,0,26,8,6,6,24,52,66,36,6,10,14,30</A></CODE></BLOCKQUOTE>
+</BODY>
+</HTML>
