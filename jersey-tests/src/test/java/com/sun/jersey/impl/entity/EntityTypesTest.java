@@ -610,14 +610,31 @@ public class EntityTypesTest extends AbstractTypeTester {
     }
 
 
-    // TODO: issue with stripping root element, which is actually a non-root element
-    //       issue with value in JAXBBean being treated as array
     public void testJAXBListRepresentationJSON() throws Exception {
         initiateWebApplication(JAXBListResourceJSON.class);
         WebResource r = resource("/");
 
-        JSONArray a = r.get(JSONArray.class);
-        assertTrue(a.length() == 3);
+        Collection<JAXBBean> a = r.get(
+                new GenericType<Collection<JAXBBean>>(){});
+        Collection<JAXBBean> b = r.post(new GenericType<Collection<JAXBBean>>(){},
+                new GenericEntity<Collection<JAXBBean>>(a){});
+
+        assertEquals(a, b);
+
+        b = r.path("type").post(new GenericType<Collection<JAXBBean>>(){},
+                new GenericEntity<Collection<JAXBBean>>(a){});
+        assertEquals(a, b);
+
+        // TODO: would be nice to produce/consume a real JSON array like following
+        // instead of what we have now:
+//        JSONArray a = r.get(JSONArray.class);
+//        JSONArray b = new JSONArray().
+//                put(new JSONObject().put("value", "one")).
+//                put(new JSONObject().put("value", "two")).
+//                put(new JSONObject().put("value", "three"));
+//        assertEquals(a.toString(), b.toString());
+//        JSONArray c = r.post(JSONArray.class, b);
+//        assertEquals(a.toString(), c.toString());
     }
 
 }

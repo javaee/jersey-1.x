@@ -190,8 +190,7 @@ public class JsonXmlStreamWriter implements XMLStreamWriter {
             if ((null == processingStack.get(depth).lastWasPrimitive) || !processingStack.get(depth).lastWasPrimitive) {
                 processingStack.get(depth).writer.write("}");
             }
-            processingStack.remove(depth);
-            depth--;
+            pollStack();
         } catch (IOException ex) {
             Logger.getLogger(JsonXmlStreamWriter.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -223,8 +222,7 @@ public class JsonXmlStreamWriter implements XMLStreamWriter {
             processingStack.get(depth - 1).lastName = processingStack.get(depth - 1).currentName;
             processingStack.get(depth - 1).lastWasPrimitive = false;
             processingStack.get(depth - 1).lastElementWriter = processingStack.get(depth).writer;
-            processingStack.remove(depth);
-            depth--;
+            pollStack();
         } catch (IOException ex) {
             Logger.getLogger(JsonXmlStreamWriter.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -347,6 +345,10 @@ public class JsonXmlStreamWriter implements XMLStreamWriter {
     public void writeEmptyElement(String prefix, String localName, String namespaceURI) throws XMLStreamException {
         writeStartElement(localName);
         writeEndElement();
+    }
+
+    private void pollStack() throws IOException {
+        processingStack.remove(depth--);
     }
 
     private void printStack(String localName) {

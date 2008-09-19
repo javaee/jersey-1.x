@@ -1,9 +1,9 @@
 /*
  *
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
- * 
+ *
  * Copyright 1997-2007 Sun Microsystems, Inc. All rights reserved.
- * 
+ *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
  * and Distribution License("CDDL") (collectively, the "License").  You
@@ -11,7 +11,7 @@
  * a copy of the License at https://jersey.dev.java.net/CDDL+GPL.html
  * or jersey/legal/LICENSE.txt.  See the License for the specific
  * language governing permissions and limitations under the License.
- * 
+ *
  * When distributing the software, include this License Header Notice in each
  * file and include the License file at jersey/legal/LICENSE.txt.
  * Sun designates this particular file as subject to the "Classpath" exception
@@ -20,9 +20,9 @@
  * Header, with the fields enclosed by brackets [] replaced by your own
  * identifying information: "Portions Copyrighted [year]
  * [name of copyright owner]"
- * 
+ *
  * Contributor(s):
- * 
+ *
  * If you wish your version of this file to be governed by only the CDDL or
  * only the GPL Version 2, indicate your decision by adding "[Contributor]
  * elects to include this software in this distribution under the [CDDL or GPL
@@ -58,33 +58,33 @@ import javax.xml.stream.XMLStreamReader;
  * @author japod
  */
 public class JsonXmlStreamReader implements XMLStreamReader {
-    
-    
-    private enum LaState { 
-        START, 
-        END, 
-        AFTER_OBJ_START_BRACE, 
-        BEFORE_OBJ_NEXT_KV_PAIR, 
-        BEFORE_COLON_IN_KV_PAIR, 
-        BEFORE_VALUE_IN_KV_PAIR, 
-        AFTER_OBJ_KV_PAIR, 
-        AFTER_ARRAY_START_BRACE, 
-        BEFORE_NEXT_ARRAY_ELEM, 
+
+
+    private enum LaState {
+        START,
+        END,
+        AFTER_OBJ_START_BRACE,
+        BEFORE_OBJ_NEXT_KV_PAIR,
+        BEFORE_COLON_IN_KV_PAIR,
+        BEFORE_VALUE_IN_KV_PAIR,
+        AFTER_OBJ_KV_PAIR,
+        AFTER_ARRAY_START_BRACE,
+        BEFORE_NEXT_ARRAY_ELEM,
         AFTER_ARRAY_ELEM
     };
-    
+
     static class MyLocation implements Location {
-        
+
         int charOffset = -1;
         int column = -1;
         int line = -1;
-        
+
         MyLocation(final int charOffset, final int column, final int line) {
             this.charOffset = charOffset;
             this.column = column;
             this.line = line;
         }
-        
+
         MyLocation(final JsonLexer lexer) {
             this(lexer.getCharOffset(), lexer.getColumn(), lexer.getLineNumber());
         }
@@ -108,44 +108,44 @@ public class JsonXmlStreamReader implements XMLStreamReader {
         public String getSystemId() {
             return null;
         }
-        
+
     }
-    
-    private static final Logger LOGGER = Logger.getLogger(JsonXmlStreamReader.class.getName());   
-    
+
+    private static final Logger LOGGER = Logger.getLogger(JsonXmlStreamReader.class.getName());
+
     boolean jsonRootUnwrapping;
     String rootElementName;
     final Collection<String> attrAsElemNames = new LinkedList<String>();
 
     JsonLexer lexer;
     JsonToken lastToken;
-    
+
     private static final class ProcessingState {
         String lastName;
         LaState state;
         JsonReaderXmlEvent eventToReadAttributesFor;
-        
+
         ProcessingState() {
             this(LaState.START);
         }
-        
+
         ProcessingState(LaState state) {
             this(state, null);
         }
-        
+
         ProcessingState(LaState state, String name) {
             this.state = state;
             this.lastName = name;
         }
-        
+
         @Override
         public String toString() {
             return String.format("{lastName:%s,laState:%s}", lastName, state);
         }
     }
-    
+
     final Queue<JsonReaderXmlEvent> eventQueue = new LinkedList<JsonReaderXmlEvent>();
-    
+
     List<ProcessingState> processingStack;
     int depth;
 
@@ -156,7 +156,7 @@ public class JsonXmlStreamReader implements XMLStreamReader {
     public JsonXmlStreamReader(Reader reader, boolean stripRoot) throws IOException {
         this(reader, stripRoot, null);
     }
-    
+
     public JsonXmlStreamReader(Reader reader, boolean stripRoot, Collection<String> attrAsElems) throws IOException {
         this(reader, stripRoot ? "rootElement" : null, attrAsElems);
     }
@@ -171,7 +171,7 @@ public class JsonXmlStreamReader implements XMLStreamReader {
         if (attrAsElems != null) {
             this.attrAsElemNames.addAll(attrAsElems);
         }
-        lexer = new JsonLexer(reader); 
+        lexer = new JsonLexer(reader);
         depth = 0;
         processingStack = new ArrayList<ProcessingState>();
         processingStack.add(new ProcessingState());
@@ -184,12 +184,12 @@ public class JsonXmlStreamReader implements XMLStreamReader {
             throw new IOException("Colon expected instead of \"" + token.tokenText + "\"");
         }
     }
-    
+
     JsonToken nextToken() throws IOException {
         JsonToken result = lexer.yylex();
         return result;
     }
-    
+
     private void valueRead() {
         if (LaState.BEFORE_VALUE_IN_KV_PAIR == processingStack.get(depth).state) {
             processingStack.get(depth).state = LaState.AFTER_OBJ_KV_PAIR;
@@ -199,11 +199,11 @@ public class JsonXmlStreamReader implements XMLStreamReader {
             processingStack.get(depth).state = LaState.AFTER_ARRAY_ELEM;
         }
     }
-    
+
     private void readNext() throws IOException {
         readNext(false);
     }
-    
+
     private void readNext(boolean checkAttributesOnly) throws IOException {
         if (!checkAttributesOnly) {
             eventQueue.poll();
@@ -717,7 +717,7 @@ public class JsonXmlStreamReader implements XMLStreamReader {
     public String getNamespaceURI(String arg0) {
         throw new UnsupportedOperationException("Not supported yet.");
     }
-    
+
     private StartElementEvent generateSEEvent(String name) {
         StartElementEvent event = null;
         if (!"$".equals(name)) {
@@ -731,5 +731,5 @@ public class JsonXmlStreamReader implements XMLStreamReader {
        if (!"$".equals(name)) {
            eventQueue.add(new EndElementEvent(name, new MyLocation(lexer)));
        }
-    }    
+    }
 }

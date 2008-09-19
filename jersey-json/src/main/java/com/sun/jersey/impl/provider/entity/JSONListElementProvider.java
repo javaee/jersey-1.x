@@ -39,6 +39,7 @@ package com.sun.jersey.impl.provider.entity;
 
 import com.sun.jersey.api.json.JSONJAXBContext;
 import com.sun.jersey.impl.json.JSONMarshaller;
+import com.sun.jersey.impl.json.JSONUnmarshaller;
 import com.sun.jersey.impl.json.reader.JsonXmlStreamReader;
 import com.sun.jersey.impl.json.writer.JsonXmlStreamWriter;
 import java.io.IOException;
@@ -57,6 +58,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.ext.Providers;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
+import javax.xml.bind.Unmarshaller;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
@@ -76,37 +78,17 @@ public class JSONListElementProvider extends AbstractListElementProvider {
     @Override
     public final void writeList(Class<?> elementType, Collection<?> t, MediaType mediaType, Charset c, Marshaller m, OutputStream entityStream) throws JAXBException, IOException {
         final OutputStreamWriter osw = new OutputStreamWriter(entityStream, c);
+        // TODO: should reuse customization options from the marshaller (if it is JSONMarshaller)
+        // TODO: should force the elementType being treated as array (for 1-elem lists)
         final XMLStreamWriter jxsw = JsonXmlStreamWriter.createWriter(osw, true);
-        final boolean isJsonMarshaller = m instanceof JSONMarshaller;
         try {
-
-            if (isJsonMarshaller) {
-                m.setProperty(JSONJAXBContext.JSON_ENABLED, Boolean.TRUE);
-            }
-
-            entityStream.write("[".getBytes());            
-            
-            boolean firstElement = true;
+            jxsw.writeStartElement(getRootElementName(elementType));
             for (Object o : t) {
-                if (!firstElement) {
-                    entityStream.write(",".getBytes());
-                } else {
-                    firstElement = false;
-                }
-                if (isJsonMarshaller) {
-                    m.marshal(o, entityStream);
-                    entityStream.flush();
-                } else {
                     m.marshal(o, jxsw);
-                    jxsw.flush();
-               }
             }
-            if (!isJsonMarshaller) {
-                jxsw.flush();
-            }
-
-            entityStream.write("]".getBytes());
-            entityStream.flush();            
+            jxsw.writeEndElement();
+            jxsw.writeEndDocument();
+            jxsw.flush();
         } catch (XMLStreamException ex) {
             Logger.getLogger(JSONListElementProvider.class.getName()).log(Level.SEVERE, null, ex);
             throw new JAXBException(ex.getMessage(), ex);
@@ -122,5 +104,4 @@ public class JSONListElementProvider extends AbstractListElementProvider {
             throw new XMLStreamException(ex.getMessage(), ex);
         }
     }
-
 }
