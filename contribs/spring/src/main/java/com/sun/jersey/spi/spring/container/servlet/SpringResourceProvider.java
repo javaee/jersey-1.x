@@ -74,7 +74,6 @@ import com.sun.jersey.spi.service.ComponentProvider;
  * </p>
  * 
  * @author <a href="mailto:martin.grotzke@freiheit.com">Martin Grotzke</a>
- * @version $Id$
  */
 public class SpringResourceProvider implements ResourceProvider {
 

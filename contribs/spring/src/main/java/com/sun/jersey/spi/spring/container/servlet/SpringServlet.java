@@ -46,11 +46,15 @@ import com.sun.jersey.spi.service.ComponentContext;
 import com.sun.jersey.spi.service.ComponentProvider;
 
 /**
- * TODO: DESCRIBE ME<br>
- * Created on: Apr 3, 2008<br>
+ * A servlet container for deploying root resource classes with Spring
+ * integration.
+ * <p>
+ * This servlet extends {@link ServletContainer} and initiates the
+ * {@link WebApplication} with a spring-based {@link ComponetProvider} such
+ * that resource and provider classes can be registered Spring-based beans
+ * using XML-based registration or auto-wire-based registration.
  * 
  * @author <a href="mailto:martin.grotzke@freiheit.com">Martin Grotzke</a>
- * @version $Id$
  */
 public class SpringServlet extends ServletContainer {
 
@@ -163,7 +167,8 @@ public class SpringServlet extends ServletContainer {
             
             if ( rc.getProperty( ResourceConfig.PROPERTY_DEFAULT_RESOURCE_PROVIDER_CLASS ) == null
                     && springComponentAnnotationAvailable() ) {
-                rc.getProperties().put( ResourceConfig.PROPERTY_DEFAULT_RESOURCE_PROVIDER_CLASS, SpringResourceProvider.class );
+                rc.getProperties().put( ResourceConfig.PROPERTY_DEFAULT_RESOURCE_PROVIDER_CLASS,
+                        SpringResourceProvider.class );
             }
             
             wa.initiate(rc, new SpringComponentProvider((ConfigurableApplicationContext) springContext));
