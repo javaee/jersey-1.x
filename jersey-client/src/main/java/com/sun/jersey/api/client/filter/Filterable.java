@@ -43,6 +43,12 @@ import com.sun.jersey.api.client.ClientHandler;
 /**
  * An abstract class providing support for registering and managing a chain
  * of {@link ClientFilter} instances.
+ * <p>
+ * A {@link ClientFilter} instance MUST be occur at most once in any
+ * {@link Filterable} instance, otherwise unexpected results may occur.
+ * If it is necessary to add the same type of {@link ClientFilter} more than once
+ * to the same {@link Filterable} instance or to more than one {@link Filterable}
+ * instance then a new instance of that {@link ClientFilter} MUST be added.
  * 
  * @author Paul.Sandoz@Sun.Com
  */

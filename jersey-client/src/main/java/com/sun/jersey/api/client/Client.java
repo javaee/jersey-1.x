@@ -75,6 +75,10 @@ import javax.ws.rs.ext.Providers;
  * A client may be configured by passing a {@link ClientConfig} instance to
  * the appropriate construtor.
  * <p>
+ * Methods to create instances of {@link WebResource} are thread-safe. Methods
+ * that modify configuration and or filters are not guaranteed to be
+ * thread-safe.
+ * <p>
  * A client may integrate with an IoC framework by passing a 
  * {@link ComponentProvider} instance to the appropriate constructor.
  * 

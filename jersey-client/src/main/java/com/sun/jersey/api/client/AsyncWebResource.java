@@ -58,6 +58,9 @@ import javax.ws.rs.core.UriBuilder;
  * The Web resource implements the {@link UniformInterface} to invoke the HTTP 
  * method on the Web resource. A client request may be built before invocation
  * on the uniform interface.
+ * <p>
+ * Methods to create a request and return a response are thread-safe. Methods
+ * that modify filters are not guaranteed to be thread-safe.
  * 
  * @author Paul.Sandoz@Sun.Com
  */
