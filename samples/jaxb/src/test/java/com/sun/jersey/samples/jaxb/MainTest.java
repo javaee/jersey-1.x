@@ -73,9 +73,8 @@ public class MainTest extends TestCase {
     @Override
     protected void tearDown() throws Exception {
         super.tearDown();
-        if (threadSelector != null) {
-            threadSelector.stopEndpoint();
-        }
+        
+        threadSelector.stopEndpoint();
     }
 
     public void testRootElement() {

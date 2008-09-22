@@ -67,7 +67,7 @@ public class Main {
         SelectorThread threadSelector = startServer();
         System.out.println(String.format(
                 "Jersey app started with WADL available at %s/application.wadl\n" +
-                "Hit enter to stop it...", getBaseURI()));
+                "Hit enter to stop it...", BASE_URI));
         System.in.read();
         threadSelector.stopEndpoint();
         System.exit(0);

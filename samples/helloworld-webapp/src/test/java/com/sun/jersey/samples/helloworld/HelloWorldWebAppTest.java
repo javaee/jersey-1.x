@@ -40,7 +40,9 @@ package com.sun.jersey.samples.helloworld;
 import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.WebResource;
 import java.io.File;
+import java.net.URI;
 import java.util.Collections;
+import javax.ws.rs.core.UriBuilder;
 import junit.framework.TestCase;
 import org.glassfish.embed.ScatteredWar;
 import org.glassfish.embed.GlassFish;
@@ -50,17 +52,28 @@ import org.glassfish.embed.GlassFish;
  * @author Naresh
  */
 public class HelloWorldWebAppTest extends TestCase {
-
-    private final String contextName = "helloworld-webapp";
-
-    private final int httpPort = 9999;
-
-    private final String baseUri = "http://localhost:" + httpPort + "/" + contextName;
+    
+    private static int getPort(int defaultPort) {
+        String port = System.getenv("JERSEY_HTTP_PORT");
+        if (null != port) {
+            try {
+                return Integer.parseInt(port);
+            } catch (NumberFormatException e) {
+            }
+        }
+        return defaultPort;        
+    } 
+    
+    private static URI getBaseURI() {
+        return UriBuilder.fromUri("http://localhost/").port(getPort(9998)).
+                path("helloworld-webapp").build();
+    }
+    
+    private static final URI BASE_URI = getBaseURI();
+    
     private GlassFish glassfish;
 
-    private Client c;
-
-    private WebResource wr;
+    private WebResource r;
     
     public HelloWorldWebAppTest(String testName) {
         super(testName);
@@ -69,35 +82,29 @@ public class HelloWorldWebAppTest extends TestCase {
     @Override
     protected void setUp() throws Exception {
         super.setUp();
-        glassfish = newGlassFish(httpPort);
-        assertNotNull("Glassfish instance returned is null", glassfish);
-        deployApplication();
-        c = Client.create();
-        wr = c.resource(baseUri);
+        
+        // Start Glassfish
+        glassfish = new GlassFish(BASE_URI.getPort());
+        // Deploy Glassfish referencing the web.xml
+        ScatteredWar war = new ScatteredWar(BASE_URI.getRawPath(),
+                new File("src/main/webapp"),
+                new File("src/main/webapp/WEB-INF/web.xml"),
+                Collections.singleton(new File("target/classes").toURI().toURL()));
+        glassfish.deploy(war);
+        
+        Client c = Client.create();
+        r = c.resource(BASE_URI);
     }
 
     @Override
     protected void tearDown() throws Exception {
         super.tearDown();
+        
         glassfish.stop();
     }
 
     public void testHelloWorld() throws Exception {
-        String responseMsg = wr.path("helloworld").get(String.class);
+        String responseMsg = r.path("helloworld").get(String.class);
         assertEquals("Hello World", responseMsg);
     }
-
-    private GlassFish newGlassFish(int port) throws Exception {
-        GlassFish glassfishInstance = new GlassFish(port);
-        return glassfishInstance;
-    }
-
-    private void deployApplication() throws Exception {
-        ScatteredWar war = new ScatteredWar(contextName,
-                new File("src/main/webapp"),
-                new File("src/main/webapp/WEB-INF/web.xml"),
-                Collections.singleton(new File("target/classes").toURI().toURL()));
-        glassfish.deploy(war);
-    }
-
 }
