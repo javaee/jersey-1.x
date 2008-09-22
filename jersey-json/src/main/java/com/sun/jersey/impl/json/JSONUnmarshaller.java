@@ -66,7 +66,6 @@ import javax.xml.stream.XMLStreamReader;
 import javax.xml.transform.Source;
 import javax.xml.validation.Schema;
 import org.codehaus.jettison.badgerfish.BadgerFishXMLStreamReader;
-import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 import org.codehaus.jettison.json.JSONTokener;
 import org.codehaus.jettison.mapped.Configuration;
@@ -251,21 +250,13 @@ public class JSONUnmarshaller implements Unmarshaller {
         if (JSONJAXBContext.JSON_ENABLED.equals(key)) {
             this.jsonEnabled = (Boolean) value;
         } else if (JSONJAXBContext.JSON_NOTATION.equals(key)) {
-            this.jsonNotation = JSONJAXBContext.JSONNotation.valueOf((String) value);
+            this.jsonNotation = (JSONJAXBContext.JSONNotation) value;
         } else if (JSONJAXBContext.JSON_ROOT_UNWRAPPING.equals(key)) {
             this.jsonRootUnwrapping = (Boolean) value;
         } else if (JSONJAXBContext.JSON_XML2JSON_NS.equals(key)) {
-            try {
-                this.xml2jsonNamespace = JSONTransformer.asMap((String) value);
-            } catch (JSONException e) {
-                throw new PropertyException("JSON exception when trying to set " + JSONJAXBContext.JSON_XML2JSON_NS + " property.", e);
-            }
+            this.xml2jsonNamespace = (Map<String, String>) value;
         } else if (JSONJAXBContext.JSON_ATTRS_AS_ELEMS.equals(key)) {
-            try {
-                this.attrAsElemNames = JSONTransformer.asCollection((String) value);
-            } catch (JSONException e) {
-                throw new PropertyException("JSON exception when trying to set " + JSONJAXBContext.JSON_ATTRS_AS_ELEMS + " property.", e);
-            }
+            this.attrAsElemNames = (Collection<String>) value;
         } else {
             if (!key.startsWith(JSONJAXBContext.NAMESPACE)) {
                 this.jaxbUnmarshaller.setProperty(key, value);
@@ -277,13 +268,13 @@ public class JSONUnmarshaller implements Unmarshaller {
         if (JSONJAXBContext.JSON_ENABLED.equals(key)) {
             return this.jsonEnabled;
         } else if (JSONJAXBContext.JSON_NOTATION.equals(key)) {
-            return this.jsonNotation.name();
+            return this.jsonNotation;
         } else if (JSONJAXBContext.JSON_ROOT_UNWRAPPING.equals(key)) {
             return this.jsonRootUnwrapping;
         } else if (JSONJAXBContext.JSON_XML2JSON_NS.equals(key)) {
-            return JSONTransformer.asJsonObject(this.xml2jsonNamespace);
+            return this.xml2jsonNamespace;
         } else if (JSONJAXBContext.JSON_ATTRS_AS_ELEMS.equals(key)) {
-            return JSONTransformer.asJsonArray(this.attrAsElemNames);
+            return this.attrAsElemNames;
         } else {
             if (key.startsWith(JSONJAXBContext.NAMESPACE)) {
                 return null;

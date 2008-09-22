@@ -204,7 +204,7 @@ public final class JSONJAXBContext extends JAXBContext {
     private static final Map<String, Object> defaultJsonProperties = new HashMap<String, Object>();
     
     static {
-        defaultJsonProperties.put(JSON_NOTATION, JSONNotation.MAPPED.name());
+        defaultJsonProperties.put(JSON_NOTATION, JSONNotation.MAPPED);
         defaultJsonProperties.put(JSON_ROOT_UNWRAPPING, Boolean.TRUE);
     }
     

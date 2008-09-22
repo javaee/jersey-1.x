@@ -45,6 +45,7 @@ import java.io.StringWriter;
 import java.lang.reflect.Method;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Map;
 import java.util.StringTokenizer;
@@ -95,7 +96,7 @@ public class JSONJAXBRoudtripTest extends TestCase {
     public void testInternalNotation() throws Exception {
         System.out.println("INTERNAL NOTATION");
         Map<String, Object> props = new HashMap<String, Object>();
-        props.put(JSONJAXBContext.JSON_NOTATION, "MAPPED");
+        props.put(JSONJAXBContext.JSON_NOTATION, JSONJAXBContext.JSONNotation.MAPPED);
         props.put(JSONJAXBContext.JSON_ROOT_UNWRAPPING, Boolean.FALSE);
         allBeansTest(new JSONJAXBContext(classes, props), beans);
     }
@@ -103,16 +104,16 @@ public class JSONJAXBRoudtripTest extends TestCase {
     public void testInternalNotationAttrAsElems() throws Exception {
         System.out.println("INTERNAL NOTATION WITH SOME ATTR AS ELEMS");
         Map<String, Object> props = new HashMap<String, Object>();
-        props.put(JSONJAXBContext.JSON_NOTATION, "MAPPED");
+        props.put(JSONJAXBContext.JSON_NOTATION, JSONJAXBContext.JSONNotation.MAPPED);
         props.put(JSONJAXBContext.JSON_ROOT_UNWRAPPING, Boolean.TRUE);
-        props.put(JSONJAXBContext.JSON_ATTRS_AS_ELEMS, "[\"i\",\"j\"]");
+        props.put(JSONJAXBContext.JSON_ATTRS_AS_ELEMS, new HashSet<String>(3){{add("i");add("j");}});
         allBeansTest(new JSONJAXBContext(classes, props), beans);
     }
 
     public void testJettisonBadgerfishNotation() throws Exception {
         System.out.println("BADGERFISH NOTATION");
         Map<String, Object> props = new HashMap<String, Object>();
-        props.put(JSONJAXBContext.JSON_NOTATION, "BADGERFISH");
+        props.put(JSONJAXBContext.JSON_NOTATION, JSONJAXBContext.JSONNotation.BADGERFISH);
         allBeansTest(new JSONJAXBContext(classes, props), beans);
     }
     

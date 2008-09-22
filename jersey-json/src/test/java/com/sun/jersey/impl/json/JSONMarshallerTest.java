@@ -39,7 +39,10 @@ package com.sun.jersey.impl.json;
 
 import com.sun.jersey.api.json.JSONJAXBContext;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.xml.bind.JAXBException;
@@ -53,6 +56,15 @@ import junit.framework.TestCase;
 public class JSONMarshallerTest extends TestCase {
     
     Marshaller marshaller;
+    static final Collection<Boolean> booleanVals = new HashSet<Boolean>(2){{add(Boolean.FALSE); add(Boolean.TRUE);}};
+    static final Collection<Collection<String>> arrayVals = new HashSet<Collection<String>>(2) {{
+            add(new HashSet<String>());
+            add(new HashSet<String>(2){{
+                add("two");
+                add("one");
+            }});
+        }};
+
     
     public JSONMarshallerTest(String testName) {
         super(testName);
@@ -69,43 +81,43 @@ public class JSONMarshallerTest extends TestCase {
     }
 
     public void testJsonEnabledProperty() throws Exception {
-        Boolean[] vals = {Boolean.FALSE, Boolean.TRUE};
-        checkValues(JSONJAXBContext.JSON_ENABLED, vals);
+        checkValues(JSONJAXBContext.JSON_ENABLED, booleanVals);
     }
     
     public void testJsonNotationProperty() throws Exception {
-        Collection<String> notations = new LinkedList<String>();
+        Collection<JSONJAXBContext.JSONNotation> notations = new LinkedList<JSONJAXBContext.JSONNotation>();
         for (JSONJAXBContext.JSONNotation notation : JSONJAXBContext.JSONNotation.values()) {
-            notations.add(notation.name());
+            notations.add(notation);
         }
-        checkValues(JSONJAXBContext.JSON_NOTATION, notations.toArray());
+        checkValues(JSONJAXBContext.JSON_NOTATION, notations);
     }
     
     public void testJsonRootUnwrappingProperty() throws Exception {
-        Boolean[] vals = {Boolean.FALSE, Boolean.TRUE};
-        checkValues(JSONJAXBContext.JSON_ROOT_UNWRAPPING, vals);
+        checkValues(JSONJAXBContext.JSON_ROOT_UNWRAPPING, booleanVals);
     }
 
     public void testJsonArraysProperty() throws Exception {
-        String[] vals = {"[]", "[\"one\",\"two\"]"};
-        checkValues(JSONJAXBContext.JSON_ARRAYS, vals);
+        checkValues(JSONJAXBContext.JSON_ARRAYS, arrayVals);
     }
 
     public void testJsonNonstringsProperty() throws Exception {
-        String[] vals = {"[]", "[\"two\",\"one\"]"};
-        checkValues(JSONJAXBContext.JSON_NON_STRINGS, vals);
+        checkValues(JSONJAXBContext.JSON_NON_STRINGS, arrayVals);
     }
     
     public void testJsonNs2JnsProperty() throws Exception {
-        String[] vals = {"{}", "{\"http:\\/\\/sun.com\":\"sc\"}"};
+        Collection<Map<String, String>> vals = new HashSet<Map<String, String>>(2) {{
+            add(new HashMap<String,String>());
+            add(new HashMap<String, String>(1){{
+                put("http://sun.com", "sc");
+            }});
+        }};
         checkValues(JSONJAXBContext.JSON_XML2JSON_NS, vals);
     }
 
-    private void checkValues(String propertyName, Object[] values) throws Exception {
+    private void checkValues(String propertyName, Collection values) throws Exception {
         for (Object v : values) {
             marshaller.setProperty(propertyName, v);
             Object got = marshaller.getProperty(propertyName);
-            //System.out.println((new Formatter()).format("%s\n%s", v.toString(), got.toString()).toString());
             assertEquals(v, got);
         }
     }
