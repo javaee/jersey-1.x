@@ -55,11 +55,11 @@ import javax.xml.bind.Validator;
  * <p>
  * The JSON format may be configured by setting properties on this class
  * when it is constructed and on properties of the Marshaller and
- * Unmarshaller returned from the relevant methods on ths class.
+ * Unmarshaller returned from the relevant methods on this class.
  * <p>
  * To enable JSON marshalling and unmarshalling it is necessary to set
- * the {@link #JSON_ENABLED} property to true on appropriate Marshaller and
- * Unmarshaller returned from the relevant methods on ths class.
+ * the {@link #JSON_ENABLED} property to <code>true</code> on the Marshaller
+ * and Unmarshaller returned from the relevant methods on this class.
  * 
  */
 public final class JSONJAXBContext extends JAXBContext {
