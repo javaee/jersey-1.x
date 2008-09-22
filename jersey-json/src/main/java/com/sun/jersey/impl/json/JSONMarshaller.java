@@ -169,17 +169,53 @@ public final class JSONMarshaller implements Marshaller {
         if (JSONJAXBContext.JSON_ENABLED.equals(key)) {
             this.jsonEnabled = (Boolean) value;
         } else if (JSONJAXBContext.JSON_NOTATION.equals(key)) {
-            this.jsonNotation = (JSONJAXBContext.JSONNotation) value;
+            if (value instanceof JSONJAXBContext.JSONNotation) {            
+                this.jsonNotation = (JSONJAXBContext.JSONNotation) value;
+            } else {
+                this.jsonNotation = JSONJAXBContext.JSONNotation.valueOf((String)value);
+            }
         } else if (JSONJAXBContext.JSON_ROOT_UNWRAPPING.equals(key)) {
             this.jsonRootUnwrapping = (Boolean) value;
         } else if (JSONJAXBContext.JSON_ARRAYS.equals(key)) {
-            this.arrays = (Collection<String>) value;
+            if (Collection.class.isAssignableFrom(value.getClass())) {
+                this.arrays = (Collection<String>) value;
+            } else { // accept a String representation of JSONArray for backward compatibility
+                try {
+                    this.arrays = JSONTransformer.asCollection((String) value);
+                } catch (JSONException e) {
+                    throw new PropertyException("JSON exception when trying to set " + JSONJAXBContext.JSON_ARRAYS + " property.", e);
+                }
+            }
         } else if (JSONJAXBContext.JSON_NON_STRINGS.equals(key)) {
+            if (Collection.class.isAssignableFrom(value.getClass())) {
                 this.nonStrings = (Collection<String>) value;
+            } else { // accept a String representation of JSONArray for backward compatibility
+                try {
+                    this.nonStrings = JSONTransformer.asCollection((String) value);
+                } catch (JSONException e) {
+                    throw new PropertyException("JSON exception when trying to set " + JSONJAXBContext.JSON_NON_STRINGS + " property.", e);
+                }
+            }
         } else if (JSONJAXBContext.JSON_XML2JSON_NS.equals(key)) {
+            if (Map.class.isAssignableFrom(value.getClass())) {
                 this.xml2jsonNamespace = (Map<String, String>) value;
+            } else { // accept a String representation of JSONObject for backward compatibility
+                try {
+                    this.xml2jsonNamespace = JSONTransformer.asMap((String) value);
+                } catch (JSONException e) {
+                    throw new PropertyException("JSON exception when trying to set " + JSONJAXBContext.JSON_XML2JSON_NS + " property.", e);
+                }
+            }
         } else if (JSONJAXBContext.JSON_ATTRS_AS_ELEMS.equals(key)) {
+            if (Collection.class.isAssignableFrom(value.getClass())) {
                 this.attrAsElemNames = (Collection<String>) value;
+            } else { // accept a String representation of JSONArray for backward compatibility
+                try {
+                    this.attrAsElemNames = JSONTransformer.asCollection((String) value);
+                } catch (JSONException e) {
+                    throw new PropertyException("JSON exception when trying to set " + JSONJAXBContext.JSON_ATTRS_AS_ELEMS + " property.", e);
+                }
+            }
         } else {
             if (!key.startsWith(JSONJAXBContext.NAMESPACE)) {
                 jaxbMarshaller.setProperty(key, value);

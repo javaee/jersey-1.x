@@ -66,6 +66,7 @@ import javax.xml.stream.XMLStreamReader;
 import javax.xml.transform.Source;
 import javax.xml.validation.Schema;
 import org.codehaus.jettison.badgerfish.BadgerFishXMLStreamReader;
+import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 import org.codehaus.jettison.json.JSONTokener;
 import org.codehaus.jettison.mapped.Configuration;
@@ -250,13 +251,33 @@ public class JSONUnmarshaller implements Unmarshaller {
         if (JSONJAXBContext.JSON_ENABLED.equals(key)) {
             this.jsonEnabled = (Boolean) value;
         } else if (JSONJAXBContext.JSON_NOTATION.equals(key)) {
-            this.jsonNotation = (JSONJAXBContext.JSONNotation) value;
+            if (value instanceof JSONJAXBContext.JSONNotation) {
+                this.jsonNotation = (JSONJAXBContext.JSONNotation) value;
+            } else {
+                this.jsonNotation = JSONJAXBContext.JSONNotation.valueOf((String)value);
+            }
         } else if (JSONJAXBContext.JSON_ROOT_UNWRAPPING.equals(key)) {
             this.jsonRootUnwrapping = (Boolean) value;
         } else if (JSONJAXBContext.JSON_XML2JSON_NS.equals(key)) {
-            this.xml2jsonNamespace = (Map<String, String>) value;
+            if (Map.class.isAssignableFrom(value.getClass())) {
+                this.xml2jsonNamespace = (Map<String, String>) value;
+            } else { // accept a String representation of JSONObject for backward compatibility
+                try {
+                    this.xml2jsonNamespace = JSONTransformer.asMap((String) value);
+                } catch (JSONException e) {
+                    throw new PropertyException("JSON exception when trying to set " + JSONJAXBContext.JSON_XML2JSON_NS + " property.", e);
+                }
+            }
         } else if (JSONJAXBContext.JSON_ATTRS_AS_ELEMS.equals(key)) {
-            this.attrAsElemNames = (Collection<String>) value;
+            if (Collection.class.isAssignableFrom(value.getClass())) {
+                this.attrAsElemNames = (Collection<String>) value;
+            } else { // accept a String representation of JSONArray for backward compatibility
+                try {
+                    this.attrAsElemNames = JSONTransformer.asCollection((String) value);
+                } catch (JSONException e) {
+                    throw new PropertyException("JSON exception when trying to set " + JSONJAXBContext.JSON_ATTRS_AS_ELEMS + " property.", e);
+                }
+            }
         } else {
             if (!key.startsWith(JSONJAXBContext.NAMESPACE)) {
                 this.jaxbUnmarshaller.setProperty(key, value);
