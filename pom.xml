@@ -147,7 +147,12 @@
                     </execution>
                 </executions>
             </plugin>
-        </plugins>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-javadoc-plugin</artifactId>
+          <!--version>2.5</version-->
+        </plugin>
+      </plugins>
         <extensions>
             <extension>
                 <groupId>org.jvnet.wagon-svn</groupId>
@@ -156,6 +161,27 @@
             </extension>
         </extensions>
     </build>
+
+<!--
+    <reporting>
+       <plugins>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-javadoc-plugin</artifactId>
+          <version>2.5</version>
+          <reportSets>
+            <reportSet>
+              <id>aggregate</id>
+              <configuration>
+                <excludePackageNames>com.sun.jersey.samples</excludePackageNames>
+              </configuration>
+            </reportSet>
+          </reportSets>
+        </plugin>
+      </plugins>
+    </reporting>
+-->
+
     <pluginRepositories>
         <pluginRepository>
             <id>maven2-repository.dev.java.net</id>
