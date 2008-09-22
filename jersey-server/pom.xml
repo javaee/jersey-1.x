@@ -133,6 +133,7 @@
                 </executions>
                 <configuration>
                     <generatePackage>com.sun.research.ws.wadl</generatePackage>
+                    <catalog>${basedir}/etc/catalog.xml</catalog>
                     <schemaDirectory>${basedir}/etc</schemaDirectory>
                     <schemaIncludes>
                         <include>wadl.xsd</include>
