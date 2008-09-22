@@ -35,14 +35,13 @@ import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
  * <p>
  * Autowiring is performed via {@link AutowireCapableBeanFactory#createBean(Class, int, boolean)}
  * to have a fully initialized bean, including applied BeanPostProcessors (in contrast to
- * {@link AutowireCapableBeanFactory#autowire()}).<br/>
+ * {@link AutowireCapableBeanFactory#autowire(java.lang.Class, int, boolean)}).<br/>
  * The parameters <em>autowiring mode</em> and <em>dependencyCheck</em> when invoking
  * {@link AutowireCapableBeanFactory#createBean(Class, int, boolean)} are used as specified
  * with this annotation.
  * </p>
  * 
  * @author <a href="mailto:martin.grotzke@freiheit.com">Martin Grotzke</a>
- * @version $Id$
  */
 @Target({TYPE})
 @Retention(RUNTIME)

@@ -50,7 +50,7 @@ import com.sun.jersey.spi.service.ComponentProvider;
  * integration.
  * <p>
  * This servlet extends {@link ServletContainer} and initiates the
- * {@link WebApplication} with a spring-based {@link ComponetProvider} such
+ * {@link WebApplication} with a spring-based {@link ComponentProvider} such
  * that resource and provider classes can be registered Spring-based beans
  * using XML-based registration or auto-wire-based registration.
  * 
@@ -62,7 +62,7 @@ public class SpringServlet extends ServletContainer {
     
     private static final Log LOG = LogFactory.getLog( SpringServlet.class );
 
-    public static class SpringComponentProvider implements ComponentProvider {
+    private static class SpringComponentProvider implements ComponentProvider {
         
         /* (non-Javadoc)
          * @see com.sun.ws.rest.spi.service.ComponentProvider#getInjectableInstance(java.lang.Object)

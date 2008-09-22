@@ -19,31 +19,17 @@
  * enclosed by brackets [] replaced by your own identifying information:
  *     "Portions Copyrighted [year] [name of copyright owner]"
  */
-package com.sun.jersey.api.spring;
-
-import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
-
 /**
- * This enumerations encapsulates the autowiring modes provided by the
- * {@link AutowireCapableBeanFactory}.
- * 
- * @author <a href="mailto:martin.grotzke@freiheit.com">Martin Grotzke</a>
+ * Provides support for Spring-based Web applications.
+ * <p>
+ * For Spring-based support it is necessary to add the 
+ * {@link com.sun.jersey.spi.spring.container.servlet.SpringServlet} to the 
+ * web.xml.
+ * <p>
+ * For Spring-based autowire support it is not necessary to refer explictly
+ * to Jersey life-cycle annotations and the 
+ * {@link org.springframework.context.annotation.Scope} annotation may be used,
+ * values of which are mapped to Jersey as specified by 
+ * {@link com.sun.jersey.spi.spring.container.servlet.SpringResourceProvider.SupportedSpringScopes}
  */
-public enum AutowireMode {
-    
-    AUTODETECT( AutowireCapableBeanFactory.AUTOWIRE_AUTODETECT ),
-    BY_NAME ( AutowireCapableBeanFactory.AUTOWIRE_BY_NAME ),
-    BY_TYPE ( AutowireCapableBeanFactory.AUTOWIRE_BY_TYPE ),
-    CONSTRUCTOR ( AutowireCapableBeanFactory.AUTOWIRE_CONSTRUCTOR );
-    
-    private final int _springCode;
-    
-    private AutowireMode( int mode ) {
-        _springCode = mode;
-    }
-    
-    public int getSpringCode() {
-        return _springCode;
-    }
-    
-}
+package com.sun.jersey.spi.spring.container.servlet;

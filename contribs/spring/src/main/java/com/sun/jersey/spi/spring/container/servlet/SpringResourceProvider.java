@@ -67,10 +67,10 @@ import com.sun.jersey.spi.service.ComponentProvider;
  * an appropriate {@link ResourceProvider} implementation and delegates all further work to this.
  * </p>
  * <p>
- * These spring scopes are supported: {@link SupportedSpringScopes}.
+ * These Spring scopes are supported: {@link SupportedSpringScopes}.
  * </p>
  * <p>
- * This {@link ResourceProvider} depends on spring 2.5
+ * This {@link ResourceProvider} depends on Spring 2.5
  * </p>
  * 
  * @author <a href="mailto:martin.grotzke@freiheit.com">Martin Grotzke</a>
@@ -80,7 +80,7 @@ public class SpringResourceProvider implements ResourceProvider {
     private static final Log LOG = LogFactory.getLog(SpringResourceProvider.class);
 
     /**
-     * This enum defines the mapping of spring scopes to the jersey lifecycle/scopes
+     * The mapping of Spring scopes to the jersey lifecycle/scopes.
      */
     public enum SupportedSpringScopes {
 
@@ -100,7 +100,9 @@ public class SpringResourceProvider implements ResourceProvider {
          * Maps the spring scope "session" to the {@link PerSessionProvider}
          */
         SESSION("session", PerSessionProvider.class);
+
         private final String _springScope;
+
         private final Class<? extends ResourceProvider> _resourceProviderClass;
 
         private SupportedSpringScopes(String springScope,
@@ -109,22 +111,40 @@ public class SpringResourceProvider implements ResourceProvider {
             _resourceProviderClass = resourceProviderClass;
         }
 
-        public Class<? extends ResourceProvider> createResourceProviderClass() {
+        /**
+         * Get the resource provider.
+         *
+         * @return the resource provider.
+         */
+        public Class<? extends ResourceProvider> getResourceProviderClass() {
             return _resourceProviderClass;
         }
 
+        /**
+         * Get the Spring scope.
+         *
+         * @return the Spring scope.
+         */
         public String getSpringScope() {
             return _springScope;
         }
-        
+
+        /**
+         * Get the default support scope.
+         * 
+         * @return the default supported scope.
+         */
         public static SupportedSpringScopes defaultSpringScope() {
             return SINGLETON;
         }
 
         /**
-         * Selects the matching SupportedSpringScopes item or <code>null</code>.
-         * @param springScope the spring scope
-         * @return the matching SupportedSpringScopes item or <code>null</code>.
+         * Select the matching supported scope item.
+         *
+         * @param springScope the Spring scope
+         *
+         * @return the matching supported scope, or <code>null</code> if
+         *         the scope could not be matched.
          */
         public static SupportedSpringScopes valueOfSpringScope(String springScope) {
             for (SupportedSpringScopes scope : values()) {
@@ -135,6 +155,12 @@ public class SpringResourceProvider implements ResourceProvider {
             return null;
         }
 
+        /**
+         * Get the suppport spring scopes.
+         *
+         * @return the support spring scopes as a String of comma
+         * separated values.
+         */
         public static String getSpringScopesAsCSV() {
             final StringBuilder sb = new StringBuilder();
             for (int i = 0; i < values().length; i++) {
@@ -147,6 +173,7 @@ public class SpringResourceProvider implements ResourceProvider {
             return sb.toString();
         }
     }
+    
     private ResourceProvider _resourceProvider;
 
     public void init(ComponentProvider provider, ComponentProvider resourceProvider, AbstractResource resource) {
@@ -168,14 +195,14 @@ public class SpringResourceProvider implements ResourceProvider {
             if (scope != null) {
                 final SupportedSpringScopes springScope = SupportedSpringScopes.valueOfSpringScope(scope.value());
                 if (springScope != null) {
-                    resourceProviderClass = springScope.createResourceProviderClass();
+                    resourceProviderClass = springScope.getResourceProviderClass();
                 } else {
                     throw new RuntimeException("No jersey lifecycle annotation specified on" +
                             " resource class " + resourceClass.getName() +
                             " and also no valid spring scope (valid scopes: " + SupportedSpringScopes.getSpringScopesAsCSV() + ")");
                 }
             } else {
-                resourceProviderClass = SupportedSpringScopes.defaultSpringScope().createResourceProviderClass();
+                resourceProviderClass = SupportedSpringScopes.defaultSpringScope().getResourceProviderClass();
             }
         }
         try {
