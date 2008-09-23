@@ -1,4 +1,48 @@
 release 0.11 (2008-09-xx)
+- Improved JavaDoc of Jersey API.
+- Support for JAXB with FastInfoset using the media type
+  "application/fastinfoset".
+- Content-Encoding using GZIP filters, see:
+    com.sun.jersey.api.client.filter.GZIPContentEncodingFilter
+    com.sun.jersey.api.container.filter.GZIPContentEncodingFilter
+- Fixed issue 33
+  https://jersey.dev.java.net/issues/show_bug.cgi?id=33
+  Improve the scope of resource class validation and warnings.
+- Fixed issue 109
+  https://jersey.dev.java.net/issues/show_bug.cgi?id=109
+  The LW HTTP server uses the Executors.newCachedThreadPool() as the
+  default executor.
+- Fixed issue 18
+  https://jersey.dev.java.net/issues/show_bug.cgi?id=18
+  Collections of JAXB beans are supported. See the jaxb sample.
+- Fixed issue 6
+  https://jersey.dev.java.net/issues/show_bug.cgi?id=6
+  Client and server-side logging filters of requests and responses, see:
+    com.sun.jersey.api.client.filter.LogggingFilter
+    com.sun.jersey.api.container.filter.LoggingFilter
+- Client API supports the sending and recieving of Java types that contain
+  generic information, see:
+    javax.ws.rs.core.GenericEntity
+    com.sun.jersey.api.client.GenericType
+- Added new samples: sparklines and jaxb.
+- Fixed issue 111
+  https://jersey.dev.java.net/issues/show_bug.cgi?id=111
+  com.sun.jersey.api.json.JSONJAXBContext cannot be created specifying a
+  ClassLoader.
+- Fixed issue 110
+  https://jersey.dev.java.net/issues/show_bug.cgi?id=110
+  "If none of the entity tags match, then the server MAY perform the requested
+   method as if the If-None-Match header field did not exist, but MUST also
+   ignore any If-Modified-Since header field(s) in the request. That is, if no
+   entity tags match, then the server MUST NOT return a 304 (Not Modified)
+   response."
+- Fixed issue 103
+  https://jersey.dev.java.net/issues/show_bug.cgi?id=103
+  Use of Class.getPackage is unsafe.
+- Fixed issue 21
+  https://jersey.dev.java.net/issues/show_bug.cgi?id=21
+  WADL can now include JavaDoc from source.
+  See the samples: generate-wadl and extended-wadl-webapp
 - Fixed issue 106
   https://jersey.dev.java.net/issues/show_bug.cgi?id=93
   Improved error message when an invalid media type is declared for the content
