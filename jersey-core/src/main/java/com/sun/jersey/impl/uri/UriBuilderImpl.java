@@ -435,7 +435,7 @@ public final class UriBuilderImpl extends UriBuilder {
                     path.append('=').append(encode(value, UriComponent.Type.MATRIX_PARAM));
             }
         }
-        matrixParams.clear();
+        matrixParams = null;
     }
 
     private void encodeQuery() {
@@ -453,7 +453,7 @@ public final class UriBuilderImpl extends UriBuilder {
                     query.append('=').append(encode(value, UriComponent.Type.QUERY_PARAM));
             }
         }
-        queryParams.clear();
+        queryParams = null;
     }
 
     private String encode(String s, UriComponent.Type type) {
