@@ -37,6 +37,7 @@
 
 package com.sun.jersey.impl.json;
 
+import javax.xml.bind.annotation.XmlRootElement;
 import junit.framework.TestCase;
 
 /**
@@ -48,13 +49,29 @@ public class JSONHelperTest extends TestCase {
     public JSONHelperTest(String testName) {
         super(testName);
     }
-    
+
+    @XmlRootElement(name="string")
+    public static class OneTwoThree {}
+
+    @XmlRootElement
+    public static class Drink {}
+
+    @XmlRootElement
+    public static class JAXBBeanType {}
+
     /**
      * Test of getRootElementName method, of class JSONHelper.
      */
     public void testGetRootElementName() {
-        assertEquals("string", JSONHelper.getRootElementName("String"));
-        assertEquals("drink", JSONHelper.getRootElementName("drink"));
-        assertEquals("jaxbBeanType", JSONHelper.getRootElementName("JAXBBeanType"));
+        Class<?> clazz;
+
+        clazz = OneTwoThree.class;
+        assertEquals("string", JSONHelper.getRootElementName((Class<Object>)clazz));
+
+        clazz = Drink.class;
+        assertEquals("drink", JSONHelper.getRootElementName((Class<Object>)clazz));
+        
+        clazz = JAXBBeanType.class;
+        assertEquals("jaxbBeanType", JSONHelper.getRootElementName((Class<Object>)clazz));
     }
 }

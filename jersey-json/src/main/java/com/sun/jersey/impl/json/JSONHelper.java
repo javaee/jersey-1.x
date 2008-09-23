@@ -36,46 +36,40 @@
  */
 package com.sun.jersey.impl.json;
 
+import javax.xml.bind.annotation.XmlRootElement;
+
 /**
  *
  * @author japod
  */
 public final class JSONHelper {
 
+    // just to make clear no instances are meant to be created
+    private JSONHelper() {
+    }
 
     /**
-     *  Need to create an element name for given base, the same name what jaxb would use for appropriate element
+     *  calculating local name of an appropriate XML element,
+     *  pretty much the same way as it is done by JAXB 2.1 impl
+     *  (for situations when we want to pretend the element was present
+     *  in an incoming stream amd all we have is the type information)
+     *  TODO: work out with JAXB guys a better way of doing it,
+     *        probably we could take it from an existing JAXBContext?
      */
-    public static final String getRootElementName(String baseName) {
-    
-        // TODO: find a way to delegate the following to JAXB impl
-        //       (or the method should take a Class as a parameter and take into account also annotations)
-        //        hmmm, the method should probably take a Class param anyway
+    public static final String getRootElementName(Class<Object> clazz) {
+        XmlRootElement e = clazz.getAnnotation(XmlRootElement.class);
+        if (e == null) {
+            return getVariableName(clazz.getSimpleName());
+        }
+        if ("##default".equals(e.name())) {
+            return getVariableName(clazz.getSimpleName());
+        } else {
+            return e.name();
+        }
+    }
 
-        StringBuffer result = new StringBuffer();
-        Character lastChar = baseName.charAt(0);
-        if (Character.isLowerCase(lastChar)) {
-            return baseName;
-        }
-        boolean firstPart = true;
-        for (int i = 1; i < baseName.length(); i++) {
-            if (firstPart) {
-                if (Character.isUpperCase(baseName.charAt(i))) {
-                    result.append(Character.toLowerCase(lastChar));
-                    lastChar = baseName.charAt(i);
-                } else {
-                    if (result.length() < 2) {
-                        result.append(Character.toLowerCase(lastChar));
-                    } else {
-                        result.append(lastChar);
-                    }
-                    result.append(baseName.charAt(i));
-                    firstPart = false;
-                }
-            } else {
-                result.append(baseName.charAt(i));
-            }
-        }
-        return result.toString();
+
+    private static final String getVariableName(String baseName) {
+        return NameUtil.toMixedCaseName(NameUtil.toWordList(baseName), false);
     }
 }

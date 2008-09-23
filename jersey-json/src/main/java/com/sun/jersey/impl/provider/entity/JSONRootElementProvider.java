@@ -89,7 +89,7 @@ public final class JSONRootElementProvider extends AbstractRootElementProvider {
                 return u.unmarshal(
                         new JsonXmlStreamReader(
                             new InputStreamReader(entityStream, c),
-                            JSONHelper.getRootElementName(type.getSimpleName())));
+                            JSONHelper.getRootElementName(type)));
             }
         } else {
             if (u instanceof JSONUnmarshaller) {
@@ -100,7 +100,7 @@ public final class JSONRootElementProvider extends AbstractRootElementProvider {
                 return u.unmarshal(
                         new JsonXmlStreamReader(
                             new InputStreamReader(entityStream, c), 
-                            JSONHelper.getRootElementName(type.getSimpleName())), type).getValue();
+                            JSONHelper.getRootElementName(type)), type).getValue();
             }
         }
     }

@@ -45,7 +45,7 @@ import javax.xml.bind.annotation.XmlRootElement;
  *
  * @author japod
  */
-@XmlRootElement
+@XmlRootElement(name="DummyOne")
 public class SimpleBean {
     @XmlElement
     public String child;

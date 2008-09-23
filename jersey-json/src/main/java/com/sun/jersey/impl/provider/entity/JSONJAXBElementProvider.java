@@ -82,7 +82,7 @@ public final class JSONJAXBElementProvider extends AbstractJAXBElementProvider {
             return (JAXBElement) u.unmarshal(
                     new JsonXmlStreamReader(
                         new InputStreamReader(entityStream, getCharset(mediaType)),
-                        JSONHelper.getRootElementName(type.getSimpleName())), type);
+                        JSONHelper.getRootElementName((Class<Object>)type)), type);
         }
     }
     
