@@ -90,13 +90,13 @@ public final class JSONJAXBContext extends JAXBContext {
     /**
      * JSON notation property.
      * <p>
-     * The type of this property is {@link String}.
+     * The type of this property is enum type {@link JSONNotation}.
      * <p>
-     * The value may be one following that are the currently supported JSON
-     * notations: <code>"MAPPED"</code>,
-     * <code>"MAPPED_JETTISON"</code> and <code>"BADGERFISH"</code>
+     * The value may be one of the following that are the currently supported JSON
+     * notations: <code>JSONNotation.MAPPED</code>,
+     * <code>JSONNotation.MAPPED_JETTISON</code> and <code>JSONNotation.BADGERFISH</code>
      * <p>
-     * The default value is "MAPPED".
+     * The default value is <code>JSONNotation.MAPPED</code>.
      */
     public static final String JSON_NOTATION = NAMESPACE + "notation";
     
@@ -117,7 +117,7 @@ public final class JSONJAXBContext extends JAXBContext {
      * The type of this property is {@link Boolean}
      * <p>
      * If set to true, JSON code corresponding to the XML root element will be stripped out
-     * for MAPPED (default) notation.
+     * for <code>JSONNotation.MAPPED</code> (default) notation.
      * <p>
      * The default value is false.
      */
@@ -125,64 +125,64 @@ public final class JSONJAXBContext extends JAXBContext {
     
     /**
      * JSON arrays property. 
-     * This property is valid for the MAPPED notation only.
+     * This property is valid for the <code>JSONNotation.MAPPED</code> notation only.
      * <p>
-     * The type of this property is {@link String}.
+     * The type of this property is <code>java.util.Collection&lt;String&gt;</code>.
      * <p>
-     * The value is a JSON expression that is an array of string values that are
+     * The value is a collection of string values that are
      * object names.
-     * The value of an object name in the JSON document that exists in the array 
+     * The value of an object name in the JSON document that exists in the collection
      * of object names will be declared as an array, even if only one
      * element is present.
      * <p>
-     * For example, consder that the the property value is not set and the 
+     * For example, consider that the the property value is not set and the
      * JSON document is <code>{ ..., "arr1":"single element", ... }</code>.
-     * If the property value is set to the expression <code>"[\"arr1\"]"</code> then
+     * If the property value is set to contain <code>"arr1"</code> then
      * the JSON document would be <code>{ ..., "arr1":["single element"], ... }</code>.
      * <p>
-     * The default value is an empty array.
+     * The default value is an empty collection.
      */
     public static final String JSON_ARRAYS = NAMESPACE + "arrays";
 
     /**
      * JSON non-string values property. 
-     * This property is valid for the MAPPED notation only.
+     * This property is valid for the <code>JSONNotation.MAPPED</code> notation only.
      * <p>
-     * The type of this property is {@link String}.
+     * The type of this property is <code>Collection&lt;String&gt;</code>.
      * <p>
-     * The value is a JSON expression that is an array of string values that are
+     * The value is collection of string values that are
      * object names.
-     * The value of an object name in the JSON document that exists in the array
+     * The value of an object name in the JSON document that exists in the collection
      * of object names will be declared as non-string value, which is not surrounded 
      * by double quotes.
      * <p>
-     * For example, consder that the the property value is not set and the 
+     * For example, consider that the the property value is not set and the
      * JSON document is <code>{ ..., "anumber":"12", ... }</code>.
-     * If the property value is set to the expression <code>"[\"anumber\"]"</code>
+     * If the property value is set to contain <code>"anumber"</code>
      * then the JSON document would be <code>{ ..., "anumber":12, ... }</code>.
      * <p>
-     * The default value is an empty array.
+     * The default value is an empty collection.
      */
     public static final String JSON_NON_STRINGS = NAMESPACE + "non.strings";
 
     /**
      * JSON attributes as elements property.
-     * This property is valid for the MAPPED notation only.
+     * This property is valid for the <code>JSONNotation.MAPPED</code> notation only.
      * <p>
-     * The type of this property is {@link String}.
+     * The type of this property is <code>Collection&lt;String&gt;</code>.
      * <p>
-     * The value is a JSON expression that is an array of string values that are
+     * The value is a collection of string values that are
      * object names that correspond to XML attribute information items.
-     * The value of an object name in the JSON document that exists in the array
+     * The value of an object name in the JSON document that exists in the collection
      * of object names will be declared as an element as not as an attribute if
      * the object corresponds to an XML attribute information item.
      * <p>
-     * For example, consder that the the property value is not set and the 
+     * For example, consider that the the property value is not set and the
      * JSON document is <code>{ ..., "@number":"12", ... }</code>.
-     * If the property value is set to the expression <code>"[\"number\"]"</code>
+     * If the property value is set contain <code>"number"</code>
      * then the JSON document would be <code>{ ..., "number":"12", ... }</code>.
      * <p>
-     * The default value is an empty array.
+     * The default value is an empty collection.
      */
     public static final String JSON_ATTRS_AS_ELEMS = NAMESPACE + "attrs.as.elems";
 
@@ -191,13 +191,13 @@ public final class JSONJAXBContext extends JAXBContext {
      * This property is valid for the MAPPED_JETTISON notation only.
      * <p>
      * <p>
-     * The type of this property is {@link String}.
+     * The type of this property is <code>Map&lt;String,String&gt;</code>.
      * <p>
-     * The value is a JSON expression that is an object with zero or more
-     * name/value pairs, where the name is an XML namespace and the value
+     * The value is a map with zero or more
+     * key/value pairs, where the key is an XML namespace and the value
      * is the prefix to use as the replacement for the XML namespace.
      * <p>
-     * The default value is an object with zero name/value pairs.
+     * The default value is a map with zero key/value pairs.
      */
     public static final String JSON_XML2JSON_NS = NAMESPACE + "xml.to.json.ns";
         
