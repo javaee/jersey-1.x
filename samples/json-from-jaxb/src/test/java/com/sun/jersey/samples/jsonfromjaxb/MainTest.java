@@ -51,8 +51,10 @@ import com.sun.jersey.samples.jsonfromjaxb.jaxb.Flights;
  */
 public class MainTest extends TestCase {
     
-    SelectorThread threadSelector;
+    private SelectorThread threadSelector;
     
+    private WebResource r;
+
     public MainTest(String testName) {
         super(testName);
     }
@@ -60,49 +62,48 @@ public class MainTest extends TestCase {
     @Override
     protected void setUp() throws Exception {
         super.setUp();
+        
         threadSelector = Main.startServer();
+
+        ClientConfig cc = new DefaultClientConfig();
+        // use the following jaxb context resolver
+        cc.getClasses().add(JAXBContextResolver.class);
+        Client c = Client.create(cc);
+        r = c.resource(Main.BASE_URI);
     }
 
     @Override
     protected void tearDown() throws Exception {
         super.tearDown();
-        if (threadSelector != null) {
-            threadSelector.stopEndpoint();
-        }
+
+        threadSelector.stopEndpoint();
     }
 
     // TODO Add asserts
     public void testMain() throws Exception {
-            ClientConfig cc = new DefaultClientConfig();
-            // use the following jaxb context resolver
-            cc.getClasses().add(JAXBContextResolver.class);
-            Client c = Client.create(cc);
-            
-            WebResource wr = c.resource(Main.baseUri);
-            
-            // get the initial representation            
-            Flights flights = wr.path("flights").
-                    accept("application/json").get(Flights.class);
-            System.out.println("List of flights found:\n" +
-                    flights.toString());
-            
-            // update the list                        
-            // remove the second row
-            if (flights.getFlight().size() > 1) {
-                flights.getFlight().remove(1);
-            }
-            
-            // update the first one
-            flights.getFlight().get(0).setNumber(125);
-            flights.getFlight().get(0).setFlightId("OK125");
-                        
-            // and send the updated list back to the server
-            wr.path("flights").type("application/json").put(flights);
-            
-            // get the updated list out from the server:
-            Flights updatedFlights = wr.path("flights").
-                    accept("application/json").get(Flights.class);
-            System.out.println("List of updated flights:\n" +
-                    updatedFlights.toString());
+        // get the initial representation
+        Flights flights = r.path("flights").
+                accept("application/json").get(Flights.class);
+        System.out.println("List of flights found:\n" +
+                flights.toString());
+
+        // update the list
+        // remove the second row
+        if (flights.getFlight().size() > 1) {
+            flights.getFlight().remove(1);
+        }
+
+        // update the first one
+        flights.getFlight().get(0).setNumber(125);
+        flights.getFlight().get(0).setFlightId("OK125");
+
+        // and send the updated list back to the server
+        r.path("flights").type("application/json").put(flights);
+
+        // get the updated list out from the server:
+        Flights updatedFlights = r.path("flights").
+                accept("application/json").get(Flights.class);
+        System.out.println("List of updated flights:\n" +
+                updatedFlights.toString());
     }
 }
