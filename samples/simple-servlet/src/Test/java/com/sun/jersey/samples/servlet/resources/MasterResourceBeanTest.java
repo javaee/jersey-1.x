@@ -39,6 +39,7 @@ package com.sun.jersey.samples.servlet.resources;
 
 import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.WebResource;
+import com.sun.jersey.api.representation.Form;
 import java.io.File;
 import java.net.URI;
 import java.util.Collections;
@@ -108,7 +109,7 @@ public class MasterResourceBeanTest extends TestCase {
      * The test method calls the tests on the various resources.
      * @throws java.lang.Exception
      */
-    public void testResources() throws Exception {
+    public void testResources() {
         doTestStartPage();
         doTestResource1Page();
         doTestResource2Page();
@@ -117,9 +118,8 @@ public class MasterResourceBeanTest extends TestCase {
 
     /**
      * Test that a request to the resource path "/start" redirects to the html page.
-     * @throws java.lang.Exception
      */
-    public void doTestStartPage() throws Exception {
+    public void doTestStartPage() {
         int responseStatus = wr.path("resources").path("start")
                 .accept(MediaType.TEXT_HTML).head().getStatus();
         assertEquals(200, responseStatus);
@@ -132,9 +132,8 @@ public class MasterResourceBeanTest extends TestCase {
 
     /**
      * Test that the request for resource 1 gives appropriate response.
-     * @throws java.lang.Exception
      */
-    public void doTestResource1Page() throws Exception {
+    public void doTestResource1Page() {
         int responseStatus = wr.path("resources").path("resource1")
                 .accept(MediaType.TEXT_PLAIN).head().getStatus();
         assertEquals("Response status 200 not found for request to resource 1", 200, responseStatus);
@@ -147,9 +146,8 @@ public class MasterResourceBeanTest extends TestCase {
 
     /**
      * Test the the request for resource 2 gives the appropriate reponse.
-     * @throws java.lang.Exception
      */
-    public void doTestResource2Page() throws Exception {
+    public void doTestResource2Page() {
         int responseStatus = wr.path("resources").path("resource2")
                 .accept(MediaType.TEXT_PLAIN).head().getStatus();
         assertEquals("Response status 200 not found for request to resource 2", 200, responseStatus);
@@ -163,14 +161,13 @@ public class MasterResourceBeanTest extends TestCase {
     /**
      * Test the request for resource 3 with different values for the query param "rep"
      * gives the appropriate response.
-     * @throws java.lang.Exception
      */
-    public void doTestResource3Page() throws Exception {
+    public void doTestResource3Page() {
         String arg1 = "firstArg";
         String arg2 = "secondArg";
         String expectedResponseWithRep0 = "<pre>Received args: ";
         String expectedResponseWithRep1 = "representation: StringRepresentation: arg1: ";
-        String expectedResponseWithRep2 = "sex=male&arg2=";
+        
         //test with rep=0
         UriBuilder requestUriBuilder =  wr.path("resources").path("resource3")
                 .path(arg1).path(arg2).getBuilder().queryParam("rep", 0);
@@ -181,6 +178,7 @@ public class MasterResourceBeanTest extends TestCase {
         String responseText = wr.get(String.class);
         assertTrue("Expected reponse not seen with query param '?rep=0'",
                 responseText.startsWith(expectedResponseWithRep0));
+
         // test with rep=1
         requestUriBuilder = requestUriBuilder.replaceQueryParam("rep", 1);
         requestUri = requestUriBuilder.build();
@@ -190,15 +188,20 @@ public class MasterResourceBeanTest extends TestCase {
         responseText = wr.get(String.class);
         assertTrue("Expected reponse not seen with query param '?rep=1'",
                 responseText.startsWith(expectedResponseWithRep1));
+
         // test with rep=2
         requestUriBuilder = requestUriBuilder.replaceQueryParam("rep", 2);
         requestUri = requestUriBuilder.build();
         wr = c.resource(requestUri);
         responseStatus = wr.head().getStatus();
-        assertEquals("Response status 200 not found for request to resource 3 with rep=2", 200, responseStatus);
-        responseText = wr.get(String.class);
-        assertTrue("Expected reponse not seen with query param '?rep=2'",
-                responseText.startsWith(expectedResponseWithRep2));
+        assertEquals("Response status 200 not found for request to resource 3 with rep=2", 200, responseStatus);        
+        Form f = wr.get(Form.class);
+        assertEquals("FormURLEncodedRepresentation", f.getFirst("representation"));
+        assertEquals("Master Duke", f.getFirst("name"));
+        assertEquals("male", f.getFirst("sex"));
+        assertEquals("firstArg", f.getFirst("arg1"));
+        assertEquals("secondArg", f.getFirst("arg2"));
+        
         // test with rep>3
         requestUriBuilder = requestUriBuilder.replaceQueryParam("rep", 4);
         requestUri = requestUriBuilder.build();
@@ -207,8 +210,6 @@ public class MasterResourceBeanTest extends TestCase {
         assertEquals("Response status 200 not found for request to resource 3 with rep>3", 200, responseStatus);
         responseText = wr.get(String.class);
         assertTrue("Expected reponse not seen with query param 'rep>3'",
-                responseText.startsWith(expectedResponseWithRep0));
-        
+                responseText.startsWith(expectedResponseWithRep0));        
     }
-    
 }
