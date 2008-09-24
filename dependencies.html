@@ -5,7 +5,7 @@
 	<TITLE>Dependencies</TITLE>
 	<META NAME="GENERATOR" CONTENT="OpenOffice.org 3.0 Beta (Unix)">
 	<META NAME="CREATED" CONTENT="0;0">
-	<META NAME="CHANGED" CONTENT="20080911;11380900">
+	<META NAME="CHANGED" CONTENT="20080924;11485900">
 </HEAD>
 <BODY LANG="en-US" DIR="LTR">
 <H1>Dependencies</H1>
@@ -103,7 +103,7 @@ module.</P>
 <BLOCKQUOTE><A HREF="http://download.java.net/maven/2/com/sun/net/httpserver/http/20070405/http-20070405.jar">http.jar</A></BLOCKQUOTE>
 <P>Deploying an application using the light weight HTTP server with
 Java SE 6 requires no additional dependences.</P>
-<H3>Servlet</H3>
+<H3><A NAME="Servlet|outline"></A>Servlet</H3>
 <P>Deploying an application on a servlet container requires a
 deployment dependency with that container.</P>
 <P>Using servlet:</P>
@@ -227,6 +227,9 @@ module.</P>
 <P>The servlet:</P>
 <BLOCKQUOTE><FONT FACE="Courier New, monospace">com.sun.jersey.spi.spring.container.servlet.SpringServlet</FONT></BLOCKQUOTE>
 <P>is required to be referenced in the web.xml of the Spring-based
-Web application.</P>
+Web application. Developers wishing to transition from non-Spring to
+Spring support may replace the reference in the web.xml to the
+servlet as documented in the <A HREF="#Servlet|outline">Servlet</A>
+section.</P>
 </BODY>
 </HTML>
