@@ -307,8 +307,9 @@ public final class UriBuilderImpl extends UriBuilder {
         if (matrixParams == null) {
             int i = path.lastIndexOf("/");
             if (i != -1) i = 0;
+//            i = path.indexOf(";", i);
+            matrixParams = UriComponent.decodeMatrix((i != -1) ? path.substring(i) : "", false);
             i = path.indexOf(";", i);
-            matrixParams = UriComponent.decodeMatrix((i != -1) ? path.substring(i + 1) : "", false);
             if (i != -1) path.setLength(i);
         }
         
