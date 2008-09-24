@@ -141,7 +141,7 @@
                     </execution>
                 </executions>
             </plugin>
-            <plugin>
+            <plugin> <!-- want to unpack sources from individual modules jus to be able to generate javadoc from it -->
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-dependency-plugin</artifactId>
                 <executions>
@@ -160,8 +160,7 @@
                               <type>jar</type>
                                   <classifier>sources</classifier>
                               <overWrite>false</overWrite>
-                              <outputDirectory>${project.build.directory}/gen-src</outputDirectory>
-                              <!--destFileName>[ filename ]</destFileName-->
+                              <outputDirectory>${gen-src-dir}</outputDirectory>
                             </artifactItem>
                              <artifactItem>
                               <groupId>com.sun.jersey</groupId>
@@ -170,8 +169,7 @@
                               <type>jar</type>
                                   <classifier>sources</classifier>
                               <overWrite>false</overWrite>
-                              <outputDirectory>${project.build.directory}/gen-src</outputDirectory>
-                              <!--destFileName>[ filename ]</destFileName-->
+                              <outputDirectory>${gen-src-dir}</outputDirectory>
                             </artifactItem>
                              <artifactItem>
                               <groupId>com.sun.jersey</groupId>
@@ -180,8 +178,7 @@
                               <type>jar</type>
                                   <classifier>sources</classifier>
                               <overWrite>false</overWrite>
-                              <outputDirectory>${project.build.directory}/gen-src</outputDirectory>
-                              <!--destFileName>[ filename ]</destFileName-->
+                              <outputDirectory>${gen-src-dir}</outputDirectory>
                             </artifactItem>
                              <artifactItem>
                               <groupId>com.sun.jersey</groupId>
@@ -190,8 +187,7 @@
                               <type>jar</type>
                                   <classifier>sources</classifier>
                               <overWrite>false</overWrite>
-                              <outputDirectory>${project.build.directory}/gen-src</outputDirectory>
-                              <!--destFileName>[ filename ]</destFileName-->
+                              <outputDirectory>${gen-src-dir}</outputDirectory>
                             </artifactItem>
                              <artifactItem>
                               <groupId>com.sun.jersey</groupId>
@@ -200,8 +196,7 @@
                               <type>jar</type>
                                   <classifier>sources</classifier>
                               <overWrite>false</overWrite>
-                              <outputDirectory>${project.build.directory}/gen-src</outputDirectory>
-                              <!--destFileName>[ filename ]</destFileName-->
+                              <outputDirectory>${gen-src-dir}</outputDirectory>
                             </artifactItem>
                              <artifactItem>
                               <groupId>com.sun.jersey</groupId>
@@ -210,39 +205,18 @@
                               <type>jar</type>
                                   <classifier>sources</classifier>
                               <overWrite>false</overWrite>
-                              <outputDirectory>${project.build.directory}/gen-src</outputDirectory>
-                              <!--destFileName>[ filename ]</destFileName-->
+                              <outputDirectory>${gen-src-dir}</outputDirectory>
                             </artifactItem>
                           </artifactItems>
                         </configuration>
                     </execution>
                 </executions>
             </plugin>
-<!--
-             <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>build-helper-maven-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>add-source</id>
-                        <phase>generate-sources</phase>
-                        <goals>
-                            <goal>add-source</goal>
-                        </goals>
-                        <configuration>
-                            <sources>
-                                <source>${project.build.directory}/gen-src</source>
-                            </sources>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
--->
-            <plugin>
+           <plugin> <!-- generate javadoc from sources unpacked above -->
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
                 <configuration>
-                    <sourcepath>${project.build.directory}/gen-src</sourcepath>
+                    <sourcepath>${gen-src-dir}</sourcepath>
                 </configuration>
                 <executions>
                     <execution>
@@ -253,7 +227,10 @@
                     </execution>
                 </executions>
             </plugin>
- 
          </plugins>
     </build>
+
+    <properties>
+      <gen-src-dir>${project.build.directory}/gen-src</gen-src-dir>
+    </properties>
 </project>
