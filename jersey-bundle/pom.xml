@@ -99,9 +99,8 @@
                             <promoteTransitiveDependencies>false</promoteTransitiveDependencies>
                             <createDependencyReducedPom>true</createDependencyReducedPom>
                             <!-- createSourcesJar switch is quite unreliable :-(
-                            -->
                             <createSourcesJar>true</createSourcesJar>
-                            <!-- createSourcesJar switch is quite unreliable :-(
+                             createSourcesJar switch is quite unreliable :-(
                             -->
                             <transformers>
                                 <transformer implementation="org.apache.maven.plugins.shade.resource.AppendingTransformer">
@@ -142,6 +141,119 @@
                     </execution>
                 </executions>
             </plugin>
-        </plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>unpack</id>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>unpack</goal>
+                        </goals>
+                        <configuration>
+                          <artifactItems>
+                            <artifactItem>
+                              <groupId>com.sun.jersey</groupId>
+                              <artifactId>jersey-core</artifactId>
+                              <version>${project.version}</version>
+                              <type>jar</type>
+                                  <classifier>sources</classifier>
+                              <overWrite>false</overWrite>
+                              <outputDirectory>${project.build.directory}/gen-src</outputDirectory>
+                              <!--destFileName>[ filename ]</destFileName-->
+                            </artifactItem>
+                             <artifactItem>
+                              <groupId>com.sun.jersey</groupId>
+                              <artifactId>jersey-server</artifactId>
+                              <version>${project.version}</version>
+                              <type>jar</type>
+                                  <classifier>sources</classifier>
+                              <overWrite>false</overWrite>
+                              <outputDirectory>${project.build.directory}/gen-src</outputDirectory>
+                              <!--destFileName>[ filename ]</destFileName-->
+                            </artifactItem>
+                             <artifactItem>
+                              <groupId>com.sun.jersey</groupId>
+                              <artifactId>jersey-client</artifactId>
+                              <version>${project.version}</version>
+                              <type>jar</type>
+                                  <classifier>sources</classifier>
+                              <overWrite>false</overWrite>
+                              <outputDirectory>${project.build.directory}/gen-src</outputDirectory>
+                              <!--destFileName>[ filename ]</destFileName-->
+                            </artifactItem>
+                             <artifactItem>
+                              <groupId>com.sun.jersey</groupId>
+                              <artifactId>jersey-atom</artifactId>
+                              <version>${project.version}</version>
+                              <type>jar</type>
+                                  <classifier>sources</classifier>
+                              <overWrite>false</overWrite>
+                              <outputDirectory>${project.build.directory}/gen-src</outputDirectory>
+                              <!--destFileName>[ filename ]</destFileName-->
+                            </artifactItem>
+                             <artifactItem>
+                              <groupId>com.sun.jersey</groupId>
+                              <artifactId>jersey-json</artifactId>
+                              <version>${project.version}</version>
+                              <type>jar</type>
+                                  <classifier>sources</classifier>
+                              <overWrite>false</overWrite>
+                              <outputDirectory>${project.build.directory}/gen-src</outputDirectory>
+                              <!--destFileName>[ filename ]</destFileName-->
+                            </artifactItem>
+                             <artifactItem>
+                              <groupId>com.sun.jersey</groupId>
+                              <artifactId>jersey-fastinfoset</artifactId>
+                              <version>${project.version}</version>
+                              <type>jar</type>
+                                  <classifier>sources</classifier>
+                              <overWrite>false</overWrite>
+                              <outputDirectory>${project.build.directory}/gen-src</outputDirectory>
+                              <!--destFileName>[ filename ]</destFileName-->
+                            </artifactItem>
+                          </artifactItems>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+<!--
+             <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>build-helper-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>add-source</id>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>add-source</goal>
+                        </goals>
+                        <configuration>
+                            <sources>
+                                <source>${project.build.directory}/gen-src</source>
+                            </sources>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+-->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <configuration>
+                    <sourcepath>${project.build.directory}/gen-src</sourcepath>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>attach-javadocs</id>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+ 
+         </plugins>
     </build>
 </project>
