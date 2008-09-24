@@ -12,16 +12,16 @@
 <P>Getting started with Jersey is very easy. First, it is necessary
 depend on the correct Jersey artifacts as described in the
 <A HREF="dependencies.html">dependences</A> document.</P>
-<P>Maven developers require a dependency on the <A HREF="http://download.java.net/maven/2/com/sun/jersey/jersey-server/0.11-ea-SNAPSHOT/jersey-server-0.11-ea-SNAPSHOT.pom">jersey-server</A>
+<P>Maven developers require a dependency on the <A HREF="http://download.java.net/maven/2/com/sun/jersey/jersey-server/1.0-ea-SNAPSHOT/jersey-server-1.0-ea-SNAPSHOT.pom">jersey-server</A>
 module, the <A HREF="http://download.java.net/maven/2/com/sun/grizzly/grizzly-servlet-webserver/1.8.3/grizzly-servlet-webserver-1.8.3.pom">grizzly-servlet-webserver</A>
 module and optionally for WADL support if using Java SE 5 the
 <A HREF="http://download.java.net/maven/1/com.sun.xml.bind/poms/jaxb-impl-2.1.pom">jaxb-impl</A>
 module.</P>
 <P>Non-maven developers require:</P>
 <BLOCKQUOTE><A HREF="http://download.java.net/maven/2/com/sun/grizzly/grizzly-servlet-webserver/1.8.3/grizzly-servlet-webserver-1.8.3.jar">grizzly-servlet-webserver.jar</A>,
-<A HREF="http://download.java.net/maven/2/com/sun/jersey/jersey-server/0.11-ea-SNAPSHOT/jersey-server-0.11-ea-SNAPSHOT.jar">jersey-server.jar</A>,
-<A HREF="http://download.java.net/maven/2/com/sun/jersey/jersey-core/0.11-ea-SNAPSHOT/jersey-core-0.11-ea-SNAPSHOT.jar">jersey-core.jar</A>,
-<A HREF="http://download.java.net/maven/2/javax/ws/rs/jsr311-api/0.11/jsr311-api-0.11.jar">jsr311-api.jar</A>,
+<A HREF="http://download.java.net/maven/2/com/sun/jersey/jersey-server/1.0-ea-SNAPSHOT/jersey-server-1.0-ea-SNAPSHOT.jar">jersey-server.jar</A>,
+<A HREF="http://download.java.net/maven/2/com/sun/jersey/jersey-core/1.0-ea-SNAPSHOT/jersey-core-1.0-ea-SNAPSHOT.jar">jersey-core.jar</A>,
+<A HREF="http://download.java.net/maven/2/javax/ws/rs/jsr311-api/1.0/jsr311-api-1.0.jar">jsr311-api.jar</A>,
 <A HREF="http://repo1.maven.org/maven2/asm/asm/3.1/asm-3.1.jar">asm.jar</A></BLOCKQUOTE>
 <P>and optionally for WADL support if using Java SE 5:</P>
 <BLOCKQUOTE><A HREF="http://download.java.net/maven/1/com.sun.xml.bind/jars/jaxb-impl-2.1.jar">jaxb-impl.jar</A>,
@@ -68,7 +68,6 @@ container.</P>
  7
  8            initParams.put(&quot;com.sun.jersey.config.property.packages&quot;, 
  9                    &quot;com.sun.jersey.samples.helloworld.resources&quot;);
-
 10
 11            System.out.println(&quot;Starting grizzly...&quot;);
 12            SelectorThread threadSelector = GrizzlyWebContainerFactory.create(
@@ -101,7 +100,7 @@ in your favourite browser.</P>
 <P>Or, from the command line use <CODE>curl:</CODE></P>
 <PRE STYLE="margin-bottom: 0.2in"><CODE>    &gt; curl http://localhost:9998/helloworld</CODE></PRE><H1>
 <A NAME="created"></A>Here's one I created earlier</H1>
-<P>The example code presented above is shipped as the <A HREF="http://download.java.net/maven/2/com/sun/jersey/samples/helloworld/0.11-ea-SNAPSHOT/helloworld-0.11-ea-SNAPSHOT-project.zip">HelloWorld</A>
+<P>The example code presented above is shipped as the <A HREF="http://download.java.net/maven/2/com/sun/jersey/samples/helloworld/1.0-ea-SNAPSHOT/helloworld-1.0-ea-SNAPSHOT-project.zip">HelloWorld</A>
 sample in the Java.Net maven repo.</P>
 </BODY>
 </HTML>

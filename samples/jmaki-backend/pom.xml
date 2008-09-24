@@ -41,7 +41,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.sun.jersey.samples</groupId>
     <artifactId>jmaki-backend</artifactId>
-    <version>0.11-ea-SNAPSHOT</version>
+    <version>1.0-ea-SNAPSHOT</version>
     <name>jMaki Backend WebApp - Jersey sample</name>
     <packaging>war</packaging>
     <dependencies>
