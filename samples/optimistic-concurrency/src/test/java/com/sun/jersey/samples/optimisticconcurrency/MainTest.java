@@ -40,6 +40,7 @@ package com.sun.jersey.samples.optimisticconcurrency;
 import com.sun.grizzly.http.SelectorThread;
 import com.sun.jersey.api.MediaTypes;
 import com.sun.jersey.api.client.Client;
+import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.WebResource;
 import javax.ws.rs.core.MediaType;
 import junit.framework.TestCase;
@@ -114,15 +115,18 @@ public class MainTest extends TestCase {
      * and is allowed only once per content item.
      */
     public void testOnUpdateItemContent() {
+        // Create a child WebResource
+        WebResource content = r.path("item").path("content");
+
         String putData = "All play and no REST makes me a dull boy";
-        r.path("item").path("content").path("0").type(MediaType.TEXT_PLAIN)
+        content.path("0").type(MediaType.TEXT_PLAIN)
                 .put(putData);
-        String contentData = r.path("item").path("content").get(String.class);
+        String contentData = content.get(String.class);
         assertEquals("Data that has been PUT is not the same as what is retrieved",
                 putData, contentData);
         // check that the 409 error is seen on a duplicate update
-        com.sun.jersey.api.client.ClientResponse cr = r.path("item").path("content").path("0").type(MediaType.TEXT_PLAIN)
-                .put(com.sun.jersey.api.client.ClientResponse.class , putData);
+        ClientResponse cr = content.path("0").type(MediaType.TEXT_PLAIN)
+                .put(ClientResponse.class , putData);
         int responseStatus = cr.getStatus();
         assertEquals("Expected 409 HTTP error not seen", 409, responseStatus);
     }

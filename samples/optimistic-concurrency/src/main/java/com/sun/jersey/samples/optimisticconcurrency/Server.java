@@ -38,11 +38,11 @@
 package com.sun.jersey.samples.optimisticconcurrency;
 
 import com.sun.grizzly.http.SelectorThread;
-import com.sun.jersey.api.container.grizzly.*;
-import com.sun.jersey.impl.container.grizzly.*;
-import java.util.*;
+import com.sun.jersey.api.container.grizzly.GrizzlyWebContainerFactory;
 import java.io.IOException;
 import java.net.URI;
+import java.util.HashMap;
+import java.util.Map;
 import javax.ws.rs.core.UriBuilder;
 
 /**
@@ -52,10 +52,9 @@ import javax.ws.rs.core.UriBuilder;
 public class Server {
 
     /**
-     * Method call returns the HTTP port to be used for the
-     * container.
-     * @param defaultPort
-     * @return httpPort
+     * Get the HTTP port for the Web application.
+     * @param defaultPort the default HTTP port to use.
+     * @return the HTTP port.
      */
     private static int getPort(int defaultPort) {
         String port = System.getenv("JERSEY_HTTP_PORT");
@@ -69,28 +68,29 @@ public class Server {
     }
 
     /**
-     * Method call gives the base uri for the application.
-     * @return baseUri
+     * Get the base URI for the Web application.
+     * @return the base URI.
      */
     private static URI getBaseURI() {
         return UriBuilder.fromUri("http://localhost/occ").port(getPort(9998)).build();
     }
 
     /**
-     * Holds the BASE_URI of the application.
+     * The base URI of the Web application.
      */
     public static final URI BASE_URI = getBaseURI();
 
     /**
-     * Method call starts the Grizzly HTTP Container and returns its handle.
-     * @return SelectorThread
-     * @throws java.io.IOException
+     * Start the Grizzly HTTP Container.
+     * @return SelectorThread the Grizzly selector thread.
+     * @throws java.io.IOException if there is an error starting the Grizzly
+     *         HTTP container.
      */
     protected static SelectorThread startServer() throws IOException {
         final Map<String, String> initParams = new HashMap<String, String>();
 
-        initParams.put("com.sun.jersey.config.property.resourceConfigClass", "com.sun.jersey.api.core.PackagesResourceConfig");
-        initParams.put("com.sun.jersey.config.property.packages", "com.sun.jersey.samples.optimisticconcurrency.resources");
+        initParams.put("com.sun.jersey.config.property.packages",
+                "com.sun.jersey.samples.optimisticconcurrency.resources");
         System.out.println("Starting grizzly...");
         SelectorThread threadSelector = GrizzlyWebContainerFactory.create(BASE_URI, initParams);
         return threadSelector;
