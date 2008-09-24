@@ -1,4 +1,8 @@
 release 0.11 (2008-09-xx)
+- Fixed issue 112
+  https://jersey.dev.java.net/issues/show_bug.cgi?id=112
+  JSON now works with JAXB annotated @XmlRootElement beans where
+  the XML element name is declared by the annotation value.
 - Improved JavaDoc of Jersey API.
 - Support for JAXB with FastInfoset using the media type
   "application/fastinfoset".
