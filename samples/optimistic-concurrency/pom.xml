@@ -95,7 +95,7 @@
                     </execution>
                 </executions>
                 <configuration>
-                    <mainClass>com.sun.jersey.samples.optimisticconcurrency.Server</mainClass>
+                    <mainClass>com.sun.jersey.samples.optimisticconcurrency.Main</mainClass>
                 </configuration>
             </plugin>
             <plugin>

@@ -49,7 +49,7 @@ import javax.ws.rs.core.UriBuilder;
  *
  * @author Paul.Sandosz@Sun.Com
  */
-public class Server {
+public class Main {
 
     /**
      * Get the HTTP port for the Web application.

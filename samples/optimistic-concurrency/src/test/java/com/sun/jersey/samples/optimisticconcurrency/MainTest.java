@@ -64,10 +64,10 @@ public class MainTest extends TestCase {
         super.setUp();
 
         //start the Grizzly web container and create the client
-        threadSelector = Server.startServer();
+        threadSelector = Main.startServer();
 
         Client c = Client.create();
-        r = c.resource(Server.BASE_URI);
+        r = c.resource(Main.BASE_URI);
     }
 
     @Override
