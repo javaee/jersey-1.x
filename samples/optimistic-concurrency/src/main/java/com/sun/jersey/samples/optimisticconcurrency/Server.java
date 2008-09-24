@@ -42,22 +42,63 @@ import com.sun.jersey.api.container.grizzly.*;
 import com.sun.jersey.impl.container.grizzly.*;
 import java.util.*;
 import java.io.IOException;
+import java.net.URI;
+import javax.ws.rs.core.UriBuilder;
 
 /**
  *
  * @author Paul.Sandosz@Sun.Com
  */
 public class Server {
-    public static void main(String[] args) throws IOException {
-        final String baseUri = "http://localhost:9998/occ";
+
+    /**
+     * Method call returns the HTTP port to be used for the
+     * container.
+     * @param defaultPort
+     * @return httpPort
+     */
+    private static int getPort(int defaultPort) {
+        String port = System.getenv("JERSEY_HTTP_PORT");
+        if (null != port) {
+            try {
+                return Integer.parseInt(port);
+            } catch (NumberFormatException e) {
+            }
+        }
+        return defaultPort;
+    }
+
+    /**
+     * Method call gives the base uri for the application.
+     * @return baseUri
+     */
+    private static URI getBaseURI() {
+        return UriBuilder.fromUri("http://localhost/occ").port(getPort(9998)).build();
+    }
+
+    /**
+     * Holds the BASE_URI of the application.
+     */
+    public static final URI BASE_URI = getBaseURI();
+
+    /**
+     * Method call starts the Grizzly HTTP Container and returns its handle.
+     * @return SelectorThread
+     * @throws java.io.IOException
+     */
+    protected static SelectorThread startServer() throws IOException {
         final Map<String, String> initParams = new HashMap<String, String>();
 
         initParams.put("com.sun.jersey.config.property.resourceConfigClass", "com.sun.jersey.api.core.PackagesResourceConfig");
         initParams.put("com.sun.jersey.config.property.packages", "com.sun.jersey.samples.optimisticconcurrency.resources");
-
         System.out.println("Starting grizzly...");
-        SelectorThread threadSelector = GrizzlyWebContainerFactory.create(baseUri, initParams);
-        System.out.println(String.format("Jersey app started with WADL at %s/application.wadl", baseUri));
+        SelectorThread threadSelector = GrizzlyWebContainerFactory.create(BASE_URI, initParams);
+        return threadSelector;
+    }
+
+    public static void main(String[] args) throws IOException {
+        SelectorThread threadSelector = startServer();
+        System.out.println(String.format("Jersey app started with WADL at %s/application.wadl", BASE_URI));
         System.out.println("Hit return to stop...");
         System.in.read();
         threadSelector.stop();
