@@ -42,7 +42,7 @@ package com.sun.jersey.api.client;
  * <p>
  * Any Java type for a response entity, that is supported by the client
  * configuration of the client, may be declared using
- * <code>Class&lt;T&gt;<code> where <code>T</code> is the Java type, or
+ * <code>Class&lt;T&gt;</code> where <code>T</code> is the Java type, or
  * using {@link GenericType} where the generic parameter is the Java type.
  * <p>
  * Any Java type instance for a request entity, that is supported by the client
