@@ -1,4 +1,13 @@
-release 0.11 (2008-09-xx)
+release 1.0-ea (2008-10-xx)
+- Support for EJB stateless session beans as resource classes.
+  A local or remote interface may be annotated with JAX-RS annotations, for
+  example the interface may be annotated with @Path to make the session bean
+  a root resource class.
+  When an application is deployed Jersey will attempt to look up any registeted
+  root resource classes that are interfaces using JNDI where the fully qualified
+  class name is the JNDI name. If an instance is found then the class is removed
+  from registered set of classes and the instance is added to the registered set
+  of singletons.
 - Fixed issue 112
   https://jersey.dev.java.net/issues/show_bug.cgi?id=112
   JSON now works with JAXB annotated @XmlRootElement beans where
