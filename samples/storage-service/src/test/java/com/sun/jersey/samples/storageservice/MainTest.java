@@ -42,7 +42,10 @@ import com.sun.jersey.api.MediaTypes;
 import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.WebResource;
+import java.net.MalformedURLException;
 import java.net.URI;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.ws.rs.core.MediaType;
 import junit.framework.TestCase;
 
@@ -145,31 +148,28 @@ public class MainTest extends TestCase {
                 (responseStatusCode - SUCCESS_STATUS_CODE) >= 0 && (responseStatusCode - SUCCESS_STATUS_CODE) <= 4);
 
         // check that there are four items in the container "quotes"
-        String containerData = content.accept(MediaType.APPLICATION_XML).get(String.class);
-        int numberOfItems = containerData.split("<item>").length - 1;
+        Container container = content.accept(MediaType.APPLICATION_XML).get(Container.class);
+        int numberOfItems = container.getItem().size();
         int expectedNumber = 4;
         assertEquals("Expected: " + expectedNumber + " items, Seeing: " + numberOfItems,
+                expectedNumber, numberOfItems);
+
+         //search the container for all items containing the word "king"
+        URI searchUri = content.getBuilder().queryParam("search", "king").build();
+        try {
+            System.out.println(searchUri.toURL().toString());
+        } catch (MalformedURLException ex) {
+            Logger.getLogger(MainTest.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        container = c.resource(searchUri).accept(MediaType.APPLICATION_XML).get(Container.class);
+        numberOfItems = (container.getItem() == null)?0:container.getItem().size();
+        expectedNumber = 1;
+        assertEquals("Expected: " + expectedNumber + " items which pass the search criterion, Seeing: " + numberOfItems,
                 expectedNumber, numberOfItems);
 
         
     }
 
-    /**
-     * Test searches for "king" in all the items in the container, and
-     * returns and xml document which has the item information.
-     * This word is seen in item number 3 of the input data.
-     */
-    public void testSearchOnItems() {
-        // Create a child WebResource for the container "quotes"
-        WebResource content = r.path("containers").path("quotes");
-        //search the container for all items containing the word "king"
-        URI searchUri = content.getBuilder().queryParam("search", "king").build();
-        String containerData = c.resource(searchUri).accept(MediaType.APPLICATION_XML).get(String.class);
-        int numberOfItems = containerData.split("<item>").length - 1;
-        int expectedNumber = 1;
-        assertEquals("Expected: " + expectedNumber + " items which pass the search criterion, Seeing: " + numberOfItems,
-                expectedNumber, numberOfItems);
-    }
 
     /**
      * Test deletes the item 3, which is the only one which supposedly has the word "king"
@@ -178,13 +178,31 @@ public class MainTest extends TestCase {
     public void testDeleteItem3AndSearchForKing() {
         // Create a child WebResource for the container "quotes"
         WebResource content = r.path("containers").path("quotes");
+
+        //PUT the container "quotes"
+        ClientResponse response = content.put(ClientResponse.class);
+        int responseStatusCode = response.getStatus();
+        assertTrue("Expected HTTP response code not seen. Seeing: " + responseStatusCode,
+                (responseStatusCode - SUCCESS_STATUS_CODE) >= 0 && (responseStatusCode - SUCCESS_STATUS_CODE) <= 4);
+
+        // the items to be added to the container
+        String item1 = "Something is rotten in the state of Denmark";
+        String item2 = "I could be bounded in a nutshell";
+        String item3 = "catch the conscience of the king";
+        String item4 = "Get thee to a nunnery";
+        //PUT the items in the container
+        response = content.path("1").type(MediaType.TEXT_PLAIN).put(ClientResponse.class, item1);
+        response = content.path("2").type(MediaType.TEXT_PLAIN).put(ClientResponse.class, item2);
+        response = content.path("3").type(MediaType.TEXT_PLAIN).put(ClientResponse.class, item3);
+        response = content.path("4").type(MediaType.TEXT_PLAIN).put(ClientResponse.class, item4);
+
         // delete item 3
-        ClientResponse response = content.path("3").delete(ClientResponse.class);
+        response = content.path("3").delete(ClientResponse.class);
         
         //search the container for all items containing the word "king"
         URI searchUri = content.getBuilder().queryParam("search", "king").build();
-        String containerData = c.resource(searchUri).accept(MediaType.APPLICATION_XML).get(String.class);
-        int numberOfItems = containerData.split("<item>").length - 1;
+        Container container = c.resource(searchUri).accept(MediaType.APPLICATION_XML).get(Container.class);
+        int numberOfItems = (container.getItem() == null)?0:container.getItem().size();
         int expectedNumber = 0;
         assertEquals("Expected: " + expectedNumber + " items which pass the search criterion, Seeing: " + numberOfItems,
                 expectedNumber, numberOfItems);        
@@ -197,10 +215,27 @@ public class MainTest extends TestCase {
     public void testDeleteContainerQuotes() {
         // Create a child WebResource for the container "quotes"
         WebResource content = r.path("containers").path("quotes");
-        
+
+        //PUT the container "quotes"
+        ClientResponse response = content.put(ClientResponse.class);
+        int responseStatusCode = response.getStatus();
+        assertTrue("Expected HTTP response code not seen. Seeing: " + responseStatusCode,
+                (responseStatusCode - SUCCESS_STATUS_CODE) >= 0 && (responseStatusCode - SUCCESS_STATUS_CODE) <= 4);
+
+        // the items to be added to the container
+        String item1 = "Something is rotten in the state of Denmark";
+        String item2 = "I could be bounded in a nutshell";
+        String item3 = "catch the conscience of the king";
+        String item4 = "Get thee to a nunnery";
+        //PUT the items in the container
+        response = content.path("1").type(MediaType.TEXT_PLAIN).put(ClientResponse.class, item1);
+        response = content.path("2").type(MediaType.TEXT_PLAIN).put(ClientResponse.class, item2);
+        response = content.path("3").type(MediaType.TEXT_PLAIN).put(ClientResponse.class, item3);
+        response = content.path("4").type(MediaType.TEXT_PLAIN).put(ClientResponse.class, item4);
+
         // delete thc container
         content.delete(ClientResponse.class);
-        ClientResponse response = content.get(ClientResponse.class);
+        response = content.get(ClientResponse.class);
         assertEquals("404 error not seen on trying to access deleted container",
                 404, response.getStatus());
     }
