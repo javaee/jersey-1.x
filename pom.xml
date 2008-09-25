@@ -44,23 +44,38 @@
     <version>1.0-ea-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>jersey-project</name>
+    <description>
+        Jersey is the open source (under dual CDDL+GPL license) JAX-RS (JSR 311)
+        production quality Reference Implementation for building
+        RESTful Web services.
+    </description>
     <url>https://jersey.dev.java.net/</url>
     <organization>
         <name>Sun Microsystems, Inc</name>
         <url>http://www.sun.com/</url>
     </organization>
     <issueManagement>
-        <system>bugzilla</system>
+        <system>java.net</system>
         <url>https://jersey.dev.java.net/servlets/ProjectIssues</url>
     </issueManagement>
+    <ciManagement>
+        <system>Hudson</system>
+        <url>http://hudson.glassfish.org/job/Jersey/</url>
+    </ciManagement>
+    <scm>
+        <connection>scm:svn:https://jersey.dev.java.net/svn/jersey/trunk/jersey/</connection>
+        <developerConnection>scm:svn:https://jersey.dev.java.net/svn/jersey/trunk/jersey/</developerConnection>
+        <tag>HEAD</tag>
+        <url>https://jersey.dev.java.net/source/browse/jersey/trunk/jersey/</url>
+    </scm>
     <mailingLists>
         <mailingList>
             <name>Jersey Users List</name>
-            <archive>https://jersey.dev.java.net/servlets/SummarizeList?listName=users</archive>
+            <archive>http://markmail.org/search/?q=list%3Anet.java.dev.jersey.users</archive>
             <post>users@jersey.dev.java.net</post>
             <otherArchives>
-                <otherArchive>http://markmail.org/search/?q=list%3Anet.java.dev.jersey.users</otherArchive>
                 <otherArchive>http://n2.nabble.com/Jersey-f576304.html</otherArchive>
+                <otherArchive>https://jersey.dev.java.net/servlets/SummarizeList?listName=users</otherArchive>
             </otherArchives>
         </mailingList>
         <mailingList>
