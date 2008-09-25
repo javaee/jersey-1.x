@@ -128,10 +128,9 @@ public class ContainerResource {
     
     private boolean match(byte[] search, String container, String item) {
         byte[] b = MemoryStore.MS.getItemData(container, item);
-        
-        OUTER: for (int i = 0; i < b.length - search.length; i++) {
-            int j = 0;
-            for (; j < search.length; j++) {
+
+        OUTER: for (int i = 0; i < b.length - search.length + 1; i++) {
+            for (int j = 0; j < search.length; j++) {
                 if (b[i + j] != search[j])
                     continue OUTER;
             }
