@@ -37,147 +37,72 @@
 
 package com.sun.jersey.samples.storageservice;
 
-import java.io.BufferedInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.FileInputStream;
+import com.sun.grizzly.http.SelectorThread;
+import com.sun.jersey.api.container.grizzly.GrizzlyWebContainerFactory;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.net.HttpURLConnection;
-import java.net.URL;
+import java.net.URI;
+import java.util.HashMap;
+import java.util.Map;
+import javax.ws.rs.core.UriBuilder;
 
 /**
  *
- * @author Paul.Sandoz@Sun.Com
+ * @author Paul.Sandosz@Sun.Com
  */
 public class Main {
-    
-    public static void main(String[] args) throws Exception {
-        if (args.length == 2) {
-            // <"GET" | "DELETE" | "PUT"> <URI>
-            String uri = args[1];
-            if (args[0].equalsIgnoreCase("GET")) {
-                // Collection operations
-                // Get all collections
-                byte[] content = get(uri);
-                System.out.println(new String(content));
-            } else if (args[0].equalsIgnoreCase("DELETE")) {
-                // Collection operation
-                // Delete a collection
-                delete(uri);
-            } else if (args[0].equalsIgnoreCase("PUT")) {
-                // Collection operation
-                // Create a collection (if not already created)
-                put(uri);
-            } else {
-                throw new IllegalArgumentException();
+
+    /**
+     * Get the HTTP port for the Web application.
+     * @param defaultPort the default HTTP port to use.
+     * @return the HTTP port.
+     */
+    private static int getPort(int defaultPort) {
+        String port = System.getenv("JERSEY_HTTP_PORT");
+        if (null != port) {
+            try {
+                return Integer.parseInt(port);
+            } catch (NumberFormatException e) {
             }
-        } else if (args.length == 3) {
-            // PUT <URI> <mediaType>
-            String uri = args[1];
-            if (args[0].equalsIgnoreCase("PUT")) {
-                // Item operation
-                // Create an item, or update if already created
-                put(uri, args[2], new BufferedInputStream(System.in));                
-            } else if (args[0].equalsIgnoreCase("POST")) {
-                post(uri, args[2], new BufferedInputStream(System.in));                
-            } else {
-                throw new IllegalArgumentException();
-            }
-        } else if (args.length == 4) {
-            // PUT <URI> <mediaType> <file>
-            String uri = args[1];
-            if (args[0].equalsIgnoreCase("PUT")) {
-                // Item operation
-                // Create an item, or update if already created
-                put(uri, args[2], new BufferedInputStream(new FileInputStream(args[3])));                
-            } else if (args[0].equalsIgnoreCase("POST")) {
-                post(uri, args[2], new BufferedInputStream(new FileInputStream(args[3])));                
-            } else {
-                throw new IllegalArgumentException();
-            }
-        } else {
-            throw new IllegalArgumentException();
         }
+        return defaultPort;
     }
-    
-    private void printUsage() {
-        
+
+    /**
+     * Get the base URI for the Web application.
+     * @return the base URI.
+     */
+    private static URI getBaseURI() {
+        return UriBuilder.fromUri("http://localhost/storage").port(getPort(9998)).build();
     }
-    
-    private static byte[] get(String uri) throws IOException {
-        URL u = new URL(uri);
-        HttpURLConnection uc = (HttpURLConnection)u.openConnection();
-        uc.setRequestMethod("GET");
+
+    /**
+     * The base URI of the Web application.
+     */
+    public static final URI BASE_URI = getBaseURI();
+
+    /**
+     * Start the Grizzly HTTP Container.
+     * @return SelectorThread the Grizzly selector thread.
+     * @throws java.io.IOException if there is an error starting the Grizzly
+     *         HTTP container.
+     */
+    protected static SelectorThread startServer() throws IOException {
+        final Map<String, String> initParams = new HashMap<String, String>();
+
+        initParams.put("com.sun.jersey.config.property.packages",
+                "com.sun.jersey.samples.storageservice.resources");
+        System.out.println("Starting grizzly...");
+        SelectorThread threadSelector = GrizzlyWebContainerFactory.create(BASE_URI, initParams);
+        return threadSelector;
+    }
+
+    public static void main(String[] args) throws IOException {
         
-        int status = uc.getResponseCode();
-        String mediaType = uc.getContentType();
-        
-        InputStream in = uc.getInputStream();
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        byte[] buffer = new byte[1024];
-        int r;
-        while ((r = in.read(buffer)) != -1) {
-            baos.write(buffer, 0, r);
-        }
-        
-        return baos.toByteArray();        
+        SelectorThread threadSelector = startServer();
+        System.out.println(String.format("Jersey app started with WADL available at %s/application.wadl", BASE_URI));
+        System.out.println("Hit return to stop...");
+        System.in.read();
+        threadSelector.stopEndpoint();
+        System.exit(0);
     }    
-    
-    private static void put(String uri) throws IOException {
-        URL u = new URL(uri);
-        HttpURLConnection uc = (HttpURLConnection)u.openConnection();
-        uc.setRequestMethod("PUT");
-        
-        int status = uc.getResponseCode();
-        System.out.println("Status: " + status);
-    }    
-    
-    private static void put(String uri, String mediaType, InputStream in) throws IOException {
-        URL u = new URL(uri);
-        HttpURLConnection uc = (HttpURLConnection)u.openConnection();
-        uc.setRequestMethod("PUT");
-        uc.setRequestProperty("Content-Type", mediaType);        
-        uc.setDoOutput(true);
-        
-        OutputStream out = uc.getOutputStream();
-        
-        byte[] data = new byte[2048];
-        int read;
-        while ((read = in.read(data)) != -1)
-            out.write(data, 0, read);
-        out.close();
-        
-        int status = uc.getResponseCode();
-        System.out.println("Status: " + status);
-    }    
-    
-    private static void post(String uri, String mediaType, InputStream in) throws IOException {
-        URL u = new URL(uri);
-        HttpURLConnection uc = (HttpURLConnection)u.openConnection();
-        uc.setRequestMethod("POST");
-        uc.setRequestProperty("Content-Type", mediaType);        
-        uc.setDoOutput(true);
-        
-        OutputStream out = uc.getOutputStream();
-        
-        byte[] data = new byte[2048];
-        int read;
-        while ((read = in.read(data)) != -1)
-            out.write(data, 0, read);
-        out.close();
-        
-        int status = uc.getResponseCode();
-        System.out.println("Status: " + status);
-    }    
-    
-    private static void delete(String uri) throws IOException {
-        URL u = new URL(uri);
-        HttpURLConnection uc = (HttpURLConnection)u.openConnection();
-        uc.setRequestMethod("DELETE");
-        
-        int status = uc.getResponseCode();
-        System.out.println("Status: " + status);
-    }    
-    
 }
