@@ -1,11 +1,11 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
 <HTML>
 <HEAD>
-	<META HTTP-EQUIV="CONTENT-TYPE" CONTENT="text/html; charset=iso-8859-1">
+	<META HTTP-EQUIV="CONTENT-TYPE" CONTENT="text/html; charset=utf-8">
 	<TITLE>Getting Started</TITLE>
-	<META NAME="GENERATOR" CONTENT="StarOffice 8  (Solaris x86)">
+	<META NAME="GENERATOR" CONTENT="OpenOffice.org 3.0 Beta (Unix)">
 	<META NAME="CREATED" CONTENT="0;0">
-	<META NAME="CHANGED" CONTENT="20080822;14464000">
+	<META NAME="CHANGED" CONTENT="20080925;11132900">
 </HEAD>
 <BODY LANG="en-US" DIR="LTR">
 <H1>Getting Started</H1>
@@ -16,8 +16,31 @@ depend on the correct Jersey artifacts as described in the
 module, the <A HREF="http://download.java.net/maven/2/com/sun/grizzly/grizzly-servlet-webserver/1.8.3/grizzly-servlet-webserver-1.8.3.pom">grizzly-servlet-webserver</A>
 module and optionally for WADL support if using Java SE 5 the
 <A HREF="http://download.java.net/maven/1/com.sun.xml.bind/poms/jaxb-impl-2.1.pom">jaxb-impl</A>
-module.</P>
-<P>Non-maven developers require:</P>
+module. The following dependency needs to be added to the pom:</P>
+<PRE STYLE="margin-left: 0.79in">&lt;dependency&gt;
+    &lt;groupId&gt;com.sun.jersey&lt;/groupId&gt;
+    &lt;artifactId&gt;jersey-server&lt;/artifactId&gt;
+    &lt;version&gt;1.0-ea-SNAPSHOT&lt;/version&gt;
+&lt;/dependency&gt;&lt;dependency&gt;
+    &lt;groupId&gt;com.sun.grizzly&lt;/groupId&gt;
+    &lt;artifactId&gt;grizzly-servlet-webserver&lt;/artifactId&gt;
+    &lt;version&gt;1.8.3&lt;/version&gt;
+&lt;/dependency&gt;
+</PRE><P>
+And the following repositories need to be added to the pom:</P>
+<PRE STYLE="margin-left: 0.79in">&lt;repository&gt;
+    &lt;id&gt;maven2-repository.dev.java.net&lt;/id&gt;
+    &lt;name&gt;Java.net Repository for Maven&lt;/name&gt;
+    &lt;url&gt;http://download.java.net/maven/2/&lt;/url&gt;
+    &lt;layout&gt;default&lt;/layout&gt;
+&lt;/repository&gt; 
+&lt;repository&gt;
+    &lt;id&gt;maven-repository.dev.java.net&lt;/id&gt;
+    &lt;name&gt;Java.net Maven 1 Repository (legacy)&lt;/name&gt;
+    &lt;url&gt;http://download.java.net/maven/1&lt;/url&gt;
+    &lt;layout&gt;legacy&lt;/layout&gt;
+&lt;/repository&gt;</PRE><P>
+Non-maven developers require:</P>
 <BLOCKQUOTE><A HREF="http://download.java.net/maven/2/com/sun/grizzly/grizzly-servlet-webserver/1.8.3/grizzly-servlet-webserver-1.8.3.jar">grizzly-servlet-webserver.jar</A>,
 <A HREF="http://download.java.net/maven/2/com/sun/jersey/jersey-server/1.0-ea-SNAPSHOT/jersey-server-1.0-ea-SNAPSHOT.jar">jersey-server.jar</A>,
 <A HREF="http://download.java.net/maven/2/com/sun/jersey/jersey-core/1.0-ea-SNAPSHOT/jersey-core-1.0-ea-SNAPSHOT.jar">jersey-core.jar</A>,
@@ -73,14 +96,13 @@ container.</P>
 12            SelectorThread threadSelector = GrizzlyWebContainerFactory.create(
 13                    baseUri, initParams);
 14            System.out.println(String.format(
-15                    &quot;Jersey app started with WADL available at %sapplication.wadl\n&rdquo; + 
-16                    &ldquo;Try out %shelloworld\nHit enter to stop it...&quot;, baseUri, baseUri));
+15                    &quot;Jersey app started with WADL available at %sapplication.wadl\n” + 
+16                    “Try out %shelloworld\nHit enter to stop it...&quot;, baseUri, baseUri));
 17            System.in.read();
 18            threadSelector.stopEndpoint();
 19            System.exit(0);
 20        }    
-21    }
-</PRE><P>
+21    }</PRE><P>
 The <CODE>Main</CODE> class deploys the <CODE>HelloWorldResource</CODE>
 using the Grizzly Web container.</P>
 <P>Lines 8 to 9 creates an initialization parameter that informs the
@@ -89,7 +111,7 @@ deployed. In this case it assumes the root resource class in the
 package <FONT FACE="Courier New, monospace">com.sun.jersey.samples.helloworld.resources</FONT>
 (or in a sub-package of).</P>
 <P>Lines 12 to 13 deploys the root resource to the base URI
-&ldquo;&quot;<A HREF="http://localhost:9998/">http://localhost:9998/</A>&rdquo;
+“&quot;<A HREF="http://localhost:9998/">http://localhost:9998/</A>”
 and returns a Grizzly SelectorThread. The complete URI of the Hello
 World root resource is &quot;http://localhost:9998/helloworld&quot;.</P>
 <P>Notice that no deployment descriptors were needed and the root
