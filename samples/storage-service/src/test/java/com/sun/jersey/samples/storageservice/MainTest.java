@@ -113,6 +113,9 @@ public class MainTest extends TestCase {
         // Create a child WebResource for the container "quotes"
         WebResource content = r.path("containers").path("quotes");
 
+        // delete thc container
+        content.delete(ClientResponse.class);
+
         // PUT the container "quotes"
         ClientResponse response = content.put(ClientResponse.class);
         assertEquals(Response.Status.CREATED, response.getResponseStatus());
