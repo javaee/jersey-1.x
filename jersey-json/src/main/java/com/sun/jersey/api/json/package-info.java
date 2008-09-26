@@ -37,6 +37,37 @@
 /**
  * Provides support for enabling and configuring JSON.
  * <p>
- * 
+ * The JSON API allows you to customize the JSON format produced/consumed
+ * with JAXB bean entities. All you need is to provide your own implementation
+ * of {@link javax.ws.rs.ext.ContextResolver} and make it return a pre-configured
+ * {@link com.sun.jersey.api.json.JSONJAXBContext}.
+ * <p>
+ * The JSON API can be used as follows to configure other than the default JSON format:
+ * <blockquote><pre>
+ * <span style="font-weight:bold">&#064;Provider</span>
+ * public final class JAXBContextResolver <span style="font-weight:bold">implements ContextResolver&lt;JAXBContext&gt;</span> {
+ *
+ *   <span style="font-weight:bold">private final JAXBContext context;</span>
+ *
+ *   private final Set&lt;Class&gt; types;
+ *
+ *   private final Class[] cTypes = {BeanOne.class, BeanTwo.class};
+ *
+ *   public JAXBContextResolver() throws Exception {
+ *       Map&lt;String, Object&gt; props = new HashMap&lt;String, Object&gt;();
+ *       <span style="font-weight:bold">props.put(JSONJAXBContext.JSON_NOTATION, JSONJAXBContext.JSONNotation.MAPPED);
+ *       props.put(JSONJAXBContext.JSON_ROOT_UNWRAPPING, Boolean.TRUE);
+ *       props.put(JSONJAXBContext.JSON_NON_STRINGS, new HashSet&lt;String&gt;(1){{add("number");}});</span>
+ *       this.types = new HashSet(Arrays.asList(cTypes));
+ *       this.context = new <span style="font-weight:bold">JSONJAXBContext</span>(cTypes, <span style="font-weight:bold">props</span>);
+ *   }
+ *
+ *   <span style="font-weight:bold">public JAXBContext getContext(Class&lt;?&gt; objectType)</span> {
+ *       return (types.contains(objectType)) ? <span style="font-weight:bold">context</span> : null;
+ *   }
+ * }
+ * </pre></blockquote>
+ *
+ * <p>For a complete set of supported properties, please see {@link com.sun.jersey.api.json.JSONJAXBContext}.
  */
 package com.sun.jersey.api.json;
