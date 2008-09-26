@@ -54,37 +54,18 @@
             <groupId>javax.servlet</groupId>
             <artifactId>jstl</artifactId>
             <version>1.1.2</version>
-            <scope>test</scope>
+            <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>taglibs</groupId>
             <artifactId>standard</artifactId>
             <version>1.1.2</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.sun.jersey</groupId>
-            <artifactId>jersey-client</artifactId>
-            <version>${project.version}</version>
-            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
             <version>3.8.1</version>
             <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.glassfish.distributions</groupId>
-            <artifactId>web-all</artifactId>
-            <version>10.0-build-20080430</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.glassfish.embedded</groupId>
-            <artifactId>gf-embedded-api</artifactId>
-            <version>1.0-alpha-4</version>
-            <scope>provided</scope>
         </dependency>
     </dependencies>
     <build>
@@ -98,7 +79,7 @@
                     <target>1.5</target>
                 </configuration>
             </plugin>
-            <!-- Run the application using "mvn clean package glassfish:run" -->
+            <!-- Run the application using "mvn glassfish:run" -->
             <plugin>
                 <groupId>org.glassfish</groupId>
                 <artifactId>maven-glassfish-plugin</artifactId>
@@ -116,73 +97,6 @@
                         <phase>package</phase> <!-- append to the packaging phase. -->
                         <goals>
                             <goal>attached</goal> <!-- goals == mojos -->
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin><!-- Run the application using "mvn clean compile exec:java" -->
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>exec-maven-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>java</goal>
-                        </goals>
-                    </execution>
-                </executions>
-                <configuration>
-                    <mainClass>com.sun.jersey.samples.bookstore.Main</mainClass>
-                </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-dependency-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>copy</id>
-                        <phase>generate-sources</phase>
-                        <goals>
-                            <goal>copy</goal>
-                        </goals>
-                        <configuration>
-                            <artifactItems>
-                                <artifactItem>
-                                    <groupId>taglibs</groupId>
-                                    <artifactId>standard</artifactId>
-                                    <type>jar</type>
-                                    <overWrite>false</overWrite>
-                                </artifactItem>
-                                <artifactItem>
-                                    <groupId>javax.servlet</groupId>
-                                    <artifactId>jstl</artifactId>
-                                    <type>jar</type>
-                                    <overWrite>false</overWrite>
-                                </artifactItem>
-                                <artifactItem>
-                                    <groupId>com.sun.jersey</groupId>
-                                    <artifactId>jersey-server</artifactId>
-                                    <type>jar</type>
-                                    <overWrite>false</overWrite>
-                                </artifactItem>
-                            </artifactItems>
-                            <outputDirectory>${project.build.directory}/lib</outputDirectory>
-                            <stripVersion>true</stripVersion>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <artifactId>maven-surefire-plugin</artifactId>
-                <configuration>
-                    <forkMode>always</forkMode>
-                    <enableAssertions>false</enableAssertions>
-                    <!--skipTests>true</skipTests-->
-                </configuration>
-                <executions>
-                    <execution>
-                        <phase>test</phase>
-                        <goals>
-                            <goal>test</goal>
                         </goals>
                     </execution>
                 </executions>
