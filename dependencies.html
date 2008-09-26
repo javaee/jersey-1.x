@@ -5,7 +5,11 @@
 	<TITLE>Dependencies</TITLE>
 	<META NAME="GENERATOR" CONTENT="OpenOffice.org 3.0 Beta (Unix)">
 	<META NAME="CREATED" CONTENT="0;0">
-	<META NAME="CHANGED" CONTENT="20080925;11145800">
+	<META NAME="CHANGED" CONTENT="20080926;10344900">
+	<META NAME="Info 1" CONTENT="">
+	<META NAME="Info 2" CONTENT="">
+	<META NAME="Info 3" CONTENT="">
+	<META NAME="Info 4" CONTENT="">
 </HEAD>
 <BODY LANG="en-US" DIR="LTR">
 <H1>Dependencies</H1>
@@ -30,7 +34,9 @@ or other build technologies. This document will explain to both maven
 and non-maven developers how to depend on Jersey for their
 application. For the convenience of non-maven developers a jersey
 bundle is provided to avoid the dependency management of multiple
-jersey-based jars.</P>
+jersey-based jars. Ant developers are likely to find the <A HREF="http://maven.apache.org/ant-tasks.html">Ant
+Tasks for Maven</A> very useful.  
+</P>
 <P>Jersey's runtime dependences are categorized into the following:</P>
 <UL>
 	<LI><P>Core server. The minimum set of dependences that Jersey
@@ -77,6 +83,23 @@ the jersey-bundle:</BLOCKQUOTE>
 <BLOCKQUOTE><A NAME="DDE_LINK2"></A><A HREF="http://download.java.net/maven/2/com/sun/jersey/jersey-bundle/1.0-ea-SNAPSHOT/jersey-bundle-1.0-ea-SNAPSHOT.jar">jersey-bundle.jar</A>,
 <A HREF="http://download.java.net/maven/2/javax/ws/rs/jsr311-api/1.0/jsr311-api-1.0.jar">jsr311-api.jar</A>,
 <A HREF="http://repo1.maven.org/maven2/asm/asm/3.1/asm-3.1.jar">asm.jar</A></BLOCKQUOTE>
+<BLOCKQUOTE STYLE="margin-left: 0in; margin-right: 0in">For Ant
+developers the <A HREF="http://maven.apache.org/ant-tasks.html">Ant
+Tasks for Maven</A> may be used to add the following to the ant
+document such that the dependencies do not need to be downloaded
+explicitly:</BLOCKQUOTE>
+<PRE STYLE="margin-left: 0.79in">&lt;artifact:dependencies pathId=&quot;dependency.classpath&quot;&gt;
+  &lt;dependency groupId=&quot;com.sun.jersey&quot; 
+              artifactId=&quot;jersey-server&quot;
+              version=&quot;1.0-ea-SNAPSHOT&quot;/&gt;
+  &lt;artifact:remoteRepository id=&quot;maven2-repository.dev.java.net&quot;
+                             url=&quot;http://download.java.net/maven/2/&quot; /&gt;
+  &lt;artifact:remoteRepository id=&quot;maven-repository.dev.java.net&quot;
+                             url=&quot;http://download.java.net/maven/1&quot; 
+                             layout=&quot;legacy&quot; /&gt;
+&lt;/artifact:dependencies&gt;</PRE><BLOCKQUOTE STYLE="margin-left: 0in; margin-right: 0in">
+The path id “dependency.classpath” may then be referenced as the
+classpath to be used for compiling or executing.</BLOCKQUOTE>
 <BLOCKQUOTE STYLE="margin-left: 0in; margin-right: 0in">Specifically
 the <A HREF="http://repo1.maven.org/maven2/asm/asm/3.1/asm-3.1.jar">asm.jar</A>
 dependency is required when either of the following

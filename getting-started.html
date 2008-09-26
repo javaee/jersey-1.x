@@ -5,7 +5,11 @@
 	<TITLE>Getting Started</TITLE>
 	<META NAME="GENERATOR" CONTENT="OpenOffice.org 3.0 Beta (Unix)">
 	<META NAME="CREATED" CONTENT="0;0">
-	<META NAME="CHANGED" CONTENT="20080925;11132900">
+	<META NAME="CHANGED" CONTENT="20080926;10395100">
+	<META NAME="Info 1" CONTENT="">
+	<META NAME="Info 2" CONTENT="">
+	<META NAME="Info 3" CONTENT="">
+	<META NAME="Info 4" CONTENT="">
 </HEAD>
 <BODY LANG="en-US" DIR="LTR">
 <H1>Getting Started</H1>
@@ -25,8 +29,7 @@ module. The following dependencies need to be added to the pom:</P>
     &lt;groupId&gt;com.sun.grizzly&lt;/groupId&gt;
     &lt;artifactId&gt;grizzly-servlet-webserver&lt;/artifactId&gt;
     &lt;version&gt;1.8.3&lt;/version&gt;
-&lt;/dependency&gt;
-</PRE><P>
+&lt;/dependency&gt;</PRE><P>
 And the following repositories need to be added to the pom:</P>
 <PRE STYLE="margin-left: 0.79in">&lt;repository&gt;
     &lt;id&gt;maven2-repository.dev.java.net&lt;/id&gt;
@@ -51,7 +54,27 @@ Non-maven developers require:</P>
 <A HREF="http://download.java.net/maven/1/javax.xml.bind/jars/jaxb-api-2.1.jar">jaxb-api.jar</A>,
 <A HREF="http://download.java.net/maven/1/javax.activation/jars/activation-1.1.jar">activation.jar</A>,
 <A HREF="http://download.java.net/maven/1/javax.xml.stream/jars/stax-api-1.0-2.jar">stax-api.jar</A></BLOCKQUOTE>
-<P>Then, create a new project (using your favourite IDE or just
+<BLOCKQUOTE STYLE="margin-left: 0in; margin-right: 0in">For Ant
+developers the <A HREF="http://maven.apache.org/ant-tasks.html">Ant
+Tasks for Maven</A> may be used to add the following to the ant
+document such that the dependencies do not need to be downloaded
+explicitly:</BLOCKQUOTE>
+<PRE STYLE="margin-left: 0.79in">&lt;artifact:dependencies pathId=&quot;dependency.classpath&quot;&gt;
+  &lt;dependency groupId=&quot;com.sun.jersey&quot; 
+              artifactId=&quot;jersey-server&quot;
+              version=&quot;1.0-ea-SNAPSHOT&quot;/&gt;
+  &lt;dependency groupId=&quot;com.sun.grizzly&quot; 
+              artifactId=&quot;grizzly-servlet-webserver&quot;
+              version=&quot;1.8.3&quot;/&gt;
+  &lt;artifact:remoteRepository id=&quot;maven2-repository.dev.java.net&quot;
+                             url=&quot;http://download.java.net/maven/2/&quot; /&gt;
+  &lt;artifact:remoteRepository id=&quot;maven-repository.dev.java.net&quot;
+                             url=&quot;http://download.java.net/maven/1&quot; 
+                             layout=&quot;legacy&quot; /&gt;
+&lt;/artifact:dependencies&gt;</PRE><BLOCKQUOTE STYLE="margin-left: 0in; margin-right: 0in">
+The path id “dependency.classpath” may then be referenced as the
+classpath to be used for compiling or executing.</BLOCKQUOTE>
+<P>Second, create a new project (using your favourite IDE or just
 ant/maven) and add the dependences. (For those who want to skip the
 creation of their own project take a look at the last <A HREF="#created">section</A>
 of this document.)</P>
@@ -111,9 +134,9 @@ deployed. In this case it assumes the root resource class in the
 package <FONT FACE="Courier New, monospace">com.sun.jersey.samples.helloworld.resources</FONT>
 (or in a sub-package of).</P>
 <P>Lines 12 to 13 deploys the root resource to the base URI
-“&quot;<A HREF="http://localhost:9998/">http://localhost:9998/</A>”
+&quot;<A HREF="http://localhost:9998/">http://localhost:9998/</A>&quot;
 and returns a Grizzly SelectorThread. The complete URI of the Hello
-World root resource is &quot;http://localhost:9998/helloworld&quot;.</P>
+World root resource is &quot;<A HREF="http://localhost:9998/helloworld">http://localhost:9998/helloworld</A>&quot;.</P>
 <P>Notice that no deployment descriptors were needed and the root
 resource was setup in a few statements of Java code.</P>
 <H1>Testing the root resource</H1>
