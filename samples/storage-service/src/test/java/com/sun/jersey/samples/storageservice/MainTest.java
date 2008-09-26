@@ -41,12 +41,13 @@ import com.sun.grizzly.http.SelectorThread;
 import com.sun.jersey.api.MediaTypes;
 import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.ClientResponse;
+import com.sun.jersey.api.client.UniformInterfaceException;
 import com.sun.jersey.api.client.WebResource;
-import java.net.MalformedURLException;
 import java.net.URI;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import java.util.Date;
+import javax.ws.rs.core.EntityTag;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 import junit.framework.TestCase;
 
 /**
@@ -60,8 +61,6 @@ public class MainTest extends TestCase {
     private WebResource r;
 
     private Client c;
-
-    private int SUCCESS_STATUS_CODE = 200;
 
     public MainTest(String testName) {
         super(testName);
@@ -100,10 +99,9 @@ public class MainTest extends TestCase {
      * resource "containers".
      */
     public void testContainersResource() {
-        String serviceXml = r.path("containers").
-                accept(MediaType.APPLICATION_XML).get(String.class);
-        assertTrue("Looks like the given xml response is not the expected one",
-                serviceXml.length() > 0);
+        Containers containers = r.path("containers").
+                accept(MediaType.APPLICATION_XML).get(Containers.class);
+        assertNotNull(containers);
     }
 
     /**
@@ -115,37 +113,26 @@ public class MainTest extends TestCase {
         // Create a child WebResource for the container "quotes"
         WebResource content = r.path("containers").path("quotes");
 
-        //PUT the container "quotes"
+        // PUT the container "quotes"
         ClientResponse response = content.put(ClientResponse.class);
-        int responseStatusCode = response.getStatus();
-        assertTrue("Expected HTTP response code not seen. Seeing: " + responseStatusCode,
-                (responseStatusCode - SUCCESS_STATUS_CODE) >= 0 && (responseStatusCode - SUCCESS_STATUS_CODE) <= 4);
+        assertEquals(Response.Status.CREATED, response.getResponseStatus());
 
-        // the items to be added to the container
-        String item1 = "Something is rotten in the state of Denmark";
-        String item2 = "I could be bounded in a nutshell";
-        String item3 = "catch the conscience of the king";
-        String item4 = "Get thee to a nunnery";
-        //PUT the items in the container
-        response = content.path("1").type(MediaType.TEXT_PLAIN).put(ClientResponse.class, item1);
-        responseStatusCode = response.getStatus();
-        assertTrue("Expected HTTP response code not seen for item 1. Seeing: " + responseStatusCode,
-                (responseStatusCode - SUCCESS_STATUS_CODE) >= 0 && (responseStatusCode - SUCCESS_STATUS_CODE) <= 4);
+        // PUT the items to be added to the the "quotes" container
+        response = content.path("1").type(MediaType.TEXT_PLAIN).put(ClientResponse.class,
+                "Something is rotten in the state of Denmark");
+        assertEquals(Response.Status.CREATED, response.getResponseStatus());
 
-        response = content.path("2").type(MediaType.TEXT_PLAIN).put(ClientResponse.class, item2);
-        responseStatusCode = response.getStatus();
-        assertTrue("Expected HTTP response code not seen for item 2. Seeing: " + responseStatusCode,
-                (responseStatusCode - SUCCESS_STATUS_CODE) >= 0 && (responseStatusCode - SUCCESS_STATUS_CODE) <= 4);
+        response = content.path("2").type(MediaType.TEXT_PLAIN).put(ClientResponse.class,
+                "I could be bounded in a nutshell");
+        assertEquals(Response.Status.CREATED, response.getResponseStatus());
 
-        response = content.path("3").type(MediaType.TEXT_PLAIN).put(ClientResponse.class, item3);
-        responseStatusCode = response.getStatus();
-        assertTrue("Expected HTTP response code not seen for item 3. Seeing: " + responseStatusCode,
-                (responseStatusCode - SUCCESS_STATUS_CODE) >= 0 && (responseStatusCode - SUCCESS_STATUS_CODE) <= 4);
+        response = content.path("3").type(MediaType.TEXT_PLAIN).put(ClientResponse.class,
+                "catch the conscience of the king");
+        assertEquals(Response.Status.CREATED, response.getResponseStatus());
 
-        response = content.path("4").type(MediaType.TEXT_PLAIN).put(ClientResponse.class, item4);
-        responseStatusCode = response.getStatus();
-        assertTrue("Expected HTTP response code not seen for item 4. Seeing: " + responseStatusCode,
-                (responseStatusCode - SUCCESS_STATUS_CODE) >= 0 && (responseStatusCode - SUCCESS_STATUS_CODE) <= 4);
+        response = content.path("4").type(MediaType.TEXT_PLAIN).put(ClientResponse.class,
+                "Get thee to a nunnery");
+        assertEquals(Response.Status.CREATED, response.getResponseStatus());
 
         // check that there are four items in the container "quotes"
         Container container = content.accept(MediaType.APPLICATION_XML).get(Container.class);
@@ -156,55 +143,79 @@ public class MainTest extends TestCase {
 
          //search the container for all items containing the word "king"
         URI searchUri = content.getBuilder().queryParam("search", "king").build();
-        try {
-            System.out.println(searchUri.toURL().toString());
-        } catch (MalformedURLException ex) {
-            Logger.getLogger(MainTest.class.getName()).log(Level.SEVERE, null, ex);
-        }
         container = c.resource(searchUri).accept(MediaType.APPLICATION_XML).get(Container.class);
-        numberOfItems = (container.getItem() == null)?0:container.getItem().size();
+        numberOfItems = (container.getItem() == null) ? 0 : container.getItem().size();
         expectedNumber = 1;
-        assertEquals("Expected: " + expectedNumber + " items which pass the search criterion, Seeing: " + numberOfItems,
-                expectedNumber, numberOfItems);
-
-        
+        assertEquals("Expected: " + expectedNumber +
+                " items which pass the search criterion, Seeing: " + numberOfItems,
+                expectedNumber, numberOfItems);        
     }
 
 
+    public void testUpdateItem3() {
+        WebResource content = r.path("containers").path("quotes");
+
+        content.path("1").type(MediaType.TEXT_PLAIN).put(
+                "Something is rotten in the state of Denmark");
+        content.path("2").type(MediaType.TEXT_PLAIN).put(
+                "I could be bounded in a nutshell");
+        content.path("3").type(MediaType.TEXT_PLAIN).put(
+                "catch the conscience of the king");
+        content.path("4").type(MediaType.TEXT_PLAIN).put(
+                "Get thee to a nunnery");
+
+        // Get the last modified and etag of item 3
+        ClientResponse response = content.path("3").get(ClientResponse.class);
+        Date lastModified = response.getLastModified();
+        EntityTag etag = response.getEntityTag();
+
+        // Check that a Not Modified response is returned
+        response = content.path("3").
+                header("If-Modified-Since", lastModified).
+                header("If-None-Match", etag).
+                get(ClientResponse.class);
+        assertEquals(Response.Status.NOT_MODIFIED, response.getResponseStatus());
+
+        // Update item 3
+        content.path("3").type(MediaType.TEXT_PLAIN).put(
+                "The play's the thing Wherein I'll catch the conscience of the king");
+
+        // Check that a OK response is returned
+        response = content.path("3").
+                header("If-Modified-Since", lastModified).
+                header("If-None-Match", etag).
+                get(ClientResponse.class);
+        assertEquals(Response.Status.OK, response.getResponseStatus());
+        assertEquals("The play's the thing Wherein I'll catch the conscience of the king",
+                response.getEntity(String.class));
+    }
+    
     /**
      * Test deletes the item 3, which is the only one which supposedly has the word "king"
      * and then searches for the word in the other items of the container.
      */
     public void testDeleteItem3AndSearchForKing() {
-        // Create a child WebResource for the container "quotes"
         WebResource content = r.path("containers").path("quotes");
 
-        //PUT the container "quotes"
-        ClientResponse response = content.put(ClientResponse.class);
-        int responseStatusCode = response.getStatus();
-        assertTrue("Expected HTTP response code not seen. Seeing: " + responseStatusCode,
-                (responseStatusCode - SUCCESS_STATUS_CODE) >= 0 && (responseStatusCode - SUCCESS_STATUS_CODE) <= 4);
-
-        // the items to be added to the container
-        String item1 = "Something is rotten in the state of Denmark";
-        String item2 = "I could be bounded in a nutshell";
-        String item3 = "catch the conscience of the king";
-        String item4 = "Get thee to a nunnery";
-        //PUT the items in the container
-        response = content.path("1").type(MediaType.TEXT_PLAIN).put(ClientResponse.class, item1);
-        response = content.path("2").type(MediaType.TEXT_PLAIN).put(ClientResponse.class, item2);
-        response = content.path("3").type(MediaType.TEXT_PLAIN).put(ClientResponse.class, item3);
-        response = content.path("4").type(MediaType.TEXT_PLAIN).put(ClientResponse.class, item4);
-
+        content.path("1").type(MediaType.TEXT_PLAIN).put(
+                "Something is rotten in the state of Denmark");
+        content.path("2").type(MediaType.TEXT_PLAIN).put(
+                "I could be bounded in a nutshell");
+        content.path("3").type(MediaType.TEXT_PLAIN).put(
+                "catch the conscience of the king");
+        content.path("4").type(MediaType.TEXT_PLAIN).put(
+                "Get thee to a nunnery");
+        
         // delete item 3
-        response = content.path("3").delete(ClientResponse.class);
+        content.path("3").delete();
         
         //search the container for all items containing the word "king"
         URI searchUri = content.getBuilder().queryParam("search", "king").build();
         Container container = c.resource(searchUri).accept(MediaType.APPLICATION_XML).get(Container.class);
-        int numberOfItems = (container.getItem() == null)?0:container.getItem().size();
+        int numberOfItems = (container.getItem() == null) ? 0 : container.getItem().size();
         int expectedNumber = 0;
-        assertEquals("Expected: " + expectedNumber + " items which pass the search criterion, Seeing: " + numberOfItems,
+        assertEquals("Expected: " + expectedNumber +
+                " items which pass the search criterion, Seeing: " + numberOfItems,
                 expectedNumber, numberOfItems);        
     }
 
@@ -213,31 +224,24 @@ public class MainTest extends TestCase {
      * on subsequent requests for the container.
      */
     public void testDeleteContainerQuotes() {
-        // Create a child WebResource for the container "quotes"
         WebResource content = r.path("containers").path("quotes");
 
-        //PUT the container "quotes"
-        ClientResponse response = content.put(ClientResponse.class);
-        int responseStatusCode = response.getStatus();
-        assertTrue("Expected HTTP response code not seen. Seeing: " + responseStatusCode,
-                (responseStatusCode - SUCCESS_STATUS_CODE) >= 0 && (responseStatusCode - SUCCESS_STATUS_CODE) <= 4);
-
-        // the items to be added to the container
-        String item1 = "Something is rotten in the state of Denmark";
-        String item2 = "I could be bounded in a nutshell";
-        String item3 = "catch the conscience of the king";
-        String item4 = "Get thee to a nunnery";
-        //PUT the items in the container
-        response = content.path("1").type(MediaType.TEXT_PLAIN).put(ClientResponse.class, item1);
-        response = content.path("2").type(MediaType.TEXT_PLAIN).put(ClientResponse.class, item2);
-        response = content.path("3").type(MediaType.TEXT_PLAIN).put(ClientResponse.class, item3);
-        response = content.path("4").type(MediaType.TEXT_PLAIN).put(ClientResponse.class, item4);
+        content.put();
 
         // delete thc container
-        content.delete(ClientResponse.class);
-        response = content.get(ClientResponse.class);
-        assertEquals("404 error not seen on trying to access deleted container",
-                404, response.getStatus());
+        content.delete();
+
+        boolean caught = false;
+        try {
+            // A UniformInterfaceException will be throw because the "quotes"
+            // container no longer exists
+            content.get(String.class);
+        } catch(UniformInterfaceException e) {
+            caught = true;
+            assertEquals("404 error not seen on trying to access deleted container",
+                    Response.Status.NOT_FOUND, e.getResponse().getResponseStatus());
+        }
+        assertTrue("Expecting a UniformInterfaceException to be thrown", caught);
     }
     
 }
