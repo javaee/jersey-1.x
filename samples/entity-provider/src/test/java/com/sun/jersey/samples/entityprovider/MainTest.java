@@ -34,7 +34,6 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-
 package com.sun.jersey.samples.entityprovider;
 
 import com.sun.grizzly.http.SelectorThread;
@@ -43,6 +42,9 @@ import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.WebResource;
 import com.sun.jersey.api.representation.Form;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.util.Properties;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import junit.framework.TestCase;
@@ -54,7 +56,6 @@ import junit.framework.TestCase;
 public class MainTest extends TestCase {
 
     private SelectorThread threadSelector;
-
     private WebResource r;
 
     public MainTest(String testName) {
@@ -90,12 +91,15 @@ public class MainTest extends TestCase {
 
     /**
      * Test checks that a request to properties resource gives back
-     * a response with status "OK".
+     * a list of properties that contains the "java.class.path"
+     * property.
      */
-    public void testPropertiesResource() {
-       ClientResponse response = r.path("properties").accept(MediaType.TEXT_PLAIN).get(ClientResponse.class);
-       assertEquals("Request for properties doesn't give expected response.",
-               Response.Status.OK, response.getResponseStatus());       
+    public void testPropertiesResource() throws IOException {
+        String sProperties = r.path("properties").accept(MediaType.TEXT_PLAIN).get(String.class);
+        Properties properties = new Properties();
+        properties.load(new ByteArrayInputStream(sProperties.getBytes()));
+        assertNotNull("Properties does not contain 'java.class.path' property", 
+                properties.getProperty("java.class.path"));
     }
 
     /**
@@ -105,7 +109,7 @@ public class MainTest extends TestCase {
     public void testGetOnDataResource() {
         ClientResponse response = r.path("data").accept(MediaType.TEXT_HTML).get(ClientResponse.class);
         assertEquals("Request for data doesn't give expected response.",
-               Response.Status.OK, response.getResponseStatus());
+                Response.Status.OK, response.getResponseStatus());
     }
 
     /**
@@ -123,5 +127,4 @@ public class MainTest extends TestCase {
                 responseMsg.contains("testName") && responseMsg.contains("testValue"));
 
     }
-
 }
