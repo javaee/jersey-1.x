@@ -1,4 +1,8 @@
 release 1.0-ea (2008-10-xx)
+- Fixed issue 114.
+  https://jersey.dev.java.net/issues/show_bug.cgi?id=114
+  When URI building with template parameters and no explicit port is declared
+  then -1 occurs as the port component in the built URI.
 - Support for EJB stateless session beans as resource classes.
   A local or remote interface may be annotated with JAX-RS annotations, for
   example the interface may be annotated with @Path to make the session bean

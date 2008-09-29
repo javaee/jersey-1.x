@@ -450,6 +450,20 @@ public class UriBuilderTest extends TestCase {
         assertEquals(URI.create("http://localhost:8080/a/b/c/x/y/z/x"), bu);
     }
 
+    public void testTemplatesDefaultPort() {
+        URI bu = UriBuilder.fromUri("http://localhost/a/b/c").
+                path("/{foo}/{bar}/{baz}/{foo}").build("x", "y", "z");
+        assertEquals(URI.create("http://localhost/a/b/c/x/y/z/x"), bu);
+
+        Map<String, Object> m = new HashMap<String, Object>();
+        m.put("foo", "x");
+        m.put("bar", "y");
+        m.put("baz", "z");
+        bu = UriBuilder.fromUri("http://localhost/a/b/c").
+                path("/{foo}/{bar}/{baz}/{foo}").buildFromMap(m);
+        assertEquals(URI.create("http://localhost/a/b/c/x/y/z/x"), bu);
+    }
+
     public void testClone() {
         UriBuilder ub = UriBuilder.fromUri("http://user@localhost:8080/?query#fragment").path("a");
         URI full = ub.clone().path("b").build();

@@ -478,45 +478,37 @@ public final class UriBuilderImpl extends UriBuilder {
         encodeQuery();
         
         String uri = UriTemplate.createURI(scheme, 
-                userInfo, host, String.valueOf(port), 
+                userInfo, host, (port != -1) ? String.valueOf(port) : null,
                 path.toString(), query.toString(), fragment, values, encode);
         return createURI(uri);        
     }
     
     @Override
     public URI build(Object... values) {
-        if (values == null || values.length == 0)
-            return createURI(create());
-
-        if (ssp != null) 
-            throw new IllegalArgumentException("Schema specific part is opaque");
-                
-        encodeMatrix();
-        encodeQuery();
-
-        String uri = UriTemplate.createURI(scheme, 
-                userInfo, host, String.valueOf(port), 
-                path.toString(), query.toString(), fragment, values, true);
-        return createURI(uri);              
+        return _build(true, values);
     }
     
     @Override
     public URI buildFromEncoded(Object... values) {
-        if (values == null || values.length == 0)
-            return createURI(create());
-        
-        if (ssp != null) 
-            throw new IllegalArgumentException("Schema specific part is opaque");  
-                
-        encodeMatrix();
-        encodeQuery();
-        
-        String uri = UriTemplate.createURI(scheme, 
-                userInfo, host, String.valueOf(port), 
-                path.toString(), query.toString(), fragment, values, false);
-        return createURI(uri);              
+        return _build(false, values);
     }
     
+    private URI _build(boolean encode, Object... values) {
+        if (values == null || values.length == 0)
+            return createURI(create());
+
+        if (ssp != null)
+            throw new IllegalArgumentException("Schema specific part is opaque");
+
+        encodeMatrix();
+        encodeQuery();
+
+        String uri = UriTemplate.createURI(scheme,
+                userInfo, host, (port != -1) ? String.valueOf(port) : null,
+                path.toString(), query.toString(), fragment, values, encode);
+        return createURI(uri);
+    }
+
     private String create() {
         encodeMatrix();
         encodeQuery();
