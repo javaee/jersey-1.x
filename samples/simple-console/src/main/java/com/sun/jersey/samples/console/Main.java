@@ -37,29 +37,55 @@
 
 package com.sun.jersey.samples.console;
 
-import com.sun.jersey.api.container.ContainerFactory;
-import com.sun.net.httpserver.HttpServer;
-import com.sun.jersey.api.container.httpserver.HttpServerFactory;
-import com.sun.jersey.api.core.PackagesResourceConfig;
-import com.sun.net.httpserver.HttpHandler;
+import com.sun.jersey.api.container.grizzly.GrizzlyWebContainerFactory;
+import com.sun.grizzly.http.SelectorThread;
 import java.io.IOException;
+import java.net.URI;
+import java.util.HashMap;
+import java.util.Map;
+import javax.ws.rs.core.UriBuilder;
 
 public class Main {
-    
+
+    private static int getPort(int defaultPort) {
+        String port = System.getenv("JERSEY_HTTP_PORT");
+        if (null != port) {
+            try {
+                return Integer.parseInt(port);
+            } catch (NumberFormatException e) {
+            }
+        }
+        return defaultPort;
+    }
+
+    private static URI getBaseURI() {
+        return UriBuilder.fromUri("http://localhost/resources").port(getPort(9998)).build();
+    }
+
+    public static final URI BASE_URI = getBaseURI();
+
+    protected static SelectorThread startServer() throws IOException {
+        final Map<String, String> initParams = new HashMap<String, String>();
+
+        initParams.put("com.sun.jersey.config.property.packages",
+                "com.sun.jersey.samples.console");
+
+        System.out.println("Starting grizzly...");
+        SelectorThread threadSelector = GrizzlyWebContainerFactory.create(BASE_URI, initParams);
+        return threadSelector;
+    }
+
     /**
      * @param args the command line arguments
      */
     public static void main(String[] args) throws IOException {
-        
-        HttpHandler handler = ContainerFactory.createContainer(HttpHandler.class, new PackagesResourceConfig("com.sun.jersey.samples.console"));
-        HttpServer server = HttpServerFactory.create("http://localhost:9998/resources", handler);
-        server.start();
-        
+        SelectorThread threadSelector = startServer();
         System.out.println("Server running, visit: http://127.0.0.1:9998/resources/form, hit return to stop...");
         System.in.read();
         System.out.println("Stopping server");
         
-        server.stop(0);
+        threadSelector.stopEndpoint();
         System.out.println("Server stopped");
+        System.exit(0);
     }
 }
