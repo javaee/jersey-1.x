@@ -37,12 +37,57 @@
 /**
  * Provides support for enabling and configuring JSON.
  * <p>
- * The JSON API allows you to customize the JSON format produced/consumed
+ * Besides enabling JSON, the API also allows you to customize the JSON format produced/consumed
  * with JAXB bean entities. All you need is to provide your own implementation
  * of {@link javax.ws.rs.ext.ContextResolver} and make it return a pre-configured
  * {@link com.sun.jersey.api.json.JSONJAXBContext}.
- * <p>
- * The JSON API can be used as follows to configure other than the default JSON format:
+ *
+ * <p>Let say, you have two JAXB beans defined:
+ * <blockquote><pre>
+ * <span style="font-weight:bold">&#064;XmlRootElement</span>
+ * public class <span style="font-weight:bold">BeanOne</span> {
+ *   public String name;
+ *   public int number;
+ * }
+ *
+ * <span style="font-weight:bold">&#064;XmlRootElement</span>
+ * public class <span style="font-weight:bold">BeanTwo</span> {
+ *   public List&lt;String&gt; titles;
+ * }
+ * </pre></blockquote>
+ *
+ * And the following resource using the above JAXB beans:
+ *
+ * <blockquote><pre>
+ * &#064;Path("beans")
+ * public class MyResource {
+ *
+ *   &#064;GET &#064;Path("one") &#064;Produces(MediaType.APPLICATION_JSON)
+ *   public <span style="font-weight:bold">BeanOne</span> getOne() {
+ *       BeanOne one = new BeanOne();
+ *       one.name = "Howard";
+ *       one.number = 3;
+ *       return one;
+ *   }
+ *
+ *   &#064;GET &#064;Path("two") &#064;Produces(MediaType.APPLICATION_JSON)
+ *   public <span style="font-weight:bold">BeanTwo</span> getTwo() {
+ *       BeanTwo two = new BeanTwo();
+ *       two.titles = new ArrayList<String>(1){{add("Title1");}};
+ *       return two;
+ *   }
+ * </pre></blockquote>
+ *
+ * <p>Then, for URI <code>beans/one</code>, you will obtain
+ * <code>{"name":"Howard","number":<span style="color:red">"</span>3<span style="color:red">"</span>}</code>,
+ * but you might want to get just number <code>3</code> there instead of string value <code>"3"</code>.
+ *
+ * For <code>beans/two</code>, the JSON returned will be <code>{"titles":"Title1"}</code>.
+ * But it would be probably better to get <code><span style="color:red">[</span>"Title1"<span style="color:red">]</span></code>,
+ * as <code>titles</code> represents an array, and you want to proces it the same way on the client side no matter how many elements
+ * the array contains.
+ *
+ * <p>The JSON API can be used as follows to configure other than the default JSON format, to achieve desired changes:
  * <blockquote><pre>
  * <span style="font-weight:bold">&#064;Provider</span>
  * public final class JAXBContextResolver <span style="font-weight:bold">implements ContextResolver&lt;JAXBContext&gt;</span> {
@@ -57,7 +102,8 @@
  *       Map&lt;String, Object&gt; props = new HashMap&lt;String, Object&gt;();
  *       <span style="font-weight:bold">props.put(JSONJAXBContext.JSON_NOTATION, JSONJAXBContext.JSONNotation.MAPPED);
  *       props.put(JSONJAXBContext.JSON_ROOT_UNWRAPPING, Boolean.TRUE);
- *       props.put(JSONJAXBContext.JSON_NON_STRINGS, new HashSet&lt;String&gt;(1){{add("number");}});</span>
+ *       props.put(JSONJAXBContext.JSON_NON_STRINGS, new HashSet&lt;String&gt;(1){{add("number");}});
+ *       props.put(JSONJAXBContext.JSON_ARRAYS, new HashSet&lt;String&gt;(1){{add("titles");}});</span>
  *       this.types = new HashSet(Arrays.asList(cTypes));
  *       this.context = new <span style="font-weight:bold">JSONJAXBContext</span>(cTypes, <span style="font-weight:bold">props</span>);
  *   }
@@ -67,6 +113,8 @@
  *   }
  * }
  * </pre></blockquote>
+ *
+ * Then the output JSON would become: <code>{"name":"Howard","number":3}</code> and <code>{"titles":["Title1"]}</code>, which is exactly what we wanted.
  *
  * <p>For a complete set of supported properties, please see {@link com.sun.jersey.api.json.JSONJAXBContext}.
  */
