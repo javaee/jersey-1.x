@@ -579,7 +579,6 @@ public class UriTemplate {
         int i = 0;
         while(m.find()) {
             b.append(template, i, m.start());
-            String x = m.group(1);
             String tValue = values.get(m.group(1)).toString();
             if (tValue != null) {
                 if (encode)
