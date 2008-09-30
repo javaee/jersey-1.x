@@ -1,4 +1,8 @@
 release 1.0-ea (2008-10-xx)
+- Fixed issue 115.
+  https://jersey.dev.java.net/issues/show_bug.cgi?id=115
+  UriBulder.buildFromEncoded does not work correctly for query parameters
+  that contain '+' characters.
 - Fixed issue 114.
   https://jersey.dev.java.net/issues/show_bug.cgi?id=114
   When URI building with template parameters and no explicit port is declared

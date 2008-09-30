@@ -483,7 +483,7 @@ public class UriTemplate {
      * @param values the template variable to value map
      * @param encode if true encode a template value according to the correspond
      *        component type of the associated template variable, otherwise
-     *        validate the template value
+     *        contextually encode the template value
      * @return a URI
      */
     public final static String createURI(final String scheme, 
@@ -517,7 +517,7 @@ public class UriTemplate {
      * @param values the template variable to value map
      * @param encode if true encode a template value according to the correspond
      *        component type of the associated template variable, otherwise
-     *        validate the template value
+     *        contextually encode the template value
      * @return a URI
      */
     public final static String createURIWithStringValues(final String scheme, 
@@ -554,7 +554,7 @@ public class UriTemplate {
         
         if (query != null && query.length() > 0) {
             sb.append('?');
-            createURIComponent(UriComponent.Type.QUERY, query, values, encode, sb);
+            createURIComponent(UriComponent.Type.QUERY_PARAM, query, values, encode, sb);
         }
          
         if (fragment != null && fragment.length() > 0) {
@@ -579,12 +579,13 @@ public class UriTemplate {
         int i = 0;
         while(m.find()) {
             b.append(template, i, m.start());
+            String x = m.group(1);
             String tValue = values.get(m.group(1)).toString();
             if (tValue != null) {
                 if (encode)
                     tValue = UriComponent.encode(tValue, t);
                 else
-                    UriComponent.validate(tValue, t);
+                    tValue =UriComponent.contextualEncode(tValue, t);
                 b.append(tValue);
             } else {
                 throw new IllegalArgumentException("The template variable, " + 
@@ -614,7 +615,7 @@ public class UriTemplate {
      * @param values the array of template values
      * @param encode if true encode a template value according to the correspond
      *        component type of the associated template variable, otherwise
-     *        validate the template value
+     *        contextually encode the template value
      * @return a URI
      */
     public final static String createURI(final String scheme, 
@@ -646,7 +647,7 @@ public class UriTemplate {
      * @param values the array of template values
      * @param encode if true encode a template value according to the correspond
      *        component type of the associated template variable, otherwise
-     *        validate the template value
+     *        contextually encode the template value
      * @return a URI
      */
     public final static String createURIWithStringValues(final String scheme, 
@@ -692,7 +693,7 @@ public class UriTemplate {
         
         if (query != null && query.length() > 0) {
             sb.append('?');
-            offset = createURIComponent(UriComponent.Type.QUERY, query, values, 
+            offset = createURIComponent(UriComponent.Type.QUERY_PARAM, query, values,
                     offset, encode, mapValues, sb);
         }
          
@@ -731,7 +732,7 @@ public class UriTemplate {
                         if (encode)
                             tValue = UriComponent.encode(tValue, t);
                         else
-                            UriComponent.validate(tValue, t);
+                            tValue = UriComponent.contextualEncode(tValue, t);
                         b.append(tValue);
                     } else {
                         throw new IllegalArgumentException("The template variable, " + 

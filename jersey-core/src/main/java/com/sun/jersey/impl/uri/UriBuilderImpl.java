@@ -462,15 +462,15 @@ public final class UriBuilderImpl extends UriBuilder {
     }
     
     public URI buildFromMap(Map<String, ? extends Object> values) {
-        return _buildFromMap(values, true);
+        return _buildFromMap(false, values);
     }
 
     @Override
     public URI buildFromEncodedMap(Map<String, ? extends Object> values) throws IllegalArgumentException, UriBuilderException {
-        return _buildFromMap(values, false);
+        return _buildFromMap(true, values);
     }
 
-    private URI _buildFromMap(Map<String, ? extends Object> values, boolean encode) {
+    private URI _buildFromMap(boolean encode, Map<String, ? extends Object> values) {
         if (ssp != null) 
             throw new IllegalArgumentException("Schema specific part is opaque");
         
@@ -485,12 +485,12 @@ public final class UriBuilderImpl extends UriBuilder {
     
     @Override
     public URI build(Object... values) {
-        return _build(true, values);
+        return _build(false, values);
     }
     
     @Override
     public URI buildFromEncoded(Object... values) {
-        return _build(false, values);
+        return _build(true, values);
     }
     
     private URI _build(boolean encode, Object... values) {

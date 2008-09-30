@@ -73,15 +73,18 @@ public class UriComponentEncodeTest extends TestCase {
     }
     
     public void testEncodeQuery() {
-        assertEquals("a+b+c.-*_",
-                UriComponent.encode("a b c.-*_", UriComponent.Type.QUERY));
+        assertEquals("a+b+c.-*_=+",
+                UriComponent.encode("a b c.-*_=+", UriComponent.Type.QUERY));
+        assertEquals("a+b+c.-*_%3D%2B",
+                UriComponent.encode("a b c.-*_=+", UriComponent.Type.QUERY_PARAM));
     }
     
     public void testContextualEncodeQuery() {
-        assertEquals("a+b+c.-*_=",
-                UriComponent.contextualEncode("a b c.-*_=", UriComponent.Type.QUERY));
-        assertEquals("a+b+c.-*_=",
-                UriComponent.contextualEncode("a+b+c.-*_=", UriComponent.Type.QUERY));
+        assertEquals("a+b+c.-*_=+",
+                UriComponent.contextualEncode("a b c.-*_=+", UriComponent.Type.QUERY));
+        System.out.println(UriComponent.contextualEncode("a b c.-*_=+", UriComponent.Type.QUERY_PARAM));
+        assertEquals("a+b+c.-*_%3D+",
+                UriComponent.contextualEncode("a b c.-*_=+", UriComponent.Type.QUERY_PARAM));
     }
 
     public void testContextualEncodeQueryParam() {
@@ -103,5 +106,9 @@ public class UriComponentEncodeTest extends TestCase {
                 UriComponent.contextualEncode("a%x", UriComponent.Type.PATH));
         assertEquals("a%25%20%20",
                 UriComponent.contextualEncode("a%  ", UriComponent.Type.PATH));
+
+        assertEquals("a%20a%20%20",
+                UriComponent.contextualEncode("a a%20 ", UriComponent.Type.PATH));
+
     }
 }

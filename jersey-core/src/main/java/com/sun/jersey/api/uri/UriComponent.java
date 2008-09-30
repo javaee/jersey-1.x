@@ -59,11 +59,11 @@ import javax.ws.rs.core.PathSegment;
 public final class UriComponent {
 
     // TODO rewrite to use masks and not lookup tables
-
     /**
      * The URI component type.
      */
     public enum Type {
+
         /**
          * The URI scheme component type.
          */
@@ -75,7 +75,7 @@ public final class UriComponent {
         /**
          * The URI host component type.
          */
-        HOST, 
+        HOST,
         /**
          * The URI port component type.
          */
@@ -83,11 +83,11 @@ public final class UriComponent {
         /**
          * The URI path component type.
          */
-        PATH, 
+        PATH,
         /**
          * The URI path component type that is a path segment.
          */
-        PATH_SEGMENT, 
+        PATH_SEGMENT,
         /**
          * The URI path component type that is a matrix parameter.
          */
@@ -95,7 +95,7 @@ public final class UriComponent {
         /**
          * The URI query component type.
          */
-        QUERY, 
+        QUERY,
         /**
          * The URI query component type that is a query parameter.
          */
@@ -105,7 +105,7 @@ public final class UriComponent {
          */
         FRAGMENT,
     }
-    
+
     private UriComponent() {
     }
 
@@ -121,7 +121,7 @@ public final class UriComponent {
     public static void validate(String s, Type t) {
         validate(s, t, false);
     }
-    
+
     /**
      * Validates the legal characters of a percent-encoded string that 
      * represents a URI component type.
@@ -134,11 +134,12 @@ public final class UriComponent {
      */
     public static void validate(String s, Type t, boolean template) {
         int i = _valid(s, t, template);
-        if (i > -1)
-            // TODO localize
-            throw new IllegalArgumentException("The string '" + s + 
-                    "' for the URI component " + t + 
+        if (i > -1) // TODO localize
+        {
+            throw new IllegalArgumentException("The string '" + s +
+                    "' for the URI component " + t +
                     " contains an invalid character, '" + s.charAt(i) + "', at index " + i);
+        }
     }
 
     /**
@@ -152,7 +153,7 @@ public final class UriComponent {
     public static boolean valid(String s, Type t) {
         return valid(s, t, false);
     }
-    
+
     /**
      * Validates the legal characters of a percent-encoded string that 
      * represents a URI component type.
@@ -165,19 +166,21 @@ public final class UriComponent {
     public static boolean valid(String s, Type t, boolean template) {
         return _valid(s, t, template) == -1;
     }
-    
+
     private static int _valid(String s, Type t, boolean template) {
         boolean[] table = ENCODING_TABLES[t.ordinal()];
-        
+
         for (int i = 0; i < s.length(); i++) {
             final char c = s.charAt(i);
-            if ((c < 0x80 && c != '%' && !table[c]) || c >= 0x80)
-                if (!template || (c != '{' && c != '}'))
+            if ((c < 0x80 && c != '%' && !table[c]) || c >= 0x80) {
+                if (!template || (c != '{' && c != '}')) {
                     return i;
+                }
+            }
         }
         return -1;
     }
-    
+
     /**
      * Contextually encodes the characters of string that are either non-ASCII
      * characters or are ASCII characters that must be percent-encoded using the
@@ -208,7 +211,7 @@ public final class UriComponent {
     public static String contextualEncode(String s, Type t, boolean template) {
         return _encode(s, t, template, true);
     }
-    
+
     /**
      * Encodes the characters of string that are either non-ASCII characters 
      * or are ASCII characters that must be percent-encoded using the 
@@ -222,7 +225,7 @@ public final class UriComponent {
     public static String encode(String s, Type t) {
         return _encode(s, t, false, false);
     }
-    
+
     /**
      * Encodes the characters of string that are either non-ASCII characters 
      * or are ASCII characters that must be percent-encoded using the 
@@ -237,9 +240,9 @@ public final class UriComponent {
     public static String encode(String s, Type t, boolean template) {
         return _encode(s, t, template, false);
     }
-    
+
     private static String _encode(String s, Type t, boolean template, boolean contextualEncode) {
-        boolean[] table = ENCODING_TABLES[t.ordinal()];
+        final boolean[] table = ENCODING_TABLES[t.ordinal()];
 
         StringBuilder sb = null;
         for (int i = 0; i < s.length(); i++) {
@@ -250,59 +253,63 @@ public final class UriComponent {
                 if (template && (c == '{' || c == '}')) {
                     if (sb != null) sb.append(c);
                     continue;
-                } else if (contextualEncode && c == '%' && i + 2 < s.length()) {
-                    if (isHexCharacter(s.charAt(i + 1)) &&
-                            isHexCharacter(s.charAt(i + 2))) {
-                        i += 2;
+                } else if (contextualEncode) {
+                    if (c == '%' && i + 2 < s.length()) {
+                        if (isHexCharacter(s.charAt(i + 1)) &&
+                                isHexCharacter(s.charAt(i + 2))) {
+                            if (sb != null)
+                                sb.append('%').append(s.charAt(i + 1)).append(s.charAt(i + 2));
+                            i += 2;
+                            continue;
+                        }
+                    } else if (c == '+' && (t == Type.QUERY || t == Type.QUERY_PARAM)) {
+                        if (sb != null) sb.append(c);
                         continue;
                     }
                 }
-                
-                if (sb == null) { 
+
+                if (sb == null) {
                     sb = new StringBuilder();
                     sb.append(s.substring(0, i));
                 }
 
                 if (c < 0x80) {
-                    if (c == ' ' && (t == Type.QUERY || t == Type.QUERY_PARAM))                    
+                    if (c == ' ' && (t == Type.QUERY || t == Type.QUERY_PARAM)) {
                         sb.append('+');
-                    else
+                    } else {
                         appendPercentEncodedOctet(sb, c);
-                } else
+                    }
+                } else {
                     appendUTF8EncodedCharacter(sb, c);
-            }            
+                }
+            }
         }
-        
+
         return (sb == null) ? s : sb.toString();
     }
-
     private final static char[] HEX_DIGITS = {
-	'0', '1', '2', '3', '4', '5', '6', '7',
-	'8', '9', 'A', 'B', 'C', 'D', 'E', 'F'
+        '0', '1', '2', '3', '4', '5', '6', '7',
+        '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'
     };
 
     private static void appendPercentEncodedOctet(StringBuilder sb, int b) {
-	sb.append('%');
-	sb.append(HEX_DIGITS[b >> 4]);
-	sb.append(HEX_DIGITS[b & 0x0F]);
+        sb.append('%');
+        sb.append(HEX_DIGITS[b >> 4]);
+        sb.append(HEX_DIGITS[b & 0x0F]);
     }
-    
+
     private static void appendUTF8EncodedCharacter(StringBuilder sb, char c) {
         final ByteBuffer bb = UTF_8_CHARSET.encode("" + c);
-        
-	while (bb.hasRemaining()) {
+
+        while (bb.hasRemaining()) {
             appendPercentEncodedOctet(sb, bb.get() & 0xFF);
-	}
+        }
     }
-    
     private static final String[] SCHEME = {"0-9", "A-Z", "a-z", "+", "-", "."};
-    
     private static final String[] UNRESERVED = {"0-9", "A-Z", "a-z", "-", ".", "_", "~"};
-    
     private static final String[] SUB_DELIMS = {"!", "$", "&", "'", "(", ")", "*", "+", ",", ";", "="};
-    
     private static final boolean[][] ENCODING_TABLES = creatingEncodingTables();
-    
+
     private static boolean[][] creatingEncodingTables() {
         boolean[][] tables = new boolean[Type.values().length][];
 
@@ -315,9 +322,9 @@ public final class UriComponent {
         l.addAll(Arrays.asList(SUB_DELIMS));
 
         tables[Type.HOST.ordinal()] = creatingEncodingTable(l);
-        
+
         tables[Type.PORT.ordinal()] = creatingEncodingTable(Arrays.asList("0-9"));
-        
+
         l.add(":");
 
         tables[Type.USER_INFO.ordinal()] = creatingEncodingTable(l);
@@ -325,41 +332,43 @@ public final class UriComponent {
         l.add("@");
 
         tables[Type.PATH_SEGMENT.ordinal()] = creatingEncodingTable(l);
-        
+
         tables[Type.MATRIX_PARAM.ordinal()] = tables[Type.PATH_SEGMENT.ordinal()].clone();
         tables[Type.MATRIX_PARAM.ordinal()]['='] = false;
-        
+
         l.add("/");
-        
+
         tables[Type.PATH.ordinal()] = creatingEncodingTable(l);
-        
+
         l.add("?");
-        
+
         tables[Type.QUERY.ordinal()] = creatingEncodingTable(l);
-        
+
         tables[Type.FRAGMENT.ordinal()] = tables[Type.QUERY.ordinal()];
-        
+
         tables[Type.QUERY_PARAM.ordinal()] = creatingEncodingTable(l);
         tables[Type.QUERY_PARAM.ordinal()]['='] = false;
+        tables[Type.QUERY_PARAM.ordinal()]['+'] = false;
 
         return tables;
     }
-    
+
     private static boolean[] creatingEncodingTable(List<String> allowed) {
         boolean[] table = new boolean[0x80];
         for (String range : allowed) {
-            if (range.length() == 1)
+            if (range.length() == 1) {
                 table[range.charAt(0)] = true;
-            else if (range.length() == 3 && range.charAt(1) == '-')
-                for (int i = range.charAt(0); i <= range.charAt(2); i++)
-                    table[i] = true;                
+            } else if (range.length() == 3 && range.charAt(1) == '-') {
+                for (int i = range.charAt(0); i <= range.charAt(2); i++) {
+                    table[i] = true;
+                }
+            }
         }
-        
+
         return table;
     }
-    
     private static final Charset UTF_8_CHARSET = Charset.forName("UTF-8");
-    
+
     /**
      * Decodes characters of a string that are percent-encoded octets using 
      * UTF-8 decoding (if needed).
@@ -378,30 +387,35 @@ public final class UriComponent {
      *         detected
      */
     public static String decode(String s, Type t) {
-	if (s == null)
-	    throw new IllegalArgumentException();
-        
-	final int n = s.length();
-	if (n == 0)
-	    return s;
+        if (s == null) {
+            throw new IllegalArgumentException();
+        }
+
+        final int n = s.length();
+        if (n == 0) {
+            return s;
+        }
 
         // If there are no percent-escaped octets
-	if (s.indexOf('%') < 0)
-	    return s;
-        
+        if (s.indexOf('%') < 0) {
+            return s;
+        }
+
         // Malformed percent-escaped octet at the end
-        if (n < 2)
-            // TODO localize
-	    throw new IllegalArgumentException("Malformed percent-encoded octet at index 1");
-            
+        if (n < 2) // TODO localize
+        {
+            throw new IllegalArgumentException("Malformed percent-encoded octet at index 1");
+        }
+
         // Malformed percent-escaped octet at the end
-        if (s.charAt(n - 2) == '%')
-            // TODO localize
-	    throw new IllegalArgumentException("Malformed percent-encoded octet at index " + (n - 2));
+        if (s.charAt(n - 2) == '%') // TODO localize
+        {
+            throw new IllegalArgumentException("Malformed percent-encoded octet at index " + (n - 2));
+        }
 
         return (t != Type.HOST) ? decode(s, n) : decodeHost(s, n);
     }
-        
+
     /**
      * Decode the query component of a URI.
      * 
@@ -413,7 +427,7 @@ public final class UriComponent {
     public static MultivaluedMap<String, String> decodeQuery(URI u, boolean decode) {
         return decodeQuery(u.getRawQuery(), decode);
     }
-    
+
     /**
      * Decode the query component of a URI.
      * 
@@ -424,10 +438,11 @@ public final class UriComponent {
      */
     public static MultivaluedMap<String, String> decodeQuery(String q, boolean decode) {
         MultivaluedMap<String, String> queryParameters = new MultivaluedMapImpl();
-        
-        if (q == null || q.length() == 0)
+
+        if (q == null || q.length() == 0) {
             return queryParameters;
-        
+        }
+
         int s = 0, e = 0;
         do {
             e = q.indexOf('&', s);
@@ -439,7 +454,7 @@ public final class UriComponent {
             }
             s = e + 1;
         } while (s > 0 && s < q.length());
-        
+
         return queryParameters;
     }
 
@@ -463,32 +478,31 @@ public final class UriComponent {
             throw new IllegalArgumentException(ex);
         }
     }
-    
+
     private static final class PathSegmentImpl implements PathSegment {
+
         private static final PathSegment EMPTY_PATH_SEGMENT = new PathSegmentImpl("", false);
-        
         private final String path;
-        
         private final MultivaluedMap<String, String> matrixParameters;
-        
+
         PathSegmentImpl(String path, boolean decode) {
             this(path, decode, new MultivaluedMapImpl());
         }
-        
+
         PathSegmentImpl(String path, boolean decode, MultivaluedMap<String, String> matrixParameters) {
             this.path = (decode) ? UriComponent.decode(path, UriComponent.Type.PATH_SEGMENT) : path;
             this.matrixParameters = matrixParameters;
         }
-        
+
         public String getPath() {
             return path;
         }
-        
+
         public MultivaluedMap<String, String> getMatrixParameters() {
             return matrixParameters;
         }
     }
-    
+
     /**
      * Decode the path component of a URI as path segments.
      * 
@@ -501,8 +515,9 @@ public final class UriComponent {
      */
     public static List<PathSegment> decodePath(URI u, boolean decode) {
         String rawPath = u.getRawPath();
-        if (rawPath != null && rawPath.length() > 0 && rawPath.charAt(0) == '/')
-                rawPath = rawPath.substring(1);
+        if (rawPath != null && rawPath.length() > 0 && rawPath.charAt(0) == '/') {
+            rawPath = rawPath.substring(1);
+        }
         return decodePath(rawPath, decode);
     }
 
@@ -523,9 +538,10 @@ public final class UriComponent {
      */
     public static List<PathSegment> decodePath(String path, boolean decode) {
         List<PathSegment> segments = new LinkedList<PathSegment>();
-        
-        if (path == null)
+
+        if (path == null) {
             return segments;
+        }
 
         int s = 0;
         int e = -1;
@@ -539,13 +555,14 @@ public final class UriComponent {
                 segments.add(PathSegmentImpl.EMPTY_PATH_SEGMENT);
             }
         } while (e != -1);
-        if (s < path.length())
+        if (s < path.length()) {
             decodePathSegment(segments, path.substring(s), decode);
-        else
+        } else {
             segments.add(PathSegmentImpl.EMPTY_PATH_SEGMENT);
+        }
         return segments;
     }
-    
+
     public static void decodePathSegment(List<PathSegment> segments, String segment, boolean decode) {
         int colon = segment.indexOf(';');
         if (colon != -1) {
@@ -559,7 +576,7 @@ public final class UriComponent {
                     decode));
         }
     }
-    
+
     /**
      * Decode the matrix component of a URI path segment.
      * 
@@ -573,8 +590,9 @@ public final class UriComponent {
 
         // Skip over path segment
         int s = pathSegment.indexOf(';') + 1;
-        if (s == 0 || s == pathSegment.length())
+        if (s == 0 || s == pathSegment.length()) {
             return matrixMap;
+        }
 
         int e = 0;
         do {
@@ -587,10 +605,10 @@ public final class UriComponent {
             }
             s = e + 1;
         } while (s > 0 && s < pathSegment.length());
-        
+
         return matrixMap;
-    }        
-    
+    }
+
     private static void decodeMatrixParam(MultivaluedMap<String, String> params,
             String param, boolean decode) {
         int equals = param.indexOf('=');
@@ -608,46 +626,46 @@ public final class UriComponent {
     }
 
     private static String decode(String s, int n) {
-	final StringBuilder sb = new StringBuilder(n);
-	ByteBuffer bb = ByteBuffer.allocate(1);
+        final StringBuilder sb = new StringBuilder(n);
+        ByteBuffer bb = ByteBuffer.allocate(1);
 
-	for (int i = 0; i < n;) {
+        for (int i = 0; i < n;) {
             final char c = s.charAt(i++);
-	    if (c != '%') {
-		sb.append(c);
-	    } else {            
+            if (c != '%') {
+                sb.append(c);
+            } else {
                 bb = decodePercentEncodedOctets(s, i, bb);
                 i = decodeOctets(i, bb, sb);
             }
-	}
+        }
 
-	return sb.toString();
+        return sb.toString();
     }
-    
+
     private static String decodeHost(String s, int n) {
-	final StringBuilder sb = new StringBuilder(n);
-	ByteBuffer bb = ByteBuffer.allocate(1);
+        final StringBuilder sb = new StringBuilder(n);
+        ByteBuffer bb = ByteBuffer.allocate(1);
 
-    	boolean betweenBrackets = false;
-	for (int i = 0; i < n;) {
+        boolean betweenBrackets = false;
+        for (int i = 0; i < n;) {
             final char c = s.charAt(i++);
-	    if (c == '[') {
-		betweenBrackets = true;
-	    } else if (betweenBrackets && c == ']') {
-		betweenBrackets = false;
-	    }
-            
-	    if (c != '%' || betweenBrackets) {
-		sb.append(c);
-	    } else {
+            if (c == '[') {
+                betweenBrackets = true;
+            } else if (betweenBrackets && c == ']') {
+                betweenBrackets = false;
+            }
+
+            if (c != '%' || betweenBrackets) {
+                sb.append(c);
+            } else {
                 bb = decodePercentEncodedOctets(s, i, bb);
                 i = decodeOctets(i, bb, sb);
             }
-	}
+        }
 
-	return sb.toString();        
+        return sb.toString();
     }
-    
+
     /**
      * Decode a contigious sequence of percent encoded octets.
      * <p>
@@ -656,19 +674,21 @@ public final class UriComponent {
      */
     private static ByteBuffer decodePercentEncodedOctets(String s, int i, ByteBuffer bb) {
         bb.clear();
-        
+
         while (true) {
             // Decode the hex digits
             bb.put((byte) (decodeHex(s, i++) << 4 | decodeHex(s, i++)));
 
             // Finish if at the end of the string
-            if (i == s.length())
+            if (i == s.length()) {
                 break;
+            }
 
             // Finish if no more percent-encoded octets follow
-            if (s.charAt(i++) != '%')
+            if (s.charAt(i++) != '%') {
                 break;
-            
+            }
+
             // Check if the byte buffer needs to be increased in size
             if (bb.position() == bb.capacity()) {
                 bb.flip();
@@ -679,11 +699,11 @@ public final class UriComponent {
                 bb = bb_new;
             }
         }
-        
+
         bb.flip();
         return bb;
     }
-    
+
     /**
      * Decodes octets to characters using the UTF-8 decoding and appends
      * the characters to a StringBuffer.
@@ -693,7 +713,7 @@ public final class UriComponent {
         // If there is only one octet and is an ASCII character
         if (bb.limit() == 1 && (bb.get(0) & 0xFF) < 0x80) {
             // Octet can be appended directly
-            sb.append((char)bb.get(0));
+            sb.append((char) bb.get(0));
             return i + 2;
         } else {
             // 
@@ -702,32 +722,38 @@ public final class UriComponent {
             return i + bb.limit() * 3 - 1;
         }
     }
-    
+
     private static int decodeHex(String s, int i) {
         final int v = decodeHex(s.charAt(i));
-        if (v == -1)
-            // TODO localize
-            throw new IllegalArgumentException("Malformed percent-encoded octet at index " + i + 
+        if (v == -1) // TODO localize
+        {
+            throw new IllegalArgumentException("Malformed percent-encoded octet at index " + i +
                     ", invalid hexadecimal digit '" + s.charAt(i) + "'");
+        }
         return v;
-    }    
-    
+    }
     private static final int[] HEX_TABLE = createHexTable();
-    
+
     private static int[] createHexTable() {
         int[] table = new int[0x80];
         Arrays.fill(table, -1);
-        
-        for (char c = '0'; c <= '9'; c++) table[c] = c - '0';
-        for (char c = 'A'; c <= 'F'; c++) table[c] = c - 'A' + 10;
-        for (char c = 'a'; c <= 'f'; c++) table[c] = c - 'a' + 10;
+
+        for (char c = '0'; c <= '9'; c++) {
+            table[c] = c - '0';
+        }
+        for (char c = 'A'; c <= 'F'; c++) {
+            table[c] = c - 'A' + 10;
+        }
+        for (char c = 'a'; c <= 'f'; c++) {
+            table[c] = c - 'a' + 10;
+        }
         return table;
     }
 
     private static int decodeHex(char c) {
         return (c < 128) ? HEX_TABLE[c] : -1;
-    }    
-    
+    }
+
     private static boolean isHexCharacter(char c) {
         return c < 128 && HEX_TABLE[c] != -1;
     }
