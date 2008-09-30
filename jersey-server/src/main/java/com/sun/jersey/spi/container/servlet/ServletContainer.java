@@ -128,7 +128,10 @@ import javax.ws.rs.core.UriBuilder;
  * If this parameter is not set then the default value is set to the following 
  * virtual paths: 
  * "/WEB-INF/lib;/WEB-INF/classes".
- * 
+ * <p>
+ * All servlet initialization parameters are added as properties of the created
+ * {@link ResourceConfig}.
+ *
  * <p>
  * A new {@link WebApplication} instance will be created and configured such
  * that the following classes may be injected onto the field of a root 
