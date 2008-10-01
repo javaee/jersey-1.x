@@ -90,9 +90,8 @@ public class BookmarksResource {
     @Produces("application/json")
     public JSONArray getBookmarksAsJsonArray() {
         JSONArray uriArray = new JSONArray();
-        UriBuilder ub = null;
         for (BookmarkEntity bookmarkEntity : getBookmarks()) {
-            ub = (ub == null) ? uriInfo.getAbsolutePathBuilder() : ub.clone();
+            UriBuilder ub = uriInfo.getAbsolutePathBuilder();
             URI bookmarkUri = ub.
                     path(bookmarkEntity.getBookmarkEntityPK().getBmid()).
                     build();

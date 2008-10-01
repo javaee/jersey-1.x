@@ -82,9 +82,8 @@ public class UsersResource {
     @Produces("application/json")
     public JSONArray getUsersAsJsonArray() {
         JSONArray uriArray = new JSONArray();
-        UriBuilder ub = null;
         for (UserEntity userEntity : getUsers()) {
-            ub = (ub == null) ? uriInfo.getAbsolutePathBuilder() : ub.clone();
+            UriBuilder ub = uriInfo.getAbsolutePathBuilder();
             URI userUri = ub.
                     path(userEntity.getUserid()).
                     build();
