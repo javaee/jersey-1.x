@@ -123,9 +123,13 @@ public final class HttpMethodRule implements UriRule {
             method.getDispatcher().dispatch(resource, context);
             return true;
         } else if (s == MatchStatus.NO_MATCH_FOR_CONSUME) {
-            throw new WebApplicationException(Responses.unsupportedMediaType().build());
+            response.setResponse(Responses.unsupportedMediaType().build());
+            // Allow any further matching rules to be processed
+            return false;
         } else if (s == MatchStatus.NO_MATCH_FOR_PRODUCE) {
-            throw new WebApplicationException(Responses.notAcceptable().build());
+            response.setResponse(Responses.notAcceptable().build());
+            // Allow any further matching rules to be processed
+            return false;
         }
         
         return true;

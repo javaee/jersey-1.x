@@ -1,4 +1,7 @@
 release 1.0-ea (2008-10-xx)
+- When implicit views are enabled allow deferral to implicit GET when
+  non of the explicit GETs match. Previously if there were any explicit
+  GETs non-matching or otherwise no deferral occurred.
 - Fixed issue 115.
   https://jersey.dev.java.net/issues/show_bug.cgi?id=115
   UriBulder.buildFromEncoded does not work correctly for query parameters
