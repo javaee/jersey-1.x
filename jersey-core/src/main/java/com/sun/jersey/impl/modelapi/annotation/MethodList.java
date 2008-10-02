@@ -58,17 +58,27 @@ public class MethodList implements Iterable<AnnotatedMethod> {
     }
     
     public MethodList(List<Method> methods) {
-        this.methods = new AnnotatedMethod[methods.size()];
-        for (int i = 0; i < methods.size(); i++)
-            this.methods[i] = new AnnotatedMethod(methods.get(i));        
+        List<AnnotatedMethod> l = new ArrayList<AnnotatedMethod>();
+        for (Method m : methods) {
+            if (!m.isBridge())
+                l.add(new AnnotatedMethod(m));
+        }
+
+        this.methods = new AnnotatedMethod[l.size()];
+        this.methods = l.toArray(this.methods);
     }
     
     public MethodList(Method... methods) {
-        this.methods = new AnnotatedMethod[methods.length];
-        for (int i = 0; i < methods.length; i++)
-            this.methods[i] = new AnnotatedMethod(methods[i]);
+        List<AnnotatedMethod> l = new ArrayList<AnnotatedMethod>();
+        for (Method m : methods) {
+            if (!m.isBridge())
+                l.add(new AnnotatedMethod(m));
+        }
+
+        this.methods = new AnnotatedMethod[l.size()];
+        this.methods = l.toArray(this.methods);
     }
-    
+
     public MethodList(AnnotatedMethod... methods) {        
         this.methods = methods;
     }

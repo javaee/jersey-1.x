@@ -75,51 +75,51 @@ public class MethodIAnnotationnheritenceTest extends AbstractResourceTester {
         String p;
         String q;
         String h;
-        
+
         SubResource(UriInfo ui, String p, String q, String h) {
             this.ui = ui;
             this.p = p;
             this.q = q;
             this.h = h;
         }
-        
+
         @GET
         public String get() {
             return p + q + h;
         }
     }
-    
+
     public static interface Interface {
         @GET
         @Produces("application/get")
         String get();
-        
+
         @GET
         @Produces("application/getParams")
         String getParams(
                 @Context UriInfo ui,
                 @PathParam("p") String p,
-                @QueryParam("q") String q, 
+                @QueryParam("q") String q,
                 @HeaderParam("h") String h);
-        
+
         @POST
         @Produces("application/xml")
         @Consumes("text/plain")
         String post(String s);
-        
+
         @Path("sub")
         SubResource subResource(
                 @Context UriInfo ui,
                 @PathParam("p") String p,
-                @QueryParam("q") String q, 
+                @QueryParam("q") String q,
                 @HeaderParam("h") String h);
-        
+
         @GET
         @Path("submethod")
         String subMethod(
                 @Context UriInfo ui,
                 @PathParam("p") String p,
-                @QueryParam("q") String q, 
+                @QueryParam("q") String q,
                 @HeaderParam("h") String h);
     }
 
@@ -128,37 +128,37 @@ public class MethodIAnnotationnheritenceTest extends AbstractResourceTester {
         public String get() {
             return "implementation";
         }
-        
+
         public String getParams(UriInfo ui, String p, String q, String h) {
             return p + q + h;
         }
-        
+
         public String post(String s) {
             return "<root>" + s + "</root>";
-        }        
-        
+        }
+
         public SubResource subResource(UriInfo ui, String p, String q, String h) {
             return new SubResource(ui, p, q, h);
         }
-        
+
         public String subMethod(UriInfo ui, String p, String q, String h) {
             return p + q + h;
         }
     }
-    
+
     public void testInterfaceImplementation() {
         initiateWebApplication(InterfaceImplementation.class);
-        
+
         _test();
     }
-    
-    
+
+
     static class ProxyComponentProvider implements ComponentProvider {
         public <T> T getInjectableInstance(T instance) {
             return instance;
         }
 
-        public <T> T getInstance(Scope scope, Class<T> c) 
+        public <T> T getInstance(Scope scope, Class<T> c)
                 throws InstantiationException, IllegalAccessException {
             if (Interface.class.isAssignableFrom(c)) {
                 final Object o = c.newInstance();
@@ -173,180 +173,180 @@ public class MethodIAnnotationnheritenceTest extends AbstractResourceTester {
             } else return null;
         }
 
-        public <T> T getInstance(Scope scope, Constructor<T> constructor, Object[] parameters) 
+        public <T> T getInstance(Scope scope, Constructor<T> constructor, Object[] parameters)
                 throws InstantiationException, IllegalArgumentException, IllegalAccessException, InvocationTargetException {
             return null;
         }
 
-        public <T> T getInstance(ComponentContext cc, Scope scope, Class<T> c) 
+        public <T> T getInstance(ComponentContext cc, Scope scope, Class<T> c)
                 throws InstantiationException, IllegalAccessException {
             return getInstance(scope, c);
         }
-        
+
         public void inject(Object instance) {
         }
     }
-    
+
     public void testInterfaceImplementationComponentProviderProxy() {
         initiateWebApplication(new ProxyComponentProvider(), InterfaceImplementation.class);
-        
+
         _test();
     }
-    
+
     public void _test() {
         String s = resource("/a").accept("application/get").
                 get(String.class);
         assertEquals("implementation", s);
-        
+
         s = resource("/a?q=b").accept("application/getParams").
                 header("h", "c").
                 get(String.class);
         assertEquals("abc", s);
-        
+
         ClientResponse cr = resource("/a").
                 type("text/plain").
                 accept("application/xml").
                 post(ClientResponse.class, "content");
         assertEquals("<root>content</root>", cr.getEntity(String.class));
         assertEquals(MediaType.valueOf("application/xml"), cr.getType());
-        
+
         s = resource("/a/sub?q=b").
                 header("h", "c").
                 get(String.class);
         assertEquals("abc", s);
-        
+
         s = resource("/a/submethod?q=b").
                 header("h", "c").
                 get(String.class);
-        assertEquals("abc", s);        
+        assertEquals("abc", s);
     }
-    
+
     public static abstract class AbstractClass {
         @GET
         @Produces("application/get")
         public abstract String get();
-        
+
         @GET
         @Produces("application/getParams")
         public abstract String getParams(
                 @Context UriInfo ui,
                 @PathParam("p") String p,
-                @QueryParam("q") String q, 
+                @QueryParam("q") String q,
                 @HeaderParam("h") String h);
-        
+
         @POST
         @Produces("application/xml")
         @Consumes("text/plain")
         public abstract String post(String s);
-        
+
         @Path("sub")
         public abstract SubResource subResource(
                 @Context UriInfo ui,
                 @PathParam("p") String p,
-                @QueryParam("q") String q, 
+                @QueryParam("q") String q,
                 @HeaderParam("h") String h);
-        
+
         @GET
         @Path("submethod")
         public abstract String subMethod(
                 @Context UriInfo ui,
                 @PathParam("p") String p,
-                @QueryParam("q") String q, 
-                @HeaderParam("h") String h);        
+                @QueryParam("q") String q,
+                @HeaderParam("h") String h);
     }
-    
+
     @Path("/{p}")
     public static class AbstractClassImplementation extends AbstractClass {
         public String get() {
             return "implementation";
         }
-        
+
         public String getParams(UriInfo ui, String p, String q, String h) {
             return p + q + h;
         }
-        
+
         public String post(String s) {
             return "<root>" + s + "</root>";
-        }        
-        
+        }
+
         public SubResource subResource(UriInfo ui, String p, String q, String h) {
             return new SubResource(ui, p, q, h);
         }
-        
+
         public String subMethod(UriInfo ui, String p, String q, String h) {
             return p + q + h;
         }
     }
-    
+
     public void testAbstractClassImplementation() {
         initiateWebApplication(AbstractClassImplementation.class);
-        
+
         _test();
     }
-    
-    
+
+
     public static class ConcreteClass {
         @GET
         @Produces("application/get")
         public String get() {
             return "void";
         }
-        
+
         @GET
         @Produces("application/getParams")
         public String getParams(
                 @Context UriInfo ui,
                 @PathParam("p") String p,
-                @QueryParam("q") String q, 
+                @QueryParam("q") String q,
                 @HeaderParam("h") String h) {
             return "void";
         }
-        
+
         @POST
         @Produces("application/xml")
         @Consumes("text/plain")
         public String post(String s) {
             return "void";
         }
-        
+
         @Path("sub")
         public SubResource subResource(
                 @Context UriInfo ui,
                 @PathParam("p") String p,
-                @QueryParam("q") String q, 
+                @QueryParam("q") String q,
                 @HeaderParam("h") String h) {
-            return null;            
+            return null;
         }
-        
+
         @GET
         @Path("submethod")
         public String subMethod(
                 @Context UriInfo ui,
                 @PathParam("p") String p,
-                @QueryParam("q") String q, 
+                @QueryParam("q") String q,
                 @HeaderParam("h") String h) {
-            return "void";            
+            return "void";
         }
     }
-    
+
     @Path("/{p}")
     public static class ConcreteClassOverride extends ConcreteClass {
         public String get() {
             return "implementation";
         }
-        
+
         public String getParams(UriInfo ui, String p, String q, String h) {
             return p + q + h;
         }
-        
+
         public String post(String s) {
             return "<root>" + s + "</root>";
-        }        
-        
+        }
+
         public SubResource subResource(UriInfo ui, String p, String q, String h) {
             return new SubResource(ui, p, q, h);
         }
-        
+
         public String subMethod(UriInfo ui, String p, String q, String h) {
             return p + q + h;
         }
@@ -354,149 +354,172 @@ public class MethodIAnnotationnheritenceTest extends AbstractResourceTester {
 
     public void testConcreteClassOverride() {
         initiateWebApplication(ConcreteClassOverride.class);
-        
+
         _test();
     }
 
-    
+
     public static abstract class AbstractOverrideClass implements Interface {
         public abstract String get();
-        
+
         public abstract String getParams(UriInfo ui, String p, String q, String h);
-        
+
         public abstract String post(String s);
-        
+
         public abstract SubResource subResource(UriInfo ui, String p, String q, String h);
-        
+
         public abstract String subMethod(UriInfo ui, String p, String q, String h);
     }
-    
+
     @Path("/{p}")
     public static class AbstractOverrideClassInterface extends AbstractOverrideClass {
         public String get() {
             return "implementation";
         }
-        
+
         public String getParams(UriInfo ui, String p, String q, String h) {
             return p + q + h;
         }
-        
+
         public String post(String s) {
             return "<root>" + s + "</root>";
-        }        
-        
+        }
+
         public SubResource subResource(UriInfo ui, String p, String q, String h) {
             return new SubResource(ui, p, q, h);
         }
-        
+
         public String subMethod(UriInfo ui, String p, String q, String h) {
             return p + q + h;
         }
     }
-    
+
     public void testAbstractOverrideClassInterface() {
         initiateWebApplication(AbstractOverrideClassInterface.class);
-        
+
         _test();
     }
 
     @Path("/{x_p}")
     public static class InterfaceImplementationOverride implements Interface {
-        
+
         @GET
         @Produces("application/getoverride")
         public String get() {
             return "override";
         }
-        
+
         @GET
         @Produces("application/getParamsoverride")
         public String getParams(
                 @Context UriInfo ui,
                 @PathParam("x_p") String p,
-                @QueryParam("_q") String q, 
+                @QueryParam("_q") String q,
                 @HeaderParam("_h") String h) {
             return p + q + h;
         }
-        
+
         @POST
         @Produces("application/xhtml")
         @Consumes("application/octet-stream")
         public String post(String s) {
             return "<root>" + s + "</root>";
-        }  
-        
+        }
+
         @Path("suboverride")
         public SubResource subResource(
                 @Context UriInfo ui,
                 @PathParam("x_p") String p,
-                @QueryParam("_q") String q, 
+                @QueryParam("_q") String q,
                 @HeaderParam("_h") String h) {
-            return new SubResource(ui, p, q, h);            
+            return new SubResource(ui, p, q, h);
         }
-        
+
         @GET
         @Path("submethodoverride")
         public String subMethod(
                 @Context UriInfo ui,
                 @PathParam("x_p") String p,
-                @QueryParam("_q") String q, 
+                @QueryParam("_q") String q,
                 @HeaderParam("_h") String h) {
-            return p + q + h;            
+            return p + q + h;
         }
     }
-    
+
     public void testInterfaceImplementationOverride() {
         initiateWebApplication(InterfaceImplementationOverride.class);
+
         String s = resource("/a").accept("application/getoverride")
                 .get(String.class);
         assertEquals("override", s);
-        
+
         s = resource("/a?_q=b").
                 accept("application/getParamsoverride").
                 header("_h", "c").
                 get(String.class);
         assertEquals("abc", s);
-        
+
         ClientResponse cr = resource("/a").
                 type("application/octet-stream").
                 accept("application/xhtml").
                 post(ClientResponse.class, "content");
         assertEquals("<root>content</root>", cr.getEntity(String.class));
         assertEquals(MediaType.valueOf("application/xhtml"), cr.getType());
-        
+
         s = resource("/a/suboverride?_q=b").
                 header("_h", "c").
                 get(String.class);
-        assertEquals("abc", s);        
-        
+        assertEquals("abc", s);
+
         s = resource("/a/submethodoverride?_q=b").
                 header("_h", "c").
                 get(String.class);
-        assertEquals("abc", s);        
-        
-        
+        assertEquals("abc", s);
+
+
         cr = resource("/a", false).accept("application/get").
                 get(ClientResponse.class);
         assertEquals(406, cr.getStatus());
-        
+
         cr = resource("/a?q=b", false).accept("application/getParams")
                 .header("h", "c").
                 get(ClientResponse.class);
         assertEquals(406, cr.getStatus());
-        
+
         cr = resource("/a", false).
                 type("text/plain").
                 accept("application/xml").
                 post(ClientResponse.class, "content");
-        assertEquals(415, cr.getStatus());        
-        
+        assertEquals(415, cr.getStatus());
+
         cr = resource("/a/sub", false).
                 get(ClientResponse.class);
         assertEquals(404, cr.getStatus());
-        
+
         cr = resource("/a/submethod", false).
                 get(ClientResponse.class);
         assertEquals(404, cr.getStatus());
+    }
+
+
+    public static abstract class BaseResource {
+        @GET
+        @Produces("text/plain")
+        public abstract Object get();
+    }
+
+    @Path("concrete")
+    public static class ConcreteSubTypeResource extends BaseResource {
+        public String get() {
+            return "get";
+        }
+    }
+
+    public void testConcreteSubTypeResource() {
+        initiateWebApplication(ConcreteSubTypeResource.class);
+
+        String s = resource("/concrete")
+                .get(String.class);
+        assertEquals("get", s);
     }
 }
