@@ -134,25 +134,27 @@
       <p>This example shows how to support polymorphism of resources and JSP pages.
          Hence it is possible to add another resource, such as a DVD resource with associated JSP pages,
          which extends Item without having to change the logic of Bookstore or the existing JSP pages.</p>
-      <p>Each relative JSP page referenced using the Views annotation declared on a resource class corresponds to:
-      <ul>
-      <li>a relative URI path (relative to the URI path of the class) that corresponds to the name of the JSP page minus the '.jsp' suffix; or
-      </li>
-      <li>the 'index.jsp" that corresponds to the URI path of the class.
-      </ul>
-      <p>A relative JSP page is resolved by converting the fully qualified class name of the resource class into a path
-         and appending the name of JSP page to that path. For example, when a GET is performed on the URI path "/"
-         then the relative JSP page is "index.jsp" as referenced by the Bookstore resource class. This is resolved
-         to "/com/sun/jersey/samples/bookstore/resources/Bookstore/index.jsp" that resides in the Web pages of the WAR.
-         Similarly when a GET is performed on URI path "/count" then the relative JSP page is "count.jsp" as referenced by 
-         Bookstore resource class.
+         
+      <p>JSP pages are associated with resource classes. Such JSP pages are resolved
+         by converting the fully qualified class name of the resource class into a path
+         and appending last path segment of the request URI path to that path.
+         
+         For example, when a GET is performed on the URI path "/" then the path
+         to the JSP page is "/com/sun/jersey/samples/bookstore/resources/Bookstore/",
+         and in this case since the last path segment is empty "index.jsp" is
+         appended to the path. Then the request us forwarded to the JSP page
+         at that path.
+         
+         Similarly when a GET is performed on the URI path "/count" then the
+         path to the JSP page is "/com/sun/jersey/samples/bookstore/resources/Bookstore/count.jsp".
       </p>
-      <p>The runtime fowards to the absolute JSP page using the servlet RequestDispatcher.forward method. The variable "it"
-         is automatically set to the instance of Bookstore so that the index.jsp, or count.jsp, has access to the Bookstore instance as
-         a Java bean.
+      <p>The JSP variable "it" is set to the instance of Bookstore so that the index.jsp, or count.jsp,
+         has access to the Bookstore instance as a Java bean.
       </p>
-      <p>If a resource class inherits from another resource class then it will automatically inherit the views from the super class.</p>
-      <p>A JSP page may also include views using the inheritance mechanism, for example the index,jsp page associated with the
-         Book resource class includes a footer.jsp page whoose location is specified by the super class, Item.
+      <p>If a resource class inherits from another resource class then it will automatically 
+         inherit the JSPs from the super class.</p>
+      <p>A JSP page may also include JSPs using the inheritance mechanism,
+         for example the index.jsp page associated with the Book resource class includes a
+         footer.jsp page whoose location is specified by the super class, Item.
       </p>
   </body></html>
