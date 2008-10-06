@@ -228,8 +228,30 @@
                     </execution>
                 </executions>
             </plugin>
-         </plugins>
-    </build>
+            <plugin>
+              <!-- TODO: replace the following with bnd maven plugin once it becomes more stable -->
+              <artifactId>maven-antrun-plugin</artifactId>
+              <executions>
+                <execution>
+                  <phase>package</phase>
+                  <configuration>
+                    <tasks> <!-- download bnd tool, and create osgified jar file using it -->
+                      <get src="http://www.aqute.biz/repo/biz/aQute/bnd/0.0.249/bnd-0.0.249.jar" dest="${project.build.directory}/bnd.jar"/>
+                      <java jar="${project.build.directory}/bnd.jar" fork="true">
+                        <arg line="wrap -output ${project.build.directory}/osgified.jar ${project.build.directory}/${project.artifactId}-${project.version}.jar"/>
+                      </java>
+                      <move file="${project.build.directory}/osgified.jar" tofile="${project.build.directory}/${project.artifactId}-${project.version}.jar"/>
+                      <delete file="${project.build.directory}/bnd.jar"/>
+                    </tasks>
+                  </configuration>
+                  <goals>
+                    <goal>run</goal>
+                  </goals>
+                </execution>
+              </executions>
+            </plugin>
+       </plugins>
+  </build>
 
     <properties>
       <gen-src-dir>${project.build.directory}/gen-src</gen-src-dir>
