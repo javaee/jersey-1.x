@@ -79,21 +79,44 @@ public class MainTest extends TestCase {
         threadSelector.stopEndpoint();
     }
 
-    // TODO Add asserts
-    public void testMain() throws Exception {
+    /**
+     * Test checks that the application.wadl is reachable.
+     */
+    public void testApplicationWadl() {
+        String applicationWadl = r.path("application.wadl").get(String.class);
+        assertTrue("Something wrong. Returned wadl length is not > 0",
+                applicationWadl.length() > 0);
+    }
+
+    /**
+     * Test check GET on the "flights" resource in "application/json" format.
+     */
+    public void testGetOnFlightsJSONFormat() {
         // get the initial representation
         Flights flights = r.path("flights").
                 accept("application/json").get(Flights.class);
-        System.out.println("List of flights found:\n" +
-                flights.toString());
+        // check that there are two flight entries
+        assertEquals("Expected number of initial entries not found",
+                2, flights.getFlight().size());
+    }
 
-        // update the list
-        // remove the second row
+    /**
+     * Test checks PUT on the "flights" resource in "application/json" format.
+     */
+    public void testPutOnFlightsJSONFormat() {
+        // get the initial representation
+        Flights flights = r.path("flights").
+                accept("application/json").get(Flights.class);
+        // check that there are two flight entries
+        assertEquals("Expected number of initial entries not found",
+                2, flights.getFlight().size());
+
+        // remove the second flight entry
         if (flights.getFlight().size() > 1) {
             flights.getFlight().remove(1);
         }
 
-        // update the first one
+        // update the first entry
         flights.getFlight().get(0).setNumber(125);
         flights.getFlight().get(0).setFlightId("OK125");
 
@@ -103,7 +126,58 @@ public class MainTest extends TestCase {
         // get the updated list out from the server:
         Flights updatedFlights = r.path("flights").
                 accept("application/json").get(Flights.class);
-        System.out.println("List of updated flights:\n" +
-                updatedFlights.toString());
+        //check that there is only one flight entry
+        assertEquals("Remaining number of flight entries do not match the expected value",
+                1, updatedFlights.getFlight().size());
+        // check that the flight entry in retrieved list has FlightID OK!@%
+        assertEquals("Retrieved flight ID doesn't match the expected value",
+                "OK125", updatedFlights.getFlight().get(0).getFlightId());
     }
+
+    /**
+     * Test checks GET on "flights" resource with mime-type "application/xml".
+     */
+    public void testGetOnFlightsXMLFormat() {
+        // get the initial representation
+        Flights flights = r.path("flights").
+                accept("application/xml").get(Flights.class);
+        // check that there are two flight entries
+        assertEquals("Expected number of initial entries not found",
+                2, flights.getFlight().size());
+    }
+
+    /**
+     * Test checks PUT on "flights" resource with mime-type "application/xml".
+     */
+    public void testPutOnFlightsXMLFormat() {
+        // get the initial representation
+        Flights flights = r.path("flights").
+                accept("application/XML").get(Flights.class);
+        // check that there are two flight entries
+        assertEquals("Expected number of initial entries not found",
+                2, flights.getFlight().size());
+
+        // remove the second flight entry
+        if (flights.getFlight().size() > 1) {
+            flights.getFlight().remove(1);
+        }
+
+        // update the first entry
+        flights.getFlight().get(0).setNumber(125);
+        flights.getFlight().get(0).setFlightId("OK125");
+
+        // and send the updated list back to the server
+        r.path("flights").type("application/XML").put(flights);
+
+        // get the updated list out from the server:
+        Flights updatedFlights = r.path("flights").
+                accept("application/XML").get(Flights.class);
+        //check that there is only one flight entry
+        assertEquals("Remaining number of flight entries do not match the expected value",
+                1, updatedFlights.getFlight().size());
+        // check that the flight entry in retrieved list has FlightID OK!@%
+        assertEquals("Retrieved flight ID doesn't match the expected value",
+                "OK125", updatedFlights.getFlight().get(0).getFlightId());
+    }
+
 }
