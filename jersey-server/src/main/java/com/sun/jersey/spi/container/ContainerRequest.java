@@ -404,7 +404,7 @@ public class ContainerRequest implements HttpRequestContext {
              
              acceptLanguages = new ArrayList<Locale>(alts.size());
              for(AcceptableLanguageTag alt : alts) {
-                 acceptLanguages.add(new Locale(alt.getTag()));
+                 acceptLanguages.add(alt.getAsLocale());
              }
         }
         

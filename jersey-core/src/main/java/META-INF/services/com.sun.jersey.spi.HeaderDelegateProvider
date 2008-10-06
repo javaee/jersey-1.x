@@ -1,3 +1,4 @@
+com.sun.jersey.impl.provider.header.LocaleProvider
 com.sun.jersey.impl.provider.header.EntityTagProvider
 com.sun.jersey.impl.provider.header.MediaTypeProvider
 com.sun.jersey.impl.provider.header.CacheControlProvider

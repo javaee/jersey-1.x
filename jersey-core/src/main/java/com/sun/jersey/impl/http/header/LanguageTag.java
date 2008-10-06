@@ -86,10 +86,21 @@ public class LanguageTag {
     public final boolean isCompatible(Locale tag) {
         if (this.tag.equals("*"))
             return true;
-        
-        return this.tag.equalsIgnoreCase(tag.toString());
+
+        if (subTags == null) {
+            return primaryTag.equalsIgnoreCase(tag.getLanguage());
+        } else {
+            return primaryTag.equalsIgnoreCase(tag.getLanguage()) &&
+                    subTags.equalsIgnoreCase(tag.getCountry());
+        }
     }
-    
+
+    public final Locale getAsLocale() {
+        return (subTags == null)
+                ? new Locale(primaryTag)
+                : new Locale(primaryTag, subTags);
+    }
+
     protected final void parse(String languageTag) throws ParseException {
         if (!isValid(languageTag)) {
             throw new ParseException("String, " + languageTag + ", is not a valid language tag", 0);

@@ -1,4 +1,7 @@
 release 1.0-ea (2008-10-xx)
+- Fixed issue 119
+  https://jersey.dev.java.net/issues/show_bug.cgi?id=119
+  Locale instances not correctly created from HTTP language-based headers.
 - Fixed issue with bridge methods being included in the analysis
   of resource classes.
 - When implicit views are enabled allow deferral to implicit GET when

@@ -120,11 +120,11 @@ public class VariantsTest extends AbstractResourceTester {
             List<Variant> vs = Variant.VariantListBuilder.newInstance().
                     mediaTypes(MediaType.valueOf("image/jpeg")).add().
                     mediaTypes(MediaType.valueOf("application/xml")).
-                    languages(new Locale("en-us")).add().
+                    languages(new Locale("en", "us")).add().
                     mediaTypes(MediaType.valueOf("text/xml")).
                     languages(new Locale("en")).add().
                     mediaTypes(MediaType.valueOf("text/xml")).
-                    languages(new Locale("en-us")).add().
+                    languages(new Locale("en", "us")).add().
                     build();
                     
             Variant v = r.selectVariant(vs);
@@ -150,7 +150,7 @@ public class VariantsTest extends AbstractResourceTester {
                 get(ClientResponse.class);
         assertEquals("GET", r.getEntity(String.class));
         assertEquals(MediaType.valueOf("text/xml"), r.getType());
-        assertEquals("en-us", r.getLanguage());
+        assertEquals("en-US", r.getLanguage());
     }   
     
     public void testGetComplex2() throws IOException {
@@ -186,7 +186,7 @@ public class VariantsTest extends AbstractResourceTester {
                 get(ClientResponse.class);
         assertEquals("GET", r.getEntity(String.class));
         assertEquals(MediaType.valueOf("application/xml"), r.getType());
-        assertEquals("en-us", r.getLanguage());
+        assertEquals("en-US", r.getLanguage());
     }   
     
     public void testGetComplexNotAcceptable() throws IOException {

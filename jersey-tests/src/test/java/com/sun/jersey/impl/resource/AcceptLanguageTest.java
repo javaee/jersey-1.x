@@ -37,6 +37,7 @@
 
 package com.sun.jersey.impl.resource;
 
+import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.WebResource;
 import com.sun.jersey.impl.AbstractResourceTester;
 import java.io.IOException;
@@ -46,6 +47,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.GET;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
+import javax.ws.rs.core.Response;
 
 /**
  *
@@ -60,33 +62,36 @@ public class AcceptLanguageTest extends AbstractResourceTester {
     @Path("/")
     public static class Resource {
         @GET
-        public String empty(@Context HttpHeaders h) {
+        public Response empty(@Context HttpHeaders h) {
             List<Locale> ld = h.getAcceptableLanguages();
             
             assertEquals(1, ld.size());
-            assertEquals("*", ld.get(0).toString());
-            return "";
+            assertEquals("*", ld.get(0).getLanguage());
+            return Response.ok().language(Locale.ENGLISH).build();
         }
         
         @Path("en-gb")
         @GET
-        public String one(@Context HttpHeaders h) {
+        public Response one(@Context HttpHeaders h) {
             List<Locale> ld = h.getAcceptableLanguages();
             
             assertEquals(1, ld.size());
-            assertEquals("en-gb", ld.get(0).toString());
-            return "";
+            assertEquals("en", ld.get(0).getLanguage());
+            assertEquals("GB", ld.get(0).getCountry());
+            return Response.ok().language(ld.get(0)).build();
         }
-        @Path("en-gb/de/fr")
+
+        @Path("fr/de/en-gb")
         @GET
-        public String two(@Context HttpHeaders h) {
+        public Response two(@Context HttpHeaders h) {
             List<Locale> ld = h.getAcceptableLanguages();
             
             assertEquals(3, ld.size());
-            assertEquals("en-gb", ld.get(0).toString());
+            assertEquals("fr", ld.get(0).toString());
             assertEquals("de", ld.get(1).toString());
-            assertEquals("fr", ld.get(2).toString());
-            return "";
+            assertEquals("en", ld.get(2).getLanguage());
+            assertEquals("GB", ld.get(2).getCountry());
+            return Response.ok().language(ld.get(0)).build();
         }
     }
     
@@ -94,20 +99,24 @@ public class AcceptLanguageTest extends AbstractResourceTester {
         initiateWebApplication(Resource.class);
         WebResource r = resource("/");
         
-        r.get(String.class);
+        ClientResponse cr = r.get(ClientResponse.class);
+        assertEquals("en", cr.getLanguage());
+
+        cr = r.path("en-gb").acceptLanguage("en-gb").get(ClientResponse.class);
+        assertEquals("en-GB", cr.getLanguage());
         
-        r.path("en-gb").acceptLanguage("en-gb").get(String.class);
-        
-        r.path("en-gb/de/fr").
+        cr = r.path("fr/de/en-gb").
                 acceptLanguage("de;q=0.8").
-                acceptLanguage("fr;q=0.5").
-                acceptLanguage("en-gb").
-                get(String.class);
+                acceptLanguage("fr").
+                acceptLanguage("en-gb;q=0.7").
+                get(ClientResponse.class);
+        assertEquals("fr", cr.getLanguage());
         
-        r.path("en-gb/de/fr").
+        cr = r.path("fr/de/en-gb").
                 acceptLanguage("de;q=0.8").
-                acceptLanguage("fr;q=0.5").
-                acceptLanguage("en-gb;q=1.0").
-                get(String.class);
+                acceptLanguage("fr;q=1.0").
+                acceptLanguage("en-gb;q=0.7").
+                get(ClientResponse.class);
+        assertEquals("fr", cr.getLanguage());
     }
 }

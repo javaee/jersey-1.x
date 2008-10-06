@@ -259,7 +259,7 @@ public final class ResponseBuilderImpl extends Response.ResponseBuilder {
     
     public Response.ResponseBuilder language(Locale language) {
         if (language != null)
-            set(CONTENT_LANGUAGE, language.toString());
+            set(CONTENT_LANGUAGE, language);
         else
             set(CONTENT_LANGUAGE, null);
         return this;
