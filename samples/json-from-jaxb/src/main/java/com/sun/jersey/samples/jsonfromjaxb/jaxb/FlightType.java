@@ -181,7 +181,7 @@ public class FlightType {
     @Override
     public String toString() {
         return (new Formatter()).format(
-                "{\"fligthId\":\"%s\",\"company\":\"%s\",\"number\":%d,\"aircraft\":\"%s\"}", 
+                "{\"flightId\":\"%s\",\"company\":\"%s\",\"number\":%d,\"aircraft\":\"%s\"}",
                 this.flightId, this.company, this.number, this.aircraft).toString();
     }
 
