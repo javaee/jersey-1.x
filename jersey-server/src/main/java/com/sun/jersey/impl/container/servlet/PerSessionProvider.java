@@ -73,7 +73,7 @@ public final class PerSessionProvider implements ResourceProvider {
             ComponentProvider resourceProvider, AbstractResource abstractResource) {
         this.c = abstractResource.getResourceClass();
         
-        this.rci = new ResourceClassInjector(ipc, Scope.PerRequest, 
+        this.rci = new ResourceClassInjector(ipc, Scope.Undefined,
                 abstractResource);
                 
         ResourceConstructor rc = new ResourceConstructor(ipc);
@@ -96,7 +96,7 @@ public final class PerSessionProvider implements ResourceProvider {
 
         try {
             if (constructor == null) {
-                o = provider.getInstance(Scope.Singleton, c);
+                o = provider.getInstance(Scope.Undefined, c);
             } else {
                 final Object[] params = new Object[constructorInjectableParams.size()];
                 int index = 0;
@@ -104,7 +104,7 @@ public final class PerSessionProvider implements ResourceProvider {
                     params[index++] = (i != null) ? i.getValue(context) : null;
                 }
 
-                o = provider.getInstance(Scope.Singleton,
+                o = provider.getInstance(Scope.Undefined,
                     constructor, params);
             }
             rci.inject(context, provider.getInjectableInstance(o));
