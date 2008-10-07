@@ -42,9 +42,9 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.springframework.aop.framework.Advised;
 import org.springframework.aop.support.AopUtils;
 import org.springframework.context.ApplicationContext;
@@ -65,7 +65,7 @@ import com.sun.jersey.spi.service.ComponentProvider;
  */
 public class SpringComponentProvider implements ComponentProvider {
 
-    private static final Log LOG = LogFactory.getLog(SpringComponentProvider.class);
+    private static final Logger LOGGER = Logger.getLogger(SpringComponentProvider.class.getName());
 
     private ConfigurableApplicationContext springContext;
 
@@ -92,8 +92,8 @@ public class SpringComponentProvider implements ComponentProvider {
 
         final Autowire autowire = clazz.getAnnotation(Autowire.class);
         if (autowire != null) {
-            if (LOG.isDebugEnabled()) {
-                LOG.debug("Creating resource class " + 
+            if (LOGGER.isLoggable(Level.FINEST)) {
+                LOGGER.finest("Creating resource class " +
                         clazz.getSimpleName() +
                         " annotated with @" +
                         Autowire.class.getSimpleName() +
@@ -117,8 +117,8 @@ public class SpringComponentProvider implements ComponentProvider {
          * the scope of this dependency, so it's left to the application...
          */
         if (scope == Scope.Undefined || scope == Scope.Singleton && springContext.isSingleton(beanName) || scope == Scope.PerRequest && springContext.isPrototype(beanName)) {
-            if (LOG.isDebugEnabled()) {
-                LOG.debug("Retrieving bean '" + beanName + "' for resource class " + clazz.getSimpleName() + " from spring.");
+            if (LOGGER.isLoggable(Level.FINEST)) {
+                LOGGER.finest("Retrieving bean '" + beanName + "' for resource class " + clazz.getSimpleName() + " from spring.");
             }
             final Object result = springContext.getBean(beanName, clazz);
             return clazz.cast(result);
@@ -145,7 +145,7 @@ public class SpringComponentProvider implements ComponentProvider {
                 final T result = (T) aopResource.getTargetSource().getTarget();
                 return result;
             } catch (Exception e) {
-                LOG.fatal("Could not get target object from proxy.", e);
+                LOGGER.log(Level.SEVERE, "Could not get target object from proxy.", e);
                 throw new RuntimeException("Could not get target object from proxy.", e);
             }
         } else {

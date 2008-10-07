@@ -21,8 +21,9 @@
  */
 package com.sun.jersey.spi.spring.container.servlet;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
@@ -48,8 +49,8 @@ public class SpringServlet extends ServletContainer {
 
     private static final long serialVersionUID = 5686655395749077671L;
     
-    private static final Log LOG = LogFactory.getLog( SpringServlet.class );
-    
+    private static final Logger LOGGER = Logger.getLogger(SpringServlet.class.getName());
+
     @Override
     protected void initiate(ResourceConfig rc, WebApplication wa) {
         try {
@@ -64,18 +65,18 @@ public class SpringServlet extends ServletContainer {
             
             wa.initiate(rc, new SpringComponentProvider((ConfigurableApplicationContext) springContext));
         } catch( RuntimeException e ) {
-            LOG.error( "Got exception while trying to initialize", e );
+            LOGGER.log(Level.SEVERE, "Exception occurred when intialization", e);
             throw e;
         }
     }
     
     private boolean springComponentAnnotationAvailable() {
         try {
-            Class.forName( "org.springframework.stereotype.Component" );
-            LOG.info( "The spring Component annotation is present, we're using spring >= 2.5" );
+            Class.forName("org.springframework.stereotype.Component");
+            LOGGER.info( "The spring Component annotation is present: using spring >= 2.5" );
             return true;
         } catch ( ClassNotFoundException e ) {
-            LOG.info( "The spring Component annotation is not present, we're using spring < 2.5" );
+            LOGGER.info( "The spring Component annotation is not present: using spring < 2.5" );
             return false;
         }
     }

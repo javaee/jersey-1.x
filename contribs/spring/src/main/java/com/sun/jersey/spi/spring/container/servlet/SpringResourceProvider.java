@@ -37,9 +37,9 @@
 package com.sun.jersey.spi.spring.container.servlet;
 
 import java.lang.annotation.Annotation;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
@@ -77,8 +77,8 @@ import com.sun.jersey.spi.service.ComponentProvider;
  */
 public class SpringResourceProvider implements ResourceProvider {
 
-    private static final Log LOG = LogFactory.getLog(SpringResourceProvider.class);
-
+    private static final Logger LOGGER = Logger.getLogger(SpringResourceProvider.class.getName());
+    
     /**
      * The mapping of Spring scopes to the jersey lifecycle/scopes.
      */
@@ -210,11 +210,10 @@ public class SpringResourceProvider implements ResourceProvider {
                     ComponentProvider.Scope.PerRequest, resourceProviderClass);
             _resourceProvider.init(provider, resourceProvider, resource);
         } catch (RuntimeException e) {
-            LOG.error("Could not initialize resource provider for resource class " + resourceClass.getName());
+            LOGGER.log(Level.SEVERE, "Could not initialize resource provider for resource class " + resourceClass.getName(), e);
             throw e;
         } catch (Exception e) {
-            LOG.error("Could not initialize resource provider for resource class " + resourceClass.getName());
-            e.printStackTrace();
+            LOGGER.log(Level.SEVERE, "Could not initialize resource provider for resource class " + resourceClass.getName(), e);
             throw new RuntimeException("Could not initialize resource provider for resource class ", e);
         }
     }
