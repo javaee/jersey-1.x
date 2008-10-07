@@ -47,6 +47,7 @@ import javax.ws.rs.core.UriInfo;
 /**
  *
  * @author Marc Hadley
+ * @author Konstantin Bulenkov
  */
 public class ConstructorParamsTest extends AbstractResourceTester {
     
