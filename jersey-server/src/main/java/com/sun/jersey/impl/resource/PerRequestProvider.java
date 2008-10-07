@@ -51,11 +51,14 @@ import com.sun.jersey.spi.service.ComponentProvider.Scope;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.List;
+import java.util.Map;
+import java.util.HashMap;
 import javax.ws.rs.core.Context;
 
 /**
  *
  * @author mh124079
+ * @author Konstantin Bulenkov
  */
 public final class PerRequestProvider implements ResourceProvider {
     @Context InjectableProviderContext ipc;
@@ -95,8 +98,10 @@ public final class PerRequestProvider implements ResourceProvider {
             } else {
                 final Object[] params = new Object[constructorInjectableParams.size()];
                 int index = 0;
+                Class<?>[] types = constructor.getParameterTypes();
                 for (Injectable i : constructorInjectableParams) {
-                    params[index++] = (i != null) ? i.getValue(context) : null;
+                    params[index] = (i != null) ? i.getValue(context) : DEFAULT_VALUES.get(types[index]);
+                    index++;
                 }
                 
                 o = provider.getInstance(Scope.PerRequest, 
@@ -119,5 +124,20 @@ public final class PerRequestProvider implements ResourceProvider {
                 throw new ContainerException("Unable to create resource", t);
             }
         }        
+    }
+
+    private static final Map<Class, Object> DEFAULT_VALUES = createDefaultValues();
+    
+    private static Map<Class, Object> createDefaultValues() {
+        Map<Class, Object> defaultValues = new HashMap<Class, Object>();
+        defaultValues.put(byte.class, (byte) 0);
+        defaultValues.put(short.class, (short) 0);
+        defaultValues.put(int.class, 0);
+        defaultValues.put(long.class, (long) 0);
+        defaultValues.put(float.class, (float)0.0);
+        defaultValues.put(double.class, 0.0);
+        defaultValues.put(char.class, '\0');
+        defaultValues.put(boolean.class, Boolean.FALSE);
+        return defaultValues;
     }
 }

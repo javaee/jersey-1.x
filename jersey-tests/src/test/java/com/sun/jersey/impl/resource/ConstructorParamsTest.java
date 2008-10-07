@@ -55,19 +55,19 @@ public class ConstructorParamsTest extends AbstractResourceTester {
     }
     
     @Path("/{id}")
-    public static class TestOneWebResourceBean {
+    public static class TestResourceConstructor {
         
         private String id;
         private UriInfo info;
         
-        public TestOneWebResourceBean(@PathParam("id") String id, @Context UriInfo info) {
+        public TestResourceConstructor(@PathParam("id") String id, @Context UriInfo info) {
             this.id = id;
             this.info = info;
         }
         
         @GET
         public String doGet() {
-            assertEquals(id, "foo");            
+            assertEquals("foo", id);
             assertEquals("foo", info.getPath());            
             return "foo";
         }
@@ -75,7 +75,40 @@ public class ConstructorParamsTest extends AbstractResourceTester {
     }
     
     public void testOneWebResource() {
-        initiateWebApplication(TestOneWebResourceBean.class);
+        initiateWebApplication(TestResourceConstructor.class);
         resource("/foo").get(String.class);
-    }    
+    }
+
+
+    @Path("/{id}")
+    public static class TestResourceConstructorWithPrimitives {
+        public TestResourceConstructorWithPrimitives(byte b, short s, int i, long l,
+                                       boolean bool, float f, double d, char c,
+                                       Object o,
+                                       @PathParam("id") String id,
+                                       @Context UriInfo info) {
+            assertEquals(b, (byte)0);
+            assertEquals(s, (short)0);
+            assertEquals(i, 0);
+            assertEquals(l, 0L);
+            assertEquals(bool, false);
+            assertEquals(f, 0.0f);
+            assertEquals(d, 0.0);
+            assertEquals(c, '\0');
+            assertEquals(o, null);
+            
+            assertEquals("foo", id);
+            assertEquals("foo", info.getPath());
+        }
+
+        @GET
+        public String foo() {
+            return "foo";
+        }
+    }
+
+    public void testResourceCtorInit() {
+        initiateWebApplication(TestResourceConstructorWithPrimitives.class);
+        resource("/foo").get(String.class);
+    }
 }
