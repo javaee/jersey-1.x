@@ -153,7 +153,7 @@ public abstract class ResourceConfig extends Application {
      * <p>
      * The instance may be a String[] or String that contains one or more fully 
      * qualified class name of a request filter class separeted by ';'.
-     * Otherwise the instance may be List&ltContainerRequestFilter&gt.
+     * Otherwise the instance may be List&lt;ContainerRequestFilter&gt;.
      */
     public static final String PROPERTY_CONTAINER_REQUEST_FILTERS = 
             "com.sun.jersey.spi.container.ContainerRequestFilters";
@@ -165,7 +165,7 @@ public abstract class ResourceConfig extends Application {
      * <p>
      * The instance may be a String[] or String that contains one or more fully 
      * qualified class name of a response filter class separeted by ';'.
-     * Otherwise the instance may be List&ltContainerResponseFilter&gt.
+     * Otherwise the instance may be List&lt;ContainerResponseFilter&gt;.
      */
     public static final String PROPERTY_CONTAINER_RESPONSE_FILTERS = 
             "com.sun.jersey.spi.container.ContainerResponseFilters";
