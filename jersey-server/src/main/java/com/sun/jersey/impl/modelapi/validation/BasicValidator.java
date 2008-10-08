@@ -172,7 +172,9 @@ public class BasicValidator extends AbstractModelValidator {
     }
 
     private abstract class ResourceMethodAmbiguityErrMsgGenerator<T extends AbstractResourceMethod> {
+
         abstract void generateInErrMsg(AbstractResource resource, T arm1, T arm2, MediaType mt);
+
         abstract void generateOutErrMsg(AbstractResource resource, T arm1, T arm2, MediaType mt);
     }
 
@@ -194,10 +196,17 @@ public class BasicValidator extends AbstractModelValidator {
                         }
                     }
                     // check output mime types
-                    for (MediaType mt1 : arm1.getSupportedOutputTypes()) {
-                        for (MediaType mt2 : arm2.getSupportedOutputTypes()) {
-                            if (mt1.isCompatible(mt2) && (!(mt1.isWildcardType() || mt1.isWildcardSubtype() || mt2.isWildcardType() || mt2.isWildcardSubtype()))) {
-                                generator.generateOutErrMsg(resource, arm1, arm2, mt1);
+                    for (MediaType outmt1 : arm1.getSupportedOutputTypes()) {
+                        for (MediaType outmt2 : arm2.getSupportedOutputTypes()) {
+                            if (outmt1.isCompatible(outmt2) && (!(outmt1.isWildcardType() || outmt1.isWildcardSubtype() || outmt2.isWildcardType() || outmt2.isWildcardSubtype()))) {
+                                // possible conflict in output mime types, still need to check if input types are conflicting as well:
+                                for (MediaType inmt1 : arm1.getSupportedInputTypes()) {
+                                    for (MediaType inmt2 : arm2.getSupportedInputTypes()) {
+                                        if (outmt1.isCompatible(inmt2) && (!(inmt1.isWildcardType() || inmt1.isWildcardSubtype() || inmt2.isWildcardType() || inmt2.isWildcardSubtype()))) {
+                                            generator.generateOutErrMsg(resource, arm1, arm2, outmt1);
+                                        }
+                                    }
+                                }
                             }
                         }
                     }
