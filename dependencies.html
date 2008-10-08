@@ -5,7 +5,7 @@
 	<TITLE>Dependencies</TITLE>
 	<META NAME="GENERATOR" CONTENT="OpenOffice.org 3.0 Beta (Unix)">
 	<META NAME="CREATED" CONTENT="0;0">
-	<META NAME="CHANGED" CONTENT="20080926;10344900">
+	<META NAME="CHANGED" CONTENT="20081008;16005600">
 	<META NAME="Info 1" CONTENT="">
 	<META NAME="Info 2" CONTENT="">
 	<META NAME="Info 3" CONTENT="">
@@ -17,12 +17,18 @@
 deployed to the Java.Net maven repository at the following location:</P>
 <BLOCKQUOTE><A HREF="http://download.java.net/maven/2/com/sun/jersey">http://download.java.net/maven/2/com/sun/jersey</A></BLOCKQUOTE>
 <P>Jars, Jar sources, Jar JavaDoc and samples are all available on
-the java.net maven repository. A zip file containing all maven-based
-samples can be obtained <A HREF="http://download.java.net/maven/2/com/sun/jersey/samples/jersey-samples/1.0-ea-SNAPSHOT/jersey-samples-1.0-ea-SNAPSHOT-project.zip">here</A>.
+the java.net maven repository. 
+</P>
+<P>For getting started with a simple example please read the <A HREF="getting-started.html">getting
+started</A> document. For an overview of many JAX-RS features please
+read the <A HREF="http://wikis.sun.com/display/Jersey/Overview+of+JAX-RS+1.0+Features">overview</A>
+document.</P>
+<P>A zip file containing all maven-based samples can be obtained
+<A HREF="http://download.java.net/maven/2/com/sun/jersey/samples/jersey-samples/1.0-ea-SNAPSHOT/jersey-samples-1.0-ea-SNAPSHOT-project.zip">here</A>.
 Individual zip files for each sample may be found by browsing the
 <A HREF="http://download.java.net/maven/2/com/sun/jersey/samples/">samples</A>
-directory. For getting started with a simple example please read the
-<A HREF="getting-started.html">getting started</A> document.</P>
+directory. 
+</P>
 <P>An application depending on Jersey requires that it in turn
 includes the set of jars that Jersey depends on. Jersey has a
 pluggable component architecture so the set of jars required to be
@@ -35,7 +41,7 @@ and non-maven developers how to depend on Jersey for their
 application. For the convenience of non-maven developers a jersey
 bundle is provided to avoid the dependency management of multiple
 jersey-based jars. Ant developers are likely to find the <A HREF="http://maven.apache.org/ant-tasks.html">Ant
-Tasks for Maven</A> very useful.  
+Tasks for Maven</A> very useful. 
 </P>
 <P>Jersey's runtime dependences are categorized into the following:</P>
 <UL>
@@ -180,12 +186,12 @@ when using the MIME media type &quot;application/json&quot; require a
 dependency on the <A HREF="http://download.java.net/maven/2/com/sun/jersey/jersey-json/1.0-ea-SNAPSHOT/jersey-json-1.0-ea-SNAPSHOT.pom">jersey-json</A>
 module (no explicit dependency on jaxb-impl is required). The
 following dependency needs to be added to the pom:</P>
-<P STYLE="margin-left: 0.79in; margin-bottom: 0in"><FONT FACE="Courier New, monospace">&lt;dependency&gt;</FONT></P>
-<P STYLE="margin-left: 0.79in; margin-bottom: 0in"><FONT FACE="Courier New, monospace">&lt;groupId&gt;com.sun.jersey&lt;/groupId&gt;</FONT></P>
-<P STYLE="margin-left: 0.79in; margin-bottom: 0in"><FONT FACE="Courier New, monospace">&lt;artifactId&gt;jersey-json&lt;/artifactId&gt;</FONT></P>
-<P STYLE="margin-left: 0.79in; margin-bottom: 0in"><FONT FACE="Courier New, monospace">&lt;version&gt;1.0-ea-SNAPSHOT&lt;/version&gt;</FONT></P>
-<P STYLE="margin-left: 0.79in; margin-bottom: 0in"><FONT FACE="Courier New, monospace">&lt;/dependency&gt;</FONT></P>
-<P STYLE="margin-bottom: 0in"><BR>
+<PRE STYLE="margin-left: 0.79in">&lt;dependency&gt;
+    &lt;groupId&gt;com.sun.jersey&lt;/groupId&gt;
+    &lt;artifactId&gt;jersey-json&lt;/artifactId&gt;
+    &lt;version&gt;1.0-ea-SNAPSHOT&lt;/version&gt;
+&lt;/dependency&gt;</PRE><P STYLE="margin-bottom: 0in">
+<BR>
 </P>
 <P>Non-maven developers require:</P>
 <BLOCKQUOTE><A HREF="http://repo1.maven.org/maven2/org/codehaus/jettison/jettison/1.0.1/jettison-1.0.1.jar">jettison.jar</A>,
