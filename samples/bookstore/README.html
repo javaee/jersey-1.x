@@ -40,13 +40,15 @@
 	<tr>
 	<th>URI path</th>
 	<th>Resource class</th>
-	<th>HTTP methods</th>
-	</tr>
+	<th>HTTP methods</th> 
+    <th>JSP page</th>
+    </tr>
 
 	<tr>
 	<td>/</td>
 	<td>Bookstore</td>
 	<td>GET</td>
+	<td>/com/sun/jersey/samples/bookstore/resources/Bookstore/index.jsp</td>
 	</tr>
 	<tr>
 
@@ -54,69 +56,33 @@
 	<td>/count</td>
 	<td>Bookstore</td>
 	<td>GET</td>
+	<td>/com/sun/jersey/samples/bookstore/resources/Bookstore/count.jsp</td>
 	</tr>
 
 	<tr>
 	<td>/time</td>
 	<td>Bookstore</td>
 	<td>GET</td>
+	<td>/com/sun/jersey/samples/bookstore/resources/Bookstore/time.jsp</td>
 	</tr>
 
 	<tr>
 	<td>/items/{itemid}</td>
 	<td>Book, CD</td>
 	<td>GET</td>
+	<td>/com/sun/jersey/samples/bookstore/resources/Book/index.jsp,<br>
+        /com/sun/jersey/samples/bookstore/resources/CD/index.jsp </td>
 	</tr>
 
 	<tr>
 	<td>/items/{itemid}/tracks/{num}</td>
 	<td>Track</td>
 	<td>GET</td>
-	</tr>
-
-	</table>
-
-    <p>The mapping of the views to URI paths and JSP pages is presented in the following table:</p>
-	<table border="1">
-	<tr>
-	<th>View</th>
-	<th>URI path</th>
-	<th>JSP page</th>
-	</tr>
-
-	<tr>
-	<td>Bookstore:index.jsp</td>
-	<td>/</td>
-	<td>/com/sun/jersey/samples/bookstore/resources/Bookstore/index.jsp</td>
-	</tr>
-	<tr>
-	<td>Bookstore:count.jsp</td>
-	<td>/count</td>
-	<td>/com/sun/jersey/samples/bookstore/resources/Bookstore/count.jsp</td>
-	</tr>
-	<tr>
-	<td>Bookstore:time.jsp</td>
-	<td>/time</td>
-	<td>/com/sun/jersey/samples/bookstore/resources/Bookstore/time.jsp</td>
-	</tr>
-
-	<tr>
-	<td>Book:index.jsp</td>
-	<td>/items/{itemid}</td>
-	<td>/com/sun/jersey/samples/bookstore/resources/Book/index.jsp</td>
-	</tr>
-	<tr>
-	<td>CD:index.jsp</td>
-	<td>/items/{itemid}</td>
-	<td>/com/sun/jersey/samples/bookstore/resources/CD/index.jsp</td>
-	</tr>
-	<tr>
-	<td>Track:index.jsp</td>
-	<td>/items/{itemid}/tracks/{num}</td>
 	<td>/com/sun/jersey/samples/bookstore/resources/Track/index.jsp</td>
 	</tr>
 
 	</table>
+
     <h2>Running the Example</h2>
 
     
