@@ -44,7 +44,7 @@ public class Main {
     } 
     
     private static URI getBaseURI() {
-        return UriBuilder.fromUri("http://localhost/").port(getPort(9998)).build();
+        return UriBuilder.fromUri("http://localhost/jsonfromjaxb/").port(getPort(9998)).build();
     }
 
     public static final URI BASE_URI = getBaseURI();
@@ -63,7 +63,7 @@ public class Main {
         System.out.println("Starting grizzly...");
         SelectorThread threadSelector = startServer();
         System.out.println(String.format(
-                "Jersey app started with WADL available at %s/application.wadl\n" +
+                "Jersey app started with WADL available at %sapplication.wadl\n" +
                 "Hit enter to stop it...", BASE_URI));
         System.in.read();
         threadSelector.stopEndpoint();

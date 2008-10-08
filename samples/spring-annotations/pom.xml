@@ -160,7 +160,7 @@
         </repository>
     </repositories>
     <properties>
-        <netbeans.hint.deploy.server>J2EE</netbeans.hint.deploy.server>
+        <netbeans.hint.deploy.server>gfv3</netbeans.hint.deploy.server>
         <spring-release-version>[2.5.5,)</spring-release-version>
     </properties>
     <distributionManagement>
