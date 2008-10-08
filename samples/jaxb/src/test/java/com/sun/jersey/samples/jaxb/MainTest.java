@@ -77,6 +77,15 @@ public class MainTest extends TestCase {
         threadSelector.stopEndpoint();
     }
 
+    /**
+     * Test checks that the application.wadl is reachable.
+     */
+    public void testApplicationWadl() {
+        String applicationWadl = r.path("application.wadl").get(String.class);
+        assertTrue("Something wrong. Returned wadl length is not > 0",
+                applicationWadl.length() > 0);
+    }
+
     public void testRootElement() {
         JAXBXmlRootElement e1 = r.path("jaxb/XmlRootElement").
                 get(JAXBXmlRootElement.class);
