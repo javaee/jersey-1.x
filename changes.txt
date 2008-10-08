@@ -1,4 +1,8 @@
 release 1.0-ea (2008-10-xx)
+- The response filter chain will now get invoked if an exception is thrown
+  from a request filter or a resource class and is mapped to a response.
+  If an exception is thrown from a response filter then the response filter
+  chain is terminated and the exception is mapped to a response.
 - Fixed issue 119
   https://jersey.dev.java.net/issues/show_bug.cgi?id=119
   Locale instances not correctly created from HTTP language-based headers.

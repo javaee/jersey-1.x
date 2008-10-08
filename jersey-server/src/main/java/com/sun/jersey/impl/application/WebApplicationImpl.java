@@ -721,10 +721,7 @@ public final class WebApplicationImpl implements WebApplication {
             
             if (!rootsRule.accept(path, null, localContext)) {
                 throw new NotFoundException();
-            }
-            
-            for (ContainerResponseFilter f : responseFilters)
-                response = f.filter(request, response);
+            }            
         } catch (WebApplicationException e) {
             mapWebApplicationException(e, response);
         } catch (ContainerCheckedException e) {
@@ -738,7 +735,19 @@ public final class WebApplicationImpl implements WebApplication {
                 throw e;
             }
         }
-     
+
+        try {
+            for (ContainerResponseFilter f : responseFilters)
+                response = f.filter(request, response);
+        } catch (WebApplicationException e) {
+            mapWebApplicationException(e, response);
+        } catch (RuntimeException e) {
+            if (!mapException(e, response)) {
+                context.set(null);
+                throw e;
+            }
+        }
+
         try {
             response.write();
         } catch (WebApplicationException e) {

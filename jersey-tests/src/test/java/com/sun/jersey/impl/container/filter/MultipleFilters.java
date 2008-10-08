@@ -40,7 +40,6 @@ import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.WebResource;
 import com.sun.jersey.api.core.DefaultResourceConfig;
 import com.sun.jersey.api.core.ResourceConfig;
-import com.sun.jersey.impl.resource.*;
 import com.sun.jersey.impl.AbstractResourceTester;
 import com.sun.jersey.spi.container.ContainerRequest;
 import com.sun.jersey.spi.container.ContainerRequestFilter;
@@ -50,8 +49,10 @@ import java.util.Arrays;
 import java.util.List;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
+import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
+import javax.ws.rs.core.Response;
 
 /**
  *
@@ -69,6 +70,17 @@ public class MultipleFilters extends AbstractResourceTester {
         }
     }
     
+    @Path("/")
+    public static class ResourceException {
+        @GET
+        public String get(@Context HttpHeaders hh) {
+            List<String> xTest = hh.getRequestHeaders().get("X-TEST");
+            assertEquals(2, xTest.size());
+            throw new WebApplicationException(Response.ok(xTest.get(0) + xTest.get(1)).
+                    build());
+        }
+    }
+
     public MultipleFilters(String testName) {
         super(testName);
     }
@@ -120,16 +132,63 @@ public class MultipleFilters extends AbstractResourceTester {
         _test();
     }
     
+    public void testWithResourceException() {
+        ResourceConfig rc = new DefaultResourceConfig(ResourceException.class);
+
+        FilterOne f1 = new FilterOne();
+        FilterTwo f2 = new FilterTwo();
+        rc.getProperties().put(ResourceConfig.PROPERTY_CONTAINER_REQUEST_FILTERS,
+                Arrays.asList(f1, f2));
+        rc.getProperties().put(ResourceConfig.PROPERTY_CONTAINER_RESPONSE_FILTERS,
+                Arrays.asList(f1, f2));
+        initiateWebApplication(rc);
+        _test();
+    }
+
     public void _test() {
         WebResource r = resource("/", false);
-        
+
         ClientResponse cr = r.get(ClientResponse.class);
         assertEquals(200, cr.getStatus());
         assertEquals("onetwo", cr.getEntity(String.class));
-        
         List<String> xTest = cr.getMetadata().get("X-TEST");
         assertEquals(2, xTest.size());
         assertEquals("one", xTest.get(0));
         assertEquals("two", xTest.get(1));
+
+
+        cr = r.path("/foo").get(ClientResponse.class);
+        assertEquals(404, cr.getStatus());
+        xTest = cr.getMetadata().get("X-TEST");
+        assertEquals(2, xTest.size());
+        assertEquals("one", xTest.get(0));
+        assertEquals("two", xTest.get(1));
+    }
+    
+    public static class FilterException implements ContainerResponseFilter {
+        public ContainerResponse filter(ContainerRequest request, ContainerResponse response) {
+            throw new WebApplicationException(500);
+        }
+    }
+
+    public void testWithFilterException() {
+        ResourceConfig rc = new DefaultResourceConfig(Resource.class);
+
+        FilterOne f1 = new FilterOne();
+        FilterTwo f2 = new FilterTwo();
+        FilterException fe = new FilterException();
+        rc.getProperties().put(ResourceConfig.PROPERTY_CONTAINER_REQUEST_FILTERS,
+                Arrays.asList(f1, f2));
+        rc.getProperties().put(ResourceConfig.PROPERTY_CONTAINER_RESPONSE_FILTERS,
+                Arrays.asList(fe, f1));
+        initiateWebApplication(rc);
+
+        WebResource r = resource("/", false);
+
+        ClientResponse cr = r.get(ClientResponse.class);
+        assertEquals(500, cr.getStatus());
+
+        List<String> xTest = cr.getMetadata().get("X-TEST");
+        assertNull(xTest);
     }
 }
