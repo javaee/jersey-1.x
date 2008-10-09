@@ -84,15 +84,27 @@ public class ApplicationTest extends AbstractGrizzlyWebContainerTester {
         }
     }
     
-    public void testContdSlashes() {        
+    public void testWithResourceConfigPropertyName() {
         Map<String, String> initParams = new HashMap<String, String>();
         initParams.put(ServletContainer.RESOURCE_CONFIG_CLASS, App.class.getName());
-        
+
         startServer(initParams);
-        
+
         WebResource r = Client.create().resource(getUri().
                 path("/").build());
-        
+
+        assertEquals("get", r.get(String.class));
+    }
+
+    public void testWithApplicationPropertyName() {
+        Map<String, String> initParams = new HashMap<String, String>();
+        initParams.put(ServletContainer.APPLICATION_CONFIG_CLASS, App.class.getName());
+
+        startServer(initParams);
+
+        WebResource r = Client.create().resource(getUri().
+                path("/").build());
+
         assertEquals("get", r.get(String.class));
     }
 }

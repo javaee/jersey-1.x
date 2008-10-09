@@ -90,7 +90,7 @@ import javax.ws.rs.core.UriBuilder;
  * <p>
  * The web.xml MAY configure the servlet to have an initialization parameter 
  * "com.sun.jersey.config.property.resourceConfigClass" or
- * "javax.ws.rs.ApplicationConfig" and whose value is a
+ * "javax.ws.rs.Application" and whose value is a
  * fully qualified name of a class that implements {@link ResourceConfig} or
  * {@link Application}.
  * If the concrete class has a constructor that takes a single parameter of the 
@@ -101,7 +101,7 @@ import javax.ws.rs.core.UriBuilder;
  * <p>
  * If the initialization parameter 
  * "com.sun.jersey.config.property.resourceConfigClass" or
- * "javax.ws.rs.ApplicationConfig" is not present and a
+ * "javax.ws.rs.Application" is not present and a
  * initialization parameter "com.sun.jersey.config.property.packages" is present 
  * (see {@link PackagesResourceConfig#PROPERTY_PACKAGES}) a new instance of
  * {@link PackagesResourceConfig} is created. The initialization parameter 
@@ -156,7 +156,7 @@ public class ServletContainer extends HttpServlet implements ContainerListener {
      * {@link Application}.
      */
     public static final String APPLICATION_CONFIG_CLASS =
-            "javax.ws.rs.ApplicationConfig";
+            Application.class.getName();
 
     /**
      * The servlet initializaton property whose value is a fully qualified
