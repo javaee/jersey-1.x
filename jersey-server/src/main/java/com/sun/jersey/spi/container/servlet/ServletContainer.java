@@ -156,7 +156,7 @@ public class ServletContainer extends HttpServlet implements ContainerListener {
      * {@link Application}.
      */
     public static final String APPLICATION_CONFIG_CLASS =
-            Application.class.getName();
+            "javax.ws.rs.Application";
 
     /**
      * The servlet initializaton property whose value is a fully qualified

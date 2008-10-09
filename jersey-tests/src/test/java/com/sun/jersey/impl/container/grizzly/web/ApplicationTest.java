@@ -98,7 +98,7 @@ public class ApplicationTest extends AbstractGrizzlyWebContainerTester {
 
     public void testWithApplicationPropertyName() {
         Map<String, String> initParams = new HashMap<String, String>();
-        initParams.put(ServletContainer.APPLICATION_CONFIG_CLASS, App.class.getName());
+        initParams.put("javax.ws.rs.Application", App.class.getName());
 
         startServer(initParams);
 
