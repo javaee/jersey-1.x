@@ -41,7 +41,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.sun.jersey.samples</groupId>
     <artifactId>generate-wadl</artifactId>
-    <version>1.0-ea-SNAPSHOT</version>
+    <version>1.0.1-SNAPSHOT</version>
     <name>Generate WADL - Jersey sample</name>
     <packaging>jar</packaging>
     

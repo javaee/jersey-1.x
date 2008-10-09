@@ -40,7 +40,7 @@
     xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.sun.jersey.samples</groupId>
-    <version>1.0-ea-SNAPSHOT</version>
+    <version>1.0.1-SNAPSHOT</version>
     <artifactId>sparklines</artifactId>
     <name>Sparklines - Jersey sample</name>
     <packaging>jar</packaging>
