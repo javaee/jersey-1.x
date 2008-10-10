@@ -38,8 +38,6 @@ package com.sun.jersey.impl.wadl;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.net.URL;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -50,13 +48,9 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
-import javax.xml.bind.Unmarshaller;
 
 import com.sun.jersey.api.model.AbstractResource;
-import com.sun.jersey.impl.wadl.generators.resourcedoc.WadlGeneratorResourceDocSupport;
-import com.sun.jersey.impl.wadl.generators.resourcedoc.model.ResourceDocType;
 import com.sun.research.ws.wadl.Application;
 
 /**
@@ -85,8 +79,7 @@ public final class WadlResource {
                 _a.getResources().setBase( uriInfo.getBaseUri().toString() );
             }
             try {
-                final JAXBContext jaxbContext = JAXBContext.newInstance( _requiredJaxbContextPath,
-                        getClass().getClassLoader() );
+                final JAXBContext jaxbContext = JAXBContext.newInstance(_requiredJaxbContextPath);
                 final Marshaller marshaller = jaxbContext.createMarshaller();
                 marshaller.setProperty( Marshaller.JAXB_FORMATTED_OUTPUT, true );
                 final ByteArrayOutputStream os = new ByteArrayOutputStream();
