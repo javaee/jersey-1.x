@@ -43,6 +43,10 @@ import com.sun.jersey.api.representation.Form;
 import com.sun.jersey.impl.AbstractResourceTester;
 import com.sun.jersey.spi.container.ContainerRequest;
 import com.sun.jersey.spi.container.ContainerRequestFilter;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.net.URI;
 import java.util.Arrays;
 import javax.ws.rs.POST;
@@ -74,6 +78,25 @@ public class FormFilterTest extends AbstractResourceTester {
         }
     }
 
+    public static class MaskInputStreamFilter implements ContainerRequestFilter {
+        public ContainerRequest filter(ContainerRequest request) {
+            InputStream in = request.getEntityInputStream();
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            try {
+                int read;
+                final byte[] data = new byte[2048];
+                while ((read = in.read(data)) != -1)
+                    baos.write(data, 0, read);
+            } catch (IOException e) {
+                throw new IllegalArgumentException(e);
+            }
+
+            in = new ByteArrayInputStream(baos.toByteArray()) { };
+            request.setEntityInputStream(in);
+            return request;
+        }
+    }
+
     public static abstract class AbstractFormFilter implements ContainerRequestFilter {
         public ContainerRequest filter(ContainerRequest request) {
             Form f = request.getFormParameters();
@@ -97,7 +120,9 @@ public class FormFilterTest extends AbstractResourceTester {
     public void testWithInstance() {
         ResourceConfig rc = new DefaultResourceConfig(Resource.class);
         rc.getProperties().put(ResourceConfig.PROPERTY_CONTAINER_REQUEST_FILTERS,
-                Arrays.asList(new AbstractFormFilter(){}, new AbstractFormFilter(){}));
+                Arrays.asList(new MaskInputStreamFilter(), 
+                new AbstractFormFilter(){},
+                new AbstractFormFilter(){}));
         initiateWebApplication(rc);
 
         WebResource r = resource("/");
