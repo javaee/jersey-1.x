@@ -37,6 +37,7 @@
 
 package com.sun.jersey.api.core;
 
+import com.sun.jersey.api.representation.Form;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 import java.net.URI;
@@ -224,4 +225,16 @@ public interface HttpRequestContext extends HttpHeaders, Request, SecurityContex
      */
     <T> T getEntity(Class<T> type, Type genericType, Annotation[] as) 
             throws WebApplicationException;
+
+    /**
+     * Get the form parameters of the request entity.
+     * <p>
+     * This method will ensure that the request entity is buffered
+     * such that it may be consumed by the applicaton.
+     *
+     * @return the form parameters, if there is a request entity and the
+     * content type is "application/x-www-form-urlencoded", otherwise an
+     * instance containing no parameters will be returned.
+     */
+    Form getFormParameters();
 }

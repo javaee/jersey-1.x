@@ -39,6 +39,7 @@ package com.sun.jersey.spi.container;
 import com.sun.jersey.api.InBoundHeaders;
 import com.sun.jersey.api.Responses;
 import com.sun.jersey.api.core.HttpRequestContext;
+import com.sun.jersey.api.representation.Form;
 import com.sun.jersey.api.uri.UriComponent;
 import com.sun.jersey.impl.MultivaluedMapImpl;
 import com.sun.jersey.impl.VariantSelector;
@@ -47,6 +48,8 @@ import com.sun.jersey.impl.http.header.HttpHeaderFactory;
 import com.sun.jersey.impl.http.header.reader.HttpHeaderReader;
 import com.sun.jersey.impl.model.HttpHelper;
 import com.sun.jersey.spi.MessageBodyWorkers;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.annotation.Annotation;
@@ -381,6 +384,35 @@ public class ContainerRequest implements HttpRequestContext {
         return cookieNames;
     }
     
+    public Form getFormParameters() {
+        if (MediaType.APPLICATION_FORM_URLENCODED_TYPE.isCompatible(getMediaType())) {
+            InputStream in = getEntityInputStream();
+            if (in.getClass() != ByteArrayInputStream.class) {
+                // Buffer input
+                ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                try {
+                    int read;
+                    final byte[] data = new byte[2048];
+                    while ((read = in.read(data)) != -1)
+                        baos.write(data, 0, read);
+                } catch (IOException e) {
+                    throw new IllegalArgumentException(e);
+                }
+
+                in = new ByteArrayInputStream(baos.toByteArray());
+                setEntityInputStream(in);
+            }
+
+            ByteArrayInputStream bais = (ByteArrayInputStream)in;
+            Form f = getEntity(Form.class);
+            bais.reset();
+            return f;
+        } else {
+            return new Form();
+        }
+    }
+
+
     // HttpHeaders
     
     public MultivaluedMap<String, String> getRequestHeaders() {
