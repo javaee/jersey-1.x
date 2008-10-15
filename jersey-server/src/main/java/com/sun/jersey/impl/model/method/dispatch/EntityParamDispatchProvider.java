@@ -101,6 +101,8 @@ public class EntityParamDispatchProvider implements ResourceMethodDispatchProvid
                 return params;
             } catch (WebApplicationException e) {
                 throw e;
+            } catch (ContainerException e) {
+                throw e;
             } catch (RuntimeException e) {
                 throw new ContainerException("Exception injecting parameters to Web resource method", e);
             }

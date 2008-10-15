@@ -38,7 +38,6 @@
 package com.sun.jersey.impl.model.parameter.multivalued;
 
 import com.sun.jersey.api.container.ContainerException;
-import com.sun.jersey.api.container.MappableContainerException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import javax.ws.rs.WebApplicationException;

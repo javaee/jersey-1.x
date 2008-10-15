@@ -46,12 +46,14 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.nio.charset.Charset;
+import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.ext.Providers;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
+import javax.xml.bind.UnmarshalException;
 import javax.xml.bind.Unmarshaller;
 
 /**
@@ -87,6 +89,8 @@ public abstract class AbstractJAXBElementProvider extends AbstractJAXBProvider<J
         
         try {
             return readFrom(ta, mediaType, getUnmarshaller(ta, mediaType), entityStream);
+        } catch (UnmarshalException ex) {
+            throw new WebApplicationException(ex, 400);
         } catch (JAXBException cause) {
             throw ThrowHelper.withInitCause(cause,
                     new IOException(ImplMessages.ERROR_UNMARSHALLING_JAXB(type))

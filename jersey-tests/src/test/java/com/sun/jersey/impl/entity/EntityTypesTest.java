@@ -145,6 +145,15 @@ public class EntityTypesTest extends AbstractTypeTester {
         _test(new JAXBBean("CONTENT"), JAXBBeanResource.class);
     }
     
+    public void testJAXBBeanRepresentationError() {
+        initiateWebApplication(JAXBBeanResource.class);
+        WebResource r = resource("/", false);
+
+        String xml = "<root>foo</root>";
+        ClientResponse cr = r.post(ClientResponse.class, xml);
+        assertEquals(400, cr.getStatus());
+    }
+
     @Path("/")
     @Produces("text/xml")
     @Consumes("text/xml")
@@ -163,6 +172,15 @@ public class EntityTypesTest extends AbstractTypeTester {
         _test(new JAXBBean("CONTENT"), JAXBElementBeanResource.class);
     }
     
+    public void testJAXBElementBeanRepresentationError() {
+        initiateWebApplication(JAXBElementBeanResource.class);
+        WebResource r = resource("/", false);
+
+        String xml = "<root><value>foo";
+        ClientResponse cr = r.post(ClientResponse.class, xml);
+        assertEquals(400, cr.getStatus());
+    }
+
     @Path("/")
     @Produces("text/xml")
     @Consumes("text/xml")
@@ -223,6 +241,15 @@ public class EntityTypesTest extends AbstractTypeTester {
         JAXBBean out = r.entity(in, "application/xml").
                 post(JAXBBean.class);
         assertEquals(in, out);
+    }
+
+    public void testJAXBObjectRepresentationError() {
+        initiateWebApplication(JAXBObjectResolver.class, JAXBObjectResource.class);
+        WebResource r = resource("/", false);
+
+        String xml = "<root>foo</root>";
+        ClientResponse cr = r.post(ClientResponse.class, xml);
+        assertEquals(400, cr.getStatus());
     }
     
     @Path("/")
@@ -577,7 +604,16 @@ public class EntityTypesTest extends AbstractTypeTester {
                 new GenericEntity<Collection<JAXBBean>>(a){});
         assertEquals(a, b);
     }
-    
+
+    public void testJAXBListRepresentationError() {
+        initiateWebApplication(JAXBListResource.class);
+        WebResource r = resource("/", false);
+
+        String xml = "<root><value>foo";
+        ClientResponse cr = r.post(ClientResponse.class, xml);
+        assertEquals(400, cr.getStatus());
+    }
+
     @Path("/")
     @Produces("application/fastinfoset")
     @Consumes("application/fastinfoset")

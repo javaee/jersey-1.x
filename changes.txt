@@ -1,4 +1,8 @@
 release 1.0.1 (2008-11/12)
+- Fixed isse 117
+  https://jersey.dev.java.net/issues/show_bug.cgi?id=126
+  A JAXB unmarshalling error from the JAXB related providers will result in
+  a 400 response.
 - Fixed issue 126
   https://jersey.dev.java.net/issues/show_bug.cgi?id=126
   Registered ExceptionMapper's will only map exceptions thrown by the

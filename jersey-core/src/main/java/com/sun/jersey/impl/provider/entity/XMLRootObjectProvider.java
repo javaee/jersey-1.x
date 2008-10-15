@@ -54,6 +54,7 @@ import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.ext.Providers;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
+import javax.xml.bind.UnmarshalException;
 
 /**
  *
@@ -111,6 +112,8 @@ public class XMLRootObjectProvider extends AbstractJAXBProvider<Object> {
             InputStream entityStream) throws IOException {        
         try {
             return getUnmarshaller(type, mediaType).unmarshal(entityStream);
+        } catch (UnmarshalException ex) {
+            throw new WebApplicationException(ex, 400);
         } catch (JAXBException cause) {
             throw ThrowHelper.withInitCause(cause,
                     new IOException(ImplMessages.ERROR_UNMARSHALLING_JAXB(type))
