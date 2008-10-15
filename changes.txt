@@ -1,7 +1,13 @@
 release 1.0.1 (2008-11/12)
-- Support the getting form parameters from a request,
-  see HttpRequestContext.getFormParameters. Filters may use this method to
-  get access to form parameters.
+- Fixed issue 126
+  https://jersey.dev.java.net/issues/show_bug.cgi?id=126
+  Registered ExceptionMapper's will only map exceptions thrown by the
+  application and not by the Jersey runtime (which is an error, either in
+  the runtime itself or in the configuration of the application).
+- Fixed issue 124
+  https://jersey.dev.java.net/issues/show_bug.cgi?id=124
+  The method HttpRequestContext.getFormParameters can be used by a filter to
+  obtain the form parameters.
   
 release 1.0 (2008-10-13)
 - The response filter chain will now get invoked if an exception is thrown

@@ -37,8 +37,8 @@
 
 package com.sun.jersey.impl.model.method.dispatch;
 
-import com.sun.jersey.api.container.ContainerCheckedException;
 import com.sun.jersey.api.container.ContainerException;
+import com.sun.jersey.api.container.MappableContainerException;
 import com.sun.jersey.api.core.HttpContext;
 import com.sun.jersey.api.core.HttpRequestContext;
 import com.sun.jersey.api.model.AbstractResourceMethod;
@@ -88,15 +88,8 @@ public abstract class ResourceJavaMethodDispatcher implements RequestDispatcher 
             if (context.getResponse().getEntity() != null)
                 context.getResponse().setAnnotations(annotations);
         } catch (InvocationTargetException e) {
-            Throwable t = e.getTargetException();
-            if (t instanceof RuntimeException) {
-                // Propagate runtime exception
-                throw (RuntimeException)t;
-            } else if (t instanceof Exception) {
-                // Propagate checked exception wrapping around runtime exception
-                throw new ContainerCheckedException((Exception)t);
-            } else
-                throw new ContainerException(t);
+            // Propagate the target exception so it may be mapped to a response
+            throw new MappableContainerException(e.getTargetException());
         } catch (IllegalAccessException e) {
             throw new ContainerException(e);
         }

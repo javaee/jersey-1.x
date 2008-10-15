@@ -73,11 +73,7 @@ abstract class CollectionStringConstructorExtractor<V extends Collection>
         if (stringList != null) {            
             V valueList = getInstance();
             for (String v : stringList) {
-                try {
-                    valueList.add(getValue(v));
-                } catch (Exception e) {
-                    throw new ContainerException(e);
-                }
+                valueList.add(getValue(v));
             }
 
             return valueList;

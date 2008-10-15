@@ -37,8 +37,10 @@
 
 package com.sun.jersey.impl.model.parameter.multivalued;
 
+import com.sun.jersey.api.container.ContainerException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import javax.ws.rs.WebApplicationException;
 
 /**
  *
@@ -51,8 +53,20 @@ abstract class BaseValueOfExtractor {
         this.valueOf = valueOf;
     }
 
-    protected final Object getValue(String v)
-            throws IllegalAccessException, InvocationTargetException {
-        return valueOf.invoke(null, v);
+    protected final Object getValue(String v) {
+        try {
+            return valueOf.invoke(null, v);
+        } catch (InvocationTargetException ex) {
+            Throwable target = ex.getTargetException();
+            if (target instanceof WebApplicationException) {
+                throw (WebApplicationException)target;
+            } else {
+                throw new ContainerException(target);
+            }
+        } catch (RuntimeException ex) {
+            throw new ContainerException(ex);
+        } catch (Exception ex) {
+            throw new ContainerException(ex);
+        }
     }
 }

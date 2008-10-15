@@ -37,8 +37,11 @@
 
 package com.sun.jersey.impl.model.parameter.multivalued;
 
+import com.sun.jersey.api.container.ContainerException;
+import com.sun.jersey.api.container.MappableContainerException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+import javax.ws.rs.WebApplicationException;
 
 /**
  *
@@ -51,11 +54,22 @@ abstract class BaseStringConstructorExtractor {
         this.c = c;
     }
 
-    protected final Object getValue(String v) 
-            throws InstantiationException, IllegalAccessException, InvocationTargetException {
+    protected final Object getValue(String v) {
         if (v == null || v.length() == 0) 
             return null;
-        
-        return c.newInstance(v);
+        try {
+            return c.newInstance(v);
+        } catch (InvocationTargetException ex) {
+            Throwable target = ex.getTargetException();
+            if (target instanceof WebApplicationException) {
+                throw (WebApplicationException)target;
+            } else {
+                throw new ContainerException(target);
+            }
+        } catch (RuntimeException ex) {
+            throw new ContainerException(ex);
+        } catch (Exception ex) {
+            throw new ContainerException(ex);
+        }
     }
 }

@@ -38,6 +38,7 @@ package com.sun.jersey.spi.container;
 
 import com.sun.jersey.api.InBoundHeaders;
 import com.sun.jersey.api.Responses;
+import com.sun.jersey.api.container.MappableContainerException;
 import com.sun.jersey.api.core.HttpRequestContext;
 import com.sun.jersey.api.representation.Form;
 import com.sun.jersey.api.uri.UriComponent;
@@ -336,21 +337,24 @@ public class ContainerRequest implements HttpRequestContext {
     }
 
     public <T> T getEntity(Class<T> type, Type genericType, Annotation[] as) {
+        MediaType mediaType = getMediaType();
+        MessageBodyReader<T> bw = bodyContext.getMessageBodyReader(
+                type, genericType,
+                as, mediaType);
+        if (bw == null) {
+            LOGGER.severe("A message body reader for Java type, " + type +
+                    ", and MIME media type, " + mediaType + ", was not found");
+
+            throw new WebApplicationException(
+                    Responses.unsupportedMediaType().build());
+        }
+
         try {
-            MediaType mediaType = getMediaType();
-            MessageBodyReader<T> bw = bodyContext.getMessageBodyReader(
-                    type, genericType, 
-                    as, mediaType);
-            if (bw == null) {
-                LOGGER.severe("A message body reader for Java type, " + type + 
-                        ", and MIME media type, " + mediaType + ", was not found");    
-                
-                throw new WebApplicationException(
-                        Responses.unsupportedMediaType().build());
-            }
             return bw.readFrom(type, genericType, as, mediaType, headers, entity);
-        } catch (IOException e) {
-            throw new IllegalArgumentException(e);
+        } catch (RuntimeException e) {
+            throw new MappableContainerException(e);
+        } catch (Exception e) {
+            throw new MappableContainerException(e);
         }
     }
     

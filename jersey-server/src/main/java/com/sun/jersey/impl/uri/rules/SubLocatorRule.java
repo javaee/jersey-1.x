@@ -38,6 +38,7 @@
 package com.sun.jersey.impl.uri.rules;
 
 import com.sun.jersey.api.container.ContainerException;
+import com.sun.jersey.api.container.MappableContainerException;
 import com.sun.jersey.api.core.HttpContext;
 import com.sun.jersey.api.uri.UriTemplate;
 import com.sun.jersey.spi.inject.Injectable;
@@ -106,17 +107,14 @@ public final class SubLocatorRule extends BaseRule {
                 return m.invoke(resource, params);
             }
         } catch (InvocationTargetException e) {
-            Throwable t = e.getTargetException();
-            if (t instanceof RuntimeException)
-                throw (RuntimeException)t;
-            else
-                throw new ContainerException(t);
+            // Propagate the target exception so it may be mapped to a response
+            throw new MappableContainerException(e.getTargetException());
         } catch (IllegalAccessException e) {
             throw new ContainerException(e);
         } catch (WebApplicationException e) {
             throw e;
         } catch (RuntimeException e) {
-            throw new ContainerException("Exception injecting parameters to dynamic resolving method", e);
+            throw new ContainerException("Exception injecting parameters for sub-locator method: " + m, e);
         }
     }
 }

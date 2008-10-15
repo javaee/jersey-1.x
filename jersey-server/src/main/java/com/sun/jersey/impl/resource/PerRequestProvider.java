@@ -38,6 +38,7 @@
 package com.sun.jersey.impl.resource;
 
 import com.sun.jersey.api.container.ContainerException;
+import com.sun.jersey.api.container.MappableContainerException;
 import com.sun.jersey.api.core.HttpContext;
 import com.sun.jersey.api.model.AbstractResource;
 import com.sun.jersey.spi.inject.InjectableProviderContext;
@@ -53,6 +54,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 import java.util.Map;
 import java.util.HashMap;
+import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
 
 /**
@@ -114,16 +116,13 @@ public final class PerRequestProvider implements ResourceProvider {
         } catch (IllegalAccessException ex) {
             throw new ContainerException("Unable to create resource", ex);
         } catch (InvocationTargetException ex) {
-            Throwable t = ex.getTargetException();
-            if (t instanceof RuntimeException) {
-                // Rethrow the runtime exception
-                throw (RuntimeException)t;
-            } else {
-                // TODO should a checked exception be wrapped in 
-                // WebApplicationException ?
-                throw new ContainerException("Unable to create resource", t);
-            }
-        }        
+            // Propagate the target exception so it may be mapped to a response
+            throw new MappableContainerException(ex.getTargetException());
+        } catch (WebApplicationException ex) {
+            throw ex;
+        } catch (RuntimeException ex) {
+            throw new ContainerException("Unable to create resource", ex);
+        }
     }
 
     private static final Map<Class, Object> DEFAULT_VALUES = createDefaultValues();

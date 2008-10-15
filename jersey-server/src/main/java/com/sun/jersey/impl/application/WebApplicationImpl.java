@@ -69,8 +69,8 @@ import javax.ws.rs.core.UriInfo;
 import javax.ws.rs.ext.ExceptionMapper;
 
 import com.sun.jersey.api.NotFoundException;
-import com.sun.jersey.api.container.ContainerCheckedException;
 import com.sun.jersey.api.container.ContainerException;
+import com.sun.jersey.api.container.MappableContainerException;
 import com.sun.jersey.api.core.HttpContext;
 import com.sun.jersey.api.core.HttpResponseContext;
 import com.sun.jersey.api.core.ResourceConfig;
@@ -693,11 +693,20 @@ public final class WebApplicationImpl implements WebApplication {
     }
     
     public void handleRequest(ContainerRequest request, ContainerResponse response) throws IOException {
+        final WebApplicationContext localContext = new
+                WebApplicationContext(this, request, response);
+        
+        context.set(localContext);
         try {
-            final WebApplicationContext localContext = new 
-                    WebApplicationContext(this, request, response);
-            context.set(localContext);
+            _handleRequest(localContext, request, response);
+        } finally {
+            context.set(null);
+        }
+    }
 
+    public void _handleRequest(final WebApplicationContext localContext,
+            ContainerRequest request, ContainerResponse response) throws IOException {
+        try {
             /**
              * The matching algorithm currently works from an absolute path.
              * The path is required to be in encoded form.
@@ -724,16 +733,23 @@ public final class WebApplicationImpl implements WebApplication {
             }            
         } catch (WebApplicationException e) {
             mapWebApplicationException(e, response);
-        } catch (ContainerCheckedException e) {
-            if (!mapException(e.getCause(), response)) {
-                context.set(null);
-                throw e;
+        } catch (MappableContainerException e) {
+            Throwable cause = e.getCause();
+            
+            if (cause instanceof WebApplicationException) {
+                mapWebApplicationException((WebApplicationException)cause, response);
+            } else if (!mapException(cause, response)) {
+                if (cause instanceof RuntimeException) {
+                    throw (RuntimeException)cause;
+                } else {
+                    throw e;
+                }
             }
         } catch (RuntimeException e) {
-            if (!mapException(e, response)) {
-                context.set(null);
-                throw e;
-            }
+            // Any runtime exception other than WebApplicationException or
+            // MappableContainerException is an error in the Jersey runtime.
+            // TODO allow exception mapper to map if feature is set?
+            throw e;
         }
 
         try {
@@ -743,7 +759,6 @@ public final class WebApplicationImpl implements WebApplication {
             mapWebApplicationException(e, response);
         } catch (RuntimeException e) {
             if (!mapException(e, response)) {
-                context.set(null);
                 throw e;
             }
         }
@@ -757,8 +772,6 @@ public final class WebApplicationImpl implements WebApplication {
                 mapWebApplicationException(e, response);
                 response.write();
             }
-        } finally {
-            context.set(null);
         }
     }
 
@@ -966,7 +979,7 @@ public final class WebApplicationImpl implements WebApplication {
             }
         }
     }
-    
+
     @SuppressWarnings("unchecked")
     private boolean mapException(Throwable e,
             HttpResponseContext response) {

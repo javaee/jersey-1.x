@@ -54,9 +54,9 @@ import javax.ws.rs.ext.Provider;
  *
  * @author Paul.Sandoz@Sun.Com
  */
-public class ExceptionTest extends AbstractResourceTester {
+public class ResourceExceptionTest extends AbstractResourceTester {
     
-    public ExceptionTest(String testName) {
+    public ResourceExceptionTest(String testName) {
         super(testName);
     }
 

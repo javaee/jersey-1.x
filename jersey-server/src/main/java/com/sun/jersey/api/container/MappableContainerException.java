@@ -37,22 +37,17 @@
 package com.sun.jersey.api.container;
 
 /**
- * A runtime exception that propagates a checked exception.
+ * A runtime exception that contains a cause, a checked or runtime exception,
+ * that may be mapped to a {@link javax.ws.rs.core.Response} instance.
  * <p>
- * The runtime will catch such exceptions and attempt to map the checked
- * exception to a registered {@link javax.ws.rs.ext.ExceptionMapper} that may
- * provide an appropriate {@link javax.ws.rs.core.Response} instance.
+ * The runtime will catch such exceptions and attempt to map the cause
+ * exception to a registered {@link javax.ws.rs.ext.ExceptionMapper} that
+ * provides an appropriate {@link javax.ws.rs.core.Response} instance.
  * 
  * @author Paul.Sandoz@Sun.Com
  */
-public class ContainerCheckedException extends ContainerException {
-    public ContainerCheckedException(Exception cause) {
-        super(checkType(cause));
-    }
-    
-    private static Exception checkType(Exception cause) {
-        if (cause instanceof RuntimeException)
-            throw new IllegalArgumentException("The cause must be an instance of a checked exception");        
-        return cause;
+public class MappableContainerException extends ContainerException {
+    public MappableContainerException(Throwable cause) {
+        super(cause);
     }
 }
