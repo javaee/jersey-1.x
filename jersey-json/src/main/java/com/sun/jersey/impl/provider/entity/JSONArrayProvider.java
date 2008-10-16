@@ -45,6 +45,7 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
+import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import org.codehaus.jettison.json.JSONArray;
@@ -74,7 +75,9 @@ public class JSONArrayProvider  extends AbstractMessageReaderWriterProvider<JSON
         try {
             return new JSONArray(readFromAsString(entityStream, mediaType));
         } catch (JSONException je) {
-            throw ThrowHelper.withInitCause(je, new IOException(ImplMessages.ERROR_PARSING_JSON_ARRAY()));
+            throw new WebApplicationException(
+                    new Exception(ImplMessages.ERROR_PARSING_JSON_ARRAY(), je),
+                    400);
         }
     }
     
