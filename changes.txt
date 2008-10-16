@@ -1,6 +1,13 @@
 release 1.0.1 (2008-11/12)
-- Fixed isse 117
-  https://jersey.dev.java.net/issues/show_bug.cgi?id=126
+- Included simple Groovy example.
+- Fixed issue 128
+  https://jersey.dev.java.net/issues/show_bug.cgi?id=128
+  An method parameter that is a request entity is a parameter that is:
+  1) not annotated with any annotations; or
+  2) annotated with one or more annotations all of which are recognized by
+     the Jersey runtime.
+- Fixed issue 117
+  https://jersey.dev.java.net/issues/show_bug.cgi?id=117
   A JAXB unmarshalling error from the JAXB related providers will result in
   a 400 response.
 - Fixed issue 126

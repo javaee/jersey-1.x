@@ -229,50 +229,72 @@ public class EntityParamDispatchProvider implements ResourceMethodDispatchProvid
         if ((null == method.getParameters()) || (0 == method.getParameters().size())) {
             return Collections.emptyList();
         }
-        
+
+        boolean hasEntity = false;
         List<Injectable> is = new ArrayList<Injectable>(method.getParameters().size());
         for (int i = 0; i < method.getParameters().size(); i++) {
-            Injectable injectable = processParameter(
-                    method,
-                    method.getParameters().get(i),
-                    method.getMethod().getParameterAnnotations()[i],
-                    requireNoEntityParameter);
+            Parameter parameter = method.getParameters().get(i);
             
-            if (injectable == null)
-                return null;
-            
-            is.add(injectable);
+            if (Parameter.Source.ENTITY == parameter.getSource()) {
+                hasEntity = true;
+                is.add(processEntityParameter(method,
+                        parameter,
+                        method.getMethod().getParameterAnnotations()[i],
+                        requireNoEntityParameter));
+            } else {
+                is.add(ipc.getInjectable(parameter, Scope.PerRequest));
+            }
         }
-        
+
+        if (is.contains(null)) {
+            int n = 0;
+            for (Injectable i : is)
+                if (i == null) n++;
+
+            // If there is more than one null injectable or
+            // if there is only one null injectable but there is an entity
+            // injectable then return null
+            if (n > 1 || hasEntity)
+                return null;
+
+            // Otherwise create the entity injectable
+            for (int i = 0; i < is.size(); i++) {
+                if (is.get(i) == null) {
+                    Injectable ij = processEntityParameter(method,
+                        method.getParameters().get(i),
+                        method.getMethod().getParameterAnnotations()[i],
+                        requireNoEntityParameter);
+                    is.set(i, ij);
+                    break;
+                }
+            }
+
+            if (is.contains(null))
+                return null;
+        }
         return is;
     }
 
-    private Injectable processParameter(
+    private Injectable processEntityParameter(
             AbstractResourceMethod method,
-            Parameter parameter, 
+            Parameter parameter,
             Annotation[] annotations,
             boolean requireNoEntityParameter) {
-
-        if (Parameter.Source.ENTITY == parameter.getSource()) {
-            if (requireNoEntityParameter) {
-                // Entity as a method parameterClass is not required
-                return null;
-            }
-            
-            if (parameter.getParameterType() instanceof TypeVariable) {
-                ReflectionHelper.ClassTypePair ct = ReflectionHelper.resolveTypeVariable(
-                        method.getDeclaringResource().getResourceClass(), 
-                        method.getMethod().getDeclaringClass(),
-                        (TypeVariable)parameter.getParameterType());
-                
-                return (ct != null) ? new EntityInjectable(ct.c, ct.t, annotations) : null;
-            } else {
-                return new EntityInjectable(parameter.getParameterClass(), 
-                        parameter.getParameterType(), annotations);
-            }
+        if (requireNoEntityParameter) {
+            // Entity as a method parameterClass is not required
+            return null;
         }
 
-        Injectable i = ipc.getInjectable(parameter, Scope.PerRequest);
-        return i;
-    }        
+        if (parameter.getParameterType() instanceof TypeVariable) {
+            ReflectionHelper.ClassTypePair ct = ReflectionHelper.resolveTypeVariable(
+                    method.getDeclaringResource().getResourceClass(),
+                    method.getMethod().getDeclaringClass(),
+                    (TypeVariable)parameter.getParameterType());
+
+            return (ct != null) ? new EntityInjectable(ct.c, ct.t, annotations) : null;
+        } else {
+            return new EntityInjectable(parameter.getParameterClass(),
+                    parameter.getParameterType(), annotations);
+        }
+    }
 }
