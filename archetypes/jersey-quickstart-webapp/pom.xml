@@ -35,36 +35,18 @@
  only if the new code is made subject to such option by the copyright
  holder.
 -->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-    <modelVersion>4.0.0</modelVersion>
+  <parent>
     <groupId>com.sun.jersey.archetypes</groupId>
-    <version>1.0.1-SNAPSHOT</version>
     <artifactId>jersey-archetypes</artifactId>
-    <packaging>pom</packaging>
-    <name>All Jersey Archetypes</name>
-    <description>
-        A module containing archetypes for generating Jersey based applications.
-    </description>
-    <modules>
-        <module>jersey-quickstart-grizzly</module>
-        <module>jersey-quickstart-webapp</module>
-    </modules>
-    <build>
-        <extensions>
-            <extension>
-                <groupId>org.jvnet.wagon-svn</groupId>
-                <artifactId>wagon-svn</artifactId>
-                <version>1.8</version>
-            </extension>
-        </extensions>
-     </build>
-    <distributionManagement>
-        <repository>
-            <uniqueVersion>false</uniqueVersion>
-            <id>java.net-m2-dist-repository</id>
-            <name>java.net-m2-repository</name>
-            <url>java-net:/maven2-repository/trunk/www/repository/</url>
-        </repository>
-    </distributionManagement>
- </project>
+    <version>1.0.1-SNAPSHOT</version>
+  </parent>
+  <modelVersion>4.0.0</modelVersion>
+  <description>
+    An archetype which contains a sample Jersey based Webapp project.
+  </description>
+  <artifactId>jersey-quickstart-webapp</artifactId>
+  <name>Jersey Archetype: Web App with WAR packaging</name>
+</project>
