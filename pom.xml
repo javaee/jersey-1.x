@@ -104,6 +104,7 @@
         <module>jersey-fastinfoset</module>
         <module>jersey-tests</module>
         <module>jersey-bundle</module>
+        <module>archetypes</module>
     </modules>
     <build>
         <plugins>
