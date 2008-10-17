@@ -55,5 +55,6 @@
     <modules>
         <module>spring</module>
         <module>maven-wadl-plugin</module>
+        <module>jersey-multipart</module>
     </modules>
 </project>
