@@ -37,11 +37,7 @@
 
 package com.sun.jersey.impl;
 
-import java.lang.annotation.Annotation;
 import java.net.URI;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Set;
 
 
 import junit.framework.TestCase;
@@ -55,6 +51,8 @@ import com.sun.jersey.api.client.config.ClientConfig;
 import com.sun.jersey.api.core.DefaultResourceConfig;
 import com.sun.jersey.api.core.ResourceConfig;
 import com.sun.jersey.impl.application.WebApplicationImpl;
+import com.sun.jersey.spi.container.ContainerListener;
+import com.sun.jersey.spi.container.ContainerNotifier;
 import com.sun.jersey.spi.container.WebApplication;
 import com.sun.jersey.spi.service.ComponentProvider;
 
@@ -62,7 +60,7 @@ import com.sun.jersey.spi.service.ComponentProvider;
  *
  * @author Paul.Sandoz@Sun.Com
  */
-public abstract class AbstractResourceTester extends TestCase {
+public abstract class AbstractResourceTester extends TestCase implements ContainerListener {
     protected static final URI BASE_URI = URI.create("test:/base/");
 
     protected WebApplication w;
@@ -71,6 +69,10 @@ public abstract class AbstractResourceTester extends TestCase {
         super(testName);
     }
     
+    protected void initiateWebApplication(ComponentProvider cp, ResourceConfig c) {
+        w = createWebApplication(c, cp);
+    }
+
     protected void initiateWebApplication(ComponentProvider cp, Class... classes) {
         w = createWebApplication(cp, classes);
     }
@@ -98,6 +100,13 @@ public abstract class AbstractResourceTester extends TestCase {
     }
     
     private WebApplication createWebApplication(ResourceConfig c, ComponentProvider cp) {
+        Object o = c.getProperties().get(
+                ResourceConfig.PROPERTY_CONTAINER_NOTIFIER);
+        if (o instanceof ContainerNotifier) {
+            ContainerNotifier crf = (ContainerNotifier)o;
+            crf.addListener(this);
+        }
+
         WebApplicationImpl a = new WebApplicationImpl();
         initiate(c, a);
         a.initiate(c, cp);
@@ -143,5 +152,11 @@ public abstract class AbstractResourceTester extends TestCase {
             relativeUri = relativeUri.substring(1);
         
         return URI.create(baseUri.toString() + relativeUri);
+    }
+
+    // ContainerListener
+
+    public void onReload() {
+        w = w.clone();
     }
 }

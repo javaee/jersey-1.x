@@ -34,7 +34,6 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-
 package com.sun.jersey.impl.container.grizzly.web;
 
 import com.sun.jersey.api.client.Client;
@@ -46,43 +45,47 @@ import com.sun.jersey.spi.container.ContainerListener;
 import com.sun.jersey.spi.container.ContainerNotifier;
 import com.sun.jersey.spi.container.WebApplication;
 import com.sun.jersey.spi.container.servlet.ServletContainer;
-import java.io.IOException;
+import com.sun.jersey.spi.inject.SingletonTypeInjectableProvider;
 import java.util.ArrayList;
 import java.util.List;
 import javax.servlet.ServletConfig;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.GET;
+import javax.ws.rs.POST;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.UriInfo;
 
 /**
  *
  * @author Paul.Sandoz@Sun.Com
  */
-public class ReloadTest extends AbstractGrizzlyWebContainerTester {
+public class ReloadResourceTest extends AbstractGrizzlyWebContainerTester {
+
     @Path("/one")
     public static class One {
+
         @GET
         public String get() {
             return "one";
-        }               
+        }
     }
-        
+
     @Path("/two")
     public static class Two {
+
         @GET
         public String get() {
             return "two";
-        }               
+        }
     }
-    
+
     private static class Reloader implements ContainerNotifier {
+
         List<ContainerListener> ls;
-        
+
         public Reloader() {
             ls = new ArrayList<ContainerListener>();
         }
-        
+
         public void addListener(ContainerListener l) {
             ls.add(l);
         }
@@ -91,51 +94,64 @@ public class ReloadTest extends AbstractGrizzlyWebContainerTester {
             for (ContainerListener l : ls) {
                 l.onReload();
             }
-        }        
-    }
-    
-    public static class ReloadServletContainer extends ServletContainer {
-        ResourceConfig rc;
-        Reloader cr;
-        int i = 0;
-        
-        @Override
-        public void service(HttpServletRequest req, HttpServletResponse resp)
-        throws ServletException, IOException {
-            i++;
-            super.service(req, resp);
-            
-            if (i == 2) {
-                rc.getClasses().add(Two.class);
-                cr.reload();
-            }
         }
+    }
+
+    @Path("reload")
+    public static class ReloaderResource {
+
+        @Context ResourceConfig rc;
         
+        @Context UriInfo ui;
+
+        @Context Reloader r;
+
+        @POST
+        public String postReload() {
+            if (rc.getClasses().contains(Two.class)) {
+                rc.getClasses().remove(Two.class);
+            } else {
+                rc.getClasses().add(Two.class);
+            }
+            
+            r.reload();
+            return ui.getPath();
+        }
+    }
+
+    public static class ReloadServletContainer extends ServletContainer {
+
         @Override
         protected void configure(final ServletConfig sc, ResourceConfig rc, WebApplication wa) {
             super.configure(sc, rc, wa);
-            this.rc = rc;
-        
-            cr = new Reloader();
-            rc.getProperties().put(ResourceConfig.PROPERTY_CONTAINER_NOTIFIER, cr);                    
-        }        
+
+            Reloader r = new Reloader();
+            rc.getSingletons().add(new SingletonTypeInjectableProvider<Context, Reloader>(
+                    Reloader.class, r){});
+            rc.getProperties().put(ResourceConfig.PROPERTY_CONTAINER_NOTIFIER, r);
+        }
     }
-    
-    public ReloadTest(String testName) {
+
+    public ReloadResourceTest(String testName) {
         super(testName);
     }
-    
-    
+
     public void testReload() {
         setServletClass(ReloadServletContainer.class);
-        startServer(One.class);
+        startServer(One.class, ReloaderResource.class);
 
         WebResource r = Client.create().resource(getUri().path("/").build());
-                
-        assertEquals("one", r.path("one").get(String.class));
-        assertEquals(404, r.path("two").get(ClientResponse.class).getStatus());
-        
-        assertEquals("one", r.path("one").get(String.class));
-        assertEquals("two", r.path("two").get(String.class));        
+
+        for (int i = 0; i < 2; i++) {
+            assertEquals("one", r.path("one").get(String.class));
+            assertEquals(404, r.path("two").get(ClientResponse.class).getStatus());
+
+            assertEquals("reload", r.path("reload").post(String.class));
+
+            assertEquals("one", r.path("one").get(String.class));
+            assertEquals("two", r.path("two").get(String.class));
+
+            assertEquals("reload", r.path("reload").post(String.class));
+        }
     }
 }

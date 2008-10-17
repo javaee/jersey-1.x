@@ -522,15 +522,6 @@ public class ServletContainer extends HttpServlet implements ContainerListener {
     /**
      * Load the Web application. This will create, configure and initiate
      * the web application.
-     * <p>
-     * This method may be called at runtime, more than once, to reload the 
-     * Web application. For example, if a {@link ResourceConfig} implementation 
-     * is capable of detecting changes to resource classes (addition or removal)
-     * or providers then this method may be invoked to reload the web 
-     * application for such changes to take effect.
-     * <p>
-     * If this method is called when there are pending requests then such
-     * requests will be processed using the previously loaded web application.
      */
     public final void load() {
         WebApplication _application = create();        
@@ -539,6 +530,26 @@ public class ServletContainer extends HttpServlet implements ContainerListener {
         application = _application;
     }
     
+    /**
+     * Reload the Web application. This will create and initiate the web
+     * application using the same {@link ResourceConfig} implementation
+     * that was used to load the Web application.
+     * <p>
+     * This method may be called at runtime, more than once, to reload the
+     * Web application. For example, if a {@link ResourceConfig} implementation
+     * is capable of detecting changes to resource classes (addition or removal)
+     * or providers then this method may be invoked to reload the web
+     * application for such changes to take effect.
+     * <p>
+     * If this method is called when there are pending requests then such
+     * requests will be processed using the previously loaded web application.
+     */
+    public final void reload() {
+        WebApplication _application = create();
+        initiate(resourceConfig, _application);
+        application = _application;
+    }
+
     /**
      * Create a new instance of a {@link WebApplication}.
      * 
@@ -557,22 +568,26 @@ public class ServletContainer extends HttpServlet implements ContainerListener {
     }
     
     /**
-     * Configure the {@link WebApplication}.
+     * Configure the {@link ResourceConfig}.
      * <p>
-     * The {@link WebApplication} is configured such that the following classes 
+     * The {@link ResourceConfig} is configured such that the following classes
      * may be injected onto the field of a root resource class or a parameter 
      * of a method of root resource class that is annotated with 
      * {@link javax.ws.rs.core.Context}: {@link HttpServletRequest}, {@link HttpServletResponse}
      * , {@link ServletContext}, and {@link ServletConfig}.
      * <p>
      * An inheriting class may override this method to configure the 
-     * {@link WebApplication} to provide alternative or additional instances
+     * {@link ResourceConfig} to provide alternative or additional instances
      * that are resource or provider classes or instances, and may modify the
      * features and properties of the {@link ResourceConfig}. For an inheriting
      * class to extend configuration behaviour the overriding method MUST call
      * super.configure(servletConfig, rc, wa) as the first statement of that 
      * method.
-     * 
+     * <p>
+     * This method will be called only once at servlet initiation. Subsequent
+     * reloads of the Web application will not result in subsequence calls to
+     * this method.
+     *
      * @param sc the Servlet configuration
      * @param rc the Resource configuration
      * @param wa the Web application
@@ -613,6 +628,9 @@ public class ServletContainer extends HttpServlet implements ContainerListener {
      * with the fully qualified class name as the JNDI name then that named
      * object is added as a singleton root resource and the class is removed
      * from the set of root resource classes.
+     * <p>
+     * This method will be called once at servlet initiation and for
+     * each reload of the Web application.
      * 
      * @param rc the Resource configuration
      * @param wa the Web application
@@ -660,6 +678,6 @@ public class ServletContainer extends HttpServlet implements ContainerListener {
     // ContainerListener
     
     public void onReload() {
-        load();
+        reload();
     }
 }
