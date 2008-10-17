@@ -43,13 +43,12 @@
     <parent>
         <groupId>com.sun.jersey</groupId>
         <artifactId>jersey-project</artifactId>
-        <version>1.0</version>
+        <version>1.0.1-SNAPSHOT</version>
     </parent>
 
     <artifactId>jersey-multipart</artifactId>
     <packaging>jar</packaging>
     <name>jersey-multipart</name>
-    <version>1.0.1-SNAPSHOT</version>
 
     <dependencies>
         <dependency>
