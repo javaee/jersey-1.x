@@ -27,12 +27,35 @@
             <artifactId>jersey-server</artifactId>
             <version>${jersey-version}</version>
         </dependency>
+        <!-- uncomment this to get JSON support:
          <dependency>
             <groupId>com.sun.jersey</groupId>
             <artifactId>jersey-json</artifactId>
             <version>${jersey-version}</version>
         </dependency>
-        <dependency>
+        -->
+        <!-- uncomment this to get Fastinfoset support:
+         <dependency>
+            <groupId>com.sun.jersey</groupId>
+            <artifactId>jersey-fastinfoset</artifactId>
+            <version>${jersey-version}</version>
+        </dependency>
+        -->
+        <!-- uncomment this to get ATOM support:
+         <dependency>
+            <groupId>com.sun.jersey</groupId>
+            <artifactId>jersey-atom</artifactId>
+            <version>${jersey-version}</version>
+        </dependency>
+        -->
+        <!-- uncomment this to get multipart MIME types support:
+         <dependency>
+            <groupId>com.sun.jersey</groupId>
+            <artifactId>jersey-multipart</artifactId>
+            <version>${jersey-version}</version>
+        </dependency>
+        -->
+           <dependency>
             <groupId>com.sun.grizzly</groupId>
             <artifactId>grizzly-servlet-webserver</artifactId>
             <version>1.8.6</version>
