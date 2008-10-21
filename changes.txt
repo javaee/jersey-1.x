@@ -1,4 +1,8 @@
 release 1.0.1 (2008-11/12)
+- Fixed issue 130
+  https://jersey.dev.java.net/issues/show_bug.cgi?id=130
+  Building from an @Path value that contains a template with a regex now
+  build the URI without error.
 - Fixed reloading of servlet container. The configuration of the web application
   occurs only at servlet initiation and not when a reload occurs.
 - Included simple Groovy example.

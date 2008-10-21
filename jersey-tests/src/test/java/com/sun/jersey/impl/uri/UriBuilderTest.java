@@ -442,6 +442,56 @@ public class UriBuilderTest extends TestCase {
         assertEquals(URI.create("http://localhost:8080/base/method/locator"), ub);
     }
 
+    @Path("resource/{id}")
+    class ResourceWithTemplate {
+        @Path("method/{id1}")
+        public @GET String get() { return ""; }
+
+        @Path("locator/{id2}")
+        public Object locator() { return null; }
+    }
+
+    public void testResourceWithTemplateAppendPath() throws NoSuchMethodException {
+        URI ub = UriBuilder.fromUri("http://localhost:8080/base").
+                path(ResourceWithTemplate.class).build("foo");
+        assertEquals(URI.create("http://localhost:8080/base/resource/foo"), ub);
+
+        ub = UriBuilder.fromUri("http://localhost:8080/base").
+                path(ResourceWithTemplate.class, "get").build("foo");
+        assertEquals(URI.create("http://localhost:8080/base/method/foo"), ub);
+
+        Method get = ResourceWithTemplate.class.getMethod("get");
+        Method locator = ResourceWithTemplate.class.getMethod("locator");
+        ub = UriBuilder.fromUri("http://localhost:8080/base").
+                path(get).path(locator).build("foo", "bar");
+        assertEquals(URI.create("http://localhost:8080/base/method/foo/locator/bar"), ub);
+    }
+
+    @Path("resource/{id: .+}")
+    class ResourceWithTemplateRegex {
+        @Path("method/{id1: .+}")
+        public @GET String get() { return ""; }
+
+        @Path("locator/{id2: .+}")
+        public Object locator() { return null; }
+    }
+
+    public void testResourceWithTemplateRegexAppendPath() throws NoSuchMethodException {
+        URI ub = UriBuilder.fromUri("http://localhost:8080/base").
+                path(ResourceWithTemplateRegex.class).build("foo");
+        assertEquals(URI.create("http://localhost:8080/base/resource/foo"), ub);
+
+        ub = UriBuilder.fromUri("http://localhost:8080/base").
+                path(ResourceWithTemplateRegex.class, "get").build("foo");
+        assertEquals(URI.create("http://localhost:8080/base/method/foo"), ub);
+
+        Method get = ResourceWithTemplateRegex.class.getMethod("get");
+        Method locator = ResourceWithTemplateRegex.class.getMethod("locator");
+        ub = UriBuilder.fromUri("http://localhost:8080/base").
+                path(get).path(locator).build("foo", "bar");
+        assertEquals(URI.create("http://localhost:8080/base/method/foo/locator/bar"), ub);
+    }
+
     public void testBuildTemplates() {
         URI bu = UriBuilder.fromUri("http://localhost:8080/a/b/c").
                 path("/{foo}/{bar}/{baz}/{foo}").build("x", "y", "z");

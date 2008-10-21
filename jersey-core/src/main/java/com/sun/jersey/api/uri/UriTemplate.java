@@ -565,7 +565,7 @@ public class UriTemplate {
     }
     
     private static StringBuilder createURIComponent(final UriComponent.Type t, 
-            final String template,
+            String template,
             final Map<String, ? extends Object> values, 
             final boolean encode, 
             final StringBuilder b) {
@@ -575,7 +575,9 @@ public class UriTemplate {
         }
         
         // Find all template variables
+        template = new UriTemplateParser(template).getNormalizedTemplate();
         final Matcher m = TEMPLATE_NAMES_PATTERN.matcher(template);
+
         int i = 0;
         while(m.find()) {
             b.append(template, i, m.start());
@@ -705,12 +707,18 @@ public class UriTemplate {
     }
     
     private static int createURIComponent(final UriComponent.Type t, 
-            final String template,
+            String template,
             final String[] values, final int offset,
             final boolean encode, 
             final Map<String, String> mapValues,
             final StringBuilder b) {
+        if (template.indexOf('{') == -1) {
+            b.append(template);
+            return offset;
+        }
+
         // Find all template variables
+        template = new UriTemplateParser(template).getNormalizedTemplate();
         final Matcher m = TEMPLATE_NAMES_PATTERN.matcher(template);
         int v = offset;
         int i = 0;
