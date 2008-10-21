@@ -284,6 +284,15 @@ public class BasicValidator extends AbstractModelValidator {
                     ImplMessages.ERROR_SUBRES_LOC_URI_PATH_INVALID(locator.getMethod(), locator.getPath()),
                     true));
         }
+        // Sub-resource locator can not have an entity parameter
+        for (Parameter parameter : locator.getParameters()) {
+            if (Parameter.Source.ENTITY == parameter.getSource()) {
+                issueList.add(new ResourceModelIssue(
+                    locator,
+                    ImplMessages.ERROR_SUBRES_LOC_HAS_ENTITY_PARAM(locator.getMethod()),
+                    true));
+            }
+        }
     }
 
     // TODO: the method could probably have more then 2 params...

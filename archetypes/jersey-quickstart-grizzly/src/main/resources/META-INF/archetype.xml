@@ -2,7 +2,7 @@
   <id>jersey-quickstart-grizzly</id>
   <sources>
     <source>src/main/java/Main.java</source>
-    <source>src/main/java/HelloWorldResource.java</source>
+    <source>src/main/java/MyResource.java</source>
   </sources>
   <testSources>
     <source>src/test/java/MainTest.java</source>

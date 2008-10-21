@@ -532,6 +532,25 @@ public class BasicValidatorTest extends TestCase {
         assertTrue(validator.getIssueList().get(0).isFatal());
     }
 
+    @Path("rootEntityParamOnSRL")
+    public static class TestEntityParamOnSRL {
+
+        @Path("srl")
+        public String locator(String s) {
+            return "it";
+        }
+    }
+
+    public void testEntityParamOnSRL() throws Exception {
+        System.out.println("---\nAn issue should be reported if an entity parameter exists on a sub-resource locator:");
+        AbstractResource ar = IntrospectionModeller.createResource(TestEntityParamOnSRL.class);
+        BasicValidator validator = new BasicValidator();
+        validator.validate(ar);
+        printIssueList(validator);
+        assertTrue(!validator.getIssueList().isEmpty());
+        assertTrue(validator.getIssueList().get(0).isFatal());
+    }
+
     // TODO: test multiple root resources with the same uriTempl (in WebApplicationImpl.processRootResources ?)
 
     private static void printIssueList(BasicValidator validator) {
