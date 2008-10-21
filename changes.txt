@@ -1,4 +1,7 @@
 release 1.0.1 (2008-11/12)
+- Improved valdation error when a sub-resource locator has a unannotated
+  parameter this is likely, instead, to be associated with an request entity of 
+  a resource method.
 - Fixed issue 130
   https://jersey.dev.java.net/issues/show_bug.cgi?id=130
   Building from an @Path value that contains a template with a regex now
