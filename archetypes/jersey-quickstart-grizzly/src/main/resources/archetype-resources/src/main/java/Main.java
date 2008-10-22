@@ -28,8 +28,8 @@ public class Main {
     public static void main(String[] args) throws IOException {
         SelectorThread threadSelector = startServer();
         System.out.println(String.format("Jersey app started with WADL available at "
-                + "%sapplication.wadl\nTry out %shelloworld\nHit enter to stop it...",
-                BASE_URI, BASE_URI));
+                + "%sapplication.wadl\nHit enter to stop it...",
+                BASE_URI));
         System.in.read();
         threadSelector.stopEndpoint();
         System.exit(0);
