@@ -36,11 +36,11 @@ public class MainTest extends TestCase {
     }
 
     /**
-     * Test to see that the message "Hello World" is sent in the response.
+     * Test to see that the message "Got it!" is sent in the response.
      */
-    public void testHelloWorld() {
-        String responseMsg = r.path("helloworld").get(String.class);
-        assertEquals("Hello World", responseMsg);
+    public void _testMyResource() {
+        String responseMsg = r.path("myresource").get(String.class);
+        assertEquals("Got it!", responseMsg);
     }
 
     /**
