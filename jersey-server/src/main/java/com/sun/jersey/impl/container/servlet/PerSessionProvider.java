@@ -40,6 +40,7 @@ package com.sun.jersey.impl.container.servlet;
 import com.sun.jersey.api.container.ContainerException;
 import com.sun.jersey.api.core.HttpContext;
 import com.sun.jersey.api.model.AbstractResource;
+import com.sun.jersey.server.impl.inject.AbstractHttpContextInjectable;
 import com.sun.jersey.server.impl.inject.ServerInjectableProviderContext;
 import com.sun.jersey.spi.inject.Injectable;
 import com.sun.jersey.spi.resource.ResourceClassInjector;
@@ -66,7 +67,7 @@ public final class PerSessionProvider implements ResourceProvider {
     
     private Constructor<?> constructor;
     
-    private List<Injectable> constructorInjectableParams;
+    private List<AbstractHttpContextInjectable> constructorInjectableParams;
 
     
     public void init(ComponentProvider provider,
@@ -84,7 +85,7 @@ public final class PerSessionProvider implements ResourceProvider {
             this.constructorInjectableParams = null;
         } else {
             this.constructor = cip.con;
-            this.constructorInjectableParams = cip.is;
+            this.constructorInjectableParams = AbstractHttpContextInjectable.transform(cip.is);
         }
     }
 
@@ -100,7 +101,7 @@ public final class PerSessionProvider implements ResourceProvider {
             } else {
                 final Object[] params = new Object[constructorInjectableParams.size()];
                 int index = 0;
-                for (Injectable i : constructorInjectableParams) {
+                for (AbstractHttpContextInjectable i : constructorInjectableParams) {
                     params[index++] = (i != null) ? i.getValue(context) : null;
                 }
 

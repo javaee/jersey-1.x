@@ -43,6 +43,7 @@ import com.sun.jersey.api.model.AbstractField;
 import com.sun.jersey.api.model.AbstractResource;
 import com.sun.jersey.api.model.AbstractSetterMethod;
 import com.sun.jersey.api.model.Parameter;
+import com.sun.jersey.server.impl.inject.AbstractHttpContextInjectable;
 import com.sun.jersey.spi.service.AccessibleObjectContext;
 import com.sun.jersey.spi.inject.Injectable;
 import com.sun.jersey.spi.service.ComponentProvider.Scope;
@@ -68,14 +69,14 @@ public final class ResourceClassInjector {
     private Object[] singletonFieldValues;
     
     private Field[] perRequestFields;
-    private Injectable<?>[] perRequestFieldInjectables;
+    private AbstractHttpContextInjectable<?>[] perRequestFieldInjectables;
     private boolean[] perRequestPrimitive;
     
     private Method[] singletonSetters;    
     private Object[] singletonSetterValues;
     
     private Method[] perRequestSetters;
-    private Injectable<?>[] perRequestSetterInjectables;
+    private AbstractHttpContextInjectable<?>[] perRequestSetterInjectables;
     
     /**
      * Create a new resource class injector.
@@ -159,17 +160,17 @@ public final class ResourceClassInjector {
         int i = 0;
         for (Map.Entry<Field, Injectable<?>> e : singletons.entrySet()) {
             singletonFields[i] = e.getKey();
-            singletonFieldValues[i++] = e.getValue().getValue(null);
+            singletonFieldValues[i++] = e.getValue().getValue();
         }
         
         size = perRequest.entrySet().size();
         perRequestFields = new Field[size];
-        perRequestFieldInjectables = new Injectable<?>[size];
+        perRequestFieldInjectables = new AbstractHttpContextInjectable<?>[size];
         perRequestPrimitive = new boolean[size];
         i = 0;
         for (Map.Entry<Field, Injectable<?>> e : perRequest.entrySet()) {
             perRequestFields[i] = e.getKey();
-            perRequestFieldInjectables[i] = e.getValue();
+            perRequestFieldInjectables[i] = AbstractHttpContextInjectable.transform(e.getValue());
             perRequestPrimitive[i++] = e.getKey().getType().isPrimitive();
         }        
     }
@@ -250,16 +251,16 @@ public final class ResourceClassInjector {
         int i = 0;
         for (Map.Entry<Method, Injectable<?>> e : singletons.entrySet()) {
             singletonSetters[i] = e.getKey();
-            singletonSetterValues[i++] = e.getValue().getValue(null);
+            singletonSetterValues[i++] = e.getValue().getValue();
         }
         
         size = perRequest.entrySet().size();
         perRequestSetters = new Method[size];
-        perRequestSetterInjectables = new Injectable<?>[size];        
+        perRequestSetterInjectables = new AbstractHttpContextInjectable<?>[size];
         i = 0;
         for (Map.Entry<Method, Injectable<?>> e : perRequest.entrySet()) {
             perRequestSetters[i] = e.getKey();
-            perRequestSetterInjectables[i++] = e.getValue();
+            perRequestSetterInjectables[i++] = AbstractHttpContextInjectable.transform(e.getValue());
         }        
     }
     

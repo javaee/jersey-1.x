@@ -77,7 +77,7 @@ import com.sun.jersey.api.core.ResourceConfig;
 import com.sun.jersey.api.core.ResourceContext;
 import com.sun.jersey.api.model.AbstractResource;
 import com.sun.jersey.api.model.ResourceModelIssue;
-import com.sun.jersey.api.uri.ExtendedUriInfo;
+import com.sun.jersey.api.core.ExtendedUriInfo;
 import com.sun.jersey.api.uri.UriTemplate;
 import com.sun.jersey.impl.ImplMessages;
 import com.sun.jersey.impl.ThreadLocalHttpContext;
@@ -215,7 +215,7 @@ public final class WebApplicationImpl implements WebApplication {
                 final Object o = m.get(c);
                 if (o != null) {
                     return new Injectable() {
-                        public Object getValue(HttpContext c) {
+                        public Object getValue() {
                             return o;
                         }
                     };
@@ -564,7 +564,7 @@ public final class WebApplicationImpl implements WebApplication {
                                 new AccessibleObjectContext(
                                 ic.getAccesibleObject(), ic.getAnnotations());
                         return new Injectable<Object>() {
-                            public Object getValue(HttpContext context) {
+                            public Object getValue() {
                                 try {
                                     return provider.getInstance(aic, Scope.Undefined, (Class)c);
                                 } catch (Exception e) {
@@ -589,14 +589,6 @@ public final class WebApplicationImpl implements WebApplication {
         
         injectableFactory.configure(cpc);
         
-        // Add per-request-based injectable providers
-        injectableFactory.add(new CookieParamInjectableProvider());
-        injectableFactory.add(new HeaderParamInjectableProvider());
-        injectableFactory.add(new HttpContextInjectableProvider());
-        injectableFactory.add(new MatrixParamInjectableProvider());
-        injectableFactory.add(new PathParamInjectableProvider());
-        injectableFactory.add(new QueryParamInjectableProvider());
-
         // Obtain all context resolvers
         final ContextResolverFactory crf = new ContextResolverFactory(cpc, 
                 injectableFactory);

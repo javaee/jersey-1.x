@@ -38,7 +38,6 @@
 package com.sun.jersey.spi.inject;
 
 import com.sun.jersey.spi.service.ComponentContext;
-import com.sun.jersey.api.core.HttpContext;
 import com.sun.jersey.spi.service.ComponentProvider.Scope;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
@@ -80,7 +79,7 @@ public abstract class SingletonTypeInjectableProvider<A extends Annotation, T>
             return null;
     }
 
-    public final T getValue(HttpContext c) {
+    public final T getValue() {
         return instance;
     }
 }

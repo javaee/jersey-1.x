@@ -40,7 +40,7 @@ package com.sun.jersey.impl.inject;
 import com.sun.jersey.api.core.DefaultResourceConfig;
 import com.sun.jersey.api.core.HttpContext;
 import com.sun.jersey.api.core.ResourceConfig;
-import com.sun.jersey.api.uri.ExtendedUriInfo;
+import com.sun.jersey.api.core.ExtendedUriInfo;
 import com.sun.jersey.impl.AbstractResourceTester;
 import com.sun.jersey.spi.MessageBodyWorkers;
 import com.sun.jersey.spi.resource.Singleton;

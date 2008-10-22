@@ -79,7 +79,7 @@ public final class SingletonProvider implements ResourceProvider {
                 int i = 0;
                 for (Injectable injectable : cip.is) {
                     if (injectable != null)
-                        params[i++] = injectable.getValue(null);
+                        params[i++] = injectable.getValue();
                 }
                 resource = resourceProvider.getInstance(Scope.Singleton, cip.con, params);
             }

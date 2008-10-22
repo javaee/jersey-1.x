@@ -41,6 +41,7 @@ import com.sun.jersey.api.container.ContainerException;
 import com.sun.jersey.api.container.MappableContainerException;
 import com.sun.jersey.api.core.HttpContext;
 import com.sun.jersey.api.uri.UriTemplate;
+import com.sun.jersey.server.impl.inject.AbstractHttpContextInjectable;
 import com.sun.jersey.spi.inject.Injectable;
 import com.sun.jersey.spi.uri.rules.UriRule;
 import com.sun.jersey.spi.uri.rules.UriRuleContext;
@@ -57,7 +58,7 @@ import javax.ws.rs.WebApplicationException;
  */
 public final class SubLocatorRule extends BaseRule {
 
-    private final List<Injectable> is;
+    private final List<AbstractHttpContextInjectable> is;
     
     private final Method m;
 
@@ -65,7 +66,7 @@ public final class SubLocatorRule extends BaseRule {
             Method m, List<Injectable> is) {
         super(template);
         this.m = m;
-        this.is = is;
+        this.is = AbstractHttpContextInjectable.transform(is);
     }
 
     public boolean accept(CharSequence path, Object resource, UriRuleContext context) {
@@ -100,7 +101,7 @@ public final class SubLocatorRule extends BaseRule {
             } else {
                 final Object[] params = new Object[is.size()];
                 int index = 0;
-                for (Injectable i : is) {
+                for (AbstractHttpContextInjectable i : is) {
                     params[index++] = i.getValue(context);                        
                 }
                 

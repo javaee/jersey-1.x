@@ -37,8 +37,6 @@
 
 package com.sun.jersey.spi.inject;
 
-import com.sun.jersey.api.core.HttpContext;
-
 /**
  * The type of something that is injectable.
  * 
@@ -49,9 +47,7 @@ public interface Injectable<T> {
     /**
      * Get the injectable value.
      * 
-     * @param context the HTTP context, may be null if no context is available
-     *        for the scope of injection.
      * @return the injectable value
      */
-    T getValue(HttpContext context);
+    T getValue();
 }

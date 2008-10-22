@@ -42,6 +42,7 @@ import com.sun.jersey.impl.model.parameter.multivalued.MultivaluedParameterExtra
 import com.sun.jersey.impl.model.parameter.multivalued.MultivaluedParameterProcessor;
 import com.sun.jersey.api.core.HttpContext;
 import com.sun.jersey.api.model.Parameter;
+import com.sun.jersey.server.impl.inject.AbstractHttpContextInjectable;
 import com.sun.jersey.spi.inject.Injectable;
 import com.sun.jersey.spi.inject.InjectableProvider;
 import com.sun.jersey.spi.service.ComponentContext;
@@ -57,7 +58,7 @@ import javax.ws.rs.core.Cookie;
 public final class CookieParamInjectableProvider implements 
         InjectableProvider<CookieParam, Parameter> {
     
-    private static final class CookieParamInjectable implements Injectable<Object> {
+    private static final class CookieParamInjectable extends AbstractHttpContextInjectable<Object> {
         private final MultivaluedParameterExtractor extractor;
         
         CookieParamInjectable(MultivaluedParameterExtractor extractor) {
@@ -73,7 +74,7 @@ public final class CookieParamInjectableProvider implements
         }
     }
     
-    private static final class CookieTypeParamInjectable implements Injectable<Cookie> {
+    private static final class CookieTypeParamInjectable extends AbstractHttpContextInjectable<Cookie> {
         private final String name;
         
         CookieTypeParamInjectable(String name) {

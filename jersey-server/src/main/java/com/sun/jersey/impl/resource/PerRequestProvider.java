@@ -41,6 +41,7 @@ import com.sun.jersey.api.container.ContainerException;
 import com.sun.jersey.api.container.MappableContainerException;
 import com.sun.jersey.api.core.HttpContext;
 import com.sun.jersey.api.model.AbstractResource;
+import com.sun.jersey.server.impl.inject.AbstractHttpContextInjectable;
 import com.sun.jersey.server.impl.inject.ServerInjectableProviderContext;
 import com.sun.jersey.spi.resource.ResourceClassInjector;
 import com.sun.jersey.spi.inject.Injectable;
@@ -71,7 +72,7 @@ public final class PerRequestProvider implements ResourceProvider {
     
     private Constructor<?> constructor;
     
-    private List<Injectable> constructorInjectableParams;
+    private List<AbstractHttpContextInjectable> constructorInjectableParams;
     
     public void init(ComponentProvider provider,
             ComponentProvider resourceProvider, AbstractResource abstractResource) {
@@ -88,7 +89,7 @@ public final class PerRequestProvider implements ResourceProvider {
             this.constructorInjectableParams = null;
         } else {
             this.constructor = cip.con;
-            this.constructorInjectableParams = cip.is;
+            this.constructorInjectableParams = AbstractHttpContextInjectable.transform(cip.is);
         }
     }
 
@@ -101,7 +102,7 @@ public final class PerRequestProvider implements ResourceProvider {
                 final Object[] params = new Object[constructorInjectableParams.size()];
                 int index = 0;
                 Class<?>[] types = constructor.getParameterTypes();
-                for (Injectable i : constructorInjectableParams) {
+                for (AbstractHttpContextInjectable i : constructorInjectableParams) {
                     params[index] = (i != null) ? i.getValue(context) : DEFAULT_VALUES.get(types[index]);
                     index++;
                 }

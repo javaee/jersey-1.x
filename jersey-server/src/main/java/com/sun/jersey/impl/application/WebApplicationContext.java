@@ -38,7 +38,7 @@ package com.sun.jersey.impl.application;
 
 import com.sun.jersey.api.core.HttpRequestContext;
 import com.sun.jersey.api.core.HttpResponseContext;
-import com.sun.jersey.api.uri.ExtendedUriInfo;
+import com.sun.jersey.api.core.ExtendedUriInfo;
 import com.sun.jersey.api.uri.UriComponent;
 import com.sun.jersey.api.uri.UriTemplate;
 import com.sun.jersey.api.MultivaluedMapImpl;

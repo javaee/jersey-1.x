@@ -44,6 +44,7 @@ import com.sun.jersey.api.model.Parameter;
 import com.sun.jersey.api.representation.Form;
 import com.sun.jersey.impl.http.header.reader.HttpHeaderReader;
 import com.sun.jersey.impl.http.header.reader.HttpHeaderReaderImpl;
+import com.sun.jersey.server.impl.inject.AbstractHttpContextInjectable;
 import com.sun.jersey.spi.MessageBodyWorkers;
 import com.sun.jersey.spi.dispatch.RequestDispatcher;
 import com.sun.jersey.spi.inject.Injectable;
@@ -105,7 +106,7 @@ public class MultipartFormDispatchProvider extends FormDispatchProvider {
         
     @Context MessageBodyWorkers mbws;
     
-    private final class MultipartFormInjectable implements Injectable<Object> {
+    private final class MultipartFormInjectable extends AbstractHttpContextInjectable<Object> {
         final Class<?> c;
         final Type t;
         final Annotation[] as;
@@ -123,7 +124,7 @@ public class MultipartFormDispatchProvider extends FormDispatchProvider {
         }        
     }
     
-    private static final class MultipartFormParamInjectable implements Injectable<Object> {
+    private static final class MultipartFormParamInjectable extends AbstractHttpContextInjectable<Object> {
         private final MessageBodyWorkers mbws;
         private final Parameter p;
         

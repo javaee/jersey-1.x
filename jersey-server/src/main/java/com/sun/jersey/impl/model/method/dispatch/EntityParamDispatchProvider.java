@@ -44,6 +44,7 @@ import com.sun.jersey.api.model.AbstractResourceMethod;
 import com.sun.jersey.api.model.Parameter;
 import com.sun.jersey.impl.ResponseBuilderImpl;
 import com.sun.jersey.core.reflection.ReflectionHelper;
+import com.sun.jersey.server.impl.inject.AbstractHttpContextInjectable;
 import com.sun.jersey.server.impl.inject.ServerInjectableProviderContext;
 import com.sun.jersey.spi.dispatch.RequestDispatcher;
 import com.sun.jersey.spi.inject.Injectable;
@@ -66,7 +67,7 @@ import javax.ws.rs.core.Response;
  */
 public class EntityParamDispatchProvider implements ResourceMethodDispatchProvider {
                 
-    static final class EntityInjectable implements Injectable<Object> {
+    static final class EntityInjectable extends AbstractHttpContextInjectable<Object> {
         final Class<?> c;
         final Type t;
         final Annotation[] as;
@@ -83,19 +84,19 @@ public class EntityParamDispatchProvider implements ResourceMethodDispatchProvid
     }
         
     static abstract class EntityParamInInvoker extends ResourceJavaMethodDispatcher {        
-        final private List<Injectable> is;
+        final private List<AbstractHttpContextInjectable> is;
         
         EntityParamInInvoker(AbstractResourceMethod abstractResourceMethod, 
                 List<Injectable> is) {
             super(abstractResourceMethod);
-            this.is = is;
+            this.is = AbstractHttpContextInjectable.transform(is);
         }
 
         protected final Object[] getParams(HttpContext context) {
             final Object[] params = new Object[is.size()];
             try {
                 int index = 0;
-                for (Injectable i : is) {
+                for (AbstractHttpContextInjectable i : is) {
                     params[index++] = i.getValue(context);                        
                 }
                 return params;

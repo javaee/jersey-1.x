@@ -37,7 +37,6 @@
 package com.sun.jersey.core.spi.factory;
 
 import com.sun.jersey.api.MediaTypes;
-import com.sun.jersey.api.core.HttpContext;
 import com.sun.jersey.core.util.KeyComparator;
 import com.sun.jersey.core.util.KeyComparatorHashMap;
 import com.sun.jersey.spi.inject.Injectable;
@@ -145,7 +144,7 @@ public final class ContextResolverFactory {
                 if (cr == null) return null;
                 
                 return new Injectable() {
-                    public Object getValue(HttpContext context) {
+                    public Object getValue() {
                         return cr;
                     }
                 };

@@ -53,6 +53,7 @@ import java.net.URI;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.ext.Provider;
 
@@ -64,7 +65,14 @@ public class OverrideInjectableTest extends AbstractResourceTester {
     
     @Provider
     public static class QueryParamInjectableProvider implements 
-            InjectableProvider<QueryParam, Parameter> {        
+            InjectableProvider<QueryParam, Parameter> {
+
+        private final @Context HttpContext hc;
+
+        public QueryParamInjectableProvider(@Context HttpContext hc) {
+            this.hc = hc;
+        }
+        
         public Scope getScope() {
             return Scope.PerRequest;
         }
@@ -76,8 +84,8 @@ public class OverrideInjectableTest extends AbstractResourceTester {
             
             final String name = c.getSourceName();
             return new Injectable<Map<String, String>>() {
-                public Map<String, String> getValue(HttpContext c) {
-                    String value = c.getUriInfo().getQueryParameters().getFirst(name);
+                public Map<String, String> getValue() {
+                    String value = hc.getUriInfo().getQueryParameters().getFirst(name);
 
                     Map<String, String> m = new LinkedHashMap<String, String>();
                     String[] kvs = value.split(",");

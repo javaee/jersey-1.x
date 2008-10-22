@@ -123,7 +123,7 @@ public class ServletAdaptor extends ServletContainer {
                         emfHandler);
                 
                 return new Injectable<EntityManagerFactory>() {
-                    public EntityManagerFactory getValue(HttpContext c) {
+                    public EntityManagerFactory getValue() {
                         return emf;
                     }                    
                 };

@@ -35,8 +35,9 @@
  * holder.
  */
 
-package com.sun.jersey.api.uri;
+package com.sun.jersey.api.core;
 
+import com.sun.jersey.api.uri.UriTemplate;
 import java.util.List;
 import java.util.regex.MatchResult;
 import javax.ws.rs.core.PathSegment;

@@ -1,9 +1,9 @@
 /*
  *
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
- * 
+ *
  * Copyright 1997-2007 Sun Microsystems, Inc. All rights reserved.
- * 
+ *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
  * and Distribution License("CDDL") (collectively, the "License").  You
@@ -11,7 +11,7 @@
  * a copy of the License at https://jersey.dev.java.net/CDDL+GPL.html
  * or jersey/legal/LICENSE.txt.  See the License for the specific
  * language governing permissions and limitations under the License.
- * 
+ *
  * When distributing the software, include this License Header Notice in each
  * file and include the License file at jersey/legal/LICENSE.txt.
  * Sun designates this particular file as subject to the "Classpath" exception
@@ -20,9 +20,9 @@
  * Header, with the fields enclosed by brackets [] replaced by your own
  * identifying information: "Portions Copyrighted [year]
  * [name of copyright owner]"
- * 
+ *
  * Contributor(s):
- * 
+ *
  * If you wish your version of this file to be governed by only the CDDL or
  * only the GPL Version 2, indicate your decision by adding "[Contributor]
  * elects to include this software in this distribution under the [CDDL or GPL
@@ -34,7 +34,47 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
+package com.sun.jersey.server.impl.inject;
+
+import com.sun.jersey.api.core.HttpContext;
+import com.sun.jersey.spi.inject.Injectable;
+import java.util.ArrayList;
+import java.util.List;
+
 /**
- * Provides support for server-side request and response interfaces.
+ *
+ * @author Paul.Sandoz@Sun.Com
  */
-package com.sun.jersey.api.core;
+public abstract class AbstractHttpContextInjectable<T> implements Injectable<T> {
+
+    public T getValue() {
+        throw new IllegalStateException();
+    }
+
+    public abstract T getValue(HttpContext c);
+
+    public static List<AbstractHttpContextInjectable> transform(List<Injectable> l) {
+        List<AbstractHttpContextInjectable> al = new ArrayList<AbstractHttpContextInjectable>(l.size());
+
+        for (Injectable i : l) {
+            al.add(transform(i));
+        }
+
+        return al;
+    }
+
+    public static AbstractHttpContextInjectable transform(final Injectable i) {
+        if (i == null) {
+            return null;
+        } else if (i instanceof AbstractHttpContextInjectable) {
+            return (AbstractHttpContextInjectable)i;
+        } else {
+            return new AbstractHttpContextInjectable() {
+                @Override
+                public Object getValue(HttpContext c) {
+                    return i.getValue();
+                }
+            };
+        }
+    }
+}

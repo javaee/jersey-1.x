@@ -38,7 +38,8 @@
 package com.sun.jersey.impl.model.parameter;
 
 import com.sun.jersey.api.core.HttpContext;
-import com.sun.jersey.api.uri.ExtendedUriInfo;
+import com.sun.jersey.api.core.ExtendedUriInfo;
+import com.sun.jersey.server.impl.inject.AbstractHttpContextInjectable;
 import com.sun.jersey.spi.inject.Injectable;
 import com.sun.jersey.spi.inject.InjectableProvider;
 import com.sun.jersey.spi.service.ComponentContext;
@@ -59,19 +60,19 @@ import javax.ws.rs.core.UriInfo;
 public final class HttpContextInjectableProvider implements 
         InjectableProvider<Context, Type> {
         
-    private static final class HttpContextInjectable implements Injectable<Object> {
+    private static final class HttpContextInjectable extends AbstractHttpContextInjectable<Object> {
         public Object getValue(HttpContext context) {
             return context;
         }
     }
     
-    private static final class HttpContextRequestInjectable implements Injectable<Object> {
+    private static final class HttpContextRequestInjectable extends AbstractHttpContextInjectable<Object> {
         public Object getValue(HttpContext context) {
             return context.getRequest();
         }
     }
     
-    private static final class UriInfoInjectable implements Injectable<UriInfo> {
+    private static final class UriInfoInjectable extends AbstractHttpContextInjectable<UriInfo> {
         public UriInfo getValue(HttpContext context) {
             return context.getUriInfo();
         }

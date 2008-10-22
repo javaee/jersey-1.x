@@ -180,7 +180,7 @@ public final class ComponentProviderCache {
                 int i = 0;
                 for (Injectable injectable : cip.is) {
                     if (injectable != null)
-                        params[i++] = injectable.getValue(null);
+                        params[i++] = injectable.getValue();
                 }
                 o = componentProvider.getInstance(Scope.Singleton, cip.con, params);
             }

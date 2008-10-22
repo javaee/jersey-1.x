@@ -42,13 +42,13 @@ import com.sun.jersey.impl.model.parameter.multivalued.MultivaluedParameterExtra
 import com.sun.jersey.impl.model.parameter.multivalued.MultivaluedParameterProcessor;
 import com.sun.jersey.api.core.HttpContext;
 import com.sun.jersey.api.model.Parameter;
+import com.sun.jersey.server.impl.inject.AbstractHttpContextInjectable;
 import com.sun.jersey.spi.inject.Injectable;
 import com.sun.jersey.spi.inject.InjectableProvider;
 import com.sun.jersey.spi.service.ComponentContext;
 import com.sun.jersey.spi.service.ComponentProvider.Scope;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
-import java.util.Collections;
 import java.util.List;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.WebApplicationException;
@@ -61,7 +61,7 @@ import javax.ws.rs.core.PathSegment;
 public final class PathParamInjectableProvider implements 
         InjectableProvider<PathParam, Parameter> {
     
-    private static final class PathParamInjectable implements Injectable<Object> {
+    private static final class PathParamInjectable extends AbstractHttpContextInjectable<Object> {
         private final MultivaluedParameterExtractor extractor;
         private final boolean decode;
         
@@ -79,7 +79,7 @@ public final class PathParamInjectableProvider implements
         }
     }
     
-    private static final class PathParamPathSegmentInjectable implements Injectable<PathSegment> {
+    private static final class PathParamPathSegmentInjectable extends AbstractHttpContextInjectable<PathSegment> {
         private final String name;
         private final boolean decode;
         
@@ -96,7 +96,7 @@ public final class PathParamInjectableProvider implements
         }
     }
     
-    private static final class PathParamListPathSegmentInjectable implements Injectable<List<PathSegment>> {
+    private static final class PathParamListPathSegmentInjectable extends AbstractHttpContextInjectable<List<PathSegment>> {
         private final String name;
         private final boolean decode;
         

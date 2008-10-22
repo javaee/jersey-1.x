@@ -92,7 +92,7 @@ public class AnnotationInjectableTest extends AbstractResourceTester {
         
         public Injectable<String> getInjectable(ComponentContext ic, MyAnnotation a, Type c) {
             return new Injectable<String>() {
-                public String getValue(HttpContext c) {
+                public String getValue() {
                     return value;
                 }                    
             };

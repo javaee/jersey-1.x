@@ -40,7 +40,7 @@ package com.sun.jersey.impl;
 import com.sun.jersey.api.core.HttpContext;
 import com.sun.jersey.api.core.HttpRequestContext;
 import com.sun.jersey.api.core.HttpResponseContext;
-import com.sun.jersey.api.uri.ExtendedUriInfo;
+import com.sun.jersey.api.core.ExtendedUriInfo;
 import java.util.Map;
 
 /**

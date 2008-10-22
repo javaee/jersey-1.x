@@ -44,7 +44,6 @@ import com.sun.jersey.spi.service.AnnotationObjectContext;
 import com.sun.jersey.spi.service.ComponentProvider.Scope;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Logger;
 
 /**
  *
@@ -53,8 +52,6 @@ import java.util.logging.Logger;
 public final class ServerInjectableProviderFactory extends InjectableProviderFactory
             implements ServerInjectableProviderContext {
     
-    private static final Logger LOGGER = Logger.getLogger(ServerInjectableProviderFactory.class.getName());    
-        
     public Injectable getInjectable(Parameter p, Scope s) {
         if (p.getAnnotation() == null) return null;
         

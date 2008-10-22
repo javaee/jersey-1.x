@@ -37,7 +37,6 @@
 
 package com.sun.jersey.api.core;
 
-import com.sun.jersey.api.uri.ExtendedUriInfo;
 import java.util.Map;
 
 /**

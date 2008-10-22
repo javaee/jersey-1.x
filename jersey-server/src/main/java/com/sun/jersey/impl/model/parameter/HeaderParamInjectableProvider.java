@@ -42,6 +42,7 @@ import com.sun.jersey.impl.model.parameter.multivalued.MultivaluedParameterExtra
 import com.sun.jersey.impl.model.parameter.multivalued.MultivaluedParameterProcessor;
 import com.sun.jersey.api.core.HttpContext;
 import com.sun.jersey.api.model.Parameter;
+import com.sun.jersey.server.impl.inject.AbstractHttpContextInjectable;
 import com.sun.jersey.spi.inject.Injectable;
 import com.sun.jersey.spi.inject.InjectableProvider;
 import com.sun.jersey.spi.service.ComponentContext;
@@ -56,7 +57,7 @@ import javax.ws.rs.WebApplicationException;
 public final class HeaderParamInjectableProvider implements 
         InjectableProvider<HeaderParam, Parameter> {
 
-    private static final class HeaderParamInjectable implements Injectable<Object> {
+    private static final class HeaderParamInjectable extends AbstractHttpContextInjectable<Object> {
         private MultivaluedParameterExtractor extractor;
         
         HeaderParamInjectable(MultivaluedParameterExtractor extractor) {

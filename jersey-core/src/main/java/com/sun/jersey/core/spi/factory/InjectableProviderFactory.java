@@ -127,11 +127,6 @@ public class InjectableProviderFactory implements InjectableProviderContext {
                         Type[] args = pt.getActualTypeArguments();
                         for (int i = 0; i < args.length; i++)
                             args[i] = getResolvedType(args[i], c, _c);
-                            
-//                        if (args[0] instanceof Class &&
-//                                args[1] instanceof Class &&
-//                                (args[1] == Type.class || args[1] == Parameter.class))
-//                            return args;
                         if (args[0] instanceof Class &&
                                 args[1] instanceof Class)
                             return args;
@@ -248,7 +243,7 @@ public class InjectableProviderFactory implements InjectableProviderContext {
                             a.annotationType(), aoc, a, f.getGenericType(), 
                             Scope.UNDEFINED_SINGLETON);
                     if (i != null) {
-                        setFieldValue(o, f, i.getValue(null));
+                        setFieldValue(o, f, i.getValue());
                     }
                 }
                 
@@ -271,7 +266,7 @@ public class InjectableProviderFactory implements InjectableProviderContext {
                         a.annotationType(), aoc, a, t, 
                         Scope.UNDEFINED_SINGLETON);
                 if (i != null) {
-                    setMethodValue(o, m, i.getValue(null));
+                    setMethodValue(o, m, i.getValue());
                 }
             }
         }
