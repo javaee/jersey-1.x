@@ -35,31 +35,34 @@
  * holder.
  */
 
-package com.sun.jersey.impl.template;
+package com.sun.jersey.impl.container.servlet;
 
-import com.sun.jersey.spi.template.TemplateProcessor;
-import com.sun.jersey.spi.template.TemplateContext;
-import com.sun.jersey.spi.service.ComponentProviderCache;
-import java.util.Set;
-import java.util.logging.Logger;
+import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.Method;
+
 
 /**
- *
- * @author Paul.Sandoz@Sun.Com
+ * A proxy invocation handler that delegates all methods to a thread
+ * local instance
  */
-public final class TemplateFactory implements TemplateContext {
-    private static final Logger LOGGER = Logger.getLogger(TemplateFactory.class.getName());
+public class ThreadLocalInvoker<T> implements InvocationHandler {
+    private ThreadLocal<T> threadLocalInstance = new ThreadLocal<T>();
     
-    private final Set<TemplateProcessor> templates;
-    
-    public TemplateFactory(ComponentProviderCache componentProviderCache) {
-        templates = componentProviderCache.getProvidersAndServices(
-                TemplateProcessor.class);
+    public void set(T threadLocalInstance) {
+        this.threadLocalInstance.set(threadLocalInstance);
     }
-
-    // TemplateContext
     
-    public Set<TemplateProcessor> getTemplateProcessors() {
-        return templates;
-    }    
+    public T get() {
+        return this.threadLocalInstance.get();
+    }
+    
+    public ThreadLocal<T> getThreadLocal() {
+        return threadLocalInstance;
+    }
+    
+    public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+        if (threadLocalInstance.get() == null)
+            throw new IllegalStateException();
+        return method.invoke(threadLocalInstance.get(), args);
+    }
 }

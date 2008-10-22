@@ -35,27 +35,29 @@
  * holder.
  */
 
-package com.sun.jersey.impl.util;
+package com.sun.jersey.core.util;
+
+import java.util.Comparator;
 
 /**
- * Case insensitive String key comparator.
- *
+ * A key comparator.
+ * 
  * @author Paul.Sandoz@Sun.Com
  */
-public class StringIgnoreCaseKeyComparator implements KeyComparator<String> {
-    public static final StringIgnoreCaseKeyComparator SINGLETON = 
-            new StringIgnoreCaseKeyComparator();
-    
-    public int hash(String k) {
-        return k.toLowerCase().hashCode();
-    }
+public interface KeyComparator<K> extends Comparator<K> {
+    /**
+     * Compare two keys for equality.
+     * 
+     * @param x the first key
+     * @param y the second key
+     * @return true if the keys are equal.
+     */
+    boolean equals(K x, K y);
 
-    public boolean equals(String x, String y) {
-        return x.equalsIgnoreCase(y);
-    }
-    
-    public int compare(String o1, String o2) {
-        return o1.compareToIgnoreCase(o2);
-    }
-        
+    /**
+     * Get the hash code of a key.
+     * @param k the key.
+     * @return the hash code of the key.
+     */
+    int hash(K k);
 }

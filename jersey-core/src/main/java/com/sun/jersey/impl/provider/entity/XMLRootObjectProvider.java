@@ -37,7 +37,6 @@
 
 package com.sun.jersey.impl.provider.entity;
 
-import com.sun.jersey.api.container.ContainerException;
 import com.sun.jersey.impl.ImplMessages;
 import com.sun.jersey.impl.util.ThrowHelper;
 import java.io.IOException;
@@ -98,7 +97,7 @@ public class XMLRootObjectProvider extends AbstractJAXBProvider<Object> {
             return Object.class == type && getUnmarshaller(type) != null;
         } catch (JAXBException cause) {
             throw ThrowHelper.withInitCause(cause,
-                    new ContainerException(ImplMessages.ERROR_UNMARSHALLING_JAXB(type))
+                    new RuntimeException(ImplMessages.ERROR_UNMARSHALLING_JAXB(type))
                     );
         }
     }

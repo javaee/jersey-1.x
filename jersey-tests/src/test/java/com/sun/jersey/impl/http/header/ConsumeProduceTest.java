@@ -37,10 +37,10 @@
 
 package com.sun.jersey.impl.http.header;
 
+import com.sun.jersey.api.MediaTypes;
+import java.util.List;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.Produces;
-import com.sun.jersey.impl.model.MediaTypeHelper;
-import java.util.List;
 import javax.ws.rs.core.MediaType;
 import junit.framework.TestCase;
 
@@ -68,13 +68,13 @@ public class ConsumeProduceTest extends TestCase {
     
     public void testConsumes() {
         Consumes c = ConsumesClass.class.getAnnotation(Consumes.class);
-        List<MediaType> l = MediaTypeHelper.createMediaTypes(c);
+        List<MediaType> l = MediaTypes.createMediaTypes(c);
         checkMediaTypes(l);
     }
     
     public void testProduces() {
         Produces p = ProducesClass.class.getAnnotation(Produces.class);
-        List<MediaType> l = MediaTypeHelper.createMediaTypes(p);
+        List<MediaType> l = MediaTypes.createMediaTypes(p);
         checkMediaTypes(l);
     }
     

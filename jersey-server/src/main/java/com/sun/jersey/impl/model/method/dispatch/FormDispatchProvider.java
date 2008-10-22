@@ -46,8 +46,8 @@ import com.sun.jersey.api.representation.Form;
 import com.sun.jersey.impl.ResponseBuilderImpl;
 import com.sun.jersey.impl.model.parameter.multivalued.MultivaluedParameterExtractor;
 import com.sun.jersey.impl.model.parameter.multivalued.MultivaluedParameterProcessor;
+import com.sun.jersey.server.impl.inject.ServerInjectableProviderContext;
 import com.sun.jersey.spi.MessageBodyWorkers;
-import com.sun.jersey.spi.inject.InjectableProviderContext;
 import com.sun.jersey.spi.dispatch.RequestDispatcher;
 import com.sun.jersey.spi.inject.Injectable;
 import com.sun.jersey.spi.service.ComponentProvider.Scope;
@@ -236,7 +236,7 @@ public class FormDispatchProvider implements ResourceMethodDispatchProvider {
         }
     }
         
-    @Context InjectableProviderContext ipc;
+    @Context ServerInjectableProviderContext sipc;
 
     @Context MessageBodyWorkers mbw;
     
@@ -277,7 +277,7 @@ public class FormDispatchProvider implements ResourceMethodDispatchProvider {
                 is.add(new FormParamInjectable(e, !p.isEncoded()));
                 
             } else {
-                Injectable injectable = ipc.getInjectable(p, Scope.PerRequest);
+                Injectable injectable = sipc.getInjectable(p, Scope.PerRequest);
                 if (injectable == null)
                     return null;
                 is.add(injectable);

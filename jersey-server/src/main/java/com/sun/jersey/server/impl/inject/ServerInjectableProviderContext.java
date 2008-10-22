@@ -35,16 +35,38 @@
  * holder.
  */
 
-package com.sun.jersey.impl.util;
+package com.sun.jersey.server.impl.inject;
 
-import java.util.Comparator;
+import com.sun.jersey.api.model.Parameter;
+import com.sun.jersey.spi.inject.Injectable;
+import com.sun.jersey.spi.inject.InjectableProviderContext;
+import com.sun.jersey.spi.service.ComponentProvider.Scope;
+import java.util.List;
 
 /**
- *
+ * The server context to obtain {@link Injectable} instances.
+ * 
  * @author Paul.Sandoz@Sun.Com
  */
-public interface KeyComparator<K> extends Comparator<K> {    
-    boolean equals(K x, K y);
+public interface ServerInjectableProviderContext extends InjectableProviderContext {
+    /**
+     * Get an injectable given a parameter.
+     * 
+     * @param p the parameter.
+     * @param s the scope for which the injectable will be used
+     * @return the injectable, otherwise null if an injectable could
+     *         not be found.
+     */
+    Injectable getInjectable(Parameter p, Scope s);
     
-    int hash(K k);
+    /**
+     * Get a list of injectable given a list of parameter.
+     * 
+     * @param ps the list of parameter.
+     * @param s the scope for which the injectable will be used
+     * @return the list of injectable, if an injectable for a parameter
+     *         could not be found the corresponding element in the 
+     *         list will be null.
+     */
+    List<Injectable> getInjectable(List<Parameter> ps, Scope s);
 }

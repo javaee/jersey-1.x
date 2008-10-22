@@ -34,57 +34,73 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-package com.sun.jersey.spi.resource;
 
-import com.sun.jersey.api.model.AbstractResource;
-import com.sun.jersey.api.model.AbstractResourceConstructor;
-import com.sun.jersey.server.impl.inject.ServerInjectableProviderContext;
-import com.sun.jersey.spi.inject.Injectable;
-import com.sun.jersey.spi.service.ComponentConstructor;
-import com.sun.jersey.spi.service.ComponentProvider.Scope;
-import java.util.List;
-import java.util.SortedSet;
-import java.util.TreeSet;
+package com.sun.jersey.impl.uri;
+
+import com.sun.jersey.api.uri.UriPattern;
+import com.sun.jersey.api.uri.UriTemplate;
+import java.util.Comparator;
 
 /**
- * A utility class to obtain the most suitable constructor for a 
- * resource class.
+ * A URI pattern that is a regular expression generated from a URI path.
  * 
  * @author Paul.Sandoz@Sun.Com
  */
-public class ResourceConstructor extends ComponentConstructor {
-    private final ServerInjectableProviderContext sipc;
-
-    public ResourceConstructor(ServerInjectableProviderContext sipc) {
-        super(sipc);
-        this.sipc = sipc;
-    }
+public final class PathPattern extends UriPattern {
+    public static final PathPattern EMPTY_PATH = new PathPattern();
+    
+    /**
+     * Defer to comparing the templates associated with the patterns
+     */
+    static public final Comparator<PathPattern> COMPARATOR = new Comparator<PathPattern>() {
+        public int compare(PathPattern o1, PathPattern o2) {
+            return UriTemplate.COMPARATOR.compare(o1.template, o2.template);
+        }
+    };
 
     /**
-     * Get the most suitable constructor. The constructor with the most
-     * parameters and that has the most parameters associated with 
-     * Injectable instances will be chosen.
-     * 
-     * @param <T> the type of the resource.
-     * @param c the class to instantiate.
-     * @param ar the abstract resource.
-     * @param s the scope for which the injectables will be used.
-     * @return a list constructor and list of injectables for the constructor
-     *         parameters.
+     * The regular expression that represents the right hand side of
+     * a URI path.
      */
-    @SuppressWarnings("unchecked")
-    public <T> ConstructorInjectablePair<T> getConstructor(Class<T> c, AbstractResource ar,
-            Scope s) {
-        if (ar.getConstructors().isEmpty())
-            return null;
+    private static final String RIGHT_HAND_SIDE = "(/.*)?";
         
-        SortedSet<ConstructorInjectablePair<T>> cs = new TreeSet<ConstructorInjectablePair<T>>(
-                new ConstructorComparator());        
-        for (AbstractResourceConstructor arc : ar.getConstructors()) {
-            List<Injectable> is = sipc.getInjectable(arc.getParameters(), s);
-            cs.add(new ConstructorInjectablePair<T>(arc.getCtor(), is));
-        }
-                
-        return cs.first();        
+    private final UriTemplate template;
+    
+    private PathPattern() {
+        super();
+        this.template = UriTemplate.EMPTY;
     }
- }
+    
+    /**
+     * Create a path pattern from a regular expression.
+     * 
+     * @param regex the regular expression for the path.
+     */
+    public PathPattern(UriTemplate template) {
+        super(postfixWithCapturingGroup(template.getPattern().getRegex()),
+            indexCapturingGroup(template.getPattern().getGroupIndexes()));
+        
+        this.template = template;
+    }
+    
+    public UriTemplate getTemplate() {
+        return template;
+    }
+    
+    private static String postfixWithCapturingGroup(String regex) {
+        if (regex.endsWith("/"))
+            regex = regex.substring(0, regex.length() - 1);
+            
+        return regex + RIGHT_HAND_SIDE;
+    }
+
+    private static int[] indexCapturingGroup(int[] indexes) {
+        if (indexes.length == 0) return indexes;
+
+        int[] cgIndexes = new int[indexes.length + 1];
+        System.arraycopy(indexes, 0, cgIndexes, 0, indexes.length);
+        
+        cgIndexes[indexes.length] = cgIndexes[indexes.length - 1] + 1;
+        return cgIndexes;
+    }
+}

@@ -43,8 +43,8 @@ import com.sun.jersey.api.core.HttpContext;
 import com.sun.jersey.api.model.AbstractResourceMethod;
 import com.sun.jersey.api.model.Parameter;
 import com.sun.jersey.impl.ResponseBuilderImpl;
-import com.sun.jersey.spi.inject.InjectableProviderContext;
-import com.sun.jersey.impl.model.ReflectionHelper;
+import com.sun.jersey.core.reflection.ReflectionHelper;
+import com.sun.jersey.server.impl.inject.ServerInjectableProviderContext;
 import com.sun.jersey.spi.dispatch.RequestDispatcher;
 import com.sun.jersey.spi.inject.Injectable;
 import com.sun.jersey.spi.service.ComponentProvider.Scope;
@@ -185,7 +185,7 @@ public class EntityParamDispatchProvider implements ResourceMethodDispatchProvid
         }
     }
 
-    @Context InjectableProviderContext ipc;
+    @Context ServerInjectableProviderContext sipc;
     
     public RequestDispatcher create(AbstractResourceMethod abstractResourceMethod) {
         boolean requireReturnOfRepresentation = false;
@@ -242,7 +242,7 @@ public class EntityParamDispatchProvider implements ResourceMethodDispatchProvid
                         method.getMethod().getParameterAnnotations()[i],
                         requireNoEntityParameter));
             } else {
-                is.add(ipc.getInjectable(parameter, Scope.PerRequest));
+                is.add(sipc.getInjectable(parameter, Scope.PerRequest));
             }
         }
 

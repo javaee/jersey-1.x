@@ -41,8 +41,6 @@ import com.sun.jersey.impl.uri.UriHelper;
 import junit.framework.*;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.LinkedList;
-import java.util.List;
 
 /**
  *

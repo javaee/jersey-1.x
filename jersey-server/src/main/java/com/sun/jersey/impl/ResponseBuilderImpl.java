@@ -37,8 +37,8 @@
 
 package com.sun.jersey.impl;
 
-import com.sun.jersey.impl.util.KeyComparatorHashMap;
-import com.sun.jersey.impl.util.StringIgnoreCaseKeyComparator;
+import com.sun.jersey.core.util.KeyComparatorHashMap;
+import com.sun.jersey.core.util.StringIgnoreCaseKeyComparator;
 import java.lang.reflect.Type;
 import java.net.URI;
 import java.util.ArrayList;

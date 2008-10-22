@@ -37,10 +37,10 @@
 
 package com.sun.jersey.impl.model.method;
 
+import com.sun.jersey.api.MediaTypes;
 import com.sun.jersey.api.core.HttpContext;
 import com.sun.jersey.api.uri.UriTemplate;
 import com.sun.jersey.spi.dispatch.RequestDispatcher;
-import com.sun.jersey.impl.model.MediaTypeHelper;
 import java.util.List;
 import java.util.Map;
 import javax.ws.rs.core.Response;
@@ -76,8 +76,8 @@ public final class ResourceHttpOptionsMethod extends ResourceMethod {
     public ResourceHttpOptionsMethod(Map<String, List<ResourceMethod>> methods) {
         super("OPTIONS",
                 UriTemplate.EMPTY,
-                MediaTypeHelper.GENERAL_MEDIA_TYPE_LIST, 
-                MediaTypeHelper.GENERAL_MEDIA_TYPE_LIST,
+                MediaTypes.GENERAL_MEDIA_TYPE_LIST, 
+                MediaTypes.GENERAL_MEDIA_TYPE_LIST,
                 new OptionsRequestDispatcher(methods));
     }
     

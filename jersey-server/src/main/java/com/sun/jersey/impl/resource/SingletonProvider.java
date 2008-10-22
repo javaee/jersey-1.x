@@ -40,8 +40,8 @@ package com.sun.jersey.impl.resource;
 import com.sun.jersey.api.container.ContainerException;
 import com.sun.jersey.api.core.HttpContext;
 import com.sun.jersey.api.model.AbstractResource;
+import com.sun.jersey.server.impl.inject.ServerInjectableProviderContext;
 import com.sun.jersey.spi.inject.Injectable;
-import com.sun.jersey.spi.inject.InjectableProviderContext;
 import com.sun.jersey.spi.resource.ResourceClassInjector;
 import com.sun.jersey.spi.resource.ResourceConstructor;
 import com.sun.jersey.spi.resource.ResourceProvider;
@@ -55,7 +55,7 @@ import javax.ws.rs.core.Context;
  * A simple provider that maintains a singleton resource class instance
  */
 public final class SingletonProvider implements ResourceProvider {
-    @Context InjectableProviderContext ipc;
+    @Context ServerInjectableProviderContext sipc;
 
     private Object resource;
     
@@ -64,11 +64,11 @@ public final class SingletonProvider implements ResourceProvider {
         Class<?> c = abstractResource.getResourceClass();
         
         ResourceClassInjector rci = new ResourceClassInjector(
-                ipc, 
+                sipc,
                 Scope.Singleton, 
                 abstractResource);
         
-        ResourceConstructor rc = new ResourceConstructor(ipc);
+        ResourceConstructor rc = new ResourceConstructor(sipc);
         ConstructorInjectablePair<?> cip = rc.getConstructor(c, abstractResource, 
                 Scope.Singleton);
         try {

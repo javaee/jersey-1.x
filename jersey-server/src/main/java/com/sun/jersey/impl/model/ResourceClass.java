@@ -52,7 +52,6 @@ import com.sun.jersey.impl.uri.rules.SubLocatorRule;
 import com.sun.jersey.impl.uri.PathPattern;
 import com.sun.jersey.impl.uri.PathTemplate;
 import com.sun.jersey.api.uri.UriTemplate;
-import com.sun.jersey.spi.inject.InjectableProviderContext;
 import com.sun.jersey.impl.application.ResourceMethodDispatcherFactory;
 import com.sun.jersey.impl.template.ViewableRule;
 import com.sun.jersey.impl.uri.rules.CombiningMatchingPatterns;
@@ -62,6 +61,7 @@ import com.sun.jersey.impl.uri.rules.SequentialMatchingPatterns;
 import com.sun.jersey.impl.uri.rules.TerminatingRule;
 import com.sun.jersey.impl.uri.rules.UriRulesFactory;
 import com.sun.jersey.impl.wadl.WadlFactory;
+import com.sun.jersey.server.impl.inject.ServerInjectableProviderContext;
 import com.sun.jersey.spi.resource.ResourceProvider;
 import com.sun.jersey.spi.resource.ResourceProviderFactory;
 import com.sun.jersey.spi.service.ComponentProvider;
@@ -97,7 +97,7 @@ public final class ResourceClass {
             ResourceConfig config,
             ComponentProvider provider,
             ResourceMethodDispatcherFactory df,
-            InjectableProviderContext injectableContext,
+            ServerInjectableProviderContext injectableContext,
             AbstractResource resource,
             WadlFactory wadlFactory) {
         this.resource = resource;
@@ -198,7 +198,7 @@ public final class ResourceClass {
         rmm.put(rm);
     }
 
-    private void processSubResourceLocators(InjectableProviderContext injectableContext,
+    private void processSubResourceLocators(ServerInjectableProviderContext injectableContext,
             RulesMap<UriRule> rulesMap) {
         for (final AbstractSubResourceLocator locator : resource.getSubResourceLocators()) {
             UriTemplate t = new PathTemplate(locator.getPath().getValue());

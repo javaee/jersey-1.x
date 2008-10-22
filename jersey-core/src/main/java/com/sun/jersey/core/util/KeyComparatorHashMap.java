@@ -35,7 +35,7 @@
  * holder.
  */
 
-package com.sun.jersey.impl.util;
+package com.sun.jersey.core.util;
 
 import java.io.IOException;
 import java.io.Serializable;

@@ -35,31 +35,50 @@
  * holder.
  */
 
-package com.sun.jersey.impl.template;
-
-import com.sun.jersey.spi.template.TemplateProcessor;
-import com.sun.jersey.spi.template.TemplateContext;
-import com.sun.jersey.spi.service.ComponentProviderCache;
-import java.util.Set;
-import java.util.logging.Logger;
+package com.sun.jersey.api.container;
 
 /**
+ * Runtime exception to be caught by the container.
+ * <p>
+ * This exception may be thrown by the application signaling that the 
+ * container should handle the exception to produce an appropriate HTTP response.
+ * <p>
+ * This exception may also be thrown by the runtime if an exception  
+ * occurs that should be handled by the container.
  *
  * @author Paul.Sandoz@Sun.Com
  */
-public final class TemplateFactory implements TemplateContext {
-    private static final Logger LOGGER = Logger.getLogger(TemplateFactory.class.getName());
-    
-    private final Set<TemplateProcessor> templates;
-    
-    public TemplateFactory(ComponentProviderCache componentProviderCache) {
-        templates = componentProviderCache.getProvidersAndServices(
-                TemplateProcessor.class);
+public class ContainerException extends RuntimeException {
+
+    /**
+     * Construct a new instance with the supplied message
+     */
+    public ContainerException() {
+        super();
     }
 
-    // TemplateContext
-    
-    public Set<TemplateProcessor> getTemplateProcessors() {
-        return templates;
-    }    
+    /**
+     * Construct a new instance with the supplied message
+     * @param message the message
+     */
+    public ContainerException(String message) {
+        super(message);
+    }
+
+    /**
+     * Construct a new instance with the supplied message and cause
+     * @param message the message
+     * @param cause the Throwable that caused the exception to be thrown
+     */
+    public ContainerException(String message, Throwable cause) {
+        super(message, cause);
+    }
+        
+    /**
+     * Construct a new instance with the supplied cause
+     * @param cause the Throwable that caused the exception to be thrown
+     */
+    public ContainerException(Throwable cause) {
+        super(cause);
+    }
 }

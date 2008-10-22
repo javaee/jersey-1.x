@@ -47,7 +47,6 @@ import com.sun.jersey.api.MediaTypes;
 import com.sun.jersey.api.core.HttpContext;
 import com.sun.jersey.api.model.AbstractResource;
 import com.sun.jersey.api.uri.UriTemplate;
-import com.sun.jersey.impl.model.MediaTypeHelper;
 import com.sun.jersey.impl.model.method.ResourceHttpOptionsMethod;
 import com.sun.jersey.impl.model.method.ResourceMethod;
 import com.sun.research.ws.wadl.Application;
@@ -64,8 +63,8 @@ import com.sun.research.ws.wadl.Resource;
                 AbstractResource resource, String path, WadlGenerator wadlGenerator) {
             super("OPTIONS",
                     UriTemplate.EMPTY,
-                    MediaTypeHelper.GENERAL_MEDIA_TYPE_LIST, 
-                    MediaTypeHelper.GENERAL_MEDIA_TYPE_LIST,
+                    MediaTypes.GENERAL_MEDIA_TYPE_LIST, 
+                    MediaTypes.GENERAL_MEDIA_TYPE_LIST,
                     new WadlOptionsMethodDispatcher(methods, resource, path, wadlGenerator));        
         }
 

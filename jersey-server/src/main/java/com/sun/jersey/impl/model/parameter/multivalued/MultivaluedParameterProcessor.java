@@ -39,7 +39,7 @@ package com.sun.jersey.impl.model.parameter.multivalued;
 
 import com.sun.jersey.api.container.ContainerException;
 import com.sun.jersey.impl.ImplMessages;
-import com.sun.jersey.impl.model.ReflectionHelper;
+import com.sun.jersey.core.reflection.ReflectionHelper;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;

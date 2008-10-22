@@ -41,7 +41,6 @@ import com.sun.jersey.api.client.ClientHandlerException;
 import com.sun.jersey.api.client.ClientRequest;
 import com.sun.jersey.api.client.ClientRequestAdapter;
 import com.sun.jersey.api.client.ClientResponse;
-import com.sun.jersey.api.container.ContainerException;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -167,7 +166,7 @@ public final class LoggingFilter extends ClientFilter {
             printResponseEntity(requestEntity);
             response.setEntityInputStream(new ByteArrayInputStream(requestEntity));
         } catch (IOException ex) {
-            throw new ContainerException(ex);
+            throw new ClientHandlerException(ex);
         }
         prefixId(id).append(NOTIFICATION_PREFIX).
                 append("In-bound response").println();

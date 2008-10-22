@@ -37,10 +37,10 @@
 
 package com.sun.jersey.impl.model.method;
 
+import com.sun.jersey.api.MediaTypes;
 import com.sun.jersey.api.uri.UriTemplate;
 import com.sun.jersey.spi.dispatch.RequestDispatcher;
 import com.sun.jersey.impl.http.header.AcceptableMediaType;
-import com.sun.jersey.impl.model.MediaTypeHelper;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Iterator;
@@ -58,7 +58,7 @@ public abstract class ResourceMethod {
      * Comparator for resource methods, comparing the consumed and produced
      * media types.
      * <p>
-     * Defer to {@link MediaTypeHelper#MEDIA_TYPE_LIST_COMPARATOR} for comparing
+     * Defer to {@link MediaTypes#MEDIA_TYPE_LIST_COMPARATOR} for comparing
      * the list of media type that are comsumed and produced. The comparison of 
      * consumed media take precedence over the comparison of produced 
      * media.
@@ -66,10 +66,10 @@ public abstract class ResourceMethod {
     static public final Comparator<ResourceMethod> COMPARATOR = 
             new Comparator<ResourceMethod>() {
         public int compare(ResourceMethod o1, ResourceMethod o2) {
-            int i = MediaTypeHelper.MEDIA_TYPE_LIST_COMPARATOR.
+            int i = MediaTypes.MEDIA_TYPE_LIST_COMPARATOR.
                     compare(o1.consumeMime, o2.consumeMime);
             if (i == 0)
-                i = MediaTypeHelper.MEDIA_TYPE_LIST_COMPARATOR.
+                i = MediaTypes.MEDIA_TYPE_LIST_COMPARATOR.
                         compare(o1.produceMime, o2.produceMime);
             
             return i;
@@ -160,7 +160,7 @@ public abstract class ResourceMethod {
      * @param accept The list of media types of entities that may be produced. 
      *        This list MUST be ordered with the highest quality acceptable
      *        media type occuring first 
-     *        (see {@link MediaTypeHelper#ACCEPT_MEDIA_TYPE_COMPARATOR}).
+     *        (see {@link MediaTypes#ACCEPT_MEDIA_TYPE_COMPARATOR}).
      * @return the quality of the first acceptable media type in the accept 
      *         list, otherwise -1 if no media types are acceptable.
      */

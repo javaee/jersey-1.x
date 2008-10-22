@@ -35,31 +35,27 @@
  * holder.
  */
 
-package com.sun.jersey.impl.template;
-
-import com.sun.jersey.spi.template.TemplateProcessor;
-import com.sun.jersey.spi.template.TemplateContext;
-import com.sun.jersey.spi.service.ComponentProviderCache;
-import java.util.Set;
-import java.util.logging.Logger;
+package com.sun.jersey.core.util;
 
 /**
+ * Case insensitive String key comparator.
  *
  * @author Paul.Sandoz@Sun.Com
  */
-public final class TemplateFactory implements TemplateContext {
-    private static final Logger LOGGER = Logger.getLogger(TemplateFactory.class.getName());
+public class StringIgnoreCaseKeyComparator implements KeyComparator<String> {
+    public static final StringIgnoreCaseKeyComparator SINGLETON = 
+            new StringIgnoreCaseKeyComparator();
     
-    private final Set<TemplateProcessor> templates;
-    
-    public TemplateFactory(ComponentProviderCache componentProviderCache) {
-        templates = componentProviderCache.getProvidersAndServices(
-                TemplateProcessor.class);
+    public int hash(String k) {
+        return k.toLowerCase().hashCode();
     }
 
-    // TemplateContext
+    public boolean equals(String x, String y) {
+        return x.equalsIgnoreCase(y);
+    }
     
-    public Set<TemplateProcessor> getTemplateProcessors() {
-        return templates;
-    }    
+    public int compare(String o1, String o2) {
+        return o1.compareToIgnoreCase(o2);
+    }
+        
 }

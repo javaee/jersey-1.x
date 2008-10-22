@@ -39,6 +39,7 @@ package com.sun.jersey.impl.application;
 import com.sun.jersey.api.core.DefaultResourceConfig;
 import com.sun.jersey.spi.container.ContainerRequestFilter;
 import com.sun.jersey.spi.container.ContainerResponseFilter;
+import com.sun.jersey.spi.service.ComponentProviderCache;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;

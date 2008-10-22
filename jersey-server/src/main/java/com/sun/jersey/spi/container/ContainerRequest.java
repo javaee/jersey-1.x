@@ -42,7 +42,7 @@ import com.sun.jersey.api.container.MappableContainerException;
 import com.sun.jersey.api.core.HttpRequestContext;
 import com.sun.jersey.api.representation.Form;
 import com.sun.jersey.api.uri.UriComponent;
-import com.sun.jersey.impl.MultivaluedMapImpl;
+import com.sun.jersey.api.MultivaluedMapImpl;
 import com.sun.jersey.impl.VariantSelector;
 import com.sun.jersey.impl.http.header.AcceptableLanguageTag;
 import com.sun.jersey.impl.http.header.HttpHeaderFactory;

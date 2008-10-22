@@ -35,7 +35,7 @@
  * holder.
  */
 
-package com.sun.jersey.impl;
+package com.sun.jersey.api;
 
 import java.lang.reflect.Constructor;
 import java.util.ArrayList;
@@ -45,7 +45,9 @@ import java.util.List;
 import javax.ws.rs.core.MultivaluedMap;
 
 /**
- *
+ * An implementation of {@link MultivaluedMap} where values are instances
+ * of String.
+ * 
  * @author Paul.Sandoz@Sun.Com
  */
 public class MultivaluedMapImpl 

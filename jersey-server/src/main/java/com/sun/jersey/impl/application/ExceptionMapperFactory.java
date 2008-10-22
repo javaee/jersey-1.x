@@ -36,7 +36,8 @@
  */
 package com.sun.jersey.impl.application;
 
-import com.sun.jersey.impl.model.ReflectionHelper;
+import com.sun.jersey.core.reflection.ReflectionHelper;
+import com.sun.jersey.spi.service.ComponentProviderCache;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;

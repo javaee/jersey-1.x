@@ -37,9 +37,8 @@
 
 package com.sun.jersey.impl.model;
 
+import com.sun.jersey.api.MediaTypes;
 import com.sun.jersey.api.core.HttpRequestContext;
-import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.core.MediaType;
 import com.sun.jersey.impl.ImplMessages;
 import com.sun.jersey.impl.http.header.AcceptableLanguageTag;
 import com.sun.jersey.impl.http.header.AcceptableMediaType;
@@ -48,6 +47,8 @@ import com.sun.jersey.impl.http.header.HttpHeaderFactory;
 import java.util.Collections;
 import java.util.List;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.MediaType;
 
 /**
  * Helper classes for HTTP.
@@ -101,14 +102,14 @@ public final class HttpHelper {
      * @param request The HTTP request.
      * @return The list of MediaType. This list
      *         is ordered with the highest quality acceptable Media type occuring first
-     *         (see {@link MediaTypeHelper#ACCEPT_MEDIA_TYPE_COMPARATOR}).
+     *         (see {@link MediaTypes#ACCEPT_MEDIA_TYPE_COMPARATOR}).
      *         If no "Accept" is present then a list with a single item of the Media
      *         type "*\\/*" is returned.
      */
     public static List<AcceptableMediaType> getAccept(HttpRequestContext request) {
         final String accept = request.getHeaderValue("Accept");
         if (accept == null || accept.length() == 0) {
-            return MediaTypeHelper.GENERAL_ACCEPT_MEDIA_TYPE_LIST;
+            return MediaTypes.GENERAL_ACCEPT_MEDIA_TYPE_LIST;
         }
         try {
             return HttpHeaderFactory.createAcceptMediaType(accept);
@@ -186,7 +187,7 @@ public final class HttpHelper {
      * @param contentType The Media type.
      * @param accept The list of Media types of entities that may be produced. This list
      *        MUST be ordered with the highest quality acceptable Media type occuring first
-     *        (see {@link MediaTypeHelper#ACCEPT_MEDIA_TYPE_COMPARATOR}).
+     *        (see {@link MediaTypes#ACCEPT_MEDIA_TYPE_COMPARATOR}).
      * @return true if the Media type can be produced, otherwise false.
      */
     public static boolean produces(MediaType contentType, List<MediaType> accept) {

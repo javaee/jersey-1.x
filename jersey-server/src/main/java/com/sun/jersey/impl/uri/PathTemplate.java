@@ -35,34 +35,41 @@
  * holder.
  */
 
-package com.sun.jersey.impl;
+package com.sun.jersey.impl.uri;
 
-import java.lang.reflect.InvocationHandler;
-import java.lang.reflect.Method;
-
+import com.sun.jersey.api.uri.UriComponent;
+import com.sun.jersey.api.uri.UriTemplate;
+import com.sun.jersey.api.uri.UriTemplateParser;
 
 /**
- * A proxy invocation handler that delegates all methods to a thread
- * local instance
+ * A URI template for a URI path.
+ * 
+ * @author Paul.Sandoz@Sun.Com
  */
-public class ThreadLocalInvoker<T> implements InvocationHandler {
-    private ThreadLocal<T> threadLocalInstance = new ThreadLocal<T>();
-    
-    public void set(T threadLocalInstance) {
-        this.threadLocalInstance.set(threadLocalInstance);
+public final class PathTemplate extends UriTemplate {
+
+    private static final class PathTemplateParser extends UriTemplateParser {
+        PathTemplateParser(String path) {
+            super(path);
+        }
+        
+        @Override
+        protected String encodeLiteralCharacters(String literalCharacters) {
+            return UriComponent.contextualEncode(literalCharacters, UriComponent.Type.PATH);
+        }
     }
-    
-    public T get() {
-        return this.threadLocalInstance.get();
+
+    /**
+     * Create a URI path template and encode (percent escape) any characters 
+     * of the template that are not valid URI characters.
+     * 
+     * @param template the URI path template
+     */
+    public PathTemplate(String path) {
+        super(new PathTemplateParser(prefixWithSlash(path)));
     }
-    
-    public ThreadLocal<T> getThreadLocal() {
-        return threadLocalInstance;
-    }
-    
-    public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-        if (threadLocalInstance.get() == null)
-            throw new IllegalStateException();
-        return method.invoke(threadLocalInstance.get(), args);
+        
+    private static String prefixWithSlash(String path) {
+        return (!path.startsWith("/")) ? "/" + path : path;
     }
 }

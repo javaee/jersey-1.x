@@ -37,7 +37,6 @@
 
 package com.sun.jersey.spi.inject;
 
-import com.sun.jersey.api.model.Parameter;
 import com.sun.jersey.spi.service.ComponentContext;
 import com.sun.jersey.spi.service.ComponentProvider.Scope;
 import java.lang.annotation.Annotation;
@@ -92,25 +91,4 @@ public interface InjectableProviderContext {
             A a,
             C c,
             List<Scope> s);
-    
-    /**
-     * Get an injectable given a parameter.
-     * 
-     * @param p the parameter.
-     * @param s the scope for which the injectable will be used
-     * @return the injectable, otherwise null if an injectable could
-     *         not be found.
-     */
-    Injectable getInjectable(Parameter p, Scope s);
-    
-    /**
-     * Get a list of injectable given a list of parameter.
-     * 
-     * @param ps the list of parameter.
-     * @param s the scope for which the injectable will be used
-     * @return the list of injectable, if an injectable for a parameter
-     *         could not be found the corresponding element in the 
-     *         list will be null.
-     */
-    List<Injectable> getInjectable(List<Parameter> ps, Scope s);
 }

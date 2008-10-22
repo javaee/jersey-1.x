@@ -43,7 +43,7 @@ import com.sun.jersey.api.model.AbstractField;
 import com.sun.jersey.api.model.AbstractResource;
 import com.sun.jersey.api.model.AbstractSetterMethod;
 import com.sun.jersey.api.model.Parameter;
-import com.sun.jersey.impl.application.InjectableProviderFactory.AccessibleObjectContext;
+import com.sun.jersey.spi.service.AccessibleObjectContext;
 import com.sun.jersey.spi.inject.Injectable;
 import com.sun.jersey.spi.service.ComponentProvider.Scope;
 import java.lang.reflect.Field;

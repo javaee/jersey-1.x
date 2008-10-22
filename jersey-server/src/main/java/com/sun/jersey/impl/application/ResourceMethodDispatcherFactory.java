@@ -41,11 +41,9 @@ import com.sun.jersey.api.model.AbstractResourceMethod;
 import com.sun.jersey.impl.ImplMessages;
 import com.sun.jersey.impl.model.method.dispatch.ResourceMethodDispatchProvider;
 import com.sun.jersey.spi.dispatch.RequestDispatcher;
-import com.sun.jersey.spi.service.ServiceFinder;
-import com.sun.jersey.spi.template.TemplateProcessor;
+import com.sun.jersey.spi.service.ComponentProviderCache;
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.util.LinkedList;
 import java.util.Set;
 import java.util.logging.Logger;
 

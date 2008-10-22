@@ -36,6 +36,9 @@
  */
 package com.sun.jersey.impl.modelapi.annotation;
 
+import com.sun.jersey.core.reflection.AnnotatedMethod;
+import com.sun.jersey.core.reflection.MethodList;
+import com.sun.jersey.api.MediaTypes;
 import com.sun.jersey.api.model.AbstractField;
 import com.sun.jersey.api.model.AbstractResource;
 import com.sun.jersey.api.model.AbstractResourceConstructor;
@@ -48,7 +51,6 @@ import com.sun.jersey.api.model.Parameter.Source;
 import com.sun.jersey.api.model.Parameterized;
 import com.sun.jersey.api.model.PathValue;
 import com.sun.jersey.impl.ImplMessages;
-import com.sun.jersey.impl.model.MediaTypeHelper;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
@@ -148,7 +150,7 @@ public class IntrospectionModeller {
             consumeMimeAnnotation = am.getAnnotation(Consumes.class);
         
         resourceMethod.getSupportedInputTypes().addAll(
-                MediaTypeHelper.createMediaTypes(consumeMimeAnnotation));
+                MediaTypes.createMediaTypes(consumeMimeAnnotation));
     }
 
     private static final void addProduces(
@@ -160,7 +162,7 @@ public class IntrospectionModeller {
             produceMimeAnnotation = am.getAnnotation(Produces.class);
 
         resourceMethod.getSupportedOutputTypes().addAll(
-                MediaTypeHelper.createMediaTypes(produceMimeAnnotation));
+                MediaTypes.createMediaTypes(produceMimeAnnotation));
     }
 
     private static final void workOutConstructorsList(

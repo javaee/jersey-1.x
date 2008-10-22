@@ -37,7 +37,6 @@
 
 package com.sun.jersey.impl.container.servlet;
 
-import com.sun.jersey.impl.ThreadLocalInvoker;
 import java.lang.reflect.Method;
 import javax.naming.Context;
 import javax.naming.InitialContext;

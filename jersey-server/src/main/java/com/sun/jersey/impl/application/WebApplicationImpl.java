@@ -100,6 +100,8 @@ import com.sun.jersey.impl.uri.rules.RightHandPathRule;
 import com.sun.jersey.impl.uri.rules.RootResourceClassesRule;
 import com.sun.jersey.impl.wadl.WadlFactory;
 import com.sun.jersey.impl.wadl.WadlResource;
+import com.sun.jersey.server.impl.inject.ServerInjectableProviderContext;
+import com.sun.jersey.server.impl.inject.ServerInjectableProviderFactory;
 import com.sun.jersey.spi.MessageBodyWorkers;
 import com.sun.jersey.spi.container.ContainerRequest;
 import com.sun.jersey.spi.container.ContainerRequestFilter;
@@ -107,15 +109,19 @@ import com.sun.jersey.spi.container.ContainerResponse;
 import com.sun.jersey.spi.container.ContainerResponseFilter;
 import com.sun.jersey.spi.container.ContainerResponseWriter;
 import com.sun.jersey.spi.container.WebApplication;
+import com.sun.jersey.core.spi.factory.ContextResolverFactory;
+import com.sun.jersey.core.spi.factory.MessageBodyFactory;
 import com.sun.jersey.spi.inject.Inject;
 import com.sun.jersey.spi.inject.Injectable;
 import com.sun.jersey.spi.inject.InjectableProvider;
 import com.sun.jersey.spi.inject.SingletonTypeInjectableProvider;
 import com.sun.jersey.spi.inject.InjectableProviderContext;
 import com.sun.jersey.spi.resource.ResourceProviderFactory;
+import com.sun.jersey.spi.service.AccessibleObjectContext;
 import com.sun.jersey.spi.service.ComponentContext;
 import com.sun.jersey.spi.service.ComponentProvider;
 import com.sun.jersey.spi.service.ComponentProvider.Scope;
+import com.sun.jersey.spi.service.ComponentProviderCache;
 import com.sun.jersey.spi.template.TemplateContext;
 import com.sun.jersey.spi.uri.rules.UriRule;
 import java.lang.annotation.Annotation;
@@ -147,7 +153,7 @@ public final class WebApplicationImpl implements WebApplication {
     
     private RootResourceClassesRule rootsRule;
     
-    private InjectableProviderFactory injectableFactory;
+    private ServerInjectableProviderFactory injectableFactory;
     
     private MessageBodyFactory bodyFactory;
     
@@ -186,9 +192,11 @@ public final class WebApplicationImpl implements WebApplication {
         };
         
         // Create injectable provider factory
-        this.injectableFactory = new InjectableProviderFactory(); 
+        this.injectableFactory = new ServerInjectableProviderFactory();
         injectableFactory.add(new ContextInjectableProvider<InjectableProviderContext>(
                 InjectableProviderContext.class, injectableFactory));
+        injectableFactory.add(new ContextInjectableProvider<ServerInjectableProviderContext>(
+                ServerInjectableProviderContext.class, injectableFactory));
         
         // Add proxied injectables
         final Map<Type, Object> m = new HashMap<Type, Object>();
@@ -552,8 +560,8 @@ public final class WebApplicationImpl implements WebApplication {
                         if (!(c instanceof Class))
                             return null;
                         
-                        final InjectableProviderFactory.AccessibleObjectContext aic = 
-                                new InjectableProviderFactory.AccessibleObjectContext(
+                        final AccessibleObjectContext aic =
+                                new AccessibleObjectContext(
                                 ic.getAccesibleObject(), ic.getAnnotations());
                         return new Injectable<Object>() {
                             public Object getValue(HttpContext context) {

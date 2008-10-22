@@ -35,7 +35,7 @@
  * holder.
  */
 
-package com.sun.jersey.impl;
+package com.sun.jersey.impl.provider;
 
 import java.util.ArrayList;
 import java.util.List;

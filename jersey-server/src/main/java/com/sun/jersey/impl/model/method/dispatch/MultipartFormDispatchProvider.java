@@ -209,7 +209,7 @@ public class MultipartFormDispatchProvider extends FormDispatchProvider {
             } else if (p.getAnnotation().annotationType() == FormParam.class) {
                 is.add(new MultipartFormParamInjectable(mbws, p));
             } else {
-                Injectable injectable = ipc.getInjectable(p, Scope.PerRequest);
+                Injectable injectable = sipc.getInjectable(p, Scope.PerRequest);
                 is.add(injectable);
             }
         }

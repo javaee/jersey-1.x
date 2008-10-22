@@ -36,7 +36,6 @@
  */
 package com.sun.jersey.spi.service;
 
-import com.sun.jersey.impl.application.InjectableProviderFactory.AnnotationObjectContext;
 import com.sun.jersey.spi.inject.Injectable;
 import com.sun.jersey.spi.inject.InjectableProviderContext;
 import com.sun.jersey.spi.service.ComponentProvider.Scope;

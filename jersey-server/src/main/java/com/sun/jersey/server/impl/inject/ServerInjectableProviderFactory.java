@@ -34,57 +34,62 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-package com.sun.jersey.spi.resource;
+package com.sun.jersey.server.impl.inject;
 
-import com.sun.jersey.api.model.AbstractResource;
-import com.sun.jersey.api.model.AbstractResourceConstructor;
-import com.sun.jersey.server.impl.inject.ServerInjectableProviderContext;
+import com.sun.jersey.api.model.Parameter;
 import com.sun.jersey.spi.inject.Injectable;
-import com.sun.jersey.spi.service.ComponentConstructor;
+import com.sun.jersey.spi.service.ComponentContext;
+import com.sun.jersey.core.spi.factory.InjectableProviderFactory;
+import com.sun.jersey.spi.service.AnnotationObjectContext;
 import com.sun.jersey.spi.service.ComponentProvider.Scope;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.SortedSet;
-import java.util.TreeSet;
+import java.util.logging.Logger;
 
 /**
- * A utility class to obtain the most suitable constructor for a 
- * resource class.
- * 
+ *
  * @author Paul.Sandoz@Sun.Com
  */
-public class ResourceConstructor extends ComponentConstructor {
-    private final ServerInjectableProviderContext sipc;
-
-    public ResourceConstructor(ServerInjectableProviderContext sipc) {
-        super(sipc);
-        this.sipc = sipc;
-    }
-
-    /**
-     * Get the most suitable constructor. The constructor with the most
-     * parameters and that has the most parameters associated with 
-     * Injectable instances will be chosen.
-     * 
-     * @param <T> the type of the resource.
-     * @param c the class to instantiate.
-     * @param ar the abstract resource.
-     * @param s the scope for which the injectables will be used.
-     * @return a list constructor and list of injectables for the constructor
-     *         parameters.
-     */
-    @SuppressWarnings("unchecked")
-    public <T> ConstructorInjectablePair<T> getConstructor(Class<T> c, AbstractResource ar,
-            Scope s) {
-        if (ar.getConstructors().isEmpty())
-            return null;
+public final class ServerInjectableProviderFactory extends InjectableProviderFactory
+            implements ServerInjectableProviderContext {
+    
+    private static final Logger LOGGER = Logger.getLogger(ServerInjectableProviderFactory.class.getName());    
         
-        SortedSet<ConstructorInjectablePair<T>> cs = new TreeSet<ConstructorInjectablePair<T>>(
-                new ConstructorComparator());        
-        for (AbstractResourceConstructor arc : ar.getConstructors()) {
-            List<Injectable> is = sipc.getInjectable(arc.getParameters(), s);
-            cs.add(new ConstructorInjectablePair<T>(arc.getCtor(), is));
+    public Injectable getInjectable(Parameter p, Scope s) {
+        if (p.getAnnotation() == null) return null;
+        
+        ComponentContext ic = new AnnotationObjectContext(p.getAnnotations());
+        
+        if (s == Scope.PerRequest) {
+            // Find a per request injectable with Parameter
+            Injectable i = getInjectable(p.getAnnotation().annotationType(), ic, p.getAnnotation(), 
+                    p, Scope.PerRequest);
+            if (i != null) return i;
+
+            // Find a per request, undefined or singleton injectable with parameter Type
+            return getInjectable(
+                    p.getAnnotation().annotationType(), 
+                    ic, 
+                    p.getAnnotation(), 
+                    p.getParameterType(),
+                    Scope.PERREQUEST_UNDEFINED_SINGLETON
+                    );
+        } else {
+            // Find a undefined or singleton injectable with parameter Type
+            return getInjectable(
+                    p.getAnnotation().annotationType(), 
+                    ic, 
+                    p.getAnnotation(), 
+                    p.getParameterType(),
+                    Scope.UNDEFINED_SINGLETON
+                    );            
         }
-                
-        return cs.first();        
     }
- }
+    
+    public List<Injectable> getInjectable(List<Parameter> ps, Scope s) {
+        List<Injectable> is = new ArrayList<Injectable>();
+        for (Parameter p : ps)
+            is.add(getInjectable(p, s));
+        return is;
+    }
+}

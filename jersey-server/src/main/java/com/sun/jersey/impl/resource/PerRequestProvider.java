@@ -41,7 +41,7 @@ import com.sun.jersey.api.container.ContainerException;
 import com.sun.jersey.api.container.MappableContainerException;
 import com.sun.jersey.api.core.HttpContext;
 import com.sun.jersey.api.model.AbstractResource;
-import com.sun.jersey.spi.inject.InjectableProviderContext;
+import com.sun.jersey.server.impl.inject.ServerInjectableProviderContext;
 import com.sun.jersey.spi.resource.ResourceClassInjector;
 import com.sun.jersey.spi.inject.Injectable;
 import com.sun.jersey.spi.resource.ResourceConstructor;
@@ -63,7 +63,7 @@ import javax.ws.rs.core.Context;
  * @author Konstantin Bulenkov
  */
 public final class PerRequestProvider implements ResourceProvider {
-    @Context InjectableProviderContext ipc;
+    @Context ServerInjectableProviderContext sipc;
 
     private Class<?> c;
     
@@ -77,10 +77,10 @@ public final class PerRequestProvider implements ResourceProvider {
             ComponentProvider resourceProvider, AbstractResource abstractResource) {
         this.c = abstractResource.getResourceClass();
         
-        this.rci = new ResourceClassInjector(ipc, Scope.PerRequest, 
+        this.rci = new ResourceClassInjector(sipc, Scope.PerRequest,
                 abstractResource);
                 
-        ResourceConstructor rc = new ResourceConstructor(ipc);
+        ResourceConstructor rc = new ResourceConstructor(sipc);
         ConstructorInjectablePair<?> cip = rc.getConstructor(c, abstractResource, 
                 Scope.PerRequest);
         if (cip == null || cip.is.size() == 0) {
