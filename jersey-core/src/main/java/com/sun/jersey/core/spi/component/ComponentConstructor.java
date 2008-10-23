@@ -34,10 +34,11 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-package com.sun.jersey.spi.service;
+package com.sun.jersey.core.spi.component;
 
 import com.sun.jersey.spi.inject.Injectable;
 import com.sun.jersey.spi.inject.InjectableProviderContext;
+import com.sun.jersey.spi.service.AnnotationObjectContext;
 import com.sun.jersey.spi.service.ComponentProvider.Scope;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
@@ -56,14 +57,14 @@ import java.util.TreeSet;
  *
  * @author Paul.Sandoz@Sun.Com
  */
-public class ComponentConstructor {
+public class ComponentConstructor<T> {
     /**
      * A tuple of a constructor and the list of injectables associated with
      * the parameters of the constructor.
      * 
      * @param <T> the type to construct.
      */
-    public static class ConstructorInjectablePair<T> {
+    protected static class ConstructorInjectablePair<T> {
         /**
          * The constructor.
          */
@@ -87,7 +88,7 @@ public class ComponentConstructor {
         }
     }
     
-    public static class ConstructorComparator<T> implements Comparator<ConstructorInjectablePair<T>> {
+    protected static class ConstructorComparator<T> implements Comparator<ConstructorInjectablePair<T>> {
         public int compare(ConstructorInjectablePair<T> o1, ConstructorInjectablePair<T> o2) {
             int p = Collections.frequency(o1.is, null) - Collections.frequency(o2.is, null);
             if (p != 0)
@@ -99,15 +100,36 @@ public class ComponentConstructor {
     
     protected final InjectableProviderContext ipc;
 
+    protected final Class<T> c;
+    
     /**
      * Create a component constructor with the injectable provider context.
      *
      * @param ipc the injectable provider context.
+     * @param c
      */
-    public ComponentConstructor(InjectableProviderContext ipc) {
+    public ComponentConstructor(InjectableProviderContext ipc, Class<T> c) {
         this.ipc = ipc;
+        this.c = c;
     }
-    
+
+    public T getInstance()
+            throws InstantiationException, IllegalAccessException,
+            IllegalArgumentException, InvocationTargetException {
+        ConstructorInjectablePair<T> cip = getConstructor();
+        if (cip == null || cip.is.size() == 0) {
+            return c.newInstance();
+        } else {
+            Object[] params = new Object[cip.is.size()];
+            int i = 0;
+            for (Injectable injectable : cip.is) {
+                if (injectable != null)
+                    params[i++] = injectable.getValue();
+            }
+            return cip.con.newInstance(params);
+        }
+    }
+
     /**
      * Get the most suitable constructor. The constructor with the most
      * parameters and that has the most parameters associated with 
@@ -118,8 +140,7 @@ public class ComponentConstructor {
      * @return a list of constructor and list of injectables for the constructor 
      *         parameters.
      */
-    @SuppressWarnings("unchecked")
-    public <T> ConstructorInjectablePair<T> getConstructor(Class<T> c) {
+    private ConstructorInjectablePair<T> getConstructor() {
         if (c.getConstructors().length == 0)
             return null;
         
@@ -146,22 +167,5 @@ public class ComponentConstructor {
         }
                 
         return cs.first();
-    }
-
-    public <T> T getInstance(Class<T> c)
-            throws InstantiationException, IllegalAccessException,
-            IllegalArgumentException, InvocationTargetException {
-        ConstructorInjectablePair<T> cip = getConstructor(c);
-        if (cip == null || cip.is.size() == 0) {
-            return c.newInstance();
-        } else {
-            Object[] params = new Object[cip.is.size()];
-            int i = 0;
-            for (Injectable injectable : cip.is) {
-                if (injectable != null)
-                    params[i++] = injectable.getValue();
-            }
-            return cip.con.newInstance(params);
-        }
     }
 }

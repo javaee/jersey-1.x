@@ -1,9 +1,9 @@
 /*
  *
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
- * 
+ *
  * Copyright 1997-2007 Sun Microsystems, Inc. All rights reserved.
- * 
+ *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
  * and Distribution License("CDDL") (collectively, the "License").  You
@@ -11,7 +11,7 @@
  * a copy of the License at https://jersey.dev.java.net/CDDL+GPL.html
  * or jersey/legal/LICENSE.txt.  See the License for the specific
  * language governing permissions and limitations under the License.
- * 
+ *
  * When distributing the software, include this License Header Notice in each
  * file and include the License file at jersey/legal/LICENSE.txt.
  * Sun designates this particular file as subject to the "Classpath" exception
@@ -20,9 +20,9 @@
  * Header, with the fields enclosed by brackets [] replaced by your own
  * identifying information: "Portions Copyrighted [year]
  * [name of copyright owner]"
- * 
+ *
  * Contributor(s):
- * 
+ *
  * If you wish your version of this file to be governed by only the CDDL or
  * only the GPL Version 2, indicate your decision by adding "[Contributor]
  * elects to include this software in this distribution under the [CDDL or GPL
@@ -34,59 +34,32 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
+package com.sun.jersey.core.spi.component;
 
-package com.sun.jersey.impl.application;
-
-import com.sun.jersey.api.model.AbstractResourceMethod;
-import com.sun.jersey.core.spi.component.ProviderServices;
-import com.sun.jersey.impl.ImplMessages;
-import com.sun.jersey.impl.model.method.dispatch.ResourceMethodDispatchProvider;
-import com.sun.jersey.spi.dispatch.RequestDispatcher;
-import java.io.PrintWriter;
-import java.io.StringWriter;
-import java.util.Set;
-import java.util.logging.Logger;
+import com.sun.jersey.spi.inject.InjectableProviderContext;
+import com.sun.jersey.spi.service.ComponentProvider.Scope;
+import java.lang.reflect.InvocationTargetException;
 
 /**
  *
  * @author Paul.Sandoz@Sun.Com
  */
-public final class ResourceMethodDispatcherFactory {
-    private static final Logger LOGGER = Logger.getLogger(ResourceMethodDispatcherFactory.class.getName());
+public class IoCProviderComponentProviderFactory extends ProviderComponentProviderFactory {
+
+    private final com.sun.jersey.spi.service.ComponentProvider cp;
     
-    private final Set<ResourceMethodDispatchProvider> dispatchers;
-    
-    public ResourceMethodDispatcherFactory(ProviderServices providerServices) {
-        dispatchers = providerServices.getProvidersAndServices(
-                ResourceMethodDispatchProvider.class);
+    public IoCProviderComponentProviderFactory(
+            InjectableProviderContext ipc,
+            com.sun.jersey.spi.service.ComponentProvider cp) {
+        super(ipc);
+        this.cp = cp;
     }
 
-    // TemplateContext
-    
-    public Set<ResourceMethodDispatchProvider> getDispatchers() {
-        return dispatchers;
-    }
-    
-    public RequestDispatcher getDispatcher(AbstractResourceMethod abstractResourceMethod) {
-        for (ResourceMethodDispatchProvider rmdp : dispatchers) {
-            try {
-                RequestDispatcher d = rmdp.create(abstractResourceMethod);
-                if (d != null)
-                    return d;
-            } catch (Exception e) {
-                StringWriter sw = new StringWriter();
-                
-                sw.write(ImplMessages.ERROR_PROCESSING_METHOD(
-                        abstractResourceMethod.getMethod(), 
-                        rmdp.getClass().getName()));
-                PrintWriter pw = new PrintWriter(sw);
-                e.printStackTrace(pw);
-                pw.flush();
-                
-                LOGGER.severe(sw.toString());
-            }
-        }
-        
-        return null;        
+    @Override
+    protected Object getInstance(Class c)
+            throws InstantiationException, IllegalAccessException,
+            IllegalArgumentException, InvocationTargetException {
+        Object o = cp.getInstance(Scope.Singleton, c);
+        return (o != null) ? o : super.getInstance(c);
     }
 }

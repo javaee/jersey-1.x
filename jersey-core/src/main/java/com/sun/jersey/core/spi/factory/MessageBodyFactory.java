@@ -38,10 +38,10 @@
 package com.sun.jersey.core.spi.factory;
 
 import com.sun.jersey.api.MediaTypes;
+import com.sun.jersey.core.spi.component.ProviderServices;
 import com.sun.jersey.core.util.KeyComparator;
 import com.sun.jersey.core.util.KeyComparatorHashMap;
 import com.sun.jersey.spi.MessageBodyWorkers;
-import com.sun.jersey.spi.service.ComponentProviderCache;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
@@ -76,7 +76,7 @@ public final class MessageBodyFactory implements MessageBodyWorkers {
         }        
     };
     
-    private final ComponentProviderCache componentProviderCache;
+    private final ProviderServices providerServices;
     
     private Map<MediaType, List<MessageBodyReader>> readerProviders;
     
@@ -95,8 +95,8 @@ public final class MessageBodyFactory implements MessageBodyWorkers {
         }
     }
     
-    public MessageBodyFactory(ComponentProviderCache componentProviderCache) {
-        this.componentProviderCache = componentProviderCache;
+    public MessageBodyFactory(ProviderServices providerServices) {
+        this.providerServices = providerServices;
     }
      
     public void init() {
@@ -113,7 +113,7 @@ public final class MessageBodyFactory implements MessageBodyWorkers {
                 MEDIA_TYPE_COMPARATOR);
         this.writerListProviders = new ArrayList<MessageBodyWriterPair>();
         
-        for (MessageBodyWriter provider : componentProviderCache.getProvidersAndServices(MessageBodyWriter.class)) {
+        for (MessageBodyWriter provider : providerServices.getProvidersAndServices(MessageBodyWriter.class)) {
             MediaType values[] = getAnnotationValues(provider.getClass(), Produces.class);
             if (values == null)
                 getClassCapability(writerProviders, provider, MediaTypes.GENERAL_MEDIA_TYPE);
@@ -131,7 +131,7 @@ public final class MessageBodyFactory implements MessageBodyWorkers {
         Map<MediaType, List<T>> s = new KeyComparatorHashMap<MediaType, List<T>>(
                 MEDIA_TYPE_COMPARATOR);
         
-        for (T provider : componentProviderCache.getProvidersAndServices(serviceClass)) {
+        for (T provider : providerServices.getProvidersAndServices(serviceClass)) {
             MediaType values[] = getAnnotationValues(provider.getClass(), annotationClass);
             if (values == null)
                 getClassCapability(s, provider, MediaTypes.GENERAL_MEDIA_TYPE);

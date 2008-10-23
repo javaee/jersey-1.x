@@ -37,7 +37,7 @@
 package com.sun.jersey.impl.application;
 
 import com.sun.jersey.core.reflection.ReflectionHelper;
-import com.sun.jersey.spi.service.ComponentProviderCache;
+import com.sun.jersey.core.spi.component.ProviderServices;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
@@ -63,8 +63,8 @@ public class ExceptionMapperFactory {
 
     private Set<ExceptionMapperType> emts = new HashSet<ExceptionMapperType>();
     
-    public ExceptionMapperFactory(ComponentProviderCache componentProviderCache) {
-        for (ExceptionMapper em : componentProviderCache.getProviders(ExceptionMapper.class)) {
+    public ExceptionMapperFactory(ProviderServices providerServices) {
+        for (ExceptionMapper em : providerServices.getProviders(ExceptionMapper.class)) {
             Class<? extends Throwable> c = getExceptionType(em.getClass());
             if (c != null) {
                 emts.add(new ExceptionMapperType(em, c));

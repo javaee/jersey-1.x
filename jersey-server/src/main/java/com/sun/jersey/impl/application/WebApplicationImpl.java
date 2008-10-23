@@ -79,6 +79,9 @@ import com.sun.jersey.api.model.AbstractResource;
 import com.sun.jersey.api.model.ResourceModelIssue;
 import com.sun.jersey.api.core.ExtendedUriInfo;
 import com.sun.jersey.api.uri.UriTemplate;
+import com.sun.jersey.core.spi.component.IoCProviderComponentProviderFactory;
+import com.sun.jersey.core.spi.component.ProviderComponentProviderFactory;
+import com.sun.jersey.core.spi.component.ProviderServices;
 import com.sun.jersey.impl.ImplMessages;
 import com.sun.jersey.impl.ThreadLocalHttpContext;
 import com.sun.jersey.impl.model.ResourceClass;
@@ -121,7 +124,6 @@ import com.sun.jersey.spi.service.AccessibleObjectContext;
 import com.sun.jersey.spi.service.ComponentContext;
 import com.sun.jersey.spi.service.ComponentProvider;
 import com.sun.jersey.spi.service.ComponentProvider.Scope;
-import com.sun.jersey.spi.service.ComponentProviderCache;
 import com.sun.jersey.spi.template.TemplateContext;
 import com.sun.jersey.spi.uri.rules.UriRule;
 import java.lang.annotation.Annotation;
@@ -159,6 +161,8 @@ public final class WebApplicationImpl implements WebApplication {
     
     private ComponentProvider provider;
     
+    private ProviderComponentProviderFactory componentProviderFactory;
+
     private ComponentProvider resourceProvider;
     
     private TemplateContext templateContext;
@@ -360,7 +364,7 @@ public final class WebApplicationImpl implements WebApplication {
             return o;
         }
 
-        public <T> T getInstance(ComponentContext cc, Scope scope, Class<T> c) 
+        public <T> T getInstance(ComponentContext cc, Scope scope, Class<T> c)
                 throws InstantiationException, IllegalAccessException {
             T o = cp.getInstance(cc, scope, c);
             if (o == null) {
@@ -371,7 +375,7 @@ public final class WebApplicationImpl implements WebApplication {
             }
             return o;
         }
-        
+
         public <T> T getInjectableInstance(T instance) {
             return cp.getInjectableInstance(instance);
         }
@@ -515,12 +519,16 @@ public final class WebApplicationImpl implements WebApplication {
         // Validate the resource config
         resourceConfig.validate();
 
-        // Set up the component provider to be
-        // used with non-resource class components
         this.provider = (_provider == null)
                 ? new DefaultComponentProvider()
                 : new AdaptingComponentProvider(_provider);
         
+        // Set up the component provider factory to be
+        // used with non-resource class components
+        this.componentProviderFactory = (_provider == null)
+                ? new ProviderComponentProviderFactory(injectableFactory)
+                : new IoCProviderComponentProviderFactory(injectableFactory, _provider);
+
         // Set up the resource component provider to be
         // used with resource class components
         this.resourceProvider = (_provider == null)
@@ -542,11 +550,11 @@ public final class WebApplicationImpl implements WebApplication {
             }
         };
 
-        ComponentProviderCache cpc = new ComponentProviderCache(
-                    this.injectableFactory,
-                    this.provider,
-                    resourceConfig.getProviderClasses(),
-                    resourceConfig.getProviderSingletons());
+        ProviderServices providerServices = new ProviderServices(
+                this.injectableFactory,
+                this.componentProviderFactory,
+                resourceConfig.getProviderClasses(),
+                resourceConfig.getProviderSingletons());
 
         // Add injectable provider for @Inject
         injectableFactory.add(
@@ -587,26 +595,27 @@ public final class WebApplicationImpl implements WebApplication {
         injectableFactory.add(new ContextInjectableProvider<ResourceContext>(
                 ResourceContext.class, resourceContext));
         
-        injectableFactory.configure(cpc);
+        injectableFactory.configure(providerServices);
         
         // Obtain all context resolvers
-        final ContextResolverFactory crf = new ContextResolverFactory(cpc, 
+        final ContextResolverFactory crf = new ContextResolverFactory(
+                providerServices,
                 injectableFactory);
         
         // Obtain all the templates
-        this.templateContext = new TemplateFactory(cpc);
+        this.templateContext = new TemplateFactory(providerServices);
         // Allow injection of template context
         injectableFactory.add(new ContextInjectableProvider<TemplateContext>(
                 TemplateContext.class, templateContext));
 
         // Obtain all the exception mappers
-        this.exceptionFactory = new ExceptionMapperFactory(cpc);
+        this.exceptionFactory = new ExceptionMapperFactory(providerServices);
         
         // Obtain all resource method dispatchers
-        this.dispatcherFactory = new ResourceMethodDispatcherFactory(cpc);
+        this.dispatcherFactory = new ResourceMethodDispatcherFactory(providerServices);
         
         // Obtain all message body readers/writers
-        this.bodyFactory = new MessageBodyFactory(cpc);
+        this.bodyFactory = new MessageBodyFactory(providerServices);
         injectableFactory.add(
                 new ContextInjectableProvider<MessageBodyWorkers>(
                 MessageBodyWorkers.class, bodyFactory));
@@ -650,20 +659,21 @@ public final class WebApplicationImpl implements WebApplication {
         injectableFactory.add(new QueryParamInjectableProvider());
 
         // Intiate filters
-        FilterFactory ff = new FilterFactory(cpc);
+        FilterFactory ff = new FilterFactory(providerServices);
         // Initiate request filters
         requestFilters.addAll(ff.getRequestFilters(
                 resourceConfig.getProperty(
                     ResourceConfig.PROPERTY_CONTAINER_REQUEST_FILTERS)));
-        requestFilters.addAll(cpc.getServices(ContainerRequestFilter.class));        
+        requestFilters.addAll(providerServices.getServices(ContainerRequestFilter.class));
         // Initiate response filters
         responseFilters.addAll(ff.getResponseFilters(
                 resourceConfig.getProperty(
                     ResourceConfig.PROPERTY_CONTAINER_RESPONSE_FILTERS)));
-        responseFilters.addAll(cpc.getServices(ContainerResponseFilter.class));        
+        responseFilters.addAll(providerServices.getServices(ContainerResponseFilter.class));
         
         // Inject on all components
-        cpc.injectOnComponents();
+        componentProviderFactory.injectOnAllComponents();
+        componentProviderFactory.injectOnProviderInstances(resourceConfig.getProviderSingletons());
         
         this.wadlFactory = new WadlFactory( resourceConfig );
         

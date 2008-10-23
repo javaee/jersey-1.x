@@ -40,6 +40,9 @@ import com.sun.jersey.api.client.filter.Filterable;
 import com.sun.jersey.api.client.config.DefaultClientConfig;
 import com.sun.jersey.api.client.config.ClientConfig;
 import com.sun.jersey.api.client.filter.ClientFilter;
+import com.sun.jersey.core.spi.component.IoCProviderComponentProviderFactory;
+import com.sun.jersey.core.spi.component.ProviderComponentProviderFactory;
+import com.sun.jersey.core.spi.component.ProviderServices;
 import com.sun.jersey.impl.client.urlconnection.URLConnectionClientHandler;
 import com.sun.jersey.spi.MessageBodyWorkers;
 import com.sun.jersey.core.spi.factory.ContextResolverFactory;
@@ -48,7 +51,6 @@ import com.sun.jersey.core.spi.factory.MessageBodyFactory;
 import com.sun.jersey.spi.inject.SingletonTypeInjectableProvider;
 import com.sun.jersey.spi.service.ComponentContext;
 import com.sun.jersey.spi.service.ComponentProvider;
-import com.sun.jersey.spi.service.ComponentProviderCache;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
@@ -89,97 +91,12 @@ public final class Client extends Filterable implements ClientHandler {
     
     private final ClientConfig config;
     
-    private final ComponentProvider provider;
-    
+    private ProviderComponentProviderFactory componentProviderFactory;
+
     private final MessageBodyFactory bodyContext;
     
     private Map<String, Object> properties;
-    
-    private final class AdaptingComponentProvider implements ComponentProvider {
-        private final ComponentProvider cp;
         
-        AdaptingComponentProvider(ComponentProvider cp) {
-            this.cp = cp;
-        }
-
-        public <T> T getInstance(Scope scope, Class<T> c) 
-                throws InstantiationException, IllegalAccessException {
-            T o = cp.getInstance(scope,c);
-            if (o == null) {
-                o = c.newInstance();
-                injectResources(o);
-            } else {
-                injectResources(cp.getInjectableInstance(o));
-            }
-            return o;
-        }
-
-        public <T> T getInstance(Scope scope, Constructor<T> contructor, Object[] parameters) 
-                throws InstantiationException, IllegalArgumentException, 
-                IllegalAccessException, InvocationTargetException {
-            T o = cp.getInstance(scope, contructor, parameters);
-            if (o == null) {
-                o = contructor.newInstance(parameters);
-                injectResources(o);                
-            } else {
-                injectResources(cp.getInjectableInstance(o));
-            }
-            return o;
-        }
-
-        public <T> T getInstance(ComponentContext cc, Scope scope, Class<T> c) 
-                throws InstantiationException, IllegalAccessException {
-            T o = cp.getInstance(cc, scope,c);
-            if (o == null) {
-                o = c.newInstance();
-                injectResources(o);
-            } else {
-                injectResources(cp.getInjectableInstance(o));
-            }
-            return o;
-        }
-        
-        public <T> T getInjectableInstance(T instance) {
-            return cp.getInjectableInstance(instance);
-        }
-        
-        public void inject(Object instance) {
-            cp.inject(instance);
-            injectResources(cp.getInjectableInstance(instance));
-        }
-
-    }
-    
-    private final class DefaultComponentProvider implements ComponentProvider {
-        public <T> T getInstance(Scope scope, Class<T> c) 
-                throws InstantiationException, IllegalAccessException {
-            final T o = c.newInstance();
-            injectResources(o);
-            return o;
-        }
-
-        public <T> T getInstance(Scope scope, Constructor<T> contructor, Object[] parameters) 
-                throws InstantiationException, IllegalArgumentException, 
-                IllegalAccessException, InvocationTargetException {
-            final T o = contructor.newInstance(parameters);
-            injectResources(o);
-            return o;
-        }
-
-        public <T> T getInstance(ComponentContext cc, Scope scope, Class<T> c) 
-                throws InstantiationException, IllegalAccessException {
-            return getInstance(scope, c);
-        }
-        
-        public <T> T getInjectableInstance(T instance) {
-            return instance;
-        }
-        
-        public void inject(Object instance) {
-            injectResources(instance);
-        }
-    }
-    
     private static class ContextInjectableProvider<T> extends
             SingletonTypeInjectableProvider<Context, T> {
 
@@ -232,26 +149,24 @@ public final class Client extends Filterable implements ClientHandler {
         // Allow injection of resource config
         injectableFactory.add(new ContextInjectableProvider<ClientConfig>(
                 ClientConfig.class, config));
-        
-        // Set up the component provider
-        this.provider = (provider == null)
-            ? new DefaultComponentProvider()
-            : new AdaptingComponentProvider(provider);
-            
-        // Create the component provider cache
-        ComponentProviderCache cpc = new ComponentProviderCache(
-                    this.injectableFactory,
-                    this.provider,
-                    config.getClasses(),
-                    config.getSingletons());
+                    
+        // Set up the component provider factory
+        this.componentProviderFactory = (provider == null)
+                ? new ProviderComponentProviderFactory(injectableFactory)
+                : new IoCProviderComponentProviderFactory(injectableFactory, provider);
 
+        ProviderServices providerServices = new ProviderServices(
+                this.injectableFactory,
+                this.componentProviderFactory,
+                config.getClasses(),
+                config.getSingletons());
 
         // Obtain all context resolvers
-        final ContextResolverFactory crf = new ContextResolverFactory(cpc, 
+        final ContextResolverFactory crf = new ContextResolverFactory(providerServices,
                 injectableFactory);
         
         // Obtain all message body readers/writers
-        this.bodyContext = new MessageBodyFactory(cpc);
+        this.bodyContext = new MessageBodyFactory(providerServices);
         // Allow injection of message body context
         injectableFactory.add(new ContextInjectableProvider<MessageBodyWorkers>(
                 MessageBodyWorkers.class, bodyContext));
@@ -282,9 +197,12 @@ public final class Client extends Filterable implements ClientHandler {
 
         // Initiate message body readers/writers
         bodyContext.init();
-        
-        // Inject on root client handler
-        injectResources(root);
+
+
+        // Inject on all components
+        componentProviderFactory.injectOnAllComponents();
+        componentProviderFactory.injectOnProviderInstances(config.getSingletons());
+        componentProviderFactory.injectOnProviderInstance(root);
     }
         
     /**
@@ -404,12 +322,6 @@ public final class Client extends Filterable implements ClientHandler {
         return getHeadHandler().handle(cr);
     }
 
-    //
-    
-    private void injectResources(Object o) {
-        injectableFactory.injectResources(o);
-    }
-        
     /**
      * Create a default client.
      * 

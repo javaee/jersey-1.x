@@ -39,13 +39,13 @@ package com.sun.jersey.core.spi.factory;
 import com.sun.jersey.core.reflection.ReflectionHelper;
 import com.sun.jersey.core.reflection.AnnotatedMethod;
 import com.sun.jersey.core.reflection.MethodList;
+import com.sun.jersey.core.spi.component.ProviderServices;
 import com.sun.jersey.spi.inject.Injectable;
 import com.sun.jersey.spi.inject.InjectableProvider;
 import com.sun.jersey.spi.inject.InjectableProviderContext;
 import com.sun.jersey.spi.service.AccessibleObjectContext;
 import com.sun.jersey.spi.service.ComponentContext;
 import com.sun.jersey.spi.service.ComponentProvider.Scope;
-import com.sun.jersey.spi.service.ComponentProviderCache;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
@@ -100,9 +100,9 @@ public class InjectableProviderFactory implements InjectableProviderContext {
         }
     }
 
-    public final void configure(ComponentProviderCache componentProviderCache) {
+    public final void configure(ProviderServices providerServices) {
         for (InjectableProvider ip : 
-            componentProviderCache.getProvidersAndServices(InjectableProvider.class)) {
+            providerServices.getProvidersAndServices(InjectableProvider.class)) {
             add(ip);
         }
     }

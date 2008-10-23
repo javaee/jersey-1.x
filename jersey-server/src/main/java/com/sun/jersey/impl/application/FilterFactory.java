@@ -37,9 +37,9 @@
 package com.sun.jersey.impl.application;
 
 import com.sun.jersey.api.core.DefaultResourceConfig;
+import com.sun.jersey.core.spi.component.ProviderServices;
 import com.sun.jersey.spi.container.ContainerRequestFilter;
 import com.sun.jersey.spi.container.ContainerResponseFilter;
-import com.sun.jersey.spi.service.ComponentProviderCache;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
@@ -52,10 +52,10 @@ import java.util.logging.Logger;
 public class FilterFactory {
     private static final Logger LOGGER = Logger.getLogger(FilterFactory.class.getName());
     
-    private final ComponentProviderCache cpc;
+    private final ProviderServices providerServices;
     
-    FilterFactory(ComponentProviderCache cpc) {
-        this.cpc = cpc;
+    FilterFactory(ProviderServices providerServices) {
+        this.providerServices = providerServices;
     }
     
     public List<ContainerRequestFilter> getRequestFilters(Object o) {
@@ -90,7 +90,7 @@ public class FilterFactory {
     
     private <T> List<T> getFilters(Class<T> c, String[] classNames) {
         List<T> f = new LinkedList<T>();
-        f.addAll(cpc.getInstances(c, classNames));
+        f.addAll(providerServices.getInstances(c, classNames));
         return f;
     }
     
@@ -105,9 +105,9 @@ public class FilterFactory {
                         ". The filter is ignored.");
                 continue;
             }
-            cpc.getComponentProvider().inject(o);
             f.add(c.cast(o));
         }
+        providerServices.getComponentProviderFactory().injectOnProviderInstances(f);
         return f;
     }
 }

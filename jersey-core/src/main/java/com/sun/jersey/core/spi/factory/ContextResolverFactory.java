@@ -37,13 +37,13 @@
 package com.sun.jersey.core.spi.factory;
 
 import com.sun.jersey.api.MediaTypes;
+import com.sun.jersey.core.spi.component.ProviderServices;
 import com.sun.jersey.core.util.KeyComparator;
 import com.sun.jersey.core.util.KeyComparatorHashMap;
 import com.sun.jersey.spi.inject.Injectable;
 import com.sun.jersey.spi.inject.InjectableProvider;
 import com.sun.jersey.spi.service.ComponentContext;
 import com.sun.jersey.spi.service.ComponentProvider.Scope;
-import com.sun.jersey.spi.service.ComponentProviderCache;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
@@ -81,13 +81,13 @@ public final class ContextResolverFactory {
     
     private final Map<Type, Map<MediaType, ContextResolver>> resolver;
     
-    public ContextResolverFactory(ComponentProviderCache componentProviderCache,
+    public ContextResolverFactory(ProviderServices providersServices,
             InjectableProviderFactory ipf) {
         Map<Type, Map<MediaType, Set<ContextResolver>>> rs = 
                 new HashMap<Type, Map<MediaType, Set<ContextResolver>>>();
         
         Set<ContextResolver> providers = 
-                componentProviderCache.getProviders(ContextResolver.class);
+                providersServices.getProviders(ContextResolver.class);
         for (ContextResolver provider : providers) {
             MediaType[] ms = getAnnotationValues(provider.getClass(), Produces.class);
             ParameterizedType pType = getType(provider.getClass());
@@ -114,7 +114,6 @@ public final class ContextResolverFactory {
         
         this.resolver = new HashMap<Type, Map<MediaType, ContextResolver>>(4);
         for (Map.Entry<Type, Map<MediaType, Set<ContextResolver>>> e : rs.entrySet()) {
-//            Map<MediaType, ContextResolver> mr = new HashMap<MediaType, ContextResolver>(4);            
             Map<MediaType, ContextResolver> mr = new KeyComparatorHashMap<MediaType, ContextResolver>(
                     4, MEDIA_TYPE_COMPARATOR);
             resolver.put(e.getKey(), mr);
