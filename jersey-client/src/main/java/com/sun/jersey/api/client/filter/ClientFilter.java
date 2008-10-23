@@ -58,7 +58,7 @@ import com.sun.jersey.api.client.ClientResponse;
  *             ClientRequest mcr = modifyRequest(cr);
  * 
  *             // Call the next client handler in the filter chain
- *             ClientResponse resp = getNext(mcr);
+ *             ClientResponse resp = getNext().handle(mcr);
  * 
  *             // Modify the response
  *             return modifyResponse(resp);
