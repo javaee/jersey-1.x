@@ -69,7 +69,7 @@ public class SpringComponentProviderFactory implements IoCComponentProviderFacto
 
     private static final Logger LOGGER = Logger.getLogger(SpringComponentProviderFactory.class.getName());
 
-    private ConfigurableApplicationContext springContext;
+    private final ConfigurableApplicationContext springContext;
 
     public SpringComponentProviderFactory(ConfigurableApplicationContext springContext) {
         this.springContext = springContext;
