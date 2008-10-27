@@ -37,30 +37,22 @@
 package com.sun.jersey.core.spi.factory;
 
 import com.sun.jersey.core.reflection.ReflectionHelper;
-import com.sun.jersey.core.reflection.AnnotatedMethod;
-import com.sun.jersey.core.reflection.MethodList;
 import com.sun.jersey.core.spi.component.ProviderServices;
 import com.sun.jersey.spi.inject.Injectable;
 import com.sun.jersey.spi.inject.InjectableProvider;
 import com.sun.jersey.spi.inject.InjectableProviderContext;
-import com.sun.jersey.spi.service.AccessibleObjectContext;
-import com.sun.jersey.spi.service.ComponentContext;
-import com.sun.jersey.spi.service.ComponentProvider.Scope;
+import com.sun.jersey.core.spi.component.ComponentContext;
+import com.sun.jersey.core.spi.component.ComponentScope;
 import java.lang.annotation.Annotation;
-import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
-import java.security.AccessController;
-import java.security.PrivilegedAction;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import javax.ws.rs.HttpMethod;
-import javax.ws.rs.Path;
 
 /**
  *
@@ -160,7 +152,7 @@ public class InjectableProviderFactory implements InjectableProviderContext {
     private List<MetaInjectableProvider> findInjectableProviders(
             Class<? extends Annotation> ac, 
             Class<?> cc,
-            Scope s) {
+            ComponentScope s) {
         List<MetaInjectableProvider> subips = new ArrayList<MetaInjectableProvider>();        
         for (MetaInjectableProvider i : getList(ac)) {
             if (s == i.ip.getScope()) {
@@ -180,7 +172,7 @@ public class InjectableProviderFactory implements InjectableProviderContext {
             ComponentContext ic,
             A a,
             C c,
-            Scope s) {
+            ComponentScope s) {
         return getInjectable(ac, ic, a, c, Collections.singletonList(s));
     }
     
@@ -189,8 +181,8 @@ public class InjectableProviderFactory implements InjectableProviderContext {
             ComponentContext ic,
             A a,
             C c,
-            List<Scope> ls) {
-        for (Scope s : ls) {
+            List<ComponentScope> ls) {
+        for (ComponentScope s : ls) {
             Injectable i = _getInjectable(ac, ic, a, c, s);
             if (i != null)
                 return i;
@@ -212,103 +204,12 @@ public class InjectableProviderFactory implements InjectableProviderContext {
             ComponentContext ic,
             A a,
             C c,
-            Scope s) {
+            ComponentScope s) {
         for (MetaInjectableProvider mip : findInjectableProviders(ac, c.getClass(), s)) {
             Injectable i = mip.ip.getInjectable(ic, a, c);
             if (i != null)
                 return i;
         }
         return null;
-    }
-    
-    //
-    
-    /**
-     * Inject onto a singleton provider.
-     * 
-     * @param o the singleton instance
-     */
-    public final void injectResources(final Object o) {
-        AccessibleObjectContext aoc = new AccessibleObjectContext();
-        
-        Class oClass = o.getClass();
-        while (oClass != Object.class) {
-            for (final Field f : oClass.getDeclaredFields()) {
-                if (getFieldValue(o, f) != null) continue;
-                
-                aoc.setAccesibleObject(f);
-                final Annotation[] as = f.getAnnotations();
-                for (Annotation a : as) {
-                    Injectable i = getInjectable(
-                            a.annotationType(), aoc, a, f.getGenericType(), 
-                            Scope.UNDEFINED_SINGLETON);
-                    if (i != null) {
-                        setFieldValue(o, f, i.getValue());
-                    }
-                }
-                
-            }
-            oClass = oClass.getSuperclass();
-        }
-        
-        MethodList ml = new MethodList(o.getClass().getMethods());
-        for (AnnotatedMethod m : ml.
-                hasNotMetaAnnotation(HttpMethod.class).
-                hasNotAnnotation(Path.class).
-                hasNumParams(1).
-                hasReturnType(void.class).
-                nameStartsWith("set")) {
-            final Annotation[] as = m.getAnnotations();
-            aoc.setAccesibleObject(m.getMethod(), as);
-            final Type t = m.getGenericParameterTypes()[0];
-            for (Annotation a : as) {
-                Injectable i = getInjectable(
-                        a.annotationType(), aoc, a, t, 
-                        Scope.UNDEFINED_SINGLETON);
-                if (i != null) {
-                    setMethodValue(o, m, i.getValue());
-                }
-            }
-        }
-        
-    }
-    
-    private void setFieldValue(final Object resource, final Field f, final Object value) {
-        AccessController.doPrivileged(new PrivilegedAction<Object>() {
-            public Object run() {
-                try {
-                    if (!f.isAccessible()) {
-                        f.setAccessible(true);
-                    }
-                    f.set(resource, value);
-                    return null;
-                } catch (IllegalAccessException ex) {
-                    throw new RuntimeException(ex);
-                }
-            }
-        });
-    }
-    
-    private Object getFieldValue(final Object resource, final Field f) {
-        return AccessController.doPrivileged(new PrivilegedAction<Object>() {
-            public Object run() {
-                try {
-                    if (!f.isAccessible()) {
-                        f.setAccessible(true);
-                    }
-                    return f.get(resource);
-                } catch (IllegalAccessException ex) {
-                    throw new RuntimeException(ex);
-                }
-            }
-        });
-    }
-
-    private void setMethodValue(Object o, AnnotatedMethod m, Object value) {
-        try {
-            m.getMethod().invoke(o, value);
-        } catch (Exception ex) {
-            throw new RuntimeException(ex);
-        }
     }
 }

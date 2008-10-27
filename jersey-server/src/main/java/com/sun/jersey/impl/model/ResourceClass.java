@@ -52,6 +52,7 @@ import com.sun.jersey.impl.uri.rules.SubLocatorRule;
 import com.sun.jersey.impl.uri.PathPattern;
 import com.sun.jersey.impl.uri.PathTemplate;
 import com.sun.jersey.api.uri.UriTemplate;
+import com.sun.jersey.core.spi.component.ComponentInjector;
 import com.sun.jersey.impl.application.ResourceMethodDispatcherFactory;
 import com.sun.jersey.impl.template.ViewableRule;
 import com.sun.jersey.impl.uri.rules.CombiningMatchingPatterns;
@@ -62,10 +63,9 @@ import com.sun.jersey.impl.uri.rules.TerminatingRule;
 import com.sun.jersey.impl.uri.rules.UriRulesFactory;
 import com.sun.jersey.impl.wadl.WadlFactory;
 import com.sun.jersey.server.impl.inject.ServerInjectableProviderContext;
-import com.sun.jersey.spi.resource.ResourceProvider;
-import com.sun.jersey.spi.resource.ResourceProviderFactory;
-import com.sun.jersey.spi.service.ComponentProvider;
-import com.sun.jersey.spi.service.ComponentProvider.Scope;
+import com.sun.jersey.server.spi.component.ResourceComponentProvider;
+import com.sun.jersey.server.impl.component.ResourceFactory;
+import com.sun.jersey.core.spi.component.ComponentScope;
 import com.sun.jersey.spi.uri.rules.UriRule;
 import com.sun.jersey.spi.uri.rules.UriRules;
 import java.util.ArrayList;
@@ -91,11 +91,10 @@ public final class ResourceClass {
     
     public final AbstractResource resource;
     
-    public ResourceProvider provider;
+    public ResourceComponentProvider rcProvider;
     
     public ResourceClass(
             ResourceConfig config,
-            ComponentProvider provider,
             ResourceMethodDispatcherFactory df,
             ServerInjectableProviderContext injectableContext,
             AbstractResource resource,
@@ -141,10 +140,13 @@ public final class ResourceClass {
         UriRules<UriRule> atomicRules = UriRulesFactory.create(rulesMap);
         
         // Create the end sequential rules, zero or more may be matched
+        ComponentInjector<ViewableRule> ci = new ComponentInjector(injectableContext,
+                ViewableRule.class);
         List<PatternRulePair<UriRule>> patterns = new ArrayList<PatternRulePair<UriRule>>();
         if (config.getFeature(ResourceConfig.FEATURE_IMPLICIT_VIEWABLES)) {
-            UriRule r = new ViewableRule();
-            provider.inject(r);
+            ViewableRule r = new ViewableRule();
+            ci.inject(r);
+
             // The matching rule for a sub-resource template
             patterns.add(new PatternRulePair<UriRule>(
                     new UriPattern("/([^/]+)"), r));        
@@ -173,13 +175,9 @@ public final class ResourceClass {
         this.rules = combiningRules;
     }
         
-    public void init(
-            ComponentProvider provider,
-            ComponentProvider resourceProvider,
-            ResourceProviderFactory providerFactory) {
-        this.provider = providerFactory.createProvider(
-                provider, resourceProvider, 
-                resource, config.getFeatures(), config.getProperties());  
+    public void init(ResourceFactory rcpFactory) {
+        this.rcProvider = rcpFactory.getComponentProvider(resource.getResourceClass());
+        this.rcProvider.init(resource);
     }
     
     public UriRules<UriRule> getRules() {
@@ -207,7 +205,7 @@ public final class ResourceClass {
             UriRule r = new SubLocatorRule(
                     t,
                     locator.getMethod(),
-                    injectableContext.getInjectable(locator.getParameters(), Scope.PerRequest));
+                    injectableContext.getInjectable(locator.getParameters(), ComponentScope.PerRequest));
 
             rulesMap.put(p, 
                     new RightHandPathRule(

@@ -46,8 +46,11 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
 /**
- * Used to annotate fields that shall be injected with instances obtained
- * from the component provider.
+ * Used to annotate fields or parameters that shall be injected with instances 
+ * obtained from the registered IoC component provider factory (if any).
+ * <p>
+ * If the name of instance to inject is not recognized or there is no IoC
+ * component provider factory registered then no injection will occur.
  *
  * @author <a href="mailto:martin.grotzke@freiheit.com">Martin Grotzke</a>
  */

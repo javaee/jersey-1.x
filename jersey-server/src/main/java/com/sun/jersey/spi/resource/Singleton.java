@@ -37,7 +37,8 @@
 
 package com.sun.jersey.spi.resource;
 
-import com.sun.jersey.impl.resource.SingletonProvider;
+import com.sun.jersey.impl.resource.SingletonFactory;
+import com.sun.jersey.server.spi.component.ResourceComponentProviderFactoryClass;
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -50,5 +51,5 @@ import java.lang.annotation.Target;
 @Target({ElementType.TYPE})
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
-@ResourceFactory(SingletonProvider.class)
+@ResourceComponentProviderFactoryClass(SingletonFactory.class)
 public @interface Singleton {}

@@ -44,6 +44,7 @@ import com.sun.jersey.api.core.ClasspathResourceConfig;
 import com.sun.jersey.api.core.PackagesResourceConfig;
 import com.sun.jersey.api.uri.UriComponent;
 import com.sun.jersey.api.InBoundHeaders;
+import com.sun.jersey.core.spi.component.ioc.IoCComponentProviderFactory;
 import com.sun.jersey.impl.container.servlet.JSPTemplateProcessor;
 import com.sun.jersey.impl.container.servlet.ServletContainerRequest;
 import com.sun.jersey.impl.container.servlet.ThreadLocalInvoker;
@@ -55,7 +56,6 @@ import com.sun.jersey.spi.container.ContainerResponseWriter;
 import com.sun.jersey.spi.container.WebApplication;
 import com.sun.jersey.spi.container.WebApplicationFactory;
 import com.sun.jersey.spi.inject.SingletonTypeInjectableProvider;
-import com.sun.jersey.spi.service.ComponentProvider;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.lang.reflect.Constructor;
@@ -143,9 +143,9 @@ import javax.ws.rs.core.UriBuilder;
  * {@link HttpServletResponse}, {@link ServletContext}, and {@link ServletConfig}.
  * 
  * <p>
- * A {@link ComponentProvider} instance may be registered by extending this class
+ * A {@link IoCComponentProviderFactory} instance may be registered by extending this class
  * and overriding the method {@link #initiate(ResourceConfig, WebApplication)}
- * to initiate the {@link WebApplication} with the {@link ComponentProvider} 
+ * to initiate the {@link WebApplication} with the {@link IoCComponentProviderFactory}
  * instance.
  * 
  */

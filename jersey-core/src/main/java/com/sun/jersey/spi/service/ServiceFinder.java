@@ -43,8 +43,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.lang.reflect.Array;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
@@ -148,36 +146,9 @@ public final class ServiceFinder<T> implements Iterable<T> {
     
     private static final String PREFIX = "META-INF/services/";
     
-    private static final ComponentProvider DEFAULT_COMPONENT_PROVIDER = new ComponentProvider() {
-        public <T> T getInstance(Scope scope, Class<T> c) 
-                throws InstantiationException, IllegalAccessException {
-            return c.newInstance();
-        }
-
-        public <T> T getInstance(Scope scope, Constructor<T> contructor, Object[] parameters) 
-                throws InstantiationException, IllegalArgumentException, 
-                IllegalAccessException, InvocationTargetException {
-            throw new UnsupportedOperationException("");
-        }
-
-        public <T> T getInstance(ComponentContext cc, Scope scope, Class<T> c) 
-                throws InstantiationException, IllegalAccessException {
-            return getInstance(scope, c);
-        }
-        
-        public <T> T getInjectableInstance(T instance) {
-            return instance;
-        }
-        
-        public void inject(Object instance) {
-            throw new UnsupportedOperationException("");
-        }
-    };
-            
     private final Class<T> serviceClass;
     private final ClassLoader classLoader;
     private final boolean ignoreOnClassNotFound;
-    private final ComponentProvider componentProvider;
     
     
     /**
@@ -210,8 +181,7 @@ public final class ServiceFinder<T> implements Iterable<T> {
             throws ServiceConfigurationError {
         return find(service, 
                 loader, 
-                false, 
-                DEFAULT_COMPONENT_PROVIDER);
+                false);
     }
     
     /**
@@ -236,8 +206,6 @@ public final class ServiceFinder<T> implements Iterable<T> {
      *                be used
      * @param ignoreOnClassNotFound If a provider cannot be loaded by the class loader
      *                              then move on to the next available provider.
-     * @param componentProvider the component provider responsible for instantiating
-     *                          the provider implementation
      * @throws ServiceConfigurationError If a provider-configuration file violates the specified format
      *                                   or names a provider class that cannot be found and instantiated
      * @see #find(Class)
@@ -246,12 +214,10 @@ public final class ServiceFinder<T> implements Iterable<T> {
      */
     public static <T> ServiceFinder<T> find(Class<T> service, 
             ClassLoader loader, 
-            boolean ignoreOnClassNotFound,
-            ComponentProvider componentProvider) throws ServiceConfigurationError {
+            boolean ignoreOnClassNotFound) throws ServiceConfigurationError {
         return new ServiceFinder<T>(service,
                 loader,
-                ignoreOnClassNotFound,
-                componentProvider);
+                ignoreOnClassNotFound);
     }
     
     /**
@@ -274,8 +240,7 @@ public final class ServiceFinder<T> implements Iterable<T> {
             throws ServiceConfigurationError {
         return find(service,
                 Thread.currentThread().getContextClassLoader(), 
-                false,
-                DEFAULT_COMPONENT_PROVIDER);
+                false);
     }
     
     /**
@@ -301,46 +266,14 @@ public final class ServiceFinder<T> implements Iterable<T> {
             boolean ignoreOnClassNotFound) throws ServiceConfigurationError {
         return find(service,
                 Thread.currentThread().getContextClassLoader(), 
-                ignoreOnClassNotFound,
-                DEFAULT_COMPONENT_PROVIDER);
-    }
-    
-    /**
-     * Locates and incrementally instantiates the available providers of a
-     * given service using the context class loader.  This convenience method
-     * is equivalent to
-     * <p/>
-     * <pre>
-     *   ClassLoader cl = Thread.currentThread().getContextClassLoader();
-     *   boolean ingore = ...
-     *   return Service.providers(service, cl, ignore);
-     * </pre>
-     * @param service The service's abstract service class
-     * @param ignoreOnClassNotFound If a provider cannot be loaded by the class loader
-     *                              then move on to the next available provider.
-     * @param componentProvider the component provider responsible for instantiating
-     *                          the provider implementation
-     * @throws ServiceConfigurationError If a provider-configuration file violates the specified format
-     *                                   or names a provider class that cannot be found and instantiated
-     * @see #find(Class, ClassLoader)
-     * @param <T> the type of the service instance.
-     * @return the service finder
-     */
-    public static <T> ServiceFinder<T> find(Class<T> service, 
-            boolean ignoreOnClassNotFound, ComponentProvider componentProvider) 
-            throws ServiceConfigurationError {
-        return find(service,
-                Thread.currentThread().getContextClassLoader(), 
-                ignoreOnClassNotFound,
-                componentProvider);
+                ignoreOnClassNotFound);
     }
     
     private ServiceFinder(Class<T> service, ClassLoader loader, 
-            boolean ignoreOnClassNotFound, ComponentProvider componentProvider) {
+            boolean ignoreOnClassNotFound) {
         this.serviceClass = service;
         this.classLoader = loader;
         this.ignoreOnClassNotFound = ignoreOnClassNotFound;
-        this.componentProvider = componentProvider;
     }
     
     /**
@@ -354,7 +287,7 @@ public final class ServiceFinder<T> implements Iterable<T> {
      */
     public Iterator<T> iterator() {
         return new LazyObjectIterator<T>(serviceClass,classLoader,
-                ignoreOnClassNotFound, componentProvider);
+                ignoreOnClassNotFound);
     }
     
     /**
@@ -368,7 +301,7 @@ public final class ServiceFinder<T> implements Iterable<T> {
      */
     public Iterator<Class<T>> classIterator() {
         return new LazyClassIterator<T>(serviceClass,classLoader,
-                ignoreOnClassNotFound, componentProvider);
+                ignoreOnClassNotFound);
     }
     
     /**
@@ -506,7 +439,6 @@ public final class ServiceFinder<T> implements Iterable<T> {
         final Class<T> service;
         final ClassLoader loader;
         final boolean ignoreOnClassNotFound;
-        final ComponentProvider componentProvider;
         
         Enumeration<URL> configs = null;
         Iterator<String> pending = null;
@@ -514,11 +446,10 @@ public final class ServiceFinder<T> implements Iterable<T> {
         String nextName = null;
         
         private AbstractLazyIterator(Class<T> service, ClassLoader loader, 
-                boolean ignoreOnClassNotFound, ComponentProvider componentProvider) {
+                boolean ignoreOnClassNotFound) {
             this.service = service;
             this.loader = loader;
             this.ignoreOnClassNotFound = ignoreOnClassNotFound;
-            this.componentProvider = componentProvider;
         }
         
         protected final void setConfigs() {
@@ -602,8 +533,8 @@ public final class ServiceFinder<T> implements Iterable<T> {
             implements Iterator<Class<T>> {
 
         private LazyClassIterator(Class<T> service, ClassLoader loader, 
-                boolean ignoreOnClassNotFound, ComponentProvider componentProvider) {
-            super(service, loader, ignoreOnClassNotFound, componentProvider);
+                boolean ignoreOnClassNotFound) {
+            super(service, loader, ignoreOnClassNotFound);
         }
         
         @SuppressWarnings("unchecked")
@@ -642,8 +573,8 @@ public final class ServiceFinder<T> implements Iterable<T> {
         private T t;
         
         private LazyObjectIterator(Class<T> service, ClassLoader loader, 
-                boolean ignoreOnClassNotFound, ComponentProvider componentProvider) {
-            super(service, loader, ignoreOnClassNotFound, componentProvider);
+                boolean ignoreOnClassNotFound) {
+            super(service, loader, ignoreOnClassNotFound);
         }
         
         @Override
@@ -662,8 +593,8 @@ public final class ServiceFinder<T> implements Iterable<T> {
                 }
                 nextName = pending.next();
                 try {
-                    t = service.cast(componentProvider.getInstance(null, 
-                            Class.forName(nextName, true, loader)));
+                    t = service.cast( 
+                            Class.forName(nextName, true, loader).newInstance());
                 } catch (ClassNotFoundException ex) {
                     if (ignoreOnClassNotFound) {
                         // Provider implementation not found

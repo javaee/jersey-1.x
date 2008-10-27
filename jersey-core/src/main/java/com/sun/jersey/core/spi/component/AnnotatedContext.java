@@ -36,18 +36,32 @@
  */
 package com.sun.jersey.core.spi.component;
 
-/**
- * A factory for obtaining component providers.
- *
- * @author Paul.Sandoz@Sun.Com
- */
-public interface ComponentProviderFactory<C extends ComponentProvider> {
+import java.lang.annotation.Annotation;
+import java.lang.reflect.AccessibleObject;
 
-    /**
-     * Get the component provider for a class.
-     *
-     * @param c the class
-     * @return the component provider for the class
-     */
-    C getComponentProvider(Class c);
+public final class AnnotatedContext implements ComponentContext {
+
+    private Annotation[] annotations;
+
+    public AnnotatedContext() {
+        super();
+    }
+
+    public AnnotatedContext(Annotation[] annotations) {
+        super();
+        this.annotations = annotations;
+    }
+
+    public void setAnnotations(Annotation[] annotations) {
+        this.annotations = annotations;
+    }
+
+    // ComponentContext
+    public AccessibleObject getAccesibleObject() {
+        return null;
+    }
+
+    public Annotation[] getAnnotations() {
+        return annotations;
+    }
 }

@@ -39,13 +39,13 @@ package com.sun.jersey.impl;
 import com.sun.jersey.api.container.ContainerException;
 import com.sun.jersey.api.core.HttpContext;
 import com.sun.jersey.api.core.ResourceConfig;
+import com.sun.jersey.core.spi.component.ioc.IoCComponentProviderFactory;
 import com.sun.jersey.spi.MessageBodyWorkers;
 import com.sun.jersey.spi.container.ContainerRequest;
 import com.sun.jersey.spi.container.ContainerResponse;
 import com.sun.jersey.spi.container.ContainerResponseWriter;
 import com.sun.jersey.spi.container.WebApplication;
 import com.sun.jersey.spi.inject.InjectableProvider;
-import com.sun.jersey.spi.service.ComponentProvider;
 import java.io.IOException;
 
 /**
@@ -57,7 +57,7 @@ public class DummyWebApplication implements WebApplication {
     public void initiate(ResourceConfig resourceConfig) throws IllegalArgumentException, ContainerException {
     }
 
-    public void initiate(ResourceConfig resourceConfig, ComponentProvider provider) throws IllegalArgumentException, ContainerException {
+    public void initiate(ResourceConfig resourceConfig, IoCComponentProviderFactory provider) throws IllegalArgumentException, ContainerException {
     }
 
     @Override
@@ -66,14 +66,6 @@ public class DummyWebApplication implements WebApplication {
     }
 
     public MessageBodyWorkers getMessageBodyWorkers() {
-        return null;
-    }
-
-    public ComponentProvider getComponentProvider() {
-        return null;
-    }
-
-    public ComponentProvider getResourceComponentProvider() {
         return null;
     }
 

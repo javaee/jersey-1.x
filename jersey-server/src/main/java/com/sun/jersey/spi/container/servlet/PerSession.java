@@ -37,8 +37,8 @@
 
 package com.sun.jersey.spi.container.servlet;
 
-import com.sun.jersey.impl.container.servlet.PerSessionProvider;
-import com.sun.jersey.spi.resource.ResourceFactory;
+import com.sun.jersey.impl.container.servlet.PerSessionFactory;
+import com.sun.jersey.server.spi.component.ResourceComponentProviderFactoryClass;
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -53,5 +53,5 @@ import java.lang.annotation.Target;
 @Target({ElementType.TYPE})
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
-@ResourceFactory(PerSessionProvider.class)
+@ResourceComponentProviderFactoryClass(PerSessionFactory.class)
 public @interface PerSession {}

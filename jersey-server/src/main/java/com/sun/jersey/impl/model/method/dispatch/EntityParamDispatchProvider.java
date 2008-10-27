@@ -48,7 +48,7 @@ import com.sun.jersey.server.impl.inject.AbstractHttpContextInjectable;
 import com.sun.jersey.server.impl.inject.ServerInjectableProviderContext;
 import com.sun.jersey.spi.dispatch.RequestDispatcher;
 import com.sun.jersey.spi.inject.Injectable;
-import com.sun.jersey.spi.service.ComponentProvider.Scope;
+import com.sun.jersey.core.spi.component.ComponentScope;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Type;
@@ -243,7 +243,7 @@ public class EntityParamDispatchProvider implements ResourceMethodDispatchProvid
                         method.getMethod().getParameterAnnotations()[i],
                         requireNoEntityParameter));
             } else {
-                is.add(sipc.getInjectable(parameter, Scope.PerRequest));
+                is.add(sipc.getInjectable(parameter, ComponentScope.PerRequest));
             }
         }
 

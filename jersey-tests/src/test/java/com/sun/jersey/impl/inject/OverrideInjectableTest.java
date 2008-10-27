@@ -38,8 +38,8 @@ package com.sun.jersey.impl.inject;
 
 import com.sun.jersey.api.core.HttpContext;
 import com.sun.jersey.api.model.Parameter;
-import com.sun.jersey.spi.service.ComponentContext;
-import com.sun.jersey.spi.service.ComponentProvider.Scope;
+import com.sun.jersey.core.spi.component.ComponentContext;
+import com.sun.jersey.core.spi.component.ComponentScope;
 
 import java.io.IOException;
 
@@ -73,8 +73,8 @@ public class OverrideInjectableTest extends AbstractResourceTester {
             this.hc = hc;
         }
         
-        public Scope getScope() {
-            return Scope.PerRequest;
+        public ComponentScope getScope() {
+            return ComponentScope.PerRequest;
         }
         
         public Injectable<Map<String, String>> getInjectable(ComponentContext ic, 

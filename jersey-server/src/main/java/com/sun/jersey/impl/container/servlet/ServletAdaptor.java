@@ -38,14 +38,13 @@
 package com.sun.jersey.impl.container.servlet;
 
 import com.sun.jersey.api.container.ContainerException;
-import com.sun.jersey.api.core.HttpContext;
 import com.sun.jersey.api.core.ResourceConfig;
 import com.sun.jersey.spi.container.WebApplication;
 import com.sun.jersey.spi.container.servlet.ServletContainer;
 import com.sun.jersey.spi.inject.Injectable;
 import com.sun.jersey.spi.inject.InjectableProvider;
-import com.sun.jersey.spi.service.ComponentContext;
-import com.sun.jersey.spi.service.ComponentProvider.Scope;
+import com.sun.jersey.core.spi.component.ComponentContext;
+import com.sun.jersey.core.spi.component.ComponentScope;
 import java.lang.reflect.Proxy;
 import java.lang.reflect.Type;
 import java.util.Enumeration;
@@ -101,8 +100,8 @@ public class ServletAdaptor extends ServletContainer {
         }
         
         rc.getSingletons().add(new InjectableProvider<PersistenceUnit, Type>() {
-            public Scope getScope() {
-                return Scope.Singleton;
+            public ComponentScope getScope() {
+                return ComponentScope.Singleton;
             }
             
             public Injectable<EntityManagerFactory> getInjectable(ComponentContext ic, PersistenceUnit pu, Type c) {

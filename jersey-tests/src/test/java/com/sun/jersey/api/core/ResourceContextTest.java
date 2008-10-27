@@ -36,18 +36,13 @@
  */
 package com.sun.jersey.api.core;
 
+import com.sun.jersey.impl.AbstractResourceTester;
+import com.sun.jersey.spi.resource.Singleton;
 import java.io.IOException;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
-
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.core.Context;
-import javax.xml.bind.annotation.XmlRootElement;
 
-import com.sun.jersey.impl.AbstractResourceTester;
-import com.sun.jersey.spi.service.ComponentContext;
-import com.sun.jersey.spi.service.ComponentProvider;
 
 /**
  * Test {@link ResourceContext}: resource context must provide access to
@@ -66,94 +61,47 @@ public class ResourceContextTest extends AbstractResourceTester {
     @Path("/")
     public static class MyRootResource {
         
-        @Context ResourceContext _resourceContext;
+        @Context ResourceContext resourceContext;
         
-        @Path( "subresource" )
-        public MySubResource getMySubResource() {
-            MySubResource result = _resourceContext.getResource( MySubResource.class );
-            return result;
+        @Path("singleton")
+        public SingletonResource getSingletonResource() {
+            return resourceContext.getResource(SingletonResource.class);
         }      
         
+        @Path("perrequest")
+        public PerRequestResource getPerRequestSubResource() {
+            return resourceContext.getResource(PerRequestResource.class);
+        }
     }
 
-    public static class MySubResource {
-        
-        private final MyBean _myBean;
-        
-        public MySubResource( MyBean myBean ) {
-            _myBean = myBean;
-        }
-        
+    @Singleton
+    public static class SingletonResource {
+        int i;
+
         @GET
-        public MyBean get() {
-            return _myBean;
-        }                
+        public String get() {
+            i++;
+            return Integer.toString(i);
+        }
     }
-    
+
+    public static class PerRequestResource {
+        int i;
+
+        @GET
+        public String get() {
+            i++;
+            return Integer.toString(i);
+        }
+    }
+
     public void testGetResourceFromResourceContext() throws IOException {
-        
-        final String value = "foo";
-        final MyBean expected = new MyBean( value );
-        
-        final MySubResource mySubResource = new MySubResource( expected );
-        
-        initiateWebApplication( new MyComponentProvider( mySubResource ), MyRootResource.class );
+        initiateWebApplication(MyRootResource.class);
 
-        final MyBean actual = resource("/subresource").get( MyBean.class );
-        assertNotNull( actual );
-        assertEquals( expected, actual );        
-    }
-    
-    static class MyComponentProvider implements ComponentProvider {
-        
-        private final MySubResource _subResourceToProvide;
+        assertEquals("1", resource("/singleton").get(String.class));
+        assertEquals("2", resource("/singleton").get(String.class));
 
-        public MyComponentProvider( MySubResource mySubResource ) {
-            _subResourceToProvide = mySubResource;
-        }
-
-        public <T> T getInjectableInstance( T instance ) {
-            return instance;
-        }
-
-        public <T> T getInstance( Scope scope, Class<T> c ) throws InstantiationException, IllegalAccessException {
-            if ( MySubResource.class.equals( c ) ) {
-                return c.cast( _subResourceToProvide );
-            }
-            return null;
-        }
-
-        public <T> T getInstance( Scope scope, Constructor<T> constructor, Object[] parameters ) throws InstantiationException, IllegalArgumentException, IllegalAccessException, InvocationTargetException {
-            return getInstance( scope, constructor.getDeclaringClass() );
-        }
-
-        public <T> T getInstance(ComponentContext cc, Scope scope, Class<T> c ) throws InstantiationException, IllegalAccessException {
-            return getInstance(scope, c);
-        }
-        
-        public void inject( Object instance ) {
-        }
-        
-    }
-    
-    @XmlRootElement
-    static class MyBean {
-        
-        public String value; 
-        public MyBean() {}
-        public MyBean(String str) {
-            value = str;
-        }
-        
-        public boolean equals(Object o) {
-            if (!(o instanceof MyBean)) 
-                return false;
-            return ((MyBean) o).value.equals(value);
-        }
-        
-        public String toString() {
-            return "JAXBClass: "+value;
-        }
-    }
-
+        assertEquals("1", resource("/perrequest").get(String.class));
+        assertEquals("1", resource("/perrequest").get(String.class));
+    }    
 }

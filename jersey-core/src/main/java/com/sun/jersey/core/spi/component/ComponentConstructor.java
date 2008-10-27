@@ -38,8 +38,6 @@ package com.sun.jersey.core.spi.component;
 
 import com.sun.jersey.spi.inject.Injectable;
 import com.sun.jersey.spi.inject.InjectableProviderContext;
-import com.sun.jersey.spi.service.AnnotationObjectContext;
-import com.sun.jersey.spi.service.ComponentProvider.Scope;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
@@ -64,17 +62,17 @@ public class ComponentConstructor<T> {
      * 
      * @param <T> the type to construct.
      */
-    protected static class ConstructorInjectablePair<T> {
+    private static class ConstructorInjectablePair<T> {
         /**
          * The constructor.
          */
-        public final Constructor<T> con;
+        private final Constructor<T> con;
 
         /**
          * The list of injectables associated with the parameters of the
          * constructor;
          */
-        public final List<Injectable> is;
+        private final List<Injectable> is;
 
         /**
          * Create a new tuple of a constructor and list of injectables.
@@ -82,13 +80,13 @@ public class ComponentConstructor<T> {
          * @param con the constructor
          * @param is the list of injectables.
          */
-        public ConstructorInjectablePair(Constructor<T> con, List<Injectable> is) {
+        private ConstructorInjectablePair(Constructor<T> con, List<Injectable> is) {
             this.con = con;
             this.is = is;
         }
     }
     
-    protected static class ConstructorComparator<T> implements Comparator<ConstructorInjectablePair<T>> {
+    private static class ConstructorComparator<T> implements Comparator<ConstructorInjectablePair<T>> {
         public int compare(ConstructorInjectablePair<T> o1, ConstructorInjectablePair<T> o2) {
             int p = Collections.frequency(o1.is, null) - Collections.frequency(o2.is, null);
             if (p != 0)
@@ -98,9 +96,9 @@ public class ComponentConstructor<T> {
         }
     }
     
-    protected final InjectableProviderContext ipc;
+    private final InjectableProviderContext ipc;
 
-    protected final Class<T> c;
+    private final Class<T> c;
     
     /**
      * Create a component constructor with the injectable provider context.
@@ -147,7 +145,7 @@ public class ComponentConstructor<T> {
         SortedSet<ConstructorInjectablePair<T>> cs = new TreeSet<ConstructorInjectablePair<T>>(
                 new ConstructorComparator());
         
-        AnnotationObjectContext aoc = new AnnotationObjectContext();
+        AnnotatedContext aoc = new AnnotatedContext();
         for (Constructor con : c.getConstructors()) {
             List<Injectable> is = new ArrayList<Injectable>();
             int ps = con.getParameterTypes().length;
@@ -159,7 +157,7 @@ public class ComponentConstructor<T> {
                 for (Annotation a : as) {
                     i = ipc.getInjectable(
                             a.annotationType(), aoc, a, pgtype, 
-                            Scope.UNDEFINED_SINGLETON);
+                            ComponentScope.UNDEFINED_SINGLETON);
                 }
                 is.add(i);
             }

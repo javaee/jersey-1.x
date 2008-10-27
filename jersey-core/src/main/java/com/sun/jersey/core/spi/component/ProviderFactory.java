@@ -37,7 +37,6 @@
 package com.sun.jersey.core.spi.component;
 
 import com.sun.jersey.spi.inject.InjectableProviderContext;
-import com.sun.jersey.spi.service.ComponentContext;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Collection;
 import java.util.HashMap;
@@ -49,8 +48,8 @@ import java.util.logging.Logger;
  *
  * @author Paul.Sandoz@Sun.Com
  */
-public class ProviderComponentProviderFactory implements ComponentProviderFactory<ComponentProvider> {
-    private static final Logger LOGGER = Logger.getLogger(ProviderComponentProviderFactory.class.getName());
+public class ProviderFactory implements ComponentProviderFactory<ComponentProvider> {
+    private static final Logger LOGGER = Logger.getLogger(ProviderFactory.class.getName());
 
     private static final class SingletonComponentProvider implements ComponentProvider {
         private final Object o;
@@ -76,8 +75,12 @@ public class ProviderComponentProviderFactory implements ComponentProviderFactor
 
     private final InjectableProviderContext ipc;
 
-    public ProviderComponentProviderFactory(InjectableProviderContext ipc) {
+    public ProviderFactory(InjectableProviderContext ipc) {
         this.ipc = ipc;
+    }
+
+    public InjectableProviderContext getInjectableProviderContext() {
+        return ipc;
     }
 
     public ComponentProvider getComponentProvider(Class c) {
@@ -110,10 +113,6 @@ public class ProviderComponentProviderFactory implements ComponentProviderFactor
                     ", could not be instantiated");
             return null;
         }
-    }
-
-    public ComponentProvider getComponentProvider(ComponentContext cc, Class c) {
-        return getComponentProvider(c);
     }
 
     public void injectOnAllComponents() {

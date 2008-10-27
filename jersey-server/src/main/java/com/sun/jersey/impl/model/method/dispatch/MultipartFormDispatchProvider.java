@@ -48,7 +48,7 @@ import com.sun.jersey.server.impl.inject.AbstractHttpContextInjectable;
 import com.sun.jersey.spi.MessageBodyWorkers;
 import com.sun.jersey.spi.dispatch.RequestDispatcher;
 import com.sun.jersey.spi.inject.Injectable;
-import com.sun.jersey.spi.service.ComponentProvider.Scope;
+import com.sun.jersey.core.spi.component.ComponentScope;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.lang.annotation.Annotation;
@@ -210,7 +210,7 @@ public class MultipartFormDispatchProvider extends FormDispatchProvider {
             } else if (p.getAnnotation().annotationType() == FormParam.class) {
                 is.add(new MultipartFormParamInjectable(mbws, p));
             } else {
-                Injectable injectable = sipc.getInjectable(p, Scope.PerRequest);
+                Injectable injectable = sipc.getInjectable(p, ComponentScope.PerRequest);
                 is.add(injectable);
             }
         }

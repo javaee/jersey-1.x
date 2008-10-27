@@ -42,8 +42,8 @@ import com.sun.jersey.core.util.KeyComparator;
 import com.sun.jersey.core.util.KeyComparatorHashMap;
 import com.sun.jersey.spi.inject.Injectable;
 import com.sun.jersey.spi.inject.InjectableProvider;
-import com.sun.jersey.spi.service.ComponentContext;
-import com.sun.jersey.spi.service.ComponentProvider.Scope;
+import com.sun.jersey.core.spi.component.ComponentContext;
+import com.sun.jersey.core.spi.component.ComponentScope;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
@@ -126,8 +126,8 @@ public final class ContextResolverFactory {
         // Add injectable
         
         ipf.add(new InjectableProvider<Context, Type>() {
-            public Scope getScope() {
-                return Scope.Singleton;
+            public ComponentScope getScope() {
+                return ComponentScope.Singleton;
             }
 
             public Injectable getInjectable(ComponentContext ic, Context ac, Type c) {

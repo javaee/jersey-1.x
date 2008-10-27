@@ -40,7 +40,7 @@ package com.sun.jersey.server.impl.inject;
 import com.sun.jersey.api.model.Parameter;
 import com.sun.jersey.spi.inject.Injectable;
 import com.sun.jersey.spi.inject.InjectableProviderContext;
-import com.sun.jersey.spi.service.ComponentProvider.Scope;
+import com.sun.jersey.core.spi.component.ComponentScope;
 import java.util.List;
 
 /**
@@ -57,7 +57,7 @@ public interface ServerInjectableProviderContext extends InjectableProviderConte
      * @return the injectable, otherwise null if an injectable could
      *         not be found.
      */
-    Injectable getInjectable(Parameter p, Scope s);
+    Injectable getInjectable(Parameter p, ComponentScope s);
     
     /**
      * Get a list of injectable given a list of parameter.
@@ -68,5 +68,5 @@ public interface ServerInjectableProviderContext extends InjectableProviderConte
      *         could not be found the corresponding element in the 
      *         list will be null.
      */
-    List<Injectable> getInjectable(List<Parameter> ps, Scope s);
+    List<Injectable> getInjectable(List<Parameter> ps, ComponentScope s);
 }

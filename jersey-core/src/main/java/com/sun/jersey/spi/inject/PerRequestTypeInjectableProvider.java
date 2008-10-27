@@ -5,8 +5,8 @@
 
 package com.sun.jersey.spi.inject;
 
-import com.sun.jersey.spi.service.ComponentContext;
-import com.sun.jersey.spi.service.ComponentProvider.Scope;
+import com.sun.jersey.core.spi.component.ComponentContext;
+import com.sun.jersey.core.spi.component.ComponentScope;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 
@@ -32,8 +32,8 @@ public abstract class PerRequestTypeInjectableProvider <A extends Annotation, T>
         this.t = t;
     }
 
-    public final Scope getScope() {
-        return Scope.PerRequest;
+    public final ComponentScope getScope() {
+        return ComponentScope.PerRequest;
     }
 
     public final Injectable getInjectable(ComponentContext ic, A a, Type c) {

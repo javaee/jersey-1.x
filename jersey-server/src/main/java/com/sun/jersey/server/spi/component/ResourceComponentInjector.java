@@ -34,7 +34,7 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-package com.sun.jersey.spi.resource;
+package com.sun.jersey.server.spi.component;
 
 import com.sun.jersey.spi.inject.InjectableProviderContext;
 import com.sun.jersey.api.container.ContainerException;
@@ -44,9 +44,9 @@ import com.sun.jersey.api.model.AbstractResource;
 import com.sun.jersey.api.model.AbstractSetterMethod;
 import com.sun.jersey.api.model.Parameter;
 import com.sun.jersey.server.impl.inject.AbstractHttpContextInjectable;
-import com.sun.jersey.spi.service.AccessibleObjectContext;
+import com.sun.jersey.core.spi.component.AccessibleObjectContext;
 import com.sun.jersey.spi.inject.Injectable;
-import com.sun.jersey.spi.service.ComponentProvider.Scope;
+import com.sun.jersey.core.spi.component.ComponentScope;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.security.AccessController;
@@ -64,7 +64,7 @@ import java.util.Map;
  * 
  * @author Paul.Sandoz@Sun.Com
  */
-public final class ResourceClassInjector {
+public final class ResourceComponentInjector {
     private Field[] singletonFields;    
     private Object[] singletonFieldValues;
     
@@ -79,19 +79,19 @@ public final class ResourceClassInjector {
     private AbstractHttpContextInjectable<?>[] perRequestSetterInjectables;
     
     /**
-     * Create a new resource class injector.
+     * Create a new resource component injector.
      * 
      * @param ipc the injectable provider context to obtain injectables.
      * @param s the scope underwhich injection will be performed.
      * @param resource the abstract resource model.
      */
-    public ResourceClassInjector(InjectableProviderContext ipc, Scope s, AbstractResource resource) {
+    public ResourceComponentInjector(InjectableProviderContext ipc, ComponentScope s, AbstractResource resource) {
         // processFields(ipc, s, resource.getResourceClass());
         processFields(ipc, s, resource.getFields());
         processSetters(ipc, s, resource.getSetterMethods());
     }
 
-    private void processFields(InjectableProviderContext ipc, Scope s, 
+    private void processFields(InjectableProviderContext ipc, ComponentScope s,
             List<AbstractField> fields) {
         Map<Field, Injectable<?>> singletons = new HashMap<Field, Injectable<?>>();
         Map<Field, Injectable<?>> perRequest = new HashMap<Field, Injectable<?>>();
@@ -103,14 +103,14 @@ public final class ResourceClassInjector {
             
             if (p.getAnnotation() == null) continue;
 
-            if (s == Scope.PerRequest) {
+            if (s == ComponentScope.PerRequest) {
                 // Find a per request injectable with Parameter
                 Injectable i = ipc.getInjectable(
                         p.getAnnotation().annotationType(), 
                         aoc, 
                         p.getAnnotation(), 
                         p, 
-                        Scope.PerRequest);
+                        ComponentScope.PerRequest);
                 if (i != null) {
                     configureField(af.getField());
                     perRequest.put(af.getField(), i);
@@ -120,7 +120,7 @@ public final class ResourceClassInjector {
                             aoc, 
                             p.getAnnotation(), 
                             p.getParameterType(),
-                            Scope.PERREQUEST_UNDEFINED
+                            ComponentScope.PERREQUEST_UNDEFINED
                             );
                     if (i != null) {
                         configureField(af.getField());
@@ -131,7 +131,7 @@ public final class ResourceClassInjector {
                                 aoc, 
                                 p.getAnnotation(), 
                                 p.getParameterType(),
-                                Scope.Singleton
+                                ComponentScope.Singleton
                                 );
                         if (i != null) {
                             configureField(af.getField());
@@ -145,7 +145,7 @@ public final class ResourceClassInjector {
                         aoc, 
                         p.getAnnotation(), 
                         p.getParameterType(),
-                        Scope.UNDEFINED_SINGLETON
+                        ComponentScope.UNDEFINED_SINGLETON
                         );            
                 if (i != null) {
                     configureField(af.getField());
@@ -186,7 +186,7 @@ public final class ResourceClassInjector {
         }
     }
     
-    private void processSetters(InjectableProviderContext ipc, Scope s, 
+    private void processSetters(InjectableProviderContext ipc, ComponentScope s,
             List<AbstractSetterMethod> setterMethods) {
         Map<Method, Injectable<?>> singletons = new HashMap<Method, Injectable<?>>();
         Map<Method, Injectable<?>> perRequest = new HashMap<Method, Injectable<?>>();
@@ -198,14 +198,14 @@ public final class ResourceClassInjector {
             
             if (p.getAnnotation() == null) continue;
 
-            if (s == Scope.PerRequest) {
+            if (s == ComponentScope.PerRequest) {
                 // Find a per request injectable with Parameter
                 Injectable i = ipc.getInjectable(
                         p.getAnnotation().annotationType(), 
                         aoc, 
                         p.getAnnotation(), 
                         p, 
-                        Scope.PerRequest);
+                        ComponentScope.PerRequest);
                 if (i != null) {
                      perRequest.put(sm.getMethod(), i);
                 } else {
@@ -214,7 +214,7 @@ public final class ResourceClassInjector {
                             aoc, 
                             p.getAnnotation(), 
                             p.getParameterType(),
-                            Scope.PERREQUEST_UNDEFINED
+                            ComponentScope.PERREQUEST_UNDEFINED
                             );
                     if (i != null) {
                         perRequest.put(sm.getMethod(), i);                        
@@ -224,7 +224,7 @@ public final class ResourceClassInjector {
                                 aoc, 
                                 p.getAnnotation(), 
                                 p.getParameterType(),
-                                Scope.Singleton
+                                ComponentScope.Singleton
                                 );
                         if (i != null) {
                             singletons.put(sm.getMethod(), i);                        
@@ -237,7 +237,7 @@ public final class ResourceClassInjector {
                         aoc, 
                         p.getAnnotation(), 
                         p.getParameterType(),
-                        Scope.UNDEFINED_SINGLETON
+                        ComponentScope.UNDEFINED_SINGLETON
                         );            
                 if (i != null) {
                     singletons.put(sm.getMethod(), i);                        

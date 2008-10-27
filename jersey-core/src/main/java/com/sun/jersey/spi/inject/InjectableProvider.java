@@ -37,8 +37,8 @@
 
 package com.sun.jersey.spi.inject;
 
-import com.sun.jersey.spi.service.ComponentContext;
-import com.sun.jersey.spi.service.ComponentProvider;
+import com.sun.jersey.core.spi.component.ComponentContext;
+import com.sun.jersey.core.spi.component.ComponentScope;
 import java.lang.annotation.Annotation;
 
 /**
@@ -59,7 +59,7 @@ public interface InjectableProvider<A extends Annotation, C> {
      * 
      * @return the scope.
      */
-    ComponentProvider.Scope getScope();
+    ComponentScope getScope();
     
     /**
      * Get an injectable.

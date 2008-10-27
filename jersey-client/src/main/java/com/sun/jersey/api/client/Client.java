@@ -40,8 +40,9 @@ import com.sun.jersey.api.client.filter.Filterable;
 import com.sun.jersey.api.client.config.DefaultClientConfig;
 import com.sun.jersey.api.client.config.ClientConfig;
 import com.sun.jersey.api.client.filter.ClientFilter;
-import com.sun.jersey.core.spi.component.IoCProviderComponentProviderFactory;
-import com.sun.jersey.core.spi.component.ProviderComponentProviderFactory;
+import com.sun.jersey.core.spi.component.ioc.IoCComponentProviderFactory;
+import com.sun.jersey.core.spi.component.ioc.IoCProviderFactory;
+import com.sun.jersey.core.spi.component.ProviderFactory;
 import com.sun.jersey.core.spi.component.ProviderServices;
 import com.sun.jersey.impl.client.urlconnection.URLConnectionClientHandler;
 import com.sun.jersey.spi.MessageBodyWorkers;
@@ -49,11 +50,7 @@ import com.sun.jersey.core.spi.factory.ContextResolverFactory;
 import com.sun.jersey.core.spi.factory.InjectableProviderFactory;
 import com.sun.jersey.core.spi.factory.MessageBodyFactory;
 import com.sun.jersey.spi.inject.SingletonTypeInjectableProvider;
-import com.sun.jersey.spi.service.ComponentContext;
-import com.sun.jersey.spi.service.ComponentProvider;
 import java.lang.annotation.Annotation;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Type;
 import java.net.URI;
 import java.util.HashMap;
@@ -82,7 +79,7 @@ import javax.ws.rs.ext.Providers;
  * thread-safe.
  * <p>
  * A client may integrate with an IoC framework by passing a 
- * {@link ComponentProvider} instance to the appropriate constructor.
+ * {@link IoCComponentProviderFactory} instance to the appropriate constructor.
  * 
  * @author Paul.Sandoz@Sun.Com
  */
@@ -91,7 +88,7 @@ public final class Client extends Filterable implements ClientHandler {
     
     private final ClientConfig config;
     
-    private ProviderComponentProviderFactory componentProviderFactory;
+    private ProviderFactory componentProviderFactory;
 
     private final MessageBodyFactory bodyContext;
     
@@ -133,10 +130,10 @@ public final class Client extends Filterable implements ClientHandler {
      * @param root the root client handler for dispatching a request and
      *        returning a response.
      * @param config the client configuration.
-     * @param provider the component provider.
+     * @param provider the IoC component provider factory.
      */
     public Client(ClientHandler root, ClientConfig config, 
-            ComponentProvider provider) {
+            IoCComponentProviderFactory provider) {
         // Defer instantiation of root to component provider
         super(root);
     
@@ -152,8 +149,8 @@ public final class Client extends Filterable implements ClientHandler {
                     
         // Set up the component provider factory
         this.componentProviderFactory = (provider == null)
-                ? new ProviderComponentProviderFactory(injectableFactory)
-                : new IoCProviderComponentProviderFactory(injectableFactory, provider);
+                ? new ProviderFactory(injectableFactory)
+                : new IoCProviderFactory(injectableFactory, provider);
 
         ProviderServices providerServices = new ProviderServices(
                 this.injectableFactory,
@@ -345,10 +342,10 @@ public final class Client extends Filterable implements ClientHandler {
      * Create a default client with client configuration and component provider.
      * 
      * @param cc the client configuration.
-     * @param cp the component provider.
+     * @param provider the IoC component provider factory.
      * @return a default client.
      */
-    public static Client create(ClientConfig cc, ComponentProvider cp) {
-        return new Client(new URLConnectionClientHandler(), cc, cp);
+    public static Client create(ClientConfig cc, IoCComponentProviderFactory provider) {
+        return new Client(new URLConnectionClientHandler(), cc, provider);
     }
 }

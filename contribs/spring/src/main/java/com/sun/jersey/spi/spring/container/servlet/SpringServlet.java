@@ -29,17 +29,17 @@ import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
 import com.sun.jersey.api.core.ResourceConfig;
+import com.sun.jersey.core.spi.component.ioc.IoCComponentProviderFactory;
 import com.sun.jersey.spi.container.WebApplication;
 import com.sun.jersey.spi.container.servlet.ServletContainer;
-import com.sun.jersey.spi.service.ComponentProvider;
 
 /**
  * A servlet container for deploying root resource classes with Spring
  * integration.
  * <p>
  * This servlet extends {@link ServletContainer} and initiates the
- * {@link WebApplication} with a Spring-based {@link ComponentProvider},
- * {@link SpringComponentProvider}, such that resource and provider classes
+ * {@link WebApplication} with a Spring-based {@link IoCComponentProviderFactory},
+ * {@link SpringComponentProviderFactory}, such that resource and provider classes
  * can be registered Spring-based beans using XML-based registration or
  * auto-wire-based registration.
  * 
@@ -56,28 +56,11 @@ public class SpringServlet extends ServletContainer {
         try {
             final WebApplicationContext springContext = WebApplicationContextUtils.
                     getRequiredWebApplicationContext(getServletContext());
-            
-            if ( rc.getProperty( ResourceConfig.PROPERTY_DEFAULT_RESOURCE_PROVIDER_CLASS ) == null
-                    && springComponentAnnotationAvailable() ) {
-                rc.getProperties().put( ResourceConfig.PROPERTY_DEFAULT_RESOURCE_PROVIDER_CLASS,
-                        SpringResourceProvider.class );
-            }
-            
-            wa.initiate(rc, new SpringComponentProvider((ConfigurableApplicationContext) springContext));
+
+            wa.initiate(rc, new SpringComponentProviderFactory((ConfigurableApplicationContext)springContext));
         } catch( RuntimeException e ) {
             LOGGER.log(Level.SEVERE, "Exception occurred when intialization", e);
             throw e;
-        }
-    }
-    
-    private boolean springComponentAnnotationAvailable() {
-        try {
-            Class.forName("org.springframework.stereotype.Component");
-            LOGGER.info( "The spring Component annotation is present: using spring >= 2.5" );
-            return true;
-        } catch ( ClassNotFoundException e ) {
-            LOGGER.info( "The spring Component annotation is not present: using spring < 2.5" );
-            return false;
         }
     }
 }

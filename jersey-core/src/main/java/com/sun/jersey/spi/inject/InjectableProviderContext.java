@@ -37,8 +37,8 @@
 
 package com.sun.jersey.spi.inject;
 
-import com.sun.jersey.spi.service.ComponentContext;
-import com.sun.jersey.spi.service.ComponentProvider.Scope;
+import com.sun.jersey.core.spi.component.ComponentContext;
+import com.sun.jersey.core.spi.component.ComponentScope;
 import java.lang.annotation.Annotation;
 import java.util.List;
 
@@ -68,7 +68,7 @@ public interface InjectableProviderContext {
             ComponentContext ic,
             A a,
             C c,
-            Scope s);
+            ComponentScope s);
     
     /**
      * Get an injectable.
@@ -90,5 +90,5 @@ public interface InjectableProviderContext {
             ComponentContext ic,
             A a,
             C c,
-            List<Scope> s);
+            List<ComponentScope> s);
 }

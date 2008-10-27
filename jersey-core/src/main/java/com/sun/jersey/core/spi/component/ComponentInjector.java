@@ -40,8 +40,6 @@ import com.sun.jersey.core.reflection.AnnotatedMethod;
 import com.sun.jersey.core.reflection.MethodList;
 import com.sun.jersey.spi.inject.Injectable;
 import com.sun.jersey.spi.inject.InjectableProviderContext;
-import com.sun.jersey.spi.service.AccessibleObjectContext;
-import com.sun.jersey.spi.service.ComponentProvider.Scope;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.Type;
@@ -77,7 +75,7 @@ public class ComponentInjector<T> {
                 for (Annotation a : as) {
                     Injectable i = ipc.getInjectable(
                             a.annotationType(), aoc, a, f.getGenericType(),
-                            Scope.UNDEFINED_SINGLETON);
+                            ComponentScope.UNDEFINED_SINGLETON);
                     if (i != null) {
                         setFieldValue(t, f, i.getValue());
                     }
@@ -100,7 +98,7 @@ public class ComponentInjector<T> {
             for (Annotation a : as) {
                 Injectable i = ipc.getInjectable(
                         a.annotationType(), aoc, a, gpt,
-                        Scope.UNDEFINED_SINGLETON);
+                        ComponentScope.UNDEFINED_SINGLETON);
                 if (i != null) {
                     setMethodValue(t, m, i.getValue());
                 }

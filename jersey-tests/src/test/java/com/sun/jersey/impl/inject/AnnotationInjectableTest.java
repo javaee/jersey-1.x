@@ -36,10 +36,9 @@
  */
 package com.sun.jersey.impl.inject;
 
-import com.sun.jersey.api.core.HttpContext;
 import com.sun.jersey.api.core.ResourceConfig;
-import com.sun.jersey.spi.service.ComponentContext;
-import com.sun.jersey.spi.service.ComponentProvider.Scope;
+import com.sun.jersey.core.spi.component.ComponentContext;
+import com.sun.jersey.core.spi.component.ComponentScope;
 import static java.lang.annotation.ElementType.CONSTRUCTOR;
 import static java.lang.annotation.ElementType.FIELD;
 import static java.lang.annotation.ElementType.PARAMETER;
@@ -86,8 +85,8 @@ public class AnnotationInjectableTest extends AbstractResourceTester {
             this.value = value;
         }
         
-        public Scope getScope() {
-            return Scope.Singleton;
+        public ComponentScope getScope() {
+            return ComponentScope.Singleton;
         }
         
         public Injectable<String> getInjectable(ComponentContext ic, MyAnnotation a, Type c) {

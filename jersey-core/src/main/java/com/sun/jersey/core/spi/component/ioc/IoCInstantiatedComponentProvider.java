@@ -34,20 +34,12 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-package com.sun.jersey.core.spi.component;
+package com.sun.jersey.core.spi.component.ioc;
 
 /**
- * A factory for obtaining component providers.
  *
  * @author Paul.Sandoz@Sun.Com
  */
-public interface ComponentProviderFactory<C extends ComponentProvider> {
-
-    /**
-     * Get the component provider for a class.
-     *
-     * @param c the class
-     * @return the component provider for the class
-     */
-    C getComponentProvider(Class c);
+public interface IoCInstantiatedComponentProvider extends IoCComponentProvider {
+   Object getInjectableInstance(Object o);
 }

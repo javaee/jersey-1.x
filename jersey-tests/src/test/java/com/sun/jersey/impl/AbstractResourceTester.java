@@ -50,11 +50,11 @@ import com.sun.jersey.api.client.WebResource;
 import com.sun.jersey.api.client.config.ClientConfig;
 import com.sun.jersey.api.core.DefaultResourceConfig;
 import com.sun.jersey.api.core.ResourceConfig;
+import com.sun.jersey.core.spi.component.ioc.IoCComponentProviderFactory;
 import com.sun.jersey.impl.application.WebApplicationImpl;
 import com.sun.jersey.spi.container.ContainerListener;
 import com.sun.jersey.spi.container.ContainerNotifier;
 import com.sun.jersey.spi.container.WebApplication;
-import com.sun.jersey.spi.service.ComponentProvider;
 
 /**
  *
@@ -69,12 +69,12 @@ public abstract class AbstractResourceTester extends TestCase implements Contain
         super(testName);
     }
     
-    protected void initiateWebApplication(ComponentProvider cp, ResourceConfig c) {
-        w = createWebApplication(c, cp);
+    protected void initiateWebApplication(IoCComponentProviderFactory provider, ResourceConfig c) {
+        w = createWebApplication(c, provider);
     }
 
-    protected void initiateWebApplication(ComponentProvider cp, Class... classes) {
-        w = createWebApplication(cp, classes);
+    protected void initiateWebApplication(IoCComponentProviderFactory provider, Class... classes) {
+        w = createWebApplication(provider, classes);
     }
     
     protected void initiateWebApplication(Class... classes) {
@@ -89,17 +89,17 @@ public abstract class AbstractResourceTester extends TestCase implements Contain
         return createWebApplication(null, classes);
     }
     
-    private WebApplication createWebApplication(ComponentProvider cp, Class... classes) {
+    private WebApplication createWebApplication(IoCComponentProviderFactory provider, Class... classes) {
         ResourceConfig rc = new DefaultResourceConfig(classes);
         
-        return createWebApplication(rc, cp);
+        return createWebApplication(rc, provider);
     }
     
     private WebApplication createWebApplication(ResourceConfig c) {
         return createWebApplication(c, null);
     }
     
-    private WebApplication createWebApplication(ResourceConfig c, ComponentProvider cp) {
+    private WebApplication createWebApplication(ResourceConfig c, IoCComponentProviderFactory provider) {
         Object o = c.getProperties().get(
                 ResourceConfig.PROPERTY_CONTAINER_NOTIFIER);
         if (o instanceof ContainerNotifier) {
@@ -109,7 +109,7 @@ public abstract class AbstractResourceTester extends TestCase implements Contain
 
         WebApplicationImpl a = new WebApplicationImpl();
         initiate(c, a);
-        a.initiate(c, cp);
+        a.initiate(c, provider);
         return a;
     }
 

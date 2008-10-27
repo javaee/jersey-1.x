@@ -37,7 +37,6 @@
 
 package com.sun.jersey.impl.resource;
 
-import com.sun.jersey.impl.resource.PerRequestProvider;
 import com.sun.jersey.impl.AbstractResourceTester;
 import com.sun.jersey.api.core.ResourceConfig;
 import com.sun.jersey.impl.application.WebApplicationImpl;
@@ -130,8 +129,8 @@ public class ResourceLifecycleTest extends AbstractResourceTester {
     
     public void testOverrideDefault() {
         ResourceConfig c = getResourceConfig();
-        c.getProperties().put(ResourceConfig.PROPERTY_DEFAULT_RESOURCE_PROVIDER_CLASS,
-                PerRequestProvider.class);
+        c.getProperties().put(ResourceConfig.PROPERTY_DEFAULT_RESOURCE_COMPONENT_PROVIDER_FACTORY_CLASS,
+                PerRequestFactory.class);
         
         initiateWebApplication(c);
         _test();
@@ -139,7 +138,7 @@ public class ResourceLifecycleTest extends AbstractResourceTester {
     
     public void testNullResourceProviderProperty() {
         ResourceConfig c = getResourceConfig();
-        c.getProperties().put(ResourceConfig.PROPERTY_DEFAULT_RESOURCE_PROVIDER_CLASS,
+        c.getProperties().put(ResourceConfig.PROPERTY_DEFAULT_RESOURCE_COMPONENT_PROVIDER_FACTORY_CLASS,
                 null);
         
         initiateWebApplication(c);
@@ -148,7 +147,7 @@ public class ResourceLifecycleTest extends AbstractResourceTester {
     
     public void testBadTypeResourceProviderProperty() {
         ResourceConfig c = getResourceConfig();
-        c.getProperties().put(ResourceConfig.PROPERTY_DEFAULT_RESOURCE_PROVIDER_CLASS,
+        c.getProperties().put(ResourceConfig.PROPERTY_DEFAULT_RESOURCE_COMPONENT_PROVIDER_FACTORY_CLASS,
                 "VALUE");
 
         boolean caught = false;
@@ -162,7 +161,7 @@ public class ResourceLifecycleTest extends AbstractResourceTester {
     
     public void testBadClassResourceProviderProperty() {
         ResourceConfig c = getResourceConfig();
-        c.getProperties().put(ResourceConfig.PROPERTY_DEFAULT_RESOURCE_PROVIDER_CLASS,
+        c.getProperties().put(ResourceConfig.PROPERTY_DEFAULT_RESOURCE_COMPONENT_PROVIDER_FACTORY_CLASS,
                 String.class);
         
         boolean caught = false;

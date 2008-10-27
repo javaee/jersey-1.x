@@ -39,7 +39,6 @@ package com.sun.jersey.core.spi.component;
 
 import com.sun.jersey.core.spi.factory.InjectableProviderFactory;
 import com.sun.jersey.spi.service.ServiceFinder;
-import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -59,7 +58,7 @@ public final class ProviderServices {
     
     private final InjectableProviderFactory injectableFactory;
     
-    private final ProviderComponentProviderFactory componentProviderFactory;
+    private final ProviderFactory componentProviderFactory;
     
     private final Set<Class<?>> providers;
     
@@ -67,7 +66,7 @@ public final class ProviderServices {
     
     public ProviderServices(
             InjectableProviderFactory injectableFactory,
-            ProviderComponentProviderFactory componentProviderFactory,
+            ProviderFactory componentProviderFactory,
             Set<Class<?>> providers,
             Set<?> providerInstances) {
         this.injectableFactory = injectableFactory;
@@ -76,7 +75,7 @@ public final class ProviderServices {
         this.providerInstances = providerInstances;
     }
     
-    public ProviderComponentProviderFactory getComponentProviderFactory() {
+    public ProviderFactory getComponentProviderFactory() {
         return componentProviderFactory;
     }
     
@@ -200,7 +199,4 @@ public final class ProviderServices {
         for (Class pc : pca)
             sp.add(pc);
     }
-
-
-
 }

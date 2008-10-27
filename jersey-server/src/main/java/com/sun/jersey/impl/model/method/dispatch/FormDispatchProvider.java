@@ -51,7 +51,7 @@ import com.sun.jersey.server.impl.inject.ServerInjectableProviderContext;
 import com.sun.jersey.spi.MessageBodyWorkers;
 import com.sun.jersey.spi.dispatch.RequestDispatcher;
 import com.sun.jersey.spi.inject.Injectable;
-import com.sun.jersey.spi.service.ComponentProvider.Scope;
+import com.sun.jersey.core.spi.component.ComponentScope;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Type;
@@ -278,7 +278,7 @@ public class FormDispatchProvider implements ResourceMethodDispatchProvider {
                 is.add(new FormParamInjectable(e, !p.isEncoded()));
                 
             } else {
-                Injectable injectable = sipc.getInjectable(p, Scope.PerRequest);
+                Injectable injectable = sipc.getInjectable(p, ComponentScope.PerRequest);
                 if (injectable == null)
                     return null;
                 is.add(injectable);

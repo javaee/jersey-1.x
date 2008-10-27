@@ -37,11 +37,11 @@
 package com.sun.jersey.server.impl.inject;
 
 import com.sun.jersey.api.model.Parameter;
-import com.sun.jersey.spi.inject.Injectable;
-import com.sun.jersey.spi.service.ComponentContext;
+import com.sun.jersey.core.spi.component.AnnotatedContext;
+import com.sun.jersey.core.spi.component.ComponentContext;
+import com.sun.jersey.core.spi.component.ComponentScope;
 import com.sun.jersey.core.spi.factory.InjectableProviderFactory;
-import com.sun.jersey.spi.service.AnnotationObjectContext;
-import com.sun.jersey.spi.service.ComponentProvider.Scope;
+import com.sun.jersey.spi.inject.Injectable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -52,15 +52,15 @@ import java.util.List;
 public final class ServerInjectableProviderFactory extends InjectableProviderFactory
             implements ServerInjectableProviderContext {
     
-    public Injectable getInjectable(Parameter p, Scope s) {
+    public Injectable getInjectable(Parameter p, ComponentScope s) {
         if (p.getAnnotation() == null) return null;
         
-        ComponentContext ic = new AnnotationObjectContext(p.getAnnotations());
+        ComponentContext ic = new AnnotatedContext(p.getAnnotations());
         
-        if (s == Scope.PerRequest) {
+        if (s == ComponentScope.PerRequest) {
             // Find a per request injectable with Parameter
             Injectable i = getInjectable(p.getAnnotation().annotationType(), ic, p.getAnnotation(), 
-                    p, Scope.PerRequest);
+                    p, ComponentScope.PerRequest);
             if (i != null) return i;
 
             // Find a per request, undefined or singleton injectable with parameter Type
@@ -69,7 +69,7 @@ public final class ServerInjectableProviderFactory extends InjectableProviderFac
                     ic, 
                     p.getAnnotation(), 
                     p.getParameterType(),
-                    Scope.PERREQUEST_UNDEFINED_SINGLETON
+                    ComponentScope.PERREQUEST_UNDEFINED_SINGLETON
                     );
         } else {
             // Find a undefined or singleton injectable with parameter Type
@@ -78,12 +78,12 @@ public final class ServerInjectableProviderFactory extends InjectableProviderFac
                     ic, 
                     p.getAnnotation(), 
                     p.getParameterType(),
-                    Scope.UNDEFINED_SINGLETON
+                    ComponentScope.UNDEFINED_SINGLETON
                     );            
         }
     }
     
-    public List<Injectable> getInjectable(List<Parameter> ps, Scope s) {
+    public List<Injectable> getInjectable(List<Parameter> ps, ComponentScope s) {
         List<Injectable> is = new ArrayList<Injectable>();
         for (Parameter p : ps)
             is.add(getInjectable(p, s));

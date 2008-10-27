@@ -36,29 +36,26 @@
  */
 package com.sun.jersey.impl.inject;
 
+import com.sun.jersey.core.spi.component.ioc.IoCComponentProvider;
+import com.sun.jersey.core.spi.component.ioc.IoCComponentProviderFactory;
+import com.sun.jersey.core.spi.component.ComponentContext;
+import com.sun.jersey.core.spi.component.ComponentScope;
 import java.io.IOException;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 
 import com.sun.jersey.impl.AbstractResourceTester;
 import com.sun.jersey.spi.inject.Inject;
-import com.sun.jersey.spi.service.ComponentContext;
-import com.sun.jersey.spi.service.ComponentProvider;
 
 /**
- * TODO: DESCRIBE ME<br>
- * Created on: Apr 12, 2008<br>
- * 
+ *
  * @author <a href="mailto:martin.grotzke@freiheit.com">Martin Grotzke</a>
- * @version $Id$
  */
 public class InjectAnnotationInjectableTest extends AbstractResourceTester {
     
     public InjectAnnotationInjectableTest(String testName) {
-        super( testName );
+        super(testName);
     }
 
     @Path("/")
@@ -68,49 +65,50 @@ public class InjectAnnotationInjectableTest extends AbstractResourceTester {
         
         @GET
         public MyBean get() {
-            assertNotNull( myBean );
+            assertNotNull(myBean);
             return myBean;
         }                
     }
     
     public void testInjected() throws IOException {
         final String value = "foo";
-        
-        initiateWebApplication( new MyComponentProvider( value ), MyResource.class);
+
+        initiateWebApplication(new MyIoCComponentProviderFactory(value), MyResource.class);
 
         final MyBean myBean = resource("/").get(MyBean.class);
-        assertNotNull( myBean );
-        assertEquals( value, myBean.value );        
+        assertEquals(value, myBean.value);
     }
-    
-    static class MyComponentProvider implements ComponentProvider {
-        
+
+    static class MyIoCComponentProviderFactory implements IoCComponentProviderFactory {
+
         private final String _valueToSet;
 
-        public MyComponentProvider( String valueToSet ) {
+        public MyIoCComponentProviderFactory(String valueToSet) {
             _valueToSet = valueToSet;
         }
 
-        public <T> T getInjectableInstance( T instance ) {
-            return instance;
-        }
+        public IoCComponentProvider getComponentProvider(Class c) {
+            if (c == MyBean.class) {
+                return new IoCComponentProvider() {
+                    public ComponentScope getScope() {
+                        return ComponentScope.PerRequest;
+                    }
 
-        public <T> T getInstance( Scope scope, Class<T> c ) throws InstantiationException, IllegalAccessException {
-            return null;
-        }
+                    public Object getInjectableInstance(Object o) {
+                        return o;
+                    }
 
-        public <T> T getInstance( Scope scope, Constructor<T> constructor, Object[] parameters ) throws InstantiationException, IllegalArgumentException, IllegalAccessException, InvocationTargetException {
-            return getInstance( scope, constructor.getDeclaringClass() );
-        }
-
-        public <T> T getInstance( ComponentContext cc, Scope scope, Class<T> c ) throws InstantiationException, IllegalAccessException {
-            if ( MyBean.class.equals( c ) ) {                
-                return c.cast( new MyBean( _valueToSet ) );
+                    public Object getInstance() {
+                        return new MyBean(_valueToSet);
+                    }
+                };
+            } else {
+                return null;
             }
-            return null;
         }
-        
-        public void inject( Object instance ) {
-        }   
+
+        public IoCComponentProvider getComponentProvider(ComponentContext cc, Class c) {
+            return getComponentProvider(c);
+        }
     }
 }

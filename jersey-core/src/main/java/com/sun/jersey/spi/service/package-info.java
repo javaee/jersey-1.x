@@ -35,6 +35,6 @@
  * holder.
  */
 /**
- * Provides support for services and components.
+ * Provides support for services obtained using META-INF/services.
  */
 package com.sun.jersey.spi.service;

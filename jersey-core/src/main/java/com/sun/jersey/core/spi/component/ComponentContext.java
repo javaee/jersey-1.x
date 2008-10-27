@@ -34,57 +34,34 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-package com.sun.jersey.spi.resource;
 
-import com.sun.jersey.api.model.AbstractResource;
-import com.sun.jersey.api.model.AbstractResourceConstructor;
-import com.sun.jersey.server.impl.inject.ServerInjectableProviderContext;
-import com.sun.jersey.spi.inject.Injectable;
-import com.sun.jersey.spi.service.ComponentConstructor;
-import com.sun.jersey.spi.service.ComponentProvider.Scope;
-import java.util.List;
-import java.util.SortedSet;
-import java.util.TreeSet;
+package com.sun.jersey.core.spi.component;
+
+import com.sun.jersey.spi.inject.InjectableProvider;
+import java.lang.annotation.Annotation;
+import java.lang.reflect.AccessibleObject;
 
 /**
- * A utility class to obtain the most suitable constructor for a 
- * resource class.
+ * A component context providing information to {@link ComponentProvider}
+ * and {@link InjectableProvider} instances on the accessible object and list of
+ * annotations associated with the component instance to be obtained and/or
+ * injected.
  * 
  * @author Paul.Sandoz@Sun.Com
  */
-public class ResourceConstructor extends ComponentConstructor {
-    private final ServerInjectableProviderContext sipc;
-
-    public ResourceConstructor(ServerInjectableProviderContext sipc) {
-        super(sipc);
-        this.sipc = sipc;
-    }
-
+public interface ComponentContext {
+    
     /**
-     * Get the most suitable constructor. The constructor with the most
-     * parameters and that has the most parameters associated with 
-     * Injectable instances will be chosen.
+     * Get the accessible object.
      * 
-     * @param <T> the type of the resource.
-     * @param c the class to instantiate.
-     * @param ar the abstract resource.
-     * @param s the scope for which the injectables will be used.
-     * @return a list constructor and list of injectables for the constructor
-     *         parameters.
+     * @return the accessible object, may be null.
      */
-    @SuppressWarnings("unchecked")
-    public <T> ConstructorInjectablePair<T> getConstructor(Class<T> c, AbstractResource ar,
-            Scope s) {
-        if (ar.getConstructors().isEmpty())
-            return null;
-        
-        SortedSet<ConstructorInjectablePair<T>> cs = new TreeSet<ConstructorInjectablePair<T>>(
-                new ConstructorComparator());        
-        for (AbstractResourceConstructor arc : ar.getConstructors()) {
-            List<Injectable> is = sipc.getInjectable(arc.getParameters(), s);
-            cs.add(new ConstructorInjectablePair<T>(arc.getCtor(), is));
-        }
-                
-        return cs.first();        
-    }
- }
+    AccessibleObject getAccesibleObject();
+    
+    /**
+     * Get the array of annotations.
+     * 
+     * @return the array of annotations.
+     */
+    Annotation[] getAnnotations();    
+}

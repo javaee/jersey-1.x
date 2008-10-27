@@ -34,34 +34,13 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-package com.sun.jersey.spi.service;
+package com.sun.jersey.core.spi.component.ioc;
 
-import java.lang.annotation.Annotation;
-import java.lang.reflect.AccessibleObject;
+import com.sun.jersey.core.spi.component.ComponentProvider;
 
-public final class AnnotationObjectContext implements ComponentContext {
-
-    private Annotation[] annotations;
-
-    public AnnotationObjectContext() {
-        super();
-    }
-
-    public AnnotationObjectContext(Annotation[] annotations) {
-        super();
-        this.annotations = annotations;
-    }
-
-    public void setAnnotations(Annotation[] annotations) {
-        this.annotations = annotations;
-    }
-
-    // ComponentContext
-    public AccessibleObject getAccesibleObject() {
-        return null;
-    }
-
-    public Annotation[] getAnnotations() {
-        return annotations;
-    }
+/**
+ *
+ * @author Paul.Sandoz@Sun.Com
+ */
+public interface IoCComponentProvider extends ComponentProvider {
 }

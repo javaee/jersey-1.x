@@ -119,7 +119,7 @@ public final class WebApplicationContext implements UriRuleContext, ExtendedUriI
 
     public Object getResource(Class resourceClass) {
         final ResourceClass rc = app.getResourceClass(resourceClass);
-        return rc.provider.getInstance(app.getResourceComponentProvider(), this);
+        return rc.rcProvider.getInstance(this);
     }
 
     public UriRules<UriRule> getRules(Class resourceClass) {

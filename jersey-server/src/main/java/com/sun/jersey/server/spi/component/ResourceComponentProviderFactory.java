@@ -34,49 +34,15 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-package com.sun.jersey.spi.service;
+package com.sun.jersey.server.spi.component;
 
-import java.lang.annotation.Annotation;
-import java.lang.reflect.AccessibleObject;
+import com.sun.jersey.core.spi.component.ComponentProviderFactory;
+import com.sun.jersey.core.spi.component.ioc.IoCComponentProvider;
 
-public final class AccessibleObjectContext implements ComponentContext {
-
-    private AccessibleObject accesibleObject;
-    private Annotation[] annotations;
-
-    public AccessibleObjectContext() {
-        super();
-    }
-
-    public AccessibleObjectContext(AccessibleObject ao) {
-        super();
-        this.accesibleObject = ao;
-    }
-
-    public AccessibleObjectContext(AccessibleObject ao, Annotation[] annotations) {
-        super();
-        this.accesibleObject = ao;
-        this.annotations = annotations;
-    }
-
-    public void setAccesibleObject(AccessibleObject ao) {
-        this.accesibleObject = ao;
-    }
-
-    public void setAccesibleObject(AccessibleObject ao, Annotation[] annotations) {
-        this.accesibleObject = ao;
-        this.annotations = annotations;
-    }
-
-    // ComponentContext
-    public AccessibleObject getAccesibleObject() {
-        return accesibleObject;
-    }
-
-    public Annotation[] getAnnotations() {
-        if (annotations != null) {
-            return annotations;
-        }
-        return accesibleObject.getAnnotations();
-    }
+/**
+ *
+ * @author Paul.Sandoz@Sun.Com
+ */
+public interface ResourceComponentProviderFactory extends ComponentProviderFactory<ResourceComponentProvider> {
+    ResourceComponentProvider getComponentProvider(IoCComponentProvider icp, Class c);
 }

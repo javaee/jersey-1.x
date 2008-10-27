@@ -41,8 +41,8 @@ package com.sun.jersey.spi.container;
 import com.sun.jersey.api.container.ContainerException;
 import com.sun.jersey.api.core.HttpContext;
 import com.sun.jersey.api.core.ResourceConfig;
+import com.sun.jersey.core.spi.component.ioc.IoCComponentProviderFactory;
 import com.sun.jersey.spi.MessageBodyWorkers;
-import com.sun.jersey.spi.service.ComponentProvider;
 import java.io.IOException;
 
 /**
@@ -77,20 +77,20 @@ public interface WebApplication {
      * 
      * @param resourceConfig the resource configuration containing the set
      *        of Web resources to be managed by the Web application.
-     * @param provider the component provider to use, if null the default
-     *        component provider will be used.
+     * @param provider the IoC component provider factory to use, if null the default
+     *        component provider factory will be used.
      * @throws IllegalArgumentException if resourceConfig is null.
      * @throws ContainerException if a second or further call to the method 
      *         is invoked.
      */
-    void initiate(ResourceConfig resourceConfig, ComponentProvider provider) 
+    void initiate(ResourceConfig resourceConfig, IoCComponentProviderFactory provider)
             throws IllegalArgumentException, ContainerException;
     
     /**
      * Clone the WebApplication instance.
      * <p>
      * A new WebApplication instance will be created that is initiated with
-     * the {@link ResourceConfig} and {@link ComponentProvider} instances
+     * the {@link ResourceConfig} and {@link IoCComponentProviderFactory} instances
      * that were used to initiate this WebApplication instance.
      *
      * @return the cloned instance.
@@ -106,24 +106,6 @@ public interface WebApplication {
      */
     MessageBodyWorkers getMessageBodyWorkers();
 
-    /**
-     * Get the component provider that can be used for instantiating
-     * components other than resource classes.
-     * 
-     * @return the component provider. The return value is 
-     *         undefined before the web applicaiton is initialized.
-     */
-    ComponentProvider getComponentProvider();
-
-    /**
-     * Get the component provider that can be used for instantiating
-     * resource classes.
-     * 
-     * @return the component provider. The return value is 
-     *         undefined before the web applicaiton is initialized.
-     */
-    ComponentProvider getResourceComponentProvider();
-    
     /**
      * Get an instance of {@link HttpContext} that is a proxy to
      * a thread local instance of {@link HttpContext}.

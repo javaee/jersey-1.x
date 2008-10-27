@@ -45,8 +45,8 @@ import com.sun.jersey.api.model.Parameter;
 import com.sun.jersey.server.impl.inject.AbstractHttpContextInjectable;
 import com.sun.jersey.spi.inject.Injectable;
 import com.sun.jersey.spi.inject.InjectableProvider;
-import com.sun.jersey.spi.service.ComponentContext;
-import com.sun.jersey.spi.service.ComponentProvider.Scope;
+import com.sun.jersey.core.spi.component.ComponentContext;
+import com.sun.jersey.core.spi.component.ComponentScope;
 import javax.ws.rs.HeaderParam;
 import javax.ws.rs.WebApplicationException;
 
@@ -73,8 +73,8 @@ public final class HeaderParamInjectableProvider implements
         }
     }
     
-    public Scope getScope() {
-        return Scope.PerRequest;
+    public ComponentScope getScope() {
+        return ComponentScope.PerRequest;
     }
     
     public Injectable getInjectable(ComponentContext ic, HeaderParam a, Parameter c) {

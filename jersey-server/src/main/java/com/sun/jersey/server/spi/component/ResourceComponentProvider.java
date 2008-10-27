@@ -34,20 +34,29 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-package com.sun.jersey.core.spi.component;
+package com.sun.jersey.server.spi.component;
+
+import com.sun.jersey.api.core.HttpContext;
+import com.sun.jersey.api.model.AbstractResource;
+import com.sun.jersey.core.spi.component.ComponentProvider;
 
 /**
- * A factory for obtaining component providers.
  *
  * @author Paul.Sandoz@Sun.Com
  */
-public interface ComponentProviderFactory<C extends ComponentProvider> {
+public interface ResourceComponentProvider extends ComponentProvider {
 
     /**
-     * Get the component provider for a class.
      *
-     * @param c the class
-     * @return the component provider for the class
+     * @param abstractResource
      */
-    C getComponentProvider(Class c);
+    void init(AbstractResource abstractResource);
+
+    /**
+     * Get the instance.
+     *
+     * @param hc the HTTP context.
+     * @return the instance.
+     */
+    Object getInstance(HttpContext hc);
 }

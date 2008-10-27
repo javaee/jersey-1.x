@@ -36,9 +36,8 @@
  */
 package com.sun.jersey.spi.spring.container.servlet;
 
+import com.sun.jersey.api.spring.Autowire;
 import java.lang.annotation.Annotation;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
@@ -50,114 +49,121 @@ import org.springframework.aop.support.AopUtils;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ConfigurableApplicationContext;
 
-import com.sun.jersey.api.spring.Autowire;
+import com.sun.jersey.core.spi.component.ComponentContext;
+import com.sun.jersey.core.spi.component.ComponentScope;
+import com.sun.jersey.core.spi.component.ioc.IoCComponentProvider;
+import com.sun.jersey.core.spi.component.ioc.IoCComponentProviderFactory;
+import com.sun.jersey.core.spi.component.ioc.IoCInstantiatedComponentProvider;
+import com.sun.jersey.core.spi.component.ioc.IoCManagedComponentProvider;
 import com.sun.jersey.spi.inject.Inject;
-import com.sun.jersey.spi.service.ComponentContext;
-import com.sun.jersey.spi.service.ComponentProvider;
 
 /**
- * The Spring-based {@link ComponentProvider}.
+ * The Spring-based {@link IoCComponentProviderFactory}.
  * <p>
  * Resource and provider classes can be registered Spring-based beans using
  * XML-based registration or auto-wire-based registration.
  * 
  * @author Paul.Sandoz@Sun.Com
  */
-public class SpringComponentProvider implements ComponentProvider {
+public class SpringComponentProviderFactory implements IoCComponentProviderFactory {
 
-    private static final Logger LOGGER = Logger.getLogger(SpringComponentProvider.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(SpringComponentProviderFactory.class.getName());
 
     private ConfigurableApplicationContext springContext;
 
-    public SpringComponentProvider(ConfigurableApplicationContext springContext) {
+    public SpringComponentProviderFactory(ConfigurableApplicationContext springContext) {
         this.springContext = springContext;
     }
 
-    public <T> T getInstance(Scope scope, Class<T> clazz)
-            throws InstantiationException, IllegalAccessException {
-        return getInstance(null, scope, clazz);
+    public IoCComponentProvider getComponentProvider(Class c) {
+        return getComponentProvider(null, c);
     }
 
-    public <T> T getInstance(Scope scope, Constructor<T> constructor,
-            Object[] parameters)
-            throws InstantiationException, IllegalArgumentException,
-            IllegalAccessException, InvocationTargetException {
-
-        return getInstance(null, scope, constructor.getDeclaringClass());
-
-    }
-
-    public <T> T getInstance(ComponentContext cc, Scope scope, Class<T> clazz)
-            throws InstantiationException, IllegalAccessException {
-
-        final Autowire autowire = clazz.getAnnotation(Autowire.class);
+    public IoCComponentProvider getComponentProvider(ComponentContext cc, Class c) {
+        final Autowire autowire = (Autowire)c.getAnnotation(Autowire.class);
         if (autowire != null) {
             if (LOGGER.isLoggable(Level.FINEST)) {
                 LOGGER.finest("Creating resource class " +
-                        clazz.getSimpleName() +
+                        c.getSimpleName() +
                         " annotated with @" +
                         Autowire.class.getSimpleName() +
                         " as spring bean.");
             }
-
-            /* use createBean to have a fully initialized bean, including
-             * applied BeanPostProcessors (in contrast to #autowire()).
-             */
-            final Object result = springContext.getBeanFactory().createBean(clazz,
-                    autowire.mode().getSpringCode(), autowire.dependencyCheck());
-            return clazz.cast(result);
+            return new SpringInstantiatedComponentProvider(c, autowire);
         }
-
-        final String beanName = getBeanName(cc, clazz, springContext);
+        
+        final String beanName = getBeanName(cc, c, springContext);
         if (beanName == null) {
             return null;
         }
 
-        /* if the scope is Undefined, this means that jersey simply doesn't know what's
-         * the scope of this dependency, so it's left to the application...
-         */
-        if (scope == Scope.Undefined || scope == Scope.Singleton && springContext.isSingleton(beanName) || scope == Scope.PerRequest && springContext.isPrototype(beanName)) {
-            if (LOGGER.isLoggable(Level.FINEST)) {
-                LOGGER.finest("Retrieving bean '" + beanName + "' for resource class " + clazz.getSimpleName() + " from spring.");
-            }
-            final Object result = springContext.getBean(beanName, clazz);
-            return clazz.cast(result);
+        if (springContext.isSingleton(beanName)) {
+            return new SpringManagedComponentProvider(ComponentScope.Singleton, beanName, c);
+        } else if (springContext.isPrototype(beanName)) {
+            return new SpringManagedComponentProvider(ComponentScope.PerRequest, beanName, c);
         } else {
-
-            /* detect conflicts and raise them...
-             */
-            if (scope == Scope.Singleton && !springContext.isSingleton(beanName) || scope == Scope.PerRequest && !springContext.isPrototype(beanName)) {
-                throw new RuntimeException("The scopes defined for jersey and spring do" +
-                        " not match for the resource class " + clazz.getName() +
-                        " and bean with name " + beanName + "!");
-            }
-
-            return null;
+            return new SpringManagedComponentProvider(ComponentScope.Undefined, beanName, c);
         }
-
     }
 
-    public <T> T getInjectableInstance(T instance) {
-        if (AopUtils.isAopProxy(instance)) {
-            final Advised aopResource = (Advised) instance;
+    private class SpringInstantiatedComponentProvider implements IoCInstantiatedComponentProvider {
+        private final Class c;
+        private final Autowire a;
+
+        SpringInstantiatedComponentProvider(Class c, Autowire a) {
+            this.c = c;
+            this.a = a;
+        }
+
+        public Object getInstance() {
+            return springContext.getBeanFactory().createBean(c,
+                    a.mode().getSpringCode(), a.dependencyCheck());
+        }
+        
+        public Object getInjectableInstance(Object o) {
+            return SpringComponentProviderFactory.getInjectableInstance(o);
+        }
+    }
+    
+    private class SpringManagedComponentProvider implements IoCManagedComponentProvider {
+        private final ComponentScope scope;
+        private final String beanName;
+        private final Class c;
+        
+        SpringManagedComponentProvider(ComponentScope scope, String beanName, Class c) {
+            this.scope = scope;
+            this.beanName = beanName;
+            this.c = c;
+        }
+
+        public ComponentScope getScope() {
+            return scope;
+        }
+
+        public Object getInjectableInstance(Object o) {
+            return SpringComponentProviderFactory.getInjectableInstance(o);
+        }
+
+        public Object getInstance() {
+            return springContext.getBean(beanName, c);
+        }
+    }
+
+    private static Object getInjectableInstance(Object o) {
+        if (AopUtils.isAopProxy(o)) {
+            final Advised aopResource = (Advised)o;
             try {
-                @SuppressWarnings("unchecked")
-                final T result = (T) aopResource.getTargetSource().getTarget();
-                return result;
+                return aopResource.getTargetSource().getTarget();
             } catch (Exception e) {
                 LOGGER.log(Level.SEVERE, "Could not get target object from proxy.", e);
                 throw new RuntimeException("Could not get target object from proxy.", e);
             }
         } else {
-            return instance;
+            return o;
         }
     }
 
-    public void inject(Object instance) {
-    }
-
     private static String getBeanName(ComponentContext cc, Class<?> c, ApplicationContext springContext) {
-
         boolean annotatedWithInject = false;
         if (cc != null) {
             final Inject inject = getAnnotation(cc.getAnnotations(), Inject.class);
@@ -180,7 +186,6 @@ public class SpringComponentProvider implements ComponentProvider {
             final StringBuilder sb = new StringBuilder();
             sb.append("There are multiple beans configured in spring for the type ").
                     append(c.getName()).append(".");
-
 
             if (annotatedWithInject) {
                 sb.append("\nYou should specify the name of the preferred bean at @Inject: Inject(\"yourBean\").");

@@ -39,9 +39,7 @@ package com.sun.jersey.impl.application;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.Proxy;
@@ -79,8 +77,11 @@ import com.sun.jersey.api.model.AbstractResource;
 import com.sun.jersey.api.model.ResourceModelIssue;
 import com.sun.jersey.api.core.ExtendedUriInfo;
 import com.sun.jersey.api.uri.UriTemplate;
-import com.sun.jersey.core.spi.component.IoCProviderComponentProviderFactory;
-import com.sun.jersey.core.spi.component.ProviderComponentProviderFactory;
+import com.sun.jersey.core.spi.component.ComponentInjector;
+import com.sun.jersey.core.spi.component.ioc.IoCComponentProvider;
+import com.sun.jersey.core.spi.component.ioc.IoCComponentProviderFactory;
+import com.sun.jersey.core.spi.component.ioc.IoCProviderFactory;
+import com.sun.jersey.core.spi.component.ProviderFactory;
 import com.sun.jersey.core.spi.component.ProviderServices;
 import com.sun.jersey.impl.ImplMessages;
 import com.sun.jersey.impl.ThreadLocalHttpContext;
@@ -114,16 +115,15 @@ import com.sun.jersey.spi.container.ContainerResponseWriter;
 import com.sun.jersey.spi.container.WebApplication;
 import com.sun.jersey.core.spi.factory.ContextResolverFactory;
 import com.sun.jersey.core.spi.factory.MessageBodyFactory;
+import com.sun.jersey.server.impl.component.IoCResourceFactory;
+import com.sun.jersey.server.impl.component.ResourceFactory;
 import com.sun.jersey.spi.inject.Inject;
 import com.sun.jersey.spi.inject.Injectable;
 import com.sun.jersey.spi.inject.InjectableProvider;
 import com.sun.jersey.spi.inject.SingletonTypeInjectableProvider;
 import com.sun.jersey.spi.inject.InjectableProviderContext;
-import com.sun.jersey.spi.resource.ResourceProviderFactory;
-import com.sun.jersey.spi.service.AccessibleObjectContext;
-import com.sun.jersey.spi.service.ComponentContext;
-import com.sun.jersey.spi.service.ComponentProvider;
-import com.sun.jersey.spi.service.ComponentProvider.Scope;
+import com.sun.jersey.core.spi.component.ComponentContext;
+import com.sun.jersey.core.spi.component.ComponentScope;
 import com.sun.jersey.spi.template.TemplateContext;
 import com.sun.jersey.spi.uri.rules.UriRule;
 import java.lang.annotation.Annotation;
@@ -145,8 +145,6 @@ public final class WebApplicationImpl implements WebApplication {
     private final ConcurrentMap<Class, ResourceClass> metaClassMap =
             new ConcurrentHashMap<Class, ResourceClass>();
     
-    private final ResourceProviderFactory resolverFactory;
-    
     private final ThreadLocalHttpContext context;
     
     private boolean initiated;
@@ -156,14 +154,14 @@ public final class WebApplicationImpl implements WebApplication {
     private RootResourceClassesRule rootsRule;
     
     private ServerInjectableProviderFactory injectableFactory;
-    
-    private MessageBodyFactory bodyFactory;
-    
-    private ComponentProvider provider;
-    
-    private ProviderComponentProviderFactory componentProviderFactory;
 
-    private ComponentProvider resourceProvider;
+    private ProviderFactory cpFactory;
+
+    private ResourceFactory rcpFactory;
+
+    private IoCComponentProviderFactory provider;
+
+    private MessageBodyFactory bodyFactory;
     
     private TemplateContext templateContext;
     
@@ -180,8 +178,6 @@ public final class WebApplicationImpl implements WebApplication {
     private WadlFactory wadlFactory;
     
     public WebApplicationImpl() {
-        this.resolverFactory = ResourceProviderFactory.getInstance();
-
         this.context = new ThreadLocalHttpContext();
 
         InvocationHandler requestHandler = new InvocationHandler() {
@@ -211,8 +207,8 @@ public final class WebApplicationImpl implements WebApplication {
         m.put(Request.class, createProxy(Request.class, requestHandler));
         m.put(SecurityContext.class, createProxy(SecurityContext.class, requestHandler));        
         injectableFactory.add(new InjectableProvider<Context, Type>() {
-            public Scope getScope() {
-                return Scope.Singleton;
+            public ComponentScope getScope() {
+                return ComponentScope.Singleton;
             }
             
             public Injectable getInjectable(ComponentContext ic, Context a, Type c) {
@@ -232,13 +228,7 @@ public final class WebApplicationImpl implements WebApplication {
     @Override
     public WebApplication clone() {
         WebApplicationImpl wa = new WebApplicationImpl();
-        if (provider instanceof DefaultComponentProvider) {
-            wa.initiate(resourceConfig, null);
-        } else {
-            AdaptingComponentProvider acp = (AdaptingComponentProvider) provider;
-            wa.initiate(resourceConfig, acp.getAdaptedComponentProvider());
-        }
-
+        wa.initiate(resourceConfig, provider);
         return wa;
     }
 
@@ -265,18 +255,14 @@ public final class WebApplicationImpl implements WebApplication {
             rc = newResourceClass(getAbstractResource(c));
             metaClassMap.put(c, rc);
         }
-        rc.init(getComponentProvider(), 
-                getResourceComponentProvider(), 
-                resolverFactory);
+        rc.init(rcpFactory);
         return rc;
     }
 
     private ResourceClass getResourceClass(AbstractResource ar) {
         ResourceClass rc = newResourceClass(ar);
         metaClassMap.put(ar.getResourceClass(), rc);
-        rc.init(getComponentProvider(), 
-                getResourceComponentProvider(), 
-                resolverFactory);
+        rc.init(rcpFactory);
         return rc;
     }
 
@@ -303,7 +289,6 @@ public final class WebApplicationImpl implements WebApplication {
         }
         return new ResourceClass(
                 resourceConfig,
-                getComponentProvider(), 
                 dispatcherFactory,
                 injectableFactory, 
                 ar,
@@ -318,187 +303,6 @@ public final class WebApplicationImpl implements WebApplication {
         return IntrospectionModeller.createResource(c);
     }
 
-    /**
-     * Inject resources onto fields of an object.
-     * @param o the object
-     */
-    private void injectResources(Object o) {
-        injectableFactory.injectResources(o);
-    }
-
-    private final class AdaptingComponentProvider implements ComponentProvider {
-
-        private final ComponentProvider cp;
-
-        AdaptingComponentProvider(ComponentProvider cp) {
-            this.cp = cp;
-        }
-
-        public ComponentProvider getAdaptedComponentProvider() {
-            return cp;
-        }
-
-        //
-        public <T> T getInstance(Scope scope, Class<T> c)
-                throws InstantiationException, IllegalAccessException {
-            T o = cp.getInstance(scope, c);
-            if (o == null) {
-                o = c.newInstance();
-                injectResources(o);
-            } else {
-                injectResources(cp.getInjectableInstance(o));
-            }
-            return o;
-        }
-
-        public <T> T getInstance(Scope scope, Constructor<T> contructor, Object[] parameters)
-                throws InstantiationException, IllegalArgumentException,
-                IllegalAccessException, InvocationTargetException {
-            T o = cp.getInstance(scope, contructor, parameters);
-            if (o == null) {
-                o = contructor.newInstance(parameters);
-                injectResources(o);
-            } else {
-                injectResources(cp.getInjectableInstance(o));
-            }
-            return o;
-        }
-
-        public <T> T getInstance(ComponentContext cc, Scope scope, Class<T> c)
-                throws InstantiationException, IllegalAccessException {
-            T o = cp.getInstance(cc, scope, c);
-            if (o == null) {
-                o = c.newInstance();
-                injectResources(o);
-            } else {
-                injectResources(cp.getInjectableInstance(o));
-            }
-            return o;
-        }
-
-        public <T> T getInjectableInstance(T instance) {
-            return cp.getInjectableInstance(instance);
-        }
-
-        public void inject(Object instance) {
-            cp.inject(instance);
-            injectResources(cp.getInjectableInstance(instance));
-        }
-    }
-
-    private final static class AdaptingResourceComponentProvider implements ComponentProvider {
-
-        private final ComponentProvider cp;
-
-        AdaptingResourceComponentProvider(ComponentProvider cp) {
-            this.cp = cp;
-        }
-
-        public ComponentProvider getAdaptedComponentProvider() {
-            return cp;
-        }
-
-        //
-        public <T> T getInstance(Scope scope, Class<T> c)
-                throws InstantiationException, IllegalAccessException {
-            T o = cp.getInstance(scope, c);
-            if (o == null)
-                o = c.newInstance();
-            return o;
-        }
-
-        public <T> T getInstance(Scope scope, Constructor<T> contructor, Object[] parameters)
-                throws InstantiationException, IllegalArgumentException,
-                IllegalAccessException, InvocationTargetException {
-            T o = cp.getInstance(scope, contructor, parameters);
-            if (o == null) {
-                o = contructor.newInstance(parameters);
-            }
-            return o;
-        }
-
-        public <T> T getInstance(ComponentContext cc, Scope scope, Class<T> c) 
-                throws InstantiationException, IllegalAccessException {
-            T o = cp. getInstance(cc, scope, c);
-            if (o == null)
-                o = c.newInstance();            
-            return o;
-        }
-        
-        public <T> T getInjectableInstance(T instance) {
-            return cp.getInjectableInstance(instance);
-        }
-
-        public void inject(Object instance) {
-            cp.inject(instance);
-        }
-    }
-    
-    private final class DefaultComponentProvider implements ComponentProvider {
-
-        public <T> T getInstance(Scope scope, Class<T> c)
-                throws InstantiationException, IllegalAccessException {
-            final T o = c.newInstance();
-            injectResources(o);
-            return o;
-        }
-
-        public <T> T getInstance(Scope scope, Constructor<T> contructor, Object[] parameters)
-                throws InstantiationException, IllegalArgumentException,
-                IllegalAccessException, InvocationTargetException {
-            final T o = contructor.newInstance(parameters);
-            injectResources(o);
-            return o;
-        }
-
-        public <T> T getInstance(ComponentContext cc, Scope scope, Class<T> c) 
-                throws InstantiationException, IllegalAccessException {
-            return getInstance(scope, c);
-        }
-        
-        public <T> T getInjectableInstance(T instance) {
-            return instance;
-        }
-
-        public void inject(Object instance) {
-            injectResources(instance);
-        }
-    }
-
-    private final static class DefaultResourceComponentProvider implements ComponentProvider {
-
-        public <T> T getInstance(Scope scope, Class<T> c)
-                throws InstantiationException, IllegalAccessException {
-            final T o = c.newInstance();
-            return o;
-        }
-
-        public <T> T getInstance(Scope scope, Constructor<T> contructor, Object[] parameters)
-                throws InstantiationException, IllegalArgumentException,
-                IllegalAccessException, InvocationTargetException {
-            final T o = contructor.newInstance(parameters);
-            return o;
-        }
-
-        public <T> T getInstance(ComponentContext cc, Scope scope, Class<T> c) 
-                throws InstantiationException, IllegalAccessException {
-            return getInstance(scope, c);
-        }
-        
-        public <T> T getInjectableInstance(T instance) {
-            return instance;
-        }
-
-        public void inject(Object instance) {
-        }
-    }
-    
-    // Singleton
-    
-    public void initiate(ResourceConfig resourceConfig) {
-        initiate(resourceConfig, null);
-    }
-
     private static class ContextInjectableProvider<T> extends
             SingletonTypeInjectableProvider<Context, T> {
         ContextInjectableProvider(Type type, T instance) {
@@ -506,7 +310,11 @@ public final class WebApplicationImpl implements WebApplication {
         }
     }
 
-    public void initiate(ResourceConfig resourceConfig, ComponentProvider _provider) {
+    public void initiate(ResourceConfig resourceConfig) {
+        initiate(resourceConfig, null);
+    }
+    
+    public void initiate(ResourceConfig resourceConfig, IoCComponentProviderFactory _provider) {
         if (resourceConfig == null) {
             throw new IllegalArgumentException("ResourceConfig instance MUST NOT be null");
         }
@@ -519,25 +327,22 @@ public final class WebApplicationImpl implements WebApplication {
         // Validate the resource config
         resourceConfig.validate();
 
-        this.provider = (_provider == null)
-                ? new DefaultComponentProvider()
-                : new AdaptingComponentProvider(_provider);
-        
-        // Set up the component provider factory to be
-        // used with non-resource class components
-        this.componentProviderFactory = (_provider == null)
-                ? new ProviderComponentProviderFactory(injectableFactory)
-                : new IoCProviderComponentProviderFactory(injectableFactory, _provider);
-
-        // Set up the resource component provider to be
-        // used with resource class components
-        this.resourceProvider = (_provider == null)
-                ? new DefaultResourceComponentProvider()
-                : new AdaptingResourceComponentProvider(_provider);
-        
         // Check the resource configuration
         this.resourceConfig = resourceConfig;
 
+        this.provider = _provider;
+        
+        // Set up the component provider factory to be
+        // used with non-resource class components
+        this.cpFactory = (_provider == null)
+                ? new ProviderFactory(injectableFactory)
+                : new IoCProviderFactory(injectableFactory, _provider);
+
+        // Set up the resource component provider factory
+        this.rcpFactory = (_provider == null)
+                ? new ResourceFactory(this.resourceConfig, this.injectableFactory)
+                : new IoCResourceFactory(this.resourceConfig, this.injectableFactory, _provider);
+                
         this.resourceContext = new ResourceContext() {
             public <T> T getResource(Class<T> c) {
                 final ResourceClass rc = getResourceClass(c);
@@ -545,40 +350,41 @@ public final class WebApplicationImpl implements WebApplication {
                     LOGGER.severe("No resource class found for class " + c.getName());
                     throw new ContainerException("No resource class found for class " + c.getName());
                 }
-                final Object instance = rc.provider.getInstance(resourceProvider, context);
+                final Object instance = rc.rcProvider.getInstance(context);
                 return instance != null ? c.cast(instance) : null;
             }
         };
 
         ProviderServices providerServices = new ProviderServices(
                 this.injectableFactory,
-                this.componentProviderFactory,
+                this.cpFactory,
                 resourceConfig.getProviderClasses(),
                 resourceConfig.getProviderSingletons());
 
         // Add injectable provider for @Inject
         injectableFactory.add(
             new InjectableProvider<Inject, Type>() {
-                    public Scope getScope() {
-                        return Scope.Undefined;
+                    public ComponentScope getScope() {
+                        return ComponentScope.Undefined;
                     }
 
                     @SuppressWarnings("unchecked")
                     public Injectable<Object> getInjectable(ComponentContext ic, Inject a, final Type c) {
                         if (!(c instanceof Class))
                             return null;
+
+                        if (provider == null)
+                            return null;
                         
-                        final AccessibleObjectContext aic =
-                                new AccessibleObjectContext(
-                                ic.getAccesibleObject(), ic.getAnnotations());
+                        final IoCComponentProvider p = provider.getComponentProvider(ic, (Class)c);
                         return new Injectable<Object>() {
                             public Object getValue() {
                                 try {
-                                    return provider.getInstance(aic, Scope.Undefined, (Class)c);
+                                    return p.getInstance();
                                 } catch (Exception e) {
-                                    LOGGER.log(Level.SEVERE, "Could not get instance from component provider for type " +
+                                    LOGGER.log(Level.SEVERE, "Could not get instance from IoC component provider for type " +
                                             c, e);
-                                    throw new ContainerException("Could not get instance from component provider for type " +
+                                    throw new ContainerException("Could not get instance from IoC component provider for type " +
                                             c, e);
                                 }
                             }
@@ -672,8 +478,8 @@ public final class WebApplicationImpl implements WebApplication {
         responseFilters.addAll(providerServices.getServices(ContainerResponseFilter.class));
         
         // Inject on all components
-        componentProviderFactory.injectOnAllComponents();
-        componentProviderFactory.injectOnProviderInstances(resourceConfig.getProviderSingletons());
+        cpFactory.injectOnAllComponents();
+        cpFactory.injectOnProviderInstances(resourceConfig.getProviderSingletons());
         
         this.wadlFactory = new WadlFactory( resourceConfig );
         
@@ -685,14 +491,6 @@ public final class WebApplicationImpl implements WebApplication {
         return bodyFactory;
     }
 
-    public ComponentProvider getComponentProvider() {
-        return provider;
-    }
-
-    public ComponentProvider getResourceComponentProvider() {
-        return resourceProvider;
-    }
-    
     public void handleRequest(ContainerRequest request, ContainerResponseWriter responseWriter) 
             throws IOException {
         final ContainerResponse response = new ContainerResponse(
@@ -809,9 +607,9 @@ public final class WebApplicationImpl implements WebApplication {
                 continue;
             }
 
-            // Inject onto the singleton
-            injectResources(o);
-            
+            ComponentInjector ci = new ComponentInjector(injectableFactory, o.getClass());
+            ci.inject(o);
+
             ResourceClass r = getResourceClass(ar);
             rootResources.add(r.resource);
 

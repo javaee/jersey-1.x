@@ -124,17 +124,17 @@ public abstract class ResourceConfig extends Application {
             = "com.sun.jersey.config.feature.ImplicitViewables";
     
     /**
-     * If set the default resource provider to be used by the 
-     * {@link com.sun.jersey.spi.resource.ResourceProviderFactory}.
+     * If set the default resource component provider factory for the
+     * life-cycle of resource classes.
      * <p>
      * The type of this property must be a Java class that implementations
-     * {@link com.sun.jersey.spi.resource.ResourceProvider}.
+     * {@link com.sun.jersey.server.spi.component.ResourceComponentProviderFactory}.
      * <p>
-     * If not set the default resource provider will be the per-request 
-     * resource provider
+     * If not set the default resource component provider factory will be the 
+     * per-request resource component provider factory.
      */
-    public static final String PROPERTY_DEFAULT_RESOURCE_PROVIDER_CLASS
-            = "com.sun.jersey.config.property.DefaultResourceProviderClass";
+    public static final String PROPERTY_DEFAULT_RESOURCE_COMPONENT_PROVIDER_FACTORY_CLASS
+            = "com.sun.jersey.config.property.DefaultResourceComponentProviderFactoryClass";
     
     /**
      * If set the instance of {@link ContainerNotifier} to register

@@ -38,13 +38,12 @@
 package com.sun.jersey.impl.resource;
 
 import com.sun.jersey.api.client.ClientResponse;
+import com.sun.jersey.core.spi.component.ioc.IoCComponentProvider;
+import com.sun.jersey.core.spi.component.ioc.IoCComponentProviderFactory;
+import com.sun.jersey.core.spi.component.ioc.IoCProxiedComponentProvider;
 import com.sun.jersey.impl.AbstractResourceTester;
-import com.sun.jersey.spi.service.ComponentContext;
-import com.sun.jersey.spi.service.ComponentProvider;
-import com.sun.jersey.spi.service.ComponentProvider.Scope;
-import java.lang.reflect.Constructor;
+import com.sun.jersey.core.spi.component.ComponentContext;
 import java.lang.reflect.InvocationHandler;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import javax.ws.rs.Consumes;
@@ -153,42 +152,37 @@ public class MethodIAnnotationnheritenceTest extends AbstractResourceTester {
     }
 
 
-    static class ProxyComponentProvider implements ComponentProvider {
-        public <T> T getInjectableInstance(T instance) {
-            return instance;
-        }
-
-        public <T> T getInstance(Scope scope, Class<T> c)
-                throws InstantiationException, IllegalAccessException {
+    static class ProxyIoCComponentProviderFactory implements IoCComponentProviderFactory {
+        public IoCComponentProvider getComponentProvider(Class c) {
             if (Interface.class.isAssignableFrom(c)) {
-                final Object o = c.newInstance();
-                return (T) Proxy.newProxyInstance(
-                        this.getClass().getClassLoader(),
-                        new Class[]{Interface.class},
-                        new InvocationHandler() {
-                    public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-                        return method.invoke(o, args);
+                return new IoCProxiedComponentProvider() {
+                    public Object proxy(final Object o) {
+                        return Proxy.newProxyInstance(
+                                this.getClass().getClassLoader(),
+                                new Class[]{Interface.class},
+                                new InvocationHandler() {
+                            public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+                                return method.invoke(o, args);
+                            }
+                        });
+
                     }
-                });
-            } else return null;
+
+                    public Object getInstance() {
+                        throw new IllegalStateException();
+                    }
+                };
+            } else
+                return null;
         }
 
-        public <T> T getInstance(Scope scope, Constructor<T> constructor, Object[] parameters)
-                throws InstantiationException, IllegalArgumentException, IllegalAccessException, InvocationTargetException {
-            return null;
-        }
-
-        public <T> T getInstance(ComponentContext cc, Scope scope, Class<T> c)
-                throws InstantiationException, IllegalAccessException {
-            return getInstance(scope, c);
-        }
-
-        public void inject(Object instance) {
+        public IoCComponentProvider getComponentProvider(ComponentContext cc, Class c) {
+            return getComponentProvider(c);
         }
     }
 
     public void testInterfaceImplementationComponentProviderProxy() {
-        initiateWebApplication(new ProxyComponentProvider(), InterfaceImplementation.class);
+        initiateWebApplication(new ProxyIoCComponentProviderFactory(), InterfaceImplementation.class);
 
         _test();
     }
