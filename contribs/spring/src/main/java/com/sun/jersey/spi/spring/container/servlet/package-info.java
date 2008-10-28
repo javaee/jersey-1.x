@@ -22,14 +22,11 @@
 /**
  * Provides support for Spring-based Web applications.
  * <p>
- * For Spring-based support it is necessary to add the 
- * {@link com.sun.jersey.spi.spring.container.servlet.SpringServlet} to the 
+ * Spring support is enabled by referencing the the servlet
+ * {@link com.sun.jersey.spi.spring.container.servlet.SpringServlet} in the
  * web.xml.
  * <p>
- * For Spring-based autowire support it is not necessary to refer explictly
- * to Jersey life-cycle annotations and the 
- * {@link org.springframework.context.annotation.Scope} annotation may be used,
- * values of which are mapped to Jersey as specified by 
- * {@link com.sun.jersey.spi.spring.container.servlet.SpringResourceProvider.SupportedSpringScopes}
+ * Components managed by Spring will not be managed by Jersey and the 
+ * Jersey-based life-cycle annotations on a resource class will be ignored.
  */
 package com.sun.jersey.spi.spring.container.servlet;
