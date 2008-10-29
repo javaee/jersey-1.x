@@ -46,7 +46,6 @@ import java.io.OutputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 import java.net.URI;
-import java.util.List;
 import java.util.logging.Logger;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.GenericEntity;
@@ -122,8 +121,8 @@ public class ContainerResponse implements HttpResponseContext {
         
         @Override
         public void flush() throws IOException {
-            if (isCommitted)
-                o.flush();
+            commitWrite();
+            o.flush();
         }
         
         @Override
@@ -213,10 +212,12 @@ public class ContainerResponse implements HttpResponseContext {
         
         MediaType contentType = getContentType();
         if (contentType == null) {
-            List<MediaType> mts = bodyContext.getMessageBodyWriterMediaTypes(
-                    entity.getClass(), entityType, annotations);
-            contentType = request.getAcceptableMediaType(mts);
-            if (contentType == null || 
+            contentType = bodyContext.getMessageBodyWriterMediaType(
+                        entity.getClass(),
+                        entityType,
+                        annotations,
+                        request.getAcceptableMediaTypes());
+            if (contentType == null ||
                     contentType.isWildcardType() || contentType.isWildcardSubtype())
                 contentType = MediaType.APPLICATION_OCTET_STREAM_TYPE;
             

@@ -189,13 +189,13 @@ public final class MessageBodyFactory implements MessageBodyWorkers {
             MediaType mediaType) {        
         MessageBodyReader p = null;
         if (mediaType != null) {
-            p = _getMessageBodyReader(c, t, as, mediaType);
+            p = _getMessageBodyReader(c, t, as, mediaType, mediaType);
             if (p == null)
-                p = _getMessageBodyReader(c, t, as, 
+                p = _getMessageBodyReader(c, t, as, mediaType,
                         new MediaType(mediaType.getType(), MediaType.MEDIA_TYPE_WILDCARD));
         }
         if (p == null)
-            p = _getMessageBodyReader(c, t, as, MediaTypes.GENERAL_MEDIA_TYPE);
+            p = _getMessageBodyReader(c, t, as, mediaType, MediaTypes.GENERAL_MEDIA_TYPE);
         
         return p;
     }
@@ -204,8 +204,8 @@ public final class MessageBodyFactory implements MessageBodyWorkers {
     @SuppressWarnings("unchecked")
     private <T> MessageBodyReader<T> _getMessageBodyReader(Class<T> c, Type t, 
             Annotation[] as, 
-            MediaType mediaType) {
-        List<MessageBodyReader> readers = readerProviders.get(mediaType);
+            MediaType mediaType, MediaType lookup) {
+        List<MessageBodyReader> readers = readerProviders.get(lookup);
         if (readers == null)
             return null;
         for (MessageBodyReader p : readers) {
@@ -221,13 +221,13 @@ public final class MessageBodyFactory implements MessageBodyWorkers {
             MediaType mediaType) {        
         MessageBodyWriter p = null;
         if (mediaType != null) {
-            p = _getMessageBodyWriter(c, t, as, mediaType);
+            p = _getMessageBodyWriter(c, t, as, mediaType, mediaType);
             if (p == null)
-                p = _getMessageBodyWriter(c, t, as, 
+                p = _getMessageBodyWriter(c, t, as, mediaType,
                         new MediaType(mediaType.getType(), MediaType.MEDIA_TYPE_WILDCARD));
         }
         if (p == null)
-            p = _getMessageBodyWriter(c, t, as, MediaTypes.GENERAL_MEDIA_TYPE);
+            p = _getMessageBodyWriter(c, t, as, mediaType, MediaTypes.GENERAL_MEDIA_TYPE);
         
         return p;
     }
@@ -235,8 +235,8 @@ public final class MessageBodyFactory implements MessageBodyWorkers {
     @SuppressWarnings("unchecked")
     private <T> MessageBodyWriter<T> _getMessageBodyWriter(Class<T> c, Type t,
             Annotation[] as,
-            MediaType mediaType) {        
-        List<MessageBodyWriter> writers = writerProviders.get(mediaType);
+            MediaType mediaType, MediaType lookup) {        
+        List<MessageBodyWriter> writers = writerProviders.get(lookup);
         if (writers == null)
             return null;
         for (MessageBodyWriter p : writers) {
@@ -259,5 +259,20 @@ public final class MessageBodyFactory implements MessageBodyWorkers {
         
         Collections.sort(mtl, MediaTypes.MEDIA_TYPE_COMPARATOR);
         return mtl;
+    }
+
+	public <T> MediaType getMessageBodyWriterMediaType(Class<T> c, Type t,
+			Annotation[] as, List<MediaType> acceptableMedaTypes) {
+        for (MessageBodyWriterPair mbwp : writerListProviders) {
+            for (MediaType acceptable : acceptableMedaTypes) {
+                for (MediaType mt : mbwp.types) {
+                    if (mt.isCompatible(acceptable) &&
+                            mbwp.mbw.isWriteable(c, t, as, acceptable)) {
+                        return MediaTypes.mostSpecific(mt, acceptable);
+                    }
+                }
+            }
+        }
+        return null;
     }
 }

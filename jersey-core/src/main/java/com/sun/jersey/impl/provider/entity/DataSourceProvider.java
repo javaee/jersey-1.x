@@ -44,6 +44,8 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 import javax.activation.DataSource;
 import javax.mail.util.ByteArrayDataSource;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 
@@ -51,6 +53,8 @@ import javax.ws.rs.core.MultivaluedMap;
  *
  * @author Paul.Sandoz@Sun.Com
  */
+@Produces({"application/octet-stream", "*/*"})
+@Consumes({"application/octet-stream", "*/*"})
 public class DataSourceProvider extends AbstractMessageReaderWriterProvider<DataSource> {
     
     public DataSourceProvider() {

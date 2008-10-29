@@ -65,7 +65,7 @@ public final class MediaTypes {
      * <p>
      * x/y < x/* < *\\/*
      */
-    static public final Comparator<MediaType> MEDIA_TYPE_COMPARATOR = new Comparator<MediaType>() {
+    public static final Comparator<MediaType> MEDIA_TYPE_COMPARATOR = new Comparator<MediaType>() {
         public int compare(MediaType o1, MediaType o2) {
             if (o1.getType().equals("*") && !o2.getType().equals("*")) {
                 return 1;
@@ -88,6 +88,24 @@ public final class MediaTypes {
     };
 
     /**
+     * Get the most specific media type from a pair of media types. The most
+     * specific media type is the media type from the pair that has least
+     * wild cards present.
+     * 
+     * @param m1 the first media type
+     * @param m2 the second media type
+     * @return the most specific media type. If the media types are equally
+     *         specific then the first media type is returned.
+     */
+    public static final MediaType mostSpecific(MediaType m1, MediaType m2) {
+        if (m1.isWildcardSubtype() && !m2.isWildcardSubtype())
+            return m2;
+        if (m1.isWildcardType() && !m2.isWildcardType())
+            return m2;
+        return m1;
+    }
+
+    /**
      * Comparator for lists of media types.
      * <p>
      * The least specific content type of each list is obtained and then compared
@@ -96,7 +114,7 @@ public final class MediaTypes {
      * Assumes each list is already ordered according to {@link #MEDIA_TYPE_COMPARATOR}
      * and therefore the least specific media type is at the end of the list.
      */
-    static public final Comparator<List<MediaType>> MEDIA_TYPE_LIST_COMPARATOR =
+    public static final Comparator<List<MediaType>> MEDIA_TYPE_LIST_COMPARATOR =
             new Comparator<List<MediaType>>() {
         public int compare(List<MediaType> o1, List<MediaType> o2) {
             return MEDIA_TYPE_COMPARATOR.compare(getLeastSpecific(o1), getLeastSpecific(o2));

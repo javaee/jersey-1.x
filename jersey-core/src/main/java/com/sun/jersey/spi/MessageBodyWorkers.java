@@ -136,4 +136,34 @@ public interface MessageBodyWorkers {
             Class<T> type, 
             Type genericType,
             Annotation[] annotations);
+
+    /**
+     * Get the most acceptable media type supported for a Java type given a set
+     * of acceptable media types.
+     *
+     * @param <T> the type of object that is to be written.
+     *
+     * @param type the class of object that is to be written.
+     *
+     * @param genericType the type of object to be written. E.g. if the
+     * message body is to be produced from a field, this will be
+     * the declared type of the field as returned by
+     * <code>Field.getGenericType</code>.
+     *
+     * @param annotations an array of the annotations on the declaration of the
+     * artifact that will be written. E.g. if the
+     * message body is to be produced from a field, this will be
+     * the annotations on that field returned by
+     * <code>Field.getDeclaredAnnotations</code>.
+     *
+     * @param acceptableMedaTypes the list of acceptable media types, sorted
+     *        according to the quality with the media type of highest quality
+     *        occurring first first.
+     * @return the best media types
+     */
+	<T> MediaType getMessageBodyWriterMediaType(
+            Class<T> type,
+            Type genericType,
+			Annotation[] annotations,
+            List<MediaType> acceptableMedaTypes);
 }

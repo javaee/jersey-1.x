@@ -152,8 +152,8 @@ public final class ProviderServices {
     }
     
     private Object getComponent(Class provider) {
-        return componentProviderFactory.getComponentProvider(provider).
-                getInstance();
+        ComponentProvider cp = componentProviderFactory.getComponentProvider(provider);
+        return (cp != null) ? cp.getInstance() : null;
     }
     
     private <T> Set<T> getProviderInstances(Class<T> service) {

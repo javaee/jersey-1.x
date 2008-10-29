@@ -80,12 +80,12 @@ public class HeadTest extends AbstractHttpServerTester {
         
         WebResource r = Client.create().resource(getUri().path("/").build());
         
-        ClientResponse cr = r.path("string").head();
+        ClientResponse cr = r.path("string").accept("text/plain").head();
         assertEquals(200, cr.getStatus());
         assertEquals(MediaType.TEXT_PLAIN_TYPE, cr.getType());
         assertFalse(cr.hasEntity());
         
-        cr = r.path("byte").head();
+        cr = r.path("byte").accept("application/octet-stream").head();
         assertEquals(200, cr.getStatus());
         String length = cr.getMetadata().getFirst("Content-Length");
         assertNotNull(length);
@@ -93,7 +93,7 @@ public class HeadTest extends AbstractHttpServerTester {
         assertEquals(MediaType.APPLICATION_OCTET_STREAM_TYPE, cr.getType());
         assertFalse(cr.hasEntity());
         
-        cr = r.path("ByteArrayInputStream").head();
+        cr = r.path("ByteArrayInputStream").accept("application/octet-stream").head();
         assertEquals(200, cr.getStatus());
         length = cr.getMetadata().getFirst("Content-Length");
         assertNotNull(length);

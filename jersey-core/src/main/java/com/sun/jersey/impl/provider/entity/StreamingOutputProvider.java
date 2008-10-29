@@ -41,6 +41,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
+import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.StreamingOutput;
@@ -50,6 +51,7 @@ import javax.ws.rs.ext.MessageBodyWriter;
  *
  * @author Paul.Sandoz@Sun.Com
  */
+@Produces({"application/octet-stream", "*/*"})
 public final class StreamingOutputProvider implements MessageBodyWriter<StreamingOutput> {
 
     public boolean isWriteable(Class<?> t, Type gt, Annotation[] as, MediaType mediaType) {

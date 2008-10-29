@@ -251,8 +251,8 @@ public class ServletContainer extends HttpServlet implements ContainerListener {
 
         @Override
         public void flush() throws IOException {
-            initiate();
-            out.flush();
+            if (out != null)
+                out.flush();
         }
 
         @Override

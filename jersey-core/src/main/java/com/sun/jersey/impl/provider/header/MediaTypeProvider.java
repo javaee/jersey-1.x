@@ -52,7 +52,7 @@ import java.util.Map;
 public class MediaTypeProvider implements HeaderDelegateProvider<MediaType> {
     
     public boolean supports(Class<?> type) {
-        return type == MediaType.class;
+        return MediaType.class.isAssignableFrom(type);
     }
 
     public String toString(MediaType header) {
