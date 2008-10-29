@@ -100,7 +100,7 @@ public class ResponseWriterMetadataTest extends AbstractHttpServerTester {
 
         WebResource r = Client.create().resource(getUri().path("/").build());
                 
-        ClientResponse cr = r.get(ClientResponse.class);
+        ClientResponse cr = r.accept("text/plain").get(ClientResponse.class);
         assertEquals("x", cr.getMetadata().getFirst("X-BEFORE-WRITE"));
         assertNull(cr.getMetadata().getFirst("X-AFTER-WRITE"));
     }

@@ -156,7 +156,7 @@ public interface MessageBodyWorkers {
      * the annotations on that field returned by
      * <code>Field.getDeclaredAnnotations</code>.
      *
-     * @param acceptableMedaTypes the list of acceptable media types, sorted
+     * @param acceptableMediaTypes the list of acceptable media types, sorted
      *        according to the quality with the media type of highest quality
      *        occurring first first.
      * @return the best media types
@@ -165,5 +165,5 @@ public interface MessageBodyWorkers {
             Class<T> type,
             Type genericType,
 			Annotation[] annotations,
-            List<MediaType> acceptableMedaTypes);
+            List<MediaType> acceptableMediaTypes);
 }

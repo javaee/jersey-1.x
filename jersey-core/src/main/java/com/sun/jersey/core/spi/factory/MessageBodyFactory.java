@@ -262,9 +262,9 @@ public final class MessageBodyFactory implements MessageBodyWorkers {
     }
 
 	public <T> MediaType getMessageBodyWriterMediaType(Class<T> c, Type t,
-			Annotation[] as, List<MediaType> acceptableMedaTypes) {
-        for (MessageBodyWriterPair mbwp : writerListProviders) {
-            for (MediaType acceptable : acceptableMedaTypes) {
+			Annotation[] as, List<MediaType> acceptableMediaTypes) {
+        for (MediaType acceptable : acceptableMediaTypes) {
+            for (MessageBodyWriterPair mbwp : writerListProviders) {
                 for (MediaType mt : mbwp.types) {
                     if (mt.isCompatible(acceptable) &&
                             mbwp.mbw.isWriteable(c, t, as, acceptable)) {
