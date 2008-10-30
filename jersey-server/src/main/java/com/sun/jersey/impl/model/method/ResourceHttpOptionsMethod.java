@@ -78,6 +78,7 @@ public final class ResourceHttpOptionsMethod extends ResourceMethod {
                 UriTemplate.EMPTY,
                 MediaTypes.GENERAL_MEDIA_TYPE_LIST, 
                 MediaTypes.GENERAL_MEDIA_TYPE_LIST,
+                false,
                 new OptionsRequestDispatcher(methods));
     }
     

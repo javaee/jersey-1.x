@@ -79,18 +79,22 @@ public abstract class ResourceMethod {
     private final List<MediaType> consumeMime;
     
     private final List<MediaType> produceMime;
-        
+
+    private final boolean isProducesDeclared;
+
     private final RequestDispatcher dispatcher;
     
     public ResourceMethod(String httpMethod,
             UriTemplate template,
             List<MediaType> consumeMime, 
             List<MediaType> produceMime,
+            boolean isProducesDeclared,
             RequestDispatcher dispatcher) {
         this.httpMethod = httpMethod;
         this.template = template;
         this.consumeMime = consumeMime;
         this.produceMime = produceMime;
+        this.isProducesDeclared = isProducesDeclared;
         this.dispatcher = dispatcher;
     }
 
@@ -108,6 +112,10 @@ public abstract class ResourceMethod {
     
     public final List<MediaType> getProduces() {
         return produceMime;
+    }
+
+    public final boolean isProducesDeclared() {
+        return isProducesDeclared;
     }
     
     public final RequestDispatcher getDispatcher() {

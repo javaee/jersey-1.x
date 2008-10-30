@@ -65,6 +65,7 @@ import com.sun.research.ws.wadl.Resource;
                     UriTemplate.EMPTY,
                     MediaTypes.GENERAL_MEDIA_TYPE_LIST, 
                     MediaTypes.GENERAL_MEDIA_TYPE_LIST,
+                    false,
                     new WadlOptionsMethodDispatcher(methods, resource, path, wadlGenerator));        
         }
 

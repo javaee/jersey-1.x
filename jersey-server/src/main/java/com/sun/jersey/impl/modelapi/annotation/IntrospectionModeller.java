@@ -160,7 +160,8 @@ public class IntrospectionModeller {
         // Override annotation is present in method
         if (am.isAnnotationPresent(Produces.class))
             produceMimeAnnotation = am.getAnnotation(Produces.class);
-
+        
+        resourceMethod.setAreInputTypesDeclared(produceMimeAnnotation != null);
         resourceMethod.getSupportedOutputTypes().addAll(
                 MediaTypes.createMediaTypes(produceMimeAnnotation));
     }

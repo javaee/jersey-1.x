@@ -50,6 +50,7 @@ public class AbstractResourceMethod extends AbstractMethod
     private AbstractResource resource;
     private List<MediaType> consumeMimeList;
     private List<MediaType> produceMimeList;
+    private boolean isProducesDeclared;    
     private List<Parameter> parameters;
     private String httpMethod;
     private Annotation[] annotations;
@@ -79,6 +80,14 @@ public class AbstractResourceMethod extends AbstractMethod
         return produceMimeList;
     }
 
+    public void setAreInputTypesDeclared(boolean declared) {
+        isProducesDeclared = declared;
+    }
+
+    public boolean areInputTypesDeclared() {
+        return isProducesDeclared;
+    }
+    
     public String getHttpMethod() {
         return httpMethod;
     }

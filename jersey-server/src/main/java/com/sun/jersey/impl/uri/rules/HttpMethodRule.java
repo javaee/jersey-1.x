@@ -124,9 +124,11 @@ public final class HttpMethodRule implements UriRule {
             method.getDispatcher().dispatch(resource, context);
 
             // If the content type is not explicitly set then set it
-            // to the selected media type, if a concrete media type.
+            // to the selected media type, if a concrete media type
+            // and @Produces is declared on the resource method or the resource
+            // class
             Object contentType = response.getHttpHeaders().getFirst("Content-Type");
-            if (contentType == null) {
+            if (contentType == null && m.rmSelected.isProducesDeclared()) {
                 if (!m.mSelected.isWildcardType() && !m.mSelected.isWildcardSubtype()) {
                     response.getHttpHeaders().putSingle("Content-Type", m.mSelected);
                 }

@@ -64,95 +64,95 @@ public class AcceptTest extends AbstractResourceTester {
         public String doGetFoo() {
             return "foo";
         }
-        
+
         @Produces("application/bar")
         @GET
         public String doGetBar() {
             return "bar";
         }
-        
+
         @Produces("application/baz")
         @GET
         public String doGetBaz() {
             return "baz";
         }
-        
+
         @Produces("*/*")
         @GET
         public Response doGetWildCard() {
             return Response.ok("wildcard", "application/wildcard").build();
         }
     }
-    
+
     public void testAcceptGet() throws IOException {
         initiateWebApplication(Resource.class);
         WebResource r = resource("/");
-        
+
         String s = r.accept("application/foo").get(String.class);
         assertEquals("foo", s);
-        
+
         s = r.accept("application/foo;q=0.1").get(String.class);
         assertEquals("foo", s);
 
         s = r.accept("application/foo", "application/bar;q=0.4", "application/baz;q=0.2").
                 get(String.class);
         assertEquals("foo", s);
-        
+
         s = r.accept("application/foo;q=0.4", "application/bar", "application/baz;q=0.2").
                 get(String.class);
         assertEquals("bar", s);
-        
+
         s = r.accept("application/foo;q=0.4", "application/bar;q=0.2", "application/baz").
                 get(String.class);
         assertEquals("baz", s);
-    }   
-    
+    }
+
     public void testAcceptGetWildCard() {
         initiateWebApplication(Resource.class);
         WebResource r = resource("/");
-        
-        String s = r.accept("application/wildcard", "application/foo;q=0.6", 
+
+        String s = r.accept("application/wildcard", "application/foo;q=0.6",
                 "application/bar;q=0.4", "application/baz;q=0.2").
                 get(String.class);
         assertEquals("wildcard", s);
-    }   
-    
+    }
+
     public void testQualityErrorGreaterThanOne() {
         initiateWebApplication(Resource.class);
         WebResource r = resource("/", false);
 
         ClientResponse response = r.accept("application/foo;q=1.1").get(ClientResponse.class);
-        assertEquals(400, response.getStatus());        
+        assertEquals(400, response.getStatus());
     }
-    
+
     public void testQualityErrorMoreThanThreeDigits() {
         initiateWebApplication(Resource.class);
         WebResource r = resource("/", false);
-        
+
         ClientResponse response = r.accept("application/foo;q=0.1234").get(ClientResponse.class);
         assertEquals(400, response.getStatus());
     }
-    
+
     @Path("/")
     public static class MultipleResource {
         @Produces({"application/foo", "application/bar"})
         @GET
         public String get() {
             return "GET";
-        }        
+        }
     }
-    
+
     public void testAcceptMultiple() {
         initiateWebApplication(MultipleResource.class);
         WebResource r = resource("/");
 
         MediaType foo = MediaType.valueOf("application/foo");
         MediaType bar = MediaType.valueOf("application/bar");
-        
+
         ClientResponse response = r.accept(foo).get(ClientResponse.class);
         assertEquals("GET", response.getEntity(String.class));
         assertEquals(foo, response.getType());
-        
+
         response = r.accept(bar).get(ClientResponse.class);
         assertEquals("GET", response.getEntity(String.class));
         assertEquals(bar, response.getType());
@@ -164,12 +164,12 @@ public class AcceptTest extends AbstractResourceTester {
         response = r.accept("application/*").get(ClientResponse.class);
         assertEquals("GET", response.getEntity(String.class));
         assertEquals(foo, response.getType());
-        
+
         response = r.accept("application/foo;q=0.1").
                 accept("application/bar").get(ClientResponse.class);
         assertEquals("GET", response.getEntity(String.class));
         assertEquals(bar, response.getType());
-        
+
         response = r.accept("application/foo;q=0.5").
                 accept("application/bar;q=0.1").get(ClientResponse.class);
         assertEquals("GET", response.getEntity(String.class));
@@ -196,6 +196,27 @@ public class AcceptTest extends AbstractResourceTester {
         response = r.accept("image/png, text/plain").get(ClientResponse.class);
         assertEquals("GET", response.getEntity(String.class));
         assertEquals(MediaType.TEXT_PLAIN_TYPE, response.getType());
+
+        response = r.accept("text/plain;q=0.5, text/html").get(ClientResponse.class);
+        assertEquals("GET", response.getEntity(String.class));
+        assertEquals(MediaType.TEXT_HTML_TYPE, response.getType());
+    }
+
+    @Path("/")
+    public static class NoProducesResource {
+        @GET
+        public String get() {
+            return "GET";
+        }
+    }
+
+    public void testAcceptNoProduces() {
+        initiateWebApplication(NoProducesResource.class);
+        WebResource r = resource("/");
+
+        ClientResponse response = r.accept("image/png, text/plain").get(ClientResponse.class);
+        assertEquals("GET", response.getEntity(String.class));
+        assertEquals(MediaType.valueOf("image/png"), response.getType());
 
         response = r.accept("text/plain;q=0.5, text/html").get(ClientResponse.class);
         assertEquals("GET", response.getEntity(String.class));

@@ -64,6 +64,7 @@ public final class ResourceHttpMethod extends ResourceMethod {
                 template,
                 method.getSupportedInputTypes(), 
                 method.getSupportedOutputTypes(),
+                method.areInputTypesDeclared(),
                 df.getDispatcher(method));
 
         this.m = method.getMethod();
