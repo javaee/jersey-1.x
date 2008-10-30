@@ -257,4 +257,51 @@ public class AcceptMediaTypeProviderTest extends TestCase {
         assertEquals("*", m.getSubtype());
         assertEquals(1, m.getParameters().size());
     }
+
+    public void testMediaTypeSpecifityHTTPExample1() throws Exception {
+        String header = "text/*, text/html, text/html;level=1, */*";
+        List<AcceptableMediaType> l = HttpHeaderFactory.createAcceptMediaType(header);
+
+        MediaType m;
+        m = l.get(0);
+        assertEquals("text", m.getType());
+        assertEquals("html", m.getSubtype());
+        assertEquals(0, m.getParameters().size());
+        m = l.get(1);
+        assertEquals("text", m.getType());
+        assertEquals("html", m.getSubtype());
+        assertEquals(1, m.getParameters().size());
+        m = l.get(2);
+        assertEquals("text", m.getType());
+        assertEquals("*", m.getSubtype());
+        assertEquals(0, m.getParameters().size());
+        m = l.get(3);
+        assertEquals("*", m.getType());
+        assertEquals("*", m.getSubtype());
+        assertEquals(0, m.getParameters().size());
+    }
+
+    public void testMediaTypeSpecifityHTTPExample2() throws Exception {
+        String header = "text/*, text/html;level=1, text/html, */*";
+        List<AcceptableMediaType> l = HttpHeaderFactory.createAcceptMediaType(header);
+
+        MediaType m;
+        m = l.get(0);
+        assertEquals("text", m.getType());
+        assertEquals("html", m.getSubtype());
+        assertEquals(1, m.getParameters().size());
+        m = l.get(1);
+        assertEquals("text", m.getType());
+        assertEquals("html", m.getSubtype());
+        assertEquals(0, m.getParameters().size());
+        m = l.get(2);
+        assertEquals("text", m.getType());
+        assertEquals("*", m.getSubtype());
+        assertEquals(0, m.getParameters().size());
+        m = l.get(3);
+        assertEquals("*", m.getType());
+        assertEquals("*", m.getSubtype());
+        assertEquals(0, m.getParameters().size());
+    }
+
 }
