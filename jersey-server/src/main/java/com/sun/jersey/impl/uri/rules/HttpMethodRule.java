@@ -37,6 +37,7 @@
 
 package com.sun.jersey.impl.uri.rules;
 
+import com.sun.jersey.api.MediaTypes;
 import com.sun.jersey.api.core.HttpRequestContext;
 import com.sun.jersey.api.core.HttpResponseContext;
 import com.sun.jersey.impl.http.header.AcceptableMediaType;
@@ -44,9 +45,9 @@ import com.sun.jersey.impl.model.method.ResourceMethod;
 import com.sun.jersey.api.Responses;
 import com.sun.jersey.spi.uri.rules.UriRule;
 import com.sun.jersey.spi.uri.rules.UriRuleContext;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.ListIterator;
 import java.util.Map;
 import javax.ws.rs.core.MediaType;
 
@@ -104,12 +105,13 @@ public final class HttpMethodRule implements UriRule {
 
         // Get the list of matching methods
         List<MediaType> accept = request.getAcceptableMediaTypes();
-        LinkedList<ResourceMethod> matches = 
-            new LinkedList<ResourceMethod>();
-        MatchStatus s = match(methods, request.getMediaType(), accept, matches);
+
+        final Matcher m = new Matcher();
+        final MatchStatus s = m.match(methods, request.getMediaType(), accept);
+
         if (s == MatchStatus.MATCH) {
             // If there is a match choose the first method
-            final ResourceMethod method = matches.get(0);
+            final ResourceMethod method = m.rmSelected;
 
             // If a sub-resource method then need to push the resource
             // (again) as as to keep in sync with the ancestor URIs
@@ -120,6 +122,16 @@ public final class HttpMethodRule implements UriRule {
             }
             
             method.getDispatcher().dispatch(resource, context);
+
+            // If the content type is not explicitly set then set it
+            // to the selected media type, if a concrete media type.
+            Object contentType = response.getHttpHeaders().getFirst("Content-Type");
+            if (contentType == null) {
+                if (!m.mSelected.isWildcardType() && !m.mSelected.isWildcardSubtype()) {
+                    response.getHttpHeaders().putSingle("Content-Type", m.mSelected);
+                }
+            }
+
             return true;
         } else if (s == MatchStatus.NO_MATCH_FOR_CONSUME) {
             response.setResponse(Responses.unsupportedMediaType().build());
@@ -138,67 +150,71 @@ public final class HttpMethodRule implements UriRule {
         MATCH, NO_MATCH_FOR_CONSUME, NO_MATCH_FOR_PRODUCE
     }
     
-    /**
-     * Find the subset of methods that match the 'Content-Type' and 'Accept'.
-     *
-     * @param methods the list of resource methods
-     * @param contentType the 'Content-Type'.
-     * @param accept the 'Accept' as a list. This list
-     *        MUST be ordered with the highest quality acceptable Media type 
-     *        occuring first (see 
-     *        {@link com.sun.ws.rest.impl.model.MimeHelper#ACCEPT_MEDIA_TYPE_COMPARATOR}).
-     * @param matches the list to add the matches to.
-     * @return the match status.
-     */
-    private MatchStatus match(List<ResourceMethod> methods,
-            MediaType contentType,
-            List<MediaType> accept,
-            LinkedList<ResourceMethod> matches) {
-                
-        if (contentType != null) {
-            // Find all methods that consume the MIME type of 'Content-Type'
-            for (ResourceMethod method : methods)
-                if (method.consumes(contentType))
-                    matches.add(method);
-            
-            if (matches.isEmpty())
-                return MatchStatus.NO_MATCH_FOR_CONSUME;
-            
-        } else {
-            matches.addAll(methods);
-        }
+    private static class Matcher extends LinkedList<ResourceMethod> {
+        private MediaType mSelected = null;
 
-        // Find all methods that produce the one or more Media types of 'Accept'
-        ListIterator<ResourceMethod> i = matches.listIterator();
-        int currentQuality = AcceptableMediaType.MINUMUM_QUALITY;
-        int currentIndex = 0;
-        while(i.hasNext()) {
-            int index = i.nextIndex();
-            int quality = i.next().produces(accept);
-            
-            if (quality == -1) {
-                // No match
-                i.remove();
-            } else if (quality < currentQuality) {
-                // Match but of a lower quality than a previous match
-                i.remove();
-            } else if (quality > currentQuality) {
-                // Match and of a higher quality than the pervious match
-                currentIndex = index;
-                currentQuality = quality;
+        private ResourceMethod rmSelected = null;
+
+        /**
+         * Find the subset of methods that match the 'Content-Type' and 'Accept'.
+         *
+         * @param methods the list of resource methods
+         * @param contentType the 'Content-Type'.
+         * @param accept the 'Accept' as a list. This list
+         *        MUST be ordered with the highest quality acceptable Media type
+         *        occuring first (see
+         *        {@link com.sun.ws.rest.impl.model.MimeHelper#ACCEPT_MEDIA_TYPE_COMPARATOR}).
+         * @return the match status.
+         */
+        private MatchStatus match(
+                List<ResourceMethod> methods,
+                MediaType contentType,
+                List<MediaType> acceptableMediaTypes) {
+
+            List<ResourceMethod> selected = null;
+            if (contentType != null) {
+                // Find all methods that consume the MIME type of 'Content-Type'
+                for (ResourceMethod method : methods)
+                    if (method.consumes(contentType))
+                        add(method);
+
+                if (isEmpty())
+                    return MatchStatus.NO_MATCH_FOR_CONSUME;
+
+                selected = this;
+            } else {
+                selected = methods;
             }
-        }
 
-        if (matches.isEmpty())
-            return MatchStatus.NO_MATCH_FOR_PRODUCE;
+            // Find all methods that produce the one or more Media types of 'Accept'
+            int currentQuality = AcceptableMediaType.MINUMUM_QUALITY;
+            for (ResourceMethod rm : selected) {
+                int quality = -1;
+                MediaType m = null;
+                Iterator<MediaType> amtIterator = acceptableMediaTypes.iterator();
+                while (quality < 0 && amtIterator.hasNext()) {
+                    AcceptableMediaType amt = (AcceptableMediaType)amtIterator.next();
+                    for (MediaType p : rm.getProduces()) {
+                        if (p.isCompatible(amt)) {
+                            quality = amt.getQuality();
+                            m = MediaTypes.mostSpecific(p, amt);
+                            break;
+                        }
+                    }
+                }
 
-        // Remove all methods of a lower quality at the 
-        // start of the list
-        while (currentIndex > 0) {
-            matches.removeFirst();
-            currentIndex--;
+                if (quality > currentQuality) {
+                    // Match and of a higher quality than the pervious match
+                    currentQuality = quality;
+                    mSelected = m;
+                    rmSelected = rm;
+                }
+            }
+
+            if (mSelected == null)
+                return MatchStatus.NO_MATCH_FOR_PRODUCE;
+
+            return MatchStatus.MATCH;
         }
-        
-        return MatchStatus.MATCH;
-    }    
+    }
 }

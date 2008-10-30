@@ -203,4 +203,58 @@ public class AcceptMediaTypeProviderTest extends TestCase {
         assertEquals("xml", m.getSubtype());
         assertEquals(1, m.getParameters().size());
     }
+    
+    public void testMediaTypeSpecifity() throws Exception {
+        String header = "*/*, text/*, text/plain";
+        List<AcceptableMediaType> l = HttpHeaderFactory.createAcceptMediaType(header);
+
+        assertEquals(3, l.size());
+
+        MediaType m;
+        m = l.get(0);
+        assertEquals("text", m.getType());
+        assertEquals("plain", m.getSubtype());
+        assertEquals(0, m.getParameters().size());
+        m = l.get(1);
+        assertEquals("text", m.getType());
+        assertEquals("*", m.getSubtype());
+        assertEquals(0, m.getParameters().size());
+        m = l.get(2);
+        assertEquals("*", m.getType());
+        assertEquals("*", m.getSubtype());
+        assertEquals(0, m.getParameters().size());
+    }
+
+    public void testMediaTypeSpecifityWithQuality() throws Exception {
+        String header = "*/*, */*;q=0.5, text/*, text/*;q=0.5, text/plain, text/plain;q=0.5";
+        List<AcceptableMediaType> l = HttpHeaderFactory.createAcceptMediaType(header);
+
+        assertEquals(6, l.size());
+
+        MediaType m;
+        m = l.get(0);
+        assertEquals("text", m.getType());
+        assertEquals("plain", m.getSubtype());
+        assertEquals(0, m.getParameters().size());
+        m = l.get(1);
+        assertEquals("text", m.getType());
+        assertEquals("*", m.getSubtype());
+        assertEquals(0, m.getParameters().size());
+        m = l.get(2);
+        assertEquals("*", m.getType());
+        assertEquals("*", m.getSubtype());
+        assertEquals(0, m.getParameters().size());
+        m = l.get(3);
+        assertEquals("text", m.getType());
+        assertEquals("plain", m.getSubtype());
+        assertEquals(1, m.getParameters().size());
+        m = l.get(4);
+        assertEquals("text", m.getType());
+        assertEquals("*", m.getSubtype());
+        assertEquals(1, m.getParameters().size());
+        m = l.get(5);
+        assertEquals("*", m.getType());
+        assertEquals("*", m.getSubtype());
+        assertEquals(1, m.getParameters().size());
+    }
 }

@@ -280,4 +280,13 @@ public abstract class HttpHeaderReader {
         Collections.sort(l, QUALITY_COMPARATOR);
         return l;
     }
+
+    public static <T extends QualityFactor> List<T> readAcceptableList(
+            Comparator<T> comparator,
+            ListElementCreator<T> c,
+            String header) throws ParseException {
+        List<T> l = readList(c, header);
+        Collections.sort(l, comparator);
+        return l;
+    }
 }

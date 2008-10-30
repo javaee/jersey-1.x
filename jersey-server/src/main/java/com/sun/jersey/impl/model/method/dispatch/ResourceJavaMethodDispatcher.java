@@ -40,14 +40,11 @@ package com.sun.jersey.impl.model.method.dispatch;
 import com.sun.jersey.api.container.ContainerException;
 import com.sun.jersey.api.container.MappableContainerException;
 import com.sun.jersey.api.core.HttpContext;
-import com.sun.jersey.api.core.HttpRequestContext;
 import com.sun.jersey.api.model.AbstractResourceMethod;
 import com.sun.jersey.spi.dispatch.RequestDispatcher;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.List;
-import javax.ws.rs.core.MediaType;
 
 /**
  *
@@ -57,26 +54,11 @@ public abstract class ResourceJavaMethodDispatcher implements RequestDispatcher 
 
     protected final Method method;
     
-    private final List<MediaType> produceMime;
-
     private final Annotation[] annotations;
     
-    private final MediaType mediaType;
-
     public ResourceJavaMethodDispatcher(AbstractResourceMethod abstractResourceMethod) {
         this.method = abstractResourceMethod.getMethod();
-        this.produceMime = abstractResourceMethod.getSupportedOutputTypes();
-        this.annotations = abstractResourceMethod.getAnnotations();
-        
-        if (this.produceMime.size() == 1) {
-            MediaType c = this.produceMime.get(0);
-            if (c.getType().equals("*") || c.getSubtype().equals("*")) 
-                mediaType = null;
-            else
-                mediaType = c;
-        } else {
-            mediaType = null;
-        }        
+        this.annotations = abstractResourceMethod.getAnnotations();        
     }    
     
     public final void dispatch(Object resource, HttpContext context) {
@@ -92,20 +74,6 @@ public abstract class ResourceJavaMethodDispatcher implements RequestDispatcher 
             throw new MappableContainerException(e.getTargetException());
         } catch (IllegalAccessException e) {
             throw new ContainerException(e);
-        }
-    }
-    
-    protected final MediaType getAcceptableMediaType(HttpRequestContext requestContext) {
-        if (produceMime.size() == 1) {
-            return mediaType;
-        } else {
-            MediaType m = requestContext.getAcceptableMediaType(produceMime);
-            if (m != null) {
-                if (m.isWildcardType() || m.isWildcardSubtype())
-                    return null;
-            }
-
-            return m;
         }
     }
     

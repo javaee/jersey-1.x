@@ -43,7 +43,6 @@ import java.lang.reflect.Type;
 import java.net.URI;
 import java.util.Iterator;
 import java.util.List;
-import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
@@ -107,24 +106,17 @@ public final class ResponseImpl extends Response {
     }
     
     public MultivaluedMap<String, Object> getMetadataOptimal(
-            HttpRequestContext request, MediaType contentType) {
+            HttpRequestContext request) {
         if (headers != null)
             return headers;
         
         headers = new OutBoundHeaders();
 
-        if (values.length == 0 && contentType != null) {
-            headers.putSingle(ResponseBuilderImpl.
-                    getHeader(ResponseBuilderImpl.CONTENT_TYPE), contentType);
-        }
-        
         for (int i = 0; i < values.length; i++) {
             switch(i) {
                 case ResponseBuilderImpl.CONTENT_TYPE:
                     if (values[i] != null)
                         headers.putSingle(ResponseBuilderImpl.getHeader(i), values[i]);
-                    else if (contentType != null)
-                        headers.putSingle(ResponseBuilderImpl.getHeader(i), contentType);
                     break;
                 case ResponseBuilderImpl.LOCATION:
                     Object location = values[i];

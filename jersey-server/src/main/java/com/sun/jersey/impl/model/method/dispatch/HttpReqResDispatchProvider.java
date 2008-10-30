@@ -43,7 +43,6 @@ import com.sun.jersey.api.core.HttpResponseContext;
 import com.sun.jersey.api.model.AbstractResourceMethod;
 import com.sun.jersey.spi.dispatch.RequestDispatcher;
 import java.lang.reflect.InvocationTargetException;
-import javax.ws.rs.core.MediaType;
 
 /**
  *
@@ -59,10 +58,6 @@ public class HttpReqResDispatchProvider implements ResourceMethodDispatchProvide
         public void _dispatch(Object resource, HttpContext context) 
         throws IllegalAccessException, InvocationTargetException {
             method.invoke(resource, context.getRequest(), context.getResponse());
-            MediaType m = getAcceptableMediaType(context.getRequest());
-            if (m != null) 
-                context.getResponse().
-                        getHttpHeaders().putSingle("Content-Type", m);
         }
     }
 

@@ -41,7 +41,6 @@ import java.io.OutputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 import javax.ws.rs.core.GenericEntity;
-import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 
@@ -68,16 +67,6 @@ public interface HttpResponseContext {
      */
     void setResponse(Response response);
     
-    /**
-     * Set the response state from a Response instance. This replaces any 
-     * pre-existing response state.
-     *
-     * @param response the response.
-     * @param contentType the MIME media type to use for the Content-Type response
-     *        header if the header is not set by the response.
-     */
-    void setResponse(Response response, MediaType contentType);
-
     /**
      * Check if the response has been set using the setReponse methods.
      * 

@@ -174,5 +174,31 @@ public class AcceptTest extends AbstractResourceTester {
                 accept("application/bar;q=0.1").get(ClientResponse.class);
         assertEquals("GET", response.getEntity(String.class));
         assertEquals(foo, response.getType());
-    }   
+    }
+
+    @Path("/")
+    public static class SubTypeResource {
+        @Produces("text/*")
+        @GET
+        public String get() {
+            return "GET";
+        }
+    }
+
+    public void testAcceptSubType() {
+        initiateWebApplication(SubTypeResource.class);
+        WebResource r = resource("/");
+
+        ClientResponse response = r.accept("text/plain").get(ClientResponse.class);
+        assertEquals("GET", response.getEntity(String.class));
+        assertEquals(MediaType.TEXT_PLAIN_TYPE, response.getType());
+
+        response = r.accept("image/png, text/plain").get(ClientResponse.class);
+        assertEquals("GET", response.getEntity(String.class));
+        assertEquals(MediaType.TEXT_PLAIN_TYPE, response.getType());
+
+        response = r.accept("text/plain;q=0.5, text/html").get(ClientResponse.class);
+        assertEquals("GET", response.getEntity(String.class));
+        assertEquals(MediaType.TEXT_HTML_TYPE, response.getType());
+    }
 }

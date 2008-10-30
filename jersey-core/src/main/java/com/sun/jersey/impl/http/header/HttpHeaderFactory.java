@@ -37,6 +37,7 @@
 
 package com.sun.jersey.impl.http.header;
 
+import com.sun.jersey.api.MediaTypes;
 import com.sun.jersey.impl.http.header.reader.HttpHeaderReader;
 import com.sun.jersey.impl.http.header.reader.HttpHeaderReader.ListElementCreator;
 import java.lang.reflect.InvocationTargetException;
@@ -44,6 +45,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.text.ParseException;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -64,8 +66,22 @@ public final class HttpHeaderFactory {
         }
     };
     
+    private static final Comparator<AcceptableMediaType> ACCEPTABLE_MEDIA_TYPE_COMPARATOR
+            = new Comparator<AcceptableMediaType>() {
+        public int compare(AcceptableMediaType o1, AcceptableMediaType o2) {
+            int i = o2.getQuality() - o1.getQuality();
+            if (i != 0)
+                return i;
+
+            return MediaTypes.MEDIA_TYPE_COMPARATOR.compare(o1, o2);
+        }
+    };
+
     public static List<AcceptableMediaType> createAcceptMediaType(String header) throws ParseException {
-        return HttpHeaderReader.readAcceptableList(ACCEPTABLE_MEDIA_TYPE_CREATOR, header);
+        return HttpHeaderReader.readAcceptableList(
+                ACCEPTABLE_MEDIA_TYPE_COMPARATOR,
+                ACCEPTABLE_MEDIA_TYPE_CREATOR,
+                header);
     }
     
     public static final ListElementCreator<Token> TOKEN_CREATOR = 

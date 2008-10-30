@@ -292,20 +292,16 @@ public class ContainerResponse implements HttpResponseContext {
     }
     
     public void setResponse(Response response) {
-        setResponse(response, null);
-    }
-    
-    public void setResponse(Response r, MediaType contentType) {
         this.isCommitted = false;
         this.out = null;
-        this.response = r = (r != null) ? r : Responses.noContent().build();
+        this.response = response = (response != null) ? response : Responses.noContent().build();
         
-        this.status = r.getStatus();
+        this.status = response.getStatus();
         
-        if (r instanceof ResponseImpl) {
-            this.headers = setResponseOptimal((ResponseImpl)r, contentType);
+        if (response instanceof ResponseImpl) {
+            this.headers = setResponseOptimal((ResponseImpl)response);
         } else {
-            this.headers = setResponseNonOptimal(r, contentType);
+            this.headers = setResponseNonOptimal(response);
         }
     }
     
@@ -388,7 +384,7 @@ public class ContainerResponse implements HttpResponseContext {
         else if (status == 200 && entity == null) status = 204;
     }
     
-    private MultivaluedMap<String, Object> setResponseOptimal(ResponseImpl r, MediaType contentType) {
+    private MultivaluedMap<String, Object> setResponseOptimal(ResponseImpl r) {
         this.entityType = r.getEntityType();
         this.entity = r.getEntity();        
         if (entity instanceof GenericEntity) {
@@ -397,17 +393,13 @@ public class ContainerResponse implements HttpResponseContext {
             this.entity = ge.getEntity();
         }
         
-        return r.getMetadataOptimal(request, contentType);
+        return r.getMetadataOptimal(request);
     }
     
-    private MultivaluedMap<String, Object> setResponseNonOptimal(Response r, MediaType contentType) {
+    private MultivaluedMap<String, Object> setResponseNonOptimal(Response r) {
         setEntity(r.getEntity());
         
         MultivaluedMap<String, Object> _headers = r.getMetadata();
-        
-        if (_headers.getFirst("Content-Type") == null && contentType != null) {
-            _headers.putSingle("Content-Type", contentType);
-        }
         
         Object location = _headers.getFirst("Location");
         if (location != null) {

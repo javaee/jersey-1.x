@@ -40,10 +40,7 @@ package com.sun.jersey.impl.model.method;
 import com.sun.jersey.api.MediaTypes;
 import com.sun.jersey.api.uri.UriTemplate;
 import com.sun.jersey.spi.dispatch.RequestDispatcher;
-import com.sun.jersey.impl.http.header.AcceptableMediaType;
-import java.util.Collections;
 import java.util.Comparator;
-import java.util.Iterator;
 import java.util.List;
 import javax.ws.rs.core.MediaType;
 
@@ -52,7 +49,6 @@ import javax.ws.rs.core.MediaType;
  * @author Paul.Sandoz@Sun.Com
  */
 public abstract class ResourceMethod {
-    static private final List<String> EMPTY_LIST = Collections.emptyList();
     
     /**
      * Comparator for resource methods, comparing the consumed and produced
@@ -136,49 +132,6 @@ public abstract class ResourceMethod {
         return false;
     }
         
-    /**
-     * Ascertain if the method is capable of producing an entity of a specific 
-     * media type.
-     *
-     * @param contentType the media type.
-     * @return true if the media type can be produced, otherwise false.
-     */
-    public final boolean produces(MediaType contentType) {
-        for (MediaType c : produceMime) {
-            if (c.getType().equals("*")) return true;
-            
-            if (c.isCompatible(contentType)) return true;
-        }
-        
-        return false;
-    }
-    
-    /**
-     * Ascertain if the method is capable of producing one or more entities 
-     * from a list of media types.
-     *
-     * @param accept The list of media types of entities that may be produced. 
-     *        This list MUST be ordered with the highest quality acceptable
-     *        media type occuring first 
-     *        (see {@link MediaTypes#ACCEPT_MEDIA_TYPE_COMPARATOR}).
-     * @return the quality of the first acceptable media type in the accept 
-     *         list, otherwise -1 if no media types are acceptable.
-     */
-    public final int produces(List accept) {
-        Iterator i = accept.iterator();
-        while (i.hasNext()) {
-            AcceptableMediaType a = (AcceptableMediaType)i.next();
-            if (a.getType().equals("*")) return a.getQuality();
-        
-            for (MediaType c : produceMime) {
-                if (c.getType().equals("*")) return a.getQuality();
-                
-                if (c.isCompatible(a)) return a.getQuality();
-            }            
-        }
-        return -1;
-    }
-    
     public final boolean mediaEquals(ResourceMethod that) {
         boolean v = consumeMime.equals(that.consumeMime);
         if (v == false)
