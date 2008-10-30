@@ -39,6 +39,7 @@ package com.sun.jersey.api.uri;
 
 import com.sun.jersey.api.uri.UriComponent;
 import com.sun.jersey.api.uri.UriTemplate;
+import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Method;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -210,8 +211,11 @@ public final class UriBuilderImpl extends UriBuilder {
         if (resource == null) 
             throw new IllegalArgumentException("Resource parameter is null");
 
-        Class<?> c = resource; 
-        appendPath(c.getAnnotation(Path.class));
+        Class<?> c = resource;
+        Path p = c.getAnnotation(Path.class);
+        if (p == null)
+            throw new IllegalArgumentException("The class, " + resource + " is not annotated with @Path");
+        appendPath(p);
         return this;
     }
 
@@ -234,9 +238,10 @@ public final class UriBuilderImpl extends UriBuilder {
         }
 
         if (found == null)
-            throw new IllegalArgumentException();
-        
-        appendPath(found.getAnnotation(Path.class));
+            throw new IllegalArgumentException("The method named, " + methodName +
+                    ", is not specified by " + resource);
+
+        appendPath(getPath(found));
         
         return this;
     }
@@ -246,10 +251,18 @@ public final class UriBuilderImpl extends UriBuilder {
         checkSsp();
         if (method == null)
             throw new IllegalArgumentException("Method is null");
-        appendPath(method.getAnnotation(Path.class));
+        appendPath(getPath(method));
         return this;
     }
     
+    private Path getPath(AnnotatedElement ae) {
+        Path p = ae.getAnnotation(Path.class);
+        if (p == null)
+            throw new IllegalArgumentException("The annotated element, " +
+                    ae + " is not annotated with @Path");
+        return p;
+    }
+
 
     @Override
     public UriBuilder segment(String... segments) throws IllegalArgumentException {
