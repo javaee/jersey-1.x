@@ -101,7 +101,6 @@ public class Main {
         System.out.println(String.format("Jersey app started with WADL at %s/application.wadl", BASE_URI));
         System.out.println("Hit return to stop...");
         System.in.read();
-        threadSelector.stop();
-        System.exit(0);
+        threadSelector.stopEndpoint();
     }    
 }

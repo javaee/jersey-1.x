@@ -86,6 +86,5 @@ public class Main {
         
         threadSelector.stopEndpoint();
         System.out.println("Server stopped");
-        System.exit(0);
     }
 }

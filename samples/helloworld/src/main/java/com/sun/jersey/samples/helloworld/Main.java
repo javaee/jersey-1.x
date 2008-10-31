@@ -68,6 +68,5 @@ public class Main {
                 BASE_URI, BASE_URI));
         System.in.read();
         threadSelector.stopEndpoint();
-        System.exit(0);
     }    
 }

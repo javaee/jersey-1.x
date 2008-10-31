@@ -63,6 +63,5 @@ public class Main {
                 "Hit enter to stop it...", baseUri, baseUri));
         System.in.read();
         threadSelector.stopEndpoint();
-        System.exit(0);
     }    
 }

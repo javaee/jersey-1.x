@@ -103,6 +103,5 @@ public class Main {
         System.out.println("Hit return to stop...");
         System.in.read();
         threadSelector.stopEndpoint();
-        System.exit(0);
     }    
 }
