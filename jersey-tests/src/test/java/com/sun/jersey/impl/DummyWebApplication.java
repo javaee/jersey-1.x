@@ -81,4 +81,7 @@ public class DummyWebApplication implements WebApplication {
 
     public void handleRequest(ContainerRequest request, ContainerResponse response) throws IOException {
     }
+
+    public void destroy() {
+    }
 }

@@ -137,4 +137,12 @@ public interface WebApplication {
      */
     void handleRequest(ContainerRequest request, ContainerResponse response) 
             throws IOException;
+
+    /**
+     * Destroy the Web application.
+     * <p>
+     * This method MUST only be called only once. Calls to <code>handlerRequest</code>
+     * MUST not occur while and after this method has been called.
+     */
+    void destroy();
 }

@@ -35,8 +35,9 @@
  * holder.
  */
 
-package com.sun.jersey.impl.resource;
+package com.sun.jersey.impl.lifecycle;
 
+import com.sun.jersey.impl.resource.*;
 import com.sun.jersey.impl.AbstractResourceTester;
 import com.sun.jersey.api.core.ResourceConfig;
 import com.sun.jersey.impl.application.WebApplicationImpl;

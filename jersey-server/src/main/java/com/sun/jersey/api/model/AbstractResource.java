@@ -36,6 +36,7 @@
  */
 package com.sun.jersey.api.model;
 
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -53,6 +54,8 @@ public class AbstractResource implements PathAnnotated, AbstractModelComponent {
     private final List<AbstractResourceMethod> resourceMethods;
     private final List<AbstractSubResourceMethod> subResourceMethods;
     private final List<AbstractSubResourceLocator> subResourceLocators;
+    private final List<Method> postConstructMethods;
+    private final List<Method> preDestroyMethods;
 
     /**
      * Creates a new instance of AbstractResource
@@ -67,12 +70,14 @@ public class AbstractResource implements PathAnnotated, AbstractModelComponent {
     public AbstractResource(Class<?> resourceClass, PathValue uriPath) {
         this.resourceClass = resourceClass;
         this.uriPath = uriPath;
-        this.constructors = new ArrayList<AbstractResourceConstructor>();
-        this.fields = new ArrayList<AbstractField>();
-        this.setterMethods = new ArrayList<AbstractSetterMethod>();
-        this.resourceMethods = new ArrayList<AbstractResourceMethod>();
-        this.subResourceLocators = new ArrayList<AbstractSubResourceLocator>();
-        this.subResourceMethods = new ArrayList<AbstractSubResourceMethod>();
+        this.constructors = new ArrayList<AbstractResourceConstructor>(4);
+        this.fields = new ArrayList<AbstractField>(4);
+        this.setterMethods = new ArrayList<AbstractSetterMethod>(2);
+        this.resourceMethods = new ArrayList<AbstractResourceMethod>(4);
+        this.subResourceLocators = new ArrayList<AbstractSubResourceLocator>(4);
+        this.subResourceMethods = new ArrayList<AbstractSubResourceMethod>(4);
+        this.postConstructMethods = new ArrayList<Method>(1);
+        this.preDestroyMethods = new ArrayList<Method>(1);
     }
 
     public Class<?> getResourceClass() {
@@ -128,6 +133,20 @@ public class AbstractResource implements PathAnnotated, AbstractModelComponent {
      */
     public List<AbstractSubResourceLocator> getSubResourceLocators() {
         return subResourceLocators;
+    }
+
+    /**
+     * @return the postCreate
+     */
+    public List<Method> getPostConstructMethods() {
+        return postConstructMethods;
+    }
+
+    /**
+     * @return the preDestroy
+     */
+    public List<Method> getPreDestroyMethods() {
+        return preDestroyMethods;
     }
 
     public void accept(AbstractModelVisitor visitor) {

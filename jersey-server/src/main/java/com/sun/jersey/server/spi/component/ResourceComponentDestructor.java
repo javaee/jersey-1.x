@@ -1,9 +1,9 @@
 /*
  *
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
- *
+ * 
  * Copyright 1997-2007 Sun Microsystems, Inc. All rights reserved.
- *
+ * 
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
  * and Distribution License("CDDL") (collectively, the "License").  You
@@ -11,7 +11,7 @@
  * a copy of the License at https://jersey.dev.java.net/CDDL+GPL.html
  * or jersey/legal/LICENSE.txt.  See the License for the specific
  * language governing permissions and limitations under the License.
- *
+ * 
  * When distributing the software, include this License Header Notice in each
  * file and include the License file at jersey/legal/LICENSE.txt.
  * Sun designates this particular file as subject to the "Classpath" exception
@@ -20,9 +20,9 @@
  * Header, with the fields enclosed by brackets [] replaced by your own
  * identifying information: "Portions Copyrighted [year]
  * [name of copyright owner]"
- *
+ * 
  * Contributor(s):
- *
+ * 
  * If you wish your version of this file to be governed by only the CDDL or
  * only the GPL Version 2, indicate your decision by adding "[Contributor]
  * elects to include this software in this distribution under the [CDDL or GPL
@@ -36,32 +36,29 @@
  */
 package com.sun.jersey.server.spi.component;
 
-import com.sun.jersey.api.core.HttpContext;
 import com.sun.jersey.api.model.AbstractResource;
-import com.sun.jersey.core.spi.component.ComponentProvider;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 
 /**
- *
+ * A utility class for the destruction of a resource class instance.
+ * 
  * @author Paul.Sandoz@Sun.Com
  */
-public interface ResourceComponentProvider extends ComponentProvider {
+public class ResourceComponentDestructor {
+    private final Method preDestroy;
+    
+    public ResourceComponentDestructor(AbstractResource ar) {
+        if (ar.getPreDestroyMethods().size() > 0) {
+            this.preDestroy = ar.getPreDestroyMethods().get(0);
+        } else {
+            this.preDestroy = null;
+        }
+    }
 
-    /**
-     *
-     * @param abstractResource
-     */
-    void init(AbstractResource abstractResource);
-
-    /**
-     * Get the instance.
-     *
-     * @param hc the HTTP context.
-     * @return the instance.
-     */
-    Object getInstance(HttpContext hc);
-
-    /**
-     * Destroy the resource component provider.
-     */
-    void destroy();
-}
+    public void destroy(Object o) throws IllegalAccessException,
+            IllegalArgumentException, InvocationTargetException {
+        if (preDestroy != null)
+            preDestroy.invoke(o);
+    }
+ }

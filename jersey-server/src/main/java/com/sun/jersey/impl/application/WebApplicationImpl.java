@@ -124,6 +124,7 @@ import com.sun.jersey.spi.inject.SingletonTypeInjectableProvider;
 import com.sun.jersey.spi.inject.InjectableProviderContext;
 import com.sun.jersey.core.spi.component.ComponentContext;
 import com.sun.jersey.core.spi.component.ComponentScope;
+import com.sun.jersey.impl.resource.PerRequestFactory;
 import com.sun.jersey.spi.template.TemplateContext;
 import com.sun.jersey.spi.uri.rules.UriRule;
 import java.lang.annotation.Annotation;
@@ -508,11 +509,18 @@ public final class WebApplicationImpl implements WebApplication {
         try {
             _handleRequest(localContext, request, response);
         } finally {
+            PerRequestFactory.destroy(localContext);
             context.set(null);
         }
     }
 
-    public void _handleRequest(final WebApplicationContext localContext,
+    public void destroy() {
+        for (ResourceClass rc : metaClassMap.values()) {
+            rc.destroy();
+        }
+    }
+
+    private void _handleRequest(final WebApplicationContext localContext,
             ContainerRequest request, ContainerResponse response) throws IOException {
         try {
             /**

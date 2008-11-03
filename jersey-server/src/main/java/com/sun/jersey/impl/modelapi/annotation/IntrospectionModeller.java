@@ -121,8 +121,13 @@ public class IntrospectionModeller {
         workOutSubResourceMethodsList(resource, methodList, isEncodedAnotOnClass, 
                 classScopeConsumesAnnotation, classScopeProducesAnnotation);
         workOutSubResourceLocatorsList(resource, methodList, isEncodedAnotOnClass);
+
+        final MethodList declaredMethods = new MethodList(
+                getDeclaredMethods(resourceClass));
+
+        workOutPostConstructPreDestroy(resource, declaredMethods);
         
-        logNonPublicMethods(resourceClass);
+        logNonPublicMethods(resourceClass, declaredMethods);
 
         if (LOGGER.isLoggable(Level.FINEST)) {
             LOGGER.finest(ImplMessages.NEW_AR_CREATED_BY_INTROSPECTION_MODELER(
@@ -202,7 +207,39 @@ public class IntrospectionModeller {
              c = c.getSuperclass();
         }
     }
-    
+
+    private static void workOutPostConstructPreDestroy(
+            AbstractResource resource,
+            MethodList methodList) {
+        Class postConstruct = classForName("javax.annotation.PostConstruct");
+        if (postConstruct == null)
+            return;
+
+        Class preDestroy = classForName("javax.annotation.PreDestroy");
+
+        for (AnnotatedMethod m : methodList.
+                hasAnnotation(postConstruct).
+                hasNumParams(0).
+                hasReturnType(void.class)) {
+            resource.getPostConstructMethods().add(m.getMethod());
+        }
+
+        for (AnnotatedMethod m : methodList.
+                hasAnnotation(preDestroy).
+                hasNumParams(0).
+                hasReturnType(void.class)) {
+            resource.getPreDestroyMethods().add(m.getMethod());
+        }
+    }
+
+    private static Class classForName(String name) {
+        try {
+            return Class.forName(name, true, Thread.currentThread().getContextClassLoader());
+        } catch (ClassNotFoundException ex) {
+            return null;
+        }
+    }
+
     private static final void workOutSetterMethodsList(
             AbstractResource resource, 
             MethodList methodList,
@@ -484,15 +521,12 @@ public class IntrospectionModeller {
         return null;
     }
     
-    private static void logNonPublicMethods(final Class resourceClass) {
+    private static void logNonPublicMethods(final Class resourceClass, final MethodList declaredMethods) {
         assert null != resourceClass;
         
         if (!LOGGER.isLoggable(Level.WARNING)) {
             return; // does not make sense to check when logging is disabled anyway
         }
-        
-        final MethodList declaredMethods = new MethodList(
-                getDeclaredMethods(resourceClass));
         
         // non-public resource methods
         for (AnnotatedMethod m : declaredMethods.hasMetaAnnotation(HttpMethod.class).

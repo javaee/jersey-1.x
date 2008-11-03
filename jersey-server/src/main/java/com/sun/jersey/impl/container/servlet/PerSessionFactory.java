@@ -45,13 +45,19 @@ import com.sun.jersey.core.spi.component.ComponentScope;
 import com.sun.jersey.core.spi.component.ioc.IoCInstantiatedComponentProvider;
 import com.sun.jersey.core.spi.component.ioc.IoCProxiedComponentProvider;
 import com.sun.jersey.core.spi.component.ioc.IoCComponentProvider;
+import com.sun.jersey.impl.modelapi.annotation.IntrospectionModeller;
 import com.sun.jersey.server.impl.inject.ServerInjectableProviderContext;
 import com.sun.jersey.server.spi.component.ResourceComponentConstructor;
+import com.sun.jersey.server.spi.component.ResourceComponentDestructor;
 import com.sun.jersey.server.spi.component.ResourceComponentInjector;
 import com.sun.jersey.server.spi.component.ResourceComponentProvider;
 import com.sun.jersey.server.spi.component.ResourceComponentProviderFactory;
 import java.lang.reflect.InvocationTargetException;
+import java.util.HashMap;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
+import javax.servlet.http.HttpSessionBindingEvent;
+import javax.servlet.http.HttpSessionBindingListener;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
 
@@ -88,16 +94,76 @@ public final class PerSessionFactory implements ResourceComponentProviderFactory
         throw new IllegalStateException();
     }
 
-    private class PerSesson implements ResourceComponentProvider {
-        private Class c;
+    private static class SessionMap extends HashMap<String, Object>
+            implements HttpSessionBindingListener {
 
+        public void valueBound(HttpSessionBindingEvent hsbe) {
+        }
+
+        public void valueUnbound(HttpSessionBindingEvent hsbe) {
+            for (Object o : values()) {
+                try {
+                    AbstractResource ar = IntrospectionModeller.createResource(o.getClass());
+                    ResourceComponentDestructor rcd = new ResourceComponentDestructor(ar);
+                    rcd.destroy(o);
+                } catch (IllegalAccessException ex) {
+                    throw new ContainerException("Unable to destroy resource", ex);
+                } catch (InvocationTargetException ex) {
+                    throw new ContainerException("Unable to destroy resource", ex);
+                } catch (RuntimeException ex) {
+                    throw new ContainerException("Unable to destroy resource", ex);
+                }
+            }
+        }
+    }
+
+    private abstract class AbstractPerSesson implements ResourceComponentProvider {
+        private static final String SCOPE_PER_SESSION = "com.sun.jersey.scope.PerSession";
+
+        private Class c;
+        
+        public void init(AbstractResource abstractResource) {
+            this.c = abstractResource.getResourceClass();
+        }
+
+        public final Object getInstance() {
+            return getInstance(threadLocalHc);
+        }
+
+        public final Object getInstance(HttpContext hc) {
+            HttpSession hs = hsr.getSession();
+
+            synchronized(hs) {
+                SessionMap sm = (SessionMap)hs.getAttribute(SCOPE_PER_SESSION);
+                if (sm == null) {
+                    sm = new SessionMap();
+                    hs.setAttribute(SCOPE_PER_SESSION, sm);
+                }
+                Object o = sm.get(c.getName());
+                if (o != null)
+                    return o;
+
+                o = _getInstance(hc);
+                sm.put(c.getName(), o);
+                return o;
+            }
+        }
+
+        protected abstract Object _getInstance(HttpContext hc);
+
+        public final void destroy() {
+        }
+    }
+
+    private final class PerSesson extends AbstractPerSesson {
         private ResourceComponentConstructor rcc;
 
         private ResourceComponentInjector rci;
 
+        @Override
         public void init(AbstractResource abstractResource) {
-            this.c = abstractResource.getResourceClass();
-
+            super.init(abstractResource);
+            
             this.rcc = new ResourceComponentConstructor(
                     sipc,
                     ComponentScope.Undefined,
@@ -108,20 +174,10 @@ public final class PerSessionFactory implements ResourceComponentProviderFactory
                     abstractResource);
         }
 
-        public Object getInstance() {
-            return getInstance(threadLocalHc);
-        }
-
-        public Object getInstance(HttpContext hc) {
-            Object o = hsr.getSession().getAttribute(c.getName());
-            if (o != null) return o;
-
+        protected Object _getInstance(HttpContext hc) {
             try {
-                o = rcc.getInstance(hc);
+                Object o = rcc.construct(hc);
                 rci.inject(hc, o);
-
-                hsr.getSession().setAttribute(c.getName(), o);
-
                 return o;
             } catch (InstantiationException ex) {
                 throw new ContainerException("Unable to create resource", ex);
@@ -138,12 +194,8 @@ public final class PerSessionFactory implements ResourceComponentProviderFactory
         }
     }
 
-    private class PerSessonInstantiated implements ResourceComponentProvider {
+    private final class PerSessonInstantiated extends AbstractPerSesson {
         private final IoCInstantiatedComponentProvider iicp;
-
-        private Class c;
-
-        private ResourceComponentConstructor rcc;
 
         private ResourceComponentInjector rci;
 
@@ -151,36 +203,25 @@ public final class PerSessionFactory implements ResourceComponentProviderFactory
             this.iicp = iicp;
         }
 
+        @Override
         public void init(AbstractResource abstractResource) {
-            this.c = abstractResource.getResourceClass();
-
+            super.init(abstractResource);
+            
             this.rci = new ResourceComponentInjector(
                     sipc,
                     ComponentScope.Undefined,
                     abstractResource);
         }
 
-        public Object getInstance() {
-            return getInstance(threadLocalHc);
-        }
-
-        public Object getInstance(HttpContext hc) {
-            Object o = hsr.getSession().getAttribute(c.getName());
-            if (o != null) return o;
-
-            o = iicp.getInstance();
+        protected Object _getInstance(HttpContext hc) {
+            Object o = iicp.getInstance();
             rci.inject(hc, iicp.getInjectableInstance(o));
-
-            hsr.getSession().setAttribute(c.getName(), o);
-
             return o;
         }
     }
 
-    private class PerSessonProxied implements ResourceComponentProvider {
+    private final class PerSessonProxied extends AbstractPerSesson {
         private final IoCProxiedComponentProvider ipcp;
-
-        private Class c;
 
         private ResourceComponentConstructor rcc;
 
@@ -190,9 +231,10 @@ public final class PerSessionFactory implements ResourceComponentProviderFactory
             this.ipcp = ipcp;
         }
 
+        @Override
         public void init(AbstractResource abstractResource) {
-            this.c = abstractResource.getResourceClass();
-
+            super.init(abstractResource);
+            
             this.rcc = new ResourceComponentConstructor(
                     sipc,
                     ComponentScope.Undefined,
@@ -203,21 +245,11 @@ public final class PerSessionFactory implements ResourceComponentProviderFactory
                     abstractResource);
         }
 
-        public Object getInstance() {
-            return getInstance(threadLocalHc);
-        }
-
-        public Object getInstance(HttpContext hc) {
-            Object o = hsr.getSession().getAttribute(c.getName());
-            if (o != null) return o;
-
+        protected Object _getInstance(HttpContext hc) {
             try {
-                o = rcc.getInstance(hc);
+                Object o = rcc.construct(hc);
                 rci.inject(hc, o);
                 Object po = ipcp.proxy(o);
-
-                hsr.getSession().setAttribute(c.getName(), po);
-
                 return po;
             } catch (InstantiationException ex) {
                 throw new ContainerException("Unable to create resource", ex);

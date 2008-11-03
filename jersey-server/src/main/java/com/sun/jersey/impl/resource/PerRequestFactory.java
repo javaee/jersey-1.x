@@ -50,7 +50,12 @@ import com.sun.jersey.server.spi.component.ResourceComponentInjector;
 import com.sun.jersey.server.spi.component.ResourceComponentProvider;
 import com.sun.jersey.server.spi.component.ResourceComponentProviderFactory;
 import com.sun.jersey.core.spi.component.ComponentScope;
+import com.sun.jersey.server.spi.component.ResourceComponentDestructor;
 import java.lang.reflect.InvocationTargetException;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
 
@@ -59,9 +64,25 @@ import javax.ws.rs.core.Context;
  * @author Paul.Sandoz@Sun.Com
  */
 public final class PerRequestFactory implements ResourceComponentProviderFactory {
+    private static final Logger LOGGER = Logger.getLogger(PerRequestFactory.class.getName());
+
     private final ServerInjectableProviderContext sipc;
 
     private final HttpContext threadLocalHc;
+
+    public static void destroy(HttpContext hc) {
+        Map<AbstractPerRequest, Object> m = (Map<AbstractPerRequest, Object>)hc.getProperties().
+                get(SCOPE_PER_REQUEST);
+        if (m != null) {
+            for (Map.Entry<AbstractPerRequest, Object> e : m.entrySet()) {
+                try {
+                    e.getKey().destroy(e.getValue());
+                } catch (ContainerException ex) {
+                    LOGGER.log(Level.SEVERE, "Unable to destroy resource", ex);
+                }
+            }
+        }
+    }
 
     public PerRequestFactory(
             @Context ServerInjectableProviderContext sipc,
@@ -83,12 +104,62 @@ public final class PerRequestFactory implements ResourceComponentProviderFactory
         throw new IllegalStateException();
     }
 
-    private class PerRequest implements ResourceComponentProvider {
+    private static final String SCOPE_PER_REQUEST = "com.sun.jersey.scope.PerRequest";
+
+    private abstract class AbstractPerRequest implements ResourceComponentProvider {
+
+        private ResourceComponentDestructor rcd;
+        
+        public final Object getInstance() {
+            return getInstance(threadLocalHc);
+        }
+
+        public void init(AbstractResource abstractResource) {
+            rcd = new ResourceComponentDestructor(abstractResource);
+        }
+
+        public final Object getInstance(HttpContext hc) {
+            Map<AbstractPerRequest, Object> m = (Map<AbstractPerRequest, Object>)hc.getProperties().
+                    get(SCOPE_PER_REQUEST);
+            if (m == null) {
+                m = new HashMap<AbstractPerRequest, Object>();
+                hc.getProperties().put(SCOPE_PER_REQUEST, m);
+            } else {
+                Object o = m.get(this);
+                if (o != null) return o;
+            }
+
+            Object o = _getInstance(hc);
+            m.put(this, o);
+            return o;
+        }
+
+        public final void destroy() {
+        }
+        
+        protected abstract Object _getInstance(HttpContext hc);
+
+        private void destroy(Object o) {
+            try {
+                rcd.destroy(o);
+            } catch (IllegalAccessException ex) {
+                throw new ContainerException("Unable to destroy resource", ex);
+            } catch (InvocationTargetException ex) {
+                throw new ContainerException("Unable to destroy resource", ex);
+            } catch (RuntimeException ex) {
+                throw new ContainerException("Unable to destroy resource", ex);
+            }
+        }
+    }
+
+    private final class PerRequest extends AbstractPerRequest {
         private ResourceComponentConstructor rcc;
 
         private ResourceComponentInjector rci;
 
+        @Override
         public void init(AbstractResource abstractResource) {
+            super.init(abstractResource);
             this.rcc = new ResourceComponentConstructor(
                     sipc,
                     ComponentScope.PerRequest,
@@ -99,13 +170,9 @@ public final class PerRequestFactory implements ResourceComponentProviderFactory
                     abstractResource);
         }
 
-        public Object getInstance() {
-            return getInstance(threadLocalHc);
-        }
-
-        public Object getInstance(HttpContext hc) {
+        protected Object _getInstance(HttpContext hc) {
             try {
-                Object o = rcc.getInstance(hc);
+                Object o = rcc.construct(hc);
                 rci.inject(hc, o);
                 return o;
             } catch (InstantiationException ex) {
@@ -123,34 +190,32 @@ public final class PerRequestFactory implements ResourceComponentProviderFactory
         }
     }
 
-    private class PerRequestInstantiated implements ResourceComponentProvider {
+    private final class PerRequestInstantiated extends AbstractPerRequest {
         private final IoCInstantiatedComponentProvider iicp;
-        
+
         private ResourceComponentInjector rci;
 
         PerRequestInstantiated(IoCInstantiatedComponentProvider iicp) {
             this.iicp = iicp;
         }
 
+        @Override
         public void init(AbstractResource abstractResource) {
+            super.init(abstractResource);
             this.rci = new ResourceComponentInjector(
                     sipc,
                     ComponentScope.PerRequest,
                     abstractResource);
         }
 
-        public Object getInstance() {
-            return getInstance(threadLocalHc);
-        }
-
-        public Object getInstance(HttpContext hc) {
+        public Object _getInstance(HttpContext hc) {
             Object o = iicp.getInstance();
             rci.inject(hc, iicp.getInjectableInstance(o));
             return o;
         }
     }
 
-    private class PerRequestProxied implements ResourceComponentProvider {
+    private final class PerRequestProxied extends AbstractPerRequest {
         private final IoCProxiedComponentProvider ipcp;
 
         private ResourceComponentConstructor rcc;
@@ -161,7 +226,9 @@ public final class PerRequestFactory implements ResourceComponentProviderFactory
             this.ipcp = ipcp;
         }
 
+        @Override
         public void init(AbstractResource abstractResource) {
+            super.init(abstractResource);
             this.rcc = new ResourceComponentConstructor(
                     sipc,
                     ComponentScope.PerRequest,
@@ -172,13 +239,9 @@ public final class PerRequestFactory implements ResourceComponentProviderFactory
                     abstractResource);
         }
 
-        public Object getInstance() {
-            return getInstance(threadLocalHc);
-        }
-
-        public Object getInstance(HttpContext hc) {
+        public Object _getInstance(HttpContext hc) {
             try {
-                Object o = rcc.getInstance(hc);
+                Object o = rcc.construct(hc);
                 rci.inject(hc, o);
                 Object po = ipcp.proxy(o);
                     return po;

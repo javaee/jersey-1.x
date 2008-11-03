@@ -133,7 +133,7 @@ public class ProviderFactory implements ComponentProviderFactory<ComponentProvid
         ci.inject(provider);
     }
 
-    protected Object getInstance(Class c)
+    private Object getInstance(Class c)
             throws InstantiationException, IllegalAccessException,
             IllegalArgumentException, InvocationTargetException {
         ComponentConstructor cc = new ComponentConstructor(ipc, c);

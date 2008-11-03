@@ -44,20 +44,12 @@ import java.util.List;
  *
  * @author Paul.Sandoz@Sun.Com
  */
-public class AbstractSetterMethod implements Parameterized, AbstractModelComponent {
+public class AbstractSetterMethod extends AbstractMethod implements Parameterized, AbstractModelComponent {
     private List<Parameter> parameters;
     
-    private Method method;
-
     public AbstractSetterMethod(Method method) {
-        assert null != method;
-
-        this.method = method;
+        super(method);
         this.parameters = new ArrayList<Parameter>();        
-    }
-    
-    public Method getMethod() {
-        return method;
     }
     
     public List<Parameter> getParameters() {

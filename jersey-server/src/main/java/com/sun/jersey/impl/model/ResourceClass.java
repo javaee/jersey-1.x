@@ -73,7 +73,6 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Logger;
 import javax.ws.rs.HttpMethod;
 
 /**
@@ -81,8 +80,6 @@ import javax.ws.rs.HttpMethod;
  * @author Paul.Sandoz@Sun.Com
  */
 public final class ResourceClass {
-    private static final Logger LOGGER = Logger.getLogger(ResourceClass.class.getName());
-    
     private final UriRules<UriRule> rules;
     
     private final ResourceConfig config;
@@ -171,7 +168,6 @@ public final class ResourceClass {
                 new CombiningMatchingPatterns<UriRule>(
                 Arrays.asList(atomicRules, sequentialRules));
         
-        // this.rules = UriRulesFactory.create(rulesMap);
         this.rules = combiningRules;
     }
         
@@ -179,7 +175,11 @@ public final class ResourceClass {
         this.rcProvider = rcpFactory.getComponentProvider(resource.getResourceClass());
         this.rcProvider.init(resource);
     }
-    
+
+    public void destroy() {
+        this.rcProvider.destroy();
+    }
+
     public UriRules<UriRule> getRules() {
         return rules;
     }

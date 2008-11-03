@@ -46,16 +46,21 @@ import com.sun.jersey.core.spi.component.ioc.IoCInstantiatedComponentProvider;
 import com.sun.jersey.core.spi.component.ioc.IoCProxiedComponentProvider;
 import com.sun.jersey.server.impl.inject.ServerInjectableProviderContext;
 import com.sun.jersey.server.spi.component.ResourceComponentConstructor;
+import com.sun.jersey.server.spi.component.ResourceComponentDestructor;
 import com.sun.jersey.server.spi.component.ResourceComponentInjector;
 import com.sun.jersey.server.spi.component.ResourceComponentProvider;
 import com.sun.jersey.server.spi.component.ResourceComponentProviderFactory;
 import java.lang.reflect.InvocationTargetException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.ws.rs.core.Context;
 
 /**
  * A simple provider that maintains a singleton resource class instance
  */
 public final class SingletonFactory implements ResourceComponentProviderFactory  {
+    private static final Logger LOGGER = Logger.getLogger(SingletonFactory.class.getName());
+
     private final ServerInjectableProviderContext sipc;
 
     private final HttpContext threadLocalHc;
@@ -80,10 +85,40 @@ public final class SingletonFactory implements ResourceComponentProviderFactory 
         throw new IllegalStateException();
     }
 
-    private class Singleton implements ResourceComponentProvider {
-        private Object resource;
+    private abstract class AbstractSingleton implements ResourceComponentProvider {
+        private ResourceComponentDestructor rcd;
 
+        protected Object resource;
+        
         public void init(AbstractResource abstractResource) {
+            rcd = new ResourceComponentDestructor(abstractResource);
+        }
+        
+        public final Object getInstance(HttpContext hc) {
+            return resource;
+        }
+
+        public final Object getInstance() {
+            return resource;
+        }
+
+        public final void destroy() {
+            try {
+                rcd.destroy(resource);
+            } catch (IllegalAccessException ex) {
+                LOGGER.log(Level.SEVERE, "Unable to destroy resource", ex);
+            } catch (IllegalArgumentException ex) {
+                LOGGER.log(Level.SEVERE, "Unable to destroy resource", ex);
+            } catch (InvocationTargetException ex) {
+                LOGGER.log(Level.SEVERE, "Unable to destroy resource", ex);
+            }
+        }
+    }
+
+    private class Singleton extends AbstractSingleton {
+        @Override
+        public void init(AbstractResource abstractResource) {
+            super.init(abstractResource);
             ResourceComponentConstructor rcc = new ResourceComponentConstructor(
                     sipc,
                     ComponentScope.Singleton,
@@ -94,7 +129,7 @@ public final class SingletonFactory implements ResourceComponentProviderFactory 
                     abstractResource);
 
             try {
-                this.resource = rcc.getInstance(null);
+                this.resource = rcc.construct(null);
                 rci.inject(null, resource);
             } catch (InvocationTargetException ex) {
                 throw new ContainerException("Unable to create resource", ex);
@@ -104,26 +139,18 @@ public final class SingletonFactory implements ResourceComponentProviderFactory 
                 throw new ContainerException("Unable to create resource", ex);
             }
         }
-
-        public Object getInstance(HttpContext hc) {
-            return resource;
-        }
-
-        public Object getInstance() {
-            return resource;
-        }
     }
 
-    private class SingletonInstantiated implements ResourceComponentProvider {
+    private class SingletonInstantiated extends AbstractSingleton {
         private final IoCInstantiatedComponentProvider iicp;
         
-        private Object resource;
-
         SingletonInstantiated(IoCInstantiatedComponentProvider iicp) {
             this.iicp = iicp;
         }
 
+        @Override
         public void init(AbstractResource abstractResource) {
+            super.init(abstractResource);
             ResourceComponentInjector rci = new ResourceComponentInjector(
                     sipc,
                     ComponentScope.Singleton,
@@ -132,26 +159,18 @@ public final class SingletonFactory implements ResourceComponentProviderFactory 
             resource = iicp.getInstance();
             rci.inject(null, iicp.getInjectableInstance(resource));
         }
-
-        public Object getInstance(HttpContext hc) {
-            return resource;
-        }
-
-        public Object getInstance() {
-            return resource;
-        }
     }
 
-    private class SingletonProxied implements ResourceComponentProvider {
+    private class SingletonProxied extends AbstractSingleton {
         private final IoCProxiedComponentProvider ipcp;
-
-        private Object resource;
 
         SingletonProxied(IoCProxiedComponentProvider ipcp) {
             this.ipcp = ipcp;
         }
 
+        @Override
         public void init(AbstractResource abstractResource) {
+            super.init(abstractResource);
             ResourceComponentConstructor rcc = new ResourceComponentConstructor(
                     sipc,
                     ComponentScope.Singleton,
@@ -162,7 +181,7 @@ public final class SingletonFactory implements ResourceComponentProviderFactory 
                     abstractResource);
 
             try {
-                Object o = rcc.getInstance(null);
+                Object o = rcc.construct(null);
                 rci.inject(null, o);
                 resource = ipcp.proxy(o);
             } catch (InvocationTargetException ex) {
@@ -172,14 +191,6 @@ public final class SingletonFactory implements ResourceComponentProviderFactory 
             } catch (IllegalAccessException ex) {
                 throw new ContainerException("Unable to create resource", ex);
             }
-        }
-
-        public Object getInstance(HttpContext hc) {
-            return resource;
-        }
-
-        public Object getInstance() {
-            return resource;
         }
     }
 }

@@ -45,6 +45,7 @@ import com.sun.jersey.server.impl.inject.ServerInjectableProviderContext;
 import com.sun.jersey.spi.inject.Injectable;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -64,6 +65,8 @@ public class ResourceComponentConstructor {
     
     private final Constructor constructor;
 
+    private final Method postConstruct;
+    
     private final List<AbstractHttpContextInjectable> injectables;
 
     /**
@@ -109,7 +112,12 @@ public class ResourceComponentConstructor {
     public ResourceComponentConstructor(ServerInjectableProviderContext sipc,
             ComponentScope scope, AbstractResource ar) {
         this.c = ar.getResourceClass();
-
+        if (ar.getPostConstructMethods().size() > 0) {
+            this.postConstruct = ar.getPostConstructMethods().get(0);
+        } else {
+            this.postConstruct = null;
+        }
+        
         ConstructorInjectablePair cip = getConstructor(sipc, scope, ar);
         if (cip == null || cip.is.size() == 0) {
             this.constructor = null;
@@ -135,7 +143,16 @@ public class ResourceComponentConstructor {
         }
     }
 
-    public Object getInstance(HttpContext hc)
+    public Object construct(HttpContext hc)
+            throws InstantiationException, IllegalAccessException,
+            IllegalArgumentException, InvocationTargetException {
+        final Object o = _construct(hc);
+        if (postConstruct != null)
+            postConstruct.invoke(o);
+        return o;
+    }
+    
+    public Object _construct(HttpContext hc)
             throws InstantiationException, IllegalAccessException,
             IllegalArgumentException, InvocationTargetException {
         if (constructor == null) {
@@ -149,7 +166,7 @@ public class ResourceComponentConstructor {
             return constructor.newInstance(params);
         }
     }
-    
+
     /**
      * Get the most suitable constructor. The constructor with the most
      * parameters and that has the most parameters associated with 
