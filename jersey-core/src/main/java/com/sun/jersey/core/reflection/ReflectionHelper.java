@@ -56,6 +56,22 @@ import java.util.Map;
  */
 public final class ReflectionHelper {
     /**
+     * Get the Class from the class name.
+     * <p>
+     * The context class loader of the current thread is used.
+     * 
+     * @param name the class name.
+     * @return the Class.
+     */
+    public static Class classForName(String name) {
+        try {
+            return Class.forName(name, true, Thread.currentThread().getContextClassLoader());
+        } catch (ClassNotFoundException ex) {
+            return null;
+        }
+    }
+
+    /**
      * Get the class that is the type argument of a parameterized type.
      * <p>
      * @param parameterizedType must be an instance of ParameterizedType

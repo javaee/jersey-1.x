@@ -518,6 +518,8 @@ public final class WebApplicationImpl implements WebApplication {
         for (ResourceClass rc : metaClassMap.values()) {
             rc.destroy();
         }
+
+        cpFactory.destroy();
     }
 
     private void _handleRequest(final WebApplicationContext localContext,

@@ -204,6 +204,11 @@ public class ServletContainer extends HttpServlet implements ContainerListener {
         }        
     }
     
+    @Override
+    public void destroy() {
+        application.destroy();
+    }
+
     private final static class Writer extends OutputStream implements ContainerResponseWriter {
         final HttpServletResponse response;
         

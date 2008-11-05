@@ -36,11 +36,15 @@
  */
 package com.sun.jersey.core.spi.component;
 
+import com.sun.jersey.core.reflection.AnnotatedMethod;
+import com.sun.jersey.core.reflection.MethodList;
+import com.sun.jersey.core.reflection.ReflectionHelper;
 import com.sun.jersey.spi.inject.Injectable;
 import com.sun.jersey.spi.inject.InjectableProviderContext;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -99,7 +103,9 @@ public class ComponentConstructor<T> {
     private final InjectableProviderContext ipc;
 
     private final Class<T> c;
-    
+
+    private final Method postConstruct;
+
     /**
      * Create a component constructor with the injectable provider context.
      *
@@ -109,9 +115,33 @@ public class ComponentConstructor<T> {
     public ComponentConstructor(InjectableProviderContext ipc, Class<T> c) {
         this.ipc = ipc;
         this.c = c;
+        this.postConstruct = getPostConstructMethod(c);
+    }
+
+    private static Method getPostConstructMethod(Class c) {
+        Class postConstructClass = ReflectionHelper.classForName("javax.annotation.PostConstruct");
+        if (postConstructClass != null) {
+            MethodList methodList = new MethodList(c);
+            for (AnnotatedMethod m : methodList.
+                    hasAnnotation(postConstructClass).
+                    hasNumParams(0).
+                    hasReturnType(void.class)) {
+                return m.getMethod();
+            }
+        }
+        return null;
     }
 
     public T getInstance()
+            throws InstantiationException, IllegalAccessException,
+            IllegalArgumentException, InvocationTargetException {
+        final T t = _getInstance();
+        if (postConstruct != null)
+            postConstruct.invoke(t);
+        return t;
+    }
+
+    private T _getInstance()
             throws InstantiationException, IllegalAccessException,
             IllegalArgumentException, InvocationTargetException {
         ConstructorInjectablePair<T> cip = getConstructor();

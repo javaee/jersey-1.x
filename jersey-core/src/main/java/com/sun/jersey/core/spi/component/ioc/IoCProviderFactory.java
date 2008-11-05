@@ -57,9 +57,9 @@ public class IoCProviderFactory extends ProviderFactory {
     }
 
     @Override
-    public ComponentProvider getComponentProvider(Class c) {
+    public ComponentProvider _getComponentProvider(Class c) {
         IoCComponentProvider icp = icpf.getComponentProvider(c);
-        return (icp == null) ? super.getComponentProvider(c) : wrap(c, icp);
+        return (icp == null) ? super._getComponentProvider(c) : wrap(c, icp);
     }
 
     private ComponentProvider wrap(Class c, IoCComponentProvider icp) {
@@ -75,7 +75,7 @@ public class IoCProviderFactory extends ProviderFactory {
             return new SingletonWrapper(getInjectableProviderContext(), iicp, c);
         } else if (icp instanceof IoCProxiedComponentProvider) {
             IoCProxiedComponentProvider ipcp = (IoCProxiedComponentProvider)icp;
-            ComponentProvider cp = super.getComponentProvider(c);
+            ComponentProvider cp = super._getComponentProvider(c);
             return new ProxiedSingletonWrapper(ipcp, cp, c);
         }
         throw new UnsupportedOperationException();

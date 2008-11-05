@@ -54,9 +54,12 @@ public class ProviderFactory implements ComponentProviderFactory<ComponentProvid
     private static final class SingletonComponentProvider implements ComponentProvider {
         private final Object o;
 
+        private final ComponentDestructor cd;
+
         private final ComponentInjector ci;
 
         SingletonComponentProvider(ComponentInjector ci, Object o) {
+            this.cd = new ComponentDestructor(o.getClass());
             this.ci = ci;
             this.o = o;
         }
@@ -68,10 +71,22 @@ public class ProviderFactory implements ComponentProviderFactory<ComponentProvid
         public void inject() {
             ci.inject(o);
         }
+
+        public void destroy() {
+            try {
+                cd.destroy(o);
+            } catch (IllegalAccessException ex) {
+                LOGGER.log(Level.SEVERE, "Unable to destroy resource", ex);
+            } catch (IllegalArgumentException ex) {
+                LOGGER.log(Level.SEVERE, "Unable to destroy resource", ex);
+            } catch (InvocationTargetException ex) {
+                LOGGER.log(Level.SEVERE, "Unable to destroy resource", ex);
+            }
+        }
     }
     
-    private final Map<Class, SingletonComponentProvider> cache =
-            new HashMap<Class, SingletonComponentProvider>();
+    private final Map<Class, ComponentProvider> cache =
+            new HashMap<Class, ComponentProvider>();
 
     private final InjectableProviderContext ipc;
 
@@ -83,19 +98,24 @@ public class ProviderFactory implements ComponentProviderFactory<ComponentProvid
         return ipc;
     }
 
-    public ComponentProvider getComponentProvider(Class c) {
-        SingletonComponentProvider cp = cache.get(c);
+    public final ComponentProvider getComponentProvider(Class c) {
+        ComponentProvider cp = cache.get(c);
         if (cp != null) return cp;
 
+        cp = _getComponentProvider(c);
+        if (cp != null) cache.put(c, cp);
+        return cp;
+    }
+
+    protected ComponentProvider _getComponentProvider(Class c) {
         try {
             Object o = getInstance(c);
 
             ComponentInjector ci = new ComponentInjector(ipc, c);
             ci.inject(o);
-            
-            cp = new SingletonComponentProvider(ci, o);
-            cache.put(c, cp);
-            return cp;
+
+            SingletonComponentProvider scp = new SingletonComponentProvider(ci, o);
+            return scp;
         } catch (NoClassDefFoundError ex) {
             // Dependent class of provider not found
             // This assumes that ex.getLocalizedMessage() returns
@@ -116,8 +136,20 @@ public class ProviderFactory implements ComponentProviderFactory<ComponentProvid
     }
 
     public void injectOnAllComponents() {
-        for (SingletonComponentProvider scp : cache.values()) {
-            scp.inject();
+        for (ComponentProvider cp : cache.values()) {
+            if (cp instanceof SingletonComponentProvider) {
+                SingletonComponentProvider scp = (SingletonComponentProvider)cp;
+                scp.inject();
+            }
+        }
+    }
+
+    public void destroy() {
+        for (ComponentProvider cp : cache.values()) {
+            if (cp instanceof SingletonComponentProvider) {
+                SingletonComponentProvider scp = (SingletonComponentProvider)cp;
+                scp.destroy();
+            }
         }
     }
 
