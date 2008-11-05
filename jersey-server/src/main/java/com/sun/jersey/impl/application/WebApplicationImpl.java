@@ -525,12 +525,17 @@ public final class WebApplicationImpl implements WebApplication {
     private void _handleRequest(final WebApplicationContext localContext,
             ContainerRequest request, ContainerResponse response) throws IOException {
         try {
+            for (ContainerRequestFilter f : requestFilters) {
+                request = f.filter(request);
+                localContext.setContainerRequest(request);
+            }
+            
             /**
              * The matching algorithm currently works from an absolute path.
              * The path is required to be in encoded form.
              */
             StringBuilder path = new StringBuilder();
-            path.append("/").append(localContext.getPath(false));
+            path.append("/").append(request.getPath(false));
 
             if (!resourceConfig.getFeature(ResourceConfig.FEATURE_MATCH_MATRIX_PARAMS)) {
                 path = stripMatrixParams(path);
@@ -542,10 +547,7 @@ public final class WebApplicationImpl implements WebApplication {
                     !resourceConfig.getLanguageMappings().isEmpty()) {
                 uriConneg(path, request);
             }
-        
-            for (ContainerRequestFilter f : requestFilters)
-                request = f.filter(request);
-            
+
             if (!rootsRule.accept(path, null, localContext)) {
                 throw new NotFoundException();
             }            
@@ -571,8 +573,10 @@ public final class WebApplicationImpl implements WebApplication {
         }
 
         try {
-            for (ContainerResponseFilter f : responseFilters)
+            for (ContainerResponseFilter f : responseFilters) {
                 response = f.filter(request, response);
+                localContext.setContainerResponse(response);
+            }
         } catch (WebApplicationException e) {
             mapWebApplicationException(e, response);
         } catch (RuntimeException e) {

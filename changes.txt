@@ -1,4 +1,11 @@
 release 1.0.1 (2008-11/12)
+- Fixed issue 141
+  https://jersey.dev.java.net/issues/show_bug.cgi?id=141
+  A request filter can modify the request URI.
+- Fixed issue 88
+  https://jersey.dev.java.net/issues/show_bug.cgi?id=88
+  @PostConstruct and @PreDestroy are supported on resource and provider
+  classes.
 - Fixed issue 136
   https://jersey.dev.java.net/issues/show_bug.cgi?id=136
   Improved error messages when building a URI from classes/methods that are not

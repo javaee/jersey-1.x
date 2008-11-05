@@ -67,10 +67,13 @@ import javax.ws.rs.core.UriBuilder;
  */
 public final class WebApplicationContext implements UriRuleContext, ExtendedUriInfo {
 
-    private final ContainerRequest request;
-    private final ContainerResponse response;
     private final WebApplicationImpl app;
+
     private Map<String, Object> properties;
+
+    private ContainerRequest request;
+    
+    private ContainerResponse response;
 
     public WebApplicationContext(WebApplicationImpl app,
             ContainerRequest request, ContainerResponse response) {
@@ -79,7 +82,17 @@ public final class WebApplicationContext implements UriRuleContext, ExtendedUriI
         this.response = response;
     }
 
+    /* package */ void setContainerRequest(ContainerRequest request) {
+        this.request = request;
+        this.response.setContainerRequest(request);
+    }
+
+    /* package */ void setContainerResponse(ContainerResponse response) {
+        this.response = response;
+    }
+
     // HttpContext
+
     public HttpRequestContext getRequest() {
         return request;
     }

@@ -71,12 +71,12 @@ public class ContainerResponse implements HttpResponseContext {
     
     private static final RuntimeDelegate rd = RuntimeDelegate.getInstance();
     
-    private MessageBodyWorkers bodyContext;
+    private final MessageBodyWorkers bodyContext;
     
     private ContainerRequest request;
     
     private ContainerResponseWriter responseWriter;
-    
+
     private Response response;
     
     private int status;
@@ -265,6 +265,24 @@ public class ContainerResponse implements HttpResponseContext {
      */
     public void reset() {
         setResponse(Responses.noContent().build());
+    }
+
+    /**
+     * Get the container request.
+     *
+     * @return the container request.
+     */
+    public ContainerRequest getContainerRequest() {
+        return request;
+    }
+
+    /**
+     * Set the container request.
+     *
+     * @param request the container request.
+     */
+    public void setContainerRequest(ContainerRequest request) {
+        this.request = request;
     }
     
     /**
