@@ -84,14 +84,8 @@ import javax.ws.rs.ext.Providers;
  * @author Paul.Sandoz@Sun.Com
  */
 public final class Client extends Filterable implements ClientHandler {
-    private InjectableProviderFactory injectableFactory;
-    
-    private final ClientConfig config;
-    
     private ProviderFactory componentProviderFactory;
 
-    private final MessageBodyFactory bodyContext;
-    
     private Map<String, Object> properties;
         
     private static class ContextInjectableProvider<T> extends
@@ -137,10 +131,8 @@ public final class Client extends Filterable implements ClientHandler {
         // Defer instantiation of root to component provider
         super(root);
     
-        this.injectableFactory = new InjectableProviderFactory();
+        InjectableProviderFactory injectableFactory = new InjectableProviderFactory();
 
-        this.config = config;
-        
         getProperties().putAll(config.getProperties());
         
         // Allow injection of resource config
@@ -153,17 +145,19 @@ public final class Client extends Filterable implements ClientHandler {
                 : new IoCProviderFactory(injectableFactory, provider);
 
         ProviderServices providerServices = new ProviderServices(
-                this.injectableFactory,
+                injectableFactory,
                 this.componentProviderFactory,
                 config.getClasses(),
                 config.getSingletons());
+
+        injectableFactory.configure(providerServices);
 
         // Obtain all context resolvers
         final ContextResolverFactory crf = new ContextResolverFactory(providerServices,
                 injectableFactory);
         
         // Obtain all message body readers/writers
-        this.bodyContext = new MessageBodyFactory(providerServices);
+        final MessageBodyFactory bodyContext = new MessageBodyFactory(providerServices);
         // Allow injection of message body context
         injectableFactory.add(new ContextInjectableProvider<MessageBodyWorkers>(
                 MessageBodyWorkers.class, bodyContext));
@@ -201,7 +195,27 @@ public final class Client extends Filterable implements ClientHandler {
         componentProviderFactory.injectOnProviderInstances(config.getSingletons());
         componentProviderFactory.injectOnProviderInstance(root);
     }
-        
+
+    /**
+     * Destroy the client. Any system resources associated with the client
+     * will be cleaned up.
+     * <p>
+     * This method must be called when there are not responses pending otherwise
+     * undefined behaviour will occur.
+     * <p>
+     * The client must not be reused after this method is called otherwise
+     * undefined behaviour will occur.
+     */
+    public void destroy() {
+        componentProviderFactory.destroy();
+        componentProviderFactory = null;
+    }
+
+    @Override
+    protected void finalize() {
+        destroy();
+    }
+
     /**
      * Create a Web resource from the client.
      * 
