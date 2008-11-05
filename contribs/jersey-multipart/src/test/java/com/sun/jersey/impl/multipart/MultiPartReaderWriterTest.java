@@ -206,6 +206,35 @@ public class MultiPartReaderWriterTest extends TestCase {
         }
     }
 
+    // Test a response of type "multipart/form-data".  The example comes from
+    // Section 6 of RFC 1867.
+    public void testFive() {
+        WebResource.Builder builder = client.resource(BASE_URI)
+                .path("multipart/five").accept("multipart/form-data");
+        try {
+            MultiPart result = builder.get(MultiPart.class);
+            checkMediaType(new MediaType("multipart", "form-data"), result.getMediaType());
+            assertEquals(2, result.getBodyParts().size());
+            BodyPart part1 = result.getBodyParts().get(0);
+            checkMediaType(new MediaType("text", "plain"), part1.getMediaType());
+            checkEntity("Joe Blow\r\n", (BodyPartEntity) part1.getEntity());
+            String value1 = part1.getHeaders().getFirst("Content-Disposition");
+            assertEquals("form-data; name=\"field1\"", value1);
+            BodyPart part2 = result.getBodyParts().get(1);
+            checkMediaType(new MediaType("text", "plain"), part2.getMediaType());
+            checkEntity("... contents of file1.txt ...\r\n", (BodyPartEntity) part2.getEntity());
+            String value2 = part2.getHeaders().getFirst("Content-Disposition");
+            assertEquals("form-data; name=\"pics\"; filename=\"file1.txt\"", value2);
+            result.cleanup();
+        } catch (IOException e) {
+            e.printStackTrace(System.out);
+            fail("Caught exception: " + e);
+        } catch (UniformInterfaceException e) {
+            report(e);
+            fail("Caught exception: " + e);
+        }
+    }
+
     /*
     public void testListen() throws Exception {
         System.out.println("Running for 30 seconds");

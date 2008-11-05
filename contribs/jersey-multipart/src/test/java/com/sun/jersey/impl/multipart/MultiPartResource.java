@@ -123,4 +123,21 @@ public class MultiPartResource {
         return Response.ok("SUCCESS:  All tests passed").build();
     }
 
+    @Path("five")
+    @GET
+    @Produces("multipart/form-data")
+    public Response five() {
+        MultiPart entity = new MultiPart();
+        entity.setMediaType(MediaType.MULTIPART_FORM_DATA_TYPE);
+        BodyPart part1 = new BodyPart();
+        part1.setMediaType(MediaType.TEXT_PLAIN_TYPE);
+        part1.getHeaders().add("Content-Disposition", "form-data; name=\"field1\"");
+        part1.setEntity("Joe Blow\r\n");
+        BodyPart part2 = new BodyPart();
+        part2.setMediaType(MediaType.TEXT_PLAIN_TYPE);
+        part2.getHeaders().add("Content-Disposition", "form-data; name=\"pics\"; filename=\"file1.txt\"");
+        part2.setEntity("... contents of file1.txt ...\r\n");
+        return Response.ok(entity.bodyPart(part1).bodyPart(part2)).build();
+    }
+
 }
