@@ -88,6 +88,7 @@ public class MultiPartReaderWriterTest extends TestCase {
         config.getClasses().add(MultiPartReader.class);
         config.getClasses().add(MultiPartWriter.class);
         config.getClasses().add(MultiPartBeanProvider.class);
+        config.getClasses().add(MultiPartConfigProvider.class);
         client = Client.create(config);
     }
 

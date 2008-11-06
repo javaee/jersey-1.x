@@ -40,6 +40,8 @@ package com.sun.jersey.impl.multipart;
 import com.sun.jersey.api.multipart.BodyPart;
 import com.sun.jersey.api.multipart.BodyPartEntity;
 import com.sun.jersey.api.multipart.MultiPart;
+import com.sun.jersey.api.multipart.MultiPartConfigParam;
+import com.sun.jersey.api.multipart.MultiPartConfig;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -67,6 +69,22 @@ import javax.ws.rs.ext.Providers;
 @Provider
 @Consumes("multipart/*")
 public class MultiPartReader implements MessageBodyReader<MultiPart> {
+
+    /**
+     * <p>Accept constructor injection of the configuration parameters for this
+     * application.</p>
+     */
+    public MultiPartReader(@MultiPartConfigParam MultiPartConfig config) {
+        System.out.println("MultiPartConfig = " + config);
+        this.config = config;
+    }
+
+
+    /**
+     * <p>Injected configuration parameters for this application.</p>
+     */
+    private MultiPartConfig config = null;
+
 
     /**
      * <P>Injectable helper to look up appropriate {@link Provider}s
@@ -138,8 +156,7 @@ public class MultiPartReader implements MessageBodyReader<MultiPart> {
                 MediaType bpMediaType = MediaType.valueOf(bp.getContentType());
                 bodyPart.setMediaType(bpMediaType);
                 // Copy data into a BodyPartEntity structure
-                // FIXME - how to make in-memory threshold value configurable
-                bodyPart.setEntity(new BodyPartEntity(bp.getInputStream(), 4096));
+                bodyPart.setEntity(new BodyPartEntity(bp.getInputStream(), config.getBufferThreshold()));
                 // Add this BodyPart to our MultiPart
                 multiPart.getBodyParts().add(bodyPart);
             }
