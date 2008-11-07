@@ -37,6 +37,7 @@
 
 package com.sun.jersey.impl.model.method.dispatch;
 
+import com.sun.jersey.api.MultivaluedMapImpl;
 import com.sun.jersey.api.container.ContainerException;
 import com.sun.jersey.api.core.HttpContext;
 import com.sun.jersey.api.model.AbstractResourceMethod;
@@ -48,6 +49,8 @@ import com.sun.jersey.spi.MessageBodyWorkers;
 import com.sun.jersey.spi.dispatch.RequestDispatcher;
 import com.sun.jersey.spi.inject.Injectable;
 import com.sun.jersey.core.spi.component.ComponentScope;
+import com.sun.jersey.impl.model.parameter.multivalued.MultivaluedParameterExtractor;
+import com.sun.jersey.impl.model.parameter.multivalued.MultivaluedParameterProcessor;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.lang.annotation.Annotation;
@@ -126,10 +129,14 @@ public class MultipartFormDispatchProvider extends FormDispatchProvider {
     private static final class MultipartFormParamInjectable extends AbstractHttpContextInjectable<Object> {
         private final MessageBodyWorkers mbws;
         private final Parameter p;
-        
+        private final MultivaluedParameterExtractor extractor;
+
         MultipartFormParamInjectable(MessageBodyWorkers mbws, Parameter p) {
             this.mbws = mbws;
             this.p = p;
+            this.extractor = MultivaluedParameterProcessor.
+                    process(p.getDefaultValue(), p.getParameterClass(),
+                    p.getParameterType(), p.getSourceName());
         }
         
         @SuppressWarnings("unchecked")
@@ -149,20 +156,26 @@ public class MultipartFormDispatchProvider extends FormDispatchProvider {
         @SuppressWarnings("unchecked")
         private Object getAsForm(Form form, HttpContext context) throws Exception {
             String c = form.getFirst(p.getSourceName());
-            InputStream is = new ByteArrayInputStream(c.getBytes("UTF-8"));
+
             MessageBodyReader r = mbws.getMessageBodyReader(
                     p.getParameterClass(), 
                     p.getParameterType(), 
                     p.getAnnotations(), 
                     MediaType.TEXT_PLAIN_TYPE);
             
-            return r.readFrom(
-                    p.getParameterClass(), 
-                    p.getParameterType(), 
-                    p.getAnnotations(), 
-                    MediaType.TEXT_PLAIN_TYPE, 
-                    context.getRequest().getRequestHeaders(), 
-                    is);
+            if (r != null) {
+                InputStream is = new ByteArrayInputStream(c.getBytes("UTF-8"));
+                return r.readFrom(
+                        p.getParameterClass(),
+                        p.getParameterType(),
+                        p.getAnnotations(),
+                        MediaType.TEXT_PLAIN_TYPE,
+                        context.getRequest().getRequestHeaders(),
+                        is);
+            } else if (extractor != null) {
+                return extractor.extract(form);
+            } else
+                return null;
         }
         
         @SuppressWarnings("unchecked")
@@ -182,13 +195,34 @@ public class MultipartFormDispatchProvider extends FormDispatchProvider {
                     p.getAnnotations(), 
                     m);
 
-            return r.readFrom(
-                    p.getParameterClass(), 
-                    p.getParameterType(), 
-                    p.getAnnotations(), 
-                    m, 
-                    context.getRequest().getRequestHeaders(), 
-                    bp.getInputStream());
+            if (r != null) {
+                return r.readFrom(
+                        p.getParameterClass(),
+                        p.getParameterType(),
+                        p.getAnnotations(),
+                        m,
+                        context.getRequest().getRequestHeaders(),
+                        bp.getInputStream());
+            } else if (extractor != null) {
+                r = mbws.getMessageBodyReader(
+                    String.class,
+                    String.class,
+                    p.getAnnotations(),
+                    m);
+                
+                String v = (String)r.readFrom(
+                        String.class,
+                        String.class,
+                        p.getAnnotations(),
+                        m,
+                        context.getRequest().getRequestHeaders(),
+                        bp.getInputStream());
+                MultivaluedMap<String, String> mvm = new MultivaluedMapImpl();
+                mvm.putSingle(p.getSourceName(), v);
+                return extractor.extract(mvm);
+            } else {
+                return null;
+            }
         }
     }
     

@@ -40,6 +40,7 @@ import com.sun.jersey.api.client.WebResource;
 import com.sun.jersey.api.representation.Form;
 import com.sun.jersey.impl.AbstractResourceTester;
 import com.sun.jersey.impl.entity.JAXBBean;
+import java.math.BigDecimal;
 import javax.mail.internet.InternetHeaders;
 import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMultipart;
@@ -68,7 +69,7 @@ public class FormParamTest extends AbstractResourceTester {
         @POST
         @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
         public String post(
-                @FormParam("a") String a, 
+                @FormParam("a") String a,
                 @FormParam("b") String b,
                 MultivaluedMap<String, String> form,
                 @Context UriInfo ui,
@@ -78,13 +79,13 @@ public class FormParamTest extends AbstractResourceTester {
             return a + b;
         }
     }
-    
+
     @Path("/")
     public class FormResourceY {
         @POST
         @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
         public String post(
-                @FormParam("a") String a, 
+                @FormParam("a") String a,
                 @FormParam("b") String b,
                 Form form,
                 @Context UriInfo ui,
@@ -94,39 +95,39 @@ public class FormParamTest extends AbstractResourceTester {
             return a + b;
         }
     }
-    
+
     public void testFormParamX() {
         initiateWebApplication(FormResourceX.class);
-        
+
         WebResource r = resource("/");
-        
+
         Form form = new Form();
         form.add("a", "foo");
-        form.add("b", "bar");        
-        
+        form.add("b", "bar");
+
         String s = r.post(String.class, form);
         assertEquals("foobar", s);
-    }    
-    
+    }
+
     public void testFormParamY() {
         initiateWebApplication(FormResourceY.class);
-        
+
         WebResource r = resource("/");
-        
+
         Form form = new Form();
         form.add("a", "foo");
-        form.add("b", "bar");        
-        
+        form.add("b", "bar");
+
         String s = r.post(String.class, form);
         assertEquals("foobar", s);
-    }    
-    
+    }
+
     @Path("/")
     public class MultipartFormResourceX {
         @POST
         @Consumes({"multipart/form-data", MediaType.APPLICATION_FORM_URLENCODED})
         public String post(
-                @FormParam("a") String a, 
+                @FormParam("a") String a,
                 @FormParam("b") String b,
                 @FormParam("c") JAXBBean c,
                 MimeMultipart m,
@@ -136,13 +137,13 @@ public class FormParamTest extends AbstractResourceTester {
             return a + b;
         }
     }
-    
+
     @Path("/")
     public class MultipartFormResourceY {
         @POST
         @Consumes({"multipart/form-data", MediaType.APPLICATION_FORM_URLENCODED})
         public String post(
-                @FormParam("a") String a, 
+                @FormParam("a") String a,
                 @FormParam("b") String b,
                 @FormParam("c") JAXBBean c,
                 Form form,
@@ -153,14 +154,14 @@ public class FormParamTest extends AbstractResourceTester {
             return a + b;
         }
     }
-        
+
     public void testMultipartFormParam() throws Exception {
         initiateWebApplication(MultipartFormResourceX.class);
-        
+
         WebResource r = resource("/");
-                
+
         MimeMultipart form = new MimeMultipart();
-        
+
         InternetHeaders headers = new InternetHeaders();
         headers.addHeader("content-disposition", "form-data; name=\"a\"");
         MimeBodyPart bp = new MimeBodyPart(headers, "foo".getBytes());
@@ -176,22 +177,64 @@ public class FormParamTest extends AbstractResourceTester {
         headers.addHeader("Content-type", "application/xml");
         bp = new MimeBodyPart(headers, "<jaxbBean><value>content</value></jaxbBean>".getBytes());
         form.addBodyPart(bp);
-        
+
         String s = r.type("multipart/form-data").post(String.class, form);
         assertEquals("foobar", s);
     }
-    
+
     public void testMultipartFormParamWithForm() {
         initiateWebApplication(MultipartFormResourceY.class);
-        
+
         WebResource r = resource("/");
-        
+
         Form form = new Form();
         form.add("a", "foo");
         form.add("b", "bar");
         form.add("c", "<jaxbBean><value>content</value></jaxbBean>");
-        
+
         String s = r.post(String.class, form);
         assertEquals("foobar", s);
+    }
+
+
+    @Path("/")
+    public class MultipartFormParamTypes
+    {
+        @POST
+        @Consumes("multipart/form-data")
+        public String createSubscription(
+                @FormParam("int") int i,
+                @FormParam("float") float f,
+                @FormParam("decimal") BigDecimal d
+                ) {
+            return "" + i + " " + f + " " + d;
+        }
+    }
+
+    public void testMultipartFormListSubscription() throws Exception {
+        initiateWebApplication(MultipartFormParamTypes.class);
+
+        WebResource r = resource("/");
+
+        MimeMultipart form = new MimeMultipart();
+
+        InternetHeaders headers = new InternetHeaders();
+        headers.addHeader("content-disposition", "form-data; name=\"int\"");
+        MimeBodyPart bp = new MimeBodyPart(headers, "1234".getBytes());
+        form.addBodyPart(bp);
+
+        headers = new InternetHeaders();
+        headers.addHeader("content-disposition", "form-data; name=\"float\"");
+        bp = new MimeBodyPart(headers, "3.14".getBytes());
+        form.addBodyPart(bp);
+
+        headers = new InternetHeaders();
+        headers.addHeader("content-disposition", "form-data; name=\"decimal\"");
+        headers.addHeader("Content-type", "application/xml");
+        bp = new MimeBodyPart(headers, "1.61".getBytes());
+        form.addBodyPart(bp);
+
+        String s = r.type("multipart/form-data").post(String.class, form);
+        assertEquals("1234 3.14 1.61", s);
     }
 }
