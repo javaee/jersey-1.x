@@ -44,6 +44,8 @@ public class ContentDisposition {
             parameters = HttpHeaderReader.readParameters(reader);        
         if (parameters == null)
             parameters = Collections.emptyMap();
+        else
+            parameters = Collections.unmodifiableMap(parameters);
 
         createParameters();
     }
