@@ -26,8 +26,7 @@ public class FormDataContentDisposition extends ContentDisposition {
             throw new IllegalArgumentException("The content dispostion type is not equal to form-data");
         }
 
-        createParameters();
-        
+        name = getParameters().get("name");
         if (name == null) {
             throw new IllegalArgumentException("The name parameter is not present");
         }
@@ -40,10 +39,5 @@ public class FormDataContentDisposition extends ContentDisposition {
      */
     public String getName() {
         return name;
-    }
-
-
-    private void createParameters() throws ParseException {
-        name = getParameters().get("name");
     }
 }
