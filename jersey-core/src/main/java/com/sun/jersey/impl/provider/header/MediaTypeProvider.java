@@ -38,7 +38,6 @@
 package com.sun.jersey.impl.provider.header;
 
 import com.sun.jersey.core.header.reader.HttpHeaderReader;
-import com.sun.jersey.impl.provider.header.WriterUtil;
 import com.sun.jersey.spi.HeaderDelegateProvider;
 import java.text.ParseException;
 import java.util.Map;
