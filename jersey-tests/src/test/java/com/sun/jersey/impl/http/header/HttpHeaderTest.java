@@ -37,14 +37,12 @@
 
 package com.sun.jersey.impl.http.header;
 
-import com.sun.jersey.impl.http.header.AcceptableLanguageTag;
-import com.sun.jersey.impl.http.header.Token;
-import com.sun.jersey.impl.http.header.AcceptableToken;
-import com.sun.jersey.impl.http.header.HttpDateFormat;
-import com.sun.jersey.impl.http.header.LanguageTag;
-import com.sun.jersey.impl.http.header.HttpHeaderFactory;
-import com.sun.jersey.impl.http.header.reader.HttpHeaderReader;
-import com.sun.jersey.impl.http.header.reader.HttpHeaderReaderImpl;
+import com.sun.jersey.core.header.AcceptableToken;
+import com.sun.jersey.core.header.AcceptableLanguageTag;
+import com.sun.jersey.core.header.Token;
+import com.sun.jersey.core.header.LanguageTag;
+import com.sun.jersey.core.header.HttpDateFormat;
+import com.sun.jersey.core.header.reader.HttpHeaderReader;
 import java.text.ParseException;
 import java.util.Date;
 import java.util.List;
@@ -65,7 +63,7 @@ public class HttpHeaderTest extends TestCase {
     public void testTokens() throws ParseException {
         String header = "type  /  content; a = \"asdsd\"";
         
-        HttpHeaderReaderImpl r = new HttpHeaderReaderImpl(header);
+        HttpHeaderReader r =HttpHeaderReader.newInstance(header);
         while (r.hasNext()) {
             r.next();
             System.out.println(r.getEvent() + " '" + r.getEventValue() + "'");
@@ -89,7 +87,7 @@ public class HttpHeaderTest extends TestCase {
     
     public void testAcceptableLanguageTagList() throws Exception {
         String languageTags = "en-US;q=0.123, fr;q=0.2, en;q=0.3, *;q=0.01";
-        List<AcceptableLanguageTag> l = HttpHeaderFactory.createAcceptLanguage(languageTags);
+        List<AcceptableLanguageTag> l = HttpHeaderReader.readAcceptLanguage(languageTags);
         assertEquals("en", l.get(0).getTag());
         assertEquals("fr", l.get(1).getTag());
         assertEquals("en-US", l.get(2).getTag());
@@ -108,8 +106,7 @@ public class HttpHeaderTest extends TestCase {
     
     public void testAcceptableTokenList() throws Exception {
         String tokens = "gzip;q=0.123, compress;q=0.2, zlib;q=0.3, *;q=0.01";
-        List<AcceptableToken> l = HttpHeaderReader.readAcceptableList(
-                HttpHeaderFactory.ACCEPTABLE_TOKEN_CREATOR, tokens);
+        List<AcceptableToken> l = HttpHeaderReader.readAcceptToken(tokens);
         assertEquals("zlib", l.get(0).getToken());
         assertEquals("compress", l.get(1).getToken());
         assertEquals("gzip", l.get(2).getToken());

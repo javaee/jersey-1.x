@@ -37,40 +37,56 @@
 
 package com.sun.jersey.impl.provider.header;
 
-import com.sun.jersey.core.header.reader.HttpHeaderReader;
-import com.sun.jersey.impl.provider.header.WriterUtil;
-import com.sun.jersey.spi.HeaderDelegateProvider;
-import javax.ws.rs.core.Cookie;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
-public class CookieProvider implements HeaderDelegateProvider<Cookie> {
+/**
+ *
+ * @author Marc.Hadley@Sun.Com
+ */
+/* package */ class WriterUtil {
     
-    public boolean supports(Class<?> type) {
-        return type == Cookie.class;
-    }
+    private static Pattern whitespace = Pattern.compile("\\s");
 
-    public String toString(Cookie cookie) {
-        StringBuilder b = new StringBuilder();
-        
-        b.append("$Version=").append(cookie.getVersion()).append(';');
-        
-        b.append(cookie.getName()).append('=');
-        WriterUtil.appendQuotedIfWhitespace(b, cookie.getValue());
-        
-        if (cookie.getDomain() != null) {
-            b.append(";$Domain=");
-            WriterUtil.appendQuotedIfWhitespace(b, cookie.getDomain());
-        }
-        if (cookie.getPath() != null) {
-            b.append(";$Path=");
-            WriterUtil.appendQuotedIfWhitespace(b, cookie.getPath());
-        }
-        return b.toString();
+    private static Pattern whitespaceOrQuote = Pattern.compile("[\\s\"]");
+    
+    public static void appendQuotedMediaType(StringBuilder b, String value) {
+        if (value==null)
+            return;
+        Matcher m = whitespaceOrQuote.matcher(value);
+        boolean quote = m.find();
+        if (quote)
+            b.append('"');
+        appendEscapingQuotes(b, value);
+        if (quote)
+            b.append('"');        
     }
-
-    public Cookie fromString(String header) {
-        if (header == null)
-            throw new IllegalArgumentException();
-        
-        return HttpHeaderReader.readCookie(header);
+    
+    public static void appendQuotedIfWhitespace(StringBuilder b, String value) {
+        if (value==null)
+            return;
+        Matcher m = whitespace.matcher(value);
+        boolean quote = m.find();
+        if (quote)
+            b.append('"');
+        appendEscapingQuotes(b, value);
+        if (quote)
+            b.append('"');
     }
+    
+    public static void appendQuoted(StringBuilder b, String value) {
+        b.append('"');
+        appendEscapingQuotes(b, value);
+        b.append('"');
+    }
+    
+    public static void appendEscapingQuotes(StringBuilder b, String value) {
+        for (int i = 0; i < value.length(); i++) {
+            char c = value.charAt(i);
+            if (c == '"')
+                b.append('\\');
+            b.append(c);
+        }
+    }
+    
 }

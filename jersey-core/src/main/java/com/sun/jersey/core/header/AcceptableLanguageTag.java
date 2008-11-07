@@ -35,42 +35,44 @@
  * holder.
  */
 
-package com.sun.jersey.impl.provider.header;
+package com.sun.jersey.core.header;
 
 import com.sun.jersey.core.header.reader.HttpHeaderReader;
-import com.sun.jersey.impl.provider.header.WriterUtil;
-import com.sun.jersey.spi.HeaderDelegateProvider;
-import javax.ws.rs.core.Cookie;
+import java.text.ParseException;
 
-public class CookieProvider implements HeaderDelegateProvider<Cookie> {
+/**
+ * An acceptable language tag.
+ * 
+ * @author Paul.Sandoz@Sun.Com
+ */
+public final class AcceptableLanguageTag extends LanguageTag implements QualityFactor {
     
-    public boolean supports(Class<?> type) {
-        return type == Cookie.class;
-    }
+    protected int quality = DEFAULT_QUALITY_FACTOR;
 
-    public String toString(Cookie cookie) {
-        StringBuilder b = new StringBuilder();
-        
-        b.append("$Version=").append(cookie.getVersion()).append(';');
-        
-        b.append(cookie.getName()).append('=');
-        WriterUtil.appendQuotedIfWhitespace(b, cookie.getValue());
-        
-        if (cookie.getDomain() != null) {
-            b.append(";$Domain=");
-            WriterUtil.appendQuotedIfWhitespace(b, cookie.getDomain());
-        }
-        if (cookie.getPath() != null) {
-            b.append(";$Path=");
-            WriterUtil.appendQuotedIfWhitespace(b, cookie.getPath());
-        }
-        return b.toString();
+    public AcceptableLanguageTag(String primaryTag, String subTags) {
+        super(primaryTag, subTags);
     }
-
-    public Cookie fromString(String header) {
-        if (header == null)
-            throw new IllegalArgumentException();
-        
-        return HttpHeaderReader.readCookie(header);
+    
+    public AcceptableLanguageTag(String header) throws ParseException {
+        this(HttpHeaderReader.newInstance(header));
     }
+    
+    public AcceptableLanguageTag(HttpHeaderReader reader) throws ParseException {
+        // Skip any white space
+        reader.hasNext();
+        
+        tag = reader.nextToken();        
+        if (!tag.equals("*"))
+            parse(tag);
+        else
+            primaryTag = tag;
+        
+        if (reader.hasNext()) {
+            quality = HttpHeaderReader.readQualityFactorParameter(reader);
+        }
+    }
+    
+    public int getQuality() {
+        return quality;
+    }    
 }

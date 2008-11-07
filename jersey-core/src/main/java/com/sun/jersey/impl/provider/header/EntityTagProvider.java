@@ -37,9 +37,8 @@
 
 package com.sun.jersey.impl.provider.header;
 
-import com.sun.jersey.impl.http.header.reader.HttpHeaderReader;
-import com.sun.jersey.impl.http.header.reader.HttpHeaderReaderImpl;
-import com.sun.jersey.impl.http.header.writer.WriterUtil;
+import com.sun.jersey.core.header.reader.HttpHeaderReader;
+import com.sun.jersey.impl.provider.header.WriterUtil;
 import com.sun.jersey.spi.HeaderDelegateProvider;
 import java.text.ParseException;
 import javax.ws.rs.core.EntityTag;
@@ -71,7 +70,7 @@ public class EntityTagProvider implements HeaderDelegateProvider<EntityTag> {
             header = header.substring(2);
             weak = true;
         }
-        HttpHeaderReader reader = new HttpHeaderReaderImpl(header);
+        HttpHeaderReader reader = HttpHeaderReader.newInstance(header);
         try {
             EntityTag eTag = new EntityTag(reader.nextQuotedString(),weak);
             return eTag;

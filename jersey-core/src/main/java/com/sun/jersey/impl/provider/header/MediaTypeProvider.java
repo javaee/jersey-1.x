@@ -37,13 +37,12 @@
 
 package com.sun.jersey.impl.provider.header;
 
-import javax.ws.rs.core.MediaType;
-import com.sun.jersey.impl.http.header.reader.HttpHeaderReader;
-import com.sun.jersey.impl.http.header.reader.HttpHeaderReaderImpl;
-import com.sun.jersey.impl.http.header.writer.WriterUtil;
+import com.sun.jersey.core.header.reader.HttpHeaderReader;
+import com.sun.jersey.impl.provider.header.WriterUtil;
 import com.sun.jersey.spi.HeaderDelegateProvider;
 import java.text.ParseException;
 import java.util.Map;
+import javax.ws.rs.core.MediaType;
 
 /**
  *
@@ -74,7 +73,7 @@ public class MediaTypeProvider implements HeaderDelegateProvider<MediaType> {
             throw new IllegalArgumentException("Media type is null");
         
         try {
-            HttpHeaderReader reader = new HttpHeaderReaderImpl(header);
+            HttpHeaderReader reader = HttpHeaderReader.newInstance(header);
             // Skip any white space
             reader.hasNext();
 

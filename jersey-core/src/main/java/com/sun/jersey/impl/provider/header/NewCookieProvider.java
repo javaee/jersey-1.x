@@ -37,8 +37,8 @@
 
 package com.sun.jersey.impl.provider.header;
 
-import com.sun.jersey.impl.http.header.HttpHeaderFactory;
-import com.sun.jersey.impl.http.header.writer.WriterUtil;
+import com.sun.jersey.core.header.reader.HttpHeaderReader;
+import com.sun.jersey.impl.provider.header.WriterUtil;
 import com.sun.jersey.spi.HeaderDelegateProvider;
 import javax.ws.rs.core.NewCookie;
 
@@ -81,6 +81,6 @@ public class NewCookieProvider implements HeaderDelegateProvider<NewCookie> {
         if (header == null)
             throw new IllegalArgumentException("NewCookie is null");
         
-        return HttpHeaderFactory.createNewCookie(header);
+        return HttpHeaderReader.readNewCookie(header);
     }
 }

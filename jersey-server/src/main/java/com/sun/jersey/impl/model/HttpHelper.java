@@ -40,10 +40,10 @@ package com.sun.jersey.impl.model;
 import com.sun.jersey.api.MediaTypes;
 import com.sun.jersey.api.core.HttpRequestContext;
 import com.sun.jersey.impl.ImplMessages;
-import com.sun.jersey.impl.http.header.AcceptableLanguageTag;
-import com.sun.jersey.impl.http.header.AcceptableMediaType;
-import com.sun.jersey.impl.http.header.AcceptableToken;
-import com.sun.jersey.impl.http.header.HttpHeaderFactory;
+import com.sun.jersey.core.header.AcceptableLanguageTag;
+import com.sun.jersey.core.header.AcceptableMediaType;
+import com.sun.jersey.core.header.AcceptableToken;
+import com.sun.jersey.core.header.reader.HttpHeaderReader;
 import java.util.Collections;
 import java.util.List;
 import javax.ws.rs.core.Response;
@@ -112,7 +112,7 @@ public final class HttpHelper {
             return MediaTypes.GENERAL_ACCEPT_MEDIA_TYPE_LIST;
         }
         try {
-            return HttpHeaderFactory.createAcceptMediaType(accept);
+            return HttpHeaderReader.readAcceptMediaType(accept);
         } catch (java.text.ParseException e) {
             throw clientError(ImplMessages.BAD_ACCEPT_FIELD(accept), e);
         }
@@ -131,7 +131,7 @@ public final class HttpHelper {
             return Collections.singletonList(new AcceptableLanguageTag("*", null));
         }
         try {
-            return HttpHeaderFactory.createAcceptLanguage(acceptLanguage);
+            return HttpHeaderReader.readAcceptLanguage(acceptLanguage);
         } catch (java.text.ParseException e) {
             throw clientError("Bad Accept-Language field: " + acceptLanguage, e);
         }
@@ -150,7 +150,7 @@ public final class HttpHelper {
             if (acceptCharset == null || acceptCharset.length() == 0) {
                 return Collections.singletonList(new AcceptableToken("*"));
             }
-            return HttpHeaderFactory.createAcceptCharset(acceptCharset);
+            return HttpHeaderReader.readAcceptToken(acceptCharset);
         } catch (java.text.ParseException e) {
             throw clientError("Bad Accept-Charset field: " + acceptCharset, e);
         }
@@ -169,7 +169,7 @@ public final class HttpHelper {
             if (acceptEncoding == null || acceptEncoding.length() == 0) {
                 return Collections.singletonList(new AcceptableToken("*"));
             }
-            return HttpHeaderFactory.createAcceptEncoding(acceptEncoding);
+            return HttpHeaderReader.readAcceptToken(acceptEncoding);
         } catch (java.text.ParseException e) {
             throw clientError("Bad Accept-Encoding field: " + acceptEncoding, e);
         }

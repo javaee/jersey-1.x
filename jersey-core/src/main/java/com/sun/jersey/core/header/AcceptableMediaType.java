@@ -35,42 +35,60 @@
  * holder.
  */
 
-package com.sun.jersey.impl.provider.header;
+package com.sun.jersey.core.header;
 
 import com.sun.jersey.core.header.reader.HttpHeaderReader;
-import com.sun.jersey.impl.provider.header.WriterUtil;
-import com.sun.jersey.spi.HeaderDelegateProvider;
-import javax.ws.rs.core.Cookie;
+import java.text.ParseException;
+import javax.ws.rs.core.MediaType;
+import java.util.Map;
 
-public class CookieProvider implements HeaderDelegateProvider<Cookie> {
+/**
+ * An acceptable media type.
+ *
+ * @author Paul.Sandoz@Sun.Com
+ */
+public final class AcceptableMediaType extends MediaType implements QualityFactor {
+    private final int q;
+
+    public AcceptableMediaType(String p, String s) {
+        super(p, s);
+        q = DEFAULT_QUALITY_FACTOR;
+    }
     
-    public boolean supports(Class<?> type) {
-        return type == Cookie.class;
+    public AcceptableMediaType(String p, String s, int q, Map<String, String> parameters) {
+        super(p, s, parameters);
+        this.q = q;
     }
-
-    public String toString(Cookie cookie) {
-        StringBuilder b = new StringBuilder();
         
-        b.append("$Version=").append(cookie.getVersion()).append(';');
-        
-        b.append(cookie.getName()).append('=');
-        WriterUtil.appendQuotedIfWhitespace(b, cookie.getValue());
-        
-        if (cookie.getDomain() != null) {
-            b.append(";$Domain=");
-            WriterUtil.appendQuotedIfWhitespace(b, cookie.getDomain());
-        }
-        if (cookie.getPath() != null) {
-            b.append(";$Path=");
-            WriterUtil.appendQuotedIfWhitespace(b, cookie.getPath());
-        }
-        return b.toString();
+    public int getQuality() {
+        return q;
     }
-
-    public Cookie fromString(String header) {
-        if (header == null)
-            throw new IllegalArgumentException();
+    
+    public static AcceptableMediaType valueOf(HttpHeaderReader reader) throws ParseException {
+        // Skip any white space
+        reader.hasNext();
         
-        return HttpHeaderReader.readCookie(header);
+        // Get the type
+        String type = reader.nextToken();
+        String subType = "*";
+        // Some HTTP implements use "*" to mean "*/*"
+        if (reader.hasNextSeparator('/', false)) {
+            reader.next(false);
+            // Get the subtype
+            subType = reader.nextToken();
+        }
+        
+        Map<String, String> parameters = null;
+        int quality = DEFAULT_QUALITY_FACTOR;
+        if (reader.hasNext()) {
+            parameters = HttpHeaderReader.readParameters(reader);
+            if (parameters != null) {
+                String v = parameters.get(QUALITY_FACTOR);
+                if (v != null)
+                    quality = HttpHeaderReader.readQualityFactor(v);
+            }
+        }
+        
+        return new AcceptableMediaType(type, subType, quality, parameters);  
     }
 }

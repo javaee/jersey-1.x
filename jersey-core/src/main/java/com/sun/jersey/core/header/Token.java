@@ -35,42 +35,44 @@
  * holder.
  */
 
-package com.sun.jersey.impl.provider.header;
+package com.sun.jersey.core.header;
 
 import com.sun.jersey.core.header.reader.HttpHeaderReader;
-import com.sun.jersey.impl.provider.header.WriterUtil;
-import com.sun.jersey.spi.HeaderDelegateProvider;
-import javax.ws.rs.core.Cookie;
+import java.text.ParseException;
 
-public class CookieProvider implements HeaderDelegateProvider<Cookie> {
+/**
+ * A token.
+ * 
+ * @author Paul.Sandoz@Sun.Com
+ */
+public class Token {
+    protected String token;
+        
+    protected Token() {    
+    }
     
-    public boolean supports(Class<?> type) {
-        return type == Cookie.class;
+    public Token(String header) throws ParseException {
+        this(HttpHeaderReader.newInstance(header));
     }
-
-    public String toString(Cookie cookie) {
-        StringBuilder b = new StringBuilder();
+    
+    public Token(HttpHeaderReader reader) throws ParseException {
+        // Skip any white space
+        reader.hasNext();
         
-        b.append("$Version=").append(cookie.getVersion()).append(';');
+        token = reader.nextToken();        
         
-        b.append(cookie.getName()).append('=');
-        WriterUtil.appendQuotedIfWhitespace(b, cookie.getValue());
-        
-        if (cookie.getDomain() != null) {
-            b.append(";$Domain=");
-            WriterUtil.appendQuotedIfWhitespace(b, cookie.getDomain());
-        }
-        if (cookie.getPath() != null) {
-            b.append(";$Path=");
-            WriterUtil.appendQuotedIfWhitespace(b, cookie.getPath());
-        }
-        return b.toString();
+        if (reader.hasNext())
+            throw new ParseException("Invalid token", reader.getIndex());
     }
-
-    public Cookie fromString(String header) {
-        if (header == null)
-            throw new IllegalArgumentException();
-        
-        return HttpHeaderReader.readCookie(header);
+    
+    public String getToken() {
+        return token;
     }
+    
+    public final boolean isCompatible(String token) {
+        if (this.token.equals("*"))
+            return true;
+        
+        return this.token.equals(token);
+    }    
 }

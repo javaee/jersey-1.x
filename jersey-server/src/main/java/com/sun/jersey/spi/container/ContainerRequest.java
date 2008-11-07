@@ -44,9 +44,8 @@ import com.sun.jersey.api.representation.Form;
 import com.sun.jersey.api.uri.UriComponent;
 import com.sun.jersey.api.MultivaluedMapImpl;
 import com.sun.jersey.impl.VariantSelector;
-import com.sun.jersey.impl.http.header.AcceptableLanguageTag;
-import com.sun.jersey.impl.http.header.HttpHeaderFactory;
-import com.sun.jersey.impl.http.header.reader.HttpHeaderReader;
+import com.sun.jersey.core.header.AcceptableLanguageTag;
+import com.sun.jersey.core.header.reader.HttpHeaderReader;
 import com.sun.jersey.impl.model.HttpHelper;
 import com.sun.jersey.spi.MessageBodyWorkers;
 import java.io.ByteArrayInputStream;
@@ -471,7 +470,7 @@ public class ContainerRequest implements HttpRequestContext {
                 for (String cookie : cl) {
                     if (cookie != null)
                         cookies.putAll(
-                                HttpHeaderFactory.createCookies(cookie));
+                                HttpHeaderReader.readCookies(cookie));
                 }
             }            
         }

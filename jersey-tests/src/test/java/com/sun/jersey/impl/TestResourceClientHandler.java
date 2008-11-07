@@ -43,7 +43,7 @@ import com.sun.jersey.api.client.ClientHandlerException;
 import com.sun.jersey.api.client.ClientRequest;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.GenericType;
-import com.sun.jersey.impl.http.header.HttpHeaderFactory;
+import com.sun.jersey.core.header.reader.HttpHeaderReader;
 import com.sun.jersey.spi.MessageBodyWorkers;
 import com.sun.jersey.spi.container.ContainerRequest;
 import com.sun.jersey.spi.container.ContainerResponse;
@@ -211,7 +211,7 @@ public class TestResourceClientHandler implements ClientHandler {
             for (String cookie : cookies) {
                 if (cookie != null)
                     cRequest.getCookies().putAll(
-                            HttpHeaderFactory.createCookies(cookie));
+                            HttpHeaderReader.readCookies(cookie));
             }
         }
         

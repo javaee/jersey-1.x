@@ -35,42 +35,83 @@
  * holder.
  */
 
-package com.sun.jersey.impl.provider.header;
+package com.sun.jersey.core.header.reader;
 
-import com.sun.jersey.core.header.reader.HttpHeaderReader;
-import com.sun.jersey.impl.provider.header.WriterUtil;
-import com.sun.jersey.spi.HeaderDelegateProvider;
-import javax.ws.rs.core.Cookie;
+import java.text.ParseException;
 
-public class CookieProvider implements HeaderDelegateProvider<Cookie> {
+/**
+ *
+ * @author Paul.Sandoz@Sun.Com
+ */
+/* package */ class HttpHeaderListAdapter extends HttpHeaderReader {
+    private HttpHeaderReader reader;
+            
+    boolean isTerminated;
+        
+    public HttpHeaderListAdapter(HttpHeaderReader reader) {
+        this.reader = reader;
+    }
     
-    public boolean supports(Class<?> type) {
-        return type == Cookie.class;
+    public void reset() {
+        isTerminated = false;
     }
 
-    public String toString(Cookie cookie) {
-        StringBuilder b = new StringBuilder();
+    
+    public boolean hasNext() {
+        if (isTerminated)
+            return false;
         
-        b.append("$Version=").append(cookie.getVersion()).append(';');
-        
-        b.append(cookie.getName()).append('=');
-        WriterUtil.appendQuotedIfWhitespace(b, cookie.getValue());
-        
-        if (cookie.getDomain() != null) {
-            b.append(";$Domain=");
-            WriterUtil.appendQuotedIfWhitespace(b, cookie.getDomain());
+        if (reader.hasNext()) {
+            if (reader.hasNextSeparator(',', true)) {
+                isTerminated = true;
+                return false;
+            } else
+                return true;
         }
-        if (cookie.getPath() != null) {
-            b.append(";$Path=");
-            WriterUtil.appendQuotedIfWhitespace(b, cookie.getPath());
-        }
-        return b.toString();
+        
+        return false;
     }
 
-    public Cookie fromString(String header) {
-        if (header == null)
-            throw new IllegalArgumentException();
+    public boolean hasNextSeparator(char separator, boolean skipWhiteSpace) {
+        if (isTerminated)
+            return false;
         
-        return HttpHeaderReader.readCookie(header);
+        if (reader.hasNextSeparator(',', skipWhiteSpace)) {
+            isTerminated = true;
+            return false;
+        } else
+            return reader.hasNextSeparator(separator, skipWhiteSpace);
+    }
+    
+    public Event next() throws ParseException {
+        return next(true);
+    }
+
+    public HttpHeaderReader.Event next(boolean skipWhiteSpace) throws ParseException {
+        if (isTerminated)
+            throw new ParseException("End of header", getIndex());
+        
+        if (reader.hasNextSeparator(',', skipWhiteSpace)) {
+            isTerminated = true;
+            throw new ParseException("End of header", getIndex());
+        }
+        
+        return reader.next(skipWhiteSpace);
+    }
+
+    public HttpHeaderReader.Event getEvent() {
+        return reader.getEvent();
+    }
+
+    public String getEventValue() {
+        return reader.getEventValue();
+    }
+
+    public String getRemainder() {
+        return reader.getRemainder();
+    }    
+
+    public int getIndex() {
+        return reader.getIndex();
     }
 }

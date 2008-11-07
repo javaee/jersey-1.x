@@ -37,7 +37,7 @@
 
 package com.sun.jersey.api;
 
-import com.sun.jersey.impl.http.header.AcceptableMediaType;
+import com.sun.jersey.core.header.AcceptableMediaType;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;

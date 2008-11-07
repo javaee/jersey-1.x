@@ -42,8 +42,7 @@ import com.sun.jersey.api.core.HttpContext;
 import com.sun.jersey.api.model.AbstractResourceMethod;
 import com.sun.jersey.api.model.Parameter;
 import com.sun.jersey.api.representation.Form;
-import com.sun.jersey.impl.http.header.reader.HttpHeaderReader;
-import com.sun.jersey.impl.http.header.reader.HttpHeaderReaderImpl;
+import com.sun.jersey.core.header.reader.HttpHeaderReader;
 import com.sun.jersey.server.impl.inject.AbstractHttpContextInjectable;
 import com.sun.jersey.spi.MessageBodyWorkers;
 import com.sun.jersey.spi.dispatch.RequestDispatcher;
@@ -233,7 +232,7 @@ public class MultipartFormDispatchProvider extends FormDispatchProvider {
     }
     
     private static String getName(String disposition) throws ParseException {
-        HttpHeaderReader reader = new HttpHeaderReaderImpl(disposition);
+        HttpHeaderReader reader = HttpHeaderReader.newInstance(disposition);
         // Skip any white space
         reader.hasNext();
 

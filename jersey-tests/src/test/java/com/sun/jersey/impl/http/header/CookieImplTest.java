@@ -37,7 +37,7 @@
 
 package com.sun.jersey.impl.http.header;
 
-import com.sun.jersey.impl.http.header.CookiesParser;
+import com.sun.jersey.core.header.reader.HttpHeaderReader;
 import java.util.Map;
 import junit.framework.*;
 import javax.ws.rs.core.Cookie;
@@ -93,7 +93,7 @@ public class CookieImplTest extends TestCase {
     
     public void testCreateCookies() {
         String cookieHeader = "fred=flintstone";
-        Map<String, Cookie> cookies = CookiesParser.parseCookies(cookieHeader);
+        Map<String, Cookie> cookies = HttpHeaderReader.readCookies(cookieHeader);
         assertEquals(cookies.size(), 1);
         Cookie c = cookies.get("fred");
         assertEquals(c.getVersion(), 0);
@@ -101,7 +101,7 @@ public class CookieImplTest extends TestCase {
         assertTrue(c.getValue().equals("flintstone"));
         
         cookieHeader = "fred=flintstone,barney=rubble";
-        cookies = CookiesParser.parseCookies(cookieHeader);
+        cookies = HttpHeaderReader.readCookies(cookieHeader);
         assertEquals(cookies.size(), 2);
         c = cookies.get("fred");
         assertEquals(c.getVersion(), 0);
@@ -113,7 +113,7 @@ public class CookieImplTest extends TestCase {
         assertTrue(c.getValue().equals("rubble"));
 
         cookieHeader = "fred=flintstone;barney=rubble";
-        cookies = CookiesParser.parseCookies(cookieHeader);
+        cookies = HttpHeaderReader.readCookies(cookieHeader);
         assertEquals(cookies.size(), 2);
         c = cookies.get("fred");
         assertEquals(c.getVersion(), 0);
@@ -125,7 +125,7 @@ public class CookieImplTest extends TestCase {
         assertTrue(c.getValue().equals("rubble"));
     
         cookieHeader = "$Version=1;fred=flintstone;$Path=/path;barney=rubble";
-        cookies = CookiesParser.parseCookies(cookieHeader);
+        cookies = HttpHeaderReader.readCookies(cookieHeader);
         assertEquals(cookies.size(), 2);
         c = cookies.get("fred");
         assertEquals(c.getVersion(), 1);
@@ -138,7 +138,7 @@ public class CookieImplTest extends TestCase {
         assertTrue(c.getValue().equals("rubble"));
 
         cookieHeader = "$Version=1;fred=flintstone;$Path=/path,barney=rubble;$Domain=.sun.com";
-        cookies = CookiesParser.parseCookies(cookieHeader);
+        cookies = HttpHeaderReader.readCookies(cookieHeader);
         assertEquals(cookies.size(), 2);
         c = cookies.get("fred");
         assertEquals(c.getVersion(), 1);
@@ -152,7 +152,7 @@ public class CookieImplTest extends TestCase {
         assertTrue(c.getDomain().equals(".sun.com"));
 
         cookieHeader = "$Version=1; fred = flintstone ; $Path=/path, barney=rubble ;$Domain=.sun.com";
-        cookies = CookiesParser.parseCookies(cookieHeader);
+        cookies = HttpHeaderReader.readCookies(cookieHeader);
         assertEquals(cookies.size(), 2);
         c = cookies.get("fred");
         assertEquals(c.getVersion(), 1);

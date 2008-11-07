@@ -38,10 +38,10 @@
 package com.sun.jersey.impl;
 
 import com.sun.jersey.api.core.HttpRequestContext;
-import com.sun.jersey.impl.http.header.AcceptableLanguageTag;
-import com.sun.jersey.impl.http.header.AcceptableMediaType;
-import com.sun.jersey.impl.http.header.AcceptableToken;
-import com.sun.jersey.impl.http.header.QualityFactor;
+import com.sun.jersey.core.header.AcceptableLanguageTag;
+import com.sun.jersey.core.header.AcceptableMediaType;
+import com.sun.jersey.core.header.AcceptableToken;
+import com.sun.jersey.core.header.QualityFactor;
 import com.sun.jersey.impl.model.HttpHelper;
 import java.util.Collection;
 import java.util.List;

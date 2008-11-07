@@ -51,12 +51,6 @@ public class CacheControlImplTest extends TestCase {
         super(testName);
     }
 
-    protected void setUp() throws Exception {
-    }
-
-    protected void tearDown() throws Exception {
-    }
-
     /**
      * Test of toString method, of class com.sun.jersey.api.response.CacheControl.
      */

@@ -37,9 +37,7 @@
 
 package com.sun.jersey.impl.provider.header;
 
-import com.sun.jersey.impl.http.header.HttpDateFormat;
-import com.sun.jersey.impl.http.header.HttpHeaderFactory;
-import com.sun.jersey.impl.http.header.LanguageTag;
+import com.sun.jersey.core.header.LanguageTag;
 import com.sun.jersey.spi.HeaderDelegateProvider;
 import java.text.ParseException;
 import java.util.Locale;
