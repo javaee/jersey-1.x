@@ -19,27 +19,27 @@
  * enclosed by brackets [] replaced by your own identifying information:
  *     "Portions Copyrighted [year] [name of copyright owner]"
  */
-package com.sun.jersey.spring;
+package com.sun.jersey.spring.jerseymanaged;
 
+import com.sun.jersey.spring.*;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
 import com.sun.jersey.api.client.WebResource;
 
 /**
- * Test prototype resources that are not managed by spring (but jersey).<br>
+ * Test singleton resources that are not managed by spring (but jersey).<br>
  * Created on: Apr 10, 2008<br>
  * 
  * @author <a href="mailto:martin.grotzke@freiheit.com">Martin Grotzke</a>
  * @version $Id$
  */
-public class JerseyManagedPerRequestResourceTest extends AbstractResourceTest {
+public class JerseyManagedSingletonResourceTest extends AbstractResourceTest {
     
     @Test
-    public void testGetAndUpdateInjectedSingletonItem() {
+    public void testGetAndUpdateInjectedItem() {
         
-        final WebResource itemResource = resource( "unmanagedperrequest/singletonitem" );
-        
+        final WebResource itemResource = resource( "unmanagedsingleton/item" );
         final Item actualItem = itemResource.get( Item.class );
         Assert.assertNotNull( actualItem );
         Assert.assertEquals( actualItem.getValue(), TestData.MANAGED );
@@ -47,7 +47,7 @@ public class JerseyManagedPerRequestResourceTest extends AbstractResourceTest {
         /* update the value of the singleton item and afterwards check if it's the same
          */
         final String newValue = "newValue";
-        final WebResource itemValueResource = resource( "unmanagedperrequest/singletonitem/value/" + newValue );
+        final WebResource itemValueResource = resource( "unmanagedsingleton/item/value/" + newValue );
         itemValueResource.put();
         
         final Item actualUpdatedItem = itemResource.get( Item.class );
@@ -57,37 +57,14 @@ public class JerseyManagedPerRequestResourceTest extends AbstractResourceTest {
     }
     
     @Test
-    public void testGetAndUpdateInjectedPrototypeItem() {
-        
-        final WebResource itemResource = resource( "unmanagedperrequest/prototypeitem" );
-        final Item2 actualItem = itemResource.get( Item2.class );
-        Assert.assertNotNull( actualItem );
-        Assert.assertEquals( actualItem.getValue(), TestData.MANAGED );
-        
-        /* update the value of the prototype item and afterwards check that it's not the same
-         */
-        final String newValue = "newValue";
-        final WebResource itemValueResource = resource( "unmanagedperrequest/prototypeitem/value/" + newValue );
-        itemValueResource.put();
-        
-        final Item2 actualUpdatedItem = itemResource.get( Item2.class );
-        Assert.assertNotNull( actualUpdatedItem );
-        Assert.assertEquals( actualUpdatedItem.getValue(), TestData.MANAGED );
-        
-    }
-    
-    @Test
     public void testGetAndUpdateCount() {
         
-        final WebResource countResource = resource( "unmanagedperrequest/count" );
+        final WebResource countResource = resource( "managedsingleton/countusage" );
         
-        /* the count has to be the same for each request, even if one request
-         * changed the count
-         */
         final int actualCount = Integer.parseInt( countResource.get( String.class ) );
         countResource.post();
         final int actualCountUpdated = Integer.parseInt( countResource.get( String.class ) );
-        Assert.assertEquals( actualCountUpdated, actualCount );
+        Assert.assertEquals( actualCountUpdated, actualCount + 1 );
         
     }
 

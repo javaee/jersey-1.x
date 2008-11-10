@@ -19,23 +19,7 @@
  * enclosed by brackets [] replaced by your own identifying information:
  *     "Portions Copyrighted [year] [name of copyright owner]"
  */
-package com.sun.jersey.spring;
-
-import javax.ws.rs.Path;
-
-import com.sun.jersey.api.spring.Autowire;
-import com.sun.jersey.spi.resource.Singleton;
-
 /**
- * A singleton resource class that is not managed by spring (but jersey)<br>
- * Created on: Apr 10, 2008<br>
- * 
- * @author <a href="mailto:martin.grotzke@freiheit.com">Martin Grotzke</a>
- * @version $Id$
+ * Provides support for Spring-based applications.
  */
-@Path("autowiredsingleton")
-@Singleton
-@Autowire
-public class AutowiredByJerseySpringSingletonResource extends AutowiredSingletonResourceBase {
-    
-}
+package com.sun.jersey.spi.spring.container;

@@ -10,9 +10,13 @@
     <servlet>
         <servlet-name>Jersey Spring Web Application</servlet-name>
         <servlet-class>com.sun.jersey.spi.spring.container.servlet.SpringServlet</servlet-class>
+        <!-- The following initialization parameter is only required for
+             registering Jersey managed classes. Spring-managed classes
+             are automatically registered.
+        -->
         <init-param>
             <param-name>com.sun.jersey.config.property.packages</param-name>
-            <param-value>com.sun.jersey.samples.springannotations.resources</param-value>
+            <param-value>com.sun.jersey.samples.springannotations.resources.jerseymanaged</param-value>
         </init-param>
         <load-on-startup>1</load-on-startup>
     </servlet>

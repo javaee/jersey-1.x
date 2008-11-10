@@ -34,8 +34,9 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-package com.sun.jersey.spi.spring.container.servlet;
+package com.sun.jersey.spi.spring.container;
 
+import com.sun.jersey.api.core.ResourceConfig;
 import com.sun.jersey.api.spring.Autowire;
 import java.lang.annotation.Annotation;
 import java.util.Arrays;
@@ -71,8 +72,27 @@ public class SpringComponentProviderFactory implements IoCComponentProviderFacto
 
     private final ConfigurableApplicationContext springContext;
 
-    public SpringComponentProviderFactory(ConfigurableApplicationContext springContext) {
+    public SpringComponentProviderFactory(ResourceConfig rc, ConfigurableApplicationContext springContext) {
         this.springContext = springContext;
+        register(rc, springContext);
+    }
+
+    private void register(ResourceConfig rc, ConfigurableApplicationContext springContext) {
+        String[] names = springContext.getBeanDefinitionNames();
+        for (String name : names) {
+            Class type = springContext.getType(name);
+            if (ResourceConfig.isProviderClass(type)) {
+                LOGGER.info("Registering Spring bean, " + name + 
+                        ", of type " + type.getName() +
+                        " as a provider class");
+                rc.getClasses().add(type);
+            } else if (ResourceConfig.isRootResourceClass(type)) {
+                LOGGER.info("Registering Spring bean, " + name + 
+                        ", of type " + type.getName() +
+                        " as a root resource class");
+                rc.getClasses().add(type);
+            }
+        }
     }
 
     public IoCComponentProvider getComponentProvider(Class c) {

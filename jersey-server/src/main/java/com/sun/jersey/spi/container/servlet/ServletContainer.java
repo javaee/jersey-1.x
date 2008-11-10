@@ -392,12 +392,8 @@ public class ServletContainer extends HttpServlet implements ContainerListener {
                 props.put(PackagesResourceConfig.PROPERTY_PACKAGES, packages);
                 return new PackagesResourceConfig(props);                    
             }
-            
-            // Default to using class path resource config
-            String[] paths = getPaths(servletConfig.getInitParameter(
-                    ClasspathResourceConfig.PROPERTY_CLASSPATH));
-            props.put(ClasspathResourceConfig.PROPERTY_CLASSPATH, paths);
-            return new ClasspathResourceConfig(props);
+
+            return getDefaultResourceConfig(props, servletConfig);
         }
 
         try {
@@ -464,7 +460,7 @@ public class ServletContainer extends HttpServlet implements ContainerListener {
         }
         return props;
     }
-    
+
     private String[] getPaths(String classpath) throws ServletException {
         if (classpath == null) {
             String[] paths =  {
@@ -643,6 +639,33 @@ public class ServletContainer extends HttpServlet implements ContainerListener {
     protected void initiate(ResourceConfig rc, WebApplication wa) {
         validate(rc);
         wa.initiate(rc);
+    }
+
+    /**
+     * Get the default resource configuration if one is not declared in the
+     * web.xml.
+     * <p>
+     * This implementaton returns an instance of {@link ClasspathResourceConfig}
+     * that scans in files and directories as declared by the
+     * {@link ClasspathResourceConfig.PROPERTY_CLASSPATH} if present, otherwise
+     * in the "WEB-INF/lib" and "WEB-INF/classes" directories.
+     * <p>
+     * An inheriting class may override this method to supply a different
+     * default resource configuraton implementaton.
+     * 
+     * @param props the properties to pass to the resource configuraton.
+     * @param servletConfig the servlet configuration.
+     * @return the default resource configuraton.
+     * 
+     * @throws javax.servlet.ServletException
+     */
+    protected ResourceConfig getDefaultResourceConfig(Map<String, Object> props,
+            ServletConfig servletConfig) throws ServletException  {
+        // Default to using class path resource config
+        String[] paths = getPaths(servletConfig.getInitParameter(
+                ClasspathResourceConfig.PROPERTY_CLASSPATH));
+        props.put(ClasspathResourceConfig.PROPERTY_CLASSPATH, paths);
+        return new ClasspathResourceConfig(props);
     }
 
     private void validate(ResourceConfig rc) {

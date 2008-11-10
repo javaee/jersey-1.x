@@ -19,8 +19,9 @@
  * enclosed by brackets [] replaced by your own identifying information:
  *     "Portions Copyrighted [year] [name of copyright owner]"
  */
-package com.sun.jersey.spring;
+package com.sun.jersey.spring.jerseymanaged;
 
+import com.sun.jersey.spring.*;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;

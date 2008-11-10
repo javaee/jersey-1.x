@@ -54,7 +54,6 @@ public class AbstractResourceTest {
     private static final Logger LOGGER = Logger.getLogger(AbstractResourceTest.class.getName());
 
     protected String _springConfig;
-    protected String _resourcePackages;
     private final int _port;
     private final String _servletPath;
     
@@ -62,7 +61,6 @@ public class AbstractResourceTest {
     
     public AbstractResourceTest() {
         _springConfig = System.getProperty( "applicationContext", APPLICATION_CONTEXT_SPRING25_XML );
-        _resourcePackages = System.getProperty( "resourcePackages", "com.sun.jersey.spring;com.sun.jersey.spring25" );
         _port = 9999;
         _servletPath = "/jersey-spring";
     }
@@ -97,7 +95,7 @@ public class AbstractResourceTest {
          sh.setInitParameter( "com.sun.jersey.config.property.resourceConfigClass",
                  PackagesResourceConfig.class.getName() );
          sh.setInitParameter( PackagesResourceConfig.PROPERTY_PACKAGES,
-                 _resourcePackages );
+                 "com.sun.jersey.spring.jerseymanaged" );
          sh.setInitOrder( 2 );
          context.addServlet(sh, servletPath + "/*");
          

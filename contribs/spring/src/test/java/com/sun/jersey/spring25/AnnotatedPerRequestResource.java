@@ -29,7 +29,6 @@ import javax.ws.rs.Produces;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
-import com.sun.jersey.spi.resource.PerRequest;
 import com.sun.jersey.spring.Item;
 
 /**
@@ -42,7 +41,6 @@ import com.sun.jersey.spring.Item;
  * @version $Id$
  */
 @Path("annotatedPerRequest")
-@PerRequest
 @Component
 @Scope( "prototype" )
 public class AnnotatedPerRequestResource {

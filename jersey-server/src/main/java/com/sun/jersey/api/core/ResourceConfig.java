@@ -53,6 +53,7 @@ import java.util.logging.Logger;
 import javax.ws.rs.Path;
 import javax.ws.rs.core.Application;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.ext.Provider;
 
 
 /**
@@ -394,13 +395,29 @@ public abstract class ResourceConfig extends Application {
         
         return Collections.unmodifiableSet(s);
     }
-    
-    private boolean isRootResourceClass(Class<?> c) {
+
+    /**
+     * Determine if a class is a root resource class.
+     *
+     * @param c the class.
+     * @return true if the class is a root resource class, otherwise false.
+     */
+    public static boolean isRootResourceClass(Class<?> c) {
         if (c.isAnnotationPresent(Path.class)) return true;
 
         for (Class i : c.getInterfaces())
             if (i.isAnnotationPresent(Path.class)) return true;
 
         return false;
-    }    
+    }
+
+    /**
+     * Determine if a class is a provider class.
+     *
+     * @param c the class.
+     * @return true if the class is a provider class, otherwise false.
+     */
+    public static boolean isProviderClass(Class<?> c) {
+        return c.isAnnotationPresent(Provider.class);
+    }
 }

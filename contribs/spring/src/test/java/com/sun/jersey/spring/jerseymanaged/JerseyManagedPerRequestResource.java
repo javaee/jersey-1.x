@@ -19,8 +19,9 @@
  * enclosed by brackets [] replaced by your own identifying information:
  *     "Portions Copyrighted [year] [name of copyright owner]"
  */
-package com.sun.jersey.spring;
+package com.sun.jersey.spring.jerseymanaged;
 
+import com.sun.jersey.spring.*;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
@@ -28,7 +29,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 
-import com.sun.jersey.api.spring.Autowire;
+import com.sun.jersey.spi.inject.Inject;
 import com.sun.jersey.spi.resource.PerRequest;
 
 /**
@@ -38,17 +39,20 @@ import com.sun.jersey.spi.resource.PerRequest;
  * @author <a href="mailto:martin.grotzke@freiheit.com">Martin Grotzke</a>
  * @version $Id$
  */
-@Path("autowiredperrequest")
+@Path("unmanagedperrequest")
 @PerRequest
-@Autowire
-public class AutowiredPerRequestResource {
+public class JerseyManagedPerRequestResource {
     
-    private Item _singletonItem;
-    private Item2 _prototypeItem;
-    private int _count;
-    
-    public AutowiredPerRequestResource() {
+    public JerseyManagedPerRequestResource() {
     }
+    
+    @Inject
+    private Item _singletonItem;
+    
+    @Inject
+    private Item2 _prototypeItem;
+    
+    private int _count;
 
     @GET
     @Path( "singletonitem" )
@@ -87,22 +91,6 @@ public class AutowiredPerRequestResource {
     @Path( "count" )
     public void updateCount() {
         _count++;
-    }
-
-    /**
-     * @param prototypeItem the prototypeItem to set
-     * @author Martin Grotzke
-     */
-    public void setPrototypeItem( Item2 prototypeItem ) {
-        _prototypeItem = prototypeItem;
-    }
-
-    /**
-     * @param singletonItem the singletonItem to set
-     * @author Martin Grotzke
-     */
-    public void setSingletonItem( Item singletonItem ) {
-        _singletonItem = singletonItem;
     }
     
 }

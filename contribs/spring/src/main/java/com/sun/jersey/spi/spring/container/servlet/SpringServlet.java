@@ -21,6 +21,8 @@
  */
 package com.sun.jersey.spi.spring.container.servlet;
 
+import com.sun.jersey.spi.spring.container.SpringComponentProviderFactory;
+import com.sun.jersey.api.core.DefaultResourceConfig;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -32,6 +34,9 @@ import com.sun.jersey.api.core.ResourceConfig;
 import com.sun.jersey.core.spi.component.ioc.IoCComponentProviderFactory;
 import com.sun.jersey.spi.container.WebApplication;
 import com.sun.jersey.spi.container.servlet.ServletContainer;
+import java.util.Map;
+import javax.servlet.ServletConfig;
+import javax.servlet.ServletException;
 
 /**
  * A servlet container for deploying root resource classes with Spring
@@ -39,9 +44,14 @@ import com.sun.jersey.spi.container.servlet.ServletContainer;
  * <p>
  * This servlet extends {@link ServletContainer} and initiates the
  * {@link WebApplication} with a Spring-based {@link IoCComponentProviderFactory},
- * {@link SpringComponentProviderFactory}, such that resource and provider classes
- * can be registered Spring-based beans using XML-based registration or
- * auto-wire-based registration.
+ * {@link SpringComponentProviderFactory}, such that instances of resource and
+ * provider classes declared and managed by Spring can be obtained.
+ * <p>
+ * Classes of Spring beans declared using XML-based configuration or
+ * auto-wire-based confguration will be automatically registered if such
+ * classes are root resource classes or provider classes. It is not necessary
+ * to provide initialization parameters for declaring classes in the web.xml
+ * unless a mixture of Spring-managed and Jersey-managed classes is required.
  * 
  * @author <a href="mailto:martin.grotzke@freiheit.com">Martin Grotzke</a>
  */
@@ -52,12 +62,22 @@ public class SpringServlet extends ServletContainer {
     private static final Logger LOGGER = Logger.getLogger(SpringServlet.class.getName());
 
     @Override
+    protected ResourceConfig getDefaultResourceConfig(Map<String, Object> props,
+            ServletConfig servletConfig) throws ServletException  {
+        DefaultResourceConfig rc = new DefaultResourceConfig();
+        rc.setPropertiesAndFeatures(props);
+        return rc;
+    }
+
+    @Override
     protected void initiate(ResourceConfig rc, WebApplication wa) {
         try {
-            final WebApplicationContext springContext = WebApplicationContextUtils.
+            final WebApplicationContext springWebContext = WebApplicationContextUtils.
                     getRequiredWebApplicationContext(getServletContext());
+            final ConfigurableApplicationContext springContext =
+                    (ConfigurableApplicationContext)springWebContext;
 
-            wa.initiate(rc, new SpringComponentProviderFactory((ConfigurableApplicationContext)springContext));
+            wa.initiate(rc, new SpringComponentProviderFactory(rc, springContext));
         } catch( RuntimeException e ) {
             LOGGER.log(Level.SEVERE, "Exception occurred when intialization", e);
             throw e;

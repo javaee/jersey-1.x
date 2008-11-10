@@ -146,7 +146,7 @@ public class DefaultResourceConfig extends ResourceConfig {
      * of the entry value. Features are only added if an existing feature
      * does not currently exist.
      */
-    protected void setPropertiesAndFeatures(Map<String, Object> entries) {
+    public void setPropertiesAndFeatures(Map<String, Object> entries) {
         getProperties().putAll(entries);
         
         for (Map.Entry<String, Object> e : entries.entrySet()) {

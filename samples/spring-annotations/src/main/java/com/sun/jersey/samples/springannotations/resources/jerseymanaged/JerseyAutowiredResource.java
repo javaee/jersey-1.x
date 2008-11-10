@@ -34,7 +34,7 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-package com.sun.jersey.samples.springannotations.resources;
+package com.sun.jersey.samples.springannotations.resources.jerseymanaged;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;

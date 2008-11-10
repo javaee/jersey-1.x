@@ -43,7 +43,6 @@ import javax.ws.rs.Produces;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
-import com.sun.jersey.spi.resource.Singleton;
 
 /**
  * A resource class that is only annotated with spring's {@link Scope} annotation
@@ -52,9 +51,9 @@ import com.sun.jersey.spi.resource.Singleton;
  * @author <a href="mailto:martin.grotzke@freiheit.com">Martin Grotzke</a>
  * @version $Id$
  */
- @Path( "SpringScopedResource" )
- @Component
- @Scope( "singleton" )
+@Path( "SpringScopedResource" )
+@Component
+@Scope( "singleton" )
 public class SpringScopedResource {
     
     public SpringScopedResource() {

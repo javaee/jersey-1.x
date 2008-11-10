@@ -202,10 +202,6 @@
                                     <name>applicationContext</name>
                                     <value>applicationContext-spring25.xml</value>
                                 </property>
-                                <property>
-                                    <name>resourcePackages</name>
-                                    <value>com.sun.jersey.spring;com.sun.jersey.spring25</value>
-                                </property>
                             </systemProperties>
                         </configuration>
                     </plugin>
@@ -241,10 +237,6 @@
                                 <property>
                                     <name>applicationContext</name>
                                     <value>applicationContext-spring20.xml</value>
-                                </property>
-                                <property>
-                                    <name>resourcePackages</name>
-                                    <value>com.sun.jersey.spring</value>
                                 </property>
                             </systemProperties>
                         </configuration>

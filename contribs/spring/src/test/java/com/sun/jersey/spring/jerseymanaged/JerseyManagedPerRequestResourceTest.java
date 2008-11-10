@@ -19,8 +19,9 @@
  * enclosed by brackets [] replaced by your own identifying information:
  *     "Portions Copyrighted [year] [name of copyright owner]"
  */
-package com.sun.jersey.spring;
+package com.sun.jersey.spring.jerseymanaged;
 
+import com.sun.jersey.spring.*;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
@@ -33,14 +34,12 @@ import com.sun.jersey.api.client.WebResource;
  * @author <a href="mailto:martin.grotzke@freiheit.com">Martin Grotzke</a>
  * @version $Id$
  */
-public class AutowiredPerRequestResourceTest extends AbstractResourceTest {
-    
-    private static final String RESOURCE_PATH = "autowiredperrequest";
+public class JerseyManagedPerRequestResourceTest extends AbstractResourceTest {
     
     @Test
-    public void testGetAndUpdateSingletonItem() {
+    public void testGetAndUpdateInjectedSingletonItem() {
         
-        final WebResource itemResource = resource( RESOURCE_PATH + "/singletonitem" );
+        final WebResource itemResource = resource( "unmanagedperrequest/singletonitem" );
         
         final Item actualItem = itemResource.get( Item.class );
         Assert.assertNotNull( actualItem );
@@ -49,7 +48,7 @@ public class AutowiredPerRequestResourceTest extends AbstractResourceTest {
         /* update the value of the singleton item and afterwards check if it's the same
          */
         final String newValue = "newValue";
-        final WebResource itemValueResource = resource( RESOURCE_PATH + "/singletonitem/value/" + newValue );
+        final WebResource itemValueResource = resource( "unmanagedperrequest/singletonitem/value/" + newValue );
         itemValueResource.put();
         
         final Item actualUpdatedItem = itemResource.get( Item.class );
@@ -59,9 +58,9 @@ public class AutowiredPerRequestResourceTest extends AbstractResourceTest {
     }
     
     @Test
-    public void testGetAndUpdatePrototypeItem() {
+    public void testGetAndUpdateInjectedPrototypeItem() {
         
-        final WebResource itemResource = resource( RESOURCE_PATH + "/prototypeitem" );
+        final WebResource itemResource = resource( "unmanagedperrequest/prototypeitem" );
         final Item2 actualItem = itemResource.get( Item2.class );
         Assert.assertNotNull( actualItem );
         Assert.assertEquals( actualItem.getValue(), TestData.MANAGED );
@@ -69,7 +68,7 @@ public class AutowiredPerRequestResourceTest extends AbstractResourceTest {
         /* update the value of the prototype item and afterwards check that it's not the same
          */
         final String newValue = "newValue";
-        final WebResource itemValueResource = resource( RESOURCE_PATH + "/prototypeitem/value/" + newValue );
+        final WebResource itemValueResource = resource( "unmanagedperrequest/prototypeitem/value/" + newValue );
         itemValueResource.put();
         
         final Item2 actualUpdatedItem = itemResource.get( Item2.class );
@@ -81,7 +80,7 @@ public class AutowiredPerRequestResourceTest extends AbstractResourceTest {
     @Test
     public void testGetAndUpdateCount() {
         
-        final WebResource countResource = resource( RESOURCE_PATH + "/count" );
+        final WebResource countResource = resource( "unmanagedperrequest/count" );
         
         /* the count has to be the same for each request, even if one request
          * changed the count

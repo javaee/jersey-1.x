@@ -19,26 +19,29 @@
  * enclosed by brackets [] replaced by your own identifying information:
  *     "Portions Copyrighted [year] [name of copyright owner]"
  */
-package com.sun.jersey.spring;
+package com.sun.jersey.spring.jerseymanaged;
 
+import com.sun.jersey.spring.*;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
 import com.sun.jersey.api.client.WebResource;
 
 /**
- * Test singleton resources that are not managed by spring (but jersey).<br>
+ * Test singleton resources that use autowiring.<br>
  * Created on: Apr 10, 2008<br>
  * 
  * @author <a href="mailto:martin.grotzke@freiheit.com">Martin Grotzke</a>
  * @version $Id$
  */
-public class JerseyManagedSingletonResourceTest extends AbstractResourceTest {
+public class AutowiredByJerseySpringSingletonResourceTest extends AbstractResourceTest {
+    
+    private static final String RESOURCE_PATH = "autowiredsingleton";
     
     @Test
-    public void testGetAndUpdateInjectedItem() {
+    public void testGetAndUpdateItem() {
         
-        final WebResource itemResource = resource( "unmanagedsingleton/item" );
+        final WebResource itemResource = resource( RESOURCE_PATH + "/item" );
         final Item actualItem = itemResource.get( Item.class );
         Assert.assertNotNull( actualItem );
         Assert.assertEquals( actualItem.getValue(), TestData.MANAGED );
@@ -46,7 +49,7 @@ public class JerseyManagedSingletonResourceTest extends AbstractResourceTest {
         /* update the value of the singleton item and afterwards check if it's the same
          */
         final String newValue = "newValue";
-        final WebResource itemValueResource = resource( "unmanagedsingleton/item/value/" + newValue );
+        final WebResource itemValueResource = resource( RESOURCE_PATH + "/item/value/" + newValue );
         itemValueResource.put();
         
         final Item actualUpdatedItem = itemResource.get( Item.class );
@@ -58,7 +61,7 @@ public class JerseyManagedSingletonResourceTest extends AbstractResourceTest {
     @Test
     public void testGetAndUpdateCount() {
         
-        final WebResource countResource = resource( "managedsingleton/countusage" );
+        final WebResource countResource = resource( RESOURCE_PATH + "/countusage" );
         
         final int actualCount = Integer.parseInt( countResource.get( String.class ) );
         countResource.post();

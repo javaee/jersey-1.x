@@ -19,28 +19,30 @@
  * enclosed by brackets [] replaced by your own identifying information:
  *     "Portions Copyrighted [year] [name of copyright owner]"
  */
-package com.sun.jersey.spring;
+package com.sun.jersey.spring.jerseymanaged;
 
+import com.sun.jersey.spring.*;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
 import com.sun.jersey.api.client.WebResource;
 
 /**
- * Test singleton resources that use autowiring.<br>
+ * Test prototype resources that are not managed by spring (but jersey).<br>
  * Created on: Apr 10, 2008<br>
  * 
  * @author <a href="mailto:martin.grotzke@freiheit.com">Martin Grotzke</a>
  * @version $Id$
  */
-public class AutowiredByJerseySpringSingletonResourceTest extends AbstractResourceTest {
+public class AutowiredPerRequestResourceTest extends AbstractResourceTest {
     
-    private static final String RESOURCE_PATH = "autowiredsingleton";
+    private static final String RESOURCE_PATH = "autowiredperrequest";
     
     @Test
-    public void testGetAndUpdateItem() {
+    public void testGetAndUpdateSingletonItem() {
         
-        final WebResource itemResource = resource( RESOURCE_PATH + "/item" );
+        final WebResource itemResource = resource( RESOURCE_PATH + "/singletonitem" );
+        
         final Item actualItem = itemResource.get( Item.class );
         Assert.assertNotNull( actualItem );
         Assert.assertEquals( actualItem.getValue(), TestData.MANAGED );
@@ -48,7 +50,7 @@ public class AutowiredByJerseySpringSingletonResourceTest extends AbstractResour
         /* update the value of the singleton item and afterwards check if it's the same
          */
         final String newValue = "newValue";
-        final WebResource itemValueResource = resource( RESOURCE_PATH + "/item/value/" + newValue );
+        final WebResource itemValueResource = resource( RESOURCE_PATH + "/singletonitem/value/" + newValue );
         itemValueResource.put();
         
         final Item actualUpdatedItem = itemResource.get( Item.class );
@@ -58,14 +60,37 @@ public class AutowiredByJerseySpringSingletonResourceTest extends AbstractResour
     }
     
     @Test
+    public void testGetAndUpdatePrototypeItem() {
+        
+        final WebResource itemResource = resource( RESOURCE_PATH + "/prototypeitem" );
+        final Item2 actualItem = itemResource.get( Item2.class );
+        Assert.assertNotNull( actualItem );
+        Assert.assertEquals( actualItem.getValue(), TestData.MANAGED );
+        
+        /* update the value of the prototype item and afterwards check that it's not the same
+         */
+        final String newValue = "newValue";
+        final WebResource itemValueResource = resource( RESOURCE_PATH + "/prototypeitem/value/" + newValue );
+        itemValueResource.put();
+        
+        final Item2 actualUpdatedItem = itemResource.get( Item2.class );
+        Assert.assertNotNull( actualUpdatedItem );
+        Assert.assertEquals( actualUpdatedItem.getValue(), TestData.MANAGED );
+        
+    }
+    
+    @Test
     public void testGetAndUpdateCount() {
         
-        final WebResource countResource = resource( RESOURCE_PATH + "/countusage" );
+        final WebResource countResource = resource( RESOURCE_PATH + "/count" );
         
+        /* the count has to be the same for each request, even if one request
+         * changed the count
+         */
         final int actualCount = Integer.parseInt( countResource.get( String.class ) );
         countResource.post();
         final int actualCountUpdated = Integer.parseInt( countResource.get( String.class ) );
-        Assert.assertEquals( actualCountUpdated, actualCount + 1 );
+        Assert.assertEquals( actualCountUpdated, actualCount );
         
     }
 

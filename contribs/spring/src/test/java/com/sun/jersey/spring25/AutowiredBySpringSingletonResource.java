@@ -38,10 +38,9 @@ import com.sun.jersey.spring.Item;
  * @author <a href="mailto:martin.grotzke@freiheit.com">Martin Grotzke</a>
  * @version $Id$
  */
- @Path("springautowiredsingleton")
- @Singleton
- @Component
- @Scope( "singleton" )
+@Path("springautowiredsingleton")
+@Component
+@Scope( "singleton" )
 public class AutowiredBySpringSingletonResource extends AutowiredSingletonResourceBase {
     
     @Autowired

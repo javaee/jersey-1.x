@@ -28,7 +28,6 @@ import javax.ws.rs.Produces;
 
 import org.springframework.stereotype.Component;
 
-import com.sun.jersey.spi.resource.Singleton;
 import com.sun.jersey.spring.Item;
 
 /**
@@ -41,7 +40,6 @@ import com.sun.jersey.spring.Item;
  * @version $Id$
  */
 @Path("annotatedSingleton")
-@Singleton
 @Component
 // The scope has not to be defined, default is singleton...
 public class AnnotatedSingletonResource {
