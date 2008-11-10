@@ -236,6 +236,8 @@ public abstract class HttpHeaderReader {
         
         while (reader.hasNext()) {
             reader.nextSeparator(';');
+            while(reader.hasNextSeparator(';', true))
+                reader.next();
             
             // Ignore a ';' with no parameters
             if (!reader.hasNext())

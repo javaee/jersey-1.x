@@ -42,6 +42,7 @@ import com.sun.jersey.core.header.AcceptableLanguageTag;
 import com.sun.jersey.core.header.Token;
 import com.sun.jersey.core.header.LanguageTag;
 import com.sun.jersey.core.header.HttpDateFormat;
+import com.sun.jersey.core.header.ParameterizedHeader;
 import com.sun.jersey.core.header.reader.HttpHeaderReader;
 import java.text.ParseException;
 import java.util.Date;
@@ -137,4 +138,41 @@ public class HttpHeaderTest extends TestCase {
         assertEquals(date_RFC1123, date_formatted);
     }
 
+    public void testParameterizedHeader() throws ParseException {
+        ParameterizedHeader ph = new ParameterizedHeader("a");
+        assertEquals("a", ph.getValue());
+
+        ph = new ParameterizedHeader("a/b");
+        assertEquals("a/b", ph.getValue());
+
+        ph = new ParameterizedHeader("  a  /  b  ");
+        assertEquals("a/b", ph.getValue());
+
+        ph = new ParameterizedHeader("");
+        assertEquals("", ph.getValue());
+
+        ph = new ParameterizedHeader(";");
+        assertEquals("", ph.getValue());
+        assertEquals(0, ph.getParameters().size());
+
+        ph = new ParameterizedHeader(";;;");
+        assertEquals("", ph.getValue());
+        assertEquals(0, ph.getParameters().size());
+
+        ph = new ParameterizedHeader("  ;  ;  ;  ");
+        assertEquals("", ph.getValue());
+        assertEquals(0, ph.getParameters().size());
+
+        ph = new ParameterizedHeader("a;x=1;y=2");
+        assertEquals("a", ph.getValue());
+        assertEquals(2, ph.getParameters().size());
+        assertEquals("1", ph.getParameters().get("x"));
+        assertEquals("2", ph.getParameters().get("y"));
+
+        ph = new ParameterizedHeader("a ;  x=1  ;  y=2  ");
+        assertEquals("a", ph.getValue());
+        assertEquals(2, ph.getParameters().size());
+        assertEquals("1", ph.getParameters().get("x"));
+        assertEquals("2", ph.getParameters().get("y"));
+    }
 }

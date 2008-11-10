@@ -17,7 +17,7 @@ public class FormDataContentDisposition extends ContentDisposition {
     private String name;
 
     public FormDataContentDisposition(String header) throws ParseException {
-        super(header);
+        this(HttpHeaderReader.newInstance(header));
     }
 
     public FormDataContentDisposition(HttpHeaderReader reader) throws ParseException {
@@ -33,7 +33,7 @@ public class FormDataContentDisposition extends ContentDisposition {
     }
 
     /**
-     * Get the name parameter. Present when the type is "form-data".
+     * Get the name parameter.
      *
      * @return the name
      */

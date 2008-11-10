@@ -43,6 +43,7 @@ import com.sun.jersey.api.core.HttpContext;
 import com.sun.jersey.api.model.AbstractResourceMethod;
 import com.sun.jersey.api.model.Parameter;
 import com.sun.jersey.api.representation.Form;
+import com.sun.jersey.core.header.FormDataContentDisposition;
 import com.sun.jersey.core.header.reader.HttpHeaderReader;
 import com.sun.jersey.server.impl.inject.AbstractHttpContextInjectable;
 import com.sun.jersey.spi.MessageBodyWorkers;
@@ -255,40 +256,14 @@ public class MultipartFormDispatchProvider extends FormDispatchProvider {
         
         for (int i = 0; i < mm.getCount(); i++) {
             BodyPart b = mm.getBodyPart(i);
-            if (b.getDisposition() != null && 
+            if (b.getDisposition() != null &&
                     b.getDisposition().equalsIgnoreCase("form-data")) {
-                String name = getName(b.getHeader("content-disposition")[0]);
-                if (name != null)
-                    m.put(name, b);
+                FormDataContentDisposition fdcd = new FormDataContentDisposition(
+                        b.getHeader("content-disposition")[0]);
+                if (fdcd.getName() != null)
+                    m.put(fdcd.getName(), b);
             }
         }
         return m;
-    }
-    
-    private static String getName(String disposition) throws ParseException {
-        HttpHeaderReader reader = HttpHeaderReader.newInstance(disposition);
-        // Skip any white space
-        reader.hasNext();
-
-        // Get the "form-data"
-        reader.nextToken();
-
-        while (reader.hasNext()) {
-            reader.nextSeparator(';');
-            
-            // Ignore a ';' with no parameters
-            if (!reader.hasNext())
-                break;
-            
-            // Get the parameter name
-            String name = reader.nextToken();
-            reader.nextSeparator('=');
-            // Get the parameter value
-            String value = reader.nextTokenOrQuotedString();
-            if (name.equalsIgnoreCase("name")) {
-                return value;
-            }
-        }
-        return null;
     }
 }
