@@ -24,8 +24,6 @@ package com.sun.jersey.spring;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.mortbay.jetty.Server;
 import org.mortbay.jetty.servlet.Context;
 import org.mortbay.jetty.servlet.ServletHolder;
@@ -37,6 +35,8 @@ import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.WebResource;
 import com.sun.jersey.api.core.PackagesResourceConfig;
 import com.sun.jersey.spi.spring.container.servlet.SpringServlet;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 
 /**
@@ -51,7 +51,7 @@ public class AbstractResourceTest {
     public static final String APPLICATION_CONTEXT_SPRING20_XML = "applicationContext-spring20.xml";
     public static final String APPLICATION_CONTEXT_SPRING25_XML = "applicationContext-spring25.xml";
 
-    private static final Log LOG = LogFactory.getLog( AbstractResourceTest.class );
+    private static final Logger LOGGER = Logger.getLogger(AbstractResourceTest.class.getName());
 
     protected String _springConfig;
     protected String _resourcePackages;
@@ -77,7 +77,7 @@ public class AbstractResourceTest {
     }
     
     private void startJetty( int port, String servletPath ) throws Exception {
-        LOG.info( "Starting jetty on port " + port + "..." );
+        LOGGER.info( "Starting jetty on port " + port + "..." );
 
          _server = new Server(port);
          final Context context = new Context(_server, "/", Context.SESSIONS);
@@ -102,22 +102,22 @@ public class AbstractResourceTest {
          context.addServlet(sh, servletPath + "/*");
          
          _server.start();
-         LOG.info( "Successfully started jetty." );
+         LOGGER.info( "Successfully started jetty." );
     }
     
     private void stopJetty() throws Exception {
         try {
             _server.stop();
         } catch( Exception e ) {
-            LOG.warn( "Could not stop jetty...", e );
+            LOGGER.log(Level.WARNING, "Could not stop jetty...", e );
         }
     }
     
     @AfterClass
     public void tearDown() throws Exception {
-        LOG.info( "tearDown..." );
+        LOGGER.info( "tearDown..." );
         stopJetty();
-        LOG.info( "done..." );
+        LOGGER.info( "done..." );
     }
 
     public WebResource resource( final String path ) {
