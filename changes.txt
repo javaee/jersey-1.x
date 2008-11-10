@@ -1,4 +1,10 @@
 release 1.0.1 (2008-11/12)
+- The following classes in jersey-core have moved:
+  - The following classes in package "com.sun.jersey.api" have moved to
+    the package "com.sun.jersey.core.header": InBoundHeaders, MediaTypes and
+    OutBoundHeaders.
+  - The following classe in package "com.sun.jersey.api" have moved to
+    the package "com.sun.jersey.core.util": MultivaluedMapImpl.
 - The Spring servlet automatically registers Spring-based classes (declared
   via the XML configuration or autowiring) and no configuration via the web.xml
   servlet initialization parameters is required unless non-Spring managed
