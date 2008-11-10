@@ -35,7 +35,7 @@
  * holder.
  */
 
-package com.sun.jersey.api;
+package com.sun.jersey.core.header;
 
 import com.sun.jersey.core.header.AcceptableMediaType;
 import java.util.ArrayList;

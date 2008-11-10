@@ -38,11 +38,11 @@
 package com.sun.jersey.samples.storageservice;
 
 import com.sun.grizzly.http.SelectorThread;
-import com.sun.jersey.api.MediaTypes;
 import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.UniformInterfaceException;
 import com.sun.jersey.api.client.WebResource;
+import com.sun.jersey.core.header.MediaTypes;
 import java.net.URI;
 import java.util.Date;
 import javax.ws.rs.core.EntityTag;

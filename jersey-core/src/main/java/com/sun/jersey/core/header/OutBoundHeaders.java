@@ -35,149 +35,115 @@
  * holder.
  */
 
-package com.sun.jersey.api;
+package com.sun.jersey.core.header;
 
 import com.sun.jersey.core.util.KeyComparatorHashMap;
 import com.sun.jersey.core.util.StringIgnoreCaseKeyComparator;
-import java.lang.reflect.Constructor;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import javax.ws.rs.core.MultivaluedMap;
 
 /**
- * In-bound HTTP headers.
+ * Out-bound HTTP headers.
  * <p>
- * Such HTTP headers will be associated with the in-bound HTTP request on the
- * server-side and the in-bound HTTP response on the client-side.
- *
+ * Such HTTP headers will be associated with the out-bound HTTP request on the
+ * client-side and the out-bound HTTP response on the server-side.
+ * 
  * @author Paul.Sandoz@Sun.Com
  */
-public final class InBoundHeaders 
-        extends KeyComparatorHashMap<String, List<String>> 
-        implements MultivaluedMap<String, String> {
-        
-    public InBoundHeaders() {
+public class OutBoundHeaders 
+        extends KeyComparatorHashMap<String, List<Object>> 
+        implements MultivaluedMap<String, Object> {
+    
+    static final long serialVersionUID = -6052320403766368902L;
+    
+    /**
+     * Creates a new instance of MultivaluedMapImpl
+     */
+    public OutBoundHeaders() {
         super(StringIgnoreCaseKeyComparator.SINGLETON);
     }
 
     // MultivaluedMap
     
-    public void putSingle(String key, String value) {
+    public void putSingle(String key, Object value) {
         if (value == null)
             return;
         
-        List<String> l = getList(key);        
+        List<Object> l = getList(key);        
         l.clear();
         l.add(value);
     }
     
-    public void add(String key, String value) {
+    public void add(String key, Object value) {
         if (value == null)
             return;
         
-        List<String> l = getList(key);
+        List<Object> l = getList(key);
         l.add(value);        
     }
     
-    public String getFirst(String key) {
-        List<String> values = get(key);
+    public Object getFirst(String key) {
+        List<Object> values = get(key);
         if (values != null && values.size() > 0)
             return values.get(0);
         else
             return null;
-    }    
-    
+    }
+
+
     // 
     
+    @SuppressWarnings("unchecked")
     public <A> List<A> get(String key, Class<A> type) {
-        Constructor<A> c = null;
-        try {
-            c = type.getConstructor(String.class);
-        } catch (Exception ex) {
-            throw new IllegalArgumentException(type.getName()+" has no String constructor", ex);
-        }
-        
         ArrayList<A> l = null;
-        List<String> values = get(key);
+        List<Object> values = get(key);
         if (values != null) {
             l = new ArrayList<A>();
-            for (String value: values) {
-                try {
-                    l.add(c.newInstance(value));
-                } catch (Exception ex) {
-                    l.add(null);
+            for (Object value : values) {
+                if (type.isInstance(value)) {
+                    l.add((A)value);
+                } else {
+                    throw new IllegalArgumentException(type + " is not an instance of " + value.getClass());            
                 }
             }
         }
         return l;
     }
-
-    public void putSingle(String key, Object value) {
-        List<String> l = getList(key);
-                
-        l.clear();
-        if (value != null)
-            l.add(value.toString());
-        else 
-            l.add("");
-    }
     
-    public void add(String key, Object value) {
-        List<String> l = getList(key);
-        
-        if (value != null)
-            l.add(value.toString());
-        else 
-            l.add("");
-    }
-
-    private List<String> getList(String key) {
-        List<String> l = get(key);
-        if (l == null) {
-            l = new LinkedList<String>();
-            put(key, l);
-        }
-        return l;
-    }
-    
+    @SuppressWarnings("unchecked")
     public <A> A getFirst(String key, Class<A> type) {
-        String value = getFirst(key);
+        Object value = getFirst(key);
         if (value == null)
             return null;
-        Constructor<A> c = null;
-        try {
-            c = type.getConstructor(String.class);
-        } catch (Exception ex) {
-            throw new IllegalArgumentException(type.getName()+" has no String constructor", ex);
-        }
-        A retVal = null;
-        try {
-            retVal = c.newInstance(value);
-        } catch (Exception ex) {
-        }
-        return retVal;
+
+        if (type.isInstance(value)) {
+            return (A)value;
+        } else {
+            throw new IllegalArgumentException(type + " is not an instance of " + value.getClass());            
+        }        
     }
     
     @SuppressWarnings("unchecked")
     public <A> A getFirst(String key, A defaultValue) {
-        String value = getFirst(key);
+        Object value = getFirst(key);
         if (value == null)
             return defaultValue;
         
-        Class<A> type = (Class<A>)defaultValue.getClass();
-        
-        Constructor<A> c = null;
-        try {
-            c = type.getConstructor(String.class);
-        } catch (Exception ex) {
-            throw new IllegalArgumentException(type.getName()+" has no String constructor", ex);
-        }
-        A retVal = defaultValue;
-        try {
-            retVal = c.newInstance(value);
-        } catch (Exception ex) {
-        }
-        return retVal;
+        if (defaultValue.getClass().isInstance(value)) {
+            return (A)value;
+        } else {
+            throw new IllegalArgumentException(defaultValue.getClass() + " is not an instance of " + value.getClass());            
+        }        
     }
+
+    private List<Object> getList(String key) {
+        List<Object> l = get(key);
+        if (l == null) {
+            l = new LinkedList<Object>();
+            put(key, l);
+        }
+        return l;
+    }    
 }

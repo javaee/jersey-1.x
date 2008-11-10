@@ -37,7 +37,7 @@
 
 package com.sun.jersey.impl.http.header;
 
-import com.sun.jersey.api.MediaTypes;
+import com.sun.jersey.core.header.MediaTypes;
 import java.util.List;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.Produces;

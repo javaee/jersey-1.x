@@ -35,7 +35,7 @@
  * holder.
  */
 
-package com.sun.jersey.api;
+package com.sun.jersey.core.util;
 
 import java.lang.reflect.Constructor;
 import java.util.ArrayList;

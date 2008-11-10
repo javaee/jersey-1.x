@@ -44,7 +44,7 @@ import com.sun.jersey.spi.container.ContainerListener;
 import com.sun.jersey.spi.container.ContainerRequest;
 import com.sun.jersey.spi.container.ContainerResponse;
 import com.sun.jersey.spi.container.ContainerResponseWriter;
-import com.sun.jersey.api.InBoundHeaders;
+import com.sun.jersey.core.header.InBoundHeaders;
 import com.sun.jersey.spi.container.WebApplication;
 import com.sun.net.httpserver.Headers;
 import com.sun.net.httpserver.HttpServer;

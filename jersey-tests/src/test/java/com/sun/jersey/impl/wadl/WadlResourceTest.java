@@ -41,7 +41,7 @@
 
 package com.sun.jersey.impl.wadl;
 
-import com.sun.jersey.api.MediaTypes;
+import com.sun.jersey.core.header.MediaTypes;
 import com.sun.jersey.impl.AbstractResourceTester;
 import com.sun.jersey.api.client.WebResource;
 import java.io.File;

@@ -37,7 +37,7 @@
 
 package com.sun.jersey.impl.model.method;
 
-import com.sun.jersey.api.MediaTypes;
+import com.sun.jersey.core.header.MediaTypes;
 import com.sun.jersey.api.core.HttpContext;
 import com.sun.jersey.api.uri.UriTemplate;
 import com.sun.jersey.spi.dispatch.RequestDispatcher;

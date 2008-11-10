@@ -37,7 +37,7 @@
 
 package com.sun.jersey.core.header.reader;
 
-import com.sun.jersey.api.MediaTypes;
+import com.sun.jersey.core.header.MediaTypes;
 import com.sun.jersey.core.header.AcceptableLanguageTag;
 import com.sun.jersey.core.header.AcceptableMediaType;
 import com.sun.jersey.core.header.AcceptableToken;

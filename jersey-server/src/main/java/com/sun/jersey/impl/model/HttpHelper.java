@@ -37,7 +37,7 @@
 
 package com.sun.jersey.impl.model;
 
-import com.sun.jersey.api.MediaTypes;
+import com.sun.jersey.core.header.MediaTypes;
 import com.sun.jersey.api.core.HttpRequestContext;
 import com.sun.jersey.impl.ImplMessages;
 import com.sun.jersey.core.header.AcceptableLanguageTag;

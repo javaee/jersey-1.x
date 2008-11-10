@@ -43,7 +43,7 @@ import com.sun.jersey.api.core.ResourceConfig;
 import com.sun.jersey.api.core.ClasspathResourceConfig;
 import com.sun.jersey.api.core.PackagesResourceConfig;
 import com.sun.jersey.api.uri.UriComponent;
-import com.sun.jersey.api.InBoundHeaders;
+import com.sun.jersey.core.header.InBoundHeaders;
 import com.sun.jersey.core.spi.component.ioc.IoCComponentProviderFactory;
 import com.sun.jersey.impl.container.servlet.JSPTemplateProcessor;
 import com.sun.jersey.impl.container.servlet.ServletContainerRequest;

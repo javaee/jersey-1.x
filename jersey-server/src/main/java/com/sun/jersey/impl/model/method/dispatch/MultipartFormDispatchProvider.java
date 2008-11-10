@@ -37,7 +37,7 @@
 
 package com.sun.jersey.impl.model.method.dispatch;
 
-import com.sun.jersey.api.MultivaluedMapImpl;
+import com.sun.jersey.core.util.MultivaluedMapImpl;
 import com.sun.jersey.api.container.ContainerException;
 import com.sun.jersey.api.core.HttpContext;
 import com.sun.jersey.api.model.AbstractResourceMethod;

@@ -37,9 +37,9 @@
 
 package com.sun.jersey.samples.extendedwadl;
 
-import com.sun.jersey.api.MediaTypes;
 import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.WebResource;
+import com.sun.jersey.core.header.MediaTypes;
 import java.io.File;
 import java.net.URI;
 import java.util.Collections;

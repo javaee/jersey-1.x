@@ -37,11 +37,11 @@
 package com.sun.jersey.samples.entityprovider;
 
 import com.sun.grizzly.http.SelectorThread;
-import com.sun.jersey.api.MediaTypes;
 import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.WebResource;
 import com.sun.jersey.api.representation.Form;
+import com.sun.jersey.core.header.MediaTypes;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.Properties;

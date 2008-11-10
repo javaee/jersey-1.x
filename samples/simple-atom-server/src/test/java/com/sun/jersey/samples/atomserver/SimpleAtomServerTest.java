@@ -38,10 +38,10 @@
 package com.sun.jersey.samples.atomserver;
 
 import com.sun.grizzly.http.SelectorThread;
-import com.sun.jersey.api.MediaTypes;
 import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.WebResource;
+import com.sun.jersey.core.header.MediaTypes;
 import com.sun.syndication.feed.atom.Entry;
 import com.sun.syndication.feed.atom.Feed;
 import java.util.Iterator;

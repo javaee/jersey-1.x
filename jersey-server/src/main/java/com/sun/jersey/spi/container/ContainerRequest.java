@@ -36,13 +36,13 @@
  */
 package com.sun.jersey.spi.container;
 
-import com.sun.jersey.api.InBoundHeaders;
+import com.sun.jersey.core.header.InBoundHeaders;
 import com.sun.jersey.api.Responses;
 import com.sun.jersey.api.container.MappableContainerException;
 import com.sun.jersey.api.core.HttpRequestContext;
 import com.sun.jersey.api.representation.Form;
 import com.sun.jersey.api.uri.UriComponent;
-import com.sun.jersey.api.MultivaluedMapImpl;
+import com.sun.jersey.core.util.MultivaluedMapImpl;
 import com.sun.jersey.impl.VariantSelector;
 import com.sun.jersey.core.header.AcceptableLanguageTag;
 import com.sun.jersey.core.header.reader.HttpHeaderReader;

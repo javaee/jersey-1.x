@@ -41,7 +41,7 @@ import com.sun.jersey.api.core.HttpResponseContext;
 import com.sun.jersey.api.core.ExtendedUriInfo;
 import com.sun.jersey.api.uri.UriComponent;
 import com.sun.jersey.api.uri.UriTemplate;
-import com.sun.jersey.api.MultivaluedMapImpl;
+import com.sun.jersey.core.util.MultivaluedMapImpl;
 import com.sun.jersey.impl.model.ResourceClass;
 import com.sun.jersey.spi.container.ContainerRequest;
 import com.sun.jersey.spi.container.ContainerResponse;

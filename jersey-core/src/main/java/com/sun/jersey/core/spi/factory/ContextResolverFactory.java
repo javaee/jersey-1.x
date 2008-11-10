@@ -36,7 +36,7 @@
  */
 package com.sun.jersey.core.spi.factory;
 
-import com.sun.jersey.api.MediaTypes;
+import com.sun.jersey.core.header.MediaTypes;
 import com.sun.jersey.core.spi.component.ProviderServices;
 import com.sun.jersey.core.util.KeyComparator;
 import com.sun.jersey.core.util.KeyComparatorHashMap;

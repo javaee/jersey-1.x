@@ -37,7 +37,7 @@
 
 package com.sun.jersey.impl.uri.rules;
 
-import com.sun.jersey.api.MediaTypes;
+import com.sun.jersey.core.header.MediaTypes;
 import com.sun.jersey.api.core.HttpRequestContext;
 import com.sun.jersey.api.core.HttpResponseContext;
 import com.sun.jersey.core.header.AcceptableMediaType;

@@ -43,7 +43,7 @@ import com.sun.syndication.feed.atom.Entry;
 import com.sun.syndication.feed.atom.Feed;
 import com.sun.jersey.api.client.WebResource;
 import com.sun.jersey.api.representation.Form;
-import com.sun.jersey.api.MultivaluedMapImpl;
+import com.sun.jersey.core.util.MultivaluedMapImpl;
 import com.sun.jersey.impl.provider.entity.AtomEntryProvider;
 import com.sun.jersey.impl.provider.entity.AtomFeedProvider;
 import com.sun.jersey.impl.provider.entity.FileProvider;

@@ -37,7 +37,7 @@
 
 package com.sun.jersey.impl;
 
-import com.sun.jersey.api.InBoundHeaders;
+import com.sun.jersey.core.header.InBoundHeaders;
 import junit.framework.*;
 
 /**

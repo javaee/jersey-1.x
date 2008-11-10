@@ -37,7 +37,7 @@
 
 package com.sun.jersey.api.representation;
 
-import com.sun.jersey.api.MultivaluedMapImpl;
+import com.sun.jersey.core.util.MultivaluedMapImpl;
 
 /**
  * An implementation of {@link javax.ws.rs.core.MultivaluedMap} that may be

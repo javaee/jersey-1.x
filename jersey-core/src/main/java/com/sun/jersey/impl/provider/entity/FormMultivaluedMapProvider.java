@@ -37,7 +37,7 @@
 
 package com.sun.jersey.impl.provider.entity;
 
-import com.sun.jersey.api.MultivaluedMapImpl;
+import com.sun.jersey.core.util.MultivaluedMapImpl;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;

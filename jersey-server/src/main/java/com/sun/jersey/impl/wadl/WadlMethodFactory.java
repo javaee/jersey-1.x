@@ -43,7 +43,7 @@ import java.util.Map;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 
-import com.sun.jersey.api.MediaTypes;
+import com.sun.jersey.core.header.MediaTypes;
 import com.sun.jersey.api.core.HttpContext;
 import com.sun.jersey.api.model.AbstractResource;
 import com.sun.jersey.api.uri.UriTemplate;

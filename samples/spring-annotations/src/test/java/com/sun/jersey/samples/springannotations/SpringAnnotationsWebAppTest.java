@@ -37,9 +37,9 @@
 
 package com.sun.jersey.samples.springannotations;
 
-import com.sun.jersey.api.MediaTypes;
 import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.WebResource;
+import com.sun.jersey.core.header.MediaTypes;
 import com.sun.jersey.samples.springannotations.model.Item;
 import com.sun.jersey.samples.springannotations.model.Item2;
 import java.io.File;
