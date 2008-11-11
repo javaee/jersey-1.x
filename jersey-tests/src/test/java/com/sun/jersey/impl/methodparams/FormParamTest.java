@@ -38,6 +38,7 @@ package com.sun.jersey.impl.methodparams;
 
 import com.sun.jersey.api.client.WebResource;
 import com.sun.jersey.api.representation.Form;
+import com.sun.jersey.core.header.FormDataContentDisposition;
 import com.sun.jersey.impl.AbstractResourceTester;
 import com.sun.jersey.impl.entity.JAXBBean;
 import java.math.BigDecimal;
@@ -130,11 +131,12 @@ public class FormParamTest extends AbstractResourceTester {
                 @FormParam("a") String a,
                 @FormParam("b") String b,
                 @FormParam("c") JAXBBean c,
+                @FormParam("c") FormDataContentDisposition cdc,
                 MimeMultipart m,
                 @Context UriInfo ui,
                 @QueryParam("a") String qa) throws Exception {
             assertEquals(3, m.getCount());
-            return a + b;
+            return a + b + cdc.getFileName();
         }
     }
 
@@ -146,11 +148,13 @@ public class FormParamTest extends AbstractResourceTester {
                 @FormParam("a") String a,
                 @FormParam("b") String b,
                 @FormParam("c") JAXBBean c,
+                @FormParam("c") FormDataContentDisposition cdc,
                 Form form,
                 @Context UriInfo ui,
                 @QueryParam("a") String qa) throws Exception {
             assertEquals(a, form.getFirst("a"));
             assertEquals(b, form.getFirst("b"));
+            assertNull(cdc);
             return a + b;
         }
     }
@@ -173,13 +177,13 @@ public class FormParamTest extends AbstractResourceTester {
         form.addBodyPart(bp);
 
         headers = new InternetHeaders();
-        headers.addHeader("content-disposition", "form-data; name=\"c\"");
+        headers.addHeader("content-disposition", "form-data; name=\"c\"; filename=\"file.xml\"");
         headers.addHeader("Content-type", "application/xml");
         bp = new MimeBodyPart(headers, "<jaxbBean><value>content</value></jaxbBean>".getBytes());
         form.addBodyPart(bp);
 
         String s = r.type("multipart/form-data").post(String.class, form);
-        assertEquals("foobar", s);
+        assertEquals("foobarfile.xml", s);
     }
 
     public void testMultipartFormParamWithForm() {

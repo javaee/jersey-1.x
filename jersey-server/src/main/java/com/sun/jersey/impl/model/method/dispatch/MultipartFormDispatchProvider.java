@@ -44,7 +44,6 @@ import com.sun.jersey.api.model.AbstractResourceMethod;
 import com.sun.jersey.api.model.Parameter;
 import com.sun.jersey.api.representation.Form;
 import com.sun.jersey.core.header.FormDataContentDisposition;
-import com.sun.jersey.core.header.reader.HttpHeaderReader;
 import com.sun.jersey.server.impl.inject.AbstractHttpContextInjectable;
 import com.sun.jersey.spi.MessageBodyWorkers;
 import com.sun.jersey.spi.dispatch.RequestDispatcher;
@@ -56,7 +55,6 @@ import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
-import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -82,7 +80,7 @@ public class MultipartFormDispatchProvider extends FormDispatchProvider {
         if (m != null && m.isCompatible(MULTIPART_FORM_DATA)) {
             MimeMultipart form = context.getRequest().getEntity(MimeMultipart.class);
             try {
-                Map<String, BodyPart> formMap = getFormData(form);
+                Map<String, FormDataBodyPart> formMap = getFormData(form);
                 context.getProperties().put("com.sun.jersey.api.representation.form", formMap);
                 context.getProperties().put("com.sun.jersey.api.representation.form.multipart", form);
             } catch(Exception e) {
@@ -127,6 +125,35 @@ public class MultipartFormDispatchProvider extends FormDispatchProvider {
         }        
     }
     
+    private static final class DispositionParamInjectable
+            extends AbstractHttpContextInjectable<FormDataContentDisposition> {
+
+        private final String name;
+
+        DispositionParamInjectable(Parameter p) {
+            this.name = p.getSourceName();
+        }
+
+        @Override
+        public FormDataContentDisposition getValue(HttpContext context) {
+            try {
+                Object o = context.getProperties().get("com.sun.jersey.api.representation.form");
+                if (o instanceof Form) {
+                    return null;
+                } else {
+                    Map<String, FormDataBodyPart> formMap = (Map<String, FormDataBodyPart>)o;
+                    FormDataBodyPart fdbp = formMap.get(name);
+                    if (fdbp == null)
+                        return null;
+                    else
+                        return fdbp.fdcd;
+                }
+            } catch (Exception ex) {
+                throw new ContainerException(ex);
+            }
+        }
+    }
+
     private static final class MultipartFormParamInjectable extends AbstractHttpContextInjectable<Object> {
         private final MessageBodyWorkers mbws;
         private final Parameter p;
@@ -147,7 +174,7 @@ public class MultipartFormDispatchProvider extends FormDispatchProvider {
                 if (o instanceof Form) {
                     return getAsForm((Form)o, context);                    
                 } else {
-                    return getAsMultipartFormData((Map<String, BodyPart>)o, context);
+                    return getAsMultipartFormData((Map<String, FormDataBodyPart>)o, context);
                 }                
             } catch (Exception ex) {
                 throw new ContainerException(ex);
@@ -180,15 +207,15 @@ public class MultipartFormDispatchProvider extends FormDispatchProvider {
         }
         
         @SuppressWarnings("unchecked")
-        private Object getAsMultipartFormData(Map<String, BodyPart> formMap, HttpContext context) 
+        private Object getAsMultipartFormData(Map<String, FormDataBodyPart> formMap, HttpContext context)
                 throws Exception {
-            BodyPart bp = formMap.get(p.getSourceName());
-            if (bp == null)
+            FormDataBodyPart fdbp = formMap.get(p.getSourceName());
+            if (fdbp == null)
                 return null;
 
-            MediaType m = (bp.getContentType() == null) 
+            MediaType m = (fdbp.bp.getContentType() == null)
                     ? MediaType.TEXT_PLAIN_TYPE 
-                    : MediaType.valueOf(bp.getContentType());
+                    : MediaType.valueOf(fdbp.bp.getContentType());
 
             MessageBodyReader r = mbws.getMessageBodyReader(
                     p.getParameterClass(), 
@@ -203,7 +230,7 @@ public class MultipartFormDispatchProvider extends FormDispatchProvider {
                         p.getAnnotations(),
                         m,
                         context.getRequest().getRequestHeaders(),
-                        bp.getInputStream());
+                        fdbp.bp.getInputStream());
             } else if (extractor != null) {
                 r = mbws.getMessageBodyReader(
                     String.class,
@@ -217,7 +244,7 @@ public class MultipartFormDispatchProvider extends FormDispatchProvider {
                         p.getAnnotations(),
                         m,
                         context.getRequest().getRequestHeaders(),
-                        bp.getInputStream());
+                        fdbp.bp.getInputStream());
                 MultivaluedMap<String, String> mvm = new MultivaluedMapImpl();
                 mvm.putSingle(p.getSourceName(), v);
                 return extractor.extract(mvm);
@@ -242,7 +269,11 @@ public class MultipartFormDispatchProvider extends FormDispatchProvider {
                     is.add(null);                    
                 }
             } else if (p.getAnnotation().annotationType() == FormParam.class) {
-                is.add(new MultipartFormParamInjectable(mbws, p));
+                if (FormDataContentDisposition.class == p.getParameterClass()) {
+                    is.add(new DispositionParamInjectable(p));
+                } else {
+                    is.add(new MultipartFormParamInjectable(mbws, p));
+                }
             } else {
                 Injectable injectable = sipc.getInjectable(p, ComponentScope.PerRequest);
                 is.add(injectable);
@@ -250,9 +281,19 @@ public class MultipartFormDispatchProvider extends FormDispatchProvider {
         }
         return is;
     }    
-    
-    private static Map<String, BodyPart> getFormData(MimeMultipart mm) throws Exception {
-        Map<String, BodyPart> m = new HashMap<String, BodyPart>();
+
+    private static class FormDataBodyPart {
+        final BodyPart bp;
+        final FormDataContentDisposition fdcd;
+        
+        FormDataBodyPart(BodyPart bp, FormDataContentDisposition fdcd) {
+            this.bp = bp;
+            this.fdcd = fdcd;
+        }
+    }
+
+    private static Map<String, FormDataBodyPart> getFormData(MimeMultipart mm) throws Exception {
+        Map<String, FormDataBodyPart> m = new HashMap<String, FormDataBodyPart>();
         
         for (int i = 0; i < mm.getCount(); i++) {
             BodyPart b = mm.getBodyPart(i);
@@ -261,7 +302,7 @@ public class MultipartFormDispatchProvider extends FormDispatchProvider {
                 FormDataContentDisposition fdcd = new FormDataContentDisposition(
                         b.getHeader("content-disposition")[0]);
                 if (fdcd.getName() != null)
-                    m.put(fdcd.getName(), b);
+                    m.put(fdcd.getName(), new FormDataBodyPart(b, fdcd));
             }
         }
         return m;
