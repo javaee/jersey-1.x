@@ -2,7 +2,7 @@
 package $package;
 
 import com.sun.grizzly.http.SelectorThread;
-import com.sun.jersey.api.MediaTypes;
+import com.sun.jersey.core.header.MediaTypes;
 import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.WebResource;
 import junit.framework.TestCase;
