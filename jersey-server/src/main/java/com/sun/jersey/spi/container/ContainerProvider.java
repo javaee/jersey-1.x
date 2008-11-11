@@ -66,8 +66,8 @@ public interface ContainerProvider<T> {
     /**
      * Create an container of type T.
      * <p>
-     * The container provider is responsible for initiating the Web application
-     * with the resource configuration.
+     * The container provider SHOULD NOT initiate the Web application. The container
+     * provider MAY modify the resource configuraton.
      * <p>
      * @return the container, otherwise null if the provider does not support
      *         the requested <code>type</code>.
@@ -77,6 +77,7 @@ public interface ContainerProvider<T> {
      *         the handling of HTTP requests.
      * @throws ContainerException if there is an error creating the container.
      */
-    T createContainer(Class<T> type, ResourceConfig resourceConfig, WebApplication application) 
+    T createContainer(Class<T> type, ResourceConfig resourceConfig, 
+            WebApplication application)
     throws ContainerException;
 }

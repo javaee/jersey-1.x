@@ -54,12 +54,11 @@ public class GrizzlyContainerProvider implements ContainerProvider<Adapter> {
     }
     
     public Adapter createContainer(Class<Adapter> type, 
-            ResourceConfig resourceConfig, WebApplication application) throws ContainerException {
+            ResourceConfig resourceConfig, 
+            WebApplication application) throws ContainerException {
         if (type != Adapter.class)
             return null;
         
-        GrizzlyContainer c = new GrizzlyContainer(application);
-        application.initiate(resourceConfig);
-        return c;
+        return new GrizzlyContainer(application);
     }
 }

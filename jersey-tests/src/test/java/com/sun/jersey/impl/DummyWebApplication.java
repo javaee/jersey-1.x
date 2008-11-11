@@ -54,6 +54,10 @@ import java.io.IOException;
  */
 public class DummyWebApplication implements WebApplication {
 
+    public boolean isInitiated() {
+        return true;
+    }
+    
     public void initiate(ResourceConfig resourceConfig) throws IllegalArgumentException, ContainerException {
     }
 

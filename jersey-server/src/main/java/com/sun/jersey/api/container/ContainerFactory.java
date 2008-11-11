@@ -40,6 +40,7 @@ package com.sun.jersey.api.container;
 import com.sun.jersey.api.core.DefaultResourceConfig;
 import com.sun.jersey.api.core.ResourceConfig;
 import com.sun.jersey.api.core.ClasspathResourceConfig;
+import com.sun.jersey.core.spi.component.ioc.IoCComponentProviderFactory;
 import com.sun.jersey.spi.container.ContainerProvider;
 import com.sun.jersey.spi.container.ContainerListener;
 import com.sun.jersey.spi.container.ContainerNotifier;
@@ -83,7 +84,8 @@ public final class ContainerFactory {
         Set<Class<?>> resourceClassesSet = new HashSet<Class<?>>(
                 Arrays.asList(resourceClasses));
         
-        return createContainer(type, new DefaultResourceConfig(resourceClassesSet));
+        return createContainer(type, new DefaultResourceConfig(resourceClassesSet),
+                null);
     }
     
     /**
@@ -104,7 +106,8 @@ public final class ContainerFactory {
     @SuppressWarnings("unchecked")
     public static <A> A createContainer(Class<A> type, Set<Class<?>> resourceClasses)
     throws ContainerException, IllegalArgumentException {
-        return createContainer(type, new DefaultResourceConfig(resourceClasses));
+        return createContainer(type, new DefaultResourceConfig(resourceClasses),
+                null);
     }
     
     /**
@@ -122,19 +125,50 @@ public final class ContainerFactory {
      * @throws ContainerException if there is an error creating the container.
      * @throws IllegalArgumentException if no container provider supports the type.
      */
-    @SuppressWarnings("unchecked")
     public static <A> A createContainer(Class<A> type, ResourceConfig resourceConfig)
+    throws ContainerException, IllegalArgumentException {
+        return createContainer(type, resourceConfig, null);
+    }
+
+    /**
+     * Create a container according to the class requested.
+     * <p>
+     * The list of service-provider supporting the {@link ContainerProvider}
+     * service-provider will be iterated over until one returns a non-null
+     * container instance.
+     * <p>
+     * @param <A> the type of the container.
+     * @param type the type of the container.
+     * @param resourceConfig the resource configuration containing the set
+     *        of Web resources to be managed by the Web application.
+     * @param factory the IoC component provider factory the web application
+     *        delegates to for obtaining instances of resource and provider
+     *        classes. May be null if the web application is responsible for
+     *        instantiating resource and provider classes.
+     * @return the container.
+     * @throws ContainerException if there is an error creating the container.
+     * @throws IllegalArgumentException if no container provider supports the type.
+     */
+    @SuppressWarnings("unchecked")
+    public static <A> A createContainer(Class<A> type, ResourceConfig resourceConfig,
+            IoCComponentProviderFactory factory)
     throws ContainerException, IllegalArgumentException {
         WebApplication wa = WebApplicationFactory.createWebApplication();
         
-        // Revese the order so that applications may override
+        // Reverse the order so that applications may override
         LinkedList<ContainerProvider> cps = new LinkedList<ContainerProvider>();
         for (ContainerProvider cp : ServiceFinder.find(ContainerProvider.class, true))
             cps.addFirst(cp);
         
         for (ContainerProvider<A> cp : cps) {
             A c = cp.createContainer(type, resourceConfig, wa);
-            if (c != null) {        
+            if (c != null) {
+                // Initiate the web application
+                if (!wa.isInitiated()) {
+                    wa.initiate(resourceConfig, factory);
+                }
+
+                // Register a container listener
                 Object o = resourceConfig.getProperties().get(
                         ResourceConfig.PROPERTY_CONTAINER_NOTIFIER);
                 if (o instanceof ContainerNotifier && 
@@ -169,7 +203,7 @@ public final class ContainerFactory {
         try {
             Class<?> resourcesClass = ContainerFactory.class.getClassLoader().loadClass(resourcesClassName);
             ResourceConfig config = (ResourceConfig) resourcesClass.newInstance();
-            return createContainer(type, config);
+            return createContainer(type, config, null);
         } catch (ClassNotFoundException e) {
             throw new ContainerException(e);
         } catch (InstantiationException e) {
@@ -212,7 +246,7 @@ public final class ContainerFactory {
      */
     public static <A> A createContainer(Class<A> type, String... paths) {
         ClasspathResourceConfig config = new ClasspathResourceConfig(paths);
-        return createContainer(type, config);
+        return createContainer(type, config, null);
     }
     
 }

@@ -50,13 +50,13 @@ import com.sun.jersey.spi.container.WebApplication;
  */
 public final class HttpHandlerContainerProvider implements ContainerProvider<HttpHandler> {
     
-    public HttpHandler createContainer(Class<HttpHandler> type, 
-            ResourceConfig resourceConfig, WebApplication application) throws ContainerException {
+    public HttpHandler createContainer(
+            Class<HttpHandler> type,
+            ResourceConfig resourceConfig, 
+            WebApplication application) throws ContainerException {
         if (type != HttpHandler.class)
             return null;
         
-        HttpHandlerContainer c = new HttpHandlerContainer(application);
-        application.initiate(resourceConfig);
-        return c;
+        return new HttpHandlerContainer(application);
     }
 }

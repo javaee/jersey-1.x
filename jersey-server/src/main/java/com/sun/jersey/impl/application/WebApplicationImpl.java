@@ -311,6 +311,10 @@ public final class WebApplicationImpl implements WebApplication {
         }
     }
 
+    public boolean isInitiated () {
+        return initiated;
+    }
+
     public void initiate(ResourceConfig resourceConfig) {
         initiate(resourceConfig, null);
     }

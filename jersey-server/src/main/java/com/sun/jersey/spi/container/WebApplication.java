@@ -55,6 +55,12 @@ import java.io.IOException;
  */
 public interface WebApplication {
     /**
+     *
+     * @return true if th web application is initiated, otherwise false.
+     */
+    boolean isInitiated();
+
+    /**
      * Initiate the Web application.
      * <p>
      * This method can only be called once. Further calls will result in an

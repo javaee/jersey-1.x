@@ -40,6 +40,8 @@ import com.sun.grizzly.http.SelectorThread;
 import com.sun.grizzly.standalone.StaticStreamAlgorithm;
 import com.sun.grizzly.tcp.Adapter;
 import com.sun.jersey.api.container.ContainerFactory;
+import com.sun.jersey.api.core.ResourceConfig;
+import com.sun.jersey.core.spi.component.ioc.IoCComponentProviderFactory;
 import java.io.IOException;
 import java.net.URI;
 
@@ -79,8 +81,8 @@ public final class GrizzlyServerFactory {
     
     /**
      * Create a {@link SelectorThread} that registers an {@link Adapter} that 
-     * in turn manages all root resource and provder classes found by searching the classes
-     * referenced in the java classath.
+     * in turn manages all root resource and provder classes found by searching 
+     * the classes referenced in the java classath.
      * <p>
      * This implementation defers to the 
      * {@link ContainerFactory#createContainer(Class)} method for creating
@@ -99,6 +101,114 @@ public final class GrizzlyServerFactory {
         return create(u, ContainerFactory.createContainer(Adapter.class));
     }
         
+    /**
+     * Create a {@link SelectorThread} that registers an {@link Adapter} that
+     * in turn manages all root resource and provder classes declared by the
+     * resource configuration.
+     * <p>
+     * This implementation defers to the
+     * {@link ContainerFactory#createContainer(Class, ResourceConfig)} method
+     * for creating an Adapter that manages the root resources.
+     *
+     * @param u the URI to create the http server. The URI scheme must be
+     *        equal to "http". The URI user information and host
+     *        are ignored If the URI port is not present then port 80 will be
+     *        used. The URI path, query and fragment components are ignored.
+     * @param rc the resource configuration.
+     * @return the select thread, with the endpoint started
+     * @throws IOException if an error occurs creating the container.
+     * @throws IllegalArgumentException if <code>u</code> is null
+     */
+    public static SelectorThread create(String u, ResourceConfig rc)
+            throws IOException, IllegalArgumentException {
+        if (u == null)
+            throw new IllegalArgumentException("The URI must not be null");
+
+        return create(URI.create(u), rc);
+    }
+
+    /**
+     * Create a {@link SelectorThread} that registers an {@link Adapter} that
+     * in turn manages all root resource and provder classes declared by the
+     * resource configuration.
+     * <p>
+     * This implementation defers to the
+     * {@link ContainerFactory#createContainer(Class, ResourceConfig)} method
+     * for creating an Adapter that manages the root resources.
+     *
+     * @param u the URI to create the http server. The URI scheme must be
+     *        equal to "http". The URI user information and host
+     *        are ignored If the URI port is not present then port 80 will be
+     *        used. The URI path, query and fragment components are ignored.
+     * @param rc the resource configuration.
+     * @return the select thread, with the endpoint started
+     * @throws IOException if an error occurs creating the container.
+     * @throws IllegalArgumentException if <code>u</code> is null
+     */
+    public static SelectorThread create(URI u, ResourceConfig rc)
+            throws IOException, IllegalArgumentException {
+        return create(u, ContainerFactory.createContainer(Adapter.class, rc));
+    }
+
+    /**
+     * Create a {@link SelectorThread} that registers an {@link Adapter} that
+     * in turn manages all root resource and provder classes declared by the
+     * resource configuration.
+     * <p>
+     * This implementation defers to the
+     * {@link ContainerFactory#createContainer(Class, ResourceConfig, IoCComponentProviderFactory)} method
+     * for creating an Adapter that manages the root resources.
+     *
+     * @param u the URI to create the http server. The URI scheme must be
+     *        equal to "http". The URI user information and host
+     *        are ignored If the URI port is not present then port 80 will be
+     *        used. The URI path, query and fragment components are ignored.
+     * @param rc the resource configuration.
+     * @param factory the IoC component provider factory the web application
+     *        delegates to for obtaining instances of resource and provider
+     *        classes. May be null if the web application is responsible for
+     *        instantiating resource and provider classes.
+     * @return the select thread, with the endpoint started
+     * @throws IOException if an error occurs creating the container.
+     * @throws IllegalArgumentException if <code>u</code> is null
+     */
+    public static SelectorThread create(String u, ResourceConfig rc,
+            IoCComponentProviderFactory factory)
+            throws IOException, IllegalArgumentException {
+        if (u == null)
+            throw new IllegalArgumentException("The URI must not be null");
+
+        return create(URI.create(u), rc, factory);
+    }
+
+    /**
+     * Create a {@link SelectorThread} that registers an {@link Adapter} that
+     * in turn manages all root resource and provder classes declared by the
+     * resource configuration.
+     * <p>
+     * This implementation defers to the
+     * {@link ContainerFactory#createContainer(Class, ResourceConfig, IoCComponentProviderFactory)} method
+     * for creating an Adapter that manages the root resources.
+     *
+     * @param u the URI to create the http server. The URI scheme must be
+     *        equal to "http". The URI user information and host
+     *        are ignored If the URI port is not present then port 80 will be
+     *        used. The URI path, query and fragment components are ignored.
+     * @param rc the resource configuration.
+     * @param factory the IoC component provider factory the web application
+     *        delegates to for obtaining instances of resource and provider
+     *        classes. May be null if the web application is responsible for
+     *        instantiating resource and provider classes.
+     * @return the select thread, with the endpoint started
+     * @throws IOException if an error occurs creating the container.
+     * @throws IllegalArgumentException if <code>u</code> is null
+     */
+    public static SelectorThread create(URI u, ResourceConfig rc,
+            IoCComponentProviderFactory factory)
+            throws IOException, IllegalArgumentException {
+        return create(u, ContainerFactory.createContainer(Adapter.class, rc, factory));
+    }
+
     /**
      * Create a {@link SelectorThread} that registers an {@link Adapter} that 
      * in turn manages all root resource and provder classes found by searching the classes

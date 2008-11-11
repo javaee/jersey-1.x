@@ -1,4 +1,12 @@
 release 1.0.1 (2008-11/12)
+- The following classes have been modified to include the creation of
+  a container with an instance of an IoCContainerProviderFactory:
+  - com.sun.jersey.api.container.ContainerFactory
+  - com.sun.jersey.api.container.httpserver.HttpServerFactory
+  - com.sun.jersey.api.container.grizzly.GrizzlyServerFactory
+  A com.sun.jersey.spi.container.ContainerProvider implementaton should not
+  initiate the web application, otherwise the IoCContainerProviderFactory
+  instance cannot be set.
 - The following classes in jersey-core have moved:
   - The following classes in package "com.sun.jersey.api" have moved to
     the package "com.sun.jersey.core.header": InBoundHeaders, MediaTypes and

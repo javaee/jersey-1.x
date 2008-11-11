@@ -39,6 +39,7 @@ package com.sun.jersey.impl.provider;
 
 import com.sun.jersey.api.container.ContainerFactory;
 import com.sun.jersey.api.core.ApplicationAdapter;
+import com.sun.jersey.api.core.ResourceConfig;
 import com.sun.jersey.impl.ResponseBuilderImpl;
 import com.sun.jersey.api.uri.UriBuilderImpl;
 import com.sun.jersey.spi.HeaderDelegateProvider;
@@ -110,8 +111,13 @@ public class RuntimeDelegateImpl extends RuntimeDelegate {
     public <T> T createEndpoint(Application application, 
             Class<T> endpointType) 
             throws IllegalArgumentException, UnsupportedOperationException {
-        return ContainerFactory.createContainer(endpointType, 
-                new ApplicationAdapter(application));
+        if (application instanceof ResourceConfig) {
+            return ContainerFactory.createContainer(endpointType,
+                    (ResourceConfig)application);
+        } else {
+            return ContainerFactory.createContainer(endpointType,
+                    new ApplicationAdapter(application));
+        }
     }
     
     @Override
