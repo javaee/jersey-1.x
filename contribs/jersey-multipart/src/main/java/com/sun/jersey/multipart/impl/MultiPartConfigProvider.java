@@ -37,13 +37,13 @@
 
 package com.sun.jersey.multipart.impl;
 
-import com.sun.jersey.multipart.MultiPartConfigParam;
 import com.sun.jersey.multipart.MultiPartConfig;
 import com.sun.jersey.core.spi.component.ComponentContext;
 import com.sun.jersey.core.spi.component.ComponentScope;
 import com.sun.jersey.spi.inject.Injectable;
 import com.sun.jersey.spi.inject.InjectableProvider;
 import java.lang.reflect.Type;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.ext.Provider;
 
 /**
@@ -51,24 +51,20 @@ import javax.ws.rs.ext.Provider;
  * of {@link MultiPartConfig} for this application.</p>
  */
 @Provider
-public class MultiPartConfigProvider implements InjectableProvider<MultiPartConfigParam, Type> {
+public class MultiPartConfigProvider implements InjectableProvider<Context, Type> {
 
     public ComponentScope getScope() {
         return ComponentScope.Singleton;
     }
 
-    public Injectable getInjectable(ComponentContext ic, MultiPartConfigParam a, Type t) {
-        if (!(t instanceof Class)) {
-            System.out.println("Type " + t.toString() + " is not a Class"); // FIXME - remove debug statement
+    public Injectable<MultiPartConfig> getInjectable(ComponentContext ic, Context a, Type t) {
+        if (MultiPartConfig.class != t) {
             return null;
         }
-        if (((Class) t).isPrimitive()) {
-            System.out.println("Type " + t.toString() + " is a primitive"); // FIXME - remove debug statement
-            return null;
-        }
-        return new Injectable<Object>() {
-            public Object getValue() {
-                return new MultiPartConfig();
+        final MultiPartConfig mpc = new MultiPartConfig();
+        return new Injectable<MultiPartConfig>() {
+            public MultiPartConfig getValue() {
+                return mpc;
             }
         };
     }

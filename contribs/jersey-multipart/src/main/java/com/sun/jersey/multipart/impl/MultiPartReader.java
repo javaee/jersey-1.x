@@ -40,7 +40,6 @@ package com.sun.jersey.multipart.impl;
 import com.sun.jersey.multipart.BodyPart;
 import com.sun.jersey.multipart.BodyPartEntity;
 import com.sun.jersey.multipart.MultiPart;
-import com.sun.jersey.multipart.MultiPartConfigParam;
 import com.sun.jersey.multipart.MultiPartConfig;
 import java.io.IOException;
 import java.io.InputStream;
@@ -74,8 +73,8 @@ public class MultiPartReader implements MessageBodyReader<MultiPart> {
      * <p>Accept constructor injection of the configuration parameters for this
      * application.</p>
      */
-    public MultiPartReader(@MultiPartConfigParam MultiPartConfig config) {
-        System.out.println("MultiPartConfig = " + config);
+    public MultiPartReader(@Context MultiPartConfig config) {
+//        System.out.println("MultiPartConfig = " + config);
         this.config = config;
     }
 
@@ -139,7 +138,6 @@ public class MultiPartReader implements MessageBodyReader<MultiPart> {
         multiPart.setMediaType(mediaType);
 
         // Transliterate each body part as well
-        Annotation[] emptyAnnotations = new Annotation[0];
         try {
             int count = mm.getCount();
             for (int i = 0; i < count; i++) {
