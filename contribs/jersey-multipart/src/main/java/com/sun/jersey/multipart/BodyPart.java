@@ -37,9 +37,12 @@
 
 package com.sun.jersey.multipart;
 
-import java.io.ByteArrayInputStream;
+import com.sun.jersey.core.header.ParameterizedHeader;
 import java.io.IOException;
+import java.lang.String;
 import java.lang.annotation.Annotation;
+import java.text.ParseException;
+import java.util.Collections;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.ext.MessageBodyReader;
@@ -131,6 +134,19 @@ public class BodyPart {
      */
     public MultivaluedMap<String, String> getHeaders() {
         return this.headers;
+    }
+
+
+    /**
+     * <p>Return an immutable map of parameterized HTTP header value(s) for this
+     * {@link BodyPart}, keyed by header name.  Key comparisons in the
+     * returned map must be case-insensitive.  If you wish to modify the
+     * headers map for this {@link BodyPart}, modify the map returned by
+     * <code>getHeaders()</code> instead.</p>
+     */
+    public MultivaluedMap<String, ParameterizedHeader> getParameterizedHeaders() throws ParseException {
+        return (MultivaluedMap<String,ParameterizedHeader>)
+          Collections.unmodifiableMap(new ParameterizedHeadersMap(headers));
     }
 
 

@@ -144,7 +144,25 @@ public class HeadersMapTest extends TestCase {
         // FIXME - detailed tests for the HeadersEntries methods
     }
 
-    // FIXME - testEquals()
+    public void testEqualsAndHashCode() {
+        HeadersMap map2 = new HeadersMap();
+        List valuesFoo = new ArrayList();
+        valuesFoo.add("foo1");
+        valuesFoo.add("foo2");
+        map.put("foo", valuesFoo);
+        map2.put("foo", valuesFoo);
+        List valuesBar = new ArrayList();
+        valuesBar.add("bar1");
+        valuesBar.add("bar2");
+        map.put("bar", valuesBar);
+        map2.put("bar", valuesBar);
+        assertTrue(map.equals(map2));
+        assertTrue(map2.equals(map));
+        assertEquals(map.hashCode(), map2.hashCode());
+        map2.remove("bar");
+        assertTrue(!map.equals(map2));
+        assertTrue(!map2.equals(map));
+    }
 
     /**
      * Test of get method, of class HeadersMap.
@@ -173,8 +191,6 @@ public class HeadersMapTest extends TestCase {
         assertEquals(3, map.get("foo").size());
         assertEquals("bar", map.getFirst("foo"));
     }
-
-    // FIXME - testHashCode()
 
     /**
      * Test of isEmpty method, of class HeadersMap.
