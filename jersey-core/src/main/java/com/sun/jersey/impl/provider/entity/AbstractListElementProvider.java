@@ -218,6 +218,6 @@ public abstract class AbstractListElementProvider extends AbstractJAXBProvider<C
     }
 
     protected final String getRootElementName(Class<?> elementType) {
-        return convertToXmlName(inflector.pluralize(inflector.demodulize(elementType.getName())));
+        return convertToXmlName(inflector.decapitalize(inflector.pluralize(inflector.demodulize(elementType.getName()))));
     }    
 }

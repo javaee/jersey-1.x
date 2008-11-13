@@ -626,6 +626,23 @@ public class Inflector {
 
     }
 
+    public String decapitalize(String word) {
+        // do nothing if null or empty
+        if ((word == null) || (word.length() < 1)) {
+            return word;
+        }
+        // or if already decapitalized
+        char first =  word.charAt(0);
+        if (Character.isLowerCase(first)) {
+            return word;
+        }
+        // otherwise turn the first character to lower case and attach the rest
+        StringBuilder sb = new StringBuilder(word.length());
+        sb.append(Character.toLowerCase(first));
+        sb.append(word.substring(1));
+        return sb.toString();
+    }
+
     /**
      * <p>The reverse of <code>camelize()</code>, makes an underscored form
      * from the expression in the string.  Changes "." to "/" to convert
