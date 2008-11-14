@@ -36,8 +36,6 @@
  */
 package com.sun.jersey.spi.spring.container;
 
-import com.sun.jersey.api.core.ResourceConfig;
-import com.sun.jersey.api.spring.Autowire;
 import java.lang.annotation.Annotation;
 import java.util.Arrays;
 import java.util.Collection;
@@ -49,7 +47,10 @@ import org.springframework.aop.framework.Advised;
 import org.springframework.aop.support.AopUtils;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ConfigurableApplicationContext;
+import org.springframework.util.ClassUtils;
 
+import com.sun.jersey.api.core.ResourceConfig;
+import com.sun.jersey.api.spring.Autowire;
 import com.sun.jersey.core.spi.component.ComponentContext;
 import com.sun.jersey.core.spi.component.ComponentScope;
 import com.sun.jersey.core.spi.component.ioc.IoCComponentProvider;
@@ -80,7 +81,7 @@ public class SpringComponentProviderFactory implements IoCComponentProviderFacto
     private void register(ResourceConfig rc, ConfigurableApplicationContext springContext) {
         String[] names = springContext.getBeanDefinitionNames();
         for (String name : names) {
-            Class type = springContext.getType(name);
+            Class<?> type = ClassUtils.getUserClass( springContext.getType(name) );
             if (ResourceConfig.isProviderClass(type)) {
                 LOGGER.info("Registering Spring bean, " + name + 
                         ", of type " + type.getName() +
