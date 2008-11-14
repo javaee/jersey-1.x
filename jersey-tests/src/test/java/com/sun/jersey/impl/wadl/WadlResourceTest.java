@@ -41,21 +41,20 @@
 
 package com.sun.jersey.impl.wadl;
 
-import com.sun.jersey.core.header.MediaTypes;
-import com.sun.jersey.impl.AbstractResourceTester;
-import com.sun.jersey.api.client.WebResource;
 import java.io.File;
 import java.io.IOException;
 import java.util.Iterator;
 import java.util.Properties;
+
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
+import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
 import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
 import javax.xml.XMLConstants;
 import javax.xml.namespace.NamespaceContext;
 import javax.xml.parsers.DocumentBuilder;
@@ -71,8 +70,16 @@ import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
+
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
+
+import com.sun.jersey.api.client.WebResource;
+import com.sun.jersey.api.representation.Form;
+import com.sun.jersey.core.header.FormDataContentDisposition;
+import com.sun.jersey.core.header.MediaTypes;
+import com.sun.jersey.impl.AbstractResourceTester;
+import com.sun.jersey.impl.entity.JAXBBean;
 
 /**
  *
@@ -380,6 +387,59 @@ public class WadlResourceTest extends AbstractResourceTester {
         
     }
     
+    @Path("form")
+    public static class FormResource {
+        
+        @POST
+        @Consumes( "multipart/form-data" )
+        public void post(
+                @FormParam( "a" ) String a,
+                @FormParam( "b" ) String b,
+                @FormParam( "c" ) JAXBBean c,
+                @FormParam( "c" ) FormDataContentDisposition cdc,
+                Form form ) {
+        }
+        
+    }
+    
+    public void testFormParam() throws ParserConfigurationException, SAXException, IOException, XPathExpressionException {
+        initiateWebApplication(FormResource.class);
+        WebResource r = resource("/application.wadl");
+        
+        File tmpFile = r.get(File.class);
+        DocumentBuilderFactory bf = DocumentBuilderFactory.newInstance();
+        bf.setNamespaceAware(true);
+        bf.setValidating(false);
+        bf.setXIncludeAware(false);
+        DocumentBuilder b = bf.newDocumentBuilder();
+        Document d = b.parse(tmpFile);
+        printSource(new DOMSource(d));
+        XPath xp = XPathFactory.newInstance().newXPath();
+        xp.setNamespaceContext(new NSResolver("wadl", "http://research.sun.com/wadl/2006/10"));
+        
+        final String requestPath = "//wadl:resource[@path='form']/wadl:method[@name='POST']/wadl:request";
+        final String representationPath = requestPath + "/wadl:representation";
+
+        // check number of request params is zero
+        int count = ( (Double)xp.evaluate("count(" + requestPath + "/wadl:param)", d, XPathConstants.NUMBER) ).intValue();
+        assertEquals( 0, count );
+        
+        // check number of request representations is one
+        count = ( (Double)xp.evaluate("count(" + representationPath + ")", d, XPathConstants.NUMBER) ).intValue();
+        assertEquals( 1, count );
+        
+        // check number of request representation params is three
+        count = ( (Double)xp.evaluate("count(" + representationPath + "/wadl:param)", d, XPathConstants.NUMBER) ).intValue();
+        assertEquals( 3, count );
+        
+        // check the style of the request representation param is 'query'
+        String val = (String)xp.evaluate( representationPath + "/wadl:param[@name='a']/@style", d, XPathConstants.STRING);
+        assertEquals( "query", val );
+        val = (String)xp.evaluate( representationPath + "/wadl:param[@name='b']/@style", d, XPathConstants.STRING);
+        assertEquals( "query", val );
+        
+    }
+    
     private static class NSResolver implements NamespaceContext {
         private String prefix;
         private String nsURI;
@@ -407,7 +467,6 @@ public class WadlResourceTest extends AbstractResourceTester {
             return null;
         }
     }
-
     
     private static void printSource(Source source) {
         try {

@@ -37,14 +37,17 @@
 
 package com.sun.jersey.impl.wadl;
 
-import com.sun.jersey.api.model.AbstractMethod;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import javax.ws.rs.FormParam;
 import javax.ws.rs.core.MediaType;
+import javax.xml.namespace.QName;
 
+import com.sun.jersey.api.model.AbstractMethod;
 import com.sun.jersey.api.model.AbstractResource;
 import com.sun.jersey.api.model.AbstractResourceMethod;
 import com.sun.jersey.api.model.AbstractSubResourceLocator;
@@ -61,8 +64,6 @@ import com.sun.research.ws.wadl.Request;
 import com.sun.research.ws.wadl.Resource;
 import com.sun.research.ws.wadl.Resources;
 import com.sun.research.ws.wadl.Response;
-import javax.ws.rs.core.UriInfo;
-import javax.xml.namespace.QName;
 
 /**
  * This class implements the algorithm how the wadl is built for one or more
@@ -173,10 +174,21 @@ public final class WadlBuilder {
         for (Parameter p: m.getParameters()) {
             if (p.getSource()==Parameter.Source.ENTITY) {
                 for (MediaType mediaType: m.getSupportedInputTypes()) {
-                    RepresentationType wadlRepresentation = _wadlGenerator.createRequestRepresentation( r, m, mediaType );
-                    wadlRequest.getRepresentation().add(wadlRepresentation);
+                    setRepresentationForMediaType( r, m, mediaType, wadlRequest );
                 }
-            } else {
+            }
+            else if ( p.getAnnotation().annotationType() == FormParam.class ) {
+                for ( MediaType mediaType: m.getSupportedInputTypes() ) {
+                    final RepresentationType wadlRepresentation = setRepresentationForMediaType( r, m, mediaType, wadlRequest );
+                    if ( getParamByName( wadlRepresentation.getParam(), p.getSourceName() ) == null ) {
+                        final Param wadlParam = generateParam( r, m, p );
+                        if ( wadlParam != null ) {
+                            wadlRepresentation.getParam().add( wadlParam );
+                        }
+                    }
+                }
+            }
+            else {
                 Param wadlParam = generateParam( r, m, p );
                 if (wadlParam == null)
                     continue;
@@ -190,6 +202,46 @@ public final class WadlBuilder {
             return null;
         else
             return wadlRequest;
+    }
+
+    private Param getParamByName( final List<Param> params, final String name ) {
+        for( Param param : params ) {
+            if ( param.getName().equals( name ) ) {
+                return param;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Create the wadl {@link RepresentationType} for the specified {@link MediaType} if not yet
+     * existing for the wadl {@link Request} and return it.
+     * @param r the resource
+     * @param m the resource method
+     * @param mediaType an accepted media type of the resource method
+     * @param wadlRequest the wadl request the wadl representation is to be created for (if not yet existing).
+     * @author Martin Grotzke
+     * @return the wadl request representation for the specified {@link MediaType}.
+     */
+    private RepresentationType setRepresentationForMediaType( AbstractResource r,
+            final AbstractResourceMethod m, MediaType mediaType,
+            Request wadlRequest ) {
+        RepresentationType wadlRepresentation = getRepresentationByMediaType( wadlRequest.getRepresentation(), mediaType );
+        if ( wadlRepresentation == null ) {
+            wadlRepresentation = _wadlGenerator.createRequestRepresentation( r, m, mediaType );
+            wadlRequest.getRepresentation().add(wadlRepresentation);
+        }
+        return wadlRepresentation;
+    }
+
+    private RepresentationType getRepresentationByMediaType(
+            final List<RepresentationType> representations, MediaType mediaType ) {
+        for( RepresentationType representation : representations ) {
+            if ( mediaType.toString().equals( representation.getMediaType() ) ) {
+                return representation;
+            }
+        }
+        return null;
     }
 
     private Param generateParam(AbstractResource r, AbstractMethod m, final Parameter p) {

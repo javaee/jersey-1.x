@@ -38,6 +38,8 @@
 package com.sun.jersey.impl.wadl;
 
 import com.sun.jersey.api.model.AbstractMethod;
+
+import javax.ws.rs.FormParam;
 import javax.ws.rs.core.MediaType;
 import javax.xml.bind.JAXBElement;
 import javax.xml.namespace.QName;
@@ -105,22 +107,32 @@ public final class WadlGeneratorImpl implements WadlGenerator {
     public Param createParam( AbstractResource r, AbstractMethod m, final Parameter p ) {
         Param wadlParam = new Param();
         wadlParam.setName(p.getSourceName());
-        switch (p.getSource()) {
-            case QUERY: 
-                wadlParam.setStyle(ParamStyle.QUERY);
-                break;
-            case MATRIX:
-                wadlParam.setStyle(ParamStyle.MATRIX);
-                break;
-            case PATH:
-                wadlParam.setStyle(ParamStyle.TEMPLATE);
-                break;
-            case HEADER:
-                wadlParam.setStyle(ParamStyle.HEADER);
-                break;
-            default:
-                break;
+
+        /* the form param right now has no Parameter.Source representation
+         * and requires some special handling
+         */
+        if ( p.getAnnotation().annotationType() == FormParam.class ) {
+            wadlParam.setStyle( ParamStyle.QUERY );
         }
+        else {
+            switch (p.getSource()) {
+                case QUERY: 
+                    wadlParam.setStyle(ParamStyle.QUERY);
+                    break;
+                case MATRIX:
+                    wadlParam.setStyle(ParamStyle.MATRIX);
+                    break;
+                case PATH:
+                    wadlParam.setStyle(ParamStyle.TEMPLATE);
+                    break;
+                case HEADER:
+                    wadlParam.setStyle(ParamStyle.HEADER);
+                    break;
+                default:
+                    break;
+            }
+        }
+        
         if (p.hasDefaultValue())
             wadlParam.setDefault(p.getDefaultValue());
         Class<?> pClass = p.getParameterClass();
