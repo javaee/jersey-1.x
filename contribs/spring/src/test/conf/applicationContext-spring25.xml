@@ -18,6 +18,10 @@ http://www.springframework.org/schema/tx http://www.springframework.org/schema/t
         That means that the two components are autodetected and  wired together
     -->
     <context:component-scan base-package="com.sun.jersey.spring25"/>
+    
+    <aop:aspectj-autoproxy/>
+    
+    <bean id="loggingAdvice" class="com.sun.jersey.spring25.LoggingAdvice" />
      
     <bean id="managedSingletonResource" class="com.sun.jersey.spring.SpringManagedSingletonResource"
         scope="singleton">

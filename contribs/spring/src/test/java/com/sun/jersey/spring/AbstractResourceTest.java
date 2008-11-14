@@ -125,7 +125,11 @@ public class AbstractResourceTest {
     }
 
     public String getResourcePath( final String path ) {
-        return "http://localhost:" + _port + _servletPath + "/" + path;
+        return getBaseUri() + path;
+    }
+
+    protected String getBaseUri() {
+        return "http://localhost:" + _port + _servletPath + "/";
     }
 
 }
