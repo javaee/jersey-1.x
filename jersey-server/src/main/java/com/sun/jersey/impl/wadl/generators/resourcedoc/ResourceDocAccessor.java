@@ -39,12 +39,7 @@ package com.sun.jersey.impl.wadl.generators.resourcedoc;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 
-import javax.ws.rs.MatrixParam;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.QueryParam;
-
 import com.sun.jersey.api.model.Parameter;
-import com.sun.jersey.api.model.Parameter.Source;
 import com.sun.jersey.impl.wadl.generators.resourcedoc.model.AnnotationDocType;
 import com.sun.jersey.impl.wadl.generators.resourcedoc.model.ClassDocType;
 import com.sun.jersey.impl.wadl.generators.resourcedoc.model.MethodDocType;
@@ -104,7 +99,7 @@ public class ResourceDocAccessor {
         if ( methodDoc != null ) {
             for ( ParamDocType paramDocType : methodDoc.getParamDocs() ) {
                 for ( AnnotationDocType annotationDocType : paramDocType.getAnnotationDocs() ) {
-                    final Class<? extends Annotation> annotationType = ParameterAnnotationMapping.getAnnotationTypeBySource( p.getSource() );
+                    final Class<? extends Annotation> annotationType = p.getAnnotation().annotationType();
                     if ( annotationType != null ) {
                         final String sourceName = getSourceName( p, paramDocType, annotationDocType );
                         if ( sourceName != null && sourceName.equals( p.getSourceName() ) ) {
@@ -147,38 +142,6 @@ public class ResourceDocAccessor {
             }
         }
         return null;
-    }
-    
-    enum ParameterAnnotationMapping {
-        
-        QUERY_PARAM( QueryParam.class, Source.QUERY ),
-        MATRIX_PARAM( MatrixParam.class, Source.MATRIX ),
-        PATH_PARAM( PathParam.class, Source.PATH );
-        
-        private final Class<? extends Annotation> _jaxRsParamAnnotationType;
-        private final Parameter.Source _parameterSource;
-        
-        private ParameterAnnotationMapping(
-                Class<? extends Annotation> jaxRsParamAnnotationType,
-                Source parameterSource) {
-            _jaxRsParamAnnotationType = jaxRsParamAnnotationType;
-            _parameterSource = parameterSource;
-        }
-
-        public static Class<? extends Annotation> getAnnotationTypeBySource( Source source ) {
-            if ( source == null ) {
-                return null;
-            }
-            for( ParameterAnnotationMapping mapping : values() ) {
-                if( source == mapping._parameterSource ) {
-                    return mapping._jaxRsParamAnnotationType;
-                }
-            }
-            return null;
-        }
-        
-        
-        
     }
 
 }
