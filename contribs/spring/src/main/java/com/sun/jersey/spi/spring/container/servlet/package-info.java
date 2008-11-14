@@ -22,7 +22,7 @@
 /**
  * Provides support for Spring-based Web applications.
  * <p>
- * Spring support is enabled by referencing the the servlet
+ * Spring support is enabled by referencing the servlet
  * {@link com.sun.jersey.spi.spring.container.servlet.SpringServlet} in the
  * web.xml. For example:
  * <blockquote><pre>
