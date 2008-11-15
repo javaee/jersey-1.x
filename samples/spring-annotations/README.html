@@ -5,26 +5,37 @@
   <body>
       <h1>Spring Annotations Example</h1>
       
-      <p>This example demonstrates how to use spring and spring annotations, which requires spring &gt;= 2.5.</p>
+      <p>This example demonstrates how to use spring and spring annotations, which requires spring &gt;= 2.5. Included is an example
+        that shows how to use spring-aop with jersey - use spring-aop as you're used to it with your spring bean (spring managed resource class).</p>
       <p>There's also an example resource (<code>JerseyAutowiredResource</code>) that shows how to use annotation based autowiring with spring &lt; 2.5
         (via the <code>@Autowire</code> annotation provided by jersey-spring.
       </p>
       
       <h2>Contents</h2>
-      <p>The example consists of three resource classes:</p>
+      <p>The example consists of four resource classes:</p>
       <dl>
+      
           <dt><code>com.sun.jersey.samples.springannotations.resources.SpringResourcedResource</code></dt>
           <dd>A resource class that demonstrates the usage of the
             <a href="http://java.sun.com/javase/6/docs/api/javax/annotation/Resource.html">@Resource</a> annotation
             provided/supported since spring-2.5+.</dd>
+            
           <dt><code>com.sun.jersey.samples.springannotations.resources.SpringAutowiredResource</code></dt>
           <dd>A resource class that demonstrates the usage of the 
             <a href="http://static.springframework.org/spring/docs/2.5.x/api/org/springframework/beans/factory/annotation/Autowired.html">@Autowired</a>
             annotation provided by spring-2.5+.</dd>
+            
+          <dt><code>com.sun.jersey.samples.springannotations.resources.aop.SpringAopResource</code></dt>
+          <dd>A resource class that demonstrates the usage of 
+            <a href="http://static.springframework.org/spring/docs/2.5.x/reference/aop.html">spring-aop</a>.
+            The resource method is annotated with a custom <code>@Secure</code> annotation. A <code>SecurityAdvice</code>
+            is defined with a pointcut matching methods with this annotation (this dummy advice just logs to stdout).</dd>
+            
           <dt><code>com.sun.jersey.samples.springannotations.resources.jerseymanaged.JerseyAutowiredResource</code></dt>
           <dd>A resource class that demonstrates the usage of the 
             <a href="https://jersey.dev.java.net/source/browse/*checkout*/jersey/trunk/jersey/contribs/spring/src/main/java/com/sun/jersey/api/spring/Autowire.java">@Autowire</a>
             annotation provided by jersey-spring (for users of spring &lt; 2.5).</dd>
+            
       </dl>
     <p>The mapping of the URI path space is presented in the following table:</p>
 	<table border="1">
@@ -44,6 +55,11 @@
     <td>GET</td>
     </tr>
     <tr>
+    <td>/spring-aop</td>
+    <td>SpringAopResource</td>
+    <td>GET</td>
+    </tr>
+    <tr>
     <td>/jersey-autowired</td>
     <td>JerseyAutowiredResource</td>
     <td>GET</td>
@@ -59,6 +75,8 @@
         <code><a href="http://localhost:8080/spring/spring-resourced">http://localhost:8080/spring/spring-resourced</a></code>
         <br/>
         <code><a href="http://localhost:8080/spring/spring-autowired">http://localhost:8080/spring/spring-autowired</a></code>
+        <br/>
+        <code><a href="http://localhost:8080/spring/spring-aop">http://localhost:8080/spring/spring-aop</a></code>
         <br/>
         <code><a href="http://localhost:8080/spring/jersey-autowired">http://localhost:8080/spring/jersey-autowired</a></code>
       </blockquote>

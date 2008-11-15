@@ -1,8 +1,10 @@
 <beans xmlns="http://www.springframework.org/schema/beans"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:aop="http://www.springframework.org/schema/aop"
        xmlns:context="http://www.springframework.org/schema/context"
        xsi:schemaLocation="
 http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd
 http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-2.5.xsd">
 
     <!--  Autowiring support (spring 2.5+)  -->
@@ -12,6 +14,10 @@ http://www.springframework.org/schema/context http://www.springframework.org/sch
         That means that the two components are autodetected and  wired together
     -->
     <context:component-scan base-package="com.sun.jersey.samples.springannotations"/>
+    
+    <aop:aspectj-autoproxy/>
+    
+    <bean id="securityAdvice" class="com.sun.jersey.samples.springannotations.resources.aop.SecurityAdvice" />
     
     <!-- The following beans are just defined here so that they are initialized somehow... -->
     <bean id="item1" class="com.sun.jersey.samples.springannotations.model.Item" scope="prototype">
