@@ -33,7 +33,7 @@
             annotation (this dummy advice just logs to stdout). The resource class <strong>must</strong> be managed by
             spring so that spring-aop can come into play.<br/>
             The resource class also has a subresource locator that obtains the subresource instance from
-            the <code>ResourceContext</code>, so that this subresource instance is created and proxied by spring.</dd>
+            the <code>ResourceContext</code>, so that this subresource instance is also created and proxied by spring.</dd>
             
           <dt><code>com.sun.jersey.samples.springannotations.resources.jerseymanaged.JerseyAutowiredResource</code></dt>
           <dd>A resource class that demonstrates the usage of the 
@@ -64,6 +64,11 @@
     <td>GET</td>
     </tr>
     <tr>
+    <td>/spring-aop/subresource</td>
+    <td>SpringAopSubResource</td>
+    <td>GET</td>
+    </tr>
+    <tr>
     <td>/jersey-autowired</td>
     <td>JerseyAutowiredResource</td>
     <td>GET</td>
@@ -81,6 +86,8 @@
         <code><a href="http://localhost:8080/spring/spring-autowired">http://localhost:8080/spring/spring-autowired</a></code>
         <br/>
         <code><a href="http://localhost:8080/spring/spring-aop">http://localhost:8080/spring/spring-aop</a></code>
+        <br/>
+        <code><a href="http://localhost:8080/spring/spring-aop">http://localhost:8080/spring/spring-aop/subresource</a></code>
         <br/>
         <code><a href="http://localhost:8080/spring/jersey-autowired">http://localhost:8080/spring/jersey-autowired</a></code>
       </blockquote>
