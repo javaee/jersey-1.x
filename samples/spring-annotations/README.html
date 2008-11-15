@@ -31,7 +31,9 @@
             The resource method (of the spring managed resource class) is annotated with a custom <code>@Secure</code>
             annotation. A <code>SecurityAdvice</code> is defined with a pointcut matching methods with this
             annotation (this dummy advice just logs to stdout). The resource class <strong>must</strong> be managed by
-            spring so that spring-aop can come into play.</dd>
+            spring so that spring-aop can come into play.<br/>
+            The resource class also has a subresource locator that obtains the subresource instance from
+            the <code>ResourceContext</code>, so that this subresource instance is created and proxied by spring.</dd>
             
           <dt><code>com.sun.jersey.samples.springannotations.resources.jerseymanaged.JerseyAutowiredResource</code></dt>
           <dd>A resource class that demonstrates the usage of the 

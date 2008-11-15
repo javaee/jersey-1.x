@@ -37,47 +37,36 @@
 package com.sun.jersey.samples.springannotations.resources.aop;
 
 import javax.ws.rs.GET;
-import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
-import javax.ws.rs.core.Context;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 import com.sun.jersey.api.core.ResourceContext;
-import com.sun.jersey.samples.springannotations.model.Item;
+import com.sun.jersey.samples.springannotations.model.Item2;
 
 /**
- * This spring managed resource demonstrates the usage of spring aop: {@link #getItem()} is annotated with
- * an annotation that is checked by the {@link SecurityAdvice}. The subresource locator obtains
- * the (spring managed) subresource instance from the {@link ResourceContext} so that this can also be proxied
- * by spring.
+ * This subresource is also proxied by spring - in the case that it's created by spring,
+ * which is the case if it's fetched from the {@link ResourceContext}.
  * 
  * @author <a href="mailto:martin.grotzke@freiheit.com">Martin Grotzke</a>
  * @version $Id$
  */
-@Path("/spring-aop")
 @Component
-@Scope("singleton")
-public class SpringAopResource {
-    
-    @Context
-    private ResourceContext _resourceContext;
+@Scope("prototype")
+public class SpringAopSubResource {
 
     @Autowired
-    private Item _item;
+    @Qualifier("1")
+    private Item2 _item;
 
     @GET
     @Secure
     @Produces("application/xml")
-    public Item getItem() {
+    public Item2 getItem() {
         return _item;
-    }
-    
-    @Path( "subresource" )
-    public SpringAopSubResource getSubResource() {
-        return _resourceContext.getResource( SpringAopSubResource.class );
     }
     
 }
