@@ -37,6 +37,7 @@
 
 package com.sun.jersey.impl.provider.entity;
 
+import com.sun.jersey.core.provider.jaxb.AbstractJAXBProvider;
 import com.sun.jersey.impl.ImplMessages;
 import com.sun.jersey.impl.util.ThrowHelper;
 import java.io.IOException;

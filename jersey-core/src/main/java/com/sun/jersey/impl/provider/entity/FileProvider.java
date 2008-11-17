@@ -37,6 +37,7 @@
 
 package com.sun.jersey.impl.provider.entity;
 
+import com.sun.jersey.core.provider.AbstractMessageReaderWriterProvider;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.File;

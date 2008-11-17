@@ -38,6 +38,7 @@
 package com.sun.jersey.impl.provider.entity;
 
 
+import com.sun.jersey.core.provider.AbstractMessageReaderWriterProvider;
 import com.sun.jersey.impl.json.ImplMessages;
 import com.sun.jersey.impl.util.ThrowHelper;
 import java.io.IOException;

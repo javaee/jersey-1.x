@@ -100,7 +100,7 @@ public final class AsyncWebResource extends Filterable implements
         
     // UniformInterface
     
-    public Future<ClientResponse> head() throws UniformInterfaceException {
+    public Future<ClientResponse> head() {
         return handle(ClientResponse.class, new ClientRequestImpl(getURI(), "HEAD"));
     }
         
@@ -349,7 +349,7 @@ public final class AsyncWebResource extends Filterable implements
             return handle(ClientResponse.class, build("HEAD"));
         }
         
-        public <T> Future<T> options(Class<T> c) {
+        public <T> Future<T> options(Class<T> c) throws UniformInterfaceException {
             return handle(c, build("OPTIONS"));
         }
                 
@@ -357,7 +357,7 @@ public final class AsyncWebResource extends Filterable implements
             return handle(gt, build("OPTIONS"));
         }
 
-        public <T> Future<T> get(Class<T> c) {
+        public <T> Future<T> get(Class<T> c) throws UniformInterfaceException {
             return handle(c, build("GET"));
         }
                 
@@ -365,15 +365,15 @@ public final class AsyncWebResource extends Filterable implements
             return handle(gt, build("GET"));
         }
 
-        public Future<?> put() {
+        public Future<?> put() throws UniformInterfaceException {
             return voidHandle(build("PUT"));
         }
 
-        public Future<?> put(Object requestEntity) {
+        public Future<?> put(Object requestEntity) throws UniformInterfaceException {
             return voidHandle(build("PUT", requestEntity));
         }
         
-        public <T> Future<T> put(Class<T> c) {
+        public <T> Future<T> put(Class<T> c) throws UniformInterfaceException {
             return handle(c, build("PUT"));
         }
         
@@ -381,7 +381,7 @@ public final class AsyncWebResource extends Filterable implements
             return handle(gt, build("PUT"));
         }
 
-        public <T> Future<T> put(Class<T> c, Object requestEntity) {
+        public <T> Future<T> put(Class<T> c, Object requestEntity) throws UniformInterfaceException {
             return handle(c, build("PUT", requestEntity));
         }
         
@@ -389,15 +389,15 @@ public final class AsyncWebResource extends Filterable implements
             return handle(gt, build("PUT", requestEntity));
         }
 
-        public Future<?> post() {
+        public Future<?> post() throws UniformInterfaceException {
             return voidHandle(build("POST"));
         }
 
-        public Future<?> post(Object requestEntity) {
+        public Future<?> post(Object requestEntity) throws UniformInterfaceException {
             return voidHandle(build("POST", requestEntity));
         }
 
-        public <T> Future<T> post(Class<T> c) {
+        public <T> Future<T> post(Class<T> c) throws UniformInterfaceException {
             return handle(c, build("POST"));
         }
                 
@@ -405,7 +405,7 @@ public final class AsyncWebResource extends Filterable implements
             return handle(gt, build("POST"));
         }
 
-        public <T> Future<T> post(Class<T> c, Object requestEntity) {
+        public <T> Future<T> post(Class<T> c, Object requestEntity) throws UniformInterfaceException {
             return handle(c, build("POST", requestEntity));
         }
         
@@ -413,15 +413,15 @@ public final class AsyncWebResource extends Filterable implements
             return handle(gt, build("POST", requestEntity));
         }
 
-        public Future<?> delete() {
+        public Future<?> delete() throws UniformInterfaceException {
             return voidHandle(build("DELETE"));
         }
 
-        public Future<?> delete(Object requestEntity) {
+        public Future<?> delete(Object requestEntity) throws UniformInterfaceException {
             return voidHandle(build("DELETE", requestEntity));
         }
         
-        public <T> Future<T> delete(Class<T> c) {
+        public <T> Future<T> delete(Class<T> c) throws UniformInterfaceException {
             return handle(c, build("DELETE"));
         }
         
@@ -429,7 +429,7 @@ public final class AsyncWebResource extends Filterable implements
             return handle(gt, build("DELETE"));
         }
 
-        public <T> Future<T> delete(Class<T> c, Object requestEntity) {
+        public <T> Future<T> delete(Class<T> c, Object requestEntity) throws UniformInterfaceException {
             return handle(c, build("DELETE", requestEntity));
         }
         
@@ -437,15 +437,15 @@ public final class AsyncWebResource extends Filterable implements
             return handle(gt, build("DELETE", requestEntity));
         }
 
-        public Future<?> method(String method) {
+        public Future<?> method(String method) throws UniformInterfaceException {
             return voidHandle(build(method));
         }
 
-        public Future<?> method(String method, Object requestEntity) {
+        public Future<?> method(String method, Object requestEntity) throws UniformInterfaceException {
             return voidHandle(build(method, requestEntity));
         }
 
-        public <T> Future<T> method(String method, Class<T> c) {
+        public <T> Future<T> method(String method, Class<T> c) throws UniformInterfaceException {
             return handle(c, build(method));
         }
 
@@ -453,7 +453,7 @@ public final class AsyncWebResource extends Filterable implements
             return handle(gt, build(method));
         }
 
-        public <T> Future<T> method(String method, Class<T> c, Object requestEntity) {
+        public <T> Future<T> method(String method, Class<T> c, Object requestEntity) throws UniformInterfaceException {
             return handle(c, build(method, requestEntity));
         }
         

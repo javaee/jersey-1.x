@@ -40,7 +40,7 @@ package com.sun.jersey.impl.entity;
 import com.sun.jersey.api.client.ClientHandlerException;
 import com.sun.jersey.impl.AbstractResourceTester;
 import com.sun.jersey.api.client.WebResource;
-import com.sun.jersey.impl.provider.entity.AbstractMessageReaderWriterProvider;
+import com.sun.jersey.core.provider.AbstractMessageReaderWriterProvider;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.ObjectInputStream;

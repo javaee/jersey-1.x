@@ -38,7 +38,7 @@
 package com.sun.jersey.impl.provider.entity.fastinfoset;
 
 import com.sun.jersey.core.header.MediaTypes;
-import com.sun.jersey.impl.provider.entity.AbstractListElementProvider;
+import com.sun.jersey.core.provider.jaxb.AbstractListElementProvider;
 import com.sun.jersey.impl.util.ThrowHelper;
 import com.sun.xml.fastinfoset.stax.StAXDocumentParser;
 import com.sun.xml.fastinfoset.stax.StAXDocumentSerializer;

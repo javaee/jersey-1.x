@@ -35,8 +35,9 @@
  * holder.
  */
 
-package com.sun.jersey.impl.provider.entity;
+package com.sun.jersey.core.provider.jaxb;
 
+import com.sun.jersey.impl.provider.entity.*;
 import com.sun.jersey.impl.ImplMessages;
 import com.sun.jersey.impl.util.ThrowHelper;
 import java.io.IOException;

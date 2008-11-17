@@ -97,7 +97,7 @@ public final class WebResource extends Filterable implements
         
     // UniformInterface
     
-    public ClientResponse head() throws UniformInterfaceException {
+    public ClientResponse head() {
         return getHeadHandler().handle(new ClientRequestImpl(getURI(), "HEAD"));
     }
         
@@ -345,121 +345,121 @@ public final class WebResource extends Filterable implements
             return getHeadHandler().handle(build("HEAD"));
         }
         
-        public <T> T options(Class<T> c) {
+        public <T> T options(Class<T> c) throws UniformInterfaceException {
             return handle(c, build("OPTIONS"));
         }
                 
-        public <T> T options(GenericType<T> gt) {
+        public <T> T options(GenericType<T> gt) throws UniformInterfaceException {
             return handle(gt, build("OPTIONS"));            
         }
         
-        public <T> T get(Class<T> c) {
+        public <T> T get(Class<T> c) throws UniformInterfaceException {
             return handle(c, build("GET"));
         }
                 
-        public <T> T get(GenericType<T> gt) {
+        public <T> T get(GenericType<T> gt) throws UniformInterfaceException {
             return handle(gt, build("GET"));            
         }
         
-        public void put() {
+        public void put() throws UniformInterfaceException {
             voidHandle(build("PUT"));
         }
 
-        public void put(Object requestEntity) {
+        public void put(Object requestEntity) throws UniformInterfaceException {
             voidHandle(build("PUT", requestEntity));
         }
         
-        public <T> T put(Class<T> c) {
+        public <T> T put(Class<T> c) throws UniformInterfaceException {
             return handle(c, build("PUT"));
         }
         
-        public <T> T put(GenericType<T> gt) {
+        public <T> T put(GenericType<T> gt) throws UniformInterfaceException {
             return handle(gt, build("PUT"));
         }
 
-        public <T> T put(Class<T> c, Object requestEntity) {
+        public <T> T put(Class<T> c, Object requestEntity) throws UniformInterfaceException {
             return handle(c, build("PUT", requestEntity));
         }
         
-        public <T> T put(GenericType<T> gt, Object requestEntity) {
+        public <T> T put(GenericType<T> gt, Object requestEntity) throws UniformInterfaceException {
             return handle(gt, build("PUT", requestEntity));
         }
 
-        public void post() {
+        public void post() throws UniformInterfaceException {
             voidHandle(build("POST"));
         }
 
-        public void post(Object requestEntity) {
+        public void post(Object requestEntity) throws UniformInterfaceException {
             voidHandle(build("POST", requestEntity));
         }
 
-        public <T> T post(Class<T> c) {
+        public <T> T post(Class<T> c) throws UniformInterfaceException {
             return handle(c, build("POST"));
         }
                 
-        public <T> T post(GenericType<T> gt) {
+        public <T> T post(GenericType<T> gt) throws UniformInterfaceException {
             return handle(gt, build("POST"));
         }
 
-        public <T> T post(Class<T> c, Object requestEntity) {
+        public <T> T post(Class<T> c, Object requestEntity) throws UniformInterfaceException {
             return handle(c, build("POST", requestEntity));
         }
         
-        public <T> T post(GenericType<T> gt, Object requestEntity) {
+        public <T> T post(GenericType<T> gt, Object requestEntity) throws UniformInterfaceException {
             return handle(gt, build("POST", requestEntity));
         }
     
-        public void delete() {
+        public void delete() throws UniformInterfaceException {
             voidHandle(build("DELETE"));
         }
 
-        public void delete(Object requestEntity) {
+        public void delete(Object requestEntity) throws UniformInterfaceException {
             voidHandle(build("DELETE", requestEntity));
         }
         
-        public <T> T delete(Class<T> c) {
+        public <T> T delete(Class<T> c) throws UniformInterfaceException {
             return handle(c, build("DELETE"));
         }
         
-        public <T> T delete(GenericType<T> gt) {
+        public <T> T delete(GenericType<T> gt) throws UniformInterfaceException {
             return handle(gt, build("DELETE"));
         }
 
-        public <T> T delete(Class<T> c, Object requestEntity) {
+        public <T> T delete(Class<T> c, Object requestEntity) throws UniformInterfaceException {
             return handle(c, build("DELETE", requestEntity));
         }
         
-        public <T> T delete(GenericType<T> gt, Object requestEntity) {
+        public <T> T delete(GenericType<T> gt, Object requestEntity) throws UniformInterfaceException {
             return handle(gt, build("DELETE", requestEntity));
         }
     
-        public void method(String method) {
+        public void method(String method) throws UniformInterfaceException {
             voidHandle(build(method));
         }
 
-        public void method(String method, Object requestEntity) {
+        public void method(String method, Object requestEntity) throws UniformInterfaceException {
             voidHandle(build(method, requestEntity));
         }
 
-        public <T> T method(String method, Class<T> c) {
+        public <T> T method(String method, Class<T> c) throws UniformInterfaceException {
             return handle(c, build(method));
         }
 
-        public <T> T method(String method, GenericType<T> gt) {
+        public <T> T method(String method, GenericType<T> gt) throws UniformInterfaceException {
             return handle(gt, build(method));
         }
 
-        public <T> T method(String method, Class<T> c, Object requestEntity) {
+        public <T> T method(String method, Class<T> c, Object requestEntity) throws UniformInterfaceException {
             return handle(c, build(method, requestEntity));
         }        
         
-        public <T> T method(String method, GenericType<T> gt, Object requestEntity) {
+        public <T> T method(String method, GenericType<T> gt, Object requestEntity) throws UniformInterfaceException {
             return handle(gt, build(method, requestEntity));
         }        
     }
     
     
-    private <T> T handle(Class<T> c, ClientRequest ro) {
+    private <T> T handle(Class<T> c, ClientRequest ro) throws UniformInterfaceException {
         ClientResponse r = getHeadHandler().handle(ro);
         
         if (c == ClientResponse.class) return c.cast(r);
@@ -469,7 +469,7 @@ public final class WebResource extends Filterable implements
         throw new UniformInterfaceException("Status: " + r.getStatus(), r);
     }
     
-    private <T> T handle(GenericType<T> gt, ClientRequest ro) {
+    private <T> T handle(GenericType<T> gt, ClientRequest ro) throws UniformInterfaceException {
         ClientResponse r = getHeadHandler().handle(ro);
         
         if (gt.getRawClass() == ClientResponse.class) gt.getRawClass().cast(r);
@@ -479,7 +479,7 @@ public final class WebResource extends Filterable implements
         throw new UniformInterfaceException("Status: " + r.getStatus(), r);
     }
     
-    private void voidHandle(ClientRequest ro) {
+    private void voidHandle(ClientRequest ro) throws UniformInterfaceException {
         ClientResponse r = getHeadHandler().handle(ro);
         
         if (r.getStatus() >= 300) 

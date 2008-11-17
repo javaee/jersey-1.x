@@ -37,6 +37,7 @@
 
 package com.sun.jersey.impl.provider.entity;
 
+import com.sun.jersey.core.provider.AbstractMessageReaderWriterProvider;
 import com.sun.syndication.feed.atom.Entry;
 import com.sun.syndication.feed.atom.Feed;
 import com.sun.syndication.io.FeedException;

@@ -37,6 +37,7 @@
 
 package com.sun.jersey.impl.provider.entity;
 
+import com.sun.jersey.core.provider.jaxb.AbstractListElementProvider;
 import com.sun.jersey.api.json.JSONJAXBContext;
 import com.sun.jersey.impl.json.JSONMarshaller;
 import com.sun.jersey.impl.json.JSONUnmarshaller;

@@ -35,8 +35,9 @@
  * holder.
  */
 
-package com.sun.jersey.impl.provider.entity;
+package com.sun.jersey.core.provider.jaxb;
 
+import com.sun.jersey.core.provider.AbstractMessageReaderWriterProvider;
 import java.util.Map;
 import java.util.WeakHashMap;
 import javax.ws.rs.core.MediaType;

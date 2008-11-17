@@ -35,7 +35,7 @@
  * holder.
  */
 
-package com.sun.jersey.impl.provider.entity;
+package com.sun.jersey.core.provider;
 
 import java.io.BufferedWriter;
 import javax.ws.rs.ext.MessageBodyReader;
