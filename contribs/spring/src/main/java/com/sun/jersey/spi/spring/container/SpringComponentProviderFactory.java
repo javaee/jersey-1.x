@@ -58,6 +58,9 @@ import com.sun.jersey.core.spi.component.ioc.IoCComponentProviderFactory;
 import com.sun.jersey.core.spi.component.ioc.IoCInstantiatedComponentProvider;
 import com.sun.jersey.core.spi.component.ioc.IoCManagedComponentProvider;
 import com.sun.jersey.spi.inject.Inject;
+import java.util.HashMap;
+import java.util.Map;
+import org.springframework.beans.factory.config.BeanDefinition;
 
 /**
  * The Spring-based {@link IoCComponentProviderFactory}.
@@ -118,13 +121,23 @@ public class SpringComponentProviderFactory implements IoCComponentProviderFacto
             return null;
         }
 
-        if (springContext.isSingleton(beanName)) {
-            return new SpringManagedComponentProvider(ComponentScope.Singleton, beanName, c);
-        } else if (springContext.isPrototype(beanName)) {
-            return new SpringManagedComponentProvider(ComponentScope.PerRequest, beanName, c);
-        } else {
-            return new SpringManagedComponentProvider(ComponentScope.Undefined, beanName, c);
-        }
+        final String scope = springContext.getBeanFactory().
+                getBeanDefinition(beanName).getScope();
+        return new SpringManagedComponentProvider(getComponentScope(scope), beanName, c);
+    }
+
+    private ComponentScope getComponentScope(String scope) {
+        ComponentScope cs = scopeMap.get(scope);
+        return (cs != null) ? cs : ComponentScope.Undefined;
+    }
+    
+    private final Map<String, ComponentScope> scopeMap = createScopeMap();    
+    private Map<String, ComponentScope> createScopeMap() {
+        Map<String, ComponentScope> m = new HashMap<String, ComponentScope>();
+        m.put(BeanDefinition.SCOPE_SINGLETON, ComponentScope.Singleton);
+        m.put(BeanDefinition.SCOPE_PROTOTYPE, ComponentScope.PerRequest);
+        m.put("request", ComponentScope.PerRequest);
+        return m;
     }
 
     private class SpringInstantiatedComponentProvider implements IoCInstantiatedComponentProvider {
