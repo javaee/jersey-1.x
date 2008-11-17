@@ -52,11 +52,12 @@ package com.sun.jersey.api.client;
  * <p>
  * A type of {@link ClientResponse} declared for the response entity
  * may be used to obtain the status, headers and response entity. If any other
- * type is declared then and the response status is greater than or equal to
+ * type is declared and the response status is greater than or equal to
  * 300 then a {@link UniformInterfaceException} exception will be thrown, from 
  * which the {@link ClientResponse} instance can be accessed.
  * 
  * @author Paul.Sandoz@Sun.Com
+ * @see com.sun.jersey.api.client
  */
 public interface UniformInterface {
     
@@ -75,7 +76,7 @@ public interface UniformInterface {
      * @param c the type of the returned response.
      * @return an instance of type <code>c</code>.
      * @throws UniformInterfaceException if the status of the HTTP response is 
-     *         greater than or equal to 300 and <code>c<code> is not the type 
+     *         greater than or equal to 300 and <code>c</code> is not the type
      *         {@link ClientResponse}.
      */
     <T> T options(Class<T> c) throws UniformInterfaceException;
@@ -88,7 +89,7 @@ public interface UniformInterface {
      * @param gt the generic type of the returned response.
      * @return an instance of type represented by the generic type.
      * @throws UniformInterfaceException if the status of the HTTP response is 
-     *         greater than or equal to 300 and <code>gt<code> does not
+     *         greater than or equal to 300 and <code>gt</code> does not
      *         represent the type {@link ClientResponse}.
      */
     <T> T options(GenericType<T> gt) throws UniformInterfaceException;
@@ -100,7 +101,7 @@ public interface UniformInterface {
      * @param c the type of the returned response.
      * @return an instance of type <code>c</code>.
      * @throws UniformInterfaceException if the status of the HTTP response is 
-     *         greater than or equal to 300 and <code>c<code> is not the type 
+     *         greater than or equal to 300 and <code>c</code> is not the type
      *         {@link ClientResponse}.
      */
     <T> T get(Class<T> c) throws UniformInterfaceException;
@@ -112,7 +113,7 @@ public interface UniformInterface {
      * @param gt the generic type of the returned response.
      * @return an instance of type represented by the generic type.
      * @throws UniformInterfaceException if the status of the HTTP response is 
-     *         greater than or equal to 300 and <code>gt<code> does not
+     *         greater than or equal to 300 and <code>gt</code> does not
      *         represent the type {@link ClientResponse}.
      */
     <T> T get(GenericType<T> gt) throws UniformInterfaceException;
@@ -148,7 +149,7 @@ public interface UniformInterface {
      * @param c the type of the returned response.
      * @return an instance of type <code>c</code>.
      * @throws UniformInterfaceException if the status of the HTTP response is 
-     *         greater than or equal to 300 and <code>c<code> is not the type 
+     *         greater than or equal to 300 and <code>c</code> is not the type
      *         {@link ClientResponse}.
      */
     <T> T put(Class<T> c) throws UniformInterfaceException;
@@ -160,7 +161,7 @@ public interface UniformInterface {
      * @param gt the generic type of the returned response.
      * @return an instance of type represented by the generic type.
      * @throws UniformInterfaceException if the status of the HTTP response is 
-     *         greater than or equal to 300 and <code>gt<code> does not
+     *         greater than or equal to 300 and <code>gt</code> does not
      *         represent the type {@link ClientResponse}.
      */
     <T> T put(GenericType<T> gt) throws UniformInterfaceException;
@@ -173,7 +174,7 @@ public interface UniformInterface {
      * @param requestEntity the request entity.
      * @return an instance of type <code>c</code>.
      * @throws UniformInterfaceException if the status of the HTTP response is 
-     *         greater than or equal to 300 and <code>c<code> is not the type 
+     *         greater than or equal to 300 and <code>c</code> is not the type
      *         {@link ClientResponse}.
      */
     <T> T put(Class<T> c, Object requestEntity) 
@@ -187,7 +188,7 @@ public interface UniformInterface {
      * @param requestEntity the request entity.
      * @return an instance of type represented by the generic type.
      * @throws UniformInterfaceException if the status of the HTTP response is 
-     *         greater than or equal to 300 and <code>gt<code> does not
+     *         greater than or equal to 300 and <code>gt</code> does not
      *         represent the type {@link ClientResponse}.
      */
     <T> T put(GenericType<T> gt, Object requestEntity) 
@@ -223,7 +224,7 @@ public interface UniformInterface {
      * @param c the type of the returned response.
      * @return an instance of type <code>c</code>.
      * @throws UniformInterfaceException if the status of the HTTP response is 
-     *         greater than or equal to 300 and <code>c<code> is not the type 
+     *         greater than or equal to 300 and <code>c</code> is not the type
      *         {@link ClientResponse}.
      */
     <T> T post(Class<T> c) throws UniformInterfaceException;
@@ -235,7 +236,7 @@ public interface UniformInterface {
      * @param gt the generic type of the returned response.
      * @return an instance of type represented by the generic type.
      * @throws UniformInterfaceException if the status of the HTTP response is 
-     *         greater than or equal to 300 and <code>gt<code> does not
+     *         greater than or equal to 300 and <code>gt</code> does not
      *         represent the type {@link ClientResponse}.
      */
     <T> T post(GenericType<T> gt) throws UniformInterfaceException;
@@ -248,7 +249,7 @@ public interface UniformInterface {
      * @param requestEntity the request entity.
      * @return an instance of type <code>c</code>.
      * @throws UniformInterfaceException if the status of the HTTP response is 
-     *         greater than or equal to 300 and <code>c<code> is not the type 
+     *         greater than or equal to 300 and <code>c</code> is not the type
      *         {@link ClientResponse}.
      */
     <T> T post(Class<T> c, Object requestEntity) 
@@ -262,7 +263,7 @@ public interface UniformInterface {
      * @param requestEntity the request entity.
      * @return an instance of type represented by the generic type.
      * @throws UniformInterfaceException if the status of the HTTP response is 
-     *         greater than or equal to 300 and <code>gt<code> does not
+     *         greater than or equal to 300 and <code>gt</code> does not
      *         represent the type {@link ClientResponse}.
      */
     <T> T post(GenericType<T> gt, Object requestEntity)
@@ -298,7 +299,7 @@ public interface UniformInterface {
      * @param c the type of the returned response.
      * @return an instance of type <code>c</code>.
      * @throws UniformInterfaceException if the status of the HTTP response is 
-     *         greater than or equal to 300 and <code>c<code> is not the type 
+     *         greater than or equal to 300 and <code>c</code> is not the type
      *         {@link ClientResponse}.
      */
     <T> T delete(Class<T> c) throws UniformInterfaceException;
@@ -310,7 +311,7 @@ public interface UniformInterface {
      * @param gt the generic type of the returned response.
      * @return an instance of type represented by the generic type.
      * @throws UniformInterfaceException if the status of the HTTP response is 
-     *         greater than or equal to 300 and <code>gt<code> does not
+     *         greater than or equal to 300 and <code>gt</code> does not
      *         represent the type {@link ClientResponse}.
      */
     <T> T delete(GenericType<T> gt) throws UniformInterfaceException;
@@ -323,7 +324,7 @@ public interface UniformInterface {
      * @param requestEntity the request entity.
      * @return an instance of type <code>c</code>.
      * @throws UniformInterfaceException if the status of the HTTP response is 
-     *         greater than or equal to 300 and <code>c<code> is not the type 
+     *         greater than or equal to 300 and <code>c</code> is not the type
      *         {@link ClientResponse}.
      */
     <T> T delete(Class<T> c, Object requestEntity) 
@@ -337,7 +338,7 @@ public interface UniformInterface {
      * @param requestEntity the request entity.
      * @return an instance of type represented by the generic type.
      * @throws UniformInterfaceException if the status of the HTTP response is 
-     *         greater than or equal to 300 and <code>gt<code> does not
+     *         greater than or equal to 300 and <code>gt</code> does not
      *         represent the type {@link ClientResponse}.
      */
     <T> T delete(GenericType<T> gt, Object requestEntity)
@@ -377,7 +378,7 @@ public interface UniformInterface {
      * @param c the type of the returned response.
      * @return an instance of type <code>c</code>.
      * @throws UniformInterfaceException if the status of the HTTP response is 
-     *         greater than or equal to 300 and <code>c<code> is not the type 
+     *         greater than or equal to 300 and <code>c</code> is not the type
      *         {@link ClientResponse}.
      */
     <T> T method(String method, Class<T> c) throws UniformInterfaceException;
@@ -390,7 +391,7 @@ public interface UniformInterface {
      * @param gt the generic type of the returned response.
      * @return an instance of type represented by the generic type.
      * @throws UniformInterfaceException if the status of the HTTP response is 
-     *         greater than or equal to 300 and <code>gt<code> does not
+     *         greater than or equal to 300 and <code>gt</code> does not
      *         represent the type {@link ClientResponse}.
      */
     <T> T method(String method, GenericType<T> gt) throws UniformInterfaceException;
@@ -404,7 +405,7 @@ public interface UniformInterface {
      * @param requestEntity the request entity.
      * @return an instance of type <code>c</code>.
      * @throws UniformInterfaceException if the status of the HTTP response is 
-     *         greater than or equal to 300 and <code>c<code> is not the type 
+     *         greater than or equal to 300 and <code>c</code> is not the type
      *         {@link ClientResponse}.
      */
     <T> T method(String method, Class<T> c, Object requestEntity) 
@@ -419,7 +420,7 @@ public interface UniformInterface {
      * @param requestEntity the request entity.
      * @return an instance of type represented by the generic type.
      * @throws UniformInterfaceException if the status of the HTTP response is 
-     *         greater than or equal to 300 and <code>gt<code> does not
+     *         greater than or equal to 300 and <code>gt</code> does not
      *         represent the type {@link ClientResponse}.
      */
     <T> T method(String method, GenericType<T> gt, Object requestEntity) 

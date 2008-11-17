@@ -59,7 +59,7 @@ import javax.ws.rs.ext.RuntimeDelegate;
 /**
  * A default client-based and hardcoded implementation of
  * {@link RuntimeDelegate} that will be instantiated if all look up mechanisms
- * to to find an instance fail.
+ * fail to find an instance.
  * <p>
  * A hardcoded reference to this class name occurs in the {@link RuntimeDelegate}
  * class present in the JAX-RS api jar.

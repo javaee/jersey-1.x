@@ -60,6 +60,7 @@ import javax.ws.rs.core.UriBuilder;
  * that modify filters are not guaranteed to be thread-safe.
  * 
  * @author Paul.Sandoz@Sun.Com
+ * @see com.sun.jersey.api.client
  */
 public final class WebResource extends Filterable implements 
         RequestBuilder<WebResource.Builder>,
@@ -96,119 +97,119 @@ public final class WebResource extends Filterable implements
         
     // UniformInterface
     
-    public ClientResponse head() {
+    public ClientResponse head() throws UniformInterfaceException {
         return getHeadHandler().handle(new ClientRequestImpl(getURI(), "HEAD"));
     }
         
-    public <T> T options(Class<T> c) {
+    public <T> T options(Class<T> c) throws UniformInterfaceException {
         return handle(c, new ClientRequestImpl(getURI(), "OPTIONS"));
     }
         
-    public <T> T options(GenericType<T> gt) {
+    public <T> T options(GenericType<T> gt) throws UniformInterfaceException {
         return handle(gt, new ClientRequestImpl(getURI(), "OPTIONS"));            
     }
         
-    public <T> T get(Class<T> c) {
+    public <T> T get(Class<T> c) throws UniformInterfaceException {
         return handle(c, new ClientRequestImpl(getURI(), "GET"));
     }
             
-    public <T> T get(GenericType<T> gt) {
+    public <T> T get(GenericType<T> gt) throws UniformInterfaceException {
         return handle(gt, new ClientRequestImpl(getURI(), "GET"));            
     }
         
-    public void put() {
+    public void put() throws UniformInterfaceException {
         voidHandle(new ClientRequestImpl(getURI(), "PUT", null));
     }
     
-    public void put(Object requestEntity) {
+    public void put(Object requestEntity) throws UniformInterfaceException {
         voidHandle(new ClientRequestImpl(getURI(), "PUT", requestEntity));
     }
     
-    public <T> T put(Class<T> c) {
+    public <T> T put(Class<T> c) throws UniformInterfaceException {
         return handle(c, new ClientRequestImpl(getURI(), "PUT"));
     }
 
-    public <T> T put(GenericType<T> gt) {
+    public <T> T put(GenericType<T> gt) throws UniformInterfaceException {
         return handle(gt, new ClientRequestImpl(getURI(), "PUT"));
     }
 
-    public <T> T put(Class<T> c, Object requestEntity) {
+    public <T> T put(Class<T> c, Object requestEntity) throws UniformInterfaceException {
         return handle(c, new ClientRequestImpl(getURI(), "PUT", requestEntity));
     }
             
-    public <T> T put(GenericType<T> gt, Object requestEntity) {
+    public <T> T put(GenericType<T> gt, Object requestEntity) throws UniformInterfaceException {
         return handle(gt, new ClientRequestImpl(getURI(), "PUT", requestEntity));
     }
 
-    public void post() {
+    public void post() throws UniformInterfaceException {
         voidHandle(new ClientRequestImpl(getURI(), "POST"));
     }
     
-    public void post(Object requestEntity) {
+    public void post(Object requestEntity) throws UniformInterfaceException {
         voidHandle(new ClientRequestImpl(getURI(), "POST", requestEntity));
     }
     
-    public <T> T post(Class<T> c) {
+    public <T> T post(Class<T> c) throws UniformInterfaceException {
         return handle(c, new ClientRequestImpl(getURI(), "POST"));
     }
 
-    public <T> T post(GenericType<T> gt) {
+    public <T> T post(GenericType<T> gt) throws UniformInterfaceException {
         return handle(gt, new ClientRequestImpl(getURI(), "POST"));
     }
     
-    public <T> T post(Class<T> c, Object requestEntity) {
+    public <T> T post(Class<T> c, Object requestEntity) throws UniformInterfaceException {
         return handle(c, new ClientRequestImpl(getURI(), "POST", requestEntity));
     }
             
-    public <T> T post(GenericType<T> gt, Object requestEntity) {
+    public <T> T post(GenericType<T> gt, Object requestEntity) throws UniformInterfaceException {
         return handle(gt, new ClientRequestImpl(getURI(), "POST", requestEntity));
     }
     
-    public void delete() {
+    public void delete() throws UniformInterfaceException {
         voidHandle(new ClientRequestImpl(getURI(), "DELETE"));
     }
     
-    public void delete(Object requestEntity) {
+    public void delete(Object requestEntity) throws UniformInterfaceException {
         voidHandle(new ClientRequestImpl(getURI(), "DELETE", requestEntity));
     }
     
-    public <T> T delete(Class<T> c) {
+    public <T> T delete(Class<T> c) throws UniformInterfaceException {
         return handle(c, new ClientRequestImpl(getURI(), "DELETE"));    
     }
 
-    public <T> T delete(GenericType<T> gt) {
+    public <T> T delete(GenericType<T> gt) throws UniformInterfaceException {
         return handle(gt, new ClientRequestImpl(getURI(), "DELETE"));
     }
     
-    public <T> T delete(Class<T> c, Object requestEntity) {
+    public <T> T delete(Class<T> c, Object requestEntity) throws UniformInterfaceException {
         return handle(c, new ClientRequestImpl(getURI(), "DELETE", requestEntity));
     }
       
-    public <T> T delete(GenericType<T> gt, Object requestEntity) {
+    public <T> T delete(GenericType<T> gt, Object requestEntity) throws UniformInterfaceException {
         return handle(gt, new ClientRequestImpl(getURI(), "DELETE", requestEntity));
     }
     
-    public void method(String method) {
+    public void method(String method) throws UniformInterfaceException {
         voidHandle(new ClientRequestImpl(getURI(), method));        
     }
     
-    public void method(String method, Object requestEntity) {
+    public void method(String method, Object requestEntity) throws UniformInterfaceException {
         voidHandle(new ClientRequestImpl(getURI(), method, requestEntity));        
     }
     
-    public <T> T method(String method, Class<T> c) {
+    public <T> T method(String method, Class<T> c) throws UniformInterfaceException {
         return handle(c, new ClientRequestImpl(getURI(), method));            
     }
     
-    public <T> T method(String method, GenericType<T> gt) {
+    public <T> T method(String method, GenericType<T> gt) throws UniformInterfaceException {
         return handle(gt, new ClientRequestImpl(getURI(), method));            
     }
     
-    public <T> T method(String method, Class<T> c, Object requestEntity) {
+    public <T> T method(String method, Class<T> c, Object requestEntity) throws UniformInterfaceException {
         return handle(c, new ClientRequestImpl(getURI(), method, requestEntity));        
     }
     
-    public <T> T method(String method, GenericType<T> gt, Object requestEntity) {
+    public <T> T method(String method, GenericType<T> gt, Object requestEntity) throws UniformInterfaceException {
         return handle(gt, new ClientRequestImpl(getURI(), method, requestEntity));        
     }
     
