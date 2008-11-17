@@ -263,16 +263,23 @@ public class UriTemplateParser {
     }
     
     private void parse(CharacterIterator ci) {
-        while (ci.hasNext()) {
-            char c = ci.next();
-            if (c == '{') {
-                processLiteralCharacters();
-                parseName(ci);
-            } else {
-                literalCharactersBuffer.append(c);
+        try {
+            while (ci.hasNext()) {
+                char c = ci.next();
+                if (c == '{') {
+                    processLiteralCharacters();
+                    parseName(ci);
+                } else {
+                    literalCharactersBuffer.append(c);
+                }
             }
+            processLiteralCharacters();
+        } catch (NoSuchElementException ex) {
+            throw new IllegalArgumentException(
+                    "Invalid syntax for the template, \"" + template +
+                    "\". Check if a path parameter is terminated with a '}'.",
+                    ex);
         }
-        processLiteralCharacters();
     }
 
     private void processLiteralCharacters() {

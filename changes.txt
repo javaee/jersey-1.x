@@ -1,4 +1,8 @@
 release 1.0.1 (2008-11/12)
+- Fix for issue 143
+  https://jersey.dev.java.net/issues/show_bug.cgi?id=143
+  Improve error message when @Path value syntax is incorrect and is most likely
+  because a path parameter is not terminated with a '}'.
 - Enable the injection of of FormDataContentDispostion when using @FormParam
   in conjuction with "multipart/form-data". This enables access to parameters
   on the "form-data" content disposition header such as the value of the
