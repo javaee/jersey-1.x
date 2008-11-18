@@ -254,7 +254,7 @@ public abstract class ResourceConfig extends Application {
      * A registered class is removed from the set of registered classes
      * if an instance of that class is a member of the set of registered
      * singletons.
-     * <p>A registered class that is an interface of an abstract class
+     * <p>A registered class that is an interface or an abstract class
      * is removed from the registered classes.
      * 
      * @throws IllegalArgumentException if the set of registered singletons 

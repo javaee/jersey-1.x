@@ -1,4 +1,12 @@
 release 1.0.1 (2008-11/12)
+- Fixed issue 144
+  https://jersey.dev.java.net/issues/show_bug.cgi?id=144
+  Async/WebResource.toString returns a String instance of the URI of
+  the Web resource.
+- Fixed issue 123
+  https://jersey.dev.java.net/issues/show_bug.cgi?id=123
+  Reduce the dependencies of the spring module to those which are
+  required.
 - Fixed issue 133
   https://jersey.dev.java.net/issues/show_bug.cgi?id=133
   Replaced e.printStackTrace() with logging.

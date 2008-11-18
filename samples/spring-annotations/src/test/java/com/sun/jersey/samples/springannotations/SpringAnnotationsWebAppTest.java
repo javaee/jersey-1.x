@@ -114,6 +114,7 @@ public class SpringAnnotationsWebAppTest extends TestCase {
         doTestSpringResourced();
         doTestSpringAutowired();
         doTestJerseyAutowired();
+        doTestSpringAop();
     }
 
     /**
@@ -159,4 +160,18 @@ public class SpringAnnotationsWebAppTest extends TestCase {
                 " does not match the expected one.", "foo", item.getValue());
     }
 
+    /**
+     * Test checks that a request for the resource "spring-aop" gives
+     * a valid response.
+     */
+    public void doTestSpringAop() {
+        Item item = r.path("spring-aop").accept(MediaType.APPLICATION_XML)
+                .get(Item.class);
+        assertEquals("Method: doTestSpringAop \nMessage: Returned item's value " +
+                " does not match the expected one.", "foo", item.getValue());
+        Item2 item2 = r.path("spring-aop/subresource").accept(MediaType.APPLICATION_XML)
+                .get(Item2.class);
+        assertEquals("Method: doTestSpringAop \nMessage: Returned item's value " +
+                " does not match the expected one.", "bar", item2.getValue());
+    }
 }

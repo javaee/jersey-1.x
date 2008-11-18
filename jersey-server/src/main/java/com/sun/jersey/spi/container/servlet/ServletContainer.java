@@ -685,7 +685,7 @@ public class ServletContainer extends HttpServlet implements ContainerListener {
                         i.remove();
                         rc.getSingletons().add(o);
                         LOGGER.log(Level.CONFIG,
-                                "An instance of the root resource class " + c.getName() +
+                                "An instance of the class " + c.getName() +
                                 " is found by JNDI look up using the class name as the JNDI name. " +
                                 "The instance will be registered as a singleton.");
                     }

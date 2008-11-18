@@ -198,11 +198,22 @@
                 </dependency>
                 <dependency>
                     <groupId>org.springframework</groupId>
-                    <artifactId>spring-webmvc</artifactId>
+                    <artifactId>spring-beans</artifactId>
                     <version>${spring25-release-version}</version>
                     <scope>compile</scope>
                 </dependency>
-                
+                <dependency>
+                    <groupId>org.springframework</groupId>
+                    <artifactId>spring-context</artifactId>
+                    <version>${spring25-release-version}</version>
+                    <scope>compile</scope>
+                </dependency>
+                <dependency>
+                    <groupId>org.springframework</groupId>
+                    <artifactId>spring-web</artifactId>
+                    <version>${spring25-release-version}</version>
+                    <scope>compile</scope>
+                </dependency>
                 <dependency>
                     <groupId>org.springframework</groupId>
                     <artifactId>spring-aop</artifactId>
