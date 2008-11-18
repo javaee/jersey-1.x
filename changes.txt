@@ -1,4 +1,7 @@
 release 1.0.1 (2008-11/12)
+- Fixed issue 133
+  https://jersey.dev.java.net/issues/show_bug.cgi?id=133
+  Replaced e.printStackTrace() with logging.
 - Fixed issue 131
   https://jersey.dev.java.net/issues/show_bug.cgi?id=131
   The use of javax.activation.DataSource no longer depends on the JavaMail jar.

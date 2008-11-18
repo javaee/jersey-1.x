@@ -42,9 +42,8 @@ import com.sun.jersey.core.spi.component.ProviderServices;
 import com.sun.jersey.impl.ImplMessages;
 import com.sun.jersey.impl.model.method.dispatch.ResourceMethodDispatchProvider;
 import com.sun.jersey.spi.dispatch.RequestDispatcher;
-import java.io.PrintWriter;
-import java.io.StringWriter;
 import java.util.Set;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
@@ -74,16 +73,9 @@ public final class ResourceMethodDispatcherFactory {
                 if (d != null)
                     return d;
             } catch (Exception e) {
-                StringWriter sw = new StringWriter();
-                
-                sw.write(ImplMessages.ERROR_PROCESSING_METHOD(
-                        abstractResourceMethod.getMethod(), 
-                        rmdp.getClass().getName()));
-                PrintWriter pw = new PrintWriter(sw);
-                e.printStackTrace(pw);
-                pw.flush();
-                
-                LOGGER.severe(sw.toString());
+                LOGGER.log(Level.SEVERE, ImplMessages.ERROR_PROCESSING_METHOD(
+                        abstractResourceMethod.getMethod(),
+                        rmdp.getClass().getName()), e);
             }
         }
         

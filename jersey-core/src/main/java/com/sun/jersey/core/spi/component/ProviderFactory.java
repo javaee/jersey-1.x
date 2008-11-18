@@ -114,8 +114,7 @@ public class ProviderFactory implements ComponentProviderFactory<ComponentProvid
             ComponentInjector ci = new ComponentInjector(ipc, c);
             ci.inject(o);
 
-            SingletonComponentProvider scp = new SingletonComponentProvider(ci, o);
-            return scp;
+            return new SingletonComponentProvider(ci, o);
         } catch (NoClassDefFoundError ex) {
             // Dependent class of provider not found
             // This assumes that ex.getLocalizedMessage() returns
@@ -126,11 +125,9 @@ public class ProviderFactory implements ComponentProviderFactory<ComponentProvid
                     " The component is ignored.");
             return null;
         } catch (Exception ex) {
-            ex.printStackTrace();
-            System.out.println(ex.getLocalizedMessage());
-            LOGGER.log(Level.CONFIG,
+            LOGGER.log(Level.SEVERE,
                     "The provider class, " + c +
-                    ", could not be instantiated");
+                    ", could not be instantiated", ex);
             return null;
         }
     }

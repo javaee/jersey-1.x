@@ -833,7 +833,7 @@ public final class WebApplicationImpl implements WebApplication {
             HttpResponseContext response) {
         // Log the stack trace
         if (r.getStatus() >= 500) {
-            e.printStackTrace();
+            LOGGER.log(Level.SEVERE, "Internal server error", e);
         }
 
         if (r.getStatus() >= 500 && r.getEntity() == null) {
