@@ -94,7 +94,15 @@ public final class WebResource extends Filterable implements
     public UriBuilder getBuilder() {
         return UriBuilder.fromUri(u);
     }
-        
+
+    /**
+     * @return the URI as a String instance
+     */
+    @Override
+    public String toString() {
+        return u.toString();
+    }
+
     // UniformInterface
     
     public ClientResponse head() {

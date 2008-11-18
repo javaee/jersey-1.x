@@ -98,6 +98,14 @@ public final class AsyncWebResource extends Filterable implements
         return UriBuilder.fromUri(u);
     }
         
+    /**
+     * @return the URI as a String instance
+     */
+    @Override
+    public String toString() {
+        return u.toString();
+    }
+    
     // UniformInterface
     
     public Future<ClientResponse> head() {
