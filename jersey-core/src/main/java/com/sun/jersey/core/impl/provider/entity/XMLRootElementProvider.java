@@ -35,13 +35,9 @@
  * holder.
  */
 
-package com.sun.jersey.impl.provider.entity.fastinfoset;
+package com.sun.jersey.core.impl.provider.entity;
 
-import com.sun.jersey.core.header.MediaTypes;
-import com.sun.jersey.core.provider.jaxb.AbstractJAXBElementProvider;
-import com.sun.jersey.core.util.ThrowHelper;
-import com.sun.xml.fastinfoset.stax.StAXDocumentSerializer;
-import com.sun.xml.fastinfoset.stax.StAXDocumentParser;
+import com.sun.jersey.core.provider.jaxb.AbstractRootElementProvider;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -51,42 +47,58 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.ext.Providers;
-import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
-import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamWriter;
+import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.transform.stream.StreamSource;
 
 /**
  *
  * @author Paul.Sandoz@Sun.Com
  */
-@Produces("application/fastinfoset")
-@Consumes("application/fastinfoset")
-public final class FastInfosetJAXBElementProvider extends AbstractJAXBElementProvider {
+public class XMLRootElementProvider extends AbstractRootElementProvider {
     
-    public FastInfosetJAXBElementProvider(@Context Providers ps) {
-        super(ps, MediaTypes.FAST_INFOSET);
+    XMLRootElementProvider(Providers ps) {
+        super(ps);
     }
     
-    protected final JAXBElement<?> readFrom(Class<?> type, MediaType mediaType,
+    XMLRootElementProvider(Providers ps, MediaType mt) {
+        super(ps, mt);
+    }
+    
+    @Produces("application/xml")
+    @Consumes("application/xml")
+    public static final class App extends XMLRootElementProvider {
+        public App(@Context Providers ps) { super(ps , MediaType.APPLICATION_XML_TYPE); }
+    }
+    
+    @Produces("text/xml")
+    @Consumes("text/xml")
+    public static final class Text extends XMLRootElementProvider {
+        public Text(@Context Providers ps) { super(ps , MediaType.TEXT_XML_TYPE); }
+    }
+    
+    @Produces("*/*")
+    @Consumes("*/*")
+    public static final class General extends XMLRootElementProvider {
+        public General(@Context Providers ps) { super(ps); }
+    }
+    
+    @Override
+    protected final Object readFrom(Class<Object> type, MediaType mediaType,
             Unmarshaller u, InputStream entityStream)
             throws JAXBException, IOException {
-        return u.unmarshal(new StAXDocumentParser(entityStream), type);
+        if (type.isAnnotationPresent(XmlRootElement.class))
+            return u.unmarshal(entityStream);
+        else
+            return u.unmarshal(new StreamSource(entityStream), type).getValue();
     }
     
-    protected final void writeTo(JAXBElement<?> t, MediaType mediaType, Charset c,
+    @Override
+    protected void writeTo(Object t, MediaType mediaType, Charset c,
             Marshaller m, OutputStream entityStream)
-            throws JAXBException, IOException {        
-        final XMLStreamWriter xsw = new StAXDocumentSerializer(entityStream);
-        m.marshal(t, xsw);
-        try {
-            xsw.flush();
-        } catch (XMLStreamException cause) {
-            throw ThrowHelper.withInitCause(cause,
-                    new IOException()
-                    );            
-        }
+            throws JAXBException, IOException {
+        m.marshal(t, entityStream);
     }
 }

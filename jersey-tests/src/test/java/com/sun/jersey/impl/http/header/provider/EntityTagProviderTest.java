@@ -37,7 +37,7 @@
 
 package com.sun.jersey.impl.http.header.provider;
 
-import com.sun.jersey.impl.provider.header.EntityTagProvider;
+import com.sun.jersey.core.impl.provider.header.EntityTagProvider;
 import javax.ws.rs.core.EntityTag;
 import junit.framework.*;
 

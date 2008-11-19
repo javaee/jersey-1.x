@@ -35,58 +35,40 @@
  * holder.
  */
 
-package com.sun.jersey.impl.provider.entity.fastinfoset;
+package com.sun.jersey.core.impl.provider.header;
 
-import com.sun.jersey.core.header.MediaTypes;
-import com.sun.jersey.core.provider.jaxb.AbstractJAXBElementProvider;
-import com.sun.jersey.core.util.ThrowHelper;
-import com.sun.xml.fastinfoset.stax.StAXDocumentSerializer;
-import com.sun.xml.fastinfoset.stax.StAXDocumentParser;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.nio.charset.Charset;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.Produces;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.ext.Providers;
-import javax.xml.bind.JAXBElement;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
-import javax.xml.bind.Unmarshaller;
-import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamWriter;
+import com.sun.jersey.core.header.LanguageTag;
+import com.sun.jersey.spi.HeaderDelegateProvider;
+import java.text.ParseException;
+import java.util.Locale;
 
 /**
  *
  * @author Paul.Sandoz@Sun.Com
  */
-@Produces("application/fastinfoset")
-@Consumes("application/fastinfoset")
-public final class FastInfosetJAXBElementProvider extends AbstractJAXBElementProvider {
+public class LocaleProvider implements HeaderDelegateProvider<Locale> {
     
-    public FastInfosetJAXBElementProvider(@Context Providers ps) {
-        super(ps, MediaTypes.FAST_INFOSET);
+    public boolean supports(Class<?> type) {
+        return Locale.class.isAssignableFrom(type);
     }
-    
-    protected final JAXBElement<?> readFrom(Class<?> type, MediaType mediaType,
-            Unmarshaller u, InputStream entityStream)
-            throws JAXBException, IOException {
-        return u.unmarshal(new StAXDocumentParser(entityStream), type);
-    }
-    
-    protected final void writeTo(JAXBElement<?> t, MediaType mediaType, Charset c,
-            Marshaller m, OutputStream entityStream)
-            throws JAXBException, IOException {        
-        final XMLStreamWriter xsw = new StAXDocumentSerializer(entityStream);
-        m.marshal(t, xsw);
-        try {
-            xsw.flush();
-        } catch (XMLStreamException cause) {
-            throw ThrowHelper.withInitCause(cause,
-                    new IOException()
-                    );            
+
+    public String toString(Locale header) {
+        if (header.getCountry().length() == 0) {
+            return header.getLanguage();
+        } else {
+            StringBuilder sb = new StringBuilder(header.getLanguage());
+            return sb.append('-').append(header.getCountry()).toString();
         }
     }
+
+    public Locale fromString(String header) {
+        try {
+            LanguageTag lt = new LanguageTag(header);
+            return lt.getAsLocale();
+        } catch (ParseException ex) {
+            throw new IllegalArgumentException(
+                    "Error parsing date '" + header + "'", ex);
+        }
+    }
+    
 }

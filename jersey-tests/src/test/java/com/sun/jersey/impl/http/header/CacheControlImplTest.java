@@ -38,7 +38,7 @@
 package com.sun.jersey.impl.http.header;
 
 import junit.framework.*;
-import com.sun.jersey.impl.provider.header.CacheControlProvider;
+import com.sun.jersey.core.impl.provider.header.CacheControlProvider;
 import javax.ws.rs.core.CacheControl;
 
 /**

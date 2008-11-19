@@ -37,7 +37,7 @@
 
 package com.sun.jersey.impl.http.header.provider;
 
-import com.sun.jersey.impl.provider.header.MediaTypeProvider;
+import com.sun.jersey.core.impl.provider.header.MediaTypeProvider;
 import java.util.HashMap;
 import junit.framework.*;
 import javax.ws.rs.core.MediaType;

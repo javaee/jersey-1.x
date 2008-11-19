@@ -35,58 +35,62 @@
  * holder.
  */
 
-package com.sun.jersey.impl.provider.entity.fastinfoset;
+package com.sun.jersey.core.impl.provider.header;
 
-import com.sun.jersey.core.header.MediaTypes;
-import com.sun.jersey.core.provider.jaxb.AbstractJAXBElementProvider;
-import com.sun.jersey.core.util.ThrowHelper;
-import com.sun.xml.fastinfoset.stax.StAXDocumentSerializer;
-import com.sun.xml.fastinfoset.stax.StAXDocumentParser;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.nio.charset.Charset;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.Produces;
-import javax.ws.rs.core.Context;
+import com.sun.jersey.core.header.reader.HttpHeaderReader;
+import com.sun.jersey.spi.HeaderDelegateProvider;
+import java.text.ParseException;
+import java.util.Map;
 import javax.ws.rs.core.MediaType;
-import javax.ws.rs.ext.Providers;
-import javax.xml.bind.JAXBElement;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
-import javax.xml.bind.Unmarshaller;
-import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamWriter;
 
 /**
  *
- * @author Paul.Sandoz@Sun.Com
+ * @author Marc.Hadley@Sun.Com
  */
-@Produces("application/fastinfoset")
-@Consumes("application/fastinfoset")
-public final class FastInfosetJAXBElementProvider extends AbstractJAXBElementProvider {
+public class MediaTypeProvider implements HeaderDelegateProvider<MediaType> {
     
-    public FastInfosetJAXBElementProvider(@Context Providers ps) {
-        super(ps, MediaTypes.FAST_INFOSET);
+    public boolean supports(Class<?> type) {
+        return MediaType.class.isAssignableFrom(type);
     }
-    
-    protected final JAXBElement<?> readFrom(Class<?> type, MediaType mediaType,
-            Unmarshaller u, InputStream entityStream)
-            throws JAXBException, IOException {
-        return u.unmarshal(new StAXDocumentParser(entityStream), type);
+
+    public String toString(MediaType header) {
+        StringBuilder b = new StringBuilder();
+        b.append(header.getType()).
+            append('/').
+            append(header.getSubtype());
+        for (Map.Entry<String, String> e : header.getParameters().entrySet()) {
+            b.append(';').
+                append(e.getKey()).
+                append('=');
+            WriterUtil.appendQuotedMediaType(b, e.getValue());
+        }
+        return b.toString();
     }
-    
-    protected final void writeTo(JAXBElement<?> t, MediaType mediaType, Charset c,
-            Marshaller m, OutputStream entityStream)
-            throws JAXBException, IOException {        
-        final XMLStreamWriter xsw = new StAXDocumentSerializer(entityStream);
-        m.marshal(t, xsw);
+
+    public MediaType fromString(String header) {
+        if (header == null)
+            throw new IllegalArgumentException("Media type is null");
+        
         try {
-            xsw.flush();
-        } catch (XMLStreamException cause) {
-            throw ThrowHelper.withInitCause(cause,
-                    new IOException()
-                    );            
+            HttpHeaderReader reader = HttpHeaderReader.newInstance(header);
+            // Skip any white space
+            reader.hasNext();
+
+            // Get the type
+            String type = reader.nextToken();
+            reader.nextSeparator('/');
+            // Get the subtype
+            String subType = reader.nextToken();
+
+            Map<String, String> params = null;
+
+            if (reader.hasNext())
+                params = HttpHeaderReader.readParameters(reader);
+
+            return new MediaType(type, subType, params);
+        } catch (ParseException ex) {
+            throw new IllegalArgumentException(
+                    "Error parsing media type '" + header + "'", ex);
         }
     }
 }

@@ -35,58 +35,58 @@
  * holder.
  */
 
-package com.sun.jersey.impl.provider.entity.fastinfoset;
+package com.sun.jersey.core.impl.provider.header;
 
-import com.sun.jersey.core.header.MediaTypes;
-import com.sun.jersey.core.provider.jaxb.AbstractJAXBElementProvider;
-import com.sun.jersey.core.util.ThrowHelper;
-import com.sun.xml.fastinfoset.stax.StAXDocumentSerializer;
-import com.sun.xml.fastinfoset.stax.StAXDocumentParser;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.nio.charset.Charset;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.Produces;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.ext.Providers;
-import javax.xml.bind.JAXBElement;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
-import javax.xml.bind.Unmarshaller;
-import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamWriter;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  *
- * @author Paul.Sandoz@Sun.Com
+ * @author Marc.Hadley@Sun.Com
  */
-@Produces("application/fastinfoset")
-@Consumes("application/fastinfoset")
-public final class FastInfosetJAXBElementProvider extends AbstractJAXBElementProvider {
+/* package */ class WriterUtil {
     
-    public FastInfosetJAXBElementProvider(@Context Providers ps) {
-        super(ps, MediaTypes.FAST_INFOSET);
+    private static Pattern whitespace = Pattern.compile("\\s");
+
+    private static Pattern whitespaceOrQuote = Pattern.compile("[\\s\"]");
+    
+    public static void appendQuotedMediaType(StringBuilder b, String value) {
+        if (value==null)
+            return;
+        Matcher m = whitespaceOrQuote.matcher(value);
+        boolean quote = m.find();
+        if (quote)
+            b.append('"');
+        appendEscapingQuotes(b, value);
+        if (quote)
+            b.append('"');        
     }
     
-    protected final JAXBElement<?> readFrom(Class<?> type, MediaType mediaType,
-            Unmarshaller u, InputStream entityStream)
-            throws JAXBException, IOException {
-        return u.unmarshal(new StAXDocumentParser(entityStream), type);
+    public static void appendQuotedIfWhitespace(StringBuilder b, String value) {
+        if (value==null)
+            return;
+        Matcher m = whitespace.matcher(value);
+        boolean quote = m.find();
+        if (quote)
+            b.append('"');
+        appendEscapingQuotes(b, value);
+        if (quote)
+            b.append('"');
     }
     
-    protected final void writeTo(JAXBElement<?> t, MediaType mediaType, Charset c,
-            Marshaller m, OutputStream entityStream)
-            throws JAXBException, IOException {        
-        final XMLStreamWriter xsw = new StAXDocumentSerializer(entityStream);
-        m.marshal(t, xsw);
-        try {
-            xsw.flush();
-        } catch (XMLStreamException cause) {
-            throw ThrowHelper.withInitCause(cause,
-                    new IOException()
-                    );            
+    public static void appendQuoted(StringBuilder b, String value) {
+        b.append('"');
+        appendEscapingQuotes(b, value);
+        b.append('"');
+    }
+    
+    public static void appendEscapingQuotes(StringBuilder b, String value) {
+        for (int i = 0; i < value.length(); i++) {
+            char c = value.charAt(i);
+            if (c == '"')
+                b.append('\\');
+            b.append(c);
         }
     }
+    
 }

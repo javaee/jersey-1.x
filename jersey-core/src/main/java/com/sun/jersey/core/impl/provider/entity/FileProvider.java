@@ -35,73 +35,75 @@
  * holder.
  */
 
-package com.sun.jersey.impl.provider.entity;
+package com.sun.jersey.core.impl.provider.entity;
 
 import com.sun.jersey.core.provider.AbstractMessageReaderWriterProvider;
-import com.sun.jersey.core.util.ThrowHelper;
-import com.sun.jersey.impl.json.ImplMessages;
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.io.OutputStreamWriter;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
-import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
-import org.codehaus.jettison.json.JSONArray;
-import org.codehaus.jettison.json.JSONException;
 
 /**
  *
- * @author japod
+ * @author Paul.Sandoz@Sun.Com
  */
-public class JSONArrayProvider  extends AbstractMessageReaderWriterProvider<JSONArray>{
+@Produces({"application/octet-stream", "*/*"})
+@Consumes({"application/octet-stream", "*/*"})
+public final class FileProvider extends AbstractMessageReaderWriterProvider<File> {
     
-    public JSONArrayProvider() {
-        Class<?> c = JSONArray.class;
+    public boolean isReadable(Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType) {
+        return File.class == type;
     }
     
-    public boolean isReadable(Class<?> type, Type genericType, Annotation annotations[], MediaType mediaType) {
-        return type == JSONArray.class;        
-    }
-    
-    public JSONArray readFrom(
-            Class<JSONArray> type, 
+    public File readFrom(
+            Class<File> type, 
             Type genericType, 
             Annotation annotations[],
             MediaType mediaType, 
             MultivaluedMap<String, String> httpHeaders, 
             InputStream entityStream) throws IOException {
+        File f = File.createTempFile("rep","tmp");        
+        OutputStream out = new BufferedOutputStream(new FileOutputStream(f));
         try {
-            return new JSONArray(readFromAsString(entityStream, mediaType));
-        } catch (JSONException je) {
-            throw new WebApplicationException(
-                    new Exception(ImplMessages.ERROR_PARSING_JSON_ARRAY(), je),
-                    400);
+            writeTo(entityStream, out);
+        } finally {
+            out.close();
         }
+        return f;
     }
-    
-    public boolean isWriteable(Class<?> type, Type genericType, Annotation annotations[], MediaType mediaType) {
-        return type == JSONArray.class;        
+
+    public boolean isWriteable(Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType) {
+        return File.class.isAssignableFrom(type);
     }
     
     public void writeTo(
-            JSONArray t, 
+            File t,
             Class<?> type, 
             Type genericType, 
             Annotation annotations[], 
             MediaType mediaType, 
             MultivaluedMap<String, Object> httpHeaders,
             OutputStream entityStream) throws IOException {
+        InputStream in = new BufferedInputStream(new FileInputStream(t));
         try {
-            OutputStreamWriter writer = new OutputStreamWriter(entityStream, 
-                    getCharset(mediaType));
-            t.write(writer);
-            writer.write("\n");
-            writer.flush();
-        } catch (JSONException je) {
-            throw ThrowHelper.withInitCause(je, new IOException(ImplMessages.ERROR_WRITING_JSON_ARRAY()));
+            writeTo(in, entityStream);
+        } finally {
+            in.close();
         }
-    }    
+    }
+
+    @Override
+    public long getSize(File t, Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType) {
+        return t.length();
+    }
 }

@@ -35,58 +35,25 @@
  * holder.
  */
 
-package com.sun.jersey.impl.provider.entity.fastinfoset;
-
-import com.sun.jersey.core.header.MediaTypes;
-import com.sun.jersey.core.provider.jaxb.AbstractJAXBElementProvider;
-import com.sun.jersey.core.util.ThrowHelper;
-import com.sun.xml.fastinfoset.stax.StAXDocumentSerializer;
-import com.sun.xml.fastinfoset.stax.StAXDocumentParser;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.nio.charset.Charset;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.Produces;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.ext.Providers;
-import javax.xml.bind.JAXBElement;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
-import javax.xml.bind.Unmarshaller;
-import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamWriter;
+package com.sun.jersey.core.util;
 
 /**
+ * Help functionality when throwing exceptions.
  *
  * @author Paul.Sandoz@Sun.Com
  */
-@Produces("application/fastinfoset")
-@Consumes("application/fastinfoset")
-public final class FastInfosetJAXBElementProvider extends AbstractJAXBElementProvider {
-    
-    public FastInfosetJAXBElementProvider(@Context Providers ps) {
-        super(ps, MediaTypes.FAST_INFOSET);
-    }
-    
-    protected final JAXBElement<?> readFrom(Class<?> type, MediaType mediaType,
-            Unmarshaller u, InputStream entityStream)
-            throws JAXBException, IOException {
-        return u.unmarshal(new StAXDocumentParser(entityStream), type);
-    }
-    
-    protected final void writeTo(JAXBElement<?> t, MediaType mediaType, Charset c,
-            Marshaller m, OutputStream entityStream)
-            throws JAXBException, IOException {        
-        final XMLStreamWriter xsw = new StAXDocumentSerializer(entityStream);
-        m.marshal(t, xsw);
-        try {
-            xsw.flush();
-        } catch (XMLStreamException cause) {
-            throw ThrowHelper.withInitCause(cause,
-                    new IOException()
-                    );            
-        }
+public final class ThrowHelper {
+
+    /**
+     * Set the cause of an exception.
+     *
+     * @param <T> the exception type.
+     * @param cause the cause.
+     * @param effect the effect
+     * @return the effect.
+     */
+    public static <T extends Exception> T withInitCause(Exception cause, T effect) {
+        effect.initCause(cause);
+        return effect;
     }
 }

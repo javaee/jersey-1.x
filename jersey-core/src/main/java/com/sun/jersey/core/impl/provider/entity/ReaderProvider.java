@@ -35,59 +35,51 @@
  * holder.
  */
 
-package com.sun.jersey.impl.provider.entity;
+package com.sun.jersey.core.impl.provider.entity;
 
 import com.sun.jersey.core.provider.AbstractMessageReaderWriterProvider;
-import com.sun.jersey.core.util.ThrowHelper;
-import com.sun.jersey.impl.json.ImplMessages;
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
+import java.io.Reader;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
-import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
-import org.codehaus.jettison.json.JSONArray;
-import org.codehaus.jettison.json.JSONException;
 
 /**
  *
- * @author japod
+ * @author Paul.Sandoz@Sun.Com
  */
-public class JSONArrayProvider  extends AbstractMessageReaderWriterProvider<JSONArray>{
-    
-    public JSONArrayProvider() {
-        Class<?> c = JSONArray.class;
-    }
+@Produces({"text/plain", "*/*"})
+@Consumes({"text/plain", "*/*"})
+public final class ReaderProvider extends AbstractMessageReaderWriterProvider<Reader> {
     
     public boolean isReadable(Class<?> type, Type genericType, Annotation annotations[], MediaType mediaType) {
-        return type == JSONArray.class;        
+        return Reader.class == type;
     }
     
-    public JSONArray readFrom(
-            Class<JSONArray> type, 
+    public Reader readFrom(
+            Class<Reader> type, 
             Type genericType, 
             Annotation annotations[],
             MediaType mediaType, 
             MultivaluedMap<String, String> httpHeaders, 
             InputStream entityStream) throws IOException {
-        try {
-            return new JSONArray(readFromAsString(entityStream, mediaType));
-        } catch (JSONException je) {
-            throw new WebApplicationException(
-                    new Exception(ImplMessages.ERROR_PARSING_JSON_ARRAY(), je),
-                    400);
-        }
+        return new BufferedReader(new InputStreamReader(entityStream, getCharset(mediaType)));
     }
-    
+
     public boolean isWriteable(Class<?> type, Type genericType, Annotation annotations[], MediaType mediaType) {
-        return type == JSONArray.class;        
+        return Reader.class.isAssignableFrom(type);
     }
     
     public void writeTo(
-            JSONArray t, 
+            Reader t, 
             Class<?> type, 
             Type genericType, 
             Annotation annotations[], 
@@ -95,13 +87,10 @@ public class JSONArrayProvider  extends AbstractMessageReaderWriterProvider<JSON
             MultivaluedMap<String, Object> httpHeaders,
             OutputStream entityStream) throws IOException {
         try {
-            OutputStreamWriter writer = new OutputStreamWriter(entityStream, 
-                    getCharset(mediaType));
-            t.write(writer);
-            writer.write("\n");
-            writer.flush();
-        } catch (JSONException je) {
-            throw ThrowHelper.withInitCause(je, new IOException(ImplMessages.ERROR_WRITING_JSON_ARRAY()));
+            writeTo(t, new OutputStreamWriter(entityStream, 
+                    getCharset(mediaType)));
+        } finally {
+            t.close();
         }
-    }    
+    }
 }

@@ -35,8 +35,9 @@
  * holder.
  */
 
-package com.sun.jersey.core.provider.jaxb;
+package com.sun.jersey.core.impl.provider.entity;
 
+import com.sun.jersey.core.provider.jaxb.AbstractJAXBProvider;
 import com.sun.jersey.impl.ImplMessages;
 import com.sun.jersey.core.util.ThrowHelper;
 import java.io.IOException;
@@ -44,51 +45,73 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
-import java.nio.charset.Charset;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.Produces;
 import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.ext.Providers;
+import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
 import javax.xml.bind.UnmarshalException;
-import javax.xml.bind.Unmarshaller;
-import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.XmlType;
 
 /**
  *
  * @author Paul.Sandoz@Sun.Com
  */
-public abstract class AbstractRootElementProvider extends AbstractJAXBProvider<Object> {    
-    public AbstractRootElementProvider(Providers ps) {
+public class XMLRootObjectProvider extends AbstractJAXBProvider<Object> {
+    
+    XMLRootObjectProvider(Providers ps) {
         super(ps);
     }
     
-    public AbstractRootElementProvider(Providers ps, MediaType mt) {
-        super(ps, mt);        
+    XMLRootObjectProvider(Providers ps, MediaType mt) {
+        super(ps, mt);
+    }
+    
+    @Override
+    protected JAXBContext getStoredJAXBContext(Class type) throws JAXBException {
+        return null;
+    }
+    
+    @Produces("application/xml")
+    @Consumes("application/xml")
+    public static final class App extends XMLRootObjectProvider {
+        public App(@Context Providers ps) { super(ps , MediaType.APPLICATION_XML_TYPE); }
+    }
+    
+    @Produces("text/xml")
+    @Consumes("text/xml")
+    public static final class Text extends XMLRootObjectProvider {
+        public Text(@Context Providers ps) { super(ps , MediaType.TEXT_XML_TYPE); }
+    }
+    
+    @Produces("*/*")
+    @Consumes("*/*")
+    public static final class General extends XMLRootObjectProvider {
+        public General(@Context Providers ps) { super(ps); }
     }
     
     public boolean isReadable(Class<?> type, Type genericType, Annotation annotations[], MediaType mediaType) {
-        return type.getAnnotation(XmlRootElement.class) != null ||
-                type.getAnnotation(XmlType.class) != null;
+        try {
+            return Object.class == type && getUnmarshaller(type) != null;
+        } catch (JAXBException cause) {
+            throw ThrowHelper.withInitCause(cause,
+                    new RuntimeException(ImplMessages.ERROR_UNMARSHALLING_JAXB(type))
+                    );
+        }
     }
     
-    public boolean isWriteable(Class<?> type, Type genericType, Annotation annotations[], MediaType mediaType) {
-        return type.getAnnotation(XmlRootElement.class) != null;
-    }
-    
-    
-    public final Object readFrom(
+    public Object readFrom(
             Class<Object> type, 
             Type genericType, 
             Annotation annotations[],
             MediaType mediaType, 
             MultivaluedMap<String, String> httpHeaders, 
-            InputStream entityStream) throws IOException { 
-        
+            InputStream entityStream) throws IOException {        
         try {
-            return readFrom(type, mediaType, getUnmarshaller(type, mediaType), entityStream);
+            return getUnmarshaller(type, mediaType).unmarshal(entityStream);
         } catch (UnmarshalException ex) {
             throw new WebApplicationException(ex, 400);
         } catch (JAXBException cause) {
@@ -98,33 +121,13 @@ public abstract class AbstractRootElementProvider extends AbstractJAXBProvider<O
         }
     }
 
-    protected abstract Object readFrom(Class<Object> type, MediaType mediaType,
-            Unmarshaller m, InputStream entityStream)
-            throws JAXBException, IOException;
-    
-    public final void writeTo(
-            Object t, 
-            Class<?> type, 
-            Type genericType, 
-            Annotation annotations[], 
-            MediaType mediaType, 
-            MultivaluedMap<String, Object> httpHeaders,
-            OutputStream entityStream) throws IOException {
-        try {
-            final Marshaller m = getMarshaller(type, mediaType);
-            final Charset c = getCharset(mediaType);
-            if (c != UTF8) {
-                m.setProperty(Marshaller.JAXB_ENCODING, c.name());
-            }
-            writeTo(t, mediaType, c, m, entityStream);
-        } catch (JAXBException cause) {
-            throw ThrowHelper.withInitCause(cause,
-                    new IOException(ImplMessages.ERROR_MARSHALLING_JAXB(t.getClass()))
-                    );
-        }
+    public boolean isWriteable(Class<?> arg0, Type arg1, Annotation[] arg2, MediaType mediaType) {
+        return false;
     }
-    
-    protected abstract void writeTo(Object t, MediaType mediaType, Charset c,
-            Marshaller m, OutputStream entityStream)
-            throws JAXBException, IOException;
+
+    public void writeTo(Object arg0, Class<?> arg1, Type arg2, Annotation[] arg3, 
+            MediaType arg4, MultivaluedMap<String, Object> arg5, OutputStream arg6) 
+            throws IOException, WebApplicationException {
+        throw new IllegalArgumentException();
+    }
 }

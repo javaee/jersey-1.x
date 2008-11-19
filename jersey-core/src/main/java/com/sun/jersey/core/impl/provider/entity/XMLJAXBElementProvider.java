@@ -35,13 +35,9 @@
  * holder.
  */
 
-package com.sun.jersey.impl.provider.entity.fastinfoset;
+package com.sun.jersey.core.impl.provider.entity;
 
-import com.sun.jersey.core.header.MediaTypes;
 import com.sun.jersey.core.provider.jaxb.AbstractJAXBElementProvider;
-import com.sun.jersey.core.util.ThrowHelper;
-import com.sun.xml.fastinfoset.stax.StAXDocumentSerializer;
-import com.sun.xml.fastinfoset.stax.StAXDocumentParser;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -55,38 +51,49 @@ import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
-import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamWriter;
+import javax.xml.transform.stream.StreamSource;
 
 /**
  *
  * @author Paul.Sandoz@Sun.Com
  */
-@Produces("application/fastinfoset")
-@Consumes("application/fastinfoset")
-public final class FastInfosetJAXBElementProvider extends AbstractJAXBElementProvider {
+public class XMLJAXBElementProvider extends AbstractJAXBElementProvider {
     
-    public FastInfosetJAXBElementProvider(@Context Providers ps) {
-        super(ps, MediaTypes.FAST_INFOSET);
+    public XMLJAXBElementProvider(Providers ps) {
+        super(ps);
+    }
+    
+    public XMLJAXBElementProvider(Providers ps, MediaType mt) {
+        super(ps, mt);        
+    }
+    
+    @Produces("application/xml")
+    @Consumes("application/xml")
+    public static final class App extends XMLJAXBElementProvider {
+        public App(@Context Providers ps) { super(ps , MediaType.APPLICATION_XML_TYPE); }
+    }
+    
+    @Produces("text/xml")
+    @Consumes("text/xml")
+    public static final class Text extends XMLJAXBElementProvider {
+        public Text(@Context Providers ps) { super(ps , MediaType.TEXT_XML_TYPE); }
+    }
+    
+    @Produces("*/*")
+    @Consumes("*/*")
+    public static final class General extends XMLJAXBElementProvider {
+        public General(@Context Providers ps) { super(ps); }
     }
     
     protected final JAXBElement<?> readFrom(Class<?> type, MediaType mediaType,
             Unmarshaller u, InputStream entityStream)
             throws JAXBException, IOException {
-        return u.unmarshal(new StAXDocumentParser(entityStream), type);
+        return u.unmarshal(new StreamSource(entityStream), type);        
     }
-    
+
     protected final void writeTo(JAXBElement<?> t, MediaType mediaType, Charset c,
             Marshaller m, OutputStream entityStream)
             throws JAXBException, IOException {        
-        final XMLStreamWriter xsw = new StAXDocumentSerializer(entityStream);
-        m.marshal(t, xsw);
-        try {
-            xsw.flush();
-        } catch (XMLStreamException cause) {
-            throw ThrowHelper.withInitCause(cause,
-                    new IOException()
-                    );            
-        }
+        m.marshal(t, entityStream);
     }
 }

@@ -46,7 +46,7 @@ import com.sun.jersey.api.representation.Form;
 import com.sun.jersey.core.util.MultivaluedMapImpl;
 import com.sun.jersey.impl.provider.entity.AtomEntryProvider;
 import com.sun.jersey.impl.provider.entity.AtomFeedProvider;
-import com.sun.jersey.impl.provider.entity.FileProvider;
+import com.sun.jersey.core.impl.provider.entity.FileProvider;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;

@@ -217,7 +217,7 @@
                 <artifactId>maven-javadoc-plugin</artifactId>
                 <configuration>
                     <sourcepath>${gen-src-dir}</sourcepath>
-                    <excludePackageNames>com.sun.jersey.impl com.sun.research.ws.wadl</excludePackageNames>
+                    <excludePackageNames>com.sun.jersey.core.impl com.sun.jersey.impl com.sun.research.ws.wadl</excludePackageNames>
                 </configuration>
                 <executions>
                     <execution>

@@ -35,58 +35,41 @@
  * holder.
  */
 
-package com.sun.jersey.impl.provider.entity.fastinfoset;
+package com.sun.jersey.core.impl.provider.header;
 
-import com.sun.jersey.core.header.MediaTypes;
-import com.sun.jersey.core.provider.jaxb.AbstractJAXBElementProvider;
-import com.sun.jersey.core.util.ThrowHelper;
-import com.sun.xml.fastinfoset.stax.StAXDocumentSerializer;
-import com.sun.xml.fastinfoset.stax.StAXDocumentParser;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.nio.charset.Charset;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.Produces;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.ext.Providers;
-import javax.xml.bind.JAXBElement;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
-import javax.xml.bind.Unmarshaller;
-import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamWriter;
+import com.sun.jersey.core.header.reader.HttpHeaderReader;
+import com.sun.jersey.spi.HeaderDelegateProvider;
+import javax.ws.rs.core.Cookie;
 
-/**
- *
- * @author Paul.Sandoz@Sun.Com
- */
-@Produces("application/fastinfoset")
-@Consumes("application/fastinfoset")
-public final class FastInfosetJAXBElementProvider extends AbstractJAXBElementProvider {
+public class CookieProvider implements HeaderDelegateProvider<Cookie> {
     
-    public FastInfosetJAXBElementProvider(@Context Providers ps) {
-        super(ps, MediaTypes.FAST_INFOSET);
+    public boolean supports(Class<?> type) {
+        return type == Cookie.class;
     }
-    
-    protected final JAXBElement<?> readFrom(Class<?> type, MediaType mediaType,
-            Unmarshaller u, InputStream entityStream)
-            throws JAXBException, IOException {
-        return u.unmarshal(new StAXDocumentParser(entityStream), type);
-    }
-    
-    protected final void writeTo(JAXBElement<?> t, MediaType mediaType, Charset c,
-            Marshaller m, OutputStream entityStream)
-            throws JAXBException, IOException {        
-        final XMLStreamWriter xsw = new StAXDocumentSerializer(entityStream);
-        m.marshal(t, xsw);
-        try {
-            xsw.flush();
-        } catch (XMLStreamException cause) {
-            throw ThrowHelper.withInitCause(cause,
-                    new IOException()
-                    );            
+
+    public String toString(Cookie cookie) {
+        StringBuilder b = new StringBuilder();
+        
+        b.append("$Version=").append(cookie.getVersion()).append(';');
+        
+        b.append(cookie.getName()).append('=');
+        WriterUtil.appendQuotedIfWhitespace(b, cookie.getValue());
+        
+        if (cookie.getDomain() != null) {
+            b.append(";$Domain=");
+            WriterUtil.appendQuotedIfWhitespace(b, cookie.getDomain());
         }
+        if (cookie.getPath() != null) {
+            b.append(";$Path=");
+            WriterUtil.appendQuotedIfWhitespace(b, cookie.getPath());
+        }
+        return b.toString();
+    }
+
+    public Cookie fromString(String header) {
+        if (header == null)
+            throw new IllegalArgumentException();
+        
+        return HttpHeaderReader.readCookie(header);
     }
 }
