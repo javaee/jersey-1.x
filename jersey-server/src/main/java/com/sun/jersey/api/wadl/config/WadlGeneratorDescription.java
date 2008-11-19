@@ -39,7 +39,7 @@ package com.sun.jersey.api.wadl.config;
 import java.io.File;
 import java.util.Properties;
 
-import com.sun.jersey.impl.wadl.WadlGenerator;
+import com.sun.jersey.server.wadl.WadlGenerator;
 
 /**
  * This is the model for the definition of wadl generators via configuration properties.<br />

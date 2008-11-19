@@ -37,7 +37,7 @@
 
 package com.sun.jersey.spi.resource;
 
-import com.sun.jersey.impl.resource.SingletonFactory;
+import com.sun.jersey.server.impl.resource.SingletonFactory;
 import com.sun.jersey.server.spi.component.ResourceComponentProviderFactoryClass;
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;

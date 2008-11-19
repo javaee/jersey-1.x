@@ -1,1 +1,1 @@
-com.sun.jersey.impl.provider.RuntimeDelegateImpl
+com.sun.jersey.server.impl.provider.RuntimeDelegateImpl

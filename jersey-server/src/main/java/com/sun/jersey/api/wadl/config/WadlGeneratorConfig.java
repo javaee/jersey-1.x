@@ -42,7 +42,7 @@ import java.util.List;
 import java.util.Properties;
 
 import com.sun.jersey.api.core.ResourceConfig;
-import com.sun.jersey.impl.wadl.WadlGenerator;
+import com.sun.jersey.server.wadl.WadlGenerator;
 
 /**
  * Provides a configured {@link WadlGenerator} with all decorations (the default
@@ -295,7 +295,7 @@ public abstract class WadlGeneratorConfig {
         }
 
         /* (non-Javadoc)
-         * @see com.sun.jersey.impl.wadl.config.WadlGeneratorConfig#getWadlGenerator()
+         * @see com.sun.jersey.server.impl.wadl.config.WadlGeneratorConfig#getWadlGenerator()
          */
         @Override
         public synchronized WadlGenerator getWadlGenerator() {

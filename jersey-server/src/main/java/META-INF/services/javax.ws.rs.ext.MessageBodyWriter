@@ -1,1 +1,1 @@
-com.sun.jersey.impl.template.ViewableMessageBodyWriter
+com.sun.jersey.server.impl.template.ViewableMessageBodyWriter

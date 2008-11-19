@@ -48,10 +48,10 @@ import javax.xml.bind.Unmarshaller;
 import com.sun.jersey.api.model.AbstractResource;
 import com.sun.jersey.api.model.AbstractResourceMethod;
 import com.sun.jersey.api.model.Parameter;
-import com.sun.jersey.impl.wadl.WadlGenerator;
-import com.sun.jersey.impl.wadl.generators.resourcedoc.ResourceDocAccessor;
-import com.sun.jersey.impl.wadl.generators.resourcedoc.model.MethodDocType;
-import com.sun.jersey.impl.wadl.generators.resourcedoc.model.ResourceDocType;
+import com.sun.jersey.server.wadl.WadlGenerator;
+import com.sun.jersey.server.wadl.generators.resourcedoc.ResourceDocAccessor;
+import com.sun.jersey.server.wadl.generators.resourcedoc.model.MethodDocType;
+import com.sun.jersey.server.wadl.generators.resourcedoc.model.ResourceDocType;
 import com.sun.research.ws.wadl.Application;
 import com.sun.research.ws.wadl.Doc;
 import com.sun.research.ws.wadl.Method;
@@ -80,14 +80,14 @@ public class ExampleWadlGenerator implements WadlGenerator {
     private ResourceDocAccessor _resourceDoc;
 
     /* (non-Javadoc)
-     * @see com.sun.jersey.impl.wadl.WadlGenerator#setWadlGeneratorDelegate(com.sun.jersey.impl.wadl.WadlGenerator)
+     * @see com.sun.jersey.server.impl.wadl.WadlGenerator#setWadlGeneratorDelegate(com.sun.jersey.server.impl.wadl.WadlGenerator)
      */
     public void setWadlGeneratorDelegate( WadlGenerator delegate ) {
         _delegate = delegate;
     }
 
     /* (non-Javadoc)
-     * @see com.sun.jersey.impl.wadl.WadlGenerator#getRequiredJaxbContextPath()
+     * @see com.sun.jersey.server.impl.wadl.WadlGenerator#getRequiredJaxbContextPath()
      */
     public String getRequiredJaxbContextPath() {
         return _delegate.getRequiredJaxbContextPath();
@@ -119,7 +119,7 @@ public class ExampleWadlGenerator implements WadlGenerator {
 
     /**
      * @return
-     * @see com.sun.jersey.impl.wadl.WadlGenerator#createApplication()
+     * @see com.sun.jersey.server.impl.wadl.WadlGenerator#createApplication()
      */
     public Application createApplication() {
         return _delegate.createApplication();
@@ -129,7 +129,7 @@ public class ExampleWadlGenerator implements WadlGenerator {
      * @param resource
      * @param resourceMethod
      * @return
-     * @see com.sun.jersey.impl.wadl.WadlGenerator#createMethod(com.sun.jersey.api.model.AbstractResource, com.sun.jersey.api.model.AbstractResourceMethod)
+     * @see com.sun.jersey.server.impl.wadl.WadlGenerator#createMethod(com.sun.jersey.api.model.AbstractResource, com.sun.jersey.api.model.AbstractResourceMethod)
      */
     public Method createMethod( AbstractResource r,
             AbstractResourceMethod m ) {
@@ -155,7 +155,7 @@ public class ExampleWadlGenerator implements WadlGenerator {
      * @param arg0
      * @param arg1
      * @return
-     * @see com.sun.jersey.impl.wadl.WadlGenerator#createRequest(com.sun.jersey.api.model.AbstractResource, com.sun.jersey.api.model.AbstractResourceMethod)
+     * @see com.sun.jersey.server.impl.wadl.WadlGenerator#createRequest(com.sun.jersey.api.model.AbstractResource, com.sun.jersey.api.model.AbstractResourceMethod)
      */
     public Request createRequest( AbstractResource arg0,
             AbstractResourceMethod arg1 ) {
@@ -167,7 +167,7 @@ public class ExampleWadlGenerator implements WadlGenerator {
      * @param arg1
      * @param arg2
      * @return
-     * @see com.sun.jersey.impl.wadl.WadlGenerator#createParam(com.sun.jersey.api.model.AbstractResource, com.sun.jersey.api.model.AbstractMethod, com.sun.jersey.api.model.Parameter)
+     * @see com.sun.jersey.server.impl.wadl.WadlGenerator#createParam(com.sun.jersey.api.model.AbstractResource, com.sun.jersey.api.model.AbstractMethod, com.sun.jersey.api.model.Parameter)
      */
     public Param createParam( AbstractResource arg0,
             AbstractMethod arg1, Parameter arg2 ) {
@@ -179,7 +179,7 @@ public class ExampleWadlGenerator implements WadlGenerator {
      * @param arg1
      * @param arg2
      * @return
-     * @see com.sun.jersey.impl.wadl.WadlGenerator#createRequestRepresentation(com.sun.jersey.api.model.AbstractResource, com.sun.jersey.api.model.AbstractResourceMethod, javax.ws.rs.core.MediaType)
+     * @see com.sun.jersey.server.impl.wadl.WadlGenerator#createRequestRepresentation(com.sun.jersey.api.model.AbstractResource, com.sun.jersey.api.model.AbstractResourceMethod, javax.ws.rs.core.MediaType)
      */
     public RepresentationType createRequestRepresentation(
             AbstractResource arg0, AbstractResourceMethod arg1, MediaType arg2 ) {
@@ -190,7 +190,7 @@ public class ExampleWadlGenerator implements WadlGenerator {
      * @param arg0
      * @param arg1
      * @return
-     * @see com.sun.jersey.impl.wadl.WadlGenerator#createResource(com.sun.jersey.api.model.AbstractResource, java.lang.String)
+     * @see com.sun.jersey.server.impl.wadl.WadlGenerator#createResource(com.sun.jersey.api.model.AbstractResource, java.lang.String)
      */
     public Resource createResource( AbstractResource arg0, String arg1 ) {
         return _delegate.createResource( arg0, arg1 );
@@ -198,7 +198,7 @@ public class ExampleWadlGenerator implements WadlGenerator {
 
     /**
      * @return
-     * @see com.sun.jersey.impl.wadl.WadlGenerator#createResources()
+     * @see com.sun.jersey.server.impl.wadl.WadlGenerator#createResources()
      */
     public Resources createResources() {
         return _delegate.createResources();
@@ -208,7 +208,7 @@ public class ExampleWadlGenerator implements WadlGenerator {
      * @param arg0
      * @param arg1
      * @return
-     * @see com.sun.jersey.impl.wadl.WadlGenerator#createResponse(com.sun.jersey.api.model.AbstractResource, com.sun.jersey.api.model.AbstractResourceMethod)
+     * @see com.sun.jersey.server.impl.wadl.WadlGenerator#createResponse(com.sun.jersey.api.model.AbstractResource, com.sun.jersey.api.model.AbstractResourceMethod)
      */
     public Response createResponse( AbstractResource arg0,
             AbstractResourceMethod arg1 ) {

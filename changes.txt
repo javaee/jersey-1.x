@@ -1,4 +1,7 @@
 release 1.0.1 (2008-11/12)
+- Refactored WADL generation classes to be placed in base package:
+  com.sun.jersey.server.wadl. Previously WADL generation classes
+  were in the base package com.sun.jersey.impl.wadl.
 - Fixed issue 144
   https://jersey.dev.java.net/issues/show_bug.cgi?id=144
   Async/WebResource.toString returns a String instance of the URI of

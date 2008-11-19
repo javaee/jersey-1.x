@@ -39,8 +39,8 @@ package com.sun.jersey.api.wadl.config;
 import java.util.logging.Logger;
 
 import com.sun.jersey.api.core.ResourceConfig;
-import com.sun.jersey.impl.wadl.WadlGenerator;
-import com.sun.jersey.impl.wadl.WadlGeneratorImpl;
+import com.sun.jersey.server.wadl.WadlGenerator;
+import com.sun.jersey.server.wadl.WadlGeneratorImpl;
 
 /**
  * Loads a {@link WadlGeneratorConfig} and provides access to the {@link WadlGenerator}

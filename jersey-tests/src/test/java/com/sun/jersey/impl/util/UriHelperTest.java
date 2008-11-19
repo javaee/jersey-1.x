@@ -37,7 +37,7 @@
 
 package com.sun.jersey.impl.util;
 
-import com.sun.jersey.impl.uri.UriHelper;
+import com.sun.jersey.server.impl.uri.UriHelper;
 import junit.framework.*;
 import java.net.URI;
 import java.net.URISyntaxException;

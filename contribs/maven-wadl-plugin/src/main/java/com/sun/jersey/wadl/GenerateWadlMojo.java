@@ -61,10 +61,10 @@ import org.apache.xml.serialize.XMLSerializer;
 import com.sun.jersey.api.core.PackagesResourceConfig;
 import com.sun.jersey.api.core.ResourceConfig;
 import com.sun.jersey.api.model.AbstractResource;
-import com.sun.jersey.impl.modelapi.annotation.IntrospectionModeller;
-import com.sun.jersey.impl.wadl.WadlBuilder;
-import com.sun.jersey.impl.wadl.WadlGenerator;
-import com.sun.jersey.impl.wadl.WadlGeneratorImpl;
+import com.sun.jersey.server.impl.modelapi.annotation.IntrospectionModeller;
+import com.sun.jersey.server.wadl.WadlBuilder;
+import com.sun.jersey.server.wadl.WadlGenerator;
+import com.sun.jersey.server.wadl.WadlGeneratorImpl;
 import com.sun.jersey.wadl.resourcedoc.ResourceDoclet;
 import com.sun.research.ws.wadl.Application;
 
@@ -135,7 +135,7 @@ public class GenerateWadlMojo extends AbstractMojoProjectClasspathSupport {
         
         try {
             
-            com.sun.jersey.impl.wadl.WadlGenerator wadlGenerator = new WadlGeneratorImpl();
+            com.sun.jersey.server.wadl.WadlGenerator wadlGenerator = new WadlGeneratorImpl();
             if ( _wadlGenerators != null ) {
                 for ( WadlGeneratorDescription wadlGeneratorDescription : _wadlGenerators ) {
                     wadlGenerator = loadWadlGenerator( wadlGeneratorDescription, wadlGenerator );
@@ -203,7 +203,7 @@ public class GenerateWadlMojo extends AbstractMojoProjectClasspathSupport {
 
     private WadlGenerator loadWadlGenerator(
             WadlGeneratorDescription wadlGeneratorDescription,
-            com.sun.jersey.impl.wadl.WadlGenerator wadlGeneratorDelegate ) throws Exception {
+            com.sun.jersey.server.wadl.WadlGenerator wadlGeneratorDelegate ) throws Exception {
         getLog().info( "Loading wadlGenerator " + wadlGeneratorDescription.getClassName() );
         final Class<?> clazz = Class.forName( wadlGeneratorDescription.getClassName(), true, Thread.currentThread().getContextClassLoader() );
         final WadlGenerator generator = clazz.asSubclass( WadlGenerator.class ).newInstance();

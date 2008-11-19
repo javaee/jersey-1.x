@@ -47,8 +47,8 @@ import java.util.List;
 import java.util.Map.Entry;
 import java.util.logging.Logger;
 
-import com.sun.jersey.impl.wadl.WadlGenerator;
-import com.sun.jersey.impl.wadl.WadlGeneratorImpl;
+import com.sun.jersey.server.wadl.WadlGenerator;
+import com.sun.jersey.server.wadl.WadlGeneratorImpl;
 
 /**
  * Loads {@link WadlGenerator}s from a provided list of {@link WadlGeneratorDescription}s.<br/>
@@ -103,7 +103,7 @@ class WadlGeneratorLoader {
 
     private static WadlGenerator loadWadlGenerator(
             WadlGeneratorDescription wadlGeneratorDescription,
-            com.sun.jersey.impl.wadl.WadlGenerator wadlGeneratorDelegate ) throws Exception {
+            com.sun.jersey.server.wadl.WadlGenerator wadlGeneratorDelegate ) throws Exception {
         LOGGER.info( "Loading wadlGenerator " + wadlGeneratorDescription.getGeneratorClass().getName() );
         final WadlGenerator generator = wadlGeneratorDescription.getGeneratorClass().newInstance();
         generator.setWadlGeneratorDelegate( wadlGeneratorDelegate );

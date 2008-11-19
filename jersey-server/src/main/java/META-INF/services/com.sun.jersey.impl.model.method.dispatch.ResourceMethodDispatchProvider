@@ -1,6 +1,0 @@
-com.sun.jersey.impl.model.method.dispatch.VoidVoidDispatchProvider
-com.sun.jersey.impl.model.method.dispatch.HttpReqResDispatchProvider
-com.sun.jersey.impl.model.method.dispatch.MultipartFormDispatchProvider
-com.sun.jersey.impl.model.method.dispatch.FormDispatchProvider
-com.sun.jersey.impl.model.method.dispatch.EntityParamDispatchProvider
-

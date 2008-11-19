@@ -44,9 +44,9 @@ import com.sun.javadoc.ClassDoc;
 import com.sun.javadoc.MethodDoc;
 import com.sun.javadoc.ParamTag;
 import com.sun.javadoc.Parameter;
-import com.sun.jersey.impl.wadl.generators.resourcedoc.model.ClassDocType;
-import com.sun.jersey.impl.wadl.generators.resourcedoc.model.MethodDocType;
-import com.sun.jersey.impl.wadl.generators.resourcedoc.model.ParamDocType;
+import com.sun.jersey.server.wadl.generators.resourcedoc.model.ClassDocType;
+import com.sun.jersey.server.wadl.generators.resourcedoc.model.MethodDocType;
+import com.sun.jersey.server.wadl.generators.resourcedoc.model.ParamDocType;
 
 /**
  * This {@link DocProcessor} wraps multiple {@link DocProcessor}s.<br>
@@ -93,7 +93,7 @@ public class DocProcessorWrapper implements DocProcessor {
     }
 
     /* (non-Javadoc)
-     * @see com.sun.jersey.wadl.resourcedoc.DocProcessor#processClassDoc(com.sun.javadoc.ClassDoc, com.sun.jersey.impl.wadl.generators.resourcedoc.model.ClassDocType)
+     * @see com.sun.jersey.wadl.resourcedoc.DocProcessor#processClassDoc(com.sun.javadoc.ClassDoc, com.sun.jersey.server.impl.wadl.generators.resourcedoc.model.ClassDocType)
      */
     public void processClassDoc( ClassDoc classDoc, ClassDocType classDocType ) {
         for( DocProcessor docProcessor : _docProcessors ) {
@@ -102,7 +102,7 @@ public class DocProcessorWrapper implements DocProcessor {
     }
 
     /* (non-Javadoc)
-     * @see com.sun.jersey.wadl.resourcedoc.DocProcessor#processMethodDoc(com.sun.javadoc.MethodDoc, com.sun.jersey.impl.wadl.generators.resourcedoc.model.MethodDocType)
+     * @see com.sun.jersey.wadl.resourcedoc.DocProcessor#processMethodDoc(com.sun.javadoc.MethodDoc, com.sun.jersey.server.impl.wadl.generators.resourcedoc.model.MethodDocType)
      */
     public void processMethodDoc( MethodDoc methodDoc,
             MethodDocType methodDocType ) {
@@ -112,7 +112,7 @@ public class DocProcessorWrapper implements DocProcessor {
     }
 
     /* (non-Javadoc)
-     * @see com.sun.jersey.wadl.resourcedoc.DocProcessor#processParamTag(com.sun.javadoc.ParamTag, com.sun.javadoc.Parameter, com.sun.jersey.impl.wadl.generators.resourcedoc.model.ParamDocType)
+     * @see com.sun.jersey.wadl.resourcedoc.DocProcessor#processParamTag(com.sun.javadoc.ParamTag, com.sun.javadoc.Parameter, com.sun.jersey.server.impl.wadl.generators.resourcedoc.model.ParamDocType)
      */
     public void processParamTag( ParamTag paramTag, Parameter parameter,
             ParamDocType paramDocType ) {

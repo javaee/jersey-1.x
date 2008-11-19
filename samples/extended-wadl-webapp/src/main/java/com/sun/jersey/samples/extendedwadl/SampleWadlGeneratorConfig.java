@@ -40,10 +40,10 @@ import java.util.List;
 
 import com.sun.jersey.api.wadl.config.WadlGeneratorConfig;
 import com.sun.jersey.api.wadl.config.WadlGeneratorDescription;
-import com.sun.jersey.impl.wadl.WadlGenerator;
-import com.sun.jersey.impl.wadl.generators.WadlGeneratorApplicationDoc;
-import com.sun.jersey.impl.wadl.generators.WadlGeneratorGrammarsSupport;
-import com.sun.jersey.impl.wadl.generators.resourcedoc.WadlGeneratorResourceDocSupport;
+import com.sun.jersey.server.wadl.WadlGenerator;
+import com.sun.jersey.server.wadl.generators.WadlGeneratorApplicationDoc;
+import com.sun.jersey.server.wadl.generators.WadlGeneratorGrammarsSupport;
+import com.sun.jersey.server.wadl.generators.resourcedoc.WadlGeneratorResourceDocSupport;
 
 /**
  * This subclass of {@link WadlGeneratorConfig} defines/configures {@link WadlGenerator}s

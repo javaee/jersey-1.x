@@ -73,16 +73,16 @@ import com.sun.javadoc.RootDoc;
 import com.sun.javadoc.SeeTag;
 import com.sun.javadoc.Tag;
 import com.sun.javadoc.AnnotationDesc.ElementValuePair;
-import com.sun.jersey.impl.wadl.generators.resourcedoc.model.AnnotationDocType;
-import com.sun.jersey.impl.wadl.generators.resourcedoc.model.ClassDocType;
-import com.sun.jersey.impl.wadl.generators.resourcedoc.model.MethodDocType;
-import com.sun.jersey.impl.wadl.generators.resourcedoc.model.NamedValueType;
-import com.sun.jersey.impl.wadl.generators.resourcedoc.model.ParamDocType;
-import com.sun.jersey.impl.wadl.generators.resourcedoc.model.RepresentationDocType;
-import com.sun.jersey.impl.wadl.generators.resourcedoc.model.RequestDocType;
-import com.sun.jersey.impl.wadl.generators.resourcedoc.model.ResourceDocType;
-import com.sun.jersey.impl.wadl.generators.resourcedoc.model.ResponseDocType;
-import com.sun.jersey.impl.wadl.generators.resourcedoc.model.WadlParamType;
+import com.sun.jersey.server.wadl.generators.resourcedoc.model.AnnotationDocType;
+import com.sun.jersey.server.wadl.generators.resourcedoc.model.ClassDocType;
+import com.sun.jersey.server.wadl.generators.resourcedoc.model.MethodDocType;
+import com.sun.jersey.server.wadl.generators.resourcedoc.model.NamedValueType;
+import com.sun.jersey.server.wadl.generators.resourcedoc.model.ParamDocType;
+import com.sun.jersey.server.wadl.generators.resourcedoc.model.RepresentationDocType;
+import com.sun.jersey.server.wadl.generators.resourcedoc.model.RequestDocType;
+import com.sun.jersey.server.wadl.generators.resourcedoc.model.ResourceDocType;
+import com.sun.jersey.server.wadl.generators.resourcedoc.model.ResponseDocType;
+import com.sun.jersey.server.wadl.generators.resourcedoc.model.WadlParamType;
 import com.sun.jersey.util.Loader;
 
 /**

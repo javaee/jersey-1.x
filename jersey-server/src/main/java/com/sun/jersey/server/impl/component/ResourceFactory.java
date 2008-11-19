@@ -41,7 +41,7 @@ import com.sun.jersey.api.container.ContainerException;
 import com.sun.jersey.api.core.ResourceConfig;
 import com.sun.jersey.core.spi.component.ComponentConstructor;
 import com.sun.jersey.core.spi.component.ComponentInjector;
-import com.sun.jersey.impl.resource.PerRequestFactory;
+import com.sun.jersey.server.impl.resource.PerRequestFactory;
 import com.sun.jersey.spi.inject.InjectableProviderContext;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationTargetException;

@@ -37,8 +37,8 @@
 
 package com.sun.jersey.impl.uri.rules;
 
-import com.sun.jersey.impl.model.RulesMap;
-import com.sun.jersey.impl.uri.PathPattern;
+import com.sun.jersey.server.impl.model.RulesMap;
+import com.sun.jersey.server.impl.uri.PathPattern;
 import com.sun.jersey.api.uri.UriTemplate;
 import com.sun.jersey.spi.uri.rules.UriMatchResultContext;
 import com.sun.jersey.spi.uri.rules.UriRules;

@@ -1,1 +1,1 @@
-com.sun.jersey.impl.container.WebApplicationProviderImpl
+com.sun.jersey.server.impl.container.WebApplicationProviderImpl

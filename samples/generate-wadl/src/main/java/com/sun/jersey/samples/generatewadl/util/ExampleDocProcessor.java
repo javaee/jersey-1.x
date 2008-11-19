@@ -41,9 +41,9 @@ import com.sun.javadoc.MethodDoc;
 import com.sun.javadoc.ParamTag;
 import com.sun.javadoc.Parameter;
 import com.sun.javadoc.Tag;
-import com.sun.jersey.impl.wadl.generators.resourcedoc.model.ClassDocType;
-import com.sun.jersey.impl.wadl.generators.resourcedoc.model.MethodDocType;
-import com.sun.jersey.impl.wadl.generators.resourcedoc.model.ParamDocType;
+import com.sun.jersey.server.wadl.generators.resourcedoc.model.ClassDocType;
+import com.sun.jersey.server.wadl.generators.resourcedoc.model.MethodDocType;
+import com.sun.jersey.server.wadl.generators.resourcedoc.model.ParamDocType;
 import com.sun.jersey.wadl.resourcedoc.DocProcessor;
 
 /**

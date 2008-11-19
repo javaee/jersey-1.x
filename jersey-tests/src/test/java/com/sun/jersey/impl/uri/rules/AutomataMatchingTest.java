@@ -37,8 +37,9 @@
 
 package com.sun.jersey.impl.uri.rules;
 
-import com.sun.jersey.impl.uri.PathPattern;
-import com.sun.jersey.impl.uri.rules.automata.AutomataMatchingUriTemplateRules;
+import com.sun.jersey.server.impl.uri.rules.PatternRulePair;
+import com.sun.jersey.server.impl.uri.PathPattern;
+import com.sun.jersey.server.impl.uri.rules.automata.AutomataMatchingUriTemplateRules;
 import com.sun.jersey.spi.uri.rules.UriRules;
 import java.util.ArrayList;
 import java.util.List;

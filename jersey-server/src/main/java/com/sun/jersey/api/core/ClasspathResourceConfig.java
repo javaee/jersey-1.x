@@ -37,7 +37,7 @@
 
 package com.sun.jersey.api.core;
 
-import com.sun.jersey.impl.container.config.AnnotatedClassScanner;
+import com.sun.jersey.server.impl.container.config.AnnotatedClassScanner;
 import java.io.File;
 import java.util.Map;
 import java.util.logging.Level;

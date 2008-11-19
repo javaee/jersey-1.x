@@ -37,7 +37,7 @@
 
 package com.sun.jersey.spi.container.servlet;
 
-import com.sun.jersey.impl.container.servlet.PerSessionFactory;
+import com.sun.jersey.server.impl.container.servlet.PerSessionFactory;
 import com.sun.jersey.server.spi.component.ResourceComponentProviderFactoryClass;
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;

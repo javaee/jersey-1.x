@@ -37,10 +37,10 @@
 
 package com.sun.jersey.impl.modelapi.validation;
 
-import com.sun.jersey.impl.modelapi.validation.BasicValidator;
+import com.sun.jersey.server.impl.modelapi.validation.BasicValidator;
 import com.sun.jersey.api.model.AbstractResource;
 import com.sun.jersey.api.model.ResourceModelIssue;
-import com.sun.jersey.impl.modelapi.annotation.IntrospectionModeller;
+import com.sun.jersey.server.impl.modelapi.annotation.IntrospectionModeller;
 import com.sun.jersey.spi.resource.Singleton;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

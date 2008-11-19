@@ -186,7 +186,7 @@
                     </packagesResourceConfig>
                     <wadlGenerators>
                         <wadlGeneratorDescription>
-                            <className>com.sun.jersey.impl.wadl.generators.WadlGeneratorApplicationDoc</className>
+                            <className>com.sun.jersey.server.wadl.generators.WadlGeneratorApplicationDoc</className>
                             <properties>
                                 <property>
                                     <name>applicationDocsFile</name>
@@ -195,7 +195,7 @@
                             </properties>
                         </wadlGeneratorDescription>
                         <wadlGeneratorDescription>
-                            <className>com.sun.jersey.impl.wadl.generators.WadlGeneratorGrammarsSupport</className>
+                            <className>com.sun.jersey.server.wadl.generators.WadlGeneratorGrammarsSupport</className>
                             <properties>
                                 <property>
                                     <name>grammarsFile</name>
@@ -204,7 +204,7 @@
                             </properties>
                         </wadlGeneratorDescription>
                         <wadlGeneratorDescription>
-                            <className>com.sun.jersey.impl.wadl.generators.resourcedoc.WadlGeneratorResourceDocSupport</className>
+                            <className>com.sun.jersey.server.wadl.generators.resourcedoc.WadlGeneratorResourceDocSupport</className>
                             <properties>
                                 <property>
                                     <name>resourceDocFile</name>

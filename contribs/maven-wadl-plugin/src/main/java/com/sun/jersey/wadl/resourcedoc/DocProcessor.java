@@ -40,10 +40,10 @@ import com.sun.javadoc.ClassDoc;
 import com.sun.javadoc.MethodDoc;
 import com.sun.javadoc.ParamTag;
 import com.sun.javadoc.Parameter;
-import com.sun.jersey.impl.wadl.WadlGenerator;
-import com.sun.jersey.impl.wadl.generators.resourcedoc.model.ClassDocType;
-import com.sun.jersey.impl.wadl.generators.resourcedoc.model.MethodDocType;
-import com.sun.jersey.impl.wadl.generators.resourcedoc.model.ParamDocType;
+import com.sun.jersey.server.wadl.WadlGenerator;
+import com.sun.jersey.server.wadl.generators.resourcedoc.model.ClassDocType;
+import com.sun.jersey.server.wadl.generators.resourcedoc.model.MethodDocType;
+import com.sun.jersey.server.wadl.generators.resourcedoc.model.ParamDocType;
 
 /**
  * A doc processor is handed over javadoc elements so that it can turn this into

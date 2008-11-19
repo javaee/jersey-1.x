@@ -37,10 +37,11 @@
 
 package com.sun.jersey.impl.lifecycle;
 
+import com.sun.jersey.server.impl.resource.PerRequestFactory;
 import com.sun.jersey.impl.resource.*;
 import com.sun.jersey.impl.AbstractResourceTester;
 import com.sun.jersey.api.core.ResourceConfig;
-import com.sun.jersey.impl.application.WebApplicationImpl;
+import com.sun.jersey.server.impl.application.WebApplicationImpl;
 import com.sun.jersey.api.core.DefaultResourceConfig;
 import com.sun.jersey.api.client.WebResource;
 import com.sun.jersey.spi.resource.PerRequest;

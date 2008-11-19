@@ -37,6 +37,7 @@
 
 package com.sun.jersey.impl.application;
 
+import com.sun.jersey.server.impl.application.WebApplicationImpl;
 import com.sun.jersey.api.container.ContainerException;
 import com.sun.jersey.api.core.HttpResponseContext;
 import com.sun.jersey.api.core.HttpRequestContext;

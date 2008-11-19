@@ -38,7 +38,7 @@
 package com.sun.jersey.impl;
 
 import com.sun.jersey.api.core.HttpRequestContext;
-import com.sun.jersey.impl.application.WebApplicationContext;
+import com.sun.jersey.server.impl.application.WebApplicationContext;
 import com.sun.jersey.spi.container.ContainerRequest;
 import java.util.List;
 import javax.ws.rs.core.MultivaluedMap;

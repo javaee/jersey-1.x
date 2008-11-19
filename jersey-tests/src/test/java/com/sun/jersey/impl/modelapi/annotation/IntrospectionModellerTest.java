@@ -37,7 +37,7 @@
 
 package com.sun.jersey.impl.modelapi.annotation;
 
-import com.sun.jersey.impl.modelapi.annotation.IntrospectionModeller;
+import com.sun.jersey.server.impl.modelapi.annotation.IntrospectionModeller;
 import com.sun.jersey.api.model.AbstractResource;
 import com.sun.jersey.api.model.AbstractResourceMethod;
 import com.sun.jersey.api.model.AbstractSubResourceLocator;

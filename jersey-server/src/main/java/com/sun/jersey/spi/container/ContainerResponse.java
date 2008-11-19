@@ -39,7 +39,7 @@ package com.sun.jersey.spi.container;
 import com.sun.jersey.core.header.OutBoundHeaders;
 import com.sun.jersey.api.Responses;
 import com.sun.jersey.api.core.HttpResponseContext;
-import com.sun.jersey.impl.ResponseImpl;
+import com.sun.jersey.server.impl.ResponseImpl;
 import com.sun.jersey.spi.MessageBodyWorkers;
 import java.io.IOException;
 import java.io.OutputStream;

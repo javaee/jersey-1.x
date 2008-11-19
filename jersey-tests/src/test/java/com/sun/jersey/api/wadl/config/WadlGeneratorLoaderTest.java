@@ -52,7 +52,7 @@ import com.sun.jersey.api.model.AbstractResource;
 import com.sun.jersey.api.model.AbstractResourceMethod;
 import com.sun.jersey.api.model.Parameter;
 import com.sun.jersey.impl.AbstractResourceTester;
-import com.sun.jersey.impl.wadl.WadlGenerator;
+import com.sun.jersey.server.wadl.WadlGenerator;
 import com.sun.research.ws.wadl.Application;
 import com.sun.research.ws.wadl.Method;
 import com.sun.research.ws.wadl.Param;

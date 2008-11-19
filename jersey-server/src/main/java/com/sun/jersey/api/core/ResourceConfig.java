@@ -37,7 +37,7 @@
 
 package com.sun.jersey.api.core;
 
-import com.sun.jersey.impl.wadl.WadlGenerator;
+import com.sun.jersey.server.wadl.WadlGenerator;
 import com.sun.jersey.spi.container.ContainerListener;
 import com.sun.jersey.spi.container.ContainerNotifier;
 import com.sun.jersey.spi.container.ContainerRequestFilter;
@@ -173,7 +173,7 @@ public abstract class ResourceConfig extends Application {
 
     /**
      * If set the wadl generator configuration that provides that {@link WadlGenerator}
-     * to be used by the {@link com.sun.jersey.impl.wadl.WadlFactory}.
+     * to be used by the {@link com.sun.jersey.server.impl.wadl.WadlFactory}.
      * <p>
      * The type of this property must be a subclass or an instance of a subclass of
      * {@link com.sun.jersey.api.wadl.config.WadlGeneratorConfig}.
