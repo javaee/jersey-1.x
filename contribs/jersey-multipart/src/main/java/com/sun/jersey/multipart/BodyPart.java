@@ -250,8 +250,7 @@ public class BodyPart {
      * @exception IllegalArgumentException if no {@link MessageBodyReader} can
      *  be found to perform the requested conversion
      * @exception IllegalStateException if this method is called when the
-     *  <code>providers</code> property has not been set
-     * @exception IllegalStateException if this method is called when the
+     *  <code>providers</code> property has not been set or when the
      *  entity instance is not the unconverted content of the body part entity
      */
     public <T> T getEntityAs(Class<T> clazz) {
