@@ -75,6 +75,9 @@ public class MultiPartReader implements MessageBodyReader<MultiPart> {
      */
     public MultiPartReader(@Context MultiPartConfig config) {
 //        System.out.println("MultiPartConfig = " + config);
+        if (config == null) {
+            throw new IllegalArgumentException("The MultiPartConfig instance we expected is not present.  Have you registered the MultiPartConfigProvider class?");
+        }
         this.config = config;
     }
 
