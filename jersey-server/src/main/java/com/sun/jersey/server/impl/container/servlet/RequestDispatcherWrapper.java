@@ -48,17 +48,20 @@ import javax.servlet.ServletResponse;
  * @author Paul.Sandoz@Sun.Com
  */
 public final class RequestDispatcherWrapper implements RequestDispatcher {
+    private final String basePath;
     private final RequestDispatcher d;
     private final Object resource;
     private final Object it;
 
-    public RequestDispatcherWrapper(RequestDispatcher d, Object resource, Object it) {
+    public RequestDispatcherWrapper(String basePath, RequestDispatcher d, Object resource, Object it) {
+        this.basePath = basePath;
         this.d = d;
         this.resource = resource;
         this.it = it;
     }
 
     public void forward(ServletRequest req, ServletResponse rsp) throws ServletException, IOException {
+        req.setAttribute("_basePath", basePath);
         req.setAttribute("resource", resource);
         req.setAttribute("it", it);
         req.setAttribute("_request", req);

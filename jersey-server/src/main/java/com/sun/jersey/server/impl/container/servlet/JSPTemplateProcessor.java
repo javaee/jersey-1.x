@@ -38,6 +38,8 @@
 package com.sun.jersey.server.impl.container.servlet;
 
 import com.sun.jersey.api.container.ContainerException;
+import com.sun.jersey.api.core.ResourceConfig;
+import com.sun.jersey.spi.container.servlet.ServletContainer;
 import com.sun.jersey.spi.template.TemplateProcessor;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -62,17 +64,34 @@ public class JSPTemplateProcessor implements TemplateProcessor {
     private final ThreadLocal<HttpServletRequest> requestInvoker;
     
     private final ThreadLocal<HttpServletResponse> responseInvoker;
+
+    private final String basePath;
     
-    public JSPTemplateProcessor(ThreadLocal<HttpServletRequest> requestInvoker,
+    public JSPTemplateProcessor(
+            ResourceConfig resourceConfig,
+            ThreadLocal<HttpServletRequest> requestInvoker,
             ThreadLocal<HttpServletResponse> responseInvoker) {
         this.requestInvoker = requestInvoker;
         this.responseInvoker = responseInvoker;
+
+        String path = (String)resourceConfig.getProperties().get(
+                ServletContainer.JSP_TEMPLATES_BASE_PATH);
+        if (path == null)
+            this.basePath = "";
+        else if (path.charAt(0) == '/') {
+            this.basePath = path;
+        } else {
+            this.basePath = "/" + path;
+        }
     }
     
     public String resolve(String path) {
         if (servletContext == null)
             return null;
 
+        if (basePath != "")
+            path = basePath + path;
+        
         try {
             if (servletContext.getResource(path) != null) {
                 return path;
@@ -100,7 +119,7 @@ public class JSPTemplateProcessor implements TemplateProcessor {
             throw new ContainerException("No request dispatcher for: " + resolvedPath);
         }
                 
-        d = new RequestDispatcherWrapper(d, ui.getMatchedResources().get(0), model);
+        d = new RequestDispatcherWrapper(basePath, d, ui.getMatchedResources().get(0), model);
         
         try {
             d.forward(requestInvoker.get(), responseInvoker.get());

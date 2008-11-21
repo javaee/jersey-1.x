@@ -1,4 +1,10 @@
 release 1.0.1 (2008-11/12)
+- Fixed issue 147
+  https://jersey.dev.java.net/issues/show_bug.cgi?id=147
+  The base path in the Web Pages for JSP templates associated with viewables
+  of resource classes is configurable. The base path may be declared as the
+  value of the servlet init-param:
+    "com.sun.jersey.config.property.JSPTemplatesBasePath"
 - Refactored WADL generation classes to be placed in base package:
   com.sun.jersey.server.wadl. Previously WADL generation classes
   were in the base package com.sun.jersey.impl.wadl.

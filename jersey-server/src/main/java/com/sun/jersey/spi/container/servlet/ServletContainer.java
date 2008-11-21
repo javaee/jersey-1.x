@@ -166,6 +166,16 @@ public class ServletContainer extends HttpServlet implements ContainerListener {
     public static final String RESOURCE_CONFIG_CLASS = 
             "com.sun.jersey.config.property.resourceConfigClass";
     
+    /**
+     * The base path in the Web Pages where JSP templates, associated with
+     * viewables of resource classes, are located.
+     * <p>
+     * If this property is not set then the base path will be the root path
+     * of the Web Pages.
+     */
+    public static final String JSP_TEMPLATES_BASE_PATH =
+            "com.sun.jersey.config.property.JSPTemplatesBasePath";
+
     private static final Logger LOGGER = 
             Logger.getLogger(ServletContainer.class.getName());
     
@@ -616,6 +626,7 @@ public class ServletContainer extends HttpServlet implements ContainerListener {
                 sc.getServletContext()));
         
         rc.getSingletons().add(new JSPTemplateProcessor(
+                resourceConfig,
                 requestInvoker.getThreadLocal(), 
                 responseInvoker.getThreadLocal()));
     }

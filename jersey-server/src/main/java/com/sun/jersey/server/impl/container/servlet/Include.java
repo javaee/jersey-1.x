@@ -114,8 +114,9 @@ public class Include extends SimpleTagSupport {
         ServletConfig cfg = (ServletConfig) getPageObject(PageContext.CONFIG);
         ServletContext sc = cfg.getServletContext();
 
+        String basePath = (String)getJspContext().getAttribute("_basePath", PageContext.REQUEST_SCOPE);
         for (Class c = resource.getClass(); c != Object.class; c = c.getSuperclass()) {
-            String name = "/" + c.getName().replace('.', '/') + '/' + page;
+            String name = basePath + "/" + c.getName().replace('.', '/') + '/' + page;
             if (sc.getResource(name) != null) {
                 // Tomcat returns a RequestDispatcher even if the JSP file doesn't exist.
                 // so check if the resource exists first.
