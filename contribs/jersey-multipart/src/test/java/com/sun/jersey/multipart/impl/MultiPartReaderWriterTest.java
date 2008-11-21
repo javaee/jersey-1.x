@@ -85,10 +85,7 @@ public class MultiPartReaderWriterTest extends TestCase {
         System.out.println("Starting grizzly ...");
         selectorThread = GrizzlyWebContainerFactory.create(BASE_URI, initParams);
         ClientConfig config = new DefaultClientConfig();
-        config.getClasses().add(MultiPartReader.class);
-        config.getClasses().add(MultiPartWriter.class);
         config.getClasses().add(MultiPartBeanProvider.class);
-        config.getClasses().add(MultiPartConfigProvider.class);
         client = Client.create(config);
     }
 

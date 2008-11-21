@@ -44,13 +44,11 @@ import com.sun.jersey.spi.inject.Injectable;
 import com.sun.jersey.spi.inject.InjectableProvider;
 import java.lang.reflect.Type;
 import javax.ws.rs.core.Context;
-import javax.ws.rs.ext.Provider;
 
 /**
  * <p>Jersey-specific injectable provider that supplies a configured instance
  * of {@link MultiPartConfig} for this application.</p>
  */
-@Provider
 public class MultiPartConfigProvider implements InjectableProvider<Context, Type> {
 
     public ComponentScope getScope() {

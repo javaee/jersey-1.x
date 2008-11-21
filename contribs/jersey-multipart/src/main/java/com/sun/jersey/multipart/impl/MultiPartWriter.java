@@ -62,7 +62,6 @@ import javax.ws.rs.ext.Providers;
  * <p>{@link Provider} {@link MessageBodyWriter} implementation for
  * {@link MultiPart} entities.</p>
  */
-@Provider
 @Produces("multipart/*")
 public class MultiPartWriter implements MessageBodyWriter<MultiPart> {
 
