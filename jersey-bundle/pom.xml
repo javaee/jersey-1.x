@@ -110,22 +110,16 @@
                                     <resource>META-INF/services/com.sun.jersey.spi.container.ContainerRequestFilter</resource>
                                 </transformer>
                                 <transformer implementation="org.apache.maven.plugins.shade.resource.AppendingTransformer">
-                                    <resource>META-INF/services/com.sun.jersey.impl.model.method.dispatch.ResourceMethodDispatchProvider</resource>
+                                    <resource>META-INF/services/com.sun.jersey.spi.container.ContainerResponseFilter</resource>
+                                </transformer>
+                                <transformer implementation="org.apache.maven.plugins.shade.resource.AppendingTransformer">
+                                    <resource>META-INF/services/com.sun.jersey.server.impl.model.method.dispatch.ResourceMethodDispatchProvider</resource>
                                 </transformer>
                                 <transformer implementation="org.apache.maven.plugins.shade.resource.AppendingTransformer">
                                     <resource>META-INF/services/com.sun.jersey.spi.container.WebApplicationProvider</resource>
                                 </transformer>
                                 <transformer implementation="org.apache.maven.plugins.shade.resource.AppendingTransformer">
                                     <resource>META-INF/services/com.sun.jersey.spi.HeaderDelegateProvider</resource>
-                                </transformer>
-                                <transformer implementation="org.apache.maven.plugins.shade.resource.AppendingTransformer">
-                                    <resource>META-INF/services/javax.ws.rs.core.Response$ResponseBuilder</resource>
-                                </transformer>
-                                <transformer implementation="org.apache.maven.plugins.shade.resource.AppendingTransformer">
-                                    <resource>META-INF/services/javax.ws.rs.core.UriBuilder</resource>
-                                </transformer>
-                                <transformer implementation="org.apache.maven.plugins.shade.resource.AppendingTransformer">
-                                    <resource>META-INF/services/javax.ws.rs.core.Variant$VariantListBuilder</resource>
                                 </transformer>
                                 <transformer implementation="org.apache.maven.plugins.shade.resource.AppendingTransformer">
                                     <resource>META-INF/services/javax.ws.rs.ext.MessageBodyReader</resource>
@@ -217,7 +211,7 @@
                 <artifactId>maven-javadoc-plugin</artifactId>
                 <configuration>
                     <sourcepath>${gen-src-dir}</sourcepath>
-                    <excludePackageNames>com.sun.jersey.core.impl com.sun.jersey.impl com.sun.research.ws.wadl</excludePackageNames>
+                    <excludePackageNames>com.sun.jersey.core.impl com.sun.jersey.client.impl com.sun.jersey.server.impl com.sun.jersey.impl com.sun.research.ws.wadl</excludePackageNames>
                 </configuration>
                 <executions>
                     <execution>

@@ -44,7 +44,7 @@ import com.sun.jersey.core.spi.component.ioc.IoCComponentProviderFactory;
 import com.sun.jersey.core.spi.component.ioc.IoCProviderFactory;
 import com.sun.jersey.core.spi.component.ProviderFactory;
 import com.sun.jersey.core.spi.component.ProviderServices;
-import com.sun.jersey.impl.client.urlconnection.URLConnectionClientHandler;
+import com.sun.jersey.client.impl.urlconnection.URLConnectionClientHandler;
 import com.sun.jersey.spi.MessageBodyWorkers;
 import com.sun.jersey.core.spi.factory.ContextResolverFactory;
 import com.sun.jersey.core.spi.factory.InjectableProviderFactory;

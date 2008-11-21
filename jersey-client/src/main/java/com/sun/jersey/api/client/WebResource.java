@@ -38,7 +38,7 @@
 package com.sun.jersey.api.client;
 
 import com.sun.jersey.api.client.filter.Filterable;
-import com.sun.jersey.impl.client.ClientRequestImpl;
+import com.sun.jersey.client.impl.ClientRequestImpl;
 import java.net.URI;
 import java.util.Locale;
 import javax.ws.rs.core.Cookie;
