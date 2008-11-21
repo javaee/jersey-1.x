@@ -64,7 +64,7 @@ import javax.ws.rs.core.HttpHeaders;
  * 
  * @author Paul.Sandoz@Sun.Com
  */
-public final class GZIPContentEncodingFilter extends ClientFilter {
+public class GZIPContentEncodingFilter extends ClientFilter {
 
     private static final class Adapter extends AbstractClientRequestAdapter {
         Adapter(ClientRequestAdapter cra) {

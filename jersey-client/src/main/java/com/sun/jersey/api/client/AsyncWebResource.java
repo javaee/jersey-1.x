@@ -65,7 +65,7 @@ import javax.ws.rs.core.UriBuilder;
  * @author Paul.Sandoz@Sun.Com
  * @see com.sun.jersey.api.client
  */
-public final class AsyncWebResource extends Filterable implements 
+public class AsyncWebResource extends Filterable implements 
         RequestBuilder<AsyncWebResource.Builder>,
         AsyncUniformInterface {    
     private final URI u;

@@ -56,7 +56,7 @@ import javax.ws.rs.core.MultivaluedMap;
  * 
  * @author Paul.Sandoz@Sun.Com
  */
-public final class LoggingFilter extends ClientFilter {
+public class LoggingFilter extends ClientFilter {
     private static final String NOTIFICATION_PREFIX = "* ";
     
     private static final String REQUEST_PREFIX = "> ";

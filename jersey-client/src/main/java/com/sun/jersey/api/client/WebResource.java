@@ -62,7 +62,7 @@ import javax.ws.rs.core.UriBuilder;
  * @author Paul.Sandoz@Sun.Com
  * @see com.sun.jersey.api.client
  */
-public final class WebResource extends Filterable implements 
+public class WebResource extends Filterable implements 
         RequestBuilder<WebResource.Builder>,
         UniformInterface {    
     private final URI u;

@@ -52,6 +52,7 @@ import com.sun.jersey.core.spi.factory.MessageBodyFactory;
 import com.sun.jersey.spi.inject.SingletonTypeInjectableProvider;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
+import java.net.HttpURLConnection;
 import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
@@ -83,7 +84,7 @@ import javax.ws.rs.ext.Providers;
  * 
  * @author Paul.Sandoz@Sun.Com
  */
-public final class Client extends Filterable implements ClientHandler {
+public class Client extends Filterable implements ClientHandler {
     private ProviderFactory componentProviderFactory;
 
     private Map<String, Object> properties;
@@ -96,6 +97,14 @@ public final class Client extends Filterable implements ClientHandler {
         }
     }
     
+    /**
+     * Create a new client instance.
+     *
+     */
+    public Client() {
+        this(createDefaultClientHander(), new DefaultClientConfig(), null);
+    }
+
     /**
      * Create a new client instance.
      * 
@@ -339,7 +348,7 @@ public final class Client extends Filterable implements ClientHandler {
      * @return a default client.
      */
     public static Client create() {
-        return new Client(new URLConnectionClientHandler());
+        return new Client(createDefaultClientHander());
     }
     
     /**
@@ -349,7 +358,7 @@ public final class Client extends Filterable implements ClientHandler {
      * @return a default client.
      */
     public static Client create(ClientConfig cc) {
-        return new Client(new URLConnectionClientHandler(), cc);
+        return new Client(createDefaultClientHander(), cc);
     }
     
     /**
@@ -360,6 +369,18 @@ public final class Client extends Filterable implements ClientHandler {
      * @return a default client.
      */
     public static Client create(ClientConfig cc, IoCComponentProviderFactory provider) {
-        return new Client(new URLConnectionClientHandler(), cc, provider);
+        return new Client(createDefaultClientHander(), cc, provider);
+    }
+
+    /**
+     * Create a default client handler.
+     * <p>
+     * This implementation returns a client handler implementation that
+     * utilizes {@link HttpURLConnection}.
+     * 
+     * @return a default client handler.
+     */
+    protected static ClientHandler createDefaultClientHander() {
+        return new URLConnectionClientHandler();
     }
 }
