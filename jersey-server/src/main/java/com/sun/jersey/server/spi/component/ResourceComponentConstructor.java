@@ -55,8 +55,7 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 
 /**
- * A utility class to obtain the most suitable constructor for a 
- * resource class.
+ * A constructor of a resource class.
  * 
  * @author Paul.Sandoz@Sun.Com
  */

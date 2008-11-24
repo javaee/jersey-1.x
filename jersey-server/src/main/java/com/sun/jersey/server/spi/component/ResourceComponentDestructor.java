@@ -41,7 +41,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 /**
- * A utility class for the destruction of a resource class instance.
+ * A destructor of a resource class instance.
  * 
  * @author Paul.Sandoz@Sun.Com
  */

@@ -37,9 +37,20 @@
 package com.sun.jersey.core.spi.component.ioc;
 
 /**
+ * An IoC-proxied component provider.
+ * <p>
+ * The component is fully managed by the runtime but when an instance is created
+ * the underlying IoC framework is deferred to for creating a proxy of the
+ * component instance.
  *
  * @author Paul.Sandoz@Sun.Com
  */
 public interface IoCProxiedComponentProvider extends IoCComponentProvider {
+    /**
+     * Proxy a component instance.
+     * 
+     * @param o the component instance to proxy.
+     * @return the proxied instance.
+     */
     Object proxy(Object o);
 }

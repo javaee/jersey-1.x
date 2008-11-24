@@ -40,7 +40,40 @@ import com.sun.jersey.core.spi.component.ComponentContext;
 import com.sun.jersey.core.spi.component.ComponentProviderFactory;
 
 /**
- *
+ * An IoC component provider factory. An implementaton of such a class may be
+ * used to support integration with Inversion of Control frameworks such as
+ * Spring and Guice.
+ * <p>
+ * An instance of IoCComponentProviderFactory may be registered with a Client
+ * or WebApplication instance on contruction and initialization respectively.
+ * <p>
+ * When a component, a resource class or provider class, needs to be instantiated
+ * the runtime will defer to the registered IoCComponentProviderFactory instance
+ * to obtain a {@link IoCComponentProvider} from which a component instance,
+ * of the resource class or provider class, can be obtained.
+ * If the component is not supported then a null value may be returned and the
+ * runtime will manage the component.
+ * <p>
+ * Specializations of {@link IoCComponentProvider} must be returned by the 
+ * <code>getComponentProvider</code> methods that declare the boundary of
+ * responsibility, between the runtime and the underlying IoC framework,
+ * for management of a component.
+ * <p>
+ * If an instance of {@link IoCManagedComponentProvider} is returned then
+ * the component is fully managed by the underlying IoC framework, which
+ * includes managing the construction, injection and destruction according
+ * to the life-cycle declared in the IoC framework's semantics.
+ * <p>
+ * If an instance of {@link IoCInstantiatedComponentProvider} is returned then
+ * the component is instantiated and injected by the underlying IoC framework,
+ * but the life-cycle is managed by the runtime according to the life-cycle
+ * declared in the runtime's semantics.
+ * <p>
+ * If an instance of {@link IoCProxiedComponentProvider} is returned then the
+ * component is fully managed by the runtime but when an instance is created
+ * the underlying IoC framework is deferred to for creating a proxy of the
+ * component instance.
+ * 
  * @author Paul.Sandoz@Sun.Com
  */
 public interface IoCComponentProviderFactory extends ComponentProviderFactory<IoCComponentProvider> {
@@ -48,10 +81,25 @@ public interface IoCComponentProviderFactory extends ComponentProviderFactory<Io
     /**
      * Get the IoC component provider for a class.
      *
-     * @param cc the component context to obtain annotations and
-     *        annotated object (if present).
      * @param c the class
-     * @return the IoC component provider for the class
+     * @return the IoC component provider for the class, otherwise null if the
+     *         class is not supported.
      */
-    IoCComponentProvider getComponentProvider(ComponentContext cc, Class c);
+    IoCComponentProvider getComponentProvider(Class<?> c);
+
+    /**
+     * Get the IoC component provider for a class with additional context.
+     * <p>
+     * The additional context will be associated with the annotations and
+     * optionally an annotated object. For example, a component provider may
+     * be requested for a class that is the type of a {@link Field}, or be
+     * requested for a class that is the type of a method parameter.
+     *
+     * @param cc the component context to obtain annotations and
+     *        the annotated object (if present).
+     * @param c the class
+     * @return the IoC component provider for the class, otherwise null if the
+     *         class is not supported.
+     */
+    IoCComponentProvider getComponentProvider(ComponentContext cc, Class<?> c);
 }

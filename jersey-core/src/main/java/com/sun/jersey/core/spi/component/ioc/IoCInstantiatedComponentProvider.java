@@ -37,9 +37,28 @@
 package com.sun.jersey.core.spi.component.ioc;
 
 /**
+ * An IoC-instantiated component provider.
+ * <p>
+ * The component is instantiated and injected by the underlying IoC framework,
+ * but the life-cycle is managed by the runtime according to the life-cycle
+ * declared ub the runtime's semantics.
  *
  * @author Paul.Sandoz@Sun.Com
  */
 public interface IoCInstantiatedComponentProvider extends IoCComponentProvider {
-   Object getInjectableInstance(Object o);
+    /**
+     * The instance for the runtime to perform injection on.
+     * <p>
+     * Some IoC frameworks create proxies that proxy instances of the class to
+     * enable, for example, Aspect Oriented Programming, to support cross
+     * cutting functionality. 
+     * If such proxies are returned then any injection of onto fields of the
+     * proxy (if any) will not have any effect. The runtime requires access
+     * to the proxied instance such that injection onto fields will take
+     * effect.
+     * 
+     * @param o the component instance returned by {@link #getInstance()}.
+     * @return the instance to inject on.
+     */
+    Object getInjectableInstance(Object o);
 }

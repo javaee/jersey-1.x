@@ -39,6 +39,7 @@ package com.sun.jersey.core.spi.component;
 /**
  * A factory for obtaining component providers.
  *
+ * @param <C> the type of the {@link ComponentProvider}
  * @author Paul.Sandoz@Sun.Com
  */
 public interface ComponentProviderFactory<C extends ComponentProvider> {
@@ -49,5 +50,5 @@ public interface ComponentProviderFactory<C extends ComponentProvider> {
      * @param c the class
      * @return the component provider for the class
      */
-    C getComponentProvider(Class c);
+    C getComponentProvider(Class<?> c);
 }

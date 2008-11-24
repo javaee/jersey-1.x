@@ -54,9 +54,9 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 
 /**
- * A class that may be used to obtain the most appropriate constructor
- * (with injectables) for a component.
+ * A constructor of a component.
  *
+ * @param <T> the type to construct
  * @author Paul.Sandoz@Sun.Com
  */
 public class ComponentConstructor<T> {
@@ -110,7 +110,7 @@ public class ComponentConstructor<T> {
      * Create a component constructor with the injectable provider context.
      *
      * @param ipc the injectable provider context.
-     * @param c
+     * @param c the class of the type to construct.
      */
     public ComponentConstructor(InjectableProviderContext ipc, Class<T> c) {
         this.ipc = ipc;
@@ -132,6 +132,11 @@ public class ComponentConstructor<T> {
         return null;
     }
 
+    /**
+     * Get a new instance.
+     *
+     * @return a new instance.
+     */
     public T getInstance()
             throws InstantiationException, IllegalAccessException,
             IllegalArgumentException, InvocationTargetException {

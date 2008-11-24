@@ -39,6 +39,11 @@ package com.sun.jersey.core.spi.component.ioc;
 import com.sun.jersey.core.spi.component.ComponentProvider;
 
 /**
+ * An IoC-based component provider.
+ * <p>
+ * This is a base interface for particular specializations of IoC-based
+ * component providers that vary in terms of responsibility for managing
+ * components.
  *
  * @author Paul.Sandoz@Sun.Com
  */

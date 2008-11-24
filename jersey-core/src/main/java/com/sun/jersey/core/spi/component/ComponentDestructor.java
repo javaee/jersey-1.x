@@ -43,7 +43,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 /**
- * A utility class for the destruction of class instance.
+ * A destructor of a component.
  *
  * @author Paul.Sandoz@Sun.Com
  */
@@ -53,7 +53,7 @@ public class ComponentDestructor {
     /**
      * Create a component destructor.
      *
-     * @param c
+     * @param c the class of instances to destruct.
      */
     public ComponentDestructor(Class c) {
         this.preDestroy = getPreDestroyMethod(c);

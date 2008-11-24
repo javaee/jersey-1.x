@@ -45,6 +45,11 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
+ * A component provider factory for provider components (which are singletons).
+ * <p>
+ * A cache of component providers is managed. When a component provider for
+ * a class is obtained it is cached such that the same instance on subsequent
+ * requests.
  *
  * @author Paul.Sandoz@Sun.Com
  */
@@ -90,14 +95,30 @@ public class ProviderFactory implements ComponentProviderFactory<ComponentProvid
 
     private final InjectableProviderContext ipc;
 
+    /**
+     * Create the provider factory.
+     * 
+     * @param ipc the injectable provider context to get injectables.
+     */
     public ProviderFactory(InjectableProviderContext ipc) {
         this.ipc = ipc;
     }
 
+    /**
+     * Get the injectable provider context.
+     *
+     * @return the injectable provider context
+     */
     public InjectableProviderContext getInjectableProviderContext() {
         return ipc;
     }
 
+    /**
+     * Get a component provider for a class.
+     * 
+     * @param c the class.
+     * @return the component provider.
+     */
     public final ComponentProvider getComponentProvider(Class c) {
         ComponentProvider cp = cache.get(c);
         if (cp != null) return cp;
@@ -132,6 +153,9 @@ public class ProviderFactory implements ComponentProviderFactory<ComponentProvid
         }
     }
 
+    /**
+     * Inject on all cached components.
+     */
     public void injectOnAllComponents() {
         for (ComponentProvider cp : cache.values()) {
             if (cp instanceof SingletonComponentProvider) {
@@ -141,6 +165,9 @@ public class ProviderFactory implements ComponentProviderFactory<ComponentProvid
         }
     }
 
+    /**
+     * Destroy all cached components.
+     */
     public void destroy() {
         for (ComponentProvider cp : cache.values()) {
             if (cp instanceof SingletonComponentProvider) {
@@ -150,12 +177,22 @@ public class ProviderFactory implements ComponentProviderFactory<ComponentProvid
         }
     }
 
+    /**
+     * Inject on a collection of providers.
+     * 
+     * @param providers the collection of providers.
+     */
     public void injectOnProviderInstances(Collection<?> providers) {
         for (Object o : providers) {
             injectOnProviderInstance(o);
         }
     }
 
+    /**
+     * Inject on a provider.
+     *
+     * @param provider the provider.
+     */
     public void injectOnProviderInstance(Object provider) {
         Class c = provider.getClass();
         ComponentInjector ci = new ComponentInjector(ipc, c);

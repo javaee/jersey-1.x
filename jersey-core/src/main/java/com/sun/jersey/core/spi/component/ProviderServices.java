@@ -48,12 +48,12 @@ import java.util.logging.Logger;
 
 
 /**
- *
- * TODO also use service finder and combine.
+ * Combines access to provider instances given a set of provider classes,
+ * a set of provider instances and providers registered in META-INF/services.
  * 
  * @author Paul.Sandoz@Sun.Com
  */
-public final class ProviderServices {
+public class ProviderServices {
     private static final Logger LOGGER = Logger.getLogger(ProviderServices.class.getName());
     
     private final InjectableProviderFactory injectableFactory;
@@ -63,7 +63,15 @@ public final class ProviderServices {
     private final Set<Class<?>> providers;
     
     private final Set<?> providerInstances;
-    
+
+    /**
+     * Create the provider services.
+     *
+     * @param injectableFactory
+     * @param componentProviderFactory
+     * @param providers
+     * @param providerInstances
+     */
     public ProviderServices(
             InjectableProviderFactory injectableFactory,
             ProviderFactory componentProviderFactory,

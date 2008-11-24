@@ -43,12 +43,19 @@ import com.sun.jersey.core.spi.component.ProviderFactory;
 import com.sun.jersey.spi.inject.InjectableProviderContext;
 
 /**
- *
+ * An extension of {@link ProviderFactory} that defers to an
+ * {@link IoCComponentProviderFactory}.
+ * 
  * @author Paul.Sandoz@Sun.Com
  */
 public class IoCProviderFactory extends ProviderFactory {
     private final IoCComponentProviderFactory icpf;
 
+    /**
+     *
+     * @param ipc the injectable provider context.
+     * @param icpf the IoC component provider factory.
+     */
     public IoCProviderFactory(
             InjectableProviderContext ipc,
             IoCComponentProviderFactory icpf) {

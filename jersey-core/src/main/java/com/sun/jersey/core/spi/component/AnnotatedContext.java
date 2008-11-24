@@ -39,16 +39,19 @@ package com.sun.jersey.core.spi.component;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.AccessibleObject;
 
-public final class AnnotatedContext implements ComponentContext {
+/**
+ * A component context for an array of annotations.
+ * 
+ * @author paulsandoz
+ */
+public class AnnotatedContext implements ComponentContext {
 
     private Annotation[] annotations;
 
     public AnnotatedContext() {
-        super();
     }
 
     public AnnotatedContext(Annotation[] annotations) {
-        super();
         this.annotations = annotations;
     }
 
@@ -57,6 +60,7 @@ public final class AnnotatedContext implements ComponentContext {
     }
 
     // ComponentContext
+    
     public AccessibleObject getAccesibleObject() {
         return null;
     }

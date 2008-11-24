@@ -39,15 +39,22 @@ package com.sun.jersey.core.spi.component.ioc;
 import com.sun.jersey.core.spi.component.ComponentScope;
 
 /**
+ * An IoC-managed component provider.
+ * <p>
+ * The component is fully managed by the underlying IoC framework, which
+ * includes managing the construction, injection and destruction according
+ * to the life-cycle declared in the IoC framework's semantics.
  *
  * @author Paul.Sandoz@Sun.Com
  */
 public interface IoCManagedComponentProvider extends IoCInstantiatedComponentProvider {
    /**
-    * Get the scope.
+    * Get the component scope.
     * <p>
-    * The Scope is required so that Jersey can correctly inject on an instance
-    * returned from an application specfic component provider.
+    * The scope of the component declared by the underlying IoC framework
+    * needs to be mapped to a {@link ComponentScope} value supported by the 
+    * runtime. This enables the runtime to correctly perform its own injecton
+    * onto a component instance.
     *
     * @return the scope
     */

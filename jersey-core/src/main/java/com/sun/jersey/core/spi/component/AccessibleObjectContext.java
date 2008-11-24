@@ -39,22 +39,25 @@ package com.sun.jersey.core.spi.component;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.AccessibleObject;
 
-public final class AccessibleObjectContext implements ComponentContext {
+/**
+ * A component context for an accessible object.
+ * 
+ * @author paulsandoz
+ */
+public class AccessibleObjectContext implements ComponentContext {
 
     private AccessibleObject accesibleObject;
+    
     private Annotation[] annotations;
 
     public AccessibleObjectContext() {
-        super();
     }
 
     public AccessibleObjectContext(AccessibleObject ao) {
-        super();
         this.accesibleObject = ao;
     }
 
     public AccessibleObjectContext(AccessibleObject ao, Annotation[] annotations) {
-        super();
         this.accesibleObject = ao;
         this.annotations = annotations;
     }
@@ -69,6 +72,7 @@ public final class AccessibleObjectContext implements ComponentContext {
     }
 
     // ComponentContext
+    
     public AccessibleObject getAccesibleObject() {
         return accesibleObject;
     }

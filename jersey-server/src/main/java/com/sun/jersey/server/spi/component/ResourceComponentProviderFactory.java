@@ -40,9 +40,17 @@ import com.sun.jersey.core.spi.component.ComponentProviderFactory;
 import com.sun.jersey.core.spi.component.ioc.IoCComponentProvider;
 
 /**
- *
+ * A resource class component provider factory.
+ * 
  * @author Paul.Sandoz@Sun.Com
  */
 public interface ResourceComponentProviderFactory extends ComponentProviderFactory<ResourceComponentProvider> {
-    ResourceComponentProvider getComponentProvider(IoCComponentProvider icp, Class c);
+    /**
+     * Get the resource class component provider.
+     *
+     * @param icp the underlying IoC component provider.
+     * @param c the resource class
+     * @return the resource class component provider.
+     */
+    ResourceComponentProvider getComponentProvider(IoCComponentProvider icp, Class<?> c);
 }

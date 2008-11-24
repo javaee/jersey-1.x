@@ -49,7 +49,9 @@ import javax.ws.rs.HttpMethod;
 import javax.ws.rs.Path;
 
 /**
- *
+ * An injector to inject on a component.
+ * 
+ * @param <T> the type to inject on.
  * @author Paul.Sandoz@Sun.Com
  */
 public class ComponentInjector<T> {
@@ -57,11 +59,22 @@ public class ComponentInjector<T> {
 
     protected final Class<T> c;
 
+    /**
+     * Create a component injector.
+     * 
+     * @param ipc the injector provider context to ontain injectables.
+     * @param c the class of the type to inject on.
+     */
     public ComponentInjector(InjectableProviderContext ipc, Class<T> c) {
         this.ipc = ipc;
         this.c = c;
     }
 
+    /**
+     * Inject on an instance.
+     *
+     * @param t the instance to inject on.
+     */
     public void inject(T t) {
         AccessibleObjectContext aoc = new AccessibleObjectContext();
 

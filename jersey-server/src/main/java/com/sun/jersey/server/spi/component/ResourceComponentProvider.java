@@ -41,13 +41,15 @@ import com.sun.jersey.api.model.AbstractResource;
 import com.sun.jersey.core.spi.component.ComponentProvider;
 
 /**
- *
+ * A resource class component provider.
+ * 
  * @author Paul.Sandoz@Sun.Com
  */
 public interface ResourceComponentProvider extends ComponentProvider {
 
     /**
-     *
+     * Initiate the component provider with the resource model.
+     * 
      * @param abstractResource
      */
     void init(AbstractResource abstractResource);
