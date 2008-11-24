@@ -54,8 +54,8 @@ public abstract class BaseRule implements UriRule {
         this.template = template;
     }
     
-    protected final void pushParameterValues(UriRuleContext context) {
-        context.pushParameterValues(template.getTemplateVariables());
+    protected final void pushMatch(UriRuleContext context) {
+        context.pushMatch(template, template.getTemplateVariables());
     }
     
     protected final UriTemplate getTemplate() {

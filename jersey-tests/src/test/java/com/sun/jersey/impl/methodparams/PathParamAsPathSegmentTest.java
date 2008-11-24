@@ -58,8 +58,8 @@ public class PathParamAsPathSegmentTest extends AbstractResourceTester {
     public static class Resource {
         @GET
         public String doGet(
-                @PathParam("arg1") PathSegment arg1, 
-                @PathParam("arg2") PathSegment arg2, 
+                @PathParam("arg1") PathSegment arg1,
+                @PathParam("arg2") PathSegment arg2,
                 @PathParam("arg3") PathSegment arg3) {
             assertEquals("a", arg1.getPath());
             assertEquals("b", arg2.getPath());
@@ -67,34 +67,34 @@ public class PathParamAsPathSegmentTest extends AbstractResourceTester {
             return "content";
         }
     }
-    
+
     public void testStringArgsGet() {
         initiateWebApplication(Resource.class);
         resource("/a/b/c").
                 get(String.class);
     }
-    
+
     @Path("/{id}")
     public static class Duplicate {
         @GET
         public String get(@PathParam("id") PathSegment id) {
             return id.getPath();
         }
-        
+
         @GET
         @Path("/{id}")
         public String getSub(@PathParam("id") PathSegment id) {
             return id.getPath();
         }
     }
-    
+
     public void testDuplicate() {
         initiateWebApplication(Duplicate.class);
-        
+
         assertEquals("foo", resource("/foo").get(String.class));
         assertEquals("bar", resource("/foo/bar").get(String.class));
     }
-    
+
     @Path("/{a}/{b}/{c}")
     public static class Root {
         @Path("/{x}/{y}/{z}")
@@ -102,55 +102,55 @@ public class PathParamAsPathSegmentTest extends AbstractResourceTester {
             return new Sub();
         }
     }
-    
+
     public static class Sub {
         @Path("{foo}")
         @GET public String get(
-                @PathParam("a") PathSegment a, 
-                @PathParam("b") PathSegment b, 
+                @PathParam("a") PathSegment a,
+                @PathParam("b") PathSegment b,
                 @PathParam("c") PathSegment c,
-                @PathParam("x") PathSegment x, 
-                @PathParam("y") PathSegment y, 
+                @PathParam("x") PathSegment x,
+                @PathParam("y") PathSegment y,
                 @PathParam("z") PathSegment z,
                 @PathParam("foo") PathSegment foo
                 ) {
             return acc(a, b, c, x, y, z, foo);
         }
-        
+
         String acc(PathSegment... ps) {
             String s = "";
             for (PathSegment p : ps)
                 s += p.getPath();
-            
+
             return s;
         }
     }
-    
+
     public void testSubResources() {
         initiateWebApplication(Root.class);
-        
+
         assertEquals("1234567", resource("/1/2/3/4/5/6/7").get(String.class));
     }
-    
+
     @Path("/{a}-{b}/{c}-{d}")
     public static class PathSeg {
         @GET
         public String doGet(
-                @PathParam("a") PathSegment a, 
+                @PathParam("a") PathSegment a,
                 @PathParam("b") PathSegment b,
-                @PathParam("c") PathSegment c, 
+                @PathParam("c") PathSegment c,
                 @PathParam("d") PathSegment d) {
             assertEquals(a.getPath(), b.getPath());
             assertEquals(c.getPath(), d.getPath());
             return "content";
         }
-        
+
         @Path("{e}-{f}")
         @GET
         public String doGetSub(
-                @PathParam("a") PathSegment a, 
+                @PathParam("a") PathSegment a,
                 @PathParam("b") PathSegment b,
-                @PathParam("c") PathSegment c, 
+                @PathParam("c") PathSegment c,
                 @PathParam("d") PathSegment d,
                 @PathParam("e") PathSegment e,
                 @PathParam("f") PathSegment f) {
@@ -160,31 +160,31 @@ public class PathParamAsPathSegmentTest extends AbstractResourceTester {
             return "sub-content";
         }
     }
-    
+
     public void testPathSeg() {
         initiateWebApplication(PathSeg.class);
-        
+
         assertEquals("content", resource("a-b/c-d").get(String.class));
         assertEquals("sub-content", resource("a-b/c-d/e-f").get(String.class));
     }
-    
+
     @Path("/{a: .+}/edit/{b}")
     public static class PathSegs {
         @GET
         public String doGet(
-                @PathParam("a") PathSegment a, 
+                @PathParam("a") PathSegment a,
                 @PathParam("b") PathSegment b) {
             return a.getPath() + "-" + b.getPath();
         }
     }
-    
+
     public void testPathSegs() {
         initiateWebApplication(PathSegs.class);
-        
+
         assertEquals("z-b", resource("/x/y/z/edit/b").get(String.class));
         assertEquals("z-b", resource("///x/y/z/edit/b").get(String.class));
-    }    
-    
+    }
+
     @Path("/{a: .+}")
     public static class PathSegsEnd {
         @GET
@@ -193,15 +193,15 @@ public class PathParamAsPathSegmentTest extends AbstractResourceTester {
             return a.getPath();
         }
     }
-    
+
     public void testPathSegsEnd() {
         initiateWebApplication(PathSegsEnd.class);
-        
+
         assertEquals("z", resource("/x/y/z").get(String.class));
         assertEquals("", resource("/x/y/z/").get(String.class));
     }
-    
-    
+
+
     @Path("/{a: .+}/edit/{b}")
     public static class PathSegsList {
         @GET
@@ -226,13 +226,13 @@ public class PathParamAsPathSegmentTest extends AbstractResourceTester {
             return s.toString();
         }
     }
-    
+
     public void testPathSegsList() {
         initiateWebApplication(PathSegsList.class);
-        
+
         assertEquals("xyz-b", resource("/x/y/z/edit/b").get(String.class));
         assertEquals("//xyz-b", resource("///x/y/z/edit/b").get(String.class));
-    }    
+    }
 
 
     @Path("/{a: .+}")
@@ -250,12 +250,37 @@ public class PathParamAsPathSegmentTest extends AbstractResourceTester {
             return s.toString();
         }
     }
-    
+
     public void testPathSegsEndList() {
         initiateWebApplication(PathSegsEndList.class);
-        
+
         assertEquals("xyz", resource("/x/y/z").get(String.class));
         assertEquals("xyz/", resource("/x/y/z/").get(String.class));
     }
-    
+
+
+    @Path("/")
+    public static class PathSegOnSubResource {
+        PathSegment ps;
+
+        public PathSegOnSubResource() { }
+
+        public PathSegOnSubResource(PathSegment ps) { this.ps = ps; }
+
+        @GET
+        public String get() {
+            return ps.getPath();
+        }
+
+        @Path("{id}")
+        public PathSegOnSubResource getSunResource(@PathParam("id") PathSegment ps) {
+            return new PathSegOnSubResource(ps);
+        }
+    }
+
+    public void testPathSegOnSubResource() {
+        initiateWebApplication(PathSegOnSubResource.class);
+
+        assertEquals("x", resource("/x").get(String.class));
+    }
 }

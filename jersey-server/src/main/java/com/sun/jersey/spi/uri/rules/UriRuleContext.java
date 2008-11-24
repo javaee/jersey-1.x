@@ -65,21 +65,20 @@ public interface UriRuleContext extends HttpContext, UriMatchResultContext {
     UriRules<UriRule> getRules(Class resourceClass);
 
     /**
-     *  Push parameter values that are the values of 
-     *  capturing groups in the current match result.
+     * Push a match.
      * 
-     *  @param names the parameter names associated with the capturing group
+     * @param template the matching URI template.
+     * @param names the parameter names associated with the capturing group
      *         values.
      */
-    void pushParameterValues(List<String> names);
-    
+    void pushMatch(UriTemplate template, List<String> names);
+
     /**
-     * Push the resource and matching URI template associated with the resource.
+     * Push a matching resource.
      * 
-     * @param resource the resource
-     * @param template the URI template associated with the resource
+     * @param resource the matching resource
      */
-    void pushResource(Object resource, UriTemplate template);
+    void pushResource(Object resource);
 
     /**
      * Push the right hand path length to calculate the entry for

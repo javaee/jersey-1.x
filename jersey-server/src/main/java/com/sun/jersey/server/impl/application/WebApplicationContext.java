@@ -140,7 +140,11 @@ public final class WebApplicationContext implements UriRuleContext, ExtendedUriI
         return rc.getRules();
     }
 
-    public void pushParameterValues(List<String> names) {
+    public void pushMatch(UriTemplate template, List<String> names) {
+        matchResults.addFirst(matchResult);
+        
+        templates.addFirst(template);
+
         if (encodedTemplateValues == null) {
             encodedTemplateValues = new MultivaluedMapImpl();
         }
@@ -156,13 +160,10 @@ public final class WebApplicationContext implements UriRuleContext, ExtendedUriI
                         UriComponent.decode(value, UriComponent.Type.PATH));
             }
         }
-
-        matchResults.addFirst(matchResult);
     }
-
-    public void pushResource(Object resource, UriTemplate template) {
+    
+    public void pushResource(Object resource) {
         resources.addFirst(resource);
-        templates.addFirst(template);
     }
 
     public void pushRightHandPathLength(int rhpathlen) {

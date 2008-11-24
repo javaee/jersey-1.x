@@ -71,7 +71,7 @@ public final class SubLocatorRule extends BaseRule {
 
     public boolean accept(CharSequence path, Object resource, UriRuleContext context) {
         // Set the template values
-        pushParameterValues(context);
+        pushMatch(context);
 
         // Invoke the sub-locator to get the sub-resource
         resource = invokeSubLocator(resource, context);
@@ -81,7 +81,7 @@ public final class SubLocatorRule extends BaseRule {
             // If so then get the instance of that class
             resource = context.getResource((Class)resource);
         }
-        context.pushResource(resource, getTemplate());
+        context.pushResource(resource);
         
         // Match sub-rules on the returned resource class
         final Iterator<UriRule> matches = context.getRules(resource.getClass()).

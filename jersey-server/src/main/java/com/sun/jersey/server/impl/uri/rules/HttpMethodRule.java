@@ -116,9 +116,9 @@ public final class HttpMethodRule implements UriRule {
             // If a sub-resource method then need to push the resource
             // (again) as as to keep in sync with the ancestor URIs
             if (isSubResource) {
-                context.pushResource(resource, method.getTemplate());        
+                context.pushResource(resource);        
                 // Set the template values
-                context.pushParameterValues(method.getTemplate().getTemplateVariables());
+                context.pushMatch(method.getTemplate(), method.getTemplate().getTemplateVariables());
             }
             
             method.getDispatcher().dispatch(resource, context);

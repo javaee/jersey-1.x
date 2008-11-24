@@ -58,11 +58,11 @@ public final class ResourceClassRule extends BaseRule {
     
     public boolean accept(CharSequence path, Object resource, UriRuleContext context) {
         // Set the template values
-        pushParameterValues(context);
+        pushMatch(context);
 
         // Get the resource instance from the resource class
         resource = context.getResource(resourceClass);
-        context.pushResource(resource, getTemplate());
+        context.pushResource(resource);
         
         // Match sub-rules on the resource class
         final Iterator<UriRule> matches = context.getRules(resourceClass).
