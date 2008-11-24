@@ -47,7 +47,7 @@ import com.sun.jersey.core.spi.component.ComponentProviderFactory;
  * An instance of IoCComponentProviderFactory may be registered with a Client
  * or WebApplication instance on contruction and initialization respectively.
  * <p>
- * When a component, a resource class or provider class, needs to be instantiated
+ * When a component, a resource class or provider class, needs to be managed
  * the runtime will defer to the registered IoCComponentProviderFactory instance
  * to obtain a {@link IoCComponentProvider} from which a component instance,
  * of the resource class or provider class, can be obtained.
