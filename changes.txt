@@ -1,4 +1,9 @@
 release 1.0.1 (2008-11/12)
+- Fixed issue for a resource method that has the following annotations
+  @POST
+  @Consumes({"multipart/form-data", MediaType.APPLICATION_FORM_URLENCODED})
+  and uses @FormParam and receives content of the latter declared consuming
+  media type for which some @FormParam parameters do not exist in the request.
 - Fixed issue 147
   https://jersey.dev.java.net/issues/show_bug.cgi?id=147
   The base path in the Web Pages for JSP templates associated with viewables

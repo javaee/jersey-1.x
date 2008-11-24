@@ -241,4 +241,46 @@ public class FormParamTest extends AbstractResourceTester {
         String s = r.type("multipart/form-data").post(String.class, form);
         assertEquals("1234 3.14 1.61", s);
     }
+
+    @Path("/")
+    public class MultipartFormResourceNull {
+        @POST
+        @Consumes({"multipart/form-data", MediaType.APPLICATION_FORM_URLENCODED})
+        public String post(
+                @FormParam("a") String a,
+                @FormParam("b") String b) throws Exception {
+            assertNotNull(a);
+            assertNull(b);
+            return a;
+        }
+    }
+
+    public void testMultipartFormParamWithFormNull() {
+        initiateWebApplication(MultipartFormResourceNull.class);
+
+        WebResource r = resource("/");
+
+        Form form = new Form();
+        form.add("a", "foo");
+
+        String s = r.post(String.class, form);
+        assertEquals("foo", s);
+    }
+
+    public void testMultipartFormParamWithFormDataNull() throws Exception {
+        initiateWebApplication(MultipartFormResourceNull.class);
+
+        WebResource r = resource("/");
+
+        MimeMultipart form = new MimeMultipart();
+
+        InternetHeaders headers = new InternetHeaders();
+        headers.addHeader("content-disposition", "form-data; name=\"a\"");
+        MimeBodyPart bp = new MimeBodyPart(headers, "foo".getBytes());
+        form.addBodyPart(bp);
+
+        String s = r.type("multipart/form-data").post(String.class, form);
+        assertEquals("foo", s);
+    }
+
 }

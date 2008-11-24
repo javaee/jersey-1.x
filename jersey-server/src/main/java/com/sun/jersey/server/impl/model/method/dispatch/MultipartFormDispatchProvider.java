@@ -183,8 +183,6 @@ public class MultipartFormDispatchProvider extends FormDispatchProvider {
         
         @SuppressWarnings("unchecked")
         private Object getAsForm(Form form, HttpContext context) throws Exception {
-            String c = form.getFirst(p.getSourceName());
-
             MessageBodyReader r = mbws.getMessageBodyReader(
                     p.getParameterClass(), 
                     p.getParameterType(), 
@@ -192,6 +190,10 @@ public class MultipartFormDispatchProvider extends FormDispatchProvider {
                     MediaType.TEXT_PLAIN_TYPE);
             
             if (r != null) {
+                String c = form.getFirst(p.getSourceName());
+                if (c == null)
+                    return null;
+                
                 InputStream is = new ByteArrayInputStream(c.getBytes("UTF-8"));
                 return r.readFrom(
                         p.getParameterClass(),
