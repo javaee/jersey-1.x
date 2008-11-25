@@ -60,7 +60,7 @@ import javax.ws.rs.core.HttpHeaders;
  * 
  * @author Paul.Sandoz@Sun.Com
  */
-public final class GZIPContentEncodingFilter implements ContainerRequestFilter, ContainerResponseFilter {
+public class GZIPContentEncodingFilter implements ContainerRequestFilter, ContainerResponseFilter {
 
     public ContainerRequest filter(ContainerRequest request) {
         if (request.getRequestHeaders().containsKey(HttpHeaders.CONTENT_ENCODING)) {

@@ -63,7 +63,7 @@ import com.sun.research.ws.wadl.Response;
  * @author <a href="mailto:martin.grotzke@freiheit.com">Martin Grotzke</a>
  * @version $Id$
  */
-public final class WadlGeneratorImpl implements WadlGenerator {
+public class WadlGeneratorImpl implements WadlGenerator {
 
     public String getRequiredJaxbContextPath() {
         final String name = Application.class.getName();

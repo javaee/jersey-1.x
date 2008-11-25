@@ -62,7 +62,7 @@ import javax.ws.rs.core.MultivaluedMap;
  * 
  * @author Paul.Sandoz@Sun.Com
  */
-public final class LoggingFilter implements ContainerRequestFilter, ContainerResponseFilter {
+public class LoggingFilter implements ContainerRequestFilter, ContainerResponseFilter {
     private static final String NOTIFICATION_PREFIX = "* ";
     
     private static final String REQUEST_PREFIX = "> ";

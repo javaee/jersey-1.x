@@ -43,7 +43,7 @@ import javax.ws.rs.core.Application;
  * An extension of {@link DefaultResourceConfig} that adapts an instance
  * of {@link Application}.
  */
-public final class ApplicationAdapter extends DefaultResourceConfig {
+public class ApplicationAdapter extends DefaultResourceConfig {
     /**
      * @param ac the application
      */

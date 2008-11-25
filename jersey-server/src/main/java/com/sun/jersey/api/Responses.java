@@ -45,7 +45,7 @@ import javax.ws.rs.core.Response.ResponseBuilder;
  * 
  * @author Paul.Sandoz@Sun.Com
  */
-public final class Responses {
+public class Responses {
     public static final int NO_CONTENT = 204;
     
     public static final int NOT_MODIFIED = 304;

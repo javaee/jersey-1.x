@@ -75,7 +75,7 @@ import com.sun.research.ws.wadl.Response;
  * @author <a href="mailto:martin.grotzke@freiheit.com">Martin Grotzke</a>
  * @version $Id$
  */
-public final class WadlBuilder {
+public class WadlBuilder {
     
     private WadlGenerator _wadlGenerator;
     
