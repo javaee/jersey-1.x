@@ -42,7 +42,7 @@ package com.sun.jersey.core.util;
  *
  * @author Paul.Sandoz@Sun.Com
  */
-public final class ThrowHelper {
+public class ThrowHelper {
 
     /**
      * Set the cause of an exception.

@@ -49,7 +49,7 @@ import java.util.TimeZone;
  *
  * @author Paul.Sandoz@Sun.Com
  */
-public final class HttpDateFormat {
+public class HttpDateFormat {
     
     private HttpDateFormat() {
     }

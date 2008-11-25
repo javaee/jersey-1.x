@@ -45,7 +45,7 @@ import java.text.ParseException;
  * 
  * @author Paul.Sandoz@Sun.Com
  */
-public final class AcceptableToken extends Token implements QualityFactor {
+public class AcceptableToken extends Token implements QualityFactor {
     protected int quality = DEFAULT_QUALITY_FACTOR;
 
     public AcceptableToken(String header) throws ParseException {

@@ -51,7 +51,7 @@ import javax.ws.rs.core.MediaType;
  * 
  * @author Paul.Sandoz@Sun.Com
  */
-public final class MediaTypes {
+public class MediaTypes {
     private MediaTypes() { }
     
     public final static MediaType WADL = 

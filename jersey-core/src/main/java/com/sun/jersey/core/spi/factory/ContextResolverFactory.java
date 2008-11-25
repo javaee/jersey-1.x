@@ -58,10 +58,11 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.ext.ContextResolver;
 
 /**
- *
+ * A factory for managing {@link ContextResolver} instances.
+ * 
  * @author Paul.Sandoz@Sun.Com
  */
-public final class ContextResolverFactory {
+public class ContextResolverFactory {
     private static final KeyComparator<MediaType> MEDIA_TYPE_COMPARATOR = 
             new KeyComparator<MediaType>() {
         public boolean equals(MediaType x, MediaType y) {

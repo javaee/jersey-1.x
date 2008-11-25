@@ -55,7 +55,7 @@ import javax.ws.rs.core.UriBuilderException;
  * 
  * @author Paul.Sandoz@Sun.Com
  */
-public final class UriBuilderImpl extends UriBuilder {
+public class UriBuilderImpl extends UriBuilder {
 
     // All fields should be in the percent-encoded form
     

@@ -53,7 +53,7 @@ import javax.ws.rs.core.MultivaluedMap;
  *
  * @author Paul.Sandoz@Sun.Com
  */
-public final class InBoundHeaders 
+public class InBoundHeaders 
         extends KeyComparatorHashMap<String, List<String>> 
         implements MultivaluedMap<String, String> {
         

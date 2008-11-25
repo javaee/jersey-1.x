@@ -55,6 +55,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
+ * A factory for managing {@link InjectableProvider} instances.
  *
  * @author Paul.Sandoz@Sun.Com
  */

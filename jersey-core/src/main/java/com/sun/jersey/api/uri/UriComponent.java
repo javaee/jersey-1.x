@@ -56,7 +56,7 @@ import javax.ws.rs.core.PathSegment;
  *
  * @author Paul.Sandoz@Sun.Com
  */
-public final class UriComponent {
+public class UriComponent {
 
     // TODO rewrite to use masks and not lookup tables
     /**

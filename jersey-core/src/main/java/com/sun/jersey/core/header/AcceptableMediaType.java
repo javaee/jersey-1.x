@@ -47,7 +47,7 @@ import java.util.Map;
  *
  * @author Paul.Sandoz@Sun.Com
  */
-public final class AcceptableMediaType extends MediaType implements QualityFactor {
+public class AcceptableMediaType extends MediaType implements QualityFactor {
     private final int q;
 
     public AcceptableMediaType(String p, String s) {

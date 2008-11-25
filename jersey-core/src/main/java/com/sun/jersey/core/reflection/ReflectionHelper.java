@@ -54,7 +54,7 @@ import java.util.Map;
  *
  * @author Paul.Sandoz@Sun.Com
  */
-public final class ReflectionHelper {
+public class ReflectionHelper {
     /**
      * Get the Class from the class name.
      * <p>

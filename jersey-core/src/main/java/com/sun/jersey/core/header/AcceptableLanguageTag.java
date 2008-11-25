@@ -45,7 +45,7 @@ import java.text.ParseException;
  * 
  * @author Paul.Sandoz@Sun.Com
  */
-public final class AcceptableLanguageTag extends LanguageTag implements QualityFactor {
+public class AcceptableLanguageTag extends LanguageTag implements QualityFactor {
     
     protected int quality = DEFAULT_QUALITY_FACTOR;
 

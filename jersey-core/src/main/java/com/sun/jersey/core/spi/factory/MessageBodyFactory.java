@@ -55,10 +55,12 @@ import javax.ws.rs.ext.MessageBodyReader;
 import javax.ws.rs.ext.MessageBodyWriter;
 
 /**
+ * A factory for managing {@link MessageBodyReader} and {@link MessageBodyWriter}
+ * instances.
  *
  * @author Paul.Sandoz@Sun.Com
  */
-public final class MessageBodyFactory implements MessageBodyWorkers {
+public class MessageBodyFactory implements MessageBodyWorkers {
     private static final KeyComparator<MediaType> MEDIA_TYPE_COMPARATOR = 
             new KeyComparator<MediaType>() {
         public boolean equals(MediaType x, MediaType y) {
