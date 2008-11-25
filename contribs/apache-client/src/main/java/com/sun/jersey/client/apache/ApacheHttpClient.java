@@ -54,7 +54,7 @@ public class ApacheHttpClient extends Client {
      *
      * @return a default Apache HTTP client handler.
      */
-    protected static ClientHandler createDefaultClientHander() {
+    public static ClientHandler createDefaultClientHander() {
         return new ApacheHttpClientHandler();
     }
 }

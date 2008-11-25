@@ -38,124 +38,29 @@ package com.sun.jersey.client.apache.config;
 
 import java.util.Map;
 
-import org.apache.commons.httpclient.HttpState;
-import org.apache.commons.httpclient.UsernamePasswordCredentials;
-import org.apache.commons.httpclient.NTCredentials;
-import org.apache.commons.httpclient.auth.AuthScope;
 
 import com.sun.jersey.api.client.config.DefaultClientConfig;
 
 /**
-   A default client configuration for clients that root with the
-   {@link
-   com.sun.jersey.impl.client.httpclient.HttpClientHandler}. This
-   class may be extended for specific configuration purposes.
-
-   @author jorgew
-**/
-
+ * A default client configuration for clients that root with the
+ * {@link
+ * com.sun.jersey.impl.client.httpclient.HttpClientHandler}. This
+ * class may be extended for specific configuration purposes.
+ *
+ * @author jorgew
+ */
 public class DefaultApacheHttpClientConfig extends DefaultClientConfig
-    implements ApacheHttpClientConfig
-{
-    /**
-       The HttpState of the current client.  This is used to maintain
-       authentication credentials.
+        implements ApacheHttpClientConfig {
 
-       The value MUST be an instance of {@link
-       org.apache.commons.httpclient.HttpState}.
-
-       This shouldn't be used directly, instead use {@link
-       #setCredentials}, {@link #setProxyCredentials}, {@link
-       #clearCredentials}, or {@link #clearProxyCredentials}.
-    **/
-    public static final String PROPERTY_HTTP_STATE =
-        "com.sun.jersey.impl.client.httpclient.httpState";
-
-    private HttpState getHttpState()
-    {
+    public ApacheHttpClientState getState() {
         Map<String, Object> props = getProperties();
-        HttpState state = (HttpState) props.get(PROPERTY_HTTP_STATE);
+        ApacheHttpClientState state = (ApacheHttpClientState) props.get(PROPERTY_HTTP_STATE);
 
         if (state == null) {
-            state = new HttpState();
-            props.put (PROPERTY_HTTP_STATE, state);
+            state = new ApacheHttpClientState();
+            props.put(PROPERTY_HTTP_STATE, state);
         }
 
         return state;
     }
-
-    public void setCredentials(String realm, String host, int port,
-                               String usernamepassword)
-    {
-        AuthScope authScope = new AuthScope (host, port, realm);
-        UsernamePasswordCredentials creds = new UsernamePasswordCredentials (usernamepassword);
-        HttpState state = getHttpState();
-
-        state.setCredentials (authScope, creds);
-    }
-
-    public void setCredentials(String realm, String host, int port,
-                               String username, String password)
-    {
-        AuthScope authScope = new AuthScope (host, port, realm);
-        UsernamePasswordCredentials creds = new UsernamePasswordCredentials (username,password);
-        HttpState state = getHttpState();
-
-        state.setCredentials (authScope, creds);
-    }
-
-    public void setCredentials(String realm, String host, int port,
-                               String username, String password,
-                               String domain, String thisHost)
-    {
-        AuthScope authScope = new AuthScope (host, port, realm);
-        NTCredentials creds = new NTCredentials (username,password, thisHost, domain);
-        HttpState state = getHttpState();
-
-        state.setCredentials (authScope, creds);
-    }
-
-    public void setProxyCredentials(String realm, String host, int port,
-                                    String usernamepassword)
-    {
-        AuthScope authScope = new AuthScope (host, port, realm);
-        UsernamePasswordCredentials creds = new UsernamePasswordCredentials (usernamepassword);
-        HttpState state = getHttpState();
-
-        state.setProxyCredentials (authScope, creds);
-    }
-
-    public void setProxyCredentials(String realm, String host, int port,
-                                    String username, String password)
-    {
-        AuthScope authScope = new AuthScope (host, port, realm);
-        UsernamePasswordCredentials creds = new UsernamePasswordCredentials (username,password);
-        HttpState state = getHttpState();
-
-        state.setProxyCredentials (authScope, creds);
-    }
-
-    public void setProxyCredentials(String realm, String host, int port,
-                                    String username, String password,
-                                    String domain, String thisHost)
-    {
-        AuthScope authScope = new AuthScope (host, port, realm);
-        NTCredentials creds = new NTCredentials (username,password, thisHost, domain);
-        HttpState state = getHttpState();
-
-        state.setProxyCredentials (authScope, creds);
-    }
-
-    public void clearCredentials()
-    {
-        HttpState state = getHttpState();
-        state.clearCredentials();
-    }
-
-    public void clearProxyCredentials()
-    {
-        HttpState state = getHttpState();
-        state.clearProxyCredentials();
-    }
 }
-

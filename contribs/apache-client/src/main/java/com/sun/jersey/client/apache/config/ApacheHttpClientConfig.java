@@ -38,253 +38,89 @@ package com.sun.jersey.client.apache.config;
 
 import com.sun.jersey.api.client.config.ClientConfig;
 
-
 /**
-   Contains configuration options specific to clients that root with
-   the {@link com.sun.jersey.impl.client.httpclient.HttpClientHandler}.
+ * Contains configuration options specific to clients that root with
+ * the {@link com.sun.jersey.impl.client.httpclient.HttpClientHandler}.
+ *
+ * @author jorgew
+ */
+public interface ApacheHttpClientConfig extends ClientConfig {
 
-   @author jorgew
-**/
-
-public interface ApacheHttpClientConfig extends ClientConfig
-{
     /**
-       A value of "true" indicates that the client should
-       interactively prompt for credentials should it receive a 401
-       response.
-
-       The value MUST be an instance of {@link java.lang.Boolean}.
-       If the property is absent the default value is "true"
-     **/
+     * A value of "true" indicates that the client should
+     * interactively prompt for credentials should it receive a 401
+     * response.
+     *
+     * The value MUST be an instance of {@link java.lang.Boolean}.
+     * If the property is absent the default value is "false"
+     */
     public static final String PROPERTY_INTERACTIVE =
-        "com.sun.jersey.impl.client.httpclient.interactive";
+            "com.sun.jersey.impl.client.httpclient.interactive";
 
     /**
-       A value of "true" indicates the client should handle cookies
-       automatically using HttpClient's default cookie policy. A value
-       of "false" will cause the client to ignore all cookies.
-
-       The value MUST be an instance of {@link java.lang.Boolean}.
-       If the property is absent the default value is "false"
-    **/
+     * A value of "true" indicates the client should handle cookies
+     * automatically using HttpClient's default cookie policy. A value
+     * of "false" will cause the client to ignore all cookies.
+     *
+     * The value MUST be an instance of {@link java.lang.Boolean}.
+     * If the property is absent the default value is "false"
+     */
     public static final String PROPERTY_HANDLE_COOKIES =
-        "com.sun.jersey.impl.client.httpclient.handleCookies";
+            "com.sun.jersey.impl.client.httpclient.handleCookies";
 
     /**
-       The credential provider that should be used to retrive
-       credentials from a user. The provider will be used only if
-       PROPERTY_INTERACTIVE is set to true.
-
-       The value MUST be an instance of {@link
-       org.apache.commons.httpclient.auth.CredentialsProvider}.  If
-       the property is absent a default provider will be used.
-    **/
+     * The credential provider that should be used to retrive
+     * credentials from a user. The provider will be used only if
+     * PROPERTY_INTERACTIVE is set to true.
+     *
+     * The value MUST be an instance of {@link
+     * org.apache.commons.httpclient.auth.CredentialsProvider}.  If
+     * the property is absent a default provider will be used.
+     */
     public static final String PROPERTY_CREDENTIALS_PROVIDER =
-        "com.sun.jersey.impl.client.httpclient.credentialsProvider";
+            "com.sun.jersey.impl.client.httpclient.credentialsProvider";
 
     /**
-       A value of "true" indicates that a client should send an
-       authentication request even before the server gives a 401
-       response.
-
-       If the value of this property is set to "true" default
-       credientials must be set for the target or proxy.
-
-       The value MUST be an instance of {@link java.lang.Boolean}.
-       If the property is absent the default value is "false"
-     **/
+     * A value of "true" indicates that a client should send an
+     * authentication request even before the server gives a 401
+     * response.
+     *
+     * If the value of this property is set to "true" default
+     * credientials must be set for the target or proxy.
+     *
+     * The value MUST be an instance of {@link java.lang.Boolean}.
+     * If the property is absent the default value is "false"
+     */
     public static final String PROPERTY_PREEMPTIVE_AUTHENTICATION =
-        "com.sun.jersey.impl.client.httpclient.preemptiveAuthentication";
+            "com.sun.jersey.impl.client.httpclient.preemptiveAuthentication";
 
     /**
-       A value of "true" indicates that a client should use a proxy
-       when connecting to a host. {@link #PROPERTY_PROXY_HOST} and
-       {@link #PROPERTY_PROXY_PORT} MUST be set.
-
-       The value MUST be an instance of {@link java.lang.Boolean}. If
-       the property is absent the default value is "false".
-     **/
-    public static final String PROPERTY_PROXY_SET =
-        "com.sun.jersey.impl.client.httpclient.proxySet";
-
-    /**
-       A value indicating the proxy host to use.  The proxy host will
-       only be set if {@link #PROPERTY_PROXY_SET} is set to "true".
-
-       The value MUST be an instance of {@link java.lang.String}.  If
-       the property is absent the default value is "localhost".
-     **/
-    public static final String PROPERTY_PROXY_HOST =
-        "com.sun.jersey.impl.client.httpclient.proxyHost";
+     * A value of a URI to configure the proxy host and proxy port to proxy
+     * HTTP requests and responses. If the port component of the URI is absent
+     * then a default port of 8080 be selected.
+     *
+     * The value MUST be an instance of {@link String} or {@link java.net.URI}.
+     * If the property absent then no proxy will be utilized.
+     */
+    public static final String PROPERTY_PROXY_URI =
+            "com.sun.jersey.impl.client.httpclient.proxyURI";
 
     /**
-       A value indicating the proxy port to use.  The proxy port will
-       only be set if {@link #PROPERTY_PROXY_SET} is set to "true".
-
-       The value MUST be an instance of {@link java.lang.Integer}. If
-       the property is absent the default value is 8080.
-     **/
-    public static final String PROPERTY_PROXY_PORT =
-        "com.sun.jersey.impl.client.httpclient.proxyPort";
-
-    /**
-       Sets the credentials for the given authentication scope.  Any
-       previous credentials for the given scope will be overwritten.
-
-       @param realm The authentication realm.  The null realm
-       signifies default credentials for the given host, which should
-       be used when no credentials have been explicitly supplied for
-       the challenging realm.
-       @param host The host the realm belongs to. The null host
-       signifies default credentials which should be used when no
-       credentials have been explicitly supplied for the challenging
-       host.
-       @param port The port the realm belongs to. A negitive port
-       signifies the credentials are applicaple to any port when no
-       credentials have been explicitly supplied for the challenging
-       port.
-       @param usernamepassword The username:password formed string.
-    **/
-    public void setCredentials(String realm, String host, int port,
-                               String usernamepassword);
+     * The {@link ApacheHttpClientState} of the current client. 
+     * This is used to maintain authentication credentials.
+     *
+     * The value MUST be an instance of {@link ApacheHttpClientState}.
+     */
+    public static final String PROPERTY_HTTP_STATE =
+            "com.sun.jersey.impl.client.httpclient.httpState";
 
     /**
-       Sets the credentials for the given authentication scope.  Any
-       previous credentials for the given scope will be overwritten.
-
-       @param realm The authentication realm.  The null realm
-       signifies default credentials for the given host, which should
-       be used when no credentials have been explicitly supplied for
-       the challenging realm.
-       @param host The host the realm belongs to. The null host
-       signifies default credentials which should be used when no
-       credentials have been explicitly supplied for the challenging
-       host.
-       @param port The port the realm belongs to. A negitive port
-       signifies the credentials are applicaple to any port when no
-       credentials have been explicitly supplied for the challenging
-       port.
-       @param username The username
-       @param password The password
-    **/
-    public void setCredentials(String realm, String host, int port,
-                               String username, String password);
-
-    /**
-       Sets the credentials for the given authentication scope.  Any
-       previous credentials for the given scope will be overwritten.
-
-       This method should be used when setting credentials for the
-       NTLM authentication scheme.
-
-       @param realm The authentication realm.  The null realm
-       signifies default credentials for the given host, which should
-       be used when no credentials have been explicitly supplied for
-       the challenging realm.
-       @param host The host the realm belongs to. The null host
-       signifies default credentials which should be used when no
-       credentials have been explicitly supplied for the challenging
-       host.
-       @param port The port the realm belongs to. A negitive port
-       signifies the credentials are applicaple to any port when no
-       credentials have been explicitly supplied for the challenging
-       port.
-       @param username The username, this should not include the
-       domain to authenticate with. For example: "user" is correct
-       wheareas "DOMAIN\\user" is not.
-       @param password The password
-       @param thisHost The host the authentication requiest is originating
-       from. Essentially, the computer name for this machine.
-       @param domain The domain to authentice with.
-    **/
-    public void setCredentials(String realm, String host, int port,
-                               String username, String password,
-                               String thisHost, String domain);
-
-    /**
-       Sets the proxy credentials for the given authentication scope.
-       Any previous credentials for the given scope will be
-       overwritten.
-
-       @param realm The authentication realm.  The null realm
-       signifies default credentials for the given host, which should
-       be used when no credentials have been explicitly supplied for
-       the challenging realm.
-       @param host The host the realm belongs to. The null host
-       signifies default credentials which should be used when no
-       credentials have been explicitly supplied for the challenging
-       host.
-       @param port The port the realm belongs to. A negitive port
-       signifies the credentials are applicaple to any port when no
-       credentials have been explicitly supplied for the challenging
-       port.
-       @param usernamepassword The username:password formed string.
-    **/
-    public void setProxyCredentials(String realm, String host, int port,
-                                    String usernamepassword);
-
-    /**
-       Sets the proxy credentials for the given authentication scope.
-       Any previous credentials for the given scope will be
-       overwritten.
-
-       @param realm The authentication realm.  The null realm
-       signifies default credentials for the given host, which should
-       be used when no credentials have been explicitly supplied for
-       the challenging realm.
-       @param host The host the realm belongs to. The null host
-       signifies default credentials which should be used when no
-       credentials have been explicitly supplied for the challenging
-       host.
-       @param port The port the realm belongs to. A negitive port
-       signifies the credentials are applicaple to any port when no
-       credentials have been explicitly supplied for the challenging
-       port.
-       @param username The username
-       @param password The password
-    **/
-    public void setProxyCredentials(String realm, String host, int port,
-                                    String username, String password);
-
-    /**
-       Sets the proxy credentials for the given authentication scope.
-       Any previous credentials for the given scope will be
-       overwritten.
-
-       This method should be used when setting credentials for the
-       NTLM authentication scheme.
-
-       @param realm The authentication realm.  The null realm
-       signifies default credentials for the given host, which should
-       be used when no credentials have been explicitly supplied for
-       the challenging realm.
-       @param host The host the realm belongs to. The null host
-       signifies default credentials which should be used when no
-       credentials have been explicitly supplied for the challenging
-       host.
-       @param port The port the realm belongs to. A negitive port
-       signifies the credentials are applicaple to any port when no
-       credentials have been explicitly supplied for the challenging
-       port.
-       @param username The username, this should not include the
-       domain to authenticate with. For example: "user" is correct
-       wheareas "DOMAIN\\user" is not.
-       @param password The password
-       @param thisHost The host the authentication requiest is originating
-       from. Essentially, the computer name for this machine.
-       @param domain The domain to authentice with.
-    **/
-    public void setProxyCredentials(String realm, String host, int port,
-                                    String username, String password,
-                                    String thisHost, String domain);
-
-    /**
-       Clears all credentials.
-    **/
-    public void clearCredentials();
-
-    /**
-       Clears all proxy credentials.
-    **/
-    public void clearProxyCredentials();
+     * Get the HTTP state. Credentials may be set on the HTTP state.
+     * <p>
+     * If no state exists then an instance is created and added
+     * as the property {@link #PROPERTY_HTTP_STATE}.
+     *
+     * @return the HTTP state.
+     */
+    public ApacheHttpClientState getState();
 }
