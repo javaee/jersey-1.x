@@ -39,6 +39,7 @@ package com.sun.jersey.api.wadl.config;
 import java.util.logging.Logger;
 
 import com.sun.jersey.api.core.ResourceConfig;
+import com.sun.jersey.core.reflection.ReflectionHelper;
 import com.sun.jersey.server.wadl.WadlGenerator;
 import com.sun.jersey.server.wadl.WadlGeneratorImpl;
 
@@ -77,10 +78,12 @@ public class WadlGeneratorConfigLoader {
 
                 final Class<? extends WadlGeneratorConfig> configClazz;
                 if ( wadlGeneratorConfigProperty instanceof Class ) {
-                    configClazz = ( (Class<?>)wadlGeneratorConfigProperty ).asSubclass( WadlGeneratorConfig.class );
+                    configClazz = ( (Class<?>)wadlGeneratorConfigProperty ).
+                            asSubclass( WadlGeneratorConfig.class );
                 }
                 else if ( wadlGeneratorConfigProperty instanceof String ) {
-                    configClazz = Class.forName( (String) wadlGeneratorConfigProperty ).asSubclass( WadlGeneratorConfig.class );
+                    configClazz = ReflectionHelper.classForName( (String) wadlGeneratorConfigProperty ).
+                            asSubclass( WadlGeneratorConfig.class );
                 }
                 else {
                     throw new RuntimeException( "The property " + ResourceConfig.PROPERTY_WADL_GENERATOR_CONFIG + 

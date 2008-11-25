@@ -58,17 +58,25 @@ public final class ReflectionHelper {
     /**
      * Get the Class from the class name.
      * <p>
-     * The context class loader of the current thread is used.
+     * The context class loader of the current thread is used, if null then the
+     * ClassLoader.getSystemClassLoader() is utilized.
      * 
      * @param name the class name.
      * @return the Class.
      */
     public static Class classForName(String name) {
         try {
-            return Class.forName(name, true, Thread.currentThread().getContextClassLoader());
+            return Class.forName(name, true, getClassLoader());
         } catch (ClassNotFoundException ex) {
             return null;
         }
+    }
+
+    private static ClassLoader getClassLoader() {
+        ClassLoader l = Thread.currentThread().getContextClassLoader();
+        if (l == null)
+            l = ClassLoader.getSystemClassLoader();
+        return l;
     }
 
     /**
