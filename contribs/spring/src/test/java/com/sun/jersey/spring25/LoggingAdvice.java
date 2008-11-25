@@ -49,4 +49,12 @@ public class LoggingAdvice {
         return retVal;
       }
     
+    @Around( "execution(* com.sun.jersey.spring25.ProxiedSubResource.getRequestUri(..))" )
+    public Object logSubResource(ProceedingJoinPoint pjp) throws Throwable {
+        final Signature signature = pjp.getSignature();
+        LOGGER.info( "Starting to execute " + signature.getDeclaringTypeName() + "." + signature.getName() );
+        Object retVal = pjp.proceed();
+        LOGGER.info( "Finished to execute " + signature.getDeclaringTypeName() + "." + signature.getName() );
+        return retVal;
+      }
 }

@@ -21,6 +21,7 @@
  */
 package com.sun.jersey.spring25;
 
+import com.sun.jersey.api.core.ResourceContext;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
@@ -54,8 +55,16 @@ public class ProxiedResource {
     @GET
     @Produces( "text/plain" )
     public String getBaseUri() {
+        Path p = this.getClass().getAnnotation(Path.class);
+        System.out.println("XXXXXXXX: " + p);
+        System.out.println("XXXXXXXX: " + this.getClass());
+        
         // if the uriInfo is not injected - of course - this produces an NPE
         return _uriInfo.getBaseUri().toString();
     }
-    
+
+    @Path("subresource")
+    public ProxiedSubResource getSubResource(@Context ResourceContext rc) {
+        return rc.getResource(ProxiedSubResource.class);
+    }
 }

@@ -46,12 +46,20 @@ public class ProxiedResourceTest extends AbstractResourceTest {
     
     @Test( enabled=true )
     public void testGetAndUpdateItem() {
-        
+
+        {
         final WebResource itemResource = resource( _resourcePath );
         final String actualItem = itemResource.get( String.class );
         Assert.assertNotNull( actualItem );
         Assert.assertEquals( actualItem, getBaseUri() );
-        
+        }
+
+        {
+        final WebResource itemResource = resource( _resourcePath + "/subresource");
+        final String actualItem = itemResource.get( String.class );
+        Assert.assertNotNull( actualItem );
+        Assert.assertEquals( actualItem, getBaseUri() + _resourcePath + "/subresource");
+        }
     }
 
 }
