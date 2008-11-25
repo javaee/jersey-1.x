@@ -380,7 +380,7 @@ public class Client extends Filterable implements ClientHandler {
      * 
      * @return a default client handler.
      */
-    protected static ClientHandler createDefaultClientHander() {
+    public static ClientHandler createDefaultClientHander() {
         return new URLConnectionClientHandler();
     }
 }
