@@ -1,4 +1,10 @@
 release 1.0.1 (2008-11/12)
+- Fixed issue 146
+  https://jersey.dev.java.net/issues/show_bug.cgi?id=146
+  UriBuilder.build was implemented as specified for UriBuilder.buildFromEncoded
+  and vice versa, this has been corrected. The '&' character for the template 
+  value of a template parameter that is part of a query parameter is now
+  percent-encoded.
 - Fixed issue 127
   https://jersey.dev.java.net/issues/show_bug.cgi?id=147
   WADL generation using incorrect class loader that fails when in an OSGi

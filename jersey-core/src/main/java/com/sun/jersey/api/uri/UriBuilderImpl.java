@@ -476,12 +476,12 @@ public class UriBuilderImpl extends UriBuilder {
     }
     
     public URI buildFromMap(Map<String, ? extends Object> values) {
-        return _buildFromMap(false, values);
+        return _buildFromMap(true, values);
     }
 
     @Override
     public URI buildFromEncodedMap(Map<String, ? extends Object> values) throws IllegalArgumentException, UriBuilderException {
-        return _buildFromMap(true, values);
+        return _buildFromMap(false, values);
     }
 
     private URI _buildFromMap(boolean encode, Map<String, ? extends Object> values) {
@@ -499,12 +499,12 @@ public class UriBuilderImpl extends UriBuilder {
     
     @Override
     public URI build(Object... values) {
-        return _build(false, values);
+        return _build(true, values);
     }
     
     @Override
     public URI buildFromEncoded(Object... values) {
-        return _build(true, values);
+        return _build(false, values);
     }
     
     private URI _build(boolean encode, Object... values) {

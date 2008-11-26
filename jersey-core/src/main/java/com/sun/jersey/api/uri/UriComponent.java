@@ -349,6 +349,7 @@ public class UriComponent {
         tables[Type.QUERY_PARAM.ordinal()] = creatingEncodingTable(l);
         tables[Type.QUERY_PARAM.ordinal()]['='] = false;
         tables[Type.QUERY_PARAM.ordinal()]['+'] = false;
+        tables[Type.QUERY_PARAM.ordinal()]['&'] = false;
 
         return tables;
     }

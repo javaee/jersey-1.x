@@ -506,76 +506,76 @@ public class UriBuilderTest extends TestCase {
         assertEquals(URI.create("http://localhost:8080/a/b/c/x/y/z/x"), bu);
     }
 
-    public void testBuildTemplatesEncoded() {
+    public void testBuildQueryTemplates() {
         URI bu = UriBuilder.fromUri("http://localhost:8080/a/b/c").
-                queryParam("a", "{b}").build("=+");
-        assertEquals(URI.create("http://localhost:8080/a/b/c?a=%3D+"), bu);
+                queryParam("a", "{b}").build("=+&%xx%20");
+        assertEquals(URI.create("http://localhost:8080/a/b/c?a=%3D%2B%26%25xx%2520"), bu);
 
         Map<String, Object> m = new HashMap<String, Object>();
-        m.put("b", "=+");
+        m.put("b", "=+&%xx%20");
         bu = UriBuilder.fromUri("http://localhost:8080/a/b/c").
                 queryParam("a", "{b}").buildFromMap(m);
-        assertEquals(URI.create("http://localhost:8080/a/b/c?a=%3D+"), bu);
+        assertEquals(URI.create("http://localhost:8080/a/b/c?a=%3D%2B%26%25xx%2520"), bu);
     }
 
-    public void testBuildFromEncodedTemplates() {
+    public void testBuildFromEncodedQueryTemplates() {
         URI bu = UriBuilder.fromUri("http://localhost:8080/a/b/c").
-                queryParam("a", "{b}").buildFromEncoded("=+");
-        assertEquals(URI.create("http://localhost:8080/a/b/c?a=%3D%2B"), bu);
+                queryParam("a", "{b}").buildFromEncoded("=+&%xx%20");
+        assertEquals(URI.create("http://localhost:8080/a/b/c?a=%3D+%26%25xx%20"), bu);
 
         Map<String, Object> m = new HashMap<String, Object>();
-        m.put("b", "=+");
+        m.put("b", "=+&%xx%20");
         bu = UriBuilder.fromUri("http://localhost:8080/a/b/c").
                 queryParam("a", "{b}").buildFromEncodedMap(m);
-        assertEquals(URI.create("http://localhost:8080/a/b/c?a=%3D%2B"), bu);
+        assertEquals(URI.create("http://localhost:8080/a/b/c?a=%3D+%26%25xx%20"), bu);
     }
 
-//    public void testTemplatesDefaultPort() {
-//        URI bu = UriBuilder.fromUri("http://localhost/a/b/c").
-//                path("/{foo}/{bar}/{baz}/{foo}").build("x", "y", "z");
-//        assertEquals(URI.create("http://localhost/a/b/c/x/y/z/x"), bu);
-//
-//        Map<String, Object> m = new HashMap<String, Object>();
-//        m.put("foo", "x");
-//        m.put("bar", "y");
-//        m.put("baz", "z");
-//        bu = UriBuilder.fromUri("http://localhost/a/b/c").
-//                path("/{foo}/{bar}/{baz}/{foo}").buildFromMap(m);
-//        assertEquals(URI.create("http://localhost/a/b/c/x/y/z/x"), bu);
-//    }
-//
-//    public void testClone() {
-//        UriBuilder ub = UriBuilder.fromUri("http://user@localhost:8080/?query#fragment").path("a");
-//        URI full = ub.clone().path("b").build();
-//        URI base = ub.build();
-//
-//        assertEquals(URI.create("http://user@localhost:8080/a?query#fragment"), base);
-//        assertEquals(URI.create("http://user@localhost:8080/a/b?query#fragment"), full);
-//    }
-//
-//    public void testIllegalArgumentException() {
-//        boolean caught = false;
-//        try {
-//            UriBuilder.fromPath(null);
-//        } catch(IllegalArgumentException e) {
-//            caught = true;
-//        }
-//        assertTrue(caught);
-//
-//        caught = false;
-//        try {
-//            UriBuilder.fromUri((URI)null);
-//        } catch(IllegalArgumentException e) {
-//            caught = true;
-//        }
-//        assertTrue(caught);
-//
-//        caught = false;
-//        try {
-//            UriBuilder.fromUri((String)null);
-//        } catch(IllegalArgumentException e) {
-//            caught = true;
-//        }
-//        assertTrue(caught);
-//    }
+    public void testTemplatesDefaultPort() {
+        URI bu = UriBuilder.fromUri("http://localhost/a/b/c").
+                path("/{foo}/{bar}/{baz}/{foo}").build("x", "y", "z");
+        assertEquals(URI.create("http://localhost/a/b/c/x/y/z/x"), bu);
+
+        Map<String, Object> m = new HashMap<String, Object>();
+        m.put("foo", "x");
+        m.put("bar", "y");
+        m.put("baz", "z");
+        bu = UriBuilder.fromUri("http://localhost/a/b/c").
+                path("/{foo}/{bar}/{baz}/{foo}").buildFromMap(m);
+        assertEquals(URI.create("http://localhost/a/b/c/x/y/z/x"), bu);
+    }
+
+    public void testClone() {
+        UriBuilder ub = UriBuilder.fromUri("http://user@localhost:8080/?query#fragment").path("a");
+        URI full = ub.clone().path("b").build();
+        URI base = ub.build();
+
+        assertEquals(URI.create("http://user@localhost:8080/a?query#fragment"), base);
+        assertEquals(URI.create("http://user@localhost:8080/a/b?query#fragment"), full);
+    }
+
+    public void testIllegalArgumentException() {
+        boolean caught = false;
+        try {
+            UriBuilder.fromPath(null);
+        } catch(IllegalArgumentException e) {
+            caught = true;
+        }
+        assertTrue(caught);
+
+        caught = false;
+        try {
+            UriBuilder.fromUri((URI)null);
+        } catch(IllegalArgumentException e) {
+            caught = true;
+        }
+        assertTrue(caught);
+
+        caught = false;
+        try {
+            UriBuilder.fromUri((String)null);
+        } catch(IllegalArgumentException e) {
+            caught = true;
+        }
+        assertTrue(caught);
+    }
 }
