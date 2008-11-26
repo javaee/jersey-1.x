@@ -19,7 +19,7 @@ import java.lang.reflect.Type;
  * @author Paul.Sandoz@Sun.Com
  */
 public abstract class PerRequestTypeInjectableProvider <A extends Annotation, T> 
-    implements InjectableProvider<A, Type>, Injectable<T> {
+    implements InjectableProvider<A, Type> {
     
     private final Type t;
     
