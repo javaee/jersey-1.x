@@ -67,6 +67,7 @@
         <module>spring-annotations</module>
         <module>sparklines</module>
         <module>groovy</module>
+        <module>scala-helloworld-webapp</module>
     </modules>
     <build>
         <plugins>
