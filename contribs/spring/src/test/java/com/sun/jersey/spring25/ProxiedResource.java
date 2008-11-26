@@ -55,10 +55,6 @@ public class ProxiedResource {
     @GET
     @Produces( "text/plain" )
     public String getBaseUri() {
-        Path p = this.getClass().getAnnotation(Path.class);
-        System.out.println("XXXXXXXX: " + p);
-        System.out.println("XXXXXXXX: " + this.getClass());
-        
         // if the uriInfo is not injected - of course - this produces an NPE
         return _uriInfo.getBaseUri().toString();
     }
