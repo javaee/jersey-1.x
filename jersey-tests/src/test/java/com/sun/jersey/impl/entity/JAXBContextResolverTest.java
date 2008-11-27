@@ -160,7 +160,7 @@ public class JAXBContextResolverTest extends AbstractResourceTester {
         initiateWebApplication(rc);
                 
         WebResource r = resource("/");
-        assertEquals("foo", r.post(JAXBBean.class, new JAXBBean("foo")).value);
+        assertEquals("foo", r.type("application/xml").post(JAXBBean.class, new JAXBBean("foo")).value);
         assertEquals(2, cr.invoked());
     }        
     
@@ -175,7 +175,7 @@ public class JAXBContextResolverTest extends AbstractResourceTester {
         initiateWebApplication(rc);
                 
         WebResource r = resource("/");
-        assertEquals("foo", r.post(JAXBBean.class, new JAXBBean("foo")).value);
+        assertEquals("foo", r.type("application/xml").post(JAXBBean.class, new JAXBBean("foo")).value);
         assertEquals(0, cr.invoked());
         assertEquals(1, mr.invoked());
         assertEquals(1, umr.invoked());
@@ -300,16 +300,16 @@ public class JAXBContextResolverTest extends AbstractResourceTester {
     
     
     @Provider
-    @Produces("text/foo")
+    @Produces("text/foo+xml")
     public static class MarshallerResolverFoo extends MarshallerResolver { }
     
     @Provider
-    @Produces("text/foo")
+    @Produces("text/foo+xml")
     public static class UnmarshallerResolverFoo extends UnmarshallerResolver { }
     
     @Path("/")
-    @Consumes("text/foo")
-    @Produces("text/foo")
+    @Consumes("text/foo+xml")
+    @Produces("text/foo+xml")
     public static class JAXBBeanResourceFoo extends JAXBBeanResource { }
     
     public void testUnMarshallerFoo() throws Exception {
@@ -327,14 +327,14 @@ public class JAXBContextResolverTest extends AbstractResourceTester {
         initiateWebApplication(rc);
                 
         WebResource r = resource("/");
-        assertEquals("foo", r.type("text/foo").post(JAXBBean.class, new JAXBBean("foo")).value);
+        assertEquals("foo", r.type("text/foo+xml").post(JAXBBean.class, new JAXBBean("foo")).value);
         assertEquals(0, cr.invoked());
         assertEquals(0, mr.invoked());
         assertEquals(0, umr.invoked());
         assertEquals(1, mrFoo.invoked());
         assertEquals(1, umrFoo.invoked());
         
-        assertEquals("foo", r.type("text/foo;charset=UTF-8").post(JAXBBean.class, new JAXBBean("foo")).value);
+        assertEquals("foo", r.type("text/foo+xml;charset=UTF-8").post(JAXBBean.class, new JAXBBean("foo")).value);
         assertEquals(0, cr.invoked());
         assertEquals(0, mr.invoked());
         assertEquals(0, umr.invoked());
@@ -345,8 +345,8 @@ public class JAXBContextResolverTest extends AbstractResourceTester {
     @Path("/")
     public static class JAXBBeanResourceAll {
         @POST
-        @Consumes("application/octet-stream")
-        @Produces("application/octet-stream")
+        @Consumes("application/foo+xml")
+        @Produces("application/foo+xml")
         public JAXBBean get(JAXBBean b) {
             return b;
         }
@@ -378,7 +378,7 @@ public class JAXBContextResolverTest extends AbstractResourceTester {
                 
         WebResource r = resource("/");
         
-        assertEquals("foo", r.type("application/octet-stream").post(JAXBBean.class, 
+        assertEquals("foo", r.type("application/foo+xml").post(JAXBBean.class,
                 new JAXBBean("foo")).value);
         assertEquals(2, cr.invoked());
         assertEquals(0, crApp.invoked());
@@ -422,7 +422,7 @@ public class JAXBContextResolverTest extends AbstractResourceTester {
                 
         WebResource r = resource("/");
         
-        assertEquals("foo", r.type("application/octet-stream").post(JAXBBean.class, 
+        assertEquals("foo", r.type("application/foo+xml").post(JAXBBean.class,
                 new JAXBBean("foo")).value);
         assertEquals(0, cr.invoked());
         assertEquals(0, crApp.invoked());
@@ -482,8 +482,8 @@ public class JAXBContextResolverTest extends AbstractResourceTester {
     @Path("/")
     public static class JAXBBeanResourceAllOtherJAXBBean {
         @POST
-        @Consumes("application/octet-stream")
-        @Produces("application/octet-stream")
+        @Consumes("application/foo+xml")
+        @Produces("application/foo+xml")
         public OtherJAXBBean get(OtherJAXBBean b) {
             return b;
         }
@@ -515,7 +515,7 @@ public class JAXBContextResolverTest extends AbstractResourceTester {
                 
         WebResource r = resource("/");
         
-        assertEquals("foo", r.type("application/octet-stream").post(OtherJAXBBean.class, 
+        assertEquals("foo", r.type("application/foo+xml").post(OtherJAXBBean.class,
                 new OtherJAXBBean("foo")).value);
         assertEquals(0, cr.invoked());
         assertEquals(0, crApp.invoked());

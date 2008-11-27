@@ -83,6 +83,11 @@ public class XMLJAXBElementProvider extends AbstractJAXBElementProvider {
     @Consumes("*/*")
     public static final class General extends XMLJAXBElementProvider {
         public General(@Context Providers ps) { super(ps); }
+
+        @Override
+        protected boolean isSupported(MediaType m) {
+            return m.getSubtype().endsWith("+xml");
+        }
     }
     
     protected final JAXBElement<?> readFrom(Class<?> type, MediaType mediaType,

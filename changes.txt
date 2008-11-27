@@ -1,4 +1,9 @@
 release 1.0.1 (2008-11/12)
+- For JAXB-related types the set of supported media types are "application/xml"
+  "text/xml", "*/*+xml", "application/json", "*/*+json".
+  Previously for JAXB-related types the set of media types for XML was
+  unrestricted which limited the set of possible user-declared media types for
+  JSON to just "application/json".
 - Fixed issue 146
   https://jersey.dev.java.net/issues/show_bug.cgi?id=146
   UriBuilder.build was implemented as specified for UriBuilder.buildFromEncoded

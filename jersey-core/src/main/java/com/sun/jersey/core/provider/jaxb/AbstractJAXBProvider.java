@@ -94,6 +94,10 @@ public abstract class AbstractJAXBProvider<T> extends AbstractMessageReaderWrite
             this.mtMarshaller = null;
         }
     }
+
+    protected boolean isSupported(MediaType m) {
+        return true;
+    }
     
     protected final Unmarshaller getUnmarshaller(Class type, MediaType mt) throws JAXBException {
         if (fixedMediaType)

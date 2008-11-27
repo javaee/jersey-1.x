@@ -38,9 +38,6 @@
 package com.sun.jersey.impl.provider.entity;
 
 import com.sun.jersey.core.provider.jaxb.AbstractListElementProvider;
-import com.sun.jersey.api.json.JSONJAXBContext;
-import com.sun.jersey.impl.json.JSONMarshaller;
-import com.sun.jersey.impl.json.JSONUnmarshaller;
 import com.sun.jersey.impl.json.reader.JsonXmlStreamReader;
 import com.sun.jersey.impl.json.writer.JsonXmlStreamWriter;
 import java.io.IOException;
@@ -59,7 +56,6 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.ext.Providers;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
-import javax.xml.bind.Unmarshaller;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
@@ -68,12 +64,31 @@ import javax.xml.stream.XMLStreamWriter;
  *
  * @author japod
  */
-@Produces("application/json")
-@Consumes("application/json")
 public class JSONListElementProvider extends AbstractListElementProvider {
 
-    public JSONListElementProvider(@Context Providers ps) {
+    JSONListElementProvider(Providers ps) {
         super(ps);
+    }
+
+    JSONListElementProvider(Providers ps, MediaType mt) {
+        super(ps, mt);
+    }
+
+    @Produces("application/json")
+    @Consumes("application/json")
+    public static final class App extends JSONListElementProvider {
+        public App(@Context Providers ps) { super(ps , MediaType.APPLICATION_JSON_TYPE); }
+    }
+
+    @Produces("*/*")
+    @Consumes("*/*")
+    public static final class General extends JSONListElementProvider {
+        public General(@Context Providers ps) { super(ps); }
+
+        @Override
+        protected boolean isSupported(MediaType m) {
+            return m.getSubtype().endsWith("+json");
+        }
     }
 
     @Override

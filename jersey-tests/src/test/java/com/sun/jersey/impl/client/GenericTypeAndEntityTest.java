@@ -81,7 +81,7 @@ public class GenericTypeAndEntityTest extends AbstractGrizzlyServerTester {
         
         Collection<JAXBBean> a = r.get(
                 new GenericType<Collection<JAXBBean>>(){});
-        Collection<JAXBBean> b = r.post(new GenericType<Collection<JAXBBean>>(){}, 
+        Collection<JAXBBean> b = r.type("application/xml").post(new GenericType<Collection<JAXBBean>>(){},
                 new GenericEntity<Collection<JAXBBean>>(a){});
         
         assertEquals(a, b);

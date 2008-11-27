@@ -70,11 +70,11 @@ public abstract class AbstractJAXBElementProvider extends AbstractJAXBProvider<J
     }
     
     public boolean isReadable(Class<?> type, Type genericType, Annotation annotations[], MediaType mediaType) {
-        return type == JAXBElement.class && genericType instanceof ParameterizedType;
+        return type == JAXBElement.class && genericType instanceof ParameterizedType && isSupported(mediaType);
     }
     
     public boolean isWriteable(Class<?> type, Type genericType, Annotation annotations[], MediaType mediaType) {
-        return JAXBElement.class.isAssignableFrom(type);
+        return JAXBElement.class.isAssignableFrom(type) && isSupported(mediaType);
     }
             
     public final JAXBElement<?> readFrom(

@@ -66,14 +66,32 @@ import javax.xml.transform.stream.StreamSource;
  *
  * @author Paul.Sandoz@Sun.Com
  */
-@Produces("application/json")
-@Consumes("application/json")
-public final class JSONRootElementProvider extends AbstractRootElementProvider {
-    
-    public JSONRootElementProvider(@Context Providers ps) {
-        super(ps, MediaType.APPLICATION_JSON_TYPE);
+public class JSONRootElementProvider extends AbstractRootElementProvider {
+    JSONRootElementProvider(Providers ps) {
+        super(ps);
+    }
+
+    JSONRootElementProvider(Providers ps, MediaType mt) {
+        super(ps, mt);
     }
     
+    @Produces("application/json")
+    @Consumes("application/json")
+    public static final class App extends JSONRootElementProvider {
+        public App(@Context Providers ps) { super(ps , MediaType.APPLICATION_JSON_TYPE); }
+    }
+
+    @Produces("*/*")
+    @Consumes("*/*")
+    public static final class General extends JSONRootElementProvider {
+        public General(@Context Providers ps) { super(ps); }
+
+        @Override
+        protected boolean isSupported(MediaType m) {
+            return m.getSubtype().endsWith("+json");
+        }
+    }
+
     @Override
     protected final Object readFrom(Class<Object> type, MediaType mediaType, 
             Unmarshaller u, InputStream entityStream)

@@ -41,6 +41,8 @@ import com.sun.jersey.impl.AbstractResourceTester;
 import com.sun.jersey.api.client.WebResource;
 import com.sun.jersey.api.client.ClientResponse;
 import javax.ws.rs.POST;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.MediaType;
 
 /**
  *
@@ -63,11 +65,19 @@ public abstract class AbstractTypeTester extends AbstractResourceTester {
         _test(in, resource, true);
     }
     
+    protected <T> void _test(T in, Class resource, MediaType m) {
+        _test(in, resource, m, true);
+    }
+
     protected <T> void _test(T in, Class resource, boolean verify) {
+        _test(in, resource, MediaType.TEXT_PLAIN_TYPE, verify);
+    }
+
+    protected <T> void _test(T in, Class resource, MediaType m, boolean verify) {
         initiateWebApplication(resource);
         WebResource r = resource("/");
 
-        ClientResponse rib = r.post(ClientResponse.class, in);
+        ClientResponse rib = r.type(m).post(ClientResponse.class, in);
         
         byte[] inBytes = (byte[])
                 rib.getProperties().get("request.entity");

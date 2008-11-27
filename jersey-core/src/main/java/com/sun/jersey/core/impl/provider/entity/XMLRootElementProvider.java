@@ -83,6 +83,11 @@ public class XMLRootElementProvider extends AbstractRootElementProvider {
     @Consumes("*/*")
     public static final class General extends XMLRootElementProvider {
         public General(@Context Providers ps) { super(ps); }
+
+        @Override
+        protected boolean isSupported(MediaType m) {
+            return m.getSubtype().endsWith("+xml");
+        }
     }
     
     @Override

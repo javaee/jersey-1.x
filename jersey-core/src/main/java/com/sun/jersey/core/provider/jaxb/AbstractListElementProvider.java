@@ -80,13 +80,13 @@ public abstract class AbstractListElementProvider extends AbstractJAXBProvider<C
     public boolean isReadable(Class<?> type, Type genericType, Annotation annotations[], MediaType mediaType) {
         if (type != List.class && type != Collection.class) return false;
 
-        return verify(genericType);
+        return verify(genericType) && isSupported(mediaType);
     }
     
     public boolean isWriteable(Class<?> type, Type genericType, Annotation annotations[], MediaType mediaType) {
         if (!List.class.isAssignableFrom(type)) return false;
 
-        return verify(genericType);
+        return verify(genericType) && isSupported(mediaType);
     }
     
     private boolean verify(Type genericType) {

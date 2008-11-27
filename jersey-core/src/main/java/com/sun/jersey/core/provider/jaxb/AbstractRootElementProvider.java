@@ -70,12 +70,12 @@ public abstract class AbstractRootElementProvider extends AbstractJAXBProvider<O
     }
     
     public boolean isReadable(Class<?> type, Type genericType, Annotation annotations[], MediaType mediaType) {
-        return type.getAnnotation(XmlRootElement.class) != null ||
-                type.getAnnotation(XmlType.class) != null;
+        return (type.getAnnotation(XmlRootElement.class) != null ||
+                type.getAnnotation(XmlType.class) != null) && isSupported(mediaType);
     }
     
     public boolean isWriteable(Class<?> type, Type genericType, Annotation annotations[], MediaType mediaType) {
-        return type.getAnnotation(XmlRootElement.class) != null;
+        return type.getAnnotation(XmlRootElement.class) != null && isSupported(mediaType);
     }
     
     

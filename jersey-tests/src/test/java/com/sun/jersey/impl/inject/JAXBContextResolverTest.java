@@ -111,7 +111,7 @@ public class JAXBContextResolverTest extends AbstractResourceTester {
         assertEquals("GET-WITH-CONTEXT", b.value);
         
         b = new MyBean("POST");
-        b = resource("/").post(MyBean.class, b);
+        b = resource("/").type("application/xml").post(MyBean.class, b);
         assertEquals("POST-WITH-CONTEXT", b.value);
     }
     
@@ -122,7 +122,7 @@ public class JAXBContextResolverTest extends AbstractResourceTester {
         assertEquals("GET-WITHOUT-CONTEXT", b.value);
         
         b = new MyBean("POST");
-        b = resource("/").post(MyBean.class, b);
+        b = resource("/").type("application/xml").post(MyBean.class, b);
         assertEquals("POST-WITHOUT-CONTEXT", b.value);
     }
 }

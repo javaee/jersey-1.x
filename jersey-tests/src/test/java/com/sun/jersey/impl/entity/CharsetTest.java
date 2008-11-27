@@ -44,11 +44,14 @@ import com.sun.jersey.api.client.config.DefaultClientConfig;
 import com.sun.jersey.api.json.JSONJAXBContext;
 import java.io.Reader;
 import java.io.StringReader;
+import java.util.HashMap;
+import java.util.Map;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.ContextResolver;
 import javax.ws.rs.ext.Provider;
@@ -183,23 +186,11 @@ public class CharsetTest extends AbstractTypeTester {
     public static class JAXBBeanResource extends CharsetResource<JAXBBean> {}
     
     public void testJAXBBeanXMLRepresentation() {
-        _test(new JAXBBean(CONTENT), JAXBBeanResource.class);
+        _test(new JAXBBean(CONTENT), JAXBBeanResource.class, MediaType.APPLICATION_XML_TYPE);
     }
     
     public void testJAXBBeanJSONRepresentation() {
-        initiateWebApplication(JAXBBeanResource.class);
-        
-        JAXBBean in = new JAXBBean(CONTENT);
-        WebResource r = resource("/");
-        for (String charset : CHARSETS) {
-            ClientResponse rib = r.type("application/json;charset=" + charset).post(ClientResponse.class, in);
-            byte[] inBytes = (byte[])
-                    rib.getProperties().get("request.entity");
-            byte[] outBytes = (byte[])
-                    rib.getProperties().get("response.entity");
-
-            _verify(inBytes, outBytes);            
-        }
+        _test(new JAXBBean(CONTENT), JAXBBeanResource.class, MediaType.APPLICATION_JSON_TYPE);
     }
     
     @Provider
@@ -255,16 +246,23 @@ public class CharsetTest extends AbstractTypeTester {
     
     @Override
     public <T> void _test(T in, Class resource) {
+        _test(in, resource, MediaType.TEXT_PLAIN_TYPE);
+    }
+
+    public <T> void _test(T in, Class resource, MediaType m) {
         initiateWebApplication(resource);
-        
+
         WebResource r = resource("/");
         for (String charset : CHARSETS) {
-            ClientResponse rib = r.type("text/plain;charset=" + charset).post(ClientResponse.class, in);
+            Map<String, String> p = new HashMap<String, String>();
+            p.put("charset", charset);
+            MediaType _m = new MediaType(m.getType(), m.getSubtype(), p);
+            ClientResponse rib = r.type(_m).post(ClientResponse.class, in);
             byte[] inBytes = (byte[])
-                    rib.getProperties().get("request.entity");            
+                    rib.getProperties().get("request.entity");
             byte[] outBytes = (byte[])
                     rib.getProperties().get("response.entity");
-            _verify(inBytes, outBytes);            
+            _verify(inBytes, outBytes);
         }
     }
 }

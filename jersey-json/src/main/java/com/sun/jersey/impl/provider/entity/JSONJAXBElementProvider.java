@@ -65,14 +65,33 @@ import javax.xml.transform.stream.StreamSource;
  *
  * @author japod
  */
-@Produces("application/json")
-@Consumes("application/json")
-public final class JSONJAXBElementProvider extends AbstractJAXBElementProvider {
+public class JSONJAXBElementProvider extends AbstractJAXBElementProvider {
     
-    public JSONJAXBElementProvider(@Context Providers ps) {
-        super(ps, MediaType.APPLICATION_JSON_TYPE);
+    JSONJAXBElementProvider(Providers ps) {
+        super(ps);
     }
-    
+
+    JSONJAXBElementProvider(Providers ps, MediaType mt) {
+        super(ps, mt);
+    }
+
+    @Produces("application/json")
+    @Consumes("application/json")
+    public static final class App extends JSONJAXBElementProvider {
+        public App(@Context Providers ps) { super(ps , MediaType.APPLICATION_JSON_TYPE); }
+    }
+
+    @Produces("*/*")
+    @Consumes("*/*")
+    public static final class General extends JSONJAXBElementProvider {
+        public General(@Context Providers ps) { super(ps); }
+
+        @Override
+        protected boolean isSupported(MediaType m) {
+            return m.getSubtype().endsWith("+json");
+        }
+    }
+
     protected final JAXBElement<?> readFrom(Class<?> type, MediaType mediaType,
             Unmarshaller u, InputStream entityStream)
             throws JAXBException, IOException {

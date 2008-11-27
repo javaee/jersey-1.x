@@ -1,5 +1,8 @@
-com.sun.jersey.impl.provider.entity.JSONRootElementProvider
-com.sun.jersey.impl.provider.entity.JSONJAXBElementProvider
+com.sun.jersey.impl.provider.entity.JSONRootElementProvider$App
+com.sun.jersey.impl.provider.entity.JSONRootElementProvider$General
+com.sun.jersey.impl.provider.entity.JSONJAXBElementProvider$App
+com.sun.jersey.impl.provider.entity.JSONJAXBElementProvider$General
+com.sun.jersey.impl.provider.entity.JSONListElementProvider$App
+com.sun.jersey.impl.provider.entity.JSONListElementProvider$General
 com.sun.jersey.impl.provider.entity.JSONArrayProvider
 com.sun.jersey.impl.provider.entity.JSONObjectProvider
-com.sun.jersey.impl.provider.entity.JSONListElementProvider

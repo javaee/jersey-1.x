@@ -84,6 +84,11 @@ public class XMLListElementProvider extends AbstractListElementProvider {
     @Consumes("*/*")
     public static final class General extends XMLListElementProvider {
         public General(@Context Providers ps) { super(ps); }
+
+        @Override
+        protected boolean isSupported(MediaType m) {
+            return m.getSubtype().endsWith("+xml");
+        }
     }
     
     protected final XMLStreamReader getXMLStreamReader(MediaType mediaType,
