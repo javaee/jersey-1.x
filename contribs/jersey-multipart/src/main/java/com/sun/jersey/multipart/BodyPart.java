@@ -38,11 +38,11 @@
 package com.sun.jersey.multipart;
 
 import com.sun.jersey.core.header.ParameterizedHeader;
+import com.sun.jersey.core.util.ImmutableMultivaluedMap;
 import java.io.IOException;
 import java.lang.String;
 import java.lang.annotation.Annotation;
 import java.text.ParseException;
-import java.util.Collections;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.ext.MessageBodyReader;
@@ -145,8 +145,8 @@ public class BodyPart {
      * <code>getHeaders()</code> instead.</p>
      */
     public MultivaluedMap<String, ParameterizedHeader> getParameterizedHeaders() throws ParseException {
-        return (MultivaluedMap<String,ParameterizedHeader>)
-          Collections.unmodifiableMap(new ParameterizedHeadersMap(headers));
+        return new ImmutableMultivaluedMap<String,ParameterizedHeader>(
+                new ParameterizedHeadersMap(headers));
     }
 
 

@@ -37,12 +37,7 @@
 
 package com.sun.jersey.core.header;
 
-import com.sun.jersey.core.util.KeyComparatorHashMap;
-import com.sun.jersey.core.util.StringIgnoreCaseKeyComparator;
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
-import javax.ws.rs.core.MultivaluedMap;
+import com.sun.jersey.core.util.StringKeyObjectValueIgnoreCaseMultivaluedMap;
 
 /**
  * Out-bound HTTP headers.
@@ -53,97 +48,5 @@ import javax.ws.rs.core.MultivaluedMap;
  * @author Paul.Sandoz@Sun.Com
  */
 public class OutBoundHeaders 
-        extends KeyComparatorHashMap<String, List<Object>> 
-        implements MultivaluedMap<String, Object> {
-    
-    static final long serialVersionUID = -6052320403766368902L;
-    
-    /**
-     * Creates a new instance of MultivaluedMapImpl
-     */
-    public OutBoundHeaders() {
-        super(StringIgnoreCaseKeyComparator.SINGLETON);
-    }
-
-    // MultivaluedMap
-    
-    public void putSingle(String key, Object value) {
-        if (value == null)
-            return;
-        
-        List<Object> l = getList(key);        
-        l.clear();
-        l.add(value);
-    }
-    
-    public void add(String key, Object value) {
-        if (value == null)
-            return;
-        
-        List<Object> l = getList(key);
-        l.add(value);        
-    }
-    
-    public Object getFirst(String key) {
-        List<Object> values = get(key);
-        if (values != null && values.size() > 0)
-            return values.get(0);
-        else
-            return null;
-    }
-
-
-    // 
-    
-    @SuppressWarnings("unchecked")
-    public <A> List<A> get(String key, Class<A> type) {
-        ArrayList<A> l = null;
-        List<Object> values = get(key);
-        if (values != null) {
-            l = new ArrayList<A>();
-            for (Object value : values) {
-                if (type.isInstance(value)) {
-                    l.add((A)value);
-                } else {
-                    throw new IllegalArgumentException(type + " is not an instance of " + value.getClass());            
-                }
-            }
-        }
-        return l;
-    }
-    
-    @SuppressWarnings("unchecked")
-    public <A> A getFirst(String key, Class<A> type) {
-        Object value = getFirst(key);
-        if (value == null)
-            return null;
-
-        if (type.isInstance(value)) {
-            return (A)value;
-        } else {
-            throw new IllegalArgumentException(type + " is not an instance of " + value.getClass());            
-        }        
-    }
-    
-    @SuppressWarnings("unchecked")
-    public <A> A getFirst(String key, A defaultValue) {
-        Object value = getFirst(key);
-        if (value == null)
-            return defaultValue;
-        
-        if (defaultValue.getClass().isInstance(value)) {
-            return (A)value;
-        } else {
-            throw new IllegalArgumentException(defaultValue.getClass() + " is not an instance of " + value.getClass());            
-        }        
-    }
-
-    private List<Object> getList(String key) {
-        List<Object> l = get(key);
-        if (l == null) {
-            l = new LinkedList<Object>();
-            put(key, l);
-        }
-        return l;
-    }    
+        extends StringKeyObjectValueIgnoreCaseMultivaluedMap {
 }

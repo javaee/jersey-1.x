@@ -51,6 +51,7 @@ import com.sun.jersey.multipart.MultiPart;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.StringWriter;
+import java.text.ParseException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -128,8 +129,13 @@ public class MultiPartReaderWriterTest extends TestCase {
             BodyPart part = result.getBodyParts().get(0);
             checkMediaType(new MediaType("text", "plain"), part.getMediaType());
             checkEntity("This is the only segment", (BodyPartEntity) part.getEntity());
+
+            result.getParameterizedHeaders();
             result.cleanup();
         } catch (IOException e) {
+            e.printStackTrace(System.out);
+            fail("Caught exception: " + e);
+        } catch(ParseException e) {
             e.printStackTrace(System.out);
             fail("Caught exception: " + e);
         } catch (UniformInterfaceException e) {
@@ -151,8 +157,13 @@ public class MultiPartReaderWriterTest extends TestCase {
             BodyPart part2 = result.getBodyParts().get(1);
             checkMediaType(new MediaType("text", "xml"), part2.getMediaType());
             checkEntity("<outer><inner>value</inner></outer>", (BodyPartEntity) part2.getEntity());
+            
+            result.getParameterizedHeaders();
             result.cleanup();
         } catch (IOException e) {
+            e.printStackTrace(System.out);
+            fail("Caught exception: " + e);
+        } catch(ParseException e) {
             e.printStackTrace(System.out);
             fail("Caught exception: " + e);
         } catch (UniformInterfaceException e) {
@@ -176,8 +187,13 @@ public class MultiPartReaderWriterTest extends TestCase {
             MultiPartBean entity = part2.getEntityAs(MultiPartBean.class);
             assertEquals("myname", entity.getName());
             assertEquals("myvalue", entity.getValue());
+
+            result.getParameterizedHeaders();
             result.cleanup();
         } catch (IOException e) {
+            e.printStackTrace(System.out);
+            fail("Caught exception: " + e);
+        } catch(ParseException e) {
             e.printStackTrace(System.out);
             fail("Caught exception: " + e);
         } catch (UniformInterfaceException e) {
@@ -223,8 +239,13 @@ public class MultiPartReaderWriterTest extends TestCase {
             checkEntity("... contents of file1.txt ...\r\n", (BodyPartEntity) part2.getEntity());
             String value2 = part2.getHeaders().getFirst("Content-Disposition");
             assertEquals("form-data; name=\"pics\"; filename=\"file1.txt\"", value2);
+
+            result.getParameterizedHeaders();
             result.cleanup();
         } catch (IOException e) {
+            e.printStackTrace(System.out);
+            fail("Caught exception: " + e);
+        } catch(ParseException e) {
             e.printStackTrace(System.out);
             fail("Caught exception: " + e);
         } catch (UniformInterfaceException e) {

@@ -35,37 +35,109 @@
  * holder.
  */
 
-package com.sun.jersey.multipart;
+package com.sun.jersey.core.util;
 
-import com.sun.jersey.core.header.ParameterizedHeader;
-import com.sun.jersey.core.util.StringKeyIgnoreCaseMultivaluedMap;
-import java.text.ParseException;
-import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
 import javax.ws.rs.core.MultivaluedMap;
 
 /**
- * A map of MIME headers with parameterized values.
- * <p>
- * An implementation of {@link MultivaluedMap} where keys are instances of
- * String and are compared ignoring case and values are instances of 
- * {@link ParameterizedHeader}.
+ * An immutable view of a {@link MultivaluedMap}.
  *
+ * @param <K> the key
+ * @param <V> the value
+ * @author Gili Tzabari
  */
-/* package */ class ParameterizedHeadersMap
-        extends StringKeyIgnoreCaseMultivaluedMap<ParameterizedHeader> {
+public class ImmutableMultivaluedMap<K, V> implements MultivaluedMap<K, V>
+{
+	private final MultivaluedMap<K, V> delegate;
 
-    public ParameterizedHeadersMap() {
-    }
+	/**
+	 * Creates a new ImmutableMultivaluedMap.
+	 *
+	 * @param delegate the underlying MultivaluedMap
+	 */
+	public ImmutableMultivaluedMap(MultivaluedMap<K, V> delegate)
+	{
+		this.delegate = delegate;
+	}
 
-    public ParameterizedHeadersMap(MultivaluedMap<String,String> headers) throws ParseException {
-        for (Map.Entry<String,List<String>> entry : headers.entrySet()) {
-            List<ParameterizedHeader> list = new ArrayList<ParameterizedHeader>(entry.getValue().size());
-            for (String value : entry.getValue()) {
-                list.add(new ParameterizedHeader(value));
-            }
-            this.put(entry.getKey(), list);
-        }
-    }
+	public void putSingle(K key, V value)
+	{
+		throw new UnsupportedOperationException();
+	}
+
+	public void add(K key, V value)
+	{
+		throw new UnsupportedOperationException();
+	}
+
+	public V getFirst(K key)
+	{
+		return delegate.getFirst(key);
+	}
+
+	public int size()
+	{
+		return delegate.size();
+	}
+
+	public boolean isEmpty()
+	{
+		return delegate.isEmpty();
+	}
+
+	public boolean containsKey(Object key)
+	{
+		return delegate.containsKey(key);
+	}
+
+	public boolean containsValue(Object value)
+	{
+		return delegate.containsValue(value);
+	}
+
+	public List<V> get(Object key)
+	{
+		return delegate.get(key);
+	}
+
+	public List<V> put(K key, List<V> value)
+	{
+		throw new UnsupportedOperationException();
+	}
+
+	public List<V> remove(Object key)
+	{
+		throw new UnsupportedOperationException();
+	}
+
+	public void putAll(Map<? extends K, ? extends List<V>> m)
+	{
+		throw new UnsupportedOperationException();
+	}
+
+	public void clear()
+	{
+		throw new UnsupportedOperationException();
+	}
+
+	public Set<K> keySet()
+	{
+		return Collections.unmodifiableSet(delegate.keySet());
+	}
+
+	public Collection<List<V>> values()
+	{
+		return Collections.unmodifiableCollection(delegate.values());
+	}
+
+	public Set<Entry<K, List<V>>> entrySet()
+	{
+		return Collections.unmodifiableSet(delegate.entrySet());
+	}
 }

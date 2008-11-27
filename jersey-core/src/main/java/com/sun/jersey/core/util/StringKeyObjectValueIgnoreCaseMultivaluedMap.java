@@ -1,9 +1,9 @@
 /*
  *
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
- *
+ * 
  * Copyright 1997-2007 Sun Microsystems, Inc. All rights reserved.
- *
+ * 
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
  * and Distribution License("CDDL") (collectively, the "License").  You
@@ -11,7 +11,7 @@
  * a copy of the License at https://jersey.dev.java.net/CDDL+GPL.html
  * or jersey/legal/LICENSE.txt.  See the License for the specific
  * language governing permissions and limitations under the License.
- *
+ * 
  * When distributing the software, include this License Header Notice in each
  * file and include the License file at jersey/legal/LICENSE.txt.
  * Sun designates this particular file as subject to the "Classpath" exception
@@ -20,9 +20,9 @@
  * Header, with the fields enclosed by brackets [] replaced by your own
  * identifying information: "Portions Copyrighted [year]
  * [name of copyright owner]"
- *
+ * 
  * Contributor(s):
- *
+ * 
  * If you wish your version of this file to be governed by only the CDDL or
  * only the GPL Version 2, indicate your decision by adding "[Contributor]
  * elects to include this software in this distribution under the [CDDL or GPL
@@ -35,37 +35,61 @@
  * holder.
  */
 
-package com.sun.jersey.multipart;
+package com.sun.jersey.core.util;
 
-import com.sun.jersey.core.header.ParameterizedHeader;
-import com.sun.jersey.core.util.StringKeyIgnoreCaseMultivaluedMap;
-import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import javax.ws.rs.core.MultivaluedMap;
 
 /**
- * A map of MIME headers with parameterized values.
- * <p>
  * An implementation of {@link MultivaluedMap} where keys are instances of
- * String and are compared ignoring case and values are instances of 
- * {@link ParameterizedHeader}.
+ * String and are compared ignoring case and values are instances of Object.
  *
+ * @author Paul.Sandoz@Sun.Com
  */
-/* package */ class ParameterizedHeadersMap
-        extends StringKeyIgnoreCaseMultivaluedMap<ParameterizedHeader> {
-
-    public ParameterizedHeadersMap() {
+public class StringKeyObjectValueIgnoreCaseMultivaluedMap
+        extends StringKeyIgnoreCaseMultivaluedMap<Object> {
+        
+    @SuppressWarnings("unchecked")
+    public <A> List<A> get(String key, Class<A> type) {
+        ArrayList<A> l = null;
+        List<Object> values = get(key);
+        if (values != null) {
+            l = new ArrayList<A>();
+            for (Object value : values) {
+                if (type.isInstance(value)) {
+                    l.add((A)value);
+                } else {
+                    throw new IllegalArgumentException(type + " is not an instance of " + value.getClass());
+                }
+            }
+        }
+        return l;
     }
 
-    public ParameterizedHeadersMap(MultivaluedMap<String,String> headers) throws ParseException {
-        for (Map.Entry<String,List<String>> entry : headers.entrySet()) {
-            List<ParameterizedHeader> list = new ArrayList<ParameterizedHeader>(entry.getValue().size());
-            for (String value : entry.getValue()) {
-                list.add(new ParameterizedHeader(value));
-            }
-            this.put(entry.getKey(), list);
+    @SuppressWarnings("unchecked")
+    public <A> A getFirst(String key, Class<A> type) {
+        Object value = getFirst(key);
+        if (value == null)
+            return null;
+
+        if (type.isInstance(value)) {
+            return (A)value;
+        } else {
+            throw new IllegalArgumentException(type + " is not an instance of " + value.getClass());
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    public <A> A getFirst(String key, A defaultValue) {
+        Object value = getFirst(key);
+        if (value == null)
+            return defaultValue;
+
+        if (defaultValue.getClass().isInstance(value)) {
+            return (A)value;
+        } else {
+            throw new IllegalArgumentException(defaultValue.getClass() + " is not an instance of " + value.getClass());
         }
     }
 }
