@@ -1,4 +1,10 @@
 release 1.0.1 (2008-11/12)
+- Support the building a WebResource with query parameters, for example:
+    WebResource r = Client.create().resource(...);
+    MultivaluedMap<String, String> qps = new MultivaluedMapImpl();
+    qps.add("a", "foo");
+    qps.add("b", "bar");
+    String s = r.queryParams(qps).get(String.class);
 - For JAXB-related types the set of supported media types are "application/xml"
   "text/xml", "*/*+xml", "application/json", "*/*+json".
   Previously for JAXB-related types the set of media types for XML was

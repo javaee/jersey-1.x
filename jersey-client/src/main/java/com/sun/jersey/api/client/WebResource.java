@@ -40,9 +40,12 @@ package com.sun.jersey.api.client;
 import com.sun.jersey.api.client.filter.Filterable;
 import com.sun.jersey.client.impl.ClientRequestImpl;
 import java.net.URI;
+import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import javax.ws.rs.core.Cookie;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.UriBuilder;
 
 /**
@@ -316,7 +319,23 @@ public class WebResource extends Filterable implements
         }
         return new WebResource(this, b);
     }
-    
+
+    /**
+     * Create a new WebResource from this web resource with additional
+     * query parameters added to the URI of this web resource.
+     *
+     * @param params the query parameters.
+     * @return the new web resource.
+     */
+    public WebResource queryParams(MultivaluedMap<String, String> params) {
+        UriBuilder b = getBuilder();
+        for (Map.Entry<String, List<String>> e : params.entrySet()) {
+            for (String value : e.getValue())
+                b.queryParam(e.getKey(), value);
+        }
+        return new WebResource(this, b);
+    }
+
     // Builder that builds client request and handles it
     
     /**

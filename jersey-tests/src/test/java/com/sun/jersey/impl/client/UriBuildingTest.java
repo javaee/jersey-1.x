@@ -41,38 +41,69 @@ import com.sun.jersey.api.client.AsyncWebResource;
 import com.sun.jersey.impl.container.grizzly.*;
 import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.WebResource;
+import com.sun.jersey.core.util.MultivaluedMapImpl;
 import java.util.concurrent.Future;
 import javax.ws.rs.Path;
 import javax.ws.rs.GET;
+import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.MultivaluedMap;
 
 /**
  *
  * @author Paul.Sandoz@Sun.Com
  */
-public class PathBuildingTest extends AbstractGrizzlyServerTester {
+public class UriBuildingTest extends AbstractGrizzlyServerTester {
+    public UriBuildingTest(String testName) {
+        super(testName);
+    }
+    
     @Path("/x/y/z")
     public static class Resource {
         @GET
         public String get() {
             return "GET";
-        }               
+        }
     }
-        
-    public PathBuildingTest(String testName) {
-        super(testName);
-    }
-    
-    public void testGet() throws Exception {
+
+    public void testPathGet() throws Exception {
         startServer(Resource.class);
         WebResource r = Client.create().resource(getUri().build());
         String s = r.path("x").path("y").path("z").get(String.class);
         assertEquals("GET", s);
     }
 
-    public void testGetAsync() throws Exception {
+    public void testPathGetAsync() throws Exception {
         startServer(Resource.class);
         AsyncWebResource r = Client.create().asyncResource(getUri().build());
         Future<String> s = r.path("x").path("y").path("z").get(String.class);
         assertEquals("GET", s.get());
+    }
+
+    @Path("/")
+    public static class QueryResource {
+        @GET
+        public String get(@QueryParam("a") String a, @QueryParam("b") String b) {
+            return a + b;
+        }
+    }
+
+    public void testQueryGet() throws Exception {
+        startServer(QueryResource.class);
+        WebResource r = Client.create().resource(getUri().build());
+        MultivaluedMap<String, String> qps = new MultivaluedMapImpl();
+        qps.add("a", "foo");
+        qps.add("b", "bar");
+        String s = r.path("/").queryParams(qps).get(String.class);
+        assertEquals("foobar", s);
+    }
+
+    public void testQueryGetAsync() throws Exception {
+        startServer(QueryResource.class);
+        AsyncWebResource r = Client.create().asyncResource(getUri().build());
+        MultivaluedMap<String, String> qps = new MultivaluedMapImpl();
+        qps.add("a", "foo");
+        qps.add("b", "bar");
+        Future<String> s = r.path("/").queryParams(qps).get(String.class);
+        assertEquals("foobar", s.get());
     }
 }
