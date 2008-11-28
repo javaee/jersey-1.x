@@ -38,12 +38,11 @@
 <project>
     <parent>
         <artifactId>jersey-contribs</artifactId>
-        <groupId>com.sun.jersey</groupId>
+        <groupId>com.sun.jersey.contribs</groupId>
         <version>1.0.1-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
     <modelVersion>4.0.0</modelVersion>
-    <groupId>com.sun.jersey</groupId>
     <artifactId>maven-wadl-plugin</artifactId>
     <packaging>maven-plugin</packaging>
     <name>maven-wadl-plugin Maven Mojo</name>

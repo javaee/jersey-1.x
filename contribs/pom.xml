@@ -45,6 +45,7 @@
         <version>1.0.1-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
+    <groupId>com.sun.jersey.contribs</groupId>
     <artifactId>jersey-contribs</artifactId>
     <packaging>pom</packaging>
     <name>Contributions to Jersey</name>

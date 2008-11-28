@@ -50,7 +50,7 @@
         -->
         <!-- uncomment this to get multipart MIME types support:
          <dependency>
-            <groupId>com.sun.jersey</groupId>
+            <groupId>com.sun.jersey.contribs</groupId>
             <artifactId>jersey-multipart</artifactId>
             <version>${jersey-version}</version>
         </dependency>
