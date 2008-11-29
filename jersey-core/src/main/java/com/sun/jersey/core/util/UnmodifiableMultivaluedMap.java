@@ -46,13 +46,13 @@ import java.util.Set;
 import javax.ws.rs.core.MultivaluedMap;
 
 /**
- * An immutable view of a {@link MultivaluedMap}.
+ * An unmodifiable view of a {@link MultivaluedMap}.
  *
  * @param <K> the key
  * @param <V> the value
  * @author Gili Tzabari
  */
-public class ImmutableMultivaluedMap<K, V> implements MultivaluedMap<K, V>
+public class UnmodifiableMultivaluedMap<K, V> implements MultivaluedMap<K, V>
 {
 	private final MultivaluedMap<K, V> delegate;
 
@@ -61,7 +61,7 @@ public class ImmutableMultivaluedMap<K, V> implements MultivaluedMap<K, V>
 	 *
 	 * @param delegate the underlying MultivaluedMap
 	 */
-	public ImmutableMultivaluedMap(MultivaluedMap<K, V> delegate)
+	public UnmodifiableMultivaluedMap(MultivaluedMap<K, V> delegate)
 	{
 		this.delegate = delegate;
 	}
