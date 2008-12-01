@@ -106,6 +106,22 @@ public class WebResource extends Filterable implements
         return u.toString();
     }
 
+    @Override
+    public int hashCode() {
+        return u.hashCode();
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+
+        if (obj instanceof WebResource) {
+            final WebResource that = (WebResource) obj;
+            return that.u.equals(this.u);
+        }
+        return false;
+    }
+
     // UniformInterface
     
     public ClientResponse head() {

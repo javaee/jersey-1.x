@@ -1,4 +1,7 @@
 release 1.0.1 (2008-11/12)
+- The group id for the contribution modules, jersey-multipart, jersey-spring
+  and maven-wadl-plugin Maven Mojo (maven-plugin) has changed to:
+    com.sun.jersey.contribs
 - Support the building a WebResource with query parameters, for example:
     WebResource r = Client.create().resource(...);
     MultivaluedMap<String, String> qps = new MultivaluedMapImpl();
