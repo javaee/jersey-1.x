@@ -41,7 +41,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.sun.jersey.samples</groupId>
     <artifactId>mandel</artifactId>
-    <version>1.0.1-SNAPSHOT</version>
+    <version>1.0.2-SNAPSHOT</version>
     <name>Mandel -- Jersey sample</name>
     <inceptionYear>2008</inceptionYear>
     <profiles>

@@ -41,7 +41,7 @@
   <parent>
     <groupId>com.sun.jersey.archetypes</groupId>
     <artifactId>jersey-archetypes</artifactId>
-    <version>1.0.1-SNAPSHOT</version>
+    <version>1.0.2-SNAPSHOT</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
   <description>
