@@ -79,6 +79,11 @@ import javax.ws.rs.ext.Providers;
  * that modify configuration and or filters are not guaranteed to be
  * thread-safe.
  * <p>
+ * The creation of a <code>Client</code> instance is expensive operation and
+ * the instance may make use of and retain many resources. It is therefore
+ * recommended that a <code>Client</code> instance is reused for the creation of
+ * {@link WebResource} instances that require the same configuration settings.
+ * <p>
  * A client may integrate with an IoC framework by passing a 
  * {@link IoCComponentProviderFactory} instance to the appropriate constructor.
  * 
