@@ -1,4 +1,6 @@
 release 1.0.2 (2009-01/02)
+- Fixed issue with runtime exceptions not being mapped when thrown from
+  a request filter.
 
 release 1.0.1 (2008-11/12)
 - The group id for the contribution modules, jersey-multipart, jersey-spring

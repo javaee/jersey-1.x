@@ -558,22 +558,11 @@ public final class WebApplicationImpl implements WebApplication {
         } catch (WebApplicationException e) {
             mapWebApplicationException(e, response);
         } catch (MappableContainerException e) {
-            Throwable cause = e.getCause();
-            
-            if (cause instanceof WebApplicationException) {
-                mapWebApplicationException((WebApplicationException)cause, response);
-            } else if (!mapException(cause, response)) {
-                if (cause instanceof RuntimeException) {
-                    throw (RuntimeException)cause;
-                } else {
-                    throw e;
-                }
-            }
+            mapMappableContainerException(e, response);
         } catch (RuntimeException e) {
-            // Any runtime exception other than WebApplicationException or
-            // MappableContainerException is an error in the Jersey runtime.
-            // TODO allow exception mapper to map if feature is set?
-            throw e;
+            if (!mapException(e, response)) {
+                throw e;
+            }
         }
 
         try {
@@ -583,6 +572,8 @@ public final class WebApplicationImpl implements WebApplication {
             }
         } catch (WebApplicationException e) {
             mapWebApplicationException(e, response);
+        } catch (MappableContainerException e) {
+            mapMappableContainerException(e, response);
         } catch (RuntimeException e) {
             if (!mapException(e, response)) {
                 throw e;
@@ -793,6 +784,21 @@ public final class WebApplicationImpl implements WebApplication {
                 this.getClass().getClassLoader(),
                 new Class[]{c},
                 i);
+    }
+
+    private void mapMappableContainerException(MappableContainerException e,
+            HttpResponseContext response) {
+        Throwable cause = e.getCause();
+
+        if (cause instanceof WebApplicationException) {
+            mapWebApplicationException((WebApplicationException)cause, response);
+        } else if (!mapException(cause, response)) {
+            if (cause instanceof RuntimeException) {
+                throw (RuntimeException)cause;
+            } else {
+                throw e;
+            }
+        }
     }
 
     private void mapWebApplicationException(WebApplicationException e, 

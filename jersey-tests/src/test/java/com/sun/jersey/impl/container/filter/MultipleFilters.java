@@ -53,6 +53,7 @@ import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.ext.ExceptionMapper;
 
 /**
  *
@@ -71,7 +72,7 @@ public class MultipleFilters extends AbstractResourceTester {
     }
     
     @Path("/")
-    public static class ResourceException {
+    public static class ResourceWebApplicationException {
         @GET
         public String get(@Context HttpHeaders hh) {
             List<String> xTest = hh.getRequestHeaders().get("X-TEST");
@@ -132,8 +133,21 @@ public class MultipleFilters extends AbstractResourceTester {
         _test();
     }
     
-    public void testWithResourceException() {
-        ResourceConfig rc = new DefaultResourceConfig(ResourceException.class);
+    public void testWithResourceWebApplicationException() {
+        ResourceConfig rc = new DefaultResourceConfig(ResourceWebApplicationException.class);
+
+        FilterOne f1 = new FilterOne();
+        FilterTwo f2 = new FilterTwo();
+        rc.getProperties().put(ResourceConfig.PROPERTY_CONTAINER_REQUEST_FILTERS,
+                Arrays.asList(f1, f2));
+        rc.getProperties().put(ResourceConfig.PROPERTY_CONTAINER_RESPONSE_FILTERS,
+                Arrays.asList(f1, f2));
+        initiateWebApplication(rc);
+        _test();
+    }
+
+    public void testWithResourceRuntimeException() {
+        ResourceConfig rc = new DefaultResourceConfig(ResourceWebApplicationException.class);
 
         FilterOne f1 = new FilterOne();
         FilterTwo f2 = new FilterTwo();
@@ -165,18 +179,23 @@ public class MultipleFilters extends AbstractResourceTester {
         assertEquals("two", xTest.get(1));
     }
     
-    public static class FilterException implements ContainerResponseFilter {
+    public static class FilterWebApplicationException 
+            implements ContainerRequestFilter, ContainerResponseFilter {
+        public ContainerRequest filter(ContainerRequest request) {
+            throw new WebApplicationException(Response.serverError().entity("request").build());
+        }
+        
         public ContainerResponse filter(ContainerRequest request, ContainerResponse response) {
-            throw new WebApplicationException(500);
+            throw new WebApplicationException(Response.serverError().entity("response").build());
         }
     }
 
-    public void testWithFilterException() {
+    public void testResponseWithFilterWebApplicationException() {
         ResourceConfig rc = new DefaultResourceConfig(Resource.class);
 
         FilterOne f1 = new FilterOne();
         FilterTwo f2 = new FilterTwo();
-        FilterException fe = new FilterException();
+        FilterWebApplicationException fe = new FilterWebApplicationException();
         rc.getProperties().put(ResourceConfig.PROPERTY_CONTAINER_REQUEST_FILTERS,
                 Arrays.asList(f1, f2));
         rc.getProperties().put(ResourceConfig.PROPERTY_CONTAINER_RESPONSE_FILTERS,
@@ -187,8 +206,106 @@ public class MultipleFilters extends AbstractResourceTester {
 
         ClientResponse cr = r.get(ClientResponse.class);
         assertEquals(500, cr.getStatus());
+        assertEquals("response", cr.getEntity(String.class));
 
         List<String> xTest = cr.getMetadata().get("X-TEST");
         assertNull(xTest);
+    }
+
+    public void testRequestWithFilterWebApplicationException() {
+        ResourceConfig rc = new DefaultResourceConfig(Resource.class);
+
+        FilterOne f1 = new FilterOne();
+        FilterTwo f2 = new FilterTwo();
+        FilterWebApplicationException fe = new FilterWebApplicationException();
+        rc.getProperties().put(ResourceConfig.PROPERTY_CONTAINER_REQUEST_FILTERS,
+                Arrays.asList(f1, fe));
+        rc.getProperties().put(ResourceConfig.PROPERTY_CONTAINER_RESPONSE_FILTERS,
+                Arrays.asList(f1, f2));
+        initiateWebApplication(rc);
+
+        WebResource r = resource("/", false);
+
+        ClientResponse cr = r.get(ClientResponse.class);
+        assertEquals(500, cr.getStatus());
+        assertEquals("request", cr.getEntity(String.class));
+
+        List<String> xTest = cr.getMetadata().get("X-TEST");
+        assertEquals(2, xTest.size());
+        assertEquals("one", xTest.get(0));
+        assertEquals("two", xTest.get(1));
+    }
+
+    public static class TestException extends RuntimeException {
+        String s;
+
+        TestException(String s) {
+            this.s = s;
+        }
+    }
+
+    public static class TestExceptionMapper implements ExceptionMapper<TestException> {
+        public Response toResponse(TestException e) {
+            return Response.serverError().entity(e.s).build();
+        }
+    }
+
+    public static class FilterRuntimeException 
+            implements ContainerRequestFilter, ContainerResponseFilter {
+        public ContainerRequest filter(ContainerRequest request) {
+            throw new TestException("request");
+        }
+
+        public ContainerResponse filter(ContainerRequest request, ContainerResponse response) {
+            throw new TestException("response");
+        }
+    }
+
+    public void testResponseWithFilterRuntimeException() {
+        ResourceConfig rc = new DefaultResourceConfig(
+                TestExceptionMapper.class, Resource.class);
+
+        FilterOne f1 = new FilterOne();
+        FilterTwo f2 = new FilterTwo();
+        FilterRuntimeException fe = new FilterRuntimeException();
+        rc.getProperties().put(ResourceConfig.PROPERTY_CONTAINER_REQUEST_FILTERS,
+                Arrays.asList(f1, f2));
+        rc.getProperties().put(ResourceConfig.PROPERTY_CONTAINER_RESPONSE_FILTERS,
+                Arrays.asList(fe, f1));
+        initiateWebApplication(rc);
+
+        WebResource r = resource("/", false);
+
+        ClientResponse cr = r.get(ClientResponse.class);
+        assertEquals(500, cr.getStatus());
+        assertEquals("response", cr.getEntity(String.class));
+
+        List<String> xTest = cr.getMetadata().get("X-TEST");
+        assertNull(xTest);
+    }
+    
+    public void testRequestWithFilterRuntimeException() {
+        ResourceConfig rc = new DefaultResourceConfig(
+                TestExceptionMapper.class, Resource.class);
+
+        FilterOne f1 = new FilterOne();
+        FilterTwo f2 = new FilterTwo();
+        FilterRuntimeException fe = new FilterRuntimeException();
+        rc.getProperties().put(ResourceConfig.PROPERTY_CONTAINER_REQUEST_FILTERS,
+                Arrays.asList(f1, fe));
+        rc.getProperties().put(ResourceConfig.PROPERTY_CONTAINER_RESPONSE_FILTERS,
+                Arrays.asList(f1, f2));
+        initiateWebApplication(rc);
+
+        WebResource r = resource("/", false);
+
+        ClientResponse cr = r.get(ClientResponse.class);
+        assertEquals(500, cr.getStatus());
+        assertEquals("request", cr.getEntity(String.class));
+
+        List<String> xTest = cr.getMetadata().get("X-TEST");
+        assertEquals(2, xTest.size());
+        assertEquals("one", xTest.get(0));
+        assertEquals("two", xTest.get(1));
     }
 }
