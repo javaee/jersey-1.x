@@ -21,7 +21,7 @@ with a Web application.</P>
 as described in the <A HREF="dependencies.html">dependencies</A>
 document.</P>
 <P>Maven developers require a dependency on the <A HREF="http://download.java.net/maven/2/com/sun/jersey/jersey-server/1.0.2-SNAPSHOT/jersey-server-1.0.2-SNAPSHOT.pom">jersey-server</A>
-module, the <A HREF="http://download.java.net/maven/2/com/sun/grizzly/grizzly-servlet-webserver/1.8.6.3/grizzly-servlet-webserver-1.8.6.3.pom">grizzly-servlet-webserver</A>
+module, the <A HREF="http://download.java.net/maven/2/com/sun/grizzly/grizzly-servlet-webserver/1.8.6.4/grizzly-servlet-webserver-1.8.6.4.pom">grizzly-servlet-webserver</A>
 module and optionally for WADL support if using Java SE 5 the
 <A HREF="http://download.java.net/maven/1/com.sun.xml.bind/poms/jaxb-impl-2.1.pom">jaxb-impl</A>
 module. The following dependencies need to be added to the pom:</P>
@@ -32,7 +32,7 @@ module. The following dependencies need to be added to the pom:</P>
 &lt;/dependency&gt;&lt;dependency&gt;
     &lt;groupId&gt;com.sun.grizzly&lt;/groupId&gt;
     &lt;artifactId&gt;grizzly-servlet-webserver&lt;/artifactId&gt;
-    &lt;version&gt;1.8.6.3&lt;/version&gt;
+    &lt;version&gt;1.8.6.4&lt;/version&gt;
 &lt;/dependency&gt;</PRE><P>
 And the following repositories need to be added to the pom:</P>
 <PRE STYLE="margin-left: 0.79in">&lt;repository&gt;
@@ -48,7 +48,7 @@ And the following repositories need to be added to the pom:</P>
     &lt;layout&gt;legacy&lt;/layout&gt;
 &lt;/repository&gt;</PRE><P>
 Non-maven developers require:</P>
-<BLOCKQUOTE><A HREF="http://download.java.net/maven/2/com/sun/grizzly/grizzly-servlet-webserver/1.8.6.3/grizzly-servlet-webserver-1.8.6.3.jar">grizzly-servlet-webserver.jar</A>,
+<BLOCKQUOTE><A HREF="http://download.java.net/maven/2/com/sun/grizzly/grizzly-servlet-webserver/1.8.6.4/grizzly-servlet-webserver-1.8.6.4.jar">grizzly-servlet-webserver.jar</A>,
 <A HREF="http://download.java.net/maven/2/com/sun/jersey/jersey-server/1.0.2-SNAPSHOT/jersey-server-1.0.2-SNAPSHOT.jar">jersey-server.jar</A>,
 <A HREF="http://download.java.net/maven/2/com/sun/jersey/jersey-core/1.0.2-SNAPSHOT/jersey-core-1.0.2-SNAPSHOT.jar">jersey-core.jar</A>,
 <A HREF="http://download.java.net/maven/2/javax/ws/rs/jsr311-api/1.0/jsr311-api-1.0.jar">jsr311-api.jar</A>,
@@ -69,7 +69,7 @@ explicitly:</BLOCKQUOTE>
               version=&quot;1.0.2-SNAPSHOT&quot;/&gt;
   &lt;dependency groupId=&quot;com.sun.grizzly&quot; 
               artifactId=&quot;grizzly-servlet-webserver&quot;
-              version=&quot;1.8.6.3&quot;/&gt;
+              version=&quot;1.8.6.4&quot;/&gt;
   &lt;artifact:remoteRepository id=&quot;maven2-repository.dev.java.net&quot;
                              url=&quot;http://download.java.net/maven/2/&quot; /&gt;
   &lt;artifact:remoteRepository id=&quot;maven-repository.dev.java.net&quot;
