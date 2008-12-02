@@ -154,4 +154,32 @@ public class MainTest extends TestCase {
                 
         assertEquals(ct1, ct2);
     }
+
+    public void testRootElementArray() {
+        JAXBXmlRootElement[] ae1 = r.path("jaxb/array/XmlRootElement").
+                get(JAXBXmlRootElement[].class);
+        JAXBXmlRootElement[] ae2 = r.path("jaxb/array/XmlRootElement").
+                type("application/xml").
+                post(JAXBXmlRootElement[].class, ae1);
+
+        assertEquals(ae1.length, ae2.length);
+        for (int i = 0; i < ae1.length; i++)
+            assertEquals(ae1[i], ae2[i]);
+    }
+
+    public void testXmlTypeArray() {
+        JAXBXmlRootElement[] ae1 = r.path("jaxb/array/XmlRootElement").
+                get(JAXBXmlRootElement[].class);
+
+        JAXBXmlType[] at1 = r.path("jaxb/array/XmlType").
+                type("application/xml").
+                post(JAXBXmlType[].class, ae1);
+
+        JAXBXmlType[] at2 = r.path("jaxb/array/XmlRootElement").
+                get(JAXBXmlType[].class);
+
+        assertEquals(at1.length, at2.length);
+        for (int i = 0; i < at1.length; i++)
+            assertEquals(at1[i], at2[i]);
+    }
 }

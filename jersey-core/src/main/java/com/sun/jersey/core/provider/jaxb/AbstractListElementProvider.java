@@ -44,10 +44,12 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.lang.annotation.Annotation;
+import java.lang.reflect.Array;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import javax.ws.rs.WebApplicationException;
@@ -67,7 +69,7 @@ import javax.xml.stream.XMLStreamReader;
  *
  * @author Paul.Sandoz@Sun.Com
  */
-public abstract class AbstractListElementProvider extends AbstractJAXBProvider<Collection<?>> {    
+public abstract class AbstractListElementProvider extends AbstractJAXBProvider<Object> {
 
     public AbstractListElementProvider(Providers ps) {
         super(ps);
@@ -78,18 +80,31 @@ public abstract class AbstractListElementProvider extends AbstractJAXBProvider<C
     }
     
     public boolean isReadable(Class<?> type, Type genericType, Annotation annotations[], MediaType mediaType) {
-        if (type != List.class && type != Collection.class) return false;
-
-        return verify(genericType) && isSupported(mediaType);
+        if (type == List.class || type == Collection.class) {
+            return verifyGenericType(genericType) && isSupported(mediaType);
+        } else if (type.isArray()) {
+            return verifyArrayType(type) && isSupported(mediaType);
+        } else
+            return false;
     }
     
     public boolean isWriteable(Class<?> type, Type genericType, Annotation annotations[], MediaType mediaType) {
-        if (!List.class.isAssignableFrom(type)) return false;
-
-        return verify(genericType) && isSupported(mediaType);
+        if (List.class.isAssignableFrom(type)) {
+            return verifyGenericType(genericType) && isSupported(mediaType);
+        } else if (type.isArray()) {
+            return verifyArrayType(type) && isSupported(mediaType);
+        } else
+            return false;
     }
     
-    private boolean verify(Type genericType) {
+    private boolean verifyArrayType(Class type) {
+        type = type.getComponentType();
+
+        return type.isAnnotationPresent(XmlRootElement.class) ||
+                type.isAnnotationPresent(XmlType.class);
+    }
+
+    private boolean verifyGenericType(Type genericType) {
         if (!(genericType instanceof ParameterizedType)) return false;
 
         final ParameterizedType pt = (ParameterizedType)genericType;
@@ -105,7 +120,7 @@ public abstract class AbstractListElementProvider extends AbstractJAXBProvider<C
     }
     
     public final void writeTo(
-            Collection<?> t, 
+            Object t,
             Class<?> type, 
             Type genericType, 
             Annotation annotations[], 
@@ -113,15 +128,20 @@ public abstract class AbstractListElementProvider extends AbstractJAXBProvider<C
             MultivaluedMap<String, Object> httpHeaders,
             OutputStream entityStream) throws IOException {
         try {
-            final Class elementType = getElementClass(type, genericType);
-            final Charset c = getCharset(mediaType);
-            final String cName = c.name();
+            final Collection c = (type.isArray()) 
+                    ? Arrays.asList((Object[])t)
+                    : (Collection)t;
+            final Class elementType = (type.isArray()) 
+                    ? type.getComponentType()
+                    : getElementClass(type, genericType);
+            final Charset charset = getCharset(mediaType);
+            final String charsetName = charset.name();
 
             final Marshaller m = getMarshaller(elementType, mediaType);
             m.setProperty(Marshaller.JAXB_FRAGMENT, true);
             if (c != UTF8)
-                m.setProperty(Marshaller.JAXB_ENCODING, cName);
-            writeList(elementType, t, mediaType, c, m, entityStream);
+                m.setProperty(Marshaller.JAXB_ENCODING, charsetName);
+            writeList(elementType, c, mediaType, charset, m, entityStream);
         } catch (JAXBException cause) {
             throw ThrowHelper.withInitCause(cause,
                     new IOException(ImplMessages.ERROR_MARSHALLING_JAXB(t.getClass()))
@@ -146,21 +166,20 @@ public abstract class AbstractListElementProvider extends AbstractJAXBProvider<C
             Marshaller m, OutputStream entityStream)
             throws JAXBException, IOException;
     
-    public final List<?> readFrom(
-            Class<Collection<?>> type, 
+    public final Object readFrom(
+            Class<Object> type,
             Type genericType, 
             Annotation annotations[],
             MediaType mediaType, 
             MultivaluedMap<String, String> httpHeaders, 
             InputStream entityStream) throws IOException { 
         try {
-            Class elementType = getElementClass(type, genericType);
-                
-            Unmarshaller u = getUnmarshaller(elementType, mediaType);
-            
-            XMLStreamReader r = getXMLStreamReader(mediaType, entityStream);
-            
-            List l = new ArrayList();
+            final Class elementType = (type.isArray())
+                    ? type.getComponentType()
+                    : getElementClass(type, genericType);                
+            final Unmarshaller u = getUnmarshaller(elementType, mediaType);            
+            final XMLStreamReader r = getXMLStreamReader(mediaType, entityStream);            
+            final List l = new ArrayList();
             
             // Move to root element
             r.nextTag();
@@ -183,7 +202,9 @@ public abstract class AbstractListElementProvider extends AbstractJAXBProvider<C
                     event = r.next();
             }
 
-            return l;
+            return (type.isArray())
+                    ? createArray(l, elementType)
+                    : l;
         } catch (UnmarshalException ex) {
             throw new WebApplicationException(ex, 400);
         } catch (XMLStreamException ex) {
@@ -195,6 +216,13 @@ public abstract class AbstractListElementProvider extends AbstractJAXBProvider<C
         }
     }
 
+    private Object createArray(List l, Class componentType) {
+        Object array = Array.newInstance(componentType, l.size());
+        for (int i = 0; i < l.size(); i++)
+            Array.set(array, i, l.get(i));
+        return array;
+    }
+    
     /**
      * Get the XMLStreamReader for unmarshalling.
      *

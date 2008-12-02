@@ -1,4 +1,6 @@
 release 1.0.2 (2009-01/02)
+- Support arrays of JAXB XML element and XML type for request and response
+  entities on the client and server.
 - Update to Grizzly 1.8.6.4
 - Fixed issue with runtime exceptions not being mapped when thrown from
   a request filter.

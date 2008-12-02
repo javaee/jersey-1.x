@@ -681,22 +681,51 @@ public class EntityTypesTest extends AbstractTypeTester {
         }        
     }
     
-    public void testJAXBListRepresentation() {
-        initiateWebApplication(JAXBListResource.class);
+    @Path("/")
+    @Produces("application/xml")
+    @Consumes("application/xml")
+    public static class JAXBArrayResource {
+        @POST
+        public JAXBBean[] post(JAXBBean[] l) {
+            return l;
+        }
+
+        @GET
+        public JAXBBean[] get() {
+            ArrayList<JAXBBean> l = new ArrayList<JAXBBean>();
+            l.add(new JAXBBean("one"));
+            l.add(new JAXBBean("two"));
+            l.add(new JAXBBean("three"));
+            return l.toArray(new JAXBBean[l.size()]);
+        }
+
+        @POST
+        @Path("type")
+        public JAXBBean[] postType(JAXBBeanType[] l) {
+            List<JAXBBean> beans = new ArrayList<JAXBBean>();
+            for (JAXBBeanType t : l)
+                beans.add(new JAXBBean(t.value));
+            return beans.toArray(new JAXBBean[beans.size()]);
+        }
+    }
+
+    public void testJAXBArrayRepresentation() {
+        initiateWebApplication(JAXBArrayResource.class);
         WebResource r = resource("/");
 
-        
-        Collection<JAXBBean> a = r.get(
-                new GenericType<Collection<JAXBBean>>(){});
-        Collection<JAXBBean> b = r.type("application/xml").post(new GenericType<Collection<JAXBBean>>(){},
-                new GenericEntity<Collection<JAXBBean>>(a){});
-        
-        assertEquals(a, b);
-        
-        b = r.path("type").type("application/xml").post(new GenericType<Collection<JAXBBean>>(){},
-                new GenericEntity<Collection<JAXBBean>>(a){});
-        assertEquals(a, b);
+        JAXBBean[] a = r.get(JAXBBean[].class);
+        JAXBBean[] b = r.type("application/xml").post(JAXBBean[].class, a);
+        assertEquals(a.length, b.length);
+        for (int i = 0; i < a.length; i++)
+            assertEquals(a[i], b[i]);
+
+        b = r.path("type").type("application/xml").post(JAXBBean[].class, a);
+        assertEquals(a.length, b.length);
+        for (int i = 0; i < a.length; i++)
+            assertEquals(a[i], b[i]);
     }
+
+
 
     @Path("/")
     @Produces("application/foo+xml")
