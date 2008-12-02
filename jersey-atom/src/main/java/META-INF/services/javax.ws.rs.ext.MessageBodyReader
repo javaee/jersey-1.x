@@ -1,2 +1,2 @@
-com.sun.jersey.impl.provider.entity.AtomFeedProvider
-com.sun.jersey.impl.provider.entity.AtomEntryProvider
+com.sun.jersey.atom.rome.impl.provider.entity.AtomFeedProvider
+com.sun.jersey.atom.rome.impl.provider.entity.AtomEntryProvider

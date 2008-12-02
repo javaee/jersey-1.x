@@ -50,7 +50,7 @@ import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.project.MavenProject;
 
-import com.sun.jersey.util.Loader;
+import com.sun.jersey.wadl.util.Loader;
 
 /**
  * This is a base class for mojos that need to access the project classpath.

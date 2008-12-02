@@ -83,7 +83,7 @@ import com.sun.jersey.server.wadl.generators.resourcedoc.model.RequestDocType;
 import com.sun.jersey.server.wadl.generators.resourcedoc.model.ResourceDocType;
 import com.sun.jersey.server.wadl.generators.resourcedoc.model.ResponseDocType;
 import com.sun.jersey.server.wadl.generators.resourcedoc.model.WadlParamType;
-import com.sun.jersey.util.Loader;
+import com.sun.jersey.wadl.util.Loader;
 
 /**
  * This doclet creates a resourcedoc xml file. The ResourceDoc file contains the javadoc documentation

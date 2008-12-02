@@ -37,8 +37,8 @@
 
 package com.sun.jersey.api.json;
 
-import com.sun.jersey.impl.json.JSONMarshaller;
-import com.sun.jersey.impl.json.JSONUnmarshaller;
+import com.sun.jersey.json.impl.JSONMarshaller;
+import com.sun.jersey.json.impl.JSONUnmarshaller;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;

@@ -1,0 +1,16 @@
+SimpleBeanWithAttributes
+ComplexBeanWithAttributes
+SimpleBeanWithJustOneAttribute
+SimpleBeanWithJustOneAttributeAndValue
+ComplexBeanWithAttributes2
+ComplexBeanWithAttributes3
+User
+UserTable
+TreeModel
+TwoListsWrapperBean
+ListAndNonListBean
+ListWrapperBean
+EncodedContentBean
+SimpleBean
+PureCharDataBean
+AttrAndCharDataBean
