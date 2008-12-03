@@ -224,15 +224,15 @@ public class SubResourceHttpMethodsTest extends AbstractResourceTester {
         assertEquals("FOO", resource("/foo").get(String.class));
         assertEquals(404, resource("/foo/bar", false).get(ClientResponse.class).getStatus());
     }
-    
+
     @Path("/")
-    static public class SubResourceExplicitRegex { 
+    static public class SubResourceExplicitRegex {
         @GET
         @Path("{id}")
         public String getSegment(@PathParam("id") String id) {
             return "segment: " + id;
         }
-        
+
         @GET
         @Path("{id: .+}")
         public String getSegments(@PathParam("id") String id) {
@@ -244,32 +244,32 @@ public class SubResourceHttpMethodsTest extends AbstractResourceTester {
         public String getDigit(@PathParam("id") int id) {
             return "digit: " + id;
         }
-        
+
         @GET
         @Path("digit/{id}")
         public String getDigitAnything(@PathParam("id") String id) {
             return "anything: " + id;
-        }        
+        }
     }
-    
+
     public void testSubResource() {
         initiateWebApplication(SubResourceExplicitRegex.class);
-        
+
         assertEquals("segments: foo", resource("/foo").get(String.class));
         assertEquals("segments: foo/bar", resource("/foo/bar").get(String.class));
 
         assertEquals("digit: 123", resource("/digit/123").get(String.class));
         assertEquals("anything: foo", resource("/digit/foo").get(String.class));
     }
-    
+
     @Path("/")
-    static public class SubResourceExplicitRegexCapturingGroups { 
+    static public class SubResourceExplicitRegexCapturingGroups {
         @GET
         @Path("{a: (\\d)(\\d*)}")
         public String getSingle(@PathParam("a") int a) {
             return "" + a;
         }
-        
+
         @GET
         @Path("{a: (\\d)(\\d*)}-{b: (\\d)(\\d*)}-{c: (\\d)(\\d*)}")
         public String getMultiple(
@@ -277,13 +277,41 @@ public class SubResourceHttpMethodsTest extends AbstractResourceTester {
                 @PathParam("b") int b,
                 @PathParam("c") int c) {
             return "" + a + "-" + b + "-" + c;
-        }        
+        }
     }
-    
+
     public void testSubResourceCapturingGroups() {
         initiateWebApplication(SubResourceExplicitRegexCapturingGroups.class);
-        
+
         assertEquals("123", resource("/123").get(String.class));
         assertEquals("123-456-789", resource("/123-456-789").get(String.class));
-    }    
+    }
+
+
+    @Path("/")
+    static public class SubResourceXXX {
+        @GET
+        @Path("{id}/literal")
+        public String getSegment(@PathParam("id") String id) {
+            return id;
+        }
+
+        @GET
+        @Path("{id1}/{id2}/{id3}")
+        public String getSegments(
+                @PathParam("id1") String id1,
+                @PathParam("id2") String id2,
+                @PathParam("id3") String id3
+                ) {
+            return id1 + id2 + id3;
+        }
+    }
+
+    public void testSubResourceXXX() {
+        initiateWebApplication(SubResourceXXX.class);
+
+        assertEquals("123", resource("/123/literal").get(String.class));
+        assertEquals("123literal789", resource("/123/literal/789").get(String.class));
+    }
+
 }

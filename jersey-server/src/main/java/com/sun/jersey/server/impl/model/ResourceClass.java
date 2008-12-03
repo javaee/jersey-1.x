@@ -222,7 +222,7 @@ public final class ResourceClass {
         for (final AbstractSubResourceMethod method : this.resource.getSubResourceMethods()) {
 
             UriTemplate t = new PathTemplate(method.getPath().getValue());
-            PathPattern p = new PathPattern(t);
+            PathPattern p = new PathPattern(t, "(/)?");
 
             ResourceMethod rm = new ResourceHttpMethod(df, t, method);
             addToPatternMethodMap(patternMethodMap, p, rm);

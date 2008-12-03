@@ -71,11 +71,6 @@ public final class PathPattern extends UriPattern {
         this.template = UriTemplate.EMPTY;
     }
     
-    /**
-     * Create a path pattern from a regular expression.
-     * 
-     * @param regex the regular expression for the path.
-     */
     public PathPattern(UriTemplate template) {
         super(postfixWithCapturingGroup(template.getPattern().getRegex()),
             indexCapturingGroup(template.getPattern().getGroupIndexes()));
@@ -83,15 +78,26 @@ public final class PathPattern extends UriPattern {
         this.template = template;
     }
     
+    public PathPattern(UriTemplate template, String rightHandSide) {
+        super(postfixWithCapturingGroup(template.getPattern().getRegex(), rightHandSide),
+            indexCapturingGroup(template.getPattern().getGroupIndexes()));
+
+        this.template = template;
+    }
+
     public UriTemplate getTemplate() {
         return template;
     }
     
     private static String postfixWithCapturingGroup(String regex) {
+        return postfixWithCapturingGroup(regex, RIGHT_HAND_SIDE);
+    }
+
+    private static String postfixWithCapturingGroup(String regex, String rightHandSide) {
         if (regex.endsWith("/"))
             regex = regex.substring(0, regex.length() - 1);
-            
-        return regex + RIGHT_HAND_SIDE;
+
+        return regex + rightHandSide;
     }
 
     private static int[] indexCapturingGroup(int[] indexes) {
