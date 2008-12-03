@@ -24,10 +24,7 @@ package com.sun.jersey.spring;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.mortbay.jetty.Server;
-import org.mortbay.jetty.servlet.Context;
-import org.mortbay.jetty.servlet.ServletHolder;
-import org.springframework.web.context.ContextLoaderServlet;
+
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 
@@ -35,6 +32,9 @@ import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.WebResource;
 import com.sun.jersey.api.core.PackagesResourceConfig;
 import com.sun.jersey.spi.spring.container.servlet.SpringServlet;
+
+import com.sun.grizzly.http.embed.GrizzlyWebServer;
+import com.sun.grizzly.http.servlet.ServletAdapter;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -57,8 +57,9 @@ public class AbstractResourceTest {
     private final int _port;
     private final String _servletPath;
     
-    private Server _server;
     
+    private GrizzlyWebServer ws ;
+
     public AbstractResourceTest() {
         _springConfig = System.getProperty( "applicationContext", APPLICATION_CONTEXT_SPRING25_XML );
         _port = 9999;
@@ -71,41 +72,45 @@ public class AbstractResourceTest {
     @BeforeClass
     @SuppressWarnings("unused")
     public void setUp() throws Exception {
-        startJetty( _port, _servletPath );
+        startGrizzly(_port, _servletPath);
     }
-    
-    private void startJetty( int port, String servletPath ) throws Exception {
-        LOGGER.info( "Starting jetty on port " + port + "..." );
 
-         _server = new Server(port);
-         final Context context = new Context(_server, "/", Context.SESSIONS);
-         
-         final Map<String,String> contextParams = new HashMap<String, String>();
-         contextParams.put( "contextConfigLocation", "classpath:" + _springConfig );
-         context.setInitParams( contextParams );
-         
-         
-         final ServletHolder springServletHolder = new ServletHolder( ContextLoaderServlet.class );
-         
-         springServletHolder.setInitOrder( 1 );
-         context.addServlet( springServletHolder, "/*" );
-         
-         
-         final ServletHolder sh = new ServletHolder(SpringServlet.class);
-         sh.setInitParameter( "com.sun.jersey.config.property.resourceConfigClass",
+   /**
+    * Starts the embedded Grizzly server.
+    * @param port
+    * @param servletPath
+    * @throws java.lang.Exception
+    */
+    private void startGrizzly(int port, String servletPath) throws Exception {
+        final Map<String, String> initParams = new HashMap<String, String>();
+
+        initParams.put( "com.sun.jersey.config.property.resourceConfigClass",
                  PackagesResourceConfig.class.getName() );
-         sh.setInitParameter( PackagesResourceConfig.PROPERTY_PACKAGES,
+        initParams.put( PackagesResourceConfig.PROPERTY_PACKAGES,
                  "com.sun.jersey.spring.jerseymanaged" );
-         sh.setInitOrder( 2 );
-         context.addServlet(sh, servletPath + "/*");
-         
-         _server.start();
-         LOGGER.info( "Successfully started jetty." );
+
+        LOGGER.info("Starting grizzly...");
+        ws = new GrizzlyWebServer(port);
+        ServletAdapter sa = new ServletAdapter();
+        sa.setServletInstance(SpringServlet.class.newInstance());
+        sa.addServletListener("org.springframework.web.context.ContextLoaderListener");
+        sa.addContextParameter("contextConfigLocation","classpath:"+_springConfig);
+        sa.addInitParameter( "com.sun.jersey.config.property.resourceConfigClass",
+                 PackagesResourceConfig.class.getName() );
+        sa.addInitParameter( PackagesResourceConfig.PROPERTY_PACKAGES,
+                 "com.sun.jersey.spring.jerseymanaged" );
+        sa.setServletPath(servletPath);
+        ws.addGrizzlyAdapter(sa);
+        ws.start();
     }
-    
-    private void stopJetty() throws Exception {
+
+    /**
+     * Stop the embedded Grizzly server.
+     * @throws java.lang.Exception
+     */
+    private void stopGrizzly() throws Exception {
         try {
-            _server.stop();
+            ws.stop();
         } catch( Exception e ) {
             LOGGER.log(Level.WARNING, "Could not stop jetty...", e );
         }
@@ -114,7 +119,7 @@ public class AbstractResourceTest {
     @AfterClass
     public void tearDown() throws Exception {
         LOGGER.info( "tearDown..." );
-        stopJetty();
+        stopGrizzly();
         LOGGER.info( "done..." );
     }
 
