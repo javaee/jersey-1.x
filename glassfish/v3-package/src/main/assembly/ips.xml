@@ -1,0 +1,32 @@
+<assembly>
+  <id>project</id>
+  <formats>
+    <format>zip</format>
+  </formats>
+  <fileSets>
+    <fileSet>
+      <directory>src/main/resources</directory>
+      <outputDirectory></outputDirectory>
+    </fileSet>
+    <fileSet>
+      <directory>target/aux/jersey-javadoc</directory>
+      <outputDirectory>jersey/apidocs/jersey</outputDirectory>
+    </fileSet>
+    <fileSet>
+      <directory>target/aux/jax-rs-javadoc</directory>
+      <outputDirectory>jersey/apidocs/jsr311</outputDirectory>
+    </fileSet>
+     <fileSet>
+      <directory>target/aux/samples</directory>
+      <outputDirectory>jersey/samples</outputDirectory>
+    </fileSet>
+     <fileSet>
+      <directory>target/aux</directory>
+      <includes>
+        <include>jsr311-api.jar</include>
+        <include>jersey-bundle.jar</include>
+      </includes>
+      <outputDirectory>glassfish/modules</outputDirectory>
+    </fileSet>
+   </fileSets>
+</assembly>
