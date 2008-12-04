@@ -57,6 +57,7 @@
         <module>spring</module>
         <module>maven-wadl-plugin</module>
         <module>jersey-multipart</module>
+        <module>jersey-atom-abdera</module>
         <!--
         Apache client module not stable
         <module>apache-client</module>
