@@ -1,6 +1,6 @@
 pkg = {
     "name"          : "jersey",
-    "version"       : "1.0.1,0-1.0",
+    "version"       : "1.0.2,0-0.1",
     "attributes"    : { "pkg.summary" : "Jersey RESTful Web services for GlassFish",
                         "pkg.description" : 
 "Jersey is the open source (under dual CDDL+GPL license)\
