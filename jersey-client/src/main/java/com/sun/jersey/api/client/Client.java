@@ -79,7 +79,7 @@ import javax.ws.rs.ext.Providers;
  * that modify configuration and or filters are not guaranteed to be
  * thread-safe.
  * <p>
- * The creation of a <code>Client</code> instance is expensive operation and
+ * The creation of a <code>Client</code> instance is an expensive operation and
  * the instance may make use of and retain many resources. It is therefore
  * recommended that a <code>Client</code> instance is reused for the creation of
  * {@link WebResource} instances that require the same configuration settings.
