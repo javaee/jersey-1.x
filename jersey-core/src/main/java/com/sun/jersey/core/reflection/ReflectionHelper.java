@@ -46,6 +46,8 @@ import java.lang.reflect.Modifier;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -55,28 +57,73 @@ import java.util.Map;
  * @author Paul.Sandoz@Sun.Com
  */
 public class ReflectionHelper {
+    
     /**
      * Get the Class from the class name.
      * <p>
-     * The context class loader of the current thread is used, if null then the
-     * ClassLoader.getSystemClassLoader() is utilized.
+     * The context class loader will be utilized if accessible and non-null.
+     * Otherwise the the defining class loader of this class will
+     * be utilized.
      * 
      * @param name the class name.
-     * @return the Class.
+     * @return the Class, otherwise null if the class cannot be found.
      */
     public static Class classForName(String name) {
-        try {
-            return Class.forName(name, true, getClassLoader());
-        } catch (ClassNotFoundException ex) {
-            return null;
+        ClassLoader cl = getContextClassLoader();
+        if (cl != null) {
+            try {
+                return Class.forName(name, false, cl);
+            } catch (ClassNotFoundException ex) {
+            }
         }
+        try {
+            return Class.forName(name);
+        } catch (ClassNotFoundException ex) {
+        }
+
+        return null;
     }
 
-    private static ClassLoader getClassLoader() {
-        ClassLoader l = Thread.currentThread().getContextClassLoader();
-        if (l == null)
-            l = ClassLoader.getSystemClassLoader();
-        return l;
+    /**
+     * Get the Class from the class name.
+     * <p>
+     * The context class loader will be utilized if accessible and non-null.
+     * Otherwise the the defining class loader of this class will
+     * be utilized.
+     *
+     * @param name the class name.
+     * @return the Class, otherwise null if the class cannot be found.
+     * @throws ClassNotFoundException if the class cannot be found.
+     */
+    public static Class classForNameWithException(String name) throws ClassNotFoundException {
+        ClassLoader cl = getContextClassLoader();
+        if (cl != null) {
+            try {
+                return Class.forName(name, false, cl);
+            } catch (ClassNotFoundException ex) {
+            }
+        }
+        return Class.forName(name);
+    }
+
+    /**
+     * Get the context class loader.
+     * 
+     * @return the context class loader, otherwise null security privilages
+     *         are not set.
+     */
+    public static ClassLoader getContextClassLoader() {
+        return AccessController.doPrivileged(
+            new PrivilegedAction<ClassLoader>() {
+                public ClassLoader run() {
+                    ClassLoader cl = null;
+                    try {
+                        cl = Thread.currentThread().getContextClassLoader();
+                    } catch (SecurityException ex) {
+                    }
+                    return cl;
+                }
+        });
     }
 
     /**

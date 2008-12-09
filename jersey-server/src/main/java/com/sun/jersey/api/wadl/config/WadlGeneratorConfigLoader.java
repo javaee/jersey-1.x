@@ -82,7 +82,7 @@ public class WadlGeneratorConfigLoader {
                             asSubclass( WadlGeneratorConfig.class );
                 }
                 else if ( wadlGeneratorConfigProperty instanceof String ) {
-                    configClazz = ReflectionHelper.classForName( (String) wadlGeneratorConfigProperty ).
+                    configClazz = ReflectionHelper.classForNameWithException( (String) wadlGeneratorConfigProperty ).
                             asSubclass( WadlGeneratorConfig.class );
                 }
                 else {
