@@ -103,6 +103,11 @@ public class MultiPartWriter implements MessageBodyWriter<MultiPart> {
                         MultivaluedMap<String, Object> headers,
                         OutputStream stream) throws IOException, WebApplicationException {
 
+        // Verify that there is at least one body part
+        if ((entity.getBodyParts() == null) || (entity.getBodyParts().size() < 1)) {
+            throw new WebApplicationException(new IllegalArgumentException("Must specify at least one body part"));
+        }
+
         // If our entity is not nested, make sure the MIME-Version header is set
         if (entity.getParent() == null) {
             Object value = headers.getFirst("MIME-Version");

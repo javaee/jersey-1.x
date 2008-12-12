@@ -39,7 +39,9 @@ package com.sun.jersey.multipart.impl;
 
 import com.sun.jersey.multipart.BodyPart;
 import com.sun.jersey.multipart.MultiPart;
+import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
+import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
@@ -138,6 +140,24 @@ public class MultiPartResource {
         part2.getHeaders().add("Content-Disposition", "form-data; name=\"pics\"; filename=\"file1.txt\"");
         part2.setEntity("... contents of file1.txt ...\r\n");
         return Response.ok(entity.bodyPart(part1).bodyPart(part2)).build();
+    }
+
+    // Note - this should never actually get reached, because the client
+    // is trying to post a MultiPart with no body parts inside, and that
+    // should throw a client side exception
+    @Path("six")
+    @POST
+    @Consumes("multipart/mixed")
+    @Produces("text/plain")
+    public Response six(MultiPart multiPart) {
+        String response = "All OK";
+        if (!"multipart".equals(multiPart.getMediaType().getType()) ||
+            !"mixed".equals(multiPart.getMediaType().getSubtype())) {
+            response = "MultiPart media type is " + multiPart.getMediaType().toString();
+        } else if (multiPart.getBodyParts().size() != 0) {
+            response = "Got " + multiPart.getBodyParts().size() + " body parts instead of zero";
+        }
+        return Response.ok(response).build();
     }
 
 }

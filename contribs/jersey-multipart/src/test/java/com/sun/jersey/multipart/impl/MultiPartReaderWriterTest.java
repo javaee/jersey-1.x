@@ -39,6 +39,7 @@ package com.sun.jersey.multipart.impl;
 
 import com.sun.grizzly.http.SelectorThread;
 import com.sun.jersey.api.client.Client;
+import com.sun.jersey.api.client.ClientHandlerException;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.UniformInterfaceException;
 import com.sun.jersey.api.client.WebResource;
@@ -55,6 +56,7 @@ import java.text.ParseException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import junit.framework.TestCase;
@@ -248,6 +250,25 @@ public class MultiPartReaderWriterTest extends TestCase {
         } catch(ParseException e) {
             e.printStackTrace(System.out);
             fail("Caught exception: " + e);
+        } catch (UniformInterfaceException e) {
+            report(e);
+            fail("Caught exception: " + e);
+        }
+    }
+
+    // Test sending a completely empty MultiPart
+    public void testSix() {
+        WebResource.Builder builder = client.resource(BASE_URI)
+                .path("multipart/six").type("multipart/mixed").accept("text/plain");
+        try {
+            String result = builder.post(String.class, new MultiPart());
+            fail("Should have thrown an exception about zero body parts");
+        } catch (ClientHandlerException e) {
+            assertNotNull(e.getCause());
+            assertEquals(WebApplicationException.class, e.getCause().getClass());
+            WebApplicationException wae = (WebApplicationException) e.getCause();
+            assertNotNull(wae.getCause());
+            assertEquals(IllegalArgumentException.class, wae.getCause().getClass());
         } catch (UniformInterfaceException e) {
             report(e);
             fail("Caught exception: " + e);
