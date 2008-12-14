@@ -53,7 +53,6 @@ import javax.ws.rs.ext.Provider;
 import org.apache.abdera.Abdera;
 import org.apache.abdera.model.Categories;
 import org.apache.abdera.model.Document;
-import org.apache.abdera.model.Feed;
 import org.apache.abdera.parser.Parser;
 import org.apache.abdera.writer.Writer;
 
@@ -61,7 +60,9 @@ import org.apache.abdera.writer.Writer;
  * <p>JAX-RS Provider for an AtomPub {@link Categories} Document instance.</p>
  */
 @Provider
-@Consumes({"application/atomcat+xml", "application/xml", "text/xml", "application/atomcat+json", "application/json"})
+//@Consumes({"application/atomcat+xml", "application/xml", "text/xml", "application/atomcat+json", "application/json"})
+// Abdera does not yet provide a JSON parser for a Categories entity
+@Consumes({"application/atomcat+xml", "application/xml", "text/xml"})
 @Produces({"application/atomcat+xml", "application/xml", "text/xml", "application/atomcat+json", "application/json"})
 public class CategoriesProvider implements MessageBodyReader<Categories>, MessageBodyWriter<Categories> {
 

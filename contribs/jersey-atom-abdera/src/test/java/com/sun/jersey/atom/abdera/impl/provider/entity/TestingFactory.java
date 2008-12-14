@@ -39,6 +39,8 @@ package com.sun.jersey.atom.abdera.impl.provider.entity;
 
 import org.apache.abdera.Abdera;
 import org.apache.abdera.model.Categories;
+import org.apache.abdera.model.Entry;
+import org.apache.abdera.model.Feed;
 import org.apache.abdera.model.Service;
 import org.apache.abdera.model.Workspace;
 
@@ -47,7 +49,9 @@ import org.apache.abdera.model.Workspace;
  */
 public class TestingFactory {
 
+
     private static Abdera abdera = Abdera.getInstance();
+
 
     /**
      * <p>Create and return a populated {@link Categories} instance.</p>
@@ -59,6 +63,65 @@ public class TestingFactory {
         categories.addCategory("http://example.com/categories/baz", "baz", "This is the 'baz' category");
         categories.addCategory("http://example.com/categories/bop", "bop", "This is the 'bop' category");
         return categories;
+    }
+
+    /**
+     * <p>Create and return a populated {@link Entry} instance with
+     * no suffixes added.</p>
+     */
+    public static Entry createEntry() {
+        return createEntry("");
+    }
+
+    /**
+     * <p>Create and return a populated {@link Entry} instance with
+     * the specified suffixes added.</p>
+     */
+    public static Entry createEntry(String suffix) {
+        Entry entry = abdera.newEntry();
+        entry.addAuthor("Entry Author 1" + suffix);
+        entry.addAuthor("Entry Author 2" + suffix);
+        entry.addCategory("Entry Category 1" + suffix);
+        entry.addCategory("Entry Category 2" + suffix);
+        entry.addCategory("Entry Category 3" + suffix);
+        entry.addContributor("Entry Contributor 1" + suffix);
+        entry.setId("EntryId" + suffix.replace(' ', '_'));
+        entry.addLink("http://example.com/entry", "self", "application/xml", "Entry Self Link" + suffix, null, 0);
+        entry.addLink("http://example.com/entry", "edit", "application/xml", "Entry Edit Link" + suffix, null, 0);
+        // FIXME - should we set a default content element?
+        return entry;
+    }
+
+    /**
+     * <p>Create and return a populated {@link Feed} instance with
+     * no suffixes added.</p>
+     */
+    public static Feed createFeed() {
+        return createFeed("");
+    }
+
+    /**
+     * <p>Create and return a populated {@link Feed} instance with
+     * the specified suffixes added.</p>
+     */
+    public static Feed createFeed(String suffix) {
+        Feed feed = abdera.newFeed();
+        feed.addAuthor("Feed Author 1" + suffix);
+        feed.addAuthor("Feed Author 2" + suffix);
+        feed.addAuthor("Feed Author 3" + suffix);
+        feed.addCategory("Feed Category 1" + suffix);
+        feed.addCategory("Feed Category 2" + suffix);
+        feed.addContributor("Feed Contributor 1" + suffix);
+        feed.addContributor("Feed Contributor 2" + suffix);
+        feed.addContributor("Feed Contributor 3" + suffix);
+        feed.addContributor("Feed Contributor 4" + suffix);
+        feed.addEntry(createEntry(suffix + " Entry 1"));
+        feed.addEntry(createEntry(suffix + " Entry 2"));
+        feed.addEntry(createEntry(suffix + " Entry 3"));
+        feed.addEntry(createEntry(suffix + " Entry 4"));
+        feed.setId("FeedId" + suffix.replace(' ', '_'));
+        feed.addLink("http://example.com/feed", "self", "application/xml", "Feed Self Link" + suffix, null, 0);
+        return feed;
     }
 
     /**

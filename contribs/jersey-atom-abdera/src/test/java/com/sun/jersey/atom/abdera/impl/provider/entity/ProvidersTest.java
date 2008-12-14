@@ -44,13 +44,19 @@ import com.sun.jersey.api.client.config.ClientConfig;
 import com.sun.jersey.api.client.config.DefaultClientConfig;
 import com.sun.jersey.api.container.grizzly.GrizzlyWebContainerFactory;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import junit.framework.TestCase;
+import org.apache.abdera.i18n.iri.IRI;
 import org.apache.abdera.model.Categories;
 import org.apache.abdera.model.Category;
 import org.apache.abdera.model.Collection;
 import org.apache.abdera.model.Element;
+import org.apache.abdera.model.Entry;
 import org.apache.abdera.model.ExtensibleElement;
+import org.apache.abdera.model.Feed;
+import org.apache.abdera.model.Link;
+import org.apache.abdera.model.Person;
 import org.apache.abdera.model.Service;
 import org.apache.abdera.model.Workspace;
 
@@ -102,6 +108,28 @@ public class ProvidersTest extends TestCase {
         "application/xml",
         "text/xml",
     };
+    private static final String[] ENTRY_MEDIA_TYPES_JSON = {
+        "application/atom+json",
+        "application/atom+json;type=entry",
+        "application/json",
+    };
+    private static final String[] ENTRY_MEDIA_TYPES_XML = {
+        "application/atom+xml",
+        "application/atom+xml;type=entry",
+        "application/xml",
+        "text/xml",
+    };
+    private static final String[] FEED_MEDIA_TYPES_JSON = {
+        "application/atom+json",
+        "application/atom+json;type=feed",
+        "application/json",
+    };
+    private static final String[] FEED_MEDIA_TYPES_XML = {
+        "application/atom+xml",
+        "application/atom+xml;type=feed",
+        "application/xml",
+        "text/xml",
+    };
     private static final String[] SERVICE_MEDIA_TYPES_JSON = {
         "application/atomsvc+json",
         "application/json",
@@ -139,6 +167,66 @@ public class ProvidersTest extends TestCase {
             String result = builder.get(String.class);
 //            System.out.println(mediaType + "=" + result);
             assertTrue("Categories for media type " + mediaType + " is XML", result.startsWith("<"));
+        }
+    }
+
+    public void testGetEntryEntity() {
+        // FIXME - Abdera does not support parsing of JSON representations for Entry instances
+        Entry expected = TestingFactory.createEntry();
+        for (String mediaType : ENTRY_MEDIA_TYPES_XML) {
+            WebResource.Builder builder = client.resource(BASE_URI)
+              .path("test").path("entry").accept(mediaType);
+            Entry actual = builder.get(Entry.class);
+            checkEntry(mediaType, expected, actual);
+        }
+    }
+
+    public void testGetEntryString() {
+        for (String mediaType : ENTRY_MEDIA_TYPES_JSON) {
+//            System.out.println("Trying " + mediaType);
+            WebResource.Builder builder = client.resource(BASE_URI)
+              .path("test").path("entry").accept(mediaType);
+            String result = builder.get(String.class);
+//            System.out.println(mediaType + "=" + result);
+            assertTrue("Entry for media type " + mediaType + " is JSON", result.startsWith("{"));
+        }
+        for (String mediaType : ENTRY_MEDIA_TYPES_XML) {
+//            System.out.println("Trying " + mediaType);
+            WebResource.Builder builder = client.resource(BASE_URI)
+              .path("test").path("entry").accept(mediaType);
+            String result = builder.get(String.class);
+//            System.out.println(mediaType + "=" + result);
+            assertTrue("Entry for media type " + mediaType + " is XML", result.startsWith("<"));
+        }
+    }
+
+    public void testGetFeedEntity() {
+        // FIXME - Abdera does not support parsing of JSON representations for Feed instances
+        Feed expected = TestingFactory.createFeed();
+        for (String mediaType : FEED_MEDIA_TYPES_XML) {
+            WebResource.Builder builder = client.resource(BASE_URI)
+              .path("test").path("feed").accept(mediaType);
+            Feed actual = builder.get(Feed.class);
+            checkFeed(mediaType, expected, actual);
+        }
+    }
+
+    public void testGetFeedString() {
+        for (String mediaType : FEED_MEDIA_TYPES_JSON) {
+//            System.out.println("Trying " + mediaType);
+            WebResource.Builder builder = client.resource(BASE_URI)
+              .path("test").path("feed").accept(mediaType);
+            String result = builder.get(String.class);
+//            System.out.println(mediaType + "=" + result);
+            assertTrue("Feed for media type " + mediaType + " is JSON", result.startsWith("{"));
+        }
+        for (String mediaType : FEED_MEDIA_TYPES_XML) {
+//            System.out.println("Trying " + mediaType);
+            WebResource.Builder builder = client.resource(BASE_URI)
+              .path("test").path("feed").accept(mediaType);
+            String result = builder.get(String.class);
+//            System.out.println(mediaType + "=" + result);
+            assertTrue("Feed for media type " + mediaType + " is XML", result.startsWith("<"));
         }
     }
 
@@ -186,7 +274,11 @@ public class ProvidersTest extends TestCase {
     private void checkCategory(String environment, Category expected, Category actual) {
         checkExtensibleElement(environment, expected, actual);
         assertEquals(environment + " label", expected.getLabel(), actual.getLabel());
-        assertEquals(environment + " scheme", expected.getScheme().toString(), actual.getScheme().toString());
+        if (expected.getScheme() == null) {
+            assertNull(environment + " scheme is null", actual.getScheme());
+        } else {
+            assertEquals(environment + " scheme", expected.getScheme().toString(), actual.getScheme().toString());
+        }
         assertEquals(environment + " term", expected.getTerm(), actual.getTerm());
     }
 
@@ -200,9 +292,104 @@ public class ProvidersTest extends TestCase {
         // FIXME - add tests for Element
     }
 
+    private void checkEntry(String environment, Entry expected, Entry actual) {
+        checkExtensibleElement(environment, expected, actual);
+        assertEquals(environment + " authors size",
+                expected.getAuthors().size(), actual.getAuthors().size());
+        for (Person author : expected.getAuthors()) {
+            Person actualAuthor = findPerson(actual.getAuthors(), author.getName());
+            assertNotNull(environment + " author " + author.getName() + " exists", actualAuthor);
+            checkPerson(environment + " author " + author.getName(), author, actualAuthor);
+        }
+        assertEquals(environment + " categories size",
+                expected.getCategories().size(), actual.getCategories().size());
+        for (Category category : expected.getCategories()) {
+            Category actualCategory = findCategory(actual.getCategories(), category.getTerm());
+            assertNotNull(environment + " category " + category.getTerm() + " exists", actualCategory);
+            checkCategory(environment + " category " + category.getTerm(), category, actualCategory);
+        }
+        // FIXME - test content, contentMimeType, contentSrc, contentType ???
+        assertEquals(environment + " contributors size",
+                expected.getContributors().size(), actual.getContributors().size());
+        for (Person contributor : expected.getContributors()) {
+            Person actualContributor = findPerson(actual.getContributors(), contributor.getName());
+            assertNotNull(environment + " contributor " + contributor.getName() + " exists", actualContributor);
+            checkPerson(environment + " contributor " + contributor.getName(), contributor, actualContributor);
+        }
+        assertEquals(environment + " id", expected.getId(), actual.getId());
+        assertEquals(environment + " links size",
+                expected.getLinks().size(), actual.getLinks().size());
+        for (Link link : expected.getLinks()) {
+            Link actualLink = findLink(actual.getLinks(), link.getRel());
+            assertNotNull(environment + " link " + link.getRel() + " exists", actualLink);
+            checkLink(environment + " link " + link.getRel(), link, actualLink);
+        }
+    }
+
     private void checkExtensibleElement(String environment, ExtensibleElement expected, ExtensibleElement actual) {
         checkElement(environment, expected, actual);
         // FIXME - add tests for ExtensibleElement
+    }
+
+    private void checkFeed(String environment, Feed expected, Feed actual) {
+        checkExtensibleElement(environment, expected, actual);
+        assertEquals(environment + " authors size",
+                expected.getAuthors().size(), actual.getAuthors().size());
+        for (Person author : expected.getAuthors()) {
+            Person actualAuthor = findPerson(actual.getAuthors(), author.getName());
+            assertNotNull(environment + " author " + author.getName() + " exists", actualAuthor);
+            checkPerson(environment + " author " + author.getName(), author, actualAuthor);
+        }
+        assertEquals(environment + " categories size",
+                expected.getCategories().size(), actual.getCategories().size());
+        for (Category category : expected.getCategories()) {
+            Category actualCategory = findCategory(actual.getCategories(), category.getTerm());
+            assertNotNull(environment + " category " + category.getTerm() + " exists", actualCategory);
+            checkCategory(environment + " category " + category.getTerm(), category, actualCategory);
+        }
+        assertEquals(environment + " contributors size",
+                expected.getContributors().size(), actual.getContributors().size());
+        for (Person contributor : expected.getContributors()) {
+            Person actualContributor = findPerson(actual.getContributors(), contributor.getName());
+            assertNotNull(environment + " contributor " + contributor.getName() + " exists", actualContributor);
+            checkPerson(environment + " contributor " + contributor.getName(), contributor, actualContributor);
+        }
+        assertEquals(environment + " entries size",
+                expected.getEntries().size(), actual.getEntries().size());
+        for (Entry entry : expected.getEntries()) {
+            Entry actualEntry = findEntry(actual.getEntries(), entry.getId());
+            assertNotNull(environment + " entry " + entry.getId() + " exists", actualEntry);
+            checkEntry(environment + " entry " + entry.getId(), entry, actualEntry);
+        }
+        assertEquals(environment + " id", expected.getId(), actual.getId());
+        assertEquals(environment + " links size",
+                expected.getLinks().size(), actual.getLinks().size());
+        for (Link link : expected.getLinks()) {
+            Link actualLink = findLink(actual.getLinks(), link.getRel());
+            assertNotNull(environment + " link " + link.getRel() + " exists", actualLink);
+            checkLink(environment + " link " + link.getRel(), link, actualLink);
+        }
+    }
+
+    private void checkLink(String environment, Link expected, Link actual) {
+        checkExtensibleElement(environment, expected, actual);
+        assertEquals(environment + " href", expected.getHref(), actual.getHref());
+        assertEquals(environment + " hrefLang", expected.getHrefLang(), actual.getHrefLang());
+        assertEquals(environment + " length", expected.getLength(), actual.getLength());
+        if (expected.getMimeType() == null) {
+            assertNull(environment + " mimeType does not exist", actual.getMimeType());
+        } else {
+            assertEquals(environment + " mimeType", expected.getMimeType().toString(), actual.getMimeType().toString());
+        }
+        assertEquals(environment + " rel", expected.getRel(), actual.getRel());
+        assertEquals(environment + " title", expected.getTitle(), actual.getTitle());
+    }
+
+    private void checkPerson(String environment, Person expected, Person actual) {
+        checkExtensibleElement(environment, expected, actual);
+        assertEquals(environment + " email", expected.getEmail(), actual.getEmail());
+        assertEquals(environment + " name", expected.getName(), actual.getName());
+        assertEquals(environment + " IRI", expected.getUri(), actual.getUri());
     }
 
     private void checkService(String environment, Service expected, Service actual) {
@@ -226,6 +413,42 @@ public class ProvidersTest extends TestCase {
             assertNotNull(environment + " collection " + collection.getTitle() + " exists", actualCollection);
             checkCollection(environment + " collection " + collection.getTitle(), collection, actualCollection);
         }
+    }
+
+    private Category findCategory(List<Category> categories, String term) {
+        for (Category category : categories) {
+            if (term.equals(category.getTerm())) {
+                return category;
+            }
+        }
+        return null;
+    }
+
+    private Entry findEntry(List<Entry> entries, IRI id) {
+        for (Entry entry : entries) {
+            if (id.equals(entry.getId())) {
+                return entry;
+            }
+        }
+        return null;
+    }
+
+    private Link findLink(List<Link> links, String rel) {
+        for (Link link : links) {
+            if (rel.equals(link.getRel())) {
+                return link;
+            }
+        }
+        return null;
+    }
+
+    private Person findPerson(List<Person> persons, String name) {
+        for (Person person : persons) {
+            if (name.equals(person.getName())) {
+                return person;
+            }
+        }
+        return null;
     }
 
 }

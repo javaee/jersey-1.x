@@ -97,7 +97,7 @@ public class EntryProvider
                         Annotation[] annotations, MediaType mediaType,
                         MultivaluedMap<String, Object> headers,
                         OutputStream stream) throws IOException, WebApplicationException {
-        if (mediaType.equals(MediaType.APPLICATION_JSON_TYPE)) {
+        if (mediaType.equals(MediaType.APPLICATION_JSON_TYPE) || mediaType.getSubtype().endsWith("+json")) {
             entry.writeTo("json", stream);
         } else {
             entry.writeTo(stream);

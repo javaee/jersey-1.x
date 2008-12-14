@@ -56,6 +56,20 @@ public class TestingResource {
     }
 
     @GET
+    @Path("entry")
+    @Produces({"application/atom", "application/atom+xml", "application/xml", "text/xml", "application/atom+json", "application/json"})
+    public Response getEntry() {
+        return Response.ok(TestingFactory.createEntry()).build();
+    }
+
+    @GET
+    @Path("feed")
+    @Produces({"application/atom", "application/atom+xml", "application/xml", "text/xml", "application/atom+json", "application/json"})
+    public Response getFeed() {
+        return Response.ok(TestingFactory.createFeed()).build();
+    }
+
+    @GET
     @Path("service")
     @Produces({"application/atomsvc+xml", "application/xml", "text/xml", "application/atomsvc+json", "application/json"})
     public Response getService() {

@@ -54,13 +54,14 @@ import org.apache.abdera.Abdera;
 import org.apache.abdera.model.Document;
 import org.apache.abdera.model.Service;
 import org.apache.abdera.parser.Parser;
-import org.apache.abdera.writer.Writer;
 
 /**
  * <p>JAX-RS Provider for an AtomPub {@link Service} Document instance.</p>
  */
 @Provider
-@Consumes({"application/atomsvc+xml", "application/xml", "text/xml", "application/atomsvc+json", "application/json"})
+// @Consumes({"application/atomsvc+xml", "application/xml", "text/xml", "application/atomsvc+json", "application/json"})
+// Abdera does not yet provide a JSON parser for a Service entity
+@Consumes({"application/atomsvc+xml", "application/xml", "text/xml"})
 @Produces({"application/atomsvc+xml", "application/xml", "text/xml", "application/atomsvc+json", "application/json"})
 public class ServiceProvider implements MessageBodyReader<Service>, MessageBodyWriter<Service> {
 

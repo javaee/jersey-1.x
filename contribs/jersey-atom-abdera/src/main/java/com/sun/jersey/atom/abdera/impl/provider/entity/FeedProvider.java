@@ -54,7 +54,6 @@ import org.apache.abdera.Abdera;
 import org.apache.abdera.model.Document;
 import org.apache.abdera.model.Feed;
 import org.apache.abdera.parser.Parser;
-import org.apache.abdera.writer.Writer;
 
 /**
  * <p>JAX-RS Provider for an Atom {@link Feed} Document instance.</p>
@@ -98,7 +97,7 @@ public class FeedProvider
                         Annotation[] annotations, MediaType mediaType,
                         MultivaluedMap<String, Object> headers,
                         OutputStream stream) throws IOException, WebApplicationException {
-        if (mediaType.equals(MediaType.APPLICATION_JSON_TYPE)) {
+        if (mediaType.equals(MediaType.APPLICATION_JSON_TYPE) || mediaType.getSubtype().endsWith("+json")) {
             feed.writeTo("json", stream);
         } else {
             feed.writeTo(stream);
