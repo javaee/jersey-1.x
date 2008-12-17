@@ -199,7 +199,7 @@ public class FormDataBodyPart extends BodyPart {
      *
      * @param clazz Desired class into which the field value should be converted
      *
-     * @exception IllegalArgumentException if no {@link MessageBodyReader} can
+     * @exception IllegalArgumentException if no <code>MessageBodyReader</code> can
      *  be found to perform the requested conversion
      * @exception IllegalStateException if this method is called when the
      *  <code>providers</code> property has not been set or when the
