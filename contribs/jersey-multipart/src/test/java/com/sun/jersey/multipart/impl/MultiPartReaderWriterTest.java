@@ -48,6 +48,7 @@ import com.sun.jersey.api.client.config.DefaultClientConfig;
 import com.sun.jersey.api.container.grizzly.GrizzlyWebContainerFactory;
 import com.sun.jersey.multipart.BodyPart;
 import com.sun.jersey.multipart.BodyPartEntity;
+import com.sun.jersey.multipart.FormDataMultiPart;
 import com.sun.jersey.multipart.MultiPart;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -269,6 +270,48 @@ public class MultiPartReaderWriterTest extends TestCase {
             WebApplicationException wae = (WebApplicationException) e.getCause();
             assertNotNull(wae.getCause());
             assertEquals(IllegalArgumentException.class, wae.getCause().getClass());
+        } catch (UniformInterfaceException e) {
+            report(e);
+            fail("Caught exception: " + e);
+        }
+    }
+
+    public void testSeven() {
+        WebResource.Builder builder = client.resource(BASE_URI)
+                .path("multipart/seven").accept("multipart/form-data");
+        try {
+            FormDataMultiPart result = builder.get(FormDataMultiPart.class);
+            checkMediaType(new MediaType("multipart", "form-data"), result.getMediaType());
+            assertEquals(3, result.getFields().size());
+            assertNotNull(result.getField("foo"));
+            assertEquals("bar", result.getField("foo").getValue());
+            assertNotNull(result.getField("baz"));
+            assertEquals("bop", result.getField("baz").getValue());
+            assertNotNull(result.getField("bean"));
+            MultiPartBean bean = result.getField("bean").getValueAs(MultiPartBean.class);
+            assertNotNull(bean);
+            assertEquals("myname", bean.getName());
+            assertEquals("myvalue", bean.getValue());
+            result.cleanup();
+        } catch (UniformInterfaceException e) {
+            report(e);
+            fail("Caught exception: " + e);
+        }
+    }
+
+    public void testEight() {
+        WebResource.Builder builder = client.resource(BASE_URI)
+                .path("multipart/eight").accept("text/plain").type("multipart/form-data");
+        try {
+            MultiPartBean bean = new MultiPartBean("myname", "myvalue");
+            FormDataMultiPart entity = new FormDataMultiPart().
+                field("foo", "bar").
+                field("baz", "bop").
+                field("bean", bean, new MediaType("x-application", "x-format"));
+            String response = builder.put(String.class, entity);
+            if (!response.startsWith("SUCCESS:")) {
+                fail("Response is '" + response + "'");
+            }
         } catch (UniformInterfaceException e) {
             report(e);
             fail("Caught exception: " + e);

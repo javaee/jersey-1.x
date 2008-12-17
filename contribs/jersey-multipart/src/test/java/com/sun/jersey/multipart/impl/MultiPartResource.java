@@ -38,6 +38,7 @@
 package com.sun.jersey.multipart.impl;
 
 import com.sun.jersey.multipart.BodyPart;
+import com.sun.jersey.multipart.FormDataMultiPart;
 import com.sun.jersey.multipart.MultiPart;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
@@ -125,6 +126,7 @@ public class MultiPartResource {
         return Response.ok("SUCCESS:  All tests passed").build();
     }
 
+    // Test "multipart/form-data" the hard way (no subclasses)
     @Path("five")
     @GET
     @Produces("multipart/form-data")
@@ -158,6 +160,51 @@ public class MultiPartResource {
             response = "Got " + multiPart.getBodyParts().size() + " body parts instead of zero";
         }
         return Response.ok(response).build();
+    }
+
+    // Test "multipart/form-data" the easy way (with subclasses)
+    @Path("seven")
+    @GET
+    @Produces("multipart/form-data")
+    public Response seven() {
+        // Exercise builder pattern with explicit content type
+        MultiPartBean bean = new MultiPartBean("myname", "myvalue");
+        return Response.ok(new FormDataMultiPart().
+                             field("foo", "bar").
+                             field("baz", "bop").
+                             field("bean", bean, new MediaType("x-application", "x-format"))).build();
+    }
+
+    @Path("eight")
+    @PUT
+    @Consumes("multipart/form-data")
+    @Produces("text/plain")
+    public Response eight(FormDataMultiPart multiPart) {
+        if (!(multiPart.getBodyParts().size() == 3)) {
+            return Response.ok("FAILED:  Number of body parts is " + multiPart.getBodyParts().size() + " instead of 3").build();
+        }
+        if (multiPart.getField("foo") == null) {
+            return Response.ok("FAILED:  Missing field 'foo'").build();
+        } else if (!"bar".equals(multiPart.getField("foo").getValue())) {
+            return Response.ok("FAILED:  Field 'foo' has value '" + multiPart.getField("foo").getValue() + "' instead of 'bar'").build();
+        }
+        if (multiPart.getField("baz") == null) {
+            return Response.ok("FAILED:  Missing field 'baz'").build();
+        } else if (!"bop".equals(multiPart.getField("baz").getValue())) {
+            return Response.ok("FAILED:  Field 'baz' has value '" + multiPart.getField("baz").getValue() + "' instead of 'bop'").build();
+        }
+        if (multiPart.getField("bean") == null) {
+            return Response.ok("FAILED:  Missing field 'bean'").build();
+        }
+        MultiPartBean bean = multiPart.getField("bean").getValueAs(MultiPartBean.class);
+        if (!bean.getName().equals("myname")) {
+            return Response.ok("FAILED:  Second part name = " + bean.getName()).build();
+        }
+        if (!bean.getValue().equals("myvalue")) {
+            return Response.ok("FAILED:  Second part value = " + bean.getValue()).build();
+        }
+        multiPart.cleanup();
+        return Response.ok("SUCCESS:  All tests passed").build();
     }
 
 }

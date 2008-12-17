@@ -52,33 +52,43 @@ public class MultiPartTest extends TestCase {
     @Override
     protected void setUp() throws Exception {
         super.setUp();
+        multiPart = new MultiPart();
     }
 
     @Override
     protected void tearDown() throws Exception {
+        multiPart = null;
         super.tearDown();
     }
 
-    // TODO add test methods here. The name must begin with 'test'. For example:
-    // public void testHello() {}
+    protected MultiPart multiPart = null;
 
     @SuppressWarnings("empty-statement")
     public void testCreate() {
-        MultiPart multiPart = new MultiPart();
-        assertEquals("multipart/mixed", multiPart.getMediaType().toString());
-        multiPart.setMediaType(new MediaType("multipart", "alternative"));
-        assertEquals("multipart/alternative", multiPart.getMediaType().toString());
-        try {
-            multiPart.setMediaType(new MediaType("text", "xml"));
-            fail("Should have thrown IllegalArgumentException");
-        } catch (IllegalArgumentException e) {
-            ; // Expected result
+        if (multiPart instanceof FormDataMultiPart) {
+            assertEquals("multipart/form-data", multiPart.getMediaType().toString());
+            try {
+                multiPart.setMediaType(new MediaType("multipart", "foo"));
+                fail("Should have thrown IllegalArgumentException");
+            } catch (IllegalArgumentException e) {
+                // Expected result
+            }
+            multiPart.setMediaType(MediaType.MULTIPART_FORM_DATA_TYPE);
+        } else {
+            assertEquals("multipart/mixed", multiPart.getMediaType().toString());
+            multiPart.setMediaType(new MediaType("multipart", "alternative"));
+            assertEquals("multipart/alternative", multiPart.getMediaType().toString());
+            try {
+                multiPart.setMediaType(new MediaType("text", "xml"));
+                fail("Should have thrown IllegalArgumentException");
+            } catch (IllegalArgumentException e) {
+                ; // Expected result
+            }
         }
     }
 
     @SuppressWarnings("empty-statement")
     public void testEntity() {
-        MultiPart multiPart = new MultiPart();
         try {
             multiPart.setEntity("foo bar baz");
             fail("Should have thrown IllegalStateException");

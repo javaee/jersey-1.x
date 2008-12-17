@@ -37,8 +37,11 @@
 
 package com.sun.jersey.multipart.impl;
 
+import com.sun.jersey.core.header.FormDataContentDisposition;
 import com.sun.jersey.multipart.BodyPart;
 import com.sun.jersey.multipart.BodyPartEntity;
+import com.sun.jersey.multipart.FormDataBodyPart;
+import com.sun.jersey.multipart.FormDataMultiPart;
 import com.sun.jersey.multipart.MultiPart;
 import com.sun.jersey.multipart.MultiPartConfig;
 import java.io.IOException;
@@ -46,6 +49,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
+import java.text.ParseException;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.Map;
@@ -113,6 +117,8 @@ public class MultiPartReader implements MessageBodyReader<MultiPart> {
      * @throws java.io.IOException if an I/O error occurs
      * @throws javax.ws.rs.WebApplicationException if an HTTP error response
      *  needs to be produced (only effective if the response is not committed yet)
+     * @throws javax.ws.rs.WebApplicationException if the Content-Disposition
+     *  header of a <code>multipart/form-data</code> body part cannot be parsed
      */
     public MultiPart readFrom(Class<MultiPart> type, Type genericType,
                               Annotation[] annotations, MediaType mediaType,
@@ -128,7 +134,14 @@ public class MultiPartReader implements MessageBodyReader<MultiPart> {
         }
 
         // Transliterate the entire MimeMultipart into our own {@link MultiPart} instance
-        MultiPart multiPart = new MultiPart();
+        boolean formData = false;
+        MultiPart multiPart = null;
+        if ("multipart".equals(mediaType.getType()) && "form-data".equals(mediaType.getSubtype())) {
+            multiPart = new FormDataMultiPart();
+            formData = true;
+        } else {
+            multiPart = new MultiPart();
+        }
         multiPart.setProviders(providers);
         MultivaluedMap<String,String> mpHeaders = multiPart.getHeaders();
         for (Map.Entry<String,List<String>> entry : headers.entrySet()) {
@@ -144,7 +157,12 @@ public class MultiPartReader implements MessageBodyReader<MultiPart> {
             int count = mm.getCount();
             for (int i = 0; i < count; i++) {
                 javax.mail.BodyPart bp = mm.getBodyPart(i);
-                BodyPart bodyPart = new BodyPart();
+                BodyPart bodyPart = null;
+                if (formData) {
+                    bodyPart = new FormDataBodyPart();
+                } else {
+                    bodyPart = new BodyPart();
+                }
                 // Configure providers
                 bodyPart.setProviders(providers);
                 // Copy headers
@@ -152,6 +170,14 @@ public class MultiPartReader implements MessageBodyReader<MultiPart> {
                 while (bpHeaders.hasMoreElements()) {
                     javax.mail.Header bpHeader = (javax.mail.Header) bpHeaders.nextElement();
                     bodyPart.getHeaders().add(bpHeader.getName(), bpHeader.getValue());
+                    if (formData && "Content-Disposition".equalsIgnoreCase(bpHeader.getName())) {
+                        try {
+                            FormDataContentDisposition header = new FormDataContentDisposition(bpHeader.getValue());
+                            ((FormDataBodyPart) bodyPart).setName(header.getName());
+                        } catch (ParseException e) {
+                            throw new WebApplicationException(e);
+                        }
+                    }
                 }
                 MediaType bpMediaType = MediaType.valueOf(bp.getContentType());
                 bodyPart.setMediaType(bpMediaType);

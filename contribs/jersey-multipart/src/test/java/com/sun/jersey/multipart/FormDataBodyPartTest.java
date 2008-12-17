@@ -1,9 +1,9 @@
 /*
  *
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
- * 
+ *
  * Copyright 1997-2007 Sun Microsystems, Inc. All rights reserved.
- * 
+ *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
  * and Distribution License("CDDL") (collectively, the "License").  You
@@ -11,7 +11,7 @@
  * a copy of the License at https://jersey.dev.java.net/CDDL+GPL.html
  * or jersey/legal/LICENSE.txt.  See the License for the specific
  * language governing permissions and limitations under the License.
- * 
+ *
  * When distributing the software, include this License Header Notice in each
  * file and include the License file at jersey/legal/LICENSE.txt.
  * Sun designates this particular file as subject to the "Classpath" exception
@@ -20,9 +20,9 @@
  * Header, with the fields enclosed by brackets [] replaced by your own
  * identifying information: "Portions Copyrighted [year]
  * [name of copyright owner]"
- * 
+ *
  * Contributor(s):
- * 
+ *
  * If you wish your version of this file to be governed by only the CDDL or
  * only the GPL Version 2, indicate your decision by adding "[Contributor]
  * elects to include this software in this distribution under the [CDDL or GPL
@@ -46,16 +46,16 @@ import junit.framework.TestCase;
 /**
  * <p>Test case for {@link BodyPart}.</p>
  */
-public class BodyPartTest extends TestCase {
-    
-    public BodyPartTest(String testName) {
+public class FormDataBodyPartTest extends BodyPartTest {
+
+    public FormDataBodyPartTest(String testName) {
         super(testName);
     }
 
     @Override
     protected void setUp() throws Exception {
         super.setUp();
-        bodyPart = new BodyPart();
+        bodyPart = new FormDataBodyPart();
     }
 
     @Override
@@ -64,32 +64,45 @@ public class BodyPartTest extends TestCase {
         super.tearDown();
     }
 
-    protected BodyPart bodyPart = null;
+    public void testCreateFDBP() {
 
-    public void testCreate() {
-        assertEquals("text/plain", bodyPart.getMediaType().toString());
-        bodyPart.setMediaType(new MediaType("application", "json"));
-        assertEquals("application/json", bodyPart.getMediaType().toString());
+        FormDataBodyPart fdbp = (FormDataBodyPart) bodyPart;
+        assertNull(fdbp.getName());
+        assertNull(fdbp.getValue());
+        assertTrue(fdbp.isSimple());
+        assertNull(fdbp.getHeaders().get("Content-Disposition"));
+
+        fdbp = new FormDataBodyPart("<foo>bar</foo>", MediaType.APPLICATION_XML_TYPE);
+        assertNull(fdbp.getName());
+        try {
+            fdbp.getValue();
+            fail("Should have thrown IllegalStateException");
+        } catch (IllegalStateException e) {
+            // Expected result
+        }
+        assertEquals("<foo>bar</foo>", fdbp.getEntity());
+        assertTrue(!fdbp.isSimple());
+        assertNull(fdbp.getHeaders().get("Content-Disposition"));
+
+        fdbp = new FormDataBodyPart("name", "value");
+        assertEquals("name", fdbp.getName());
+        assertEquals("value", fdbp.getValue());
+        assertTrue(fdbp.isSimple());
+        assertNotNull(fdbp.getHeaders().get("Content-Disposition"));
+
+        fdbp = new FormDataBodyPart("name", "<foo>bar</foo>", MediaType.APPLICATION_XML_TYPE);
+        assertEquals("name", fdbp.getName());
+        try {
+            fdbp.getValue();
+            fail("Should have thrown IllegalStateException");
+        } catch (IllegalStateException e) {
+            // Expected result
+        }
+        assertEquals("<foo>bar</foo>", fdbp.getEntity());
+        assertTrue(!fdbp.isSimple());
+        assertNotNull(fdbp.getHeaders().get("Content-Disposition"));
+
     }
 
-    public void testEntity() {
-        bodyPart.setEntity("foo bar baz");
-        assertEquals("foo bar baz", bodyPart.getEntity());
-    }
-
-    public void testHeaders() {
-        MultivaluedMap<String,String> headers = bodyPart.getHeaders();
-        assertNotNull(headers);
-        assertNull(headers.get(HttpHeaders.ACCEPT));
-        headers.add(HttpHeaders.ACCEPT, "application/xml");
-        assertEquals("application/xml", headers.getFirst(HttpHeaders.ACCEPT));
-        headers.add(HttpHeaders.ACCEPT, "application/json");
-        assertEquals("application/xml", headers.getFirst(HttpHeaders.ACCEPT));
-        List values = headers.get(HttpHeaders.ACCEPT);
-        assertTrue(values.contains("application/xml"));
-        assertTrue(values.contains("application/json"));
-        assertNotNull(headers.get("accept"));
-        assertNotNull(headers.get("ACCEPT"));
-    }
 
 }
