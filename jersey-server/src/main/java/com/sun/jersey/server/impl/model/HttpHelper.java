@@ -43,11 +43,14 @@ import com.sun.jersey.impl.ImplMessages;
 import com.sun.jersey.core.header.AcceptableLanguageTag;
 import com.sun.jersey.core.header.AcceptableMediaType;
 import com.sun.jersey.core.header.AcceptableToken;
+import com.sun.jersey.core.header.LanguageTag;
 import com.sun.jersey.core.header.reader.HttpHeaderReader;
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 
 /**
@@ -95,7 +98,30 @@ public final class HttpHelper {
         else 
             return MediaType.valueOf(contentType.toString());
     }
-    
+
+    /**
+     * Get the content language as a Locale instance.
+     *
+     * @param request The HTTP request.
+     * @return the content lanuage as a locale instance.
+     */
+    public static Locale getContentLanguageAsLocale(HttpRequestContext request) {
+        return HttpHelper.getLanguageTagAsLocale(request.getRequestHeaders().
+                getFirst(HttpHeaders.CONTENT_LANGUAGE));
+    }
+
+
+    public static Locale getLanguageTagAsLocale(String language) {
+        if (language == null)
+            return null;
+
+        try {
+            return new LanguageTag(language).getAsLocale();
+        } catch (java.text.ParseException e) {
+            throw clientError("Bad Content-Language field: " + language, e);
+        }
+    }
+
     /**
      * Get the list of Media type from the "Accept" of an HTTP request.
      * <p>

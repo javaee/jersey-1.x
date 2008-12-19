@@ -45,6 +45,7 @@ import com.sun.jersey.api.uri.UriComponent;
 import com.sun.jersey.core.util.MultivaluedMapImpl;
 import com.sun.jersey.server.impl.VariantSelector;
 import com.sun.jersey.core.header.AcceptableLanguageTag;
+import com.sun.jersey.core.header.LanguageTag;
 import com.sun.jersey.core.header.reader.HttpHeaderReader;
 import com.sun.jersey.server.impl.model.HttpHelper;
 import com.sun.jersey.spi.MessageBodyWorkers;
@@ -454,11 +455,7 @@ public class ContainerRequest implements HttpRequestContext {
     }
     
     public Locale getLanguage() {
-        final String localeString = this.getRequestHeaders().
-                getFirst(HttpHeaders.CONTENT_LANGUAGE);
-        if (localeString == null)
-            return null;
-        return new Locale(localeString);
+        return HttpHelper.getContentLanguageAsLocale(this);
     }
     
     public Map<String, Cookie> getCookies() {
