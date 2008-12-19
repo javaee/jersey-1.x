@@ -39,10 +39,10 @@
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    <groupId>com.sun.jersey.glassfish.v3</groupId>
+    <groupId>com.sun.jersey.glassfish.v2.internal</groupId>
     <version>1.0.2-SNAPSHOT</version>
-    <artifactId>jersey-gfv3-package</artifactId>
-    <name>Jersey GFv3 UC Module Image</name>
+    <artifactId>module_jersey</artifactId>
+    <name>Jersey GFv2 UC Module Internal ZIP Archive</name>
     <packaging>pom</packaging>
     <dependencies>
         <dependency>
@@ -54,6 +54,16 @@
             <groupId>com.sun.jersey</groupId>
             <artifactId>jersey-bundle</artifactId>
             <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.codehaus.jettison</groupId>
+            <artifactId>jettison</artifactId>
+            <version>1.0.1</version>
+        </dependency>
+         <dependency>
+            <groupId>asm</groupId>
+            <artifactId>asm</artifactId>
+            <version>3.1</version>
         </dependency>
     </dependencies>
     <build>
@@ -161,7 +171,7 @@
                             <goal>copy</goal>
                         </goals>
                         <configuration>
-                          <stripVersion>true</stripVersion>
+                          <stripVersion>false</stripVersion>
                           <artifactItems>
                                <artifactItem>
                                     <groupId>javax.ws.rs</groupId>
@@ -179,6 +189,22 @@
                                     <overWrite>false</overWrite>
                                     <outputDirectory>${aux.directory}</outputDirectory>
                                 </artifactItem>
+                                 <artifactItem>
+                                    <groupId>org.codehaus.jettison</groupId>
+                                    <artifactId>jettison</artifactId>
+                                    <version>1.0.1</version>
+                                    <type>jar</type>
+                                    <overWrite>false</overWrite>
+                                    <outputDirectory>${aux.directory}</outputDirectory>
+                                </artifactItem>
+                                 <artifactItem>
+                                    <groupId>asm</groupId>
+                                    <artifactId>asm</artifactId>
+                                    <version>3.1</version>
+                                    <type>jar</type>
+                                    <overWrite>false</overWrite>
+                                    <outputDirectory>${aux.directory}</outputDirectory>
+                                </artifactItem>
                            </artifactItems>
                         </configuration>
                     </execution>
@@ -188,7 +214,7 @@
                 <artifactId>maven-assembly-plugin</artifactId>
                 <configuration>
                     <descriptors>
-                        <descriptor>src/main/assembly/ips.xml</descriptor>
+                        <descriptor>src/main/assembly/internal.xml</descriptor>
                     </descriptors>
                 </configuration>
                 <executions>

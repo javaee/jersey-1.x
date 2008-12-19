@@ -1,0 +1,21 @@
+<assembly>
+  <formats>
+    <format>zip</format>
+  </formats>
+  <fileSets>
+    <fileSet>
+      <directory>src/main/resources</directory>
+      <includes>
+          <include>*.html</include>
+      </includes>
+      <outputDirectory></outputDirectory>
+    </fileSet>
+    <fileSet>
+      <directory>target</directory>
+      <includes>
+          <include>*.nbm</include>
+      </includes>
+      <outputDirectory></outputDirectory>
+    </fileSet>
+   </fileSets>
+</assembly>
