@@ -41,6 +41,8 @@ import com.sun.jersey.multipart.BodyPart;
 import com.sun.jersey.multipart.FormDataMultiPart;
 import com.sun.jersey.multipart.MultiPart;
 import javax.ws.rs.Consumes;
+import javax.ws.rs.DefaultValue;
+import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
@@ -204,6 +206,35 @@ public class MultiPartResource {
             return Response.ok("FAILED:  Second part value = " + bean.getValue()).build();
         }
         multiPart.cleanup();
+        return Response.ok("SUCCESS:  All tests passed").build();
+    }
+
+    @Path("nine")
+    @PUT
+    @Consumes("multipart/x-form-data") // FIXME - for testing @FormParam only
+    @Produces("text/plain")
+    public Response nine(
+            @FormParam("foo") String foo,
+            @FormParam("baz") String baz,
+            @FormParam("unknown1") String unknown1,
+            @FormParam("unknown2") @DefaultValue("UNKNOWN") String unknown2,
+            FormDataMultiPart fdmp) {
+
+        if (!"bar".equals(foo)) {
+            return Response.ok("FAILED:  Value of 'foo' is '" + foo + "' instead of 'bar'").build();
+        } else if (!"bop".equals(baz)) {
+            return Response.ok("FAILED:  Value of 'baz' is '" + baz + "' instead of 'bop'").build();
+        } else if (unknown1 != null) {
+            return Response.ok("FAILED:  Value of 'unknown1' is '" + unknown1 + "' instead of NULL").build();
+        } else if (!"UNKNOWN".equals(unknown2)) {
+            return Response.ok("FAILED:  Value of 'unknown2' is '" + unknown2 + "' instead of 'UNKNOWN'").build();
+        } else if (fdmp == null) {
+            return Response.ok("FAILED:  Value of fdmp is NULL").build();
+        } else if (fdmp.getFields().size() != 3) {
+            fdmp.cleanup();
+            return Response.ok("FAILED:  Value of fdmp.getFields().size() is " + fdmp.getFields().size() + " instead of 3").build();
+        }
+        fdmp.cleanup();
         return Response.ok("SUCCESS:  All tests passed").build();
     }
 

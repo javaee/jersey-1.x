@@ -318,6 +318,25 @@ public class MultiPartReaderWriterTest extends TestCase {
         }
     }
 
+    public void testNine() {
+        WebResource.Builder builder = client.resource(BASE_URI)
+                .path("multipart/nine").accept("text/plain").type("multipart/x-form-data"); // FIXME - testing @FormParam
+        try {
+            MultiPartBean bean = new MultiPartBean("myname", "myvalue");
+            FormDataMultiPart entity = new FormDataMultiPart().
+                field("foo", "bar").
+                field("baz", "bop").
+                field("bean", bean, new MediaType("x-application", "x-format"));
+            String response = builder.put(String.class, entity);
+            if (!response.startsWith("SUCCESS:")) {
+                fail("Response is '" + response + "'");
+            }
+        } catch (UniformInterfaceException e) {
+            report(e);
+            fail("Caught exception: " + e);
+        }
+    }
+
     /*
     public void testListen() throws Exception {
         System.out.println("Running for 30 seconds");

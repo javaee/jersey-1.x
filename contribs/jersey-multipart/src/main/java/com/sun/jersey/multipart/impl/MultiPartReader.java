@@ -139,6 +139,9 @@ public class MultiPartReader implements MessageBodyReader<MultiPart> {
         if ("multipart".equals(mediaType.getType()) && "form-data".equals(mediaType.getSubtype())) {
             multiPart = new FormDataMultiPart();
             formData = true;
+        } else if ("multipart".equals(mediaType.getType()) && "x-form-data".equals(mediaType.getSubtype())) { // FIXME - testing @FormParam
+            multiPart = new FormDataMultiPart();                                                              // FIXME - testing @FormParam
+            formData = true;                                                                                  // FIXME - testing @FormParam
         } else {
             multiPart = new MultiPart();
         }
@@ -150,7 +153,9 @@ public class MultiPartReader implements MessageBodyReader<MultiPart> {
                 mpHeaders.add(entry.getKey(), value);
             }
         }
-        multiPart.setMediaType(mediaType);
+        if (!formData) {
+            multiPart.setMediaType(mediaType);
+        }
 
         // Transliterate each body part as well
         try {
