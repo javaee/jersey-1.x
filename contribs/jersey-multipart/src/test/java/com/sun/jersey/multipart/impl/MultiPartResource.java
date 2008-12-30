@@ -38,8 +38,12 @@
 package com.sun.jersey.multipart.impl;
 
 import com.sun.jersey.multipart.BodyPart;
+import com.sun.jersey.multipart.BodyPartEntity;
 import com.sun.jersey.multipart.FormDataMultiPart;
 import com.sun.jersey.multipart.MultiPart;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.FormParam;
@@ -235,6 +239,37 @@ public class MultiPartResource {
             return Response.ok("FAILED:  Value of fdmp.getFields().size() is " + fdmp.getFields().size() + " instead of 3").build();
         }
         fdmp.cleanup();
+        return Response.ok("SUCCESS:  All tests passed").build();
+    }
+
+    @Path("ten")
+    @PUT
+    @Consumes("multipart/mixed")
+    @Produces("text/plain")
+    public Response ten(MultiPart mp) {
+        if (!(mp.getBodyParts().size() == 2)) {
+            return Response.ok("FAILED:  Body part count is " + mp.getBodyParts().size() + " instead of 2").build();
+        } else if (!(mp.getBodyParts().get(1).getEntity() instanceof BodyPartEntity)) {
+            return Response.ok("FAILED:  Second body part is " + mp.getBodyParts().get(1).getClass().getName() + " instead of BodyPartEntity").build();
+        }
+        BodyPartEntity bpe = (BodyPartEntity) mp.getBodyParts().get(1).getEntity();
+        try {
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            InputStream stream = bpe.getInputStream();
+            byte[] buffer = new byte[2048];
+            while (true) {
+                int n = stream.read(buffer);
+                if (n < 0) {
+                    break;
+                }
+                baos.write(buffer, 0, n);
+            }
+            if (baos.toByteArray().length > 0) {
+                return Response.ok("FAILED:  Second body part had " + baos.toByteArray().length + " bytes instead of 0").build();
+            }
+        } catch (IOException e) {
+            return Response.ok("FAILED:  Threw IOException").build();
+        }
         return Response.ok("SUCCESS:  All tests passed").build();
     }
 

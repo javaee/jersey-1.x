@@ -100,7 +100,9 @@ public class BodyPartEntity {
         // Absorb the bytes from the request or response
         byte buffer[] = new byte[threshold];
         int n = stream.read(buffer);
-        if (n < threshold) {
+        if (n < 0) { // Zero length entity
+            data = new byte[0];
+        } else if (n < threshold) {
             data = new byte[n];
             System.arraycopy(buffer, 0, data, 0, n);
         } else {

@@ -337,6 +337,25 @@ public class MultiPartReaderWriterTest extends TestCase {
         }
     }
 
+    // Zero length body part
+    public void testTen() {
+        WebResource.Builder builder = client.resource(BASE_URI)
+                .path("multipart/ten").accept("text/plain").type("multipart/mixed");
+        try {
+            MultiPartBean bean = new MultiPartBean("myname", "myvalue");
+            MultiPart entity = new MultiPart().
+                    bodyPart(bean, new MediaType("x-application", "x-format")).
+                    bodyPart("", MediaType.APPLICATION_OCTET_STREAM_TYPE);
+            String response = builder.put(String.class, entity);
+            if (!response.startsWith("SUCCESS:")) {
+                fail("Response is '" + response + "'");
+            }
+        } catch (UniformInterfaceException e) {
+            report(e);
+            fail("Caught exception: " + e);
+        }
+    }
+
     /*
     public void testListen() throws Exception {
         System.out.println("Running for 30 seconds");
