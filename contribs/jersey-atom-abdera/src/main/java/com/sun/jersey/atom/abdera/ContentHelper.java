@@ -42,7 +42,6 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.lang.annotation.Annotation;
-import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.ext.MessageBodyReader;
@@ -69,14 +68,6 @@ public class ContentHelper {
 
 
     // ------------------------------------------------------------ Constructors
-
-
-    /**
-     * <p>Provide an instance of this helper that still needs
-     * the <code>providers</code> field to be injected.</p>
-     */
-    public ContentHelper() {
-    }
 
 
     /**
@@ -114,7 +105,6 @@ public class ContentHelper {
      * <p>The injected helper to look up appropriate <code>Provider</code>
      * instances.</p>
      */
-    @Context
     private Providers providers;
 
 

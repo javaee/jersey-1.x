@@ -37,10 +37,14 @@
 
 package com.sun.jersey.atom.abdera.impl.provider.entity;
 
+import com.sun.jersey.atom.abdera.ContentHelper;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import org.apache.abdera.model.Entry;
 
 /**
  * <p>Server side resource class for the unit test suite.</p>
@@ -48,11 +52,24 @@ import javax.ws.rs.core.Response;
 @Path("/test")
 public class TestingResource {
 
+    @Context
+    ContentHelper contentHelper;
+
     @GET
     @Path("categories")
     @Produces({"application/atomcat+xml", "application/xml", "text/xml", "application/atomcat+json", "application/json"})
     public Response getCategories() {
         return Response.ok(TestingFactory.createCategories()).build();
+    }
+
+    @GET
+    @Path("content")
+    @Produces("application/xml")
+    public Response getContent() {
+        Entry entry = TestingFactory.createEntry();
+        ContentBean bean = new ContentBean("foo value", "bar value");
+        contentHelper.setContentEntity(entry, MediaType.APPLICATION_XML_TYPE, bean);
+        return Response.ok(entry).build();
     }
 
     @GET

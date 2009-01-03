@@ -43,9 +43,11 @@ import com.sun.jersey.api.client.WebResource;
 import com.sun.jersey.api.client.config.ClientConfig;
 import com.sun.jersey.api.client.config.DefaultClientConfig;
 import com.sun.jersey.api.container.grizzly.GrizzlyWebContainerFactory;
+import com.sun.jersey.atom.abdera.ContentHelper;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import javax.ws.rs.core.MediaType;
 import junit.framework.TestCase;
 import org.apache.abdera.i18n.iri.IRI;
 import org.apache.abdera.model.Categories;
@@ -82,10 +84,12 @@ public class ProvidersTest extends TestCase {
         ClientConfig config = new DefaultClientConfig();
 //        config.getClasses().add(MultiPartBeanProvider.class);
         client = Client.create(config);
+        providers = new ContentBeanProviders();
     }
 
     @Override
     protected void tearDown() throws Exception {
+        providers = null;
         client = null;
         System.out.println("Stopping grizzly ...");
         if (selectorThread.isRunning()) {
@@ -95,8 +99,9 @@ public class ProvidersTest extends TestCase {
         super.tearDown();
     }
 
-    Client client = null;
-    SelectorThread selectorThread = null;
+    private Client client = null;
+    private ContentBeanProviders providers = null;
+    private SelectorThread selectorThread = null;
 
     private static final String BASE_URI = "http://localhost:9997/";
     private static final String[] CATEGORIES_MEDIA_TYPES_JSON = {
@@ -168,6 +173,18 @@ public class ProvidersTest extends TestCase {
 //            System.out.println(mediaType + "=" + result);
             assertTrue("Categories for media type " + mediaType + " is XML", result.startsWith("<"));
         }
+    }
+
+    public void testGetContent() {
+        WebResource.Builder builder = client.resource(BASE_URI)
+                .path("test").path("content").accept(MediaType.APPLICATION_XML_TYPE);
+        Entry actual = builder.get(Entry.class);
+        assertNotNull(actual);
+        ContentHelper helper = new ContentHelper(providers);
+        ContentBean bean = helper.getContentEntity(actual, MediaType.APPLICATION_XML_TYPE, ContentBean.class);
+        assertNotNull(bean);
+        assertEquals("foo value", bean.getFoo());
+        assertEquals("bar value", bean.getBar());
     }
 
     public void testGetEntryEntity() {

@@ -2,7 +2,7 @@
  *
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 1997-2009 Sun Microsystems, Inc. All rights reserved.
+ * Copyright 1997-2007 Sun Microsystems, Inc. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -35,40 +35,49 @@
  * holder.
  */
 
-package com.sun.jersey.atom.abdera.impl.provider.injectable;
+package com.sun.jersey.atom.abdera.impl.provider.entity;
 
-import com.sun.jersey.atom.abdera.ContentHelper;
-import com.sun.jersey.core.spi.component.ComponentContext;
-import com.sun.jersey.core.spi.component.ComponentScope;
-import com.sun.jersey.spi.inject.Injectable;
-import com.sun.jersey.spi.inject.InjectableProvider;
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
-import javax.ws.rs.core.Context;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.ext.ContextResolver;
+import javax.ws.rs.ext.ExceptionMapper;
+import javax.ws.rs.ext.MessageBodyReader;
+import javax.ws.rs.ext.MessageBodyWriter;
 import javax.ws.rs.ext.Providers;
 
-/**
- * <p>Jersey-specific injectable provider that supplies a configured instance
- * of {@link ContentHelper} for this application.</p>
- */
-public class ContentHelperProvider implements InjectableProvider<Context, Type> {
+public class ContentBeanProviders implements Providers {
 
-    @Context
-    Providers providers;
+    ContentBeanProvider provider = new ContentBeanProvider();
 
-    public ComponentScope getScope() {
-        return ComponentScope.Singleton;
-    }
-
-    public Injectable getInjectable(ComponentContext ic, Context a, Type t) {
-        if (ContentHelper.class != t) {
+    public <T> MessageBodyReader<T> getMessageBodyReader(Class<T> clazz,
+            Type type, Annotation[] annotations, MediaType mediaType) {
+        if ((clazz == ContentBean.class) &&
+                mediaType.equals(MediaType.APPLICATION_XML_TYPE)) {
+            return (MessageBodyReader<T>) provider;
+        } else {
             return null;
         }
-        final ContentHelper contentHelper = new ContentHelper(providers);
-        return new Injectable<ContentHelper>() {
-            public ContentHelper getValue() {
-                return contentHelper;
-            }
-        };
+    }
+
+    public <T> MessageBodyWriter<T> getMessageBodyWriter(Class<T> clazz,
+            Type type, Annotation[] annotations, MediaType mediaType) {
+        if ((clazz == ContentBean.class) &&
+                mediaType.equals(MediaType.APPLICATION_XML_TYPE)) {
+            return (MessageBodyWriter<T>) provider;
+        } else {
+            return null;
+        }
+    }
+
+    public <T extends Throwable> ExceptionMapper<T> getExceptionMapper(Class<T> clazz) {
+        return null;
+    }
+
+    public <T> ContextResolver<T> getContextResolver(Class<T> clazz,
+            MediaType type) {
+        return null;
     }
 
 }
+

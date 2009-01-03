@@ -2,7 +2,7 @@
  *
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 1997-2009 Sun Microsystems, Inc. All rights reserved.
+ * Copyright 1997-2007 Sun Microsystems, Inc. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -35,40 +35,23 @@
  * holder.
  */
 
-package com.sun.jersey.atom.abdera.impl.provider.injectable;
+package com.sun.jersey.atom.abdera.impl.provider.entity;
 
-import com.sun.jersey.atom.abdera.ContentHelper;
-import com.sun.jersey.core.spi.component.ComponentContext;
-import com.sun.jersey.core.spi.component.ComponentScope;
-import com.sun.jersey.spi.inject.Injectable;
-import com.sun.jersey.spi.inject.InjectableProvider;
-import java.lang.reflect.Type;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.ext.Providers;
+public class ContentBean {
 
-/**
- * <p>Jersey-specific injectable provider that supplies a configured instance
- * of {@link ContentHelper} for this application.</p>
- */
-public class ContentHelperProvider implements InjectableProvider<Context, Type> {
+    public ContentBean() {}
 
-    @Context
-    Providers providers;
-
-    public ComponentScope getScope() {
-        return ComponentScope.Singleton;
+    public ContentBean(String foo, String bar) {
+        this.foo = foo;
+        this.bar = bar;
     }
 
-    public Injectable getInjectable(ComponentContext ic, Context a, Type t) {
-        if (ContentHelper.class != t) {
-            return null;
-        }
-        final ContentHelper contentHelper = new ContentHelper(providers);
-        return new Injectable<ContentHelper>() {
-            public ContentHelper getValue() {
-                return contentHelper;
-            }
-        };
-    }
+    private String foo = null;
+    private String bar = null;
+
+    public String getBar() { return this.bar; }
+    public void setBar(String bar) { this.bar = bar; }
+    public String getFoo() { return this.foo; }
+    public void setFoo(String foo) { this.foo = foo; }
 
 }
