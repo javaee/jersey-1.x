@@ -120,6 +120,9 @@ public class ContentHelper {
      *
      * @param entry <code>Entry</code> whose content element is to be processed
      * @param clazz <code>Class</code> of the object to be returned
+     *
+     * @exception IllegalArgumentException if the specified entry does not
+     *  contain a valid content element
      */
     public <T> T getContentEntity(Entry entry, Class<T> clazz) {
         String[] parts = entry.getContentMimeType().toString().split("/");
@@ -138,6 +141,9 @@ public class ContentHelper {
      * @param mediaType <code>MediaType</code> to use when selecting an
      *  appropriate provider
      * @param clazz <code>Class</code> of the object to be returned
+     *
+     * @exception IllegalArgumentException if the specified entry does not
+     *  contain a valid content element
      */
     public <T> T getContentEntity(Entry entry, MediaType mediaType, Class<T> clazz) {
 
@@ -151,6 +157,9 @@ public class ContentHelper {
         }
 
         // Extract the content element as an XML byte stream
+        if ((entry.getContentElement() == null) || (entry.getContentElement().getValueElement() == null)) {
+            throw new IllegalArgumentException("Entry does not contain a valid content element");
+        }
         Element element = entry.getContentElement().getValueElement();
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         try {
