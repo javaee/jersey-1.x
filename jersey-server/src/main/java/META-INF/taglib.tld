@@ -3,7 +3,7 @@
 <taglib>
   <tlibversion>1.0</tlibversion>
   <jspversion>1.1</jspversion>
-  <shortname>xxx</shortname>
+  <shortname>jerseyview</shortname>
   <uri>urn:com:sun:jersey:api:view</uri>
   <info>
     The tag library contains tags that takes advantage of

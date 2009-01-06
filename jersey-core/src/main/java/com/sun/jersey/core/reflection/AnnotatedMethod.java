@@ -53,6 +53,7 @@ import javax.ws.rs.Encoded;
 import javax.ws.rs.FormParam;
 import javax.ws.rs.HeaderParam;
 import javax.ws.rs.HttpMethod;
+import javax.ws.rs.MatrixParam;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
@@ -81,7 +82,8 @@ public final class AnnotatedMethod implements AnnotatedElement {
             PARAMETER_ANNOTATIONS = getSet( 
         Context.class, 
         Encoded.class, 
-        DefaultValue.class, 
+        DefaultValue.class,
+        MatrixParam.class,
         QueryParam.class,
         CookieParam.class, 
         HeaderParam.class, 

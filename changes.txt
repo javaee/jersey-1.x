@@ -1,4 +1,7 @@
 release 1.0.2 (2009-01/02)
+- Fixed issue 176
+  https://jersey.dev.java.net/issues/show_bug.cgi?id=176
+  @MatrixParam not carried over for inherited annotations.
 - Fixed issue 148
   https://jersey.dev.java.net/issues/show_bug.cgi?id=148
   Inccorect @Path matching for sub-resource methods sharing common path 
