@@ -37,6 +37,7 @@
 
 package com.sun.jersey.core.spi.component;
 
+import com.sun.jersey.core.reflection.ReflectionHelper;
 import com.sun.jersey.core.spi.factory.InjectableProviderFactory;
 import com.sun.jersey.spi.service.ServiceFinder;
 import java.util.LinkedHashSet;
@@ -129,7 +130,7 @@ public class ProviderServices {
         List<T> ps = new LinkedList<T>();
         for (String className : classNames) {
             try {
-               Class<?> c = Class.forName(className, true, getClassLoader());
+               Class<?> c = ReflectionHelper.classForNameWithException(className);
                if (provider.isAssignableFrom(c)) {
                    Object o = getComponent(c);
                    if (o != null)
@@ -152,13 +153,6 @@ public class ProviderServices {
         return ps;
     }
         
-    private ClassLoader getClassLoader() {
-        ClassLoader l = Thread.currentThread().getContextClassLoader();
-        if (l == null)
-            l = ClassLoader.getSystemClassLoader();
-        return l;
-    }
-    
     private Object getComponent(Class provider) {
         ComponentProvider cp = componentProviderFactory.getComponentProvider(provider);
         return (cp != null) ? cp.getInstance() : null;

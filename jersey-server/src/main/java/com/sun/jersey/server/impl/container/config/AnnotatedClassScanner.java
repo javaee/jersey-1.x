@@ -37,6 +37,7 @@
 
 package com.sun.jersey.server.impl.container.config;
 
+import com.sun.jersey.core.reflection.ReflectionHelper;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -86,7 +87,7 @@ public final class AnnotatedClassScanner {
      * @param annotations the set of annotations to match
      */
     public AnnotatedClassScanner(Class... annotations) {
-        this.classloader = Thread.currentThread().getContextClassLoader();
+        this.classloader = ReflectionHelper.getContextClassLoader();
         this.annotations = getAnnotationSet(annotations);
         this.classes = new HashSet<Class<?>>();
     }
@@ -319,11 +320,11 @@ public final class AnnotatedClassScanner {
     
     private Class getClassForName(String className) {
         try {
-            return classloader.loadClass(className);
+            return ReflectionHelper.classForNameWithException(className, classloader);
         } catch (ClassNotFoundException ex) {
-            String s = "A (root resource) class file of the class name, " + 
+            String s = "A class file of the class name, " + 
                     className + 
-                    "is identified but the class could not be loaded";
+                    "is identified but the class could not be found";
             LOGGER.severe(s);
             throw new RuntimeException(s, ex);
         }

@@ -62,14 +62,25 @@ public class ReflectionHelper {
      * Get the Class from the class name.
      * <p>
      * The context class loader will be utilized if accessible and non-null.
-     * Otherwise the the defining class loader of this class will
+     * Otherwise the defining class loader of this class will
      * be utilized.
      * 
      * @param name the class name.
      * @return the Class, otherwise null if the class cannot be found.
      */
     public static Class classForName(String name) {
-        ClassLoader cl = getContextClassLoader();
+        return classForName(name, getContextClassLoader());
+    }
+
+    /**
+     * Get the Class from the class name.
+     *
+     * @param name the class name.
+     * @param cl the class loader to use, if null then the defining class loader
+     * of this class will be utilized.
+     * @return the Class, otherwise null if the class cannot be found.
+     */
+    public static Class classForName(String name, ClassLoader cl) {
         if (cl != null) {
             try {
                 return Class.forName(name, false, cl);
@@ -95,8 +106,22 @@ public class ReflectionHelper {
      * @return the Class, otherwise null if the class cannot be found.
      * @throws ClassNotFoundException if the class cannot be found.
      */
-    public static Class classForNameWithException(String name) throws ClassNotFoundException {
-        ClassLoader cl = getContextClassLoader();
+    public static Class classForNameWithException(String name)
+            throws ClassNotFoundException {
+        return classForNameWithException(name, getContextClassLoader());
+    }
+
+    /**
+     * Get the Class from the class name.
+     *
+     * @param name the class name.
+     * @param cl the class loader to use, if null then the defining class loader
+     * of this class will be utilized.
+     * @return the Class, otherwise null if the class cannot be found.
+     * @throws ClassNotFoundException if the class cannot be found.
+     */
+    public static Class classForNameWithException(String name, ClassLoader cl)
+            throws ClassNotFoundException {
         if (cl != null) {
             try {
                 return Class.forName(name, false, cl);

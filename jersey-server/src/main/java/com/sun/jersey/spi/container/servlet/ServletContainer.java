@@ -44,6 +44,7 @@ import com.sun.jersey.api.core.ClasspathResourceConfig;
 import com.sun.jersey.api.core.PackagesResourceConfig;
 import com.sun.jersey.api.uri.UriComponent;
 import com.sun.jersey.core.header.InBoundHeaders;
+import com.sun.jersey.core.reflection.ReflectionHelper;
 import com.sun.jersey.core.spi.component.ioc.IoCComponentProviderFactory;
 import com.sun.jersey.server.impl.container.servlet.JSPTemplateProcessor;
 import com.sun.jersey.server.impl.container.servlet.ServletContainerRequest;
@@ -407,8 +408,8 @@ public class ServletContainer extends HttpServlet implements ContainerListener {
         }
 
         try {
-            Class resourceConfigClass = getClassLoader().
-                    loadClass(resourceConfigClassName);
+            Class resourceConfigClass = ReflectionHelper.
+                    classForNameWithException(resourceConfigClassName);
             
             if (resourceConfigClass == ClasspathResourceConfig.class) {
                 String[] paths = getPaths(servletConfig.getInitParameter(
@@ -456,11 +457,6 @@ public class ServletContainer extends HttpServlet implements ContainerListener {
         }
     }
 
-    private ClassLoader getClassLoader() {
-        ClassLoader classLoader = Thread.currentThread().getContextClassLoader();        
-        return (classLoader == null) ? getClass().getClassLoader() : classLoader;
-    }
-    
     private Map<String, Object> getInitParams(ServletConfig servletConfig) {
         Map<String, Object> props = new HashMap<String, Object>();
         Enumeration names = servletConfig.getInitParameterNames();

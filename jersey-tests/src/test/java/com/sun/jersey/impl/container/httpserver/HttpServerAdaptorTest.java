@@ -102,8 +102,8 @@ public class HttpServerAdaptorTest extends AbstractHttpServerTester {
         assertEquals("RESOURCE-ONE", r.post(String.class, "RESOURCE-ONE"));
     }
     
-    public void testPackageReference() {
-        startServer(this.getClass().getPackage().getName());
+    public void testResourceConfig() {
+        startServer(new WebResources());
         
         WebResource r = Client.create().resource(getUri().path("a").build());
         assertEquals("RESOURCE-TWO", r.post(String.class, "RESOURCE-TWO"));

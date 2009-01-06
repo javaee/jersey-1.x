@@ -195,7 +195,9 @@ public final class ContainerFactory {
      * @throws ContainerException if the resource configuration class could not
      *         be found and instantiated or there is an error creating the container.
      * @throws IllegalArgumentException if no container provider supports the type.
+     * @deprecated
      */
+    @Deprecated
     @SuppressWarnings("unchecked")
     public static <A> A createContainer(Class<A> type, String packageName)
     throws ContainerException, IllegalArgumentException {

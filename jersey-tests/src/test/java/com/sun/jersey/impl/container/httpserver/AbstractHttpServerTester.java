@@ -73,10 +73,6 @@ public abstract class AbstractHttpServerTester extends TestCase {
         start(ContainerFactory.createContainer(HttpHandler.class, config));
     }
 
-    public void startServer(String packageName) {
-        start(ContainerFactory.createContainer(HttpHandler.class, packageName));
-    }
-
     public void start(HttpHandler handler) {
         if (server != null) {
             stopServer();

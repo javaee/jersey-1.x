@@ -1,4 +1,9 @@
 release 1.0.2 (2009-01/02)
+- Fixed issues 153, 178
+  https://jersey.dev.java.net/issues/show_bug.cgi?id=153
+  https://jersey.dev.java.net/issues/show_bug.cgi?id=178
+  Use consistent class loading strategy conforming to best practice for
+  EE and OSGi friendly.
 - Fixed issue 176
   https://jersey.dev.java.net/issues/show_bug.cgi?id=176
   @MatrixParam not carried over for inherited annotations.
