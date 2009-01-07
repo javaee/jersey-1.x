@@ -64,9 +64,13 @@ public abstract class ClientResponse {
             RuntimeDelegate.getInstance().createHeaderDelegate(Date.class);
         
     /**
-     * Get a list of response properties.
+     * Get the map of response properties.
+     * <p>
+     * A response property is an application-defined property that may be
+     * added by the user, a filter, or the handler that is managing the
+     * connection.
      * 
-     * @return the list of response properties.
+     * @return the map of response properties.
      */
     public abstract Map<String, Object> getProperties();
     
@@ -102,9 +106,9 @@ public abstract class ClientResponse {
     public abstract void setResponseStatus(Response.Status status);
     
     /**
-     * Get the HTTP metadata
+     * Get the HTTP headers of the response.
      * 
-     * @return the HTTP metadata.
+     * @return the HTTP headers of the response.
      */
     public abstract MultivaluedMap<String, String> getMetadata();
 
