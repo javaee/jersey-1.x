@@ -1,4 +1,8 @@
 release 1.0.2 (2009-01/02)
+- Fixed issue 168
+  https://jersey.dev.java.net/issues/show_bug.cgi?id=168
+  Deprecated WebResource.getBuilder and renamed to WebResource.getUriBuilder().
+  Added method WebResource.getRequestBuilder.  
 - Fixed issue 165
   https://jersey.dev.java.net/issues/show_bug.cgi?id=165
   Clarified JavaDoc for ClientResponse.getProperties and

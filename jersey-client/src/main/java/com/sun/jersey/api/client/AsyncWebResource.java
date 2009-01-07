@@ -21,7 +21,7 @@
  * identifying information: "Portions Copyrighted [year]
  * [name of copyright owner]"
  * 
- * Contributor(s):
+ * Contributor(s): Gili Tzabari
  * 
  * If you wish your version of this file to be governed by only the CDDL or
  * only the GPL Version 2, indicate your decision by adding "[Contributor]
@@ -94,13 +94,33 @@ public class AsyncWebResource extends Filterable implements
     
     /**
      * Get the URI builder to the resource.
-     * 
+     *
      * @return the URI builder.
+     * @deprecated
      */
+    @Deprecated
     public UriBuilder getBuilder() {
         return UriBuilder.fromUri(u);
     }
-        
+    
+    /**
+     * Get the URI builder to the resource.
+     * 
+     * @return the URI builder.
+     */
+    public UriBuilder getUriBuilder() {
+        return UriBuilder.fromUri(u);
+    }
+
+    /**
+     * Get the ClientRequest builder.
+     *
+     * @return the ClientRequest builder.
+     */
+    public Builder getRequestBuilder() {
+        return new Builder();
+    }
+
     /**
      * @return the URI as a String instance
      */
@@ -247,47 +267,47 @@ public class AsyncWebResource extends Filterable implements
     // RequestBuilder<WebResource.Builder>
     
     public Builder entity(Object entity) {
-        return new Builder(getURI()).entity(entity);
+        return getRequestBuilder().entity(entity);
     }
 
     public Builder entity(Object entity, MediaType type) {
-        return new Builder(getURI()).entity(entity, type);
+        return getRequestBuilder().entity(entity, type);
     }
 
     public Builder entity(Object entity, String type) {
-        return new Builder(getURI()).entity(entity, type);
+        return getRequestBuilder().entity(entity, type);
     }
 
     public Builder type(MediaType type) {
-        return new Builder(getURI()).type(type);
+        return getRequestBuilder().type(type);
     }
         
     public Builder type(String type) {
-        return new Builder(getURI()).type(type);
+        return getRequestBuilder().type(type);
     }
     
     public Builder accept(MediaType... types) {
-        return new Builder(getURI()).accept(types);
+        return getRequestBuilder().accept(types);
     }
 
     public Builder accept(String... types) {
-        return new Builder(getURI()).accept(types);
-    }    
-    
+        return getRequestBuilder().accept(types);
+    }
+
     public Builder acceptLanguage(Locale... locales) {
-        return new Builder(getURI()).acceptLanguage(locales);
+        return getRequestBuilder().acceptLanguage(locales);
     }
 
     public Builder acceptLanguage(String... locales) {
-        return new Builder(getURI()).acceptLanguage(locales);
-    }    
-    
+        return getRequestBuilder().acceptLanguage(locales);
+    }
+
     public Builder cookie(Cookie cookie) {
-        return new Builder(getURI()).cookie(cookie);
+        return getRequestBuilder().cookie(cookie);
     }
     
     public Builder header(String name, Object value) {
-        return new Builder(getURI()).header(name, value);
+        return getRequestBuilder().header(name, value);
     }
 
     // URI specific building
@@ -304,7 +324,7 @@ public class AsyncWebResource extends Filterable implements
      * @return the new web resource.
      */
     public AsyncWebResource path(String path) {
-        return new AsyncWebResource(this, getBuilder().path(path));
+        return new AsyncWebResource(this, getUriBuilder().path(path));
     }
 
     /**
@@ -324,7 +344,7 @@ public class AsyncWebResource extends Filterable implements
      * @return the new web resource.
      */
     public AsyncWebResource uri(URI uri) {
-        UriBuilder b = getBuilder();
+        UriBuilder b = getUriBuilder();
         String path = uri.getRawPath();
         if (path != null && path.length() > 0) {
             if (path.startsWith("/")) {
@@ -348,7 +368,7 @@ public class AsyncWebResource extends Filterable implements
      * @return the new web resource.
      */
     public AsyncWebResource queryParams(MultivaluedMap<String, String> params) {
-        UriBuilder b = getBuilder();
+        UriBuilder b = getUriBuilder();
         for (Map.Entry<String, List<String>> e : params.entrySet()) {
             for (String value : e.getValue())
                 b.queryParam(e.getKey(), value);
@@ -363,13 +383,10 @@ public class AsyncWebResource extends Filterable implements
      * handling the request using the {@link UniformInterface}. The methods
      * of the {@link UniformInterface} are the build methods of the builder.
      */
-    public final class Builder extends PartialRequestBuilder<Builder> 
-            implements AsyncUniformInterface {  
-        
-        private final URI u;
-        
-        private Builder(URI u) {
-            this.u = u;
+    public final class Builder extends PartialRequestBuilder<Builder>
+            implements AsyncUniformInterface {
+
+        private Builder() {
         }
         
         private ClientRequest build(String method) {

@@ -145,13 +145,13 @@ public class MainTest extends TestCase {
                 expectedNumber, numberOfItems);
 
          //search the container for all items containing the word "king"
-        URI searchUri = content.getBuilder().queryParam("search", "king").build();
+        URI searchUri = content.getUriBuilder().queryParam("search", "king").build();
         container = c.resource(searchUri).accept(MediaType.APPLICATION_XML).get(Container.class);
         numberOfItems = (container.getItem() == null) ? 0 : container.getItem().size();
         expectedNumber = 1;
         assertEquals("Expected: " + expectedNumber +
                 " items which pass the search criterion, Seeing: " + numberOfItems,
-                expectedNumber, numberOfItems);        
+                expectedNumber, numberOfItems);
     }
 
 
@@ -192,7 +192,7 @@ public class MainTest extends TestCase {
         assertEquals("The play's the thing Wherein I'll catch the conscience of the king",
                 response.getEntity(String.class));
     }
-    
+
     /**
      * Test deletes the item 3, which is the only one which supposedly has the word "king"
      * and then searches for the word in the other items of the container.
@@ -208,18 +208,18 @@ public class MainTest extends TestCase {
                 "catch the conscience of the king");
         content.path("4").type(MediaType.TEXT_PLAIN).put(
                 "Get thee to a nunnery");
-        
+
         // delete item 3
         content.path("3").delete();
-        
+
         //search the container for all items containing the word "king"
-        URI searchUri = content.getBuilder().queryParam("search", "king").build();
+        URI searchUri = content.getUriBuilder().queryParam("search", "king").build();
         Container container = c.resource(searchUri).accept(MediaType.APPLICATION_XML).get(Container.class);
         int numberOfItems = (container.getItem() == null) ? 0 : container.getItem().size();
         int expectedNumber = 0;
         assertEquals("Expected: " + expectedNumber +
                 " items which pass the search criterion, Seeing: " + numberOfItems,
-                expectedNumber, numberOfItems);        
+                expectedNumber, numberOfItems);
     }
 
     /**
@@ -246,5 +246,5 @@ public class MainTest extends TestCase {
         }
         assertTrue("Expecting a UniformInterfaceException to be thrown", caught);
     }
-    
+
 }

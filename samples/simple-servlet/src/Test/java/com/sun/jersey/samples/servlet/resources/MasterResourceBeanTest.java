@@ -81,7 +81,7 @@ public class MasterResourceBeanTest extends TestCase {
     private Client c;
 
     public MasterResourceBeanTest(String testName) throws Exception {
-        super(testName);        
+        super(testName);
     }
 
     @Override
@@ -102,7 +102,7 @@ public class MasterResourceBeanTest extends TestCase {
     @Override
     public void tearDown() throws Exception {
         super.tearDown();
-        glassfish.stop();        
+        glassfish.stop();
     }
 
     /**
@@ -167,10 +167,10 @@ public class MasterResourceBeanTest extends TestCase {
         String arg2 = "secondArg";
         String expectedResponseWithRep0 = "<pre>Received args: ";
         String expectedResponseWithRep1 = "representation: StringRepresentation: arg1: ";
-        
+
         //test with rep=0
         UriBuilder requestUriBuilder =  wr.path("resources").path("resource3")
-                .path(arg1).path(arg2).getBuilder().queryParam("rep", 0);
+                .path(arg1).path(arg2).getUriBuilder().queryParam("rep", 0);
         URI requestUri = requestUriBuilder.build();
         wr = c.resource(requestUri);
         int responseStatus = wr.head().getStatus();
@@ -194,14 +194,14 @@ public class MasterResourceBeanTest extends TestCase {
         requestUri = requestUriBuilder.build();
         wr = c.resource(requestUri);
         responseStatus = wr.head().getStatus();
-        assertEquals("Response status 200 not found for request to resource 3 with rep=2", 200, responseStatus);        
+        assertEquals("Response status 200 not found for request to resource 3 with rep=2", 200, responseStatus);
         Form f = wr.get(Form.class);
         assertEquals("FormURLEncodedRepresentation", f.getFirst("representation"));
         assertEquals("Master Duke", f.getFirst("name"));
         assertEquals("male", f.getFirst("sex"));
         assertEquals("firstArg", f.getFirst("arg1"));
         assertEquals("secondArg", f.getFirst("arg2"));
-        
+
         // test with rep>3
         requestUriBuilder = requestUriBuilder.replaceQueryParam("rep", 4);
         requestUri = requestUriBuilder.build();
@@ -210,6 +210,6 @@ public class MasterResourceBeanTest extends TestCase {
         assertEquals("Response status 200 not found for request to resource 3 with rep>3", 200, responseStatus);
         responseText = wr.get(String.class);
         assertTrue("Expected reponse not seen with query param 'rep>3'",
-                responseText.startsWith(expectedResponseWithRep0));        
+                responseText.startsWith(expectedResponseWithRep0));
     }
 }
