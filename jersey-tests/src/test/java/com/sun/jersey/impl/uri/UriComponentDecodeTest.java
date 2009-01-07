@@ -161,6 +161,13 @@ public class UriComponentDecodeTest extends TestCase {
         _testDecodeQuery("%20a%20=%20x%20", false, " a ", "%20x%20");        
     }
     
+    public void testDecodeQueryParam() {
+        assertEquals(" ",
+                UriComponent.decode("+", UriComponent.Type.QUERY_PARAM));
+        assertEquals("a b c ",
+                UriComponent.decode("a+b+c+", UriComponent.Type.QUERY_PARAM));
+    }
+
     private void _testDecodeQuery(String q, String... query) {
         _testDecodeQuery(q, true, query);
     }

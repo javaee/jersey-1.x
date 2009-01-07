@@ -1,4 +1,14 @@
 release 1.0.2 (2009-01/02)
+- Fixed issue 170
+  https://jersey.dev.java.net/issues/show_bug.cgi?id=170
+  Encoding of ' ' in query parameters now round trips correctly.
+     String encoded = UriComponent.encode(" ", Type.QUERY);
+     assert(encoded.equals("%20"));
+     String decoded = UriComponent.decode(encoded, Type.QUERY);
+     assert(decoded.equals(" "));
+  The encoding of ' ' to '+' now only occurs for Type.QUERY_PARAM.
+     String encoded = UriComponent.encode(" ", Type.QUERY_PARAM);
+     assert(encoded.equals("+"));
 - Fixed issue 168
   https://jersey.dev.java.net/issues/show_bug.cgi?id=168
   Deprecated WebResource.getBuilder and renamed to WebResource.getUriBuilder().

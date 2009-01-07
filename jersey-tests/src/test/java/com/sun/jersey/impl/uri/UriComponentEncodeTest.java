@@ -73,16 +73,16 @@ public class UriComponentEncodeTest extends TestCase {
     }
     
     public void testEncodeQuery() {
-        assertEquals("a+b+c.-*_=+&%25xx%2520",
+        assertEquals("a%20b%20c.-*_=+&%25xx%2520",
                 UriComponent.encode("a b c.-*_=+&%xx%20", UriComponent.Type.QUERY));
         assertEquals("a+b+c.-*_%3D%2B%26%25xx%2520",
                 UriComponent.encode("a b c.-*_=+&%xx%20", UriComponent.Type.QUERY_PARAM));
     }
     
     public void testContextualEncodeQuery() {
-        assertEquals("a+b+c.-*_=+&%25xx%20",
+        assertEquals("a%20b%20c.-*_=+&%25xx%20",
                 UriComponent.contextualEncode("a b c.-*_=+&%xx%20", UriComponent.Type.QUERY));
-        assertEquals("a+b+c.-*_%3D+%26%25xx%20",
+        assertEquals("a+b+c.-*_%3D%2B%26%25xx%20",
                 UriComponent.contextualEncode("a b c.-*_=+&%xx%20", UriComponent.Type.QUERY_PARAM));
     }
 

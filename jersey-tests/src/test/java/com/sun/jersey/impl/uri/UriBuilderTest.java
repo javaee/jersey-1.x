@@ -187,7 +187,7 @@ public class UriBuilderTest extends TestCase {
 
     public void testBuildEncodedQuery() {
         URI u = UriBuilder.fromPath("").
-                queryParam("y", "1+%2B+2").build();
+                queryParam("y", "1 %2B 2").build();
         assertEquals(URI.create("?y=1+%2B+2"), u);
     }
 
@@ -521,13 +521,13 @@ public class UriBuilderTest extends TestCase {
     public void testBuildFromEncodedQueryTemplates() {
         URI bu = UriBuilder.fromUri("http://localhost:8080/a/b/c").
                 queryParam("a", "{b}").buildFromEncoded("=+&%xx%20");
-        assertEquals(URI.create("http://localhost:8080/a/b/c?a=%3D+%26%25xx%20"), bu);
+        assertEquals(URI.create("http://localhost:8080/a/b/c?a=%3D%2B%26%25xx%20"), bu);
 
         Map<String, Object> m = new HashMap<String, Object>();
         m.put("b", "=+&%xx%20");
         bu = UriBuilder.fromUri("http://localhost:8080/a/b/c").
                 queryParam("a", "{b}").buildFromEncodedMap(m);
-        assertEquals(URI.create("http://localhost:8080/a/b/c?a=%3D+%26%25xx%20"), bu);
+        assertEquals(URI.create("http://localhost:8080/a/b/c?a=%3D%2B%26%25xx%20"), bu);
     }
 
     public void testTemplatesDefaultPort() {

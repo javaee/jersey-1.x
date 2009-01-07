@@ -262,9 +262,6 @@ public class UriComponent {
                             i += 2;
                             continue;
                         }
-                    } else if (c == '+' && (t == Type.QUERY || t == Type.QUERY_PARAM)) {
-                        if (sb != null) sb.append(c);
-                        continue;
                     }
                 }
 
@@ -274,7 +271,7 @@ public class UriComponent {
                 }
 
                 if (c < 0x80) {
-                    if (c == ' ' && (t == Type.QUERY || t == Type.QUERY_PARAM)) {
+                    if (c == ' ' && (t == Type.QUERY_PARAM)) {
                         sb.append('+');
                     } else {
                         appendPercentEncodedOctet(sb, c);
@@ -381,6 +378,9 @@ public class UriComponent {
      * If the URI component is of type HOST then any "%" found between "[]" is 
      * left alone. It is an IPv6 literal with a scope_id.
      * <p>
+     * If the URI component is of type QUERY_PARAM then any "+" is decoded as
+     * as ' '.
+     * <p>
      * @param s the string to be decoded.
      * @param t the URI component type, may be null.
      * @return the decoded string.
@@ -399,22 +399,39 @@ public class UriComponent {
 
         // If there are no percent-escaped octets
         if (s.indexOf('%') < 0) {
-            return s;
+            // If there are no '+' characters for query param
+            if (t == Type.QUERY_PARAM) {
+                if (s.indexOf('+') < 0) {
+                    return s;
+                }
+            } else {
+                return s;
+            }
+        } else {
+            // Malformed percent-escaped octet at the end
+            if (n < 2) // TODO localize
+            {
+                throw new IllegalArgumentException("Malformed percent-encoded octet at index 1");
+            }
+
+            // Malformed percent-escaped octet at the end
+            if (s.charAt(n - 2) == '%') // TODO localize
+            {
+                throw new IllegalArgumentException("Malformed percent-encoded octet at index " + (n - 2));
+            }
         }
 
-        // Malformed percent-escaped octet at the end
-        if (n < 2) // TODO localize
-        {
-            throw new IllegalArgumentException("Malformed percent-encoded octet at index 1");
+        if (t == null)
+            return decode(s, n);
+        
+        switch (t) {
+            case HOST :
+                return decodeHost(s, n);
+            case QUERY_PARAM :
+                return decodeQueryParam(s, n);
+            default :
+                return decode(s, n);
         }
-
-        // Malformed percent-escaped octet at the end
-        if (s.charAt(n - 2) == '%') // TODO localize
-        {
-            throw new IllegalArgumentException("Malformed percent-encoded octet at index " + (n - 2));
-        }
-
-        return (t != Type.HOST) ? decode(s, n) : decodeHost(s, n);
     }
 
     /**
@@ -628,7 +645,7 @@ public class UriComponent {
 
     private static String decode(String s, int n) {
         final StringBuilder sb = new StringBuilder(n);
-        ByteBuffer bb = ByteBuffer.allocate(1);
+        ByteBuffer bb = null;
 
         for (int i = 0; i < n;) {
             final char c = s.charAt(i++);
@@ -643,9 +660,29 @@ public class UriComponent {
         return sb.toString();
     }
 
+    private static String decodeQueryParam(String s, int n) {
+        final StringBuilder sb = new StringBuilder(n);
+        ByteBuffer bb = null;
+
+        for (int i = 0; i < n;) {
+            final char c = s.charAt(i++);
+            if (c != '%') {
+                if (c != '+')
+                    sb.append(c);
+                else
+                    sb.append(' ');
+            } else {
+                bb = decodePercentEncodedOctets(s, i, bb);
+                i = decodeOctets(i, bb, sb);
+            }
+        }
+
+        return sb.toString();
+    }
+
     private static String decodeHost(String s, int n) {
         final StringBuilder sb = new StringBuilder(n);
-        ByteBuffer bb = ByteBuffer.allocate(1);
+        ByteBuffer bb = null;
 
         boolean betweenBrackets = false;
         for (int i = 0; i < n;) {
@@ -674,7 +711,10 @@ public class UriComponent {
      * percent-encoded octet.
      */
     private static ByteBuffer decodePercentEncodedOctets(String s, int i, ByteBuffer bb) {
-        bb.clear();
+        if (bb == null)
+            bb = ByteBuffer.allocate(1);
+        else
+            bb.clear();
 
         while (true) {
             // Decode the hex digits
