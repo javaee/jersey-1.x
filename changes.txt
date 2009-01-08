@@ -1,4 +1,12 @@
 release 1.0.2 (2009-01/02)
+- Refactored Client API implementations for HttpURLConnection and the in-memory
+  to leverage inherited classes for writing and reading HTTP requests and 
+  responses. This makes it easier for other HTTP protocol implementations to 
+  plugin and use the client API.
+- Fixed issue 167
+  https://jersey.dev.java.net/issues/show_bug.cgi?id=167
+  A UniformInterfaceException will be thrown if the client requests an
+  entity and the response status is 204.
 - Fixed issue 170
   https://jersey.dev.java.net/issues/show_bug.cgi?id=170
   Encoding of ' ' in query parameters now round trips correctly.

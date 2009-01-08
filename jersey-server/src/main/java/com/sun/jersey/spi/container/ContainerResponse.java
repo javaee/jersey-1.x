@@ -227,7 +227,6 @@ public class ContainerResponse implements HttpResponseContext {
         final MessageBodyWriter p = bodyContext.getMessageBodyWriter(
                 entity.getClass(), entityType, 
                 annotations, contentType);
-        // If there is no message body writer return a Not Acceptable response
         if (p == null) {
             String message = "A message body writer for Java type, " + entity.getClass() + 
                     ", and MIME media type, " + contentType + ", was not found";
@@ -236,8 +235,9 @@ public class ContainerResponse implements HttpResponseContext {
             if (request.getMethod().equals("HEAD")) {
                 responseWriter.writeStatusAndHeaders(-1, this);
                 return;                
-            } else 
+            } else {
                 throw new WebApplicationException(Response.serverError().entity(message).build());
+            }
         }
 
         final long size = p.getSize(entity, entity.getClass(), entityType, 

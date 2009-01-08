@@ -34,34 +34,47 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
+package com.sun.jersey.impl.container.grizzly.web;
 
-package com.sun.jersey.api.client;
+import com.sun.jersey.api.client.Client;
+import com.sun.jersey.api.client.ClientResponse;
+import com.sun.jersey.api.client.WebResource;
+import javax.ws.rs.HeaderParam;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
+import javax.ws.rs.core.MediaType;
 
 /**
- * A runtime exception thrown by a method on the {@link UniformInterface} or
- * {@link ClientResponse} when the status code of the HTTP response indicates
- * a response that is not expected.
- * 
+ *
  * @author Paul.Sandoz@Sun.Com
  */
-public class UniformInterfaceException extends RuntimeException {
-    transient private final ClientResponse r;
-    
-    public UniformInterfaceException(ClientResponse r) {
-        this.r = r;
-    }    
-    
-    public UniformInterfaceException(String message, ClientResponse r) {
-	super(message);
-        this.r = r;
+public class FixedRequestSizeTest extends AbstractGrizzlyWebContainerTester {
+    public FixedRequestSizeTest(String testName) {
+        super(testName);
     }
     
-    /**
-     * Get the client response assocatiated with the exception.
-
-     * @return the client response.
-     */
-    public ClientResponse getResponse() {
-        return r;
+    @Path("/")
+    public static class Resource {
+        @POST
+        public byte[] post(@HeaderParam("Content-Length") Integer size, byte[] in) {
+            assertNotNull(size);
+            assertEquals(4, size.intValue());
+            return in;
+        }               
+    }
+        
+    public void testHead() throws Exception {
+        startServer(Resource.class);
+        
+        WebResource r = Client.create().resource(getUri().path("/").build());
+        
+        ClientResponse cr = r.accept("application/octet-stream").post(ClientResponse.class,
+                "POST".getBytes());
+        assertEquals(200, cr.getStatus());
+        String length = cr.getMetadata().getFirst("Content-Length");
+        assertNotNull(length);
+        assertEquals(4, Integer.parseInt(length));
+        assertEquals(MediaType.APPLICATION_OCTET_STREAM_TYPE, cr.getType());
+        assertTrue(cr.hasEntity());
     }
 }

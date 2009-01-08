@@ -36,11 +36,18 @@
  */
 package com.sun.jersey.api.client;
 
+import com.sun.jersey.core.header.InBoundHeaders;
+import com.sun.jersey.spi.MessageBodyWorkers;
+import java.io.Closeable;
+import java.io.IOException;
 import java.io.InputStream;
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Type;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import javax.ws.rs.core.EntityTag;
@@ -48,6 +55,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.NewCookie;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.ext.MessageBodyReader;
 import javax.ws.rs.ext.RuntimeDelegate;
 import javax.ws.rs.ext.RuntimeDelegate.HeaderDelegate;
 
@@ -56,13 +64,32 @@ import javax.ws.rs.ext.RuntimeDelegate.HeaderDelegate;
  * 
  * @author Paul.Sandoz@Sun.Com
  */
-public abstract class ClientResponse {
+public class ClientResponse {
+    private static final Annotation[] EMPTY_ANNOTATIONS = new Annotation[0];
+    
     protected static final HeaderDelegate<EntityTag> entityTagDelegate = 
             RuntimeDelegate.getInstance().createHeaderDelegate(EntityTag.class);
     
     protected static final HeaderDelegate<Date> dateDelegate = 
             RuntimeDelegate.getInstance().createHeaderDelegate(Date.class);
         
+    private Map<String, Object> properties;
+
+    private int status;
+    
+    private InBoundHeaders headers;
+    
+    private InputStream entity;
+
+    private MessageBodyWorkers workers;
+    
+    public ClientResponse(int status, InBoundHeaders headers, InputStream entity, MessageBodyWorkers workers) {
+        this.status = status;
+        this.headers = headers;
+        this.entity = entity;
+        this.workers = workers;
+    }
+
     /**
      * Get the map of response properties.
      * <p>
@@ -72,21 +99,29 @@ public abstract class ClientResponse {
      * 
      * @return the map of response properties.
      */
-    public abstract Map<String, Object> getProperties();
+    public Map<String, Object> getProperties() {
+        if (properties != null) return properties;
+
+        return properties = new HashMap<String, Object>();
+    }
     
     /**
      * Get the status code.
      * 
      * @return the status code.
      */
-    public abstract int getStatus();
+    public int getStatus() {
+        return status;
+    }
     
     /**
      * Set the status code.
      * 
      * @param status the status code.
      */
-    public abstract void setStatus(int status);
+    public void setStatus(int status) {
+        this.status = status;
+    }
 
     /**
      * Get the status code.
@@ -96,67 +131,124 @@ public abstract class ClientResponse {
      *         mapping between the the integer value and the Response.Status
      *         enumeration value.
      */
-    public abstract Response.Status getResponseStatus();
+    public Response.Status getResponseStatus() {
+        return Response.Status.fromStatusCode(status);
+    }
     
     /**
      * Set the status code.
      * 
      * @param status the status code.
      */
-    public abstract void setResponseStatus(Response.Status status);
+    public void setResponseStatus(Response.Status status) {
+        setStatus(status.getStatusCode());
+    }
     
     /**
      * Get the HTTP headers of the response.
      * 
      * @return the HTTP headers of the response.
      */
-    public abstract MultivaluedMap<String, String> getMetadata();
+    public MultivaluedMap<String, String> getMetadata() {
+        return headers;
+    }
 
     /**
      * 
      * @return true if there is an entity present in the response.
      */
-    public abstract boolean hasEntity();
+    public boolean hasEntity() {
+        try {
+            return entity.available() > 0;
+        } catch (IOException ex) {
+            throw new ClientHandlerException(ex);
+        }
+    }
 
     /**
      * Get the input stream of the response.
      * 
-     * @return the input stream of the response, otherwise null if
-     *         no entity is present.
+     * @return the input stream of the response.
      */
-    public abstract InputStream getEntityInputStream();
+    public InputStream getEntityInputStream() {
+        return entity;
+    }
 
     /**
      * Set the input stream of the response.
      * 
-     * @param in the input stream of the response.
+     * @param entity the input stream of the response.
      */
-    public abstract void setEntityInputStream(InputStream in);
+    public void setEntityInputStream(InputStream entity) {
+        this.entity = entity;
+    }
 
     /**
      * Get the entity of the response.
+     * <p>
+     * If the entity is not an instance of Closeable then the entity
+     * input stream is closed.
      * 
      * @param <T> the type of the response.
      * @param c the type of the entity.
      * @return an instance of the type <code>c</code>.
      * 
      * @throws java.lang.IllegalArgumentException
+     * @throws UniformInterfaceException if the response status is 204 (No Contnet).
      */
-    public abstract <T> T getEntity(Class<T> c) throws IllegalArgumentException;
+    public <T> T getEntity(Class<T> c) throws IllegalArgumentException, UniformInterfaceException {
+        return getEntity(c, c);
+    }
 
     /**
      * Get the entity of the response.
+     * <p>
+     * If the entity is not an instance of Closeable then the entity
+     * input stream is closed.
      * 
      * @param <T> the type of the response.
      * @param gt the generic type of the entity.
      * @return an instance of the type represented by the generic type.
      * 
      * @throws java.lang.IllegalArgumentException
+     * @throws UniformInterfaceException if the response status is 204 (No Content).
      */
-    public abstract <T> T getEntity(GenericType<T> gt) throws IllegalArgumentException;
+    public <T> T getEntity(GenericType<T> gt) throws IllegalArgumentException, UniformInterfaceException {
+        return getEntity(gt.getRawClass(), gt.getType());
+    }
+
+    private <T> T getEntity(Class<T> c, Type type) {
+        if (getStatus() == 204) {
+            throw new UniformInterfaceException("204 (No Content)", this);
+        }
+
+        try {
+            MediaType mediaType = getType();
+            if (mediaType == null) {
+                mediaType = MediaType.APPLICATION_OCTET_STREAM_TYPE;
+            }
+            
+            final MessageBodyReader<T> br = workers.getMessageBodyReader(
+                    c, type,
+                    EMPTY_ANNOTATIONS, mediaType);
+            if (br == null) {
+                throw new ClientHandlerException(
+                        "A message body reader for Java type, " + c +
+                        ", and MIME media type, " + mediaType + ", was not found");
+            }
+            T t = br.readFrom(c, type, EMPTY_ANNOTATIONS, mediaType, headers, entity);
+            if (!(t instanceof Closeable)) {
+                entity.close();
+            }
+            entity = null;
+            return t;
+        } catch (IOException ex) {
+            throw new IllegalArgumentException(ex);
+        }
+    }
 
     /**
-     * Get the media type of the response
+     * Get the media type of the response.
      * 
      * @return the media type.
      */

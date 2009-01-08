@@ -37,153 +37,48 @@
 package com.sun.jersey.client.impl.urlconnection;
 
 import com.sun.jersey.core.header.InBoundHeaders;
-import com.sun.jersey.api.client.ClientHandler;
 import com.sun.jersey.api.client.ClientHandlerException;
 import com.sun.jersey.api.client.ClientRequest;
 import com.sun.jersey.api.client.ClientResponse;
-import com.sun.jersey.api.client.GenericType;
+import com.sun.jersey.api.client.TerminatingClientHandler;
+import com.sun.jersey.api.client.WriteRequestEntityListener;
 import com.sun.jersey.api.client.config.ClientConfig;
-import com.sun.jersey.spi.MessageBodyWorkers;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.lang.annotation.Annotation;
-import java.lang.reflect.Type;
 import java.net.HttpURLConnection;
 import java.net.ProtocolException;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.GenericEntity;
-import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.ext.MessageBodyReader;
-import javax.ws.rs.ext.MessageBodyWriter;
-import javax.ws.rs.ext.RuntimeDelegate;
-import javax.ws.rs.ext.RuntimeDelegate.HeaderDelegate;
 
 /**
  *
  * @author Paul.Sandoz@Sun.Com
  */
-public final class URLConnectionClientHandler implements ClientHandler {
-    private static final Annotation[] EMPTY_ANNOTATIONS = new Annotation[0];
+public final class URLConnectionClientHandler extends TerminatingClientHandler {
     
     private final class URLConnectionResponse extends ClientResponse {
-        private Map<String, Object> properties;
         private final String method;
-        private int status;
         private final HttpURLConnection uc;
-        private final MultivaluedMap<String, String> metadata;
-        private InputStream in;
 
-        URLConnectionResponse(String method, int status, HttpURLConnection uc) {
+        URLConnectionResponse(int status, InBoundHeaders headers, InputStream entity, String method, HttpURLConnection uc) {
+            super(status, headers, entity, getMessageBodyWorkers());
             this.method = method;
-            this.status = status;
             this.uc = uc;
-            
-            this.metadata = new InBoundHeaders();            
-            for (Map.Entry<String, List<String>> e : uc.getHeaderFields().entrySet()) {
-                if (e.getKey() != null)
-                    metadata.put(e.getKey(), e.getValue());
-            }
-            
-            try {
-                this.in = getInputStream();
-            } catch (IOException ex) {
-                throw new IllegalArgumentException(ex);
-            }
         }
         
-        public int getStatus() {
-            return status;
-        }
-
-        public void setStatus(int status) {
-            this.status = status;
-        }
-
-        public Response.Status getResponseStatus() {
-            return Response.Status.fromStatusCode(status);
-        }
-    
-        public void setResponseStatus(Response.Status status) {
-            setStatus(status.getStatusCode());            
-        }
-
-        public MultivaluedMap<String, String> getMetadata() {
-            return metadata;
-        }
-
+        @Override
         public boolean hasEntity() {
-            if (method.equals("HEAD") || in == null)
+            if (method.equals("HEAD") || getEntityInputStream() == null)
                 return false;
 
             int l = uc.getContentLength();
             return l > 0 || l == -1;
         }
-        
-        public InputStream getEntityInputStream() {
-            return in;
-        }
-
-        public void setEntityInputStream(InputStream in) {
-            this.in = in;
-        }
-        
-        public <T> T getEntity(Class<T> c) {
-            return getEntity(c, c);
-        }
-
-        public <T> T getEntity(GenericType<T> gt) {
-            return getEntity(gt.getRawClass(), gt.getType());
-        }
-    
-        private <T> T getEntity(Class<T> c, Type type) {
-            try {
-                MediaType mediaType = getType();
-                final MessageBodyReader<T> br = bodyContext.getMessageBodyReader(
-                        c, type,
-                        EMPTY_ANNOTATIONS, mediaType);
-                if (br == null) {
-                    throw new ClientHandlerException(
-                            "A message body reader for Java type, " + c + 
-                            ", and MIME media type, " + mediaType + ", was not found");
-                }
-                T t = br.readFrom(c, type, EMPTY_ANNOTATIONS, mediaType, metadata, in);
-                if (!(t instanceof InputStream)) {
-                    in.close();
-                }
-                in = null;
-                return t;
-            } catch (IOException ex) {
-                throw new IllegalArgumentException(ex);
-            }
-        }
-        
-        public Map<String, Object> getProperties() {
-            if (properties != null) return properties;
-
-            return properties = new HashMap<String, Object>();
-        }
-        
-        private InputStream getInputStream() throws IOException {
-            if (status < 300) {
-                return uc.getInputStream();
-            } else {
-                InputStream ein = uc.getErrorStream();
-                return (ein != null)
-                        ? ein : new ByteArrayInputStream(new byte[0]);
-            }
-        }
-
     }
 
-    @Context private MessageBodyWorkers bodyContext;
-    
     // ClientHandler
     
     public ClientResponse handle(ClientRequest ro) {
@@ -194,9 +89,9 @@ public final class URLConnectionClientHandler implements ClientHandler {
         }
     }
 
-    private ClientResponse _invoke(ClientRequest ro) 
+    private ClientResponse _invoke(final ClientRequest ro)
             throws ProtocolException, IOException {
-        HttpURLConnection uc = (HttpURLConnection)ro.getURI().toURL().openConnection();
+        final HttpURLConnection uc = (HttpURLConnection)ro.getURI().toURL().openConnection();
         
         Integer readTimeout = (Integer)ro.getProperties().get(
                 ClientConfig.PROPERTY_READ_TIMEOUT);
@@ -220,100 +115,79 @@ public final class URLConnectionClientHandler implements ClientHandler {
         uc.setRequestMethod(ro.getMethod());
 
         // Write the request headers
-        writeHeaders(ro.getMetadata(), uc);
+        writeOutBoundHeaders(ro.getMetadata(), uc);
         
         // Write the entity (if any)
         Object entity = ro.getEntity();
         if (entity != null) {
             uc.setDoOutput(true);
-            writeEntity(uc, ro, entity);
+            writeRequestEntity(ro, new WriteRequestEntityListener() {
+                public void onRequestEntitySize(long size) {
+                    if (size != -1 && size < Integer.MAX_VALUE) {
+                        // HttpURLConnection uses the int type for content length
+                        uc.setFixedLengthStreamingMode((int)size);
+                    } else {
+                        // TODO it appears HttpURLConnection has some bugs in
+                        // chunked encoding
+                        // uc.setChunkedStreamingMode(0);
+                        Integer chunkedEncodingSize = (Integer)ro.getProperties().get(
+                                ClientConfig.PROPERTY_CHUNKED_ENCODING_SIZE);
+                        if (chunkedEncodingSize != null) {
+                            uc.setChunkedStreamingMode(chunkedEncodingSize);
+                        }
+                    }
+                }
+
+                public OutputStream onGetOutputStream() throws IOException {
+                    return uc.getOutputStream();
+                }
+            });
         }
         
         // Return the in-bound response
-        return new URLConnectionResponse(ro.getMethod(), uc.getResponseCode(), uc);        
+        return new URLConnectionResponse(
+                uc.getResponseCode(),
+                getInBoundHeaders(uc),
+                getInputStream(uc),
+                ro.getMethod(),
+                uc);
     }
     
-    private void writeHeaders(MultivaluedMap<String, Object> metadata, HttpURLConnection uc) {
+    private void writeOutBoundHeaders(MultivaluedMap<String, Object> metadata, HttpURLConnection uc) {
         for (Map.Entry<String, List<Object>> e : metadata.entrySet()) {
             List<Object> vs = e.getValue();
             if (vs.size() == 1) {
-                uc.setRequestProperty(e.getKey(), getHeaderValue(vs.get(0)));
+                uc.setRequestProperty(e.getKey(), headerValueToString(vs.get(0)));
             } else {
                 StringBuilder b = new StringBuilder();
                 boolean add = false;
                 for (Object v : e.getValue()) {
                     if (add) b.append(',');
                     add = true;
-                    b.append(getHeaderValue(v));
+                    b.append(headerValueToString(v));
                 }
                 uc.setRequestProperty(e.getKey(), b.toString());
             }
 
-        }        
+        }
     }
-    
-    @SuppressWarnings("unchecked")
-    private String getHeaderValue(Object headerValue) {
-        HeaderDelegate hp = RuntimeDelegate.getInstance().
-                createHeaderDelegate(headerValue.getClass());
-        return hp.toString(headerValue);
+
+    private InBoundHeaders getInBoundHeaders(HttpURLConnection uc) {
+        InBoundHeaders headers = new InBoundHeaders();
+        for (Map.Entry<String, List<String>> e : uc.getHeaderFields().entrySet()) {
+            if (e.getKey() != null)
+                headers.put(e.getKey(), e.getValue());
+        }
+        return headers;
     }
-    
-    @SuppressWarnings("unchecked")
-    private void writeEntity(HttpURLConnection uc, 
-            ClientRequest ro, Object entity) throws IOException {
-        MultivaluedMap<String, Object> metadata = ro.getMetadata();
-        MediaType mediaType = null;
-        final Object mediaTypeHeader = metadata.getFirst("Content-Type");
-        if (mediaTypeHeader instanceof MediaType) {
-            mediaType = (MediaType)mediaTypeHeader;
+
+    private InputStream getInputStream(HttpURLConnection uc) throws IOException {
+        if (uc.getResponseCode() < 300) {
+            return uc.getInputStream();
         } else {
-            if (mediaTypeHeader != null) {
-                mediaType = MediaType.valueOf(mediaTypeHeader.toString());
-            } else {
-                mediaType = new MediaType("application", "octet-stream");
-            }
+            InputStream ein = uc.getErrorStream();
+            return (ein != null)
+                    ? ein : new ByteArrayInputStream(new byte[0]);
         }
-            
-        Type entityType = null;
-        if (entity instanceof GenericEntity) {
-            final GenericEntity ge = (GenericEntity)entity;
-            entityType = ge.getType();                
-            entity = ge.getEntity();            
-        } else {
-            entityType = entity.getClass();
-        }
-        final Class entityClass = entity.getClass();
-        
-        final MessageBodyWriter bw = bodyContext.getMessageBodyWriter(
-                entityClass, entityType,
-                EMPTY_ANNOTATIONS, mediaType);
-        if (bw == null) {
-            throw new ClientHandlerException(
-                    "A message body writer for Java type, " + entity.getClass() + 
-                    ", and MIME media type, " + mediaType + ", was not found");
-        }
-        final long size = bw.getSize(
-                entity, entityClass, entityType,
-                EMPTY_ANNOTATIONS, mediaType);
-        if (size != -1 && size < Integer.MAX_VALUE) {
-            // HttpURLConnection uses the int type for content length
-            uc.setFixedLengthStreamingMode((int)size);
-        } else {
-            // TODO it appears HttpURLConnection has some bugs in
-            // chunked encoding
-            // uc.setChunkedStreamingMode(0);
-            Integer chunkedEncodingSize = (Integer)ro.getProperties().get(
-                    ClientConfig.PROPERTY_CHUNKED_ENCODING_SIZE);
-            if (chunkedEncodingSize != null) {
-                uc.setChunkedStreamingMode(chunkedEncodingSize);
-            }
-        }
-        
-        final OutputStream out = ro.getAdapter().adapt(ro, uc.getOutputStream());
-        bw.writeTo(entity, entityClass, entityType,
-                EMPTY_ANNOTATIONS, mediaType, metadata, out);
-        out.flush();
-        out.close();
     }
 }

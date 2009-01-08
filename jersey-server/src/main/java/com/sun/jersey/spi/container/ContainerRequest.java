@@ -45,7 +45,6 @@ import com.sun.jersey.api.uri.UriComponent;
 import com.sun.jersey.core.util.MultivaluedMapImpl;
 import com.sun.jersey.server.impl.VariantSelector;
 import com.sun.jersey.core.header.AcceptableLanguageTag;
-import com.sun.jersey.core.header.LanguageTag;
 import com.sun.jersey.core.header.reader.HttpHeaderReader;
 import com.sun.jersey.server.impl.model.HttpHelper;
 import com.sun.jersey.spi.MessageBodyWorkers;
@@ -338,6 +337,10 @@ public class ContainerRequest implements HttpRequestContext {
 
     public <T> T getEntity(Class<T> type, Type genericType, Annotation[] as) {
         MediaType mediaType = getMediaType();
+        if (mediaType == null) {
+            mediaType = MediaType.APPLICATION_OCTET_STREAM_TYPE;
+        }
+
         MessageBodyReader<T> bw = bodyContext.getMessageBodyReader(
                 type, genericType,
                 as, mediaType);

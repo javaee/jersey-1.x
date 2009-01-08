@@ -35,33 +35,45 @@
  * holder.
  */
 
-package com.sun.jersey.api.client;
+package com.sun.jersey.impl.resource;
+
+import com.sun.jersey.api.client.UniformInterfaceException;
+import com.sun.jersey.api.client.WebResource;
+import com.sun.jersey.impl.AbstractResourceTester;
+import java.io.IOException;
+import javax.ws.rs.Path;
+import javax.ws.rs.GET;
 
 /**
- * A runtime exception thrown by a method on the {@link UniformInterface} or
- * {@link ClientResponse} when the status code of the HTTP response indicates
- * a response that is not expected.
- * 
+ *
  * @author Paul.Sandoz@Sun.Com
  */
-public class UniformInterfaceException extends RuntimeException {
-    transient private final ClientResponse r;
+public class NoContentResponseTest extends AbstractResourceTester {
     
-    public UniformInterfaceException(ClientResponse r) {
-        this.r = r;
-    }    
-    
-    public UniformInterfaceException(String message, ClientResponse r) {
-	super(message);
-        this.r = r;
+    public NoContentResponseTest(String testName) {
+        super(testName);
     }
-    
-    /**
-     * Get the client response assocatiated with the exception.
 
-     * @return the client response.
-     */
-    public ClientResponse getResponse() {
-        return r;
+    @Path("/")
+    public static class Resource {
+        @GET
+        public void doGet() {
+        }
     }
+
+    public void testNoContent() throws IOException {
+        initiateWebApplication(Resource.class);
+        WebResource r = resource("/");
+
+        r.method("GET");
+
+        boolean caught = false;
+        try {
+            r.get(String.class);
+        } catch (UniformInterfaceException ex) {
+            caught = true;
+        }
+        assertTrue(caught);
+    }
+
 }
