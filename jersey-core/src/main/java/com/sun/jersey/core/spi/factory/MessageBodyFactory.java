@@ -254,7 +254,7 @@ public class MessageBodyFactory implements MessageBodyWorkers {
             Annotation[] as) {
         List<MediaType> mtl = new ArrayList<MediaType>();
         for (MessageBodyWriterPair mbwp : writerListProviders) {
-            if (mbwp.mbw.isWriteable(c, t, as, null)) {
+            if (mbwp.mbw.isWriteable(c, t, as, MediaType.APPLICATION_OCTET_STREAM_TYPE)) {
                 for (MediaType mt : mbwp.types) mtl.add(mt);
             }
         }

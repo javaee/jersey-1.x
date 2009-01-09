@@ -41,6 +41,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
+import java.util.List;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.GenericEntity;
 import javax.ws.rs.core.MediaType;
@@ -99,19 +100,6 @@ public abstract class TerminatingClientHandler implements ClientHandler {
         if (entity == null)
             return;
 
-        MultivaluedMap<String, Object> metadata = ro.getMetadata();
-        MediaType mediaType = null;
-        final Object mediaTypeHeader = metadata.getFirst("Content-Type");
-        if (mediaTypeHeader instanceof MediaType) {
-            mediaType = (MediaType)mediaTypeHeader;
-        } else {
-            if (mediaTypeHeader != null) {
-                mediaType = MediaType.valueOf(mediaTypeHeader.toString());
-            } else {
-                mediaType = MediaType.APPLICATION_OCTET_STREAM_TYPE;
-            }
-        }
-
         Type entityType = null;
         if (entity instanceof GenericEntity) {
             final GenericEntity ge = (GenericEntity)entity;
@@ -121,6 +109,28 @@ public abstract class TerminatingClientHandler implements ClientHandler {
             entityType = entity.getClass();
         }
         final Class entityClass = entity.getClass();
+
+
+        MultivaluedMap<String, Object> metadata = ro.getMetadata();
+        MediaType mediaType = null;
+        final Object mediaTypeHeader = metadata.getFirst("Content-Type");
+        if (mediaTypeHeader instanceof MediaType) {
+            mediaType = (MediaType)mediaTypeHeader;
+        } else {
+            if (mediaTypeHeader != null) {
+                mediaType = MediaType.valueOf(mediaTypeHeader.toString());
+            } else {
+                // Content-Type is not present choose a default type
+                List<MediaType> mediaTypes = workers.getMessageBodyWriterMediaTypes(
+                        entityClass, entityType, EMPTY_ANNOTATIONS);
+                mediaType = mediaTypes.get(0);
+                if (mediaType.isWildcardType() || mediaType.isWildcardSubtype())
+                    mediaType = MediaType.APPLICATION_OCTET_STREAM_TYPE;
+                
+                metadata.putSingle("Content-Type", mediaType);
+            }
+        }
+
 
         final MessageBodyWriter bw = workers.getMessageBodyWriter(
                 entityClass, entityType,

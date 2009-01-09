@@ -296,7 +296,7 @@ public class EntityTypesTest extends AbstractTypeTester {
         WebResource r = resource("/", false);
 
         String xml = "<root>foo</root>";
-        ClientResponse cr = r.post(ClientResponse.class, xml);
+        ClientResponse cr = r.type("application/xml").post(ClientResponse.class, xml);
         assertEquals(400, cr.getStatus());
     }
     
