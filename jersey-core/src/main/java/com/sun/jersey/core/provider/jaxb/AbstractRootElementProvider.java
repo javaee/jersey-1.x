@@ -55,9 +55,15 @@ import javax.xml.bind.UnmarshalException;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
+import javax.xml.transform.stream.StreamSource;
 
 /**
- *
+ * An abstract provider for JAXB types that are annotated with
+ * {@link XmlRootElement} or {@link XmlType}.
+ * <p>
+ * Implementing classes may extend this class to provide specific marshalling
+ * and unmarshallng behaviour.
+ * 
  * @author Paul.Sandoz@Sun.Com
  */
 public abstract class AbstractRootElementProvider extends AbstractJAXBProvider<Object> {    
@@ -98,10 +104,28 @@ public abstract class AbstractRootElementProvider extends AbstractJAXBProvider<O
         }
     }
 
-    protected abstract Object readFrom(Class<Object> type, MediaType mediaType,
-            Unmarshaller m, InputStream entityStream)
-            throws JAXBException, IOException;
-    
+    /**
+     * Unmarshal a JAXB type.
+     * <p>
+     * Implementing classes may override this method.
+     *
+     * @param type the JAXB type
+     * @param mediaType the media type
+     * @param u the unmarshaller to use for unmarshalling.
+     * @param entityStream the input stream to unmarshal from.
+     * @return an instance of the JAXB type.
+     * @throws javax.xml.bind.JAXBException
+     * @throws java.io.IOException
+     */
+    protected Object readFrom(Class<Object> type, MediaType mediaType,
+            Unmarshaller u, InputStream entityStream)
+            throws JAXBException, IOException {
+        if (type.isAnnotationPresent(XmlRootElement.class))
+            return u.unmarshal(entityStream);
+        else
+            return u.unmarshal(new StreamSource(entityStream), type).getValue();
+    }
+
     public final void writeTo(
             Object t, 
             Class<?> type, 
@@ -123,8 +147,23 @@ public abstract class AbstractRootElementProvider extends AbstractJAXBProvider<O
                     );
         }
     }
-    
-    protected abstract void writeTo(Object t, MediaType mediaType, Charset c,
+
+    /**
+     * Marshal an instance of a JAXB type.
+     * <p>
+     * Implementing classes may override this method.
+     *
+     * @param t the instance of the JAXB type.
+     * @param mediaType the meida type.
+     * @param c the character set to serialize characters to.
+     * @param m the marshaller to marshaller the instance of the JAXB type.
+     * @param entityStream the output stream to marshal to.
+     * @throws javax.xml.bind.JAXBException
+     * @throws java.io.IOException
+     */
+    protected void writeTo(Object t, MediaType mediaType, Charset c,
             Marshaller m, OutputStream entityStream)
-            throws JAXBException, IOException;
+            throws JAXBException, IOException {
+        m.marshal(t, entityStream);
+    }
 }

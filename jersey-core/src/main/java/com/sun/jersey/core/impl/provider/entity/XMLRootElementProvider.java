@@ -38,20 +38,11 @@
 package com.sun.jersey.core.impl.provider.entity;
 
 import com.sun.jersey.core.provider.jaxb.AbstractRootElementProvider;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.nio.charset.Charset;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.ext.Providers;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
-import javax.xml.bind.Unmarshaller;
-import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.transform.stream.StreamSource;
 
 /**
  *
@@ -88,22 +79,5 @@ public class XMLRootElementProvider extends AbstractRootElementProvider {
         protected boolean isSupported(MediaType m) {
             return m.getSubtype().endsWith("+xml");
         }
-    }
-    
-    @Override
-    protected final Object readFrom(Class<Object> type, MediaType mediaType,
-            Unmarshaller u, InputStream entityStream)
-            throws JAXBException, IOException {
-        if (type.isAnnotationPresent(XmlRootElement.class))
-            return u.unmarshal(entityStream);
-        else
-            return u.unmarshal(new StreamSource(entityStream), type).getValue();
-    }
-    
-    @Override
-    protected void writeTo(Object t, MediaType mediaType, Charset c,
-            Marshaller m, OutputStream entityStream)
-            throws JAXBException, IOException {
-        m.marshal(t, entityStream);
     }
 }
