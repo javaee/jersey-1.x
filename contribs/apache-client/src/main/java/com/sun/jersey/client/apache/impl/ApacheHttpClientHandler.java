@@ -45,34 +45,22 @@ import java.io.FilterInputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
 
-import java.lang.annotation.Annotation;
-import java.lang.reflect.Type;
 
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Map;
-import java.util.HashMap;
 
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.GenericEntity;
 import javax.ws.rs.core.MultivaluedMap;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.ext.MessageBodyReader;
-import javax.ws.rs.ext.MessageBodyWriter;
-import javax.ws.rs.ext.RuntimeDelegate;
-import javax.ws.rs.ext.RuntimeDelegate.HeaderDelegate;
 
 import com.sun.jersey.core.header.InBoundHeaders;
 
-import com.sun.jersey.api.client.ClientHandler;
 import com.sun.jersey.api.client.ClientHandlerException;
 import com.sun.jersey.api.client.ClientRequest;
 import com.sun.jersey.api.client.ClientResponse;
-import com.sun.jersey.api.client.GenericType;
 
+import com.sun.jersey.api.client.TerminatingClientHandler;
+import com.sun.jersey.api.client.WriteRequestEntityListener;
 import com.sun.jersey.client.apache.config.ApacheHttpClientState;
-import com.sun.jersey.spi.MessageBodyWorkers;
 
 import java.net.URI;
 import org.apache.commons.httpclient.HttpClient;
@@ -123,16 +111,11 @@ import org.apache.commons.httpclient.auth.CredentialsProvider;
  *
  * @author jorgew
  */
-public final class ApacheHttpClientHandler implements ClientHandler {
-
-    private static final Annotation[] EMPTY_ANNOTATIONS = new Annotation[0];
+public final class ApacheHttpClientHandler extends TerminatingClientHandler {
 
     private static final DefaultCredentialsProvider DEFAULT_CREDENTIALS_PROVIDER =
             new DefaultCredentialsProvider();
 
-    @Context
-    private MessageBodyWorkers bodyContext;
-    
     private HttpClient client = new HttpClient(new MultiThreadedHttpConnectionManager());
 
     public ClientResponse handle(ClientRequest cr)
@@ -229,7 +212,7 @@ public final class ApacheHttpClientHandler implements ClientHandler {
 
             method.setDoAuthentication(true);
 
-            writeHeaders(cr.getMetadata(), method);
+            writeOutBoundHeaders(cr.getMetadata(), method);
 
             if (method instanceof EntityEnclosingMethod) {
                 EntityEnclosingMethod entMethod = (EntityEnclosingMethod) method;
@@ -246,7 +229,17 @@ public final class ApacheHttpClientHandler implements ClientHandler {
 
                 Object entity = cr.getEntity();
                 if (entity != null) {
-                    writeEntity(entMethod, cr, entity);
+                    final ByteArrayOutputStream bout = new ByteArrayOutputStream();
+                    writeRequestEntity(cr, new WriteRequestEntityListener() {
+                        public void onRequestEntitySize(long size) {
+                        }
+
+                        public OutputStream onGetOutputStream() throws IOException {
+                            return bout;
+                        }
+                    });
+                    entMethod.setRequestEntity(new ByteArrayRequestEntity(bout.toByteArray(),
+                            cr.getMetadata().getFirst("Content-Type").toString()));
                 }
             } else {
                 Boolean followRedirects = (Boolean) props.get(ApacheHttpClientConfig.PROPERTY_FOLLOW_REDIRECTS);
@@ -260,7 +253,6 @@ public final class ApacheHttpClientHandler implements ClientHandler {
             client.executeMethod(method);
 
             return new HttpClientResponse(method);
-
         } catch (Exception e) {
             if (method != null) {
                 method.releaseConnection();
@@ -279,75 +271,37 @@ public final class ApacheHttpClientHandler implements ClientHandler {
         }
     }
     
-    private void writeEntity(EntityEnclosingMethod entMethod, ClientRequest cr, Object entity)
-            throws IOException {
-
-        MultivaluedMap<String, Object> metadata = cr.getMetadata();
-        MediaType mediaType = null;
-        final Object mediaTypeHeader = metadata.getFirst("Content-Type");
-        if (mediaTypeHeader instanceof MediaType) {
-            mediaType = (MediaType) mediaTypeHeader;
-        } else {
-            if (mediaTypeHeader != null) {
-                mediaType = MediaType.valueOf(mediaTypeHeader.toString());
-            } else {
-                mediaType = new MediaType("application", "octet-stream");
-            }
-        }
-
-        Type entityType = null;
-        if (entity instanceof GenericEntity) {
-            final GenericEntity ge = (GenericEntity) entity;
-            entityType = ge.getType();
-            entity = ge.getEntity();
-        } else {
-            entityType = entity.getClass();
-        }
-        final Class entityClass = entity.getClass();
-
-        final MessageBodyWriter bw = bodyContext.getMessageBodyWriter(entityClass, entityType,
-                EMPTY_ANNOTATIONS, mediaType);
-        if (bw == null) {
-            throw new ClientHandlerException(
-                    "A message body writer for Java type, " + entity.getClass() +
-                    ", and MIME media type, " + mediaType + ", was not found");
-        }
-
-        final ByteArrayOutputStream bout = new ByteArrayOutputStream();
-        final OutputStream out = cr.getAdapter().adapt(cr, bout);
-        bw.writeTo(entity, entityClass, entityType,
-                EMPTY_ANNOTATIONS, mediaType, metadata, out);
-        out.flush();
-        out.close();
-
-        entMethod.setRequestEntity(new ByteArrayRequestEntity(bout.toByteArray(), mediaType.toString()));
-    }
-
-    private void writeHeaders(MultivaluedMap<String, Object> metadata, HttpMethod method) {
+    private void writeOutBoundHeaders(MultivaluedMap<String, Object> metadata, HttpMethod method) {
         for (Map.Entry<String, List<Object>> e : metadata.entrySet()) {
             List<Object> vs = e.getValue();
             if (vs.size() == 1) {
-                method.setRequestHeader(e.getKey(), getHeaderValue(vs.get(0)));
+                method.setRequestHeader(e.getKey(), headerValueToString(vs.get(0)));
             } else {
                 StringBuilder b = new StringBuilder();
                 boolean add = false;
                 for (Object v : e.getValue()) {
-                    if (add) {
-                        b.append(',');
-                    }
+                    if (add) b.append(',');
                     add = true;
-                    b.append(getHeaderValue(v));
+                    b.append(headerValueToString(v));
                 }
-                method.setRequestHeader(e.getKey(), b.toString());
+                 method.setRequestHeader(e.getKey(), b.toString());
             }
+
         }
     }
 
-    @SuppressWarnings("unchecked")
-    private String getHeaderValue(Object headerValue) {
-        HeaderDelegate hp = RuntimeDelegate.getInstance().
-                createHeaderDelegate(headerValue.getClass());
-        return hp.toString(headerValue);
+    private InBoundHeaders getInBoundHeaders(HttpMethod method) {
+        InBoundHeaders headers = new InBoundHeaders();
+        Header[] respHeaders = method.getResponseHeaders();
+        for (Header header : respHeaders) {
+            List<String> list = headers.get(header.getName());
+            if (list == null) {
+                list = new ArrayList<String>();
+            }
+            list.add(header.getValue());
+            headers.put(header.getName(), list);
+        }
+        return headers;
     }
 
     private final class HttpClientResponseInputStream extends FilterInputStream {
@@ -371,62 +325,16 @@ public final class ApacheHttpClientHandler implements ClientHandler {
     private final class HttpClientResponse extends ClientResponse {
 
         private final HttpMethod method;
-        private final MultivaluedMap<String, String> metadata;
-        private Map<String, Object> properties;
-        private InputStream in;
-        private int status;
 
-        HttpClientResponse(HttpMethod method) {
+        HttpClientResponse(HttpMethod method) throws IOException {
+            super(method.getStatusCode(), getInBoundHeaders(method),
+                    new HttpClientResponseInputStream(method), getMessageBodyWorkers());
             this.method = method;
-            this.status = method.getStatusCode();
-
-            this.metadata = new InBoundHeaders();
-            Header[] respHeaders = method.getResponseHeaders();
-            for (Header header : respHeaders) {
-                List<String> list = metadata.get(header.getName());
-                if (list == null) {
-                    list = new ArrayList<String>();
-                }
-                list.add(header.getValue());
-                metadata.put(header.getName(), list);
-            }
-
-            try {
-                in = new HttpClientResponseInputStream(method);
-            } catch (IOException ex) {
-                throw new IllegalArgumentException(ex);
-            }
-        }
-
-        @Override
-        public int getStatus() {
-            return status;
-        }
-
-        @Override
-        public void setStatus(int status) {
-            this.status = status;
-        }
-
-        @Override
-        public Response.Status getResponseStatus() {
-            return Response.Status.fromStatusCode(status);
-        }
-
-        @Override
-        public void setResponseStatus(Response.Status status) {
-            setStatus(status.getStatusCode());
-        }
-
-        @Override
-        public MultivaluedMap<String, String> getMetadata() {
-            return metadata;
         }
 
         @Override
         public boolean hasEntity() {
-            if ((method instanceof HeadMethod) ||
-                    (in == null)) {
+            if (method instanceof HeadMethod) {
                 return false;
             }
 
@@ -440,57 +348,6 @@ public final class ApacheHttpClientHandler implements ClientHandler {
             }
 
             return false;
-        }
-
-        @Override
-        public InputStream getEntityInputStream() {
-            return in;
-        }
-
-        @Override
-        public void setEntityInputStream(InputStream in) {
-            this.in = in;
-        }
-
-        @Override
-        public <T> T getEntity(Class<T> c) {
-            return getEntity(c, c);
-        }
-
-        @Override
-        public <T> T getEntity(GenericType<T> gt) {
-            return getEntity(gt.getRawClass(), gt.getType());
-        }
-
-        private <T> T getEntity(Class<T> c, Type type) {
-            try {
-                MediaType mediaType = getType();
-                final MessageBodyReader<T> br = bodyContext.getMessageBodyReader(
-                        c, type,
-                        EMPTY_ANNOTATIONS, mediaType);
-                if (br == null) {
-                    throw new ClientHandlerException(
-                            "A message body reader for Java type, " + c +
-                            ", and MIME media type, " + mediaType + ", was not found");
-                }
-                T t = br.readFrom(c, type, EMPTY_ANNOTATIONS, mediaType, metadata, in);
-                if (!(t instanceof InputStream)) {
-                    in.close();
-                }
-                in = null;
-                return t;
-            } catch (IOException ex) {
-                throw new IllegalArgumentException(ex);
-            }
-        }
-
-        @Override
-        public Map<String, Object> getProperties() {
-            if (properties != null) {
-                return properties;
-            }
-
-            return properties = new HashMap<String, Object>();
         }
     }
 }
