@@ -46,13 +46,27 @@ package com.sun.jersey.api.client;
  */
 public class UniformInterfaceException extends RuntimeException {
     transient private final ClientResponse r;
-    
+
+    /**
+     * Construct a uniform interface exception.
+     *
+     * @param r the client response. The message of the expception is set to
+     *        r.toString();
+     */
     public UniformInterfaceException(ClientResponse r) {
+        super(r.toString());
         this.r = r;
     }    
     
+    /**
+     * Construct a uniform interface exception.
+     *
+     * @param message the message of the exception.
+     * @param r the client response.
+     *
+     */
     public UniformInterfaceException(String message, ClientResponse r) {
-	super(message);
+        super(message);
         this.r = r;
     }
     

@@ -1,4 +1,9 @@
 release 1.0.2 (2009-01/02)
+- Fixed issue 182
+  https://jersey.dev.java.net/issues/show_bug.cgi?id=182
+  The message of UniformInterfaceException is set to ClientResponse.toString()
+  if no message is explicitly given. ClientResponse.toString() returns a String
+  with the status code of the response.
 - Fixed issue 150
   https://jersey.dev.java.net/issues/show_bug.cgi?id=150
   If no media type is declared with a client request of the Client API

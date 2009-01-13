@@ -219,7 +219,7 @@ public class ClientResponse {
 
     private <T> T getEntity(Class<T> c, Type type) {
         if (getStatus() == 204) {
-            throw new UniformInterfaceException("204 (No Content)", this);
+            throw new UniformInterfaceException(this);
         }
 
         try {
@@ -312,5 +312,10 @@ public class ClientResponse {
             cs.add(NewCookie.valueOf(h));
         }
         return cs;
+    }
+
+    @Override
+    public String toString() {
+        return "Client response status: " + status;
     }
 }

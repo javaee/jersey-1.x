@@ -532,7 +532,7 @@ public class AsyncWebResource extends Filterable implements
 
                 if (r.getStatus() < 300) return r.getEntity(c);
 
-                throw new UniformInterfaceException("Status: " + r.getStatus(), r);
+                throw new UniformInterfaceException(r);
             }
         });
         new Thread(ft).start();
@@ -548,7 +548,7 @@ public class AsyncWebResource extends Filterable implements
 
                 if (r.getStatus() < 300) return r.getEntity(gt);
 
-                throw new UniformInterfaceException("Status: " + r.getStatus(), r);
+                throw new UniformInterfaceException(r);
             }
         });
         new Thread(ft).start();
@@ -561,7 +561,7 @@ public class AsyncWebResource extends Filterable implements
                 ClientResponse r = getHeadHandler().handle(ro);
 
                 if (r.getStatus() >= 300) 
-                    throw new UniformInterfaceException("Status: " + r.getStatus(), r);
+                    throw new UniformInterfaceException(r);
                 return null;
             }
         });
