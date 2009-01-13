@@ -50,7 +50,7 @@ public class UniformInterfaceException extends RuntimeException {
     /**
      * Construct a uniform interface exception.
      *
-     * @param r the client response. The message of the expception is set to
+     * @param r the client response. The message of the exception is set to
      *        r.toString();
      */
     public UniformInterfaceException(ClientResponse r) {
