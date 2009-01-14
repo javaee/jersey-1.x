@@ -53,19 +53,17 @@ public class AbstractResourceMethod extends AbstractMethod
     private boolean isProducesDeclared;    
     private List<Parameter> parameters;
     private String httpMethod;
-    private Annotation[] annotations;
 
     public AbstractResourceMethod(AbstractResource resource, 
             Method method, String httpMethod,
             Annotation[] annotations) {
-        super(method);
+        super(method, annotations);
 
         this.resource = resource;
         this.httpMethod = httpMethod.toUpperCase();
         this.consumeMimeList = new ArrayList<MediaType>();
         this.produceMimeList = new ArrayList<MediaType>();
         this.parameters = new ArrayList<Parameter>();
-        this.annotations = annotations;
     }
 
     public AbstractResource getDeclaringResource() {
@@ -96,10 +94,6 @@ public class AbstractResourceMethod extends AbstractMethod
         return parameters;
     }
 
-    public Annotation[] getAnnotations() {
-        return annotations;
-    }
-    
     public void accept(AbstractModelVisitor visitor) {
         visitor.visitAbstractResourceMethod(this);
     }

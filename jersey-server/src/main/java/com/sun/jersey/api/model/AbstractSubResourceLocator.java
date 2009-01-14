@@ -36,6 +36,7 @@
  */
 package com.sun.jersey.api.model;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
@@ -53,8 +54,8 @@ public class AbstractSubResourceLocator extends AbstractMethod
     /**
      * Creates a new instance of AbstractSubResourceLocator
      */
-    public AbstractSubResourceLocator(Method method, PathValue uriPath) {
-        super(method);
+    public AbstractSubResourceLocator(Method method, PathValue uriPath, Annotation[] annotations) {
+        super(method, annotations);
         
         this.uriPath =  uriPath;
         this.parameters = new ArrayList<Parameter>();

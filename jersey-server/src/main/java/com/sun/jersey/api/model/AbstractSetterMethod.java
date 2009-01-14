@@ -36,6 +36,7 @@
  */
 package com.sun.jersey.api.model;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
@@ -47,8 +48,8 @@ import java.util.List;
 public class AbstractSetterMethod extends AbstractMethod implements Parameterized, AbstractModelComponent {
     private List<Parameter> parameters;
     
-    public AbstractSetterMethod(Method method) {
-        super(method);
+    public AbstractSetterMethod(Method method, Annotation[] annotations) {
+        super(method, annotations);
         this.parameters = new ArrayList<Parameter>();        
     }
     

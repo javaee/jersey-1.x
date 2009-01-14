@@ -36,6 +36,7 @@
  */
 package com.sun.jersey.api.model;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 
 /**
@@ -45,12 +46,31 @@ import java.lang.reflect.Method;
 public abstract class AbstractMethod {
     private Method method;
 
-    public AbstractMethod(Method method) { 
+    private Annotation[] annotations;
+
+    public AbstractMethod(Method method, Annotation[] annotations) {
         assert null != method;
         this.method = method;
+        this.annotations = annotations;
     }
     
     public Method getMethod() {
         return method;
+    }
+
+    public <T extends Annotation> T getAnnotation(Class<T> annotationType) {
+        for (Annotation a : annotations) {
+            if (annotationType == a.annotationType())
+                return annotationType.cast(a);
+        }
+        return null;
+    }
+
+    public Annotation[] getAnnotations() {
+        return annotations;
+    }
+
+    public boolean isAnnotationPresent(Class<? extends Annotation> annotationType) {
+        return getAnnotation(annotationType) != null;
     }
 }
