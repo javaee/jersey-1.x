@@ -559,7 +559,7 @@ public class UriTemplate {
          
         if (fragment != null && fragment.length() > 0) {
             sb.append('#');
-            createURIComponent(UriComponent.Type.FRAGMENT, path, values, encode, sb);                
+            createURIComponent(UriComponent.Type.FRAGMENT, fragment, values, encode, sb);
         }
         return sb.toString();
     }
@@ -700,7 +700,7 @@ public class UriTemplate {
          
         if (fragment != null && fragment.length() > 0) {
             sb.append('#');
-            offset = createURIComponent(UriComponent.Type.FRAGMENT, path, values, 
+            offset = createURIComponent(UriComponent.Type.FRAGMENT, fragment, values,
                     offset, encode, mapValues, sb);
         }
         return sb.toString();

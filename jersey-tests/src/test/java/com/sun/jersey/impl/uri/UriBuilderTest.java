@@ -530,6 +530,20 @@ public class UriBuilderTest extends TestCase {
         assertEquals(URI.create("http://localhost:8080/a/b/c?a=%3D%2B%26%25xx%20"), bu);
     }
 
+    public void testBuildFragmentTemplates() {
+        URI bu = UriBuilder.fromUri("http://localhost:8080/a/b/c").
+                path("/{foo}/{bar}/{baz}/{foo}").fragment("{foo}").build("x", "y", "z");
+        assertEquals(URI.create("http://localhost:8080/a/b/c/x/y/z/x#x"), bu);
+
+        Map<String, Object> m = new HashMap<String, Object>();
+        m.put("foo", "x");
+        m.put("bar", "y");
+        m.put("baz", "z");
+        bu = UriBuilder.fromUri("http://localhost:8080/a/b/c").
+                path("/{foo}/{bar}/{baz}/{foo}").fragment("{foo}").buildFromMap(m);
+        assertEquals(URI.create("http://localhost:8080/a/b/c/x/y/z/x#x"), bu);
+    }
+
     public void testTemplatesDefaultPort() {
         URI bu = UriBuilder.fromUri("http://localhost/a/b/c").
                 path("/{foo}/{bar}/{baz}/{foo}").build("x", "y", "z");

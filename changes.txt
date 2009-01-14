@@ -1,4 +1,7 @@
 release 1.0.2 (2009-01/02)
+- Fixed issue when building a URI with templates and fragment: the fragment
+  component was being ignored and the path component was used instead as
+  the fragment component.
 - Fixed issue 182
   https://jersey.dev.java.net/issues/show_bug.cgi?id=182
   The message of UniformInterfaceException is set to ClientResponse.toString()
