@@ -552,9 +552,12 @@ public class ServletContainer extends HttpServlet implements ContainerListener {
      * requests will be processed using the previously loaded web application.
      */
     public final void reload() {
-        WebApplication _application = create();
-        initiate(resourceConfig, _application);
-        application = _application;
+        WebApplication oldApplication = application;
+        WebApplication newApplication = create();
+        initiate(resourceConfig, newApplication);
+
+        application = newApplication;
+        oldApplication.destroy();
     }
 
     /**

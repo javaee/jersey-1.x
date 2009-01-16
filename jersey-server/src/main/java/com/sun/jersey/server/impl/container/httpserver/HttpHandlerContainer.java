@@ -195,6 +195,8 @@ public class HttpHandlerContainer implements HttpHandler, ContainerListener {
     // ContainerListener
     
     public void onReload() {
+        WebApplication oldApplication = application;
         application = application.clone();
+        oldApplication.destroy();
     }
 }

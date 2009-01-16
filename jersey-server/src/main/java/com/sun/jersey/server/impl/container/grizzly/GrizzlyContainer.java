@@ -159,6 +159,8 @@ public final class GrizzlyContainer extends GrizzlyAdapter implements ContainerL
     // ContainerListener
     
     public void onReload() {
+        WebApplication oldApplication = application;
         application = application.clone();
+        oldApplication.destroy();
     }    
 }
