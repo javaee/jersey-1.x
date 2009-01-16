@@ -82,14 +82,6 @@ public final class WebApplicationContext implements UriRuleContext, ExtendedUriI
         this.response = response;
     }
 
-    /* package */ void setContainerRequest(ContainerRequest request) {
-        this.request = request;
-        this.response.setContainerRequest(request);
-    }
-
-    /* package */ void setContainerResponse(ContainerResponse response) {
-        this.response = response;
-    }
 
     // HttpContext
 
@@ -113,7 +105,9 @@ public final class WebApplicationContext implements UriRuleContext, ExtendedUriI
         return properties = new HashMap<String, Object>();
     }
 
+    
     // UriMatchResultContext
+
     private MatchResult matchResult;
 
     public MatchResult getMatchResult() {
@@ -123,12 +117,31 @@ public final class WebApplicationContext implements UriRuleContext, ExtendedUriI
     public void setMatchResult(MatchResult matchResult) {
         this.matchResult = matchResult;
     }
-    
+
+
     // UriRuleContext
+
     private final LinkedList<Object> resources = new LinkedList<Object>();
     private final LinkedList<MatchResult> matchResults = new LinkedList<MatchResult>();
     private final LinkedList<String> paths = new LinkedList<String>();
     private final LinkedList<UriTemplate> templates = new LinkedList<UriTemplate>();
+
+    public ContainerRequest getContainerRequest() {
+        return request;
+    }
+
+    public void setContainerRequest(ContainerRequest request) {
+        this.request = request;
+        this.response.setContainerRequest(request);
+    }
+
+    public ContainerResponse getContainerResponse() {
+        return response;
+    }
+    
+    public void setContainerResponse(ContainerResponse response) {
+        this.response = response;
+    }
 
     public Object getResource(Class resourceClass) {
         final ResourceClass rc = app.getResourceClass(resourceClass);
@@ -171,7 +184,10 @@ public final class WebApplicationContext implements UriRuleContext, ExtendedUriI
         paths.addFirst(ep.substring(0,
                 ep.length() - rhpathlen));
     }
+
+    
     // UriInfo, defer to HttpRequestContext
+
     private MultivaluedMapImpl encodedTemplateValues;
     private MultivaluedMapImpl decodedTemplateValues;
 
@@ -223,7 +239,9 @@ public final class WebApplicationContext implements UriRuleContext, ExtendedUriI
         return request.getQueryParameters(decode);
     }
 
+
     // UriInfo, matching specific functionality
+
     public MultivaluedMap<String, String> getPathParameters() {
         return getPathParameters(true);
     }
@@ -263,6 +281,7 @@ public final class WebApplicationContext implements UriRuleContext, ExtendedUriI
         return resources;
     }
 
+    
     // ExtendedUriInfo
     
     public List<MatchResult> getMatchedResults() {

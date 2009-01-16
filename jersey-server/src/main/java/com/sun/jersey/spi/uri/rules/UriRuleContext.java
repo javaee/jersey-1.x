@@ -39,6 +39,8 @@ package com.sun.jersey.spi.uri.rules;
 
 import com.sun.jersey.api.core.HttpContext;
 import com.sun.jersey.api.uri.UriTemplate;
+import com.sun.jersey.spi.container.ContainerRequest;
+import com.sun.jersey.spi.container.ContainerResponse;
 import java.util.List;
 
 /**
@@ -47,6 +49,34 @@ import java.util.List;
  * @author Paul.Sandoz@Sun.Com
  */
 public interface UriRuleContext extends HttpContext, UriMatchResultContext {
+
+    /**
+     * Get the container request.
+     *
+     * @return the container request.
+     */
+    ContainerRequest getContainerRequest();
+
+    /**
+     * Set the container request.
+     *
+     * @param request the container request.
+     */
+    void setContainerRequest(ContainerRequest request);
+
+    /**
+     * Get the container response.
+     *
+     * @return the container response.
+     */
+    ContainerResponse getContainerResponse();
+    
+    /**
+     * Set the container response.
+     *
+     * @param response the container response.
+     */
+    void setContainerResponse(ContainerResponse response);
 
     /**
      * Get the resource instance from a resource class.

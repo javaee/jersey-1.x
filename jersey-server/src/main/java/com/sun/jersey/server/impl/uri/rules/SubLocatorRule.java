@@ -42,6 +42,8 @@ import com.sun.jersey.api.container.MappableContainerException;
 import com.sun.jersey.api.core.HttpContext;
 import com.sun.jersey.api.uri.UriTemplate;
 import com.sun.jersey.server.impl.inject.AbstractHttpContextInjectable;
+import com.sun.jersey.spi.container.ContainerRequestFilter;
+import com.sun.jersey.spi.container.ContainerResponseFilter;
 import com.sun.jersey.spi.inject.Injectable;
 import com.sun.jersey.spi.uri.rules.UriRule;
 import com.sun.jersey.spi.uri.rules.UriRuleContext;
@@ -62,11 +64,20 @@ public final class SubLocatorRule extends BaseRule {
     
     private final Method m;
 
+    private final List<ContainerRequestFilter> requestFilters;
+
+    private final List<ContainerResponseFilter> responseFilters;
+    
     public SubLocatorRule(UriTemplate template,
-            Method m, List<Injectable> is) {
+            Method m, 
+            List<Injectable> is,
+            List<ContainerRequestFilter> requestFilters,
+            List<ContainerResponseFilter> responseFilters) {
         super(template);
         this.m = m;
         this.is = AbstractHttpContextInjectable.transform(is);
+        this.requestFilters = requestFilters;
+        this.responseFilters = responseFilters;
     }
 
     public boolean accept(CharSequence path, Object resource, UriRuleContext context) {

@@ -66,6 +66,8 @@ import com.sun.jersey.server.impl.inject.ServerInjectableProviderContext;
 import com.sun.jersey.server.spi.component.ResourceComponentProvider;
 import com.sun.jersey.server.impl.component.ResourceFactory;
 import com.sun.jersey.core.spi.component.ComponentScope;
+import com.sun.jersey.server.impl.application.FilterFactory;
+import com.sun.jersey.spi.container.ResourceFilter;
 import com.sun.jersey.spi.uri.rules.UriRule;
 import com.sun.jersey.spi.uri.rules.UriRules;
 import java.util.ArrayList;
@@ -94,8 +96,10 @@ public final class ResourceClass {
             ResourceConfig config,
             ResourceMethodDispatcherFactory df,
             ServerInjectableProviderContext injectableContext,
-            AbstractResource resource,
-            WadlFactory wadlFactory) {
+            FilterFactory ff,
+            WadlFactory wadlFactory,
+            AbstractResource resource
+            ) {
         this.resource = resource;
 
         this.config = config;
@@ -104,12 +108,12 @@ public final class ResourceClass {
 
         RulesMap<UriRule> rulesMap = new RulesMap<UriRule>();
 
-        processSubResourceLocators(injectableContext, rulesMap);
+        processSubResourceLocators(ff, injectableContext, rulesMap);
 
         final Map<PathPattern, ResourceMethodMap> patternMethodMap =
-                processSubResourceMethods(df);
+                processSubResourceMethods(df, ff);
 
-        final ResourceMethodMap methodMap = processMethods(df);
+        final ResourceMethodMap methodMap = processMethods(df, ff);
 
         // Create the rules for the sub-resource HTTP methods
         for (Map.Entry<PathPattern, ResourceMethodMap> e : patternMethodMap.entrySet()) {
@@ -196,16 +200,21 @@ public final class ResourceClass {
         rmm.put(rm);
     }
 
-    private void processSubResourceLocators(ServerInjectableProviderContext injectableContext,
+    private void processSubResourceLocators(
+            FilterFactory ff,
+            ServerInjectableProviderContext injectableContext,
             RulesMap<UriRule> rulesMap) {
         for (final AbstractSubResourceLocator locator : resource.getSubResourceLocators()) {
             UriTemplate t = new PathTemplate(locator.getPath().getValue());
             PathPattern p = new PathPattern(t);
 
+            List<ResourceFilter> resourceFilters = ff.getResourceFilters(locator);
             UriRule r = new SubLocatorRule(
                     t,
                     locator.getMethod(),
-                    injectableContext.getInjectable(locator.getParameters(), ComponentScope.PerRequest));
+                    injectableContext.getInjectable(locator.getParameters(), ComponentScope.PerRequest),
+                    ff.getRequestFilters(resourceFilters),
+                    ff.getResponseFilters(resourceFilters));
 
             rulesMap.put(p, 
                     new RightHandPathRule(
@@ -216,7 +225,8 @@ public final class ResourceClass {
     }
 
     private Map<PathPattern, ResourceMethodMap> processSubResourceMethods(
-            ResourceMethodDispatcherFactory df) {
+            ResourceMethodDispatcherFactory df,
+            FilterFactory ff) {
         final Map<PathPattern, ResourceMethodMap> patternMethodMap =
                 new HashMap<PathPattern, ResourceMethodMap>();
         for (final AbstractSubResourceMethod method : this.resource.getSubResourceMethods()) {
@@ -224,7 +234,7 @@ public final class ResourceClass {
             UriTemplate t = new PathTemplate(method.getPath().getValue());
             PathPattern p = new PathPattern(t, "(/)?");
 
-            ResourceMethod rm = new ResourceHttpMethod(df, t, method);
+            ResourceMethod rm = new ResourceHttpMethod(df, ff, t, method);
             addToPatternMethodMap(patternMethodMap, p, rm);
         }
 
@@ -236,10 +246,11 @@ public final class ResourceClass {
         return patternMethodMap;
     }
 
-    private ResourceMethodMap processMethods(ResourceMethodDispatcherFactory df) {
+    private ResourceMethodMap processMethods(ResourceMethodDispatcherFactory df,
+            FilterFactory ff) {
         final ResourceMethodMap methodMap = new ResourceMethodMap();
         for (final AbstractResourceMethod resourceMethod : this.resource.getResourceMethods()) {
-            ResourceMethod rm = new ResourceHttpMethod(df, resourceMethod);
+            ResourceMethod rm = new ResourceHttpMethod(df, ff, resourceMethod);
             methodMap.put(rm);
         }
 

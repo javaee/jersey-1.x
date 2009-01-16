@@ -171,10 +171,8 @@ public final class WebApplicationImpl implements WebApplication {
     private ResourceMethodDispatcherFactory dispatcherFactory;
     
     private ResourceContext resourceContext;
-        
-    private List<ContainerRequestFilter> requestFilters = new LinkedList<ContainerRequestFilter>();
-    
-    private List<ContainerResponseFilter> responseFilters = new LinkedList<ContainerResponseFilter>();
+
+    private FilterFactory filterFactory;
 
     private WadlFactory wadlFactory;
     
@@ -291,9 +289,10 @@ public final class WebApplicationImpl implements WebApplication {
         return new ResourceClass(
                 resourceConfig,
                 dispatcherFactory,
-                injectableFactory, 
-                ar,
-                this.wadlFactory);
+                injectableFactory,
+                filterFactory,
+                wadlFactory,
+                ar);
     }
 
     private AbstractResource getAbstractResource(Object o) {
@@ -470,18 +469,8 @@ public final class WebApplicationImpl implements WebApplication {
         injectableFactory.add(new QueryParamInjectableProvider());
 
         // Intiate filters
-        FilterFactory ff = new FilterFactory(providerServices);
-        // Initiate request filters
-        requestFilters.addAll(ff.getRequestFilters(
-                resourceConfig.getProperty(
-                    ResourceConfig.PROPERTY_CONTAINER_REQUEST_FILTERS)));
-        requestFilters.addAll(providerServices.getServices(ContainerRequestFilter.class));
-        // Initiate response filters
-        responseFilters.addAll(ff.getResponseFilters(
-                resourceConfig.getProperty(
-                    ResourceConfig.PROPERTY_CONTAINER_RESPONSE_FILTERS)));
-        responseFilters.addAll(providerServices.getServices(ContainerResponseFilter.class));
-        
+        filterFactory = new FilterFactory(providerServices, resourceConfig);
+
         // Inject on all components
         cpFactory.injectOnAllComponents();
         cpFactory.injectOnProviderInstances(resourceConfig.getProviderSingletons());
@@ -529,7 +518,7 @@ public final class WebApplicationImpl implements WebApplication {
     private void _handleRequest(final WebApplicationContext localContext,
             ContainerRequest request, ContainerResponse response) throws IOException {
         try {
-            for (ContainerRequestFilter f : requestFilters) {
+            for (ContainerRequestFilter f : filterFactory.getRequestFilters()) {
                 request = f.filter(request);
                 localContext.setContainerRequest(request);
             }
@@ -566,7 +555,7 @@ public final class WebApplicationImpl implements WebApplication {
         }
 
         try {
-            for (ContainerResponseFilter f : responseFilters) {
+            for (ContainerResponseFilter f : filterFactory.getResponseFilters()) {
                 response = f.filter(request, response);
                 localContext.setContainerResponse(response);
             }

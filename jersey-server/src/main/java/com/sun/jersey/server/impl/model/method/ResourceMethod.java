@@ -39,7 +39,10 @@ package com.sun.jersey.server.impl.model.method;
 
 import com.sun.jersey.core.header.MediaTypes;
 import com.sun.jersey.api.uri.UriTemplate;
+import com.sun.jersey.spi.container.ContainerRequestFilter;
+import com.sun.jersey.spi.container.ContainerResponseFilter;
 import com.sun.jersey.spi.dispatch.RequestDispatcher;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import javax.ws.rs.core.MediaType;
@@ -84,18 +87,35 @@ public abstract class ResourceMethod {
 
     private final RequestDispatcher dispatcher;
     
+    private final List<ContainerRequestFilter> requestFilters;
+
+    private final List<ContainerResponseFilter> responseFilters;
+
+    public ResourceMethod(String httpMethod,
+            UriTemplate template,
+            List<MediaType> consumeMime,
+            List<MediaType> produceMime,
+            boolean isProducesDeclared,
+            RequestDispatcher dispatcher) {
+        this(httpMethod, template, consumeMime, produceMime, isProducesDeclared, dispatcher, Collections.EMPTY_LIST, Collections.EMPTY_LIST);
+    }
+
     public ResourceMethod(String httpMethod,
             UriTemplate template,
             List<MediaType> consumeMime, 
             List<MediaType> produceMime,
             boolean isProducesDeclared,
-            RequestDispatcher dispatcher) {
+            RequestDispatcher dispatcher,
+            List<ContainerRequestFilter> requestFilters,
+            List<ContainerResponseFilter> responseFilters) {
         this.httpMethod = httpMethod;
         this.template = template;
         this.consumeMime = consumeMime;
         this.produceMime = produceMime;
         this.isProducesDeclared = isProducesDeclared;
         this.dispatcher = dispatcher;
+        this.requestFilters = requestFilters;
+        this.responseFilters = responseFilters;
     }
 
     public final String getHttpMethod() {
@@ -122,6 +142,14 @@ public abstract class ResourceMethod {
         return dispatcher;
     }
 
+    public final List<ContainerRequestFilter> getRequestFilters() {
+        return requestFilters;
+    }
+
+    public final List<ContainerResponseFilter> getResponseFilters() {
+        return responseFilters;
+    }
+    
      /**
      * Ascertain if the method is capable of consuming an entity of a certain 
      * media type.

@@ -37,9 +37,13 @@
 package com.sun.jersey.server.impl.application;
 
 import com.sun.jersey.api.core.DefaultResourceConfig;
+import com.sun.jersey.api.core.ResourceConfig;
+import com.sun.jersey.api.model.AbstractMethod;
 import com.sun.jersey.core.spi.component.ProviderServices;
 import com.sun.jersey.spi.container.ContainerRequestFilter;
 import com.sun.jersey.spi.container.ContainerResponseFilter;
+import com.sun.jersey.spi.container.ResourceFilter;
+import com.sun.jersey.spi.container.ResourceFilterFactory;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
@@ -49,23 +53,82 @@ import java.util.logging.Logger;
  *
  * @author Paul.Sandoz@Sun.Com
  */
-public class FilterFactory {
+public final class FilterFactory {
     private static final Logger LOGGER = Logger.getLogger(FilterFactory.class.getName());
     
     private final ProviderServices providerServices;
     
-    FilterFactory(ProviderServices providerServices) {
+    private final List<ContainerRequestFilter> requestFilters = new LinkedList<ContainerRequestFilter>();
+
+    private final List<ContainerResponseFilter> responseFilters = new LinkedList<ContainerResponseFilter>();
+
+    private final List<ResourceFilterFactory> resourceFilterFactories = new LinkedList<ResourceFilterFactory>();
+
+    FilterFactory(ProviderServices providerServices, ResourceConfig resourceConfig) {
         this.providerServices = providerServices;
+
+        // Initiate request filters
+        requestFilters.addAll(getRequestFilters(
+                resourceConfig.getProperty(
+                    ResourceConfig.PROPERTY_CONTAINER_REQUEST_FILTERS)));
+        requestFilters.addAll(providerServices.getServices(ContainerRequestFilter.class));
+        
+        // Initiate response filters
+        responseFilters.addAll(getResponseFilters(
+                resourceConfig.getProperty(
+                    ResourceConfig.PROPERTY_CONTAINER_RESPONSE_FILTERS)));
+        responseFilters.addAll(providerServices.getServices(ContainerResponseFilter.class));
+
+        // Initiate resource filter factories
+        resourceFilterFactories.addAll(providerServices.getProviders(ResourceFilterFactory.class));
     }
-    
-    public List<ContainerRequestFilter> getRequestFilters(Object o) {
+
+    public List<ContainerRequestFilter> getRequestFilters() {
+        return requestFilters;
+    }
+
+    public List<ContainerResponseFilter> getResponseFilters() {
+        return responseFilters;
+    }
+
+    public List<ResourceFilter> getResourceFilters(AbstractMethod am) {
+        List<ResourceFilter> resourceFilters = new LinkedList<ResourceFilter>();
+        for (ResourceFilterFactory rff : resourceFilterFactories) {
+            ResourceFilter rf = rff.create(am);
+            if (rf != null)
+                resourceFilters.add(rf);
+        }
+        return resourceFilters;
+    }
+
+    public List<ContainerRequestFilter> getRequestFilters(List<ResourceFilter> resourceFilters) {
+        final List<ContainerRequestFilter> filters = new LinkedList<ContainerRequestFilter>();
+        for (ResourceFilter rf : resourceFilters) {
+            ContainerRequestFilter crf = rf.getRequestFilter();
+            if (crf != null)
+                filters.add(crf);
+        }
+        return filters;
+    }
+
+    public List<ContainerResponseFilter> getResponseFilters(List<ResourceFilter> resourceFilters) {
+        final List<ContainerResponseFilter> filters = new LinkedList<ContainerResponseFilter>();
+        for (ResourceFilter rf : resourceFilters) {
+            ContainerResponseFilter crf = rf.getResponseFilter();
+            if (crf != null)
+                filters.add(crf);
+        }
+        return filters;
+    }
+
+    private List<ContainerRequestFilter> getRequestFilters(Object o) {
         return getFilters(ContainerRequestFilter.class, o);
     }
     
-    public List<ContainerResponseFilter> getResponseFilters(Object o) {
+    private List<ContainerResponseFilter> getResponseFilters(Object o) {
         return getFilters(ContainerResponseFilter.class, o);        
     }
-    
+
     private <T> List<T> getFilters(Class<T> c, Object o) {
         if (o == null)
             return Collections.emptyList();
