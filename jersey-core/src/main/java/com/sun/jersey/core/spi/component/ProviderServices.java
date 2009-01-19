@@ -153,6 +153,17 @@ public class ProviderServices {
         return ps;
     }
         
+    public <T> List<T> getInstances(Class<T> provider, Class<? extends T>[] classes) {
+        List<T> ps = new LinkedList<T>();
+        for (Class<? extends T> c : classes) {
+           Object o = getComponent(c);
+           if (o != null)
+               ps.add(provider.cast(o));
+        }
+
+        return ps;
+    }
+
     private Object getComponent(Class provider) {
         ComponentProvider cp = componentProviderFactory.getComponentProvider(provider);
         return (cp != null) ? cp.getInstance() : null;

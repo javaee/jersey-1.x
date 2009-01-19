@@ -34,22 +34,40 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-package com.sun.jersey.spi.container;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+package com.sun.jersey.server.impl.container.filter;
+
+import com.sun.jersey.api.model.AbstractMethod;
+import com.sun.jersey.spi.container.ResourceFilter;
+import com.sun.jersey.spi.container.ResourceFilterFactory;
+import com.sun.jersey.spi.container.ResourceFilters;
+import java.util.List;
 
 /**
-* Defines the list of application-declared {@link ResourceFilter}
-* associated with a resource method, a sub-resource method,
-* or a sub-resource locator.
-*
-* @author Paul.Sandoz@Sun.Com
-*/
-@Target({ElementType.TYPE, ElementType.METHOD})
-@Retention(RetentionPolicy.RUNTIME)
-public @interface ResourceFilters {
-   Class<? extends ResourceFilter>[] value();
+ *
+ * @author Paul.Sandoz@Sun.Com
+ */
+public final class AnnotationResourceFilterFactory implements ResourceFilterFactory {
+    private FilterFactory ff;
+
+    public AnnotationResourceFilterFactory(FilterFactory ff) {
+        this.ff = ff;
+    }
+
+    public List<ResourceFilter> create(AbstractMethod am) {
+        ResourceFilters rfs = am.getMethod().getAnnotation(ResourceFilters.class);
+        if (rfs == null)
+            rfs = am.getMethod().getDeclaringClass().getAnnotation(ResourceFilters.class);
+        if (rfs == null)
+            return null;
+
+        return getResourceFilters(rfs.value());
+    }
+
+    private List<ResourceFilter> getResourceFilters(Class<? extends ResourceFilter>[] classes) {
+        if (classes == null || classes.length == 0)
+            return null;
+
+        return ff.getResourceFilters(classes);
+    }
 }

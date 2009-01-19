@@ -52,6 +52,7 @@ import com.sun.jersey.spi.container.ContainerResponseFilter;
 import com.sun.jersey.spi.container.ResourceFilter;
 import com.sun.jersey.spi.container.ResourceFilterFactory;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -112,8 +113,8 @@ public class ResourceFilterFactoriesTest extends AbstractResourceTester {
             return this;
         }
 
-        public ResourceFilter create(AbstractMethod am) {
-            return this;
+        public List<ResourceFilter> create(AbstractMethod am) {
+            return Collections.singletonList((ResourceFilter)this);
         }
     }
         
@@ -143,8 +144,8 @@ public class ResourceFilterFactoriesTest extends AbstractResourceTester {
             return this;
         }
 
-        public ResourceFilter create(AbstractMethod am) {
-            return this;
+        public List<ResourceFilter> create(AbstractMethod am) {
+            return Collections.singletonList((ResourceFilter)this);
         }
     }
 
@@ -178,18 +179,18 @@ public class ResourceFilterFactoriesTest extends AbstractResourceTester {
     }
 
     public static class FilterOneSubresourceLocator extends FilterOne {
-        public ResourceFilter create(AbstractMethod am) {
+        public List<ResourceFilter> create(AbstractMethod am) {
             if (am instanceof AbstractSubResourceLocator)
-                return this;
+                return Collections.singletonList((ResourceFilter)this);
             else
                 return null;
         }
     }
     
     public static class FilterTwoSubresourceLocator extends FilterTwo {
-        public ResourceFilter create(AbstractMethod am) {
+        public List<ResourceFilter> create(AbstractMethod am) {
             if (am instanceof AbstractSubResourceLocator)
-                return this;
+                return Collections.singletonList((ResourceFilter)this);
             else
                 return null;
         }
@@ -216,18 +217,18 @@ public class ResourceFilterFactoriesTest extends AbstractResourceTester {
     }
 
     public static class FilterOneMethod extends FilterOne {
-        public ResourceFilter create(AbstractMethod am) {
+        public List<ResourceFilter> create(AbstractMethod am) {
             if (am instanceof AbstractResourceMethod)
-                return this;
+                return Collections.singletonList((ResourceFilter)this);
             else
                 return null;
         }
     }
 
     public static class FilterTwoMethod extends FilterTwo {
-        public ResourceFilter create(AbstractMethod am) {
+        public List<ResourceFilter> create(AbstractMethod am) {
             if (am instanceof AbstractResourceMethod)
-                return this;
+                return Collections.singletonList((ResourceFilter)this);
             else
                 return null;
         }
@@ -255,18 +256,18 @@ public class ResourceFilterFactoriesTest extends AbstractResourceTester {
 
 
     public static class FilterOneSubresourceMethod extends FilterOne {
-        public ResourceFilter create(AbstractMethod am) {
+        public List<ResourceFilter> create(AbstractMethod am) {
             if (am instanceof AbstractSubResourceMethod)
-                return this;
+                return Collections.singletonList((ResourceFilter)this);
             else
                 return null;
         }
     }
 
     public static class FilterTwoSubrsourceMethod extends FilterTwo {
-        public ResourceFilter create(AbstractMethod am) {
+        public List<ResourceFilter> create(AbstractMethod am) {
             if (am instanceof AbstractSubResourceMethod)
-                return this;
+                return Collections.singletonList((ResourceFilter)this);
             else
                 return null;
         }

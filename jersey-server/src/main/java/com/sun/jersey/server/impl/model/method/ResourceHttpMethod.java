@@ -41,7 +41,7 @@ import com.sun.jersey.api.container.ContainerException;
 import com.sun.jersey.api.model.AbstractResourceMethod;
 import com.sun.jersey.api.uri.UriTemplate;
 import com.sun.jersey.impl.ImplMessages;
-import com.sun.jersey.server.impl.application.FilterFactory;
+import com.sun.jersey.server.impl.container.filter.FilterFactory;
 import com.sun.jersey.server.impl.application.ResourceMethodDispatcherFactory;
 import com.sun.jersey.spi.container.ResourceFilter;
 import java.lang.reflect.Method;

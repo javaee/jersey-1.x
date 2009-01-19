@@ -40,18 +40,13 @@ import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.WebResource;
 import com.sun.jersey.api.core.DefaultResourceConfig;
 import com.sun.jersey.api.core.ResourceConfig;
-import com.sun.jersey.api.model.AbstractMethod;
-import com.sun.jersey.api.model.AbstractResourceMethod;
-import com.sun.jersey.api.model.AbstractSubResourceLocator;
 import com.sun.jersey.impl.AbstractResourceTester;
 import com.sun.jersey.spi.container.ContainerRequest;
 import com.sun.jersey.spi.container.ContainerRequestFilter;
 import com.sun.jersey.spi.container.ContainerResponse;
 import com.sun.jersey.spi.container.ContainerResponseFilter;
 import com.sun.jersey.spi.container.ResourceFilter;
-import com.sun.jersey.spi.container.ResourceFilterFactory;
-import java.util.Arrays;
-import java.util.Collections;
+import com.sun.jersey.spi.container.ResourceFilters;
 import java.util.List;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -62,11 +57,12 @@ import javax.ws.rs.core.HttpHeaders;
  *
  * @author Paul.Sandoz@Sun.Com
  */
-public class LayeredResourceFilterFactoriesTest extends AbstractResourceTester {
+public class LayeredAnnotatedResourceFiltersTest extends AbstractResourceTester {
     
     @Path("/")
     public static class ResourceWithSubresourceLocator {
         @Path("sub")
+        @ResourceFilters(FilterOne.class)
         public Object get() {
             return new ResourceWithMethod();
         }
@@ -75,6 +71,7 @@ public class LayeredResourceFilterFactoriesTest extends AbstractResourceTester {
     @Path("/")
     public static class ResourceWithMethod {
         @GET
+        @ResourceFilters(FilterTwo.class)
         public String get(@Context HttpHeaders hh) { 
             List<String> xTest = hh.getRequestHeaders().get("X-TEST");
             assertEquals(2, xTest.size());
@@ -83,6 +80,7 @@ public class LayeredResourceFilterFactoriesTest extends AbstractResourceTester {
 
         @GET
         @Path("submethod")
+        @ResourceFilters(FilterTwo.class)
         public String getSubmethod(@Context HttpHeaders hh) {
             List<String> xTest = hh.getRequestHeaders().get("X-TEST");
             assertEquals(2, xTest.size());
@@ -90,11 +88,11 @@ public class LayeredResourceFilterFactoriesTest extends AbstractResourceTester {
         }
     }
     
-    public LayeredResourceFilterFactoriesTest(String testName) {
+    public LayeredAnnotatedResourceFiltersTest(String testName) {
         super(testName);
     }
         
-    public static class FilterSubresourceLocator implements ResourceFilterFactory, ResourceFilter, ContainerRequestFilter, ContainerResponseFilter {
+    public static class FilterOne implements ResourceFilter, ContainerRequestFilter, ContainerResponseFilter {
         public ContainerRequest filter(ContainerRequest request) {
             List<String> xTest = request.getRequestHeaders().get("X-TEST");
             assertNull(xTest);
@@ -119,16 +117,9 @@ public class LayeredResourceFilterFactoriesTest extends AbstractResourceTester {
         public ContainerResponseFilter getResponseFilter() {
             return this;
         }
-
-        public List<ResourceFilter> create(AbstractMethod am) {
-            if (am instanceof AbstractSubResourceLocator)
-                return Collections.singletonList((ResourceFilter)this);
-            else
-                return null;
-        }
     }
         
-    public static class FilterResourceMethod implements ResourceFilterFactory, ResourceFilter, ContainerRequestFilter, ContainerResponseFilter {
+    public static class FilterTwo implements ResourceFilter, ContainerRequestFilter, ContainerResponseFilter {
         public ContainerRequest filter(ContainerRequest request) {
             List<String> xTest = request.getRequestHeaders().get("X-TEST");
             assertEquals(1, xTest.size());
@@ -153,22 +144,11 @@ public class LayeredResourceFilterFactoriesTest extends AbstractResourceTester {
         public ContainerResponseFilter getResponseFilter() {
             return this;
         }
-
-        public List<ResourceFilter> create(AbstractMethod am) {
-            if (am instanceof AbstractResourceMethod)
-                return Collections.singletonList((ResourceFilter)this);
-            else
-                return null;
-        }
     }
 
     public void testResourceMethod() {
         ResourceConfig rc = new DefaultResourceConfig(ResourceWithSubresourceLocator.class);
         
-        FilterSubresourceLocator f1 = new FilterSubresourceLocator();
-        FilterResourceMethod f2 = new FilterResourceMethod();
-        rc.getProperties().put(ResourceConfig.PROPERTY_RESOURCE_FILTER_FACTORIES,
-                Arrays.asList(f1, f2));
         initiateWebApplication(rc);
 
         WebResource r = resource("/sub", false);
@@ -185,10 +165,6 @@ public class LayeredResourceFilterFactoriesTest extends AbstractResourceTester {
     public void testResourceSubresourceMethod() {
         ResourceConfig rc = new DefaultResourceConfig(ResourceWithSubresourceLocator.class);
 
-        FilterSubresourceLocator f1 = new FilterSubresourceLocator();
-        FilterResourceMethod f2 = new FilterResourceMethod();
-        rc.getProperties().put(ResourceConfig.PROPERTY_RESOURCE_FILTER_FACTORIES,
-                Arrays.asList(f1, f2));
         initiateWebApplication(rc);
 
         WebResource r = resource("/sub/submethod", false);
@@ -201,4 +177,118 @@ public class LayeredResourceFilterFactoriesTest extends AbstractResourceTester {
         assertEquals("two", xTest.get(0));
         assertEquals("one", xTest.get(1));
     }
+
+
+    @Path("/")
+    @ResourceFilters(FilterOne.class)
+    public static class ResourceWithSubresourceLocatorOnClass {
+        @Path("sub")
+        public Object get() {
+            return new ResourceWithMethodOnClass();
+        }
+    }
+
+    @Path("/")
+    @ResourceFilters(FilterTwo.class)
+    public static class ResourceWithMethodOnClass {
+        @GET
+        public String get(@Context HttpHeaders hh) {
+            List<String> xTest = hh.getRequestHeaders().get("X-TEST");
+            assertEquals(2, xTest.size());
+            return xTest.get(0) + xTest.get(1);
+        }
+
+        @GET
+        @Path("submethod")
+        public String getSubmethod(@Context HttpHeaders hh) {
+            List<String> xTest = hh.getRequestHeaders().get("X-TEST");
+            assertEquals(2, xTest.size());
+            return xTest.get(0) + xTest.get(1);
+        }
+    }
+
+    public void testResourceMethodOnClass() {
+        ResourceConfig rc = new DefaultResourceConfig(ResourceWithSubresourceLocatorOnClass.class);
+
+        initiateWebApplication(rc);
+
+        WebResource r = resource("/sub", false);
+
+        ClientResponse cr = r.get(ClientResponse.class);
+        assertEquals(200, cr.getStatus());
+        assertEquals("onetwo", cr.getEntity(String.class));
+        List<String> xTest = cr.getMetadata().get("X-TEST");
+        assertEquals(2, xTest.size());
+        assertEquals("two", xTest.get(0));
+        assertEquals("one", xTest.get(1));
+    }
+
+    public void testResourceSubresourceMethodOnClass() {
+        ResourceConfig rc = new DefaultResourceConfig(ResourceWithSubresourceLocatorOnClass.class);
+
+        initiateWebApplication(rc);
+
+        WebResource r = resource("/sub/submethod", false);
+
+        ClientResponse cr = r.get(ClientResponse.class);
+        assertEquals(200, cr.getStatus());
+        assertEquals("onetwo", cr.getEntity(String.class));
+        List<String> xTest = cr.getMetadata().get("X-TEST");
+        assertEquals(2, xTest.size());
+        assertEquals("two", xTest.get(0));
+        assertEquals("one", xTest.get(1));
+    }
+
+    @Path("/")
+    public static class ResourceWithMethodMultiple {
+        @GET
+        @ResourceFilters({FilterOne.class, FilterTwo.class})
+        public String get(@Context HttpHeaders hh) {
+            List<String> xTest = hh.getRequestHeaders().get("X-TEST");
+            assertEquals(2, xTest.size());
+            return xTest.get(0) + xTest.get(1);
+        }
+
+        @GET
+        @Path("submethod")
+        @ResourceFilters({FilterOne.class, FilterTwo.class})
+        public String getSubmethod(@Context HttpHeaders hh) {
+            List<String> xTest = hh.getRequestHeaders().get("X-TEST");
+            assertEquals(2, xTest.size());
+            return xTest.get(0) + xTest.get(1);
+        }
+    }
+
+    public void testResourceMethodMultiple() {
+        ResourceConfig rc = new DefaultResourceConfig(ResourceWithMethodMultiple.class);
+
+        initiateWebApplication(rc);
+
+        WebResource r = resource("/", false);
+
+        ClientResponse cr = r.get(ClientResponse.class);
+        assertEquals(200, cr.getStatus());
+        assertEquals("onetwo", cr.getEntity(String.class));
+        List<String> xTest = cr.getMetadata().get("X-TEST");
+        assertEquals(2, xTest.size());
+        assertEquals("two", xTest.get(0));
+        assertEquals("one", xTest.get(1));
+    }
+
+    public void testResourceSubresourceMethodMultiple() {
+        ResourceConfig rc = new DefaultResourceConfig(ResourceWithMethodMultiple.class);
+
+        initiateWebApplication(rc);
+
+        WebResource r = resource("/submethod", false);
+
+        ClientResponse cr = r.get(ClientResponse.class);
+        assertEquals(200, cr.getStatus());
+        assertEquals("onetwo", cr.getEntity(String.class));
+        List<String> xTest = cr.getMetadata().get("X-TEST");
+        assertEquals(2, xTest.size());
+        assertEquals("two", xTest.get(0));
+        assertEquals("one", xTest.get(1));
+    }
+
 }

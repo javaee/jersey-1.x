@@ -40,6 +40,7 @@ import com.sun.jersey.api.model.AbstractMethod;
 import com.sun.jersey.api.model.AbstractResourceMethod;
 import com.sun.jersey.api.model.AbstractSubResourceLocator;
 import com.sun.jersey.api.model.AbstractSubResourceMethod;
+import java.util.List;
 
 /**
  * A resource filter factory responsible for creating {@link ResourceFilter}
@@ -50,14 +51,14 @@ import com.sun.jersey.api.model.AbstractSubResourceMethod;
 public interface ResourceFilterFactory {
 
     /**
-     * Create a {@link ResourceFilter} instance given a method
+     * Create a list of {@link ResourceFilter} instance given a method
      * of the abstract resource model.
      *
      * @param am the abstract method. This may be an instance
      *        of the following: {@link AbstractResourceMethod},
      *        {@link AbstractSubResourceMethod} or {@link AbstractSubResourceLocator}.
-     * @return the resource filter, otherwise null if no resource filter is
-     *         associated with the method.
+     * @return the list of resource filter, otherwise an empty list or null if
+     *         no resource filters are associated with the method.
      */
-    ResourceFilter create(AbstractMethod am);
+    List<ResourceFilter> create(AbstractMethod am);
 }

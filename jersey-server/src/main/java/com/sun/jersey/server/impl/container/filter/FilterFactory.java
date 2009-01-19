@@ -34,7 +34,7 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-package com.sun.jersey.server.impl.application;
+package com.sun.jersey.server.impl.container.filter;
 
 import com.sun.jersey.api.core.DefaultResourceConfig;
 import com.sun.jersey.api.core.ResourceConfig;
@@ -64,7 +64,7 @@ public final class FilterFactory {
 
     private final List<ResourceFilterFactory> resourceFilterFactories = new LinkedList<ResourceFilterFactory>();
 
-    FilterFactory(ProviderServices providerServices, ResourceConfig resourceConfig) {
+    public FilterFactory(ProviderServices providerServices, ResourceConfig resourceConfig) {
         this.providerServices = providerServices;
 
         // Initiate request filters
@@ -84,6 +84,7 @@ public final class FilterFactory {
                 resourceConfig.getProperty(
                     ResourceConfig.PROPERTY_RESOURCE_FILTER_FACTORIES)));
         resourceFilterFactories.addAll(providerServices.getServices(ResourceFilterFactory.class));
+        resourceFilterFactories.add(new AnnotationResourceFilterFactory(this));
     }
 
     public List<ContainerRequestFilter> getRequestFilters() {
@@ -97,11 +98,18 @@ public final class FilterFactory {
     public List<ResourceFilter> getResourceFilters(AbstractMethod am) {
         List<ResourceFilter> resourceFilters = new LinkedList<ResourceFilter>();
         for (ResourceFilterFactory rff : resourceFilterFactories) {
-            ResourceFilter rf = rff.create(am);
-            if (rf != null)
-                resourceFilters.add(rf);
+            List<ResourceFilter> rfs = rff.create(am);
+            if (rfs != null)
+                resourceFilters.addAll(rfs);
         }
         return resourceFilters;
+    }
+
+    public List<ResourceFilter> getResourceFilters(Class<? extends ResourceFilter>[] classes) {
+        if (classes == null || classes.length == 0)
+            return Collections.EMPTY_LIST;
+
+        return providerServices.getInstances(ResourceFilter.class, classes);
     }
 
     public List<ContainerRequestFilter> getRequestFilters(List<ResourceFilter> resourceFilters) {

@@ -66,7 +66,7 @@ import com.sun.jersey.server.impl.inject.ServerInjectableProviderContext;
 import com.sun.jersey.server.spi.component.ResourceComponentProvider;
 import com.sun.jersey.server.impl.component.ResourceFactory;
 import com.sun.jersey.core.spi.component.ComponentScope;
-import com.sun.jersey.server.impl.application.FilterFactory;
+import com.sun.jersey.server.impl.container.filter.FilterFactory;
 import com.sun.jersey.spi.container.ResourceFilter;
 import com.sun.jersey.spi.uri.rules.UriRule;
 import com.sun.jersey.spi.uri.rules.UriRules;
