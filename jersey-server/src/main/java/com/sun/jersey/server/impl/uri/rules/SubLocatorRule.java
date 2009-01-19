@@ -39,9 +39,9 @@ package com.sun.jersey.server.impl.uri.rules;
 
 import com.sun.jersey.api.container.ContainerException;
 import com.sun.jersey.api.container.MappableContainerException;
-import com.sun.jersey.api.core.HttpContext;
 import com.sun.jersey.api.uri.UriTemplate;
 import com.sun.jersey.server.impl.inject.AbstractHttpContextInjectable;
+import com.sun.jersey.spi.container.ContainerRequest;
 import com.sun.jersey.spi.container.ContainerRequestFilter;
 import com.sun.jersey.spi.container.ContainerResponseFilter;
 import com.sun.jersey.spi.inject.Injectable;
@@ -104,7 +104,19 @@ public final class SubLocatorRule extends BaseRule {
         return false;            
     }
     
-    private Object invokeSubLocator(Object resource, HttpContext context) {
+    private Object invokeSubLocator(Object resource, UriRuleContext context) {
+        // Push the response filters
+        context.pushContainerResponseFilters(responseFilters);
+        
+        // Process the request filter
+        if (!requestFilters.isEmpty()) {
+            ContainerRequest containerRequest = context.getContainerRequest();
+            for (ContainerRequestFilter f : requestFilters) {
+                containerRequest = f.filter(containerRequest);
+                context.setContainerRequest(containerRequest);
+            }
+        }
+
         // Invoke the sub-locator method
         try {
             if (is.size() == 0) {

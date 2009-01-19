@@ -45,6 +45,7 @@ import com.sun.jersey.core.util.MultivaluedMapImpl;
 import com.sun.jersey.server.impl.model.ResourceClass;
 import com.sun.jersey.spi.container.ContainerRequest;
 import com.sun.jersey.spi.container.ContainerResponse;
+import com.sun.jersey.spi.container.ContainerResponseFilter;
 import com.sun.jersey.spi.uri.rules.UriRule;
 import com.sun.jersey.spi.uri.rules.UriRuleContext;
 import com.sun.jersey.spi.uri.rules.UriRules;
@@ -75,13 +76,19 @@ public final class WebApplicationContext implements UriRuleContext, ExtendedUriI
     
     private ContainerResponse response;
 
+    private List<ContainerResponseFilter> responseFilters;
+    
     public WebApplicationContext(WebApplicationImpl app,
             ContainerRequest request, ContainerResponse response) {
         this.app = app;
         this.request = request;
         this.response = response;
+        this.responseFilters = Collections.EMPTY_LIST;
     }
 
+    public List<ContainerResponseFilter> getResponseFilters() {
+        return responseFilters;
+    }
 
     // HttpContext
 
@@ -141,6 +148,18 @@ public final class WebApplicationContext implements UriRuleContext, ExtendedUriI
     
     public void setContainerResponse(ContainerResponse response) {
         this.response = response;
+    }
+
+    public void pushContainerResponseFilters(List<ContainerResponseFilter> filters) {
+        if (filters.isEmpty())
+            return;
+
+        if (responseFilters == Collections.EMPTY_LIST)
+            responseFilters = new LinkedList<ContainerResponseFilter>();
+
+        for (ContainerResponseFilter f : filters) {
+            responseFilters.add(0, f);
+        }
     }
 
     public Object getResource(Class resourceClass) {

@@ -42,6 +42,7 @@ import com.sun.jersey.spi.container.ContainerListener;
 import com.sun.jersey.spi.container.ContainerNotifier;
 import com.sun.jersey.spi.container.ContainerRequestFilter;
 import com.sun.jersey.spi.container.ContainerResponseFilter;
+import com.sun.jersey.spi.container.ResourceFilter;
 import java.lang.reflect.Modifier;
 import java.util.Collections;
 import java.util.HashSet;
@@ -149,7 +150,7 @@ public abstract class ResourceConfig extends Application {
     
     /**
      * If set the list of {@link ContainerRequestFilter} that are applied
-     * to filter the request. The filters are applied in order form 
+     * to filter the request. The filters are applied in order from
      * first to last as declared.
      * <p>
      * The instance may be a String[] or String that contains one or more fully 
@@ -161,7 +162,7 @@ public abstract class ResourceConfig extends Application {
     
     /**
      * If set the list of {@link ContainerResponseFilter} that are applied
-     * to filter the response. The filters are applied in order form 
+     * to filter the response. The filters are applied in order from
      * first to last as declared.
      * <p>
      * The instance may be a String[] or String that contains one or more fully 
@@ -170,6 +171,18 @@ public abstract class ResourceConfig extends Application {
      */
     public static final String PROPERTY_CONTAINER_RESPONSE_FILTERS = 
             "com.sun.jersey.spi.container.ContainerResponseFilters";
+
+    /**
+     * If set the list of {@link ResourceFilterFactory} that are applied
+     * to resources. The resource filter factories are applied in order from
+     * first to last as declared.
+     * <p>
+     * The instance may be a String[] or String that contains one or more fully
+     * qualified class name of a response filter class separeted by ';'.
+     * Otherwise the instance may be List&lt;ResourceFilterFactory&gt;.
+     */
+    public static final String PROPERTY_RESOURCE_FILTER_FACTORIES =
+            "com.sun.jersey.spi.container.ResourceFilters";
 
     /**
      * If set the wadl generator configuration that provides that {@link WadlGenerator}

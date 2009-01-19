@@ -41,6 +41,7 @@ import com.sun.jersey.api.core.HttpContext;
 import com.sun.jersey.api.uri.UriTemplate;
 import com.sun.jersey.spi.container.ContainerRequest;
 import com.sun.jersey.spi.container.ContainerResponse;
+import com.sun.jersey.spi.container.ContainerResponseFilter;
 import java.util.List;
 
 /**
@@ -78,6 +79,17 @@ public interface UriRuleContext extends HttpContext, UriMatchResultContext {
      */
     void setContainerResponse(ContainerResponse response);
 
+    /**
+     * Push a list of container response filters to apply after the
+     * container response has been produced.
+     * <p>
+     * The list of response filters is processed in reverse order of last
+     * to first.
+     *
+     * @param filters the list container response filters
+     */
+    void pushContainerResponseFilters(List<ContainerResponseFilter> filters);
+    
     /**
      * Get the resource instance from a resource class.
      * 

@@ -80,7 +80,10 @@ public final class FilterFactory {
         responseFilters.addAll(providerServices.getServices(ContainerResponseFilter.class));
 
         // Initiate resource filter factories
-        resourceFilterFactories.addAll(providerServices.getProviders(ResourceFilterFactory.class));
+        resourceFilterFactories.addAll(getResourceFilterFactories(
+                resourceConfig.getProperty(
+                    ResourceConfig.PROPERTY_RESOURCE_FILTER_FACTORIES)));
+        resourceFilterFactories.addAll(providerServices.getServices(ResourceFilterFactory.class));
     }
 
     public List<ContainerRequestFilter> getRequestFilters() {
@@ -127,6 +130,10 @@ public final class FilterFactory {
     
     private List<ContainerResponseFilter> getResponseFilters(Object o) {
         return getFilters(ContainerResponseFilter.class, o);        
+    }
+
+    private List<ResourceFilterFactory> getResourceFilterFactories(Object o) {
+        return getFilters(ResourceFilterFactory.class, o);
     }
 
     private <T> List<T> getFilters(Class<T> c, Object o) {

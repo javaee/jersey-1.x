@@ -555,6 +555,12 @@ public final class WebApplicationImpl implements WebApplication {
         }
 
         try {
+            // Process response filters from resources
+            for (ContainerResponseFilter f : localContext.getResponseFilters()) {
+                response = f.filter(request, response);
+                localContext.setContainerResponse(response);
+            }
+
             for (ContainerResponseFilter f : filterFactory.getResponseFilters()) {
                 response = f.filter(request, response);
                 localContext.setContainerResponse(response);

@@ -43,6 +43,8 @@ import com.sun.jersey.api.core.HttpResponseContext;
 import com.sun.jersey.core.header.AcceptableMediaType;
 import com.sun.jersey.server.impl.model.method.ResourceMethod;
 import com.sun.jersey.api.Responses;
+import com.sun.jersey.spi.container.ContainerRequest;
+import com.sun.jersey.spi.container.ContainerRequestFilter;
 import com.sun.jersey.spi.uri.rules.UriRule;
 import com.sun.jersey.spi.uri.rules.UriRuleContext;
 import java.util.Iterator;
@@ -120,7 +122,20 @@ public final class HttpMethodRule implements UriRule {
                 // Set the template values
                 context.pushMatch(method.getTemplate(), method.getTemplate().getTemplateVariables());
             }
-            
+
+            // Push the response filters
+            context.pushContainerResponseFilters(method.getResponseFilters());
+
+            // Process the request filter
+            if (!method.getRequestFilters().isEmpty()) {
+                ContainerRequest containerRequest = context.getContainerRequest();
+                for (ContainerRequestFilter f : method.getRequestFilters()) {
+                    containerRequest = f.filter(containerRequest);
+                    context.setContainerRequest(containerRequest);
+                }
+            }
+
+            // Dispatch to the resource method
             method.getDispatcher().dispatch(resource, context);
 
             // If the content type is not explicitly set then set it
