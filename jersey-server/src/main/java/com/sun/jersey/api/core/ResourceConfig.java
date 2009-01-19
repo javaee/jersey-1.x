@@ -400,9 +400,13 @@ public abstract class ResourceConfig extends Application {
      * Determine if a class is a root resource class.
      *
      * @param c the class.
-     * @return true if the class is a root resource class, otherwise false.
+     * @return true if the class is a root resource class, otherwise false
+     *         (including if the class is null).
      */
     public static boolean isRootResourceClass(Class<?> c) {
+        if (c == null)
+            return false;
+        
         if (c.isAnnotationPresent(Path.class)) return true;
 
         for (Class i : c.getInterfaces())
@@ -415,9 +419,13 @@ public abstract class ResourceConfig extends Application {
      * Determine if a class is a provider class.
      *
      * @param c the class.
-     * @return true if the class is a provider class, otherwise false.
+     * @return true if the class is a provider class, otherwise false
+     *         (including if the class is null)
      */
     public static boolean isProviderClass(Class<?> c) {
+        if (c == null)
+            return false;
+        
         return c.isAnnotationPresent(Provider.class);
     }
 }
