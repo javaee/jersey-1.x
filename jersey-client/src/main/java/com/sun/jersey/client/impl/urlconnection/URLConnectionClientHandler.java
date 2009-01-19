@@ -77,6 +77,11 @@ public final class URLConnectionClientHandler extends TerminatingClientHandler {
             int l = uc.getContentLength();
             return l > 0 || l == -1;
         }
+
+        @Override
+        public String toString() {
+            return uc.getRequestMethod() + " " + uc.getURL() + " returned a response status of " + this.getStatus();
+        }
     }
 
     // ClientHandler

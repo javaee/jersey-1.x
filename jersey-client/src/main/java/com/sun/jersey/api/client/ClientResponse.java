@@ -290,6 +290,17 @@ public class ClientResponse {
     }
 
     /**
+     * Get response date (server side).
+     *
+     * @return the server side response date.
+     */
+    public Date getResponseDate() {
+        String d = getMetadata().getFirst("Date");
+
+        return (d != null) ? dateDelegate.fromString(d) : null;
+    }
+    
+    /**
      * Get the language.
      * 
      * @return the language.
