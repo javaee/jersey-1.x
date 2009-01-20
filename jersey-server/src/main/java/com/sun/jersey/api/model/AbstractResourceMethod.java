@@ -47,7 +47,6 @@ import javax.ws.rs.core.MediaType;
  */
 public class AbstractResourceMethod extends AbstractMethod 
         implements Parameterized, AbstractModelComponent {
-    private AbstractResource resource;
     private List<MediaType> consumeMimeList;
     private List<MediaType> produceMimeList;
     private boolean isProducesDeclared;    
@@ -57,9 +56,8 @@ public class AbstractResourceMethod extends AbstractMethod
     public AbstractResourceMethod(AbstractResource resource, 
             Method method, String httpMethod,
             Annotation[] annotations) {
-        super(method, annotations);
+        super(resource, method, annotations);
 
-        this.resource = resource;
         this.httpMethod = httpMethod.toUpperCase();
         this.consumeMimeList = new ArrayList<MediaType>();
         this.produceMimeList = new ArrayList<MediaType>();
@@ -67,7 +65,7 @@ public class AbstractResourceMethod extends AbstractMethod
     }
 
     public AbstractResource getDeclaringResource() {
-        return resource;
+        return getResource();
     }
     
     public List<MediaType> getSupportedInputTypes() {

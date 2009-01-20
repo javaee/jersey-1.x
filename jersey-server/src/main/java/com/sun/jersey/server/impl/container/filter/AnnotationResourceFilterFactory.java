@@ -55,9 +55,9 @@ public final class AnnotationResourceFilterFactory implements ResourceFilterFact
     }
 
     public List<ResourceFilter> create(AbstractMethod am) {
-        ResourceFilters rfs = am.getMethod().getAnnotation(ResourceFilters.class);
+        ResourceFilters rfs = am.getAnnotation(ResourceFilters.class);
         if (rfs == null)
-            rfs = am.getMethod().getDeclaringClass().getAnnotation(ResourceFilters.class);
+            rfs = am.getResource().getAnnotation(ResourceFilters.class);
         if (rfs == null)
             return null;
 

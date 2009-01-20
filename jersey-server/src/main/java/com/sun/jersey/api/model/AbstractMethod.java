@@ -37,21 +37,29 @@
 package com.sun.jersey.api.model;
 
 import java.lang.annotation.Annotation;
+import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Method;
 
 /**
  *
  * @author Paul.Sandoz@Sun.Com
  */
-public abstract class AbstractMethod {
+public abstract class AbstractMethod implements AnnotatedElement {
     private Method method;
 
     private Annotation[] annotations;
 
-    public AbstractMethod(Method method, Annotation[] annotations) {
+    private AbstractResource resource;
+
+    public AbstractMethod(AbstractResource resource, Method method, Annotation[] annotations) {
         assert null != method;
         this.method = method;
         this.annotations = annotations;
+        this.resource = resource;
+    }
+
+    public AbstractResource getResource() {
+        return resource;
     }
     
     public Method getMethod() {
@@ -67,7 +75,11 @@ public abstract class AbstractMethod {
     }
 
     public Annotation[] getAnnotations() {
-        return annotations;
+        return annotations.clone();
+    }
+
+    public Annotation[] getDeclaredAnnotations() {
+        return annotations.clone();
     }
 
     public boolean isAnnotationPresent(Class<? extends Annotation> annotationType) {

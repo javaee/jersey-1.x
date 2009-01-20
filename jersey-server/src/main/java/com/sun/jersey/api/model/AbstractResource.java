@@ -36,6 +36,8 @@
  */
 package com.sun.jersey.api.model;
 
+import java.lang.annotation.Annotation;
+import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -44,7 +46,7 @@ import java.util.List;
 /**
  * Abstraction for resource class
  */
-public class AbstractResource implements PathAnnotated, AbstractModelComponent {
+public class AbstractResource implements PathAnnotated, AbstractModelComponent, AnnotatedElement {
 
     private final Class<?> resourceClass;
     private final PathValue uriPath;
@@ -153,6 +155,25 @@ public class AbstractResource implements PathAnnotated, AbstractModelComponent {
         visitor.visitAbstractResource(this);
     }
 
+
+    // Annotaed element
+
+    public boolean isAnnotationPresent(Class<? extends Annotation> a) {
+        return resourceClass.isAnnotationPresent(a);
+    }
+
+    public <T extends Annotation> T getAnnotation(Class<T> a) {
+        return resourceClass.getAnnotation(a);
+    }
+
+    public Annotation[] getAnnotations() {
+        return resourceClass.getAnnotations();
+    }
+
+    public Annotation[] getDeclaredAnnotations() {
+        return resourceClass.getDeclaredAnnotations();
+    }
+
     @Override
     public String toString() {
         return "AbstractResource(" 
@@ -175,4 +196,5 @@ public class AbstractResource implements PathAnnotated, AbstractModelComponent {
         components.addAll(getSubResourceLocators());
         return components;
     }
+
 }

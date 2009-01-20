@@ -48,8 +48,8 @@ import java.util.List;
 public class AbstractSetterMethod extends AbstractMethod implements Parameterized, AbstractModelComponent {
     private List<Parameter> parameters;
     
-    public AbstractSetterMethod(Method method, Annotation[] annotations) {
-        super(method, annotations);
+    public AbstractSetterMethod(AbstractResource resource, Method method, Annotation[] annotations) {
+        super(resource, method, annotations);
         this.parameters = new ArrayList<Parameter>();        
     }
     

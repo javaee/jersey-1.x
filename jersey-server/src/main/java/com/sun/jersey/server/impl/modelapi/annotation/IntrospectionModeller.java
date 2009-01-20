@@ -241,7 +241,7 @@ public class IntrospectionModeller {
                 hasReturnType(void.class).
                 nameStartsWith("set")) {
             
-            final AbstractSetterMethod asm = new AbstractSetterMethod(m.getMethod(), m.getAnnotations());
+            final AbstractSetterMethod asm = new AbstractSetterMethod(resource, m.getMethod(), m.getAnnotations());
             Parameter p = createParameter(m.toString(), 1, isEncoded, 
                     m.getParameterTypes()[0],
                     m.getGenericParameterTypes()[0],
@@ -309,6 +309,7 @@ public class IntrospectionModeller {
                 hasAnnotation(Path.class)) {
             final Path mPathAnnotation = m.getAnnotation(Path.class);
             final AbstractSubResourceLocator subResourceLocator = new AbstractSubResourceLocator(
+                    resource,
                     m.getMethod(),
                     new PathValue(
                         mPathAnnotation.value()),

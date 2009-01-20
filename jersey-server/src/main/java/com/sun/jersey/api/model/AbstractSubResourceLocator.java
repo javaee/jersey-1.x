@@ -54,8 +54,8 @@ public class AbstractSubResourceLocator extends AbstractMethod
     /**
      * Creates a new instance of AbstractSubResourceLocator
      */
-    public AbstractSubResourceLocator(Method method, PathValue uriPath, Annotation[] annotations) {
-        super(method, annotations);
+    public AbstractSubResourceLocator(AbstractResource resource, Method method, PathValue uriPath, Annotation[] annotations) {
+        super(resource, method, annotations);
         
         this.uriPath =  uriPath;
         this.parameters = new ArrayList<Parameter>();
