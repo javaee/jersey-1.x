@@ -353,7 +353,17 @@
                 </execution>
               </executions>
             </plugin>
-        </plugins>
+            <plugin> <!-- remove the generated src dir-->
+                <artifactId>maven-clean-plugin</artifactId>
+                <configuration>
+                  <filesets>
+                    <fileset>
+                      <directory>src</directory>
+                    </fileset>
+                  </filesets>  
+                </configuration>
+            </plugin>
+         </plugins>
     </build>
 
     <properties>
