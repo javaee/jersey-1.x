@@ -81,4 +81,9 @@ public class EncodedContentBean {
         return hash;
     }
     
+    @Override
+    public String toString() {
+        return String.format("ECB(%s, %s)", one, two);
+    }
+
 }

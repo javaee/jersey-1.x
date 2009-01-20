@@ -350,43 +350,6 @@ public class JSONUnmarshaller implements Unmarshaller {
     }
     
     private XMLStreamReader createXmlStreamReader(Reader reader) {
-        if (JSONJAXBContext.JSONNotation.MAPPED == this.jsonNotation) {
-            try {
-                return new JsonXmlStreamReader(reader, this.jsonRootUnwrapping ? "rootElement" : null, attrAsElemNames);
-            } catch (IOException ex) {
-                Logger.getLogger(JSONUnmarshaller.class.getName()).log(Level.SEVERE, null, ex);
-            }
-        } else if (JSONJAXBContext.JSONNotation.MAPPED_JETTISON == this.jsonNotation) {
-            try {
-                Configuration jmConfig;
-                if (null == this.xml2jsonNamespace) {
-                    jmConfig = new Configuration();
-                } else {
-                    jmConfig = new Configuration(this.xml2jsonNamespace);
-                }
-                return new MappedXMLStreamReader(
-                        new JSONObject(new JSONTokener(readFromAsString(reader))), 
-                        new MappedNamespaceConvention(jmConfig));
-            } catch (Exception ex) {
-                Logger.getLogger(JSONUnmarshaller.class.getName()).log(Level.SEVERE, null, ex);
-            }
-        } else {
-            try {
-                return new BadgerFishXMLStreamReader(new JSONObject(new JSONTokener(readFromAsString(reader))));
-            } catch (Exception ex) {
-                Logger.getLogger(JSONUnmarshaller.class.getName()).log(Level.SEVERE, null, ex);
-            }
-        }
-        return null;
+        return Stax2JsonFactory.createReader(jsonNotation, reader, this.jsonRootUnwrapping ? "rootElement" : null, attrAsElemNames, xml2jsonNamespace);
     }
-    
-    private String readFromAsString(Reader reader) throws IOException {
-        StringBuilder sb = new StringBuilder();
-        char[] c = new char[1024];
-        int l;
-        while ((l = reader.read(c)) != -1) {
-            sb.append(c, 0, l);
-        } 
-        return sb.toString();
-    }    
 }

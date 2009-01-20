@@ -37,6 +37,7 @@
 package com.sun.jersey.json.impl;
 
 import com.sun.jersey.api.json.JSONJAXBContext;
+import com.sun.jersey.json.impl.writer.Stax2JacksonWriter;
 import java.io.Reader;
 import java.io.StringReader;
 import java.io.StringWriter;
@@ -114,6 +115,14 @@ public class JSONJAXBRoudtripTest extends TestCase {
         props.put(JSONJAXBContext.JSON_NOTATION, JSONJAXBContext.JSONNotation.BADGERFISH);
         allBeansTest(new JSONJAXBContext(classes, props), beans);
     }
+
+    public void testNaturalNotation() throws Exception {
+        System.out.println("NATURAL NOTATION");
+        Map<String, Object> props = new HashMap<String, Object>();
+        props.put(JSONJAXBContext.JSON_NOTATION, JSONJAXBContext.JSONNotation.NATURAL);
+        //props.put(JSONJAXBContext.JSON_ROOT_UNWRAPPING, Boolean.TRUE);
+        allBeansTest(new JSONJAXBContext(classes, props), beans);
+    }
     
 //    TODO: Jettison gets stuck on the following :-(
 //    public void testJettisonMappedNotation() throws Exception {
@@ -131,16 +140,16 @@ public class JSONJAXBRoudtripTest extends TestCase {
         JSONUnmarshaller unmarshaller = (JSONUnmarshaller)context.createUnmarshaller();
         unmarshaller.setProperty(JSONJAXBContext.JSON_ENABLED, Boolean.TRUE);
         for (Object originalBean : beans) {
-            System.out.println("Checking " + originalBean.toString());
-            JAXBContext ctx = JAXBContext.newInstance(originalBean.getClass());
-            Marshaller m = ctx.createMarshaller();
-            m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
-            m.marshal(originalBean, System.out);
+//            System.out.println("Checking " + originalBean.toString());
+//            JAXBContext ctx = JAXBContext.newInstance(originalBean.getClass());
+//            Marshaller m = ctx.createMarshaller();
+//            m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
+//            m.marshal(originalBean, System.out);
             StringWriter sWriter = new StringWriter();
             marshaller.marshal(originalBean, sWriter);
             System.out.println(sWriter.toString());
             assertEquals(originalBean, unmarshall(unmarshaller, originalBean.getClass(), new StringReader(sWriter.toString())));
-            System.out.println("OK");
+//            System.out.println("OK");
         }
     }
 

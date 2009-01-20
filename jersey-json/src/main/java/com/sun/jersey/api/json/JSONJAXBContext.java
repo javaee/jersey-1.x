@@ -39,6 +39,7 @@ package com.sun.jersey.api.json;
 
 import com.sun.jersey.json.impl.JSONMarshaller;
 import com.sun.jersey.json.impl.JSONUnmarshaller;
+import com.sun.xml.bind.v2.runtime.JAXBContextImpl;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -74,7 +75,7 @@ public final class JSONJAXBContext extends JAXBContext {
      */
     public enum JSONNotation {
         /**
-         * The mapped (default) JSON notation.
+         * The mapped JSON notation.
          */
         MAPPED,
         /**
@@ -84,7 +85,11 @@ public final class JSONJAXBContext extends JAXBContext {
         /**
          * The mapped Badgerfish JSON notation.
          */
-        BADGERFISH 
+        BADGERFISH,
+        /**
+         * The natural (default) JSON notation, leveraging tight JAXB RI integration.
+         */
+        NATURAL
     };
 
     /**
@@ -294,8 +299,10 @@ public final class JSONJAXBContext extends JAXBContext {
     
     private Map<String, Object> createProperties(Map<String, Object> properties) {
         Map<String, Object> workProperties = new HashMap<String, Object>();
-        for (Entry<String, Object> entry : properties.entrySet()) {
-            workProperties.put(entry.getKey(), entry.getValue());
+        workProperties.putAll(defaultJsonProperties);
+        workProperties.putAll(properties);
+        if (JSONJAXBContext.JSONNotation.NATURAL == workProperties.get(JSONJAXBContext.JSON_NOTATION)) {
+            workProperties.put(JAXBContextImpl.RETAIN_REFERENCE_TO_INFO, Boolean.TRUE);
         }
         processProperties(workProperties);
         return workProperties;

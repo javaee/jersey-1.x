@@ -37,9 +37,10 @@
 package com.sun.jersey.json.impl;
 
 import com.sun.jersey.api.json.JSONJAXBContext;
-import com.sun.jersey.json.impl.writer.JsonXmlStreamWriter;
+import com.sun.jersey.json.impl.Stax2JsonFactory;
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
@@ -61,11 +62,7 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 import javax.xml.transform.Result;
 import javax.xml.validation.Schema;
-import org.codehaus.jettison.badgerfish.BadgerFishXMLStreamWriter;
 import org.codehaus.jettison.json.JSONException;
-import org.codehaus.jettison.mapped.Configuration;
-import org.codehaus.jettison.mapped.MappedNamespaceConvention;
-import org.codehaus.jettison.mapped.MappedXMLStreamWriter;
 import org.w3c.dom.Node;
 import org.xml.sax.ContentHandler;
 
@@ -300,23 +297,12 @@ public final class JSONMarshaller implements Marshaller {
         }
     }
 
-    private XMLStreamWriter createXmlStreamWriter(Writer writer) {
-        XMLStreamWriter xmlStreamWriter;
-        if (JSONJAXBContext.JSONNotation.MAPPED == this.jsonNotation) {
-            xmlStreamWriter = JsonXmlStreamWriter.createWriter(writer, this.jsonRootUnwrapping, this.arrays, this.nonStrings, this.attrAsElemNames);
-        } else if (JSONJAXBContext.JSONNotation.MAPPED_JETTISON == this.jsonNotation) {
-                Configuration jmConfig;
-                if (null == this.xml2jsonNamespace) {
-                    jmConfig = new Configuration();
-                } else {
-                    jmConfig = new Configuration(this.xml2jsonNamespace);
-                }
-            xmlStreamWriter = new MappedXMLStreamWriter(
-                    new MappedNamespaceConvention(jmConfig), writer);
-        } else {
-            xmlStreamWriter = new BadgerFishXMLStreamWriter(writer);
+    private XMLStreamWriter createXmlStreamWriter(Writer writer) throws JAXBException  {
+        try {
+            return Stax2JsonFactory.createWriter(jsonNotation, writer, jsonRootUnwrapping, arrays, nonStrings, attrAsElemNames, xml2jsonNamespace);
+        } catch (IOException ex) {
+            throw new JAXBException(ex.getMessage(), ex);
         }
-        return xmlStreamWriter;
     }
     
     private Charset getCharset() throws JAXBException {

@@ -73,44 +73,6 @@ public class JsonXmlStreamReader implements XMLStreamReader {
         AFTER_ARRAY_ELEM
     };
 
-    static class MyLocation implements Location {
-
-        int charOffset = -1;
-        int column = -1;
-        int line = -1;
-
-        MyLocation(final int charOffset, final int column, final int line) {
-            this.charOffset = charOffset;
-            this.column = column;
-            this.line = line;
-        }
-
-        MyLocation(final JsonLexer lexer) {
-            this(lexer.getCharOffset(), lexer.getColumn(), lexer.getLineNumber());
-        }
-
-        public int getCharacterOffset() {
-            return charOffset;
-        }
-
-        public int getColumnNumber() {
-            return column;
-        }
-
-        public int getLineNumber() {
-            return line;
-        }
-
-        public String getPublicId() {
-            return null;
-        }
-
-        public String getSystemId() {
-            return null;
-        }
-
-    }
-
     private static final Logger LOGGER = Logger.getLogger(JsonXmlStreamReader.class.getName());
 
     boolean jsonRootUnwrapping;
@@ -215,13 +177,13 @@ public class JsonXmlStreamReader implements XMLStreamReader {
                 if (jsonRootUnwrapping) {
                     generateEEEvent(processingStack.get(depth).lastName);
                 }
-                eventQueue.add(new EndDocumentEvent(new MyLocation(lexer)));
+                eventQueue.add(new EndDocumentEvent(new StaxLocation(lexer)));
                 break;
             }
             switch (processingStack.get(depth).state) {
                 case START:
                     if (0 == depth) {
-                        eventQueue.add(new StartDocumentEvent(new MyLocation(lexer)));
+                        eventQueue.add(new StartDocumentEvent(new StaxLocation(lexer)));
                         processingStack.get(depth).state = LaState.AFTER_OBJ_START_BRACE;
                         if (jsonRootUnwrapping) {
                             processingStack.get(depth).lastName = this.rootElementName;
@@ -242,7 +204,7 @@ public class JsonXmlStreamReader implements XMLStreamReader {
                             case JsonToken.TRUE:
                             case JsonToken.FALSE:
                             case JsonToken.NULL:
-                                eventQueue.add(new CharactersEvent(lastToken.tokenText, new MyLocation(lexer)));
+                                eventQueue.add(new CharactersEvent(lastToken.tokenText, new StaxLocation(lexer)));
                                 processingStack.get(depth).state = LaState.END;
                                 break;
                             default:
@@ -329,7 +291,7 @@ public class JsonXmlStreamReader implements XMLStreamReader {
                         case JsonToken.TRUE:
                         case JsonToken.FALSE:
                         case JsonToken.NULL:
-                            eventQueue.add(new CharactersEvent(lastToken.tokenText, new MyLocation(lexer)));
+                            eventQueue.add(new CharactersEvent(lastToken.tokenText, new StaxLocation(lexer)));
                             processingStack.get(depth).state = LaState.AFTER_OBJ_KV_PAIR;
                             break;
                         default:
@@ -369,7 +331,7 @@ public class JsonXmlStreamReader implements XMLStreamReader {
                             valueRead();
                             break;
                         case JsonToken.STRING:
-                            eventQueue.add(new CharactersEvent(lastToken.tokenText, new MyLocation(lexer)));
+                            eventQueue.add(new CharactersEvent(lastToken.tokenText, new StaxLocation(lexer)));
                             processingStack.get(depth).state = LaState.AFTER_ARRAY_ELEM;
                             break;
                         default:
@@ -390,7 +352,7 @@ public class JsonXmlStreamReader implements XMLStreamReader {
                             depth++;
                             break;
                         case JsonToken.STRING:
-                            eventQueue.add(new CharactersEvent(lastToken.tokenText, new MyLocation(lexer)));
+                            eventQueue.add(new CharactersEvent(lastToken.tokenText, new StaxLocation(lexer)));
                             processingStack.get(depth).state = LaState.AFTER_ARRAY_ELEM;
                             break;
                         default:
@@ -721,7 +683,7 @@ public class JsonXmlStreamReader implements XMLStreamReader {
     private StartElementEvent generateSEEvent(String name) {
         StartElementEvent event = null;
         if (!"$".equals(name)) {
-           event = new StartElementEvent(name, new MyLocation(lexer));
+           event = new StartElementEvent(name, new StaxLocation(lexer));
            eventQueue.add(event);
         }
         return event;
@@ -729,7 +691,7 @@ public class JsonXmlStreamReader implements XMLStreamReader {
 
     private void generateEEEvent(String name) {
        if (!"$".equals(name)) {
-           eventQueue.add(new EndElementEvent(name, new MyLocation(lexer)));
+           eventQueue.add(new EndElementEvent(name, new StaxLocation(lexer)));
        }
     }
 }
