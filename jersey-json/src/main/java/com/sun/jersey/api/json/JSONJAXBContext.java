@@ -75,7 +75,7 @@ public final class JSONJAXBContext extends JAXBContext {
      */
     public enum JSONNotation {
         /**
-         * The mapped JSON notation.
+         * The mapped (default) JSON notation.
          */
         MAPPED,
         /**
@@ -87,7 +87,7 @@ public final class JSONJAXBContext extends JAXBContext {
          */
         BADGERFISH,
         /**
-         * The natural (default) JSON notation, leveraging tight JAXB RI integration.
+         * The natural JSON notation, leveraging tight JAXB RI integration.
          */
         NATURAL
     };
