@@ -156,6 +156,15 @@ public abstract class ResourceConfig extends Application {
      * The instance may be a String[] or String that contains one or more fully 
      * qualified class name of a request filter class separeted by ';'.
      * Otherwise the instance may be List&lt;ContainerRequestFilter&gt;.
+     * <p>
+     * If a String[] or String of fully qualified class names then each
+     * class is instantiated as a singleton. Thus, if there is more than one
+     * class registered for this property or the same class is also registered for
+     * the {@link #PROPERTY_CONTAINER_RESPONSE_FILTERS} property then only
+     * one instance will be instatiated.
+     * <p>
+     * When applying the list of request filters to a request each request filter
+     * is applied, in order, from the first to last entry in the list.
      */
     public static final String PROPERTY_CONTAINER_REQUEST_FILTERS = 
             "com.sun.jersey.spi.container.ContainerRequestFilters";
@@ -168,6 +177,15 @@ public abstract class ResourceConfig extends Application {
      * The instance may be a String[] or String that contains one or more fully 
      * qualified class name of a response filter class separeted by ';'.
      * Otherwise the instance may be List&lt;ContainerResponseFilter&gt;.
+     * <p>
+     * If a String[] or String of fully qualified class names then each
+     * class is instantiated as a singleton. Thus, if there is more than one
+     * class registered for this property or the same class is also registered for
+     * the {@link #PROPERTY_CONTAINER_REQUEST_FILTERS} property then only
+     * one instance will be instatiated.
+     * <p>
+     * When applying the list of response filters to a response each response filter
+     * is applied, in order, from the first to last entry in the list.
      */
     public static final String PROPERTY_CONTAINER_RESPONSE_FILTERS = 
             "com.sun.jersey.spi.container.ContainerResponseFilters";
@@ -180,6 +198,17 @@ public abstract class ResourceConfig extends Application {
      * The instance may be a String[] or String that contains one or more fully
      * qualified class name of a response filter class separeted by ';'.
      * Otherwise the instance may be List&lt;ResourceFilterFactory&gt;.
+     * <p>
+     * If a String[] or String of fully qualified class names then each
+     * class is instantiated as a singleton. Thus, if there is more than one
+     * class registered for this property one instance will be instatiated.
+     * <p>
+     * When applying the list of resource filters factories to a request each 
+     * resource filter factory is applied, in order, from the first to last entry
+     * in the list.
+     * When applying the list of resource filters factories to a response each
+     * resource filter factory is applied, in reverse order, from the last to
+     * first entry in the list.
      */
     public static final String PROPERTY_RESOURCE_FILTER_FACTORIES =
             "com.sun.jersey.spi.container.ResourceFilters";

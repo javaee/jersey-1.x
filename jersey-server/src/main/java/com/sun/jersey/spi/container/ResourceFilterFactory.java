@@ -36,6 +36,7 @@
  */
 package com.sun.jersey.spi.container;
 
+import com.sun.jersey.api.core.ResourceConfig;
 import com.sun.jersey.api.model.AbstractMethod;
 import com.sun.jersey.api.model.AbstractResourceMethod;
 import com.sun.jersey.api.model.AbstractSubResourceLocator;
@@ -45,7 +46,10 @@ import java.util.List;
 /**
  * A resource filter factory responsible for creating {@link ResourceFilter}
  * instances that match methods of the abstract resource model.
- *
+ * <p>
+ * Resource filter factories are registered with the {@link ResourceConfig}
+ * using the property {@link ResourceConfig#PROPERTY_RESOURCE_FILTER_FACTORIES}.
+ * 
  * @author Paul.Sandoz@Sun.Com
  */
 public interface ResourceFilterFactory {
@@ -53,6 +57,11 @@ public interface ResourceFilterFactory {
     /**
      * Create a list of {@link ResourceFilter} instance given a method
      * of the abstract resource model.
+     * <p>
+     * When applying the list of resource filters to a request each resource filter
+     * is applied, in order, from the first to last entry in the list.
+     * When applying the list of resource filters to a response each resource filter
+     * is applied, in reverse order, from the last to first entry in the list.
      *
      * @param am the abstract method. This may be an instance
      *        of the following: {@link AbstractResourceMethod},

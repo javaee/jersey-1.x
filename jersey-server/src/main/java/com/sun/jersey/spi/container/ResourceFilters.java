@@ -42,12 +42,17 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
-* Defines the list of application-declared {@link ResourceFilter}
-* associated with a resource method, a sub-resource method,
-* or a sub-resource locator.
-*
-* @author Paul.Sandoz@Sun.Com
-*/
+ * Defines the list of application-declared {@link ResourceFilter}
+ * classes associated with a resource method, a sub-resource method,
+ * or a sub-resource locator.
+ * <p>
+ * The classes will be instantiated as singleton components. Thus, if there
+ * is the same class declared more than once in the same or a different
+ * declaration of this annotation then only one instance of the class will be
+ * instantiated.
+ *
+ * @author Paul.Sandoz@Sun.Com
+ */
 @Target({ElementType.TYPE, ElementType.METHOD})
 @Retention(RetentionPolicy.RUNTIME)
 public @interface ResourceFilters {
