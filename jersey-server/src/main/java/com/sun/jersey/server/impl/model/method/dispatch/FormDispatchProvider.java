@@ -68,10 +68,14 @@ import javax.ws.rs.core.Response;
  * @author Paul.Sandoz@Sun.Com
  */
 public class FormDispatchProvider implements ResourceMethodDispatchProvider {
-                
+    public static final String FORM_PROPERTY = "com.sun.jersey.api.representation.form";
+    
     protected void processForm(HttpContext context) {
-        Form form = context.getRequest().getEntity(Form.class);
-        context.getProperties().put("com.sun.jersey.api.representation.form", form);        
+        Form form = (Form)context.getProperties().get(FORM_PROPERTY);
+        if (form == null) {
+            form = context.getRequest().getEntity(Form.class);
+            context.getProperties().put(FORM_PROPERTY, form);
+        }
     }
     
     abstract class FormParamInInvoker extends ResourceJavaMethodDispatcher {        
@@ -209,7 +213,7 @@ public class FormDispatchProvider implements ResourceMethodDispatchProvider {
         }
 
         public Object getValue(HttpContext context) {
-            return context.getProperties().get("com.sun.jersey.api.representation.form");
+            return context.getProperties().get(FORM_PROPERTY);
         }        
     }
     
@@ -224,7 +228,7 @@ public class FormDispatchProvider implements ResourceMethodDispatchProvider {
         
         public Object getValue(HttpContext context) {
             Form form = (Form)
-                    context.getProperties().get("com.sun.jersey.api.representation.form");
+                    context.getProperties().get(FORM_PROPERTY);
             try {
                 return extractor.extract(form);
             } catch (ContainerException e) {

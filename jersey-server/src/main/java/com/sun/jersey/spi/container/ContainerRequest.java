@@ -45,6 +45,7 @@ import com.sun.jersey.api.uri.UriComponent;
 import com.sun.jersey.core.util.MultivaluedMapImpl;
 import com.sun.jersey.server.impl.VariantSelector;
 import com.sun.jersey.core.header.AcceptableLanguageTag;
+import com.sun.jersey.core.header.MediaTypes;
 import com.sun.jersey.core.header.reader.HttpHeaderReader;
 import com.sun.jersey.server.impl.model.HttpHelper;
 import com.sun.jersey.spi.MessageBodyWorkers;
@@ -91,6 +92,8 @@ public class ContainerRequest implements HttpRequestContext {
     private static final Annotation[] EMTPTY_ANNOTATIONS = new Annotation[0];
     
     private final MessageBodyWorkers bodyContext;
+    
+    private Map<String, Object> properties;
     
     private String method;
     
@@ -164,6 +167,19 @@ public class ContainerRequest implements HttpRequestContext {
     
     // ContainerRequest
     
+    /**
+     * Get the mutable propertiee.
+     *
+     * @return the properties.
+     */
+    public Map<String, Object> getProperties() {
+        if (properties != null) {
+            return properties;
+        }
+
+        return properties = new HashMap<String, Object>();
+    }
+
     /**
      * Set the HTTP method.
      * @param method the method.
@@ -392,7 +408,7 @@ public class ContainerRequest implements HttpRequestContext {
     }
     
     public Form getFormParameters() {
-        if (MediaType.APPLICATION_FORM_URLENCODED_TYPE.isCompatible(getMediaType())) {
+        if (MediaTypes.typeEquals(MediaType.APPLICATION_FORM_URLENCODED_TYPE, getMediaType())) {
             InputStream in = getEntityInputStream();
             if (in.getClass() != ByteArrayInputStream.class) {
                 // Buffer input

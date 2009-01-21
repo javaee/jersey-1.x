@@ -44,6 +44,7 @@ import com.sun.jersey.api.model.AbstractResourceMethod;
 import com.sun.jersey.api.model.Parameter;
 import com.sun.jersey.api.representation.Form;
 import com.sun.jersey.core.header.FormDataContentDisposition;
+import com.sun.jersey.core.header.MediaTypes;
 import com.sun.jersey.server.impl.inject.AbstractHttpContextInjectable;
 import com.sun.jersey.spi.MessageBodyWorkers;
 import com.sun.jersey.spi.dispatch.RequestDispatcher;
@@ -77,7 +78,7 @@ public class MultipartFormDispatchProvider extends FormDispatchProvider {
     @Override
     protected void processForm(HttpContext context) {
         MediaType m = context.getRequest().getMediaType();
-        if (m != null && m.isCompatible(MULTIPART_FORM_DATA)) {
+        if (MediaTypes.typeEquals(MULTIPART_FORM_DATA, m)) {
             MimeMultipart form = context.getRequest().getEntity(MimeMultipart.class);
             try {
                 Map<String, FormDataBodyPart> formMap = getFormData(form);
@@ -87,8 +88,7 @@ public class MultipartFormDispatchProvider extends FormDispatchProvider {
                 throw new ContainerException(e);
             }
         } else {
-            Form form = context.getRequest().getEntity(Form.class);
-            context.getProperties().put("com.sun.jersey.api.representation.form", form);
+            super.processForm(context);
         }
     }
     

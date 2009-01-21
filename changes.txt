@@ -1,4 +1,10 @@
 release 1.0.2 (2009-01/02)
+- Fixed issue 188
+  https://jersey.dev.java.net/issues/show_bug.cgi?id=188
+  Servlet consumes the request of the type "application/x-www-form-urlencoded"
+  when HttpServletRequest.getParamter(...) and related methods are called.
+  Jersey constructs a Form instance from the request parameters such that
+  resource methods that utilize @FormParam will work as expected.
 - Added support for resource specific filters and support for @RolesAllowed
   See JavaDoc for the package:
     com.sun.jersey.api.container.filter

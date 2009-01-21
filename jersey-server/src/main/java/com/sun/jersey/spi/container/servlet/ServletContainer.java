@@ -42,13 +42,16 @@ import com.sun.jersey.api.core.ApplicationAdapter;
 import com.sun.jersey.api.core.ResourceConfig;
 import com.sun.jersey.api.core.ClasspathResourceConfig;
 import com.sun.jersey.api.core.PackagesResourceConfig;
+import com.sun.jersey.api.representation.Form;
 import com.sun.jersey.api.uri.UriComponent;
 import com.sun.jersey.core.header.InBoundHeaders;
+import com.sun.jersey.core.header.MediaTypes;
 import com.sun.jersey.core.reflection.ReflectionHelper;
 import com.sun.jersey.core.spi.component.ioc.IoCComponentProviderFactory;
 import com.sun.jersey.server.impl.container.servlet.JSPTemplateProcessor;
 import com.sun.jersey.server.impl.container.servlet.ServletContainerRequest;
 import com.sun.jersey.server.impl.container.servlet.ThreadLocalInvoker;
+import com.sun.jersey.server.impl.model.method.dispatch.FormDispatchProvider;
 import com.sun.jersey.spi.container.ContainerListener;
 import com.sun.jersey.spi.container.ContainerNotifier;
 import com.sun.jersey.spi.container.ContainerRequest;
@@ -57,13 +60,16 @@ import com.sun.jersey.spi.container.ContainerResponseWriter;
 import com.sun.jersey.spi.container.WebApplication;
 import com.sun.jersey.spi.container.WebApplicationFactory;
 import com.sun.jersey.spi.inject.SingletonTypeInjectableProvider;
+import java.io.BufferedInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Proxy;
 import java.lang.reflect.Type;
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -82,6 +88,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.core.Application;
 import javax.ws.rs.core.Context;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.UriBuilder;
 
@@ -352,7 +359,12 @@ public class ServletContainer extends HttpServlet implements ContainerListener {
                 requestUri,
                 getHeaders(request),
                 request.getInputStream());
-        
+
+        // Check if any servlet filters have consumed a request entity
+        // of the media type application/x-www-form-urlencoded
+        // This can happen if a filter calls request.getParameter(...)
+        filterFormParameters(request, cRequest);
+
         try {
             requestInvoker.set(request);
             responseInvoker.set(response);
@@ -525,7 +537,40 @@ public class ServletContainer extends HttpServlet implements ContainerListener {
         if (value != null)
             rc.getFeatures().put(feature, Boolean.valueOf(value));
     }
-    
+
+    private void filterFormParameters(HttpServletRequest hsr, ContainerRequest cr) throws IOException {
+        if (MediaTypes.typeEquals(MediaType.APPLICATION_FORM_URLENCODED_TYPE, cr.getMediaType())) {
+            if (!isEntityPresent(cr)) {
+                Form f = new Form();
+
+                Enumeration e = hsr.getParameterNames();
+                while (e.hasMoreElements()) {
+                    String name = (String)e.nextElement();
+                    String[] values = hsr.getParameterValues(name);
+
+                    f.put(name, Arrays.asList(values));
+                }
+                cr.getProperties().put(FormDispatchProvider.FORM_PROPERTY, f);
+            }
+        }
+    }
+
+    private boolean isEntityPresent(ContainerRequest cr) throws IOException {
+        InputStream in = cr.getEntityInputStream();
+        if (!in.markSupported()) {
+            in = new BufferedInputStream(in);
+            cr.setEntityInputStream(in);
+        }
+
+        in.mark(1);
+        if (in.read() == -1)
+            return false;
+        else {
+            in.reset();
+            return true;
+        }
+    }
+
     /**
      * Load the Web application. This will create, configure and initiate
      * the web application.

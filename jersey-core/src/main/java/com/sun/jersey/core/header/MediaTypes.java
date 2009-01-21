@@ -60,6 +60,13 @@ public class MediaTypes {
     public final static MediaType FAST_INFOSET =
             MediaType.valueOf("application/fastinfoset");
 
+    public final static boolean typeEquals(MediaType m1, MediaType m2) {
+        if (m1 == null || m2 == null)
+            return false;
+        
+        return m1.getSubtype().equalsIgnoreCase(m2.getSubtype()) && m1.getType().equalsIgnoreCase(m2.getType());
+    }
+
     /**
      * Comparator for media types.
      * <p>
