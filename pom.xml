@@ -105,6 +105,7 @@
         <module>jersey-tests</module>
         <module>jersey-bundle</module>
         <module>archetypes</module>
+        <module>archive</module>
     </modules>
     <build>
         <plugins>
