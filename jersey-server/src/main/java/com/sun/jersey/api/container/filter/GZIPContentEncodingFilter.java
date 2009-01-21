@@ -57,8 +57,22 @@ import javax.ws.rs.core.HttpHeaders;
  * If the request contains a Accept-Encoding header that contains
  * "gzip" then the response entity (if any) is compressed using gzip and a
  * Content-Encoding header of "gzip" is added to the response.
- * 
+ * <p>
+ * When an application is deployed in the Servlet container this filter can be
+ * registered using the following Servlet initialization parameters:
+ * <blockquote><pre>
+ *     &lt;init-param&gt;
+ *         &lt;param-name&gt;com.sun.jersey.spi.container.ContainerRequestFilters&lt;/param-name&gt;
+ *         &lt;param-value&gt;com.sun.jersey.api.container.filter.GZIPContentEncodingFilter&lt;/param-value&gt;
+ *     &lt;/init-param&gt
+ *     &lt;init-param&gt
+ *         &lt;param-name&gtcom.sun.jersey.spi.container.ContainerResponseFilters&lt;/param-name&gt;
+ *         &lt;param-value&gtcom.sun.jersey.api.container.filter.GZIPContentEncodingFilter&lt;/param-value&gt;
+ *     &lt;/init-param&gt;
+ * </pre></blockquote>
+ *
  * @author Paul.Sandoz@Sun.Com
+ * @see com.sun.jersey.api.container.filter
  */
 public class GZIPContentEncodingFilter implements ContainerRequestFilter, ContainerResponseFilter {
 

@@ -55,8 +55,8 @@ import javax.ws.rs.core.SecurityContext;
 
 /**
  * A {@link ResourceFilterFactory} supporting the {@link RolesAllowed},
- * {@link PermitAll} and {@link DenyAll} on resource methods and sub-resource
- * locator methods.
+ * {@link PermitAll} and {@link DenyAll} on resource methods sub-resource methods,
+ * and sub-resource locators.
  * <p>
  * The {@link SecurityContext} is utilized, using the
  * {@link SecurityContext#isUserInRole(java.lang.String) } method,
@@ -69,8 +69,19 @@ import javax.ws.rs.core.SecurityContext;
  * <p>
  * If the {@link PermitAll} annotation is declared and is not overridden then
  * this filter will not be applied.
+ * <p>
+ * <p>
+ * When an application is deployed in the Servlet container this resource filter
+ * factory can be registered using the following Servlet initialization parameter:
+ * <blockquote><pre>
+ *     &lt;init-param&gt;
+ *         &lt;param-name&gt;com.sun.jersey.spi.container.ResourceFilters&lt;/param-name&gt;
+ *         &lt;param-value&gt;com.sun.jersey.api.container.filter.RolesAllowedResourceFilterFactory&lt;/param-value&gt;
+ *     &lt;/init-param&gt
+ * </pre></blockquote>
  *
  * @author Paul.Sandoz@Sun.Com
+ * @see com.sun.jersey.api.container.filter
  */
 public class RolesAllowedResourceFilterFactory implements ResourceFilterFactory {
 

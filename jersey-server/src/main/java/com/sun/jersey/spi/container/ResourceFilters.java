@@ -50,8 +50,15 @@ import java.lang.annotation.Target;
  * is the same class declared more than once in the same or a different
  * declaration of this annotation then only one instance of the class will be
  * instantiated.
- *
+ * <p>
+ * This annotation can be specified on a class or on method(s). Specifying it
+ * at a class level means that it applies to all the methods in the class.
+ * Specifying it on a method means that it is applicable to that method only.
+ * If applied at both the class and methods level , the method value overrides
+ * the class value.
+ * 
  * @author Paul.Sandoz@Sun.Com
+ * @see com.sun.jersey.api.container.filter
  */
 @Target({ElementType.TYPE, ElementType.METHOD})
 @Retention(RetentionPolicy.RUNTIME)

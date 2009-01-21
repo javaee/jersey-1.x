@@ -59,8 +59,22 @@ import javax.ws.rs.core.MultivaluedMap;
  * <p>
  * The request headers, request entity, response headers and response entity
  * will be logged. By default logging will be output to System.out.
- * 
+ * <p>
+ * When an application is deployed in the Servlet container this filter can be
+ * registered using the following Servlet initialization parameters:
+ * <blockquote><pre>
+ *     &lt;init-param&gt;
+ *         &lt;param-name&gt;com.sun.jersey.spi.container.ContainerRequestFilters&lt;/param-name&gt;
+ *         &lt;param-value&gt;com.sun.jersey.api.container.filter.LoggingFilter&lt;/param-value&gt;
+ *     &lt;/init-param&gt
+ *     &lt;init-param&gt
+ *         &lt;param-name&gtcom.sun.jersey.spi.container.ContainerResponseFilters&lt;/param-name&gt;
+ *         &lt;param-value&gtcom.sun.jersey.api.container.filter.LoggingFilter&lt;/param-value&gt;
+ *     &lt;/init-param&gt;
+ * </pre></blockquote>
+ *
  * @author Paul.Sandoz@Sun.Com
+ * @see com.sun.jersey.api.container.filter
  */
 public class LoggingFilter implements ContainerRequestFilter, ContainerResponseFilter {
     private static final String NOTIFICATION_PREFIX = "* ";

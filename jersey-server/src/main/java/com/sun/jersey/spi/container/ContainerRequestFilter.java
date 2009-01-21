@@ -37,10 +37,10 @@
 package com.sun.jersey.spi.container;
 
 /**
- * A filter for filtering a requests before the request is
- * dispatched to a root resource class.
+ * A filter for filtering a request.
  * 
  * @author Paul.Sandoz@Sun.Com
+ * @see com.sun.jersey.api.container.filter
  */
 public interface ContainerRequestFilter {
     /**

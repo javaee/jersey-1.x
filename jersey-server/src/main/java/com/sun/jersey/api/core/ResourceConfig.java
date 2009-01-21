@@ -42,7 +42,7 @@ import com.sun.jersey.spi.container.ContainerListener;
 import com.sun.jersey.spi.container.ContainerNotifier;
 import com.sun.jersey.spi.container.ContainerRequestFilter;
 import com.sun.jersey.spi.container.ContainerResponseFilter;
-import com.sun.jersey.spi.container.ResourceFilter;
+import com.sun.jersey.spi.container.ResourceFilterFactory;
 import java.lang.reflect.Modifier;
 import java.util.Collections;
 import java.util.HashSet;
@@ -150,8 +150,9 @@ public abstract class ResourceConfig extends Application {
     
     /**
      * If set the list of {@link ContainerRequestFilter} that are applied
-     * to filter the request. The filters are applied in order from
-     * first to last as declared.
+     * to filter the request. When applying the list of request filters to
+     * a request each request filter is applied, in order, from the first to
+     * the last entry in the list.
      * <p>
      * The instance may be a String[] or String that contains one or more fully 
      * qualified class name of a request filter class separeted by ';'.
@@ -162,17 +163,17 @@ public abstract class ResourceConfig extends Application {
      * class registered for this property or the same class is also registered for
      * the {@link #PROPERTY_CONTAINER_RESPONSE_FILTERS} property then only
      * one instance will be instatiated.
-     * <p>
-     * When applying the list of request filters to a request each request filter
-     * is applied, in order, from the first to last entry in the list.
+     * 
+     * @see com.sun.jersey.api.container.filter
      */
     public static final String PROPERTY_CONTAINER_REQUEST_FILTERS = 
             "com.sun.jersey.spi.container.ContainerRequestFilters";
     
     /**
      * If set the list of {@link ContainerResponseFilter} that are applied
-     * to filter the response. The filters are applied in order from
-     * first to last as declared.
+     * to filter the response. When applying the list of response filters to
+     * a response each response filter is applied, in order, from the first to
+     * the last entry in the list.
      * <p>
      * The instance may be a String[] or String that contains one or more fully 
      * qualified class name of a response filter class separeted by ';'.
@@ -183,17 +184,17 @@ public abstract class ResourceConfig extends Application {
      * class registered for this property or the same class is also registered for
      * the {@link #PROPERTY_CONTAINER_REQUEST_FILTERS} property then only
      * one instance will be instatiated.
-     * <p>
-     * When applying the list of response filters to a response each response filter
-     * is applied, in order, from the first to last entry in the list.
+     *
+     * @see com.sun.jersey.api.container.filter
      */
     public static final String PROPERTY_CONTAINER_RESPONSE_FILTERS = 
             "com.sun.jersey.spi.container.ContainerResponseFilters";
 
     /**
      * If set the list of {@link ResourceFilterFactory} that are applied
-     * to resources. The resource filter factories are applied in order from
-     * first to last as declared.
+     * to resources. When applying the list of resource filters factories to a
+     * request each resource filter factory is applied, in order, from the first
+     * to last entry in the list.
      * <p>
      * The instance may be a String[] or String that contains one or more fully
      * qualified class name of a response filter class separeted by ';'.
@@ -202,13 +203,8 @@ public abstract class ResourceConfig extends Application {
      * If a String[] or String of fully qualified class names then each
      * class is instantiated as a singleton. Thus, if there is more than one
      * class registered for this property one instance will be instatiated.
-     * <p>
-     * When applying the list of resource filters factories to a request each 
-     * resource filter factory is applied, in order, from the first to last entry
-     * in the list.
-     * When applying the list of resource filters factories to a response each
-     * resource filter factory is applied, in reverse order, from the last to
-     * first entry in the list.
+     * 
+     * @see com.sun.jersey.api.container.filter
      */
     public static final String PROPERTY_RESOURCE_FILTER_FACTORIES =
             "com.sun.jersey.spi.container.ResourceFilters";

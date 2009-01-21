@@ -1,4 +1,7 @@
 release 1.0.2 (2009-01/02)
+- Added support for resource specific filters and support for @RolesAllowed
+  See JavaDoc for the package:
+    com.sun.jersey.api.container.filter
 - Fixed issue when building a URI with templates and fragment: the fragment
   component was being ignored and the path component was used instead as
   the fragment component.

@@ -37,10 +37,10 @@
 package com.sun.jersey.spi.container;
 
 /**
- * A filter for filtering a response after the response is returned
- * from a resource class and before the response is written to the container.
+ * A filter for filtering a response.
  * 
  * @author Paul.Sandoz@Sun.Com
+ * @see com.sun.jersey.api.container.filter
  */
 public interface ContainerResponseFilter {
     /**

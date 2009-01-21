@@ -51,6 +51,7 @@ import java.util.List;
  * using the property {@link ResourceConfig#PROPERTY_RESOURCE_FILTER_FACTORIES}.
  * 
  * @author Paul.Sandoz@Sun.Com
+ * @see com.sun.jersey.api.container.filter
  */
 public interface ResourceFilterFactory {
 
