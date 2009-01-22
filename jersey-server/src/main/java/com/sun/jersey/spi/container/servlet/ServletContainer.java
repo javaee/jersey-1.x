@@ -539,18 +539,31 @@ public class ServletContainer extends HttpServlet implements ContainerListener {
     }
 
     private void filterFormParameters(HttpServletRequest hsr, ContainerRequest cr) throws IOException {
-        if (MediaTypes.typeEquals(MediaType.APPLICATION_FORM_URLENCODED_TYPE, cr.getMediaType())) {
-            if (!isEntityPresent(cr)) {
-                Form f = new Form();
+        if (cr.getMethod().equals("POST")
+                && MediaTypes.typeEquals(MediaType.APPLICATION_FORM_URLENCODED_TYPE, cr.getMediaType())
+                && !isEntityPresent(cr)) {
+            Form f = new Form();
 
-                Enumeration e = hsr.getParameterNames();
-                while (e.hasMoreElements()) {
-                    String name = (String)e.nextElement();
-                    String[] values = hsr.getParameterValues(name);
+            Enumeration e = hsr.getParameterNames();
+            while (e.hasMoreElements()) {
+                String name = (String)e.nextElement();
+                String[] values = hsr.getParameterValues(name);
 
-                    f.put(name, Arrays.asList(values));
-                }
+                f.put(name, Arrays.asList(values));
+            }
+
+            if (!f.isEmpty()) {
                 cr.getProperties().put(FormDispatchProvider.FORM_PROPERTY, f);
+                if (LOGGER.isLoggable(Level.WARNING)) {
+                    LOGGER.log(Level.WARNING,
+                     "A servlet POST request, to the URI " + cr.getRequestUri() + ", " +
+                     "contains form parameters in " +
+                     "the request body but the request body has been consumed " +
+                     "by the servlet or a servlet filter accessing the request " +
+                     "parameters. Only resource methods using @FormParam " +
+                     "will work as expected. Resource methods consuming the " +
+                     "request body by other means will not work as expected.");
+                }
             }
         }
     }
