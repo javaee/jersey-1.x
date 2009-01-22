@@ -9,6 +9,7 @@ import javax.ws.rs.ext._
 
 package com.sun.jersey.samples.mandel {
 
+@Produces(Array("image/*"))
 @Provider
 class RenderedImageProvider extends MessageBodyWriter[RenderedImage] {
     def isWriteable(c: Class[_], gt: Type, annotations: Array[Annotation], mediaType: MediaType) : boolean = {
@@ -42,7 +43,7 @@ object RenderedImageProvider {
         val i = ImageIO.getImageWritersByMIMEType(t)
         if (!i.hasNext()) return null
 
-        i.next.asInstanceOf[ImageWriter].getOriginatingProvider.getFormatNames()(0)
+        i.next.getOriginatingProvider.getFormatNames()(0)
     }
 
     def isSupported(t: MediaType) = ImageIO.getImageWritersByMIMEType(t.toString()).hasNext()

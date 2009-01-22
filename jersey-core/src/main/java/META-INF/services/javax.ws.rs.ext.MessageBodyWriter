@@ -3,6 +3,7 @@ com.sun.jersey.core.impl.provider.entity.ByteArrayProvider
 com.sun.jersey.core.impl.provider.entity.FileProvider
 com.sun.jersey.core.impl.provider.entity.InputStreamProvider
 com.sun.jersey.core.impl.provider.entity.DataSourceProvider
+com.sun.jersey.core.impl.provider.entity.RenderedImageProvider
 com.sun.jersey.core.impl.provider.entity.MimeMultipartProvider
 com.sun.jersey.core.impl.provider.entity.FormProvider
 com.sun.jersey.core.impl.provider.entity.FormMultivaluedMapProvider

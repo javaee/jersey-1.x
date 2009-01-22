@@ -1,4 +1,15 @@
 release 1.0.2 (2009-01/02)
+- Added support for a RenderedImage provider for consuming and producing images.
+  For producing images the Java type must be assignable to RenderedImage. Any
+  media type that is compatible with "image/*" is supported, but the actual
+  image formats supported is restricted to the image readers registered with
+  the Java imaging API.
+  When consuming images the Java type RenderedImage or BufferedImage may be used.
+  The media types supported for consuming are "image/*" and 
+  "application/octet-stream". For the former the actual image formats supported
+  is restricted to the image writers registered with the Java imaging API.
+  For the latter the Java image API will determine the appropriate
+  image format (if supported) from the contents of the entity body.
 - Fixed issue 188
   https://jersey.dev.java.net/issues/show_bug.cgi?id=188
   Servlet consumes the request of the type "application/x-www-form-urlencoded"
