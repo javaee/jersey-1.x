@@ -1,4 +1,7 @@
 release 1.0.2 (2009-01/02)
+- jersey-archive module added to provide archive files that include the
+  set of Jersey jars and JavaDoc. See:
+  http://download.java.net/maven/2/com/sun/jersey/jersey-archive/
 - Fixed issue 191
   https://jersey.dev.java.net/issues/show_bug.cgi?id=191
   ResourceConfig.isProviderClass and ResourceConfig.isRootResourceClass return

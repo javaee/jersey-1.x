@@ -19,11 +19,11 @@
       <outputDirectory>apidocs/jsr311</outputDirectory>
     </fileSet-->
     <fileSet>
-      <directory>target/aux/apidocs</directory>
+      <directory>target/assembly/apidocs</directory>
       <outputDirectory>apidocs</outputDirectory>
     </fileSet>
      <fileSet>
-      <directory>target/aux</directory>
+      <directory>target/assembly</directory>
       <includes>
         <include>jsr311-api-*.jar</include>
         <include>jersey-server-*.jar</include>
@@ -36,7 +36,7 @@
       <outputDirectory>lib</outputDirectory>
     </fileSet>
      <fileSet>
-      <directory>target/aux/contribs</directory>
+      <directory>target/assembly/contribs</directory>
           <includes>
               <include>*.jar</include>
           </includes>
