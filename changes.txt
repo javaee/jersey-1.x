@@ -16,6 +16,8 @@ release 1.0.2 (2009-01/02)
   when HttpServletRequest.getParamter(...) and related methods are called.
   Jersey constructs a Form instance from the request parameters such that
   resource methods that utilize @FormParam will work as expected.
+- Fixed jersey-client issues 164 and 184: added ClientResponse.getDate() and
+  URLConnectionResponse.toString()
 - Added support for resource specific filters and support for @RolesAllowed
   See JavaDoc for the package:
     com.sun.jersey.api.container.filter
