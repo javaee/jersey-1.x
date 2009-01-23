@@ -29,7 +29,9 @@ release 1.0.2 (2009-01/02)
   https://jersey.dev.java.net/issues/show_bug.cgi?id=184
   Implemented URLConnectionClientHandler.URLConnectionResponse.toString() to
   return the HTTP method, request URL and status code.
-- Added support for resource specific filters and support for @RolesAllowed
+- Fixed issue 134
+  https://jersey.dev.java.net/issues/show_bug.cgi?id=134
+  Added support for resource specific filters and support for @RolesAllowed
   See JavaDoc for the package:
     com.sun.jersey.api.container.filter
 - Fixed issue when building a URI with templates and fragment: the fragment
