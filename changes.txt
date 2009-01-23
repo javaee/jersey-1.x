@@ -1,4 +1,10 @@
 release 1.0.2 (2009-01/02)
+- Fixed issue 191
+  https://jersey.dev.java.net/issues/show_bug.cgi?id=191
+  ResourceConfig.isProviderClass and ResourceConfig.isRootResourceClass return
+  false if the class parameter is null.
+  This fixes an issue with the SpringComponentProviderFactory throwing an NPE
+  for abstract Spring beans.
 - Added support for a RenderedImage provider for consuming and producing images.
   For producing images the Java type must be assignable to RenderedImage. Any
   media type that is compatible with "image/*" is supported, but the actual
@@ -16,8 +22,13 @@ release 1.0.2 (2009-01/02)
   when HttpServletRequest.getParamter(...) and related methods are called.
   Jersey constructs a Form instance from the request parameters such that
   resource methods that utilize @FormParam will work as expected.
-- Fixed jersey-client issues 164 and 184: added ClientResponse.getDate() and
-  URLConnectionResponse.toString()
+- Fixed issue 164
+  https://jersey.dev.java.net/issues/show_bug.cgi?id=164
+  Added ClientResponse.getResponseDate() to obtain the value of "Date" header.
+- Fixed issue 184
+  https://jersey.dev.java.net/issues/show_bug.cgi?id=184
+  Implemented URLConnectionClientHandler.URLConnectionResponse.toString() to
+  return the HTTP method, request URL and status code.
 - Added support for resource specific filters and support for @RolesAllowed
   See JavaDoc for the package:
     com.sun.jersey.api.container.filter
