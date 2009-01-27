@@ -59,7 +59,7 @@ import org.apache.abdera.writer.Writer;
 /**
  * <p>JAX-RS Provider for an AtomPub {@link Categories} Document instance.</p>
  */
-@Provider
+//@Provider
 //@Consumes({"application/atomcat+xml", "application/xml", "text/xml", "application/atomcat+json", "application/json"})
 // Abdera does not yet provide a JSON parser for a Categories entity
 @Consumes({"application/atomcat+xml", "application/xml", "text/xml"})

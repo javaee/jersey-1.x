@@ -58,7 +58,7 @@ import org.apache.abdera.parser.Parser;
 /**
  * <p>JAX-RS Provider for an Atom {@link Feed} Document instance.</p>
  */
-@Provider
+//@Provider
 @Consumes({"application/atom+xml", "application/xml", "text/xml", "application/atom+json", "application/json"})
 @Produces({"application/atom+xml", "application/xml", "text/xml", "application/atom+json", "application/json"})
 public class FeedProvider

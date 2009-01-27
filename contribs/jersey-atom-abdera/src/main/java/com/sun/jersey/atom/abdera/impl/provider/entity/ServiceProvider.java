@@ -58,7 +58,7 @@ import org.apache.abdera.parser.Parser;
 /**
  * <p>JAX-RS Provider for an AtomPub {@link Service} Document instance.</p>
  */
-@Provider
+//@Provider
 // @Consumes({"application/atomsvc+xml", "application/xml", "text/xml", "application/atomsvc+json", "application/json"})
 // Abdera does not yet provide a JSON parser for a Service entity
 @Consumes({"application/atomsvc+xml", "application/xml", "text/xml"})
