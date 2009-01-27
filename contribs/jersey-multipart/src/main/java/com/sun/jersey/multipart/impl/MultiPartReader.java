@@ -69,7 +69,7 @@ import javax.ws.rs.ext.Providers;
  * <p>{@link Provider} {@link MessageBodyReader} implementation for
  * {@link MultiPart} entities.</p>
  */
-@Provider
+//@Provider
 @Consumes("multipart/*")
 public class MultiPartReader implements MessageBodyReader<MultiPart> {
 
