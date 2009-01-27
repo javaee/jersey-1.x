@@ -52,6 +52,8 @@ import com.sun.jersey.server.impl.uri.rules.SubLocatorRule;
 import com.sun.jersey.server.impl.uri.PathPattern;
 import com.sun.jersey.server.impl.uri.PathTemplate;
 import com.sun.jersey.api.uri.UriTemplate;
+import com.sun.jersey.api.view.ImplicitProduces;
+import com.sun.jersey.core.header.MediaTypes;
 import com.sun.jersey.core.spi.component.ComponentInjector;
 import com.sun.jersey.server.impl.application.ResourceMethodDispatcherFactory;
 import com.sun.jersey.server.impl.template.ViewableRule;
@@ -67,6 +69,7 @@ import com.sun.jersey.server.spi.component.ResourceComponentProvider;
 import com.sun.jersey.server.impl.component.ResourceFactory;
 import com.sun.jersey.core.spi.component.ComponentScope;
 import com.sun.jersey.server.impl.container.filter.FilterFactory;
+import com.sun.jersey.server.impl.template.ViewResourceMethod;
 import com.sun.jersey.spi.container.ResourceFilter;
 import com.sun.jersey.spi.uri.rules.UriRule;
 import com.sun.jersey.spi.uri.rules.UriRules;
@@ -76,6 +79,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import javax.ws.rs.HttpMethod;
+import javax.ws.rs.core.MediaType;
 
 /**
  *
@@ -106,14 +110,24 @@ public final class ResourceClass {
         
         this.wadlFactory = wadlFactory;
 
+        final boolean implicitViewables = config.getFeature(
+                ResourceConfig.FEATURE_IMPLICIT_VIEWABLES);
+        List<MediaType> implictProduces = null;
+        if (implicitViewables) {
+            ImplicitProduces ip = resource.getAnnotation(ImplicitProduces.class);
+            if (ip != null && ip.value() != null && ip.value().length > 0) {
+                implictProduces = MediaTypes.createMediaTypes(ip.value());
+            }
+        }
+
         RulesMap<UriRule> rulesMap = new RulesMap<UriRule>();
 
         processSubResourceLocators(ff, injectableContext, rulesMap);
 
         final Map<PathPattern, ResourceMethodMap> patternMethodMap =
-                processSubResourceMethods(df, ff);
+                processSubResourceMethods(implictProduces, df, ff);
 
-        final ResourceMethodMap methodMap = processMethods(df, ff);
+        final ResourceMethodMap methodMap = processMethods(implictProduces, df, ff);
 
         // Create the rules for the sub-resource HTTP methods
         for (Map.Entry<PathPattern, ResourceMethodMap> e : patternMethodMap.entrySet()) {
@@ -125,7 +139,7 @@ public final class ResourceClass {
                     new RightHandPathRule(
                     config.getFeature(ResourceConfig.FEATURE_REDIRECT),                    
                     p.getTemplate().endsWithSlash(),
-                    new HttpMethodRule(rmm, true)));
+                    new HttpMethodRule(rmm, implictProduces, true)));
         }
 
         // Create the rules for the HTTP methods
@@ -133,7 +147,7 @@ public final class ResourceClass {
         if (!methodMap.isEmpty()) {
             // No need to adapt with the RightHandPathRule as the URI path
             // will be consumed when such a rule is accepted
-            rulesMap.put(PathPattern.EMPTY_PATH, new HttpMethodRule(methodMap));
+            rulesMap.put(PathPattern.EMPTY_PATH, new HttpMethodRule(methodMap, implictProduces));
         }
 
         
@@ -225,6 +239,7 @@ public final class ResourceClass {
     }
 
     private Map<PathPattern, ResourceMethodMap> processSubResourceMethods(
+            List<MediaType> implictProduces,
             ResourceMethodDispatcherFactory df,
             FilterFactory ff) {
         final Map<PathPattern, ResourceMethodMap> patternMethodMap =
@@ -239,6 +254,13 @@ public final class ResourceClass {
         }
 
         for (Map.Entry<PathPattern, ResourceMethodMap> e : patternMethodMap.entrySet()) {
+            if (implictProduces != null) {
+                List<ResourceMethod> getList = e.getValue().get(HttpMethod.GET);
+                if (getList != null && !getList.isEmpty()) {
+                    e.getValue().put(new ViewResourceMethod(implictProduces));
+                }
+            }
+
             processHead(e.getValue());
             processOptions(e.getValue(), this.resource, e.getKey());            
         }
@@ -246,12 +268,21 @@ public final class ResourceClass {
         return patternMethodMap;
     }
 
-    private ResourceMethodMap processMethods(ResourceMethodDispatcherFactory df,
+    private ResourceMethodMap processMethods(            
+            List<MediaType> implictProduces,
+            ResourceMethodDispatcherFactory df,
             FilterFactory ff) {
         final ResourceMethodMap methodMap = new ResourceMethodMap();
         for (final AbstractResourceMethod resourceMethod : this.resource.getResourceMethods()) {
             ResourceMethod rm = new ResourceHttpMethod(df, ff, resourceMethod);
             methodMap.put(rm);
+        }
+
+        if (implictProduces != null) {
+            List<ResourceMethod> getList = methodMap.get(HttpMethod.GET);
+            if (getList != null && !getList.isEmpty()) {
+                methodMap.put(new ViewResourceMethod(implictProduces));
+            }
         }
 
         processHead(methodMap);

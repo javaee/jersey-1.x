@@ -39,6 +39,7 @@ package com.sun.jersey.impl.http.header.provider;
 
 import com.sun.jersey.core.header.AcceptableMediaType;
 import com.sun.jersey.core.header.reader.HttpHeaderReader;
+import java.util.Collections;
 import junit.framework.*;
 import javax.ws.rs.core.MediaType;
 import java.util.List;
@@ -304,4 +305,71 @@ public class AcceptMediaTypeProviderTest extends TestCase {
         assertEquals(0, m.getParameters().size());
     }
 
+    public void testHttpURLConnectionAcceptHeaderWithPrority() throws Exception {
+        String header = "text/html, image/gif, image/jpeg, *; q=.2, */*; q=.2";
+        List<AcceptableMediaType> l = HttpHeaderReader.readAcceptMediaType(header,
+                Collections.singletonList(MediaType.TEXT_HTML_TYPE));
+
+        assertEquals(5, l.size());
+
+        MediaType m;
+        m = l.get(0);
+        assertEquals("text", m.getType());
+        assertEquals("html", m.getSubtype());
+        assertEquals(0, m.getParameters().size());
+        m = l.get(1);
+        assertEquals("image", m.getType());
+        assertEquals("gif", m.getSubtype());
+        assertEquals(0, m.getParameters().size());
+        m = l.get(2);
+        assertEquals("image", m.getType());
+        assertEquals("jpeg", m.getSubtype());
+        assertEquals(0, m.getParameters().size());
+        m = l.get(3);
+        assertEquals("*", m.getType());
+        assertEquals("*", m.getSubtype());
+        assertEquals(1, m.getParameters().size());
+        m = l.get(4);
+        assertEquals("*", m.getType());
+        assertEquals("*", m.getSubtype());
+        assertEquals(1, m.getParameters().size());
+    }
+
+    public void testFirefoxAcceptHeaderWithPrority() throws Exception {
+        String header = "text/xml,application/xml,application/xhtml+xml,text/html;q=0.9,text/plain;q=0.8,image/png,*/*;q=0.5";
+        List<AcceptableMediaType> l = HttpHeaderReader.readAcceptMediaType(header,
+                Collections.singletonList(MediaType.TEXT_HTML_TYPE));
+
+        assertEquals(7, l.size());
+
+        MediaType m;
+        m = l.get(0);
+        assertEquals("text", m.getType());
+        assertEquals("html", m.getSubtype());
+        assertEquals(1, m.getParameters().size());
+        m = l.get(1);
+        assertEquals("text", m.getType());
+        assertEquals("xml", m.getSubtype());
+        assertEquals(0, m.getParameters().size());
+        m = l.get(2);
+        assertEquals("application", m.getType());
+        assertEquals("xml", m.getSubtype());
+        assertEquals(0, m.getParameters().size());
+        m = l.get(3);
+        assertEquals("application", m.getType());
+        assertEquals("xhtml+xml", m.getSubtype());
+        assertEquals(0, m.getParameters().size());
+        m = l.get(4);
+        assertEquals("image", m.getType());
+        assertEquals("png", m.getSubtype());
+        assertEquals(0, m.getParameters().size());
+        m = l.get(5);
+        assertEquals("text", m.getType());
+        assertEquals("plain", m.getSubtype());
+        assertEquals(1, m.getParameters().size());
+        m = l.get(6);
+        assertEquals("*", m.getType());
+        assertEquals("*", m.getSubtype());
+        assertEquals(1, m.getParameters().size());
+    }
 }

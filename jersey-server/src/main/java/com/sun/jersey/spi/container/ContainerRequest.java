@@ -396,6 +396,10 @@ public class ContainerRequest implements HttpRequestContext {
         return null;
     }
 
+    public List<MediaType> getAcceptableMediaTypes(List<MediaType> priorityMediaTypes) {
+        return new ArrayList<MediaType>(HttpHelper.getAccept(this, priorityMediaTypes));
+    }
+
     public MultivaluedMap<String, String> getCookieNameValueMap() {
         if (cookieNames == null || headersModCount != headers.getModCount()) {
             cookieNames = new MultivaluedMapImpl();

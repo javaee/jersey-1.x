@@ -43,6 +43,7 @@ import com.sun.jersey.api.core.HttpResponseContext;
 import com.sun.jersey.core.header.AcceptableMediaType;
 import com.sun.jersey.server.impl.model.method.ResourceMethod;
 import com.sun.jersey.api.Responses;
+import com.sun.jersey.server.impl.template.ViewResourceMethod;
 import com.sun.jersey.spi.container.ContainerRequest;
 import com.sun.jersey.spi.container.ContainerRequestFilter;
 import com.sun.jersey.spi.uri.rules.UriRule;
@@ -61,16 +62,24 @@ import javax.ws.rs.core.MediaType;
 public final class HttpMethodRule implements UriRule {
     private final Map<String, List<ResourceMethod>> map;
     
+    private final List<MediaType> priorityMediaTypes;
+
     private final String allow;
             
     private final boolean isSubResource;
     
-    public HttpMethodRule(Map<String, List<ResourceMethod>> methods) {
-        this(methods, false);
+    public HttpMethodRule(
+            Map<String, List<ResourceMethod>> methods,
+            List<MediaType> priorityMediaTypes) {
+        this(methods, priorityMediaTypes, false);
     }
           
-    public HttpMethodRule(Map<String, List<ResourceMethod>> methods, boolean isSubResource) {
+    public HttpMethodRule(
+            Map<String, List<ResourceMethod>> methods,
+            List<MediaType> priorityMediaTypes,
+            boolean isSubResource) {
         this.map = methods;
+        this.priorityMediaTypes = priorityMediaTypes;
         this.isSubResource = isSubResource;
         this.allow = getAllow(methods);
     }
@@ -106,7 +115,9 @@ public final class HttpMethodRule implements UriRule {
         }
 
         // Get the list of matching methods
-        List<MediaType> accept = request.getAcceptableMediaTypes();
+        List<MediaType> accept = (priorityMediaTypes == null) 
+                ? request.getAcceptableMediaTypes()
+                : request.getAcceptableMediaTypes(priorityMediaTypes);
 
         final Matcher m = new Matcher();
         final MatchStatus s = m.match(methods, request.getMediaType(), accept);
@@ -115,6 +126,11 @@ public final class HttpMethodRule implements UriRule {
             // If there is a match choose the first method
             final ResourceMethod method = m.rmSelected;
 
+            if (method instanceof ViewResourceMethod) {
+                // Allow any further matching rules to be processed
+                return false;
+            }
+            
             // If a sub-resource method then need to push the resource
             // (again) as as to keep in sync with the ancestor URIs
             if (isSubResource) {
@@ -203,35 +219,20 @@ public final class HttpMethodRule implements UriRule {
                 selected = methods;
             }
 
-            // Find all methods that produce the one or more Media types of 'Accept'
-            int currentQuality = AcceptableMediaType.MINUMUM_QUALITY;
-            for (ResourceMethod rm : selected) {
-                int quality = -1;
-                MediaType m = null;
-                Iterator<MediaType> amtIterator = acceptableMediaTypes.iterator();
-                while (quality < 0 && amtIterator.hasNext()) {
-                    AcceptableMediaType amt = (AcceptableMediaType)amtIterator.next();
+
+            for (MediaType amt : acceptableMediaTypes) {
+                for (ResourceMethod rm : selected) {
                     for (MediaType p : rm.getProduces()) {
                         if (p.isCompatible(amt)) {
-                            quality = amt.getQuality();
-                            m = MediaTypes.mostSpecific(p, amt);
-                            break;
+                            mSelected = MediaTypes.mostSpecific(p, amt);
+                            rmSelected = rm;
+                            return MatchStatus.MATCH;
                         }
                     }
                 }
-
-                if (quality > currentQuality) {
-                    // Match and of a higher quality than the pervious match
-                    currentQuality = quality;
-                    mSelected = m;
-                    rmSelected = rm;
-                }
             }
 
-            if (mSelected == null)
-                return MatchStatus.NO_MATCH_FOR_PRODUCE;
-
-            return MatchStatus.MATCH;
+            return MatchStatus.NO_MATCH_FOR_PRODUCE;
         }
     }
 }

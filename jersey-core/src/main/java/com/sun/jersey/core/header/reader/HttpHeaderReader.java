@@ -53,6 +53,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import javax.ws.rs.core.Cookie;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.NewCookie;
 
 /**
@@ -296,6 +297,30 @@ public abstract class HttpHeaderReader {
                 header);
     }
 
+    public static List<AcceptableMediaType> readAcceptMediaType(String header, final List<MediaType> priorityMediaTypes) throws ParseException {
+        return HttpHeaderReader.readAcceptableList(
+                new Comparator<AcceptableMediaType>() {
+                   public int compare(AcceptableMediaType o1, AcceptableMediaType o2) {
+                       int i = 0;
+                       for (MediaType m : priorityMediaTypes) {
+                           if (MediaTypes.typeEquals(o1, m))
+                               i = -1;
+                           else if (MediaTypes.typeEquals(o2, m))
+                               i = 1;
+                       }
+                       if (i != 0)
+                           return i;
+
+                       i = o2.getQuality() - o1.getQuality();
+                       if (i != 0)
+                           return i;
+
+                       return MediaTypes.MEDIA_TYPE_COMPARATOR.compare(o1, o2);
+                   }
+                },
+                ACCEPTABLE_MEDIA_TYPE_CREATOR,
+                header);
+    }
 
     private static final ListElementCreator<AcceptableToken> ACCEPTABLE_TOKEN_CREATOR =
             new ListElementCreator<AcceptableToken>() {

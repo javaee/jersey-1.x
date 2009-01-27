@@ -222,4 +222,76 @@ public class AcceptTest extends AbstractResourceTester {
         assertEquals("GET", response.getEntity(String.class));
         assertEquals(MediaType.TEXT_HTML_TYPE, response.getType());
     }
+
+    @Path("/")
+    public static class ProducesOneMethodFooBarResource {
+        @GET
+        @Produces({"application/foo", "application/bar"})
+        public String get() {
+            return "GET";
+        }
+    }
+
+    public void testProducesOneMethodFooBarResource() {
+        test(ProducesOneMethodFooBarResource.class);
+    }
+
+    @Path("/")
+    public static class ProducesTwoMethodsFooBarResource {
+        @GET
+        @Produces("application/foo")
+        public String getFoo() {
+            return "GET";
+        }
+
+        @GET
+        @Produces("application/bar")
+        public String getBar() {
+            return "GET";
+        }
+    }
+
+    public void testProducesTwoMethodsFooBarResource() {
+        test(ProducesTwoMethodsFooBarResource.class);
+    }
+
+    @Path("/")
+    public static class ProducesTwoMethodsBarFooResource {
+        @GET
+        @Produces("application/bar")
+        public String getBar() {
+            return "GET";
+        }
+
+        @GET
+        @Produces("application/foo")
+        public String getFoo() {
+            return "GET";
+        }
+    }
+
+    public void testProducesTwoMethodsBarFooResource() {
+        test(ProducesTwoMethodsBarFooResource.class);
+    }
+
+    private void test(Class<?> c) {
+        initiateWebApplication(c);
+        WebResource r = resource("/");
+
+        ClientResponse response = r.accept("application/foo").get(ClientResponse.class);
+        assertEquals("GET", response.getEntity(String.class));
+        assertEquals(MediaType.valueOf("application/foo"), response.getType());
+
+        response = r.accept("application/bar").get(ClientResponse.class);
+        assertEquals("GET", response.getEntity(String.class));
+        assertEquals(MediaType.valueOf("application/bar"), response.getType());
+
+        response = r.accept("application/foo", "application/bar").get(ClientResponse.class);
+        assertEquals("GET", response.getEntity(String.class));
+        assertEquals(MediaType.valueOf("application/foo"), response.getType());
+
+        response = r.accept("application/bar", "application/foo").get(ClientResponse.class);
+        assertEquals("GET", response.getEntity(String.class));
+        assertEquals(MediaType.valueOf("application/bar"), response.getType());
+    }
 }

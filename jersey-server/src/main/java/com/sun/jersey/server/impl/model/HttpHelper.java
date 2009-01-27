@@ -144,6 +144,19 @@ public final class HttpHelper {
         }
     }
     
+    public static List<AcceptableMediaType> getAccept(HttpRequestContext request,
+            List<MediaType> priorityMediaTypes) {
+        final String accept = request.getHeaderValue("Accept");
+        if (accept == null || accept.length() == 0) {
+            return MediaTypes.GENERAL_ACCEPT_MEDIA_TYPE_LIST;
+        }
+        try {
+            return HttpHeaderReader.readAcceptMediaType(accept, priorityMediaTypes);
+        } catch (java.text.ParseException e) {
+            throw clientError(ImplMessages.BAD_ACCEPT_FIELD(accept), e);
+        }
+    }
+
     /**
      * Get the list of language tag from the "Accept-Language" of an HTTP request.
      * <p>

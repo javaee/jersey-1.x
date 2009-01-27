@@ -193,6 +193,17 @@ public interface HttpRequestContext extends HttpHeaders, Request, SecurityContex
     MediaType getAcceptableMediaType(List<MediaType> mediaTypes);
         
     /**
+     * Get a list of media types that are acceptable for the response.
+     *
+     * @param priorityMediaTypes the list of media types that take priority.
+     * 
+     * @return a list of requested response media types sorted according
+     * to those that occur in the priority list and then those sorted according
+     * to their q-value, with highest preference first.
+     */
+    List<MediaType> getAcceptableMediaTypes(List<MediaType> priorityMediaTypes);
+
+    /**
      * Get the cookie name value map.
      * 
      * @return the cookie bame value map.
