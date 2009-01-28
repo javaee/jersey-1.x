@@ -35,44 +35,40 @@
  * holder.
  */
 
-package com.sun.jersey.server.impl.provider;
+package com.sun.jersey.impl.http.header.provider;
 
-import com.sun.jersey.api.container.ContainerFactory;
-import com.sun.jersey.api.core.ApplicationAdapter;
-import com.sun.jersey.api.core.ResourceConfig;
-import com.sun.jersey.server.impl.ResponseBuilderImpl;
-import com.sun.jersey.core.spi.factory.AbstractRuntimeDelegate;
-import javax.ws.rs.core.Application;
-import javax.ws.rs.core.Response.ResponseBuilder;
-import javax.ws.rs.core.Variant.VariantListBuilder;
-
+import javax.ws.rs.Path;
+import com.sun.jersey.impl.AbstractResourceTester;
+import com.sun.jersey.api.client.ClientResponse;
+import javax.ws.rs.GET;
+import javax.ws.rs.core.Response;
 
 /**
  *
  * @author Paul.Sandoz@Sun.Com
  */
-public class RuntimeDelegateImpl extends AbstractRuntimeDelegate {
-
-    @Override
-    public ResponseBuilder createResponseBuilder() {
-        return new ResponseBuilderImpl();
+public class ToStringHeaderTest extends AbstractResourceTester {
+    
+    public ToStringHeaderTest(String testName) {
+        super(testName);
     }
 
-    @Override
-    public VariantListBuilder createVariantListBuilder() {
-        return new VariantListBuilderImpl();
+    @Path("/")
+    public static class TestResource {
+        @GET
+        public Response doGet() {
+            return Response.noContent().
+                    header("X-INTEGER", 1).
+                    build();
+        }
     }
     
-    @Override
-    public <T> T createEndpoint(Application application, 
-            Class<T> endpointType) 
-            throws IllegalArgumentException, UnsupportedOperationException {
-        if (application instanceof ResourceConfig) {
-            return ContainerFactory.createContainer(endpointType,
-                    (ResourceConfig)application);
-        } else {
-            return ContainerFactory.createContainer(endpointType,
-                    new ApplicationAdapter(application));
-        }
+    public void testHeader() {
+        initiateWebApplication(TestResource.class);
+        
+        ClientResponse response = resource("/").get(ClientResponse.class);
+        
+        assertEquals("1",
+                response.getMetadata().getFirst("X-INTEGER"));
     }
 }

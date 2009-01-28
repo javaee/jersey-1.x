@@ -172,7 +172,9 @@ public class ContainerResponse implements HttpResponseContext {
      * string value.
      * <p>
      * This method defers to {@link RuntimeDelegate#createHeaderDelegate} to
-     * obtain a {@link HeaderDelegate} to convert the value to a string.
+     * obtain a {@link HeaderDelegate} to convert the value to a string. If
+     * a {@link HeaderDelegate} is not found then the <code>toString</code>
+     * is utilized.
      * <p>
      * Containers may use this method to convert the header values obtained
      * from the {@link #getHttpHeaders}
@@ -180,10 +182,10 @@ public class ContainerResponse implements HttpResponseContext {
      * @param headerValue the header value as an object
      * @return the string value
      */
-    @SuppressWarnings("unchecked")
     public static String getHeaderValue(Object headerValue) {
         HeaderDelegate hp = rd.createHeaderDelegate(headerValue.getClass());
-        return hp.toString(headerValue);
+        
+        return (hp != null) ? hp.toString(headerValue) : headerValue.toString();
     }
     
     /**

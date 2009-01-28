@@ -47,8 +47,6 @@ import javax.ws.rs.core.GenericEntity;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.ext.MessageBodyWriter;
-import javax.ws.rs.ext.RuntimeDelegate;
-import javax.ws.rs.ext.RuntimeDelegate.HeaderDelegate;
 
 /**
  * A terminating client handler that is invoked to produce an HTTP request
@@ -71,14 +69,14 @@ public abstract class TerminatingClientHandler implements ClientHandler {
     
     /**
      * Convert a header value to a String instance.
+     * <p>
+     * This method defers to {@link ClientRequest#getHeaderValue(java.lang.Object) }.
      * 
      * @param headerValue the header value.
      * @return the string instance.
      */
     protected String headerValueToString(Object headerValue) {
-        HeaderDelegate hp = RuntimeDelegate.getInstance().
-                createHeaderDelegate(headerValue.getClass());
-        return hp.toString(headerValue);
+        return ClientRequest.getHeaderValue(headerValue);
     }
 
     /**

@@ -1,4 +1,12 @@
 release 1.0.2 (2009-01/02)
+- Fixed issue 193
+  https://jersey.dev.java.net/issues/show_bug.cgi?id=196
+  Conversion of an Object that is a header value will use the Object.toString()
+  method if a header delegate cannot be found. For example,
+     return Response.noContent().
+                    header("X-INTEGER", 1).
+                    build();
+  will build a 204 response with a header "X-INTEGER: 1".
 - jersey-archive module added to provide archive files that include the
   set of Jersey jars and JavaDoc. See:
   http://download.java.net/maven/2/com/sun/jersey/jersey-archive/

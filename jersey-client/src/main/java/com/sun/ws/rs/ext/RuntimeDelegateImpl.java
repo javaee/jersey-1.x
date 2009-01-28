@@ -36,23 +36,9 @@
  */
 package com.sun.ws.rs.ext;
 
-import com.sun.jersey.api.uri.UriBuilderImpl;
-import com.sun.jersey.spi.HeaderDelegateProvider;
-import com.sun.jersey.spi.service.ServiceFinder;
-import java.net.URI;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-import java.util.WeakHashMap;
+import com.sun.jersey.core.spi.factory.AbstractRuntimeDelegate;
 import javax.ws.rs.core.Application;
-import javax.ws.rs.core.CacheControl;
-import javax.ws.rs.core.Cookie;
-import javax.ws.rs.core.EntityTag;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.NewCookie;
 import javax.ws.rs.core.Response.ResponseBuilder;
-import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.Variant.VariantListBuilder;
 import javax.ws.rs.ext.RuntimeDelegate;
 
@@ -66,35 +52,7 @@ import javax.ws.rs.ext.RuntimeDelegate;
  *
  * @author Paul.Sandoz@Sun.Com
  */
-public class RuntimeDelegateImpl extends RuntimeDelegate {
-
-    final Set<HeaderDelegateProvider> hps =
-            new HashSet<HeaderDelegateProvider>();
-
-    final private Map<Class<?>, HeaderDelegate> map =
-            new WeakHashMap<Class<?>, HeaderDelegate>();
-
-    public RuntimeDelegateImpl() {
-        for (HeaderDelegateProvider p : ServiceFinder.find(HeaderDelegateProvider.class, true))
-            hps.add(p);
-
-        /**
-         * Construct a map for quick look up of known header classes
-         */
-        map.put(EntityTag.class, _createHeaderDelegate(EntityTag.class));
-        map.put(MediaType.class, _createHeaderDelegate(MediaType.class));
-        map.put(CacheControl.class, _createHeaderDelegate(CacheControl.class));
-        map.put(NewCookie.class, _createHeaderDelegate(NewCookie.class));
-        map.put(Cookie.class, _createHeaderDelegate(Cookie.class));
-        map.put(URI.class, _createHeaderDelegate(URI.class));
-        map.put(Date.class, _createHeaderDelegate(Date.class));
-        map.put(String.class, _createHeaderDelegate(String.class));
-    }
-
-    @Override
-    public UriBuilder createUriBuilder() {
-        return new UriBuilderImpl();
-    }
+public class RuntimeDelegateImpl extends AbstractRuntimeDelegate {
 
     @Override
     public ResponseBuilder createResponseBuilder() {
@@ -110,24 +68,5 @@ public class RuntimeDelegateImpl extends RuntimeDelegate {
     public <T> T createEndpoint(Application application, Class<T> endpointType)
             throws IllegalArgumentException, UnsupportedOperationException {
         throw new UnsupportedOperationException();
-    }
-
-    @Override
-    @SuppressWarnings("unchecked")
-    public <T> HeaderDelegate<T> createHeaderDelegate(Class<T> type) {
-        HeaderDelegate h = map.get(type);
-        if (h != null) return h;
-
-        return _createHeaderDelegate(type);
-    }
-
-    @SuppressWarnings("unchecked")
-    private <T> HeaderDelegate<T> _createHeaderDelegate(Class<T> type) {
-        for (HeaderDelegateProvider hp: hps)
-            if (hp.supports(type))
-                return hp;
-
-        throw new IllegalArgumentException("A header delegate provider for type, " + type +
-                ", is not supported");
     }
 }

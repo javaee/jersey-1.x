@@ -51,7 +51,6 @@ import javax.ws.rs.core.UriBuilder;
  *
  * @author Paul.Sandoz@Sun.Com
  */
-@SuppressWarnings("unchecked")
 public class BeanTest extends AbstractResourceTester {
     
     public BeanTest(String testName) {
