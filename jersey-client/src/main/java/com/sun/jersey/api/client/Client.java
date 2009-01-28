@@ -90,10 +90,14 @@ import javax.ws.rs.ext.Providers;
  * @author Paul.Sandoz@Sun.Com
  */
 public class Client extends Filterable implements ClientHandler {
-    private ProviderFactory componentProviderFactory;
+    private final ProviderFactory componentProviderFactory;
 
+    private final Providers providers;
+
+    private boolean destroyed = false;
+    
     private Map<String, Object> properties;
-        
+
     private static class ContextInjectableProvider<T> extends
             SingletonTypeInjectableProvider<Context, T> {
 
@@ -177,7 +181,7 @@ public class Client extends Filterable implements ClientHandler {
                 MessageBodyWorkers.class, bodyContext));
         
         // Injection of Providers
-        Providers p = new Providers() {
+        this.providers = new Providers() {
             public <T> MessageBodyReader<T> getMessageBodyReader(Class<T> c, Type t, 
                     Annotation[] as, MediaType m) {
                 return bodyContext.getMessageBodyReader(c, t, as, m);
@@ -198,7 +202,7 @@ public class Client extends Filterable implements ClientHandler {
         };
         injectableFactory.add(
                 new ContextInjectableProvider<Providers>(
-                Providers.class, p));
+                Providers.class, this.providers));
 
         // Initiate message body readers/writers
         bodyContext.init();
@@ -221,15 +225,29 @@ public class Client extends Filterable implements ClientHandler {
      * undefined behaviour will occur.
      */
     public void destroy() {
-        componentProviderFactory.destroy();
-        componentProviderFactory = null;
+        if (!destroyed) {
+            componentProviderFactory.destroy();
+            destroyed = true;
+        }
     }
 
+    /**
+     * Defer to {@link #destroy() }
+     */
     @Override
     protected void finalize() {
         destroy();
     }
 
+    /**
+     * Get the {@link Providers} utilized by the client.
+     *
+     * @return the {@link Providers} utilized by the client.
+     */
+    public Providers getProviders() {
+        return providers;
+    }
+    
     /**
      * Create a Web resource from the client.
      * 
