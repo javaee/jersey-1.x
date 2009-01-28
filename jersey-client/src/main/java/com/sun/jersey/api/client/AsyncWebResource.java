@@ -129,11 +129,29 @@ public class AsyncWebResource extends Filterable implements
         return u.toString();
     }
     
+    /**
+     * Returns a hash code for this <code>WebResource</code>.
+     * <p>
+     * The hash code is the hash code of URI of this
+     * <code>WebResource</code>.
+     *
+     * @return a hash code for this <code>WebResource</code>.
+     */
     @Override
     public int hashCode() {
         return u.hashCode();
     }
 
+    /**
+     * Compares this resource to the specified object.
+     * <p>
+     * The result is true if and only if the argument is not null and is a
+     * <code>WebResource</code> object whose URI is equal to the URI of this
+     * <code>WebResource</code>.
+     *
+     * @param obj the object to compare this <code>WebResource</code> against.
+     * @return true if the <code>WebResource</code> are equal; false otherwise.
+     */
     @Override
     public boolean equals(Object obj) {
         if (this == obj) return true;
