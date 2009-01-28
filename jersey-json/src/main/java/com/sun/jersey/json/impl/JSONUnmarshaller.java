@@ -37,19 +37,16 @@
 
 package com.sun.jersey.json.impl;
 
+import com.sun.jersey.api.json.JSONConfigurated;
+import com.sun.jersey.api.json.JSONConfiguration;
 import com.sun.jersey.api.json.JSONJAXBContext;
-import com.sun.jersey.json.impl.reader.JsonXmlStreamReader;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.net.URL;
-import java.util.Collection;
-import java.util.Map;
-import java.util.Map.Entry;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.xml.bind.JAXBContext;
@@ -65,13 +62,6 @@ import javax.xml.stream.XMLEventReader;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.transform.Source;
 import javax.xml.validation.Schema;
-import org.codehaus.jettison.badgerfish.BadgerFishXMLStreamReader;
-import org.codehaus.jettison.json.JSONException;
-import org.codehaus.jettison.json.JSONObject;
-import org.codehaus.jettison.json.JSONTokener;
-import org.codehaus.jettison.mapped.Configuration;
-import org.codehaus.jettison.mapped.MappedNamespaceConvention;
-import org.codehaus.jettison.mapped.MappedXMLStreamReader;
 import org.w3c.dom.Node;
 import org.xml.sax.InputSource;
 
@@ -79,22 +69,15 @@ import org.xml.sax.InputSource;
  *
  * @author japod
  */
-public class JSONUnmarshaller implements Unmarshaller {
+public class JSONUnmarshaller implements Unmarshaller, JSONConfigurated {
 
     private Unmarshaller jaxbUnmarshaller;
-    private JSONJAXBContext.JSONNotation jsonNotation;
+    private final JSONConfiguration jsonConfig;
     private boolean jsonEnabled;
-    private boolean jsonRootUnwrapping;
-    private Collection<String> attrAsElemNames;
-    private Map<String, String> xml2jsonNamespace;
 
-    public JSONUnmarshaller(JAXBContext jaxbContext, Map<String, Object> properties) throws JAXBException {
-        try {
-            this.jaxbUnmarshaller = jaxbContext.createUnmarshaller();
-            setProperties(properties);
-        } catch (PropertyException ex) {
-            Logger.getLogger(JSONUnmarshaller.class.getName()).log(Level.SEVERE, null, ex);
-        }
+    public JSONUnmarshaller(JAXBContext jaxbContext, JSONConfiguration jsonConfig) throws JAXBException {
+        this.jsonConfig = jsonConfig;
+        this.jaxbUnmarshaller = jaxbContext.createUnmarshaller();
     }
     
     public Object unmarshal(InputStream inputStream, Class<Object> type) throws JAXBException {
@@ -247,62 +230,20 @@ public class JSONUnmarshaller implements Unmarshaller {
         return this.jaxbUnmarshaller.getEventHandler();
     }
 
+    public boolean isJsonEnabled() {
+        return jsonEnabled;
+    }
+
+    public void setJsonEnabled(boolean jsonEnabled) {
+        this.jsonEnabled = jsonEnabled;
+    }
+
     public void setProperty(String key, Object value) throws PropertyException {
-        if (JSONJAXBContext.JSON_ENABLED.equals(key)) {
-            this.jsonEnabled = (Boolean) value;
-        } else if (JSONJAXBContext.JSON_NOTATION.equals(key)) {
-            if (value instanceof JSONJAXBContext.JSONNotation) {
-                this.jsonNotation = (JSONJAXBContext.JSONNotation) value;
-            } else {
-                this.jsonNotation = JSONJAXBContext.JSONNotation.valueOf((String)value);
-            }
-        } else if (JSONJAXBContext.JSON_ROOT_UNWRAPPING.equals(key)) {
-            this.jsonRootUnwrapping = (Boolean) value;
-        } else if (JSONJAXBContext.JSON_XML2JSON_NS.equals(key)) {
-            if (Map.class.isAssignableFrom(value.getClass())) {
-                this.xml2jsonNamespace = (Map<String, String>) value;
-            } else { // accept a String representation of JSONObject for backward compatibility
-                try {
-                    this.xml2jsonNamespace = JSONTransformer.asMap((String) value);
-                } catch (JSONException e) {
-                    throw new PropertyException("JSON exception when trying to set " + JSONJAXBContext.JSON_XML2JSON_NS + " property.", e);
-                }
-            }
-        } else if (JSONJAXBContext.JSON_ATTRS_AS_ELEMS.equals(key)) {
-            if (Collection.class.isAssignableFrom(value.getClass())) {
-                this.attrAsElemNames = (Collection<String>) value;
-            } else { // accept a String representation of JSONArray for backward compatibility
-                try {
-                    this.attrAsElemNames = JSONTransformer.asCollection((String) value);
-                } catch (JSONException e) {
-                    throw new PropertyException("JSON exception when trying to set " + JSONJAXBContext.JSON_ATTRS_AS_ELEMS + " property.", e);
-                }
-            }
-        } else {
-            if (!key.startsWith(JSONJAXBContext.NAMESPACE)) {
-                this.jaxbUnmarshaller.setProperty(key, value);
-            }
-        }
+        this.jaxbUnmarshaller.setProperty(key, value);
     }
 
     public Object getProperty(String key) throws PropertyException {
-        if (JSONJAXBContext.JSON_ENABLED.equals(key)) {
-            return this.jsonEnabled;
-        } else if (JSONJAXBContext.JSON_NOTATION.equals(key)) {
-            return this.jsonNotation;
-        } else if (JSONJAXBContext.JSON_ROOT_UNWRAPPING.equals(key)) {
-            return this.jsonRootUnwrapping;
-        } else if (JSONJAXBContext.JSON_XML2JSON_NS.equals(key)) {
-            return this.xml2jsonNamespace;
-        } else if (JSONJAXBContext.JSON_ATTRS_AS_ELEMS.equals(key)) {
-            return this.attrAsElemNames;
-        } else {
-            if (key.startsWith(JSONJAXBContext.NAMESPACE)) {
-                return null;
-            } else {
-                return this.jaxbUnmarshaller.getProperty(key);
-            }
-        }
+        return this.jaxbUnmarshaller.getProperty(key);
     }
 
     public void setSchema(Schema schema) {
@@ -340,16 +281,12 @@ public class JSONUnmarshaller implements Unmarshaller {
     public Listener getListener() {
         return this.jaxbUnmarshaller.getListener();
     }
-
-    private void setProperties(Map<String, Object> properties) throws PropertyException {
-        if (null != properties) {
-            for (Entry<String, Object> entry : properties.entrySet()) {
-                setProperty(entry.getKey(), entry.getValue());
-            }
-        }
-    }
     
     private XMLStreamReader createXmlStreamReader(Reader reader) {
-        return Stax2JsonFactory.createReader(jsonNotation, reader, this.jsonRootUnwrapping ? "rootElement" : null, attrAsElemNames, xml2jsonNamespace);
+        return Stax2JsonFactory.createReader(reader, jsonConfig, jsonConfig.isRootUnwrapping() ? "rootElement" : null);
+    }
+
+    public JSONConfiguration getJSONConfiguration() {
+        return jsonConfig;
     }
 }

@@ -41,6 +41,7 @@ package com.sun.jersey.samples.jsonfromjaxb.resources;
 import com.sun.jersey.samples.jsonfromjaxb.jaxb.FlightType;
 import com.sun.jersey.samples.jsonfromjaxb.jaxb.Flights;
 import com.sun.jersey.spi.resource.Singleton;
+import java.util.List;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.PUT;
@@ -78,6 +79,12 @@ public class FlightList {
         flight124.setAircraft("AB115");
         myFlights.getFlight().add(flight123);
         myFlights.getFlight().add(flight124);
+    }
+
+    @GET @Path("realJsonList")
+    @Produces("application/json")
+    public synchronized List<FlightType> getList() {
+        return myFlights.getFlight();
     }
 
     @GET

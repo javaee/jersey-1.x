@@ -37,7 +37,10 @@
 
 package com.sun.jersey.json.impl.provider.entity;
 
+import com.sun.jersey.api.json.JSONConfiguration;
 import com.sun.jersey.core.provider.jaxb.AbstractListElementProvider;
+import com.sun.jersey.json.impl.JSONMarshaller;
+import com.sun.jersey.json.impl.Stax2JsonFactory;
 import com.sun.jersey.json.impl.reader.JsonXmlStreamReader;
 import com.sun.jersey.json.impl.writer.JsonXmlStreamWriter;
 import java.io.IOException;
@@ -96,7 +99,12 @@ public class JSONListElementProvider extends AbstractListElementProvider {
         final OutputStreamWriter osw = new OutputStreamWriter(entityStream, c);
         // TODO: should reuse customization options from the marshaller (if it is JSONMarshaller)
         // TODO: should force the elementType being treated as array (for 1-elem lists)
-        final XMLStreamWriter jxsw = JsonXmlStreamWriter.createWriter(osw, true);
+        JSONConfiguration jsonConfig = JSONConfiguration.DEFAULT;
+        if (m instanceof JSONMarshaller) {
+            JSONMarshaller jm = (JSONMarshaller)m;
+            jsonConfig = jm.getJSONConfiguration();
+        }
+        final XMLStreamWriter jxsw = Stax2JsonFactory.createWriter(osw, jsonConfig, true);
         try {
             jxsw.writeStartElement(getRootElementName(elementType));
             for (Object o : t) {
@@ -105,6 +113,7 @@ public class JSONListElementProvider extends AbstractListElementProvider {
             jxsw.writeEndElement();
             jxsw.writeEndDocument();
             jxsw.flush();
+            jxsw.close();
         } catch (XMLStreamException ex) {
             Logger.getLogger(JSONListElementProvider.class.getName()).log(Level.SEVERE, null, ex);
             throw new JAXBException(ex.getMessage(), ex);

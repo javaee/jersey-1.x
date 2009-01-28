@@ -36,6 +36,7 @@
  */
 package com.sun.jersey.json.impl;
 
+import com.sun.jersey.api.json.JSONConfiguration;
 import com.sun.jersey.json.impl.writer.*;
 import com.sun.jersey.api.json.JSONJAXBContext;
 import com.sun.jersey.json.impl.reader.Jackson2StaxReader;
@@ -51,7 +52,6 @@ import java.util.logging.Logger;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 import org.codehaus.jackson.JsonFactory;
-import org.codehaus.jackson.JsonParseException;
 import org.codehaus.jettison.badgerfish.BadgerFishXMLStreamReader;
 import org.codehaus.jettison.badgerfish.BadgerFishXMLStreamWriter;
 import org.codehaus.jettison.json.JSONObject;
@@ -70,31 +70,38 @@ public class Stax2JsonFactory {
     private Stax2JsonFactory() {
     }
 
-    public static XMLStreamWriter createWriter(JSONJAXBContext.JSONNotation notation, Writer writer, boolean stripRoot, Collection<String> arrays, Collection<String> nonStrings, Collection<String> attrAsElemName, Map<String, String> xml2jsonNamespace) throws IOException {
-        switch (notation) {
+    public static XMLStreamWriter createWriter(Writer writer, JSONConfiguration config) throws IOException {
+        return createWriter(writer, config, false);
+    }
+
+    public static XMLStreamWriter createWriter(Writer writer, JSONConfiguration config, boolean writingList) throws IOException {
+        switch (config.getNotation()) {
             case NATURAL:
-                return new Stax2JacksonWriter(JacksonRootStrippingGenerator.createRootStrippingGenerator(new JsonFactory().createJsonGenerator(writer)));
+                if (writingList) {
+                    return new Stax2JacksonWriter(JacksonArrayWrapperGenerator.createArrayWrapperGenerator(JacksonRootStrippingGenerator.createRootStrippingGenerator(new JsonFactory().createJsonGenerator(writer))));
+                } else {
+                    return new Stax2JacksonWriter(JacksonRootStrippingGenerator.createRootStrippingGenerator(new JsonFactory().createJsonGenerator(writer)));
+                }
             case MAPPED:
-                return JsonXmlStreamWriter.createWriter(writer, stripRoot, arrays, nonStrings, attrAsElemName);
+                return JsonXmlStreamWriter.createWriter(writer, config.isRootUnwrapping(), config.getArrays(), config.getNonStrings(), config.getAttrsAsElems());
             case BADGERFISH:
                 return new BadgerFishXMLStreamWriter(writer);
             case MAPPED_JETTISON:
                 Configuration jmConfig;
-                if (null == xml2jsonNamespace) {
+                if (null == config.getJsonXml2JsonNs()) {
                     jmConfig = new Configuration();
                 } else {
-                    jmConfig = new Configuration(xml2jsonNamespace);
+                    jmConfig = new Configuration(config.getJsonXml2JsonNs());
                 }
                 return new MappedXMLStreamWriter(
                         new MappedNamespaceConvention(jmConfig), writer);
-
             default:
                 return null;
         }
     }
 
-    public static XMLStreamReader createReader(JSONJAXBContext.JSONNotation notation, Reader reader, String rootName, Collection<String> attrAsElemName, Map<String, String> xml2jsonNamespace) {
-        switch (notation) {
+    public static XMLStreamReader createReader(Reader reader, JSONConfiguration config, String rootName) {
+        switch (config.getNotation()) {
             case NATURAL:
                 try {
                     return new Jackson2StaxReader(JacksonRootAddingParser.createRootAddingParser(new JsonFactory().createJsonParser(reader), rootName));
@@ -104,7 +111,7 @@ public class Stax2JsonFactory {
                 break;
             case MAPPED:
                 try {
-                    return new JsonXmlStreamReader(reader, rootName, attrAsElemName);
+                    return new JsonXmlStreamReader(reader, rootName, config.getAttrsAsElems());
                 } catch (IOException ex) {
                     Logger.getLogger(JSONUnmarshaller.class.getName()).log(Level.SEVERE, null, ex);
                 }
@@ -112,10 +119,10 @@ public class Stax2JsonFactory {
             case MAPPED_JETTISON:
                 try {
                     Configuration jmConfig;
-                    if (null == xml2jsonNamespace) {
+                    if (null == config.getJsonXml2JsonNs()) {
                         jmConfig = new Configuration();
                     } else {
-                        jmConfig = new Configuration(xml2jsonNamespace);
+                        jmConfig = new Configuration(config.getJsonXml2JsonNs());
                     }
                     return new MappedXMLStreamReader(
                             new JSONObject(new JSONTokener(readFromAsString(reader))),
@@ -135,6 +142,72 @@ public class Stax2JsonFactory {
         return null;
     }
 
+//    @Deprecated
+//    public static XMLStreamWriter createWriter(JSONJAXBContext.JSONNotation notation, Writer writer, boolean stripRoot, Collection<String> arrays, Collection<String> nonStrings, Collection<String> attrAsElemName, Map<String, String> xml2jsonNamespace) throws IOException {
+//        switch (notation) {
+//            case NATURAL:
+//                return new Stax2JacksonWriter(JacksonRootStrippingGenerator.createRootStrippingGenerator(new JsonFactory().createJsonGenerator(writer)));
+//            case MAPPED:
+//                return JsonXmlStreamWriter.createWriter(writer, stripRoot, arrays, nonStrings, attrAsElemName);
+//            case BADGERFISH:
+//                return new BadgerFishXMLStreamWriter(writer);
+//            case MAPPED_JETTISON:
+//                Configuration jmConfig;
+//                if (null == xml2jsonNamespace) {
+//                    jmConfig = new Configuration();
+//                } else {
+//                    jmConfig = new Configuration(xml2jsonNamespace);
+//                }
+//                return new MappedXMLStreamWriter(
+//                        new MappedNamespaceConvention(jmConfig), writer);
+//
+//            default:
+//                return null;
+//        }
+//    }
+//
+//    @Deprecated
+//    public static XMLStreamReader createReader(JSONJAXBContext.JSONNotation notation, Reader reader, String rootName, Collection<String> attrAsElemName, Map<String, String> xml2jsonNamespace) {
+//        switch (notation) {
+//            case NATURAL:
+//                try {
+//                    return new Jackson2StaxReader(JacksonRootAddingParser.createRootAddingParser(new JsonFactory().createJsonParser(reader), rootName));
+//                } catch (Exception ex) {
+//                    Logger.getLogger(JSONUnmarshaller.class.getName()).log(Level.SEVERE, null, ex);
+//                }
+//                break;
+//            case MAPPED:
+//                try {
+//                    return new JsonXmlStreamReader(reader, rootName, attrAsElemName);
+//                } catch (IOException ex) {
+//                    Logger.getLogger(JSONUnmarshaller.class.getName()).log(Level.SEVERE, null, ex);
+//                }
+//                break;
+//            case MAPPED_JETTISON:
+//                try {
+//                    Configuration jmConfig;
+//                    if (null == xml2jsonNamespace) {
+//                        jmConfig = new Configuration();
+//                    } else {
+//                        jmConfig = new Configuration(xml2jsonNamespace);
+//                    }
+//                    return new MappedXMLStreamReader(
+//                            new JSONObject(new JSONTokener(readFromAsString(reader))),
+//                            new MappedNamespaceConvention(jmConfig));
+//                } catch (Exception ex) {
+//                    Logger.getLogger(JSONUnmarshaller.class.getName()).log(Level.SEVERE, null, ex);
+//                }
+//                break;
+//            case BADGERFISH:
+//                try {
+//                    return new BadgerFishXMLStreamReader(new JSONObject(new JSONTokener(readFromAsString(reader))));
+//                } catch (Exception ex) {
+//                    Logger.getLogger(JSONUnmarshaller.class.getName()).log(Level.SEVERE, null, ex);
+//                }
+//                break;
+//        }
+//        return null;
+//    }
     private static String readFromAsString(Reader reader) throws IOException {
         StringBuilder sb = new StringBuilder();
         char[] c = new char[1024];

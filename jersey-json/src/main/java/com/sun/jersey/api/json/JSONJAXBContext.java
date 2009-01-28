@@ -40,10 +40,11 @@ package com.sun.jersey.api.json;
 import com.sun.jersey.json.impl.JSONMarshaller;
 import com.sun.jersey.json.impl.JSONUnmarshaller;
 import com.sun.xml.bind.v2.runtime.JAXBContextImpl;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
-import java.util.Map.Entry;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
@@ -63,32 +64,38 @@ import javax.xml.bind.Validator;
  * and Unmarshaller returned from the relevant methods on this class.
  * 
  */
-public final class JSONJAXBContext extends JAXBContext {
+public final class JSONJAXBContext extends JAXBContext implements JSONConfigurated {
     
     /**
      * A namespace for JSONJAXBContext related properties names.
      */
+    @Deprecated
     public static final String NAMESPACE = "com.sun.jersey.impl.json.";
 
     /**
      * Enumeration of supported JSON notations.
      */
+     @Deprecated
     public enum JSONNotation {
         /**
          * The mapped (default) JSON notation.
          */
+        @Deprecated
         MAPPED,
         /**
          * The mapped Jettison JSON notation.
          */
+        @Deprecated
         MAPPED_JETTISON,
         /**
          * The mapped Badgerfish JSON notation.
          */
+        @Deprecated
         BADGERFISH,
         /**
          * The natural JSON notation, leveraging tight JAXB RI integration.
          */
+        @Deprecated
         NATURAL
     };
 
@@ -103,6 +110,7 @@ public final class JSONJAXBContext extends JAXBContext {
      * <p>
      * The default value is <code>JSONNotation.MAPPED</code>.
      */
+    @Deprecated
     public static final String JSON_NOTATION = NAMESPACE + "notation";
     
     /**
@@ -114,6 +122,7 @@ public final class JSONJAXBContext extends JAXBContext {
      * <p>
      * The default value is false.
      */
+    @Deprecated
     public static final String JSON_ENABLED = NAMESPACE + "enabled";
     
     /**
@@ -126,6 +135,7 @@ public final class JSONJAXBContext extends JAXBContext {
      * <p>
      * The default value is false.
      */
+    @Deprecated
     public static final String JSON_ROOT_UNWRAPPING = NAMESPACE + "root.unwrapping";
     
     /**
@@ -147,6 +157,7 @@ public final class JSONJAXBContext extends JAXBContext {
      * <p>
      * The default value is an empty collection.
      */
+    @Deprecated
     public static final String JSON_ARRAYS = NAMESPACE + "arrays";
 
     /**
@@ -168,6 +179,7 @@ public final class JSONJAXBContext extends JAXBContext {
      * <p>
      * The default value is an empty collection.
      */
+    @Deprecated
     public static final String JSON_NON_STRINGS = NAMESPACE + "non.strings";
 
     /**
@@ -189,6 +201,7 @@ public final class JSONJAXBContext extends JAXBContext {
      * <p>
      * The default value is an empty collection.
      */
+    @Deprecated
     public static final String JSON_ATTRS_AS_ELEMS = NAMESPACE + "attrs.as.elems";
 
     /**
@@ -204,6 +217,7 @@ public final class JSONJAXBContext extends JAXBContext {
      * <p>
      * The default value is a map with zero key/value pairs.
      */
+    @Deprecated
     public static final String JSON_XML2JSON_NS = NAMESPACE + "xml.to.json.ns";
         
     private static final Map<String, Object> defaultJsonProperties = new HashMap<String, Object>();
@@ -213,8 +227,8 @@ public final class JSONJAXBContext extends JAXBContext {
         defaultJsonProperties.put(JSON_ROOT_UNWRAPPING, Boolean.TRUE);
     }
     
-    private final Map<String, Object> jsonProperties = new HashMap<String, Object>();
-        
+//    private final Map<String, Object> jsonProperties = new HashMap<String, Object>();
+    private  JSONConfiguration jsonConfiguration;
     private final JAXBContext jaxbContext;
     
     /**
@@ -296,6 +310,10 @@ public final class JSONJAXBContext extends JAXBContext {
                 classLoader, 
                 createProperties(properties));
     }
+
+    public JSONConfiguration getJSONConfiguration() {
+        return jsonConfiguration;
+    }
     
     private Map<String, Object> createProperties(Map<String, Object> properties) {
         Map<String, Object> workProperties = new HashMap<String, Object>();
@@ -317,7 +335,7 @@ public final class JSONJAXBContext extends JAXBContext {
      */
     @Override
     public Unmarshaller createUnmarshaller() throws JAXBException {
-        return new JSONUnmarshaller(jaxbContext, jsonProperties);
+        return new JSONUnmarshaller(jaxbContext, getJSONConfiguration());
     }
 
     /**
@@ -329,7 +347,7 @@ public final class JSONJAXBContext extends JAXBContext {
      */
     @Override
     public Marshaller createMarshaller() throws JAXBException {
-        return new JSONMarshaller(jaxbContext, jsonProperties);
+        return new JSONMarshaller(jaxbContext, getJSONConfiguration());
     }
 
     /**
@@ -342,19 +360,41 @@ public final class JSONJAXBContext extends JAXBContext {
     public Validator createValidator() throws JAXBException {
         return jaxbContext.createValidator();
     }
+
+    static final Map<String, JSONConfiguration.Notation> _notationMap = new HashMap<String, JSONConfiguration.Notation>() {
+        {
+            put(JSONJAXBContext.JSONNotation.BADGERFISH.toString(), JSONConfiguration.Notation.BADGERFISH);
+            put(JSONJAXBContext.JSONNotation.MAPPED.toString(), JSONConfiguration.Notation.MAPPED);
+            put(JSONJAXBContext.JSONNotation.MAPPED_JETTISON.toString(), JSONConfiguration.Notation.MAPPED_JETTISON);
+            put(JSONJAXBContext.JSONNotation.NATURAL.toString(), JSONConfiguration.Notation.NATURAL);
+        }
+    };
     
     private final void processProperties(Map<String, Object> properties) {
-        for (Map.Entry<String, Object> e : properties.entrySet()) {
-            if (e.getKey().startsWith(NAMESPACE)) {
-                getJsonProperties().put(e.getKey(), e.getValue());
+        final Collection<String> jsonKeys = new HashSet<String>();
+        for (String k : Collections.unmodifiableSet(properties.keySet())) {
+            if (k.startsWith(NAMESPACE)) {
+                jsonKeys.add(k);
             }
         }
-        for (String k : getJsonProperties().keySet()) {
+        if (!jsonKeys.isEmpty()) {
+            JSONConfiguration.Notation pNotation = JSONConfiguration.Notation.MAPPED;
+            if (properties.containsKey(JSONJAXBContext.JSON_NOTATION)) {
+                Object nO = properties.get(JSONJAXBContext.JSON_NOTATION);
+                if ((nO instanceof JSONJAXBContext.JSONNotation) || (nO instanceof String)) {
+                    pNotation = _notationMap.get(nO.toString());
+                }
+            }
+            JSONConfiguration.Builder builder = JSONConfiguration.getBuilder(pNotation);
+            builder.setArrays((Collection<String>)properties.get(JSONJAXBContext.JSON_ARRAYS));
+            builder.setAttrsAsElems((Collection<String>)properties.get(JSONJAXBContext.JSON_ATTRS_AS_ELEMS));
+            builder.setNonStrings((Collection<String>)properties.get(JSONJAXBContext.JSON_NON_STRINGS));
+            builder.setJsonXml2JsonNs((Map<String, String>)properties.get(JSONJAXBContext.JSON_XML2JSON_NS));
+            builder.setRootUnwrapping((Boolean)properties.get(JSONJAXBContext.JSON_ROOT_UNWRAPPING));
+            jsonConfiguration = builder.build();
+        }
+        for (String k : jsonKeys) {
             properties.remove(k);
         }
-    }
-    
-    private Map<String, Object> getJsonProperties() {
-        return jsonProperties;
     }
 }

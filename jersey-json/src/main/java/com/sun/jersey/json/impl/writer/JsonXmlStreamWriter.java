@@ -171,7 +171,12 @@ public class JsonXmlStreamWriter implements XMLStreamWriter {
     }
 
     public void close() throws XMLStreamException {
-        throw new UnsupportedOperationException("Not supported yet.");
+        try {
+            this.mainWriter.close();
+        } catch (IOException ex) {
+            Logger.getLogger(JsonXmlStreamWriter.class.getName()).log(Level.SEVERE, null, ex);
+            throw new XMLStreamException(ex);
+        }
     }
 
     public void flush() throws XMLStreamException {

@@ -99,8 +99,9 @@ public class JSONRootElementProvider extends AbstractRootElementProvider {
         final Charset c = getCharset(mediaType);
         if (type.isAnnotationPresent(XmlRootElement.class)) {
             if (u instanceof JSONUnmarshaller) {
-                u.setProperty(JSONJAXBContext.JSON_ENABLED, Boolean.TRUE);
-                JAXBElement jaxbElem = (JAXBElement)((JSONUnmarshaller)u).
+                JSONUnmarshaller ju = (JSONUnmarshaller)u;
+                ju.setJsonEnabled(true);
+                JAXBElement jaxbElem = (JAXBElement)ju.
                         unmarshal(new InputStreamReader(entityStream, c),
                         type);
                 return jaxbElem.getValue();
@@ -113,8 +114,9 @@ public class JSONRootElementProvider extends AbstractRootElementProvider {
         } else {
             if (u instanceof JSONUnmarshaller) {
                 // TODO what about the charset ?
-                u.setProperty(JSONJAXBContext.JSON_ENABLED, Boolean.TRUE);
-                return u.unmarshal(new StreamSource(entityStream), type).getValue();
+                JSONUnmarshaller ju = (JSONUnmarshaller)u;
+                ju.setJsonEnabled(true);
+                return ju.unmarshal(new StreamSource(entityStream), type).getValue();
             } else {
                 return u.unmarshal(
                         new JsonXmlStreamReader(
@@ -130,8 +132,9 @@ public class JSONRootElementProvider extends AbstractRootElementProvider {
             Marshaller m, OutputStream entityStream)
             throws JAXBException, IOException {
         if (m instanceof JSONMarshaller) {
-            m.setProperty(JSONJAXBContext.JSON_ENABLED, Boolean.TRUE);
-            m.marshal(t,
+            JSONMarshaller jm = (JSONMarshaller)m;
+            jm.setJsonEnabled(true);
+            jm.marshal(t,
                     new OutputStreamWriter(entityStream, c));
         } else {
             m.marshal(t, JsonXmlStreamWriter.createWriter(

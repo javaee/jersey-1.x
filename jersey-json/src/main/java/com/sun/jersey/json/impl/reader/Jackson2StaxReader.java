@@ -126,8 +126,8 @@ public class Jackson2StaxReader implements XMLStreamReader {
         }
         while (eventQueue.isEmpty() || lookingForAttributes) {
             org.codehaus.jackson.JsonToken jtok;
-            int counter = 20;
-            while (counter-- > 0) { // better then while(true)
+            // TODO: ask Jackson to take care of DOS
+            while (true) {
                 parser.nextToken();
                 jtok = parser.getCurrentToken();
                 final ProcessingInfo pi = peek(processingStack);
@@ -216,7 +216,6 @@ public class Jackson2StaxReader implements XMLStreamReader {
                         //return;
                 }
             }
-            throw new IOException("error reading next element");
         }
     }
 

@@ -118,6 +118,7 @@ public class Stax2JacksonWriter implements XMLStreamWriter {
             return hash;
         }
     }
+    
     JsonGenerator generator;
     final List<ProcessingInfo> processingStack = new ArrayList<ProcessingInfo>();
     boolean writingAttr = false;

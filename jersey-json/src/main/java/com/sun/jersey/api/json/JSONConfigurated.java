@@ -1,9 +1,9 @@
 /*
  *
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
- * 
+ *
  * Copyright 1997-2007 Sun Microsystems, Inc. All rights reserved.
- * 
+ *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
  * and Distribution License("CDDL") (collectively, the "License").  You
@@ -11,7 +11,7 @@
  * a copy of the License at https://jersey.dev.java.net/CDDL+GPL.html
  * or jersey/legal/LICENSE.txt.  See the License for the specific
  * language governing permissions and limitations under the License.
- * 
+ *
  * When distributing the software, include this License Header Notice in each
  * file and include the License file at jersey/legal/LICENSE.txt.
  * Sun designates this particular file as subject to the "Classpath" exception
@@ -20,9 +20,9 @@
  * Header, with the fields enclosed by brackets [] replaced by your own
  * identifying information: "Portions Copyrighted [year]
  * [name of copyright owner]"
- * 
+ *
  * Contributor(s):
- * 
+ *
  * If you wish your version of this file to be governed by only the CDDL or
  * only the GPL Version 2, indicate your decision by adding "[Contributor]
  * elects to include this software in this distribution under the [CDDL or GPL
@@ -34,48 +34,16 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-package com.sun.jersey.samples.jmaki.config;
-
-import com.sun.jersey.api.json.JSONJAXBContext;
-import com.sun.jersey.samples.jmaki.beans.Printer;
-import com.sun.jersey.samples.jmaki.beans.PrinterTableModel;
-import com.sun.jersey.samples.jmaki.beans.TreeModel;
-import com.sun.jersey.samples.jmaki.beans.WebResourceList;
-import java.util.HashMap;
-import java.util.Map;
-import javax.ws.rs.ext.ContextResolver;
-import javax.ws.rs.ext.Provider;
-import javax.xml.bind.JAXBContext;
+package com.sun.jersey.api.json;
 
 /**
- *
  * @author japod
  */
-@Provider
-public class JAXBContextResolver implements ContextResolver<JAXBContext> {
+public interface JSONConfigurated {
 
-    private JAXBContext context;
-    private Class[] types = {Printer.class, PrinterTableModel.class, TreeModel.class, WebResourceList.class};
-
-    public JAXBContextResolver() throws Exception {
-        Map<String, Object> props = new HashMap<String, Object>();
-        props.put(JSONJAXBContext.JSON_NOTATION, JSONJAXBContext.JSONNotation.NATURAL);
-        // The following configuration is equvalent to what you get with NATURAL notation
-//        props.put(JSONJAXBContext.JSON_NOTATION, "MAPPED");
-//        props.put(JSONJAXBContext.JSON_ROOT_UNWRAPPING, Boolean.TRUE);
-//        props.put(JSONJAXBContext.JSON_ARRAYS, "[\"rows\", \"cols\", \"children\", \"resources\"]");
-//        props.put(JSONJAXBContext.JSON_NON_STRINGS, "[\"expanded\"]");
-        this.context = new JSONJAXBContext(types, props);
-    }
-
-    public JAXBContext getContext(Class<?> objectType) {
-        for (Class type : types) {
-            if (type == objectType) {
-                return context;
-            }
-        }
-        return null;
-        
-    }
+/**
+ *  Provides information on current JSON configuration options for this object
+ * @return a non-null {@link JSONConfiguration} instance
+ */
+    public JSONConfiguration getJSONConfiguration();
 }
-

@@ -36,8 +36,9 @@
  */
 package com.sun.jersey.json.impl;
 
+import com.sun.jersey.api.json.JSONConfigurated;
+import com.sun.jersey.api.json.JSONConfiguration;
 import com.sun.jersey.api.json.JSONJAXBContext;
-import com.sun.jersey.json.impl.Stax2JsonFactory;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -45,7 +46,6 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.nio.charset.Charset;
-import java.util.Collection;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.logging.Level;
@@ -62,7 +62,6 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 import javax.xml.transform.Result;
 import javax.xml.validation.Schema;
-import org.codehaus.jettison.json.JSONException;
 import org.w3c.dom.Node;
 import org.xml.sax.ContentHandler;
 
@@ -70,27 +69,17 @@ import org.xml.sax.ContentHandler;
  *
  * @author japod
  */
-public final class JSONMarshaller implements Marshaller {
+public final class JSONMarshaller implements Marshaller, JSONConfigurated {
 
     private final JAXBContext jaxbContext;
     private final Marshaller jaxbMarshaller;
-    private JSONJAXBContext.JSONNotation jsonNotation;
     private boolean jsonEnabled;
-    private boolean jsonRootUnwrapping;
-    private Collection<String> arrays;
-    private Collection<String> nonStrings;
-    private Collection<String> attrAsElemNames;
-    private Map<String, String> xml2jsonNamespace;
+    private final JSONConfiguration jsonConfig;
 
-    public JSONMarshaller(JAXBContext jaxbContext, Map<String, Object> properties) throws JAXBException {
-        try {
-            this.jaxbContext = jaxbContext;
-            this.jaxbMarshaller = jaxbContext.createMarshaller();
-            setProperties(properties);
-        } catch (PropertyException ex) {
-            Logger.getLogger(JSONMarshaller.class.getName()).log(Level.SEVERE, null, ex);
-            throw new JAXBException(ex);
-        }
+    public JSONMarshaller(JAXBContext jaxbContext, JSONConfiguration jsonConfig) throws JAXBException {
+        this.jaxbContext = jaxbContext;
+        this.jsonConfig = jsonConfig;
+        this.jaxbMarshaller = jaxbContext.createMarshaller();
     }
 
     public void marshal(Object jaxbObject, Result result) throws JAXBException {
@@ -163,86 +152,19 @@ public final class JSONMarshaller implements Marshaller {
     }
 
     public void setProperty(String key, Object value) throws PropertyException {
-        if (JSONJAXBContext.JSON_ENABLED.equals(key)) {
-            this.jsonEnabled = (Boolean) value;
-        } else if (JSONJAXBContext.JSON_NOTATION.equals(key)) {
-            if (value instanceof JSONJAXBContext.JSONNotation) {            
-                this.jsonNotation = (JSONJAXBContext.JSONNotation) value;
-            } else {
-                this.jsonNotation = JSONJAXBContext.JSONNotation.valueOf((String)value);
-            }
-        } else if (JSONJAXBContext.JSON_ROOT_UNWRAPPING.equals(key)) {
-            this.jsonRootUnwrapping = (Boolean) value;
-        } else if (JSONJAXBContext.JSON_ARRAYS.equals(key)) {
-            if (Collection.class.isAssignableFrom(value.getClass())) {
-                this.arrays = (Collection<String>) value;
-            } else { // accept a String representation of JSONArray for backward compatibility
-                try {
-                    this.arrays = JSONTransformer.asCollection((String) value);
-                } catch (JSONException e) {
-                    throw new PropertyException("JSON exception when trying to set " + JSONJAXBContext.JSON_ARRAYS + " property.", e);
-                }
-            }
-        } else if (JSONJAXBContext.JSON_NON_STRINGS.equals(key)) {
-            if (Collection.class.isAssignableFrom(value.getClass())) {
-                this.nonStrings = (Collection<String>) value;
-            } else { // accept a String representation of JSONArray for backward compatibility
-                try {
-                    this.nonStrings = JSONTransformer.asCollection((String) value);
-                } catch (JSONException e) {
-                    throw new PropertyException("JSON exception when trying to set " + JSONJAXBContext.JSON_NON_STRINGS + " property.", e);
-                }
-            }
-        } else if (JSONJAXBContext.JSON_XML2JSON_NS.equals(key)) {
-            if (Map.class.isAssignableFrom(value.getClass())) {
-                this.xml2jsonNamespace = (Map<String, String>) value;
-            } else { // accept a String representation of JSONObject for backward compatibility
-                try {
-                    this.xml2jsonNamespace = JSONTransformer.asMap((String) value);
-                } catch (JSONException e) {
-                    throw new PropertyException("JSON exception when trying to set " + JSONJAXBContext.JSON_XML2JSON_NS + " property.", e);
-                }
-            }
-        } else if (JSONJAXBContext.JSON_ATTRS_AS_ELEMS.equals(key)) {
-            if (Collection.class.isAssignableFrom(value.getClass())) {
-                this.attrAsElemNames = (Collection<String>) value;
-            } else { // accept a String representation of JSONArray for backward compatibility
-                try {
-                    this.attrAsElemNames = JSONTransformer.asCollection((String) value);
-                } catch (JSONException e) {
-                    throw new PropertyException("JSON exception when trying to set " + JSONJAXBContext.JSON_ATTRS_AS_ELEMS + " property.", e);
-                }
-            }
-        } else {
-            if (!key.startsWith(JSONJAXBContext.NAMESPACE)) {
-                jaxbMarshaller.setProperty(key, value);
-            }
-        }
+        jaxbMarshaller.setProperty(key, value);
     }
 
-    
+    public boolean isJsonEnabled() {
+        return jsonEnabled;
+    }
+
+    public void setJsonEnabled(boolean jsonEnabled) {
+        this.jsonEnabled = jsonEnabled;
+    }
+
     public Object getProperty(String key) throws PropertyException {
-        if (JSONJAXBContext.JSON_ENABLED.equals(key)) {
-            return this.jsonEnabled;
-        } else if (JSONJAXBContext.JSON_NOTATION.equals(key)) {
-            return this.jsonNotation;
-        } else if (JSONJAXBContext.JSON_ROOT_UNWRAPPING.equals(key)) {
-            return this.jsonRootUnwrapping;
-        } else if (JSONJAXBContext.JSON_ARRAYS.equals(key)) {
-            return this.arrays;
-        } else if (JSONJAXBContext.JSON_NON_STRINGS.equals(key)) {
-            return this.nonStrings;
-        } else if (JSONJAXBContext.JSON_XML2JSON_NS.equals(key)) {
-            return this.xml2jsonNamespace;
-        } else if (JSONJAXBContext.JSON_ATTRS_AS_ELEMS.equals(key)) {
-            return this.attrAsElemNames;
-        } else {
-            if (key.startsWith(JSONJAXBContext.NAMESPACE)) {
-                return null;
-            } else {
-                return jaxbMarshaller.getProperty(key);
-            }
-        }
+        return jaxbMarshaller.getProperty(key);
     }
 
     public void setEventHandler(ValidationEventHandler handler) throws JAXBException {
@@ -299,7 +221,7 @@ public final class JSONMarshaller implements Marshaller {
 
     private XMLStreamWriter createXmlStreamWriter(Writer writer) throws JAXBException  {
         try {
-            return Stax2JsonFactory.createWriter(jsonNotation, writer, jsonRootUnwrapping, arrays, nonStrings, attrAsElemNames, xml2jsonNamespace);
+            return Stax2JsonFactory.createWriter(writer, jsonConfig);
         } catch (IOException ex) {
             throw new JAXBException(ex.getMessage(), ex);
         }
@@ -308,5 +230,9 @@ public final class JSONMarshaller implements Marshaller {
     private Charset getCharset() throws JAXBException {
         String charset = (String)jaxbMarshaller.getProperty(Marshaller.JAXB_ENCODING);
         return (charset == null) ? Charset.forName("UTF-8") : Charset.forName(charset);
+    }
+
+    public JSONConfiguration getJSONConfiguration() {
+        return jsonConfig;
     }
 }

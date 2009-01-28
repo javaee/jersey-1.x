@@ -64,9 +64,10 @@ public final class JAXBContextResolver implements ContextResolver<JAXBContext> {
     
     public JAXBContextResolver() throws Exception {
         Map<String, Object> props = new HashMap<String, Object>();
-        props.put(JSONJAXBContext.JSON_NOTATION, JSONJAXBContext.JSONNotation.MAPPED);
-        props.put(JSONJAXBContext.JSON_ROOT_UNWRAPPING, Boolean.TRUE);
-        props.put(JSONJAXBContext.JSON_NON_STRINGS, new HashSet<String>(1){{add("number");}});
+        props.put(JSONJAXBContext.JSON_NOTATION, JSONJAXBContext.JSONNotation.NATURAL);
+        //props.put(JSONJAXBContext.JSON_ROOT_UNWRAPPING, Boolean.TRUE);
+        //props.put(JSONJAXBContext.JSON_NON_STRINGS, new HashSet<String>(2){{add("fromRange");add("toRange");}});
+        //props.put(JSONJAXBContext.JSON_ARRAYS, new HashSet<String>(1){{add("gradeScaleRecord");}});
         this.types = new HashSet(Arrays.asList(cTypes));
         this.context = new JSONJAXBContext(cTypes, props);
     }

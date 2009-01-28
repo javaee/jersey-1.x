@@ -135,10 +135,10 @@ public class JSONJAXBRoudtripTest extends TestCase {
     
     public synchronized void allBeansTest(JSONJAXBContext context, Collection<Object> beans) throws Exception {
         JSONMarshaller marshaller = (JSONMarshaller)context.createMarshaller();
-        marshaller.setProperty(JSONJAXBContext.JSON_ENABLED, Boolean.TRUE);
+        marshaller.setJsonEnabled(true);
         marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
         JSONUnmarshaller unmarshaller = (JSONUnmarshaller)context.createUnmarshaller();
-        unmarshaller.setProperty(JSONJAXBContext.JSON_ENABLED, Boolean.TRUE);
+        unmarshaller.setJsonEnabled(true);
         for (Object originalBean : beans) {
 //            System.out.println("Checking " + originalBean.toString());
 //            JAXBContext ctx = JAXBContext.newInstance(originalBean.getClass());
