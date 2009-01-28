@@ -11,11 +11,11 @@
       <outputDirectory></outputDirectory>
     </fileSet>
     <!--fileSet>
-      <directory>target/aux/jersey-javadoc</directory>
+      <directory>target/assembly/jersey-javadoc</directory>
       <outputDirectory>apidocs/jersey</outputDirectory>
     </fileSet>
     <fileSet>
-      <directory>target/aux/jax-rs-javadoc</directory>
+      <directory>target/assembly/jax-rs-javadoc</directory>
       <outputDirectory>apidocs/jsr311</outputDirectory>
     </fileSet-->
     <fileSet>

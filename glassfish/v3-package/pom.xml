@@ -77,7 +77,7 @@
                                     <type>jar</type>
                                     <classifier>javadoc</classifier>
                                     <overWrite>false</overWrite>
-                                    <outputDirectory>${aux.directory}/jax-rs-javadoc</outputDirectory>
+                                    <outputDirectory>${assembly.directory}/jax-rs-javadoc</outputDirectory>
                                 </artifactItem>
                                 <artifactItem>
                                     <groupId>com.sun.jersey</groupId>
@@ -86,7 +86,7 @@
                                     <type>jar</type>
                                     <classifier>javadoc</classifier>
                                     <overWrite>false</overWrite>
-                                    <outputDirectory>${aux.directory}/jersey-javadoc</outputDirectory>
+                                    <outputDirectory>${assembly.directory}/jersey-javadoc</outputDirectory>
                                 </artifactItem>
                                 <artifactItem>
                                     <groupId>com.sun.jersey.samples</groupId>
@@ -95,7 +95,7 @@
                                     <type>zip</type>
                                     <classifier>gf-project</classifier>
                                     <overWrite>false</overWrite>
-                                    <outputDirectory>${aux.directory}/samples</outputDirectory>
+                                    <outputDirectory>${assembly.directory}/samples</outputDirectory>
                                 </artifactItem>
                                  <artifactItem>
                                     <groupId>com.sun.jersey.samples</groupId>
@@ -104,7 +104,7 @@
                                     <type>zip</type>
                                     <classifier>gf-project</classifier>
                                     <overWrite>false</overWrite>
-                                    <outputDirectory>${aux.directory}/samples</outputDirectory>
+                                    <outputDirectory>${assembly.directory}/samples</outputDirectory>
                                 </artifactItem>
                                  <artifactItem>
                                     <groupId>com.sun.jersey.samples</groupId>
@@ -113,7 +113,7 @@
                                     <type>zip</type>
                                     <classifier>gf-project</classifier>
                                     <overWrite>false</overWrite>
-                                    <outputDirectory>${aux.directory}/samples</outputDirectory>
+                                    <outputDirectory>${assembly.directory}/samples</outputDirectory>
                                 </artifactItem>
                                  <artifactItem>
                                     <groupId>com.sun.jersey.samples</groupId>
@@ -122,7 +122,7 @@
                                     <type>zip</type>
                                     <classifier>gf-project</classifier>
                                     <overWrite>false</overWrite>
-                                    <outputDirectory>${aux.directory}/samples</outputDirectory>
+                                    <outputDirectory>${assembly.directory}/samples</outputDirectory>
                                 </artifactItem>
                                  <artifactItem>
                                     <groupId>com.sun.jersey.samples</groupId>
@@ -131,7 +131,7 @@
                                     <type>zip</type>
                                     <classifier>gf-project</classifier>
                                     <overWrite>false</overWrite>
-                                    <outputDirectory>${aux.directory}/samples</outputDirectory>
+                                    <outputDirectory>${assembly.directory}/samples</outputDirectory>
                                 </artifactItem>
                                  <artifactItem>
                                     <groupId>com.sun.jersey.samples</groupId>
@@ -140,7 +140,7 @@
                                     <type>zip</type>
                                     <classifier>gf-project</classifier>
                                     <overWrite>false</overWrite>
-                                    <outputDirectory>${aux.directory}/samples</outputDirectory>
+                                    <outputDirectory>${assembly.directory}/samples</outputDirectory>
                                 </artifactItem>
                                  <artifactItem>
                                     <groupId>com.sun.jersey.samples</groupId>
@@ -149,7 +149,7 @@
                                     <type>zip</type>
                                     <classifier>gf-project</classifier>
                                     <overWrite>false</overWrite>
-                                    <outputDirectory>${aux.directory}/samples</outputDirectory>
+                                    <outputDirectory>${assembly.directory}/samples</outputDirectory>
                                 </artifactItem>
                             </artifactItems>
                         </configuration>
@@ -169,7 +169,7 @@
                                     <version>1.0</version>
                                     <type>jar</type>
                                     <overWrite>false</overWrite>
-                                    <outputDirectory>${aux.directory}</outputDirectory>
+                                    <outputDirectory>${assembly.directory}</outputDirectory>
                                 </artifactItem>
                                 <artifactItem>
                                     <groupId>com.sun.jersey</groupId>
@@ -177,7 +177,7 @@
                                     <version>${project.version}</version>
                                     <type>jar</type>
                                     <overWrite>false</overWrite>
-                                    <outputDirectory>${aux.directory}</outputDirectory>
+                                    <outputDirectory>${assembly.directory}</outputDirectory>
                                 </artifactItem>
                            </artifactItems>
                         </configuration>
@@ -205,7 +205,7 @@
     </build>
 
     <properties>
-      <aux.directory>${project.build.directory}/aux</aux.directory>
+      <assembly.directory>${project.build.directory}/assembly</assembly.directory>
     </properties>
 
     <repositories>

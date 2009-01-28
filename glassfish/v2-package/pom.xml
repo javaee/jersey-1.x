@@ -76,7 +76,7 @@
                                     <version>${project.version}</version>
                                     <type>zip</type>
                                     <overWrite>false</overWrite>
-                                    <outputDirectory>${aux.directory}/module</outputDirectory>
+                                    <outputDirectory>${assembly.directory}/module</outputDirectory>
                                 </artifactItem>
                             </artifactItems>
                         </configuration>
@@ -91,19 +91,19 @@
                         <phase>generate-sources</phase>
                         <configuration>
                             <tasks>
-                                <copy file="${basedir}/src/main/resources/Info/info.xml"  tofile="${aux.directory}/Info/info.xml"/>
-                                <length file="${aux.directory}/module/module_jersey.zip" property="uc.module.length"/>
-                                <replace file="${aux.directory}/Info/info.xml" token="@@@@DOWNLOAD_SIZE@@@@" value="${uc.module.length}"/>
+                                <copy file="${basedir}/src/main/resources/Info/info.xml"  tofile="${assembly.directory}/Info/info.xml"/>
+                                <length file="${assembly.directory}/module/module_jersey.zip" property="uc.module.length"/>
+                                <replace file="${assembly.directory}/Info/info.xml" token="@@@@DOWNLOAD_SIZE@@@@" value="${uc.module.length}"/>
                                 <tstamp>
                                     <format property="uc.module.timestamp" pattern="ss/mm/hh/dd/MM/yyyy"/>
                                     <format property="uc.module.release.date" pattern="yyyy/MM/dd"/>
                                     <format property="uc.module.impl.version" pattern="yyyyMMddhhmm"/>
                                 </tstamp>
-                                <replace file="${aux.directory}/Info/info.xml" token="@@@@MODULE_TIMESTAMP@@@@" value="${uc.module.timestamp}"/>
-                                <replace file="${aux.directory}/Info/info.xml" token="@@@@MODULE_RELEASE_DATE@@@@" value="${uc.module.release.date}"/>
-                                <replace file="${aux.directory}/Info/info.xml" token="@@@@MODULE_IMPL_VERSION@@@@" value="${uc.module.impl.version}"/>
-                                <replace file="${aux.directory}/Info/info.xml" token="@@@@RELEASE_IMPL_VERSION@@@@" value="${project.version}"/>
-                                <jar basedir="${aux.directory}"  destfile="${project.build.directory}/module_jersey.nbm"/>
+                                <replace file="${assembly.directory}/Info/info.xml" token="@@@@MODULE_TIMESTAMP@@@@" value="${uc.module.timestamp}"/>
+                                <replace file="${assembly.directory}/Info/info.xml" token="@@@@MODULE_RELEASE_DATE@@@@" value="${uc.module.release.date}"/>
+                                <replace file="${assembly.directory}/Info/info.xml" token="@@@@MODULE_IMPL_VERSION@@@@" value="${uc.module.impl.version}"/>
+                                <replace file="${assembly.directory}/Info/info.xml" token="@@@@RELEASE_IMPL_VERSION@@@@" value="${project.version}"/>
+                                <jar basedir="${assembly.directory}"  destfile="${project.build.directory}/module_jersey.nbm"/>
                             </tasks>
                         </configuration>
                         <goals>
@@ -133,7 +133,7 @@
     </build>
 
     <properties>
-        <aux.directory>${project.build.directory}/aux</aux.directory>
+        <assembly.directory>${project.build.directory}/assembly</assembly.directory>
     </properties>
 
     <repositories>

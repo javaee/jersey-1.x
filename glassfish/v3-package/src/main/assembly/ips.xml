@@ -9,19 +9,19 @@
       <outputDirectory></outputDirectory>
     </fileSet>
     <fileSet>
-      <directory>target/aux/jersey-javadoc</directory>
+      <directory>target/assembly/jersey-javadoc</directory>
       <outputDirectory>jersey/apidocs/jersey</outputDirectory>
     </fileSet>
     <fileSet>
-      <directory>target/aux/jax-rs-javadoc</directory>
+      <directory>target/assembly/jax-rs-javadoc</directory>
       <outputDirectory>jersey/apidocs/jsr311</outputDirectory>
     </fileSet>
      <fileSet>
-      <directory>target/aux/samples</directory>
+      <directory>target/assembly/samples</directory>
       <outputDirectory>jersey/samples</outputDirectory>
     </fileSet>
      <fileSet>
-      <directory>target/aux</directory>
+      <directory>target/assembly</directory>
       <includes>
         <include>jsr311-api.jar</include>
         <include>jersey-bundle.jar</include>
