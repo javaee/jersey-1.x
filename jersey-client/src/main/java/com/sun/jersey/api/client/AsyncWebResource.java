@@ -361,6 +361,20 @@ public class AsyncWebResource extends Filterable implements
     }
     
     /**
+     * Create a new WebResource from this web resource with an additional
+     * query parameter added to the URI of this web resource.
+     *
+     * @param key the query parameter name
+     * @param value the query parameter value
+     * @return the new web resource.
+     */
+    public AsyncWebResource queryParam(String key, String value) {
+        UriBuilder b = getUriBuilder();
+        b.queryParam(key, value);
+        return new AsyncWebResource(this, b);
+    }
+
+    /**
      * Create a new WebResource from this web resource with additional
      * query parameters added to the URI of this web resource.
      *
@@ -375,7 +389,7 @@ public class AsyncWebResource extends Filterable implements
         }
         return new AsyncWebResource(this, b);
     }
-    
+
     // Builder that builds client request and handles it
     
     /**

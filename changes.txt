@@ -1,4 +1,8 @@
 release 1.0.2 (2009-01/02)
+- Fixed issue 183
+  https://jersey.dev.java.net/issues/show_bug.cgi?id=183
+  Query parameters may be built for a WebResource as follows:
+    r.queryParam("a", "foo").queryParam("b", "bar").get(String.class)
 - Fixed issue 196
   https://jersey.dev.java.net/issues/show_bug.cgi?id=196
   Removal of filters, using Filterable.removeFilter, no longer causes an

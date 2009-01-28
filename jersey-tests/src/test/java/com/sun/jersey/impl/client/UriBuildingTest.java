@@ -106,4 +106,18 @@ public class UriBuildingTest extends AbstractGrizzlyServerTester {
         Future<String> s = r.path("/").queryParams(qps).get(String.class);
         assertEquals("foobar", s.get());
     }
+
+    public void testQueryGet2() throws Exception {
+        startServer(QueryResource.class);
+        WebResource r = Client.create().resource(getUri().build());
+        String s = r.path("/").queryParam("a", "foo").queryParam("b", "bar").get(String.class);
+        assertEquals("foobar", s);
+    }
+
+    public void testQueryGetAsync2() throws Exception {
+        startServer(QueryResource.class);
+        AsyncWebResource r = Client.create().asyncResource(getUri().build());
+        Future<String> s = r.path("/").queryParam("a", "foo").queryParam("b", "bar").get(String.class);
+        assertEquals("foobar", s.get());
+    }
 }

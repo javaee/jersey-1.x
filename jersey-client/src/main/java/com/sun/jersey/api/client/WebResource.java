@@ -357,6 +357,20 @@ public class WebResource extends Filterable implements
     }
 
     /**
+     * Create a new WebResource from this web resource with an additional
+     * query parameter added to the URI of this web resource.
+     *
+     * @param key the query parameter name
+     * @param value the query parameter value
+     * @return the new web resource.
+     */
+    public WebResource queryParam(String key, String value) {
+        UriBuilder b = getUriBuilder();
+        b.queryParam(key, value);
+        return new WebResource(this, b);
+    }
+
+    /**
      * Create a new WebResource from this web resource with additional
      * query parameters added to the URI of this web resource.
      *
