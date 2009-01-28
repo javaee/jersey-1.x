@@ -92,9 +92,16 @@ public abstract class Filterable {
      * @param f the filter to remove.
      */
     public void removeFilter(ClientFilter f) {
-        if (head == root) return;
-        
-        if (head == f) head = f.getNext();
+        // No filters added
+        if (head == root) {
+            return;
+        }
+
+        // Filter is at the head
+        if (head == f) {
+            head = f.getNext();
+            return;
+        }
 
         ClientFilter e = (ClientFilter)head;
         while (e.getNext() != f) {
@@ -105,7 +112,32 @@ public abstract class Filterable {
         
         e.setNext(f.getNext());
     }
-    
+
+    /**
+     * Check if a filter is present in the chain.
+     *
+     * @param f the filter to remove.
+     * @return return true if the filter is present, otherwise false.
+     */
+    public boolean isFilterPreset(ClientFilter f) {
+        if (head == root) {
+            return false;
+        }
+
+        if (head == f) {
+            return true;
+        }
+
+        ClientFilter e = (ClientFilter)head;
+        while (e.getNext() != f) {
+            if (e.getNext() == root) return false;
+
+            e = (ClientFilter)e.getNext();
+        }
+
+        return true;
+    }
+
     /**
      * Remove all filters from the filter chain.
      */

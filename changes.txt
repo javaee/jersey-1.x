@@ -1,5 +1,9 @@
 release 1.0.2 (2009-01/02)
-- Fixed issue 193
+- Fixed issue 196
+  https://jersey.dev.java.net/issues/show_bug.cgi?id=196
+  Removal of filters, using Filterable.removeFilter, no longer causes an
+  exception.
+- Fixed issue 196
   https://jersey.dev.java.net/issues/show_bug.cgi?id=196
   Conversion of an Object that is a header value will use the Object.toString()
   method if a header delegate cannot be found. For example,
