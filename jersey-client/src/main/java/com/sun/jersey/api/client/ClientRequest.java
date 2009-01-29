@@ -59,6 +59,18 @@ public abstract class ClientRequest {
      * @return the property bag.
      */
     public abstract Map<String, Object> getProperties();
+
+    /**
+     * Get a boolean property from the property bag.
+     *
+     * @param name the name of the property;
+     * @return true if the property value is present and is an instance of
+     *         <code>Boolean</code> and that value is true, otherwise false.
+     */
+    public boolean getBooleanProperty(String name) {
+        Boolean v = (Boolean)getProperties().get(name);
+        return (v != null) ? v : false;
+    }
     
     /**
      * Get the URI of the request. The URI shall contain sufficient
