@@ -36,13 +36,12 @@
  */
 package com.sun.jersey.samples.jmaki.config;
 
+import com.sun.jersey.api.json.JSONConfiguration;
 import com.sun.jersey.api.json.JSONJAXBContext;
 import com.sun.jersey.samples.jmaki.beans.Printer;
 import com.sun.jersey.samples.jmaki.beans.PrinterTableModel;
 import com.sun.jersey.samples.jmaki.beans.TreeModel;
 import com.sun.jersey.samples.jmaki.beans.WebResourceList;
-import java.util.HashMap;
-import java.util.Map;
 import javax.ws.rs.ext.ContextResolver;
 import javax.ws.rs.ext.Provider;
 import javax.xml.bind.JAXBContext;
@@ -58,14 +57,7 @@ public class JAXBContextResolver implements ContextResolver<JAXBContext> {
     private Class[] types = {Printer.class, PrinterTableModel.class, TreeModel.class, WebResourceList.class};
 
     public JAXBContextResolver() throws Exception {
-        Map<String, Object> props = new HashMap<String, Object>();
-        props.put(JSONJAXBContext.JSON_NOTATION, JSONJAXBContext.JSONNotation.NATURAL);
-        // The following configuration is equvalent to what you get with NATURAL notation
-//        props.put(JSONJAXBContext.JSON_NOTATION, "MAPPED");
-//        props.put(JSONJAXBContext.JSON_ROOT_UNWRAPPING, Boolean.TRUE);
-//        props.put(JSONJAXBContext.JSON_ARRAYS, "[\"rows\", \"cols\", \"children\", \"resources\"]");
-//        props.put(JSONJAXBContext.JSON_NON_STRINGS, "[\"expanded\"]");
-        this.context = new JSONJAXBContext(types, props);
+        this.context = new JSONJAXBContext(JSONConfiguration.getBuilder(JSONConfiguration.Notation.NATURAL).build(), types);
     }
 
     public JAXBContext getContext(Class<?> objectType) {
