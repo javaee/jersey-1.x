@@ -37,13 +37,12 @@
 
 package com.sun.jersey.samples.jsonfromjaxb.config;
 
+import com.sun.jersey.api.json.JSONConfiguration;
 import com.sun.jersey.api.json.JSONJAXBContext;
 import com.sun.jersey.samples.jsonfromjaxb.jaxb.FlightType;
 import com.sun.jersey.samples.jsonfromjaxb.jaxb.Flights;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 import javax.ws.rs.ext.ContextResolver;
 import javax.ws.rs.ext.Provider;
@@ -63,13 +62,8 @@ public final class JAXBContextResolver implements ContextResolver<JAXBContext> {
     private final Class[] cTypes = {Flights.class, FlightType.class};
     
     public JAXBContextResolver() throws Exception {
-        Map<String, Object> props = new HashMap<String, Object>();
-        props.put(JSONJAXBContext.JSON_NOTATION, JSONJAXBContext.JSONNotation.NATURAL);
-        //props.put(JSONJAXBContext.JSON_ROOT_UNWRAPPING, Boolean.TRUE);
-        //props.put(JSONJAXBContext.JSON_NON_STRINGS, new HashSet<String>(2){{add("fromRange");add("toRange");}});
-        //props.put(JSONJAXBContext.JSON_ARRAYS, new HashSet<String>(1){{add("gradeScaleRecord");}});
         this.types = new HashSet(Arrays.asList(cTypes));
-        this.context = new JSONJAXBContext(cTypes, props);
+        this.context = new JSONJAXBContext(JSONConfiguration.getBuilder(JSONConfiguration.Notation.NATURAL).build(), cTypes);
     }
     
     public JAXBContext getContext(Class<?> objectType) {
