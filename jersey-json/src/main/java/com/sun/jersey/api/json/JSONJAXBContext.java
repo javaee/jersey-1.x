@@ -232,7 +232,7 @@ public final class JSONJAXBContext extends JAXBContext implements JSONConfigurat
     private final JAXBContext jaxbContext;
     
     /**
-     * Constructs a new instance with default properties.
+     * Constructs a new instance with default {@link JSONConfiguration}.
      * 
      * @param classesToBeBound list of java classes to be recognized by the 
      *        new JSONJAXBContext. Can be empty, in which case a JSONJAXBContext
@@ -241,16 +241,34 @@ public final class JSONJAXBContext extends JAXBContext implements JSONConfigurat
      *         underlying JAXBContext.
      */
     public JSONJAXBContext(Class... classesToBeBound) throws JAXBException {
-        this(classesToBeBound, Collections.unmodifiableMap(defaultJsonProperties));
+        this(JSONConfiguration.DEFAULT, classesToBeBound);
     }
 
     /**
-     * Constructs a new instance with a custom set of properties.
+     * Constructs a new instance with given {@link JSONConfiguration}.
+     *
+     * @param config {@link JSONConfiguration}, can not be null
+     * @param classesToBeBound list of java classes to be recognized by the
+     *        new JSONJAXBContext. Can be empty, in which case a JSONJAXBContext
+     *        that only knows about spec-defined classes will be returned.
+     * @throws JAXBException if an error was encountered while creating the
+     *         underlying JAXBContext.
+     */
+    public JSONJAXBContext(JSONConfiguration config, Class... classesToBeBound) throws JAXBException {
+        jsonConfiguration = config;
+        jaxbContext = JAXBContext.newInstance(classesToBeBound);
+    }
+
+    /**
+     * Constructs a new instance with a custom set of properties. 
+     * The default {@link JSONConfiguration} is used if no (now deprecated)
+     * JSON related properties are specified
      * 
      * @param classesToBeBound list of java classes to be recognized by the 
      *        new JSONJAXBContext. Can be empty, in which case a JSONJAXBContext
      *        that only knows about spec-defined classes will be returned. 
-     * @param properties the custom set of properties.
+     * @param properties the custom set of properties. If it contains(now deprecated) JSON related properties,
+     *                  then a non-default {@link JSONConfiguration} is used reflecting the JSON properties
      * @throws JAXBException if an error was encountered while creating the
      *         underlying JAXBContext.
      */
@@ -258,11 +276,33 @@ public final class JSONJAXBContext extends JAXBContext implements JSONConfigurat
             throws JAXBException {
         jaxbContext = JAXBContext.newInstance(classesToBeBound, 
                 createProperties(properties));
+        if(jsonConfiguration == null) {
+            jsonConfiguration = JSONConfiguration.DEFAULT;
+        }
+    }
+
+    /**
+     * Constructs a new instance with a custom set of properties.
+     * If no (now deprecated) JSON related properties are specified,
+     * the {@link JSONConfiguration.DEFAULT} is used as {@link JSONConfiguration}
+     *
+     * @param config {@link JSONConfiguration}, can not be null
+     * @param classesToBeBound list of java classes to be recognized by the
+     *        new JSONJAXBContext. Can be empty, in which case a JSONJAXBContext
+     *        that only knows about spec-defined classes will be returned.
+     * @param properties the custom set of properties.
+     * @throws JAXBException if an error was encountered while creating the
+     *         underlying JAXBContext.
+     */
+    public JSONJAXBContext(JSONConfiguration config, Class[] classesToBeBound, Map<String, Object> properties)
+            throws JAXBException {
+        jsonConfiguration = config;
+        jaxbContext = JAXBContext.newInstance(classesToBeBound, properties);
     }
 
     /**
      * Construct a new instance of using context class loader of the thread
-     * with default properties.
+     * with default {@link JSONConfiguration}.
      * 
      * @param contextPath list of java package names that contain schema
      *        derived class and/or java to schema (JAXB-annotated) mapped
@@ -272,12 +312,28 @@ public final class JSONJAXBContext extends JAXBContext implements JSONConfigurat
      */
     public JSONJAXBContext(String contextPath)
             throws JAXBException {
-        this(contextPath, Thread.currentThread().getContextClassLoader());
+        this(JSONConfiguration.DEFAULT, contextPath);
+    }
+
+    /**
+     * Construct a new instance of using context class loader of the thread
+     * with given {@link JSONConfiguration}.
+     *
+     * @param contextPath list of java package names that contain schema
+     *        derived class and/or java to schema (JAXB-annotated) mapped
+     *        classes
+     * @throws JAXBException if an error was encountered while creating the
+     *         underlying JAXBContext.
+     */
+    public JSONJAXBContext(JSONConfiguration config, String contextPath)
+            throws JAXBException {
+        jaxbContext = JAXBContext.newInstance(contextPath, Thread.currentThread().getContextClassLoader());
+        jsonConfiguration = config;
     }
     
     /**
      * Construct a new instance using a specified class loader with
-     * default properties.
+     * default  {@link JSONConfiguration}.
      * 
      * @param contextPath list of java package names that contain schema
      *        derived class and/or java to schema (JAXB-annotated) mapped
@@ -288,12 +344,14 @@ public final class JSONJAXBContext extends JAXBContext implements JSONConfigurat
      */
     public JSONJAXBContext(String contextPath, ClassLoader classLoader)
             throws JAXBException {
-        this(contextPath, classLoader, Collections.unmodifiableMap(defaultJsonProperties));
+        jaxbContext = JAXBContext.newInstance(contextPath, classLoader);
+        jsonConfiguration = JSONConfiguration.DEFAULT;
     }
     
     /**
      * Construct a new instance using a specified class loader and 
-     * a custom set of properties.
+     * a custom set of properties. {@link JSONConfiguration} is set to default,
+     * if user does not specify any (now deprecated) JSON related properties
      * 
      * @param contextPath list of java package names that contain schema
      *        derived class and/or java to schema (JAXB-annotated) mapped
@@ -303,12 +361,33 @@ public final class JSONJAXBContext extends JAXBContext implements JSONConfigurat
      * @throws JAXBException if an error was encountered while creating the
      *         underlying JAXBContext.
      */
-    public JSONJAXBContext(String contextPath, ClassLoader classLoader,
-            Map<String, Object> properties)
+    public JSONJAXBContext(String contextPath, ClassLoader classLoader,  Map<String, Object> properties)
             throws JAXBException {
-        jaxbContext = JAXBContext.newInstance(contextPath, 
-                classLoader, 
+        jaxbContext = JAXBContext.newInstance(contextPath, classLoader, createProperties(properties));
+        if(jsonConfiguration == null) {
+            jsonConfiguration = JSONConfiguration.DEFAULT;
+        }
+    }
+
+    /**
+     * Construct a new instance using a specified class loader,
+     * set of properties and {@link JSONConfiguration} .
+     *
+     * @param config {@link JSONConfiguration}, can not be null
+     * @param contextPath list of java package names that contain schema
+     *        derived class and/or java to schema (JAXB-annotated) mapped
+     *        classes
+     * @param classLoader
+     * @param properties the custom set of properties.
+     * @throws JAXBException if an error was encountered while creating the
+     *         underlying JAXBContext.
+     */
+    public JSONJAXBContext(JSONConfiguration config, String contextPath, ClassLoader classLoader,  Map<String, Object> properties)
+            throws JAXBException {
+        jaxbContext = JAXBContext.newInstance(contextPath,
+                classLoader,
                 createProperties(properties));
+        jsonConfiguration = config;
     }
 
     public JSONConfiguration getJSONConfiguration() {
@@ -378,20 +457,22 @@ public final class JSONJAXBContext extends JAXBContext implements JSONConfigurat
             }
         }
         if (!jsonKeys.isEmpty()) {
-            JSONConfiguration.Notation pNotation = JSONConfiguration.Notation.MAPPED;
-            if (properties.containsKey(JSONJAXBContext.JSON_NOTATION)) {
-                Object nO = properties.get(JSONJAXBContext.JSON_NOTATION);
-                if ((nO instanceof JSONJAXBContext.JSONNotation) || (nO instanceof String)) {
-                    pNotation = _notationMap.get(nO.toString());
+            if (jsonConfiguration != null) {
+                JSONConfiguration.Notation pNotation = JSONConfiguration.Notation.MAPPED;
+                if (properties.containsKey(JSONJAXBContext.JSON_NOTATION)) {
+                    Object nO = properties.get(JSONJAXBContext.JSON_NOTATION);
+                    if ((nO instanceof JSONJAXBContext.JSONNotation) || (nO instanceof String)) {
+                        pNotation = _notationMap.get(nO.toString());
+                    }
                 }
+                JSONConfiguration.Builder builder = JSONConfiguration.getBuilder(pNotation);
+                builder.setArrays((Collection<String>) properties.get(JSONJAXBContext.JSON_ARRAYS));
+                builder.setAttrsAsElems((Collection<String>) properties.get(JSONJAXBContext.JSON_ATTRS_AS_ELEMS));
+                builder.setNonStrings((Collection<String>) properties.get(JSONJAXBContext.JSON_NON_STRINGS));
+                builder.setJsonXml2JsonNs((Map<String, String>) properties.get(JSONJAXBContext.JSON_XML2JSON_NS));
+                builder.setRootUnwrapping((Boolean) properties.get(JSONJAXBContext.JSON_ROOT_UNWRAPPING));
+                jsonConfiguration = builder.build();
             }
-            JSONConfiguration.Builder builder = JSONConfiguration.getBuilder(pNotation);
-            builder.setArrays((Collection<String>)properties.get(JSONJAXBContext.JSON_ARRAYS));
-            builder.setAttrsAsElems((Collection<String>)properties.get(JSONJAXBContext.JSON_ATTRS_AS_ELEMS));
-            builder.setNonStrings((Collection<String>)properties.get(JSONJAXBContext.JSON_NON_STRINGS));
-            builder.setJsonXml2JsonNs((Map<String, String>)properties.get(JSONJAXBContext.JSON_XML2JSON_NS));
-            builder.setRootUnwrapping((Boolean)properties.get(JSONJAXBContext.JSON_ROOT_UNWRAPPING));
-            jsonConfiguration = builder.build();
         }
         for (String k : jsonKeys) {
             properties.remove(k);

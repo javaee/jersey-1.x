@@ -36,8 +36,8 @@
  */
 package com.sun.jersey.json.impl;
 
+import com.sun.jersey.api.json.JSONConfiguration;
 import com.sun.jersey.api.json.JSONJAXBContext;
-import com.sun.jersey.json.impl.writer.Stax2JacksonWriter;
 import java.io.Reader;
 import java.io.StringReader;
 import java.io.StringWriter;
@@ -48,7 +48,6 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Map;
 import java.util.StringTokenizer;
-import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.Marshaller;
 import junit.framework.TestCase;
@@ -94,6 +93,11 @@ public class JSONJAXBRoudtripTest extends TestCase {
     
     public void testInternalNotation() throws Exception {
         System.out.println("INTERNAL NOTATION");
+        allBeansTest(new JSONJAXBContext(JSONConfiguration.getBuilder(JSONConfiguration.Notation.MAPPED).setRootUnwrapping(false).build(), classes), beans);
+    }
+
+    public void testInternalNotationDeprecatedConfig() throws Exception {
+        System.out.println("INTERNAL NOTATION DEPRECATED CONFIG");
         Map<String, Object> props = new HashMap<String, Object>();
         props.put(JSONJAXBContext.JSON_NOTATION, JSONJAXBContext.JSONNotation.MAPPED);
         props.put(JSONJAXBContext.JSON_ROOT_UNWRAPPING, Boolean.FALSE);
@@ -102,6 +106,11 @@ public class JSONJAXBRoudtripTest extends TestCase {
 
     public void testInternalNotationAttrAsElems() throws Exception {
         System.out.println("INTERNAL NOTATION WITH SOME ATTR AS ELEMS");
+        allBeansTest(new JSONJAXBContext(JSONConfiguration.getBuilder(JSONConfiguration.Notation.MAPPED).setRootUnwrapping(true).setAttrsAsElems(new HashSet<String>(3){{add("i");add("j");}}).build(), classes), beans);
+    }
+
+    public void testInternalNotationAttrAsElemsDeprecatedConfig() throws Exception {
+        System.out.println("INTERNAL NOTATION WITH SOME ATTR AS ELEMS DEPRECATED CONFIG");
         Map<String, Object> props = new HashMap<String, Object>();
         props.put(JSONJAXBContext.JSON_NOTATION, JSONJAXBContext.JSONNotation.MAPPED);
         props.put(JSONJAXBContext.JSON_ROOT_UNWRAPPING, Boolean.TRUE);
@@ -111,6 +120,11 @@ public class JSONJAXBRoudtripTest extends TestCase {
 
     public void testJettisonBadgerfishNotation() throws Exception {
         System.out.println("BADGERFISH NOTATION");
+        allBeansTest(new JSONJAXBContext(JSONConfiguration.getBuilder(JSONConfiguration.Notation.BADGERFISH).build(), classes), beans);
+    }
+
+    public void testJettisonBadgerfishNotationDeprecatedConfig() throws Exception {
+        System.out.println("BADGERFISH NOTATION DEPRECATED CONFIG");
         Map<String, Object> props = new HashMap<String, Object>();
         props.put(JSONJAXBContext.JSON_NOTATION, JSONJAXBContext.JSONNotation.BADGERFISH);
         allBeansTest(new JSONJAXBContext(classes, props), beans);
@@ -118,12 +132,16 @@ public class JSONJAXBRoudtripTest extends TestCase {
 
     public void testNaturalNotation() throws Exception {
         System.out.println("NATURAL NOTATION");
-        Map<String, Object> props = new HashMap<String, Object>();
-        props.put(JSONJAXBContext.JSON_NOTATION, JSONJAXBContext.JSONNotation.NATURAL);
-        //props.put(JSONJAXBContext.JSON_ROOT_UNWRAPPING, Boolean.TRUE);
-        allBeansTest(new JSONJAXBContext(classes, props), beans);
+        allBeansTest(new JSONJAXBContext(JSONConfiguration.getBuilder(JSONConfiguration.Notation.NATURAL).build(), classes), beans);
     }
     
+    public void testNaturalNotationDeprecatedConfig() throws Exception {
+        System.out.println("NATURAL NOTATION DEPRECATED CONFIG");
+        Map<String, Object> props = new HashMap<String, Object>();
+        props.put(JSONJAXBContext.JSON_NOTATION, JSONJAXBContext.JSONNotation.NATURAL);
+        allBeansTest(new JSONJAXBContext(classes, props), beans);
+    }
+
 //    TODO: Jettison gets stuck on the following :-(
 //    public void testJettisonMappedNotation() throws Exception {
 //        System.out.println("MAPPED (JETTISON) NOTATION");
