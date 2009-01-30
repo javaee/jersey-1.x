@@ -174,4 +174,13 @@ public interface ClientConfig {
      *         given property name.
      */
     Object getProperty(String propertyName);
+    
+    /**
+     * Get a feature that is boolean property of the property bag.
+     *
+     * @param featureName the name of the feature;
+     * @return true if the feature value is present and is an instance of
+     *         <code>Boolean</code> and that value is true, otherwise false.
+     */
+    public boolean getPropertyAsFeature(String featureName);
 }

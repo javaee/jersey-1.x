@@ -61,13 +61,13 @@ public abstract class ClientRequest {
     public abstract Map<String, Object> getProperties();
 
     /**
-     * Get a boolean property from the property bag.
+     * Get a feature that is boolean property of the property bag.
      *
-     * @param name the name of the property;
-     * @return true if the property value is present and is an instance of
+     * @param name the name of the feature;
+     * @return true if the feature value is present and is an instance of
      *         <code>Boolean</code> and that value is true, otherwise false.
      */
-    public boolean getBooleanProperty(String name) {
+    public boolean getPropertyAsFeature(String name) {
         Boolean v = (Boolean)getProperties().get(name);
         return (v != null) ? v : false;
     }

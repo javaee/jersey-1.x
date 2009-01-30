@@ -82,4 +82,9 @@ public class DefaultClientConfig implements ClientConfig {
     public Object getProperty(String propertyName) {
         return properties.get(propertyName);
     }
+    
+    public boolean getPropertyAsFeature(String name) {
+        Boolean v = (Boolean)getProperties().get(name);
+        return (v != null) ? v : false;
+    }
 }

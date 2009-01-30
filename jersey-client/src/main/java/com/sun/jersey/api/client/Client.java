@@ -403,7 +403,7 @@ public class Client extends Filterable implements ClientHandler {
      * 
      * @return a default client handler.
      */
-    public static ClientHandler createDefaultClientHander() {
+    private static ClientHandler createDefaultClientHander() {
         return new URLConnectionClientHandler();
     }
 }
