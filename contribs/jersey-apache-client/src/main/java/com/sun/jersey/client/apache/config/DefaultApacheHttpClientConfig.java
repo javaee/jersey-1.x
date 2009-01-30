@@ -54,7 +54,7 @@ public class DefaultApacheHttpClientConfig extends DefaultClientConfig
 
     public ApacheHttpClientState getState() {
         Map<String, Object> props = getProperties();
-        ApacheHttpClientState state = (ApacheHttpClientState) props.get(PROPERTY_HTTP_STATE);
+        ApacheHttpClientState state = (ApacheHttpClientState)props.get(PROPERTY_HTTP_STATE);
 
         if (state == null) {
             state = new ApacheHttpClientState();

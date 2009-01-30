@@ -34,7 +34,7 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-package com.sun.jersey.client.apache.impl;
+package com.sun.jersey.client.apache;
 
 import com.sun.jersey.client.apache.config.DefaultCredentialsProvider;
 import com.sun.jersey.client.apache.config.DefaultApacheHttpClientConfig;
@@ -67,9 +67,7 @@ import org.apache.commons.httpclient.HttpMethod;
 import org.apache.commons.httpclient.HostConfiguration;
 import org.apache.commons.httpclient.ProxyHost;
 import org.apache.commons.httpclient.Header;
-import org.apache.commons.httpclient.HttpConnection;
 import org.apache.commons.httpclient.HttpState;
-import org.apache.commons.httpclient.MultiThreadedHttpConnectionManager;
 import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.httpclient.methods.DeleteMethod;
 import org.apache.commons.httpclient.methods.PostMethod;
@@ -115,23 +113,21 @@ public final class ApacheHttpClientHandler extends TerminatingClientHandler {
 
     private static final DefaultCredentialsProvider DEFAULT_CREDENTIALS_PROVIDER =
             new DefaultCredentialsProvider();
-    private HttpClient client = new HttpClient(new MultiThreadedHttpConnectionManager());
+    
+    private final HttpClient client;
 
+    public ApacheHttpClientHandler(HttpClient client) {
+        this.client = client;
+    }
+
+    public HttpClient getHttpClient() {
+        return client;
+    }
+    
     public ClientResponse handle(ClientRequest cr)
             throws ClientHandlerException {
 
-        Map<String, Object> props = cr.getProperties();
-
-        // Seems that this property can only be set on the client
-        client.getParams().setAuthenticationPreemptive(cr.getBooleanProperty(ApacheHttpClientConfig.PROPERTY_PREEMPTIVE_AUTHENTICATION));
-
-
-        // This can be set on HttpConnectionParams
-        Integer connectTimeout = (Integer)props.get(ApacheHttpClientConfig.PROPERTY_CONNECT_TIMEOUT);
-        if (connectTimeout != null) {
-            client.getHttpConnectionManager().getParams().setConnectionTimeout(connectTimeout);
-        }
-
+        final Map<String, Object> props = cr.getProperties();
 
         final HttpMethod method = getHttpMethod(cr);
 
@@ -140,12 +136,12 @@ public final class ApacheHttpClientHandler extends TerminatingClientHandler {
         final HttpMethodParams methodParams = method.getParams();
 
         // Set the handle cookies property
-        if (!cr.getBooleanProperty(ApacheHttpClientConfig.PROPERTY_HANDLE_COOKIES)) {
+        if (!cr.getPropertyAsFeature(ApacheHttpClientConfig.PROPERTY_HANDLE_COOKIES)) {
             methodParams.setCookiePolicy(CookiePolicy.IGNORE_COOKIES);
         }
 
         // Set the interactive and credential provider properties
-        if (cr.getBooleanProperty(ApacheHttpClientConfig.PROPERTY_INTERACTIVE)) {
+        if (cr.getPropertyAsFeature(ApacheHttpClientConfig.PROPERTY_INTERACTIVE)) {
             CredentialsProvider provider = (CredentialsProvider)props.get(ApacheHttpClientConfig.PROPERTY_CREDENTIALS_PROVIDER);
             if (provider == null) {
                 provider = DEFAULT_CREDENTIALS_PROVIDER;
@@ -165,7 +161,7 @@ public final class ApacheHttpClientHandler extends TerminatingClientHandler {
 
         if (method instanceof EntityEnclosingMethod) {
             EntityEnclosingMethod entMethod = (EntityEnclosingMethod) method;
-            Integer chunkedEncodingSize = (Integer) props.get(ApacheHttpClientConfig.PROPERTY_CHUNKED_ENCODING_SIZE);
+            Integer chunkedEncodingSize = (Integer)props.get(ApacheHttpClientConfig.PROPERTY_CHUNKED_ENCODING_SIZE);
             if (chunkedEncodingSize != null) {
                 //
                 //  There doesn't seems to be a way to set the
@@ -198,31 +194,12 @@ public final class ApacheHttpClientHandler extends TerminatingClientHandler {
             }
         } else {
             // Follow redirects
-            method.setFollowRedirects(cr.getBooleanProperty(ApacheHttpClientConfig.PROPERTY_FOLLOW_REDIRECTS));
+            method.setFollowRedirects(cr.getPropertyAsFeature(ApacheHttpClientConfig.PROPERTY_FOLLOW_REDIRECTS));
         }
 
         try {
-
-            /*
-            {
-                HttpConnection connection = client.getHttpConnectionManager().
-                        getConnection(getHostConfiguration(client, props));
-
-                final Integer readTimeout = (Integer)props.get(ApacheHttpClientConfig.PROPERTY_READ_TIMEOUT);
-                if (readTimeout != null) {
-                    connection.getParams().setSoTimeout(readTimeout);
-                }
-
-                Integer connectTimeout = (Integer)props.get(ApacheHttpClientConfig.PROPERTY_CONNECT_TIMEOUT);
-                if (connectTimeout != null) {
-                    connection.getParams().setConnectionTimeout(connectTimeout);
-                }
-
-                method.execute(getHttpState(client, props), connection);
-            }
-            */
-
             client.executeMethod(getHostConfiguration(client, props), method, getHttpState(client, props));
+            
             return new HttpClientResponse(method);
         } catch (Exception e) {
             method.releaseConnection();
@@ -278,7 +255,7 @@ public final class ApacheHttpClientHandler extends TerminatingClientHandler {
             }
             return hostConfig;
         } else {
-            return client.getHostConfiguration();
+            return null;
         }
     }
 
@@ -287,7 +264,7 @@ public final class ApacheHttpClientHandler extends TerminatingClientHandler {
         if (httpState != null) {
             return httpState.getHttpState();
         } else {
-            return client.getState();
+            return null;
         }
     }
 
@@ -333,7 +310,7 @@ public final class ApacheHttpClientHandler extends TerminatingClientHandler {
         return headers;
     }
 
-    private final class HttpClientResponseInputStream extends FilterInputStream {
+    private static final class HttpClientResponseInputStream extends FilterInputStream {
 
         private final HttpMethod method;
 

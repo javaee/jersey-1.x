@@ -43,9 +43,9 @@
         <artifactId>jersey-contribs</artifactId>
         <version>1.0.2-SNAPSHOT</version>
     </parent>
-    <artifactId>apache-client</artifactId>
+    <artifactId>jersey-apache-client</artifactId>
     <packaging>jar</packaging>
-    <name>apache-client</name>
+    <name>Jersey Apache HTTP Client</name>
     <dependencies>
         <dependency>
             <groupId>com.sun.jersey</groupId>
@@ -53,14 +53,26 @@
             <version>${project.version}</version>
         </dependency>
         <dependency>
-          <groupId>commons-httpclient</groupId>
-          <artifactId>commons-httpclient</artifactId>
-          <version>3.1</version>
+            <groupId>commons-httpclient</groupId>
+            <artifactId>commons-httpclient</artifactId>
+            <version>3.1</version>
         </dependency>
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
             <version>3.8.1</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.sun.grizzly</groupId>
+            <artifactId>grizzly-servlet-webserver</artifactId>
+            <version>1.8.6.4</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.sun.jersey</groupId>
+            <artifactId>jersey-server</artifactId>
+            <version>${project.version}</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
