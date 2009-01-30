@@ -254,9 +254,13 @@ public final class JSONJAXBContext extends JAXBContext implements JSONConfigurat
      * @throws JAXBException if an error was encountered while creating the
      *         underlying JAXBContext.
      */
-    public JSONJAXBContext(JSONConfiguration config, Class... classesToBeBound) throws JAXBException {
+    public JSONJAXBContext(final JSONConfiguration config, final Class... classesToBeBound) throws JAXBException {
         jsonConfiguration = config;
-        jaxbContext = JAXBContext.newInstance(classesToBeBound);
+        if (config.getNotation() == JSONConfiguration.Notation.NATURAL) {
+            jaxbContext = JAXBContext.newInstance(classesToBeBound, new HashMap<String,Object>(1){{put(JAXBContextImpl.RETAIN_REFERENCE_TO_INFO, Boolean.TRUE);}});
+        } else {
+            jaxbContext = JAXBContext.newInstance(classesToBeBound);
+        }
     }
 
     /**
@@ -294,10 +298,17 @@ public final class JSONJAXBContext extends JAXBContext implements JSONConfigurat
      * @throws JAXBException if an error was encountered while creating the
      *         underlying JAXBContext.
      */
-    public JSONJAXBContext(JSONConfiguration config, Class[] classesToBeBound, Map<String, Object> properties)
+    public JSONJAXBContext(final JSONConfiguration config, final Class[] classesToBeBound, final Map<String, Object> properties)
             throws JAXBException {
         jsonConfiguration = config;
-        jaxbContext = JAXBContext.newInstance(classesToBeBound, properties);
+        if (config.getNotation() == JSONConfiguration.Notation.NATURAL) {
+            Map<String,Object> myProps = new HashMap<String, Object>(properties.size() + 1);
+            myProps.putAll(properties);
+            myProps.put(JAXBContextImpl.RETAIN_REFERENCE_TO_INFO, Boolean.TRUE);
+            jaxbContext = JAXBContext.newInstance(classesToBeBound, myProps);
+        } else {
+            jaxbContext = JAXBContext.newInstance(classesToBeBound, properties);
+        }
     }
 
     /**
@@ -327,7 +338,11 @@ public final class JSONJAXBContext extends JAXBContext implements JSONConfigurat
      */
     public JSONJAXBContext(JSONConfiguration config, String contextPath)
             throws JAXBException {
-        jaxbContext = JAXBContext.newInstance(contextPath, Thread.currentThread().getContextClassLoader());
+        if (config.getNotation() == JSONConfiguration.Notation.NATURAL) {
+            jaxbContext = JAXBContext.newInstance(contextPath, Thread.currentThread().getContextClassLoader(), new HashMap<String,Object>(1){{put(JAXBContextImpl.RETAIN_REFERENCE_TO_INFO, Boolean.TRUE);}});
+        } else {
+            jaxbContext = JAXBContext.newInstance(contextPath, Thread.currentThread().getContextClassLoader());
+        }
         jsonConfiguration = config;
     }
     
@@ -384,9 +399,14 @@ public final class JSONJAXBContext extends JAXBContext implements JSONConfigurat
      */
     public JSONJAXBContext(JSONConfiguration config, String contextPath, ClassLoader classLoader,  Map<String, Object> properties)
             throws JAXBException {
-        jaxbContext = JAXBContext.newInstance(contextPath,
-                classLoader,
-                createProperties(properties));
+        if (config.getNotation() == JSONConfiguration.Notation.NATURAL) {
+            Map<String,Object> myProps = new HashMap<String, Object>(properties.size() + 1);
+            myProps.putAll(properties);
+            myProps.put(JAXBContextImpl.RETAIN_REFERENCE_TO_INFO, Boolean.TRUE);
+            jaxbContext = JAXBContext.newInstance(contextPath,  classLoader,  myProps);
+        } else {
+            jaxbContext = JAXBContext.newInstance(contextPath,  classLoader,  properties);
+        }
         jsonConfiguration = config;
     }
 
