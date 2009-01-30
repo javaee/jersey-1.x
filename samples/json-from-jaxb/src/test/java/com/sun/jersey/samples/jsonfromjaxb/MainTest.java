@@ -40,11 +40,14 @@ package com.sun.jersey.samples.jsonfromjaxb;
 import com.sun.grizzly.http.SelectorThread;
 import junit.framework.TestCase;
 import com.sun.jersey.api.client.Client;
+import com.sun.jersey.api.client.GenericType;
 import com.sun.jersey.api.client.WebResource;
 import com.sun.jersey.api.client.config.ClientConfig;
 import com.sun.jersey.api.client.config.DefaultClientConfig;
 import com.sun.jersey.samples.jsonfromjaxb.config.JAXBContextResolver;
+import com.sun.jersey.samples.jsonfromjaxb.jaxb.AircraftType;
 import com.sun.jersey.samples.jsonfromjaxb.jaxb.Flights;
+import java.util.List;
 /**
  *
  * @author japod
@@ -178,6 +181,20 @@ public class MainTest extends TestCase {
         // check that the flight entry in retrieved list has FlightID OK!@%
         assertEquals("Retrieved flight ID doesn't match the expected value",
                 "OK125", updatedFlights.getFlight().get(0).getFlightId());
+    }
+
+    /**
+     * Test check GET on the "aircrafts" resource in "application/json" format.
+     */
+    public void testGetOnAircraftsJSONFormat() {
+        GenericType<List<AircraftType>> genericType =
+                new GenericType<List<AircraftType>>() {};
+        // get the initial representation
+        List<AircraftType> aircraftTypes = r.path("aircrafts").
+                accept("application/json").get(genericType);
+        // check that there are two aircraft type entries
+        assertEquals("Expected number of initial aircraft types not found",
+                2, aircraftTypes.size());
     }
 
 }

@@ -39,6 +39,7 @@ package com.sun.jersey.samples.jsonfromjaxb.config;
 
 import com.sun.jersey.api.json.JSONConfiguration;
 import com.sun.jersey.api.json.JSONJAXBContext;
+import com.sun.jersey.samples.jsonfromjaxb.jaxb.AircraftType;
 import com.sun.jersey.samples.jsonfromjaxb.jaxb.FlightType;
 import com.sun.jersey.samples.jsonfromjaxb.jaxb.Flights;
 import java.util.Arrays;
@@ -59,7 +60,7 @@ public final class JAXBContextResolver implements ContextResolver<JAXBContext> {
     
     private final Set<Class> types;
     
-    private final Class[] cTypes = {Flights.class, FlightType.class};
+    private final Class[] cTypes = {Flights.class, FlightType.class, AircraftType.class};
     
     public JAXBContextResolver() throws Exception {
         this.types = new HashSet(Arrays.asList(cTypes));

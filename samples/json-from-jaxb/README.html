@@ -13,12 +13,13 @@
   <body>
     <h1>JsonFromJaxb Example</h1>
     <p>This example demonstrates how to use JSON representation of JAXB based resources. 
-    <p>A simple web application is presented with just one resource: flight list. A client can obtain
-the list or update it using XML or JSON representation of the list. 
+    <p>A simple web application is presented with two resources: a flight list and a aircraft type list. A client can obtain
+the former list or update it using XML or JSON representation. The second list is read-only and shows how to provide JSON array using List&gt;JAXBBean&lt; objects.
      
 
     <h2>Contents</h2>
     <p>The flight list web resource is implemented by <code>com.sun.jersey.samples.jsonfromjaxb.resources.FlightList</code> class.
+    The aircraft type list web resource is implemented by <code>com.sun.jersey.samples.jsonfromjaxb.resources.AircraftTypeList</code> class.
     <p>The mapping of the URI path space is presented in the following table:</p>
 	<table border="1">
 	<tr>
@@ -32,9 +33,14 @@ the list or update it using XML or JSON representation of the list.
 	<td>FlightList</td>
 	<td>GET, PUT</td>
 	</tr>
-	<tr>
 
-	</table>
+	<tr>
+	<td>/aircrafts/</td>
+	<td>AircraftTypeList</td>
+	<td>GET</td>
+	</tr>
+
+    </table>
 
     <h2>Running the Example</h2>
          <p>Run the example as follows:</p>
@@ -51,6 +57,9 @@ mvn clean compile exec:java</pre></blockquote>
     
         <p>Get the list of flights in XML format:</p>
         <blockquote><pre>curl -HAccept:application/xml http://localhost:9998/jsonfromjaxb/flights</pre></blockquote>
+
+        <p>Get the list of aircraft types in JSON format:</p>
+        <blockquote><pre>curl -HAccept:application/json http://localhost:9998/jsonfromjaxb/aircrafts</pre></blockquote>
 
         <p>You can also see test classes at <code>src/main/test</code> subdirectory
          for detail information how to consume the service using Jersey client API</p>
