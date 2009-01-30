@@ -50,6 +50,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.ext.Providers;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
+import javax.xml.bind.Unmarshaller;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
@@ -90,8 +91,9 @@ public class XMLListElementProvider extends AbstractListElementProvider {
             return m.getSubtype().endsWith("+xml");
         }
     }
-    
-    protected final XMLStreamReader getXMLStreamReader(MediaType mediaType,
+
+    @Override
+    protected final XMLStreamReader getXMLStreamReader(Class<?> elementType, MediaType mediaType, Unmarshaller u,
             InputStream entityStream)
             throws XMLStreamException {
         return XMLInputFactory.newInstance().

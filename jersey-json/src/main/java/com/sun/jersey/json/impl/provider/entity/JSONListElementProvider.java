@@ -37,12 +37,12 @@
 
 package com.sun.jersey.json.impl.provider.entity;
 
+import com.sun.jersey.api.json.JSONConfigurated;
 import com.sun.jersey.api.json.JSONConfiguration;
 import com.sun.jersey.core.provider.jaxb.AbstractListElementProvider;
 import com.sun.jersey.json.impl.JSONMarshaller;
 import com.sun.jersey.json.impl.Stax2JsonFactory;
 import com.sun.jersey.json.impl.reader.JsonXmlStreamReader;
-import com.sun.jersey.json.impl.writer.JsonXmlStreamWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -59,6 +59,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.ext.Providers;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
+import javax.xml.bind.Unmarshaller;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
@@ -121,12 +122,11 @@ public class JSONListElementProvider extends AbstractListElementProvider {
     }
 
     @Override
-    protected final XMLStreamReader getXMLStreamReader(MediaType mediaType, InputStream entityStream) throws XMLStreamException {
-        try {
-            return new JsonXmlStreamReader(new InputStreamReader(entityStream), true);
-        } catch (IOException ex) {
-            Logger.getLogger(JSONListElementProvider.class.getName()).log(Level.SEVERE, null, ex);
-            throw new XMLStreamException(ex.getMessage(), ex);
+    protected final XMLStreamReader getXMLStreamReader(Class<?> elementType, MediaType mediaType, Unmarshaller u, InputStream entityStream) throws XMLStreamException {
+        JSONConfiguration c = JSONConfiguration.DEFAULT;
+        if (u instanceof JSONConfigurated) {
+            c = ((JSONConfigurated) u).getJSONConfiguration();
         }
+        return Stax2JsonFactory.createReader(new InputStreamReader(entityStream), c, getRootElementName(elementType));
     }
 }

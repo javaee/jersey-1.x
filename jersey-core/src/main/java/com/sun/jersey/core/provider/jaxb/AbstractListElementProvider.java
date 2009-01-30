@@ -178,7 +178,7 @@ public abstract class AbstractListElementProvider extends AbstractJAXBProvider<O
                     ? type.getComponentType()
                     : getElementClass(type, genericType);                
             final Unmarshaller u = getUnmarshaller(elementType, mediaType);            
-            final XMLStreamReader r = getXMLStreamReader(mediaType, entityStream);            
+            final XMLStreamReader r = getXMLStreamReader(elementType, mediaType, u, entityStream);
             final List l = new ArrayList();
             
             // Move to root element
@@ -226,12 +226,14 @@ public abstract class AbstractListElementProvider extends AbstractJAXBProvider<O
     /**
      * Get the XMLStreamReader for unmarshalling.
      *
+     * @param elementType the individual element type.
      * @param mediaType the media type.
+     * @param unmarshaller the unmarshaller as a carrier of possible config options.
      * @param entityStream the input stream.
      * @return the XMLStreamReader.
      * @throws javax.xml.stream.XMLStreamException
      */
-    protected abstract XMLStreamReader getXMLStreamReader(MediaType mediaType,
+    protected abstract XMLStreamReader getXMLStreamReader(Class<?> elementType, MediaType mediaType, Unmarshaller unmarshaller,
             InputStream entityStream)
             throws XMLStreamException;
 
