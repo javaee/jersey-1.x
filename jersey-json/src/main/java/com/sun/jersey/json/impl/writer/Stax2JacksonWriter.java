@@ -62,30 +62,25 @@ import org.codehaus.jackson.JsonGenerator;
  */
 public class Stax2JacksonWriter implements XMLStreamWriter {
 
-    private enum GeneralType {
-        // TODO: get rid of PRIMITIVE, need just ARRAY/OTHER
-        PRIMITIVE, ARRAY, OTHER;
-    }
-
     private static class ProcessingInfo {
 
         RuntimePropertyInfo rpi;
-        GeneralType gt;
+        boolean isArray;
         Type t;
         ProcessingInfo lastUnderlyingPI;
         boolean startObjectWritten = false;
         boolean afterFN = false;
         String elementName;
 
-        public ProcessingInfo(String elementName, RuntimePropertyInfo rpi, GeneralType gt, Type t) {
+        public ProcessingInfo(String elementName, RuntimePropertyInfo rpi, boolean isArray, Type t) {
             this.elementName = elementName;
             this.rpi = rpi;
-            this.gt = gt;
+            this.isArray = isArray;
             this.t = t;
         }
 
         public ProcessingInfo(ProcessingInfo pi) {
-            this(pi.elementName, pi.rpi, pi.gt, pi.t);
+            this(pi.elementName, pi.rpi, pi.isArray, pi.t);
         }
 
         @Override
@@ -100,7 +95,7 @@ public class Stax2JacksonWriter implements XMLStreamWriter {
             if (this.rpi != other.rpi && (this.rpi == null || !this.rpi.equals(other.rpi))) {
                 return false;
             }
-            if (this.gt != other.gt) {
+            if (this.isArray != other.isArray) {
                 return false;
             }
             if (this.t != other.t && (this.t == null || !this.t.equals(other.t))) {
@@ -113,12 +108,11 @@ public class Stax2JacksonWriter implements XMLStreamWriter {
         public int hashCode() {
             int hash = 5;
             hash = 47 * hash + (this.rpi != null ? this.rpi.hashCode() : 0);
-            hash = 47 * hash + (this.gt != null ? this.gt.hashCode() : 0);
+            hash = 47 * hash + (this.isArray ? 1 : 0);
             hash = 47 * hash + (this.t != null ? this.t.hashCode() : 0);
             return hash;
         }
     }
-    
     JsonGenerator generator;
     final List<ProcessingInfo> processingStack = new ArrayList<ProcessingInfo>();
     boolean writingAttr = false;
@@ -160,42 +154,30 @@ public class Stax2JacksonWriter implements XMLStreamWriter {
             pushPropInfo(localName);
             ProcessingInfo currentPI = peek(processingStack);
             ProcessingInfo parentPI = peek2nd(processingStack);
-            switch (currentPI.gt) {
-                case PRIMITIVE:
-                    if ((parentPI != null) && (parentPI.lastUnderlyingPI != null) && (parentPI.lastUnderlyingPI.gt == GeneralType.ARRAY)) {
-                        //cleanlyEndObject(parentPI.lastUnderlyingPI);
-                        generator.writeEndArray();
-                    }
-                    ensureStartObjectBeforeFieldName(parentPI);
-                    generator.writeFieldName(localName);
-                    currentPI.afterFN = true;
-                    break;
-                case OTHER:
-                    if ((parentPI != null) && (parentPI.lastUnderlyingPI != null) && (parentPI.lastUnderlyingPI.gt == GeneralType.ARRAY)) {
+            if (!currentPI.isArray) {
+                if ((parentPI != null) && (parentPI.lastUnderlyingPI != null) && (parentPI.lastUnderlyingPI.isArray)) {
+                    generator.writeEndArray();
+                    parentPI.afterFN = false;
+                }
+                ensureStartObjectBeforeFieldName(parentPI);
+                generator.writeFieldName(localName);
+                currentPI.afterFN = true;
+            } else {
+                if ((parentPI == null) || (!currentPI.equals(parentPI.lastUnderlyingPI))) {
+                    // not the same array, need to close the last array off?
+                    if ((parentPI != null) && (parentPI.lastUnderlyingPI != null) && (parentPI.lastUnderlyingPI.isArray)) {
                         generator.writeEndArray();
                         parentPI.afterFN = false;
                     }
+                    // now start the new array
                     ensureStartObjectBeforeFieldName(parentPI);
                     generator.writeFieldName(localName);
+                    generator.writeStartArray();
                     currentPI.afterFN = true;
-                    break;
-                case ARRAY:
-                    if ((parentPI == null) || (!currentPI.equals(parentPI.lastUnderlyingPI))) {
-                        // not the same array, need to close the last array off?
-                        if ((parentPI != null) && (parentPI.lastUnderlyingPI != null) && (parentPI.lastUnderlyingPI.gt == GeneralType.ARRAY)) {
-                            generator.writeEndArray();
-                            parentPI.afterFN = false;
-                        }
-                        // now start the new array
-                        ensureStartObjectBeforeFieldName(parentPI);
-                        generator.writeFieldName(localName);
-                        generator.writeStartArray();
-                        currentPI.afterFN = true;
-                    } else {
-                        // next array element
-                        currentPI.afterFN = true;
-                    }
-                    break;
+                } else {
+                    // next array element
+                    currentPI.afterFN = true;
+                }
             }
         } catch (IOException ex) {
             Logger.getLogger(Stax2JacksonWriter.class.getName()).log(Level.SEVERE, null, ex);
@@ -259,26 +241,26 @@ public class Stax2JacksonWriter implements XMLStreamWriter {
         if (null == rt) {
             if (writingAttr) {
                 // this should not happen:
-                processingStack.add(new ProcessingInfo(elementName, ri, GeneralType.PRIMITIVE, null));
+                processingStack.add(new ProcessingInfo(elementName, ri, false, null));
                 return;
             } else {
-                processingStack.add(new ProcessingInfo(elementName, ri, GeneralType.OTHER, null));
+                processingStack.add(new ProcessingInfo(elementName, ri, false, null));
                 return;
             }
         }
         if (primitiveTypes.contains(rt)) {
-            processingStack.add(new ProcessingInfo(elementName, ri, GeneralType.PRIMITIVE, rt));
+            processingStack.add(new ProcessingInfo(elementName, ri, false, rt));
             return;
         }
         if (ri.isCollection()) { // another array
-            if (!((parentPI != null) && (parentPI.gt == GeneralType.ARRAY) && (parentPI.rpi == ri))) {
+            if (!((parentPI != null) && (parentPI.isArray) && (parentPI.rpi == ri))) {
                 // another array
-                processingStack.add(new ProcessingInfo(elementName, ri, GeneralType.ARRAY, rt));
+                processingStack.add(new ProcessingInfo(elementName, ri, true, rt));
                 return;
             }
         }
         // something else
-        processingStack.add(new ProcessingInfo(elementName, ri, GeneralType.OTHER, rt));
+        processingStack.add(new ProcessingInfo(elementName, ri, false, rt));
         return;
     }
 
@@ -313,14 +295,10 @@ public class Stax2JacksonWriter implements XMLStreamWriter {
             if (currentPI != null) {
                 currentPI.lastUnderlyingPI = removedPI;
             }
-            if (removedPI.gt != GeneralType.ARRAY) {
+            if (!removedPI.isArray) {
                 // need to check first, if there was an array to be closed off
-                if (removedPI.lastUnderlyingPI != null) {
-                    switch (removedPI.lastUnderlyingPI.gt) {
-                        case ARRAY:
-                            generator.writeEndArray();
-                            break;
-                    }
+                if ((removedPI.lastUnderlyingPI != null) && (removedPI.lastUnderlyingPI.isArray)) {
+                    generator.writeEndArray();
                 }
             }
             cleanlyEndObject(removedPI);
@@ -367,7 +345,7 @@ public class Stax2JacksonWriter implements XMLStreamWriter {
 
     // TODO: need it parameterized
     final static boolean attrsWithPrefix = false;
-    
+
     public void writeAttribute(String prefix, String namespaceURI, String localName, String value) throws XMLStreamException {
         writingAttr = true;
         writeStartElement(prefix, attrsWithPrefix ? ("@" + localName) : localName, namespaceURI);
