@@ -40,9 +40,8 @@ package com.sun.jersey.json.impl.provider.entity;
 import com.sun.jersey.api.json.JSONConfigurated;
 import com.sun.jersey.api.json.JSONConfiguration;
 import com.sun.jersey.core.provider.jaxb.AbstractListElementProvider;
-import com.sun.jersey.json.impl.JSONMarshaller;
+import com.sun.jersey.json.impl.JSONHelper;
 import com.sun.jersey.json.impl.Stax2JsonFactory;
-import com.sun.jersey.json.impl.reader.JsonXmlStreamReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -98,12 +97,9 @@ public class JSONListElementProvider extends AbstractListElementProvider {
     @Override
     public final void writeList(Class<?> elementType, Collection<?> t, MediaType mediaType, Charset c, Marshaller m, OutputStream entityStream) throws JAXBException, IOException {
         final OutputStreamWriter osw = new OutputStreamWriter(entityStream, c);
-        // TODO: should reuse customization options from the marshaller (if it is JSONMarshaller)
-        // TODO: should force the elementType being treated as array (for 1-elem lists)
         JSONConfiguration jsonConfig = JSONConfiguration.DEFAULT;
-        if (m instanceof JSONMarshaller) {
-            JSONMarshaller jm = (JSONMarshaller)m;
-            jsonConfig = jm.getJSONConfiguration();
+        if (m instanceof JSONConfigurated) {
+            jsonConfig = ((JSONConfigurated)m).getJSONConfiguration();
         }
         final XMLStreamWriter jxsw = Stax2JsonFactory.createWriter(osw, jsonConfig, true);
         try {
@@ -127,6 +123,6 @@ public class JSONListElementProvider extends AbstractListElementProvider {
         if (u instanceof JSONConfigurated) {
             c = ((JSONConfigurated) u).getJSONConfiguration();
         }
-        return Stax2JsonFactory.createReader(new InputStreamReader(entityStream), c, getRootElementName(elementType));
+        return Stax2JsonFactory.createReader(new InputStreamReader(entityStream), c, JSONHelper.getRootElementName((Class)elementType), true);
     }
 }
