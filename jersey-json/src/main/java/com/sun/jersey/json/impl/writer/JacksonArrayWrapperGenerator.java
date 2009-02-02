@@ -46,6 +46,7 @@ import org.codehaus.jackson.JsonGenerationException;
 import org.codehaus.jackson.JsonGenerator;
 import org.codehaus.jackson.JsonParser;
 import org.codehaus.jackson.JsonProcessingException;
+import org.codehaus.jackson.JsonToken;
 import org.codehaus.jackson.JsonWriteContext;
 
 /**
@@ -54,6 +55,9 @@ import org.codehaus.jackson.JsonWriteContext;
  */
 public class JacksonArrayWrapperGenerator extends JsonGenerator {
 
+   private enum State { START, AFTER_NULL, IN_THE_MIDDLE };
+
+   State state = State.START;
    JsonGenerator generator;
 
    private JacksonArrayWrapperGenerator() {
@@ -61,15 +65,21 @@ public class JacksonArrayWrapperGenerator extends JsonGenerator {
 
     private JacksonArrayWrapperGenerator(JsonGenerator generator) {
         this.generator = generator;
-        try {
-            generator.writeStartArray();
-        } catch (IOException ex) {
-            Logger.getLogger(JacksonArrayWrapperGenerator.class.getName()).log(Level.SEVERE, null, ex);
-        }
     }
 
     public static JsonGenerator createArrayWrapperGenerator(JsonGenerator g) {
         return new JacksonArrayWrapperGenerator(g);
+    }
+
+    private void aboutToWriteANonNull() throws IOException {
+        if (state == State.START) {
+            generator.writeStartArray();
+            state = State.IN_THE_MIDDLE;
+        } else if(state == State.AFTER_NULL) {
+            generator.writeStartArray();
+            generator.writeNull();
+            state = State.IN_THE_MIDDLE;
+        }
     }
 
     @Override
@@ -99,107 +109,141 @@ public class JacksonArrayWrapperGenerator extends JsonGenerator {
 
     @Override
     public void writeStartArray() throws IOException, JsonGenerationException {
+        aboutToWriteANonNull();
         generator.writeStartArray();
     }
 
     @Override
     public void writeEndArray() throws IOException, JsonGenerationException {
+        aboutToWriteANonNull();
         generator.writeEndArray();
     }
 
     @Override
     public void writeStartObject() throws IOException, JsonGenerationException {
-            generator.writeStartObject();
+        aboutToWriteANonNull();
+        generator.writeStartObject();
     }
 
     @Override
     public void writeEndObject() throws IOException, JsonGenerationException {
-            generator.writeEndObject();
+        aboutToWriteANonNull();
+        generator.writeEndObject();
     }
 
     @Override
     public void writeFieldName(String name) throws IOException, JsonGenerationException {
-            generator.writeFieldName(name);
+        aboutToWriteANonNull();
+        generator.writeFieldName(name);
     }
 
     @Override
     public void writeString(String s) throws IOException, JsonGenerationException {
+        aboutToWriteANonNull();
         generator.writeString(s);
     }
 
     @Override
     public void writeString(char[] text, int start, int length) throws IOException, JsonGenerationException {
+        aboutToWriteANonNull();
         generator.writeString(text, start, length);
     }
 
     @Override
     public void writeRaw(String raw) throws IOException, JsonGenerationException {
+        aboutToWriteANonNull();
         generator.writeRaw(raw);
     }
 
     @Override
     public void writeRaw(String raw, int start, int length) throws IOException, JsonGenerationException {
+        aboutToWriteANonNull();
         generator.writeRaw(raw, start, length);
     }
 
     @Override
     public void writeRaw(char[] raw, int start, int count) throws IOException, JsonGenerationException {
+        aboutToWriteANonNull();
         generator.writeRaw(raw, start, count);
     }
 
     @Override
     public void writeRaw(char c) throws IOException, JsonGenerationException {
+        aboutToWriteANonNull();
         generator.writeRaw(c);
     }
 
     @Override
     public void writeBinary(Base64Variant variant, byte[] bytes, int start, int count) throws IOException, JsonGenerationException {
+        aboutToWriteANonNull();
         generator.writeBinary(variant, bytes, start, count);
     }
 
     @Override
     public void writeNumber(int i) throws IOException, JsonGenerationException {
+        aboutToWriteANonNull();
         generator.writeNumber(i);
     }
 
     @Override
     public void writeNumber(long l) throws IOException, JsonGenerationException {
+        aboutToWriteANonNull();
         generator.writeNumber(l);
     }
 
     @Override
     public void writeNumber(double d) throws IOException, JsonGenerationException {
+        aboutToWriteANonNull();
         generator.writeNumber(d);
     }
 
     @Override
     public void writeNumber(float f) throws IOException, JsonGenerationException {
+        aboutToWriteANonNull();
         generator.writeNumber(f);
     }
 
     @Override
     public void writeNumber(BigDecimal bd) throws IOException, JsonGenerationException {
+        aboutToWriteANonNull();
         generator.writeNumber(bd);
     }
 
     @Override
     public void writeNumber(String number) throws IOException, JsonGenerationException, UnsupportedOperationException {
+        aboutToWriteANonNull();
         generator.writeNumber(number);
     }
 
     @Override
     public void writeBoolean(boolean b) throws IOException, JsonGenerationException {
+        aboutToWriteANonNull();
         generator.writeBoolean(b);
     }
 
     @Override
     public void writeNull() throws IOException, JsonGenerationException {
-        generator.writeNull();
+        switch (state) {
+            case START :
+                state = State.AFTER_NULL;
+                break;
+            case AFTER_NULL :
+                generator.writeStartArray();
+                generator.writeNull();
+                state = State.IN_THE_MIDDLE;
+            default:
+                generator.writeNull();
+        }
     }
 
     @Override
     public void copyCurrentEvent(JsonParser parser) throws IOException, JsonProcessingException {
-        generator.copyCurrentEvent(parser);
+        if (JsonToken.VALUE_NULL != parser.getCurrentToken()) {
+            aboutToWriteANonNull();
+            generator.copyCurrentEvent(parser);
+        } else {
+            writeNull();
+        }
     }
 
     @Override
@@ -219,7 +263,16 @@ public class JacksonArrayWrapperGenerator extends JsonGenerator {
 
     @Override
     public void close() throws IOException {
-        generator.writeEndArray();
+        switch (state) {
+            case IN_THE_MIDDLE :
+                generator.writeEndArray();
+                break;
+            case AFTER_NULL :
+            case START :
+                generator.writeStartArray();
+                generator.writeEndArray();
+                break;
+        }
         generator.close();
     }
 }

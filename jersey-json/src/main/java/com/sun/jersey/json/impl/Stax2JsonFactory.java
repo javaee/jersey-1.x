@@ -75,7 +75,7 @@ public class Stax2JsonFactory {
         switch (config.getNotation()) {
             case NATURAL:
                 if (writingList) {
-                    return new Stax2JacksonWriter(JacksonArrayWrapperGenerator.createArrayWrapperGenerator(JacksonRootStrippingGenerator.createRootStrippingGenerator(new JsonFactory().createJsonGenerator(writer))));
+                    return new Stax2JacksonWriter(JacksonRootStrippingGenerator.createRootStrippingGenerator(JacksonArrayWrapperGenerator.createArrayWrapperGenerator(new JsonFactory().createJsonGenerator(writer))));
                 } else {
                     return new Stax2JacksonWriter(JacksonRootStrippingGenerator.createRootStrippingGenerator(new JsonFactory().createJsonGenerator(writer)));
                 }
