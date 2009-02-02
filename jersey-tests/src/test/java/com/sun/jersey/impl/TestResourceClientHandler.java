@@ -42,7 +42,6 @@ import com.sun.jersey.api.client.ClientHandlerException;
 import com.sun.jersey.api.client.ClientRequest;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.TerminatingClientHandler;
-import com.sun.jersey.api.client.WriteRequestEntityListener;
 import com.sun.jersey.core.header.reader.HttpHeaderReader;
 import com.sun.jersey.spi.container.ContainerRequest;
 import com.sun.jersey.spi.container.ContainerResponse;
@@ -146,7 +145,7 @@ public class TestResourceClientHandler extends TerminatingClientHandler {
     private byte[] writeRequestEntity(ClientRequest ro) {
         try {
             final ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            writeRequestEntity(ro, new WriteRequestEntityListener() {
+            writeRequestEntity(ro, new RequestEntityWriterListener() {
 
                 public void onRequestEntitySize(long size) throws IOException {
                 }

@@ -59,8 +59,167 @@ import javax.ws.rs.ext.MessageBodyWriter;
  * @author Paul.Sandoz@Sun.Com
  */
 public abstract class TerminatingClientHandler implements ClientHandler {
-    private static final Annotation[] EMPTY_ANNOTATIONS = new Annotation[0];
-    
+    protected static final Annotation[] EMPTY_ANNOTATIONS = new Annotation[0];
+
+    /**
+     * A lister for listensing to events when writing a request entity.
+     * <p>
+     * The listener is registered when invoking the {@link TerminatingClientHandler#writeRequestEntity(com.sun.jersey.api.client.ClientRequest, com.sun.jersey.api.client.WriteRequestEntityListener) }
+     * method.
+     *
+     * @author Paul.Sandoz@Sun.Com
+     */
+    protected interface RequestEntityWriterListener {
+
+        /**
+         * Called when the size of the request entity is obtained.
+         * <p>
+         * Enables the appropriate setting of HTTP headers
+         * for the size of the request entity and/or configure an appropriate
+         * transport encoding.
+         *
+         * @param size the size, in bytes, of the request entity, otherwise -1
+         *        if the size cannot be determined before serialization.
+         * @throws java.io.IOException
+         */
+        void onRequestEntitySize(long size) throws IOException;
+
+        /**
+         * Called when the output stream is required to write the request
+         * entity.
+         *
+         * @return the output stream to write the request entity.
+         * @throws java.io.IOException
+         */
+        OutputStream onGetOutputStream() throws IOException;
+    }
+
+    /**
+     * A writer for writing a request entity.
+     * <p>
+     * An instance of a <code>RequestEntityWriter</code> is obtained by
+     * invoking the {@link TerminatingClientHandler#getRequestEntityWriter(com.sun.jersey.api.client.ClientRequest) }
+     * method.
+     * 
+     */
+    protected interface RequestEntityWriter {
+        /**
+         * 
+         * @return size the size, in bytes, of the request entity, otherwise -1
+         *         if the size cannot be determined before serialization.
+         */
+        long getSize();
+
+        /**
+         *
+         * @return the media type of the request entity.
+         */
+        MediaType getMediaType();
+
+        /**
+         * Write the request entity.
+         * 
+         * @param out the output stream to write the request entity.
+         * @throws java.io.IOException
+         */
+        void writeRequestEntity(OutputStream out) throws IOException;
+    }
+
+    /**
+     * 
+     */
+    private final class RequestEntityWriterImpl implements RequestEntityWriter {
+        private final ClientRequest cr;
+        private final Object entity;
+        private final Type entityType;
+        private MediaType mediaType;
+        private final long size;
+        private final MessageBodyWriter bw;
+
+        /**
+         * 
+         * @param cr
+         */
+        public RequestEntityWriterImpl(ClientRequest cr) {
+            this.cr = cr;
+
+            final Object e = cr.getEntity();
+            if (e == null)
+                throw new IllegalArgumentException("The entity of the client request is null");
+
+            if (e instanceof GenericEntity) {
+                final GenericEntity ge = (GenericEntity)e;
+                this.entity = ge.getEntity();
+                this.entityType = ge.getType();
+            } else {
+                this.entity = e;
+                this.entityType = entity.getClass();
+            }
+            final Class entityClass = entity.getClass();
+
+
+            MultivaluedMap<String, Object> metadata = cr.getMetadata();
+            final Object mediaTypeHeader = metadata.getFirst("Content-Type");
+            if (mediaTypeHeader instanceof MediaType) {
+                this.mediaType = (MediaType)mediaTypeHeader;
+            } else {
+                if (mediaTypeHeader != null) {
+                    this.mediaType = MediaType.valueOf(mediaTypeHeader.toString());
+                } else {
+                    // Content-Type is not present choose a default type
+                    List<MediaType> mediaTypes = workers.getMessageBodyWriterMediaTypes(
+                            entityClass, entityType, EMPTY_ANNOTATIONS);
+                    this.mediaType = mediaTypes.get(0);
+                    if (this.mediaType.isWildcardType() || this.mediaType.isWildcardSubtype())
+                        this.mediaType = MediaType.APPLICATION_OCTET_STREAM_TYPE;
+
+                    metadata.putSingle("Content-Type", this.mediaType);
+                }
+            }
+
+            this.bw = workers.getMessageBodyWriter(
+                    entityClass, entityType,
+                    EMPTY_ANNOTATIONS, mediaType);
+            if (bw == null) {
+                throw new ClientHandlerException(
+                        "A message body writer for Java type, " + entity.getClass() +
+                        ", and MIME media type, " + mediaType + ", was not found");
+            }
+
+            this.size = bw.getSize(
+                    entity, entityClass, entityType,
+                    EMPTY_ANNOTATIONS, mediaType);
+        }
+
+        /**
+         *
+         * @return
+         */
+        public long getSize() {
+            return size;
+        }
+
+        /**
+         * 
+         * @return
+         */
+        public MediaType getMediaType() {
+            return mediaType;
+        }
+
+        /**
+         * 
+         * @param out
+         * @throws java.io.IOException
+         */
+        public void writeRequestEntity(OutputStream out) throws IOException {
+            bw.writeTo(entity, entity.getClass(), entityType,
+                    EMPTY_ANNOTATIONS, mediaType, cr.getMetadata(),
+                    cr.getAdapter().adapt(cr, out));
+            out.flush();
+        }
+    }
+
     @Context private MessageBodyWorkers workers;
 
     protected MessageBodyWorkers getMessageBodyWorkers() {
@@ -80,6 +239,16 @@ public abstract class TerminatingClientHandler implements ClientHandler {
     }
 
     /**
+     * Get a request entity writer capable of writing the request entity.
+     * 
+     * @param ro the client request.
+     * @return the request entity writer.
+     */
+    protected RequestEntityWriter getRequestEntityWriter(ClientRequest ro) {
+        return new RequestEntityWriterImpl(ro);
+    }
+
+    /**
      * Write a request entity using an appropriate message body writer.
      * <p>
      * The method {@link WriteRequestEntityListener#onRequestEntitySize(long) } will be invoked
@@ -93,7 +262,7 @@ public abstract class TerminatingClientHandler implements ClientHandler {
      * @throws java.io.IOException
      */
     protected void writeRequestEntity(ClientRequest ro,
-            WriteRequestEntityListener listener) throws IOException {
+            RequestEntityWriterListener listener) throws IOException {
         Object entity = ro.getEntity();
         if (entity == null)
             return;

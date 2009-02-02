@@ -36,48 +36,41 @@
  */
 package com.sun.jersey.client.apache;
 
-import com.sun.jersey.client.apache.config.DefaultCredentialsProvider;
-import com.sun.jersey.client.apache.config.DefaultApacheHttpClientConfig;
-import com.sun.jersey.client.apache.config.ApacheHttpClientConfig;
-import java.io.IOException;
-import java.io.ByteArrayOutputStream;
-import java.io.FilterInputStream;
-import java.io.OutputStream;
-
-
-import java.util.List;
-import java.util.ArrayList;
-import java.util.Map;
-
-import javax.ws.rs.core.MultivaluedMap;
-
-import com.sun.jersey.core.header.InBoundHeaders;
-
 import com.sun.jersey.api.client.ClientHandlerException;
 import com.sun.jersey.api.client.ClientRequest;
 import com.sun.jersey.api.client.ClientResponse;
-
 import com.sun.jersey.api.client.TerminatingClientHandler;
-import com.sun.jersey.api.client.WriteRequestEntityListener;
+import com.sun.jersey.client.apache.config.ApacheHttpClientConfig;
 import com.sun.jersey.client.apache.config.ApacheHttpClientState;
+import com.sun.jersey.client.apache.config.DefaultApacheHttpClientConfig;
+import com.sun.jersey.client.apache.config.DefaultCredentialsProvider;
+import com.sun.jersey.core.header.InBoundHeaders;
 
+import java.io.FilterInputStream;
+import java.io.IOException;
+import java.io.OutputStream;
 import java.net.URI;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import javax.ws.rs.core.MultivaluedMap;
+
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpMethod;
-import org.apache.commons.httpclient.HostConfiguration;
-import org.apache.commons.httpclient.ProxyHost;
 import org.apache.commons.httpclient.Header;
+import org.apache.commons.httpclient.HostConfiguration;
 import org.apache.commons.httpclient.HttpState;
-import org.apache.commons.httpclient.methods.GetMethod;
-import org.apache.commons.httpclient.methods.DeleteMethod;
-import org.apache.commons.httpclient.methods.PostMethod;
-import org.apache.commons.httpclient.methods.PutMethod;
-import org.apache.commons.httpclient.methods.OptionsMethod;
+import org.apache.commons.httpclient.ProxyHost;
 import org.apache.commons.httpclient.methods.HeadMethod;
 import org.apache.commons.httpclient.methods.EntityEnclosingMethod;
-import org.apache.commons.httpclient.methods.ByteArrayRequestEntity;
 import org.apache.commons.httpclient.cookie.CookiePolicy;
 import org.apache.commons.httpclient.auth.CredentialsProvider;
+import org.apache.commons.httpclient.methods.DeleteMethod;
+import org.apache.commons.httpclient.methods.GetMethod;
+import org.apache.commons.httpclient.methods.OptionsMethod;
+import org.apache.commons.httpclient.methods.PostMethod;
+import org.apache.commons.httpclient.methods.PutMethod;
+import org.apache.commons.httpclient.methods.RequestEntity;
 import org.apache.commons.httpclient.params.HttpMethodParams;
 
 /**
@@ -160,37 +153,36 @@ public final class ApacheHttpClientHandler extends TerminatingClientHandler {
         writeOutBoundHeaders(cr.getMetadata(), method);
 
         if (method instanceof EntityEnclosingMethod) {
-            EntityEnclosingMethod entMethod = (EntityEnclosingMethod) method;
-            Integer chunkedEncodingSize = (Integer)props.get(ApacheHttpClientConfig.PROPERTY_CHUNKED_ENCODING_SIZE);
-            if (chunkedEncodingSize != null) {
-                //
-                //  There doesn't seems to be a way to set the
-                //  chunk size.
-                //
-                entMethod.setContentChunked(true);
-            } else {
-                entMethod.setContentChunked(false);
-            }
+            final EntityEnclosingMethod entMethod = (EntityEnclosingMethod) method;
 
-            Object entity = cr.getEntity();
-            if (entity != null) {
-                final ByteArrayOutputStream bout = new ByteArrayOutputStream();
-
-                try {
-                    writeRequestEntity(cr, new WriteRequestEntityListener() {
-
-                        public void onRequestEntitySize(long size) {
-                        }
-
-                        public OutputStream onGetOutputStream() throws IOException {
-                            return bout;
-                        }
-                    });
-                } catch (IOException e) {
-                    throw new ClientHandlerException(e);
+            if (cr.getEntity() != null) {
+                final Integer chunkedEncodingSize = (Integer)props.get(ApacheHttpClientConfig.PROPERTY_CHUNKED_ENCODING_SIZE);
+                if (chunkedEncodingSize != null) {
+                    // There doesn't seems to be a way to set the chunk size.
+                    entMethod.setContentChunked(true);
+                } else {
+                    entMethod.setContentChunked(false);
                 }
-                entMethod.setRequestEntity(new ByteArrayRequestEntity(bout.toByteArray(),
-                        cr.getMetadata().getFirst("Content-Type").toString()));
+
+                final RequestEntityWriter re = getRequestEntityWriter(cr);
+                entMethod.setRequestEntity(new RequestEntity() {
+                    public boolean isRepeatable() {
+                        return false;
+                    }
+
+                    public void writeRequest(OutputStream out) throws IOException {
+                        re.writeRequestEntity(out);
+                    }
+
+                    public long getContentLength() {
+                        return re.getSize();
+                    }
+
+                    public String getContentType() {
+                        return re.getMediaType().toString();
+                    }
+                    
+                });
             }
         } else {
             // Follow redirects
@@ -198,7 +190,7 @@ public final class ApacheHttpClientHandler extends TerminatingClientHandler {
         }
 
         try {
-            client.executeMethod(getHostConfiguration(client, props), method, getHttpState(client, props));
+            client.executeMethod(getHostConfiguration(client, props), method, getHttpState(props));
             
             return new HttpClientResponse(method);
         } catch (Exception e) {
@@ -259,7 +251,7 @@ public final class ApacheHttpClientHandler extends TerminatingClientHandler {
         }
     }
 
-    private HttpState getHttpState(HttpClient client, Map<String, Object> props) {
+    private HttpState getHttpState(Map<String, Object> props) {
         ApacheHttpClientState httpState = (ApacheHttpClientState) props.get(DefaultApacheHttpClientConfig.PROPERTY_HTTP_STATE);
         if (httpState != null) {
             return httpState.getHttpState();

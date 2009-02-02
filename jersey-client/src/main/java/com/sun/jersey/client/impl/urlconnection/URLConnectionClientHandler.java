@@ -41,7 +41,6 @@ import com.sun.jersey.api.client.ClientHandlerException;
 import com.sun.jersey.api.client.ClientRequest;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.TerminatingClientHandler;
-import com.sun.jersey.api.client.WriteRequestEntityListener;
 import com.sun.jersey.api.client.config.ClientConfig;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -126,7 +125,7 @@ public final class URLConnectionClientHandler extends TerminatingClientHandler {
         Object entity = ro.getEntity();
         if (entity != null) {
             uc.setDoOutput(true);
-            writeRequestEntity(ro, new WriteRequestEntityListener() {
+            writeRequestEntity(ro, new RequestEntityWriterListener() {
                 public void onRequestEntitySize(long size) {
                     if (size != -1 && size < Integer.MAX_VALUE) {
                         // HttpURLConnection uses the int type for content length
