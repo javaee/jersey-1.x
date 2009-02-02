@@ -162,6 +162,18 @@ public class WebApplicationTest extends TestCase {
         call(a, "GET", "/resource2", "RESOURCE-TWO");
         call(a, "GET", "/resource2", "RESOURCE-TWO");
     }
+
+    public void testResourcesWithSamePath() {
+        try {
+            WebApplicationImpl a = createWebApplication(
+                com.sun.jersey.impl.application.ResourceTwo.class,
+                com.sun.jersey.impl.application.AnotherResourceTwo.class);
+        } catch (Exception e) {
+            return;
+        }
+        fail("Detection of same path for various root resources failed!");
+    }
+
     
     public WebApplicationImpl createWebApplication(Class... resources) {
         final Set<Class<?>> s = new HashSet<Class<?>>();

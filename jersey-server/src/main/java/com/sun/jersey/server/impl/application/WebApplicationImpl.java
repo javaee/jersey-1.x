@@ -590,6 +590,15 @@ public final class WebApplicationImpl implements WebApplication {
         return context;
     }
 
+    private void ensureTemplateUnused(UriTemplate t, AbstractResource ar, Set<UriTemplate> templates) {
+        if (!templates.contains(t)) {
+            templates.add(t);
+        } else {
+            LOGGER.severe(ImplMessages.AMBIGUOUS_RR_PATH(ar.getResourceClass(), t));
+            throw new ContainerException(ImplMessages.AMBIGUOUS_RR_PATH(ar.getResourceClass(), t));
+        }
+    }
+
     private RulesMap<UriRule> processRootResources() {
         Set<Class<?>> classes = resourceConfig.getRootResourceClasses();
         Set<Object> singletons = resourceConfig.getRootResourceSingletons();
@@ -599,6 +608,9 @@ public final class WebApplicationImpl implements WebApplication {
         }
 
         RulesMap<UriRule> rulesMap = new RulesMap<UriRule>();
+
+        // need to validate possible conflicts in uri templates
+        Set<UriTemplate> uriTemplatesUsed = new HashSet<UriTemplate>();
 
         Set<AbstractResource> rootResources = new HashSet<AbstractResource>();
         for (Object o : singletons) {
@@ -613,16 +625,19 @@ public final class WebApplicationImpl implements WebApplication {
             ComponentInjector ci = new ComponentInjector(injectableFactory, o.getClass());
             ci.inject(o);
 
+            UriTemplate t = new PathTemplate(ar.getPath().getValue());
+
+            ensureTemplateUnused(t, ar, uriTemplatesUsed);
+
             ResourceClass r = getResourceClass(ar);
             rootResources.add(r.resource);
 
-            UriTemplate t = new PathTemplate(r.resource.getPath().getValue());
             PathPattern p = new PathPattern(t);
 
             rulesMap.put(p, new RightHandPathRule(
-                    resourceConfig.getFeature(ResourceConfig.FEATURE_REDIRECT),
-                    t.endsWithSlash(),
-                    new ResourceObjectRule(t, o)));
+                        resourceConfig.getFeature(ResourceConfig.FEATURE_REDIRECT),
+                        t.endsWithSlash(),
+                        new ResourceObjectRule(t, o)));
         }
         
         for (Class<?> c : classes) {
@@ -648,10 +663,12 @@ public final class WebApplicationImpl implements WebApplication {
                 continue;
             }
 
+            UriTemplate t = new PathTemplate(ar.getPath().getValue());
+            ensureTemplateUnused(t, ar, uriTemplatesUsed);
+
             ResourceClass r = getResourceClass(ar);
             rootResources.add(r.resource);
 
-            UriTemplate t = new PathTemplate(r.resource.getPath().getValue());
             PathPattern p = new PathPattern(t);
 
             rulesMap.put(p, new RightHandPathRule(
