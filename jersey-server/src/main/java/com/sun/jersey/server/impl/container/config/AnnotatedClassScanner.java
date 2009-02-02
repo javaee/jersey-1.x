@@ -68,7 +68,7 @@ import org.objectweb.asm.Opcodes;
  * 
  * @author Frank D. Martinez. fmartinez@asimovt.com
  */
-public final class AnnotatedClassScanner {
+public class AnnotatedClassScanner {
     private static final Logger LOGGER = 
             Logger.getLogger(AnnotatedClassScanner.class.getName());
     
