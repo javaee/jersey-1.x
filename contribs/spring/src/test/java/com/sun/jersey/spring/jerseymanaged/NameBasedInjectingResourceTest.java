@@ -36,6 +36,10 @@ import com.sun.jersey.api.client.WebResource;
  */
 public class NameBasedInjectingResourceTest extends AbstractResourceTest {
     
+    public NameBasedInjectingResourceTest() {
+        super(false);
+    }
+
     @Test
     public void testGetInjectedItems() {
         

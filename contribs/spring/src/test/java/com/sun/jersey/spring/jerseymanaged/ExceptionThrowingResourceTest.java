@@ -43,6 +43,7 @@ import com.sun.jersey.spring.AbstractResourceTest;
 public class ExceptionThrowingResourceTest extends AbstractResourceTest {
     
     public ExceptionThrowingResourceTest() {
+        super(false);
     }
 
     /* (non-Javadoc)

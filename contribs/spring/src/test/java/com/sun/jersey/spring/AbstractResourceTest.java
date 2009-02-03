@@ -56,14 +56,19 @@ public class AbstractResourceTest {
     protected String _springConfig;
     private final int _port;
     private final String _servletPath;
-    
+    private final boolean springManaged;
     
     private GrizzlyWebServer ws ;
 
     public AbstractResourceTest() {
+        this(true);
+    }
+
+    public AbstractResourceTest(boolean springManaged) {
         _springConfig = System.getProperty( "applicationContext", APPLICATION_CONTEXT_SPRING25_XML );
         _port = 9999;
         _servletPath = "/jersey-spring";
+        this.springManaged = springManaged;
     }
 
     /* (non-Javadoc)
@@ -95,10 +100,12 @@ public class AbstractResourceTest {
         sa.setServletInstance(SpringServlet.class.newInstance());
         sa.addServletListener("org.springframework.web.context.ContextLoaderListener");
         sa.addContextParameter("contextConfigLocation","classpath:"+_springConfig);
-        sa.addInitParameter( "com.sun.jersey.config.property.resourceConfigClass",
-                 PackagesResourceConfig.class.getName() );
-        sa.addInitParameter( PackagesResourceConfig.PROPERTY_PACKAGES,
-                 "com.sun.jersey.spring.jerseymanaged" );
+        if (!springManaged) {
+            sa.addInitParameter( "com.sun.jersey.config.property.resourceConfigClass",
+                     PackagesResourceConfig.class.getName() );
+            sa.addInitParameter( PackagesResourceConfig.PROPERTY_PACKAGES,
+                     "com.sun.jersey.spring.jerseymanaged" );
+        }
         sa.setServletPath(servletPath);
         ws.addGrizzlyAdapter(sa);
         ws.start();

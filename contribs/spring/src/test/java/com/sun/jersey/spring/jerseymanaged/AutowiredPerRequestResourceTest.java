@@ -38,6 +38,10 @@ public class AutowiredPerRequestResourceTest extends AbstractResourceTest {
     
     private static final String RESOURCE_PATH = "autowiredperrequest";
     
+    public AutowiredPerRequestResourceTest() {
+        super(false);
+    }
+
     @Test
     public void testGetAndUpdateSingletonItem() {
         

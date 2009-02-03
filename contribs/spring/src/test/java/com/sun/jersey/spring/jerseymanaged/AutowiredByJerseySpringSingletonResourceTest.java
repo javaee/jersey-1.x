@@ -37,6 +37,10 @@ import com.sun.jersey.api.client.WebResource;
 public class AutowiredByJerseySpringSingletonResourceTest extends AbstractResourceTest {
     
     private static final String RESOURCE_PATH = "autowiredsingleton";
+
+    public AutowiredByJerseySpringSingletonResourceTest() {
+        super(false);
+    }
     
     @Test
     public void testGetAndUpdateItem() {

@@ -36,6 +36,10 @@ import com.sun.jersey.api.client.WebResource;
  */
 public class JerseyManagedPerRequestResourceTest extends AbstractResourceTest {
     
+    public JerseyManagedPerRequestResourceTest() {
+        super(false);
+    }
+
     @Test
     public void testGetAndUpdateInjectedSingletonItem() {
         

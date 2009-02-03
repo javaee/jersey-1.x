@@ -34,8 +34,8 @@ import com.sun.jersey.api.core.ResourceConfig;
 import com.sun.jersey.core.spi.component.ioc.IoCComponentProviderFactory;
 import com.sun.jersey.spi.container.WebApplication;
 import com.sun.jersey.spi.container.servlet.ServletContainer;
+import com.sun.jersey.spi.container.servlet.WebConfig;
 import java.util.Map;
-import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 
 /**
@@ -63,7 +63,7 @@ public class SpringServlet extends ServletContainer {
 
     @Override
     protected ResourceConfig getDefaultResourceConfig(Map<String, Object> props,
-            ServletConfig servletConfig) throws ServletException  {
+            WebConfig webConfig) throws ServletException  {
         DefaultResourceConfig rc = new DefaultResourceConfig();
         rc.setPropertiesAndFeatures(props);
         return rc;
