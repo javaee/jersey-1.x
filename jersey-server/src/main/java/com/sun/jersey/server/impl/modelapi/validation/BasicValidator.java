@@ -185,16 +185,16 @@ public class BasicValidator extends AbstractModelValidator {
                 T arm2 = methods.get(j);
                 if (arm1.getHttpMethod().equalsIgnoreCase(arm2.getHttpMethod())) {
                     // check input mime types, but only for other then GET methods
-                    // TODO: check only when an entity parameter is present, do not hardcode the http GET method
-                    if (!"GET".equalsIgnoreCase(arm1.getHttpMethod())) {
+                    // TODO: check only when an entity parameter is present, do not hardcode the http GET/HEAD method
+                    if (!(("GET".equalsIgnoreCase(arm1.getHttpMethod())) || ("HEAD".equalsIgnoreCase(arm1.getHttpMethod())))) {
                         for (MediaType mt1 : arm1.getSupportedInputTypes()) {
                             for (MediaType mt2 : arm2.getSupportedInputTypes()) {
-                                if (mt1.isCompatible(mt2) && (!(mt1.isWildcardType() || mt1.isWildcardSubtype() || mt2.isWildcardType() || mt2.isWildcardSubtype()))) {
+                                if (mt1.isCompatible(mt2) && ((mt1.isWildcardType() == mt2.isWildcardType()) && (mt1.isWildcardSubtype() == mt2.isWildcardSubtype()))) {
                                     generator.generateInErrMsg(resource, arm1, arm2, mt1);
                                     // check also output mime types
                                     for (MediaType outmt1 : arm1.getSupportedOutputTypes()) {
                                         for (MediaType outmt2 : arm2.getSupportedOutputTypes()) {
-                                            if (outmt1.isCompatible(outmt2) && (!(outmt1.isWildcardType() || outmt1.isWildcardSubtype() || outmt2.isWildcardType() || outmt2.isWildcardSubtype()))) {
+                                            if (outmt1.isCompatible(outmt2) && ((outmt1.isWildcardType() == outmt2.isWildcardType()) && (outmt1.isWildcardSubtype() == outmt2.isWildcardSubtype()))) {
                                                 generator.generateOutErrMsg(resource, arm1, arm2, outmt1);
                                             }
                                         }
@@ -202,10 +202,10 @@ public class BasicValidator extends AbstractModelValidator {
                                 }
                             }
                         }
-                    } else { // for GET method we can just check the output types:
+                    } else { // for GET/HEAD method we can just check the output types:
                         for (MediaType outmt1 : arm1.getSupportedOutputTypes()) {
                             for (MediaType outmt2 : arm2.getSupportedOutputTypes()) {
-                                if (outmt1.isCompatible(outmt2) && (!(outmt1.isWildcardType() || outmt1.isWildcardSubtype() || outmt2.isWildcardType() || outmt2.isWildcardSubtype()))) {
+                                if (outmt1.isCompatible(outmt2) && ((outmt1.isWildcardType() == outmt2.isWildcardType()) && (outmt1.isWildcardSubtype() == outmt2.isWildcardSubtype()))) {
                                     generator.generateOutErrMsg(resource, arm1, arm2, outmt1);
                                 }
                             }
