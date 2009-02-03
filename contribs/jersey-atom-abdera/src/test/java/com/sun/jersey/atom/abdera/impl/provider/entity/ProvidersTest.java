@@ -83,10 +83,9 @@ public class ProvidersTest extends TestCase {
         System.out.println("Starting grizzly ...");
         selectorThread = GrizzlyWebContainerFactory.create(BASE_URI, initParams);
         ClientConfig config = new DefaultClientConfig();
-//        config.getClasses().add(MultiPartBeanProvider.class);
+        config.getClasses().add(ContentBeanProvider.class);
         client = Client.create(config);
-        providers = new ContentBeanProviders();
-//        providers = client.getProviders();
+        providers = client.getProviders();
     }
 
     @Override
