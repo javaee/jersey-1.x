@@ -65,12 +65,10 @@ import com.sun.jersey.server.impl.modelapi.annotation.IntrospectionModeller;
 import com.sun.jersey.server.wadl.WadlBuilder;
 import com.sun.jersey.server.wadl.WadlGenerator;
 import com.sun.jersey.server.wadl.WadlGeneratorImpl;
-import com.sun.jersey.wadl.resourcedoc.ResourceDoclet;
 import com.sun.research.ws.wadl.Application;
 
 /**
- * This mojo generates a wadl file, using an option resourcedoc file created
- * by the {@link ResourceDoclet} and an applicationdoc file.<br />
+ * This mojo generates a wadl file, without the need of a running webapp.<br />
  * Created on: Jun 18, 2008<br />
  * 
  * @author <a href="mailto:martin.grotzke@freiheit.com">Martin Grotzke</a>
