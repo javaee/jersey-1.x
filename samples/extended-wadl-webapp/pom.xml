@@ -244,7 +244,7 @@
                     <docletArtifacts>
                         <docletArtifact>
                             <groupId>com.sun.jersey.contribs</groupId>
-                            <artifactId>maven-wadl-plugin</artifactId>
+                            <artifactId>wadl-resourcedoc-doclet</artifactId>
                             <version>${jersey-release-version}</version>
                         </docletArtifact>
                         <!--
