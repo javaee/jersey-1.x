@@ -126,7 +126,7 @@ public class AnnotatedClassScanner {
                 while (urls.hasMoreElements()) {
                     URL url = urls.nextElement();
                     try {
-                        URI uri = url.toURI();
+                        URI uri = getURI(url);
                         index(uri, fileP);
                     } catch (URISyntaxException e) {
                         LOGGER.warning("URL, " + 
@@ -145,7 +145,16 @@ public class AnnotatedClassScanner {
         
         return classes;
     }
-    
+
+    private URI getURI(URL url) throws URISyntaxException {
+        if (url.getProtocol().equalsIgnoreCase("vfsfile")) {
+            // Used with JBoss 5.x: trim prefix "vfs"
+            return new URI(url.toString().substring(3));
+        } else {
+            return url.toURI();
+        }
+    }
+
     /**
      * Get the current set of matching classes.
      * 
