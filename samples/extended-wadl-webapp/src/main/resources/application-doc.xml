@@ -1,15 +1,11 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <applicationDocs targetNamespace="http://research.sun.com/wadl/2006/10">
     
-    <doc xml:lang="de" title="The doc for your API">
+    <doc xml:lang="en" title="The doc for your API">
         This is a paragraph that is added to the start of the generated application.wadl
     </doc>
     
-    <doc xml:lang="de">
-        <p>
-            <h3>Multiple doc elements</h3>
-            <hr />
-            This application-docs file can contain several doc elements.
-        </p>
+    <doc xml:lang="de" title="Die Dokumentation fuer Ihre API">
+        Dies in ein Abschnitt, der dem Beginn der generierte application.wadl hinzugefügt wird - in deutscher Sprache.
     </doc>
 </applicationDocs>
