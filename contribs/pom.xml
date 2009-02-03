@@ -56,6 +56,7 @@
     <modules>
         <module>spring</module>
         <module>maven-wadl-plugin</module>
+        <module>wadl-resourcedoc-doclet</module>
         <module>jersey-multipart</module>
         <module>jersey-atom-abdera</module>
         <module>jersey-apache-client</module>
