@@ -58,6 +58,11 @@
             <version>${jersey-release-version}</version>
         </dependency>        
         <dependency>
+            <groupId>com.sun.jersey.contribs</groupId>
+            <artifactId>wadl-resourcedoc-doclet</artifactId>
+            <version>${jersey-release-version}</version>
+        </dependency>
+        <dependency>
             <groupId>org.codehaus.jettison</groupId>
             <artifactId>jettison</artifactId>
             <version>1.0.1</version>
@@ -275,6 +280,11 @@
                                 <docletArtifact>
                                     <groupId>com.sun.jersey.contribs</groupId>
                                     <artifactId>maven-wadl-plugin</artifactId>
+                                    <version>${jersey-release-version}</version>
+                                </docletArtifact>
+                                <docletArtifact>
+                                    <groupId>com.sun.jersey.contribs</groupId>
+                                    <artifactId>wadl-resourcedoc-doclet</artifactId>
                                     <version>${jersey-release-version}</version>
                                 </docletArtifact>
                                 <!--

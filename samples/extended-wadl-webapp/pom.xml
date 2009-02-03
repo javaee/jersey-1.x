@@ -66,6 +66,11 @@
                                     <artifactId>maven-wadl-plugin</artifactId>
                                     <version>${jersey-release-version}</version>
                                 </docletArtifact>
+                                <docletArtifact>
+                                    <groupId>com.sun.jersey.contribs</groupId>
+                                    <artifactId>wadl-resourcedoc-doclet</artifactId>
+                                    <version>${jersey-release-version}</version>
+                                </docletArtifact>
                                 <!--
                                     Also specify jersey and xerces as doclet artifacts as the ResourceDoclet
                                     uses classes provided by them to generate the resourcedoc.
