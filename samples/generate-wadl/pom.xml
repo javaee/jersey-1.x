@@ -139,7 +139,7 @@
                     <docletArtifacts>
                         <docletArtifact>
                             <groupId>com.sun.jersey.contribs</groupId>
-                            <artifactId>maven-wadl-plugin</artifactId>
+                            <artifactId>wadl-resourcedoc-doclet</artifactId>
                             <version>${jersey-release-version}</version>
                         </docletArtifact>
                         <!--
@@ -175,9 +175,7 @@
                         <phase>compile</phase>
                     </execution>
                 </executions>
-
                 <configuration>
-
                     <wadlFile>${project.build.outputDirectory}/application.wadl</wadlFile>
                     <formatWadlFile>true</formatWadlFile>
                     <baseUri>http://www.example.com/api</baseUri>
