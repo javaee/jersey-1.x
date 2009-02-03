@@ -48,6 +48,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.ext.Providers;
 import junit.framework.TestCase;
 import org.apache.abdera.i18n.iri.IRI;
 import org.apache.abdera.model.Categories;
@@ -85,6 +86,7 @@ public class ProvidersTest extends TestCase {
 //        config.getClasses().add(MultiPartBeanProvider.class);
         client = Client.create(config);
         providers = new ContentBeanProviders();
+//        providers = client.getProviders();
     }
 
     @Override
@@ -100,7 +102,7 @@ public class ProvidersTest extends TestCase {
     }
 
     private Client client = null;
-    private ContentBeanProviders providers = null;
+    private Providers providers = null;
     private SelectorThread selectorThread = null;
 
     private static final String BASE_URI = "http://localhost:9997/";
