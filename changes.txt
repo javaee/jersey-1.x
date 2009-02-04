@@ -1,4 +1,8 @@
 release 1.0.2 (2009-01/02)
+- Fixed issue 80
+  https://jersey.dev.java.net/issues/show_bug.cgi?id=80
+  The class and package registration mechanisms for root resource classes
+  and providers works correctly on the JBoss 5.x app server.
 - The ResourceDoclet (generating a resourcedoc file for extended WADL) moved
   from the maven-wadl-plugin to the wadl-resourcedoc-doclet module. If you're
   using extended wadl you need to change the docletArtifact/artifactId of the
