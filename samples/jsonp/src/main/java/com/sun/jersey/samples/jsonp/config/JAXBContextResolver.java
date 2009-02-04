@@ -1,9 +1,9 @@
 /*
  *
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
- *
+ * 
  * Copyright 1997-2007 Sun Microsystems, Inc. All rights reserved.
- *
+ * 
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
  * and Distribution License("CDDL") (collectively, the "License").  You
@@ -11,7 +11,7 @@
  * a copy of the License at https://jersey.dev.java.net/CDDL+GPL.html
  * or jersey/legal/LICENSE.txt.  See the License for the specific
  * language governing permissions and limitations under the License.
- *
+ * 
  * When distributing the software, include this License Header Notice in each
  * file and include the License file at jersey/legal/LICENSE.txt.
  * Sun designates this particular file as subject to the "Classpath" exception
@@ -20,9 +20,9 @@
  * Header, with the fields enclosed by brackets [] replaced by your own
  * identifying information: "Portions Copyrighted [year]
  * [name of copyright owner]"
- *
+ * 
  * Contributor(s):
- *
+ * 
  * If you wish your version of this file to be governed by only the CDDL or
  * only the GPL Version 2, indicate your decision by adding "[Contributor]
  * elects to include this software in this distribution under the [CDDL or GPL
@@ -35,51 +35,37 @@
  * holder.
  */
 
+package com.sun.jersey.samples.jsonp.config;
 
-package com.sun.jersey.samples.jsonfromjaxb.resources;
-
-import com.sun.jersey.api.json.JSONPWrapper;
-import com.sun.jersey.samples.jsonfromjaxb.jaxb.AircraftType;
-import com.sun.jersey.samples.jsonfromjaxb.jaxb.Flights;
-import java.util.LinkedList;
-import java.util.List;
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
-import javax.ws.rs.core.GenericEntity;
-import javax.ws.rs.core.MediaType;
-import org.codehaus.jettison.json.JSONException;
-import org.codehaus.jettison.json.JSONObject;
+import com.sun.jersey.api.json.JSONConfiguration;
+import com.sun.jersey.api.json.JSONJAXBContext;
+import com.sun.jersey.samples.jsonp.jaxb.ChangeRecordBean;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
+import javax.ws.rs.ext.ContextResolver;
+import javax.ws.rs.ext.Provider;
+import javax.xml.bind.JAXBContext;
 
 /**
  *
  * @author japod
  */
-@Path("/aircrafts")
-public class AircraftTypeList {
-
-    static final List<AircraftType> aircraftTypes = new LinkedList<AircraftType>();
-
-    static {
-        aircraftTypes.add(new AircraftType("B737", 42.1, 204));
-        aircraftTypes.add(new AircraftType("A330", 58.8, 253));
+@Provider
+public final class JAXBContextResolver implements ContextResolver<JAXBContext> {
+    
+    private final JAXBContext context;
+    
+    private final Set<Class> types;
+    
+    private final Class[] cTypes = {ChangeRecordBean.class};
+    
+    public JAXBContextResolver() throws Exception {
+        this.types = new HashSet(Arrays.asList(cTypes));
+        this.context = new JSONJAXBContext(JSONConfiguration.getBuilder(JSONConfiguration.Notation.NATURAL).build(), cTypes);
     }
-
-    @GET @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
-    public List<AircraftType> getAircraftTypes() {
-        return aircraftTypes;
-    }
-
-    @GET @Path("test")
-    @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML, "application/javascript"})
-    public JSONPWrapper getJSONP(@QueryParam("callback") String callback, @QueryParam("type") int type) throws JSONException {
-        switch(type) {
-            case 0 : return new JSONPWrapper((new JSONObject()).put("one", "two"), callback);
-            case 1:  return new JSONPWrapper(new GenericEntity<List<AircraftType>>(aircraftTypes){}, callback);
-            case 2:
-            default:
-                return new JSONPWrapper((new FlightList()).getFlightList(), callback);
-        }
+    
+    public JAXBContext getContext(Class<?> objectType) {
+        return (types.contains(objectType)) ? context : null;
     }
 }

@@ -35,51 +35,29 @@
  * holder.
  */
 
+package com.sun.jersey.samples.jsonp.jaxb;
 
-package com.sun.jersey.samples.jsonfromjaxb.resources;
-
-import com.sun.jersey.api.json.JSONPWrapper;
-import com.sun.jersey.samples.jsonfromjaxb.jaxb.AircraftType;
-import com.sun.jersey.samples.jsonfromjaxb.jaxb.Flights;
-import java.util.LinkedList;
-import java.util.List;
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
-import javax.ws.rs.core.GenericEntity;
-import javax.ws.rs.core.MediaType;
-import org.codehaus.jettison.json.JSONException;
-import org.codehaus.jettison.json.JSONObject;
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlRootElement;
 
 /**
  *
  * @author japod
  */
-@Path("/aircrafts")
-public class AircraftTypeList {
+@XmlRootElement(name="change")
+public class ChangeRecordBean {
 
-    static final List<AircraftType> aircraftTypes = new LinkedList<AircraftType>();
+    @XmlAttribute
+    public boolean madeByAdmin;
 
-    static {
-        aircraftTypes.add(new AircraftType("B737", 42.1, 204));
-        aircraftTypes.add(new AircraftType("A330", 58.8, 253));
-    }
+    public int linesChanged;
+    public String logMessage;
 
-    @GET @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
-    public List<AircraftType> getAircraftTypes() {
-        return aircraftTypes;
-    }
+    public ChangeRecordBean(){};
 
-    @GET @Path("test")
-    @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML, "application/javascript"})
-    public JSONPWrapper getJSONP(@QueryParam("callback") String callback, @QueryParam("type") int type) throws JSONException {
-        switch(type) {
-            case 0 : return new JSONPWrapper((new JSONObject()).put("one", "two"), callback);
-            case 1:  return new JSONPWrapper(new GenericEntity<List<AircraftType>>(aircraftTypes){}, callback);
-            case 2:
-            default:
-                return new JSONPWrapper((new FlightList()).getFlightList(), callback);
-        }
+    public ChangeRecordBean(boolean madeByAdmin, int linesChanged, String logMessage) {
+        this.madeByAdmin = madeByAdmin;
+        this.linesChanged = linesChanged;
+        this.logMessage = logMessage;
     }
 }
