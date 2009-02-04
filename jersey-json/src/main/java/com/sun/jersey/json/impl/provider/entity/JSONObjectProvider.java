@@ -99,7 +99,6 @@ public class JSONObjectProvider  extends AbstractMessageReaderWriterProvider<JSO
             OutputStreamWriter writer = new OutputStreamWriter(entityStream, 
                     getCharset(mediaType));
             t.write(writer);
-            writer.write("\n");
             writer.flush();
         } catch (JSONException je) {
             throw ThrowHelper.withInitCause(je, new IOException(ImplMessages.ERROR_WRITING_JSON_OBJECT()));

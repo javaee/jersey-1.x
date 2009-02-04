@@ -110,7 +110,6 @@ public class JSONListElementProvider extends AbstractListElementProvider {
             jxsw.writeEndElement();
             jxsw.writeEndDocument();
             jxsw.flush();
-            jxsw.close();
         } catch (XMLStreamException ex) {
             Logger.getLogger(JSONListElementProvider.class.getName()).log(Level.SEVERE, null, ex);
             throw new JAXBException(ex.getMessage(), ex);

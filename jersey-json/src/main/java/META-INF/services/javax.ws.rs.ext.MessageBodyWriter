@@ -6,3 +6,4 @@ com.sun.jersey.json.impl.provider.entity.JSONListElementProvider$App
 com.sun.jersey.json.impl.provider.entity.JSONListElementProvider$General
 com.sun.jersey.json.impl.provider.entity.JSONArrayProvider
 com.sun.jersey.json.impl.provider.entity.JSONObjectProvider
+com.sun.jersey.json.impl.provider.entity.JSONPWrapperProvider

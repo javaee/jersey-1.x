@@ -258,11 +258,6 @@ public class JacksonArrayWrapperGenerator extends JsonGenerator {
 
     @Override
     public void flush() throws IOException {
-        generator.flush();
-    }
-
-    @Override
-    public void close() throws IOException {
         switch (state) {
             case IN_THE_MIDDLE :
                 generator.writeEndArray();
@@ -273,6 +268,12 @@ public class JacksonArrayWrapperGenerator extends JsonGenerator {
                 generator.writeEndArray();
                 break;
         }
+        generator.flush();
+    }
+
+    @Override
+    public void close() throws IOException {
+        flush();
         generator.close();
     }
 }
