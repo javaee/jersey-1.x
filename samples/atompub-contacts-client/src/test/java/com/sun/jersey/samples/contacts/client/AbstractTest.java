@@ -67,7 +67,7 @@ public abstract class AbstractTest extends TestCase {
         super.setUp();
         System.out.println("Starting grizzly ...");
         selectorThread = Server.startServer();
-        client = new ContactsClient("http://localhost:" + getPort(9888), "admin", "password");
+        client = new ContactsClient("http://localhost:" + getPort(9998), "admin", "password");
         abdera = Abdera.getInstance();
     }
 
