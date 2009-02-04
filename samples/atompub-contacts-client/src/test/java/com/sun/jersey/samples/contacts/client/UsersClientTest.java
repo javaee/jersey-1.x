@@ -97,7 +97,7 @@ public class UsersClientTest extends AbstractTest {
 
     public void testAuthenticationNegative() {
         try {
-            client = new ContactsClient("http://localhost:9998", "badusername", "badpassword");
+            client = new ContactsClient("http://localhost:" + getPort(9888), "badusername", "badpassword");
             client.findUser("OldUsername");
             fail("Should have thrown IllegalStateException");
         } catch (IllegalStateException e) {

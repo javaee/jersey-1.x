@@ -51,12 +51,23 @@ public abstract class AbstractTest extends TestCase {
         super(testName);
     }
 
+        protected int getPort(int defaultPort) {
+        String port = System.getenv("JERSEY_HTTP_PORT");
+        if (null != port) {
+            try {
+                return Integer.parseInt(port);
+            } catch (NumberFormatException e) {
+            }
+        }
+        return defaultPort;
+    }
+
     @Override
     protected void setUp() throws Exception {
         super.setUp();
         System.out.println("Starting grizzly ...");
         selectorThread = Server.startServer();
-        client = new ContactsClient("http://localhost:9998", "admin", "password");
+        client = new ContactsClient("http://localhost:" + getPort(9888), "admin", "password");
         abdera = Abdera.getInstance();
     }
 
