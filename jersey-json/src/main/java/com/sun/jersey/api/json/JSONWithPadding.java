@@ -43,19 +43,19 @@ import javax.ws.rs.core.GenericEntity;
  *
  * @author japod
  */
-public class JSONPWrapper {
+public class JSONWithPadding {
 
     public static final String DefaultCallbackNAME = "callback";
 
     String callbackName;
     Object jsonSource;
 
-    private JSONPWrapper(){};
+    private JSONWithPadding(){};
 
-    public JSONPWrapper(Object jsonSource) {
+    public JSONWithPadding(Object jsonSource) {
         this(jsonSource, DefaultCallbackNAME);
     }
-    public JSONPWrapper(Object jsonSource, String callbackName) {
+    public JSONWithPadding(Object jsonSource, String callbackName) {
         this.jsonSource = jsonSource;
         this.callbackName = (callbackName == null) ? DefaultCallbackNAME : callbackName;
     }

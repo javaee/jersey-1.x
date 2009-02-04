@@ -38,7 +38,7 @@
 
 package com.sun.jersey.json.impl.provider.entity;
 
-import com.sun.jersey.api.json.JSONPWrapper;
+import com.sun.jersey.api.json.JSONWithPadding;
 import com.sun.jersey.core.provider.AbstractMessageReaderWriterProvider;
 import com.sun.jersey.json.impl.ImplMessages;
 import com.sun.jersey.spi.MessageBodyWorkers;
@@ -59,9 +59,9 @@ import javax.ws.rs.ext.MessageBodyWriter;
  *
  * @author japod
  */
-public class JSONPWrapperProvider extends AbstractMessageReaderWriterProvider<JSONPWrapper> {
+public class JSONWithPaddingProvider extends AbstractMessageReaderWriterProvider<JSONWithPadding> {
 
-    private static final Logger LOGGER = Logger.getLogger(JSONPWrapperProvider.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(JSONWithPaddingProvider.class.getName());
 
     @Context MessageBodyWorkers bodyWorker;
 
@@ -69,15 +69,15 @@ public class JSONPWrapperProvider extends AbstractMessageReaderWriterProvider<JS
         return false;
     }
 
-    public JSONPWrapper readFrom(Class<JSONPWrapper> type, Type genericType, Annotation[] annotations, MediaType mediaType, MultivaluedMap<String, String> httpHeaders, InputStream entityStream) throws IOException, WebApplicationException {
+    public JSONWithPadding readFrom(Class<JSONWithPadding> type, Type genericType, Annotation[] annotations, MediaType mediaType, MultivaluedMap<String, String> httpHeaders, InputStream entityStream) throws IOException, WebApplicationException {
         throw new UnsupportedOperationException("Not supported by design.");
     }
 
     public boolean isWriteable(Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType) {
-        return type == JSONPWrapper.class;
+        return type == JSONWithPadding.class;
     }
 
-    public void writeTo(JSONPWrapper t, Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType, MultivaluedMap<String, Object> httpHeaders, OutputStream entityStream) throws IOException, WebApplicationException {
+    public void writeTo(JSONWithPadding t, Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType, MultivaluedMap<String, Object> httpHeaders, OutputStream entityStream) throws IOException, WebApplicationException {
         Object jsonEntity = t.getJsonSource();
         Type entityGenericType = jsonEntity.getClass();
         Class<?> entityType = jsonEntity.getClass();

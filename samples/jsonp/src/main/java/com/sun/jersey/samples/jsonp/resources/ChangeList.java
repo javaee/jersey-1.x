@@ -38,7 +38,7 @@
 
 package com.sun.jersey.samples.jsonp.resources;
 
-import com.sun.jersey.api.json.JSONPWrapper;
+import com.sun.jersey.api.json.JSONWithPadding;
 import com.sun.jersey.samples.jsonp.jaxb.ChangeRecordBean;
 import java.util.LinkedList;
 import java.util.List;
@@ -65,12 +65,12 @@ public class ChangeList {
     }
 
     @GET
-    public JSONPWrapper getChanges(@QueryParam("callback") String callback, @QueryParam("type") int type) {
-        return new JSONPWrapper(new GenericEntity<List<ChangeRecordBean>>(changes){}, callback);
+    public JSONWithPadding getChanges(@QueryParam("callback") String callback, @QueryParam("type") int type) {
+        return new JSONWithPadding(new GenericEntity<List<ChangeRecordBean>>(changes){}, callback);
     }
 
     @GET @Path("latest")
-    public JSONPWrapper getLastChange(@QueryParam("callback") String callback, @QueryParam("type") int type) {
-        return new JSONPWrapper(changes.get(changes.size() - 1), callback);
+    public JSONWithPadding getLastChange(@QueryParam("callback") String callback, @QueryParam("type") int type) {
+        return new JSONWithPadding(changes.get(changes.size() - 1), callback);
     }
 }

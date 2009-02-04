@@ -416,7 +416,7 @@ public class Stax2JacksonWriter implements XMLStreamWriter {
                 generator.writeString(text);
             } else {
                 if ((boolean.class == currentPI.t) || (Boolean.class == currentPI.t)) {
-                    generator.writeBoolean(Boolean.getBoolean(text));
+                    generator.writeBoolean(Boolean.parseBoolean(text));
                 } else {
                     generator.writeNumber(text);
                 }
