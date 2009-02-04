@@ -38,6 +38,7 @@
 package com.sun.jersey.api.core;
 
 import com.sun.jersey.api.representation.Form;
+import com.sun.jersey.core.header.QualitySourceMediaType;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 import java.net.URI;
@@ -198,10 +199,11 @@ public interface HttpRequestContext extends HttpHeaders, Request, SecurityContex
      * @param priorityMediaTypes the list of media types that take priority.
      * 
      * @return a list of requested response media types sorted according
-     * to those that occur in the priority list and then those sorted according
-     * to their q-value, with highest preference first.
+     * to higest relative quality value, which is product of the 
+     * quality parameter, q, of an acceptable media type, and the quality source
+     * parameter, qs, of matching media type.
      */
-    List<MediaType> getAcceptableMediaTypes(List<MediaType> priorityMediaTypes);
+    List<MediaType> getAcceptableMediaTypes(List<QualitySourceMediaType> priorityMediaTypes);
 
     /**
      * Get the cookie name value map.

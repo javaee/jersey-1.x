@@ -44,6 +44,7 @@ import com.sun.jersey.core.header.AcceptableLanguageTag;
 import com.sun.jersey.core.header.AcceptableMediaType;
 import com.sun.jersey.core.header.AcceptableToken;
 import com.sun.jersey.core.header.LanguageTag;
+import com.sun.jersey.core.header.QualitySourceMediaType;
 import com.sun.jersey.core.header.reader.HttpHeaderReader;
 import java.util.Collections;
 import java.util.List;
@@ -145,7 +146,7 @@ public final class HttpHelper {
     }
     
     public static List<AcceptableMediaType> getAccept(HttpRequestContext request,
-            List<MediaType> priorityMediaTypes) {
+            List<QualitySourceMediaType> priorityMediaTypes) {
         final String accept = request.getHeaderValue("Accept");
         if (accept == null || accept.length() == 0) {
             return MediaTypes.GENERAL_ACCEPT_MEDIA_TYPE_LIST;

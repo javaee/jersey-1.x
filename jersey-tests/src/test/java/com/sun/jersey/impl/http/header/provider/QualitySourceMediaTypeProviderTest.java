@@ -38,20 +38,21 @@
 package com.sun.jersey.impl.http.header.provider;
 
 import com.sun.jersey.core.header.AcceptableMediaType;
+import com.sun.jersey.core.header.QualitySourceMediaType;
 import com.sun.jersey.core.header.reader.HttpHeaderReader;
 import junit.framework.*;
 import javax.ws.rs.core.MediaType;
 import java.util.List;
 
-public class AcceptMediaTypeProviderTest extends TestCase {
+public class QualitySourceMediaTypeProviderTest extends TestCase {
     
-    public AcceptMediaTypeProviderTest(String testName) {
+    public QualitySourceMediaTypeProviderTest(String testName) {
         super(testName);
     }
 
     public void testOneMediaType() throws Exception {
         String header = "application/xml";
-        List<AcceptableMediaType> l = HttpHeaderReader.readAcceptMediaType(header);
+        List<QualitySourceMediaType> l = HttpHeaderReader.readQualitySourceMediaType(header);
         
         assertEquals(1, l.size());
         
@@ -63,7 +64,7 @@ public class AcceptMediaTypeProviderTest extends TestCase {
     
     public void testOneMediaTypeWithParameters() throws Exception {
         String header = "application/xml;charset=utf8";
-        List<AcceptableMediaType> l = HttpHeaderReader.readAcceptMediaType(header);
+        List<QualitySourceMediaType> l = HttpHeaderReader.readQualitySourceMediaType(header);
         
         assertEquals(1, l.size());
         
@@ -77,7 +78,7 @@ public class AcceptMediaTypeProviderTest extends TestCase {
     
     public void testMultipleMediaType() throws Exception {
         String header = "application/xml, text/xml, text/html";
-        List<AcceptableMediaType> l = HttpHeaderReader.readAcceptMediaType(header);
+        List<QualitySourceMediaType> l = HttpHeaderReader.readQualitySourceMediaType(header);
         
         assertEquals(3, l.size());
         
@@ -97,8 +98,8 @@ public class AcceptMediaTypeProviderTest extends TestCase {
     }
     
     public void testMultipleMediaTypeWithQuality() throws Exception {
-        String header = "application/xml;q=0.1, text/xml;q=0.2, text/html;q=0.3";
-        List<AcceptableMediaType> l = HttpHeaderReader.readAcceptMediaType(header);
+        String header = "application/xml;qs=0.1, text/xml;qs=0.2, text/html;qs=0.3";
+        List<QualitySourceMediaType> l = HttpHeaderReader.readQualitySourceMediaType(header);
         
         assertEquals(3, l.size());
         
@@ -117,11 +118,32 @@ public class AcceptMediaTypeProviderTest extends TestCase {
         assertEquals(1, m.getParameters().size());
     }
     
+    public void testMultipleMediaTypeWithQuality2() throws Exception {
+        String header = "application/xml;qs=10.1, text/xml;qs=10.2, text/html;qs=99.3";
+        List<QualitySourceMediaType> l = HttpHeaderReader.readQualitySourceMediaType(header);
+
+        assertEquals(3, l.size());
+
+        MediaType m;
+        m = l.get(0);
+        assertEquals("text", m.getType());
+        assertEquals("html", m.getSubtype());
+        assertEquals(1, m.getParameters().size());
+        m = l.get(1);
+        assertEquals("text", m.getType());
+        assertEquals("xml", m.getSubtype());
+        assertEquals(1, m.getParameters().size());
+        m = l.get(2);
+        assertEquals("application", m.getType());
+        assertEquals("xml", m.getSubtype());
+        assertEquals(1, m.getParameters().size());
+    }
+
     public void testHttpURLConnectionAcceptHeader() throws Exception {
-        String header = "text/html, image/gif, image/jpeg, *; q=.2, */*; q=.2";
-        List<AcceptableMediaType> l = HttpHeaderReader.readAcceptMediaType(header);
+        String header = "text/html, image/gif, image/jpeg, */*; qs=.2";
+        List<QualitySourceMediaType> l = HttpHeaderReader.readQualitySourceMediaType(header);
         
-        assertEquals(5, l.size());
+        assertEquals(4, l.size());
         
         MediaType m;
         m = l.get(0);
@@ -140,15 +162,11 @@ public class AcceptMediaTypeProviderTest extends TestCase {
         assertEquals("*", m.getType());
         assertEquals("*", m.getSubtype());
         assertEquals(1, m.getParameters().size());
-        m = l.get(4);
-        assertEquals("*", m.getType());
-        assertEquals("*", m.getSubtype());
-        assertEquals(1, m.getParameters().size());
     }
 
     public void testFirefoxAcceptHeader() throws Exception {
-        String header = "text/xml,application/xml,application/xhtml+xml,text/html;q=0.9,text/plain;q=0.8,image/png,*/*;q=0.5";
-        List<AcceptableMediaType> l = HttpHeaderReader.readAcceptMediaType(header);
+        String header = "text/xml,application/xml,application/xhtml+xml,text/html;qs=0.9,text/plain;qs=0.8,image/png,*/*;qs=0.5";
+        List<QualitySourceMediaType> l = HttpHeaderReader.readQualitySourceMediaType(header);
         
         assertEquals(7, l.size());
         
@@ -183,30 +201,9 @@ public class AcceptMediaTypeProviderTest extends TestCase {
         assertEquals(1, m.getParameters().size());
     }
     
-    public void testWithStarAcceptHeader() throws Exception {
-        String header = "application/xml;q=0.1, text/xml;q=0.2, *;q=0.3";
-        List<AcceptableMediaType> l = HttpHeaderReader.readAcceptMediaType(header);
-        
-        assertEquals(3, l.size());
-        
-        MediaType m;
-        m = l.get(0);
-        assertEquals("*", m.getType());
-        assertEquals("*", m.getSubtype());
-        assertEquals(1, m.getParameters().size());
-        m = l.get(1);
-        assertEquals("text", m.getType());
-        assertEquals("xml", m.getSubtype());
-        assertEquals(1, m.getParameters().size());
-        m = l.get(2);
-        assertEquals("application", m.getType());
-        assertEquals("xml", m.getSubtype());
-        assertEquals(1, m.getParameters().size());
-    }
-    
     public void testMediaTypeSpecifity() throws Exception {
         String header = "*/*, text/*, text/plain";
-        List<AcceptableMediaType> l = HttpHeaderReader.readAcceptMediaType(header);
+        List<QualitySourceMediaType> l = HttpHeaderReader.readQualitySourceMediaType(header);
 
         assertEquals(3, l.size());
 
@@ -226,8 +223,8 @@ public class AcceptMediaTypeProviderTest extends TestCase {
     }
 
     public void testMediaTypeSpecifityWithQuality() throws Exception {
-        String header = "*/*, */*;q=0.5, text/*, text/*;q=0.5, text/plain, text/plain;q=0.5";
-        List<AcceptableMediaType> l = HttpHeaderReader.readAcceptMediaType(header);
+        String header = "*/*, */*;qs=0.5, text/*, text/*;qs=0.5, text/plain, text/plain;qs=0.5";
+        List<QualitySourceMediaType> l = HttpHeaderReader.readQualitySourceMediaType(header);
 
         assertEquals(6, l.size());
 
@@ -260,7 +257,7 @@ public class AcceptMediaTypeProviderTest extends TestCase {
 
     public void testMediaTypeSpecifityHTTPExample1() throws Exception {
         String header = "text/*, text/html, text/html;level=1, */*";
-        List<AcceptableMediaType> l = HttpHeaderReader.readAcceptMediaType(header);
+        List<QualitySourceMediaType> l = HttpHeaderReader.readQualitySourceMediaType(header);
 
         MediaType m;
         m = l.get(0);
@@ -283,7 +280,7 @@ public class AcceptMediaTypeProviderTest extends TestCase {
 
     public void testMediaTypeSpecifityHTTPExample2() throws Exception {
         String header = "text/*, text/html;level=1, text/html, */*";
-        List<AcceptableMediaType> l = HttpHeaderReader.readAcceptMediaType(header);
+        List<QualitySourceMediaType> l = HttpHeaderReader.readQualitySourceMediaType(header);
 
         MediaType m;
         m = l.get(0);
@@ -302,112 +299,5 @@ public class AcceptMediaTypeProviderTest extends TestCase {
         assertEquals("*", m.getType());
         assertEquals("*", m.getSubtype());
         assertEquals(0, m.getParameters().size());
-    }
-
-    public void testHttpURLConnectionAcceptHeaderWithPrority() throws Exception {
-        String header = "text/html, image/gif, image/jpeg, *; q=.2, */*; q=.2";
-
-        List<AcceptableMediaType> l = HttpHeaderReader.readAcceptMediaType(header,
-                HttpHeaderReader.readQualitySourceMediaType(MediaType.TEXT_HTML));
-
-        assertEquals(5, l.size());
-
-        MediaType m;
-        m = l.get(0);
-        assertEquals("text", m.getType());
-        assertEquals("html", m.getSubtype());
-        assertEquals(0, m.getParameters().size());
-        m = l.get(1);
-        assertEquals("image", m.getType());
-        assertEquals("gif", m.getSubtype());
-        assertEquals(0, m.getParameters().size());
-        m = l.get(2);
-        assertEquals("image", m.getType());
-        assertEquals("jpeg", m.getSubtype());
-        assertEquals(0, m.getParameters().size());
-        m = l.get(3);
-        assertEquals("*", m.getType());
-        assertEquals("*", m.getSubtype());
-        assertEquals(1, m.getParameters().size());
-        m = l.get(4);
-        assertEquals("*", m.getType());
-        assertEquals("*", m.getSubtype());
-        assertEquals(1, m.getParameters().size());
-    }
-
-    public void testFirefoxAcceptHeaderWithPrority() throws Exception {
-        String header = "text/xml,application/xml,application/xhtml+xml,text/html;q=0.9,text/plain;q=0.8,image/png,*/*;q=0.5";
-        List<AcceptableMediaType> l = HttpHeaderReader.readAcceptMediaType(header,
-                HttpHeaderReader.readQualitySourceMediaType("text/html;qs=2"));
-
-        assertEquals(7, l.size());
-
-        MediaType m;
-        m = l.get(0);
-        assertEquals("text", m.getType());
-        assertEquals("html", m.getSubtype());
-        assertEquals(1, m.getParameters().size());
-        m = l.get(1);
-        assertEquals("text", m.getType());
-        assertEquals("xml", m.getSubtype());
-        assertEquals(0, m.getParameters().size());
-        m = l.get(2);
-        assertEquals("application", m.getType());
-        assertEquals("xml", m.getSubtype());
-        assertEquals(0, m.getParameters().size());
-        m = l.get(3);
-        assertEquals("application", m.getType());
-        assertEquals("xhtml+xml", m.getSubtype());
-        assertEquals(0, m.getParameters().size());
-        m = l.get(4);
-        assertEquals("image", m.getType());
-        assertEquals("png", m.getSubtype());
-        assertEquals(0, m.getParameters().size());
-        m = l.get(5);
-        assertEquals("text", m.getType());
-        assertEquals("plain", m.getSubtype());
-        assertEquals(1, m.getParameters().size());
-        m = l.get(6);
-        assertEquals("*", m.getType());
-        assertEquals("*", m.getSubtype());
-        assertEquals(1, m.getParameters().size());
-    }
-    
-    public void testFirefoxAcceptHeaderWithPrority2() throws Exception {
-        String header = "text/xml,application/xml,application/xhtml+xml,text/html;q=0.9,text/plain;q=0.8,image/png,*/*;q=0.5";
-        List<AcceptableMediaType> l = HttpHeaderReader.readAcceptMediaType(header,
-                HttpHeaderReader.readQualitySourceMediaType(new String[]{"text/html;qs=2", "application/xml;qs=1.1"}));
-
-        assertEquals(7, l.size());
-
-        MediaType m;
-        m = l.get(0);
-        assertEquals("text", m.getType());
-        assertEquals("html", m.getSubtype());
-        assertEquals(1, m.getParameters().size());
-        m = l.get(1);
-        assertEquals("application", m.getType());
-        assertEquals("xml", m.getSubtype());
-        assertEquals(0, m.getParameters().size());
-        m = l.get(2);
-        assertEquals("text", m.getType());
-        assertEquals("xml", m.getSubtype());
-        assertEquals(0, m.getParameters().size());
-        m = l.get(3);
-        assertEquals("application", m.getType());
-        assertEquals("xhtml+xml", m.getSubtype());
-        assertEquals(0, m.getParameters().size());
-        m = l.get(4);
-        assertEquals("image", m.getType());
-        assertEquals("png", m.getSubtype());
-        assertEquals(0, m.getParameters().size());
-        m = l.get(5);
-        assertEquals("text", m.getType());
-        assertEquals("plain", m.getSubtype());
-        assertEquals(1, m.getParameters().size());
-        m = l.get(6);
-        assertEquals("*", m.getType());
-        assertEquals("*", m.getSubtype());
-        assertEquals(1, m.getParameters().size());
     }
 }

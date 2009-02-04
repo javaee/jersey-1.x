@@ -54,6 +54,7 @@ import com.sun.jersey.server.impl.uri.PathTemplate;
 import com.sun.jersey.api.uri.UriTemplate;
 import com.sun.jersey.api.view.ImplicitProduces;
 import com.sun.jersey.core.header.MediaTypes;
+import com.sun.jersey.core.header.QualitySourceMediaType;
 import com.sun.jersey.core.spi.component.ComponentInjector;
 import com.sun.jersey.server.impl.application.ResourceMethodDispatcherFactory;
 import com.sun.jersey.server.impl.template.ViewableRule;
@@ -79,7 +80,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import javax.ws.rs.HttpMethod;
-import javax.ws.rs.core.MediaType;
 
 /**
  *
@@ -112,11 +112,11 @@ public final class ResourceClass {
 
         final boolean implicitViewables = config.getFeature(
                 ResourceConfig.FEATURE_IMPLICIT_VIEWABLES);
-        List<MediaType> implictProduces = null;
+        List<QualitySourceMediaType> implictProduces = null;
         if (implicitViewables) {
             ImplicitProduces ip = resource.getAnnotation(ImplicitProduces.class);
             if (ip != null && ip.value() != null && ip.value().length > 0) {
-                implictProduces = MediaTypes.createMediaTypes(ip.value());
+                implictProduces = MediaTypes.createQualitySourceMediaTypes(ip.value());
             }
         }
 
@@ -239,7 +239,7 @@ public final class ResourceClass {
     }
 
     private Map<PathPattern, ResourceMethodMap> processSubResourceMethods(
-            List<MediaType> implictProduces,
+            List<QualitySourceMediaType> implictProduces,
             ResourceMethodDispatcherFactory df,
             FilterFactory ff) {
         final Map<PathPattern, ResourceMethodMap> patternMethodMap =
@@ -269,7 +269,7 @@ public final class ResourceClass {
     }
 
     private ResourceMethodMap processMethods(            
-            List<MediaType> implictProduces,
+            List<QualitySourceMediaType> implictProduces,
             ResourceMethodDispatcherFactory df,
             FilterFactory ff) {
         final ResourceMethodMap methodMap = new ResourceMethodMap();

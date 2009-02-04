@@ -60,7 +60,7 @@ public class ImplicitProducesTemplateProcessorTest extends AbstractResourceTeste
     }
 
     @Path("/")
-    @ImplicitProduces("text/plain")
+    @ImplicitProduces("text/plain;qs=5")
     public static class ImplicitWithGetTemplate {
         @GET
         @Produces("application/foo")
@@ -100,7 +100,7 @@ public class ImplicitProducesTemplateProcessorTest extends AbstractResourceTeste
     }
 
     @Path("/")
-    @ImplicitProduces("text/plain")
+    @ImplicitProduces("text/plain;qs=5")
     public static class ImplicitWithSubResourceGetTemplate {
         @Path("sub")
         @GET

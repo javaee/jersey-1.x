@@ -43,6 +43,19 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+/**
+ * Defines the media type(s) that a resource class can produce for
+ * implicit views.
+ * <p>
+ * The list of media types may be declared individually as String items or
+ * as a comma separated list of one or more String items.
+ * <p>
+ * A quality source parameter, qs, may be declared as a paramter of a media
+ * type. The quality source will be multiple by the quality parameter, q, of
+ * an acceptable matching media type. This enables the application to prefer say
+ * "text/html" over "application/xml" even if the client declares a higher 
+ * quality value for the latter than the former.
+ */
 @Inherited
 @Target({ElementType.TYPE})
 @Retention(RetentionPolicy.RUNTIME)

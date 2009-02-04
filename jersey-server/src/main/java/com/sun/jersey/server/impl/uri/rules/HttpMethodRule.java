@@ -40,15 +40,14 @@ package com.sun.jersey.server.impl.uri.rules;
 import com.sun.jersey.core.header.MediaTypes;
 import com.sun.jersey.api.core.HttpRequestContext;
 import com.sun.jersey.api.core.HttpResponseContext;
-import com.sun.jersey.core.header.AcceptableMediaType;
 import com.sun.jersey.server.impl.model.method.ResourceMethod;
 import com.sun.jersey.api.Responses;
+import com.sun.jersey.core.header.QualitySourceMediaType;
 import com.sun.jersey.server.impl.template.ViewResourceMethod;
 import com.sun.jersey.spi.container.ContainerRequest;
 import com.sun.jersey.spi.container.ContainerRequestFilter;
 import com.sun.jersey.spi.uri.rules.UriRule;
 import com.sun.jersey.spi.uri.rules.UriRuleContext;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -62,7 +61,7 @@ import javax.ws.rs.core.MediaType;
 public final class HttpMethodRule implements UriRule {
     private final Map<String, List<ResourceMethod>> map;
     
-    private final List<MediaType> priorityMediaTypes;
+    private final List<QualitySourceMediaType> priorityMediaTypes;
 
     private final String allow;
             
@@ -70,13 +69,13 @@ public final class HttpMethodRule implements UriRule {
     
     public HttpMethodRule(
             Map<String, List<ResourceMethod>> methods,
-            List<MediaType> priorityMediaTypes) {
+            List<QualitySourceMediaType> priorityMediaTypes) {
         this(methods, priorityMediaTypes, false);
     }
           
     public HttpMethodRule(
             Map<String, List<ResourceMethod>> methods,
-            List<MediaType> priorityMediaTypes,
+            List<QualitySourceMediaType> priorityMediaTypes,
             boolean isSubResource) {
         this.map = methods;
         this.priorityMediaTypes = priorityMediaTypes;

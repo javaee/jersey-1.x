@@ -38,6 +38,8 @@
 package com.sun.jersey.core.header;
 
 import com.sun.jersey.core.header.AcceptableMediaType;
+import com.sun.jersey.core.header.reader.HttpHeaderReader;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -195,7 +197,7 @@ public class MediaTypes {
     }
 
     /**
-     * Create a list of memdia type from an array of media types.
+     * Create a list of media type from an array of media types.
      * <p>
      * @param mediaTypes the array of meda types.
      * @return the list of {@link MediaType}, ordered according to {@link #MEDIA_TYPE_COMPARATOR}.
@@ -208,5 +210,22 @@ public class MediaTypes {
 
         Collections.sort(l, MEDIA_TYPE_COMPARATOR);
         return l;
+    }
+
+
+    /**
+     * Create a list of quality source media type from an array of media types.
+     * <p>
+     * @param mediaTypes the array of meda types.
+     * @return the list of {@link QualitySourceMediaType}, ordered according to
+     * the quality source as the primiary key and {@link #MEDIA_TYPE_COMPARATOR}
+     * as the secondary key.
+     */
+    public static List<QualitySourceMediaType> createQualitySourceMediaTypes(String[] mediaTypes) {
+        try {
+            return HttpHeaderReader.readQualitySourceMediaType(mediaTypes);
+        } catch (ParseException ex) {
+            throw new IllegalArgumentException(ex);
+        }
     }
 }

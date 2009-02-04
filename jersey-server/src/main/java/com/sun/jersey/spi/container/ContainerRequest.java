@@ -46,6 +46,7 @@ import com.sun.jersey.core.util.MultivaluedMapImpl;
 import com.sun.jersey.server.impl.VariantSelector;
 import com.sun.jersey.core.header.AcceptableLanguageTag;
 import com.sun.jersey.core.header.MediaTypes;
+import com.sun.jersey.core.header.QualitySourceMediaType;
 import com.sun.jersey.core.header.reader.HttpHeaderReader;
 import com.sun.jersey.server.impl.model.HttpHelper;
 import com.sun.jersey.spi.MessageBodyWorkers;
@@ -396,7 +397,7 @@ public class ContainerRequest implements HttpRequestContext {
         return null;
     }
 
-    public List<MediaType> getAcceptableMediaTypes(List<MediaType> priorityMediaTypes) {
+    public List<MediaType> getAcceptableMediaTypes(List<QualitySourceMediaType> priorityMediaTypes) {
         return new ArrayList<MediaType>(HttpHelper.getAccept(this, priorityMediaTypes));
     }
 

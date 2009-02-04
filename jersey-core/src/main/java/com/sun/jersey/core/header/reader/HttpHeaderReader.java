@@ -43,6 +43,7 @@ import com.sun.jersey.core.header.AcceptableMediaType;
 import com.sun.jersey.core.header.AcceptableToken;
 import com.sun.jersey.core.header.HttpDateFormat;
 import com.sun.jersey.core.header.QualityFactor;
+import com.sun.jersey.core.header.QualitySourceMediaType;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -297,17 +298,70 @@ public abstract class HttpHeaderReader {
                 header);
     }
 
-    public static List<AcceptableMediaType> readAcceptMediaType(String header, final List<MediaType> priorityMediaTypes) throws ParseException {
+
+    private static final ListElementCreator<QualitySourceMediaType> QUALITY_SOURCE_MEDIA_TYPE_CREATOR =
+            new ListElementCreator<QualitySourceMediaType>() {
+        public QualitySourceMediaType create(HttpHeaderReader reader) throws ParseException {
+            return QualitySourceMediaType.valueOf(reader);
+        }
+    };
+
+    private static final Comparator<QualitySourceMediaType> QUALITY_SOURCE_MEDIA_TYPE_COMPARATOR
+            = new Comparator<QualitySourceMediaType>() {
+        public int compare(QualitySourceMediaType o1, QualitySourceMediaType o2) {
+            int i = o2.getQualitySource() - o1.getQualitySource();
+            if (i != 0)
+                return i;
+
+            return MediaTypes.MEDIA_TYPE_COMPARATOR.compare(o1, o2);
+        }
+    };
+
+    public static List<QualitySourceMediaType> readQualitySourceMediaType(String header) throws ParseException {
+        return HttpHeaderReader.readAcceptableList(
+                QUALITY_SOURCE_MEDIA_TYPE_COMPARATOR,
+                QUALITY_SOURCE_MEDIA_TYPE_CREATOR,
+                header);
+    }
+
+    public static List<QualitySourceMediaType> readQualitySourceMediaType(String[] header) throws ParseException {
+        if (header.length < 2)
+            return readQualitySourceMediaType(header[0]);
+        
+        StringBuffer sb = new StringBuffer();
+        for (String h : header) {
+            if (sb.length() > 0)
+                sb.append(",");
+
+            sb.append(h);
+        }
+
+        return readQualitySourceMediaType(sb.toString());
+    }
+
+    public static List<AcceptableMediaType> readAcceptMediaType(String header, final List<QualitySourceMediaType> priorityMediaTypes) throws ParseException {
         return HttpHeaderReader.readAcceptableList(
                 new Comparator<AcceptableMediaType>() {
                    public int compare(AcceptableMediaType o1, AcceptableMediaType o2) {
-                       int i = 0;
-                       for (MediaType m : priorityMediaTypes) {
-                           if (MediaTypes.typeEquals(o1, m))
-                               i = -1;
-                           else if (MediaTypes.typeEquals(o2, m))
-                               i = 1;
+//                       int i = 0;
+                       boolean q_o1_set = false;
+                       int q_o1 = QualitySourceMediaType.DEFAULT_QUALITY_SOURCE_FACTOR * QualitySourceMediaType.DEFAULT_QUALITY_SOURCE_FACTOR;
+                       boolean q_o2_set = false;
+                       int q_o2 = QualitySourceMediaType.DEFAULT_QUALITY_SOURCE_FACTOR * QualitySourceMediaType.DEFAULT_QUALITY_SOURCE_FACTOR;
+                       for (QualitySourceMediaType m : priorityMediaTypes) {
+                           if (!q_o1_set && MediaTypes.typeEquals(o1, m)) {
+                               q_o1 = o1.getQuality() * m.getQualitySource();
+                               q_o1_set = true;
+                           } else if (!q_o2_set && MediaTypes.typeEquals(o2, m)) {
+                               q_o2 = o2.getQuality() * m.getQualitySource();
+                               q_o2_set = true;
+                           }
+//                           if (MediaTypes.typeEquals(o1, m))
+//                               i = -1;
+//                           else if (MediaTypes.typeEquals(o2, m))
+//                               i = 1;
                        }
+                       int i = q_o2 - q_o1;
                        if (i != 0)
                            return i;
 
@@ -360,7 +414,7 @@ public abstract class HttpHeaderReader {
         return l;
     }
 
-    public static <T extends QualityFactor> List<T> readAcceptableList(
+    public static <T> List<T> readAcceptableList(
             Comparator<T> comparator,
             ListElementCreator<T> c,
             String header) throws ParseException {
