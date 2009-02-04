@@ -343,7 +343,6 @@ public abstract class HttpHeaderReader {
         return HttpHeaderReader.readAcceptableList(
                 new Comparator<AcceptableMediaType>() {
                    public int compare(AcceptableMediaType o1, AcceptableMediaType o2) {
-//                       int i = 0;
                        boolean q_o1_set = false;
                        int q_o1 = QualitySourceMediaType.DEFAULT_QUALITY_SOURCE_FACTOR * QualitySourceMediaType.DEFAULT_QUALITY_SOURCE_FACTOR;
                        boolean q_o2_set = false;
@@ -356,10 +355,6 @@ public abstract class HttpHeaderReader {
                                q_o2 = o2.getQuality() * m.getQualitySource();
                                q_o2_set = true;
                            }
-//                           if (MediaTypes.typeEquals(o1, m))
-//                               i = -1;
-//                           else if (MediaTypes.typeEquals(o2, m))
-//                               i = 1;
                        }
                        int i = q_o2 - q_o1;
                        if (i != 0)
