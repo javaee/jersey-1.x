@@ -91,24 +91,26 @@ public class JSONPWrapperProvider extends AbstractMessageReaderWriterProvider<JS
             entityType = ge.getRawType();
         }
 
-        MessageBodyWriter bw = bodyWorker.getMessageBodyWriter(entityType, entityGenericType, annotations, MediaType.APPLICATION_JSON_TYPE);
+        final boolean isCallback = mediaType.getSubtype().endsWith("javascript");
+        final MediaType workerMediaType = isCallback ? MediaType.APPLICATION_JSON_TYPE : mediaType;
+
+        MessageBodyWriter bw = bodyWorker.getMessageBodyWriter(entityType, entityGenericType, annotations, workerMediaType);
         if (bw == null) {
             if (!genericEntityUsed) {
-                LOGGER.severe(ImplMessages.ERROR_NONGE_JSONP_MSG_BODY_WRITER_NOT_FOUND(jsonEntity, MediaType.APPLICATION_JSON));
+                LOGGER.severe(ImplMessages.ERROR_NONGE_JSONP_MSG_BODY_WRITER_NOT_FOUND(jsonEntity, workerMediaType));
             } else {
-                LOGGER.severe(ImplMessages.ERROR_JSONP_MSG_BODY_WRITER_NOT_FOUND(jsonEntity, MediaType.APPLICATION_JSON));
+                LOGGER.severe(ImplMessages.ERROR_JSONP_MSG_BODY_WRITER_NOT_FOUND(jsonEntity, workerMediaType));
             }
             throw new WebApplicationException();
         }
 
-        final boolean isCallback = mediaType.getSubtype().endsWith("javascript");
 
         if (isCallback) {
             entityStream.write(t.getCallbackName().getBytes());
             entityStream.write('(');
         }
 
-        bw.writeTo(jsonEntity, entityType, entityGenericType, annotations, MediaType.APPLICATION_JSON_TYPE, httpHeaders, entityStream);
+        bw.writeTo(jsonEntity, entityType, entityGenericType, annotations, workerMediaType, httpHeaders, entityStream);
 
         if (isCallback) {
             entityStream.write(')');
