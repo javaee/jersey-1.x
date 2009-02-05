@@ -356,6 +356,18 @@ public class MultiPartReaderWriterTest extends TestCase {
         }
     }
 
+    // Echo back various sized body part entities, and check size/content
+    public void testEleven() {
+        String seed = "0123456789ABCDEF";
+        checkEleven(seed, 0);
+        checkEleven(seed, 1);
+        checkEleven(seed, 10);
+        checkEleven(seed, 100);
+        checkEleven(seed, 1000);
+        checkEleven(seed, 10000);
+        checkEleven(seed, 100000);
+    }
+
     /*
     public void testListen() throws Exception {
         System.out.println("Running for 30 seconds");
@@ -376,6 +388,29 @@ public class MultiPartReaderWriterTest extends TestCase {
         }
         // Perform the comparison
         assertEquals(expected, sw.toString());
+    }
+
+    private void checkEleven(String seed, int multiplier) {
+//        System.out.println("Multiplier=" + multiplier);
+        StringBuilder sb = new StringBuilder(seed.length() * multiplier);
+        for (int i = 0; i < multiplier; i++) {
+            sb.append(seed);
+        }
+        String expected = sb.toString();
+        WebResource.Builder builder = client.resource(BASE_URI)
+                .path("multipart/eleven").accept("multipart/mixed").type("multipart/mixed");
+        try {
+            MultiPart entity = new MultiPart().
+              bodyPart(expected, MediaType.TEXT_PLAIN_TYPE);
+            MultiPart response = builder.put(MultiPart.class, entity);
+            String actual = response.getBodyParts().get(0).getEntityAs(String.class);
+            assertEquals("Length for multiplier " + multiplier, expected.length(), actual.length());
+            assertEquals("Content for multiplier " + multiplier, expected, actual);
+            entity.cleanup();
+        } catch (UniformInterfaceException e) {
+            report(e);
+            fail("Caught exception: " + e + " for multiplier " + multiplier);
+        }
     }
 
     private void checkMediaType(MediaType expected, MediaType actual) {
