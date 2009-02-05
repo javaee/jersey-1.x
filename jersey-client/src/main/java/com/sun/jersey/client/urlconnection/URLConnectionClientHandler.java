@@ -48,20 +48,27 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.ProtocolException;
+import java.net.URL;
 import java.util.List;
 import java.util.Map;
 import javax.net.ssl.HttpsURLConnection;
 import javax.ws.rs.core.MultivaluedMap;
 
 /**
- * Handles URL connection requests and adds propeties to created http
- * connections.
- *
- * Connection is by default created via URL.openConnection() but this behavior
- * can be modified by providing HttpURLConnectionFactory instance as a
- * constructor parameter.
- *
+ * A terminating client handler that uses {@link HttpURLConnection} or
+ * {@link HttpsURLConnection} to make HTTP requests and receive HTTP responses.
+ * <p>
+ * By default a {@link HttpURLConnection} or {@link HttpsURLConnection}
+ * instance is obtained using {@link URL#openConnection() }. This behaviour
+ * may be overridden by registering an {@link HttpURLConnectionFactory}
+ * instance when constructing this class.
+ * <p>
+ * For SSL configuration of HTTPS the {@link HTTPSProperties} may be used
+ * and an instance added as a property of the {@link Client} or
+ * {@link ClientRequest}.
+ * 
  * @author Paul.Sandoz@Sun.Com
+ * @see HttpURLConnectionFactory
  */
 public final class URLConnectionClientHandler extends TerminatingClientHandler {
 
@@ -93,8 +100,9 @@ public final class URLConnectionClientHandler extends TerminatingClientHandler {
     private HttpURLConnectionFactory httpURLConnectionFactory = null;
 
     /**
+     * Construct a new instance with an HTTP URL connection factory.
      *
-     * @param httpURLConnectionFactory custom url connection factory
+     * @param httpURLConnectionFactory the HTTP URL connection factory.
      */
     public URLConnectionClientHandler(HttpURLConnectionFactory httpURLConnectionFactory) {
         this.httpURLConnectionFactory = httpURLConnectionFactory;
@@ -148,14 +156,11 @@ public final class URLConnectionClientHandler extends TerminatingClientHandler {
             uc.setInstanceFollowRedirects(followRedirects);
         }
 
-        HTTPSProperties httpsProperties = (HTTPSProperties) ro.getProperties().get(
-                ClientConfig.PROPERTY_HTTPS_PROPERTIES);
-        if (httpsProperties != null) {
-            if (uc instanceof HttpsURLConnection) {
-                HttpsURLConnection httpsUC = (HttpsURLConnection) uc;
-
-                httpsUC.setHostnameVerifier(httpsProperties.getHostnameVerifier());
-                httpsUC.setSSLSocketFactory(httpsProperties.getSSLContext().getSocketFactory());
+        if (uc instanceof HttpsURLConnection) {
+            HTTPSProperties httpsProperties = (HTTPSProperties) ro.getProperties().get(
+                    HTTPSProperties.PROPERTY_HTTPS_PROPERTIES);
+            if (httpsProperties != null) {
+                httpsProperties.setConnection((HttpsURLConnection)uc);
             }
         }
 

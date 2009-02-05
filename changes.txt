@@ -4,10 +4,15 @@ release 1.0.2 (2009-01/02)
   such as a request filter, to override the supply authorization logic in
   combination with the @RolesAllowed annotation and the
   com.sun.jersey.api.container.filter.RolesAllowedResourceFilterFactory.
-- Added support for setting https properties (HostnameVerifier and SSLContext)
-  in jersey-client (via ClientConfig.PROPERTY_HTTPS_PROPERTIES)
-- Added support for custom HttpUrlConnectionFactory in
-  com.sun.jersey.client.urlconnection.URLConnectionClientHandler
+- Fixed issue 160
+  https://jersey.dev.java.net/issues/show_bug.cgi?id=160
+  Added support for setting HTTPS properties (HostnameVerifier and SSLContext)
+  when the Jersey Client with HttpsURLConnection. See JavaDoc of:
+    com.sun.jersey.client.urlconnection.HTTPSProperties
+- Added support when using the Jersey client for a factory to create
+  HttpURLConnection or HttpsURLConnection. See JavaDoc of:
+    com.sun.jersey.client.urlconnection.URLConnectionClientHandler
+    com.sun.jersey.client.urlconnection.HttpURLConnectionFactory
 - Fixed issue 80
   https://jersey.dev.java.net/issues/show_bug.cgi?id=80
   The class and package registration mechanisms for root resource classes

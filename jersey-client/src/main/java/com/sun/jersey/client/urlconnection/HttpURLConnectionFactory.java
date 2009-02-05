@@ -36,18 +36,35 @@
  */
 package com.sun.jersey.client.urlconnection;
 
+import com.sun.jersey.api.client.Client;
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
 /**
- * Custom http connection factory interface.
+ * A factory for {@link HttpURLConnection} instances.
+ * <p>
+ * A factory may be used to create a {@link HttpURLConnection} and configure
+ * it in a custom manner that is not possible using the Client API.
+ * <p>
+ * A factory instance may be registered with the constructor
+ * {@link URLConnectionClientHandler#URLConnectionClientHandler(com.sun.jersey.client.urlconnection.HttpURLConnectionFactory)}.
+ * Then the {@link URLConnectionClientHandler} instance may be registered with a {@link Client}
+ * using the constructor {@link Client#Client(com.sun.jersey.api.client.ClientHandler) }.
  *
  * @author pavel.bucek@sun.com
  */
 public interface HttpURLConnectionFactory {
 
+    /**
+     * Get a {@link HttpURLConnection} for a given URL.
+     * <p>
+     * This method is re-entrant so implementation should not return the same
+     * {@link HttpURLConnection} instance for multiple and concurrent requests.
+     * 
+     * @param url the URL.
+     * @return the {@link HttpURLConnection}.
+     * @throws java.io.IOException
+     */
     public HttpURLConnection getHttpURLConnection(URL url) throws IOException;
-
 }
-

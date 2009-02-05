@@ -114,16 +114,6 @@ public interface ClientConfig {
             "com.sun.jersey.client.property.chunkedEncodingSize";
 
     /**
-     * Https properties property
-     *
-     * The value MUST be an instance of {@link com.sun.jersey.client.urlconnection.HTTPSProperties}.
-     *
-     * If the property is absent then https properties will not be used.
-     */
-    public static final String PROPERTY_HTTPS_PROPERTIES =
-            "com.sun.jersey.client.impl.urlconnection.httpsProperties";
-
-    /**
      * Get the set of provider classes to be instantiated in the scope
      * of the Client
      * <p>

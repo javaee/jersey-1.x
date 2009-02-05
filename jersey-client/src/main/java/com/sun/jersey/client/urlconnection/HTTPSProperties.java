@@ -38,41 +38,62 @@ package com.sun.jersey.client.urlconnection;
 
 import java.security.NoSuchAlgorithmException;
 import javax.net.ssl.HostnameVerifier;
+import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLContext;
 
 /**
- * Java bean for setting https properties: HostnameVerifier and SSLContext.
- *
+ * HTTPS properties for SSL configuration of a {@link HttpsURLConnection}.
+ * <p>
+ * An instance of this class may be added as a property of the {@link Client}
+ * or {@link ClientRequest} using the property name
+ * {@link #PROPERTY_HTTPS_PROPERTIES}.
+ * 
  * @author pavel.bucek@sun.com
  */
 public class HTTPSProperties {
 
+    /**
+     * HTTPS properties property.
+     * 
+     * The value MUST be an instance of {@link com.sun.jersey.client.urlconnection.HTTPSProperties}.
+     *
+     * If the property is absent then HTTPS properties will not be used.
+     */
+    public static final String PROPERTY_HTTPS_PROPERTIES =
+            "com.sun.jersey.client.impl.urlconnection.httpsProperties";
+
     private HostnameVerifier hostnameVerifier = null;
+    
     private SSLContext sslContext = null;
 
     /**
-     * HostnameVerifier isn't used and SSLContext is generated for SSL protocol
+     * Construct default properties with no {@link HostnameVerifier}
+     * and a {@link SSLContext} constructed using <code>SSLContext.getInstance("SSL")</code>.
      *
-     * @throws java.security.NoSuchAlgorithmException
+     * @throws java.security.NoSuchAlgorithmException if the SSLContext could not
+     *         be created.
      */
     public HTTPSProperties() throws NoSuchAlgorithmException {
         this(null, SSLContext.getInstance("SSL"));
     }
 
     /**
-     * SSLContext is generated for SSL protocol
+     * Construct with a {@link HostnameVerifier} and a {@link SSLContext}
+     * constructed using <code>SSLContext.getInstance("SSL")</code>.
      *
-     * @param hv HostnameVerifier instance
-     * @throws java.security.NoSuchAlgorithmException
+     * @param hv the HostnameVerifier.
+     * @throws java.security.NoSuchAlgorithmException if the SSLContext could not
+     *         be created.
      */
     public HTTPSProperties(HostnameVerifier hv) throws NoSuchAlgorithmException {
         this (hv, SSLContext.getInstance("SSL"));
     }
 
     /**
+     * Construct with a {@link HostnameVerifier} and a {@link SSLContext}.
      * 
-     * @param hv HostnameVerifier instance
-     * @param c SSLContext instance
+     * @param hv the HostnameVerifier.
+     * @param c the SSLContext.
      */
     public HTTPSProperties(HostnameVerifier hv, SSLContext c) {
         this.hostnameVerifier = hv;
@@ -81,21 +102,32 @@ public class HTTPSProperties {
 
 
     /**
-     * Getter for HostnameVerifier
+     * Get the P{@link HostnameVerifier}.
      *
-     * @return HostnameVerifier
+     * @return the HostnameVerifier, is <code>null</code> if not set
+     *         at construction.
      */
     public HostnameVerifier getHostnameVerifier() {
         return hostnameVerifier;
     }
 
     /**
-     * Getter for SSLContext
+     * Get the {@link SSLContext}.
      *
-     * @return SSLContext
+     * @return the SSLContext.
      */
     public SSLContext getSSLContext() {
         return sslContext;
     }
 
+    /**
+     * Set the {@link HttpsURLConnection} with the HTTPS properties.
+     *
+     * @param connection the HttpsURLConnection.
+     */
+    public void setConnection(HttpsURLConnection connection) {
+        if (hostnameVerifier != null)
+            connection.setHostnameVerifier(hostnameVerifier);
+        connection.setSSLSocketFactory(sslContext.getSocketFactory());
+    }
 }
