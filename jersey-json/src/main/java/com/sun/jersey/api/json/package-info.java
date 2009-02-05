@@ -99,7 +99,7 @@
  * represents an array, thus enabling consuming of such JSON values the same way on
  * the client side no matter how many elements the array contains.
  *
- * <p>The {@link com.sun.jersey.api.json.JSONJAXBContext} may be configured to enabled
+ * <p>The {@link com.sun.jersey.api.json.JSONJAXBContext} may be configured to enable
  * such required production of JSON as described above in the following manner:
  * <blockquote><pre>
  * <span style="font-weight:bold">&#064;Provider</span>
@@ -112,12 +112,7 @@
  *   private final Class[] cTypes = {BeanOne.class, BeanTwo.class};
  *
  *   public JAXBContextResolver() throws JAXBException {
- *       Map&lt;String, Object&gt; props = new HashMap&lt;String, Object&gt;();
- *       <span style="font-weight:bold">props.put(JSONJAXBContext.JSON_ROOT_UNWRAPPING, Boolean.TRUE);
- *       props.put(JSONJAXBContext.JSON_NON_STRINGS, new HashSet&lt;String&gt;(1){{add("number");}});
- *       props.put(JSONJAXBContext.JSON_ARRAYS, new HashSet&lt;String&gt;(1){{add("titles");}});</span>
- *       this.context = new <span style="font-weight:bold">JSONJAXBContext</span>(cTypes, <span style="font-weight:bold">props</span>);
- * 
+ *       this.context = new <span style="font-weight:bold">JSONJAXBContext</span>(<span style="font-weight:bold">JSONConfiguration.getBuilder(JSONConfiguration.Notation.NATURAL).build()</span>, cTypes);
  *       this.types = new HashSet(Arrays.asList(cTypes));
  *   }
  *
@@ -129,9 +124,12 @@
  *
  * Then, the produced JSON would become: <code>{"name":"Howard","number":3}</code>
  * and <code>{"titles":["Title1"]}</code> respectively for the URI paths
- * <code>beans/one</code> and <code>beans/two</code>.
+ * <code>beans/one</code> and <code>beans/two</code>. Please note, that you do not need
+ * to configure this in much detail. Using {@link com.sun.jersey.api.json.JSONConfiguration.Notation.NATURAL} notation
+ * means that Jersey JSON processor will autamatically take care about numbers, booleans and arrays. This notation
+ * will probably become the default one for Jersey in one of the future releases.
  *
  * <p>For a complete set of supported properties, see
- * {@link com.sun.jersey.api.json.JSONJAXBContext}.
+ * {@link com.sun.jersey.api.json.JSONConfiguration.Builder}.
  */
 package com.sun.jersey.api.json;

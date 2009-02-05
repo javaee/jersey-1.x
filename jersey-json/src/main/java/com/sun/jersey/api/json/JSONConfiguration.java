@@ -45,7 +45,7 @@ import java.util.Map;
 /**
  * Immutable bag of various JSON notation related configuration options
  *
- * @author japod
+ * @author Jakub.Podlesak@Sun.COM
  */
 public class JSONConfiguration {
 
@@ -53,6 +53,7 @@ public class JSONConfiguration {
      * Enumeration of supported JSON notations.
      */
     public enum Notation {
+
         /**
          * The mapped (default) JSON notation.
          */
@@ -70,8 +71,6 @@ public class JSONConfiguration {
          */
         NATURAL
     };
-
-
     private final Notation notation;
     private final Collection<String> arrays;
     private final Collection<String> attrsAsElems;
@@ -80,12 +79,11 @@ public class JSONConfiguration {
     private final Map<String, String> jsonXml2JsonNs;
 
     /**
-     *  Inner Builder class for constracting {@link JSONConfiguration} options bag
+     *  Builder class for constructing {@link JSONConfiguration} options bag
      */
     public static class Builder {
 
         private final Notation notation;
-
         private Collection<String> arrays = new HashSet<String>(0);
         private Collection<String> attrsAsElems = new HashSet<String>(0);
         private Collection<String> nonStrings = new HashSet<String>(0);
@@ -105,32 +103,97 @@ public class JSONConfiguration {
             return new JSONConfiguration(this);
         }
 
+        /**
+         * Setter for JSON array configuration property.
+         * This property is valid for the {@link JSONConfiguration.Notation#MAPPED} notation only.
+         * <p>
+         * The property value is a collection of strings representing JSON object names.
+         * Those objects will be declared as arrays in  JSON document.
+         * <p>
+         * For example, consider that the the property value is not set and the
+         * JSON document is <code>{ ..., "arr1":"single element", ... }</code>.
+         * If the property value is set to contain <code>"arr1"</code> then
+         * the JSON document would become <code>{ ..., "arr1":["single element"], ... }</code>.
+         * <p>
+         * The default value is an empty collection.
+         */
         public Builder setArrays(Collection<String> arrays) {
             this.arrays = arrays;
             return this;
         }
 
+        /**
+         * Setter for JSON attributes as elements property.
+         * This property is valid for the {@link JSONConfiguration.Notation#MAPPED} notation only.
+         * <p>
+         * The value is a collection of string values that are
+         * object names that correspond to XML attribute information items.
+         * The value of an object name in the JSON document that exists in the collection
+         * of object names will be declared as an element as not as an attribute if
+         * the object corresponds to an XML attribute information item.
+         * <p>
+         * For example, consider that the property value is not set and the
+         * JSON document is <code>{ ..., "@number":"12", ... }</code>.
+         * If the property value is set to contain <code>"number"</code>
+         * then the JSON document would be <code>{ ..., "number":"12", ... }</code>.
+         * <p>
+         * The default value is an empty collection.
+         */
         public Builder setAttrsAsElems(Collection<String> attrsAsElems) {
             this.attrsAsElems = attrsAsElems;
             return this;
         }
 
+        /**
+         * Setter for XML to JSON namespace mapping.
+         * This property is valid for the {@link JSONConfiguration.Notation#MAPPED_JETTISON} notation only.
+         * <p>
+         * The value is a map with zero or more
+         * key/value pairs, where the key is an XML namespace and the value
+         * is the prefix to use as the replacement for the XML namespace.
+         * <p>
+         * The default value is a map with zero key/value pairs.
+         */
         public Builder setJsonXml2JsonNs(Map<String, String> jsonXml2JsonNs) {
             this.jsonXml2JsonNs = jsonXml2JsonNs;
             return this;
         }
 
+        /**
+         * Setter for JSON non-string values property.
+         * This property is valid for the {@link JSONConfiguration.Notation#MAPPED} notation only.
+         * <p>
+         * The value is collection of string values that are
+         * object names.
+         * The value of an object name in the JSON document that exists in the collection
+         * of object names will be declared as non-string value, which is not surrounded
+         * by double quotes.
+         * <p>
+         * For example, consider that the the property value is not set and the
+         * JSON document is <code>{ ..., "anumber":"12", ... }</code>.
+         * If the property value is set to contain <code>"anumber"</code>
+         * then the JSON document would be <code>{ ..., "anumber":12, ... }</code>.
+         * <p>
+         * The default value is an empty collection.
+         */
         public Builder setNonStrings(Collection<String> nonStrings) {
             this.nonStrings = nonStrings;
             return this;
         }
 
+        /**
+         * Setter for XML root element unwrapping.
+         * This property is valid for the {@link JSONConfiguration.Notation#MAPPED} notation only.
+         * <p>
+         * If set to true, JSON code corresponding to the XML root element will be stripped out
+         * <p>
+         * The default value is false.
+         */
         public Builder setRootUnwrapping(boolean rootUnwrapping) {
             this.rootUnwrapping = rootUnwrapping;
             return this;
         }
     }
-
 
     private JSONConfiguration(Builder b) {
         notation = b.notation;
@@ -140,9 +203,19 @@ public class JSONConfiguration {
         rootUnwrapping = b.rootUnwrapping;
         jsonXml2JsonNs = b.jsonXml2JsonNs;
     }
-
+    /**
+     * The default JSONConfiguration uses {@link JSONConfiguration.Notation#MAPPED} notation with root unwrapping option set to true.
+     */
     public static JSONConfiguration DEFAULT = getBuilder(Notation.MAPPED).setRootUnwrapping(true).build();
 
+    /**
+     * A static method for obtaining a builder of {@link JSONConfiguration} instance.
+     * After getting the builder, you can set configuration options on it and finally get an immutable  JSONConfiguration
+     * bag built for you using {@link Builder#build() } method.
+     *
+     * @param notation is the JSON notation, which will be used
+     * @return a builder for JSONConfiguration instance
+     */
     public static Builder getBuilder(Notation notation) {
         return new Builder(notation);
     }
