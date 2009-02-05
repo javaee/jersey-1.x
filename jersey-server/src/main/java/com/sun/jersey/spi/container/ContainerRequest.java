@@ -75,6 +75,7 @@ import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.PathSegment;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.ResponseBuilder;
+import javax.ws.rs.core.SecurityContext;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.Variant;
 import javax.ws.rs.ext.MessageBodyReader;
@@ -84,7 +85,13 @@ import javax.ws.rs.ext.MessageBodyReader;
  * <p>
  * Containers instantiate, or inherit, and provide an instance to the
  * {@link WebApplication}.
- *
+ * <p>
+ * By default the implementation of {@link SecurityContext} will throw
+ * {@link UnsupportedOperationException} if the methods are invoked.
+ * Containers SHOULD use the method {@link #setSecurityContext(javax.ws.rs.core.SecurityContext) }
+ * to define security context behaviour rather than extending from this class
+ * and overriding the methods.
+ * 
  * @author Paul.Sandoz@Sun.Com
  */
 public class ContainerRequest implements HttpRequestContext {
@@ -131,6 +138,8 @@ public class ContainerRequest implements HttpRequestContext {
     private Map<String, Cookie> cookies;
     
     private MultivaluedMap<String, String> cookieNames;
+
+    private SecurityContext securityContext;
     
     /**
      * Create a new container request.
@@ -242,7 +251,16 @@ public class ContainerRequest implements HttpRequestContext {
         cookies = null;
         cookieNames = null;        
     }
-        
+
+    /**
+     * Set the security context.
+     *
+     * @param securityContext the security context.
+     */
+    public void setSecurityContext(SecurityContext securityContext) {
+        this.securityContext = securityContext;
+    }
+    
     // HttpRequestContext
     
     public URI getBaseUri() {
@@ -630,18 +648,26 @@ public class ContainerRequest implements HttpRequestContext {
     // SecurityContext
     
     public Principal getUserPrincipal() {
-        throw new UnsupportedOperationException();
+        if (securityContext == null)
+            throw new UnsupportedOperationException();
+        return securityContext.getUserPrincipal();
     }
     
     public boolean isUserInRole(String role) {
-        throw new UnsupportedOperationException();
+        if (securityContext == null)
+            throw new UnsupportedOperationException();
+        return securityContext.isUserInRole(role);
     }
     
     public boolean isSecure() {
-        throw new UnsupportedOperationException();
+        if (securityContext == null)
+            throw new UnsupportedOperationException();
+        return securityContext.isSecure();
     }
     
     public String getAuthenticationScheme() {
-        throw new UnsupportedOperationException();
+        if (securityContext == null)
+            throw new UnsupportedOperationException();
+        return securityContext.getAuthenticationScheme();
     }
 }

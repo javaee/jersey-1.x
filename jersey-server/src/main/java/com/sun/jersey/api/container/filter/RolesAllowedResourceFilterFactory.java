@@ -62,9 +62,9 @@ import javax.ws.rs.core.SecurityContext;
  * {@link SecurityContext#isUserInRole(java.lang.String) } method,
  * to ascertain if the user is in one
  * of the roles declared in by a {@link RolesAllowed}. If a user is in none of 
- * the declared roles then a 401 (Forbidden) response is returned.
+ * the declared roles then a 403 (Forbidden) response is returned.
  * <p>
- * If the {@link DenyAll} annotation is declared then a 401 (Forbidden) response
+ * If the {@link DenyAll} annotation is declared then a 403 (Forbidden) response
  * is returned.
  * <p>
  * If the {@link PermitAll} annotation is declared and is not overridden then

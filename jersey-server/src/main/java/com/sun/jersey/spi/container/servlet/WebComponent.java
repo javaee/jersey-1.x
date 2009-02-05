@@ -47,7 +47,6 @@ import com.sun.jersey.core.header.InBoundHeaders;
 import com.sun.jersey.core.header.MediaTypes;
 import com.sun.jersey.core.reflection.ReflectionHelper;
 import com.sun.jersey.server.impl.container.servlet.JSPTemplateProcessor;
-import com.sun.jersey.server.impl.container.servlet.ServletContainerRequest;
 import com.sun.jersey.server.impl.container.servlet.ThreadLocalInvoker;
 import com.sun.jersey.server.impl.model.method.dispatch.FormDispatchProvider;
 import com.sun.jersey.spi.container.ContainerListener;
@@ -66,6 +65,7 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Proxy;
 import java.lang.reflect.Type;
 import java.net.URI;
+import java.security.Principal;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Enumeration;
@@ -86,6 +86,7 @@ import javax.ws.rs.core.Application;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
+import javax.ws.rs.core.SecurityContext;
 
 /**
  * An abstract Web component that may be extended to become a Servlet and/or
@@ -263,21 +264,37 @@ public abstract class WebComponent implements ContainerListener {
      * @exception ServletException if the HTTP request cannot
      *            be handled.
      */
-    protected void service(URI baseUri, URI requestUri, HttpServletRequest request, HttpServletResponse response)
+    protected void service(URI baseUri, URI requestUri, final HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         // Copy the application field to local instance to ensure that the
         // currently loaded web application is used to process
         // request
         final WebApplication _application = application;
 
-        final ContainerRequest cRequest = new ServletContainerRequest(
-                request,
+        final ContainerRequest cRequest = new ContainerRequest(
                 _application,
                 request.getMethod(),
                 baseUri,
                 requestUri,
                 getHeaders(request),
                 request.getInputStream());
+        cRequest.setSecurityContext(new SecurityContext() {
+            public Principal getUserPrincipal() {
+                return request.getUserPrincipal();
+            }
+
+            public boolean isUserInRole(String role) {
+                return request.isUserInRole(role);
+            }
+
+            public boolean isSecure() {
+                return request.isSecure();
+            }
+
+            public String getAuthenticationScheme() {
+                return request.getAuthType();
+            }
+        });
 
         // Check if any servlet filters have consumed a request entity
         // of the media type application/x-www-form-urlencoded

@@ -37,7 +37,6 @@
 
 package com.sun.jersey.impl.container.grizzly.web;
 
-import com.sun.jersey.impl.container.grizzly.web.ClassNameResourceConfig;
 import com.sun.grizzly.http.SelectorThread;
 import com.sun.jersey.api.container.grizzly.GrizzlyWebContainerFactory;
 import com.sun.jersey.impl.test.util.TestHelper;
@@ -143,7 +142,7 @@ public abstract class AbstractGrizzlyWebContainerTester extends TestCase {
             selectorThread.stopEndpoint();
         }
     }
-    
+
     @Override
     public void tearDown() {
         stopServer();

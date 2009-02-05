@@ -1,4 +1,9 @@
 release 1.0.2 (2009-01/02)
+- Support the setting of a javax.ws.rs.core.SecurityContext implementation
+  on com.sun.jersey.spi.container.ContainerRequest. This allows implementations,
+  such as a request filter, to override the supply authorization logic in
+  combination with the @RolesAllowed annotation and the
+  com.sun.jersey.api.container.filter.RolesAllowedResourceFilterFactory.
 - Fixed issue 80
   https://jersey.dev.java.net/issues/show_bug.cgi?id=80
   The class and package registration mechanisms for root resource classes
