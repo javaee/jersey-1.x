@@ -47,6 +47,11 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 import java.util.logging.Logger;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
@@ -63,7 +68,25 @@ public class JSONWithPaddingProvider extends AbstractMessageReaderWriterProvider
 
     private static final Logger LOGGER = Logger.getLogger(JSONWithPaddingProvider.class.getName());
 
+    private final Map<String, Set<String>> javascriptTypes;
+
     @Context MessageBodyWorkers bodyWorker;
+
+
+    public JSONWithPaddingProvider() {
+        javascriptTypes = new HashMap<String, Set<String>>();
+        // application/javascript, application/x-javascript, text/ecmascript, application/ecmascript, text/jscript
+        javascriptTypes.put("application", new HashSet<String>(Arrays.asList("x-javascript", "ecmascript", "javascript")));
+        javascriptTypes.put("text", new HashSet<String>(Arrays.asList("ecmascript", "jscript")));
+    }
+
+    private boolean isJavascript(MediaType m) {
+        Set<String> subtypes = javascriptTypes.get(m.getType());
+        if (subtypes == null) return false;
+
+        return subtypes.contains(m.getSubtype());
+    }
+    
 
     public boolean isReadable(Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType) {
         return false;
@@ -91,8 +114,8 @@ public class JSONWithPaddingProvider extends AbstractMessageReaderWriterProvider
             entityType = ge.getRawType();
         }
 
-        final boolean isCallback = mediaType.getSubtype().endsWith("javascript");
-        final MediaType workerMediaType = isCallback ? MediaType.APPLICATION_JSON_TYPE : mediaType;
+        final boolean isJavaScript = isJavascript(mediaType);
+        final MediaType workerMediaType = isJavaScript ? MediaType.APPLICATION_JSON_TYPE : mediaType;
 
         MessageBodyWriter bw = bodyWorker.getMessageBodyWriter(entityType, entityGenericType, annotations, workerMediaType);
         if (bw == null) {
@@ -105,14 +128,14 @@ public class JSONWithPaddingProvider extends AbstractMessageReaderWriterProvider
         }
 
 
-        if (isCallback) {
+        if (isJavaScript) {
             entityStream.write(t.getCallbackName().getBytes());
             entityStream.write('(');
         }
 
         bw.writeTo(jsonEntity, entityType, entityGenericType, annotations, workerMediaType, httpHeaders, entityStream);
 
-        if (isCallback) {
+        if (isJavaScript) {
             entityStream.write(')');
         }
     }

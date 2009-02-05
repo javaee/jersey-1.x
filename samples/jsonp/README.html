@@ -62,7 +62,7 @@ mvn clean compile exec:java</pre></blockquote>
         <blockquote><pre>curl -HAccept:application/xml http://localhost:9998/jsonp/changes</pre></blockquote>
 
         <p>Get the list of changes as a JavaScript callback:</p>
-        <blockquote><pre>curl -HAccept:application/javascript http://localhost:9998/jsonp/changes</pre></blockquote>
+        <blockquote><pre>curl -HAccept:application/x-javascript http://localhost:9998/jsonp/changes</pre></blockquote>
 
         <p>You can also see test classes at <code>src/main/test</code> subdirectory
          for detail information how to consume the service using Jersey client API</p>

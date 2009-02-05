@@ -54,7 +54,7 @@ import javax.ws.rs.core.MediaType;
  * @author japod
  */
 @Path("/changes")
-@Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML, "application/javascript"})
+@Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML, "application/x-javascript"})
 public class ChangeList {
 
     static final List<ChangeRecordBean> changes = new LinkedList<ChangeRecordBean>();

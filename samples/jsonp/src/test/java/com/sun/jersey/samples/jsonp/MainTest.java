@@ -114,11 +114,11 @@ public class MainTest extends TestCase {
     }
 
     /**
-     * Test check GET on the "changes" resource in "application/javascript" format.
+     * Test check GET on the "changes" resource in "application/x-javascript" format.
      */
     public void testGetOnLatestChangeJavasriptFormat() {
         String js = r.path("changes").
-                accept("application/javascript").get(String.class);
+                accept("application/x-javascript").get(String.class);
         assertTrue(js.startsWith("callback"));
     }
 }
