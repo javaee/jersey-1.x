@@ -34,7 +34,7 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-package com.sun.jersey.client.impl.urlconnection;
+package com.sun.jersey.client.urlconnection;
 
 import com.sun.jersey.core.header.InBoundHeaders;
 import com.sun.jersey.api.client.ClientHandlerException;
@@ -50,14 +50,21 @@ import java.net.HttpURLConnection;
 import java.net.ProtocolException;
 import java.util.List;
 import java.util.Map;
+import javax.net.ssl.HttpsURLConnection;
 import javax.ws.rs.core.MultivaluedMap;
 
 /**
+ * Handles URL connection requests and adds propeties to created http
+ * connections.
+ *
+ * Connection is by default created via URL.openConnection() but this behavior
+ * can be modified by providing HttpURLConnectionFactory instance as a
+ * constructor parameter.
  *
  * @author Paul.Sandoz@Sun.Com
  */
 public final class URLConnectionClientHandler extends TerminatingClientHandler {
-    
+
     private final class URLConnectionResponse extends ClientResponse {
         private final String method;
         private final HttpURLConnection uc;
@@ -83,8 +90,27 @@ public final class URLConnectionClientHandler extends TerminatingClientHandler {
         }
     }
 
-    // ClientHandler
-    
+    private HttpURLConnectionFactory httpURLConnectionFactory = null;
+
+    /**
+     *
+     * @param httpURLConnectionFactory custom url connection factory
+     */
+    public URLConnectionClientHandler(HttpURLConnectionFactory httpURLConnectionFactory) {
+        this.httpURLConnectionFactory = httpURLConnectionFactory;
+    }
+
+    public URLConnectionClientHandler() {
+        this(null);
+    }
+
+
+    /**
+     * ClientRequest handler.
+     *
+     * @param ro ClientRequest
+     * @return Server response represented as ClientResponse
+     */
     public ClientResponse handle(ClientRequest ro) {
         try {
             return _invoke(ro);
@@ -95,8 +121,15 @@ public final class URLConnectionClientHandler extends TerminatingClientHandler {
 
     private ClientResponse _invoke(final ClientRequest ro)
             throws ProtocolException, IOException {
-        final HttpURLConnection uc = (HttpURLConnection)ro.getURI().toURL().openConnection();
-        
+
+        final HttpURLConnection uc;
+
+        if(this.httpURLConnectionFactory == null) {
+            uc = (HttpURLConnection)ro.getURI().toURL().openConnection();
+        } else {
+            uc = this.httpURLConnectionFactory.getHttpURLConnection(ro.getURI().toURL());
+        }
+
         Integer readTimeout = (Integer)ro.getProperties().get(
                 ClientConfig.PROPERTY_READ_TIMEOUT);
         if (readTimeout != null) {
@@ -113,8 +146,19 @@ public final class URLConnectionClientHandler extends TerminatingClientHandler {
                 ClientConfig.PROPERTY_FOLLOW_REDIRECTS);
         if (followRedirects != null) {
             uc.setInstanceFollowRedirects(followRedirects);
-        }        
-        
+        }
+
+        HTTPSProperties httpsProperties = (HTTPSProperties) ro.getProperties().get(
+                ClientConfig.PROPERTY_HTTPS_PROPERTIES);
+        if (httpsProperties != null) {
+            if (uc instanceof HttpsURLConnection) {
+                HttpsURLConnection httpsUC = (HttpsURLConnection) uc;
+
+                httpsUC.setHostnameVerifier(httpsProperties.getHostnameVerifier());
+                httpsUC.setSSLSocketFactory(httpsProperties.getSSLContext().getSocketFactory());
+            }
+        }
+
         // Set the request method
         uc.setRequestMethod(ro.getMethod());
 
