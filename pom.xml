@@ -106,6 +106,7 @@
         <module>jersey-bundle</module>
         <module>archetypes</module>
         <module>archive</module>
+        <module>glassfish</module>
     </modules>
     <build>
         <plugins>
