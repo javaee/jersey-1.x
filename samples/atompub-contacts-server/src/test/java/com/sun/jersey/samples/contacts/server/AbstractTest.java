@@ -39,13 +39,18 @@ package com.sun.jersey.samples.contacts.server;
 
 import com.sun.grizzly.http.SelectorThread;
 import com.sun.jersey.api.client.Client;
+import com.sun.jersey.api.client.UniformInterfaceException;
 import com.sun.jersey.api.client.WebResource;
 import com.sun.jersey.api.client.config.ClientConfig;
 import com.sun.jersey.api.client.config.DefaultClientConfig;
 import com.sun.jersey.atom.abdera.ContentHelper;
+import com.sun.jersey.samples.contacts.models.User;
 import com.sun.jersey.samples.contacts.server.auth.Base64;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.ext.Providers;
 import junit.framework.TestCase;
+import org.apache.abdera.Abdera;
+import org.apache.abdera.model.Entry;
 
 /**
  * <p>Abstract base class for JUnit tests of the Contacts Service.</p>
@@ -82,6 +87,8 @@ public abstract class AbstractTest extends TestCase {
         super.tearDown();
     }
 
+    protected static final Abdera abdera = Abdera.getInstance();
+
     Client client = null;
     ContentHelper helper = null;
     Providers providers = null;
@@ -102,6 +109,33 @@ public abstract class AbstractTest extends TestCase {
             sb.append(path);
         }
         return sb.toString();
+    }
+
+    protected void createUser(String credentials, String mediaType, String username, String password) {
+        Entry entry = abdera.newEntry();
+        entry.setId(username);
+        entry.setTitle(username);
+        User user = new User();
+        user.setPassword(password);
+        user.setUsername(username);
+        helper.setContentEntity(entry, MediaType.APPLICATION_XML_TYPE, user);
+        try {
+            service.
+              path("users").
+              type(mediaType).
+              header("Authorization", credentials).
+              post(entry);
+        } catch (UniformInterfaceException e) {
+            fail("Returned status " + e.getResponse().getStatus() + " instead of 200");
+        }
+    }
+
+    protected void deleteUser(String credentials, String username) {
+        service.
+          path("users").
+          path(username).
+          header("Authorization", credentials).
+          delete();
     }
 
     protected WebResource resource(String[] paths) {

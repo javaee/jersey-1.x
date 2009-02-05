@@ -43,6 +43,7 @@ import com.sun.jersey.samples.contacts.models.User;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.UUID;
+import javax.annotation.security.RolesAllowed;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -87,6 +88,7 @@ public class UsersResource extends BaseResource {
      *
      * <p>FIXME - support pagination and filtering query parameters.</p>
      */
+    @RolesAllowed("admin")
     @GET
     @Produces({"application/atom+xml",
                "application/atom+xml;type=feed",
@@ -121,6 +123,7 @@ public class UsersResource extends BaseResource {
     /**
      * <p>Create a new user based on the specified contact information.</p>
      */
+    @RolesAllowed("admin")
     @POST
     @Consumes({"application/atom+xml",
                "application/atom+xml;type=entry",

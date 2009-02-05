@@ -40,6 +40,7 @@ package com.sun.jersey.samples.contacts.server;
 import com.sun.jersey.atom.abdera.ContentHelper;
 import com.sun.jersey.samples.contacts.models.User;
 import java.util.Date;
+import javax.annotation.security.RolesAllowed;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
@@ -89,6 +90,7 @@ public class UserResource extends BaseResource {
      * <p>Delete the contact information for the specified user, as well as
      * all contacts owned by this user.</p>
      */
+    @RolesAllowed("admin")
     @DELETE
     public Response delete() {
         synchronized (Database.users) {
@@ -114,6 +116,7 @@ public class UserResource extends BaseResource {
      * the <code>password</code> property will <strong>NOT</strong> be
      * included.</p>
      */
+    @RolesAllowed("admin")
     @GET
     @Produces({"application/atom+xml",
                "application/atom+xml;type=entry",
@@ -148,6 +151,7 @@ public class UserResource extends BaseResource {
     /**
      * <p>Update the contact information for the specified user.</p>
      */
+    @RolesAllowed("admin")
     @PUT
     @Consumes({"application/atom+xml",
                "application/atom+xml;type=entry",

@@ -38,8 +38,10 @@
 package com.sun.jersey.samples.contacts.server;
 
 import com.sun.grizzly.http.SelectorThread;
+import com.sun.jersey.api.container.filter.RolesAllowedResourceFilterFactory;
 import com.sun.jersey.api.container.grizzly.GrizzlyWebContainerFactory;
 import com.sun.jersey.api.core.ResourceConfig;
+import com.sun.jersey.samples.contacts.server.auth.SecurityFilter;
 import java.io.IOException;
 import java.net.URI;
 import java.util.HashMap;
@@ -74,8 +76,12 @@ public class Server {
         initParams.put("com.sun.jersey.config.property.packages",
                 "com.sun.jersey.samples.contacts.server;" +
                 "com.sun.jersey.samples.contacts.server.auth");
+//        initParams.put(ResourceConfig.PROPERTY_CONTAINER_REQUEST_FILTERS,
+//                "com.sun.jersey.samples.contacts.server.auth.AuthFilter");
         initParams.put(ResourceConfig.PROPERTY_CONTAINER_REQUEST_FILTERS,
-                "com.sun.jersey.samples.contacts.server.auth.AuthFilter");
+                SecurityFilter.class.getName());
+        initParams.put(ResourceConfig.PROPERTY_RESOURCE_FILTER_FACTORIES,
+                RolesAllowedResourceFilterFactory.class.getName());
 
 //        System.out.println("Starting grizzly...");
         SelectorThread threadSelector = GrizzlyWebContainerFactory.create(BASE_URI, initParams);

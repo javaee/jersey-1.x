@@ -38,10 +38,10 @@
 package com.sun.jersey.samples.contacts.server;
 
 import com.sun.jersey.samples.contacts.models.Contact;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
+import javax.annotation.security.RolesAllowed;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -94,6 +94,7 @@ public class ContactsResource extends BaseResource {
      *
      * <p>FIXME - support pagination and filtering query parameters.</p>
      */
+    @RolesAllowed("user")
     @GET
     @Produces({"application/atom+xml",
                "application/atom+xml;type=feed",
@@ -131,6 +132,7 @@ public class ContactsResource extends BaseResource {
     /**
      * <p>Create a new contact based on the specified contact information.</p>
      */
+    @RolesAllowed("user")
     @POST
     @Consumes({"application/atom+xml",
                "application/atom+xml;type=entry",

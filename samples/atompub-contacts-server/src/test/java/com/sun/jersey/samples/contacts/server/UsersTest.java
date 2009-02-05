@@ -38,11 +38,9 @@
 package com.sun.jersey.samples.contacts.server;
 
 import com.sun.jersey.api.client.UniformInterfaceException;
-import com.sun.jersey.atom.abdera.ContentHelper;
 import com.sun.jersey.samples.contacts.models.User;
 import javax.ws.rs.core.MediaType;
 import javax.xml.namespace.QName;
-import org.apache.abdera.Abdera;
 import org.apache.abdera.model.Element;
 import org.apache.abdera.model.Entry;
 import org.apache.abdera.model.Feed;
@@ -65,8 +63,6 @@ public class UsersTest extends AbstractTest {
     protected void tearDown() throws Exception {
         super.tearDown();
     }
-
-    private static final Abdera abdera = Abdera.getInstance();
 
     private static final QName USER_QNAME = new QName("http://example.com/contacts", "user");
     private static final QName USERNAME_QNAME = new QName("http://example.com/contacts", "username");
@@ -144,7 +140,7 @@ public class UsersTest extends AbstractTest {
         for (String mediaType : ENTRY_MEDIA_TYPES) {
             feed = getFeed(credentials, "application/atom+xml;type=feed");
             assertEquals("Before entries for media type " + mediaType, 1, feed.getEntries().size());
-            postEntry(credentials, mediaType, "newuser", "newpass");
+            createUser(credentials, mediaType, "newuser", "newpass");
             feed = getFeed(credentials, "application/atom+xml;type=feed");
             assertEquals("After entries for media type " + mediaType, 2, feed.getEntries().size());
             Entry entry = getEntry(credentials, mediaType, "newuser");
@@ -153,7 +149,7 @@ public class UsersTest extends AbstractTest {
             User user = helper.getContentEntity(entry, User.class);
             assertEquals("Username for media type " + mediaType, "newuser", user.getUsername());
             assertEquals("Password for media type " + mediaType, "newpass", user.getPassword());
-            deleteEntry(credentials, "newuser");
+            deleteUser(credentials, "newuser");
             feed = getFeed(credentials, "application/atom+xml;type=feed");
             assertEquals("Cleaned entries for media type " + mediaType, 1, feed.getEntries().size());
         }
@@ -162,7 +158,7 @@ public class UsersTest extends AbstractTest {
     public void testPutEntryPositive() {
         String credentials = adminCredentials();
         for (String mediaType : ENTRY_MEDIA_TYPES) {
-            postEntry(credentials, mediaType, "newuser", "oldpass");
+            createUser(credentials, mediaType, "newuser", "oldpass");
             Entry entry = getEntry(credentials, mediaType, "newuser");
             User user = helper.getContentEntity(entry, MediaType.APPLICATION_XML_TYPE, User.class);
             assertEquals("Old password for media type " + mediaType, "oldpass", user.getPassword());
@@ -172,7 +168,7 @@ public class UsersTest extends AbstractTest {
             entry = getEntry(credentials, mediaType, "newuser");
             user = helper.getContentEntity(entry, MediaType.APPLICATION_XML_TYPE, User.class);
             assertEquals("new password for media type " + mediaType, "newpass", user.getPassword());
-            deleteEntry(credentials, "newuser");
+            deleteUser(credentials, "newuser");
         }
     }
 
@@ -198,14 +194,6 @@ public class UsersTest extends AbstractTest {
         username = getElement(user, "username"); // FIXME - Abdera bug not namespacing child elements?
         assertNotNull("Username element for media type " + mediaType, username);
         assertEquals("Username text for media type " + mediaType, "admin", username.getText());
-    }
-
-    private void deleteEntry(String credentials, String username) {
-        service.
-          path("users").
-          path(username).
-          header("Authorization", credentials).
-          delete();
     }
 
     private Element getElement(Element parent, String localPart) {
@@ -247,25 +235,6 @@ public class UsersTest extends AbstractTest {
               type(mediaType).
               header("Authorization", credentials).
               put(entry);
-        } catch (UniformInterfaceException e) {
-            fail("Returned status " + e.getResponse().getStatus() + " instead of 200");
-        }
-    }
-
-    private void postEntry(String credentials, String mediaType, String username, String password) {
-        Entry entry = abdera.newEntry();
-        entry.setId(username);
-        entry.setTitle(username);
-        User user = new User();
-        user.setPassword(password);
-        user.setUsername(username);
-        helper.setContentEntity(entry, MediaType.APPLICATION_XML_TYPE, user);
-        try {
-            service.
-              path("users").
-              type(mediaType).
-              header("Authorization", credentials).
-              post(entry);
         } catch (UniformInterfaceException e) {
             fail("Returned status " + e.getResponse().getStatus() + " instead of 200");
         }

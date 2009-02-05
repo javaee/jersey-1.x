@@ -40,6 +40,7 @@ package com.sun.jersey.samples.contacts.server;
 import com.sun.jersey.samples.contacts.models.Contact;
 import java.util.Date;
 import java.util.List;
+import javax.annotation.security.RolesAllowed;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
@@ -93,6 +94,7 @@ public class ContactResource extends BaseResource {
     /**
      * <p>Delete the contact information for the specified contact.</p>
      */
+    @RolesAllowed("user")
     @DELETE
     public Response delete() {
         synchronized (Database.contacts) {
@@ -121,6 +123,7 @@ public class ContactResource extends BaseResource {
     /**
      * <p>Return the contact information for the specified contact.</p>
      */
+    @RolesAllowed("user")
     @GET
     @Produces({"application/atom+xml",
                "application/atom+xml;type=entry",
@@ -158,6 +161,7 @@ public class ContactResource extends BaseResource {
     /**
      * <p>Update the contact information for the specified contact.</p>
      */
+    @RolesAllowed("user")
     @PUT
     @Consumes({"application/atom+xml",
                "application/atom+xml;type=entry",

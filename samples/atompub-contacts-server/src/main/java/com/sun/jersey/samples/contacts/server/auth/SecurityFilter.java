@@ -39,17 +39,29 @@ package com.sun.jersey.samples.contacts.server.auth;
 
 import com.sun.jersey.api.container.MappableContainerException;
 import com.sun.jersey.samples.contacts.models.User;
-import com.sun.jersey.samples.contacts.server.BaseResource;
 import com.sun.jersey.samples.contacts.server.Database;
 import com.sun.jersey.spi.container.ContainerRequest;
 import com.sun.jersey.spi.container.ContainerRequestFilter;
+import java.security.Principal;
 import java.util.List;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.PathSegment;
+import javax.ws.rs.core.SecurityContext;
+import javax.ws.rs.core.UriInfo;
 
 /**
- * <p>Authentication and authorization filter for the Contacts Service.</p>
+ * <p>A Jersey {@link ContainerRequestFilter} that provides a {@link SecurityContext}
+ * for all requests processed by this application.  All defined users are
+ * considered to possess role <code>user</code>, which authorizes read/write
+ * access to the contacts list for that user.  The user named <code>admin</code>
+ * is also considered to possess role <code>admin</code>, which authorizes
+ * read/write access to the contacts list for any user, as well as read/write
+ * access to the list of defined users.</p>
  */
-public class AuthFilter implements ContainerRequestFilter {
+public class SecurityFilter implements ContainerRequestFilter {
+
+
+    // ------------------------------------------------------ Manifest Constants
 
 
     /**
@@ -58,19 +70,37 @@ public class AuthFilter implements ContainerRequestFilter {
     private static final String REALM = "Contacts Service";
 
 
+    // ------------------------------------------------------ Instance Variables
+
+
     /**
-     * <p>Ensure that all requests contain proper authentication credentials,
-     * and ensure that the authenticated caller is authorized to perform the
-     * requested operation.</p>
+     * <p>The URI information for this request.</p>
+     */
+    @Context
+    UriInfo uriInfo;
+
+
+    // ------------------------------------------ ContainerRequestFilter Methods
+
+
+    /**
+     * <p>Authenticate the user for this request, and add a security context
+     * so that role checking can be performed.</p>
+     *
+     * @param request The request we re processing
+     * @return the decorated request
+     * @exception AuthenticationException if authentication credentials
+     *  are missing or invalid
      */
     public ContainerRequest filter(ContainerRequest request) {
-
         User user = authenticate(request);
-        authorize(request, user);
-        BaseResource.authenticatedUserVariable.set(user);
+        request.setSecurityContext(new Authorizer(user));
+//        System.out.println("CURRENT USER IS " + user.getUsername());
         return request;
-
     }
+
+
+    // --------------------------------------------------------- Private Methods
 
 
     /**
@@ -122,59 +152,71 @@ public class AuthFilter implements ContainerRequestFilter {
     }
 
 
+    // --------------------------------------------------------- Support Classes
+
+
     /**
-     * <p>Authorize this request based on the authenticated user and the
-     * request being attempted.</p>
-     *
-     * @exception MappableContainerException if authorization fails
-     *  (will contain an AuthorizationException)
+     * <p>SecurityContext used to perform authorization checks.</p>
      */
-    private void authorize(ContainerRequest request, User user) {
-/*
-        System.out.println("REQUEST CHARACTERISTICS");
-        System.out.println("          absolutePath=" + request.getAbsolutePath());
-        for (MediaType mediaType : request.getAcceptableMediaTypes()) {
-          System.out.println("   acceptableMediaType=" + mediaType);
-        }
-        System.out.println("  authenticationScheme=" + request.getAuthenticationScheme());
-        System.out.println("               baseUri=" + request.getBaseUri());
-        System.out.println("              language=" + request.getLanguage());
-        System.out.println("             mediaType=" + request.getMediaType());
-        System.out.println("                method=" + request.getMethod());
-        System.out.println("                  path=" + request.getPath());
-        for (PathSegment pathSegment : request.getPathSegments()) {
-          System.out.println("           pathSegment=" + pathSegment.getPath());
-        }
-        System.out.println("            requestUri=" + request.getRequestUri());
-*/
-        // Administrative user can do anything
-        if (Database.ADMIN_USERNAME.equals(user.getUsername())) {
-            return;
+    public class Authorizer implements SecurityContext {
+
+        public Authorizer(final User user) {
+            this.principal = new Principal() {
+                public String getName() {
+                    return user.getUsername();
+                }
+            };
         }
 
-        // Extract path segments for this request
-        List<PathSegment> pathSegments = request.getPathSegments();
-        if (pathSegments.size() < 1) {
-            throw new MappableContainerException(new AuthorizationException("No path to authorize\r\n"));
+        private Principal principal;
+
+        public Principal getUserPrincipal() {
+            return this.principal;
         }
 
-        // All users can access the service document
-        if ("service".equals(pathSegments.get(0).getPath())) {
-            return;
-        }
-
-        // Non-admin users can access only their own contacts list
-        else if ("contacts".equals(pathSegments.get(0).getPath())) {
-            if ((pathSegments.size() > 1) &&
-                (user.getUsername().equals(pathSegments.get(1).getPath()))) {
-                return;
+        /**
+         * <p>Determine whether the authenticated user possesses the requested
+         * role, according to the following rules:</p>
+         * <ul>
+         * <li>User <code>admin</code> has the <code>admin</code> and
+         *     <code>user</code> roles unconditionally.</li>
+         * <li>All other users have the <code>user</code> role <strong>ONLY</strong>
+         *     for URIs that specify their own contact lists.</li>
+         * </ul>
+         *
+         * @param role Role to be checked
+         */
+        public boolean isUserInRole(String role) {
+            if ("admin".equals(role)) {
+//                System.out.println("isUserInRole(admin) ==> " + "admin".equals(this.principal.getName()));
+                return "admin".equals(this.principal.getName());
+            } else if ("user".equals(role)) {
+                if ("admin".equals(this.principal.getName())) {
+//                    System.out.println("isUserInRole(user) ==> true for admin unconditionally");
+                    return true;
+                }
+                List<PathSegment> pathSegments = uriInfo.getPathSegments();
+                if ((pathSegments.size() >= 2) &&
+                    "contacts".equals(pathSegments.get(0).getPath()) &&
+                    this.principal.getName().equals(pathSegments.get(1).getPath())) {
+//                    System.out.println("isUserInRole(user) ==> true for this user");
+                    return true;
+                } else {
+//                    System.out.println("isUserInRole(user) ==> false for this user");
+                    return false;
+                }
             }
+//            System.out.println("isUserInRole(" + role + ") ==> false unconditionally");
+            return false;
         }
 
-        // All other access is not authorized
-        throw new MappableContainerException(
-                new AuthorizationException("User '" + user.getUsername() + "' cannot access path '" + request.getPath() + "'\r\n"));
+        public boolean isSecure() {
+            return "https".equals(uriInfo.getRequestUri().getScheme());
+        }
 
+        public String getAuthenticationScheme() {
+            return SecurityContext.BASIC_AUTH;
+        }
     }
 
 
