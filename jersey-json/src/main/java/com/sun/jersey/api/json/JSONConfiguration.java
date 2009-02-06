@@ -121,7 +121,34 @@ public class JSONConfiguration {
 
     /**
      * Builder class for constructing {@link JSONConfiguration} options
-     * for the {@link MAPPED} convention.
+     * for the {@link Notation#MAPPED_JETTISON} convention.
+     */
+    public static class MappedJettisonBuilder extends Builder {
+
+        private MappedJettisonBuilder(Notation notation) {
+            super(notation);
+        }
+
+        /**
+         * Setter for XML to JSON namespace mapping.
+         * This property is valid for the {@link JSONConfiguration.Notation#MAPPED_JETTISON} notation only.
+         * <p>
+         * The value is a map with zero or more
+         * key/value pairs, where the key is an XML namespace and the value
+         * is the prefix to use as the replacement for the XML namespace.
+         * <p>
+         * The default value is a map with zero key/value pairs.
+         */
+        public MappedJettisonBuilder xml2JsonNs(Map<String, String> jsonXml2JsonNs) {
+            this.jsonXml2JsonNs = jsonXml2JsonNs;
+            return this;
+        }
+
+    }
+
+        /**
+     * Builder class for constructing {@link JSONConfiguration} options
+     * for the {@link Notation#MAPPED} convention.
      */
     public static class MappedBuilder extends Builder {
 
@@ -172,25 +199,6 @@ public class JSONConfiguration {
          */
         public MappedBuilder attributeAsElement(String... attributeAsElements) {
             this.attrsAsElems.addAll(Arrays.asList(attributeAsElements));
-            return this;
-        }
-
-        /**
-         * Setter for XML to JSON namespace mapping.
-         * This property is valid for the {@link JSONConfiguration.Notation#MAPPED_JETTISON} notation only.
-         * <p>
-         * The value is a map with zero or more
-         * key/value pairs, where the key is an XML namespace and the value
-         * is the prefix to use as the replacement for the XML namespace.
-         * <p>
-         * The default value is a map with zero key/value pairs.
-         * @param jsonXml2JsonNs a map with zero or more key/value pairs,
-         *        where the key is an XML namespace and the value
-         *        is the prefix to use as the replacement for the XML namespace.
-         * @return the mapped builder.
-         */
-        public MappedBuilder xml2JsonNs(Map<String, String> jsonXml2JsonNs) {
-            this.jsonXml2JsonNs = jsonXml2JsonNs;
             return this;
         }
 
@@ -278,8 +286,8 @@ public class JSONConfiguration {
      *
      * @return a builder for JSONConfiguration instance
      */
-    public static Builder mappedJettison() {
-        return new MappedBuilder(Notation.MAPPED_JETTISON);
+    public static MappedJettisonBuilder mappedJettison() {
+        return new MappedJettisonBuilder(Notation.MAPPED_JETTISON);
     }
 
     /**

@@ -501,17 +501,23 @@ public final class JSONJAXBContext extends JAXBContext implements JSONConfigurat
 
     private JSONConfiguration getConfiguration(JSONConfiguration.Notation pNotation,
             Map<String, Object> properties) {
+
+        String [] a = new String[0];
+
         switch (pNotation) {
             case BADGERFISH :
                 return JSONConfiguration.badgerFish().build();
             case MAPPED_JETTISON : 
-                return JSONConfiguration.mappedJettison().build();
+                JSONConfiguration.MappedJettisonBuilder mappedJettisonBuilder = JSONConfiguration.mappedJettison();
+                if (properties.containsKey(JSONJAXBContext.JSON_XML2JSON_NS)) {
+                    mappedJettisonBuilder.xml2JsonNs((Map<String, String>) properties.get(JSONJAXBContext.JSON_XML2JSON_NS));
+                }
+                return mappedJettisonBuilder.build();
             case NATURAL : 
                 return JSONConfiguration.natural().build();
             case MAPPED :
             default: {
                 JSONConfiguration.MappedBuilder mappedBuilder = JSONConfiguration.mapped();
-                String [] a = new String[0];
                 if (properties.containsKey(JSONJAXBContext.JSON_ARRAYS)) {
                     mappedBuilder.arrays(((Collection<String>) properties.get(JSONJAXBContext.JSON_ARRAYS)).toArray(a));
                 }
@@ -520,9 +526,6 @@ public final class JSONJAXBContext extends JAXBContext implements JSONConfigurat
                 }
                 if (properties.containsKey(JSONJAXBContext.JSON_NON_STRINGS)) {
                     mappedBuilder.nonStrings(((Collection<String>) properties.get(JSONJAXBContext.JSON_NON_STRINGS)).toArray(a));
-                }
-                if (properties.containsKey(JSONJAXBContext.JSON_XML2JSON_NS)) {
-                    mappedBuilder.xml2JsonNs((Map<String, String>) properties.get(JSONJAXBContext.JSON_XML2JSON_NS));
                 }
                 if (properties.containsKey(JSONJAXBContext.JSON_ROOT_UNWRAPPING)) {
                     mappedBuilder.rootUnwrapping((Boolean) properties.get(JSONJAXBContext.JSON_ROOT_UNWRAPPING));
