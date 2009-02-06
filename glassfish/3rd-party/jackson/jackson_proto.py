@@ -1,7 +1,7 @@
 pkg = {
     "name"          : "jackson",
     "version"       : "0.9.4,0-0.1",
-    "attributes"    : { "pkg.summary" : "Jackson is JSON processor framework",
+    "attributes"    : { "pkg.summary" : "Jackson",
                         "pkg.description" : 
 "Jackson is a Streaming, Light-weight, FAST, Fully conformant, Open Source JSON processor framework",
                      "info.classification" : "Frameworks"  },
