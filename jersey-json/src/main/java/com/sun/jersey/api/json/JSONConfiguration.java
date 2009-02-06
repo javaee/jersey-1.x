@@ -44,8 +44,8 @@ import java.util.HashSet;
 import java.util.Map;
 
 /**
- * Immutable bag of various JSON notation related configuration options. JSONConfiguration could be used
- * for configuring JSON notation on {@link JSONJAXBContext}
+ * An immutable configuration of JSON notationand options. JSONConfiguration could be used
+ * for configuring the JSON notation on {@link JSONJAXBContext}
  *
  * @author Jakub.Podlesak@Sun.COM
  */
@@ -78,7 +78,7 @@ public class JSONConfiguration {
          */
         BADGERFISH,
         /**
-         * The natural JSON notation, leveraging tight JAXB RI integration.
+         * The natural JSON notation, leveraging closely-coupled JAXB RI integration.
          * <p>Example JSON expression:<pre>
          * {"columns":[{"id":"userid","label":"UserID"},{"id":"name","label":"User Name"}],"rows":[{"userid":1621,"name":"Grotefend"}]}
          * </pre>
@@ -110,7 +110,7 @@ public class JSONConfiguration {
         }
         
         /**
-         *  Constructs a new immutable {@link JSONConfiguration} object based on options set on this Builder
+         * Constructs a new immutable {@link JSONConfiguration} object based on options set on this Builder
          *
          * @return a non-null {@link JSONConfiguration} instance
          */
@@ -142,6 +142,8 @@ public class JSONConfiguration {
          * the JSON document would become <code>{ ..., "arr1":["single element"], ... }</code>.
          * <p>
          * The default value is an empty collection.
+         * @param arrays an array of strings representing JSON object names.
+         * @return the mapped builder.
          */
         public MappedBuilder arrays(String... arrays) {
             this.arrays.addAll(Arrays.asList(arrays));
@@ -164,6 +166,9 @@ public class JSONConfiguration {
          * then the JSON document would be <code>{ ..., "number":"12", ... }</code>.
          * <p>
          * The default value is an empty collection.
+         * @param attributeAsElements an array of string values that are
+         *        object names that correspond to XML attribute information items.
+         * @return the mapped builder.
          */
         public MappedBuilder attributeAsElement(String... attributeAsElements) {
             this.attrsAsElems.addAll(Arrays.asList(attributeAsElements));
@@ -179,6 +184,10 @@ public class JSONConfiguration {
          * is the prefix to use as the replacement for the XML namespace.
          * <p>
          * The default value is a map with zero key/value pairs.
+         * @param jsonXml2JsonNs a map with zero or more key/value pairs,
+         *        where the key is an XML namespace and the value
+         *        is the prefix to use as the replacement for the XML namespace.
+         * @return the mapped builder.
          */
         public MappedBuilder xml2JsonNs(Map<String, String> jsonXml2JsonNs) {
             this.jsonXml2JsonNs = jsonXml2JsonNs;
@@ -201,6 +210,9 @@ public class JSONConfiguration {
          * then the JSON document would be <code>{ ..., "anumber":12, ... }</code>.
          * <p>
          * The default value is an empty collection.
+         * @param nonStrings an array of string values that are
+         * object names
+         * @return the mapped builder.
          */
         public MappedBuilder nonStrings(String... nonStrings) {
             this.nonStrings.addAll(Arrays.asList(nonStrings));
@@ -214,6 +226,9 @@ public class JSONConfiguration {
          * If set to true, JSON code corresponding to the XML root element will be stripped out
          * <p>
          * The default value is false.
+         * @param rootUnwrapping if set to true, JSON code corresponding to the
+         *        XML root element will be stripped out.
+         * @return the mapped builder.
          */
         public MappedBuilder rootUnwrapping(boolean rootUnwrapping) {
             this.rootUnwrapping = rootUnwrapping;
@@ -236,8 +251,8 @@ public class JSONConfiguration {
 
     /**
      * A static method for obtaining a builder of {@link JSONConfiguration} instance, which will use {@link Notation#NATURAL} JSON notation.
-     * After getting the builder, you can set configuration options on it, and finally get an immutable  JSONConfiguration
-     * bag using {@link Builder#build() } method.
+     * After getting the builder, you can set configuration options on it, and finally get an immutable JSONConfiguration
+     * instance using the {@link Builder#build() } method.
      *
      * @return a builder for JSONConfiguration instance
      */
@@ -248,7 +263,7 @@ public class JSONConfiguration {
     /**
      * A static method for obtaining a builder of {@link JSONConfiguration} instance, which will use {@link Notation#MAPPED} JSON notation.
      * After getting the builder, you can set configuration options on it and finally get an immutable  JSONConfiguration
-     * bag built using {@link Builder#build() } method.
+     * instance the using {@link Builder#build() } method.
      *
      * @return a builder for JSONConfiguration instance
      */
@@ -259,7 +274,7 @@ public class JSONConfiguration {
     /**
      * A static method for obtaining a builder of {@link JSONConfiguration} instance, which will use {@link Notation#MAPPED_JETTISON} JSON notation.
      * After getting the builder, you can set configuration options on it and finally get an immutable  JSONConfiguration
-     * bag built using {@link Builder#build() } method.
+     * instance using the {@link Builder#build() } method.
      *
      * @return a builder for JSONConfiguration instance
      */
@@ -270,7 +285,7 @@ public class JSONConfiguration {
     /**
      * A static method for obtaining a builder of {@link JSONConfiguration} instance, which will use {@link Notation#BADGERFISH} JSON notation.
      * After getting the builder, you can set configuration options on it and finally get an immutable  JSONConfiguration
-     * bag built using {@link Builder#build() } method.
+     * instance using the {@link Builder#build() } method.
      *
      * @return a builder for JSONConfiguration instance
      */
