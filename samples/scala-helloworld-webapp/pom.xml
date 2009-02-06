@@ -205,7 +205,7 @@
     </repositories>
     <properties>
         <netbeans.hint.deploy.server>gfv3</netbeans.hint.deploy.server>
-        <scala.version>2.7.2</scala.version>
+        <scala.version>2.7.3</scala.version>
     </properties>
     <distributionManagement>
         <repository>

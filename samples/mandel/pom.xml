@@ -192,7 +192,7 @@
         </plugins>
     </reporting>
     <properties>
-        <scala.version>2.7.2</scala.version>
+        <scala.version>2.7.3</scala.version>
     </properties>
     <distributionManagement>
         <repository>

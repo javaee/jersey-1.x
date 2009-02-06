@@ -32,7 +32,7 @@ class HelloWorldWebAppTest extends TestCase {
 
     var glassfish : GlassFish = _
 
-    // TODO Scala 2.7.2 compiler crashes when WebResource is referred to
+    // TODO Scala 2.7.3 compiler crashes when WebResource is referred to
     // 
 //    var r : WebResource = _
 
