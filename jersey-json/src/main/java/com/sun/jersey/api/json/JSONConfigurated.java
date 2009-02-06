@@ -37,13 +37,16 @@
 package com.sun.jersey.api.json;
 
 /**
+ * An interface declaring a JSON configuration is available.
+ * 
  * @author Jakub.Podlesak@Sun.COM
  */
 public interface JSONConfigurated {
 
-/**
- *  Provides information on current JSON configuration options for this object
- * @return a non-null {@link JSONConfiguration} instance
- */
+    /**
+     * Provides information on current JSON configuration options for this object.
+     * 
+     * @return a non-null {@link JSONConfiguration} instance.
+     */
     public JSONConfiguration getJSONConfiguration();
 }

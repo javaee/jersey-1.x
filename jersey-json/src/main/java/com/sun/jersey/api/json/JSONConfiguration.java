@@ -85,6 +85,7 @@ public class JSONConfiguration {
          */
         NATURAL
     };
+    
     private final Notation notation;
     private final Collection<String> arrays;
     private final Collection<String> attrsAsElems;
@@ -93,21 +94,21 @@ public class JSONConfiguration {
     private final Map<String, String> jsonXml2JsonNs;
 
     /**
-     *  Builder class for constructing {@link JSONConfiguration} options bag
+     * Builder class for constructing {@link JSONConfiguration} options
      */
     public static class Builder {
 
         private final Notation notation;
-        private Collection<String> arrays = new HashSet<String>(0);
-        private Collection<String> attrsAsElems = new HashSet<String>(0);
-        private Collection<String> nonStrings = new HashSet<String>(0);
-        private boolean rootUnwrapping = true;
-        private Map<String, String> jsonXml2JsonNs = new HashMap<String, String>(0);
+        protected Collection<String> arrays = new HashSet<String>(0);
+        protected Collection<String> attrsAsElems = new HashSet<String>(0);
+        protected Collection<String> nonStrings = new HashSet<String>(0);
+        protected boolean rootUnwrapping = true;
+        protected Map<String, String> jsonXml2JsonNs = new HashMap<String, String>(0);
 
         private Builder(Notation notation) {
             this.notation = notation;
         }
-
+        
         /**
          *  Constructs a new immutable {@link JSONConfiguration} object based on options set on this Builder
          *
@@ -115,6 +116,17 @@ public class JSONConfiguration {
          */
         public JSONConfiguration build() {
             return new JSONConfiguration(this);
+        }
+    }
+
+    /**
+     * Builder class for constructing {@link JSONConfiguration} options
+     * for the {@link MAPPED} convention.
+     */
+    public static class MappedBuilder extends Builder {
+
+        private MappedBuilder(Notation notation) {
+            super(notation);
         }
 
         /**
@@ -131,7 +143,7 @@ public class JSONConfiguration {
          * <p>
          * The default value is an empty collection.
          */
-        public Builder arrays(String... arrays) {
+        public MappedBuilder arrays(String... arrays) {
             this.arrays.addAll(Arrays.asList(arrays));
             return this;
         }
@@ -153,7 +165,7 @@ public class JSONConfiguration {
          * <p>
          * The default value is an empty collection.
          */
-        public Builder attributeAsElement(String... attributeAsElements) {
+        public MappedBuilder attributeAsElement(String... attributeAsElements) {
             this.attrsAsElems.addAll(Arrays.asList(attributeAsElements));
             return this;
         }
@@ -168,7 +180,7 @@ public class JSONConfiguration {
          * <p>
          * The default value is a map with zero key/value pairs.
          */
-        public Builder xml2JsonNs(Map<String, String> jsonXml2JsonNs) {
+        public MappedBuilder xml2JsonNs(Map<String, String> jsonXml2JsonNs) {
             this.jsonXml2JsonNs = jsonXml2JsonNs;
             return this;
         }
@@ -190,7 +202,7 @@ public class JSONConfiguration {
          * <p>
          * The default value is an empty collection.
          */
-        public Builder nonStrings(String... nonStrings) {
+        public MappedBuilder nonStrings(String... nonStrings) {
             this.nonStrings.addAll(Arrays.asList(nonStrings));
             return this;
         }
@@ -203,7 +215,7 @@ public class JSONConfiguration {
          * <p>
          * The default value is false.
          */
-        public Builder rootUnwrapping(boolean rootUnwrapping) {
+        public MappedBuilder rootUnwrapping(boolean rootUnwrapping) {
             this.rootUnwrapping = rootUnwrapping;
             return this;
         }
@@ -240,8 +252,8 @@ public class JSONConfiguration {
      *
      * @return a builder for JSONConfiguration instance
      */
-    public static Builder mapped() {
-        return new Builder(Notation.MAPPED);
+    public static MappedBuilder mapped() {
+        return new MappedBuilder(Notation.MAPPED);
     }
 
     /**
@@ -252,7 +264,7 @@ public class JSONConfiguration {
      * @return a builder for JSONConfiguration instance
      */
     public static Builder mappedJettison() {
-        return new Builder(Notation.MAPPED_JETTISON);
+        return new MappedBuilder(Notation.MAPPED_JETTISON);
     }
 
     /**
@@ -266,42 +278,7 @@ public class JSONConfiguration {
         return new Builder(Notation.BADGERFISH);
     }
 
-    /**
-     * Returns JSON array names property
-     * @return collection of array names
-     * @see Builder#arrays(java.lang.String[]) 
-     */
-    public Collection<String> getArrays() {
-        return (arrays != null) ? Collections.unmodifiableCollection(arrays) : null;
-    }
-
-    /**
-     * Returns names of attributes, which will be handled as elements
-     * @return attribute as element names collection
-     * @see Builder#attributeAsElement(java.lang.String[])
-     */
-    public Collection<String> getAttributeAsElements() {
-        return (attrsAsElems != null) ? Collections.unmodifiableCollection(attrsAsElems) : null;
-    }
-
-    /**
-     * Returns a map for XML to JSON namespace mapping
-     * @return a map for XML to JSON namespace mapping
-     * @see Builder#xml2JsonNs(java.util.Map)
-     */
-    public Map<String, String> getXml2JsonNs() {
-        return (jsonXml2JsonNs != null) ? Collections.unmodifiableMap(jsonXml2JsonNs) : null;
-    }
-
-    /**
-     * Returns names of JSON objects, which will be serialized out as non-strings, i.e. without delimiting their values with double quotes
-     * @return name of non-string JSON objects
-     * @see Builder#nonStrings(java.lang.String[])
-     */
-    public Collection<String> getNonStrings() {
-        return (nonStrings != null) ? Collections.unmodifiableCollection(nonStrings) : null;
-    }
-
+    
     /**
      * Returns JSON notation selected for this configuration
      * @return JSON notation
@@ -311,7 +288,48 @@ public class JSONConfiguration {
     }
 
     /**
+     * Returns JSON array names property
+     * This property is valid for the {@link JSONConfiguration.Notation#MAPPED} notation only.
+     * @return collection of array names
+     * @see Builder#arrays(java.lang.String[]) 
+     */
+    public Collection<String> getArrays() {
+        return (arrays != null) ? Collections.unmodifiableCollection(arrays) : null;
+    }
+
+    /**
+     * Returns names of attributes, which will be handled as elements
+     * This property is valid for the {@link JSONConfiguration.Notation#MAPPED} notation only.
+     * @return attribute as element names collection
+     * @see Builder#attributeAsElement(java.lang.String[])
+     */
+    public Collection<String> getAttributeAsElements() {
+        return (attrsAsElems != null) ? Collections.unmodifiableCollection(attrsAsElems) : null;
+    }
+
+    /**
+     * Returns a map for XML to JSON namespace mapping
+     * This property is valid for the {@link JSONConfiguration.Notation#MAPPED} notation only.
+     * @return a map for XML to JSON namespace mapping
+     * @see Builder#xml2JsonNs(java.util.Map)
+     */
+    public Map<String, String> getXml2JsonNs() {
+        return (jsonXml2JsonNs != null) ? Collections.unmodifiableMap(jsonXml2JsonNs) : null;
+    }
+
+    /**
+     * Returns names of JSON objects, which will be serialized out as non-strings, i.e. without delimiting their values with double quotes
+     * This property is valid for the {@link JSONConfiguration.Notation#MAPPED} notation only.
+     * @return name of non-string JSON objects
+     * @see Builder#nonStrings(java.lang.String[])
+     */
+    public Collection<String> getNonStrings() {
+        return (nonStrings != null) ? Collections.unmodifiableCollection(nonStrings) : null;
+    }
+
+    /**
      * Says if the root element will be stripped off
+     * This property is valid for the {@link JSONConfiguration.Notation#MAPPED} notation only.
      * @return true, if root element has to be stripped off
      * @see Builder#rootUnwrapping(boolean) 
      */

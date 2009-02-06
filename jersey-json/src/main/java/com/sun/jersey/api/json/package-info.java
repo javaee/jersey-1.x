@@ -112,7 +112,7 @@
  *   private final Class[] cTypes = {BeanOne.class, BeanTwo.class};
  *
  *   public JAXBContextResolver() throws JAXBException {
- *       this.context = new <span style="font-weight:bold">JSONJAXBContext</span>(<span style="font-weight:bold">JSONConfiguration.getBuilder(JSONConfiguration.Notation.NATURAL).build()</span>, cTypes);
+ *       this.context = new <span style="font-weight:bold">JSONJAXBContext</span>(<span style="font-weight:bold">JSONConfiguration.natural().build()</span>, cTypes);
  *       this.types = new HashSet(Arrays.asList(cTypes));
  *   }
  *

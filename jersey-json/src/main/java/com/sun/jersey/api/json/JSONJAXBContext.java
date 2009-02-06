@@ -479,35 +479,44 @@ public final class JSONJAXBContext extends JAXBContext implements JSONConfigurat
                         pNotation = _notationMap.get(nO.toString());
                     }
                 }
-                JSONConfiguration.Builder builder = null;
-                switch (pNotation) {
-                    case BADGERFISH : builder = JSONConfiguration.badgerFish();break;
-                    case MAPPED_JETTISON : builder = JSONConfiguration.mappedJettison(); break;
-                    case NATURAL : builder = JSONConfiguration.natural(); break;
-                    case MAPPED :
-                    default: builder = JSONConfiguration.mapped(); break;
-                }
-                String [] a = new String[0];
-                if (properties.containsKey(JSONJAXBContext.JSON_ARRAYS)) {
-                    builder.arrays(((Collection<String>) properties.get(JSONJAXBContext.JSON_ARRAYS)).toArray(a));
-                }
-                if (properties.containsKey(JSONJAXBContext.JSON_ATTRS_AS_ELEMS)) {
-                    builder.attributeAsElement(((Collection<String>) properties.get(JSONJAXBContext.JSON_ATTRS_AS_ELEMS)).toArray(a));
-                }
-                if (properties.containsKey(JSONJAXBContext.JSON_NON_STRINGS)) {
-                    builder.nonStrings(((Collection<String>) properties.get(JSONJAXBContext.JSON_NON_STRINGS)).toArray(a));
-                }
-                if (properties.containsKey(JSONJAXBContext.JSON_XML2JSON_NS)) {
-                    builder.xml2JsonNs((Map<String, String>) properties.get(JSONJAXBContext.JSON_XML2JSON_NS));
-                }
-                if (properties.containsKey(JSONJAXBContext.JSON_ROOT_UNWRAPPING)) {
-                    builder.rootUnwrapping((Boolean) properties.get(JSONJAXBContext.JSON_ROOT_UNWRAPPING));
-                }
-                jsonConfiguration = builder.build();
+                jsonConfiguration = getConfiguration(pNotation, properties);
             }
         }
         for (String k : jsonKeys) {
             properties.remove(k);
+        }
+    }
+
+    private JSONConfiguration getConfiguration(JSONConfiguration.Notation pNotation,
+            Map<String, Object> properties) {
+        switch (pNotation) {
+            case BADGERFISH :
+                return JSONConfiguration.badgerFish().build();
+            case MAPPED_JETTISON : 
+                return JSONConfiguration.mappedJettison().build();
+            case NATURAL : 
+                return JSONConfiguration.natural().build();
+            case MAPPED :
+            default: {
+                JSONConfiguration.MappedBuilder mappedBuilder = JSONConfiguration.mapped();
+                String [] a = new String[0];
+                if (properties.containsKey(JSONJAXBContext.JSON_ARRAYS)) {
+                    mappedBuilder.arrays(((Collection<String>) properties.get(JSONJAXBContext.JSON_ARRAYS)).toArray(a));
+                }
+                if (properties.containsKey(JSONJAXBContext.JSON_ATTRS_AS_ELEMS)) {
+                    mappedBuilder.attributeAsElement(((Collection<String>) properties.get(JSONJAXBContext.JSON_ATTRS_AS_ELEMS)).toArray(a));
+                }
+                if (properties.containsKey(JSONJAXBContext.JSON_NON_STRINGS)) {
+                    mappedBuilder.nonStrings(((Collection<String>) properties.get(JSONJAXBContext.JSON_NON_STRINGS)).toArray(a));
+                }
+                if (properties.containsKey(JSONJAXBContext.JSON_XML2JSON_NS)) {
+                    mappedBuilder.xml2JsonNs((Map<String, String>) properties.get(JSONJAXBContext.JSON_XML2JSON_NS));
+                }
+                if (properties.containsKey(JSONJAXBContext.JSON_ROOT_UNWRAPPING)) {
+                    mappedBuilder.rootUnwrapping((Boolean) properties.get(JSONJAXBContext.JSON_ROOT_UNWRAPPING));
+                }
+                return mappedBuilder.build();
+            }
         }
     }
 }
