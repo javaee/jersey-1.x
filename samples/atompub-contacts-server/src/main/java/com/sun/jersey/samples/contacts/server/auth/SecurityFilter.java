@@ -180,8 +180,14 @@ public class SecurityFilter implements ContainerRequestFilter {
          * <ul>
          * <li>User <code>admin</code> has the <code>admin</code> and
          *     <code>user</code> roles unconditionally.</li>
-         * <li>All other users have the <code>user</code> role <strong>ONLY</strong>
-         *     for URIs that specify their own contact lists.</li>
+         * <li>For all other users, grant the <code>user</code> role IF AND ONLY IF
+         *     this request URI used the <code>username</code> path parameter,
+         *     and the specifyed username matches the username in the HTTP
+         *     Basic authentication header.  (An alternative strategy for
+         *     conditionally granting a role would be to call
+         *     <code>uriInfo.getPathSegments()</code> and make a decision
+         *     based on a more fine grained understanding of this application's
+         *     URI structure.)</li>
          * </ul>
          *
          * @param role Role to be checked
@@ -195,6 +201,13 @@ public class SecurityFilter implements ContainerRequestFilter {
 //                    System.out.println("isUserInRole(user) ==> true for admin unconditionally");
                     return true;
                 }
+                String pathParam = uriInfo.getPathParameters().getFirst("username");
+                if ((pathParam != null) &&
+                    this.principal.getName().endsWith(pathParam)) {
+//                    System.out.println("isUserInRole(user) ==> true for this user");
+                    return true;
+                }
+                /*
                 List<PathSegment> pathSegments = uriInfo.getPathSegments();
                 if ((pathSegments.size() >= 2) &&
                     "contacts".equals(pathSegments.get(0).getPath()) &&
@@ -205,6 +218,7 @@ public class SecurityFilter implements ContainerRequestFilter {
 //                    System.out.println("isUserInRole(user) ==> false for this user");
                     return false;
                 }
+                */
             }
 //            System.out.println("isUserInRole(" + role + ") ==> false unconditionally");
             return false;
