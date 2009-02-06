@@ -57,7 +57,7 @@ public class JAXBContextResolver implements ContextResolver<JAXBContext> {
     private Class[] types = {Printer.class, PrinterTableModel.class, TreeModel.class, WebResourceList.class};
 
     public JAXBContextResolver() throws Exception {
-        this.context = new JSONJAXBContext(JSONConfiguration.getBuilder(JSONConfiguration.Notation.NATURAL).build(), types);
+        this.context = new JSONJAXBContext(JSONConfiguration.natural().build(), types);
     }
 
     public JAXBContext getContext(Class<?> objectType) {

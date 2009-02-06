@@ -80,15 +80,15 @@ public class Stax2JsonFactory {
                     return new Stax2JacksonWriter(JacksonRootStrippingGenerator.createRootStrippingGenerator(new JsonFactory().createJsonGenerator(writer)));
                 }
             case MAPPED:
-                return JsonXmlStreamWriter.createWriter(writer, config.isRootUnwrapping(), config.getArrays(), config.getNonStrings(), config.getAttrsAsElems());
+                return JsonXmlStreamWriter.createWriter(writer, config.isRootUnwrapping(), config.getArrays(), config.getNonStrings(), config.getAttributeAsElements());
             case BADGERFISH:
                 return new BadgerFishXMLStreamWriter(writer);
             case MAPPED_JETTISON:
                 Configuration jmConfig;
-                if (null == config.getJsonXml2JsonNs()) {
+                if (null == config.getXml2JsonNs()) {
                     jmConfig = new Configuration();
                 } else {
-                    jmConfig = new Configuration(config.getJsonXml2JsonNs());
+                    jmConfig = new Configuration(config.getXml2JsonNs());
                 }
                 return new MappedXMLStreamWriter(
                         new MappedNamespaceConvention(jmConfig), writer);
@@ -120,7 +120,7 @@ public class Stax2JsonFactory {
                 break;
             case MAPPED:
                 try {
-                    return new JsonXmlStreamReader(reader, rootName, config.getAttrsAsElems());
+                    return new JsonXmlStreamReader(reader, rootName, config.getAttributeAsElements());
                 } catch (IOException ex) {
                     Logger.getLogger(JSONUnmarshaller.class.getName()).log(Level.SEVERE, null, ex);
                 }
@@ -128,10 +128,10 @@ public class Stax2JsonFactory {
             case MAPPED_JETTISON:
                 try {
                     Configuration jmConfig;
-                    if (null == config.getJsonXml2JsonNs()) {
+                    if (null == config.getXml2JsonNs()) {
                         jmConfig = new Configuration();
                     } else {
-                        jmConfig = new Configuration(config.getJsonXml2JsonNs());
+                        jmConfig = new Configuration(config.getXml2JsonNs());
                     }
                     return new MappedXMLStreamReader(
                             new JSONObject(new JSONTokener(readFromAsString(reader))),

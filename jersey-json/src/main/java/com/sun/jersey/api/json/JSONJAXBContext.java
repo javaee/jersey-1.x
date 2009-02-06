@@ -55,14 +55,8 @@ import javax.xml.bind.Validator;
  * An adaption of {@link JAXBContext} that supports marshalling
  * and unmarshalling of JAXB beans using the JSON format.
  * <p>
- * The JSON format may be configured by setting properties on this class
- * when it is constructed and on properties of the Marshaller and
- * Unmarshaller returned from the relevant methods on this class.
- * <p>
- * To enable JSON marshalling and unmarshalling it is necessary to set
- * the {@link #JSON_ENABLED} property to <code>true</code> on the Marshaller
- * and Unmarshaller returned from the relevant methods on this class.
- * 
+ * The JSON format may be configured by using a {@link JSONConfiguration} object as a parameter
+ * at various {@code JSONJAXBContext} constructors.
  */
 public final class JSONJAXBContext extends JAXBContext implements JSONConfigurated {
     
@@ -100,7 +94,7 @@ public final class JSONJAXBContext extends JAXBContext implements JSONConfigurat
     };
 
     /**
-     * JSON notation property.
+     * JSON notation property is now deprecated. See {@link JSONConfiguration}.
      * <p>
      * The type of this property is enum type {@link JSONNotation}.
      * <p>
@@ -114,7 +108,7 @@ public final class JSONJAXBContext extends JAXBContext implements JSONConfigurat
     public static final String JSON_NOTATION = NAMESPACE + "notation";
     
     /**
-     * JSON enabled property.
+     * JSON enabled property is now deprecated. See {@link JSONConfiguration}.
      * <p>
      * The type of this property is {@link Boolean}
      * <p>
@@ -126,7 +120,7 @@ public final class JSONJAXBContext extends JAXBContext implements JSONConfigurat
     public static final String JSON_ENABLED = NAMESPACE + "enabled";
     
     /**
-     * XML root element unwrapping.
+     * XML root element unwrapping property is now deprecated. See {@link JSONConfiguration}.
      * <p>
      * The type of this property is {@link Boolean}
      * <p>
@@ -139,7 +133,7 @@ public final class JSONJAXBContext extends JAXBContext implements JSONConfigurat
     public static final String JSON_ROOT_UNWRAPPING = NAMESPACE + "root.unwrapping";
     
     /**
-     * JSON arrays property. 
+     * JSON arrays property is now deprecated. See {@link JSONConfiguration}.
      * This property is valid for the <code>JSONNotation.MAPPED</code> notation only.
      * <p>
      * The type of this property is <code>java.util.Collection&lt;String&gt;</code>.
@@ -161,7 +155,7 @@ public final class JSONJAXBContext extends JAXBContext implements JSONConfigurat
     public static final String JSON_ARRAYS = NAMESPACE + "arrays";
 
     /**
-     * JSON non-string values property. 
+     * JSON non-string values property is now deprecated. See {@link JSONConfiguration}.
      * This property is valid for the <code>JSONNotation.MAPPED</code> notation only.
      * <p>
      * The type of this property is <code>Collection&lt;String&gt;</code>.
@@ -183,7 +177,7 @@ public final class JSONJAXBContext extends JAXBContext implements JSONConfigurat
     public static final String JSON_NON_STRINGS = NAMESPACE + "non.strings";
 
     /**
-     * JSON attributes as elements property.
+     * JSON attributes as elements property is now deprecated. See {@link JSONConfiguration}.
      * This property is valid for the <code>JSONNotation.MAPPED</code> notation only.
      * <p>
      * The type of this property is <code>Collection&lt;String&gt;</code>.
@@ -205,7 +199,7 @@ public final class JSONJAXBContext extends JAXBContext implements JSONConfigurat
     public static final String JSON_ATTRS_AS_ELEMS = NAMESPACE + "attrs.as.elems";
 
     /**
-     * XML to JSON namespace mapping.
+     * XML to JSON namespace mapping property is now deprecated. See {@link JSONConfiguration}.
      * This property is valid for the MAPPED_JETTISON notation only.
      * <p>
      * <p>
@@ -477,7 +471,7 @@ public final class JSONJAXBContext extends JAXBContext implements JSONConfigurat
             }
         }
         if (!jsonKeys.isEmpty()) {
-            if (jsonConfiguration != null) {
+            if (jsonConfiguration == null) {
                 JSONConfiguration.Notation pNotation = JSONConfiguration.Notation.MAPPED;
                 if (properties.containsKey(JSONJAXBContext.JSON_NOTATION)) {
                     Object nO = properties.get(JSONJAXBContext.JSON_NOTATION);
@@ -485,12 +479,30 @@ public final class JSONJAXBContext extends JAXBContext implements JSONConfigurat
                         pNotation = _notationMap.get(nO.toString());
                     }
                 }
-                JSONConfiguration.Builder builder = JSONConfiguration.getBuilder(pNotation);
-                builder.setArrays((Collection<String>) properties.get(JSONJAXBContext.JSON_ARRAYS));
-                builder.setAttrsAsElems((Collection<String>) properties.get(JSONJAXBContext.JSON_ATTRS_AS_ELEMS));
-                builder.setNonStrings((Collection<String>) properties.get(JSONJAXBContext.JSON_NON_STRINGS));
-                builder.setJsonXml2JsonNs((Map<String, String>) properties.get(JSONJAXBContext.JSON_XML2JSON_NS));
-                builder.setRootUnwrapping((Boolean) properties.get(JSONJAXBContext.JSON_ROOT_UNWRAPPING));
+                JSONConfiguration.Builder builder = null;
+                switch (pNotation) {
+                    case BADGERFISH : builder = JSONConfiguration.badgerFish();break;
+                    case MAPPED_JETTISON : builder = JSONConfiguration.mappedJettison(); break;
+                    case NATURAL : builder = JSONConfiguration.natural(); break;
+                    case MAPPED :
+                    default: builder = JSONConfiguration.mapped(); break;
+                }
+                String [] a = new String[0];
+                if (properties.containsKey(JSONJAXBContext.JSON_ARRAYS)) {
+                    builder.arrays(((Collection<String>) properties.get(JSONJAXBContext.JSON_ARRAYS)).toArray(a));
+                }
+                if (properties.containsKey(JSONJAXBContext.JSON_ATTRS_AS_ELEMS)) {
+                    builder.attributeAsElement(((Collection<String>) properties.get(JSONJAXBContext.JSON_ATTRS_AS_ELEMS)).toArray(a));
+                }
+                if (properties.containsKey(JSONJAXBContext.JSON_NON_STRINGS)) {
+                    builder.nonStrings(((Collection<String>) properties.get(JSONJAXBContext.JSON_NON_STRINGS)).toArray(a));
+                }
+                if (properties.containsKey(JSONJAXBContext.JSON_XML2JSON_NS)) {
+                    builder.xml2JsonNs((Map<String, String>) properties.get(JSONJAXBContext.JSON_XML2JSON_NS));
+                }
+                if (properties.containsKey(JSONJAXBContext.JSON_ROOT_UNWRAPPING)) {
+                    builder.rootUnwrapping((Boolean) properties.get(JSONJAXBContext.JSON_ROOT_UNWRAPPING));
+                }
                 jsonConfiguration = builder.build();
             }
         }

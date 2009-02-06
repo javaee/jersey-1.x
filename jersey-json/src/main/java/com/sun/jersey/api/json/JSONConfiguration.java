@@ -36,6 +36,7 @@
  */
 package com.sun.jersey.api.json;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -43,7 +44,8 @@ import java.util.HashSet;
 import java.util.Map;
 
 /**
- * Immutable bag of various JSON notation related configuration options
+ * Immutable bag of various JSON notation related configuration options. JSONConfiguration could be used
+ * for configuring JSON notation on {@link JSONJAXBContext}
  *
  * @author Jakub.Podlesak@Sun.COM
  */
@@ -56,18 +58,30 @@ public class JSONConfiguration {
 
         /**
          * The mapped (default) JSON notation.
+         * <p>Example JSON expression:<pre>
+         * {"columns":[{"id":"userid","label":"UserID"},{"id":"name","label":"User Name"}],"rows":{"userid":"1621","name":"Grotefend"}}
+         * </pre>
          */
         MAPPED,
         /**
          * The mapped Jettison JSON notation.
+         * <p>Example JSON expression:<pre>
+         * {"userTable":{"columns":[{"id":"userid","label":"UserID"},{"id":"name","label":"User Name"}],"rows":{"userid":1621,"name":"Grotefend"}}}
+         * </pre>
          */
         MAPPED_JETTISON,
         /**
          * The mapped Badgerfish JSON notation.
+         * <p>Example JSON expression:<pre>
+         * {"userTable":{"columns":[{"id":{"$":"userid"},"label":{"$":"UserID"}},{"id":{"$":"name"},"label":{"$":"User Name"}}],"rows":{"userid":{"$":"1621"},"name":{"$":"Grotefend"}}}}
+         * </pre>
          */
         BADGERFISH,
         /**
          * The natural JSON notation, leveraging tight JAXB RI integration.
+         * <p>Example JSON expression:<pre>
+         * {"columns":[{"id":"userid","label":"UserID"},{"id":"name","label":"User Name"}],"rows":[{"userid":1621,"name":"Grotefend"}]}
+         * </pre>
          */
         NATURAL
     };
@@ -88,7 +102,7 @@ public class JSONConfiguration {
         private Collection<String> attrsAsElems = new HashSet<String>(0);
         private Collection<String> nonStrings = new HashSet<String>(0);
         private boolean rootUnwrapping = true;
-        private Map<String, String> jsonXml2JsonNs = new HashMap<String, String>();
+        private Map<String, String> jsonXml2JsonNs = new HashMap<String, String>(0);
 
         private Builder(Notation notation) {
             this.notation = notation;
@@ -104,7 +118,7 @@ public class JSONConfiguration {
         }
 
         /**
-         * Setter for JSON array configuration property.
+         * Adds name(s) to JSON arrays configuration property.
          * This property is valid for the {@link JSONConfiguration.Notation#MAPPED} notation only.
          * <p>
          * The property value is a collection of strings representing JSON object names.
@@ -117,13 +131,13 @@ public class JSONConfiguration {
          * <p>
          * The default value is an empty collection.
          */
-        public Builder setArrays(Collection<String> arrays) {
-            this.arrays = arrays;
+        public Builder arrays(String... arrays) {
+            this.arrays.addAll(Arrays.asList(arrays));
             return this;
         }
 
         /**
-         * Setter for JSON attributes as elements property.
+         * Adds name(s) toJSON attributes as elements property.
          * This property is valid for the {@link JSONConfiguration.Notation#MAPPED} notation only.
          * <p>
          * The value is a collection of string values that are
@@ -139,8 +153,8 @@ public class JSONConfiguration {
          * <p>
          * The default value is an empty collection.
          */
-        public Builder setAttrsAsElems(Collection<String> attrsAsElems) {
-            this.attrsAsElems = attrsAsElems;
+        public Builder attributeAsElement(String... attributeAsElements) {
+            this.attrsAsElems.addAll(Arrays.asList(attributeAsElements));
             return this;
         }
 
@@ -154,13 +168,13 @@ public class JSONConfiguration {
          * <p>
          * The default value is a map with zero key/value pairs.
          */
-        public Builder setJsonXml2JsonNs(Map<String, String> jsonXml2JsonNs) {
+        public Builder xml2JsonNs(Map<String, String> jsonXml2JsonNs) {
             this.jsonXml2JsonNs = jsonXml2JsonNs;
             return this;
         }
 
         /**
-         * Setter for JSON non-string values property.
+         * Adds name(s) JSON non-string values property.
          * This property is valid for the {@link JSONConfiguration.Notation#MAPPED} notation only.
          * <p>
          * The value is collection of string values that are
@@ -176,8 +190,8 @@ public class JSONConfiguration {
          * <p>
          * The default value is an empty collection.
          */
-        public Builder setNonStrings(Collection<String> nonStrings) {
-            this.nonStrings = nonStrings;
+        public Builder nonStrings(String... nonStrings) {
+            this.nonStrings.addAll(Arrays.asList(nonStrings));
             return this;
         }
 
@@ -189,7 +203,7 @@ public class JSONConfiguration {
          * <p>
          * The default value is false.
          */
-        public Builder setRootUnwrapping(boolean rootUnwrapping) {
+        public Builder rootUnwrapping(boolean rootUnwrapping) {
             this.rootUnwrapping = rootUnwrapping;
             return this;
         }
@@ -206,40 +220,101 @@ public class JSONConfiguration {
     /**
      * The default JSONConfiguration uses {@link JSONConfiguration.Notation#MAPPED} notation with root unwrapping option set to true.
      */
-    public static JSONConfiguration DEFAULT = getBuilder(Notation.MAPPED).setRootUnwrapping(true).build();
+    public static JSONConfiguration DEFAULT = mapped().rootUnwrapping(true).build();
 
     /**
-     * A static method for obtaining a builder of {@link JSONConfiguration} instance.
-     * After getting the builder, you can set configuration options on it and finally get an immutable  JSONConfiguration
-     * bag built for you using {@link Builder#build() } method.
+     * A static method for obtaining a builder of {@link JSONConfiguration} instance, which will use {@link Notation#NATURAL} JSON notation.
+     * After getting the builder, you can set configuration options on it, and finally get an immutable  JSONConfiguration
+     * bag using {@link Builder#build() } method.
      *
-     * @param notation is the JSON notation, which will be used
      * @return a builder for JSONConfiguration instance
      */
-    public static Builder getBuilder(Notation notation) {
-        return new Builder(notation);
+    public static Builder natural() {
+        return new Builder(Notation.NATURAL);
     }
 
+    /**
+     * A static method for obtaining a builder of {@link JSONConfiguration} instance, which will use {@link Notation#MAPPED} JSON notation.
+     * After getting the builder, you can set configuration options on it and finally get an immutable  JSONConfiguration
+     * bag built using {@link Builder#build() } method.
+     *
+     * @return a builder for JSONConfiguration instance
+     */
+    public static Builder mapped() {
+        return new Builder(Notation.MAPPED);
+    }
+
+    /**
+     * A static method for obtaining a builder of {@link JSONConfiguration} instance, which will use {@link Notation#MAPPED_JETTISON} JSON notation.
+     * After getting the builder, you can set configuration options on it and finally get an immutable  JSONConfiguration
+     * bag built using {@link Builder#build() } method.
+     *
+     * @return a builder for JSONConfiguration instance
+     */
+    public static Builder mappedJettison() {
+        return new Builder(Notation.MAPPED_JETTISON);
+    }
+
+    /**
+     * A static method for obtaining a builder of {@link JSONConfiguration} instance, which will use {@link Notation#BADGERFISH} JSON notation.
+     * After getting the builder, you can set configuration options on it and finally get an immutable  JSONConfiguration
+     * bag built using {@link Builder#build() } method.
+     *
+     * @return a builder for JSONConfiguration instance
+     */
+    public static Builder badgerFish() {
+        return new Builder(Notation.BADGERFISH);
+    }
+
+    /**
+     * Returns JSON array names property
+     * @return collection of array names
+     * @see Builder#arrays(java.lang.String[]) 
+     */
     public Collection<String> getArrays() {
         return (arrays != null) ? Collections.unmodifiableCollection(arrays) : null;
     }
 
-    public Collection<String> getAttrsAsElems() {
+    /**
+     * Returns names of attributes, which will be handled as elements
+     * @return attribute as element names collection
+     * @see Builder#attributeAsElement(java.lang.String[])
+     */
+    public Collection<String> getAttributeAsElements() {
         return (attrsAsElems != null) ? Collections.unmodifiableCollection(attrsAsElems) : null;
     }
 
-    public Map<String, String> getJsonXml2JsonNs() {
+    /**
+     * Returns a map for XML to JSON namespace mapping
+     * @return a map for XML to JSON namespace mapping
+     * @see Builder#xml2JsonNs(java.util.Map)
+     */
+    public Map<String, String> getXml2JsonNs() {
         return (jsonXml2JsonNs != null) ? Collections.unmodifiableMap(jsonXml2JsonNs) : null;
     }
 
+    /**
+     * Returns names of JSON objects, which will be serialized out as non-strings, i.e. without delimiting their values with double quotes
+     * @return name of non-string JSON objects
+     * @see Builder#nonStrings(java.lang.String[])
+     */
     public Collection<String> getNonStrings() {
         return (nonStrings != null) ? Collections.unmodifiableCollection(nonStrings) : null;
     }
 
+    /**
+     * Returns JSON notation selected for this configuration
+     * @return JSON notation
+     */
     public Notation getNotation() {
         return notation;
     }
 
+    /**
+     * Says if the root element will be stripped off
+     * @return true, if root element has to be stripped off
+     * @see Builder#rootUnwrapping(boolean) 
+     */
     public boolean isRootUnwrapping() {
         return rootUnwrapping;
     }

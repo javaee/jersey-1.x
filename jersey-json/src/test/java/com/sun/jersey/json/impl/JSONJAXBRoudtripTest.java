@@ -93,7 +93,7 @@ public class JSONJAXBRoudtripTest extends TestCase {
     
     public void testInternalNotation() throws Exception {
         System.out.println("INTERNAL NOTATION");
-        allBeansTest(new JSONJAXBContext(JSONConfiguration.getBuilder(JSONConfiguration.Notation.MAPPED).setRootUnwrapping(false).build(), classes), beans);
+        allBeansTest(new JSONJAXBContext(JSONConfiguration.mapped().rootUnwrapping(false).build(), classes), beans);
     }
 
     public void testInternalNotationDeprecatedConfig() throws Exception {
@@ -106,7 +106,7 @@ public class JSONJAXBRoudtripTest extends TestCase {
 
     public void testInternalNotationAttrAsElems() throws Exception {
         System.out.println("INTERNAL NOTATION WITH SOME ATTR AS ELEMS");
-        allBeansTest(new JSONJAXBContext(JSONConfiguration.getBuilder(JSONConfiguration.Notation.MAPPED).setRootUnwrapping(true).setAttrsAsElems(new HashSet<String>(3){{add("i");add("j");}}).build(), classes), beans);
+        allBeansTest(new JSONJAXBContext(JSONConfiguration.mapped().rootUnwrapping(true).attributeAsElement("i", "j").build(), classes), beans);
     }
 
     public void testInternalNotationAttrAsElemsDeprecatedConfig() throws Exception {
@@ -114,13 +114,13 @@ public class JSONJAXBRoudtripTest extends TestCase {
         Map<String, Object> props = new HashMap<String, Object>();
         props.put(JSONJAXBContext.JSON_NOTATION, JSONJAXBContext.JSONNotation.MAPPED);
         props.put(JSONJAXBContext.JSON_ROOT_UNWRAPPING, Boolean.TRUE);
-        props.put(JSONJAXBContext.JSON_ATTRS_AS_ELEMS, new HashSet<String>(3){{add("i");add("j");}});
+        props.put(JSONJAXBContext.JSON_ATTRS_AS_ELEMS, new HashSet<String>(2){{add("i");add("j");}});
         allBeansTest(new JSONJAXBContext(classes, props), beans);
     }
 
     public void testJettisonBadgerfishNotation() throws Exception {
         System.out.println("BADGERFISH NOTATION");
-        allBeansTest(new JSONJAXBContext(JSONConfiguration.getBuilder(JSONConfiguration.Notation.BADGERFISH).build(), classes), beans);
+        allBeansTest(new JSONJAXBContext(JSONConfiguration.badgerFish().build(), classes), beans);
     }
 
     public void testJettisonBadgerfishNotationDeprecatedConfig() throws Exception {
@@ -132,7 +132,7 @@ public class JSONJAXBRoudtripTest extends TestCase {
 
     public void testNaturalNotation() throws Exception {
         System.out.println("NATURAL NOTATION");
-        allBeansTest(new JSONJAXBContext(JSONConfiguration.getBuilder(JSONConfiguration.Notation.NATURAL).build(), classes), beans);
+        allBeansTest(new JSONJAXBContext(JSONConfiguration.natural().build(), classes), beans);
     }
     
     public void testNaturalNotationDeprecatedConfig() throws Exception {
@@ -147,7 +147,7 @@ public class JSONJAXBRoudtripTest extends TestCase {
 //        System.out.println("MAPPED (JETTISON) NOTATION");
 //        Map<String, Object> props = new HashMap<String, Object>();
 //        props.put(JSONJAXBContext.JSON_NOTATION, "MAPPED_JETTISON");
-//        props.put(JSONJAXBContext.JSON_ROOT_UNWRAPPING, Boolean.TRUE);        
+//        props.put(JSONJAXBContext.JSON_ROOT_UNWRAPPING, Boolean.TRUE);
 //        allBeansTest(new JSONJAXBContext(classes, props), beans);
 //    }
     

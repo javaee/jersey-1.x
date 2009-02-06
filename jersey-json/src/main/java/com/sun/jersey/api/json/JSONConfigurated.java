@@ -37,7 +37,7 @@
 package com.sun.jersey.api.json;
 
 /**
- * @author japod
+ * @author Jakub.Podlesak@Sun.COM
  */
 public interface JSONConfigurated {
 

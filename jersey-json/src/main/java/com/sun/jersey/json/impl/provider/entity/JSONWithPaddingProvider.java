@@ -62,7 +62,7 @@ import javax.ws.rs.ext.MessageBodyWriter;
 
 /**
  *
- * @author japod
+ * @author Jakub.Podlesak@Sun.COM, Paul.Sandoz@Sun.COM
  */
 public class JSONWithPaddingProvider extends AbstractMessageReaderWriterProvider<JSONWithPadding> {
 

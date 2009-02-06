@@ -62,7 +62,7 @@ public final class JAXBContextResolver implements ContextResolver<JAXBContext> {
     
     public JAXBContextResolver() throws Exception {
         this.types = new HashSet(Arrays.asList(cTypes));
-        this.context = new JSONJAXBContext(JSONConfiguration.getBuilder(JSONConfiguration.Notation.NATURAL).build(), cTypes);
+        this.context = new JSONJAXBContext(JSONConfiguration.natural().build(), cTypes);
     }
     
     public JAXBContext getContext(Class<?> objectType) {
