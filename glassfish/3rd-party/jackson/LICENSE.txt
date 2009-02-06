@@ -1,0 +1,1 @@
+Jackson is dual-licensed under two alternative popular Open Source licenses: Apache (AL 2.0) and Gnu Lesser GPL (LGPL 2.1). You choose one or the other, as necessary (if you want to redistribute the code – for use, you do not need license), and abide by the license rules as defined by the respective license agreement (and only that one).

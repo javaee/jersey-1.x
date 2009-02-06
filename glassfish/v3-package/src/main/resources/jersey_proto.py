@@ -14,7 +14,7 @@ pkg = {
                   "pkg:/asm@3.1" : {"type" : "require" }
                   ,"pkg:/jaxb@2.1.10" : {"type" : "require" }
                   ,"pkg:/jettison@1.0.1" : {"type" : "require" }
-                  ,"pkg:/jackson@0.9.4" : {"type" : "require" }
+                  ,"pkg:/jackson@0.9.4" : {"type" : "optional" }
                 },
     "licenses" : { "jersey/LICENSE.txt" : { "license" : "CDDL+GPL" }}
 }
