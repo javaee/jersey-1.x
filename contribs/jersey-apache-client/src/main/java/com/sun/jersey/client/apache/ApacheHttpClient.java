@@ -45,8 +45,23 @@ import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.MultiThreadedHttpConnectionManager;
 
 /**
- * Apache HTTP client.
- *
+ * A {@link Client} that utilizes the Apache HTTP client to send and receive
+ * HTTP request and responses.
+ * <p>
+ * If an {@link ApacheHttpClientHandler} is not explicitly passed as a
+ * constructor or method parameter then by default an instance is created with
+ * an {@link HttpClient} constructed with a {@link MultiThreadedHttpConnectionManager}
+ * instance.
+ * <p>
+ * The following properties are only supported at construction of this class:
+ * {@link ApacheHttpClientConfig#PROPERTY_PREEMPTIVE_AUTHENTICATION} and
+ * {@link ClientConfig#PROPERTY_CONNECT_TIMEOUT}.
+ * <p>
+ * If a response entity is obtained that is an instance of {@link Closeable}
+ * then the instance MUST be closed after processing the entity to release
+ * connection-based resources.
+ * 
+ * @author jorgeluisw@mac.com
  * @author Paul.Sandoz@Sun.Com
  */
 public class ApacheHttpClient extends Client {

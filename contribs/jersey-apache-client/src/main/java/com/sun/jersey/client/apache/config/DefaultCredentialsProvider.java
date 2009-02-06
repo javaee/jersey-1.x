@@ -51,35 +51,32 @@ import org.apache.commons.httpclient.auth.CredentialsNotAvailableException;
 import org.apache.commons.httpclient.auth.NTLMScheme;
 import org.apache.commons.httpclient.auth.RFC2617Scheme;
 
-
 /**
-   A very simple credential provider.
+ * A simple interactive credentials provider using Swing dialogs to prompt
+ * the user for a user name and password.
+ *
+ * @author jorgeluisw@mac.com
+ */
+public class DefaultCredentialsProvider implements CredentialsProvider {
 
-   @author jorgew
- **/
-
-
-public class DefaultCredentialsProvider implements CredentialsProvider
-{
-    public Credentials getCredentials (AuthScheme scheme,
-                                       String host,
-                                       int port,
-                                       boolean proxy)
-        throws CredentialsNotAvailableException
-    {
+    public Credentials getCredentials(AuthScheme scheme,
+            String host,
+            int port,
+            boolean proxy)
+            throws CredentialsNotAvailableException {
         if (scheme == null) {
             return null;
-            }
+        }
 
         try {
-            JTextField         userField = new JTextField();
+            JTextField userField = new JTextField();
             JPasswordField passwordField = new JPasswordField();
             int response;
 
             if (scheme instanceof NTLMScheme) {
                 JTextField domainField = new JTextField();
                 Object[] msg = {
-                    host+":"+port+" requires Windows authentication",
+                    host + ":" + port + " requires Windows authentication",
                     "Domain",
                     domainField,
                     "User Name",
@@ -87,51 +84,49 @@ public class DefaultCredentialsProvider implements CredentialsProvider
                     "Password",
                     passwordField
                 };
-                response = JOptionPane.showConfirmDialog (null, msg, "Authenticate",
-                                                          JOptionPane.OK_CANCEL_OPTION);
+                response = JOptionPane.showConfirmDialog(null, msg, "Authenticate",
+                        JOptionPane.OK_CANCEL_OPTION);
 
                 if ((response == JOptionPane.CANCEL_OPTION) ||
-                    (response == JOptionPane.CLOSED_OPTION))
-                    {
-                        throw new CredentialsNotAvailableException ("User cancled windows authentication.");
-                    }
+                        (response == JOptionPane.CLOSED_OPTION)) {
+                    throw new CredentialsNotAvailableException("User cancled windows authentication.");
+                }
 
-                return new NTCredentials (userField.getText(), new String (passwordField.getPassword()),
-                                          host, domainField.getText());
+                return new NTCredentials(userField.getText(), new String(passwordField.getPassword()),
+                        host, domainField.getText());
 
 
             } else if (scheme instanceof RFC2617Scheme) {
                 Object[] msg = {
-                    host+":"+port+" requires authentication with the realm '"+
-                    scheme.getRealm()+"'",
+                    host + ":" + port + " requires authentication with the realm '" +
+                    scheme.getRealm() + "'",
                     "User Name",
                     userField,
                     "Password",
                     passwordField
                 };
 
-                response = JOptionPane.showConfirmDialog (null, msg, "Authenticate",
-                                                          JOptionPane.OK_CANCEL_OPTION);
+                response = JOptionPane.showConfirmDialog(null, msg, "Authenticate",
+                        JOptionPane.OK_CANCEL_OPTION);
 
                 if ((response == JOptionPane.CANCEL_OPTION) ||
-                    (response == JOptionPane.CLOSED_OPTION))
-                    {
-                        throw new CredentialsNotAvailableException ("User cancled windows authentication.");
-                    }
+                        (response == JOptionPane.CLOSED_OPTION)) {
+                    throw new CredentialsNotAvailableException("User cancled windows authentication.");
+                }
 
 
-                return new UsernamePasswordCredentials (userField.getText(),
-                                                        new String(passwordField.getPassword()));
+                return new UsernamePasswordCredentials(userField.getText(),
+                        new String(passwordField.getPassword()));
 
             } else {
 
-                throw new CredentialsNotAvailableException ("Unsupported authentication scheme: " +
-                                                            scheme.getSchemeName());
+                throw new CredentialsNotAvailableException("Unsupported authentication scheme: " +
+                        scheme.getSchemeName());
 
             }
-        }catch (IOException ioe) {
+        } catch (IOException ioe) {
 
-            throw new CredentialsNotAvailableException (ioe.getMessage(), ioe);
+            throw new CredentialsNotAvailableException(ioe.getMessage(), ioe);
 
         }
     }

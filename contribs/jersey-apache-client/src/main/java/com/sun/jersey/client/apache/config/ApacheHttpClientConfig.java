@@ -37,12 +37,15 @@
 package com.sun.jersey.client.apache.config;
 
 import com.sun.jersey.api.client.config.ClientConfig;
+import com.sun.jersey.client.apache.ApacheHttpClient;
+import com.sun.jersey.client.apache.ApacheHttpClientHandler;
 
 /**
- * Contains configuration options specific to clients that root with
- * the {@link com.sun.jersey.impl.client.httpclient.HttpClientHandler}.
+ * Configuration options specific to the Client API that utilizes
+ * {@link ApacheHttpClient} or {@link ApacheHttpClientHandler}.
  *
- * @author jorgew
+ * @author jorgeluisw@mac.com
+ * @author Paul.Sandoz@Sun.Com
  */
 public interface ApacheHttpClientConfig extends ClientConfig {
 
@@ -69,9 +72,9 @@ public interface ApacheHttpClientConfig extends ClientConfig {
             "com.sun.jersey.impl.client.httpclient.handleCookies";
 
     /**
-     * The credential provider that should be used to retrive
+     * The credential provider that should be used to retrieve
      * credentials from a user. The provider will be used only if
-     * PROPERTY_INTERACTIVE is set to true.
+     * {@link #PROPERTY_INTERACTIVE} is set to true.
      *
      * The value MUST be an instance of {@link
      * org.apache.commons.httpclient.auth.CredentialsProvider}.  If
@@ -84,6 +87,9 @@ public interface ApacheHttpClientConfig extends ClientConfig {
      * A value of "true" indicates that a client should send an
      * authentication request even before the server gives a 401
      * response.
+     *
+     * This property may only be set when constructing a {@link ApacheHttpClient}
+     * instance.
      *
      * If the value of this property is set to "true" default
      * credientials must be set for the target or proxy.

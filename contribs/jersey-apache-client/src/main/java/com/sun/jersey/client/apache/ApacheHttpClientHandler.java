@@ -40,12 +40,14 @@ import com.sun.jersey.api.client.ClientHandlerException;
 import com.sun.jersey.api.client.ClientRequest;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.TerminatingClientHandler;
+import com.sun.jersey.api.client.config.ClientConfig;
 import com.sun.jersey.client.apache.config.ApacheHttpClientConfig;
 import com.sun.jersey.client.apache.config.ApacheHttpClientState;
 import com.sun.jersey.client.apache.config.DefaultApacheHttpClientConfig;
 import com.sun.jersey.client.apache.config.DefaultCredentialsProvider;
 import com.sun.jersey.core.header.InBoundHeaders;
 
+import java.io.Closeable;
 import java.io.FilterInputStream;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -76,31 +78,23 @@ import org.apache.commons.httpclient.params.HttpMethodParams;
 /**
  * A root handler with Jakarta Commons HttpClient acting as a backend.
  * <p>
- *  <strong>Please Note:</strong>
- *  <ul>
- *     <li>There is a single HTTPClient per HttpClientHandler. It may
- *     be worth while to use it as a root for multiple Clients to
- *     save on resources. There should typically be a single
- *     HttpClientHandler per application.</li>
- *     <li>Client operations are thread safe, the HTTP connection may
- *     be shared between different threads. If you retrive a
- *     response entity input stream you <strong>must</strong> call
- *     close() on the stream when you're done with it in order to
- *     release the connection to other threads.</li>
- *     <li>In this initial implementation, only standard methods
- *     (GET, POST, DELETE, OPTIONS, HEAD, and PUT) are
- *     supported.</li>
- *     <li>Chunk encoding is a true/false operation in HTTPClient
- *      there's no way of specifying a chunk size.  If you set
- *      PROPERTY_CHUNKED_ENCODING_SIZE to anything other than null it
- *      will be set to true.</li>
- *     <li>In this initial implementation, chunk encoding probably
- *     doesn't matter since we write entities to a byte array before
- *     we transmit them</li>
- *  </ul>
- * </p>
+ * Client operations are thread safe, the HTTP connection may
+ * be shared between different threads.
+ * <p>
+ * If a response entity is obtained that is an instance of {@link Closeable} 
+ * then the instance MUST be closed after processing the entity to release
+ * connection-based resources.
+ * <p>
+ * The following methods are currently supported: HEAD, GET, POST, PUT, DELETE
+ * and OPTIONS.
+ * <p>
+ * Chunked transfer encoding can be enabled or disabled but configuration of
+ * the chunked encoding size is not possible. If the 
+ * {@link ClientConfig#PROPERTY_CHUNKED_ENCODING_SIZE} property is set
+ * to a non-null value then chunked transfer encoding is enabled.
  *
- * @author jorgew
+ * @author jorgeluisw@mac.com
+ * @author Paul.Sandoz@Sun.Com
  */
 public final class ApacheHttpClientHandler extends TerminatingClientHandler {
 
@@ -109,10 +103,20 @@ public final class ApacheHttpClientHandler extends TerminatingClientHandler {
     
     private final HttpClient client;
 
+    /**
+     * Create a new root handler with an {@link HttpClient}.
+     *
+     * @param client the {@link HttpClient}.
+     */
     public ApacheHttpClientHandler(HttpClient client) {
         this.client = client;
     }
 
+    /**
+     * Get the {@link HttpClient}.
+     *
+     * @return the {@link HttpClient}.
+     */
     public HttpClient getHttpClient() {
         return client;
     }

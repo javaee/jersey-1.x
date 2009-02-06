@@ -45,7 +45,7 @@ import org.apache.commons.httpclient.auth.AuthScope;
  * An encapsulation of the Apache {@link HttpState} that provides easier
  * functionality for setting up credentials and proxy credentials.
  * 
- * @author jorgew
+ * @author jorgeluisw@mac.com
  * @author Paul.Sandoz@Sun.Com
  */
 public class ApacheHttpClientState {
