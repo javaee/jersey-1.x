@@ -10,6 +10,11 @@ pkg = {
  so that developers may extend Jersey to suite their needs.",
                      "info.classification" : "Web Services"  },
     "dirtrees" : [ "jersey", "glassfish"],
-    "depends" : { "pkg:/jaxb@2.1.10" : {"type" : "require" }},
+    "depends" : { 
+                  "pkg:/asm@3.1" : {"type" : "require" }
+                  ,"pkg:/jaxb@2.1.10" : {"type" : "require" }
+                  ,"pkg:/jettison@1.0.1" : {"type" : "require" }
+                  ,"pkg:/jackson@0.9.4" : {"type" : "require" }
+                },
     "licenses" : { "jersey/LICENSE.txt" : { "license" : "CDDL+GPL" }}
 }
