@@ -1,4 +1,11 @@
 release 1.0.2 (2009-01/02)
+- JSON specific configuration options moved to a new JSONConfiguration class
+  See JavaDoc for:
+    com.sun.jersey.api.json.JSONConfiguration
+- Added new NATURAL JSON notation
+  Requires JAXB-RI impl 2.1.10
+  When the new notation is used, users do not need any more 
+  to take care about configurating proper serialization of arrays, numbers and booleans in JSON
 - Fixed issue 180
   https://jersey.dev.java.net/issues/show_bug.cgi?id=180
   Support JSON with Padding.
