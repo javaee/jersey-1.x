@@ -60,7 +60,13 @@
             <artifactId>jettison</artifactId>
             <version>1.0.1</version>
         </dependency>
-         <dependency>
+        <dependency>
+            <groupId>org.codehaus.jackson</groupId>
+            <artifactId>jackson-lgpl</artifactId>
+            <version>0.9.4</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
             <groupId>asm</groupId>
             <artifactId>asm</artifactId>
             <version>3.1</version>
@@ -190,6 +196,14 @@
                                     <outputDirectory>${assembly.directory}</outputDirectory>
                                 </artifactItem>
                                  <artifactItem>
+                                    <groupId>org.codehaus.jackson</groupId>
+                                    <artifactId>jackson-lgpl</artifactId>
+                                    <version>0.9.4</version>
+                                    <type>jar</type>
+                                    <overWrite>false</overWrite>
+                                    <outputDirectory>${assembly.directory}</outputDirectory>
+                                </artifactItem>
+                                  <artifactItem>
                                     <groupId>org.codehaus.jettison</groupId>
                                     <artifactId>jettison</artifactId>
                                     <version>1.0.1</version>
