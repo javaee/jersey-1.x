@@ -39,8 +39,11 @@
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    <groupId>com.sun.jersey.samples</groupId>
-    <version>1.0.2-SNAPSHOT</version>
+    <parent>
+        <groupId>com.sun.jersey.samples</groupId>
+        <artifactId>jersey-samples</artifactId>
+        <version>1.0.2-SNAPSHOT</version>
+    </parent>
     <artifactId>jsonp</artifactId>
     <name>JSONP - Jersey sample</name>
     <packaging>jar</packaging>
@@ -133,12 +136,4 @@
             <layout>legacy</layout>
         </repository>
     </repositories>
-    <distributionManagement>
-        <repository>
-            <uniqueVersion>false</uniqueVersion>
-            <id>java.net-m2-dist-repository</id>
-            <name>java.net-m2-repository</name>
-            <url>java-net:/maven2-repository/trunk/www/repository/</url>
-        </repository>
-    </distributionManagement>
 </project>
