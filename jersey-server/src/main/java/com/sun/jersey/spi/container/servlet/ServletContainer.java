@@ -66,10 +66,18 @@ import javax.ws.rs.core.UriBuilder;
 
 
 /**
- * A servlet container for deploying root resource classes.
+ * A {@link Servlet} or {@link Filter} for deploying root resource classes.
  * <p>
- * The web.xml MAY configure the servlet to have an initialization parameter 
- * "com.sun.jersey.config.property.resourceConfigClass" or
+ * If this class is declared as a filter then it must be declared at the last
+ * position in the filter chain as it will not forward any request to a next
+ * filter (if any) in the chain.
+ * <p>
+ * The following sections make reference to initialization parameters. Unless
+ * otherwise specified the initialization parameters apply to both server
+ * and filter initialization parameters.
+ * <p>
+ * The servlet or filter may be configured to have an initialization
+ * parameter "com.sun.jersey.config.property.resourceConfigClass" or
  * "javax.ws.rs.Application" and whose value is a
  * fully qualified name of a class that implements {@link ResourceConfig} or
  * {@link Application}.
@@ -79,7 +87,7 @@ import javax.ws.rs.core.UriBuilder;
  * parameter. Otherwise the default contructor is used to instantate the class.
  * 
  * <p>
- * If the initialization parameter 
+ * If the initialization parameter
  * "com.sun.jersey.config.property.resourceConfigClass" or
  * "javax.ws.rs.Application" is not present and a
  * initialization parameter "com.sun.jersey.config.property.packages" is present 
@@ -112,7 +120,7 @@ import javax.ws.rs.core.UriBuilder;
  * virtual paths: 
  * "/WEB-INF/lib;/WEB-INF/classes".
  * <p>
- * All servlet initialization parameters are added as properties of the created
+ * All initialization parameters are added as properties of the created
  * {@link ResourceConfig}.
  *
  * <p>
@@ -121,6 +129,9 @@ import javax.ws.rs.core.UriBuilder;
  * resource class or a parameter of a method of root resource class that is 
  * annotated with {@link javax.ws.rs.core.Context}: {@link HttpServletRequest}, 
  * {@link HttpServletResponse}, {@link ServletContext}, and {@link ServletConfig}.
+ * If this class is used as a Servlet then the {@link ServletConfig} class may be
+ * injected. If this class is used as a Filter then the {@link FilterConfig} class may be
+ * injected.
  * 
  * <p>
  * A {@link IoCComponentProviderFactory} instance may be registered by extending this class

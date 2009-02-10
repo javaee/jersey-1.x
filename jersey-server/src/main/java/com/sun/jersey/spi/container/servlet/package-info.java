@@ -35,6 +35,111 @@
  * holder.
  */
 /**
- * Provides support for a servlet-based container.
+ * Provides support for servlet-based and filter-based Web applications.
+ * <p>
+ * Web application support is enabled by referencing the servlet
+ * {@link com.sun.jersey.spi.container.servlet.ServletContainer} in the
+ * web.xml.
+ * <p>
+ * For example, the following will deploy Jersey and automatically
+ * register any root resource or provider classes present in the directory
+ * "/WEB-INF/classes" or jar files present in the directory "/WEB-INF/lib":
+ * <blockquote><pre>
+ *   &lt;web-app&gt;
+ *     &lt;servlet&gt;
+ *       &lt;servlet-name&gt;Jersey Web Application&lt;/servlet-name&gt;
+ *       &lt;servlet-class&gt;com.sun.jersey.spi.container.servlet.ServletContainer&lt;/servlet-class&gt;
+ *     &lt;/servlet&gt;
+ *     &lt;servlet-mapping&gt;
+ *       &lt;servlet-name&gt;Jersey Web Application&lt;/servlet-name&gt;
+ *       &lt;url-pattern&gt;/*&lt;/url-pattern&gt;
+ *     &lt;/servlet-mapping&gt;
+ *   &lt;/web-app&gt;
+ * </blockquote></pre>
+ * <p>
+ * A deployment approach, that is more portable with respect to maven and 
+ * application servers, is to declare the package names where root resource and provider
+ * classes reside. For example, the following will deploy Jersey and
+ * automatically register any root resource or provider classes present
+ * in the package "managed", or any sub-packages.
+ * <blockquote><pre>
+ *   &lt;web-app&gt;
+ *     &lt;servlet&gt;
+ *       &lt;servlet-name&gt;Jersey Web Application&lt;/servlet-name&gt;
+ *       &lt;servlet-class&gt;com.sun.jersey.spi.container.servlet.ServletContainer&lt;/servlet-class&gt;
+ *       &lt;init-param&gt;
+ *           &lt;param-name&gt;com.sun.jersey.config.property.packages&lt;/param-name&gt;
+ *           &lt;param-value&gt;managed&lt;/param-value&gt;
+ *       &lt;/init-param>
+ *     &lt;/servlet&gt;
+ *     &lt;servlet-mapping&gt;
+ *       &lt;servlet-name&gt;Jersey Web Application&lt;/servlet-name&gt;
+ *       &lt;url-pattern&gt;/*&lt;/url-pattern&gt;
+ *     &lt;/servlet-mapping&gt;
+ *   &lt;/web-app&gt;
+ * </blockquote></pre>
+ * The deployment approach that is portable accross JAX-RS implementations is to
+ * register an implementation of {@link javax.ws.rs.core.Application}. For
+ * example given an implementation as follows:
+ * <blockquote><pre>
+ *   package com.foo;
+ *
+ *   import ...
+ * 
+ *   public class MyApplicaton extends Application {
+ *       public Set<Class<?>> getClasses() {
+ *           Set<Class<?>> s = new HashSet<Class<?>>();
+ *           s.add(HelloWorldResource.class);
+ *           return s;
+ *       }
+ *   }
+ * </blockquote></pre>
+ * then that implementation can be registered as follows:
+ * <blockquote><pre>
+ *   &lt;web-app&gt;
+ *     &lt;servlet&gt;
+ *       &lt;servlet-name&gt;Jersey Web Application&lt;/servlet-name&gt;
+ *       &lt;servlet-class&gt;com.sun.jersey.spi.container.servlet.ServletContainer&lt;/servlet-class&gt;
+ *       &lt;init-param&gt;
+ *           &lt;param-name&gt;javax.ws.rs.Application&lt;/param-name&gt;
+ *           &lt;param-value&gt;com.foo.MyApplication&lt;/param-value&gt;
+ *       &lt;/init-param>
+ *     &lt;/servlet&gt;
+ *     &lt;servlet-mapping&gt;
+ *       &lt;servlet-name&gt;Jersey Web Application&lt;/servlet-name&gt;
+ *       &lt;url-pattern&gt;/*&lt;/url-pattern&gt;
+ *     &lt;/servlet-mapping&gt;
+ *   &lt;/web-app&gt;
+ * </blockquote></pre>
+ * It is possible to combine package-based registration and {@link Application}
+ * registered by extending {@link com.sun.jersey.api.core.PackagesResourceConfig}
+ * and registering the extended class, for example:
+ * <blockquote><pre>
+ *   public class MyApplication extends PackagesResourceConfig {
+ *       public MyApplication() {
+ *           super("org.foo.rest;org.bar.rest");
+ *       }
+ *   }
+ * </blockquote></pre>
+ * The above examples apply to Servlet-based configurations but they equally
+ * applicable to Filter-based configurations. For example, the following
+ * presents the same package-based configuration as above but utilizing a filter:
+ * <blockquote><pre>
+ *   &lt;web-app&gt;
+ *     &lt;filter&gt;
+ *       &lt;filter-name&gt;Jersey Web Application&lt;/filter-name&gt;
+ *       &lt;filter-class&gt;com.sun.jersey.spi.container.servlet.ServletContainer&lt;/filter-class&gt;
+ *       &lt;init-param&gt;
+ *           &lt;param-name&gt;com.sun.jersey.config.property.packages&lt;/param-name&gt;
+ *           &lt;param-value&gt;managed&lt;/param-value&gt;
+ *       &lt;/init-param>
+ *     &lt;/filter&gt;
+ *     &lt;filter-mapping&gt;
+ *       &lt;filter-name&gt;Jersey Web Application&lt;/filter-name&gt;
+ *       &lt;url-pattern&gt;/*&lt;/url-pattern&gt;
+ *     &lt;/filter-mapping&gt;
+ *   &lt;/web-app&gt;
+ * </blockquote></pre>
+ *
  */
 package com.sun.jersey.spi.container.servlet;

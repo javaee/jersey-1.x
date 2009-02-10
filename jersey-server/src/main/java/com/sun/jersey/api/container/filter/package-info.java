@@ -60,8 +60,8 @@
  * registered using the property  {@link com.sun.jersey.api.core.ResourceConfig#PROPERTY_CONTAINER_RESPONSE_FILTERS}.
  * <p>
  * For example, to log requests and responses when an application is deployed 
- * in the Servlet container a {@link com.sun.jersey.api.container.filter.LoggingFilter} can be registered using
- * the following Servlet initialization parameters:
+ * as a Servlet or Filter a {@link com.sun.jersey.api.container.filter.LoggingFilter} can be registered using
+ * the following initialization parameters:
  * <blockquote><pre>
  *     &lt;init-param&gt;
  *         &lt;param-name&gt;com.sun.jersey.spi.container.ContainerRequestFilters&lt;/param-name&gt;
@@ -90,9 +90,9 @@
  * before the response is filtered by filters produced by resource filter factories.
  * <p>
  * For example, to support {@link javax.annotation.security.RolesAllowed} on resource classes when an application
- * is deployed in the Servlet container a
+ * is deployed as a Servlet or Filter a
  * {@link com.sun.jersey.api.container.filter.RolesAllowedResourceFilterFactory}
- * can be registered using the following Servlet initialization parameter:
+ * can be registered using the following initialization parameter:
  * <blockquote><pre>
  *     &lt;init-param&gt;
  *         &lt;param-name&gt;com.sun.jersey.spi.container.ResourceFilters&lt;/param-name&gt;

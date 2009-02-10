@@ -70,9 +70,8 @@ import javax.ws.rs.core.SecurityContext;
  * If the {@link PermitAll} annotation is declared and is not overridden then
  * this filter will not be applied.
  * <p>
- * <p>
- * When an application is deployed in the Servlet container this resource filter
- * factory can be registered using the following Servlet initialization parameter:
+ * When an application is deployed as a Servlet or Filter this Jersey resource
+ * filter can be registered using the following initialization parameter:
  * <blockquote><pre>
  *     &lt;init-param&gt;
  *         &lt;param-name&gt;com.sun.jersey.spi.container.ResourceFilters&lt;/param-name&gt;

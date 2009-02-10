@@ -39,10 +39,10 @@ import java.util.Map;
 import javax.servlet.ServletException;
 
 /**
- * A servlet container for deploying root resource classes with Spring
+ * A servlet or filter for deploying root resource classes with Spring
  * integration.
  * <p>
- * This servlet extends {@link ServletContainer} and initiates the
+ * This class extends {@link ServletContainer} and initiates the
  * {@link WebApplication} with a Spring-based {@link IoCComponentProviderFactory},
  * {@link SpringComponentProviderFactory}, such that instances of resource and
  * provider classes declared and managed by Spring can be obtained.

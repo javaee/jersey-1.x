@@ -51,8 +51,8 @@ import com.sun.jersey.spi.container.ContainerRequestFilter;
  * a request header "X-HTTP-Method-Override" with a non-empty value. That value
  * will be the HTTP method that replaces the POST method.
  * <p>
- * When an application is deployed in the Servlet container this filter can be
- * registered using the following Servlet initialization parameters:
+ * When an application is deployed as a Servlet or Filter this Jersey filter can be
+ * registered using the following initialization parameter:
  * <blockquote><pre>
  *     &lt;init-param&gt;
  *         &lt;param-name&gt;com.sun.jersey.spi.container.ContainerRequestFilters&lt;/param-name&gt;

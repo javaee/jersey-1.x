@@ -58,8 +58,8 @@ import javax.ws.rs.core.HttpHeaders;
  * "gzip" then the response entity (if any) is compressed using gzip and a
  * Content-Encoding header of "gzip" is added to the response.
  * <p>
- * When an application is deployed in the Servlet container this filter can be
- * registered using the following Servlet initialization parameters:
+ * When an application is deployed as a Servlet or Filter this Jersey filter can be
+ * registered using the following initialization parameters:
  * <blockquote><pre>
  *     &lt;init-param&gt;
  *         &lt;param-name&gt;com.sun.jersey.spi.container.ContainerRequestFilters&lt;/param-name&gt;

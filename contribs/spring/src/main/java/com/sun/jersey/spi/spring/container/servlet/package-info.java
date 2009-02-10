@@ -22,7 +22,7 @@
 /**
  * Provides support for Spring-based Web applications.
  * <p>
- * Spring support is enabled by referencing the servlet
+ * Spring support is enabled by referencing the class
  * {@link com.sun.jersey.spi.spring.container.servlet.SpringServlet} in the
  * web.xml. For example:
  * <blockquote><pre>
@@ -72,11 +72,35 @@
  *     &lt;/servlet-mapping&gt;
  *   &lt;/web-app&gt;
  * </blockquote></pre>
+ * The above examples apply to Servlet-based configurations but they equally
+ * applicable to Filter-based configurations. For example, the following
+ * presents the same package-based configuration as above but utilizing a filter:
+ * <blockquote><pre>
+ *   &lt;web-app&gt;
+ *     &lt;context-param&gt;
+ *       &lt;param-name&gt;contextConfigLocation&lt;/param-name&gt;
+ *       &lt;param-value&gt;classpath:applicationContext.xml&lt;/param-value&gt;
+ *     &lt;/context-param&gt;
+ *     &lt;listener&gt;
+ *       &lt;listener-class&gt;org.springframework.web.context.ContextLoaderListener&lt;/listener-class&gt;
+ *     &lt;/listener&gt;
+ *     &lt;filter&gt;
+ *       &lt;filter-name&gt;Jersey Spring Web Application&lt;/filter-name&gt;
+ *       &lt;filter-class&gt;com.sun.jersey.spi.spring.container.servlet.SpringServlet&lt;/filter-class&gt;
+ *     &lt;/filter&gt;
+ *     &lt;filter-mapping&gt;
+ *       &lt;filter-name&gt;Jersey Spring Web Application&lt;/filter-name&gt;
+ *       &lt;url-pattern&gt;/*&lt;/url-pattern&gt;
+ *     &lt;/filter-mapping&gt;
+ *   &lt;/web-app&gt;
+ * </blockquote></pre>
  * Spring-based classes will be registered and any root resource and provider
  * classes in the package <code>managed</code> will also be registered. A class
  * will only be registered at most once so it does not matter if there are Spring
  * managed classes present in the <code>managed</code> package.
  * Components managed by Spring will not be managed by Jersey and the 
  * Jersey-based life-cycle annotations on a resource class will be ignored.
+ * <p>
+ *
  */
 package com.sun.jersey.spi.spring.container.servlet;
