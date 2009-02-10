@@ -46,7 +46,7 @@ import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlType;
 
 /**
- * The documentation type for method params.<br>
+ * The documentation type for params: method params, path params on a class etc.<br>
  * Created on: Jun 12, 2008<br>
  * 
  * @author <a href="mailto:martin.grotzke@freiheit.com">Martin Grotzke</a>
@@ -61,6 +61,14 @@ public class ParamDocType {
     private String paramName;
     private String commentText;
 
+    public ParamDocType() {
+    }
+    
+    public ParamDocType(String paramName, String commentText) {
+        this.paramName = paramName;
+        this.commentText = commentText;
+    }
+    
     @XmlElementWrapper(name = "annotationDocs")
     protected List<AnnotationDocType> annotationDoc;
 

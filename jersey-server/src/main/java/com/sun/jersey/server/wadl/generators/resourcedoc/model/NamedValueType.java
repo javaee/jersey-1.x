@@ -52,9 +52,17 @@ import javax.xml.bind.annotation.XmlType;
 
 })
 public class NamedValueType {
-    
+
     private String name;
     private String value;
+    
+    public NamedValueType() {
+    }
+    
+    public NamedValueType(String name, String value) {
+        this.name = name;
+        this.value = value;
+    }
 
     /**
      * @return the name
