@@ -71,3 +71,7 @@ This module also has a dependency on the "atompub-contacts-models" module
 for definitions of the Contact and User classes (same dependency as the
 server, so that these classes are guaranteed to be defined identically
 at both ends).
+
+Note:
+   1. The tests in the sample can be run using "mvn clean test". 
+   2. "mvn exec:java" is not supported as there is no main class implementation which makes the resource calls.
