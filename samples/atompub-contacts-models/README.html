@@ -1,0 +1,112 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head><title>AtomPub Contacts Models Sample</title></head>
+
+
+  <body>
+	<h1>AtomPub Example Application -- Contacts System</h1>
+
+	      <p>This module is one of a three part set of modules that contain an example
+application using the jersey-atom-abdera module to send and receive data
+encapsulated in Atom Publishing Protocol feeds and entries.  The sample
+application itself is inspired by the Google Contacts Data API
+<http://code.google.com/apis/contacts/>, with some additional functionality
+to illustrate alternative techniques.
+</p>
+
+	      <h2>INTRODUCTION</h2>
+	      <p>The separation of functionality into three modules allows a common set of
+JavaBean "model" classes to be shared by the client and server modules.
+</p>
+
+    <ol>
+    	<li>ATOMPUB-CONTACTS-MODELS MODULE <br>
+    	    <p>
+    	    This module contains JavaBean classes for the two types of application data
+	    that can be transmitted via this web service -- User represents a system user,
+	    and Contact represents one of potentially many contacts associated with that
+	    user.  The User class contains JAXB annotations, so we can leverage the fact
+	    that JAX-RS based applications can automatically serialize and deserialize
+	    instances of such a class, with no need to provide MessageBodyReader or
+	    MessageBodyWriter providers itself.
+    	     </p>
+    	</li>
+    	<li>ATOMPUB-CONTACTS-SERVER MODULE <br>
+	    	    <p>
+	    	    This module contains a Jersey based server that implements the contacts API.
+		    To simplify setup, the "database" behind this service is hashmaps of
+		    JavaBeans (so it goes away when the service is stopped).  It implements two
+		    top-level resources -- "/users" returns an Atom feed of all users defined
+		    in the database, while "/contacts/{username}" returns an Atom feed of all
+		    contacts defined for the specified user.
+	    	     </p>
+	    	     <p>
+	    	     The server implementation uses a Jersey filter to implement authentication
+		     and authorization checks.  Every client request must specify a valid username/
+		     password combination (the database is initialized with a user named
+		     "admin" and password "password").  The administrative user can add, update,
+		     and delete other users, as well as manage the contacts for any user.  All
+		     other users can only manage their own contact lists.
+		     </p>
+    	    	    <p>
+	    	    This module contains JavaBean classes for the two types of application data
+		    that can be transmitted via this web service -- User represents a system user,
+		    and Contact represents one of potentially many contacts associated with that
+		    user.  The User class contains JAXB annotations, so we can leverage the fact
+		    that JAX-RS based applications can automatically serialize and deserialize
+		    instances of such a class, with no need to provide MessageBodyReader or
+		    MessageBodyWriter providers itself.
+	    	     </p>
+	    	     <p>
+	    	     The server illustrates two different techniques for embedding application
+		     data in Atom feeds and entries:
+	    	     	<ul>
+	    	     		<li>
+					Contact data is sent and received by using a custom XML namespace,
+  and embedding the various data elements as extension elements in an
+  Atom entry.  This is the same technique that Google Contacts Data API
+  uses for this purpose.
+	    	     		</li>
+	    	     		<li>
+					User data is sent and received by embedding a custom XML representation
+  inside the <content> element of an Atom entry.  The ContentHelper
+  class (from jersey-atom-abdera) is utilized to serialize and deserialize
+  the User instances, using the same providers (built in, since this class
+  has JAXB annotations) that would be used if you sent or received the
+  User instance as an entity of a JAX-RS request or response.
+	    	     		</li>
+	    	     	</ul>
+	    	     </p>
+	    	     <p>
+	    	     		This module has a dependency on the "atompub-contacts-models" module for
+				definitions of the Contact and User classes representing the application data
+				that can be transported.
+	    	     </p>
+    	</li>
+    	<li>
+    		ATOMPUB-CONTACTS-CLIENT MODULE<BR>
+    		<p>
+    		While you can write a client application to communicate with this server in
+		any language you like (including Java), a Java client application has the
+		option to use the ContactsClient class from this module as a proxy for the
+		remote web service.  This allows your application development efforts to
+		focus on the business logic of your application, rather than the low level
+		details of formatting a proper Atom message, and dealing with low level
+		HTTP communication.
+		</p>
+		</p>
+		This module also has a dependency on the "atompub-contacts-models" module
+		for definitions of the Contact and User classes (same dependency as the
+		server, so that these classes are guaranteed to be defined identically
+		at both ends).
+    		</p>
+    	</li>
+    </ol>
+
+
+    <h3>Note:</h3>
+    <ol>
+   <li> The tests in the sample can be run using "mvn clean test".  </li>
+   <li> "mvn exec:java" is not supported as there is no main class implementation which makes the resource calls. </li>
+     </ol>
+	 </body></html>
+
