@@ -99,15 +99,6 @@
                                 </artifactItem>
                                  <artifactItem>
                                     <groupId>com.sun.jersey.samples</groupId>
-                                    <artifactId>extended-wadl-webapp</artifactId>
-                                    <version>${project.version}</version>
-                                    <type>zip</type>
-                                    <classifier>gf-project</classifier>
-                                    <overWrite>false</overWrite>
-                                    <outputDirectory>${assembly.directory}/samples</outputDirectory>
-                                </artifactItem>
-                                 <artifactItem>
-                                    <groupId>com.sun.jersey.samples</groupId>
                                     <artifactId>helloworld-webapp</artifactId>
                                     <version>${project.version}</version>
                                     <type>zip</type>
