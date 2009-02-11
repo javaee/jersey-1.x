@@ -107,7 +107,7 @@ public class ContactsResource extends BaseResource {
         Feed feed = abdera.newFeed();
         // NOTE - RFC 4287 requires a feed to have id, title, and updated properties
         feed.setId("contacts");
-        feed.setTitle("Contacts System Users for '" + username + "'");
+        feed.setTitle("Contacts System Contacts for user '" + username + "'");
         feed.addLink(uriInfo.getRequestUriBuilder().build().toString(), "self");
         synchronized (Database.contacts) {
             feed.setUpdated(Database.contactsUpdated.get(username));

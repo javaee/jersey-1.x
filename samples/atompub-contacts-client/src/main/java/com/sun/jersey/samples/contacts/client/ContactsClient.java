@@ -45,6 +45,7 @@ import com.sun.jersey.api.client.config.ClientConfig;
 import com.sun.jersey.api.client.config.DefaultClientConfig;
 import com.sun.jersey.atom.abdera.ContentHelper;
 import com.sun.jersey.samples.contacts.models.Contact;
+import com.sun.jersey.samples.contacts.models.EmailAddress;
 import com.sun.jersey.samples.contacts.models.User;
 import java.net.URI;
 import java.util.ArrayList;
@@ -569,6 +570,21 @@ public class ContactsClient {
         }
         
         ContactsClient client = new ContactsClient(uri, username, password);
-        System.out.println(String.format("List of users: %s", client.findUsers()));
+
+        User bob = new User();
+        bob.setUsername("bob");
+        bob.setPassword("alice");
+
+        client.createUser(bob);
+
+        Contact c = new Contact();
+        c.setName("bobs");
+        c.setContent("Bob contacts");
+
+        EmailAddress email = new EmailAddress("bob@example.com", "work e-mail", true, "work");
+
+        c.getEmailAddresses().add(email);
+
+        client.createContact(bob.getUsername(), c);
     }
 }

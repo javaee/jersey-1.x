@@ -105,11 +105,17 @@ JavaBean "model" classes to be shared by the client and server modules.
     </pre>
     from <code>atompub-contacts-server</code> directory.
 
-    <p>Then you can try the client with
+    Then at <a href="http://localhost:9998/users">http://localhost:9998/users</a> you can see an initial list of users
+    as an Atom feed.
+
+    <p>Then you can try to the client with
     <pre>
         cd ../atompub-contacts-client
         mvn clean compile exec:java
     </pre>
+
+    The client should populate data on a new user. You can now check <a href="http://localhost:9998/users">http://localhost:9998/users</a>
+    again to see the new user.
 
 </body></html>
 
