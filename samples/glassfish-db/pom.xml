@@ -42,7 +42,7 @@
     <parent>
         <groupId>com.sun.jersey.samples</groupId>
         <artifactId>jersey-samples</artifactId>
-        <version>1.0.2-SNAPSHOT</version>
+        <version>1.0.3-SNAPSHOT</version>
     </parent>
     <artifactId>glassfish-db</artifactId>
     <name>GlassFish DB WebApp - Jersey sample</name>

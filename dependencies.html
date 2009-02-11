@@ -32,7 +32,7 @@ started</A> document. For an overview of many JAX-RS features please
 read the <A HREF="http://wikis.sun.com/display/Jersey/Overview+of+JAX-RS+1.0+Features">overview</A>
 document.</P>
 <P>A zip file containing all maven-based samples can be obtained
-<A HREF="http://download.java.net/maven/2/com/sun/jersey/samples/jersey-samples/1.0.2-SNAPSHOT/jersey-samples-1.0.2-SNAPSHOT-project.zip">here</A>.
+<A HREF="http://download.java.net/maven/2/com/sun/jersey/samples/jersey-samples/1.0.3-SNAPSHOT/jersey-samples-1.0.3-SNAPSHOT-project.zip">here</A>.
 Individual zip files for each sample may be found by browsing the
 <A HREF="http://download.java.net/maven/2/com/sun/jersey/samples/">samples</A>
 directory. 
@@ -66,12 +66,12 @@ Tasks for Maven</A> very useful.
 </UL>
 <P>All dependences in this documented are referenced by hyper-links</P>
 <H2>Core server</H2>
-<P>Maven developers require a dependency on the <A HREF="http://download.java.net/maven/2/com/sun/jersey/jersey-server/1.0.2-SNAPSHOT/jersey-server-1.0.2-SNAPSHOT.pom">jersey-server</A>
+<P>Maven developers require a dependency on the <A HREF="http://download.java.net/maven/2/com/sun/jersey/jersey-server/1.0.3-SNAPSHOT/jersey-server-1.0.3-SNAPSHOT.pom">jersey-server</A>
 module. The following dependency needs to be added to the pom:</P>
 <PRE STYLE="margin-left: 0.79in">&lt;dependency&gt;
     &lt;groupId&gt;com.sun.jersey&lt;/groupId&gt;
     &lt;artifactId&gt;jersey-server&lt;/artifactId&gt;
-    &lt;version&gt;1.0.2-SNAPSHOT&lt;/version&gt;
+    &lt;version&gt;1.0.3-SNAPSHOT&lt;/version&gt;
 &lt;/dependency&gt;</PRE><P>
 And the following repositories need to be added to the pom:</P>
 <PRE STYLE="margin-left: 0.79in">&lt;repository&gt;
@@ -88,13 +88,13 @@ And the following repositories need to be added to the pom:</P>
 &lt;/repository&gt;</PRE><P>
 Non-maven developers require: 
 </P>
-<BLOCKQUOTE><A HREF="http://download.java.net/maven/2/com/sun/jersey/jersey-server/1.0.2-SNAPSHOT/jersey-server-1.0.2-SNAPSHOT.jar">jersey-server.jar</A>,
-<A HREF="http://download.java.net/maven/2/com/sun/jersey/jersey-core/1.0.2-SNAPSHOT/jersey-core-1.0.2-SNAPSHOT.jar">jersey-core.jar</A>,
+<BLOCKQUOTE><A HREF="http://download.java.net/maven/2/com/sun/jersey/jersey-server/1.0.3-SNAPSHOT/jersey-server-1.0.3-SNAPSHOT.jar">jersey-server.jar</A>,
+<A HREF="http://download.java.net/maven/2/com/sun/jersey/jersey-core/1.0.3-SNAPSHOT/jersey-core-1.0.3-SNAPSHOT.jar">jersey-core.jar</A>,
 <A HREF="http://download.java.net/maven/2/javax/ws/rs/jsr311-api/1.0/jsr311-api-1.0.jar">jsr311-api.jar</A>,
 <A HREF="http://repo1.maven.org/maven2/asm/asm/3.1/asm-3.1.jar">asm.jar</A></BLOCKQUOTE>
 <BLOCKQUOTE STYLE="margin-left: 0in; margin-right: 0in">or, if using
 the jersey-bundle:</BLOCKQUOTE>
-<BLOCKQUOTE><A NAME="DDE_LINK2"></A><A HREF="http://download.java.net/maven/2/com/sun/jersey/jersey-bundle/1.0.2-SNAPSHOT/jersey-bundle-1.0.2-SNAPSHOT.jar">jersey-bundle.jar</A>,
+<BLOCKQUOTE><A NAME="DDE_LINK2"></A><A HREF="http://download.java.net/maven/2/com/sun/jersey/jersey-bundle/1.0.3-SNAPSHOT/jersey-bundle-1.0.3-SNAPSHOT.jar">jersey-bundle.jar</A>,
 <A HREF="http://download.java.net/maven/2/javax/ws/rs/jsr311-api/1.0/jsr311-api-1.0.jar">jsr311-api.jar</A>,
 <A HREF="http://repo1.maven.org/maven2/asm/asm/3.1/asm-3.1.jar">asm.jar</A></BLOCKQUOTE>
 <BLOCKQUOTE STYLE="margin-left: 0in; margin-right: 0in">For Ant
@@ -105,7 +105,7 @@ explicitly:</BLOCKQUOTE>
 <PRE STYLE="margin-left: 0.79in">&lt;artifact:dependencies pathId=&quot;dependency.classpath&quot;&gt;
   &lt;dependency groupId=&quot;com.sun.jersey&quot; 
               artifactId=&quot;jersey-server&quot;
-              version=&quot;1.0.2-SNAPSHOT&quot;/&gt;
+              version=&quot;1.0.3-SNAPSHOT&quot;/&gt;
   &lt;artifact:remoteRepository id=&quot;maven2-repository.dev.java.net&quot;
                              url=&quot;http://download.java.net/maven/2/&quot; /&gt;
   &lt;artifact:remoteRepository id=&quot;maven-repository.dev.java.net&quot;
@@ -130,21 +130,21 @@ if an alternative is not specified. If an alternative is specified
 that does not depend on the asm.jar then it is no longer necessary to
 include the asm.jar in the minimum set of required jars.</P>
 <H2>Core client</H2>
-<P>Maven developers require a dependency on the <A HREF="http://download.java.net/maven/2/com/sun/jersey/jersey-client/1.0.2-SNAPSHOT/jersey-client-1.0.2-SNAPSHOT.pom">jersey-client</A>
+<P>Maven developers require a dependency on the <A HREF="http://download.java.net/maven/2/com/sun/jersey/jersey-client/1.0.3-SNAPSHOT/jersey-client-1.0.3-SNAPSHOT.pom">jersey-client</A>
 module. The following dependency needs to be added to the pom:</P>
 <PRE STYLE="margin-left: 0.79in">&lt;dependency&gt;
     &lt;groupId&gt;com.sun.jersey&lt;/groupId&gt;
     &lt;artifactId&gt;jersey-client&lt;/artifactId&gt;
-    &lt;version&gt;1.0.2-SNAPSHOT&lt;/version&gt;
+    &lt;version&gt;1.0.3-SNAPSHOT&lt;/version&gt;
 &lt;/dependency&gt;</PRE><P>
 Non-maven developers require: 
 </P>
-<BLOCKQUOTE><A HREF="http://download.java.net/maven/2/com/sun/jersey/jersey-client/1.0.2-SNAPSHOT/jersey-client-1.0.2-SNAPSHOT.jar">jersey-client.jar</A>,
-<A HREF="http://download.java.net/maven/2/com/sun/jersey/jersey-core/1.0.2-SNAPSHOT/jersey-core-1.0.2-SNAPSHOT.jar">jersey-core.jar</A>,
+<BLOCKQUOTE><A HREF="http://download.java.net/maven/2/com/sun/jersey/jersey-client/1.0.3-SNAPSHOT/jersey-client-1.0.3-SNAPSHOT.jar">jersey-client.jar</A>,
+<A HREF="http://download.java.net/maven/2/com/sun/jersey/jersey-core/1.0.3-SNAPSHOT/jersey-core-1.0.3-SNAPSHOT.jar">jersey-core.jar</A>,
 <A HREF="http://download.java.net/maven/2/javax/ws/rs/jsr311-api/1.0/jsr311-api-1.0.jar">jsr311-api.jar</A></BLOCKQUOTE>
 <BLOCKQUOTE STYLE="margin-left: 0in; margin-right: 0in">or, if using
 the jersey-bundle:</BLOCKQUOTE>
-<BLOCKQUOTE><A HREF="http://download.java.net/maven/2/com/sun/jersey/jersey-bundle/1.0.2-SNAPSHOT/jersey-bundle-1.0.2-SNAPSHOT.jar">jersey-bundle.jar</A>,
+<BLOCKQUOTE><A HREF="http://download.java.net/maven/2/com/sun/jersey/jersey-bundle/1.0.3-SNAPSHOT/jersey-bundle-1.0.3-SNAPSHOT.jar">jersey-bundle.jar</A>,
 <A HREF="http://download.java.net/maven/2/javax/ws/rs/jsr311-api/1.0/jsr311-api-1.0.jar">jsr311-api.jar</A></BLOCKQUOTE>
 <H2>Container</H2>
 <H3>Grizzly HTTP Web server</H3>
@@ -191,13 +191,13 @@ module.</P>
 <A HREF="http://download.java.net/maven/1/javax.xml.stream/jars/stax-api-1.0-2.jar">stax-api.jar</A></BLOCKQUOTE>
 <P>Maven developers, using JSON serialization support of JAXB beans
 when using the MIME media type &quot;application/json&quot; require a
-dependency on the <A HREF="http://download.java.net/maven/2/com/sun/jersey/jersey-json/1.0.2-SNAPSHOT/jersey-json-1.0.2-SNAPSHOT.pom">jersey-json</A>
+dependency on the <A HREF="http://download.java.net/maven/2/com/sun/jersey/jersey-json/1.0.3-SNAPSHOT/jersey-json-1.0.3-SNAPSHOT.pom">jersey-json</A>
 module (no explicit dependency on jaxb-impl is required). The
 following dependency needs to be added to the pom:</P>
 <PRE STYLE="margin-left: 0.79in">&lt;dependency&gt;
     &lt;groupId&gt;com.sun.jersey&lt;/groupId&gt;
     &lt;artifactId&gt;jersey-json&lt;/artifactId&gt;
-    &lt;version&gt;1.0.2-SNAPSHOT&lt;/version&gt;
+    &lt;version&gt;1.0.3-SNAPSHOT&lt;/version&gt;
 &lt;/dependency&gt;</PRE><P>
 Non-maven developers require:</P>
 <BLOCKQUOTE><A HREF="http://repo1.maven.org/maven2/org/codehaus/jettison/jettison/1.0.1/jettison-1.0.1.jar">jettison.jar</A>,
@@ -206,19 +206,19 @@ Non-maven developers require:</P>
 <A HREF="http://download.java.net/maven/1/javax.activation/jars/activation-1.1.jar">activation.jar</A>,
 <A HREF="http://download.java.net/maven/1/javax.xml.stream/jars/stax-api-1.0-2.jar">stax-api.jar</A></BLOCKQUOTE>
 <BLOCKQUOTE STYLE="margin-left: 0in; margin-right: 0in">and
-additionally, if not depending on the <A HREF="http://download.java.net/maven/2/com/sun/jersey/jersey-bundle/1.0.2-SNAPSHOT/jersey-bundle-1.0.2-SNAPSHOT.jar">jersey-bundle.jar</A>,
+additionally, if not depending on the <A HREF="http://download.java.net/maven/2/com/sun/jersey/jersey-bundle/1.0.3-SNAPSHOT/jersey-bundle-1.0.3-SNAPSHOT.jar">jersey-bundle.jar</A>,
 non-maven developers require:</BLOCKQUOTE>
-<BLOCKQUOTE><A HREF="http://download.java.net/maven/2/com/sun/jersey/jersey-json/1.0.2-SNAPSHOT/jersey-json-1.0.2-SNAPSHOT.jar">jersey-json.jar</A></BLOCKQUOTE>
+<BLOCKQUOTE><A HREF="http://download.java.net/maven/2/com/sun/jersey/jersey-json/1.0.3-SNAPSHOT/jersey-json-1.0.3-SNAPSHOT.jar">jersey-json.jar</A></BLOCKQUOTE>
 <BLOCKQUOTE STYLE="margin-left: 0in; margin-right: 0in">Maven
 developers, using Fast Infoset serialization support of JAXB beans
 with using the MIME media type &quot;application/fastinfoset&quot;
-require a dependency on the <A HREF="http://download.java.net/maven/2/com/sun/jersey/jersey-fastinfoset/1.0.2-SNAPSHOT/jersey-fastinfoset-1.0.2-SNAPSHOT.pom">jersey-fastinfoset</A>
+require a dependency on the <A HREF="http://download.java.net/maven/2/com/sun/jersey/jersey-fastinfoset/1.0.3-SNAPSHOT/jersey-fastinfoset-1.0.3-SNAPSHOT.pom">jersey-fastinfoset</A>
 module (no dependency on jaxb-impl is required). The following
 dependency needs to be added to the pom:</BLOCKQUOTE>
 <PRE STYLE="margin-left: 0.79in">&lt;dependency&gt;
     &lt;groupId&gt;com.sun.jersey&lt;/groupId&gt;
     &lt;artifactId&gt;jersey-fastinfoset&lt;/artifactId&gt;
-    &lt;version&gt;1.0.2-SNAPSHOT&lt;/version&gt;
+    &lt;version&gt;1.0.3-SNAPSHOT&lt;/version&gt;
 &lt;/dependency&gt;</PRE><P>
 Non-maven developers require:</P>
 <BLOCKQUOTE><A HREF="http://download.java.net/maven/1/com.sun.xml.fastinfoset/jars/FastInfoset-1.2.2.jar">FastInfoset.jar</A>,
@@ -227,44 +227,44 @@ Non-maven developers require:</P>
 <A HREF="http://download.java.net/maven/1/javax.activation/jars/activation-1.1.jar">activation.jar</A>,
 <A HREF="http://download.java.net/maven/1/javax.xml.stream/jars/stax-api-1.0-2.jar">stax-api.jar</A></BLOCKQUOTE>
 <BLOCKQUOTE STYLE="margin-left: 0in; margin-right: 0in">and
-additionally, if not depending on the <A HREF="http://download.java.net/maven/2/com/sun/jersey/jersey-bundle/1.0.2-SNAPSHOT/jersey-bundle-1.0.2-SNAPSHOT.jar">jersey-bundle.jar</A>,
+additionally, if not depending on the <A HREF="http://download.java.net/maven/2/com/sun/jersey/jersey-bundle/1.0.3-SNAPSHOT/jersey-bundle-1.0.3-SNAPSHOT.jar">jersey-bundle.jar</A>,
 non-maven developers require:</BLOCKQUOTE>
-<BLOCKQUOTE><A HREF="http://download.java.net/maven/2/com/sun/jersey/jersey-fastinfoset/1.0.2-SNAPSHOT/jersey-fastinfoset-1.0.2-SNAPSHOT.jar">jersey-fastinfoset.jar</A></BLOCKQUOTE>
+<BLOCKQUOTE><A HREF="http://download.java.net/maven/2/com/sun/jersey/jersey-fastinfoset/1.0.3-SNAPSHOT/jersey-fastinfoset-1.0.3-SNAPSHOT.jar">jersey-fastinfoset.jar</A></BLOCKQUOTE>
 <H3>Atom</H3>
 <P>The use of the Java types <FONT FACE="Courier New, monospace">com.sun.syndication.feed.atom.Entry</FONT>
 and <FONT FACE="Courier New, monospace">com.sun.syndication.feed.atom.Feed</FONT>
 requires a dependency on ROME version 0.9 or higher.</P>
-<P>Maven developers require a dependency on the <A HREF="http://download.java.net/maven/2/com/sun/jersey/jersey-atom/1.0.2-SNAPSHOT/jersey-atom-1.0.2-SNAPSHOT.pom">jersey-atom</A>
+<P>Maven developers require a dependency on the <A HREF="http://download.java.net/maven/2/com/sun/jersey/jersey-atom/1.0.3-SNAPSHOT/jersey-atom-1.0.3-SNAPSHOT.pom">jersey-atom</A>
 module. The following dependency needs to be added to the pom:</P>
 <PRE STYLE="margin-left: 0.79in">&lt;dependency&gt;
     &lt;groupId&gt;com.sun.jersey&lt;/groupId&gt;
     &lt;artifactId&gt;jersey-atom&lt;/artifactId&gt;
-    &lt;version&gt;1.0.2-SNAPSHOT&lt;/version&gt;
+    &lt;version&gt;1.0.3-SNAPSHOT&lt;/version&gt;
 &lt;/dependency&gt;</PRE><P>
 Non-maven developers require:</P>
 <BLOCKQUOTE><A HREF="http://download.java.net/maven/1/rome/jars/rome-0.9.jar">rome.jar</A>,
 <A HREF="http://repo1.maven.org/maven2/jdom/jdom/1.0/jdom-1.0.jar">jdom.jar</A></BLOCKQUOTE>
 <BLOCKQUOTE STYLE="margin-left: 0in; margin-right: 0in">and
-additionally, if not depending on the <A HREF="http://download.java.net/maven/2/com/sun/jersey/jersey-bundle/1.0.2-SNAPSHOT/jersey-bundle-1.0.2-SNAPSHOT.jar">jersey-bundle.jar</A>,
+additionally, if not depending on the <A HREF="http://download.java.net/maven/2/com/sun/jersey/jersey-bundle/1.0.3-SNAPSHOT/jersey-bundle-1.0.3-SNAPSHOT.jar">jersey-bundle.jar</A>,
 non-maven developers require:</BLOCKQUOTE>
-<BLOCKQUOTE><A HREF="http://download.java.net/maven/2/com/sun/jersey/jersey-atom/1.0.2-SNAPSHOT/jersey-atom-1.0.2-SNAPSHOT.jar">jersey-atom.jar</A></BLOCKQUOTE>
+<BLOCKQUOTE><A HREF="http://download.java.net/maven/2/com/sun/jersey/jersey-atom/1.0.3-SNAPSHOT/jersey-atom-1.0.3-SNAPSHOT.jar">jersey-atom.jar</A></BLOCKQUOTE>
 <H3>JSON</H3>
 <P>The use of the Java types <FONT FACE="Courier New, monospace">org.codehaus.jettison.json.JSONObject</FONT>
 and <FONT FACE="Courier New, monospace">org.codehaus.jettison.json.JSONArray</FONT>
 requires Jettison version 1.0 or higher.</P>
-<P>Maven developers require a dependency on the <A HREF="http://download.java.net/maven/2/com/sun/jersey/jersey-json/1.0.2-SNAPSHOT/jersey-json-1.0.2-SNAPSHOT.pom">jersey-json</A>
+<P>Maven developers require a dependency on the <A HREF="http://download.java.net/maven/2/com/sun/jersey/jersey-json/1.0.3-SNAPSHOT/jersey-json-1.0.3-SNAPSHOT.pom">jersey-json</A>
 module. The following dependency needs to be added to the pom:</P>
 <PRE STYLE="margin-left: 0.79in">&lt;dependency&gt;
     &lt;groupId&gt;com.sun.jersey&lt;/groupId&gt;
     &lt;artifactId&gt;jersey-fastinfoset&lt;/artifactId&gt;
-    &lt;version&gt;1.0.2-SNAPSHOT&lt;/version&gt;
+    &lt;version&gt;1.0.3-SNAPSHOT&lt;/version&gt;
 &lt;/dependency&gt;</PRE><P>
 Non-maven developers require:</P>
 <BLOCKQUOTE><A HREF="http://repo1.maven.org/maven2/org/codehaus/jettison/jettison/1.0.1/jettison-1.0.1.jar">jettison.jar</A></BLOCKQUOTE>
 <BLOCKQUOTE STYLE="margin-left: 0in; margin-right: 0in">and
-additionally, if not depending on the <A HREF="http://download.java.net/maven/2/com/sun/jersey/jersey-bundle/1.0.2-SNAPSHOT/jersey-bundle-1.0.2-SNAPSHOT.jar">jersey-bundle.jar</A>,
+additionally, if not depending on the <A HREF="http://download.java.net/maven/2/com/sun/jersey/jersey-bundle/1.0.3-SNAPSHOT/jersey-bundle-1.0.3-SNAPSHOT.jar">jersey-bundle.jar</A>,
 non-maven developers require:</BLOCKQUOTE>
-<BLOCKQUOTE><A HREF="http://download.java.net/maven/2/com/sun/jersey/jersey-json/1.0.2-SNAPSHOT/jersey-json-1.0.2-SNAPSHOT.jar">jersey-json.jar</A></BLOCKQUOTE>
+<BLOCKQUOTE><A HREF="http://download.java.net/maven/2/com/sun/jersey/jersey-json/1.0.3-SNAPSHOT/jersey-json-1.0.3-SNAPSHOT.jar">jersey-json.jar</A></BLOCKQUOTE>
 <H3>Mail and MIME multipart</H3>
 <P>The use of the Java type <FONT FACE="Courier New, monospace">javax.mail.internet.MimeMultipart</FONT>
 with Java SE 5 or 6 requires Java Mail version 1.4 or higher.</P>
@@ -276,17 +276,17 @@ module.</P>
 <P>The use of the Java type <FONT FACE="Courier New, monospace">javax.mail.internet.MimeMultipart</FONT>
 with Java EE 5 requires no additional dependencies.</P>
 <P>Jersey ships with a high-level MIME multipart API. Maven
-developers requires a dependency on the <A HREF="http://download.java.net/maven/2/com/sun/jersey/contribs/jersey-multipart/1.0.2-SNAPSHOT/jersey-multipart-1.0.2-SNAPSHOT.pom">jersey-multipart</A>
+developers requires a dependency on the <A HREF="http://download.java.net/maven/2/com/sun/jersey/contribs/jersey-multipart/1.0.3-SNAPSHOT/jersey-multipart-1.0.3-SNAPSHOT.pom">jersey-multipart</A>
 module. The following dependency needs to be added to the pom:</P>
 <PRE STYLE="margin-left: 0.79in">&lt;dependency&gt;
     &lt;groupId&gt;com.sun.jersey.contribs&lt;/groupId&gt;
     &lt;artifactId&gt;jersey-multipart&lt;/artifactId&gt;
-    &lt;version&gt;1.0.2-SNAPSHOT&lt;/version&gt;
+    &lt;version&gt;1.0.3-SNAPSHOT&lt;/version&gt;
 &lt;/dependency&gt;</PRE><P>
 Non-maven developers require if not utilizing Java EE 5:</P>
 <BLOCKQUOTE><A NAME="DDE_LINK6"></A><A HREF="http://download.java.net/maven/1/javax.mail/jars/mail-1.4.jar">mail.jar</A>,
 <A HREF="http://download.java.net/maven/1/javax.activation/jars/activation-1.1.jar">activation.jar</A>,
-<A HREF="http://download.java.net/maven/2/com/sun/jersey/jersey-multipart/1.0.2-SNAPSHOT/jersey-multipart-1.0.2-SNAPSHOT.jar">jersey-multipart.jar</A></BLOCKQUOTE>
+<A HREF="http://download.java.net/maven/2/com/sun/jersey/jersey-multipart/1.0.3-SNAPSHOT/jersey-multipart-1.0.3-SNAPSHOT.jar">jersey-multipart.jar</A></BLOCKQUOTE>
 <H3>Activation</H3>
 <P>The use of the Java type <FONT FACE="Courier New, monospace">javax.activation.DataSource</FONT>
 with Java SE 5 requires Java Activation 1.1 or higher.</P>
@@ -316,12 +316,12 @@ disabled and a warning will be logged.</P>
 for runtime WADL support.</P>
 <H2>Spring</H2>
 <P>Maven developers, using Spring 2.0.x or Spring 2.5.x, require a
-dependency on the <A HREF="http://download.java.net/maven/2/com/sun/jersey/contribs/jersey-spring/1.0.2-SNAPSHOT/jersey-spring-1.0.2-SNAPSHOT.pom">jersey-spring</A>
+dependency on the <A HREF="http://download.java.net/maven/2/com/sun/jersey/contribs/jersey-spring/1.0.3-SNAPSHOT/jersey-spring-1.0.3-SNAPSHOT.pom">jersey-spring</A>
 module. The following dependency needs to be added to the pom:</P>
 <PRE STYLE="margin-left: 0.79in">&lt;dependency&gt;
     &lt;groupId&gt;com.sun.jersey.contribs&lt;/groupId&gt;
     &lt;artifactId&gt;jersey-spring&lt;/artifactId&gt;
-    &lt;version&gt;1.0.2-SNAPSHOT&lt;/version&gt;
+    &lt;version&gt;1.0.3-SNAPSHOT&lt;/version&gt;
 &lt;/dependency&gt;</PRE><P>
 The servlet:</P>
 <BLOCKQUOTE><FONT FACE="Courier New, monospace">com.sun.jersey.spi.spring.container.servlet.SpringServlet</FONT></BLOCKQUOTE>

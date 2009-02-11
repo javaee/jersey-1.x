@@ -1,4 +1,7 @@
-release 1.0.2 (2009-01/02)
+release 1.0.3 (2009-03/04)
+-
+
+release 1.0.2 (2009-02-11)
 - JSON specific configuration options moved to a new JSONConfiguration class
   See JavaDoc for:
     com.sun.jersey.api.json.JSONConfiguration

@@ -41,7 +41,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.sun.jersey.glassfish</groupId>
     <artifactId>glassfish-packages</artifactId>
-    <version>1.0.2-SNAPSHOT</version>
+    <version>1.0.3-SNAPSHOT</version>
     <name>Jersey GlassFish Packages</name>
     <description>
         GlassFish Update Center Packages
