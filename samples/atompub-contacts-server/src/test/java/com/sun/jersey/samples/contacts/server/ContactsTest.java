@@ -119,7 +119,7 @@ public class ContactsTest extends AbstractTest {
                 Feed feed = getFeed(credentials, mediaType, "admin");
                 assertNotNull("Got feed for media type " + mediaType, feed);
                 assertEquals("Feed id for media type " + mediaType, "contacts", feed.getId().toString());
-                assertEquals("Feed title for media type " + mediaType, "Contacts System Users for 'admin'", feed.getTitle());
+                assertEquals("Feed title for media type " + mediaType, "Contacts System Contacts for user 'admin'", feed.getTitle());
                 assertEquals("Feed self link for media type " + mediaType, 1, feed.getLinks("self").size());
                 assertEquals("Feed entries for media type " + mediaType, 0, feed.getEntries().size());
                 assertNotNull("Feed updated for media type " + mediaType, feed.getUpdated());
