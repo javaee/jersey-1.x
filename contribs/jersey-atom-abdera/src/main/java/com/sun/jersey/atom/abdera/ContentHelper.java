@@ -54,15 +54,15 @@ import org.apache.abdera.model.Entry;
 import org.apache.abdera.parser.Parser;
 
 /**
- * <p>Helper class to assist in serializing and deserializing Java entities
+ * Helper class to assist in serializing and deserializing Java entities
  * as XML that will be transferred through the <code>content</code> element
  * of an Atom <code>Entry</code> instance.  A configured instance of this
- * class can be made available in a resource class as follows:</p>
+ * class can be made available in a resource class as follows:
  *
- * <pre>
- *   @Context
+ * <blockquote><pre>
+ *   &#064;Context
  *   private ContentHelper contentHelper;
- * </pre>
+ * </blockquote></pre>
  */
 public class ContentHelper {
 
