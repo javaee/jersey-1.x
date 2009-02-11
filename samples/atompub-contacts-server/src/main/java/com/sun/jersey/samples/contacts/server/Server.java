@@ -90,7 +90,7 @@ public class Server {
 
     public static void main(String[] args) throws IOException {
         SelectorThread threadSelector = startServer();
-        System.out.println(String.format("Jersey app started with WADL at %s/application.wadl", BASE_URI));
+        System.out.println(String.format("Jersey app started with WADL at %sapplication.wadl", BASE_URI));
         System.out.println("Hit return to stop...");
         System.in.read();
         threadSelector.stopEndpoint();

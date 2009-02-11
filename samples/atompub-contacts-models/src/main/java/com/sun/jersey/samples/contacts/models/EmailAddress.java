@@ -189,5 +189,8 @@ public class EmailAddress extends Base {
         this.type = type;
     }
 
-
+    @Override
+    public String toString() {
+        return String.format("emailAddress:{type:%s,label:%s,address:%s}", type, label, address);
+    }
 }

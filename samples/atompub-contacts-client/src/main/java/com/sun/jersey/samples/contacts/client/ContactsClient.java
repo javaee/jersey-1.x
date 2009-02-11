@@ -46,11 +46,13 @@ import com.sun.jersey.api.client.config.DefaultClientConfig;
 import com.sun.jersey.atom.abdera.ContentHelper;
 import com.sun.jersey.samples.contacts.models.Contact;
 import com.sun.jersey.samples.contacts.models.User;
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.UriBuilder;
 import org.apache.abdera.Abdera;
 import org.apache.abdera.model.Entry;
 import org.apache.abdera.model.Feed;
@@ -521,7 +523,7 @@ public class ContactsClient {
         int paddingCount = (3 - (encode.length() % 3)) % 3;
         encode += "\0\0".substring(0, paddingCount);
         StringBuilder encoded = new StringBuilder();
-        for (int i = 0; i < encode.length() ; i+= 3) {
+        for (int i = 0; i < encode.length(); i += 3) {
             int j = (encode.charAt(i) << 16) + (encode.charAt(i + 1) << 8) + encode.charAt(i + 2);
             encoded.append(BASE64_CHARS.charAt((j >> 18) & 0x3f));
             encoded.append(BASE64_CHARS.charAt((j >> 12) & 0x3f));
@@ -532,5 +534,41 @@ public class ContactsClient {
 
     }
 
+    private static int getPort(int defaultPort) {
+        String port = System.getenv("JERSEY_HTTP_PORT");
+        if (null != port) {
+            try {
+                return Integer.parseInt(port);
+            } catch (NumberFormatException e) {
+            }
+        }
+        return defaultPort;
+    }
 
+    private static URI getBaseURI() {
+        return UriBuilder.fromUri("http://localhost/").port(getPort(9998)).build();
+    }
+
+    public static final URI BASE_URI = getBaseURI();
+
+    /**
+     *  This is only a sample main method, you can experiment on your own by using above implemented methods.
+     */
+    public static void main(String[] args) {
+
+        String uri, username, password;
+
+        if (args.length < 3) {
+            uri = BASE_URI.toString();
+            username = "admin";
+            password = "password";
+        } else {
+            uri = args[0];
+            username = args[1];
+            password = args[2];
+        }
+        
+        ContactsClient client = new ContactsClient(uri, username, password);
+        System.out.println(String.format("List of users: %s", client.findUsers()));
+    }
 }

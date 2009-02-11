@@ -112,4 +112,8 @@ public class User {
         this.username = username;
     }
 
+    @Override
+    public String toString() {
+        return String.format("user:{id:%s,username:%s}", id, username);
+    }
 }

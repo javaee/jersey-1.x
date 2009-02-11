@@ -291,4 +291,8 @@ public class Contact extends Base {
         this.updated = updated;
     }
 
+    @Override
+    public String toString() {
+        return String.format("contact:{id:%s,name:%s,content:%s}", id, name, content);
+    }
 }

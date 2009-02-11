@@ -207,5 +207,8 @@ public class PhoneNumber extends Base {
         this.type = type;
     }
 
-
+    @Override
+    public String toString() {
+        return String.format("phoneNumber:{type:%s,label: %s,number: %s}", type, label, number);
+    }
 }

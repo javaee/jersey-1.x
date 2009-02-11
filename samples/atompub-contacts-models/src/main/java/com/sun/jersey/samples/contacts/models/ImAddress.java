@@ -207,5 +207,8 @@ public class ImAddress extends Base {
         this.type = type;
     }
 
-
+    @Override
+    public String toString() {
+        return String.format("imAddress:{type:%s,label:%s,address:%s}", type, label, address);
+    }
 }

@@ -217,5 +217,8 @@ public class Organization extends Base {
         this.type = type;
     }
 
-
+    @Override
+    public String toString() {
+        return String.format("organization:{type:%s,label:%s,title:%s,name:%s}", type, label, orgTitle, orgName);
+    }
 }

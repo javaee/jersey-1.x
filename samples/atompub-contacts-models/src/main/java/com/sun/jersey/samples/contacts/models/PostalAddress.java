@@ -189,5 +189,9 @@ public class PostalAddress extends Base {
         this.type = type;
     }
 
+    @Override
+    public String toString() {
+        return String.format("address:{type:%s,label:%s,address:%s}", type, label, address);
+    }
 
 }

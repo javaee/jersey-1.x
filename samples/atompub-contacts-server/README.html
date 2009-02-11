@@ -9,17 +9,16 @@
 application using the jersey-atom-abdera module to send and receive data
 encapsulated in Atom Publishing Protocol feeds and entries.  The sample
 application itself is inspired by the Google Contacts Data API
-<http://code.google.com/apis/contacts/>, with some additional functionality
+<a href="http://code.google.com/apis/contacts/">http://code.google.com/apis/contacts/</a>, with some additional functionality
 to illustrate alternative techniques.
 </p>
 	      
-	      <h2>INTRODUCTION</h2>
+	      <h2>Introduction</h2>
 	      <p>The separation of functionality into three modules allows a common set of
 JavaBean "model" classes to be shared by the client and server modules.
 </p>
 
-    <ol>
-    	<li>ATOMPUB-CONTACTS-MODELS MODULE <br>
+    	<h3>atompub-contacts-models module</h3>
     	    <p>
     	    This module contains JavaBean classes for the two types of application data
 	    that can be transmitted via this web service -- User represents a system user,
@@ -29,8 +28,8 @@ JavaBean "model" classes to be shared by the client and server modules.
 	    instances of such a class, with no need to provide MessageBodyReader or
 	    MessageBodyWriter providers itself.
     	     </p>
-    	</li>
-    	<li>ATOMPUB-CONTACTS-SERVER MODULE <br>
+
+        <h3>atompub-contacts-server module</h3>
 	    	    <p>
 	    	    This module contains a Jersey based server that implements the contacts API.
 		    To simplify setup, the "database" behind this service is hashmaps of
@@ -42,8 +41,8 @@ JavaBean "model" classes to be shared by the client and server modules.
 	    	     <p>
 	    	     The server implementation uses a Jersey filter to implement authentication
 		     and authorization checks.  Every client request must specify a valid username/
-		     password combination (the database is initialized with a user named
-		     "admin" and password "password").  The administrative user can add, update,
+		     password combination (<b>the database is initialized with a user named
+             "admin" and password "password"</b>).  The administrative user can add, update,
 		     and delete other users, as well as manage the contacts for any user.  All
 		     other users can only manage their own contact lists.
 		     </p>
@@ -68,7 +67,7 @@ JavaBean "model" classes to be shared by the client and server modules.
 	    	     		</li>
 	    	     		<li>
 					User data is sent and received by embedding a custom XML representation
-  inside the <content> element of an Atom entry.  The ContentHelper
+  inside the &lt;content&gt; element of an Atom entry.  The ContentHelper
   class (from jersey-atom-abdera) is utilized to serialize and deserialize
   the User instances, using the same providers (built in, since this class
   has JAXB annotations) that would be used if you sent or received the
@@ -81,9 +80,7 @@ JavaBean "model" classes to be shared by the client and server modules.
 				definitions of the Contact and User classes representing the application data
 				that can be transported.
 	    	     </p>
-    	</li>
-    	<li>
-    		ATOMPUB-CONTACTS-CLIENT MODULE<BR>
+            <h3>atompub-contacts-client module</h3>
     		<p>
     		While you can write a client application to communicate with this server in
 		any language you like (including Java), a Java client application has the
@@ -93,20 +90,26 @@ JavaBean "model" classes to be shared by the client and server modules.
 		details of formatting a proper Atom message, and dealing with low level
 		HTTP communication.
 		</p>
-		</p>
+        <p>
 		This module also has a dependency on the "atompub-contacts-models" module
 		for definitions of the Contact and User classes (same dependency as the
 		server, so that these classes are guaranteed to be defined identically
 		at both ends).
-    		</p>
-    	</li>
-    </ol>
+      </p>
 
 
-    <h3>Note:</h3>
-    <ol>
-   <li> The tests in the sample can be run using "mvn clean test".  </li>
-   <li> "mvn exec:java" is not supported as there is no main class implementation which makes the resource calls. </li>
-     </ol>
-	 </body></html>
+    <h3>Running the example</h3>
+    <p>You can start the server by issuing
+   <pre>
+       mvn clean compile exec:java
+    </pre>
+    from <code>atompub-contacts-server</code> directory.
+
+    <p>Then you can try the client with
+    <pre>
+        cd ../atompub-contacts-client
+        mvn clean compile exec:java
+    </pre>
+
+</body></html>
 
