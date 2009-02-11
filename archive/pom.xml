@@ -130,6 +130,15 @@
                                     <overWrite>false</overWrite>
                                     <outputDirectory>${assembly.directory}/apidocs/contribs/jersey-atom-abdera</outputDirectory>
                                 </artifactItem>
+                                <artifactItem>
+                                    <groupId>com.sun.jersey.contribs</groupId>
+                                    <artifactId>jersey-apache-client</artifactId>
+                                    <version>${project.version}</version>
+                                    <type>jar</type>
+                                    <classifier>javadoc</classifier>
+                                    <overWrite>false</overWrite>
+                                    <outputDirectory>${assembly.directory}/apidocs/contribs/jersey-apache-client</outputDirectory>
+                                </artifactItem>
                             </artifactItems>
                         </configuration>
                     </execution>
@@ -242,6 +251,14 @@
                                 <artifactItem>
                                     <groupId>com.sun.jersey.contribs</groupId>
                                     <artifactId>jersey-atom-abdera</artifactId>
+                                    <version>${project.version}</version>
+                                    <type>jar</type>
+                                    <overWrite>false</overWrite>
+                                    <outputDirectory>${assembly.directory}/contribs</outputDirectory>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>com.sun.jersey.contribs</groupId>
+                                    <artifactId>jersey-apache-client</artifactId>
                                     <version>${project.version}</version>
                                     <type>jar</type>
                                     <overWrite>false</overWrite>
