@@ -338,7 +338,7 @@
                 <artifactId>maven-javadoc-plugin</artifactId>
                 <configuration>
                     <sourcepath>${gen-src-dir}</sourcepath>
-                    <excludePackageNames>com.sun.jersey.core.impl com.sun.jersey.client.impl com.sun.jersey.server.impl com.sun.jersey.impl com.sun.research.ws.wadl</excludePackageNames>
+                    <excludePackageNames>com.sun.jersey.core.impl com.sun.jersey.client.impl com.sun.jersey.server.impl com.sun.jersey.impl com.sun.research.ws.wadl com.sun.jersey.atom.rome.impl com.sun.jersey.fastinfoset.impl com.sun.jersey.json.impl</excludePackageNames>
                 </configuration>
                 <executions>
                     <execution>
