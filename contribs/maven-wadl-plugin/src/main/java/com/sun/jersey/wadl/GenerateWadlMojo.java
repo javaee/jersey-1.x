@@ -230,7 +230,7 @@ public class GenerateWadlMojo extends AbstractMojoProjectClasspathSupport {
         else {
             /* does the param class provide a constructor for string?
              */
-            final Constructor<?> paramTypeConstructor = paramClazz.getConstructor( propertyValue.getClass() );
+            final Constructor<?> paramTypeConstructor = getMatchingConstructor( paramClazz, propertyValue );
             if ( paramTypeConstructor != null ) {
                 final Object typedPropertyValue = paramTypeConstructor.newInstance( propertyValue );
                 method.invoke( object, typedPropertyValue );
@@ -242,6 +242,17 @@ public class GenerateWadlMojo extends AbstractMojoProjectClasspathSupport {
                 		" The expected parameter is of type " + paramClazz.getName() );
             }
         }
+    }
+
+    private Constructor<?> getMatchingConstructor( final Class<?> paramClazz,
+            final Object propertyValue ) {
+        final Constructor<?>[] constructors = paramClazz.getConstructors();
+        for ( Constructor<?> constructor : constructors ) {
+            if ( constructor.getParameterTypes()[0] == propertyValue.getClass() ) {
+                return constructor;
+            }
+        }
+        return null;
     }
 
     private Method getMethodByName( final String methodName, final Class<?> clazz ) {
