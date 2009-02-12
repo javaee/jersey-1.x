@@ -3,9 +3,13 @@
 <HEAD>
 	<META HTTP-EQUIV="CONTENT-TYPE" CONTENT="text/html; charset=utf-8">
 	<TITLE>Dependencies</TITLE>
-	<META NAME="GENERATOR" CONTENT="OpenOffice.org 3.0  (Unix)">
+	<META NAME="GENERATOR" CONTENT="StarOffice 9  (Unix)">
 	<META NAME="CREATED" CONTENT="0;0">
-	<META NAME="CHANGED" CONTENT="20081201;11224600">
+	<META NAME="CHANGED" CONTENT="20090212;14432000">
+	<META NAME="Info 1" CONTENT="">
+	<META NAME="Info 2" CONTENT="">
+	<META NAME="Info 3" CONTENT="">
+	<META NAME="Info 4" CONTENT="">
 	<META NAME="Info 1" CONTENT="">
 	<META NAME="Info 2" CONTENT="">
 	<META NAME="Info 3" CONTENT="">
@@ -46,11 +50,17 @@ include in the class path can be different for each application.
 manage dependencies of their applications than developers using ant
 or other build technologies. This document will explain to both maven
 and non-maven developers how to depend on Jersey for their
-application. For the convenience of non-maven developers a jersey
-bundle is provided to avoid the dependency management of multiple
-jersey-based jars. Ant developers are likely to find the <A HREF="http://maven.apache.org/ant-tasks.html">Ant
-Tasks for Maven</A> very useful. 
-</P>
+application.  Ant developers are likely to find the <A HREF="http://maven.apache.org/ant-tasks.html">Ant
+Tasks for Maven</A> very useful. For the convenience of non-maven
+developers the following are provides:</P>
+<UL>
+	<LI><P>A  <A HREF="http://download.java.net/maven/2/com/sun/jersey/jersey-archive/1.0.3-SNAPSHOT/jersey-archive-1.0.3-SNAPSHOT.zip">zip
+	of Jersey</A> containing the Jersey jars, core dependencies (it does
+	not provide dependencies for third party jars beyond the those for
+	JSON support) and JavaDoc.</P>
+	<LI><P>A jersey bundle jar to avoid the dependency management of
+	multiple jersey-based jars.</P>
+</UL>
 <P>Jersey's runtime dependences are categorized into the following:</P>
 <UL>
 	<LI><P>Core server. The minimum set of dependences that Jersey
@@ -146,7 +156,16 @@ Non-maven developers require:
 the jersey-bundle:</BLOCKQUOTE>
 <BLOCKQUOTE><A HREF="http://download.java.net/maven/2/com/sun/jersey/jersey-bundle/1.0.3-SNAPSHOT/jersey-bundle-1.0.3-SNAPSHOT.jar">jersey-bundle.jar</A>,
 <A HREF="http://download.java.net/maven/2/javax/ws/rs/jsr311-api/1.0/jsr311-api-1.0.jar">jsr311-api.jar</A></BLOCKQUOTE>
-<H2>Container</H2>
+<P>The use of client with the Apache HTTP client to make HTTP request
+and receive HTTP responses requires a dependency on the
+<A HREF="http://download.java.net/maven/2/com/sun/jersey/contribs/jersey-apache-client/1.0.3-SNAPSHOT/jersey-apache-client-1.0.3-SNAPSHOT.pom">jersey-apache-client</A>
+module. The following dependency needs to be added to the pom:</P>
+<PRE STYLE="margin-left: 0.79in">&lt;dependency&gt;
+    &lt;groupId&gt;com.sun.jersey.contribs&lt;/groupId&gt;
+    &lt;artifactId&gt;jersey-apache-client&lt;/artifactId&gt;
+    &lt;version&gt;1.0.3-SNAPSHOT&lt;/version&gt;
+&lt;/dependency&gt;</PRE><H2>
+Container</H2>
 <H3>Grizzly HTTP Web server</H3>
 <P><A NAME="DDE_LINK1"></A><A NAME="DDE_LINK5"></A>Maven developers,
 deploying an application using the Grizzly HTTP Web server, require a
@@ -200,7 +219,8 @@ following dependency needs to be added to the pom:</P>
     &lt;version&gt;1.0.3-SNAPSHOT&lt;/version&gt;
 &lt;/dependency&gt;</PRE><P>
 Non-maven developers require:</P>
-<BLOCKQUOTE><A HREF="http://repo1.maven.org/maven2/org/codehaus/jettison/jettison/1.0.1/jettison-1.0.1.jar">jettison.jar</A>,
+<BLOCKQUOTE><A HREF="http://repo1.maven.org/maven2/org/codehaus/jackson/jackson-lgpl/0.9.4/jackson-lgpl-0.9.4.jar">jackson-lgpl.jar</A>,
+<A HREF="http://repo1.maven.org/maven2/org/codehaus/jettison/jettison/1.0.1/jettison-1.0.1.jar">jettison.jar</A>,
 <A HREF="http://download.java.net/maven/1/com.sun.xml.bind/jars/jaxb-impl-2.1.jar">jaxb-impl.jar</A>,
 <A HREF="http://download.java.net/maven/1/javax.xml.bind/jars/jaxb-api-2.1.jar">jaxb-api.jar</A>,
 <A HREF="http://download.java.net/maven/1/javax.activation/jars/activation-1.1.jar">activation.jar</A>,
@@ -231,7 +251,16 @@ additionally, if not depending on the <A HREF="http://download.java.net/maven/2/
 non-maven developers require:</BLOCKQUOTE>
 <BLOCKQUOTE><A HREF="http://download.java.net/maven/2/com/sun/jersey/jersey-fastinfoset/1.0.3-SNAPSHOT/jersey-fastinfoset-1.0.3-SNAPSHOT.jar">jersey-fastinfoset.jar</A></BLOCKQUOTE>
 <H3>Atom</H3>
-<P>The use of the Java types <FONT FACE="Courier New, monospace">com.sun.syndication.feed.atom.Entry</FONT>
+<P>The use of the Java types <FONT FACE="Courier New, monospace">org.apache.abdera.model.{Categories,
+Entry, Feed, Service}</FONT> requires a dependency on Apache Abdera.</P>
+<P>Maven developers require a dependency on the <A HREF="http://download.java.net/maven/2/com/sun/jersey/contribs/jersey-atom-abdera/1.0.3-SNAPSHOT/jersey-atom-abdera-1.0.3-SNAPSHOT.pom">jersey-atom-abdera</A>
+module. The following dependency needs to be added to the pom:</P>
+<PRE STYLE="margin-left: 0.79in">&lt;dependency&gt;
+    &lt;groupId&gt;com.sun.jersey.contribs&lt;/groupId&gt;
+    &lt;artifactId&gt;jersey-atom-abdera&lt;/artifactId&gt;
+    &lt;version&gt;1.0.3-SNAPSHOT&lt;/version&gt;
+&lt;/dependency&gt;</PRE><P>
+The use of the Java types <FONT FACE="Courier New, monospace">com.sun.syndication.feed.atom.Entry</FONT>
 and <FONT FACE="Courier New, monospace">com.sun.syndication.feed.atom.Feed</FONT>
 requires a dependency on ROME version 0.9 or higher.</P>
 <P>Maven developers require a dependency on the <A HREF="http://download.java.net/maven/2/com/sun/jersey/jersey-atom/1.0.3-SNAPSHOT/jersey-atom-1.0.3-SNAPSHOT.pom">jersey-atom</A>
@@ -256,7 +285,7 @@ requires Jettison version 1.0 or higher.</P>
 module. The following dependency needs to be added to the pom:</P>
 <PRE STYLE="margin-left: 0.79in">&lt;dependency&gt;
     &lt;groupId&gt;com.sun.jersey&lt;/groupId&gt;
-    &lt;artifactId&gt;jersey-fastinfoset&lt;/artifactId&gt;
+    &lt;artifactId&gt;jersey-json&lt;/artifactId&gt;
     &lt;version&gt;1.0.3-SNAPSHOT&lt;/version&gt;
 &lt;/dependency&gt;</PRE><P>
 Non-maven developers require:</P>
