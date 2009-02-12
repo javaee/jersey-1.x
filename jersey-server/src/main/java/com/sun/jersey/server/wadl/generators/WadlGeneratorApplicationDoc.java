@@ -36,15 +36,14 @@
  */
 package com.sun.jersey.server.wadl.generators;
 
-import com.sun.jersey.api.model.AbstractMethod;
 import java.io.File;
-import java.util.logging.Logger;
+import java.io.InputStream;
 
 import javax.ws.rs.core.MediaType;
 import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 
+import com.sun.jersey.api.model.AbstractMethod;
 import com.sun.jersey.api.model.AbstractResource;
 import com.sun.jersey.api.model.AbstractResourceMethod;
 import com.sun.jersey.api.model.Parameter;
@@ -59,18 +58,25 @@ import com.sun.research.ws.wadl.Resources;
 import com.sun.research.ws.wadl.Response;
 
 /**
- * This {@link WadlGenerator} adds all doc elements provided by {@link ApplicationDocs#getDocs()} to the
- * generated wadl-file.<br>
+ * This {@link WadlGenerator} adds all doc elements provided by {@link ApplicationDocs#getDocs()}
+ * to the generated wadl-file.
+ * <p>
+ * The {@link ApplicationDocs} content can either be provided via a {@link File} reference
+ * ({@link #setApplicationDocsFile(File)}) or
+ * via an {@link InputStream} ({@link #setApplicationDocsStream(InputStream)}).<br/>
+ * Only one at a time can be set, otherwise an {@link IllegalStateException}
+ * will be thrown.
+ * </p>
  * Created on: Jun 16, 2008<br>
  * 
  * @author <a href="mailto:martin.grotzke@freiheit.com">Martin Grotzke</a>
  * @version $Id$
  */
 public class WadlGeneratorApplicationDoc implements WadlGenerator {
-
-    private static final Logger LOG = Logger.getLogger(WadlGeneratorApplicationDoc.class.getName());
+    
     private WadlGenerator _delegate;
     private File _applicationDocsFile;
+    private InputStream _applicationDocsStream;
     private ApplicationDocs _applicationDocs;
 
     public WadlGeneratorApplicationDoc() {
@@ -90,23 +96,36 @@ public class WadlGeneratorApplicationDoc implements WadlGenerator {
     }
 
     public void setApplicationDocsFile(File applicationDocsFile) {
+        if ( _applicationDocsStream != null ) {
+            throw new IllegalStateException( "The applicationDocsStream property is already set," +
+                    " therefore you cannot set the applicationDocsFile property. Only one of both can be set at a time." );
+        }
         _applicationDocsFile = applicationDocsFile;
-        LOG.info("Setting grammarsFile " + applicationDocsFile.getAbsolutePath());
+    }
+
+    public void setApplicationDocsStream(InputStream applicationDocsStream) {
+        if ( _applicationDocsFile != null ) {
+            throw new IllegalStateException( "The applicationDocsFile property is already set," +
+                    " therefore you cannot set the applicationDocsStream property. Only one of both can be set at a time." );
+        }
+        _applicationDocsStream = applicationDocsStream;
     }
 
     public void init() throws Exception {
+        if ( _applicationDocsFile == null && _applicationDocsStream == null ) {
+            throw new IllegalStateException( "Neither the applicationDocsFile nor the applicationDocsStream" +
+                    " is set, one of both is required." );
+        }
         _delegate.init();
-        _applicationDocs = loadFile(_applicationDocsFile, ApplicationDocs.class);
-    }
-
-    private <T> T loadFile(File fileToLoad, Class<T> targetClass) throws JAXBException {
-        String name = targetClass.getName();
+        String name = ApplicationDocs.class.getName();
         final int i = name.lastIndexOf('.');
         name = (i != -1) ? name.substring(0, i) : "";
         final JAXBContext c = JAXBContext.newInstance(name,
                 Thread.currentThread().getContextClassLoader());
         final Unmarshaller m = c.createUnmarshaller();
-        return targetClass.cast(m.unmarshal(fileToLoad));
+        final Object obj = _applicationDocsFile != null
+            ? m.unmarshal( _applicationDocsFile ) : m.unmarshal( _applicationDocsStream );
+        _applicationDocs = ApplicationDocs.class.cast(obj);
     }
 
     /**

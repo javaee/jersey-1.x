@@ -37,6 +37,7 @@
 package com.sun.jersey.api.wadl.config;
 
 import java.io.File;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
@@ -100,6 +101,7 @@ import com.sun.jersey.server.wadl.WadlGenerator;
  * <li>The types match exactly:<br/>
  *  if the WadlGenerator property is of type <code>org.example.Foo</code> and the
  *  provided property value is of type <code>org.example.Foo</code></li>
+ * <li>Types that provide a constructor for the provided type (mostly java.lang.String)</li>
  * <li>The WadlGenerator property is of type {@link File} and the provided property value is a {@link String}:<br/>
  *  the provided property value can contain the prefix <em>classpath:</em> to denote, that the
  *  path to the file is relative to the classpath. In this case, the property value is stripped by 
@@ -108,6 +110,10 @@ import com.sun.jersey.server.wadl.WadlGenerator;
  *  Notice that the filename is loaded from the classpath in this case, e.g. <em>classpath:test.xml</em>
  *  refers to a file in the package of the class ({@link WadlGeneratorDescription#getGeneratorClass()}). The
  *  file reference <em>classpath:/test.xml</em> refers to a file that is in the root of the classpath.
+ * </li>
+ * <li>java.io.InputStream: The {@link InputStream} can e.g. represent a file. The stream is loaded from the
+ *  property value (provided by the {@link WadlGeneratorDescription}) via 
+ *  {@link ClassLoader#getResourceAsStream(String)}. It will be closed after {@link WadlGenerator#init()} was called.
  * </li>
  * </ul>
  * </p>
@@ -197,17 +203,25 @@ public abstract class WadlGeneratorConfig {
         }
         
         /**
-         * Specify the property value for the current {@link WadlGenerator}.<br/>
-         * 
-         * The {@link WadlGenerator} property can be of type {@link String}, {@link File} or any other type that provides
-         * a {@link String} constructor.
-         * 
+         * Specify the property value for the current {@link WadlGenerator}.
+         * <p>
+         * The {@link WadlGenerator} property can be of type {@link String}, {@link File}, {@link InputStream}
+         * or any type that provides a {@link String} constructor.
+         * </p>
+         * <p>
          * If the {@link WadlGenerator} property is of type {@link File}, then the specified property value can start with the
          * prefix <em>classpath:</em> to denote, that the File shall be loaded from the classpath like this:
          * <pre><code>new File( generator.getClass().getResource( strippedFilename ).toURI() )</code></pre>
          * Notice that the file is loaded as a resource from the classpath in this case, therefore <em>classpath:test.xml</em>
          * refers to a file in the package of the specified <code>&lt;classname&gt;</code>. The
          * file reference <em>classpath:/test.xml</em> refers to a file that is in the root of the classpath.
+         * </p>
+         * <p>
+         * If the {@link WadlGenerator} property is of type {@link InputStream}, then the specified property value
+         * is loaded with {@link ClassLoader#getResourceAsStream(String)} using the current threads context classloader.
+         * The {@link InputStream} will be closed after {@link WadlGenerator#init()} was called and therefore must not be closed
+         * by the {@link WadlGenerator} using this stream.
+         * </p>
          * @param propName the property name
          * @param propValue the stringified property value
          * @return this builder instance

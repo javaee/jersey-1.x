@@ -36,8 +36,8 @@
  */
 package com.sun.jersey.server.wadl.generators;
 
-import com.sun.jersey.api.model.AbstractMethod;
 import java.io.File;
+import java.io.InputStream;
 import java.util.logging.Logger;
 
 import javax.ws.rs.core.MediaType;
@@ -45,6 +45,7 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 
+import com.sun.jersey.api.model.AbstractMethod;
 import com.sun.jersey.api.model.AbstractResource;
 import com.sun.jersey.api.model.AbstractResourceMethod;
 import com.sun.jersey.api.model.Parameter;
@@ -61,7 +62,13 @@ import com.sun.research.ws.wadl.Response;
 
 /**
  * This {@link WadlGenerator} adds the provided {@link Grammars} element to the
- * generated wadl-file.<br>
+ * generated wadl-file.
+ * <p>
+ * The {@link Grammars} content can either be provided via a {@link File} ({@link #setGrammarsFile(File)}) reference or
+ * via an {@link InputStream} ({@link #setGrammarsStream(InputStream)}).<br/>
+ * Only one at a time can be set, otherwise an {@link IllegalStateException}
+ * will be thrown.
+ * </p>
  * Created on: Jun 24, 2008<br>
  * 
  * @author <a href="mailto:martin.grotzke@freiheit.com">Martin Grotzke</a>
@@ -73,6 +80,7 @@ public class WadlGeneratorGrammarsSupport implements WadlGenerator {
 
     private WadlGenerator _delegate;
     private File _grammarsFile;
+    private InputStream _grammarsStream;
     private Grammars _grammars;
     
     public WadlGeneratorGrammarsSupport() {
@@ -93,16 +101,34 @@ public class WadlGeneratorGrammarsSupport implements WadlGenerator {
     }
     
     public void setGrammarsFile( File grammarsFile ) {
+        if ( _grammarsStream != null ) {
+            throw new IllegalStateException( "The grammarsStream property is already set," +
+                    " therefore you cannot set the grammarsFile property. Only one of both can be set at a time." );
+        }
         _grammarsFile = grammarsFile;
-        LOG.info( "Setting grammarsFile " + grammarsFile.getAbsolutePath() );
+    }
+    
+    public void setGrammarsStream( InputStream grammarsStream ) {
+        if ( _grammarsFile != null ) {
+            throw new IllegalStateException( "The grammarsFile property is already set," +
+                    " therefore you cannot set the grammarsStream property. Only one of both can be set at a time." );
+        }
+        _grammarsStream = grammarsStream;
     }
     
     public void init() throws Exception {
+        if ( _grammarsFile == null && _grammarsStream == null ) {
+            throw new IllegalStateException( "Neither the grammarsFile nor the grammarsStream" +
+                    " is set, one of both is required." );
+        }
         _delegate.init();
-        _grammars = loadFile( _grammarsFile, Grammars.class );
+        final JAXBContext c = JAXBContext.newInstance( Grammars.class );
+        final Unmarshaller m = c.createUnmarshaller();
+        final Object obj = _grammarsFile != null ? m.unmarshal( _grammarsFile ) : m.unmarshal( _grammarsStream );
+        _grammars = Grammars.class.cast( obj );
     }
     
-    private <T> T loadFile( File fileToLoad, Class<T> targetClass ) throws JAXBException {
+    private <T> T loadFile( InputStream fileToLoad, Class<T> targetClass ) throws JAXBException {
         final JAXBContext c = JAXBContext.newInstance( targetClass );
         final Unmarshaller m = c.createUnmarshaller();
         return targetClass.cast( m.unmarshal( fileToLoad ) );

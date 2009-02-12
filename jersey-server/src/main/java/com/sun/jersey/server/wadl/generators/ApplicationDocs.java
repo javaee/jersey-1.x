@@ -48,7 +48,7 @@ import javax.xml.bind.annotation.XmlType;
 import com.sun.research.ws.wadl.Doc;
 
 /**
- * TODO: DESCRIBE ME<br>
+ * The wrapper root document for multiple {@link Doc} elements.
  * Created on: Jun 10, 2008<br>
  * 
  * @author <a href="mailto:martin.grotzke@freiheit.com">Martin Grotzke</a>

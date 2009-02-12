@@ -37,14 +37,16 @@
 package com.sun.jersey.api.wadl.config;
 
 import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
 import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.net.URISyntaxException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map.Entry;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import com.sun.jersey.server.wadl.WadlGenerator;
@@ -55,13 +57,22 @@ import com.sun.jersey.server.wadl.WadlGeneratorImpl;
  * The properties of the {@link WadlGeneratorDescription}s can refer to {@link WadlGenerator} properties
  * of these types:
  * <ul>
+ * 
  * <li>exact match: if the WadlGenerator property is of type <code>org.example.Foo</code> and the
  * property value provided by the {@link WadlGeneratorDescription} is of type <code>org.example.Foo</code></li>
+ * 
  * <li>java.lang.File: The property value can contain the prefix <em>classpath:</em> to denote, that the
  * path to the file is relative to the classpath. In this case, the property value is stripped by 
  * the prefix <em>classpath:</em> and the java.lang.File is created via
  * <pre><code>new File( generator.getClass().getResource( strippedFilename ).toURI() )</code></pre></li>
+ * 
+ * <li>java.io.InputStream: The {@link InputStream} can e.g. represent a file. The stream is loaded from the
+ * property value (provided by the {@link WadlGeneratorDescription}) via 
+ * {@link ClassLoader#getResourceAsStream(String)}. It will be closed after {@link WadlGenerator#init()} was called.
+ * </li>
+ * 
  * <li>Types that provide a constructor for the provided type (mostly java.lang.String)</li>
+ * 
  * </ul>
  * 
  * @author <a href="mailto:martin.grotzke@freiheit.com">Martin Grotzke</a>
@@ -91,34 +102,57 @@ class WadlGeneratorLoader {
 
     static WadlGenerator loadWadlGeneratorDescriptions( List<WadlGeneratorDescription> wadlGeneratorDescriptions ) throws Exception {
         WadlGenerator wadlGenerator = new WadlGeneratorImpl();
-        if ( wadlGeneratorDescriptions != null && !wadlGeneratorDescriptions.isEmpty() ) {
-            for ( WadlGeneratorDescription wadlGeneratorDescription : wadlGeneratorDescriptions ) {
-                wadlGenerator = loadWadlGenerator( wadlGeneratorDescription, wadlGenerator );
+        
+        final CallbackList callbacks = new CallbackList();
+        try {
+            if ( wadlGeneratorDescriptions != null && !wadlGeneratorDescriptions.isEmpty() ) {
+                for ( WadlGeneratorDescription wadlGeneratorDescription : wadlGeneratorDescriptions ) {
+                    final WadlGeneratorControl control = loadWadlGenerator( wadlGeneratorDescription, wadlGenerator );
+                    wadlGenerator = control.wadlGenerator;
+                    callbacks.add( control.callback );
+                }
             }
+            wadlGenerator.init();
+        } finally {
+            callbacks.callback();
         }
-        wadlGenerator.init();
+        
         return wadlGenerator;
         
     }
 
-    private static WadlGenerator loadWadlGenerator(
+    private static WadlGeneratorControl loadWadlGenerator(
             WadlGeneratorDescription wadlGeneratorDescription,
             com.sun.jersey.server.wadl.WadlGenerator wadlGeneratorDelegate ) throws Exception {
         LOGGER.info( "Loading wadlGenerator " + wadlGeneratorDescription.getGeneratorClass().getName() );
         final WadlGenerator generator = wadlGeneratorDescription.getGeneratorClass().newInstance();
         generator.setWadlGeneratorDelegate( wadlGeneratorDelegate );
+        CallbackList callbacks = null;
         if ( wadlGeneratorDescription.getProperties() != null
                 && !wadlGeneratorDescription.getProperties().isEmpty() ) {
+            callbacks = new CallbackList();
             for ( Entry<Object, Object> entry : wadlGeneratorDescription.getProperties().entrySet() ) {
-                setProperty( generator, entry.getKey().toString(), entry.getValue() );
+                final Callback callback = setProperty( generator, entry.getKey().toString(), entry.getValue() );
+                callbacks.add( callback );
             }
         }
-        return generator;
+
+        return new WadlGeneratorControl( generator, callbacks );
     }
 
-    private static void setProperty( final Object generator, final String propertyName, final Object propertyValue )
-            throws IllegalAccessException, InvocationTargetException,
-            NoSuchMethodException, InstantiationException, URISyntaxException {
+    /**
+     * Set the object (generator) property with the given name to the specified value.
+     * @param generator the object, on which the property shall be set
+     * @param propertyName the name of the property, that shall be set
+     * @param propertyValue the value to populate the property with
+     * @return a {@link Callback} object that must be called later, or null if no callback is required.
+     * @throws Exception if s.th. goes wrong
+     */
+    private static Callback setProperty( final Object generator, final String propertyName, final Object propertyValue )
+            throws Exception {
+        
+        Callback result = null;
+        
         final String methodName = "set" + propertyName.substring( 0, 1 ).toUpperCase() + propertyName.substring( 1 );
         final Method method = getMethodByName( methodName, generator.getClass() );
         if ( method.getParameterTypes().length != 1 ) {
@@ -135,15 +169,47 @@ class WadlGeneratorLoader {
                 final URL resource = generator.getClass().getResource( strippedFilename );
                 if ( resource == null ) {
                     throw new RuntimeException( "The file '" + strippedFilename + "' does not exist in the classpath." +
-                    		" It's loaded by the generator class, so if you use a relative filename it's relative to" +
-                    		" the generator class, otherwise you might want to load it via an absolute classpath reference like" +
-                    		" classpath:/somefile.xml" );
+                            " It's loaded by the generator class, so if you use a relative filename it's relative to" +
+                            " the generator class, otherwise you might want to load it via an absolute classpath reference like" +
+                            " classpath:/somefile.xml" );
                 }
                 final File file = new File( resource.toURI() );
                 method.invoke( generator, file );
             }
             else {
                 method.invoke( generator, new File( filename ) );
+            }
+        }
+        else if ( InputStream.class.equals( paramClazz ) && propertyValue instanceof String ) {
+            final String resource = propertyValue.toString();
+            ClassLoader loader = Thread.currentThread().getContextClassLoader();
+            if (loader == null) {
+                loader = WadlGeneratorLoader.class.getClassLoader();
+            }
+            final InputStream is = loader.getResourceAsStream( resource );
+            if ( is == null ) {
+                String message = "The resource '" + resource + "' does not exist.";
+                throw new RuntimeException( message );
+            }
+            result = new Callback() {
+
+                public void callback() {
+                    try {
+                        is.close();
+                    } catch ( IOException e ) {
+                        LOGGER.log( Level.WARNING, "Could not close InputStream from resource " + resource, e );
+                    }
+                }
+                
+            };
+            /* if the method invocation fails we need to close the input stream
+             * by ourselves...
+             */
+            try {
+                method.invoke( generator, is );
+            } catch( Exception e ) {
+                is.close();
+                throw e;
             }
         }
         else {
@@ -161,6 +227,8 @@ class WadlGeneratorLoader {
                         " The expected parameter is of type " + paramClazz.getName() );
             }
         }
+        
+        return result;
     }
 
     private static Method getMethodByName( final String methodName, final Class<?> clazz ) {
@@ -170,6 +238,54 @@ class WadlGeneratorLoader {
             }
         }
         throw new RuntimeException( "Method '" + methodName + "' not found for class " + clazz.getName() );
+    }
+    
+    private static class WadlGeneratorControl {
+        
+        WadlGenerator wadlGenerator;
+        Callback callback;
+        
+        /**
+         * The constructor.
+         * @param wadlGenerator the generator, must not be null
+         * @param callback the callback, can be null
+         */
+        public WadlGeneratorControl(WadlGenerator wadlGenerator,
+                Callback callback) {
+            this.wadlGenerator = wadlGenerator;
+            this.callback = callback;
+        }
+        
+    }
+    
+    private static interface Callback {
+        void callback();
+    }
+    
+    private static class CallbackList extends ArrayList<Callback> implements Callback {
+        
+        private static final long serialVersionUID = 1L;
+
+        /**
+         * Callback all registered {@link Callback} items.
+         */
+        public void callback() {
+            for( Callback callback : this ) {
+                callback.callback();
+            }
+        }
+
+        /**
+         * Appends the specified element to the end of the list, if the element is not null.
+         * 
+         * @param e the element to append, can be null.
+         * @return true if the element was appended to the list, otherwise null.
+         */
+        @Override
+        public boolean add( Callback e ) {
+            return e != null ? super.add( e ) : false;
+        }
+        
     }
 
 }

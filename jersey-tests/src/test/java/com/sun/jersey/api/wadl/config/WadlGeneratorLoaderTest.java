@@ -41,13 +41,17 @@
 
 package com.sun.jersey.api.wadl.config;
 
-import com.sun.jersey.api.model.AbstractMethod;
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.URL;
 import java.util.Properties;
 
 import javax.ws.rs.core.MediaType;
 
+import com.sun.jersey.api.model.AbstractMethod;
 import com.sun.jersey.api.model.AbstractResource;
 import com.sun.jersey.api.model.AbstractResourceMethod;
 import com.sun.jersey.api.model.Parameter;
@@ -63,8 +67,7 @@ import com.sun.research.ws.wadl.Resources;
 import com.sun.research.ws.wadl.Response;
 
 /**
- * TODO: DESCRIBE ME<br>
- * Created on: Aug 2, 2008<br>
+ * Test the {@link WadlGeneratorLoader}.
  * 
  * @author <a href="mailto:martin.grotzke@freiheit.com">Martin Grotzke</a>
  * @version $Id$
@@ -120,10 +123,27 @@ public class WadlGeneratorLoaderTest extends AbstractResourceTester {
         
     }
     
+    public void testLoadStream() throws Exception {
+        
+        final Properties props = new Properties();
+        final String path = getClass().getPackage().getName().replaceAll( "\\.", "/" ) + "/testfile.xml";
+        props.put( "testStream", path );
+        final WadlGeneratorDescription description = new WadlGeneratorDescription( MyWadlGenerator2.class, props );
+        
+        final WadlGenerator wadlGenerator = WadlGeneratorLoader.loadWadlGeneratorDescriptions( description );
+        assertEquals( MyWadlGenerator2.class, wadlGenerator.getClass() );
+
+        final URL resource = getClass().getResource( "testfile.xml" );
+        assertEquals( new File( resource.toURI() ).length(), ((MyWadlGenerator2)wadlGenerator).getTestStreamContent().length() );
+        
+    }
+    
     static class MyWadlGenerator2 implements WadlGenerator {
 
-        
+
         private File _testFile;
+        private InputStream _testStream;
+        private File _testStreamContent;
         private WadlGenerator _delegate;
 
         /**
@@ -132,13 +152,48 @@ public class WadlGeneratorLoaderTest extends AbstractResourceTester {
         public void setTestFile( File testFile ) {
             _testFile = testFile;
         }
-        
+
+        public void setTestStream( InputStream testStream ) {
+            _testStream = testStream;
+        }
+
         public File getTestFile() {
             return _testFile;
         }
+        
+        public File getTestStreamContent() {
+            /*
+            try {
+                System.out.println( "listing file " + _testFileContent.getName() );
+                BufferedReader in = new BufferedReader( new FileReader( _testFileContent ) );
+                String line = null;
+                while ( (line = in.readLine()) != null ) {
+                    System.out.println( line );
+                }
+            } catch ( Exception e ) {
+                e.printStackTrace();
+            }
+            */
+            return _testStreamContent;
+        }
 
         public void init() throws Exception {
-            
+            if ( _testStream != null ) {
+                _testStreamContent = File.createTempFile( "testfile-" + getClass().getSimpleName(), null );
+                OutputStream to = null;
+                try {
+                    to = new FileOutputStream(_testStreamContent);
+                    byte[] buffer = new byte[4096];
+                    int bytes_read;
+                    while((bytes_read = _testStream.read(buffer)) != -1) {
+                        to.write(buffer, 0, bytes_read);
+                    }
+                }
+                // Always close the streams, even if exceptions were thrown
+                finally {
+                    if (to != null) try { to.close(); } catch (IOException e) { ; }
+                }
+            }
         }
 
         public void setWadlGeneratorDelegate( WadlGenerator delegate ) {

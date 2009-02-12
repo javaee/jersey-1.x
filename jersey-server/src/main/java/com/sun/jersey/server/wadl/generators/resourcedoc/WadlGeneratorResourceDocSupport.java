@@ -36,11 +36,9 @@
  */
 package com.sun.jersey.server.wadl.generators.resourcedoc;
 
-import com.sun.jersey.api.model.AbstractMethod;
 import java.io.File;
+import java.io.InputStream;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import javax.ws.rs.core.MediaType;
 import javax.xml.bind.JAXBContext;
@@ -48,6 +46,7 @@ import javax.xml.bind.JAXBElement;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.namespace.QName;
 
+import com.sun.jersey.api.model.AbstractMethod;
 import com.sun.jersey.api.model.AbstractResource;
 import com.sun.jersey.api.model.AbstractResourceMethod;
 import com.sun.jersey.api.model.Parameter;
@@ -72,19 +71,26 @@ import com.sun.research.ws.wadl.Resources;
 import com.sun.research.ws.wadl.Response;
 
 /**
- * TODO: DESCRIBE ME<br>
- * Created on: Jun 16, 2008<br>
+ * A {@link WadlGenerator} implementation that enhances the generated wadl by
+ * information read from a resourcedoc (containing javadoc information about resource
+ * classes).
+ * <p>
+ * The resourcedoc information can either be provided via a {@link File} ({@link #setResourceDocFile(File)}) reference or
+ * via an {@link InputStream} ({@link #setResourceDocStream(InputStream)}).<br/>
+ * Only one at a time can be set, otherwise an {@link IllegalStateException}
+ * will be thrown.
+ * </p>
  * 
  * @author <a href="mailto:martin.grotzke@freiheit.com">Martin Grotzke</a>
  * @version $Id$
  */
 public class WadlGeneratorResourceDocSupport implements WadlGenerator {
-
-    private static final Logger LOG = Logger.getLogger( WadlGeneratorResourceDocSupport.class.getName() );
+    
     public static final String RESOURCE_DOC_FILE = "resourcedoc.xml";
 
     private WadlGenerator _delegate;
     private File _resourceDocFile;
+    private InputStream _resourceDocStream;
     private ResourceDocAccessor _resourceDoc;
     
     public WadlGeneratorResourceDocSupport() {
@@ -99,27 +105,47 @@ public class WadlGeneratorResourceDocSupport implements WadlGenerator {
         _delegate = delegate;
     }
     
+    /**
+     * Set the <code>resourceDocFile</code> to the given file. Invoking this method is only allowed, as long as
+     * the <code>resourceDocStream</code> is not set, otherwise an {@link IllegalStateException} will be thrown.
+     * @param resourceDocFile the resourcedoc file to set.
+     */
     public void setResourceDocFile( File resourceDocFile ) {
+        if ( _resourceDocStream != null ) {
+            throw new IllegalStateException( "The resourceDocStream property is already set," +
+            		" therefore you cannot set the resourceDocFile property. Only one of both can be set at a time." );
+        }
         _resourceDocFile = resourceDocFile;
     }
     
-    public void init() throws Exception {
-        _delegate.init();
-        final ResourceDocType resourceDoc = loadFile( _resourceDocFile, ResourceDocType.class );
-        _resourceDoc = new ResourceDocAccessor( resourceDoc );
-    }
-
-    private <T> T loadFile( File fileToLoad, Class<T> targetClass ) {
-        if ( fileToLoad != null ) {
-            try {
-                final JAXBContext c = JAXBContext.newInstance( targetClass );
-                final Unmarshaller m = c.createUnmarshaller();
-                return targetClass.cast( m.unmarshal( fileToLoad ) );
-            } catch( Exception e ) {
-                LOG.log( Level.SEVERE, "Could not unmarshal file " + fileToLoad, e );
-            }
+    /**
+     * Set the <code>resourceDocStream</code> to the given file. Invoking this method is only allowed, as long as
+     * the <code>resourceDocFile</code> is not set, otherwise an {@link IllegalStateException} will be thrown.
+     * <p>
+     * The resourcedoc stream must be closed by the client providing the stream.
+     * </p>
+     * @param resourceDocStream the resourcedoc stream to set.
+     */
+    public void setResourceDocStream( InputStream resourceDocStream ) {
+        if ( _resourceDocStream != null ) {
+            throw new IllegalStateException( "The resourceDocFile property is already set," +
+                    " therefore you cannot set the resourceDocStream property. Only one of both can be set at a time." );
         }
-        return null;
+        _resourceDocStream = resourceDocStream;
+    }
+    
+    public void init() throws Exception {
+        if ( _resourceDocFile == null && _resourceDocStream == null ) {
+            throw new IllegalStateException( "Neither the resourceDocFile nor the resourceDocStream" +
+                    " is set, one of both is required." );
+        }
+        _delegate.init();
+        final JAXBContext c = JAXBContext.newInstance( ResourceDocType.class );
+        final Unmarshaller m = c.createUnmarshaller();
+        final Object resourceDocObj = _resourceDocFile != null
+            ? m.unmarshal( _resourceDocFile ) : m.unmarshal( _resourceDocStream );
+        final ResourceDocType resourceDoc = ResourceDocType.class.cast( resourceDocObj );
+        _resourceDoc = new ResourceDocAccessor( resourceDoc );
     }
     
     public String getRequiredJaxbContextPath() {
@@ -132,7 +158,7 @@ public class WadlGeneratorResourceDocSupport implements WadlGenerator {
     }
 
     /**
-     * @return
+     * @return the {@link Application} created by the delegate
      * @see com.sun.jersey.server.impl.wadl.WadlGenerator#createApplication()
      */
     public Application createApplication() {
@@ -142,7 +168,7 @@ public class WadlGeneratorResourceDocSupport implements WadlGenerator {
     /**
      * @param r
      * @param path
-     * @return
+     * @return the enhanced {@link Resource}
      * @see com.sun.jersey.server.impl.wadl.WadlGenerator#createResource(com.sun.jersey.api.model.AbstractResource, java.lang.String)
      */
     public Resource createResource( AbstractResource r, String path ) {
@@ -159,7 +185,7 @@ public class WadlGeneratorResourceDocSupport implements WadlGenerator {
     /**
      * @param r
      * @param m
-     * @return
+     * @return the enhanced {@link Method}
      * @see com.sun.jersey.server.impl.wadl.WadlGenerator#createMethod(com.sun.jersey.api.model.AbstractResource, com.sun.jersey.api.model.AbstractResourceMethod)
      */
     public Method createMethod( AbstractResource r, AbstractResourceMethod m ) {
@@ -178,7 +204,7 @@ public class WadlGeneratorResourceDocSupport implements WadlGenerator {
      * @param r
      * @param m
      * @param mediaType
-     * @return
+     * @return the enhanced {@link RepresentationType}
      * @see com.sun.jersey.server.impl.wadl.WadlGenerator#createRequestRepresentation(com.sun.jersey.api.model.AbstractResource, com.sun.jersey.api.model.AbstractResourceMethod, javax.ws.rs.core.MediaType)
      */
     public RepresentationType createRequestRepresentation( AbstractResource r,
@@ -195,7 +221,7 @@ public class WadlGeneratorResourceDocSupport implements WadlGenerator {
     /**
      * @param r
      * @param m
-     * @return
+     * @return the enhanced {@link Request}
      * @see com.sun.jersey.server.impl.wadl.WadlGenerator#createRequest(com.sun.jersey.api.model.AbstractResource, com.sun.jersey.api.model.AbstractResourceMethod)
      */
     public Request createRequest( AbstractResource r, AbstractResourceMethod m ) {
@@ -205,7 +231,7 @@ public class WadlGeneratorResourceDocSupport implements WadlGenerator {
     /**
      * @param r
      * @param m
-     * @return
+     * @return the enhanced {@link Response}
      * @see com.sun.jersey.server.impl.wadl.WadlGenerator#createResponse(com.sun.jersey.api.model.AbstractResource, com.sun.jersey.api.model.AbstractResourceMethod)
      */
     public Response createResponse( AbstractResource r, AbstractResourceMethod m ) {
@@ -282,7 +308,7 @@ public class WadlGeneratorResourceDocSupport implements WadlGenerator {
      * @param r
      * @param m
      * @param p
-     * @return
+     * @return the enhanced {@link Param}
      * @see com.sun.jersey.server.impl.wadl.WadlGenerator#createParam(com.sun.jersey.api.model.AbstractResource, com.sun.jersey.api.model.AbstractMethod, com.sun.jersey.api.model.Parameter)
      */
     public Param createParam( AbstractResource r,
@@ -298,7 +324,7 @@ public class WadlGeneratorResourceDocSupport implements WadlGenerator {
     }
 
     /**
-     * @return
+     * @return the {@link Resources} created by the delegate
      * @see com.sun.jersey.server.impl.wadl.WadlGenerator#createResources()
      */
     public Resources createResources() {
