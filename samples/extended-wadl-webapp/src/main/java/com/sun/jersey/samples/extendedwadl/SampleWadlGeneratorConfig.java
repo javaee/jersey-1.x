@@ -57,11 +57,11 @@ public class SampleWadlGeneratorConfig extends WadlGeneratorConfig {
     @Override
     public List<WadlGeneratorDescription> configure() {
         return generator( WadlGeneratorApplicationDoc.class )
-        .prop( "applicationDocsFile", "classpath:/application-doc.xml" )
+        .prop( "applicationDocsStream", "application-doc.xml" )
         .generator( WadlGeneratorGrammarsSupport.class )
-        .prop( "grammarsFile", "classpath:/application-grammars.xml" )
+        .prop( "grammarsStream", "application-grammars.xml" )
         .generator( WadlGeneratorResourceDocSupport.class )
-        .prop( "resourceDocFile", "classpath:/resourcedoc.xml" )
+        .prop( "resourceDocStream", "resourcedoc.xml" )
         .descriptions();
     }
 
