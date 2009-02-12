@@ -36,7 +36,6 @@
  */
 package com.sun.jersey.samples.generatewadl.util;
 
-import com.sun.jersey.api.model.AbstractMethod;
 import java.io.File;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -45,6 +44,7 @@ import javax.ws.rs.core.MediaType;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Unmarshaller;
 
+import com.sun.jersey.api.model.AbstractMethod;
 import com.sun.jersey.api.model.AbstractResource;
 import com.sun.jersey.api.model.AbstractResourceMethod;
 import com.sun.jersey.api.model.Parameter;
