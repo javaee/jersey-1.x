@@ -49,6 +49,8 @@ import java.io.Serializable;
 import java.net.URI;
 import java.util.Enumeration;
 import java.util.Map;
+import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
 import javax.servlet.FilterConfig;
@@ -142,9 +144,36 @@ import javax.ws.rs.core.UriBuilder;
  */
 public class ServletContainer extends WebComponent implements Servlet, ServletConfig, Filter, Serializable {
 
+    /**
+     * If set the regular expression used to match an incoming servlet path URI
+     * to some web page content such as static resources or JSPs to be handled
+     * by the underlying servlet engine.
+     * <p>
+     * The type of this property must be a String and the value must be a valid
+     * regular expression.
+     * <p>
+     * This property is only applicable when this class is used as a
+     * {@link Filter}, otherwise this property will be ingored and not
+     * processed.
+     * <p>
+     * If a servlet path matches this regular expression then the filter
+     * forwards the request to the next filter in the filter chain so that the
+     * underlying servlet engine can process the request otherwise Jersey
+     * will process the request.
+     * <p>
+     * For example if you set the value to
+     * <code>/(image|css)/.*</code>
+     * then you can serve up images and CSS files for your Implicit or Explicit Views
+     * while still processing your JAX-RS resources.
+     */
+    public static final String PROPERTY_WEB_PAGE_CONTENT_REGEX
+            = "com.sun.jersey.config.property.WebPageContentRegex";
+
     private transient ServletConfig servletConfig;
 
     private transient FilterConfig filterConfig;
+
+    private transient Pattern staticContentPattern;
 
     // ServletConfig
 
@@ -189,6 +218,16 @@ public class ServletContainer extends WebComponent implements Servlet, ServletCo
      */
     public String getServletInfo() {
         return "";
+    }
+
+    /**
+     * @return the {@link Pattern} compiled from a regular expression that is
+     * the property value of {@link #PROPERTY_STATIC_CONTENT_REGEX}.
+     * A <code>null</code> value will be returned if the property is not present
+     * is or an empty String.
+     */
+    public Pattern getStaticContentPattern() {
+        return staticContentPattern;
     }
 
     public final void init(ServletConfig servletConfig) throws ServletException {
@@ -369,6 +408,12 @@ public class ServletContainer extends WebComponent implements Servlet, ServletCo
     /**
      * Dispatches client requests to the {@link #service(java.net.URI, java.net.URI, javax.servlet.http.HttpServletRequest, javax.servlet.http.HttpServletResponse)  }
      * method.
+     * <p>
+     * If the servlet path matches the regular expression declared by the
+     * property {@link #PROPERTY_STATIC_CONTENT_REGEX} then the request
+     * is forwarded to the next filter in the filter chain so that the
+     * underlying servlet engine can process the request otherwise Jersey
+     * will process the request.
      * 
      * @param request the {@link HttpServletRequest} object that
      *        contains the request the client made to
@@ -381,6 +426,16 @@ public class ServletContainer extends WebComponent implements Servlet, ServletCo
      * @throws javax.servlet.ServletException
      */
     public void doFilter(HttpServletRequest request, HttpServletResponse response, FilterChain chain) throws IOException, ServletException {
+        String servletPath = request.getServletPath();
+
+        // if we match the static content regular expression lets delegate to the filter chain
+        // to use the default container servlets & handlers
+        Pattern p = getStaticContentPattern();
+        if (p != null && p.matcher(servletPath).matches()) {
+            chain.doFilter(request, response);
+            return;
+        }
+
         final UriBuilder absoluteUriBuilder = UriBuilder.fromUri(
                 request.getRequestURL().toString());
 
@@ -452,6 +507,17 @@ public class ServletContainer extends WebComponent implements Servlet, ServletCo
     protected void configure(final FilterConfig fc, ResourceConfig rc, WebApplication wa) {
         rc.getSingletons().add(new ContextInjectableProvider<FilterConfig>(
                 FilterConfig.class, fc));
+
+        String regex = (String)rc.getProperty(PROPERTY_WEB_PAGE_CONTENT_REGEX);
+        if (regex != null && regex.length() > 0) {
+            try {
+                staticContentPattern = Pattern.compile(regex);
+            } catch (PatternSyntaxException ex) {
+                throw new ContainerException(
+                        "The syntax is invalid for the regular expression, " + regex +
+                        ", associated with the initialization parameter " + PROPERTY_WEB_PAGE_CONTENT_REGEX, ex);
+            }
+        }
     }
 
     //

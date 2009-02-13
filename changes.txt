@@ -1,4 +1,14 @@
 release 1.0.3 (2009-03/04)
+- Fixed issue 208
+  https://jersey.dev.java.net/issues/show_bug.cgi?id=208
+  When ServletContainer is used as a servlet filter the initialization
+  property "com.sun.jersey.config.property.WebPageContentRegex" can be used
+  to declare a regular expression. If that expression matches the servlet path
+  then the request is forwarded to the next filter in the filter chain otherwise
+  the ServletContainer processes the request.
+  See:
+    com.sun.jersey.spi.container.servlet.ServletContainer#PROPERTY_WEB_PAGE_CONTENT_REGEX
+  The bookstore sample has been modified to use this feature.
 - Fixed problems with constructor injection for InjectableProvider providers.
   Application-defined injectable providers may now use the constructor for injection
   system-defined providers.

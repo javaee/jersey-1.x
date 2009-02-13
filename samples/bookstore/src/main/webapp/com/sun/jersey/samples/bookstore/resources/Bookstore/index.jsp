@@ -9,6 +9,9 @@
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <style type="text/css" media="screen">
+          @import url( <c:url value="/css/style.css"/> );
+        </style>
         <title>REST Bookstore Sample</title>
     </head>
     <body>
@@ -29,7 +32,7 @@
     <p>
       <a href="time">get the system time</a>
     <p>
-      <a href="help.jsp">regular resources</a>
+      <a href="jsp/help.jsp">regular resources</a>
     </p>    
     </body>
 </html>

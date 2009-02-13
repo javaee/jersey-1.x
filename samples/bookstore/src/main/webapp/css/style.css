@@ -1,0 +1,46 @@
+/* a simple style sheet */
+
+body {
+  font-family: Verdana, "Bitstream Vera Sans", sans-serif;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  color: #111;
+}
+
+a {
+  color: #125AA7;
+}
+
+a:hover {
+  color: #000;
+}
+
+blockquote {
+  color: #666;
+}
+
+pre {
+  background: #eee;
+  border: 1px solid #ddd;
+}
+
+hr {
+  background: #B2CCFF;
+  color: #B2CCFF;
+}
+
+table {
+  border-top: 1px solid #ddd;
+  border-left: 1px solid #ddd;
+}
+
+th, td {
+  border-bottom: 1px solid #ddd;
+  border-right: 1px solid #ddd;
+}
+
+a img {
+  text-decoration: none;
+}
+
