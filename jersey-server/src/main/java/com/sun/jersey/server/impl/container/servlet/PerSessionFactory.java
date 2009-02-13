@@ -158,8 +158,6 @@ public final class PerSessionFactory implements ResourceComponentProviderFactory
     private final class PerSesson extends AbstractPerSesson {
         private ResourceComponentConstructor rcc;
 
-        private ResourceComponentInjector rci;
-
         @Override
         public void init(AbstractResource abstractResource) {
             super.init(abstractResource);
@@ -168,17 +166,11 @@ public final class PerSessionFactory implements ResourceComponentProviderFactory
                     sipc,
                     ComponentScope.Undefined,
                     abstractResource);
-            this.rci = new ResourceComponentInjector(
-                    sipc,
-                    ComponentScope.Undefined,
-                    abstractResource);
         }
 
         protected Object _getInstance(HttpContext hc) {
             try {
-                Object o = rcc.construct(hc);
-                rci.inject(hc, o);
-                return o;
+                return rcc.construct(hc);
             } catch (InstantiationException ex) {
                 throw new ContainerException("Unable to create resource", ex);
             } catch (IllegalAccessException ex) {
@@ -225,8 +217,6 @@ public final class PerSessionFactory implements ResourceComponentProviderFactory
 
         private ResourceComponentConstructor rcc;
 
-        private ResourceComponentInjector rci;
-
         PerSessonProxied(IoCProxiedComponentProvider ipcp) {
             this.ipcp = ipcp;
         }
@@ -239,18 +229,11 @@ public final class PerSessionFactory implements ResourceComponentProviderFactory
                     sipc,
                     ComponentScope.Undefined,
                     abstractResource);
-            this.rci = new ResourceComponentInjector(
-                    sipc,
-                    ComponentScope.Undefined,
-                    abstractResource);
         }
 
         protected Object _getInstance(HttpContext hc) {
             try {
-                Object o = rcc.construct(hc);
-                rci.inject(hc, o);
-                Object po = ipcp.proxy(o);
-                return po;
+                return ipcp.proxy(rcc.construct(hc));
             } catch (InstantiationException ex) {
                 throw new ContainerException("Unable to create resource", ex);
             } catch (IllegalAccessException ex) {

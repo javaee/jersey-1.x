@@ -106,15 +106,12 @@ public class ComponentConstructor<T> {
 
     private final Method postConstruct;
 
-    /**
-     * Create a component constructor with the injectable provider context.
-     *
-     * @param ipc the injectable provider context.
-     * @param c the class of the type to construct.
-     */
-    public ComponentConstructor(InjectableProviderContext ipc, Class<T> c) {
+    private final ComponentInjector<T> ci;
+    
+    public ComponentConstructor(InjectableProviderContext ipc, Class<T> c, ComponentInjector<T> ci) {
         this.ipc = ipc;
         this.c = c;
+        this.ci = ci;
         this.postConstruct = getPostConstructMethod(c);
     }
 
@@ -141,6 +138,7 @@ public class ComponentConstructor<T> {
             throws InstantiationException, IllegalAccessException,
             IllegalArgumentException, InvocationTargetException {
         final T t = _getInstance();
+        ci.inject(t);
         if (postConstruct != null)
             postConstruct.invoke(t);
         return t;

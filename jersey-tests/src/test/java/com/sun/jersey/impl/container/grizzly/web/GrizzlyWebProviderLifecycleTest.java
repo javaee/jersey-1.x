@@ -47,9 +47,11 @@ import java.util.ArrayList;
 import java.util.List;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
+import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.ext.MessageBodyWriter;
@@ -70,6 +72,10 @@ public class GrizzlyWebProviderLifecycleTest extends AbstractGrizzlyWebContainer
     @Provider
     public static class FileReferenceWriter implements MessageBodyWriter<FileType> {
         List<File> files;
+
+        public FileReferenceWriter(@Context HttpServletRequest r) {
+            assertNotNull(r);
+        }
 
         @PostConstruct
         public void postConstruct() {

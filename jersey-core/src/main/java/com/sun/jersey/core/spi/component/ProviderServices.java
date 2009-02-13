@@ -125,7 +125,24 @@ public class ProviderServices {
 
         return ps;
     }
+
+    public static interface ProviderListener<T> {
+        void onAdd(T t);
+    }
     
+    public <T> void getProvidersAndServices(Class<T> provider, ProviderListener listener) {
+        for (T t : getProviderInstances(provider)) {
+            listener.onAdd(t);
+        }
+
+        for (Class pc : getProviderAndServiceClasses(provider)) {
+            Object o = getComponent(pc);
+            if (o != null) {
+                listener.onAdd(provider.cast(o));
+            }
+        }
+    }
+
     public <T> List<T> getInstances(Class<T> provider, String[] classNames) {
         List<T> ps = new LinkedList<T>();
         for (String className : classNames) {

@@ -49,6 +49,7 @@ import com.sun.jersey.spi.inject.SingletonTypeInjectableProvider;
 import java.util.ArrayList;
 import java.util.List;
 import javax.servlet.ServletConfig;
+import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.core.Context;
@@ -105,6 +106,10 @@ public class ReloadResourceTest extends AbstractGrizzlyWebContainerTester {
         @Context UriInfo ui;
 
         @Context Reloader r;
+
+        public ReloaderResource(@Context HttpServletRequest r) {
+            assertNotNull(r);
+        }
 
         @POST
         public String postReload() {

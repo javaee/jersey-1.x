@@ -119,18 +119,14 @@ public final class SingletonFactory implements ResourceComponentProviderFactory 
         @Override
         public void init(AbstractResource abstractResource) {
             super.init(abstractResource);
+
             ResourceComponentConstructor rcc = new ResourceComponentConstructor(
-                    sipc,
-                    ComponentScope.Singleton,
-                    abstractResource);
-            ResourceComponentInjector rci = new ResourceComponentInjector(
                     sipc,
                     ComponentScope.Singleton,
                     abstractResource);
 
             try {
                 this.resource = rcc.construct(null);
-                rci.inject(null, resource);
             } catch (InvocationTargetException ex) {
                 throw new ContainerException("Unable to create resource", ex);
             } catch (InstantiationException ex) {
@@ -151,6 +147,7 @@ public final class SingletonFactory implements ResourceComponentProviderFactory 
         @Override
         public void init(AbstractResource abstractResource) {
             super.init(abstractResource);
+            
             ResourceComponentInjector rci = new ResourceComponentInjector(
                     sipc,
                     ComponentScope.Singleton,
@@ -171,18 +168,14 @@ public final class SingletonFactory implements ResourceComponentProviderFactory 
         @Override
         public void init(AbstractResource abstractResource) {
             super.init(abstractResource);
+
             ResourceComponentConstructor rcc = new ResourceComponentConstructor(
-                    sipc,
-                    ComponentScope.Singleton,
-                    abstractResource);
-            ResourceComponentInjector rci = new ResourceComponentInjector(
                     sipc,
                     ComponentScope.Singleton,
                     abstractResource);
 
             try {
                 Object o = rcc.construct(null);
-                rci.inject(null, o);
                 resource = ipcp.proxy(o);
             } catch (InvocationTargetException ex) {
                 throw new ContainerException("Unable to create resource", ex);

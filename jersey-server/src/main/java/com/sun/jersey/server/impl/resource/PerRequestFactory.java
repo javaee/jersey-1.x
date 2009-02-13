@@ -155,16 +155,11 @@ public final class PerRequestFactory implements ResourceComponentProviderFactory
     private final class PerRequest extends AbstractPerRequest {
         private ResourceComponentConstructor rcc;
 
-        private ResourceComponentInjector rci;
-
         @Override
         public void init(AbstractResource abstractResource) {
             super.init(abstractResource);
+
             this.rcc = new ResourceComponentConstructor(
-                    sipc,
-                    ComponentScope.PerRequest,
-                    abstractResource);
-            this.rci = new ResourceComponentInjector(
                     sipc,
                     ComponentScope.PerRequest,
                     abstractResource);
@@ -172,9 +167,7 @@ public final class PerRequestFactory implements ResourceComponentProviderFactory
 
         protected Object _getInstance(HttpContext hc) {
             try {
-                Object o = rcc.construct(hc);
-                rci.inject(hc, o);
-                return o;
+                return rcc.construct(hc);
             } catch (InstantiationException ex) {
                 throw new ContainerException("Unable to create resource", ex);
             } catch (IllegalAccessException ex) {
@@ -220,8 +213,6 @@ public final class PerRequestFactory implements ResourceComponentProviderFactory
 
         private ResourceComponentConstructor rcc;
 
-        private ResourceComponentInjector rci;
-
         PerRequestProxied(IoCProxiedComponentProvider ipcp) {
             this.ipcp = ipcp;
         }
@@ -229,11 +220,8 @@ public final class PerRequestFactory implements ResourceComponentProviderFactory
         @Override
         public void init(AbstractResource abstractResource) {
             super.init(abstractResource);
+
             this.rcc = new ResourceComponentConstructor(
-                    sipc,
-                    ComponentScope.PerRequest,
-                    abstractResource);
-            this.rci = new ResourceComponentInjector(
                     sipc,
                     ComponentScope.PerRequest,
                     abstractResource);
@@ -241,10 +229,7 @@ public final class PerRequestFactory implements ResourceComponentProviderFactory
 
         public Object _getInstance(HttpContext hc) {
             try {
-                Object o = rcc.construct(hc);
-                rci.inject(hc, o);
-                Object po = ipcp.proxy(o);
-                    return po;
+                return ipcp.proxy(rcc.construct(hc));
             } catch (InstantiationException ex) {
                 throw new ContainerException("Unable to create resource", ex);
             } catch (IllegalAccessException ex) {

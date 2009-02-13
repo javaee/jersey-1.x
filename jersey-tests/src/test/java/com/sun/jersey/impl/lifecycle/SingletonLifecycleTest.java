@@ -39,6 +39,7 @@ package com.sun.jersey.impl.lifecycle;
 
 import com.sun.jersey.impl.AbstractResourceTester;
 import com.sun.jersey.api.client.WebResource;
+import com.sun.jersey.api.core.HttpContext;
 import com.sun.jersey.api.core.ResourceContext;
 import com.sun.jersey.spi.resource.Singleton;
 import java.io.File;
@@ -64,6 +65,8 @@ public class SingletonLifecycleTest extends AbstractResourceTester {
     public static class PostConstructResource {
         private int count;
 
+        @Context HttpContext hc;
+
         public PostConstructResource() {
             this.count = 0;
         }
@@ -71,6 +74,7 @@ public class SingletonLifecycleTest extends AbstractResourceTester {
         @PostConstruct
         public void postConstruct() {
             count++;
+            assertNotNull(hc);
         }
 
         @GET

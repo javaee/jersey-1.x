@@ -1,4 +1,11 @@
 release 1.0.3 (2009-03/04)
+- Fixed problems with constructor injection for InjectableProvider providers.
+  Application-defined injectable providers may now use the constructor for injection
+  system-defined providers.
+- Fixed issue where field injection occurs after a @PostConstruct method
+  is invoked.
+  Field injection is now performed after a component is instantiated and before
+  the @PostConstruct method (if present) is invoked.
 - Fixed issue 207
   https://jersey.dev.java.net/issues/show_bug.cgi?id=207
   The loading of resources uses the Thread.currentThread().getContextClassLoader()

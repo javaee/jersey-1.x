@@ -39,6 +39,7 @@ package com.sun.jersey.impl.lifecycle;
 
 import com.sun.jersey.impl.AbstractResourceTester;
 import com.sun.jersey.api.client.WebResource;
+import com.sun.jersey.api.core.HttpContext;
 import com.sun.jersey.api.core.ResourceContext;
 import java.io.File;
 import java.io.IOException;
@@ -62,12 +63,15 @@ public class PerRequestLifecycleTest extends AbstractResourceTester {
     public static class PostConstructResource {
         private int count;
 
+        @Context HttpContext hc;
+
         public PostConstructResource() {
             this.count = 0;
         }
 
         @PostConstruct
         public void postConstruct() {
+            assertNotNull(hc);
             count++;
         }
 

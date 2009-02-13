@@ -43,6 +43,7 @@ import com.sun.jersey.spi.inject.InjectableProvider;
 import com.sun.jersey.spi.inject.InjectableProviderContext;
 import com.sun.jersey.core.spi.component.ComponentContext;
 import com.sun.jersey.core.spi.component.ComponentScope;
+import com.sun.jersey.core.spi.component.ProviderServices.ProviderListener;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
@@ -94,10 +95,16 @@ public class InjectableProviderFactory implements InjectableProviderContext {
     }
 
     public final void configure(ProviderServices providerServices) {
-        for (InjectableProvider ip : 
-            providerServices.getProvidersAndServices(InjectableProvider.class)) {
-            add(ip);
-        }
+        providerServices.getProvidersAndServices(InjectableProvider.class,
+                new ProviderListener<InjectableProvider>() {
+                    public void onAdd(InjectableProvider ip) {
+                        add(ip);
+                    }
+        });
+//        for (InjectableProvider ip :
+//            providerServices.getProvidersAndServices(InjectableProvider.class)) {
+//            add(ip);
+//        }
     }
     
     private LinkedList<MetaInjectableProvider> getList(Class<? extends Annotation> c) {

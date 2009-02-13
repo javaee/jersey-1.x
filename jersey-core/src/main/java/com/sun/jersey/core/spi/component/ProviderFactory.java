@@ -130,10 +130,9 @@ public class ProviderFactory implements ComponentProviderFactory<ComponentProvid
 
     protected ComponentProvider _getComponentProvider(Class c) {
         try {
-            Object o = getInstance(c);
-
             ComponentInjector ci = new ComponentInjector(ipc, c);
-            ci.inject(o);
+            ComponentConstructor cc = new ComponentConstructor(ipc, c, ci);
+            Object o = cc.getInstance();
 
             return new SingletonComponentProvider(ci, o);
         } catch (NoClassDefFoundError ex) {
@@ -152,7 +151,7 @@ public class ProviderFactory implements ComponentProviderFactory<ComponentProvid
             return null;
         }
     }
-
+    
     /**
      * Inject on all cached components.
      */
@@ -199,10 +198,4 @@ public class ProviderFactory implements ComponentProviderFactory<ComponentProvid
         ci.inject(provider);
     }
 
-    private Object getInstance(Class c)
-            throws InstantiationException, IllegalAccessException,
-            IllegalArgumentException, InvocationTargetException {
-        ComponentConstructor cc = new ComponentConstructor(ipc, c);
-        return cc.getInstance();
-    }
 }

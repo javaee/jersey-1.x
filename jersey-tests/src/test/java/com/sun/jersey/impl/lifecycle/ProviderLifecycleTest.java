@@ -39,6 +39,7 @@ package com.sun.jersey.impl.lifecycle;
 
 import com.sun.jersey.impl.AbstractResourceTester;
 import com.sun.jersey.api.client.WebResource;
+import com.sun.jersey.api.core.HttpContext;
 import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -51,6 +52,7 @@ import javax.ws.rs.Path;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.ext.MessageBodyWriter;
@@ -73,8 +75,11 @@ public class ProviderLifecycleTest extends AbstractResourceTester {
     public static class FileReferenceWriter implements MessageBodyWriter<FileType> {
         List<File> files;
 
+        @Context HttpContext hc;
+        
         @PostConstruct
         public void postConstruct() {
+            assertNotNull(hc);
             this.files = new ArrayList<File>();
         }
 

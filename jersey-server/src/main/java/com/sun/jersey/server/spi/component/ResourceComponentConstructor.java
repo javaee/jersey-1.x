@@ -61,6 +61,8 @@ import java.util.TreeSet;
  */
 public class ResourceComponentConstructor {
     private final Class c;
+
+    private final ResourceComponentInjector rci;
     
     private final Constructor constructor;
 
@@ -111,6 +113,11 @@ public class ResourceComponentConstructor {
     public ResourceComponentConstructor(ServerInjectableProviderContext sipc,
             ComponentScope scope, AbstractResource ar) {
         this.c = ar.getResourceClass();
+        this.rci = new ResourceComponentInjector(
+                sipc,
+                scope,
+                ar);
+
         if (ar.getPostConstructMethods().size() > 0) {
             this.postConstruct = ar.getPostConstructMethods().get(0);
         } else {
@@ -146,6 +153,7 @@ public class ResourceComponentConstructor {
             throws InstantiationException, IllegalAccessException,
             IllegalArgumentException, InvocationTargetException {
         final Object o = _construct(hc);
+        rci.inject(hc, o);
         if (postConstruct != null)
             postConstruct.invoke(o);
         return o;

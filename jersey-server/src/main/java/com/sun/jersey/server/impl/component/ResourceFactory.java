@@ -109,15 +109,13 @@ public class ResourceFactory {
         }
 
         try {
-            ComponentConstructor<ResourceComponentProviderFactory> cc =
-                    new ComponentConstructor(ipc, providerFactoryClass);
-            ResourceComponentProviderFactory rcpf = cc.getInstance();
-
             ComponentInjector<ResourceComponentProviderFactory> ci =
                     new ComponentInjector(ipc, providerFactoryClass);
-            ci.inject(rcpf);
 
-            return rcpf;
+            ComponentConstructor<ResourceComponentProviderFactory> cc =
+                    new ComponentConstructor(ipc, providerFactoryClass, ci);
+
+            return cc.getInstance();
         } catch (IllegalArgumentException ex) {
             throw new ContainerException("Unable to create resource component provider", ex);
         } catch (InvocationTargetException ex) {
