@@ -1,4 +1,10 @@
 release 1.0.3 (2009-03/04)
+- Fixed issue 209
+  https://jersey.dev.java.net/issues/show_bug.cgi?id=209
+  UriTemplate.java - added throwing IllegalArgumentException when variable
+  without value is used.
+- Fixed issue 216
+  https://jersey.dev.java.net/issues/show_bug.cgi?id=216
 - Fixed issue 208
   https://jersey.dev.java.net/issues/show_bug.cgi?id=208
   When ServletContainer is used as a servlet filter the initialization
