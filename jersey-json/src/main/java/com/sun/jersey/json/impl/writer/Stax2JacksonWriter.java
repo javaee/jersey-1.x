@@ -41,6 +41,8 @@ import com.sun.xml.bind.v2.runtime.XMLSerializer;
 import com.sun.xml.bind.v2.runtime.property.Property;
 import java.io.IOException;
 import java.lang.reflect.Type;
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -186,17 +188,17 @@ public class Stax2JacksonWriter implements XMLStreamWriter {
     }
     static final Type[] _pt = new Type[]{
         byte.class, short.class, int.class, long.class, float.class, double.class, boolean.class, char.class,
-        Byte.class, Short.class, Integer.class, Long.class, Float.class, Double.class, Boolean.class, Character.class,
+        Byte.class, Short.class, Integer.class, Long.class, Float.class, Double.class, Boolean.class, Character.class, 
         String.class
     };
     static final Type[] _pta = new Type[]{
         byte[].class, short[].class, int[].class, long[].class, float[].class, double[].class, boolean[].class, char[].class,
-        Byte[].class, Short[].class, Integer[].class, Long[].class, Float[].class, Double[].class, Boolean[].class, Character[].class,
+        Byte[].class, Short[].class, Integer[].class, Long[].class, Float[].class, Double[].class, Boolean[].class, Character[].class, 
         String[].class
     };
     static final Type[] _nst = new Type[]{
         byte.class, short.class, int.class, long.class, float.class, double.class, boolean.class,
-        Byte.class, Short.class, Integer.class, Long.class, Float.class, Double.class, Boolean.class
+        Byte.class, Short.class, Integer.class, Long.class, Float.class, Double.class, Boolean.class, BigInteger.class, BigDecimal.class,
     };
     static final Set<Type> primitiveTypes = new HashSet<Type>() {
 
