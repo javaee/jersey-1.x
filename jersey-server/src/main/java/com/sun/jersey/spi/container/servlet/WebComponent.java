@@ -80,6 +80,7 @@ import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
+import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.core.Application;
@@ -89,12 +90,12 @@ import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.SecurityContext;
 
 /**
- * An abstract Web component that may be extended to become a Servlet and/or
- * Filter implementation.
+ * An abstract Web component that may be extended a Servlet and/or
+ * Filter implementation, or ecapsulated by a Servlet or Filter implementaton.
  * 
  * @author Paul.Sandoz@Sun.Com
  */
-public abstract class WebComponent implements ContainerListener {
+public class WebComponent implements ContainerListener {
     /**
      * The servlet initializaton property whose value is a fully qualified
      * class name of a class that implements {@link ResourceConfig} or
@@ -145,7 +146,7 @@ public abstract class WebComponent implements ContainerListener {
      *
      * @return the Web configuration.
      */
-    protected WebConfig getWebConfig() {
+    public WebConfig getWebConfig() {
         return config;
     }
 
@@ -156,7 +157,7 @@ public abstract class WebComponent implements ContainerListener {
      * 
      * @throws javax.servlet.ServletException
      */
-    protected final void init(WebConfig webConfig) throws ServletException {
+    public void init(WebConfig webConfig) throws ServletException {
         config = webConfig;
 
         context = config.getServletContext();
@@ -172,13 +173,12 @@ public abstract class WebComponent implements ContainerListener {
             ContainerNotifier crf = (ContainerNotifier)o;
             crf.addListener(this);
         }
-
     }
 
     /**
      * Destroy this Web component.
      * <p>
-     * This will destroty the Web application created by this this Web component.
+     * This will destroy the Web application created by this this Web component.
      */
     public void destroy() {
         application.destroy();
@@ -264,7 +264,7 @@ public abstract class WebComponent implements ContainerListener {
      * @exception ServletException if the HTTP request cannot
      *            be handled.
      */
-    protected void service(URI baseUri, URI requestUri, final HttpServletRequest request, HttpServletResponse response)
+    public void service(URI baseUri, URI requestUri, final HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         // Copy the application field to local instance to ensure that the
         // currently loaded web application is used to process
@@ -427,7 +427,7 @@ public abstract class WebComponent implements ContainerListener {
      * Load the Web application. This will create, configure and initiate
      * the web application.
      */
-    public final void load() {
+    public void load() {
         WebApplication _application = create();
         configure(config, resourceConfig, _application);
         initiate(resourceConfig, _application);
@@ -448,7 +448,7 @@ public abstract class WebComponent implements ContainerListener {
      * If this method is called when there are pending requests then such
      * requests will be processed using the previously loaded web application.
      */
-    public final void reload() {
+    public void reload() {
         WebApplication oldApplication = application;
         WebApplication newApplication = create();
         initiate(resourceConfig, newApplication);
@@ -470,18 +470,14 @@ public abstract class WebComponent implements ContainerListener {
      * default resource configuraton implementaton.
      *
      * @param props the properties to pass to the resource configuraton.
-     * @param webConfig the web configuration.
+     * @param wc the web configuration.
      * @return the default resource configuraton.
      *
      * @throws javax.servlet.ServletException
      */
     protected ResourceConfig getDefaultResourceConfig(Map<String, Object> props,
-            WebConfig webConfig) throws ServletException  {
-        // Default to using class path resource config
-        String[] paths = getPaths(webConfig.getInitParameter(
-                ClasspathResourceConfig.PROPERTY_CLASSPATH));
-        props.put(ClasspathResourceConfig.PROPERTY_CLASSPATH, paths);
-        return new ClasspathResourceConfig(props);
+            WebConfig wc) throws ServletException  {
+        return getClassPathResourceConfig(props, wc);
     }
 
     
@@ -494,6 +490,15 @@ public abstract class WebComponent implements ContainerListener {
 
     //
     
+    /* package */ ResourceConfig getClassPathResourceConfig(Map<String, Object> props,
+            WebConfig webConfig) throws ServletException  {
+        // Default to using class path resource config
+        String[] paths = getPaths(webConfig.getInitParameter(
+                ClasspathResourceConfig.PROPERTY_CLASSPATH));
+        props.put(ClasspathResourceConfig.PROPERTY_CLASSPATH, paths);
+        return new ClasspathResourceConfig(props);
+    }
+
     private ResourceConfig createResourceConfig(WebConfig webConfig)
             throws ServletException {
         Map<String, Object> props = getInitParams(webConfig);

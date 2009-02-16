@@ -44,8 +44,10 @@ import com.sun.jersey.api.core.PackagesResourceConfig;
 import com.sun.jersey.api.uri.UriComponent;
 import com.sun.jersey.core.spi.component.ioc.IoCComponentProviderFactory;
 import com.sun.jersey.spi.container.WebApplication;
+import com.sun.jersey.spi.container.WebApplicationFactory;
+import com.sun.jersey.spi.inject.SingletonTypeInjectableProvider;
 import java.io.IOException;
-import java.io.Serializable;
+import java.lang.reflect.Type;
 import java.net.URI;
 import java.util.Enumeration;
 import java.util.Map;
@@ -60,6 +62,7 @@ import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
+import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.core.Application;
@@ -142,7 +145,32 @@ import javax.ws.rs.core.UriBuilder;
  * instance.
  * 
  */
-public class ServletContainer extends WebComponent implements Servlet, ServletConfig, Filter, Serializable {
+public class ServletContainer extends HttpServlet implements Filter {
+    /**
+     * The servlet initializaton property whose value is a fully qualified
+     * class name of a class that implements {@link ResourceConfig} or
+     * {@link Application}.
+     */
+    public static final String APPLICATION_CONFIG_CLASS =
+            "javax.ws.rs.Application";
+
+    /**
+     * The servlet initializaton property whose value is a fully qualified
+     * class name of a class that implements {@link ResourceConfig} or
+     * {@link Application}.
+     */
+    public static final String RESOURCE_CONFIG_CLASS =
+            "com.sun.jersey.config.property.resourceConfigClass";
+
+    /**
+     * The base path in the Web Pages where JSP templates, associated with
+     * viewables of resource classes, are located.
+     * <p>
+     * If this property is not set then the base path will be the root path
+     * of the Web Pages.
+     */
+    public static final String JSP_TEMPLATES_BASE_PATH =
+            "com.sun.jersey.config.property.JSPTemplatesBasePath";
 
     /**
      * If set the regular expression used to match an incoming servlet path URI
@@ -169,116 +197,323 @@ public class ServletContainer extends WebComponent implements Servlet, ServletCo
     public static final String PROPERTY_WEB_PAGE_CONTENT_REGEX
             = "com.sun.jersey.config.property.WebPageContentRegex";
 
-    private transient ServletConfig servletConfig;
+    /**
+     * A helper class for creating an injectable provider that supports
+     * {@link Context} with a type and constant value.
+     *
+     * @param <T> the type of the constant value.
+     */
+    protected static class ContextInjectableProvider<T> extends
+            SingletonTypeInjectableProvider<Context, T> {
+
+        /**
+         * Create a new instance.
+         *
+         * @param type the type of the constant value.
+         * @param instance the constant value.
+         */
+        protected ContextInjectableProvider(Type type, T instance) {
+            super(type, instance);
+        }
+    }
+
+    private transient WebComponent webComponent;
 
     private transient FilterConfig filterConfig;
 
     private transient Pattern staticContentPattern;
 
-    // ServletConfig
-
-    public String getServletName() {
-        return _getServletConfig().getServletName();
-    }
-
-    public ServletContext getServletContext() {
-        return _getServletConfig().getServletContext();
-    }
-
-    public String getInitParameter(String name) {
-        return _getServletConfig().getInitParameter(name);
-    }
-
-    public Enumeration getInitParameterNames() {
-        return _getServletConfig().getInitParameterNames();
-    }
-
-    // Servlet
-
-    public ServletConfig getServletConfig() {
-        return servletConfig;
-    }
-
-    private ServletConfig _getServletConfig() {
-        if (servletConfig == null) {
-            throw new IllegalStateException("Servlet is not initialized");
+    private class InternalWebComponent extends WebComponent {
+        @Override
+        protected WebApplication create() {
+            return ServletContainer.this.create();
         }
-        return servletConfig;
+
+        @Override
+        protected void configure(WebConfig wc, ResourceConfig rc, WebApplication wa) {
+            super.configure(wc, rc, wa);
+
+            ServletContainer.this.configure(wc, rc, wa);
+        }
+
+        @Override
+        protected void initiate(ResourceConfig rc, WebApplication wa) {
+            ServletContainer.this.initiate(rc, wa);
+        }
+
+        @Override
+        protected ResourceConfig getDefaultResourceConfig(Map<String, Object> props,
+                WebConfig wc) throws ServletException  {
+            return ServletContainer.this.getDefaultResourceConfig(props, wc);
+        }
     }
 
+    // GenericServlet
+
     /**
-     * Returns information about the servlet, such as
-     * author, version, and copyright.
-     * By default, this method returns an empty string.  Override this method
-     * to have it return a meaningful value.  See {@link
-     * Servlet#getServletInfo}.
+     * Get the servlet context for the servlet or filter, depending on
+     * how this class is registered.
+     * <p>
+     * It is recommended that the {@link WebConfig} be utilized,
+     * see the method {@link #getWebConfig() }, to obtain the servlet context
+     * and initialization parameters for a servlet or filter.
      *
-     * @return String information about this servlet, by default an
-     *         empty string
+     * @return the servlet context for the servlet or filter.
      */
-    public String getServletInfo() {
-        return "";
+    @Override
+    public ServletContext getServletContext() {
+        if (filterConfig != null)
+            return filterConfig.getServletContext();
+
+        return super.getServletContext();
+    }
+    
+    /**
+     * Initiate the Web component.
+     *
+     * @param webConfig the Web configuration.
+     *
+     * @throws javax.servlet.ServletException
+     */
+    protected void init(WebConfig webConfig) throws ServletException {
+        webComponent = new InternalWebComponent();
+        webComponent.init(webConfig);
     }
 
     /**
-     * @return the {@link Pattern} compiled from a regular expression that is
-     * the property value of {@link #PROPERTY_STATIC_CONTENT_REGEX}.
-     * A <code>null</code> value will be returned if the property is not present
-     * is or an empty String.
+     * Get the Web configuration.
+     *
+     * @return the Web configuration.
      */
-    public Pattern getStaticContentPattern() {
-        return staticContentPattern;
+    protected WebConfig getWebConfig() {
+        return webComponent.getWebConfig();
     }
 
-    public final void init(ServletConfig servletConfig) throws ServletException {
-        this.servletConfig = servletConfig;
+    /**
+     * Create a new instance of a {@link WebApplication}.
+     *
+     * @return the {@link WebApplication} instance.
+     */
+    protected WebApplication create() {
+        return WebApplicationFactory.createWebApplication();
+    }
+    
+    /**
+     * Get the default resource configuration if one is not declared in the
+     * web.xml.
+     * <p>
+     * This implementaton returns an instance of {@link ClasspathResourceConfig}
+     * that scans in files and directories as declared by the
+     * {@link ClasspathResourceConfig.PROPERTY_CLASSPATH} if present, otherwise
+     * in the "WEB-INF/lib" and "WEB-INF/classes" directories.
+     * <p>
+     * An inheriting class may override this method to supply a different
+     * default resource configuraton implementaton.
+     *
+     * @param props the properties to pass to the resource configuraton.
+     * @param wc the web configuration.
+     * @return the default resource configuraton.
+     *
+     * @throws javax.servlet.ServletException
+     */
+    protected ResourceConfig getDefaultResourceConfig(Map<String, Object> props,
+            WebConfig wc) throws ServletException  {
+        return webComponent.getClassPathResourceConfig(props, wc);
+    }
 
+    /**
+     * Configure the {@link ResourceConfig}.
+     * <p>
+     * The {@link ResourceConfig} is configured such that the following classes
+     * may be injected onto the field of a root resource class or a parameter
+     * of a method of root resource class that is annotated with
+     * {@link javax.ws.rs.core.Context}: {@link HttpServletRequest}, {@link HttpServletResponse}
+     * , {@link ServletContext} and {@link WebConfig}.
+     * <p>
+     * Any root resource class in registered in the resource configuration
+     * that is an interface is processed as follows.
+     * If the class is an interface and there exists a JNDI named object
+     * with the fully qualified class name as the JNDI name then that named
+     * object is added as a singleton root resource and the class is removed
+     * from the set of root resource classes.
+     * <p>
+     * An inheriting class may override this method to configure the
+     * {@link ResourceConfig} to provide alternative or additional instances
+     * that are resource or provider classes or instances, and may modify the
+     * features and properties of the {@link ResourceConfig}. For an inheriting
+     * class to extend configuration behaviour the overriding method MUST call
+     * <code>super.configure(servletConfig, rc, wa)</code> as the first statement
+     * of that method.
+     * <p>
+     * This method will be called only once at initiation. Subsequent
+     * reloads of the Web application will not result in subsequence calls to
+     * this method.
+     *
+     * @param wc the Web configuration
+     * @param rc the Resource configuration
+     * @param wa the Web application
+     */
+    protected void configure(WebConfig wc, ResourceConfig rc, WebApplication wa) {
+        if (getServletConfig() != null)
+            configure(getServletConfig(), rc, wa);
+        else if (filterConfig != null)
+            configure(filterConfig, rc, wa);
+    }
+    
+    /**
+     * Initiate the {@link WebApplication}.
+     * <p>
+     * This method will be called once at initiation and for
+     * each reload of the Web application.
+     * <p>
+     * An inheriting class may override this method to initiate the
+     * Web application with different parameters.
+     *
+     * @param rc the Resource configuration
+     * @param wa the Web application
+     */
+    protected void initiate(ResourceConfig rc, WebApplication wa) {
+        wa.initiate(rc);
+    }
+
+    /**
+     * Load the Web application. This will create, configure and initiate
+     * the web application.
+     */
+    public void load() {
+        webComponent.load();
+    }
+
+    /**
+     * Reload the Web application. This will create and initiate the web
+     * application using the same {@link ResourceConfig} implementation
+     * that was used to load the Web application.
+     * <p>
+     * This method may be called at runtime, more than once, to reload the
+     * Web application. For example, if a {@link ResourceConfig} implementation
+     * is capable of detecting changes to resource classes (addition or removal)
+     * or providers then this method may be invoked to reload the web
+     * application for such changes to take effect.
+     * <p>
+     * If this method is called when there are pending requests then such
+     * requests will be processed using the previously loaded web application.
+     */
+    public void reload() {
+        webComponent.reload();
+    }
+
+    /**
+     * Dispatch client requests to a resource class.
+     *
+     * @param baseUri the base URI of the request.
+     * @param requestUri the URI of the request.
+     * @param request the {@link HttpServletRequest} object that
+     *        contains the request the client made to
+     *	      the Web component.
+     * @param response the {@link HttpServletResponse} object that
+     *        contains the response the Web component returns
+     *        to the client.
+     * @exception IOException if an input or output error occurs
+     *            while the Web component is handling the
+     *            HTTP request.
+     * @exception ServletException if the HTTP request cannot
+     *            be handled.
+     */
+    public void service(URI baseUri, URI requestUri, final HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        webComponent.service(baseUri, requestUri, request, response);
+    }
+
+    /**
+     * Destroy this Servlet or Filter.
+     * 
+     */
+    @Override
+    public void destroy() {
+        webComponent.destroy();
+    }
+
+    
+    // Servlet
+    
+    @Override
+    public void init() throws ServletException {
         init(new WebConfig() {
 
             public String getName() {
-                return ServletContainer.this.servletConfig.getServletName();
+                return ServletContainer.this.getServletName();
             }
 
             public String getInitParameter(String name) {
-                return ServletContainer.this.servletConfig.getInitParameter(name);
+                return ServletContainer.this.getInitParameter(name);
             }
 
             public Enumeration getInitParameterNames() {
-                return ServletContainer.this.servletConfig.getInitParameterNames();
+                return ServletContainer.this.getInitParameterNames();
             }
 
             public ServletContext getServletContext() {
-                return ServletContainer.this.servletConfig.getServletContext();
+                return ServletContainer.this.getServletContext();
             }
 
             public ResourceConfig getDefaultResourceConfig(Map<String, Object> props) throws ServletException {
-                return ServletContainer.this.getDefaultResourceConfig(props, ServletContainer.this.servletConfig);
+                return ServletContainer.this.getDefaultResourceConfig(props, ServletContainer.this.getServletConfig());
             }
         });
     }
 
     /**
-     * Dispatches client requests to the {@link #service(javax.servlet.http.HttpServletRequest, javax.servlet.http.HttpServletResponse) }
-     * method.
+     * Get the default resource configuration if one is not declared in the
+     * web.xml.
+     * <p>
+     * This implementaton returns an instance of {@link ClasspathResourceConfig}
+     * that scans in files and directories as declared by the
+     * {@link ClasspathResourceConfig.PROPERTY_CLASSPATH} if present, otherwise
+     * in the "WEB-INF/lib" and "WEB-INF/classes" directories.
+     * <p>
+     * An inheriting class may override this method to supply a different
+     * default resource configuraton implementaton.
      *
-     * @param request the {@link HttpServletRequest} object that
-     *        contains the request the client made to
-     *	      the servlet.
-     * @param response the {@link HttpServletResponse} object that
-     *        contains the response the servlet returns
-     *        to the client.
-     * @exception IOException if an input or output error occurs
-     *            while the servlet is handling the
-     *            HTTP request.
-     * @exception ServletException if the HTTP request cannot
-     *            be handled.
+     * @param props the properties to pass to the resource configuraton.
+     * @param servletConfig the servlet configuration.
+     * @return the default resource configuraton.
+     *
+     * @throws javax.servlet.ServletException
+     * @deprecated methods should implement {@link #getDefaultResourceConfig(java.util.Map, com.sun.jersey.spi.container.servlet.WebConfig) }.
      */
-    public void service(ServletRequest request, ServletResponse response) throws ServletException, IOException {
-        try {
-            service((HttpServletRequest) request, (HttpServletResponse) response);
-        } catch (ClassCastException e) {
-            throw new ServletException("non-HTTP request or response");
-        }
+    @Deprecated
+    protected ResourceConfig getDefaultResourceConfig(Map<String, Object> props,
+            ServletConfig servletConfig) throws ServletException  {
+        return getDefaultResourceConfig(props, getWebConfig());
+    }
+
+    /**
+     * Configure the {@link ResourceConfig} for a Servlet.
+     * <p>
+     * The {@link ResourceConfig} is configured such that the following classes
+     * may be injected onto the field of a root resource class or a parameter
+     * of a method of root resource class that is annotated with
+     * {@link javax.ws.rs.core.Context}: {@link ServletConfig}.
+     * <p>
+     * An inheriting class may override this method to configure the
+     * {@link ResourceConfig} to provide alternative or additional instances
+     * that are resource or provider classes or instances, and may modify the
+     * features and properties of the {@link ResourceConfig}. For an inheriting
+     * class to extend configuration behaviour the overriding method MUST call
+     * <code>super.configure(servletConfig, rc, wa)</code> as the first statement of that
+     * method.
+     * <p>
+     * This method will be called only once at servlet initiation. Subsequent
+     * reloads of the Web application will not result in subsequence calls to
+     * this method.
+     *
+     * @param sc the Servlet configuration
+     * @param rc the Resource configuration
+     * @param wa the Web application
+     */
+    protected void configure(final ServletConfig sc, ResourceConfig rc, WebApplication wa) {
+        rc.getSingletons().add(new ContextInjectableProvider<ServletConfig>(
+                ServletConfig.class, sc));
     }
 
     /**
@@ -297,6 +532,7 @@ public class ServletContainer extends WebComponent implements Servlet, ServletCo
      * @exception ServletException if the HTTP request cannot
      *            be handled.
      */
+    @Override
     public void service(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         /**
          * There is an annoying edge case where the service method is
@@ -384,6 +620,56 @@ public class ServletContainer extends WebComponent implements Servlet, ServletCo
     }
 
     /**
+     * @return the {@link Pattern} compiled from a regular expression that is
+     * the property value of {@link #PROPERTY_STATIC_CONTENT_REGEX}.
+     * A <code>null</code> value will be returned if the property is not present
+     * is or an empty String.
+     */
+    public Pattern getStaticContentPattern() {
+        return staticContentPattern;
+    }
+
+    /**
+     * Configure the {@link ResourceConfig} for a Filter.
+     * <p>
+     * The {@link ResourceConfig} is configured such that the following classes
+     * may be injected onto the field of a root resource class or a parameter
+     * of a method of root resource class that is annotated with
+     * {@link javax.ws.rs.core.Context}: {@link FilterConfig}.
+     * <p>
+     * An inheriting class may override this method to configure the
+     * {@link ResourceConfig} to provide alternative or additional instances
+     * that are resource or provider classes or instances, and may modify the
+     * features and properties of the {@link ResourceConfig}. For an inheriting
+     * class to extend configuration behaviour the overriding method MUST call
+     * <code>super.configure(servletConfig, rc, wa)</code> as the first statement of that
+     * method.
+     * <p>
+     * This method will be called only once at servlet initiation. Subsequent
+     * reloads of the Web application will not result in subsequence calls to
+     * this method.
+     *
+     * @param fc the Filter configuration
+     * @param rc the Resource configuration
+     * @param wa the Web application
+     */
+    protected void configure(final FilterConfig fc, ResourceConfig rc, WebApplication wa) {
+        rc.getSingletons().add(new ContextInjectableProvider<FilterConfig>(
+                FilterConfig.class, fc));
+
+        String regex = (String)rc.getProperty(PROPERTY_WEB_PAGE_CONTENT_REGEX);
+        if (regex != null && regex.length() > 0) {
+            try {
+                staticContentPattern = Pattern.compile(regex);
+            } catch (PatternSyntaxException ex) {
+                throw new ContainerException(
+                        "The syntax is invalid for the regular expression, " + regex +
+                        ", associated with the initialization parameter " + PROPERTY_WEB_PAGE_CONTENT_REGEX, ex);
+            }
+        }
+    }
+    
+    /**
      * Dispatches client requests to the {@link #doFilter(javax.servlet.http.HttpServletRequest, javax.servlet.http.HttpServletResponse, javax.servlet.FilterChain) }
      * method.
      *
@@ -449,111 +735,4 @@ public class ServletContainer extends WebComponent implements Servlet, ServletCo
 
         service(baseUri, requestUri, request, response);
     }
-
-
-    /**
-     * Configure the {@link ResourceConfig} for a Servlet.
-     * <p>
-     * The {@link ResourceConfig} is configured such that the following classes
-     * may be injected onto the field of a root resource class or a parameter
-     * of a method of root resource class that is annotated with
-     * {@link javax.ws.rs.core.Context}: {@link ServletConfig}.
-     * <p>
-     * An inheriting class may override this method to configure the
-     * {@link ResourceConfig} to provide alternative or additional instances
-     * that are resource or provider classes or instances, and may modify the
-     * features and properties of the {@link ResourceConfig}. For an inheriting
-     * class to extend configuration behaviour the overriding method MUST call
-     * <code>super.configure(servletConfig, rc, wa)</code> as the first statement of that
-     * method.
-     * <p>
-     * This method will be called only once at servlet initiation. Subsequent
-     * reloads of the Web application will not result in subsequence calls to
-     * this method.
-     *
-     * @param sc the Servlet configuration
-     * @param rc the Resource configuration
-     * @param wa the Web application
-     */
-    protected void configure(final ServletConfig sc, ResourceConfig rc, WebApplication wa) {
-        rc.getSingletons().add(new ContextInjectableProvider<ServletConfig>(
-                ServletConfig.class, sc));
-    }
-
-    /**
-     * Configure the {@link ResourceConfig} for a Filter.
-     * <p>
-     * The {@link ResourceConfig} is configured such that the following classes
-     * may be injected onto the field of a root resource class or a parameter
-     * of a method of root resource class that is annotated with
-     * {@link javax.ws.rs.core.Context}: {@link FilterConfig}.
-     * <p>
-     * An inheriting class may override this method to configure the
-     * {@link ResourceConfig} to provide alternative or additional instances
-     * that are resource or provider classes or instances, and may modify the
-     * features and properties of the {@link ResourceConfig}. For an inheriting
-     * class to extend configuration behaviour the overriding method MUST call
-     * <code>super.configure(servletConfig, rc, wa)</code> as the first statement of that
-     * method.
-     * <p>
-     * This method will be called only once at servlet initiation. Subsequent
-     * reloads of the Web application will not result in subsequence calls to
-     * this method.
-     *
-     * @param fc the Filter configuration
-     * @param rc the Resource configuration
-     * @param wa the Web application
-     */
-    protected void configure(final FilterConfig fc, ResourceConfig rc, WebApplication wa) {
-        rc.getSingletons().add(new ContextInjectableProvider<FilterConfig>(
-                FilterConfig.class, fc));
-
-        String regex = (String)rc.getProperty(PROPERTY_WEB_PAGE_CONTENT_REGEX);
-        if (regex != null && regex.length() > 0) {
-            try {
-                staticContentPattern = Pattern.compile(regex);
-            } catch (PatternSyntaxException ex) {
-                throw new ContainerException(
-                        "The syntax is invalid for the regular expression, " + regex +
-                        ", associated with the initialization parameter " + PROPERTY_WEB_PAGE_CONTENT_REGEX, ex);
-            }
-        }
-    }
-
-    //
-
-    @Override
-    protected void configure(WebConfig wc, ResourceConfig rc, WebApplication wa) {
-        super.configure(wc, rc, wa);
-        if (servletConfig != null)
-            configure(servletConfig, rc, wa);
-        else if (filterConfig != null)
-            configure(filterConfig, rc, wa);
-    }
-
-
-    /**
-     * Get the default resource configuration if one is not declared in the
-     * web.xml.
-     * <p>
-     * This implementaton returns an instance of {@link ClasspathResourceConfig}
-     * that scans in files and directories as declared by the
-     * {@link ClasspathResourceConfig.PROPERTY_CLASSPATH} if present, otherwise
-     * in the "WEB-INF/lib" and "WEB-INF/classes" directories.
-     * <p>
-     * An inheriting class may override this method to supply a different
-     * default resource configuraton implementaton.
-     *
-     * @param props the properties to pass to the resource configuraton.
-     * @param servletConfig the servlet configuration.
-     * @return the default resource configuraton.
-     *
-     * @throws javax.servlet.ServletException
-     * @deprecated methods should implement {@link #getDefaultResourceConfig(java.util.Map, com.sun.jersey.spi.container.servlet.WebConfig) }.
-     */
-    @Deprecated
-    protected ResourceConfig getDefaultResourceConfig(Map<String, Object> props,
-            ServletConfig servletConfig) throws ServletException  {
-        return getDefaultResourceConfig(props, getWebConfig());
-    }    
 }

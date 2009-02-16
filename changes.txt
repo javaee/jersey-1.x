@@ -1,10 +1,22 @@
 release 1.0.3 (2009-03/04)
+- Fixed issue 219
+  https://jersey.dev.java.net/issues/show_bug.cgi?id=219
+  Refactored com.sun.jersey.spi.container.servlet.ServletContainer to
+  inherit from HttpServlet.
+- Fixed issue 217
+  https://jersey.dev.java.net/issues/show_bug.cgi?id=217
+  SpringServlet was failing when used as a filter.
 - Fixed issue 209
   https://jersey.dev.java.net/issues/show_bug.cgi?id=209
-  UriTemplate.java - added throwing IllegalArgumentException when variable
-  without value is used.
+  UriBuilder.buildFromEncoded(Object...) throws IllegalArgumentException if a
+  template does not have an associated value declared in the object array.
 - Fixed issue 216
   https://jersey.dev.java.net/issues/show_bug.cgi?id=216
+  If a URI template contains two or more declarations of a template variable
+  then encoded value for the template variable is used for all declarations.
+  Previously the encoded value was only used for the first declaration and
+  the non-encoded value for subsequent declarations.
+  Previously the
 - Fixed issue 208
   https://jersey.dev.java.net/issues/show_bug.cgi?id=208
   When ServletContainer is used as a servlet filter the initialization
