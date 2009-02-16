@@ -288,18 +288,15 @@ public class Stax2JacksonWriter implements XMLStreamWriter {
     }
 
     public void writeEndElement() throws XMLStreamException {
-        //Thread.dumpStack();
         try {
             ProcessingInfo removedPI = pop(processingStack);
             ProcessingInfo currentPI = peek(processingStack);
             if (currentPI != null) {
                 currentPI.lastUnderlyingPI = removedPI;
             }
-            if (!removedPI.isArray) {
-                // need to check first, if there was an array to be closed off
-                if ((removedPI.lastUnderlyingPI != null) && (removedPI.lastUnderlyingPI.isArray)) {
-                    generator.writeEndArray();
-                }
+            // need to check first, if there was an array to be closed off
+            if ((removedPI.lastUnderlyingPI != null) && (removedPI.lastUnderlyingPI.isArray)) {
+                generator.writeEndArray();
             }
             cleanlyEndObject(removedPI);
         } catch (IOException ex) {
