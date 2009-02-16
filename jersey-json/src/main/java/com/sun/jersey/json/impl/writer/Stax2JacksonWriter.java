@@ -345,11 +345,14 @@ public class Stax2JacksonWriter implements XMLStreamWriter {
     // TODO: need it parameterized
     final static boolean attrsWithPrefix = false;
 
+    final static String XML_SCHEMA_INSTANCE = "http://www.w3.org/2001/XMLSchema-instance";
+
     public void writeAttribute(String prefix, String namespaceURI, String localName, String value) throws XMLStreamException {
         writingAttr = true;
         writeStartElement(prefix, attrsWithPrefix ? ("@" + localName) : localName, namespaceURI);
         writingAttr = false;
-        writeCharacters(value);
+        // a dirty hack, since jaxb ri is giving us wrong info on the actual attribute type in this case
+        writeCharacters(value, "type".equals(localName) && XML_SCHEMA_INSTANCE.equals(namespaceURI));
         writeEndElement();
     }
 
@@ -403,7 +406,7 @@ public class Stax2JacksonWriter implements XMLStreamWriter {
         }
     }
 
-    public void writeCharacters(String text) throws XMLStreamException {
+    private void writeCharacters(String text, boolean forceString) throws XMLStreamException {
         try {
             ProcessingInfo currentPI = peek(processingStack);
             ProcessingInfo parentPI = peek2nd(processingStack);
@@ -411,7 +414,7 @@ public class Stax2JacksonWriter implements XMLStreamWriter {
                 generator.writeFieldName("$");
             }
             currentPI.afterFN = false;
-            if (!nonStringTypes.contains(currentPI.t)) {
+            if (forceString || !nonStringTypes.contains(currentPI.t)) {
                 generator.writeString(text);
             } else {
                 if ((boolean.class == currentPI.t) || (Boolean.class == currentPI.t)) {
@@ -424,6 +427,10 @@ public class Stax2JacksonWriter implements XMLStreamWriter {
             Logger.getLogger(Stax2JacksonWriter.class.getName()).log(Level.SEVERE, null, ex);
             throw new XMLStreamException(ex);
         }
+    }
+
+    public void writeCharacters(String text) throws XMLStreamException {
+        writeCharacters(text, false);
     }
 
     public void writeCharacters(char[] text, int start, int length) throws XMLStreamException {
