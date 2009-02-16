@@ -589,8 +589,7 @@ public class UriTemplate {
                     tValue =UriComponent.contextualEncode(tValue, t);
                 b.append(tValue);
             } else {
-                throw new IllegalArgumentException("The template variable, " + 
-                        m.group(1) + ", has no value");
+                throw templateVariableHasNoValue(m.group(1));
             }
             i = m.end();
         }
@@ -623,7 +622,7 @@ public class UriTemplate {
             final String userInfo, final String host, final String port, 
             final String path, final String query, final String fragment,
             final Object[] values, final boolean encode) {
-        
+
         String[] stringValues = new String[values.length];
         for (int i = 0; i < values.length; i++) {
             if (values[i] != null)
@@ -697,7 +696,7 @@ public class UriTemplate {
             offset = createURIComponent(UriComponent.Type.QUERY_PARAM, query, values,
                     offset, encode, mapValues, sb);
         }
-         
+
         if (fragment != null && fragment.length() > 0) {
             sb.append('#');
             offset = createURIComponent(UriComponent.Type.FRAGMENT, fragment, values,
@@ -731,25 +730,29 @@ public class UriTemplate {
             String tValue = mapValues.get(tVariable);
             if (tValue != null) {
                 b.append(tValue);
-            } else {
-                if (v < values.length) {
-                    tValue = values[v++];
-                    if (tValue != null) {
-                        mapValues.put(tVariable, tValue);
-                        if (encode)
-                            tValue = UriComponent.encode(tValue, t);
-                        else
-                            tValue = UriComponent.contextualEncode(tValue, t);
-                        b.append(tValue);
-                    } else {
-                        throw new IllegalArgumentException("The template variable, " + 
-                                tVariable + ", has no value");                        
-                    }
+            } else if (v < values.length) {
+                tValue = values[v++];
+                if (tValue != null) {
+                    if (encode)
+                        tValue = UriComponent.encode(tValue, t);
+                    else
+                        tValue = UriComponent.contextualEncode(tValue, t);
+                    mapValues.put(tVariable, tValue);
+                    b.append(tValue);
+                } else {
+                    throw templateVariableHasNoValue(tVariable);
                 }
+            } else {
+                throw templateVariableHasNoValue(tVariable);
             }
             i = m.end();
         }
         b.append(template, i, template.length());
         return v;
-    }    
+    }
+
+    private static IllegalArgumentException templateVariableHasNoValue(String tVariable) {
+        return new IllegalArgumentException("The template variable, " +
+                                tVariable + ", has no value");
+    }
 }

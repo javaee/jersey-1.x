@@ -189,6 +189,11 @@ public class UriBuilderTest extends TestCase {
         URI u = UriBuilder.fromPath("").
                 queryParam("y", "1 %2B 2").build();
         assertEquals(URI.create("?y=1+%2B+2"), u);
+
+        // Issue 216
+        u = UriBuilder.fromPath("http://localhost:8080").path("/{x}/{y}/{z}/{x}").
+                   buildFromEncoded("%xy", " ", "=");
+        assertEquals(URI.create("http://localhost:8080/%25xy/%20/=/%25xy"), u);
     }
 
     public void testReplaceQueryParams() {
@@ -587,6 +592,19 @@ public class UriBuilderTest extends TestCase {
         caught = false;
         try {
             UriBuilder.fromUri((String)null);
+        } catch(IllegalArgumentException e) {
+            caught = true;
+        }
+        assertTrue(caught);
+    }
+
+    public void testVariableWithoutValue() {
+        boolean caught = false;
+        try {
+            UriBuilder.fromPath("http://localhost:8080").
+                    path("/{a}/{b}").
+                    buildFromEncoded("aVal");
+
         } catch(IllegalArgumentException e) {
             caught = true;
         }
