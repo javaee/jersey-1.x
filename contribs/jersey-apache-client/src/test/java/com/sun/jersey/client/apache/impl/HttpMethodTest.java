@@ -40,7 +40,12 @@ package com.sun.jersey.client.apache.impl;
 import com.sun.jersey.api.client.ClientResponse;
 import javax.ws.rs.Path;
 import com.sun.jersey.api.client.WebResource;
+import com.sun.jersey.api.container.filter.LoggingFilter;
+import com.sun.jersey.api.core.DefaultResourceConfig;
+import com.sun.jersey.api.core.ResourceConfig;
 import com.sun.jersey.client.apache.ApacheHttpClient;
+import com.sun.jersey.client.apache.config.ApacheHttpClientConfig;
+import com.sun.jersey.client.apache.config.DefaultApacheHttpClientConfig;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -88,40 +93,109 @@ public class HttpMethodTest extends AbstractGrizzlyServerTester {
         super(testName);
     }
     
+    public void testHead() {
+        startServer(HttpMethodResource.class);
+        WebResource r = ApacheHttpClient.create().resource(getUri().path("test").build());
+        ClientResponse cr = r.head();
+        assertFalse(cr.hasEntity());
+    }
+
+    public void testOptions() {
+        startServer(HttpMethodResource.class);
+        WebResource r = ApacheHttpClient.create().resource(getUri().path("test").build());
+        ClientResponse cr = r.options(ClientResponse.class);
+        assertFalse(cr.hasEntity());
+        cr.close();
+    }
+
     public void testGet() {
         startServer(HttpMethodResource.class);
         WebResource r = ApacheHttpClient.create().resource(getUri().path("test").build());
         assertEquals("GET", r.get(String.class));
+
+        ClientResponse cr = r.get(ClientResponse.class);
+        assertTrue(cr.hasEntity());
+        cr.close();
     }
     
     public void testPost() {
         startServer(HttpMethodResource.class);
         WebResource r = ApacheHttpClient.create().resource(getUri().path("test").build());
         assertEquals("POST", r.post(String.class, "POST"));
+
+        ClientResponse cr = r.post(ClientResponse.class, "POST");
+        assertTrue(cr.hasEntity());
+        cr.close();
     }    
     
+    public void testPostChunked() {
+//        startServer(HttpMethodResource.class);
+        ResourceConfig rc = new DefaultResourceConfig(HttpMethodResource.class);
+        rc.getProperties().put(ResourceConfig.PROPERTY_CONTAINER_REQUEST_FILTERS,
+                LoggingFilter.class.getName());
+        startServer(rc);
+
+        DefaultApacheHttpClientConfig config = new DefaultApacheHttpClientConfig();
+        config.getProperties().put(ApacheHttpClientConfig.PROPERTY_CHUNKED_ENCODING_SIZE, 1024);
+        ApacheHttpClient c = ApacheHttpClient.create(config);
+
+        WebResource r = c.resource(getUri().path("test").build());
+        assertEquals("POST", r.post(String.class, "POST"));
+
+        ClientResponse cr = r.post(ClientResponse.class, "POST");
+        assertTrue(cr.hasEntity());
+        cr.close();
+    }
+
+    public void testPostVoid() {
+        startServer(HttpMethodResource.class);
+        WebResource r = ApacheHttpClient.create().resource(getUri().path("test").build());
+
+        // This test will lock up if ClientResponse is not closed by WebResource.
+        // TODO need a better way to detect this.
+        for (int i = 0; i < 100; i++) {
+            r.post("POST");
+        }
+    }
+
     public void testPostNoProduce() {
         startServer(HttpMethodResource.class);
         WebResource r = ApacheHttpClient.create().resource(getUri().path("test").build());
         assertEquals(204, r.path("noproduce").post(ClientResponse.class, "POST").getStatus());
+
+        ClientResponse cr = r.path("noproduce").post(ClientResponse.class, "POST");
+        assertFalse(cr.hasEntity());
+        cr.close();
     }
 
     public void testPostNoConsumeProduce() {
         startServer(HttpMethodResource.class);
         WebResource r = ApacheHttpClient.create().resource(getUri().path("test").build());
         assertEquals(204, r.path("noconsumeproduce").post(ClientResponse.class).getStatus());
+
+        ClientResponse cr = r.path("noconsumeproduce").post(ClientResponse.class, "POST");
+        assertFalse(cr.hasEntity());
+        cr.close();
     }
 
     public void testPut() {
         startServer(HttpMethodResource.class);
         WebResource r = ApacheHttpClient.create().resource(getUri().path("test").build());
-        assertEquals("PUT", r.post(String.class, "PUT"));
+        assertEquals("PUT", r.put(String.class, "PUT"));
+
+        ClientResponse cr = r.put(ClientResponse.class, "PUT");
+        assertTrue(cr.hasEntity());
+        cr.close();
     }
     
     public void testDelete() {
         startServer(HttpMethodResource.class);
         WebResource r = ApacheHttpClient.create().resource(getUri().path("test").build());
         assertEquals("DELETE", r.delete(String.class));
+
+        ClientResponse cr = r.delete(ClientResponse.class);
+        assertTrue(cr.hasEntity());
+        cr.close();
     }
     
     public void testAll() {

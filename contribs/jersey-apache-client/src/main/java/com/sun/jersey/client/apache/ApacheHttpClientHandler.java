@@ -47,6 +47,8 @@ import com.sun.jersey.client.apache.config.DefaultApacheHttpClientConfig;
 import com.sun.jersey.client.apache.config.DefaultCredentialsProvider;
 import com.sun.jersey.core.header.InBoundHeaders;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.Closeable;
 import java.io.FilterInputStream;
 import java.io.IOException;
@@ -84,6 +86,10 @@ import org.apache.commons.httpclient.params.HttpMethodParams;
  * If a response entity is obtained that is an instance of {@link Closeable} 
  * then the instance MUST be closed after processing the entity to release
  * connection-based resources.
+ * <p>
+ * If a {@link ClientResponse} is obtained and an entity is not read from the
+ * response then {@link ClientResponse#close() } MUST be called after processing
+ * the response to release connection-based resources.
  * <p>
  * The following methods are currently supported: HEAD, GET, POST, PUT, DELETE
  * and OPTIONS.
@@ -160,33 +166,63 @@ public final class ApacheHttpClientHandler extends TerminatingClientHandler {
             final EntityEnclosingMethod entMethod = (EntityEnclosingMethod) method;
 
             if (cr.getEntity() != null) {
+                final RequestEntityWriter re = getRequestEntityWriter(cr);
                 final Integer chunkedEncodingSize = (Integer)props.get(ApacheHttpClientConfig.PROPERTY_CHUNKED_ENCODING_SIZE);
                 if (chunkedEncodingSize != null) {
                     // There doesn't seems to be a way to set the chunk size.
                     entMethod.setContentChunked(true);
+
+                    // Do not buffer the request entity when chunked encoding is
+                    // set
+                    entMethod.setRequestEntity(new RequestEntity() {
+                        public boolean isRepeatable() {
+                            return false;
+                        }
+
+                        public void writeRequest(OutputStream out) throws IOException {
+                            re.writeRequestEntity(out);
+                        }
+
+                        public long getContentLength() {
+                            return re.getSize();
+                        }
+
+                        public String getContentType() {
+                            return re.getMediaType().toString();
+                        }
+
+                    });
+
                 } else {
                     entMethod.setContentChunked(false);
+
+                    ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                    try {
+                        re.writeRequestEntity(baos);
+                    } catch (IOException ex) {
+                        throw new ClientHandlerException(ex);
+                    }
+                    final byte[] content = baos.toByteArray();
+                    entMethod.setRequestEntity(new RequestEntity() {
+                        public boolean isRepeatable() {
+                            return true;
+                        }
+
+                        public void writeRequest(OutputStream out) throws IOException {
+                            out.write(content);
+                        }
+
+                        public long getContentLength() {
+                            return content.length;
+                        }
+
+                        public String getContentType() {
+                            return re.getMediaType().toString();
+                        }
+
+                    });
                 }
 
-                final RequestEntityWriter re = getRequestEntityWriter(cr);
-                entMethod.setRequestEntity(new RequestEntity() {
-                    public boolean isRepeatable() {
-                        return false;
-                    }
-
-                    public void writeRequest(OutputStream out) throws IOException {
-                        re.writeRequestEntity(out);
-                    }
-
-                    public long getContentLength() {
-                        return re.getSize();
-                    }
-
-                    public String getContentType() {
-                        return re.getMediaType().toString();
-                    }
-                    
-                });
             }
         } else {
             // Follow redirects
@@ -195,7 +231,7 @@ public final class ApacheHttpClientHandler extends TerminatingClientHandler {
 
         try {
             client.executeMethod(getHostConfiguration(client, props), method, getHttpState(props));
-            
+
             return new HttpClientResponse(method);
         } catch (Exception e) {
             method.releaseConnection();
@@ -312,7 +348,8 @@ public final class ApacheHttpClientHandler extends TerminatingClientHandler {
 
         HttpClientResponseInputStream(HttpMethod method)
                 throws IOException {
-            super(method.getResponseBodyAsStream());
+            super((method.getResponseBodyAsStream() != null)
+                ? method.getResponseBodyAsStream() : new ByteArrayInputStream(new byte[0]));
             this.method = method;
         }
 
@@ -340,16 +377,11 @@ public final class ApacheHttpClientHandler extends TerminatingClientHandler {
                 return false;
             }
 
-            Header contentLength = method.getResponseHeader("Content-Length");
-            if (contentLength != null) {
-                try {
-                    int len = Integer.parseInt(contentLength.getValue());
-                    return len > 0 || len == -1;
-                } catch (NumberFormatException nfe) {
-                }
+            try {
+                return method.getResponseBodyAsStream() != null;
+            } catch (IOException ex) {
+                throw new ClientHandlerException(ex);
             }
-
-            return false;
         }
     }
 }

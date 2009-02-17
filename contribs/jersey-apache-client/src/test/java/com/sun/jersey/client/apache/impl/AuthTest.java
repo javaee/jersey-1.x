@@ -47,6 +47,7 @@ import com.sun.jersey.client.apache.config.ApacheHttpClientConfig;
 import com.sun.jersey.client.apache.config.DefaultApacheHttpClientConfig;
 import com.sun.jersey.spi.resource.Singleton;
 import javax.ws.rs.GET;
+import javax.ws.rs.POST;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
@@ -75,6 +76,13 @@ public class AuthTest extends AbstractGrizzlyServerTester {
             assertNotNull(value);
             return "GET";
         }
+
+        @POST
+        public String post(@Context HttpHeaders h, String e) {
+            String value = h.getRequestHeaders().getFirst("Authorization");
+            assertNotNull(value);
+            return e;
+        }
     }
         
     public void testPreemptiveAuth() {
@@ -92,6 +100,20 @@ public class AuthTest extends AbstractGrizzlyServerTester {
         assertEquals("GET", r.get(String.class));
     }
 
+    public void testPreemptiveAuthPost() {
+        ResourceConfig rc = new DefaultResourceConfig(PreemptiveAuthResource.class);
+        rc.getProperties().put(ResourceConfig.PROPERTY_CONTAINER_REQUEST_FILTERS,
+                LoggingFilter.class.getName());
+        startServer(rc);
+
+        DefaultApacheHttpClientConfig config = new DefaultApacheHttpClientConfig();
+        config.getState().setCredentials(null, null, -1, "name", "password");
+        config.getProperties().put(ApacheHttpClientConfig.PROPERTY_PREEMPTIVE_AUTHENTICATION, true);
+        ApacheHttpClient c = ApacheHttpClient.create(config);
+
+        WebResource r = c.resource(getUri().build());
+        assertEquals("POST", r.post(String.class, "POST"));
+    }
 
     @Path("/test")
     @Singleton
@@ -110,9 +132,24 @@ public class AuthTest extends AbstractGrizzlyServerTester {
 
             return "GET";
         }
+
+        @POST
+        public String post(@Context HttpHeaders h, String e) {
+            requestCount++;
+            String value = h.getRequestHeaders().getFirst("Authorization");
+            if (value == null) {
+                assertEquals(1, requestCount);
+                throw new WebApplicationException(Response.status(401).header("WWW-Authenticate", "Basic realm=\"WallyWorld\"").build());
+            } else {
+                assertTrue(requestCount > 1);
+            }
+
+            return e;
+        }
+
     }
 
-    public void testAuth() {
+    public void testAuthGet() {
         ResourceConfig rc = new DefaultResourceConfig(AuthResource.class);
         rc.getProperties().put(ResourceConfig.PROPERTY_CONTAINER_REQUEST_FILTERS,
                 LoggingFilter.class.getName());
@@ -124,6 +161,20 @@ public class AuthTest extends AbstractGrizzlyServerTester {
 
         WebResource r = c.resource(getUri().path("test").build());
         assertEquals("GET", r.get(String.class));
+    }
+
+    public void testAuthPost() {
+        ResourceConfig rc = new DefaultResourceConfig(AuthResource.class);
+//        rc.getProperties().put(ResourceConfig.PROPERTY_CONTAINER_REQUEST_FILTERS,
+//                LoggingFilter.class.getName());
+        startServer(rc);
+
+        DefaultApacheHttpClientConfig config = new DefaultApacheHttpClientConfig();
+        config.getState().setCredentials(null, null, -1, "name", "password");
+        ApacheHttpClient c = ApacheHttpClient.create(config);
+
+        WebResource r = c.resource(getUri().path("test").build());
+        assertEquals("POST", r.post(String.class, "POST"));
     }
 
     static class BasicCredentialsProvider implements CredentialsProvider {
@@ -140,7 +191,7 @@ public class AuthTest extends AbstractGrizzlyServerTester {
         }
     }
 
-    public void testAuthInteractive() {
+    public void testAuthInteractiveGet() {
         ResourceConfig rc = new DefaultResourceConfig(AuthResource.class);
         rc.getProperties().put(ResourceConfig.PROPERTY_CONTAINER_REQUEST_FILTERS,
                 LoggingFilter.class.getName());
@@ -157,4 +208,20 @@ public class AuthTest extends AbstractGrizzlyServerTester {
         assertTrue(bcp.isCalled());
     }
 
+    public void testAuthInteractivePost() {
+        ResourceConfig rc = new DefaultResourceConfig(AuthResource.class);
+        rc.getProperties().put(ResourceConfig.PROPERTY_CONTAINER_REQUEST_FILTERS,
+                LoggingFilter.class.getName());
+        startServer(rc);
+
+        DefaultApacheHttpClientConfig config = new DefaultApacheHttpClientConfig();
+        config.getProperties().put(ApacheHttpClientConfig.PROPERTY_INTERACTIVE, true);
+        BasicCredentialsProvider bcp = new BasicCredentialsProvider();
+        config.getProperties().put(ApacheHttpClientConfig.PROPERTY_CREDENTIALS_PROVIDER, bcp);
+        ApacheHttpClient c = ApacheHttpClient.create(config);
+
+        WebResource r = c.resource(getUri().path("test").build());
+        assertEquals("POST", r.post(String.class, "POST"));
+        assertTrue(bcp.isCalled());
+    }
 }

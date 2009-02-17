@@ -1,4 +1,13 @@
 release 1.0.3 (2009-03/04)
+- Fixed two issues with the Apache HTTP client integration:
+  1) Requests are repeatable by default and requests are buffered. Setting the
+     property ClientConfig.PROPERTY_CHUNKED_ENCODING_SIZE to a value > 0 will
+     turn off buffering.
+  2) Connections are correctly released when a response entity is present
+     but the client does not consume the entity. It is important if
+     ClientResponse is used without reading an entity (when one is present) or
+     entities are processed that are instances of Closeable that the response
+     or stream is closed respectively after processing the response.
 - The project version and build number are now correctly included in the
   jersey-bundle.jar and thus those values now appear correctly in generated
   WADL documents.

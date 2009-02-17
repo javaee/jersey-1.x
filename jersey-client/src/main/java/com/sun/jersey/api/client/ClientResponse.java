@@ -203,14 +203,15 @@ public class ClientResponse {
     /**
      * Get the entity of the response.
      * <p>
-     * If the entity is not an instance of Closeable then the entity
-     * input stream is closed.
+     * If the entity is not an instance of Closeable then this response
+     * is closed.
      * 
      * @param <T> the type of the response.
      * @param gt the generic type of the entity.
      * @return an instance of the type represented by the generic type.
      * 
-     * @throws java.lang.IllegalArgumentException
+     * @throws com.sun.jersey.api.client.ClientHandlerException if there
+     *         is an error processing the response.
      * @throws UniformInterfaceException if the response status is 204 (No Content).
      */
     public <T> T getEntity(GenericType<T> gt) throws IllegalArgumentException, UniformInterfaceException {
@@ -238,15 +239,30 @@ public class ClientResponse {
             }
             T t = br.readFrom(c, type, EMPTY_ANNOTATIONS, mediaType, headers, entity);
             if (!(t instanceof Closeable)) {
-                entity.close();
+                close();
             }
-            entity = null;
             return t;
         } catch (IOException ex) {
-            throw new IllegalArgumentException(ex);
+            throw new ClientHandlerException(ex);
         }
     }
 
+    /**
+     * Close the response.
+     * <p>
+     * The entity input stream is closed.
+     * 
+     * @throws com.sun.jersey.api.client.ClientHandlerException if there
+     *         is an error closing the response.
+     */
+    public void close() throws ClientHandlerException {
+        try {
+            entity.close();
+        } catch (IOException e) {
+            throw new ClientHandlerException(e);
+        }
+    }
+    
     /**
      * Get the media type of the response.
      * 

@@ -577,5 +577,7 @@ public class WebResource extends Filterable implements
         
         if (r.getStatus() >= 300) 
             throw new UniformInterfaceException(r);
+        
+        r.close();
     }
 }

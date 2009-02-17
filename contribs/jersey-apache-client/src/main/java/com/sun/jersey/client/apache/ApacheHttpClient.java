@@ -57,9 +57,23 @@ import org.apache.commons.httpclient.MultiThreadedHttpConnectionManager;
  * {@link ApacheHttpClientConfig#PROPERTY_PREEMPTIVE_AUTHENTICATION} and
  * {@link ClientConfig#PROPERTY_CONNECT_TIMEOUT}.
  * <p>
+ * By default a request entity is buffered and repeatable such that
+ * authorization may be performed automatically in response to a 401 response.
+ * <p>
+ * If the property {@link ClientConfig#PROPERTY_CHUNKED_ENCODING_SIZE} size
+ * is set to a value greater than 0 then chunked encoding will be enabled
+ * and the request entity (if present) will not be buffered and is not
+ * repeatable. For authorization to work in such scenarios the property
+ * {@link ApacheHttpClientConfig#PROPERTY_PREEMPTIVE_AUTHENTICATION} must
+ * be set to true.
+ * <p>
  * If a response entity is obtained that is an instance of {@link Closeable}
  * then the instance MUST be closed after processing the entity to release
  * connection-based resources.
+ * <p>
+ * If a {@link ClientResponse} is obtained and an entity is not read from the
+ * response then {@link ClientResponse#close() } MUST be called after processing
+ * the response to release connection-based resources.
  * 
  * @author jorgeluisw@mac.com
  * @author Paul.Sandoz@Sun.Com
