@@ -1,4 +1,7 @@
 release 1.0.3 (2009-03/04)
+- The project version and build number are now correctly included in the
+  jersey-bundle.jar and thus those values now appear correctly in generated
+  WADL documents.
 - Fixed issue 219
   https://jersey.dev.java.net/issues/show_bug.cgi?id=219
   Refactored com.sun.jersey.spi.container.servlet.ServletContainer to
