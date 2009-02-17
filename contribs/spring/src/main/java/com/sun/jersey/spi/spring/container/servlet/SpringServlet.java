@@ -64,9 +64,7 @@ public class SpringServlet extends ServletContainer {
     @Override
     protected ResourceConfig getDefaultResourceConfig(Map<String, Object> props,
             WebConfig webConfig) throws ServletException  {
-        DefaultResourceConfig rc = new DefaultResourceConfig();
-        rc.setPropertiesAndFeatures(props);
-        return rc;
+        return new DefaultResourceConfig();
     }
 
     @Override

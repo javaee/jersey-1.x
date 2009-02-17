@@ -163,7 +163,6 @@ public class WebComponent implements ContainerListener {
         context = config.getServletContext();
 
         resourceConfig = createResourceConfig(config);
-        initResourceConfigFeatures(webConfig, resourceConfig);
 
         load();
 
@@ -501,8 +500,14 @@ public class WebComponent implements ContainerListener {
 
     private ResourceConfig createResourceConfig(WebConfig webConfig)
             throws ServletException {
-        Map<String, Object> props = getInitParams(webConfig);
+        final Map<String, Object> props = getInitParams(webConfig);
+        final ResourceConfig rc = createResourceConfig(webConfig, props);
+        rc.setPropertiesAndFeatures(props);
+        return rc;
+    }
 
+    private ResourceConfig createResourceConfig(WebConfig webConfig, Map<String, Object> props)
+            throws ServletException {
         // Check if the resource config class property is present
         String resourceConfigClassName = webConfig.getInitParameter(RESOURCE_CONFIG_CLASS);
         // Otherwise check if the JAX-RS applicaion config class property is
@@ -559,10 +564,8 @@ public class WebComponent implements ContainerListener {
                 }
             } else if (Application.class.isAssignableFrom(resourceConfigClass)) {
                 try {
-                    ResourceConfig rc = new ApplicationAdapter(
+                    return new ApplicationAdapter(
                             (Application)resourceConfigClass.newInstance());
-                    rc.getProperties().putAll(props);
-                    return rc;
                 } catch(Exception e) {
                     throw new ServletException(e);
                 }
@@ -626,25 +629,6 @@ public class WebComponent implements ContainerListener {
             }
             return resourcePaths.toArray(new String[resourcePaths.size()]);
         }
-    }
-
-    private void initResourceConfigFeatures(WebConfig webConfig, ResourceConfig rc) {
-        setResourceConfigFeature(webConfig, rc,
-                ResourceConfig.FEATURE_CANONICALIZE_URI_PATH);
-        setResourceConfigFeature(webConfig, rc,
-                ResourceConfig.FEATURE_MATCH_MATRIX_PARAMS);
-        setResourceConfigFeature(webConfig, rc,
-                ResourceConfig.FEATURE_NORMALIZE_URI);
-        setResourceConfigFeature(webConfig, rc,
-                ResourceConfig.FEATURE_REDIRECT);
-        setResourceConfigFeature(webConfig, rc,
-                ResourceConfig.FEATURE_IMPLICIT_VIEWABLES);
-    }
-
-    private void setResourceConfigFeature(WebConfig webConfig, ResourceConfig rc, String feature) {
-        String value = webConfig.getInitParameter(feature);
-        if (value != null)
-            rc.getFeatures().put(feature, Boolean.valueOf(value));
     }
 
     private void configureJndiResources(ResourceConfig rc) {

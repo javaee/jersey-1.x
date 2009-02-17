@@ -132,40 +132,7 @@ public class DefaultResourceConfig extends ResourceConfig {
     public Object getProperty(String propertyName) {
         return properties.get(propertyName);
     }
-    
-    /**
-     * Set the properties and features given a map of entries.
-     * 
-     * @param entries the map of entries. All entries are added as properties.
-     * Any entry with a value that is an
-     * instance of Boolean is added as a feature with the feature name set
-     * to the entry name and the feature value set to the entry value.
-     * Any entry with a value that is an instance String and is equal (ignoring
-     * case) to "true" or "false" is added as a feature with the feature name
-     * set to the entry name and the feature value set to the Boolean value
-     * of the entry value. Features are only added if an existing feature
-     * does not currently exist.
-     */
-    public void setPropertiesAndFeatures(Map<String, Object> entries) {
-        getProperties().putAll(entries);
         
-        for (Map.Entry<String, Object> e : entries.entrySet()) {
-            if (getFeatures().get(e.getKey()) != null) continue;
-            
-            Object v = e.getValue();
-            if (v instanceof String) {
-                String sv = (String)v;
-                if (sv.equalsIgnoreCase("true")) {
-                    getFeatures().put(e.getKey(), true);                    
-                } else if (sv.equalsIgnoreCase("false")) {
-                    getFeatures().put(e.getKey(), false);
-                }
-            } else if (v instanceof Boolean) {
-                getFeatures().put(e.getKey(), (Boolean)v);
-            }
-        }
-    }
-    
     /**
      * Get a cannonical array of String elements from a String array
      * where each entry may contain zero or more elements separated by ';'.

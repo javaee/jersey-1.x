@@ -466,4 +466,40 @@ public abstract class ResourceConfig extends Application {
         
         return c.isAnnotationPresent(Provider.class);
     }
+
+    /**
+     * Set the properties and features given a map of entries.
+     *
+     * @param entries the map of entries. All entries are added as properties.
+     * Properties are only added if an existing property does not currently exist.
+     *
+     * Any entry with a value that is an instance of Boolean is added as a
+     * feature with the feature name set to the entry name and the feature value
+     * set to the entry value. Any entry with a value that is an instance String
+     * and is equal (ignoring case and white space) to "true" or "false" is added
+     * as a feature with the feature name set to the entry name and the feature
+     * value set to the Boolean value of the entry value. Features are only added
+     * if an existing feature does not currently exist.
+     */
+    public void setPropertiesAndFeatures(Map<String, Object> entries) {
+        for (Map.Entry<String, Object> e : entries.entrySet()) {
+            if (!getProperties().containsKey(e.getKey())) {
+                getProperties().put(e.getKey(), e.getValue());
+            }
+
+            if (!getFeatures().containsKey(e.getKey())) {
+                Object v = e.getValue();
+                if (v instanceof String) {
+                    String sv = ((String)v).trim();
+                    if (sv.equalsIgnoreCase("true")) {
+                        getFeatures().put(e.getKey(), true);
+                    } else if (sv.equalsIgnoreCase("false")) {
+                        getFeatures().put(e.getKey(), false);
+                    }
+                } else if (v instanceof Boolean) {
+                    getFeatures().put(e.getKey(), (Boolean)v);
+                }
+            }
+        }
+    }
 }
