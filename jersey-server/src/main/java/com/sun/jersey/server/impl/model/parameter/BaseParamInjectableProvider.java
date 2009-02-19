@@ -35,40 +35,37 @@
  * holder.
  */
 
-package com.sun.jersey.server.impl.model.parameter.multivalued;
+package com.sun.jersey.server.impl.model.parameter;
 
-import com.sun.jersey.api.container.ContainerException;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
-import javax.ws.rs.WebApplicationException;
+import com.sun.jersey.server.impl.model.parameter.multivalued.MultivaluedParameterProcessor;
+import com.sun.jersey.api.model.Parameter;
+import com.sun.jersey.core.spi.component.ComponentScope;
+import com.sun.jersey.server.impl.model.parameter.multivalued.MultivaluedParameterExtractor;
+import com.sun.jersey.server.spi.StringReaderWorkers;
+import com.sun.jersey.spi.inject.InjectableProvider;
+import java.lang.annotation.Annotation;
 
 /**
  *
  * @author Paul.Sandoz@Sun.Com
  */
-abstract class BaseStringConstructorExtractor {
-    final Constructor c;
+public abstract class BaseParamInjectableProvider<A extends Annotation> implements
+        InjectableProvider<A, Parameter> {
+    private final StringReaderWorkers w;
 
-    protected BaseStringConstructorExtractor(Constructor c) {
-        this.c = c;
+    BaseParamInjectableProvider(StringReaderWorkers w) {
+        this.w = w;
+    }
+    
+    public ComponentScope getScope() {
+        return ComponentScope.PerRequest;
+    }
+    
+    protected MultivaluedParameterExtractor processWithoutDefaultValue(Parameter p) {
+        return MultivaluedParameterProcessor.processWithoutDefaultValue(w, p);
     }
 
-    protected final Object getValue(String v) {
-        if (v == null || v.length() == 0) 
-            return null;
-        try {
-            return c.newInstance(v);
-        } catch (InvocationTargetException ex) {
-            Throwable target = ex.getTargetException();
-            if (target instanceof WebApplicationException) {
-                throw (WebApplicationException)target;
-            } else {
-                throw new ContainerException(target);
-            }
-        } catch (RuntimeException ex) {
-            throw new ContainerException(ex);
-        } catch (Exception ex) {
-            throw new ContainerException(ex);
-        }
+    protected MultivaluedParameterExtractor process(Parameter p) {
+        return MultivaluedParameterProcessor.process(w, p);
     }
 }

@@ -1,9 +1,9 @@
 /*
  *
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
- * 
+ *
  * Copyright 1997-2007 Sun Microsystems, Inc. All rights reserved.
- * 
+ *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
  * and Distribution License("CDDL") (collectively, the "License").  You
@@ -11,7 +11,7 @@
  * a copy of the License at https://jersey.dev.java.net/CDDL+GPL.html
  * or jersey/legal/LICENSE.txt.  See the License for the specific
  * language governing permissions and limitations under the License.
- * 
+ *
  * When distributing the software, include this License Header Notice in each
  * file and include the License file at jersey/legal/LICENSE.txt.
  * Sun designates this particular file as subject to the "Classpath" exception
@@ -20,9 +20,9 @@
  * Header, with the fields enclosed by brackets [] replaced by your own
  * identifying information: "Portions Copyrighted [year]
  * [name of copyright owner]"
- * 
+ *
  * Contributor(s):
- * 
+ *
  * If you wish your version of this file to be governed by only the CDDL or
  * only the GPL Version 2, indicate your decision by adding "[Contributor]
  * elects to include this software in this distribution under the [CDDL or GPL
@@ -35,46 +35,44 @@
  * holder.
  */
 
-package com.sun.jersey.server.impl.model.parameter.multivalued;
+package com.sun.jersey.server.spi;
 
-import com.sun.jersey.api.container.ContainerException;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import javax.ws.rs.core.MultivaluedMap;
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Type;
 
 /**
- *
+ * Contract for a provider that supports the conversion of a string to a
+ * Java type. To add a <code>StringReaderProvider</code> implementation, 
+ * annotate the implementation class with <code>Provider</code>.
+ * <p>
+ * Such providers will be used when converting a String value to a java type
+ * annotated by the *Param annotations such as {@link javax.ws.rs.QueryParam}.
+ * 
+ * @param <T> The Java type.
+ * @see javax.ws.rs.ext.Provider
+ * @see com.sun.jersey.server.spi.StringReaderWorkers
  * @author Paul.Sandoz@Sun.Com
  */
-final class ValueOfExtractor 
-        extends com.sun.jersey.server.impl.model.parameter.multivalued.BaseValueOfExtractor
-        implements MultivaluedParameterExtractor {
-    final String parameter;
-    final Object defaultValue;
+public interface StringReaderProvider<T> {
 
-    public ValueOfExtractor(Method valueOf, String parameter) {
-        super(valueOf);
-        this.parameter = parameter;
-        this.defaultValue = null;
-    }
-    
-    public ValueOfExtractor(Method valueOf, String parameter, String defaultValueString) 
-    throws IllegalAccessException, InvocationTargetException {
-        super(valueOf);
-        this.parameter = parameter;
-        this.defaultValue = (defaultValueString != null) ? 
-            getValue(defaultValueString) : null;
-    }
-
-    public Object extract(MultivaluedMap<String, String> parameters) {
-        String v = parameters.getFirst(parameter);
-        if (v != null) {
-            return getValue(v);
-        } else if (defaultValue != null) {
-            // TODO do we need to clone the default value
-            return defaultValue;
-        }
-
-        return null;
-    }
+    /**
+     * Obtain a StringReader that can produce an instance of a particular type
+     * from a string.
+     *
+     * @param type the class of object to be produced.
+     *
+     * @param genericType the type of object to be produced. E.g. if the
+     * string is to be converted into a method parameter, this will be
+     * the formal type of the method parameter as returned by
+     * <code>Class.getGenericParameterTypes</code>.
+     *
+     * @param annotations an array of the annotations on the declaration of the
+     * artifact that will be initialized with the produced instance. E.g. if the
+     * string is to be converted into a method parameter, this will be
+     * the annotations on that parameter returned by
+     * <code>Class.getParameterAnnotations</code>.
+     *
+     * @return the string reader, otherwise null.
+     */
+    StringReader<T> getStringReader(Class<?> type, Type genericType, Annotation annotations[]);
 }

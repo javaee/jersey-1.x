@@ -1,9 +1,9 @@
 /*
  *
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
- * 
+ *
  * Copyright 1997-2007 Sun Microsystems, Inc. All rights reserved.
- * 
+ *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
  * and Distribution License("CDDL") (collectively, the "License").  You
@@ -11,7 +11,7 @@
  * a copy of the License at https://jersey.dev.java.net/CDDL+GPL.html
  * or jersey/legal/LICENSE.txt.  See the License for the specific
  * language governing permissions and limitations under the License.
- * 
+ *
  * When distributing the software, include this License Header Notice in each
  * file and include the License file at jersey/legal/LICENSE.txt.
  * Sun designates this particular file as subject to the "Classpath" exception
@@ -20,9 +20,9 @@
  * Header, with the fields enclosed by brackets [] replaced by your own
  * identifying information: "Portions Copyrighted [year]
  * [name of copyright owner]"
- * 
+ *
  * Contributor(s):
- * 
+ *
  * If you wish your version of this file to be governed by only the CDDL or
  * only the GPL Version 2, indicate your decision by adding "[Contributor]
  * elects to include this software in this distribution under the [CDDL or GPL
@@ -35,62 +35,25 @@
  * holder.
  */
 
-package com.sun.jersey.server.impl.model.parameter.multivalued;
-
-import com.sun.jersey.api.container.ContainerException;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.core.MultivaluedMap;
+package com.sun.jersey.server.spi;
 
 /**
+ * Read a string value and convert to a Java type.
+ * <p>
+ * A {@link StringReaderProvider} is responisble for providing an instance
+ * of this interface.
  *
+ * @param <T> the Java type to convert to.
+ * 
  * @author Paul.Sandoz@Sun.Com
  */
-final class PrimitiveValueOfExtractor 
-        implements MultivaluedParameterExtractor {
-    final Method valueOf;
-    final String parameter;
-    final Object defaultValue;
-    final Object defaultDefaultValue;
+public interface StringReader<T> {
 
-    public PrimitiveValueOfExtractor(Method valueOf, String parameter, 
-            String defaultValueString, Object defaultDefaultValue) 
-    throws IllegalAccessException, InvocationTargetException {
-        this.valueOf = valueOf;
-        this.parameter = parameter;
-        this.defaultValue = (defaultValueString != null) ? 
-            getValue(defaultValueString) : null;
-        this.defaultDefaultValue = defaultDefaultValue;
-    }
-
-
-    private Object getValue(String v) {
-        try {
-            return valueOf.invoke(null, v);
-        } catch (InvocationTargetException ex) {
-            Throwable target = ex.getTargetException();
-            if (target instanceof WebApplicationException) {
-                throw (WebApplicationException)target;
-            } else {
-                throw new ContainerException(target);
-            }
-        } catch (RuntimeException ex) {
-            throw new ContainerException(ex);
-        } catch (Exception ex) {
-            throw new ContainerException(ex);
-        }
-    }
-
-    public Object extract(MultivaluedMap<String, String> parameters) {
-        String v = parameters.getFirst(parameter);
-        if (v != null) {
-            return getValue(v);
-        } else if (defaultValue != null) {
-            // TODO do we need to clone the default value
-            return defaultValue;
-        }
-
-        return defaultDefaultValue;
-    }
+    /**
+     * Read a string value and convert to a Java type.
+     *
+     * @param value The string value.
+     * @return the instance of the Java type.
+     */
+    T fromString(String value);
 }

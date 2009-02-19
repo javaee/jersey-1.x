@@ -51,6 +51,7 @@ import com.sun.jersey.server.impl.inject.ServerInjectableProviderContext;
 import com.sun.jersey.server.impl.model.method.dispatch.FormDispatchProvider;
 import com.sun.jersey.server.impl.model.parameter.multivalued.MultivaluedParameterExtractor;
 import com.sun.jersey.server.impl.model.parameter.multivalued.MultivaluedParameterProcessor;
+import com.sun.jersey.server.spi.StringReaderWorkers;
 import com.sun.jersey.spi.MessageBodyWorkers;
 import com.sun.jersey.spi.dispatch.RequestDispatcher;
 import com.sun.jersey.spi.inject.Injectable;
@@ -92,6 +93,8 @@ public class FormDataMultiPartDispatchProvider extends FormDispatchProvider {
     @Context
     MessageBodyWorkers mbws;
 
+    @Context
+    StringReaderWorkers srw;
 
     @Context
     ServerInjectableProviderContext sipContext;
@@ -189,11 +192,7 @@ public class FormDataMultiPartDispatchProvider extends FormDispatchProvider {
         FormDataMultiPartParamInjectable(MessageBodyWorkers mbws, Parameter param) {
             this.mbws = mbws;
             this.param = param;
-            this.extractor = MultivaluedParameterProcessor.
-                    process(param.getDefaultValue(),
-                            param.getParameterClass(),
-                            param.getParameterType(),
-                            param.getSourceName());
+            this.extractor = MultivaluedParameterProcessor.process(srw, param);
         }
 
         private final MessageBodyWorkers mbws;

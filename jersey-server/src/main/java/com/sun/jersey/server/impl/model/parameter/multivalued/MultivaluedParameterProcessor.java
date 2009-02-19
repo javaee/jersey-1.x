@@ -34,35 +34,59 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-
 package com.sun.jersey.server.impl.model.parameter.multivalued;
 
 import com.sun.jersey.api.container.ContainerException;
+import com.sun.jersey.api.model.Parameter;
 import com.sun.jersey.impl.ImplMessages;
 import com.sun.jersey.core.reflection.ReflectionHelper;
+import com.sun.jersey.server.spi.StringReader;
+import com.sun.jersey.server.spi.StringReaderWorkers;
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 import java.util.List;
 import java.util.Set;
 import java.util.SortedSet;
+import javax.ws.rs.core.MultivaluedMap;
 
 /**
  *
  * @author Paul.Sandoz@Sun.Com
  */
 public class MultivaluedParameterProcessor {
-    
-    public static MultivaluedParameterExtractor process(Class<?> parameter, 
-            Type parameterType, String parameterName) {
-        return process(null, parameter, parameterType, parameterName);
+
+    public static MultivaluedParameterExtractor processWithoutDefaultValue(StringReaderWorkers w, Parameter p) {
+        return process(
+                w,
+                null,
+                p.getParameterClass(),
+                p.getParameterType(),
+                p.getAnnotations(),
+                p.getSourceName());
     }
-    
-    public static MultivaluedParameterExtractor process(String defaultValue, 
-            Class<?> parameter, Type parameterType, String parameterName) {
-       
-        if (parameter == List.class || 
-                parameter == Set.class || 
+
+    public static MultivaluedParameterExtractor process(StringReaderWorkers w, Parameter p) {
+        return process(
+                w,
+                p.getDefaultValue(),
+                p.getParameterClass(),
+                p.getParameterType(),
+                p.getAnnotations(),
+                p.getSourceName());
+    }
+
+    public static MultivaluedParameterExtractor process(
+            StringReaderWorkers w,
+            String defaultValue,
+            Class<?> parameter,
+            Type parameterType,
+            Annotation[] annotations,
+            String parameterName) {
+
+        if (parameter == List.class ||
+                parameter == Set.class ||
                 parameter == SortedSet.class) {
             // Get the generic type of the list
             // If none default to String
@@ -71,30 +95,19 @@ public class MultivaluedParameterProcessor {
                 return CollectionStringExtractor.getInstance(
                         parameter, parameterName, defaultValue);
             } else {
-                // Check for static valueOf(String )
-                Method valueOf = ReflectionHelper.getValueOfStringMethod(c);
-                if (valueOf != null) {
-                    try {
-                        return CollectionValueOfExtractor.getInstance(
-                                parameter, valueOf, parameterName, defaultValue);
-                    } catch (Exception e) {
-                        throw new ContainerException(ImplMessages.DEFAULT_COULD_NOT_PROCESS_METHOD(defaultValue, valueOf));
-                    }
-                }
+                final StringReader sr = w.getStringReader(c, c, annotations);
+                if (sr == null)
+                    return null;
 
-                // Check for constructor with String parameter
-                Constructor constructor = ReflectionHelper.getStringConstructor(c);
-                if (constructor != null) {
-                    try {
-                        return CollectionStringConstructorExtractor.getInstance(
-                                parameter, constructor, parameterName, defaultValue);
-                    } catch (Exception e) {
-                        throw new ContainerException(ImplMessages.DEFAULT_COULD_NOT_PROCESS_CONSTRUCTOR(defaultValue, constructor));
-                    }
+                try {
+                    return CollectionStringReaderExtractor.getInstance(
+                            parameter, sr, parameterName, defaultValue);
+                } catch (Exception e) {
+                    throw new ContainerException("Could not process parameter type " + parameter, e);
                 }
             }
         } else if (parameter == String.class) {
-            return new StringExtractor(parameterName, defaultValue);            
+            return new StringExtractor(parameterName, defaultValue);
         } else if (parameter.isPrimitive()) {
             // Convert primitive to wrapper class
             parameter = PrimitiveMapper.primitiveToClassMap.get(parameter);
@@ -102,40 +115,31 @@ public class MultivaluedParameterProcessor {
                 // Primitive type not supported
                 return null;
             }
-            
+
             // Check for static valueOf(String )
             Method valueOf = ReflectionHelper.getValueOfStringMethod(parameter);
             if (valueOf != null) {
                 try {
                     Object defaultDefaultValue = PrimitiveMapper.primitiveToDefaultValueMap.get(parameter);
-                    return new PrimitiveValueOfExtractor(valueOf, parameterName, 
+                    return new PrimitiveValueOfExtractor(valueOf, parameterName,
                             defaultValue, defaultDefaultValue);
                 } catch (Exception e) {
                     throw new ContainerException(ImplMessages.DEFAULT_COULD_NOT_PROCESS_METHOD(defaultValue, valueOf));
                 }
             }
-        } else {
-            // Check for static valueOf(String )
-            Method valueOf = ReflectionHelper.getValueOfStringMethod(parameter);
-            if (valueOf != null) {
-                try {
-                    return new ValueOfExtractor(valueOf, parameterName, defaultValue);
-                } catch (Exception e) {
-                    throw new ContainerException(ImplMessages.DEFAULT_COULD_NOT_PROCESS_METHOD(defaultValue, valueOf));
-                }
-            }
 
-            // Check for constructor with String parameter
-            Constructor constructor = ReflectionHelper.getStringConstructor(parameter);
-            if (constructor != null) {
-                try {
-                    return new StringConstructorExtractor(constructor, parameterName, defaultValue);
-                } catch (Exception e) {
-                    throw new ContainerException(ImplMessages.DEFAULT_COULD_NOT_PROCESS_CONSTRUCTOR(defaultValue, constructor));
-                }
+        } else {
+            final StringReader sr = w.getStringReader(parameter, parameterType, annotations);
+            if (sr == null)
+                return null;
+
+            try {
+                return new StringReaderExtractor(sr, parameterName, defaultValue);
+            } catch (Exception e) {
+                throw new ContainerException("Could not process parameter type " + parameter, e);
             }
         }
-                
+
         return null;
     }
 }

@@ -37,36 +37,35 @@
 
 package com.sun.jersey.server.impl.model.parameter.multivalued;
 
-import com.sun.jersey.api.container.ContainerException;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import javax.ws.rs.WebApplicationException;
+import com.sun.jersey.server.spi.StringReader;
+import javax.ws.rs.core.MultivaluedMap;
 
 /**
  *
  * @author Paul.Sandoz@Sun.Com
  */
-abstract class BaseValueOfExtractor {
-    final Method valueOf;
+final class StringReaderExtractor
+        implements MultivaluedParameterExtractor {
+    private final StringReader sr;
+    private final String parameter;
+    private final String defaultValueString;
 
-    protected BaseValueOfExtractor(Method valueOf) {
-        this.valueOf = valueOf;
+    public StringReaderExtractor(StringReader sr, String parameter, String defaultValueString) {
+        this.sr = sr;
+        this.parameter = parameter;
+        this.defaultValueString = defaultValueString;
+        Object defaultValue = (defaultValueString != null) ?
+            sr.fromString(defaultValueString) : null;
     }
 
-    protected final Object getValue(String v) {
-        try {
-            return valueOf.invoke(null, v);
-        } catch (InvocationTargetException ex) {
-            Throwable target = ex.getTargetException();
-            if (target instanceof WebApplicationException) {
-                throw (WebApplicationException)target;
-            } else {
-                throw new ContainerException(target);
-            }
-        } catch (RuntimeException ex) {
-            throw new ContainerException(ex);
-        } catch (Exception ex) {
-            throw new ContainerException(ex);
+    public Object extract(MultivaluedMap<String, String> parameters) {
+        String v = parameters.getFirst(parameter);
+        if (v != null) {
+            return sr.fromString(v);
+        } else if (defaultValueString != null) {
+            return sr.fromString(defaultValueString);
         }
+
+        return null;
     }
 }

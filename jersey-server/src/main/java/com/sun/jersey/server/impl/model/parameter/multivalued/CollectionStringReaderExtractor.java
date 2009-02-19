@@ -34,12 +34,9 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-
 package com.sun.jersey.server.impl.model.parameter.multivalued;
 
-import com.sun.jersey.api.container.ContainerException;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
+import com.sun.jersey.server.spi.StringReader;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
@@ -53,85 +50,85 @@ import javax.ws.rs.core.MultivaluedMap;
  *
  * @author Paul.Sandoz@Sun.Com
  */
-abstract class CollectionValueOfExtractor<V extends Collection> 
-        extends BaseValueOfExtractor 
+abstract class CollectionStringReaderExtractor<V extends Collection>
         implements MultivaluedParameterExtractor {
-    final String parameter;
-    final Object defaultValue;
 
-    protected CollectionValueOfExtractor(Method valueOf, String parameter, String defaultValueString) 
-    throws IllegalAccessException, InvocationTargetException {
-        super(valueOf);
+    final StringReader sr;
+    final String parameter;
+    final String defaultValueString;
+
+    protected CollectionStringReaderExtractor(StringReader sr, String parameter, String defaultValueString) {
+        this.sr = sr;
         this.parameter = parameter;
-        this.defaultValue = (defaultValueString != null) ? 
-            getValue(defaultValueString) : null;
+        this.defaultValueString = defaultValueString;
+        Object defaultValue = (defaultValueString != null) ? sr.fromString(defaultValueString) : null;
     }
 
     @SuppressWarnings("unchecked")
     public Object extract(MultivaluedMap<String, String> parameters) {
         List<String> stringList = parameters.get(parameter);
-        if (stringList != null) {            
+        if (stringList != null) {
             V valueList = getInstance();
             for (String v : stringList) {
-                valueList.add(getValue(v));
+                valueList.add(sr.fromString(v));
             }
 
             return valueList;
-        } else if (defaultValue != null) {
+        } else if (defaultValueString != null) {
             V valueList = getInstance();
             // TODO do we need to clone the default value
-            valueList.add(defaultValue);
+            valueList.add(sr.fromString(defaultValueString));
             return valueList;
         }
 
         return null;
     }
-    
+
     protected abstract V getInstance();
-    
-    private static final class ListValueOf extends CollectionValueOfExtractor<List> {
-        ListValueOf(Method valueOf, String parameter, String defaultValueString) 
-        throws IllegalAccessException, InvocationTargetException {
-            super(valueOf, parameter, defaultValueString);
+
+    private static final class ListValueOf extends CollectionStringReaderExtractor<List> {
+
+        ListValueOf(StringReader sr, String parameter, String defaultValueString) {
+            super(sr, parameter, defaultValueString);
         }
-        
+
         protected List getInstance() {
             return new ArrayList();
         }
     }
-    
-    private static final class SetValueOf extends CollectionValueOfExtractor<Set> {
-        SetValueOf(Method valueOf, String parameter, String defaultValueString) 
-        throws IllegalAccessException, InvocationTargetException {
-            super(valueOf, parameter, defaultValueString);
+
+    private static final class SetValueOf extends CollectionStringReaderExtractor<Set> {
+
+        SetValueOf(StringReader sr, String parameter, String defaultValueString) {
+            super(sr, parameter, defaultValueString);
         }
-        
+
         protected Set getInstance() {
             return new HashSet();
         }
     }
-    
-    private static final class SortedSetValueOf extends CollectionValueOfExtractor<SortedSet> {
-        SortedSetValueOf(Method valueOf, String parameter, String defaultValueString) 
-        throws IllegalAccessException, InvocationTargetException {
-            super(valueOf, parameter, defaultValueString);
+
+    private static final class SortedSetValueOf extends CollectionStringReaderExtractor<SortedSet> {
+
+        SortedSetValueOf(StringReader sr, String parameter, String defaultValueString) {
+            super(sr, parameter, defaultValueString);
         }
-        
+
         protected SortedSet getInstance() {
             return new TreeSet();
         }
     }
-    
-    static MultivaluedParameterExtractor getInstance(Class c, 
-            Method valueOf, String parameter, String defaultValueString) 
-    throws InstantiationException, IllegalAccessException, InvocationTargetException {
-        if (List.class == c)
-            return new ListValueOf(valueOf, parameter, defaultValueString);
-        else if (Set.class == c)
-            return new SetValueOf(valueOf, parameter, defaultValueString);
-        else if (SortedSet.class == c)
-            return new SortedSetValueOf(valueOf, parameter, defaultValueString);
-        else
+
+    static MultivaluedParameterExtractor getInstance(Class c,
+            StringReader sr, String parameter, String defaultValueString) {
+        if (List.class == c) {
+            return new ListValueOf(sr, parameter, defaultValueString);
+        } else if (Set.class == c) {
+            return new SetValueOf(sr, parameter, defaultValueString);
+        } else if (SortedSet.class == c) {
+            return new SortedSetValueOf(sr, parameter, defaultValueString);
+        } else {
             throw new RuntimeException();
-    }   
+        }
+    }
 }

@@ -1,9 +1,9 @@
 /*
  *
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
- * 
+ *
  * Copyright 1997-2007 Sun Microsystems, Inc. All rights reserved.
- * 
+ *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
  * and Distribution License("CDDL") (collectively, the "License").  You
@@ -11,7 +11,7 @@
  * a copy of the License at https://jersey.dev.java.net/CDDL+GPL.html
  * or jersey/legal/LICENSE.txt.  See the License for the specific
  * language governing permissions and limitations under the License.
- * 
+ *
  * When distributing the software, include this License Header Notice in each
  * file and include the License file at jersey/legal/LICENSE.txt.
  * Sun designates this particular file as subject to the "Classpath" exception
@@ -20,9 +20,9 @@
  * Header, with the fields enclosed by brackets [] replaced by your own
  * identifying information: "Portions Copyrighted [year]
  * [name of copyright owner]"
- * 
+ *
  * Contributor(s):
- * 
+ *
  * If you wish your version of this file to be governed by only the CDDL or
  * only the GPL Version 2, indicate your decision by adding "[Contributor]
  * elects to include this software in this distribution under the [CDDL or GPL
@@ -35,58 +35,35 @@
  * holder.
  */
 
-package com.sun.jersey.server.impl.model.parameter;
+package com.sun.jersey.server.impl.model.parameter.multivalued;
 
-import com.sun.jersey.api.container.ContainerException;
-import com.sun.jersey.server.impl.model.parameter.multivalued.MultivaluedParameterExtractor;
-import com.sun.jersey.api.core.HttpContext;
-import com.sun.jersey.api.model.Parameter;
-import com.sun.jersey.server.impl.inject.AbstractHttpContextInjectable;
-import com.sun.jersey.spi.inject.Injectable;
-import com.sun.jersey.core.spi.component.ComponentContext;
+import com.sun.jersey.core.spi.component.ProviderServices;
+import com.sun.jersey.server.spi.StringReader;
+import com.sun.jersey.server.spi.StringReaderProvider;
 import com.sun.jersey.server.spi.StringReaderWorkers;
-import javax.ws.rs.QueryParam;
-import javax.ws.rs.WebApplicationException;
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Type;
+import java.util.Set;
 
 /**
  *
  * @author Paul.Sandoz@Sun.Com
  */
-public final class QueryParamInjectableProvider extends BaseParamInjectableProvider<QueryParam> {
-    
-    private static final class QueryParamInjectable extends AbstractHttpContextInjectable<Object> {
-        private final MultivaluedParameterExtractor extractor;
-        private final boolean decode;
-        
-        QueryParamInjectable(MultivaluedParameterExtractor extractor, boolean decode) {
-            this.extractor = extractor;
-            this.decode = decode;
-        }
-        
-        public Object getValue(HttpContext context) {
-            try {
-                return extractor.extract(context.getUriInfo().getQueryParameters(decode));
-            } catch (ContainerException e) {
-                throw new WebApplicationException(e.getCause(), 404);
-            }
-        }
+public class StringReaderFactory implements StringReaderWorkers {
+
+    private Set<StringReaderProvider> readers;
+
+    public void init(ProviderServices providerServices) {
+        this.readers = providerServices.getProvidersAndServices(StringReaderProvider.class);
     }
 
-    public QueryParamInjectableProvider(StringReaderWorkers w) {
-        super(w);
-    }
-    
-    public Injectable getInjectable(ComponentContext ic, QueryParam a, Parameter c) {
-        String parameterName = c.getSourceName();
-        if (parameterName == null || parameterName.length() == 0) {
-            // Invalid query parameter name
-            return null;
+    public <T> StringReader<T> getStringReader(Class<T> type, Type genericType, Annotation[] annotations) {
+        for (StringReaderProvider<T> srp : readers) {
+            StringReader<T> sr = srp.getStringReader(type, genericType, annotations);
+            if (sr != null)
+                return sr;
         }
-        
-        MultivaluedParameterExtractor e = process(c);
-        if (e == null)
-            return null;
-        
-        return new QueryParamInjectable(e, !c.isEncoded());
+        return null;
     }
+
 }

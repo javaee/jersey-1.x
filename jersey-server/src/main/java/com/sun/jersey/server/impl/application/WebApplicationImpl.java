@@ -123,7 +123,9 @@ import com.sun.jersey.spi.inject.SingletonTypeInjectableProvider;
 import com.sun.jersey.spi.inject.InjectableProviderContext;
 import com.sun.jersey.core.spi.component.ComponentContext;
 import com.sun.jersey.core.spi.component.ComponentScope;
+import com.sun.jersey.server.impl.model.parameter.multivalued.StringReaderFactory;
 import com.sun.jersey.server.impl.resource.PerRequestFactory;
+import com.sun.jersey.server.spi.StringReaderWorkers;
 import com.sun.jersey.spi.template.TemplateContext;
 import com.sun.jersey.spi.uri.rules.UriRule;
 import java.lang.annotation.Annotation;
@@ -162,6 +164,8 @@ public final class WebApplicationImpl implements WebApplication {
     private IoCComponentProviderFactory provider;
 
     private MessageBodyFactory bodyFactory;
+
+    private StringReaderFactory stringReaderFactory;
     
     private TemplateContext templateContext;
     
@@ -458,14 +462,23 @@ public final class WebApplicationImpl implements WebApplication {
         
         // Initiate message body readers/writers
         bodyFactory.init();
+
         
+        // Obtain all String readers
+        this.stringReaderFactory = new StringReaderFactory();
+        injectableFactory.add(
+                new ContextInjectableProvider<StringReaderWorkers>(
+                StringReaderWorkers.class, stringReaderFactory));
+        stringReaderFactory.init(providerServices);
+
+
         // Add per-request-based injectable providers
-        injectableFactory.add(new CookieParamInjectableProvider());
-        injectableFactory.add(new HeaderParamInjectableProvider());
+        injectableFactory.add(new CookieParamInjectableProvider(stringReaderFactory));
+        injectableFactory.add(new HeaderParamInjectableProvider(stringReaderFactory));
         injectableFactory.add(new HttpContextInjectableProvider());
-        injectableFactory.add(new MatrixParamInjectableProvider());
-        injectableFactory.add(new PathParamInjectableProvider());
-        injectableFactory.add(new QueryParamInjectableProvider());
+        injectableFactory.add(new MatrixParamInjectableProvider(stringReaderFactory));
+        injectableFactory.add(new PathParamInjectableProvider(stringReaderFactory));
+        injectableFactory.add(new QueryParamInjectableProvider(stringReaderFactory));
 
         // Intiate filters
         filterFactory = new FilterFactory(providerServices, resourceConfig);

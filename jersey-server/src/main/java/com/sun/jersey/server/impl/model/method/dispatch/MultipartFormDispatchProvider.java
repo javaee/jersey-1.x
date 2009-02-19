@@ -52,6 +52,7 @@ import com.sun.jersey.spi.inject.Injectable;
 import com.sun.jersey.core.spi.component.ComponentScope;
 import com.sun.jersey.server.impl.model.parameter.multivalued.MultivaluedParameterExtractor;
 import com.sun.jersey.server.impl.model.parameter.multivalued.MultivaluedParameterProcessor;
+import com.sun.jersey.server.spi.StringReaderWorkers;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.lang.annotation.Annotation;
@@ -159,12 +160,10 @@ public class MultipartFormDispatchProvider extends FormDispatchProvider {
         private final Parameter p;
         private final MultivaluedParameterExtractor extractor;
 
-        MultipartFormParamInjectable(MessageBodyWorkers mbws, Parameter p) {
+        MultipartFormParamInjectable(MessageBodyWorkers mbws, StringReaderWorkers srw, Parameter p) {
             this.mbws = mbws;
             this.p = p;
-            this.extractor = MultivaluedParameterProcessor.
-                    process(p.getDefaultValue(), p.getParameterClass(),
-                    p.getParameterType(), p.getSourceName());
+            this.extractor = MultivaluedParameterProcessor.process(srw, p);
         }
         
         @SuppressWarnings("unchecked")
@@ -274,7 +273,7 @@ public class MultipartFormDispatchProvider extends FormDispatchProvider {
                 if (FormDataContentDisposition.class == p.getParameterClass()) {
                     is.add(new DispositionParamInjectable(p));
                 } else {
-                    is.add(new MultipartFormParamInjectable(mbws, p));
+                    is.add(new MultipartFormParamInjectable(mbws, srw, p));
                 }
             } else {
                 Injectable injectable = sipc.getInjectable(p, ComponentScope.PerRequest);

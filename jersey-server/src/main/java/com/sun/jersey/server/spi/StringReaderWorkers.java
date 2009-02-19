@@ -1,9 +1,9 @@
 /*
  *
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
- * 
+ *
  * Copyright 1997-2007 Sun Microsystems, Inc. All rights reserved.
- * 
+ *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
  * and Distribution License("CDDL") (collectively, the "License").  You
@@ -11,7 +11,7 @@
  * a copy of the License at https://jersey.dev.java.net/CDDL+GPL.html
  * or jersey/legal/LICENSE.txt.  See the License for the specific
  * language governing permissions and limitations under the License.
- * 
+ *
  * When distributing the software, include this License Header Notice in each
  * file and include the License file at jersey/legal/LICENSE.txt.
  * Sun designates this particular file as subject to the "Classpath" exception
@@ -20,9 +20,9 @@
  * Header, with the fields enclosed by brackets [] replaced by your own
  * identifying information: "Portions Copyrighted [year]
  * [name of copyright owner]"
- * 
+ *
  * Contributor(s):
- * 
+ *
  * If you wish your version of this file to be governed by only the CDDL or
  * only the GPL Version 2, indicate your decision by adding "[Contributor]
  * elects to include this software in this distribution under the [CDDL or GPL
@@ -35,46 +35,39 @@
  * holder.
  */
 
-package com.sun.jersey.server.impl.model.parameter.multivalued;
+package com.sun.jersey.server.spi;
 
-import com.sun.jersey.api.container.ContainerException;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
-import javax.ws.rs.core.MultivaluedMap;
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Type;
 
 /**
+ * An injectable interface providing lookup of {@link StringReader} instances.
  *
  * @author Paul.Sandoz@Sun.Com
  */
-final class StringConstructorExtractor 
-        extends BaseStringConstructorExtractor 
-        implements MultivaluedParameterExtractor {
-    final String parameter;
-    final Object defaultValue;
+public interface StringReaderWorkers {
 
-    public StringConstructorExtractor(Constructor c, String parameter) {
-        super(c);
-        this.parameter = parameter;
-        this.defaultValue = null;
-    }
-    
-    public StringConstructorExtractor(Constructor c, String parameter, String defaultValueString) 
-    throws InstantiationException, IllegalAccessException, InvocationTargetException {
-        super(c);
-        this.parameter = parameter;
-        this.defaultValue = (defaultValueString != null) ? 
-            getValue(defaultValueString) : null;
-    }
-
-    public Object extract(MultivaluedMap<String, String> parameters) {
-        String v = parameters.getFirst(parameter);
-        if (v != null) {
-            return getValue(v);
-        } else if (defaultValue != null) {
-            // TODO do we need to clone the default value
-            return defaultValue;
-        }
-
-        return null;
-    }
+    /**
+     * Get a string reader that matches a set of criteria.
+     *
+     * @param <T> the type of object to be read from a string.
+     *
+     * @param type the class of object to be read.
+     *
+     * @param genericType the type of object to be produced. E.g. if the
+     * message body is to be converted into a method parameter, this will be
+     * the formal type of the method parameter as returned by
+     * <code>Class.getGenericParameterTypes</code>.
+     *
+     * @param annotations an array of the annotations on the declaration of the
+     * artifact that will be initialized with the produced instance. E.g. if the
+     * string is to be converted into a method parameter, this will be
+     * the annotations on that parameter returned by
+     * <code>Class.getParameterAnnotations</code>.
+     *
+     * @return a StringReader that matches the supplied criteria or null
+     * if none is found.
+     */
+    <T> StringReader<T> getStringReader(Class<T> type, Type genericType,
+            Annotation annotations[]);
 }

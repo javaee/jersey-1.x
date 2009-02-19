@@ -52,6 +52,7 @@ import com.sun.jersey.spi.MessageBodyWorkers;
 import com.sun.jersey.spi.dispatch.RequestDispatcher;
 import com.sun.jersey.spi.inject.Injectable;
 import com.sun.jersey.core.spi.component.ComponentScope;
+import com.sun.jersey.server.spi.StringReaderWorkers;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Type;
@@ -240,6 +241,8 @@ public class FormDispatchProvider implements ResourceMethodDispatchProvider {
     @Context ServerInjectableProviderContext sipc;
 
     @Context MessageBodyWorkers mbw;
+
+    @Context StringReaderWorkers srw;
     
     private List<Injectable> processParameters(AbstractResourceMethod method) {        
         if (method.getParameters().isEmpty()) {
@@ -271,8 +274,7 @@ public class FormDispatchProvider implements ResourceMethodDispatchProvider {
                     return null;
             } else if (p.getAnnotation().annotationType() == FormParam.class) {
                 MultivaluedParameterExtractor e = MultivaluedParameterProcessor.
-                        process(p.getDefaultValue(), p.getParameterClass(), 
-                        p.getParameterType(), p.getSourceName());    
+                        process(srw, p);
                 if (e == null)
                     return null;
                 is.add(new FormParamInjectable(e, !p.isEncoded()));
