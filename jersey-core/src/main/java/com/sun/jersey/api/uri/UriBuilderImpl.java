@@ -176,10 +176,13 @@ public class UriBuilderImpl extends UriBuilder {
     @Override
     public UriBuilder host(String host) {
         checkSsp();
-        if(host.length() == 0) // null is used to reset host setting
-            throw new IllegalArgumentException("Invalid host name");
-        this.host = (host != null) ?
-            encode(host, UriComponent.Type.HOST) : null;
+        if(host != null) {
+            if(host.length() == 0) // null is used to reset host setting
+                throw new IllegalArgumentException("Invalid host name");
+            this.host = encode(host, UriComponent.Type.HOST);
+        } else {
+            this.host = null;
+        }
         return this;
     }
 
