@@ -65,7 +65,7 @@ import org.glassfish.embed.ScatteredWar;
     } 
     
     private static URI getBaseURI() {
-        return UriBuilder.fromUri("http://localhost/").port(getPort(9998)).
+        return UriBuilder.fromUri("http://localhost/").path("extended-wadl-webapp").port(getPort(9998)).
                 build();
     }
     
