@@ -36,12 +36,16 @@
  */
 package com.sun.jersey.api.json;
 
+import com.sun.jersey.json.impl.ImplMessages;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.naming.OperationNotSupportedException;
 
 /**
  * An immutable configuration of JSON notationand options. JSONConfiguration could be used
@@ -265,6 +269,13 @@ public class JSONConfiguration {
      * @return a builder for JSONConfiguration instance
      */
     public static Builder natural() {
+        // this is to make sure people trying to use NATURAL notation will get clear message what is missing, when an old JAXB RI version is used
+        try {
+            Class.forName("com.sun.xml.bind.annotation.OverrideAnnotationOf");
+        } catch (ClassNotFoundException ex) {
+            Logger.getLogger(JSONConfiguration.class.getName()).log(Level.SEVERE, ImplMessages.ERROR_JAXB_RI_2_1_10_MISSING());
+            throw new RuntimeException(ImplMessages.ERROR_JAXB_RI_2_1_10_MISSING());
+        }
         return new Builder(Notation.NATURAL);
     }
 
