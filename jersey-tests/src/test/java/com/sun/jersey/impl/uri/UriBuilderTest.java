@@ -636,5 +636,11 @@ public class UriBuilderTest extends TestCase {
             caught = true;
         }
         assertTrue(caught);
+
+        URI bu = UriBuilder.fromPath("").host("abc").build();
+        assertEquals(URI.create("//abc"), bu);
+
+        bu = UriBuilder.fromPath("").host("abc").host(null).build();
+        assertEquals(URI.create(""), bu);
     }
 }
