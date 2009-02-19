@@ -403,6 +403,13 @@ public class UriBuilderTest extends TestCase {
                 queryParam("c= ", "z= ").build();
         assertEquals(URI.create("http://localhost:8080/a/b/c?a=x&b=y&c%3D+=z%3D+"), bu);
 
+        try {
+            bu = UriBuilder.fromPath("http://localhost:8080").queryParam("name", "x", null).build();
+        } catch(IllegalArgumentException e) {
+            assertTrue(true);
+        } catch(NullPointerException e) {
+            assertTrue(false);
+        }
     }
 
     public void testAppendMatrixParams() {
@@ -605,6 +612,26 @@ public class UriBuilderTest extends TestCase {
                     path("/{a}/{b}").
                     buildFromEncoded("aVal");
 
+        } catch(IllegalArgumentException e) {
+            caught = true;
+        }
+        assertTrue(caught);
+    }
+
+    public void testPortValue() {
+        boolean caught = false;
+        try {
+            UriBuilder.fromPath("http://localhost").port(-2);
+        } catch(IllegalArgumentException e) {
+            caught = true;
+        }
+        assertTrue(caught);
+    }
+
+    public void testHostValue() {
+        boolean caught = false;
+        try {
+            UriBuilder.fromPath("http://localhost").host("");
         } catch(IllegalArgumentException e) {
             caught = true;
         }

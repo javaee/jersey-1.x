@@ -37,8 +37,6 @@
 
 package com.sun.jersey.api.uri;
 
-import com.sun.jersey.api.uri.UriComponent;
-import com.sun.jersey.api.uri.UriTemplate;
 import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Method;
 import java.net.URI;
@@ -178,6 +176,8 @@ public class UriBuilderImpl extends UriBuilder {
     @Override
     public UriBuilder host(String host) {
         checkSsp();
+        if(host.length() == 0) // null is used to reset host setting
+            throw new IllegalArgumentException("Invalid host name");
         this.host = (host != null) ?
             encode(host, UriComponent.Type.HOST) : null;
         return this;
@@ -186,6 +186,9 @@ public class UriBuilderImpl extends UriBuilder {
     @Override
     public UriBuilder port(int port) {
         checkSsp();
+        if(port < -1) // -1 is used to reset port setting and since URI allows
+                      // as port any positive integer, so do we.
+            throw new IllegalArgumentException("Invalid port value");
         this.port = port;
         return this;
     }
@@ -359,12 +362,18 @@ public class UriBuilderImpl extends UriBuilder {
                 if (query.length() > 0) query.append('&');
                 query.append(name);
 
+                if(value == null)
+                    throw new IllegalArgumentException("One or more of value parameters are null");
+
                 final String stringValue = value.toString();
                 if (stringValue.length() > 0)
                     query.append('=').append(encode(stringValue, UriComponent.Type.QUERY_PARAM));
             }
         } else {
             for (Object value : values) {
+                if(value == null)
+                    throw new IllegalArgumentException("One or more of value parameters are null");
+
                 queryParams.add(name,  value.toString());
             }
         }
