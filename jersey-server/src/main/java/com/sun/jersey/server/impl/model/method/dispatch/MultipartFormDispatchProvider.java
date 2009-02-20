@@ -52,7 +52,7 @@ import com.sun.jersey.spi.inject.Injectable;
 import com.sun.jersey.core.spi.component.ComponentScope;
 import com.sun.jersey.server.impl.model.parameter.multivalued.MultivaluedParameterExtractor;
 import com.sun.jersey.server.impl.model.parameter.multivalued.MultivaluedParameterProcessor;
-import com.sun.jersey.server.spi.StringReaderWorkers;
+import com.sun.jersey.spi.StringReaderWorkers;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.lang.annotation.Annotation;

@@ -51,7 +51,7 @@ import com.sun.jersey.server.impl.inject.ServerInjectableProviderContext;
 import com.sun.jersey.server.impl.model.method.dispatch.FormDispatchProvider;
 import com.sun.jersey.server.impl.model.parameter.multivalued.MultivaluedParameterExtractor;
 import com.sun.jersey.server.impl.model.parameter.multivalued.MultivaluedParameterProcessor;
-import com.sun.jersey.server.spi.StringReaderWorkers;
+import com.sun.jersey.spi.StringReaderWorkers;
 import com.sun.jersey.spi.MessageBodyWorkers;
 import com.sun.jersey.spi.dispatch.RequestDispatcher;
 import com.sun.jersey.spi.inject.Injectable;

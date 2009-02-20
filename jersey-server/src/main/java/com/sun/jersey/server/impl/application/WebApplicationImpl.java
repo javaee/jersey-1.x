@@ -125,7 +125,7 @@ import com.sun.jersey.core.spi.component.ComponentContext;
 import com.sun.jersey.core.spi.component.ComponentScope;
 import com.sun.jersey.server.impl.model.parameter.multivalued.StringReaderFactory;
 import com.sun.jersey.server.impl.resource.PerRequestFactory;
-import com.sun.jersey.server.spi.StringReaderWorkers;
+import com.sun.jersey.spi.StringReaderWorkers;
 import com.sun.jersey.spi.template.TemplateContext;
 import com.sun.jersey.spi.uri.rules.UriRule;
 import java.lang.annotation.Annotation;

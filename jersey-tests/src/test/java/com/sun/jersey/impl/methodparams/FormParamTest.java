@@ -42,6 +42,8 @@ import com.sun.jersey.core.header.FormDataContentDisposition;
 import com.sun.jersey.impl.AbstractResourceTester;
 import com.sun.jersey.impl.entity.JAXBBean;
 import java.math.BigDecimal;
+import java.util.Date;
+import java.util.List;
 import javax.mail.internet.InternetHeaders;
 import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMultipart;
@@ -281,6 +283,70 @@ public class FormParamTest extends AbstractResourceTester {
 
         String s = r.type("multipart/form-data").post(String.class, form);
         assertEquals("foo", s);
+    }
+
+
+
+    @Path("/")
+    public class FormResourceJAXB {
+        @POST
+        @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+        public JAXBBean post(
+                @FormParam("a") JAXBBean a,
+                @FormParam("b") List<JAXBBean> b) {
+            assertEquals("a", a.value);
+            assertEquals(2, b.size());
+            assertEquals("b1", b.get(0).value);
+            assertEquals("b2", b.get(1).value);
+            return a;
+        }
+    }
+
+    public void testFormParamJAXB() {
+        initiateWebApplication(FormResourceJAXB.class);
+
+        WebResource r = resource("/");
+
+        Form form = new Form();
+        form.add("a", "<jaxbBean><value>a</value></jaxbBean>");
+        form.add("b", "<jaxbBean><value>b1</value></jaxbBean>");
+        form.add("b", "<jaxbBean><value>b2</value></jaxbBean>");
+
+        JAXBBean b = r.post(JAXBBean.class, form);
+        assertEquals("a", b.value);
+    }
+
+    @Path("/")
+    public class FormResourceDate {
+        @POST
+        @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+        public String post(
+                @FormParam("a") Date a,
+                @FormParam("b") Date b,
+                @FormParam("c") Date c) {
+            assertNotNull(a);
+            assertNotNull(b);
+            assertNotNull(c);
+            return "POST";
+        }
+    }
+
+    public void testFormParamDate() {
+        initiateWebApplication(FormResourceDate.class);
+
+        WebResource r = resource("/");
+
+        String date_RFC1123 = "Sun, 06 Nov 1994 08:49:37 GMT";
+        String date_RFC1036 = "Sunday, 06-Nov-94 08:49:37 GMT";
+        String date_ANSI_C = "Sun Nov  6 08:49:37 1994";
+
+        Form form = new Form();
+        form.add("a", date_RFC1123);
+        form.add("b", date_RFC1036);
+        form.add("c", date_ANSI_C);
+
+        String b = r.post(String.class, form);
+        assertEquals("POST", b);
     }
 
 }

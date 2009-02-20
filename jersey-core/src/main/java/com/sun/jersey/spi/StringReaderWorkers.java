@@ -35,25 +35,39 @@
  * holder.
  */
 
-package com.sun.jersey.server.spi;
+package com.sun.jersey.spi;
+
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Type;
 
 /**
- * Read a string value and convert to a Java type.
- * <p>
- * A {@link StringReaderProvider} is responisble for providing an instance
- * of this interface.
+ * An injectable interface providing lookup of {@link StringReader} instances.
  *
- * @param <T> the Java type to convert to.
- * 
  * @author Paul.Sandoz@Sun.Com
  */
-public interface StringReader<T> {
+public interface StringReaderWorkers {
 
     /**
-     * Read a string value and convert to a Java type.
+     * Get a string reader that matches a set of criteria.
      *
-     * @param value The string value.
-     * @return the instance of the Java type.
+     * @param <T> the type of object to be read from a string.
+     *
+     * @param type the class of object to be read.
+     *
+     * @param genericType the type of object to be produced. E.g. if the
+     * message body is to be converted into a method parameter, this will be
+     * the formal type of the method parameter as returned by
+     * <code>Class.getGenericParameterTypes</code>.
+     *
+     * @param annotations an array of the annotations on the declaration of the
+     * artifact that will be initialized with the produced instance. E.g. if the
+     * string is to be converted into a method parameter, this will be
+     * the annotations on that parameter returned by
+     * <code>Class.getParameterAnnotations</code>.
+     *
+     * @return a StringReader that matches the supplied criteria or null
+     * if none is found.
      */
-    T fromString(String value);
+    <T> StringReader<T> getStringReader(Class<T> type, Type genericType,
+            Annotation annotations[]);
 }

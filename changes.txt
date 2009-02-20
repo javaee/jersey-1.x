@@ -1,4 +1,11 @@
 release 1.0.3 (2009-03/04)
+- Added plugable Java type support for @*Param annotations.
+  The provider interface, com.sun.jersey.spi.StringReaderProvider, may be
+  implemented and registered as a provider. Parameter processing will defer
+  to such providers for obtaining a StringReader capable of converting a String
+  to an instance of the parameter annotated Java type.
+  JAXB annotated classes and java.util.Date (using the standard HTTP date
+  formats are supported.
 - Fixed issue 213 and 214
   https://jersey.dev.java.net/issues/show_bug.cgi?id=213
   https://jersey.dev.java.net/issues/show_bug.cgi?id=214

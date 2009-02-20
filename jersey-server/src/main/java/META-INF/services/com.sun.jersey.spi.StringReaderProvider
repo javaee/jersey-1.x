@@ -1,0 +1,4 @@
+com.sun.jersey.server.impl.model.parameter.multivalued.JAXBStringReaderProviders$RootElementProvider
+com.sun.jersey.server.impl.model.parameter.multivalued.StringReaderProviders$TypeValueOf
+com.sun.jersey.server.impl.model.parameter.multivalued.StringReaderProviders$StringConstructor
+com.sun.jersey.server.impl.model.parameter.multivalued.StringReaderProviders$DateProvider

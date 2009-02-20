@@ -40,16 +40,14 @@ import com.sun.jersey.api.container.ContainerException;
 import com.sun.jersey.api.model.Parameter;
 import com.sun.jersey.impl.ImplMessages;
 import com.sun.jersey.core.reflection.ReflectionHelper;
-import com.sun.jersey.server.spi.StringReader;
-import com.sun.jersey.server.spi.StringReaderWorkers;
+import com.sun.jersey.spi.StringReader;
+import com.sun.jersey.spi.StringReaderWorkers;
 import java.lang.annotation.Annotation;
-import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 import java.util.List;
 import java.util.Set;
 import java.util.SortedSet;
-import javax.ws.rs.core.MultivaluedMap;
 
 /**
  *

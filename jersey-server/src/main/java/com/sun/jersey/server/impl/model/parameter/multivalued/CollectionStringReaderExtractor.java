@@ -36,7 +36,7 @@
  */
 package com.sun.jersey.server.impl.model.parameter.multivalued;
 
-import com.sun.jersey.server.spi.StringReader;
+import com.sun.jersey.spi.StringReader;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;

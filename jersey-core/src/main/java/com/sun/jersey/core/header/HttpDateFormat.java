@@ -37,9 +37,11 @@
 
 package com.sun.jersey.core.header;
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import java.util.TimeZone;
@@ -116,5 +118,26 @@ public class HttpDateFormat {
      */
     public static SimpleDateFormat getPreferedDateFormat() {
         return dateFormats.get().get(0);
+    }
+
+    /**
+     * Read a date.
+     * 
+     * @param date the date as a string.
+     *
+     * @return the date
+     * @throws java.text.ParseException
+     */
+    public static Date readDate(String date) throws ParseException {
+        ParseException pe = null;
+        for (SimpleDateFormat f : HttpDateFormat.getDateFormats()) {
+            try {
+                return f.parse(date);
+            } catch (ParseException e) {
+                pe = (pe == null) ? e : pe;
+            }
+        }
+
+        throw pe;
     }
 }

@@ -38,9 +38,9 @@
 package com.sun.jersey.server.impl.model.parameter.multivalued;
 
 import com.sun.jersey.core.spi.component.ProviderServices;
-import com.sun.jersey.server.spi.StringReader;
-import com.sun.jersey.server.spi.StringReaderProvider;
-import com.sun.jersey.server.spi.StringReaderWorkers;
+import com.sun.jersey.spi.StringReader;
+import com.sun.jersey.spi.StringReaderProvider;
+import com.sun.jersey.spi.StringReaderWorkers;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 import java.util.Set;

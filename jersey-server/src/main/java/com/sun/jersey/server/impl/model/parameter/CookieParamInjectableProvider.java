@@ -44,7 +44,7 @@ import com.sun.jersey.api.model.Parameter;
 import com.sun.jersey.server.impl.inject.AbstractHttpContextInjectable;
 import com.sun.jersey.spi.inject.Injectable;
 import com.sun.jersey.core.spi.component.ComponentContext;
-import com.sun.jersey.server.spi.StringReaderWorkers;
+import com.sun.jersey.spi.StringReaderWorkers;
 import javax.ws.rs.CookieParam;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Cookie;

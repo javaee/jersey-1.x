@@ -37,7 +37,7 @@
 
 package com.sun.jersey.server.impl.model.parameter.multivalued;
 
-import com.sun.jersey.server.spi.StringReader;
+import com.sun.jersey.spi.StringReader;
 import javax.ws.rs.core.MultivaluedMap;
 
 /**

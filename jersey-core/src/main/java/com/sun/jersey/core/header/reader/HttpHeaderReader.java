@@ -141,16 +141,7 @@ public abstract class HttpHeaderReader {
 
 
     public static Date readDate(String date) throws ParseException {
-        ParseException pe = null;
-        for (SimpleDateFormat f : HttpDateFormat.getDateFormats()) {
-            try {
-                return f.parse(date);
-            } catch (ParseException e) {
-                pe = (pe == null) ? e : pe;
-            }
-        }
-        
-        throw pe;
+        return HttpDateFormat.readDate(date);
     }
 
 

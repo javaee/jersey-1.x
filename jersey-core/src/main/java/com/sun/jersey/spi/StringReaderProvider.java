@@ -35,7 +35,7 @@
  * holder.
  */
 
-package com.sun.jersey.server.spi;
+package com.sun.jersey.spi;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;

@@ -37,14 +37,19 @@
 package com.sun.jersey.server.impl.model.parameter.multivalued;
 
 import com.sun.jersey.api.container.ContainerException;
+import com.sun.jersey.core.header.HttpDateFormat;
 import com.sun.jersey.core.reflection.ReflectionHelper;
-import com.sun.jersey.server.spi.StringReader;
-import com.sun.jersey.server.spi.StringReaderProvider;
+import com.sun.jersey.spi.StringReader;
+import com.sun.jersey.spi.StringReaderProvider;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
+import java.text.ParseException;
+import java.util.Date;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.ws.rs.WebApplicationException;
 
 /**
@@ -111,6 +116,26 @@ public class StringReaderProviders {
                     }
                 }
 
+            };
+        }
+
+    }
+
+    public static class DateProvider implements StringReaderProvider {
+
+        public StringReader getStringReader(Class type, Type genericType, Annotation[] annotations) {
+            if (type != Date.class)
+                return null;
+            
+            return new StringReader() {
+
+                public Object fromString(String value) {
+                    try {
+                        return HttpDateFormat.readDate(value);
+                    } catch (ParseException ex) {
+                        throw new ContainerException(ex);
+                    }
+                }
             };
         }
 
