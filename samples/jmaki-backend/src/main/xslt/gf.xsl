@@ -41,15 +41,28 @@
 <xsl:apply-templates/>
 </xsl:template>			
 			
-          <xsl:template match="pom:dependency[pom:groupId='com.sun.jersey' or pom:groupId='com.sun.xml.bind' or pom:groupId='javax.servlet']/pom:scope[text()!=test]">
+          <xsl:template match="pom:dependency[pom:groupId='javax.servlet']/pom:scope[text()!=test]">
           		<scope>provided</scope>
           </xsl:template>
 
-          <xsl:template match="pom:dependency[pom:groupId='com.sun.jersey'  or pom:groupId='com.sun.xml.bind' or pom:groupId='javax.servlet']">
+          <xsl:template match="pom:dependency[pom:groupId='com.sun.jersey' or pom:groupId='com.sun.xml.bind']/pom:scope[text()!=test]">
+          		<scope>compile</scope>
+          </xsl:template>
+
+          <xsl:template match="pom:dependency[pom:groupId='javax.servlet']">
             	<xsl:copy>
               	<xsl:apply-templates/>
               	<xsl:if test="count(pom:scope)=0">
               		<scope>provided</scope>
+              	</xsl:if>
+            	</xsl:copy>
+          </xsl:template>
+
+          <xsl:template match="pom:dependency[pom:groupId='com.sun.jersey'  or pom:groupId='com.sun.xml.bind']">
+            	<xsl:copy>
+              	<xsl:apply-templates/>
+              	<xsl:if test="count(pom:scope)=0">
+              		<scope>compile</scope>
               	</xsl:if>
             	</xsl:copy>
           </xsl:template>
