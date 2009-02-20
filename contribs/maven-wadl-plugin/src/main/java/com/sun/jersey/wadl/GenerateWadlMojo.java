@@ -253,7 +253,7 @@ public class GenerateWadlMojo extends AbstractMojoProjectClasspathSupport {
         final Constructor<?>[] constructors = paramClazz.getConstructors();
         for ( Constructor<?> constructor : constructors ) {
             final Class<?>[] parameterTypes = constructor.getParameterTypes();
-            if ( parameterTypes.length > 0
+            if ( parameterTypes.length == 1
                     && constructor.getParameterTypes()[0] == propertyValue.getClass() ) {
                 return constructor;
             }
