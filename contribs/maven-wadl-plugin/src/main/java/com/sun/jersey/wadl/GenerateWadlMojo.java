@@ -42,7 +42,6 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.OutputStream;
 import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -216,8 +215,7 @@ public class GenerateWadlMojo extends AbstractMojoProjectClasspathSupport {
     }
 
     private void setProperty( final Object object, final String propertyName, final Object propertyValue )
-            throws IllegalAccessException, InvocationTargetException,
-            NoSuchMethodException, InstantiationException {
+            throws Exception {
         final String methodName = "set" + propertyName.substring( 0, 1 ).toUpperCase() + propertyName.substring( 1 );
         final Method method = getMethodByName( methodName, object.getClass() );
         if ( method.getParameterTypes().length != 1 ) {
@@ -232,7 +230,13 @@ public class GenerateWadlMojo extends AbstractMojoProjectClasspathSupport {
              */
             final Constructor<?> paramTypeConstructor = getMatchingConstructor( paramClazz, propertyValue );
             if ( paramTypeConstructor != null ) {
-                final Object typedPropertyValue = paramTypeConstructor.newInstance( propertyValue );
+                final Object typedPropertyValue;
+                try {
+                    typedPropertyValue = paramTypeConstructor.newInstance( propertyValue );
+                } catch( Exception e ) {
+                    throw new Exception( "Could not create instance of configured property " + propertyName +
+                            " from value " + propertyValue + ", using the constructor " + paramTypeConstructor, e );
+                }
                 method.invoke( object, typedPropertyValue );
             }
             else {
