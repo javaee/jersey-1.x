@@ -104,7 +104,7 @@ public class HttpMethodTest extends AbstractGrizzlyServerTester {
         startServer(HttpMethodResource.class);
         WebResource r = ApacheHttpClient.create().resource(getUri().path("test").build());
         ClientResponse cr = r.options(ClientResponse.class);
-        assertFalse(cr.hasEntity());
+        assertTrue(cr.hasEntity());
         cr.close();
     }
 
