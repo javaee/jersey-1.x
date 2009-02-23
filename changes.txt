@@ -1,4 +1,13 @@
 release 1.0.3 (2009-03/04)
+- Fixed issue 224
+  https://jersey.dev.java.net/issues/show_bug.cgi?id=224
+  When a UniformInterfaceException is thrown by Async/WebResource then
+  the response entity is buffered by default and resources are cleaned up.
+  This ensures that the developer does not have to managed the cleaning up
+  of resources. This behaviour may be overridden by setting the property
+  ClientConfig.PROPERTY_BUFFER_RESPONSE_ENTITY_ON_EXCEPTION to false. If
+  no buffering is configured then the devloper must explicitly close
+  the ClientResponse instance obtained from the UniformInterfaceException.
 - Added plugable Java type support for @*Param annotations.
   The provider interface, com.sun.jersey.spi.StringReaderProvider, may be
   implemented and registered as a provider. Parameter processing will defer

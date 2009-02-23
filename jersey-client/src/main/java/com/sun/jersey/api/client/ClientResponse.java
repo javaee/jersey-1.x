@@ -38,6 +38,8 @@ package com.sun.jersey.api.client;
 
 import com.sun.jersey.core.header.InBoundHeaders;
 import com.sun.jersey.spi.MessageBodyWorkers;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.Closeable;
 import java.io.IOException;
 import java.io.InputStream;
@@ -78,6 +80,8 @@ public class ClientResponse {
     private int status;
     
     private InBoundHeaders headers;
+
+    private boolean isEntityBuffered;
     
     private InputStream entity;
 
@@ -180,6 +184,7 @@ public class ClientResponse {
      * @param entity the input stream of the response.
      */
     public void setEntityInputStream(InputStream entity) {
+        this.isEntityBuffered = false;
         this.entity = entity;
     }
 
@@ -193,10 +198,10 @@ public class ClientResponse {
      * @param c the type of the entity.
      * @return an instance of the type <code>c</code>.
      * 
-     * @throws java.lang.IllegalArgumentException
+     * @throws ClientHandlerException if there is an error processing the response.
      * @throws UniformInterfaceException if the response status is 204 (No Contnet).
      */
-    public <T> T getEntity(Class<T> c) throws IllegalArgumentException, UniformInterfaceException {
+    public <T> T getEntity(Class<T> c) throws ClientHandlerException, UniformInterfaceException {
         return getEntity(c, c);
     }
 
@@ -210,11 +215,10 @@ public class ClientResponse {
      * @param gt the generic type of the entity.
      * @return an instance of the type represented by the generic type.
      * 
-     * @throws com.sun.jersey.api.client.ClientHandlerException if there
-     *         is an error processing the response.
+     * @throws ClientHandlerException if there is an error processing the response.
      * @throws UniformInterfaceException if the response status is 204 (No Content).
      */
-    public <T> T getEntity(GenericType<T> gt) throws IllegalArgumentException, UniformInterfaceException {
+    public <T> T getEntity(GenericType<T> gt) throws ClientHandlerException, UniformInterfaceException {
         return getEntity(gt.getRawClass(), gt.getType());
     }
 
@@ -243,8 +247,38 @@ public class ClientResponse {
             }
             return t;
         } catch (IOException ex) {
+            close();
             throw new ClientHandlerException(ex);
         }
+    }
+
+    /**
+     * Buffer the entity.
+     * <p>
+     * All the bytes of the original entity input stream will be read
+     * and stored in memory. The original entity input stream will
+     * then be closed.
+     * @throws ClientHandlerException if there is an error processing the response.
+     */
+    public void bufferEntity() throws ClientHandlerException {
+        if (isEntityBuffered)
+            return;
+
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        byte[] b = new byte[4096];
+        int l;
+        try {
+            while ((l = entity.read(b)) != -1) {
+                baos.write(b, 0, l);
+            }
+        } catch(IOException ex) {
+            throw new ClientHandlerException(ex);
+        } finally {
+            close();
+        }
+        
+        entity = new ByteArrayInputStream(baos.toByteArray());
+        isEntityBuffered = true;
     }
 
     /**
@@ -252,8 +286,7 @@ public class ClientResponse {
      * <p>
      * The entity input stream is closed.
      * 
-     * @throws com.sun.jersey.api.client.ClientHandlerException if there
-     *         is an error closing the response.
+     * @throws ClientHandlerException if there is an error closing the response.
      */
     public void close() throws ClientHandlerException {
         try {
@@ -262,7 +295,7 @@ public class ClientResponse {
             throw new ClientHandlerException(e);
         }
     }
-    
+
     /**
      * Get the media type of the response.
      * 

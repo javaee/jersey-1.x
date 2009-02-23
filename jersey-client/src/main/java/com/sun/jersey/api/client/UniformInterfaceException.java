@@ -49,27 +49,62 @@ public class UniformInterfaceException extends RuntimeException {
 
     /**
      * Construct a uniform interface exception.
+     * <p>
+     * The client response entity will be buffered by calling
+     * {@link ClientResponse#bufferEntity() }.
      *
      * @param r the client response. The message of the exception is set to
      *        r.toString();
      */
     public UniformInterfaceException(ClientResponse r) {
-        super(r.toString());
-        this.r = r;
-    }    
+        this(r, true);
+    }
     
     /**
      * Construct a uniform interface exception.
+     *
+     * @param r the client response. The message of the exception is set to
+     *        r.toString();
+     * @param bufferResponseEntity if true buffer the client response entity by calling
+     *                             {@link ClientResponse#bufferEntity() }.
+     */
+    public UniformInterfaceException(ClientResponse r, boolean bufferResponseEntity) {
+        super(r.toString());
+        if (bufferResponseEntity)
+            r.bufferEntity();
+        this.r = r;
+    }
+
+    /**
+     * Construct a uniform interface exception.
+     * <p>
+     * The client response entity will be buffered by calling
+     * {@link ClientResponse#bufferEntity() }.
      *
      * @param message the message of the exception.
      * @param r the client response.
      *
      */
     public UniformInterfaceException(String message, ClientResponse r) {
-        super(message);
-        this.r = r;
+        this(message, r, true);
     }
     
+    /**
+     * Construct a uniform interface exception.
+     *
+     * @param message the message of the exception.
+     * @param r the client response.
+     * @param bufferResponseEntity if true buffer the client response entity by calling
+     *                             {@link ClientResponse#bufferEntity() }.
+     *
+     */
+    public UniformInterfaceException(String message, ClientResponse r, boolean bufferResponseEntity) {
+        super(message);
+        if (bufferResponseEntity)
+            r.bufferEntity();
+        this.r = r;
+    }
+
     /**
      * Get the client response assocatiated with the exception.
 

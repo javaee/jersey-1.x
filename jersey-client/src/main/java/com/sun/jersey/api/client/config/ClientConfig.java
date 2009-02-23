@@ -114,6 +114,17 @@ public interface ClientConfig {
             "com.sun.jersey.client.property.chunkedEncodingSize";
 
     /**
+     * A value of "true" declares that the client will
+     * automatically buffer the response entity (if any) and close resources
+     * when a UniformInterfaceException is thrown.
+     *
+     * The value MUST be an instance of {@link java.lang.Boolean}.
+     * If the property is absent then the default value is "true".
+     */
+    public static final String PROPERTY_BUFFER_RESPONSE_ENTITY_ON_EXCEPTION =
+            "com.sun.jersey.client.property.bufferResponseEntityOnException";
+
+    /**
      * Get the set of provider classes to be instantiated in the scope
      * of the Client
      * <p>

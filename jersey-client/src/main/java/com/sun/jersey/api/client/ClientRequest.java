@@ -68,10 +68,23 @@ public abstract class ClientRequest {
      *         <code>Boolean</code> and that value is true, otherwise false.
      */
     public boolean getPropertyAsFeature(String name) {
-        Boolean v = (Boolean)getProperties().get(name);
-        return (v != null) ? v : false;
+        return getPropertyAsFeature(name, false);
     }
     
+    /**
+     * Get a feature that is boolean property of the property bag.
+     *
+     * @param name the name of the feature;
+     * @param defaultValue the default boolean value if the property is absent.
+     * @return true if the feature value is present and is an instance of
+     *         <code>Boolean</code> and that value is true, otherwise the
+     *         <code>defaultValue</code>.
+     */
+    public boolean getPropertyAsFeature(String name, boolean defaultValue) {
+        Boolean v = (Boolean)getProperties().get(name);
+        return (v != null) ? v : defaultValue;
+    }
+
     /**
      * Get the URI of the request. The URI shall contain sufficient
      * components to correctly dispatch a request

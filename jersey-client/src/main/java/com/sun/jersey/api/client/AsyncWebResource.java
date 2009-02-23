@@ -37,6 +37,7 @@
 
 package com.sun.jersey.api.client;
 
+import com.sun.jersey.api.client.config.ClientConfig;
 import com.sun.jersey.api.client.filter.Filterable;
 import com.sun.jersey.client.impl.ClientRequestImpl;
 import java.net.URI;
@@ -564,7 +565,8 @@ public class AsyncWebResource extends Filterable implements
 
                 if (r.getStatus() < 300) return r.getEntity(c);
 
-                throw new UniformInterfaceException(r);
+                throw new UniformInterfaceException(r,
+                        ro.getPropertyAsFeature(ClientConfig.PROPERTY_BUFFER_RESPONSE_ENTITY_ON_EXCEPTION, true));
             }
         });
         new Thread(ft).start();
@@ -580,7 +582,8 @@ public class AsyncWebResource extends Filterable implements
 
                 if (r.getStatus() < 300) return r.getEntity(gt);
 
-                throw new UniformInterfaceException(r);
+                throw new UniformInterfaceException(r,
+                        ro.getPropertyAsFeature(ClientConfig.PROPERTY_BUFFER_RESPONSE_ENTITY_ON_EXCEPTION, true));
             }
         });
         new Thread(ft).start();
@@ -593,7 +596,8 @@ public class AsyncWebResource extends Filterable implements
                 ClientResponse r = getHeadHandler().handle(ro);
 
                 if (r.getStatus() >= 300) 
-                    throw new UniformInterfaceException(r);
+                    throw new UniformInterfaceException(r,
+                            ro.getPropertyAsFeature(ClientConfig.PROPERTY_BUFFER_RESPONSE_ENTITY_ON_EXCEPTION, true));
 
                 r.close();
                 return null;

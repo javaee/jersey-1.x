@@ -37,6 +37,7 @@
 
 package com.sun.jersey.api.client;
 
+import com.sun.jersey.api.client.config.ClientConfig;
 import com.sun.jersey.api.client.filter.Filterable;
 import com.sun.jersey.client.impl.ClientRequestImpl;
 import java.net.URI;
@@ -559,7 +560,8 @@ public class WebResource extends Filterable implements
         
         if (r.getStatus() < 300) return r.getEntity(c);
         
-        throw new UniformInterfaceException(r);
+        throw new UniformInterfaceException(r,
+                ro.getPropertyAsFeature(ClientConfig.PROPERTY_BUFFER_RESPONSE_ENTITY_ON_EXCEPTION, true));
     }
     
     private <T> T handle(GenericType<T> gt, ClientRequest ro) throws UniformInterfaceException {
@@ -569,14 +571,16 @@ public class WebResource extends Filterable implements
         
         if (r.getStatus() < 300) return r.getEntity(gt);
         
-        throw new UniformInterfaceException(r);
+        throw new UniformInterfaceException(r,
+                ro.getPropertyAsFeature(ClientConfig.PROPERTY_BUFFER_RESPONSE_ENTITY_ON_EXCEPTION, true));
     }
     
     private void voidHandle(ClientRequest ro) throws UniformInterfaceException {
         ClientResponse r = getHeadHandler().handle(ro);
         
         if (r.getStatus() >= 300) 
-            throw new UniformInterfaceException(r);
+            throw new UniformInterfaceException(r,
+                    ro.getPropertyAsFeature(ClientConfig.PROPERTY_BUFFER_RESPONSE_ENTITY_ON_EXCEPTION, true));
         
         r.close();
     }

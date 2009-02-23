@@ -38,6 +38,7 @@
 package com.sun.jersey.client.apache.impl;
 
 import com.sun.jersey.api.client.ClientResponse;
+import com.sun.jersey.api.client.UniformInterfaceException;
 import javax.ws.rs.Path;
 import com.sun.jersey.api.client.WebResource;
 import com.sun.jersey.api.container.filter.LoggingFilter;
@@ -50,6 +51,7 @@ import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
+import javax.ws.rs.core.Response;
 
 /**
  *
@@ -129,7 +131,6 @@ public class HttpMethodTest extends AbstractGrizzlyServerTester {
     }    
     
     public void testPostChunked() {
-//        startServer(HttpMethodResource.class);
         ResourceConfig rc = new DefaultResourceConfig(HttpMethodResource.class);
         rc.getProperties().put(ResourceConfig.PROPERTY_CONTAINER_REQUEST_FILTERS,
                 LoggingFilter.class.getName());
@@ -213,5 +214,50 @@ public class HttpMethodTest extends AbstractGrizzlyServerTester {
         assertEquals("PUT", r.post(String.class, "PUT"));
         
         assertEquals("DELETE", r.delete(String.class));
+    }
+
+
+    @Path("/test")
+    public static class ErrorResource {
+        @POST
+        public Response post(String entity) {
+            return Response.serverError().build();
+        }
+
+        @Path("entity")
+        @POST
+        public Response postWithEntity(String entity) {
+            return Response.serverError().entity("error").build();
+        }
+    }
+
+    public void testPostError() {
+        startServer(ErrorResource.class);
+        WebResource r = ApacheHttpClient.create().resource(getUri().path("test").build());
+
+        // This test will lock up if ClientResponse is not closed by WebResource.
+        // TODO need a better way to detect this.
+        for (int i = 0; i < 100; i++) {
+            try {
+                r.post("POST");
+            } catch (UniformInterfaceException ex) {
+            }
+        }
+    }
+
+    public void testPostErrorWithEntity() {
+        startServer(ErrorResource.class);
+        WebResource r = ApacheHttpClient.create().resource(getUri().path("test/entity").build());
+
+        // This test will lock up if ClientResponse is not closed by WebResource.
+        // TODO need a better way to detect this.
+        for (int i = 0; i < 100; i++) {
+            try {
+                r.post("POST");
+            } catch (UniformInterfaceException ex) {
+                String s = ex.getResponse().getEntity(String.class);
+                assertEquals("error", s);
+            }
+        }
     }
 }
