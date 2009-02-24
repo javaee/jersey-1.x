@@ -54,9 +54,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import javax.ws.rs.Consumes;
 import javax.ws.rs.HttpMethod;
-import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
 /**
@@ -119,7 +117,7 @@ public class BasicValidator extends AbstractModelValidator {
                 issueList.add(new ResourceModelIssue(
                         resource,
                         ImplMessages.AMBIGUOUS_RMS_IN(resource.getResourceClass(), arm1.getHttpMethod(), mt, arm1.getMethod().getName(), arm2.getMethod().getName(), arm1.getSupportedInputTypes(), arm2.getSupportedInputTypes()),
-                        true));
+                        false));
             }
             ;
 
@@ -155,7 +153,7 @@ public class BasicValidator extends AbstractModelValidator {
                     issueList.add(new ResourceModelIssue(
                             resource,
                             ImplMessages.AMBIGUOUS_SRMS_IN(resource.getResourceClass(), arm1.getHttpMethod(), arm1.getPath().getValue(), mt, arm1.getMethod().getName(), arm2.getMethod().getName(), arm1.getSupportedInputTypes(), arm2.getSupportedInputTypes()),
-                            true));
+                            false));
                 }
             }
             ;
@@ -184,29 +182,20 @@ public class BasicValidator extends AbstractModelValidator {
             for (int j = i + 1; j < methods.size(); j++) {
                 T arm2 = methods.get(j);
                 if (arm1.getHttpMethod().equalsIgnoreCase(arm2.getHttpMethod())) {
-                    // check input mime types, but only for other then GET methods
-                    // TODO: check only when an entity parameter is present, do not hardcode the http GET/HEAD method
-                    if (!(("GET".equalsIgnoreCase(arm1.getHttpMethod())) || ("HEAD".equalsIgnoreCase(arm1.getHttpMethod())))) {
-                        for (MediaType mt1 : arm1.getSupportedInputTypes()) {
-                            for (MediaType mt2 : arm2.getSupportedInputTypes()) {
-                                if (mt1.isCompatible(mt2) && ((mt1.isWildcardType() == mt2.isWildcardType()) && (mt1.isWildcardSubtype() == mt2.isWildcardSubtype()))) {
-                                    generator.generateInErrMsg(resource, arm1, arm2, mt1);
-                                    // check also output mime types
-                                    for (MediaType outmt1 : arm1.getSupportedOutputTypes()) {
-                                        for (MediaType outmt2 : arm2.getSupportedOutputTypes()) {
-                                            if (outmt1.isCompatible(outmt2) && ((outmt1.isWildcardType() == outmt2.isWildcardType()) && (outmt1.isWildcardSubtype() == outmt2.isWildcardSubtype()))) {
-                                                generator.generateOutErrMsg(resource, arm1, arm2, outmt1);
+                    for (MediaType mt1 : arm1.getSupportedInputTypes()) {
+                        for (MediaType mt2 : arm2.getSupportedInputTypes()) {
+                            if (mt1.isCompatible(mt2) && ((mt1.isWildcardType() == mt2.isWildcardType()) && (mt1.isWildcardSubtype() == mt2.isWildcardSubtype()))) {
+                                // check also output mime types
+                                for (MediaType outmt1 : arm1.getSupportedOutputTypes()) {
+                                    for (MediaType outmt2 : arm2.getSupportedOutputTypes()) {
+                                        if (outmt1.isCompatible(outmt2) && ((outmt1.isWildcardType() == outmt2.isWildcardType()) && (outmt1.isWildcardSubtype() == outmt2.isWildcardSubtype()))) {
+                                            // TODO: check only if an entity parameter is present, do not hardcode the http GET/HEAD method
+                                            if (!(("GET".equalsIgnoreCase(arm1.getHttpMethod())) || ("HEAD".equalsIgnoreCase(arm1.getHttpMethod())))) {
+                                                generator.generateInErrMsg(resource, arm1, arm2, mt1);
                                             }
+                                            generator.generateOutErrMsg(resource, arm1, arm2, outmt1);
                                         }
                                     }
-                                }
-                            }
-                        }
-                    } else { // for GET/HEAD method we can just check the output types:
-                        for (MediaType outmt1 : arm1.getSupportedOutputTypes()) {
-                            for (MediaType outmt2 : arm2.getSupportedOutputTypes()) {
-                                if (outmt1.isCompatible(outmt2) && ((outmt1.isWildcardType() == outmt2.isWildcardType()) && (outmt1.isWildcardSubtype() == outmt2.isWildcardSubtype()))) {
-                                    generator.generateOutErrMsg(resource, arm1, arm2, outmt1);
                                 }
                             }
                         }

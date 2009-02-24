@@ -59,16 +59,38 @@ import java.util.List;
  * of model issues found. User can call validate method to validate
  * several resources by a single validator and collect issues.
  * 
- * @author japod
+ * @author Jakub.Podlesak@Sun.COM
  */
 public abstract class AbstractModelValidator implements AbstractModelVisitor {
 
     final List<ResourceModelIssue> issueList = new LinkedList<ResourceModelIssue>();
 
+    /**
+     * Returns a list of issues found after {@link #validate(com.sun.jersey.api.model.AbstractModelComponent) }
+     * method has been invoked
+     * @return a non-null list of issues
+     */
     public List<ResourceModelIssue> getIssueList() {
         return issueList;
     }
 
+    /**
+     * Convenience method to see if there were fatal issues found
+     * @return true if there are any fatal issues present in the current issue list
+     */
+    public boolean fatalIssuesFound() {
+        for (ResourceModelIssue issue : getIssueList()) {
+            if (issue.isFatal()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Removes all issues from the current issue list. The method could be used
+     * to re-use the same validator for another resource model
+     */
     public void cleanIssueList() {
         issueList.removeAll(issueList);
     }

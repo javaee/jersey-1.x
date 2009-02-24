@@ -47,6 +47,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.CookieParam;
+import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.HeaderParam;
 import javax.ws.rs.HttpMethod;
@@ -85,8 +86,7 @@ public class BasicValidatorTest extends TestCase {
         BasicValidator validator = new BasicValidator();
         validator.validate(ar);
         printIssueList(validator);
-        assertTrue(!validator.getIssueList().isEmpty());
-        assertTrue(validator.getIssueList().get(0).isFatal());
+        assertTrue(validator.fatalIssuesFound());
     }
 
     @Path("rootNonAmbigCtors")
@@ -221,8 +221,7 @@ public class BasicValidatorTest extends TestCase {
         BasicValidator validator = new BasicValidator();
         validator.validate(ar);
         printIssueList(validator);
-        assertTrue(!validator.getIssueList().isEmpty());
-        assertTrue(validator.getIssueList().get(0).isFatal());
+        assertTrue(validator.fatalIssuesFound());
     }
 
     public static class TestSRLReturningVoid {
@@ -238,8 +237,7 @@ public class BasicValidatorTest extends TestCase {
         BasicValidator validator = new BasicValidator();
         validator.validate(ar);
         printIssueList(validator);
-        assertTrue(!validator.getIssueList().isEmpty());
-        assertTrue(validator.getIssueList().get(0).isFatal());
+        assertTrue(validator.fatalIssuesFound());
     }
 
     public static class TestGetSRMReturningVoid {
@@ -275,8 +273,7 @@ public class BasicValidatorTest extends TestCase {
         BasicValidator validator = new BasicValidator();
         validator.validate(ar);
         printIssueList(validator);
-        assertTrue(!validator.getIssueList().isEmpty());
-        assertTrue(validator.getIssueList().get(0).isFatal());
+        assertTrue(validator.fatalIssuesFound());
     }
 
     @Path("emptyResource")
@@ -324,8 +321,7 @@ public class BasicValidatorTest extends TestCase {
         BasicValidator validator = new BasicValidator();
         validator.validate(ar);
         printIssueList(validator);
-        assertTrue(!validator.getIssueList().isEmpty());
-        assertTrue(validator.getIssueList().get(0).isFatal());
+        assertTrue(validator.fatalIssuesFound());
     }
 
     @Path("rootAmbigResourceMethodsGET1")
@@ -348,8 +344,7 @@ public class BasicValidatorTest extends TestCase {
         BasicValidator validator = new BasicValidator();
         validator.validate(ar);
         printIssueList(validator);
-        assertTrue(!validator.getIssueList().isEmpty());
-        assertTrue(validator.getIssueList().get(0).isFatal());
+        assertTrue(validator.fatalIssuesFound());
     }
 
     @Path("/collection")
@@ -402,8 +397,7 @@ public class BasicValidatorTest extends TestCase {
         BasicValidator validator = new BasicValidator();
         validator.validate(ar);
         printIssueList(validator);
-        assertTrue(!validator.getIssueList().isEmpty());
-        assertTrue(validator.getIssueList().get(0).isFatal());
+        assertTrue(validator.fatalIssuesFound());
     }
 
     @Target({ElementType.METHOD})
@@ -437,8 +431,7 @@ public class BasicValidatorTest extends TestCase {
         BasicValidator validator = new BasicValidator();
         validator.validate(ar);
         printIssueList(validator);
-        assertTrue(!validator.getIssueList().isEmpty());
-        assertTrue(validator.getIssueList().get(0).isFatal());
+        assertTrue(validator.fatalIssuesFound());
     }
 
     @Path("rootAmbigSubResourceMethodsGET")
@@ -472,8 +465,7 @@ public class BasicValidatorTest extends TestCase {
         BasicValidator validator = new BasicValidator();
         validator.validate(ar);
         printIssueList(validator);
-        assertTrue(!validator.getIssueList().isEmpty());
-        assertTrue(validator.getIssueList().get(0).isFatal());
+        assertTrue(validator.fatalIssuesFound());
     }
 
     @Path("rootAmbigSubResourceMethodsPUT")
@@ -504,8 +496,7 @@ public class BasicValidatorTest extends TestCase {
         BasicValidator validator = new BasicValidator();
         validator.validate(ar);
         printIssueList(validator);
-        assertTrue(!validator.getIssueList().isEmpty());
-        assertTrue(validator.getIssueList().get(0).isFatal());
+        assertTrue(validator.fatalIssuesFound());
     }
 
     @Path("rootAmbigSubResourceMethodsCUSTOM")
@@ -536,8 +527,7 @@ public class BasicValidatorTest extends TestCase {
         BasicValidator validator = new BasicValidator();
         validator.validate(ar);
         printIssueList(validator);
-        assertTrue(!validator.getIssueList().isEmpty());
-        assertTrue(validator.getIssueList().get(0).isFatal());
+        assertTrue(validator.fatalIssuesFound());
     }
 
     @Path("rootAmbigSRLocators")
@@ -560,8 +550,7 @@ public class BasicValidatorTest extends TestCase {
         BasicValidator validator = new BasicValidator();
         validator.validate(ar);
         printIssueList(validator);
-        assertTrue(!validator.getIssueList().isEmpty());
-        assertTrue(validator.getIssueList().get(0).isFatal());
+        assertTrue(validator.fatalIssuesFound());
     }
 
     @Path("rootAmbigSRLocatorsWithSlash")
@@ -584,8 +573,7 @@ public class BasicValidatorTest extends TestCase {
         BasicValidator validator = new BasicValidator();
         validator.validate(ar);
         printIssueList(validator);
-        assertTrue(!validator.getIssueList().isEmpty());
-        assertTrue(validator.getIssueList().get(0).isFatal());
+        assertTrue(validator.fatalIssuesFound());
     }
 
     @Path("rootMultipleHttpMethodDesignatorsRM")
@@ -604,8 +592,7 @@ public class BasicValidatorTest extends TestCase {
         BasicValidator validator = new BasicValidator();
         validator.validate(ar);
         printIssueList(validator);
-        assertTrue(!validator.getIssueList().isEmpty());
-        assertTrue(validator.getIssueList().get(0).isFatal());
+        assertTrue(validator.fatalIssuesFound());
     }
 
     @Path("rootMultipleHttpMethodDesignatorsSRM")
@@ -625,8 +612,7 @@ public class BasicValidatorTest extends TestCase {
         BasicValidator validator = new BasicValidator();
         validator.validate(ar);
         printIssueList(validator);
-        assertTrue(!validator.getIssueList().isEmpty());
-        assertTrue(validator.getIssueList().get(0).isFatal());
+        assertTrue(validator.fatalIssuesFound());
     }
 
     @Path("rootEntityParamOnSRL")
@@ -644,9 +630,45 @@ public class BasicValidatorTest extends TestCase {
         BasicValidator validator = new BasicValidator();
         validator.validate(ar);
         printIssueList(validator);
-        assertTrue(!validator.getIssueList().isEmpty());
-        assertTrue(validator.getIssueList().get(0).isFatal());
+        assertTrue(validator.fatalIssuesFound());
     }
+
+    @Path(value = "/DeleteTest")
+    public static class TestNonConflictingHttpMethodDelete {
+
+        static String html_content =
+                "<html>" + "<head><title>Delete text/html</title></head>" +
+                "<body>Delete text/html</body></html>";
+
+        @DELETE
+        @Produces(value = "text/plain")
+        public String getPlain() {
+            return "Delete text/plain";
+        }
+
+        @DELETE
+        @Produces(value = "text/html")
+        public String getHtml() {
+            return html_content;
+        }
+
+        @DELETE
+        @Path(value = "/sub")
+        @Produces(value = "text/html")
+        public String getSub() {
+            return html_content;
+        }
+    }
+
+    public void testNonConflictingHttpMethodDelete() throws Exception {
+        System.out.println("---\nNo issue should be reported if produced mime types differ");
+        AbstractResource ar = IntrospectionModeller.createResource(TestNonConflictingHttpMethodDelete.class);
+        BasicValidator validator = new BasicValidator();
+        validator.validate(ar);
+        printIssueList(validator);
+        assertTrue(validator.getIssueList().isEmpty());
+    }
+
 
     // TODO: test multiple root resources with the same uriTempl (in WebApplicationImpl.processRootResources ?)
     private static void printIssueList(BasicValidator validator) {
