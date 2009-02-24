@@ -35,53 +35,44 @@
  * holder.
  */
 
-package com.sun.jersey.core.impl.provider.header;
+package com.sun.jersey.core.header;
 
 import com.sun.jersey.core.header.reader.HttpHeaderReader;
 import com.sun.jersey.core.header.reader.HttpHeaderReader.Event;
-import com.sun.jersey.spi.HeaderDelegateProvider;
 import java.text.ParseException;
+import java.util.Collections;
+import java.util.Set;
 import javax.ws.rs.core.EntityTag;
 
 /**
+ * A matching entity tag.
  *
- * @author Marc.Hadley@Sun.Com
+ * @author Paul.Sandoz@Sun.Com
  */
-public class EntityTagProvider implements HeaderDelegateProvider<EntityTag> {
+public class MatchingEntityTag extends EntityTag {
+
+    public static Set<MatchingEntityTag> ANY_MATCH = Collections.singleton(new MatchingEntityTag("*"));
+
+    public MatchingEntityTag(String value) {
+        super(value, false);
+    }
+
+    public MatchingEntityTag(String value, boolean weak) {
+        super(value, weak);
+    }
     
-    public boolean supports(Class<?> type) {
-        return type == EntityTag.class;
-    }
-
-    public String toString(EntityTag header) {
-        StringBuilder b = new StringBuilder();
-        if (header.isWeak())
-            b.append("W/");
-        WriterUtil.appendQuoted(b,header.getValue());
-        return b.toString();
-    }
-
-    public EntityTag fromString(String header) {
-        if (header == null)
-            throw new IllegalArgumentException("Entity tag is null");
-
-        try {
-            HttpHeaderReader reader = HttpHeaderReader.newInstance(header);
-            Event e = reader.next(false);
-            if (e == Event.QuotedString) {
-                return new EntityTag(reader.getEventValue());
-            } else if (e == Event.Token) {
-                if (reader.getEventValue().equals("W")) {
-                    reader.nextSeparator('/');
-                    return new EntityTag(reader.nextQuotedString(), true);
-                }
+    public static MatchingEntityTag valueOf(HttpHeaderReader reader) throws ParseException {
+        Event e = reader.next(false);
+        if (e == Event.QuotedString) {
+            return new MatchingEntityTag(reader.getEventValue());
+        } else if (e == Event.Token) {
+            String v = reader.getEventValue();
+            if (v.equals("W")) {
+                reader.nextSeparator('/');
+                return new MatchingEntityTag(reader.nextQuotedString(), true);
             }
-        } catch (ParseException ex) {
-            throw new IllegalArgumentException(
-                    "Error parsing entity tag '" + header + "'", ex);
         }
 
-        throw new IllegalArgumentException(
-                "Error parsing entity tag '" + header + "'");
-    }    
+        throw new ParseException("Error parsing entity tag", reader.getIndex());
+    }
 }

@@ -35,53 +35,48 @@
  * holder.
  */
 
-package com.sun.jersey.core.impl.provider.header;
+package com.sun.jersey.impl.http.header.provider;
 
+import com.sun.jersey.core.header.MatchingEntityTag;
 import com.sun.jersey.core.header.reader.HttpHeaderReader;
-import com.sun.jersey.core.header.reader.HttpHeaderReader.Event;
-import com.sun.jersey.spi.HeaderDelegateProvider;
-import java.text.ParseException;
+import junit.framework.*;
+import java.util.Set;
 import javax.ws.rs.core.EntityTag;
 
-/**
- *
- * @author Marc.Hadley@Sun.Com
- */
-public class EntityTagProvider implements HeaderDelegateProvider<EntityTag> {
+public class MatchingEntityTagTest extends TestCase {
     
-    public boolean supports(Class<?> type) {
-        return type == EntityTag.class;
+    public MatchingEntityTagTest(String testName) {
+        super(testName);
     }
 
-    public String toString(EntityTag header) {
-        StringBuilder b = new StringBuilder();
-        if (header.isWeak())
-            b.append("W/");
-        WriterUtil.appendQuoted(b,header.getValue());
-        return b.toString();
+    public void testOneEntityTag() throws Exception {
+        String header = "\"1\"";
+        Set<MatchingEntityTag> s = HttpHeaderReader.readMatchingEntityTag(header);
+        
+        assertEquals(1, s.size());
+
+        assertTrue(s.contains(new EntityTag("1")));
     }
 
-    public EntityTag fromString(String header) {
-        if (header == null)
-            throw new IllegalArgumentException("Entity tag is null");
+    public void testMultipleEntityTag() throws Exception {
+        String header = "\"1\", W/\"2\", \"3\"";
+        Set<MatchingEntityTag> s = HttpHeaderReader.readMatchingEntityTag(header);
 
-        try {
-            HttpHeaderReader reader = HttpHeaderReader.newInstance(header);
-            Event e = reader.next(false);
-            if (e == Event.QuotedString) {
-                return new EntityTag(reader.getEventValue());
-            } else if (e == Event.Token) {
-                if (reader.getEventValue().equals("W")) {
-                    reader.nextSeparator('/');
-                    return new EntityTag(reader.nextQuotedString(), true);
-                }
-            }
-        } catch (ParseException ex) {
-            throw new IllegalArgumentException(
-                    "Error parsing entity tag '" + header + "'", ex);
-        }
+        assertEquals(3, s.size());
 
-        throw new IllegalArgumentException(
-                "Error parsing entity tag '" + header + "'");
-    }    
+        assertTrue(s.contains(new EntityTag("1")));
+
+        assertTrue(s.contains(new EntityTag("2", true)));
+
+        assertTrue(s.contains(new EntityTag("3")));
+    }
+
+    public void testAnyMatch() throws Exception {
+        String header = "*";
+        Set<MatchingEntityTag> s = HttpHeaderReader.readMatchingEntityTag(header);
+
+        assertEquals(1, s.size());
+
+        assertTrue(s.contains(new EntityTag("*")));
+    }
 }

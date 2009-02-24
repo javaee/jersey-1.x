@@ -37,10 +37,8 @@
 
 package com.sun.jersey.impl.http.header.provider;
 
-import com.sun.jersey.core.impl.provider.header.EntityTagProvider;
 import com.sun.jersey.core.impl.provider.header.LocaleProvider;
 import java.util.Locale;
-import javax.ws.rs.core.EntityTag;
 import junit.framework.*;
 
 /**
@@ -53,9 +51,6 @@ public class LocaleProviderTest extends TestCase {
         super(testName);
     }
 
-    /**
-     * Test of toString method, of class com.sun.jersey.impl.http.header.provider.EntityTagProvider.
-     */
     public void testToString() {
         LocaleProvider instance = new LocaleProvider();
         
@@ -64,9 +59,6 @@ public class LocaleProviderTest extends TestCase {
         assertEquals("en-US", instance.toString(new Locale("en", "us")));
     }
 
-    /**
-     * Test of fromString method, of class com.sun.jersey.impl.http.header.provider.EntityTagProvider.
-     */
     public void testFromString() throws Exception {
         LocaleProvider instance = new LocaleProvider();
         

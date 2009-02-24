@@ -51,38 +51,31 @@ public class EntityTagProviderTest extends TestCase {
         super(testName);
     }
 
-    protected void setUp() throws Exception {
+    public void testToStringWeak() {
+        _testToString(new EntityTag("Hello \"World\"", true), "W/\"Hello \\\"World\\\"\"");
     }
 
-    protected void tearDown() throws Exception {
+    public void testToStringStrong() {
+        _testToString(new EntityTag("Hello \"World\""), "\"Hello \\\"World\\\"\"");
     }
 
-    /**
-     * Test of toString method, of class com.sun.jersey.impl.http.header.provider.EntityTagProvider.
-     */
-    public void testToString() {
-        System.out.println("toString");
-        
-        EntityTag header = new EntityTag("Hello \"World\"", true);
+    private void _testToString(EntityTag e, String result) {
         EntityTagProvider instance = new EntityTagProvider();
         
-        String expResult = "W/\"Hello \\\"World\\\"\"";
-        String result = instance.toString(header);
-        assertEquals(expResult, result);
+        assertEquals(result, instance.toString(e));
     }
 
-    /**
-     * Test of fromString method, of class com.sun.jersey.impl.http.header.provider.EntityTagProvider.
-     */
-    public void testFromString() throws Exception {
-        System.out.println("fromString");
-        
-        String header = "W/\"Hello \\\"World\\\"\"";
-        EntityTagProvider instance = new EntityTagProvider();
-        
-        EntityTag expResult = new EntityTag("Hello \"World\"", true);
-        EntityTag result = instance.fromString(header);
-        assertEquals(expResult, result);
+    public void testFromStringWeak() throws Exception {
+        _testFromString("W/\"Hello \\\"World\\\"\"", new EntityTag("Hello \"World\"", true));
     }
     
+    public void testFromStringStrong() throws Exception {
+        _testFromString("\"Hello \\\"World\\\"\"", new EntityTag("Hello \"World\""));
+    }
+
+    public void _testFromString(String e, EntityTag result) throws Exception {
+        EntityTagProvider instance = new EntityTagProvider();
+        
+        assertEquals(result, instance.fromString(e));
+    }
 }

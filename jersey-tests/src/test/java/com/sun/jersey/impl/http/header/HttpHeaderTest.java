@@ -114,11 +114,6 @@ public class HttpHeaderTest extends TestCase {
         assertEquals("*", l.get(3).getToken());        
     }
     
-    public void testEntityTag() throws ParseException {
-        String entityTag = "W/\"a    b\"";
-        EntityTag e = new EntityTag(entityTag);
-    }
-    
     public void testDateParsing() throws ParseException {
         String date_RFC1123 = "Sun, 06 Nov 1994 08:49:37 GMT";
         String date_RFC1036 = "Sunday, 06-Nov-94 08:49:37 GMT";

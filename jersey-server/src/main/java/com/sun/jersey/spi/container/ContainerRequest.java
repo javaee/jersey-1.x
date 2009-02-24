@@ -45,6 +45,7 @@ import com.sun.jersey.api.uri.UriComponent;
 import com.sun.jersey.core.util.MultivaluedMapImpl;
 import com.sun.jersey.server.impl.VariantSelector;
 import com.sun.jersey.core.header.AcceptableLanguageTag;
+import com.sun.jersey.core.header.MatchingEntityTag;
 import com.sun.jersey.core.header.MediaTypes;
 import com.sun.jersey.core.header.QualitySourceMediaType;
 import com.sun.jersey.core.header.reader.HttpHeaderReader;
@@ -65,6 +66,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 import java.util.logging.Logger;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Cookie;
@@ -535,34 +537,48 @@ public class ContainerRequest implements HttpRequestContext {
     
     public ResponseBuilder evaluatePreconditions(EntityTag eTag) {
         ResponseBuilder r = evaluateIfMatch(eTag);
-        if (r == null)
-            r = evaluateIfNoneMatch(eTag);
-        
-        return r;        
+        if (r != null)
+            return r;
+
+        return evaluateIfNoneMatch(eTag);
     }
 
     public ResponseBuilder evaluatePreconditions(Date lastModified) {
-        long lastModifiedTime = lastModified.getTime();
+        final long lastModifiedTime = lastModified.getTime();
         ResponseBuilder r = evaluateIfUnmodifiedSince(lastModifiedTime);
-        if (r == null)
-            r = evaluateIfModifiedSince(lastModifiedTime);
-        
-        return r;        
+        if (r != null)
+            return r;
+
+        return evaluateIfModifiedSince(lastModifiedTime);
     }
     
     public ResponseBuilder evaluatePreconditions(Date lastModified, EntityTag eTag) {
         ResponseBuilder r = evaluateIfMatch(eTag);
-        if (r == null) {
-            long lastModifiedTime = lastModified.getTime();
-            r = evaluateIfUnmodifiedSince(lastModifiedTime);
+        if (r != null)
+            return r;
+
+        final long lastModifiedTime = lastModified.getTime();
+        r = evaluateIfUnmodifiedSince(lastModifiedTime);
+        if (r != null)
+            return r;
+
+        final boolean isGetOrHead = getMethod().equals("GET") || getMethod().equals("HEAD");
+        final Set<MatchingEntityTag> matchingTags = HttpHelper.getIfNoneMatch(this);
+        if (matchingTags != null) {
+            r = evaluateIfNoneMatch(eTag, matchingTags, isGetOrHead);
+            // If the If-None-Match header is present and there is no
+            // match then the If-Modified-Since header must be ignored
             if (r == null)
-                r = evaluateIfNoneMatch(eTag);
-            // If there is no entity tag match for "If-None-Match" then
-            // the "If-Modified-Since" header should be ignored
-            // so that it is not possible to return a 304 Not Modified response
-            if (r == null)
-                return null;
-            r = evaluateIfModifiedSince(lastModifiedTime);
+                return r;
+
+            // Otherwise if the If-None-Match header is present and there
+            // is a match then the If-Modified-Since header must be checked
+            // for consistency
+        }
+
+        final String ifModifiedSinceHeader = getRequestHeaders().getFirst("If-Modified-Since");
+        if (ifModifiedSinceHeader != null && isGetOrHead) {
+            r = evaluateIfModifiedSince(lastModifiedTime, ifModifiedSinceHeader);
             if (r != null)
                 r.tag(eTag);
         }
@@ -571,12 +587,17 @@ public class ContainerRequest implements HttpRequestContext {
     }
         
     private ResponseBuilder evaluateIfMatch(EntityTag eTag) {
-        String ifMatchHeader = getRequestHeaders().getFirst("If-Match");
-        // TODO require support for eTag types
-        // Strong comparison of entity tags is required
-        if (ifMatchHeader != null &&
-                !ifMatchHeader.trim().equals("*") &&
-                !ifMatchHeader.contains(eTag.getValue())) {
+        // The strong comparison function must be used to compare the entity
+        // tags. Thus if the entity tag of the entity is weak then matching
+        // of entity tags in the If-Match header should fail.
+        if (eTag.isWeak()) {
+            return Responses.preconditionFailed();
+        }
+        
+        Set<MatchingEntityTag> matchingTags = HttpHelper.getIfMatch(this);
+        if (matchingTags != null &&
+                matchingTags != MatchingEntityTag.ANY_MATCH &&
+                !matchingTags.contains(eTag)) {
             // 412 Precondition Failed
             return Responses.preconditionFailed();
         }
@@ -585,23 +606,48 @@ public class ContainerRequest implements HttpRequestContext {
     }
     
     private ResponseBuilder evaluateIfNoneMatch(EntityTag eTag) {
-        String ifNoneMatchHeader = getRequestHeaders().getFirst("If-None-Match");
-        if (ifNoneMatchHeader != null) {
-            // TODO require support for eTag types
-            // Weak entity tag comparisons can only be used
-            // with GET/HEAD
-            if (ifNoneMatchHeader.trim().equals("*") || ifNoneMatchHeader.contains(eTag.getValue())) {
-                String httpMethod = getMethod();
-                if (httpMethod.equals("GET") || httpMethod.equals("HEAD")) {
+        Set<MatchingEntityTag> matchingTags = HttpHelper.getIfNoneMatch(this);
+        if (matchingTags == null)
+            return null;
+        
+        final String httpMethod = getMethod();
+        return evaluateIfNoneMatch(
+                eTag,
+                matchingTags,
+                httpMethod.equals("GET") || httpMethod.equals("HEAD"));
+    }
+
+    private ResponseBuilder evaluateIfNoneMatch(
+            EntityTag eTag,
+            Set<MatchingEntityTag> matchingTags,
+            boolean isGetOrHead) {
+        if (isGetOrHead) {
+            if (matchingTags == MatchingEntityTag.ANY_MATCH) {
+                // 304 Not modified
+                return Response.notModified(eTag);
+            }
+
+            if (!eTag.isWeak()) {
+                if (matchingTags.contains(eTag)) {
                     // 304 Not modified
-                    // TODO
-                    // Include cache related header fields
-                    // such as ETag
                     return Response.notModified(eTag);
-                } else {
-                    // 412 Precondition Failed
-                    return Responses.preconditionFailed();
                 }
+            } else if (matchingTags.contains(eTag) || matchingTags.contains(new EntityTag(eTag.getValue()))) {
+                // 304 Not modified
+                return Response.notModified(eTag);
+            }
+        } else {
+            // The strong comparison function must be used to compare the entity
+            // tags. Thus if the entity tag of the entity is weak then matching
+            // of entity tags in the If-None-Match header should fail if the
+            // HTTP method is not GET or not HEAD.
+            if (eTag.isWeak()) {
+                return null;
+            }
+
+            if (matchingTags == MatchingEntityTag.ANY_MATCH || matchingTags.contains(eTag)) {
+                // 412 Precondition Failed
+                return Responses.preconditionFailed();
             }
         }
         
@@ -628,18 +674,32 @@ public class ContainerRequest implements HttpRequestContext {
     
     private ResponseBuilder evaluateIfModifiedSince(long lastModified) {
         String ifModifiedSinceHeader = getRequestHeaders().getFirst("If-Modified-Since");
-        if (ifModifiedSinceHeader != null) {
-            try {
-                // TODO round up if modified since or round down last modified
-                long ifModifiedSince = HttpHeaderReader.
-                        readDate(ifModifiedSinceHeader).getTime() + 1000;
-                if (ifModifiedSince  > lastModified) {
-                    // 304 Not modified
-                    return Responses.notModified();
-                }
-            } catch (ParseException ex) {
-                // Ignore the header if parsing error
+        if (ifModifiedSinceHeader == null)
+            return null;
+
+        final String httpMethod = getMethod();
+        if (httpMethod.equals("GET") || httpMethod.equals("HEAD")) {
+            return evaluateIfModifiedSince(
+                    lastModified,
+                    ifModifiedSinceHeader);
+        } else {
+            return null;
+        }
+    }
+
+    private ResponseBuilder evaluateIfModifiedSince(
+            long lastModified,
+            String ifModifiedSinceHeader) {
+        try {
+            // TODO round up if modified since or round down last modified
+            long ifModifiedSince = HttpHeaderReader.
+                    readDate(ifModifiedSinceHeader).getTime() + 1000;
+            if (ifModifiedSince  > lastModified) {
+                // 304 Not modified
+                return Responses.notModified();
             }
+        } catch (ParseException ex) {
+            // Ignore the header if parsing error
         }
         
         return null;

@@ -44,11 +44,13 @@ import com.sun.jersey.core.header.AcceptableLanguageTag;
 import com.sun.jersey.core.header.AcceptableMediaType;
 import com.sun.jersey.core.header.AcceptableToken;
 import com.sun.jersey.core.header.LanguageTag;
+import com.sun.jersey.core.header.MatchingEntityTag;
 import com.sun.jersey.core.header.QualitySourceMediaType;
 import com.sun.jersey.core.header.reader.HttpHeaderReader;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
+import java.util.Set;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.HttpHeaders;
@@ -120,6 +122,30 @@ public final class HttpHelper {
             return new LanguageTag(language).getAsLocale();
         } catch (java.text.ParseException e) {
             throw clientError("Bad Content-Language field: " + language, e);
+        }
+    }
+
+    public static Set<MatchingEntityTag> getIfMatch(HttpRequestContext request) {
+        final String ifMatch = request.getHeaderValue("If-Match");
+        if (ifMatch == null || ifMatch.length() == 0) {
+            return null;
+        }
+        try {
+            return HttpHeaderReader.readMatchingEntityTag(ifMatch);
+        } catch (java.text.ParseException e) {
+            throw clientError("The HTTP header field \"If-Match\" with value " + ifMatch + " could not be parsed.", e);
+        }
+    }
+
+    public static Set<MatchingEntityTag> getIfNoneMatch(HttpRequestContext request) {
+        final String ifNoneMatch = request.getHeaderValue("If-None-Match");
+        if (ifNoneMatch == null || ifNoneMatch.length() == 0) {
+            return null;
+        }
+        try {
+            return HttpHeaderReader.readMatchingEntityTag(ifNoneMatch);
+        } catch (java.text.ParseException e) {
+            throw clientError("The HTTP header field \"If-None-Match\" with value " + ifNoneMatch + " could not be parsed.", e);
         }
     }
 

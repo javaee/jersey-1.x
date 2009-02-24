@@ -42,19 +42,20 @@ import com.sun.jersey.core.header.AcceptableLanguageTag;
 import com.sun.jersey.core.header.AcceptableMediaType;
 import com.sun.jersey.core.header.AcceptableToken;
 import com.sun.jersey.core.header.HttpDateFormat;
+import com.sun.jersey.core.header.MatchingEntityTag;
 import com.sun.jersey.core.header.QualityFactor;
 import com.sun.jersey.core.header.QualitySourceMediaType;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import javax.ws.rs.core.Cookie;
-import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.NewCookie;
 
 /**
@@ -263,6 +264,32 @@ public abstract class HttpHeaderReader {
     public static NewCookie readNewCookie(String header) {
         return CookiesParser.parseNewCookie(header);
     }
+
+
+    private static final ListElementCreator<MatchingEntityTag> MATCHING_ENTITY_TAG_CREATOR =
+            new ListElementCreator<MatchingEntityTag>() {
+        public MatchingEntityTag create(HttpHeaderReader reader) throws ParseException {
+            return MatchingEntityTag.valueOf(reader);
+        }
+    };
+
+    public static Set<MatchingEntityTag> readMatchingEntityTag(String header) throws ParseException {
+        if (header.equals("*"))
+            return MatchingEntityTag.ANY_MATCH;
+
+        HttpHeaderReader reader = new HttpHeaderReaderImpl(header);
+        Set<MatchingEntityTag> l = new HashSet<MatchingEntityTag>(1);
+        HttpHeaderListAdapter adapter = new HttpHeaderListAdapter(reader);
+        while(reader.hasNext()) {
+            l.add(MATCHING_ENTITY_TAG_CREATOR.create(adapter));
+            adapter.reset();
+            if (reader.hasNext())
+                reader.next();
+        }
+
+        return l;
+    }
+
 
     private static final ListElementCreator<AcceptableMediaType> ACCEPTABLE_MEDIA_TYPE_CREATOR =
             new ListElementCreator<AcceptableMediaType>() {
