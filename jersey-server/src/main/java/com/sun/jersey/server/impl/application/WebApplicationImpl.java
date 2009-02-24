@@ -487,7 +487,7 @@ public final class WebApplicationImpl implements WebApplication {
         cpFactory.injectOnAllComponents();
         cpFactory.injectOnProviderInstances(resourceConfig.getProviderSingletons());
         
-        this.wadlFactory = new WadlFactory( resourceConfig );
+        this.wadlFactory = new WadlFactory(resourceConfig);
         
         // Obtain all root resources
         this.rootsRule = new RootResourceClassesRule(processRootResources());
@@ -620,47 +620,15 @@ public final class WebApplicationImpl implements WebApplication {
             throw new ContainerException(ImplMessages.NO_ROOT_RES_IN_RES_CFG());
         }
 
-        RulesMap<UriRule> rulesMap = new RulesMap<UriRule>();
 
-        // need to validate possible conflicts in uri templates
-        Set<UriTemplate> uriTemplatesUsed = new HashSet<UriTemplate>();
+        // Create the set of abstract root resources
 
-        Set<AbstractResource> rootResources = new HashSet<AbstractResource>();
+        Map<Class<?>, AbstractResource> rootResourcesMap = new HashMap<Class<?>, AbstractResource>();
         for (Object o : singletons) {
-            AbstractResource ar = getAbstractResource(o);
-            if (!ar.isRootResource()) {
-                LOGGER.warning("The singleton, " + o + ", registered as a root resource singleton" +
-                        "of the ResourceConfig is not a root resource singleton" +
-                        ". This singleton will be ignored");
-                continue;
-            }
-
-            ComponentInjector ci = new ComponentInjector(injectableFactory, o.getClass());
-            ci.inject(o);
-
-            UriTemplate t = new PathTemplate(ar.getPath().getValue());
-
-            ensureTemplateUnused(t, ar, uriTemplatesUsed);
-
-            ResourceClass r = getResourceClass(ar);
-            rootResources.add(r.resource);
-
-            PathPattern p = new PathPattern(t);
-
-            rulesMap.put(p, new RightHandPathRule(
-                        resourceConfig.getFeature(ResourceConfig.FEATURE_REDIRECT),
-                        t.endsWithSlash(),
-                        new ResourceObjectRule(t, o)));
+            rootResourcesMap.put(o.getClass(), getAbstractResource(o));
         }
-        
+
         for (Class<?> c : classes) {
-            AbstractResource ar = getAbstractResource(c);
-            if (!ar.isRootResource()) {
-                LOGGER.warning("The class, " + c + ", registered as a root resource class " +
-                        "of the ResourceConfig is not a root resource class" +
-                        ". This class will be ignored");
-                continue;
-            }
             // TODO this should be moved to the validation
             // as such classes are not root resource classes
             int modifiers = c.getModifiers();
@@ -676,13 +644,69 @@ public final class WebApplicationImpl implements WebApplication {
                 continue;
             }
 
+            rootResourcesMap.put(c, getAbstractResource(c));
+        }
+
+        Set<AbstractResource> rootResources = new HashSet<AbstractResource>();
+        for (Map.Entry<Class<?>, AbstractResource> e : rootResourcesMap.entrySet()) {
+            rootResources.add(e.getValue());
+        }
+
+        initWadl(rootResources, wadlFactory);
+
+
+        RulesMap<UriRule> rulesMap = new RulesMap<UriRule>();
+
+        // need to validate possible conflicts in uri templates
+        Set<UriTemplate> uriTemplatesUsed = new HashSet<UriTemplate>();
+
+        for (Object o : singletons) {
+            ComponentInjector ci = new ComponentInjector(injectableFactory, o.getClass());
+            ci.inject(o);
+
+            AbstractResource ar = rootResourcesMap.get(o.getClass());
+
             UriTemplate t = new PathTemplate(ar.getPath().getValue());
+
             ensureTemplateUnused(t, ar, uriTemplatesUsed);
 
-            ResourceClass r = getResourceClass(ar);
-            rootResources.add(r.resource);
+            PathPattern p = new PathPattern(t);
+
+            // Configure meta-data
+            getResourceClass(ar);
+
+            rulesMap.put(p, new RightHandPathRule(
+                        resourceConfig.getFeature(ResourceConfig.FEATURE_REDIRECT),
+                        t.endsWithSlash(),
+                        new ResourceObjectRule(t, o)));
+        }
+        
+        for (Class<?> c : classes) {
+            // TODO this should be moved to the validation
+            // as such classes are not root resource classes
+            int modifiers = c.getModifiers();
+            if (Modifier.isAbstract(modifiers) && !Modifier.isInterface(modifiers)) {
+                LOGGER.warning("The " + c + ", registered as a root resource class " +
+                        "of the ResourceConfig cannot be instantiated" +
+                        ". This class will be ignored");
+                continue;
+            } else if (Modifier.isInterface(modifiers)) {
+                LOGGER.warning("The " + c + ", registered as a root resource class " +
+                        "of the ResourceConfig cannot be instantiated" +
+                        ". This interface will be ignored");
+                continue;
+            }
+
+            AbstractResource ar = rootResourcesMap.get(c);
+
+            UriTemplate t = new PathTemplate(ar.getPath().getValue());
+            
+            ensureTemplateUnused(t, ar, uriTemplatesUsed);
 
             PathPattern p = new PathPattern(t);
+
+            // Configure meta-data
+            getResourceClass(ar);
 
             rulesMap.put(p, new RightHandPathRule(
                     resourceConfig.getFeature(ResourceConfig.FEATURE_REDIRECT),
@@ -690,32 +714,36 @@ public final class WebApplicationImpl implements WebApplication {
                     new ResourceClassRule(t, c)));
         }
 
-        createWadlResource(rootResources, rulesMap, wadlFactory);
-
+        initWadlResource(rulesMap);
+        
         return rulesMap;
     }
 
-    private void createWadlResource(Set<AbstractResource> rootResources,
-            RulesMap<UriRule> rulesMap,
+    private void initWadl(Set<AbstractResource> rootResources,
             WadlFactory wadlFactory) {
         // TODO get ResourceConfig to check the WADL generation feature
         
-        
-        
-        Object wr = wadlFactory.createWadlResource(rootResources);
-        if (wr == null) {
+        if (!wadlFactory.isSupported())
             return;
-        }
 
-        // Preload wadl resource runtime meta data
-        getResourceClass(WadlResource.class);
+        wadlFactory.init(injectableFactory, rootResources);
+    }
+
+    private void initWadlResource(RulesMap<UriRule> rulesMap) {
+        if (!wadlFactory.isSupported())
+            return;
+
         UriTemplate t = new PathTemplate("application.wadl");
+
         PathPattern p = new PathPattern(t);
+
+        // Configure meta-data
+        getResourceClass(WadlResource.class);
 
         rulesMap.put(p, new RightHandPathRule(
                 resourceConfig.getFeature(ResourceConfig.FEATURE_REDIRECT),
-                false,
-                new ResourceObjectRule(t, wr)));
+                t.endsWithSlash(),
+                new ResourceClassRule(t, WadlResource.class)));
     }
 
     /**

@@ -46,9 +46,13 @@ import java.util.logging.Logger;
 import com.sun.jersey.api.core.ResourceConfig;
 import com.sun.jersey.api.model.AbstractResource;
 import com.sun.jersey.api.wadl.config.WadlGeneratorConfigLoader;
+import com.sun.jersey.core.spi.factory.InjectableProviderFactory;
 import com.sun.jersey.server.impl.model.method.ResourceMethod;
 import com.sun.jersey.server.impl.uri.PathPattern;
+import com.sun.jersey.server.wadl.WadlApplicationContext;
+import com.sun.jersey.spi.inject.SingletonTypeInjectableProvider;
 import java.util.logging.Level;
+import javax.ws.rs.core.Context;
 
 /**
  *
@@ -58,33 +62,38 @@ public final class WadlFactory {
     
     private static final Logger LOGGER = Logger.getLogger(WadlFactory.class.getName());
 
-    private final boolean _jaxb;
-    private final WadlGenerator _wadlGenerator;
+    private final boolean isJAXBPresent;
+
+    private final WadlGenerator wadlGenerator;
     
     public WadlFactory(ResourceConfig resourceConfig) {
-        _jaxb = checkForJAXB();
+        isJAXBPresent = checkForJAXB();
         
-        if ( _jaxb ) {
-            _wadlGenerator = WadlGeneratorConfigLoader.loadWadlGeneratorsFromConfig( resourceConfig );
+        if (isJAXBPresent) {
+            wadlGenerator = WadlGeneratorConfigLoader.loadWadlGeneratorsFromConfig(resourceConfig);
         }
         else {
-            _wadlGenerator = null;
+            wadlGenerator = null;
         }
     }
 
-    /**
-     * Create the WADL resource object.
-     * <p>
-     * This is created using reflection so that there is no runtime
-     * dependency on JAXB. If the JAXB jars are not in the class path
-     * then WADL generation will not be supported.
-     * 
-     * @param rootResources the set of root resources
-     * @return the WADL resource object
-     */
-    public Object createWadlResource(Set<AbstractResource> rootResources) {
-        if ( !_jaxb ) return null;
-        return new WadlResource( rootResources, _wadlGenerator );
+    public boolean isSupported() {
+        return isJAXBPresent;
+    }
+
+    public WadlApplicationContext createWadlApplicationContext(Set<AbstractResource> rootResources) {
+        if (!isSupported()) return null;
+
+        return new WadlApplicationContextImpl(rootResources, wadlGenerator);
+    }
+
+    public void init(InjectableProviderFactory ipf, Set<AbstractResource> rootResources) {
+        if (!isSupported()) return;
+
+        WadlApplicationContext w = new WadlApplicationContextImpl(rootResources, wadlGenerator);
+
+        ipf.add(new SingletonTypeInjectableProvider<Context, WadlApplicationContext>(
+                WadlApplicationContext.class, w) {});
     }
     
     /**
@@ -100,14 +109,14 @@ public final class WadlFactory {
     public ResourceMethod createWadlOptionsMethod(
             Map<String, List<ResourceMethod>> methods, 
             AbstractResource resource, PathPattern p) {
-        if ( !_jaxb ) return null;
+        if (!isSupported()) return null;
         
         if (p == null) {
-            return new WadlMethodFactory.WadlOptionsMethod(methods, resource, null, _wadlGenerator);
+            return new WadlMethodFactory.WadlOptionsMethod(methods, resource, null, wadlGenerator);
         } else {
             // Remove the '/' from the beginning
             String path = p.getTemplate().getTemplate().substring(1);
-            return new WadlMethodFactory.WadlOptionsMethod(methods, resource, path, _wadlGenerator);
+            return new WadlMethodFactory.WadlOptionsMethod(methods, resource, path, wadlGenerator);
         }
     }        
     
