@@ -38,6 +38,7 @@
 package com.sun.jersey.server.wadl;
 
 import com.sun.research.ws.wadl.Application;
+import javax.ws.rs.core.UriInfo;
 import javax.xml.bind.JAXBContext;
 
 /**
@@ -61,6 +62,16 @@ public interface WadlApplicationContext {
      * @return the application, the contents may be modified.
      */
     Application getApplication();
+
+    /**
+     * Get a new instance of a JAXB WADL {@link Application} corresponding to all
+     * the root resource classes, and configure the base URI.
+     *
+     * @param ui the URI information from which the base URI is set on the
+     *        WADL application.
+     * @return the application, the contents may be modified.
+     */
+    Application getApplication(UriInfo ui);
 
     /**
      * Get the default JAXB context associated with the {@link WadlGenerator}

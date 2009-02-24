@@ -43,6 +43,7 @@ import com.sun.jersey.server.wadl.WadlBuilder;
 import com.sun.jersey.server.wadl.WadlGenerator;
 import com.sun.research.ws.wadl.Application;
 import java.util.Set;
+import javax.ws.rs.core.UriInfo;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 
@@ -70,6 +71,12 @@ public class WadlApplicationContextImpl implements WadlApplicationContext {
 
     public Application getApplication() {
         return getWadlBuilder().generate(rootResources);
+    }
+
+    public Application getApplication(UriInfo ui) {
+        Application a = getWadlBuilder().generate(rootResources);
+        a.getResources().setBase(ui.getBaseUri().toString());
+        return a;
     }
 
     public JAXBContext getJAXBContext() {
