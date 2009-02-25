@@ -1,4 +1,19 @@
 release 1.0.3 (2009-03/04)
+- Fixed issue 221
+  https://jersey.dev.java.net/issues/show_bug.cgi?id=226
+  When resolving an absolute template name to a fully qualified template name
+  that has a template processor associated with it, then the class hiararchy is
+  trasversed such that if the absolute template name cannot be resolved from
+  a declared resolving class, then resolution is attempted with the super class
+  etc. until the Object class is reached, which if so means that resolution
+  failed. This means views work correctly with cglib proxied resource classes.
+- Fixed issue 226
+  https://jersey.dev.java.net/issues/show_bug.cgi?id=226
+  Viewable instances with absolute template names may be set as the response
+  entity no matching resource available. Thus filters and exception mappers
+  can use the model/view/control mechanism.
+  In addition it is possible to declare the resolving class explicitly on
+  a Viewable if required.
 - Fixed issue 228
   https://jersey.dev.java.net/issues/show_bug.cgi?id=228
   Precondition support is now working correctly for If-None-Match and

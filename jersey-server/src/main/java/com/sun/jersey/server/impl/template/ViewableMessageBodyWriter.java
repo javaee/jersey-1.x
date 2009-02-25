@@ -37,10 +37,10 @@
 
 package com.sun.jersey.server.impl.template;
 
-import com.sun.jersey.spi.template.TemplateProcessor;
+import com.sun.jersey.api.core.HttpContext;
+import com.sun.jersey.spi.template.ResolvedViewable;
 import com.sun.jersey.spi.template.TemplateContext;
 import com.sun.jersey.api.view.Viewable;
-import com.sun.jersey.api.core.ResourceConfig;
 import java.io.OutputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
@@ -56,6 +56,8 @@ import javax.ws.rs.core.UriInfo;
  * @author Paul.Sandoz@Sun.Com
  */
 public final class ViewableMessageBodyWriter implements MessageBodyWriter<Viewable> {
+
+    @Context HttpContext hc;
     
     @Context UriInfo ui;
     
@@ -69,47 +71,25 @@ public final class ViewableMessageBodyWriter implements MessageBodyWriter<Viewab
             Class<?> type, Type genericType, Annotation[] annotations, 
             MediaType mediaType, MultivaluedMap<String, Object> httpHeaders, 
             OutputStream entityStream) throws IOException {
-        if (v instanceof ResolvedViewable) {
-            ResolvedViewable rv = (ResolvedViewable)v;
-            rv.getTemplate().writeTo(v.getTemplateName(), v.getModel(), entityStream);
-        } else {
-            String absolutePath = getAbsolutePath(ui.getMatchedResources().get(0).getClass(), 
-                    v.getTemplateName());
+        final ResolvedViewable rv = resolve(v);
+        if (rv == null)
+            throw new IOException("The template name, " +
+                    v.getTemplateName() +
+                    ", could not be resolved to a fully qualified template name");
 
-            boolean resolved = false;
-            for (TemplateProcessor t : tc.getTemplateProcessors()) {
-                String resolvedPath = t.resolve(absolutePath);
-                if (resolvedPath != null) {
-                    resolved = true;
-                    t.writeTo(resolvedPath, v.getModel(), entityStream);
-                }
-            }
-            
-            if (resolved == false) {
-                throw new IOException("The template name, " + 
-                        v.getTemplateName() + 
-                        ", could not be resolved to the path of a template");
-            }
-        }
+        hc.getProperties().put("com.sun.jersey.spi.template.ResolvedViewable", rv);
+        rv.writeTo(entityStream);
     }
 
+    private ResolvedViewable resolve(Viewable v) {
+        if (v instanceof ResolvedViewable) {
+            return (ResolvedViewable)v;
+        } else {
+            return tc.resolveViewable(v, ui);
+        }
+    }
+    
     public long getSize(Viewable t, Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType) {
         return -1;
     }
-    
-    
-    private String getAbsolutePath(Class<?> resourceClass, String path) {
-        if (path == null || path.length() == 0) {
-            path = "index";
-        } else if (path.startsWith("/")) {
-            return path;
-        }
-
-        return getAbsolutePath(resourceClass) + '/' + path;
-    }
-
-    private String getAbsolutePath(Class<?> resourceClass) {
-        return "/" + resourceClass.getName().replace('.', '/').replace('$', '/');
-    }
-
 }

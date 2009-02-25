@@ -43,12 +43,25 @@ package com.sun.jersey.api.view;
  * resource class. In this respect the template is the view and the controller 
  * is the resource class in the Model View Controller pattern.
  * <p>
- * When the viewable type is processed the template name will be resolved 
- * to an fully qualifed template path (if resolvable) and the template 
- * identified by that path will be processed.
+ * The template name may be declared as absolute template name if the name
+ * begins with a '/', otherwise the template name is declared as a relative
+ * template name.
  * <p>
- * TODO specify template name to absolute template path to fully qualified 
- * template path.
+ * A relative template name requires resolving to an absolute template name
+ * when the viewable type is processed. If a resolving class is present then
+ * that class will be used to resolve the relative template name. If a resolving
+ * class is not present then the class of the last matching resource
+ * obtained from {@link javax.ws.rs.core.UriInfo#getMatchedResources() }, namely
+ * the class obtained from the expression
+ * <code>uriInfo.getMatchedResources().get(0).getClass()</code>, is utilized
+ * as the resolving class. If there are no matching resoruces then an error
+ * will result.
+ * <p>
+ * The resolving class is utilized to generate the absolution template name
+ * as follows. The base path starts with '/' character, proceeded by the fully
+ * qualified class name of the resolving class, with any '.' and '$' characters
+ * replaced with a '/' character, preceeded by a '/' character,
+ * proceeded by the relative template name.
  * 
  * @author Paul.Sandoz@Sun.Com
  */
@@ -58,6 +71,8 @@ public class Viewable {
     
     private final Object model;
 
+    private final Class<?> resolvingClass;
+
     /**
      * Construct a new viewable type with a template name and a model.
      * 
@@ -65,10 +80,25 @@ public class Viewable {
      * @param model the model.
      */
     public Viewable(String templateName, Object model) {
-        this.templateName = templateName;
-        this.model = model;
+        this(templateName, model, null);
     }
        
+    /**
+     * Construct a new viewable type with a template name, a model
+     * and a resolving class.
+     *
+     * @param templateName the template name.
+     * @param model the model.
+     * @param resolvingClass the class to use to resolve the template name
+     *        if the template is not absolute, if null then the resolving
+     *        class will be obtained from the last matching resource.
+     */
+    public Viewable(String templateName, Object model, Class<?> resolvingClass) {
+        this.templateName = templateName;
+        this.model = model;
+        this.resolvingClass = resolvingClass;
+    }
+
     /**
      * Get the template name.
      * 
@@ -85,5 +115,23 @@ public class Viewable {
      */
     public Object getModel() {
         return model;
-    }    
+    }
+
+    /**
+     * Get the resolving class.
+     *
+     * @return the resolving class.
+     */
+    public Class<?> getResolvingClass() {
+        return resolvingClass;
+    }
+
+    /**
+     * 
+     * @return true if the template name is absolute, and starts with a
+     *         '/' character
+     */
+    public boolean isTemplateNameAbsolute() {
+        return templateName.length() > 0 && templateName.charAt(0) == '/';
+    }
 }

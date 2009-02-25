@@ -50,15 +50,15 @@ import java.io.IOException;
 import java.io.PrintWriter;
 
 /**
- * Includes a side JSP file for the "it" object.
+ * Includes a side JSP file for the "resolvingClass" class.
  *
  * <p>
  * This tag looks for a side JSP file of the given name
- * from the inheritance hierarchy of the it object,
+ * from the inheritance hierarchy of the "resolvingClass" class,
  * and includes the contents of it, just like &lt;jsp:include>.
  *
  * <p>
- * For example, if the "it" object is an instance of the <tt>Foo</tt> class,
+ * For example, if the "resolvingClass" class is the <tt>Foo</tt> class,
  * which looks like the following:
  *
  * <pre>
@@ -74,16 +74,17 @@ import java.io.PrintWriter;
  * then, it looks for the following files in this order,
  * and includes the first one found.
  * <ol>
- *  <li>a side-file of the Foo class named abc.jsp (/WEB-INF/side-files/Foo/abc.jsp)
- *  <li>a side-file of the Bar class named abc.jsp (/WEB-INF/side-files/Bar/abc.jsp)
- *  <li>a side-file of the Zot class named abc.jsp (/WEB-INF/side-files/Zot/abc.jsp)
+ *  <li>a side-file of the Foo class named abc.jsp (/WEB-INF/Foo/abc.jsp)
+ *  <li>a side-file of the Bar class named abc.jsp (/WEB-INF/Bar/abc.jsp)
+ *  <li>a side-file of the Zot class named abc.jsp (/WEB-INF/Zot/abc.jsp)
  * </ol>
  *
  * @author Kohsuke Kawaguchi
+ * @author Paul.Sandoz@Sun.Com
  */
 public class Include extends SimpleTagSupport {
 
-    private Object resource;
+    private Class<?> resolvingClass;
     private String page;
 
     /**
@@ -94,10 +95,10 @@ public class Include extends SimpleTagSupport {
     }
 
     /**
-     * Specifies the object for which JSP will be included.
+     * Specifies the resolving class for which JSP will be included.
      */
-    public void setResource(Object resource) {
-        this.resource = resource;
+    public void setResolvingClass(Class<?> resolvingClass) {
+        this.resolvingClass = resolvingClass;
     }
 
     private Object getPageObject(String name) {
@@ -105,24 +106,24 @@ public class Include extends SimpleTagSupport {
     }
 
     public void doTag() throws JspException, IOException {
-        Object resource = getJspContext().getAttribute("resource", PageContext.REQUEST_SCOPE);
-        final Object oldResource = resource;
-        if (this.resource != null) {
-            resource = this.resource;
+        Class<?> resolvingClass = (Class<?>)getJspContext().getAttribute("resolvingClass", PageContext.REQUEST_SCOPE);
+        final Class<?> oldResolvingClass = resolvingClass;
+        if (this.resolvingClass != null) {
+            resolvingClass = this.resolvingClass;
         }
 
         ServletConfig cfg = (ServletConfig) getPageObject(PageContext.CONFIG);
         ServletContext sc = cfg.getServletContext();
 
         String basePath = (String)getJspContext().getAttribute("_basePath", PageContext.REQUEST_SCOPE);
-        for (Class c = resource.getClass(); c != Object.class; c = c.getSuperclass()) {
+        for (Class c = resolvingClass; c != Object.class; c = c.getSuperclass()) {
             String name = basePath + "/" + c.getName().replace('.', '/') + '/' + page;
             if (sc.getResource(name) != null) {
                 // Tomcat returns a RequestDispatcher even if the JSP file doesn't exist.
                 // so check if the resource exists first.
                 RequestDispatcher disp = sc.getRequestDispatcher(name);
                 if (disp != null) {
-                    getJspContext().setAttribute("resource", resource, PageContext.REQUEST_SCOPE);
+                    getJspContext().setAttribute("resolvingClass", resolvingClass, PageContext.REQUEST_SCOPE);
                     try {
                         HttpServletRequest request = (HttpServletRequest) getPageObject(PageContext.REQUEST);
                         disp.include(
@@ -133,14 +134,14 @@ public class Include extends SimpleTagSupport {
                     } catch (ServletException e) {
                         throw new JspException(e);
                     } finally {
-                        getJspContext().setAttribute("resource", oldResource, PageContext.REQUEST_SCOPE);
+                        getJspContext().setAttribute("resolvingClass", oldResolvingClass, PageContext.REQUEST_SCOPE);
                     }
                     return;
                 }
             }
         }
 
-        throw new JspException("Unable to find '" + page + "' for " + resource.getClass());
+        throw new JspException("Unable to find '" + page + "' for " + resolvingClass);
     }
 }
 

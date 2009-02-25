@@ -144,10 +144,24 @@ public class ProviderFactory implements ComponentProviderFactory<ComponentProvid
                     ", of the component " + c + " is not found." +
                     " The component is ignored.");
             return null;
+        } catch (InvocationTargetException ex) {
+            if (ex.getCause() instanceof NoClassDefFoundError) {
+                NoClassDefFoundError ncdf = (NoClassDefFoundError)ex.getCause();
+                LOGGER.log(Level.CONFIG,
+                        "A dependent class, " + ncdf.getLocalizedMessage() +
+                        ", of the component " + c + " is not found." +
+                        " The component is ignored.");
+                return null;
+            } else {
+                LOGGER.log(Level.SEVERE,
+                        "The provider class, " + c +
+                        ", could not be instantiated. Processing will continue but the class will not be utilized", ex);
+                return null;
+            }
         } catch (Exception ex) {
             LOGGER.log(Level.SEVERE,
                     "The provider class, " + c +
-                    ", could not be instantiated", ex);
+                    ", could not be instantiated. Processing will continue but the class will not be utilized", ex);
             return null;
         }
     }

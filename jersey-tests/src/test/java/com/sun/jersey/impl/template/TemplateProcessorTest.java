@@ -69,6 +69,16 @@ public class TemplateProcessorTest extends AbstractResourceTester {
         @POST public Viewable post() {
             return new Viewable("show", "post");
         }
+
+        @Path("absolute")
+        @GET public Viewable getAbs() {
+            return new Viewable("/com/sun/jersey/impl/template/TemplateProcessorTest/ExplicitTemplate/absolute/show", "get");
+        }
+
+        @Path("absolute")
+        @POST public Viewable postAbs() {
+            return new Viewable("/com/sun/jersey/impl/template/TemplateProcessorTest/ExplicitTemplate/absolute/show", "post");
+        }
     }
 
     public void testExplicitTemplate() throws IOException {
@@ -85,6 +95,23 @@ public class TemplateProcessorTest extends AbstractResourceTester {
         p = new Properties();
         p.load(r.post(InputStream.class));
         assertEquals("/com/sun/jersey/impl/template/TemplateProcessorTest/ExplicitTemplate/show.testp", p.getProperty("path"));
+        assertEquals("post", p.getProperty("model"));
+    }
+
+    public void testExplicitAbsoluteTemplate() throws IOException {
+        ResourceConfig rc = new DefaultResourceConfig(ExplicitTemplate.class,
+                TestTemplateProcessor.class);
+        initiateWebApplication(rc);
+        WebResource r = resource("/absolute");
+
+        Properties p = new Properties();
+        p.load(r.get(InputStream.class));
+        assertEquals("/com/sun/jersey/impl/template/TemplateProcessorTest/ExplicitTemplate/absolute/show.testp", p.getProperty("path"));
+        assertEquals("get", p.getProperty("model"));
+
+        p = new Properties();
+        p.load(r.post(InputStream.class));
+        assertEquals("/com/sun/jersey/impl/template/TemplateProcessorTest/ExplicitTemplate/absolute/show.testp", p.getProperty("path"));
         assertEquals("post", p.getProperty("model"));
     }
 

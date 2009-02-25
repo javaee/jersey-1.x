@@ -35,45 +35,63 @@
  * holder.
  */
 
-package com.sun.jersey.server.impl.template;
+package com.sun.jersey.spi.template;
 
-import com.sun.jersey.spi.template.ResolvedViewable;
-import com.sun.jersey.spi.template.TemplateContext;
-import com.sun.jersey.api.core.HttpRequestContext;
 import com.sun.jersey.api.view.Viewable;
-import com.sun.jersey.spi.uri.rules.UriRule;
-import com.sun.jersey.spi.uri.rules.UriRuleContext;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.Response;
+import java.io.IOException;
+import java.io.OutputStream;
 
 /**
- * A viewable rule that defers the request to a template. If a template
- * is not available then the rule is not accepted.
+ * A resolved {@link Viewable}.
+ * <p>
+ * A resolved viewable is obtained from the resolving method on
+ * {@link TemplateContext} and has associated with it a {@link TemplateProcessor}
+ * that is capable of processing the template, referenced by the template name,
+ * that is a fully qualified name as produced from
+ * {@link TemplateProcessor#resolve(java.lang.String).
  * 
  * @author Paul.Sandoz@Sun.Com
  */
-public class ViewableRule implements UriRule {
+public class ResolvedViewable extends Viewable {
     
-    @Context TemplateContext tc;
-    
-    public final boolean accept(CharSequence path, Object resource, UriRuleContext context) {
-        final HttpRequestContext request = context.getRequest();
-        // Only accept GET requests
-        if (!request.getMethod().equals("GET"))
-            return false;
+    private final TemplateProcessor template;
+
+    /**
+     *
+     * @param t
+     * @param fullyQualifiedTemplateName
+     * @param model
+     */
+    public ResolvedViewable(TemplateProcessor t, String fullyQualifiedTemplateName, Object model) {
+        this(t, fullyQualifiedTemplateName, model, null);
+    }
+
+    /**
+     * 
+     * @param t
+     * @param fullyQualifiedTemplateName
+     * @param model
+     * @param resolvingClass
+     */
+    public ResolvedViewable(TemplateProcessor t, String fullyQualifiedTemplateName, Object model, Class<?> resolvingClass) {
+        super(fullyQualifiedTemplateName, model, resolvingClass);
         
-        // Obtain the template path
-        final String templatePath = (path.length() > 0) ? 
-            context.getMatchResult().group(1) :
-            "";
-
-        // Resolve the viewable
-        Viewable v = new Viewable(templatePath, resource);
-        ResolvedViewable rv = tc.resolveViewable(v);
-        if (rv == null)
-            return false;
-
-        context.getResponse().setResponse(Response.ok(rv).build());
-        return true;
+        this.template = t;
+    }
+    
+    /**
+     * Write to the template, that is referenced by the fully qualified
+     * template name.
+     * <p>
+     * The model of the resolved viewable is passed to the template.
+     * 
+     * @param out the output stream that the template processor writes
+     *        the processing of the template referenced by the fully qualified
+     *        template name.
+     * 
+     * @throws java.io.IOException
+     */
+    public void writeTo(OutputStream out) throws IOException {
+        template.writeTo(getTemplateName(), getModel(), out);
     }
 }

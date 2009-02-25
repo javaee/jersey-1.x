@@ -37,18 +37,22 @@
 
 package com.sun.jersey.server.impl.template;
 
+import com.sun.jersey.spi.template.ResolvedViewable;
+import com.sun.jersey.api.view.Viewable;
 import com.sun.jersey.core.spi.component.ProviderServices;
 import com.sun.jersey.spi.template.TemplateProcessor;
 import com.sun.jersey.spi.template.TemplateContext;
+import com.sun.jersey.spi.template.TemplateContextException;
+import java.lang.Class;
+import java.util.List;
 import java.util.Set;
-import java.util.logging.Logger;
+import javax.ws.rs.core.UriInfo;
 
 /**
  *
  * @author Paul.Sandoz@Sun.Com
  */
 public final class TemplateFactory implements TemplateContext {
-    private static final Logger LOGGER = Logger.getLogger(TemplateFactory.class.getName());
     
     private final Set<TemplateProcessor> templates;
     
@@ -61,5 +65,85 @@ public final class TemplateFactory implements TemplateContext {
     
     public Set<TemplateProcessor> getTemplateProcessors() {
         return templates;
-    }    
+    }
+
+    public ResolvedViewable resolveViewable(Viewable v) {
+        if (v.isTemplateNameAbsolute()) {
+            return resolveAbsoluteViewable(v);
+        } else if (v.getResolvingClass() != null) {
+            return resolveRelativeViewable(v, v.getResolvingClass());
+        } else {
+            if (v.getModel() == null)
+                throw new TemplateContextException("The model of the view MUST not be null");
+
+            return resolveRelativeViewable(v, v.getModel().getClass());
+        }
+    }
+
+    public ResolvedViewable resolveViewable(Viewable v, UriInfo ui) {
+        if (v.isTemplateNameAbsolute()) {
+            return resolveAbsoluteViewable(v);
+        } else if (v.getResolvingClass() != null) {
+            return resolveRelativeViewable(v, v.getResolvingClass());
+        } else {
+            final List<Object> mrs = ui.getMatchedResources();
+            if (mrs == null || mrs.size() == 0)
+                throw new TemplateContextException("There is no last matching resource available");
+
+            return resolveRelativeViewable(v, mrs.get(0).getClass());
+        }
+    }
+
+    public ResolvedViewable resolveViewable(Viewable v, Class<?> resolvingClass) {
+        if (v.isTemplateNameAbsolute()) {
+            return resolveAbsoluteViewable(v);
+        } else if (v.getResolvingClass() != null) {
+            return resolveRelativeViewable(v, v.getResolvingClass());
+        } else {
+            if (resolvingClass == null)
+                throw new TemplateContextException("Resolving class MUST not be null");
+            
+            return resolveRelativeViewable(v, resolvingClass);
+        }
+    }
+
+    
+    private ResolvedViewable resolveAbsoluteViewable(Viewable v) {
+        for (TemplateProcessor t : getTemplateProcessors()) {
+            String resolvedPath = t.resolve(v.getTemplateName());
+            if (resolvedPath != null) {
+                return new ResolvedViewable(t, resolvedPath, v.getModel());
+            }
+        }
+
+        return null;
+    }
+
+    private ResolvedViewable resolveRelativeViewable(Viewable v, Class<?> resolvingClass) {
+        String path = v.getTemplateName();
+        if (path == null || path.length() == 0)
+            path = "index";
+
+        for (Class c = resolvingClass; c != Object.class; c = c.getSuperclass()) {
+            String absolutePath = getAbsolutePath(c, path);
+
+            for (TemplateProcessor t : getTemplateProcessors()) {
+                String resolvedPath = t.resolve(absolutePath);
+                if (resolvedPath != null) {
+                    return new ResolvedViewable(t, resolvedPath, v.getModel(), c);
+                }
+            }
+        }
+
+        return null;
+    }
+
+    private String getAbsolutePath(Class<?> resourceClass, String path) {
+        return getAbsolutePath(resourceClass) + '/' + path;
+    }
+
+    private String getAbsolutePath(Class<?> resourceClass) {
+        return "/" + resourceClass.getName().replace('.', '/').replace('$', '/');
+    }
+
 }

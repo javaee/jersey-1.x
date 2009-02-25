@@ -37,6 +37,8 @@
 
 package com.sun.jersey.server.impl.container.servlet;
 
+import com.sun.jersey.api.core.HttpContext;
+import com.sun.jersey.spi.template.ResolvedViewable;
 import java.io.IOException;
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
@@ -48,22 +50,25 @@ import javax.servlet.ServletResponse;
  * @author Paul.Sandoz@Sun.Com
  */
 public final class RequestDispatcherWrapper implements RequestDispatcher {
+    private final HttpContext hc;
     private final String basePath;
     private final RequestDispatcher d;
-    private final Object resource;
     private final Object it;
 
-    public RequestDispatcherWrapper(String basePath, RequestDispatcher d, Object resource, Object it) {
-        this.basePath = basePath;
+    public RequestDispatcherWrapper(RequestDispatcher d, String basePath, HttpContext hc, Object it) {
         this.d = d;
-        this.resource = resource;
+        this.basePath = basePath;
+        this.hc = hc;
         this.it = it;
     }
 
     public void forward(ServletRequest req, ServletResponse rsp) throws ServletException, IOException {
-        req.setAttribute("_basePath", basePath);
-        req.setAttribute("resource", resource);
+        ResolvedViewable rv = (ResolvedViewable)hc.getProperties().get("com.sun.jersey.spi.template.ResolvedViewable");
+
+        req.setAttribute("httpContext", hc);
+        req.setAttribute("resolvingClass", rv.getResolvingClass());
         req.setAttribute("it", it);
+        req.setAttribute("_basePath", basePath);
         req.setAttribute("_request", req);
         req.setAttribute("_response", rsp);
         d.forward(req,rsp);

@@ -35,25 +35,49 @@
  * holder.
  */
 
-package com.sun.jersey.server.impl.template;
+package com.sun.jersey.impl.template;
 
-import com.sun.jersey.spi.template.TemplateProcessor;
+import com.sun.jersey.api.client.WebResource;
+import com.sun.jersey.api.core.DefaultResourceConfig;
+import com.sun.jersey.api.core.ResourceConfig;
 import com.sun.jersey.api.view.Viewable;
+import com.sun.jersey.impl.AbstractResourceTester;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Properties;
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
 
 /**
  *
  * @author Paul.Sandoz@Sun.Com
  */
-public class ResolvedViewable extends Viewable {
-    private final TemplateProcessor template;
+public class ResolvingClassTemplateProcessorTest extends AbstractResourceTester {
     
-    public ResolvedViewable(TemplateProcessor t, String absolutePath, Object model) {
-        super(absolutePath, model);
-        
-        this.template = t;
+    public ResolvingClassTemplateProcessorTest(String testName) {
+        super(testName);
+    }
+
+    public static class ResolvingClass {
     }
     
-    public TemplateProcessor getTemplate() {
-        return template;
+    @Path("/")
+    public static class ExplicitTemplate {
+        @GET public Viewable get() {
+            return new Viewable("show", "get", ResolvingClass.class);
+        }
     }
+
+    public void testExplicitTemplate() throws IOException {
+        ResourceConfig rc = new DefaultResourceConfig(ExplicitTemplate.class,
+                TestTemplateProcessor.class);
+        initiateWebApplication(rc);
+        WebResource r = resource("/");
+
+        Properties p = new Properties();
+        p.load(r.get(InputStream.class));
+        assertEquals("/com/sun/jersey/impl/template/ResolvingClassTemplateProcessorTest/ResolvingClass/show.testp", p.getProperty("path"));
+        assertEquals("get", p.getProperty("model"));
+    }
+
 }

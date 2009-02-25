@@ -155,11 +155,11 @@ public final class ResourceClass {
         UriRules<UriRule> atomicRules = UriRulesFactory.create(rulesMap);
         
         // Create the end sequential rules, zero or more may be matched
-        ComponentInjector<ViewableRule> ci = new ComponentInjector(injectableContext,
-                ViewableRule.class);
         List<PatternRulePair<UriRule>> patterns = new ArrayList<PatternRulePair<UriRule>>();
         if (config.getFeature(ResourceConfig.FEATURE_IMPLICIT_VIEWABLES)) {
             ViewableRule r = new ViewableRule();
+            ComponentInjector<ViewableRule> ci = new ComponentInjector(injectableContext,
+                    ViewableRule.class);
             ci.inject(r);
 
             // The matching rule for a sub-resource template

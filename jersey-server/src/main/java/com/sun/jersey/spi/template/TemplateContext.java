@@ -36,10 +36,13 @@
  */
 package com.sun.jersey.spi.template;
 
+import com.sun.jersey.api.view.Viewable;
 import java.util.Set;
+import javax.ws.rs.core.UriInfo;
 
 /**
- * The context for getting template processors.
+ * The context for resolving an instance of {@link Viewable} to
+ * an instance of {@link ResolvedViewable}.
  * 
  * @author Paul.Sandoz@Sun.Com
  */
@@ -51,4 +54,30 @@ public interface TemplateContext {
      * @return the set of template processors.
      */
     Set<TemplateProcessor> getTemplateProcessors();
+
+    /**
+     *
+     * @param v
+     * @return
+     * @throws TemplateContextException
+     */
+    ResolvedViewable resolveViewable(Viewable v) throws TemplateContextException;
+
+    /**
+     *
+     * @param v
+     * @param ui
+     * @return
+     * @throws TemplateContextException
+     */
+    ResolvedViewable resolveViewable(Viewable v, UriInfo ui) throws TemplateContextException;
+
+    /**
+     * 
+     * @param v
+     * @param resolvingClass
+     * @return
+     * @throws TemplateContextException
+     */
+    ResolvedViewable resolveViewable(Viewable v, Class<?> resolvingClass) throws TemplateContextException;
 }

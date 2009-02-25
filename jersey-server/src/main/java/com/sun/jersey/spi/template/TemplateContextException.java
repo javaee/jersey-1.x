@@ -35,45 +35,49 @@
  * holder.
  */
 
-package com.sun.jersey.server.impl.template;
+package com.sun.jersey.spi.template;
 
-import com.sun.jersey.spi.template.ResolvedViewable;
-import com.sun.jersey.spi.template.TemplateContext;
-import com.sun.jersey.api.core.HttpRequestContext;
+import com.sun.jersey.api.container.ContainerException;
 import com.sun.jersey.api.view.Viewable;
-import com.sun.jersey.spi.uri.rules.UriRule;
-import com.sun.jersey.spi.uri.rules.UriRuleContext;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.Response;
 
 /**
- * A viewable rule that defers the request to a template. If a template
- * is not available then the rule is not accepted.
- * 
- * @author Paul.Sandoz@Sun.Com
+ * A rutime expception associated with errors when resolving a
+ * {@link Viewable} to a {@link ResolvedViewable} by methods on
+ * {@link TemplateContext}.
+ *
+ * @author Paul.Sandoz.@Sun.Com
  */
-public class ViewableRule implements UriRule {
-    
-    @Context TemplateContext tc;
-    
-    public final boolean accept(CharSequence path, Object resource, UriRuleContext context) {
-        final HttpRequestContext request = context.getRequest();
-        // Only accept GET requests
-        if (!request.getMethod().equals("GET"))
-            return false;
+public class TemplateContextException extends ContainerException {
+
+    /**
+     * Construct a new instance with the supplied message
+     */
+    public TemplateContextException() {
+        super();
+    }
+
+    /**
+     * Construct a new instance with the supplied message
+     * @param message the message
+     */
+    public TemplateContextException(String message) {
+        super(message);
+    }
+
+    /**
+     * Construct a new instance with the supplied message and cause
+     * @param message the message
+     * @param cause the Throwable that caused the exception to be thrown
+     */
+    public TemplateContextException(String message, Throwable cause) {
+        super(message, cause);
+    }
         
-        // Obtain the template path
-        final String templatePath = (path.length() > 0) ? 
-            context.getMatchResult().group(1) :
-            "";
-
-        // Resolve the viewable
-        Viewable v = new Viewable(templatePath, resource);
-        ResolvedViewable rv = tc.resolveViewable(v);
-        if (rv == null)
-            return false;
-
-        context.getResponse().setResponse(Response.ok(rv).build());
-        return true;
+    /**
+     * Construct a new instance with the supplied cause
+     * @param cause the Throwable that caused the exception to be thrown
+     */
+    public TemplateContextException(Throwable cause) {
+        super(cause);
     }
 }

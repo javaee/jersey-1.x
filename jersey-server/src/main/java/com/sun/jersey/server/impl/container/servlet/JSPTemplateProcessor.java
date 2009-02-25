@@ -38,8 +38,10 @@
 package com.sun.jersey.server.impl.container.servlet;
 
 import com.sun.jersey.api.container.ContainerException;
+import com.sun.jersey.api.core.HttpContext;
 import com.sun.jersey.api.core.ResourceConfig;
 import com.sun.jersey.spi.container.servlet.ServletContainer;
+import com.sun.jersey.spi.template.ResolvedViewable;
 import com.sun.jersey.spi.template.TemplateProcessor;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -57,6 +59,8 @@ import javax.ws.rs.core.UriInfo;
  * @author Paul.Sandoz@Sun.Com
  */
 public class JSPTemplateProcessor implements TemplateProcessor {
+    @Context HttpContext hc;
+    
     @Context ServletContext servletContext;
     
     @Context UriInfo ui;
@@ -118,8 +122,8 @@ public class JSPTemplateProcessor implements TemplateProcessor {
         if (d == null) {
             throw new ContainerException("No request dispatcher for: " + resolvedPath);
         }
-                
-        d = new RequestDispatcherWrapper(basePath, d, ui.getMatchedResources().get(0), model);
+
+        d = new RequestDispatcherWrapper(d, basePath, hc, model);
         
         try {
             d.forward(requestInvoker.get(), responseInvoker.get());
