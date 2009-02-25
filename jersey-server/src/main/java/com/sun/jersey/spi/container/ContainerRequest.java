@@ -586,18 +586,21 @@ public class ContainerRequest implements HttpRequestContext {
         return r;        
     }
         
-    private ResponseBuilder evaluateIfMatch(EntityTag eTag) {
+    private ResponseBuilder evaluateIfMatch(EntityTag eTag) {        
+        Set<MatchingEntityTag> matchingTags = HttpHelper.getIfMatch(this);
+        if (matchingTags == null) {
+            return null;
+        }
+
         // The strong comparison function must be used to compare the entity
         // tags. Thus if the entity tag of the entity is weak then matching
         // of entity tags in the If-Match header should fail.
         if (eTag.isWeak()) {
             return Responses.preconditionFailed();
         }
-        
-        Set<MatchingEntityTag> matchingTags = HttpHelper.getIfMatch(this);
-        if (matchingTags != null &&
-                matchingTags != MatchingEntityTag.ANY_MATCH &&
-                !matchingTags.contains(eTag)) {
+
+        if (matchingTags != MatchingEntityTag.ANY_MATCH &&
+            !matchingTags.contains(eTag)) {
             // 412 Precondition Failed
             return Responses.preconditionFailed();
         }
@@ -627,14 +630,11 @@ public class ContainerRequest implements HttpRequestContext {
                 return Response.notModified(eTag);
             }
 
-            if (!eTag.isWeak()) {
-                if (matchingTags.contains(eTag)) {
-                    // 304 Not modified
-                    return Response.notModified(eTag);
-                }
-            } else if (matchingTags.contains(eTag) || matchingTags.contains(new EntityTag(eTag.getValue()))) {
+            // The weak comparison function may be used to compare entity tags
+            if (matchingTags.contains(eTag) || matchingTags.contains(new EntityTag(eTag.getValue(), !eTag.isWeak()))) {
                 // 304 Not modified
                 return Response.notModified(eTag);
+
             }
         } else {
             // The strong comparison function must be used to compare the entity

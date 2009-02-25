@@ -1,4 +1,13 @@
 release 1.0.3 (2009-03/04)
+- Fixed issue 228
+  https://jersey.dev.java.net/issues/show_bug.cgi?id=228
+  Precondition support is now working correctly for If-None-Match and
+  in combination with If-Unmodified-Since for GET, HEAD and other HTTP
+  methods.
+  In addition entity tag matching works correctly if there is more than one 
+  entity tag to be matched in a If-Match and If-None-Match header, and entity
+  tag matching works correctly using the weak and strong comparison functions
+  as required.
 - Fixed issue 224
   https://jersey.dev.java.net/issues/show_bug.cgi?id=224
   When a UniformInterfaceException is thrown by Async/WebResource then

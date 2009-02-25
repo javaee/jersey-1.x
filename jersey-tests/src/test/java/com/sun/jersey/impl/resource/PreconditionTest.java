@@ -249,7 +249,12 @@ public class PreconditionTest extends AbstractResourceTester {
         ClientResponse response = resource("/").
                 header("If-Match", "\"1\"").
                 get(ClientResponse.class);
-        assertEquals(200, response.getStatus());        
+        assertEquals(200, response.getStatus());
+        
+        response = resource("/", false).
+                header("If-Match", "W/\"1\"").
+                get(ClientResponse.class);
+        assertEquals(412, response.getStatus());
     }
     
     public void testIfMatchWithMatchingETag_PUT() {
@@ -258,6 +263,11 @@ public class PreconditionTest extends AbstractResourceTester {
                 header("If-Match", "\"1\"").
                 put(ClientResponse.class);
         assertEquals(200, response.getStatus());
+
+        response = resource("/", false).
+                header("If-Match", "W/\"1\"").
+                put(ClientResponse.class);
+        assertEquals(412, response.getStatus());
     }
 
     public void testIfMatchWithoutMatchingETag() {
@@ -265,13 +275,23 @@ public class PreconditionTest extends AbstractResourceTester {
         ClientResponse response = resource("/", false).
                 header("If-Match", "\"2\"").
                 get(ClientResponse.class);
-        assertEquals(412, response.getStatus());        
+        assertEquals(412, response.getStatus());
+
+        response = resource("/", false).
+                header("If-Match", "W/\"2\"").
+                get(ClientResponse.class);
+        assertEquals(412, response.getStatus());
     }
     
     public void testIfMatchWithoutMatchingETag_PUT() {
         initiateWebApplication(EtagResource.class);
         ClientResponse response = resource("/", false).
                 header("If-Match", "\"2\"").
+                put(ClientResponse.class);
+        assertEquals(412, response.getStatus());
+
+        response = resource("/", false).
+                header("If-Match", "W/\"2\"").
                 put(ClientResponse.class);
         assertEquals(412, response.getStatus());
     }
@@ -299,6 +319,12 @@ public class PreconditionTest extends AbstractResourceTester {
                 get(ClientResponse.class);
         assertEquals(304, response.getStatus());
         assertEquals(new EntityTag("1"), response.getEntityTag());
+
+        response = resource("/", false).
+                header("If-None-Match", "W/\"1\"").
+                get(ClientResponse.class);
+        assertEquals(304, response.getStatus());
+        assertEquals(new EntityTag("1"), response.getEntityTag());
     }
     
     public void testIfNonMatchWithMatchingETag_PUT() {
@@ -307,6 +333,11 @@ public class PreconditionTest extends AbstractResourceTester {
                 header("If-None-Match", "\"1\"").
                 put(ClientResponse.class);
         assertEquals(412, response.getStatus());
+
+        response = resource("/", false).
+                header("If-None-Match", "W/\"1\"").
+                put(ClientResponse.class);
+        assertEquals(200, response.getStatus());
     }
 
     public void testIfNonMatchWithoutMatchingETag() {
@@ -315,12 +346,22 @@ public class PreconditionTest extends AbstractResourceTester {
                 header("If-None-Match", "\"2\"").
                 get(ClientResponse.class);
         assertEquals(200, response.getStatus());
+
+        response = resource("/").
+                header("If-None-Match", "W/\"2\"").
+                get(ClientResponse.class);
+        assertEquals(200, response.getStatus());
     }
     
     public void testIfNonMatchWithoutMatchingETag_PUT() {
         initiateWebApplication(EtagResource.class);
         ClientResponse response = resource("/").
                 header("If-None-Match", "\"2\"").
+                put(ClientResponse.class);
+        assertEquals(200, response.getStatus());
+        
+        response = resource("/", false).
+                header("If-None-Match", "W/\"2\"").
                 put(ClientResponse.class);
         assertEquals(200, response.getStatus());
     }
@@ -414,6 +455,209 @@ public class PreconditionTest extends AbstractResourceTester {
                 put(ClientResponse.class);
         assertEquals(412, response.getStatus());
     }
+
+    public void testIfNonMatchWithMultipleMatchingETag() {
+        initiateWebApplication(EtagResource.class);
+        ClientResponse response = resource("/", false).
+                header("If-None-Match", "\"xxxx\", \"1\", \"yyyy\"").
+                get(ClientResponse.class);
+        assertEquals(304, response.getStatus());
+        assertEquals(new EntityTag("1"), response.getEntityTag());
+
+        response = resource("/", false).
+                header("If-None-Match", "\"xxxx\", W/\"1\", \"yyyy\"").
+                get(ClientResponse.class);
+        assertEquals(304, response.getStatus());
+        assertEquals(new EntityTag("1"), response.getEntityTag());
+    }
+
+
+    @Path("/")
+    public static class WeakEtagResource {
+        @Context Request request;
+
+        @GET
+        public Response doGet() {
+            ResponseBuilder rb = request.evaluatePreconditions(new EntityTag("1", true));
+            if (rb != null)
+                return rb.build();
+
+            return Response.ok("foo", "text/plain").build();
+        }
+
+        @PUT
+        public Response doPut() {
+            ResponseBuilder rb = request.evaluatePreconditions(new EntityTag("1", true));
+            if (rb != null)
+                return rb.build();
+
+            return Response.ok("foo", "text/plain").build();
+        }
+    }
+
+    public void testIfMatchWithMatchingWeakETag() {
+        initiateWebApplication(WeakEtagResource.class);
+        ClientResponse response = resource("/", false).
+                header("If-Match", "\"1\"").
+                get(ClientResponse.class);
+        assertEquals(412, response.getStatus());
+
+        response = resource("/", false).
+                header("If-Match", "W/\"1\"").
+                get(ClientResponse.class);
+        assertEquals(412, response.getStatus());
+    }
+
+    public void testIfMatchWithMatchingWeakETag_PUT() {
+        initiateWebApplication(WeakEtagResource.class);
+        ClientResponse response = resource("/", false).
+                header("If-Match", "\"1\"").
+                put(ClientResponse.class);
+        assertEquals(412, response.getStatus());
+
+        response = resource("/", false).
+                header("If-Match", "W/\"1\"").
+                put(ClientResponse.class);
+        assertEquals(412, response.getStatus());
+    }
+
+    public void testIfMatchWithoutMatchingWeakETag() {
+        initiateWebApplication(WeakEtagResource.class);
+        ClientResponse response = resource("/", false).
+                header("If-Match", "\"2\"").
+                get(ClientResponse.class);
+        assertEquals(412, response.getStatus());
+
+        response = resource("/", false).
+                header("If-Match", "W/\"2\"").
+                get(ClientResponse.class);
+        assertEquals(412, response.getStatus());
+    }
+
+    public void testIfMatchWithoutMatchingWeakETag_PUT() {
+        initiateWebApplication(WeakEtagResource.class);
+        ClientResponse response = resource("/", false).
+                header("If-Match", "\"2\"").
+                put(ClientResponse.class);
+        assertEquals(412, response.getStatus());
+
+        response = resource("/", false).
+                header("If-Match", "W/\"2\"").
+                put(ClientResponse.class);
+        assertEquals(412, response.getStatus());
+    }
+
+    public void testIfMatchWildCardWeak() {
+        initiateWebApplication(WeakEtagResource.class);
+        ClientResponse response = resource("/", false).
+                header("If-Match", "*").
+                get(ClientResponse.class);
+        assertEquals(412, response.getStatus());
+    }
+
+    public void testIfMatchWildCardWeak_PUT() {
+        initiateWebApplication(WeakEtagResource.class);
+        ClientResponse response = resource("/", false).
+                header("If-Match", "*").
+                put(ClientResponse.class);
+        assertEquals(412, response.getStatus());
+    }
+
+    public void testIfNonMatchWithMatchingWeakETag() {
+        initiateWebApplication(WeakEtagResource.class);
+        ClientResponse response = resource("/", false).
+                header("If-None-Match", "\"1\"").
+                get(ClientResponse.class);
+        assertEquals(304, response.getStatus());
+        assertEquals(new EntityTag("1", true), response.getEntityTag());
+
+        response = resource("/", false).
+                header("If-None-Match", "W/\"1\"").
+                get(ClientResponse.class);
+        assertEquals(304, response.getStatus());
+        assertEquals(new EntityTag("1", true), response.getEntityTag());
+    }
+
+    public void testIfNonMatchWithMatchingWeakETag_PUT() {
+        initiateWebApplication(WeakEtagResource.class);
+        ClientResponse response = resource("/").
+                header("If-None-Match", "\"1\"").
+                put(ClientResponse.class);
+        assertEquals(200, response.getStatus());
+
+        response = resource("/").
+                header("If-None-Match", "W/\"1\"").
+                put(ClientResponse.class);
+        assertEquals(200, response.getStatus());
+    }
+
+    public void testIfNonMatchWithoutMatchingWeakETag() {
+        initiateWebApplication(WeakEtagResource.class);
+        ClientResponse response = resource("/").
+                header("If-None-Match", "\"2\"").
+                get(ClientResponse.class);
+        assertEquals(200, response.getStatus());
+
+        response = resource("/").
+                header("If-None-Match", "W/\"2\"").
+                get(ClientResponse.class);
+        assertEquals(200, response.getStatus());
+    }
+
+    public void testIfNonMatchWithoutMatchingWeakETag_PUT() {
+        initiateWebApplication(WeakEtagResource.class);
+        ClientResponse response = resource("/").
+                header("If-None-Match", "\"2\"").
+                put(ClientResponse.class);
+        assertEquals(200, response.getStatus());
+
+        response = resource("/").
+                header("If-None-Match", "W/\"2\"").
+                put(ClientResponse.class);
+        assertEquals(200, response.getStatus());
+    }
+
+    public void testIfNonMatchWildCardWeak() {
+        initiateWebApplication(WeakEtagResource.class);
+        ClientResponse response = resource("/", false).
+                header("If-None-Match", "*").
+                get(ClientResponse.class);
+        assertEquals(304, response.getStatus());
+        assertEquals(new EntityTag("1", true), response.getEntityTag());
+    }
+
+    public void testIfNonMatchWildCardWeak_PUT() {
+        initiateWebApplication(WeakEtagResource.class);
+        ClientResponse response = resource("/").
+                header("If-None-Match", "*").
+                put(ClientResponse.class);
+        assertEquals(200, response.getStatus());
+    }
+
+    public void testIfNonMatchWithMultipleMatchingWeakETag() {
+        initiateWebApplication(WeakEtagResource.class);
+        ClientResponse response = resource("/", false).
+                header("If-None-Match", "\"xxxx\", \"1\", \"yyyy\"").
+                get(ClientResponse.class);
+        assertEquals(304, response.getStatus());
+        assertEquals(new EntityTag("1", true), response.getEntityTag());
+
+        response = resource("/", false).
+                header("If-None-Match", "\"xxxx\", W/\"1\", \"yyyy\"").
+                get(ClientResponse.class);
+        assertEquals(304, response.getStatus());
+        assertEquals(new EntityTag("1", true), response.getEntityTag());
+    }
+
+    
+
+
+
+
+
+
+
+
 
 
 
