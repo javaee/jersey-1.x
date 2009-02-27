@@ -48,7 +48,32 @@
 	<dependencies>
 		<dependency>
 			<groupId>com.sun.jersey</groupId>
+			<artifactId>jersey-core</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+			<dependency>
+			<groupId>com.sun.jersey</groupId>
+			<artifactId>jersey-server</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+			<dependency>
+			<groupId>com.sun.jersey</groupId>
+			<artifactId>jersey-client</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+			<dependency>
+			<groupId>com.sun.jersey</groupId>
+			<artifactId>jersey-fastinfoset</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+			<dependency>
+			<groupId>com.sun.jersey</groupId>
 			<artifactId>jersey-json</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+			<dependency>
+			<groupId>com.sun.jersey</groupId>
+			<artifactId>jersey-atom</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 	</dependencies>
