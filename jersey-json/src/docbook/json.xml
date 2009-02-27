@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.4//EN"
+                 "http://www.oasis-open.org/docbook/xml/4.4/docbookx.dtd">
+<chapter id="json">
+<title>JSON Support</title>
+<para>
+TBD...
+
+<!--mediaobject>
+  <imageobject>
+    <imagedata fileref="includes/json-object.gif" format="GIF"/>
+  </imageobject>
+  <textobject>
+    <phrase>JSON Object</phrase>
+  </textobject>
+  <caption>
+    <para>JSON Object...
+    </para>
+  </caption>
+</mediaobject-->
+</para>
+</chapter>
+

@@ -1,0 +1,25 @@
+<assembly>
+  <id>docbook</id>
+  <includeBaseDirectory>false</includeBaseDirectory>
+  <formats>
+    <format>zip</format>
+  </formats>
+  <fileSets>
+    <fileSet>
+      <directory>src/docbook</directory>
+      <outputDirectory></outputDirectory>
+    </fileSet>
+     <fileSet>
+      <directory>${assembly.directory}/docbook</directory>
+      <outputDirectory></outputDirectory>
+    </fileSet>
+    <fileSet>
+      <directory>${project.build.directory}/docbook</directory>
+      <includes>
+        <include>*.html</include>
+        <include>*.pdf</include>
+      </includes>
+      <outputDirectory></outputDirectory>
+    </fileSet>
+   </fileSets>
+</assembly>

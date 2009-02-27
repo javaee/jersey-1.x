@@ -107,6 +107,7 @@
         <module>archetypes</module>
         <module>archive</module>
         <module>glassfish</module>
+        <module>jersey-documentation</module>
     </modules>
     <build>
         <plugins>

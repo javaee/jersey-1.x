@@ -41,116 +41,86 @@
 		<groupId>com.sun.jersey</groupId>
 		<artifactId>jersey-project</artifactId>
 		<version>1.0.3-SNAPSHOT</version>
-      <!--relativePath>../pom.xml</relativePath-->
 	</parent>
-	<artifactId>jersey-json</artifactId>
-	<packaging>jar</packaging>
-	<name>jersey-json</name>
+	<artifactId>jersey-documentation</artifactId>
+	<packaging>pom</packaging>
+	<name>jersey-documentation</name>
 	<dependencies>
 		<dependency>
 			<groupId>com.sun.jersey</groupId>
-			<artifactId>jersey-core</artifactId>
+			<artifactId>jersey-json</artifactId>
 			<version>${project.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.codehaus.jettison</groupId>
-			<artifactId>jettison</artifactId>
-			<version>1.0.1</version>
-		</dependency>
-		<dependency>
-			<groupId>com.sun.xml.bind</groupId>
-			<artifactId>jaxb-impl</artifactId>
-			<version>2.1.10</version>
-		</dependency>
-		<dependency>
-			<groupId>org.codehaus.jackson</groupId>
-			<artifactId>jackson-lgpl</artifactId>
-			<version>0.9.4</version>
-			<scope>compile</scope>
-		</dependency>
-		<dependency>
-			<groupId>junit</groupId>
-			<artifactId>junit</artifactId>
-			<version>3.8.1</version>
-			<scope>test</scope>
 		</dependency>
 	</dependencies>
 	<build>
-		<resources>
-			<resource>
-				<directory>${basedir}/src/main/java</directory>
-				<includes>
-					<include>META-INF/**/*</include>
-				</includes>
-			</resource>
-		</resources>
 		<plugins>
 			<plugin>
-				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>build-helper-maven-plugin</artifactId>
-				<executions>
-					<execution>
-						<id>add-source</id>
-						<phase>generate-sources</phase>
-						<goals>
-							<goal>add-source</goal>
-						</goals>
-						<configuration>
-							<sources>
-								<source>${project.build.directory}/generated-sources</source>
-							</sources>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>
-			<plugin>
-				<groupId>com.sun.istack</groupId>
-				<artifactId>maven-istack-commons-plugin</artifactId>
-				<version>0.1-SNAPSHOT</version>
-				<executions>
-					<execution>
-						<phase>generate-sources</phase>
-						<configuration>
-							<resources>
-								<directory>${basedir}/src/main/resources</directory>
-								<includes>
-									<include>**/*.properties</include>
-								</includes>
-							</resources>
-							<destDir>${project.build.directory}/generated-sources</destDir>
-						</configuration>
-						<goals>
-							<goal>rs-gen</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
-			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-javadoc-plugin</artifactId>
-				<configuration>
-					<excludePackageNames>com.sun.jersey.json.impl</excludePackageNames>
-				</configuration>
+				<artifactId>maven-dependency-plugin</artifactId>
 				<executions>
 					<execution>
-						<id>attach-javadocs</id>
+						<id>unpack</id>
+						<phase>generate-sources</phase>
 						<goals>
-							<goal>jar</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
-			<plugin>
-				<groupId>de.jflex.maven.plugin</groupId>
-				<artifactId>maven-jflex-plugin</artifactId>
-				<version>0.2</version>
-				<executions>
-					<execution>
-						<goals>
-							<goal>generate</goal>
+							<goal>unpack</goal>
 						</goals>
 						<configuration>
-							<outputDirectory>${project.build.directory}/generated-sources</outputDirectory>
+							<artifactItems>
+								<artifactItem>
+									<groupId>com.sun.jersey</groupId>
+									<artifactId>jersey-core</artifactId>
+									<version>${version}</version>
+									<type>zip</type>
+									<classifier>docbook</classifier>
+									<overWrite>false</overWrite>
+									<outputDirectory>${assembly.directory}/docbook</outputDirectory>
+								</artifactItem>
+									<artifactItem>
+									<groupId>com.sun.jersey</groupId>
+									<artifactId>jersey-server</artifactId>
+									<version>${version}</version>
+									<type>zip</type>
+									<classifier>docbook</classifier>
+									<overWrite>false</overWrite>
+									<outputDirectory>${assembly.directory}/docbook</outputDirectory>
+								</artifactItem>
+									<artifactItem>
+									<groupId>com.sun.jersey</groupId>
+									<artifactId>jersey-client</artifactId>
+									<version>${version}</version>
+									<type>zip</type>
+									<classifier>docbook</classifier>
+									<overWrite>false</overWrite>
+									<outputDirectory>${assembly.directory}/docbook</outputDirectory>
+								</artifactItem>
+									<artifactItem>
+									<groupId>com.sun.jersey</groupId>
+									<artifactId>jersey-fastinfoset</artifactId>
+									<version>${version}</version>
+									<type>zip</type>
+									<classifier>docbook</classifier>
+									<overWrite>false</overWrite>
+									<outputDirectory>${assembly.directory}/docbook</outputDirectory>
+								</artifactItem>
+									<artifactItem>
+									<groupId>com.sun.jersey</groupId>
+									<artifactId>jersey-json</artifactId>
+									<version>${version}</version>
+									<type>zip</type>
+									<classifier>docbook</classifier>
+									<overWrite>false</overWrite>
+									<outputDirectory>${assembly.directory}/docbook</outputDirectory>
+								</artifactItem>
+									<artifactItem>
+									<groupId>com.sun.jersey</groupId>
+									<artifactId>jersey-atom</artifactId>
+									<version>${version}</version>
+									<type>zip</type>
+									<classifier>docbook</classifier>
+									<overWrite>false</overWrite>
+									<outputDirectory>${assembly.directory}/docbook</outputDirectory>
+								</artifactItem>
+							</artifactItems>
 						</configuration>
 					</execution>
 				</executions>
@@ -167,19 +137,30 @@
 					</dependency>
 				</dependencies>
 				<configuration>
+					<xincludeSupported>true</xincludeSupported>
           <sourceDirectory>src/docbook</sourceDirectory>
           <targetDirectory>${project.build.directory}/docbook</targetDirectory>
-					<!--calloutGraphicsPath>src/docbook/includes</calloutGraphicsPath-->
+					<entities>
+						<entity>
+							<name>version</name>
+							<value>${version}</value>
+						</entity>
+						<entity>
+							<name>docbooksrc</name>
+							<value>${assembly.directory}/docbook</value>
+						</entity>
+					</entities>
 				</configuration>
 				<executions>
 					<execution>
 						<goals>
 							<goal>generate-html</goal>
+							<goal>generate-pdf</goal>
 						</goals>
 						<phase>package</phase>
 					</execution>
 				</executions>
-			</plugin>
+				</plugin>
 			<plugin>
 				<artifactId>maven-assembly-plugin</artifactId>
 				<configuration>
@@ -197,27 +178,33 @@
 					</execution>
 				</executions>
 			</plugin>
-		</plugins>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>build-helper-maven-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>attach-artifacts</id>
+            <phase>package</phase>
+            <goals>
+              <goal>attach-artifact</goal>
+            </goals>
+            <configuration>
+              <artifacts>
+                <artifact>
+                  <file>${project.build.directory}/docbook/user-guide.pdf</file>
+                  <type>pdf</type>
+                  <classifier>user-guide</classifier>
+                </artifact>
+              </artifacts>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+			</plugins>
 	</build>
-	<pluginRepositories>
-		<pluginRepository>
-			<id>jflex</id>
-			<name>JFlex repository</name>
-			<url>http://jflex.sourceforge.net/repo/</url>
-		</pluginRepository>
-	</pluginRepositories>
-	<reporting>
-		<plugins>
-			<plugin>
-				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>cobertura-maven-plugin</artifactId>
-				<configuration>
-					<formats>
-						<format>html</format>
-						<format>xml</format>
-					</formats>
-				</configuration>
-			</plugin>
-		</plugins>
-	</reporting>
+
+	<properties>
+		<assembly.directory>${project.build.directory}/assembly</assembly.directory>
+	</properties>
+
 </project>
