@@ -78,7 +78,7 @@ NUMBER_TEXT=-?(0|[1-9][0-9]*)(\.[0-9]+)?([eE][+-]?[0-9]+)?
   \\n           { string.append('\n'); }
   \\r           { string.append('\r'); }
   \\t          { string.append('\t'); }
-  \\u[0-9A-F]{4}    { string.append(Character.toChars(Integer.parseInt(yytext().substring(2),16))); }
+  \\u[0-9A-Fa-f]{4}    { string.append(Character.toChars(Integer.parseInt(yytext().substring(2),16))); }
 }
 
 
