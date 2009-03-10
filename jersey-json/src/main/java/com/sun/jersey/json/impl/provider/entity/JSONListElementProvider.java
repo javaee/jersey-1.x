@@ -119,9 +119,10 @@ public class JSONListElementProvider extends AbstractListElementProvider {
     @Override
     protected final XMLStreamReader getXMLStreamReader(Class<?> elementType, MediaType mediaType, Unmarshaller u, InputStream entityStream) throws XMLStreamException {
         JSONConfiguration c = JSONConfiguration.DEFAULT;
+        final Charset charset = getCharset(mediaType);
         if (u instanceof JSONConfigurated) {
             c = ((JSONConfigurated) u).getJSONConfiguration();
         }
-        return Stax2JsonFactory.createReader(new InputStreamReader(entityStream), c, JSONHelper.getRootElementName((Class)elementType), true);
+        return Stax2JsonFactory.createReader(new InputStreamReader(entityStream, charset), c, JSONHelper.getRootElementName((Class)elementType), true);
     }
 }
