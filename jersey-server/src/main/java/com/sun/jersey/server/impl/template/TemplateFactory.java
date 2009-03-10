@@ -43,7 +43,6 @@ import com.sun.jersey.core.spi.component.ProviderServices;
 import com.sun.jersey.spi.template.TemplateProcessor;
 import com.sun.jersey.spi.template.TemplateContext;
 import com.sun.jersey.spi.template.TemplateContextException;
-import java.lang.Class;
 import java.util.List;
 import java.util.Set;
 import javax.ws.rs.core.UriInfo;

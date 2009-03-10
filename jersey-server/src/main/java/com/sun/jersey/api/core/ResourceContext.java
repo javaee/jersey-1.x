@@ -40,10 +40,15 @@ import com.sun.jersey.api.container.ContainerException;
 import javax.ws.rs.core.Context;
 
 /**
- * The resource context provides access to instances of root resource classes.
+ * The resource context provides access to instances of resource classes.
  * <p>
- * It can be injected using the {@link Context} annotation.
- * 
+ * This interface can be injected using the {@link Context} annotation.
+ * <p>
+ * The resource context can be utilized when instances of managed resource
+ * classes are to be returned by sub-resource locator methods. Such instances
+ * will be injected and managed within the declared scope just like instances
+ * of root resource classes.
+ *
  * @author <a href="mailto:martin.grotzke@freiheit.com">Martin Grotzke</a>
  */
 public interface ResourceContext {

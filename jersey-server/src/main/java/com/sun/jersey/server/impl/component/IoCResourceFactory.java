@@ -43,6 +43,7 @@ import com.sun.jersey.core.spi.component.ioc.IoCComponentProvider;
 import com.sun.jersey.core.spi.component.ioc.IoCComponentProviderFactory;
 import com.sun.jersey.core.spi.component.ioc.IoCManagedComponentProvider;
 import com.sun.jersey.core.spi.component.ComponentScope;
+import com.sun.jersey.core.spi.component.ioc.IoCFullyManagedComponentProvider;
 import com.sun.jersey.server.spi.component.ResourceComponentInjector;
 import com.sun.jersey.server.spi.component.ResourceComponentProvider;
 import com.sun.jersey.server.spi.component.ResourceComponentProviderFactory;
@@ -79,12 +80,37 @@ public class IoCResourceFactory extends ResourceFactory {
             } else {
                 return new UndefinedWrapper(getInjectableProviderContext(), imcp);
             }
+        } else if (icp instanceof IoCFullyManagedComponentProvider) {
+            IoCFullyManagedComponentProvider ifmcp = (IoCFullyManagedComponentProvider)icp;
+            return new FullyManagedWrapper(ifmcp);
         } else {
             ResourceComponentProviderFactory rcpf = getComponentProviderFactory(c);
             return rcpf.getComponentProvider(icp, c);
         }
     }
 
+    private static class FullyManagedWrapper implements ResourceComponentProvider {
+        private final IoCFullyManagedComponentProvider ifmcp;
+
+        FullyManagedWrapper(IoCFullyManagedComponentProvider ifmcp) {
+            this.ifmcp = ifmcp;
+        }
+
+        public void init(AbstractResource abstractResource) {
+        }
+
+        public Object getInstance(HttpContext hc) {
+            return ifmcp.getInstance();
+        }
+
+        public Object getInstance() {
+            throw new IllegalStateException();
+        }
+
+        public void destroy() {
+        }
+    }
+    
     private static class PerRequestWrapper implements ResourceComponentProvider {
         private final InjectableProviderContext ipc;
         private final IoCManagedComponentProvider imcp;

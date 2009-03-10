@@ -41,9 +41,11 @@ import com.sun.jersey.core.spi.component.ComponentScope;
 /**
  * An IoC-managed component provider.
  * <p>
- * The component is fully managed by the underlying IoC framework, which
+ * The component is managed by the underlying IoC framework, which
  * includes managing the construction, injection and destruction according
- * to the life-cycle declared in the IoC framework's semantics.
+ * to the life-cycle declared in the IoC framework's semantics. It is the
+ * reponsibility of the Jersey runtime to inject Jersey-based artfacts onto
+ * the component.
  *
  * @author Paul.Sandoz@Sun.Com
  */

@@ -56,28 +56,66 @@ public interface TemplateContext {
     Set<TemplateProcessor> getTemplateProcessors();
 
     /**
+     * Resolve a {@link Viewable}.
+     * <p>
+     * If the template name of the viewable is not absolute then the resolving
+     * class of the viewable is utilized to resolve the relative template name
+     * into an absolute template name. 
+     * 
+     * If the resolving class is not set (a null value) then the class of the
+     * model is utilized as the resolving class.
      *
-     * @param v
-     * @return
-     * @throws TemplateContextException
+     * If the model is not set (a null value) then a {@link TemplateContextException}
+     * is thrown.
+     *
+     * @param v the viewable
+     * @return the resolved viewable
+     * @throws TemplateContextException if the viewable cannot be resolved.
      */
     ResolvedViewable resolveViewable(Viewable v) throws TemplateContextException;
 
     /**
+     * Resolve a {@link Viewable}.
+     * <p>
+     * If the template name of the viewable is not absolute then the resolving
+     * class of the viewable is utilized to resolve the relative template name
+     * into an absolute template name.
      *
-     * @param v
+     * If the resolving class is not set (a null value) then the class of the
+     * last matching resource obtained from
+     * {@link javax.ws.rs.core.UriInfo#getMatchedResources() }, namely
+     * the class obtained from the expression
+     * <code>uriInfo.getMatchedResources().get(0).getClass()</code>, is utilized
+     * as the resolving class.
+     *
+     * If there are no matching resoruces then a {@link TemplateContextException}
+     * is thrown.
+     *
+     * @param v the viewable
      * @param ui
-     * @return
-     * @throws TemplateContextException
+     * @return the resolved viewable
+     * @throws TemplateContextException if the viewable cannot be resolved.
      */
     ResolvedViewable resolveViewable(Viewable v, UriInfo ui) throws TemplateContextException;
 
     /**
-     * 
-     * @param v
-     * @param resolvingClass
-     * @return
-     * @throws TemplateContextException
+     * Resolve a {@link Viewable} given a resolving class.
+     * <p>
+     * If the template name of the viewable is not absolute then the resolving
+     * class of the viewable is utilized to resolve the relative template name
+     * into an absolute template name.
+     *
+     * If the resolving class is not set (a null value) then the clas of the
+     * <code>resolvingClass</code> parameter is utilized as the resolving class.
+     *
+     * If the <code>resolvingClass</code> parameter is null then a
+     * {@link TemplateContextException} is thrown.
+     *
+     * @param v the viewable.
+     * @param resolvingClass the resolving class to use if the resolving
+     *        class of the viewable is not set.
+     * @return the resolved viewable.
+     * @throws TemplateContextException if the viewable cannot be resolved.
      */
     ResolvedViewable resolveViewable(Viewable v, Class<?> resolvingClass) throws TemplateContextException;
 }

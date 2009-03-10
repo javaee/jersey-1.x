@@ -45,6 +45,11 @@ import com.sun.jersey.core.spi.component.ioc.IoCProviderFactory;
 import com.sun.jersey.core.spi.component.ProviderFactory;
 import com.sun.jersey.core.spi.component.ProviderServices;
 import com.sun.jersey.client.urlconnection.URLConnectionClientHandler;
+import com.sun.jersey.core.spi.component.ComponentInjector;
+import com.sun.jersey.core.spi.component.ComponentScope;
+import com.sun.jersey.core.spi.component.ioc.IoCComponentProcessor;
+import com.sun.jersey.core.spi.component.ioc.IoCComponentProcessorFactory;
+import com.sun.jersey.core.spi.component.ioc.IoCComponentProcessorFactoryInitializer;
 import com.sun.jersey.spi.MessageBodyWorkers;
 import com.sun.jersey.core.spi.factory.ContextResolverFactory;
 import com.sun.jersey.core.spi.factory.InjectableProviderFactory;
@@ -52,7 +57,6 @@ import com.sun.jersey.core.spi.factory.MessageBodyFactory;
 import com.sun.jersey.spi.inject.SingletonTypeInjectableProvider;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
-import java.net.HttpURLConnection;
 import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
@@ -153,10 +157,13 @@ public class Client extends Filterable implements ClientHandler {
 
         getProperties().putAll(config.getProperties());
         
-        // Allow injection of resource config
-        injectableFactory.add(new ContextInjectableProvider<ClientConfig>(
-                ClientConfig.class, config));
-                    
+        if (provider != null) {
+            if (provider instanceof IoCComponentProcessorFactoryInitializer) {
+                IoCComponentProcessorFactoryInitializer i = (IoCComponentProcessorFactoryInitializer)provider;
+                i.init(new ComponentProcessorFactoryImpl(injectableFactory));
+            }
+        }
+
         // Set up the component provider factory
         this.componentProviderFactory = (provider == null)
                 ? new ProviderFactory(injectableFactory)
@@ -169,6 +176,10 @@ public class Client extends Filterable implements ClientHandler {
                 config.getSingletons());
 
         injectableFactory.configure(providerServices);
+
+        // Allow injection of resource config
+        injectableFactory.add(new ContextInjectableProvider<ClientConfig>(
+                ClientConfig.class, config));
 
         // Obtain all context resolvers
         final ContextResolverFactory crf = new ContextResolverFactory(providerServices,
@@ -212,6 +223,27 @@ public class Client extends Filterable implements ClientHandler {
         componentProviderFactory.injectOnAllComponents();
         componentProviderFactory.injectOnProviderInstances(config.getSingletons());
         componentProviderFactory.injectOnProviderInstance(root);
+    }
+
+    private class ComponentProcessorFactoryImpl implements IoCComponentProcessorFactory {
+        private final InjectableProviderFactory injectableFactory;
+
+        ComponentProcessorFactoryImpl(InjectableProviderFactory injectableFactory) {
+            this.injectableFactory = injectableFactory;
+        }
+
+        public IoCComponentProcessor get(Class c, ComponentScope scope) {
+            final ComponentInjector ci = new ComponentInjector(injectableFactory, c);
+            return new IoCComponentProcessor() {
+
+                public void preConstruct() {
+                }
+
+                public void postConstruct(Object o) {
+                    ci.inject(o);
+                }
+            };
+        }
     }
 
     /**

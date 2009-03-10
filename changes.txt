@@ -1,4 +1,19 @@
 release 1.0.3 (2009-03/04)
+- Support for IoC integration where by the IoC framework manages components
+  and supports third-party injection onto components by listening on
+  post construction of a component.
+  See:
+    com.sun.jersey.core.spi.component.ioc.{
+        IoCFullyManagedComponentProvider,
+        IoCComponentProcessorFactory,
+        IoCComponentProcessorFactoryInitializer
+    }
+- Fixed issue where charset of the media type was not being used when
+  unmarshalling a list of JAXB objects serialized as a JSON document.
+- Fixed issue 233
+  https://jersey.dev.java.net/issues/show_bug.cgi?id=233
+  The Jersey JSON parser now correctly supports lowercase unicode escape
+  sequences.
 - Fixed issue 221
   https://jersey.dev.java.net/issues/show_bug.cgi?id=226
   When resolving an absolute template name to a fully qualified template name

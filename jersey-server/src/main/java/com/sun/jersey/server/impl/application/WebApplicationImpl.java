@@ -123,8 +123,12 @@ import com.sun.jersey.spi.inject.SingletonTypeInjectableProvider;
 import com.sun.jersey.spi.inject.InjectableProviderContext;
 import com.sun.jersey.core.spi.component.ComponentContext;
 import com.sun.jersey.core.spi.component.ComponentScope;
+import com.sun.jersey.core.spi.component.ioc.IoCComponentProcessor;
+import com.sun.jersey.core.spi.component.ioc.IoCComponentProcessorFactory;
+import com.sun.jersey.core.spi.component.ioc.IoCComponentProcessorFactoryInitializer;
 import com.sun.jersey.server.impl.model.parameter.multivalued.StringReaderFactory;
 import com.sun.jersey.server.impl.resource.PerRequestFactory;
+import com.sun.jersey.server.spi.component.ResourceComponentInjector;
 import com.sun.jersey.spi.StringReaderWorkers;
 import com.sun.jersey.spi.template.TemplateContext;
 import com.sun.jersey.spi.uri.rules.UriRule;
@@ -144,6 +148,9 @@ public final class WebApplicationImpl implements WebApplication {
 
     private static final Logger LOGGER = Logger.getLogger(WebApplicationImpl.class.getName());
     
+    private final Map<Class, AbstractResource> abstractResourceMap =
+            new HashMap<Class, AbstractResource>();
+
     private final ConcurrentMap<Class, ResourceClass> metaClassMap =
             new ConcurrentHashMap<Class, ResourceClass>();
     
@@ -226,6 +233,44 @@ public final class WebApplicationImpl implements WebApplication {
             }
         });
     }
+
+    private class ComponentProcessorImpl implements IoCComponentProcessor {
+        private final ResourceComponentInjector rci;
+
+        ComponentProcessorImpl(ComponentScope s, AbstractResource resource) {
+            this.rci = new ResourceComponentInjector(injectableFactory, s, resource);
+        }
+
+        public void preConstruct() {
+        }
+
+        public void postConstruct(Object o) {
+            rci.inject(context.get(), o);
+        }
+    }
+
+    private class ComponentProcessorFactoryImpl implements IoCComponentProcessorFactory {
+        private final ConcurrentMap<Class, IoCComponentProcessor> componentProcessorMap =
+                new ConcurrentHashMap<Class, IoCComponentProcessor>();
+
+        public IoCComponentProcessor get(Class c, ComponentScope scope) {
+            IoCComponentProcessor cp = componentProcessorMap.get(c);
+            if (cp != null) {
+                return cp;
+            }
+
+            synchronized (metaClassMap) {
+                cp = componentProcessorMap.get(c);
+                if (cp != null) {
+                    return cp;
+                }
+
+                cp = new ComponentProcessorImpl(scope, getAbstractResource(c));
+                componentProcessorMap.put(c, cp);
+            }
+            return cp;
+        }
+    }
  
     @Override
     public WebApplication clone() {
@@ -256,8 +301,8 @@ public final class WebApplicationImpl implements WebApplication {
 
             rc = newResourceClass(getAbstractResource(c));
             metaClassMap.put(c, rc);
+            rc.init(rcpFactory);
         }
-        rc.init(rcpFactory);
         return rc;
     }
 
@@ -303,7 +348,13 @@ public final class WebApplicationImpl implements WebApplication {
     }
     
     private AbstractResource getAbstractResource(Class c) {
-        return IntrospectionModeller.createResource(c);
+        AbstractResource ar = abstractResourceMap.get(c);
+        if (ar == null) {
+            ar = IntrospectionModeller.createResource(c);
+            abstractResourceMap.put(c, ar);
+        }
+
+        return ar;
     }
 
     private static class ContextInjectableProvider<T> extends
@@ -330,7 +381,7 @@ public final class WebApplicationImpl implements WebApplication {
             throw new ContainerException(ImplMessages.WEB_APP_ALREADY_INITIATED());
         }
         this.initiated = true;
-        
+
         // Validate the resource config
         resourceConfig.validate();
 
@@ -338,6 +389,12 @@ public final class WebApplicationImpl implements WebApplication {
         this.resourceConfig = resourceConfig;
 
         this.provider = _provider;
+        if (_provider != null) {
+            if (_provider instanceof IoCComponentProcessorFactoryInitializer) {
+                IoCComponentProcessorFactoryInitializer i = (IoCComponentProcessorFactoryInitializer)_provider;
+                i.init(new ComponentProcessorFactoryImpl());
+            }
+        }
         
         // Set up the component provider factory to be
         // used with non-resource class components

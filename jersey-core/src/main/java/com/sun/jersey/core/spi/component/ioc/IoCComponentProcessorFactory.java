@@ -1,9 +1,9 @@
 /*
  *
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
- * 
+ *
  * Copyright 1997-2007 Sun Microsystems, Inc. All rights reserved.
- * 
+ *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
  * and Distribution License("CDDL") (collectively, the "License").  You
@@ -11,7 +11,7 @@
  * a copy of the License at https://jersey.dev.java.net/CDDL+GPL.html
  * or jersey/legal/LICENSE.txt.  See the License for the specific
  * language governing permissions and limitations under the License.
- * 
+ *
  * When distributing the software, include this License Header Notice in each
  * file and include the License file at jersey/legal/LICENSE.txt.
  * Sun designates this particular file as subject to the "Classpath" exception
@@ -20,9 +20,9 @@
  * Header, with the fields enclosed by brackets [] replaced by your own
  * identifying information: "Portions Copyrighted [year]
  * [name of copyright owner]"
- * 
+ *
  * Contributor(s):
- * 
+ *
  * If you wish your version of this file to be governed by only the CDDL or
  * only the GPL Version 2, indicate your decision by adding "[Contributor]
  * elects to include this software in this distribution under the [CDDL or GPL
@@ -34,59 +34,24 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-package com.sun.jersey.impl;
+package com.sun.jersey.core.spi.component.ioc;
 
-import com.sun.jersey.api.container.ContainerException;
-import com.sun.jersey.api.core.HttpContext;
-import com.sun.jersey.api.core.ResourceConfig;
-import com.sun.jersey.core.spi.component.ioc.IoCComponentProcessorFactory;
-import com.sun.jersey.core.spi.component.ioc.IoCComponentProviderFactory;
-import com.sun.jersey.spi.MessageBodyWorkers;
-import com.sun.jersey.spi.container.ContainerRequest;
-import com.sun.jersey.spi.container.ContainerResponse;
-import com.sun.jersey.spi.container.ContainerResponseWriter;
-import com.sun.jersey.spi.container.WebApplication;
-import java.io.IOException;
+import com.sun.jersey.core.spi.component.ComponentScope;
 
 /**
+ * A factory for obtaining {@link IoCComponentProcessor} instances.
  *
- * @author ps23762
+ * @author Paul.Sandoz@Sun.Com
  */
-public class DummyWebApplication implements WebApplication {
-
-    public boolean isInitiated() {
-        return true;
-    }
+public interface IoCComponentProcessorFactory {
     
-    public void initiate(ResourceConfig resourceConfig) throws IllegalArgumentException, ContainerException {
-    }
-
-    public void initiate(ResourceConfig resourceConfig, IoCComponentProviderFactory provider) throws IllegalArgumentException, ContainerException {
-    }
-
-    @Override
-    public WebApplication clone() {
-        return null;
-    }
-
-    public MessageBodyWorkers getMessageBodyWorkers() {
-        return null;
-    }
-
-    public HttpContext getThreadLocalHttpContext() {
-        return null;
-    }
-
-    public void handleRequest(ContainerRequest request, ContainerResponseWriter responseWriter) throws IOException {
-    }
-
-    public void handleRequest(ContainerRequest request, ContainerResponse response) throws IOException {
-    }
-
-    public void destroy() {
-    }
-
-    public IoCComponentProcessorFactory getComponentProcessorFactory() {
-        return null;
-    }
+    /**
+     * Get a {@link IoCComponentProcessor} instance given a class
+     * and scope.
+     *
+     * @param c the class.
+     * @param scope the scope.
+     * @return the IoC component processor.
+     */
+    IoCComponentProcessor get(Class c, ComponentScope scope);
 }

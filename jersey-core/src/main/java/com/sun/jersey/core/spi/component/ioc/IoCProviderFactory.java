@@ -77,6 +77,9 @@ public class IoCProviderFactory extends ProviderFactory {
             } else {
                 throw new RuntimeException("The scope of the component " + c + " must be a singleton");
             }
+        } else if (icp instanceof IoCFullyManagedComponentProvider) {
+            IoCFullyManagedComponentProvider ifmcp = (IoCFullyManagedComponentProvider)icp;
+            return new FullyManagedSingleton(ifmcp.getInstance());
         } else if (icp instanceof IoCInstantiatedComponentProvider) {
             IoCInstantiatedComponentProvider iicp = (IoCInstantiatedComponentProvider)icp;
             return new SingletonWrapper(getInjectableProviderContext(), iicp, c);
@@ -106,6 +109,17 @@ public class IoCProviderFactory extends ProviderFactory {
         }
     }
 
+    private static class FullyManagedSingleton implements ComponentProvider {
+        private final Object o;
+
+        FullyManagedSingleton(Object o) {
+            this.o = o;
+        }
+
+        public Object getInstance() {
+            return o;
+        }
+    }
 
     private static class ProxiedSingletonWrapper implements ComponentProvider {
         private final Object o;

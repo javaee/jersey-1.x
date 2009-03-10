@@ -37,6 +37,8 @@
 
 package com.sun.jersey.api.view;
 
+import com.sun.jersey.spi.template.TemplateContext;
+
 /**
  * A viewable type referencing a template by name and a model to be passed
  * to the template. Such a type may be returned by a resource method of a 
@@ -48,20 +50,35 @@ package com.sun.jersey.api.view;
  * template name.
  * <p>
  * A relative template name requires resolving to an absolute template name
- * when the viewable type is processed. If a resolving class is present then
- * that class will be used to resolve the relative template name. If a resolving
- * class is not present then the class of the last matching resource
- * obtained from {@link javax.ws.rs.core.UriInfo#getMatchedResources() }, namely
- * the class obtained from the expression
+ * when the viewable type is processed. 
+ * 
+ * If a resolving class is present then that class will be used to resolve the
+ * relative template name.
+ * 
+ * If a resolving class is not present then the class of the last matching
+ * resource obtained from {@link javax.ws.rs.core.UriInfo#getMatchedResources() },
+ * namely the class obtained from the expression
  * <code>uriInfo.getMatchedResources().get(0).getClass()</code>, is utilized
- * as the resolving class. If there are no matching resoruces then an error
- * will result.
+ * as the resolving class. 
+ * 
+ * If there are no matching resources then an error will result.
+ * 
  * <p>
- * The resolving class is utilized to generate the absolution template name
- * as follows. The base path starts with '/' character, proceeded by the fully
+ * The resolving class, and super classes in the inheritence hierarchy, are
+ * utilized to generate the absolute template name as follows.
+ *
+ * The base path starts with '/' character, followed by the fully
  * qualified class name of the resolving class, with any '.' and '$' characters
- * replaced with a '/' character, preceeded by a '/' character,
- * proceeded by the relative template name.
+ * replaced with a '/' character, followed by a '/' character,
+ * followed by the relative template name.
+ *
+ * If the absolute template name cannot be resolved into a fully qualified
+ * template name (see {@link TemplateContext}) then the super class of the
+ * resolving class is utilized, and is set as the resolving class. Traversal up
+ * the inheritence hierarchy proceeds until an absolute template name can be
+ * resolved into a fully qualified template name, or the Object class is
+ * reached, which means the absolute template name could not be resolved and
+ * an error will result.
  * 
  * @author Paul.Sandoz@Sun.Com
  */
@@ -76,8 +93,8 @@ public class Viewable {
     /**
      * Construct a new viewable type with a template name and a model.
      * 
-     * @param templateName the template name.
-     * @param model the model.
+     * @param templateName the template name, shall not be null.
+     * @param model the model, may be null.
      */
     public Viewable(String templateName, Object model) {
         this(templateName, model, null);
@@ -87,13 +104,18 @@ public class Viewable {
      * Construct a new viewable type with a template name, a model
      * and a resolving class.
      *
-     * @param templateName the template name.
-     * @param model the model.
+     * @param templateName the template name, shall not be null.
+     * @param model the model, may be null.
      * @param resolvingClass the class to use to resolve the template name
      *        if the template is not absolute, if null then the resolving
      *        class will be obtained from the last matching resource.
+     * @throws IllegalArgumentException if the template name is null.
      */
-    public Viewable(String templateName, Object model, Class<?> resolvingClass) {
+    public Viewable(String templateName, Object model, Class<?> resolvingClass) 
+            throws IllegalArgumentException {
+        if (templateName == null)
+            throw new IllegalArgumentException("The template name MUST not be null");
+
         this.templateName = templateName;
         this.model = model;
         this.resolvingClass = resolvingClass;

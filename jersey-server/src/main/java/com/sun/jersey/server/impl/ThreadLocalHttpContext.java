@@ -60,6 +60,10 @@ public final class ThreadLocalHttpContext implements HttpContext {
         this.context.set(context);
     }
 
+    public HttpContext get() {
+        return this.context.get();
+    }
+
     public ExtendedUriInfo getUriInfo() {
         try {
             return context.get().getUriInfo();

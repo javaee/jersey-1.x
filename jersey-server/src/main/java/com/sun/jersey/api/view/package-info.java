@@ -35,6 +35,40 @@
  * holder.
  */
 /**
- * Provides support for model view controller.
+ * Provides support for Model, View and Controller (MVC).
+ * <p>
+ * Given the MVC pattern the Controller corresponds to a resource class,
+ * the View to a template referenced by a template name, and the Model
+ * to a Java object (or a Java bean).
+ * <p>
+ * A resource method of a resource class may return an instance of 
+ * {@link com.sun.jersey.api.view.Viewable} that encapsulates the template name 
+ * and the model. In this respect the instance of
+ * {@link com.sun.jersey.api.view.Viewable} is the response entity. Such a
+ * viewable response entity may be set in contexts other than a resource
+ * method but for the purposes of this section the focus is on resource methods.
+ * <p>
+ * The {@link com.sun.jersey.api.view.Viewable}, returned by a resource method,
+ * will be processed such that the template name is resolved to a fully qualified
+ * template name that identifies a template of a template processor.
+ * 
+ * The template processor then processes template given the model to produce a
+ * response entity that is returned to the client.
+ * <p>
+ * For example, the template name could reference a Java Server Page (JSP) and
+ * the model will be accessible to that JSP. The JSP template processor will
+ * process the JSP resulting in an HTML document that is returned
+ * as the response entity. (See later for more details.)
+ * <p>
+ * Two forms of returning {@link com.sun.jersey.api.view.Viewable} instances 
+ * are supported: explicit; and implicit.
+ *
+ * <h2>Explicit views</h2>
+ *
+ * <h2>Implicit views</h2>
+ *
+ * <h2>Integration with Java Server Pages (JSPs)</h2>
+ *
+ * <h2>Developing a Template Processor</h2>
  */
 package com.sun.jersey.api.view;

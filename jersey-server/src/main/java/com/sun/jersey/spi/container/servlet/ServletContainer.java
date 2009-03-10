@@ -73,9 +73,10 @@ import javax.ws.rs.core.UriBuilder;
 /**
  * A {@link Servlet} or {@link Filter} for deploying root resource classes.
  * <p>
- * If this class is declared as a filter then it must be declared at the last
- * position in the filter chain as it will not forward any request to a next
- * filter (if any) in the chain.
+ * If this class is declared as a filter and the initialization parameter
+ * {@link #PROPERTY_WEB_PAGE_CONTENT_REGEX} is not set, then the filter must be
+ * declared at the last position in the filter chain as the filter will not
+ * forward any request to a next filter (if any) in the chain.
  * <p>
  * The following sections make reference to initialization parameters. Unless
  * otherwise specified the initialization parameters apply to both server

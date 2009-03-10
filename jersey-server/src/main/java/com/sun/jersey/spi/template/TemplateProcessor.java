@@ -36,37 +36,55 @@
  */
 package com.sun.jersey.spi.template;
 
+import com.sun.jersey.api.core.ResourceConfig;
 import java.io.IOException;
 import java.io.OutputStream;
+import javax.ws.rs.core.Application;
+import javax.ws.rs.ext.Provider;
 
 /**
- * A processor for templates.
+ * A template processor.
+ * <p>
+ * Implementations of this interface shall be capable of resolving a
+ * template name into a fully qualified template name that identifies
+ * a template supported by the implementation. And, processing the
+ * template, identified by the fully qualified template name, the results
+ * of which are written to an output stream.
+ * <p>
+ * Implementations can register a template processor as a provider, for
+ * example, annotating the implementation class with {@link Provider}
+ * or registering an instance as a singleton with {@link ResourceConfig}
+ * or {@link Application}.
+ * <p>
+ * Such template processors could be JSP template processors (supported by the
+ * Jersey servlet and filter implementations) or say Freemarker or Velocity
+ * template processors (not implemented).
  * 
  * @author Paul.Sandoz@Sun.Com
  */
 public interface TemplateProcessor {
    
     /**
-     * Resolve an abstract template path into a fully qualified concrete
-     * template path that identifies a template.
+     * Resolve a template name into a fully qualified template name that
+     * identifies a template.
      * 
-     * @param path the abstract template path 
-     * @return the fully qualified concrete template path, otherwise null
-     *         if the abstract template path cannot be resolved.
+     * @param name the template name
+     * @return the fully qualified template name, otherwise null
+     *         if the template name cannot be resolved.
      */
-    String resolve(String path);
+    String resolve(String name);
     
     /**
      * Process a template and write the result to an output stream.
      * 
-     * @param resolvedPath the resolved path identifying a template. This
-     *        is obtained by calling the resolve method with an abstract 
-     *        template path.
+     * @param fullyQualifedName the fully qualified template name identifying a
+     *        template. This is obtained by calling the resolve method with a
+     *        template name.
      * @param model the model to be passed to the template.
      * @param out the output stream to write the result of processing the
      *        template.
      * @throws java.io.IOException if there was an error processing the
      *         template.
      */
-    void writeTo(String resolvedPath, Object model, OutputStream out) throws IOException;
+    void writeTo(String fullyQualifedName, Object model, OutputStream out) throws IOException;
 }
