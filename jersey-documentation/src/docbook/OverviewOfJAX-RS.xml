@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.4//EN"
+"http://www.oasis-open.org/docbook/xml/4.4/docbookx.dtd">
+<chapter>
+  <title>Overview of JAX-RS 1.0</title>
+
+  <para>This chapter presents an overview of the JAX-RS 1.0 features.</para>
+
+  <para>The JAX-RS 1.0 API may be found online <ulink
+  url="https://jsr311.dev.java.net/nonav/releases/1.0/index.html">here</ulink>.</para>
+
+  <para>The JAX-RS 1.0 specification may be found online <ulink
+  url="https://jsr311.dev.java.net/nonav/releases/1.0/spec/index.html">here</ulink>.</para>
+
+  <section>
+    <title>Creating a Root Resource</title>
+
+    <para>Root resource classes are POJOs (Plain Old Java Objects) that are
+    annotated with @Path have at least one method annotated with @Path or a
+    resource method designator annotation such as @GET, @PUT, @POST, or
+    @DELETE. Resource methods are methods of a resource class annotated with a
+    resource method designator. This section shows how to use Jersey to
+    annotate Java objects to create RESTful web services.</para>
+
+    <para>The following code example is a very simple example of a root
+    resource class using JAX-RS annotations. The example code shown here is
+    from one of the samples that ships with Jersey, the zip file of which can
+    be found in the maven repository here.</para>
+
+    <para><programlisting>package com.sun.ws.rest.samples.helloworld.resources;
+
+import javax.ws.rs.GET;
+import javax.ws.rs.Produces;
+import javax.ws.rs.Path;
+
+// The Java class will be hosted at the URI path "/helloworld"
+@Path("/helloworld")
+public class HelloWorldResource {
+
+    // The Java method will process HTTP GET requests
+    @GET
+    // The Java method will produce content identified by the MIME Media
+    // type "text/plain"
+    @Produces("text/plain")
+    public String getClichedMessage() {
+        // Return some cliched textual content
+        return "Hello World";
+    }
+}</programlisting>Let's look at some of the JAX-RS annotations used in this
+    example.</para>
+
+    <section>
+      <title>@Path</title>
+
+      <para>content</para>
+    </section>
+  </section>
+</chapter>

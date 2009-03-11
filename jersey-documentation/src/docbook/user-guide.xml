@@ -2,27 +2,30 @@
 <!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.4//EN"
                  "http://www.oasis-open.org/docbook/xml/4.4/docbookx.dtd">
 <book>
-  <bookinfo>
-    <title>Jersey &version; User Guide</title>
-  </bookinfo>
-  <preface>
-    <title>Preface</title>
-    <para>
+    <bookinfo>
+        <title>Jersey &version; User Guide</title>
+    </bookinfo>
+    <preface>
+        <title>Preface</title>
+        <para>
 This doc is yet in a very early state. We want to create here sort
 of a user guide for jersey users, which will get versioned together 
 with jersey code base. 
-    </para>
-<para>
+        </para>
+        <para>
 More content to come soon...
-</para>
-  </preface>
+        </para>
+    </preface>
   
+    <xi:include xmlns:xi="http://www.w3.org/2001/XInclude"  href="OverviewOfJAX-RS.xml" />
+<!--
 <xi:include xmlns:xi="http://www.w3.org/2001/XInclude"  href="&docbooksrc;/core.xml" /> 
 <xi:include xmlns:xi="http://www.w3.org/2001/XInclude"  href="&docbooksrc;/server.xml" /> 
 <xi:include xmlns:xi="http://www.w3.org/2001/XInclude"  href="&docbooksrc;/client.xml" /> 
 <xi:include xmlns:xi="http://www.w3.org/2001/XInclude"  href="&docbooksrc;/fastinfoset.xml" /> 
 <xi:include xmlns:xi="http://www.w3.org/2001/XInclude"  href="&docbooksrc;/json.xml" />
 <xi:include xmlns:xi="http://www.w3.org/2001/XInclude"  href="&docbooksrc;/atom.xml" />
+-->
 
-  </book>
+</book>
 
