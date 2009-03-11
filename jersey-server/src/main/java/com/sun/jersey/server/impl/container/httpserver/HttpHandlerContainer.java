@@ -45,10 +45,10 @@ import com.sun.jersey.spi.container.ContainerRequest;
 import com.sun.jersey.spi.container.ContainerResponse;
 import com.sun.jersey.spi.container.ContainerResponseWriter;
 import com.sun.jersey.core.header.InBoundHeaders;
+import com.sun.jersey.server.impl.application.WebApplicationImpl;
 import com.sun.jersey.spi.container.WebApplication;
 import com.sun.net.httpserver.Headers;
-import com.sun.net.httpserver.HttpServer;
-import com.sun.net.httpserver.HttpsServer;
+import com.sun.net.httpserver.HttpsExchange;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.InetSocketAddress;
@@ -147,13 +147,20 @@ public class HttpHandlerContainer implements HttpHandler, ContainerListener {
          * TODO this is missing the user information component, how
          * can this be obtained?
          */
-        HttpServer server = exchange.getHttpContext().getServer();
-        String scheme = (server instanceof HttpsServer) ? "https" : "http";
-        InetSocketAddress addr = exchange.getLocalAddress();
+        String scheme = (exchange instanceof HttpsExchange) ? "https" : "http";
+
         URI baseUri = null;
         try {
-            baseUri = new URI(scheme, null, addr.getHostName(), addr.getPort(), 
-                    decodedBasePath, null, null);
+            List<String> hostHeader = exchange.getRequestHeaders().get("Host");
+            if (hostHeader != null) {
+                StringBuilder sb = new StringBuilder(scheme);
+                sb.append("://").append(hostHeader.get(0)).append(decodedBasePath);
+                baseUri = new URI(sb.toString());
+            } else {
+                InetSocketAddress addr = exchange.getLocalAddress();
+                baseUri = new URI(scheme, null, addr.getHostName(), addr.getPort(),
+                        decodedBasePath, null, null);
+            }
         } catch (URISyntaxException ex) {
             throw new IllegalArgumentException(ex);
         }
@@ -180,7 +187,7 @@ public class HttpHandlerContainer implements HttpHandler, ContainerListener {
         exchange.getResponseBody().close();
         exchange.close();                    
     }
-    
+
     private InBoundHeaders getHeaders(HttpExchange exchange) {
         InBoundHeaders rh = new InBoundHeaders();
         

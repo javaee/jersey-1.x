@@ -1,4 +1,7 @@
 release 1.0.3 (2009-03/04)
+- Fixed issue with LW HTTP server container not using the correct host and
+  port for the base and request URIs. It is necessary to use the host and
+  port declared in the Host HTTP header.
 - Support for IoC integration where by the IoC framework manages components
   and supports third-party injection onto components by listening on
   post construction of a component.
