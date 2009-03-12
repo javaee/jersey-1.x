@@ -611,7 +611,7 @@ public final class WebApplicationImpl implements WebApplication {
             }
 
             if (!rootsRule.accept(path, null, localContext)) {
-                throw new NotFoundException();
+                throw new NotFoundException(request.getRequestUri());
             }            
         } catch (WebApplicationException e) {
             mapWebApplicationException(e, response);

@@ -1,4 +1,9 @@
 release 1.0.3 (2009-03/04)
+- Fixed issue 181
+  https://jersey.dev.java.net/issues/show_bug.cgi?id=181
+  NotFoundException construction now includes an optional URI that was not
+  found. Jersey will pass in the URI if it throws NotFoundException because
+  the request URI could not be matched to a resource class.
 - Fixed issue 198
   https://jersey.dev.java.net/issues/show_bug.cgi?id=198
   UriBuilder.uri works correctly replacing scheme specific parts.
