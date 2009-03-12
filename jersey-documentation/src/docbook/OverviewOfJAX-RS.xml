@@ -1,6 +1,3 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.4//EN"
-"http://www.oasis-open.org/docbook/xml/4.4/docbookx.dtd">
 <chapter>
   <title>Overview of JAX-RS 1.0</title>
 
@@ -12,7 +9,7 @@
   <para>The JAX-RS 1.0 specification may be found online <ulink
   url="https://jsr311.dev.java.net/nonav/releases/1.0/spec/index.html">here</ulink>.</para>
 
-  <section>
+  <sect1>
     <title>Root Resource Classes</title>
 
     <para><emphasis>Root resource classes</emphasis> are POJOs (Plain Old Java
@@ -60,7 +57,7 @@ public class HelloWorldResource {
 }</programlisting>Let's look at some of the JAX-RS annotations used in this
     example.</para>
 
-    <section>
+    <sect2>
       <title>@Path</title>
 
       <para>The <ulink
@@ -124,9 +121,9 @@ public class UserResource {
       request URL does not end in a '/' and the matching <ulink
       url="https://jsr311.dev.java.net/nonav/releases/1.0/javax/ws/rs/Path.html">@Path</ulink>
       does end in a '/'.</para>
-    </section>
+    </sect2>
 
-    <section>
+    <sect2>
       <title>HTTP Methods</title>
 
       <para><ulink
@@ -173,9 +170,9 @@ public Response putContainer() {
       addition Jersey will return a <ulink
       url="https://wadl.dev.java.net/">WADL</ulink> document describing the
       resource.</para>
-    </section>
+    </sect2>
 
-    <section>
+    <sect2>
       <title>@Produces</title>
 
       <para>The <ulink
@@ -247,9 +244,9 @@ public String doGetAsXmlOrJson() {
       clarity. It is possible to refer to constant values, which may reduce
       typographical errors, see the constant field values of <ulink
       url="https://jsr311.dev.java.net/nonav/releases/1.0/javax/ws/rs/core/MediaType.html">MediaType</ulink>.</para>
-    </section>
+    </sect2>
 
-    <section>
+    <sect2>
       <title>@Consumes</title>
 
       <para>The <ulink
@@ -275,10 +272,10 @@ public void postClichedMessage(String message) {
       media type may be declared in the same <ulink
       url="https://jsr311.dev.java.net/nonav/releases/1.0/javax/ws/rs/Consumes.html">@Consumes</ulink>
       declaration.</para>
-    </section>
-  </section>
+    </sect2>
+  </sect1>
 
-  <section>
+  <sect1>
     <title>Deploying a RESTful Web Service</title>
 
     <para>JAX-RS provides the deployment agnostic abstract class <ulink
@@ -352,9 +349,9 @@ public void postClichedMessage(String message) {
 
     <para>The Jersey samples provide many examples of Servlet-based and
     Grizzly-in-process-based deployments.</para>
-  </section>
+  </sect1>
 
-  <section>
+  <sect1>
     <title>Extracting Request Parameters</title>
 
     <para>Parameters of a resource method may be annotated with
@@ -522,9 +519,9 @@ public String get(@Context HttpHeaders hh) {
 public void post(MultivaluedMap&lt;String, String&gt; formParams) {
     // Store the message
 }</programlisting></para>
-  </section>
+  </sect1>
 
-  <section>
+  <sect1>
     <title>Represetations and Java Types</title>
 
     <para>Previous sections on <ulink
@@ -589,9 +586,9 @@ public String doGetAsXmlOrJson() {
     <para>if "application/xml" is the most acceptable then the
     <literal>Content-Type</literal> of the response will be set to
     "application/xml".</para>
-  </section>
+  </sect1>
 
-  <section>
+  <sect1>
     <title>Building Responses</title>
 
     <para>Sometimes it is necessary to return information additional
@@ -626,9 +623,9 @@ public Response post(String content) {
 
     <para>Response building provides other functionality such as setting the
     entity tag and last modified date of the representation.</para>
-  </section>
+  </sect1>
 
-  <section>
+  <sect1>
     <title>Sub-resources</title>
 
     <para><ulink
@@ -747,9 +744,9 @@ public class ItemContentResource {
     field injection onto instances returned from sub-resource locator methods.
     This is because the runtime does not know what the life-cycle of the
     instance is.</para>
-  </section>
+  </sect1>
 
-  <section>
+  <sect1>
     <title>Building URIs</title>
 
     <para>A very important aspects of REST is hyperlinks, URIs, in
@@ -833,9 +830,9 @@ public class UsersResource {
     path("{a}").
     queryParam("name", "{value}").
     build("segment", "value");</programlisting></para>
-  </section>
+  </sect1>
 
-  <section>
+  <sect1>
     <title>WebApplicationException and Mapping Exceptions to Responses</title>
 
     <para>Previous sections have shown how to return HTTP responses and it is
@@ -912,9 +909,9 @@ public class EntityNotFoundMapper implements
     url="http://java.sun.com/javaee/5/docs/api/javax/persistence/EntityNotFoundException.html">EntityNotFoundException</ulink>
     the <literal>toResponse</literal> method of the
     <literal>EntityNotFoundMapper</literal> instance will be invoked.</para>
-  </section>
+  </sect1>
 
-  <section>
+  <sect1>
     <title>Conditional GETs and Returning 304 (Not Modified) Responses</title>
 
     <para>Conditional GETs are a great way to reduce bandwidth, and
@@ -970,9 +967,9 @@ public class EntityNotFoundMapper implements
     <para>Notice that in this example the constructor of a resource class can
     be used perform actions that may otherwise have to be duplicated to
     invoked for each resource method.</para>
-  </section>
+  </sect1>
 
-  <section>
+  <sect1>
     <title>Life-cycle of Root Resource Classes</title>
 
     <para>By default the life-cycle of root resource classes is per-request,
@@ -997,9 +994,9 @@ public class EntityNotFoundMapper implements
     only one instance is created per-web applcation. If a root resource class
     is annotated with @PerSession then one instance is created per web session
     and stored as a session attribute.</para>
-  </section>
+  </sect1>
 
-  <section>
+  <sect1>
     <title>Security</title>
 
     <para>Security information is available by obtaining the <ulink
@@ -1024,9 +1021,9 @@ public ShoppingBasketResource get(@Context SecurityContext sc) {
        return new ShoppingBasketResource();
     }
 }</programlisting></para>
-  </section>
+  </sect1>
 
-  <section>
+  <sect1>
     <title>Rules of Injection</title>
 
     <para>Previous sections have presented examples of annotated types, mostly
@@ -1079,9 +1076,9 @@ public class InjectedResource {
     annotation is special and may only be utilized on resource and
     sub-resource methods. This is because it extracts information from a
     request entity.</para>
-  </section>
+  </sect1>
 
-  <section>
+  <sect1>
     <title>Use of @Context</title>
 
     <para>Previous sections have introduced the use of <ulink
@@ -1102,13 +1099,13 @@ public class InjectedResource {
     url="http://java.sun.com/javaee/5/docs/api/javax/servlet/http/HttpServletResponse.html">HttpServletResponse</ulink>
     are available using <ulink
     url="https://jsr311.dev.java.net/nonav/releases/1.0/javax/ws/rs/core/Context.html">@Context</ulink>.</para>
-  </section>
+  </sect1>
 
-  <section>
+  <sect1>
     <title>Annotations Defined By JAX-RS</title>
 
     <para>For a list of the annotations specified by JAX-RS see <ulink
     url="https://jsr311.dev.java.net/nonav/releases/1.0/spec/index.html">Appendix
     A</ulink> of the specification.</para>
-  </section>
+  </sect1>
 </chapter>

@@ -80,77 +80,6 @@
 	<build>
 		<plugins>
 			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-dependency-plugin</artifactId>
-				<executions>
-					<execution>
-						<id>unpack</id>
-						<phase>generate-sources</phase>
-						<goals>
-							<goal>unpack</goal>
-						</goals>
-						<configuration>
-							<artifactItems>
-								<artifactItem>
-									<groupId>com.sun.jersey</groupId>
-									<artifactId>jersey-core</artifactId>
-									<version>${version}</version>
-									<type>zip</type>
-									<classifier>docbook</classifier>
-									<overWrite>false</overWrite>
-									<outputDirectory>${assembly.directory}/docbook</outputDirectory>
-								</artifactItem>
-									<artifactItem>
-									<groupId>com.sun.jersey</groupId>
-									<artifactId>jersey-server</artifactId>
-									<version>${version}</version>
-									<type>zip</type>
-									<classifier>docbook</classifier>
-									<overWrite>false</overWrite>
-									<outputDirectory>${assembly.directory}/docbook</outputDirectory>
-								</artifactItem>
-									<artifactItem>
-									<groupId>com.sun.jersey</groupId>
-									<artifactId>jersey-client</artifactId>
-									<version>${version}</version>
-									<type>zip</type>
-									<classifier>docbook</classifier>
-									<overWrite>false</overWrite>
-									<outputDirectory>${assembly.directory}/docbook</outputDirectory>
-								</artifactItem>
-									<artifactItem>
-									<groupId>com.sun.jersey</groupId>
-									<artifactId>jersey-fastinfoset</artifactId>
-									<version>${version}</version>
-									<type>zip</type>
-									<classifier>docbook</classifier>
-									<overWrite>false</overWrite>
-									<outputDirectory>${assembly.directory}/docbook</outputDirectory>
-								</artifactItem>
-									<artifactItem>
-									<groupId>com.sun.jersey</groupId>
-									<artifactId>jersey-json</artifactId>
-									<version>${version}</version>
-									<type>zip</type>
-									<classifier>docbook</classifier>
-									<overWrite>false</overWrite>
-									<outputDirectory>${assembly.directory}/docbook</outputDirectory>
-								</artifactItem>
-									<artifactItem>
-									<groupId>com.sun.jersey</groupId>
-									<artifactId>jersey-atom</artifactId>
-									<version>${version}</version>
-									<type>zip</type>
-									<classifier>docbook</classifier>
-									<overWrite>false</overWrite>
-									<outputDirectory>${assembly.directory}/docbook</outputDirectory>
-								</artifactItem>
-							</artifactItems>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>
-			<plugin>
 				<groupId>com.agilejava.docbkx</groupId>
 				<artifactId>docbkx-maven-plugin</artifactId>
 				<dependencies>
@@ -175,6 +104,9 @@
 							<value>${assembly.directory}/docbook</value>
 						</entity>
 					</entities>
+          <partAutolabel>1</partAutolabel>
+          <sectionAutolabel>1</sectionAutolabel>
+          <sectionLabelIncludesComponentLabel>1</sectionLabelIncludesComponentLabel>
 				</configuration>
 				<executions>
 					<execution>

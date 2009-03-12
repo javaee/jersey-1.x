@@ -82,48 +82,6 @@
                     </execution>
                 </executions>
             </plugin>
-			<plugin>
-				<groupId>com.agilejava.docbkx</groupId>
-				<artifactId>docbkx-maven-plugin</artifactId>
-				<dependencies>
-					<dependency>
-						<groupId>org.docbook</groupId>
-						<artifactId>docbook-xml</artifactId>
-						<version>4.4</version>
-						<scope>runtime</scope>
-					</dependency>
-				</dependencies>
-				<configuration>
-          <sourceDirectory>src/docbook</sourceDirectory>
-          <targetDirectory>${project.build.directory}/docbook</targetDirectory>
-					<!--calloutGraphicsPath>src/docbook/includes</calloutGraphicsPath-->
-				</configuration>
-				<executions>
-					<execution>
-						<goals>
-							<goal>generate-html</goal>
-						</goals>
-						<phase>package</phase>
-					</execution>
-				</executions>
-			</plugin>
-			<plugin>
-				<artifactId>maven-assembly-plugin</artifactId>
-				<configuration>
-					<descriptors>
-						<descriptor>src/main/assembly/docbook.xml</descriptor>
-					</descriptors>
-				</configuration>
-				<executions>
-					<execution>
-						<id>make-assembly</id>
-						<phase>package</phase>
-						<goals>
-							<goal>attached</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
 	        </plugins>
     </build>
 </project>
