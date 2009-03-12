@@ -103,25 +103,39 @@ public class UriBuilderImpl extends UriBuilder {
         if (uri == null) 
             throw new IllegalArgumentException("URI parameter is null");
         
-        if (uri.getScheme() != null) scheme = uri.getScheme();
-        if (uri.getRawSchemeSpecificPart() != null && uri.getRawPath() == null) {
-            ssp = uri.getRawSchemeSpecificPart();
-        } else {
-            ssp = null;
-            if (uri.getRawUserInfo() != null) userInfo = uri.getRawUserInfo();
-            if (uri.getHost() != null) host = uri.getHost();
-            if (uri.getPort() != -1) port = uri.getPort();
-            if (uri.getRawPath() != null && uri.getRawPath().length() > 0) {
-                path.setLength(0);
-                path.append(uri.getRawPath());
-            }
-            if (uri.getRawQuery() != null && uri.getRawQuery().length() > 0) {
-                query.setLength(0);
-                query.append(uri.getRawQuery());
-
-            }
-        }
         if (uri.getRawFragment() != null) fragment = uri.getRawFragment();
+
+        if (uri.isOpaque()) {
+            scheme = uri.getScheme();
+            ssp = uri.getRawSchemeSpecificPart();
+            return this;
+        }
+
+        if (uri.getScheme() == null) {
+            if (ssp != null) {
+                if (uri.getRawSchemeSpecificPart() != null) {
+                    ssp = uri.getRawSchemeSpecificPart();
+                    return this;
+                }
+            }
+        } else {
+            scheme = uri.getScheme();
+        }
+
+        ssp = null;
+        if (uri.getRawUserInfo() != null) userInfo = uri.getRawUserInfo();
+        if (uri.getHost() != null) host = uri.getHost();
+        if (uri.getPort() != -1) port = uri.getPort();
+        if (uri.getRawPath() != null && uri.getRawPath().length() > 0) {
+            path.setLength(0);
+            path.append(uri.getRawPath());
+        }
+        if (uri.getRawQuery() != null && uri.getRawQuery().length() > 0) {
+            query.setLength(0);
+            query.append(uri.getRawQuery());
+
+        }
+
         return this;
     }
 

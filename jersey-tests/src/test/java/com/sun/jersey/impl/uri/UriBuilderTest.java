@@ -39,6 +39,7 @@ package com.sun.jersey.impl.uri;
 import com.sun.jersey.api.uri.UriComponent;
 import java.lang.reflect.Method;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -66,6 +67,11 @@ public class UriBuilderTest extends TestCase {
 
     public void testOpaqueUriReplaceSchemeSpecificPart() {
         URI bu = UriBuilder.fromUri("mailto:a@b").schemeSpecificPart("c@d").build();
+        assertEquals(URI.create("mailto:c@d"), bu);
+    }
+
+    public void testOpaqueReplaceUri() {
+        URI bu = UriBuilder.fromUri("mailto:a@b").uri(URI.create("c@d")).build();
         assertEquals(URI.create("mailto:c@d"), bu);
     }
 

@@ -1,5 +1,10 @@
 release 1.0.3 (2009-03/04)
-- Fixed issue with LW HTTP server container not using the correct host and
+- Fixed issue 198
+  https://jersey.dev.java.net/issues/show_bug.cgi?id=198
+  UriBuilder.uri works correctly replacing scheme specific parts.
+- Fixed issue 240
+  https://jersey.dev.java.net/issues/show_bug.cgi?id=240
+  Fixed issue with LW HTTP server container not using the correct host and
   port for the base and request URIs. It is necessary to use the host and
   port declared in the Host HTTP header.
 - Support for IoC integration where by the IoC framework manages components
