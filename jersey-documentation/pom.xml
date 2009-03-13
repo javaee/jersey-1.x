@@ -45,40 +45,42 @@
 	<artifactId>jersey-documentation</artifactId>
 	<packaging>pom</packaging>
 	<name>jersey-documentation</name>
-	<dependencies>
+	<!--dependencies>
 		<dependency>
 			<groupId>com.sun.jersey</groupId>
-			<artifactId>jersey-core</artifactId>
+			<artifactId>jersey-bundle</artifactId>
 			<version>${project.version}</version>
 		</dependency>
-			<dependency>
-			<groupId>com.sun.jersey</groupId>
-			<artifactId>jersey-server</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-			<dependency>
-			<groupId>com.sun.jersey</groupId>
-			<artifactId>jersey-client</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-			<dependency>
-			<groupId>com.sun.jersey</groupId>
-			<artifactId>jersey-fastinfoset</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-			<dependency>
-			<groupId>com.sun.jersey</groupId>
-			<artifactId>jersey-json</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-			<dependency>
-			<groupId>com.sun.jersey</groupId>
-			<artifactId>jersey-atom</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-	</dependencies>
+	</dependencies-->
 	<build>
 		<plugins>
+			<plugin>
+				<artifactId>maven-antrun-plugin</artifactId>
+				<executions>
+					<execution>
+						<configuration>
+							<tasks>
+								<echo message="Preparing char entities"/>
+								<mkdir dir="${gen-src-dir}"/>
+								<copy todir="${gen-src-dir}">
+									<fileset dir="src/docbook"/>
+								</copy>
+								<replace file="${gen-src-dir}/jersey.ent" token="$version" value="${version}"/>
+								<!--
+								<echo message="Copying individual modules"/>
+								<copy file="../jersey-module/src/docbook/module.xml" todir="${gen-src-dir}"/>
+								-->
+							</tasks>
+						</configuration>
+						<id>process-entities</id>
+						<phase>package</phase>
+						<goals>
+							<goal>run</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+			
 			<plugin>
 				<groupId>com.agilejava.docbkx</groupId>
 				<artifactId>docbkx-maven-plugin</artifactId>
@@ -92,21 +94,12 @@
 				</dependencies>
 				<configuration>
 					<xincludeSupported>true</xincludeSupported>
-          <sourceDirectory>src/docbook</sourceDirectory>
-          <targetDirectory>${project.build.directory}/docbook</targetDirectory>
-					<entities>
-						<entity>
-							<name>version</name>
-							<value>${version}</value>
-						</entity>
-						<entity>
-							<name>docbooksrc</name>
-							<value>${assembly.directory}/docbook</value>
-						</entity>
-					</entities>
-          <partAutolabel>1</partAutolabel>
-          <sectionAutolabel>1</sectionAutolabel>
-          <sectionLabelIncludesComponentLabel>1</sectionLabelIncludesComponentLabel>
+					<sourceDirectory>${gen-src-dir}</sourceDirectory>
+					<targetDirectory>${project.build.directory}/docbook</targetDirectory>
+					<includes>user-guide.xml</includes>
+					<partAutolabel>1</partAutolabel>
+					<sectionAutolabel>1</sectionAutolabel>
+					<sectionLabelIncludesComponentLabel>1</sectionLabelIncludesComponentLabel>
 				</configuration>
 				<executions>
 					<execution>
@@ -117,7 +110,7 @@
 						<phase>package</phase>
 					</execution>
 				</executions>
-				</plugin>
+			</plugin>
 			<plugin>
 				<artifactId>maven-assembly-plugin</artifactId>
 				<configuration>
@@ -135,33 +128,44 @@
 					</execution>
 				</executions>
 			</plugin>
-      <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>build-helper-maven-plugin</artifactId>
-        <executions>
-          <execution>
-            <id>attach-artifacts</id>
-            <phase>package</phase>
-            <goals>
-              <goal>attach-artifact</goal>
-            </goals>
-            <configuration>
-              <artifacts>
-                <artifact>
-                  <file>${project.build.directory}/docbook/user-guide.pdf</file>
-                  <type>pdf</type>
-                  <classifier>user-guide</classifier>
-                </artifact>
-              </artifacts>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
-			</plugins>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>build-helper-maven-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>attach-artifacts</id>
+						<phase>package</phase>
+						<goals>
+							<goal>attach-artifact</goal>
+						</goals>
+						<configuration>
+							<artifacts>
+								<artifact>
+									<file>${project.build.directory}/docbook/user-guide.pdf</file>
+									<type>pdf</type>
+									<classifier>user-guide</classifier>
+								</artifact>
+							</artifacts>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin> <!-- remove the generated src dir-->
+				<artifactId>maven-clean-plugin</artifactId>
+				<configuration>
+					<filesets>
+						<fileset>
+							<directory>${gen-src-dir}</directory>
+						</fileset>
+					</filesets>
+				</configuration>
+			</plugin>
+		</plugins>
 	</build>
-
+	
 	<properties>
 		<assembly.directory>${project.build.directory}/assembly</assembly.directory>
+		<gen-src-dir>${basedir}/gen-src</gen-src-dir>
 	</properties>
 
 </project>
