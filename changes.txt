@@ -1,4 +1,7 @@
 release 1.0.3 (2009-03/04)
+- Added ConnectionListenerFilter
+  ConnectionListenerFilter provides informations about proceeding requests and
+  responses.
 - Fixed issue 181
   https://jersey.dev.java.net/issues/show_bug.cgi?id=181
   NotFoundException construction now includes an optional URI that was not

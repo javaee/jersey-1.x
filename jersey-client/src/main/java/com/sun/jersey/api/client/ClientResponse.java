@@ -357,7 +357,27 @@ public class ClientResponse {
     public String getLanguage() {
         return getMetadata().getFirst("Content-Language");
     }
-    
+
+    /**
+     * Get Content-Length.
+     *
+     * @return Content-Length as integer if present and valid number. In other
+     * cases returns -1.
+     */
+    public int getLength() {
+        int size = -1;
+
+        String sizeStr = getMetadata().getFirst("Content-Length");
+
+        try {
+            size = Integer.parseInt(sizeStr);
+        } catch (NumberFormatException nfe) {
+            // do nothing
+        }
+
+        return size;
+    }
+
     /**
      * Get the list of cookies.
      * 
