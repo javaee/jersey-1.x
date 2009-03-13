@@ -1,9 +1,9 @@
 /*
  *
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
- * 
- * Copyright 1997-2007 Sun Microsystems, Inc. All rights reserved.
- * 
+ *
+ * Copyright 1997-2008 Sun Microsystems, Inc. All rights reserved.
+ *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
  * and Distribution License("CDDL") (collectively, the "License").  You
@@ -11,7 +11,7 @@
  * a copy of the License at https://jersey.dev.java.net/CDDL+GPL.html
  * or jersey/legal/LICENSE.txt.  See the License for the specific
  * language governing permissions and limitations under the License.
- * 
+ *
  * When distributing the software, include this License Header Notice in each
  * file and include the License file at jersey/legal/LICENSE.txt.
  * Sun designates this particular file as subject to the "Classpath" exception
@@ -20,9 +20,9 @@
  * Header, with the fields enclosed by brackets [] replaced by your own
  * identifying information: "Portions Copyrighted [year]
  * [name of copyright owner]"
- * 
+ *
  * Contributor(s):
- * 
+ *
  * If you wish your version of this file to be governed by only the CDDL or
  * only the GPL Version 2, indicate your decision by adding "[Contributor]
  * elects to include this software in this distribution under the [CDDL or GPL
@@ -34,45 +34,55 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
+package com.sun.jersey.samples.bookstore.resources.glassfish;
 
-package com.sun.jersey.samples.bookstore.resources;
+import java.io.File;
+import java.net.URI;
+import java.util.Arrays;
 
-import com.sun.jersey.api.view.ImplicitProduces;
+import com.sun.jersey.samples.bookstore.resources.WebContainerFacade;
+import org.glassfish.embed.EmbeddedInfo;
+import org.glassfish.embed.ScatteredArchive;
+import org.glassfish.embed.Server;
 
-import javax.ws.rs.GET;
-import javax.ws.rs.Produces;
-import javax.ws.rs.core.MediaType;
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlRootElement;
+/**
+ * @version $Revision: 1.1 $
+ */
+public class GlassFishFacade implements WebContainerFacade {
 
-@ImplicitProduces("text/html;qs=5")
-@XmlRootElement
-@XmlAccessorType(XmlAccessType.FIELD)
-public class Item {
+    private Server glassfish;
     
-    private String title;
-    private String author;
+    private final URI BASE_URI;
 
-    public Item() {
+    public GlassFishFacade(URI baseUri) {
+        this.BASE_URI = baseUri;
     }
 
-    public Item(final String title, final String author) {
-        this.title = title;
-        this.author = author;
+    public void setUp() throws Exception {
+        if (glassfish == null) {
+            EmbeddedInfo embeddedInfo = new EmbeddedInfo();
+            embeddedInfo.setLogging(true);
+            embeddedInfo.setHttpPort(BASE_URI.getPort());
+            embeddedInfo.setVerbose(true);
+            
+            glassfish = new Server(embeddedInfo);
+
+            // Deploy Glassfish referencing the web.xml
+            ScatteredArchive war = new ScatteredArchive(BASE_URI.getRawPath(),
+                    new File("src/main/webapp"),
+                    new File("src/main/webapp/WEB-INF/web.xml"),
+                    Arrays.asList(new File("target/classes").toURI().toURL(),
+                    new File("target/test-classes").toURI().toURL()));
+
+            glassfish.start();
+            glassfish.getDeployer().deploy(war, null);
+        }
     }
 
-    public String getTitle() {
-        return title;
-    }
-
-    public String getAuthor() {
-        return author;
-    }
-
-    @GET
-    @Produces({MediaType.APPLICATION_XML, MediaType.TEXT_XML, MediaType.APPLICATION_JSON})
-    public Item getXml() {
-        return this;
+    public void tearDown() throws Exception {
+        if (glassfish != null) {
+            glassfish.stop();
+            glassfish = null;
+        }
     }
 }

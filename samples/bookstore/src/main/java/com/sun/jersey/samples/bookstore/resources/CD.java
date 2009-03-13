@@ -40,10 +40,18 @@ package com.sun.jersey.samples.bookstore.resources;
 import com.sun.jersey.api.NotFoundException;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlRootElement;
 
+@XmlRootElement
+@XmlAccessorType(XmlAccessType.FIELD)
 public class CD extends Item {
     
-    private final Track[] tracks;
+    private Track[] tracks;
+
+    public CD() {
+    }
     
     public CD(final String title, final String author, final Track[] tracks) {
         super(title, author);

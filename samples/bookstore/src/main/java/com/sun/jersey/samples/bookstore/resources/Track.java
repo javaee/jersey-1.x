@@ -37,16 +37,25 @@
 
 package com.sun.jersey.samples.bookstore.resources;
 
-/**
- *
- * @author japod
- */
+import com.sun.jersey.api.view.ImplicitProduces;
+import javax.ws.rs.GET;
+import javax.ws.rs.Produces;
+import javax.ws.rs.core.MediaType;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlRootElement;
+
+@ImplicitProduces("text/html;qs=5")
+@XmlRootElement
+@XmlAccessorType(XmlAccessType.FIELD)
 public class Track {
     
     private String name;
     private int length;
-    
-    /** Creates a new instance of Track */
+
+    public Track() {
+    }
+
     public Track(String name, int length) {
         this.name = name;
         this.length = length;
@@ -58,5 +67,11 @@ public class Track {
 
     public int getLength() {
         return length;
+    }
+    
+    @GET
+    @Produces({MediaType.APPLICATION_XML, MediaType.TEXT_XML, MediaType.APPLICATION_JSON})
+    public Track getXml() {
+        return this;
     }
 }
