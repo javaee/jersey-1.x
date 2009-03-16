@@ -50,7 +50,7 @@
         <dependency>
             <groupId>com.sun.jersey</groupId>
             <artifactId>jersey-core</artifactId>
-            <version>>${project.version}</version>
+            <version>${project.version}</version>
             <!-- <scope>test</scope> -->
         </dependency>
         <dependency>
