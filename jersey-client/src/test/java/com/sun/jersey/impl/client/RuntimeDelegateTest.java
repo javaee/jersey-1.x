@@ -38,11 +38,10 @@ package com.sun.jersey.impl.client;
 
 import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.WebResource;
-import com.sun.jersey.server.impl.provider.RuntimeDelegateImpl; // not sure whether this is ok
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import com.sun.net.httpserver.HttpServer;
-// import com.sun.ws.rs.ext.RuntimeDelegateImpl;
+import com.sun.ws.rs.ext.RuntimeDelegateImpl;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;

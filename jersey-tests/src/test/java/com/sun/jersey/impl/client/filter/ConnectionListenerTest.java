@@ -41,6 +41,7 @@ import com.sun.jersey.api.client.ClientRequest;
 import com.sun.jersey.api.client.WebResource;
 import com.sun.jersey.api.client.filter.ContainerListener;
 import com.sun.jersey.api.client.filter.OnStartConnectionListener;
+import com.sun.jersey.impl.container.grizzly.AbstractGrizzlyServerTester;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;

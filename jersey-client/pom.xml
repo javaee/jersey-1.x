@@ -51,7 +51,6 @@
             <groupId>com.sun.jersey</groupId>
             <artifactId>jersey-core</artifactId>
             <version>${project.version}</version>
-            <!-- <scope>test</scope> -->
         </dependency>
         <dependency>
             <groupId>junit</groupId>
@@ -64,23 +63,6 @@
             <artifactId>http</artifactId>
             <version>20070405</version>
             <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.sun.grizzly</groupId>
-            <artifactId>grizzly-http</artifactId>
-            <version>1.8.6.4</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.sun.jersey</groupId>
-            <artifactId>jersey-server</artifactId>
-            <version>1.0.3-SNAPSHOT</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>javax.ws.rs</groupId>
-            <artifactId>jsr311-api</artifactId>
-            <version>1.0</version>
         </dependency>
     </dependencies>
     <build>
@@ -100,6 +82,6 @@
                     </execution>
                 </executions>
             </plugin>
-	        </plugins>
+	</plugins>
     </build>
 </project>
