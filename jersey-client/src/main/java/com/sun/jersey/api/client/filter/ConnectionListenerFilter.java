@@ -78,15 +78,15 @@ public class ConnectionListenerFilter extends ClientFilter {
     private final OnStartConnectionListener listenerFactory;
 
     /**
-     * Create ConnectionListener filter.
+     * Creates ConnectionListenerFilter.
      *
-     * @param listenerFactory {@link BytesTransferredListenerFactory} instance
+     * @param listenerFactory {@link OnStartConnectionListener} instance
      *
      */
     public ConnectionListenerFilter(OnStartConnectionListener listenerFactory) {
 
         if (listenerFactory == null) {
-            throw new IllegalArgumentException("ConnectionListener can't be initiated without BytesTransferredListenerFactory");
+            throw new IllegalArgumentException("ConnectionListenerFilter can't be initiated without OnStartConnectionListener");
         }
 
         this.listenerFactory = listenerFactory;
