@@ -47,6 +47,8 @@ import com.sun.jersey.spi.container.ContainerResponseFilter;
 import com.sun.jersey.spi.inject.Injectable;
 import com.sun.jersey.spi.uri.rules.UriRule;
 import com.sun.jersey.spi.uri.rules.UriRuleContext;
+import com.sun.jersey.spi.uri.rules.UriRules;
+
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Iterator;
@@ -86,7 +88,10 @@ public final class SubLocatorRule extends BaseRule {
 
         // Invoke the sub-locator to get the sub-resource
         resource = invokeSubLocator(resource, context);
-
+        // If null then no match
+        if (resource == null)
+            return false;
+        
         // Check if instance is a class
         if (resource instanceof Class) {
             // If so then get the instance of that class
