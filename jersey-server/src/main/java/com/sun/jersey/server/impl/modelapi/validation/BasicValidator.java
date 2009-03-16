@@ -50,11 +50,21 @@ import com.sun.jersey.api.model.ResourceModelIssue;
 import com.sun.jersey.api.uri.UriTemplate;
 import com.sun.jersey.impl.ImplMessages;
 import java.lang.annotation.Annotation;
+import java.lang.reflect.Method;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import javax.ws.rs.CookieParam;
+import javax.ws.rs.HeaderParam;
 import javax.ws.rs.HttpMethod;
+import javax.ws.rs.MatrixParam;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 
 /**
@@ -215,6 +225,7 @@ public class BasicValidator extends AbstractModelValidator {
     }
 
     public void visitAbstractResourceMethod(AbstractResourceMethod method) {
+        checkParameters(method.getMethod());
         // ensure GET returns non-void value
         if (!isRequestResponseMethod(method) && ("GET".equals(method.getHttpMethod()) && (void.class == method.getMethod().getReturnType()))) {
             issueList.add(new ResourceModelIssue(
@@ -261,6 +272,7 @@ public class BasicValidator extends AbstractModelValidator {
     }
 
     public void visitAbstractSubResourceLocator(AbstractSubResourceLocator locator) {
+        checkParameters(locator.getMethod());
         if (void.class == locator.getMethod().getReturnType()) {
             issueList.add(new ResourceModelIssue(
                     locator,
@@ -277,9 +289,40 @@ public class BasicValidator extends AbstractModelValidator {
         for (Parameter parameter : locator.getParameters()) {
             if (Parameter.Source.ENTITY == parameter.getSource()) {
                 issueList.add(new ResourceModelIssue(
-                    locator,
-                    ImplMessages.ERROR_SUBRES_LOC_HAS_ENTITY_PARAM(locator.getMethod()),
-                    true));
+                        locator,
+                        ImplMessages.ERROR_SUBRES_LOC_HAS_ENTITY_PARAM(locator.getMethod()),
+                        true));
+            }
+        }
+    }
+    private static final Set<Class> ParamAnnotationSET = createParamAnnotationSet();
+
+    private static Set<Class> createParamAnnotationSet() {
+        Set<Class> set = new HashSet<Class>(6);
+        set.add(Context.class);
+        set.add(HeaderParam.class);
+        set.add(CookieParam.class);
+        set.add(MatrixParam.class);
+        set.add(QueryParam.class);
+        set.add(PathParam.class);
+        return Collections.unmodifiableSet(set);
+    }
+
+    private void checkParameters(Method m) {
+        Annotation[][] pas = m.getParameterAnnotations();
+        int paramCount = 0;
+        for (Annotation[] pa : pas) {
+            paramCount++;
+            int annotCount = 0;
+            for (Annotation a : pa) {
+                if (ParamAnnotationSET.contains(a.annotationType())) {
+                    annotCount++;
+                    if (annotCount > 1) {
+                        issueList.add(new ResourceModelIssue(m, ImplMessages.AMBIGUOUS_PARAMETER(m.toString(),
+                                Integer.toString(paramCount)), false));
+                        break;
+                    }
+                }
             }
         }
     }

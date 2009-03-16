@@ -669,6 +669,35 @@ public class BasicValidatorTest extends TestCase {
         assertTrue(validator.getIssueList().isEmpty());
     }
 
+    @Path(value = "/AmbigParamTest")
+    public static class TestAmbiguousParams {
+
+        @GET @Path("a")
+        public String get(@PathParam("a") @QueryParam("a") String a) {
+            return "hi";
+        }
+
+        @GET @Path("b")
+        public String getSub(@PathParam("a") @QueryParam("b") @MatrixParam("c") String a, @MatrixParam("m") @QueryParam("m") int i) {
+            return "hi";
+        }
+
+        @Path("c")
+        public Object getSubLoc(@MatrixParam("m") @CookieParam("c") String a) {
+            return null;
+        }
+    }
+
+    public void testAmbiguousParams() throws Exception {
+        System.out.println("---\nA warning should be reported if ambiguous source of a parameter is seen");
+        AbstractResource ar = IntrospectionModeller.createResource(TestAmbiguousParams.class);
+        BasicValidator validator = new BasicValidator();
+        validator.validate(ar);
+        printIssueList(validator);
+        assertTrue(!validator.fatalIssuesFound());
+        assertEquals(4, validator.getIssueList().size());
+    }
+
 
     // TODO: test multiple root resources with the same uriTempl (in WebApplicationImpl.processRootResources ?)
     private static void printIssueList(BasicValidator validator) {

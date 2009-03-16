@@ -474,12 +474,6 @@ public class IntrospectionModeller {
         for (Annotation annotation : annotations) {
             if (ANOT_HELPER_MAP.containsKey(annotation.annotationType())) {
                 ParamAnnotationHelper helper = ANOT_HELPER_MAP.get(annotation.annotationType());
-                if (null != paramSource) {
-                    if (LOGGER.isLoggable(Level.WARNING)) {
-                        LOGGER.warning(ImplMessages.AMBIGUOUS_PARAMETER(nameForLogging, 
-                                Integer.toString(order)));
-                    }
-                }
                 paramAnnotation = annotation;
                 paramSource = helper.getSource();
                 paramName = helper.getValueOf(annotation);
