@@ -70,9 +70,7 @@ public class BasicValidatorTest extends TestCase {
     @Path("rootNoCtor")
     public static class TestRootResourceWithoutPublicConstructor {
 
-        private TestRootResourceWithoutPublicConstructor() {
-        }
-        ;
+        private TestRootResourceWithoutPublicConstructor() { }
 
         @GET
         public String getIt() {
@@ -93,17 +91,11 @@ public class BasicValidatorTest extends TestCase {
     public static class TestRootResourceNonAmbigCtors {
 
         // TODO: hmmm, even if this is not ambiguous, it is strange; shall we warn, the 1st and the 2nd ctor won't be used?
-        public TestRootResourceNonAmbigCtors(@QueryParam("s") String s) {
-        }
-        ;
+        public TestRootResourceNonAmbigCtors(@QueryParam("s") String s) {}
 
-        public TestRootResourceNonAmbigCtors(@QueryParam("n") int n) {
-        }
-        ;
+        public TestRootResourceNonAmbigCtors(@QueryParam("n") int n) {}
 
-        public TestRootResourceNonAmbigCtors(@QueryParam("s") String s, @QueryParam("n") int n) {
-        }
-        ;
+        public TestRootResourceNonAmbigCtors(@QueryParam("s") String s, @QueryParam("n") int n) {}
 
         @GET
         public String getIt() {
@@ -171,6 +163,27 @@ public class BasicValidatorTest extends TestCase {
         assertTrue(!validator.getIssueList().isEmpty());
     // TODO: there might still be an implicit viewable associated with it
     // assertTrue(validator.getIssueList().get(0).isFatal());
+    }
+
+    public static class TestNonPublicRM1 {
+
+        @GET
+        private  String getThis() {
+            return "this";
+        }
+
+        @PUT
+        public void putThis(String t) {
+        }
+    }
+
+    public void testNonPublicRM1() throws Exception {
+        System.out.println("---\nAn issue should be reported if a resource method is not public:");
+        AbstractResource ar = IntrospectionModeller.createResource(TestNonPublicRM1.class);
+        BasicValidator validator = new BasicValidator();
+        validator.validate(ar);
+        printIssueList(validator);
+        assertTrue(!validator.getIssueList().isEmpty());
     }
 
     public static class TestMoreThanOneEntity {
@@ -672,6 +685,16 @@ public class BasicValidatorTest extends TestCase {
     @Path(value = "/AmbigParamTest")
     public static class TestAmbiguousParams {
 
+        @QueryParam("q")
+        @HeaderParam("q")
+        private int a;
+
+        @QueryParam("b")
+        @HeaderParam("b")
+        @MatrixParam("q")
+        public void setB(String b) {
+        }
+
         @GET @Path("a")
         public String get(@PathParam("a") @QueryParam("a") String a) {
             return "hi";
@@ -695,7 +718,7 @@ public class BasicValidatorTest extends TestCase {
         validator.validate(ar);
         printIssueList(validator);
         assertTrue(!validator.fatalIssuesFound());
-        assertEquals(4, validator.getIssueList().size());
+        assertEquals(6, validator.getIssueList().size());
     }
 
 

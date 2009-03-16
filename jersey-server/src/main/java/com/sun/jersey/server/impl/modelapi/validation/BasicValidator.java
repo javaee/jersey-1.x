@@ -48,9 +48,14 @@ import com.sun.jersey.api.model.AbstractSubResourceMethod;
 import com.sun.jersey.api.model.Parameter;
 import com.sun.jersey.api.model.ResourceModelIssue;
 import com.sun.jersey.api.uri.UriTemplate;
+import com.sun.jersey.core.reflection.AnnotatedMethod;
+import com.sun.jersey.core.reflection.MethodList;
 import com.sun.jersey.impl.ImplMessages;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -62,6 +67,7 @@ import javax.ws.rs.CookieParam;
 import javax.ws.rs.HeaderParam;
 import javax.ws.rs.HttpMethod;
 import javax.ws.rs.MatrixParam;
+import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
@@ -177,6 +183,18 @@ public class BasicValidator extends AbstractModelValidator {
                 }
             }
         });
+
+        // check setters for ambiguities
+        for (AbstractSetterMethod asm : resource.getSetterMethods()) {
+            checkParameter(asm, asm.getMethod().toString(), "1", asm.getMethod().getDeclaredAnnotations());
+        }
+
+        // check fields for ambiguities
+        for (AbstractField af : resource.getFields()) {
+            checkParameter(af, af.getField().toString(), af.getField().getName(), af.getField().getDeclaredAnnotations());
+        }
+
+        checkNonPublicMethods(resource);
     }
 
     private abstract class ResourceMethodAmbiguityErrMsgGenerator<T extends AbstractResourceMethod> {
@@ -308,24 +326,71 @@ public class BasicValidator extends AbstractModelValidator {
         return Collections.unmodifiableSet(set);
     }
 
-    private void checkParameters(Method m) {
-        Annotation[][] pas = m.getParameterAnnotations();
-        int paramCount = 0;
-        for (Annotation[] pa : pas) {
-            paramCount++;
+    private void checkParameter(Object source, String nameForLogging, String paramNameForLogging, Annotation[] pa) {
             int annotCount = 0;
             for (Annotation a : pa) {
                 if (ParamAnnotationSET.contains(a.annotationType())) {
                     annotCount++;
                     if (annotCount > 1) {
-                        issueList.add(new ResourceModelIssue(m, ImplMessages.AMBIGUOUS_PARAMETER(m.toString(),
-                                Integer.toString(paramCount)), false));
+                        issueList.add(new ResourceModelIssue(
+                                source,
+                                ImplMessages.AMBIGUOUS_PARAMETER(nameForLogging, paramNameForLogging),
+                                false));
                         break;
                     }
                 }
             }
+    }
+
+    private void checkParameters(Method m) {
+        Annotation[][] pas = m.getParameterAnnotations();
+        int paramCount = 0;
+        for (Annotation[] pa : pas) {
+            paramCount++;
+            checkParameter(m, m.toString(), Integer.toString(paramCount), pa);
         }
     }
+
+
+    private List<Method> getDeclaredMethods(final Class _c) {
+        final List<Method> ml = new ArrayList<Method>();
+
+        AccessController.doPrivileged(new PrivilegedAction<Object>() {
+            Class c = _c;
+            public Object run() {
+                while (c != Object.class && c != null) {
+                    for (Method m : c.getDeclaredMethods()) ml.add(m);
+                    c = c.getSuperclass();
+                }
+                return null;
+            }
+        });
+
+        return ml;
+    }
+
+    private void checkNonPublicMethods(final AbstractResource ar) {
+
+        final MethodList declaredMethods = new MethodList(
+                getDeclaredMethods(ar.getResourceClass()));
+
+        // non-public resource methods
+        for (AnnotatedMethod m : declaredMethods.hasMetaAnnotation(HttpMethod.class).
+                hasNotAnnotation(Path.class).isNotPublic()) {
+            issueList.add(new ResourceModelIssue(ar, ImplMessages.NON_PUB_RES_METHOD(m.getMethod().toGenericString()), false));
+        }
+        // non-public subres methods
+        for (AnnotatedMethod m : declaredMethods.hasMetaAnnotation(HttpMethod.class).
+                hasAnnotation(Path.class).isNotPublic()) {
+            issueList.add(new ResourceModelIssue(ar, ImplMessages.NON_PUB_SUB_RES_METHOD(m.getMethod().toGenericString()), false));
+        }
+        // non-public subres locators
+        for (AnnotatedMethod m : declaredMethods.hasNotMetaAnnotation(HttpMethod.class).
+                hasAnnotation(Path.class).isNotPublic()) {
+            issueList.add(new ResourceModelIssue(ar, ImplMessages.NON_PUB_SUB_RES_LOC(m.getMethod().toGenericString()), false));
+        }
+    }
+
 
     // TODO: the method could probably have more then 2 params...
     private boolean isRequestResponseMethod(AbstractResourceMethod method) {

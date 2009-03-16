@@ -57,11 +57,7 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
-import java.security.AccessController;
-import java.security.PrivilegedAction;
-import java.util.ArrayList;
 import java.util.Collections;
-import java.util.List;
 import java.util.Map;
 import java.util.WeakHashMap;
 import java.util.logging.Level;
@@ -125,8 +121,6 @@ public class IntrospectionModeller {
 
         workOutPostConstructPreDestroy(resource, methodList);
         
-        logNonPublicMethods(resourceClass);
-
         if (LOGGER.isLoggable(Level.FINEST)) {
             LOGGER.finest(ImplMessages.NEW_AR_CREATED_BY_INTROSPECTION_MODELER(
                     resource.toString()));
@@ -505,49 +499,5 @@ public class IntrospectionModeller {
         } catch (Exception ex) {
         }
         return null;
-    }
-    
-    private static void logNonPublicMethods(final Class resourceClass) {
-        assert null != resourceClass;
-        
-        if (!LOGGER.isLoggable(Level.WARNING)) {
-            return; // does not make sense to check when logging is disabled anyway
-        }
-        
-        final MethodList declaredMethods = new MethodList(
-                getDeclaredMethods(resourceClass));
-
-        // non-public resource methods
-        for (AnnotatedMethod m : declaredMethods.hasMetaAnnotation(HttpMethod.class).
-                hasNotAnnotation(Path.class).isNotPublic()) {
-            LOGGER.warning(ImplMessages.NON_PUB_RES_METHOD(m.getMethod().toGenericString()));
-        }
-        // non-public subres methods
-        for (AnnotatedMethod m : declaredMethods.hasMetaAnnotation(HttpMethod.class).
-                hasAnnotation(Path.class).isNotPublic()) {
-            LOGGER.warning(ImplMessages.NON_PUB_SUB_RES_METHOD(m.getMethod().toGenericString()));
-        }
-        // non-public subres locators
-        for (AnnotatedMethod m : declaredMethods.hasNotMetaAnnotation(HttpMethod.class).
-                hasAnnotation(Path.class).isNotPublic()) {
-            LOGGER.warning(ImplMessages.NON_PUB_SUB_RES_LOC(m.getMethod().toGenericString()));
-        }
-    }
-    
-    private static List<Method> getDeclaredMethods(final Class _c) {
-        final List<Method> ml = new ArrayList<Method>();
-        
-        AccessController.doPrivileged(new PrivilegedAction<Object>() {
-            Class c = _c;
-            public Object run() {
-                while (c != Object.class && c != null) {
-                    for (Method m : c.getDeclaredMethods()) ml.add(m);
-                    c = c.getSuperclass();
-                }
-                return null;
-            }
-        });
-                
-        return ml;
     }
 }
