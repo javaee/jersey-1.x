@@ -79,6 +79,8 @@ import org.apache.commons.httpclient.MultiThreadedHttpConnectionManager;
  * @author Paul.Sandoz@Sun.Com
  */
 public class ApacheHttpClient extends Client {
+
+    private ApacheHttpClientHandler clientHandler;
     
     /**
      * Create a new client instance.
@@ -122,6 +124,8 @@ public class ApacheHttpClient extends Client {
             IoCComponentProviderFactory provider) {
         super(root, config, provider);
 
+        this.clientHandler = root;
+        
         HttpClient client = root.getHttpClient();
         
         client.getParams().setAuthenticationPreemptive(
@@ -131,6 +135,15 @@ public class ApacheHttpClient extends Client {
         if (connectTimeout != null) {
             client.getHttpConnectionManager().getParams().setConnectionTimeout(connectTimeout);
         }
+    }
+
+    /**
+     * Get the Apache HTTP client handler.
+     * 
+     * @return the Apache HTTP client handler.
+     */
+    public ApacheHttpClientHandler getClientHandler() {
+        return clientHandler;
     }
 
     /**
