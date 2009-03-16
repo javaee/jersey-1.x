@@ -1,4 +1,7 @@
 release 1.0.3 (2009-03/04)
+- Fixed issue 241
+  https://jersey.dev.java.net/issues/show_bug.cgi?id=241
+  IntrospectionModeller contains logic that should be in the validator
 - Fixed issue 243
   https://jersey.dev.java.net/issues/show_bug.cgi?id=243
   Return null from a sub-resource locator results in a 404 response.
