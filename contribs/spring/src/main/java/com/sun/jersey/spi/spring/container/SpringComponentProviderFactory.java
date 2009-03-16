@@ -45,6 +45,9 @@ import java.util.logging.Logger;
 
 import org.springframework.aop.framework.Advised;
 import org.springframework.aop.support.AopUtils;
+import org.springframework.beans.factory.BeanFactoryUtils;
+import org.springframework.beans.factory.NoSuchBeanDefinitionException;
+import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.util.ClassUtils;
@@ -60,7 +63,6 @@ import com.sun.jersey.core.spi.component.ioc.IoCManagedComponentProvider;
 import com.sun.jersey.spi.inject.Inject;
 import java.util.HashMap;
 import java.util.Map;
-import org.springframework.beans.factory.config.BeanDefinition;
 
 /**
  * The Spring-based {@link IoCComponentProviderFactory}.
@@ -73,7 +75,7 @@ import org.springframework.beans.factory.config.BeanDefinition;
 public class SpringComponentProviderFactory implements IoCComponentProviderFactory {
 
     private static final Logger LOGGER = Logger.getLogger(SpringComponentProviderFactory.class.getName());
-
+    
     private final ConfigurableApplicationContext springContext;
 
     public SpringComponentProviderFactory(ResourceConfig rc, ConfigurableApplicationContext springContext) {
@@ -82,16 +84,16 @@ public class SpringComponentProviderFactory implements IoCComponentProviderFacto
     }
 
     private void register(ResourceConfig rc, ConfigurableApplicationContext springContext) {
-        String[] names = springContext.getBeanDefinitionNames();
+        String[] names = BeanFactoryUtils.beanNamesIncludingAncestors(springContext);
         for (String name : names) {
-            Class<?> type = ClassUtils.getUserClass( springContext.getType(name) );
+            Class<?> type = ClassUtils.getUserClass(springContext.getType(name));
             if (ResourceConfig.isProviderClass(type)) {
-                LOGGER.info("Registering Spring bean, " + name + 
+                LOGGER.info("Registering Spring bean, " + name +
                         ", of type " + type.getName() +
                         " as a provider class");
                 rc.getClasses().add(type);
             } else if (ResourceConfig.isRootResourceClass(type)) {
-                LOGGER.info("Registering Spring bean, " + name + 
+                LOGGER.info("Registering Spring bean, " + name +
                         ", of type " + type.getName() +
                         " as a root resource class");
                 rc.getClasses().add(type);
@@ -104,7 +106,7 @@ public class SpringComponentProviderFactory implements IoCComponentProviderFacto
     }
 
     public IoCComponentProvider getComponentProvider(ComponentContext cc, Class c) {
-        final Autowire autowire = (Autowire)c.getAnnotation(Autowire.class);
+        final Autowire autowire = (Autowire) c.getAnnotation(Autowire.class);
         if (autowire != null) {
             if (LOGGER.isLoggable(Level.FINEST)) {
                 LOGGER.finest("Creating resource class " +
@@ -115,23 +117,50 @@ public class SpringComponentProviderFactory implements IoCComponentProviderFacto
             }
             return new SpringInstantiatedComponentProvider(c, autowire);
         }
-        
+
         final String beanName = getBeanName(cc, c, springContext);
         if (beanName == null) {
             return null;
         }
 
-        final String scope = springContext.getBeanFactory().
-                getBeanDefinition(beanName).getScope();
+        final String scope = findBeanDefinition(beanName).getScope();
         return new SpringManagedComponentProvider(getComponentScope(scope), beanName, c);
+    }
+
+    /**
+     * Fine the bean definition from a given context or from any of the parent
+     * contexts.
+     *
+     * @param beanName the bean name.
+     * @return the bean definition.
+     * @throws NoSuchBeanDefinitionException if the bean definition could not
+     *         be found.
+     */
+    private BeanDefinition findBeanDefinition(String beanName) {
+        ConfigurableApplicationContext current = springContext;
+        BeanDefinition beanDef = null;
+        do {
+            try {
+                return current.getBeanFactory().getBeanDefinition(beanName);
+            } catch (NoSuchBeanDefinitionException e) {
+                final ApplicationContext parent = current.getParent();
+                if (parent != null && parent instanceof ConfigurableApplicationContext) {
+                    current = (ConfigurableApplicationContext) parent;
+                } else {
+                    throw e;
+                }
+            }
+        } while (beanDef == null && current != null);
+        return beanDef;
     }
 
     private ComponentScope getComponentScope(String scope) {
         ComponentScope cs = scopeMap.get(scope);
         return (cs != null) ? cs : ComponentScope.Undefined;
     }
-    
-    private final Map<String, ComponentScope> scopeMap = createScopeMap();    
+
+    private final Map<String, ComponentScope> scopeMap = createScopeMap();
+
     private Map<String, ComponentScope> createScopeMap() {
         Map<String, ComponentScope> m = new HashMap<String, ComponentScope>();
         m.put(BeanDefinition.SCOPE_SINGLETON, ComponentScope.Singleton);
@@ -141,6 +170,7 @@ public class SpringComponentProviderFactory implements IoCComponentProviderFacto
     }
 
     private class SpringInstantiatedComponentProvider implements IoCInstantiatedComponentProvider {
+
         private final Class c;
         private final Autowire a;
 
@@ -153,17 +183,18 @@ public class SpringComponentProviderFactory implements IoCComponentProviderFacto
             return springContext.getBeanFactory().createBean(c,
                     a.mode().getSpringCode(), a.dependencyCheck());
         }
-        
+
         public Object getInjectableInstance(Object o) {
             return SpringComponentProviderFactory.getInjectableInstance(o);
         }
     }
-    
+
     private class SpringManagedComponentProvider implements IoCManagedComponentProvider {
+
         private final ComponentScope scope;
         private final String beanName;
         private final Class c;
-        
+
         SpringManagedComponentProvider(ComponentScope scope, String beanName, Class c) {
             this.scope = scope;
             this.beanName = beanName;
@@ -185,7 +216,7 @@ public class SpringComponentProviderFactory implements IoCComponentProviderFacto
 
     private static Object getInjectableInstance(Object o) {
         if (AopUtils.isAopProxy(o)) {
-            final Advised aopResource = (Advised)o;
+            final Advised aopResource = (Advised) o;
             try {
                 return aopResource.getTargetSource().getTarget();
             } catch (Exception e) {
@@ -210,7 +241,7 @@ public class SpringComponentProviderFactory implements IoCComponentProviderFacto
             }
         }
 
-        final String names[] = springContext.getBeanNamesForType(c);
+        final String names[] = BeanFactoryUtils.beanNamesForTypeIncludingAncestors(springContext, c);
 
         if (names.length == 0) {
             return null;

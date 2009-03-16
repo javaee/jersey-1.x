@@ -1,7 +1,15 @@
 release 1.0.3 (2009-03/04)
-- Added ConnectionListenerFilter
-  ConnectionListenerFilter provides informations about proceeding requests and
-  responses.
+- Fix for issue 222
+  https://jersey.dev.java.net/issues/show_bug.cgi?id=222
+  The Spring integration now correctly supports configurations with
+  hierarchical application contexts.
+- Fix for issue 39
+  https://jersey.dev.java.net/issues/show_bug.cgi?id=39
+  Listening to and getting feedback from the client making requests and
+  receiving responses is now possible using the filter:
+    com.sun.jersey.api.client.filter.ConnectionListenerFilter
+  Such a filter can be utilized to obtain progress for the sending
+  and recieving of large documents.
 - Fixed issue 181
   https://jersey.dev.java.net/issues/show_bug.cgi?id=181
   NotFoundException construction now includes an optional URI that was not
