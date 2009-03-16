@@ -152,20 +152,13 @@
 			</plugin>
 			<plugin> <!-- remove the generated src dir-->
 				<artifactId>maven-clean-plugin</artifactId>
-				<configuration>
-					<filesets>
-						<fileset>
-							<directory>${gen-src-dir}</directory>
-						</fileset>
-					</filesets>
-				</configuration>
 			</plugin>
 		</plugins>
 	</build>
 	
 	<properties>
 		<assembly.directory>${project.build.directory}/assembly</assembly.directory>
-		<gen-src-dir>${basedir}/gen-src</gen-src-dir>
+		<gen-src-dir>${basedir}/target/gen-src</gen-src-dir>
 	</properties>
 
 </project>
