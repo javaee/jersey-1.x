@@ -160,7 +160,7 @@ public class MultiPartReaderWriterTest extends TestCase {
             BodyPart part2 = result.getBodyParts().get(1);
             checkMediaType(new MediaType("text", "xml"), part2.getMediaType());
             checkEntity("<outer><inner>value</inner></outer>", (BodyPartEntity) part2.getEntity());
-            
+
             result.getParameterizedHeaders();
             result.cleanup();
         } catch (IOException e) {
@@ -368,6 +368,40 @@ public class MultiPartReaderWriterTest extends TestCase {
         checkEleven(seed, 100000);
     }
 
+    // Echo back the multipart that was sent
+    public void testTwelve() {
+        WebResource.Builder builder = client.resource(BASE_URI)
+                .path("multipart/twelve").accept("multipart/mixed").type("multipart/mixed");
+        try {
+            MultiPart entity = new MultiPart().
+              bodyPart("CONTENT", MediaType.TEXT_PLAIN_TYPE);
+            MultiPart response = builder.put(MultiPart.class, entity);
+            String actual = response.getBodyParts().get(0).getEntityAs(String.class);
+            assertEquals("CONTENT", actual);
+            response.cleanup();
+        } catch (UniformInterfaceException e) {
+            report(e);
+            fail("Caught exception: " + e);
+        }
+
+    }
+
+    // Call clean up explicitly
+    public void testThirteen() {
+        WebResource.Builder builder = client.resource(BASE_URI)
+                .path("multipart/thirteen").accept("multipart/mixed").type("multipart/mixed");
+        try {
+            MultiPart entity = new MultiPart().
+              bodyPart("CONTENT", MediaType.TEXT_PLAIN_TYPE);
+            String response = builder.put(String.class, entity);
+            assertEquals("cleanup", response);
+        } catch (UniformInterfaceException e) {
+            report(e);
+            fail("Caught exception: " + e);
+        }
+
+    }
+
     /*
     public void testListen() throws Exception {
         System.out.println("Running for 30 seconds");
@@ -391,7 +425,6 @@ public class MultiPartReaderWriterTest extends TestCase {
     }
 
     private void checkEleven(String seed, int multiplier) {
-//        System.out.println("Multiplier=" + multiplier);
         StringBuilder sb = new StringBuilder(seed.length() * multiplier);
         for (int i = 0; i < multiplier; i++) {
             sb.append(seed);
@@ -406,7 +439,7 @@ public class MultiPartReaderWriterTest extends TestCase {
             String actual = response.getBodyParts().get(0).getEntityAs(String.class);
             assertEquals("Length for multiplier " + multiplier, expected.length(), actual.length());
             assertEquals("Content for multiplier " + multiplier, expected, actual);
-            entity.cleanup();
+            response.cleanup();
         } catch (UniformInterfaceException e) {
             report(e);
             fail("Caught exception: " + e + " for multiplier " + multiplier);

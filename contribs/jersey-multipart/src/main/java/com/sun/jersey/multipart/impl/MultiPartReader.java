@@ -44,18 +44,14 @@ import com.sun.jersey.multipart.FormDataBodyPart;
 import com.sun.jersey.multipart.FormDataMultiPart;
 import com.sun.jersey.multipart.MultiPart;
 import com.sun.jersey.multipart.MultiPartConfig;
+import com.sun.jersey.spi.CloseableService;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 import java.text.ParseException;
-import java.util.Enumeration;
 import java.util.List;
 import java.util.Map;
-import javax.activation.DataSource;
-import javax.mail.MessagingException;
-import javax.mail.internet.MimeMultipart;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
@@ -64,6 +60,11 @@ import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.ext.MessageBodyReader;
 import javax.ws.rs.ext.Provider;
 import javax.ws.rs.ext.Providers;
+import org.jvnet.mimepull.Header;
+import org.jvnet.mimepull.MIMEConfig;
+import org.jvnet.mimepull.MIMEMessage;
+import org.jvnet.mimepull.MIMEParsingException;
+import org.jvnet.mimepull.MIMEPart;
 
 /**
  * <p>{@link Provider} {@link MessageBodyReader} implementation for
@@ -74,30 +75,39 @@ import javax.ws.rs.ext.Providers;
 public class MultiPartReader implements MessageBodyReader<MultiPart> {
 
     /**
-     * <p>Accept constructor injection of the configuration parameters for this
-     * application.</p>
+     * <P>Injectable helper to look up appropriate {@link Provider}s
+     * for our body parts.</p>
      */
-    public MultiPartReader(@Context MultiPartConfig config) {
-//        System.out.println("MultiPartConfig = " + config);
-        if (config == null) {
-            throw new IllegalArgumentException("The MultiPartConfig instance we expected is not present.  Have you registered the MultiPartConfigProvider class?");
-        }
-        this.config = config;
-    }
-
+    private final Providers providers;
 
     /**
      * <p>Injected configuration parameters for this application.</p>
      */
-    private MultiPartConfig config = null;
+    private final MultiPartConfig config;
 
+    private final CloseableService closeableService;
+
+    private final MIMEConfig mimeConfig;
 
     /**
-     * <P>Injectable helper to look up appropriate {@link Provider}s
-     * for our body parts.</p>
+     * <p>Accept constructor injection of the configuration parameters for this
+     * application.</p>
      */
-    @Context
-    private Providers providers;
+    public MultiPartReader(@Context Providers providers, @Context MultiPartConfig config, 
+            @Context CloseableService closeableService) {
+        this.providers = providers;
+        
+        if (config == null) {
+            throw new IllegalArgumentException("The MultiPartConfig instance we expected is not present.  Have you registered the MultiPartConfigProvider class?");
+        }
+        this.config = config;
+
+        this.closeableService = closeableService;
+
+        mimeConfig = new MIMEConfig();
+        mimeConfig.setMemoryThreshold(config.getBufferThreshold());
+    }
+
 
     public boolean isReadable(Class<?> type, Type genericType,
                                Annotation[] annotations, MediaType mediaType) {
@@ -126,111 +136,75 @@ public class MultiPartReader implements MessageBodyReader<MultiPart> {
                               MultivaluedMap<String, String> headers,
                               InputStream stream) throws IOException, WebApplicationException {
 
-        // First, use JavaMail to parse the entire input stream into a MimeMultipart
-        MimeMultipart mm = null;
         try {
-            mm = new MimeMultipart(new MultiPartDataSource(mediaType.toString(), stream));
-        } catch (MessagingException ex) {
-            throw new WebApplicationException(ex);
-        }
+            MIMEMessage mm = new MIMEMessage(stream, 
+                    mediaType.getParameters().get("boundary"),
+                    mimeConfig);
 
-        // Transliterate the entire MimeMultipart into our own {@link MultiPart} instance
-        boolean formData = false;
-        MultiPart multiPart = null;
-        if ("multipart".equals(mediaType.getType()) && "form-data".equals(mediaType.getSubtype())) {
-            multiPart = new FormDataMultiPart();
-            formData = true;
-        } else if ("multipart".equals(mediaType.getType()) && "x-form-data".equals(mediaType.getSubtype())) { // FIXME - testing @FormParam
-            multiPart = new FormDataMultiPart();                                                              // FIXME - testing @FormParam
-            formData = true;                                                                                  // FIXME - testing @FormParam
-        } else {
-            multiPart = new MultiPart();
-        }
-        multiPart.setProviders(providers);
-        MultivaluedMap<String,String> mpHeaders = multiPart.getHeaders();
-        for (Map.Entry<String,List<String>> entry : headers.entrySet()) {
-            List<String> values = entry.getValue();
-            for (String value : values) {
-                mpHeaders.add(entry.getKey(), value);
+            boolean formData = false;
+            MultiPart multiPart = null;
+            if ("multipart".equals(mediaType.getType()) && "form-data".equals(mediaType.getSubtype())) {
+                multiPart = new FormDataMultiPart();
+                formData = true;
+            } else if ("multipart".equals(mediaType.getType()) && "x-form-data".equals(mediaType.getSubtype())) { // FIXME - testing @FormParam
+                multiPart = new FormDataMultiPart();                                                              // FIXME - testing @FormParam
+                formData = true;                                                                                  // FIXME - testing @FormParam
+            } else {
+                multiPart = new MultiPart();
             }
-        }
-        if (!formData) {
-            multiPart.setMediaType(mediaType);
-        }
 
-        // Transliterate each body part as well
-        try {
-            int count = mm.getCount();
-            for (int i = 0; i < count; i++) {
-                javax.mail.BodyPart bp = mm.getBodyPart(i);
+            multiPart.setProviders(providers);
+
+            MultivaluedMap<String,String> mpHeaders = multiPart.getHeaders();
+            for (Map.Entry<String,List<String>> entry : headers.entrySet()) {
+                List<String> values = entry.getValue();
+                for (String value : values) {
+                    mpHeaders.add(entry.getKey(), value);
+                }
+            }
+
+            if (!formData) {
+                multiPart.setMediaType(mediaType);
+            }
+
+            for (MIMEPart mp : mm.getAttachments()) {
                 BodyPart bodyPart = null;
                 if (formData) {
                     bodyPart = new FormDataBodyPart();
                 } else {
                     bodyPart = new BodyPart();
                 }
+                
                 // Configure providers
                 bodyPart.setProviders(providers);
+                                
                 // Copy headers
-                Enumeration bpHeaders = bp.getAllHeaders();
-                while (bpHeaders.hasMoreElements()) {
-                    javax.mail.Header bpHeader = (javax.mail.Header) bpHeaders.nextElement();
-                    bodyPart.getHeaders().add(bpHeader.getName(), bpHeader.getValue());
-                    if (formData && "Content-Disposition".equalsIgnoreCase(bpHeader.getName())) {
+                for (Header h : mp.getAllHeaders()) {
+                    bodyPart.getHeaders().add(h.getName(), h.getValue());
+                    if (formData && "Content-Disposition".equalsIgnoreCase(h.getName())) {
                         try {
-                            FormDataContentDisposition header = new FormDataContentDisposition(bpHeader.getValue());
+                            FormDataContentDisposition header = new FormDataContentDisposition(h.getValue());
                             ((FormDataBodyPart) bodyPart).setName(header.getName());
                         } catch (ParseException e) {
                             throw new WebApplicationException(e);
                         }
-                    }
+                    }                    
                 }
-                MediaType bpMediaType = MediaType.valueOf(bp.getContentType());
+                
+                MediaType bpMediaType = MediaType.valueOf(mp.getContentType());
                 bodyPart.setMediaType(bpMediaType);
                 // Copy data into a BodyPartEntity structure
-                bodyPart.setEntity(new BodyPartEntity(bp.getInputStream(), config.getBufferThreshold()));
+                bodyPart.setEntity(new BodyPartEntity(mp));
                 // Add this BodyPart to our MultiPart
-                multiPart.getBodyParts().add(bodyPart);
+                multiPart.getBodyParts().add(bodyPart);                
             }
-        } catch (MessagingException ex) {
+
+            if (closeableService != null)
+                closeableService.add(multiPart);
+            
+            return multiPart;
+        } catch (MIMEParsingException ex) {
             throw new WebApplicationException(ex);
         }
-
-        return multiPart;
-
     }
-
-
-    /**
-     * <p>Private implementation of <code>DataSource</code>.</p>
-     */
-    private class MultiPartDataSource implements DataSource {
-
-        private String contentType;
-        private InputStream stream;
-
-        public MultiPartDataSource(String contentType, InputStream stream) {
-            this.contentType = contentType;
-            this.stream = stream;
-        }
-
-        public String getContentType() {
-            return this.contentType;
-        }
-
-        public InputStream getInputStream() throws IOException {
-            return this.stream;
-        }
-
-        public String getName() {
-            throw new UnsupportedOperationException("getName() is not supported.");
-        }
-
-        public OutputStream getOutputStream() throws IOException {
-            throw new UnsupportedOperationException("getOutputStream() is not supported");
-        }
-
-    }
-
-
 }

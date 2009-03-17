@@ -129,7 +129,6 @@ public class MultiPartResource {
         if (!bean.getValue().equals("myvalue")) {
             return Response.ok("FAILED:  Second part value = " + bean.getValue()).build();
         }
-        multiPart.cleanup();
         return Response.ok("SUCCESS:  All tests passed").build();
     }
 
@@ -166,7 +165,6 @@ public class MultiPartResource {
         } else if (multiPart.getBodyParts().size() != 0) {
             response = "Got " + multiPart.getBodyParts().size() + " body parts instead of zero";
         }
-        multiPart.cleanup();
         return Response.ok(response).build();
     }
 
@@ -211,7 +209,6 @@ public class MultiPartResource {
         if (!bean.getValue().equals("myvalue")) {
             return Response.ok("FAILED:  Second part value = " + bean.getValue()).build();
         }
-        multiPart.cleanup();
         return Response.ok("SUCCESS:  All tests passed").build();
     }
 
@@ -240,7 +237,6 @@ public class MultiPartResource {
             fdmp.cleanup();
             return Response.ok("FAILED:  Value of fdmp.getFields().size() is " + fdmp.getFields().size() + " instead of 3").build();
         }
-        fdmp.cleanup();
         return Response.ok("SUCCESS:  All tests passed").build();
     }
 
@@ -272,39 +268,49 @@ public class MultiPartResource {
             return Response.ok("SUCCESS:  All tests passed").build();
         } catch (IOException e) {
             return Response.ok("FAILED:  Threw IOException").build();
-        } finally {
-            mp.cleanup();
         }
     }
 
-    // Echo back a body part whose content is may or may not exceed the size
+    // Echo back a body part whose content may or may not exceed the size
     // of the buffer threshold
     @Path("eleven")
     @PUT
     @Consumes("multipart/mixed")
     @Produces("multipart/mixed")
     public Response eleven(MultiPart multiPart) throws IOException {
-        try {
-            BodyPartEntity bpe = (BodyPartEntity) multiPart.getBodyParts().get(0).getEntity();
-            StringBuilder sb = new StringBuilder();
-            InputStream stream = bpe.getInputStream();
-            InputStreamReader reader = new InputStreamReader(stream);
-            char[] buffer = new char[2048];
-            while (true) {
-                int n = reader.read(buffer);
-                if (n < 0) {
-                    break;
-                }
-                sb.append(buffer, 0, n);
+        BodyPartEntity bpe = (BodyPartEntity) multiPart.getBodyParts().get(0).getEntity();
+        StringBuilder sb = new StringBuilder();
+        InputStream stream = bpe.getInputStream();
+        InputStreamReader reader = new InputStreamReader(stream);
+        char[] buffer = new char[2048];
+        while (true) {
+            int n = reader.read(buffer);
+            if (n < 0) {
+                break;
             }
-//            System.out.println("SIZE=" + sb.toString().length());
-            return Response.ok(new MultiPart().bodyPart(sb.toString(), MediaType.TEXT_PLAIN_TYPE)).
-                    type(new MediaType("multipart", "mixed")).build();
-        } catch (IOException e) {
-            throw e;
-        } finally {
-            multiPart.cleanup();
+            sb.append(buffer, 0, n);
         }
+        return Response.ok(new MultiPart().bodyPart(sb.toString(), MediaType.TEXT_PLAIN_TYPE)).
+                type(new MediaType("multipart", "mixed")).build();
     }
 
+
+    // Echo back the multipart that was sent
+    @Path("twelve")
+    @PUT
+    @Consumes("multipart/mixed")
+    @Produces("multipart/mixed")
+    public MultiPart twelve(MultiPart multiPart) throws IOException {
+        return multiPart;
+    }
+
+    // Call clean up explicitly
+    @Path("thirteen")
+    @PUT
+    @Consumes("multipart/mixed")
+    @Produces("multipart/mixed")
+    public String thirteen(MultiPart multiPart) throws IOException {
+        multiPart.cleanup();
+        return "cleanup";
+    }
 }

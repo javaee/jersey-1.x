@@ -37,6 +37,8 @@
 
 package com.sun.jersey.multipart;
 
+import java.io.Closeable;
+import java.io.IOException;
 import java.util.List;
 import javax.ws.rs.core.MediaType;
 
@@ -45,7 +47,7 @@ import javax.ws.rs.core.MediaType;
  * {@link BodyPart} because MultiPart entities can be nested inside other
  * MultiPart entities to an arbitrary depth.</p>
  */
-public class MultiPart extends BodyPart {
+public class MultiPart extends BodyPart implements Closeable {
 
 
     // ------------------------------------------------------------ Constructors
@@ -157,18 +159,6 @@ public class MultiPart extends BodyPart {
 
 
     /**
-     * <p>Perform any necessary cleanup at the end of processing this
-     * {@link MultiPart}.</p>
-     */
-    @Override
-    public void cleanup() {
-        for (BodyPart bp : getBodyParts()) {
-            bp.cleanup();
-        }
-    }
-
-
-    /**
      * <p>Override the entity set operation on a {@link MultiPart} to throw
      * <code>IllegalArgumentException</code>.</p>
      *
@@ -194,4 +184,21 @@ public class MultiPart extends BodyPart {
     }
 
 
+    /**
+     * <p>Perform any necessary cleanup at the end of processing this
+     * {@link MultiPart}.</p>
+     */
+    @Override
+    public void cleanup() {
+        for (BodyPart bp : getBodyParts()) {
+            bp.cleanup();
+        }
+    }
+
+
+    // Closeable
+
+    public void close() throws IOException {
+        cleanup();
+    }
 }

@@ -37,155 +37,57 @@
 
 package com.sun.jersey.multipart;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
-import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
+import java.io.Closeable;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
+import org.jvnet.mimepull.MIMEPart;
 
 /**
- * <p>Proxy class representing the entity of a {@link BodyPart} when a
- * {@link MultiPart} entity is received and parsed.  Its primary purpose
- * is to provide an input stream to retrieve the actual data.  However, it
- * also transparently deals with storing the data in a temporary disk file,
- * if it is larger than a configurable size; otherwise, the data is stored
- * in memory for faster processing.</p>
+ * Proxy class representing the entity of a {@link BodyPart} when a
+ * {@link MultiPart} entity is received and parsed.
+ * <p>
+ * Its primary purpose is to provide an input stream to retrieve the actual data.
+ * However, it also transparently deals with storing the data in a temporary disk
+ * file, if it is larger than a configurable size; otherwise, the data is stored
+ * in memory for faster processing.
  */
-public class BodyPartEntity {
-
-
-    /**
-     * <p>Default threshold size if not specified to our constructor.</p>
-     */
-    private static final int DEFAULT_THRESHOLD = 4096;
-
-
-    // ------------------------------------------------------------ Constructors
-
+public class BodyPartEntity implements Closeable {
+    private final MIMEPart mimePart;
 
     /**
-     * <p>Construct a new {@link BodyPartEntity} with a default threshold size.</p>
+     * Construct a new {@link BodyPartEntity} with a {@link MIMEPart}.
      *
-     * @param stream <code>InputStream</code> containing the raw bytes of
-     *  this body part
-     *
-     * @exception IOException if an input/output error occurs
+     * @param mimePart <code>MIMEPart</code> containing the input stream
+     *        of this body part entity.
      */
-    public BodyPartEntity(InputStream stream) throws IOException {
-        this(stream, DEFAULT_THRESHOLD);
+    public BodyPartEntity(MIMEPart mimePart) {
+        this.mimePart = mimePart;
     }
 
 
     /**
-     * <p>Construct a new {@link BodyPartEntity} with a specified threshold size.</p>
-     *
-     * @param stream <code>InputStream</code> containing the raw bytes of
-     *  this body part
-     * @param threshold Desired threshold size
-     *
-     * @exception IllegalArgumentException if the specified threshold is
-     *  not positive
-     * @exception IOException if an input/output error occurs
+     * Get the input stream to the raw bytes of this body part entity.
+     * 
+     * @return the input stream of the body part entity.
      */
-    public BodyPartEntity(InputStream stream, int threshold) throws IOException {
-        // Validate and set our threshold
-        if (threshold <= 0) {
-            throw new IllegalArgumentException("Invalid threshold value " + threshold);
-        }
-        this.threshold = threshold;
-        // Absorb the bytes from the request or response
-        byte buffer[] = new byte[threshold];
-        int n = stream.read(buffer);
-        if (n < 0) { // Zero length entity
-            data = new byte[0];
-        } else if (n < threshold) {
-            data = new byte[n];
-            System.arraycopy(buffer, 0, data, 0, n);
-        } else {
-            file = File.createTempFile("BodyPartEntity.", ".data");
-            OutputStream ostream = new BufferedOutputStream(new FileOutputStream(file), threshold);
-            ostream.write(buffer, 0, n);
-            while (true) {
-                n = stream.read(buffer);
-                if (n <= 0) {
-                    break;
-                }
-                ostream.write(buffer, 0, n);
-            }
-            ostream.close();
-        }
+    public InputStream getInputStream() {
+        return mimePart.read();
     }
 
-
-    // ------------------------------------------------------ Instance Variables
-
-
     /**
-     * <p>Byte buffer containing our raw bytes, if smaller than the specified
-     * threshold.  If the data is larger than the threshold, this value should
-     * be set to <code>null</code>.</p>
-     */
-    private byte data[] = null;
-
-
-    /**
-     * <p>File containing our raw bytes, if larger than the specified
-     * threshold.  If the data is smaller than the threshold, this value should
-     * be set to <code>null</code>.</p>
-     */
-    private File file = null;
-
-
-    /**
-     * <p>Opened input stream (if any) returned by our <code>getInputStream()</code>
-     * method.</p>
-     */
-    private InputStream istream = null;
-
-
-    /**
-     * <p>Threshold size (in bytes) over which the raw data for this body part
-     * will be stored in a temporary disk file, instead of in memory.</p>
-     */
-    private int threshold = 0;
-
-
-    // ---------------------------------------------------------- Public Methods
-
-
-    /**
-     * <p>Clean up the temporary file we used, if any.</p>
+     * Clean up temporary file(s), if any were utilized.
      */
     public void cleanup() {
-        if (istream != null) {
-            try {
-                istream.close();
-            } catch (Exception e) {
-                // Ignore
-            }
-        }
-        istream = null;
-        if ((file != null) && file.exists()) {
-            file.delete();
-        }
+        mimePart.close();
     }
-
+    
+    // Closeable
 
     /**
-     * <p>Return an input stream to the raw bytes of this body part entity.</p>
+     * Defer to {@link #cleanup}.
+     * 
      */
-    public InputStream getInputStream() throws IOException {
-        if (data != null) {
-            istream = new ByteArrayInputStream(data);
-        } else {
-            istream = new BufferedInputStream(new FileInputStream(file), threshold);
-        }
-        return istream;
+    public void close() throws IOException {
+        cleanup();
     }
-
-
 }
