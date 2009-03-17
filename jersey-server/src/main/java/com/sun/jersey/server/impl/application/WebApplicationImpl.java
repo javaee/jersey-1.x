@@ -794,6 +794,11 @@ public final class WebApplicationImpl implements WebApplication {
 
         PathPattern p = new PathPattern(t);
 
+        // If "application.wadl" is already defined to not add the
+        // default WADL resource
+        if (rulesMap.containsKey(p))
+            return;
+        
         // Configure meta-data
         getResourceClass(WadlResource.class);
 
