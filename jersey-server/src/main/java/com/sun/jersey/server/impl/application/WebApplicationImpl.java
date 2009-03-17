@@ -156,6 +156,8 @@ public final class WebApplicationImpl implements WebApplication {
     
     private final ThreadLocalHttpContext context;
     
+    private final CloseableServiceFactory closeableFactory;
+
     private boolean initiated;
     
     private ResourceConfig resourceConfig;
@@ -185,7 +187,7 @@ public final class WebApplicationImpl implements WebApplication {
     private FilterFactory filterFactory;
 
     private WadlFactory wadlFactory;
-    
+
     public WebApplicationImpl() {
         this.context = new ThreadLocalHttpContext();
 
@@ -232,6 +234,9 @@ public final class WebApplicationImpl implements WebApplication {
                     return null;
             }
         });
+
+        closeableFactory = new CloseableServiceFactory(context);
+        injectableFactory.add(closeableFactory);
     }
 
     private class ComponentProcessorImpl implements IoCComponentProcessor {
@@ -572,6 +577,7 @@ public final class WebApplicationImpl implements WebApplication {
             _handleRequest(localContext, request, response);
         } finally {
             PerRequestFactory.destroy(localContext);
+            closeableFactory.close(localContext);
             context.set(null);
         }
     }
