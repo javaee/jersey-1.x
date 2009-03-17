@@ -39,6 +39,7 @@ package com.sun.jersey.client.apache;
 import com.sun.jersey.api.client.ClientHandlerException;
 import com.sun.jersey.api.client.ClientRequest;
 import com.sun.jersey.api.client.ClientResponse;
+import com.sun.jersey.api.client.CommittingOutputStream;
 import com.sun.jersey.api.client.TerminatingClientHandler;
 import com.sun.jersey.api.client.config.ClientConfig;
 import com.sun.jersey.client.apache.config.ApacheHttpClientConfig;
@@ -127,7 +128,7 @@ public final class ApacheHttpClientHandler extends TerminatingClientHandler {
         return client;
     }
     
-    public ClientResponse handle(ClientRequest cr)
+    public ClientResponse handle(final ClientRequest cr)
             throws ClientHandlerException {
 
         final Map<String, Object> props = cr.getProperties();
@@ -160,8 +161,6 @@ public final class ApacheHttpClientHandler extends TerminatingClientHandler {
             methodParams.setSoTimeout(readTimeout);
         }
 
-        writeOutBoundHeaders(cr.getMetadata(), method);
-
         if (method instanceof EntityEnclosingMethod) {
             final EntityEnclosingMethod entMethod = (EntityEnclosingMethod) method;
 
@@ -171,6 +170,14 @@ public final class ApacheHttpClientHandler extends TerminatingClientHandler {
                 if (chunkedEncodingSize != null) {
                     // There doesn't seems to be a way to set the chunk size.
                     entMethod.setContentChunked(true);
+
+                    // It is not possible for a MessageBodyWriter to modify
+                    // the set of headers before writing out any bytes to
+                    // the OutputStream
+                    // This makes it impossible to use the multipart
+                    // writer that modifies the content type to add a boundary
+                    // parameter
+                    writeOutBoundHeaders(cr.getMetadata(), method);
 
                     // Do not buffer the request entity when chunked encoding is
                     // set
@@ -198,10 +205,16 @@ public final class ApacheHttpClientHandler extends TerminatingClientHandler {
 
                     ByteArrayOutputStream baos = new ByteArrayOutputStream();
                     try {
-                        re.writeRequestEntity(baos);
+                        re.writeRequestEntity(new CommittingOutputStream(baos) {
+                            @Override
+                            protected void commit() throws IOException {
+                                writeOutBoundHeaders(cr.getMetadata(), method);
+                            }
+                        });
                     } catch (IOException ex) {
                         throw new ClientHandlerException(ex);
                     }
+
                     final byte[] content = baos.toByteArray();
                     entMethod.setRequestEntity(new RequestEntity() {
                         public boolean isRepeatable() {
@@ -225,6 +238,8 @@ public final class ApacheHttpClientHandler extends TerminatingClientHandler {
 
             }
         } else {
+            writeOutBoundHeaders(cr.getMetadata(), method);
+        
             // Follow redirects
             method.setFollowRedirects(cr.getPropertyAsFeature(ApacheHttpClientConfig.PROPERTY_FOLLOW_REDIRECTS));
         }

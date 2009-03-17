@@ -64,17 +64,17 @@ public class HttpMethodTest extends AbstractGrizzlyServerTester {
         public String get() {
             return "GET";
         }
-               
+
         @POST
         public String post(String entity) {
             return entity;
         }
-        
+
         @PUT
         public String put(String entity) {
             return entity;
         }
-        
+
         @DELETE
         public String delete() {
             return "DELETE";
@@ -90,11 +90,11 @@ public class HttpMethodTest extends AbstractGrizzlyServerTester {
         public void postNoConsumeProduce() {
         }
     }
-        
+
     public HttpMethodTest(String testName) {
         super(testName);
     }
-    
+
     public void testHead() {
         startServer(HttpMethodResource.class);
         WebResource r = ApacheHttpClient.create().resource(getUri().path("test").build());
@@ -119,7 +119,7 @@ public class HttpMethodTest extends AbstractGrizzlyServerTester {
         assertTrue(cr.hasEntity());
         cr.close();
     }
-    
+
     public void testPost() {
         startServer(HttpMethodResource.class);
         WebResource r = ApacheHttpClient.create().resource(getUri().path("test").build());
@@ -128,8 +128,8 @@ public class HttpMethodTest extends AbstractGrizzlyServerTester {
         ClientResponse cr = r.post(ClientResponse.class, "POST");
         assertTrue(cr.hasEntity());
         cr.close();
-    }    
-    
+    }
+
     public void testPostChunked() {
         ResourceConfig rc = new DefaultResourceConfig(HttpMethodResource.class);
         rc.getProperties().put(ResourceConfig.PROPERTY_CONTAINER_REQUEST_FILTERS,
@@ -188,7 +188,7 @@ public class HttpMethodTest extends AbstractGrizzlyServerTester {
         assertTrue(cr.hasEntity());
         cr.close();
     }
-    
+
     public void testDelete() {
         startServer(HttpMethodResource.class);
         WebResource r = ApacheHttpClient.create().resource(getUri().path("test").build());
@@ -198,7 +198,7 @@ public class HttpMethodTest extends AbstractGrizzlyServerTester {
         assertTrue(cr.hasEntity());
         cr.close();
     }
-    
+
     public void testAll() {
         startServer(HttpMethodResource.class);
         WebResource r = ApacheHttpClient.create().resource(getUri().path("test").build());
@@ -206,13 +206,13 @@ public class HttpMethodTest extends AbstractGrizzlyServerTester {
         assertEquals("GET", r.get(String.class));
 
         assertEquals("POST", r.post(String.class, "POST"));
-        
+
         assertEquals(204, r.path("noproduce").post(ClientResponse.class, "POST").getStatus());
 
         assertEquals(204, r.path("noconsumeproduce").post(ClientResponse.class).getStatus());
-        
+
         assertEquals("PUT", r.post(String.class, "PUT"));
-        
+
         assertEquals("DELETE", r.delete(String.class));
     }
 

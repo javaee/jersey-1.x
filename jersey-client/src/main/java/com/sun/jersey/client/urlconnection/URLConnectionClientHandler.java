@@ -36,10 +36,12 @@
  */
 package com.sun.jersey.client.urlconnection;
 
+import com.sun.jersey.api.client.Client;
 import com.sun.jersey.core.header.InBoundHeaders;
 import com.sun.jersey.api.client.ClientHandlerException;
 import com.sun.jersey.api.client.ClientRequest;
 import com.sun.jersey.api.client.ClientResponse;
+import com.sun.jersey.api.client.CommittingOutputStream;
 import com.sun.jersey.api.client.TerminatingClientHandler;
 import com.sun.jersey.api.client.config.ClientConfig;
 import java.io.ByteArrayInputStream;
@@ -129,7 +131,6 @@ public final class URLConnectionClientHandler extends TerminatingClientHandler {
 
     private ClientResponse _invoke(final ClientRequest ro)
             throws ProtocolException, IOException {
-
         final HttpURLConnection uc;
 
         if(this.httpURLConnectionFactory == null) {
@@ -169,11 +170,12 @@ public final class URLConnectionClientHandler extends TerminatingClientHandler {
 
         // Write the request headers
         writeOutBoundHeaders(ro.getMetadata(), uc);
-        
+
         // Write the entity (if any)
         Object entity = ro.getEntity();
         if (entity != null) {
             uc.setDoOutput(true);
+
             writeRequestEntity(ro, new RequestEntityWriterListener() {
                 public void onRequestEntitySize(long size) {
                     if (size != -1 && size < Integer.MAX_VALUE) {
@@ -192,9 +194,21 @@ public final class URLConnectionClientHandler extends TerminatingClientHandler {
                 }
 
                 public OutputStream onGetOutputStream() throws IOException {
-                    return uc.getOutputStream();
+                    return new CommittingOutputStream() {
+                        @Override
+                        protected OutputStream getOutputStream() throws IOException {
+                            return uc.getOutputStream();
+                        }
+
+                        @Override
+                        public void commit() throws IOException {
+                            writeOutBoundHeaders(ro.getMetadata(), uc);
+                        }
+                    };
                 }
             });
+        } else {
+            writeOutBoundHeaders(ro.getMetadata(), uc);
         }
         
         // Return the in-bound response
