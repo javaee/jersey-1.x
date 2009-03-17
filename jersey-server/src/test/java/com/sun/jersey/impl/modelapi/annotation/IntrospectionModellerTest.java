@@ -119,31 +119,6 @@ public class IntrospectionModellerTest extends TestCase {
         
     }
     
-    @Path("/np")
-    public class TestRootResourceNonPubMethods {
-        
-        /** Creates a new instance of TestRootResourceOne */
-        public TestRootResourceNonPubMethods() {
-        }
-        
-        @GET
-        String nonPublicResourceMethod() {
-            return "jedna";
-        }
-
-        @Path("loc")
-        String nonPublicSubresLocator() {
-            return "dve";
-        }
-
-        @GET
-        @Path("poc")
-        String nonPublicSubresMethod() {
-            return "tri";
-        }
-    }
-
-    
     public IntrospectionModellerTest(String testName) {
         super(testName);
     }
@@ -285,14 +260,4 @@ public class IntrospectionModellerTest extends TestCase {
         @Override
         public void close() throws SecurityException {}
     }
-    
-    public void testNonPubMethodLogging() {
-        Logger logger = Logger.getLogger(IntrospectionModeller.class.getName());
-        TestHandler myHandler = new TestHandler();
-        logger.addHandler(myHandler);
-        logger.setLevel(Level.WARNING);
-        IntrospectionModeller.createResource(TestRootResourceNonPubMethods.class);
-        assertEquals(3, myHandler.nonPubCounter);
-    }
-    
 }
