@@ -275,22 +275,43 @@ public class IntrospectionModeller {
             boolean isEncoded,
             Consumes classScopeConsumesAnnotation, 
             Produces classScopeProducesAnnotation) {
-        for (AnnotatedMethod m : methodList.hasMetaAnnotation(HttpMethod.class).
-                hasAnnotation(Path.class)) {
-            final Path mPathAnnotation = m.getAnnotation(Path.class);
-            final AbstractSubResourceMethod subResourceMethod = new AbstractSubResourceMethod(
-                    resource,
-                    m.getMethod(),
-                    new PathValue(
-                        mPathAnnotation.value()),
-                    m.getMetaMethodAnnotations(HttpMethod.class).get(0).value(),
-                    m.getAnnotations());
-       
-            addConsumes(m, subResourceMethod, classScopeConsumesAnnotation);
-            addProduces(m, subResourceMethod, classScopeProducesAnnotation);
-            processParameters(subResourceMethod, m, isEncoded);
 
-            resource.getSubResourceMethods().add(subResourceMethod);
+        for (AnnotatedMethod m : methodList.hasMetaAnnotation(HttpMethod.class).hasAnnotation(Path.class)) {
+
+            final Path mPathAnnotation = m.getAnnotation(Path.class);
+            final PathValue pv = new PathValue(mPathAnnotation.value());
+
+            final boolean emptySegmentCase =  "/".equals(pv.getValue()) || "".equals(pv.getValue());
+            
+            if (!emptySegmentCase) {
+
+                final AbstractSubResourceMethod abstractSubResourceMethod = new AbstractSubResourceMethod(
+                        resource,
+                        m.getMethod(),
+                        pv,
+                        m.getMetaMethodAnnotations(HttpMethod.class).get(0).value(),
+                        m.getAnnotations());
+
+                addConsumes(m, abstractSubResourceMethod, classScopeConsumesAnnotation);
+                addProduces(m, abstractSubResourceMethod, classScopeProducesAnnotation);
+                processParameters(abstractSubResourceMethod, m, isEncoded);
+
+                resource.getSubResourceMethods().add(abstractSubResourceMethod);
+
+            } else { // treat the sub-resource method as a resource method
+                
+                final AbstractResourceMethod abstractResourceMethod = new AbstractResourceMethod(
+                        resource,
+                        m.getMethod(),
+                        m.getMetaMethodAnnotations(HttpMethod.class).get(0).value(),
+                        m.getAnnotations());
+
+                addConsumes(m, abstractResourceMethod, classScopeConsumesAnnotation);
+                addProduces(m, abstractResourceMethod, classScopeProducesAnnotation);
+                processParameters(abstractResourceMethod, m, isEncoded);
+
+                resource.getResourceMethods().add(abstractResourceMethod);
+            }
         }
     }
     

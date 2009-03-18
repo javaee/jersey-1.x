@@ -721,8 +721,28 @@ public class BasicValidatorTest extends TestCase {
         assertEquals(6, validator.getIssueList().size());
     }
 
+    @Path(value = "/EmptyPathSegmentTest")
+    public static class TestEmptyPathSegment {
+
+        @GET @Path("/")
+        public String get() {
+            return "hi";
+        }
+    }
+
+    public void testEmptyPathSegment() throws Exception {
+        System.out.println("---\nA warning should be reported if @Path with \"/\" or empty string value is seen");
+        AbstractResource ar = IntrospectionModeller.createResource(TestEmptyPathSegment.class);
+        BasicValidator validator = new BasicValidator();
+        validator.validate(ar);
+        printIssueList(validator);
+        assertTrue(!validator.fatalIssuesFound());
+        assertEquals(1, validator.getIssueList().size());
+    }
+
 
     // TODO: test multiple root resources with the same uriTempl (in WebApplicationImpl.processRootResources ?)
+
     private static void printIssueList(BasicValidator validator) {
         for (ResourceModelIssue issue : validator.getIssueList()) {
             System.out.println((issue.isFatal() ? "ERROR: " : "WARNING: ") + issue.getMessage());

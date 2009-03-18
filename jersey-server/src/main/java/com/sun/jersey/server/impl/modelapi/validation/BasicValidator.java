@@ -267,6 +267,9 @@ public class BasicValidator extends AbstractModelValidator {
         for (Annotation a : method.getMethod().getDeclaredAnnotations()) {
             if (null != a.annotationType().getAnnotation(HttpMethod.class)) {
                 httpAnnotList.add(a.toString());
+            } else if ((a.annotationType() == Path.class) && !(method instanceof AbstractSubResourceMethod)) {
+                issueList.add(new ResourceModelIssue(
+                        method, ImplMessages.SUB_RES_METHOD_TREATED_AS_RES_METHOD(method.getMethod(), ((Path)a).value()), false));
             }
         }
         if (httpAnnotList.size() > 1) {
