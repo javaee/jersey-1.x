@@ -46,44 +46,36 @@ import javax.ws.rs.Path;
  *
  * @author Jakub.Podlesak@Sun.COM
  */
-public class SlashAnnotatedMethodTest extends AbstractResourceTester {
+public class EmptyPathSegSRMTest extends AbstractResourceTester {
 
     // test for issue#239
 
     @Path("/")
-    public static class SlashResource1 {
-        @GET
-        public String get() {
-            return "1";
-        }
-    }
-
-    @Path("/")
-    public static class SlashResource2 {
+    public static class SlashResource {
         @GET @Path("/")
         public String get() {
-            return "2";
+            return "/";
         }
     }
 
-    public SlashAnnotatedMethodTest(String name) {
+    @Path("/3")
+    public static class Resource3 {
+        @GET @Path("")
+        public String get() {
+            return "3";
+        }
+    }
+
+    public EmptyPathSegSRMTest(String name) {
         super(name);
     }
 
-   public void testSlash1() {
-        initiateWebApplication(SlashResource1.class);
+   public void testEmptyPathSegMethods() {
+        initiateWebApplication(SlashResource.class, Resource3.class);
 
         WebResource r = resource("/", false);
         
-        assertEquals("1", r.get(String.class));
+        assertEquals("/", r.get(String.class));
+        assertEquals("3", r.path("3").get(String.class));
    }
-
-   public void testSlash2() {
-        initiateWebApplication(SlashResource2.class);
-
-        WebResource r = resource("/", false);
-
-        assertEquals("2", r.get(String.class));
-   }
-
 }
