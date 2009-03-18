@@ -59,7 +59,7 @@ import java.util.List;
 public class EntityParamDispatchProvider extends AbstractResourceMethodDispatchProvider {
                 
     @Override
-    protected InjectableValuesProvider getParameterProvider(AbstractResourceMethod abstractResourceMethod) {
+    protected InjectableValuesProvider getInjectableValuesProvider(AbstractResourceMethod abstractResourceMethod) {
         boolean requireNoEntityParameter =
                 "GET".equals(abstractResourceMethod.getHttpMethod());
 

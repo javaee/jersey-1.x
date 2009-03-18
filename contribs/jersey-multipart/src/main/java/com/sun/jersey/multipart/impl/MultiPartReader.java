@@ -38,6 +38,7 @@
 package com.sun.jersey.multipart.impl;
 
 import com.sun.jersey.core.header.FormDataContentDisposition;
+import com.sun.jersey.core.header.MediaTypes;
 import com.sun.jersey.multipart.BodyPart;
 import com.sun.jersey.multipart.BodyPartEntity;
 import com.sun.jersey.multipart.FormDataBodyPart;
@@ -143,12 +144,9 @@ public class MultiPartReader implements MessageBodyReader<MultiPart> {
 
             boolean formData = false;
             MultiPart multiPart = null;
-            if ("multipart".equals(mediaType.getType()) && "form-data".equals(mediaType.getSubtype())) {
+            if (MediaTypes.typeEquals(mediaType, MediaType.MULTIPART_FORM_DATA_TYPE)) {
                 multiPart = new FormDataMultiPart();
                 formData = true;
-            } else if ("multipart".equals(mediaType.getType()) && "x-form-data".equals(mediaType.getSubtype())) { // FIXME - testing @FormParam
-                multiPart = new FormDataMultiPart();                                                              // FIXME - testing @FormParam
-                formData = true;                                                                                  // FIXME - testing @FormParam
             } else {
                 multiPart = new MultiPart();
             }

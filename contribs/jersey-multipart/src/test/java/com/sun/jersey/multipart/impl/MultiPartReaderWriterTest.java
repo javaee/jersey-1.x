@@ -320,7 +320,7 @@ public class MultiPartReaderWriterTest extends TestCase {
 
     public void testNine() {
         WebResource.Builder builder = client.resource(BASE_URI)
-                .path("multipart/nine").accept("text/plain").type("multipart/x-form-data"); // FIXME - testing @FormParam
+                .path("multipart/nine").accept("text/plain").type("multipart/form-data");
         try {
             MultiPartBean bean = new MultiPartBean("myname", "myvalue");
             FormDataMultiPart entity = new FormDataMultiPart().

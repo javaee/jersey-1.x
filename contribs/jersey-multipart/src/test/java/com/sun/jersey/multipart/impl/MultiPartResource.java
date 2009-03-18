@@ -40,6 +40,7 @@ package com.sun.jersey.multipart.impl;
 import com.sun.jersey.multipart.BodyPart;
 import com.sun.jersey.multipart.BodyPartEntity;
 import com.sun.jersey.multipart.FormDataMultiPart;
+import com.sun.jersey.multipart.FormDataParam;
 import com.sun.jersey.multipart.MultiPart;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -47,7 +48,6 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DefaultValue;
-import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
@@ -214,13 +214,13 @@ public class MultiPartResource {
 
     @Path("nine")
     @PUT
-    @Consumes("multipart/x-form-data") // FIXME - for testing @FormParam only
+    @Consumes("multipart/form-data")
     @Produces("text/plain")
     public Response nine(
-            @FormParam("foo") String foo,
-            @FormParam("baz") String baz,
-            @FormParam("unknown1") String unknown1,
-            @FormParam("unknown2") @DefaultValue("UNKNOWN") String unknown2,
+            @FormDataParam("foo") String foo,
+            @FormDataParam("baz") String baz,
+            @FormDataParam("unknown1") String unknown1,
+            @FormDataParam("unknown2") @DefaultValue("UNKNOWN") String unknown2,
             FormDataMultiPart fdmp) {
 
         if (!"bar".equals(foo)) {

@@ -46,9 +46,12 @@ import com.sun.jersey.core.util.MultivaluedMapImpl;
 import com.sun.jersey.multipart.BodyPartEntity;
 import com.sun.jersey.multipart.FormDataBodyPart;
 import com.sun.jersey.multipart.FormDataMultiPart;
+import com.sun.jersey.multipart.FormDataParam;
 import com.sun.jersey.server.impl.inject.AbstractHttpContextInjectable;
-import com.sun.jersey.server.impl.model.method.dispatch.FormDispatchProvider;
+import com.sun.jersey.server.impl.inject.InjectableValuesProvider;
+import com.sun.jersey.server.impl.model.method.dispatch.AbstractResourceMethodDispatchProvider;
 import com.sun.jersey.server.impl.model.parameter.multivalued.MultivaluedParameterExtractor;
+import com.sun.jersey.server.impl.model.parameter.multivalued.MultivaluedParameterExtractorProvider;
 import com.sun.jersey.spi.MessageBodyWorkers;
 import com.sun.jersey.spi.dispatch.RequestDispatcher;
 import com.sun.jersey.spi.inject.Injectable;
@@ -56,49 +59,34 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
-import javax.ws.rs.FormParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.ext.MessageBodyReader;
 
 /**
- * <p>Support <code>@FormParam</code> injection into method parameters from
+ * <p>Support <code>@FormDataParam</code> injection into method parameters from
  * a {@link FormDataMultiPart} entity.</p>
  */
-public class FormDataMultiPartDispatchProvider extends FormDispatchProvider {
-
-
-    // ------------------------------------------------------------ Constructors
-
-
-    public FormDataMultiPartDispatchProvider() {
-        super();
-    }
-
-
-    // -------------------------------------------------------- Static Variables
-
-
-    private static MediaType MULTIPART_FORM_DATA =
-            new MediaType("multipart", "x-form-data");
-
-
-    // ------------------------------------------------------ Instance Variables
-
+public class FormDataMultiPartDispatchProvider extends AbstractResourceMethodDispatchProvider {
+    private static final String FORM_MULTIPART_PROPERTY = "com.sun.jersey.api.representation.form.multipart";
 
     @Context
-    MessageBodyWorkers mbws;
+    private MessageBodyWorkers mbws;
 
-
-    // -------------------------------------------------------- Subclass Methods
+    @Context
+    private MultivaluedParameterExtractorProvider mpep;
 
 
     @Override
     public RequestDispatcher create(AbstractResourceMethod method) {
+        if ("GET".equals(method.getHttpMethod())) {
+            return null;
+        }
+        
         boolean found = false;
         for (MediaType m : method.getSupportedInputTypes()) {
-            found = (!m.isWildcardSubtype() && m.isCompatible(MULTIPART_FORM_DATA));
+            found = (!m.isWildcardSubtype() && m.isCompatible(MediaType.MULTIPART_FORM_DATA_TYPE));
             if (found) {
                 break;
             }
@@ -106,25 +94,58 @@ public class FormDataMultiPartDispatchProvider extends FormDispatchProvider {
         if (!found) {
             return null;
         }
+        
         return super.create(method);
     }
 
+    private static final class FormDataParameterProvider extends InjectableValuesProvider {
+        public FormDataParameterProvider(List<Injectable> is) {
+            super(is);
+        }
+
+        @Override
+        public Object[] getInjectableValues(HttpContext context) {
+            MediaType m = context.getRequest().getMediaType();
+            FormDataMultiPart form = context.getRequest().getEntity(FormDataMultiPart.class);
+            context.getProperties().put(FORM_MULTIPART_PROPERTY, form);
+
+            return super.getInjectableValues(context);
+        }
+    }
 
     @Override
-    protected List<Injectable> getInjectables(AbstractResourceMethod method) {
+    protected InjectableValuesProvider getInjectableValuesProvider(AbstractResourceMethod method) {
+        if (method.getParameters().isEmpty()) {
+            return null;
+        }
+
+        boolean hasFormParam = false;
+        for (int i = 0; i < method.getParameters().size(); i++) {
+            Parameter parameter = method.getParameters().get(i);
+            if (parameter.getAnnotation() != null)
+                hasFormParam |= parameter.getAnnotation().annotationType() == FormDataParam.class;
+        }
+        if (!hasFormParam)
+            return null;
+
+        List<Injectable> is = getInjectables(method);
+        if (is == null)
+            return null;
+
+        return new FormDataParameterProvider(is);
+    }
+
+    private List<Injectable> getInjectables(AbstractResourceMethod method) {
         List<Injectable> list = new ArrayList<Injectable>(method.getParameters().size());
         for (int i = 0; i < method.getParameters().size(); i++) {
             Parameter p = method.getParameters().get(i);
             if (Parameter.Source.ENTITY == p.getSource()) {
-                if (FormDataMultiPart.class.isAssignableFrom(p.getParameterClass())
-                    || MultivaluedMap.class.isAssignableFrom(p.getParameterClass())) {
-                    list.add(new FormDataMultiPartInjectable(p.getParameterClass(),
-                                                             p.getParameterType(),
-                                                             p.getAnnotations()));
+                if (FormDataMultiPart.class.isAssignableFrom(p.getParameterClass())) {
+                    list.add(new FormDataMultiPartInjectable());
                 } else {
                     list.add(null);
                 }
-            } else if (p.getAnnotation().annotationType() == FormParam.class) {
+            } else if (p.getAnnotation().annotationType() == FormDataParam.class) {
 //                if (FormDataContentDisposition.class == p.getParameterClass()) {
 //                    list.add(new DispositionParamInjectable(p));
 //                } else {
@@ -139,43 +160,16 @@ public class FormDataMultiPartDispatchProvider extends FormDispatchProvider {
     }
 
 
-    @Override
-    protected void processForm(HttpContext context) {
-        MediaType m = context.getRequest().getMediaType();
-        if ((m != null) && m.isCompatible(MULTIPART_FORM_DATA)) {
-            FormDataMultiPart form = context.getRequest().getEntity(FormDataMultiPart.class);
-            context.getProperties().put("com.sun.jersey.api.representation.form.multipart", form);
-//        } else {
-//            Form form = context.getRequest().getEntity(Form.class);
-//            context.getProperties().put("com.sun.jersey.api.representation.form", form);
-        }
-    }
-
-
-    // --------------------------------------------------------- Private Classes
-
-
     private final class FormDataMultiPartInjectable
             extends AbstractHttpContextInjectable<Object> {
-
-        FormDataMultiPartInjectable(Class clazz, Type type, Annotation[] annotations) {
-            this.clazz = clazz;
-            this.type = type;
-            this.annotations = annotations;
-        }
-
-        final Class<?> clazz;
-        final Type type;
-        final Annotation[] annotations;
 
         @Override
         public Object getValue(HttpContext context) {
             // Return entire FormDataMultiPart instance (if any)
-            return context.getProperties().get("com.sun.jersey.api.representation.form.multipart");
+            return context.getProperties().get(FORM_MULTIPART_PROPERTY);
         }
 
     }
-
 
     private final class FormDataMultiPartParamInjectable
             extends AbstractHttpContextInjectable<Object> {
@@ -183,7 +177,7 @@ public class FormDataMultiPartDispatchProvider extends FormDispatchProvider {
         FormDataMultiPartParamInjectable(MessageBodyWorkers mbws, Parameter param) {
             this.mbws = mbws;
             this.param = param;
-            this.extractor = getMultivaluedParameterExtractorProvider().get(param);
+            this.extractor = mpep.get(param);
         }
 
         private final MessageBodyWorkers mbws;
@@ -195,7 +189,7 @@ public class FormDataMultiPartDispatchProvider extends FormDispatchProvider {
             // Return the field value for the field specified by the
             // sourceName property
             FormDataMultiPart fdmp = (FormDataMultiPart)
-                    context.getProperties().get("com.sun.jersey.api.representation.form.multipart");
+                    context.getProperties().get(FORM_MULTIPART_PROPERTY);
             if (fdmp == null) {
                 return param.getDefaultValue();
             }
@@ -249,6 +243,4 @@ public class FormDataMultiPartDispatchProvider extends FormDispatchProvider {
             }
         }
     }
-
-
 }

@@ -76,7 +76,7 @@ public class FormDispatchProvider extends AbstractResourceMethodDispatchProvider
     }
             
     @Override
-    protected InjectableValuesProvider getParameterProvider(AbstractResourceMethod abstractResourceMethod) {
+    protected InjectableValuesProvider getInjectableValuesProvider(AbstractResourceMethod abstractResourceMethod) {
         List<Injectable> is = processParameters(abstractResourceMethod);
         if (is == null)
             return null;
