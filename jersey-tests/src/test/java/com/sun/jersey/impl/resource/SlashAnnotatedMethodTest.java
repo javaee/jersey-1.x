@@ -35,20 +35,18 @@
  * holder.
  */
 
-package com.sun.jersey.impl.container.grizzly;
+package com.sun.jersey.impl.resource;
 
-import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.WebResource;
-import java.net.URI;
+import com.sun.jersey.impl.AbstractResourceTester;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
-import javax.ws.rs.core.UriBuilder;
 
 /**
  *
  * @author Jakub.Podlesak@Sun.COM
  */
-public class SlashAnnotatedMethodTest extends AbstractGrizzlyServerTester {
+public class SlashAnnotatedMethodTest extends AbstractResourceTester {
 
     // test for issue#239
 
@@ -73,19 +71,17 @@ public class SlashAnnotatedMethodTest extends AbstractGrizzlyServerTester {
     }
 
    public void testSlash1() {
-        startServer(SlashResource1.class);
+        initiateWebApplication(SlashResource1.class);
 
-        WebResource r = Client.create().resource(
-                getUri().path("/").build());
+        WebResource r = resource("/", false);
         
         assertEquals("1", r.get(String.class));
    }
 
    public void testSlash2() {
-        startServer(SlashResource2.class);
+        initiateWebApplication(SlashResource2.class);
 
-        WebResource r = Client.create().resource(
-                getUri().path("/").build());
+        WebResource r = resource("/", false);
 
         assertEquals("2", r.get(String.class));
    }
