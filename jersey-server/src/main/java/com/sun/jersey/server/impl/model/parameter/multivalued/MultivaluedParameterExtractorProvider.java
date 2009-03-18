@@ -34,72 +34,28 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-package com.sun.jersey.server.impl.inject;
 
-import com.sun.jersey.api.core.HttpContext;
-import com.sun.jersey.spi.inject.Injectable;
-import java.util.ArrayList;
-import java.util.List;
+package com.sun.jersey.server.impl.model.parameter.multivalued;
+
+import com.sun.jersey.api.model.Parameter;
 
 /**
- * An injectable that obtains an injectable value given the {@link HttpContext}.
- * 
- * @param <T> the type of the injectable value.
+ *
  * @author Paul.Sandoz@Sun.Com
  */
-public abstract class AbstractHttpContextInjectable<T> implements Injectable<T> {
+public interface MultivaluedParameterExtractorProvider {
 
     /**
-     * This implementation throws an {@link IllegalStateException}.
-     * 
-     */
-    public T getValue() {
-        throw new IllegalStateException();
-    }
-
-    /**
-     * Get the injectable value given the {@link HttpContext}.
      *
-     * @param c the http context,
-     * @return the value.
-     * 
+     * @param p
+     * @return
      */
-    public abstract T getValue(HttpContext c);
+    MultivaluedParameterExtractor get(Parameter p);
 
     /**
-     * Transform a list of {@link Injectable} into a list of this class.
      *
-     * @param l the list of injectable.
-     * @return the list of this class.
+     * @param p
+     * @return
      */
-    public static List<AbstractHttpContextInjectable> transform(List<Injectable> l) {
-        List<AbstractHttpContextInjectable> al = new ArrayList<AbstractHttpContextInjectable>(l.size());
-
-        for (Injectable i : l) {
-            al.add(transform(i));
-        }
-
-        return al;
-    }
-
-    /**
-     * Transform a {@link Injectable} into an instance of this class.
-     * <p>
-     * @param i the injectable.
-     * @return an instance of this class.
-     */
-    public static AbstractHttpContextInjectable transform(final Injectable i) {
-        if (i == null) {
-            return null;
-        } else if (i instanceof AbstractHttpContextInjectable) {
-            return (AbstractHttpContextInjectable)i;
-        } else {
-            return new AbstractHttpContextInjectable() {
-                @Override
-                public Object getValue(HttpContext c) {
-                    return i.getValue();
-                }
-            };
-        }
-    }
+    MultivaluedParameterExtractor getWithoutDefaultValue(Parameter p);
 }

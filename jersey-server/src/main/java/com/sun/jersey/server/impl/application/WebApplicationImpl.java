@@ -126,6 +126,8 @@ import com.sun.jersey.core.spi.component.ComponentScope;
 import com.sun.jersey.core.spi.component.ioc.IoCComponentProcessor;
 import com.sun.jersey.core.spi.component.ioc.IoCComponentProcessorFactory;
 import com.sun.jersey.core.spi.component.ioc.IoCComponentProcessorFactoryInitializer;
+import com.sun.jersey.server.impl.model.parameter.multivalued.MultivaluedParameterExtractorFactory;
+import com.sun.jersey.server.impl.model.parameter.multivalued.MultivaluedParameterExtractorProvider;
 import com.sun.jersey.server.impl.model.parameter.multivalued.StringReaderFactory;
 import com.sun.jersey.server.impl.resource.PerRequestFactory;
 import com.sun.jersey.server.spi.component.ResourceComponentInjector;
@@ -533,14 +535,21 @@ public final class WebApplicationImpl implements WebApplication {
                 StringReaderWorkers.class, stringReaderFactory));
         stringReaderFactory.init(providerServices);
 
+        MultivaluedParameterExtractorProvider mpep =
+                new MultivaluedParameterExtractorFactory(stringReaderFactory);
+        // Add the multi-valued parameter extractor provider
+        injectableFactory.add(
+                new ContextInjectableProvider<MultivaluedParameterExtractorProvider>(
+                MultivaluedParameterExtractorProvider.class, mpep));
+
 
         // Add per-request-based injectable providers
-        injectableFactory.add(new CookieParamInjectableProvider(stringReaderFactory));
-        injectableFactory.add(new HeaderParamInjectableProvider(stringReaderFactory));
+        injectableFactory.add(new CookieParamInjectableProvider(mpep));
+        injectableFactory.add(new HeaderParamInjectableProvider(mpep));
         injectableFactory.add(new HttpContextInjectableProvider());
-        injectableFactory.add(new MatrixParamInjectableProvider(stringReaderFactory));
-        injectableFactory.add(new PathParamInjectableProvider(stringReaderFactory));
-        injectableFactory.add(new QueryParamInjectableProvider(stringReaderFactory));
+        injectableFactory.add(new MatrixParamInjectableProvider(mpep));
+        injectableFactory.add(new PathParamInjectableProvider(mpep));
+        injectableFactory.add(new QueryParamInjectableProvider(mpep));
 
         // Intiate filters
         filterFactory = new FilterFactory(providerServices, resourceConfig);

@@ -234,7 +234,6 @@ public class MultiPartResource {
         } else if (fdmp == null) {
             return Response.ok("FAILED:  Value of fdmp is NULL").build();
         } else if (fdmp.getFields().size() != 3) {
-            fdmp.cleanup();
             return Response.ok("FAILED:  Value of fdmp.getFields().size() is " + fdmp.getFields().size() + " instead of 3").build();
         }
         return Response.ok("SUCCESS:  All tests passed").build();

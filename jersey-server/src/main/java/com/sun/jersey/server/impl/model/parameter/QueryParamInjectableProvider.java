@@ -38,15 +38,16 @@
 package com.sun.jersey.server.impl.model.parameter;
 
 import com.sun.jersey.api.container.ContainerException;
-import com.sun.jersey.server.impl.model.parameter.multivalued.MultivaluedParameterExtractor;
 import com.sun.jersey.api.core.HttpContext;
 import com.sun.jersey.api.model.Parameter;
-import com.sun.jersey.server.impl.inject.AbstractHttpContextInjectable;
-import com.sun.jersey.spi.inject.Injectable;
 import com.sun.jersey.core.spi.component.ComponentContext;
-import com.sun.jersey.spi.StringReaderWorkers;
+import com.sun.jersey.server.impl.inject.AbstractHttpContextInjectable;
+import com.sun.jersey.server.impl.model.parameter.multivalued.MultivaluedParameterExtractor;
+import com.sun.jersey.server.impl.model.parameter.multivalued.MultivaluedParameterExtractorProvider;
+import com.sun.jersey.spi.inject.Injectable;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.WebApplicationException;
+
 
 /**
  *
@@ -72,7 +73,7 @@ public final class QueryParamInjectableProvider extends BaseParamInjectableProvi
         }
     }
 
-    public QueryParamInjectableProvider(StringReaderWorkers w) {
+    public QueryParamInjectableProvider(MultivaluedParameterExtractorProvider w) {
         super(w);
     }
     
@@ -83,7 +84,7 @@ public final class QueryParamInjectableProvider extends BaseParamInjectableProvi
             return null;
         }
         
-        MultivaluedParameterExtractor e = process(c);
+        MultivaluedParameterExtractor e = get(c);
         if (e == null)
             return null;
         

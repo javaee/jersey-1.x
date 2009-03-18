@@ -37,189 +37,40 @@
 
 package com.sun.jersey.server.impl.model.method.dispatch;
 
-import javax.ws.rs.WebApplicationException;
-import com.sun.jersey.api.container.ContainerException;
 import com.sun.jersey.api.core.HttpContext;
 import com.sun.jersey.api.model.AbstractResourceMethod;
 import com.sun.jersey.api.model.Parameter;
-import com.sun.jersey.server.impl.ResponseBuilderImpl;
 import com.sun.jersey.core.reflection.ReflectionHelper;
 import com.sun.jersey.server.impl.inject.AbstractHttpContextInjectable;
-import com.sun.jersey.server.impl.inject.ServerInjectableProviderContext;
-import com.sun.jersey.spi.dispatch.RequestDispatcher;
 import com.sun.jersey.spi.inject.Injectable;
 import com.sun.jersey.core.spi.component.ComponentScope;
+import com.sun.jersey.server.impl.inject.InjectableValuesProvider;
 import java.lang.annotation.Annotation;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.GenericEntity;
-import javax.ws.rs.core.Response;
 
 /**
  *
  * @author Paul.Sandoz@Sun.Com
  */
-public class EntityParamDispatchProvider implements ResourceMethodDispatchProvider {
+public class EntityParamDispatchProvider extends AbstractResourceMethodDispatchProvider {
                 
-    static final class EntityInjectable extends AbstractHttpContextInjectable<Object> {
-        final Class<?> c;
-        final Type t;
-        final Annotation[] as;
-        
-        EntityInjectable(Class c, Type t, Annotation[] as) {
-            this.c = c;
-            this.t = t;
-            this.as = as;
-        }
+    @Override
+    protected InjectableValuesProvider getParameterProvider(AbstractResourceMethod abstractResourceMethod) {
+        boolean requireNoEntityParameter =
+                "GET".equals(abstractResourceMethod.getHttpMethod());
 
-        public Object getValue(HttpContext context) {
-            return context.getRequest().getEntity(c, t, as);
-        }        
-    }
-        
-    static abstract class EntityParamInInvoker extends ResourceJavaMethodDispatcher {        
-        final private List<AbstractHttpContextInjectable> is;
-        
-        EntityParamInInvoker(AbstractResourceMethod abstractResourceMethod, 
-                List<Injectable> is) {
-            super(abstractResourceMethod);
-            this.is = AbstractHttpContextInjectable.transform(is);
-        }
-
-        protected final Object[] getParams(HttpContext context) {
-            final Object[] params = new Object[is.size()];
-            try {
-                int index = 0;
-                for (AbstractHttpContextInjectable i : is) {
-                    params[index++] = i.getValue(context);                        
-                }
-                return params;
-            } catch (WebApplicationException e) {
-                throw e;
-            } catch (ContainerException e) {
-                throw e;
-            } catch (RuntimeException e) {
-                throw new ContainerException("Exception injecting parameters to Web resource method", e);
-            }
-        }        
-    }
-    
-    static final class VoidOutInvoker extends EntityParamInInvoker {
-        VoidOutInvoker(AbstractResourceMethod abstractResourceMethod, List<Injectable> is) {
-            super(abstractResourceMethod, is);
-        }
-
-        @SuppressWarnings("unchecked")
-        public void _dispatch(Object resource, HttpContext context) 
-        throws IllegalAccessException, InvocationTargetException {
-            final Object[] params = getParams(context);
-            method.invoke(resource, params);
-        }
-    }
-    
-    static final class TypeOutInvoker extends EntityParamInInvoker {
-        private final Type t;
-        
-        TypeOutInvoker(AbstractResourceMethod abstractResourceMethod, List<Injectable> is) {
-            super(abstractResourceMethod, is);
-            this.t = abstractResourceMethod.getMethod().getGenericReturnType();
-        }
-
-        @SuppressWarnings("unchecked")
-        public void _dispatch(Object resource, HttpContext context)
-        throws IllegalAccessException, InvocationTargetException {
-            final Object[] params = getParams(context);
-            
-            Object o = method.invoke(resource, params);
-            if (o != null) {
-                Response r = new ResponseBuilderImpl().
-                        entityWithType(o, t).status(200).build();
-                context.getResponse().setResponse(r);
-            }
-        }
-    }
-    
-    static final class ResponseOutInvoker extends EntityParamInInvoker {
-        ResponseOutInvoker(AbstractResourceMethod abstractResourceMethod, List<Injectable> is) {
-            super(abstractResourceMethod, is);
-        }
-
-        @SuppressWarnings("unchecked")
-        public void _dispatch(Object resource, HttpContext context)
-        throws IllegalAccessException, InvocationTargetException {
-            final Object[] params = getParams(context);
-
-            Response r = (Response)method.invoke(resource, params);
-            if (r != null) {
-                context.getResponse().setResponse(r);
-            }
-        }
-    }
-    
-    static final class ObjectOutInvoker extends EntityParamInInvoker {
-        ObjectOutInvoker(AbstractResourceMethod abstractResourceMethod, List<Injectable> is) {
-            super(abstractResourceMethod, is);
-        }
-
-        public void _dispatch(Object resource, HttpContext context)
-        throws IllegalAccessException, InvocationTargetException {
-            final Object[] params = getParams(context);
-            
-            Object o = method.invoke(resource, params);
-            
-            if (o instanceof Response) {
-                Response r = (Response)o;
-                context.getResponse().setResponse(r);
-            } else if (o != null) {
-                Response r = new ResponseBuilderImpl().status(200).entity(o).build();
-                context.getResponse().setResponse(r);
-            }            
-        }
-    }
-
-    @Context ServerInjectableProviderContext sipc;
-    
-    public RequestDispatcher create(AbstractResourceMethod abstractResourceMethod) {
-        boolean requireReturnOfRepresentation = false;
-        boolean requireNoEntityParameter = false;
-        
-        // TODO
-        // Strictly speaking a GET request can contain an entity in the
-        // message body, but this is likely to be not implemented by many
-        // servers and clients, but should we support it?
-        if ("GET".equals(abstractResourceMethod.getHttpMethod())) {
-            requireReturnOfRepresentation = true;
-            requireNoEntityParameter = true;
-        }
-        
-        // Let through other methods
-        
-        List<Injectable> is = processParameters(abstractResourceMethod, 
+        List<Injectable> is = processParameters(abstractResourceMethod,
                 requireNoEntityParameter);
         if (is == null)
             return null;
-        
-        Class<?> returnType = abstractResourceMethod.getMethod().getReturnType();
-        if (Response.class.isAssignableFrom(returnType)) {
-            return new ResponseOutInvoker(abstractResourceMethod, is);                
-        } else if (returnType != void.class) {
-            if (returnType == Object.class || GenericEntity.class.isAssignableFrom(returnType)) {
-                return new ObjectOutInvoker(abstractResourceMethod, is);
-            } else {
-                return new TypeOutInvoker(abstractResourceMethod, is);
-            }
-        } else if (requireReturnOfRepresentation) {
-            return null;
-        } else {
-            return new VoidOutInvoker(abstractResourceMethod, is);
-        }
+
+        return new InjectableValuesProvider(is);
     }
-    
+
     private List<Injectable> processParameters(AbstractResourceMethod method,
             boolean requireNoEntityParameter) {
         
@@ -239,7 +90,8 @@ public class EntityParamDispatchProvider implements ResourceMethodDispatchProvid
                         method.getMethod().getParameterAnnotations()[i],
                         requireNoEntityParameter));
             } else {
-                is.add(sipc.getInjectable(parameter, ComponentScope.PerRequest));
+                is.add(getInjectableProviderContext().
+                        getInjectable(parameter, ComponentScope.PerRequest));
             }
         }
 
@@ -272,6 +124,22 @@ public class EntityParamDispatchProvider implements ResourceMethodDispatchProvid
         return is;
     }
 
+    static final class EntityInjectable extends AbstractHttpContextInjectable<Object> {
+        final Class<?> c;
+        final Type t;
+        final Annotation[] as;
+
+        EntityInjectable(Class c, Type t, Annotation[] as) {
+            this.c = c;
+            this.t = t;
+            this.as = as;
+        }
+
+        public Object getValue(HttpContext context) {
+            return context.getRequest().getEntity(c, t, as);
+        }
+    }
+        
     private Injectable processEntityParameter(
             AbstractResourceMethod method,
             Parameter parameter,

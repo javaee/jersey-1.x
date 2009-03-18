@@ -37,40 +37,59 @@
 
 package com.sun.jersey.server.impl.model.method.dispatch;
 
-import javax.ws.rs.WebApplicationException;
 import com.sun.jersey.api.container.ContainerException;
 import com.sun.jersey.api.core.HttpContext;
 import com.sun.jersey.api.model.AbstractResourceMethod;
 import com.sun.jersey.api.model.Parameter;
 import com.sun.jersey.api.representation.Form;
-import com.sun.jersey.server.impl.ResponseBuilderImpl;
-import com.sun.jersey.server.impl.model.parameter.multivalued.MultivaluedParameterExtractor;
-import com.sun.jersey.server.impl.model.parameter.multivalued.MultivaluedParameterProcessor;
+import com.sun.jersey.core.spi.component.ComponentScope;
 import com.sun.jersey.server.impl.inject.AbstractHttpContextInjectable;
-import com.sun.jersey.server.impl.inject.ServerInjectableProviderContext;
-import com.sun.jersey.spi.MessageBodyWorkers;
+import com.sun.jersey.server.impl.inject.InjectableValuesProvider;
+import com.sun.jersey.server.impl.model.parameter.multivalued.MultivaluedParameterExtractor;
+import com.sun.jersey.server.impl.model.parameter.multivalued.MultivaluedParameterExtractorProvider;
 import com.sun.jersey.spi.dispatch.RequestDispatcher;
 import com.sun.jersey.spi.inject.Injectable;
-import com.sun.jersey.core.spi.component.ComponentScope;
-import com.sun.jersey.spi.StringReaderWorkers;
 import java.lang.annotation.Annotation;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 import javax.ws.rs.FormParam;
+import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
-import javax.ws.rs.core.GenericEntity;
 import javax.ws.rs.core.MultivaluedMap;
-import javax.ws.rs.core.Response;
+
 
 /**
  *
  * @author Paul.Sandoz@Sun.Com
  */
-public class FormDispatchProvider implements ResourceMethodDispatchProvider {
+public class FormDispatchProvider extends AbstractResourceMethodDispatchProvider {
     public static final String FORM_PROPERTY = "com.sun.jersey.api.representation.form";
     
+    @Override
+    public RequestDispatcher create(AbstractResourceMethod abstractResourceMethod) {
+        if ("GET".equals(abstractResourceMethod.getHttpMethod())) {
+            return null;
+        }
+
+        return super.create(abstractResourceMethod);
+    }
+            
+    @Override
+    protected InjectableValuesProvider getParameterProvider(AbstractResourceMethod abstractResourceMethod) {
+        List<Injectable> is = processParameters(abstractResourceMethod);
+        if (is == null)
+            return null;
+
+        return new FormParameterProvider(is);
+    }
+
+    @Context private MultivaluedParameterExtractorProvider mpep;
+
+    protected MultivaluedParameterExtractorProvider getMultivaluedParameterExtractorProvider() {
+        return mpep;
+    }
+
     protected void processForm(HttpContext context) {
         Form form = (Form)context.getProperties().get(FORM_PROPERTY);
         if (form == null) {
@@ -78,172 +97,20 @@ public class FormDispatchProvider implements ResourceMethodDispatchProvider {
             context.getProperties().put(FORM_PROPERTY, form);
         }
     }
-    
-    abstract class FormParamInInvoker extends ResourceJavaMethodDispatcher {        
-        final private List<AbstractHttpContextInjectable> is;
-        
-        FormParamInInvoker(AbstractResourceMethod abstractResourceMethod, 
-                List<Injectable> is) {
-            super(abstractResourceMethod);
-            this.is = AbstractHttpContextInjectable.transform(is);
+
+    private final class FormParameterProvider extends InjectableValuesProvider {
+        public FormParameterProvider(List<Injectable> is) {
+            super(is);
         }
 
-        protected final Object[] getParams(HttpContext context) {
+        @Override
+        public Object[] getInjectableValues(HttpContext context) {
             processForm(context);
-            
-            final Object[] params = new Object[is.size()];
-            try {
-                int index = 0;
-                for (AbstractHttpContextInjectable i : is) {
-                    params[index++] = i.getValue(context);                        
-                }
-                return params;
-            } catch (WebApplicationException e) {
-                throw e;
-            } catch (RuntimeException e) {
-                throw new ContainerException("Exception injecting parameters to Web resource method", e);
-            }
-        }        
-    }
-    
-    final class VoidOutInvoker extends FormParamInInvoker {
-        VoidOutInvoker(AbstractResourceMethod abstractResourceMethod, List<Injectable> is) {
-            super(abstractResourceMethod, is);
-        }
 
-        @SuppressWarnings("unchecked")
-        public void _dispatch(Object resource, HttpContext context) 
-        throws IllegalAccessException, InvocationTargetException {
-            final Object[] params = getParams(context);
-            method.invoke(resource, params);
-        }
-    }
-    
-    final class TypeOutInvoker extends FormParamInInvoker {
-        private final Type t;
-        
-        TypeOutInvoker(AbstractResourceMethod abstractResourceMethod, List<Injectable> is) {
-            super(abstractResourceMethod, is);
-            this.t = abstractResourceMethod.getMethod().getGenericReturnType();
-        }
-
-        @SuppressWarnings("unchecked")
-        public void _dispatch(Object resource, HttpContext context)
-        throws IllegalAccessException, InvocationTargetException {
-            final Object[] params = getParams(context);
-            
-            Object o = method.invoke(resource, params);
-            if (o != null) {
-                Response r = new ResponseBuilderImpl().
-                        entityWithType(o, t).status(200).build();
-                context.getResponse().setResponse(r);
-            }
-        }
-    }
-    
-    final class ResponseOutInvoker extends FormParamInInvoker {
-        ResponseOutInvoker(AbstractResourceMethod abstractResourceMethod, List<Injectable> is) {
-            super(abstractResourceMethod, is);
-        }
-
-        @SuppressWarnings("unchecked")
-        public void _dispatch(Object resource, HttpContext context)
-        throws IllegalAccessException, InvocationTargetException {
-            final Object[] params = getParams(context);
-
-            Response r = (Response)method.invoke(resource, params);
-            if (r != null) {
-                context.getResponse().setResponse(r);
-            }
-        }
-    }
-    
-    final class ObjectOutInvoker extends FormParamInInvoker {
-        ObjectOutInvoker(AbstractResourceMethod abstractResourceMethod, List<Injectable> is) {
-            super(abstractResourceMethod, is);
-        }
-
-        public void _dispatch(Object resource, HttpContext context)
-        throws IllegalAccessException, InvocationTargetException {
-            final Object[] params = getParams(context);
-            
-            Object o = method.invoke(resource, params);
-            
-            if (o instanceof Response) {
-                Response r = (Response)o;
-                context.getResponse().setResponse(r);
-            } else if (o != null) {
-                Response r = new ResponseBuilderImpl().status(200).entity(o).build();
-                context.getResponse().setResponse(r);
-            }            
+            return super.getInjectableValues(context);
         }
     }
 
-    public RequestDispatcher create(AbstractResourceMethod abstractResourceMethod) {
-        if ("GET".equals(abstractResourceMethod.getHttpMethod())) {
-            return null;
-        }
-        
-        List<Injectable> is = processParameters(abstractResourceMethod);
-        if (is == null)
-            return null;
-        
-        Class<?> returnType = abstractResourceMethod.getMethod().getReturnType();
-        if (Response.class.isAssignableFrom(returnType)) {
-            return new ResponseOutInvoker(abstractResourceMethod, is);                
-        } else if (returnType != void.class) {
-            if (returnType == Object.class || GenericEntity.class.isAssignableFrom(returnType)) {
-                return new ObjectOutInvoker(abstractResourceMethod, is);
-            } else {
-                return new TypeOutInvoker(abstractResourceMethod, is);
-            }
-        } else {
-            return new VoidOutInvoker(abstractResourceMethod, is);
-        }
-    }
-    
-    private final class FormEntityInjectable extends AbstractHttpContextInjectable<Object> {
-        final Class<?> c;
-        final Type t;
-        final Annotation[] as;
-        
-        FormEntityInjectable(Class c, Type t, Annotation[] as) {
-            this.c = c;
-            this.t = t;
-            this.as = as;
-        }
-
-        public Object getValue(HttpContext context) {
-            return context.getProperties().get(FORM_PROPERTY);
-        }        
-    }
-    
-    private static final class FormParamInjectable extends AbstractHttpContextInjectable<Object> {
-        private final MultivaluedParameterExtractor extractor;
-        private final boolean decode;
-        
-        FormParamInjectable(MultivaluedParameterExtractor extractor, boolean decode) {
-            this.extractor = extractor;
-            this.decode = decode;
-        }
-        
-        public Object getValue(HttpContext context) {
-            Form form = (Form)
-                    context.getProperties().get(FORM_PROPERTY);
-            try {
-                return extractor.extract(form);
-            } catch (ContainerException e) {
-                throw new WebApplicationException(e.getCause(), 400);
-            }
-        }
-    }
-        
-    @Context ServerInjectableProviderContext sipc;
-
-    @Context MessageBodyWorkers mbw;
-
-    @Context StringReaderWorkers srw;
-    
     private List<Injectable> processParameters(AbstractResourceMethod method) {        
         if (method.getParameters().isEmpty()) {
             return null;
@@ -261,6 +128,42 @@ public class FormDispatchProvider implements ResourceMethodDispatchProvider {
         return getInjectables(method);
     }
     
+    private static final class FormEntityInjectable extends AbstractHttpContextInjectable<Object> {
+        final Class<?> c;
+        final Type t;
+        final Annotation[] as;
+
+        FormEntityInjectable(Class c, Type t, Annotation[] as) {
+            this.c = c;
+            this.t = t;
+            this.as = as;
+        }
+
+        public Object getValue(HttpContext context) {
+            return context.getProperties().get(FORM_PROPERTY);
+        }
+    }
+
+    private static final class FormParamInjectable extends AbstractHttpContextInjectable<Object> {
+        private final MultivaluedParameterExtractor extractor;
+        private final boolean decode;
+
+        FormParamInjectable(MultivaluedParameterExtractor extractor, boolean decode) {
+            this.extractor = extractor;
+            this.decode = decode;
+        }
+
+        public Object getValue(HttpContext context) {
+            Form form = (Form)
+                    context.getProperties().get(FORM_PROPERTY);
+            try {
+                return extractor.extract(form);
+            } catch (ContainerException e) {
+                throw new WebApplicationException(e.getCause(), 400);
+            }
+        }
+    }
+
     protected List<Injectable> getInjectables(AbstractResourceMethod method) {
         List<Injectable> is = new ArrayList<Injectable>(method.getParameters().size());
         for (int i = 0; i < method.getParameters().size(); i++) {
@@ -273,14 +176,14 @@ public class FormDispatchProvider implements ResourceMethodDispatchProvider {
                 } else
                     return null;
             } else if (p.getAnnotation().annotationType() == FormParam.class) {
-                MultivaluedParameterExtractor e = MultivaluedParameterProcessor.
-                        process(srw, p);
+                MultivaluedParameterExtractor e = mpep.get(p);
                 if (e == null)
                     return null;
                 is.add(new FormParamInjectable(e, !p.isEncoded()));
                 
             } else {
-                Injectable injectable = sipc.getInjectable(p, ComponentScope.PerRequest);
+                Injectable injectable = getInjectableProviderContext().
+                        getInjectable(p, ComponentScope.PerRequest);
                 if (injectable == null)
                     return null;
                 is.add(injectable);

@@ -53,9 +53,15 @@ import java.util.SortedSet;
  *
  * @author Paul.Sandoz@Sun.Com
  */
-public class MultivaluedParameterProcessor {
+public final class MultivaluedParameterExtractorFactory implements MultivaluedParameterExtractorProvider {
 
-    public static MultivaluedParameterExtractor processWithoutDefaultValue(StringReaderWorkers w, Parameter p) {
+    private final StringReaderWorkers w;
+
+    public MultivaluedParameterExtractorFactory(StringReaderWorkers w) {
+        this.w = w;
+    }
+
+    public MultivaluedParameterExtractor getWithoutDefaultValue(Parameter p) {
         return process(
                 w,
                 null,
@@ -65,7 +71,7 @@ public class MultivaluedParameterProcessor {
                 p.getSourceName());
     }
 
-    public static MultivaluedParameterExtractor process(StringReaderWorkers w, Parameter p) {
+    public MultivaluedParameterExtractor get(Parameter p) {
         return process(
                 w,
                 p.getDefaultValue(),
@@ -75,7 +81,7 @@ public class MultivaluedParameterProcessor {
                 p.getSourceName());
     }
 
-    public static MultivaluedParameterExtractor process(
+    private MultivaluedParameterExtractor process(
             StringReaderWorkers w,
             String defaultValue,
             Class<?> parameter,
@@ -140,4 +146,5 @@ public class MultivaluedParameterProcessor {
 
         return null;
     }
+
 }

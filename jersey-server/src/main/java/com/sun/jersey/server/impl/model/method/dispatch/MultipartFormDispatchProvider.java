@@ -37,7 +37,6 @@
 
 package com.sun.jersey.server.impl.model.method.dispatch;
 
-import com.sun.jersey.core.util.MultivaluedMapImpl;
 import com.sun.jersey.api.container.ContainerException;
 import com.sun.jersey.api.core.HttpContext;
 import com.sun.jersey.api.model.AbstractResourceMethod;
@@ -45,14 +44,14 @@ import com.sun.jersey.api.model.Parameter;
 import com.sun.jersey.api.representation.Form;
 import com.sun.jersey.core.header.FormDataContentDisposition;
 import com.sun.jersey.core.header.MediaTypes;
+import com.sun.jersey.core.spi.component.ComponentScope;
+import com.sun.jersey.core.util.MultivaluedMapImpl;
 import com.sun.jersey.server.impl.inject.AbstractHttpContextInjectable;
+import com.sun.jersey.server.impl.model.parameter.multivalued.MultivaluedParameterExtractor;
+import com.sun.jersey.server.impl.model.parameter.multivalued.MultivaluedParameterExtractorProvider;
 import com.sun.jersey.spi.MessageBodyWorkers;
 import com.sun.jersey.spi.dispatch.RequestDispatcher;
 import com.sun.jersey.spi.inject.Injectable;
-import com.sun.jersey.core.spi.component.ComponentScope;
-import com.sun.jersey.server.impl.model.parameter.multivalued.MultivaluedParameterExtractor;
-import com.sun.jersey.server.impl.model.parameter.multivalued.MultivaluedParameterProcessor;
-import com.sun.jersey.spi.StringReaderWorkers;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.lang.annotation.Annotation;
@@ -69,6 +68,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.ext.MessageBodyReader;
 
+
 /**
  *
  * @author Paul.Sandoz@Sun.Com
@@ -76,6 +76,8 @@ import javax.ws.rs.ext.MessageBodyReader;
 public class MultipartFormDispatchProvider extends FormDispatchProvider {
     private static MediaType MULTIPART_FORM_DATA = new MediaType("multipart", "form-data");
     
+    private @Context MessageBodyWorkers mbws;
+
     @Override
     protected void processForm(HttpContext context) {
         MediaType m = context.getRequest().getMediaType();
@@ -106,8 +108,6 @@ public class MultipartFormDispatchProvider extends FormDispatchProvider {
         return super.create(method);
     }
         
-    @Context MessageBodyWorkers mbws;
-    
     private final class MultipartFormInjectable extends AbstractHttpContextInjectable<Object> {
         final Class<?> c;
         final Type t;
@@ -160,10 +160,10 @@ public class MultipartFormDispatchProvider extends FormDispatchProvider {
         private final Parameter p;
         private final MultivaluedParameterExtractor extractor;
 
-        MultipartFormParamInjectable(MessageBodyWorkers mbws, StringReaderWorkers srw, Parameter p) {
+        MultipartFormParamInjectable(MessageBodyWorkers mbws, MultivaluedParameterExtractorProvider mpep, Parameter p) {
             this.mbws = mbws;
             this.p = p;
-            this.extractor = MultivaluedParameterProcessor.process(srw, p);
+            this.extractor = mpep.get(p);
         }
         
         @SuppressWarnings("unchecked")
@@ -273,10 +273,11 @@ public class MultipartFormDispatchProvider extends FormDispatchProvider {
                 if (FormDataContentDisposition.class == p.getParameterClass()) {
                     is.add(new DispositionParamInjectable(p));
                 } else {
-                    is.add(new MultipartFormParamInjectable(mbws, srw, p));
+                    is.add(new MultipartFormParamInjectable(mbws, getMultivaluedParameterExtractorProvider(), p));
                 }
             } else {
-                Injectable injectable = sipc.getInjectable(p, ComponentScope.PerRequest);
+                Injectable injectable = getInjectableProviderContext().
+                        getInjectable(p, ComponentScope.PerRequest);
                 is.add(injectable);
             }
         }

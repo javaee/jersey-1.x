@@ -37,11 +37,10 @@
 
 package com.sun.jersey.server.impl.model.parameter;
 
-import com.sun.jersey.server.impl.model.parameter.multivalued.MultivaluedParameterProcessor;
 import com.sun.jersey.api.model.Parameter;
 import com.sun.jersey.core.spi.component.ComponentScope;
 import com.sun.jersey.server.impl.model.parameter.multivalued.MultivaluedParameterExtractor;
-import com.sun.jersey.spi.StringReaderWorkers;
+import com.sun.jersey.server.impl.model.parameter.multivalued.MultivaluedParameterExtractorProvider;
 import com.sun.jersey.spi.inject.InjectableProvider;
 import java.lang.annotation.Annotation;
 
@@ -51,21 +50,21 @@ import java.lang.annotation.Annotation;
  */
 public abstract class BaseParamInjectableProvider<A extends Annotation> implements
         InjectableProvider<A, Parameter> {
-    private final StringReaderWorkers w;
+    private final MultivaluedParameterExtractorProvider mpep;
 
-    BaseParamInjectableProvider(StringReaderWorkers w) {
-        this.w = w;
+    BaseParamInjectableProvider(MultivaluedParameterExtractorProvider mpep) {
+        this.mpep = mpep;
     }
     
     public ComponentScope getScope() {
         return ComponentScope.PerRequest;
     }
     
-    protected MultivaluedParameterExtractor processWithoutDefaultValue(Parameter p) {
-        return MultivaluedParameterProcessor.processWithoutDefaultValue(w, p);
+    protected MultivaluedParameterExtractor getWithoutDefaultValue(Parameter p) {
+        return mpep.getWithoutDefaultValue(p);
     }
 
-    protected MultivaluedParameterExtractor process(Parameter p) {
-        return MultivaluedParameterProcessor.process(w, p);
+    protected MultivaluedParameterExtractor get(Parameter p) {
+        return mpep.get(p);
     }
 }

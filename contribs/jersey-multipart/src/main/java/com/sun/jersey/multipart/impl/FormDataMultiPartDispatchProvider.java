@@ -47,11 +47,8 @@ import com.sun.jersey.multipart.BodyPartEntity;
 import com.sun.jersey.multipart.FormDataBodyPart;
 import com.sun.jersey.multipart.FormDataMultiPart;
 import com.sun.jersey.server.impl.inject.AbstractHttpContextInjectable;
-import com.sun.jersey.server.impl.inject.ServerInjectableProviderContext;
 import com.sun.jersey.server.impl.model.method.dispatch.FormDispatchProvider;
 import com.sun.jersey.server.impl.model.parameter.multivalued.MultivaluedParameterExtractor;
-import com.sun.jersey.server.impl.model.parameter.multivalued.MultivaluedParameterProcessor;
-import com.sun.jersey.spi.StringReaderWorkers;
 import com.sun.jersey.spi.MessageBodyWorkers;
 import com.sun.jersey.spi.dispatch.RequestDispatcher;
 import com.sun.jersey.spi.inject.Injectable;
@@ -92,12 +89,6 @@ public class FormDataMultiPartDispatchProvider extends FormDispatchProvider {
 
     @Context
     MessageBodyWorkers mbws;
-
-    @Context
-    StringReaderWorkers srw;
-
-    @Context
-    ServerInjectableProviderContext sipContext;
 
 
     // -------------------------------------------------------- Subclass Methods
@@ -140,7 +131,7 @@ public class FormDataMultiPartDispatchProvider extends FormDispatchProvider {
                     list.add(new FormDataMultiPartParamInjectable(mbws, p));
 //                }
             } else {
-                Injectable injectable = sipContext.getInjectable(p, ComponentScope.PerRequest);
+                Injectable injectable = getInjectableProviderContext().getInjectable(p, ComponentScope.PerRequest);
                 list.add(injectable);
             }
         }
@@ -192,7 +183,7 @@ public class FormDataMultiPartDispatchProvider extends FormDispatchProvider {
         FormDataMultiPartParamInjectable(MessageBodyWorkers mbws, Parameter param) {
             this.mbws = mbws;
             this.param = param;
-            this.extractor = MultivaluedParameterProcessor.process(srw, param);
+            this.extractor = getMultivaluedParameterExtractorProvider().get(param);
         }
 
         private final MessageBodyWorkers mbws;

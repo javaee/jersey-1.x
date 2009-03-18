@@ -38,19 +38,21 @@
 package com.sun.jersey.server.impl.model.parameter;
 
 import com.sun.jersey.api.container.ContainerException;
-import com.sun.jersey.server.impl.model.parameter.multivalued.MultivaluedParameterExtractor;
 import com.sun.jersey.api.core.HttpContext;
 import com.sun.jersey.api.model.Parameter;
-import com.sun.jersey.server.impl.inject.AbstractHttpContextInjectable;
-import com.sun.jersey.spi.inject.Injectable;
 import com.sun.jersey.core.spi.component.ComponentContext;
-import com.sun.jersey.spi.StringReaderWorkers;
+import com.sun.jersey.server.impl.inject.AbstractHttpContextInjectable;
+import com.sun.jersey.server.impl.model.parameter.multivalued.MultivaluedParameterExtractor;
+import com.sun.jersey.server.impl.model.parameter.multivalued.MultivaluedParameterExtractorProvider;
+import com.sun.jersey.spi.inject.Injectable;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.List;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.PathSegment;
+
+
 
 /**
  *
@@ -107,7 +109,7 @@ public final class PathParamInjectableProvider extends BaseParamInjectableProvid
         }
     }
 
-    public PathParamInjectableProvider(StringReaderWorkers w) {
+    public PathParamInjectableProvider(MultivaluedParameterExtractorProvider w) {
         super(w);
     }
 
@@ -131,7 +133,7 @@ public final class PathParamInjectableProvider extends BaseParamInjectableProvid
             }
         }
         
-        MultivaluedParameterExtractor e =  processWithoutDefaultValue(c);
+        MultivaluedParameterExtractor e =  getWithoutDefaultValue(c);
         if (e == null)
             return null;
 

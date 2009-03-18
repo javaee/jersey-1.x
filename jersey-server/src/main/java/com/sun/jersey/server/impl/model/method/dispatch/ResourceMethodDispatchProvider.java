@@ -37,7 +37,6 @@
 
 package com.sun.jersey.server.impl.model.method.dispatch;
 
-import com.sun.jersey.api.container.ContainerException;
 import com.sun.jersey.api.model.AbstractResourceMethod;
 import com.sun.jersey.spi.dispatch.RequestDispatcher;
 
@@ -64,13 +63,12 @@ import com.sun.jersey.spi.dispatch.RequestDispatcher;
 public interface ResourceMethodDispatchProvider {
     
     /**
-     * Create a {@link RequestDispatcher} according the {@link ResourceMethod} 
-     * of a Web resource.
-     * <p>
+     * Create a {@link RequestDispatcher} for a resource method of
+     * a resource.
      * 
-     * 
-     * @param method the model of a method of a Web resource.
-     * @return the dispatcher, otherwise null if it could not be created.
+     * @param abstractResourceMethod the abstract resource method.
+     * @return the request dispatcher, otherwise null if it could not be created
+     *         for the abstract resource method.
      */
-    RequestDispatcher create(AbstractResourceMethod abstractResourceMethod) throws ContainerException;    
+    RequestDispatcher create(AbstractResourceMethod abstractResourceMethod);    
 }
