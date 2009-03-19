@@ -43,8 +43,10 @@ import com.sun.jersey.api.client.UniformInterfaceException;
 import com.sun.jersey.api.client.WebResource;
 import com.sun.jersey.api.client.config.ClientConfig;
 import com.sun.jersey.api.client.config.DefaultClientConfig;
+import com.sun.jersey.core.header.FormDataContentDisposition;
 import com.sun.jersey.multipart.BodyPart;
 import com.sun.jersey.multipart.BodyPartEntity;
+import com.sun.jersey.multipart.FormDataBodyPart;
 import com.sun.jersey.multipart.FormDataMultiPart;
 import com.sun.jersey.multipart.FormDataParam;
 import com.sun.jersey.multipart.MultiPart;
@@ -52,6 +54,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.StringWriter;
 import java.text.ParseException;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import javax.ws.rs.Consumes;
@@ -252,7 +255,7 @@ public class FormDataMultiPartReaderWriterTest extends AbstractGrizzlyServerTest
         @PUT
         @Consumes("multipart/form-data")
         @Produces("text/plain")
-        public Response nine(
+        public Response get(
                 @FormDataParam("foo") String foo,
                 @FormDataParam("baz") String baz,
                 @FormDataParam("bean") MultiPartBean bean,
@@ -281,7 +284,7 @@ public class FormDataMultiPartReaderWriterTest extends AbstractGrizzlyServerTest
         }
     }
 
-    public void testNine() {
+    public void testConsumesFormDataParamResource() {
         startServer(ConsumesFormDataParamResource.class, MultiPartBeanProvider.class);
 
         WebResource.Builder builder = client.resource(getUri()).
@@ -302,6 +305,141 @@ public class FormDataMultiPartReaderWriterTest extends AbstractGrizzlyServerTest
         }
     }
 
+    @Path("/")
+    public class FormDataTypesResource {
+
+        @PUT
+        @Consumes("multipart/form-data")
+        @Produces("text/plain")
+        public String get(
+                @FormDataParam("foo") FormDataContentDisposition fooDisp,
+                @FormDataParam("foo") FormDataBodyPart fooPart,
+                @FormDataParam("baz") FormDataContentDisposition bazDisp,
+                @FormDataParam("baz") FormDataBodyPart bazPart) {
+
+            assertNotNull(fooDisp);
+            assertNotNull(fooPart);
+            assertNotNull(bazDisp);
+            assertNotNull(bazPart);
+
+            assertEquals("foo", fooDisp.getName());
+            assertEquals("foo", fooPart.getName());
+            assertEquals("bar", fooPart.getValue());
+
+            assertEquals("baz", bazDisp.getName());
+            assertEquals("baz", bazPart.getName());
+            assertEquals("bop", bazPart.getValue());
+
+            return "OK";
+        }
+    }
+
+    public void testFormDataTypesResource() {
+        startServer(FormDataTypesResource.class, MultiPartBeanProvider.class);
+
+        WebResource.Builder builder = client.resource(getUri()).
+                accept("text/plain").type("multipart/form-data");
+        try {
+            FormDataMultiPart entity = new FormDataMultiPart().
+                field("foo", "bar").
+                field("baz", "bop");
+            String response = builder.put(String.class, entity);
+            assertEquals("OK", response);
+        } catch (UniformInterfaceException e) {
+            report(e);
+            fail("Caught exception: " + e);
+        }
+    }
+
+    @Path("/")
+    public class FormDataListTypesResource {
+
+        @PUT
+        @Consumes("multipart/form-data")
+        @Produces("text/plain")
+        public String get(
+                @FormDataParam("foo") List<FormDataContentDisposition> fooDisp,
+                @FormDataParam("foo") List<FormDataBodyPart> fooPart,
+                @FormDataParam("baz") List<FormDataContentDisposition> bazDisp,
+                @FormDataParam("baz") List<FormDataBodyPart> bazPart) {
+
+            assertNotNull(fooDisp);
+            assertNotNull(fooPart);
+            assertNotNull(bazDisp);
+            assertNotNull(bazPart);
+
+            assertEquals(2, fooDisp.size());
+            assertEquals(2, fooPart.size());
+            assertEquals(2, bazDisp.size());
+            assertEquals(2, bazPart.size());
+
+            return "OK";
+        }
+    }
+
+    public void testFormDataListTypesResource() {
+        startServer(FormDataListTypesResource.class, MultiPartBeanProvider.class);
+
+        WebResource.Builder builder = client.resource(getUri()).
+                accept("text/plain").type("multipart/form-data");
+        try {
+            FormDataMultiPart entity = new FormDataMultiPart().
+                field("foo", "bar").
+                field("foo", "bar2").
+                field("baz", "bop").
+                field("baz", "bop2");
+            String response = builder.put(String.class, entity);
+            assertEquals("OK", response);
+        } catch (UniformInterfaceException e) {
+            report(e);
+            fail("Caught exception: " + e);
+        }
+    }
+
+    @Path("/")
+    public class FormDataCollectionTypesResource {
+
+        @PUT
+        @Consumes("multipart/form-data")
+        @Produces("text/plain")
+        public String get(
+                @FormDataParam("foo") Collection<FormDataContentDisposition> fooDisp,
+                @FormDataParam("foo") Collection<FormDataBodyPart> fooPart,
+                @FormDataParam("baz") Collection<FormDataContentDisposition> bazDisp,
+                @FormDataParam("baz") Collection<FormDataBodyPart> bazPart) {
+
+            assertNotNull(fooDisp);
+            assertNotNull(fooPart);
+            assertNotNull(bazDisp);
+            assertNotNull(bazPart);
+
+            assertEquals(2, fooDisp.size());
+            assertEquals(2, fooPart.size());
+            assertEquals(2, bazDisp.size());
+            assertEquals(2, bazPart.size());
+
+            return "OK";
+        }
+    }
+
+    public void testFormDataCollectionTypesResource() {
+        startServer(FormDataCollectionTypesResource.class, MultiPartBeanProvider.class);
+
+        WebResource.Builder builder = client.resource(getUri()).
+                accept("text/plain").type("multipart/form-data");
+        try {
+            FormDataMultiPart entity = new FormDataMultiPart().
+                field("foo", "bar").
+                field("foo", "bar2").
+                field("baz", "bop").
+                field("baz", "bop2");
+            String response = builder.put(String.class, entity);
+            assertEquals("OK", response);
+        } catch (UniformInterfaceException e) {
+            report(e);
+            fail("Caught exception: " + e);
+        }
+    }
 
     private void checkEntity(String expected, BodyPartEntity entity) throws IOException {
         // Convert the raw bytes into a String

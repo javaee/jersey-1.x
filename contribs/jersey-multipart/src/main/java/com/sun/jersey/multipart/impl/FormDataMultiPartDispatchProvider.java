@@ -41,6 +41,8 @@ import com.sun.jersey.api.container.ContainerException;
 import com.sun.jersey.api.core.HttpContext;
 import com.sun.jersey.api.model.AbstractResourceMethod;
 import com.sun.jersey.api.model.Parameter;
+import com.sun.jersey.core.header.FormDataContentDisposition;
+import com.sun.jersey.core.reflection.ReflectionHelper;
 import com.sun.jersey.core.spi.component.ComponentScope;
 import com.sun.jersey.core.util.MultivaluedMapImpl;
 import com.sun.jersey.multipart.BodyPartEntity;
@@ -55,9 +57,8 @@ import com.sun.jersey.server.impl.model.parameter.multivalued.MultivaluedParamet
 import com.sun.jersey.spi.MessageBodyWorkers;
 import com.sun.jersey.spi.dispatch.RequestDispatcher;
 import com.sun.jersey.spi.inject.Injectable;
-import java.lang.annotation.Annotation;
-import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
@@ -98,8 +99,8 @@ public class FormDataMultiPartDispatchProvider extends AbstractResourceMethodDis
         return super.create(method);
     }
 
-    private static final class FormDataParameterProvider extends InjectableValuesProvider {
-        public FormDataParameterProvider(List<Injectable> is) {
+    private static final class FormDataInjectableValuesProvider extends InjectableValuesProvider {
+        public FormDataInjectableValuesProvider(List<Injectable> is) {
             super(is);
         }
 
@@ -132,7 +133,7 @@ public class FormDataMultiPartDispatchProvider extends AbstractResourceMethodDis
         if (is == null)
             return null;
 
-        return new FormDataParameterProvider(is);
+        return new FormDataInjectableValuesProvider(is);
     }
 
     private List<Injectable> getInjectables(AbstractResourceMethod method) {
@@ -146,11 +147,20 @@ public class FormDataMultiPartDispatchProvider extends AbstractResourceMethodDis
                     list.add(null);
                 }
             } else if (p.getAnnotation().annotationType() == FormDataParam.class) {
-//                if (FormDataContentDisposition.class == p.getParameterClass()) {
-//                    list.add(new DispositionParamInjectable(p));
-//                } else {
-                    list.add(new FormDataMultiPartParamInjectable(mbws, p));
-//                }
+                if (Collection.class == p.getParameterClass() || List.class == p.getParameterClass()) {
+                    Class c = ReflectionHelper.getGenericClass(p.getParameterType());
+                    if (FormDataBodyPart.class == c) {
+                        list.add(new ListFormDataBodyPartMultiPartInjectable(p.getSourceName()));
+                    } else if (FormDataContentDisposition.class == c) {
+                        list.add(new ListFormDataContentDispositionMultiPartInjectable(p.getSourceName()));
+                    }
+                } else if (FormDataBodyPart.class == p.getParameterClass()) {
+                    list.add(new FormDataBodyPartMultiPartInjectable(p.getSourceName()));
+                } else if (FormDataContentDisposition.class == p.getParameterClass()) {
+                    list.add(new FormDataContentDispositionMultiPartInjectable(p.getSourceName()));
+                } else {
+                    list.add(new FormDataMultiPartParamInjectable(p));
+                }
             } else {
                 Injectable injectable = getInjectableProviderContext().getInjectable(p, ComponentScope.PerRequest);
                 list.add(injectable);
@@ -159,8 +169,7 @@ public class FormDataMultiPartDispatchProvider extends AbstractResourceMethodDis
         return list;
     }
 
-
-    private final class FormDataMultiPartInjectable
+    private static final class FormDataMultiPartInjectable
             extends AbstractHttpContextInjectable<Object> {
 
         @Override
@@ -171,18 +180,98 @@ public class FormDataMultiPartDispatchProvider extends AbstractResourceMethodDis
 
     }
 
+    private static final class FormDataBodyPartMultiPartInjectable
+            extends AbstractHttpContextInjectable<FormDataBodyPart> {
+        private final String name;
+
+        FormDataBodyPartMultiPartInjectable(String name) {
+            this.name = name;
+        }
+
+        @Override
+        public FormDataBodyPart getValue(HttpContext context) {
+            FormDataMultiPart fdmp = (FormDataMultiPart)
+                    context.getProperties().get(FORM_MULTIPART_PROPERTY);
+
+            return fdmp.getField(name);
+        }
+    }
+
+    private static final class ListFormDataBodyPartMultiPartInjectable
+            extends AbstractHttpContextInjectable<List<FormDataBodyPart>> {
+        private final String name;
+
+        ListFormDataBodyPartMultiPartInjectable(String name) {
+            this.name = name;
+        }
+
+        @Override
+        public List<FormDataBodyPart> getValue(HttpContext context) {
+            FormDataMultiPart fdmp = (FormDataMultiPart)
+                    context.getProperties().get(FORM_MULTIPART_PROPERTY);
+
+            return fdmp.getFields(name);
+        }
+    }
+
+    private static final class FormDataContentDispositionMultiPartInjectable
+            extends AbstractHttpContextInjectable<FormDataContentDisposition> {
+        private final String name;
+
+        FormDataContentDispositionMultiPartInjectable(String name) {
+            this.name = name;
+        }
+
+        @Override
+        public FormDataContentDisposition getValue(HttpContext context) {
+            FormDataMultiPart fdmp = (FormDataMultiPart)
+                    context.getProperties().get(FORM_MULTIPART_PROPERTY);
+
+            FormDataBodyPart fdbp = fdmp.getField(name);
+            if (fdbp == null)
+                return null;
+            
+            return fdmp.getField(name).getFormDataContentDisposition();
+        }
+    }
+
+    private static final class ListFormDataContentDispositionMultiPartInjectable
+            extends AbstractHttpContextInjectable<List<FormDataContentDisposition>> {
+        private final String name;
+
+        ListFormDataContentDispositionMultiPartInjectable(String name) {
+            this.name = name;
+        }
+
+        @Override
+        public List<FormDataContentDisposition> getValue(HttpContext context) {
+            FormDataMultiPart fdmp = (FormDataMultiPart)
+                    context.getProperties().get(FORM_MULTIPART_PROPERTY);
+
+            List<FormDataBodyPart> fdbps = fdmp.getFields(name);
+            if (fdbps == null)
+                return null;
+
+            List<FormDataContentDisposition> l = new ArrayList<FormDataContentDisposition>(fdbps.size());
+            for (FormDataBodyPart fdbp : fdbps) {
+                l.add(fdbp.getFormDataContentDisposition());
+            }
+
+            return l;
+        }
+    }
+
     private final class FormDataMultiPartParamInjectable
             extends AbstractHttpContextInjectable<Object> {
 
-        FormDataMultiPartParamInjectable(MessageBodyWorkers mbws, Parameter param) {
-            this.mbws = mbws;
+        private final Parameter param;
+
+        private final MultivaluedParameterExtractor extractor;
+
+        FormDataMultiPartParamInjectable(Parameter param) {
             this.param = param;
             this.extractor = mpep.get(param);
         }
-
-        private final MessageBodyWorkers mbws;
-        private final Parameter param;
-        private final MultivaluedParameterExtractor extractor;
 
         @Override
         public Object getValue(HttpContext context) {
@@ -190,17 +279,19 @@ public class FormDataMultiPartDispatchProvider extends AbstractResourceMethodDis
             // sourceName property
             FormDataMultiPart fdmp = (FormDataMultiPart)
                     context.getProperties().get(FORM_MULTIPART_PROPERTY);
-            if (fdmp == null) {
-                return param.getDefaultValue();
-            }
+            
             FormDataBodyPart fdbp = fdmp.getField(param.getSourceName());
             if (fdbp == null) {
+                // TODO this value needs to be processed by the
+                // reader or extractor
                 return param.getDefaultValue();
             }
+
             MediaType mediaType = fdbp.getMediaType();
             if (mediaType == null) {
                 mediaType = MediaType.TEXT_PLAIN_TYPE;
             }
+
             MessageBodyReader reader = mbws.getMessageBodyReader(
                     param.getParameterClass(),
                     param.getParameterType(),
