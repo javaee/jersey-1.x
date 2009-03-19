@@ -39,33 +39,25 @@ package com.sun.jersey.multipart.impl;
 
 import com.sun.jersey.multipart.BodyPart;
 import com.sun.jersey.multipart.BodyPartEntity;
-import com.sun.jersey.multipart.FormDataMultiPart;
-import com.sun.jersey.multipart.FormDataParam;
 import com.sun.jersey.multipart.MultiPart;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import javax.ws.rs.Consumes;
-import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
-import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import javax.ws.rs.ext.Providers;
 
 /**
  * <p>Resource file for {@link MultiPartReaderWriterTest}.</p>
  */
 @Path("/multipart")
 public class MultiPartResource {
-
-    @Context
-    private Providers providers = null;
 
     @Path("zero")
     @GET
@@ -132,24 +124,6 @@ public class MultiPartResource {
         return Response.ok("SUCCESS:  All tests passed").build();
     }
 
-    // Test "multipart/form-data" the hard way (no subclasses)
-    @Path("five")
-    @GET
-    @Produces("multipart/form-data")
-    public Response five() {
-        MultiPart entity = new MultiPart();
-        entity.setMediaType(MediaType.MULTIPART_FORM_DATA_TYPE);
-        BodyPart part1 = new BodyPart();
-        part1.setMediaType(MediaType.TEXT_PLAIN_TYPE);
-        part1.getHeaders().add("Content-Disposition", "form-data; name=\"field1\"");
-        part1.setEntity("Joe Blow\r\n");
-        BodyPart part2 = new BodyPart();
-        part2.setMediaType(MediaType.TEXT_PLAIN_TYPE);
-        part2.getHeaders().add("Content-Disposition", "form-data; name=\"pics\"; filename=\"file1.txt\"");
-        part2.setEntity("... contents of file1.txt ...\r\n");
-        return Response.ok(entity.bodyPart(part1).bodyPart(part2)).build();
-    }
-
     // Note - this should never actually get reached, because the client
     // is trying to post a MultiPart with no body parts inside, and that
     // should throw a client side exception
@@ -166,77 +140,6 @@ public class MultiPartResource {
             response = "Got " + multiPart.getBodyParts().size() + " body parts instead of zero";
         }
         return Response.ok(response).build();
-    }
-
-    // Test "multipart/form-data" the easy way (with subclasses)
-    @Path("seven")
-    @GET
-    @Produces("multipart/form-data")
-    public Response seven() {
-        // Exercise builder pattern with explicit content type
-        MultiPartBean bean = new MultiPartBean("myname", "myvalue");
-        return Response.ok(new FormDataMultiPart().
-                             field("foo", "bar").
-                             field("baz", "bop").
-                             field("bean", bean, new MediaType("x-application", "x-format"))).build();
-    }
-
-    @Path("eight")
-    @PUT
-    @Consumes("multipart/form-data")
-    @Produces("text/plain")
-    public Response eight(FormDataMultiPart multiPart) {
-        if (!(multiPart.getBodyParts().size() == 3)) {
-            return Response.ok("FAILED:  Number of body parts is " + multiPart.getBodyParts().size() + " instead of 3").build();
-        }
-        if (multiPart.getField("foo") == null) {
-            return Response.ok("FAILED:  Missing field 'foo'").build();
-        } else if (!"bar".equals(multiPart.getField("foo").getValue())) {
-            return Response.ok("FAILED:  Field 'foo' has value '" + multiPart.getField("foo").getValue() + "' instead of 'bar'").build();
-        }
-        if (multiPart.getField("baz") == null) {
-            return Response.ok("FAILED:  Missing field 'baz'").build();
-        } else if (!"bop".equals(multiPart.getField("baz").getValue())) {
-            return Response.ok("FAILED:  Field 'baz' has value '" + multiPart.getField("baz").getValue() + "' instead of 'bop'").build();
-        }
-        if (multiPart.getField("bean") == null) {
-            return Response.ok("FAILED:  Missing field 'bean'").build();
-        }
-        MultiPartBean bean = multiPart.getField("bean").getValueAs(MultiPartBean.class);
-        if (!bean.getName().equals("myname")) {
-            return Response.ok("FAILED:  Second part name = " + bean.getName()).build();
-        }
-        if (!bean.getValue().equals("myvalue")) {
-            return Response.ok("FAILED:  Second part value = " + bean.getValue()).build();
-        }
-        return Response.ok("SUCCESS:  All tests passed").build();
-    }
-
-    @Path("nine")
-    @PUT
-    @Consumes("multipart/form-data")
-    @Produces("text/plain")
-    public Response nine(
-            @FormDataParam("foo") String foo,
-            @FormDataParam("baz") String baz,
-            @FormDataParam("unknown1") String unknown1,
-            @FormDataParam("unknown2") @DefaultValue("UNKNOWN") String unknown2,
-            FormDataMultiPart fdmp) {
-
-        if (!"bar".equals(foo)) {
-            return Response.ok("FAILED:  Value of 'foo' is '" + foo + "' instead of 'bar'").build();
-        } else if (!"bop".equals(baz)) {
-            return Response.ok("FAILED:  Value of 'baz' is '" + baz + "' instead of 'bop'").build();
-        } else if (unknown1 != null) {
-            return Response.ok("FAILED:  Value of 'unknown1' is '" + unknown1 + "' instead of NULL").build();
-        } else if (!"UNKNOWN".equals(unknown2)) {
-            return Response.ok("FAILED:  Value of 'unknown2' is '" + unknown2 + "' instead of 'UNKNOWN'").build();
-        } else if (fdmp == null) {
-            return Response.ok("FAILED:  Value of fdmp is NULL").build();
-        } else if (fdmp.getFields().size() != 3) {
-            return Response.ok("FAILED:  Value of fdmp.getFields().size() is " + fdmp.getFields().size() + " instead of 3").build();
-        }
-        return Response.ok("SUCCESS:  All tests passed").build();
     }
 
     @Path("ten")

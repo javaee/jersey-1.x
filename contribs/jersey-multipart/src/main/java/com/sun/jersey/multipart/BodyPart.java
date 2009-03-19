@@ -37,10 +37,10 @@
 
 package com.sun.jersey.multipart;
 
+import com.sun.jersey.core.header.ContentDisposition;
 import com.sun.jersey.core.header.ParameterizedHeader;
 import com.sun.jersey.core.util.UnmodifiableMultivaluedMap;
 import java.io.IOException;
-import java.lang.String;
 import java.lang.annotation.Annotation;
 import java.text.ParseException;
 import javax.ws.rs.core.MediaType;
@@ -63,7 +63,7 @@ public class BodyPart {
      * <code>text/plain</code>.</p>
      */
     public BodyPart() {
-        this(new MediaType("text", "plain"));
+        this(MediaType.TEXT_PLAIN_TYPE);
     }
 
 
@@ -150,8 +150,42 @@ public class BodyPart {
     }
 
 
-    private MediaType mediaType = null;
+    protected ContentDisposition cd = null;
 
+    /**
+     * Get the content disposition.
+     * <p>
+     * The "Content-Disposition" header, if present, will be parsed.
+     *
+     * @return the content disposition, will be null if not present.
+     * @throws IllegalArgumentException if the content disposition header
+     *         cannot be parsed.
+     */
+    public ContentDisposition getContentDisposition() {
+        if (cd == null) {
+            String scd = headers.getFirst("Content-Disposition");
+            if (scd != null) {
+                try {
+                    cd = new ContentDisposition(scd);
+                } catch (ParseException ex) {
+                    throw new IllegalArgumentException("Error parsing content disposition: " + scd, ex);
+                }
+            }
+        }
+        return cd;
+    }
+
+    /**
+     * Set the content disposition.
+     *
+     * @param cd the content disposition.
+     */
+    public void setContentDisposition(ContentDisposition cd) {
+        this.cd = cd;
+        headers.remove("Content-Disposition");
+    }
+    
+    private MediaType mediaType = null;
 
     /**
      * <p>Return the {@link MediaType} for this {@link BodyPart}.  If never
@@ -285,4 +319,8 @@ public class BodyPart {
         return this;
     }
 
+    public BodyPart contentDisposition(ContentDisposition cd) {
+        setContentDisposition(cd);
+        return this;
+    }
 }

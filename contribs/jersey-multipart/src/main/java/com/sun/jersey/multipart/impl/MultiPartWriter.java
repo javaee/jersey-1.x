@@ -123,7 +123,6 @@ public class MultiPartWriter implements MessageBodyWriter<MultiPart> {
         }
 
         // Initialize local variables we need
-        Annotation[] emptyAnnotations = new Annotation[0];
         Writer writer = new BufferedWriter(new OutputStreamWriter(stream)); // FIXME - charset???
 
         // Determine the boundary string to be used, creating one if needed
@@ -162,6 +161,11 @@ public class MultiPartWriter implements MessageBodyWriter<MultiPart> {
             MultivaluedMap<String, String> bodyHeaders = bodyPart.getHeaders();
             bodyHeaders.putSingle("Content-Type", bodyMediaType.toString());
 
+            if (bodyHeaders.getFirst("Content-Disposition") == null
+                    && bodyPart.getContentDisposition() != null) {
+                bodyHeaders.putSingle("Content-Disposition", bodyPart.getContentDisposition().toString());
+            }
+
             // Iterate for the nested body parts
             for (Map.Entry<String, List<String>> entry : bodyHeaders.entrySet()) {
 
@@ -174,14 +178,14 @@ public class MultiPartWriter implements MessageBodyWriter<MultiPart> {
                 writer.write(entry.getKey());
                 writer.write(':');
                 boolean first = true;
-                for (Object value : entry.getValue()) {
+                for (String value : entry.getValue()) {
                     if (first) {
                         writer.write(' ');
                         first = false;
                     } else {
                         writer.write(',');
                     }
-                    writer.write(value.toString());
+                    writer.write(value);
                 }
                 writer.write("\r\n");
             }

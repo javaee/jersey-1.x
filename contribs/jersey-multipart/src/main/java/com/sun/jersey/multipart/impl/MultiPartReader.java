@@ -37,7 +37,6 @@
 
 package com.sun.jersey.multipart.impl;
 
-import com.sun.jersey.core.header.FormDataContentDisposition;
 import com.sun.jersey.core.header.MediaTypes;
 import com.sun.jersey.multipart.BodyPart;
 import com.sun.jersey.multipart.BodyPartEntity;
@@ -50,7 +49,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
-import java.text.ParseException;
 import java.util.List;
 import java.util.Map;
 import javax.ws.rs.Consumes;
@@ -179,18 +177,16 @@ public class MultiPartReader implements MessageBodyReader<MultiPart> {
                 // Copy headers
                 for (Header h : mp.getAllHeaders()) {
                     bodyPart.getHeaders().add(h.getName(), h.getValue());
-                    if (formData && "Content-Disposition".equalsIgnoreCase(h.getName())) {
-                        try {
-                            FormDataContentDisposition header = new FormDataContentDisposition(h.getValue());
-                            ((FormDataBodyPart) bodyPart).setName(header.getName());
-                        } catch (ParseException e) {
-                            throw new WebApplicationException(e);
-                        }
-                    }                    
+                }
+
+                try {
+                    bodyPart.setMediaType(MediaType.valueOf(mp.getContentType()));
+                    
+                    bodyPart.getContentDisposition();
+                } catch (IllegalArgumentException ex) {
+                    throw new WebApplicationException(ex);
                 }
                 
-                MediaType bpMediaType = MediaType.valueOf(mp.getContentType());
-                bodyPart.setMediaType(bpMediaType);
                 // Copy data into a BodyPartEntity structure
                 bodyPart.setEntity(new BodyPartEntity(mp));
                 // Add this BodyPart to our MultiPart

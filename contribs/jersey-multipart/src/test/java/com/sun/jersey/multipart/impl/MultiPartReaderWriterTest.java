@@ -37,7 +37,6 @@
 
 package com.sun.jersey.multipart.impl;
 
-import com.sun.grizzly.http.SelectorThread;
 import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.ClientHandlerException;
 import com.sun.jersey.api.client.ClientResponse;
@@ -45,73 +44,54 @@ import com.sun.jersey.api.client.UniformInterfaceException;
 import com.sun.jersey.api.client.WebResource;
 import com.sun.jersey.api.client.config.ClientConfig;
 import com.sun.jersey.api.client.config.DefaultClientConfig;
-import com.sun.jersey.api.container.grizzly.GrizzlyWebContainerFactory;
 import com.sun.jersey.multipart.BodyPart;
 import com.sun.jersey.multipart.BodyPartEntity;
-import com.sun.jersey.multipart.FormDataMultiPart;
 import com.sun.jersey.multipart.MultiPart;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.StringWriter;
 import java.text.ParseException;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
-import junit.framework.TestCase;
 
 /**
  * <p>Unit tests for {@link MultiPartReader} (in the client) and
  * {@link MultiPartWriter} (in the server).</p>
  */
-public class MultiPartReaderWriterTest extends TestCase {
-
-    private static final String BASE_URI = "http://localhost:9997/";
-
+public class MultiPartReaderWriterTest extends AbstractGrizzlyServerTester {
+    
     public MultiPartReaderWriterTest(String testName) {
         super(testName);
     }
 
+    Client client = null;
+    
     @Override
     protected void setUp() throws Exception {
         super.setUp();
-        Map<String,String> initParams = new HashMap<String,String>();
-        initParams.put("com.sun.jersey.config.property.resourceConfigClass",
-                       "com.sun.jersey.api.core.PackagesResourceConfig");
-        initParams.put("com.sun.jersey.config.property.packages",
-                       "com.sun.jersey.multipart.impl");
-        /*
-        initParams.put("com.sun.jersey.config.property.resourceConfigClass",
-                       "com.sun.jersey.api.core.ClasspathResourceConfig");
-        */
-        System.out.println("Starting grizzly ...");
-        selectorThread = GrizzlyWebContainerFactory.create(BASE_URI, initParams);
+
+        startServer(MultiPartResource.class, MultiPartBeanProvider.class);
+
         ClientConfig config = new DefaultClientConfig();
         config.getClasses().add(MultiPartBeanProvider.class);
         client = Client.create(config);
     }
 
     @Override
-    protected void tearDown() throws Exception {
-        client = null;
-        System.out.println("Stopping grizzly ...");
-        if (selectorThread.isRunning()) {
-            selectorThread.stopEndpoint();
-        }
-        selectorThread = null;
+    public void tearDown() {
         super.tearDown();
+        client = null;
     }
 
-    Client client = null;
-    SelectorThread selectorThread = null;
 
     // TODO add test methods here. The name must begin with 'test'. For example:
     // public void testHello() {}
 
     public void testZero() {
-        WebResource.Builder builder = client.resource(BASE_URI)
+        WebResource.Builder builder = client.resource(getUri())
                 .path("multipart/zero").accept("text/plain");
         try {
             String result = builder.get(String.class);
@@ -123,7 +103,7 @@ public class MultiPartReaderWriterTest extends TestCase {
     }
 
     public void testOne() {
-        WebResource.Builder builder = client.resource(BASE_URI)
+        WebResource.Builder builder = client.resource(getUri())
                 .path("multipart/one").accept("multipart/mixed");
         try {
             MultiPart result = builder.get(MultiPart.class);
@@ -148,7 +128,7 @@ public class MultiPartReaderWriterTest extends TestCase {
     }
 
     public void testTwo() {
-        WebResource.Builder builder = client.resource(BASE_URI)
+        WebResource.Builder builder = client.resource(getUri())
                 .path("multipart/two").accept("multipart/mixed");
         try {
             MultiPart result = builder.get(MultiPart.class);
@@ -176,7 +156,7 @@ public class MultiPartReaderWriterTest extends TestCase {
     }
 
     public void testThree() {
-        WebResource.Builder builder = client.resource(BASE_URI)
+        WebResource.Builder builder = client.resource(getUri())
                 .path("multipart/three").accept("multipart/mixed");
         try {
             MultiPart result = builder.get(MultiPart.class);
@@ -206,7 +186,7 @@ public class MultiPartReaderWriterTest extends TestCase {
     }
 
     public void testFour() {
-        WebResource.Builder builder = client.resource(BASE_URI)
+        WebResource.Builder builder = client.resource(getUri())
                 .path("multipart/four").accept("text/plain").type("multipart/mixed");
         try {
             MultiPartBean bean = new MultiPartBean("myname", "myvalue");
@@ -223,43 +203,9 @@ public class MultiPartReaderWriterTest extends TestCase {
         }
     }
 
-    // Test a response of type "multipart/form-data".  The example comes from
-    // Section 6 of RFC 1867.
-    public void testFive() {
-        WebResource.Builder builder = client.resource(BASE_URI)
-                .path("multipart/five").accept("multipart/form-data");
-        try {
-            MultiPart result = builder.get(MultiPart.class);
-            checkMediaType(new MediaType("multipart", "form-data"), result.getMediaType());
-            assertEquals(2, result.getBodyParts().size());
-            BodyPart part1 = result.getBodyParts().get(0);
-            checkMediaType(new MediaType("text", "plain"), part1.getMediaType());
-            checkEntity("Joe Blow\r\n", (BodyPartEntity) part1.getEntity());
-            String value1 = part1.getHeaders().getFirst("Content-Disposition");
-            assertEquals("form-data; name=\"field1\"", value1);
-            BodyPart part2 = result.getBodyParts().get(1);
-            checkMediaType(new MediaType("text", "plain"), part2.getMediaType());
-            checkEntity("... contents of file1.txt ...\r\n", (BodyPartEntity) part2.getEntity());
-            String value2 = part2.getHeaders().getFirst("Content-Disposition");
-            assertEquals("form-data; name=\"pics\"; filename=\"file1.txt\"", value2);
-
-            result.getParameterizedHeaders();
-            result.cleanup();
-        } catch (IOException e) {
-            e.printStackTrace(System.out);
-            fail("Caught exception: " + e);
-        } catch(ParseException e) {
-            e.printStackTrace(System.out);
-            fail("Caught exception: " + e);
-        } catch (UniformInterfaceException e) {
-            report(e);
-            fail("Caught exception: " + e);
-        }
-    }
-
     // Test sending a completely empty MultiPart
     public void testSix() {
-        WebResource.Builder builder = client.resource(BASE_URI)
+        WebResource.Builder builder = client.resource(getUri())
                 .path("multipart/six").type("multipart/mixed").accept("text/plain");
         try {
             String result = builder.post(String.class, new MultiPart());
@@ -276,70 +222,9 @@ public class MultiPartReaderWriterTest extends TestCase {
         }
     }
 
-    public void testSeven() {
-        WebResource.Builder builder = client.resource(BASE_URI)
-                .path("multipart/seven").accept("multipart/form-data");
-        try {
-            FormDataMultiPart result = builder.get(FormDataMultiPart.class);
-            checkMediaType(new MediaType("multipart", "form-data"), result.getMediaType());
-            assertEquals(3, result.getFields().size());
-            assertNotNull(result.getField("foo"));
-            assertEquals("bar", result.getField("foo").getValue());
-            assertNotNull(result.getField("baz"));
-            assertEquals("bop", result.getField("baz").getValue());
-            assertNotNull(result.getField("bean"));
-            MultiPartBean bean = result.getField("bean").getValueAs(MultiPartBean.class);
-            assertNotNull(bean);
-            assertEquals("myname", bean.getName());
-            assertEquals("myvalue", bean.getValue());
-            result.cleanup();
-        } catch (UniformInterfaceException e) {
-            report(e);
-            fail("Caught exception: " + e);
-        }
-    }
-
-    public void testEight() {
-        WebResource.Builder builder = client.resource(BASE_URI)
-                .path("multipart/eight").accept("text/plain").type("multipart/form-data");
-        try {
-            MultiPartBean bean = new MultiPartBean("myname", "myvalue");
-            FormDataMultiPart entity = new FormDataMultiPart().
-                field("foo", "bar").
-                field("baz", "bop").
-                field("bean", bean, new MediaType("x-application", "x-format"));
-            String response = builder.put(String.class, entity);
-            if (!response.startsWith("SUCCESS:")) {
-                fail("Response is '" + response + "'");
-            }
-        } catch (UniformInterfaceException e) {
-            report(e);
-            fail("Caught exception: " + e);
-        }
-    }
-
-    public void testNine() {
-        WebResource.Builder builder = client.resource(BASE_URI)
-                .path("multipart/nine").accept("text/plain").type("multipart/form-data");
-        try {
-            MultiPartBean bean = new MultiPartBean("myname", "myvalue");
-            FormDataMultiPart entity = new FormDataMultiPart().
-                field("foo", "bar").
-                field("baz", "bop").
-                field("bean", bean, new MediaType("x-application", "x-format"));
-            String response = builder.put(String.class, entity);
-            if (!response.startsWith("SUCCESS:")) {
-                fail("Response is '" + response + "'");
-            }
-        } catch (UniformInterfaceException e) {
-            report(e);
-            fail("Caught exception: " + e);
-        }
-    }
-
     // Zero length body part
     public void testTen() {
-        WebResource.Builder builder = client.resource(BASE_URI)
+        WebResource.Builder builder = client.resource(getUri())
                 .path("multipart/ten").accept("text/plain").type("multipart/mixed");
         try {
             MultiPartBean bean = new MultiPartBean("myname", "myvalue");
@@ -370,7 +255,7 @@ public class MultiPartReaderWriterTest extends TestCase {
 
     // Echo back the multipart that was sent
     public void testTwelve() {
-        WebResource.Builder builder = client.resource(BASE_URI)
+        WebResource.Builder builder = client.resource(getUri())
                 .path("multipart/twelve").accept("multipart/mixed").type("multipart/mixed");
         try {
             MultiPart entity = new MultiPart().
@@ -388,7 +273,7 @@ public class MultiPartReaderWriterTest extends TestCase {
 
     // Call clean up explicitly
     public void testThirteen() {
-        WebResource.Builder builder = client.resource(BASE_URI)
+        WebResource.Builder builder = client.resource(getUri())
                 .path("multipart/thirteen").accept("multipart/mixed").type("multipart/mixed");
         try {
             MultiPart entity = new MultiPart().
@@ -430,7 +315,7 @@ public class MultiPartReaderWriterTest extends TestCase {
             sb.append(seed);
         }
         String expected = sb.toString();
-        WebResource.Builder builder = client.resource(BASE_URI)
+        WebResource.Builder builder = client.resource(getUri())
                 .path("multipart/eleven").accept("multipart/mixed").type("multipart/mixed");
         try {
             MultiPart entity = new MultiPart().

@@ -37,8 +37,6 @@
 
 package com.sun.jersey.multipart;
 
-import javax.ws.rs.core.MediaType;
-
 /**
  * <p>Test case for {@link MultiPartImpl}.</p>
  */
@@ -70,17 +68,28 @@ public class FormDataMultiPartTest extends MultiPartTest {
         FormDataMultiPart fdmp = (FormDataMultiPart) multiPart;
         assertEquals(0, fdmp.getFields().size());
         fdmp = fdmp.field("foo", "bar").field("baz", "bop");
+
         assertEquals(2, fdmp.getFields().size());
+
         assertNotNull(fdmp.getField("foo"));
         assertEquals("bar", fdmp.getField("foo").getValue());
         assertNotNull(fdmp.getField("baz"));
         assertEquals("bop", fdmp.getField("baz").getValue());
+
+        assertEquals("bar", fdmp.getFields("foo").get(0).getValue());
+        assertEquals("bop", fdmp.getFields("baz").get(0).getValue());
+
         assertNotNull(fdmp.getFields().get("foo"));
-        assertEquals("bar", fdmp.getFields().get("foo").getValue());
+        assertEquals("bar", fdmp.getFields().get("foo").get(0).getValue());
         assertNotNull(fdmp.getFields().get("baz"));
-        assertEquals("bop", fdmp.getFields().get("baz").getValue());
+        assertEquals("bop", fdmp.getFields().get("baz").get(0).getValue());
 
+
+        fdmp = fdmp.field("foo", "bar").field("baz", "bop");
+
+        assertEquals(2, fdmp.getFields().get("foo").size());
+        assertEquals(2, fdmp.getFields().get("baz").size());
+        assertEquals(2, fdmp.getFields("foo").size());
+        assertEquals(2, fdmp.getFields("baz").size());
     }
-
-
 }

@@ -37,11 +37,11 @@
 
 package com.sun.jersey.multipart;
 
-import java.util.Collections;
+import com.sun.jersey.core.header.MediaTypes;
+import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import javax.ws.rs.core.MediaType;
 
 /**
@@ -59,7 +59,7 @@ import javax.ws.rs.core.MediaType;
  * <li>Incoming body parts will be of type {@link FormDataBodyPart},
  *     enabling access to its specialized methods.</li>
  * <li>Convenience method to return the {@link FormDataBodyPart} for a
- *     specified field name.</li>
+ *     specified control name.</li>
  * <li>Convenience method to return a <code>Map</code> of {@link FormDataBodyPart}s
  *     for all fields, keyed by field name.</li>
  * </ul>
@@ -82,27 +82,21 @@ import javax.ws.rs.core.MediaType;
 public class FormDataMultiPart extends MultiPart {
 
 
-    // ------------------------------------------------------------ Constructors
-
-
     /**
-     * <p>Instantiate a new {@link FormDataMultiPart} instance with
-     * default characteristics.</p>
+     * Instantiate a new {@link FormDataMultiPart} instance with
+     * default characteristics.
      */
     public FormDataMultiPart() {
         super(MediaType.MULTIPART_FORM_DATA_TYPE);
     }
 
-
-    // ------------------------------------------------------ Instance Variables
-
-
-    // ---------------------------------------------------------- Public Methods
-
-
     /**
-     * <p>Builder pattern method to add a named field with a text value,
-     * and return this instance.</p>
+     * Builder pattern method to add a named field with a text value,
+     * and return this instance.
+     *
+     * @param name the control name
+     * @param value the text value
+     * @return this instance.
      */
     public FormDataMultiPart field(String name, String value) {
         getBodyParts().add(new FormDataBodyPart(name, value));
@@ -111,12 +105,13 @@ public class FormDataMultiPart extends MultiPart {
 
 
     /**
-     * <p>Builder pattern method to add a named field with an arbitrary
-     * media type and entity, and return this instance.</p>
+     * Builder pattern method to add a named field with an arbitrary
+     * media type and entity, and return this instance.
      *
-     * @param name Field name of the new field
-     * @param entity Entity value for the new field
-     * @param mediaType Media type for the new field
+     * @param name the control name.
+     * @param entity entity value for the new field
+     * @param mediaType media type for the new field
+     * @return this instance.
      */
     public FormDataMultiPart field(String name, Object entity, MediaType mediaType) {
         getBodyParts().add(new FormDataBodyPart(name, entity, mediaType));
@@ -125,8 +120,14 @@ public class FormDataMultiPart extends MultiPart {
 
 
     /**
-     * <p>Return the {@link FormDataBodyPart} for the specified field name,
-     * if any; otherwise, return <code>null</code>.</p>
+     * Get a form data body part given a control name.
+     * <p>
+     * 
+     * @param name the control name.
+     * @return the form data body part, otherwise null if no part
+     *         is present with the given control name. If more that one
+     *         part is present with the same control name, then the first
+     *         part that occurs is returned.
      */
     public FormDataBodyPart getField(String name) {
         FormDataBodyPart result = null;
@@ -141,26 +142,55 @@ public class FormDataMultiPart extends MultiPart {
         return result;
     }
 
-
     /**
-     * <p>Return an immutable <code>Map</code> of the {@link FormDataBodyPart}s
-     * for all fields, keyed by field name.</p>
+     * Get a list of one or more form data body parts given a control name.
+     *
+     * @param name the control name.
+     * @return the list of form data body parts, otherwise null if no parts
+     *         are present with the given control name.
      */
-    public Map<String,FormDataBodyPart> getFields() {
-        Map<String,FormDataBodyPart> map = new HashMap<String,FormDataBodyPart>();
+    public List<FormDataBodyPart> getFields(String name) {
+        List<FormDataBodyPart> result = null;
         for (BodyPart bodyPart : getBodyParts()) {
             if (!(bodyPart instanceof FormDataBodyPart)) {
                 continue;
             }
-            map.put(((FormDataBodyPart) bodyPart).getName(), (FormDataBodyPart) bodyPart);
+            if (name.equals(((FormDataBodyPart) bodyPart).getName())) {
+                if (result == null)
+                    result = new ArrayList<FormDataBodyPart>(1);
+                result.add((FormDataBodyPart) bodyPart);
+            }
         }
-        return Collections.unmodifiableMap(map);
+        return result;
     }
 
+    /**
+     * Get a map of form data body parts where the key is the control name
+     * and the value is a list of one or more form data body parts.
+     *
+     * @return return the map of form data body parts.
+     */
+    public Map<String, List<FormDataBodyPart>> getFields() {
+        Map<String, List<FormDataBodyPart>> map = new HashMap<String, List<FormDataBodyPart>>();
+        for (BodyPart bodyPart : getBodyParts()) {
+            if (!(bodyPart instanceof FormDataBodyPart)) {
+                continue;
+            }
+
+            FormDataBodyPart p = (FormDataBodyPart) bodyPart;
+            List<FormDataBodyPart> l = map.get(p.getName());
+            if (l == null) {
+                l = new ArrayList<FormDataBodyPart>(1);
+                map.put(p.getName(), l);
+            }
+            l.add(p);
+        }
+        return map;
+    }
 
     /**
-     * <p>Disable changing the media type to anything other than
-     * <code>multipart/form-data</code>.</p>
+     * Disable changing the media type to anything other than
+     * <code>multipart/form-data</code>.
      *
      * @param mediaType The proposed media type
      *
@@ -169,14 +199,9 @@ public class FormDataMultiPart extends MultiPart {
      */
     @Override
     public void setMediaType(MediaType mediaType) {
-        if (!"multipart".equals(mediaType.getType()) || !"form-data".equals(mediaType.getSubtype())) {
+        if (!MediaTypes.typeEquals(mediaType, MediaType.MULTIPART_FORM_DATA_TYPE)) {
             throw new IllegalArgumentException("Cannot change media type of a FormDataMultiPart instance");
         }
         super.setMediaType(mediaType);
     }
-
-
-    // --------------------------------------------------------- Private Methods
-
-
 }

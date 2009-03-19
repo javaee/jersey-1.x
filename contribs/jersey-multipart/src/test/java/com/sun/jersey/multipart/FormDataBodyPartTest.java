@@ -37,11 +37,8 @@
 
 package com.sun.jersey.multipart;
 
-import java.util.List;
-import javax.ws.rs.core.HttpHeaders;
+import com.sun.jersey.core.header.FormDataContentDisposition;
 import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.MultivaluedMap;
-import junit.framework.TestCase;
 
 /**
  * <p>Test case for {@link BodyPart}.</p>
@@ -67,12 +64,13 @@ public class FormDataBodyPartTest extends BodyPartTest {
     public void testCreateFDBP() {
 
         FormDataBodyPart fdbp = (FormDataBodyPart) bodyPart;
+        assertNull(fdbp.getFormDataContentDisposition());
         assertNull(fdbp.getName());
         assertNull(fdbp.getValue());
         assertTrue(fdbp.isSimple());
-        assertNull(fdbp.getHeaders().get("Content-Disposition"));
 
         fdbp = new FormDataBodyPart("<foo>bar</foo>", MediaType.APPLICATION_XML_TYPE);
+        assertNull(fdbp.getFormDataContentDisposition());
         assertNull(fdbp.getName());
         try {
             fdbp.getValue();
@@ -82,15 +80,15 @@ public class FormDataBodyPartTest extends BodyPartTest {
         }
         assertEquals("<foo>bar</foo>", fdbp.getEntity());
         assertTrue(!fdbp.isSimple());
-        assertNull(fdbp.getHeaders().get("Content-Disposition"));
 
         fdbp = new FormDataBodyPart("name", "value");
+        assertNotNull(fdbp.getFormDataContentDisposition());
         assertEquals("name", fdbp.getName());
         assertEquals("value", fdbp.getValue());
         assertTrue(fdbp.isSimple());
-        assertNotNull(fdbp.getHeaders().get("Content-Disposition"));
 
         fdbp = new FormDataBodyPart("name", "<foo>bar</foo>", MediaType.APPLICATION_XML_TYPE);
+        assertNotNull(fdbp.getFormDataContentDisposition());
         assertEquals("name", fdbp.getName());
         try {
             fdbp.getValue();
@@ -100,8 +98,22 @@ public class FormDataBodyPartTest extends BodyPartTest {
         }
         assertEquals("<foo>bar</foo>", fdbp.getEntity());
         assertTrue(!fdbp.isSimple());
-        assertNotNull(fdbp.getHeaders().get("Content-Disposition"));
 
+        fdbp = new FormDataBodyPart(
+                FormDataContentDisposition.name("name").fileName("filename").build(),
+                "<foo>bar</foo>",
+                MediaType.APPLICATION_XML_TYPE);
+        assertNotNull(fdbp.getFormDataContentDisposition());
+        assertEquals("name", fdbp.getName());
+        assertEquals("filename", fdbp.getFormDataContentDisposition().getFileName());
+        try {
+            fdbp.getValue();
+            fail("Should have thrown IllegalStateException");
+        } catch (IllegalStateException e) {
+            // Expected result
+        }
+        assertEquals("<foo>bar</foo>", fdbp.getEntity());
+        assertTrue(!fdbp.isSimple());
     }
 
 

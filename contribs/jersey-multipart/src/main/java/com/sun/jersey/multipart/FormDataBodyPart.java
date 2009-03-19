@@ -37,8 +37,11 @@
 
 package com.sun.jersey.multipart;
 
+import com.sun.jersey.core.header.ContentDisposition;
+import com.sun.jersey.core.header.FormDataContentDisposition;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.text.ParseException;
 import javax.ws.rs.core.MediaType;
 
 /**
@@ -51,7 +54,7 @@ import javax.ws.rs.core.MediaType;
  * <code>multipart/form-data</code> message, the following features
  * are provided:</p>
  * <ul>
- * <li>Property accessor to retrieve the field name.</li>
+ * <li>Property accessor to retrieve the control name.</li>
  * <li>Property accessor to retrieve the field value for a simple
  *     String field.</li>
  * <li>Convenience accessor to retrieve the field value after conversion
@@ -64,7 +67,7 @@ import javax.ws.rs.core.MediaType;
  * <ul>
  * <li>Convenience constructors for named fields with either
  *     simple string values, or arbitrary entities and media types.</li>
- * <li>Property accessor to set the field name.</li>
+ * <li>Property accessor to set the control name.</li>
  * <li>Property accessor to set the field value for a simple
  *     String field.</li>
  * <li>Convenience accessor to set the media type and value of a
@@ -73,22 +76,18 @@ import javax.ws.rs.core.MediaType;
  */
 public class FormDataBodyPart extends BodyPart {
 
-
-    // ------------------------------------------------------------ Constructors
-
-
     /**
-     * <p>Instantiate an unnamed new {@link FormDataBodyPart} with a
-     * <code>mediaType</code> of <code>text/plain</code>.</p>
+     * <Instantiate an unnamed new {@link FormDataBodyPart} with a
+     * <code>mediaType</code> of <code>text/plain</code>.
      */
     public FormDataBodyPart() {
-        this(new MediaType("text", "plain"));
+        super();
     }
 
 
     /**
-     * <p>Instantiate an unnamed {@link FormDataBodyPart} with the
-     * specified characteristics.</p>
+     * Instantiate an unnamed {@link FormDataBodyPart} with the
+     * specified characteristics.
      *
      * @param mediaType The {@link MediaType} for this body part
      */
@@ -98,8 +97,8 @@ public class FormDataBodyPart extends BodyPart {
 
 
     /**
-     * <p>Instantiate an unnamed {@link FormDataBodyPart} with the
-     * specified characteristics.</p>
+     * Instantiate an unnamed {@link FormDataBodyPart} with the
+     * specified characteristics.
      *
      * @param entity The entity for this body part
      * @param mediaType The {@link MediaType} for this body part
@@ -110,11 +109,11 @@ public class FormDataBodyPart extends BodyPart {
 
 
     /**
-     * <p>Instantiate a named {@link FormDataBodyPart} with a
-     * media type of <code>text/plain</code> and String value.</p>
+     * Instantiate a named {@link FormDataBodyPart} with a
+     * media type of <code>text/plain</code> and String value.
      *
-     * @param name Field name for this body part
-     * @param value Field value for this body part
+     * @param name the control name for this body part
+     * @param value the value for this body part
      */
     public FormDataBodyPart(String name, String value) {
         super(value, MediaType.TEXT_PLAIN_TYPE);
@@ -123,12 +122,12 @@ public class FormDataBodyPart extends BodyPart {
 
 
     /**
-     * <p>Instantiate a named {@link FormDataBodyPart} with the
-     * specified characteristics.</p>
+     * Instantiate a named {@link FormDataBodyPart} with the
+     * specified characteristics.
      *
-     * @param name Field name for this body part
-     * @param entity The entity for this body part
-     * @param mediaType The {@link MediaType} for this body part
+     * @param name the control name for this body part
+     * @param entity the entity for this body part
+     * @param mediaType the {@link MediaType} for this body part
      */
     public FormDataBodyPart(String name, Object entity, MediaType mediaType) {
         super(entity, mediaType);
@@ -136,34 +135,134 @@ public class FormDataBodyPart extends BodyPart {
     }
 
 
-    // ------------------------------------------------------ Instance Variables
-
-
     /**
-     * <p>The field name, saved to avoid the overhead of parsing a header
-     * when <code>getName()</code> is called.</p>
+     * Instantiate a named {@link FormDataBodyPart} with the
+     * specified characteristics.
+     *
+     * @param fdcd the content disposition header for this body part.
+     * @param value the value for this body part
      */
-    private String name = null;
-
-
-    // ---------------------------------------------------------- Public Methods
-
-
-    /**
-     * <p>Return the field name for this body part, or <code>null</code>
-     * if no name has been established yet.</p>
-     */
-    public String getName() {
-        return this.name;
+    public FormDataBodyPart(FormDataContentDisposition fdcd, String value) {
+        super(value, MediaType.TEXT_PLAIN_TYPE);
+        setFormDataContentDisposition(fdcd);
     }
 
 
     /**
-     * <p>Return the field value for this body part.  This should be called
-     * only on body parts representing simple field values.</p>
+     * Instantiate a named {@link FormDataBodyPart} with the
+     * specified characteristics.
      *
-     * @exception IllegalStateException if called on a body part with a
-     *  media type other than <code>text/plain</code>
+     * @param fdcd the content disposition header for this body part.
+     * @param entity The entity for this body part
+     * @param mediaType The {@link MediaType} for this body part
+     */
+    public FormDataBodyPart(FormDataContentDisposition fdcd, Object entity, MediaType mediaType) {
+        super(entity, mediaType);
+        setFormDataContentDisposition(fdcd);
+    }
+
+    /**
+     * Get the form data content disposition.
+     *
+     * @return the form data content disposition.
+     */
+    public FormDataContentDisposition getFormDataContentDisposition() {
+        return (FormDataContentDisposition)getContentDisposition();
+    }
+
+    /**
+     * Set the form data content disposition.
+     * 
+     * @param cd the form data content disposition.
+     */
+    public void setFormDataContentDisposition(FormDataContentDisposition cd) {
+        super.setContentDisposition(cd);
+    }
+
+    /**
+     * Override the behaviour on {@link BodyPart} to ensure that
+     * only instances of {@link FormDataContentDisposition} can be obtained.
+     *
+     * @return the content disposition.
+     * @throws IllegalArgumentException if the content disposition header
+     *         cannot be parsed.
+     */
+    @Override
+    public ContentDisposition getContentDisposition() {
+        if (cd == null) {
+            String scd = getHeaders().getFirst("Content-Disposition");
+            if (scd != null) {
+                try {
+                    cd = new FormDataContentDisposition(scd);
+                } catch (ParseException ex) {
+                    throw new IllegalArgumentException("Error parsing content disposition: " + scd, ex);
+                }
+            }
+        }
+        return cd;
+    }
+
+    /**
+     * Override the behaviour on {@link BodyPart} to ensure that
+     * only instances of {@link FormDataContentDisposition} can be set.
+     *
+     * @param cd the content disposition which must be an instance
+     *        of {@link FormDataContentDisposition}.
+     * @throws IllegalArgumentException if the content disposition is not an
+     *         instance of {@link FormDataContentDisposition}.
+     */
+    @Override
+    public void setContentDisposition(ContentDisposition cd) {
+        if (cd instanceof FormDataContentDisposition) {
+            super.setContentDisposition(cd);
+        } else {
+            throw new IllegalArgumentException();
+        }
+    }
+
+
+    /**
+     * Get the control name.
+     *
+     * @return the control name.
+     */
+    public String getName() {
+        FormDataContentDisposition fdcd = getFormDataContentDisposition();
+        if (fdcd == null)
+            return null;
+
+        return fdcd.getName();
+    }
+
+    /**
+     * Set the control name.
+     * 
+     * @param name the control name.
+     */
+    public void setName(String name) {
+        if (getFormDataContentDisposition() == null) {
+            super.setContentDisposition(FormDataContentDisposition.name(name).build());
+        } else {
+            FormDataContentDisposition cd = getFormDataContentDisposition();
+            cd = FormDataContentDisposition.name(name).
+                    fileName(cd.getFileName()).
+                    creationDate(cd.getCreationDate()).
+                    modificationDate(cd.getModificationDate()).
+                    readDate(cd.getReadDate()).
+                    size(cd.getSize()).
+                    build();
+            super.setContentDisposition(cd);
+        }
+    }
+
+
+    /**
+     * Get the field value for this body part.  This should be called
+     * only on body parts representing simple field values.
+     *
+     * @return the simple field value.
+     * @throws IllegalStateException if called on a body part with a
+     *         media type other than <code>text/plain</code>
      */
     public String getValue() {
         if (!MediaType.TEXT_PLAIN_TYPE.equals(getMediaType())) {
@@ -192,54 +291,32 @@ public class FormDataBodyPart extends BodyPart {
 
 
     /**
-     * <p>Return the field value after appropriate conversion to the requested
+     * Get the field value after appropriate conversion to the requested
      * type.  This is useful only when the containing {@link FormDataMultiPart}
-     * instance has been received, which causes the <code>providers</code> property
-     * to have been set.</p>
+     * instance has been received, which causes the <code>providers</code> 
+     * property to have been set.
      *
+     * @param <T> the type of the field value.
      * @param clazz Desired class into which the field value should be converted
-     *
-     * @exception IllegalArgumentException if no <code>MessageBodyReader</code> can
-     *  be found to perform the requested conversion
-     * @exception IllegalStateException if this method is called when the
-     *  <code>providers</code> property has not been set or when the
-     *  entity instance is not the unconverted content of the body part entity
+     * @return the field value
+     * @throws IllegalArgumentException if no <code>MessageBodyReader</code> can
+     *         be found to perform the requested conversion
+     * @throws IllegalStateException if this method is called when the
+     *         <code>providers</code> property has not been set or when the
+     *         entity instance is not the unconverted content of the body part
+     *         entity
      */
     public <T> T getValueAs(Class<T> clazz) {
         return getEntityAs(clazz);
     }
 
-
     /**
-     * <p>Return a flag indicating whether this {@link FormDataBodyPart}
-     * represents a simple String-valued field.</p>
-     */
-    public boolean isSimple() {
-        return MediaType.TEXT_PLAIN_TYPE.equals(getMediaType());
-    }
-
-
-    /**
-     * <p>Set the field name for this body part.</p>
+     * Set the field value for this body part.  This should be called
+     * only on body parts representing simple field values.
      *
-     * @param name New field name for this body part
-     */
-    public void setName(String name) {
-        this.name = name;
-        if (getHeaders().get("Content-Disposition") == null) {
-            getHeaders().putSingle("Content-Disposition", "form-data; name=\"" + name + "\"");
-        }
-    }
-
-
-    /**
-     * <p>Set the field value for this body part.  This should be called
-     * only on body parts representing simple field values.</p>
-     *
-     * @param value The new field value
-     *
-     * @exception IllegalStateException if called on a body part with a
-     *  media type other than <code>text/plain</code>
+     * @param value the field value
+     * @throws IllegalStateException if called on a body part with a
+     *         media type other than <code>text/plain</code>
      */
     public void setValue(String value) {
         if (!MediaType.TEXT_PLAIN_TYPE.equals(getMediaType())) {
@@ -248,17 +325,23 @@ public class FormDataBodyPart extends BodyPart {
         setEntity(value);
     }
 
-
     /**
-     * <p>Set the field media type and value for this body part.</p>
+     * Set the field media type and value for this body part.
      *
-     * @param mediaType Media type for this field value
-     * @param value Field value as a Java object
+     * @param mediaType the media type for this field value
+     * @param value the field value as a Java object
      */
     public void setValue(MediaType mediaType, Object value) {
         setMediaType(mediaType);
         setEntity(value);
     }
-
-
+    
+    /**
+     *
+     * @return true if this body part represents a simple, string-based,
+     *         field value, otherwise false.
+     */
+    public boolean isSimple() {
+        return MediaType.TEXT_PLAIN_TYPE.equals(getMediaType());
+    }
 }
