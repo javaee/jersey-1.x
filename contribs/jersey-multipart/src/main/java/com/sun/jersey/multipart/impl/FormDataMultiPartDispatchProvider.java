@@ -282,7 +282,8 @@ public class FormDataMultiPartDispatchProvider extends AbstractResourceMethodDis
             FormDataMultiPart fdmp = (FormDataMultiPart)
                     context.getProperties().get(FORM_MULTIPART_PROPERTY);
             
-            FormDataBodyPart fdbp = fdmp.getField(param.getSourceName());
+            List<FormDataBodyPart> fdbps = fdmp.getFields(param.getSourceName());
+            FormDataBodyPart fdbp = (fdbps != null) ? fdbps.get(0) : null;
 
             MediaType mediaType = (fdbp != null)
                     ? fdbp.getMediaType() : MediaType.TEXT_PLAIN_TYPE;
@@ -320,22 +321,26 @@ public class FormDataMultiPartDispatchProvider extends AbstractResourceMethodDis
             } else if (extractor != null) {
                 MultivaluedMap<String, String> map = new MultivaluedMapImpl();
                 if (fdbp != null) {
-                    reader = mbws.getMessageBodyReader(
-                            String.class,
-                            String.class,
-                            param.getAnnotations(),
-                            mediaType);
-
                     try {
-                        String value = (String) reader.readFrom(
-                                String.class,
-                                String.class,
-                                param.getAnnotations(),
-                                mediaType,
-                                context.getRequest().getRequestHeaders(),
-                                ((BodyPartEntity) fdbp.getEntity()).getInputStream());
+                        for (FormDataBodyPart p : fdbps) {
+                            mediaType = p.getMediaType();
 
-                        map.putSingle(param.getSourceName(), value);
+                            reader = mbws.getMessageBodyReader(
+                                    String.class,
+                                    String.class,
+                                    param.getAnnotations(),
+                                    mediaType);
+
+                            String value = (String) reader.readFrom(
+                                    String.class,
+                                    String.class,
+                                    param.getAnnotations(),
+                                    mediaType,
+                                    context.getRequest().getRequestHeaders(),
+                                    ((BodyPartEntity) p.getEntity()).getInputStream());
+
+                            map.add(param.getSourceName(), value);
+                        }
                     } catch (IOException e) {
                         throw new ContainerException(e);
                     }
