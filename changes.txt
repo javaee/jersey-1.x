@@ -1,4 +1,14 @@
 release 1.0.3 (2009-03/04)
+- Fixed issue 122
+  https://jersey.dev.java.net/issues/show_bug.cgi?id=122
+  When the ServletContainer is used as a filter then the init-param
+  property "com.sun.jersey.config.property.WebPageContentRegex" may
+  used to declare a regex to match against the request path. If the
+  path matches then the requets is forwarded to the next filter (if any)
+  in the filter chain and Jersey will not process the request.
+  For example if you set the value to "/(image|css)/.*" then you can serve up
+  images and CSS files for your Implicit or Explicit Views while still
+  processing your JAX-RS resources.
 - Added the annotation com.sun.jersey.multipart.FormDataParam for
   processing parameters that are named body parts of "multipart/form-data"
   messages. This functionality replaces the overloaded use of @FormParam,
