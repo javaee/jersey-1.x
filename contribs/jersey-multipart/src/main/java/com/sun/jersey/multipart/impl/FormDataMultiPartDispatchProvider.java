@@ -57,6 +57,9 @@ import com.sun.jersey.server.impl.model.parameter.multivalued.MultivaluedParamet
 import com.sun.jersey.spi.MessageBodyWorkers;
 import com.sun.jersey.spi.dispatch.RequestDispatcher;
 import com.sun.jersey.spi.inject.Injectable;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -106,7 +109,6 @@ public class FormDataMultiPartDispatchProvider extends AbstractResourceMethodDis
 
         @Override
         public Object[] getInjectableValues(HttpContext context) {
-            MediaType m = context.getRequest().getMediaType();
             FormDataMultiPart form = context.getRequest().getEntity(FormDataMultiPart.class);
             context.getProperties().put(FORM_MULTIPART_PROPERTY, form);
 
@@ -281,23 +283,29 @@ public class FormDataMultiPartDispatchProvider extends AbstractResourceMethodDis
                     context.getProperties().get(FORM_MULTIPART_PROPERTY);
             
             FormDataBodyPart fdbp = fdmp.getField(param.getSourceName());
-            if (fdbp == null) {
-                // TODO this value needs to be processed by the
-                // reader or extractor
-                return param.getDefaultValue();
-            }
 
-            MediaType mediaType = fdbp.getMediaType();
-            if (mediaType == null) {
-                mediaType = MediaType.TEXT_PLAIN_TYPE;
-            }
+            MediaType mediaType = (fdbp != null)
+                    ? fdbp.getMediaType() : MediaType.TEXT_PLAIN_TYPE;
 
             MessageBodyReader reader = mbws.getMessageBodyReader(
                     param.getParameterClass(),
                     param.getParameterType(),
                     param.getAnnotations(),
                     mediaType);
+           
             if (reader != null) {
+                InputStream in = null;
+                if (fdbp == null) {
+                    if (param.getDefaultValue() != null) {
+                        // Convert default value to bytes
+                        in = new ByteArrayInputStream(param.getDefaultValue().getBytes());
+                    } else {
+                        return null;
+                    }
+                } else {
+                    in = ((BodyPartEntity) fdbp.getEntity()).getInputStream();
+                }
+
                 try {
                     return reader.readFrom(
                             param.getParameterClass(),
@@ -305,30 +313,34 @@ public class FormDataMultiPartDispatchProvider extends AbstractResourceMethodDis
                             param.getAnnotations(),
                             mediaType,
                             context.getRequest().getRequestHeaders(),
-                            ((BodyPartEntity) fdbp.getEntity()).getInputStream());
-                } catch (Exception e) {
+                            in);
+                } catch (IOException e) {
                     throw new ContainerException(e);
                 }
             } else if (extractor != null) {
-                reader = mbws.getMessageBodyReader(
-                        String.class,
-                        String.class,
-                        param.getAnnotations(),
-                        mediaType);
-                try {
-                    String value = (String) reader.readFrom(
+                MultivaluedMap<String, String> map = new MultivaluedMapImpl();
+                if (fdbp != null) {
+                    reader = mbws.getMessageBodyReader(
                             String.class,
                             String.class,
                             param.getAnnotations(),
-                            mediaType,
-                            context.getRequest().getRequestHeaders(),
-                            ((BodyPartEntity) fdbp.getEntity()).getInputStream());
-                    MultivaluedMap<String,String> map = new MultivaluedMapImpl();
-                    map.putSingle(param.getSourceName(), value);
-                    return extractor.extract(map);
-                } catch (Exception e) {
-                    throw new ContainerException(e);
+                            mediaType);
+
+                    try {
+                        String value = (String) reader.readFrom(
+                                String.class,
+                                String.class,
+                                param.getAnnotations(),
+                                mediaType,
+                                context.getRequest().getRequestHeaders(),
+                                ((BodyPartEntity) fdbp.getEntity()).getInputStream());
+
+                        map.putSingle(param.getSourceName(), value);
+                    } catch (IOException e) {
+                        throw new ContainerException(e);
+                    }
                 }
+                return extractor.extract(map);
             } else {
                 return null;
             }

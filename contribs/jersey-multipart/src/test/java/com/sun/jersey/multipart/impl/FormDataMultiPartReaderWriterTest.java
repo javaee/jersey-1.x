@@ -441,6 +441,93 @@ public class FormDataMultiPartReaderWriterTest extends AbstractGrizzlyServerTest
         }
     }
 
+    @Path("/")
+    public class PrimitivesFormDataParamResource {
+
+        @PUT
+        @Consumes("multipart/form-data")
+        @Produces("text/plain")
+        public String get(
+                @FormDataParam("bP") boolean bP,
+                @FormDataParam("bT") Boolean bT,
+                @FormDataParam("bP_absent") boolean bP_absent,
+                @FormDataParam("bT_absent") Boolean bT_absent,
+                @DefaultValue("true") @FormDataParam("bP_absent_default") boolean bP_absent_default,
+                @DefaultValue("true") @FormDataParam("bT_absent_default") Boolean bT_absent_default,
+                @DefaultValue("true") @FormDataParam("bP_default") boolean bP_default,
+                @DefaultValue("true") @FormDataParam("bT_default") Boolean bT_default
+                ) {
+            assertTrue(bP);
+            assertTrue(bT);
+            assertFalse(bP_absent);
+            assertNull(bT_absent);
+            assertTrue(bP_absent_default);
+            assertTrue(bT_absent_default);
+            assertFalse(bP_default);
+            assertFalse(bT_default);
+
+            return "OK";
+        }
+    }
+
+    public void testPrimitivesFormDataParamResource() {
+        startServer(PrimitivesFormDataParamResource.class, MultiPartBeanProvider.class);
+
+        WebResource.Builder builder = client.resource(getUri()).
+                accept("text/plain").type("multipart/form-data");
+        try {
+            FormDataMultiPart entity = new FormDataMultiPart().
+                field("bP", "true").
+                field("bT", "true").
+                field("bP_default", "false").
+                field("bT_default", "false");
+            String response = builder.put(String.class, entity);
+            assertEquals("OK", response);
+        } catch (UniformInterfaceException e) {
+            report(e);
+            fail("Caught exception: " + e);
+        }
+    }
+
+    @Path("/")
+    public class DefaultFormDataParamResource {
+
+        @PUT
+        @Consumes("multipart/form-data")
+        @Produces("text/plain")
+        public String get(
+                @FormDataParam("bean") MultiPartBean bean,
+                @FormDataParam("bean_absent") MultiPartBean bean_absent,
+                @DefaultValue("myname=myvalue") @FormDataParam("bean_default") MultiPartBean bean_default
+                ) {
+            assertNotNull(bean);
+            assertNull(bean_absent);
+            assertNull(bean_default);
+
+            assertEquals("myname", bean.getName());
+            assertEquals("myvalue", bean.getValue());
+
+            return "OK";
+        }
+    }
+
+    public void testDefaultFormDataParamResource() {
+        startServer(DefaultFormDataParamResource.class, MultiPartBeanProvider.class);
+
+        WebResource.Builder builder = client.resource(getUri()).
+                accept("text/plain").type("multipart/form-data");
+        try {
+            MultiPartBean bean = new MultiPartBean("myname", "myvalue");
+            FormDataMultiPart entity = new FormDataMultiPart().
+                field("bean", bean, new MediaType("x-application", "x-format"));
+            String response = builder.put(String.class, entity);
+            assertEquals("OK", response);
+        } catch (UniformInterfaceException e) {
+            report(e);
+            fail("Caught exception: " + e);
+        }
+    }
+
     private void checkEntity(String expected, BodyPartEntity entity) throws IOException {
         // Convert the raw bytes into a String
         InputStreamReader sr = new InputStreamReader(entity.getInputStream());

@@ -200,8 +200,12 @@ public class BodyPart {
      * <p>Set the {@link MediaType} for this {@link BodyPart}.
      *
      * @param mediaType The new {@link MediaType}
+     * @throws IllegalArgumentException if the <code>mediaType</code> is null.
      */
     public void setMediaType(MediaType mediaType) {
+        if (mediaType == null)
+            throw new IllegalArgumentException("mediaType cannot be null");
+        
         this.mediaType = mediaType;
     }
 
