@@ -4,6 +4,22 @@ release 1.0.3 (2009-03/04)
   messages. This functionality replaces the overloaded use of @FormParam,
   and such functionaity for processing "multipart/form-data" will be
   deprecated.
+- Fixed issue 236
+  https://jersey.dev.java.net/issues/show_bug.cgi?id=236
+  Multiple named body parts of a "multipart/form-data" message can be accessed
+  as follows:
+    @Path("form-data")
+    @Consumes(MediaType.MULTIPART_FORM_DATA)
+    @POST
+    public void uploadUrlFormData(
+            @FormDataParam("file") List<FormDataBodyPart> parts) {
+        for (FormDataBodyPart part : parts) {
+            FormDataContentDisposition disp = part.
+                    getFormDataContentDisposition();
+            InputStream in = part.getValueAs(InputStream.class);
+            ...
+        }
+    }
 - Fixed issue 238
   https://jersey.dev.java.net/issues/show_bug.cgi?id=238
   The MIME multipart processing performed by the jersey-multipart module
