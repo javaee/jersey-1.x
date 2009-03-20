@@ -1,4 +1,20 @@
 release 1.0.3 (2009-03/04)
+- Added the annotation com.sun.jersey.multipart.FormDataParam for
+  processing parameters that are named body parts of "multipart/form-data"
+  messages. This functionality replaces the overloaded use of @FormParam,
+  and such functionaity for processing "multipart/form-data" will be
+  deprecated.
+- Fixed issue 238
+  https://jersey.dev.java.net/issues/show_bug.cgi?id=238
+  The MIME multipart processing performed by the jersey-multipart module
+  now utilizes the MIMEPull API, instance of the JavaMail API. MIMEPull
+  enables streaming and caching, to disk, of body parts and does not
+  require that a MIME multipart message be loaded completely into memory.
+- Fixed issue 86
+  https://jersey.dev.java.net/issues/show_bug.cgi?id=86
+  The use of @FormParam with "multipart/form-data" will be deprecated
+  and instead @FormDataParam, from the jersey-multipart module must be used.
+  The behaviour of @FormDataParam is documented in the JavaDoc.
 - Fixed issue 241
   https://jersey.dev.java.net/issues/show_bug.cgi?id=241
   IntrospectionModeller contains logic that should be in the validator
