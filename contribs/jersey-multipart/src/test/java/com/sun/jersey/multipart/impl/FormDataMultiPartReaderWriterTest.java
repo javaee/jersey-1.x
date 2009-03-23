@@ -528,6 +528,41 @@ public class FormDataMultiPartReaderWriterTest extends AbstractGrizzlyServerTest
         }
     }
 
+    @Path("/")
+    public class NonContentTypeForPartResource {
+
+        @PUT
+        @Consumes("multipart/form-data")
+        @Produces("text/plain")
+        public String put(
+                @FormDataParam("submit") FormDataBodyPart bean
+                ) {
+            assertNotNull(bean);
+            assertNull(bean.getHeaders().getFirst("Content-Type"));
+            assertEquals("upload", bean.getValue());
+            return "OK";
+        }
+    }
+
+    public void testNonContentTypeForPartResource() {
+        startServer(NonContentTypeForPartResource.class);
+
+        WebResource.Builder builder = client.resource(getUri()).
+                accept("text/plain").type("multipart/form-data;boundary=\"---------------------------33219615019106944971719437488\"");
+        try {
+            String entity =
+                    "-----------------------------33219615019106944971719437488\n" +
+                    "Content-Disposition: form-data; name=\"submit\"\n\n" +
+                    "upload\n" +
+                    "-----------------------------33219615019106944971719437488--";
+            String response = builder.put(String.class, entity);
+            assertEquals("OK", response);
+        } catch (UniformInterfaceException e) {
+            report(e);
+            fail("Caught exception: " + e);
+        }
+    }
+
     private void checkEntity(String expected, BodyPartEntity entity) throws IOException {
         // Convert the raw bytes into a String
         InputStreamReader sr = new InputStreamReader(entity.getInputStream());

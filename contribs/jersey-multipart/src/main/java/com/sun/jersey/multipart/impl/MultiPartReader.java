@@ -180,8 +180,10 @@ public class MultiPartReader implements MessageBodyReader<MultiPart> {
                 }
 
                 try {
-                    bodyPart.setMediaType(MediaType.valueOf(mp.getContentType()));
-                    
+                    String contentType = bodyPart.getHeaders().getFirst("Content-Type");
+                    if (contentType != null)
+                        bodyPart.setMediaType(MediaType.valueOf(contentType));
+
                     bodyPart.getContentDisposition();
                 } catch (IllegalArgumentException ex) {
                     throw new WebApplicationException(ex);
