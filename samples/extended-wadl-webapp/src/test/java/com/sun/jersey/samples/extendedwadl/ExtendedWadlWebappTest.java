@@ -37,80 +37,45 @@
 
 package com.sun.jersey.samples.extendedwadl;
 
-import com.sun.jersey.api.client.Client;
-import com.sun.jersey.api.client.WebResource;
 import com.sun.jersey.core.header.MediaTypes;
-import java.io.File;
+import com.sun.jersey.test.framework.JerseyTest;
+import com.sun.jersey.test.framework.util.ApplicationDescriptor;
+import java.util.HashMap;
+import java.util.Map;
 import java.net.URI;
-import java.util.Collections;
 import javax.ws.rs.core.UriBuilder;
-import junit.framework.TestCase;
-import org.glassfish.embed.GlassFish;
-import org.glassfish.embed.ScatteredWar;
+import org.junit.Assert;
+import org.junit.Test;
 
 /**
  *
  * @author Naresh (Srinivas.Bhimisetty@Sun.com)
- */public class ExtendedWadlWebappTest extends TestCase {
+ */
+public class ExtendedWadlWebappTest extends JerseyTest {
     
-    private static int getPort(int defaultPort) {
-        String port = System.getenv("JERSEY_HTTP_PORT");
-        if (null != port) {
-            try {
-                return Integer.parseInt(port);
-            } catch (NumberFormatException e) {
-            }
-        }
-        return defaultPort;        
-    } 
-    
-    private static URI getBaseURI() {
-        return UriBuilder.fromUri("http://localhost/").path("extended-wadl-webapp").port(getPort(9998)).
-                build();
+    public ExtendedWadlWebappTest() throws Exception {
+        super();
+        Map<String, String> initParams = new HashMap<String, String>();
+        initParams.put("com.sun.jersey.config.property.packages",
+                "com.sun.jersey.samples.extendedwadl.resources");
+        initParams.put("com.sun.jersey.config.property.WadlGeneratorConfig",
+                "com.sun.jersey.samples.extendedwadl.SampleWadlGeneratorConfig");
+        ApplicationDescriptor appDescriptor = new ApplicationDescriptor();
+        appDescriptor.setServletInitParams(initParams);
+        appDescriptor.setContextPath("extended-wadl-webapp");
+        super.setupTestEnvironment(appDescriptor);
     }
     
-    private static final URI BASE_URI = getBaseURI();
-    
-    private GlassFish glassfish;
-
-    private WebResource r;
-    
-     public ExtendedWadlWebappTest(String testName) {
-        super(testName);
-    }
-
-    @Override
-    protected void setUp() throws Exception {
-        super.setUp();
-
-        // Start Glassfish
-        glassfish = new GlassFish(BASE_URI.getPort());
-        // Deploy Glassfish referencing the web.xml
-        ScatteredWar war = new ScatteredWar(BASE_URI.getRawPath(),
-                new File("src/main/webapp"),
-                new File("src/main/webapp/WEB-INF/web.xml"),
-                Collections.singleton(new File("target/classes").toURI().toURL()));
-        glassfish.deploy(war);
-        Client c = Client.create();
-        r = c.resource(BASE_URI);
-    }
-
-    @Override
-    protected void tearDown() throws Exception {
-        super.tearDown();
-
-        glassfish.stop();
-    }
-
     /**
      * Test checks that the WADL generated using the WadlGenerator api doesn't
      * contain the expected text.
      * @throws java.lang.Exception
      */
+    @Test
     public void testExtendedWadl() throws Exception {
-        String wadl = r.path("application.wadl").accept(MediaTypes.WADL).get(String.class);
-        assertTrue("Generated wadl is of null length", wadl.length() > 0);
-        assertTrue("Generated wadl doesn't contain the expected text",
+        String wadl = webResource.path("application.wadl").accept(MediaTypes.WADL).get(String.class);
+        Assert.assertTrue("Generated wadl is of null length", wadl.length() > 0);
+        Assert.assertTrue("Generated wadl doesn't contain the expected text",
                 wadl.contains("This is a paragraph"));
     }
 

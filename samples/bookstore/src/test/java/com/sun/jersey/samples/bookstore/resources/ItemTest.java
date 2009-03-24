@@ -37,17 +37,25 @@
 package com.sun.jersey.samples.bookstore.resources;
 
 import com.sun.jersey.api.client.WebResource;
+import org.junit.Test;
+import static org.junit.Assert.*;
 
 /**
  * @version $Revision: 1.1 $
  */
 public class ItemTest extends TestSupport {
 
+    public ItemTest()  throws Exception {
+
+    }
+
+    @Test
     public void testResourceAsHtml() throws Exception {
         String response = resource().get(String.class);
         assertItemHtmlResponse(response);
     }
 
+    @Test
     public void testResourceAsXml() throws Exception {
         String text = resource().accept("application/xml").get(String.class);
         System.out.println("Item XML is: " + text);
@@ -57,6 +65,7 @@ public class ItemTest extends TestSupport {
         assertEquals("item title", "Svejk", response.getTitle());
     }
 
+    @Test
     public void testResourceAsHtmlUsingFirefoxAcceptHeaders() throws Exception {
         String response = resource().accept(
                 "text/html",
@@ -66,6 +75,7 @@ public class ItemTest extends TestSupport {
         assertItemHtmlResponse(response);
     }
 
+    @Test
     public void testResourceAsHtmlUsingSafariAcceptHeaders() throws Exception {
         WebResource.Builder resource = resource().accept(
                 "text/xml",
@@ -85,7 +95,7 @@ public class ItemTest extends TestSupport {
     }
 
     protected WebResource resource() {
-        return baseResource.path("/items/1");
+        return webResource.path("/items/1");
     }
 
 

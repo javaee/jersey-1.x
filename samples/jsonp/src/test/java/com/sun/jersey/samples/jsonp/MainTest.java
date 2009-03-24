@@ -37,55 +37,44 @@
 
 package com.sun.jersey.samples.jsonp;
 
-import com.sun.grizzly.http.SelectorThread;
-import junit.framework.TestCase;
 import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.GenericType;
 import com.sun.jersey.api.client.WebResource;
 import com.sun.jersey.api.client.config.ClientConfig;
 import com.sun.jersey.api.client.config.DefaultClientConfig;
+import com.sun.jersey.api.client.filter.LoggingFilter;
 import com.sun.jersey.samples.jsonp.config.JAXBContextResolver;
 import com.sun.jersey.samples.jsonp.jaxb.ChangeRecordBean;
+import com.sun.jersey.test.framework.JerseyTest;
+import com.sun.jersey.test.framework.impl.util.CommonUtils;
 import java.util.List;
+import org.junit.Test;
+import static org.junit.Assert.*;
+
 /**
  *
  * @author japod
  */
-public class MainTest extends TestCase {
-    
-    private SelectorThread threadSelector;
-    
-    private WebResource r;
+public class MainTest extends JerseyTest {
 
-    public MainTest(String testName) {
-        super(testName);
-    }
+    private WebResource r1;
 
-    @Override
-    protected void setUp() throws Exception {
-        super.setUp();
-        
-        threadSelector = Main.startServer();
-
+    public MainTest() throws Exception {
+        super("jsonp", "", "com.sun.jersey.samples.jsonp");
         ClientConfig cc = new DefaultClientConfig();
         // use the following jaxb context resolver
         cc.getClasses().add(JAXBContextResolver.class);
         Client c = Client.create(cc);
-        r = c.resource(Main.BASE_URI);
+        r1 = c.resource(CommonUtils.getBaseURI("jsonp", ""));
+        r1.addFilter(new LoggingFilter());
     }
-
-    @Override
-    protected void tearDown() throws Exception {
-        super.tearDown();
-
-        threadSelector.stopEndpoint();
-    }
-
+    
     /**
      * Test checks that the application.wadl is reachable.
      */
+    @Test
     public void testApplicationWadl() {
-        String applicationWadl = r.path("application.wadl").get(String.class);
+        String applicationWadl = r1.path("application.wadl").get(String.class);
         assertTrue("Something wrong. Returned wadl length is not > 0",
                 applicationWadl.length() > 0);
     }
@@ -93,11 +82,12 @@ public class MainTest extends TestCase {
     /**
      * Test check GET on the "changes" resource in "application/json" format.
      */
+    @Test
     public void testGetOnChangesJSONFormat() {
         GenericType<List<ChangeRecordBean>> genericType =
                 new GenericType<List<ChangeRecordBean>>() {};
         // get the initial representation
-        List<ChangeRecordBean> changes = r.path("changes").
+        List<ChangeRecordBean> changes = r1.path("changes").
                 accept("application/json").get(genericType);
         // check that there are two changes entries
         assertEquals("Expected number of initial changes not found",
@@ -107,17 +97,19 @@ public class MainTest extends TestCase {
     /**
      * Test check GET on the "changes" resource in "application/xml" format.
      */
+    @Test
     public void testGetOnLatestChangeXMLFormat() {
-        ChangeRecordBean lastChange = r.path("changes/latest").
+        ChangeRecordBean lastChange = r1.path("changes/latest").
                 accept("application/xml").get(ChangeRecordBean.class);
         assertEquals(1, lastChange.linesChanged);
     }
 
     /**
-     * Test check GET on the "changes" resource in "application/x-javascript" format.
+     * Test check GET on the "changes" resource in "application/javascript" format.
      */
+    @Test
     public void testGetOnLatestChangeJavasriptFormat() {
-        String js = r.path("changes").
+        String js = r1.path("changes").
                 accept("application/x-javascript").get(String.class);
         assertTrue(js.startsWith("callback"));
     }

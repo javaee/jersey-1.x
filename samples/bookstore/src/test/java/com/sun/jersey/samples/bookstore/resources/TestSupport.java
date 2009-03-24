@@ -37,13 +37,12 @@
 
 package com.sun.jersey.samples.bookstore.resources;
 
-import com.sun.jersey.api.client.Client;
-import com.sun.jersey.api.client.WebResource;
-import com.sun.jersey.samples.bookstore.resources.glassfish.GlassFishFacade;
-import junit.framework.TestCase;
 
-import javax.ws.rs.core.UriBuilder;
-import java.net.URI;
+import com.sun.jersey.test.framework.JerseyTest;
+import com.sun.jersey.test.framework.util.ApplicationDescriptor;
+import java.util.HashMap;
+import java.util.Map;
+import static org.junit.Assert.*;
 
 /**
  * A base class for test cases which boots up a GlassFish server for in container testing of RESTful resources
@@ -51,53 +50,23 @@ import java.net.URI;
  * @author James Strachan
  * @author Naresh
  */
-public class TestSupport extends TestCase {
+public class TestSupport extends JerseyTest {
 
-    protected static final URI BASE_URI = getBaseURI();
-
-    protected WebResource baseResource;
-    protected WebContainerFacade webContainer = createWebContainerFacade();
-
-    protected static int getPort(int defaultPort) {
-        String port = System.getenv("JERSEY_HTTP_PORT");
-        if (null != port) {
-            try {
-                return Integer.parseInt(port);
-            } catch (NumberFormatException e) {
-            }
-        }
-        return defaultPort;
+    public TestSupport() throws Exception {
+        super();
+        Map<String, String> INIT_PARAMS = new HashMap<String, String>();
+        INIT_PARAMS.put("com.sun.jersey.config.feature.Redirect", "true");
+        INIT_PARAMS.put("com.sun.jersey.config.feature.ImplicitViewables", "true");
+        INIT_PARAMS.put("com.sun.jersey.config.property.WebPageContentRegex",
+                "/(images|css|jsp)/.*");
+        ApplicationDescriptor  applicationDescriptor = new ApplicationDescriptor();
+        applicationDescriptor = applicationDescriptor.setContextPath("bookstore")
+                .setRootResourcePackageName("com.sun.jersey.samples.bookstore.resources")
+                .setServletInitParams(INIT_PARAMS);
+        super.setupTestEnvironment(applicationDescriptor);
     }
 
-    protected static URI getBaseURI() {
-        return UriBuilder.fromUri("http://localhost/").port(getPort(9998)).
-                path("bookstore").build();
-    }
-
-
-    @Override
-    protected void setUp() throws Exception {
-        super.setUp();
-
-        webContainer.setUp();
-
-        Client client = Client.create();
-        baseResource = client.resource(BASE_URI);
-    }
-
-
-    @Override
-    protected void tearDown() throws Exception {
-        super.tearDown();
-
-        webContainer.tearDown();
-    }
-
-    protected WebContainerFacade createWebContainerFacade() {
-        // TODO we could use system properties or something to choose
-        return new GlassFishFacade(BASE_URI);
-    }
-
+    
 
     protected void assertHtmlResponse(String response) {
         assertNotNull("No text returned!", response);

@@ -36,55 +36,39 @@
  */
 package com.sun.jersey.samples.entityprovider;
 
-import com.sun.grizzly.http.SelectorThread;
-import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.ClientResponse;
-import com.sun.jersey.api.client.WebResource;
 import com.sun.jersey.api.representation.Form;
 import com.sun.jersey.core.header.MediaTypes;
+import com.sun.jersey.test.framework.JerseyTest;
+import com.sun.jersey.test.framework.util.ApplicationDescriptor;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.Properties;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import junit.framework.TestCase;
+import org.junit.Test;
+import static org.junit.Assert.*;
 
 /**
  *
  * @author Naresh
  */
-public class MainTest extends TestCase {
+public class MainTest extends JerseyTest {
 
-    private SelectorThread threadSelector;
-    private WebResource r;
-
-    public MainTest(String testName) {
-        super(testName);
-    }
-
-    @Override
-    protected void setUp() throws Exception {
-        super.setUp();
-
-        threadSelector = Main.startServer();
-
-        Client c = Client.create();
-        r = c.resource(Main.BASE_URI);
-    }
-
-    @Override
-    protected void tearDown() throws Exception {
-        super.tearDown();
-
-        threadSelector.stopEndpoint();
+    public MainTest()throws Exception {
+        super();
+        ApplicationDescriptor appDescriptor = new ApplicationDescriptor();
+        appDescriptor.setRootResourcePackageName("com.sun.jersey.samples.entityprovider");
+        super.setupTestEnvironment(appDescriptor);
     }
 
     /**
      * Test if a WADL document is available at the relative path
      * "application.wadl".
      */
+    @Test
     public void testApplicationWadl() {
-        String serviceWadl = r.path("application.wadl").
+        String serviceWadl = webResource.path("application.wadl").
                 accept(MediaTypes.WADL).get(String.class);
         assertTrue(serviceWadl.length() > 0);
     }
@@ -94,8 +78,9 @@ public class MainTest extends TestCase {
      * a list of properties that contains the "java.class.path"
      * property.
      */
+    @Test
     public void testPropertiesResource() throws IOException {
-        String sProperties = r.path("properties").accept(MediaType.TEXT_PLAIN).get(String.class);
+        String sProperties = webResource.path("properties").accept(MediaType.TEXT_PLAIN).get(String.class);
         Properties properties = new Properties();
         properties.load(new ByteArrayInputStream(sProperties.getBytes()));
         assertNotNull("Properties does not contain 'java.class.path' property", 
@@ -106,8 +91,9 @@ public class MainTest extends TestCase {
      * Test checks that a GET request on "data" resource gives back a reponse
      * with status "OK".
      */
+    @Test
     public void testGetOnDataResource() {
-        ClientResponse response = r.path("data").accept(MediaType.TEXT_HTML).get(ClientResponse.class);
+        ClientResponse response = webResource.path("data").accept(MediaType.TEXT_HTML).get(ClientResponse.class);
         assertEquals("Request for data doesn't give expected response.",
                 Response.Status.OK, response.getResponseStatus());
     }
@@ -116,13 +102,14 @@ public class MainTest extends TestCase {
      * Test checks that a POST on "data" resource adds the submitted data to
      * the maintained map.
      */
+    @Test
     public void testPostOnDataResource() {
         Form formData = new Form();
         formData.add("name", "testName");
         formData.add("value", "testValue");
-        ClientResponse response = r.path("data").type(MediaType.APPLICATION_FORM_URLENCODED).post(ClientResponse.class, formData);
+        ClientResponse response = webResource.path("data").type(MediaType.APPLICATION_FORM_URLENCODED).post(ClientResponse.class, formData);
         assertEquals(Response.Status.OK, response.getResponseStatus());
-        String responseMsg = r.path("data").type(MediaType.TEXT_HTML).get(String.class);
+        String responseMsg = webResource.path("data").type(MediaType.TEXT_HTML).get(String.class);
         assertTrue("Submitted data did not get added to the list...",
                 responseMsg.contains("testName") && responseMsg.contains("testValue"));
 

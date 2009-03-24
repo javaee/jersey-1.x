@@ -66,9 +66,9 @@
         <module>mandel</module>
         <module>optimistic-concurrency</module>
         <module>scala-helloworld-webapp</module>
-        <module>simple-atom-server</module>
+        <module>simple-atom-server</module> 
         <module>simple-console</module>
-        <module>simple-servlet</module>
+        <module>simple-servlet</module> 
         <module>sparklines</module>
         <module>spring-annotations</module>
         <module>storage-service</module>

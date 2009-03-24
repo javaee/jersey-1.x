@@ -37,25 +37,34 @@
 package com.sun.jersey.samples.bookstore.resources;
 
 import com.sun.jersey.api.client.WebResource;
+import org.junit.Test;
+import static org.junit.Assert.*;
 
 /**
  * @version $Revision: 1.1 $
  */
 public class BookstoreTest extends TestSupport {
 
+    public BookstoreTest()  throws Exception {
+
+    }
+
+    @Test
     public void testResourceAsHtml() throws Exception {
-        String response = resource().get(String.class);
+        String response = webResource.get(String.class);
         assertBookstoreHtmlResponse(response);
     }
 
+    @Test
     public void testResourceAsXml() throws Exception {
-        Bookstore response = resource().accept("application/xml").get(Bookstore.class);
+        Bookstore response = webResource.accept("application/xml").get(Bookstore.class);
         assertNotNull("Should have returned a bookstore!", response);
         assertEquals("bookstore name", "Czech Bookstore", response.getName());
     }
 
+    @Test
     public void testResourceAsHtmlUsingFirefoxAcceptHeaders() throws Exception {
-        String response = resource().accept(
+        String response = webResource.accept(
                 "text/html",
                 "application/xhtml+xml",
                 "application/xml;q=0.9",
@@ -63,8 +72,9 @@ public class BookstoreTest extends TestSupport {
         assertBookstoreHtmlResponse(response);
     }
 
+    @Test
     public void testResourceAsHtmlUsingSafariAcceptHeaders() throws Exception {
-        WebResource.Builder resource = resource().accept(
+        WebResource.Builder resource = webResource.accept(
                 "text/xml",
                 "application/xml",
                 "application/xhtml+xml",
@@ -75,10 +85,7 @@ public class BookstoreTest extends TestSupport {
         assertBookstoreHtmlResponse(response);
     }
 
-    protected WebResource resource() {
-        return baseResource.path("/");
-    }
-
+    
     protected void assertBookstoreHtmlResponse(String response) {
         assertHtmlResponse(response);
         assertResponseContains(response, "Bookstore");

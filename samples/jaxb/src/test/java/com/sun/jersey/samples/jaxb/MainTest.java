@@ -36,129 +36,114 @@
  */
 package com.sun.jersey.samples.jaxb;
 
-import com.sun.grizzly.http.SelectorThread;
-import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.GenericType;
-import com.sun.jersey.api.client.WebResource;
+import com.sun.jersey.test.framework.JerseyTest;
 import java.util.Collection;
 import javax.ws.rs.core.GenericEntity;
 import javax.xml.bind.JAXBElement;
 import javax.xml.namespace.QName;
-import junit.framework.TestCase;
+import org.junit.Test;
+import static org.junit.Assert.*;
 
 /**
  *
  * @author Paul.Sandoz@Sun.Com
  */
-public class MainTest extends TestCase {
+public class MainTest extends JerseyTest {
+
+    public MainTest() throws Exception {
+        super("com.sun.jersey.samples.jaxb");
+    }
     
-    SelectorThread threadSelector;
-    
-    WebResource r;
-
-    public MainTest(String testName) {
-        super(testName);
-    }
-
-    @Override
-    protected void setUp() throws Exception {
-        super.setUp();
-
-        threadSelector = Main.startServer();
-
-        Client c = Client.create();
-        r = c.resource(Main.BASE_URI);
-    }
-
-    @Override
-    protected void tearDown() throws Exception {
-        super.tearDown();
-        
-        threadSelector.stopEndpoint();
-    }
-
     /**
      * Test checks that the application.wadl is reachable.
      */
+    @Test
     public void testApplicationWadl() {
-        String applicationWadl = r.path("application.wadl").get(String.class);
+        String applicationWadl = webResource.path("application.wadl").get(String.class);
         assertTrue("Something wrong. Returned wadl length is not > 0",
                 applicationWadl.length() > 0);
     }
 
+    @Test
     public void testRootElement() {
-        JAXBXmlRootElement e1 = r.path("jaxb/XmlRootElement").
+        JAXBXmlRootElement e1 = webResource.path("jaxb/XmlRootElement").
                 get(JAXBXmlRootElement.class);
         
-        JAXBXmlRootElement e2 = r.path("jaxb/XmlRootElement").type("application/xml").
+        JAXBXmlRootElement e2 = webResource.path("jaxb/XmlRootElement").type("application/xml").
                 post(JAXBXmlRootElement.class, e1);
 
         assertEquals(e1, e2);
     }
-    
+
+    @Test
     public void testJAXBElement() {
         GenericType<JAXBElement<JAXBXmlType>> genericType = 
                 new GenericType<JAXBElement<JAXBXmlType>>() {};
                 
-        JAXBElement<JAXBXmlType> e1 = r.path("jaxb/JAXBElement").
+        JAXBElement<JAXBXmlType> e1 = webResource.path("jaxb/JAXBElement").
                 get(genericType);
         
-        JAXBElement<JAXBXmlType> e2 = r.path("jaxb/JAXBElement").type("application/xml").
+        JAXBElement<JAXBXmlType> e2 = webResource.path("jaxb/JAXBElement").type("application/xml").
                 post(genericType, e1);
 
         assertEquals(e1.getValue(), e2.getValue());
     }
 
+    @Test
     public void testXmlType() {
-        JAXBXmlType t1 = r.path("jaxb/JAXBElement").
+        JAXBXmlType t1 = webResource.path("jaxb/JAXBElement").
                 get(JAXBXmlType.class);
         
         JAXBElement<JAXBXmlType> e = new JAXBElement<JAXBXmlType>(
                 new QName("jaxbXmlRootElement"),
                 JAXBXmlType.class,
                 t1);
-        JAXBXmlType t2 = r.path("jaxb/XmlType").type("application/xml").
+        JAXBXmlType t2 = webResource.path("jaxb/XmlType").type("application/xml").
                 post(JAXBXmlType.class, e);
         
         assertEquals(t1, t2);
     }
-    
+
+    @Test
     public void testRootElementCollection() {
         GenericType<Collection<JAXBXmlRootElement>> genericType = 
                 new GenericType<Collection<JAXBXmlRootElement>>() {};
         
-        Collection<JAXBXmlRootElement> ce1 = r.path("jaxb/collection/XmlRootElement").
+        Collection<JAXBXmlRootElement> ce1 = webResource.path("jaxb/collection/XmlRootElement").
                 get(genericType);
-        Collection<JAXBXmlRootElement> ce2 = r.path("jaxb/collection/XmlRootElement").
+        Collection<JAXBXmlRootElement> ce2 = webResource.path("jaxb/collection/XmlRootElement").
                 type("application/xml").
                 post(genericType, new GenericEntity<Collection<JAXBXmlRootElement>>(ce1){});
                 
         assertEquals(ce1, ce2);
     }
 
+    @Test
     public void testXmlTypeCollection() {
         GenericType<Collection<JAXBXmlRootElement>> genericRootElement =
                 new GenericType<Collection<JAXBXmlRootElement>>() {};
         GenericType<Collection<JAXBXmlType>> genericXmlType = 
                 new GenericType<Collection<JAXBXmlType>>() {};
                 
-        Collection<JAXBXmlRootElement> ce1 = r.path("jaxb/collection/XmlRootElement").
+        Collection<JAXBXmlRootElement> ce1 = webResource.path("jaxb/collection/XmlRootElement").
                 get(genericRootElement);
         
-        Collection<JAXBXmlType> ct1 = r.path("jaxb/collection/XmlType").
+        Collection<JAXBXmlType> ct1 = webResource.path("jaxb/collection/XmlType").
                 type("application/xml").
                 post(genericXmlType, new GenericEntity<Collection<JAXBXmlRootElement>>(ce1){});
                 
-        Collection<JAXBXmlType> ct2 = r.path("jaxb/collection/XmlRootElement").
+        Collection<JAXBXmlType> ct2 = webResource.path("jaxb/collection/XmlRootElement").
                 get(genericXmlType);
                 
         assertEquals(ct1, ct2);
     }
 
+    @Test
     public void testRootElementArray() {
-        JAXBXmlRootElement[] ae1 = r.path("jaxb/array/XmlRootElement").
+        JAXBXmlRootElement[] ae1 = webResource.path("jaxb/array/XmlRootElement").
                 get(JAXBXmlRootElement[].class);
-        JAXBXmlRootElement[] ae2 = r.path("jaxb/array/XmlRootElement").
+        JAXBXmlRootElement[] ae2 = webResource.path("jaxb/array/XmlRootElement").
                 type("application/xml").
                 post(JAXBXmlRootElement[].class, ae1);
 
@@ -167,19 +152,21 @@ public class MainTest extends TestCase {
             assertEquals(ae1[i], ae2[i]);
     }
 
+    @Test
     public void testXmlTypeArray() {
-        JAXBXmlRootElement[] ae1 = r.path("jaxb/array/XmlRootElement").
+        JAXBXmlRootElement[] ae1 = webResource.path("jaxb/array/XmlRootElement").
                 get(JAXBXmlRootElement[].class);
 
-        JAXBXmlType[] at1 = r.path("jaxb/array/XmlType").
+        JAXBXmlType[] at1 = webResource.path("jaxb/array/XmlType").
                 type("application/xml").
                 post(JAXBXmlType[].class, ae1);
 
-        JAXBXmlType[] at2 = r.path("jaxb/array/XmlRootElement").
+        JAXBXmlType[] at2 = webResource.path("jaxb/array/XmlRootElement").
                 get(JAXBXmlType[].class);
 
         assertEquals(at1.length, at2.length);
         for (int i = 0; i < at1.length; i++)
             assertEquals(at1[i], at2[i]);
     }
+
 }

@@ -42,7 +42,7 @@ import java.util.Arrays;
 
 import com.sun.jersey.samples.bookstore.resources.WebContainerFacade;
 import org.glassfish.embed.EmbeddedInfo;
-import org.glassfish.embed.ScatteredArchive;
+import org.glassfish.embed.ScatteredWar;
 import org.glassfish.embed.Server;
 
 /**
@@ -68,10 +68,10 @@ public class GlassFishFacade implements WebContainerFacade {
             glassfish = new Server(embeddedInfo);
 
             // Deploy Glassfish referencing the web.xml
-            ScatteredArchive war = new ScatteredArchive(BASE_URI.getRawPath(),
-                    new File("src/main/webapp"),
-                    new File("src/main/webapp/WEB-INF/web.xml"),
-                    Arrays.asList(new File("target/classes").toURI().toURL(),
+            ScatteredWar war = new ScatteredWar(BASE_URI.getRawPath(),
+                        new File("src/main/webapp"),
+                        new File("src/main/webapp/WEB-INF/web.xml"),
+                        Arrays.asList(new File("target/classes").toURI().toURL(),
                     new File("target/test-classes").toURI().toURL()));
 
             glassfish.start();
