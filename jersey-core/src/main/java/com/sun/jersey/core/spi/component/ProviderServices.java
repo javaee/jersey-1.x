@@ -103,7 +103,7 @@ public class ProviderServices {
 
     public <T> Set<T> getServices(Class<T> provider) {
         Set<T> ps = new LinkedHashSet<T>();
-        for (Class pc : getServiceClasses(provider)) {
+        for (ProviderClass pc : getServiceClasses(provider)) {
             Object o = getComponent(pc);
             if (o != null) {
                 ps.add(provider.cast(o));
@@ -116,7 +116,7 @@ public class ProviderServices {
     public <T> Set<T> getProvidersAndServices(Class<T> provider) {
         Set<T> ps = new LinkedHashSet<T>();
         ps.addAll(getProviderInstances(provider));
-        for (Class pc : getProviderAndServiceClasses(provider)) {
+        for (ProviderClass pc : getProviderAndServiceClasses(provider)) {
             Object o = getComponent(pc);
             if (o != null) {
                 ps.add(provider.cast(o));
@@ -135,7 +135,7 @@ public class ProviderServices {
             listener.onAdd(t);
         }
 
-        for (Class pc : getProviderAndServiceClasses(provider)) {
+        for (ProviderClass pc : getProviderAndServiceClasses(provider)) {
             Object o = getComponent(pc);
             if (o != null) {
                 listener.onAdd(provider.cast(o));
@@ -186,6 +186,11 @@ public class ProviderServices {
         return (cp != null) ? cp.getInstance() : null;
     }
     
+    private Object getComponent(ProviderClass provider) {
+        ComponentProvider cp = componentProviderFactory.getComponentProvider(provider);
+        return (cp != null) ? cp.getInstance() : null;
+    }
+
     private <T> Set<T> getProviderInstances(Class<T> service) {
         Set<T> sp = new LinkedHashSet<T>();
         for (Object p : providerInstances) {
@@ -205,20 +210,38 @@ public class ProviderServices {
         
         return sp;
     }
-    
-    private Set<Class> getProviderAndServiceClasses(Class<?> service) {
-        Set<Class> sp = new LinkedHashSet<Class>(getProviderClasses(service));         
+
+    public class ProviderClass {
+        final boolean isServiceClass;
+        final Class c;
+        
+        ProviderClass(Class c) {
+            this.c = c;
+            this.isServiceClass = false;
+        }
+
+        ProviderClass(Class c, boolean isServiceClass) {
+            this.c = c;
+            this.isServiceClass = isServiceClass;
+        }
+    }
+
+    private Set<ProviderClass> getProviderAndServiceClasses(Class<?> service) {
+        Set<ProviderClass> sp = new LinkedHashSet<ProviderClass>();
+        for(Class c : getProviderClasses(service)) {
+            sp.add(new ProviderClass(c));
+        }
         getServiceClasses(service, sp);
         return sp;
     }    
     
-    private Set<Class> getServiceClasses(Class<?> service) {
-        Set<Class> sp = new LinkedHashSet<Class>(); 
+    private Set<ProviderClass> getServiceClasses(Class<?> service) {
+        Set<ProviderClass> sp = new LinkedHashSet<ProviderClass>();
         getServiceClasses(service, sp);
         return sp;
     }    
     
-    private void getServiceClasses(Class<?> service, Set<Class> sp) {
+    private void getServiceClasses(Class<?> service, Set<ProviderClass> sp) {
         // Get the service-defined provider classes that implement serviceClass
         LOGGER.log(Level.CONFIG, "Searching for providers that implement: " + service);
         Class<?>[] pca = ServiceFinder.find(service, true).toClassArray();
@@ -227,6 +250,6 @@ public class ProviderServices {
         
         // Add service-defined providers to the set after application-defined
         for (Class pc : pca)
-            sp.add(pc);
+            sp.add(new ProviderClass(pc, true));
     }
 }

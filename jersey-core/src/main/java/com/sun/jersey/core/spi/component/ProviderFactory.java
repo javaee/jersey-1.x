@@ -115,6 +115,26 @@ public class ProviderFactory implements ComponentProviderFactory<ComponentProvid
 
     /**
      * Get a component provider for a class.
+     *
+     * @param pc the provider class.
+     * @return the component provider.
+     */
+    public final ComponentProvider getComponentProvider(ProviderServices.ProviderClass pc) {
+        if (!pc.isServiceClass) {
+            return getComponentProvider(pc.c);
+        }
+
+        ComponentProvider cp = cache.get(pc.c);
+        if (cp != null) return cp;
+
+        cp = __getComponentProvider(pc.c);
+        
+        if (cp != null) cache.put(pc.c, cp);
+        return cp;
+    }
+
+    /**
+     * Get a component provider for a class.
      * 
      * @param c the class.
      * @return the component provider.
@@ -129,6 +149,10 @@ public class ProviderFactory implements ComponentProviderFactory<ComponentProvid
     }
 
     protected ComponentProvider _getComponentProvider(Class c) {
+        return __getComponentProvider(c);
+    }
+    
+    private ComponentProvider __getComponentProvider(Class c) {
         try {
             ComponentInjector ci = new ComponentInjector(ipc, c);
             ComponentConstructor cc = new ComponentConstructor(ipc, c, ci);
@@ -165,7 +189,7 @@ public class ProviderFactory implements ComponentProviderFactory<ComponentProvid
             return null;
         }
     }
-    
+
     /**
      * Inject on all cached components.
      */
