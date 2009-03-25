@@ -38,6 +38,108 @@
 /**
  * Provides support for Guice-based Web applications.
  * <p>
- * TODO provide example.
+ * Guice support is enabled by referencing the Guice filter
+ * {@link com.google.inject.servlet.GuiceFilter} and an application
+ * specific {@link javax.servlet.ServletContextListener} that extends from
+ * {@link com.google.inject.servlet.GuiceServletContextListener} in the web.xml.
+ * For example, the web.xml may be as follows:
+ * <blockquote><pre>
+ *   &lt;web-app&gt;
+ *     &lt;listener&gt;
+ *       &lt;listener-class&gt;foo.MyGuiceConfig&lt;/listener-class&gt;
+ *     &lt;/listener&gt;
+ *     &lt;filter&gt;
+ *       &lt;servlet-name&gt;Guice Filter&lt;/servlet-name&gt;
+ *       &lt;servlet-class&gt;com.google.inject.servlet.GuiceFilter&lt;/servlet-class&gt;
+ *     &lt;/filter&gt;
+ *   &lt;/web-app&gt;
+ * </blockquote></pre>
+ * and the application specific servlet context listener may be as follows:
+ * <blockquote><pre>
+ *     package foo;
+ * 
+ *     import com.google.inject.Guice;
+ *     import com.google.inject.Injector;
+ *     import com.google.inject.servlet.GuiceServletContextListener;
+ *     import com.google.inject.servlet.ServletModule;
+ *     import com.sun.jersey.guice.spi.container.servlet.GuiceContainer;
+ *     import foo.GuiceResource
+ *     
+ *     public class MyGuiceConfig extends GuiceServletContextListener {
+ *
+ *         @Override
+ *         protected Injector getInjector() {
+ *             return Guice.createInjector(new ServletModule() {
+ *
+ *                 @Override
+ *                 protected void configureServlets() {
+ *                     bind(GuiceResource.class);
+ *
+ *                     serve("/*").with(GuiceContainer.class);
+ *             }
+ *         });
+ *     }
+ * }
+ * </blockquote></pre>
+ * Notice that one class <code>GuiceResource</code> is bound and the
+ * {@link com.sun.jersey.guice.spi.container.servlet.GuiceContainer} is 
+ * declared in the <code>serve</code> method. Instances of
+ * <code>GuiceResource</code> will be managed according to the scope declared
+ * using Guice defined scopes. For example the <code>GuiceResource</code>
+ * could be as follows:
+ * <blockquote><pre>
+ *    @Path("bound/perrequest")
+ *    @RequestScoped
+ *    public static class BoundPerRequestResource {
+ *
+ *        @Context UriInfo ui;
+ *
+ *        @QueryParam("x") String x;
+ *
+ *        @GET
+ *        @Produces("text/plain")
+ *        public String getIt() {
+ *            return "Hello From Guice: " + x;
+ *        }
+ *    }
+ * </blockquote></pre>
+ * <p>
+ * Any root resource classes or provider classes bound by Guice
+ * will be automatically registered. It is possible to intermix Guice and
+ * non-Guice registration of classes by additionally using the normal
+ * Jersey-based registration mechanisms in the servlet context listener
+ * implementation. For example:
+ * <blockquote><pre>
+ *     package foo;
+ *
+ *     import com.google.inject.Guice;
+ *     import com.google.inject.Injector;
+ *     import com.google.inject.servlet.GuiceServletContextListener;
+ *     import com.google.inject.servlet.ServletModule;
+ *     import com.sun.jersey.api.core.PackagesResourceConfig;
+ *     import com.sun.jersey.guice.spi.container.servlet.GuiceContainer;
+ *     import foo.GuiceResource
+ *     import java.util.HashMap;
+ *     import java.util.Map;
+ * 
+ *     public class GuiceServletConfig extends GuiceServletContextListener {
+ *
+ *         @Override
+ *         protected Injector getInjector() {
+ *             return Guice.createInjector(new ServletModule() {
+ *
+ *                 @Override
+ *                 protected void configureServlets() {
+ *                     bind(GuiceResource.class);
+ *
+ *                     Map<String, String> params = new HashMap<String, String>();
+ *                     params.put(PackagesResourceConfig.PROPERTY_PACKAGES, "unbound");
+ *                     serve("/*").with(GuiceContainer.class, params);
+ *             }
+ *         });
+ *     }
+ * }
+ * </blockquote></pre>
+ *
  */
 package com.sun.jersey.guice.spi.container.servlet;

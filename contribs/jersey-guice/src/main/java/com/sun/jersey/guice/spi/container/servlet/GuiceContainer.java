@@ -38,9 +38,12 @@ package com.sun.jersey.guice.spi.container.servlet;
 
 import com.google.inject.Inject;
 import com.google.inject.Injector;
+import com.google.inject.Scope;
 import com.google.inject.Singleton;
+import com.google.inject.servlet.ServletScopes;
 import com.sun.jersey.api.core.DefaultResourceConfig;
 import com.sun.jersey.api.core.ResourceConfig;
+import com.sun.jersey.core.spi.component.ComponentScope;
 import com.sun.jersey.guice.spi.container.GuiceComponentProviderFactory;
 import com.sun.jersey.spi.container.WebApplication;
 import com.sun.jersey.spi.container.servlet.ServletContainer;
@@ -53,17 +56,17 @@ import javax.servlet.ServletException;
  * with Guice integration.
  * <p>
  * This class must be registered using
- * <code>com.google.inject.servlet.ServletModule</code>. TODO provide example.
+ * <code>com.google.inject.servlet.ServletModule</code>.
  * <p>
  * This class extends {@link ServletContainer} and initiates the
  * {@link WebApplication} with a Guice-based {@link IoCComponentProviderFactory},
  * {@link GuiceComponentProviderFactory}, such that instances of resource and
  * provider classes declared and managed by Guice can be obtained.
  * <p>
- * Guice-managed classes will be automatically registered if such
+ * Guice-bound classes will be automatically registered if such
  * classes are root resource classes or provider classes. It is not necessary
  * to provide initialization parameters for declaring classes in the web.xml
- * unless a mixture of Guice-managed and Jersey-managed classes is required.
+ * unless a mixture of Guice-bound and Jersey-managed classes is required.
  *
  * @author Gili Tzabari
  * @author Paul Sandoz
@@ -74,6 +77,19 @@ public class GuiceContainer extends ServletContainer {
 
     private final Injector injector;
 
+    public class ServletGuiceComponentProviderFactory extends GuiceComponentProviderFactory {
+        public ServletGuiceComponentProviderFactory(ResourceConfig config, Injector injector) {
+            super(config, injector);
+        }
+        
+        @Override
+        public Map<Scope, ComponentScope> createScopeMap() {
+            Map<Scope, ComponentScope> m = super.createScopeMap();
+
+            m.put(ServletScopes.REQUEST, ComponentScope.PerRequest);
+            return m;
+        }
+    }
     /**
      * Creates a new Injector.
      *
@@ -92,6 +108,6 @@ public class GuiceContainer extends ServletContainer {
 
     @Override
     protected void initiate(ResourceConfig config, WebApplication webapp) {
-        webapp.initiate(config, new GuiceComponentProviderFactory(config, injector));
+        webapp.initiate(config, new ServletGuiceComponentProviderFactory(config, injector));
     }
 }
