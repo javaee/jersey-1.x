@@ -34,40 +34,55 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-package com.sun.jersey.impl.container.grizzly.web;
+package com.sun.jersey.api.core;
 
-import com.sun.jersey.api.core.DefaultResourceConfig;
-import java.util.Collections;
 import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 /**
  * A mutable implementation of {@link DefaultResourceConfig} that explicitly
- * references classes.
- * 
- * TODO move to the API.
- * 
+ * declares for root resource and provider classes.
+ *
  * @author Paul.Sandoz@Sun.Com
  */
-public class ClassNameResourceConfig extends DefaultResourceConfig {
+public class ClassNamesResourceConfig extends DefaultResourceConfig {
 
+    /**
+     * The property value MUST be an instance String or String[]. Each String
+     * instance represents one or more package names that MUST be separated by ';'.
+     */
     public static final String PROPERTY_CLASSNAMES = "com.sun.jersey.config.property.classnames";
 
-    public ClassNameResourceConfig(Class... classes) {
+    /**
+     * Declare an array of root resource and provider classes.
+     *
+     * @param classes the array of classes.
+     */
+    public ClassNamesResourceConfig(Class... classes) {
         super();
         
         for (Class c : classes)
             getClasses().add(c);
     }
     
-    public ClassNameResourceConfig(String[] names) {
-        super(getClasses(names));
+    /**
+     * Declare root resource and provider class as an array of class names.
+     *
+     * @param classNames the array of classes.
+     */
+    public ClassNamesResourceConfig(String... classNames) {
+        super(getClasses(classNames));
     }
     
-    public ClassNameResourceConfig(Map<String, Object> props) {
+    /**
+     * Declare root resource and provider classes declaring the class names as a
+     * property of {@link ResourceConfig}.
+     *
+     * @param props the property bag that contains the property
+     *        {@link #PROPERTY_CLASSNAMES}.
+     */
+    public ClassNamesResourceConfig(Map<String, Object> props) {
         super(getClasses(props));
         setPropertiesAndFeatures(props);
     }
@@ -79,7 +94,7 @@ public class ClassNameResourceConfig extends DefaultResourceConfig {
         }
         Set<Class<?>> s = getClasses(v);
         if (s.isEmpty()) {
-            throw new IllegalArgumentException(PROPERTY_CLASSNAMES + " contains no paths");
+            throw new IllegalArgumentException(PROPERTY_CLASSNAMES + " contains no classes");
         }
         return s;
     }
@@ -89,7 +104,7 @@ public class ClassNameResourceConfig extends DefaultResourceConfig {
     }
     
     private static Set<Class<?>> getClasses(String[] elements) {
-        return convertToSet(_getClasses(elements));
+        return convertToSet(getElements(elements));
     }
 
     private static Set<Class<?>> convertToSet(String[] classes) {
@@ -101,36 +116,22 @@ public class ClassNameResourceConfig extends DefaultResourceConfig {
                 throw new RuntimeException(e);
             }
         }
-        return s;        
+        return s;
     }
     
     private static String[] _getClasses(Object param) {
         if (param instanceof String) {
-            return _getClasses((String) param);
+            return getElements(new String[] { (String)param });
         } else if (param instanceof String[]) {
-            return _getClasses((String[]) param);
+            return getElements((String[])param);
         } else {
-            throw new IllegalArgumentException(PROPERTY_CLASSNAMES + " must " + "have a property value of type String or String[]");
+            throw new IllegalArgumentException(PROPERTY_CLASSNAMES + " must " +
+                    "have a property value of type String or String[]");
         }
     }
 
-    private static String[] _getClasses(String[] elements) {
-        List<String> paths = new LinkedList<String>();
-        for (String element : elements) {
-            if (element == null || element.length() == 0) {
-                continue;
-            }
-            Collections.addAll(paths, _getClasses(element));
-        }
-        return paths.toArray(new String[paths.size()]);
-    }
-
-    private static String[] _getClasses(String paths) {
-        return paths.split(";");
-    }
-    
     private static ClassLoader getClassLoader() {
         ClassLoader classLoader = Thread.currentThread().getContextClassLoader();        
-        return (classLoader == null) ? ClassNameResourceConfig.class.getClassLoader() : classLoader;
+        return (classLoader == null) ? ClassNamesResourceConfig.class.getClassLoader() : classLoader;
     }    
 }

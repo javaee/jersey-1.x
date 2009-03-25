@@ -37,6 +37,7 @@
 
 package com.sun.jersey.impl.container.grizzly.web;
 
+import com.sun.jersey.api.core.ClassNamesResourceConfig;
 import com.sun.grizzly.http.SelectorThread;
 import com.sun.jersey.api.container.grizzly.GrizzlyWebContainerFactory;
 import com.sun.jersey.impl.test.util.TestHelper;
@@ -100,9 +101,9 @@ public abstract class AbstractGrizzlyWebContainerTester extends TestCase {
         }
         
         initParams.put(ServletContainer.RESOURCE_CONFIG_CLASS, 
-                ClassNameResourceConfig.class.getName());
+                ClassNamesResourceConfig.class.getName());
                 // ClassConfig.class.getName());
-        initParams.put(ClassNameResourceConfig.PROPERTY_CLASSNAMES, sb.toString());
+        initParams.put(ClassNamesResourceConfig.PROPERTY_CLASSNAMES, sb.toString());
         return initParams;
     }
     
