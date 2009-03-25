@@ -87,13 +87,6 @@ public class AbstractResourceTest {
     * @throws java.lang.Exception
     */
     private void startGrizzly(int port, String servletPath) throws Exception {
-        final Map<String, String> initParams = new HashMap<String, String>();
-
-        initParams.put( "com.sun.jersey.config.property.resourceConfigClass",
-                 PackagesResourceConfig.class.getName() );
-        initParams.put( PackagesResourceConfig.PROPERTY_PACKAGES,
-                 "com.sun.jersey.spring.jerseymanaged" );
-
         LOGGER.info("Starting grizzly...");
         ws = new GrizzlyWebServer(port);
         ServletAdapter sa = new ServletAdapter();
@@ -107,7 +100,7 @@ public class AbstractResourceTest {
                      "com.sun.jersey.spring.jerseymanaged" );
         }
         sa.setServletPath(servletPath);
-        ws.addGrizzlyAdapter(sa);
+        ws.addGrizzlyAdapter(sa, new String[] {""} );
         ws.start();
     }
 
@@ -119,7 +112,7 @@ public class AbstractResourceTest {
         try {
             ws.stop();
         } catch( Exception e ) {
-            LOGGER.log(Level.WARNING, "Could not stop jetty...", e );
+            LOGGER.log(Level.WARNING, "Could not stop grizzly...", e );
         }
     }
     
