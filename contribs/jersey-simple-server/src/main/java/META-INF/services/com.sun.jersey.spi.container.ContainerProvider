@@ -1,1 +1,1 @@
-com.sun.jersey.server.simple.impl.container.SimpleContainerProvider
+com.sun.jersey.simple.impl.container.SimpleContainerProvider

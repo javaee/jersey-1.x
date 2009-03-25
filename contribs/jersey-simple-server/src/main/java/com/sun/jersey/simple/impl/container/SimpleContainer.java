@@ -35,7 +35,7 @@
  * holder.
  */
 
-package com.sun.jersey.server.simple.impl.container;
+package com.sun.jersey.simple.impl.container;
 
 import java.io.IOException;
 import java.io.OutputStream;

@@ -34,7 +34,7 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-package com.sun.jersey.api.simple.container;
+package com.sun.jersey.simple.container;
 
 import java.io.Closeable;
 import java.io.IOException;

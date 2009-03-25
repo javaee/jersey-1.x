@@ -35,7 +35,7 @@
  * holder.
  */
 
-package com.sun.jersey.server.simple.impl.container;
+package com.sun.jersey.simple.impl.container;
 
 import org.simpleframework.http.core.Container;
 
