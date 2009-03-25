@@ -47,6 +47,8 @@ import java.lang.reflect.Method;
  */
 public class ThreadLocalInvoker<T> implements InvocationHandler {
     private ThreadLocal<T> threadLocalInstance = new ThreadLocal<T>();
+
+    private ThreadLocal<T> immutableThreadLocalInstance;
     
     public void set(T threadLocalInstance) {
         this.threadLocalInstance.set(threadLocalInstance);
@@ -60,6 +62,28 @@ public class ThreadLocalInvoker<T> implements InvocationHandler {
         return threadLocalInstance;
     }
     
+    public ThreadLocal<T> getImmutableThreadLocal() {
+        if (immutableThreadLocalInstance == null) {
+            immutableThreadLocalInstance = new ThreadLocal<T>() {
+                @Override
+                public T get() {
+                    return ThreadLocalInvoker.this.get();
+                }
+
+                @Override
+                public void remove() {
+                    throw new IllegalStateException();
+                }
+
+                @Override
+                public void set(T t) {
+                    throw new IllegalStateException();
+                }
+            };
+        }
+        return immutableThreadLocalInstance;
+    }
+
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
         if (threadLocalInstance.get() == null)
             throw new IllegalStateException();

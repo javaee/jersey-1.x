@@ -80,11 +80,11 @@ import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.core.Application;
 import javax.ws.rs.core.Context;
+import javax.ws.rs.core.GenericEntity;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.SecurityContext;
@@ -390,6 +390,16 @@ public class WebComponent implements ContainerListener {
                         HttpServletResponse.class.getClassLoader(),
                         new Class[] { HttpServletResponse.class },
                         responseInvoker)));
+
+        GenericEntity<ThreadLocal<HttpServletRequest>> requestThreadLocal =
+                new GenericEntity<ThreadLocal<HttpServletRequest>>(requestInvoker.getImmutableThreadLocal()) {};
+        rc.getSingletons().add(new ContextInjectableProvider<ThreadLocal<HttpServletRequest>>(
+                requestThreadLocal.getType(), requestThreadLocal.getEntity()));
+
+        GenericEntity<ThreadLocal<HttpServletResponse>> responseThreadLocal =
+                new GenericEntity<ThreadLocal<HttpServletResponse>>(responseInvoker.getImmutableThreadLocal()) {};
+        rc.getSingletons().add(new ContextInjectableProvider<ThreadLocal<HttpServletResponse>>(
+                responseThreadLocal.getType(), responseThreadLocal.getEntity()));
 
         rc.getSingletons().add(new ContextInjectableProvider<ServletContext>(
                 ServletContext.class,
