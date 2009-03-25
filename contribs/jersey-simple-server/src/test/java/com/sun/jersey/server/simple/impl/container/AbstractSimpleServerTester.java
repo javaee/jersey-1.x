@@ -37,15 +37,14 @@
 
 package com.sun.jersey.server.simple.impl.container;
 
-import java.io.IOException;
 import java.net.InetSocketAddress;
+import java.net.SocketAddress;
 
 import javax.ws.rs.core.UriBuilder;
 
 import junit.framework.TestCase;
 
 import org.simpleframework.http.core.Container;
-import org.simpleframework.transport.Server;
 import org.simpleframework.transport.connect.Connection;
 import org.simpleframework.transport.connect.SocketConnection;
 
@@ -53,11 +52,6 @@ import com.sun.jersey.api.container.ContainerFactory;
 import com.sun.jersey.api.core.ResourceConfig;
 
 /**
- * This is used to create a test that has the capability to start a 
- * server that listens to an ephemeral port. Starting servers using the
- * ephemeral ports ensures multiple servers can be started and stopped
- * within the same VM. This also provides a {@link UriBuilder} that
- * enables the server to be connected to from within the test.
  *
  * @author Paul.Sandoz@Sun.Com
  */
@@ -65,33 +59,33 @@ public abstract class AbstractSimpleServerTester extends TestCase {
    
     public static final String CONTEXT = "";
 
-    private InetSocketAddress address;
+    private int port = getEnvVariable("JERSEY_HTTP_PORT", 9997);
+
+    private static int getEnvVariable(final String varName, int defaultValue) {
+        if (null == varName) {
+            return defaultValue;
+        }
+        String varValue = System.getenv(varName);
+        if (null != varValue) {
+            try {
+                return Integer.parseInt(varValue);
+            }catch (NumberFormatException e) {
+                // will return default value bellow
+            }
+        }
+        return defaultValue;
+    }
+
     private Connection connection;
     
     public AbstractSimpleServerTester(String name) {
         super(name);
     }
     
-    /**
-     * Create a {@link UriBuilder} which will contain the ephemeral port
-     * that the server is connected to. This ensures that the tests will
-     * know how to connect to the server.
-     * 
-     * @return a target to connect to the server
-     * 
-     * @throws IOException thrown if the server has not been started
-     */
     public UriBuilder getUri() {
-       if(connection == null) {
-          throw new RuntimeException("Server has not been started");
-       }
-       String base = "http://localhost";
-       int port = address.getPort();
-       System.out.println(port);
-       
-       return UriBuilder.fromUri(base).port(port).path(CONTEXT);
+        return UriBuilder.fromUri("http://localhost").port(port).path(CONTEXT);
     }
-    
+
     public void startServer(Class... resources) {
         start(ContainerFactory.createContainer(Container.class, resources));
     }
@@ -100,20 +94,14 @@ public abstract class AbstractSimpleServerTester extends TestCase {
         start(ContainerFactory.createContainer(Container.class, config));
     }
     
-    /**
-     * This will start the server and connection to an ephemeral port
-     * to ensure that there is no conflict when starting and stopping
-     * multiple {@link Server} instances in the same VM.
-     * 
-     * @throws RuntimeException if the server has already started
-     */
     protected void start(Container container) {
         if (connection != null) {
             stopServer();
         }
         try {
-           connection = new SocketConnection(container);
-           address = (InetSocketAddress)connection.connect(null);
+            SocketAddress listen = new InetSocketAddress(port);
+            connection = new SocketConnection(container);
+            connection.connect(listen);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

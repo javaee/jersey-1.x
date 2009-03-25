@@ -55,7 +55,7 @@
         <dependency>
             <groupId>org.simpleframework</groupId>
             <artifactId>simple</artifactId>
-            <version>4.1.8</version>
+            <version>4.1.9</version>
         </dependency>
         <dependency>
             <groupId>com.sun.jersey</groupId>
