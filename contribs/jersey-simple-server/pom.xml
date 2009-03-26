@@ -43,9 +43,9 @@
         <artifactId>jersey-contribs</artifactId>
         <version>1.0.3-SNAPSHOT</version>
     </parent>
-    <artifactId>jersey-simple</artifactId>
+    <artifactId>jersey-simple-server</artifactId>
     <packaging>jar</packaging>
-    <name>jersey-simple</name>
+    <name>jersey-simple-server</name>
     <dependencies>
         <dependency>
             <groupId>com.sun.jersey</groupId>
