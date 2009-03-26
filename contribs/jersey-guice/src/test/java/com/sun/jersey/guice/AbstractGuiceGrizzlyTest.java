@@ -47,6 +47,8 @@ import java.io.IOException;
 import java.net.URI;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.servlet.ServletContextEvent;
+import javax.servlet.ServletContextListener;
 import javax.ws.rs.core.UriBuilder;
 import junit.framework.TestCase;
 
@@ -108,8 +110,10 @@ public abstract class AbstractGuiceGrizzlyTest extends TestCase {
      */
     private void stopGrizzly() throws Exception {
         try {
-            if (ws != null)
+            if (ws != null) {
                 ws.stop();
+                ws = null;
+            }
         } catch( Exception e ) {
             LOGGER.log(Level.WARNING, "Could not stop grizzly...", e );
         }

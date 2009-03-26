@@ -67,11 +67,11 @@
  *     
  *     public class MyGuiceConfig extends GuiceServletContextListener {
  *
- *         @Override
+ *         &#64;Override
  *         protected Injector getInjector() {
  *             return Guice.createInjector(new ServletModule() {
  *
- *                 @Override
+ *                 &#64;Override
  *                 protected void configureServlets() {
  *                     bind(GuiceResource.class);
  *
@@ -88,23 +88,21 @@
  * using Guice defined scopes. For example the <code>GuiceResource</code>
  * could be as follows:
  * <blockquote><pre>
- *    @Path("bound/perrequest")
- *    @RequestScoped
- *    public static class BoundPerRequestResource {
+ *    &#64;Path("bound/perrequest")
+ *    &#64;RequestScoped
+ *    public static class GuiceResource {
  *
- *        @Context UriInfo ui;
+ *        &#64;QueryParam("x") String x;
  *
- *        @QueryParam("x") String x;
- *
- *        @GET
- *        @Produces("text/plain")
+ *        &#64;GET
+ *        &#64;Produces("text/plain")
  *        public String getIt() {
  *            return "Hello From Guice: " + x;
  *        }
  *    }
  * </blockquote></pre>
  * <p>
- * Any root resource classes or provider classes bound by Guice
+ * Any root resource or provider classes bound by Guice
  * will be automatically registered. It is possible to intermix Guice and
  * non-Guice registration of classes by additionally using the normal
  * Jersey-based registration mechanisms in the servlet context listener
@@ -124,15 +122,15 @@
  * 
  *     public class GuiceServletConfig extends GuiceServletContextListener {
  *
- *         @Override
+ *         &#64;Override
  *         protected Injector getInjector() {
  *             return Guice.createInjector(new ServletModule() {
  *
- *                 @Override
+ *                 &#64;Override
  *                 protected void configureServlets() {
  *                     bind(GuiceResource.class);
  *
- *                     Map<String, String> params = new HashMap<String, String>();
+ *                     Map&lt;String, String&gt; params = new HashMap&lt;String, String&gt;();
  *                     params.put(PackagesResourceConfig.PROPERTY_PACKAGES, "unbound");
  *                     serve("/*").with(GuiceContainer.class, params);
  *             }
@@ -140,6 +138,19 @@
  *     }
  * }
  * </blockquote></pre>
- *
+ * <p>
+ * Any root resource or provider classes found in the package <code>unbound</code>
+ * or sub-packages of will be registered whether they be Guice-bound nor not.
+ * <p>
+ * Sometimes it is convienient for developers not to explicitly bind a
+ * resource or provider, let Guice instantiate, and let Jersey manage
+ * the life-cycle. This behaviour can be enabled for a resource or
+ * provider class as follows:
+ * <ol>
+ * <li>a class constructor is annotated with {@link com.google.inject.Inject};
+ * <li>the class is not explicitly bound in Guice; and
+ * <li>the class is registered using a Jersey based registration mechanism,
+ *     for example using package scanning registration.
+ * </ol>
  */
 package com.sun.jersey.guice.spi.container.servlet;

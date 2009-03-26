@@ -50,7 +50,6 @@ import com.sun.jersey.core.spi.component.ioc.IoCComponentProvider;
 import com.sun.jersey.core.spi.component.ioc.IoCComponentProviderFactory;
 import com.sun.jersey.core.spi.component.ioc.IoCInstantiatedComponentProvider;
 import com.sun.jersey.core.spi.component.ioc.IoCManagedComponentProvider;
-import com.sun.jersey.guice.GuiceInstantiated;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Type;
 import java.util.HashMap;
@@ -119,8 +118,8 @@ public class GuiceComponentProviderFactory implements IoCComponentProviderFactor
         Key<?> key = Key.get(clazz);
         // If there is no explicit binding
         if (!injector.getBindings().containsKey(key)) {
-            // If the GuiceInstantiated annotation is present
-            if (!clazz.isAnnotationPresent(GuiceInstantiated.class)) {
+            // If an @Inject is explicitly declared
+            if (!isInjectPresent(clazz)) {
                 return null;
             }
 
@@ -131,16 +130,13 @@ public class GuiceComponentProviderFactory implements IoCComponentProviderFactor
                     return new GuiceInstantiatedComponentProvider(injector, clazz);
                 }
             } catch (ConfigurationException e) {
-                // The class cannot be injected. For example, the constructor might be missing a @Inject annotation.
+                // The class cannot be injected. 
+                // For example, the constructor might contain parameters that
+                // cannot be injected
                 LOGGER.log(Level.INFO, "Cannot bind " + clazz.getName(), e);
-                for (Constructor<?> constructor : clazz.getConstructors()) {
-                    if (constructor.getAnnotation(Inject.class) != null) {
-                        // Guice should have picked this up. We fail-fast to prevent Jersey from trying to handle
-                        // injection.
-                        throw e;
-                    }
-                }
-                return null;
+                // Guice should have picked this up. We fail-fast to prevent 
+                // Jersey from trying to handle injection.
+                throw e;
             }
 
         }
@@ -177,6 +173,14 @@ public class GuiceComponentProviderFactory implements IoCComponentProviderFactor
         return new GuiceManagedComponentProvider(injector, componentScope, clazz);
     }
 
+    private boolean isInjectPresent(Class<?> c) {
+        for (Constructor<?> con : c.getConstructors()) {
+            if (con.isAnnotationPresent(Inject.class))
+                return true;
+        }
+
+        return false;
+    }
     /**
      * Converts a Guice scope to Jersey scope.
      *
