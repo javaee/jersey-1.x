@@ -66,8 +66,10 @@
 									<fileset dir="src/docbook"/>
 								</copy>
 								<replace file="${gen-src-dir}/jersey.ent" token="$version" value="${version}"/>
-								<!--
+								<replace file="${gen-src-dir}/jersey.ent" token="$jsr311-version" value="1.0"/>
 								<echo message="Copying individual modules"/>
+								<copy file="../jersey-json/src/docbook/json.xml" todir="${gen-src-dir}"/>
+                <!--
 								<copy file="../jersey-module/src/docbook/module.xml" todir="${gen-src-dir}"/>
 								-->
 							</tasks>
@@ -100,6 +102,12 @@
 					<partAutolabel>1</partAutolabel>
 					<sectionAutolabel>1</sectionAutolabel>
 					<sectionLabelIncludesComponentLabel>1</sectionLabelIncludesComponentLabel>
+          <useExtensions>1</useExtensions>
+          <linenumberingExtension>1</linenumberingExtension>
+          <linenumberingEveryNth>1</linenumberingEveryNth>
+          <calloutsExtension>1</calloutsExtension>
+          <calloutGraphics>0</calloutGraphics>
+          <!--calloutGraphicsExtension>1</calloutGraphicsExtension-->
 				</configuration>
 				<executions>
 					<execution>

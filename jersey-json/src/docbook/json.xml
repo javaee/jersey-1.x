@@ -1,20 +1,203 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.4//EN"
+"http://www.oasis-open.org/docbook/xml/4.4/docbookx.dtd" [
+<!ENTITY % ents SYSTEM "jersey.ent">
+%ents;
+]>
 <chapter id="json">
-<title>JSON Support</title>
-<para>
-TBD...
+  <title>JSON Support</title>
 
-<!--mediaobject>
-  <imageobject>
-    <imagedata fileref="includes/json-object.gif" format="GIF"/>
-  </imageobject>
-  <textobject>
-    <phrase>JSON Object</phrase>
-  </textobject>
-  <caption>
-    <para>JSON Object...
+  <para>Jersey JSON support comes as a set of JAX-RS <ulink
+  url="https://jsr311.dev.java.net/nonav/releases/&jsr311-version;/javax/ws/rs/ext/MessageBodyReader.html">MessageBodyReader</ulink>
+  and <ulink
+  url="https://jsr311.dev.java.net/nonav/releases/&jsr311-version;/javax/ws/rs/ext/MessageBodyWriter.html">MessageBodyWriter</ulink>
+  providers distributed with <emphasis>jersey-json</emphasis> module. These providers enable using
+  two basic approaches when working with JSON format:
+
+  <itemizedlist>
+    <listitem>
+      <para>JAXB based JSON support</para>
+    </listitem>
+    <listitem>
+      <para>Low-level, JSONObject/JSONArray based JSON support</para>
+    </listitem>
+  </itemizedlist>
+  
+  Both approaches use the same principle. You need to make your resource methods consume and/or produce
+  instances of certain Java types, known to provided MessageBodyReaders/Writers. Also, naturally, you need to make sure
+  you use <emphasis>jersey-json</emphasis> module with your application.
+  </para>
+
+  <section>
+    <title>JAXB Based JSON support</title>
+    
+    <para>
+     Taking this approach will save you a lot of time, if you want to easily produce/consume both JSON and XML data format.
+     Because even then you will still be able to use a unified Java model. 
+     Another advantage is simplicity of working with such a model, as JAXB leverages annotated POJOs and these could be handled
+     as simple Java beans
     </para>
-  </caption>
-</mediaobject-->
-</para>
-</chapter>
+    <para>
+     A disadvantage of JAXB based approach could be if you need to work with a very specific JSON format. Then it could be
+     difficult to find a proper way to get such a format produced and consumed. This is a reason why a lot of configuration options
+     are provided, so that you can control how things get serialized out and deserialized back.
+    </para>
+    
+    <para>
+    Following is a very simple example of how a JAXB bean could look like.
+<example>
+<title>Simple JAXB bean implementation</title>
+<programlisting linenumbering="numbered">@XmlRootElement
+public class MyJaxbBean {
+  public String name;
+  public int age;
+      
+  public MyJaxbBean() {} // JAXB needs this
 
+  public MyJaxbBean(String name, int age) {
+    this.name = name;
+    this.age = age;
+  }
+}</programlisting>
+</example>
+    
+    Using the above JAXB bean for producing JSON data format from you resource method, is then as simple as:
+    
+<example>
+<title>JAXB bean used to generate JSON representation</title>
+<programlisting linenumbering="numbered">@GET @Produces(<emphasis>"application/json"</emphasis>)
+public <emphasis>MyJaxbBean</emphasis> getMyBean() {
+   return <emphasis>new MyJaxbBean("Agamemnon", 32)</emphasis>;
+}</programlisting>
+</example>
+    
+    Notice, that JSON specific mime type is specified in @Produces annotation, and the method returns an instance
+    of MyJaxbBean, which JAXB is able to process. Resulting JSON in this case would look like:
+    
+<programlisting>
+    {"name":"Agamemnon", "age":"32"}
+</programlisting>
+    </para>
+    
+    <section>
+    	<title>Configuration Options</title>
+	
+	<para>
+	JAXB itself enables you to control output JSON format to certain extent. Specifically renaming 
+	and ommiting items is easy to do directly using JAXB annotations.
+	
+	E.g. the following example depicts changes in the above mentioned MyJaxbBean that will result in <code>{"king":"Agamemnon"}</code> JSON output.
+<example>
+<title>Tweaking JSON format using JAXB</title>
+<programlisting linenumbering="numbered">@XmlRootElement
+public class MyJaxbBean {
+  
+    @XmlElement(name="king")
+    public String name;
+  
+    @XmlTransient
+    public int age;
+ 
+    // several lines removed       
+}</programlisting>
+</example>
+	</para>
+	
+	<para>
+	To achieve more important JSON format changes, you will need to configure Jersey JSON procesor itself.
+	Various configuration options could be set on  an
+	<ulink url="https://jersey.dev.java.net/nonav/apidocs/&version;/jersey/com/sun/jersey/api/json/JSONConfiguration.html">JSONConfiguration</ulink>
+	instance. The instance could be then further used to create a JSONConfigurated 
+	<ulink url="https://jersey.dev.java.net/nonav/apidocs/&version;/jersey/com/sun/jersey/api/json/JSONJAXBContext.html">JSONJAXBContext</ulink>,
+	which serves as a main configuration point in this area.
+	To pass your specialized JSONJAXBContext to Jersey, you will finally need to implement 
+	a JAXBContext <ulink url="https://jsr311.dev.java.net/nonav/releases/&jsr311-version;/javax/ws/rs/ext/ContextResolver.html">ContextResolver</ulink>
+	</para>
+	
+	<example>
+	<title>An example of a JAXBContext resolver implementation</title>
+	<programlisting linenumbering="numbered">@Provider
+public class JAXBContextResolver implements ContextResolver&lt;JAXBContext&gt; {
+
+    private JAXBContext context;
+    private Class[] types = {MyJaxbBean.class};
+
+    public JAXBContextResolver() throws Exception {
+        this.context = 
+	  new JSONJAXBContext( <co id="json.ctx.resolver.init"/>
+	    JSONConfiguration.natural().build(), types); <co id="json.ctx.resolver.config"/>
+    }
+
+    public JAXBContext getContext(Class&lt;?&gt; objectType) {
+        for (Class type : types) {
+            if (type == objectType) {
+                return context;
+            }
+        }
+        return null;
+    }
+}</programlisting>
+	<calloutlist>
+	 <callout arearefs="json.ctx.resolver.init">
+	 	<para>Creation of our specialized JAXBContext</para> 
+	</callout>
+	 <callout arearefs="json.ctx.resolver.config">
+	 	<para>Final JSON format is given by this JSONConfiguration instance</para> 
+	</callout>
+	</calloutlist>
+	</example>
+    </section>
+
+   <para>Download <ulink url="http://download.java.net/maven/2/com/sun/jersey/samples/json-from-jaxb/&version;/json-from-jaxb-&version;-project.zip">http://download.java.net/maven/2/com/sun/jersey/samples/json-from-jaxb/&version;/json-from-jaxb-&version;-project.zip</ulink>
+   or
+   <ulink url="http://download.java.net/maven/2/com/sun/jersey/samples/jmaki-backend/&version;/jmaki-backend-&version;-project.zip">http://download.java.net/maven/2/com/sun/jersey/samples/jmaki-backend/&version;/jmaki-backend-&version;-project.zip</ulink>
+   to get a more complex example using JAXB based JSON support.
+   </para>
+    
+  </section>
+
+  <section>
+    <title>Low-Level JSON support</title>
+
+    <para>Using this approach means you will be using JSONObject and/or JSONArray classes for your data representations.
+    These classes are actually taken from Jettison project, but conform to the description 
+    provided at <ulink url="http://www.json.org/java/index.html"> http://www.json.org/java/index.html</ulink>.
+    </para>
+    
+    <para>
+    The biggest advantage here is, that you will gain full control over the JSON format produced and consumed.
+    On the other hand, dealing with your data model objects will probably be a bit more complex, than when taking the JAXB based approach.
+    Differencies are depicted at the following code snipets.
+    </para>
+    
+    <para>
+    <example><title>JAXB bean creation</title>
+    <programlisting>MyJaxbBean myBean = new MyJaxbBean("Agamemnon", 32);</programlisting>
+    </example>
+    
+    Above you construct a simple JAXB bean, which could be written in JSON as <code>{"name":"Agamemnon", "age":32}</code>
+    </para>
+    
+    <para>
+    Now to build an equivalent JSONObject (in terms of resulting JSON expression), you would need several more lines of code.
+    
+    <example>
+    <title>Constructing a JSONObject</title>
+ <programlisting linenumbering="numbered">JSONObject myObject = new JSONObject();
+myObject.JSONObject myObject = new JSONObject();
+try {
+  myObject.put("name", "Agamemnon");
+  myObject.put("age", 32);
+} catch (JSONException ex) {
+  LOGGER.log(Level.SEVERE, "Error ...", ex);
+}</programlisting>
+    </example>
+    </para>
+
+   <para>Download <ulink url="http://download.java.net/maven/2/com/sun/jersey/samples/bookmark/&version;/bookmark-&version;-project.zip">http://download.java.net/maven/2/com/sun/jersey/samples/bookmark/&version;/bookmark-&version;-project.zip</ulink> 
+   to get a more complex example using low-level JSON support.
+   </para>
+   
+  </section>
+
+</chapter>
