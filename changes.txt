@@ -2,7 +2,8 @@ release 1.0.3 (2009-03/04)
 - Fixed issue 225
   https://jersey.dev.java.net/issues/show_bug.cgi?id=225
   Niall Gallagher contributed support for the Simple HTTP server
-  integration with Jersey. See the JavaDoc for:
+  integration with Jersey. See the JavaDoc for the following in the
+  jersey-simple-server module:
     com.sun.jersey.simple.container.SimpleServerFactory
 - Fixed issue 122
   https://jersey.dev.java.net/issues/show_bug.cgi?id=122
