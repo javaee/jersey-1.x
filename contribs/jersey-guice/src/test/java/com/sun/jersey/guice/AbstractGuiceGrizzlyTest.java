@@ -47,8 +47,6 @@ import java.io.IOException;
 import java.net.URI;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.servlet.ServletContextEvent;
-import javax.servlet.ServletContextListener;
 import javax.ws.rs.core.UriBuilder;
 import junit.framework.TestCase;
 
@@ -76,7 +74,9 @@ public abstract class AbstractGuiceGrizzlyTest extends TestCase {
 
     private final URI baseUri = getUri().build();
 
-    private GrizzlyWebServer ws ;
+    private GrizzlyWebServer ws;
+
+    private GuiceFilter f;
 
     public UriBuilder getUri() {
         return UriBuilder.fromUri("http://localhost").port(port).path(CONTEXT);
@@ -91,7 +91,8 @@ public abstract class AbstractGuiceGrizzlyTest extends TestCase {
 
         sa.addServletListener(c.getName());
 
-        sa.addFilter(new GuiceFilter(), "guiceFilter", null);
+        f = new GuiceFilter();
+        sa.addFilter(f, "guiceFilter", null);
 
         sa.setContextPath(baseUri.getRawPath());
 
@@ -111,6 +112,8 @@ public abstract class AbstractGuiceGrizzlyTest extends TestCase {
     private void stopGrizzly() throws Exception {
         try {
             if (ws != null) {
+                // Work around bug in Grizzly
+                f.destroy();
                 ws.stop();
                 ws = null;
             }
