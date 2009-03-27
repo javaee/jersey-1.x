@@ -91,7 +91,7 @@ public class MainTest extends JerseyTest {
                 accept("application/json").get(genericType);
         // check that there are two changes entries
         assertEquals("Expected number of initial changes not found",
-                2, changes.size());
+                5, changes.size());
     }
 
     /**

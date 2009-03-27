@@ -1,15 +1,33 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html>
-<head>
+<head id="scriptComesHere">
 <title>Jsonp Example</title>
 <style type="text/css"><!--
   .figure { text-align:center;
             margin: 20px}
   .cliSample { background-color:lightgray }
+          .odd { background:lightgray}
+            .even { background:white}
+            .footer {font-size: 8pt; font-style:italic;padding-top:4pt;}
 --></style>
+  <script language="javascript">//<![CDATA[
+          function callback(data) {
+              var len = data.length;
+              var resultDiv = document.getElementById("writehere");
+              resultDiv.innerHTML = "";
+              var rowStyle = ["odd", "even"];
+              for (i=0; i<len; i++) {
+                  var rowObject = document.createElement("div");
+                  rowObject.setAttribute("class", rowStyle[i%2]);
+                  rowObject.innerHTML = data[i].logMessage + ", " + data[i].linesChanged + " line(s) changed" + (data[i].madeByAdmin ? " by admin" : "");
+                  resultDiv.appendChild(rowObject);
+              }
+              var footerObject = document.createElement("div");
+              footerObject.setAttribute("class", "footer");
+              footerObject.innerHTML = len + " change(s) found";
+              resultDiv.appendChild(footerObject);
+          }//]]</script>
 </head>
-
-
   <body>
     <h1>JSONP Example</h1>
     <p>This example demonstrates how to use JSONP wrapper in order to serve
@@ -52,7 +70,7 @@ mvn clean compile exec:java</pre></blockquote>
         <p>This deploys the JSONP example using
             <a href="https://grizzly.dev.java.net/">Grizzly</a>
         </p>
-        <p>A <a href="http://wadl.dev.java.net/#spec">WADL description</a> may be accessed at the URL:</p>
+        <p>A <a href="http://wadl.dev.java.net/#spec">WADL description</a> may be then accessed at the URL:</p>
         <blockquote><code><a href="http://localhost:9998/jsonp/application.wadl">http://localhost:9998/jsonp/application.wadl</a></code></blockquote>
        <p>Following steps are using <a href="http://curl.haxx.se/">cURL</a> command line tool: 
         <p>Get the list of changes in JSON format:</p>
@@ -66,5 +84,19 @@ mvn clean compile exec:java</pre></blockquote>
 
         <p>You can also see test classes at <code>src/main/test</code> subdirectory
          for detail information how to consume the service using Jersey client API</p>
+
+         <h3>JavaScript Client</h3>
+         <p>After starting the service and refreshing this page, a list of changes should be displayed below:
+    <div id="writehere">
+        <script language="javascript">//<![CDATA[
+            var headLoc = document.getElementById("scriptComesHere");
+            var scriptObj = document.createElement("script");
+            scriptObj.setAttribute("type", "application/x-javascript");
+            scriptObj.setAttribute("src", "http://localhost:9998/jsonp/changes");
+            headLoc.appendChild(scriptObj);
+            //]]</script>
+            You need to run the service first!
+    </div>
+
   </body>
 </html>
