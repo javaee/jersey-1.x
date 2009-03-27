@@ -55,6 +55,7 @@ import java.io.InputStreamReader;
 import java.io.StringWriter;
 import java.text.ParseException;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import javax.ws.rs.Consumes;
@@ -63,6 +64,8 @@ import javax.ws.rs.GET;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
@@ -562,6 +565,48 @@ public class FormDataMultiPartReaderWriterTest extends AbstractGrizzlyServerTest
             fail("Caught exception: " + e);
         }
     }
+
+    @Path("/")
+    public class MediaTypeWithBoundaryResource {
+
+        @PUT
+        @Consumes("multipart/form-data")
+        @Produces("text/plain")
+        public String get(
+                @Context HttpHeaders h,
+                @FormDataParam("submit") String s
+                ) {
+            String b = h.getMediaType().getParameters().get("boundary");
+            assertEquals("XXXX_YYYY", b);
+            return s;
+        }
+    }
+
+    public void testMediaTypeWithBoundaryResource() {
+        startServer(MediaTypeWithBoundaryResource.class);
+
+        Map<String, String> parameters = new HashMap<String, String>();
+        parameters.put("boundary", "XXXX_YYYY");
+        MediaType mediaType = new MediaType(
+                MediaType.MULTIPART_FORM_DATA_TYPE.getType(),
+                MediaType.MULTIPART_FORM_DATA_TYPE.getSubtype(), parameters);
+
+        WebResource.Builder builder = client.resource(getUri()).
+                accept("text/plain").type(mediaType);
+        try {
+
+            FormDataMultiPart entity = new FormDataMultiPart().
+                    field("submit", "OK");
+            String response = builder.put(String.class, entity);
+            assertEquals("OK", response);
+        } catch (UniformInterfaceException e) {
+            report(e);
+            fail("Caught exception: " + e);
+        }
+    }
+
+
+
 
     private void checkEntity(String expected, BodyPartEntity entity) throws IOException {
         // Convert the raw bytes into a String
