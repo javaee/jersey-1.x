@@ -42,6 +42,10 @@ import javax.ws.rs.core.MediaType;
 
 /**
  * <p>Test case for {@link BodyPart}.</p>
+ * 
+ * @author Craig.McClanahan@Sun.COM
+ * @author Paul.Sandoz@Sun.Com
+ * @author imran@smartitengineering.com
  */
 public class FormDataBodyPartTest extends BodyPartTest {
 
@@ -114,6 +118,14 @@ public class FormDataBodyPartTest extends BodyPartTest {
         }
         assertEquals("<foo>bar</foo>", fdbp.getEntity());
         assertTrue(!fdbp.isSimple());
+        try {
+            fdbp = new FormDataBodyPart();
+            fdbp.setName(null);
+            fail("Name should be null settable!");
+        }
+        catch(IllegalArgumentException argumentException) {
+            //expected
+        }
     }
 
 

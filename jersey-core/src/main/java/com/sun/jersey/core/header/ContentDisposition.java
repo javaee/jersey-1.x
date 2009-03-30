@@ -47,6 +47,7 @@ import java.util.Map;
  * A content disposition header.
  * 
  * @author Paul.Sandoz@Sun.Com
+ * @author imran@smartitengineering.com
  */
 public class ContentDisposition {
     private String type;
@@ -186,7 +187,7 @@ public class ContentDisposition {
 
     protected void addDateParameter(StringBuilder sb, String name, Date p) {
         if (p != null)
-            sb.append(';').append(name).append('=').append(HttpDateFormat.getPreferedDateFormat().format(p));
+            sb.append(';').append(name).append("=\"").append(HttpDateFormat.getPreferedDateFormat().format(p)).append("\"");
     }
 
     protected void addLongParameter(StringBuilder sb, String name, Long p) {

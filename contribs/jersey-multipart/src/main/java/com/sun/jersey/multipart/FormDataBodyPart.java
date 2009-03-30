@@ -73,6 +73,10 @@ import javax.ws.rs.core.MediaType;
  * <li>Convenience accessor to set the media type and value of a
  *     "file" field.</li>
  * </ul>
+ *
+ * @author Craig.McClanahan@Sun.COM
+ * @author Paul.Sandoz@Sun.Com
+ * @author imran@smartitengineering.com
  */
 public class FormDataBodyPart extends BodyPart {
 
@@ -240,8 +244,14 @@ public class FormDataBodyPart extends BodyPart {
      * @param name the control name.
      */
     public void setName(String name) {
+        if(name == null) {
+            throw new IllegalArgumentException("Name can not be null.");
+        }
         if (getFormDataContentDisposition() == null) {
-            super.setContentDisposition(FormDataContentDisposition.name(name).build());
+            FormDataContentDisposition contentDisposition;
+            contentDisposition = FormDataContentDisposition.name(name)
+                .build();
+            super.setContentDisposition(contentDisposition);
         } else {
             FormDataContentDisposition cd = getFormDataContentDisposition();
             cd = FormDataContentDisposition.name(name).

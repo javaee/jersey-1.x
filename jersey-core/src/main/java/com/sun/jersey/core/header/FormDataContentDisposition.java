@@ -45,6 +45,7 @@ import java.util.Date;
  * A form-data content disposition header.
  * 
  * @author Paul.Sandoz@Sun.Com
+ * @author imran@smartitengineering.com
  */
 public class FormDataContentDisposition extends ContentDisposition {
     private String name;
@@ -59,12 +60,22 @@ public class FormDataContentDisposition extends ContentDisposition {
      * @param modificationDate the modification date.
      * @param readDate the read date.
      * @param size the size.
+     * @throws IllegalArgumentException if the type is not equal to "form-data"
+     *         or the name is <code>null</code>
      */
     protected FormDataContentDisposition(String type, String name, String fileName,
             Date creationDate, Date modificationDate, Date readDate,
             long size) {
         super(type, fileName, creationDate, modificationDate, readDate, size);
         this.name = name;
+
+        if (!getType().equalsIgnoreCase("form-data")) {
+            throw new IllegalArgumentException("The content dispostion type is not equal to form-data");
+        }
+        
+        if (name == null) {
+            throw new IllegalArgumentException("The name parameter is not present");
+        }
     }
 
     public FormDataContentDisposition(String header) throws ParseException {
@@ -73,7 +84,7 @@ public class FormDataContentDisposition extends ContentDisposition {
 
     public FormDataContentDisposition(HttpHeaderReader reader) throws ParseException {
         super(reader);
-        if (!getType().equals("form-data")) {
+        if (!getType().equalsIgnoreCase("form-data")) {
             throw new IllegalArgumentException("The content dispostion type is not equal to form-data");
         }
 
