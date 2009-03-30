@@ -253,15 +253,15 @@ public class FormDataBodyPart extends BodyPart {
                 .build();
             super.setContentDisposition(contentDisposition);
         } else {
-            FormDataContentDisposition cd = getFormDataContentDisposition();
-            cd = FormDataContentDisposition.name(name).
+            FormDataContentDisposition _cd = getFormDataContentDisposition();
+            _cd = FormDataContentDisposition.name(name).
                     fileName(cd.getFileName()).
                     creationDate(cd.getCreationDate()).
                     modificationDate(cd.getModificationDate()).
                     readDate(cd.getReadDate()).
                     size(cd.getSize()).
                     build();
-            super.setContentDisposition(cd);
+            super.setContentDisposition(_cd);
         }
     }
 
