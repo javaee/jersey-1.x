@@ -126,6 +126,7 @@ import com.sun.jersey.core.spi.component.ComponentScope;
 import com.sun.jersey.core.spi.component.ioc.IoCComponentProcessor;
 import com.sun.jersey.core.spi.component.ioc.IoCComponentProcessorFactory;
 import com.sun.jersey.core.spi.component.ioc.IoCComponentProcessorFactoryInitializer;
+import com.sun.jersey.server.impl.ejb.EJBComponentProviderFactoryInitilizer;
 import com.sun.jersey.server.impl.model.parameter.multivalued.MultivaluedParameterExtractorFactory;
 import com.sun.jersey.server.impl.model.parameter.multivalued.MultivaluedParameterExtractorProvider;
 import com.sun.jersey.server.impl.model.parameter.multivalued.StringReaderFactory;
@@ -135,6 +136,8 @@ import com.sun.jersey.spi.StringReaderWorkers;
 import com.sun.jersey.spi.template.TemplateContext;
 import com.sun.jersey.spi.uri.rules.UriRule;
 import java.lang.annotation.Annotation;
+import java.util.ArrayList;
+import java.util.List;
 import javax.ws.rs.ext.ContextResolver;
 import javax.ws.rs.ext.MessageBodyReader;
 import javax.ws.rs.ext.MessageBodyWriter;
@@ -173,6 +176,8 @@ public final class WebApplicationImpl implements WebApplication {
     private ResourceFactory rcpFactory;
 
     private IoCComponentProviderFactory provider;
+    
+    private List<IoCComponentProviderFactory> providerFactories;
 
     private MessageBodyFactory bodyFactory;
 
@@ -396,23 +401,37 @@ public final class WebApplicationImpl implements WebApplication {
         this.resourceConfig = resourceConfig;
 
         this.provider = _provider;
-        if (_provider != null) {
-            if (_provider instanceof IoCComponentProcessorFactoryInitializer) {
-                IoCComponentProcessorFactoryInitializer i = (IoCComponentProcessorFactoryInitializer)_provider;
-                i.init(new ComponentProcessorFactoryImpl());
+
+        this. providerFactories = new ArrayList<IoCComponentProviderFactory>(2);
+
+        final IoCComponentProviderFactory ejb = EJBComponentProviderFactoryInitilizer.getComponentProviderFactory();
+        if (ejb != null)
+            providerFactories.add(ejb);
+        if (_provider != null)
+            providerFactories.add(_provider);
+
+        for (IoCComponentProviderFactory f : providerFactories) {
+            IoCComponentProcessorFactory cpf = null;
+            if (f instanceof IoCComponentProcessorFactoryInitializer) {
+                if (cpf == null) {
+                    cpf = new ComponentProcessorFactoryImpl();
+                }
+                IoCComponentProcessorFactoryInitializer i = (IoCComponentProcessorFactoryInitializer)f;
+                i.init(cpf);
             }
+
         }
-        
+
         // Set up the component provider factory to be
         // used with non-resource class components
-        this.cpFactory = (_provider == null)
+        this.cpFactory = (providerFactories.isEmpty())
                 ? new ProviderFactory(injectableFactory)
-                : new IoCProviderFactory(injectableFactory, _provider);
+                : new IoCProviderFactory(injectableFactory, providerFactories);
 
         // Set up the resource component provider factory
-        this.rcpFactory = (_provider == null)
+        this.rcpFactory = (providerFactories.isEmpty())
                 ? new ResourceFactory(this.resourceConfig, this.injectableFactory)
-                : new IoCResourceFactory(this.resourceConfig, this.injectableFactory, _provider);
+                : new IoCResourceFactory(this.resourceConfig, this.injectableFactory, providerFactories);
                 
         this.resourceContext = new ResourceContext() {
             public <T> T getResource(Class<T> c) {
@@ -444,22 +463,27 @@ public final class WebApplicationImpl implements WebApplication {
                         if (!(c instanceof Class))
                             return null;
 
-                        if (provider == null)
+                        if (providerFactories.isEmpty())
                             return null;
-                        
-                        final IoCComponentProvider p = provider.getComponentProvider(ic, (Class)c);
-                        return new Injectable<Object>() {
-                            public Object getValue() {
-                                try {
-                                    return p.getInstance();
-                                } catch (Exception e) {
-                                    LOGGER.log(Level.SEVERE, "Could not get instance from IoC component provider for type " +
-                                            c, e);
-                                    throw new ContainerException("Could not get instance from IoC component provider for type " +
-                                            c, e);
-                                }
+
+                        for (IoCComponentProviderFactory f : providerFactories) {
+                            final IoCComponentProvider p = f.getComponentProvider(ic, (Class)c);
+                            if (p != null) {
+                                return new Injectable<Object>() {
+                                    public Object getValue() {
+                                        try {
+                                            return p.getInstance();
+                                        } catch (Exception e) {
+                                            LOGGER.log(Level.SEVERE, "Could not get instance from IoC component provider for type " +
+                                                    c, e);
+                                            throw new ContainerException("Could not get instance from IoC component provider for type " +
+                                                    c, e);
+                                        }
+                                    }
+                                };
                             }
-                        };
+                        }
+                        return null;
                     }
 
                 });

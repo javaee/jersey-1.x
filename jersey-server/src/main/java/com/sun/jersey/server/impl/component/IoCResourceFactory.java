@@ -48,25 +48,31 @@ import com.sun.jersey.server.spi.component.ResourceComponentInjector;
 import com.sun.jersey.server.spi.component.ResourceComponentProvider;
 import com.sun.jersey.server.spi.component.ResourceComponentProviderFactory;
 import com.sun.jersey.spi.inject.InjectableProviderContext;
+import java.util.List;
 
 /**
  *
  * @author Paul.Sandoz@Sun.Com
  */
 public class IoCResourceFactory extends ResourceFactory {
-    private final IoCComponentProviderFactory icpf;
+    private final List<IoCComponentProviderFactory> factories;
     
     public IoCResourceFactory(
             ResourceConfig config,
             InjectableProviderContext ipc,
-            IoCComponentProviderFactory icpf) {
+            List<IoCComponentProviderFactory> factories) {
         super(config, ipc);
-        this.icpf = icpf;
+        this.factories = factories;
     }
 
     @Override
     public ResourceComponentProvider getComponentProvider(Class c) {
-        IoCComponentProvider icp = icpf.getComponentProvider(c);
+        IoCComponentProvider icp = null;
+        for (IoCComponentProviderFactory f : factories) {
+            icp = f.getComponentProvider(c);
+            if (icp != null)
+                break;
+        }
         return (icp == null) ? super.getComponentProvider(c) : wrap(c, icp);
     }
 

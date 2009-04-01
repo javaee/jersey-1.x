@@ -1,4 +1,12 @@
 release 1.0.3 (2009-03/04)
+- Support for EJB 3.1 no-interface view beans as resource or provider class
+  instances deployed into the war.
+  This requires Glassfish V3 build 43, from the 30th of March, or greater.
+- Fixed issue 246
+  Imran M Yousuf contributed support for file attachments for the jersey-multipart
+  module.
+  See the class
+    com.sun.jersey.multipart.file.FileDataBodyPart
 - Fixed issue 225
   https://jersey.dev.java.net/issues/show_bug.cgi?id=225
   Niall Gallagher contributed support for the Simple HTTP server

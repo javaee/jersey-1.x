@@ -41,6 +41,8 @@ import com.sun.jersey.core.spi.component.ComponentProvider;
 import com.sun.jersey.core.spi.component.ComponentScope;
 import com.sun.jersey.core.spi.component.ProviderFactory;
 import com.sun.jersey.spi.inject.InjectableProviderContext;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * An extension of {@link ProviderFactory} that defers to an
@@ -49,7 +51,7 @@ import com.sun.jersey.spi.inject.InjectableProviderContext;
  * @author Paul.Sandoz@Sun.Com
  */
 public class IoCProviderFactory extends ProviderFactory {
-    private final IoCComponentProviderFactory icpf;
+    private final List<IoCComponentProviderFactory> factories;
 
     /**
      *
@@ -59,13 +61,29 @@ public class IoCProviderFactory extends ProviderFactory {
     public IoCProviderFactory(
             InjectableProviderContext ipc,
             IoCComponentProviderFactory icpf) {
+        this(ipc, Collections.singletonList(icpf));
+    }
+
+    /**
+     *
+     * @param ipc the injectable provider context.
+     * @param factories the list of IoC component provider factory.
+     */
+    public IoCProviderFactory(
+            InjectableProviderContext ipc,
+            List<IoCComponentProviderFactory> factories) {
         super(ipc);
-        this.icpf = icpf;
+        this.factories = factories;
     }
 
     @Override
     public ComponentProvider _getComponentProvider(Class c) {
-        IoCComponentProvider icp = icpf.getComponentProvider(c);
+        IoCComponentProvider icp = null;
+        for (IoCComponentProviderFactory f : factories) {
+            icp = f.getComponentProvider(c);
+            if (icp != null)
+                break;
+        }
         return (icp == null) ? super._getComponentProvider(c) : wrap(c, icp);
     }
 
