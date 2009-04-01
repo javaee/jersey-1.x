@@ -187,11 +187,7 @@ public class JSONUnmarshaller implements Unmarshaller, JSONConfigurated {
     }
 
     public <T> JAXBElement<T> unmarshal(XMLStreamReader xmlStreamReader, Class<T> type) throws JAXBException {
-        if (jsonEnabled) {
-            throw new UnsupportedOperationException("Not supported yet.");
-        } else {
-            return this.jaxbUnmarshaller.unmarshal(xmlStreamReader, type);
-        }
+        return this.jaxbUnmarshaller.unmarshal(xmlStreamReader, type);
     }
 
     public Object unmarshal(XMLEventReader xmlEventReader) throws JAXBException {

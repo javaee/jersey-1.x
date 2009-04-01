@@ -114,7 +114,7 @@ public class MyJaxbBean {
 	a JAXBContext <ulink url="https://jsr311.dev.java.net/nonav/releases/&jsr311-version;/javax/ws/rs/ext/ContextResolver.html">ContextResolver</ulink>
 	</para>
 	
-	<example>
+	<example id="json.jaxb.context.resolver.example">
 	<title>An example of a JAXBContext resolver implementation</title>
 	<programlisting linenumbering="numbered">@Provider
 public class JAXBContextResolver implements ContextResolver&lt;JAXBContext&gt; {
@@ -146,6 +146,144 @@ public class JAXBContextResolver implements ContextResolver&lt;JAXBContext&gt; {
 	</callout>
 	</calloutlist>
 	</example>
+    </section>
+    
+    <section>
+     <title>JSON Notations</title>
+     <para>
+      JSONConfiguration allows you to use four various JSON notations. Each of these notations serializes JSON in a different way.
+      Following is a list of supported notations:
+
+      <itemizedlist>
+    <listitem>
+      <para>MAPPED (default notation)</para>
+    </listitem>
+    <listitem>
+      <para>NATURAL</para>
+    </listitem>
+    <listitem>
+      <para>JETTISON_MAPPED</para>
+    </listitem>
+    <listitem>
+      <para>BADGERFISH</para>
+    </listitem>
+  </itemizedlist>
+      </para>
+      
+      <para>
+      Individual notations and their further configuration options are described bellow. Rather then explaining rules for mapping
+      XML constructs into JSON, the notations will be described using a simple example. Following are JAXB beans, which will be used.
+      
+      <example><title>JAXB beans for JSON supported notations description, simple address bean</title>
+      <programlisting linenumbering="numbered">@XmlRootElement
+public class Address {
+    public String street;
+    public String town;
+
+    public Address(){}
+
+    public Address(String street, String town) {
+        this.street = street;
+        this.town = town;
+    }
+}</programlisting>
+      </example>
+
+      <example><title>JAXB beans for JSON supported notations description, contact bean</title>
+      <programlisting linenumbering="numbered">@XmlRootElement
+public class Contact {
+
+    public int id;
+    public String name;
+    public List&lt;Address&gt; addresses;
+
+    public Contact() {};
+
+    public Contact(int id, String name, List&lt;Address&gt; addresses) {
+        this.name = name;
+        this.id = id;
+        this.addresses = (addresses != null) ? new LinkedList&lt;Address&gt;(addresses) : null;
+    }
+}</programlisting>
+      </example>
+      </para>
+      
+      <para>
+      Following text will be mainly working with a contact bean initialized with:
+      <example id="json.jaxb.bean.init.example"><title>JAXB beans for JSON supported notations description, initialization</title>
+      <programlisting>final Address[] addresses = {new Address("Long Street 1", "Short Village")};
+Contact contact = new Contact(2, "Bob", Arrays.asList(addresses));</programlisting>
+</example>
+I.e. contact bean with <code>id=2</code>, <code>name="Bob"</code> containing 
+a single address (<code>street="Long Street 1"</code>, <code>town="Short Village"</code>).
+      </para>
+      
+      <section>
+       <title>Mapped notation</title>
+       <para>
+       <code>JSONConfiguration</code> based on <literal>mapped</literal> notation could be build with 
+       <programlisting>JSONConfiguration.mapped().build()</programlisting>
+       for usage in a <code>JAXBContext</code> resolver, <xref linkend="json.jaxb.context.resolver.example"/>.
+       Then a contact bean initialized with <xref linkend="json.jaxb.bean.init.example"/>, will be serialized as
+       <example><title>JSON expression produced using <literal>mapped</literal> notation</title>
+       <programlisting linenumbering="numbered">{ "id":"2" 
+ ,"name":"Bob"
+ ,"addresses":{"street":"Long Street 1"
+                    ,"town":"Short Village"}}</programlisting>
+       </example>
+       The JSON representation seems fine, and will be working flawlessly with Java based Jersey client API.
+       </para>
+       <para>
+       However, at least one issue might appear once you start using it with a JavaScript based client.
+       The information, that <code>addresses</code> item represents an array is being lost for every single element array. 
+       If you added another address bean to the contact,<programlisting>contact.addresses.add(new Address("Short Street 1000", "Long Village"));</programlisting>,
+       you will get 
+       <programlisting linenumbering="numbered">{ "id":"2" 
+ ,"name":"Bob"
+ ,"addresses":[{"street":"Long Street 1","town":"Short Village"}
+              ,{"street":"Short Street 1000","town":"Long Village"}]}</programlisting>
+        which is all right. To fix this issue, you will need to instruct the JSON processor, what items need to be treated as arrays
+	and set an optional property on your <code>JSONConfiguration</code> object.
+	For our case, you can do it with
+       <example><title>Force arrays in <literal>mapped</literal> JSON notation</title>
+       <programlisting linenumbering="numbered">JSONConfiguration.mapped().arrays("addresses").build()</programlisting>
+       </example>
+       </para>
+      </section>
+      <section>
+       <title>Natural notation</title>
+       <para>
+       <example><title>JSON expression produced using <literal>natural</literal> notation</title>
+       <programlisting linenumbering="numbered">{ "id":2
+ ,"name":"Bob"
+ ,"addresses":[{"street":"Long Street 1"
+                     ,"town":"Short Village"}]}</programlisting>
+       </example>
+       </para>
+      </section>
+      <section>
+       <title>Jettison mapped notation</title>
+       <para>
+       <example><title>JSON expression produced using Jettison <literal>mapped</literal> notation</title>
+       <programlisting linenumbering="numbered">{ "contact:{"id":2
+              ,"name":"Bob"
+              ,"addresses":{"street":"Long Street 1"
+                                 ,"town":"Short Village"}}</programlisting>
+       </example>
+       </para>
+      </section>
+      <section>
+       <title>Badgerfish notation</title>
+       <para>
+       <example><title>JSON expression produced using <literal>badgerfish</literal> notation</title>
+       <programlisting linenumbering="numbered">{"contact":{"id":{"$":"2"}
+              ,"name":{"$":"Bob"}
+              ,"addresses":{"street":{"$":"Long Street 1"}
+                                 ,"town":{"$":"Short Village"}}}}</programlisting>
+       </example>
+       </para>
+      </section>
+      
     </section>
 
    <para>Download <ulink url="http://download.java.net/maven/2/com/sun/jersey/samples/json-from-jaxb/&version;/json-from-jaxb-&version;-project.zip">http://download.java.net/maven/2/com/sun/jersey/samples/json-from-jaxb/&version;/json-from-jaxb-&version;-project.zip</ulink>

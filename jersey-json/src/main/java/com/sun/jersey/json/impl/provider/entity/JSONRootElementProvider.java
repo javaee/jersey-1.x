@@ -42,6 +42,7 @@ import com.sun.jersey.api.json.JSONJAXBContext;
 import com.sun.jersey.json.impl.JSONHelper;
 import com.sun.jersey.json.impl.JSONMarshaller;
 import com.sun.jersey.json.impl.JSONUnmarshaller;
+import com.sun.jersey.json.impl.Stax2JsonFactory;
 import com.sun.jersey.json.impl.reader.JsonXmlStreamReader;
 import com.sun.jersey.json.impl.writer.JsonXmlStreamWriter;
 import java.io.IOException;
@@ -116,7 +117,8 @@ public class JSONRootElementProvider extends AbstractRootElementProvider {
                 // TODO what about the charset ?
                 JSONUnmarshaller ju = (JSONUnmarshaller)u;
                 ju.setJsonEnabled(true);
-                return ju.unmarshal(new StreamSource(entityStream), type).getValue();
+                return ju.unmarshal(
+                        Stax2JsonFactory.createReader(new InputStreamReader(entityStream), ju.getJSONConfiguration(), JSONHelper.getRootElementName(type)), type).getValue();
             } else {
                 return u.unmarshal(
                         new JsonXmlStreamReader(

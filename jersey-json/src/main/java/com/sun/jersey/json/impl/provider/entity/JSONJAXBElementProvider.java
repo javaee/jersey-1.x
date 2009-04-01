@@ -96,8 +96,9 @@ public class JSONJAXBElementProvider extends AbstractJAXBElementProvider {
             Unmarshaller u, InputStream entityStream)
             throws JAXBException, IOException {
         if (u instanceof JSONUnmarshaller) {
-            u.setProperty(JSONJAXBContext.JSON_ENABLED, Boolean.TRUE);
-            return u.unmarshal(new StreamSource(entityStream), type);
+            JSONUnmarshaller ju = (JSONUnmarshaller) u;
+            ju.setJsonEnabled(true);
+            return ju.unmarshal(new StreamSource(entityStream), type);
         } else {
             return (JAXBElement) u.unmarshal(
                     new JsonXmlStreamReader(
@@ -110,8 +111,9 @@ public class JSONJAXBElementProvider extends AbstractJAXBElementProvider {
             Marshaller m, OutputStream entityStream)
             throws JAXBException, IOException {
         if (m instanceof JSONMarshaller) {
-            m.setProperty(JSONJAXBContext.JSON_ENABLED, Boolean.TRUE);
-            m.marshal(t,
+            JSONMarshaller jm = (JSONMarshaller) m;
+            jm.setJsonEnabled(true);
+            jm.marshal(t,
                     new OutputStreamWriter(entityStream, c));
         } else {
             m.marshal(t, JsonXmlStreamWriter.createWriter(
