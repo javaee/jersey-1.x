@@ -392,6 +392,14 @@
          </plugins>
     </build>
 
+    <repositories>
+        <repository>
+            <id>glassfish-repository</id>
+            <name>Java.net Repository for Glassfish</name>
+            <url>http://download.java.net/maven/glassfish</url>
+        </repository>
+    </repositories>
+    
     <properties>
         <gen-src-dir>${basedir}/src/main/java</gen-src-dir>
     </properties>
