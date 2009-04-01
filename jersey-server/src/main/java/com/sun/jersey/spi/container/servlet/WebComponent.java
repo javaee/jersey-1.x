@@ -46,8 +46,10 @@ import com.sun.jersey.api.representation.Form;
 import com.sun.jersey.core.header.InBoundHeaders;
 import com.sun.jersey.core.header.MediaTypes;
 import com.sun.jersey.core.reflection.ReflectionHelper;
+import com.sun.jersey.core.spi.component.ioc.IoCComponentProviderFactory;
 import com.sun.jersey.server.impl.container.servlet.JSPTemplateProcessor;
 import com.sun.jersey.server.impl.container.servlet.ThreadLocalInvoker;
+import com.sun.jersey.server.impl.ejb.EJBComponentProviderFactoryInitilizer;
 import com.sun.jersey.server.impl.model.method.dispatch.FormDispatchProvider;
 import com.sun.jersey.spi.container.ContainerListener;
 import com.sun.jersey.spi.container.ContainerNotifier;
@@ -413,6 +415,11 @@ public class WebComponent implements ContainerListener {
                 resourceConfig,
                 requestInvoker.getThreadLocal(),
                 responseInvoker.getThreadLocal()));
+
+        final IoCComponentProviderFactory ejb =
+                EJBComponentProviderFactoryInitilizer.getComponentProviderFactory();
+        if (ejb != null)
+            rc.getSingletons().add(ejb);
     }
 
     /**

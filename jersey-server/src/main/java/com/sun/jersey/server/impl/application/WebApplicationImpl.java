@@ -126,7 +126,6 @@ import com.sun.jersey.core.spi.component.ComponentScope;
 import com.sun.jersey.core.spi.component.ioc.IoCComponentProcessor;
 import com.sun.jersey.core.spi.component.ioc.IoCComponentProcessorFactory;
 import com.sun.jersey.core.spi.component.ioc.IoCComponentProcessorFactoryInitializer;
-import com.sun.jersey.server.impl.ejb.EJBComponentProviderFactoryInitilizer;
 import com.sun.jersey.server.impl.model.parameter.multivalued.MultivaluedParameterExtractorFactory;
 import com.sun.jersey.server.impl.model.parameter.multivalued.MultivaluedParameterExtractorProvider;
 import com.sun.jersey.server.impl.model.parameter.multivalued.StringReaderFactory;
@@ -402,11 +401,14 @@ public final class WebApplicationImpl implements WebApplication {
 
         this.provider = _provider;
 
-        this. providerFactories = new ArrayList<IoCComponentProviderFactory>(2);
+        this.providerFactories = new ArrayList<IoCComponentProviderFactory>(2);
 
-        final IoCComponentProviderFactory ejb = EJBComponentProviderFactoryInitilizer.getComponentProviderFactory();
-        if (ejb != null)
-            providerFactories.add(ejb);
+        for (Object o : resourceConfig.getProviderSingletons()) {
+            if (o instanceof IoCComponentProviderFactory) {
+                providerFactories.add((IoCComponentProviderFactory)o);
+            }
+        }
+
         if (_provider != null)
             providerFactories.add(_provider);
 

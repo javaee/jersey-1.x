@@ -40,6 +40,7 @@ package com.sun.jersey.api.core;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -56,9 +57,9 @@ import javax.ws.rs.core.MediaType;
  */
 public class DefaultResourceConfig extends ResourceConfig {
     
-    private final Set<Class<?>> classes = new HashSet<Class<?>>();
+    private final Set<Class<?>> classes = new LinkedHashSet<Class<?>>();
     
-    private final Set<Object> singletons = new HashSet<Object>();
+    private final Set<Object> singletons = new LinkedHashSet<Object>();
     
     private final Map<String, MediaType> mediaExtentions = new HashMap<String, MediaType>();
     

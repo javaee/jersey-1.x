@@ -64,13 +64,16 @@ public final class EJBComponentProviderFactory implements
     private static final Logger LOGGER = Logger.getLogger(
             EJBComponentProviderFactory.class.getName());
 
-    private final Object interceptorBinder;
-
-    private final Method interceptorBinderMethod;
+    private final EJBInjectionInterceptor interceptor;
 
     public EJBComponentProviderFactory(Object interceptorBinder, Method interceptorBinderMethod) {
-        this.interceptorBinder = interceptorBinder;
-        this.interceptorBinderMethod = interceptorBinderMethod;
+        this.interceptor = new EJBInjectionInterceptor();
+
+        try {
+            interceptorBinderMethod.invoke(interceptorBinder, interceptor);
+        } catch (Exception ex) {
+            throw new ContainerException(ex);
+        }
     }
 
     // IoCComponentProviderFactory
@@ -114,25 +117,23 @@ public final class EJBComponentProviderFactory implements
     // IoCComponentProcessorFactoryInitializer
     
     public void init(IoCComponentProcessorFactory cpf) {
-        try {
-            interceptorBinderMethod.invoke(interceptorBinder, 
-                    new EJBInjectionInterceptor(cpf));
-        } catch (Exception ex) {
-            throw new ContainerException(ex);
-        }
+        interceptor.setFactory(cpf);
     }
 
     private static class EJBInjectionInterceptor {
+        private IoCComponentProcessorFactory cpf;
 
-        private final IoCComponentProcessorFactory cpf;
-
-        public EJBInjectionInterceptor(IoCComponentProcessorFactory cpf) {
+        public void setFactory(IoCComponentProcessorFactory cpf) {
             this.cpf = cpf;
         }
 
         @PostConstruct
         private void init(InvocationContext context) throws Exception {
-
+            if (cpf == null) {
+                // Not initialized
+                return;
+            }
+            
             Object beanInstance = context.getTarget();
 
             cpf.get(beanInstance.getClass(), ComponentScope.Singleton).
