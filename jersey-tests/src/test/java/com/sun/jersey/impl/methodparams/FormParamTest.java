@@ -40,7 +40,6 @@ import com.sun.jersey.api.client.WebResource;
 import com.sun.jersey.api.representation.Form;
 import com.sun.jersey.core.header.FormDataContentDisposition;
 import com.sun.jersey.impl.AbstractResourceTester;
-import com.sun.jersey.impl.entity.JAXBBean;
 import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
@@ -56,6 +55,7 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.UriInfo;
+import javax.xml.bind.annotation.XmlRootElement;
 
 /**
  *
@@ -67,6 +67,24 @@ public class FormParamTest extends AbstractResourceTester {
         super(testName);
     }
     
+    @XmlRootElement
+    public static class JAXBBean {
+
+        public String value;
+        
+        public JAXBBean() {}
+
+        public boolean equals(Object o) {
+            if (!(o instanceof JAXBBean))
+                return false;
+            return ((JAXBBean) o).value.equals(value);
+        }
+
+        public String toString() {
+            return "JAXBClass: "+value;
+        }
+    }
+
     @Path("/")
     public class FormResourceX {
         @POST
