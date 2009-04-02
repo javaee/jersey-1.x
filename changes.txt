@@ -1,4 +1,13 @@
 release 1.0.3 (2009-03/04)
+- Fixed issue 251
+  https://jersey.dev.java.net/issues/show_bug.cgi?id=251
+  The set of methods on the Allow header is accessible using
+  ClientResponse.getAllow.
+- Fixed issue 230
+  https://jersey.dev.java.net/issues/show_bug.cgi?id=230
+  No-interface view session beans deployed in the war may also be resource
+  and provided classes. Injection of Jersey/JAX-RS artifacts on to fields and
+  setters will work correctly.
 - Fixed issue 239
   https://jersey.dev.java.net/issues/show_bug.cgi?id=239
   @Path("/") annotated resource methods are equivalent to if the @Path is not

@@ -50,8 +50,11 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.StringTokenizer;
 import javax.ws.rs.core.EntityTag;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
@@ -152,8 +155,19 @@ public class ClientResponse {
      * Get the HTTP headers of the response.
      * 
      * @return the HTTP headers of the response.
+     * @deprecated
      */
+    @Deprecated
     public MultivaluedMap<String, String> getMetadata() {
+        return getHeaders();
+    }
+
+    /**
+     * Get the HTTP headers of the response.
+     *
+     * @return the HTTP headers of the response.
+     */
+    public MultivaluedMap<String, String> getHeaders() {
         return headers;
     }
 
@@ -309,7 +323,7 @@ public class ClientResponse {
     /**
      * Get the location.
      * 
-     * @return the location.
+     * @return the location, otherwise <code>null</code> if not present.
      */
     public URI getLocation() {
         String l = getMetadata().getFirst("Location");        
@@ -319,7 +333,7 @@ public class ClientResponse {
     /**
      * Get the entity tag.
      * 
-     * @return the entity tag.
+     * @return the entity tag, otherwise <code>null</code> if not present.
      */
     public EntityTag getEntityTag() {
         String t = getMetadata().getFirst("ETag");
@@ -330,7 +344,7 @@ public class ClientResponse {
     /**
      * Get the last modified date.
      * 
-     * @return the last modified date.
+     * @return the last modified date, otherwise <code>null</code> if not present.
      */
     public Date getLastModified() {
         String d = getMetadata().getFirst("Last-Modified");
@@ -341,7 +355,7 @@ public class ClientResponse {
     /**
      * Get response date (server side).
      *
-     * @return the server side response date.
+     * @return the server side response date, otherwise <code>null</code> if not present.
      */
     public Date getResponseDate() {
         String d = getMetadata().getFirst("Date");
@@ -352,7 +366,7 @@ public class ClientResponse {
     /**
      * Get the language.
      * 
-     * @return the language.
+     * @return the language, otherwise <code>null</code> if not present.
      */
     public String getLanguage() {
         return getMetadata().getFirst("Content-Language");
@@ -368,7 +382,9 @@ public class ClientResponse {
         int size = -1;
 
         String sizeStr = getMetadata().getFirst("Content-Length");
-
+        if (sizeStr == null)
+            return -1;
+        
         try {
             size = Integer.parseInt(sizeStr);
         } catch (NumberFormatException nfe) {
@@ -392,6 +408,30 @@ public class ClientResponse {
             cs.add(NewCookie.valueOf(h));
         }
         return cs;
+    }
+
+    /**
+     * Get the allowed HTTP methods from the Allow HTTP header.
+     * <p>
+     * Note that the Allow HTTP header will be returned from an OPTIONS
+     * request.
+     * 
+     * @return the allowed HTTP methods, all methods will returned as
+     *         upper case strings.
+     */
+    public Set<String> getAllow() {
+        String allow = headers.getFirst("Allow");
+        if (allow == null)
+            return Collections.emptySet();
+
+        Set<String> allowedMethods = new HashSet<String>();
+        StringTokenizer tokenizer = new StringTokenizer(allow, ",");
+        while (tokenizer.hasMoreTokens()) {
+            String m = tokenizer.nextToken().trim();
+            if (m.length() > 0)
+                allowedMethods.add(m.toUpperCase());
+        }
+        return allowedMethods;
     }
 
     @Override
