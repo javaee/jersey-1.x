@@ -218,6 +218,10 @@ I.e. contact bean with <code>id=2</code>, <code>name="Bob"</code> containing
 a single address (<code>street="Long Street 1"</code>, <code>town="Short Village"</code>).
       </para>
       
+      <para>All bellow described configuration options are documented 
+      also in apidocs at <ulink url="https://jersey.dev.java.net/nonav/apidocs/&version;/jersey/com/sun/jersey/api/json/JSONConfiguration.html"/>
+      </para>
+      
       <section>
        <title>Mapped notation</title>
        <para>
@@ -235,30 +239,82 @@ a single address (<code>street="Long Street 1"</code>, <code>town="Short Village
        </para>
        <para>
        However, at least one issue might appear once you start using it with a JavaScript based client.
-       The information, that <code>addresses</code> item represents an array is being lost for every single element array. 
+       The information, that <code>addresses</code> item represents an array, is being lost for every single element array. 
        If you added another address bean to the contact,<programlisting>contact.addresses.add(new Address("Short Street 1000", "Long Village"));</programlisting>,
-       you will get 
+       you would get 
        <programlisting linenumbering="numbered">{ "id":"2" 
  ,"name":"Bob"
  ,"addresses":[{"street":"Long Street 1","town":"Short Village"}
               ,{"street":"Short Street 1000","town":"Long Village"}]}</programlisting>
-        which is all right. To fix this issue, you will need to instruct the JSON processor, what items need to be treated as arrays
-	and set an optional property on your <code>JSONConfiguration</code> object.
-	For our case, you can do it with
+        Both representations are correct, but you will not be able to consume them using a single JavaScript client,
+	because to access <code>"Short Village"</code> value, you will write <code>addresses.town</code> in one
+	case and <code>addresses[0].town</code> in the other.
+	To fix this issue, you need to instruct the JSON processor, what items need to be treated as arrays
+	by setting an optional property, <literal>arrays</literal>, on your <code>JSONConfiguration</code> object.
+	For our case, you would do it with
        <example><title>Force arrays in <literal>mapped</literal> JSON notation</title>
-       <programlisting linenumbering="numbered">JSONConfiguration.mapped().arrays("addresses").build()</programlisting>
+       <programlisting>JSONConfiguration.mapped().arrays("addresses").build()</programlisting>
+       </example>
+       You can use multiple string values in the <literal>arrays</literal> method call, in case you are dealing with more
+       than one array item in your beans. Similar mechanism (one or more argument values) applies also for all below desribed options.
+       </para>
+       
+       <para>Another issue might be, that number value, <literal>2</literal>, for <code>id</code> item 
+       gets written as a string, <literal>"2"</literal>. To avoid this, you can use another optional property on <code>JSONConfiguration</code>
+       called <literal>nonStrings</literal>.
+       <example><title>Force non-string values in <literal>mapped</literal> JSON notation</title>
+       <programlisting>JSONConfiguration.mapped().arrays("addresses").nonStrings("id").build()</programlisting>
+       </example>
+	</para>       
+       
+       <para>
+       It might happen you use XML attributes in your JAXB beans. In <literal>mapped</literal> JSON notation, these attribute names are prefixed with <literal>@</literal>
+       character. If <code>id</code> was an attribute, it´s definition would look like:
+       <programlisting>  ...
+  @XmlAttribute
+  public int id;
+  ...</programlisting>
+       and then you would get <programlisting>{"@id":"2" ...</programlisting> at the JSON output.
+       In case, you want to get rid of the <literal>@</literal> prefix, you can take advantage of another configuration 
+       option of <literal>JSONConfiguration</literal>, called <literal>attributeAsElement</literal>.
+       Usage is similar to previous options.
+       <example><title>XML attributes as XML elements in <literal>mapped</literal> JSON notation</title>
+       <programlisting>JSONConfiguration.mapped().attributeAsElement("id").build()</programlisting>
        </example>
        </para>
+	<para>
+	<literal>Mapped</literal> JSON notation was designed to produce the simplest possible JSON expression out of JAXB beans. While in XML,
+	you must always have a root tag to start a XML document with, there is no such a constraint in JSON. If you wanted to be strict,
+	you might have wanted to keep a XML root tag equivalent generated in your JSON. If that is the case, another configuration option
+	is available for you, which is called <literal>rootUnwrapping</literal>. You can use it as follows:
+       <example><title>Keep XML root tag equivalent in JSON <literal>mapped</literal> JSON notation</title>
+       <programlisting>JSONConfiguration.mapped().rootUnwrapping(false).build()</programlisting>
+       </example>
+       and get the following JSON for our <literal>Contact</literal> bean:
+       <example><title>XML root tag equivalent kept in JSON using <literal>mapped</literal> notation</title>
+       <programlisting linenumbering="numbered">{"contact":{ "id":"2" 
+ ,"name":"Bob"
+ ,"addresses":{"street":"Long Street 1"
+                    ,"town":"Short Village"}}}</programlisting>
+       </example>
+	<literal>rootUnwrapping</literal> option is set to <literal>true</literal> by default.
+	</para>
       </section>
       <section>
        <title>Natural notation</title>
        <para>
+       After using <literal>mapped</literal> JSON notation for a while, it was apparent, that a need to configure all the various things
+       manually could be problematic. To avoid the manual work, a new <literal>natural</literal> JSON notation was introduced in Jersey version 1.0.2.
+       With <literal>natural</literal> notation, without any additional configuration, you will get the following JSON for the bean 
+       initialized at <xref linkend="json.jaxb.bean.init.example"/>:
        <example><title>JSON expression produced using <literal>natural</literal> notation</title>
        <programlisting linenumbering="numbered">{ "id":2
  ,"name":"Bob"
  ,"addresses":[{"street":"Long Street 1"
                      ,"town":"Short Village"}]}</programlisting>
        </example>
+       You might notice, that single element array <literal>addresses</literal> remains array, and also the non-string <literal>id</literal>
+       value is not limited with double quotes, as <literal>natural</literal> notation automatically detects these things.
        </para>
       </section>
       <section>

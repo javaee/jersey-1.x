@@ -42,7 +42,9 @@
     be found in the maven repository <ulink
     url="http://download.java.net/maven/2/com/sun/jersey/samples/helloworld/1.0.3-SNAPSHOT/helloworld-1.0.3-SNAPSHOT-project.zip">here</ulink>.</para>
 
-    <para><programlisting>package com.sun.ws.rest.samples.helloworld.resources;
+    <para><example>
+<title>Simple hello world root resource class</title>
+<programlisting  linenumbering="numbered">package com.sun.ws.rest.samples.helloworld.resources;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Produces;
@@ -61,7 +63,7 @@ public class HelloWorldResource {
         // Return some cliched textual content
         return "Hello World";
     }
-}</programlisting>Let's look at some of the JAX-RS annotations used in this
+}</programlisting></example>Let's look at some of the JAX-RS annotations used in this
     example.</para>
 
     <section>
@@ -97,7 +99,9 @@ public class HelloWorldResource {
       url="https://jsr311.dev.java.net/nonav/releases/1.0/javax/ws/rs/PathParam.html">@PathParam</ulink>
       may be used on method parameter of a request method, for example:</para>
 
-      <para><programlisting>@Path("/users/{username}")
+      <para><example>
+<title>Specifying URI path parameter</title>
+<programlisting  linenumbering="numbered">@Path("/users/{username}")
 public class UserResource {
 
     @GET
@@ -105,7 +109,7 @@ public class UserResource {
     public String getUser(@PathParam("username") String userName) {
         ...
     }
-}</programlisting>If it is required that a user name must only consist of
+}</programlisting></example>If it is required that a user name must only consist of
       lower and upper case numeric characters then it is possible to declare a
       particular regular expression, which overrides the default regular
       expression, "[^/]+?", for example:</para>
@@ -153,7 +157,9 @@ public class UserResource {
       sample that shows the use of the PUT method to create or update a
       storage container:</para>
 
-      <para><programlisting>@PUT
+      <para><example>
+<title>PUT method</title>
+<programlisting  linenumbering="numbered">@PUT
 public Response putContainer() {
     System.out.println("PUT CONTAINER " + container);
 
@@ -169,7 +175,7 @@ public Response putContainer() {
 
     MemoryStore.MS.createContainer(c);
     return r;
-}</programlisting>By default the JAX-RS runtime will automatically support the
+}</programlisting></example>By default the JAX-RS runtime will automatically support the
       methods HEAD and OPTIONS, if not explicitly implemented. For HEAD the
       runtime will invoke the implemented GET method (if present) and ignore
       the response entity (if set). For OPTIONS the the Allow response header
@@ -194,7 +200,9 @@ public Response putContainer() {
       can be applied at both the class and method levels. Here's an
       example:</para>
 
-      <para><programlisting>@Path("/myResource")
+      <para><example>
+<title>Specifying output MIME type</title>
+<programlisting  linenumbering="numbered">@Path("/myResource")
 @Produces("text/plain")
 public class SomeResource {
     @GET
@@ -207,7 +215,7 @@ public class SomeResource {
     public String doGetAsHtml() {
         ...
     }
-}</programlisting>The <literal>doGetAsPlainText</literal> method defaults to
+}</programlisting></example>The <literal>doGetAsPlainText</literal> method defaults to
       the MIME type of the <ulink
       url="https://jsr311.dev.java.net/nonav/releases/1.0/javax/ws/rs/Produces.html">@Produces</ulink>
       annotation at the class level. The <literal>doGetAsHtml</literal>
@@ -238,11 +246,13 @@ public class SomeResource {
       url="https://jsr311.dev.java.net/nonav/releases/1.0/javax/ws/rs/Produces.html">@Produces</ulink>
       declaration, for example:</para>
 
-      <para><programlisting>@GET
+      <para><example>
+<title>Using multiple output MIME types</title>
+<programlisting  linenumbering="numbered">@GET
 @Produces({"application/xml", "application/json"})
 public String doGetAsXmlOrJson() {
     ...
-}</programlisting>The <literal>doGetAsXmlOrJson</literal> method will get
+}</programlisting></example>The <literal>doGetAsXmlOrJson</literal> method will get
       invoked if either of the media types "application/xml" and
       "application/json" are acceptable. If both are equally acceptable then
       the former will be chosen because it occurs first. </para>
@@ -262,11 +272,13 @@ public String doGetAsXmlOrJson() {
       resource can consume that were sent by the client. The above example can
       be modified to set the cliched message as follows:</para>
 
-      <para><programlisting>@POST
+      <para><example>
+<title>Specifying input MIME type</title>
+<programlisting  linenumbering="numbered">@POST
 @Consumes("text/plain")
 public void postClichedMessage(String message) {
     // Store the message
-}</programlisting></para>
+}</programlisting></example></para>
 
       <para>In this example, the Java method will consume representations
       identified by the MIME media type "text/plain". Notice that the resource
@@ -291,24 +303,28 @@ public void postClichedMessage(String message) {
     A Web service may extend this class to declare root resource classes. For
     example,</para>
 
-    <para><programlisting>public class MyApplicaton extends Application {
+    <para><example>
+<title>Deployment agnostic application model</title>
+<programlisting  linenumbering="numbered">public class MyApplicaton extends Application {
     public Set&lt;Class&lt;?&gt;&gt; getClasses() {
         Set&lt;Class&lt;?&gt;&gt; s = new HashSet&lt;Class&lt;?&gt;&gt;();
         s.add(HelloWorldResource.class);
         return s;
     }
-}</programlisting>Alternatively it is possible to reuse one of Jersey's
+}</programlisting></example>Alternatively it is possible to reuse one of Jersey's
     implementations that scans for root resource classes given a classpath or
     a set of package names. Such classes are automatically added to the set of
     classes that are returned by <literal>getClasses</literal>. For example,
     the following scans for root resource classes in packages "org.foo.rest",
     "org.bar.rest" and in any sub-packages of those two:</para>
 
-    <para><programlisting>public class MyApplication extends PackagesResourceConfig {
+    <para><example>
+<title>Reusing Jersey implementation in your custom application model</title>
+<programlisting  linenumbering="numbered">public class MyApplication extends PackagesResourceConfig {
     public MyApplication() {
         super("org.foo.rest;org.bar.rest");
     }
-}</programlisting></para>
+}</programlisting></example></para>
 
     <para>For servlet deployments JAX-RS specifies that a class that
     implements <ulink
@@ -321,7 +337,9 @@ public void postClichedMessage(String message) {
     url="https://jsr311.dev.java.net/nonav/releases/1.0/javax/ws/rs/core/Application.html">Application</ulink>
     class as follows:</para>
 
-    <para><programlisting>&lt;web-app&gt;
+    <para><example>
+<title>Deployment of your application using Jersey specific servlet</title>
+<programlisting  linenumbering="numbered">&lt;web-app&gt;
     &lt;servlet&gt;
         &lt;servlet-name&gt;Jersey Web Application&lt;/servlet-name&gt;
         &lt;servlet-class&gt;com.sun.jersey.spi.container.servlet.ServletContainer&lt;/servlet-class&gt;
@@ -330,11 +348,13 @@ public void postClichedMessage(String message) {
             &lt;param-value&gt;MyApplication&lt;/param-value&gt;
         &lt;/init-param&gt;
     &lt;/servlet&gt;
-    ....</programlisting>Alternatively a simpler approach is to let Jersey
+    ....</programlisting></example>Alternatively a simpler approach is to let Jersey
     choose the PackagesResourceConfig implementation automatically by
     declaring the packages as follows:</para>
 
-    <para><programlisting>&lt;web-app&gt;
+    <para><example>
+<title>Using Jersey specific servlet without an application model instance</title>
+<programlisting  linenumbering="numbered">&lt;web-app&gt;
     &lt;servlet&gt;
         &lt;servlet-name&gt;Jersey Web Application&lt;/servlet-name&gt;
         &lt;servlet-class&gt;com.sun.jersey.spi.container.servlet.ServletContainer&lt;/servlet-class&gt;
@@ -343,7 +363,7 @@ public void postClichedMessage(String message) {
             &lt;param-value&gt;org.foo.rest;org.bar.rest&lt;/param-value&gt;
         &lt;/init-param&gt;
     &lt;/servlet&gt;
-    ....</programlisting>JAX-RS also provides the ability to obtain a
+    ....</programlisting></example>JAX-RS also provides the ability to obtain a
     container specific artifact from an <ulink
     url="https://jsr311.dev.java.net/nonav/releases/1.0/javax/ws/rs/core/Application.html">Application</ulink>
     instance. For example, Jersey supports using <ulink
@@ -375,7 +395,9 @@ public void postClichedMessage(String message) {
     request URL. The following example is an extract from the sparklines
     sample: </para>
 
-    <programlisting>@Path("smooth")
+    <example>
+<title>Query parameters</title>
+<programlisting  linenumbering="numbered">@Path("smooth")
 @GET
 public Response smooth(
         @DefaultValue("2") @QueryParam("step") int step,
@@ -385,7 +407,7 @@ public Response smooth(
         @DefaultValue("blue") @QueryParam("min-color") ColorParam minColor,
         @DefaultValue("green") @QueryParam("max-color") ColorParam maxColor,
         @DefaultValue("red") @QueryParam("last-color") ColorParam lastColor
-        ) { ... }</programlisting>
+        ) { ... }</programlisting></example>
 
     <para>If a query parameter "step" exists in the query component of the
     request URI then the "step" value will be will extracted and parsed as a
@@ -398,7 +420,9 @@ public Response smooth(
     <literal>ColorParam</literal> may be used, which as implemented as
     follows: </para>
 
-    <programlisting>public class ColorParam extends Color {
+    <example>
+<title>Custom Java type for consuming request parameters</title>
+<programlisting  linenumbering="numbered">public class ColorParam extends Color {
     public ColorParam(String s) {
         super(getRGB(s));
     }
@@ -420,7 +444,7 @@ public Response smooth(
             }
         }
     }
-}</programlisting>
+}</programlisting></example>
 
     <para>In general the Java type of the method parameter may:</para>
 
@@ -492,40 +516,47 @@ public Response smooth(
     following extracts the form parameter named "name" from the POSTed form
     data: </para>
 
-    <para><programlisting>@POST
+    <para><example>
+<title>Processing POSTed HTML form</title>
+<programlisting  linenumbering="numbered">@POST
 @Consumes("application/x-www-form-urlencoded")
 public void post(@FormParam("name") String name) {
     // Store the message
-}</programlisting></para>
+}</programlisting></example></para>
 
     <para>If it is necessary to obtain a general map of parameter name to
     values then, for query and path parameters it is possible to do the
     following: </para>
 
-    <para><programlisting>@GET
+    <para><example>
+<title>Obtaining general map of URI path and/or query parameters</title>
+<programlisting  linenumbering="numbered">@GET
 public String get(@Context UriInfo ui) {
     MultivaluedMap&lt;String, String&gt; queryParams = ui.getQueryParameters();
     MultivaluedMap&lt;String, String&gt; pathParams = ui.getPathParameters();
-}</programlisting></para>
+}</programlisting></example></para>
 
     <para>For header and cookie parameters the following:</para>
 
-    <para><programlisting>@GET
+    <para><example>
+<title>Obtaining general map of header parameters</title>
+<programlisting  linenumbering="numbered">@GET
 public String get(@Context HttpHeaders hh) {
     MultivaluedMap&lt;String, String&gt; headerParams = ui.getRequestHeaders();
     Map&lt;String, Cookie&gt; pathParams = ui.getCookies();
-}</programlisting></para>
+}</programlisting></example></para>
 
     <para>In general <ulink
     url="https://jsr311.dev.java.net/nonav/releases/1.0/javax/ws/rs/core/Context.html">@Context</ulink>
     can be used to obtain contextual Java types related to the request or
     response. For form parameters it is possible to do the following:</para>
 
-    <para><programlisting>@POST
+    <para><example>
+<title>Obtaining general map of form parameters</title><programlisting  linenumbering="numbered">@POST
 @Consumes("application/x-www-form-urlencoded")
 public void post(MultivaluedMap&lt;String, String&gt; formParams) {
     // Store the message
-}</programlisting></para>
+}</programlisting></example></para>
   </section>
 
   <section>
@@ -561,7 +592,8 @@ public void post(MultivaluedMap&lt;String, String&gt; formParams) {
     the resource method. For example JAX-RS makes it simple to produce images
     that are instance of <literal>File</literal> as follows:</para>
 
-    <para><programlisting>@GET
+    <para><example>
+<title>Using <code>File</code> with a specific MIME type to produce a response</title><programlisting  linenumbering="numbered">@GET
 @Path("/images/{image}")
 @Produces("image/*")
 public Response getImage(@PathParam("image") String image) {
@@ -573,7 +605,7 @@ public Response getImage(@PathParam("image") String image) {
 
     String mt = new MimetypesFileTypeMap().getContentType(f);
     return Response.ok(f, mt).build();
-}</programlisting></para>
+}</programlisting></example></para>
 
     <para>A <literal>File</literal> type can also be used when consuming, a
     temporary file will be created where the request entity is stored.</para>
@@ -584,11 +616,12 @@ public Response getImage(@PathParam("image") String image) {
     if the most acceptable media type is not a wild card (one that contains a
     *, for example "application/" or "/*"). Given the following method:</para>
 
-    <para><programlisting>@GET
+    <para><example>
+<title>The most acceptable MIME type is used when multiple output MIME types allowed</title><programlisting linenumbering="numbered">@GET
 @Produces({"application/xml", "application/json"})
 public String doGetAsXmlOrJson() {
     ...
-}</programlisting></para>
+}</programlisting></example></para>
 
     <para>if "application/xml" is the most acceptable then the
     <literal>Content-Type</literal> of the response will be set to
@@ -598,7 +631,7 @@ public String doGetAsXmlOrJson() {
   <section>
     <title>Building Responses</title>
 
-    <para>Sometimes it is necessary to return information additional
+    <para>Sometimes it is necessary to return additional
     information in response to a HTTP request. Such information may be built
     and returned using <ulink
     url="https://jsr311.dev.java.net/nonav/releases/1.0/javax/ws/rs/core/Response.html">Response</ulink>
@@ -609,24 +642,26 @@ public String doGetAsXmlOrJson() {
     a <literal>Location</literal> header whose value is the URI to the newly
     created resource. This may be acheived as follows:</para>
 
-    <para><programlisting>@POST
+    <para><example>
+<title>Returning 201 status code and adding <literal>Location</literal> header in response to POST request</title><programlisting linenumbering="numbered">@POST
 @Consumes("application/xml")
 public Response post(String content) {
     URI createdUri = ...
     create(content);
     return Response.created(createdUri).build();
-}</programlisting></para>
+}</programlisting></example></para>
 
     <para>In the above no representation produced is returned, this can be
     achieved by building an entity as part of the response as follows:</para>
 
-    <para><programlisting>@POST
+    <para><example>
+<title>Adding an entity body to a custom response</title><programlisting  linenumbering="numbered">@POST
 @Consumes("application/xml")
 public Response post(String content) {
     URI createdUri = ...
     String createdContent = create(content);
     return Response.created(createdUri).entity(createdContent).build();
-}</programlisting></para>
+}</programlisting></example></para>
 
     <para>Response building provides other functionality such as setting the
     entity tag and last modified date of the representation.</para>
@@ -651,7 +686,8 @@ public Response post(String content) {
     method signatures for a root resource class from the jmaki-backend
     sample:</para>
 
-    <para><programlisting>@Singleton
+    <para><example>
+<title>Sub-resource methods</title><programlisting linenumbering="numbered">@Singleton
 @Path("/printers")
 public class PrintersResource {
 
@@ -681,7 +717,7 @@ public class PrintersResource {
 
     @DELETE @Path("/ids/{printerid}")
     public void deletePrinter(@PathParam("printerid") String printerId) { ... }
-}</programlisting></para>
+}</programlisting></example></para>
 
     <para>If the path of the request URL is "printers" then the resource
     methods not annotated with <ulink
@@ -705,7 +741,8 @@ public class PrintersResource {
     a root resource class and a resource class from the optimistic-concurrency
     sample:</para>
 
-    <para><programlisting>@Path("/item")
+    <para><example>
+<title>Sub-resource locators</title><programlisting linenumbering="numbered">@Path("/item")
 public class ItemResource {
     @Context UriInfo uriInfo;
 
@@ -730,7 +767,7 @@ public class ItemContentResource {
             @PathParam("version") int version,
             @Context HttpHeaders headers,
             byte[] in) { ... }
-}</programlisting></para>
+}</programlisting></example></para>
 
     <para>The root resource class <literal>ItemResource</literal> contains the
     sub-resource locator method <literal>getItemContentResource</literal> that
@@ -781,7 +818,8 @@ public class ItemContentResource {
     url="https://jsr311.dev.java.net/nonav/releases/1.0/javax/ws/rs/core/UriBuilder.html">UriBuilder</ulink>
     from the bookmark sample:</para>
 
-    <para><programlisting>@Path("/users/")
+    <para><example>
+<title>URI building</title><programlisting linenumbering="numbered">@Path("/users/")
 public class UsersResource {
 
     @Context UriInfo uriInfo;
@@ -801,7 +839,7 @@ public class UsersResource {
         }
         return uriArray;
     }
-}</programlisting></para>
+}</programlisting></example></para>
 
     <para><ulink
     url="https://jsr311.dev.java.net/nonav/releases/1.0/javax/ws/rs/core/UriInfo.html">UriInfo</ulink>
@@ -833,10 +871,11 @@ public class UsersResource {
     also be declared, for example the following will build the URI
     "http://localhost/segment?name=value":</para>
 
-    <para><programlisting>UriBuilder.fromUri("http://localhost/").
+    <para><example>
+<title>Building URIs using query parameters</title><programlisting linenumbering="numbered">UriBuilder.fromUri("http://localhost/").
     path("{a}").
     queryParam("name", "{value}").
-    build("segment", "value");</programlisting></para>
+    build("segment", "value");</programlisting></example></para>
   </section>
 
   <section>
@@ -850,21 +889,23 @@ public class UsersResource {
     <para>The following example shows the throwing of a
     <literal>NotFoundException</literal> from the bookmark sample:</para>
 
-    <para><programlisting>@Path("items/{itemid}/")
+    <para><example>
+<title>Throwing Jersey specific exceptions to control response</title><programlisting linenumbering="numbered">@Path("items/{itemid}/")
 public Item getItem(@PathParam("itemid") String itemid) {
     Item i = getItems().get(itemid);
     if (i == null)
         throw new NotFoundException("Item, " + itemid + ", is not found");
 
     return i;
-}</programlisting></para>
+}</programlisting></example></para>
 
     <para>This exception is a Jersey specific exception that extends <ulink
     url="https://jsr311.dev.java.net/nonav/releases/1.0/javax/ws/rs/WebApplicationException.html">WebApplicationException</ulink>
     and builds a HTTP response with the 404 status code and an optional
     message as the body of the response:</para>
 
-    <para><programlisting>public class NotFoundException extends WebApplicationException {
+    <para><example>
+<title>Jersey specific exception implementation</title><programlisting linenumbering="numbered">public class NotFoundException extends WebApplicationException {
 
     /**
      * Create a HTTP 404 (Not Found) exception.
@@ -882,7 +923,7 @@ public Item getItem(@PathParam("itemid") String itemid) {
                 entity(message).type("text/plain").build());
     }
 
-}</programlisting></para>
+}</programlisting></example></para>
 
     <para>In other cases it may not be appropriate to throw instances of
     <ulink
@@ -896,7 +937,8 @@ public Item getItem(@PathParam("itemid") String itemid) {
     url="http://java.sun.com/javaee/5/docs/api/javax/persistence/EntityNotFoundException.html">EntityNotFoundException</ulink>
     to a 404 (Not Found) response:</para>
 
-    <para><programlisting>@Provider
+    <para><example>
+<title>Mapping generic exceptions to responses</title><programlisting linenumbering="numbered">@Provider
 public class EntityNotFoundMapper implements
         ExceptionMapper&lt;javax.persistence.EntityNotFoundException&gt; {
     public Response toResponse(javax.persistence.EntityNotFoundException ex) {
@@ -905,7 +947,7 @@ public class EntityNotFoundMapper implements
             type("text/plain").
             build();
     }
-}</programlisting></para>
+}</programlisting></example></para>
 
     <para>The above class is annotated with <ulink
     url="https://jsr311.dev.java.net/nonav/releases/1.0/javax/ws/rs/ext/Provider.html">@Provider</ulink>,
@@ -934,7 +976,8 @@ public class EntityNotFoundMapper implements
     <para>The following example shows conditional GET support from the
     sparklines sample: </para>
 
-    <para><programlisting>public SparklinesResource(
+    <para><example>
+<title>Conditional GET support</title><programlisting linenumbering="numbered">public SparklinesResource(
         @QueryParam("d") IntegerList data,
         @DefaultValue("0,100") @QueryParam("limits") Interval limits,
         @Context Request request,
@@ -955,7 +998,7 @@ public class EntityNotFoundMapper implements
         if (rb != null)
             throw new WebApplicationException(rb.build());
     }
-}</programlisting></para>
+}</programlisting></example></para>
 
     <para>The constructor of the <literal>SparklinesResouce</literal> root
     resource class computes an entity tag from the request URI and then calls
@@ -1020,14 +1063,15 @@ public class EntityNotFoundMapper implements
     example, a sub-resource locator could return a different resource if a
     user is a preferred customer:</para>
 
-    <para><programlisting>@Path("basket")
+    <para><example>
+<title>Accessing <code>SecurityContext</code></title><programlisting linenumbering="numbered">@Path("basket")
 public ShoppingBasketResource get(@Context SecurityContext sc) {
     if (sc.isUserInRole("PreferredCustomer") {
        return new PreferredCustomerShoppingBaskestResource();
     } else {
        return new ShoppingBasketResource();
     }
-}</programlisting></para>
+}</programlisting></example></para>
   </section>
 
   <section>
@@ -1043,7 +1087,8 @@ public ShoppingBasketResource get(@Context SecurityContext sc) {
     setter methods. The following presents an example of all such injection
     cases: </para>
 
-    <para><programlisting>@Path("id: \d+")
+    <para><example>
+<title>Injection</title><programlisting linenumbering="numbered">@Path("id: \d+")
 public class InjectedResource {
     // Injection onto field
     @DefaultValue("q") @QueryParam("p")
@@ -1068,7 +1113,7 @@ public class InjectedResource {
     // Injection using bean setter method
     @HeaderParam("X-header")
     public void setHeader(String header) { ... }
-}</programlisting></para>
+}</programlisting></example></para>
 
     <para>There are some restrictions when injecting on to resource classes
     with a life-cycle other than per-request. In such cases it is not possible
