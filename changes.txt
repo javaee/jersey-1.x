@@ -1,4 +1,9 @@
 release 1.0.3 (2009-03/04)
+- Fixed issue 254
+  https://jersey.dev.java.net/issues/show_bug.cgi?id=254
+  Some implementations of javax.naming.InitialContext return null while
+  others throw a NamingException, if threre is no Object associated with
+  a name when looking up an object.
 - Fixed issue 251
   https://jersey.dev.java.net/issues/show_bug.cgi?id=251
   The set of methods on the Allow header is accessible using

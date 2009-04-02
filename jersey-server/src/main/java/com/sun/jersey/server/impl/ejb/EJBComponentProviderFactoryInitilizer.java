@@ -55,6 +55,14 @@ public final class EJBComponentProviderFactoryInitilizer {
         try {
             Object interceptorBinder = new InitialContext().
                     lookup("java:org.glassfish.ejb.container.interceptor_binding_spi");
+            // Some implementations of InitialContext return null instead of
+            // throwing NamingException if there is no Object associated with
+            // the name
+            if (interceptorBinder == null) {
+                LOGGER.config("The EJB interceptor binding API is not available. JAX-RS EJB support is disabled.");
+                return null;
+            }
+            
             Method interceptorBinderMethod = interceptorBinder.getClass().
                     getMethod("registerInterceptor", java.lang.Object.class);
 
