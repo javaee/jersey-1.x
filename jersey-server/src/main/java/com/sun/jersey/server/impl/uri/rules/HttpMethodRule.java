@@ -126,8 +126,17 @@ public final class HttpMethodRule implements UriRule {
             final ResourceMethod method = m.rmSelected;
 
             if (method instanceof ViewResourceMethod) {
-                // Allow any further matching rules to be processed
+                // Set the content type to the most acceptable
+                if (!m.mSelected.isWildcardType() && !m.mSelected.isWildcardSubtype()) {
+                    response.getHttpHeaders().putSingle("Content-Type", m.mSelected);
+                }
+
+                // Allow the view to be processed by the further matching view rule
                 return false;
+
+                // TODO what about resource specific request and response filters?
+                // Should the viewable rule be responsible for those declared on
+                // the class
             }
             
             // If a sub-resource method then need to push the resource
@@ -158,7 +167,7 @@ public final class HttpMethodRule implements UriRule {
             // and @Produces is declared on the resource method or the resource
             // class
             Object contentType = response.getHttpHeaders().getFirst("Content-Type");
-            if (contentType == null && m.rmSelected.isProducesDeclared()) {
+            if (contentType == null && method.isProducesDeclared()) {
                 if (!m.mSelected.isWildcardType() && !m.mSelected.isWildcardSubtype()) {
                     response.getHttpHeaders().putSingle("Content-Type", m.mSelected);
                 }

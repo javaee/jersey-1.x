@@ -1,4 +1,6 @@
 release 1.0.3 (2009-03/04)
+- Ensure that when @ImplicitProduces is utilized that the most acceptable
+  media type is set as the content type when an implicit view is returned.
 - Fixed issue 254
   https://jersey.dev.java.net/issues/show_bug.cgi?id=254
   Some implementations of javax.naming.InitialContext return null while

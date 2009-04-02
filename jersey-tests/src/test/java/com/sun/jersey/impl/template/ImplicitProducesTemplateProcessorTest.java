@@ -37,17 +37,19 @@
 
 package com.sun.jersey.impl.template;
 
+import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.WebResource;
 import com.sun.jersey.api.core.DefaultResourceConfig;
 import com.sun.jersey.api.core.ResourceConfig;
 import com.sun.jersey.api.view.ImplicitProduces;
+import com.sun.jersey.core.header.MediaTypes;
 import com.sun.jersey.impl.AbstractResourceTester;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.Properties;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
+import javax.ws.rs.core.MediaType;
 
 /**
  *
@@ -57,6 +59,50 @@ public class ImplicitProducesTemplateProcessorTest extends AbstractResourceTeste
     
     public ImplicitProducesTemplateProcessorTest(String testName) {
         super(testName);
+    }
+
+    @Path("/")
+    @ImplicitProduces("text/plain;qs=5")
+    public static class ImplicitTemplate {
+        public String toString() {
+            return "ImplicitTemplate";
+        }
+    }
+
+    public void testImplicitTemplate() throws IOException {
+        ResourceConfig rc = new DefaultResourceConfig(ImplicitTemplate.class,
+                TestTemplateProcessor.class);
+        rc.getFeatures().put(ResourceConfig.FEATURE_IMPLICIT_VIEWABLES, true);
+        initiateWebApplication(rc);
+        WebResource r = resource("/");
+
+        Properties p = new Properties();
+        ClientResponse cr = r.accept("text/plain", "application/foo").get(ClientResponse.class);
+        assertTrue(MediaTypes.typeEquals(MediaType.TEXT_PLAIN_TYPE, cr.getType()));
+        p.load(cr.getEntityInputStream());
+        assertEquals("/com/sun/jersey/impl/template/ImplicitProducesTemplateProcessorTest/ImplicitTemplate/index.testp", p.getProperty("path"));
+        assertEquals("ImplicitTemplate", p.getProperty("model"));
+
+        p = new Properties();
+        cr = r.accept("application/foo", "text/plain").get(ClientResponse.class);
+        assertTrue(MediaTypes.typeEquals(MediaType.TEXT_PLAIN_TYPE, cr.getType()));
+        p.load(cr.getEntityInputStream());
+        assertEquals("/com/sun/jersey/impl/template/ImplicitProducesTemplateProcessorTest/ImplicitTemplate/index.testp", p.getProperty("path"));
+        assertEquals("ImplicitTemplate", p.getProperty("model"));
+
+        p = new Properties();
+        cr = r.accept("text/plain;q=0.5", "application/foo").get(ClientResponse.class);
+        assertTrue(MediaTypes.typeEquals(MediaType.TEXT_PLAIN_TYPE, cr.getType()));
+        p.load(cr.getEntityInputStream());
+        assertEquals("/com/sun/jersey/impl/template/ImplicitProducesTemplateProcessorTest/ImplicitTemplate/index.testp", p.getProperty("path"));
+        assertEquals("ImplicitTemplate", p.getProperty("model"));
+
+        p = new Properties();
+        cr = r.accept("application/foo", "text/plain;q=0.5").get(ClientResponse.class);
+        assertTrue(MediaTypes.typeEquals(MediaType.TEXT_PLAIN_TYPE, cr.getType()));
+        p.load(cr.getEntityInputStream());
+        assertEquals("/com/sun/jersey/impl/template/ImplicitProducesTemplateProcessorTest/ImplicitTemplate/index.testp", p.getProperty("path"));
+        assertEquals("ImplicitTemplate", p.getProperty("model"));
     }
 
     @Path("/")
@@ -77,22 +123,30 @@ public class ImplicitProducesTemplateProcessorTest extends AbstractResourceTeste
         WebResource r = resource("/");
 
         Properties p = new Properties();
-        p.load(r.accept("text/plain", "application/foo").get(InputStream.class));
+        ClientResponse cr = r.accept("text/plain", "application/foo").get(ClientResponse.class);
+        assertTrue(MediaTypes.typeEquals(MediaType.TEXT_PLAIN_TYPE, cr.getType()));
+        p.load(cr.getEntityInputStream());
         assertEquals("/com/sun/jersey/impl/template/ImplicitProducesTemplateProcessorTest/ImplicitWithGetTemplate/index.testp", p.getProperty("path"));
         assertEquals("ImplicitWithGetTemplate", p.getProperty("model"));
 
         p = new Properties();
-        p.load(r.accept("application/foo", "text/plain").get(InputStream.class));
+        cr = r.accept("application/foo", "text/plain").get(ClientResponse.class);
+        assertTrue(MediaTypes.typeEquals(MediaType.TEXT_PLAIN_TYPE, cr.getType()));
+        p.load(cr.getEntityInputStream());
         assertEquals("/com/sun/jersey/impl/template/ImplicitProducesTemplateProcessorTest/ImplicitWithGetTemplate/index.testp", p.getProperty("path"));
         assertEquals("ImplicitWithGetTemplate", p.getProperty("model"));
 
         p = new Properties();
-        p.load(r.accept("text/plain;q=0.5", "application/foo").get(InputStream.class));
+        cr = r.accept("text/plain;q=0.5", "application/foo").get(ClientResponse.class);
+        assertTrue(MediaTypes.typeEquals(MediaType.TEXT_PLAIN_TYPE, cr.getType()));
+        p.load(cr.getEntityInputStream());
         assertEquals("/com/sun/jersey/impl/template/ImplicitProducesTemplateProcessorTest/ImplicitWithGetTemplate/index.testp", p.getProperty("path"));
         assertEquals("ImplicitWithGetTemplate", p.getProperty("model"));
 
         p = new Properties();
-        p.load(r.accept("application/foo", "text/plain;q=0.5").get(InputStream.class));
+        cr = r.accept("application/foo", "text/plain;q=0.5").get(ClientResponse.class);
+        assertTrue(MediaTypes.typeEquals(MediaType.TEXT_PLAIN_TYPE, cr.getType()));
+        p.load(cr.getEntityInputStream());
         assertEquals("/com/sun/jersey/impl/template/ImplicitProducesTemplateProcessorTest/ImplicitWithGetTemplate/index.testp", p.getProperty("path"));
         assertEquals("ImplicitWithGetTemplate", p.getProperty("model"));
 
@@ -118,22 +172,30 @@ public class ImplicitProducesTemplateProcessorTest extends AbstractResourceTeste
         WebResource r = resource("/sub");
 
         Properties p = new Properties();
-        p.load(r.accept("text/plain", "application/foo").get(InputStream.class));
+        ClientResponse cr = r.accept("text/plain", "application/foo").get(ClientResponse.class);
+        assertTrue(MediaTypes.typeEquals(MediaType.TEXT_PLAIN_TYPE, cr.getType()));
+        p.load(cr.getEntityInputStream());
         assertEquals("/com/sun/jersey/impl/template/ImplicitProducesTemplateProcessorTest/ImplicitWithSubResourceGetTemplate/sub.testp", p.getProperty("path"));
         assertEquals("ImplicitWithSubResourceGetTemplate", p.getProperty("model"));
 
         p = new Properties();
-        p.load(r.accept("application/foo", "text/plain").get(InputStream.class));
+        cr = r.accept("application/foo", "text/plain").get(ClientResponse.class);
+        assertTrue(MediaTypes.typeEquals(MediaType.TEXT_PLAIN_TYPE, cr.getType()));
+        p.load(cr.getEntityInputStream());
         assertEquals("/com/sun/jersey/impl/template/ImplicitProducesTemplateProcessorTest/ImplicitWithSubResourceGetTemplate/sub.testp", p.getProperty("path"));
         assertEquals("ImplicitWithSubResourceGetTemplate", p.getProperty("model"));
 
         p = new Properties();
-        p.load(r.accept("text/plain;q=0.5", "application/foo").get(InputStream.class));
+        cr = r.accept("text/plain;q=0.5", "application/foo").get(ClientResponse.class);
+        assertTrue(MediaTypes.typeEquals(MediaType.TEXT_PLAIN_TYPE, cr.getType()));
+        p.load(cr.getEntityInputStream());
         assertEquals("/com/sun/jersey/impl/template/ImplicitProducesTemplateProcessorTest/ImplicitWithSubResourceGetTemplate/sub.testp", p.getProperty("path"));
         assertEquals("ImplicitWithSubResourceGetTemplate", p.getProperty("model"));
 
         p = new Properties();
-        p.load(r.accept("application/foo", "text/plain;q=0.5").get(InputStream.class));
+        cr = r.accept("application/foo", "text/plain;q=0.5").get(ClientResponse.class);
+        assertTrue(MediaTypes.typeEquals(MediaType.TEXT_PLAIN_TYPE, cr.getType()));
+        p.load(cr.getEntityInputStream());
         assertEquals("/com/sun/jersey/impl/template/ImplicitProducesTemplateProcessorTest/ImplicitWithSubResourceGetTemplate/sub.testp", p.getProperty("path"));
         assertEquals("ImplicitWithSubResourceGetTemplate", p.getProperty("model"));
 

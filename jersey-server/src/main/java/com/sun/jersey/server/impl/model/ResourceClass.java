@@ -157,7 +157,7 @@ public final class ResourceClass {
         // Create the end sequential rules, zero or more may be matched
         List<PatternRulePair<UriRule>> patterns = new ArrayList<PatternRulePair<UriRule>>();
         if (config.getFeature(ResourceConfig.FEATURE_IMPLICIT_VIEWABLES)) {
-            ViewableRule r = new ViewableRule();
+            ViewableRule r = new ViewableRule(implictProduces);
             ComponentInjector<ViewableRule> ci = new ComponentInjector(injectableContext,
                     ViewableRule.class);
             ci.inject(r);

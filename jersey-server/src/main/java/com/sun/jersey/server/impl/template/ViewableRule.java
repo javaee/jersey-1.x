@@ -40,11 +40,14 @@ package com.sun.jersey.server.impl.template;
 import com.sun.jersey.spi.template.ResolvedViewable;
 import com.sun.jersey.spi.template.TemplateContext;
 import com.sun.jersey.api.core.HttpRequestContext;
+import com.sun.jersey.api.core.HttpResponseContext;
 import com.sun.jersey.api.view.Viewable;
+import com.sun.jersey.core.header.QualitySourceMediaType;
 import com.sun.jersey.spi.uri.rules.UriRule;
 import com.sun.jersey.spi.uri.rules.UriRuleContext;
+import java.util.List;
 import javax.ws.rs.core.Context;
-import javax.ws.rs.core.Response;
+import javax.ws.rs.core.MediaType;
 
 /**
  * A viewable rule that defers the request to a template. If a template
@@ -53,9 +56,14 @@ import javax.ws.rs.core.Response;
  * @author Paul.Sandoz@Sun.Com
  */
 public class ViewableRule implements UriRule {
-    
+    private final List<QualitySourceMediaType> priorityMediaTypes;
+
     @Context TemplateContext tc;
-    
+
+    public ViewableRule(List<QualitySourceMediaType> priorityMediaTypes) {
+        this.priorityMediaTypes = priorityMediaTypes;
+    }
+
     public final boolean accept(CharSequence path, Object resource, UriRuleContext context) {
         final HttpRequestContext request = context.getRequest();
         // Only accept GET requests
@@ -73,7 +81,31 @@ public class ViewableRule implements UriRule {
         if (rv == null)
             return false;
 
-        context.getResponse().setResponse(Response.ok(rv).build());
+        final HttpResponseContext response = context.getResponse();
+
+        response.setStatus(200);
+        
+        response.setEntity(rv);
+
+        if (!response.getHttpHeaders().containsKey("Content-Type")) {
+            MediaType contentType = getContentType(request, response);
+            response.getHttpHeaders().putSingle("Content-Type", contentType);
+        }
+
         return true;
+    }
+
+    private MediaType getContentType(HttpRequestContext request, HttpResponseContext response) {
+        List<MediaType> accept = (priorityMediaTypes == null)
+                ? request.getAcceptableMediaTypes()
+                : request.getAcceptableMediaTypes(priorityMediaTypes);
+        if (!accept.isEmpty()) {
+            MediaType contentType = accept.get(0);
+
+            if (!contentType.isWildcardType() && !contentType.isWildcardSubtype()) {
+                return contentType;
+            }
+        }
+        return null;
     }
 }
