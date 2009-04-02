@@ -202,7 +202,8 @@ public class Contact {
     public Contact(int id, String name, List&lt;Address&gt; addresses) {
         this.name = name;
         this.id = id;
-        this.addresses = (addresses != null) ? new LinkedList&lt;Address&gt;(addresses) : null;
+        this.addresses = 
+	        (addresses != null) ? new LinkedList&lt;Address&gt;(addresses) : null;
     }
 }</programlisting>
       </example>
