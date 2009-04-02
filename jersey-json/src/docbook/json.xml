@@ -16,10 +16,10 @@
 
   <itemizedlist>
     <listitem>
-      <para>JAXB based JSON support</para>
+      <para><link linkend="json.jaxb.approach.title">JAXB based JSON support</link></para>
     </listitem>
     <listitem>
-      <para>Low-level, JSONObject/JSONArray based JSON support</para>
+      <para><link linkend="json.low.level.approach.title">Low-level, JSONObject/JSONArray based JSON support</link></para>
     </listitem>
   </itemizedlist>
   
@@ -29,7 +29,7 @@
   </para>
 
   <section>
-    <title>JAXB Based JSON support</title>
+    <title id="json.jaxb.approach.title">JAXB Based JSON support</title>
     
     <para>
      Taking this approach will save you a lot of time, if you want to easily produce/consume both JSON and XML data format.
@@ -304,8 +304,13 @@ a single address (<code>street="Long Street 1"</code>, <code>town="Short Village
        <title>Natural notation</title>
        <para>
        After using <literal>mapped</literal> JSON notation for a while, it was apparent, that a need to configure all the various things
-       manually could be problematic. To avoid the manual work, a new <literal>natural</literal> JSON notation was introduced in Jersey version 1.0.2.
-       With <literal>natural</literal> notation, without any additional configuration, you will get the following JSON for the bean 
+       manually could be a bit problematic. To avoid the manual work, a new, <literal>natural</literal>, JSON notation was introduced in Jersey version 1.0.2.
+       With <literal>natural</literal> notation, Jersey will automatically figure out how individual items need to be processed, so that you 
+       do not need to do any kind of manual configuration. Java arrays and lists are mapped into JSON arrays, even for single-element cases. 
+       Java numbers and booleans are correctly mapped into JSON numbers and booleans, and you do not need to bother with XML attributes,
+       as in JSON, they keep the original names. So  without any additional configuration, just using
+       <programlisting>JSONConfiguration.natural().build()</programlisting>
+       for configuring your <code>JAXBContext</code>, you will get the following JSON for the bean 
        initialized at <xref linkend="json.jaxb.bean.init.example"/>:
        <example><title>JSON expression produced using <literal>natural</literal> notation</title>
        <programlisting linenumbering="numbered">{ "id":2
@@ -313,24 +318,67 @@ a single address (<code>street="Long Street 1"</code>, <code>town="Short Village
  ,"addresses":[{"street":"Long Street 1"
                      ,"town":"Short Village"}]}</programlisting>
        </example>
-       You might notice, that single element array <literal>addresses</literal> remains array, and also the non-string <literal>id</literal>
+       You might notice, that the single element array <literal>addresses</literal> remains an array, and also the non-string <literal>id</literal>
        value is not limited with double quotes, as <literal>natural</literal> notation automatically detects these things.
        </para>
       </section>
       <section>
        <title>Jettison mapped notation</title>
        <para>
-       <example><title>JSON expression produced using Jettison <literal>mapped</literal> notation</title>
+       Next two notations are based on project <ulink url="http://jettison.codehaus.org/User%27s+Guide">Jettison</ulink>.
+       You might want to use one of these notations, when working with more complex XML documents. Namely when you deal with 
+       multiple XML namespaces in your JAXB beans. 
+       </para>
+       <para>
+       Jettison based <literal>mapped</literal> notation could be configured using:
+       <programlisting>JSONConfiguration.mappedJettison().build()</programlisting>
+       If nothing else is configured, you will get similar JSON output as for the default, <literal>mapped</literal>, notation:
+       <example><title>JSON expression produced using Jettison based <literal>mapped</literal> notation</title>
        <programlisting linenumbering="numbered">{ "contact:{"id":2
               ,"name":"Bob"
               ,"addresses":{"street":"Long Street 1"
                                  ,"town":"Short Village"}}</programlisting>
        </example>
+	The only difference is, your numbers and booleans will not be converted into strings, but you have no option for forcing arrays remain arrays
+	in single-element case. Also the JSON object, representing XML root tag is being produced.
+       </para>
+       <para>
+       If you need to deal with various XML namespaces, however, you will find Jettison <literal>mapped</literal> notation pretty useful.
+       Lets define a particular namespace for <code>id</code> item:
+       <programlisting>  ...
+  @XmlElement(namespace="http://example.com")
+  public int id;
+  ...</programlisting>
+ 	Then you simply confgure a mapping from XML namespace into JSON prefix as follows:
+      <example><title>XML namespace to JSON mapping configuration for Jettison based <literal>mapped</literal> notation</title>
+       <programlisting linenumbering="numbered">        Map&lt;String,String&gt; ns2json = new HashMap&lt;String, String&gt;();
+        ns2json.put("http://example.com", "example");
+        context = new JSONJAXBContext(
+	      JSONConfiguration.mappedJettison()
+	           .xml2JsonNs(ns2json).build(), types);</programlisting>
+       </example>
+       Resulting JSON will look like in the example bellow.
+        <example><title>JSON expression with XML namespaces mapped into JSON</title>
+       <programlisting linenumbering="numbered">{ "contact:{"example.id":2
+              ,"name":"Bob"
+              ,"addresses":{"street":"Long Street 1"
+                                 ,"town":"Short Village"}}</programlisting>
+       </example>
+       Please note, that <code>id</code> item became <code>example.id</code> based on the XML namespace mapping.
+       If you have more XML namespaces in your XML, you will need to configure appropriate mapping for all of them
        </para>
       </section>
       <section>
        <title>Badgerfish notation</title>
        <para>
+       Badgerfish notation is the other notation based on Jettison. From JSON and JavaScript perspective, this notation is definitely
+       the worst readable one. You will probably not want to use it, unless you need to make sure your JAXB beans could be flawlessly
+       written and read back to and from JSON, without bothering with any formatting configuration, namespaces, etc.
+       </para>
+       <para>
+       <code>JSONConfiguration</code> instance using <literal>badgerfish</literal> notation could be built with
+       <programlisting>JSONConfiguration.badgerFish().build()</programlisting>
+       and the output JSON for <xref linkend="json.jaxb.bean.init.example"/> will be as follows.
        <example><title>JSON expression produced using <literal>badgerfish</literal> notation</title>
        <programlisting linenumbering="numbered">{"contact":{"id":{"$":"2"}
               ,"name":{"$":"Bob"}
@@ -341,17 +389,19 @@ a single address (<code>street="Long Street 1"</code>, <code>town="Short Village
       </section>
       
     </section>
-
+<section><title>Examples</title>
    <para>Download <ulink url="http://download.java.net/maven/2/com/sun/jersey/samples/json-from-jaxb/&version;/json-from-jaxb-&version;-project.zip">http://download.java.net/maven/2/com/sun/jersey/samples/json-from-jaxb/&version;/json-from-jaxb-&version;-project.zip</ulink>
    or
    <ulink url="http://download.java.net/maven/2/com/sun/jersey/samples/jmaki-backend/&version;/jmaki-backend-&version;-project.zip">http://download.java.net/maven/2/com/sun/jersey/samples/jmaki-backend/&version;/jmaki-backend-&version;-project.zip</ulink>
    to get a more complex example using JAXB based JSON support.
    </para>
-    
-  </section>
+   </section>
+  
+   </section>
+  
 
   <section>
-    <title>Low-Level JSON support</title>
+    <title id="json.low.level.approach.title">Low-Level JSON support</title>
 
     <para>Using this approach means you will be using JSONObject and/or JSONArray classes for your data representations.
     These classes are actually taken from Jettison project, but conform to the description 
@@ -388,10 +438,12 @@ try {
     </example>
     </para>
 
+    <section><title>Examples</title>
+
    <para>Download <ulink url="http://download.java.net/maven/2/com/sun/jersey/samples/bookmark/&version;/bookmark-&version;-project.zip">http://download.java.net/maven/2/com/sun/jersey/samples/bookmark/&version;/bookmark-&version;-project.zip</ulink> 
    to get a more complex example using low-level JSON support.
    </para>
    
   </section>
-
+</section>
 </chapter>
