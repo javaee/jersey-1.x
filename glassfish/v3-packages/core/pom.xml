@@ -41,8 +41,8 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.sun.jersey.glassfish.v3</groupId>
     <version>1.0.3-SNAPSHOT</version>
-    <artifactId>jersey-gfv3-package</artifactId>
-    <name>Jersey GFv3 UC Module Image</name>
+    <artifactId>jersey-gfv3-core</artifactId>
+    <name>Jersey GFv3 UC Core Package Image</name>
     <packaging>pom</packaging>
     <dependencies>
         <dependency>
@@ -63,98 +63,6 @@
                 <artifactId>maven-dependency-plugin</artifactId>
                 <executions>
                     <execution>
-                        <id>unpack</id>
-                        <phase>generate-sources</phase>
-                        <goals>
-                            <goal>unpack</goal>
-                        </goals>
-                        <configuration>
-                          <artifactItems>
-                               <artifactItem>
-                                    <groupId>javax.ws.rs</groupId>
-                                    <artifactId>jsr311-api</artifactId>
-                                    <version>1.0</version>
-                                    <type>jar</type>
-                                    <classifier>javadoc</classifier>
-                                    <overWrite>false</overWrite>
-                                    <outputDirectory>${assembly.directory}/jax-rs-javadoc</outputDirectory>
-                                </artifactItem>
-                                <artifactItem>
-                                    <groupId>com.sun.jersey</groupId>
-                                    <artifactId>jersey-bundle</artifactId>
-                                    <version>${project.version}</version>
-                                    <type>jar</type>
-                                    <classifier>javadoc</classifier>
-                                    <overWrite>false</overWrite>
-                                    <outputDirectory>${assembly.directory}/jersey-javadoc</outputDirectory>
-                                </artifactItem>
-                                <artifactItem>
-                                    <groupId>com.sun.jersey.samples</groupId>
-                                    <artifactId>bookstore</artifactId>
-                                    <version>${project.version}</version>
-                                    <type>zip</type>
-                                    <classifier>gf-project</classifier>
-                                    <overWrite>false</overWrite>
-                                    <outputDirectory>${assembly.directory}/samples</outputDirectory>
-                                </artifactItem>
-                                 <artifactItem>
-                                    <groupId>com.sun.jersey.samples</groupId>
-                                    <artifactId>helloworld-webapp</artifactId>
-                                    <version>${project.version}</version>
-                                    <type>zip</type>
-                                    <classifier>gf-project</classifier>
-                                    <overWrite>false</overWrite>
-                                    <outputDirectory>${assembly.directory}/samples</outputDirectory>
-                                </artifactItem>
-                                 <artifactItem>
-                                    <groupId>com.sun.jersey.samples</groupId>
-                                    <artifactId>jmaki-backend</artifactId>
-                                    <version>${project.version}</version>
-                                    <type>zip</type>
-                                    <classifier>gf-project</classifier>
-                                    <overWrite>false</overWrite>
-                                    <outputDirectory>${assembly.directory}/samples</outputDirectory>
-                                </artifactItem>
-                                 <artifactItem>
-                                    <groupId>com.sun.jersey.samples</groupId>
-                                    <artifactId>scala-helloworld-webapp</artifactId>
-                                    <version>${project.version}</version>
-                                    <type>zip</type>
-                                    <classifier>gf-project</classifier>
-                                    <overWrite>false</overWrite>
-                                    <outputDirectory>${assembly.directory}/samples</outputDirectory>
-                                </artifactItem>
-                                 <artifactItem>
-                                    <groupId>com.sun.jersey.samples</groupId>
-                                    <artifactId>simple-servlet</artifactId>
-                                    <version>${project.version}</version>
-                                    <type>zip</type>
-                                    <classifier>gf-project</classifier>
-                                    <overWrite>false</overWrite>
-                                    <outputDirectory>${assembly.directory}/samples</outputDirectory>
-                                </artifactItem>
-                                 <artifactItem>
-                                    <groupId>com.sun.jersey.samples</groupId>
-                                    <artifactId>spring-annotations</artifactId>
-                                    <version>${project.version}</version>
-                                    <type>zip</type>
-                                    <classifier>gf-project</classifier>
-                                    <overWrite>false</overWrite>
-                                    <outputDirectory>${assembly.directory}/samples</outputDirectory>
-                                </artifactItem>
-                                  <artifactItem>
-                                    <groupId>com.sun.jersey.samples</groupId>
-                                    <artifactId>extended-wadl-webapp</artifactId>
-                                    <version>${project.version}</version>
-                                    <type>zip</type>
-                                    <classifier>gf-project</classifier>
-                                    <overWrite>false</overWrite>
-                                    <outputDirectory>${assembly.directory}/samples</outputDirectory>
-                                </artifactItem>
-                            </artifactItems>
-                        </configuration>
-                    </execution>
-                     <execution>
                         <id>copy</id>
                         <phase>generate-sources</phase>
                         <goals>

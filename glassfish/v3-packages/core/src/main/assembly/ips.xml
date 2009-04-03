@@ -8,18 +8,6 @@
       <directory>src/main/resources</directory>
       <outputDirectory></outputDirectory>
     </fileSet>
-    <fileSet>
-      <directory>target/assembly/jersey-javadoc</directory>
-      <outputDirectory>jersey/apidocs/jersey</outputDirectory>
-    </fileSet>
-    <fileSet>
-      <directory>target/assembly/jax-rs-javadoc</directory>
-      <outputDirectory>jersey/apidocs/jsr311</outputDirectory>
-    </fileSet>
-     <fileSet>
-      <directory>target/assembly/samples</directory>
-      <outputDirectory>jersey/samples</outputDirectory>
-    </fileSet>
      <fileSet>
       <directory>target/assembly</directory>
       <includes>
