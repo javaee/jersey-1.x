@@ -1,7 +1,7 @@
 pkg = {
     "name"          : "jersey-core",
     "version"       : "1.0.3,0-0.1",
-    "attributes"    : { "pkg.summary" : "Jersey RESTful Web services for GlassFish",
+    "attributes"    : { "pkg.summary" : "Jersey Core, RESTful Web services for GlassFish",
                         "pkg.description" : 
 "Jersey is the open source (under dual CDDL+GPL license)\
  JAX-RS (JSR 311) Reference Implementation for building RESTful Web services. \
