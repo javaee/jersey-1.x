@@ -49,7 +49,7 @@
     <packaging>pom</packaging>
     <modules>
         <module>v2-package</module>
-        <module>v3-package</module>
+        <!--module>v3-package</module-->
     </modules>
     <distributionManagement>
         <repository>
