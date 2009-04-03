@@ -1,0 +1,90 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head><title>HTTPS Client/Server Example - Grizzly</title></head>
+
+
+    <body style="width: 50em">
+        <h1>HTTPS Client/Server Example - Grizzly</h1>
+
+        <p>This example demonstrates how to develop RESTful HTTPS Server using
+            Grizzly and how implement HTTPS Client using Jersey with server authentication.</p>
+
+        <h2>Contents</h2>
+        <h3>Server side</h3>
+
+        <p>This example consists of just one resource - RootResource, which is
+            basically copy of HelloWorld Resource from corresponding sample with little
+            improvement.</p>
+
+        <p>Other classes are used to start Grizzly embedded server and set up its
+            authentication and authorization mechanism and keystore and truststore.
+        </p>
+
+        <h3>Client side</h3>
+        <p>Client side is implemented as a test case, see class <b>com.sun.jersey.samples.https_grizzly.MainTest</b>,
+            and its method testSSLWithAuth (others are just tests for invalid authorization).
+            First thing you have to do if you want to communicate with service via
+            https is set up <b>SSLContext</b> which is basically providing keystore and
+            truststore. Keystore is used for storing own keys and truststore is used for storing certificates to
+            which you have decided to trust. For more informations see <a href="#JSSERefGuide">[1]</a>.</p>
+        <p>To set <b>SSLContext</b> on Jersey client you have to create instance of <b>com.sun.jersey.client.urlconnection.HTTPSProperties</b>
+            and set it as a property to the client instance:
+
+        <pre>    HTTPSProperties prop = new HTTPSProperties(null, context);
+
+    DefaultClientConfig dcc = new DefaultClientConfig();
+    dcc.getProperties().put(HTTPSProperties.PROPERTY_HTTPS_PROPERTIES, prop);
+
+    Client c = Client.create(dcc);</pre>
+</p>
+
+
+<h3>Certificates setup</h3>
+<p>We need set up few things to get this example working:
+<ul>
+    <li>generate client and server keys</li>
+    <li>generate client and server certificates</li>
+    <li>import certificates to corresponding truststores</li>
+</ul>
+Client certificate is needed too because we're going to use server-side
+certificate authentication as well (yes, after this HTTP Basic authentication
+seems to be kind of redundant but there are some usecases where you might
+want to use them both).
+</p>
+<p>
+    Generate client key and store it into keystore:<br />
+<pre>keytool -genkey -keystore ./keystore_client -alias clientKey -dname "CN=Client, OU=Jersey, O=Sun Microsystem, L=Prague, ST=Czech Republic, C=CZ"</pre>
+Generate client certificate (this will generate self signed certificate; if you have certification authority and want generate certificate request, use keytool -certreq):<br />
+<pre>keytool -export -alias clientKey -rfc -keystore ./keystore_client > ./client.cert</pre>
+Import client certificate to servers truststore:<br />
+<pre>keytool -import -alias clientCert -file ./client.cert -keystore ./truststore_server</pre>
+
+These steps are similar for server side:
+<pre>keytool -genkey -keystore ./keystore_server -alias serverKey -dname "CN=localhost, OU=Jersey, O=Sun Microsystem, L=Prague, ST=Czech Republic, C=CZ"
+keytool -export -alias serverKey -rfc -keystore ./keystore_server > ./server.cert
+keytool -import -alias serverCert -file ./server.cert -keystore ./truststore_client</pre>
+</p>
+
+
+<h2>Running the Example</h2>
+<p>Run the example as follows:</p>
+<p> test
+<blockquote><code>mvn test</code><p></blockquote></p>
+<p> run 
+<blockquote><code>mvn compile exec:java</code><p></blockquote></p>
+<p>From a web browser, visit:<br />
+    <b style="color: red">This won't work! *</b>
+<blockquote><code><a href="https://localhost:4463/">https://localhost:4463/</a></code></blockquote>
+<b style="color: red">[*]</b> Your web browser needs have and use generated
+client keys. Or you have to disable server side client
+authentication - remove line (or set NeedClientAuth to false) <b>((SSLSelectorThread) webServer.getSelectorThread()).setNeedClientAuth(true);</b>
+in <i>Server.java</i>. Then ignore any security warning (self-signed certificates
+    aren't trusted in general) and login with username "user" and password "password".
+    Text "JERSEY HTTPS EXAMPLE" should appear.
+
+<h2>References</h2>
+
+<a name="JSSERefGuide"/>[1] <a href="http://java.sun.com/javase/6/docs/technotes/guides/security/jsse/JSSERefGuide.html">http://java.sun.com/javase/6/docs/technotes/guides/security/jsse/JSSERefGuide.html</a>
+
+
+
+</body></html>

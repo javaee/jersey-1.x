@@ -72,6 +72,7 @@
         <module>sparklines</module>
         <module>spring-annotations</module>
         <module>storage-service</module>
+        <module>https-clientserver-grizzly</module>
     </modules>
     <build>
         <plugins>
