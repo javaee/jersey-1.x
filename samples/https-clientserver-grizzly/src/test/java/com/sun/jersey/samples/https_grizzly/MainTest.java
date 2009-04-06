@@ -318,9 +318,9 @@ class MyX509TrustManager implements X509TrustManager {
 class MyX509KeyManager implements X509KeyManager {
 
      /*
-      * The default PKIX X509TrustManager9.  We'll delegate
+      * The default PKIX X509KeyManager9.  We'll delegate
       * decisions to it, and fall back to the logic in this class if the
-      * default X509TrustManager doesn't trust it.
+      * default X509KeyManager doesn't trust it.
       */
      X509KeyManager pkixKeyManager;
 
@@ -329,7 +329,7 @@ class MyX509KeyManager implements X509KeyManager {
      }
 
      MyX509KeyManager(File keyStore, char[] password) throws Exception {
-         // create a "default" JSSE X509TrustManager.
+         // create a "default" JSSE X509KeyManager.
 
          KeyStore ks = KeyStore.getInstance("JKS");
          ks.load(new FileInputStream(keyStore), password);
@@ -340,9 +340,9 @@ class MyX509KeyManager implements X509KeyManager {
          KeyManager kms[] = kmf.getKeyManagers();
 
          /*
-          * Iterate over the returned trustmanagers, look
-          * for an instance of X509TrustManager.  If found,
-          * use that as our "default" trust manager.
+          * Iterate over the returned keymanagers, look
+          * for an instance of X509KeyManager.  If found,
+          * use that as our "default" key manager.
           */
          for (int i = 0; i < kms.length; i++) {
              if (kms[i] instanceof X509KeyManager) {
