@@ -38,6 +38,7 @@
 package com.sun.jersey.server.impl.model;
 
 import com.sun.jersey.api.core.ResourceConfig;
+import com.sun.jersey.api.model.AbstractImplicitViewMethod;
 import com.sun.jersey.api.model.AbstractResource;
 import com.sun.jersey.api.model.AbstractResourceMethod;
 import com.sun.jersey.api.model.AbstractSubResourceLocator;
@@ -157,7 +158,12 @@ public final class ResourceClass {
         // Create the end sequential rules, zero or more may be matched
         List<PatternRulePair<UriRule>> patterns = new ArrayList<PatternRulePair<UriRule>>();
         if (config.getFeature(ResourceConfig.FEATURE_IMPLICIT_VIEWABLES)) {
-            ViewableRule r = new ViewableRule(implictProduces);
+            AbstractImplicitViewMethod method = new AbstractImplicitViewMethod(resource);
+            List<ResourceFilter> resourceFilters = ff.getResourceFilters(method);
+            ViewableRule r = new ViewableRule(
+                    implictProduces,
+                    ff.getRequestFilters(resourceFilters),
+                    ff.getResponseFilters(resourceFilters));
             ComponentInjector<ViewableRule> ci = new ComponentInjector(injectableContext,
                     ViewableRule.class);
             ci.inject(r);

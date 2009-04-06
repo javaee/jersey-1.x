@@ -36,52 +36,22 @@
  */
 package com.sun.jersey.api.model;
 
-import java.lang.annotation.Annotation;
-import java.lang.reflect.AnnotatedElement;
-import java.lang.reflect.Method;
-
 /**
+ * Abstraction for an implicit view method.
+ * <p>
+ * The annotations on this abstract method will be copied from the class. The
+ * Java method will be null.
  *
- * @author Paul.Sandoz@Sun.Com
  */
-public abstract class AbstractMethod implements AnnotatedElement {
-    private Method method;
+public class AbstractImplicitViewMethod extends AbstractMethod {
 
-    private Annotation[] annotations;
-
-    private AbstractResource resource;
-
-    public AbstractMethod(AbstractResource resource, Method method, Annotation[] annotations) {
-        this.method = method;
-        this.annotations = annotations;
-        this.resource = resource;
+    public AbstractImplicitViewMethod(AbstractResource resource) {
+        super(resource, null, resource.getAnnotations());
     }
 
-    public AbstractResource getResource() {
-        return resource;
-    }
-    
-    public Method getMethod() {
-        return method;
-    }
-
-    public <T extends Annotation> T getAnnotation(Class<T> annotationType) {
-        for (Annotation a : annotations) {
-            if (annotationType == a.annotationType())
-                return annotationType.cast(a);
-        }
-        return null;
-    }
-
-    public Annotation[] getAnnotations() {
-        return annotations.clone();
-    }
-
-    public Annotation[] getDeclaredAnnotations() {
-        return annotations.clone();
-    }
-
-    public boolean isAnnotationPresent(Class<? extends Annotation> annotationType) {
-        return getAnnotation(annotationType) != null;
+    @Override
+    public String toString() {
+        return "AbstractImplicitViewMethod("
+                + getMethod().getDeclaringClass().getSimpleName() + ")";
     }
 }

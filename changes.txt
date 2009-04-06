@@ -1,4 +1,7 @@
 release 1.0.3 (2009-03/04)
+- Resource filters can be utilized with implicit views. Annotations
+  on the class will be utilized as annotations of the AbtractMethod, specifically
+  the concrete class com.sun.jersey.api.model.AbstractImplicitViewMethod.
 - Ensure that when @ImplicitProduces is utilized that the most acceptable
   media type is set as the content type when an implicit view is returned.
 - Fixed issue 254
