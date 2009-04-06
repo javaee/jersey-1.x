@@ -1,5 +1,6 @@
 <assembly>
   <id>project</id>
+  <includeBaseDirectory>false</includeBaseDirectory>
   <formats>
     <format>zip</format>
   </formats>
