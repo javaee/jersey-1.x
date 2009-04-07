@@ -411,7 +411,9 @@ public class UriBuilderImpl extends UriBuilder {
         if(values == null) return this;
 
         for (Object value : values) {
-            if(value != null && !value.equals(""))
+            if(value == null)
+                throw new IllegalArgumentException("One or more of value parameters are null");
+            else if(!value.equals(""))
                 queryParams.add(name, value.toString());
         }
         return this;
