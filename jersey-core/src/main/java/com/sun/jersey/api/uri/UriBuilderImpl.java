@@ -407,8 +407,12 @@ public class UriBuilderImpl extends UriBuilder {
         }
 
         queryParams.remove(name);
+
+        if(values == null) return this;
+
         for (Object value : values) {
-            queryParams.add(name, value.toString());
+            if(value != null && !value.equals(""))
+                queryParams.add(name, value.toString());
         }
         return this;
     }
