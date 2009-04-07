@@ -10,9 +10,9 @@ pkg = {
  so that developers may extend Jersey to suite their needs. \
 This package contains Jersey apidocs and examples",
                      "info.classification" : "Web Services"  },
-    "dirtrees" : [ "jersey" ],
+    "dirtrees" : [ "glassfish" ],
     "depends" : { 
-                  "pkg:/jersey-core@1.0.3" : {"type" : "require" }
+                  "pkg:/jersey@1.0.3" : {"type" : "require" }
                 },
     "licenses" : { "jersey/LICENSE.txt" : { "license" : "CDDL+GPL" }}
 }

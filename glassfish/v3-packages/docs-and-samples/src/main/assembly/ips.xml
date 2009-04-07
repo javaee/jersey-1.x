@@ -11,15 +11,15 @@
     </fileSet>
     <fileSet>
       <directory>target/assembly/jersey-javadoc</directory>
-      <outputDirectory>jersey/apidocs/jersey</outputDirectory>
+      <outputDirectory>glassfish/jersey/apidocs/jersey</outputDirectory>
     </fileSet>
     <fileSet>
       <directory>target/assembly/jax-rs-javadoc</directory>
-      <outputDirectory>jersey/apidocs/jsr311</outputDirectory>
+      <outputDirectory>glassfish/jersey/apidocs/jsr311</outputDirectory>
     </fileSet>
      <fileSet>
       <directory>target/assembly/samples</directory>
-      <outputDirectory>jersey/samples</outputDirectory>
+      <outputDirectory>glassfish/jersey/samples</outputDirectory>
     </fileSet>
   </fileSets>
 </assembly>
