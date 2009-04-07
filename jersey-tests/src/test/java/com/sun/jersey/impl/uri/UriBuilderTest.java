@@ -246,7 +246,7 @@ public class UriBuilderTest extends TestCase {
 
         // issue 257 - param is removed after setting it to empty string
         {
-            URI u = UriBuilder.fromPath("http://localhost:8080").queryParam("x", "").replaceQueryParam("x", null).build();
+            URI u = UriBuilder.fromPath("http://localhost:8080").queryParam("x", "10").replaceQueryParam("x", "").build();
 
             assertTrue(u.toString().equals("http://localhost:8080"));
         }
