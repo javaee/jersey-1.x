@@ -14,5 +14,5 @@ This package contains Jersey apidocs and examples",
     "depends" : { 
                   "pkg:/jersey@1.0.3" : {"type" : "require" }
                 },
-    "licenses" : { "jersey/LICENSE.txt" : { "license" : "CDDL+GPL" }}
+    "licenses" : { "glassfish/jersey/LICENSE.txt" : { "license" : "CDDL+GPL" }}
 }
