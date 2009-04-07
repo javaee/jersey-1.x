@@ -581,12 +581,12 @@ public class UriTemplate {
         int i = 0;
         while(m.find()) {
             b.append(template, i, m.start());
-            String tValue = values.get(m.group(1)).toString();
+            Object tValue = values.get(m.group(1));
             if (tValue != null) {
                 if (encode)
-                    tValue = UriComponent.encode(tValue, t);
+                    tValue = UriComponent.encode(tValue.toString(), t);
                 else
-                    tValue =UriComponent.contextualEncode(tValue, t);
+                    tValue =UriComponent.contextualEncode(tValue.toString(), t);
                 b.append(tValue);
             } else {
                 throw templateVariableHasNoValue(m.group(1));

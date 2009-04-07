@@ -39,7 +39,6 @@ package com.sun.jersey.impl.uri;
 import com.sun.jersey.api.uri.UriComponent;
 import java.lang.reflect.Method;
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -522,6 +521,27 @@ public class UriBuilderTest extends TestCase {
         bu = UriBuilder.fromUri("http://localhost:8080/a/b/c").
                 path("/{foo}/{bar}/{baz}/{foo}").buildFromMap(m);
         assertEquals(URI.create("http://localhost:8080/a/b/c/x/y/z/x"), bu);
+    }
+
+    public void testBuildFromMap() {
+        Map maps = new HashMap();
+        maps.put("x", null);
+        maps.put("y", "/path-absolute/test1");
+        maps.put("z", "fred@example.com");
+        maps.put("w", "path-rootless/test2");
+        maps.put("u", "extra");
+
+        boolean caught = false;
+
+        try {
+            System.out.println(UriBuilder.fromPath("").path("{w}/{x}/{y}/{z}/{x}").
+                    buildFromEncodedMap(maps));
+
+        } catch (IllegalArgumentException ex) {
+            caught = true;
+        }
+
+        assertTrue(caught);
     }
 
     public void testBuildQueryTemplates() {
