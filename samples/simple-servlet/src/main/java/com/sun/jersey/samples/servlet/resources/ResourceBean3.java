@@ -91,12 +91,12 @@ public class ResourceBean3  {
                         header("resource3-header", "text/plain").build();
                 break;
             case 2:
-                r = Response.ok(getFormURLEncodedRep(arg1, arg2), "text/plain").
-                        header("resource3-header", "text/plain").build();
+                r = Response.ok(getFormURLEncodedRep(arg1, arg2), "application/x-www-form-urlencoded").
+                        header("resource3-header", "application/x-www-form-urlencoded").build();
                 break;
             case 3:
-                r = Response.ok(getImageRep(), "text/plain").
-                        header("resource3-header", "text/plain").build();
+                r = Response.ok(getImageRep(), "image/jpg").
+                        header("resource3-header", "image/jpg").build();
                 break;
             default :
                 r = Response.ok(help, "text/plain").build();
