@@ -13,7 +13,9 @@
       <directory>target/assembly</directory>
       <includes>
         <include>jsr311-api.jar</include>
-        <include>jersey-bundle.jar</include>
+        <include>jersey-gf-bundle.jar</include>
+        <include>jackson-asl.jar</include>
+        <include>jettison.jar</include>
       </includes>
       <outputDirectory>glassfish/modules</outputDirectory>
     </fileSet>
