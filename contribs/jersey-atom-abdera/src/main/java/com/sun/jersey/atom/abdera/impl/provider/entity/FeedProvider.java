@@ -47,9 +47,6 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
-import javax.ws.rs.ext.MessageBodyReader;
-import javax.ws.rs.ext.MessageBodyWriter;
-import javax.ws.rs.ext.Provider;
 import org.apache.abdera.Abdera;
 import org.apache.abdera.model.Document;
 import org.apache.abdera.model.Feed;
@@ -61,8 +58,7 @@ import org.apache.abdera.parser.Parser;
 //@Provider
 @Consumes({"application/atom+xml", "application/xml", "text/xml", "application/atom+json", "application/json"})
 @Produces({"application/atom+xml", "application/xml", "text/xml", "application/atom+json", "application/json"})
-public class FeedProvider
-        implements MessageBodyReader<Feed>, MessageBodyWriter<Feed> {
+public class FeedProvider extends AbstractCompletableReaderWriter<Feed> {
 
     public long getSize(Feed feed, Class<?> type, Type genericType,
                         Annotation[] annotations, MediaType mediaType) {

@@ -47,9 +47,6 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
-import javax.ws.rs.ext.MessageBodyReader;
-import javax.ws.rs.ext.MessageBodyWriter;
-import javax.ws.rs.ext.Provider;
 import org.apache.abdera.Abdera;
 import org.apache.abdera.model.Categories;
 import org.apache.abdera.model.Document;
@@ -64,7 +61,7 @@ import org.apache.abdera.writer.Writer;
 // Abdera does not yet provide a JSON parser for a Categories entity
 @Consumes({"application/atomcat+xml", "application/xml", "text/xml"})
 @Produces({"application/atomcat+xml", "application/xml", "text/xml", "application/atomcat+json", "application/json"})
-public class CategoriesProvider implements MessageBodyReader<Categories>, MessageBodyWriter<Categories> {
+public class CategoriesProvider extends AbstractCompletableReaderWriter<Categories> {
 
     public long getSize(Categories feed, Class<?> type, Type genericType,
                         Annotation[] annotations, MediaType mediaType) {

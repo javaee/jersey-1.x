@@ -37,6 +37,7 @@
 package com.sun.jersey.api.client;
 
 import com.sun.jersey.core.header.InBoundHeaders;
+import com.sun.jersey.core.provider.CompletableReader;
 import com.sun.jersey.spi.MessageBodyWorkers;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -256,6 +257,9 @@ public class ClientResponse {
                         ", and MIME media type, " + mediaType + ", was not found");
             }
             T t = br.readFrom(c, type, EMPTY_ANNOTATIONS, mediaType, headers, entity);
+            if (br instanceof CompletableReader) {
+                t = ((CompletableReader<T>)br).complete(t);
+            }
             if (!(t instanceof Closeable)) {
                 close();
             }

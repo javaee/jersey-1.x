@@ -47,9 +47,6 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
-import javax.ws.rs.ext.MessageBodyReader;
-import javax.ws.rs.ext.MessageBodyWriter;
-import javax.ws.rs.ext.Provider;
 import org.apache.abdera.Abdera;
 import org.apache.abdera.model.Document;
 import org.apache.abdera.model.Service;
@@ -63,7 +60,7 @@ import org.apache.abdera.parser.Parser;
 // Abdera does not yet provide a JSON parser for a Service entity
 @Consumes({"application/atomsvc+xml", "application/xml", "text/xml"})
 @Produces({"application/atomsvc+xml", "application/xml", "text/xml", "application/atomsvc+json", "application/json"})
-public class ServiceProvider implements MessageBodyReader<Service>, MessageBodyWriter<Service> {
+public class ServiceProvider extends AbstractCompletableReaderWriter<Service> {
 
     public long getSize(Service service, Class<?> type, Type genericType,
                         Annotation[] annotations, MediaType mediaType) {
