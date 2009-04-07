@@ -49,12 +49,6 @@
     <packaging>war</packaging>
     <dependencies>
         <dependency>
-            <groupId>com.sun.jersey.test.framework</groupId>
-            <artifactId>jersey-test-framework</artifactId>
-            <version>${project.version}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
             <groupId>com.sun.jersey</groupId>
             <artifactId>jersey-server</artifactId>
             <version>${project.version}</version>
@@ -63,7 +57,26 @@
             <groupId>com.sun.jersey</groupId>
             <artifactId>jersey-json</artifactId>
             <version>${project.version}</version>
-        </dependency>        
+        </dependency>
+        <dependency>
+            <groupId>javax.servlet</groupId>
+            <artifactId>jstl</artifactId>
+            <version>1.1.2</version>
+            <scope>compile</scope>
+        </dependency>
+        <!-- the following two dependencies can be removed once the
+             latest embedded GF is used -->
+        <dependency>
+            <groupId>taglibs</groupId>
+            <artifactId>standard</artifactId>
+            <version>1.1.2</version>
+        </dependency>
+        <dependency>
+            <groupId>com.sun.jersey.test.framework</groupId>
+            <artifactId>jersey-test-framework</artifactId>
+            <version>${project.version}</version>
+            <scope>test</scope>
+        </dependency>
         <!--
         <dependency>
             <groupId>junit</groupId>
@@ -121,15 +134,10 @@
             </plugin>
 
             <!-- Run the application using "mvn glassfish:run" -->
-            <!--
-                 This plugin is not in sync with the promoted builds.
-            -->
-            <!--
             <plugin>
                 <groupId>org.glassfish</groupId>
                 <artifactId>maven-glassfish-plugin</artifactId>
             </plugin>
-            -->
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>xslt-maven-plugin</artifactId>
