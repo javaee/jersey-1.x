@@ -58,7 +58,7 @@
                 <artifactId>maven-bundle-plugin</artifactId>
                 <configuration>
                     <instructions>
-                        <Export-Package>com.sun.jersey.*;version=${version}</Export-Package>
+                        <Export-Package>com.sun.jersey.*</Export-Package>
                     </instructions>
                     <unpackBundle>true</unpackBundle>
                 </configuration>
