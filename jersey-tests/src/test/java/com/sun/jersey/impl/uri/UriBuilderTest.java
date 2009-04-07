@@ -251,11 +251,17 @@ public class UriBuilderTest extends TestCase {
             assertTrue(u.toString().equals("http://localhost:8080"));
         }
 
-        // issue 257 - null value is ignored (NPE or IllegalArgumentException is not thrown)
+        // issue 257 - IllegalArgumentException
         {
-            URI u = UriBuilder.fromPath("http://localhost:8080").queryParam("x", "10").replaceQueryParam("x", "1", null, "2").build();
+            boolean caught = false;
 
-            assertTrue(u.toString().equals("http://localhost:8080?x=1&x=2"));
+            try {
+                URI u = UriBuilder.fromPath("http://localhost:8080").queryParam("x", "10").replaceQueryParam("x", "1", null, "2").build();
+            } catch (IllegalArgumentException iae) {
+                caught = true;
+            }
+            
+            assertTrue(caught);
         }
 
     }
