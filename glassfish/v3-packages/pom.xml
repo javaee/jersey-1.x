@@ -50,7 +50,6 @@
     <modules>
         <module>core</module>
         <module>docs-and-samples</module>
-        <module>all</module>
     </modules>
     <distributionManagement>
         <repository>
