@@ -1,4 +1,9 @@
 release 1.0.3 (2009-03/04)
+- Fixed issues 257 & 259
+  https://jersey.dev.java.net/issues/show_bug.cgi?id=257
+  https://jersey.dev.java.net/issues/show_bug.cgi?id=259
+  added null value checks to UriBuilder.replaceQueryParam and
+  UriTemplate.createURIComponent (used when building uri from a map)
 - Resource filters can be utilized with implicit views. Annotations
   on the class will be utilized as annotations of the AbtractMethod, specifically
   the concrete class com.sun.jersey.api.model.AbstractImplicitViewMethod.
