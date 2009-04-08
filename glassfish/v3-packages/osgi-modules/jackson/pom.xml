@@ -59,7 +59,8 @@
                 <artifactId>maven-bundle-plugin</artifactId>
                 <configuration>
                     <instructions>
-                        <Export-Package>org.codehaus.jackson.*; password="GlassFish"; mandatory:=password</Export-Package>
+                        <Export-Package>org.codehaus.jackson.*;version=0.9.4</Export-Package>
+                        <Import-Package>*</Import-Package>
                     </instructions>
                     <unpackBundle>true</unpackBundle>
                 </configuration>

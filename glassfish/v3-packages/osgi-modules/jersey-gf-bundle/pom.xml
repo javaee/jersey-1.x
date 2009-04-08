@@ -45,7 +45,6 @@
       <artifactId>osgi-modules</artifactId>
       <version>1.0.3-SNAPSHOT</version>
     </parent>
-    <version>1.0.3-SNAPSHOT</version>
     <artifactId>jersey-gf-bundle</artifactId>
     <packaging>jar</packaging> 
     <name>Jersey bundle repackaged as OSGi module for GlassFish</name>
@@ -54,23 +53,75 @@
     <build>
         <plugins>
             <plugin>
-                <groupId>org.apache.felix</groupId>
-                <artifactId>maven-bundle-plugin</artifactId>
-                <configuration>
-                    <instructions>
-                        <Export-Package>com.sun.jersey.*</Export-Package>
-                    </instructions>
-                    <unpackBundle>true</unpackBundle>
-                </configuration>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
                 <executions>
                     <execution>
-                        <id>osgi-bundle</id>
-                        <phase>package</phase>
+                        <id>copy</id>
+                        <phase>generate-sources</phase>
                         <goals>
-                            <goal>bundle</goal>
+                            <goal>copy</goal>
                         </goals>
+                        <configuration>
+                            <stripVersion>true</stripVersion>
+                            <artifactItems>
+                                <artifactItem>
+                                  <groupId>org.glassfish.external</groupId>
+                                  <artifactId>asm-all-repackaged</artifactId>
+                                  <version>3.0-b43</version>
+                                  <type>jar</type>
+                                  <overWrite>false</overWrite>
+                                  <outputDirectory>${osgi.deps.directory}</outputDirectory>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>com.sun.jersey.glassfish.v3.osgi</groupId>
+                                    <artifactId>jackson-asl</artifactId>
+                                    <version>${project.version}</version>
+                                    <type>jar</type>
+                                    <overWrite>false</overWrite>
+                                    <outputDirectory>${osgi.deps.directory}</outputDirectory>
+                                </artifactItem>
+                                 <artifactItem>
+                                    <groupId>com.sun.jersey.glassfish.v3.osgi</groupId>
+                                    <artifactId>jettison</artifactId>
+                                    <version>${project.version}</version>
+                                    <type>jar</type>
+                                    <overWrite>false</overWrite>
+                                    <outputDirectory>${osgi.deps.directory}</outputDirectory>
+                                </artifactItem>
+                                  <artifactItem>
+                                    <groupId>com.sun.jersey</groupId>
+                                    <artifactId>jersey-bundle</artifactId>
+                                    <version>${project.version}</version>
+                                    <type>jar</type>
+                                    <overWrite>false</overWrite>
+                                    <outputDirectory>${osgi.src.directory}</outputDirectory>
+                                </artifactItem>
+                            </artifactItems>
+                        </configuration>
                     </execution>
                 </executions>
+            </plugin>
+            <plugin>
+              <artifactId>maven-antrun-plugin</artifactId>
+              <executions>
+                <execution>
+                  <phase>package</phase>
+              <configuration>
+                    <tasks> <!-- download bnd tool, and create osgified jar file using it -->
+                      <get src="http://www.aqute.biz/repo/biz/aQute/bnd/0.0.249/bnd-0.0.249.jar" dest="${project.build.directory}/bnd.jar"/>
+                      <java jar="${project.build.directory}/bnd.jar" fork="true">
+                        <arg line="wrap -output ${project.build.directory}/osgified.jar -classpath ${osgi.deps.directory}/asm-all-repackaged.jar,${osgi.deps.directory}/jackson-asl.jar,${osgi.deps.directory}/jettison.jar ${osgi.src.directory}/jersey-bundle.jar"/>
+                      </java>
+                      <move file="${project.build.directory}/osgified.jar" tofile="${project.build.directory}/${project.artifactId}-${project.version}.jar"/>
+                      <delete file="${project.build.directory}/bnd.jar"/>
+                    </tasks>
+              </configuration>
+                  <goals>
+                    <goal>run</goal>
+                  </goals>
+                </execution>
+              </executions>
             </plugin>
         </plugins>
     </build>
@@ -79,27 +130,27 @@
           <groupId>org.glassfish.external</groupId>
           <artifactId>asm-all-repackaged</artifactId>
           <version>3.0-b43</version>
-          <optional>true</optional>
         </dependency>
          <dependency>
           <groupId>com.sun.jersey.glassfish.v3.osgi</groupId>
           <artifactId>jackson-asl</artifactId>
-          <version>1.0.3-SNAPSHOT</version>
-          <optional>true</optional>
+          <version>${project.version}</version>
         </dependency>
          <dependency>
           <groupId>com.sun.jersey.glassfish.v3.osgi</groupId>
           <artifactId>jettison</artifactId>
-          <version>1.0.3-SNAPSHOT</version>
-          <optional>true</optional>
+          <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>com.sun.jersey</groupId>
             <artifactId>jersey-bundle</artifactId>
-            <version>1.0.3-SNAPSHOT</version>
-            <optional>true</optional>
+            <version>${project.version}</version>
         </dependency>
     </dependencies>
+    <properties>
+        <osgi.deps.directory>${project.build.directory}/osgi.deps</osgi.deps.directory>
+        <osgi.src.directory>${project.build.directory}/osgi.src</osgi.src.directory>
+    </properties>
     <repositories>
       <repository>
         <id>gf.djn.repo</id>

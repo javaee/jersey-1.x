@@ -52,6 +52,16 @@
         </dependency>
         <dependency>
             <groupId>com.sun.jersey.glassfish.v3.osgi</groupId>
+            <artifactId>jettison</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+         <dependency>
+            <groupId>com.sun.jersey.glassfish.v3.osgi</groupId>
+            <artifactId>jackson-asl</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+         <dependency>
+            <groupId>com.sun.jersey.glassfish.v3.osgi</groupId>
             <artifactId>jersey-gf-bundle</artifactId>
             <version>${project.version}</version>
         </dependency>
