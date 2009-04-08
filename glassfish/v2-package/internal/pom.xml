@@ -62,7 +62,7 @@
         </dependency>
         <dependency>
             <groupId>org.codehaus.jackson</groupId>
-            <artifactId>jackson-lgpl</artifactId>
+            <artifactId>jackson-asl</artifactId>
             <version>0.9.4</version>
             <scope>compile</scope>
         </dependency>
@@ -197,7 +197,7 @@
                                 </artifactItem>
                                  <artifactItem>
                                     <groupId>org.codehaus.jackson</groupId>
-                                    <artifactId>jackson-lgpl</artifactId>
+                                    <artifactId>jackson-asl</artifactId>
                                     <version>0.9.4</version>
                                     <type>jar</type>
                                     <overWrite>false</overWrite>
