@@ -653,7 +653,7 @@ public class WebComponent implements ContainerListener {
         // Assumes such instances are singletons
         // Registered classes have to be interfaces
         javax.naming.Context x = getContext();
-        if (context != null) {
+        if (x != null) {
             Iterator<Class<?>> i = rc.getClasses().iterator();
             while (i.hasNext()) {
                 Class<?> c = i.next();
@@ -664,7 +664,7 @@ public class WebComponent implements ContainerListener {
                     if (o != null) {
                         i.remove();
                         rc.getSingletons().add(o);
-                        LOGGER.log(Level.CONFIG,
+                        LOGGER.log(Level.INFO,
                                 "An instance of the class " + c.getName() +
                                 " is found by JNDI look up using the class name as the JNDI name. " +
                                 "The instance will be registered as a singleton.");
@@ -678,7 +678,7 @@ public class WebComponent implements ContainerListener {
     private javax.naming.Context getContext() {
         try {
             return new InitialContext();
-        } catch (NamingException ex) {
+        } catch (Exception ex) {
             return null;
         }
     }
