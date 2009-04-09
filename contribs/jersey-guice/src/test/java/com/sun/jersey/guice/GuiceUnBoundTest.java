@@ -3,6 +3,7 @@ package com.sun.jersey.guice;
 import com.google.inject.Guice;
 import com.google.inject.Inject;
 import com.google.inject.Injector;
+import com.google.inject.Singleton;
 import com.google.inject.servlet.GuiceServletContextListener;
 import com.google.inject.servlet.ServletModule;
 import com.sun.jersey.api.client.WebResource;
@@ -31,8 +32,12 @@ public class GuiceUnBoundTest extends AbstractGuiceGrizzlyTest {
         
         @QueryParam("x") String x;
 
+        GuiceManagedClass gmc;
+
         @Inject
-        public UnBoundPerRequestResource() {}
+        public UnBoundPerRequestResource(GuiceManagedClass gmc) {
+            this.gmc = gmc;
+        }
 
         @GET
         @Produces("text/plain")
@@ -40,35 +45,32 @@ public class GuiceUnBoundTest extends AbstractGuiceGrizzlyTest {
             assertEquals("unbound/perrequest", ui.getPath());
             assertEquals("x", x);
 
-            return "OK";
+            return gmc.toString();
         }
     }
 
-    public static class GuiceServletConfig extends GuiceServletContextListener {
+    public static class GuiceManagedClass {
+        public String toString() {
+            return "GuiceManagedClass";
+        }
+    }
 
+    public static class TestServletConfig extends JerseyGuiceServletContextListener {
         @Override
-        protected Injector getInjector() {
-            return Guice.createInjector(new ServletModule() {
-
-                @Override
-                protected void configureServlets() {
-                    Map<String, String> params = new HashMap<String, String>();
-                    params.put(ServletContainer.APPLICATION_CONFIG_CLASS, ClassNamesResourceConfig.class.getName());
-                    params.put(ClassNamesResourceConfig.PROPERTY_CLASSNAMES, UnBoundPerRequestResource.class.getName());
-
-                    // For some reason "/*" does not work with Grizzly
-                    // "/*" works fine for Web container deployments with GF
-                    serve("*").with(GuiceContainer.class, params);
-                }
-            });
+        protected ServletModule configure() {
+            return new JerseyServletModule().
+                    path("*").
+                    initParam(ServletContainer.APPLICATION_CONFIG_CLASS, ClassNamesResourceConfig.class.getName()).
+                    initParam(ClassNamesResourceConfig.PROPERTY_CLASSNAMES, UnBoundPerRequestResource.class.getName()).
+                    bindClass(GuiceManagedClass.class);
         }
     }
 
     public void testBoundPerRequestResource() {
-        startServer(GuiceServletConfig.class);
+        startServer(TestServletConfig.class);
 
         WebResource r = resource().path("/unbound/perrequest").queryParam("x", "x");
         String s = r.get(String.class);
-        assertEquals(s, "OK");
+        assertEquals(s, "GuiceManagedClass");
     }
 }
