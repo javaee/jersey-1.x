@@ -41,7 +41,15 @@ mvn clean package
 $AS_HOME/bin/asadmin deploy target/[sample-name].war
 </pre>
 
-<p>You can also run the examples using <a href="http://www.netbeans.org">NetBeans 6.5</a>
+<p>You can also use GlassFish admin console to deploy a generated war file. Just start your GlassFish instance
+and visit <a href="http://localhost:4848">http://localhost:4848</a>. Then select 
+<code>Applications</code>-><code>Web Applications</code> node in the left-hand menu 
+and click the <code>Deploy...</code> button. In the
+following screen, just select an example war file, and click the <code>OK</code> button at the bottom
+of the screen to get it deployed.
+<p> <img src="img/gfv3-admin-console.png"/>
+
+<p>Another option would be to run the examples using <a href="http://www.netbeans.org">NetBeans 6.5</a>
 
 <h2>GFv3 Prelude Notes</h2>
 
