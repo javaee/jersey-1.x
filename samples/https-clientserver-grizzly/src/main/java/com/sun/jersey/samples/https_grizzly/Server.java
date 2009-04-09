@@ -46,8 +46,6 @@ import com.sun.jersey.samples.https_grizzly.auth.SecurityFilter;
 import com.sun.jersey.spi.container.servlet.ServletContainer;
 import java.io.IOException;
 import java.net.URI;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.ws.rs.core.UriBuilder;
 
 /**
@@ -115,10 +113,11 @@ public class Server {
         ((SSLSelectorThread) webServer.getSelectorThread()).setNeedClientAuth(true);
 
         try {
-            // start Grizzly embedded server
+            // start Grizzly embedded server //
+            System.out.println("Jersey app started. Try out " + BASE_URI + "\nHit CTRL + C to stop it...");
             webServer.start();
-        } catch (IOException ex) {
-            Logger.getLogger(Server.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (Exception ex) {
+            System.out.println(ex.getMessage());
         }
     }
 
@@ -126,7 +125,7 @@ public class Server {
         webServer.stop();
     }
 
-    public static void main(String[] args) throws InterruptedException {
+    public static void main(String[] args) throws InterruptedException, IOException {
         startServer();
     }
 }
