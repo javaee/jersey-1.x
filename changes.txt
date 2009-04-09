@@ -1,4 +1,7 @@
 release 1.0.3 (2009-03/04)
+- Fixed issue 163
+  https://jersey.dev.java.net/issues/show_bug.cgi?id=163
+  Guice integration is supported with the jersey-guice module.
 - Fixed issue 245
   https://jersey.dev.java.net/issues/show_bug.cgi?id=245
   When the Apache Adbera Java types are utilized with the jersey-atom-abdera 
