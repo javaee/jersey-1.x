@@ -5,19 +5,11 @@
     <format>zip</format>
   </formats>
   <fileSets>
-    <fileSet>
-      <directory>src/docbook</directory>
-      <outputDirectory></outputDirectory>
-    </fileSet>
-     <fileSet>
-      <directory>${assembly.directory}/docbook</directory>
-      <outputDirectory></outputDirectory>
-    </fileSet>
-    <fileSet>
+   <fileSet>
       <directory>${project.build.directory}/docbook</directory>
       <includes>
-        <include>*.html</include>
-        <include>*.pdf</include>
+        <include>user-guide.html</include>
+        <include>user-guide.pdf</include>
       </includes>
       <outputDirectory></outputDirectory>
     </fileSet>
