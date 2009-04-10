@@ -77,6 +77,9 @@ public final class EJBComponentProviderFactoryInitilizer {
         } catch (SecurityException ex) {
             LOGGER.log(Level.SEVERE, "Security issue when configuring to use the EJB interceptor binding API. JAX-RS EJB support is disabled.", ex);
             return null;
+        } catch (LinkageError ex) {
+            LOGGER.log(Level.SEVERE, "Linkage error when configuring to use the EJB interceptor binding API. JAX-RS EJB support is disabled.", ex);
+            return null;
         }
     }
 }

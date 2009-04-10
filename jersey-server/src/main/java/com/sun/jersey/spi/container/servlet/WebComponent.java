@@ -678,7 +678,9 @@ public class WebComponent implements ContainerListener {
     private javax.naming.Context getContext() {
         try {
             return new InitialContext();
-        } catch (Throwable ex) {
+        } catch (NamingException ex) {
+            return null;
+        } catch (LinkageError ex) {
             return null;
         }
     }
