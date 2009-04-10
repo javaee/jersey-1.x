@@ -76,6 +76,7 @@
  *                     bind(GuiceResource.class);
  *
  *                     serve("/*").with(GuiceContainer.class);
+ *                 }
  *             }
  *         });
  *     }
@@ -133,6 +134,7 @@
  *                     Map&lt;String, String&gt; params = new HashMap&lt;String, String&gt;();
  *                     params.put(PackagesResourceConfig.PROPERTY_PACKAGES, "unbound");
  *                     serve("/*").with(GuiceContainer.class, params);
+ *                 }
  *             }
  *         });
  *     }
