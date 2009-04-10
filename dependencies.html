@@ -5,19 +5,7 @@
 	<TITLE>Dependencies</TITLE>
 	<META NAME="GENERATOR" CONTENT="StarOffice 9  (Unix)">
 	<META NAME="CREATED" CONTENT="0;0">
-	<META NAME="CHANGED" CONTENT="20090222;11422100">
-	<META NAME="Info 1" CONTENT="">
-	<META NAME="Info 2" CONTENT="">
-	<META NAME="Info 3" CONTENT="">
-	<META NAME="Info 4" CONTENT="">
-	<META NAME="Info 1" CONTENT="">
-	<META NAME="Info 2" CONTENT="">
-	<META NAME="Info 3" CONTENT="">
-	<META NAME="Info 4" CONTENT="">
-	<META NAME="Info 1" CONTENT="">
-	<META NAME="Info 2" CONTENT="">
-	<META NAME="Info 3" CONTENT="">
-	<META NAME="Info 4" CONTENT="">
+	<META NAME="CHANGED" CONTENT="20090410;14364700">
 	<META NAME="Info 1" CONTENT="">
 	<META NAME="Info 2" CONTENT="">
 	<META NAME="Info 3" CONTENT="">
@@ -73,6 +61,7 @@ developers the following are provided:</P>
 	has it's own set of dependences.</P>
 	<LI><P>Tools. The set of dependencies required for runtime tooling.</P>
 	<LI><P>Spring. The set of dependencies required for Spring.</P>
+	<LI><P>Guice. The set of dependencies required for Guice.</P>
 </UL>
 <P>All dependences in this documented are referenced by hyper-links</P>
 <H2>Core server</H2>
@@ -127,15 +116,15 @@ classpath to be used for compiling or executing.</BLOCKQUOTE>
 <BLOCKQUOTE STYLE="margin-left: 0in; margin-right: 0in">Specifically
 the <A HREF="http://repo1.maven.org/maven2/asm/asm/3.1/asm-3.1.jar">asm.jar</A>
 dependency is required when either of the following
-<FONT FACE="Courier New, monospace">com.sun.jersey.api.core.ResourceConfig</FONT>
+<A HREF="https://jersey.dev.java.net/nonav/apidocs/1.0.3-SNAPSHOT/jersey/com/sun/jersey/api/core/ResourceConfig.html"><FONT FACE="Courier New, monospace">com.sun.jersey.api.core.ResourceConfig</FONT></A>
 implementations are utilized: 
 </BLOCKQUOTE>
 <UL>
-	<LI><P><FONT FACE="Courier New, monospace">com.sun.jersey.api.core.ClasspathResourceConfig</FONT>;
+	<LI><P><A HREF="https://jersey.dev.java.net/nonav/apidocs/1.0.3-SNAPSHOT/jersey/com/sun/jersey/api/core/ClasspathResourceConfig.html"><FONT FACE="Courier New, monospace">com.sun.jersey.api.core.ClasspathResourceConfig</FONT></A>;
 	or</P>
-	<LI><P><FONT FACE="Courier New, monospace">com.sun.jersey.api.core.PackagesResourceConfig</FONT></P>
+	<LI><P><FONT FACE="Courier New, monospace"><A HREF="https://jersey.dev.java.net/nonav/apidocs/1.0.3-SNAPSHOT/jersey/com/sun/jersey/api/core/PackagesResourceConfig.html">com.sun.jersey.api.core.PackagesResourceConfig</A></FONT></P>
 </UL>
-<P>By default Jersey will utilize the <FONT FACE="Courier New, monospace">ClasspathResourceConfig</FONT>
+<P>By default Jersey will utilize the <A HREF="https://jersey.dev.java.net/nonav/apidocs/1.0.3-SNAPSHOT/jersey/com/sun/jersey/api/core/ClasspathResourceConfig.html"><FONT FACE="Courier New, monospace">ClasspathResourceConfig</FONT></A>
 if an alternative is not specified. If an alternative is specified
 that does not depend on the asm.jar then it is no longer necessary to
 include the asm.jar in the minimum set of required jars.</P>
@@ -173,6 +162,10 @@ dependency on the <A HREF="http://download.java.net/maven/2/com/sun/grizzly/griz
 module.</P>
 <P>Non-maven developers require:</P>
 <BLOCKQUOTE><A NAME="DDE_LINK4"></A><A HREF="http://download.java.net/maven/2/com/sun/grizzly/grizzly-servlet-webserver/1.8.6.4/grizzly-servlet-webserver-1.8.6.4.jar">grizzly-servlet-webserver.jar</A></BLOCKQUOTE>
+<H3>Simple HTTP Web server</H3>
+<P>Maven developers, deploying an application using the Simple HTTP
+Web server, require a dependency on the <A HREF="http://download.java.net/maven/2/com/sun/jersey/contribs/jersey-simple/1.0.3-SNAPSHOT/jersey-simple-1.0.3-SNAPSHOT.pom">jersey-simple</A>
+module.</P>
 <H3>Light weight HTTP server</H3>
 <P><A NAME="DDE_LINK3"></A>Maven developers, using Java SE 5 and
 deploying an application using the light weight HTTP server, require
@@ -182,9 +175,11 @@ module.</P>
 <BLOCKQUOTE><A HREF="http://download.java.net/maven/2/com/sun/net/httpserver/http/20070405/http-20070405.jar">http.jar</A></BLOCKQUOTE>
 <P>Deploying an application using the light weight HTTP server with
 Java SE 6 requires no additional dependences.</P>
-<H3><A NAME="Servlet|outline"></A>Servlet</H3>
+<H3>Servlet</H3>
 <P>Deploying an application on a servlet container requires a
 deployment dependency with that container.</P>
+<P>See the Java documentation <A HREF="https://jersey.dev.java.net/nonav/apidocs/1.0.3-SNAPSHOT/jersey/com/sun/jersey/spi/container/servlet/package-summary.html">here</A>
+on how to configure the servlet container.</P>
 <P>Using servlet:</P>
 <BLOCKQUOTE><FONT FACE="Courier New, monospace">com.sun.jersey.spi.container.servlet.ServletContainer</FONT></BLOCKQUOTE>
 <P><A NAME="DDE_LINK7"></A>requires no additional dependences.</P>
@@ -359,64 +354,18 @@ module. The following dependency needs to be added to the pom:</P>
     &lt;artifactId&gt;jersey-spring&lt;/artifactId&gt;
     &lt;version&gt;1.0.3-SNAPSHOT&lt;/version&gt;
 &lt;/dependency&gt;</PRE><P>
-The servlet:</P>
-<BLOCKQUOTE><FONT FACE="Courier New, monospace">com.sun.jersey.spi.spring.container.servlet.SpringServlet</FONT></BLOCKQUOTE>
-<P>is required to be referenced in the web.xml of the Spring-based
-Web application. Developers wishing to transition from non-Spring to
-Spring support may replace the reference in the web.xml to the
-servlet as documented in the <A HREF="#Servlet|outline">Servlet</A>
-section.</P>
-<P>For example, the web.xml might be as follows:</P>
-<PRE STYLE="margin-left: 0.79in">&lt;web-app&gt;
-    &lt;context-param&gt;
-        &lt;param-name&gt;contextConfigLocation&lt;/param-name&gt;
-        &lt;param-value&gt;classpath:applicationContext.xml&lt;/param-value&gt;
-    &lt;/context-param&gt;
-    &lt;listener&gt;
-        &lt;listener-class&gt;org.springframework.web.context.ContextLoaderListener&lt;/listener-class&gt;
-    &lt;/listener&gt;
-    &lt;servlet&gt;
-        &lt;servlet-name&gt;Jersey Spring Web Application&lt;/servlet-name&gt;
-        &lt;servlet-class&gt;com.sun.jersey.spi.spring.container.servlet.SpringServlet&lt;/servlet-class&gt;
-    &lt;/servlet&gt;
-    &lt;servlet-mapping&gt;
-        &lt;servlet-name&gt;Jersey Spring Web Application&lt;/servlet-name&gt;
-        &lt;url-pattern&gt;/*&lt;/url-pattern&gt;
-    &lt;/servlet-mapping&gt;
-&lt;/web-app&gt;</PRE><P>
-Any root resource classes or provider classes declared by Spring (in
-the XML configuration or by auto-wiring) will be automatically
-registered. It is possible to intermix Spring and non-Spring
-registration of classes by additionally using the normal Jersey-based
-registration mechanisms. For example, in the following web.xml:</P>
-<PRE STYLE="margin-left: 0.79in">&lt;web-app&gt;
-    &lt;context-param&gt;
-        &lt;param-name&gt;contextConfigLocation&lt;/param-name&gt;
-        &lt;param-value&gt;classpath:applicationContext.xml&lt;/param-value&gt;
-    &lt;/context-param&gt;
-    &lt;listener&gt;
-        &lt;listener-class&gt;org.springframework.web.context.ContextLoaderListener&lt;/listener-class&gt;
-    &lt;/listener&gt;
-    &lt;servlet&gt;
-        &lt;servlet-name&gt;Jersey Spring Web Application&lt;/servlet-name&gt;
-        &lt;servlet-class&gt;com.sun.jersey.spi.spring.container.servlet.SpringServlet&lt;/servlet-class&gt;
-        &lt;init-param&gt;
-            &lt;param-name&gt;com.sun.jersey.config.property.packages&lt;/param-name&gt;
-            &lt;param-value&gt;managed&lt;/param-value&gt;
-        &lt;/init-param&gt;
-    &lt;/servlet&gt;
-    &lt;servlet-mapping&gt;
-        &lt;servlet-name&gt;Jersey Spring Web Application&lt;/servlet-name&gt;
-        &lt;url-pattern&gt;/*&lt;/url-pattern&gt;
-    &lt;/servlet-mapping&gt;
-&lt;/web-app&gt;</PRE><P>
-Spring-based classes will be registered and any root resource and
-provider classes in the package <FONT FACE="Courier New, monospace">managed</FONT>
-will also be registered. A class will only be registered at most once
-so it does not matter if there are Spring managed classes present in
-the managed package. Components managed by Spring will not be managed
-by Jersey and the Jersey-based life-cycle annotations on a resource
-class will be ignored. 
-</P>
+See the Java documentation <A HREF="https://jersey.dev.java.net/nonav/apidocs/1.0.3-SNAPSHOT/contribs/jersey-spring/com/sun/jersey/spi/spring/container/servlet/package-summary.html">here</A>
+on how to integrate Jersey-based Web applications with Spring.</P>
+<H2>Guice</H2>
+<P>Maven developers, using Guice 2.0, require a dependency on the
+<A HREF="http://download.java.net/maven/2/com/sun/jersey/contribs/jersey-guice/1.0.3-SNAPSHOT/jersey-guice-1.0.3-SNAPSHOT.pom">jersey-guice</A>
+module. The following dependency needs to be added to the pom:</P>
+<PRE STYLE="margin-left: 0.79in">&lt;dependency&gt;
+    &lt;groupId&gt;com.sun.jersey.contribs&lt;/groupId&gt;
+    &lt;artifactId&gt;jersey-guice&lt;/artifactId&gt;
+    &lt;version&gt;1.0.3-SNAPSHOT&lt;/version&gt;
+&lt;/dependency&gt;</PRE><P>
+See the Java documentation <A HREF="https://jersey.dev.java.net/nonav/apidocs/1.0.3-SNAPSHOT/contribs/jersey-guice/com/sun/jersey/guice/spi/container/servlet/package-summary.html">here</A>
+on how to integrate Jersey-based Web applications with Spring.</P>
 </BODY>
 </HTML>
