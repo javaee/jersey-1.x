@@ -96,6 +96,7 @@
                 <artifactId>maven-javadoc-plugin</artifactId>
                 <configuration>
                     <notimestamp>true</notimestamp>
+                    <excludePackageNames>com.sun.jersey.simple.impl</excludePackageNames>
                 </configuration>
                 <executions>
                     <execution>
