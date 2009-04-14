@@ -34,9 +34,7 @@
  and therefore, elected the GPL Version 2 license, then the option applies
  only if the new code is made subject to such option by the copyright
  holder.
--->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+--><project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>com.sun.jersey</groupId>
@@ -47,12 +45,10 @@
     <artifactId>jersey-bundle</artifactId>
     <packaging>jar</packaging>
     <name>jersey-bundle</name>
-    <description>
-        A bundle containing code of all jar-based modules that provide 
+    <description>A bundle containing code of all jar-based modules that provide 
         JAX-RS and Jersey-related features. Such a bundle is *only intended* for
         developers that do not use Maven's dependency system.
-        The bundle does not include code for contributes, tests and samples.
-    </description>
+        The bundle does not include code for contributes, tests and samples.</description>
     <dependencies>
         <!--<dependency>
             <groupId>com.sun.jersey</groupId>
@@ -185,6 +181,12 @@
             <artifactId>asm</artifactId>
             <version>3.1</version>
             <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>3.8.2</version>
+            <scope>test</scope>
         </dependency>
     </dependencies>
     <build>
@@ -357,6 +359,25 @@
                     </execution>
                 </executions>
             </plugin>
+          <plugin>
+            <groupId>org.codehaus.mojo</groupId>
+            <artifactId>build-helper-maven-plugin</artifactId>
+            <version>1.1</version>
+            <executions>
+              <execution>
+                <id>add-test-source</id>
+                <phase>generate-sources</phase>
+                <goals>
+                  <goal>add-test-source</goal>
+                </goals>
+                <configuration>
+                  <sources>
+                    <source>src-test</source>
+                  </sources>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
            <plugin> <!-- remove the generated src dir-->
                 <artifactId>maven-clean-plugin</artifactId>
                 <configuration>
