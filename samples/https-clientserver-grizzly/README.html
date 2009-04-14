@@ -1,5 +1,5 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
-<html><head><title>HTTPS Client/Server Example - Grizzly</title></head>
+<html><head><meta http-equiv="content-type" content="text/html;charset=utf-8"><title>HTTPS Client/Server Example - Grizzly</title></head>
 
 
     <body style="width: 50em">
@@ -35,7 +35,6 @@
     dcc.getProperties().put(HTTPSProperties.PROPERTY_HTTPS_PROPERTIES, prop);
 
     Client c = Client.create(dcc);</pre>
-</p>
 
 
 <h3>Certificates setup</h3>
@@ -51,11 +50,11 @@ Client certificate is needed too because we're going to use server-side
 certificate authentication as well (yes, after this HTTP Basic authentication
 seems to be kind of redundant but there are some usecases where you might
 want to use them both).
-</p>
+
 <p>
     Generate client key and store it into keystore:<br />
 <pre>keytool -genkey -keystore ./keystore_client -alias clientKey -dname "CN=Client, OU=Jersey, O=Sun Microsystem, L=Prague, ST=Czech Republic, C=CZ"</pre>
-Generate client certificate (this will generate self signed certificate; if you have certification authority and want generate certificate request, use keytool -certreq):<br />
+Generate client certificate (this will generate self-signed certificate; if you have certification authority and want generate certificate request, use keytool -certreq):<br />
 <pre>keytool -export -alias clientKey -rfc -keystore ./keystore_client > ./client.cert</pre>
 Import client certificate to servers truststore:<br />
 <pre>keytool -import -alias clientCert -file ./client.cert -keystore ./truststore_server</pre>
@@ -64,15 +63,14 @@ These steps are similar for server side:
 <pre>keytool -genkey -keystore ./keystore_server -alias serverKey -dname "CN=localhost, OU=Jersey, O=Sun Microsystem, L=Prague, ST=Czech Republic, C=CZ"
 keytool -export -alias serverKey -rfc -keystore ./keystore_server > ./server.cert
 keytool -import -alias serverCert -file ./server.cert -keystore ./truststore_client</pre>
-</p>
 
 
 <h2>Running the Example</h2>
 <p>Run the example as follows:</p>
 <p> test
-<blockquote><code>mvn test</code><p></blockquote></p>
+<blockquote><code>mvn test</code></blockquote></p>
 <p> run 
-<blockquote><code>mvn compile exec:java</code><p></blockquote></p>
+<blockquote><code>mvn compile exec:java</code></blockquote></p>
 <p>From a web browser, visit:<br />
     <b style="color: red">This won't work! *</b>
 <blockquote><code><a href="https://localhost:4463/">https://localhost:4463/</a></code></blockquote>
@@ -82,6 +80,11 @@ authentication - remove line (or set NeedClientAuth to false) <b>((SSLSelectorTh
 in <i>Server.java</i>. Then ignore any security warning (self-signed certificates
     aren't trusted in general) and login with username "user" and password "password".
     Text "JERSEY HTTPS EXAMPLE" should appear.
+    
+    <p>Mozila Firefox and Internet Explorer don't allow users to
+    display any content provided on behalf of any self-signed certificate so you have to use some other
+    browser which allows this (for example Safari or Opera).</p>
+
 
 <h2>References</h2>
 
