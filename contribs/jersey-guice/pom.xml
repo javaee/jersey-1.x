@@ -63,14 +63,19 @@
             <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>com.google.code.guice</groupId>
-            <artifactId>guice</artifactId>
-            <version>2.0-r804</version>
+            <groupId>aopalliance</groupId>
+            <artifactId>aopalliance</artifactId>
+            <version>1.0</version>
+        </dependency>        
+        <dependency>
+            <groupId>org.guiceyfruit</groupId>
+            <artifactId>guice-all</artifactId>
+            <version>2.0-beta-6</version>
         </dependency>
         <dependency>
-            <groupId>com.google.code.guice</groupId>
+            <groupId>org.guiceyfruit</groupId>
             <artifactId>guice-servlet</artifactId>
-            <version>2.0-r804</version>
+            <version>2.0-beta-6</version>
         </dependency>
         <dependency>
             <groupId>com.sun.grizzly</groupId>
@@ -116,7 +121,7 @@
         <repository>
             <id>guice-maven</id>
             <name>guice maven</name>
-            <url>http://guice-maven.googlecode.com/svn/trunk</url>
+            <url>http://guiceyfruit.googlecode.com/svn/repo/releases</url>
         </repository>
     </repositories>
 </project>

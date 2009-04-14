@@ -5,7 +5,7 @@
 	<TITLE>Dependencies</TITLE>
 	<META NAME="GENERATOR" CONTENT="StarOffice 9  (Unix)">
 	<META NAME="CREATED" CONTENT="0;0">
-	<META NAME="CHANGED" CONTENT="20090410;14364700">
+	<META NAME="CHANGED" CONTENT="20090414;13591300">
 	<META NAME="Info 1" CONTENT="">
 	<META NAME="Info 2" CONTENT="">
 	<META NAME="Info 3" CONTENT="">
@@ -122,7 +122,7 @@ implementations are utilized:
 <UL>
 	<LI><P><A HREF="https://jersey.dev.java.net/nonav/apidocs/1.0.3-SNAPSHOT/jersey/com/sun/jersey/api/core/ClasspathResourceConfig.html"><FONT FACE="Courier New, monospace">com.sun.jersey.api.core.ClasspathResourceConfig</FONT></A>;
 	or</P>
-	<LI><P><FONT FACE="Courier New, monospace"><A HREF="https://jersey.dev.java.net/nonav/apidocs/1.0.3-SNAPSHOT/jersey/com/sun/jersey/api/core/PackagesResourceConfig.html">com.sun.jersey.api.core.PackagesResourceConfig</A></FONT></P>
+	<LI><P><A HREF="https://jersey.dev.java.net/nonav/apidocs/1.0.3-SNAPSHOT/jersey/com/sun/jersey/api/core/PackagesResourceConfig.html"><FONT FACE="Courier New, monospace">com.sun.jersey.api.core.PackagesResourceConfig</FONT></A></P>
 </UL>
 <P>By default Jersey will utilize the <A HREF="https://jersey.dev.java.net/nonav/apidocs/1.0.3-SNAPSHOT/jersey/com/sun/jersey/api/core/ClasspathResourceConfig.html"><FONT FACE="Courier New, monospace">ClasspathResourceConfig</FONT></A>
 if an alternative is not specified. If an alternative is specified
@@ -367,5 +367,18 @@ module. The following dependency needs to be added to the pom:</P>
 &lt;/dependency&gt;</PRE><P>
 See the Java documentation <A HREF="https://jersey.dev.java.net/nonav/apidocs/1.0.3-SNAPSHOT/contribs/jersey-guice/com/sun/jersey/guice/spi/container/servlet/package-summary.html">here</A>
 on how to integrate Jersey-based Web applications with Spring.</P>
+<P>Guice support depends on the Guice artifacts distributed with
+<A HREF="http://code.google.com/p/guiceyfruit/">GuiceyFruit</A> a set
+of extensions on top of Guice 2.0,  such as support for Java EE
+artifacts like @PostConstruct/@PreDestroy, @Resource and
+@PersistenceContext. To avail of GuiceyFruit features add the
+following dependency and repository to the pom:</P>
+<PRE STYLE="margin-left: 0.79in">&lt;dependency&gt;
+    &lt;groupId&gt;org.guiceyfruit&lt;/groupId&gt;
+    &lt;artifactId&gt;guiceyfruit&lt;/artifactId&gt;
+    &lt;version&gt;2.0-beta-6&lt;/version&gt;
+&lt;/dependency&gt;<BR><BR>...<BR><BR>&lt;repository&gt;<BR>    &lt;id&gt;guice-maven&lt;/id&gt;<BR>    &lt;name&gt;guice maven&lt;/name&gt;<BR>    &lt;url&gt;<A HREF="http://guiceyfruit.googlecode.com/svn/repo/releases">http://guiceyfruit.googlecode.com/svn/repo/releases</A>&lt;/url&gt;<BR>&lt;/repository&gt;</PRE><P>
+<BR><BR>
+</P>
 </BODY>
 </HTML>
