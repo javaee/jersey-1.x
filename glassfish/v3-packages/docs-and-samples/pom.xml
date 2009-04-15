@@ -40,7 +40,7 @@
     xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.sun.jersey.glassfish.v3</groupId>
-    <version>1.0.3-SNAPSHOT</version>
+    <version>1.1.0-ea-SNAPSHOT</version>
     <artifactId>jersey-gfv3-docs-and-samples</artifactId>
     <name>Jersey GFv3 UC Docs And Examples Package Image</name>
     <packaging>pom</packaging>

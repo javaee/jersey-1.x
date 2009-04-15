@@ -20,7 +20,7 @@ with a Web application.</P>
 <P>First, it is necessary to depend on the correct Jersey artifacts
 as described in the <A HREF="dependencies.html">dependencies</A>
 document.</P>
-<P>Maven developers require a dependency on the <A HREF="http://download.java.net/maven/2/com/sun/jersey/jersey-server/1.0.3-SNAPSHOT/jersey-server-1.0.3-SNAPSHOT.pom">jersey-server</A>
+<P>Maven developers require a dependency on the <A HREF="http://download.java.net/maven/2/com/sun/jersey/jersey-server/1.1.0-ea-SNAPSHOT/jersey-server-1.1.0-ea-SNAPSHOT.pom">jersey-server</A>
 module, the <A HREF="http://download.java.net/maven/2/com/sun/grizzly/grizzly-servlet-webserver/1.8.6.4/grizzly-servlet-webserver-1.8.6.4.pom">grizzly-servlet-webserver</A>
 module and optionally for WADL support if using Java SE 5 the
 <A HREF="http://download.java.net/maven/1/com.sun.xml.bind/poms/jaxb-impl-2.1.pom">jaxb-impl</A>
@@ -28,7 +28,7 @@ module. The following dependencies need to be added to the pom:</P>
 <PRE STYLE="margin-left: 0.79in">&lt;dependency&gt;
     &lt;groupId&gt;com.sun.jersey&lt;/groupId&gt;
     &lt;artifactId&gt;jersey-server&lt;/artifactId&gt;
-    &lt;version&gt;1.0.3-SNAPSHOT&lt;/version&gt;
+    &lt;version&gt;1.1.0-ea-SNAPSHOT&lt;/version&gt;
 &lt;/dependency&gt;&lt;dependency&gt;
     &lt;groupId&gt;com.sun.grizzly&lt;/groupId&gt;
     &lt;artifactId&gt;grizzly-servlet-webserver&lt;/artifactId&gt;
@@ -49,8 +49,8 @@ And the following repositories need to be added to the pom:</P>
 &lt;/repository&gt;</PRE><P>
 Non-maven developers require:</P>
 <BLOCKQUOTE><A HREF="http://download.java.net/maven/2/com/sun/grizzly/grizzly-servlet-webserver/1.8.6.4/grizzly-servlet-webserver-1.8.6.4.jar">grizzly-servlet-webserver.jar</A>,
-<A HREF="http://download.java.net/maven/2/com/sun/jersey/jersey-server/1.0.3-SNAPSHOT/jersey-server-1.0.3-SNAPSHOT.jar">jersey-server.jar</A>,
-<A HREF="http://download.java.net/maven/2/com/sun/jersey/jersey-core/1.0.3-SNAPSHOT/jersey-core-1.0.3-SNAPSHOT.jar">jersey-core.jar</A>,
+<A HREF="http://download.java.net/maven/2/com/sun/jersey/jersey-server/1.1.0-ea-SNAPSHOT/jersey-server-1.1.0-ea-SNAPSHOT.jar">jersey-server.jar</A>,
+<A HREF="http://download.java.net/maven/2/com/sun/jersey/jersey-core/1.1.0-ea-SNAPSHOT/jersey-core-1.1.0-ea-SNAPSHOT.jar">jersey-core.jar</A>,
 <A HREF="http://download.java.net/maven/2/javax/ws/rs/jsr311-api/1.0/jsr311-api-1.0.jar">jsr311-api.jar</A>,
 <A HREF="http://repo1.maven.org/maven2/asm/asm/3.1/asm-3.1.jar">asm.jar</A></BLOCKQUOTE>
 <P>and optionally for WADL support if using Java SE 5:</P>
@@ -66,7 +66,7 @@ explicitly:</BLOCKQUOTE>
 <PRE STYLE="margin-left: 0.79in">&lt;artifact:dependencies pathId=&quot;dependency.classpath&quot;&gt;
   &lt;dependency groupId=&quot;com.sun.jersey&quot; 
               artifactId=&quot;jersey-server&quot;
-              version=&quot;1.0.3-SNAPSHOT&quot;/&gt;
+              version=&quot;1.1.0-ea-SNAPSHOT&quot;/&gt;
   &lt;dependency groupId=&quot;com.sun.grizzly&quot; 
               artifactId=&quot;grizzly-servlet-webserver&quot;
               version=&quot;1.8.6.4&quot;/&gt;
@@ -149,11 +149,11 @@ in your favourite browser.</P>
 <P>Or, from the command line use <CODE>curl:</CODE></P>
 <PRE STYLE="margin-bottom: 0.2in"><CODE>    &gt; curl http://localhost:9998/helloworld</CODE></PRE><H1>
 <A NAME="created"></A>Here's one I created earlier</H1>
-<P>The example code presented above is shipped as the <A HREF="http://download.java.net/maven/2/com/sun/jersey/samples/helloworld/1.0.3-SNAPSHOT/helloworld-1.0.3-SNAPSHOT-project.zip">HelloWorld</A>
+<P>The example code presented above is shipped as the <A HREF="http://download.java.net/maven/2/com/sun/jersey/samples/helloworld/1.1.0-ea-SNAPSHOT/helloworld-1.1.0-ea-SNAPSHOT-project.zip">HelloWorld</A>
 sample in the Java.Net maven repository.</P>
 <P>For developers wishing to get started by deploying a Web
 application an equivalent sample, as a Web application, is shipped as
-the <A HREF="http://download.java.net/maven/2/com/sun/jersey/samples/helloworld-webapp/1.0.3-SNAPSHOT/helloworld-webapp-1.0.3-SNAPSHOT-project.zip">HelloWorld-WebApp</A>
+the <A HREF="http://download.java.net/maven/2/com/sun/jersey/samples/helloworld-webapp/1.1.0-ea-SNAPSHOT/helloworld-webapp-1.1.0-ea-SNAPSHOT-project.zip">HelloWorld-WebApp</A>
 sample.</P>
 </BODY>
 </HTML>

@@ -43,10 +43,10 @@
     <parent>
       <groupId>com.sun.jersey.glassfish.v3.osgi</groupId>
       <artifactId>osgi-modules</artifactId>
-      <version>1.0.3-SNAPSHOT</version>
+      <version>1.1.0-ea-SNAPSHOT</version>
     </parent>
     <!-- i am not sure about the version, tough decision, once the module is stable, should make it 1.0.1 ? -->
-    <version>1.0.3-SNAPSHOT</version>
+    <version>1.1.0-ea-SNAPSHOT</version>
     <artifactId>jettison</artifactId>
     <packaging>jar</packaging> 
     <name>Jettison library repackaged as OSGi bundle for GlassFish</name>

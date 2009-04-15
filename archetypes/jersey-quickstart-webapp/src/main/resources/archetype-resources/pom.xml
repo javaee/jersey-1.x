@@ -76,7 +76,7 @@
         </dependency>
     </dependencies>
     <properties>
-        <jersey-version>1.0.3-SNAPSHOT</jersey-version>
+        <jersey-version>1.1.0-ea-SNAPSHOT</jersey-version>
     </properties>
     <repositories>
         <repository>

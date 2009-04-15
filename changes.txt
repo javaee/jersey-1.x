@@ -1,4 +1,6 @@
-release 1.0.3 (2009-03/04)
+release 1.1.0-ea (2009-05)
+
+release 1.0.3 (2009-04-15)
 - Fixed issue 163
   https://jersey.dev.java.net/issues/show_bug.cgi?id=163
   Guice integration is supported with the jersey-guice module.
