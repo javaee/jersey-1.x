@@ -63,6 +63,8 @@ public final class GrizzlyContainer extends GrizzlyAdapter implements ContainerL
     
     private WebApplication application;
     
+    private String basePath = "/";
+
     public GrizzlyContainer(WebApplication app) throws ContainerException {
         this.application = app;
     }
@@ -109,7 +111,15 @@ public final class GrizzlyContainer extends GrizzlyAdapter implements ContainerL
          */
         final URI requestUri = baseUri.resolve(
                 request.getRequest().unparsedURI().toString());
-        
+
+        /**
+         * Check if the request URI path starts with the base URI path
+         */
+        if (!requestUri.getRawPath().startsWith(basePath)) {
+            response.setStatus(404);
+            return;
+        }
+
         try {
             final ContainerRequest cRequest = new ContainerRequest(
                     _application, 
@@ -125,8 +135,26 @@ public final class GrizzlyContainer extends GrizzlyAdapter implements ContainerL
         }
     }
 
+    @Override
     public void afterService(GrizzlyRequest request, GrizzlyResponse response) 
             throws Exception {
+    }
+
+    @Override
+    public void setResourcesContextPath(String resourcesContextPath) {
+        super.setResourcesContextPath(resourcesContextPath);
+
+        if (resourcesContextPath == null || resourcesContextPath.length() == 0) {
+            basePath = "/";
+        } else if (resourcesContextPath.charAt(resourcesContextPath.length() - 1) != '/') {
+            basePath = resourcesContextPath + "/";
+        } else {
+            basePath = resourcesContextPath;
+        }
+
+        if (basePath.charAt(0) != '/')
+            throw new IllegalArgumentException("The resource context path, " + resourcesContextPath +
+                    ", must start with a '/'");
     }
 
     private URI getBaseUri(GrizzlyRequest request) {
@@ -136,7 +164,7 @@ public final class GrizzlyContainer extends GrizzlyAdapter implements ContainerL
                     null, 
                     request.getServerName(), 
                     request.getServerPort(), 
-                    "/", 
+                    basePath,
                     null, null);
         } catch (URISyntaxException ex) {
             throw new IllegalArgumentException(ex);

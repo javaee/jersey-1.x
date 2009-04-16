@@ -1,4 +1,12 @@
 release 1.1.0-ea (2009-05)
+- Support a base path from which root resource classes are matchd when
+  using the Grizzly adapter. The base path may be set as follows:
+
+    ResourceConfig rc = ...
+    Adapter a = ContainerFactory.createContainer(Adapter.class, rc);
+    (GrizzlyAdapter)adapter).setResourcesContextPath("/basePath");
+
+  By default the base path is "/".
 
 release 1.0.3 (2009-04-15)
 - Fixed issue 163

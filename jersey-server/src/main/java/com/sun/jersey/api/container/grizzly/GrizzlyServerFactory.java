@@ -39,6 +39,7 @@ package com.sun.jersey.api.container.grizzly;
 import com.sun.grizzly.http.SelectorThread;
 import com.sun.grizzly.standalone.StaticStreamAlgorithm;
 import com.sun.grizzly.tcp.Adapter;
+import com.sun.grizzly.tcp.http11.GrizzlyAdapter;
 import com.sun.jersey.api.container.ContainerFactory;
 import com.sun.jersey.api.core.ResourceConfig;
 import com.sun.jersey.core.spi.component.ioc.IoCComponentProviderFactory;
@@ -239,11 +240,14 @@ public final class GrizzlyServerFactory {
      * @param u the URI to create the http server. The URI scheme must be
      *        equal to "http". The URI user information and host
      *        are ignored If the URI port is not present then port 80 will be 
-     *        used. The URI path, query and fragment components are ignored.
+     *        used. The URI path will be set as the resources context root
+     *        value, which must be an empty String or begin with a "/".
+     *        The URI query and fragment components are ignored.
      * @param adapter the Adapter
      * @return the select thread, with the endpoint started
      * @throws IOException if an error occurs creating the container.
-     * @throws IllegalArgumentException if <code>u</code> is null
+     * @throws IllegalArgumentException if <code>u</code> is null or the URI
+     *         path does not begin with a "/".
      */
     public static SelectorThread create(URI u, Adapter adapter) 
             throws IOException, IllegalArgumentException {
@@ -255,6 +259,11 @@ public final class GrizzlyServerFactory {
         if (!scheme.equalsIgnoreCase("http"))
             throw new IllegalArgumentException("The URI scheme, of the URI " + u + 
                     ", must be equal (ignoring case) to 'http'");            
+
+        if (adapter instanceof GrizzlyAdapter) {
+            GrizzlyAdapter ga = (GrizzlyAdapter)adapter;
+            ga.setResourcesContextPath(u.getRawPath());
+        }
         
         final SelectorThread selectorThread = new SelectorThread();
 

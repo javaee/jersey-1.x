@@ -39,12 +39,16 @@ package com.sun.jersey.impl.container.grizzly;
 
 import com.sun.grizzly.http.SelectorThread;
 import com.sun.grizzly.tcp.Adapter;
+import com.sun.jersey.api.client.Client;
+import com.sun.jersey.api.client.ClientResponse;
+import com.sun.jersey.api.client.WebResource;
 import com.sun.jersey.api.container.ContainerFactory;
 import com.sun.jersey.api.container.grizzly.GrizzlyServerFactory;
-import com.sun.jersey.api.core.ResourceConfig;
 import com.sun.jersey.impl.test.util.TestHelper;
 import java.io.IOException;
 import java.net.URI;
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
 import javax.ws.rs.core.UriBuilder;
 import junit.framework.TestCase;
 
@@ -52,37 +56,83 @@ import junit.framework.TestCase;
  *
  * @author Paul.Sandoz@Sun.Com
  */
-public abstract class AbstractGrizzlyServerTester extends TestCase {
-    public static final String CONTEXT = "/test";
+public class ResourcesContextPathTest extends TestCase {
+
+    @Path("resource")
+    public static class Resource {
+        @GET
+        public String get() {
+            return "GET";
+        }
+    }
 
     private SelectorThread selectorThread;
 
     private int port = TestHelper.getEnvVariable("JERSEY_HTTP_PORT", 9997);
     
-    public AbstractGrizzlyServerTester(String name) {
+    public ResourcesContextPathTest(String name) {
         super(name);
     }
-    
-    public UriBuilder getUri() {
-        return UriBuilder.fromUri("http://localhost").port(port).path(CONTEXT).path("/");
+
+    public void testEmpty() {
+        _test("");
+    }
+
+    public void testSlash() {
+        _test("/");
+    }
+
+    public void testSlashPath() {
+        _test("/test");
+    }
+
+    public void testSlashPathSlash() {
+        _test("/test/");
+    }
+
+    public void testNoSlash() {
+        _test(URI.create("http://localhost:" + port));
     }
     
-    public void startServer(Class... resources) {
-        start(ContainerFactory.createContainer(Adapter.class, resources));
+    public void testSubPath404() {
+        start(getUri("/test").build());
+
+        WebResource r = Client.create().resource(getUri("/t").build());
+        ClientResponse cr = r.get(ClientResponse.class);
+        assertEquals(404, cr.getStatus());
+    }
+
+    public void testDifferentPath404() {
+        start(getUri("/test").build());
+
+        WebResource r = Client.create().resource(getUri("/other").build());
+        ClientResponse cr = r.get(ClientResponse.class);
+        assertEquals(404, cr.getStatus());
+    }
+
+    private void _test(String basePath) {
+        _test(getUri(basePath).build());
+    }
+
+    private void _test(URI u) {
+        start(u);
+
+        WebResource r = Client.create().resource(u).path("resource");
+        assertEquals("GET", r.get(String.class));
+    }
+
+    public UriBuilder getUri(String basePath) {
+        return UriBuilder.fromUri("http://localhost").port(port).path(basePath);
     }
     
-    public void startServer(ResourceConfig config) {
-        start(ContainerFactory.createContainer(Adapter.class, config));
-    }
-    
-    private void start(Adapter adapter) {
+    private void start(URI u) {
         if (selectorThread != null && selectorThread.isRunning()){
             stopServer();
         }
 
+        Adapter adapter = ContainerFactory.createContainer(Adapter.class, Resource.class);
         System.out.println("Starting GrizzlyServer port number = " + port);
         
-        URI u = getUri().build();
         try {
             selectorThread = GrizzlyServerFactory.create(u, adapter);
         } catch (IOException e) {
