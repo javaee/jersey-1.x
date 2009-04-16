@@ -40,38 +40,24 @@
     xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
+      <groupId>com.sun.jersey.glassfish.v2</groupId>
       <artifactId>glassfish-packages</artifactId>
-      <groupId>com.sun.jersey.glassfish.v3</groupId>
       <version>1.1.0-ea-SNAPSHOT</version>
     </parent>
-    <artifactId>jersey-gfv3-core</artifactId>
-    <name>Jersey GFv3 UC Core Package Image</name>
+    <artifactId>jersey-gfv2-package</artifactId>
+    <name>Jersey GFv2 UC Main Module</name>
     <packaging>pom</packaging>
     <dependencies>
         <dependency>
-            <groupId>javax.ws.rs</groupId>
-            <artifactId>jsr311-api</artifactId>
-            <version>1.0</version>
-        </dependency>
-        <dependency>
-            <groupId>com.sun.jersey.glassfish.v3.osgi</groupId>
-            <artifactId>jettison</artifactId>
+            <groupId>com.sun.jersey.glassfish.v2.internal</groupId>
+            <artifactId>module_jersey</artifactId>
             <version>${project.version}</version>
-        </dependency>
-         <dependency>
-            <groupId>com.sun.jersey.glassfish.v3.osgi</groupId>
-            <artifactId>jackson-asl</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-         <dependency>
-            <groupId>com.sun.jersey.glassfish.v3.osgi</groupId>
-            <artifactId>jersey-gf-bundle</artifactId>
-            <version>${project.version}</version>
+            <type>zip</type>
         </dependency>
     </dependencies>
     <build>
         <plugins>
-            <plugin> 
+            <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-dependency-plugin</artifactId>
                 <executions>
@@ -82,42 +68,47 @@
                             <goal>copy</goal>
                         </goals>
                         <configuration>
-                          <stripVersion>true</stripVersion>
-                          <artifactItems>
-                               <artifactItem>
-                                    <groupId>javax.ws.rs</groupId>
-                                    <artifactId>jsr311-api</artifactId>
-                                    <version>1.0</version>
-                                    <type>jar</type>
-                                    <overWrite>false</overWrite>
-                                    <outputDirectory>${assembly.directory}</outputDirectory>
-                                </artifactItem>
+                            <stripVersion>true</stripVersion>
+                            <artifactItems>
                                 <artifactItem>
-                                    <groupId>com.sun.jersey.glassfish.v3.osgi</groupId>
-                                    <artifactId>jersey-gf-bundle</artifactId>
+                                    <groupId>com.sun.jersey.glassfish.v2.internal</groupId>
+                                    <artifactId>module_jersey</artifactId>
                                     <version>${project.version}</version>
-                                    <type>jar</type>
+                                    <type>zip</type>
                                     <overWrite>false</overWrite>
-                                    <outputDirectory>${assembly.directory}</outputDirectory>
+                                    <outputDirectory>${assembly.directory}/module</outputDirectory>
                                 </artifactItem>
-                                 <artifactItem>
-                                    <groupId>com.sun.jersey.glassfish.v3.osgi</groupId>
-                                    <artifactId>jackson-asl</artifactId>
-                                    <version>${project.version}</version>
-                                    <type>jar</type>
-                                    <overWrite>false</overWrite>
-                                    <outputDirectory>${assembly.directory}</outputDirectory>
-                                </artifactItem>
-                                 <artifactItem>
-                                    <groupId>com.sun.jersey.glassfish.v3.osgi</groupId>
-                                    <artifactId>jettison</artifactId>
-                                    <version>${project.version}</version>
-                                    <type>jar</type>
-                                    <overWrite>false</overWrite>
-                                    <outputDirectory>${assembly.directory}</outputDirectory>
-                                </artifactItem>
-                           </artifactItems>
+                            </artifactItems>
                         </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <version>1.1</version>
+                <executions>
+                    <execution>
+                        <phase>generate-sources</phase>
+                        <configuration>
+                            <tasks>
+                                <copy file="${basedir}/src/main/resources/Info/info.xml"  tofile="${assembly.directory}/Info/info.xml"/>
+                                <length file="${assembly.directory}/module/module_jersey.zip" property="uc.module.length"/>
+                                <replace file="${assembly.directory}/Info/info.xml" token="@@@@DOWNLOAD_SIZE@@@@" value="${uc.module.length}"/>
+                                <tstamp>
+                                    <format property="uc.module.timestamp" pattern="ss/mm/hh/dd/MM/yyyy"/>
+                                    <format property="uc.module.release.date" pattern="yyyy/MM/dd"/>
+                                    <format property="uc.module.impl.version" pattern="yyyyMMddhhmm"/>
+                                </tstamp>
+                                <replace file="${assembly.directory}/Info/info.xml" token="@@@@MODULE_TIMESTAMP@@@@" value="${uc.module.timestamp}"/>
+                                <replace file="${assembly.directory}/Info/info.xml" token="@@@@MODULE_RELEASE_DATE@@@@" value="${uc.module.release.date}"/>
+                                <replace file="${assembly.directory}/Info/info.xml" token="@@@@MODULE_IMPL_VERSION@@@@" value="${uc.module.impl.version}"/>
+                                <replace file="${assembly.directory}/Info/info.xml" token="@@@@RELEASE_IMPL_VERSION@@@@" value="${project.version}"/>
+                                <jar basedir="${assembly.directory}"  destfile="${project.build.directory}/module_jersey.nbm"/>
+                            </tasks>
+                        </configuration>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
                     </execution>
                 </executions>
             </plugin>
@@ -125,15 +116,15 @@
                 <artifactId>maven-assembly-plugin</artifactId>
                 <configuration>
                     <descriptors>
-                        <descriptor>src/main/assembly/ips.xml</descriptor>
+                        <descriptor>src/main/assembly/module.xml</descriptor>
                     </descriptors>
                 </configuration>
                 <executions>
                     <execution>
-                        <id>make-assembly</id> <!-- this is used for inheritance merges -->
-                        <phase>package</phase> <!-- append to the packaging phase. -->
+                        <id>make-assembly</id>
+                        <phase>package</phase>
                         <goals>
-                            <goal>attached</goal> <!-- goals == mojos -->
+                            <goal>attached</goal>
                         </goals>
                     </execution>
                 </executions>
@@ -142,7 +133,7 @@
     </build>
 
     <properties>
-      <assembly.directory>${project.build.directory}/assembly</assembly.directory>
+        <assembly.directory>${project.build.directory}/assembly</assembly.directory>
     </properties>
 
 </project>

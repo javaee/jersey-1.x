@@ -39,9 +39,13 @@
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
+    <parent>
+      <groupId>com.sun.jersey</groupId>
+      <artifactId>jersey-project</artifactId>
+      <version>1.1.0-ea-SNAPSHOT</version>
+    </parent>
     <groupId>com.sun.jersey.glassfish</groupId>
     <artifactId>glassfish-packages</artifactId>
-    <version>1.1.0-ea-SNAPSHOT</version>
     <name>Jersey GlassFish Packages</name>
     <description>
         GlassFish Update Center Packages
@@ -51,12 +55,4 @@
         <module>v2-package</module>
         <module>v3-packages</module>
     </modules>
-    <distributionManagement>
-        <repository>
-            <uniqueVersion>false</uniqueVersion>
-            <id>java.net-m2-dist-repository</id>
-            <name>java.net-m2-repository</name>
-            <url>java-net:/maven2-repository/trunk/repository/</url>
-        </repository>
-    </distributionManagement>
 </project>
