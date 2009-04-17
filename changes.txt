@@ -13,6 +13,11 @@ release 1.1.0-ea (2009-05)
     compatibility, where both methods exist, valueOf will take precedence except
     for Enums where the precedence is reversed since every enum defines an
     implicit valueOf method that cannot be overridden.
+  - Support Request.evaluatePreconditions() which is to be called when a
+    resource does not exist. If the "If-Match" header is present with
+    one or more entities, or is "*" then a 412 response will be returned
+    otherwise null will be returned.
+    This is primarily of use for implementations of PUT.
 
 release 1.0.3 (2009-04-15)
 - Fixed issue 163

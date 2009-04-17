@@ -535,9 +535,15 @@ public class ContainerRequest implements HttpRequestContext {
         return VariantSelector.selectVariant(this, variants);
     }
 
-    // TODO
     public ResponseBuilder evaluatePreconditions() {
-        throw new UnsupportedOperationException();
+        Set<MatchingEntityTag> matchingTags = HttpHelper.getIfMatch(this);
+        if (matchingTags == null) {
+            return null;
+        }
+
+        // Since the resource does not exist the method must not be
+        // perform and 412 Precondition Failed is returned
+        return Responses.preconditionFailed();
     }
 
     public ResponseBuilder evaluatePreconditions(EntityTag eTag) {

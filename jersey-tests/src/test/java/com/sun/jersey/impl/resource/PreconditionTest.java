@@ -41,7 +41,9 @@ import com.sun.jersey.impl.AbstractResourceTester;
 import javax.ws.rs.Path;
 import com.sun.jersey.api.client.ClientResponse;
 import java.util.GregorianCalendar;
+import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
+import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
 import javax.ws.rs.core.EntityTag;
 import javax.ws.rs.core.Context;
@@ -649,18 +651,6 @@ public class PreconditionTest extends AbstractResourceTester {
         assertEquals(new EntityTag("1", true), response.getEntityTag());
     }
 
-    
-
-
-
-
-
-
-
-
-
-
-
 
     @Path("/")
     public static class LastModifiedEtagResource {
@@ -795,4 +785,103 @@ public class PreconditionTest extends AbstractResourceTester {
                 put(ClientResponse.class);
         assertEquals(200, response.getStatus());
     }
+
+
+    @Path("/")
+    public static class NonExistingResource {
+        @Context Request request;
+
+        @GET
+        public Response doGet() {
+            ResponseBuilder rb = request.evaluatePreconditions();
+            if (rb != null)
+                return rb.build();
+
+            return Response.status(404).build();
+        }
+
+        @PUT
+        public Response doPut() {
+            ResponseBuilder rb = request.evaluatePreconditions();
+            if (rb != null)
+                return rb.build();
+
+            return Response.status(201).build();
+        }
+
+        @POST
+        public Response doPost() {
+            ResponseBuilder rb = request.evaluatePreconditions();
+            if (rb != null)
+                return rb.build();
+
+            return Response.status(201).build();
+        }
+
+        @DELETE
+        public Response doDelete() {
+            ResponseBuilder rb = request.evaluatePreconditions();
+            if (rb != null)
+                return rb.build();
+
+            return Response.status(404).build();
+        }
+    }
+
+    public void testNonExistingResourceIfMatchStar() {
+        initiateWebApplication(NonExistingResource.class);
+        ClientResponse response = resource("/", false).
+                header("If-Match", "*").
+                get(ClientResponse.class);
+        assertEquals(412, response.getStatus());
+        response = resource("/", false).
+                header("If-Match", "*").
+                put(ClientResponse.class);
+        assertEquals(412, response.getStatus());
+        response = resource("/", false).
+                header("If-Match", "*").
+                post(ClientResponse.class);
+        assertEquals(412, response.getStatus());
+        response = resource("/", false).
+                header("If-Match", "*").
+                delete(ClientResponse.class);
+        assertEquals(412, response.getStatus());
+    }
+
+    public void testNonExistingResourceIfMatchEntity() {
+        initiateWebApplication(NonExistingResource.class);
+        ClientResponse response = resource("/", false).
+                header("If-Match", "\"1\"").
+                get(ClientResponse.class);
+        assertEquals(412, response.getStatus());
+        response = resource("/", false).
+                header("If-Match", "\"1\"").
+                put(ClientResponse.class);
+        assertEquals(412, response.getStatus());
+        response = resource("/", false).
+                header("If-Match", "\"1\"").
+                post(ClientResponse.class);
+        assertEquals(412, response.getStatus());
+        response = resource("/", false).
+                header("If-Match", "\"1\"").
+                delete(ClientResponse.class);
+        assertEquals(412, response.getStatus());
+    }
+
+    public void testNonExistingResourceNoIfMatch() {
+        initiateWebApplication(NonExistingResource.class);
+        ClientResponse response = resource("/", false).
+                get(ClientResponse.class);
+        assertEquals(404, response.getStatus());
+        response = resource("/", false).
+                put(ClientResponse.class);
+        assertEquals(201, response.getStatus());
+        response = resource("/", false).
+                post(ClientResponse.class);
+        assertEquals(201, response.getStatus());
+        response = resource("/", false).
+                delete(ClientResponse.class);
+        assertEquals(404, response.getStatus());
+    }
+
 }
