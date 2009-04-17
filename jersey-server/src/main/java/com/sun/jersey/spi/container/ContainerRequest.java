@@ -534,7 +534,12 @@ public class ContainerRequest implements HttpRequestContext {
         
         return VariantSelector.selectVariant(this, variants);
     }
-    
+
+    // TODO
+    public ResponseBuilder evaluatePreconditions() {
+        throw new UnsupportedOperationException();
+    }
+
     public ResponseBuilder evaluatePreconditions(EntityTag eTag) {
         ResponseBuilder r = evaluateIfMatch(eTag);
         if (r != null)
