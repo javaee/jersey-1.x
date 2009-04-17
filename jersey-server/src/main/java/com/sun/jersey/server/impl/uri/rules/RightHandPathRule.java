@@ -40,6 +40,7 @@ package com.sun.jersey.server.impl.uri.rules;
 import com.sun.jersey.api.core.HttpResponseContext;
 import com.sun.jersey.spi.uri.rules.UriRule;
 import com.sun.jersey.spi.uri.rules.UriRuleContext;
+import com.sun.jersey.server.probes.UriRuleProbeProvider;
 import java.util.regex.MatchResult;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
@@ -82,6 +83,8 @@ public class RightHandPathRule implements UriRule {
     }
     
     public final boolean accept(CharSequence path, Object resource, UriRuleContext context) {
+        UriRuleProbeProvider.accept(RightHandPathRule.class.getSimpleName(), path);
+
         String rhpath = getRightHandPath(context.getMatchResult());
         if (rhpath.length() == 0) {
             // Redirect to path ending with a '/' if pattern
@@ -106,7 +109,7 @@ public class RightHandPathRule implements UriRule {
                 context.pushRightHandPathLength(rhpath.length());
             }
         }
-        
+
         // Accept using the right hand path
         return rule.accept(rhpath, resource, context);
     }

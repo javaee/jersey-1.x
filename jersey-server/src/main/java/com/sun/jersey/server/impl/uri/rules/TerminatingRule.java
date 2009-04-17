@@ -39,6 +39,7 @@ package com.sun.jersey.server.impl.uri.rules;
 
 import com.sun.jersey.spi.uri.rules.UriRule;
 import com.sun.jersey.spi.uri.rules.UriRuleContext;
+import com.sun.jersey.server.probes.UriRuleProbeProvider;
 import javax.ws.rs.WebApplicationException;
 
 /**
@@ -51,9 +52,11 @@ import javax.ws.rs.WebApplicationException;
 public class TerminatingRule implements UriRule {
    
     public final boolean accept(CharSequence path, Object resource, UriRuleContext context) {
+        UriRuleProbeProvider.accept(TerminatingRule.class.getSimpleName(), path);
+
         if (context.getResponse().isResponseSet())
             throw new WebApplicationException(context.getResponse().getResponse());
         else
             return false;
+        }
     }    
-}

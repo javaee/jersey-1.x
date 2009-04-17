@@ -40,6 +40,7 @@ package com.sun.jersey.server.impl.uri.rules;
 import com.sun.jersey.api.uri.UriTemplate;
 import com.sun.jersey.spi.uri.rules.UriRule;
 import com.sun.jersey.spi.uri.rules.UriRuleContext;
+import com.sun.jersey.server.probes.UriRuleProbeProvider;
 import java.util.Iterator;
 
 /**
@@ -57,20 +58,22 @@ public final class ResourceClassRule extends BaseRule {
     }
     
     public boolean accept(CharSequence path, Object resource, UriRuleContext context) {
+        UriRuleProbeProvider.accept(ResourceClassRule.class.getSimpleName(), path);
+
         // Set the template values
         pushMatch(context);
 
         // Get the resource instance from the resource class
         resource = context.getResource(resourceClass);
         context.pushResource(resource);
-        
+
         // Match sub-rules on the resource class
         final Iterator<UriRule> matches = context.getRules(resourceClass).
                 match(path, context);
         while (matches.hasNext())
             if (matches.next().accept(path, resource, context))
                 return true;
-        
+
         return false;
     }
 }

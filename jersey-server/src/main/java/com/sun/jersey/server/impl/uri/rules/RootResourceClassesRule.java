@@ -41,6 +41,7 @@ import com.sun.jersey.server.impl.uri.PathPattern;
 import com.sun.jersey.spi.uri.rules.UriRule;
 import com.sun.jersey.spi.uri.rules.UriRuleContext;
 import com.sun.jersey.spi.uri.rules.UriRules;
+import com.sun.jersey.server.probes.UriRuleProbeProvider;
 import java.util.Iterator;
 import java.util.Map;
 
@@ -57,7 +58,9 @@ public final class RootResourceClassesRule implements UriRule {
         this.rules = UriRulesFactory.create(rulesMap);
     }
     
-    public boolean accept(CharSequence path, Object resource, UriRuleContext context) {        
+    public boolean accept(CharSequence path, Object resource, UriRuleContext context) {
+        UriRuleProbeProvider.accept(RootResourceClassesRule.class.getSimpleName(), path);
+
         final Iterator<UriRule> matches = rules.match(path, context);
         while(matches.hasNext())
             if(matches.next().accept(path, resource, context))

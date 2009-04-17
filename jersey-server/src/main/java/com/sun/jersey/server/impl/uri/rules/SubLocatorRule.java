@@ -41,6 +41,7 @@ import com.sun.jersey.api.container.ContainerException;
 import com.sun.jersey.api.container.MappableContainerException;
 import com.sun.jersey.api.uri.UriTemplate;
 import com.sun.jersey.server.impl.inject.AbstractHttpContextInjectable;
+import com.sun.jersey.server.probes.UriRuleProbeProvider;
 import com.sun.jersey.spi.container.ContainerRequest;
 import com.sun.jersey.spi.container.ContainerRequestFilter;
 import com.sun.jersey.spi.container.ContainerResponseFilter;
@@ -82,6 +83,8 @@ public final class SubLocatorRule extends BaseRule {
     }
 
     public boolean accept(CharSequence path, Object resource, UriRuleContext context) {
+        UriRuleProbeProvider.accept(SubLocatorRule.class.getSimpleName(), path);
+
         // Set the template values
         pushMatch(context);
 
@@ -104,7 +107,7 @@ public final class SubLocatorRule extends BaseRule {
         while(matches.hasNext())
             if(matches.next().accept(path, resource, context))
                 return true;
-        
+
         return false;            
     }
     

@@ -44,6 +44,7 @@ import com.sun.jersey.server.impl.model.method.ResourceMethod;
 import com.sun.jersey.api.Responses;
 import com.sun.jersey.core.header.QualitySourceMediaType;
 import com.sun.jersey.server.impl.template.ViewResourceMethod;
+import com.sun.jersey.server.probes.UriRuleProbeProvider;
 import com.sun.jersey.spi.container.ContainerRequest;
 import com.sun.jersey.spi.container.ContainerRequestFilter;
 import com.sun.jersey.spi.uri.rules.UriRule;
@@ -96,7 +97,9 @@ public final class HttpMethodRule implements UriRule {
         return s.toString();
     }
 
-    public boolean accept(CharSequence path, Object resource, UriRuleContext context) {        
+    public boolean accept(CharSequence path, Object resource, UriRuleContext context) {
+        UriRuleProbeProvider.accept(HttpMethodRule.class.getSimpleName(), path);
+
         // If the path is not empty then do not accept
         if (path.length() > 0) return false;
         
