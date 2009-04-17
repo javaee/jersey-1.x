@@ -46,6 +46,7 @@ import java.lang.annotation.Target;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.HttpMethod;
+import javax.ws.rs.OPTIONS;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
@@ -60,12 +61,6 @@ public class OptionsSubResourceMethodTest extends AbstractResourceTester {
     @Retention(RetentionPolicy.RUNTIME)
     @HttpMethod("PATCH")
     public @interface PATCH { 
-    }
-    
-    @Target({ElementType.METHOD})
-    @Retention(RetentionPolicy.RUNTIME)
-    @HttpMethod("options")
-    public @interface OPTIONS { 
     }
     
     public OptionsSubResourceMethodTest(String testName) {
@@ -109,7 +104,7 @@ public class OptionsSubResourceMethodTest extends AbstractResourceTester {
 
         ClientResponse response = resource("/sub").options(
                 ClientResponse.class);
-        String allow = response.getMetadata().getFirst("Allow").toString();
+        String allow = response.getHeaders().getFirst("Allow").toString();
         assertTrue(allow.contains("OPTIONS"));
         assertTrue(allow.contains("GET"));
         assertTrue(allow.contains("PUT"));
@@ -163,7 +158,7 @@ public class OptionsSubResourceMethodTest extends AbstractResourceTester {
 
         ClientResponse response = resource("/sub").options(
                 ClientResponse.class);
-        String allow = response.getMetadata().getFirst("Allow").toString();
+        String allow = response.getHeaders().getFirst("Allow").toString();
         assertTrue(allow.contains("OPTIONS"));
         assertTrue(allow.contains("GET"));
         assertTrue(allow.contains("PUT"));
@@ -192,13 +187,13 @@ public class OptionsSubResourceMethodTest extends AbstractResourceTester {
 
         ClientResponse response = resource("/sub1").options( 
                 ClientResponse.class);
-        String allow = response.getMetadata().getFirst("Allow").toString();
+        String allow = response.getHeaders().getFirst("Allow").toString();
         assertTrue(allow.contains("OPTIONS"));
         assertTrue(allow.contains("GET"));
         assertFalse(allow.contains("PUT"));
         
         response = resource("/sub2").options(ClientResponse.class);
-        allow = response.getMetadata().getFirst("Allow").toString();
+        allow = response.getHeaders().getFirst("Allow").toString();
         assertTrue(allow.contains("OPTIONS"));
         assertTrue(allow.contains("PUT"));
         assertFalse(allow.contains("GET"));

@@ -46,6 +46,7 @@ import java.lang.annotation.Target;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.HttpMethod;
+import javax.ws.rs.OPTIONS;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
@@ -58,14 +59,8 @@ import javax.ws.rs.core.Response;
 public class OptionsTest extends AbstractResourceTester {
     @Target({ElementType.METHOD})
     @Retention(RetentionPolicy.RUNTIME)
-    @HttpMethod("PATCH")
+    @HttpMethod("patch")
     public @interface PATCH { 
-    }
-    
-    @Target({ElementType.METHOD})
-    @Retention(RetentionPolicy.RUNTIME)
-    @HttpMethod("options")
-    public @interface OPTIONS { 
     }
     
     public OptionsTest(String testName) {
@@ -104,7 +99,7 @@ public class OptionsTest extends AbstractResourceTester {
 
         ClientResponse response = resource("/").options(
                 ClientResponse.class);
-        String allow = response.getMetadata().getFirst("Allow").toString();
+        String allow = response.getHeaders().getFirst("Allow").toString();
         assertTrue(allow.contains("OPTIONS"));
         assertTrue(allow.contains("GET"));
         assertTrue(allow.contains("PUT"));
@@ -153,7 +148,7 @@ public class OptionsTest extends AbstractResourceTester {
 
         ClientResponse response = resource("/").options(
                 ClientResponse.class);
-        String allow = response.getMetadata().getFirst("Allow").toString();
+        String allow = response.getHeaders().getFirst("Allow").toString();
         assertTrue(allow.contains("OPTIONS"));
         assertTrue(allow.contains("GET"));
         assertTrue(allow.contains("PUT"));
@@ -161,6 +156,6 @@ public class OptionsTest extends AbstractResourceTester {
         assertTrue(allow.contains("DELETE"));
         assertTrue(allow.contains("PATCH"));
         
-        assertEquals("OVERRIDE", response.getMetadata().getFirst("X-TEST"));
+        assertEquals("OVERRIDE", response.getHeaders().getFirst("X-TEST"));
     }
 }
