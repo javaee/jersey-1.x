@@ -37,7 +37,6 @@
 
 package com.sun.jersey.impl.methodparams;
 
-import com.sun.jersey.impl.AbstractResourceTester;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.Path;

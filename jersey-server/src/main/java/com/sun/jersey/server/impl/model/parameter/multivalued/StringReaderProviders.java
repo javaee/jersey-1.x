@@ -48,8 +48,6 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 import java.text.ParseException;
 import java.util.Date;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.ws.rs.WebApplicationException;
 
 /**
@@ -58,6 +56,28 @@ import javax.ws.rs.WebApplicationException;
  */
 public class StringReaderProviders {
 
+    private static abstract class AbstractStringReader implements StringReader {
+
+        public Object fromString(String value) {
+            try {
+                return _fromString(value);
+            } catch (InvocationTargetException ex) {
+                Throwable target = ex.getTargetException();
+                if (target instanceof WebApplicationException) {
+                    throw (WebApplicationException)target;
+                } else {
+                    throw new ContainerException(target);
+                }
+            } catch (RuntimeException ex) {
+                throw new ContainerException(ex);
+            } catch (Exception ex) {
+                throw new ContainerException(ex);
+            }
+        }
+
+        protected abstract Object _fromString(String value) throws Exception;
+    }
+
     public static class StringConstructor implements StringReaderProvider {
 
         public StringReader getStringReader(Class type, Type genericType, Annotation[] annotations) {
@@ -65,29 +85,21 @@ public class StringReaderProviders {
             if (constructor == null)
                 return null;
 
-            return new StringReader() {
-
+            return new AbstractStringReader() {
+                @Override
                 public Object fromString(String value) {
                     if (value.length() == 0)
                         return null;
-                    try {
-                        return constructor.newInstance(value);
-                    } catch (InvocationTargetException ex) {
-                        Throwable target = ex.getTargetException();
-                        if (target instanceof WebApplicationException) {
-                            throw (WebApplicationException)target;
-                        } else {
-                            throw new ContainerException(target);
-                        }
-                    } catch (RuntimeException ex) {
-                        throw new ContainerException(ex);
-                    } catch (Exception ex) {
-                        throw new ContainerException(ex);
-                    }
+                    
+                    return super.fromString(value);
+                }
+
+                @Override
+                protected Object _fromString(String value) throws Exception {
+                    return constructor.newInstance(value);
                 }
             };
         }
-
     }
 
     public static class TypeValueOf implements StringReaderProvider {
@@ -97,28 +109,38 @@ public class StringReaderProviders {
             if (valueOf == null)
                 return null;
 
-            return new StringReader() {
-
-                public Object fromString(String value) {
-                    try {
-                        return valueOf.invoke(null, value);
-                    } catch (InvocationTargetException ex) {
-                        Throwable target = ex.getTargetException();
-                        if (target instanceof WebApplicationException) {
-                            throw (WebApplicationException)target;
-                        } else {
-                            throw new ContainerException(target);
-                        }
-                    } catch (RuntimeException ex) {
-                        throw new ContainerException(ex);
-                    } catch (Exception ex) {
-                        throw new ContainerException(ex);
-                    }
+            return new AbstractStringReader() {
+                public Object _fromString(String value) throws Exception {
+                    return valueOf.invoke(null, value);
                 }
-
             };
         }
+    }
 
+    public static class TypeFromString implements StringReaderProvider {
+
+        public StringReader getStringReader(Class type, Type genericType, Annotation[] annotations) {
+            final Method fromString = ReflectionHelper.getFromStringStringMethod(type);
+            if (fromString == null)
+                return null;
+
+            return new AbstractStringReader() {
+                public Object _fromString(String value) throws Exception {
+                    return fromString.invoke(null, value);
+                }
+            };
+        }
+    }
+
+    public static class TypeFromStringEnum extends TypeFromString {
+
+        @Override
+        public StringReader getStringReader(Class type, Type genericType, Annotation[] annotations) {
+            if (!Enum.class.isAssignableFrom(type))
+                return null;
+            
+            return super.getStringReader(type, genericType, annotations);
+        }
     }
 
     public static class DateProvider implements StringReaderProvider {
@@ -138,6 +160,5 @@ public class StringReaderProviders {
                 }
             };
         }
-
     }
 }

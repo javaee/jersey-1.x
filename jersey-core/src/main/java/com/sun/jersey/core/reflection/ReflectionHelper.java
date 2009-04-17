@@ -209,7 +209,26 @@ public class ReflectionHelper {
     public static Method getValueOfStringMethod(Class c) {
         try {
             Method m = c.getDeclaredMethod("valueOf", String.class);
-            if (!Modifier.isStatic(m.getModifiers())) {
+            if (!Modifier.isStatic(m.getModifiers()) && m.getReturnType() == c) {
+                return null;
+            }
+            return m;
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    /**
+     * Get the static fromString(String ) method.
+     *
+     * @param c The class to obtain the method.
+     * @return the method, otherwise null if the method is not present.
+     */
+    @SuppressWarnings("unchecked")
+    public static Method getFromStringStringMethod(Class c) {
+        try {
+            Method m = c.getDeclaredMethod("fromString", String.class);
+            if (!Modifier.isStatic(m.getModifiers()) && m.getReturnType() == c) {
                 return null;
             }
             return m;

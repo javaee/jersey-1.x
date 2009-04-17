@@ -8,8 +8,11 @@ release 1.1.0-ea (2009-05)
 
   By default the base path is "/".
 - Integrated JSR 311 API 1.1-SNAPSHOT
-
-
+  - Require support for static fromString method in addition to existing valueOf
+    method for types used as parameters in resource methods. For backwards
+    compatibility, where both methods exist, valueOf will take precedence except
+    for Enums where the precedence is reversed since every enum defines an
+    implicit valueOf method that cannot be overridden.
 
 release 1.0.3 (2009-04-15)
 - Fixed issue 163
