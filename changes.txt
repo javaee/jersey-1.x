@@ -18,6 +18,16 @@ release 1.1.0-ea (2009-05)
     one or more entities, or is "*" then a 412 response will be returned
     otherwise null will be returned.
     This is primarily of use for implementations of PUT.
+  - Unify the the value of @Consumes and @Produces as follows:
+
+        /**
+         * A list of media types. Each entry may specify a single type or consist
+         * of a comma separated list of types. E.g. {"image/jpeg,image/gif",
+         * "image/png"}. Use of the comma-separated form allows definition of a
+         * common string constant for use on multiple targets.
+         */
+        String[] value() default "*/*";
+
 
 release 1.0.3 (2009-04-15)
 - Fixed issue 163

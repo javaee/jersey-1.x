@@ -72,25 +72,28 @@ public class MediaTypeProvider implements HeaderDelegateProvider<MediaType> {
             throw new IllegalArgumentException("Media type is null");
         
         try {
-            HttpHeaderReader reader = HttpHeaderReader.newInstance(header);
-            // Skip any white space
-            reader.hasNext();
-
-            // Get the type
-            String type = reader.nextToken();
-            reader.nextSeparator('/');
-            // Get the subtype
-            String subType = reader.nextToken();
-
-            Map<String, String> params = null;
-
-            if (reader.hasNext())
-                params = HttpHeaderReader.readParameters(reader);
-
-            return new MediaType(type, subType, params);
+            return valueOf(HttpHeaderReader.newInstance(header));
         } catch (ParseException ex) {
             throw new IllegalArgumentException(
                     "Error parsing media type '" + header + "'", ex);
         }
+    }
+
+    public static MediaType valueOf(HttpHeaderReader reader) throws ParseException {
+        // Skip any white space
+        reader.hasNext();
+
+        // Get the type
+        String type = reader.nextToken();
+        reader.nextSeparator('/');
+        // Get the subtype
+        String subType = reader.nextToken();
+
+        Map<String, String> params = null;
+
+        if (reader.hasNext())
+            params = HttpHeaderReader.readParameters(reader);
+
+        return new MediaType(type, subType, params);
     }
 }

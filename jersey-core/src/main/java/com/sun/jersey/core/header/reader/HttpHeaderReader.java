@@ -45,6 +45,7 @@ import com.sun.jersey.core.header.HttpDateFormat;
 import com.sun.jersey.core.header.MatchingEntityTag;
 import com.sun.jersey.core.header.QualityFactor;
 import com.sun.jersey.core.header.QualitySourceMediaType;
+import com.sun.jersey.core.impl.provider.header.MediaTypeProvider;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -56,6 +57,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import javax.ws.rs.core.Cookie;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.NewCookie;
 
 /**
@@ -291,6 +293,20 @@ public abstract class HttpHeaderReader {
     }
 
 
+    private static final ListElementCreator<MediaType> MEDIA_TYPE_CREATOR =
+            new ListElementCreator<MediaType>() {
+        public MediaType create(HttpHeaderReader reader) throws ParseException {
+            return MediaTypeProvider.valueOf(reader);
+        }
+    };
+
+    public static List<MediaType> readMediaTypes(List<MediaType> l, String header) throws ParseException {
+        return HttpHeaderReader.readList(
+                l,
+                MEDIA_TYPE_CREATOR,
+                header);
+    }
+
     private static final ListElementCreator<AcceptableMediaType> ACCEPTABLE_MEDIA_TYPE_CREATOR =
             new ListElementCreator<AcceptableMediaType>() {
         public AcceptableMediaType create(HttpHeaderReader reader) throws ParseException {
@@ -443,7 +459,11 @@ public abstract class HttpHeaderReader {
 
     public static <T> List<T> readList(ListElementCreator<T> c,
             String header) throws ParseException {
-        List<T> l = new ArrayList<T>();
+        return readList(new ArrayList<T>(), c, header);
+    }
+
+    public static <T> List<T> readList(List<T> l, ListElementCreator<T> c,
+            String header) throws ParseException {
         HttpHeaderReader reader = new HttpHeaderReaderImpl(header);
         HttpHeaderListAdapter adapter = new HttpHeaderListAdapter(reader);
         while(reader.hasNext()) {

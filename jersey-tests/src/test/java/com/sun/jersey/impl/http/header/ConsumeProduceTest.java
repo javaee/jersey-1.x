@@ -78,7 +78,48 @@ public class ConsumeProduceTest extends TestCase {
         checkMediaTypes(l);
     }
     
-    public void checkMediaTypes(List<MediaType> l) {
+    @Consumes("*/*, a/*, b/*, a/b, c/d")
+    class ConsumesStringClass {
+    }
+
+    @Produces("*/*, a/*, b/*, a/b, c/d")
+    class ProducesStringClass {
+    }
+
+    public void testConsumesString() {
+        Consumes c = ConsumesStringClass.class.getAnnotation(Consumes.class);
+        List<MediaType> l = MediaTypes.createMediaTypes(c);
+        checkMediaTypes(l);
+    }
+
+    public void testProducesString() {
+        Produces p = ProducesStringClass.class.getAnnotation(Produces.class);
+        List<MediaType> l = MediaTypes.createMediaTypes(p);
+        checkMediaTypes(l);
+    }
+
+    @Consumes({"*/*, a/*", "b/*, a/b", "c/d"})
+    class ConsumesStringsClass {
+    }
+
+    @Produces({"*/*, a/*", "b/*, a/b", "c/d"})
+    class ProducesStringsClass {
+    }
+
+
+    public void testConsumesStrings() {
+        Consumes c = ConsumesStringsClass.class.getAnnotation(Consumes.class);
+        List<MediaType> l = MediaTypes.createMediaTypes(c);
+        checkMediaTypes(l);
+    }
+
+    public void testProducesStrings() {
+        Produces p = ProducesStringsClass.class.getAnnotation(Produces.class);
+        List<MediaType> l = MediaTypes.createMediaTypes(p);
+        checkMediaTypes(l);
+    }
+
+    void checkMediaTypes(List<MediaType> l) {
         assertEquals(5, l.size());
         assertEquals("a", l.get(0).getType());
         assertEquals("b", l.get(0).getSubtype());
@@ -91,5 +132,4 @@ public class ConsumeProduceTest extends TestCase {
         assertEquals("*", l.get(4).getType());
         assertEquals("*", l.get(4).getSubtype());
     }
-    
 }

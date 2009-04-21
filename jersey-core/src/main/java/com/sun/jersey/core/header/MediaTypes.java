@@ -204,12 +204,16 @@ public class MediaTypes {
      */
     public static List<MediaType> createMediaTypes(String[] mediaTypes) {
         List<MediaType> l = new ArrayList<MediaType>();
-        for (String mediaType : mediaTypes) {
-            l.add(MediaType.valueOf(mediaType));
-        }
+        try {
+            for (String mediaType : mediaTypes) {
+                HttpHeaderReader.readMediaTypes(l, mediaType);
+            }
 
-        Collections.sort(l, MEDIA_TYPE_COMPARATOR);
-        return l;
+            Collections.sort(l, MEDIA_TYPE_COMPARATOR);
+            return l;
+        } catch (ParseException ex) {
+            throw new IllegalArgumentException(ex);
+        }
     }
 
 
