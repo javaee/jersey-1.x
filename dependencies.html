@@ -5,7 +5,7 @@
 	<TITLE>Dependencies</TITLE>
 	<META NAME="GENERATOR" CONTENT="StarOffice 9  (Unix)">
 	<META NAME="CREATED" CONTENT="0;0">
-	<META NAME="CHANGED" CONTENT="20090414;13591300">
+	<META NAME="CHANGED" CONTENT="20090421;10352600">
 	<META NAME="Info 1" CONTENT="">
 	<META NAME="Info 2" CONTENT="">
 	<META NAME="Info 3" CONTENT="">
@@ -313,9 +313,8 @@ module. The following dependency needs to be added to the pom:</P>
     &lt;artifactId&gt;jersey-multipart&lt;/artifactId&gt;
     &lt;version&gt;1.1.0-ea-SNAPSHOT&lt;/version&gt;
 &lt;/dependency&gt;</PRE><P>
-Non-maven developers require if not utilizing Java EE 5:</P>
-<BLOCKQUOTE><A NAME="DDE_LINK6"></A><A HREF="http://download.java.net/maven/1/javax.mail/jars/mail-1.4.jar">mail.jar</A>,
-<A HREF="http://download.java.net/maven/1/javax.activation/jars/activation-1.1.jar">activation.jar</A>,
+Non-maven developers require:</P>
+<BLOCKQUOTE><A NAME="DDE_LINK6"></A><A HREF="http://download.java.net/maven/2/org/jvnet/mimepull/1.3/mimepull-1.3.jar">mimepull.jar</A>,
 <A HREF="http://download.java.net/maven/2/com/sun/jersey/contribs/jersey-multipart/1.1.0-ea-SNAPSHOT/jersey-multipart-1.1.0-ea-SNAPSHOT.jar">jersey-multipart.jar</A></BLOCKQUOTE>
 <H3>Activation</H3>
 <P>The use of the Java type <FONT FACE="Courier New, monospace">javax.activation.DataSource</FONT>
@@ -369,7 +368,7 @@ See the Java documentation <A HREF="https://jersey.dev.java.net/nonav/apidocs/1.
 on how to integrate Jersey-based Web applications with Spring.</P>
 <P>Guice support depends on the Guice artifacts distributed with
 <A HREF="http://code.google.com/p/guiceyfruit/">GuiceyFruit</A> a set
-of extensions on top of Guice 2.0,  such as support for Java EE
+of extensions on top of Guice 2.0, such as support for Java EE
 artifacts like @PostConstruct/@PreDestroy, @Resource and
 @PersistenceContext. To avail of GuiceyFruit features add the
 following dependency and repository to the pom:</P>
@@ -377,7 +376,13 @@ following dependency and repository to the pom:</P>
     &lt;groupId&gt;org.guiceyfruit&lt;/groupId&gt;
     &lt;artifactId&gt;guiceyfruit&lt;/artifactId&gt;
     &lt;version&gt;2.0-beta-6&lt;/version&gt;
-&lt;/dependency&gt;<BR><BR>...<BR><BR>&lt;repository&gt;<BR>    &lt;id&gt;guice-maven&lt;/id&gt;<BR>    &lt;name&gt;guice maven&lt;/name&gt;<BR>    &lt;url&gt;<A HREF="http://guiceyfruit.googlecode.com/svn/repo/releases">http://guiceyfruit.googlecode.com/svn/repo/releases</A>&lt;/url&gt;<BR>&lt;/repository&gt;</PRE><P>
+&lt;/dependency&gt;
+...
+&lt;repository&gt;
+    &lt;id&gt;guice-maven&lt;/id&gt;
+    &lt;name&gt;guice maven&lt;/name&gt;
+    &lt;url&gt;<A HREF="http://guiceyfruit.googlecode.com/svn/repo/releases">http://guiceyfruit.googlecode.com/svn/repo/releases</A>&lt;/url&gt;
+&lt;/repository&gt;</PRE><P>
 <BR><BR>
 </P>
 </BODY>
