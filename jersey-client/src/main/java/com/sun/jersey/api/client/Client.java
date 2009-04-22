@@ -347,7 +347,7 @@ public class Client extends Filterable implements ClientHandler {
     }
 
     /**
-     * Set the read timeout interval.
+     * Set the read timeout interval, in milliseconds.
      *
      * This method is the functional equivalent to setting the property
      * {@link ClientConfig#PROPERTY_READ_TIMEOUT} on the property bag
@@ -361,7 +361,7 @@ public class Client extends Filterable implements ClientHandler {
     }
 
     /**
-     * Set the connect timeout interval.
+     * Set the connect timeout interval, in milliseconds.
      *
      * This method is the functional equivalent to setting the property
      * {@link ClientConfig#PROPERTY_CONNECT_TIMEOUT} on the property bag

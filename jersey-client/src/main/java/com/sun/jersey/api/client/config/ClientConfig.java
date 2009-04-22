@@ -77,7 +77,7 @@ public interface ClientConfig {
             "com.sun.jersey.client.property.followRedirects";
     
     /**
-     * Read timeout interval property.
+     * Read timeout interval property, in milliseconds.
      * 
      * The value MUST be an instance of {@link java.lang.Integer}.
      * 
@@ -89,7 +89,7 @@ public interface ClientConfig {
             "com.sun.jersey.client.property.readTimeout";
     
     /**
-     * Connect timeout interval property.
+     * Connect timeout interval property, in milliseconds.
      * 
      * The value MUST be an instance of {@link java.lang.Integer}.
      * 
