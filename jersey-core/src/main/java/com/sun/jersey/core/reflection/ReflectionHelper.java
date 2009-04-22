@@ -252,6 +252,110 @@ public class ReflectionHelper {
         }
     }    
 
+
+    /**
+     * A tuple consisting of a concrete class, declaring class that declares a
+     * generic interface type.
+     */
+    public static class DeclaringClassInterfacePair {
+        public final Class concreteClass;
+
+        public final Class declaringClass;
+
+        public final Type genericInterface;
+
+        private DeclaringClassInterfacePair(Class concreteClass, Class declaringClass, Type genericInteface) {
+            this.concreteClass = concreteClass;
+            this.declaringClass = declaringClass;
+            this.genericInterface = genericInteface;
+        }
+    }
+
+    /**
+     * Get the parameterized class arguments for a declaring class that
+     * declares a generic interface type.
+     *
+     * @param p the declaring class
+     * @return the parameterized class arguments, or null if the generic
+     *         interface type is not a parameterized type.
+     */
+    public static Class[] getParameterizedClassArguments(DeclaringClassInterfacePair p) {
+        if (p.genericInterface instanceof ParameterizedType) {
+            ParameterizedType pt = (ParameterizedType)p.genericInterface;
+            Type[] as = pt.getActualTypeArguments();
+            Class[] cas = new Class[as.length];
+
+            for (int i = 0; i < as.length; i++) {
+                Type a = as[i];
+                if (a instanceof Class) {
+                    cas[i] = (Class)a;
+                } else if (a instanceof ParameterizedType) {
+                    pt = (ParameterizedType)a;
+                    cas[i] = (Class)pt.getRawType();
+                } else if (a instanceof TypeVariable) {
+                    ClassTypePair ctp = resolveTypeVariable(p.concreteClass, p.declaringClass, (TypeVariable)a);
+                    cas[i] = ctp.c;
+                }
+            }
+            return cas;
+        } else {
+            return null;
+        }
+    }
+    
+    /**
+     * Find the declaring class that implements or extends an interface.
+     *
+     * @param concrete the concrete class than directly or indirectly
+     *        implements or extends an interface class.
+     * @param iface the interface class.
+     * @return the tuple of the declaring class and the generic interface
+     *         type.
+     */
+    public static DeclaringClassInterfacePair getClass(Class concrete, Class iface) {
+        return getClass(concrete, iface, concrete);
+    }
+
+    private static DeclaringClassInterfacePair getClass(Class concrete, Class iface, Class c) {
+        Type[] gis = c.getGenericInterfaces();
+        DeclaringClassInterfacePair p = getType(concrete, iface, c, gis);
+        if (p != null)
+            return p;
+
+        c = c.getSuperclass();
+        if (c == null || c == Object.class)
+            return null;
+
+        return getClass(concrete, iface, c);
+    }
+
+    private static DeclaringClassInterfacePair getType(Class concrete, Class iface, Class c, Type[] ts) {
+        for (Type t : ts) {
+            DeclaringClassInterfacePair p = getType(concrete, iface, c, t);
+            if (p != null)
+                return p;
+        }
+        return null;
+    }
+
+    private static DeclaringClassInterfacePair getType(Class concrete, Class iface, Class c, Type t) {
+        if (t instanceof Class) {
+            if (t == iface) {
+                return new DeclaringClassInterfacePair(concrete, c, t);
+            } else {
+                return getClass(concrete, iface, (Class)t);
+            }
+        } else if (t instanceof ParameterizedType) {
+            ParameterizedType pt = (ParameterizedType)t;
+            if (pt.getRawType() == iface) {
+                return new DeclaringClassInterfacePair(concrete, c, t);
+            } else {
+                return getClass(concrete, iface, (Class)pt.getRawType());
+            }
+        }
+        return null;
+    }
+
     /**
      * A tuple consisting of a class and type of the class.
      */
@@ -289,14 +393,36 @@ public class ReflectionHelper {
         return resolveTypeVariable(c, dc, tv, new HashMap<TypeVariable, Type>());
     }
     
-    private static ClassTypePair resolveTypeVariable(Class c, Class dc, TypeVariable tv, 
+    private static ClassTypePair resolveTypeVariable(Class c, Class dc, TypeVariable tv,
             Map<TypeVariable, Type> map) {
-        ParameterizedType pt = (ParameterizedType)c.getGenericSuperclass();
+        Type[] gis = c.getGenericInterfaces();
+        for (Type gi : gis) {
+            if (gi instanceof ParameterizedType) {
+                // process pt of interface
+                ParameterizedType pt = (ParameterizedType)gi;
+                ClassTypePair ctp = resolveTypeVariable(pt, (Class)pt.getRawType(), dc, tv, map);
+                if (ctp != null)
+                    return ctp;
+            }
+        }
+
+        Type gsc = c.getGenericSuperclass();
+        if (gsc instanceof ParameterizedType) {
+            // process pt of class
+            ParameterizedType pt = (ParameterizedType)gsc;
+            return resolveTypeVariable(pt, c.getSuperclass(), dc, tv, map);
+        } else if (gsc instanceof Class) {
+            return resolveTypeVariable(c.getSuperclass(), dc, tv, map);
+        }
+        return null;
+    }
+
+    private static ClassTypePair resolveTypeVariable(ParameterizedType pt, Class c, Class dc, TypeVariable tv,
+            Map<TypeVariable, Type> map) {
         Type[] typeArguments = pt.getActualTypeArguments();
-        
-        Class sc = c.getSuperclass();        
-        TypeVariable[] typeParameters = sc.getTypeParameters();
-        
+
+        TypeVariable[] typeParameters = c.getTypeParameters();
+
         Map<TypeVariable, Type> submap = new HashMap<TypeVariable, Type>();
         for (int i = 0; i < typeArguments.length; i++) {
             // Substitute a type variable with the Java class
@@ -307,8 +433,8 @@ public class ReflectionHelper {
                 submap.put(typeParameters[i], typeArguments[i]);
             }
         }
-        
-        if (sc == dc) {
+
+        if (c == dc) {
             Type t = submap.get(tv);
             if (t instanceof Class) {
                 return new ClassTypePair((Class)t);
@@ -317,12 +443,12 @@ public class ReflectionHelper {
                 if (t instanceof Class) {
                     c = (Class)t;
                     try {
-                        // TODO is there a better way to get the Class object 
+                        // TODO is there a better way to get the Class object
                         // representing an array
                         Object o = Array.newInstance(c, 0);
                         return new ClassTypePair(o.getClass());
                     } catch (Exception e) {
-                    } 
+                    }
                     return null;
                 } else {
                     return null;
@@ -331,13 +457,13 @@ public class ReflectionHelper {
                 pt = (ParameterizedType)t;
                 if (pt.getRawType() instanceof Class) {
                     return new ClassTypePair((Class)pt.getRawType(), pt);
-                } else 
+                } else
                     return null;
             } else {
                 return null;
             }
-        } else {    
-            return resolveTypeVariable(sc, dc, tv, submap);
+        } else {
+            return resolveTypeVariable(c, dc, tv, submap);
         }
-    }    
+    }
 }

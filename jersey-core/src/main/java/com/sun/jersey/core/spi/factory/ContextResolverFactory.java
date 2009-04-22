@@ -38,7 +38,6 @@ package com.sun.jersey.core.spi.factory;
 
 import com.sun.jersey.core.header.MediaTypes;
 import com.sun.jersey.core.spi.component.ProviderServices;
-import com.sun.jersey.core.util.KeyComparator;
 import com.sun.jersey.core.util.KeyComparatorHashMap;
 import com.sun.jersey.spi.inject.Injectable;
 import com.sun.jersey.spi.inject.InjectableProvider;
@@ -49,9 +48,9 @@ import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import javax.ws.rs.Consumes;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
@@ -63,23 +62,6 @@ import javax.ws.rs.ext.ContextResolver;
  * @author Paul.Sandoz@Sun.Com
  */
 public class ContextResolverFactory {
-    private static final KeyComparator<MediaType> MEDIA_TYPE_COMPARATOR = 
-            new KeyComparator<MediaType>() {
-        public boolean equals(MediaType x, MediaType y) {
-            return x.getType().equalsIgnoreCase(y.getType())
-                    && x.getSubtype().equalsIgnoreCase(y.getSubtype());
-        }
-
-        public int hash(MediaType k) {
-            return k.getType().toLowerCase().hashCode() + 
-                    k.getSubtype().toLowerCase().hashCode();
-        }
-
-        public int compare(MediaType o1, MediaType o2) {
-            throw new UnsupportedOperationException("Not supported yet.");
-        }        
-    };
-    
     private final Map<Type, Map<MediaType, ContextResolver>> resolver;
     
     public ContextResolverFactory(ProviderServices providersServices,
@@ -90,7 +72,9 @@ public class ContextResolverFactory {
         Set<ContextResolver> providers = 
                 providersServices.getProviders(ContextResolver.class);
         for (ContextResolver provider : providers) {
-            MediaType[] ms = getAnnotationValues(provider.getClass(), Produces.class);
+            List<MediaType> ms = MediaTypes.createMediaTypes(
+                    provider.getClass().getAnnotation(Produces.class));
+
             ParameterizedType pType = getType(provider.getClass());
             Type type = pType.getActualTypeArguments()[0];
             // TODO check if concrete type
@@ -116,7 +100,7 @@ public class ContextResolverFactory {
         this.resolver = new HashMap<Type, Map<MediaType, ContextResolver>>(4);
         for (Map.Entry<Type, Map<MediaType, Set<ContextResolver>>> e : rs.entrySet()) {
             Map<MediaType, ContextResolver> mr = new KeyComparatorHashMap<MediaType, ContextResolver>(
-                    4, MEDIA_TYPE_COMPARATOR);
+                    4, MessageBodyFactory.MEDIA_TYPE_COMPARATOR);
             resolver.put(e.getKey(), mr);
             
             for (Map.Entry<MediaType, Set<ContextResolver>> f : e.getValue().entrySet()) {
@@ -152,15 +136,15 @@ public class ContextResolverFactory {
             
             ContextResolver getResolver(ComponentContext ic, Type type) {
                 ContextResolver cr = null;
-                MediaType[] ms = getMediaTypes(ic);
-                if (ms.length == 1) {
-                    cr = resolve(type, ms[0]);
+                List<MediaType> ms = getMediaTypes(ic);
+                if (ms.size() == 1) {
+                    cr = resolve(type, ms.get(0));
                     if (cr == null)
                         return null;
                 } else {
                     Set<ContextResolver> scr = new HashSet<ContextResolver>();
                     for (MediaType m : ms) {
-                        cr = resolve(type, ms[0]);
+                        cr = resolve(type, m);
                         if (cr != null) scr.add(cr);
                     }
                     if (scr.isEmpty())
@@ -170,25 +154,16 @@ public class ContextResolverFactory {
                 return cr;
             }
             
-            MediaType[] getMediaTypes(ComponentContext ic) {
-                String[] mts = null;
+            List<MediaType> getMediaTypes(ComponentContext ic) {
+                Produces p = null;
                 for (Annotation a : ic.getAnnotations()) {
                     if (a instanceof Produces) {
-                        Produces p = (Produces)a;
-                        mts = p.value();
+                        p = (Produces)a;
+                        break;
                     }
                 }
-                
-                MediaType[] mt = null;
-                if (mts == null) {
-                    mt = new MediaType[1];
-                    mt[0] = MediaTypes.GENERAL_ACCEPT_MEDIA_TYPE;
-                } else {
-                    mt = new MediaType[mts.length];
-                    for (int i = 0; i < mts.length; i++)
-                        mt[i] = MediaType.valueOf(mts[i]);
-                }
-                return mt;
+
+                return MediaTypes.createMediaTypes(p);
             }            
         });
     }
@@ -207,35 +182,6 @@ public class ContextResolverFactory {
         }
         
         throw new IllegalArgumentException();
-    }
-    
-    private MediaType[] getAnnotationValues(Class<?> clazz, Class<?> annotationClass) {
-        String[] mts = _getAnnotationValues(clazz, annotationClass);
-        if (mts == null) {
-            MediaType[] mt = new MediaType[1];
-            mt[0] = MediaTypes.GENERAL_ACCEPT_MEDIA_TYPE;
-            return mt;
-        }
-        
-        MediaType[] mt = new MediaType[mts.length];
-        for (int i = 0; i < mts.length; i++)
-            mt[i] = MediaType.valueOf(mts[i]);
-        
-        return mt;
-    }
-    
-    private String[] _getAnnotationValues(Class<?> clazz, Class<?> annotationClass) {
-        String values[] = null;
-        if (annotationClass.equals(Consumes.class)) {
-            Consumes consumes = clazz.getAnnotation(Consumes.class);
-            if (consumes != null)
-                values = consumes.value();
-        } else if (annotationClass.equals(Produces.class)) {
-            Produces produces = clazz.getAnnotation(Produces.class);
-            if (produces != null)
-                values = produces.value();
-        }
-        return values;
     }
     
     private static final class ContextResolverAdapter implements ContextResolver {
@@ -266,7 +212,7 @@ public class ContextResolverFactory {
     public <T> ContextResolver<T> resolve(Type t, MediaType m) {
         Map<MediaType, ContextResolver> x = resolver.get(t);
         if (x == null) return null;
-        if (m == null) m = MediaTypes.GENERAL_ACCEPT_MEDIA_TYPE;
+        if (m == null) m = MediaTypes.GENERAL_MEDIA_TYPE;
         return x.get(m);
     }    
 }

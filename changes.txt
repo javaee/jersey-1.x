@@ -27,7 +27,10 @@ release 1.1.0-ea (2009-05)
          * common string constant for use on multiple targets.
          */
         String[] value() default "*/*";
-
+  - Add a secondary key to the sort order used when looking for compatible
+    MessageBodyWriters such that writers whose declared generic type is closer
+    in terms of inheritance are sorted earlier than those whose declared generic
+    type is further.
 
 release 1.0.3 (2009-04-15)
 - Fixed issue 163
