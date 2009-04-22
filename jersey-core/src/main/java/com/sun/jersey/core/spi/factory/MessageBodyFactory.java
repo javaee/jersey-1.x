@@ -157,37 +157,10 @@ public class MessageBodyFactory implements MessageBodyWorkers {
                 getClassCapability(readerProviders, provider, type);
         }
 
-//        DistanceComparator<MessageBodyReader> dc = new DistanceComparator<MessageBodyReader>(MessageBodyReader.class);
-//        System.out.println("INITIATE READERS");
-//        for (Map.Entry<MediaType, List<MessageBodyReader>> e : readerProviders.entrySet()) {
-//            System.out.println("MEDIA: " + e.getKey());
-//            for (MessageBodyReader r : e.getValue()) {
-//                DeclaringClassInterfacePair p = ReflectionHelper.getClass(
-//                        r.getClass(), MessageBodyReader.class);
-//
-//                Class[] as = ReflectionHelper.getParameterizedClassArguments(p);
-//                System.out.println("  MBR: " + r.getClass() + "  " + as[0]);
-//            }
-//
-//            Collections.sort(e.getValue(), dc);
-//            System.out.println("SOIRTED MEDIA: " + e.getKey());
-//            for (MessageBodyReader r : e.getValue()) {
-//                DeclaringClassInterfacePair p = ReflectionHelper.getClass(
-//                        r.getClass(), MessageBodyReader.class);
-//
-//                Class[] as = ReflectionHelper.getParameterizedClassArguments(p);
-//                System.out.println("  MBR: " + r.getClass() + "  " + as[0]);
-//            }
-//
-//        }
-//        System.out.println(" ");
-//        System.out.println(" ");
-
         DistanceComparator<MessageBodyReader> dc = new DistanceComparator<MessageBodyReader>(MessageBodyReader.class);
         for (Map.Entry<MediaType, List<MessageBodyReader>> e : readerProviders.entrySet()) {
             Collections.sort(e.getValue(), dc);
         }
-
     }
     
     private void initWriters() {
@@ -204,33 +177,6 @@ public class MessageBodyFactory implements MessageBodyWorkers {
             writerListProviders.add(new MessageBodyWriterPair(provider, values));
         }
 
-
-//        DistanceComparator<MessageBodyWriter> dc = new DistanceComparator<MessageBodyWriter>(MessageBodyWriter.class);
-//        System.out.println("INITIATE WRITERS");
-//        for (Map.Entry<MediaType, List<MessageBodyWriter>> e : writerProviders.entrySet()) {
-//            System.out.println("MEDIA: " + e.getKey());
-//            for (MessageBodyWriter w : e.getValue()) {
-//                DeclaringClassInterfacePair p = ReflectionHelper.getClass(
-//                        w.getClass(), MessageBodyWriter.class);
-//
-//                Class[] as = ReflectionHelper.getParameterizedClassArguments(p);
-//                System.out.println("  MBW: " + w.getClass() + "  " + as[0]);
-//            }
-//
-//            Collections.sort(e.getValue(), dc);
-//            System.out.println("SOIRTED MEDIA: " + e.getKey());
-//            for (MessageBodyWriter w : e.getValue()) {
-//                DeclaringClassInterfacePair p = ReflectionHelper.getClass(
-//                        w.getClass(), MessageBodyWriter.class);
-//
-//                Class[] as = ReflectionHelper.getParameterizedClassArguments(p);
-//                System.out.println("  MBW: " + w.getClass() + "  " + as[0]);
-//            }
-//
-//        }
-//        System.out.println(" ");
-//        System.out.println(" ");
-
         final DistanceComparator<MessageBodyWriter> dc = new DistanceComparator<MessageBodyWriter>(MessageBodyWriter.class);
         for (Map.Entry<MediaType, List<MessageBodyWriter>> e : writerProviders.entrySet()) {
             Collections.sort(e.getValue(), dc);
@@ -241,8 +187,6 @@ public class MessageBodyFactory implements MessageBodyWorkers {
                 return dc.compare(p1.mbw, p2.mbw);
             }
         });
-
-
     }
     
     private <T> void getClassCapability(Map<MediaType, List<T>> capabilities, 
