@@ -411,10 +411,7 @@ public class WebComponent implements ContainerListener {
                 WebConfig.class,
                 wc));
 
-        rc.getSingletons().add(new JSPTemplateProcessor(
-                resourceConfig,
-                requestInvoker.getThreadLocal(),
-                responseInvoker.getThreadLocal()));
+        rc.getClasses().add(JSPTemplateProcessor.class);
 
         final IoCComponentProviderFactory ejb =
                 EJBComponentProviderFactoryInitilizer.getComponentProviderFactory();

@@ -41,7 +41,6 @@ import com.sun.jersey.api.container.ContainerException;
 import com.sun.jersey.api.core.HttpContext;
 import com.sun.jersey.api.core.ResourceConfig;
 import com.sun.jersey.spi.container.servlet.ServletContainer;
-import com.sun.jersey.spi.template.ResolvedViewable;
 import com.sun.jersey.spi.template.TemplateProcessor;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -51,7 +50,6 @@ import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.core.Context;
-import javax.ws.rs.core.UriInfo;
 
 /**
  * A JSP template processor.
@@ -59,24 +57,18 @@ import javax.ws.rs.core.UriInfo;
  * @author Paul.Sandoz@Sun.Com
  */
 public class JSPTemplateProcessor implements TemplateProcessor {
-    @Context HttpContext hc;
+    private @Context HttpContext hc;
     
-    @Context ServletContext servletContext;
+    private @Context ServletContext servletContext;
     
-    @Context UriInfo ui;
+    private @Context ThreadLocal<HttpServletRequest> requestInvoker;
     
-    private final ThreadLocal<HttpServletRequest> requestInvoker;
-    
-    private final ThreadLocal<HttpServletResponse> responseInvoker;
+    private @Context ThreadLocal<HttpServletResponse> responseInvoker;
 
     private final String basePath;
     
     public JSPTemplateProcessor(
-            ResourceConfig resourceConfig,
-            ThreadLocal<HttpServletRequest> requestInvoker,
-            ThreadLocal<HttpServletResponse> responseInvoker) {
-        this.requestInvoker = requestInvoker;
-        this.responseInvoker = responseInvoker;
+            @Context ResourceConfig resourceConfig) {
 
         String path = (String)resourceConfig.getProperties().get(
                 ServletContainer.JSP_TEMPLATES_BASE_PATH);
