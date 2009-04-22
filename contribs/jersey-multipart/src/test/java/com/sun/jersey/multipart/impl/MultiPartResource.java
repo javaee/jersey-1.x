@@ -102,18 +102,37 @@ public class MultiPartResource {
     @Path("four")
     @PUT
     @Produces("text/plain")
-    public Response four(MultiPart multiPart) {
+    public Response four(MultiPart multiPart) throws IOException {
         if (!(multiPart.getBodyParts().size() == 2)) {
             return Response.ok("FAILED:  Number of body parts is " + multiPart.getBodyParts().size() + " instead of 2").build();
         }
+
         BodyPart part0 = multiPart.getBodyParts().get(0);
         if (!(part0.getMediaType().equals(new MediaType("text", "plain")))) {
             return Response.ok("FAILED:  First media type is " + part0.getMediaType()).build();
         }
+
         BodyPart part1 = multiPart.getBodyParts().get(1);
         if (!(part1.getMediaType().equals(new MediaType("x-application", "x-format")))) {
             return Response.ok("FAILED:  Second media type is " + part1.getMediaType()).build();
         }
+
+        BodyPartEntity bpe = (BodyPartEntity) part0.getEntity();
+        StringBuilder sb = new StringBuilder();
+        InputStream stream = bpe.getInputStream();
+        InputStreamReader reader = new InputStreamReader(stream);
+        char[] buffer = new char[2048];
+        while (true) {
+            int n = reader.read(buffer);
+            if (n < 0) {
+                break;
+            }
+            sb.append(buffer, 0, n);
+        }
+        if (!sb.toString().equals("This is the first segment")) {
+            return Response.ok("FAILED:  First part name = " + sb.toString()).build();
+        }
+
         MultiPartBean bean = part1.getEntityAs(MultiPartBean.class);
         if (!bean.getName().equals("myname")) {
             return Response.ok("FAILED:  Second part name = " + bean.getName()).build();
