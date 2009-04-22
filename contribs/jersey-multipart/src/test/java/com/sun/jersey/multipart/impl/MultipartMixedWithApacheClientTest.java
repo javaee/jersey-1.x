@@ -38,8 +38,6 @@ package com.sun.jersey.multipart.impl;
 
 import com.sun.jersey.api.client.Client;
 import com.sun.jersey.client.apache.ApacheHttpClient;
-import com.sun.jersey.client.apache.config.ApacheHttpClientConfig;
-import com.sun.jersey.client.apache.config.DefaultApacheHttpClientConfig;
 import com.sun.jersey.multipart.MultiPart;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
