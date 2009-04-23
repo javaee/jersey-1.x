@@ -1,4 +1,9 @@
 release 1.1.0-ea (2009-05)
+- Fixed issue 151
+  https://jersey.dev.java.net/issues/show_bug.cgi?id=151
+  Added the following to ClientResponse:
+  - enum Status, containing all known HTTP status codes
+  - ClientResponse.getClientResponseStatus() that returns an instance of Status
 - When using the Apache HTTP client the request output stream was not closed.
   This causes issues with using say the GZIP content encoding filter that
   requires the closing (or finishing) of the GZIP output stream
