@@ -15,7 +15,7 @@ release 1.1.0-ea (2009-05)
     (GrizzlyAdapter)adapter).setResourcesContextPath("/basePath");
 
   By default the base path is "/".
-- Integrated JSR 311 API 1.1-SNAPSHOT
+- Integrated JSR 311 API 1.1
   - Require support for static fromString method in addition to existing valueOf
     method for types used as parameters in resource methods. For backwards
     compatibility, where both methods exist, valueOf will take precedence except
