@@ -37,7 +37,7 @@
 package com.sun.jersey.api.client;
 
 /**
- * Abstract implementation of ClientRequestAdapter that helps to adapts an 
+ * Abstract implementation of ClientRequestAdapter that helps to adapt an 
  * existing ClientRequestAdapter instance.
  * 
  * @author Paul.Sandoz@Sun.Com

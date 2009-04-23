@@ -213,10 +213,12 @@ public abstract class TerminatingClientHandler implements ClientHandler {
          * @throws java.io.IOException
          */
         public void writeRequestEntity(OutputStream out) throws IOException {
+            out = cr.getAdapter().adapt(cr, out);
             bw.writeTo(entity, entity.getClass(), entityType,
                     EMPTY_ANNOTATIONS, mediaType, cr.getMetadata(),
-                    cr.getAdapter().adapt(cr, out));
+                    out);
             out.flush();
+            out.close();
         }
     }
 

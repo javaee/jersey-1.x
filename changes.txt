@@ -1,4 +1,7 @@
 release 1.1.0-ea (2009-05)
+- When using the Apache HTTP client the request output stream was not closed.
+  This causes issues with using say the GZIP content encoding filter that
+  requires the closing (or finishing) of the GZIP output stream
 - Support a base path from which root resource classes are matchd when
   using the Grizzly adapter. The base path may be set as follows:
 

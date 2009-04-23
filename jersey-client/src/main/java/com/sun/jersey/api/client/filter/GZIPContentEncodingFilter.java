@@ -74,9 +74,8 @@ public class GZIPContentEncodingFilter extends ClientFilter {
         public OutputStream adapt(ClientRequest request, OutputStream out) throws IOException {
             return new GZIPOutputStream(getAdapter().adapt(request, out));
         }
-        
     }
-
+    
     private final boolean compressRequestEntity;
 
     /**
@@ -86,7 +85,7 @@ public class GZIPContentEncodingFilter extends ClientFilter {
     public GZIPContentEncodingFilter() {
         this(true);
     }
-    
+
     /**
      * Create a GZIP Content-Encoding filter.
      * 
@@ -113,16 +112,16 @@ public class GZIPContentEncodingFilter extends ClientFilter {
                 request.getMetadata().add(HttpHeaders.CONTENT_ENCODING, "gzip");
                 request.setAdapter(new Adapter(request.getAdapter()));
             }
-        }        
-        
+        }
+
         ClientResponse response = getNext().handle(request);
-        
+
         if (response.hasEntity() &&
-                response.getMetadata().containsKey(HttpHeaders.CONTENT_ENCODING)) {
-            String encodings = response.getMetadata().getFirst(HttpHeaders.CONTENT_ENCODING);
+                response.getHeaders().containsKey(HttpHeaders.CONTENT_ENCODING)) {
+            String encodings = response.getHeaders().getFirst(HttpHeaders.CONTENT_ENCODING);
 
             if (encodings.equals("gzip")) {
-                response.getMetadata().remove(HttpHeaders.CONTENT_ENCODING);
+                response.getHeaders().remove(HttpHeaders.CONTENT_ENCODING);
                 try {
                     response.setEntityInputStream(new GZIPInputStream(response.getEntityInputStream()));
                 } catch (IOException ex) {
@@ -130,7 +129,7 @@ public class GZIPContentEncodingFilter extends ClientFilter {
                 }
             }
         }
-        
+
         return response;
     }
 }
