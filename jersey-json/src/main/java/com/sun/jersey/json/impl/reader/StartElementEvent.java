@@ -47,8 +47,8 @@ import javax.xml.stream.XMLStreamConstants;
  */
 public class StartElementEvent extends JsonReaderXmlEvent {
     
-    public StartElementEvent(String name, Location location) {
-        this.name = new QName(name);
+    public StartElementEvent(QName name, Location location) {
+        this.name = name;
         this.location = location;
     }
     

@@ -40,9 +40,11 @@ import com.sun.xml.bind.v2.runtime.unmarshaller.UnmarshallingContext;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Queue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -62,11 +64,11 @@ public class Jackson2StaxReader implements XMLStreamReader {
 
     private static class ProcessingInfo {
 
-        String name;
+        QName name;
         boolean isArray;
         boolean isFirstElement;
 
-        ProcessingInfo(String name, boolean isArray, boolean isFirstElement) {
+        ProcessingInfo(QName name, boolean isArray, boolean isFirstElement) {
             this.name = name;
             this.isArray = isArray;
             this.isFirstElement = isFirstElement;
@@ -120,6 +122,15 @@ public class Jackson2StaxReader implements XMLStreamReader {
     // TODO: make it parameterizable
     final static boolean attrsWithPrefix = false;
 
+    private QName getQNameForLocName(final String localName) {
+        final QName result = qNamesOfExpElems.get(localName);
+        if (result != null) {
+            return result;
+        } else {
+            return new QName(localName);
+        }
+    }
+
     private void readNext(boolean lookingForAttributes) throws IOException {
         if (!lookingForAttributes) {
             eventQueue.poll();
@@ -147,8 +158,9 @@ public class Jackson2StaxReader implements XMLStreamReader {
                         } else { // non attribute
                             lookingForAttributes = false; // stop seeking attributes
                             if (!("$".equals(currentName))) {
-                                eventQueue.add(new StartElementEvent(currentName, new StaxLocation(parser.getCurrentLocation())));
-                                processingStack.add(new ProcessingInfo(currentName, false, true));
+                                final QName currentQName = getQNameForLocName(currentName);
+                                eventQueue.add(new StartElementEvent(currentQName, new StaxLocation(parser.getCurrentLocation())));
+                                processingStack.add(new ProcessingInfo(currentQName, false, true));
                                 return;
                             } else {
                                 parser.nextToken();
@@ -285,17 +297,33 @@ public class Jackson2StaxReader implements XMLStreamReader {
     }
 
     final Collection<String> elemsExpected = new HashSet<String>();
+    final Map<String, QName> qNamesOfExpElems = new HashMap<String, QName>();
 
     public int getAttributeCount() {
         try {
             if (!eventQueue.peek().attributesChecked) {
                 elemsExpected.removeAll(elemsExpected);
-                for (QName n : UnmarshallingContext.getInstance().getCurrentExpectedElements()) {
-                    String nu = n.getNamespaceURI();
-                    if (nu!=null && (nu.getBytes().length == 1) && (nu.getBytes()[0] == 0)) {
-                        elemsExpected.add("$");
-                    } else {
-                        elemsExpected.add(n.getLocalPart());
+                qNamesOfExpElems.clear();
+                final UnmarshallingContext uctx = UnmarshallingContext.getInstance();
+                if (uctx != null) {
+                    Collection<QName> currExpElems;
+                    try {
+                        currExpElems = uctx.getCurrentExpectedElements();
+                    } catch (NullPointerException npe) {
+                        // TODO: need to check what could be done in JAXB in order to prevent the npe
+                        currExpElems = null;// thrown from com.sun.xml.bind.v2.runtime.unmarshaller.UnmarshallingContext#1206
+                    }
+                    if (currExpElems != null) {
+                        for (QName n : currExpElems) {
+                            String nu = n.getNamespaceURI();
+                            if (nu != null && (nu.getBytes().length == 1) && (nu.getBytes()[0] == 0)) {
+                                elemsExpected.add("$");
+                                qNamesOfExpElems.put("$", null);
+                            } else {
+                                elemsExpected.add(n.getLocalPart());
+                                qNamesOfExpElems.put(n.getLocalPart(), n);
+                            }
+                        }
                     }
                 }
                 readNext(true);
@@ -408,7 +436,7 @@ public class Jackson2StaxReader implements XMLStreamReader {
     }
 
     public String getNamespaceURI() {
-        return null;
+        return eventQueue.peek().getName().getNamespaceURI();
     }
 
     public String getPrefix() {

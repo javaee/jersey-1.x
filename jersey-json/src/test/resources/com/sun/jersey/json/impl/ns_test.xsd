@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema xmlns:test_xsd="http://test.jaxb.com" xmlns:xsd="http://www.w3.org/2001/XMLSchema" targetNamespace="http://test.jaxb.com">
+
+	<xsd:element name="myMessage">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element name="id" type="xsd:string"/>
+				<xsd:element name="text" type="xsd:string"/>
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+
+	<xsd:element name="myError">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element name="id" type="xsd:string"/>
+				<xsd:element name="desc" type="xsd:string"/>
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+
+	<xsd:element name="myResponse">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element ref="test_xsd:myMessage" minOccurs="0" maxOccurs="unbounded" />
+				<xsd:element ref="test_xsd:myError" />
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>	
+	
+</xsd:schema>

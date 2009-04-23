@@ -683,7 +683,7 @@ public class JsonXmlStreamReader implements XMLStreamReader {
     private StartElementEvent generateSEEvent(String name) {
         StartElementEvent event = null;
         if (!"$".equals(name)) {
-           event = new StartElementEvent(name, new StaxLocation(lexer));
+           event = new StartElementEvent(new QName(name), new StaxLocation(lexer));
            eventQueue.add(event);
         }
         return event;
@@ -691,7 +691,7 @@ public class JsonXmlStreamReader implements XMLStreamReader {
 
     private void generateEEEvent(String name) {
        if (!"$".equals(name)) {
-           eventQueue.add(new EndElementEvent(name, new StaxLocation(lexer)));
+           eventQueue.add(new EndElementEvent(new QName(name), new StaxLocation(lexer)));
        }
     }
 }

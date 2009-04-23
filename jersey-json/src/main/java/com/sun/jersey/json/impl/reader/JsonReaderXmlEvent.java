@@ -205,6 +205,7 @@ public abstract class JsonReaderXmlEvent {
     
     public QName getName() {
         if (null != name) {
+            System.out.println("Returning QName " + name);
             return name;
         } else {
             throw new UnsupportedOperationException();
