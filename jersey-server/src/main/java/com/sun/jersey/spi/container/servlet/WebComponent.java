@@ -382,14 +382,14 @@ public class WebComponent implements ContainerListener {
         rc.getSingletons().add(new ContextInjectableProvider<HttpServletRequest>(
                 HttpServletRequest.class,
                 (HttpServletRequest)Proxy.newProxyInstance(
-                        HttpServletRequest.class.getClassLoader(),
+                        this.getClass().getClassLoader(),
                         new Class[] { HttpServletRequest.class },
                         requestInvoker)));
 
         rc.getSingletons().add(new ContextInjectableProvider<HttpServletResponse>(
                 HttpServletResponse.class,
                 (HttpServletResponse)Proxy.newProxyInstance(
-                        HttpServletResponse.class.getClassLoader(),
+                        this.getClass().getClassLoader(),
                         new Class[] { HttpServletResponse.class },
                         responseInvoker)));
 

@@ -117,8 +117,8 @@ public class ServletAdaptor extends ServletContainer {
                 ThreadLocalNamedInvoker<EntityManagerFactory> emfHandler =
                         new ThreadLocalNamedInvoker<EntityManagerFactory>(jndiName);
                 final EntityManagerFactory emf = (EntityManagerFactory) Proxy.newProxyInstance(
-                        EntityManagerFactory.class.getClassLoader(),
-                        new Class[] {EntityManagerFactory.class },
+                        this.getClass().getClassLoader(),
+                        new Class[] { EntityManagerFactory.class },
                         emfHandler);
                 
                 return new Injectable<EntityManagerFactory>() {
