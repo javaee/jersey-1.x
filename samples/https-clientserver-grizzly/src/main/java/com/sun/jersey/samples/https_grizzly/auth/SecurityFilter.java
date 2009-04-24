@@ -5,6 +5,7 @@
 package com.sun.jersey.samples.https_grizzly.auth;
 
 import com.sun.jersey.api.container.MappableContainerException;
+import com.sun.jersey.core.util.Base64;
 import com.sun.jersey.spi.container.ContainerRequest;
 import com.sun.jersey.spi.container.ContainerRequestFilter;
 import java.security.Principal;
@@ -58,17 +59,7 @@ public class SecurityFilter implements ContainerRequestFilter {
         // Validate the extracted credentials
         User user = null;
 
-        // BUG IN HTTPBasicAuthFilter? (Added \0\0 at the end of password) TODO XXX FIXME
-
-        //        System.out.println("--->" + username + ":" + password + "<");
-        //        System.out.println(username.equals("user"));
-        //        System.out.println(password.equals("password\0\0"));
-        //
-        //        for(char c : password.toCharArray()) {
-        //            System.out.println("->" + (int) c);
-        //        }
-
-        if (username.equals("user") && password.trim().equals("password")) {
+        if (username.equals("user") && password.equals("password")) {
             user = new User("user", "user");
             System.out.println("USER AUTHENTICATED");
         //        } else if (username.equals("admin") && password.equals("adminadmin")) {
