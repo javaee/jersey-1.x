@@ -36,6 +36,7 @@
  */
 package com.sun.jersey.server.impl.ejb;
 
+import com.sun.jersey.api.container.ContainerException;
 import com.sun.jersey.core.spi.component.ioc.IoCComponentProviderFactory;
 import java.lang.reflect.Method;
 import java.util.logging.Level;
@@ -66,8 +67,16 @@ public final class EJBComponentProviderFactoryInitilizer {
             Method interceptorBinderMethod = interceptorBinder.getClass().
                     getMethod("registerInterceptor", java.lang.Object.class);
 
-            return new EJBComponentProviderFactory(interceptorBinder,
-                    interceptorBinderMethod);
+            EJBInjectionInterceptor interceptor = new EJBInjectionInterceptor();
+
+            try {
+                interceptorBinderMethod.invoke(interceptorBinder, interceptor);
+            } catch (Exception ex) {
+                LOGGER.log(Level.SEVERE, "Error when configuring to use the EJB interceptor binding API. JAX-RS EJB support is disabled.", ex);
+                return null;
+            }
+
+            return new EJBComponentProviderFactory(interceptor);
         } catch (NamingException ex) {
             LOGGER.log(Level.CONFIG, "The EJB interceptor binding API is not available. JAX-RS EJB support is disabled.", ex);
             return null;
