@@ -1,4 +1,8 @@
 release 1.1.0-ea (2009-05)
+- Fixed issue 278
+  https://jersey.dev.java.net/issues/show_bug.cgi?id=278
+  com.sun.jersey.api.client.filter.HTTPBasicAuthFilter was not correctly
+  using "=" for padding characters.
 - Fixed issue 151
   https://jersey.dev.java.net/issues/show_bug.cgi?id=151
   Added the following to ClientResponse:
