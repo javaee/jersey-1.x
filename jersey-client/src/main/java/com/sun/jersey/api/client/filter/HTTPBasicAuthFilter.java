@@ -39,6 +39,7 @@ package com.sun.jersey.api.client.filter;
 import com.sun.jersey.api.client.ClientHandlerException;
 import com.sun.jersey.api.client.ClientRequest;
 import com.sun.jersey.api.client.ClientResponse;
+import com.sun.jersey.core.util.Base64;
 import javax.ws.rs.core.HttpHeaders;
 
 /**
@@ -57,7 +58,7 @@ public final class HTTPBasicAuthFilter extends ClientFilter {
      * @param password
      */
     public HTTPBasicAuthFilter(final String username, final String password) {
-        authentication = "Basic " + encodeCredentialsBasic(username, password);
+        authentication = "Basic " + Base64.encode(username + ":" + password);
     }
 
     @Override
@@ -67,38 +68,5 @@ public final class HTTPBasicAuthFilter extends ClientFilter {
             cr.getMetadata().add(HttpHeaders.AUTHORIZATION, authentication);
         }
         return getNext().handle(cr);
-    }
-    /**
-     * <p>Convenience string for Base 64 encoding.</p>
-     */
-    private static final String BASE64_CHARS =
-            "ABCDEFGHIJKLMNOPQRSTUVWXYZ" +
-            "abcdefghijklmnopqrstuvwxyz" +
-            "0123456789+/";
-
-    /**
-     * <p>Encode the specified credentials into a String as required by
-     * HTTP Basic Authentication (<a href= "http://www.ietf.org/rfc/rfc2617.txt">RFC 2617</a>).</p>
-     *
-     * @param username Username to be encoded
-     * @param password Password to be encoded
-     */
-    private String encodeCredentialsBasic(final String username, final String password) {
-
-        String encode = username + ":" + password;
-        int paddingCount = (3 - (encode.length() % 3)) % 3;
-        encode += "\0\0".substring(0, paddingCount);
-
-        StringBuilder encoded = new StringBuilder();
-
-        for (int i = 0; i < encode.length(); i += 3) {
-            int j = (encode.charAt(i) << 16) + (encode.charAt(i + 1) << 8) + encode.charAt(i + 2);
-            encoded.append(BASE64_CHARS.charAt((j >> 18) & 0x3f));
-            encoded.append(BASE64_CHARS.charAt((j >> 12) & 0x3f));
-            encoded.append(BASE64_CHARS.charAt((j >> 6) & 0x3f));
-            encoded.append(BASE64_CHARS.charAt(j & 0x3f));
-        }
-
-        return encoded.toString();
     }
 }
