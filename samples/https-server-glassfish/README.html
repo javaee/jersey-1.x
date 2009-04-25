@@ -1,0 +1,71 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head><title>HTTPS Server GlassFish Example</title></head>
+
+  <body>
+      <h1>HTTPS Server Example - GlassFish</h1>
+      
+      <p>This example demonstrates how to develop secure RESTful hello world web service with a Servlet 2.5 container.</p>
+      
+      <h2>Contents</h2>
+      <p>The example consists of just one Java class:</p>
+      <dl>
+          <dt><code>com.sun.jersey.samples.helloworldwebapp.resources.HelloWorldResource</code></dt>
+          <dd>A resource class that produces a textual response to an HTTP GET.</dd>
+      </dl>
+    <p>The mapping of the URI path space is presented in the following table:</p>
+	<table border="1">
+	<tr>
+	<th>URI path</th>
+	<th>Resource class</th>
+	<th>HTTP methods</th>
+	</tr>
+	<tr>
+	<td>/helloworld</td>
+	<td>HelloWorldResource</td>
+	<td>GET</td>
+	</tr>
+	</table>
+
+      <h2>Running the Example</h2>
+      <p>Run the example as follows:</p>
+      <p> create war package
+      <blockquote><code>mvn clean package</code><p></blockquote>
+
+      <p> setup GlassFish v2.x:
+      <ul>
+          <li>Add new security realm called "myRealm"</li>
+          <ul>
+              <li>Admin console: Configuration -&gt; Security -&gt; Realms -&gt; New Realm</li>
+              <table border="1px"><tr><th>Name</th><td>myRealm</td></tr>
+                  <tr><th>Class Name</th><td>com.sun.enterprise.security.auth.realm.file.FileRealm</td></tr>
+                  <tr><th>JAAS context</th><td>fileRealm</td></tr>
+                  <tr><th>Key File</th><td>${com.sun.aas.instanceRoot}/config/myRealm-keyfile</td></tr>
+              </table>
+              <li>Add at least one user (edit myRealm -&gt; Manage Users); <b>set users group to "Users"</b></li>
+          </ul>
+          <li>Check web.xml and sun-web.xml</li>
+          <li>Deploy httpsBasicAuth-webapp.war as a Web Application</li>
+          <ul>
+              <li>Admin console: Applications -&gt; Web Applications -&gt; Deploy. Select file ./target/httpsBasicAuth-webapp.war</li>
+              <li>or you can use command line: <code>/path/to/glassfishv2/glassfish/bin/asadmin deploy ./target/httpsBasicAuth-webapp.war</code></li>
+          </ul>
+
+      </ul>
+
+      <p>From a web browser, visit:</p>
+      <blockquote><code><a href="https://localhost:8181/httpsBasicAuth-webapp/helloworld">https://localhost:8181/httpsBasicAuth-webapp/helloworld</a></code> (you have to add security exception for GlassFish server certificate / ignore all warnings about security)</blockquote>
+
+ </body></html>
+
+
+ <!--
+
+ Resources:
+ http://java.sun.com/developer/technicalArticles/J2EE/security_annotation/
+ http://www.ryandelaplante.com/rdelaplante/entry/ssl_and_http_basic_authentication
+
+-->
+
+
+
+

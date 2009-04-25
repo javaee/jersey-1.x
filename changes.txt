@@ -1,4 +1,6 @@
 release 1.1.0-ea (2009-05)
+- Added security sample - https service with http basic authentication on
+  GlassFish 2.x
 - Fixed issue 278
   https://jersey.dev.java.net/issues/show_bug.cgi?id=278
   com.sun.jersey.api.client.filter.HTTPBasicAuthFilter was not correctly

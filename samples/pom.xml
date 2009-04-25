@@ -73,6 +73,7 @@
         <module>spring-annotations</module>
         <module>storage-service</module>
         <module>https-clientserver-grizzly</module>
+        <module>https-server-glassfish</module>
     </modules>
     <build>
         <plugins>
