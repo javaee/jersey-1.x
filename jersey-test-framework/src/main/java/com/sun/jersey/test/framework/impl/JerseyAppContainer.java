@@ -42,6 +42,7 @@ import com.sun.jersey.test.framework.TestConstants;
 import com.sun.jersey.test.framework.impl.container.http.HTTPContainer;
 import com.sun.jersey.test.framework.impl.container.grizzly.web.GrizzlyWebContainer;
 import com.sun.jersey.test.framework.impl.container.embedded.glassfish.EmbeddedGlassfish;
+import com.sun.jersey.test.framework.impl.container.external.ExternalContainer;
 import com.sun.jersey.test.framework.impl.util.CommonUtils;
 import com.sun.jersey.test.framework.impl.util.WebXmlGenerator;
 import java.io.File;
@@ -112,6 +113,7 @@ public class JerseyAppContainer implements TestConstants {
         containerTable.put(EMBEDDED_GF_V3, EmbeddedGlassfish.class);
         containerTable.put(GRIZZLY_WEB_CONTAINER, GrizzlyWebContainer.class);
         containerTable.put(HTTP_SERVER, HTTPContainer.class);
+        containerTable.put("External", ExternalContainer.class);
         if (!containerTable.containsKey(containerType)) {
             logger.log(Level.SEVERE, "Invalid container.type attribute passed. Expected one of :: ");
             logger.log(Level.SEVERE, "====================");

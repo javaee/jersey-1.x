@@ -53,7 +53,7 @@ public class CommonUtils implements TestConstants {
      * @return
      */
     public static int getPort(int defaultPort) {
-        String port = System.getenv("JERSEY_HTTP_PORT");
+        String port = System.getProperty("JERSEY_HTTP_PORT");
         if (null != port) {
             try {
                 return Integer.parseInt(port);
