@@ -8,10 +8,12 @@
       <p>This example demonstrates how to develop RESTful hello world web service in Scala with a Servlet 2.5 container.</p>
       
       <h2>Contents</h2>
-      <p>The example consists of just one Scala class:</p>
+      <p>The example consists of these Scala classes:</p>
       <dl>
           <dt><code>com.sun.jersey.samples.helloworldwebapp.resources.HelloWorldResource</code></dt>
           <dd>A resource class that produces a textual response to an HTTP GET.</dd>
+          <dt><code>com.sun.jersey.samples.helloworldwebapp.resources.MarkupResource</code></dt>
+          <dd>A resource class that produces a HTML response using Scala's embedded markup syntax together with the jersey-scala library.</dd>
       </dl>
     <p>The mapping of the URI path space is presented in the following table:</p>
 	<table border="1">
@@ -25,6 +27,11 @@
 	<td>HelloWorldResource</td>
 	<td>GET</td>
 	</tr>
+	<tr>
+	<td>/markup</td>
+	<td>MarkupResource</td>
+	<td>GET</td>
+	</tr>
 	</table>
 
       <h2>Running the Example</h2>
@@ -35,4 +42,5 @@ you will need to follow instructions at <a href="../../README.html">the module R
       <blockquote><code>mvn glassfish:run</code><p></blockquote>
       <p>From a web browser, visit:</p>
       <blockquote><code><a href="http://localhost:8080/scala-helloworld-webapp/helloworld">http://localhost:8080/scala-helloworld-webapp/helloworld</a></code></blockquote>
+      <blockquote><code><a href="http://localhost:8080/scala-helloworld-webapp/markup">http://localhost:8080/scala-helloworld-webapp/markup</a></code></blockquote>
  </body></html>
