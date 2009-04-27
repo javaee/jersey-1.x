@@ -9,7 +9,7 @@ import javax.ws.rs.core.{MultivaluedMap, MediaType}
 import javax.ws.rs.ext.{MessageBodyWriter, Provider}
 import _root_.java.lang.reflect.Type
 
-import scala.xml.NodeSeq
+import xml.NodeSeq
 
 /**
  * Converts a Scala {@link NodeSeq} to a String for rendering nodes as HTML, XML, XHTML etc
