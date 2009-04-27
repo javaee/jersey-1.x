@@ -3,12 +3,14 @@ pkg = {
     "version"       : "1.1.0,0-0.1",
     "attributes"    : { "pkg.summary" : "Jersey Examples And Documentation, RESTful Web services for GlassFish",
                         "pkg.description" : 
-"Jersey is the open source (under dual CDDL+GPL license)\
+"This package contains Jersey API javadocs and examples. Once installed, \
+ it's content should appear in <as_home>/glassfish/jersey subdirectory. \
+ \
+ Jersey is the open source (under dual CDDL+GPL license)\
  JAX-RS (JSR 311) Reference Implementation for building RESTful Web services. \
  But, it is also more than the Reference Implementation. \
  Jersey provides additional APIs and extension points (SPIs) \
- so that developers may extend Jersey to suite their needs. \
-This package contains Jersey apidocs and examples",
+ so that developers may extend Jersey to suite their needs." ,
                      "info.classification" : "Web Services"  },
     "dirtrees" : [ "glassfish" ],
     "depends" : { 
