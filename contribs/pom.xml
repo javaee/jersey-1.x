@@ -62,5 +62,6 @@
         <module>jersey-apache-client</module>
         <module>jersey-simple-server</module>
         <module>jersey-guice</module>
+        <module>jersey-scala</module>
     </modules>
 </project>
