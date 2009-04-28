@@ -54,6 +54,5 @@
     <modules>
         <module>jersey-gf-bundle</module>
         <module>jackson</module>
-        <module>jettison</module>
     </modules>
 </project>

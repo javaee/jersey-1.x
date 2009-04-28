@@ -81,14 +81,6 @@
                                     <overWrite>false</overWrite>
                                     <outputDirectory>${osgi.deps.directory}</outputDirectory>
                                 </artifactItem>
-                                 <artifactItem>
-                                    <groupId>com.sun.jersey.glassfish.v3.osgi</groupId>
-                                    <artifactId>jettison</artifactId>
-                                    <version>${project.version}</version>
-                                    <type>jar</type>
-                                    <overWrite>false</overWrite>
-                                    <outputDirectory>${osgi.deps.directory}</outputDirectory>
-                                </artifactItem>
                                   <artifactItem>
                                     <groupId>com.sun.jersey</groupId>
                                     <artifactId>jersey-bundle</artifactId>
@@ -111,7 +103,7 @@
                     <tasks> <!-- download bnd tool, and create osgified jar file using it -->
                       <get src="http://www.aqute.biz/repo/biz/aQute/bnd/0.0.249/bnd-0.0.249.jar" dest="${project.build.directory}/bnd.jar"/>
                       <java jar="${project.build.directory}/bnd.jar" fork="true">
-                        <arg line="wrap -output ${project.build.directory}/osgified.jar -classpath ${osgi.deps.directory}/asm-all-repackaged.jar,${osgi.deps.directory}/jackson-asl.jar,${osgi.deps.directory}/jettison.jar ${osgi.src.directory}/jersey-bundle.jar"/>
+                        <arg line="wrap -output ${project.build.directory}/osgified.jar -classpath ${osgi.deps.directory}/asm-all-repackaged.jar,${osgi.deps.directory}/jackson-asl.jar ${osgi.src.directory}/jersey-bundle.jar"/>
                       </java>
                       <unzip src="${project.build.directory}/osgified.jar" dest="${jar.messing.directory}"/> 
                       <manifest file="${jar.messing.directory}/META-INF/MANIFEST.MF" mode="update"><attribute name="probe-provider-xml-file-names" value="gfprobe-provider.xml"/></manifest>
@@ -138,11 +130,6 @@
          <dependency>
           <groupId>com.sun.jersey.glassfish.v3.osgi</groupId>
           <artifactId>jackson-asl</artifactId>
-          <version>${project.version}</version>
-        </dependency>
-         <dependency>
-          <groupId>com.sun.jersey.glassfish.v3.osgi</groupId>
-          <artifactId>jettison</artifactId>
           <version>${project.version}</version>
         </dependency>
         <dependency>
