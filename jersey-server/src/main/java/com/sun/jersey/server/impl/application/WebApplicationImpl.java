@@ -311,8 +311,9 @@ public final class WebApplicationImpl implements WebApplication {
             }
 
             rc = newResourceClass(getAbstractResource(c));
-            metaClassMap.put(c, rc);
             rc.init(rcpFactory);
+            
+            metaClassMap.put(c, rc);
         }
         return rc;
     }

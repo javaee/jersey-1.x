@@ -1,4 +1,8 @@
 release 1.1.0-ea (2009-05)
+- Fixed issue 283
+  https://jersey.dev.java.net/issues/show_bug.cgi?id=283
+  Removed race condition that may occur when concurrently creating the 
+  meta-data for a resource class.
 - Added security sample - https service with http basic authentication on
   GlassFish 2.x
 - Fixed issue 278
