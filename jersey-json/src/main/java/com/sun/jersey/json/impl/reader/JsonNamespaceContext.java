@@ -37,7 +37,9 @@
 
 package com.sun.jersey.json.impl.reader;
 
+import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map;
 import javax.xml.namespace.NamespaceContext;
 
 /**
@@ -45,17 +47,37 @@ import javax.xml.namespace.NamespaceContext;
  * @author japod
  */
 public class JsonNamespaceContext implements NamespaceContext {
+    
+    static final String PrefixPREFIX = "ns";
+
+    private final Map<String, String> ns2pMap = new HashMap<String, String>();
+    private final Map<String, String> p2nsMap = new HashMap<String, String>();
+    private int nsCount = 0;
+
+    protected int getNamespaceCount() {
+        return nsCount;
+    }
 
     public String getNamespaceURI(String prefix) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        if (p2nsMap.containsKey(prefix)) {
+            return p2nsMap.get(prefix);
+        }
+        return null;
     }
 
     public String getPrefix(String namespaceURI) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        if (ns2pMap.containsKey(namespaceURI)) {
+            return ns2pMap.get(namespaceURI);
+        } else {
+            final String newPrefix = PrefixPREFIX + ++nsCount;
+            ns2pMap.put(namespaceURI, newPrefix);
+            p2nsMap.put(newPrefix, namespaceURI);
+            return newPrefix;
+        }
     }
 
     public Iterator getPrefixes(String namespaceURI) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        return p2nsMap.keySet().iterator();
     }
 
 }

@@ -79,5 +79,9 @@ public class AnimalList {
         return hash;
     }
     
+    @Override
+    public String toString() {
+        return (animals != null) ? animals.toString() : null;
+    }
 
 }

@@ -227,7 +227,7 @@ public class JsonXmlStreamReader implements XMLStreamReader {
                                 }
                                 if (null != processingStack.get(depth - 1).eventToReadAttributesFor) {
                                     processingStack.get(depth - 1).eventToReadAttributesFor.addAttribute(
-                                            attrName.substring(1), lastToken.tokenText);
+                                            new QName(attrName.substring(1)), lastToken.tokenText);
                                 }
                                 lastToken = nextToken();
                                 switch (lastToken.tokenType) {

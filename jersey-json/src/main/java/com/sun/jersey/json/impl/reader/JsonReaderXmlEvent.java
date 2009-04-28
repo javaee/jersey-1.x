@@ -52,10 +52,10 @@ import javax.xml.stream.XMLStreamException;
 public abstract class JsonReaderXmlEvent {
     
     public static class Attribute {
-        String name;
+        QName name;
         String value;
         
-        public Attribute(String name, String value) {
+        public Attribute(QName name, String value) {
             this.name = name;
             this.value = value;
         }
@@ -110,21 +110,18 @@ public abstract class JsonReaderXmlEvent {
     }
     
     public String getAttributeLocalName(int index) {
+        return getAttributeName(index).getLocalPart();
+    }
+    
+    public QName getAttributeName(int index) {
         if ((null == attributes) || (index >= attributes.size())) {
             throw new IndexOutOfBoundsException();
         }
         return attributes.get(index).name;
-    }
-    
-    public QName getAttributeName(int index) {
-        return new QName(null, getAttributeLocalName(index));
     }    
 
     public String getAttributePrefix(int index) {
-        if ((null == attributes) || (index >= attributes.size())) {
-            throw new IndexOutOfBoundsException();
-        }
-        return null;
+        return getAttributeName(index).getPrefix();
     }
 
     public String getAttributeType(int index) {
@@ -132,7 +129,7 @@ public abstract class JsonReaderXmlEvent {
     }
 
     public String getAttributeNamespace(int index) {
-        return null;
+        return getAttributeName(index).getNamespaceURI();
     }
     
     public String getAttributeValue(int index) {
@@ -146,8 +143,9 @@ public abstract class JsonReaderXmlEvent {
         if ((null == attributes) || (null == localName) || ("".equals(localName))) {
             throw new NoSuchElementException();
         }
+        final QName askedFor = new QName(namespaceURI, localName);
         for (Attribute a : attributes) {
-            if (localName.equals(a.name)) {
+            if (askedFor.equals(a.name)) {
                 return a.value;
             }
         }
@@ -231,7 +229,7 @@ public abstract class JsonReaderXmlEvent {
         return location;
     }
     
-    public void addAttribute(String name, String value) {
+    public void addAttribute(QName name, String value) {
         if (null == attributes) {
             attributes = new LinkedList<JsonReaderXmlEvent.Attribute>();
         }

@@ -67,7 +67,9 @@ public class InheritanceTest extends TestCase {
     }
 
     public void testNatural() throws Exception {
-        // TODO: fix this
+        // TODO: a patch applied at jaxb trunk to add a new utility method on UnmarshallingContext
+        //            after this gets tested and make it to a release of jaxb, we can uncomment appropriate
+        //            stuff on Jersey side, and the following should work
         //tryListWithConfiguration(JSONConfiguration.natural().build());
         tryIndividualsWithConfiguration(JSONConfiguration.natural().build());
     }
@@ -136,6 +138,7 @@ public class InheritanceTest extends TestCase {
             }
 
             assertEquals(animalOne, animalTwo);
+            System.out.println(String.format("class one = %s; class two = %s", animalOne.getClass(), animalTwo.getClass()));
             assertEquals(animalOne.getClass(), animalTwo.getClass());
         }
     }

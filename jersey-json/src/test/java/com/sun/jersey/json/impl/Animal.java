@@ -74,6 +74,10 @@ public class Animal {
         hash = 67 * hash + (this.name != null ? this.name.hashCode() : 0);
         return hash;
     }
-    
+
+    @Override
+    public String toString() {
+        return String.format("{ \"name\":\"%s\"}", name);
+    }
     
 }

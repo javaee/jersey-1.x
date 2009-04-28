@@ -77,6 +77,7 @@ public class Jackson2StaxReader implements XMLStreamReader {
     JsonParser parser;
     final Queue<JsonReaderXmlEvent> eventQueue = new LinkedList<JsonReaderXmlEvent>();
     final List<ProcessingInfo> processingStack = new ArrayList<ProcessingInfo>();
+    final JsonNamespaceContext namespaceContext = new JsonNamespaceContext();
 
     static <T> T pop(List<T> stack) {
         return stack.remove(stack.size() - 1);
@@ -119,11 +120,12 @@ public class Jackson2StaxReader implements XMLStreamReader {
         }
     };
 
-    // TODO: make it parameterizable
-    final static boolean attrsWithPrefix = false;
+    private QName getQNameForTagLocName(final String localName) {
+        return getQNameForLocName(localName, qNamesOfExpElems);
+    }
 
-    private QName getQNameForLocName(final String localName) {
-        final QName result = qNamesOfExpElems.get(localName);
+    private QName getQNameForLocName(final String localName, final Map<String, QName> qNamesMap) {
+        final QName result = qNamesMap.get(localName);
         if (result != null) {
             return result;
         } else {
@@ -146,19 +148,22 @@ public class Jackson2StaxReader implements XMLStreamReader {
                     case FIELD_NAME:
                         // start tag
                         String currentName = parser.getCurrentName();
-                        //boolean currentIsAttribute = !("$".equals(currentName)) && !elemsExpected.contains(currentName);
-                        boolean currentIsAttribute = attrsWithPrefix ? currentName.startsWith("@") : !("$".equals(currentName)) && !elemsExpected.contains(currentName);
+                        boolean currentIsAttribute = !("$".equals(currentName)) && !elemsExpected.contains(currentName);
+//    TODO: could be used once jaxb provides information on attributes expected
+//                        boolean currentIsAttribute = !("$".equals(currentName)) && attrsExpected.contains(currentName);
                         if (lookingForAttributes && currentIsAttribute) {
                             parser.nextToken();
                             if (valueTokens.contains(parser.getCurrentToken())) {
-                                eventQueue.peek().addAttribute(attrsWithPrefix ? currentName .substring(1) : currentName, parser.getText());
+                                    eventQueue.peek().addAttribute(new QName(currentName), parser.getText());
+//    TODO: could be used once jaxb provides information on attributes expected
+//                                eventQueue.peek().addAttribute(getQNameForLocName(currentName, qNamesOfExpAttrs), parser.getText());
                             } else {
                                 throw new IOException("Not an attribute, expected primitive value!");
                             }
                         } else { // non attribute
                             lookingForAttributes = false; // stop seeking attributes
                             if (!("$".equals(currentName))) {
-                                final QName currentQName = getQNameForLocName(currentName);
+                                final QName currentQName = getQNameForTagLocName(currentName);
                                 eventQueue.add(new StartElementEvent(currentQName, new StaxLocation(parser.getCurrentLocation())));
                                 processingStack.add(new ProcessingInfo(currentQName, false, true));
                                 return;
@@ -299,20 +304,35 @@ public class Jackson2StaxReader implements XMLStreamReader {
     final Collection<String> elemsExpected = new HashSet<String>();
     final Map<String, QName> qNamesOfExpElems = new HashMap<String, QName>();
 
+//    TODO: could be used once jaxb provides information on attributes expected
+//    final Collection<String> attrsExpected = new HashSet<String>();
+//    final Map<String, QName> qNamesOfExpAttrs = new HashMap<String, QName>();
+
+
     public int getAttributeCount() {
         try {
             if (!eventQueue.peek().attributesChecked) {
-                elemsExpected.removeAll(elemsExpected);
+                elemsExpected.clear();
                 qNamesOfExpElems.clear();
+                //    TODO: could be used once jaxb provides information on attributes expected
+                //attrsExpected.clear();
+                //qNamesOfExpAttrs.clear();
                 final UnmarshallingContext uctx = UnmarshallingContext.getInstance();
                 if (uctx != null) {
                     Collection<QName> currExpElems;
+                    Collection<QName> currExpAttrs;
                     try {
                         currExpElems = uctx.getCurrentExpectedElements();
                     } catch (NullPointerException npe) {
                         // TODO: need to check what could be done in JAXB in order to prevent the npe
                         currExpElems = null;// thrown from com.sun.xml.bind.v2.runtime.unmarshaller.UnmarshallingContext#1206
                     }
+                    //    TODO: could be used once jaxb provides information on attributes expected
+//                    try {
+//                        currExpAttrs = uctx.getCurrentExpectedAttributes();
+//                    } catch (NullPointerException npe) {
+//                        currExpAttrs = null;// thrown from com.sun.xml.bind.v2.runtime.unmarshaller.UnmarshallingContext
+//                    }
                     if (currExpElems != null) {
                         for (QName n : currExpElems) {
                             String nu = n.getNamespaceURI();
@@ -325,6 +345,13 @@ public class Jackson2StaxReader implements XMLStreamReader {
                             }
                         }
                     }
+//    TODO: could be used once jaxb provides information on attributes expected
+//                    if (currExpAttrs != null) {
+//                        for (QName n : currExpAttrs) {
+//                            attrsExpected.add(n.getLocalPart());
+//                            qNamesOfExpAttrs.put(n.getLocalPart(), n);
+//                        }
+//                    }
                 }
                 readNext(true);
                 eventQueue.peek().attributesChecked = true;
@@ -370,21 +397,19 @@ public class Jackson2StaxReader implements XMLStreamReader {
     }
 
     public int getNamespaceCount() {
-        return 0;
+        return this.namespaceContext.getNamespaceCount();
     }
 
-    public String getNamespacePrefix(
-            int arg0) {
+    public String getNamespacePrefix(int idx) {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
-    public String getNamespaceURI(
-            int arg0) {
+    public String getNamespaceURI(int idx) {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
     public NamespaceContext getNamespaceContext() {
-        return new JsonNamespaceContext();
+        return this.namespaceContext;
     }
 
     public int getEventType() {
