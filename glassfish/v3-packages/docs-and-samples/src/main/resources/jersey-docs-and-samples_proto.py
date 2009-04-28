@@ -4,8 +4,7 @@ pkg = {
     "attributes"    : { "pkg.summary" : "Jersey Examples And Documentation, RESTful Web services for GlassFish",
                         "pkg.description" : 
 "This package contains Jersey API javadocs and examples. Once installed, \
- it's content should appear in <as_home>/glassfish/jersey subdirectory. \
- \
+ it's content should appear in <as_home>/glassfish/jersey subdirectory. \n \
  Jersey is the open source (under dual CDDL+GPL license)\
  JAX-RS (JSR 311) Reference Implementation for building RESTful Web services. \
  But, it is also more than the Reference Implementation. \
