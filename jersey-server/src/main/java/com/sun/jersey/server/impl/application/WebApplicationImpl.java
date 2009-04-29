@@ -126,6 +126,7 @@ import com.sun.jersey.core.spi.component.ComponentScope;
 import com.sun.jersey.core.spi.component.ioc.IoCComponentProcessor;
 import com.sun.jersey.core.spi.component.ioc.IoCComponentProcessorFactory;
 import com.sun.jersey.core.spi.component.ioc.IoCComponentProcessorFactoryInitializer;
+import com.sun.jersey.server.impl.BuildId;
 import com.sun.jersey.server.impl.model.parameter.multivalued.MultivaluedParameterExtractorFactory;
 import com.sun.jersey.server.impl.model.parameter.multivalued.MultivaluedParameterExtractorProvider;
 import com.sun.jersey.server.impl.model.parameter.multivalued.StringReaderFactory;
@@ -393,6 +394,8 @@ public final class WebApplicationImpl implements WebApplication {
             throw new ContainerException(ImplMessages.WEB_APP_ALREADY_INITIATED());
         }
         this.initiated = true;
+
+        LOGGER.info("Initiating Jersey application, version '" + BuildId.getBuildId() + "'");
 
         // Validate the resource config
         resourceConfig.validate();
