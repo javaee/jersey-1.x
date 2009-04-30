@@ -102,7 +102,7 @@
         </plugins>
     </build>
     <properties>
-        <jersey-version>1.1.0-ea-SNAPSHOT</jersey-version>
+        <jersey-version>1.1.1-ea-SNAPSHOT</jersey-version>
     </properties>
     <repositories>
         <repository>
