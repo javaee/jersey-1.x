@@ -56,4 +56,11 @@
         <module>docs-and-samples</module>
         <module>osgi-modules</module>
     </modules>
+    <repositories>
+        <repository>
+            <id>m2.dev.java.net</id>
+            <url>http://download.java.net/maven/2</url>
+            <layout>default</layout>
+        </repository>
+    </repositories>
 </project>
