@@ -1,0 +1,17 @@
+<assembly>
+  <id>project</id>
+  <formats>
+    <format>zip</format>
+  </formats>
+  <fileSets>
+    <fileSet>
+      <directory>.</directory>
+      <outputDirectory></outputDirectory>
+      <useDefaultExcludes>true</useDefaultExcludes>
+      <excludes>
+        <exclude>**/target/**</exclude>
+        <exclude>**/*jersey*</exclude>
+      </excludes>
+    </fileSet>
+  </fileSets>
+</assembly>

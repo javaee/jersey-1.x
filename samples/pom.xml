@@ -74,6 +74,7 @@
         <module>storage-service</module>
         <module>https-clientserver-grizzly</module>
         <module>https-server-glassfish</module>
+        <module>jersey-ejb</module>
     </modules>
     <build>
         <plugins>

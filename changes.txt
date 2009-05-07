@@ -1,5 +1,5 @@
 release 1.1.1-ea (2009-06)
-- 
+- Added Jersey EJB sample
 
 release 1.1.0-ea (2009-05-04)
 - Fixed issue 283
