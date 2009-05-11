@@ -37,190 +37,131 @@
 
 package com.sun.jersey.samples.jmaki;
 
-import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.ClientResponse;
-import com.sun.jersey.api.client.WebResource;
+import com.sun.jersey.api.client.filter.LoggingFilter;
 import com.sun.jersey.core.header.MediaTypes;
 import com.sun.jersey.samples.jmaki.beans.Printer;
 import com.sun.jersey.samples.jmaki.beans.PrinterTableModel;
 import com.sun.jersey.samples.jmaki.beans.TreeModel;
 import com.sun.jersey.samples.jmaki.beans.WebResourceList;
-import java.io.File;
-import java.net.URI;
-import java.util.Collections;
+import com.sun.jersey.test.framework.JerseyTest;
+import com.sun.jersey.test.framework.util.ApplicationDescriptor;
 import java.util.List;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import javax.ws.rs.core.UriBuilder;
-import junit.framework.TestCase;
-import org.glassfish.embed.ScatteredWar;
-import org.glassfish.embed.GlassFish;
+import org.junit.Assert;
+import org.junit.Test;
 
 /**
  *
  * @author Naresh
  */
-public class JMakiBackendWebappTest extends TestCase {
+public class JMakiBackendWebappTest extends JerseyTest {
 
-     private static int getPort(int defaultPort) {
-        String port = System.getenv("JERSEY_HTTP_PORT");
-        if (null != port) {
-            try {
-                return Integer.parseInt(port);
-            } catch (NumberFormatException e) {
-            }
-        }
-        return defaultPort;
-    }
-
-    private static URI getBaseURI() {
-        return UriBuilder.fromUri("http://localhost/").port(getPort(9998)).
-                path("jMakiBackend/webresources").build();
-    }
-
-    private static final URI BASE_URI = getBaseURI();
-
-    private GlassFish glassfish;
-
-    private WebResource r;
-
-    public JMakiBackendWebappTest(String testName) {
-        super(testName);
-    }
-
-    @Override
-    protected void setUp() throws Exception {
-        super.setUp();
-
-        // Start Glassfish
-        glassfish = new GlassFish(BASE_URI.getPort());
-        // Deploy Glassfish referencing the web.xml
-        ScatteredWar war = new ScatteredWar(BASE_URI.getRawPath(),
-                new File("src/main/webapp"),
-                new File("src/main/webapp/WEB-INF/web.xml"),
-                Collections.singleton(new File("target/classes").toURI().toURL()));
-        glassfish.deploy(war);
-        Client c = Client.create();
-        r = c.resource(BASE_URI);
-    }
-
-    @Override
-    protected void tearDown() throws Exception {
-        super.tearDown();
-
-        glassfish.stop();
-    }
-
-    /**
-     * Test checks responses to requests to different resources.
-     */
-    public void testAll() {
-        doTestApplicationWadl();
-        doTestGetPrinters();
-        doTestGetPrinterList();
-        doTestGetPrinterJMakiTree();
-        doTestGetPrinterJMakiTable();
-        doTestGetPrinterBasedOnId();
-        doTestPutPrinterBasedOnId();
+    public JMakiBackendWebappTest() throws Exception {
+        super();
+        ApplicationDescriptor appDescriptor = new ApplicationDescriptor()
+                .setContextPath("/jMakiBackend")
+                .setServletPath("/webresources")
+                .setRootResourcePackageName("com.sun.jersey.samples.jmaki");
+        super.setupTestEnvironment(appDescriptor);
     }
 
     /**
      * Test checks the application WADL is generated.
      */
+    @Test
     public void doTestApplicationWadl() {
-        String wadl = r.path("application.wadl").accept(MediaTypes.WADL).get(String.class);
-        assertTrue("Method: doTestApplicationWadl \nMessage: Something wrong, returned WADL length is not > 0",
+        String wadl = webResource.path("application.wadl").accept(MediaTypes.WADL).get(String.class);
+        Assert.assertTrue("Method: doTestApplicationWadl \nMessage: Something wrong, returned WADL length is not > 0",
                 wadl.length() > 0);
     }
 
     /**
      * Test checks GET on resource "printers".
      */
+    @Test
     public void doTestGetPrinters() {
         // GET Printers - mime-type application/json
-        WebResourceList resourceList = r.path("printers").accept(MediaType.APPLICATION_JSON)
-                .get(WebResourceList.class);
+        WebResourceList resourceList = webResource.path("printers").accept(MediaType.APPLICATION_JSON).get(WebResourceList.class);
         int numberOfResourceTypes = resourceList.items.size();
-        assertEquals("Method: doTestGetPrinters \nMessage: Number of resource types retrieved " +
+        Assert.assertEquals("Method: doTestGetPrinters \nMessage: Number of resource types retrieved " +
                 "with MIME-TYPE application/json do not match the expected number.", 3, numberOfResourceTypes);
 
         // GET Printers - mime-type application/xml
-        resourceList = r.path("printers").accept(MediaType.APPLICATION_XML)
-                .get(WebResourceList.class);
+        resourceList = webResource.path("printers").accept(MediaType.APPLICATION_XML).get(WebResourceList.class);
         numberOfResourceTypes = resourceList.items.size();
-        assertEquals("Method: doTestGetPrinters \nMessage: Number of resource types retrieved " +
+        Assert.assertEquals("Method: doTestGetPrinters \nMessage: Number of resource types retrieved " +
                 "with MIME-TYPE application/xml do not match the expected number.", 3, numberOfResourceTypes);
     }
 
     /**
      * Test checks GET on resource "printers/list".
      */
+    @Test
     public void doTestGetPrinterList() {
         //GET on printer list - mime-type application/json
-        WebResourceList resourceList = r.path("printers").path("list").accept(MediaType.APPLICATION_JSON)
-                .get(WebResourceList.class);
+        WebResourceList resourceList = webResource.path("printers").path("list").accept(MediaType.APPLICATION_JSON).get(WebResourceList.class);
         int numberOfPrinters = resourceList.items.size();
-        assertEquals("Method: doTestGetPrinterList \nMessage: Number of printers retrieved " +
+        Assert.assertEquals("Method: doTestGetPrinterList \nMessage: Number of printers retrieved " +
                 "with MIME-TYPE application/json do not match the expected number.", 5, numberOfPrinters);
 
         //GET on printer list - mime-type application/xml
-        resourceList = r.path("printers").path("list").accept(MediaType.APPLICATION_XML)
-                .get(WebResourceList.class);
+        resourceList = webResource.path("printers").path("list").accept(MediaType.APPLICATION_XML).get(WebResourceList.class);
         numberOfPrinters = resourceList.items.size();
-        assertEquals("Method: doTestGetPrinterList \nMessage: Number of printers retrieved " +
+        Assert.assertEquals("Method: doTestGetPrinterList \nMessage: Number of printers retrieved " +
                 "with MIME-TYPE application/xml do not match the expected number.", 5, numberOfPrinters);
     }
 
     /**
      * Test checks GET on resource "printers/jMakiTree".
      */
+    @Test
     public void doTestGetPrinterJMakiTree() {
         //GET on printer list - mime-type application/json
-        TreeModel treeModel = r.path("printers").path("jMakiTree")
-                .accept(MediaType.APPLICATION_JSON).get(TreeModel.class);
-        assertEquals("Method: doTestGetPrinterJMakiTree \nMessage: Root of the returned " +
+        TreeModel treeModel = webResource.path("printers").path("jMakiTree").accept(MediaType.APPLICATION_JSON).get(TreeModel.class);
+        Assert.assertEquals("Method: doTestGetPrinterJMakiTree \nMessage: Root of the returned " +
                 "jMakiTree doesn't match the expected value", "printers", treeModel.root.label);
     }
 
     /**
      * Test checks GET on resource "printers/jMakiTable".
      */
+    @Test
     public void doTestGetPrinterJMakiTable() {
-        PrinterTableModel printerTableModel = r.path("printers").path("jMakiTable")
-                .accept(MediaType.APPLICATION_JSON).get(PrinterTableModel.class);
+        PrinterTableModel printerTableModel = webResource.path("printers").path("jMakiTable").accept(MediaType.APPLICATION_JSON).get(PrinterTableModel.class);
         List<PrinterTableModel.JMakiTableHeader> tableHeaders = printerTableModel.columns;
-        assertEquals("Method: doTestGetPrinterJMakiTable \nMessage: Number of table headers " +
+        Assert.assertEquals("Method: doTestGetPrinterJMakiTable \nMessage: Number of table headers " +
                 "do not match the expected number", 4, tableHeaders.size());
     }
 
     /**
      * Test checks GET on resource "printers/ids" based on id.
      */
+    @Test
     public void doTestGetPrinterBasedOnId() {
-        Printer printer = r.path("printers").path("ids").path("P01")
-                .accept(MediaType.APPLICATION_JSON).get(Printer.class);
-        assertEquals("Method: doTestGetPrinterBasedOnId \nMessage: ID of the retrieved printer " +
+        Printer printer = webResource.path("printers").path("ids").path("P01").accept(MediaType.APPLICATION_JSON).get(Printer.class);
+        Assert.assertEquals("Method: doTestGetPrinterBasedOnId \nMessage: ID of the retrieved printer " +
                 "doesn't match the search value", "P01", printer.id);
     }
 
     /**
      * Test checks PUT on resource "printers/ids" based on id.
      */
+    @Test
     public void doTestPutPrinterBasedOnId() {
-        Printer printer = r.path("printers").path("ids").path("P01")
-                .accept(MediaType.APPLICATION_JSON).get(Printer.class);
+        LoggingFilter loggingFilter = new LoggingFilter();
+        webResource.addFilter(loggingFilter);
+        Printer printer = webResource.path("printers").path("ids").path("P01").accept(MediaType.APPLICATION_JSON).get(Printer.class);
         String printerModel = printer.model;
         String printerLocation = printer.location;
         String printerUrl = printer.url;
         printer = new Printer("P01", "Xerox", printerLocation, printerUrl);
-        ClientResponse response = r.path("printers").path("ids").path("P01")
-                .type(MediaType.APPLICATION_JSON).put(ClientResponse.class, printer);
-        assertEquals("Method: doTestPutPrinterBasedOnId \nMessage: Response status doesn't match the expected value.",
+        ClientResponse response = webResource.path("printers").path("ids").path("P01").type(MediaType.APPLICATION_JSON).put(ClientResponse.class, printer);
+        Assert.assertEquals("Method: doTestPutPrinterBasedOnId \nMessage: Response status doesn't match the expected value.",
                 Response.Status.NO_CONTENT, response.getResponseStatus());
-        printer = r.path("printers").path("ids").path("P01")
-                .accept(MediaType.APPLICATION_JSON).get(Printer.class);
-        assertNotSame("Method: doTestPutPrinterBasedOnId \nMessage: Printer holds the old model inspite of update.", printerModel, printer.model);
-        assertEquals("Method: doTestPutPrinterBasedOnId \nMessage: Updated printer model doesn't get reflected.", "Xerox", printer.model);
+        printer = webResource.path("printers").path("ids").path("P01").accept(MediaType.APPLICATION_JSON).get(Printer.class);
+        Assert.assertNotSame("Method: doTestPutPrinterBasedOnId \nMessage: Printer holds the old model inspite of update.", printerModel, printer.model);
+        Assert.assertEquals("Method: doTestPutPrinterBasedOnId \nMessage: Updated printer model doesn't get reflected.", "Xerox", printer.model);
     }
-
 }

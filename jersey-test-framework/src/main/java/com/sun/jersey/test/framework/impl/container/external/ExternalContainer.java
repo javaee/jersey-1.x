@@ -37,7 +37,7 @@
 
 package com.sun.jersey.test.framework.impl.container.external;
 
-import com.sun.jersey.test.framework.impl.BasicLightWeightContainer;
+import com.sun.jersey.test.framework.impl.BasicServletContainer;
 import com.sun.jersey.test.framework.impl.Deployable;
 import java.net.URI;
 import java.util.Map;
@@ -59,7 +59,7 @@ import org.codehaus.cargo.generic.deployable.DefaultDeployableFactory;
  * an external container.
  * @author Naresh (Srinivas.Bhimisetty@Sun.Com)
  */
-public class ExternalContainer implements BasicLightWeightContainer, Deployable {
+public class ExternalContainer implements BasicServletContainer, Deployable {
 
     public void setBaseUri(URI baseUri) {
         //do nothing
@@ -116,6 +116,26 @@ container.start();
 
     public void setHttpListenerPort(int httpPort) {
         //do nothing
-    } 
+    }
+
+    public void setContextParams(Map<String, String> contextParams) {
+        //do nothing
+    }
+
+    public void setServletClass(Class servletClass) {
+        //do nothing
+    }
+
+    public void setServletListener(String servletListenerClass) {
+        //do nothing
+    }
+
+    public void setServletPath(String servletPath) {
+        //do nothing
+    }
+
+    public void setContextPath(String contextPath) {
+        //do nothing
+    }
 
 }

@@ -37,91 +37,42 @@
 
 package com.sun.jersey.samples.springannotations;
 
-import com.sun.jersey.api.client.Client;
-import com.sun.jersey.api.client.WebResource;
 import com.sun.jersey.core.header.MediaTypes;
 import com.sun.jersey.samples.springannotations.model.Item;
 import com.sun.jersey.samples.springannotations.model.Item2;
-import java.io.File;
-import java.net.URI;
-import java.util.Collections;
+import com.sun.jersey.test.framework.util.ApplicationDescriptor;
+import com.sun.jersey.test.framework.JerseyTest;
+import java.util.HashMap;
+import java.util.Map;
 import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.UriBuilder;
-import junit.framework.TestCase;
-import org.glassfish.embed.ScatteredWar;
-import org.glassfish.embed.GlassFish;
+import org.junit.Test;
+import static org.junit.Assert.*;
 
 /**
  *
  * @author Naresh (Srinivas.Bhimisetty@Sun.Com)
  */
-public class SpringAnnotationsWebAppTest extends TestCase {
+public class SpringAnnotationsWebAppTest extends JerseyTest {
 
-    private static int getPort(int defaultPort) {
-        String port = System.getenv("JERSEY_HTTP_PORT");
-        if (null != port) {
-            try {
-                return Integer.parseInt(port);
-            } catch (NumberFormatException e) {
-            }
-        }
-        return defaultPort;
-    }
-
-    private static URI getBaseURI() {
-        return UriBuilder.fromUri("http://localhost/").port(getPort(9998))
-                .path("spring").build();
-    }
-
-    private static final URI BASE_URI = getBaseURI();
-
-    private GlassFish glassfish;
-
-    private WebResource r;
-
-    public SpringAnnotationsWebAppTest(String testName) {
-        super(testName);
-    }
-
-    @Override
-    protected void setUp() throws Exception {
-        super.setUp();
-
-        // Start Glassfish
-        glassfish = new GlassFish(BASE_URI.getPort());
-        // Deploy Glassfish referencing the web.xml
-        ScatteredWar war = new ScatteredWar(BASE_URI.getRawPath(),
-                new File("src/main/webapp"),
-                new File("src/main/webapp/WEB-INF/web.xml"),
-                Collections.singleton(new File("target/classes").toURI().toURL()));
-        glassfish.deploy(war);
-        Client c = Client.create();
-        r = c.resource(BASE_URI);
-    }
-
-    @Override
-    protected void tearDown() throws Exception {
-        super.tearDown();
-
-        glassfish.stop();
-    }
-
-    /**
-     * Test calls the various test elements.
-     */
-    public void testAll() {
-        doTestApplicationWadl();
-        doTestSpringResourced();
-        doTestSpringAutowired();
-        doTestJerseyAutowired();
-        doTestSpringAop();
+    public SpringAnnotationsWebAppTest() throws Exception {
+        super();
+        Map<String, String> contextParams = new HashMap<String, String>();
+        contextParams.put("contextConfigLocation", "classpath:applicationContext.xml");
+        ApplicationDescriptor appDescriptor = new ApplicationDescriptor()
+                .setContextPath("/spring")
+                .setRootResourcePackageName("com.sun.jersey.samples.springannotations.resources.jerseymanaged")
+                .setServletClass(com.sun.jersey.spi.spring.container.servlet.SpringServlet.class)
+                .setContextListenerClassName("org.springframework.web.context.ContextLoaderListener")
+                .setContextParams(contextParams);
+        super.setupTestEnvironment(appDescriptor);
     }
 
     /**
      * Test checks that an application.wadl file is generated.
      */
+    @Test
     public void doTestApplicationWadl() {
-        String wadl = r.path("application.wadl").accept(MediaTypes.WADL)
+        String wadl = webResource.path("application.wadl").accept(MediaTypes.WADL)
                 .get(String.class);
         assertTrue("Method: doTestApplicationWadl \nMessage: Something wrong, the returned " +
                 "WADL's length is not > 0", wadl.length() > 0);
@@ -131,8 +82,9 @@ public class SpringAnnotationsWebAppTest extends TestCase {
      * Test checks that a request for the resource "spring-resourced" gives
      * a valid response.
      */
+    @Test
     public void doTestSpringResourced() {
-        Item2 item = r.path("spring-resourced").accept(MediaType.APPLICATION_XML)
+        Item2 item = webResource.path("spring-resourced").accept(MediaType.APPLICATION_XML)
                 .get(Item2.class);
         assertEquals("Method: doTestSpringResourced \nMessage: Returned item's value " +
                 " does not match the expected one.", "baz", item.getValue());
@@ -142,8 +94,9 @@ public class SpringAnnotationsWebAppTest extends TestCase {
      * Test checks that a request for the resource "spring-autowired" gives a
      * valid response.
      */
+    @Test
     public void doTestSpringAutowired() {
-        Item2 item = r.path("spring-autowired").accept(MediaType.APPLICATION_XML)
+        Item2 item = webResource.path("spring-autowired").accept(MediaType.APPLICATION_XML)
                 .get(Item2.class);
         assertEquals("Method: doTestSpringAutowired \nMessage: Returned item's value " +
                 " does not match the expected one.", "bar", item.getValue());
@@ -153,25 +106,12 @@ public class SpringAnnotationsWebAppTest extends TestCase {
      * Test checks that a request for the resource "jersey-autowired" gives
      * a valid response.
      */
+    @Test
     public void doTestJerseyAutowired() {
-        Item item = r.path("jersey-autowired").accept(MediaType.APPLICATION_XML)
+        Item item = webResource.path("jersey-autowired").accept(MediaType.APPLICATION_XML)
                 .get(Item.class);
         assertEquals("Method: doTestJerseyAutowired \nMessage: Returned item's value " +
                 " does not match the expected one.", "foo", item.getValue());
     }
 
-    /**
-     * Test checks that a request for the resource "spring-aop" gives
-     * a valid response.
-     */
-    public void doTestSpringAop() {
-        Item item = r.path("spring-aop").accept(MediaType.APPLICATION_XML)
-                .get(Item.class);
-        assertEquals("Method: doTestSpringAop \nMessage: Returned item's value " +
-                " does not match the expected one.", "foo", item.getValue());
-        Item2 item2 = r.path("spring-aop/subresource").accept(MediaType.APPLICATION_XML)
-                .get(Item2.class);
-        assertEquals("Method: doTestSpringAop \nMessage: Returned item's value " +
-                " does not match the expected one.", "bar", item2.getValue());
-    }
 }

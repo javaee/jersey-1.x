@@ -50,35 +50,17 @@
     <dependencies>
         <dependency>
             <groupId>com.sun.jersey</groupId>
-            <artifactId>jersey-server</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.sun.jersey</groupId>
             <artifactId>jersey-json</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <version>3.8.2</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.glassfish.distributions</groupId>
-            <artifactId>web-all</artifactId>
-            <version>10.0-build-20080430</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.glassfish.embedded</groupId>
-            <artifactId>gf-embedded-api</artifactId>
-            <version>1.0-alpha-4</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
             <groupId>com.sun.jersey</groupId>
-            <artifactId>jersey-client</artifactId>
+            <artifactId>jersey-server</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.sun.jersey.test.framework</groupId>
+            <artifactId>jersey-test-framework</artifactId>
             <version>${project.version}</version>
             <scope>test</scope>
         </dependency>
