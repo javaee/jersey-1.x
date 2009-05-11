@@ -6,6 +6,7 @@
 package com.sun.jersey.samples.jersey_ejb.test;
 
 import com.sun.jersey.api.client.ClientResponse;
+import com.sun.jersey.api.client.UniformInterfaceException;
 import com.sun.jersey.test.framework.JerseyTest;
 import com.sun.jersey.test.framework.util.ApplicationDescriptor;
 import java.net.URI;
@@ -35,6 +36,8 @@ public class MessageBoardTest extends JerseyTest {
         ClientResponse response = webResource.path("app/messages").post(ClientResponse.class, "hello world!");
 
         assertTrue(response.getClientResponseStatus() == ClientResponse.Status.CREATED);
+
+        jerseyClient.resource(response.getLocation()).delete(); // remove added message
     }
 
     @Test public void testDeleteMessage() {
@@ -52,6 +55,18 @@ public class MessageBoardTest extends JerseyTest {
         assertTrue(s.contains("toDelete"));
 
         jerseyClient.resource(u).delete();
+
+        boolean caught = false;
+
+        try {
+            s = jerseyClient.resource(u).get(String.class);
+        } catch (UniformInterfaceException e) {
+            if (e.getResponse().getStatus() == 404) {
+                caught = true;
+            }
+        }
+
+        assertTrue(caught);
     }
 }
 
