@@ -231,23 +231,6 @@
                 </configuration>
 
             </plugin>
-
-            <!--  Maven Exec Plug-In: http://mojo.codehaus.org/exec-maven-plugin/  -->
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>exec-maven-plugin</artifactId>
-                <version>1.1</version>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>java</goal>
-                        </goals>
-                    </execution>
-                </executions>
-                <configuration>
-                    <mainClass>com.sun.jersey.samples.generatewadl.Main</mainClass>
-                </configuration>
-            </plugin>
         </plugins>
     </build>
 
