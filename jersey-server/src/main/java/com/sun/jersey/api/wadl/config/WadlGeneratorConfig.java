@@ -44,6 +44,9 @@ import java.util.Properties;
 
 import com.sun.jersey.api.core.ResourceConfig;
 import com.sun.jersey.server.wadl.WadlGenerator;
+import com.sun.jersey.server.wadl.generators.WadlGeneratorApplicationDoc;
+import com.sun.jersey.server.wadl.generators.WadlGeneratorGrammarsSupport;
+import com.sun.jersey.server.wadl.generators.resourcedoc.WadlGeneratorResourceDocSupport;
 
 /**
  * Provides a configured {@link WadlGenerator} with all decorations (the default
@@ -79,7 +82,6 @@ import com.sun.jersey.server.wadl.WadlGenerator;
  * to the name of your subclass. This class might look like this:
  * <pre><code>class MyWadlGeneratorConfig extends WadlGeneratorConfig {
 
-        &ampOverride
         public List<WadlGeneratorDescription> configure() {
             return generator( MyWadlGenerator.class )
                 .prop( "foo", propValue )
@@ -102,7 +104,13 @@ import com.sun.jersey.server.wadl.WadlGenerator;
  *  if the WadlGenerator property is of type <code>org.example.Foo</code> and the
  *  provided property value is of type <code>org.example.Foo</code></li>
  * <li>Types that provide a constructor for the provided type (mostly java.lang.String)</li>
- * <li>The WadlGenerator property is of type {@link File} and the provided property value is a {@link String}:<br/>
+ * <li>java.io.InputStream: The {@link InputStream} can e.g. represent a file. The stream is loaded from the
+ *  property value (provided by the {@link WadlGeneratorDescription}) via 
+ *  {@link ClassLoader#getResourceAsStream(String)}. It will be closed after {@link WadlGenerator#init()} was called.
+ * </li>
+ * 
+ * <li><strong>Deprected, will be removed in future versions:</strong><br/>
+ * The WadlGenerator property is of type {@link File} and the provided property value is a {@link String}:<br/>
  *  the provided property value can contain the prefix <em>classpath:</em> to denote, that the
  *  path to the file is relative to the classpath. In this case, the property value is stripped by 
  *  the prefix <em>classpath:</em> and the {@link File} is created via
@@ -111,11 +119,34 @@ import com.sun.jersey.server.wadl.WadlGenerator;
  *  refers to a file in the package of the class ({@link WadlGeneratorDescription#getGeneratorClass()}). The
  *  file reference <em>classpath:/test.xml</em> refers to a file that is in the root of the classpath.
  * </li>
- * <li>java.io.InputStream: The {@link InputStream} can e.g. represent a file. The stream is loaded from the
- *  property value (provided by the {@link WadlGeneratorDescription}) via 
- *  {@link ClassLoader#getResourceAsStream(String)}. It will be closed after {@link WadlGenerator#init()} was called.
- * </li>
+ * 
  * </ul>
+ * </p>
+ * <p>
+ * <strong>Existing {@link WadlGenerator} implementations:</strong><br/>
+ * <br/>
+ * <ul>
+ *  <li>{@link WadlGeneratorApplicationDoc}</li>
+ *  <li>{@link WadlGeneratorGrammarsSupport}</li>
+ *  <li>{@link WadlGeneratorResourceDocSupport}</li>
+ * </ul>
+ * </p>
+ * <p>
+ * A common example for a {@link WadlGeneratorConfig} would be this:
+ * <pre><code>class MyWadlGeneratorConfig extends WadlGeneratorConfig {
+
+        public List<WadlGeneratorDescription> configure() {
+            return generator( WadlGeneratorApplicationDoc.class ) 
+                .prop( "applicationDocsStream", "application-doc.xml" ) 
+              .generator( WadlGeneratorGrammarsSupport.class ) 
+                .prop( "grammarsStream", "application-grammars.xml" ) 
+              .generator( WadlGeneratorResourceDocSupport.class ) 
+                .prop( "resourceDocStream", "resourcedoc.xml" ) 
+              .descriptions();
+        }
+        
+    }
+ * </code></pre>
  * </p>
  * 
  * @author <a href="mailto:martin.grotzke@freiheit.com">Martin Grotzke</a>
@@ -144,7 +175,9 @@ public abstract class WadlGeneratorConfig {
     public abstract List<WadlGeneratorDescription> configure();
 
     /**
-     * @return the wadlGeneratorDescriptions
+     * Get or load the initialized {@link WadlGenerator}, based on the {@link WadlGeneratorDescription}s
+     * provided by {@link #configure()}.
+     * @return the initialized {@link WadlGenerator}.
      */
     public synchronized WadlGenerator getWadlGenerator() {
         if ( _wadlGenerator == null ) {

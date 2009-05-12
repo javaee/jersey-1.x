@@ -36,8 +36,6 @@
  */
 package com.sun.jersey.api.wadl.config;
 
-import java.util.logging.Logger;
-
 import com.sun.jersey.api.core.ResourceConfig;
 import com.sun.jersey.core.reflection.ReflectionHelper;
 import com.sun.jersey.server.wadl.WadlGenerator;
@@ -54,8 +52,19 @@ import com.sun.jersey.server.wadl.WadlGeneratorImpl;
  */
 public class WadlGeneratorConfigLoader {
 
-    private static final Logger LOGGER = Logger.getLogger( WadlGeneratorConfigLoader.class.getName() );
-
+    /**
+     * Load the {@link WadlGeneratorConfig} from the provided {@link ResourceConfig} using the
+     * property {@link ResourceConfig#PROPERTY_WADL_GENERATOR_CONFIG}.
+     * 
+     * <p>
+     * The type of this property must be a subclass or an instance of a subclass of
+     * {@link WadlGeneratorConfig}.<br/>
+     * If it's not set, the default {@link WadlGeneratorImpl} will be used.
+     * </p>
+     * 
+     * @param resourceConfig
+     * @return the initialized {@link WadlGenerator}.
+     */
     public static WadlGenerator loadWadlGeneratorsFromConfig( ResourceConfig resourceConfig ) {
         final Object wadlGeneratorConfigProperty = resourceConfig.getProperty(
                 ResourceConfig.PROPERTY_WADL_GENERATOR_CONFIG );

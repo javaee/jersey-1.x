@@ -61,17 +61,18 @@ import com.sun.jersey.server.wadl.WadlGeneratorImpl;
  * <li>exact match: if the WadlGenerator property is of type <code>org.example.Foo</code> and the
  * property value provided by the {@link WadlGeneratorDescription} is of type <code>org.example.Foo</code></li>
  * 
- * <li>java.lang.File: The property value can contain the prefix <em>classpath:</em> to denote, that the
- * path to the file is relative to the classpath. In this case, the property value is stripped by 
- * the prefix <em>classpath:</em> and the java.lang.File is created via
- * <pre><code>new File( generator.getClass().getResource( strippedFilename ).toURI() )</code></pre></li>
- * 
  * <li>java.io.InputStream: The {@link InputStream} can e.g. represent a file. The stream is loaded from the
  * property value (provided by the {@link WadlGeneratorDescription}) via 
  * {@link ClassLoader#getResourceAsStream(String)}. It will be closed after {@link WadlGenerator#init()} was called.
  * </li>
  * 
  * <li>Types that provide a constructor for the provided type (mostly java.lang.String)</li>
+ * 
+ * <li><strong>Deprected, will be removed in future versions from the {@link WadlGeneratorLoader}:</strong><br/>
+ * java.lang.File: The property value can contain the prefix <em>classpath:</em> to denote, that the
+ * path to the file is relative to the classpath. In this case, the property value is stripped by 
+ * the prefix <em>classpath:</em> and the java.lang.File is created via
+ * <pre><code>new File( generator.getClass().getResource( strippedFilename ).toURI() )</code></pre></li>
  * 
  * </ul>
  * 
@@ -163,6 +164,10 @@ class WadlGeneratorLoader {
             method.invoke( generator, propertyValue );
         }
         else if ( File.class.equals( paramClazz ) && propertyValue instanceof String ) {
+            /* This is now deprecated and can be removed in future versions.
+             * It's beeing replaced by the InputStream support, which must be used in
+             * a JEE environment instead of files.
+             */
             final String filename = propertyValue.toString();
             if ( filename.startsWith( "classpath:" ) ) {
                 final String strippedFilename = filename.substring( "classpath:".length() );
