@@ -8,6 +8,11 @@ release 1.1.1-ea (2009-06)
   If the @DefaultValue annotation is not present and no parameter is present
   an empty collection will be returned for the types List, Set or SortedSet.
 - Added Jersey EJB sample
+- Fixed issue 292
+  https://jersey.dev.java.net/issues/show_bug.cgi?id=292
+  The file based configuration of custom WadlGenerator implementations via
+  the WadlGeneratorConfig is now deprecated and will be removed in future
+  versions. As alternative the InputStream based configuration shall be used.
 
 release 1.1.0-ea (2009-05-04)
 - Fixed issue 283
