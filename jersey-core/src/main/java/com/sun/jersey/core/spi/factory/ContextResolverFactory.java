@@ -37,6 +37,8 @@
 package com.sun.jersey.core.spi.factory;
 
 import com.sun.jersey.core.header.MediaTypes;
+import com.sun.jersey.core.reflection.ReflectionHelper;
+import com.sun.jersey.core.reflection.ReflectionHelper.DeclaringClassInterfacePair;
 import com.sun.jersey.core.spi.component.ProviderServices;
 import com.sun.jersey.core.util.KeyComparatorHashMap;
 import com.sun.jersey.spi.inject.Injectable;
@@ -75,9 +77,7 @@ public class ContextResolverFactory {
             List<MediaType> ms = MediaTypes.createMediaTypes(
                     provider.getClass().getAnnotation(Produces.class));
 
-            ParameterizedType pType = getType(provider.getClass());
-            Type type = pType.getActualTypeArguments()[0];
-            // TODO check if concrete type
+            Type type = getParameterizedType(provider.getClass());
             
             Map<MediaType, Set<ContextResolver>> mr = rs.get(type);
             if (mr == null) {
@@ -167,23 +167,16 @@ public class ContextResolverFactory {
             }            
         });
     }
-    
-    private ParameterizedType getType(Class providerClass) {
-        while (providerClass != null) {
-            for (Type type : providerClass.getGenericInterfaces()) {
-                if (type instanceof ParameterizedType) {
-                    ParameterizedType pType = (ParameterizedType)type;
-                    if (pType.getRawType() == ContextResolver.class) {
-                        return pType;
-                    }
-                }
-            }
-            providerClass = providerClass.getSuperclass();
-        }
-        
-        throw new IllegalArgumentException();
+
+    private Type getParameterizedType(Class c) {
+        DeclaringClassInterfacePair p = ReflectionHelper.getClass(
+                c, ContextResolver.class);
+
+        Type[] as = ReflectionHelper.getParameterizedTypeArguments(p);
+
+        return (as != null) ? as[0] : Object.class;
     }
-    
+
     private static final class ContextResolverAdapter implements ContextResolver {
         private final Set<ContextResolver> crs;
         

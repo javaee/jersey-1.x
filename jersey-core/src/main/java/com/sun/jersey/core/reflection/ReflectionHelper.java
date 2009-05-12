@@ -304,6 +304,38 @@ public class ReflectionHelper {
     }
     
     /**
+     * Get the parameterized type arguments for a declaring class that
+     * declares a generic interface type.
+     *
+     * @param p the declaring class
+     * @return the parameterized type arguments, or null if the generic
+     *         interface type is not a parameterized type.
+     */
+    public static Type[] getParameterizedTypeArguments(DeclaringClassInterfacePair p) {
+        if (p.genericInterface instanceof ParameterizedType) {
+            ParameterizedType pt = (ParameterizedType)p.genericInterface;
+            Type[] as = pt.getActualTypeArguments();
+            Type[] ras = new Type[as.length];
+
+            for (int i = 0; i < as.length; i++) {
+                Type a = as[i];
+                if (a instanceof Class) {
+                    ras[i] = a;
+                } else if (a instanceof ParameterizedType) {
+                    pt = (ParameterizedType)a;
+                    ras[i] = a;
+                } else if (a instanceof TypeVariable) {
+                    ClassTypePair ctp = resolveTypeVariable(p.concreteClass, p.declaringClass, (TypeVariable)a);
+                    ras[i] = ctp.t;
+                }
+            }
+            return ras;
+        } else {
+            return null;
+        }
+    }
+
+    /**
      * Find the declaring class that implements or extends an interface.
      *
      * @param concrete the concrete class than directly or indirectly

@@ -40,6 +40,8 @@ import com.sun.jersey.impl.AbstractResourceTester;
 import com.sun.jersey.api.client.WebResource;
 import java.io.IOException;
 import java.math.BigInteger;
+import java.util.Arrays;
+import java.util.List;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
@@ -64,118 +66,118 @@ public class ContextResolverTest extends AbstractResourceTester {
         public String getContext(Class<?> objectType) {
             if (Integer.class == objectType)
                 return objectType.getName();
-            else 
+            else
                 return null;
         }
     }
-    
+
     @Provider
     public static class BigIntegerContextResolver implements ContextResolver<String> {
         public String getContext(Class<?> objectType) {
             if (BigInteger.class == objectType)
                 return objectType.getName();
-            else 
+            else
                 return null;
         }
     }
-    
+
     @Path("/")
     public static class NullContextResource {
         @Context ContextResolver<String> cr;
-        
+
         @GET
         public String get() {
             return (cr == null) ? "null" : "value";
-        }   
+        }
     }
-    
+
     @Path("/")
     public static class ContextResource {
         @Context Providers p;
-        
+
         @Context ContextResolver<String> cr;
-        
+
         @GET
         public String get() {
             ContextResolver<String> _cr = p.getContextResolver(String.class, null);
             assertEquals(_cr, cr);
             return cr.getContext(Integer.class);
-        }        
-        
+        }
+
         @GET @Path("big")
         public String getBig() {
             return cr.getContext(BigInteger.class);
-        }        
-        
+        }
+
         @GET @Path("null")
         public String getNull() {
             String s = cr.getContext(Float.class);
             return (s != null) ? s : "null";
-        }        
+        }
     }
-    
+
     public void testZero() throws IOException {
         initiateWebApplication(NullContextResource.class);
         WebResource r = resource("/");
-        
+
         assertEquals("null", resource("/").get(String.class));
     }
-    
+
     public void testOne() throws IOException {
         initiateWebApplication(ContextResource.class, IntegerContextResolver.class);
-        
-        assertEquals("java.lang.Integer", resource("/").get(String.class));        
-        
-        assertEquals("null", resource("/null").get(String.class));        
-    }   
-    
+
+        assertEquals("java.lang.Integer", resource("/").get(String.class));
+
+        assertEquals("null", resource("/null").get(String.class));
+    }
+
     public void testTwo() throws IOException {
-        initiateWebApplication(ContextResource.class, IntegerContextResolver.class, 
+        initiateWebApplication(ContextResource.class, IntegerContextResolver.class,
                 BigIntegerContextResolver.class);
-        
-        assertEquals("java.lang.Integer", resource("/").get(String.class));        
-        
-        assertEquals("java.math.BigInteger", resource("/big").get(String.class));        
-        
-        assertEquals("null", resource("/null").get(String.class));        
-    }   
-    
-    
+
+        assertEquals("java.lang.Integer", resource("/").get(String.class));
+
+        assertEquals("java.math.BigInteger", resource("/big").get(String.class));
+
+        assertEquals("null", resource("/null").get(String.class));
+    }
+
+
     @Provider
     @Produces("application/one")
     public static class IntegerContextResolverMediaOne implements ContextResolver<String> {
         public String getContext(Class<?> objectType) {
             if (Integer.class == objectType)
                 return objectType.getName();
-            else 
+            else
                 return null;
         }
     }
-    
+
     @Provider
     @Produces("application/one")
     public static class ByteContextResolverMediaOne implements ContextResolver<String> {
         public String getContext(Class<?> objectType) {
             if (Byte.class == objectType)
                 return objectType.getName();
-            else 
+            else
                 return null;
-        }        
+        }
     }
-    
+
     @Provider
     @Produces("application/two")
     public static class BigIntegerContextResolverMediaTwo implements ContextResolver<String> {
         public String getContext(Class<?> objectType) {
             if (BigInteger.class == objectType)
                 return objectType.getName();
-            else 
+            else
                 return null;
         }
     }
-        
+
     @Path("/")
-    public static class ContextMediaResource {        
+    public static class ContextMediaResource {
         ContextResolver<String> crOne;
         ContextResolver<String> crTwo;
 
@@ -183,21 +185,21 @@ public class ContextResolverTest extends AbstractResourceTester {
             crOne = p.getContextResolver(String.class, MediaType.valueOf("application/one"));
             assertNotNull(crOne);
             crTwo = p.getContextResolver(String.class, MediaType.valueOf("application/two"));
-            assertNotNull(crTwo);            
+            assertNotNull(crTwo);
         }
-        
+
         @GET
         public String get() {
             assertNull(crOne.getContext(BigInteger.class));
             return crOne.getContext(Integer.class);
-        }        
-        
+        }
+
         @GET @Path("byte")
         public String getByte() {
             assertNull(crOne.getContext(BigInteger.class));
             return crOne.getContext(Byte.class);
         }
-        
+
         @GET @Path("big")
         public String getBig() {
             assertNull(crTwo.getContext(Integer.class));
@@ -205,17 +207,92 @@ public class ContextResolverTest extends AbstractResourceTester {
             return crTwo.getContext(BigInteger.class);
         }
     }
-    
+
     public void testMedia() throws IOException {
         initiateWebApplication(ContextMediaResource.class,
-                ByteContextResolverMediaOne.class, 
-                IntegerContextResolverMediaOne.class, 
+                ByteContextResolverMediaOne.class,
+                IntegerContextResolverMediaOne.class,
                 BigIntegerContextResolverMediaTwo.class);
-        
-        assertEquals("java.lang.Integer", resource("/").get(String.class));        
-        
+
+        assertEquals("java.lang.Integer", resource("/").get(String.class));
+
         assertEquals("java.lang.Byte", resource("/byte").get(String.class));
-        
-        assertEquals("java.math.BigInteger", resource("/big").get(String.class));        
-    }    
+
+        assertEquals("java.math.BigInteger", resource("/big").get(String.class));
+    }
+
+
+    public static class GenericResolver<T> implements ContextResolver<T> {
+        private T t;
+
+        GenericResolver(T t) {
+            this.t = t;
+        }
+
+        public T getContext(Class<?> objectType) {
+            if (t.getClass() == objectType)
+                return t;
+            else
+                return null;
+        }
+    }
+
+    @Provider
+    public static class IntegerGeneticContextResolver extends GenericResolver<Integer> {
+
+        public IntegerGeneticContextResolver() {
+            super(1);
+        }
+    }
+
+    @Path("/")
+    public static class GenericContextResource {
+        @Context Providers p;
+
+        @Context ContextResolver<Integer> cr;
+
+        @GET
+        public String get() {
+            ContextResolver<Integer> _cr = p.getContextResolver(Integer.class, null);
+            assertEquals(_cr, cr);
+            return cr.getContext(Integer.class).toString();
+        }
+    }
+
+    public void testGenericContextResource() throws IOException {
+        initiateWebApplication(GenericContextResource.class, IntegerGeneticContextResolver.class);
+        WebResource r = resource("/");
+
+        assertEquals("1", resource("/").get(String.class));
+    }
+
+    public static class ListStringResolver implements ContextResolver<List<String>> {
+        public List<String> getContext(Class<?> objectType) {
+            if (Integer.class == objectType)
+                return Arrays.asList("1", "2", "3");
+            else
+                return null;
+        }
+    }
+
+    @Path("/")
+    public static class ListStringContextResource {
+        @Context Providers p;
+
+        @Context ContextResolver<List<String>> cr;
+
+        @GET
+        public String get() {
+            List<String> l = cr.getContext(Integer.class);
+            return l.get(0) + l.get(1) + l.get(2);
+        }
+    }
+
+    public void testListStringContextResource() {
+        initiateWebApplication(ListStringContextResource.class, ListStringResolver.class);
+        WebResource r = resource("/");
+
+        assertEquals("123", resource("/").get(String.class));
+    }
+
 }

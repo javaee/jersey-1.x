@@ -1,4 +1,8 @@
 release 1.1.1-ea (2009-06)
+- Fixed issue 286
+  https://jersey.dev.java.net/issues/show_bug.cgi?id=286
+  Classes that extend ContextResolver may declare a type variable declaration
+  that is resolved to a class or parameterized type by an extending class.
 - Fixed issue 291
   https://jersey.dev.java.net/issues/show_bug.cgi?id=291
   If the @DefaultValue annotation is not present and no parameter is present
