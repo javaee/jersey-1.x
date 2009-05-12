@@ -57,7 +57,7 @@ public class QueryParamAsSetPrimitiveTest extends AbstractResourceTester {
         super(testName);
         initiateWebApplication(
                 ResourceQueryPrimitiveSet.class,
-                ResourceQueryPrimitiveSetDefaultNull.class,
+                ResourceQueryPrimitiveSetDefaultEmpty.class,
                 ResourceQueryPrimitiveSetDefault.class,
                 ResourceQueryPrimitiveSetDefaultOverride.class
                 );
@@ -117,53 +117,53 @@ public class QueryParamAsSetPrimitiveTest extends AbstractResourceTester {
     }
     
     @Path("/Set/default/null")
-    public static class ResourceQueryPrimitiveSetDefaultNull {
+    public static class ResourceQueryPrimitiveSetDefaultEmpty {
         @GET
         @Produces("application/boolean")
         public String doGetBoolean(@QueryParam("boolean") Set<Boolean> v) {
-            assertEquals(null, v);
+            assertEquals(0, v.size());
             return "content";
         }        
         
         @GET
         @Produces("application/byte")
         public String doGetByte(@QueryParam("byte") Set<Byte> v) {
-            assertEquals(null, v);
+            assertEquals(0, v.size());
             return "content";
         }        
         
         @GET
         @Produces("application/short")
         public String doGetShort(@QueryParam("short") Set<Short> v) {
-            assertEquals(null, v);
+            assertEquals(0, v.size());
             return "content";
         }        
         
         @GET
         @Produces("application/int")
         public String doGetInteger(@QueryParam("int") Set<Integer> v) {
-            assertEquals(null, v);
+            assertEquals(0, v.size());
             return "content";
         }        
         
         @GET
         @Produces("application/long")
         public String doGetLong(@QueryParam("long") Set<Long> v) {
-            assertEquals(null, v);
+            assertEquals(0, v.size());
             return "content";
         }        
         
         @GET
         @Produces("application/float")
         public String doGetFloat(@QueryParam("float") Set<Float> v) {
-            assertEquals(null, v);
+            assertEquals(0, v.size());
             return "content";
         }        
         
         @GET
         @Produces("application/double")
         public String doGetDouble(@QueryParam("double") Set<Double> v) {
-            assertEquals(null, v);
+            assertEquals(0, v.size());
             return "content";
         }        
     }

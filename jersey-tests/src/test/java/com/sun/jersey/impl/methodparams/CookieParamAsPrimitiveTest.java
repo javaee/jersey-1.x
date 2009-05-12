@@ -545,49 +545,49 @@ public class CookieParamAsPrimitiveTest extends AbstractResourceTester {
         @GET
         @Produces("application/boolean")
         public String doGetBoolean(@CookieParam("boolean") List<Boolean> v) {
-            assertEquals(null, v);
+            assertEquals(0, v.size());
             return "content";
         }        
         
         @GET
         @Produces("application/byte")
         public String doGetByte(@CookieParam("byte") List<Byte> v) {
-            assertEquals(null, v);
+            assertEquals(0, v.size());
             return "content";
         }        
         
         @GET
         @Produces("application/short")
         public String doGetShort(@CookieParam("short") List<Short> v) {
-            assertEquals(null, v);
+            assertEquals(0, v.size());
             return "content";
         }        
         
         @GET
         @Produces("application/int")
         public String doGetInteger(@CookieParam("int") List<Integer> v) {
-            assertEquals(null, v);
+            assertEquals(0, v.size());
             return "content";
         }        
         
         @GET
         @Produces("application/long")
         public String doGetLong(@CookieParam("long") List<Long> v) {
-            assertEquals(null, v);
+            assertEquals(0, v.size());
             return "content";
         }        
         
         @GET
         @Produces("application/float")
         public String doGetFloat(@CookieParam("float") List<Float> v) {
-            assertEquals(null, v);
+            assertEquals(0, v.size());
             return "content";
         }        
         
         @GET
         @Produces("application/double")
         public String doGetDouble(@CookieParam("double") List<Double> v) {
-            assertEquals(null, v);
+            assertEquals(0, v.size());
             return "content";
         }        
     }

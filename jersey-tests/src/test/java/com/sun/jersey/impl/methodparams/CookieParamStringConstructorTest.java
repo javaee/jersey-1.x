@@ -37,7 +37,6 @@
 
 package com.sun.jersey.impl.methodparams;
 
-import com.sun.jersey.impl.AbstractResourceTester;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.CookieParam;
 import javax.ws.rs.Path;
@@ -94,15 +93,6 @@ public class CookieParamStringConstructorTest extends AbstractResourceTester {
     }
     
     @Path("/")
-    public static class ResourceStringListAbsent {
-        @GET
-        public String doGetString(@CookieParam("args") List<BigDecimal> args) {
-            assertEquals(null, args);
-            return "content";
-        }
-    }
-    
-    @Path("/")
     public static class ResourceStringNullDefault {
         @GET
         public String doGet(
@@ -133,10 +123,10 @@ public class CookieParamStringConstructorTest extends AbstractResourceTester {
     }
     
     @Path("/")
-    public static class ResourceStringListNullDefault {
+    public static class ResourceStringListEmptyDefault {
         @GET
         public String doGetString(@CookieParam("args") List<BigDecimal> args) {
-            assertEquals(null, args);
+            assertEquals(0, args.size());
             return "content";
         }
     }
@@ -189,14 +179,6 @@ public class CookieParamStringConstructorTest extends AbstractResourceTester {
                 get(String.class);
     }
     
-    public void testStringConstructorListAbsentGet() {
-        initiateWebApplication(ResourceStringListAbsent.class);
-        
-        resource("/").
-            accept("application/stringlist").
-            get(String.class);
-    }
-    
     public void testStringConstructorNullDefault() {
         initiateWebApplication(ResourceStringNullDefault.class);
         
@@ -217,8 +199,8 @@ public class CookieParamStringConstructorTest extends AbstractResourceTester {
                 get(String.class);
     }
     
-    public void testStringConstructorListNullDefault() {
-        initiateWebApplication(ResourceStringListNullDefault.class);
+    public void testStringConstructorListEmptyDefault() {
+        initiateWebApplication(ResourceStringListEmptyDefault.class);
         
         resource("/").get(String.class);
     }

@@ -57,7 +57,7 @@ public class QueryParamAsSortedSetPrimitiveTest extends AbstractResourceTester {
         super(testName);
         initiateWebApplication(
                 ResourceQueryPrimitiveSortedSet.class,
-                ResourceQueryPrimitiveSortedSetDefaultNull.class,
+                ResourceQueryPrimitiveSortedSetDefaultEmpty.class,
                 ResourceQueryPrimitiveSortedSetDefault.class,
                 ResourceQueryPrimitiveSortedSetDefaultOverride.class
                 );
@@ -117,53 +117,53 @@ public class QueryParamAsSortedSetPrimitiveTest extends AbstractResourceTester {
     }
     
     @Path("/SortedSet/default/null")
-    public static class ResourceQueryPrimitiveSortedSetDefaultNull {
+    public static class ResourceQueryPrimitiveSortedSetDefaultEmpty {
         @GET
         @Produces("application/boolean")
         public String doGetBoolean(@QueryParam("boolean") SortedSet<Boolean> v) {
-            assertEquals(null, v);
+            assertEquals(0, v.size());
             return "content";
         }        
         
         @GET
         @Produces("application/byte")
         public String doGetByte(@QueryParam("byte") SortedSet<Byte> v) {
-            assertEquals(null, v);
+            assertEquals(0, v.size());
             return "content";
         }        
         
         @GET
         @Produces("application/short")
         public String doGetShort(@QueryParam("short") SortedSet<Short> v) {
-            assertEquals(null, v);
+            assertEquals(0, v.size());
             return "content";
         }        
         
         @GET
         @Produces("application/int")
         public String doGetInteger(@QueryParam("int") SortedSet<Integer> v) {
-            assertEquals(null, v);
+            assertEquals(0, v.size());
             return "content";
         }        
         
         @GET
         @Produces("application/long")
         public String doGetLong(@QueryParam("long") SortedSet<Long> v) {
-            assertEquals(null, v);
+            assertEquals(0, v.size());
             return "content";
         }        
         
         @GET
         @Produces("application/float")
         public String doGetFloat(@QueryParam("float") SortedSet<Float> v) {
-            assertEquals(null, v);
+            assertEquals(0, v.size());
             return "content";
         }        
         
         @GET
         @Produces("application/double")
         public String doGetDouble(@QueryParam("double") SortedSet<Double> v) {
-            assertEquals(null, v);
+            assertEquals(0, v.size());
             return "content";
         }        
     }

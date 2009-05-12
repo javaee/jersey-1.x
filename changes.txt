@@ -1,4 +1,8 @@
 release 1.1.1-ea (2009-06)
+- Fixed issue 291
+  https://jersey.dev.java.net/issues/show_bug.cgi?id=291
+  If the @DefaultValue annotation is not present and no parameter is present
+  an empty collection will be returned for the types List, Set or SortedSet.
 - Added Jersey EJB sample
 
 release 1.1.0-ea (2009-05-04)

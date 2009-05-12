@@ -65,7 +65,7 @@ public class MatrixParamAsPrimitiveTest extends AbstractResourceTester {
                 ResourceMatrixPrimitiveWrappersDefault.class,
                 ResourceMatrixPrimitiveWrappersDefaultOverride.class,                
                 ResourceMatrixPrimitiveList.class,
-                ResourceMatrixPrimitiveListDefaultNull.class,
+                ResourceMatrixPrimitiveListDefaultEmpty.class,
                 ResourceMatrixPrimitiveListDefault.class,
                 ResourceMatrixPrimitiveListDefaultOverride.class
                 );
@@ -554,53 +554,53 @@ public class MatrixParamAsPrimitiveTest extends AbstractResourceTester {
     }
     
     @Path("/list/default/null")
-    public static class ResourceMatrixPrimitiveListDefaultNull {
+    public static class ResourceMatrixPrimitiveListDefaultEmpty {
         @GET
         @Produces("application/boolean")
         public String doGetBoolean(@MatrixParam("boolean") List<Boolean> v) {
-            assertEquals(null, v);
+            assertEquals(0, v.size());
             return "content";
         }        
         
         @GET
         @Produces("application/byte")
         public String doGetByte(@MatrixParam("byte") List<Byte> v) {
-            assertEquals(null, v);
+            assertEquals(0, v.size());
             return "content";
         }        
         
         @GET
         @Produces("application/short")
         public String doGetShort(@MatrixParam("short") List<Short> v) {
-            assertEquals(null, v);
+            assertEquals(0, v.size());
             return "content";
         }        
         
         @GET
         @Produces("application/int")
         public String doGetInteger(@MatrixParam("int") List<Integer> v) {
-            assertEquals(null, v);
+            assertEquals(0, v.size());
             return "content";
         }        
         
         @GET
         @Produces("application/long")
         public String doGetLong(@MatrixParam("long") List<Long> v) {
-            assertEquals(null, v);
+            assertEquals(0, v.size());
             return "content";
         }        
         
         @GET
         @Produces("application/float")
         public String doGetFloat(@MatrixParam("float") List<Float> v) {
-            assertEquals(null, v);
+            assertEquals(0, v.size());
             return "content";
         }        
         
         @GET
         @Produces("application/double")
         public String doGetDouble(@MatrixParam("double") List<Double> v) {
-            assertEquals(null, v);
+            assertEquals(0, v.size());
             return "content";
         }        
     }

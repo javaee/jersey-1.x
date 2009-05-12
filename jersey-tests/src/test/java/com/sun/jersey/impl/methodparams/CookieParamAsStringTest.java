@@ -128,17 +128,7 @@ public class CookieParamAsStringTest extends AbstractResourceTester {
             return "content";
         }        
     }
-    
-    @Path("/")
-    public static class ResourceStringListAbsent {
-        @GET
-        @Produces("application/stringlist")
-        public String doGetString(@CookieParam("args") List<String> args) {
-            assertEquals(null, args);
-            return "content";
-        }        
-    }
-    
+        
     @Path("/")
     public static class ResourceStringNullDefault {
         @GET
@@ -180,12 +170,12 @@ public class CookieParamAsStringTest extends AbstractResourceTester {
     }
     
     @Path("/")
-    public static class ResourceStringListNullDefault {
+    public static class ResourceStringListEmptyDefault {
         @GET
         @Produces("application/stringlist")
         public String doGetString(
                 @CookieParam("args") List<String> args) {
-            assertEquals(null, args);
+            assertEquals(0, args.size());
             return "content";
         }
         
@@ -193,7 +183,7 @@ public class CookieParamAsStringTest extends AbstractResourceTester {
         @Produces("application/list")
         public String doGet(
                 @CookieParam("args") List args) {
-            assertEquals(null, args);
+            assertEquals(0, args.size());
             return "content";
         }
     }
@@ -294,14 +284,6 @@ public class CookieParamAsStringTest extends AbstractResourceTester {
             get(String.class);
     }
     
-    public void testStringListAbsentGet() {
-        initiateWebApplication(ResourceStringListAbsent.class);
-        
-        resource("/").
-            accept("application/stringlist").
-            get(String.class);
-    }
-    
     public void testListGet() {
         initiateWebApplication(ResourceStringList.class);
         
@@ -333,16 +315,16 @@ public class CookieParamAsStringTest extends AbstractResourceTester {
             get(String.class);
     }
     
-    public void testStringListNullDefault() {
-        initiateWebApplication(ResourceStringListNullDefault.class);
+    public void testStringListEmptyDefault() {
+        initiateWebApplication(ResourceStringListEmptyDefault.class);
         
         resource("/").
             accept("application/stringlist").
             get(String.class);
     }
     
-    public void testListNullDefault() {
-        initiateWebApplication(ResourceStringListNullDefault.class);
+    public void testListEmptyDefault() {
+        initiateWebApplication(ResourceStringListEmptyDefault.class);
         
         resource("/").
             accept("application/list").

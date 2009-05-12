@@ -137,17 +137,7 @@ public class HeaderParamAsStringTest extends AbstractResourceTester {
     }
     
     @Path("/")
-    public static class ResourceStringListAbsent {
-        @GET
-        @Produces("application/stringlist")
-        public String doGetString(@HeaderParam("args") List<String> args) {
-            assertEquals(null, args);
-            return "content";
-        }        
-    }
-    
-    @Path("/")
-    public static class ResourceStringNullDefault {
+    public static class ResourceStringEmptyDefault {
         @GET
         public String doGet(@HeaderParam("arg1") String arg1, 
                 @HeaderParam("arg2") String arg2, @HeaderParam("arg3") String arg3) {
@@ -192,7 +182,7 @@ public class HeaderParamAsStringTest extends AbstractResourceTester {
         @Produces("application/stringlist")
         public String doGetString(
                 @HeaderParam("args") List<String> args) {
-            assertEquals(null, args);
+            assertEquals(0, args.size());
             return "content";
         }
         
@@ -200,7 +190,7 @@ public class HeaderParamAsStringTest extends AbstractResourceTester {
         @Produces("application/list")
         public String doGet(
                 @HeaderParam("args") List args) {
-            assertEquals(null, args);
+            assertEquals(0, args.size());
             return "content";
         }
     }
@@ -305,14 +295,6 @@ public class HeaderParamAsStringTest extends AbstractResourceTester {
             get(String.class);
     }
     
-    public void testStringListAbsentGet() {
-        initiateWebApplication(ResourceStringListAbsent.class);
-        
-        resource("/").
-            accept("application/stringlist").
-            get(String.class);
-    }
-    
     public void testListGet() {
         initiateWebApplication(ResourceStringList.class);
         
@@ -325,7 +307,7 @@ public class HeaderParamAsStringTest extends AbstractResourceTester {
     }
     
     public void testStringNullDefault() {
-        initiateWebApplication(ResourceStringNullDefault.class);
+        initiateWebApplication(ResourceStringEmptyDefault.class);
         
         resource("/").get(String.class);
     }
@@ -346,7 +328,7 @@ public class HeaderParamAsStringTest extends AbstractResourceTester {
             get(String.class);
     }
     
-    public void testStringListNullDefault() {
+    public void testStringListEmptyDefault() {
         initiateWebApplication(ResourceStringListNullDefault.class);
         
         resource("/").
@@ -354,7 +336,7 @@ public class HeaderParamAsStringTest extends AbstractResourceTester {
             get(String.class);
     }
     
-    public void testListNullDefault() {
+    public void testListEmptyDefault() {
         initiateWebApplication(ResourceStringListNullDefault.class);
         
         resource("/").

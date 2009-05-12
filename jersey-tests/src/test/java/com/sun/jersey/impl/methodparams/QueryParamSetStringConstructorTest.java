@@ -65,22 +65,12 @@ public class QueryParamSetStringConstructorTest extends AbstractResourceTester {
             return "content";
         }
     }
-    
+        
     @Path("/")
-    public static class ResourceStringSetAbsent {
+    public static class ResourceStringSetEmptyDefault {
         @GET
         public String doGetString(@QueryParam("args") Set<BigDecimal> args) {
-            assertEquals(null, args);
-            return "content";
-        }
-    }
-    
-    
-    @Path("/")
-    public static class ResourceStringSetNullDefault {
-        @GET
-        public String doGetString(@QueryParam("args") Set<BigDecimal> args) {
-            assertEquals(null, args);
+            assertEquals(0, args.size());
             return "content";
         }
     }
@@ -112,18 +102,9 @@ public class QueryParamSetStringConstructorTest extends AbstractResourceTester {
                 accept("application/stringSet").
                 get(String.class);
     }
-    
-    public void testStringConstructorSetAbsentGet() {
-        initiateWebApplication(ResourceStringSetAbsent.class);
         
-        resource("/").
-            accept("application/stringSet").
-            get(String.class);
-    }
-    
-    
     public void testStringConstructorSetNullDefault() {
-        initiateWebApplication(ResourceStringSetNullDefault.class);
+        initiateWebApplication(ResourceStringSetEmptyDefault.class);
         
         resource("/").get(String.class);
     }

@@ -67,20 +67,10 @@ public class QueryParamSortedSetStringConstructorTest extends AbstractResourceTe
     }
     
     @Path("/")
-    public static class ResourceStringSortedSetAbsent {
+    public static class ResourceStringSortedSetEmptyDefault {
         @GET
         public String doGetString(@QueryParam("args") SortedSet<BigDecimal> args) {
-            assertEquals(null, args);
-            return "content";
-        }
-    }
-    
-    
-    @Path("/")
-    public static class ResourceStringSortedSetNullDefault {
-        @GET
-        public String doGetString(@QueryParam("args") SortedSet<BigDecimal> args) {
-            assertEquals(null, args);
+            assertEquals(0, args.size());
             return "content";
         }
     }
@@ -111,19 +101,10 @@ public class QueryParamSortedSetStringConstructorTest extends AbstractResourceTe
         resource("/?args=3.145&args=2.718&args=1.618").
                 accept("application/stringSortedSet").
                 get(String.class);
-    }
-    
-    public void testStringConstructorSortedSetAbsentGet() {
-        initiateWebApplication(ResourceStringSortedSetAbsent.class);
-        
-        resource("/").
-            accept("application/stringSortedSet").
-            get(String.class);
-    }
-    
+    }    
     
     public void testStringConstructorSortedSetNullDefault() {
-        initiateWebApplication(ResourceStringSortedSetNullDefault.class);
+        initiateWebApplication(ResourceStringSortedSetEmptyDefault.class);
         
         resource("/").get(String.class);
     }

@@ -97,15 +97,6 @@ public class MatrixParamStringConstructorTest extends AbstractResourceTester {
     }
     
     @Path("/")
-    public static class ResourceStringListAbsent {
-        @GET
-        public String doGetString(@MatrixParam("args") List<BigDecimal> args) {
-            assertEquals(null, args);
-            return "content";
-        }
-    }
-    
-    @Path("/")
     public static class ResourceStringNullDefault {
         @GET
         public String doGet(
@@ -136,10 +127,10 @@ public class MatrixParamStringConstructorTest extends AbstractResourceTester {
     }
     
     @Path("/")
-    public static class ResourceStringListNullDefault {
+    public static class ResourceStringListEmptyDefault {
         @GET
         public String doGetString(@MatrixParam("args") List<BigDecimal> args) {
-            assertEquals(null, args);
+            assertEquals(0, args.size());
             return "content";
         }
     }
@@ -187,14 +178,6 @@ public class MatrixParamStringConstructorTest extends AbstractResourceTester {
                 get(String.class);
     }
     
-    public void testStringConstructorListAbsentGet() {
-        initiateWebApplication(ResourceStringListAbsent.class);
-        
-        resource("/").
-            accept("application/stringlist").
-            get(String.class);
-    }
-    
     public void testStringConstructorNullDefault() {
         initiateWebApplication(ResourceStringNullDefault.class);
         
@@ -215,7 +198,7 @@ public class MatrixParamStringConstructorTest extends AbstractResourceTester {
     }
     
     public void testStringConstructorListNullDefault() {
-        initiateWebApplication(ResourceStringListNullDefault.class);
+        initiateWebApplication(ResourceStringListEmptyDefault.class);
         
         resource("/").get(String.class);
     }

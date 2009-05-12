@@ -65,7 +65,7 @@ public class HeaderParamAsPrimitiveTest extends AbstractResourceTester {
                 ResourceHeaderPrimitiveWrappersDefault.class,
                 ResourceHeaderPrimitiveWrappersDefaultOverride.class,                
                 ResourceHeaderPrimitiveList.class,
-                ResourceHeaderPrimitiveListDefaultNull.class,
+                ResourceHeaderPrimitiveListDefaultEmpty.class,
                 ResourceHeaderPrimitiveListDefault.class,
                 ResourceHeaderPrimitiveListDefaultOverride.class
                 );
@@ -554,53 +554,53 @@ public class HeaderParamAsPrimitiveTest extends AbstractResourceTester {
     }
     
     @Path("/list/default/null")
-    public static class ResourceHeaderPrimitiveListDefaultNull {
+    public static class ResourceHeaderPrimitiveListDefaultEmpty {
         @GET
         @Produces("application/boolean")
         public String doGetBoolean(@HeaderParam("boolean") List<Boolean> v) {
-            assertEquals(null, v);
+            assertEquals(0, v.size());
             return "content";
         }        
         
         @GET
         @Produces("application/byte")
         public String doGetByte(@HeaderParam("byte") List<Byte> v) {
-            assertEquals(null, v);
+            assertEquals(0, v.size());
             return "content";
         }        
         
         @GET
         @Produces("application/short")
         public String doGetShort(@HeaderParam("short") List<Short> v) {
-            assertEquals(null, v);
+            assertEquals(0, v.size());
             return "content";
         }        
         
         @GET
         @Produces("application/int")
         public String doGetInteger(@HeaderParam("int") List<Integer> v) {
-            assertEquals(null, v);
+            assertEquals(0, v.size());
             return "content";
         }        
         
         @GET
         @Produces("application/long")
         public String doGetLong(@HeaderParam("long") List<Long> v) {
-            assertEquals(null, v);
+            assertEquals(0, v.size());
             return "content";
         }        
         
         @GET
         @Produces("application/float")
         public String doGetFloat(@HeaderParam("float") List<Float> v) {
-            assertEquals(null, v);
+            assertEquals(0, v.size());
             return "content";
         }        
         
         @GET
         @Produces("application/double")
         public String doGetDouble(@HeaderParam("double") List<Double> v) {
-            assertEquals(null, v);
+            assertEquals(0, v.size());
             return "content";
         }        
     }

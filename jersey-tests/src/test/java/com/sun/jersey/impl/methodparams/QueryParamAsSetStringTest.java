@@ -89,22 +89,12 @@ public class QueryParamAsSetStringTest extends AbstractResourceTester {
     }
     
     @Path("/")
-    public static class ResourceStringSetAbsent {
-        @GET
-        @Produces("application/stringSet")
-        public String doGetString(@QueryParam("args") Set<String> args) {
-            assertEquals(null, args);
-            return "content";
-        }        
-    }
-    
-    @Path("/")
-    public static class ResourceStringSetNullDefault {
+    public static class ResourceStringSetEmptyDefault {
         @GET
         @Produces("application/stringSet")
         public String doGetString(
                 @QueryParam("args") Set<String> args) {
-            assertEquals(null, args);
+            assertEquals(0, args.size());
             return "content";
         }
         
@@ -112,7 +102,7 @@ public class QueryParamAsSetStringTest extends AbstractResourceTester {
         @Produces("application/Set")
         public String doGet(
                 @QueryParam("args") Set args) {
-            assertEquals(null, args);
+            assertEquals(0, args.size());
             return "content";
         }
     }
@@ -172,14 +162,6 @@ public class QueryParamAsSetStringTest extends AbstractResourceTester {
             get(String.class);
     }
     
-    public void testStringSetAbsentGet() {
-        initiateWebApplication(ResourceStringSetAbsent.class);
-        
-        resource("/").
-            accept("application/stringSet").
-            get(String.class);
-    }
-    
     public void testSetGet() {
          initiateWebApplication(ResourceStringSet.class);
         
@@ -188,16 +170,16 @@ public class QueryParamAsSetStringTest extends AbstractResourceTester {
             get(String.class);
     }
         
-    public void testStringSetNullDefault() {
-        initiateWebApplication(ResourceStringSetNullDefault.class);
+    public void testStringSetEmptyDefault() {
+        initiateWebApplication(ResourceStringSetEmptyDefault.class);
         
         resource("/").
             accept("application/stringSet").
             get(String.class);
     }
     
-    public void testSetNullDefault() {
-        initiateWebApplication(ResourceStringSetNullDefault.class);
+    public void testSetEmptyDefault() {
+        initiateWebApplication(ResourceStringSetEmptyDefault.class);
         
         resource("/").
             accept("application/Set").

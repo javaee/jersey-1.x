@@ -72,7 +72,7 @@ abstract class CollectionStringExtractor<V extends Collection<String>>
             return l;
         }
 
-        return null;
+        return getInstance();
     }
     
     protected abstract V getInstance();

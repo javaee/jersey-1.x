@@ -89,22 +89,12 @@ public class QueryParamAsSortedSetStringTest extends AbstractResourceTester {
     }
     
     @Path("/")
-    public static class ResourceStringSortedSetAbsent {
-        @GET
-        @Produces("application/stringSortedSet")
-        public String doGetString(@QueryParam("args") SortedSet<String> args) {
-            assertEquals(null, args);
-            return "content";
-        }        
-    }
-    
-    @Path("/")
-    public static class ResourceStringSortedSetNullDefault {
+    public static class ResourceStringSortedSetEmptyDefault {
         @GET
         @Produces("application/stringSortedSet")
         public String doGetString(
                 @QueryParam("args") SortedSet<String> args) {
-            assertEquals(null, args);
+            assertEquals(0, args.size());
             return "content";
         }
         
@@ -112,7 +102,7 @@ public class QueryParamAsSortedSetStringTest extends AbstractResourceTester {
         @Produces("application/SortedSet")
         public String doGet(
                 @QueryParam("args") SortedSet args) {
-            assertEquals(null, args);
+            assertEquals(0, args.size());
             return "content";
         }
     }
@@ -172,14 +162,6 @@ public class QueryParamAsSortedSetStringTest extends AbstractResourceTester {
             get(String.class);
     }
     
-    public void testStringSortedSetAbsentGet() {
-        initiateWebApplication(ResourceStringSortedSetAbsent.class);
-        
-        resource("/").
-            accept("application/stringSortedSet").
-            get(String.class);
-    }
-    
     public void testSortedSetGet() {
          initiateWebApplication(ResourceStringSortedSet.class);
         
@@ -188,16 +170,16 @@ public class QueryParamAsSortedSetStringTest extends AbstractResourceTester {
             get(String.class);
     }
         
-    public void testStringSortedSetNullDefault() {
-        initiateWebApplication(ResourceStringSortedSetNullDefault.class);
+    public void testStringSortedSetEmptyDefault() {
+        initiateWebApplication(ResourceStringSortedSetEmptyDefault.class);
         
         resource("/").
             accept("application/stringSortedSet").
             get(String.class);
     }
     
-    public void testSortedSetNullDefault() {
-        initiateWebApplication(ResourceStringSortedSetNullDefault.class);
+    public void testSortedSetEmptyDefault() {
+        initiateWebApplication(ResourceStringSortedSetEmptyDefault.class);
         
         resource("/").
             accept("application/SortedSet").

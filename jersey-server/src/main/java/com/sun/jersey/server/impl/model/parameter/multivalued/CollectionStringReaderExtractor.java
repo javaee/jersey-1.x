@@ -81,7 +81,7 @@ abstract class CollectionStringReaderExtractor<V extends Collection>
             return valueList;
         }
 
-        return null;
+        return getInstance();
     }
 
     protected abstract V getInstance();
