@@ -164,10 +164,16 @@ class WadlGeneratorLoader {
             method.invoke( generator, propertyValue );
         }
         else if ( File.class.equals( paramClazz ) && propertyValue instanceof String ) {
+            
             /* This is now deprecated and can be removed in future versions.
              * It's beeing replaced by the InputStream support, which must be used in
              * a JEE environment instead of files.
              */
+            
+            LOGGER.warning( "Configuring the " + method.getDeclaringClass().getSimpleName() +
+                            " with the file based property " + propertyName + " is deprecated and will be removed" +
+                    		" in future versions of jersey! You should use the InputStream based property instead." );
+            
             final String filename = propertyValue.toString();
             if ( filename.startsWith( "classpath:" ) ) {
                 final String strippedFilename = filename.substring( "classpath:".length() );
