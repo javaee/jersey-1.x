@@ -90,19 +90,22 @@ public class GuiceComponentProviderFactory implements IoCComponentProviderFactor
      * @param injector the Guice injector
      */
     private void register(ResourceConfig config, Injector injector) {
-        for (Key<?> key : injector.getBindings().keySet()) {
-            Type type = key.getTypeLiteral().getType();
-            if (type instanceof Class) {
-                Class<?> c = (Class) type;
-                if (ResourceConfig.isProviderClass(c)) {
-                    LOGGER.info("Registering " + c.getName() + " as a provider class");
-                    config.getClasses().add(c);
-                } else if (ResourceConfig.isRootResourceClass(c)) {
-                    LOGGER.info("Registering " + c.getName() + " as a root resource class");
-                    config.getClasses().add(c);
-                }
+        while (injector != null) {
+            for (Key<?> key : injector.getBindings().keySet()) {
+                Type type = key.getTypeLiteral().getType();
+                if (type instanceof Class) {
+                    Class<?> c = (Class) type;
+                    if (ResourceConfig.isProviderClass(c)) {
+                        LOGGER.info("Registering " + c.getName() + " as a provider class");
+                        config.getClasses().add(c);
+                    } else if (ResourceConfig.isRootResourceClass(c)) {
+                        LOGGER.info("Registering " + c.getName() + " as a root resource class");
+                        config.getClasses().add(c);
+                    }
 
+                }
             }
+            injector = injector.getParent();
         }
     }
 
@@ -116,8 +119,9 @@ public class GuiceComponentProviderFactory implements IoCComponentProviderFactor
         }
 
         Key<?> key = Key.get(clazz);
+        Injector i = findInjector(key);
         // If there is no explicit binding
-        if (!injector.getBindings().containsKey(key)) {
+        if (i == null) {
             // If an @Inject is explicitly declared
             if (!isInjectPresent(clazz)) {
                 return null;
@@ -142,7 +146,7 @@ public class GuiceComponentProviderFactory implements IoCComponentProviderFactor
         }
 
         final Scope[] scope = new Scope[1];
-        injector.getBinding(key).acceptScopingVisitor(new BindingScopingVisitor<Void>() {
+        i.getBinding(key).acceptScopingVisitor(new BindingScopingVisitor<Void>() {
 
             public Void visitEagerSingleton() {
                 scope[0] = Scopes.SINGLETON;
@@ -170,7 +174,18 @@ public class GuiceComponentProviderFactory implements IoCComponentProviderFactor
         LOGGER.info("Binding " + clazz.getName() +
                 " to GuiceManagedComponentProvider with the scope \"" +
                 componentScope + "\"");
-        return new GuiceManagedComponentProvider(injector, componentScope, clazz);
+        return new GuiceManagedComponentProvider(i, componentScope, clazz);
+    }
+
+    private Injector findInjector(Key<?> key) {
+        Injector i = injector;
+        while (i != null) {
+            if (i.getBindings().containsKey(key))
+                return i;
+
+            i = i.getParent();
+        }
+        return null;
     }
 
     private boolean isInjectPresent(Class<?> c) {
