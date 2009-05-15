@@ -123,7 +123,7 @@ public class GuiceComponentProviderFactory implements IoCComponentProviderFactor
         // If there is no explicit binding
         if (i == null) {
             // If an @Inject is explicitly declared
-            if (!isInjectPresent(clazz)) {
+            if (!isImplicitGuiceComponent(clazz)) {
                 return null;
             }
 
@@ -188,14 +188,6 @@ public class GuiceComponentProviderFactory implements IoCComponentProviderFactor
         return null;
     }
 
-    private boolean isInjectPresent(Class<?> c) {
-        for (Constructor<?> con : c.getConstructors()) {
-            if (con.isAnnotationPresent(Inject.class))
-                return true;
-        }
-
-        return false;
-    }
     /**
      * Converts a Guice scope to Jersey scope.
      *
@@ -205,6 +197,22 @@ public class GuiceComponentProviderFactory implements IoCComponentProviderFactor
     private ComponentScope getComponentScope(Scope scope) {
         ComponentScope cs = scopeMap.get(scope);
         return (cs != null) ? cs : ComponentScope.Undefined;
+    }
+
+    /**
+     * Determine if a class is an implicit Guice component that can be
+     * instatiated by Guice and the life-cycle managed by Jersey.
+     * 
+     * @param c the class.
+     * @return true if the class is an implicit Guice component.
+     */
+    public boolean isImplicitGuiceComponent(Class<?> c) {
+        for (Constructor<?> con : c.getConstructors()) {
+            if (con.isAnnotationPresent(Inject.class))
+                return true;
+        }
+
+        return false;
     }
 
     /**
