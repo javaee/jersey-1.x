@@ -1,9 +1,9 @@
 /*
  *
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
- * 
+ *
  * Copyright 1997-2007 Sun Microsystems, Inc. All rights reserved.
- * 
+ *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
  * and Distribution License("CDDL") (collectively, the "License").  You
@@ -11,7 +11,7 @@
  * a copy of the License at https://jersey.dev.java.net/CDDL+GPL.html
  * or jersey/legal/LICENSE.txt.  See the License for the specific
  * language governing permissions and limitations under the License.
- * 
+ *
  * When distributing the software, include this License Header Notice in each
  * file and include the License file at jersey/legal/LICENSE.txt.
  * Sun designates this particular file as subject to the "Classpath" exception
@@ -20,9 +20,9 @@
  * Header, with the fields enclosed by brackets [] replaced by your own
  * identifying information: "Portions Copyrighted [year]
  * [name of copyright owner]"
- * 
+ *
  * Contributor(s):
- * 
+ *
  * If you wish your version of this file to be governed by only the CDDL or
  * only the GPL Version 2, indicate your decision by adding "[Contributor]
  * elects to include this software in this distribution under the [CDDL or GPL
@@ -46,14 +46,14 @@ import java.util.regex.Pattern;
  * <p>API for performing inflections (pluralization, singularization, and so on)
  * on various strings.  These inflections will be useful in code generators that
  * convert things like database table names into Java class names.</p>
- * 
+ *
  * <p>The <code>getInstance()</code> method returns a singleton instance of
  * this class with a default set of rules, which can then be customized.
  * Rules added during customization will take precedence over the standard ones.
  * Use the <code>addIrregular()</code>, <code>addPlural()</code>, <code>addSingular()</code>,
  * and <code>addUncountable()</code> methods to add additional rules ot the default
  * ones.</p>
- * 
+ *
  * <p><strong>IMPLEMENTATION NOTE</strong> - The default implementation is
  * intended to be functionally compatible with the <code>Inflector::inflections</code>
  * class in Ruby on Rails.  The <code>gsub()</code> method on Ruby strings
@@ -152,12 +152,12 @@ public class Inflector {
      * <p>List of <code>Replacer</code>s for performing replacement operations
      * on matches for plural words.</p>
      */
-    private List plurals = new LinkedList();
+    private List<Replacer> plurals = new LinkedList<Replacer>();
     /**
      * <p>List of <code>Replacer</code>s for performing replacement operations
      * on matches for addSingular words.</p>
      */
-    private List singulars = new ArrayList();
+    private List<Replacer> singulars = new ArrayList<Replacer>();
     /**
      * <p>List of words that represent addUncountable concepts that cannot be
      * pluralized or singularized.</p>
@@ -266,7 +266,7 @@ public class Inflector {
     /**
      * <p>Create and return a simple class name that corresponds to a
      * addPlural table name.  Any leading schema name will be trimmed.</p>
-     * 
+     *
      * <table border="1" width="100%">
      *   <tr>
      *     <th>Input</th>
@@ -281,7 +281,7 @@ public class Inflector {
      *     <td>"Baz"</td>
      *   </tr>
      * </table>
-     * 
+     *
      * @param tableName Table name to be converted
      */
     public String classify(String tableName) {
@@ -499,8 +499,8 @@ public class Inflector {
 
     /**
      * <p>Return a addPlural version of the specified (addSingular) word.</p>
-     * 
-     * 
+     *
+     *
      * @param word Singular word to be converted
      */
     public String pluralize(String word) {
@@ -514,9 +514,9 @@ public class Inflector {
 
         // Scan our patterns for a match and return the correct replacement
         for (int i = 0; i < plurals.size(); i++) {
-            Replacer replacer = (Replacer) plurals.get(i);
-            if (replacer.matches(word)) {
-                return replacer.replacement();
+            String replacement = plurals.get(i).replacement(word);
+            if (replacement != null) {
+                return replacement;
             }
         }
 
@@ -527,8 +527,8 @@ public class Inflector {
 
     /**
      * <p>Return a addSingular version of the specified (addPlural) word.</p>
-     * 
-     * 
+     *
+     *
      * @param word Plural word to be converted
      */
     public String singularize(String word) {
@@ -542,9 +542,9 @@ public class Inflector {
 
         // Scan our patterns for a match and return the correct replacement
         for (int i = 0; i < singulars.size(); i++) {
-            Replacer replacer = (Replacer) singulars.get(i);
-            if (replacer.matches(word)) {
-                return replacer.replacement();
+            String replacement = singulars.get(i).replacement(word);
+            if (replacement != null) {
+                return replacement;
             }
         }
 
@@ -703,8 +703,8 @@ public class Inflector {
     /**
      * <p>Add the addSingular and addPlural forms of words that cannot be
      * converted using the normal rules.</p>
-     * 
-     * 
+     *
+     *
      * @param singular Singular form of the word
      * @param plural Plural form of the word
      */
@@ -721,8 +721,8 @@ public class Inflector {
      * <p>Add a match pattern and replacement rule for converting addPlural
      * forms to addSingular forms.  By default, matches will be case
      * insensitive.</p>
-     * 
-     * 
+     *
+     *
      * @param match Match pattern regular expression
      * @param rule Replacement rule
      */
@@ -735,8 +735,8 @@ public class Inflector {
     /**
      * <p>Add a match pattern and replacement rule for converting addPlural
      * forms to addSingular forms.</p>
-     * 
-     * 
+     *
+     *
      * @param match Match pattern regular expression
      * @param rule Replacement rule
      * @param insensitive Flag indicating this match should be case insensitive
@@ -750,8 +750,8 @@ public class Inflector {
     /**
      * <p>Add a match pattern and replacement rule for converting addSingular
      * forms to addPlural forms.  By default, matches will be case insensitive.</p>
-     * 
-     * 
+     *
+     *
      * @param match Match pattern regular expression
      * @param rule Replacement rule
      */
@@ -764,8 +764,8 @@ public class Inflector {
     /**
      * <p>Add a match pattern and replacement rule for converting addSingular
      * forms to addPlural forms.</p>
-     * 
-     * 
+     *
+     *
      * @param match Match pattern regular expression
      * @param rule Replacement rule
      * @param insensitive Flag indicating this match should be case insensitive
@@ -778,8 +778,8 @@ public class Inflector {
 
     /**
      * <p>Add a word that cannot be converted between addSingular and addPlural.</p>
-     * 
-     * 
+     *
+     *
      * @param word Word to be added
      */
     public void addUncountable(String word) {
@@ -805,59 +805,40 @@ public class Inflector {
             this.rule = rule;
 
         }
+
         // -------------------------------------------------- Instance Variables
-        private String input = null;
-        private Matcher matcher = null;
         private Pattern pattern = null;
         private String rule = null;
 
 
         // ------------------------------------------------------ Public Methods
+
         /**
-         * <p>Return <code>true</code> if our regular expression pattern matches
-         * the specified input.  If it does, save necessary state information so
-         * that the <code>replacement()</code> method will return appropriate
-         * results based on the <code>rule</code> specified to our constructor.</p>
+         * Replace the input if it matches the pattern.
          *
-         * @param input Input characters to be matched
+         * @param input the input string.
+         * @return the replacement, if the input matches, otherwise null.
          */
-        public boolean matches(String input) {
-
-            matcher = pattern.matcher(input);
+        public String replacement(String input) {
+            Matcher matcher = pattern.matcher(input);
             if (matcher.matches()) {
-                this.input = input;
-                return true;
-            } else {
-                this.input = null;
-                this.matcher = null;
-                return false;
-            }
-
-        }
-
-        /**
-         * <p>Return a replacement string based on the <code>rule</code> that
-         * was specified to our constructor.  This method <strong>MUST</strong>
-         * only be called when the <code>matches()</code> method has returned
-         * <code>true</code>.</p>
-         */
-        public String replacement() {
-
-            StringBuffer sb = new StringBuffer();
-            boolean group = false;
-            for (int i = 0; i < rule.length(); i++) {
-                char ch = rule.charAt(i);
-                if (group) {
-                    sb.append(matcher.group(Character.digit(ch, 10)));
-                    group = false;
-                } else if (ch == '\\') {
-                    group = true;
-                } else {
-                    sb.append(ch);
+                StringBuffer sb = new StringBuffer();
+                boolean group = false;
+                for (int i = 0; i < rule.length(); i++) {
+                    char ch = rule.charAt(i);
+                    if (group) {
+                        sb.append(matcher.group(Character.digit(ch, 10)));
+                        group = false;
+                    } else if (ch == '\\') {
+                        group = true;
+                    } else {
+                        sb.append(ch);
+                    }
                 }
+                return sb.toString();
+            } else {
+                return null;
             }
-            return sb.toString();
-
         }
     }
 }

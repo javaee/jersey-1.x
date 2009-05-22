@@ -1,4 +1,7 @@
 release 1.1.1-ea (2009-06)
+- Fixed issue 298
+  https://jersey.dev.java.net/issues/show_bug.cgi?id=298
+  A race condition was resolved when return List<T> where T is a JAXB object.
 - Fixed issue 286
   https://jersey.dev.java.net/issues/show_bug.cgi?id=286
   Classes that extend ContextResolver may declare a type variable declaration
