@@ -215,7 +215,7 @@ public class Base64 {
      * @param base64Data Byte array containing Base64 data
      * @return Array containind decoded data.
      */
-    public byte[] decode(byte[] base64Data) {
+    public static byte[] decode(byte[] base64Data) {
         int numberQuadruple = base64Data.length / FOURBYTE;
         byte decodedData[] = null;
         byte b1 = 0, b2 = 0, b3 = 0, b4 = 0, marker0 = 0, marker1 = 0;
