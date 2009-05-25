@@ -63,12 +63,10 @@ private HttpRequestContext context;
         this.context = context;
     }
 
-    @Override
     public String getRequestMethod() {
         return context.getMethod();
     }
 
-    @Override
     public String getRequestURL() {
         return context.getAbsolutePath().toString();
     }
@@ -87,7 +85,6 @@ private HttpRequestContext context;
         return v;
     }
 
-    @Override
     public Set<String> getParameterNames() {
         HashSet<String> n = new HashSet<String>();
         n.addAll(keys(context.getQueryParameters()));
@@ -95,7 +92,6 @@ private HttpRequestContext context;
         return n;
     }
 
-    @Override
     public List<String> getParameterValues(String name) {
         ArrayList<String> v = new ArrayList<String>();
         v.addAll(values(context.getQueryParameters(), name));
@@ -103,12 +99,10 @@ private HttpRequestContext context;
         return v;
     }
 
-    @Override
     public List<String> getHeaderValues(String name) {
         return context.getRequestHeader(name);
     }
 
-    @Override
     public void addHeaderValue(String name, String value) throws IllegalStateException {
         throw new IllegalStateException("Modifying OAuthServerRequest unsupported");
     }

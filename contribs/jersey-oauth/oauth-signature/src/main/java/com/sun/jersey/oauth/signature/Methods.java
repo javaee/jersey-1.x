@@ -37,7 +37,7 @@
 package com.sun.jersey.oauth.signature;
 
 import java.util.HashMap;
-import java.util.ServiceLoader;
+import com.sun.jersey.spi.service.ServiceFinder;
 
 /**
  * Loads and provides instances of OAuth signature methods.
@@ -46,10 +46,6 @@ import java.util.ServiceLoader;
  * @author Hubert A. Le Van Gong <hubert.levangong at Sun.COM>
  */
 class Methods {
-
-    /** Loads method service provider classes. */
-    private static final ServiceLoader<OAuthSignatureMethod> loader =
-     ServiceLoader.load(OAuthSignatureMethod.class);
 
     /** Contains the loaded service provider classes. */
     private static final HashMap<String, OAuthSignatureMethod> methods = loadMethods();
@@ -69,7 +65,7 @@ class Methods {
      */
     private static HashMap<String, OAuthSignatureMethod> loadMethods() {
         HashMap<String, OAuthSignatureMethod> map = new HashMap<String, OAuthSignatureMethod>();
-        for (OAuthSignatureMethod method : loader) {
+        for (OAuthSignatureMethod method : ServiceFinder.find(OAuthSignatureMethod.class, true)) {
             map.put(method.name(), method);
         }
         return map;

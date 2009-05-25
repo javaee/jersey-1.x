@@ -38,13 +38,11 @@ package com.sun.jersey.oauth.signature;
 
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.security.SignatureException;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.ServiceLoader;
-import java.util.Set;
 
 /**
  * Class used for processing an OAuth signature (signing or verifying).
