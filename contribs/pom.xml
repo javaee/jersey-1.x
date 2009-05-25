@@ -63,5 +63,6 @@
         <module>jersey-simple-server</module>
         <module>jersey-guice</module>
         <module>jersey-scala</module>
+        <module>jersey-oauth</module>
     </modules>
 </project>
