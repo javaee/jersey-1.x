@@ -38,7 +38,6 @@ package com.sun.jersey.oauth.signature;
 
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.security.SignatureException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
@@ -111,7 +110,7 @@ public class OAuthSignature {
      * @param params the OAuth authorization parameters
      * @param secrets the secrets used to verify the OAuth signature.
      * @return true if the signature is verified.
-     * @throws SignatureException if an error occurred verifying the signature.
+     * @throws OAuthSignatureException if an error occurred verifying the signature.
      */
     public static boolean verify(OAuthRequest request,
     OAuthParameters params, OAuthSecrets secrets) throws OAuthSignatureException {
