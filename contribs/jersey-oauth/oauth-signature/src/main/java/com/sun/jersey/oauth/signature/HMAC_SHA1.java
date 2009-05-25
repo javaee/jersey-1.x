@@ -1,0 +1,108 @@
+/*
+ * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+ *
+ * Copyright 2009 Sun Microsystems, Inc. All rights reserved.
+ *
+ * The contents of this file are subject to the terms of either the GNU
+ * General Public License Version 2 only ("GPL") or the Common Development
+ * and Distribution License("CDDL") (collectively, the "License").  You
+ * may not use this file except in compliance with the License. You can obtain
+ * a copy of the License at https://jersey.dev.java.net/CDDL+GPL.html
+ * or jersey/legal/LICENSE.txt.  See the License for the specific
+ * language governing permissions and limitations under the License.
+ *
+ * When distributing the software, include this License Header Notice in each
+ * file and include the License file at jersey/legal/LICENSE.txt.
+ * Sun designates this particular file as subject to the "Classpath" exception
+ * as provided by Sun in the GPL Version 2 section of the License file that
+ * accompanied this code.  If applicable, add the following below the License
+ * Header, with the fields enclosed by brackets [] replaced by your own
+ * identifying information: "Portions Copyrighted [year]
+ * [name of copyright owner]"
+ *
+ * Contributor(s):
+ *
+ * If you wish your version of this file to be governed by only the CDDL or
+ * only the GPL Version 2, indicate your decision by adding "[Contributor]
+ * elects to include this software in this distribution under the [CDDL or GPL
+ * Version 2] license."  If you don't indicate a single choice of license, a
+ * recipient has the option to distribute your version of this file under
+ * either the CDDL, the GPL Version 2 or to extend the choice of license to
+ * its licensees as provided above.  However, if you add GPL Version 2 code
+ * and therefore, elected the GPL Version 2 license, then the option applies
+ * only if the new code is made subject to such option by the copyright
+ * holder.
+ */
+
+package com.sun.jersey.oauth.signature;
+
+import java.io.UnsupportedEncodingException;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
+import javax.crypto.Mac;
+import javax.crypto.spec.SecretKeySpec;
+
+/**
+ * An OAuth signature method that implements HMAC-SHA1.
+ *
+ * @author Hubert A. Le Van Gong <hubert.levangong at Sun.COM>
+ * @author Paul C. Bryan <pbryan@sun.com>
+ */
+public class HMAC_SHA1 implements OAuthSignatureMethod {
+
+    public static final String NAME = "HMAC-SHA1";
+
+    private static final String SIGNATURE_ALGORITHM = "HmacSHA1";
+
+    public HMAC_SHA1() {
+    }
+
+    public String name() {
+        return NAME;
+    }
+
+    /**
+     * Generates the HMAC-SHA1 signature of OAuth request elements.
+     *
+     * @param elements the combined OAuth elements to sign.
+     * @param secrets the shared secrets used to sign the request.
+     * @return the OAuth signature, in base64-encoded form.
+     */
+    public String sign(String elements, OAuthSecrets secrets) {
+
+        Mac mac;
+        try { mac = Mac.getInstance(SIGNATURE_ALGORITHM); }
+        catch (NoSuchAlgorithmException nsae) { throw new IllegalStateException(nsae); }
+
+        // null secrets are interpreted as blank per OAuth specification
+        StringBuffer buf = new StringBuffer();
+        String secret = secrets.getConsumerSecret();
+        if (secret != null) { buf.append(secret); }
+        buf.append('&');
+        secret = secrets.getTokenSecret();
+        if (secret != null ) { buf.append(secret); }
+
+        byte[] key;
+        try { key = buf.toString().getBytes("UTF-8"); }
+        catch (UnsupportedEncodingException uee) { throw new IllegalStateException(uee); }
+
+        SecretKeySpec spec = new SecretKeySpec(key, SIGNATURE_ALGORITHM);
+        try { mac.init(spec); }
+        catch (InvalidKeyException ike) { throw new IllegalStateException(ike); }
+
+        return Base64.encode(mac.doFinal(elements.getBytes()));
+    }
+
+    /**
+     * Verifies the HMAC-SHA1 signature of OAuth request elements.
+     *
+     * @param elements OAuth elements signature is to be verified against.
+     * @param secrets the shared secrets for verifying the signature.
+     * @param signature base64-encoded OAuth signature to be verified.
+     */
+    public boolean verify(String elements, OAuthSecrets secrets, String signature) {
+        // with symmetric cryptography, simply sign again and compare
+        return sign(elements, secrets).equals(signature);
+    }
+}
+

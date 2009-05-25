@@ -1,0 +1,3 @@
+com.sun.jersey.oauth.signature.HMAC_SHA1
+com.sun.jersey.oauth.signature.PLAINTEXT
+com.sun.jersey.oauth.signature.RSA_SHA1
