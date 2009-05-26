@@ -41,9 +41,11 @@ import java.io.IOException;
 import java.io.Reader;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.xml.namespace.NamespaceContext;
@@ -162,6 +164,9 @@ public class JsonXmlStreamReader implements XMLStreamReader {
         }
     }
 
+    private static final Set<Integer> valueTokenTypes = new HashSet<Integer>() {{
+        add(JsonToken.FALSE); add(JsonToken.TRUE); add(JsonToken.NULL); add(JsonToken.NUMBER);add(JsonToken.STRING);}};
+
     private void readNext() throws IOException {
         readNext(false);
     }
@@ -222,7 +227,7 @@ public class JsonXmlStreamReader implements XMLStreamReader {
                                 colon();
                                 lastToken = nextToken();
                                 // TODO process attr value
-                                if (JsonToken.STRING != lastToken.tokenType) {
+                                if (!valueTokenTypes.contains(lastToken.tokenType)) {
                                     throw new IOException("Attribute value expected instead of \"" + lastToken.tokenText + "\"");
                                 }
                                 if (null != processingStack.get(depth - 1).eventToReadAttributesFor) {
