@@ -111,11 +111,23 @@ public final class OAuthClientFilter extends ClientFilter {
 
         // secrets and parameters exist; no auth header already: sign request; add as authorization header
         if (parameters != null && secrets != null && !request.getMetadata().containsKey("Authorization")) {
+
             final OAuthParameters p = (OAuthParameters)parameters.clone(); // make modifications to clone
-            if (p.getTimestamp() == null) { p.setTimestamp(); }
-            if (p.getNonce() == null) { p.setNonce(); }
-            try { OAuthSignature.sign(new RequestWrapper(request, providers), p, secrets); }
-            catch (OAuthSignatureException se) { throw new ClientHandlerException(se); }
+
+            if (p.getTimestamp() == null) {
+                p.setTimestamp();
+            }
+
+            if (p.getNonce() == null) {
+                p.setNonce();
+            }
+
+            try {
+                OAuthSignature.sign(new RequestWrapper(request, providers), p, secrets);
+            }
+            catch (OAuthSignatureException se) {
+                throw new ClientHandlerException(se);
+            }
         }
 
         // next filter in chain

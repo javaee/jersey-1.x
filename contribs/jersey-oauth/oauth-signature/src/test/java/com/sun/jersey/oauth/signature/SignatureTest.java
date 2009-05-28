@@ -90,15 +90,25 @@ public class SignatureTest extends TestCase {
 
         // generate digital signature; ensure it matches the OAuth spec
         String signature = null;
-        try { signature = OAuthSignature.generate(request, params, secrets); }
-        catch (OAuthSignatureException se) { fail(se.getMessage()); }
+
+        try {
+            signature = OAuthSignature.generate(request, params, secrets);
+        }
+        catch (OAuthSignatureException se) {
+            fail(se.getMessage());
+        }
+
         assertEquals(signature, SIGNATURE);
 
         OAuthParameters saved = (OAuthParameters)params.clone();
 
-        // sign the request; clear params; parse params from request; ensure they match original
-        try { OAuthSignature.sign(request, params, secrets); }
-        catch (OAuthSignatureException se) { fail(se.getMessage()); }
+        try {
+            // sign the request; clear params; parse params from request; ensure they match original
+            OAuthSignature.sign(request, params, secrets);
+        }
+        catch (OAuthSignatureException se) {
+            fail(se.getMessage());
+        }
 
         // signing the request should not have modified the original parameters
         assertTrue(params.equals(saved));        
@@ -115,8 +125,12 @@ public class SignatureTest extends TestCase {
         assertEquals(params.getVersion(), VERSION);
         assertEquals(params.getSignature(), SIGNATURE);
 
-        // verify signature using request that was just signed
-        try { assertTrue(OAuthSignature.verify(request, params, secrets)); }
-        catch (OAuthSignatureException se) { fail(se.getMessage()); }
+        try {
+            // verify signature using request that was just signed
+            assertTrue(OAuthSignature.verify(request, params, secrets));
+        }
+        catch (OAuthSignatureException se) {
+            fail(se.getMessage());
+        }
     }
 }

@@ -62,10 +62,14 @@ public class PLAINTEXT implements OAuthSignatureMethod {
     public String sign(String elements, OAuthSecrets secrets) {
         StringBuffer buf = new StringBuffer();
         String secret = secrets.getConsumerSecret();
-        if (secret != null) { buf.append(secret); }
+        if (secret != null) {
+            buf.append(secret);
+        }
         buf.append('&');
         secret = secrets.getTokenSecret();
-        if (secret != null ) { buf.append(secret); }
+        if (secret != null ) {
+            buf.append(secret);
+        }
         return buf.toString();
     }
 

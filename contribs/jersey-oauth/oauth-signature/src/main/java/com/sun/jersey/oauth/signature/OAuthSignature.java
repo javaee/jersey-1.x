@@ -93,7 +93,7 @@ public class OAuthSignature {
      * @param request the request to generate signature for and write header to.
      * @param params the OAuth authorization parameters.
      * @param secrets the secrets used to generate the OAuth signature.
-     * @throws SignatureException if an error occurred generating the signature.
+     * @throws OAuthSignatureException if an error occurred generating the signature.
      */
     public static void sign(OAuthRequest request,
     OAuthParameters params, OAuthSecrets secrets) throws OAuthSignatureException {
@@ -110,7 +110,7 @@ public class OAuthSignature {
      * @param params the OAuth authorization parameters
      * @param secrets the secrets used to verify the OAuth signature.
      * @return true if the signature is verified.
-     * @throws OAuthSignatureException if an error occurred verifying the signature.
+     * @throws OAuthSignatureException if an error occurred generating the signature.
      */
     public static boolean verify(OAuthRequest request,
     OAuthParameters params, OAuthSecrets secrets) throws OAuthSignatureException {
@@ -133,7 +133,9 @@ public class OAuthSignature {
         for (String key : params.keySet()) {
 
             // exclude realm and oauth_signature parameters from OAuth HTTP authorization header
-            if (key.equals(OAuthParameters.REALM) || key.equals(OAuthParameters.SIGNATURE)) { continue; }
+            if (key.equals(OAuthParameters.REALM) || key.equals(OAuthParameters.SIGNATURE)) {
+                continue;
+            }
 
             String value = params.get(key);
 
@@ -147,7 +149,9 @@ public class OAuthSignature {
         for (String key : request.getParameterNames()) {
 
             // ignore parameter if an OAuth-specific parameter that appears in the OAuth parameters
-            if (key.startsWith("oauth_") && params.containsKey(key)) { continue; }
+            if (key.startsWith("oauth_") && params.containsKey(key)) {
+                continue;
+            }
 
             // the same parameter name can have multiple values
             List<String> values = request.getParameterValues(key);
@@ -185,11 +189,17 @@ public class OAuthSignature {
      */
     private static String constructRequestURL(OAuthRequest request) throws OAuthSignatureException {
         URL url;
-        try { url = new URL(request.getRequestURL()); }
-        catch (MalformedURLException mue) { throw new OAuthSignatureException(mue); }
+        try {
+            url = new URL(request.getRequestURL());
+        }
+        catch (MalformedURLException mue) {
+            throw new OAuthSignatureException(mue);
+        }
         StringBuffer buf = new StringBuffer(url.getProtocol()).append("://").append(url.getHost().toLowerCase());
         int port = url.getPort();
-        if (port > 0 && port != url.getDefaultPort()) { buf.append(':').append(port); }
+        if (port > 0 && port != url.getDefaultPort()) {
+            buf.append(':').append(port);
+        }
         buf.append(url.getPath());
         return buf.toString();
     }
@@ -220,7 +230,9 @@ public class OAuthSignature {
     private static OAuthSignatureMethod getSignatureMethod(OAuthParameters params)
     throws UnsupportedSignatureMethodException {
         OAuthSignatureMethod method = Methods.getInstance(params.getSignatureMethod());
-        if (method == null) { throw new UnsupportedSignatureMethodException(params.getSignatureMethod()); }
+        if (method == null) {
+            throw new UnsupportedSignatureMethodException(params.getSignatureMethod());
+        }
         return method;
     }
 }

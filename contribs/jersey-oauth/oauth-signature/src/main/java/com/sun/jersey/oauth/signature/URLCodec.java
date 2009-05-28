@@ -51,8 +51,12 @@ class URLCodec {
      * @throws IllegalStateException if the JVM does not support UTF-8 encoding.
      */
     public static String decode(String value) {
-        try { return URLDecoder.decode(value, "UTF-8"); }
-        catch (UnsupportedEncodingException uee) { throw new IllegalStateException(uee); }
+        try {
+            return URLDecoder.decode(value, "UTF-8");
+        }
+        catch (UnsupportedEncodingException uee) {
+            throw new IllegalStateException(uee);
+        }
     }
 
     /**
@@ -64,8 +68,12 @@ class URLCodec {
      * @throws IllegalStateException if the JVM does not support UTF-8 encoding.
      */ 
     public static String encode(String value) {
-        try { return URLEncoder.encode(value, "UTF-8"); }
-        catch (UnsupportedEncodingException uee) { throw new IllegalStateException(uee); }
+        try {
+            return URLEncoder.encode(value, "UTF-8");
+        }
+        catch (UnsupportedEncodingException uee) {
+            throw new IllegalStateException(uee);
+        }
     }
 }
 

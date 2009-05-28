@@ -70,9 +70,17 @@ class RequestUtil {
      * @return a {@link MediaType} object representing the media type of the request.
      */
     public static MediaType getMediaType(ClientRequest request) {
+    
         final Object header = request.getMetadata().getFirst("Content-Type");
-        if (header == null) { return null; }
-        if (header instanceof MediaType) { return (MediaType)header; }
+
+        if (header == null) {
+            return null;
+        }
+
+        if (header instanceof MediaType) {
+            return (MediaType)header;
+        }
+
         return MediaType.valueOf(header.toString());
     }
 
@@ -83,8 +91,13 @@ class RequestUtil {
      * @return a {@link MultivaluedMap} containing the entity query parameters.
      */
     public static MultivaluedMap<String, String> getQueryParameters(ClientRequest request) {
+    
         URI uri = request.getURI();
-        if (uri == null) { return null; }
+
+        if (uri == null) {
+            return null;
+        }
+
         return UriComponent.decodeQuery(uri, true);
     }
 
@@ -135,11 +148,9 @@ class RequestUtil {
             writer.writeTo(entity, entityClass, entityType,
              EMPTY_ANNOTATIONS, MediaType.APPLICATION_FORM_URLENCODED_TYPE, null, out);
         }
-
         catch (WebApplicationException wae) {
             throw new IllegalStateException(wae);
         }
-
         catch (IOException ioe) {
             throw new IllegalStateException(ioe);
         }
@@ -153,7 +164,6 @@ class RequestUtil {
             return (MultivaluedMap<String, String>)reader.readFrom(MultivaluedMap.class,
              MultivaluedMap.class, EMPTY_ANNOTATIONS, MediaType.APPLICATION_FORM_URLENCODED_TYPE, null, in);
         }
-
         catch (IOException ioe) {
             throw new IllegalStateException(ioe);
         }

@@ -72,16 +72,24 @@ private HttpRequestContext context;
     }
 
     private static Set<String> keys(MultivaluedMap<String, String> mvm) {
-        if (mvm == null) { return EMPTY_SET; }
+        if (mvm == null) {
+            return EMPTY_SET;
+        }
         Set<String> s = mvm.keySet();
-        if (s == null) { return EMPTY_SET; }
+        if (s == null) {
+            return EMPTY_SET;
+        }
         return s;
     }
 
     private static List<String> values(MultivaluedMap<String, String> mvm, String key) {
-        if (mvm == null) { return EMPTY_LIST; }
+        if (mvm == null) {
+            return EMPTY_LIST;
+        }
         List<String> v = mvm.get(key);
-        if (v == null) { return EMPTY_LIST; }
+        if (v == null) {
+            return EMPTY_LIST;
+        }
         return v;
     }
 

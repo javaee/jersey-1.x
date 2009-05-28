@@ -80,32 +80,65 @@ public class RSA_SHA1 implements OAuthSignatureMethod {
     public String sign(String elements, OAuthSecrets secrets) throws InvalidSecretException {
     
         Signature sig;
-        try { sig = Signature.getInstance(SIGNATURE_ALGORITHM); }
-        catch (NoSuchAlgorithmException nsae) { throw new IllegalStateException(nsae); }
+
+        try {
+            sig = Signature.getInstance(SIGNATURE_ALGORITHM);
+        }
+        catch (NoSuchAlgorithmException nsae) {
+            throw new IllegalStateException(nsae);
+        }
 
         byte[] decodedPrivKey;
-        try { decodedPrivKey = Base64.decode(secrets.getConsumerSecret()); }
-        catch (IOException ioe) { throw new InvalidSecretException("invalid consumer secret"); }
+
+        try {
+            decodedPrivKey = Base64.decode(secrets.getConsumerSecret());
+        }
+        catch (IOException ioe) {
+            throw new InvalidSecretException("invalid consumer secret");
+        }
 
         KeyFactory keyf;
-        try { keyf = KeyFactory.getInstance(KEY_TYPE); }
-        catch (NoSuchAlgorithmException nsae) { throw new IllegalStateException(nsae); }
+
+        try {
+            keyf = KeyFactory.getInstance(KEY_TYPE);
+        }
+        catch (NoSuchAlgorithmException nsae) {
+            throw new IllegalStateException(nsae);
+        }
 
         EncodedKeySpec keySpec = new PKCS8EncodedKeySpec(decodedPrivKey);
         
         RSAPrivateKey rsaPrivKey;
-        try { rsaPrivKey = (RSAPrivateKey) keyf.generatePrivate(keySpec); }
-        catch (InvalidKeySpecException ikse) { throw new IllegalStateException(ikse); }
 
-        try { sig.initSign(rsaPrivKey); }
-        catch (InvalidKeyException ike) { throw new IllegalStateException(ike); }
+        try {
+            rsaPrivKey = (RSAPrivateKey) keyf.generatePrivate(keySpec);
+        }
+        catch (InvalidKeySpecException ikse) {
+            throw new IllegalStateException(ikse);
+        }
 
-        try { sig.update(elements.getBytes()); }
-        catch (SignatureException se) { throw new IllegalStateException(se); }
+        try {
+            sig.initSign(rsaPrivKey);
+        }
+        catch (InvalidKeyException ike) {
+            throw new IllegalStateException(ike);
+        }
+
+        try {
+            sig.update(elements.getBytes());
+        }
+        catch (SignatureException se) {
+            throw new IllegalStateException(se);
+        }
 
         byte[] rsasha1;
-        try { rsasha1 = sig.sign(); }
-        catch (SignatureException se) { throw new IllegalStateException(se); }
+
+        try {
+            rsasha1 = sig.sign();
+        }
+        catch (SignatureException se) {
+            throw new IllegalStateException(se);
+        }
 
         return new String(Base64.encode(rsasha1));
     }
@@ -121,34 +154,71 @@ public class RSA_SHA1 implements OAuthSignatureMethod {
     public boolean verify(String elements, OAuthSecrets secrets, String signature) throws InvalidSecretException {
 
         Signature sig;
-        try { sig = Signature.getInstance(SIGNATURE_ALGORITHM); }
-        catch (NoSuchAlgorithmException nsae) { throw new IllegalStateException(nsae); }
+
+        try {
+            sig = Signature.getInstance(SIGNATURE_ALGORITHM);
+        }
+        catch (NoSuchAlgorithmException nsae) {
+            throw new IllegalStateException(nsae);
+        }
 
         byte[] decodedPubKey;
-        try { decodedPubKey = Base64.decode(secrets.getConsumerSecret()); }
-        catch (IOException ioe) { throw new InvalidSecretException("invalid consumer secret"); }
+
+        try {
+            decodedPubKey = Base64.decode(secrets.getConsumerSecret());
+        }
+        catch (IOException ioe) {
+            throw new InvalidSecretException("invalid consumer secret");
+        }
 
         byte[] decodedSignature;
-        try { decodedSignature = Base64.decode(signature); }
-        catch (IOException ioe) { return false; }
+
+        try {
+            decodedSignature = Base64.decode(signature);
+        }
+        catch (IOException ioe) {
+            return false;
+        }
 
         KeyFactory keyf;
-        try { keyf = KeyFactory.getInstance(KEY_TYPE); }
-        catch (NoSuchAlgorithmException nsae) { throw new IllegalStateException(nsae); }
+
+        try {
+            keyf = KeyFactory.getInstance(KEY_TYPE);
+        }
+        catch (NoSuchAlgorithmException nsae) {
+            throw new IllegalStateException(nsae);
+        }
 
         EncodedKeySpec keySpec = new PKCS8EncodedKeySpec(decodedPubKey);
 
         RSAPublicKey rsaPubKey;
-        try { rsaPubKey = (RSAPublicKey)keyf.generatePublic(keySpec); }
-        catch (InvalidKeySpecException ikse) { throw new IllegalStateException(ikse); }
 
-        try { sig.initVerify(rsaPubKey); }
-        catch (InvalidKeyException ike) { throw new IllegalStateException(ike); }
+        try {
+            rsaPubKey = (RSAPublicKey)keyf.generatePublic(keySpec);
+        }
+        catch (InvalidKeySpecException ikse) {
+            throw new IllegalStateException(ikse);
+        }
 
-        try { sig.update(elements.getBytes()); }
-        catch (SignatureException se) { throw new IllegalStateException(se); }
+        try {
+            sig.initVerify(rsaPubKey);
+        }
+        catch (InvalidKeyException ike) {
+            throw new IllegalStateException(ike);
+        }
+
+        try {
+            sig.update(elements.getBytes());
+        }
+        catch (SignatureException se) {
+            throw new IllegalStateException(se);
+        }
         
-        try { return sig.verify(decodedSignature); }
-        catch (SignatureException se) { throw new IllegalStateException(se); }
+        try {
+            return sig.verify(decodedSignature);
+        }
+        catch (SignatureException se) {
+            throw new IllegalStateException(se);
+        }
     }
 }

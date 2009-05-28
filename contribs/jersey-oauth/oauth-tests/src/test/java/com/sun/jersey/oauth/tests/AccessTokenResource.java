@@ -70,9 +70,13 @@ public class AccessTokenResource extends Assert {
         assertEquals(params.getNonce(), "dji430splmx33448");
         assertEquals(params.getVersion(), "1.0");
 
-        // verify the plaintext signature
-        try { assertTrue(OAuthSignature.verify(osr, params, secrets)); }
-        catch (OAuthSignatureException ose) { fail(ose.getMessage()); }
+        try {
+            // verify the plaintext signature
+            assertTrue(OAuthSignature.verify(osr, params, secrets));
+        }
+        catch (OAuthSignatureException ose) {
+            fail(ose.getMessage());
+        }
 
         return "oauth_token=nnch734d00sl2jdk&oauth_token_secret=pfkkdhi9sl3r4s00";
     }

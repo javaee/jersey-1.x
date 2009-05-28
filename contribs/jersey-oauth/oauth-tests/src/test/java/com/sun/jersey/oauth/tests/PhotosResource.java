@@ -77,9 +77,13 @@ public class PhotosResource extends Assert {
         assertEquals(params.getNonce(), "kllo9940pd9333jh");
         assertEquals(params.getVersion(), "1.0");
 
-        // verify the HMAC-SHA1 signature
-        try { assertTrue(OAuthSignature.verify(osr, params, secrets)); }
-        catch (OAuthSignatureException ose) { fail(ose.getMessage()); }
+        try {
+            // verify the HMAC-SHA1 signature
+            assertTrue(OAuthSignature.verify(osr, params, secrets));
+        }
+        catch (OAuthSignatureException ose) {
+            fail(ose.getMessage());
+        }
 
         return "PHOTO";
     }

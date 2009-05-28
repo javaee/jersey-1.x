@@ -71,24 +71,46 @@ public class HMAC_SHA1 implements OAuthSignatureMethod {
     public String sign(String elements, OAuthSecrets secrets) {
 
         Mac mac;
-        try { mac = Mac.getInstance(SIGNATURE_ALGORITHM); }
-        catch (NoSuchAlgorithmException nsae) { throw new IllegalStateException(nsae); }
+
+        try {
+            mac = Mac.getInstance(SIGNATURE_ALGORITHM);
+        }
+        catch (NoSuchAlgorithmException nsae) {
+            throw new IllegalStateException(nsae);
+        }
 
         // null secrets are interpreted as blank per OAuth specification
         StringBuffer buf = new StringBuffer();
         String secret = secrets.getConsumerSecret();
-        if (secret != null) { buf.append(secret); }
+
+        if (secret != null) {
+            buf.append(secret);
+        }
+
         buf.append('&');
         secret = secrets.getTokenSecret();
-        if (secret != null ) { buf.append(secret); }
+
+        if (secret != null ) {
+            buf.append(secret);
+        }
 
         byte[] key;
-        try { key = buf.toString().getBytes("UTF-8"); }
-        catch (UnsupportedEncodingException uee) { throw new IllegalStateException(uee); }
+
+        try {
+            key = buf.toString().getBytes("UTF-8");
+        }
+        catch (UnsupportedEncodingException uee) {
+            throw new IllegalStateException(uee);
+        }
 
         SecretKeySpec spec = new SecretKeySpec(key, SIGNATURE_ALGORITHM);
-        try { mac.init(spec); }
-        catch (InvalidKeyException ike) { throw new IllegalStateException(ike); }
+
+        try {
+            mac.init(spec);
+        }
+        catch (InvalidKeyException ike) {
+            throw new IllegalStateException(ike);
+        }
 
         return Base64.encode(mac.doFinal(elements.getBytes()));
     }

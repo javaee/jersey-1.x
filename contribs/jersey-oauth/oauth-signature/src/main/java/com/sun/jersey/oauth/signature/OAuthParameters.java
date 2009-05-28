@@ -88,17 +88,17 @@ public class OAuthParameters extends HashMap<String, String> {
     private static final String SCHEME_SPACE = SCHEME + ' ';
 
     /**
-R     * Returns the protection realm for the request.
+     * Returns the protection realm for the request.
      */
     public String getRealm() {
-    	return get(REALM);
+        return get(REALM);
     }
 
     /**
      * Sets the protection realm for the request.
      */
     public void setRealm(String realm) {
-    	put(REALM, realm);
+        put(REALM, realm);
     }
 
     /**
@@ -109,22 +109,22 @@ R     * Returns the protection realm for the request.
      * @return this parameters object.
      */
     public OAuthParameters realm(String realm) {
-    	setRealm(realm);
-    	return this;
+        setRealm(realm);
+        return this;
     }
 
     /**
      * Returns the consumer key.
      */
     public String getConsumerKey() {
-    	return get(CONSUMER_KEY);
+        return get(CONSUMER_KEY);
     }
     
     /**
      * Sets the consumer key.
      */
     public void setConsumerKey(String consumerKey) {
-    	put(CONSUMER_KEY, consumerKey);
+        put(CONSUMER_KEY, consumerKey);
     }
 
     /**
@@ -134,22 +134,22 @@ R     * Returns the protection realm for the request.
      * @param consumerKey the consumer key.
      */
     public OAuthParameters consumerKey(String consumerKey) {
-    	setConsumerKey(consumerKey);
-    	return this;
+        setConsumerKey(consumerKey);
+        return this;
     }
 
     /**
      * Returns the request or access token.
      */
     public String getToken() {
-    	return get(TOKEN);
+        return get(TOKEN);
     }
 
     /**
      * Sets the request or access token.
      */
     public void setToken(String token) {
-    	put(TOKEN, token);
+        put(TOKEN, token);
     }
 
     /**
@@ -160,22 +160,22 @@ R     * Returns the protection realm for the request.
      * @return this parameters object.
      */
     public OAuthParameters token(String token) {
-    	setToken(token);
-    	return this;
+        setToken(token);
+        return this;
     }
 
     /**
      * Returns the signature method used to sign the request.
      */
     public String getSignatureMethod() {
-    	return get(SIGNATURE_METHOD);
+        return get(SIGNATURE_METHOD);
     }
 
     /**
      * Sets the signature method used to sign the request.
      */
     public void setSignatureMethod(String signatureMethod) {
-    	put(SIGNATURE_METHOD, signatureMethod);
+        put(SIGNATURE_METHOD, signatureMethod);
     }
 
     /**
@@ -186,22 +186,22 @@ R     * Returns the protection realm for the request.
      * @return this parameters object.
      */
     public OAuthParameters signatureMethod(String signatureMethod) {
-    	setSignatureMethod(signatureMethod);
-    	return this;
+        setSignatureMethod(signatureMethod);
+        return this;
     }
 
     /**
      * Returns the signature for the request.
      */
     public String getSignature() {
-    	return get(SIGNATURE);
+        return get(SIGNATURE);
     }
 
     /**
      * Sets the signature for the request.
      */
     public void setSignature(String signature) {
-    	put(SIGNATURE, signature);
+        put(SIGNATURE, signature);
     }
 
     /**
@@ -212,8 +212,8 @@ R     * Returns the protection realm for the request.
      * @return this parameters object.
      */
     public OAuthParameters signature(String signature) {
-    	setSignature(signature);
-    	return this;
+        setSignature(signature);
+        return this;
     }
 
     /**
@@ -222,7 +222,7 @@ R     * Returns the protection realm for the request.
      * 00:00:00 GMT (epoch).
      */
     public String getTimestamp() {
-    	return get(TIMESTAMP);
+        return get(TIMESTAMP);
     }
 
     /**
@@ -231,7 +231,7 @@ R     * Returns the protection realm for the request.
      * January 1, 1970 00:00:00 GMT (epoch).
      */
     public void setTimestamp(String timestamp) {
-    	put(TIMESTAMP, timestamp);
+        put(TIMESTAMP, timestamp);
     }
 
     /**
@@ -242,15 +242,15 @@ R     * Returns the protection realm for the request.
      * @return this parameters object.
      */
     public OAuthParameters timestamp(String timestamp) {
-    	setTimestamp(timestamp);
-    	return this;
+        setTimestamp(timestamp);
+        return this;
     }
 
     /**
      * Sets the timestamp to the current time as number of seconds since epoch.
      */
     public void setTimestamp() {
-    	setTimestamp(new Long(System.currentTimeMillis() / 1000).toString());
+        setTimestamp(new Long(System.currentTimeMillis() / 1000).toString());
     }
 
     /**
@@ -261,8 +261,8 @@ R     * Returns the protection realm for the request.
      * @return this parameters object.
      */
     public OAuthParameters timestamp() {
-    	setTimestamp();
-    	return this;
+        setTimestamp();
+        return this;
     }
 
     /**
@@ -270,14 +270,14 @@ R     * Returns the protection realm for the request.
      * timestamp.
      */
     public String getNonce() {
-    	return get(NONCE);
+        return get(NONCE);
     }
     
     /**
      * Sets the nonce, a value that should be unique for a given timestamp.
      */
     public void setNonce(String nonce) {
-    	put(NONCE, nonce);
+        put(NONCE, nonce);
     }
     
     /**
@@ -288,15 +288,15 @@ R     * Returns the protection realm for the request.
      * @return this parameters object.
      */
     public OAuthParameters nonce(String nonce) {
-    	setNonce(nonce);
-    	return this;
+        setNonce(nonce);
+        return this;
     }
 
     /**
      * Sets the nonce to contain a randomly-generated UUID.
      */
     public void setNonce() {
-    	setNonce(UUID.randomUUID().toString());
+        setNonce(UUID.randomUUID().toString());
     }
 
     /**
@@ -307,22 +307,22 @@ R     * Returns the protection realm for the request.
      * @return this parameters object.
      */
     public OAuthParameters nonce() {
-    	setNonce();
-    	return this;
+        setNonce();
+        return this;
     }
 
     /**
      * Returns the protocol version.
      */
     public String getVersion() {
-    	return get(VERSION);
+        return get(VERSION);
     }
 
     /**
      * Sets the protocol version.
      */
     public void setVersion(String version) {
-    	put(VERSION, version);
+        put(VERSION, version);
     }
 
     /**
@@ -333,15 +333,15 @@ R     * Returns the protection realm for the request.
      * @return this parameters object.
      */
     public OAuthParameters version(String version) {
-    	setVersion(version);
-    	return this;
+        setVersion(version);
+        return this;
     }
 
     /**
      * Sets the protocol version to the default value of 1.0.
      */
     private void setVersion() {
-    	setVersion("1.0");
+        setVersion("1.0");
     }
 
     /**
@@ -351,22 +351,22 @@ R     * Returns the protection realm for the request.
      * @return this parameters object.
      */
     public OAuthParameters version() {
-    	setVersion();
-    	return this;
+        setVersion();
+        return this;
     }
 
     /**
      * Returns the verifier code.
      */
     private String getVerifier() {
-    	return get(VERIFIER);
+        return get(VERIFIER);
     }
 
     /**
      * Sets the verifier code.
      */
     private void setVerifier(String verifier) {
-    	put(VERIFIER, verifier);
+        put(VERIFIER, verifier);
     }
 
     /**
@@ -377,8 +377,8 @@ R     * Returns the protection realm for the request.
      * @return this parameters object.
      */
     public OAuthParameters verifier(String verifier) {
-    	setVerifier(verifier);
-    	return this;
+        setVerifier(verifier);
+        return this;
     }
 
     /**
@@ -386,9 +386,9 @@ R     * Returns the protection realm for the request.
      * Authorization header and returns the result.
      */
     private static String dequote(String value) {
-    	int length = value.length();
-    	return ((length >= 2 && value.charAt(0) == '"' && value.charAt(length - 1) == '"') ?
-    	 value.substring(1, length - 1) : value);
+        int length = value.length();
+        return ((length >= 2 && value.charAt(0) == '"' && value.charAt(length - 1) == '"') ?
+         value.substring(1, length - 1) : value);
     } 
 
     /**
@@ -399,30 +399,40 @@ R     * Returns the protection realm for the request.
      */
     public OAuthParameters readRequest(OAuthRequest request) {
 
-    	// read supported parameters from query string or request body (lowest preference)
-    	for (String param : request.getParameterNames()) {
-    		if (!param.startsWith("oauth_")) { continue; }
-    		List values = request.getParameterValues(param);
-    		if (values == null) { continue; }
-    		Iterator<String> i = values.iterator();
-    		if (!i.hasNext()) { continue; }
-    		put(param, i.next());
-    	}
+        // read supported parameters from query string or request body (lowest preference)
+        for (String param : request.getParameterNames()) {
+            if (!param.startsWith("oauth_")) {
+                continue;
+            }
+            List values = request.getParameterValues(param);
+            if (values == null) {
+                continue;
+            }
+            Iterator<String> i = values.iterator();
+            if (!i.hasNext()) {
+                continue;
+            }
+            put(param, i.next());
+        }
 
-    	// read all parameters from authorization header (highest preference)
-    	List<String> headers = request.getHeaderValues(AUTHORIZATION_HEADER);
-    	if (headers == null) { return this; }
+        // read all parameters from authorization header (highest preference)
+        List<String> headers = request.getHeaderValues(AUTHORIZATION_HEADER);
+        if (headers == null) { return this; }
 
-    	for (String header : headers) {
-    		if (!header.regionMatches(true, 0, SCHEME_SPACE, 0, SCHEME_SPACE.length())) { continue; }
-    		for (String param : header.substring(SCHEME_SPACE.length()).trim().split(",(?=(?:[^\"]*\"[^\"]*\")+$)")) {
-    			String[] nv = param.split("=", 2);
-    			if (nv.length != 2) { continue; }
-    			put(URLCodec.decode(nv[0].trim()), URLCodec.decode(dequote(nv[1].trim())));
-    		}
-    	}
+        for (String header : headers) {
+            if (!header.regionMatches(true, 0, SCHEME_SPACE, 0, SCHEME_SPACE.length())) {
+                continue;
+            }
+            for (String param : header.substring(SCHEME_SPACE.length()).trim().split(",(?=(?:[^\"]*\"[^\"]*\")+$)")) {
+                String[] nv = param.split("=", 2);
+                if (nv.length != 2) {
+                    continue;
+                }
+                put(URLCodec.decode(nv[0].trim()), URLCodec.decode(dequote(nv[1].trim())));
+            }
+        }
 
-    	return this;
+        return this;
     }
 
     /**
@@ -432,17 +442,19 @@ R     * Returns the protection realm for the request.
      * @return this parameters object.
      */
     public OAuthParameters writeRequest(OAuthRequest request) {
-    	StringBuffer buf = new StringBuffer(SCHEME);
-    	boolean comma = false;
-    	for (String key : keySet()) {
-    		String value = get(key);
-    		if (value == null) { continue; }
-    		buf.append(comma ? ", " : " ").append(URLCodec.encode(key));
-    		buf.append("=\"").append(URLCodec.encode(value)).append('"');
-    		comma = true;
-    	}
-    	request.addHeaderValue(AUTHORIZATION_HEADER, buf.toString());
-    	return this;
+        StringBuffer buf = new StringBuffer(SCHEME);
+        boolean comma = false;
+        for (String key : keySet()) {
+            String value = get(key);
+            if (value == null) {
+                continue;
+            }
+            buf.append(comma ? ", " : " ").append(URLCodec.encode(key));
+            buf.append("=\"").append(URLCodec.encode(value)).append('"');
+            comma = true;
+        }
+        request.addHeaderValue(AUTHORIZATION_HEADER, buf.toString());
+        return this;
     }
 }
 

@@ -68,9 +68,13 @@ public class RequestTokenResource extends Assert {
         assertEquals(params.getNonce(), "hsu94j3884jdopsl");
         assertEquals(params.getVersion(), "1.0");
 
-        // verify the plaintext signature
-        try { assertTrue(OAuthSignature.verify(osr, params, secrets)); }
-        catch (OAuthSignatureException ose) { fail(ose.getMessage()); }
+        try {
+            // verify the plaintext signature
+            assertTrue(OAuthSignature.verify(osr, params, secrets));
+        }
+        catch (OAuthSignatureException ose) {
+            fail(ose.getMessage());
+        }
 
         return "oauth_token=hh5s93j4hdidpola&oauth_token_secret=hdhd0244k9j7ao03";
     }
