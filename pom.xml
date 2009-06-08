@@ -242,5 +242,13 @@
             <name>java.net-m2-repository</name>
             <url>java-net:/maven2-repository/trunk/repository/</url>
         </repository>
+        <snapshotRepository>
+          <id>jstrachan.apache.snapshots.scp</id>
+          <name>James Strachan's Apache Snapshots'</name>
+          <url>scp://people.apache.org/x1/home/jstrachan/public_html/maven-snapshots</url>
+<!--
+          <url>https://people.apache.org/~jstrachan/maven-snapshots</url>
+-->
+        </snapshotRepository>
     </distributionManagement>
 </project>
