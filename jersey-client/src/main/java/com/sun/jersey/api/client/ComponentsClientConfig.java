@@ -35,56 +35,56 @@
  * holder.
  */
 
-package com.sun.jersey.api.client.config;
+package com.sun.jersey.api.client;
 
-import java.util.HashMap;
+import com.sun.jersey.api.client.config.ClientConfig;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 
-/**
- * A default client configuration.
- * <p>
- * This class may be extended for specific confguration purposes.
- * 
- * @author Paul.Sandoz@Sun.Com
- */
-public class DefaultClientConfig implements ClientConfig {
+/* package */ class ComponentsClientConfig implements ClientConfig {
+    private final ClientConfig cc;
+    
     private final Set<Class<?>> providers = new LinkedHashSet<Class<?>>();
-    
-    private final Set<Object> providerInstances = new LinkedHashSet<Object>();
-    
-    private final Map<String, Boolean> features = new HashMap<String, Boolean>();
-    
-    private final Map<String, Object> properties = new HashMap<String, Object>();
-    
+
+    public ComponentsClientConfig(ClientConfig cc, Class<?>... components) {
+        this(cc, new HashSet<Class<?>>(Arrays.asList(components)));
+    }
+
+    public ComponentsClientConfig(ClientConfig cc, Set<Class<?>> components) {
+        this.cc = cc;
+
+        this.providers.addAll(cc.getClasses());
+        this.providers.addAll(components);
+    }
+
     public Set<Class<?>> getClasses() {
         return providers;
     }
     
     public Set<Object> getSingletons() {
-        return providerInstances;
+        return cc.getSingletons();
     }
     
     public Map<String, Boolean> getFeatures() {
-        return features;
+        return cc.getFeatures();
     }
     
     public boolean getFeature(String featureName) {
-        final Boolean v = features.get(featureName);
-        return (v != null) ? v : false;
+        return cc.getFeature(featureName);
     }
     
     public Map<String, Object> getProperties() {
-        return properties;
+        return cc.getProperties();
     }
 
     public Object getProperty(String propertyName) {
-        return properties.get(propertyName);
+        return cc.getProperty(propertyName);
     }
     
     public boolean getPropertyAsFeature(String name) {
-        Boolean v = (Boolean)getProperties().get(name);
-        return (v != null) ? v : false;
+        return cc.getPropertyAsFeature(name);
     }
 }

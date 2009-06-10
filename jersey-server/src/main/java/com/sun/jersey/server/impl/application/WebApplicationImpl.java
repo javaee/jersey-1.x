@@ -133,6 +133,7 @@ import com.sun.jersey.server.impl.model.parameter.multivalued.StringReaderFactor
 import com.sun.jersey.server.impl.resource.PerRequestFactory;
 import com.sun.jersey.server.spi.component.ResourceComponentInjector;
 import com.sun.jersey.spi.StringReaderWorkers;
+import com.sun.jersey.spi.service.ServiceFinder;
 import com.sun.jersey.spi.template.TemplateContext;
 import com.sun.jersey.spi.uri.rules.UriRule;
 import java.lang.annotation.Annotation;
@@ -385,8 +386,8 @@ public final class WebApplicationImpl implements WebApplication {
         initiate(resourceConfig, null);
     }
     
-    public void initiate(ResourceConfig resourceConfig, IoCComponentProviderFactory _provider) {
-        if (resourceConfig == null) {
+    public void initiate(ResourceConfig rc, IoCComponentProviderFactory _provider) {
+        if (rc == null) {
             throw new IllegalArgumentException("ResourceConfig instance MUST NOT be null");
         }
 
@@ -397,11 +398,24 @@ public final class WebApplicationImpl implements WebApplication {
 
         LOGGER.info("Initiating Jersey application, version '" + BuildId.getBuildId() + "'");
 
-        // Validate the resource config
-        resourceConfig.validate();
+        // If there are components defined in jaxrs-components then
+        // wrap resource config with appended set of classes
+        Class<?>[] components = ServiceFinder.find("jersey-server-components").toClassArray();
+        if (components.length > 0) {
+            if (LOGGER.isLoggable(Level.INFO)) {
+                StringBuilder b = new StringBuilder();
+                b.append("Adding the following classes declared in META-INF/services/jersey-server-components to the resource configuration:");
+                for (Class c : components)
+                        b.append('\n').append("  ").append(c);
+                LOGGER.log(Level.INFO, b.toString());
+            }
 
-        // Check the resource configuration
-        this.resourceConfig = resourceConfig;
+            this.resourceConfig = new ComponentsResourceConfig(rc, components);
+        } else {
+            this.resourceConfig = rc;
+        }
+        // Validate the resource config
+        this.resourceConfig.validate();
 
         this.provider = _provider;
 

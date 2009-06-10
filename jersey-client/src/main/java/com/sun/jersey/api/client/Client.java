@@ -55,11 +55,15 @@ import com.sun.jersey.core.spi.factory.ContextResolverFactory;
 import com.sun.jersey.core.spi.factory.InjectableProviderFactory;
 import com.sun.jersey.core.spi.factory.MessageBodyFactory;
 import com.sun.jersey.spi.inject.SingletonTypeInjectableProvider;
+import com.sun.jersey.spi.service.ServiceFinder;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
+import java.net.HttpURLConnection;
 import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.ext.ContextResolver;
@@ -94,6 +98,9 @@ import javax.ws.rs.ext.Providers;
  * @author Paul.Sandoz@Sun.Com
  */
 public class Client extends Filterable implements ClientHandler {
+
+    private static final Logger LOGGER = Logger.getLogger(Client.class.getName());
+
     private final ProviderFactory componentProviderFactory;
 
     private final Providers providers;
@@ -152,6 +159,19 @@ public class Client extends Filterable implements ClientHandler {
             IoCComponentProviderFactory provider) {
         // Defer instantiation of root to component provider
         super(root);
+
+        Class<?>[] components = ServiceFinder.find("jersey-client-components").toClassArray();
+        if (components.length > 0) {
+            if (LOGGER.isLoggable(Level.INFO)) {
+                StringBuilder b = new StringBuilder();
+                b.append("Adding the following classes declared in META-INF/services/jersey-client-components to the client configuration:");
+                for (Class c : components)
+                        b.append('\n').append("  ").append(c);
+                LOGGER.log(Level.INFO, b.toString());
+            }
+            
+            config = new ComponentsClientConfig(config, components);
+        }
 
         InjectableProviderFactory injectableFactory = new InjectableProviderFactory();
 

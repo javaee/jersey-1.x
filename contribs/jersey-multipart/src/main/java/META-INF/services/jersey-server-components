@@ -1,0 +1,4 @@
+com.sun.jersey.multipart.impl.FormDataMultiPartDispatchProvider
+com.sun.jersey.multipart.impl.MultiPartConfigProvider
+com.sun.jersey.multipart.impl.MultiPartReader
+com.sun.jersey.multipart.impl.MultiPartWriter

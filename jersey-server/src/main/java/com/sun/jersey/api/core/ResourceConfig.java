@@ -47,6 +47,7 @@ import java.lang.reflect.Modifier;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
@@ -367,7 +368,7 @@ public abstract class ResourceConfig extends Application {
      * @return the unmodifiable set of root resource classes.
      */
     public Set<Class<?>> getRootResourceClasses() {
-        Set<Class<?>> s = new HashSet<Class<?>>();
+        Set<Class<?>> s = new LinkedHashSet<Class<?>>();
         
         for (Class<?> c : getClasses()) {
             if (isRootResourceClass(c))
@@ -386,10 +387,10 @@ public abstract class ResourceConfig extends Application {
      * @return the unmodifiable set of provider classes.
      */
     public Set<Class<?>> getProviderClasses() {
-        Set<Class<?>> s = new HashSet<Class<?>>();
+        Set<Class<?>> s = new LinkedHashSet<Class<?>>();
         
         for (Class<?> c : getClasses()) {
-            if (!c.isAnnotationPresent(Path.class))
+            if (!isRootResourceClass(c))
                 s.add(c);
         }
         
@@ -405,7 +406,7 @@ public abstract class ResourceConfig extends Application {
      * @return the unmodifiable set of root resource singleton instances.
      */
     public Set<Object> getRootResourceSingletons() {
-        Set<Object> s = new HashSet<Object>();
+        Set<Object> s = new LinkedHashSet<Object>();
         
         for (Object o : getSingletons()) {
             if (isRootResourceClass(o.getClass()))
@@ -424,10 +425,10 @@ public abstract class ResourceConfig extends Application {
      * @return the unmodifiable set of provider singleton instances.
      */
     public Set<Object> getProviderSingletons() {
-        Set<Object> s = new HashSet<Object>();
+        Set<Object> s = new LinkedHashSet<Object>();
         
         for (Object o : getSingletons()) {
-            if (!o.getClass().isAnnotationPresent(Path.class))
+            if (!isRootResourceClass(o.getClass()))
                 s.add(o);
         }
         

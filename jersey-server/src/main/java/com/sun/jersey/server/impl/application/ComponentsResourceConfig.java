@@ -35,56 +35,71 @@
  * holder.
  */
 
-package com.sun.jersey.api.client.config;
+package com.sun.jersey.server.impl.application;
 
-import java.util.HashMap;
+import com.sun.jersey.api.core.ResourceConfig;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
+import javax.ws.rs.core.MediaType;
 
-/**
- * A default client configuration.
- * <p>
- * This class may be extended for specific confguration purposes.
- * 
- * @author Paul.Sandoz@Sun.Com
- */
-public class DefaultClientConfig implements ClientConfig {
-    private final Set<Class<?>> providers = new LinkedHashSet<Class<?>>();
+/* package */ class ComponentsResourceConfig extends ResourceConfig {
+
+    private final ResourceConfig rc;
+
+    private final Set<Class<?>> classes = new LinkedHashSet<Class<?>>();
     
-    private final Set<Object> providerInstances = new LinkedHashSet<Object>();
     
-    private final Map<String, Boolean> features = new HashMap<String, Boolean>();
+    public ComponentsResourceConfig(ResourceConfig rc, Class<?>... components) {
+        this(rc, new HashSet<Class<?>>(Arrays.asList(components)));
+    }
     
-    private final Map<String, Object> properties = new HashMap<String, Object>();
-    
+    public ComponentsResourceConfig(ResourceConfig rc, Set<Class<?>> components) {
+        this.rc = rc;
+
+        this.classes.addAll(rc.getClasses());
+        this.classes.addAll(components);
+    }
+
+    @Override
     public Set<Class<?>> getClasses() {
-        return providers;
+        return classes;
     }
     
+    @Override
     public Set<Object> getSingletons() {
-        return providerInstances;
+        return rc.getSingletons();
     }
     
-    public Map<String, Boolean> getFeatures() {
-        return features;
-    }
-    
-    public boolean getFeature(String featureName) {
-        final Boolean v = features.get(featureName);
-        return (v != null) ? v : false;
-    }
-    
-    public Map<String, Object> getProperties() {
-        return properties;
+    @Override
+    public Map<String, MediaType> getMediaTypeMappings() {
+        return rc.getMediaTypeMappings();
     }
 
-    public Object getProperty(String propertyName) {
-        return properties.get(propertyName);
+    @Override
+    public Map<String, String> getLanguageMappings() {
+        return rc.getLanguageMappings();
     }
     
-    public boolean getPropertyAsFeature(String name) {
-        Boolean v = (Boolean)getProperties().get(name);
-        return (v != null) ? v : false;
+    @Override
+    public Map<String, Boolean> getFeatures() {
+        return rc.getFeatures();
+    }
+    
+    @Override
+    public boolean getFeature(String featureName) {
+        return rc.getFeature(featureName);
+    }
+    
+    @Override
+    public Map<String, Object> getProperties() {
+        return rc.getProperties();
+    }
+
+    @Override
+    public Object getProperty(String propertyName) {
+        return rc.getProperty(propertyName);
     }
 }
