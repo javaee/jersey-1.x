@@ -44,7 +44,9 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 import java.util.jar.JarEntry;
 import java.util.jar.JarOutputStream;
@@ -55,12 +57,12 @@ import junit.framework.*;
  *
  * @author Paul.Sandoz@Sun.Com
  */
-public abstract class AbstractResourceConfigTester extends TestCase {
+public abstract class AbstractConfigTester extends TestCase {
     public enum Suffix {
         jar, zip
     }
     
-    public AbstractResourceConfigTester(String testName) {
+    public AbstractConfigTester(String testName) {
         super(testName);
     }
     
@@ -69,6 +71,14 @@ public abstract class AbstractResourceConfigTester extends TestCase {
     }
     
     public final File createJarFile(Suffix s, String base, String... entries) throws IOException {
+        Map<String, String> entriesMap = new HashMap<String, String>();
+        for (String entry : entries) {
+            entriesMap.put(entry, entry);
+        }
+        return createJarFile(s, base, entriesMap);
+    }
+
+    public final File createJarFile(Suffix s, String base, Map<String, String> entries) throws IOException {
         File tempJar = File.createTempFile("test", "." + s);
         tempJar.deleteOnExit();
         JarOutputStream jos = new JarOutputStream(
@@ -76,8 +86,8 @@ public abstract class AbstractResourceConfigTester extends TestCase {
                 new FileOutputStream(tempJar)), new Manifest());
         
         Set<String> usedSegments = new HashSet<String>();
-        for (String entry : entries) {
-            for (String path : getPaths(entry)) {
+        for (Map.Entry<String, String> entry : entries.entrySet()) {
+            for (String path : getPaths(entry.getValue())) {
                 if (usedSegments.contains(path))
                     continue;
                 
@@ -87,11 +97,11 @@ public abstract class AbstractResourceConfigTester extends TestCase {
                 jos.closeEntry();                
             }
             
-            JarEntry e = new JarEntry(entry);
+            JarEntry e = new JarEntry(entry.getValue());
             jos.putNextEntry(e);
 
             InputStream f = new BufferedInputStream(
-                    new FileInputStream(base + entry));
+                    new FileInputStream(base + entry.getKey()));
             byte[] buf = new byte[1024];
             int read = 1024;
             while ((read = f.read(buf, 0, read)) != -1 ) {

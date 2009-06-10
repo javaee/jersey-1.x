@@ -91,6 +91,11 @@ public class XMLRootObjectProvider extends AbstractJAXBProvider<Object> {
     @Consumes("*/*")
     public static final class General extends XMLRootObjectProvider {
         public General(@Context Providers ps) { super(ps); }
+        
+        @Override
+        protected boolean isSupported(MediaType m) {
+            return m.getSubtype().endsWith("+xml");
+        }
     }
     
     public boolean isReadable(Class<?> type, Type genericType, Annotation annotations[], MediaType mediaType) {

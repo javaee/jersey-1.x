@@ -147,6 +147,7 @@ public final class ServiceFinder<T> implements Iterable<T> {
     private static final String PREFIX = "META-INF/services/";
     
     private final Class<T> serviceClass;
+    private final String serviceName;
     private final ClassLoader classLoader;
     private final boolean ignoreOnClassNotFound;
     
@@ -268,14 +269,41 @@ public final class ServiceFinder<T> implements Iterable<T> {
                 Thread.currentThread().getContextClassLoader(), 
                 ignoreOnClassNotFound);
     }
+
+    /**
+     * Locates and incrementally instantiates the available classes of a given
+     * service file using the context class loader.
+     * 
+     * @param serviceName the service name correspond to a file in
+     *        META-INF/services that contains a list of fully qualified class
+     *        names
+     * @throws ServiceConfigurationError If a service file violates the specified format
+     *                                   or names a provider class that cannot be found and instantiated
+     * @return the service finder
+     */
+    public static ServiceFinder<?> find(String serviceName) throws ServiceConfigurationError {
+        return new ServiceFinder(Object.class, serviceName, Thread.currentThread().getContextClassLoader(), false);
+    }
+
+
+    private ServiceFinder(
+            Class<T> service,
+            ClassLoader loader,
+            boolean ignoreOnClassNotFound) {
+        this(service, service.getName(), loader, ignoreOnClassNotFound);
+    }
     
-    private ServiceFinder(Class<T> service, ClassLoader loader, 
+    private ServiceFinder(
+            Class<T> service,
+            String serviceName,
+            ClassLoader loader,
             boolean ignoreOnClassNotFound) {
         this.serviceClass = service;
+        this.serviceName = serviceName;
         this.classLoader = loader;
         this.ignoreOnClassNotFound = ignoreOnClassNotFound;
     }
-    
+
     /**
      * Returns discovered objects incrementally.
      *
@@ -286,7 +314,10 @@ public final class ServiceFinder<T> implements Iterable<T> {
      *         be found and instantiated.
      */
     public Iterator<T> iterator() {
-        return new LazyObjectIterator<T>(serviceClass,classLoader,
+        return new LazyObjectIterator<T>(
+                serviceClass,
+                serviceName,
+                classLoader,
                 ignoreOnClassNotFound);
     }
     
@@ -300,7 +331,10 @@ public final class ServiceFinder<T> implements Iterable<T> {
      *         be found.
      */
     public Iterator<Class<T>> classIterator() {
-        return new LazyClassIterator<T>(serviceClass,classLoader,
+        return new LazyClassIterator<T>(
+                serviceClass,
+                serviceName,
+                classLoader,
                 ignoreOnClassNotFound);
     }
     
@@ -341,22 +375,22 @@ public final class ServiceFinder<T> implements Iterable<T> {
         return result.toArray((Class<T>[])Array.newInstance(Class.class,result.size()));
     }
     
-    private static void fail(Class service, String msg, Throwable cause)
+    private static void fail(String serviceName, String msg, Throwable cause)
     throws ServiceConfigurationError {
         ServiceConfigurationError sce
-                = new ServiceConfigurationError(service.getName() + ": " + msg);
+                = new ServiceConfigurationError(serviceName + ": " + msg);
         sce.initCause(cause);
         throw sce;
     }
     
-    private static void fail(Class service, String msg)
+    private static void fail(String serviceName, String msg)
     throws ServiceConfigurationError {
-        throw new ServiceConfigurationError(service.getName() + ": " + msg);
+        throw new ServiceConfigurationError(serviceName + ": " + msg);
     }
     
-    private static void fail(Class service, URL u, int line, String msg)
+    private static void fail(String serviceName, URL u, int line, String msg)
     throws ServiceConfigurationError {
-        fail(service, u + ":" + line + ": " + msg);
+        fail(serviceName, u + ":" + line + ": " + msg);
     }
     
     /**
@@ -364,7 +398,7 @@ public final class ServiceFinder<T> implements Iterable<T> {
      * on the line to both the names list and the returned set iff the name is
      * not already a member of the returned set.
      */
-    private static int parseLine(Class service, URL u, BufferedReader r, int lc,
+    private static int parseLine(String serviceName, URL u, BufferedReader r, int lc,
             List<String> names, Set<String> returned)
             throws IOException, ServiceConfigurationError {
         String ln = r.readLine();
@@ -377,14 +411,14 @@ public final class ServiceFinder<T> implements Iterable<T> {
         int n = ln.length();
         if (n != 0) {
             if ((ln.indexOf(' ') >= 0) || (ln.indexOf('\t') >= 0))
-                fail(service, u, lc, SpiMessages.ILLEGAL_CONFIG_SYNTAX());
+                fail(serviceName, u, lc, SpiMessages.ILLEGAL_CONFIG_SYNTAX());
             int cp = ln.codePointAt(0);
             if (!Character.isJavaIdentifierStart(cp))
-                fail(service, u, lc, SpiMessages.ILLEGAL_PROVIDER_CLASS_NAME(ln));
+                fail(serviceName, u, lc, SpiMessages.ILLEGAL_PROVIDER_CLASS_NAME(ln));
             for (int i = Character.charCount(cp); i < n; i += Character.charCount(cp)) {
                 cp = ln.codePointAt(i);
                 if (!Character.isJavaIdentifierPart(cp) && (cp != '.'))
-                    fail(service, u, lc, SpiMessages.ILLEGAL_PROVIDER_CLASS_NAME(ln));
+                    fail(serviceName, u, lc, SpiMessages.ILLEGAL_PROVIDER_CLASS_NAME(ln));
             }
             if (!returned.contains(ln)) {
                 names.add(ln);
@@ -410,7 +444,7 @@ public final class ServiceFinder<T> implements Iterable<T> {
      *                                   if a configuration-file format error is detected
      */
     @SuppressWarnings({"StatementWithEmptyBody"})
-    private static Iterator<String> parse(Class service, URL u, Set<String> returned)
+    private static Iterator<String> parse(String serviceName, URL u, Set<String> returned)
     throws ServiceConfigurationError {
         InputStream in = null;
         BufferedReader r = null;
@@ -421,15 +455,15 @@ public final class ServiceFinder<T> implements Iterable<T> {
             in = uConn.getInputStream();
             r = new BufferedReader(new InputStreamReader(in, "utf-8"));
             int lc = 1;
-            while ((lc = parseLine(service, u, r, lc, names, returned)) >= 0) ;
+            while ((lc = parseLine(serviceName, u, r, lc, names, returned)) >= 0) ;
         } catch (IOException x) {
-            fail(service, ": " + x);
+            fail(serviceName, ": " + x);
         } finally {
             try {
                 if (r != null) r.close();
                 if (in != null) in.close();
             } catch (IOException y) {
-                fail(service, ": " + y);
+                fail(serviceName, ": " + y);
             }
         }
         return names.iterator();
@@ -437,6 +471,7 @@ public final class ServiceFinder<T> implements Iterable<T> {
     
     private static class AbstractLazyIterator<T> {
         final Class<T> service;
+        final String serviceName;
         final ClassLoader loader;
         final boolean ignoreOnClassNotFound;
         
@@ -445,9 +480,13 @@ public final class ServiceFinder<T> implements Iterable<T> {
         Set<String> returned = new TreeSet<String>();
         String nextName = null;
         
-        private AbstractLazyIterator(Class<T> service, ClassLoader loader, 
+        private AbstractLazyIterator(
+                Class<T> service,
+                String serviceName,
+                ClassLoader loader,
                 boolean ignoreOnClassNotFound) {
             this.service = service;
+            this.serviceName = serviceName;
             this.loader = loader;
             this.ignoreOnClassNotFound = ignoreOnClassNotFound;
         }
@@ -455,7 +494,7 @@ public final class ServiceFinder<T> implements Iterable<T> {
         protected final void setConfigs() {
             if (configs == null) {
                 try {
-                    String fullName = PREFIX + service.getName();
+                    String fullName = PREFIX + serviceName;
                     if (loader == null)
                         setDefaultConfigs(fullName);
                     else {
@@ -464,7 +503,7 @@ public final class ServiceFinder<T> implements Iterable<T> {
                             setDefaultConfigs(fullName);
                     }
                 } catch (IOException x) {
-                    fail(service, ": " + x);
+                    fail(serviceName, ": " + x);
                 }
             }            
         }
@@ -487,7 +526,7 @@ public final class ServiceFinder<T> implements Iterable<T> {
                     if (!configs.hasMoreElements()) {
                         return false;
                     }
-                    pending = parse(service, configs.nextElement(), returned);
+                    pending = parse(serviceName, configs.nextElement(), returned);
                 }
                 nextName = pending.next();
                 if (ignoreOnClassNotFound) {
@@ -532,9 +571,12 @@ public final class ServiceFinder<T> implements Iterable<T> {
     private static final class LazyClassIterator<T> extends AbstractLazyIterator<T> 
             implements Iterator<Class<T>> {
 
-        private LazyClassIterator(Class<T> service, ClassLoader loader, 
+        private LazyClassIterator(
+                Class<T> service,
+                String serviceName,
+                ClassLoader loader,
                 boolean ignoreOnClassNotFound) {
-            super(service, loader, ignoreOnClassNotFound);
+            super(service, serviceName, loader, ignoreOnClassNotFound);
         }
         
         @SuppressWarnings("unchecked")
@@ -547,18 +589,18 @@ public final class ServiceFinder<T> implements Iterable<T> {
             try {
                 return (Class<T>)Class.forName(cn, true, loader);
             } catch (ClassNotFoundException ex) {
-                fail(service, 
+                fail(serviceName,
                         SpiMessages.PROVIDER_NOT_FOUND(cn, service));
             } catch (NoClassDefFoundError ex) {
-                fail(service,
+                fail(serviceName,
                         SpiMessages.DEPENDENT_CLASS_OF_PROVIDER_NOT_FOUND(
                         ex.getLocalizedMessage(), cn, service));
             } catch (ClassFormatError ex) {
-                fail(service,
+                fail(serviceName,
                         SpiMessages.DEPENDENT_CLASS_OF_PROVIDER_FORMAT_ERROR(
                         ex.getLocalizedMessage(), cn, service));
             } catch (Exception x) {
-                fail(service,
+                fail(serviceName,
                         SpiMessages.PROVIDER_CLASS_COULD_NOT_BE_LOADED(cn, service, x.getLocalizedMessage()),
                         x);
             }
@@ -572,9 +614,12 @@ public final class ServiceFinder<T> implements Iterable<T> {
 
         private T t;
         
-        private LazyObjectIterator(Class<T> service, ClassLoader loader, 
+        private LazyObjectIterator(
+                Class<T> service,
+                String serviceName,
+                ClassLoader loader,
                 boolean ignoreOnClassNotFound) {
-            super(service, loader, ignoreOnClassNotFound);
+            super(service, serviceName, loader, ignoreOnClassNotFound);
         }
         
         @Override
@@ -589,7 +634,7 @@ public final class ServiceFinder<T> implements Iterable<T> {
                     if (!configs.hasMoreElements()) {
                         return false;
                     }
-                    pending = parse(service, configs.nextElement(), returned);
+                    pending = parse(serviceName, configs.nextElement(), returned);
                 }
                 nextName = pending.next();
                 try {
@@ -604,7 +649,7 @@ public final class ServiceFinder<T> implements Iterable<T> {
                         }                    
                         nextName = null;
                     } else
-                        fail(service, 
+                        fail(serviceName,
                                 SpiMessages.PROVIDER_NOT_FOUND(nextName, service));
                 } catch (NoClassDefFoundError ex) {
                     // Dependent class of provider not found
@@ -618,7 +663,7 @@ public final class ServiceFinder<T> implements Iterable<T> {
                         }
                         nextName = null; 
                     } else
-                        fail(service,
+                        fail(serviceName,
                                 SpiMessages.DEPENDENT_CLASS_OF_PROVIDER_NOT_FOUND(ex.getLocalizedMessage(), nextName, service),
                                 ex);
                 } catch (ClassFormatError ex) {
@@ -631,11 +676,11 @@ public final class ServiceFinder<T> implements Iterable<T> {
                         }
                         nextName = null; 
                     } else
-                        fail(service,
+                        fail(serviceName,
                                 SpiMessages.DEPENDENT_CLASS_OF_PROVIDER_FORMAT_ERROR(ex.getLocalizedMessage(), nextName, service),
                                 ex);
                 } catch(Exception ex) {
-                    fail(service,
+                    fail(serviceName,
                             SpiMessages.PROVIDER_COULD_NOT_BE_CREATED(nextName, service, ex.getLocalizedMessage()),
                             ex);                    
                 }

@@ -53,7 +53,7 @@ import java.util.Map;
  *
  * @author Paul.Sandoz@Sun.Com
  */
-public class PackageResourceConfigTest extends AbstractResourceConfigTester {
+public class PackageResourceConfigTest extends AbstractConfigTester {
     
     public PackageResourceConfigTest(String testName) {
         super(testName);

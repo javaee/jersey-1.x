@@ -52,7 +52,7 @@ import junit.framework.*;
  *
  * @author Paul.Sandoz@Sun.Com
  */
-public class ClasspathResourceConfigTest extends AbstractResourceConfigTester {
+public class ClasspathResourceConfigTest extends AbstractConfigTester {
     
     public ClasspathResourceConfigTest(String testName) {
         super(testName);
