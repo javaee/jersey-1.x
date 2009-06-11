@@ -1,4 +1,19 @@
 release 1.1.1-ea (2009-06)
+- Fixed issue 154
+  https://jersey.dev.java.net/issues/show_bug.cgi?id=154
+  The com.sun.jersey.core.provider.EntityHolder type may be utilized as a 
+  "meta-entity" to determine whether a request consumed by the server, or a 
+  response consumed by the client, contains the entity or contains no entity, 
+  for example:
+     @POST
+     @Consumes("text/plain")
+     public void post(EntityHolder<MyJAXBObject> s) {
+         if (s.hasEntity()) {
+             MyJAXBObject entity = s.getEntity();
+         } else {
+           ...
+         }
+     }
 - Fixed issue 298
   https://jersey.dev.java.net/issues/show_bug.cgi?id=298
   A race condition was resolved when return List<T> where T is a JAXB object.

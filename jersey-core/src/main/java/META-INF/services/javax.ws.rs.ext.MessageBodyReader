@@ -23,3 +23,4 @@ com.sun.jersey.core.impl.provider.entity.SourceProvider$DOMSourceReader
 com.sun.jersey.core.impl.provider.entity.XMLRootObjectProvider$App
 com.sun.jersey.core.impl.provider.entity.XMLRootObjectProvider$Text
 com.sun.jersey.core.impl.provider.entity.XMLRootObjectProvider$General
+com.sun.jersey.core.impl.provider.entity.EntityHolderReader
