@@ -85,14 +85,30 @@ public class HeadTest extends AbstractGrizzlyWebContainerTester {
         assertEquals(MediaType.TEXT_PLAIN_TYPE, cr.getType());
         assertFalse(cr.hasEntity());
         
-        cr = r.path("byte").accept("application/octet-stream").head();
+        cr = r.path("byte").accept("application/octet-stream").get(ClientResponse.class);
         assertEquals(200, cr.getStatus());
         String length = cr.getMetadata().getFirst("Content-Length");
         assertNotNull(length);
         assertEquals(3, Integer.parseInt(length));
         assertEquals(MediaType.APPLICATION_OCTET_STREAM_TYPE, cr.getType());
+        assertTrue(cr.hasEntity());
+
+        cr = r.path("byte").accept("application/octet-stream").head();
+        assertEquals(200, cr.getStatus());
+        length = cr.getMetadata().getFirst("Content-Length");
+        assertNotNull(length);
+        assertEquals(3, Integer.parseInt(length));
+        assertEquals(MediaType.APPLICATION_OCTET_STREAM_TYPE, cr.getType());
         assertFalse(cr.hasEntity());
         
+        cr = r.path("ByteArrayInputStream").accept("application/octet-stream").get(ClientResponse.class);
+        assertEquals(200, cr.getStatus());
+        length = cr.getMetadata().getFirst("Content-Length");
+        assertNotNull(length);
+        assertEquals(3, Integer.parseInt(length));
+        assertEquals(MediaType.APPLICATION_OCTET_STREAM_TYPE, cr.getType());
+        assertTrue(cr.hasEntity());
+
         cr = r.path("ByteArrayInputStream").accept("application/octet-stream").head();
         assertEquals(200, cr.getStatus());
         length = cr.getMetadata().getFirst("Content-Length");
