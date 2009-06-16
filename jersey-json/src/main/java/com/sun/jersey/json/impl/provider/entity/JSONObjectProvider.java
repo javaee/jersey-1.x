@@ -58,13 +58,9 @@ import org.codehaus.jettison.json.JSONObject;
  * @author japod
  */
 public class JSONObjectProvider  extends AbstractMessageReaderWriterProvider<JSONObject>{
-    
-    public JSONObjectProvider() {
-        Class<?> c = JSONObject.class;
-    }
-    
+
     public boolean isReadable(Class<?> type, Type genericType, Annotation annotations[], MediaType mediaType) {
-        return type == JSONObject.class;        
+        return (type == JSONObject.class) && isJsonRelated(mediaType);
     }
     
     public JSONObject readFrom(
@@ -84,7 +80,7 @@ public class JSONObjectProvider  extends AbstractMessageReaderWriterProvider<JSO
     }
     
     public boolean isWriteable(Class<?> type, Type genericType, Annotation annotations[], MediaType mediaType) {
-        return type == JSONObject.class;        
+        return (type == JSONObject.class) && isJsonRelated(mediaType);
     }
     
     public void writeTo(
@@ -103,5 +99,9 @@ public class JSONObjectProvider  extends AbstractMessageReaderWriterProvider<JSO
         } catch (JSONException je) {
             throw ThrowHelper.withInitCause(je, new IOException(ImplMessages.ERROR_WRITING_JSON_OBJECT()));
         }
+    }
+
+    private boolean isJsonRelated(MediaType mediaType) {
+        return (mediaType == MediaType.APPLICATION_JSON_TYPE) || mediaType.getSubtype().endsWith("+json");
     }
 }
