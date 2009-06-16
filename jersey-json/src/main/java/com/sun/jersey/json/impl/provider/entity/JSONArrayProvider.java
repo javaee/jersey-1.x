@@ -57,7 +57,12 @@ import org.codehaus.jettison.json.JSONException;
  * @author japod
  */
 public class JSONArrayProvider  extends AbstractMessageReaderWriterProvider<JSONArray>{
-    
+
+     // JavaRebel needs this ctor
+    public JSONArrayProvider() {
+        Class<?> c = JSONArray.class;
+    }
+
     public boolean isReadable(Class<?> type, Type genericType, Annotation annotations[], MediaType mediaType) {
         return (type == JSONArray.class) && isJsonRelated(mediaType);
     }
@@ -102,6 +107,6 @@ public class JSONArrayProvider  extends AbstractMessageReaderWriterProvider<JSON
     }
 
     private boolean isJsonRelated(MediaType mediaType) {
-        return (mediaType == MediaType.APPLICATION_JSON_TYPE) || mediaType.getSubtype().endsWith("+json");
+        return mediaType.equals(MediaType.APPLICATION_JSON_TYPE) || mediaType.getSubtype().endsWith("+json");
     }
 }

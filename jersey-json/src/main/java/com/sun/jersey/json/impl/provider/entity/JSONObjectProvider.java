@@ -59,6 +59,11 @@ import org.codehaus.jettison.json.JSONObject;
  */
 public class JSONObjectProvider  extends AbstractMessageReaderWriterProvider<JSONObject>{
 
+    // JavaRebel needs this ctor
+    public JSONObjectProvider() {
+        Class<?> c = JSONObject.class;
+    }
+
     public boolean isReadable(Class<?> type, Type genericType, Annotation annotations[], MediaType mediaType) {
         return (type == JSONObject.class) && isJsonRelated(mediaType);
     }
@@ -102,6 +107,6 @@ public class JSONObjectProvider  extends AbstractMessageReaderWriterProvider<JSO
     }
 
     private boolean isJsonRelated(MediaType mediaType) {
-        return (mediaType == MediaType.APPLICATION_JSON_TYPE) || mediaType.getSubtype().endsWith("+json");
+        return mediaType.equals(MediaType.APPLICATION_JSON_TYPE) || mediaType.getSubtype().endsWith("+json");
     }
 }
