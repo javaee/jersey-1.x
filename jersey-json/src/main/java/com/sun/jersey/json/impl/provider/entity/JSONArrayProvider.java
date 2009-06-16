@@ -58,12 +58,8 @@ import org.codehaus.jettison.json.JSONException;
  */
 public class JSONArrayProvider  extends AbstractMessageReaderWriterProvider<JSONArray>{
     
-    public JSONArrayProvider() {
-        Class<?> c = JSONArray.class;
-    }
-    
     public boolean isReadable(Class<?> type, Type genericType, Annotation annotations[], MediaType mediaType) {
-        return type == JSONArray.class;        
+        return (type == JSONArray.class) && isJsonRelated(mediaType);
     }
     
     public JSONArray readFrom(
@@ -83,7 +79,7 @@ public class JSONArrayProvider  extends AbstractMessageReaderWriterProvider<JSON
     }
     
     public boolean isWriteable(Class<?> type, Type genericType, Annotation annotations[], MediaType mediaType) {
-        return type == JSONArray.class;        
+        return (type == JSONArray.class) && isJsonRelated(mediaType);
     }
     
     public void writeTo(
@@ -103,5 +99,9 @@ public class JSONArrayProvider  extends AbstractMessageReaderWriterProvider<JSON
         } catch (JSONException je) {
             throw ThrowHelper.withInitCause(je, new IOException(ImplMessages.ERROR_WRITING_JSON_ARRAY()));
         }
-    }    
+    }
+
+    private boolean isJsonRelated(MediaType mediaType) {
+        return (mediaType == MediaType.APPLICATION_JSON_TYPE) || mediaType.getSubtype().endsWith("+json");
+    }
 }
