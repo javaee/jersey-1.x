@@ -361,6 +361,60 @@ public class EntityTypesTest extends AbstractTypeTester {
     }
     
    
+    @Produces("application/json")
+    @Consumes("application/json")
+    @Path("/")
+    public static class JSONObjectResource extends AResource<JSONObject> {}
+
+    public void testJSONObjectRepresentation() throws Exception {
+        JSONObject object = new JSONObject();
+        object.put("userid", 1234).
+        put("username", "1234").
+        put("email", "a@b").
+        put("password", "****");
+
+        _test(object, JSONObjectResource.class, MediaType.APPLICATION_JSON_TYPE);
+    }
+
+    @Produces("application/xxx+json")
+    @Consumes("application/xxx+json")
+    @Path("/")
+    public static class JSONObjectResourceGeneralMediaType extends AResource<JSONObject> {}
+
+    public void testJSONObjectRepresentationGeneralMediaTyp() throws Exception {
+        JSONObject object = new JSONObject();
+        object.put("userid", 1234).
+        put("username", "1234").
+        put("email", "a@b").
+        put("password", "****");
+
+        _test(object, JSONObjectResourceGeneralMediaType.class, MediaType.valueOf("application/xxx+json"));
+    }
+
+    @Produces("application/json")
+    @Consumes("application/json")
+    @Path("/")
+    public static class JSONOArrayResource extends AResource<JSONArray> {}
+
+    public void testJSONArrayRepresentation() throws Exception {
+        JSONArray array = new JSONArray();
+        array.put("One").put("Two").put("Three").put(1).put(2.0);
+
+        _test(array, JSONOArrayResource.class, MediaType.APPLICATION_JSON_TYPE);
+    }
+
+    @Produces("application/xxx+json")
+    @Consumes("application/xxx+json")
+    @Path("/")
+    public static class JSONOArrayResourceGeneralMediaType extends AResource<JSONArray> {}
+
+    public void testJSONArrayRepresentationGeneralMediaType() throws Exception {
+        JSONArray array = new JSONArray();
+        array.put("One").put("Two").put("Three").put(1).put(2.0);
+
+        _test(array, JSONOArrayResourceGeneralMediaType.class, MediaType.valueOf("application/xxx+json"));
+    }
+
     @Path("/")
     public static class FeedResource extends AResource<Feed> {}
     

@@ -37,7 +37,6 @@
 
 package com.sun.jersey.json.impl.provider.entity;
 
-import com.sun.jersey.core.provider.AbstractMessageReaderWriterProvider;
 import com.sun.jersey.core.util.ThrowHelper;
 import com.sun.jersey.json.impl.ImplMessages;
 import java.io.IOException;
@@ -46,6 +45,8 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.Produces;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
@@ -56,17 +57,26 @@ import org.codehaus.jettison.json.JSONException;
  *
  * @author japod
  */
-public class JSONArrayProvider  extends AbstractMessageReaderWriterProvider<JSONArray>{
+public class JSONArrayProvider extends JSONProvider<JSONArray>{
 
-     // JavaRebel needs this ctor
-    public JSONArrayProvider() {
-        Class<?> c = JSONArray.class;
+    @Produces("application/json")
+    @Consumes("application/json")
+    public static final class App extends JSONArrayProvider {
     }
 
-    public boolean isReadable(Class<?> type, Type genericType, Annotation annotations[], MediaType mediaType) {
-        return (type == JSONArray.class) && isJsonRelated(mediaType);
+    @Produces("*/*")
+    @Consumes("*/*")
+    public static final class General extends JSONArrayProvider {
+        @Override
+        protected boolean isSupported(MediaType m) {
+            return m.getSubtype().endsWith("+json");
+        }
     }
-    
+
+    JSONArrayProvider() {
+        super(JSONArray.class);
+    }
+
     public JSONArray readFrom(
             Class<JSONArray> type, 
             Type genericType, 
@@ -81,10 +91,6 @@ public class JSONArrayProvider  extends AbstractMessageReaderWriterProvider<JSON
                     new Exception(ImplMessages.ERROR_PARSING_JSON_ARRAY(), je),
                     400);
         }
-    }
-    
-    public boolean isWriteable(Class<?> type, Type genericType, Annotation annotations[], MediaType mediaType) {
-        return (type == JSONArray.class) && isJsonRelated(mediaType);
     }
     
     public void writeTo(
@@ -104,9 +110,5 @@ public class JSONArrayProvider  extends AbstractMessageReaderWriterProvider<JSON
         } catch (JSONException je) {
             throw ThrowHelper.withInitCause(je, new IOException(ImplMessages.ERROR_WRITING_JSON_ARRAY()));
         }
-    }
-
-    private boolean isJsonRelated(MediaType mediaType) {
-        return mediaType.equals(MediaType.APPLICATION_JSON_TYPE) || mediaType.getSubtype().endsWith("+json");
     }
 }

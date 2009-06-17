@@ -38,7 +38,6 @@
 package com.sun.jersey.json.impl.provider.entity;
 
 
-import com.sun.jersey.core.provider.AbstractMessageReaderWriterProvider;
 import com.sun.jersey.core.util.ThrowHelper;
 import com.sun.jersey.json.impl.ImplMessages;
 import java.io.IOException;
@@ -47,6 +46,8 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.Produces;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
@@ -57,17 +58,26 @@ import org.codehaus.jettison.json.JSONObject;
  *
  * @author japod
  */
-public class JSONObjectProvider  extends AbstractMessageReaderWriterProvider<JSONObject>{
+public class JSONObjectProvider extends JSONProvider<JSONObject>{
 
-    // JavaRebel needs this ctor
-    public JSONObjectProvider() {
-        Class<?> c = JSONObject.class;
+    @Produces("application/json")
+    @Consumes("application/json")
+    public static final class App extends JSONObjectProvider {
     }
 
-    public boolean isReadable(Class<?> type, Type genericType, Annotation annotations[], MediaType mediaType) {
-        return (type == JSONObject.class) && isJsonRelated(mediaType);
+    @Produces("*/*")
+    @Consumes("*/*")
+    public static final class General extends JSONObjectProvider {
+        @Override
+        protected boolean isSupported(MediaType m) {
+            return m.getSubtype().endsWith("+json");
+        }
     }
-    
+
+    JSONObjectProvider() {
+        super(JSONObject.class);
+    }
+
     public JSONObject readFrom(
             Class<JSONObject> type, 
             Type genericType, 
@@ -82,10 +92,6 @@ public class JSONObjectProvider  extends AbstractMessageReaderWriterProvider<JSO
                     new Exception(ImplMessages.ERROR_PARSING_JSON_OBJECT(), je),
                     400);
         }
-    }
-    
-    public boolean isWriteable(Class<?> type, Type genericType, Annotation annotations[], MediaType mediaType) {
-        return (type == JSONObject.class) && isJsonRelated(mediaType);
     }
     
     public void writeTo(
@@ -104,9 +110,5 @@ public class JSONObjectProvider  extends AbstractMessageReaderWriterProvider<JSO
         } catch (JSONException je) {
             throw ThrowHelper.withInitCause(je, new IOException(ImplMessages.ERROR_WRITING_JSON_OBJECT()));
         }
-    }
-
-    private boolean isJsonRelated(MediaType mediaType) {
-        return mediaType.equals(MediaType.APPLICATION_JSON_TYPE) || mediaType.getSubtype().endsWith("+json");
     }
 }

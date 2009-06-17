@@ -1,4 +1,8 @@
 release 1.1.1-ea (2009-06)
+- Fixed issue 306
+  https://jersey.dev.java.net/issues/show_bug.cgi?id=306
+  The support JSONObject and JSONArray should only work for JSON related
+  media types, namely "application/json" and "application/<something>+json".
 - Fixed issue 154
   https://jersey.dev.java.net/issues/show_bug.cgi?id=154
   The com.sun.jersey.core.provider.EntityHolder type may be utilized as a 

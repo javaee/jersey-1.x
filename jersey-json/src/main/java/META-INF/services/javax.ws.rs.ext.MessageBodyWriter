@@ -4,6 +4,8 @@ com.sun.jersey.json.impl.provider.entity.JSONJAXBElementProvider$App
 com.sun.jersey.json.impl.provider.entity.JSONJAXBElementProvider$General
 com.sun.jersey.json.impl.provider.entity.JSONListElementProvider$App
 com.sun.jersey.json.impl.provider.entity.JSONListElementProvider$General
-com.sun.jersey.json.impl.provider.entity.JSONArrayProvider
-com.sun.jersey.json.impl.provider.entity.JSONObjectProvider
+com.sun.jersey.json.impl.provider.entity.JSONArrayProvider$App
+com.sun.jersey.json.impl.provider.entity.JSONArrayProvider$General
+com.sun.jersey.json.impl.provider.entity.JSONObjectProvider$App
+com.sun.jersey.json.impl.provider.entity.JSONObjectProvider$General
 com.sun.jersey.json.impl.provider.entity.JSONWithPaddingProvider
