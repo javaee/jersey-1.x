@@ -360,29 +360,7 @@ public class EntityTypesTest extends AbstractTypeTester {
         _test(fp, FormResource.class);
     }
     
-    @Path("/")
-    public static class JSONObjectResource extends AResource<JSONObject> {}
-    
-    public void testJSONObjectRepresentation() throws Exception {
-        JSONObject object = new JSONObject();
-        object.put("userid", 1234).
-        put("username", "1234").
-        put("email", "a@b").
-        put("password", "****");
-        
-        _test(object, JSONObjectResource.class);
-    }
-
-    @Path("/")
-    public static class JSONOArrayResource extends AResource<JSONArray> {}
-    
-    public void testJSONArrayRepresentation() throws Exception {
-        JSONArray array = new JSONArray();
-        array.put("One").put("Two").put("Three").put(1).put(2.0);
-        
-        _test(array, JSONOArrayResource.class);
-    }
-    
+   
     @Path("/")
     public static class FeedResource extends AResource<Feed> {}
     
