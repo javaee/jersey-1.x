@@ -214,7 +214,8 @@ public class UriBuilderImpl extends UriBuilder {
     public UriBuilder replacePath(String path) {
         checkSsp();
         this.path.setLength(0);
-        appendPath(path);
+        if(path != null)
+            appendPath(path);
         return this;
     }
 

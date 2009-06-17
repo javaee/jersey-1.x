@@ -114,6 +114,13 @@ public class UriBuilderTest extends TestCase {
         assertEquals(URI.create("http://localhost:8080/x/y/z"), bu);
     }
 
+    public void testReplacePathNull() {
+        URI bu = UriBuilder.fromUri("http://localhost:8080/a/b/c").
+                replacePath(null).build();
+
+        assertEquals(URI.create("http://localhost:8080"), bu);
+    }
+
     public void testReplaceMatrix() {
         URI bu = UriBuilder.fromUri("http://localhost:8080/a/b/c;a=x;b=y").
                 replaceMatrix("x=a;y=b").build();
