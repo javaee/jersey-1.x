@@ -1,8 +1,10 @@
 release 1.1.1-ea (2009-06)
-- Fixed issue 258
-  https://jersey.dev.java.net/issues/show_bug.cgi?id=258
-  UriBuilder.replacePath(null) no longer throws IllegalArgument exception;
-  null parameter unsets existing path component
+- Fixed issue 285
+  https://jersey.dev.java.net/issues/show_bug.cgi?id=285
+  A spring configuration file may be declared as a child context in the
+  servlet initialization parameters for the case where multiple Spring-based
+  servlets are deployed, with different spring-based resource classes, from
+  within the same Web application.
 - Fixed issue 306
   https://jersey.dev.java.net/issues/show_bug.cgi?id=306
   The support JSONObject and JSONArray should only work for JSON related
