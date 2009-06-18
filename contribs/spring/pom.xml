@@ -66,7 +66,7 @@
         <dependency>
             <groupId>com.sun.grizzly</groupId>
             <artifactId>grizzly-servlet-webserver</artifactId>
-            <version>1.9.8</version>
+            <version>1.9.15a</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -102,12 +102,14 @@
         </dependency>
     </dependencies>
     <build>
-        <resources>
-            <resource>
+        <testResources>
+            <testResource>
+                <directory>src/test/java</directory>
+            </testResource>
+            <testResource>
                 <directory>src/test/conf</directory>
-                <filtering>false</filtering>
-            </resource>
-        </resources>
+            </testResource>
+        </testResources>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>

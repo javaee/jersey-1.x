@@ -27,8 +27,10 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.springframework.context.ConfigurableApplicationContext;
+import org.springframework.web.context.ConfigurableWebApplicationContext;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
+import org.springframework.web.context.support.XmlWebApplicationContext;
 
 import com.sun.jersey.api.core.ResourceConfig;
 import com.sun.jersey.core.spi.component.ioc.IoCComponentProviderFactory;
@@ -52,33 +54,79 @@ import javax.servlet.ServletException;
  * classes are root resource classes or provider classes. It is not necessary
  * to provide initialization parameters for declaring classes in the web.xml
  * unless a mixture of Spring-managed and Jersey-managed classes is required.
+ * <p>
+ * The servlet supports configuration of child applicationContexts, 
+ * see {@link #CONTEXT_CONFIG_LOCATION}.
+ * <p>
  * 
  * @author <a href="mailto:martin.grotzke@freiheit.com">Martin Grotzke</a>
+ * @auhtor Paul.Sandoz@Sun.Com
+ * @author recht@dev.java.net
  */
 public class SpringServlet extends ServletContainer {
 
     private static final long serialVersionUID = 5686655395749077671L;
-    
+
     private static final Logger LOGGER = Logger.getLogger(SpringServlet.class.getName());
+
+    /**
+     * The context configuration location initialization parameter for declaring
+     * that a child context should be used for bean definitions. This feature
+     * can be used when configuration multiple Jersey/Spring servlets that
+     * contain different SPring-managed resources.
+     * <p>
+     * The parameter name is the String "contextConfigLocation".
+     * <p>
+     * A parameter value is a reference to a spring configuration file declaring
+     * bean definitions.
+     * <p>
+     * If this parameter is absent then the default application context
+     * configuration is utilized.
+     */
+    public static final String CONTEXT_CONFIG_LOCATION = "contextConfigLocation";
 
     @Override
     protected ResourceConfig getDefaultResourceConfig(Map<String, Object> props,
-            WebConfig webConfig) throws ServletException  {
+            WebConfig webConfig) throws ServletException {
         return new DefaultResourceConfig();
     }
 
     @Override
     protected void initiate(ResourceConfig rc, WebApplication wa) {
         try {
-            final WebApplicationContext springWebContext = WebApplicationContextUtils.
-                    getRequiredWebApplicationContext(getServletContext());
-            final ConfigurableApplicationContext springContext =
-                    (ConfigurableApplicationContext)springWebContext;
-
-            wa.initiate(rc, new SpringComponentProviderFactory(rc, springContext));
-        } catch( RuntimeException e ) {
+            wa.initiate(rc, new SpringComponentProviderFactory(rc, getContext()));
+        } catch (RuntimeException e) {
             LOGGER.log(Level.SEVERE, "Exception occurred when intialization", e);
             throw e;
         }
+    }
+
+    private ConfigurableApplicationContext getContext() {
+        final String contextConfigLocation = getWebConfig().getInitParameter("contextConfigLocation");
+        if (contextConfigLocation == null) {
+            LOGGER.info("Using default applicationContext");
+            return getDefaultContext();
+        } else {
+            LOGGER.info("Creating new child context from " + contextConfigLocation);
+            return getChildContext(contextConfigLocation);
+        }
+    }
+
+    private ConfigurableApplicationContext getChildContext(String contextConfigLocation) {
+        final ConfigurableWebApplicationContext ctx = new XmlWebApplicationContext();
+        ctx.setParent(getDefaultContext());
+        ctx.setServletContext(getServletContext());
+        ctx.setConfigLocations(new String[]{contextConfigLocation});
+
+        ctx.refresh();
+        return ctx;
+    }
+
+    private ConfigurableApplicationContext getDefaultContext() {
+        final WebApplicationContext springWebContext =
+                WebApplicationContextUtils.getRequiredWebApplicationContext(getServletContext());
+        final ConfigurableApplicationContext springContext =
+                (ConfigurableApplicationContext) springWebContext;
+        return springContext;
     }
 }
