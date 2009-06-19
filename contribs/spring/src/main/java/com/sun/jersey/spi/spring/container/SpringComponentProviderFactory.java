@@ -253,8 +253,10 @@ public class SpringComponentProviderFactory implements IoCComponentProviderFacto
             // names for classes that extend A
             boolean inheritedNames = false;
             Class<?> a = ClassUtils.getUserClass(springContext.getType(names[0]));
+            LOGGER.info("BASE CLASS: Name " + names[0] + ": " + a);
             for (int i = 1; i < names.length; i++) {
                 Class<?> b = ClassUtils.getUserClass(springContext.getType(names[i]));
+                LOGGER.info("SUB CLASS: Name " + names[i] + ": " + b);
 
                 inheritedNames = a.isAssignableFrom(b);
             }
