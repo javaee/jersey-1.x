@@ -79,6 +79,7 @@
   <modules>
     <module>jersey-lift</module>
     <module>jersey-lift-test</module>
+    <module>jersey-scala</module>
   </modules>
 
   <build>
