@@ -1,4 +1,18 @@
 release 1.1.1-ea (2009-06)
+- Fixed issue 314
+  https://jersey.dev.java.net/issues/show_bug.cgi?id=314
+  Support MessageBodyReader/Writer implementations have declarations as follows:
+    @Provider
+    public class MyWriter<T> implements MessageBodyWriter<T> { ... }
+  namely the type variable T is never resolved and will be resolved to Object
+  when instantiated.
+- Fixed issue 297
+  https://jersey.dev.java.net/issues/show_bug.cgi?id=297
+  If a servlet URL mapping is something like "/foo/*" and the request URL
+  path is "/foo" then Jersey will consume the request as if the path was "/foo/",
+  unless the redirect feature is enabled (see features of ResourceConfig),
+  which if the case, then Jersey will return a temporary redirect response to
+  the URL with the path "/foo/".
 - Fixed issue 295
   https://jersey.dev.java.net/issues/show_bug.cgi?id=295
   Inheritence of Spring annotated classes, using @Component, that are also

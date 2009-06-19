@@ -61,14 +61,21 @@ public abstract class AbstractGrizzlyWebContainerTester extends TestCase {
 
     private int port = TestHelper.getEnvVariable("JERSEY_HTTP_PORT", 9997);
     
+    private String contextPath;
+
     private Class<? extends Servlet> sc;
     
     public AbstractGrizzlyWebContainerTester(String name) {
-        super(name);
+        this(name, CONTEXT);
     }
     
+    protected AbstractGrizzlyWebContainerTester(String name, String contextPath) {
+        super(name);
+        this.contextPath = contextPath;
+    }
+
     public UriBuilder getUri() {
-        return UriBuilder.fromUri("http://localhost").port(port).path(CONTEXT);
+        return UriBuilder.fromUri("http://localhost").port(port).path(contextPath);
     }
     
     public void setServletClass(Class<? extends Servlet> sc) {

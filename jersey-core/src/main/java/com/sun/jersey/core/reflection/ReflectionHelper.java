@@ -294,7 +294,7 @@ public class ReflectionHelper {
                     cas[i] = (Class)pt.getRawType();
                 } else if (a instanceof TypeVariable) {
                     ClassTypePair ctp = resolveTypeVariable(p.concreteClass, p.declaringClass, (TypeVariable)a);
-                    cas[i] = ctp.c;
+                    cas[i] = (ctp != null) ? ctp.c : Object.class;
                 }
             }
             return cas;

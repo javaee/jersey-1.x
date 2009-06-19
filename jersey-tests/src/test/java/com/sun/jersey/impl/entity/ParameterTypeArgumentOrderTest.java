@@ -40,15 +40,19 @@ package com.sun.jersey.impl.entity;
 import com.sun.jersey.api.client.WebResource;
 import com.sun.jersey.impl.AbstractResourceTester;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.StreamingOutput;
+import javax.ws.rs.ext.MessageBodyReader;
 import javax.ws.rs.ext.MessageBodyWriter;
 import javax.ws.rs.ext.Provider;
 
@@ -198,4 +202,64 @@ public class ParameterTypeArgumentOrderTest extends AbstractResourceTester {
         assertEquals("BB", r.path("b").get(String.class));
         assertEquals("CC", r.path("c").get(String.class));
     }
+
+
+    public static class GenericClassReaderWriter<T> implements MessageBodyWriter<T>, MessageBodyReader<T> {
+        private final Class c;
+
+        GenericClassReaderWriter(Class c) {
+            this.c = c;
+        }
+
+        public boolean isWriteable(Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType) {
+            return c.isAssignableFrom(type);
+        }
+
+        public long getSize(T t, Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType) {
+            return -1;
+        }
+
+        public void writeTo(T t, Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType, MultivaluedMap<String, Object> httpHeaders, OutputStream entityStream) throws IOException, WebApplicationException {
+            entityStream.write((c.getSimpleName() + type.getSimpleName()).getBytes());
+        }
+
+        public boolean isReadable(Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType) {
+            return c.isAssignableFrom(type);
+        }
+
+        public T readFrom(Class<T> type, Type genericType, Annotation[] annotations, MediaType mediaType, MultivaluedMap<String, String> httpHeaders, InputStream entityStream) throws IOException, WebApplicationException {
+            try {
+                return (T) c.newInstance();
+            } catch (Exception ex) {
+                throw new RuntimeException(ex);
+            }
+        }
+    }
+
+    @Provider
+    public static class AReaderWriter<T> extends GenericClassReaderWriter<T> {
+        public AReaderWriter() { super(A.class); }
+    }
+
+    @Provider
+    public static class BReaderWriter<T> extends GenericClassReaderWriter<B> {
+        public BReaderWriter() { super(B.class); }
+    }
+
+
+    @Provider
+    public static class CReaderWriter<T> extends GenericClassReaderWriter<C> {
+        public CReaderWriter() { super(C.class); }
+    }
+
+    public void testClassResourceX() {
+        initiateWebApplication(AReaderWriter.class, BReaderWriter.class, CReaderWriter.class, ClassResource.class);
+
+        WebResource r = resource("/");
+
+        assertEquals("AA", r.path("a").get(String.class));
+        assertEquals("BB", r.path("b").get(String.class));
+        assertEquals("CC", r.path("c").get(String.class));
+    }
+
 }

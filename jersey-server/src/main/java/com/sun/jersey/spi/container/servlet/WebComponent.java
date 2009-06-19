@@ -153,6 +153,15 @@ public class WebComponent implements ContainerListener {
     }
 
     /**
+     * Get the resource configuration.
+     *
+     * @return the resource configuration.
+     */
+    public ResourceConfig getResourceConfig() {
+        return resourceConfig;
+    }
+
+    /**
      * Initiate the Web component.
      * 
      * @param webConfig the Web configuration.

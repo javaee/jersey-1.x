@@ -540,10 +540,24 @@ public class ServletContainer extends HttpServlet implements Filter {
          * invoked for the case when the URI is equal to the deployment URL
          * minus the '/', for example http://locahost:8080/HelloWorldWebApp
          */
-        if (request.getPathInfo() != null &&
-                request.getPathInfo().equals("/") && !request.getRequestURI().endsWith("/")) {
-            response.setStatus(404);
-            return;
+        String pathInfo = request.getPathInfo();
+        StringBuffer requestURL = request.getRequestURL();
+        String requestURI = request.getRequestURI();
+        final boolean checkPath = pathInfo == null || pathInfo.length() == 0 || pathInfo.equals("/");
+        if (checkPath && !request.getRequestURI().endsWith("/")) {
+            if (webComponent.getResourceConfig().getFeature(ResourceConfig.FEATURE_REDIRECT)) {
+                URI l = UriBuilder.fromUri(request.getRequestURL().toString()).
+                        path("/").
+                        replaceQuery(request.getQueryString()).build();
+                
+                response.setStatus(307);
+                response.setHeader("Location", l.toASCIIString());
+                return;
+            } else {
+                pathInfo = "/";
+                requestURL.append("/");
+                requestURI += "/";
+            }
         }
 
         /**
@@ -551,7 +565,7 @@ public class ServletContainer extends HttpServlet implements Filter {
          * minus the query and fragment components.
          */
         UriBuilder absoluteUriBuilder = UriBuilder.fromUri(
-                request.getRequestURL().toString());
+                requestURL.toString());
 
         /**
          * The HttpServletRequest.getPathInfo() and
@@ -563,7 +577,7 @@ public class ServletContainer extends HttpServlet implements Filter {
          * We need to work around this and not use getPathInfo
          * for the decodedPath.
          */
-        final String decodedBasePath = (request.getPathInfo() != null)
+        final String decodedBasePath = (pathInfo != null)
                 ? request.getContextPath() + request.getServletPath() + "/"
                 : request.getContextPath() + "/";
 
@@ -583,7 +597,7 @@ public class ServletContainer extends HttpServlet implements Filter {
             queryParameters = "";
         }
 
-        final URI requestUri = absoluteUriBuilder.replacePath(request.getRequestURI()).
+        final URI requestUri = absoluteUriBuilder.replacePath(requestURI).
                 replaceQuery(queryParameters).
                 build();
 
