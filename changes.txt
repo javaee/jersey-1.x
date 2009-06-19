@@ -1,4 +1,21 @@
 release 1.1.1-ea (2009-06)
+- Fixed issue 295
+  https://jersey.dev.java.net/issues/show_bug.cgi?id=295
+  Inheritence of Spring annotated classes, using @Component, that are also
+  resource classes is now supported, for example:
+    @Path("a") @Component
+    public static class A {
+        @GET public String get() {
+            return "a";
+        }
+    }
+
+    @Path("b") @Component
+    public static class B extends A {
+        @GET @Override public String get() {
+            return "b";
+        }
+    }
 - Fixed issue 285
   https://jersey.dev.java.net/issues/show_bug.cgi?id=285
   A spring configuration file may be declared as a child context in the

@@ -3,8 +3,9 @@
  * and open the template in the editor.
  */
 
-package com.sun.jersey.spring.tests;
+package com.sun.jersey.spring.tests.childconfig;
 
+import com.sun.jersey.spring.tests.*;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.WebResource;
 import com.sun.jersey.spi.spring.container.servlet.SpringServlet;

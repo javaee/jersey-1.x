@@ -248,6 +248,20 @@ public class SpringComponentProviderFactory implements IoCComponentProviderFacto
         } else if (names.length == 1) {
             return names[0];
         } else {
+            // Check if types of the beans names are assignable
+            // Spring auto-registration for a type A will include the bean
+            // names for classes that extend A
+            boolean inheritedNames = false;
+            Class<?> a = ClassUtils.getUserClass(springContext.getType(names[0]));
+            for (int i = 1; i < names.length; i++) {
+                Class<?> b = ClassUtils.getUserClass(springContext.getType(names[i]));
+
+                inheritedNames = a.isAssignableFrom(b);
+            }
+
+            if (inheritedNames)
+                return names[0];
+            
             final StringBuilder sb = new StringBuilder();
             sb.append("There are multiple beans configured in spring for the type ").
                     append(c.getName()).append(".");
