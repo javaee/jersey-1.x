@@ -252,6 +252,10 @@
                             <version>2.6.1</version>
                         </docletArtifact>
                     </docletArtifacts>
+                    <!-- the following option is required as a work around for
+                         version 2.5 of the javadoc plugin which will be used
+                         by a maven version > 2.0.9 -->
+                    <useStandardDocletOptions>false</useStandardDocletOptions>
                     <additionalparam>-output ${project.build.outputDirectory}/resourcedoc.xml</additionalparam>
                 </configuration>
             </plugin>
