@@ -5,7 +5,7 @@
 	<TITLE>Dependencies</TITLE>
 	<META NAME="GENERATOR" CONTENT="StarOffice 9  (Unix)">
 	<META NAME="CREATED" CONTENT="0;0">
-	<META NAME="CHANGED" CONTENT="20090423;14114800">
+	<META NAME="CHANGED" CONTENT="20090622;14470200">
 	<META NAME="Info 1" CONTENT="">
 	<META NAME="Info 2" CONTENT="">
 	<META NAME="Info 3" CONTENT="">
@@ -205,6 +205,19 @@ module.</P>
 <A HREF="http://download.java.net/maven/1/javax.xml.bind/jars/jaxb-api-2.1.jar">jaxb-api.jar</A>,
 <A HREF="http://download.java.net/maven/1/javax.activation/jars/activation-1.1.jar">activation.jar</A>,
 <A HREF="http://download.java.net/maven/1/javax.xml.stream/jars/stax-api-1.0-2.jar">stax-api.jar</A></BLOCKQUOTE>
+<P>Maven developers, using Java SE 5, that are consuming or producing
+<FONT FACE="Courier New, monospace">List&lt;T&gt;</FONT> or
+<FONT FACE="Courier New, monospace">Collection&lt;T&gt;</FONT> where
+<FONT FACE="Courier New, monospace">T</FONT> is a JAXB bean require a
+dependency on a StAX implementation, such as Woodstox version 3.2.1
+or greater using the following dependency:</P>
+<PRE STYLE="margin-left: 0.79in">&lt;dependency&gt;
+    &lt;groupId&gt;woodstox&lt;/groupId&gt;
+    &lt;artifactId&gt;wstx-asl&lt;/artifactId&gt;
+    &lt;version&gt;3.2.1&lt;/version&gt;
+&lt;/dependency&gt;</PRE><P>
+Non-maven developers require:</P>
+<BLOCKQUOTE><A HREF="http://repo1.maven.org/maven2/woodstox/wstx-asl/3.2.1/wstx-asl-3.2.1.jar">wstx-asl-3.2.1.jar</A></BLOCKQUOTE>
 <P>Maven developers, using JSON serialization support of JAXB beans
 when using the MIME media type &quot;application/json&quot; require a
 dependency on the <A HREF="http://download.java.net/maven/2/com/sun/jersey/jersey-json/1.1.1-ea-SNAPSHOT/jersey-json-1.1.1-ea-SNAPSHOT.pom">jersey-json</A>
@@ -369,9 +382,11 @@ on how to integrate Jersey-based Web applications with Spring.</P>
 <P>Guice support depends on the Guice artifacts distributed with
 <A HREF="http://code.google.com/p/guiceyfruit/">GuiceyFruit</A> a set
 of extensions on top of Guice 2.0, such as support for Java EE
-artifacts like @PostConstruct/@PreDestroy, @Resource and
-@PersistenceContext. To avail of GuiceyFruit features add the
-following dependency and repository to the pom:</P>
+artifacts like <FONT FACE="Courier New, monospace">@PostConstruct</FONT>/<FONT FACE="Courier New, monospace">@PreDestroy</FONT>,
+<FONT FACE="Courier New, monospace">@Resource</FONT> and
+<FONT FACE="Courier New, monospace">@PersistenceContext</FONT>. To
+avail of GuiceyFruit features add the following dependency and
+repository to the pom:</P>
 <PRE STYLE="margin-left: 0.79in">&lt;dependency&gt;
     &lt;groupId&gt;org.guiceyfruit&lt;/groupId&gt;
     &lt;artifactId&gt;guiceyfruit&lt;/artifactId&gt;

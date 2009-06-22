@@ -1,4 +1,8 @@
 release 1.1.1-ea (2009-06)
+- Fixed issue 279
+  Updated the dependencies document to include the dependencies required
+  when list List<T> or Collection<T> where T is a JAXB bean. A StaX
+  implementation is required, such as Woodstox.
 - Fixed issue 314
   https://jersey.dev.java.net/issues/show_bug.cgi?id=314
   Support MessageBodyReader/Writer implementations have declarations as follows:
