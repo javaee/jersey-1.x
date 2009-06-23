@@ -1,5 +1,15 @@
 release 1.1.1-ea (2009-06)
+- Fixed issue 282
+  https://jersey.dev.java.net/issues/show_bug.cgi?id=282
+  The file META-INF/services/jersey-server-components may be present and
+  contain root resource and provider class names for classes that
+  should be loaded and deployed. If a class cannot be loaded then a deployment
+  error will occur.
+  The file META-INF/services/jersey-client-components may be present and contain
+  provider clases for classes that should be loaded and work with the client API.
+  If a class cannot be loaded then an error will occur.
 - Fixed issue 279
+  https://jersey.dev.java.net/issues/show_bug.cgi?id=279
   Updated the dependencies document to include the dependencies required
   when list List<T> or Collection<T> where T is a JAXB bean. A StaX
   implementation is required, such as Woodstox.
