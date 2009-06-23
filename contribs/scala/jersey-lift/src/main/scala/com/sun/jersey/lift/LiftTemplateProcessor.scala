@@ -9,7 +9,8 @@ import _root_.net.liftweb.util.{Full, Box, Log}
 
 import javax.ws.rs.Produces
 //import org.apache.log4j.Logger
-import xml.NodeSeq
+import scala.xml.NodeSeq
+
 import com.sun.jersey.api.core.HttpContext
 import com.sun.jersey.api.core.ResourceConfig
 import com.sun.jersey.api.container.ContainerException

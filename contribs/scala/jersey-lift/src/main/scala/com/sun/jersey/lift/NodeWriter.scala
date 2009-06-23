@@ -17,7 +17,7 @@ import com.sun.jersey.api.container.ContainerException
 import com.sun.jersey.api.core.HttpContext
 
 import javax.ws.rs.Produces
-import xml.NodeSeq
+import scala.xml.NodeSeq
 
 /**
  * Converts a Scala   { @link NodeSeq } to a String for rendering nodes as HTML, XML, XHTML using LiftWeb's templates
