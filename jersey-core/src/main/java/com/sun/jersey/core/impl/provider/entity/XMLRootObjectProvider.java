@@ -100,7 +100,7 @@ public class XMLRootObjectProvider extends AbstractJAXBProvider<Object> {
     
     public boolean isReadable(Class<?> type, Type genericType, Annotation annotations[], MediaType mediaType) {
         try {
-            return Object.class == type && getUnmarshaller(type) != null && isSupported(mediaType);
+            return Object.class == type && isSupported(mediaType) && getUnmarshaller(type, mediaType) != null;
         } catch (JAXBException cause) {
             throw ThrowHelper.withInitCause(cause,
                     new RuntimeException(ImplMessages.ERROR_UNMARSHALLING_JAXB(type))

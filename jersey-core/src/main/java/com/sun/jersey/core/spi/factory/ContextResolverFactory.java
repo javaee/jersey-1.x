@@ -48,11 +48,13 @@ import com.sun.jersey.core.spi.component.ComponentScope;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeSet;
+import java.util.concurrent.ConcurrentHashMap;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
@@ -66,10 +68,12 @@ import javax.ws.rs.ext.ContextResolver;
 public class ContextResolverFactory {
     private final Map<Type, Map<MediaType, ContextResolver>> resolver;
     
+    private final Map<Type, ConcurrentHashMap<MediaType, ContextResolver>> cache;
+
     public ContextResolverFactory(ProviderServices providersServices,
             InjectableProviderFactory ipf) {
-        Map<Type, Map<MediaType, Set<ContextResolver>>> rs = 
-                new HashMap<Type, Map<MediaType, Set<ContextResolver>>>();
+        Map<Type, Map<MediaType, List<ContextResolver>>> rs =
+                new HashMap<Type, Map<MediaType, List<ContextResolver>>>();
         
         Set<ContextResolver> providers = 
                 providersServices.getProviders(ContextResolver.class);
@@ -79,18 +83,18 @@ public class ContextResolverFactory {
 
             Type type = getParameterizedType(provider.getClass());
             
-            Map<MediaType, Set<ContextResolver>> mr = rs.get(type);
+            Map<MediaType, List<ContextResolver>> mr = rs.get(type);
             if (mr == null) {
-                mr = new HashMap<MediaType, Set<ContextResolver>>();
+                mr = new HashMap<MediaType, List<ContextResolver>>();
                 rs.put(type, mr);
             }
             for (MediaType m : ms) {
-                Set<ContextResolver> sr = mr.get(m);
-                if (sr == null) {
-                    sr = new HashSet<ContextResolver>();
-                    mr.put(m, sr);
+                List<ContextResolver> crl = mr.get(m);
+                if (crl == null) {
+                    crl = new ArrayList<ContextResolver>();
+                    mr.put(m, crl);
                 }
-                sr.add(provider);                
+                crl.add(provider);
             }
         }
         
@@ -98,16 +102,19 @@ public class ContextResolverFactory {
         // media type
         
         this.resolver = new HashMap<Type, Map<MediaType, ContextResolver>>(4);
-        for (Map.Entry<Type, Map<MediaType, Set<ContextResolver>>> e : rs.entrySet()) {
+        this.cache = new HashMap<Type, ConcurrentHashMap<MediaType, ContextResolver>>(4);
+        for (Map.Entry<Type, Map<MediaType, List<ContextResolver>>> e : rs.entrySet()) {
             Map<MediaType, ContextResolver> mr = new KeyComparatorHashMap<MediaType, ContextResolver>(
                     4, MessageBodyFactory.MEDIA_TYPE_COMPARATOR);
             resolver.put(e.getKey(), mr);
-            
-            for (Map.Entry<MediaType, Set<ContextResolver>> f : e.getValue().entrySet()) {
+
+            cache.put(e.getKey(), new ConcurrentHashMap<MediaType, ContextResolver>(4));
+
+            for (Map.Entry<MediaType, List<ContextResolver>> f : e.getValue().entrySet()) {
                 mr.put(f.getKey(), reduce(f.getValue()));
             }
         }
-        
+
         // Add injectable
         
         ipf.add(new InjectableProvider<Context, Type>() {
@@ -135,23 +142,37 @@ public class ContextResolverFactory {
             }
             
             ContextResolver getResolver(ComponentContext ic, Type type) {
-                ContextResolver cr = null;
+                Map<MediaType, ContextResolver> x = resolver.get(type);
+                if (x == null)
+                    return null;
+                
                 List<MediaType> ms = getMediaTypes(ic);
                 if (ms.size() == 1) {
-                    cr = resolve(type, ms.get(0));
-                    if (cr == null)
-                        return null;
-                } else {
-                    Set<ContextResolver> scr = new HashSet<ContextResolver>();
+                    return resolve(type, ms.get(0));
+                } else {                    
+                    Set<MediaType> ml = new TreeSet<MediaType>(MediaTypes.MEDIA_TYPE_COMPARATOR);
                     for (MediaType m : ms) {
-                        cr = resolve(type, m);
-                        if (cr != null) scr.add(cr);
+                        if (m.isWildcardType()) {
+                            ml.add(MediaTypes.GENERAL_MEDIA_TYPE);
+                        } else if (m.isWildcardSubtype()) {
+                            ml.add(new MediaType(m.getType(), "*"));
+                            ml.add(MediaTypes.GENERAL_MEDIA_TYPE);
+                        } else {
+                            ml.add(new MediaType(m.getType(), m.getSubtype()));
+                            ml.add(new MediaType(m.getType(), "*"));
+                            ml.add(MediaTypes.GENERAL_MEDIA_TYPE);                        }
                     }
-                    if (scr.isEmpty())
+
+                    List<ContextResolver> crl = new ArrayList<ContextResolver>(ml.size());
+                    for (MediaType m : ms) {
+                        ContextResolver cr = x.get(m);
+                        if (cr != null) crl.add(cr);
+                    }
+                    if (crl.isEmpty())
                         return null;
-                    cr = new ContextResolverAdapter(scr);
+
+                    return new ContextResolverAdapter(crl);
                 }        
-                return cr;
             }
             
             List<MediaType> getMediaTypes(ComponentContext ic) {
@@ -164,7 +185,7 @@ public class ContextResolverFactory {
                 }
 
                 return MediaTypes.createMediaTypes(p);
-            }            
+            }
         });
     }
 
@@ -177,35 +198,98 @@ public class ContextResolverFactory {
         return (as != null) ? as[0] : Object.class;
     }
 
+    private static final NullContextResolverAdapter NULL_CONTEXT_RESOLVER =
+            new NullContextResolverAdapter();
+
+    private static final class NullContextResolverAdapter implements ContextResolver {
+        public Object getContext(Class type) {
+            throw new UnsupportedOperationException("Not supported yet.");
+        }
+    }
+
     private static final class ContextResolverAdapter implements ContextResolver {
-        private final Set<ContextResolver> crs;
         
-        ContextResolverAdapter(Set<ContextResolver> crs) {
-            this.crs = crs;
+        private final ContextResolver[] cra;
+        
+        ContextResolverAdapter(ContextResolver... cra) {
+            this(removeNull(cra));
+        }
+
+        ContextResolverAdapter(List<ContextResolver> crl) {
+            this.cra = crl.toArray(new ContextResolver[crl.size()]);
         }
         
         public Object getContext(Class objectType) {
-            for (ContextResolver cr : crs) {
+            for (ContextResolver cr : cra) {
                 Object c = cr.getContext(objectType);
                 if (c != null) return c;
             }
             return null;
-        }        
+        }
+
+        ContextResolver reduce() {
+            if (cra.length == 0) {
+                return NULL_CONTEXT_RESOLVER;
+            } if (cra.length == 1) {
+                return cra[0];
+            } else {
+                return this;
+            }
+        }
+        
+        private static List<ContextResolver> removeNull(ContextResolver... cra) {
+            List<ContextResolver> crl = new ArrayList<ContextResolver>(cra.length);
+            for (ContextResolver cr : cra) {
+                if (cr != null) {
+                    crl.add(cr);
+                }
+            }
+            return crl;
+        }
     }
     
-    private ContextResolver reduce(Set<ContextResolver> r) {
+    private ContextResolver reduce(List<ContextResolver> r) {
         if (r.size() == 1) {
             return r.iterator().next();
         } else {
             return new ContextResolverAdapter(r);                
         }                
     }
-
     
     public <T> ContextResolver<T> resolve(Type t, MediaType m) {
-        Map<MediaType, ContextResolver> x = resolver.get(t);
-        if (x == null) return null;
-        if (m == null) m = MediaTypes.GENERAL_MEDIA_TYPE;
-        return x.get(m);
-    }    
+        final ConcurrentHashMap<MediaType, ContextResolver> crMapCache = cache.get(t);
+        if (crMapCache == null) return null;
+
+        if (m == null)
+            m = MediaTypes.GENERAL_MEDIA_TYPE;
+
+        ContextResolver<T> cr = crMapCache.get(m);
+        if (cr == null) {
+            final Map<MediaType, ContextResolver> crMap = resolver.get(t);
+
+            if (m.isWildcardType()) {
+                cr = crMap.get(MediaTypes.GENERAL_MEDIA_TYPE);
+                if (cr == null) {
+                    cr = NULL_CONTEXT_RESOLVER;
+                }
+            } else if (m.isWildcardSubtype()) {
+                // Include x, x/* and */*
+                final ContextResolver<T> subTypeWildCard = crMap.get(m);
+                final ContextResolver<T> wildCard = crMap.get(MediaTypes.GENERAL_MEDIA_TYPE);
+
+                cr = new ContextResolverAdapter(subTypeWildCard, wildCard).reduce();
+            } else {
+                // Include x, x/* and */*
+                final ContextResolver<T> type = crMap.get(m);
+                final ContextResolver<T> subTypeWildCard = crMap.get(new MediaType(m.getType(), "*"));
+                final ContextResolver<T> wildCard = crMap.get(MediaType.WILDCARD_TYPE);
+
+                cr = new ContextResolverAdapter(type, subTypeWildCard, wildCard).reduce();
+            }
+
+            crMapCache.putIfAbsent(m, cr);
+        }
+
+        return (cr != NULL_CONTEXT_RESOLVER) ? cr : null;
+    }
 }

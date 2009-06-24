@@ -1,4 +1,34 @@
 release 1.1.1-ea (2009-06)
+- Fixed issue 288
+  https://jersey.dev.java.net/issues/show_bug.cgi?id=288
+  ContextResolver instances injected or obtained from 
+  Providers.getContextResolver now correctly aggregate registered
+  ContextResolver implementations according to the specivity of the media type.
+  If you have, say, three ContextResolver implementations:
+
+    @Provider @Produces("application/foo")
+    public class TypeResolver implements ContextResolver<MyContext> { ...}
+
+    @Provider @Produces("application/*")
+    public class SubTypeResolver implements ContextResolver<MyContext> { ...}
+
+    @Provider @Produces("*/*")
+    public class WildCardResolver implements ContextResolver<MyContext> { ...}
+
+  The a call Providers.getContextResolver(...), such as follows:
+
+    MediaType m = MediaType.valueOf("application/foo");
+    Object someType = ...
+    Providers p = ...
+    ContextResolver<MyContext> cr = p.getContextResolver(
+       MyContext.class, m);
+    if (cr != null) {
+      MyContext c = cr.get(someType);
+    }
+
+  will result in a ContextResolver<MyContext> implementation that is an
+  aggregate of TypeResolver, SubTypeResolver, WildCardResolver, where each is
+  checked in order according to the specificity of the produces media types.
 - Fixed issue 282
   https://jersey.dev.java.net/issues/show_bug.cgi?id=282
   The file META-INF/services/jersey-server-components may be present and

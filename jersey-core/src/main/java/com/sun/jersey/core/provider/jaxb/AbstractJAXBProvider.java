@@ -60,12 +60,6 @@ public abstract class AbstractJAXBProvider<T> extends AbstractMessageReaderWrite
     
     private final boolean fixedMediaType;
     
-    private final ContextResolver<JAXBContext> context;
-
-    private final ContextResolver<Unmarshaller> unmarshaller;
-    
-    private final ContextResolver<Marshaller> marshaller;
-    
     private final ContextResolver<JAXBContext> mtContext;
 
     private final ContextResolver<Unmarshaller> mtUnmarshaller;
@@ -79,12 +73,8 @@ public abstract class AbstractJAXBProvider<T> extends AbstractMessageReaderWrite
     public AbstractJAXBProvider(Providers ps, MediaType mt) {
         this.ps = ps;
         
-        this.context = ps.getContextResolver(JAXBContext.class, null);
-        this.unmarshaller = ps.getContextResolver(Unmarshaller.class, null);
-        this.marshaller = ps.getContextResolver(Marshaller.class, null);
-        
         fixedMediaType = mt != null;
-        if (mt != null) {
+        if (fixedMediaType) {
             this.mtContext = ps.getContextResolver(JAXBContext.class, mt);
             this.mtUnmarshaller = ps.getContextResolver(Unmarshaller.class, mt);
             this.mtMarshaller = ps.getContextResolver(Marshaller.class, mt);            
@@ -109,22 +99,12 @@ public abstract class AbstractJAXBProvider<T> extends AbstractMessageReaderWrite
             if (u != null) return u;
         }
 
-        if (unmarshaller != null) {
-            Unmarshaller u = unmarshaller.getContext(type);
-            if (u != null) return u;
-        }
-        
         return getJAXBContext(type, mt).createUnmarshaller();
     }
     
-    protected final Unmarshaller getUnmarshaller(Class type) throws JAXBException {
+    private final Unmarshaller getUnmarshaller(Class type) throws JAXBException {
         if (mtUnmarshaller != null) {
             Unmarshaller u = mtUnmarshaller.getContext(type);
-            if (u != null) return u;
-        }
-
-        if (unmarshaller != null) {
-            Unmarshaller u = unmarshaller.getContext(type);
             if (u != null) return u;
         }
         
@@ -137,55 +117,35 @@ public abstract class AbstractJAXBProvider<T> extends AbstractMessageReaderWrite
         
         final ContextResolver<Marshaller> mcr = ps.getContextResolver(Marshaller.class, mt);            
         if (mcr != null) {
-            Marshaller u = mcr.getContext(type);
-            if (u != null) return u;
+            Marshaller m = mcr.getContext(type);
+            if (m != null) return m;
         }
 
-        if (marshaller != null) {
-            Marshaller u = marshaller.getContext(type);
-            if (u != null) return u;
-        }
-        
         return getJAXBContext(type, mt).createMarshaller();
     }
     
-    protected final Marshaller getMarshaller(Class type) throws JAXBException {
+    private final Marshaller getMarshaller(Class type) throws JAXBException {
         if (mtMarshaller != null) {
             Marshaller u = mtMarshaller.getContext(type);
             if (u != null) return u;
         }
 
-        if (marshaller != null) {
-            Marshaller u = marshaller.getContext(type);
-            if (u != null) return u;
-        }
-        
         return getJAXBContext(type).createMarshaller();
     }
     
-    private final JAXBContext getJAXBContext(Class type) throws JAXBException {
-        if (mtContext != null) {
-            JAXBContext c = mtContext.getContext(type);
-            if (c != null) return c;
-        }
-        
-        if (context != null) {
-            JAXBContext c = context.getContext(type);
-            if (c != null) return c;
-        }
-        
-        return getStoredJAXBContext(type);
-    }
-    
     private final JAXBContext getJAXBContext(Class type, MediaType mt) throws JAXBException {
-        final ContextResolver<JAXBContext> cr = ps.getContextResolver(JAXBContext.class, mt);        
+        final ContextResolver<JAXBContext> cr = ps.getContextResolver(JAXBContext.class, mt);
         if (cr != null) {
             JAXBContext c = cr.getContext(type);
             if (c != null) return c;
         }
-        
-        if (context != null) {
-            JAXBContext c = context.getContext(type);
+
+        return getStoredJAXBContext(type);
+    }
+
+    private final JAXBContext getJAXBContext(Class type) throws JAXBException {
+        if (mtContext != null) {
+            JAXBContext c = mtContext.getContext(type);
             if (c != null) return c;
         }
         
