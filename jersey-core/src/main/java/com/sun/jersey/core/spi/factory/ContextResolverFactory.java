@@ -287,7 +287,15 @@ public class ContextResolverFactory {
                 cr = new ContextResolverAdapter(type, subTypeWildCard, wildCard).reduce();
             }
 
-            crMapCache.putIfAbsent(m, cr);
+            ContextResolver<T> _cr = crMapCache.putIfAbsent(m, cr);
+            // If there is already a value in the cache use that
+            // instance, and discard the new and redundent instance, to
+            // ensure the same instance is always returned.
+            // The cached instance and the new instance will have the same
+            // functionality.
+            if (_cr != null) {
+                cr = _cr;
+            }
         }
 
         return (cr != NULL_CONTEXT_RESOLVER) ? cr : null;
