@@ -335,7 +335,34 @@ public class ContactsClient {
 
     // ---------------------------------------------------- Users Public Methods
 
-
+    /**
+     * Check if a user exists.
+     *
+     * @param username User name of the user
+     * @return true if the user exists otherwise false
+      *@exception IllegalStateException if you are not authorized to
+     *  perform this request
+     */
+    public boolean doesUserExist(String username) {
+        try {
+            service.
+              path("users").
+              path(username).
+              header(AUTHENTICATION_HEADER, authentication).
+              get(String.class);
+            return true;
+        } catch (UniformInterfaceException e) {
+            if (e.getResponse().getStatus() == 404) {
+                return false;
+            } else if (e.getResponse().getStatus() == 401) {
+                throw new IllegalStateException(e);
+            } else if (e.getResponse().getStatus() == 403) {
+                throw new IllegalStateException(e);
+            } else {
+                throw e;
+            }
+        }
+    }
     /**
      * <p>Add the specified user to the Contacts System.  Returns the URI
      * of the newly created user.</p>
@@ -574,6 +601,13 @@ public class ContactsClient {
         User bob = new User();
         bob.setUsername("bob");
         bob.setPassword("alice");
+
+        if (client.doesUserExist(bob.getUsername())) {
+            System.out.println("User bob already exists");
+            return;
+        } else {
+            System.out.println("Creating user bob with one contact");
+        }
 
         client.createUser(bob);
 
