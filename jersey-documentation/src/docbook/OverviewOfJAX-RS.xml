@@ -299,8 +299,8 @@ public void postClichedMessage(String message) {
 
     <para>JAX-RS provides the deployment agnostic abstract class <ulink
     url="https://jsr311.dev.java.net/nonav/releases/1.0/javax/ws/rs/core/Application.html">Application</ulink>
-    for declaring root resource classes and root resource singleton instances.
-    A Web service may extend this class to declare root resource classes. For
+    for declaring root resource and provider classes, and root resource and provider singleton instances.
+    A Web service may extend this class to declare root resource and provider classes. For
     example,</para>
 
     <para><example>
@@ -312,10 +312,10 @@ public void postClichedMessage(String message) {
         return s;
     }
 }</programlisting></example>Alternatively it is possible to reuse one of Jersey's
-    implementations that scans for root resource classes given a classpath or
+    implementations that scans for root resource and provider classes given a classpath or
     a set of package names. Such classes are automatically added to the set of
     classes that are returned by <literal>getClasses</literal>. For example,
-    the following scans for root resource classes in packages "org.foo.rest",
+    the following scans for root resource and provider classes in packages "org.foo.rest",
     "org.bar.rest" and in any sub-packages of those two:</para>
 
     <para><example>
