@@ -191,6 +191,15 @@ public class UriBuilderTest extends TestCase {
         }
     }
 
+    public void testReplaceMatrixParamsEncoded() {
+        UriBuilder ubu = UriBuilder.fromUri("http://localhost/").
+                replaceMatrix("limit=10;sql=select+*+from+users");
+        ubu.replaceMatrixParam("limit", 100);
+
+        URI bu = ubu.build();
+        assertEquals(URI.create("http://localhost/;limit=100;sql=select+*+from+users"), bu);
+    }
+
     public void testReplaceQuery() {
         URI bu = UriBuilder.fromUri("http://localhost:8080/a/b/c?a=x&b=y").
                 replaceQuery("x=a&y=b").build();
@@ -284,6 +293,15 @@ public class UriBuilderTest extends TestCase {
         assertEquals(1, c.size());
         assertEquals("c", c.get(0));
         }
+    }
+
+    public void testReplaceQueryParamsEncoded() {
+        UriBuilder ubu = UriBuilder.fromUri("http://localhost/").
+                replaceQuery("limit=10&sql=select+*+from+users");
+        ubu.replaceQueryParam("limit", 100);
+
+        URI bu = ubu.build();
+        assertEquals(URI.create("http://localhost/?limit=100&sql=select+*+from+users"), bu);
     }
 
     public void testReplaceFragment() {

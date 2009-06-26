@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<testsuite errors="0" failures="0" hostname="dhcp-egnb07-211-138.France.Sun.COM" name="com.sun.jersey.impl.uri.UriBuilderTest" tests="43" time="0.38" timestamp="2009-06-26T11:30:14">
+  <properties>
+    <property name="java.runtime.name" value="Java(TM) 2 Runtime Environment, Standard Edition" />
+    <property name="sun.boot.library.path" value="/System/Library/Frameworks/JavaVM.framework/Versions/1.5.0/Libraries" />
+    <property name="java.vm.version" value="1.5.0_16-133" />
+    <property name="awt.nativeDoubleBuffering" value="true" />
+    <property name="gopherProxySet" value="false" />
+    <property name="java.vm.vendor" value="Apple Inc." />
+    <property name="java.vendor.url" value="http://www.apple.com/" />
+    <property name="path.separator" value=":" />
+    <property name="java.vm.name" value="Java HotSpot(TM) Client VM" />
+    <property name="file.encoding.pkg" value="sun.io" />
+    <property name="user.country" value="US" />
+    <property name="sun.java.launcher" value="SUN_STANDARD" />
+    <property name="sun.os.patch.level" value="unknown" />
+    <property name="test" value="UriBuilderTest" />
+    <property name="java.vm.specification.name" value="Java Virtual Machine Specification" />
+    <property name="user.dir" value="/Users/paulsandoz/Projects/jersey/trunk/jersey/jersey-tests" />
+    <property name="java.runtime.version" value="1.5.0_16-b06-284" />
+    <property name="java.awt.graphicsenv" value="apple.awt.CGraphicsEnvironment" />
+    <property name="basedir" value="/Users/paulsandoz/Projects/jersey/trunk/jersey/jersey-tests" />
+    <property name="java.endorsed.dirs" value="/System/Library/Frameworks/JavaVM.framework/Versions/1.5.0/Home/lib/endorsed" />
+    <property name="os.arch" value="i386" />
+    <property name="java.io.tmpdir" value="/tmp" />
+    <property name="line.separator" value="
+" />
+    <property name="java.vm.specification.vendor" value="Sun Microsystems Inc." />
+    <property name="os.name" value="Mac OS X" />
+    <property name="sun.jnu.encoding" value="MacRoman" />
+    <property name="java.library.path" value=".:/Library/Java/Extensions:/System/Library/Java/Extensions:/usr/lib/java" />
+    <property name="java.specification.name" value="Java Platform API Specification" />
+    <property name="java.class.version" value="49.0" />
+    <property name="sun.management.compiler" value="HotSpot Client Compiler" />
+    <property name="os.version" value="10.5.6" />
+    <property name="http.nonProxyHosts" value="local|*.local|169.254/16|*.169.254/16" />
+    <property name="user.home" value="/Users/paulsandoz" />
+    <property name="user.timezone" value="" />
+    <property name="java.awt.printerjob" value="apple.awt.CPrinterJob" />
+    <property name="java.specification.version" value="1.5" />
+    <property name="file.encoding" value="MacRoman" />
+    <property name="user.name" value="paulsandoz" />
+    <property name="java.class.path" value="/Applications/NetBeans/NetBeans Dev 200905291401.app/Contents/Resources/NetBeans/java2/ant/patches/72080.jar:/Applications/NetBeans/NetBeans Dev 200905291401.app/Contents/Resources/NetBeans/java2/ant/patches/ant-42275.jar:/Applications/NetBeans/NetBeans Dev 200905291401.app/Contents/Resources/NetBeans/java2/ant/lib/ant.jar:/Applications/NetBeans/NetBeans Dev 200905291401.app/Contents/Resources/NetBeans/java2/ant/lib/ant-junit.jar:/Users/paulsandoz/Projects/jersey/trunk/jersey/jersey-tests/target/classes:/Users/paulsandoz/Projects/jersey/trunk/jersey/jersey-tests/src/main/resources:/Users/paulsandoz/Projects/jersey/trunk/jersey/jersey-tests/target/test-classes:/Users/paulsandoz/Projects/jersey/trunk/jersey/jersey-tests/src/test/java:/Users/paulsandoz/Projects/jersey/trunk/jersey/jersey-tests/src/test/resources:/Users/paulsandoz/.m2/repository/junit/junit/3.8.1/junit-3.8.1.jar:/Users/paulsandoz/.m2/repository/woodstox/wstx-asl/3.2.1/wstx-asl-3.2.1.jar:/Users/paulsandoz/.m2/repository/com/sun/xml/bind/jaxb-impl/2.1.10/jaxb-impl-2.1.10.jar:/Users/paulsandoz/.m2/repository/javax/xml/bind/jaxb-api/2.1/jaxb-api-2.1.jar:/Users/paulsandoz/.m2/repository/javax/xml/stream/stax-api/1.0-2/stax-api-1.0-2.jar:/Users/paulsandoz/.m2/repository/javax/activation/activation/1.1/activation-1.1.jar:/Users/paulsandoz/.m2/repository/javax/annotation/jsr250-api/1.0/jsr250-api-1.0.jar:/Users/paulsandoz/.m2/repository/javax/mail/mail/1.4/mail-1.4.jar:/Users/paulsandoz/.m2/repository/com/sun/grizzly/grizzly-servlet-webserver/1.9.8/grizzly-servlet-webserver-1.9.8.jar:/Users/paulsandoz/.m2/repository/com/sun/grizzly/grizzly-http/1.9.8/grizzly-http-1.9.8.jar:/Users/paulsandoz/.m2/repository/com/sun/grizzly/grizzly-framework/1.9.8/grizzly-framework-1.9.8.jar:/Users/paulsandoz/.m2/repository/com/sun/grizzly/grizzly-utils/1.9.8/grizzly-utils-1.9.8.jar:/Users/paulsandoz/.m2/repository/com/sun/grizzly/grizzly-rcm/1.9.8/grizzly-rcm-1.9.8.jar:/Users/paulsandoz/.m2/repository/com/sun/grizzly/grizzly-portunif/1.9.8/grizzly-portunif-1.9.8.jar:/Users/paulsandoz/.m2/repository/com/sun/grizzly/grizzly-http-servlet/1.9.8/grizzly-http-servlet-1.9.8.jar:/Users/paulsandoz/.m2/repository/javax/servlet/servlet-api/2.5/servlet-api-2.5.jar:/Users/paulsandoz/.m2/repository/com/sun/net/httpserver/http/20070405/http-20070405.jar:/Users/paulsandoz/Projects/jersey/trunk/jersey/jersey-server/target/classes:/Users/paulsandoz/Projects/jersey/trunk/jersey/jersey-server/src/main/java:/Users/paulsandoz/Projects/jersey/trunk/jersey/jersey-server/target/generated-sources/xjc:/Users/paulsandoz/Projects/jersey/trunk/jersey/jersey-server/src/main/resources:/Users/paulsandoz/Projects/jersey/trunk/jersey/jersey-core/target/classes:/Users/paulsandoz/Projects/jersey/trunk/jersey/jersey-core/src/main/java:/Users/paulsandoz/Projects/jersey/trunk/jersey/jersey-core/target/generated-sources/rsrc-gen:/Users/paulsandoz/Projects/jersey/trunk/jersey/jersey-core/src/main/resources:/Users/paulsandoz/.m2/repository/javax/ws/rs/jsr311-api/1.1/jsr311-api-1.1.jar:/Users/paulsandoz/.m2/repository/asm/asm/3.1/asm-3.1.jar:/Users/paulsandoz/Projects/jersey/branches/json-xml-ns-support/jersey-json/target/classes:/Users/paulsandoz/Projects/jersey/branches/json-xml-ns-support/jersey-json/src/main/java:/Users/paulsandoz/Projects/jersey/branches/json-xml-ns-support/jersey-json/target/generated-sources:/Users/paulsandoz/Projects/jersey/branches/json-xml-ns-support/jersey-json/target/generated-sources/com:/Users/paulsandoz/.m2/repository/org/codehaus/jettison/jettison/1.1/jettison-1.1.jar:/Users/paulsandoz/.m2/repository/stax/stax-api/1.0.1/stax-api-1.0.1.jar:/Users/paulsandoz/.m2/repository/org/codehaus/jackson/jackson-asl/0.9.4/jackson-asl-0.9.4.jar:/Users/paulsandoz/Projects/jersey/trunk/jersey/jersey-atom/target/classes:/Users/paulsandoz/Projects/jersey/trunk/jersey/jersey-atom/src/main/java:/Users/paulsandoz/Projects/jersey/trunk/jersey/jersey-atom/target/generated-sources/rsrc-gen:/Users/paulsandoz/.m2/repository/rome/rome/0.9/rome-0.9.jar:/Users/paulsandoz/.m2/repository/jdom/jdom/1.0/jdom-1.0.jar:/Users/paulsandoz/Projects/jersey/trunk/jersey/jersey-fastinfoset/target/classes:/Users/paulsandoz/Projects/jersey/trunk/jersey/jersey-fastinfoset/src/main/java:/Users/paulsandoz/.m2/repository/com/sun/xml/fastinfoset/FastInfoset/1.2.2/FastInfoset-1.2.2.jar:/Users/paulsandoz/Projects/jersey/trunk/jersey/jersey-client/target/classes:/Users/paulsandoz/Projects/jersey/trunk/jersey/jersey-client/src/main/java:/Users/paulsandoz/Projects/jersey/trunk/jersey/jersey-client/src/main/resources" />
+    <property name="java.vm.specification.version" value="1.0" />
+    <property name="sun.arch.data.model" value="32" />
+    <property name="java.home" value="/System/Library/Frameworks/JavaVM.framework/Versions/1.5.0/Home" />
+    <property name="java.specification.vendor" value="Sun Microsystems Inc." />
+    <property name="user.language" value="en" />
+    <property name="awt.toolkit" value="apple.awt.CToolkit" />
+    <property name="java.vm.info" value="mixed mode" />
+    <property name="java.version" value="1.5.0_16" />
+    <property name="java.ext.dirs" value="/Library/Java/Extensions:/System/Library/Java/Extensions:/System/Library/Frameworks/JavaVM.framework/Versions/1.5.0/Home/lib/ext" />
+    <property name="sun.boot.class.path" value="/System/Library/Frameworks/JavaVM.framework/Versions/1.5.0/Classes/classes.jar:/System/Library/Frameworks/JavaVM.framework/Versions/1.5.0/Classes/ui.jar:/System/Library/Frameworks/JavaVM.framework/Versions/1.5.0/Classes/laf.jar:/System/Library/Frameworks/JavaVM.framework/Versions/1.5.0/Classes/sunrsasign.jar:/System/Library/Frameworks/JavaVM.framework/Versions/1.5.0/Classes/jsse.jar:/System/Library/Frameworks/JavaVM.framework/Versions/1.5.0/Classes/jce.jar:/System/Library/Frameworks/JavaVM.framework/Versions/1.5.0/Classes/charsets.jar" />
+    <property name="java.vendor" value="Apple Inc." />
+    <property name="file.separator" value="/" />
+    <property name="java.vendor.url.bug" value="http://bugreport.apple.com/" />
+    <property name="forkMode" value="once" />
+    <property name="sun.cpu.endian" value="little" />
+    <property name="sun.io.unicode.encoding" value="UnicodeLittle" />
+    <property name="mrj.version" value="1050.1.5.0_16-284" />
+    <property name="socksNonProxyHosts" value="local|*.local|169.254/16|*.169.254/16" />
+    <property name="ftp.nonProxyHosts" value="local|*.local|169.254/16|*.169.254/16" />
+    <property name="sun.cpu.isalist" value="" />
+  </properties>
+  <testcase classname="com.sun.jersey.impl.uri.UriBuilderTest" name="testOpaqueUri" time="0.192" />
+  <testcase classname="com.sun.jersey.impl.uri.UriBuilderTest" name="testOpaqueUriReplaceSchemeSpecificPart" time="0.0" />
+  <testcase classname="com.sun.jersey.impl.uri.UriBuilderTest" name="testOpaqueReplaceUri" time="0.0" />
+  <testcase classname="com.sun.jersey.impl.uri.UriBuilderTest" name="testReplaceScheme" time="0.0070" />
+  <testcase classname="com.sun.jersey.impl.uri.UriBuilderTest" name="testReplaceSchemeSpecificPart" time="0.0" />
+  <testcase classname="com.sun.jersey.impl.uri.UriBuilderTest" name="testReplaceUserInfo" time="0.0010" />
+  <testcase classname="com.sun.jersey.impl.uri.UriBuilderTest" name="testReplaceHost" time="0.0" />
+  <testcase classname="com.sun.jersey.impl.uri.UriBuilderTest" name="testReplacePort" time="0.0010" />
+  <testcase classname="com.sun.jersey.impl.uri.UriBuilderTest" name="testReplacePath" time="0.0" />
+  <testcase classname="com.sun.jersey.impl.uri.UriBuilderTest" name="testReplacePathNull" time="0.0010" />
+  <testcase classname="com.sun.jersey.impl.uri.UriBuilderTest" name="testReplaceMatrix" time="0.0" />
+  <testcase classname="com.sun.jersey.impl.uri.UriBuilderTest" name="testReplaceMatrixParams" time="0.0080" />
+  <testcase classname="com.sun.jersey.impl.uri.UriBuilderTest" name="testReplaceMatrixParamsEmpty" time="0.0" />
+  <testcase classname="com.sun.jersey.impl.uri.UriBuilderTest" name="testReplaceMatrixParamsEncoded" time="0.0" />
+  <testcase classname="com.sun.jersey.impl.uri.UriBuilderTest" name="testReplaceQuery" time="0.0" />
+  <testcase classname="com.sun.jersey.impl.uri.UriBuilderTest" name="testBuildEncodedQuery" time="0.011" />
+  <testcase classname="com.sun.jersey.impl.uri.UriBuilderTest" name="testReplaceQueryParams" time="0.0010" />
+  <testcase classname="com.sun.jersey.impl.uri.UriBuilderTest" name="testReplaceQueryParamsEmpty" time="0.0010" />
+  <testcase classname="com.sun.jersey.impl.uri.UriBuilderTest" name="testReplaceQueryParamsEncoded" time="0.0" />
+  <testcase classname="com.sun.jersey.impl.uri.UriBuilderTest" name="testReplaceFragment" time="0.0010" />
+  <testcase classname="com.sun.jersey.impl.uri.UriBuilderTest" name="testReplaceUri" time="0.0" />
+  <testcase classname="com.sun.jersey.impl.uri.UriBuilderTest" name="testSchemeSpecificPart" time="0.0" />
+  <testcase classname="com.sun.jersey.impl.uri.UriBuilderTest" name="testAppendPath" time="0.0010" />
+  <testcase classname="com.sun.jersey.impl.uri.UriBuilderTest" name="testAppendSegment" time="0.0" />
+  <testcase classname="com.sun.jersey.impl.uri.UriBuilderTest" name="testRelativefromUri" time="0.0" />
+  <testcase classname="com.sun.jersey.impl.uri.UriBuilderTest" name="testRelativefromPath" time="0.0" />
+  <testcase classname="com.sun.jersey.impl.uri.UriBuilderTest" name="testAppendQueryParams" time="0.0" />
+  <testcase classname="com.sun.jersey.impl.uri.UriBuilderTest" name="testAppendMatrixParams" time="0.0010" />
+  <testcase classname="com.sun.jersey.impl.uri.UriBuilderTest" name="testAppendPathAndMatrixParams" time="0.0" />
+  <testcase classname="com.sun.jersey.impl.uri.UriBuilderTest" name="testResourceAppendPath" time="0.04" />
+  <testcase classname="com.sun.jersey.impl.uri.UriBuilderTest" name="testResourceWithTemplateAppendPath" time="0.0030" />
+  <testcase classname="com.sun.jersey.impl.uri.UriBuilderTest" name="testResourceWithTemplateRegexAppendPath" time="0.0020" />
+  <testcase classname="com.sun.jersey.impl.uri.UriBuilderTest" name="testBuildTemplates" time="0.0010" />
+  <testcase classname="com.sun.jersey.impl.uri.UriBuilderTest" name="testBuildFromMap" time="0.0010" />
+  <testcase classname="com.sun.jersey.impl.uri.UriBuilderTest" name="testBuildQueryTemplates" time="0.0010" />
+  <testcase classname="com.sun.jersey.impl.uri.UriBuilderTest" name="testBuildFromEncodedQueryTemplates" time="0.0" />
+  <testcase classname="com.sun.jersey.impl.uri.UriBuilderTest" name="testBuildFragmentTemplates" time="0.0010" />
+  <testcase classname="com.sun.jersey.impl.uri.UriBuilderTest" name="testTemplatesDefaultPort" time="0.0010" />
+  <testcase classname="com.sun.jersey.impl.uri.UriBuilderTest" name="testClone" time="0.0" />
+  <testcase classname="com.sun.jersey.impl.uri.UriBuilderTest" name="testIllegalArgumentException" time="0.0010" />
+  <testcase classname="com.sun.jersey.impl.uri.UriBuilderTest" name="testVariableWithoutValue" time="0.0" />
+  <testcase classname="com.sun.jersey.impl.uri.UriBuilderTest" name="testPortValue" time="0.0" />
+  <testcase classname="com.sun.jersey.impl.uri.UriBuilderTest" name="testHostValue" time="0.0" />
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

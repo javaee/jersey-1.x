@@ -302,7 +302,11 @@ public class UriBuilderImpl extends UriBuilder {
         int i = path.lastIndexOf("/");
         if (i != -1) i = 0;
         i = path.indexOf(";", i);
-        if (i != -1) path.setLength(i + 1);
+        if (i != -1) {
+            path.setLength(i + 1);
+        } else {
+            path.append(';');
+        }
         
         if (matrix != null)
             path.append(encode(matrix, UriComponent.Type.PATH));
@@ -319,10 +323,13 @@ public class UriBuilderImpl extends UriBuilder {
         if (values.length == 0)
             return this;
         
+        name = encode(name, UriComponent.Type.MATRIX_PARAM);
         if (matrixParams == null) {
-            name = encode(name, UriComponent.Type.MATRIX_PARAM);
             for (Object value : values) {
                 path.append(';').append(name);
+
+                if (value == null)
+                    throw new IllegalArgumentException("One or more of matrix value parameters are null");
 
                 final String stringValue = value.toString();
                 if (stringValue.length() > 0)
@@ -330,7 +337,10 @@ public class UriBuilderImpl extends UriBuilder {
             }
         } else {
             for (Object value : values) {
-                matrixParams.add(name, value.toString());
+                if (value == null)
+                    throw new IllegalArgumentException("One or more of matrix value parameters are null");
+                
+                matrixParams.add(name, encode(value.toString(), UriComponent.Type.MATRIX_PARAM));
             }            
         }
         return this;
@@ -348,9 +358,13 @@ public class UriBuilderImpl extends UriBuilder {
             if (i != -1) path.setLength(i);
         }
         
+        name = encode(name, UriComponent.Type.MATRIX_PARAM);
         matrixParams.remove(name);
         for (Object value : values) {
-            matrixParams.add(name, value.toString());
+            if (value == null)
+                throw new IllegalArgumentException("One or more of matrix value parameters are null");
+
+            matrixParams.add(name, encode(value.toString(), UriComponent.Type.MATRIX_PARAM));
         }
         return this;
     }
@@ -374,14 +388,14 @@ public class UriBuilderImpl extends UriBuilder {
         if (values.length == 0)
             return this;
 
+        name = encode(name, UriComponent.Type.QUERY_PARAM);
         if (queryParams == null) {
-            name = encode(name, UriComponent.Type.QUERY_PARAM);
             for (Object value : values) {
                 if (query.length() > 0) query.append('&');
                 query.append(name);
 
-                if(value == null)
-                    throw new IllegalArgumentException("One or more of value parameters are null");
+                if (value == null)
+                    throw new IllegalArgumentException("One or more of query value parameters are null");
 
                 final String stringValue = value.toString();
                 if (stringValue.length() > 0)
@@ -389,10 +403,10 @@ public class UriBuilderImpl extends UriBuilder {
             }
         } else {
             for (Object value : values) {
-                if(value == null)
-                    throw new IllegalArgumentException("One or more of value parameters are null");
+                if (value == null)
+                    throw new IllegalArgumentException("One or more of query value parameters are null");
 
-                queryParams.add(name,  value.toString());
+                queryParams.add(name, encode(value.toString(), UriComponent.Type.QUERY_PARAM));
             }
         }
         return this;
@@ -407,15 +421,16 @@ public class UriBuilderImpl extends UriBuilder {
             query.setLength(0);
         }
 
+        name = encode(name, UriComponent.Type.QUERY_PARAM);
         queryParams.remove(name);
 
-        if(values == null) return this;
+        if (values == null) return this;
 
         for (Object value : values) {
-            if(value == null)
-                throw new IllegalArgumentException("One or more of value parameters are null");
+            if (value == null)
+                throw new IllegalArgumentException("One or more of query value parameters are null");
 
-            queryParams.add(name, value.toString());
+            queryParams.add(name, encode(value.toString(), UriComponent.Type.QUERY_PARAM));
         }
         return this;
     }
@@ -475,12 +490,12 @@ public class UriBuilderImpl extends UriBuilder {
             return;
 
         for (Map.Entry<String, List<String>> e : matrixParams.entrySet()) {
-            String name = encode(e.getKey(), UriComponent.Type.MATRIX_PARAM);
+            String name = e.getKey();
             
             for (String value : e.getValue()) {
                 path.append(';').append(name);
                 if (value.length() > 0)
-                    path.append('=').append(encode(value, UriComponent.Type.MATRIX_PARAM));
+                    path.append('=').append(value);
             }
         }
         matrixParams = null;
@@ -491,14 +506,14 @@ public class UriBuilderImpl extends UriBuilder {
             return;
 
         for (Map.Entry<String, List<String>> e : queryParams.entrySet()) {
-            String name = encode(e.getKey(), UriComponent.Type.QUERY_PARAM);
+            String name = e.getKey();
 
             for (String value : e.getValue()) {
                 if (query.length() > 0) query.append('&');
                 query.append(name);
 
                 if (value.length() > 0)
-                    query.append('=').append(encode(value, UriComponent.Type.QUERY_PARAM));
+                    query.append('=').append(value);
             }
         }
         queryParams = null;

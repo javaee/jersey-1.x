@@ -1,4 +1,11 @@
 release 1.1.1-ea (2009-06)
+- Fixed issue 319
+  https://jersey.dev.java.net/issues/show_bug.cgi?id=319
+  Ensure that no double encoding of query or matrix components when building
+  from a URI that contains a query or matrix component some parameters of
+  which are replaced, for example:
+    String uri = "http://localhost/query?limit=10&sql=select+*+from+users";
+    URI u = UriBuilder.fromUri(uri).replaceQueryParam("limit", 100).build();
 - Fixed issue 288
   https://jersey.dev.java.net/issues/show_bug.cgi?id=288
   ContextResolver instances injected or obtained from 
