@@ -41,6 +41,7 @@
 
 package com.sun.jersey.impl.wadl;
 
+import com.sun.jersey.api.client.ClientResponse;
 import java.io.File;
 import java.io.IOException;
 import java.util.Iterator;
@@ -75,6 +76,8 @@ import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 
 import com.sun.jersey.api.client.WebResource;
+import com.sun.jersey.api.core.DefaultResourceConfig;
+import com.sun.jersey.api.core.ResourceConfig;
 import com.sun.jersey.api.representation.Form;
 import com.sun.jersey.core.header.FormDataContentDisposition;
 import com.sun.jersey.core.header.MediaTypes;
@@ -140,6 +143,28 @@ public class WadlResourceTest extends AbstractResourceTester {
         }
     }
     
+    public void testDisableWadl() {
+        ResourceConfig rc = new DefaultResourceConfig(WidgetsResource.class, ExtraResource.class);
+        rc.getFeatures().put(ResourceConfig.FEATURE_DISABLE_WADL, true);
+        initiateWebApplication(rc);
+
+        WebResource r = resource("/application.wadl", false);
+
+        ClientResponse cr = r.get(ClientResponse.class);
+        assertEquals(404, cr.getStatus());
+    }
+
+    public void testEnableWadl() {
+        ResourceConfig rc = new DefaultResourceConfig(WidgetsResource.class, ExtraResource.class);
+        rc.getFeatures().put(ResourceConfig.FEATURE_DISABLE_WADL, false);
+        initiateWebApplication(rc);
+
+        WebResource r = resource("/application.wadl", false);
+
+        ClientResponse cr = r.get(ClientResponse.class);
+        assertEquals(200, cr.getStatus());
+    }
+
     /**
      * Test WADL generation
      */

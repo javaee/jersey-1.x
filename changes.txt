@@ -1,4 +1,14 @@
 release 1.1.1-ea (2009-06)
+- Fixed issue 299
+  https://jersey.dev.java.net/issues/show_bug.cgi?id=299
+  Suppport disabling of WADL. Set the following feature on ResourceConfig to
+  true:
+    ResourceConfig.FEATURE_DISABLE_WADL
+  or add the following initialiation parameter to the Jerseuy servlet or filter:
+    <init-param>
+        <param-name>com.sun.jersey.config.feature.DisableWADL</param-name>
+        <param-value>true</param-value>
+    </init-param>
 - Fixed issue 319
   https://jersey.dev.java.net/issues/show_bug.cgi?id=319
   Ensure that no double encoding of query or matrix components when building

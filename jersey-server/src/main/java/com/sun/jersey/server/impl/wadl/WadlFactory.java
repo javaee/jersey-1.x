@@ -62,14 +62,14 @@ public final class WadlFactory {
     
     private static final Logger LOGGER = Logger.getLogger(WadlFactory.class.getName());
 
-    private final boolean isJAXBPresent;
+    private final boolean isWadlEnabled;
 
     private final WadlGenerator wadlGenerator;
     
     public WadlFactory(ResourceConfig resourceConfig) {
-        isJAXBPresent = checkForJAXB();
+        isWadlEnabled = isWadlEnabled(resourceConfig);
         
-        if (isJAXBPresent) {
+        if (isWadlEnabled) {
             wadlGenerator = WadlGeneratorConfigLoader.loadWadlGeneratorsFromConfig(resourceConfig);
         }
         else {
@@ -78,7 +78,7 @@ public final class WadlFactory {
     }
 
     public boolean isSupported() {
-        return isJAXBPresent;
+        return isWadlEnabled;
     }
 
     public WadlApplicationContext createWadlApplicationContext(Set<AbstractResource> rootResources) {
@@ -126,7 +126,11 @@ public final class WadlFactory {
      * 
      * @throws java.lang.ClassNotFoundException
      */
-    private static boolean checkForJAXB() {
+    private static boolean isWadlEnabled(ResourceConfig resourceConfig) {
+        if (resourceConfig.getFeature(ResourceConfig.FEATURE_DISABLE_WADL)) {
+            return false;
+        }
+        
         try {
             Class.forName("javax.xml.bind.JAXBElement");
             return true;

@@ -127,6 +127,17 @@ public abstract class ResourceConfig extends Application {
             = "com.sun.jersey.config.feature.ImplicitViewables";
     
     /**
+     * If true then disable WADL generation.
+     * <p>
+     * By default WADL generation is automatically enabled, if JAXB is
+     * present in the classpath.
+     * <p>
+     * The default value is false.
+     */
+    public static final String FEATURE_DISABLE_WADL
+            = "com.sun.jersey.config.feature.DisableWADL";
+
+    /**
      * If set the default resource component provider factory for the
      * life-cycle of resource classes.
      * <p>
