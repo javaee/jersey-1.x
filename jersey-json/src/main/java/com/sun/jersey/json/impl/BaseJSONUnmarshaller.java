@@ -89,7 +89,7 @@ public class BaseJSONUnmarshaller implements JSONUnmarshaller, JSONConfigurated 
 
     public <T> T unmarshalFromJSON(Reader reader, Class<T> expectedType) throws JAXBException {
         if (jsonConfig.isRootUnwrapping() || !expectedType.isAnnotationPresent(XmlRootElement.class)) {
-            return jaxbUnmarshaller.unmarshal(createXmlStreamReader(reader, expectedType), expectedType).getValue();
+            return unmarshalJAXBElementFromJSON(reader, expectedType).getValue();
         } else {
             return (T) jaxbUnmarshaller.unmarshal(createXmlStreamReader(reader, expectedType));
         }
@@ -104,6 +104,7 @@ public class BaseJSONUnmarshaller implements JSONUnmarshaller, JSONConfigurated 
     }
 
     private XMLStreamReader createXmlStreamReader(Reader reader, Class expectedType) {
-        return Stax2JsonFactory.createReader(reader, jsonConfig, jsonConfig.isRootUnwrapping() ? JSONHelper.getRootElementName(expectedType) : null);
+        return Stax2JsonFactory.createReader(reader, jsonConfig,
+                jsonConfig.isRootUnwrapping() ? JSONHelper.getRootElementName(expectedType) : null);
     }
 }

@@ -410,7 +410,8 @@ public class JSONConfiguration {
 
     /**
      * Says if the root element will be stripped off
-     * This property is valid for the {@link JSONConfiguration.Notation#MAPPED} notation only.
+     * This property is valid for the {@link JSONConfiguration.Notation#MAPPED} 
+     * and {@link Notation#NATURAL} notations.
      * @return true, if root element has to be stripped off
      * @see Builder#rootUnwrapping(boolean) 
      */

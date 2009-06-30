@@ -44,11 +44,10 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.nio.charset.Charset;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
+import javax.xml.stream.XMLStreamWriter;
 
 /**
  *
@@ -80,14 +79,30 @@ public class BaseJSONMarshaller implements JSONMarshaller, JSONConfigurated {
     // JSONMarshaller
 
     public void marshallToJSON(Object o, OutputStream outputStream) throws JAXBException {
+        if (outputStream == null) {
+            throw new IllegalArgumentException("The output stream is null");
+        }
+
         marshallToJSON(o, new OutputStreamWriter(outputStream, UTF8));
     }
 
     public void marshallToJSON(Object o, Writer writer) throws JAXBException {
+        if (o == null) {
+            throw new IllegalArgumentException("The JAXB element is null");
+        }
+
+        if (writer == null) {
+            throw new IllegalArgumentException("The writer is null");
+        }
+
+        jaxbMarshaller.marshal(o, getXMLStreamWrtier(writer));
+    }
+
+    private XMLStreamWriter getXMLStreamWrtier(Writer writer) throws JAXBException {
         try {
-            jaxbMarshaller.marshal(o, Stax2JsonFactory.createWriter(writer, jsonConfig));
+            return Stax2JsonFactory.createWriter(writer, jsonConfig);
         } catch (IOException ex) {
-            Logger.getLogger(BaseJSONMarshaller.class.getName()).log(Level.SEVERE, null, ex);
+            throw new JAXBException(ex);
         }
     }
 }

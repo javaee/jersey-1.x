@@ -34,7 +34,6 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-
 package com.sun.jersey.api.json;
 
 import com.sun.jersey.json.impl.BaseJSONMarshaller;
@@ -62,7 +61,6 @@ import javax.xml.bind.Validator;
  */
 public final class JSONJAXBContext extends JAXBContext implements JSONConfigurated {
 
-   
     /**
      * A namespace for JSONJAXBContext related properties names.
      */
@@ -72,8 +70,9 @@ public final class JSONJAXBContext extends JAXBContext implements JSONConfigurat
     /**
      * Enumeration of supported JSON notations.
      */
-     @Deprecated
+    @Deprecated
     public enum JSONNotation {
+
         /**
          * The mapped (default) JSON notation.
          */
@@ -95,7 +94,6 @@ public final class JSONJAXBContext extends JAXBContext implements JSONConfigurat
         @Deprecated
         NATURAL
     };
-
     /**
      * JSON notation property is now deprecated. See {@link JSONConfiguration}.
      * <p>
@@ -109,7 +107,6 @@ public final class JSONJAXBContext extends JAXBContext implements JSONConfigurat
      */
     @Deprecated
     public static final String JSON_NOTATION = NAMESPACE + "notation";
-    
     /**
      * JSON enabled property is now deprecated. See {@link JSONConfiguration}.
      * <p>
@@ -121,7 +118,6 @@ public final class JSONJAXBContext extends JAXBContext implements JSONConfigurat
      */
     @Deprecated
     public static final String JSON_ENABLED = NAMESPACE + "enabled";
-    
     /**
      * XML root element unwrapping property is now deprecated. See {@link JSONConfiguration}.
      * <p>
@@ -134,7 +130,6 @@ public final class JSONJAXBContext extends JAXBContext implements JSONConfigurat
      */
     @Deprecated
     public static final String JSON_ROOT_UNWRAPPING = NAMESPACE + "root.unwrapping";
-    
     /**
      * JSON arrays property is now deprecated. See {@link JSONConfiguration}.
      * This property is valid for the <code>JSONNotation.MAPPED</code> notation only.
@@ -156,7 +151,6 @@ public final class JSONJAXBContext extends JAXBContext implements JSONConfigurat
      */
     @Deprecated
     public static final String JSON_ARRAYS = NAMESPACE + "arrays";
-
     /**
      * JSON non-string values property is now deprecated. See {@link JSONConfiguration}.
      * This property is valid for the <code>JSONNotation.MAPPED</code> notation only.
@@ -178,7 +172,6 @@ public final class JSONJAXBContext extends JAXBContext implements JSONConfigurat
      */
     @Deprecated
     public static final String JSON_NON_STRINGS = NAMESPACE + "non.strings";
-
     /**
      * JSON attributes as elements property is now deprecated. See {@link JSONConfiguration}.
      * This property is valid for the <code>JSONNotation.MAPPED</code> notation only.
@@ -200,7 +193,6 @@ public final class JSONJAXBContext extends JAXBContext implements JSONConfigurat
      */
     @Deprecated
     public static final String JSON_ATTRS_AS_ELEMS = NAMESPACE + "attrs.as.elems";
-
     /**
      * XML to JSON namespace mapping property is now deprecated. See {@link JSONConfiguration}.
      * This property is valid for the MAPPED_JETTISON notation only.
@@ -216,17 +208,15 @@ public final class JSONJAXBContext extends JAXBContext implements JSONConfigurat
      */
     @Deprecated
     public static final String JSON_XML2JSON_NS = NAMESPACE + "xml.to.json.ns";
-        
     private static final Map<String, Object> defaultJsonProperties = new HashMap<String, Object>();
-    
+
     static {
         defaultJsonProperties.put(JSON_NOTATION, JSONNotation.MAPPED);
         defaultJsonProperties.put(JSON_ROOT_UNWRAPPING, Boolean.TRUE);
     }
-    
-    private  JSONConfiguration jsonConfiguration;
+    private JSONConfiguration jsonConfiguration;
     private final JAXBContext jaxbContext;
-    
+
     /**
      * Constructs a new instance with default {@link JSONConfiguration}.
      * 
@@ -251,12 +241,18 @@ public final class JSONJAXBContext extends JAXBContext implements JSONConfigurat
      *         underlying JAXBContext.
      */
     public JSONJAXBContext(final JSONConfiguration config, final Class... classesToBeBound) throws JAXBException {
-        if (config == null)
+        if (config == null) {
             throw new IllegalArgumentException("JSONConfiguration MUST not be null");
-        
+        }
+
         jsonConfiguration = config;
         if (config.getNotation() == JSONConfiguration.Notation.NATURAL) {
-            jaxbContext = JAXBContext.newInstance(classesToBeBound, new HashMap<String,Object>(1){{put(JAXBContextImpl.RETAIN_REFERENCE_TO_INFO, Boolean.TRUE);}});
+            jaxbContext = JAXBContext.newInstance(classesToBeBound, new HashMap<String, Object>(1) {
+
+                {
+                    put(JAXBContextImpl.RETAIN_REFERENCE_TO_INFO, Boolean.TRUE);
+                }
+            });
         } else {
             jaxbContext = JAXBContext.newInstance(classesToBeBound);
         }
@@ -275,11 +271,11 @@ public final class JSONJAXBContext extends JAXBContext implements JSONConfigurat
      * @throws JAXBException if an error was encountered while creating the
      *         underlying JAXBContext.
      */
-    public JSONJAXBContext(Class[] classesToBeBound, Map<String, Object> properties) 
+    public JSONJAXBContext(Class[] classesToBeBound, Map<String, Object> properties)
             throws JAXBException {
-        jaxbContext = JAXBContext.newInstance(classesToBeBound, 
+        jaxbContext = JAXBContext.newInstance(classesToBeBound,
                 createProperties(properties));
-        if(jsonConfiguration == null) {
+        if (jsonConfiguration == null) {
             jsonConfiguration = JSONConfiguration.DEFAULT;
         }
     }
@@ -299,12 +295,13 @@ public final class JSONJAXBContext extends JAXBContext implements JSONConfigurat
      */
     public JSONJAXBContext(final JSONConfiguration config, final Class[] classesToBeBound, final Map<String, Object> properties)
             throws JAXBException {
-        if (config == null)
+        if (config == null) {
             throw new IllegalArgumentException("JSONConfiguration MUST not be null");
-        
+        }
+
         jsonConfiguration = config;
         if (config.getNotation() == JSONConfiguration.Notation.NATURAL) {
-            Map<String,Object> myProps = new HashMap<String, Object>(properties.size() + 1);
+            Map<String, Object> myProps = new HashMap<String, Object>(properties.size() + 1);
             myProps.putAll(properties);
             myProps.put(JAXBContextImpl.RETAIN_REFERENCE_TO_INFO, Boolean.TRUE);
             jaxbContext = JAXBContext.newInstance(classesToBeBound, myProps);
@@ -341,17 +338,23 @@ public final class JSONJAXBContext extends JAXBContext implements JSONConfigurat
      */
     public JSONJAXBContext(JSONConfiguration config, String contextPath)
             throws JAXBException {
-        if (config == null)
+        if (config == null) {
             throw new IllegalArgumentException("JSONConfiguration MUST not be null");
-        
+        }
+
         if (config.getNotation() == JSONConfiguration.Notation.NATURAL) {
-            jaxbContext = JAXBContext.newInstance(contextPath, Thread.currentThread().getContextClassLoader(), new HashMap<String,Object>(1){{put(JAXBContextImpl.RETAIN_REFERENCE_TO_INFO, Boolean.TRUE);}});
+            jaxbContext = JAXBContext.newInstance(contextPath, Thread.currentThread().getContextClassLoader(), new HashMap<String, Object>(1) {
+
+                {
+                    put(JAXBContextImpl.RETAIN_REFERENCE_TO_INFO, Boolean.TRUE);
+                }
+            });
         } else {
             jaxbContext = JAXBContext.newInstance(contextPath, Thread.currentThread().getContextClassLoader());
         }
         jsonConfiguration = config;
     }
-    
+
     /**
      * Construct a new instance using a specified class loader with
      * default  {@link JSONConfiguration}.
@@ -368,7 +371,7 @@ public final class JSONJAXBContext extends JAXBContext implements JSONConfigurat
         jaxbContext = JAXBContext.newInstance(contextPath, classLoader);
         jsonConfiguration = JSONConfiguration.DEFAULT;
     }
-    
+
     /**
      * Construct a new instance using a specified class loader and 
      * a custom set of properties. {@link JSONConfiguration} is set to default,
@@ -382,10 +385,10 @@ public final class JSONJAXBContext extends JAXBContext implements JSONConfigurat
      * @throws JAXBException if an error was encountered while creating the
      *         underlying JAXBContext.
      */
-    public JSONJAXBContext(String contextPath, ClassLoader classLoader,  Map<String, Object> properties)
+    public JSONJAXBContext(String contextPath, ClassLoader classLoader, Map<String, Object> properties)
             throws JAXBException {
         jaxbContext = JAXBContext.newInstance(contextPath, classLoader, createProperties(properties));
-        if(jsonConfiguration == null) {
+        if (jsonConfiguration == null) {
             jsonConfiguration = JSONConfiguration.DEFAULT;
         }
     }
@@ -403,34 +406,47 @@ public final class JSONJAXBContext extends JAXBContext implements JSONConfigurat
      * @throws JAXBException if an error was encountered while creating the
      *         underlying JAXBContext.
      */
-    public JSONJAXBContext(JSONConfiguration config, String contextPath, ClassLoader classLoader,  Map<String, Object> properties)
+    public JSONJAXBContext(JSONConfiguration config, String contextPath, ClassLoader classLoader, Map<String, Object> properties)
             throws JAXBException {
-        if (config == null)
+        if (config == null) {
             throw new IllegalArgumentException("JSONConfiguration MUST not be null");
-        
+        }
+
         if (config.getNotation() == JSONConfiguration.Notation.NATURAL) {
-            Map<String,Object> myProps = new HashMap<String, Object>(properties.size() + 1);
+            Map<String, Object> myProps = new HashMap<String, Object>(properties.size() + 1);
             myProps.putAll(properties);
             myProps.put(JAXBContextImpl.RETAIN_REFERENCE_TO_INFO, Boolean.TRUE);
-            jaxbContext = JAXBContext.newInstance(contextPath,  classLoader,  myProps);
+            jaxbContext = JAXBContext.newInstance(contextPath, classLoader, myProps);
         } else {
-            jaxbContext = JAXBContext.newInstance(contextPath,  classLoader,  properties);
+            jaxbContext = JAXBContext.newInstance(contextPath, classLoader, properties);
         }
         jsonConfiguration = config;
     }
 
-    public static JSONMarshaller getJSONMarshaller(Marshaller marshaller) throws JAXBException {
+    /**
+     * Get a {@link JSONMarshaller} from a {@link Marshaller}.
+     * 
+     * @param marshaller the JAXB marshaller.
+     * @return the JSON marshaller.
+     */
+    public static JSONMarshaller getJSONMarshaller(Marshaller marshaller) {
         if (marshaller instanceof JSONMarshaller) {
-            return (JSONMarshaller)marshaller;
+            return (JSONMarshaller) marshaller;
         } else {
             return new BaseJSONMarshaller(marshaller, JSONConfiguration.DEFAULT);
         }
 
     }
 
-    public static JSONUnmarshaller getJSONUnmarshaller(Unmarshaller unmarshaller) throws JAXBException {
+    /**
+     * Get a {@link JSONUnmarshaller} from a {@link Unmarshaller}.
+     *
+     * @param unmarshaller the JAXB unmarshaller.
+     * @return the JSON unmarshaller.
+     */
+    public static JSONUnmarshaller getJSONUnmarshaller(Unmarshaller unmarshaller) {
         if (unmarshaller instanceof JSONUnmarshaller) {
-            return (JSONUnmarshaller)unmarshaller;
+            return (JSONUnmarshaller) unmarshaller;
         } else {
             return new BaseJSONUnmarshaller(unmarshaller, JSONConfiguration.DEFAULT);
         }
@@ -441,13 +457,13 @@ public final class JSONJAXBContext extends JAXBContext implements JSONConfigurat
         return jsonConfiguration;
     }
 
-     public JSONUnmarshaller createJSONUnmarshaller() throws JAXBException {
-         return new JSONUnmarshallerImpl(this, getJSONConfiguration());
-     }
+    public JSONUnmarshaller createJSONUnmarshaller() throws JAXBException {
+        return new JSONUnmarshallerImpl(this, getJSONConfiguration());
+    }
 
-     public JSONMarshaller createJSONMarshaller() throws JAXBException {
-         return new JSONMarshallerImpl(this, getJSONConfiguration());
-     }
+    public JSONMarshaller createJSONMarshaller() throws JAXBException {
+        return new JSONMarshallerImpl(this, getJSONConfiguration());
+    }
 
     private Map<String, Object> createProperties(Map<String, Object> properties) {
         Map<String, Object> workProperties = new HashMap<String, Object>();
@@ -459,7 +475,7 @@ public final class JSONJAXBContext extends JAXBContext implements JSONConfigurat
         processProperties(workProperties);
         return workProperties;
     }
-   
+
     /**
      * Overrides underlaying createUnmarshaller method and returns
      * an unmarshaller which is capable of JSON deserialization.
@@ -494,8 +510,8 @@ public final class JSONJAXBContext extends JAXBContext implements JSONConfigurat
     public Validator createValidator() throws JAXBException {
         return jaxbContext.createValidator();
     }
-
     static final Map<String, JSONConfiguration.Notation> _notationMap = new HashMap<String, JSONConfiguration.Notation>() {
+
         {
             put(JSONJAXBContext.JSONNotation.BADGERFISH.toString(), JSONConfiguration.Notation.BADGERFISH);
             put(JSONJAXBContext.JSONNotation.MAPPED.toString(), JSONConfiguration.Notation.MAPPED);
@@ -503,7 +519,7 @@ public final class JSONJAXBContext extends JAXBContext implements JSONConfigurat
             put(JSONJAXBContext.JSONNotation.NATURAL.toString(), JSONConfiguration.Notation.NATURAL);
         }
     };
-    
+
     private final void processProperties(Map<String, Object> properties) {
         final Collection<String> jsonKeys = new HashSet<String>();
         for (String k : Collections.unmodifiableSet(properties.keySet())) {
@@ -531,20 +547,20 @@ public final class JSONJAXBContext extends JAXBContext implements JSONConfigurat
     private JSONConfiguration getConfiguration(JSONConfiguration.Notation pNotation,
             Map<String, Object> properties) {
 
-        String [] a = new String[0];
+        String[] a = new String[0];
 
         switch (pNotation) {
-            case BADGERFISH :
+            case BADGERFISH:
                 return JSONConfiguration.badgerFish().build();
-            case MAPPED_JETTISON : 
+            case MAPPED_JETTISON:
                 JSONConfiguration.MappedJettisonBuilder mappedJettisonBuilder = JSONConfiguration.mappedJettison();
                 if (properties.containsKey(JSONJAXBContext.JSON_XML2JSON_NS)) {
                     mappedJettisonBuilder.xml2JsonNs((Map<String, String>) properties.get(JSONJAXBContext.JSON_XML2JSON_NS));
                 }
                 return mappedJettisonBuilder.build();
-            case NATURAL : 
+            case NATURAL:
                 return JSONConfiguration.natural().build();
-            case MAPPED :
+            case MAPPED:
             default: {
                 JSONConfiguration.MappedBuilder mappedBuilder = JSONConfiguration.mapped();
                 if (properties.containsKey(JSONJAXBContext.JSON_ARRAYS)) {

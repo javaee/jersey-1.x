@@ -34,27 +34,106 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-
 package com.sun.jersey.api.json;
 
 import java.io.InputStream;
 import java.io.Reader;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
+import javax.xml.bind.UnmarshalException;
+import javax.xml.bind.annotation.XmlType;
 
 /**
- *
+ * A JSON unmarshaller responsible for deserializing JSON data to a Java
+ * content tree, defined by JAXB.
+ * 
  * @author Jakub.Podlesak@Sun.COM, Paul.Sandoz@Sun.COM
  */
 public interface JSONUnmarshaller {
 
-     // Assume UTF-8 charset
-    <T> T unmarshalFromJSON(InputStream inputStream, Class<T> expectedType) throws JAXBException;
+    /**
+     * Unmarshal JSON data from the specified <code>InputStream</code> and
+     * return the resulting Java content tree.
+     * <p>
+     * The UTF-8 character encoding scheme will be used to decode the encoded 
+     * characters of the JSON data.
+     *
+     * @param <T> the type of the Java content tree.
+     * @param is the InputStream to unmarshal JSON data from.
+     * @param expectedType the expected type of the Java content tree.
+     * @return the newly created root object of the Java content tree. The
+     *         content tree may be an instance of a class that is
+     *         mapped to a XML root element (for example, annotated with
+     *         {@link XmlRootElement}) or mapped to an XML type (for example,
+     *         annotated with {@link XmlType}).
+     * @throws JAXBException if any unexpected errors occur while unmarshalling.
+     * @throws UnmarshalException if the <code>JSONUnmarshaller</code> is unable
+     *         to perform the JSON to Java binding.
+     */
+    <T> T unmarshalFromJSON(InputStream is,
+            Class<T> expectedType) throws JAXBException;
 
-    <T> T unmarshalFromJSON(Reader reader, Class<T> expectedType) throws JAXBException;
+    /**
+     * Unmarshal JSON data from the specified <code>Reader</code> and
+     * return the resulting Java content tree.
+     * <p>
+     * The character encoding scheme of the <code>reader</code> will be used to
+     * encode the characters of the JSON data.
+     *
+     * @param <T> the type of the Java content tree.
+     * @param reader the Reader to unmarshal JSON data from.
+     * @param expectedType the expected type of the Java content tree.
+     * @return the newly created root object of the Java content tree. The
+     *         content tree may be an instance of a class that is
+     *         mapped to a XML root element (for example, annotated with
+     *         {@link XmlRootElement}) or mapped to an XML type (for example,
+     *         annotated with {@link XmlType}).
+     * @throws JAXBException if any unexpected errors occur while unmarshalling.
+     * @throws UnmarshalException if the <code>JSONUnmarshaller</code> is unable
+     *         to perform the JSON to Java binding.
+     */
+    <T> T unmarshalFromJSON(Reader reader,
+            Class<T> expectedType) throws JAXBException;
 
-     // Assume UTF-8 charset
-     <T> JAXBElement<T> unmarshalJAXBElementFromJSON(InputStream is, Class<T> declaredType) throws JAXBException;
+    /**
+     * Unmarshal JSON data from the <code>InputStream</code> by
+     * <code>declaredType</code> and return the resulting content tree.
+     * <p>
+     * The UTF-8 character encoding scheme will be used to decode the encoded
+     * characters of the JSON data.
+     *
+     * @param <T> the type of the Java content tree.
+     * @param is the InputStream to unmarshal JSON data from.
+     * @param declaredType a class that is mapped to a XML root element
+     *        (for example, annotated with {@link XmlRootElement}) or mapped to
+     *        an XML type (for example, annotated with {@link XmlType}).
+     * @return the newly created root object of the Java content tree, root
+     *         by a {@link JAXBElement} instance.
+     * @throws JAXBException if any unexpected errors occur while unmarshalling.
+     * @throws UnmarshalException if the <code>JSONUnmarshaller</code> is unable
+     *         to perform the JSON to Java binding.
+     */
+    <T> JAXBElement<T> unmarshalJAXBElementFromJSON(InputStream is,
+            Class<T> declaredType) throws JAXBException;
 
-     <T> JAXBElement<T> unmarshalJAXBElementFromJSON(Reader reader, Class<T> declaredType) throws JAXBException;
+    /**
+     * Unmarshal JSON data from the <code>Reader</code> by
+     * <code>declaredType</code> and return the resulting content tree.
+     * <p>
+     * The character encoding scheme of the <code>reader</code> will be used to
+     * encode the characters of the JSON data.
+     *
+     * @param <T> the type of the Java content tree.
+     * @param reader the Reader to unmarshal JSON data from.
+     * @param declaredType a class that is mapped to a XML root element
+     *        (for example, annotated with {@link XmlRootElement}) or mapped to
+     *        an XML type (for example, annotated with {@link XmlType}).
+     * @return the newly created root object of the Java content tree, root
+     *         by a {@link JAXBElement} instance.
+     * @throws JAXBException if any unexpected errors occur while unmarshalling.
+     * @throws UnmarshalException if the <code>JSONUnmarshaller</code> is unable
+     *         to perform the JSON to Java binding.
+     */
+    <T> JAXBElement<T> unmarshalJAXBElementFromJSON(Reader reader,
+            Class<T> declaredType) throws JAXBException;
 }

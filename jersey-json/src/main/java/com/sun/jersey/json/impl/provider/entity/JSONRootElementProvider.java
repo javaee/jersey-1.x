@@ -52,7 +52,6 @@ import javax.ws.rs.ext.Providers;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
-import javax.xml.bind.annotation.XmlRootElement;
 
 /**
  *
@@ -97,7 +96,8 @@ public class JSONRootElementProvider extends AbstractRootElementProvider {
             throws JAXBException, IOException {
         final Charset c = getCharset(mediaType);
 
-        return JSONJAXBContext.getJSONUnmarshaller(u).unmarshalFromJSON(new InputStreamReader(entityStream, c), type);
+        return JSONJAXBContext.getJSONUnmarshaller(u).
+                unmarshalFromJSON(new InputStreamReader(entityStream, c), type);
     }
 
     @Override

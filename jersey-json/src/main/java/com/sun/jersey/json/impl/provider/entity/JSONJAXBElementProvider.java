@@ -37,12 +37,8 @@
 
 package com.sun.jersey.json.impl.provider.entity;
 
-import com.sun.jersey.api.json.JSONConfiguration;
 import com.sun.jersey.api.json.JSONJAXBContext;
-import com.sun.jersey.api.json.JSONUnmarshaller;
 import com.sun.jersey.core.provider.jaxb.AbstractJAXBElementProvider;
-import com.sun.jersey.json.impl.JSONHelper;
-import com.sun.jersey.json.impl.Stax2JsonFactory;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -58,7 +54,6 @@ import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
-import javax.xml.stream.XMLStreamReader;
 
 /**
  *
@@ -94,8 +89,10 @@ public class JSONJAXBElementProvider extends AbstractJAXBElementProvider {
     protected final JAXBElement<?> readFrom(Class<?> type, MediaType mediaType,
             Unmarshaller u, InputStream entityStream)
             throws JAXBException, IOException {
+        final Charset c = getCharset(mediaType);
 
-        return JSONJAXBContext.getJSONUnmarshaller(u).unmarshalJAXBElementFromJSON(entityStream, type);
+        return JSONJAXBContext.getJSONUnmarshaller(u).
+                unmarshalJAXBElementFromJSON(new InputStreamReader(entityStream, c), type);
     }
     
     protected final void writeTo(JAXBElement<?> t, MediaType mediaType, Charset c,
