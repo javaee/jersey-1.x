@@ -34,17 +34,10 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-
 package com.sun.jersey.json.impl.provider.entity;
 
-import com.sun.jersey.core.provider.jaxb.AbstractRootElementProvider;
 import com.sun.jersey.api.json.JSONJAXBContext;
-import com.sun.jersey.json.impl.JSONHelper;
-import com.sun.jersey.json.impl.JSONMarshaller;
-import com.sun.jersey.json.impl.JSONUnmarshaller;
-import com.sun.jersey.json.impl.Stax2JsonFactory;
-import com.sun.jersey.json.impl.reader.JsonXmlStreamReader;
-import com.sun.jersey.json.impl.writer.JsonXmlStreamWriter;
+import com.sun.jersey.core.provider.jaxb.AbstractRootElementProvider;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -56,18 +49,17 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.ext.Providers;
-import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.transform.stream.StreamSource;
 
 /**
  *
- * @author Paul.Sandoz@Sun.Com
+ * @author Paul.Sandoz@Sun.Com, Jakub.Podlesak@Sun.COM
  */
 public class JSONRootElementProvider extends AbstractRootElementProvider {
+
     JSONRootElementProvider(Providers ps) {
         super(ps);
     }
@@ -75,17 +67,23 @@ public class JSONRootElementProvider extends AbstractRootElementProvider {
     JSONRootElementProvider(Providers ps, MediaType mt) {
         super(ps, mt);
     }
-    
+
     @Produces("application/json")
     @Consumes("application/json")
     public static final class App extends JSONRootElementProvider {
-        public App(@Context Providers ps) { super(ps , MediaType.APPLICATION_JSON_TYPE); }
+
+        public App(@Context Providers ps) {
+            super(ps, MediaType.APPLICATION_JSON_TYPE);
+        }
     }
 
     @Produces("*/*")
     @Consumes("*/*")
     public static final class General extends JSONRootElementProvider {
-        public General(@Context Providers ps) { super(ps); }
+
+        public General(@Context Providers ps) {
+            super(ps);
+        }
 
         @Override
         protected boolean isSupported(MediaType m) {
@@ -94,53 +92,19 @@ public class JSONRootElementProvider extends AbstractRootElementProvider {
     }
 
     @Override
-    protected final Object readFrom(Class<Object> type, MediaType mediaType, 
+    protected final Object readFrom(Class<Object> type, MediaType mediaType,
             Unmarshaller u, InputStream entityStream)
             throws JAXBException, IOException {
         final Charset c = getCharset(mediaType);
-        if (type.isAnnotationPresent(XmlRootElement.class)) {
-            if (u instanceof JSONUnmarshaller) {
-                JSONUnmarshaller ju = (JSONUnmarshaller)u;
-                ju.setJsonEnabled(true);
-                JAXBElement jaxbElem = (JAXBElement)ju.
-                        unmarshal(new InputStreamReader(entityStream, c),
-                        type);
-                return jaxbElem.getValue();
-            } else {
-                return u.unmarshal(
-                        new JsonXmlStreamReader(
-                            new InputStreamReader(entityStream, c),
-                            JSONHelper.getRootElementName(type)));
-            }
-        } else {
-            if (u instanceof JSONUnmarshaller) {
-                // TODO what about the charset ?
-                JSONUnmarshaller ju = (JSONUnmarshaller)u;
-                ju.setJsonEnabled(true);
-                return ju.unmarshal(
-                        Stax2JsonFactory.createReader(new InputStreamReader(entityStream), ju.getJSONConfiguration(), JSONHelper.getRootElementName(type)), type).getValue();
-            } else {
-                return u.unmarshal(
-                        new JsonXmlStreamReader(
-                            new InputStreamReader(entityStream, c), 
-                            JSONHelper.getRootElementName(type)), type).getValue();
-            }
-        }
+
+        return JSONJAXBContext.getJSONUnmarshaller(u).unmarshalFromJSON(new InputStreamReader(entityStream, c), type);
     }
-    
-        
+
     @Override
     protected void writeTo(Object t, MediaType mediaType, Charset c,
             Marshaller m, OutputStream entityStream)
             throws JAXBException, IOException {
-        if (m instanceof JSONMarshaller) {
-            JSONMarshaller jm = (JSONMarshaller)m;
-            jm.setJsonEnabled(true);
-            jm.marshal(t,
-                    new OutputStreamWriter(entityStream, c));
-        } else {
-            m.marshal(t, JsonXmlStreamWriter.createWriter(
-                    new OutputStreamWriter(entityStream, c), true));
-        }
+        JSONJAXBContext.getJSONMarshaller(m).
+                marshallToJSON(t, new OutputStreamWriter(entityStream, c));
     }
 }

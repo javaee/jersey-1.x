@@ -35,34 +35,21 @@
  * holder.
  */
 
-package com.sun.jersey.json.impl;
+package com.sun.jersey.api.json;
 
-import com.sun.jersey.api.json.JSONJAXBContext;
-import com.sun.jersey.api.json.JSONMarshaller;
-import com.sun.jersey.api.json.JSONUnmarshaller;
-import java.io.StringReader;
-import java.io.StringWriter;
-import javax.xml.bind.JAXBElement;
-import javax.xml.namespace.QName;
-import junit.framework.TestCase;
+import java.io.OutputStream;
+import java.io.Writer;
+import javax.xml.bind.JAXBException;
 
 /**
  *
- * @author Jakub.Podlesak@Sun.COM
+ * @author Jakub.Podlesak@Sun.COM, Paul.Sandoz@Sun.COM
  */
-public class XmlTypeTest extends TestCase {
+public interface JSONMarshaller {
 
-    public void testSimpleXmlTypeBean() throws Exception {
-        
-        final JSONJAXBContext ctx = new JSONJAXBContext(SimpleXmlTypeBean.class);
-        final JSONMarshaller jm = ctx.createJSONMarshaller();
-        final JSONUnmarshaller ju = ctx.createJSONUnmarshaller();
-        final StringWriter sw = new StringWriter();
+     // Assume UTF-8 charset
+    void marshallToJSON(Object o, OutputStream outputStream) throws JAXBException;
 
-        final SimpleXmlTypeBean one=(SimpleXmlTypeBean) SimpleXmlTypeBean.createTestInstance();
-        SimpleXmlTypeBean two;
-        jm.marshallToJSON(new JAXBElement<SimpleXmlTypeBean>(new QName("test"), SimpleXmlTypeBean.class, one), sw);
-        two = ju.unmarshalFromJSON(new StringReader(sw.toString()), SimpleXmlTypeBean.class);
-        assertEquals(one, two);
-    }
+    void marshallToJSON(Object o, Writer writer) throws JAXBException;
+
 }

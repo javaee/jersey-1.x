@@ -45,7 +45,6 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.naming.OperationNotSupportedException;
 
 /**
  * An immutable configuration of JSON notationand options. JSONConfiguration could be used
@@ -125,17 +124,47 @@ public class JSONConfiguration {
 
     /**
      * Builder class for constructing {@link JSONConfiguration} options
+     * for the {@link Notation#NATURAL} convention.
+     */
+    public static class NaturalBuilder extends Builder {
+
+        private NaturalBuilder(Notation notation) {
+            super(notation);
+        }
+
+        /**
+         * Setter for XML root element unwrapping.
+         * This property is valid for the {@link JSONConfiguration.Notation#MAPPED}
+         * and {@link JSONConfiguration.Notation#NATURAL} notations only.
+         * <p>
+         * If set to true, JSON code corresponding to the XML root element will be stripped out
+         * <p>
+         * The default value is false.
+         * @param rootUnwrapping if set to true, JSON code corresponding to the
+         *        XML root element will be stripped out.
+         * @return the natural builder.
+         */
+        public NaturalBuilder rootUnwrapping(boolean rootUnwrapping) {
+            this.rootUnwrapping = rootUnwrapping;
+            return this;
+        }
+    }
+
+    /**
+     * Builder class for constructing {@link JSONConfiguration} options
      * for the {@link Notation#MAPPED_JETTISON} convention.
      */
     public static class MappedJettisonBuilder extends Builder {
 
         private MappedJettisonBuilder(Notation notation) {
             super(notation);
+            rootUnwrapping = false;
         }
 
         /**
          * Setter for XML to JSON namespace mapping.
-         * This property is valid for the {@link JSONConfiguration.Notation#MAPPED_JETTISON} notation only.
+         * This property is valid for the {@link JSONConfiguration.Notation#MAPPED_JETTISON} 
+         * and {@link JSONConfiguration.Notation#MAPPED} notations only.
          * <p>
          * The value is a map with zero or more
          * key/value pairs, where the key is an XML namespace and the value
@@ -147,7 +176,6 @@ public class JSONConfiguration {
             this.jsonXml2JsonNs = jsonXml2JsonNs;
             return this;
         }
-
     }
 
         /**
@@ -232,8 +260,25 @@ public class JSONConfiguration {
         }
 
         /**
+         * Setter for XML to JSON namespace mapping.
+         * This property is valid for the {@link JSONConfiguration.Notation#MAPPED_JETTISON}
+         * and {@link JSONConfiguration.Notation#MAPPED} notations only.
+         * <p>
+         * The value is a map with zero or more
+         * key/value pairs, where the key is an XML namespace and the value
+         * is the prefix to use as the replacement for the XML namespace.
+         * <p>
+         * The default value is a map with zero key/value pairs.
+         */
+        public MappedBuilder xml2JsonNs(Map<String, String> jsonXml2JsonNs) {
+            this.jsonXml2JsonNs = jsonXml2JsonNs;
+            return this;
+        }
+
+        /**
          * Setter for XML root element unwrapping.
-         * This property is valid for the {@link JSONConfiguration.Notation#MAPPED} notation only.
+         * This property is valid for the {@link JSONConfiguration.Notation#MAPPED} 
+         * and {@link JSONConfiguration.Notation#NATURAL} notations only.
          * <p>
          * If set to true, JSON code corresponding to the XML root element will be stripped out
          * <p>
@@ -268,7 +313,7 @@ public class JSONConfiguration {
      *
      * @return a builder for JSONConfiguration instance
      */
-    public static Builder natural() {
+    public static NaturalBuilder natural() {
         // this is to make sure people trying to use NATURAL notation will get clear message what is missing, when an old JAXB RI version is used
         try {
             Class.forName("com.sun.xml.bind.annotation.OverrideAnnotationOf");
@@ -276,7 +321,7 @@ public class JSONConfiguration {
             Logger.getLogger(JSONConfiguration.class.getName()).log(Level.SEVERE, ImplMessages.ERROR_JAXB_RI_2_1_10_MISSING());
             throw new RuntimeException(ImplMessages.ERROR_JAXB_RI_2_1_10_MISSING());
         }
-        return new Builder(Notation.NATURAL);
+        return new NaturalBuilder(Notation.NATURAL);
     }
 
     /**
@@ -309,7 +354,9 @@ public class JSONConfiguration {
      * @return a builder for JSONConfiguration instance
      */
     public static Builder badgerFish() {
-        return new Builder(Notation.BADGERFISH);
+        Builder badgerFishBuilder =  new Builder(Notation.BADGERFISH);
+        badgerFishBuilder.rootUnwrapping = false;
+        return badgerFishBuilder;
     }
 
     
@@ -369,5 +416,10 @@ public class JSONConfiguration {
      */
     public boolean isRootUnwrapping() {
         return rootUnwrapping;
+    }
+
+    @Override
+    public String toString() {
+        return String.format("{notation:%s,rootStripping:%b}", notation, rootUnwrapping);
     }
 }

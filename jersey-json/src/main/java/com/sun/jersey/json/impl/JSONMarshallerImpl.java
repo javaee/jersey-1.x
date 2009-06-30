@@ -36,20 +36,10 @@
  */
 package com.sun.jersey.json.impl;
 
-import com.sun.jersey.api.json.JSONConfigurated;
 import com.sun.jersey.api.json.JSONConfiguration;
-import com.sun.jersey.api.json.JSONJAXBContext;
 import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.io.OutputStream;
-import java.io.OutputStreamWriter;
 import java.io.Writer;
-import java.nio.charset.Charset;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
@@ -58,7 +48,6 @@ import javax.xml.bind.ValidationEventHandler;
 import javax.xml.bind.annotation.adapters.XmlAdapter;
 import javax.xml.bind.attachment.AttachmentMarshaller;
 import javax.xml.stream.XMLEventWriter;
-import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 import javax.xml.transform.Result;
 import javax.xml.validation.Schema;
@@ -67,68 +56,29 @@ import org.xml.sax.ContentHandler;
 
 /**
  *
- * @author japod
+ * @author Jakub.Podlesak@Sun.COM
  */
-public final class JSONMarshaller implements Marshaller, JSONConfigurated {
+public final class JSONMarshallerImpl extends BaseJSONMarshaller implements Marshaller {
 
-    private final JAXBContext jaxbContext;
-    private final Marshaller jaxbMarshaller;
-    private boolean jsonEnabled;
-    private final JSONConfiguration jsonConfig;
-
-    public JSONMarshaller(JAXBContext jaxbContext, JSONConfiguration jsonConfig) throws JAXBException {
-        this.jaxbContext = jaxbContext;
-        this.jsonConfig = jsonConfig;
-        this.jaxbMarshaller = jaxbContext.createMarshaller();
+    public JSONMarshallerImpl(JAXBContext jaxbContext, JSONConfiguration jsonConfig) throws JAXBException {
+        super(jaxbContext, jsonConfig);
     }
 
+    // Marshaller
     public void marshal(Object jaxbObject, Result result) throws JAXBException {
         jaxbMarshaller.marshal(jaxbObject, result);
     }
 
     public void marshal(Object jaxbObject, OutputStream os) throws JAXBException {
-        if (jsonEnabled) {
-            try {
-                XMLStreamWriter xsw = createXmlStreamWriter(new OutputStreamWriter(os, getCharset()));
-                jaxbMarshaller.marshal(jaxbObject, xsw);
-                xsw.flush();
-            } catch (XMLStreamException ex) {
-                throw new JAXBException(ex.getMessage(), ex);
-            }
-        } else {
-            jaxbMarshaller.marshal(jaxbObject, os);
-        }
+        jaxbMarshaller.marshal(jaxbObject, os);
     }
 
     public void marshal(Object jaxbObject, File file) throws JAXBException {
-        if (jsonEnabled) {
-            try {
-                XMLStreamWriter xsw = createXmlStreamWriter(
-                        new OutputStreamWriter(new FileOutputStream(file), getCharset()));
-                jaxbMarshaller.marshal(jaxbObject, xsw);
-                xsw.flush();
-            } catch (Exception ex) {
-                Logger.getLogger(JSONMarshaller.class.getName()).log(
-                        Level.SEVERE, "IOException caught when marshalling into a file.", ex);
-                throw new JAXBException(ex.getMessage(), ex);
-            }
-        } else {
-            jaxbMarshaller.marshal(jaxbObject, file);
-        }
+        jaxbMarshaller.marshal(jaxbObject, file);
     }
 
     public void marshal(Object jaxbObject, Writer writer) throws JAXBException {
-        if (jsonEnabled) {
-            XMLStreamWriter xsw = createXmlStreamWriter(writer);
-            jaxbMarshaller.marshal(jaxbObject, xsw);
-            try {
-                xsw.flush();
-            } catch (XMLStreamException ex) {
-                throw new JAXBException(ex.getMessage(), ex);
-            }
-        } else {
-            jaxbMarshaller.marshal(jaxbObject, writer);
-        }
+        jaxbMarshaller.marshal(jaxbObject, writer);
     }
 
     public void marshal(Object jaxbObject, ContentHandler handler) throws JAXBException {
@@ -153,14 +103,6 @@ public final class JSONMarshaller implements Marshaller, JSONConfigurated {
 
     public void setProperty(String key, Object value) throws PropertyException {
         jaxbMarshaller.setProperty(key, value);
-    }
-
-    public boolean isJsonEnabled() {
-        return jsonEnabled;
-    }
-
-    public void setJsonEnabled(boolean jsonEnabled) {
-        this.jsonEnabled = jsonEnabled;
     }
 
     public Object getProperty(String key) throws PropertyException {
@@ -209,30 +151,5 @@ public final class JSONMarshaller implements Marshaller, JSONConfigurated {
 
     public Listener getListener() {
         return jaxbMarshaller.getListener();
-    }
-
-    private void setProperties(Map<String, Object> properties) throws PropertyException {
-        if (null != properties) {
-            for (Entry<String, Object> entry : properties.entrySet()) {
-                setProperty(entry.getKey(), entry.getValue());
-            }
-        }
-    }
-
-    private XMLStreamWriter createXmlStreamWriter(Writer writer) throws JAXBException  {
-        try {
-            return Stax2JsonFactory.createWriter(writer, jsonConfig);
-        } catch (IOException ex) {
-            throw new JAXBException(ex.getMessage(), ex);
-        }
-    }
-    
-    private Charset getCharset() throws JAXBException {
-        String charset = (String)jaxbMarshaller.getProperty(Marshaller.JAXB_ENCODING);
-        return (charset == null) ? Charset.forName("UTF-8") : Charset.forName(charset);
-    }
-
-    public JSONConfiguration getJSONConfiguration() {
-        return jsonConfig;
     }
 }

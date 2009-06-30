@@ -35,34 +35,26 @@
  * holder.
  */
 
-package com.sun.jersey.json.impl;
+package com.sun.jersey.impl.json;
 
-import com.sun.jersey.api.json.JSONJAXBContext;
-import com.sun.jersey.api.json.JSONMarshaller;
-import com.sun.jersey.api.json.JSONUnmarshaller;
-import java.io.StringReader;
-import java.io.StringWriter;
-import javax.xml.bind.JAXBElement;
-import javax.xml.namespace.QName;
-import junit.framework.TestCase;
+import javax.xml.bind.annotation.XmlRootElement;
 
 /**
  *
- * @author Jakub.Podlesak@Sun.COM
+ * @author japod
  */
-public class XmlTypeTest extends TestCase {
+@XmlRootElement(name="dog")
+public class Dog extends Animal {
 
-    public void testSimpleXmlTypeBean() throws Exception {
-        
-        final JSONJAXBContext ctx = new JSONJAXBContext(SimpleXmlTypeBean.class);
-        final JSONMarshaller jm = ctx.createJSONMarshaller();
-        final JSONUnmarshaller ju = ctx.createJSONUnmarshaller();
-        final StringWriter sw = new StringWriter();
+    public Dog() {
+    }
 
-        final SimpleXmlTypeBean one=(SimpleXmlTypeBean) SimpleXmlTypeBean.createTestInstance();
-        SimpleXmlTypeBean two;
-        jm.marshallToJSON(new JAXBElement<SimpleXmlTypeBean>(new QName("test"), SimpleXmlTypeBean.class, one), sw);
-        two = ju.unmarshalFromJSON(new StringReader(sw.toString()), SimpleXmlTypeBean.class);
-        assertEquals(one, two);
+    public Dog(String name) {
+        super(name);
+    }
+
+    @Override
+    public String toString() {
+        return String.format("{ \"dog\" : %s }", super.toString());
     }
 }

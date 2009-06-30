@@ -1,9 +1,9 @@
 /*
  *
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
- *
+ * 
  * Copyright 1997-2007 Sun Microsystems, Inc. All rights reserved.
- *
+ * 
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
  * and Distribution License("CDDL") (collectively, the "License").  You
@@ -11,7 +11,7 @@
  * a copy of the License at https://jersey.dev.java.net/CDDL+GPL.html
  * or jersey/legal/LICENSE.txt.  See the License for the specific
  * language governing permissions and limitations under the License.
- *
+ * 
  * When distributing the software, include this License Header Notice in each
  * file and include the License file at jersey/legal/LICENSE.txt.
  * Sun designates this particular file as subject to the "Classpath" exception
@@ -20,9 +20,9 @@
  * Header, with the fields enclosed by brackets [] replaced by your own
  * identifying information: "Portions Copyrighted [year]
  * [name of copyright owner]"
- *
+ * 
  * Contributor(s):
- *
+ * 
  * If you wish your version of this file to be governed by only the CDDL or
  * only the GPL Version 2, indicate your decision by adding "[Contributor]
  * elects to include this software in this distribution under the [CDDL or GPL
@@ -35,34 +35,36 @@
  * holder.
  */
 
-package com.sun.jersey.json.impl;
+package com.sun.jersey.json.impl.provider.entity;
 
-import com.sun.jersey.api.json.JSONJAXBContext;
-import com.sun.jersey.api.json.JSONMarshaller;
-import com.sun.jersey.api.json.JSONUnmarshaller;
-import java.io.StringReader;
-import java.io.StringWriter;
-import javax.xml.bind.JAXBElement;
-import javax.xml.namespace.QName;
-import junit.framework.TestCase;
+
+import com.sun.jersey.core.provider.AbstractMessageReaderWriterProvider;
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Type;
+import javax.ws.rs.core.MediaType;
 
 /**
  *
- * @author Jakub.Podlesak@Sun.COM
+ * @author japod
  */
-public class XmlTypeTest extends TestCase {
+public abstract class JSONLowLevelProvider<T> extends AbstractMessageReaderWriterProvider<T>{
 
-    public void testSimpleXmlTypeBean() throws Exception {
+    private final Class<T> c;
+
+    // JavaRebel needs this ctor
+    protected JSONLowLevelProvider(Class<T> c) {
+        this.c = c;
+    }
+
+    public boolean isReadable(Class<?> type, Type genericType, Annotation annotations[], MediaType mediaType) {
+        return (type == c) && isSupported(mediaType);
+    }
         
-        final JSONJAXBContext ctx = new JSONJAXBContext(SimpleXmlTypeBean.class);
-        final JSONMarshaller jm = ctx.createJSONMarshaller();
-        final JSONUnmarshaller ju = ctx.createJSONUnmarshaller();
-        final StringWriter sw = new StringWriter();
-
-        final SimpleXmlTypeBean one=(SimpleXmlTypeBean) SimpleXmlTypeBean.createTestInstance();
-        SimpleXmlTypeBean two;
-        jm.marshallToJSON(new JAXBElement<SimpleXmlTypeBean>(new QName("test"), SimpleXmlTypeBean.class, one), sw);
-        two = ju.unmarshalFromJSON(new StringReader(sw.toString()), SimpleXmlTypeBean.class);
-        assertEquals(one, two);
+    public boolean isWriteable(Class<?> type, Type genericType, Annotation annotations[], MediaType mediaType) {
+        return (type == c) && isSupported(mediaType);
+    }
+    
+    protected boolean isSupported(MediaType m) {
+        return true;
     }
 }

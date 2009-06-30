@@ -37,13 +37,16 @@
 
 package com.sun.jersey.json.impl.reader;
 
+import com.sun.jersey.api.json.JSONConfiguration;
 import java.io.IOException;
 import java.io.Reader;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
 import java.util.logging.Level;
@@ -79,6 +82,7 @@ public class JsonXmlStreamReader implements XMLStreamReader {
 
     boolean jsonRootUnwrapping;
     String rootElementName;
+    final Map<String, String> revertedXml2JsonNs = new HashMap<String, String>();
     final Collection<String> attrAsElemNames = new LinkedList<String>();
 
     JsonLexer lexer;
@@ -113,27 +117,23 @@ public class JsonXmlStreamReader implements XMLStreamReader {
     List<ProcessingState> processingStack;
     int depth;
 
-    public JsonXmlStreamReader(Reader reader) throws IOException {
-        this(reader, null);
-    }
-
-    public JsonXmlStreamReader(Reader reader, boolean stripRoot) throws IOException {
-        this(reader, stripRoot, null);
-    }
-
-    public JsonXmlStreamReader(Reader reader, boolean stripRoot, Collection<String> attrAsElems) throws IOException {
-        this(reader, stripRoot ? "rootElement" : null, attrAsElems);
+    public JsonXmlStreamReader(Reader reader, JSONConfiguration config) throws IOException {
+        this(reader, config.isRootUnwrapping() ? "rootElement" : null, config);
     }
 
     public JsonXmlStreamReader(Reader reader, String rootElementName) throws IOException {
-        this(reader, rootElementName, null);
+        this(reader, rootElementName, JSONConfiguration.DEFAULT);
     }
 
-    public JsonXmlStreamReader(Reader reader, String rootElementName, Collection<String> attrAsElems) throws IOException {
+    public JsonXmlStreamReader(Reader reader, String rootElementName, JSONConfiguration config) throws IOException {
         this.jsonRootUnwrapping = (rootElementName != null);
         this.rootElementName = rootElementName;
-        if (attrAsElems != null) {
-            this.attrAsElemNames.addAll(attrAsElems);
+        if (config.getAttributeAsElements() != null) {
+            this.attrAsElemNames.addAll(config.getAttributeAsElements());
+        }
+        if (config.getXml2JsonNs() != null) {
+            for (String uri : config.getXml2JsonNs().keySet())
+            revertedXml2JsonNs.put(config.getXml2JsonNs().get(uri), uri);
         }
         lexer = new JsonLexer(reader);
         depth = 0;
@@ -232,7 +232,7 @@ public class JsonXmlStreamReader implements XMLStreamReader {
                                 }
                                 if (null != processingStack.get(depth - 1).eventToReadAttributesFor) {
                                     processingStack.get(depth - 1).eventToReadAttributesFor.addAttribute(
-                                            new QName(attrName.substring(1)), lastToken.tokenText);
+                                            createQName(attrName.substring(1)), lastToken.tokenText);
                                 }
                                 lastToken = nextToken();
                                 switch (lastToken.tokenType) {
@@ -553,8 +553,10 @@ public class JsonXmlStreamReader implements XMLStreamReader {
 
     public String getNamespaceURI() {
         LOGGER.entering(JsonXmlStreamReader.class.getName(), "getNamespaceURI");
-        LOGGER.exiting(JsonXmlStreamReader.class.getName(), "getNamespaceURI", null);
-        return null;
+        assert !eventQueue.isEmpty();
+        String result = eventQueue.peek().getName().getNamespaceURI();
+        LOGGER.exiting(JsonXmlStreamReader.class.getName(), "getNamespaceURI", result);
+        return result;
     }
 
     public String getPIData() {
@@ -688,7 +690,7 @@ public class JsonXmlStreamReader implements XMLStreamReader {
     private StartElementEvent generateSEEvent(String name) {
         StartElementEvent event = null;
         if (!"$".equals(name)) {
-           event = new StartElementEvent(new QName(name), new StaxLocation(lexer));
+           event = new StartElementEvent(createQName(name), new StaxLocation(lexer));
            eventQueue.add(event);
         }
         return event;
@@ -696,7 +698,18 @@ public class JsonXmlStreamReader implements XMLStreamReader {
 
     private void generateEEEvent(String name) {
        if (!"$".equals(name)) {
-           eventQueue.add(new EndElementEvent(new QName(name), new StaxLocation(lexer)));
+           eventQueue.add(new EndElementEvent(createQName(name), new StaxLocation(lexer)));
        }
+    }
+
+    private QName createQName(String name) {
+        if (revertedXml2JsonNs.isEmpty() || !name.contains(".")) {
+            return new QName(name);
+        } else {
+            int dotIndex = name.indexOf(".");
+            String prefix = name.substring(0, dotIndex);
+            String suffix = name.substring(dotIndex + 1);
+            return revertedXml2JsonNs.containsKey(prefix) ? new QName(revertedXml2JsonNs.get(prefix), suffix) : new QName(name);
+        }
     }
 }

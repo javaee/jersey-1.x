@@ -35,34 +35,49 @@
  * holder.
  */
 
-package com.sun.jersey.json.impl;
+package com.sun.jersey.impl.json;
 
-import com.sun.jersey.api.json.JSONJAXBContext;
-import com.sun.jersey.api.json.JSONMarshaller;
-import com.sun.jersey.api.json.JSONUnmarshaller;
-import java.io.StringReader;
-import java.io.StringWriter;
-import javax.xml.bind.JAXBElement;
-import javax.xml.namespace.QName;
-import junit.framework.TestCase;
+import javax.xml.bind.annotation.XmlRootElement;
 
 /**
  *
- * @author Jakub.Podlesak@Sun.COM
+ * @author japod
  */
-public class XmlTypeTest extends TestCase {
+@XmlRootElement(name="animal")
+public class Animal {
+    public  String name;
 
-    public void testSimpleXmlTypeBean() throws Exception {
-        
-        final JSONJAXBContext ctx = new JSONJAXBContext(SimpleXmlTypeBean.class);
-        final JSONMarshaller jm = ctx.createJSONMarshaller();
-        final JSONUnmarshaller ju = ctx.createJSONUnmarshaller();
-        final StringWriter sw = new StringWriter();
+    public Animal(){}
 
-        final SimpleXmlTypeBean one=(SimpleXmlTypeBean) SimpleXmlTypeBean.createTestInstance();
-        SimpleXmlTypeBean two;
-        jm.marshallToJSON(new JAXBElement<SimpleXmlTypeBean>(new QName("test"), SimpleXmlTypeBean.class, one), sw);
-        two = ju.unmarshalFromJSON(new StringReader(sw.toString()), SimpleXmlTypeBean.class);
-        assertEquals(one, two);
+    public Animal(String name) {
+        this.name = name;
     }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final Animal other = (Animal) obj;
+        if ((this.name == null) ? (other.name != null) : !this.name.equals(other.name)) {
+            return false;
+        }
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 7;
+        hash = 67 * hash + (this.name != null ? this.name.hashCode() : 0);
+        return hash;
+    }
+
+    @Override
+    public String toString() {
+        return String.format("{ \"name\":\"%s\"}", name);
+    }
+    
 }

@@ -39,11 +39,12 @@ package com.sun.jersey.json.impl;
 
 import com.sun.jersey.api.json.JSONConfiguration;
 import com.sun.jersey.api.json.JSONJAXBContext;
+import com.sun.jersey.api.json.JSONMarshaller;
+import com.sun.jersey.api.json.JSONUnmarshaller;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.util.HashMap;
 import java.util.Map;
-import javax.xml.bind.JAXBElement;
 import junit.framework.TestCase;
 
 /**
@@ -61,20 +62,18 @@ public class NaturalNamespacesSupportTest extends TestCase {
 //        jsonXml2JsonNs.put("http://test.jaxb.com", "tjc");
 //        final JSONJAXBContext ctx = new JSONJAXBContext(JSONConfiguration.mappedJettison().xml2JsonNs(jsonXml2JsonNs).build(), MyError.class, MyMessage.class, MyResponse.class);
         final JSONJAXBContext ctx = new JSONJAXBContext(JSONConfiguration.natural().build(), MyError.class, MyMessage.class, MyResponse.class);
-        final JSONMarshaller jm = (JSONMarshaller) ctx.createMarshaller();
-        final JSONUnmarshaller ju = (JSONUnmarshaller) ctx.createUnmarshaller();
+        final JSONMarshaller jm =  ctx.createJSONMarshaller();
+        final JSONUnmarshaller ju = ctx.createJSONUnmarshaller();
         final StringWriter sw = new StringWriter();
 
-        jm.setJsonEnabled(jsonEnabled);
         final MyResponse one=(MyResponse) MyResponse.createTestInstance();
         MyResponse two;
-        jm.marshal(one, sw);
+        jm.marshallToJSON(one, sw);
 
 //        System.out.println(String.format("%s", sw));
 
-        ju.setJsonEnabled(jsonEnabled);
-        final JAXBElement e = (JAXBElement)ju.unmarshal(new StringReader(sw.toString()), (Class) one.getClass());
-        two = (MyResponse) e.getValue();
+        two =  ju.unmarshalFromJSON(new StringReader(sw.toString()), MyResponse.class);
+
         assertEquals(one, two);
     }
 

@@ -37,13 +37,12 @@
 
 package com.sun.jersey.json.impl.provider.entity;
 
-import com.sun.jersey.core.provider.jaxb.AbstractJAXBElementProvider;
+import com.sun.jersey.api.json.JSONConfiguration;
 import com.sun.jersey.api.json.JSONJAXBContext;
+import com.sun.jersey.api.json.JSONUnmarshaller;
+import com.sun.jersey.core.provider.jaxb.AbstractJAXBElementProvider;
 import com.sun.jersey.json.impl.JSONHelper;
-import com.sun.jersey.json.impl.JSONMarshaller;
-import com.sun.jersey.json.impl.JSONUnmarshaller;
-import com.sun.jersey.json.impl.reader.JsonXmlStreamReader;
-import com.sun.jersey.json.impl.writer.JsonXmlStreamWriter;
+import com.sun.jersey.json.impl.Stax2JsonFactory;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -59,7 +58,7 @@ import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
-import javax.xml.transform.stream.StreamSource;
+import javax.xml.stream.XMLStreamReader;
 
 /**
  *
@@ -95,29 +94,15 @@ public class JSONJAXBElementProvider extends AbstractJAXBElementProvider {
     protected final JAXBElement<?> readFrom(Class<?> type, MediaType mediaType,
             Unmarshaller u, InputStream entityStream)
             throws JAXBException, IOException {
-        if (u instanceof JSONUnmarshaller) {
-            JSONUnmarshaller ju = (JSONUnmarshaller) u;
-            ju.setJsonEnabled(true);
-            return ju.unmarshal(new StreamSource(entityStream), type);
-        } else {
-            return (JAXBElement) u.unmarshal(
-                    new JsonXmlStreamReader(
-                        new InputStreamReader(entityStream, getCharset(mediaType)),
-                        JSONHelper.getRootElementName((Class<Object>)type)), type);
-        }
+
+        return JSONJAXBContext.getJSONUnmarshaller(u).unmarshalJAXBElementFromJSON(entityStream, type);
     }
     
     protected final void writeTo(JAXBElement<?> t, MediaType mediaType, Charset c,
             Marshaller m, OutputStream entityStream)
             throws JAXBException, IOException {
-        if (m instanceof JSONMarshaller) {
-            JSONMarshaller jm = (JSONMarshaller) m;
-            jm.setJsonEnabled(true);
-            jm.marshal(t,
-                    new OutputStreamWriter(entityStream, c));
-        } else {
-            m.marshal(t, JsonXmlStreamWriter.createWriter(
-                    new OutputStreamWriter(entityStream, c), true));
-        }
+
+        JSONJAXBContext.getJSONMarshaller(m).
+                marshallToJSON(t, new OutputStreamWriter(entityStream, c));
     }
 }

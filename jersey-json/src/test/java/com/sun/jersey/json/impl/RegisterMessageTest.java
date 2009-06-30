@@ -39,6 +39,8 @@ package com.sun.jersey.json.impl;
 
 import com.sun.jersey.api.json.JSONConfiguration;
 import com.sun.jersey.api.json.JSONJAXBContext;
+import com.sun.jersey.api.json.JSONMarshaller;
+import com.sun.jersey.api.json.JSONUnmarshaller;
 import java.io.StringReader;
 import java.io.StringWriter;
 import junit.framework.TestCase;
@@ -51,23 +53,18 @@ public class RegisterMessageTest extends TestCase {
 
     public void testRegisterMessage() throws Exception {
 
-
-        final boolean jsonEnabled = true;
-
         final JSONJAXBContext ctx = new JSONJAXBContext(JSONConfiguration.mapped().rootUnwrapping(false).attributeAsElement("agentUID", "requestTime").nonStrings("requestTime").build(), RegisterMessage.class);
-        final JSONMarshaller jm = (JSONMarshaller) ctx.createMarshaller();
-        final JSONUnmarshaller ju = (JSONUnmarshaller) ctx.createUnmarshaller();
+        final JSONMarshaller jm = ctx.createJSONMarshaller();
+        final JSONUnmarshaller ju = ctx.createJSONUnmarshaller();
         final StringWriter sw = new StringWriter();
 
-        jm.setJsonEnabled(jsonEnabled);
         final RegisterMessage one=(RegisterMessage) RegisterMessage.createTestInstance();
         RegisterMessage two;
-        jm.marshal(one, sw);
+        jm.marshallToJSON(one, sw);
 
         System.out.println(String.format("%s", sw));
 
-        ju.setJsonEnabled(jsonEnabled);
-        two = (RegisterMessage)ju.unmarshal(new StringReader(sw.toString()));
+        two = ju.unmarshalFromJSON(new StringReader(sw.toString()), RegisterMessage.class);
 
         assertEquals(one, two);
     }

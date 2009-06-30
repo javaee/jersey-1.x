@@ -37,18 +37,11 @@
 
 package com.sun.jersey.json.impl;
 
-import com.sun.jersey.api.json.JSONConfigurated;
 import com.sun.jersey.api.json.JSONConfiguration;
-import com.sun.jersey.api.json.JSONJAXBContext;
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.Reader;
 import java.net.URL;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
@@ -67,123 +60,54 @@ import org.xml.sax.InputSource;
 
 /**
  *
- * @author japod
+ * @author Jakub.Podlesak@Sun.COM
  */
-public class JSONUnmarshaller implements Unmarshaller, JSONConfigurated {
+public class JSONUnmarshallerImpl extends BaseJSONUnmarshaller implements Unmarshaller {
 
-    private Unmarshaller jaxbUnmarshaller;
-    private final JSONConfiguration jsonConfig;
-    private boolean jsonEnabled;
-
-    public JSONUnmarshaller(JAXBContext jaxbContext, JSONConfiguration jsonConfig) throws JAXBException {
-        this.jsonConfig = jsonConfig;
-        this.jaxbUnmarshaller = jaxbContext.createUnmarshaller();
+    public JSONUnmarshallerImpl(JAXBContext jaxbContext, JSONConfiguration jsonConfig) throws JAXBException {
+        super (jaxbContext, jsonConfig);
     }
-    
-    public Object unmarshal(InputStream inputStream, Class<Object> type) throws JAXBException {
-        if (jsonEnabled) {
-            if (null != type) {
-                return this.jaxbUnmarshaller.unmarshal(
-                    createXmlStreamReader(new InputStreamReader(inputStream)), type);
-            } else {
-                return this.jaxbUnmarshaller.unmarshal(
-                    createXmlStreamReader(new InputStreamReader(inputStream)));                
-            }
-        } else {
-            return this.jaxbUnmarshaller.unmarshal(inputStream);
-        }
-    }
-
-    public Object unmarshal(Reader reader, Class<Object> type) throws JAXBException {
-        if (jsonEnabled) {
-            if (null != type) {
-                return this.jaxbUnmarshaller.unmarshal(createXmlStreamReader(reader), type);
-            } else {
-                return this.jaxbUnmarshaller.unmarshal(createXmlStreamReader(reader));
-            }
-        } else {
-            return this.jaxbUnmarshaller.unmarshal(reader);
-        }
-    }
-
     
     // Unmarshaller
     
     public Object unmarshal(File file) throws JAXBException {
-        if (jsonEnabled) {
-            try {
-                return this.jaxbUnmarshaller.unmarshal(createXmlStreamReader(new FileReader(file)));
-            } catch (FileNotFoundException ex) {
-                Logger.getLogger(JSONUnmarshaller.class.getName()).log(Level.SEVERE, null, ex);
-                throw new JAXBException(ex);
-            }
-        } else {
-            return this.jaxbUnmarshaller.unmarshal(file);
-        }
+        return this.jaxbUnmarshaller.unmarshal(file);
     }
 
     public Object unmarshal(InputStream inputStream) throws JAXBException {
-        return unmarshal(inputStream, null);
+        return this.jaxbUnmarshaller.unmarshal(inputStream);
     }
     
     public Object unmarshal(Reader reader) throws JAXBException {
-        return unmarshal(reader, null);
+        return this.jaxbUnmarshaller.unmarshal(reader);
     }
 
     public Object unmarshal(URL url) throws JAXBException {
-        if (jsonEnabled) {
-            throw new UnsupportedOperationException("Not supported yet.");
-        } else {
-            return this.jaxbUnmarshaller.unmarshal(url);
-        }
+        return this.jaxbUnmarshaller.unmarshal(url);
     }
 
     public Object unmarshal(InputSource inputSource) throws JAXBException {
-        if (jsonEnabled) {
-            throw new UnsupportedOperationException("Not supported yet.");
-        } else {
-            return this.jaxbUnmarshaller.unmarshal(inputSource);
-        }
+        return this.jaxbUnmarshaller.unmarshal(inputSource);
     }
 
     public Object unmarshal(Node node) throws JAXBException {
-        if (jsonEnabled) {
-            throw new UnsupportedOperationException("Not supported yet.");
-        } else {
-            return this.jaxbUnmarshaller.unmarshal(node);
-        }
+        return this.jaxbUnmarshaller.unmarshal(node);
     }
 
     public <T> JAXBElement<T> unmarshal(Node node, Class<T> type) throws JAXBException {
-        if (jsonEnabled) {
-            throw new UnsupportedOperationException("Not supported yet.");
-        } else {
-            return this.jaxbUnmarshaller.unmarshal(node, type);
-        }
+        return this.jaxbUnmarshaller.unmarshal(node, type);
     }
 
     public Object unmarshal(Source source) throws JAXBException {
-        if (jsonEnabled) {
-            throw new UnsupportedOperationException("Not supported yet.");
-        } else {
-            return this.jaxbUnmarshaller.unmarshal(source);
-        }
+        return this.jaxbUnmarshaller.unmarshal(source);
     }
 
     public <T> JAXBElement<T> unmarshal(Source source, Class<T> type) throws JAXBException {
-        if (jsonEnabled) {
-            throw new UnsupportedOperationException("Not supported yet.");
-        } else {
-            return this.jaxbUnmarshaller.unmarshal(source, type);
-        }
+        return this.jaxbUnmarshaller.unmarshal(source, type);
     }
 
     public Object unmarshal(XMLStreamReader xmlStreamReader) throws JAXBException {
-        if (jsonEnabled) {
-            throw new UnsupportedOperationException("Not supported yet.");
-        } else {
-            return this.jaxbUnmarshaller.unmarshal(xmlStreamReader);
-        }
+        return this.jaxbUnmarshaller.unmarshal(xmlStreamReader);
     }
 
     public <T> JAXBElement<T> unmarshal(XMLStreamReader xmlStreamReader, Class<T> type) throws JAXBException {
@@ -191,19 +115,11 @@ public class JSONUnmarshaller implements Unmarshaller, JSONConfigurated {
     }
 
     public Object unmarshal(XMLEventReader xmlEventReader) throws JAXBException {
-        if (jsonEnabled) {
-            throw new UnsupportedOperationException("Not supported yet.");
-        } else {
-            return this.jaxbUnmarshaller.unmarshal(xmlEventReader);
-        }
+        return this.jaxbUnmarshaller.unmarshal(xmlEventReader);
     }
 
     public <T> JAXBElement<T> unmarshal(XMLEventReader xmlEventReader, Class<T> type) throws JAXBException {
-        if (jsonEnabled) {
-            throw new UnsupportedOperationException("Not supported yet.");
-        } else {
-            return this.jaxbUnmarshaller.unmarshal(xmlEventReader, type);
-        }
+        return this.jaxbUnmarshaller.unmarshal(xmlEventReader, type);
     }
 
     public UnmarshallerHandler getUnmarshallerHandler() {
@@ -224,14 +140,6 @@ public class JSONUnmarshaller implements Unmarshaller, JSONConfigurated {
 
     public ValidationEventHandler getEventHandler() throws JAXBException {
         return this.jaxbUnmarshaller.getEventHandler();
-    }
-
-    public boolean isJsonEnabled() {
-        return jsonEnabled;
-    }
-
-    public void setJsonEnabled(boolean jsonEnabled) {
-        this.jsonEnabled = jsonEnabled;
     }
 
     public void setProperty(String key, Object value) throws PropertyException {
@@ -276,13 +184,5 @@ public class JSONUnmarshaller implements Unmarshaller, JSONConfigurated {
 
     public Listener getListener() {
         return this.jaxbUnmarshaller.getListener();
-    }
-    
-    private XMLStreamReader createXmlStreamReader(Reader reader) {
-        return Stax2JsonFactory.createReader(reader, jsonConfig, jsonConfig.isRootUnwrapping() ? "rootElement" : null);
-    }
-
-    public JSONConfiguration getJSONConfiguration() {
-        return jsonConfig;
     }
 }

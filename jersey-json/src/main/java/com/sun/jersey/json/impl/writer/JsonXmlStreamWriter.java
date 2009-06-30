@@ -36,13 +36,16 @@
  */
 package com.sun.jersey.json.impl.writer;
 
+import com.sun.jersey.api.json.JSONConfiguration;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.xml.namespace.NamespaceContext;
@@ -96,7 +99,7 @@ public class JsonXmlStreamWriter implements XMLStreamWriter {
         }
 
         @Override
-        void write( String s) throws IOException {
+        void write(String s) throws IOException {
         }
 
         @Override
@@ -135,38 +138,35 @@ public class JsonXmlStreamWriter implements XMLStreamWriter {
     int depth;
     final Collection<String> arrayElementNames = new LinkedList<String>();
     final Collection<String> nonStringElementNames = new LinkedList<String>();
+    final Map<String, String> xml2JsonNs = new HashMap<String, String>();
 
     private JsonXmlStreamWriter(Writer writer) {
-        this(writer, false, null, null);
+        this(writer, JSONConfiguration.DEFAULT);
     }
 
-    private JsonXmlStreamWriter(Writer writer, boolean stripRoot) {
-        this(writer, stripRoot, null, null);
-    }
-
-    private JsonXmlStreamWriter(Writer writer, boolean stripRoot, Collection<String> arrays, Collection<String> nonStrings) {
+    private JsonXmlStreamWriter(Writer writer, JSONConfiguration config) {
         this.mainWriter = writer;
-        this.stripRoot = stripRoot;
-        if (null != arrays) {
-            this.arrayElementNames.addAll(arrays);
+        this.stripRoot = config.isRootUnwrapping();
+        if (null != config.getArrays()) {
+            this.arrayElementNames.addAll(config.getArrays());
         }
-        if (null != nonStrings) {
-            this.nonStringElementNames.addAll(nonStrings);
+        if (null != config.getNonStrings()) {
+            this.nonStringElementNames.addAll(config.getNonStrings());
+        }
+        if (null != config.getXml2JsonNs()) {
+            this.xml2JsonNs.putAll(config.getXml2JsonNs());
         }
         processingStack.add(createProcessingState());
         depth = 0;
     }
 
-    public static XMLStreamWriter createWriter(Writer writer, boolean stripRoot) {
-        return new JsonXmlStreamWriter(writer, stripRoot);
-    }
-
-    public static XMLStreamWriter createWriter(Writer writer, boolean stripRoot, Collection<String> arrays, Collection<String> nonStrings, Collection<String> attrsAsElems) {
-        if (attrsAsElems != null) {
+    public static XMLStreamWriter createWriter(Writer writer, JSONConfiguration config) {
+        final Collection<String> attrsAsElems = config.getAttributeAsElements();
+        if ((attrsAsElems != null) && !attrsAsElems.isEmpty()) {
             return new A2EXmlStreamWriterProxy(
-                    new JsonXmlStreamWriter(writer, stripRoot, arrays, nonStrings), attrsAsElems);
+                    new JsonXmlStreamWriter(writer, config), attrsAsElems);
         } else {
-            return new JsonXmlStreamWriter(writer, stripRoot, arrays, nonStrings);
+            return new JsonXmlStreamWriter(writer, config);
         }
     }
 
@@ -340,7 +340,7 @@ public class JsonXmlStreamWriter implements XMLStreamWriter {
     }
 
     public void writeStartElement(String namespaceURI, String localName) throws XMLStreamException {
-        writeStartElement(null, localName, null);
+        writeStartElement(null, localName, namespaceURI);
     }
 
     public void writeAttribute(String namespaceURI, String localName, String value) throws XMLStreamException {
@@ -381,9 +381,18 @@ public class JsonXmlStreamWriter implements XMLStreamWriter {
         return nonStringElementNames.contains(name);
     }
 
+    private String getEffectiveName(String namespaceURI, String localName) {
+        if ((namespaceURI != null) && xml2JsonNs.containsKey(namespaceURI)) {
+            return String.format("%s.%s", xml2JsonNs.get(namespaceURI), localName);
+        } else {
+            return localName;
+        }
+    }
+
     public void writeStartElement(String prefix, String localName, String namespaceURI) throws XMLStreamException {
+        String effectiveName = getEffectiveName(namespaceURI, localName);
         processingStack.get(depth).isNotEmpty = true;
-        processingStack.get(depth).currentName = localName;
+        processingStack.get(depth).currentName = effectiveName;
         try {
             boolean isNextArrayElement = processingStack.get(depth).currentName.equals(processingStack.get(depth).lastName);
             if (!isNextArrayElement) {
@@ -416,7 +425,7 @@ public class JsonXmlStreamWriter implements XMLStreamWriter {
                 if (null == processingStack.get(depth).lastWasPrimitive) {
                     processingStack.get(depth).writer.write("{"); // first sub-element
                 }
-                processingStack.get(depth).writer.write("\"" + localName + "\":");
+                processingStack.get(depth).writer.write("\"" + effectiveName + "\":");
             } else { // next array element
                 processingStack.get(depth).writer.write(processingStack.get(depth).lastIsArray ? "," : "[");  // next element at the same level
                 processingStack.get(depth).lastIsArray = true;
@@ -432,7 +441,7 @@ public class JsonXmlStreamWriter implements XMLStreamWriter {
     }
 
     public void writeAttribute(String prefix, String namespaceURI, String localName, String value) throws XMLStreamException {
-        writeStartElement(prefix, "@" + localName, namespaceURI);
+        writeStartElement(prefix, "@" + getEffectiveName(namespaceURI, localName), null);
         writeCharacters(value);
         writeEndElement();
     }

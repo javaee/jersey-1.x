@@ -37,8 +37,10 @@
 
 package com.sun.jersey.api.json;
 
-import com.sun.jersey.json.impl.JSONMarshaller;
-import com.sun.jersey.json.impl.JSONUnmarshaller;
+import com.sun.jersey.json.impl.BaseJSONMarshaller;
+import com.sun.jersey.json.impl.BaseJSONUnmarshaller;
+import com.sun.jersey.json.impl.JSONMarshallerImpl;
+import com.sun.jersey.json.impl.JSONUnmarshallerImpl;
 import com.sun.xml.bind.v2.runtime.JAXBContextImpl;
 import java.util.Collection;
 import java.util.Collections;
@@ -59,7 +61,8 @@ import javax.xml.bind.Validator;
  * as a constructor parameter of this class.
  */
 public final class JSONJAXBContext extends JAXBContext implements JSONConfigurated {
-    
+
+   
     /**
      * A namespace for JSONJAXBContext related properties names.
      */
@@ -416,10 +419,36 @@ public final class JSONJAXBContext extends JAXBContext implements JSONConfigurat
         jsonConfiguration = config;
     }
 
+    public static JSONMarshaller getJSONMarshaller(Marshaller marshaller) throws JAXBException {
+        if (marshaller instanceof JSONMarshaller) {
+            return (JSONMarshaller)marshaller;
+        } else {
+            return new BaseJSONMarshaller(marshaller, JSONConfiguration.DEFAULT);
+        }
+
+    }
+
+    public static JSONUnmarshaller getJSONUnmarshaller(Unmarshaller unmarshaller) throws JAXBException {
+        if (unmarshaller instanceof JSONUnmarshaller) {
+            return (JSONUnmarshaller)unmarshaller;
+        } else {
+            return new BaseJSONUnmarshaller(unmarshaller, JSONConfiguration.DEFAULT);
+        }
+
+    }
+
     public JSONConfiguration getJSONConfiguration() {
         return jsonConfiguration;
     }
-    
+
+     public JSONUnmarshaller createJSONUnmarshaller() throws JAXBException {
+         return new JSONUnmarshallerImpl(this, getJSONConfiguration());
+     }
+
+     public JSONMarshaller createJSONMarshaller() throws JAXBException {
+         return new JSONMarshallerImpl(this, getJSONConfiguration());
+     }
+
     private Map<String, Object> createProperties(Map<String, Object> properties) {
         Map<String, Object> workProperties = new HashMap<String, Object>();
         workProperties.putAll(defaultJsonProperties);
@@ -440,7 +469,7 @@ public final class JSONJAXBContext extends JAXBContext implements JSONConfigurat
      */
     @Override
     public Unmarshaller createUnmarshaller() throws JAXBException {
-        return new JSONUnmarshaller(jaxbContext, getJSONConfiguration());
+        return new JSONUnmarshallerImpl(jaxbContext, getJSONConfiguration());
     }
 
     /**
@@ -452,7 +481,7 @@ public final class JSONJAXBContext extends JAXBContext implements JSONConfigurat
      */
     @Override
     public Marshaller createMarshaller() throws JAXBException {
-        return new JSONMarshaller(jaxbContext, getJSONConfiguration());
+        return new JSONMarshallerImpl(jaxbContext, getJSONConfiguration());
     }
 
     /**

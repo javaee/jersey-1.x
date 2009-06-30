@@ -38,6 +38,8 @@ package com.sun.jersey.json.impl;
 
 import com.sun.jersey.api.json.JSONConfiguration;
 import com.sun.jersey.api.json.JSONJAXBContext;
+import com.sun.jersey.api.json.JSONMarshaller;
+import com.sun.jersey.api.json.JSONUnmarshaller;
 import java.io.Reader;
 import java.io.StringReader;
 import java.io.StringWriter;
@@ -50,11 +52,12 @@ import java.util.Map;
 import java.util.StringTokenizer;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.Marshaller;
+import javax.xml.transform.stream.StreamSource;
 import junit.framework.TestCase;
 
 /**
  *
- * @author japod
+ * @author Jakub.Podlesak@Sun.COM
  */
 public class JSONJAXBRoudtripTest extends TestCase {
     
@@ -152,11 +155,8 @@ public class JSONJAXBRoudtripTest extends TestCase {
 //    }
     
     public synchronized void allBeansTest(JSONJAXBContext context, Collection<Object> beans) throws Exception {
-        JSONMarshaller marshaller = (JSONMarshaller)context.createMarshaller();
-        marshaller.setJsonEnabled(true);
-        marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
-        JSONUnmarshaller unmarshaller = (JSONUnmarshaller)context.createUnmarshaller();
-        unmarshaller.setJsonEnabled(true);
+        JSONMarshaller marshaller = context.createJSONMarshaller();
+        JSONUnmarshaller unmarshaller = context.createJSONUnmarshaller();
         for (Object originalBean : beans) {
 //            System.out.println("Checking " + originalBean.toString());
 //            JAXBContext ctx = JAXBContext.newInstance(originalBean.getClass());
@@ -164,17 +164,16 @@ public class JSONJAXBRoudtripTest extends TestCase {
 //            m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
 //            m.marshal(originalBean, System.out);
             StringWriter sWriter = new StringWriter();
-            marshaller.marshal(originalBean, sWriter);
+            marshaller.marshallToJSON(originalBean, sWriter);
             System.out.println(sWriter.toString());
             assertEquals(originalBean, unmarshall(unmarshaller, originalBean.getClass(), new StringReader(sWriter.toString())));
 //            System.out.println("OK");
         }
     }
 
-    @SuppressWarnings("unchecked")
-    private Object unmarshall(JSONUnmarshaller unmarshaller, Class type, Reader r) throws Exception {
+    private <T> T unmarshall(JSONUnmarshaller unmarshaller, Class<T> type, Reader r) throws Exception {
         assert null != unmarshaller;
-        JAXBElement jaxbElem = (JAXBElement)unmarshaller.unmarshal(r, type);
+        JAXBElement<T> jaxbElem  = unmarshaller.unmarshalJAXBElementFromJSON(r, type);
         return jaxbElem.getValue();
     }
     

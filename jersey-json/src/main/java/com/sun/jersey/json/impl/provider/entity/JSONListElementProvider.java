@@ -39,6 +39,7 @@ package com.sun.jersey.json.impl.provider.entity;
 
 import com.sun.jersey.api.json.JSONConfigurated;
 import com.sun.jersey.api.json.JSONConfiguration;
+import com.sun.jersey.api.json.JSONMarshaller;
 import com.sun.jersey.core.provider.jaxb.AbstractListElementProvider;
 import com.sun.jersey.json.impl.JSONHelper;
 import com.sun.jersey.json.impl.Stax2JsonFactory;
@@ -65,7 +66,7 @@ import javax.xml.stream.XMLStreamWriter;
 
 /**
  *
- * @author japod
+ * @author Jakub.Podlesak@Sun.COM
  */
 public class JSONListElementProvider extends AbstractListElementProvider {
 

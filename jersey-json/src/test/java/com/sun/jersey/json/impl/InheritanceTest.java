@@ -38,11 +38,12 @@ package com.sun.jersey.json.impl;
 
 import com.sun.jersey.api.json.JSONConfiguration;
 import com.sun.jersey.api.json.JSONJAXBContext;
+import com.sun.jersey.api.json.JSONMarshaller;
+import com.sun.jersey.api.json.JSONUnmarshaller;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.util.HashMap;
 import java.util.Map;
-import javax.xml.bind.JAXBElement;
 import junit.framework.TestCase;
 
 /**
@@ -51,15 +52,16 @@ import junit.framework.TestCase;
  */
 public class InheritanceTest extends TestCase {
 
-    final boolean jsonEnabled = true;
     final AnimalList one = (AnimalList) AnimalList.createTestInstance();
 
     public void testBadgerfish() throws Exception {
+        System.out.println("\nTesting BadgerFish: ------------------------");
         tryListWithConfiguration(JSONConfiguration.badgerFish().build());
         tryIndividualsWithConfiguration(JSONConfiguration.badgerFish().build());
     }
 
     public void testMappedJettison() throws Exception {
+        System.out.println("\nTesting Mapped Jettison: ---------------------");
         Map<String, String> ns2json = new HashMap<String, String>();
         ns2json.put("http://www.w3.org/2001/XMLSchema-instance", "xsi");
         tryListWithConfiguration(JSONConfiguration.mappedJettison().xml2JsonNs(ns2json).build());
@@ -67,40 +69,36 @@ public class InheritanceTest extends TestCase {
     }
 
     public void testNatural() throws Exception {
+        System.out.println("\nTesting Natural: -------------------------");
         // TODO: a patch applied at jaxb trunk to add a new utility method on UnmarshallingContext
         //            after this gets tested and make it to a release of jaxb, we can uncomment appropriate
         //            stuff on Jersey side, and the following should work
         //tryListWithConfiguration(JSONConfiguration.natural().build());
-        tryIndividualsWithConfiguration(JSONConfiguration.natural().build());
+        tryIndividualsWithConfiguration(JSONConfiguration.natural().rootUnwrapping(false).build());
     }
 
     public void testMapped() throws Exception {
+        System.out.println("\nTesting Mapped: -------------------------");
         // TODO: fix this
-        //tryListWithConfiguration(JSONConfiguration.mapped().build());
-        tryIndividualsWithConfiguration(JSONConfiguration.mapped().build());
+        Map<String, String> ns2json = new HashMap<String, String>();
+        ns2json.put("http://www.w3.org/2001/XMLSchema-instance", "xsi");
+        tryListWithConfiguration(JSONConfiguration.mapped().xml2JsonNs(ns2json).build());
+        tryIndividualsWithConfiguration(JSONConfiguration.mapped().rootUnwrapping(false).build());
     }
 
     private void tryListWithConfiguration(JSONConfiguration configuration) throws Exception {
 
         final JSONJAXBContext ctx = new JSONJAXBContext(configuration, AnimalList.class, Animal.class, Dog.class, Cat.class);
-        final JSONMarshaller jm = (JSONMarshaller) ctx.createMarshaller();
-        final JSONUnmarshaller ju = (JSONUnmarshaller) ctx.createUnmarshaller();
+        final JSONMarshaller jm = ctx.createJSONMarshaller();
+        final JSONUnmarshaller ju = ctx.createJSONUnmarshaller();
         final StringWriter sw = new StringWriter();
 
-        jm.setJsonEnabled(jsonEnabled);
         AnimalList two;
-        jm.marshal(one, sw);
+        jm.marshallToJSON(one, sw);
 
-        System.out.println(String.format("%s", sw));
+        System.out.println(String.format("Marshalled: %s", sw));
 
-        ju.setJsonEnabled(jsonEnabled);
-
-        if (configuration.isRootUnwrapping()) {
-            final JAXBElement e = (JAXBElement) ju.unmarshal(new StringReader(sw.toString()), (Class) one.getClass());
-            two = (AnimalList) e.getValue();
-        } else {
-            two = (AnimalList) ju.unmarshal(new StringReader(sw.toString()));
-        }
+        two = ju.unmarshalFromJSON(new StringReader(sw.toString()), AnimalList.class);
 
         assertEquals(one, two);
         for (int i = 0; i < one.animals.size(); i++) {
@@ -111,12 +109,9 @@ public class InheritanceTest extends TestCase {
     private void tryIndividualsWithConfiguration(JSONConfiguration configuration) throws Exception {
 
         final JSONJAXBContext ctx = new JSONJAXBContext(configuration, AnimalList.class, Animal.class, Dog.class, Cat.class);
-        final JSONMarshaller jm = (JSONMarshaller) ctx.createMarshaller();
-        final JSONUnmarshaller ju = (JSONUnmarshaller) ctx.createUnmarshaller();
+        final JSONMarshaller jm = ctx.createJSONMarshaller();
+        final JSONUnmarshaller ju = ctx.createJSONUnmarshaller();
 
-
-        jm.setJsonEnabled(jsonEnabled);
-        ju.setJsonEnabled(jsonEnabled);
 
         Animal animalTwo;
 
@@ -125,17 +120,11 @@ public class InheritanceTest extends TestCase {
             final StringWriter sw = new StringWriter();
             Animal animalOne = one.animals.get(i);
 
-            jm.marshal(animalOne, sw);
+            jm.marshallToJSON(animalOne, sw);
 
-            System.out.println(String.format("%s", sw));
+            System.out.println(String.format("Marshalled: %s", sw));
 
-
-            if (configuration.isRootUnwrapping()) {
-                final JAXBElement e = (JAXBElement) ju.unmarshal(new StringReader(sw.toString()), (Class) animalOne.getClass());
-                animalTwo = (Animal) e.getValue();
-            } else {
-                animalTwo = (Animal) ju.unmarshal(new StringReader(sw.toString()));
-            }
+            animalTwo = ju.unmarshalFromJSON(new StringReader(sw.toString()), Animal.class);
 
             assertEquals(animalOne, animalTwo);
             System.out.println(String.format("class one = %s; class two = %s", animalOne.getClass(), animalTwo.getClass()));

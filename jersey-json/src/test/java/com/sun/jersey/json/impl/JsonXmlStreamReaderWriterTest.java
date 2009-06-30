@@ -36,6 +36,8 @@
  */
 package com.sun.jersey.json.impl;
 
+import com.sun.jersey.api.json.JSONConfiguration;
+import com.sun.jersey.api.json.JSONConfiguration.MappedBuilder;
 import com.sun.jersey.json.impl.writer.JsonXmlStreamWriter;
 import com.sun.jersey.json.impl.reader.JsonXmlStreamReader;
 import java.io.IOException;
@@ -212,26 +214,37 @@ public class JsonXmlStreamReaderWriterTest extends TestCase {
         addStringsToCollection(arrays, arrayElements);
         addStringsToCollection(nonStrings, nonStringElements);
         addStringsToCollection(attrAsElems, attrAsElements);
-        tryWritingBean(jaxbBean, filename, stripRoot, arrayElements, nonStringElements, attrAsElements);
-        tryReadingBean(filename, jaxbBean, stripRoot, arrayElements, nonStringElements, attrAsElements);
+        final MappedBuilder configBuilder = JSONConfiguration.mapped().rootUnwrapping(stripRoot);
+        for (String array : arrayElements) {
+            configBuilder.arrays(array);
+        }
+        for (String nonString : nonStringElements) {
+            configBuilder.nonStrings(nonString);
+        }
+        for (String attrAsElem : attrAsElements) {
+            configBuilder.attributeAsElement(attrAsElem);
+        }
+        JSONConfiguration config = configBuilder.build();
+        tryWritingBean(jaxbBean, filename, config);
+        tryReadingBean(filename, jaxbBean, config);
     }
 
     public void tryWritingBean(Object jaxbBean, String expectedJsonExprFilename, 
-            boolean stripRoot, Collection<String> arrays, Collection<String> nonStrings, Collection<String> attrAsElements) throws JAXBException, IOException {
+            JSONConfiguration config) throws JAXBException, IOException {
         String expectedJsonExpr = ResourceHelper.getResourceAsString(PKG_NAME, expectedJsonExprFilename);
         Marshaller marshaller = jaxbContext.createMarshaller();
         StringWriter resultWriter = new StringWriter();
-        marshaller.marshal(jaxbBean, JsonXmlStreamWriter.createWriter(resultWriter, stripRoot, arrays, nonStrings, attrAsElements));
+        marshaller.marshal(jaxbBean, JsonXmlStreamWriter.createWriter(resultWriter, config));
         assertEquals("MISMATCH:\n" + expectedJsonExpr + "\n" + resultWriter.toString() + "\n", 
                 expectedJsonExpr, resultWriter.toString());
     }
 
     public void tryReadingBean(String jsonExprFilename, Object expectedJaxbBean, 
-            boolean stripRoot, Collection<String> arrays, Collection<String> nonStrings, Collection<String> attrAsElements) throws JAXBException, IOException {
+            JSONConfiguration config) throws JAXBException, IOException {
         Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
         JAXBElement jaxbElement = unmarshaller.unmarshal(
                 new JsonXmlStreamReader(
-                    new StringReader(ResourceHelper.getResourceAsString(PKG_NAME, jsonExprFilename)), stripRoot, attrAsElements),
+                    new StringReader(ResourceHelper.getResourceAsString(PKG_NAME, jsonExprFilename)), config),
                 expectedJaxbBean.getClass());
         System.out.println("unmarshalled: " + jaxbElement.getValue().toString());
         assertEquals("MISMATCH:\n" + expectedJaxbBean + "\n" + jaxbElement.getValue() + "\n", 

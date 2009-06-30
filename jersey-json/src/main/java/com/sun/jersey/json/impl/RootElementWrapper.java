@@ -34,35 +34,35 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-
 package com.sun.jersey.json.impl;
 
-import com.sun.jersey.api.json.JSONJAXBContext;
-import com.sun.jersey.api.json.JSONMarshaller;
-import com.sun.jersey.api.json.JSONUnmarshaller;
-import java.io.StringReader;
-import java.io.StringWriter;
-import javax.xml.bind.JAXBElement;
-import javax.xml.namespace.QName;
-import junit.framework.TestCase;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.SequenceInputStream;
+import java.io.UnsupportedEncodingException;
 
 /**
  *
  * @author Jakub.Podlesak@Sun.COM
  */
-public class XmlTypeTest extends TestCase {
+public class RootElementWrapper {
 
-    public void testSimpleXmlTypeBean() throws Exception {
-        
-        final JSONJAXBContext ctx = new JSONJAXBContext(SimpleXmlTypeBean.class);
-        final JSONMarshaller jm = ctx.createJSONMarshaller();
-        final JSONUnmarshaller ju = ctx.createJSONUnmarshaller();
-        final StringWriter sw = new StringWriter();
+    public static InputStream wrapInput(InputStream inputStream, String rootName) throws UnsupportedEncodingException {
+        SequenceInputStream sis = new SequenceInputStream(new ByteArrayInputStream(String.format("{\"%s\":", rootName).getBytes("UTF-8")), inputStream);
+        return new SequenceInputStream(sis, new ByteArrayInputStream("}".getBytes("UTF-8")));
+    }
 
-        final SimpleXmlTypeBean one=(SimpleXmlTypeBean) SimpleXmlTypeBean.createTestInstance();
-        SimpleXmlTypeBean two;
-        jm.marshallToJSON(new JAXBElement<SimpleXmlTypeBean>(new QName("test"), SimpleXmlTypeBean.class, one), sw);
-        two = ju.unmarshalFromJSON(new StringReader(sw.toString()), SimpleXmlTypeBean.class);
-        assertEquals(one, two);
+    public static InputStream unwrapInput(InputStream inputStream) throws IOException {
+        return new JsonRootEatingInputStreamFilter(inputStream);
+    }
+
+    public static OutputStream unwrapOutput(OutputStream outputStream) throws IOException {
+        throw new UnsupportedOperationException("to be implemented yet");
+    }
+
+    public static OutputStream wrapOutput(OutputStream outputStream) throws IOException {
+        throw new UnsupportedOperationException("to be implemented yet");
     }
 }

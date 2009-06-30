@@ -35,34 +35,53 @@
  * holder.
  */
 
-package com.sun.jersey.json.impl;
+package com.sun.jersey.impl.json;
 
-import com.sun.jersey.api.json.JSONJAXBContext;
-import com.sun.jersey.api.json.JSONMarshaller;
-import com.sun.jersey.api.json.JSONUnmarshaller;
-import java.io.StringReader;
-import java.io.StringWriter;
-import javax.xml.bind.JAXBElement;
-import javax.xml.namespace.QName;
-import junit.framework.TestCase;
+import java.util.LinkedList;
+import java.util.List;
+import javax.xml.bind.annotation.XmlRootElement;
 
 /**
  *
- * @author Jakub.Podlesak@Sun.COM
+ * @author japod
  */
-public class XmlTypeTest extends TestCase {
+@XmlRootElement(name="animalList")
+public class AnimalList {
+    public List<Animal> animals;
 
-    public void testSimpleXmlTypeBean() throws Exception {
-        
-        final JSONJAXBContext ctx = new JSONJAXBContext(SimpleXmlTypeBean.class);
-        final JSONMarshaller jm = ctx.createJSONMarshaller();
-        final JSONUnmarshaller ju = ctx.createJSONUnmarshaller();
-        final StringWriter sw = new StringWriter();
-
-        final SimpleXmlTypeBean one=(SimpleXmlTypeBean) SimpleXmlTypeBean.createTestInstance();
-        SimpleXmlTypeBean two;
-        jm.marshallToJSON(new JAXBElement<SimpleXmlTypeBean>(new QName("test"), SimpleXmlTypeBean.class, one), sw);
-        two = ju.unmarshalFromJSON(new StringReader(sw.toString()), SimpleXmlTypeBean.class);
-        assertEquals(one, two);
+    public static Object createTestInstance() {
+        AnimalList aList = new AnimalList();
+        aList.animals = new LinkedList<Animal>();
+        aList.animals.add(new Dog("Fifi"));
+        aList.animals.add(new Cat("Daisy"));
+        return aList;
     }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final AnimalList other = (AnimalList) obj;
+        if (this.animals != other.animals && (this.animals == null || !this.animals.equals(other.animals))) {
+            return false;
+        }
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 3;
+        hash = 89 * hash + (this.animals != null ? this.animals.hashCode() : 0);
+        return hash;
+    }
+    
+    @Override
+    public String toString() {
+        return (animals != null) ? animals.toString() : null;
+    }
+
 }

@@ -49,6 +49,8 @@ import java.util.logging.Logger;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 import org.codehaus.jackson.JsonFactory;
+import org.codehaus.jackson.JsonGenerator;
+import org.codehaus.jackson.JsonParser;
 import org.codehaus.jettison.badgerfish.BadgerFishXMLStreamReader;
 import org.codehaus.jettison.badgerfish.BadgerFishXMLStreamWriter;
 import org.codehaus.jettison.json.JSONObject;
@@ -74,13 +76,15 @@ public class Stax2JsonFactory {
     public static XMLStreamWriter createWriter(Writer writer, JSONConfiguration config, boolean writingList) throws IOException {
         switch (config.getNotation()) {
             case NATURAL:
-                if (writingList) {
-                    return new Stax2JacksonWriter(JacksonRootStrippingGenerator.createRootStrippingGenerator(JacksonArrayWrapperGenerator.createArrayWrapperGenerator(new JsonFactory().createJsonGenerator(writer))));
+                final JsonGenerator rawGenerator = new JsonFactory().createJsonGenerator(writer);
+                final JsonGenerator bodyGenerator = writingList ? JacksonArrayWrapperGenerator.createArrayWrapperGenerator(rawGenerator) : rawGenerator;
+                if (config.isRootUnwrapping()) {
+                    return new Stax2JacksonWriter(JacksonRootStrippingGenerator.createRootStrippingGenerator(bodyGenerator));
                 } else {
-                    return new Stax2JacksonWriter(JacksonRootStrippingGenerator.createRootStrippingGenerator(new JsonFactory().createJsonGenerator(writer)));
+                    return new Stax2JacksonWriter(bodyGenerator);
                 }
             case MAPPED:
-                return JsonXmlStreamWriter.createWriter(writer, config.isRootUnwrapping(), config.getArrays(), config.getNonStrings(), config.getAttributeAsElements());
+                return JsonXmlStreamWriter.createWriter(writer, config);
             case BADGERFISH:
                 return new BadgerFishXMLStreamWriter(writer);
             case MAPPED_JETTISON:
@@ -90,8 +94,7 @@ public class Stax2JsonFactory {
                 } else {
                     jmConfig = new Configuration(config.getXml2JsonNs());
                 }
-                return new MappedXMLStreamWriter(
-                        new MappedNamespaceConvention(jmConfig), writer);
+                return new MappedXMLStreamWriter(new MappedNamespaceConvention(jmConfig), writer);
             default:
                 return null;
         }
@@ -100,29 +103,27 @@ public class Stax2JsonFactory {
     public static XMLStreamReader createReader(Reader reader, JSONConfiguration config, String rootName) {
         return createReader(reader, config, rootName, false);
     }
-        
+
     public static XMLStreamReader createReader(Reader reader, JSONConfiguration config, String rootName, boolean readingList) {
         switch (config.getNotation()) {
             case NATURAL:
                 try {
-                   if(!readingList) {
-                        return new Jackson2StaxReader(JacksonRootAddingParser.createRootAddingParser(new JsonFactory().createJsonParser(reader), rootName));
+                    final JsonParser rawParser = new JsonFactory().createJsonParser(reader);
+                    final JsonParser nonListParser = config.isRootUnwrapping() ? JacksonRootAddingParser.createRootAddingParser(rawParser, rootName) : rawParser;
+                    if (!readingList) {
+                        return new Jackson2StaxReader(nonListParser);
                     } else {
-                        return new Jackson2StaxReader(
-                                JacksonRootAddingParser.createRootAddingParser(
-                                JacksonRootAddingParser.createRootAddingParser(new JsonFactory().createJsonParser(reader), rootName)
-                                , "whatever")
-                                );
+                        return new Jackson2StaxReader(JacksonRootAddingParser.createRootAddingParser(nonListParser, "jsonArrayRootElement"));
                     }
                 } catch (Exception ex) {
-                    Logger.getLogger(JSONUnmarshaller.class.getName()).log(Level.SEVERE, null, ex);
+                    Logger.getLogger(JSONUnmarshallerImpl.class.getName()).log(Level.SEVERE, null, ex);
                 }
                 break;
             case MAPPED:
                 try {
-                    return new JsonXmlStreamReader(reader, rootName, config.getAttributeAsElements());
+                    return new JsonXmlStreamReader(reader, rootName, config);
                 } catch (IOException ex) {
-                    Logger.getLogger(JSONUnmarshaller.class.getName()).log(Level.SEVERE, null, ex);
+                    Logger.getLogger(JSONUnmarshallerImpl.class.getName()).log(Level.SEVERE, null, ex);
                 }
                 break;
             case MAPPED_JETTISON:
@@ -137,14 +138,14 @@ public class Stax2JsonFactory {
                             new JSONObject(new JSONTokener(readFromAsString(reader))),
                             new MappedNamespaceConvention(jmConfig));
                 } catch (Exception ex) {
-                    Logger.getLogger(JSONUnmarshaller.class.getName()).log(Level.SEVERE, null, ex);
+                    Logger.getLogger(JSONUnmarshallerImpl.class.getName()).log(Level.SEVERE, null, ex);
                 }
                 break;
             case BADGERFISH:
                 try {
                     return new BadgerFishXMLStreamReader(new JSONObject(new JSONTokener(readFromAsString(reader))));
                 } catch (Exception ex) {
-                    Logger.getLogger(JSONUnmarshaller.class.getName()).log(Level.SEVERE, null, ex);
+                    Logger.getLogger(JSONUnmarshallerImpl.class.getName()).log(Level.SEVERE, null, ex);
                 }
                 break;
         }

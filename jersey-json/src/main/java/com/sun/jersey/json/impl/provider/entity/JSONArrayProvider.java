@@ -57,7 +57,7 @@ import org.codehaus.jettison.json.JSONException;
  *
  * @author japod
  */
-public class JSONArrayProvider extends JSONProvider<JSONArray>{
+public class JSONArrayProvider extends JSONLowLevelProvider<JSONArray>{
 
     @Produces("application/json")
     @Consumes("application/json")

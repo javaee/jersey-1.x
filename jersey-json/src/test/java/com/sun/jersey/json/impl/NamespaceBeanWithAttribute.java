@@ -35,34 +35,77 @@
  * holder.
  */
 
+
 package com.sun.jersey.json.impl;
 
-import com.sun.jersey.api.json.JSONJAXBContext;
-import com.sun.jersey.api.json.JSONMarshaller;
-import com.sun.jersey.api.json.JSONUnmarshaller;
-import java.io.StringReader;
-import java.io.StringWriter;
-import javax.xml.bind.JAXBElement;
-import javax.xml.namespace.QName;
-import junit.framework.TestCase;
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
 
 /**
  *
- * @author Jakub.Podlesak@Sun.COM
+ * @author japod
  */
-public class XmlTypeTest extends TestCase {
 
-    public void testSimpleXmlTypeBean() throws Exception {
-        
-        final JSONJAXBContext ctx = new JSONJAXBContext(SimpleXmlTypeBean.class);
-        final JSONMarshaller jm = ctx.createJSONMarshaller();
-        final JSONUnmarshaller ju = ctx.createJSONUnmarshaller();
-        final StringWriter sw = new StringWriter();
+@XmlRootElement
+public class NamespaceBeanWithAttribute {
 
-        final SimpleXmlTypeBean one=(SimpleXmlTypeBean) SimpleXmlTypeBean.createTestInstance();
-        SimpleXmlTypeBean two;
-        jm.marshallToJSON(new JAXBElement<SimpleXmlTypeBean>(new QName("test"), SimpleXmlTypeBean.class, one), sw);
-        two = ju.unmarshalFromJSON(new StringReader(sw.toString()), SimpleXmlTypeBean.class);
-        assertEquals(one, two);
+    @XmlAttribute(namespace="http://example.com")
+    public String attr;
+
+    @XmlElement
+    public String a;
+
+    @XmlElement(namespace="http://example.com")
+    public String b;
+
+    public NamespaceBeanWithAttribute() {};
+
+    public NamespaceBeanWithAttribute(String attr, String a, String b) {
+        this.attr = attr;
+        this.a = a;
+        this.b = b;
     }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final NamespaceBeanWithAttribute other = (NamespaceBeanWithAttribute) obj;
+        if ((this.attr == null) ? (other.attr != null) : !this.attr.equals(other.attr)) {
+            return false;
+        }
+        if ((this.a == null) ? (other.a != null) : !this.a.equals(other.a)) {
+            return false;
+        }
+        if ((this.b == null) ? (other.b != null) : !this.b.equals(other.b)) {
+            return false;
+        }
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 7;
+        hash = 37 * hash + (this.attr != null ? this.attr.hashCode() : 0);
+        hash = 37 * hash + (this.a != null ? this.a.hashCode() : 0);
+        hash = 37 * hash + (this.b != null ? this.b.hashCode() : 0);
+        return hash;
+    }
+
+
+
+    public static Object createTestInstance() {
+        return new NamespaceBeanWithAttribute("value", "foo", "bar");
+    }
+
+    @Override
+    public String toString() {
+        return String.format("{attr:%s, a:%s, b:%s", attr, a, b);
+    }
+
 }

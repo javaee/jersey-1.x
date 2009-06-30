@@ -37,32 +37,50 @@
 
 package com.sun.jersey.json.impl;
 
-import com.sun.jersey.api.json.JSONJAXBContext;
-import com.sun.jersey.api.json.JSONMarshaller;
-import com.sun.jersey.api.json.JSONUnmarshaller;
-import java.io.StringReader;
-import java.io.StringWriter;
-import javax.xml.bind.JAXBElement;
-import javax.xml.namespace.QName;
-import junit.framework.TestCase;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.util.LinkedList;
+import java.util.Queue;
 
 /**
  *
  * @author Jakub.Podlesak@Sun.COM
  */
-public class XmlTypeTest extends TestCase {
+public class BufferingInputOutputStream extends OutputStream {
 
-    public void testSimpleXmlTypeBean() throws Exception {
-        
-        final JSONJAXBContext ctx = new JSONJAXBContext(SimpleXmlTypeBean.class);
-        final JSONMarshaller jm = ctx.createJSONMarshaller();
-        final JSONUnmarshaller ju = ctx.createJSONUnmarshaller();
-        final StringWriter sw = new StringWriter();
+    private final Queue<byte[]> buffers = new LinkedList<byte[]>();
 
-        final SimpleXmlTypeBean one=(SimpleXmlTypeBean) SimpleXmlTypeBean.createTestInstance();
-        SimpleXmlTypeBean two;
-        jm.marshallToJSON(new JAXBElement<SimpleXmlTypeBean>(new QName("test"), SimpleXmlTypeBean.class, one), sw);
-        two = ju.unmarshalFromJSON(new StringReader(sw.toString()), SimpleXmlTypeBean.class);
-        assertEquals(one, two);
+    @Override
+    public void write(int b) throws IOException {
+        byte[] buffer = new byte[1];
+        buffer[0] = (byte) b;
+        buffers.add(buffer);
     }
+
+    @Override
+    public void write(byte[] b) throws IOException {
+        buffers.add(b);
+    }
+
+    @Override
+    public void write(byte[] b, int off, int len) throws IOException {
+        if (len > 0) {
+            byte[] buffer = new byte[len];
+            System.arraycopy(b, off, buffer, 0, len);
+            buffers.add(buffer);
+        }
+    }
+
+    public byte[] nextBytes() {
+        return buffers.poll();
+    }
+
+    public int available() {
+        if (buffers.isEmpty()) {
+            return 0;
+        } else {
+            return buffers.peek().length;
+        }
+    }
+
 }

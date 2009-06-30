@@ -34,35 +34,65 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-
 package com.sun.jersey.json.impl;
 
+import com.sun.jersey.api.json.JSONConfiguration;
 import com.sun.jersey.api.json.JSONJAXBContext;
 import com.sun.jersey.api.json.JSONMarshaller;
 import com.sun.jersey.api.json.JSONUnmarshaller;
 import java.io.StringReader;
 import java.io.StringWriter;
+import java.util.HashMap;
+import java.util.Map;
 import javax.xml.bind.JAXBElement;
-import javax.xml.namespace.QName;
 import junit.framework.TestCase;
 
 /**
  *
  * @author Jakub.Podlesak@Sun.COM
  */
-public class XmlTypeTest extends TestCase {
+public class NamespaceElementTest extends TestCase {
 
-    public void testSimpleXmlTypeBean() throws Exception {
-        
-        final JSONJAXBContext ctx = new JSONJAXBContext(SimpleXmlTypeBean.class);
+    final boolean jsonEnabled = true;
+    final NamespaceBean one = (NamespaceBean) NamespaceBean.createTestInstance();
+
+    public void _disabledFailingtestBadgerfish() throws Exception {
+        tryConfiguration(JSONConfiguration.badgerFish().build());
+    }
+
+    public void testMappedJettison() throws Exception {
+        Map<String, String> ns2json = new HashMap<String, String>();
+        ns2json.put("http://example.com", "example");
+        tryConfiguration(JSONConfiguration.mappedJettison().xml2JsonNs(ns2json).build());
+    }
+
+    public void testNatural() throws Exception {
+        tryConfiguration(JSONConfiguration.natural().build());
+    }
+
+    public void testMapped() throws Exception {
+        Map<String, String> ns2json = new HashMap<String, String>();
+        ns2json.put("http://example.com", "example");
+        tryConfiguration(JSONConfiguration.mapped().xml2JsonNs(ns2json).rootUnwrapping(false).build());
+    }
+
+    private void tryConfiguration(JSONConfiguration configuration) throws Exception {
+
+        final JSONJAXBContext ctx = new JSONJAXBContext(configuration, NamespaceBean.class);
         final JSONMarshaller jm = ctx.createJSONMarshaller();
         final JSONUnmarshaller ju = ctx.createJSONUnmarshaller();
+
+
+        NamespaceBean beanTwo;
+
         final StringWriter sw = new StringWriter();
 
-        final SimpleXmlTypeBean one=(SimpleXmlTypeBean) SimpleXmlTypeBean.createTestInstance();
-        SimpleXmlTypeBean two;
-        jm.marshallToJSON(new JAXBElement<SimpleXmlTypeBean>(new QName("test"), SimpleXmlTypeBean.class, one), sw);
-        two = ju.unmarshalFromJSON(new StringReader(sw.toString()), SimpleXmlTypeBean.class);
-        assertEquals(one, two);
+        jm.marshallToJSON(one, sw);
+
+        System.out.println(String.format("%s", sw));
+
+        beanTwo = ju.unmarshalFromJSON(new StringReader(sw.toString()), NamespaceBean.class);
+
+        assertEquals(one, beanTwo);
     }
 }

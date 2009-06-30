@@ -58,7 +58,7 @@ import org.codehaus.jettison.json.JSONObject;
  *
  * @author japod
  */
-public class JSONObjectProvider extends JSONProvider<JSONObject>{
+public class JSONObjectProvider extends JSONLowLevelProvider<JSONObject>{
 
     @Produces("application/json")
     @Consumes("application/json")
