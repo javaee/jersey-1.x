@@ -247,12 +247,8 @@ public final class JSONJAXBContext extends JAXBContext implements JSONConfigurat
 
         jsonConfiguration = config;
         if (config.getNotation() == JSONConfiguration.Notation.NATURAL) {
-            jaxbContext = JAXBContext.newInstance(classesToBeBound, new HashMap<String, Object>(1) {
-
-                {
-                    put(JAXBContextImpl.RETAIN_REFERENCE_TO_INFO, Boolean.TRUE);
-                }
-            });
+            jaxbContext = JAXBContext.newInstance(classesToBeBound,
+                    Collections.singletonMap(JAXBContextImpl.RETAIN_REFERENCE_TO_INFO, true));
         } else {
             jaxbContext = JAXBContext.newInstance(classesToBeBound);
         }
@@ -343,12 +339,9 @@ public final class JSONJAXBContext extends JAXBContext implements JSONConfigurat
         }
 
         if (config.getNotation() == JSONConfiguration.Notation.NATURAL) {
-            jaxbContext = JAXBContext.newInstance(contextPath, Thread.currentThread().getContextClassLoader(), new HashMap<String, Object>(1) {
-
-                {
-                    put(JAXBContextImpl.RETAIN_REFERENCE_TO_INFO, Boolean.TRUE);
-                }
-            });
+            jaxbContext = JAXBContext.newInstance(contextPath,
+                    Thread.currentThread().getContextClassLoader(),
+                    Collections.singletonMap(JAXBContextImpl.RETAIN_REFERENCE_TO_INFO, true));
         } else {
             jaxbContext = JAXBContext.newInstance(contextPath, Thread.currentThread().getContextClassLoader());
         }
