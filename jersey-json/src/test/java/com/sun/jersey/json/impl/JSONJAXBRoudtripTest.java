@@ -148,8 +148,13 @@ public class JSONJAXBRoudtripTest extends TestCase {
     public void testJettisonMappedNotation() throws Exception {
         System.out.println("MAPPED (JETTISON) NOTATION");
         Map<String, Object> props = new HashMap<String, Object>();
+        allBeansTest(new JSONJAXBContext(JSONConfiguration.mappedJettison().build(), classes), beans);
+    }
+
+    public void testJettisonMappedNotationDeprecatedConfig() throws Exception {
+        System.out.println("MAPPED (JETTISON) NOTATION DEPRECATED CONFIG");
+        Map<String, Object> props = new HashMap<String, Object>();
         props.put(JSONJAXBContext.JSON_NOTATION, "MAPPED_JETTISON");
-        props.put(JSONJAXBContext.JSON_ROOT_UNWRAPPING, Boolean.TRUE);
         allBeansTest(new JSONJAXBContext(classes, props), beans);
     }
     
