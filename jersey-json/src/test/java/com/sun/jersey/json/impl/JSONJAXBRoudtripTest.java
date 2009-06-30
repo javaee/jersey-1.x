@@ -40,7 +40,6 @@ import com.sun.jersey.api.json.JSONConfiguration;
 import com.sun.jersey.api.json.JSONJAXBContext;
 import com.sun.jersey.api.json.JSONMarshaller;
 import com.sun.jersey.api.json.JSONUnmarshaller;
-import java.io.Reader;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.lang.reflect.Method;
@@ -50,9 +49,10 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Map;
 import java.util.StringTokenizer;
-import javax.xml.bind.JAXBElement;
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
-import javax.xml.transform.stream.StreamSource;
+import javax.xml.bind.PropertyException;
 import junit.framework.TestCase;
 
 /**
@@ -145,36 +145,35 @@ public class JSONJAXBRoudtripTest extends TestCase {
         allBeansTest(new JSONJAXBContext(classes, props), beans);
     }
 
-//    TODO: Jettison gets stuck on the following :-(
-//    public void testJettisonMappedNotation() throws Exception {
-//        System.out.println("MAPPED (JETTISON) NOTATION");
-//        Map<String, Object> props = new HashMap<String, Object>();
-//        props.put(JSONJAXBContext.JSON_NOTATION, "MAPPED_JETTISON");
-//        props.put(JSONJAXBContext.JSON_ROOT_UNWRAPPING, Boolean.TRUE);
-//        allBeansTest(new JSONJAXBContext(classes, props), beans);
-//    }
+    public void testJettisonMappedNotation() throws Exception {
+        System.out.println("MAPPED (JETTISON) NOTATION");
+        Map<String, Object> props = new HashMap<String, Object>();
+        props.put(JSONJAXBContext.JSON_NOTATION, "MAPPED_JETTISON");
+        props.put(JSONJAXBContext.JSON_ROOT_UNWRAPPING, Boolean.TRUE);
+        allBeansTest(new JSONJAXBContext(classes, props), beans);
+    }
     
     public synchronized void allBeansTest(JSONJAXBContext context, Collection<Object> beans) throws Exception {
+
         JSONMarshaller marshaller = context.createJSONMarshaller();
         JSONUnmarshaller unmarshaller = context.createJSONUnmarshaller();
+
         for (Object originalBean : beans) {
-//            System.out.println("Checking " + originalBean.toString());
-//            JAXBContext ctx = JAXBContext.newInstance(originalBean.getClass());
-//            Marshaller m = ctx.createMarshaller();
-//            m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
-//            m.marshal(originalBean, System.out);
+            printAsXml(originalBean);
+
             StringWriter sWriter = new StringWriter();
             marshaller.marshallToJSON(originalBean, sWriter);
+
             System.out.println(sWriter.toString());
-            assertEquals(originalBean, unmarshall(unmarshaller, originalBean.getClass(), new StringReader(sWriter.toString())));
-//            System.out.println("OK");
+            assertEquals(originalBean, unmarshaller.unmarshalFromJSON(new StringReader(sWriter.toString()), originalBean.getClass()));
         }
     }
 
-    private <T> T unmarshall(JSONUnmarshaller unmarshaller, Class<T> type, Reader r) throws Exception {
-        assert null != unmarshaller;
-        JAXBElement<T> jaxbElem  = unmarshaller.unmarshalJAXBElementFromJSON(r, type);
-        return jaxbElem.getValue();
+    private void printAsXml(Object originalBean) throws JAXBException, PropertyException {
+        System.out.println("Checking " + originalBean.toString());
+        JAXBContext ctx = JAXBContext.newInstance(originalBean.getClass());
+        Marshaller m = ctx.createMarshaller();
+        m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
+        m.marshal(originalBean, System.out);
     }
-    
 }

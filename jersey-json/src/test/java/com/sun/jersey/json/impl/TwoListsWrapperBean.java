@@ -46,7 +46,7 @@ import javax.xml.bind.annotation.XmlRootElement;
  *
  * @author japod
  */
-@XmlRootElement(name = "item")
+@XmlRootElement(name = "item2")
 public class TwoListsWrapperBean {
     public List<String> property1, property2;
     
