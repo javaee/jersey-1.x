@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<probe-provider name="glassfish" module="jersey">
+<probe-provider moduleProviderName="glassfish" moduleName="jersey" probeProviderName="server" >
     <probe name="pathAccept">
        <class>com.sun.jersey.server.probes.UriRuleProbeProvider</class>
        <method>accept</method>
