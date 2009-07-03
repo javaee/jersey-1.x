@@ -115,7 +115,6 @@ public class JsonXmlStreamWriter implements XMLStreamWriter {
         WriterAdapter lastElementWriter;
         Boolean lastWasPrimitive;
         boolean lastIsArray;
-        boolean hasNoElements = true;
         boolean isNotEmpty = false;
         WriterAdapter writer;
 
@@ -129,7 +128,7 @@ public class JsonXmlStreamWriter implements XMLStreamWriter {
 
         @Override
         public String toString() {
-            return "PS(" + currentName + "|" + ((writer != null) ? writer.getContent() : null) + "|" + lastName + "|" + ((lastElementWriter != null) ? lastElementWriter.getContent() : null) + ")";
+            return String.format("{currentName:%s, writer: \"%s\", lastName:%s, lastWriter: %s}", currentName, ((writer != null) ? writer.getContent() : null), lastName, ((lastElementWriter != null) ? lastElementWriter.getContent() : null));
         }
     }
     Writer mainWriter;
@@ -396,7 +395,7 @@ public class JsonXmlStreamWriter implements XMLStreamWriter {
         try {
             boolean isNextArrayElement = processingStack.get(depth).currentName.equals(processingStack.get(depth).lastName);
             if (!isNextArrayElement) {
-                if (isArrayElement(processingStack.get(depth).lastName) && processingStack.get(depth).hasNoElements) { // one elem array
+                if (isArrayElement(processingStack.get(depth).lastName) ) { // one elem array
                     processingStack.get(depth).writer.write("[");
                     processingStack.get(depth).lastIsArray = true;
                     processingStack.get(depth).writer.write(processingStack.get(depth).lastElementWriter.getContent());
@@ -407,7 +406,6 @@ public class JsonXmlStreamWriter implements XMLStreamWriter {
                             processingStack.get(depth).writer.write(",");
                             processingStack.get(depth).writer.write(processingStack.get(depth).lastElementWriter.getContent());
                             processingStack.get(depth).writer.write("]");
-                            processingStack.get(depth).hasNoElements = false;
                         } else {
                             processingStack.get(depth).writer.write(processingStack.get(depth).lastElementWriter.getContent());
                         }
@@ -430,7 +428,6 @@ public class JsonXmlStreamWriter implements XMLStreamWriter {
                 processingStack.get(depth).writer.write(processingStack.get(depth).lastIsArray ? "," : "[");  // next element at the same level
                 processingStack.get(depth).lastIsArray = true;
                 processingStack.get(depth).writer.write(processingStack.get(depth).lastElementWriter.getContent());
-                processingStack.get(depth).hasNoElements = false;
             }
 
             depth++;
