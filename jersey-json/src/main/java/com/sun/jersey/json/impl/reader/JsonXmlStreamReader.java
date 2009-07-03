@@ -262,6 +262,7 @@ public class JsonXmlStreamReader implements XMLStreamReader {
                             checkAttributesOnly = false;
                             processingStack.remove(depth);
                             depth--;
+                            valueRead();
                             break;
                         default:
                         // TODO: handle problem
@@ -697,7 +698,7 @@ public class JsonXmlStreamReader implements XMLStreamReader {
     }
 
     private void generateEEEvent(String name) {
-       if (!"$".equals(name)) {
+       if ((null != name) && !"$".equals(name)) {
            eventQueue.add(new EndElementEvent(createQName(name), new StaxLocation(lexer)));
        }
     }

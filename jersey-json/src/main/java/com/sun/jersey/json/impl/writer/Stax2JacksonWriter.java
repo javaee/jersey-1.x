@@ -37,6 +37,7 @@
 package com.sun.jersey.json.impl.writer;
 
 import com.sun.xml.bind.v2.model.runtime.RuntimePropertyInfo;
+import com.sun.xml.bind.v2.model.runtime.RuntimeReferencePropertyInfo;
 import com.sun.xml.bind.v2.runtime.XMLSerializer;
 import com.sun.xml.bind.v2.runtime.property.Property;
 import java.io.IOException;
@@ -254,7 +255,8 @@ public class Stax2JacksonWriter implements XMLStreamWriter {
             processingStack.add(new ProcessingInfo(elementName, ri, false, rt));
             return;
         }
-        if (ri.isCollection()) { // another array
+        // TODO: wildcard could still simulate an array by adding several elements of the same name
+        if (ri.isCollection() && !isWildcardElement(ri)) { // another array
             if (!((parentPI != null) && (parentPI.isArray) && (parentPI.rpi == ri))) {
                 // another array
                 processingStack.add(new ProcessingInfo(elementName, ri, true, rt));
@@ -264,6 +266,10 @@ public class Stax2JacksonWriter implements XMLStreamWriter {
         // something else
         processingStack.add(new ProcessingInfo(elementName, ri, false, rt));
         return;
+    }
+
+    private boolean isWildcardElement(RuntimePropertyInfo ri) {
+        return (ri instanceof RuntimeReferencePropertyInfo) && (((RuntimeReferencePropertyInfo)ri).getWildcard() != null);
     }
 
     public void writeEmptyElement(String localName) throws XMLStreamException {

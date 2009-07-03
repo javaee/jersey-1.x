@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ExtrinsicObject xmlns="urn:oasis:names:tc:ebxml-regrep:xsd:rim:4.0" xmlns:ns2="http://www.w3.org/1999/xlink" xmlns:ns3="http://www.w3.org/2005/08/addressing" xmlns:ns4="urn:oasis:names:tc:ebxml-regrep:xsd:query:4.0" xmlns:ns5="urn:oasis:names:tc:ebxml-regrep:xsd:lcm:4.0" xmlns:ns6="urn:oasis:names:tc:ebxml-regrep:xsd:spi:4.0" xmlns:ns7="urn:oasis:names:tc:ebxml-regrep:xsd:rs:4.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="urn:oasis:names:tc:ebxml-regrep:xsd:rim:4.0  http://www.wellfleetsoftware.com/files/rim.xsd" mimeType="text/xml" status="urn:oasis:names:tc:ebxml-regrep:StatusType:Submitted" objectType="urn:iso:TC211:19115:profile:ObjectType:MD_MetaData" lid="urn:foo:Dataset:Lightning-1:metadata" id="urn:foo:Dataset:Lightning-1:metadata">
+    <Slot dataType="urn:ogc:def:dataType:ISO-19107:GM_Envelope" name="urn:iso:TC211:19115:slot:geographicBoundingBox">
+        <ValueList>
+            <ValueListItem xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="AnyValueType">
+                <ns1:Polygon xmlns:ns1="http://www.opengis.net/gml/3.2" xmlns:ns4="http://www.isotc211.org/2005/gco" xmlns:ns3="http://www.isotc211.org/2005/gmd" xmlns:ns5="http://www.isotc211.org/2005/gmx" xmlns:ns6="http://www.isotc211.org/2005/gts" ns1:id="">
+                    <ns1:exterior>
+                        <ns1:LinearRing>
+                            <ns1:posList>-120.0 25.0 -70.0 25.0 -70.0 40.0 -120.0 40.0 -120.0 25.0</ns1:posList>
+                        </ns1:LinearRing>
+                    </ns1:exterior>
+                </ns1:Polygon>
+            </ValueListItem>
+        </ValueList>
+    </Slot>
+</ExtrinsicObject>
