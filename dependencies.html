@@ -400,5 +400,24 @@ repository to the pom:</P>
 &lt;/repository&gt;</PRE><P>
 <BR><BR>
 </P>
+<H2>Jersey Test Framework</H2>
+<P>Jersey Test Framework allows you to test your RESTful Web Services on a wide range of containers. It supports light-weight containers 
+like GrizzlyWeb, EmbeddedGlassFish, HTTPServer, and also the regualr web containers like GlassFish, Tomcat, etc. 
+One interesting feature of this framework is that it takes care of the instantiation*, deployment* and testing of your web services. 
+The test class just needs to extend the class com.sun.jersey.test.framework.JerseyTest.</P>
+<P> For more information on this framework please go through this blog entry on <a href="http://blogs.sun.com/naresh/entry/jersey_test_framework_makes_it">Jersey Test Framework</a>. </P>
+<P>Maven developers require a dependency on the
+<A HREF="http://download.java.net/maven/2/com/sun/jersey/test/framework/jersey-test-framework/1.1.1-ea-SNAPSHOT/jersey-test-framework-1.1.1-ea-SNAPSHOT.pom">jersey-test-framework</A>
+module. The following dependency needs to be added to the pom:</P>
+<PRE STYLE="margin-left: 0.79in">&lt;dependency&gt;
+    &lt;groupId&gt;com.sun.jersey.test.framework&lt;/groupId&gt;
+    &lt;artifactId&gt;jersey-test-framework&lt;/artifactId&gt;
+    &lt;version&gt;1.1.1-ea-SNAPSHOT&lt;/version&gt;
+    &lt;scope&gt;test&lt;/scope&gt;
+&lt;/dependency&gt;</PRE><P>
+<P>Note: The framework currently doesn't support instantiating and deploying on external containers. But it is planned to be 
+supported in the coming versions. To test a service with an external container like GlassFish, create a war file using <b>mvn clean package -Dmaven.test.skip=true</b>,
+ deploy it on the container, and then to run the tests use the command: <b>mvn test -Dcontainer.type=External -DJERSEY_HTTP_PORT=</b>&lt;HTTP_PORT&gt;.
+<BR><BR>
 </BODY>
 </HTML>
