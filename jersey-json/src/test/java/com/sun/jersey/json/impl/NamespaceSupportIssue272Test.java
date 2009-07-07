@@ -51,27 +51,32 @@ import junit.framework.TestCase;
  *
  * @author Jakub.Podlesak@Sun.COM
  */
-public class NaturalNamespacesSupportTest extends TestCase {
+public class NamespaceSupportIssue272Test extends TestCase {
 
-    public void testNamespaces() throws Exception {
+    public void testNaturalNotation() throws Exception {
+        _testNamespaces(new JSONJAXBContext(JSONConfiguration.natural().build(), MyError.class, MyMessage.class, MyResponse.class));
+    }
 
-        final boolean jsonEnabled = true;
-
+    public void testMappedNotation() throws Exception {
         Map<String, String> jsonXml2JsonNs = new HashMap<String, String>();
-// just for curiosity: even after making jettison encode ns info into json, the thing still does not work
-//        jsonXml2JsonNs.put("http://test.jaxb.com", "tjc");
-//        final JSONJAXBContext ctx = new JSONJAXBContext(JSONConfiguration.mappedJettison().xml2JsonNs(jsonXml2JsonNs).build(), MyError.class, MyMessage.class, MyResponse.class);
-        final JSONJAXBContext ctx = new JSONJAXBContext(JSONConfiguration.natural().build(), MyError.class, MyMessage.class, MyResponse.class);
+        jsonXml2JsonNs.put("http://test.jaxb.com", "tjc");
+        final JSONJAXBContext ctx = new JSONJAXBContext(JSONConfiguration.mapped().xml2JsonNs(jsonXml2JsonNs).build(), MyError.class, MyMessage.class, MyResponse.class);
+        _testNamespaces(ctx);
+    }
+
+    public void _testNamespaces(JSONJAXBContext ctx) throws Exception {
+
         final JSONMarshaller jm =  ctx.createJSONMarshaller();
         final JSONUnmarshaller ju = ctx.createJSONUnmarshaller();
         final StringWriter sw = new StringWriter();
 
         final MyResponse one=(MyResponse) MyResponse.createTestInstance();
-        MyResponse two;
+
         jm.marshallToJSON(one, sw);
 
-//        System.out.println(String.format("%s", sw));
+        System.out.println(String.format("%s", sw));
 
+        MyResponse two;
         two =  ju.unmarshalFromJSON(new StringReader(sw.toString()), MyResponse.class);
 
         assertEquals(one, two);
