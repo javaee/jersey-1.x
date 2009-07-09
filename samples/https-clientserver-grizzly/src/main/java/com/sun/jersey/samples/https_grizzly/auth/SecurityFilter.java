@@ -9,6 +9,7 @@ import com.sun.jersey.core.util.Base64;
 import com.sun.jersey.spi.container.ContainerRequest;
 import com.sun.jersey.spi.container.ContainerRequestFilter;
 import java.security.Principal;
+import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.SecurityContext;
 import javax.ws.rs.core.UriInfo;
@@ -44,15 +45,13 @@ public class SecurityFilter implements ContainerRequestFilter {
         authentication = authentication.substring("Basic ".length());
         String[] values = new String(Base64.base64Decode(authentication)).split(":");
         if (values.length < 2) {
-            return null;
-            // additional checks should be done here
+            throw new WebApplicationException(400);
             // "Invalid syntax for username and password"
         }
         String username = values[0];
         String password = values[1];
         if ((username == null) || (password == null)) {
-            return null;
-            // additional checks should be done here
+            throw new WebApplicationException(400);
             // "Missing username or password"
         }
 
