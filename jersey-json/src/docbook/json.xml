@@ -223,8 +223,13 @@ a single address (<code>street="Long Street 1"</code>, <code>town="Short Village
       also in apidocs at <ulink url="https://jersey.dev.java.net/nonav/apidocs/&version;/jersey/com/sun/jersey/api/json/JSONConfiguration.html"/>
       </para>
       
+      
+      
+      
       <section>
        <title>Mapped notation</title>
+       
+       
        <para>
        <code>JSONConfiguration</code> based on <literal>mapped</literal> notation could be build with 
        <programlisting>JSONConfiguration.mapped().build()</programlisting>
@@ -300,9 +305,32 @@ a single address (<code>street="Long Street 1"</code>, <code>town="Short Village
        </example>
 	<literal>rootUnwrapping</literal> option is set to <literal>true</literal> by default.
 	</para>
+	
+	<para>
+	In version 1.1.1-ea, XML namespace support was added to the MAPPED JSON notation. There is of course no such thing as XML namespaces in JSON,
+	but when working from JAXB, XML infoset is used as an intermediary format. And then when various XML namespaces are used, ceratin information 
+	related to the concrete namespaces is needed even in JSON data, so that the JSON procesor could correctly unmarshal JSON to XML and JAXB. 
+	To make it short, the XML namespace support means, you should be able to use the very same JAXB beans for XML and JSON even if XML namespaces are involved.
+	</para>
+	<para>
+	Namespace mapping definition is similar to <xref linked="json.jaxb.jettison.mapped.ns.def"/> 
+      <example><title>XML namespace to JSON mapping configuration for <literal>mapped</literal> notation</title>
+       <programlisting linenumbering="numbered">        Map&lt;String,String&gt; ns2json = new HashMap&lt;String, String&gt;();
+        ns2json.put("http://example.com", "example");
+        context = new JSONJAXBContext(
+	      JSONConfiguration.mapped()
+	           .xml2JsonNs(ns2json).build(), types);</programlisting>
+		   </example>
+	</para>
       </section>
+      
+      
+      
+      
       <section>
        <title>Natural notation</title>
+       
+       
        <para>
        After using <literal>mapped</literal> JSON notation for a while, it was apparent, that a need to configure all the various things
        manually could be a bit problematic. To avoid the manual work, a new, <literal>natural</literal>, JSON notation was introduced in Jersey version 1.0.2.
@@ -323,9 +351,13 @@ a single address (<code>street="Long Street 1"</code>, <code>town="Short Village
        value is not limited with double quotes, as <literal>natural</literal> notation automatically detects these things.
        </para>
       </section>
+
+
+
       <section>
-       <title>Jettison mapped notation</title>
-       <para>
+      <title>Jettison mapped notation</title>
+
+      <para>
        Next two notations are based on project <ulink url="http://jettison.codehaus.org/User%27s+Guide">Jettison</ulink>.
        You might want to use one of these notations, when working with more complex XML documents. Namely when you deal with 
        multiple XML namespaces in your JAXB beans. 
@@ -351,7 +383,7 @@ a single address (<code>street="Long Street 1"</code>, <code>town="Short Village
   public int id;
   ...</programlisting>
  	Then you simply confgure a mapping from XML namespace into JSON prefix as follows:
-      <example><title>XML namespace to JSON mapping configuration for Jettison based <literal>mapped</literal> notation</title>
+      <example id="json.jaxb.jettison.mapped.ns.def"><title>XML namespace to JSON mapping configuration for Jettison based <literal>mapped</literal> notation</title>
        <programlisting linenumbering="numbered">        Map&lt;String,String&gt; ns2json = new HashMap&lt;String, String&gt;();
         ns2json.put("http://example.com", "example");
         context = new JSONJAXBContext(
@@ -369,9 +401,14 @@ a single address (<code>street="Long Street 1"</code>, <code>town="Short Village
        If you have more XML namespaces in your XML, you will need to configure appropriate mapping for all of them
        </para>
       </section>
+
+
+
       <section>
-       <title>Badgerfish notation</title>
-       <para>
+      <title>Badgerfish notation</title>
+      
+      
+      <para>
        Badgerfish notation is the other notation based on Jettison. From JSON and JavaScript perspective, this notation is definitely
        the worst readable one. You will probably not want to use it, unless you need to make sure your JAXB beans could be flawlessly
        written and read back to and from JSON, without bothering with any formatting configuration, namespaces, etc.
@@ -401,7 +438,9 @@ a single address (<code>street="Long Street 1"</code>, <code>town="Short Village
    </section>
   
 
-  <section>
+  
+   
+   <section>
     <title id="json.low.level.approach.title">Low-Level JSON support</title>
 
     <para>Using this approach means you will be using JSONObject and/or JSONArray classes for your data representations.

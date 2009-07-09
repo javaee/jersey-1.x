@@ -148,15 +148,12 @@ public class Jackson2StaxReader implements XMLStreamReader {
                     case FIELD_NAME:
                         // start tag
                         String currentName = parser.getCurrentName();
-                        boolean currentIsAttribute = !("$".equals(currentName)) && !elemsExpected.contains(currentName);
-//    TODO: could be used once jaxb provides information on attributes expected
-//                        boolean currentIsAttribute = !("$".equals(currentName)) && attrsExpected.contains(currentName);
+                        boolean currentIsAttribute = !("$".equals(currentName)) && attrsExpected.contains(currentName);
                         if (lookingForAttributes && currentIsAttribute) {
                             parser.nextToken();
                             if (valueTokens.contains(parser.getCurrentToken())) {
                                     eventQueue.peek().addAttribute(new QName(currentName), parser.getText());
-//    TODO: could be used once jaxb provides information on attributes expected
-//                                eventQueue.peek().addAttribute(getQNameForLocName(currentName, qNamesOfExpAttrs), parser.getText());
+                                eventQueue.peek().addAttribute(getQNameForLocName(currentName, qNamesOfExpAttrs), parser.getText());
                             } else {
                                 System.out.println(String.format("CurrentName=%s", currentName));
                                 throw new IOException("Not an attribute, expected primitive value!");
@@ -227,11 +224,8 @@ public class Jackson2StaxReader implements XMLStreamReader {
                         peek(processingStack).isArray = true;
                         break;
                     case END_ARRAY :
-                        //if (lookingForAttributes) {
-                            pop(processingStack);
-                            lookingForAttributes = false;
-                        //}
-                        //return;
+                         pop(processingStack);
+                         lookingForAttributes = false;
                 }
             }
         }
@@ -305,9 +299,8 @@ public class Jackson2StaxReader implements XMLStreamReader {
     final Collection<String> elemsExpected = new HashSet<String>();
     final Map<String, QName> qNamesOfExpElems = new HashMap<String, QName>();
 
-//    TODO: could be used once jaxb provides information on attributes expected
-//    final Collection<String> attrsExpected = new HashSet<String>();
-//    final Map<String, QName> qNamesOfExpAttrs = new HashMap<String, QName>();
+    final Collection<String> attrsExpected = new HashSet<String>();
+    final Map<String, QName> qNamesOfExpAttrs = new HashMap<String, QName>();
 
 
     public int getAttributeCount() {
@@ -315,9 +308,8 @@ public class Jackson2StaxReader implements XMLStreamReader {
             if (!eventQueue.peek().attributesChecked) {
                 elemsExpected.clear();
                 qNamesOfExpElems.clear();
-                //    TODO: could be used once jaxb provides information on attributes expected
-                //attrsExpected.clear();
-                //qNamesOfExpAttrs.clear();
+                attrsExpected.clear();
+                qNamesOfExpAttrs.clear();
                 final UnmarshallingContext uctx = UnmarshallingContext.getInstance();
                 if (uctx != null) {
                     Collection<QName> currExpElems;
@@ -328,12 +320,11 @@ public class Jackson2StaxReader implements XMLStreamReader {
                         // TODO: need to check what could be done in JAXB in order to prevent the npe
                         currExpElems = null;// thrown from com.sun.xml.bind.v2.runtime.unmarshaller.UnmarshallingContext#1206
                     }
-                    //    TODO: could be used once jaxb provides information on attributes expected
-//                    try {
-//                        currExpAttrs = uctx.getCurrentExpectedAttributes();
-//                    } catch (NullPointerException npe) {
-//                        currExpAttrs = null;// thrown from com.sun.xml.bind.v2.runtime.unmarshaller.UnmarshallingContext
-//                    }
+                    try {
+                        currExpAttrs = uctx.getCurrentExpectedAttributes();
+                    } catch (NullPointerException npe) {
+                        currExpAttrs = null;// thrown from com.sun.xml.bind.v2.runtime.unmarshaller.UnmarshallingContext
+                    }
                     if (currExpElems != null) {
                         for (QName n : currExpElems) {
                             String nu = n.getNamespaceURI();
@@ -346,13 +337,12 @@ public class Jackson2StaxReader implements XMLStreamReader {
                             }
                         }
                     }
-//    TODO: could be used once jaxb provides information on attributes expected
-//                    if (currExpAttrs != null) {
-//                        for (QName n : currExpAttrs) {
-//                            attrsExpected.add(n.getLocalPart());
-//                            qNamesOfExpAttrs.put(n.getLocalPart(), n);
-//                        }
-//                    }
+                    if (currExpAttrs != null) {
+                        for (QName n : currExpAttrs) {
+                            attrsExpected.add(n.getLocalPart());
+                            qNamesOfExpAttrs.put(n.getLocalPart(), n);
+                        }
+                    }
                 }
                 readNext(true);
                 eventQueue.peek().attributesChecked = true;

@@ -44,7 +44,6 @@ import java.io.StringReader;
 import java.io.StringWriter;
 import java.util.HashMap;
 import java.util.Map;
-import javax.xml.bind.JAXBElement;
 import junit.framework.TestCase;
 
 /**
@@ -53,7 +52,6 @@ import junit.framework.TestCase;
  */
 public class NamespaceAttributeTest extends TestCase {
 
-    final boolean jsonEnabled = true;
     final NamespaceBeanWithAttribute one = (NamespaceBeanWithAttribute) NamespaceBeanWithAttribute.createTestInstance();
 
     public void _disabledFailing_testBadgerfish() throws Exception {
@@ -66,8 +64,8 @@ public class NamespaceAttributeTest extends TestCase {
         tryConfiguration(JSONConfiguration.mappedJettison().xml2JsonNs(ns2json).build());
     }
 
-    public void _disabledFailing_testNatural() throws Exception {
-        tryConfiguration(JSONConfiguration.natural().build());
+    public void testNatural() throws Exception {
+        tryConfiguration(JSONConfiguration.natural().rootUnwrapping(false).build());
     }
 
     public void testMapped() throws Exception {
