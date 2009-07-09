@@ -233,4 +233,55 @@ public class SimpleLinkType {
         this.actuate = value;
     }
 
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final SimpleLinkType other = (SimpleLinkType) obj;
+        if ((this.type == null) ? (other.type != null) : !this.type.equals(other.type)) {
+            return false;
+        }
+        if ((this.href == null) ? (other.href != null) : !this.href.equals(other.href)) {
+            return false;
+        }
+        if ((this.role == null) ? (other.role != null) : !this.role.equals(other.role)) {
+            return false;
+        }
+        if ((this.arcrole == null) ? (other.arcrole != null) : !this.arcrole.equals(other.arcrole)) {
+            return false;
+        }
+        if ((this.title == null) ? (other.title != null) : !this.title.equals(other.title)) {
+            return false;
+        }
+        if ((this.show == null) ? (other.show != null) : !this.show.equals(other.show)) {
+            return false;
+        }
+        if ((this.actuate == null) ? (other.actuate != null) : !this.actuate.equals(other.actuate)) {
+            return false;
+        }
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 7;
+        hash = 89 * hash + (this.type != null ? this.type.hashCode() : 0);
+        hash = 89 * hash + (this.href != null ? this.href.hashCode() : 0);
+        hash = 89 * hash + (this.role != null ? this.role.hashCode() : 0);
+        hash = 89 * hash + (this.arcrole != null ? this.arcrole.hashCode() : 0);
+        hash = 89 * hash + (this.title != null ? this.title.hashCode() : 0);
+        hash = 89 * hash + (this.show != null ? this.show.hashCode() : 0);
+        hash = 89 * hash + (this.actuate != null ? this.actuate.hashCode() : 0);
+        return hash;
+    }
+
+    @Override
+    public String toString() {
+        return String.format("{type:%s, href:%s, role: %s, arcrole:%s, title:%s, show:%s, actuate:%s}", type, href, role, arcrole, title, show, actuate);
+    }
+
 }

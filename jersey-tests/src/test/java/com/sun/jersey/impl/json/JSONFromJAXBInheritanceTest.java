@@ -63,8 +63,8 @@ import javax.xml.bind.JAXBException;
  *
  * @author Jakub.Podlesak@Sun.Com
  */
-public class JSONFromJAXBInheritanceTester extends AbstractResourceTester {
-    public JSONFromJAXBInheritanceTester(String testName) {
+public class JSONFromJAXBInheritanceTest extends AbstractResourceTester {
+    public JSONFromJAXBInheritanceTest(String testName) {
         super(testName);
     }
 

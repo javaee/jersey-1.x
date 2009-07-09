@@ -91,4 +91,34 @@ public class VersionInfoType {
         this.comment = value;
     }
 
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final VersionInfoType other = (VersionInfoType) obj;
+        if ((this.versionName == null) ? (other.versionName != null) : !this.versionName.equals(other.versionName)) {
+            return false;
+        }
+        if ((this.comment == null) ? (other.comment != null) : !this.comment.equals(other.comment)) {
+            return false;
+        }
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 7;
+        hash = 59 * hash + (this.versionName != null ? this.versionName.hashCode() : 0);
+        hash = 59 * hash + (this.comment != null ? this.comment.hashCode() : 0);
+        return hash;
+    }
+
+    @Override
+    public String toString() {
+        return String.format("{versionName:%s, comment: %s}", versionName, comment);
+    }
 }

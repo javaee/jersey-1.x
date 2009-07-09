@@ -36,6 +36,7 @@
  */
 package com.sun.jersey.json.impl.reader;
 
+import com.sun.jersey.json.impl.ImplMessages;
 import com.sun.xml.bind.v2.runtime.unmarshaller.UnmarshallingContext;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -78,6 +79,15 @@ public class Jackson2StaxReader implements XMLStreamReader {
     final Queue<JsonReaderXmlEvent> eventQueue = new LinkedList<JsonReaderXmlEvent>();
     final List<ProcessingInfo> processingStack = new ArrayList<ProcessingInfo>();
     final JsonNamespaceContext namespaceContext = new JsonNamespaceContext();
+
+
+    boolean properJAXBVersion = true;
+
+    final Collection<String> elemsExpected = new HashSet<String>();
+    final Map<String, QName> qNamesOfExpElems = new HashMap<String, QName>();
+
+    final Collection<String> attrsExpected = new HashSet<String>();
+    final Map<String, QName> qNamesOfExpAttrs = new HashMap<String, QName>();
 
     static <T> T pop(List<T> stack) {
         return stack.remove(stack.size() - 1);
@@ -148,7 +158,7 @@ public class Jackson2StaxReader implements XMLStreamReader {
                     case FIELD_NAME:
                         // start tag
                         String currentName = parser.getCurrentName();
-                        boolean currentIsAttribute = !("$".equals(currentName)) && attrsExpected.contains(currentName);
+                        boolean currentIsAttribute = !("$".equals(currentName)) && properJAXBVersion ? attrsExpected.contains(currentName) : !elemsExpected.contains(currentName);
                         if (lookingForAttributes && currentIsAttribute) {
                             parser.nextToken();
                             if (valueTokens.contains(parser.getCurrentToken())) {
@@ -296,36 +306,21 @@ public class Jackson2StaxReader implements XMLStreamReader {
         return eventQueue.peek().getAttributeValue(namespaceURI, localName);
     }
 
-    final Collection<String> elemsExpected = new HashSet<String>();
-    final Map<String, QName> qNamesOfExpElems = new HashMap<String, QName>();
-
-    final Collection<String> attrsExpected = new HashSet<String>();
-    final Map<String, QName> qNamesOfExpAttrs = new HashMap<String, QName>();
-
-
     public int getAttributeCount() {
         try {
+
             if (!eventQueue.peek().attributesChecked) {
+
                 elemsExpected.clear();
                 qNamesOfExpElems.clear();
                 attrsExpected.clear();
                 qNamesOfExpAttrs.clear();
+
                 final UnmarshallingContext uctx = UnmarshallingContext.getInstance();
+
                 if (uctx != null) {
-                    Collection<QName> currExpElems;
-                    Collection<QName> currExpAttrs;
                     try {
-                        currExpElems = uctx.getCurrentExpectedElements();
-                    } catch (NullPointerException npe) {
-                        // TODO: need to check what could be done in JAXB in order to prevent the npe
-                        currExpElems = null;// thrown from com.sun.xml.bind.v2.runtime.unmarshaller.UnmarshallingContext#1206
-                    }
-                    try {
-                        currExpAttrs = uctx.getCurrentExpectedAttributes();
-                    } catch (NullPointerException npe) {
-                        currExpAttrs = null;// thrown from com.sun.xml.bind.v2.runtime.unmarshaller.UnmarshallingContext
-                    }
-                    if (currExpElems != null) {
+                        Collection<QName> currExpElems = uctx.getCurrentExpectedElements();
                         for (QName n : currExpElems) {
                             String nu = n.getNamespaceURI();
                             if (nu != null && (nu.getBytes().length == 1) && (nu.getBytes()[0] == 0)) {
@@ -336,14 +331,28 @@ public class Jackson2StaxReader implements XMLStreamReader {
                                 qNamesOfExpElems.put(n.getLocalPart(), n);
                             }
                         }
+                    } catch (NullPointerException npe) {
+                        // TODO: need to check what could be done in JAXB in order to prevent the npe
+                        // thrown from com.sun.xml.bind.v2.runtime.unmarshaller.UnmarshallingContext#1206
                     }
-                    if (currExpAttrs != null) {
-                        for (QName n : currExpAttrs) {
-                            attrsExpected.add(n.getLocalPart());
-                            qNamesOfExpAttrs.put(n.getLocalPart(), n);
+
+                    if (properJAXBVersion) {
+                        try {
+                            Collection<QName> currExpAttrs = uctx.getCurrentExpectedAttributes();
+                            for (QName n : currExpAttrs) {
+                                attrsExpected.add(n.getLocalPart());
+                                qNamesOfExpAttrs.put(n.getLocalPart(), n);
+                            }
+                        } catch (NullPointerException npe) {
+                                // thrown from com.sun.xml.bind.v2.runtime.unmarshaller.UnmarshallingContext
+                        } catch (NoSuchMethodError nsme) {
+                            // thrown when JAXB version is less than 2.1.12
+                            properJAXBVersion = false;
+                            Logger.getLogger(Jackson2StaxReader.class.getName()).log(Level.SEVERE, ImplMessages.ERROR_JAXB_RI_2_1_12_MISSING(), nsme);
                         }
-                    }
+                    } 
                 }
+
                 readNext(true);
                 eventQueue.peek().attributesChecked = true;
             }

@@ -166,4 +166,43 @@ public class ExtrinsicObjectType
         this.mimeType = value;
     }
 
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final ExtrinsicObjectType other = (ExtrinsicObjectType) obj;
+        if (this.contentVersionInfo != other.contentVersionInfo && (this.contentVersionInfo == null || !this.contentVersionInfo.equals(other.contentVersionInfo))) {
+            return false;
+        }
+        if (this.repositoryItemRef != other.repositoryItemRef && (this.repositoryItemRef == null || !this.repositoryItemRef.equals(other.repositoryItemRef))) {
+            return false;
+        }
+//        if (this.repositoryItem != other.repositoryItem && (this.repositoryItem == null || !this.repositoryItem.equals(other.repositoryItem))) {
+//            return false;
+//        }
+        if ((this.mimeType == null) ? (other.mimeType != null) : !this.mimeType.equals(other.mimeType)) {
+            return false;
+        }
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 7;
+        hash = 37 * hash + (this.contentVersionInfo != null ? this.contentVersionInfo.hashCode() : 0);
+        hash = 37 * hash + (this.repositoryItemRef != null ? this.repositoryItemRef.hashCode() : 0);
+        //hash = 37 * hash + (this.repositoryItem != null ? this.repositoryItem.hashCode() : 0);
+        hash = 37 * hash + (this.mimeType != null ? this.mimeType.hashCode() : 0);
+        return hash;
+    }
+
+    @Override
+    public String toString() {
+        return String.format("{contentVersionInfo:%s, repositoryItemRef: %s, mimeType:%s}", contentVersionInfo, repositoryItemRef, mimeType);
+    }
+
 }
