@@ -49,9 +49,13 @@
  *       &lt;listener-class&gt;foo.MyGuiceConfig&lt;/listener-class&gt;
  *     &lt;/listener&gt;
  *     &lt;filter&gt;
- *       &lt;servlet-name&gt;Guice Filter&lt;/servlet-name&gt;
- *       &lt;servlet-class&gt;com.google.inject.servlet.GuiceFilter&lt;/servlet-class&gt;
+ *       &lt;filter-name&gt;Guice Filter&lt;/filter-name&gt;
+ *       &lt;filter-class&gt;com.google.inject.servlet.GuiceFilter&lt;/filter-class&gt;
  *     &lt;/filter&gt;
+ *     &lt;filter-mapping&gt;
+ *       &lt;filter-name>Guice Filter&lt;/filter-name&gt;
+ *       &lt;url-pattern>/*&lt;/url-pattern&gt;
+ *     &lt;/filter-mapping&gt;
  *   &lt;/web-app&gt;
  * </blockquote></pre>
  * and the application specific servlet context listener may be as follows:
