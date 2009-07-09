@@ -40,10 +40,12 @@ import com.sun.jersey.api.client.ClientHandlerException;
 import com.sun.jersey.api.client.ClientRequest;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.core.util.Base64;
+import java.io.UnsupportedEncodingException;
 import javax.ws.rs.core.HttpHeaders;
 
 /**
- * Client filter adding HTTP Basic Authentication header to the HTTP request, if no such header is already present
+ * Client filter adding HTTP Basic Authentication header to the HTTP request,
+ * if no such header is already present
  *
  * @author Jakub.Podlesak@Sun.COM, Craig.McClanahan@Sun.COM
  */
@@ -52,13 +54,19 @@ public final class HTTPBasicAuthFilter extends ClientFilter {
     private final String authentication;
 
     /**
-     * Creates a new HTTP Basic Authentication filter using provided username and password credentials
+     * Creates a new HTTP Basic Authentication filter using provided username
+     * and password credentials
      *
      * @param username
      * @param password
      */
     public HTTPBasicAuthFilter(final String username, final String password) {
-        authentication = "Basic " + Base64.encode(username + ":" + password);
+        try {
+            authentication = "Basic " + new String(Base64.encode(username + ":" + password), "ASCII");
+        } catch (UnsupportedEncodingException ex) {
+            // This should never occur
+            throw new RuntimeException(ex);
+        }
     }
 
     @Override
