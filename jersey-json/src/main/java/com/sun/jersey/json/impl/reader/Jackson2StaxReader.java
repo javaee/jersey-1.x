@@ -323,7 +323,7 @@ public class Jackson2StaxReader implements XMLStreamReader {
                         Collection<QName> currExpElems = uctx.getCurrentExpectedElements();
                         for (QName n : currExpElems) {
                             String nu = n.getNamespaceURI();
-                            if (nu != null && (nu.getBytes().length == 1) && (nu.getBytes()[0] == 0)) {
+                            if (nu != null && (nu.equals("\u0000"))) {
                                 elemsExpected.add("$");
                                 qNamesOfExpElems.put("$", null);
                             } else {
