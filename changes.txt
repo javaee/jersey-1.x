@@ -1,4 +1,24 @@
 release 1.1.1-ea (2009-06)
+- Fixed issue 310
+  https://jersey.dev.java.net/issues/show_bug.cgi?id=310
+  Single element array in mapped JSON notation is incorrect
+- Fixed issue 305
+  https://jersey.dev.java.net/issues/show_bug.cgi?id=305
+  JSON Natural Notation can not correctly marshall unbounded "any" wildcard
+- Fixed issue 294
+  https://jersey.dev.java.net/issues/show_bug.cgi?id=294
+  Empty JSON elements break deserialization
+- Fixed issue 272
+  https://jersey.dev.java.net/issues/show_bug.cgi?id=272
+  JSONUnmarshaller cannot unmarshal nested array element
+- Fixed issue 113
+  https://jersey.dev.java.net/issues/show_bug.cgi?id=113
+  Namespace support for mapped and natural JSON notations
+    For the MAPPED convention, you would need to explicitly configure mapping
+    of any possible namespaces URIs to JSON prefixes, using the xml2JsonNs method
+    on the JSONConfiguration builder. No such configuration is needed for the
+    NATURAL convention, as it leverages information provided by JAXB implementation.
+    JAXB version 2.1.12 and better is needed.
 - Fixed issue 299
   https://jersey.dev.java.net/issues/show_bug.cgi?id=299
   Suppport disabling of WADL. Set the following feature on ResourceConfig to
