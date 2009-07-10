@@ -293,7 +293,7 @@ a single address (<code>street="Long Street 1"</code>, <code>town="Short Village
 	you must always have a root tag to start a XML document with, there is no such a constraint in JSON. If you wanted to be strict,
 	you might have wanted to keep a XML root tag equivalent generated in your JSON. If that is the case, another configuration option
 	is available for you, which is called <literal>rootUnwrapping</literal>. You can use it as follows:
-       <example><title>Keep XML root tag equivalent in JSON <literal>mapped</literal> JSON notation</title>
+       <example id="json.jaxb.mapped.root.unwrapping"><title>Keep XML root tag equivalent in JSON <literal>mapped</literal> JSON notation</title>
        <programlisting>JSONConfiguration.mapped().rootUnwrapping(false).build()</programlisting>
        </example>
        and get the following JSON for our <literal>Contact</literal> bean:
@@ -303,7 +303,9 @@ a single address (<code>street="Long Street 1"</code>, <code>town="Short Village
  ,"addresses":{"street":"Long Street 1"
                     ,"town":"Short Village"}}}</programlisting>
        </example>
-	<literal>rootUnwrapping</literal> option is set to <literal>true</literal> by default.
+	<literal>rootUnwrapping</literal> option is set to <literal>true</literal> by default. You should switch it to <literal>false</literal>
+	if you use inheritance at your JAXB beans. Then JAXB might try to encode type information into root element names, and by stripping these
+	elements off, you could break unmarshalling.
 	</para>
 	
 	<para>
@@ -313,7 +315,7 @@ a single address (<code>street="Long Street 1"</code>, <code>town="Short Village
 	To make it short, the XML namespace support means, you should be able to use the very same JAXB beans for XML and JSON even if XML namespaces are involved.
 	</para>
 	<para>
-	Namespace mapping definition is similar to <xref linked="json.jaxb.jettison.mapped.ns.def"/> 
+	Namespace mapping definition is similar to <xref linkend="json.jaxb.jettison.mapped.ns.def"/> 
       <example><title>XML namespace to JSON mapping configuration for <literal>mapped</literal> notation</title>
        <programlisting linenumbering="numbered">        Map&lt;String,String&gt; ns2json = new HashMap&lt;String, String&gt;();
         ns2json.put("http://example.com", "example");
@@ -349,6 +351,13 @@ a single address (<code>street="Long Street 1"</code>, <code>town="Short Village
        </example>
        You might notice, that the single element array <literal>addresses</literal> remains an array, and also the non-string <literal>id</literal>
        value is not limited with double quotes, as <literal>natural</literal> notation automatically detects these things.
+       </para>
+       <para>
+       To support cases, when you use inheritance for your JAXB beans, an option was introduced to the <literal>natural</literal> JSON configuration builder
+       to forbid XML root element stripping. The option looks pretty same as at the default <literal>mapped</literal> notation case (<xref linkend="json.jaxb.mapped.root.unwrapping"/>).
+       <example id="json.jaxb.natural.root.unwrapping"><title>Keep XML root tag equivalent in JSON <literal>natural</literal> JSON notation</title>
+       <programlisting>JSONConfiguration.natural().rootUnwrapping(false).build()</programlisting>
+       </example>
        </para>
       </section>
 
