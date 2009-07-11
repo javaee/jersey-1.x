@@ -37,6 +37,7 @@
 
 package com.sun.jersey.api.core;
 
+import com.sun.jersey.core.util.FeaturesAndProperties;
 import com.sun.jersey.server.wadl.WadlGenerator;
 import com.sun.jersey.spi.container.ContainerListener;
 import com.sun.jersey.spi.container.ContainerNotifier;
@@ -61,7 +62,7 @@ import javax.ws.rs.ext.Provider;
 /**
  * The resource configuration for configuring a web application.
  */
-public abstract class ResourceConfig extends Application {
+public abstract class ResourceConfig extends Application implements FeaturesAndProperties {
     private static final Logger LOGGER = 
             Logger.getLogger(ResourceConfig.class.getName());
     

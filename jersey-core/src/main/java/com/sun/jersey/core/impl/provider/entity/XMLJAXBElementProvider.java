@@ -51,7 +51,7 @@ import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
-import javax.xml.transform.stream.StreamSource;
+import javax.xml.parsers.SAXParserFactory;
 
 /**
  *
@@ -59,30 +59,42 @@ import javax.xml.transform.stream.StreamSource;
  */
 public class XMLJAXBElementProvider extends AbstractJAXBElementProvider {
     
-    public XMLJAXBElementProvider(Providers ps) {
+    private final SAXParserFactory spf;
+    
+    public XMLJAXBElementProvider(SAXParserFactory spf, Providers ps) {
         super(ps);
+
+        this.spf = spf;
     }
     
-    public XMLJAXBElementProvider(Providers ps, MediaType mt) {
+    public XMLJAXBElementProvider(SAXParserFactory spf, Providers ps, MediaType mt) {
         super(ps, mt);        
+
+        this.spf = spf;
     }
     
     @Produces("application/xml")
     @Consumes("application/xml")
     public static final class App extends XMLJAXBElementProvider {
-        public App(@Context Providers ps) { super(ps , MediaType.APPLICATION_XML_TYPE); }
+        public App(@Context SAXParserFactory spf, @Context Providers ps) {
+            super(spf, ps , MediaType.APPLICATION_XML_TYPE);
+        }
     }
     
     @Produces("text/xml")
     @Consumes("text/xml")
     public static final class Text extends XMLJAXBElementProvider {
-        public Text(@Context Providers ps) { super(ps , MediaType.TEXT_XML_TYPE); }
+        public Text(@Context SAXParserFactory spf, @Context Providers ps) {
+            super(spf, ps , MediaType.TEXT_XML_TYPE);
+        }
     }
     
     @Produces("*/*")
     @Consumes("*/*")
     public static final class General extends XMLJAXBElementProvider {
-        public General(@Context Providers ps) { super(ps); }
+        public General(@Context SAXParserFactory spf, @Context Providers ps) {
+            super(spf, ps);
+        }
 
         @Override
         protected boolean isSupported(MediaType m) {
@@ -93,7 +105,7 @@ public class XMLJAXBElementProvider extends AbstractJAXBElementProvider {
     protected final JAXBElement<?> readFrom(Class<?> type, MediaType mediaType,
             Unmarshaller u, InputStream entityStream)
             throws JAXBException, IOException {
-        return u.unmarshal(new StreamSource(entityStream), type);        
+        return u.unmarshal(getSAXSource(spf, entityStream), type);
     }
 
     protected final void writeTo(JAXBElement<?> t, MediaType mediaType, Charset c,

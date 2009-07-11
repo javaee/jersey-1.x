@@ -34,50 +34,83 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-
 package com.sun.jersey.core.impl.provider.entity;
 
 import com.sun.jersey.core.provider.jaxb.AbstractRootElementProvider;
+import java.io.IOException;
+import java.io.InputStream;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.ext.Providers;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Unmarshaller;
+import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.parsers.SAXParserFactory;
+import javax.xml.transform.sax.SAXSource;
 
 /**
  *
  * @author Paul.Sandoz@Sun.Com
  */
 public class XMLRootElementProvider extends AbstractRootElementProvider {
-    
-    XMLRootElementProvider(Providers ps) {
+
+    private final SAXParserFactory spf;
+
+    XMLRootElementProvider(SAXParserFactory spf, Providers ps) {
         super(ps);
+
+        this.spf = spf;
     }
-    
-    XMLRootElementProvider(Providers ps, MediaType mt) {
+
+    XMLRootElementProvider(SAXParserFactory spf, Providers ps, MediaType mt) {
         super(ps, mt);
+
+        this.spf = spf;
     }
-    
+
     @Produces("application/xml")
     @Consumes("application/xml")
     public static final class App extends XMLRootElementProvider {
-        public App(@Context Providers ps) { super(ps , MediaType.APPLICATION_XML_TYPE); }
+
+        public App(@Context SAXParserFactory spf, @Context Providers ps) {
+            super(spf, ps, MediaType.APPLICATION_XML_TYPE);
+        }
     }
-    
+
     @Produces("text/xml")
     @Consumes("text/xml")
     public static final class Text extends XMLRootElementProvider {
-        public Text(@Context Providers ps) { super(ps , MediaType.TEXT_XML_TYPE); }
+
+        public Text(@Context SAXParserFactory spf, @Context Providers ps) {
+            super(spf, ps, MediaType.TEXT_XML_TYPE);
+        }
     }
-    
+
     @Produces("*/*")
     @Consumes("*/*")
     public static final class General extends XMLRootElementProvider {
-        public General(@Context Providers ps) { super(ps); }
+
+        public General(@Context SAXParserFactory spf, @Context Providers ps) {
+            super(spf, ps);
+        }
 
         @Override
         protected boolean isSupported(MediaType m) {
             return m.getSubtype().endsWith("+xml");
+        }
+    }
+
+    @Override
+    protected Object readFrom(Class<Object> type, MediaType mediaType,
+            Unmarshaller u, InputStream entityStream)
+            throws JAXBException, IOException {
+        final SAXSource s = getSAXSource(spf, entityStream);
+        if (type.isAnnotationPresent(XmlRootElement.class)) {
+            return u.unmarshal(s);
+        } else {
+            return u.unmarshal(s, type).getValue();
         }
     }
 }

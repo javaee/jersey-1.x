@@ -182,9 +182,12 @@ public abstract class AbstractListElementProvider extends AbstractJAXBProvider<O
             final List l = new ArrayList();
             
             // Move to root element
-            r.nextTag();
             int event = r.next();
+            while (event != XMLStreamReader.START_ELEMENT)
+                event = r.next();
+
             // Move to first child (if any)
+            event = r.next();
             while (event != XMLStreamReader.START_ELEMENT &&
                     event != XMLStreamReader.END_DOCUMENT)
                 event = r.next();

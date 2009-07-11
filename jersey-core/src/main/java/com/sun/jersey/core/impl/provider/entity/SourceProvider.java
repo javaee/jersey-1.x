@@ -37,6 +37,7 @@
 
 package com.sun.jersey.core.impl.provider.entity;
 
+import com.sun.jersey.core.util.ThrowHelper;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -44,12 +45,14 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.Produces;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.ext.MessageBodyReader;
 import javax.ws.rs.ext.MessageBodyWriter;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.parsers.SAXParserFactory;
 import javax.xml.transform.Source;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
@@ -90,6 +93,12 @@ public final class SourceProvider {
     @Consumes({"application/xml", "text/xml", "*/*"})
     public static final class SAXSourceReader implements 
             MessageBodyReader<SAXSource> {
+        private final SAXParserFactory spf;
+
+        public SAXSourceReader(@Context SAXParserFactory spf) {
+            this.spf = spf;
+        }
+
         public boolean isReadable(Class<?> t, Type gt, Annotation[] as, MediaType mediaType) {
             return SAXSource.class == t;
         }
@@ -101,7 +110,14 @@ public final class SourceProvider {
                 MediaType mediaType, 
                 MultivaluedMap<String, String> httpHeaders,
                 InputStream entityStream) throws IOException {
-            return new SAXSource(new InputSource(entityStream));
+            try {
+                return new SAXSource(spf.newSAXParser().getXMLReader(),
+                        new InputSource(entityStream));
+            } catch (Exception ex) {
+                throw ThrowHelper.withInitCause(ex,
+                        new IOException("Error creating SAXSource")
+                        );
+            }
         }
     }
     
@@ -111,9 +127,8 @@ public final class SourceProvider {
             MessageBodyReader<DOMSource> {
         private final DocumentBuilderFactory dbf;
         
-        public DOMSourceReader() {
-            dbf = DocumentBuilderFactory.newInstance();
-            dbf.setNamespaceAware(true);
+        public DOMSourceReader(@Context DocumentBuilderFactory dbf) {
+            this.dbf = dbf;
         }
         
         public boolean isReadable(Class<?> t, Type gt, Annotation[] as, MediaType mediaType) {

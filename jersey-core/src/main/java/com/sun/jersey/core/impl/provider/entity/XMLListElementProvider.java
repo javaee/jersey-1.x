@@ -38,6 +38,7 @@
 package com.sun.jersey.core.impl.provider.entity;
 
 import com.sun.jersey.core.provider.jaxb.AbstractListElementProvider;
+import com.sun.jersey.spi.inject.Injectable;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -61,30 +62,44 @@ import javax.xml.stream.XMLStreamReader;
  */
 public class XMLListElementProvider extends AbstractListElementProvider {
 
-    XMLListElementProvider(Providers ps) {
+    // Use Injectable to delay creaton of XMLInputFactory and thus
+    // any error if no StAX implementation is available
+    private final Injectable<XMLInputFactory> xif;
+    
+    XMLListElementProvider(Injectable<XMLInputFactory> xif, Providers ps) {
         super(ps);
+
+        this.xif = xif;
     }
     
-    XMLListElementProvider(Providers ps, MediaType mt) {
+    XMLListElementProvider(Injectable<XMLInputFactory> xif, Providers ps, MediaType mt) {
         super(ps, mt);
+
+        this.xif = xif;
     }
 
     @Produces("application/xml")
     @Consumes("application/xml")
     public static final class App extends XMLListElementProvider {
-        public App(@Context Providers ps) { super(ps , MediaType.APPLICATION_XML_TYPE); }
+        public App(@Context Injectable<XMLInputFactory> xif, @Context Providers ps) {
+            super(xif, ps , MediaType.APPLICATION_XML_TYPE);
+        }
     }
     
     @Produces("text/xml")
     @Consumes("text/xml")
     public static final class Text extends XMLListElementProvider {
-        public Text(@Context Providers ps) { super(ps , MediaType.TEXT_XML_TYPE); }
+        public Text(@Context Injectable<XMLInputFactory> xif, @Context Providers ps) {
+            super(xif, ps , MediaType.TEXT_XML_TYPE);
+        }
     }
     
     @Produces("*/*")
     @Consumes("*/*")
     public static final class General extends XMLListElementProvider {
-        public General(@Context Providers ps) { super(ps); }
+        public General(@Context Injectable<XMLInputFactory> xif, @Context Providers ps) {
+            super(xif, ps);
+        }
 
         @Override
         protected boolean isSupported(MediaType m) {
@@ -93,11 +108,12 @@ public class XMLListElementProvider extends AbstractListElementProvider {
     }
 
     @Override
-    protected final XMLStreamReader getXMLStreamReader(Class<?> elementType, MediaType mediaType, Unmarshaller u,
+    protected final XMLStreamReader getXMLStreamReader(Class<?> elementType, 
+            MediaType mediaType,
+            Unmarshaller u,
             InputStream entityStream)
             throws XMLStreamException {
-        return XMLInputFactory.newInstance().
-                    createXMLStreamReader(entityStream);
+        return xif.getValue().createXMLStreamReader(entityStream);
     }
     
     public final void writeList(Class<?> elementType, Collection<?> t,

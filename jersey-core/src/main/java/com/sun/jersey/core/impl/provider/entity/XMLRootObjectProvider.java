@@ -55,19 +55,26 @@ import javax.ws.rs.ext.Providers;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.UnmarshalException;
+import javax.xml.parsers.SAXParserFactory;
 
 /**
  *
  * @author Paul.Sandoz@Sun.Com
  */
 public class XMLRootObjectProvider extends AbstractJAXBProvider<Object> {
+
+    private final SAXParserFactory spf;
     
-    XMLRootObjectProvider(Providers ps) {
+    XMLRootObjectProvider(SAXParserFactory spf, Providers ps) {
         super(ps);
+
+        this.spf = spf;
     }
     
-    XMLRootObjectProvider(Providers ps, MediaType mt) {
+    XMLRootObjectProvider(SAXParserFactory spf, Providers ps, MediaType mt) {
         super(ps, mt);
+
+        this.spf = spf;
     }
     
     @Override
@@ -78,19 +85,25 @@ public class XMLRootObjectProvider extends AbstractJAXBProvider<Object> {
     @Produces("application/xml")
     @Consumes("application/xml")
     public static final class App extends XMLRootObjectProvider {
-        public App(@Context Providers ps) { super(ps , MediaType.APPLICATION_XML_TYPE); }
+        public App(@Context SAXParserFactory spf, @Context Providers ps) { 
+            super(spf, ps , MediaType.APPLICATION_XML_TYPE);
+        }
     }
     
     @Produces("text/xml")
     @Consumes("text/xml")
     public static final class Text extends XMLRootObjectProvider {
-        public Text(@Context Providers ps) { super(ps , MediaType.TEXT_XML_TYPE); }
+        public Text(@Context SAXParserFactory spf, @Context Providers ps) { 
+            super(spf, ps , MediaType.TEXT_XML_TYPE);
+        }
     }
     
     @Produces("*/*")
     @Consumes("*/*")
     public static final class General extends XMLRootObjectProvider {
-        public General(@Context Providers ps) { super(ps); }
+        public General(@Context SAXParserFactory spf, @Context Providers ps) { 
+            super(spf, ps);
+        }
         
         @Override
         protected boolean isSupported(MediaType m) {
@@ -116,7 +129,8 @@ public class XMLRootObjectProvider extends AbstractJAXBProvider<Object> {
             MultivaluedMap<String, String> httpHeaders, 
             InputStream entityStream) throws IOException {        
         try {
-            return getUnmarshaller(type, mediaType).unmarshal(entityStream);
+            return getUnmarshaller(type, mediaType).
+                    unmarshal(getSAXSource(spf, entityStream));
         } catch (UnmarshalException ex) {
             throw new WebApplicationException(ex, 400);
         } catch (JAXBException cause) {

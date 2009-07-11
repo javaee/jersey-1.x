@@ -45,6 +45,7 @@ import com.sun.jersey.core.spi.component.ioc.IoCProviderFactory;
 import com.sun.jersey.core.spi.component.ProviderFactory;
 import com.sun.jersey.core.spi.component.ProviderServices;
 import com.sun.jersey.client.urlconnection.URLConnectionClientHandler;
+import com.sun.jersey.core.spi.component.ComponentContext;
 import com.sun.jersey.core.spi.component.ComponentInjector;
 import com.sun.jersey.core.spi.component.ComponentScope;
 import com.sun.jersey.core.spi.component.ioc.IoCComponentProcessor;
@@ -54,11 +55,14 @@ import com.sun.jersey.spi.MessageBodyWorkers;
 import com.sun.jersey.core.spi.factory.ContextResolverFactory;
 import com.sun.jersey.core.spi.factory.InjectableProviderFactory;
 import com.sun.jersey.core.spi.factory.MessageBodyFactory;
+import com.sun.jersey.core.util.FeaturesAndProperties;
+import com.sun.jersey.spi.inject.Injectable;
+import com.sun.jersey.spi.inject.InjectableProvider;
 import com.sun.jersey.spi.inject.SingletonTypeInjectableProvider;
 import com.sun.jersey.spi.service.ServiceFinder;
 import java.lang.annotation.Annotation;
+import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
-import java.net.HttpURLConnection;
 import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
@@ -173,7 +177,7 @@ public class Client extends Filterable implements ClientHandler {
             config = new ComponentsClientConfig(config, components);
         }
 
-        InjectableProviderFactory injectableFactory = new InjectableProviderFactory();
+        final InjectableProviderFactory injectableFactory = new InjectableProviderFactory();
 
         getProperties().putAll(config.getProperties());
 
@@ -195,11 +199,15 @@ public class Client extends Filterable implements ClientHandler {
                 config.getClasses(),
                 config.getSingletons());
 
-        injectableFactory.configure(providerServices);
+        // Allow injection of features and properties
+        injectableFactory.add(new ContextInjectableProvider<FeaturesAndProperties>(
+                FeaturesAndProperties.class, config));
 
         // Allow injection of resource config
         injectableFactory.add(new ContextInjectableProvider<ClientConfig>(
                 ClientConfig.class, config));
+
+        injectableFactory.configure(providerServices);
 
         // Obtain all context resolvers
         final ContextResolverFactory crf = new ContextResolverFactory(providerServices,
@@ -234,6 +242,35 @@ public class Client extends Filterable implements ClientHandler {
         injectableFactory.add(
                 new ContextInjectableProvider<Providers>(
                 Providers.class, this.providers));
+
+        injectableFactory.add(new InjectableProvider<Context, Type>() {
+            public ComponentScope getScope() {
+                return ComponentScope.Singleton;
+            }
+
+            public Injectable<Injectable> getInjectable(ComponentContext ic, Context a, Type c) {
+                if (c instanceof ParameterizedType) {
+                    ParameterizedType pt = (ParameterizedType)c;
+                    if (pt.getRawType() == Injectable.class) {
+                        if (pt.getActualTypeArguments().length == 1) {
+                            final Injectable<?> i = injectableFactory.getInjectable(
+                                    a.annotationType(),
+                                    ic,
+                                    a,
+                                    pt.getActualTypeArguments()[0],
+                                    ComponentScope.Singleton);
+                            return new Injectable<Injectable>() {
+                                public Injectable getValue() {
+                                    return i;
+                                }
+                            };
+                        }
+                    }
+                }
+
+                return null;
+            }
+        });
 
         // Initiate message body readers/writers
         bodyContext.init();

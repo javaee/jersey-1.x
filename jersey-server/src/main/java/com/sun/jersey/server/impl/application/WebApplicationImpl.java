@@ -76,6 +76,8 @@ import com.sun.jersey.api.model.AbstractResource;
 import com.sun.jersey.api.model.ResourceModelIssue;
 import com.sun.jersey.api.core.ExtendedUriInfo;
 import com.sun.jersey.api.uri.UriTemplate;
+import com.sun.jersey.core.impl.provider.xml.SAXParserContextProvider;
+import com.sun.jersey.core.impl.provider.xml.XMLStreamReaderContextProvider;
 import com.sun.jersey.core.spi.component.ComponentInjector;
 import com.sun.jersey.core.spi.component.ioc.IoCComponentProvider;
 import com.sun.jersey.core.spi.component.ioc.IoCComponentProviderFactory;
@@ -126,6 +128,7 @@ import com.sun.jersey.core.spi.component.ComponentScope;
 import com.sun.jersey.core.spi.component.ioc.IoCComponentProcessor;
 import com.sun.jersey.core.spi.component.ioc.IoCComponentProcessorFactory;
 import com.sun.jersey.core.spi.component.ioc.IoCComponentProcessorFactoryInitializer;
+import com.sun.jersey.core.util.FeaturesAndProperties;
 import com.sun.jersey.server.impl.BuildId;
 import com.sun.jersey.server.impl.model.parameter.multivalued.MultivaluedParameterExtractorFactory;
 import com.sun.jersey.server.impl.model.parameter.multivalued.MultivaluedParameterExtractorProvider;
@@ -137,6 +140,7 @@ import com.sun.jersey.spi.service.ServiceFinder;
 import com.sun.jersey.spi.template.TemplateContext;
 import com.sun.jersey.spi.uri.rules.UriRule;
 import java.lang.annotation.Annotation;
+import java.lang.reflect.ParameterizedType;
 import java.util.ArrayList;
 import java.util.List;
 import javax.ws.rs.ext.ContextResolver;
@@ -240,6 +244,35 @@ public final class WebApplicationImpl implements WebApplication {
                     };
                 } else
                     return null;
+            }
+        });
+
+        injectableFactory.add(new InjectableProvider<Context, Type>() {
+            public ComponentScope getScope() {
+                return ComponentScope.Singleton;
+            }
+
+            public Injectable<Injectable> getInjectable(ComponentContext ic, Context a, Type c) {
+                if (c instanceof ParameterizedType) {
+                    ParameterizedType pt = (ParameterizedType)c;
+                    if (pt.getRawType() == Injectable.class) {
+                        if (pt.getActualTypeArguments().length == 1) {
+                            final Injectable<?> i = injectableFactory.getInjectable(
+                                    a.annotationType(),
+                                    ic,
+                                    a,
+                                    pt.getActualTypeArguments()[0],
+                                    ComponentScope.Singleton);
+                            return new Injectable<Injectable>() {
+                                public Injectable getValue() {
+                                    return i;
+                                }
+                            };
+                        }
+                    }
+                }
+
+                return null;
             }
         });
 
@@ -508,6 +541,10 @@ public final class WebApplicationImpl implements WebApplication {
 
                 });
         
+        // Allow injection of features and properties
+        injectableFactory.add(new ContextInjectableProvider<FeaturesAndProperties>(
+                FeaturesAndProperties.class, resourceConfig));
+
         // Allow injection of resource config
         injectableFactory.add(new ContextInjectableProvider<ResourceConfig>(
                 ResourceConfig.class, resourceConfig));

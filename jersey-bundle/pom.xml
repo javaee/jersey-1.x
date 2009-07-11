@@ -308,6 +308,8 @@
                                 <spi>com.sun.jersey.server.impl.model.method.dispatch.ResourceMethodDispatchProvider</spi>
                                 <spi>com.sun.jersey.spi.container.WebApplicationProvider</spi>
                                 <spi>com.sun.jersey.spi.HeaderDelegateProvider</spi>
+                                <spi>com.sun.jersey.spi.inject.InjectableProvider</spi>
+                                <spi>com.sun.jersey.spi.StringReaderProvider</spi>
                                 <spi>javax.ws.rs.ext.MessageBodyReader</spi>
                                 <spi>javax.ws.rs.ext.MessageBodyWriter</spi>
                                 <spi>javax.ws.rs.ext.RuntimeDelegate</spi>

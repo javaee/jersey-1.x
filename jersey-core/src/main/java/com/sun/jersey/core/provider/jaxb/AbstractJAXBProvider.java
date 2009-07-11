@@ -38,6 +38,7 @@
 package com.sun.jersey.core.provider.jaxb;
 
 import com.sun.jersey.core.provider.AbstractMessageReaderWriterProvider;
+import java.io.InputStream;
 import java.util.Map;
 import java.util.WeakHashMap;
 import javax.ws.rs.core.MediaType;
@@ -47,6 +48,9 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
+import javax.xml.parsers.SAXParserFactory;
+import javax.xml.transform.sax.SAXSource;
+import org.xml.sax.InputSource;
 
 /**
  *
@@ -161,5 +165,16 @@ public abstract class AbstractJAXBProvider<T> extends AbstractMessageReaderWrite
             }
             return c;
         }        
+    }
+    
+    protected static SAXSource getSAXSource(SAXParserFactory spf,
+            InputStream entityStream) throws JAXBException {
+        try {
+            return new SAXSource(
+                    spf.newSAXParser().getXMLReader(),
+                    new InputSource(entityStream));
+        } catch (Exception ex) {
+            throw new JAXBException("Error creating SAXSource", ex);
+        }
     }
 }

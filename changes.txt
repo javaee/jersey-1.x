@@ -1,4 +1,11 @@
 release 1.1.1-ea (2009-06)
+- Fixed issue 323
+  https://jersey.dev.java.net/issues/show_bug.cgi?id=323
+  By default entity processing is disabled when XML parsing, on the client and
+  server side, for JAXB types, SAXSource and DOMSource.
+  This prevents Xml eXternal Entity (XXE) attacks. Security defaults for XML
+  processing may be disabled by setting the feature 
+  FeaturesAndProperties.FEATURE_DISABLE_XML_SECURITY to true.
 - Fixed issue 310
   https://jersey.dev.java.net/issues/show_bug.cgi?id=310
   Single element array in mapped JSON notation is incorrect
@@ -24,7 +31,7 @@ release 1.1.1-ea (2009-06)
   Suppport disabling of WADL. Set the following feature on ResourceConfig to
   true:
     ResourceConfig.FEATURE_DISABLE_WADL
-  or add the following initialiation parameter to the Jerseuy servlet or filter:
+  or add the following initialiation parameter to the Jersey servlet or filter:
     <init-param>
         <param-name>com.sun.jersey.config.feature.DisableWADL</param-name>
         <param-value>true</param-value>

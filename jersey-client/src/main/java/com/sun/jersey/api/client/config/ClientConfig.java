@@ -38,6 +38,7 @@
 package com.sun.jersey.api.client.config;
 
 import com.sun.jersey.api.client.Client;
+import com.sun.jersey.core.util.FeaturesAndProperties;
 import java.util.Map;
 import java.util.Set;
 
@@ -65,7 +66,7 @@ import java.util.Set;
  * 
  * @author Paul.Sandoz@Sun.Com
  */
-public interface ClientConfig {
+public interface ClientConfig extends FeaturesAndProperties {
     /**
      * Redirection property. A value of "true" declares that the client will 
      * automatically redirect to the URI declared in 3xx responses.
@@ -150,42 +151,7 @@ public interface ClientConfig {
      *         The returned value shall never be null.
      */
     public Set<Object> getSingletons();
-    
-    /**
-     * Get the map of features associated with the client.
-     *
-     * @return the features.
-     *         The returned value shall never be null.
-     */
-    Map<String, Boolean> getFeatures();
-    
-    /**
-     * Get the value of a feature.
-     *
-     * @param featureName the feature name.
-     * @return true if the feature is present and set to true, otherwise false
-     *         if the feature is present and set to false or the feature is not 
-     *         present.
-     */
-    boolean getFeature(String featureName);
-    
-    /**
-     * Get the map of properties associated with the client.
-     *
-     * @return the properties.
-     *         The returned value shall never be null.
-     */
-    Map<String, Object> getProperties();
-
-    /**
-     * Get the value of a property.
-     *
-     * @param propertyName the property name.
-     * @return the property, or null if there is no property present for the
-     *         given property name.
-     */
-    Object getProperty(String propertyName);
-    
+        
     /**
      * Get a feature that is boolean property of the property bag.
      *
