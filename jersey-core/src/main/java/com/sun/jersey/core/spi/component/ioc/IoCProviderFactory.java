@@ -104,6 +104,10 @@ public class IoCProviderFactory extends ProviderFactory {
         } else if (icp instanceof IoCProxiedComponentProvider) {
             IoCProxiedComponentProvider ipcp = (IoCProxiedComponentProvider)icp;
             ComponentProvider cp = super._getComponentProvider(c);
+            // Problem creating the component provider
+            if (cp == null)
+                return null;
+
             return new ProxiedSingletonWrapper(ipcp, cp, c);
         }
         throw new UnsupportedOperationException();

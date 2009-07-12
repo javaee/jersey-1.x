@@ -1,4 +1,8 @@
 release 1.1.1-ea (2009-06)
+- Fixed issue 322
+  https://jersey.dev.java.net/issues/show_bug.cgi?id=323
+  A proxied IoC provider should not be invoked if the component to be proxied
+  cannot be instantiated.
 - Fixed issue 323
   https://jersey.dev.java.net/issues/show_bug.cgi?id=323
   By default entity processing is disabled when XML parsing, on the client and
