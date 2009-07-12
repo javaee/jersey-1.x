@@ -46,7 +46,7 @@ import org.testng.annotations.Test;
 
 /**
  *
- * @author paulsandoz
+ * @author Paul.Sandoz@Sun.Com
  */
 @Test
 public class InheritenceTest extends AbstractTest {

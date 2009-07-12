@@ -34,16 +34,14 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-package com.sun.jersey.spring.tests.childconfig;
+package com.sun.jersey.spring.tests.abstractbean;
 
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.WebResource;
-import com.sun.jersey.spi.spring.container.servlet.SpringServlet;
 import com.sun.jersey.spring.tests.AbstractTest;
-import java.util.HashMap;
-import java.util.Map;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
+import org.springframework.stereotype.Component;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
@@ -52,52 +50,48 @@ import org.testng.annotations.Test;
  * @author Paul.Sandoz@Sun.Com
  */
 @Test
-public class ChildConfigContextTest extends AbstractTest {
+public class AbstractBeanTest extends AbstractTest {
 
-    @Path("app")
-    public static class ApplicationConfigResource {
-
-        @GET
-        public String get() {
-            return "app";
-        }
+    public static abstract class XMLDeclaredAbstractResource {
     }
 
-    @Path("child")
-    public static class ChildConfigResource {
+    @Path("xml")
+    public static class XMLDeclaredResource extends XMLDeclaredAbstractResource {
 
         @GET
         public String get() {
-            return "child";
+            return "xml";
         }
     }
 
     @Test
-    public void testApplicationConfig() {
+    public void testXmlDeclared() {
         start();
 
-        WebResource r = resource("app");
-        Assert.assertEquals("app", r.get(String.class));
+        WebResource r = resource("xml");
+        Assert.assertEquals("xml", r.get(String.class));
+    }
 
-        r = resource("child");
 
-        ClientResponse cr = r.get(ClientResponse.class);
-        Assert.assertEquals(404, cr.getStatus());
+    @Component
+    public static abstract class AutoDeclaredAbstractResource {
+    }
+
+    @Path("auto")
+    @Component
+    public static class AutoDeclaredResource extends AutoDeclaredAbstractResource {
+
+        @GET
+        public String get() {
+            return "auto";
+        }
     }
 
     @Test
-    public void testChildConfig() {
-        String clientConfig =  this.getClass().getName();
-        clientConfig = clientConfig.replace(".", "/") + "-client-config.xml";
+    public void testAutolDeclared() {
+        start();
 
-        Map<String, String> m = new HashMap<String, String>();
-        m.put(SpringServlet.CONTEXT_CONFIG_LOCATION, "classpath:" + clientConfig);
-        start(m);
-
-        WebResource r = resource("app");
-        Assert.assertEquals("app", r.get(String.class));
-
-        r = resource("child");
-        Assert.assertEquals("child", r.get(String.class));
+        WebResource r = resource("auto");
+        Assert.assertEquals("auto", r.get(String.class));
     }
 }
