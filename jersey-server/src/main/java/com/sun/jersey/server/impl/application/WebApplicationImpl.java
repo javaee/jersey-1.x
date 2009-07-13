@@ -262,7 +262,7 @@ public final class WebApplicationImpl implements WebApplication {
                                     ic,
                                     a,
                                     pt.getActualTypeArguments()[0],
-                                    ComponentScope.Singleton);
+                                    ComponentScope.PERREQUEST_UNDEFINED_SINGLETON);
                             return new Injectable<Injectable>() {
                                 public Injectable getValue() {
                                     return i;

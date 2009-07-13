@@ -38,6 +38,7 @@
 package com.sun.jersey.core.impl.provider.entity;
 
 import com.sun.jersey.core.util.ThrowHelper;
+import com.sun.jersey.spi.inject.Injectable;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -93,9 +94,10 @@ public final class SourceProvider {
     @Consumes({"application/xml", "text/xml", "*/*"})
     public static final class SAXSourceReader implements 
             MessageBodyReader<SAXSource> {
-        private final SAXParserFactory spf;
+        // Delay construction of factory
+        private final Injectable<SAXParserFactory> spf;
 
-        public SAXSourceReader(@Context SAXParserFactory spf) {
+        public SAXSourceReader(@Context Injectable<SAXParserFactory> spf) {
             this.spf = spf;
         }
 
@@ -111,7 +113,7 @@ public final class SourceProvider {
                 MultivaluedMap<String, String> httpHeaders,
                 InputStream entityStream) throws IOException {
             try {
-                return new SAXSource(spf.newSAXParser().getXMLReader(),
+                return new SAXSource(spf.getValue().newSAXParser().getXMLReader(),
                         new InputSource(entityStream));
             } catch (Exception ex) {
                 throw ThrowHelper.withInitCause(ex,
@@ -125,9 +127,10 @@ public final class SourceProvider {
     @Consumes({"application/xml", "text/xml", "*/*"})
     public static final class DOMSourceReader implements 
             MessageBodyReader<DOMSource> {
-        private final DocumentBuilderFactory dbf;
+        // Delay construction of factory
+        private final Injectable<DocumentBuilderFactory> dbf;
         
-        public DOMSourceReader(@Context DocumentBuilderFactory dbf) {
+        public DOMSourceReader(@Context Injectable<DocumentBuilderFactory> dbf) {
             this.dbf = dbf;
         }
         
@@ -143,7 +146,7 @@ public final class SourceProvider {
                 MultivaluedMap<String, String> httpHeaders,
                 InputStream entityStream) throws IOException {
             try {
-                Document d = dbf.newDocumentBuilder().parse(entityStream);
+                Document d = dbf.getValue().newDocumentBuilder().parse(entityStream);
                 return new DOMSource(d);
             } catch (SAXException ex) {
                 throw getIOException(ex);
@@ -158,10 +161,16 @@ public final class SourceProvider {
     public static final class SourceWriter implements 
             MessageBodyWriter<Source> {
 
-        private final TransformerFactory tf;
+        // Delay construction of factory
+        private final Injectable<SAXParserFactory> spf;
         
-        public SourceWriter() {
-            tf = TransformerFactory.newInstance();
+        // Delay construction of factory
+        private final Injectable<TransformerFactory> tf;
+        
+        public SourceWriter(@Context Injectable<SAXParserFactory> spf,
+                @Context Injectable<TransformerFactory> tf) {
+            this.spf = spf;
+            this.tf = tf;
         }
         
         public boolean isWriteable(Class<?> t, Type gt, Annotation[] as, MediaType mediaType) {
@@ -176,9 +185,15 @@ public final class SourceProvider {
                 MediaType mediaType, MultivaluedMap<String, Object> httpHeaders, 
                 OutputStream entityStream) throws IOException {
             try {
+
+                if (o instanceof StreamSource) {
+                    StreamSource s = (StreamSource)o;
+                    InputSource is = new InputSource(s.getInputStream());
+                    o = new SAXSource(spf.getValue().newSAXParser().getXMLReader(), is);
+                }
                 StreamResult sr = new StreamResult(entityStream);
-                tf.newTransformer().transform(o, sr);
-            } catch (TransformerException ex) {
+                tf.getValue().newTransformer().transform(o, sr);
+            } catch (Exception ex) {
                 throw getIOException(ex);
             }
         }        

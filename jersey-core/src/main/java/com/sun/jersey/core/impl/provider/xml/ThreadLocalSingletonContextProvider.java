@@ -34,40 +34,50 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-
 package com.sun.jersey.core.impl.provider.xml;
 
-import com.sun.jersey.core.util.FeaturesAndProperties;
-import java.util.logging.Logger;
+import com.sun.jersey.core.spi.component.ComponentContext;
+import com.sun.jersey.core.spi.component.ComponentScope;
+import com.sun.jersey.spi.inject.Injectable;
+import com.sun.jersey.spi.inject.InjectableProvider;
+import java.lang.reflect.Type;
 import javax.ws.rs.core.Context;
-import javax.xml.parsers.DocumentBuilderFactory;
 
 /**
  *
  * @author Paul.Sandoz@Sun.Com
  */
-public class DocumentBuilderFactoryProvider extends ThreadLocalSingletonContextProvider<DocumentBuilderFactory> {
-    private static final Logger LOGGER = Logger.getLogger(
-            DocumentBuilderFactoryProvider.class.getName());
+public abstract class ThreadLocalSingletonContextProvider<T> implements InjectableProvider<Context, Type> {
 
-    private final boolean disableXmlSecurity;
+    private final Class<T> t;
     
-    public DocumentBuilderFactoryProvider(@Context FeaturesAndProperties fps) {
-        super(DocumentBuilderFactory.class);
+    private final ThreadLocal<T> rf;
 
-        disableXmlSecurity = fps.getFeature(FeaturesAndProperties.FEATURE_DISABLE_XML_SECURITY);
+    protected ThreadLocalSingletonContextProvider(Class<T> t) {
+        this.t = t;
+        this.rf = new ThreadLocal<T>() {
+            @Override
+            protected synchronized T initialValue() {
+                return getInstance();
+            }
+        };
     }
 
-    @Override
-    protected DocumentBuilderFactory getInstance() {
-        DocumentBuilderFactory f = DocumentBuilderFactory.newInstance();
+    public ComponentScope getScope() {
+        return ComponentScope.Undefined;
+    }
 
-        f.setNamespaceAware(true);
-
-        if (!disableXmlSecurity) {
-            f.setExpandEntityReferences(false);
+    public Injectable<T> getInjectable(ComponentContext ic, Context a, Type c) {
+        if (c == t) {
+            return new Injectable<T>() {
+                public T getValue() {
+                    return rf.get();
+                }
+            };
+        } else {
+            return null;
         }
-
-        return f;
     }
+
+    protected abstract T getInstance();
 }

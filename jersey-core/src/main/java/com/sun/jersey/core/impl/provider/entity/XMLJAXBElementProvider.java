@@ -38,6 +38,7 @@
 package com.sun.jersey.core.impl.provider.entity;
 
 import com.sun.jersey.core.provider.jaxb.AbstractJAXBElementProvider;
+import com.sun.jersey.spi.inject.Injectable;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -59,15 +60,16 @@ import javax.xml.parsers.SAXParserFactory;
  */
 public class XMLJAXBElementProvider extends AbstractJAXBElementProvider {
     
-    private final SAXParserFactory spf;
+    // Delay construction of factory
+    private final Injectable<SAXParserFactory> spf;
     
-    public XMLJAXBElementProvider(SAXParserFactory spf, Providers ps) {
+    public XMLJAXBElementProvider(Injectable<SAXParserFactory> spf, Providers ps) {
         super(ps);
 
         this.spf = spf;
     }
     
-    public XMLJAXBElementProvider(SAXParserFactory spf, Providers ps, MediaType mt) {
+    public XMLJAXBElementProvider(Injectable<SAXParserFactory> spf, Providers ps, MediaType mt) {
         super(ps, mt);        
 
         this.spf = spf;
@@ -76,7 +78,7 @@ public class XMLJAXBElementProvider extends AbstractJAXBElementProvider {
     @Produces("application/xml")
     @Consumes("application/xml")
     public static final class App extends XMLJAXBElementProvider {
-        public App(@Context SAXParserFactory spf, @Context Providers ps) {
+        public App(@Context Injectable<SAXParserFactory> spf, @Context Providers ps) {
             super(spf, ps , MediaType.APPLICATION_XML_TYPE);
         }
     }
@@ -84,7 +86,7 @@ public class XMLJAXBElementProvider extends AbstractJAXBElementProvider {
     @Produces("text/xml")
     @Consumes("text/xml")
     public static final class Text extends XMLJAXBElementProvider {
-        public Text(@Context SAXParserFactory spf, @Context Providers ps) {
+        public Text(@Context Injectable<SAXParserFactory> spf, @Context Providers ps) {
             super(spf, ps , MediaType.TEXT_XML_TYPE);
         }
     }
@@ -92,7 +94,7 @@ public class XMLJAXBElementProvider extends AbstractJAXBElementProvider {
     @Produces("*/*")
     @Consumes("*/*")
     public static final class General extends XMLJAXBElementProvider {
-        public General(@Context SAXParserFactory spf, @Context Providers ps) {
+        public General(@Context Injectable<SAXParserFactory> spf, @Context Providers ps) {
             super(spf, ps);
         }
 
@@ -105,7 +107,7 @@ public class XMLJAXBElementProvider extends AbstractJAXBElementProvider {
     protected final JAXBElement<?> readFrom(Class<?> type, MediaType mediaType,
             Unmarshaller u, InputStream entityStream)
             throws JAXBException, IOException {
-        return u.unmarshal(getSAXSource(spf, entityStream), type);
+        return u.unmarshal(getSAXSource(spf.getValue(), entityStream), type);
     }
 
     protected final void writeTo(JAXBElement<?> t, MediaType mediaType, Charset c,

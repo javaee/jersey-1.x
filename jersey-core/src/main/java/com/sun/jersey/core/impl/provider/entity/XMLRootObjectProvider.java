@@ -40,6 +40,7 @@ package com.sun.jersey.core.impl.provider.entity;
 import com.sun.jersey.core.provider.jaxb.AbstractJAXBProvider;
 import com.sun.jersey.impl.ImplMessages;
 import com.sun.jersey.core.util.ThrowHelper;
+import com.sun.jersey.spi.inject.Injectable;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -63,15 +64,16 @@ import javax.xml.parsers.SAXParserFactory;
  */
 public class XMLRootObjectProvider extends AbstractJAXBProvider<Object> {
 
-    private final SAXParserFactory spf;
+    // Delay construction of factory
+    private final Injectable<SAXParserFactory> spf;
     
-    XMLRootObjectProvider(SAXParserFactory spf, Providers ps) {
+    XMLRootObjectProvider(Injectable<SAXParserFactory> spf, Providers ps) {
         super(ps);
 
         this.spf = spf;
     }
     
-    XMLRootObjectProvider(SAXParserFactory spf, Providers ps, MediaType mt) {
+    XMLRootObjectProvider(Injectable<SAXParserFactory> spf, Providers ps, MediaType mt) {
         super(ps, mt);
 
         this.spf = spf;
@@ -85,7 +87,7 @@ public class XMLRootObjectProvider extends AbstractJAXBProvider<Object> {
     @Produces("application/xml")
     @Consumes("application/xml")
     public static final class App extends XMLRootObjectProvider {
-        public App(@Context SAXParserFactory spf, @Context Providers ps) { 
+        public App(@Context Injectable<SAXParserFactory> spf, @Context Providers ps) {
             super(spf, ps , MediaType.APPLICATION_XML_TYPE);
         }
     }
@@ -93,7 +95,7 @@ public class XMLRootObjectProvider extends AbstractJAXBProvider<Object> {
     @Produces("text/xml")
     @Consumes("text/xml")
     public static final class Text extends XMLRootObjectProvider {
-        public Text(@Context SAXParserFactory spf, @Context Providers ps) { 
+        public Text(@Context Injectable<SAXParserFactory> spf, @Context Providers ps) {
             super(spf, ps , MediaType.TEXT_XML_TYPE);
         }
     }
@@ -101,7 +103,7 @@ public class XMLRootObjectProvider extends AbstractJAXBProvider<Object> {
     @Produces("*/*")
     @Consumes("*/*")
     public static final class General extends XMLRootObjectProvider {
-        public General(@Context SAXParserFactory spf, @Context Providers ps) { 
+        public General(@Context Injectable<SAXParserFactory> spf, @Context Providers ps) {
             super(spf, ps);
         }
         
@@ -130,7 +132,7 @@ public class XMLRootObjectProvider extends AbstractJAXBProvider<Object> {
             InputStream entityStream) throws IOException {        
         try {
             return getUnmarshaller(type, mediaType).
-                    unmarshal(getSAXSource(spf, entityStream));
+                    unmarshal(getSAXSource(spf.getValue(), entityStream));
         } catch (UnmarshalException ex) {
             throw new WebApplicationException(ex, 400);
         } catch (JAXBException cause) {

@@ -48,7 +48,7 @@ import javax.xml.parsers.SAXParserFactory;
  *
  * @author Paul.Sandoz@Sun.Com
  */
-public class SAXParserContextProvider extends LazySingletonContextProvider<SAXParserFactory> {
+public class SAXParserContextProvider extends ThreadLocalSingletonContextProvider<SAXParserFactory> {
     private static final Logger LOGGER = Logger.getLogger(
             SAXParserContextProvider.class.getName());
 

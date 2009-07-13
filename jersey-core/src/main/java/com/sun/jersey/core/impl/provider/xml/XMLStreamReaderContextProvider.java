@@ -45,7 +45,7 @@ import javax.xml.stream.XMLInputFactory;
  *
  * @author Paul.Sandoz@Sun.Com
  */
-public class XMLStreamReaderContextProvider extends LazySingletonContextProvider<XMLInputFactory> {
+public class XMLStreamReaderContextProvider extends ThreadLocalSingletonContextProvider<XMLInputFactory> {
     private final boolean disableXmlSecurity;
 
 

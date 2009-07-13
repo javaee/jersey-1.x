@@ -37,6 +37,7 @@
 package com.sun.jersey.core.impl.provider.entity;
 
 import com.sun.jersey.core.provider.jaxb.AbstractRootElementProvider;
+import com.sun.jersey.spi.inject.Injectable;
 import java.io.IOException;
 import java.io.InputStream;
 import javax.ws.rs.Consumes;
@@ -56,15 +57,16 @@ import javax.xml.transform.sax.SAXSource;
  */
 public class XMLRootElementProvider extends AbstractRootElementProvider {
 
-    private final SAXParserFactory spf;
+    // Delay construction of factory
+    private final Injectable<SAXParserFactory> spf;
 
-    XMLRootElementProvider(SAXParserFactory spf, Providers ps) {
+    XMLRootElementProvider(Injectable<SAXParserFactory> spf, Providers ps) {
         super(ps);
 
         this.spf = spf;
     }
 
-    XMLRootElementProvider(SAXParserFactory spf, Providers ps, MediaType mt) {
+    XMLRootElementProvider(Injectable<SAXParserFactory> spf, Providers ps, MediaType mt) {
         super(ps, mt);
 
         this.spf = spf;
@@ -74,7 +76,7 @@ public class XMLRootElementProvider extends AbstractRootElementProvider {
     @Consumes("application/xml")
     public static final class App extends XMLRootElementProvider {
 
-        public App(@Context SAXParserFactory spf, @Context Providers ps) {
+        public App(@Context Injectable<SAXParserFactory> spf, @Context Providers ps) {
             super(spf, ps, MediaType.APPLICATION_XML_TYPE);
         }
     }
@@ -83,7 +85,7 @@ public class XMLRootElementProvider extends AbstractRootElementProvider {
     @Consumes("text/xml")
     public static final class Text extends XMLRootElementProvider {
 
-        public Text(@Context SAXParserFactory spf, @Context Providers ps) {
+        public Text(@Context Injectable<SAXParserFactory> spf, @Context Providers ps) {
             super(spf, ps, MediaType.TEXT_XML_TYPE);
         }
     }
@@ -92,7 +94,7 @@ public class XMLRootElementProvider extends AbstractRootElementProvider {
     @Consumes("*/*")
     public static final class General extends XMLRootElementProvider {
 
-        public General(@Context SAXParserFactory spf, @Context Providers ps) {
+        public General(@Context Injectable<SAXParserFactory> spf, @Context Providers ps) {
             super(spf, ps);
         }
 
@@ -106,7 +108,7 @@ public class XMLRootElementProvider extends AbstractRootElementProvider {
     protected Object readFrom(Class<Object> type, MediaType mediaType,
             Unmarshaller u, InputStream entityStream)
             throws JAXBException, IOException {
-        final SAXSource s = getSAXSource(spf, entityStream);
+        final SAXSource s = getSAXSource(spf.getValue(), entityStream);
         if (type.isAnnotationPresent(XmlRootElement.class)) {
             return u.unmarshal(s);
         } else {

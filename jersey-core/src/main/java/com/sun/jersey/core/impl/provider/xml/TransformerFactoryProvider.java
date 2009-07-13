@@ -38,34 +38,28 @@
 package com.sun.jersey.core.impl.provider.xml;
 
 import com.sun.jersey.core.util.FeaturesAndProperties;
-import java.util.logging.Logger;
 import javax.ws.rs.core.Context;
-import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.transform.TransformerFactory;
 
 /**
  *
  * @author Paul.Sandoz@Sun.Com
  */
-public class DocumentBuilderFactoryProvider extends ThreadLocalSingletonContextProvider<DocumentBuilderFactory> {
-    private static final Logger LOGGER = Logger.getLogger(
-            DocumentBuilderFactoryProvider.class.getName());
-
+public class TransformerFactoryProvider extends ThreadLocalSingletonContextProvider<TransformerFactory> {
     private final boolean disableXmlSecurity;
     
-    public DocumentBuilderFactoryProvider(@Context FeaturesAndProperties fps) {
-        super(DocumentBuilderFactory.class);
+    public TransformerFactoryProvider(@Context FeaturesAndProperties fps) {
+        super(TransformerFactory.class);
 
         disableXmlSecurity = fps.getFeature(FeaturesAndProperties.FEATURE_DISABLE_XML_SECURITY);
     }
 
     @Override
-    protected DocumentBuilderFactory getInstance() {
-        DocumentBuilderFactory f = DocumentBuilderFactory.newInstance();
-
-        f.setNamespaceAware(true);
+    protected TransformerFactory getInstance() {
+        TransformerFactory f = TransformerFactory.newInstance();
 
         if (!disableXmlSecurity) {
-            f.setExpandEntityReferences(false);
+            // TODO ?
         }
 
         return f;

@@ -62,8 +62,7 @@ import javax.xml.stream.XMLStreamReader;
  */
 public class XMLListElementProvider extends AbstractListElementProvider {
 
-    // Use Injectable to delay creaton of XMLInputFactory and thus
-    // any error if no StAX implementation is available
+    // Delay construction of factory
     private final Injectable<XMLInputFactory> xif;
     
     XMLListElementProvider(Injectable<XMLInputFactory> xif, Providers ps) {

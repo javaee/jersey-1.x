@@ -258,7 +258,7 @@ public class Client extends Filterable implements ClientHandler {
                                     ic,
                                     a,
                                     pt.getActualTypeArguments()[0],
-                                    ComponentScope.Singleton);
+                                    ComponentScope.PERREQUEST_UNDEFINED_SINGLETON);
                             return new Injectable<Injectable>() {
                                 public Injectable getValue() {
                                     return i;

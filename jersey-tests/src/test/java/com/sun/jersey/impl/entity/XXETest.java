@@ -37,18 +37,22 @@
 package com.sun.jersey.impl.entity;
 
 import com.sun.jersey.api.client.WebResource;
-import com.sun.jersey.api.client.filter.LoggingFilter;
 import com.sun.jersey.api.core.ClassNamesResourceConfig;
 import com.sun.jersey.core.util.FeaturesAndProperties;
 import com.sun.jersey.impl.AbstractResourceTester;
 import java.net.URL;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+import java.util.concurrent.CountDownLatch;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
+import javax.xml.bind.JAXBElement;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.sax.SAXSource;
+import javax.xml.transform.stream.StreamSource;
 
 /**
  *
@@ -88,6 +92,12 @@ public class XXETest extends AbstractResourceTester {
             return s.value;
         }
 
+        @Path("jaxbelement")
+        @POST
+        public String post(JAXBElement<JAXBBeanType> s) {
+            return s.getValue().value;
+        }
+
         @Path("jaxb/list")
         @POST
         public String post(List<JAXBBean> s) {
@@ -103,6 +113,12 @@ public class XXETest extends AbstractResourceTester {
         @Path("dom")
         @POST
         public DOMSource postDom(DOMSource s) {
+           return s;
+        }
+
+        @Path("stream")
+        @POST
+        public StreamSource postStream(StreamSource s) {
            return s;
         }
     }
@@ -124,6 +140,104 @@ public class XXETest extends AbstractResourceTester {
         WebResource r = resource("/");
 
         String s = r.path("jaxb").type("application/xml").post(String.class, getDocument());
+        assertEquals("COMPROMISED", s);
+    }
+
+    public void testJAXBSecureWithThreads() throws Throwable {
+        initiateWebApplication(EntityHolderResource.class);
+
+        final WebResource r = resource("/");
+
+        int n = 4;
+        final CountDownLatch latch = new CountDownLatch(n);
+
+        Runnable runnable = new Runnable() {
+            public void run() {
+                try {
+                    String s = r.path("jaxb").type("application/xml").post(String.class, getDocument());
+                    assertEquals("", s);
+                } finally {
+                    latch.countDown();
+                }
+            }
+        };
+
+        final Set<Throwable> s = new HashSet<Throwable>();
+        for (int i = 0; i < n; i++) {
+            Thread t = new Thread(runnable);
+            t.setUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
+                public void uncaughtException(Thread t, Throwable ex) {
+                    s.add(ex);
+                }
+            });
+            t.start();
+        }
+        
+        try {
+            latch.await();
+        } catch (InterruptedException ex) {
+        }
+    }
+
+    public void testJAXBInsecureWithThreads() throws Throwable {
+        ClassNamesResourceConfig rc = new ClassNamesResourceConfig(EntityHolderResource.class);
+        rc.getFeatures().put(FeaturesAndProperties.FEATURE_DISABLE_XML_SECURITY, Boolean.TRUE);
+        initiateWebApplication(rc);
+
+        final WebResource r = resource("/");
+
+        int n = 4;
+        final CountDownLatch latch = new CountDownLatch(n);
+
+        Runnable runnable = new Runnable() {
+            public void run() {
+                try {
+                    String s = r.path("jaxb").type("application/xml").post(String.class, getDocument());
+                    assertEquals("COMPROMISED", s);
+                } finally {
+                    latch.countDown();
+                }
+            }
+        };
+
+        final Set<Throwable> s = new HashSet<Throwable>();
+        for (int i = 0; i < n; i++) {
+            Thread t = new Thread(runnable);
+            t.setUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
+                public void uncaughtException(Thread t, Throwable ex) {
+                    s.add(ex);
+                }
+            });
+            t.start();
+        }
+
+        try {
+            latch.await();
+        } catch (InterruptedException ex) {
+        }
+
+        if (!s.isEmpty()) {
+            throw s.iterator().next();
+        }
+    }
+
+    public void testJAXBElementSecure() {
+        initiateWebApplication(EntityHolderResource.class);
+
+        WebResource r = resource("/");
+
+        String s = r.path("jaxbelement").type("application/xml").post(String.class, getDocument());
+        assertEquals("", s);
+    }
+
+    public void testJAXBElementInsecure() {
+        ClassNamesResourceConfig rc = new ClassNamesResourceConfig(EntityHolderResource.class);
+        rc.getFeatures().put(FeaturesAndProperties.FEATURE_DISABLE_XML_SECURITY, Boolean.TRUE);
+        initiateWebApplication(rc);
+
+        WebResource r = resource("/");
+
+        String s = r.path("jaxbelement").type("application/xml").post(String.class, getDocument());
         assertEquals("COMPROMISED", s);
     }
 
@@ -186,4 +300,25 @@ public class XXETest extends AbstractResourceTester {
         JAXBBean b = r.path("dom").type("application/xml").post(JAXBBean.class, getDocument());
         assertEquals("COMPROMISED", b.value);
     }
+
+    public void testStreamSecure() {
+        initiateWebApplication(EntityHolderResource.class);
+
+        WebResource r = resource("/");
+
+        JAXBBean b = r.path("stream").type("application/xml").post(JAXBBean.class, getDocument());
+        assertEquals("", b.value);
+    }
+
+    public void testStreamInsecure() {
+        ClassNamesResourceConfig rc = new ClassNamesResourceConfig(EntityHolderResource.class);
+        rc.getFeatures().put(FeaturesAndProperties.FEATURE_DISABLE_XML_SECURITY, Boolean.TRUE);
+        initiateWebApplication(rc);
+
+        WebResource r = resource("/");
+
+        JAXBBean b = r.path("stream").type("application/xml").post(JAXBBean.class, getDocument());
+        assertEquals("COMPROMISED", b.value);
+    }
+
 }
