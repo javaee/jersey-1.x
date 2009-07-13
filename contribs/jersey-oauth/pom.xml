@@ -41,7 +41,7 @@
     <parent>
         <groupId>com.sun.jersey.contribs</groupId>
         <artifactId>jersey-contribs</artifactId>
-        <version>1.1.1-ea-SNAPSHOT</version>
+        <version>1.1.2-ea-SNAPSHOT</version>
     </parent>
     <groupId>com.sun.jersey.oauth</groupId>
     <artifactId>jersey-oauth</artifactId>

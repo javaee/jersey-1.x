@@ -42,11 +42,11 @@
     <parent>
         <groupId>com.sun.jersey.samples</groupId>
         <artifactId>jersey-samples</artifactId>
-        <version>1.1.1-ea-SNAPSHOT</version>
+        <version>1.1.2-ea-SNAPSHOT</version>
     </parent>
     <artifactId>entity-provider</artifactId>
     <name>Entity provider -- Jersey sample</name>
-    <version>1.1.1-ea-SNAPSHOT</version>
+    <version>1.1.2-ea-SNAPSHOT</version>
     <profiles>
         <profile>
             <id>jdk-1.5</id>

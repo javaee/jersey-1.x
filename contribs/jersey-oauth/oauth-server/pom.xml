@@ -40,7 +40,7 @@
     <parent>
         <groupId>com.sun.jersey.oauth</groupId>
         <artifactId>jersey-oauth</artifactId>
-        <version>1.1.1-ea-SNAPSHOT</version>
+        <version>1.1.2-ea-SNAPSHOT</version>
     </parent>
     <artifactId>oauth-server</artifactId>
     <packaging>jar</packaging>
