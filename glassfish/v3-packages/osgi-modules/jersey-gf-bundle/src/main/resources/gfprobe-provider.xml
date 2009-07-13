@@ -1,12 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<probe-provider moduleProviderName="glassfish" moduleName="jersey" probeProviderName="server" >
-    <probe name="pathAccept">
-       <class>com.sun.jersey.server.probes.UriRuleProbeProvider</class>
-       <method>accept</method>
-       <signature>void (String, CharSequence)</signature>
-       <probe-param type="String" name="ruleName" />
-       <probe-param type="CharSequence" name="path"/>
-       <return-param type="void" />
-       <location>ENTRY</location>
-    </probe>
+<probe-providers>
+<probe-provider moduleProviderName="glassfish" moduleName="jersey" probeProviderName="rule" class="com.sun.jersey.server.probes.UriRuleProbeProvider">
+   <probe name="pathAccept">
+      <method>accept</method>
+      <probe-param type="java.lang.String" name="ruleName" />
+      <probe-param type="java.lang.CharSequence" name="path"/>
+      <return-param type="void" />
+   </probe>
 </probe-provider>
+</probe-providers>
