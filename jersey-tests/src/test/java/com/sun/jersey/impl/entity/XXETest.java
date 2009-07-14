@@ -49,10 +49,14 @@ import javax.ws.rs.Consumes;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
+import javax.ws.rs.WebApplicationException;
 import javax.xml.bind.JAXBElement;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.sax.SAXSource;
 import javax.xml.transform.stream.StreamSource;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
 
 /**
  *
@@ -112,8 +116,17 @@ public class XXETest extends AbstractResourceTester {
 
         @Path("dom")
         @POST
-        public DOMSource postDom(DOMSource s) {
-           return s;
+        public String postDom(DOMSource s) {
+            Document d = (Document)s.getNode();
+            Element e = (Element)d.getElementsByTagName("value").item(0);
+            Node n = e.getChildNodes().item(0);
+            if (n.getNodeType() == Node.TEXT_NODE) {
+                return n.getNodeValue();
+            } else if (n.getNodeType() == Node.ENTITY_REFERENCE_NODE) {
+                return "";
+            } else {
+                throw new WebApplicationException(400);
+            }
         }
 
         @Path("stream")
@@ -172,7 +185,7 @@ public class XXETest extends AbstractResourceTester {
             });
             t.start();
         }
-        
+
         try {
             latch.await();
         } catch (InterruptedException ex) {
@@ -286,8 +299,8 @@ public class XXETest extends AbstractResourceTester {
 
         WebResource r = resource("/");
 
-        JAXBBean b = r.path("dom").type("application/xml").post(JAXBBean.class, getDocument());
-        assertEquals("", b.value);
+        String s = r.path("dom").type("application/xml").post(String.class, getDocument());
+        assertEquals("", s);
     }
 
     public void testDOMInsecure() {
@@ -297,8 +310,8 @@ public class XXETest extends AbstractResourceTester {
 
         WebResource r = resource("/");
 
-        JAXBBean b = r.path("dom").type("application/xml").post(JAXBBean.class, getDocument());
-        assertEquals("COMPROMISED", b.value);
+        String s = r.path("dom").type("application/xml").post(String.class, getDocument());
+        assertEquals("COMPROMISED", s);
     }
 
     public void testStreamSecure() {
