@@ -51,9 +51,9 @@
   <packaging>pom</packaging>
 
   <properties>
-    <jetty.version>6.1.14</jetty.version>
-    <lift.version>1.1-SNAPSHOT</lift.version>
-    <scala.version>2.7.4</scala.version>
+    <jetty.version>6.1.19</jetty.version>
+    <lift.version>1.1-M3</lift.version>
+    <scala.version>2.7.5</scala.version>
   </properties>
 
   <repositories>
