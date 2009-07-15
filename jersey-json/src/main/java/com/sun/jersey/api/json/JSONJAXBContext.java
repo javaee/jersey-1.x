@@ -446,27 +446,35 @@ public final class JSONJAXBContext extends JAXBContext implements JSONConfigurat
 
     }
 
+    /**
+     * Get the JSON configuration.
+     *
+     * @return the JSON configuration.
+     */
     public JSONConfiguration getJSONConfiguration() {
         return jsonConfiguration;
     }
 
+    /**
+     * Create a JSON unmarshaller.
+     *
+     * @return the JSON unmarshaller
+     *
+     * @throws JAXBException if there is an error creating the unmarshaller.
+     */
     public JSONUnmarshaller createJSONUnmarshaller() throws JAXBException {
         return new JSONUnmarshallerImpl(this, getJSONConfiguration());
     }
 
+    /**
+     * Create a JSON marshaller.
+     *
+     * @return the JSON marshaller.
+     *
+     * @throws JAXBException if there is an error creating the marshaller.
+     */
     public JSONMarshaller createJSONMarshaller() throws JAXBException {
         return new JSONMarshallerImpl(this, getJSONConfiguration());
-    }
-
-    private Map<String, Object> createProperties(Map<String, Object> properties) {
-        Map<String, Object> workProperties = new HashMap<String, Object>();
-        workProperties.putAll(defaultJsonProperties);
-        workProperties.putAll(properties);
-        if (JSONJAXBContext.JSONNotation.NATURAL == workProperties.get(JSONJAXBContext.JSON_NOTATION)) {
-            workProperties.put(JAXBContextImpl.RETAIN_REFERENCE_TO_INFO, Boolean.TRUE);
-        }
-        processProperties(workProperties);
-        return workProperties;
     }
 
     /**
@@ -503,6 +511,7 @@ public final class JSONJAXBContext extends JAXBContext implements JSONConfigurat
     public Validator createValidator() throws JAXBException {
         return jaxbContext.createValidator();
     }
+
     static final Map<String, JSONConfiguration.Notation> _notationMap = new HashMap<String, JSONConfiguration.Notation>() {
 
         {
@@ -512,6 +521,17 @@ public final class JSONJAXBContext extends JAXBContext implements JSONConfigurat
             put(JSONJAXBContext.JSONNotation.NATURAL.toString(), JSONConfiguration.Notation.NATURAL);
         }
     };
+
+    private Map<String, Object> createProperties(Map<String, Object> properties) {
+        Map<String, Object> workProperties = new HashMap<String, Object>();
+        workProperties.putAll(defaultJsonProperties);
+        workProperties.putAll(properties);
+        if (JSONJAXBContext.JSONNotation.NATURAL == workProperties.get(JSONJAXBContext.JSON_NOTATION)) {
+            workProperties.put(JAXBContextImpl.RETAIN_REFERENCE_TO_INFO, Boolean.TRUE);
+        }
+        processProperties(workProperties);
+        return workProperties;
+    }
 
     private final void processProperties(Map<String, Object> properties) {
         final Collection<String> jsonKeys = new HashSet<String>();
