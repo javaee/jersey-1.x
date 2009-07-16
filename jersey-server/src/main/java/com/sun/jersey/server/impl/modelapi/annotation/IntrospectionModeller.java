@@ -340,12 +340,22 @@ public class IntrospectionModeller {
             Parameterized parametrized, 
             Constructor ctor, 
             boolean isEncoded) {
+        Class[] parameterTypes = ctor.getParameterTypes();
+        Type[] genericParameterTypes = ctor.getGenericParameterTypes();
+        // Workaround bug http://bugs.sun.com/view_bug.do?bug_id=5087240
+        if (parameterTypes.length != genericParameterTypes.length) {
+            Type[] _genericParameterTypes = new Type[parameterTypes.length];
+            _genericParameterTypes[0] = parameterTypes[0];
+            System.arraycopy(genericParameterTypes, 0, _genericParameterTypes, 1, genericParameterTypes.length);
+            genericParameterTypes = _genericParameterTypes;
+        }
+
         processParameters(
                 ctor.toString(),
                 parametrized,
                 ((null != ctor.getAnnotation(Encoded.class)) || isEncoded),
-                ctor.getParameterTypes(), 
-                ctor.getGenericParameterTypes(),
+                parameterTypes,
+                genericParameterTypes,
                 ctor.getParameterAnnotations());
     }
 

@@ -1,4 +1,8 @@
 release 1.1.2-ea (2009-09)
+- Fixed issue 326
+  https://jersey.dev.java.net/issues/show_bug.cgi?id=326
+  Work around bug 5087240 in the JDK:
+  http://bugs.sun.com/view_bug.do?bug_id=5087240
 - Fixed issue 330
   https://jersey.dev.java.net/issues/show_bug.cgi?id=330
   ContainerRequest and ContainerResponse by may now be adapted from within
