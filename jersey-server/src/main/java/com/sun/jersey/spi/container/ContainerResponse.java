@@ -309,7 +309,16 @@ public class ContainerResponse implements HttpResponseContext {
     public void setContainerResponseWriter(ContainerResponseWriter responseWriter) {
         this.responseWriter = responseWriter; 
     }
-    
+
+    /**
+     * Get the message body workers.
+     *
+     * @return the message body workers.
+     */
+    public MessageBodyWorkers getMessageBodyWorkers() {
+        return bodyContext;
+    }
+
     // HttpResponseContext
     
     public Response getResponse() {

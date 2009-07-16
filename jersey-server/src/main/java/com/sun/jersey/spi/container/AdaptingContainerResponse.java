@@ -36,6 +36,7 @@
  */
 package com.sun.jersey.spi.container;
 
+import com.sun.jersey.spi.MessageBodyWorkers;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.lang.annotation.Annotation;
@@ -96,6 +97,11 @@ public class AdaptingContainerResponse extends ContainerResponse {
         acr.setContainerResponseWriter(responseWriter);
     }
     
+    @Override
+    public MessageBodyWorkers getMessageBodyWorkers() {
+        return acr.getMessageBodyWorkers();
+    }
+
     @Override
     public Response getResponse() {
         return acr.getResponse();
