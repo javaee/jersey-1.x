@@ -165,6 +165,11 @@ public class ContainerResponse implements HttpResponseContext {
         this.status = Responses.NO_CONTENT;
     }
     
+    /*package */ ContainerResponse(
+            ContainerResponse acr) {
+        this.bodyContext = acr.bodyContext;
+    }
+
     // ContainerResponse
         
     /**

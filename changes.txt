@@ -1,4 +1,10 @@
 release 1.1.2-ea (2009-09)
+- Fixed issue 330
+  https://jersey.dev.java.net/issues/show_bug.cgi?id=330
+  ContainerRequest and ContainerResponse by may now be adapted from within
+  filters by extending AdaptingContainerRequest and AdaptingContainerResponse
+  respectively. The adapter CachedEntityContainerRequest is available for when
+  a request entity instance consumed by a filter needs to be cached.
 - The oauth modules at the java.net maven repository have moved from
   jersey/oauth to jersey/contribs/jersey-oauth/.
 

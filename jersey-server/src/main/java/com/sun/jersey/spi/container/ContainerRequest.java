@@ -176,7 +176,11 @@ public class ContainerRequest implements HttpRequestContext {
         this.headersModCount = headers.getModCount();
         this.entity = entity;        
     }
-    
+
+    /* package */ ContainerRequest(ContainerRequest r) {
+        this.bodyContext = r.bodyContext;
+    }
+
     // ContainerRequest
     
     /**
@@ -263,6 +267,15 @@ public class ContainerRequest implements HttpRequestContext {
         this.securityContext = securityContext;
     }
     
+    /**
+     * Get the message body workers.
+     * 
+     * @return the message body workers.
+     */
+    public MessageBodyWorkers getMessageBodyWorkers() {
+        return bodyContext;
+    }
+
     // HttpRequestContext
     
     public URI getBaseUri() {
