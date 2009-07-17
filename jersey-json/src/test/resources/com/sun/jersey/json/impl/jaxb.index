@@ -9,6 +9,7 @@ UserTable
 TreeModel
 TwoListsWrapperBean
 ListAndNonListBean
+ListEmptyBean
 ListWrapperBean
 EncodedContentBean
 SimpleBean

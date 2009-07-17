@@ -100,6 +100,20 @@ public class JsonLexerTest extends TestCase {
         token = lexer.yylex();
         assertEquals(JsonToken.NULL, token.tokenType);
     }
+
+    public void testEmpty() throws Exception {
+        String testInput = "[]{}";
+        JsonLexer lexer = new JsonLexer(new StringReader(testInput));
+        JsonToken token;
+        token = lexer.yylex();
+        assertEquals(JsonToken.START_ARRAY, token.tokenType);
+        token = lexer.yylex();
+        assertEquals(JsonToken.END_ARRAY, token.tokenType);
+        token = lexer.yylex();
+        assertEquals(JsonToken.START_OBJECT, token.tokenType);
+        token = lexer.yylex();
+        assertEquals(JsonToken.END_OBJECT, token.tokenType);
+    }
     
     public void testStrings() throws Exception {
         String testInput = "\"one\" \"one big\" \"one big \\n tower\" \"\\/ is slash\" \"other \\\" \\u0065 \\\\ symbols \\b\\f\\n\\r\\t\"";

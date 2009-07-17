@@ -43,6 +43,7 @@ import com.sun.jersey.json.impl.ComplexBeanWithAttributes2;
 import com.sun.jersey.json.impl.ComplexBeanWithAttributes3;
 import com.sun.jersey.json.impl.EncodedContentBean;
 import com.sun.jersey.json.impl.ListAndNonListBean;
+import com.sun.jersey.json.impl.ListEmptyBean;
 import com.sun.jersey.json.impl.ListWrapperBean;
 import com.sun.jersey.json.impl.PureCharDataBean;
 import com.sun.jersey.json.impl.SimpleBean;
@@ -97,6 +98,10 @@ public class Stax2JacksonWriterTest extends TestCase {
 
     public void testListAndNonListBean() throws Exception {
         _testBean(ListAndNonListBean.class, ListAndNonListBean.createTestInstance());
+    }
+
+    public void testListEmptyBean() throws Exception {
+        _testBean(ListEmptyBean.class, ListEmptyBean.createTestInstance());
     }
 
     public void testListWrapperBean() throws Exception {
