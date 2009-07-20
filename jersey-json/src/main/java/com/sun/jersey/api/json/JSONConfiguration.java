@@ -94,6 +94,7 @@ public class JSONConfiguration {
     private final Collection<String> attrsAsElems;
     private final Collection<String> nonStrings;
     private final boolean rootUnwrapping;
+    private final boolean humanReadableFormating;
     private final Map<String, String> jsonXml2JsonNs;
 
     /**
@@ -106,6 +107,7 @@ public class JSONConfiguration {
         protected Collection<String> attrsAsElems = new HashSet<String>(0);
         protected Collection<String> nonStrings = new HashSet<String>(0);
         protected boolean rootUnwrapping = true;
+        protected boolean humanReadableFormatting = false;
         protected Map<String, String> jsonXml2JsonNs = new HashMap<String, String>(0);
 
         private Builder(Notation notation) {
@@ -146,6 +148,20 @@ public class JSONConfiguration {
          */
         public NaturalBuilder rootUnwrapping(boolean rootUnwrapping) {
             this.rootUnwrapping = rootUnwrapping;
+            return this;
+        }
+
+        /**
+         * If set to true, generated JSON will contain new-line characters and indentation, so that
+         * the output is easy to read for people.
+         * This property is valid for the  {@link JSONConfiguration.Notation#NATURAL} notation only.
+         * <p>
+         * The default value is false.
+         * @param humanReadableFormatting
+         * @return the natural builder.
+         */
+        public NaturalBuilder humanReadableFormatting(boolean humanReadableFormatting) {
+            this.humanReadableFormatting = humanReadableFormatting;
             return this;
         }
     }
@@ -299,6 +315,7 @@ public class JSONConfiguration {
         attrsAsElems = b.attrsAsElems;
         nonStrings = b.nonStrings;
         rootUnwrapping = b.rootUnwrapping;
+        humanReadableFormating = b.humanReadableFormatting;
         jsonXml2JsonNs = b.jsonXml2JsonNs;
     }
     /**
@@ -417,6 +434,17 @@ public class JSONConfiguration {
      */
     public boolean isRootUnwrapping() {
         return rootUnwrapping;
+    }
+
+    /**
+     * Says if the output JSON will be formatted with new-line characters
+     * and indentation so that it is easy to read for people.
+     * This property is valid for the {@link JSONConfiguration.Notation#NATURAL} notation only.
+     * @return true, if formatting is applied on the output JSON
+     * @see Builder#humanReadableFormatting(boolean)
+     */
+    public boolean isHumanReadableFormatting() {
+        return humanReadableFormating;
     }
 
     @Override
