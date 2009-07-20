@@ -39,11 +39,16 @@ package com.sun.jersey.json.impl.reader;
 
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.math.BigInteger;
+import org.codehaus.jackson.Base64Variant;
 import org.codehaus.jackson.JsonLocation;
+import org.codehaus.jackson.JsonNode;
 import org.codehaus.jackson.JsonParseException;
 import org.codehaus.jackson.JsonParser;
-import org.codehaus.jackson.JsonReadContext;
+import org.codehaus.jackson.JsonProcessingException;
+import org.codehaus.jackson.JsonStreamContext;
 import org.codehaus.jackson.JsonToken;
+import org.codehaus.jackson.type.TypeReference;
 
 /**
  *
@@ -55,8 +60,8 @@ public class JacksonRootAddingParser extends JsonParser {
 
     String rootName;
     JsonParser parser;
-    JsonToken currentToken;
     State state;
+    boolean isClosed = false;
 
     public static JsonParser createRootAddingParser(JsonParser parser, String rootName) {
         return new JacksonRootAddingParser(parser, rootName);
@@ -86,8 +91,62 @@ public class JacksonRootAddingParser extends JsonParser {
     }
 
     @Override
-    public boolean isFeatureEnabled(Feature feature) {
-        return parser.isFeatureEnabled(feature);
+    public JsonToken nextValue() throws IOException, JsonParseException {
+        JsonToken result = nextToken();
+        while (!result.isScalarValue()) {
+            result = nextToken();
+        }
+        return result;
+    }
+
+    @Override
+    public boolean isClosed() {
+        return isClosed;
+    }
+
+    @Override
+    public byte getByteValue() throws IOException, JsonParseException {
+        return parser.getByteValue();
+    }
+
+    @Override
+    public short getShortValue() throws IOException, JsonParseException {
+        return parser.getShortValue();
+    }
+
+    @Override
+    public BigInteger getBigIntegerValue() throws IOException, JsonParseException {
+        return parser.getBigIntegerValue();
+    }
+
+    @Override
+    public float getFloatValue() throws IOException, JsonParseException {
+        return parser.getFloatValue();
+    }
+
+    @Override
+    public byte[] getBinaryValue(Base64Variant base64Variant) throws IOException, JsonParseException {
+        return parser.getBinaryValue(base64Variant);
+    }
+
+    @Override
+    public <T> T readValueAs(Class<T> type) throws IOException, JsonProcessingException {
+        return parser.readValueAs(type);
+    }
+
+    @Override
+    public <T> T readValueAs(TypeReference<?> typeRef) throws IOException, JsonProcessingException {
+        return (T)parser.readValueAs(typeRef);
+    }
+
+    @Override
+    public JsonNode readValueAsTree() throws IOException, JsonProcessingException {
+        return parser.readValueAsTree();
+    }
+
+    @Override
+    public JsonStreamContext getParsingContext() {
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 
     @Override
@@ -95,59 +154,31 @@ public class JacksonRootAddingParser extends JsonParser {
         switch (state) {
             case START :
                 state = State.AFTER_SO;
-                currentToken = JsonToken.START_OBJECT;
-                return currentToken;
+                _currToken = JsonToken.START_OBJECT;
+                return _currToken;
             case AFTER_SO :
                 state = State.AFTER_FN;
-                currentToken = JsonToken.FIELD_NAME;
-                return currentToken;
+                _currToken = JsonToken.FIELD_NAME;
+                return _currToken;
             case AFTER_FN :
                 state = State.INNER;
             case INNER :
-                currentToken = parser.nextToken();
-                if (currentToken == null) {
+                _currToken = parser.nextToken();
+                if (_currToken == null) {
                     state = State.END;
-                    currentToken = JsonToken.END_OBJECT;
+                    _currToken = JsonToken.END_OBJECT;
                 }
-                return currentToken;
+                return _currToken;
             case END :
             default :
-                    currentToken = null;
-                    return currentToken;
+                    _currToken = null;
+                    return _currToken;
         }
     }
 
     @Override
     public void skipChildren() throws IOException, JsonParseException {
         parser.skipChildren();
-    }
-
-    @Override
-    public JsonToken getCurrentToken() {
-        switch (state) {
-            case START :
-                return null;
-            case AFTER_SO :
-                return currentToken;
-            case AFTER_FN :
-                return currentToken;
-            default:
-                return currentToken;
-        }
-    }
-
-    @Override
-    public boolean hasCurrentToken() {
-        switch (state) {
-            case START :
-                return false;
-            case AFTER_SO :
-                return true;
-            case AFTER_FN :
-                return true;
-            default:
-                return currentToken != null;
-        }
     }
 
     @Override
@@ -169,11 +200,6 @@ public class JacksonRootAddingParser extends JsonParser {
     @Override
     public void close() throws IOException {
         parser.close();
-    }
-
-    @Override
-    public JsonReadContext getParsingContext() {
-        return parser.getParsingContext();
     }
 
     @Override

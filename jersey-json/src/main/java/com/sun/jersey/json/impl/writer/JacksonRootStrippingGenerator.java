@@ -39,12 +39,15 @@ package com.sun.jersey.json.impl.writer;
 
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import org.codehaus.jackson.Base64Variant;
 import org.codehaus.jackson.JsonGenerationException;
 import org.codehaus.jackson.JsonGenerator;
+import org.codehaus.jackson.JsonNode;
 import org.codehaus.jackson.JsonParser;
 import org.codehaus.jackson.JsonProcessingException;
-import org.codehaus.jackson.JsonWriteContext;
+import org.codehaus.jackson.JsonStreamContext;
+import org.codehaus.jackson.ObjectCodec;
 
 /**
  *
@@ -54,6 +57,7 @@ public class JacksonRootStrippingGenerator extends JsonGenerator {
 
    JsonGenerator generator;
    int depth = 0;
+   boolean isClosed = false;
 
    private JacksonRootStrippingGenerator() {
    }
@@ -210,11 +214,6 @@ public class JacksonRootStrippingGenerator extends JsonGenerator {
     }
 
     @Override
-    public JsonWriteContext getOutputContext() {
-        return generator.getOutputContext();
-    }
-
-    @Override
     public void flush() throws IOException {
         generator.flush();
     }
@@ -222,5 +221,56 @@ public class JacksonRootStrippingGenerator extends JsonGenerator {
     @Override
     public void close() throws IOException {
         generator.close();
+        isClosed = true;
+    }
+
+    @Override
+    public void setCodec(ObjectCodec codec) {
+        generator.setCodec(codec);
+    }
+
+    @Override
+    public ObjectCodec getCodec() {
+        return generator.getCodec();
+    }
+
+    @Override
+    public void writeRawValue(String rawString) throws IOException, JsonGenerationException {
+        generator.writeRawValue(rawString);
+    }
+
+    @Override
+    public void writeRawValue(String rawString, int startIndex, int length) throws IOException, JsonGenerationException {
+        generator.writeRawValue(rawString, startIndex, length);
+    }
+
+    @Override
+    public void writeRawValue(char[] rawChars, int startIndex, int length) throws IOException, JsonGenerationException {
+        generator.writeRawValue(rawChars, startIndex, length);
+    }
+
+    @Override
+    public void writeNumber(BigInteger number) throws IOException, JsonGenerationException {
+        generator.writeNumber(number);
+    }
+
+    @Override
+    public void writeObject(Object o) throws IOException, JsonProcessingException {
+        generator.writeObject(o);
+    }
+
+    @Override
+    public void writeTree(JsonNode node) throws IOException, JsonProcessingException {
+        generator.writeTree(node);
+    }
+
+    @Override
+    public JsonStreamContext getOutputContext() {
+        return generator.getOutputContext();
+    }
+
+    @Override
+    public boolean isClosed() {
+        return isClosed;
     }
 }
