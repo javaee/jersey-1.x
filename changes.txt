@@ -1,4 +1,12 @@
 release 1.1.2-ea (2009-09)
+- Fixed issue 280
+  https://jersey.dev.java.net/issues/show_bug.cgi?id=280
+  For the "natural" JSON convention, the humanReadableFormatting option
+  now could be set, so that the output JSON contains new-line characters
+  and indentation, which makes is easy to read for humans
+- Upgraded Jackson library to the version 1.1.1, so that people
+  relying on Jackson JAX-RS entity provider does not need to depend on two versions
+  of the very same library at their applications 
 - Fixed issue, working around a JDK bug in the method URL.toURI() when package
   scanning classes that are present in a directory path location containing
   space characters, for example "Documents and Services".
