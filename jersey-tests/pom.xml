@@ -235,14 +235,6 @@
                     <enableAssertions>false</enableAssertions>
                     <!--skipTests>true</skipTests-->
                 </configuration>
-                <executions>
-                    <execution>
-                        <phase>test</phase>
-                        <goals>
-                            <goal>test</goal>
-                        </goals>
-                    </execution>
-                </executions>
             </plugin>
             <plugin>
                 <artifactId>maven-resources-plugin</artifactId>

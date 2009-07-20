@@ -117,9 +117,7 @@ public class XMLRootObjectProvider extends AbstractJAXBProvider<Object> {
         try {
             return Object.class == type && isSupported(mediaType) && getUnmarshaller(type, mediaType) != null;
         } catch (JAXBException cause) {
-            throw ThrowHelper.withInitCause(cause,
-                    new RuntimeException(ImplMessages.ERROR_UNMARSHALLING_JAXB(type))
-                    );
+            throw new RuntimeException(ImplMessages.ERROR_UNMARSHALLING_JAXB(type), cause);
         }
     }
     

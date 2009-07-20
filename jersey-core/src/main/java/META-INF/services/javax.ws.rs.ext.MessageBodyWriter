@@ -17,5 +17,6 @@ com.sun.jersey.core.impl.provider.entity.XMLListElementProvider$App
 com.sun.jersey.core.impl.provider.entity.XMLListElementProvider$Text
 com.sun.jersey.core.impl.provider.entity.XMLListElementProvider$General
 com.sun.jersey.core.impl.provider.entity.ReaderProvider
+com.sun.jersey.core.impl.provider.entity.DocumentProvider
 com.sun.jersey.core.impl.provider.entity.StreamingOutputProvider
 com.sun.jersey.core.impl.provider.entity.SourceProvider$SourceWriter

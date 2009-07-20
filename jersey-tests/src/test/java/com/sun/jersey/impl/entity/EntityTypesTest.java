@@ -78,11 +78,14 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.namespace.QName;
+import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.sax.SAXSource;
 import javax.xml.transform.stream.StreamSource;
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONObject;
+import org.w3c.dom.Document;
+import org.xml.sax.InputSource;
 
 /**
  *
@@ -444,7 +447,7 @@ public class EntityTypesTest extends AbstractTypeTester {
         _test(new StringReader("CONTENT"), ReaderResource.class);
     }
     
-    private final static String XML_DOCUMENT="<n:x xmlns:n=\"urn:n\"><n:e>CONTNET</n:e></n:x>";
+    private final static String XML_DOCUMENT = "<n:x xmlns:n=\"urn:n\"><n:e>CONTNET</n:e></n:x>";
     
     @Path("/")
     public static class StreamSourceResource extends AResource<StreamSource> {}
@@ -467,12 +470,22 @@ public class EntityTypesTest extends AbstractTypeTester {
     @Path("/")
     public static class DOMSourceResource extends AResource<DOMSource> {}
     
-    public void ignoredTestDOMSourceRepresentation() throws Exception {
-        StreamSource ss = new StreamSource(
-                new ByteArrayInputStream(XML_DOCUMENT.getBytes()));
-        _test(ss, DOMSourceResource.class);
+    public void testDOMSourceRepresentation() throws Exception {
+        DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+        Document d = dbf.newDocumentBuilder().parse(new InputSource(new StringReader(XML_DOCUMENT)));
+        DOMSource ds = new DOMSource(d);
+        _test(ds, DOMSourceResource.class);
     }
     
+    @Path("/")
+    public static class DocumentResource extends AResource<Document> {}
+
+    public void testDocumentRepresentation() throws Exception {
+        DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+        Document d = dbf.newDocumentBuilder().parse(new InputSource(new StringReader(XML_DOCUMENT)));
+        _test(d, DocumentResource.class);
+    }
+
     @Path("/")
     @Produces("application/x-www-form-urlencoded")
     @Consumes("application/x-www-form-urlencoded")
