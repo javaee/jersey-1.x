@@ -124,6 +124,23 @@ public class PackageResourceConfigTest extends AbstractConfigTester {
         assertEquals(1, rc.getClasses().size());
     }
     
+    public void testJarTopLevelWithSpacesInName() throws Exception {
+        ClassLoader cl = createClassLoaderUsingToURLDirectly(
+                "name with space",
+                Suffix.jar,
+                "target/test-classes/",
+                "com/sun/jersey/impl/container/config/toplevel/PublicRootResourceClass.class",
+                "com/sun/jersey/impl/container/config/toplevel/PackageRootResourceClass.class"
+                );
+
+        ResourceConfig rc = createConfig(cl,
+                "com.sun.jersey.impl.container.config.toplevel");
+
+        assertTrue(rc.getClasses().contains(
+                cl.loadClass("com.sun.jersey.impl.container.config.toplevel.PublicRootResourceClass")));
+        assertEquals(1, rc.getClasses().size());
+    }
+
     public void testJarInnerStatic() throws Exception {
         ClassLoader cl = createClassLoader("target/test-classes/",
                 "com/sun/jersey/impl/container/config/innerstatic/InnerStaticClass.class",
@@ -226,6 +243,12 @@ public class PackageResourceConfigTest extends AbstractConfigTester {
         return new PackageClassLoader(us);
     } 
     
+    private ClassLoader createClassLoaderUsingToURLDirectly(String name, Suffix s, String base, String... entries) throws IOException {
+        URL[] us = new URL[1];
+        us[0] = createJarFile(name, s, base, entries).toURL();
+        return new PackageClassLoader(us);
+    }
+
     private static class PackageClassLoader extends URLClassLoader {
         PackageClassLoader(URL[] urls) {
             super(urls, null);

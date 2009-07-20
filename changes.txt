@@ -1,4 +1,7 @@
 release 1.1.2-ea (2009-09)
+- Fixed issue, working around a JDK bug in the method URL.toURI() when package
+  scanning classes that are present in a directory path location containing
+  space characters, for example "Documents and Services".
 - Fixed issue 331
   https://jersey.dev.java.net/issues/show_bug.cgi?id=331
   Add support for de/serializing instances of org.w3c.dom.Document.

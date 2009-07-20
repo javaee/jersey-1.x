@@ -78,8 +78,20 @@ public abstract class AbstractConfigTester extends TestCase {
         return createJarFile(s, base, entriesMap);
     }
 
+    public final File createJarFile(String name, Suffix s, String base, String... entries) throws IOException {
+        Map<String, String> entriesMap = new HashMap<String, String>();
+        for (String entry : entries) {
+            entriesMap.put(entry, entry);
+        }
+        return createJarFile(name, s, base, entriesMap);
+    }
+
     public final File createJarFile(Suffix s, String base, Map<String, String> entries) throws IOException {
-        File tempJar = File.createTempFile("test", "." + s);
+        return createJarFile("test", s, base, entries);
+    }
+
+    public final File createJarFile(String name, Suffix s, String base, Map<String, String> entries) throws IOException {
+        File tempJar = File.createTempFile(name, "." + s);
         tempJar.deleteOnExit();
         JarOutputStream jos = new JarOutputStream(
                 new BufferedOutputStream(

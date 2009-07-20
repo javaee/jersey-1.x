@@ -34,9 +34,10 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-
 package com.sun.jersey.server.impl.container.config;
 
+import com.sun.jersey.api.uri.UriComponent;
+import com.sun.jersey.api.uri.UriComponent.Type;
 import com.sun.jersey.core.reflection.ReflectionHelper;
 import java.io.File;
 import java.io.IOException;
@@ -69,19 +70,16 @@ import org.objectweb.asm.Opcodes;
  * @author Frank D. Martinez. fmartinez@asimovt.com
  */
 public class AnnotatedClassScanner {
-    private static final Logger LOGGER = 
+
+    private static final Logger LOGGER =
             Logger.getLogger(AnnotatedClassScanner.class.getName());
-    
     /** Matching annotated classes. */
     private Set<Class<?>> classes;
-    
     /** Set of annotations to search for. */
     private final Set<String> annotations;
-    
     /** The class loader to use to load matching Java class files */
     private final ClassLoader classloader;
 
-    
     /**
      * 
      * @param annotations the set of annotations to match
@@ -91,7 +89,7 @@ public class AnnotatedClassScanner {
         this.annotations = getAnnotationSet(annotations);
         this.classes = new HashSet<Class<?>>();
     }
-    
+
     /**
      * Scans paths for matching Java classes
      * 
@@ -101,7 +99,7 @@ public class AnnotatedClassScanner {
      */
     public Set<Class<?>> scan(File[] paths) {
         this.classes = new HashSet<Class<?>>();
-        
+
         for (File file : paths) {
             index(file);
         }
@@ -118,7 +116,7 @@ public class AnnotatedClassScanner {
      */
     public Set<Class<?>> scan(String[] packages) {
         this.classes = new HashSet<Class<?>>();
-        
+
         for (String p : packages) {
             try {
                 String fileP = p.replace('.', '/');
@@ -129,20 +127,21 @@ public class AnnotatedClassScanner {
                         URI uri = getURI(url);
                         index(uri, fileP);
                     } catch (URISyntaxException e) {
-                        LOGGER.warning("URL, " + 
-                                url + 
-                                "cannot be converted to a URI");                        
+                        LOGGER.log(Level.WARNING,
+                                "URL, " + url +
+                                ", cannot be converted to a URI",
+                                e);
                     }
                 }
             } catch (IOException ex) {
-                String s = "The resources for the package" + 
-                        p + 
+                String s = "The resources for the package" +
+                        p +
                         ", could not be obtained";
                 LOGGER.severe(s);
                 throw new RuntimeException(s, ex);
             }
         }
-        
+
         return classes;
     }
 
@@ -151,8 +150,58 @@ public class AnnotatedClassScanner {
             // Used with JBoss 5.x: trim prefix "vfs"
             return new URI(url.toString().substring(3));
         } else {
-            return url.toURI();
+            try {
+                return url.toURI();
+            } catch (URISyntaxException e) {
+                // Work around bug where some URLs are incorrectly encoded.
+                // This can occur when certain class loaders are utilized
+                // to obtain URLs for resources.
+                URI uri = URI.create(toExternalForm(url));
+                LOGGER.log(Level.WARNING,
+                        "The URL, " + url +
+                        ", obtained from the class loader, " + classloader + ", is invalid resulting in failure of the invocation URL.toURI()" +
+                        ". The URL has been explicitly converted to the URI, " + uri);
+                return uri;
+            }
         }
+    }
+
+    private String toExternalForm(URL u) {
+
+        // pre-compute length of StringBuffer
+        int len = u.getProtocol().length() + 1;
+        if (u.getAuthority() != null && u.getAuthority().length() > 0) {
+            len += 2 + u.getAuthority().length();
+        }
+        if (u.getPath() != null) {
+            len += u.getPath().length();
+        }
+        if (u.getQuery() != null) {
+            len += 1 + u.getQuery().length();
+        }
+        if (u.getRef() != null) {
+            len += 1 + u.getRef().length();
+        }
+
+        StringBuffer result = new StringBuffer(len);
+        result.append(u.getProtocol());
+        result.append(":");
+        if (u.getAuthority() != null && u.getAuthority().length() > 0) {
+            result.append("//");
+            result.append(u.getAuthority());
+        }
+        if (u.getPath() != null) {
+            result.append(UriComponent.contextualEncode(u.getPath(), Type.PATH));
+        }
+        if (u.getQuery() != null) {
+            result.append('?');
+            result.append(UriComponent.contextualEncode(u.getQuery(), Type.QUERY));
+        }
+        if (u.getRef() != null) {
+            result.append("#");
+            result.append(u.getRef());
+        }
+        return result.toString();
     }
 
     /**
@@ -164,29 +213,29 @@ public class AnnotatedClassScanner {
     public Set<Class<?>> getMatchingClasses() {
         return classes;
     }
-    
+
     private Set<String> getAnnotationSet(Class... annotations) {
         Set<String> a = new HashSet<String>();
         for (Class cls : annotations) {
             a.add(
-                "L" + cls.getName().replaceAll("\\.", "/") + ";");
+                    "L" + cls.getName().replaceAll("\\.", "/") + ";");
         }
         return a;
     }
-    
+
     private void index(File file) {
         if (file.isDirectory()) {
             indexDir(file, true);
-        } else if (file.getName().endsWith(".jar") || 
+        } else if (file.getName().endsWith(".jar") ||
                 file.getName().endsWith(".zip")) {
             indexJar(file);
         } else {
-            LOGGER.warning("File, " + 
-                    file.getAbsolutePath() + 
+            LOGGER.warning("File, " +
+                    file.getAbsolutePath() +
                     ", is ignored, it not a directory, a jar file or a zip file");
         }
     }
-    
+
     private void index(URI u, String filePackageName) {
         String scheme = u.getScheme();
         if (scheme.equals("file")) {
@@ -194,24 +243,24 @@ public class AnnotatedClassScanner {
             if (f.isDirectory()) {
                 indexDir(f, false);
             } else {
-                LOGGER.warning("URL, " + 
-                        u + 
-                        ", is ignored. The path, " + 
+                LOGGER.warning("URL, " +
+                        u +
+                        ", is ignored. The path, " +
                         f.getPath() +
-                        ", is not a directory");                
+                        ", is not a directory");
             }
         } else if (scheme.equals("jar") || scheme.equals("zip")) {
             URI jarUri = URI.create(u.getRawSchemeSpecificPart());
             String jarFile = jarUri.getPath();
-            jarFile = jarFile.substring(0, jarFile.indexOf('!'));            
+            jarFile = jarFile.substring(0, jarFile.indexOf('!'));
             indexJar(new File(jarFile), filePackageName);
         } else {
-            LOGGER.warning("URL, " + 
-                    u + 
-                    ", is ignored, it not a file or a jar file URL");            
+            LOGGER.warning("URL, " +
+                    u +
+                    ", is ignored, it not a file or a jar file URL");
         }
     }
-    
+
     private void indexDir(File root, boolean indexJars) {
         for (File child : root.listFiles()) {
             if (child.isDirectory()) {
@@ -221,9 +270,9 @@ public class AnnotatedClassScanner {
             } else if (child.getName().endsWith(".class")) {
                 analyzeClassFile(child.toURI());
             }
-        }        
+        }
     }
-    
+
     private void indexJar(File file) {
         indexJar(file, "");
     }
@@ -253,7 +302,7 @@ public class AnnotatedClassScanner {
             }
         }
     }
-    
+
     private JarFile getJarFile(File file) {
         if (file == null) {
             return null;
@@ -261,23 +310,22 @@ public class AnnotatedClassScanner {
         try {
             return new JarFile(file);
         } catch (IOException ex) {
-            String s = "File, " + 
+            String s = "File, " +
                     file.getAbsolutePath() +
                     ", is not a jar file";
             LOGGER.severe(s);
             throw new RuntimeException(s, ex);
         }
     }
-    
-    private void analyzeClassFile(URI classFileUri) {        
+
+    private void analyzeClassFile(URI classFileUri) {
         getClassReader(classFileUri).accept(classVisitor, 0);
     }
-    
-    private void analyzeClassFile(JarFile jarFile, JarEntry entry) {        
+
+    private void analyzeClassFile(JarFile jarFile, JarEntry entry) {
         getClassReader(jarFile, entry).accept(classVisitor, 0);
     }
-    
-    
+
     private ClassReader getClassReader(JarFile jarFile, JarEntry entry) {
         InputStream is = null;
         try {
@@ -285,24 +333,23 @@ public class AnnotatedClassScanner {
             ClassReader cr = new ClassReader(is);
             return cr;
         } catch (IOException ex) {
-            String s = "Error accessing input stream of the jar file, " + 
+            String s = "Error accessing input stream of the jar file, " +
                     jarFile.getName() + ", entry, " + entry.getName();
             LOGGER.severe(s);
             throw new RuntimeException(s, ex);
         } finally {
             try {
                 if (is != null) {
-                   is.close();
+                    is.close();
                 }
             } catch (IOException ex) {
-                String s = "Error closing input stream of the jar file, " + 
-                    jarFile.getName() + ", entry, " + entry.getName() + ", closed.";
+                String s = "Error closing input stream of the jar file, " +
+                        jarFile.getName() + ", entry, " + entry.getName() + ", closed.";
                 LOGGER.severe(s);
             }
         }
     }
 
-    
     private ClassReader getClassReader(URI classFileUri) {
         InputStream is = null;
         try {
@@ -310,66 +357,64 @@ public class AnnotatedClassScanner {
             ClassReader cr = new ClassReader(is);
             return cr;
         } catch (IOException ex) {
-            String s = "Error accessing input stream of the class file URI, " + 
+            String s = "Error accessing input stream of the class file URI, " +
                     classFileUri;
             LOGGER.severe(s);
             throw new RuntimeException(s, ex);
         } finally {
             try {
                 if (is != null) {
-                   is.close();
+                    is.close();
                 }
             } catch (IOException ex) {
-            String s = "Error closing input stream of the class file URI, " + 
-                    classFileUri;
-            LOGGER.severe(s);
+                String s = "Error closing input stream of the class file URI, " +
+                        classFileUri;
+                LOGGER.severe(s);
             }
         }
     }
-    
+
     private Class getClassForName(String className) {
         try {
             return ReflectionHelper.classForNameWithException(className, classloader);
         } catch (ClassNotFoundException ex) {
-            String s = "A class file of the class name, " + 
-                    className + 
+            String s = "A class file of the class name, " +
+                    className +
                     "is identified but the class could not be found";
             LOGGER.severe(s);
             throw new RuntimeException(s, ex);
         }
     }
-    
     private final AnnotatedClassVisitor classVisitor = new AnnotatedClassVisitor();
-    
+
     private final class AnnotatedClassVisitor implements ClassVisitor {
+
         /**
          * The name of the visited class.
          */
         private String className;
-        
         /**
          * True if the class has the correct scope
          */
-        private boolean isScoped;        
-        
+        private boolean isScoped;
         /**
          * True if the class has the correct declared annotations
          */
         private boolean isAnnotated;
-        
-        public void visit(int version, int access, String name, 
+
+        public void visit(int version, int access, String name,
                 String signature, String superName, String[] interfaces) {
             className = name;
             isScoped = (access & Opcodes.ACC_PUBLIC) != 0;
             isAnnotated = false;
         }
-        
+
         public AnnotationVisitor visitAnnotation(String desc, boolean visible) {
             isAnnotated |= annotations.contains(desc);
             return null;
         }
-        
-        public void visitInnerClass(String name, String outerName, 
+
+        public void visitInnerClass(String name, String outerName,
                 String innerName, int access) {
             // If the name of the class that was visited is equal
             // to the name of this visited inner class then
@@ -377,44 +422,43 @@ public class AnnotatedClassScanner {
             // of the inner class
             if (className.equals(name)) {
                 isScoped = (access & Opcodes.ACC_PUBLIC) != 0;
-                
+
                 // Inner classes need to be statically scoped
                 isScoped &= (access & Opcodes.ACC_STATIC) == Opcodes.ACC_STATIC;
             }
         }
-        
+
         public void visitEnd() {
             if (isScoped && isAnnotated) {
                 // Correctly scoped and annotated
                 // add to the set of matching classes.
-                classes.add(getClassForName(className.replaceAll("/", ".")));    
+                classes.add(getClassForName(className.replaceAll("/", ".")));
             }
         }
-        
-        
-        public void visitOuterClass(String string, String string0, 
+
+        public void visitOuterClass(String string, String string0,
                 String string1) {
             // Do nothing
         }
-        
-        public FieldVisitor visitField(int i, String string, 
+
+        public FieldVisitor visitField(int i, String string,
                 String string0, String string1, Object object) {
             // Do nothing
             return null;
         }
-        
+
         public void visitSource(String string, String string0) {
             // Do nothing
         }
-        
+
         public void visitAttribute(Attribute attribute) {
             // Do nothing
         }
-        
-        public MethodVisitor visitMethod(int i, String string, 
+
+        public MethodVisitor visitMethod(int i, String string,
                 String string0, String string1, String[] string2) {
             // Do nothing
             return null;
-        }        
+        }
     };
 }
