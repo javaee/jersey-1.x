@@ -47,7 +47,7 @@
     </parent>
     <!-- i am not sure about the version, tough decision, once the module is stable, should make it 0.9.4 ? -->
     <version>1.1.2-ea-SNAPSHOT</version>
-    <artifactId>jackson-asl</artifactId>
+    <artifactId>jackson-core-asl</artifactId>
     <packaging>jar</packaging> 
     <name>Jackson library repackaged as OSGi bundle for GlassFish</name>
     <description>Module repackaging of the Jackson library</description>
@@ -79,8 +79,8 @@
     <dependencies>
         <dependency>
             <groupId>org.codehaus.jackson</groupId>
-            <artifactId>jackson-asl</artifactId>
-            <version>0.9.4</version>
+            <artifactId>jackson-core-asl</artifactId>
+            <version>1.1.1</version>
             <optional>true</optional>
         </dependency>
     </dependencies>

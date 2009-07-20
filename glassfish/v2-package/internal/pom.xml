@@ -61,8 +61,8 @@
         </dependency>
         <dependency>
             <groupId>org.codehaus.jackson</groupId>
-            <artifactId>jackson-asl</artifactId>
-            <version>0.9.4</version>
+            <artifactId>jackson-core-asl</artifactId>
+            <version>1.1.1</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
@@ -196,8 +196,8 @@
                                 </artifactItem>
                                  <artifactItem>
                                     <groupId>org.codehaus.jackson</groupId>
-                                    <artifactId>jackson-asl</artifactId>
-                                    <version>0.9.4</version>
+                                    <artifactId>jackson-core-asl</artifactId>
+                                    <version>1.1.1</version>
                                     <type>jar</type>
                                     <overWrite>false</overWrite>
                                     <outputDirectory>${assembly.directory}</outputDirectory>
