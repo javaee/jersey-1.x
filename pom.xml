@@ -107,7 +107,6 @@
         <module>archetypes</module>
         <module>jersey-test-framework</module>
         <module>archive</module>
-        <module>glassfish</module>
         <module>jersey-documentation</module>
     </modules>
     <build>
