@@ -83,7 +83,8 @@ public class RightHandPathRule implements UriRule {
     }
     
     public final boolean accept(CharSequence path, Object resource, UriRuleContext context) {
-        UriRuleProbeProvider.accept(RightHandPathRule.class.getSimpleName(), path);
+        UriRuleProbeProvider.ruleAccept(RightHandPathRule.class.getSimpleName(), path,
+                resource);
 
         String rhpath = getRightHandPath(context.getMatchResult());
         if (rhpath.length() == 0) {

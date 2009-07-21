@@ -58,7 +58,8 @@ public final class ResourceObjectRule extends BaseRule {
     }
     
     public boolean accept(CharSequence path, Object resource, UriRuleContext context) {
-        UriRuleProbeProvider.accept(ResourceObjectRule.class.getSimpleName(), path);
+        UriRuleProbeProvider.ruleAccept(ResourceObjectRule.class.getSimpleName(), path,
+                resource);
 
         // Set the template values
         pushMatch(context);

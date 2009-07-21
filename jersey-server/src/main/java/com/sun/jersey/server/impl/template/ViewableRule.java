@@ -78,7 +78,8 @@ public class ViewableRule implements UriRule {
     }
 
     public final boolean accept(CharSequence path, Object resource, UriRuleContext context) {
-        UriRuleProbeProvider.accept(ViewableRule.class.getSimpleName(), path);
+        UriRuleProbeProvider.ruleAccept(ViewableRule.class.getSimpleName(), path,
+                resource);
 
         final HttpRequestContext request = context.getRequest();
         // Only accept GET requests

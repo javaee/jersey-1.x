@@ -1,9 +1,9 @@
 /*
  *
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
- * 
+ *
  * Copyright 1997-2007 Sun Microsystems, Inc. All rights reserved.
- * 
+ *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
  * and Distribution License("CDDL") (collectively, the "License").  You
@@ -11,7 +11,7 @@
  * a copy of the License at https://jersey.dev.java.net/CDDL+GPL.html
  * or jersey/legal/LICENSE.txt.  See the License for the specific
  * language governing permissions and limitations under the License.
- * 
+ *
  * When distributing the software, include this License Header Notice in each
  * file and include the License file at jersey/legal/LICENSE.txt.
  * Sun designates this particular file as subject to the "Classpath" exception
@@ -20,9 +20,9 @@
  * Header, with the fields enclosed by brackets [] replaced by your own
  * identifying information: "Portions Copyrighted [year]
  * [name of copyright owner]"
- * 
+ *
  * Contributor(s):
- * 
+ *
  * If you wish your version of this file to be governed by only the CDDL or
  * only the GPL Version 2, indicate your decision by adding "[Contributor]
  * elects to include this software in this distribution under the [CDDL or GPL
@@ -35,29 +35,68 @@
  * holder.
  */
 
-package com.sun.jersey.server.impl.uri.rules;
+package com.sun.jersey.server.spi.monitoring.glassfish;
 
-import com.sun.jersey.spi.uri.rules.UriRule;
-import com.sun.jersey.spi.uri.rules.UriRuleContext;
-import com.sun.jersey.server.probes.UriRuleProbeProvider;
-import javax.ws.rs.WebApplicationException;
+import java.util.HashMap;
+import java.util.Map;
+import org.glassfish.gmbal.ManagedAttribute;
+import org.glassfish.gmbal.ManagedObject;
 
 /**
- * A terminating rule that checks to see if the response has been
- * set by the runtime. If a response has been set then the rule is accepted
- * otherwise it is not.
- * 
- * @author Paul.Sandoz@Sun.Com
+ *
+ * @author pavel.bucek@sun.com
  */
-public class TerminatingRule implements UriRule {
-   
-    public final boolean accept(CharSequence path, Object resource, UriRuleContext context) {
-        UriRuleProbeProvider.ruleAccept(TerminatingRule.class.getSimpleName(), path,
-                resource);
+@ManagedObject
+public class ApplicationStatsProvider {
 
-        if (context.getResponse().isResponseSet())
-            throw new WebApplicationException(context.getResponse().getResponse());
-        else
-            return false;
+    private Map<String, Long> rootResourceClassCounter;
+    private Map<String, Long> resourceClassCounter;
+
+    @ManagedAttribute(id="rootResourceClassHitCount")
+    public Map<String, Long> getRootResourceClassCounter() {
+        return rootResourceClassCounter;
+    }
+
+    @ManagedAttribute(id="resourceClassHitCount")
+    public Map<String, Long> getResourceClassCounter() {
+        return resourceClassCounter;
+    }
+
+
+    public ApplicationStatsProvider() {
+        rootResourceClassCounter = new HashMap<String, Long>();
+        resourceClassCounter = new HashMap<String, Long>();
+    }
+
+
+    public void rootResourceClassHit(String resourceClassName) {
+
+        // synchronized (rootResourceClassCounter)?
+
+        if(rootResourceClassCounter.containsKey(resourceClassName)) {
+
+            rootResourceClassCounter.put(
+                    resourceClassName,
+                    rootResourceClassCounter.get(resourceClassName) + 1
+            );
+        } else {
+            rootResourceClassCounter.put(resourceClassName, new Long(1));
         }
-    }    
+    }
+
+
+    public void resourceClassHit(String resourceClassName) {
+
+        // synchronized (resourceClassCounter)?
+
+        if(resourceClassCounter.containsKey(resourceClassName)) {
+
+            resourceClassCounter.put(
+                    resourceClassName,
+                    resourceClassCounter.get(resourceClassName) + 1
+            );
+        } else {
+            resourceClassCounter.put(resourceClassName, new Long(1));
+        }
+    }
+}

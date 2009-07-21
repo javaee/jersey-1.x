@@ -98,7 +98,8 @@ public final class HttpMethodRule implements UriRule {
     }
 
     public boolean accept(CharSequence path, Object resource, UriRuleContext context) {
-        UriRuleProbeProvider.accept(HttpMethodRule.class.getSimpleName(), path);
+        UriRuleProbeProvider.ruleAccept(HttpMethodRule.class.getSimpleName(), path,
+                resource);
 
         // If the path is not empty then do not accept
         if (path.length() > 0) return false;

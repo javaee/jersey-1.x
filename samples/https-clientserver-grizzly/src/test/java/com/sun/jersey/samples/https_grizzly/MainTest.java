@@ -119,7 +119,7 @@ public class MainTest extends TestCase {
         Client c = Client.create(dcc);
 
         // client basic auth demonstration
-        c.addFilter(new HTTPBasicAuthFilter("user", "password"));
+       c.addFilter(new HTTPBasicAuthFilter("user", "password"));
 
         System.out.println("Client: GET " + Server.BASE_URI);
 

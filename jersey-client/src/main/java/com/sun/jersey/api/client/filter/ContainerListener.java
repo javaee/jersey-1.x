@@ -38,7 +38,7 @@
 package com.sun.jersey.api.client.filter;
 
 /**
- * ContainerListener interface
+ * ContainerListener abstract class
  *
  * @author pavel.bucek@sun.com
  */

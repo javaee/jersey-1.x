@@ -51,6 +51,7 @@ import com.sun.jersey.server.impl.container.servlet.JSPTemplateProcessor;
 import com.sun.jersey.server.impl.container.servlet.ThreadLocalInvoker;
 import com.sun.jersey.server.impl.ejb.EJBComponentProviderFactoryInitilizer;
 import com.sun.jersey.server.impl.model.method.dispatch.FormDispatchProvider;
+import com.sun.jersey.server.probes.UriRuleProbeProvider;
 import com.sun.jersey.spi.container.ContainerListener;
 import com.sun.jersey.spi.container.ContainerNotifier;
 import com.sun.jersey.spi.container.ContainerRequest;
@@ -59,6 +60,8 @@ import com.sun.jersey.spi.container.ContainerResponseWriter;
 import com.sun.jersey.spi.container.WebApplication;
 import com.sun.jersey.spi.container.WebApplicationFactory;
 import com.sun.jersey.spi.inject.SingletonTypeInjectableProvider;
+import com.sun.jersey.spi.monitoring.AbstractGlassfishMonitoringProvider;
+import com.sun.jersey.spi.service.ServiceFinder;
 import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -315,7 +318,21 @@ public class WebComponent implements ContainerListener {
             requestInvoker.set(request);
             responseInvoker.set(response);
 
+            // temporary replacement for appName
+            String path = requestUri.getPath();
+
+            int index = path.indexOf('/', 1);
+            if(index == -1)
+                path = path.substring(1);
+            else
+                path = path.substring(1, index);
+
+            UriRuleProbeProvider.requestStart(path);
+
             _application.handleRequest(cRequest, new Writer(response));
+
+            UriRuleProbeProvider.requestEnd();
+            
         } catch (ContainerException e) {
             throw new ServletException(e);
         } finally {
@@ -426,6 +443,14 @@ public class WebComponent implements ContainerListener {
                 EJBComponentProviderFactoryInitilizer.getComponentProviderFactory();
         if (ejb != null)
             rc.getSingletons().add(ejb);
+
+        // glassfish v3 monitoring
+        try {
+        for(AbstractGlassfishMonitoringProvider monitoring : ServiceFinder.find(AbstractGlassfishMonitoringProvider.class)) {
+            monitoring.startMonitoring();
+        }
+        } catch(NullPointerException npe) {
+        }
     }
 
     /**
