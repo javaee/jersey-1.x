@@ -231,7 +231,8 @@
                     <show>public</show>
                     <subpackages>com.sun.jersey.samples.extendedwadl.resources</subpackages>
                     <doclet>com.sun.jersey.wadl.resourcedoc.ResourceDoclet</doclet>
-                    <docletArtifacts>
+                        <docletPath>${path.separator}${project.build.outputDirectory}</docletPath>
+                        <docletArtifacts>
                         <docletArtifact>
                             <groupId>com.sun.jersey.contribs</groupId>
                             <artifactId>wadl-resourcedoc-doclet</artifactId>
