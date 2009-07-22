@@ -296,8 +296,14 @@ public class JsonXmlStreamReader implements XMLStreamReader {
                         case JsonToken.NUMBER:
                         case JsonToken.TRUE:
                         case JsonToken.FALSE:
-                        case JsonToken.NULL:
                             eventQueue.add(new CharactersEvent(lastToken.tokenText, new StaxLocation(lexer)));
+                            processingStack.get(depth).state = LaState.AFTER_OBJ_KV_PAIR;
+                            break;
+                        case JsonToken.NULL:
+                            //TODO: optionally generate a fake xsi:nil attribute
+//                            if (!eventQueue.isEmpty()) {
+//                                 eventQueue.peek().addAttribute(new QName("http://www.w3.org/2001/XMLSchema-instance", "nil"), "true");
+//                            }
                             processingStack.get(depth).state = LaState.AFTER_OBJ_KV_PAIR;
                             break;
                         default:

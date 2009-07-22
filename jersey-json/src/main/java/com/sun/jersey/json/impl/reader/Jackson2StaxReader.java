@@ -162,7 +162,6 @@ public class Jackson2StaxReader implements XMLStreamReader {
                         if (lookingForAttributes && currentIsAttribute) {
                             parser.nextToken();
                             if (valueTokens.contains(parser.getCurrentToken())) {
-                                    eventQueue.peek().addAttribute(new QName(currentName), parser.getText());
                                 eventQueue.peek().addAttribute(getQNameForLocName(currentName, qNamesOfExpAttrs), parser.getText());
                             } else {
                                 System.out.println(String.format("CurrentName=%s", currentName));
@@ -215,13 +214,14 @@ public class Jackson2StaxReader implements XMLStreamReader {
                     case VALUE_NUMBER_INT:
                     case VALUE_TRUE:
                     case VALUE_STRING:
-                        lookingForAttributes = false;
                         if (!pi.isFirstElement) {
                             eventQueue.add(new StartElementEvent(pi.name, new StaxLocation(parser.getCurrentLocation())));
                         } else {
                             pi.isFirstElement = false;
                         }
-                        eventQueue.add(new CharactersEvent(parser.getText(), new StaxLocation(parser.getCurrentLocation())));
+                        if (jtok != jtok.VALUE_NULL) {
+                            eventQueue.add(new CharactersEvent(parser.getText(), new StaxLocation(parser.getCurrentLocation())));
+                        }
                         eventQueue.add(new EndElementEvent(pi.name, new StaxLocation(parser.getCurrentLocation())));
                         if (!pi.isArray) {
                             pop(processingStack);
@@ -229,6 +229,7 @@ public class Jackson2StaxReader implements XMLStreamReader {
                         if (processingStack.isEmpty()) {
                             eventQueue.add(new EndDocumentEvent(new StaxLocation(parser.getCurrentLocation())));
                         }
+                        lookingForAttributes = false;
                         return;
                     case START_ARRAY:
                         peek(processingStack).isArray = true;
