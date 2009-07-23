@@ -715,6 +715,8 @@ public final class WebApplicationImpl implements WebApplication {
             mapMappableContainerException(e, response);
         } catch (RuntimeException e) {
             if (!mapException(e, response)) {
+                LOGGER.log(Level.SEVERE, "The RuntimeException could not be mapped to a response, " +
+                        "re-throwing to the HTTP container", e);
                 throw e;
             }
         }
@@ -736,6 +738,8 @@ public final class WebApplicationImpl implements WebApplication {
             mapMappableContainerException(e, response);
         } catch (RuntimeException e) {
             if (!mapException(e, response)) {
+                LOGGER.log(Level.SEVERE, "The RuntimeException could not be mapped to a response, " +
+                        "re-throwing to the HTTP container", e);
                 throw e;
             }
         }
@@ -744,6 +748,8 @@ public final class WebApplicationImpl implements WebApplication {
             response.write();
         } catch (WebApplicationException e) {
             if (response.isCommitted()) {
+                LOGGER.log(Level.SEVERE, "The response of the WebApplicationException cannot be utilized " +
+                        "as the response is already committed. Re-throwing to the HTTP container", e);
                 throw e;
             } else {
                 mapWebApplicationException(e, response);
@@ -1004,8 +1010,13 @@ public final class WebApplicationImpl implements WebApplication {
             mapWebApplicationException((WebApplicationException)cause, response);
         } else if (!mapException(cause, response)) {
             if (cause instanceof RuntimeException) {
+                LOGGER.log(Level.SEVERE, "The RuntimeException could not be mapped to a response, " +
+                        "re-throwing to the HTTP container", cause);
                 throw (RuntimeException)cause;
             } else {
+                LOGGER.log(Level.SEVERE, "The exception contained within " +
+                        "MappableContainerException could not be mapped to a response, " +
+                        "re-throwing to the HTTP container", cause);
                 throw e;
             }
         }
@@ -1028,6 +1039,10 @@ public final class WebApplicationImpl implements WebApplication {
         ExceptionMapper em = exceptionFactory.find(e.getClass());
         if (em == null) return false;
 
+        if (LOGGER.isLoggable(Level.CONFIG)) {
+            LOGGER.config("Mapping exception, " + e + ", to the ExceptionMapper, " + em);
+        }
+
         try {
             Response r = em.toResponse(e);
             if (r == null)
@@ -1035,8 +1050,8 @@ public final class WebApplicationImpl implements WebApplication {
             onException(e, r, response);
         } catch (RuntimeException ex) {
             LOGGER.severe("Exception mapper " + em +
-                    " for throwable " + e +
-                    " threw a Runtime exception when " +
+                    " for Throwable " + e +
+                    " threw a RuntimeTxception when " +
                     "attempting to obtain the response");
             Response r = Response.serverError().build();
             onException(ex, r, response);

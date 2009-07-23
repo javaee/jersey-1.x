@@ -1,4 +1,7 @@
 release 1.1.2-ea (2009-09)
+- Adding logging when Jersey cannot map an exception to a Response using
+  registered ExceptionMapper and the exception gets re-thrown to the HTTP
+  container.
 - Fixed issue 280
   https://jersey.dev.java.net/issues/show_bug.cgi?id=280
   For the "natural" JSON convention, the humanReadableFormatting option
