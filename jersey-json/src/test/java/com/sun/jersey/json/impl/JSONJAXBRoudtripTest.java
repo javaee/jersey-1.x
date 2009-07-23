@@ -71,7 +71,7 @@ public class JSONJAXBRoudtripTest extends TestCase {
     @Override
     @SuppressWarnings("unchecked")
     public void setUp() throws Exception {
-        String beanClasses = ResourceHelper.getResourceAsString(PKG_NAME, "jaxb.index");
+        String beanClasses = TestHelper.getResourceAsString(PKG_NAME, "jaxb.index");
         Collection classCollection = new LinkedList<Class>();
         StringTokenizer tokenizer = new StringTokenizer(beanClasses);
         //StringTokenizer tokenizer = new StringTokenizer("SimpleBeanWithAttributes");//beanClasses);

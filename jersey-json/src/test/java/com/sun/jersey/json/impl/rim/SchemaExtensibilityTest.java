@@ -39,7 +39,7 @@ package com.sun.jersey.json.impl.rim;
 
 import com.sun.jersey.api.json.JSONConfiguration;
 import com.sun.jersey.api.json.JSONJAXBContext;
-import com.sun.jersey.json.impl.ResourceHelper;
+import com.sun.jersey.json.impl.TestHelper;
 import java.io.StringReader;
 import java.io.StringWriter;
 import javax.xml.bind.Unmarshaller;
@@ -54,7 +54,7 @@ import junit.framework.TestCase;
 public class SchemaExtensibilityTest extends TestCase {
 
     public void testExtensibility() throws Exception {
-        String baseXml = ResourceHelper.getResourceAsString("com/sun/jersey/json/impl/rim/", "LightningDataset.xml");
+        String baseXml = TestHelper.getResourceAsString("com/sun/jersey/json/impl/rim/", "LightningDataset.xml");
         JSONJAXBContext jsonContext = new JSONJAXBContext(JSONConfiguration.natural().build(), "com.sun.jersey.json.impl.rim");
 
         Unmarshaller jaxbUnmarshaller = jsonContext.createUnmarshaller();

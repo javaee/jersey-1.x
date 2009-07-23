@@ -82,9 +82,9 @@ public class Stax2JsonFactory {
                 }
                 final JsonGenerator bodyGenerator = writingList ? JacksonArrayWrapperGenerator.createArrayWrapperGenerator(rawGenerator) : rawGenerator;
                 if (config.isRootUnwrapping()) {
-                    return new Stax2JacksonWriter(JacksonRootStrippingGenerator.createRootStrippingGenerator(bodyGenerator));
+                    return new Stax2JacksonWriter(JacksonRootStrippingGenerator.createRootStrippingGenerator(bodyGenerator), config);
                 } else {
-                    return new Stax2JacksonWriter(bodyGenerator);
+                    return new Stax2JacksonWriter(bodyGenerator, config);
                 }
             case MAPPED:
                 return JsonXmlStreamWriter.createWriter(writer, config);
@@ -114,9 +114,9 @@ public class Stax2JsonFactory {
                     final JsonParser rawParser = new JsonFactory().createJsonParser(reader);
                     final JsonParser nonListParser = config.isRootUnwrapping() ? JacksonRootAddingParser.createRootAddingParser(rawParser, rootName) : rawParser;
                     if (!readingList) {
-                        return new Jackson2StaxReader(nonListParser);
+                        return new Jackson2StaxReader(nonListParser, config);
                     } else {
-                        return new Jackson2StaxReader(JacksonRootAddingParser.createRootAddingParser(nonListParser, "jsonArrayRootElement"));
+                        return new Jackson2StaxReader(JacksonRootAddingParser.createRootAddingParser(nonListParser, "jsonArrayRootElement"), config);
                     }
                 } catch (Exception ex) {
                     Logger.getLogger(JSONUnmarshallerImpl.class.getName()).log(Level.SEVERE, null, ex);

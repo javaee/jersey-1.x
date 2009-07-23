@@ -231,7 +231,7 @@ public class JsonXmlStreamReaderWriterTest extends TestCase {
 
     public void tryWritingBean(Object jaxbBean, String expectedJsonExprFilename, 
             JSONConfiguration config) throws JAXBException, IOException {
-        String expectedJsonExpr = ResourceHelper.getResourceAsString(PKG_NAME, expectedJsonExprFilename);
+        String expectedJsonExpr = TestHelper.getResourceAsString(PKG_NAME, expectedJsonExprFilename);
         Marshaller marshaller = jaxbContext.createMarshaller();
         StringWriter resultWriter = new StringWriter();
         marshaller.marshal(jaxbBean, JsonXmlStreamWriter.createWriter(resultWriter, config));
@@ -244,7 +244,7 @@ public class JsonXmlStreamReaderWriterTest extends TestCase {
         Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
         JAXBElement jaxbElement = unmarshaller.unmarshal(
                 new JsonXmlStreamReader(
-                    new StringReader(ResourceHelper.getResourceAsString(PKG_NAME, jsonExprFilename)), config),
+                    new StringReader(TestHelper.getResourceAsString(PKG_NAME, jsonExprFilename)), config),
                 expectedJaxbBean.getClass());
         System.out.println("unmarshalled: " + jaxbElement.getValue().toString());
         assertEquals("MISMATCH:\n" + expectedJaxbBean + "\n" + jaxbElement.getValue() + "\n", 

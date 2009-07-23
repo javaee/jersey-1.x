@@ -36,6 +36,7 @@
  */
 package com.sun.jersey.json.impl.reader;
 
+import com.sun.jersey.api.json.JSONConfiguration;
 import com.sun.jersey.json.impl.ImplMessages;
 import com.sun.xml.bind.v2.runtime.unmarshaller.UnmarshallingContext;
 import java.io.IOException;
@@ -81,7 +82,8 @@ public class Jackson2StaxReader implements XMLStreamReader {
     final JsonNamespaceContext namespaceContext = new JsonNamespaceContext();
 
 
-    boolean properJAXBVersion = true;
+    private boolean properJAXBVersion = true;
+    private final boolean attrsWithPrefix;
 
     final Collection<String> elemsExpected = new HashSet<String>();
     final Map<String, QName> qNamesOfExpElems = new HashMap<String, QName>();
@@ -102,6 +104,11 @@ public class Jackson2StaxReader implements XMLStreamReader {
     }
 
     public Jackson2StaxReader(JsonParser parser) throws XMLStreamException {
+        this(parser, JSONConfiguration.DEFAULT);
+    }
+
+    public Jackson2StaxReader(JsonParser parser, JSONConfiguration config) throws XMLStreamException {
+        this.attrsWithPrefix = config.isUsingPrefixesAtNaturalAttributes();
         this.parser = parser;
         try {
             readNext();
@@ -158,6 +165,9 @@ public class Jackson2StaxReader implements XMLStreamReader {
                     case FIELD_NAME:
                         // start tag
                         String currentName = parser.getCurrentName();
+                        if (attrsWithPrefix && currentName.startsWith("@")) {
+                            currentName = currentName.substring(1);
+                        }
                         boolean currentIsAttribute = !("$".equals(currentName)) && properJAXBVersion ? attrsExpected.contains(currentName) : !elemsExpected.contains(currentName);
                         if (lookingForAttributes && currentIsAttribute) {
                             parser.nextToken();

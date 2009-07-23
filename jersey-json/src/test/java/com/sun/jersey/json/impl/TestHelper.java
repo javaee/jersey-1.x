@@ -34,19 +34,19 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-
 package com.sun.jersey.json.impl;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.lang.reflect.Method;
 
 /**
  *
  * @author japod
  */
-public class ResourceHelper {
-    
+public class TestHelper {
+
     public static String getResourceAsString(String prefix, String resource) throws IOException {
         Reader reader = new InputStreamReader(
                 Thread.currentThread().getContextClassLoader().getResourceAsStream(prefix + resource));
@@ -55,7 +55,16 @@ public class ResourceHelper {
         int l;
         while ((l = reader.read(c)) != -1) {
             sb.append(c, 0, l);
-        } 
+        }
         return sb.toString();
+    }
+
+    public static <T> T createTestInstance(Class<T> clazz) {
+        try {
+            Method createMethod = clazz.getDeclaredMethod("createTestInstance");
+            return (T) createMethod.invoke(clazz);
+        } catch (Exception ex) {
+            return null;
+        }
     }
 }

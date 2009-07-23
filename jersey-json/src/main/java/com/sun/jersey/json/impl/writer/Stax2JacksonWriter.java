@@ -36,6 +36,7 @@
  */
 package com.sun.jersey.json.impl.writer;
 
+import com.sun.jersey.api.json.JSONConfiguration;
 import com.sun.xml.bind.v2.model.runtime.RuntimePropertyInfo;
 import com.sun.xml.bind.v2.model.runtime.RuntimeReferencePropertyInfo;
 import com.sun.xml.bind.v2.runtime.XMLSerializer;
@@ -116,6 +117,11 @@ public class Stax2JacksonWriter implements XMLStreamWriter {
             return hash;
         }
     }
+
+    final private boolean attrsWithPrefix;
+
+    final static String XML_SCHEMA_INSTANCE = "http://www.w3.org/2001/XMLSchema-instance";
+
     JsonGenerator generator;
     final List<ProcessingInfo> processingStack = new ArrayList<ProcessingInfo>();
     boolean writingAttr = false;
@@ -133,6 +139,11 @@ public class Stax2JacksonWriter implements XMLStreamWriter {
     }
 
     public Stax2JacksonWriter(JsonGenerator generator) {
+        this(generator, JSONConfiguration.DEFAULT);
+    }
+
+    public Stax2JacksonWriter(JsonGenerator generator, JSONConfiguration config) {
+        this.attrsWithPrefix = config.isUsingPrefixesAtNaturalAttributes();
         this.generator = generator;
     }
 
@@ -347,11 +358,6 @@ public class Stax2JacksonWriter implements XMLStreamWriter {
     public void writeAttribute(String namespaceURI, String localName, String value) throws XMLStreamException {
         writeAttribute(null, namespaceURI, localName, value);
     }
-
-    // TODO: need it parameterized
-    final static boolean attrsWithPrefix = false;
-
-    final static String XML_SCHEMA_INSTANCE = "http://www.w3.org/2001/XMLSchema-instance";
 
     public void writeAttribute(String prefix, String namespaceURI, String localName, String value) throws XMLStreamException {
         writingAttr = true;

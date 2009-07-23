@@ -41,28 +41,55 @@ import com.sun.jersey.api.json.JSONConfiguration;
 import com.sun.jersey.api.json.JSONJAXBContext;
 import com.sun.jersey.api.json.JSONMarshaller;
 import com.sun.jersey.api.json.JSONUnmarshaller;
+import java.io.StringReader;
 import java.io.StringWriter;
 import junit.framework.TestCase;
 
 /**
  *
- * test case for issue#310
- *
  * @author Jakub.Podlesak@Sun.COM
  */
-public class FakeArrayTest extends TestCase {
+public class NaturalAttributesPrefixTest extends TestCase {
 
-    public void testSimpleXmlTypeBean() throws Exception {
-        
-        final JSONJAXBContext ctx = new JSONJAXBContext(JSONConfiguration.mapped().arrays("color").build(), FakeArrayBean.class);
+    public void testNoPrefixAdded() throws Exception {
+
+        final JSONJAXBContext ctx = new JSONJAXBContext(JSONConfiguration.natural().build(), SimpleBeanWithAttributes.class);
         final JSONMarshaller jm = ctx.createJSONMarshaller();
         final StringWriter sw = new StringWriter();
 
-        final FakeArrayBean one=(FakeArrayBean) FakeArrayBean.createTestInstance();
-
+        final SimpleBeanWithAttributes one = TestHelper.createTestInstance(SimpleBeanWithAttributes.class);
         jm.marshallToJSON(one, sw);
-        String jsonResult = sw.toString();
+        System.out.println(sw.toString());
 
-        assertEquals("{\"weight\":[\"1kg\",\"2kg\"],\"color\":[\"red\"],\"name\":\"bumper\"}", jsonResult);
+        assertFalse(sw.toString().contains("@"));
+    }
+
+    public void testPrefixAdded() throws Exception {
+
+        final JSONJAXBContext ctx = new JSONJAXBContext(JSONConfiguration.natural().usePrefixesAtNaturalAttributes().build(), SimpleBeanWithAttributes.class);
+        final JSONMarshaller jm = ctx.createJSONMarshaller();
+        final StringWriter sw = new StringWriter();
+
+        final SimpleBeanWithAttributes one=TestHelper.createTestInstance(SimpleBeanWithAttributes.class);
+        jm.marshallToJSON(one, sw);
+        System.out.println(sw.toString());
+
+        assertTrue(sw.toString().contains("@"));
+    }
+
+    public void testRoundtripWithPrefixAdded() throws Exception {
+
+        final JSONJAXBContext ctx = new JSONJAXBContext(JSONConfiguration.natural().usePrefixesAtNaturalAttributes().build(), SimpleBeanWithAttributes.class);
+        final JSONMarshaller jm = ctx.createJSONMarshaller();
+        final JSONUnmarshaller ju = ctx.createJSONUnmarshaller();
+        final StringWriter sw = new StringWriter();
+
+        final SimpleBeanWithAttributes one = TestHelper.createTestInstance(SimpleBeanWithAttributes.class);
+        jm.marshallToJSON(one, sw);
+        System.out.println(sw.toString());
+        
+        SimpleBeanWithAttributes unmarshalledOne = ju.unmarshalFromJSON(new StringReader(sw.toString()), SimpleBeanWithAttributes.class);
+
+        assertEquals(one, unmarshalledOne);
     }
 }

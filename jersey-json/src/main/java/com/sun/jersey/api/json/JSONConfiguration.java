@@ -96,6 +96,7 @@ public class JSONConfiguration {
     private final boolean rootUnwrapping;
     private final boolean humanReadableFormating;
     private final Map<String, String> jsonXml2JsonNs;
+    private final boolean usePrefixAtNaturalAttributes;
 
     /**
      * Builder class for constructing {@link JSONConfiguration} options
@@ -109,6 +110,7 @@ public class JSONConfiguration {
         protected boolean rootUnwrapping = true;
         protected boolean humanReadableFormatting = false;
         protected Map<String, String> jsonXml2JsonNs = new HashMap<String, String>(0);
+        protected boolean usePrefixAtNaturalAttributes = false;
 
         private Builder(Notation notation) {
             this.notation = notation;
@@ -162,6 +164,15 @@ public class JSONConfiguration {
          */
         public NaturalBuilder humanReadableFormatting(boolean humanReadableFormatting) {
             this.humanReadableFormatting = humanReadableFormatting;
+            return this;
+        }
+        /**
+         * JSON names corresponding to XML attributes will be written using a '@' prefix
+         * This property is valid for the  {@link JSONConfiguration.Notation#NATURAL} notation only.
+         * @return the natural builder.
+         */
+        public NaturalBuilder usePrefixesAtNaturalAttributes() {
+            this.usePrefixAtNaturalAttributes = true;
             return this;
         }
     }
@@ -317,6 +328,7 @@ public class JSONConfiguration {
         rootUnwrapping = b.rootUnwrapping;
         humanReadableFormating = b.humanReadableFormatting;
         jsonXml2JsonNs = b.jsonXml2JsonNs;
+        usePrefixAtNaturalAttributes = b.usePrefixAtNaturalAttributes;
     }
     /**
      * The default JSONConfiguration uses {@link JSONConfiguration.Notation#MAPPED} notation with root unwrapping option set to true.
@@ -434,6 +446,16 @@ public class JSONConfiguration {
      */
     public boolean isRootUnwrapping() {
         return rootUnwrapping;
+    }
+
+    /**
+     * Says if the JSON names corresponding to XML attributes should use a '@' prefix.
+     * This property is valid for the {@link JSONConfiguration.Notation#NATURAL} notation only.
+     * @return true, if prefixes are added
+     * @see Builder#prefixAtNaturalAttributesAdding(boolean)
+     */
+    public boolean isUsingPrefixesAtNaturalAttributes() {
+        return usePrefixAtNaturalAttributes;
     }
 
     /**
