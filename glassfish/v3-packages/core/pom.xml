@@ -68,6 +68,11 @@
             <artifactId>jersey-gf-bundle</artifactId>
             <version>${project.version}</version>
         </dependency>
+         <dependency>
+            <groupId>com.sun.jersey.glassfish.v3.osgi</groupId>
+            <artifactId>jersey-gf-statsproviders</artifactId>
+            <version>${project.version}</version>
+        </dependency>
           <dependency>
             <groupId>com.sun.jersey.contribs</groupId>
             <artifactId>jersey-multipart</artifactId>
@@ -100,6 +105,14 @@
                                 <artifactItem>
                                     <groupId>com.sun.jersey.glassfish.v3.osgi</groupId>
                                     <artifactId>jersey-gf-bundle</artifactId>
+                                    <version>${project.version}</version>
+                                    <type>jar</type>
+                                    <overWrite>false</overWrite>
+                                    <outputDirectory>${assembly.directory}</outputDirectory>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>com.sun.jersey.glassfish.v3.osgi</groupId>
+                                    <artifactId>jersey-gf-statsproviders</artifactId>
                                     <version>${project.version}</version>
                                     <type>jar</type>
                                     <overWrite>false</overWrite>

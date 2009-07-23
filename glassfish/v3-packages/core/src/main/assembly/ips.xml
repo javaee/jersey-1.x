@@ -14,6 +14,7 @@
       <includes>
         <include>jsr311-api.jar</include>
         <include>jersey-gf-bundle.jar</include>
+        <include>jersey-gf-statsproviders.jar</include>
         <include>jersey-multipart.jar</include>
         <include>jackson-core-asl.jar</include>
         <include>jettison.jar</include>

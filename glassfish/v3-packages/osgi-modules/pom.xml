@@ -54,5 +54,6 @@
     <modules>
         <module>jersey-gf-bundle</module>
         <module>jackson</module>
+        <module>jersey-gf-statsproviders</module>
     </modules>
 </project>
