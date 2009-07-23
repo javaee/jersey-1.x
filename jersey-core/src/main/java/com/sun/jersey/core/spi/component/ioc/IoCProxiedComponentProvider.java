@@ -47,6 +47,14 @@ package com.sun.jersey.core.spi.component.ioc;
  */
 public interface IoCProxiedComponentProvider extends IoCComponentProvider {
     /**
+     * This method will not be invoked since an instance is
+     * created by the runtime, and that instance may be proxied via the
+     * {@link #proxy(java.lang.Object) } method.
+     *
+     */
+    Object getInstance();
+
+    /**
      * Proxy a component instance.
      * 
      * @param o the component instance to proxy.
