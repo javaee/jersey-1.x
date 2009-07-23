@@ -113,12 +113,12 @@ public class JsonXmlStreamReaderWriterTest extends TestCase {
     }
     
     public void testSimpleBeanWithAttributes() throws JAXBException, IOException {
-        SimpleBeanWithAttributes bean = (SimpleBeanWithAttributes)SimpleBeanWithAttributes.createTestInstance();
+        SimpleBeanWithAttributes bean = TestHelper.createTestInstance(SimpleBeanWithAttributes.class);
         tryBean(bean, "simpleBeanWithAttributes.json", true, null, null);
     }
 
     public void testSimpleBeanWithAttributesAsElems() throws Exception {
-        SimpleBeanWithAttributes bean = (SimpleBeanWithAttributes)SimpleBeanWithAttributes.createTestInstance();
+        SimpleBeanWithAttributes bean = TestHelper.createTestInstance(SimpleBeanWithAttributes.class);
         Collection<String> attrAsElems = new LinkedList<String>();
         addStringsToCollection("i", attrAsElems);
         addStringsToCollection("j", attrAsElems);
@@ -127,12 +127,12 @@ public class JsonXmlStreamReaderWriterTest extends TestCase {
     }
 
     public void testSimpleBeanWithJustOneAttribute() throws JAXBException, IOException {
-        SimpleBeanWithJustOneAttribute bean = (SimpleBeanWithJustOneAttribute)SimpleBeanWithJustOneAttribute.createTestInstance();
+        SimpleBeanWithJustOneAttribute bean = TestHelper.createTestInstance(SimpleBeanWithJustOneAttribute.class);
         tryBean(bean, "simpleBeanWithJustOneAttribute.json", true, null, null);
     }
 
     public void testSimpleBeanWithJustOneAttributeAsElem() throws JAXBException, IOException {
-        SimpleBeanWithJustOneAttribute bean = (SimpleBeanWithJustOneAttribute)SimpleBeanWithJustOneAttribute.createTestInstance();
+        SimpleBeanWithJustOneAttribute bean = TestHelper.createTestInstance(SimpleBeanWithJustOneAttribute.class);
         Collection<String> attrAsElems = new LinkedList<String>();
         addStringsToCollection("uri", attrAsElems);
         //tryWritingBean(bean, "simpleBeanWithJustOneAttributeAsElem.json", true, null, null, attrAsElems);
@@ -140,12 +140,12 @@ public class JsonXmlStreamReaderWriterTest extends TestCase {
     }
 
     public void testSimpleBeanWithJustOneAttributeAndValue() throws JAXBException, IOException {
-        SimpleBeanWithJustOneAttributeAndValue bean = (SimpleBeanWithJustOneAttributeAndValue)SimpleBeanWithJustOneAttributeAndValue.createTestInstance();
+        SimpleBeanWithJustOneAttributeAndValue bean = TestHelper.createTestInstance(SimpleBeanWithJustOneAttributeAndValue.class);
         tryBean(bean, "simpleBeanWithJustOneAttributeAndValue.json", true, null, null);
     }
 
     public void testSimpleBeanWithJustOneAttributeAsElemAndValue() throws JAXBException, IOException {
-        SimpleBeanWithJustOneAttributeAndValue bean = (SimpleBeanWithJustOneAttributeAndValue)SimpleBeanWithJustOneAttributeAndValue.createTestInstance();
+        SimpleBeanWithJustOneAttributeAndValue bean = TestHelper.createTestInstance(SimpleBeanWithJustOneAttributeAndValue.class);
         Collection<String> attrAsElems = new LinkedList<String>();
         addStringsToCollection("uri", attrAsElems);
         //tryWritingBean(bean, "simpleBeanWithJustOneAttributeAsElemAndValue.json", true, null, null, attrAsElems);
@@ -153,37 +153,37 @@ public class JsonXmlStreamReaderWriterTest extends TestCase {
     }
 
     public void testComplexBeanWithAttributes() throws JAXBException, IOException {
-        ComplexBeanWithAttributes bean = (ComplexBeanWithAttributes)ComplexBeanWithAttributes.createTestInstance();
+        ComplexBeanWithAttributes bean = TestHelper.createTestInstance(ComplexBeanWithAttributes.class);
         tryBean(bean, "complexBeanWithAttributes.json", true, null, null);
     }
 
     public void testEmptyListWrapper() throws JAXBException, IOException {
-        ListWrapperBean bean = (ListWrapperBean)ListWrapperBean.createTestInstance();
+        ListWrapperBean bean = TestHelper.createTestInstance(ListWrapperBean.class);
         tryBean(bean, "emptyListWrapper.json", false, null, null);
     }
     
     public void testTwoListsWrapper() throws JAXBException, IOException {
-        TwoListsWrapperBean bean = (TwoListsWrapperBean)TwoListsWrapperBean.createTestInstance();
+        TwoListsWrapperBean bean = TestHelper.createTestInstance(TwoListsWrapperBean.class);
         tryBean(bean, "twoListsWrapper.json", false, "property1, property2", null);
     }
 
     public void testListAndNonList() throws JAXBException, IOException {
-        ListAndNonListBean bean = (ListAndNonListBean)ListAndNonListBean.createTestInstance();
+        ListAndNonListBean bean = TestHelper.createTestInstance(ListAndNonListBean.class);
         tryBean(bean, "listAndNonList.json", true, "a", null);
     }
     
     public void testPureCharDataValue() throws JAXBException, IOException {
-        PureCharDataBean bean = (PureCharDataBean)PureCharDataBean.createTestInstance();
+        PureCharDataBean bean = TestHelper.createTestInstance(PureCharDataBean.class);
         tryBean(bean, "pureCharDataValue.json", true, null, null);
     }
 
     public void testAttrAndCharDataValue() throws JAXBException, IOException {
-        AttrAndCharDataBean bean = (AttrAndCharDataBean)AttrAndCharDataBean.createTestInstance();
+        AttrAndCharDataBean bean = TestHelper.createTestInstance(AttrAndCharDataBean.class);
         tryBean(bean, "attrAndCharDataValue.json", true, null, null);
     }
     
     public void testAttrAndXmlVal() throws Exception {
-        SimpleBeanWithAttributes bean = (SimpleBeanWithAttributes)SimpleBeanWithAttributes.createTestInstance();
+        SimpleBeanWithAttributes bean = TestHelper.createTestInstance(SimpleBeanWithAttributes.class);
         tryBean(bean, "simpleBeanWithAttributes.json", true, null, null);
     }
 

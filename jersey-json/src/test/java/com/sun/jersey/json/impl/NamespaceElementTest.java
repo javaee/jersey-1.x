@@ -54,7 +54,7 @@ import junit.framework.TestCase;
 public class NamespaceElementTest extends TestCase {
 
     final boolean jsonEnabled = true;
-    final NamespaceBean one = (NamespaceBean) NamespaceBean.createTestInstance();
+    final NamespaceBean one = TestHelper.createTestInstance(NamespaceBean.class);
 
     public void _disabledFailingtestBadgerfish() throws Exception {
         tryConfiguration(JSONConfiguration.badgerFish().build());

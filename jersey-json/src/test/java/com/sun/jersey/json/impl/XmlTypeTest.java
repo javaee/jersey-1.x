@@ -59,7 +59,7 @@ public class XmlTypeTest extends TestCase {
         final JSONUnmarshaller ju = ctx.createJSONUnmarshaller();
         final StringWriter sw = new StringWriter();
 
-        final SimpleXmlTypeBean one=(SimpleXmlTypeBean) SimpleXmlTypeBean.createTestInstance();
+        final SimpleXmlTypeBean one=TestHelper.createTestInstance(SimpleXmlTypeBean.class);
         SimpleXmlTypeBean two;
         jm.marshallToJSON(new JAXBElement<SimpleXmlTypeBean>(new QName("test"), SimpleXmlTypeBean.class, one), sw);
         two = ju.unmarshalFromJSON(new StringReader(sw.toString()), SimpleXmlTypeBean.class);

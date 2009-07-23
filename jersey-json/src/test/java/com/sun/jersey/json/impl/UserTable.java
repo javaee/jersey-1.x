@@ -100,7 +100,7 @@ public class UserTable {
     public static Object createTestInstance() {
         UserTable instance = new UserTable();
         instance.rows = new LinkedList<User>();
-        instance.rows.add((User)User.createTestInstance());
+        instance.rows.add(TestHelper.createTestInstance(User.class));
         return instance;
     }
 

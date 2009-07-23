@@ -66,7 +66,7 @@ public class EmptyJSONElementTest extends TestCase {
         final JSONJAXBContext ctx = new JSONJAXBContext(JSONConfiguration.mapped().rootUnwrapping(false).build(), EmptyElementBean.class, EmptyElementContainingBean.class);
         final JSONUnmarshaller ju = ctx.createJSONUnmarshaller();
 
-        EmptyElementContainingBean one = (EmptyElementContainingBean)EmptyElementContainingBean.createTestInstance();
+        EmptyElementContainingBean one = TestHelper.createTestInstance(EmptyElementContainingBean.class);
         EmptyElementContainingBean two = ju.unmarshalFromJSON(new StringReader("{\"emptyElementContainingBean\":{\"emptyElementBean\":{},\"c\":\"foo\",\"d\":\"bar\"}}"), EmptyElementContainingBean.class);
 
         assertEquals(one, two);

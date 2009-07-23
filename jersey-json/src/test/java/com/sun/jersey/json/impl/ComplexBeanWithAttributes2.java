@@ -64,10 +64,10 @@ public class ComplexBeanWithAttributes2 {
         instance.a2 = 31415926;
         instance.filler1 = "111";
         instance.filler2 = "222";
-        instance.b = (SimpleBeanWithJustOneAttribute)SimpleBeanWithJustOneAttribute.createTestInstance();
+        instance.b = TestHelper.createTestInstance(SimpleBeanWithJustOneAttribute.class);
         instance.list = new LinkedList<SimpleBeanWithJustOneAttribute>();
-        instance.list.add((SimpleBeanWithJustOneAttribute)SimpleBeanWithJustOneAttribute.createTestInstance());
-        instance.list.add((SimpleBeanWithJustOneAttribute)SimpleBeanWithJustOneAttribute.createTestInstance());
+        instance.list.add(TestHelper.createTestInstance(SimpleBeanWithJustOneAttribute.class));
+        instance.list.add(TestHelper.createTestInstance(SimpleBeanWithJustOneAttribute.class));
         return instance;
     }
     

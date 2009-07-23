@@ -70,7 +70,7 @@ public class NamespaceSupportIssue272Test extends TestCase {
         final JSONUnmarshaller ju = ctx.createJSONUnmarshaller();
         final StringWriter sw = new StringWriter();
 
-        final MyResponse one=(MyResponse) MyResponse.createTestInstance();
+        final MyResponse one = TestHelper.createTestInstance(MyResponse.class);
 
         jm.marshallToJSON(one, sw);
 

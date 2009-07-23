@@ -55,7 +55,7 @@ public class FormattingOptionTest extends TestCase {
         final JSONMarshaller jm = ctx.createJSONMarshaller();
         final StringWriter sw = new StringWriter();
 
-        final User one=(User) User.createTestInstance();
+        final User one = TestHelper.createTestInstance(User.class);
         jm.marshallToJSON(one, sw);
 
         assertFalse(sw.toString().contains("\n"));
@@ -67,7 +67,7 @@ public class FormattingOptionTest extends TestCase {
         final JSONMarshaller jm = ctx.createJSONMarshaller();
         final StringWriter sw = new StringWriter();
 
-        final User one=(User) User.createTestInstance();
+        final User one = TestHelper.createTestInstance(User.class);
         jm.marshallToJSON(one, sw);
 
         assertTrue(sw.toString().contains("\n"));

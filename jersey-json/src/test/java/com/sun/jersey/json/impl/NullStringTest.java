@@ -52,7 +52,7 @@ import junit.framework.TestCase;
  */
 public class NullStringTest extends TestCase {
 
-    final NullStringBean one = (NullStringBean) NullStringBean.createTestInstance();
+    final NullStringBean one = TestHelper.createTestInstance(NullStringBean.class);
 
     @Override
     protected void setUp() throws Exception {
