@@ -97,32 +97,6 @@
                     </execution>
                 </executions>
             </plugin>
-            <plugin>             <!-- will add classes from istack-commons-runtime to avoid unnecessary dependency -->
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-dependency-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>unpack</id>
-                        <phase>generate-sources</phase>
-                        <goals>
-                            <goal>unpack</goal>
-                        </goals>
-                        <configuration>
-                            <artifactItems>
-                                <artifactItem>
-                                    <groupId>com.sun.istack</groupId>
-                                    <artifactId>istack-commons-runtime</artifactId>
-                                    <version>1.1-SNAPSHOT</version>
-                                    <type>jar</type>
-                                    <overWrite>false</overWrite>
-                                    <outputDirectory>${project.build.directory}/classes</outputDirectory>
-                                    <includes>**com/sun/istack/localization/*.class</includes>
-                                </artifactItem>
-                            </artifactItems>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
             <plugin>
                 <groupId>com.sun.istack</groupId>
                 <artifactId>maven-istack-commons-plugin</artifactId>
@@ -138,6 +112,7 @@
                                 </includes>
                             </resources>
                             <destDir>${project.build.directory}/generated-sources/rsrc-gen</destDir>
+                            <localizationUtilitiesPkgName>com.sun.jersey.localization</localizationUtilitiesPkgName>
                         </configuration>
                         <goals>
                             <goal>rs-gen</goal>

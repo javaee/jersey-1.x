@@ -191,15 +191,6 @@
                         <configuration>
                             <artifactItems>
                                 <artifactItem>
-                                    <groupId>com.sun.istack</groupId>
-                                    <artifactId>istack-commons-runtime</artifactId>
-                                    <version>1.1-SNAPSHOT</version>
-                                    <type>jar</type>
-                                    <overWrite>false</overWrite>
-                                    <outputDirectory>${project.build.directory}/classes</outputDirectory>
-                                    <includes>**com/sun/istack/localization/*.class</includes>
-                                </artifactItem>
-                                <artifactItem>
                                     <groupId>com.sun.jersey</groupId>
                                     <artifactId>jersey-core</artifactId>
                                     <version>${project.version}</version>

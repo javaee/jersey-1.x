@@ -122,6 +122,7 @@
                                 </includes>
                             </resources>
                             <destDir>${project.build.directory}/generated-sources/rsrc-gen</destDir>
+                            <localizationUtilitiesPkgName>com.sun.jersey.localization</localizationUtilitiesPkgName>
                         </configuration>
                         <goals>
                             <goal>rs-gen</goal>
