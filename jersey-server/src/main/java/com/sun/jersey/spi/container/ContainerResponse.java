@@ -214,6 +214,7 @@ public class ContainerResponse implements HttpResponseContext {
         
         if (entity == null) {
             responseWriter.writeStatusAndHeaders(-1, this);
+            responseWriter.finish();
             return;
         }
         
@@ -241,7 +242,8 @@ public class ContainerResponse implements HttpResponseContext {
             LOGGER.severe(message);            
             if (request.getMethod().equals("HEAD")) {
                 responseWriter.writeStatusAndHeaders(-1, this);
-                return;                
+                responseWriter.finish();
+                return;
             } else {
                 throw new WebApplicationException(Response.serverError().entity(message).build());
             }

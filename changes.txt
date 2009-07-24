@@ -1,4 +1,6 @@
 release 1.1.2-ea (2009-09)
+- Ensure that ContainerResponseWriter.finish is called consistently, for example
+  when no response entity is present.
 - Cleaned up declaration of checked exceptions from the abstract message body
   reader/writer classes for JAXB and removed the declaration of IOException.
 - Fixed issue 334
