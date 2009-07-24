@@ -179,7 +179,7 @@ public class ProviderFactory implements ComponentProviderFactory<ComponentProvid
             } else {
                 LOGGER.log(Level.SEVERE,
                         "The provider class, " + c +
-                        ", could not be instantiated. Processing will continue but the class will not be utilized", ex);
+                        ", could not be instantiated. Processing will continue but the class will not be utilized", ex.getTargetException());
                 return null;
             }
         } catch (Exception ex) {

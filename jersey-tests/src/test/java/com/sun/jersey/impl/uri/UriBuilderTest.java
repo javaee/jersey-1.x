@@ -390,8 +390,8 @@ public class UriBuilderTest extends TestCase {
 
     public void testAppendSegment() {
         URI bu = UriBuilder.fromUri("http://localhost:8080").
-                segment("a/b/c").build();
-        assertEquals(URI.create("http://localhost:8080/a%2Fb%2Fc"), bu);
+                segment("a/b/c;x").build();
+        assertEquals(URI.create("http://localhost:8080/a%2Fb%2Fc%3Bx"), bu);
     }
 
     public void testRelativefromUri() {
@@ -471,8 +471,8 @@ public class UriBuilderTest extends TestCase {
         assertEquals(URI.create("http://localhost:8080/a/b/c;a=x;b=y;c=z"), bu);
 
         bu = UriBuilder.fromUri("http://localhost:8080/a/b/c;a=x;b=y").
-                matrixParam("c=/ ", "z=/ ").build();
-        assertEquals(URI.create("http://localhost:8080/a/b/c;a=x;b=y;c%3D%2F%20=z%3D%2F%20"), bu);
+                matrixParam("c=/ ;", "z=/ ;").build();
+        assertEquals(URI.create("http://localhost:8080/a/b/c;a=x;b=y;c%3D%2F%20%3B=z%3D%2F%20%3B"), bu);
     }
 
     public void testAppendPathAndMatrixParams() {

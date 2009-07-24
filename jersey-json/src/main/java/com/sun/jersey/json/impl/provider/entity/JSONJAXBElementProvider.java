@@ -39,7 +39,6 @@ package com.sun.jersey.json.impl.provider.entity;
 
 import com.sun.jersey.api.json.JSONJAXBContext;
 import com.sun.jersey.core.provider.jaxb.AbstractJAXBElementProvider;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
@@ -88,7 +87,7 @@ public class JSONJAXBElementProvider extends AbstractJAXBElementProvider {
 
     protected final JAXBElement<?> readFrom(Class<?> type, MediaType mediaType,
             Unmarshaller u, InputStream entityStream)
-            throws JAXBException, IOException {
+            throws JAXBException {
         final Charset c = getCharset(mediaType);
 
         return JSONJAXBContext.getJSONUnmarshaller(u).
@@ -97,7 +96,7 @@ public class JSONJAXBElementProvider extends AbstractJAXBElementProvider {
     
     protected final void writeTo(JAXBElement<?> t, MediaType mediaType, Charset c,
             Marshaller m, OutputStream entityStream)
-            throws JAXBException, IOException {
+            throws JAXBException {
 
         JSONJAXBContext.getJSONMarshaller(m).
                 marshallToJSON(t, new OutputStreamWriter(entityStream, c));

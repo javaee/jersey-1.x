@@ -39,10 +39,8 @@ package com.sun.jersey.fastinfoset.impl.provider.entity;
 
 import com.sun.jersey.core.header.MediaTypes;
 import com.sun.jersey.core.provider.jaxb.AbstractJAXBElementProvider;
-import com.sun.jersey.core.util.ThrowHelper;
 import com.sun.xml.fastinfoset.stax.StAXDocumentSerializer;
 import com.sun.xml.fastinfoset.stax.StAXDocumentParser;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.charset.Charset;
@@ -72,21 +70,19 @@ public final class FastInfosetJAXBElementProvider extends AbstractJAXBElementPro
     
     protected final JAXBElement<?> readFrom(Class<?> type, MediaType mediaType,
             Unmarshaller u, InputStream entityStream)
-            throws JAXBException, IOException {
+            throws JAXBException {
         return u.unmarshal(new StAXDocumentParser(entityStream), type);
     }
     
     protected final void writeTo(JAXBElement<?> t, MediaType mediaType, Charset c,
             Marshaller m, OutputStream entityStream)
-            throws JAXBException, IOException {        
+            throws JAXBException {        
         final XMLStreamWriter xsw = new StAXDocumentSerializer(entityStream);
         m.marshal(t, xsw);
         try {
             xsw.flush();
         } catch (XMLStreamException cause) {
-            throw ThrowHelper.withInitCause(cause,
-                    new IOException()
-                    );            
+            throw new JAXBException(cause);
         }
     }
 }

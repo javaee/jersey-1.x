@@ -1,4 +1,10 @@
 release 1.1.2-ea (2009-09)
+- Cleaned up declaration of checked exceptions from the abstract message body
+  reader/writer classes for JAXB and removed the declaration of IOException.
+- Fixed issue 334
+  https://jersey.dev.java.net/issues/show_bug.cgi?id=334
+  UriBuilder.segment and UriBuilder.matrixParam should percent encode ';'
+  characters.
 - Adding logging when Jersey cannot map an exception to a Response using
   registered ExceptionMapper and the exception gets re-thrown to the HTTP
   container.

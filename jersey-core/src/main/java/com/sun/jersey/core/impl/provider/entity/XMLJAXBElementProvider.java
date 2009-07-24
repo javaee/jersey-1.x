@@ -39,7 +39,6 @@ package com.sun.jersey.core.impl.provider.entity;
 
 import com.sun.jersey.core.provider.jaxb.AbstractJAXBElementProvider;
 import com.sun.jersey.spi.inject.Injectable;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.charset.Charset;
@@ -106,13 +105,13 @@ public class XMLJAXBElementProvider extends AbstractJAXBElementProvider {
     
     protected final JAXBElement<?> readFrom(Class<?> type, MediaType mediaType,
             Unmarshaller u, InputStream entityStream)
-            throws JAXBException, IOException {
+            throws JAXBException {
         return u.unmarshal(getSAXSource(spf.getValue(), entityStream), type);
     }
 
     protected final void writeTo(JAXBElement<?> t, MediaType mediaType, Charset c,
             Marshaller m, OutputStream entityStream)
-            throws JAXBException, IOException {        
+            throws JAXBException {        
         m.marshal(t, entityStream);
     }
 }

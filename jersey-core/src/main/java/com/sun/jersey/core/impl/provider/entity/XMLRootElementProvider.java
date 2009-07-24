@@ -38,7 +38,6 @@ package com.sun.jersey.core.impl.provider.entity;
 
 import com.sun.jersey.core.provider.jaxb.AbstractRootElementProvider;
 import com.sun.jersey.spi.inject.Injectable;
-import java.io.IOException;
 import java.io.InputStream;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.Produces;
@@ -107,7 +106,7 @@ public class XMLRootElementProvider extends AbstractRootElementProvider {
     @Override
     protected Object readFrom(Class<Object> type, MediaType mediaType,
             Unmarshaller u, InputStream entityStream)
-            throws JAXBException, IOException {
+            throws JAXBException {
         final SAXSource s = getSAXSource(spf.getValue(), entityStream);
         if (type.isAnnotationPresent(XmlRootElement.class)) {
             return u.unmarshal(s);

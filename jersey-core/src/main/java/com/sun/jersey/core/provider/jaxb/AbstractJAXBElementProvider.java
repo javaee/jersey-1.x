@@ -100,7 +100,7 @@ public abstract class AbstractJAXBElementProvider extends AbstractJAXBProvider<J
 
     protected abstract JAXBElement<?> readFrom(Class<?> type, MediaType mediaType,
             Unmarshaller u, InputStream entityStream)
-            throws JAXBException, IOException;
+            throws JAXBException;
     
     
     public final void writeTo(
@@ -127,5 +127,5 @@ public abstract class AbstractJAXBElementProvider extends AbstractJAXBProvider<J
 
     protected abstract void writeTo(JAXBElement<?> t, MediaType mediaType, Charset c,
             Marshaller m, OutputStream entityStream)
-            throws JAXBException, IOException;
+            throws JAXBException;
 }

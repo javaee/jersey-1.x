@@ -329,6 +329,7 @@ public class UriComponent {
         l.add("@");
 
         tables[Type.PATH_SEGMENT.ordinal()] = creatingEncodingTable(l);
+        tables[Type.PATH_SEGMENT.ordinal()][';'] = false;
 
         tables[Type.MATRIX_PARAM.ordinal()] = tables[Type.PATH_SEGMENT.ordinal()].clone();
         tables[Type.MATRIX_PARAM.ordinal()]['='] = false;

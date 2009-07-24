@@ -49,6 +49,17 @@ public class UriComponentEncodeTest extends TestCase {
         super(testName);
     }
 
+    public void testEncodePathSegment() {
+        assertEquals("%2Fa%2Fb%2Fc",
+                UriComponent.encode("/a/b/c", UriComponent.Type.PATH_SEGMENT));
+        assertEquals("%2Fa%20%2Fb%20%2Fc%20",
+                UriComponent.encode("/a /b /c ", UriComponent.Type.PATH_SEGMENT));
+        assertEquals("%2Fcopyright%C2%A9",
+                UriComponent.encode("/copyright\u00a9", UriComponent.Type.PATH_SEGMENT));
+        assertEquals("%2Fa%3Bx%2Fb%3Bx%2Fc%3Bx",
+                UriComponent.encode("/a;x/b;x/c;x", UriComponent.Type.PATH_SEGMENT));
+    }
+
     public void testEncodePath() {
         assertEquals("/a/b/c", 
                 UriComponent.encode("/a/b/c", UriComponent.Type.PATH));
@@ -56,6 +67,8 @@ public class UriComponentEncodeTest extends TestCase {
                 UriComponent.encode("/a /b /c ", UriComponent.Type.PATH));
         assertEquals("/copyright%C2%A9", 
                 UriComponent.encode("/copyright\u00a9", UriComponent.Type.PATH));
+        assertEquals("/a;x/b;x/c;x",
+                UriComponent.encode("/a;x/b;x/c;x", UriComponent.Type.PATH));
     }
     
     public void testContextualEncodePath() {
@@ -87,8 +100,8 @@ public class UriComponentEncodeTest extends TestCase {
     }
 
     public void testContextualEncodeMatrixParam() {
-        assertEquals("a%3Db%20c",
-                UriComponent.contextualEncode("a=b c", UriComponent.Type.MATRIX_PARAM));
+        assertEquals("a%3Db%20c%3Bx",
+                UriComponent.contextualEncode("a=b c;x", UriComponent.Type.MATRIX_PARAM));
     }    
     
     public void testContextualEncodePercent() {

@@ -119,7 +119,7 @@ public abstract class AbstractRootElementProvider extends AbstractJAXBProvider<O
      */
     protected Object readFrom(Class<Object> type, MediaType mediaType,
             Unmarshaller u, InputStream entityStream)
-            throws JAXBException, IOException {
+            throws JAXBException {
         if (type.isAnnotationPresent(XmlRootElement.class))
             return u.unmarshal(entityStream);
         else
@@ -163,7 +163,7 @@ public abstract class AbstractRootElementProvider extends AbstractJAXBProvider<O
      */
     protected void writeTo(Object t, MediaType mediaType, Charset c,
             Marshaller m, OutputStream entityStream)
-            throws JAXBException, IOException {
+            throws JAXBException {
         m.marshal(t, entityStream);
     }
 }
