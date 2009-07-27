@@ -182,7 +182,12 @@ public class HttpHandlerContainer implements HttpHandler, ContainerListener {
             e.printStackTrace();
             exchange.getResponseHeaders().clear();
             exchange.sendResponseHeaders(500, -1);
-        }   
+        } catch (IOException ex) {
+            ex.printStackTrace();
+            exchange.getResponseHeaders().clear();
+            exchange.sendResponseHeaders(500, -1);
+            throw ex;
+        }
         exchange.getResponseBody().flush();
         exchange.getResponseBody().close();
         exchange.close();                    
