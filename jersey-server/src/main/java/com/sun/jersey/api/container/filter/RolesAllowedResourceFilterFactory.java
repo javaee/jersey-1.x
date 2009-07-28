@@ -128,12 +128,12 @@ public class RolesAllowedResourceFilterFactory implements ResourceFilterFactory 
     public List<ResourceFilter> create(AbstractMethod am) {
         // DenyAll on the method take precedence over RolesAllowed and PermitAll
         if (am.isAnnotationPresent(DenyAll.class))
-            return Collections.singletonList((ResourceFilter)new Filter());
+            return Collections.<ResourceFilter>singletonList(new Filter());
 
         // RolesAllowed on the method takes precedence over PermitAll
         RolesAllowed ra = am.getAnnotation(RolesAllowed.class);
         if (ra != null)
-            return Collections.singletonList((ResourceFilter)new Filter(ra.value()));
+            return Collections.<ResourceFilter>singletonList(new Filter(ra.value()));
 
         // PermitAll takes precedence over RolesAllowed on the class
         if (am.isAnnotationPresent(PermitAll.class))
