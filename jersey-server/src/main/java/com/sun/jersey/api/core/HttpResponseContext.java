@@ -41,6 +41,7 @@ import java.io.OutputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 import javax.ws.rs.core.GenericEntity;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 
@@ -97,14 +98,31 @@ public interface HttpResponseContext {
     Type getEntityType();
     
     /**
+     * Get the original entity instance that was set by
+     * {@link #setEntity(java.lang.Object)}.
+     */
+    Object getOriginalEntity();
+
+    /**
      * Set the entity of the response.
+     * <p>
+     * If the entity is an instance of {@link GenericEntity} then the entity
+     * and entity type are set from the entity and type of that
+     * {@link GenericEntity}. Otherwise, the entity is set from the entity 
+     * parameter and the type is the class of that parameter.
+     * <p>
+     * If it is necessary to wrap an entity that may have been set with an
+     * instance of {@link GenericEntity} then utilize the
+     * {@link #getOriginalEntity() }, for example:
+     * <blockquote><pre>
+     *     HttpResponseContext r = ...
+     *     r.setEntity(wrap(getOriginalEntity()));
+     * </blockquote></pre>
      * 
-     * @param entity the entity. If the entity is an instance of 
-     *        {@link GenericEntity} then the entity and entity type are
-     *        set from the entity and type of that {@link GenericEntity}.
+     * @param entity the entity. 
      */
     void setEntity(Object entity);
-    
+
     /**
      * Get the annotations associated with the response entity (if any).
      *
@@ -127,7 +145,14 @@ public interface HttpResponseContext {
      * @return a mutable map of headerd.
      */
     MultivaluedMap<String, Object> getHttpHeaders();
-    
+
+    /**
+     * Get the media type of the response entity.
+     *
+     * @return the media type or null if there is no response entity.
+     */
+    MediaType getMediaType();
+
     /**
      * Get an {@link OutputStream} to which an entity may be written.
      * <p>

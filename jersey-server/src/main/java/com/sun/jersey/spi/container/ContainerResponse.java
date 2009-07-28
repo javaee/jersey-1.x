@@ -83,6 +83,8 @@ public class ContainerResponse implements HttpResponseContext {
     
     private MultivaluedMap<String, Object> headers;
     
+    private Object originalEntity;
+
     private Object entity;
     
     private Type entityType;
@@ -218,7 +220,7 @@ public class ContainerResponse implements HttpResponseContext {
             return;
         }
         
-        MediaType contentType = getContentType();
+        MediaType contentType = getMediaType();
         if (contentType == null) {
             contentType = bodyContext.getMessageBodyWriterMediaType(
                         entity.getClass(),
@@ -361,15 +363,18 @@ public class ContainerResponse implements HttpResponseContext {
         return entityType;
     }
     
+    public Object getOriginalEntity() {
+        return originalEntity;
+    }
+
     public void setEntity(Object entity) {
-        this.entity = entity;        
+        this.originalEntity = this.entity = entity;
         if (this.entity instanceof GenericEntity) {
             final GenericEntity ge = (GenericEntity)this.entity;
             this.entityType = ge.getType();                
             this.entity = ge.getEntity();            
-        } else {
-            if (entity != null)
-                this.entityType = this.entity.getClass();
+        } else if (entity != null) {
+            this.entityType = this.entity.getClass();
         }        
         
         checkStatusAndEntity();
@@ -389,6 +394,17 @@ public class ContainerResponse implements HttpResponseContext {
         return headers;
     }
     
+    public MediaType getMediaType() {
+        final Object mediaTypeHeader = getHttpHeaders().getFirst("Content-Type");
+        if (mediaTypeHeader instanceof MediaType) {
+            return (MediaType)mediaTypeHeader;
+        } else if (mediaTypeHeader != null) {
+            return MediaType.valueOf(mediaTypeHeader.toString());
+        }
+
+        return null;
+    }
+    
     public OutputStream getOutputStream() throws IOException {
         if (out == null)
             out = new CommittingOutputStream(-1);
@@ -402,19 +418,7 @@ public class ContainerResponse implements HttpResponseContext {
     
     
     //
-    
-    
-    private MediaType getContentType() {        
-        final Object mediaTypeHeader = getHttpHeaders().getFirst("Content-Type");
-        if (mediaTypeHeader instanceof MediaType) {
-            return (MediaType)mediaTypeHeader;
-        } else if (mediaTypeHeader != null) {
-            return MediaType.valueOf(mediaTypeHeader.toString());
-        }
-    
-        return null;
-    }
-    
+
     private void checkStatusAndEntity() {
         if (status == 204 && entity != null) status = 200;
         else if (status == 200 && entity == null) status = 204;
