@@ -1,4 +1,14 @@
 release 1.1.2-ea (2009-09)
+- Fixed issue 161
+  https://jersey.dev.java.net/issues/show_bug.cgi?id=161
+  The Jersey client can now be used completely independently of the Jersey
+  server side when errors are produces by certain message body readers and
+  writers.
+  Response and Response.ResponseBuilder are now implemented such that they
+  can be used on the client side (without having to include jersey server
+  dependencies). This is important for some message body readers and writers
+  that may throw WebApplicationException, which in turn defers to Response
+  for building a response.
 - Fixed issue 337
   https://jersey.dev.java.net/issues/show_bug.cgi?id=337
   The LW HTTP container logs an IOException (passed from Jersey) and attempts

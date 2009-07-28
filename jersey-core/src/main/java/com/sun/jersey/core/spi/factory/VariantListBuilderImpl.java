@@ -35,7 +35,7 @@
  * holder.
  */
 
-package com.sun.jersey.server.impl.provider;
+package com.sun.jersey.core.spi.factory;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -45,6 +45,7 @@ import javax.ws.rs.core.Variant;
 import javax.ws.rs.core.Variant.VariantListBuilder;
 
 /**
+ * An implementation of {@link Variant.VariantListBuilder}.
  *
  * @author Paul.Sandoz@Sun.Com
  */

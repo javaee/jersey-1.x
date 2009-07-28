@@ -39,7 +39,7 @@ package com.sun.jersey.server.impl.model.method.dispatch;
 
 import com.sun.jersey.api.core.HttpContext;
 import com.sun.jersey.api.model.AbstractResourceMethod;
-import com.sun.jersey.server.impl.ResponseBuilderImpl;
+import com.sun.jersey.core.spi.factory.ResponseBuilderImpl;
 import com.sun.jersey.server.impl.inject.InjectableValuesProvider;
 import com.sun.jersey.server.impl.inject.ServerInjectableProviderContext;
 import com.sun.jersey.spi.dispatch.RequestDispatcher;

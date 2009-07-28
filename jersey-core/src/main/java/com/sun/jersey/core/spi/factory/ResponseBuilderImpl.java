@@ -35,10 +35,8 @@
  * holder.
  */
 
-package com.sun.jersey.server.impl;
+package com.sun.jersey.core.spi.factory;
 
-import com.sun.jersey.core.util.KeyComparatorHashMap;
-import com.sun.jersey.core.util.StringIgnoreCaseKeyComparator;
 import java.lang.reflect.Type;
 import java.net.URI;
 import java.util.ArrayList;
@@ -48,7 +46,6 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 import javax.ws.rs.core.CacheControl;
 import javax.ws.rs.core.EntityTag;
 import javax.ws.rs.core.HttpHeaders;
@@ -59,53 +56,12 @@ import javax.ws.rs.core.Response.ResponseBuilder;
 import javax.ws.rs.core.Variant;
 
 /**
- *
+ * An implementation of {@link Response.ResponseBuilder}.
+ * 
  * @author Paul.Sandoz@Sun.Com
  */
 public final class ResponseBuilderImpl extends Response.ResponseBuilder {    
-    static final int CACHE_CONTROL     = 0;
-    static final int CONTENT_LANGUAGE  = 1;
-    static final int CONTENT_LOCATION  = 2;
-    static final int CONTENT_TYPE      = 3;
-    static final int ETAG              = 4;
-    static final int LAST_MODIFIED     = 5;
-    static final int LOCATION          = 6;
-
     private static final Object[] EMPTY_VALUES = new Object[0];
-    
-    private static final Map<String, Integer> HEADER_MAP = createHeaderMap();
-            
-    private static final String[] HEADER_ARRAY = createHeaderArray();
-    
-    private static Map<String, Integer> createHeaderMap() {
-        Map<String, Integer> m = new KeyComparatorHashMap<String, Integer>(
-                StringIgnoreCaseKeyComparator.SINGLETON);
-        
-        m.put("Cache-Control", CACHE_CONTROL);
-        m.put("Content-Language", CONTENT_LANGUAGE);
-        m.put("Content-Location", CONTENT_LOCATION);
-        m.put("Content-Type", CONTENT_TYPE);
-        m.put("ETag", ETAG);
-        m.put("Last-Modified", LAST_MODIFIED);
-        m.put("Location", LOCATION);
-        
-        return Collections.unmodifiableMap(m);
-    }
-    
-    private static String[] createHeaderArray() {
-        Map<String, Integer> m = createHeaderMap();
-        
-        String[] a = new String[m.size()];
-        for (Map.Entry<String, Integer> e : m.entrySet()) {
-            a[e.getValue()] = e.getKey();
-        }
-                
-        return a;
-    }
-    
-    static String getHeader(int id) {
-        return HEADER_ARRAY[id];
-    }
     
     private int status = 204;
 
@@ -138,7 +94,10 @@ public final class ResponseBuilderImpl extends Response.ResponseBuilder {
     // Response.Builder
     
     public Response build() {
-        Response r = new ResponseImpl(status, entity, entityType,
+        Response r = new ResponseImpl(
+                status,
+                entity,
+                entityType,
                 (values != null) ? values : EMPTY_VALUES, 
                 (nameValuePairs != null) ? nameValuePairs : Collections.emptyList());
         reset();
@@ -169,15 +128,15 @@ public final class ResponseBuilderImpl extends Response.ResponseBuilder {
     }
 
     public Response.ResponseBuilder type(MediaType type) {
-        set(CONTENT_TYPE, type);
+        set(ResponseBuilderHeaders.CONTENT_TYPE, type);
         return this;
     }
 
     public Response.ResponseBuilder type(String type) {
         if (type != null)
-            set(CONTENT_TYPE, MediaType.valueOf(type));
+            set(ResponseBuilderHeaders.CONTENT_TYPE, MediaType.valueOf(type));
         else
-            set(CONTENT_TYPE, null);            
+            set(ResponseBuilderHeaders.CONTENT_TYPE, null);
         return this;
     }
 
@@ -253,48 +212,48 @@ public final class ResponseBuilderImpl extends Response.ResponseBuilder {
     }
     
     public Response.ResponseBuilder language(String language) {
-        set(CONTENT_LANGUAGE, language);
+        set(ResponseBuilderHeaders.CONTENT_LANGUAGE, language);
         return this;
     }
     
     public Response.ResponseBuilder language(Locale language) {
         if (language != null)
-            set(CONTENT_LANGUAGE, language);
+            set(ResponseBuilderHeaders.CONTENT_LANGUAGE, language);
         else
-            set(CONTENT_LANGUAGE, null);
+            set(ResponseBuilderHeaders.CONTENT_LANGUAGE, null);
         return this;
     }
 
     public Response.ResponseBuilder location(URI location) {
-        set(LOCATION, location);
+        set(ResponseBuilderHeaders.LOCATION, location);
         return this;
     }
 
     public Response.ResponseBuilder contentLocation(URI location) {
-        set(CONTENT_LOCATION, location);
+        set(ResponseBuilderHeaders.CONTENT_LOCATION, location);
         return this;
     }
 
     public Response.ResponseBuilder tag(EntityTag tag) {
-        set(ETAG, tag);
+        set(ResponseBuilderHeaders.ETAG, tag);
         return this;
     }
 
     public Response.ResponseBuilder tag(String tag) {
         if (tag != null)
-            set(ETAG, new EntityTag(tag));
+            set(ResponseBuilderHeaders.ETAG, new EntityTag(tag));
         else
-            set(ETAG, null);
+            set(ResponseBuilderHeaders.ETAG, null);
         return this;
     }
 
     public Response.ResponseBuilder lastModified(Date lastModified) {
-        set(LAST_MODIFIED, lastModified);
+        set(ResponseBuilderHeaders.LAST_MODIFIED, lastModified);
         return this;
     }
 
     public Response.ResponseBuilder cacheControl(CacheControl cacheControl) {
-        set(CACHE_CONTROL, cacheControl);
+        set(ResponseBuilderHeaders.CACHE_CONTROL, cacheControl);
         return this;
     }
 
@@ -314,7 +273,7 @@ public final class ResponseBuilderImpl extends Response.ResponseBuilder {
     }
     
     public Response.ResponseBuilder header(String name, Object value) {
-        Integer id = HEADER_MAP.get(name);
+        Integer id = ResponseBuilderHeaders.getIdFromName(name);
         if (id != null)
             set(id, value);
         else 
@@ -352,7 +311,7 @@ public final class ResponseBuilderImpl extends Response.ResponseBuilder {
     
     private void set(int id, Object value) {
         if (values == null)
-            values = new Object[HEADER_MAP.size()];
+            values = new Object[ResponseBuilderHeaders.getSize()];
         
         values[id] = value;
     }

@@ -40,11 +40,8 @@ package com.sun.jersey.server.impl.provider;
 import com.sun.jersey.api.container.ContainerFactory;
 import com.sun.jersey.api.core.ApplicationAdapter;
 import com.sun.jersey.api.core.ResourceConfig;
-import com.sun.jersey.server.impl.ResponseBuilderImpl;
 import com.sun.jersey.core.spi.factory.AbstractRuntimeDelegate;
 import javax.ws.rs.core.Application;
-import javax.ws.rs.core.Response.ResponseBuilder;
-import javax.ws.rs.core.Variant.VariantListBuilder;
 
 
 /**
@@ -53,16 +50,6 @@ import javax.ws.rs.core.Variant.VariantListBuilder;
  */
 public class RuntimeDelegateImpl extends AbstractRuntimeDelegate {
 
-    @Override
-    public ResponseBuilder createResponseBuilder() {
-        return new ResponseBuilderImpl();
-    }
-
-    @Override
-    public VariantListBuilder createVariantListBuilder() {
-        return new VariantListBuilderImpl();
-    }
-    
     @Override
     public <T> T createEndpoint(Application application, 
             Class<T> endpointType) 

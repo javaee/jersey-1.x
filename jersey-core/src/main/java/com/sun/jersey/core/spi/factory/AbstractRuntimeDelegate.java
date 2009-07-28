@@ -50,7 +50,9 @@ import javax.ws.rs.core.Cookie;
 import javax.ws.rs.core.EntityTag;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.NewCookie;
+import javax.ws.rs.core.Response.ResponseBuilder;
 import javax.ws.rs.core.UriBuilder;
+import javax.ws.rs.core.Variant.VariantListBuilder;
 import javax.ws.rs.ext.RuntimeDelegate;
 
 /**
@@ -82,6 +84,16 @@ public abstract class AbstractRuntimeDelegate extends RuntimeDelegate {
         map.put(URI.class, _createHeaderDelegate(URI.class));
         map.put(Date.class, _createHeaderDelegate(Date.class));
         map.put(String.class, _createHeaderDelegate(String.class));
+    }
+
+    @Override
+    public VariantListBuilder createVariantListBuilder() {
+        return new VariantListBuilderImpl();
+    }
+    
+    @Override
+    public ResponseBuilder createResponseBuilder() {
+        return new ResponseBuilderImpl();
     }
 
     @Override

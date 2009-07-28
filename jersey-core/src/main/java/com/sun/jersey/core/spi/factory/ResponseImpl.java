@@ -35,20 +35,18 @@
  * holder.
  */
 
-package com.sun.jersey.server.impl;
+package com.sun.jersey.core.spi.factory;
 
-import com.sun.jersey.api.core.HttpRequestContext;
 import com.sun.jersey.core.header.OutBoundHeaders;
 import java.lang.reflect.Type;
-import java.net.URI;
 import java.util.Iterator;
 import java.util.List;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
-import javax.ws.rs.core.UriBuilder;
 
 /**
- *
+ * An implementation of {@link Response}.
+ * 
  * @author Paul.Sandoz@Sun.Com
  */
 public final class ResponseImpl extends Response {
@@ -73,6 +71,14 @@ public final class ResponseImpl extends Response {
         this.nameValuePairs = nameValuePairs;
     }
 
+    public Object[] getValues() {
+        return values;
+    }
+
+    public List<Object> getNameValuePairs() {
+        return nameValuePairs;
+    }
+    
     public Type getEntityType() {
         return entityType;
     }
@@ -95,53 +101,7 @@ public final class ResponseImpl extends Response {
         
         for (int i = 0; i < values.length; i++)
             if (values[i] != null)
-                headers.putSingle(ResponseBuilderImpl.getHeader(i), values[i]);
-
-        Iterator i = nameValuePairs.iterator();
-        while (i.hasNext()) {
-            headers.add((String)i.next(), i.next());
-        }
-        
-        return headers;
-    }
-    
-    public MultivaluedMap<String, Object> getMetadataOptimal(
-            HttpRequestContext request) {
-        if (headers != null)
-            return headers;
-        
-        headers = new OutBoundHeaders();
-
-        for (int i = 0; i < values.length; i++) {
-            switch(i) {
-                case ResponseBuilderImpl.CONTENT_TYPE:
-                    if (values[i] != null)
-                        headers.putSingle(ResponseBuilderImpl.getHeader(i), values[i]);
-                    break;
-                case ResponseBuilderImpl.LOCATION:
-                    Object location = values[i];
-                    if (location != null) {
-                        if (location instanceof URI) {
-                            final URI locationUri = (URI)location;
-                            if (!locationUri.isAbsolute()) {
-                                final URI base = (status == 201) 
-                                        ? request.getAbsolutePath() 
-                                        : request.getBaseUri();
-                                location = UriBuilder.fromUri(base).
-                                        path(locationUri.getRawPath()).
-                                        replaceQuery(locationUri.getRawQuery()).
-                                        fragment(locationUri.getRawFragment()).
-                                        build();
-                            }
-                        }
-                        headers.putSingle(ResponseBuilderImpl.getHeader(i), location);
-                    }
-                    break;
-                default:
-                    if (values[i] != null)
-                        headers.putSingle(ResponseBuilderImpl.getHeader(i), values[i]);
-            }
-        }
+                headers.putSingle(ResponseBuilderHeaders.getNameFromId(i), values[i]);
 
         Iterator i = nameValuePairs.iterator();
         while (i.hasNext()) {

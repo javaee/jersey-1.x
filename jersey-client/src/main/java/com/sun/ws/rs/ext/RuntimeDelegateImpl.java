@@ -38,8 +38,6 @@ package com.sun.ws.rs.ext;
 
 import com.sun.jersey.core.spi.factory.AbstractRuntimeDelegate;
 import javax.ws.rs.core.Application;
-import javax.ws.rs.core.Response.ResponseBuilder;
-import javax.ws.rs.core.Variant.VariantListBuilder;
 import javax.ws.rs.ext.RuntimeDelegate;
 
 /**
@@ -53,16 +51,6 @@ import javax.ws.rs.ext.RuntimeDelegate;
  * @author Paul.Sandoz@Sun.Com
  */
 public class RuntimeDelegateImpl extends AbstractRuntimeDelegate {
-
-    @Override
-    public ResponseBuilder createResponseBuilder() {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public VariantListBuilder createVariantListBuilder() {
-        throw new UnsupportedOperationException();
-    }
 
     @Override
     public <T> T createEndpoint(Application application, Class<T> endpointType)

@@ -39,19 +39,24 @@ package com.sun.jersey.spi.container;
 import com.sun.jersey.core.header.OutBoundHeaders;
 import com.sun.jersey.api.Responses;
 import com.sun.jersey.api.core.HttpResponseContext;
-import com.sun.jersey.server.impl.ResponseImpl;
+import com.sun.jersey.core.spi.factory.ResponseBuilderHeaders;
+import com.sun.jersey.core.spi.factory.ResponseImpl;
 import com.sun.jersey.spi.MessageBodyWorkers;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 import java.net.URI;
+import java.util.Iterator;
+import java.util.List;
 import java.util.logging.Logger;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.GenericEntity;
+import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.ext.MessageBodyWriter;
 import javax.ws.rs.ext.RuntimeDelegate;
 import javax.ws.rs.ext.RuntimeDelegate.HeaderDelegate;
@@ -425,27 +430,77 @@ public class ContainerResponse implements HttpResponseContext {
     }
     
     private MultivaluedMap<String, Object> setResponseOptimal(ResponseImpl r) {
+        this.originalEntity = this.entity = r.getEntity();
         this.entityType = r.getEntityType();
-        this.entity = r.getEntity();        
         if (entity instanceof GenericEntity) {
             final GenericEntity ge = (GenericEntity)this.entity;
             this.entityType = ge.getType();                
             this.entity = ge.getEntity();
         }
         
-        return r.getMetadataOptimal(request);
+        return getMetadataOptimal(r.getValues(), r.getNameValuePairs());
     }
-    
+
+    private MultivaluedMap<String, Object> getMetadataOptimal(Object[] values,
+            List<Object> nameValuePairs) {
+
+        MultivaluedMap<String, Object> _headers = new OutBoundHeaders();
+
+        for (int i = 0; i < values.length; i++) {
+            if (i != ResponseBuilderHeaders.LOCATION) {
+                if (values[i] != null)
+                    _headers.putSingle(ResponseBuilderHeaders.getNameFromId(i), values[i]);
+            } else {
+                Object location = values[i];
+                if (location != null) {
+                    if (location instanceof URI) {
+                        final URI locationUri = (URI)location;
+                        if (!locationUri.isAbsolute()) {
+                            final URI base = (status == 201)
+                                    ? request.getAbsolutePath()
+                                    : request.getBaseUri();
+                            location = UriBuilder.fromUri(base).
+                                    path(locationUri.getRawPath()).
+                                    replaceQuery(locationUri.getRawQuery()).
+                                    fragment(locationUri.getRawFragment()).
+                                    build();
+                        }
+                    }
+                    _headers.putSingle(HttpHeaders.LOCATION, location);
+                }
+            }
+        }
+
+        if (nameValuePairs.size() > 0) {
+            Iterator i = nameValuePairs.iterator();
+            while (i.hasNext()) {
+                _headers.add((String)i.next(), i.next());
+            }
+        }
+
+        return _headers;
+    }
+
     private MultivaluedMap<String, Object> setResponseNonOptimal(Response r) {
         setEntity(r.getEntity());
         
         MultivaluedMap<String, Object> _headers = r.getMetadata();
         
-        Object location = _headers.getFirst("Location");
+        Object location = _headers.getFirst(HttpHeaders.LOCATION);
         if (location != null) {
             if (location instanceof URI) {
-                URI absoluteLocation = request.getBaseUri().resolve((URI)location);
-                _headers.putSingle("Location", absoluteLocation);
+                final URI locationUri = (URI)location;
+                if (!locationUri.isAbsolute()) {
+                    final URI base = (status == 201)
+                            ? request.getAbsolutePath()
+                            : request.getBaseUri();
+                    location = UriBuilder.fromUri(base).
+                            path(locationUri.getRawPath()).
+                            replaceQuery(locationUri.getRawQuery()).
+                            fragment(locationUri.getRawFragment()).
+                            build();
+                }
+                _headers.putSingle(HttpHeaders.LOCATION, location);
             }
         }
         

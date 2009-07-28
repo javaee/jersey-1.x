@@ -49,8 +49,11 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.InetSocketAddress;
 import java.net.URI;
+import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response.ResponseBuilder;
 import javax.ws.rs.core.UriBuilder;
+import javax.ws.rs.core.Variant.VariantListBuilder;
 import javax.ws.rs.ext.RuntimeDelegate;
 import junit.framework.TestCase;
 
@@ -66,6 +69,22 @@ public class RuntimeDelegateTest extends TestCase {
     
     public void testMediaType() {
         MediaType m = new MediaType("text", "plain");
+    }
+
+    public void testUriBuilder() {
+        UriBuilder ub = RuntimeDelegate.getInstance().createUriBuilder();
+    }
+
+    public void testResponseBuilder() {
+        ResponseBuilder rb = RuntimeDelegate.getInstance().createResponseBuilder();
+    }
+
+    public void testVariantListBuilder() {
+        VariantListBuilder vlb = RuntimeDelegate.getInstance().createVariantListBuilder();
+    }
+
+    public void testWebApplicationException() {
+        WebApplicationException wae = new WebApplicationException();
     }
 
     public void testClient() throws IOException {
