@@ -39,28 +39,19 @@
 package com.sun.jersey.server.spi.monitoring.glassfish;
 
 import com.sun.jersey.spi.monitoring.AbstractGlassfishMonitoringProvider;
-import org.glassfish.probe.provider.PluginPoint;
-import org.glassfish.probe.provider.StatsProviderManager;
-//import org.jvnet.hk2.annotations.Inject;
-//import org.jvnet.hk2.annotations.Service;
-//import com.sun.enterprise.config.serverbeans.Domain;
+import org.glassfish.external.probe.provider.PluginPoint;
+import org.glassfish.external.probe.provider.StatsProviderManager;
 
 
 /**
  *
  * @author pavel.bucek@sun.com
  */
-//@Service
 public class GlassfishMonitoringServiceProvider extends AbstractGlassfishMonitoringProvider {
-
-//    @Inject
-//    private Domain domain;
 
     @Override
     public void startMonitoring() {
         System.out.println("GlassfishMonitoringServiceProvider - startMonitoring");
-
-//        System.out.println("GlassfishMonitoringServiceProvider - startMonitoring; domain: " + domain);
 
         // we need somehow ensure that only one gsp is registered
         // something like:
@@ -77,10 +68,9 @@ public class GlassfishMonitoringServiceProvider extends AbstractGlassfishMonitor
 //            StatsProviderManager.register("glassfish", PluginPoint.SERVER, "/jersey/global", gsp);
 
 
-        GlobalStatsProvider gsp = new GlobalStatsProvider();
+        GlobalStatsProvider gsp = GlobalStatsProvider.getInstance();
 
-        StatsProviderManager.register("glassfish", PluginPoint.SERVER, "/jersey/global", gsp);
-        // StatsProviderManager.register("glassfish", PluginPoint.APPLICATIONS, appName + "/jersey/rules", new JerseyGlobalStatsProvider());
+        StatsProviderManager.register("web-container", PluginPoint.SERVER, "/jersey/global", gsp);
 
         // test!
 

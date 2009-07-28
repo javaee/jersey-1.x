@@ -43,12 +43,12 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import org.glassfish.external.probe.provider.PluginPoint;
+import org.glassfish.external.probe.provider.StatsProviderManager;
+import org.glassfish.external.probe.provider.annotations.ProbeListener;
+import org.glassfish.external.probe.provider.annotations.ProbeParam;
 import org.glassfish.gmbal.ManagedObject;
 import org.glassfish.gmbal.ManagedAttribute;
-import org.glassfish.probe.provider.PluginPoint;
-import org.glassfish.probe.provider.StatsProviderManager;
-import org.glassfish.probe.provider.annotations.ProbeListener;
-import org.glassfish.probe.provider.annotations.ProbeParam;
 
 /**
  *
@@ -57,6 +57,15 @@ import org.glassfish.probe.provider.annotations.ProbeParam;
 
 @ManagedObject
 public class GlobalStatsProvider {
+
+    private static GlobalStatsProvider INSTANCE = null;
+
+    public static synchronized GlobalStatsProvider getInstance() {
+        if(INSTANCE == null)
+            INSTANCE = new GlobalStatsProvider();
+
+        return INSTANCE;
+    }
 
     private Set<String> applications;
 
@@ -76,13 +85,12 @@ public class GlobalStatsProvider {
 
     private ThreadLocal<String> appName = new ThreadLocal<String>();
 
-    
     @ManagedAttribute(id="applicationList")
     public Set<String> getApplications() {
         return applications;
     }
 
-    public GlobalStatsProvider() {
+    private GlobalStatsProvider() {
         applications = new HashSet<String>();
         applicationStatsProviders = new HashMap<String, ApplicationStatsProvider>();
         // requests = new HashMap<ApplicationInfo, List<RuleAccept>>();
@@ -123,7 +131,7 @@ public class GlobalStatsProvider {
             //        appName + "/jersey/resources", applicationStatsProvider);
 
             // workaround for ^^^
-            StatsProviderManager.register("glassfish", PluginPoint.SERVER,
+            StatsProviderManager.register("web-container", PluginPoint.SERVER,
                     "applications/" + appName + "/jersey/resources", applicationStatsProvider);
 
         } else {
@@ -137,6 +145,8 @@ public class GlobalStatsProvider {
     // rule name (HttpMethodRule) was reached.
     @ProbeListener("glassfish:jersey:server:requestEnd")
     public void requestEnd() {
+
+        System.out.println("-----> JerseyStatsProvider:requestEnd()");
 
         String rootResourceName = null;
         String resourceName = null;
