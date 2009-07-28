@@ -142,7 +142,7 @@ public class RolesAllowedResourceFilterFactory implements ResourceFilterFactory 
         // RolesAllowed on the class takes precedence over PermitAll
         ra = am.getResource().getAnnotation(RolesAllowed.class);
         if (ra != null)
-            return Collections.singletonList((ResourceFilter)new Filter(ra.value()));
+            return Collections.<ResourceFilter>singletonList(new Filter(ra.value()));
 
         // No need to check whether PermitAll is present.
         return null;
