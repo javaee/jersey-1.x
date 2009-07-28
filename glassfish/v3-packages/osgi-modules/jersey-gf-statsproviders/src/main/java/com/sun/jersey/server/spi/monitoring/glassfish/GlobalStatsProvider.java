@@ -71,9 +71,6 @@ public class GlobalStatsProvider {
 
     private Map<String, ApplicationStatsProvider> applicationStatsProviders;
 
-    // temporary structure to store requests
-    // private Map<ApplicationInfo, List<RuleAccept>> requests;
-
     private ThreadLocal<List<RuleAccept>> requests = new ThreadLocal<List<RuleAccept>>() {
 
         @Override
@@ -102,17 +99,17 @@ public class GlobalStatsProvider {
             @ProbeParam("path") CharSequence path,
             @ProbeParam("clazz") Object clazz) {
 
-        System.out.println("-----> JerseyStatsProvider:ruleAccept(rulename: " + ruleName + ", path: " + path.toString() + " " + (clazz == null ? "null" : clazz.getClass().getName()) + ")");
-
         RuleAccept ruleAccept = new RuleAccept(ruleName, path, clazz);
 
         this.requests.get().add(ruleAccept);
+
+        // temporary "fix"; requestEnd listener is not called, don't know why.
+        if(ruleName.equals("HttpMethodRule"))
+            requestEnd();
     }
 
     @ProbeListener("glassfish:jersey:server:requestStart")
     public void requestStart(@ProbeParam("appName") String appName) {
-
-        System.out.println("-----> JerseyStatsProvider:requestStart(appName: " + appName + ")");
 
         // add application to applications (global "statistics")
         applications.add(appName);
@@ -138,6 +135,8 @@ public class GlobalStatsProvider {
             applicationStatsProvider = applicationStatsProviders.get(appName);
         }
 
+        System.out.print("-----> JerseyStatsProvider:requestStart; applicationStatsProvider: " + applicationStatsProvider);
+
         this.appName.set(appName);
     }
 
@@ -147,6 +146,9 @@ public class GlobalStatsProvider {
     public void requestEnd() {
 
         System.out.println("-----> JerseyStatsProvider:requestEnd()");
+        System.out.println("-----> JerseyStatsProvider:requestEnd() " + Thread.currentThread().getId());
+        System.out.println("-----> JerseyStatsProvider:requestEnd() " + appName.get());
+        System.out.println("-----> JerseyStatsProvider:requestEnd() " + requests.get().size());
 
         String rootResourceName = null;
         String resourceName = null;

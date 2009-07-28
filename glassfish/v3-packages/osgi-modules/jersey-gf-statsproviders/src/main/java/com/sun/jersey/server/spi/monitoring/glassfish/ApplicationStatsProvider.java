@@ -52,9 +52,46 @@ public class ApplicationStatsProvider {
     private Map<String, Long> rootResourceClassCounter;
     private Map<String, Long> resourceClassCounter;
 
+    @ManagedAttribute(id="rootResourceClassHitCount-description")
+    public String getRootResourceClassHitCountDesc() {
+        return "Root resource class hit count";
+    }
+
+    private long rootResourceClassHitCountStartTime = new java.util.Date().getTime();
+    private long rootResourceClassHitCountLastSampleTime;
+
+    @ManagedAttribute(id="rootResourceClassHitCount-starttime")
+    public long getRootResourceClassHitCountStartTime() {
+        return rootResourceClassHitCountStartTime;
+    }
+
+    @ManagedAttribute(id="rootResourceClassHitCount-lastsampletime")
+    public long getRootResourceClassHitCountLastSampleTime() {
+        return rootResourceClassHitCountLastSampleTime;
+    }
+
     @ManagedAttribute(id="rootResourceClassHitCount")
     public Map<String, Long> getRootResourceClassCounter() {
         return rootResourceClassCounter;
+    }
+
+    @ManagedAttribute(id="resourceClassHitCount-description")
+    public String getResourceClassHitCountDesc() {
+        return "Resource class hit count";
+    }
+
+
+    private long resourceClassHitCountStartTime = new java.util.Date().getTime();
+    private long resourceClassHitCountLastSampleTime;
+
+    @ManagedAttribute(id="resourceClassHitCount-starttime")
+    public long getResourceClassHitCountStartTime() {
+        return resourceClassHitCountStartTime;
+    }
+
+    @ManagedAttribute(id="resourceClassHitCount-lastsampletime")
+    public long getResourceClassHitCountLastSampleTime() {
+        return resourceClassHitCountLastSampleTime;
     }
 
     @ManagedAttribute(id="resourceClassHitCount")
@@ -82,6 +119,8 @@ public class ApplicationStatsProvider {
         } else {
             rootResourceClassCounter.put(resourceClassName, new Long(1));
         }
+
+        rootResourceClassHitCountLastSampleTime = new java.util.Date().getTime();
     }
 
 
@@ -98,5 +137,7 @@ public class ApplicationStatsProvider {
         } else {
             resourceClassCounter.put(resourceClassName, new Long(1));
         }
+
+        resourceClassHitCountLastSampleTime = new java.util.Date().getTime();
     }
 }

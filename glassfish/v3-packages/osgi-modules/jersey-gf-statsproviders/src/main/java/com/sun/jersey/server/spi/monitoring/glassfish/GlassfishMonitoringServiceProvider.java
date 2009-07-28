@@ -49,51 +49,18 @@ import org.glassfish.external.probe.provider.StatsProviderManager;
  */
 public class GlassfishMonitoringServiceProvider extends AbstractGlassfishMonitoringProvider {
 
+    private static boolean gspRegistered = false;
+
+    private synchronized void start() {
+        if (!gspRegistered) {
+            GlobalStatsProvider gsp = GlobalStatsProvider.getInstance();
+            StatsProviderManager.register("web-container", PluginPoint.SERVER, "/jersey/global", gsp);
+            gspRegistered = true;
+        }
+    }
+
     @Override
     public void startMonitoring() {
-        System.out.println("GlassfishMonitoringServiceProvider - startMonitoring");
-
-        // we need somehow ensure that only one gsp is registered
-        // something like:
-        // StatsProviderManager.getRegisteredObjects("glassfish", PluginPoint.SERVER, "/jersey/global").count()
-        // or we might want to interate over returned object and..:
-//
-//        boolean found = false;
-//        for(Object o : StatsProviderManager.getRegisteredObjects("glassfish", PluginPoint.SERVER, "/jersey/global")) {
-//            if(o instanceof GlobalStatsProvider)
-//                found = true;
-//        }
-//
-//        if(!found)
-//            StatsProviderManager.register("glassfish", PluginPoint.SERVER, "/jersey/global", gsp);
-
-
-        GlobalStatsProvider gsp = GlobalStatsProvider.getInstance();
-
-        StatsProviderManager.register("web-container", PluginPoint.SERVER, "/jersey/global", gsp);
-
-        // test!
-
-//        gsp.requestStart("app1");
-//        gsp.ruleAccept("RootResourceClassesRule", "" , null);
-//        gsp.ruleAccept("RightHandPathRule", "", new ResourceClazz1());
-//        gsp.ruleAccept("HttpMethodRule", "", new ResourceClazz2());
-//        gsp.requestEnd();
-
-        // result:
-
-//$ ./bin/asadmin get --monitor=true "*" | grep jersey
-//server.applications.app1.jersey.resources.resourceClassHitCount = {com.sun.jersey.server.spi.monitoring.glassfish.ResourceClazz2=1}
-//server.applications.app1.jersey.resources.rootResourceClassHitCount = {com.sun.jersey.server.spi.monitoring.glassfish.ResourceClazz1=1}
-//server.jersey.global.applicationList = [app1]
-
-        // looks ok
-
+        start();
     }
 }
-
-// only for testing
-//class ResourceClazz1 {}
-//class ResourceClazz2 {}
-//class ResourceClazz3 {}
-
