@@ -318,16 +318,15 @@ public class WebComponent implements ContainerListener {
             requestInvoker.set(request);
             responseInvoker.set(response);
 
-            // temporary replacement for appName
-            String path = requestUri.getPath();
+            String contextRoot = requestUri.getPath();
 
-            int index = path.indexOf('/', 1);
+            int index = contextRoot.indexOf('/', 1);
             if(index == -1)
-                path = path.substring(1);
+                contextRoot = contextRoot.substring(0);
             else
-                path = path.substring(1, index);
+                contextRoot = contextRoot.substring(0, index);
 
-            UriRuleProbeProvider.requestStart(path);
+            UriRuleProbeProvider.requestStart(contextRoot);
 
             _application.handleRequest(cRequest, new Writer(response));
 
@@ -445,11 +444,8 @@ public class WebComponent implements ContainerListener {
             rc.getSingletons().add(ejb);
 
         // glassfish v3 monitoring
-        try {
         for(AbstractGlassfishMonitoringProvider monitoring : ServiceFinder.find(AbstractGlassfishMonitoringProvider.class)) {
             monitoring.startMonitoring();
-        }
-        } catch(NullPointerException npe) {
         }
     }
 

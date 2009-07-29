@@ -37,6 +37,8 @@
 
 package com.sun.jersey.server.spi.monitoring.glassfish;
 
+import com.sun.enterprise.config.serverbeans.Application;
+import com.sun.enterprise.config.serverbeans.Domain;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -49,6 +51,8 @@ import org.glassfish.external.probe.provider.annotations.ProbeListener;
 import org.glassfish.external.probe.provider.annotations.ProbeParam;
 import org.glassfish.gmbal.ManagedObject;
 import org.glassfish.gmbal.ManagedAttribute;
+import org.glassfish.internal.api.Globals;
+import org.jvnet.hk2.component.Habitat;
 
 /**
  *
@@ -108,18 +112,38 @@ public class GlobalStatsProvider {
             requestEnd();
     }
 
+    private String getApplicationName(String contextRoot) {
+
+        Habitat habitat = Globals.getDefaultHabitat();
+
+        Domain domain = habitat.getInhabitantByType(Domain.class).get();
+
+        List<Application> applicationList = domain.getApplications().getApplications();
+
+        for(Application app : applicationList) {
+
+            if(app.getContextRoot().equals(contextRoot)) {
+                return app.getName();
+            }
+        }
+        
+        return null;
+    }
+
     @ProbeListener("glassfish:jersey:server:requestStart")
-    public void requestStart(@ProbeParam("appName") String appName) {
+    public void requestStart(@ProbeParam("contextRoot") String contextRoot) {
 
         // add application to applications (global "statistics")
-        applications.add(appName);
+        String applicationName = getApplicationName(contextRoot);
+
+        applications.add(applicationName);
 
         ApplicationStatsProvider applicationStatsProvider;
 
-        if (!applicationStatsProviders.containsKey(appName)) {
+        if (!applicationStatsProviders.containsKey(applicationName)) {
             //register new ApplicationStatsProvider
             applicationStatsProvider = new ApplicationStatsProvider();
-            applicationStatsProviders.put(appName, applicationStatsProvider);
+            applicationStatsProviders.put(applicationName, applicationStatsProvider);
 
             // strange functionality of PluginPoint.APPLICATIONS; it causes to
             // managed object be registered as "server.server.applications.jersey..."
@@ -129,26 +153,19 @@ public class GlobalStatsProvider {
 
             // workaround for ^^^
             StatsProviderManager.register("web-container", PluginPoint.SERVER,
-                    "applications/" + appName + "/jersey/resources", applicationStatsProvider);
+                    "applications/" + applicationName + "/jersey/resources", applicationStatsProvider);
 
         } else {
-            applicationStatsProvider = applicationStatsProviders.get(appName);
+            applicationStatsProvider = applicationStatsProviders.get(applicationName);
         }
 
-        System.out.print("-----> JerseyStatsProvider:requestStart; applicationStatsProvider: " + applicationStatsProvider);
-
-        this.appName.set(appName);
+        this.appName.set(applicationName);
     }
 
     // it might be better to have requestEnd method instead of checking whether
     // rule name (HttpMethodRule) was reached.
     @ProbeListener("glassfish:jersey:server:requestEnd")
     public void requestEnd() {
-
-        System.out.println("-----> JerseyStatsProvider:requestEnd()");
-        System.out.println("-----> JerseyStatsProvider:requestEnd() " + Thread.currentThread().getId());
-        System.out.println("-----> JerseyStatsProvider:requestEnd() " + appName.get());
-        System.out.println("-----> JerseyStatsProvider:requestEnd() " + requests.get().size());
 
         String rootResourceName = null;
         String resourceName = null;
