@@ -49,8 +49,8 @@ import org.glassfish.gmbal.ManagedObject;
 @ManagedObject
 public class ApplicationStatsProvider {
 
-    private Map<String, Long> rootResourceClassCounter;
-    private Map<String, Long> resourceClassCounter;
+    private final Map<String, Long> rootResourceClassCounter;
+    private final Map<String, Long> resourceClassCounter;
 
     @ManagedAttribute(id="rootResourceClassHitCount-description")
     public String getRootResourceClassHitCountDesc() {
@@ -108,16 +108,15 @@ public class ApplicationStatsProvider {
 
     public void rootResourceClassHit(String resourceClassName) {
 
-        // synchronized (rootResourceClassCounter)?
+        synchronized (rootResourceClassCounter) {
+            if (rootResourceClassCounter.containsKey(resourceClassName)) {
 
-        if(rootResourceClassCounter.containsKey(resourceClassName)) {
-
-            rootResourceClassCounter.put(
-                    resourceClassName,
-                    rootResourceClassCounter.get(resourceClassName) + 1
-            );
-        } else {
-            rootResourceClassCounter.put(resourceClassName, new Long(1));
+                rootResourceClassCounter.put(
+                        resourceClassName,
+                        rootResourceClassCounter.get(resourceClassName) + 1);
+            } else {
+                rootResourceClassCounter.put(resourceClassName, new Long(1));
+            }
         }
 
         rootResourceClassHitCountLastSampleTime = new java.util.Date().getTime();
@@ -126,16 +125,15 @@ public class ApplicationStatsProvider {
 
     public void resourceClassHit(String resourceClassName) {
 
-        // synchronized (resourceClassCounter)?
+        synchronized (resourceClassCounter) {
+            if (resourceClassCounter.containsKey(resourceClassName)) {
 
-        if(resourceClassCounter.containsKey(resourceClassName)) {
-
-            resourceClassCounter.put(
-                    resourceClassName,
-                    resourceClassCounter.get(resourceClassName) + 1
-            );
-        } else {
-            resourceClassCounter.put(resourceClassName, new Long(1));
+                resourceClassCounter.put(
+                        resourceClassName,
+                        resourceClassCounter.get(resourceClassName) + 1);
+            } else {
+                resourceClassCounter.put(resourceClassName, new Long(1));
+            }
         }
 
         resourceClassHitCountLastSampleTime = new java.util.Date().getTime();
