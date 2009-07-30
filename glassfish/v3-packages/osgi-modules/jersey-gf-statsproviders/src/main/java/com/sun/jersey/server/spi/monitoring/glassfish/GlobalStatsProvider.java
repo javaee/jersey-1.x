@@ -106,10 +106,6 @@ public class GlobalStatsProvider {
         RuleAccept ruleAccept = new RuleAccept(ruleName, path, clazz);
 
         this.requests.get().add(ruleAccept);
-
-        // temporary "fix"; requestEnd listener is not called, don't know why.
-        if(ruleName.equals("HttpMethodRule"))
-            requestEnd();
     }
 
     private String getApplicationName(String contextRoot) {
