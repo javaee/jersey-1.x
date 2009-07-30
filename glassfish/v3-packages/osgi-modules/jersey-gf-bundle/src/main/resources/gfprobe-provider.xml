@@ -10,7 +10,7 @@
    </probe>
    <probe name="requestStart">
       <method>requestStart</method>
-      <probe-param type="java.lang.String" name="contextRoot" />
+      <probe-param type="java.net.URI" name="requestUri" />
       <return-param type="void" />
    </probe>
    <probe name="requestEnd">

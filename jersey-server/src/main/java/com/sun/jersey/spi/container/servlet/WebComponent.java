@@ -318,23 +318,15 @@ public class WebComponent implements ContainerListener {
             requestInvoker.set(request);
             responseInvoker.set(response);
 
-            String contextRoot = requestUri.getPath();
-
-            int index = contextRoot.indexOf('/', 1);
-            if(index == -1)
-                contextRoot = contextRoot.substring(0);
-            else
-                contextRoot = contextRoot.substring(0, index);
-
-            UriRuleProbeProvider.requestStart(contextRoot);
+            UriRuleProbeProvider.requestStart(requestUri);
 
             _application.handleRequest(cRequest, new Writer(response));
 
-            UriRuleProbeProvider.requestEnd();
-            
         } catch (ContainerException e) {
             throw new ServletException(e);
         } finally {
+            UriRuleProbeProvider.requestEnd();
+
             requestInvoker.set(null);
             responseInvoker.set(null);
         }

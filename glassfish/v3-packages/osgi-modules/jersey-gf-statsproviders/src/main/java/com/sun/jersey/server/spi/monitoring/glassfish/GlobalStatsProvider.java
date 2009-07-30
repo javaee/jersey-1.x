@@ -62,7 +62,22 @@ import org.jvnet.hk2.component.Habitat;
 @ManagedObject
 public class GlobalStatsProvider {
 
+    private Set<String> applications;
+    private Map<String, ApplicationStatsProvider> applicationStatsProviders;
     private static GlobalStatsProvider INSTANCE = null;
+
+    private ThreadLocal<String> appName = new ThreadLocal<String>();
+    private ThreadLocal<List<RuleAccept>> requests = new ThreadLocal<List<RuleAccept>>() {
+        @Override
+        protected List<RuleAccept> initialValue() {
+            return new ArrayList<RuleAccept>();
+        }
+    };
+
+    private GlobalStatsProvider() {
+        applications = new HashSet<String>();
+        applicationStatsProviders = new HashMap<String, ApplicationStatsProvider>();
+    }
 
     public static synchronized GlobalStatsProvider getInstance() {
         if(INSTANCE == null)
@@ -71,66 +86,17 @@ public class GlobalStatsProvider {
         return INSTANCE;
     }
 
-    private Set<String> applications;
-
-    private Map<String, ApplicationStatsProvider> applicationStatsProviders;
-
-    private ThreadLocal<List<RuleAccept>> requests = new ThreadLocal<List<RuleAccept>>() {
-
-        @Override
-        protected List<RuleAccept> initialValue() {
-            return new ArrayList<RuleAccept>();
-        }
-
-    };
-
-    private ThreadLocal<String> appName = new ThreadLocal<String>();
 
     @ManagedAttribute(id="applicationList")
     public Set<String> getApplications() {
         return applications;
     }
 
-    private GlobalStatsProvider() {
-        applications = new HashSet<String>();
-        applicationStatsProviders = new HashMap<String, ApplicationStatsProvider>();
-        // requests = new HashMap<ApplicationInfo, List<RuleAccept>>();
-    }
-
-    @ProbeListener("glassfish:jersey:server:ruleAccept")
-    public void ruleAccept(
-            @ProbeParam("ruleName") String ruleName,
-            @ProbeParam("path") CharSequence path,
-            @ProbeParam("clazz") Object clazz) {
-
-        RuleAccept ruleAccept = new RuleAccept(ruleName, path, clazz);
-
-        this.requests.get().add(ruleAccept);
-    }
-
-    private String getApplicationName(String contextRoot) {
-
-        Habitat habitat = Globals.getDefaultHabitat();
-
-        Domain domain = habitat.getInhabitantByType(Domain.class).get();
-
-        List<Application> applicationList = domain.getApplications().getApplications();
-
-        for(Application app : applicationList) {
-
-            if(app.getContextRoot().equals(contextRoot)) {
-                return app.getName();
-            }
-        }
-        
-        return null;
-    }
-
     @ProbeListener("glassfish:jersey:server:requestStart")
-    public void requestStart(@ProbeParam("contextRoot") String contextRoot) {
+    public void requestStart(@ProbeParam("requestUri") java.net.URI requestUri) {
 
         // add application to applications (global "statistics")
-        String applicationName = getApplicationName(contextRoot);
+        String applicationName = getApplicationName(requestUri.getPath());
 
         applications.add(applicationName);
 
@@ -158,6 +124,36 @@ public class GlobalStatsProvider {
         this.appName.set(applicationName);
     }
 
+    private String getApplicationName(String path) {
+
+        Habitat habitat = Globals.getDefaultHabitat();
+
+        Domain domain = habitat.getInhabitantByType(Domain.class).get();
+
+        List<Application> applicationList = domain.getApplications().getApplications();
+
+        // looks like path always ends with "/" .. but just to be sure..
+        for(Application app : applicationList) {
+            if( path.startsWith(app.getContextRoot() + "/") ||
+                path.equals(app.getContextRoot()))
+                return app.getName();
+        }
+
+        return null;
+    }
+
+
+    @ProbeListener("glassfish:jersey:server:ruleAccept")
+    public void ruleAccept(
+            @ProbeParam("ruleName") String ruleName,
+            @ProbeParam("path") CharSequence path,
+            @ProbeParam("clazz") Object clazz) {
+
+        RuleAccept ruleAccept = new RuleAccept(ruleName, path, clazz);
+
+        this.requests.get().add(ruleAccept);
+    }
+
     // it might be better to have requestEnd method instead of checking whether
     // rule name (HttpMethodRule) was reached.
     @ProbeListener("glassfish:jersey:server:requestEnd")
@@ -167,8 +163,8 @@ public class GlobalStatsProvider {
         String resourceName = null;
 
         for (RuleAccept ruleAccept : requests.get()) {
-            if(ruleAccept.clazz != null) {
-                resourceName = ruleAccept.clazz.getClass().getName();
+            if(ruleAccept.getClazz() != null) {
+                resourceName = ruleAccept.getClazz().getClass().getName();
 
                 if(rootResourceName == null)
                     rootResourceName = resourceName;
@@ -177,20 +173,21 @@ public class GlobalStatsProvider {
 
         ApplicationStatsProvider asp = this.applicationStatsProviders.get(appName.get());
 
-        asp.rootResourceClassHit(rootResourceName);
-        asp.resourceClassHit(resourceName);
-
+        if(rootResourceName != null) asp.rootResourceClassHit(rootResourceName);
+        if(resourceName != null) asp.resourceClassHit(resourceName);
+        
         appName.remove();
         requests.remove();
     }
 }
 
 
+
 // represents accepted rule
 class RuleAccept {
-    public String ruleName;
-    public CharSequence path;
-    public Object clazz;
+    private String ruleName;
+    private CharSequence path;
+    private Object clazz;
 
     public RuleAccept() {
     }
@@ -199,5 +196,24 @@ class RuleAccept {
         this.ruleName = ruleName;
         this.path = path;
         this.clazz = clazz;
+    }
+
+    public String getRuleName() {
+        return ruleName;
+    }
+
+    public CharSequence getPath() {
+        return path;
+    }
+
+    public Object getClazz() {
+        return clazz;
+    }
+
+    @Override
+    public String toString() {
+        return "[" + RuleAccept.class.getCanonicalName() +
+                ":ruleName=" + ruleName + ";path=" + path +
+                ";clazz=" + clazz + "]";
     }
 }

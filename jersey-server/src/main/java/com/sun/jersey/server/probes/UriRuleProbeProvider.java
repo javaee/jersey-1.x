@@ -42,7 +42,7 @@ package com.sun.jersey.server.probes;
  * @author pavel.bucek@sun.com
  */
 public class UriRuleProbeProvider {
-    public static void requestStart(String contextRoot) {
+    public static void requestStart(java.net.URI requestUri) {
     }
 
     public static void ruleAccept(String ruleName, CharSequence path, Object clazz) {
