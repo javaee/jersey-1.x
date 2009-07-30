@@ -14,7 +14,7 @@
       <return-param type="void" />
    </probe>
    <probe name="requestEnd">
-      <method>requestStart</method>
+      <method>requestEnd</method>
       <return-param type="void" />
    </probe>
 </probe-provider>
