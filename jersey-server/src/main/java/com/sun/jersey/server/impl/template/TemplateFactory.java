@@ -123,8 +123,21 @@ public final class TemplateFactory implements TemplateContext {
         if (path == null || path.length() == 0)
             path = "index";
 
+        // Find in directories
         for (Class c = resolvingClass; c != Object.class; c = c.getSuperclass()) {
             String absolutePath = getAbsolutePath(c, path);
+
+            for (TemplateProcessor t : getTemplateProcessors()) {
+                String resolvedPath = t.resolve(absolutePath);
+                if (resolvedPath != null) {
+                    return new ResolvedViewable(t, resolvedPath, v.getModel(), c);
+                }
+            }
+        }
+
+        // Find in flat files
+        for (Class c = resolvingClass; c != Object.class; c = c.getSuperclass()) {
+            String absolutePath = getAbsoluteName(c, path);
 
             for (TemplateProcessor t : getTemplateProcessors()) {
                 String resolvedPath = t.resolve(absolutePath);
@@ -142,7 +155,11 @@ public final class TemplateFactory implements TemplateContext {
     }
 
     private String getAbsolutePath(Class<?> resourceClass) {
-        return "/" + resourceClass.getName().replace('.', '/').replace('$', '/');
+        return '/' + resourceClass.getName().replace('.', '/').replace('$', '/');
+    }
+
+    private String getAbsoluteName(Class<?> resourceClass, String path) {
+        return '/' + resourceClass.getName() + '.' + path;
     }
 
 }

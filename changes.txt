@@ -1,4 +1,12 @@
 release 1.1.2-ea (2009-09)
+- Fixed issue 302
+  https://jersey.dev.java.net/issues/show_bug.cgi?id=302
+  Allow a relative template name to be resolved to an absolute template name
+  that is a flat name if the template cannot be resolved the path-based
+  rule.
+  The flat name is fully qualified class name plus a "." plus the template name.
+  For example, given the resolving class com.foo.MyResource and the template
+  name index the absolute name will be "com.foo.MyResource.index.jsp".
 - Fixed issue 161
   https://jersey.dev.java.net/issues/show_bug.cgi?id=161
   The Jersey client can now be used completely independently of the Jersey
