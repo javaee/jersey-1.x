@@ -1,257 +1,268 @@
-/*
- *
- * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
- *
- * Copyright 1997-2009 Sun Microsystems, Inc. All rights reserved.
- *
- * The contents of this file are subject to the terms of either the GNU
- * General Public License Version 2 only ("GPL") or the Common Development
- * and Distribution License("CDDL") (collectively, the "License").  You
- * may not use this file except in compliance with the License. You can obtain
- * a copy of the License at https://jersey.dev.java.net/CDDL+GPL.html
- * or jersey/legal/LICENSE.txt.  See the License for the specific
- * language governing permissions and limitations under the License.
- *
- * When distributing the software, include this License Header Notice in each
- * file and include the License file at jersey/legal/LICENSE.txt.
- * Sun designates this particular file as subject to the "Classpath" exception
- * as provided by Sun in the GPL Version 2 section of the License file that
- * accompanied this code.  If applicable, add the following below the License
- * Header, with the fields enclosed by brackets [] replaced by your own
- * identifying information: "Portions Copyrighted [year]
- * [name of copyright owner]"
- *
- * Contributor(s):
- *
- * If you wish your version of this file to be governed by only the CDDL or
- * only the GPL Version 2, indicate your decision by adding "[Contributor]
- * elects to include this software in this distribution under the [CDDL or GPL
- * Version 2] license."  If you don't indicate a single choice of license, a
- * recipient has the option to distribute your version of this file under
- * either the CDDL, the GPL Version 2 or to extend the choice of license to
- * its licensees as provided above.  However, if you add GPL Version 2 code
- * and therefore, elected the GPL Version 2 license, then the option applies
- * only if the new code is made subject to such option by the copyright
- * holder.
- */
-
-
 package com.sun.jersey.test.framework;
 
-import com.sun.jersey.test.framework.util.ApplicationDescriptor;
 import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.WebResource;
 import com.sun.jersey.api.client.filter.LoggingFilter;
-import com.sun.jersey.api.core.PackagesResourceConfig;
-import com.sun.jersey.test.framework.impl.JerseyAppContainer;
-import com.sun.jersey.test.framework.impl.util.CommonUtils;
+import com.sun.jersey.test.framework.spi.container.TestContainer;
+import com.sun.jersey.test.framework.spi.container.TestContainerException;
+import com.sun.jersey.test.framework.spi.container.TestContainerFactory;
 import java.net.URI;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.logging.Logger;
+import javax.ws.rs.core.UriBuilder;
 import org.junit.After;
 import org.junit.Before;
 
 /**
- * An abstract test class which has all the calls for creating, starting and stopping
- * a test container. This class might be extended by user test classes which need to
- * just implement their test methods annotated by the JUnit 4.x @Test annotation. Also,
- * the user test class is expected to pass the contextName, servletPath (optional) and
- * resourcePackage info to the constructor of this class.
- * <p>
- * The container to test with, is set using the parameter <i>container.type</i>.
- * This parameter can take one of the following types:
- * <ol>
- *  <li>GrizzlyWeb</li>
+ * The JerseyTest class provides the infrastructure to initialise, instantiate and start
+ * a test container, and deploy and/or run tests on the container.
+ * The application test classes just have to extend this class, and call one of its
+ * constructors which takes care of instantiating the test environment.
+ * The JerseyTest class is built using the JUnit 4.x framework.
+ * <p>Currently the framework provides support for the following container types:
+ * <ul>
+ *  <li>Lightweight Grizzly</li>
+ *  <li>In Memory Container</li>
  *  <li>HTTPServer</li>
- *  <li>EmbeddedGF</li>
- * </ol>
- * The default is <i>GrizzlyWeb</i> which runs the tests on Grizzly Web Container.
- * </p>
+ *  <li>EmbeddedGlassFish</li>
+ *  <li>Grizzly Web Container</li>
+ * </ul>
  * <p>
- *    If the user wants to enable client side logging, that can be done by just
- * setting the parameter <i>enableLogging</i>.
- * </p>
- * @author Naresh (Srinivas.Bhimisetty@Sun.Com)
+ * @author paulsandoz
  */
-public abstract class JerseyTest implements TestConstants {
+public class JerseyTest {
+
+    private static final Logger LOGGER = Logger.getLogger(JerseyTest.class.getName());
+
+    private static Class<? extends TestContainerFactory> defaultTestContainerFactoryClass;
+
+    private TestContainerFactory testContainerFactory;
+
+    private final TestContainer tc;
+
+    private final Client client;
+
 
     /**
-     * Container type to be used for deployments.
+     * The no argument constructor.
+     * The test class has to provide an implementaion for the <link>configure()</link> method,
+     * in order to use this variant of the constructor.
      */
-    protected final String CONTAINER_TYPE;
+    public JerseyTest() {
+        AppDescriptor ad = configure();
+        this.tc = getContainer(ad, getTestContainerFactory());
+        this.client = getClient(tc, ad);
+    }
 
-    /**
-     * Init params for the servlet.
-     */
-    protected Map<String, String> INIT_PARAMS;
-
-    protected Map<String, String> CONTEXT_PARAMS;
-
-    /**
-     * The base uri for the resources.
-     */
-    protected URI BASE_URI;
-
-    /**
-     * Holds the resource context-name.
-     */
-    protected String contextPath;
-
-    /**
-     * Holds the servlet url-pattern.
-     */
-    protected String servletPath;
-
-    private Class servletClass;
-
-    private String contextListenerClassName;
-
-    /**
-     * Holds the root resource package name.
-     */
-    protected String resourcePackage;
-
-    /**
-     * Handle to the container on which deployments are done.
-     */
-    protected JerseyAppContainer container;
-
-    /**
-     * The no-argument constructor. It just initialzes some members.
-     * The user test needs to create an ApplicationDescriptor instance, to which all
-     * the application related information like rootResourcePackageName, contextPath, etc. is set.
-     * The user test has to explicitly call the setupTestEnvironment() method, which would
-     * take care of starting the container and deploying the application.
-     * @throws java.lang.Exception
-     */
-    public JerseyTest() throws Exception {
-        CONTAINER_TYPE = getContainerType();
-        INIT_PARAMS = new HashMap<String, String>();
-        CONTEXT_PARAMS = new HashMap<String, String>();
+    public JerseyTest(TestContainerFactory testContainerFactory) {
+        setTestContainerFactory(testContainerFactory);
+        AppDescriptor ad = configure();
+        this.tc = getContainer(ad, getTestContainerFactory());
+        this.client = getClient(tc, ad);
     }
 
     /**
-     * The constructor to be called when the application doesn't have any context path,
-     * servletPath, contextParams, etc. The call for starting the container is made inside the constructor,
-     * the setupTestContainer() method should not be called by the user explicitly in this case.
-     * @param resourcePackageName
-     * @throws java.lang.Exception
+     * The test class has to provide an implementation for this method.
+     * It is used to build an instance of <link>AppDescriptor</link> which describes
+     * the class of containers with which the tests would be run.
+     * @return <link>AppDescriptor</link>
      */
-    public JerseyTest(String resourcePackageName) throws Exception {
-        CONTAINER_TYPE = getContainerType();
-        INIT_PARAMS = new HashMap<String, String>();
-        CONTEXT_PARAMS = new HashMap<String, String>();
-        ApplicationDescriptor appDescriptor = new ApplicationDescriptor()
-                .setRootResourcePackageName(resourcePackageName);
-        setupTestEnvironment(appDescriptor);
+    protected AppDescriptor configure() {
+        throw new UnsupportedOperationException(
+                "The configure method must be implemented by the extending class");
     }
 
     /**
-     * The constructor to be called when the test just needs to pass contextPath, servletPath and
-     * root resource packages. The call for starting the container is made inside the constructor,
-     * the setupTestContainer() should not be called by the user explicitly in this case.
-     * @param contextPath
-     * @param servletPath
-     * @param resourcePackageName
-     * @throws java.lang.Exception
+     * This variant of the constructor takes an <link>AppDescriptor</link> instance
+     * as argument and creates an instance of the test container.
+     * @param ad
      */
-    public JerseyTest(String contextPath, String servletPath, String resourcePackageName) throws Exception {
-        CONTAINER_TYPE = getContainerType();
-        INIT_PARAMS = new HashMap<String, String>();
-        CONTEXT_PARAMS = new HashMap<String, String>();
-        ApplicationDescriptor appDescriptor = new ApplicationDescriptor()
-                .setRootResourcePackageName(resourcePackageName)
-                .setContextPath(contextPath)
-                .setServletPath(servletPath);
-        setupTestEnvironment(appDescriptor);
+    public JerseyTest(AppDescriptor ad) {
+        this.tc = getContainer(ad, getTestContainerFactory());
+        this.client = getClient(tc, ad);
     }
 
     /**
-     * Handle to the resources.
+     * This variant of the constructor takes as argument, an array or a comma separated
+     * list of package names which contain resource classes. It builds an instance of
+     * <link>WebAppDescriptor</link> and passes it to the <link>JerseyTest(AppDescriptor ad)</link>
+     * constructor.
+     * @param packages
      */
-    protected WebResource webResource;
+    public JerseyTest(String... packages) {
+        this(new WebAppDescriptor.Builder(packages).build());
+    }
+
+    protected void setTestContainerFactory(TestContainerFactory testContainerFactory) {
+        this.testContainerFactory = testContainerFactory;
+    }
+
+    protected TestContainerFactory getTestContainerFactory() {
+        if (testContainerFactory == null)
+            testContainerFactory = getDefaultTestContainerFactory();
+
+        return testContainerFactory;
+    }
 
     /**
-     * Handle to the Jersey client.
+     * Creates a Web resource pointing to the application's base URI.
+     * @return
      */
-    protected Client jerseyClient;
+    public WebResource resource() {
+        return client.resource(tc.getBaseUri());
+    }
 
+    public Client client() {
+        return client;
+    }
 
     /**
-     * Initial setup for the tests.
-     * @throws java.lang.Exception
+     * Starts the test container.
+     * @throws Exception
      */
     @Before
     public void setUp() throws Exception {
-        boolean setLogging = (System.getProperty("enableLogging") != null)
-                ? true : false;
-        jerseyClient = Client.create();
-        if(setLogging) {
-            jerseyClient.addFilter(new LoggingFilter());
-        }
-        webResource = jerseyClient.resource(BASE_URI);
+        tc.start();
     }
 
+    /**
+     * Stops the test container.
+     * @throws Exception
+     */
     @After
     public void tearDown() throws Exception {
-        container.stopServer();
+        tc.stop();
     }
-   
+
     /**
-     * Get the type of container to be used for deployments.
+     * Creates a test container instance.
+     * @param ad
      * @return
      */
-    protected String getContainerType() {
-        String containerType = System.getProperty("container.type");
-        return ((containerType != null) ? containerType : GRIZZLY_WEB_CONTAINER);
-    }
+    private static TestContainer getContainer(AppDescriptor ad, TestContainerFactory tcf) {
+        if (ad == null)
+            throw new IllegalArgumentException("The application descriptor cannot be null");
 
-    /**
-     * Set the context name.
-     * @param contextPath
-     */
-    protected void setContextPath(String contextPath) {
-        this.contextPath = contextPath;
-    }
-
-    /**
-     * Set the url-pattern for the servlet.
-     * @param servletPath
-     */
-    protected void setServletPath(String servletPath) {
-        this.servletPath = servletPath;
-    }
-
-    /**
-     * Set the root resource package.
-     * @param resourcePackage
-     */
-    protected void setResourcePackage(String resourcePackage) {
-        this.resourcePackage = resourcePackage;
-    }
-
-    /**
-     * A call to the method takes care of setting all the test related properties,
-     * like the root resource package name, the application context path, servlet
-     * url pattern, any init params, etc., and initialising and starting the
-     * test run container.
-     * @param appDescriptor
-     * @throws java.lang.Exception
-     */
-    public void setupTestEnvironment(ApplicationDescriptor appDescriptor) throws Exception {
-        setContextPath(appDescriptor.getContextPath());
-        setServletPath(appDescriptor.getServletPath());
-        setResourcePackage(appDescriptor.getRootResourcePackageName());
-        BASE_URI = CommonUtils.getBaseURI(contextPath, servletPath);
-        INIT_PARAMS.put(PackagesResourceConfig.PROPERTY_PACKAGES,
-                resourcePackage);
-        if(appDescriptor.getContextParams() != null) {
-            CONTEXT_PARAMS.putAll(appDescriptor.getContextParams());
+        Class<? extends AppDescriptor> adType = tcf.supports();
+        if (adType == LowLevelAppDescriptor.class &&
+                ad.getClass() == WebAppDescriptor.class) {
+            ad = LowLevelAppDescriptor.transform((WebAppDescriptor)ad);
+        } else if (adType != ad.getClass()) {
+            throw new TestContainerException("The applcation descriptor type, " +
+                    ad.getClass() +
+                    ", is not supported by the test container factory, " + tcf);
         }
-        servletClass = appDescriptor.getServletClass();
-        contextListenerClassName = appDescriptor.getContextListenerClassName();
-        container = new JerseyAppContainer(CONTAINER_TYPE, appDescriptor);
-        container.startServer();
+
+        return tcf.create(getBaseURI(), ad);
     }
-    
+
+    /**
+     * Creates an instance of the test container factory.
+     * @return
+     */
+    private static TestContainerFactory getDefaultTestContainerFactory() {
+        if (defaultTestContainerFactoryClass == null) {
+            defaultTestContainerFactoryClass = getDefaultTestContainerFactoryClass();
+        }
+
+        try {
+            return defaultTestContainerFactoryClass.newInstance();
+        } catch (Exception ex) {
+            throw new TestContainerException(
+                    "The default test container factory, " +
+                    defaultTestContainerFactoryClass +
+                    ", could not be instantiated", ex);
+        }
+    }
+
+    // Refer to the class name rather than the class so we do not introduce
+    // a required runtime dependency for those that do not want to utilize
+    // Grizzly.
+    private static final String DEFAULT_TEST_CONTAINER_FACTORY_CLASS_NAME =
+            "com.sun.jersey.test.framework.spi.container.grizzly.GrizzlyTestContainerFactory";
+
+    private static Class<? extends TestContainerFactory> getDefaultTestContainerFactoryClass() {
+        String tcfClassName = System.getProperty("test.containerFactory",
+                DEFAULT_TEST_CONTAINER_FACTORY_CLASS_NAME);
+
+        try {
+            return (Class<? extends TestContainerFactory>) Class.forName(tcfClassName);
+        } catch (ClassNotFoundException ex) {
+            throw new TestContainerException(
+                    "The default test container factory class name, " +
+                    tcfClassName +
+                    ", cannot be loaded", ex);
+        } catch (ClassCastException ex) {
+            throw new TestContainerException(
+                    "The default test container factory class, " +
+                    tcfClassName +
+                    ", is not an instance of TestContainerFactory", ex);
+        }
+    }
+
+    /**
+     * Sets the default test container for running the tests.
+     * This needs to be called in a @BeforeClass annotated method of the test class.
+     * It is advised to reset the default the test container to null in a @AfterClass
+     * annotated method of the test class.
+     * <p> One of <strong>HTTPServer</strong>, <strong>Grizzly</strong>,
+     * <strong>GrizzlyWeb</strong>, <strong>InMemory</strong>, <strong>EmbeddedGF</strong>
+     * could be used as the default test containers.
+     * @param testContainerType
+     */
+    protected static void setDefaultTestContainerFactory(
+            Class<? extends TestContainerFactory> rcf) {
+        defaultTestContainerFactoryClass = rcf;
+    }
+
+    /**
+     * Creates a <link>Client<link> instance.
+     * @param tc
+     * @param ad
+     * @return
+     */
+    private static Client getClient(TestContainer tc, AppDescriptor ad) {
+        Client c = tc.getClient();
+
+        if (c != null) {
+            return c;
+        } else {
+            c = Client.create(ad.getClientConfig());
+        }
+
+        //check if logging is required
+        boolean enableLogging = (System.getProperty("enableLogging") != null)
+                ? true
+                : false;
+        
+        if (enableLogging) {
+                c.addFilter(new LoggingFilter());
+        }
+
+        return c;
+    }
+
+    /**
+     * Returns the base URI of the application.
+     * @return
+     */
+    private static URI getBaseURI() {
+        return UriBuilder.fromUri("http://localhost/")
+                .port(getPort(9998)).build();
+    }
+
+    /**
+     * Returns the port to be used in the base URI.
+     * @param defaultPort
+     * @return
+     */
+    private static int getPort(int defaultPort) {
+        String port = System.getProperty("JERSEY_HTTP_PORT");
+        if (null != port) {
+            try {
+                return Integer.parseInt(port);
+            } catch (NumberFormatException e) {
+            }
+        }
+        return defaultPort;
+    }
 }

@@ -46,7 +46,7 @@ import java.net.URI;
 import java.util.Collections;
 import java.util.Map;
 import org.glassfish.embed.EmbeddedInfo;
-import org.glassfish.embed.ScatteredWar;
+import org.glassfish.embed.ScatteredArchive;
 import org.glassfish.embed.Server;
 
 /**
@@ -59,7 +59,7 @@ public class EmbeddedGlassfish implements BasicServletContainer, Deployable, Tes
     /**
      * War file to be deployed.
      */
-    private ScatteredWar war;
+    private ScatteredArchive war;
 
     /**
      * Container on which deployment would be done.
@@ -109,18 +109,18 @@ public class EmbeddedGlassfish implements BasicServletContainer, Deployable, Tes
     public void start() throws Exception {
         // deploy the expanded war file to embedded glassfish
         if(new File("src/main/webapp/WEB-INF/web.xml").exists()) {
-            war = new ScatteredWar(BASE_URI.getRawPath(),
+            war = new ScatteredArchive(BASE_URI.getRawPath(),
                         new File("src/main/webapp"),
                         new File("src/main/webapp/WEB-INF/web.xml"),
                         Collections.singleton(new File("target/classes").toURI().toURL()));
         } else {
-            war = new ScatteredWar(BASE_URI.getRawPath(),
+            war = new ScatteredArchive(BASE_URI.getRawPath(),
                         new File("target/webapp"),
                         new File("target/webapp/WEB-INF/web.xml"),
                         Collections.singleton(new File("target/classes").toURI().toURL()));
         }
         server.start();
-        server.getDeployer().deploy(war, null);        
+        server.getDeployer().deploy(war, null);
     }
 
     /**
@@ -129,7 +129,7 @@ public class EmbeddedGlassfish implements BasicServletContainer, Deployable, Tes
      */
     public void stop() throws Exception {
         //stop embedded glassfish
-        server.stop();    
+        server.stop();
     }
 
     public void setInitParams(Map<String, String> initParams) {
