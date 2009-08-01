@@ -37,15 +37,19 @@
 
 package com.sun.jersey.samples.springannotations;
 
+import com.sun.jersey.api.client.WebResource;
 import com.sun.jersey.core.header.MediaTypes;
 import com.sun.jersey.samples.springannotations.model.Item;
 import com.sun.jersey.samples.springannotations.model.Item2;
+import com.sun.jersey.spi.spring.container.servlet.SpringServlet;
 import com.sun.jersey.test.framework.util.ApplicationDescriptor;
 import com.sun.jersey.test.framework.JerseyTest;
+import com.sun.jersey.test.framework.WebAppDescriptor;
 import java.util.HashMap;
 import java.util.Map;
 import javax.ws.rs.core.MediaType;
 import org.junit.Test;
+import org.springframework.web.context.ContextLoaderListener;
 import static org.junit.Assert.*;
 
 /**
@@ -55,16 +59,12 @@ import static org.junit.Assert.*;
 public class SpringAnnotationsWebAppTest extends JerseyTest {
 
     public SpringAnnotationsWebAppTest() throws Exception {
-        super();
-        Map<String, String> contextParams = new HashMap<String, String>();
-        contextParams.put("contextConfigLocation", "classpath:applicationContext.xml");
-        ApplicationDescriptor appDescriptor = new ApplicationDescriptor()
-                .setContextPath("/spring")
-                .setRootResourcePackageName("com.sun.jersey.samples.springannotations.resources.jerseymanaged")
-                .setServletClass(com.sun.jersey.spi.spring.container.servlet.SpringServlet.class)
-                .setContextListenerClassName("org.springframework.web.context.ContextLoaderListener")
-                .setContextParams(contextParams);
-        super.setupTestEnvironment(appDescriptor);
+        super(new WebAppDescriptor.Builder("com.sun.jersey.samples.springannotations.resources.jerseymanaged")
+                .contextPath("spring")
+                .contextParam("contextConfigLocation", "classpath:applicationContext.xml")
+                .servletClass(SpringServlet.class)
+                .contextListenerClass(ContextLoaderListener.class)
+                .build());
     }
 
     /**
@@ -72,6 +72,7 @@ public class SpringAnnotationsWebAppTest extends JerseyTest {
      */
     @Test
     public void doTestApplicationWadl() {
+        WebResource webResource = resource();
         String wadl = webResource.path("application.wadl").accept(MediaTypes.WADL)
                 .get(String.class);
         assertTrue("Method: doTestApplicationWadl \nMessage: Something wrong, the returned " +
@@ -84,6 +85,7 @@ public class SpringAnnotationsWebAppTest extends JerseyTest {
      */
     @Test
     public void doTestSpringResourced() {
+        WebResource webResource = resource();
         Item2 item = webResource.path("spring-resourced").accept(MediaType.APPLICATION_XML)
                 .get(Item2.class);
         assertEquals("Method: doTestSpringResourced \nMessage: Returned item's value " +
@@ -96,6 +98,7 @@ public class SpringAnnotationsWebAppTest extends JerseyTest {
      */
     @Test
     public void doTestSpringAutowired() {
+        WebResource webResource = resource();
         Item2 item = webResource.path("spring-autowired").accept(MediaType.APPLICATION_XML)
                 .get(Item2.class);
         assertEquals("Method: doTestSpringAutowired \nMessage: Returned item's value " +
@@ -108,6 +111,7 @@ public class SpringAnnotationsWebAppTest extends JerseyTest {
      */
     @Test
     public void doTestJerseyAutowired() {
+        WebResource webResource = resource();
         Item item = webResource.path("jersey-autowired").accept(MediaType.APPLICATION_XML)
                 .get(Item.class);
         assertEquals("Method: doTestJerseyAutowired \nMessage: Returned item's value " +

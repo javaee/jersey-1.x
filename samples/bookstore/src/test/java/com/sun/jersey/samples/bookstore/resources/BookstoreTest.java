@@ -51,12 +51,14 @@ public class BookstoreTest extends TestSupport {
 
     @Test
     public void testResourceAsHtml() throws Exception {
+        WebResource webResource = resource();
         String response = webResource.get(String.class);
         assertBookstoreHtmlResponse(response);
     }
 
     @Test
     public void testResourceAsXml() throws Exception {
+        WebResource webResource = resource();
         Bookstore response = webResource.accept("application/xml").get(Bookstore.class);
         assertNotNull("Should have returned a bookstore!", response);
         assertEquals("bookstore name", "Czech Bookstore", response.getName());
@@ -64,6 +66,7 @@ public class BookstoreTest extends TestSupport {
 
     @Test
     public void testResourceAsHtmlUsingFirefoxAcceptHeaders() throws Exception {
+        WebResource webResource = resource();
         String response = webResource.accept(
                 "text/html",
                 "application/xhtml+xml",
@@ -74,6 +77,7 @@ public class BookstoreTest extends TestSupport {
 
     @Test
     public void testResourceAsHtmlUsingSafariAcceptHeaders() throws Exception {
+        WebResource webResource = resource();
         WebResource.Builder resource = webResource.accept(
                 "text/xml",
                 "application/xml",

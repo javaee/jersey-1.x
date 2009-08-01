@@ -37,6 +37,7 @@
 package com.sun.jersey.samples.jaxb;
 
 import com.sun.jersey.api.client.GenericType;
+import com.sun.jersey.api.client.WebResource;
 import com.sun.jersey.test.framework.JerseyTest;
 import java.util.Collection;
 import javax.ws.rs.core.GenericEntity;
@@ -60,6 +61,7 @@ public class MainTest extends JerseyTest {
      */
     @Test
     public void testApplicationWadl() {
+        WebResource webResource = resource();
         String applicationWadl = webResource.path("application.wadl").get(String.class);
         assertTrue("Something wrong. Returned wadl length is not > 0",
                 applicationWadl.length() > 0);
@@ -67,6 +69,7 @@ public class MainTest extends JerseyTest {
 
     @Test
     public void testRootElement() {
+        WebResource webResource = resource();
         JAXBXmlRootElement e1 = webResource.path("jaxb/XmlRootElement").
                 get(JAXBXmlRootElement.class);
         
@@ -78,6 +81,7 @@ public class MainTest extends JerseyTest {
 
     @Test
     public void testJAXBElement() {
+        WebResource webResource = resource();
         GenericType<JAXBElement<JAXBXmlType>> genericType = 
                 new GenericType<JAXBElement<JAXBXmlType>>() {};
                 
@@ -92,6 +96,7 @@ public class MainTest extends JerseyTest {
 
     @Test
     public void testXmlType() {
+        WebResource webResource = resource();
         JAXBXmlType t1 = webResource.path("jaxb/JAXBElement").
                 get(JAXBXmlType.class);
         
@@ -107,6 +112,7 @@ public class MainTest extends JerseyTest {
 
     @Test
     public void testRootElementCollection() {
+        WebResource webResource = resource();
         GenericType<Collection<JAXBXmlRootElement>> genericType = 
                 new GenericType<Collection<JAXBXmlRootElement>>() {};
         
@@ -121,6 +127,7 @@ public class MainTest extends JerseyTest {
 
     @Test
     public void testXmlTypeCollection() {
+        WebResource webResource = resource();
         GenericType<Collection<JAXBXmlRootElement>> genericRootElement =
                 new GenericType<Collection<JAXBXmlRootElement>>() {};
         GenericType<Collection<JAXBXmlType>> genericXmlType = 
@@ -141,6 +148,7 @@ public class MainTest extends JerseyTest {
 
     @Test
     public void testRootElementArray() {
+        WebResource webResource = resource();
         JAXBXmlRootElement[] ae1 = webResource.path("jaxb/array/XmlRootElement").
                 get(JAXBXmlRootElement[].class);
         JAXBXmlRootElement[] ae2 = webResource.path("jaxb/array/XmlRootElement").
@@ -154,6 +162,7 @@ public class MainTest extends JerseyTest {
 
     @Test
     public void testXmlTypeArray() {
+        WebResource webResource = resource();
         JAXBXmlRootElement[] ae1 = webResource.path("jaxb/array/XmlRootElement").
                 get(JAXBXmlRootElement[].class);
 

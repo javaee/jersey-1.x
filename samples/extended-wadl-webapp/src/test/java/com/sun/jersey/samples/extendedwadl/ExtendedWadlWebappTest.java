@@ -37,13 +37,10 @@
 
 package com.sun.jersey.samples.extendedwadl;
 
+import com.sun.jersey.api.client.WebResource;
 import com.sun.jersey.core.header.MediaTypes;
 import com.sun.jersey.test.framework.JerseyTest;
-import com.sun.jersey.test.framework.util.ApplicationDescriptor;
-import java.util.HashMap;
-import java.util.Map;
-import java.net.URI;
-import javax.ws.rs.core.UriBuilder;
+import com.sun.jersey.test.framework.WebAppDescriptor;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -52,18 +49,13 @@ import org.junit.Test;
  * @author Naresh (Srinivas.Bhimisetty@Sun.com)
  */
 public class ExtendedWadlWebappTest extends JerseyTest {
-    
+
     public ExtendedWadlWebappTest() throws Exception {
-        super();
-        Map<String, String> initParams = new HashMap<String, String>();
-        initParams.put("com.sun.jersey.config.property.packages",
-                "com.sun.jersey.samples.extendedwadl.resources");
-        initParams.put("com.sun.jersey.config.property.WadlGeneratorConfig",
-                "com.sun.jersey.samples.extendedwadl.SampleWadlGeneratorConfig");
-        ApplicationDescriptor appDescriptor = new ApplicationDescriptor();
-        appDescriptor.setServletInitParams(initParams);
-        appDescriptor.setContextPath("extended-wadl-webapp");
-        super.setupTestEnvironment(appDescriptor);
+        super(new WebAppDescriptor.Builder("com.sun.jersey.samples.extendedwadl.resources")
+                .contextPath("extended-wadl-webapp")
+                .initParam("com.sun.jersey.config.property.WadlGeneratorConfig",
+                "com.sun.jersey.samples.extendedwadl.SampleWadlGeneratorConfig")
+                .build());
     }
     
     /**
@@ -73,6 +65,7 @@ public class ExtendedWadlWebappTest extends JerseyTest {
      */
     @Test
     public void testExtendedWadl() throws Exception {
+        WebResource webResource = resource();
         String wadl = webResource.path("application.wadl").accept(MediaTypes.WADL).get(String.class);
         Assert.assertTrue("Generated wadl is of null length", wadl.length() > 0);
         Assert.assertTrue("Generated wadl doesn't contain the expected text",

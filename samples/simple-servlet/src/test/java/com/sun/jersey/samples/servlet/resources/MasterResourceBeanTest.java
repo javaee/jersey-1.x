@@ -37,8 +37,10 @@
 
 package com.sun.jersey.samples.servlet.resources;
 
+import com.sun.jersey.api.client.WebResource;
 import com.sun.jersey.api.representation.Form;
 import com.sun.jersey.test.framework.JerseyTest;
+import com.sun.jersey.test.framework.WebAppDescriptor;
 import javax.ws.rs.core.MediaType;
 import org.junit.Test;
 import static org.junit.Assert.*;
@@ -50,7 +52,10 @@ import static org.junit.Assert.*;
 public class MasterResourceBeanTest extends JerseyTest {
 
     public MasterResourceBeanTest() throws Exception {
-        super("SimpleServlet", "resources", "com.sun.jersey.samples.servlet.resources");        
+        super(new WebAppDescriptor.Builder("com.sun.jersey.samples.servlet.resources")
+                .contextPath("SimpleServlet")
+                .servletPath("/resources")
+                .build());
     }
 
 
@@ -59,6 +64,7 @@ public class MasterResourceBeanTest extends JerseyTest {
      */
     @Test
     public void doTestStartPage() {
+       WebResource webResource = resource();
         int responseStatus = webResource.path("start")
                 .accept(MediaType.TEXT_HTML).head().getStatus();
         assertEquals(200, responseStatus);
@@ -74,6 +80,7 @@ public class MasterResourceBeanTest extends JerseyTest {
      */
     @Test
     public void doTestResource1Page() {
+        WebResource webResource = resource();
         int responseStatus = webResource.path("resource1")
                 .accept(MediaType.TEXT_PLAIN).head().getStatus();
         assertEquals("Response status 200 not found for request to resource 1", 200, responseStatus);
@@ -89,6 +96,7 @@ public class MasterResourceBeanTest extends JerseyTest {
      */
     @Test
     public void doTestResource2Page() {
+        WebResource webResource = resource();
         int responseStatus = webResource.path("resource2")
                 .accept(MediaType.TEXT_PLAIN).head().getStatus();
         assertEquals("Response status 200 not found for request to resource 2", 200, responseStatus);
@@ -109,6 +117,8 @@ public class MasterResourceBeanTest extends JerseyTest {
         String arg2 = "secondArg";
         String expectedResponseWithRep0 = "<pre>Received args: ";
         String expectedResponseWithRep1 = "representation: StringRepresentation: arg1: ";
+
+        WebResource webResource = resource();
 
         //test with rep=0
 

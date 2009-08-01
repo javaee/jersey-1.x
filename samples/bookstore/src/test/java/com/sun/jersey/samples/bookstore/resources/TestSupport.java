@@ -39,7 +39,10 @@ package com.sun.jersey.samples.bookstore.resources;
 
 
 import com.sun.jersey.test.framework.JerseyTest;
-import com.sun.jersey.test.framework.util.ApplicationDescriptor;
+import com.sun.jersey.test.framework.WebAppDescriptor;
+import com.sun.jersey.test.framework.spi.container.TestContainerFactory;
+import com.sun.jersey.test.framework.spi.container.embedded.glassfish.EmbeddedGlassFishTestContainerFactory;
+import com.sun.jersey.test.framework.spi.container.grizzly.GrizzlyTestContainerFactory;
 import java.util.HashMap;
 import java.util.Map;
 import static org.junit.Assert.*;
@@ -53,20 +56,19 @@ import static org.junit.Assert.*;
 public class TestSupport extends JerseyTest {
 
     public TestSupport() throws Exception {
-        super();
+        super(new WebAppDescriptor.Builder("com.sun.jersey.samples.bookstore.resources")
+                .contextPath("bookstore")
+                .initParam("com.sun.jersey.config.feature.Redirect", "true")
+                .initParam("com.sun.jersey.config.feature.ImplicitViewables", "true")
+                .initParam("com.sun.jersey.config.property.WebPageContentRegex",
+                "/(images|css|jsp)/.*")
+                .build());
         Map<String, String> INIT_PARAMS = new HashMap<String, String>();
         INIT_PARAMS.put("com.sun.jersey.config.feature.Redirect", "true");
         INIT_PARAMS.put("com.sun.jersey.config.feature.ImplicitViewables", "true");
         INIT_PARAMS.put("com.sun.jersey.config.property.WebPageContentRegex",
-                "/(images|css|jsp)/.*");
-        ApplicationDescriptor  applicationDescriptor = new ApplicationDescriptor();
-        applicationDescriptor = applicationDescriptor.setContextPath("bookstore")
-                .setRootResourcePackageName("com.sun.jersey.samples.bookstore.resources")
-                .setServletInitParams(INIT_PARAMS);
-        super.setupTestEnvironment(applicationDescriptor);
+                "/(images|css|jsp)/.*");        
     }
-
-    
 
     protected void assertHtmlResponse(String response) {
         assertNotNull("No text returned!", response);

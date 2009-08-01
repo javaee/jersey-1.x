@@ -37,10 +37,10 @@
 package com.sun.jersey.samples.entityprovider;
 
 import com.sun.jersey.api.client.ClientResponse;
+import com.sun.jersey.api.client.WebResource;
 import com.sun.jersey.api.representation.Form;
 import com.sun.jersey.core.header.MediaTypes;
 import com.sun.jersey.test.framework.JerseyTest;
-import com.sun.jersey.test.framework.util.ApplicationDescriptor;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.Properties;
@@ -56,10 +56,7 @@ import static org.junit.Assert.*;
 public class MainTest extends JerseyTest {
 
     public MainTest()throws Exception {
-        super();
-        ApplicationDescriptor appDescriptor = new ApplicationDescriptor();
-        appDescriptor.setRootResourcePackageName("com.sun.jersey.samples.entityprovider");
-        super.setupTestEnvironment(appDescriptor);
+        super("com.sun.jersey.samples.entityprovider");
     }
 
     /**
@@ -68,6 +65,7 @@ public class MainTest extends JerseyTest {
      */
     @Test
     public void testApplicationWadl() {
+        WebResource webResource = resource();
         String serviceWadl = webResource.path("application.wadl").
                 accept(MediaTypes.WADL).get(String.class);
         assertTrue(serviceWadl.length() > 0);
@@ -80,7 +78,10 @@ public class MainTest extends JerseyTest {
      */
     @Test
     public void testPropertiesResource() throws IOException {
-        String sProperties = webResource.path("properties").accept(MediaType.TEXT_PLAIN).get(String.class);
+        WebResource webResource = resource();
+        String sProperties = webResource.path("properties")
+                .accept(MediaType.TEXT_PLAIN)
+                .get(String.class);
         Properties properties = new Properties();
         properties.load(new ByteArrayInputStream(sProperties.getBytes()));
         assertNotNull("Properties does not contain 'java.class.path' property", 
@@ -93,7 +94,10 @@ public class MainTest extends JerseyTest {
      */
     @Test
     public void testGetOnDataResource() {
-        ClientResponse response = webResource.path("data").accept(MediaType.TEXT_HTML).get(ClientResponse.class);
+        WebResource webResource = resource();
+        ClientResponse response = webResource.path("data")
+                .accept(MediaType.TEXT_HTML)
+                .get(ClientResponse.class);
         assertEquals("Request for data doesn't give expected response.",
                 Response.Status.OK, response.getResponseStatus());
     }
@@ -107,7 +111,10 @@ public class MainTest extends JerseyTest {
         Form formData = new Form();
         formData.add("name", "testName");
         formData.add("value", "testValue");
-        ClientResponse response = webResource.path("data").type(MediaType.APPLICATION_FORM_URLENCODED).post(ClientResponse.class, formData);
+        WebResource webResource = resource();
+        ClientResponse response = webResource.path("data")
+                .type(MediaType.APPLICATION_FORM_URLENCODED)
+                .post(ClientResponse.class, formData);
         assertEquals(Response.Status.OK, response.getResponseStatus());
         String responseMsg = webResource.path("data").type(MediaType.TEXT_HTML).get(String.class);
         assertTrue("Submitted data did not get added to the list...",

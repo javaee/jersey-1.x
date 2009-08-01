@@ -38,6 +38,7 @@
 package com.sun.jersey.samples.jmaki;
 
 import com.sun.jersey.api.client.ClientResponse;
+import com.sun.jersey.api.client.WebResource;
 import com.sun.jersey.api.client.filter.LoggingFilter;
 import com.sun.jersey.core.header.MediaTypes;
 import com.sun.jersey.samples.jmaki.beans.Printer;
@@ -45,7 +46,7 @@ import com.sun.jersey.samples.jmaki.beans.PrinterTableModel;
 import com.sun.jersey.samples.jmaki.beans.TreeModel;
 import com.sun.jersey.samples.jmaki.beans.WebResourceList;
 import com.sun.jersey.test.framework.JerseyTest;
-import com.sun.jersey.test.framework.util.ApplicationDescriptor;
+import com.sun.jersey.test.framework.WebAppDescriptor;
 import java.util.List;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -59,12 +60,10 @@ import org.junit.Test;
 public class JMakiBackendWebappTest extends JerseyTest {
 
     public JMakiBackendWebappTest() throws Exception {
-        super();
-        ApplicationDescriptor appDescriptor = new ApplicationDescriptor()
-                .setContextPath("/jMakiBackend")
-                .setServletPath("/webresources")
-                .setRootResourcePackageName("com.sun.jersey.samples.jmaki");
-        super.setupTestEnvironment(appDescriptor);
+         super(new WebAppDescriptor.Builder("com.sun.jersey.samples.jmaki")
+                .contextPath("/jMakiBackend")
+                .servletPath("/webresources")
+                .build());
     }
 
     /**
@@ -72,9 +71,10 @@ public class JMakiBackendWebappTest extends JerseyTest {
      */
     @Test
     public void doTestApplicationWadl() {
+        WebResource webResource = resource();
         String wadl = webResource.path("application.wadl").accept(MediaTypes.WADL).get(String.class);
         Assert.assertTrue("Method: doTestApplicationWadl \nMessage: Something wrong, returned WADL length is not > 0",
-                wadl.length() > 0);
+                wadl.length() > 0);            
     }
 
     /**
@@ -82,6 +82,7 @@ public class JMakiBackendWebappTest extends JerseyTest {
      */
     @Test
     public void doTestGetPrinters() {
+        WebResource webResource = resource();
         // GET Printers - mime-type application/json
         WebResourceList resourceList = webResource.path("printers").accept(MediaType.APPLICATION_JSON).get(WebResourceList.class);
         int numberOfResourceTypes = resourceList.items.size();
@@ -100,6 +101,7 @@ public class JMakiBackendWebappTest extends JerseyTest {
      */
     @Test
     public void doTestGetPrinterList() {
+        WebResource webResource = resource();
         //GET on printer list - mime-type application/json
         WebResourceList resourceList = webResource.path("printers").path("list").accept(MediaType.APPLICATION_JSON).get(WebResourceList.class);
         int numberOfPrinters = resourceList.items.size();
@@ -118,6 +120,7 @@ public class JMakiBackendWebappTest extends JerseyTest {
      */
     @Test
     public void doTestGetPrinterJMakiTree() {
+        WebResource webResource = resource();
         //GET on printer list - mime-type application/json
         TreeModel treeModel = webResource.path("printers").path("jMakiTree").accept(MediaType.APPLICATION_JSON).get(TreeModel.class);
         Assert.assertEquals("Method: doTestGetPrinterJMakiTree \nMessage: Root of the returned " +
@@ -129,6 +132,7 @@ public class JMakiBackendWebappTest extends JerseyTest {
      */
     @Test
     public void doTestGetPrinterJMakiTable() {
+        WebResource webResource = resource();
         PrinterTableModel printerTableModel = webResource.path("printers").path("jMakiTable").accept(MediaType.APPLICATION_JSON).get(PrinterTableModel.class);
         List<PrinterTableModel.JMakiTableHeader> tableHeaders = printerTableModel.columns;
         Assert.assertEquals("Method: doTestGetPrinterJMakiTable \nMessage: Number of table headers " +
@@ -140,6 +144,7 @@ public class JMakiBackendWebappTest extends JerseyTest {
      */
     @Test
     public void doTestGetPrinterBasedOnId() {
+        WebResource webResource = resource();
         Printer printer = webResource.path("printers").path("ids").path("P01").accept(MediaType.APPLICATION_JSON).get(Printer.class);
         Assert.assertEquals("Method: doTestGetPrinterBasedOnId \nMessage: ID of the retrieved printer " +
                 "doesn't match the search value", "P01", printer.id);
@@ -150,6 +155,7 @@ public class JMakiBackendWebappTest extends JerseyTest {
      */
     @Test
     public void doTestPutPrinterBasedOnId() {
+        WebResource webResource = resource();
         LoggingFilter loggingFilter = new LoggingFilter();
         webResource.addFilter(loggingFilter);
         Printer printer = webResource.path("printers").path("ids").path("P01").accept(MediaType.APPLICATION_JSON).get(Printer.class);

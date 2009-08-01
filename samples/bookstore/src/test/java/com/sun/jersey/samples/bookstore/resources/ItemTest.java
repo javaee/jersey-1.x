@@ -51,13 +51,13 @@ public class ItemTest extends TestSupport {
 
     @Test
     public void testResourceAsHtml() throws Exception {
-        String response = resource().get(String.class);
+        String response = item1resource().get(String.class);
         assertItemHtmlResponse(response);
     }
 
     @Test
     public void testResourceAsXml() throws Exception {
-        String text = resource().accept("application/xml").get(String.class);
+        String text = item1resource().accept("application/xml").get(String.class);
         System.out.println("Item XML is: " + text);
         
         Book response = resource().accept("application/xml").get(Book.class);
@@ -67,7 +67,7 @@ public class ItemTest extends TestSupport {
 
     @Test
     public void testResourceAsHtmlUsingFirefoxAcceptHeaders() throws Exception {
-        String response = resource().accept(
+        String response = item1resource().accept(
                 "text/html",
                 "application/xhtml+xml",
                 "application/xml;q=0.9",
@@ -77,7 +77,7 @@ public class ItemTest extends TestSupport {
 
     @Test
     public void testResourceAsHtmlUsingSafariAcceptHeaders() throws Exception {
-        WebResource.Builder resource = resource().accept(
+        WebResource.Builder resource = item1resource().accept(
                 "text/xml",
                 "application/xml",
                 "application/xhtml+xml",
@@ -94,8 +94,8 @@ public class ItemTest extends TestSupport {
         assertResponseContains(response, "<h1>Svejk</h1>");
     }
 
-    protected WebResource resource() {
-        return webResource.path("/items/1");
+    protected WebResource item1resource() {
+        return resource().path("/items/1");
     }
 
 

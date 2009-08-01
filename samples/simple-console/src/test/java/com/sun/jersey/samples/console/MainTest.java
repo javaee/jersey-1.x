@@ -42,6 +42,7 @@ import com.sun.jersey.api.client.WebResource;
 import com.sun.jersey.api.representation.Form;
 import com.sun.jersey.core.header.MediaTypes;
 import com.sun.jersey.test.framework.JerseyTest;
+import com.sun.jersey.test.framework.WebAppDescriptor;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
@@ -61,7 +62,9 @@ import static org.junit.Assert.*;
 public class MainTest extends JerseyTest {
     
     public MainTest() throws Exception {
-        super("resources", "", "com.sun.jersey.samples.console");
+        super(new WebAppDescriptor.Builder("com.sun.jersey.samples.console")
+                .contextPath("resources")
+                .build());
     }
 
     /**
@@ -70,6 +73,7 @@ public class MainTest extends JerseyTest {
      */
     @Test
     public void testApplicationWadl() {
+        WebResource webResource = resource();
         String serviceWadl = webResource.path("application.wadl").
                 accept(MediaTypes.WADL).get(String.class);
         assertTrue(serviceWadl.length() > 0);
@@ -80,6 +84,7 @@ public class MainTest extends JerseyTest {
      */
     @Test
     public void testGetOnForm() {
+        WebResource webResource = resource();
         ClientResponse response = webResource.path("form").accept(MediaType.TEXT_HTML)
                 .get(ClientResponse.class);
         assertEquals("GET on the 'form' resource doesn't give expected response",
@@ -96,6 +101,7 @@ public class MainTest extends JerseyTest {
         formData.add("name", "testName");
         formData.add("colour", "red");
         formData.add("hint", "re");
+        WebResource webResource = resource();
         ClientResponse response = webResource.path("form").type(MediaType.APPLICATION_FORM_URLENCODED)
                 .post(ClientResponse.class, formData);
         assertEquals(Response.Status.OK, response.getResponseStatus());
@@ -117,6 +123,7 @@ public class MainTest extends JerseyTest {
      */
     @Test
     public void testGetColoursAsPlainText() {
+        WebResource webResource = resource();
         // without the query param "match"
         ClientResponse response = webResource.path("form").path("colours").accept(MediaType.TEXT_PLAIN)
                 .get(ClientResponse.class);
@@ -141,6 +148,7 @@ public class MainTest extends JerseyTest {
      */
     @Test
     public void testGetColoursAsJson() {
+        WebResource webResource = resource();
         ClientResponse response = webResource.path("form").path("colours").accept(MediaType.APPLICATION_JSON)
                 .get(ClientResponse.class);
         assertEquals("GET on path '/form/colours' with mime type 'application/json' doesn't give expected response",

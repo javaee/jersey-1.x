@@ -37,9 +37,10 @@
 
 package com.sun.jersey.samples.helloworld;
 
+import com.sun.jersey.api.client.WebResource;
 import com.sun.jersey.core.header.MediaTypes;
 import com.sun.jersey.test.framework.JerseyTest;
-import com.sun.jersey.test.framework.util.ApplicationDescriptor;
+import com.sun.jersey.test.framework.WebAppDescriptor;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -51,11 +52,8 @@ public class HelloWorldWebAppTest extends JerseyTest {
 
 
     public HelloWorldWebAppTest() throws Exception {
-        super();
-        ApplicationDescriptor appDescriptor = new ApplicationDescriptor();
-                appDescriptor.setContextPath("/helloworld-webapp");
-                appDescriptor.setRootResourcePackageName("com.sun.jersey.samples.helloworld.resources");
-        super.setupTestEnvironment(appDescriptor);
+        super(new WebAppDescriptor.Builder("com.sun.jersey.samples.helloworld.resources")
+                .contextPath("helloworld-webapp").build());
     }
 
     /**
@@ -64,12 +62,14 @@ public class HelloWorldWebAppTest extends JerseyTest {
      */
     @Test
     public void testHelloWorld() throws Exception {
+        WebResource webResource = resource();
         String responseMsg = webResource.path("helloworld").get(String.class);
         Assert.assertEquals("Hello World", responseMsg);        
     }
 
     @Test
     public void testApplicationWadl() {
+        WebResource webResource = resource();
         String serviceWadl = webResource.path("application.wadl").
                 accept(MediaTypes.WADL).get(String.class);
 

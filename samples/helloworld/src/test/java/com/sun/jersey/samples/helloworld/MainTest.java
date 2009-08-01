@@ -37,6 +37,7 @@
 
 package com.sun.jersey.samples.helloworld;
 
+import com.sun.jersey.api.client.WebResource;
 import com.sun.jersey.core.header.MediaTypes;
 import com.sun.jersey.test.framework.JerseyTest;
 import org.junit.Test;
@@ -57,6 +58,7 @@ public class MainTest extends JerseyTest {
      */
     @Test
     public void testHelloWorld() {
+        WebResource webResource = resource();
         String responseMsg = webResource.path("helloworld").get(String.class);
         assertEquals("Hello World", responseMsg);
     }
@@ -67,6 +69,7 @@ public class MainTest extends JerseyTest {
      */
     @Test
     public void testApplicationWadl() {
+        WebResource webResource = resource();
         String serviceWadl = webResource.path("application.wadl").
                 accept(MediaTypes.WADL).get(String.class);
                 
