@@ -41,6 +41,8 @@ import com.sun.jersey.api.client.WebResource;
 import com.sun.jersey.core.header.MediaTypes;
 import com.sun.jersey.test.framework.JerseyTest;
 import com.sun.jersey.test.framework.WebAppDescriptor;
+import com.sun.jersey.test.framework.spi.container.TestContainerFactory;
+import com.sun.jersey.test.framework.spi.container.grizzly.web.GrizzlyWebTestContainerFactory;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -56,6 +58,12 @@ public class ExtendedWadlWebappTest extends JerseyTest {
                 .initParam("com.sun.jersey.config.property.WadlGeneratorConfig",
                 "com.sun.jersey.samples.extendedwadl.SampleWadlGeneratorConfig")
                 .build());
+
+    }
+
+    @Override
+    protected TestContainerFactory getTestContainerFactory() {
+        return new GrizzlyWebTestContainerFactory();
     }
     
     /**
@@ -65,6 +73,7 @@ public class ExtendedWadlWebappTest extends JerseyTest {
      */
     @Test
     public void testExtendedWadl() throws Exception {
+
         WebResource webResource = resource();
         String wadl = webResource.path("application.wadl").accept(MediaTypes.WADL).get(String.class);
         Assert.assertTrue("Generated wadl is of null length", wadl.length() > 0);

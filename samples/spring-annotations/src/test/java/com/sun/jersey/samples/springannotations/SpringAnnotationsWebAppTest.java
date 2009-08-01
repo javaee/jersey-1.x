@@ -42,11 +42,10 @@ import com.sun.jersey.core.header.MediaTypes;
 import com.sun.jersey.samples.springannotations.model.Item;
 import com.sun.jersey.samples.springannotations.model.Item2;
 import com.sun.jersey.spi.spring.container.servlet.SpringServlet;
-import com.sun.jersey.test.framework.util.ApplicationDescriptor;
 import com.sun.jersey.test.framework.JerseyTest;
 import com.sun.jersey.test.framework.WebAppDescriptor;
-import java.util.HashMap;
-import java.util.Map;
+import com.sun.jersey.test.framework.spi.container.TestContainerFactory;
+import com.sun.jersey.test.framework.spi.container.grizzly.web.GrizzlyWebTestContainerFactory;
 import javax.ws.rs.core.MediaType;
 import org.junit.Test;
 import org.springframework.web.context.ContextLoaderListener;
@@ -65,6 +64,11 @@ public class SpringAnnotationsWebAppTest extends JerseyTest {
                 .servletClass(SpringServlet.class)
                 .contextListenerClass(ContextLoaderListener.class)
                 .build());
+    }
+
+    @Override
+    protected TestContainerFactory getTestContainerFactory() {
+        return new GrizzlyWebTestContainerFactory();
     }
 
     /**
