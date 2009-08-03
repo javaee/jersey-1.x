@@ -42,7 +42,7 @@ package com.sun.jersey.spi.monitoring;
  * @author pavel.bucek@sun.com
  */
 
-public abstract class AbstractGlassfishMonitoringProvider {
-    public abstract void startMonitoring();
+public interface GlassfishMonitoringProvider {
+    public void register();
 }
 

@@ -60,7 +60,8 @@ import com.sun.jersey.spi.container.ContainerResponseWriter;
 import com.sun.jersey.spi.container.WebApplication;
 import com.sun.jersey.spi.container.WebApplicationFactory;
 import com.sun.jersey.spi.inject.SingletonTypeInjectableProvider;
-import com.sun.jersey.spi.monitoring.AbstractGlassfishMonitoringProvider;
+import com.sun.jersey.spi.monitoring.GlassfishMonitoringProvider;
+import com.sun.jersey.spi.service.ServiceConfigurationError;
 import com.sun.jersey.spi.service.ServiceFinder;
 import java.io.BufferedInputStream;
 import java.io.IOException;
@@ -436,8 +437,8 @@ public class WebComponent implements ContainerListener {
             rc.getSingletons().add(ejb);
 
         // glassfish v3 monitoring
-        for(AbstractGlassfishMonitoringProvider monitoring : ServiceFinder.find(AbstractGlassfishMonitoringProvider.class)) {
-            monitoring.startMonitoring();
+        for(GlassfishMonitoringProvider monitoring : ServiceFinder.find(GlassfishMonitoringProvider.class)) {
+            monitoring.register();
         }
     }
 

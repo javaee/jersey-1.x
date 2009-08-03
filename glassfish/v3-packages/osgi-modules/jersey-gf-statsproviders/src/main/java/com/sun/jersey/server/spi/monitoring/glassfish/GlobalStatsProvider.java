@@ -44,6 +44,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.glassfish.external.probe.provider.PluginPoint;
 import org.glassfish.external.probe.provider.StatsProviderManager;
 import org.glassfish.external.probe.provider.annotations.ProbeListener;
@@ -115,6 +117,8 @@ public class GlobalStatsProvider {
             StatsProviderManager.register(GlassfishMonitoringServiceProvider.MONITORING_CONFIG_ELEMENT,
                     PluginPoint.SERVER, "applications/" + applicationName + "/jersey/resources",
                     applicationStatsProvider);
+
+            Logger.getLogger(GlassfishMonitoringServiceProvider.LOGGER_JERSEY_MONITORING).log(Level.INFO, "ApplicationStatsProvider for application \"" + applicationName + "\" registered");
 
         } else {
             applicationStatsProvider = applicationStatsProviders.get(applicationName);
