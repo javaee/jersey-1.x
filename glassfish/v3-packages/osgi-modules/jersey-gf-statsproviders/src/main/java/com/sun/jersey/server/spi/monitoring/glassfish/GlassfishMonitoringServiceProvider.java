@@ -49,12 +49,14 @@ import org.glassfish.external.probe.provider.StatsProviderManager;
  */
 public class GlassfishMonitoringServiceProvider extends AbstractGlassfishMonitoringProvider {
 
+    public static final String MONITORING_CONFIG_ELEMENT = "web-container";
+
     private static boolean gspRegistered = false;
 
     private synchronized void start() {
         if (!gspRegistered) {
             GlobalStatsProvider gsp = GlobalStatsProvider.getInstance();
-            StatsProviderManager.register("web-container", PluginPoint.SERVER, "/jersey/global", gsp);
+            StatsProviderManager.register(MONITORING_CONFIG_ELEMENT, PluginPoint.SERVER, "/jersey/global", gsp);
             gspRegistered = true;
         }
     }

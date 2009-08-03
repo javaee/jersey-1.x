@@ -39,7 +39,6 @@ package com.sun.jersey.server.spi.monitoring.glassfish;
 
 import com.sun.enterprise.config.serverbeans.Application;
 import com.sun.enterprise.config.serverbeans.Domain;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -66,11 +65,10 @@ public class GlobalStatsProvider {
     private Map<String, ApplicationStatsProvider> applicationStatsProviders;
     private static GlobalStatsProvider INSTANCE = null;
 
-    private ThreadLocal<String> appName = new ThreadLocal<String>();
-    private ThreadLocal<List<RuleAccept>> requests = new ThreadLocal<List<RuleAccept>>() {
+    private ThreadLocal<RuleEventProcessor> ruleEventProcessor = new ThreadLocal<RuleEventProcessor>() {
         @Override
-        protected List<RuleAccept> initialValue() {
-            return new ArrayList<RuleAccept>();
+        protected RuleEventProcessor initialValue() {
+            return null;
         }
     };
 
@@ -114,18 +112,18 @@ public class GlobalStatsProvider {
             //        appName + "/jersey/resources", applicationStatsProvider);
 
             // workaround for ^^^
-            StatsProviderManager.register("web-container", PluginPoint.SERVER,
-                    "applications/" + applicationName + "/jersey/resources", applicationStatsProvider);
+            StatsProviderManager.register(GlassfishMonitoringServiceProvider.MONITORING_CONFIG_ELEMENT,
+                    PluginPoint.SERVER, "applications/" + applicationName + "/jersey/resources",
+                    applicationStatsProvider);
 
         } else {
             applicationStatsProvider = applicationStatsProviders.get(applicationName);
         }
 
-        this.appName.set(applicationName);
+        this.ruleEventProcessor.set(new RuleEventProcessor(applicationStatsProvider));
     }
 
     private String getApplicationName(String path) {
-
         Habitat habitat = Globals.getDefaultHabitat();
 
         Domain domain = habitat.getInhabitantByType(Domain.class).get();
@@ -149,71 +147,12 @@ public class GlobalStatsProvider {
             @ProbeParam("path") CharSequence path,
             @ProbeParam("clazz") Object clazz) {
 
-        RuleAccept ruleAccept = new RuleAccept(ruleName, path, clazz);
+        RuleEvent ruleAccept = new RuleEvent(ruleName, path, clazz);
 
-        this.requests.get().add(ruleAccept);
+        ruleEventProcessor.get().process(ruleAccept);
     }
 
-    // it might be better to have requestEnd method instead of checking whether
-    // rule name (HttpMethodRule) was reached.
     @ProbeListener("glassfish:jersey:server:requestEnd")
     public void requestEnd() {
-
-        String rootResourceName = null;
-        String resourceName = null;
-
-        for (RuleAccept ruleAccept : requests.get()) {
-            if(ruleAccept.getClazz() != null) {
-                resourceName = ruleAccept.getClazz().getClass().getName();
-
-                if(rootResourceName == null)
-                    rootResourceName = resourceName;
-            }
-        }
-
-        ApplicationStatsProvider asp = this.applicationStatsProviders.get(appName.get());
-
-        if(rootResourceName != null) asp.rootResourceClassHit(rootResourceName);
-        if(resourceName != null) asp.resourceClassHit(resourceName);
-        
-        appName.remove();
-        requests.remove();
-    }
-}
-
-
-
-// represents accepted rule
-class RuleAccept {
-    private String ruleName;
-    private CharSequence path;
-    private Object clazz;
-
-    public RuleAccept() {
-    }
-
-    public RuleAccept(String ruleName, CharSequence path, Object clazz) {
-        this.ruleName = ruleName;
-        this.path = path;
-        this.clazz = clazz;
-    }
-
-    public String getRuleName() {
-        return ruleName;
-    }
-
-    public CharSequence getPath() {
-        return path;
-    }
-
-    public Object getClazz() {
-        return clazz;
-    }
-
-    @Override
-    public String toString() {
-        return "[" + RuleAccept.class.getCanonicalName() +
-                ":ruleName=" + ruleName + ";path=" + path +
-                ";clazz=" + clazz + "]";
     }
 }
