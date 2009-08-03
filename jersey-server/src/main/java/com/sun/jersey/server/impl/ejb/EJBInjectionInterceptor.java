@@ -39,7 +39,9 @@ package com.sun.jersey.server.impl.ejb;
 import com.sun.jersey.core.spi.component.ComponentScope;
 import com.sun.jersey.core.spi.component.ioc.IoCComponentProcessorFactory;
 import javax.annotation.PostConstruct;
+import javax.interceptor.AroundInvoke;
 import javax.interceptor.InvocationContext;
+import javax.ws.rs.WebApplicationException;
 
 final class EJBInjectionInterceptor {
 
@@ -57,7 +59,17 @@ final class EJBInjectionInterceptor {
         }
         Object beanInstance = context.getTarget();
         cpf.get(beanInstance.getClass(), ComponentScope.Singleton).postConstruct(beanInstance);
+        
         // Invoke next interceptor in chain
         context.proceed();
+    }
+
+    @AroundInvoke
+    public Object aroundInvoke(InvocationContext ctx) throws Exception {
+        try {
+            return ctx.proceed();
+        } catch(WebApplicationException ex) {
+            throw new EJBMappableException(ex);
+        }
     }
 }

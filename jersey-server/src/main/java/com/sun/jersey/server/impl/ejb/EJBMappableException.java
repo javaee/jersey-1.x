@@ -1,9 +1,9 @@
 /*
  *
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
- * 
+ *
  * Copyright 1997-2007 Sun Microsystems, Inc. All rights reserved.
- * 
+ *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
  * and Distribution License("CDDL") (collectively, the "License").  You
@@ -11,7 +11,7 @@
  * a copy of the License at https://jersey.dev.java.net/CDDL+GPL.html
  * or jersey/legal/LICENSE.txt.  See the License for the specific
  * language governing permissions and limitations under the License.
- * 
+ *
  * When distributing the software, include this License Header Notice in each
  * file and include the License file at jersey/legal/LICENSE.txt.
  * Sun designates this particular file as subject to the "Classpath" exception
@@ -20,9 +20,9 @@
  * Header, with the fields enclosed by brackets [] replaced by your own
  * identifying information: "Portions Copyrighted [year]
  * [name of copyright owner]"
- * 
+ *
  * Contributor(s):
- * 
+ *
  * If you wish your version of this file to be governed by only the CDDL or
  * only the GPL Version 2, indicate your decision by adding "[Contributor]
  * elects to include this software in this distribution under the [CDDL or GPL
@@ -34,39 +34,20 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-package com.sun.jersey.api.container;
+
+package com.sun.jersey.server.impl.ejb;
+
+import com.sun.jersey.api.container.MappableContainerException;
+import javax.ejb.ApplicationException;
 
 /**
- * A runtime exception that contains a cause, a checked or runtime exception,
- * that may be mapped to a {@link javax.ws.rs.core.Response} instance.
- * <p>
- * The runtime will catch such exceptions and attempt to map the cause
- * exception to a registered {@link javax.ws.rs.ext.ExceptionMapper} that
- * provides an appropriate {@link javax.ws.rs.core.Response} instance.
- * 
+ *
  * @author Paul.Sandoz@Sun.Com
  */
-public class MappableContainerException extends ContainerException {
-
-    /**
-     * @param cause the cause. If the cause is an instance of
-     *        {@link MappableContainerException} then the cause of this exception
-     *        will be obtained from the cause of that MappableContainerException
-     *        instance, and the process will repeat until a cause is obtained
-     *        that is not an instance of MappableContainerException.
-     */
-    public MappableContainerException(Throwable cause) {
-        super(strip(cause));
-    }
-
-    private static Throwable strip(Throwable cause) {
-        if (cause instanceof MappableContainerException) {
-            do {
-                MappableContainerException mce = (MappableContainerException)cause;
-                cause = mce.getCause();
-            } while (cause instanceof MappableContainerException);
-        }
-
-        return cause;
+@ApplicationException
+public final class EJBMappableException extends MappableContainerException {
+    
+    public EJBMappableException(Throwable ex) {
+        super(ex);
     }
 }

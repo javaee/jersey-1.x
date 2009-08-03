@@ -1,4 +1,7 @@
 release 1.1.2-ea (2009-09)
+- Support the throwing of WebApplicationException from within a singleton
+  or stateless session bean method. This will only work with GF v3 build 58
+  or greater.
 - Fixed issue 302
   https://jersey.dev.java.net/issues/show_bug.cgi?id=302
   Allow a relative template name to be resolved to an absolute template name
