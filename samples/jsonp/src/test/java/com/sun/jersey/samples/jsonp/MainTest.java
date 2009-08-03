@@ -37,18 +37,15 @@
 
 package com.sun.jersey.samples.jsonp;
 
-import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.GenericType;
 import com.sun.jersey.api.client.WebResource;
 import com.sun.jersey.api.client.config.ClientConfig;
 import com.sun.jersey.api.client.config.DefaultClientConfig;
-import com.sun.jersey.api.client.filter.LoggingFilter;
 import com.sun.jersey.samples.jsonp.config.JAXBContextResolver;
 import com.sun.jersey.samples.jsonp.jaxb.ChangeRecordBean;
 import com.sun.jersey.test.framework.AppDescriptor;
 import com.sun.jersey.test.framework.JerseyTest;
 import com.sun.jersey.test.framework.WebAppDescriptor;
-import com.sun.jersey.test.framework.impl.util.CommonUtils;
 import java.util.List;
 import org.junit.Test;
 import static org.junit.Assert.*;
