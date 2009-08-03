@@ -178,7 +178,7 @@ public class JerseyTest {
     // a required runtime dependency for those that do not want to utilize
     // Grizzly.
     private static final String DEFAULT_TEST_CONTAINER_FACTORY_CLASS_NAME =
-            "com.sun.jersey.test.framework.spi.container.grizzly.GrizzlyTestContainerFactory";
+            "com.sun.jersey.test.framework.spi.container.grizzly.web.GrizzlyWebTestContainerFactory";
 
     private static Class<? extends TestContainerFactory> getDefaultTestContainerFactoryClass() {
         String tcfClassName = System.getProperty("test.containerFactory",
