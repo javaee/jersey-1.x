@@ -37,9 +37,11 @@
 
 package com.sun.jersey.test.framework.web.jaxb.types;
 
+import java.util.List;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlType;
 
 /**
@@ -47,7 +49,7 @@ import javax.xml.bind.annotation.XmlType;
  * @author Naresh (Srinivas.Bhimisetty@Sun.Com)
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType (name="servletInitParam", propOrder={
+@XmlType (name="servletType", propOrder={
     "servletName",
     "servletClass",
     "initParams",
@@ -62,7 +64,7 @@ public class ServletType {
     private String servletClass;
 
     @XmlElement(name="init-param", required=true)
-    private ServletInitParamType initParams;
+    private List<ServletInitParamType> initParams;
 
     @XmlElement(name="load-on-startup", defaultValue="1", required=true)
     private String loadOnStartup;
@@ -71,11 +73,11 @@ public class ServletType {
 
     }
 
-    public ServletInitParamType getInitParams() {
+    public List<ServletInitParamType> getInitParams() {
         return initParams;
     }
 
-    public void setInitParam(ServletInitParamType initParams) {
+    public void setInitParam(List<ServletInitParamType> initParams) {
         this.initParams = initParams;
     }
 

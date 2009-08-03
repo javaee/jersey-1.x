@@ -37,6 +37,7 @@
 
 package com.sun.jersey.test.framework.web.jaxb.types;
 
+import java.util.List;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlElement;
@@ -58,7 +59,7 @@ import javax.xml.bind.annotation.XmlType;
 public class WebAppType {
 
     @XmlElement(name="context-param")
-    private ContextParamType contextParam;
+    private List<ContextParamType> contextParam;
 
     @XmlElement(name="listener")
     private ListenerType listener;
@@ -69,11 +70,11 @@ public class WebAppType {
     @XmlElement(name="servlet-mapping", required=true)
     private ServletMappingType servletMapping;
 
-    public ContextParamType getContextParam() {
+    public List<ContextParamType> getContextParam() {
         return contextParam;
     }
 
-    public void setContextParam(ContextParamType contextParam) {
+    public void setContextParam(List<ContextParamType> contextParam) {
         this.contextParam = contextParam;
     }
 

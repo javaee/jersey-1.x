@@ -98,7 +98,7 @@ public class EmbeddedGlassFishTestContainerFactory implements TestContainerFacto
 
         final String TARGET_WEBAPP_PATH = "target/webapp";
 
-        final String SRC_WEBAPP_PATH = "src/webapp";
+        final String SRC_WEBAPP_PATH = "src/main/webapp";
 
         final String TARGET_CLASSES_PATH = "target/classes";
 
@@ -135,7 +135,7 @@ public class EmbeddedGlassFishTestContainerFactory implements TestContainerFacto
         public void stop() {
             LOGGER.info("Stopping the EmbeddedGlassFish instance...");
             try {
-                //server.getDeployer().undeployAll();
+                server.getDeployer().undeployAll();
                 server.stop();
             } catch (EmbeddedException ex) {
                 throw new TestContainerException(ex);

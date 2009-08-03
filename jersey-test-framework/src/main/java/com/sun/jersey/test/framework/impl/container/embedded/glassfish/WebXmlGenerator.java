@@ -45,7 +45,9 @@ import com.sun.jersey.test.framework.web.jaxb.types.ServletType;
 import com.sun.jersey.test.framework.web.jaxb.types.WebAppType;
 import com.sun.jersey.test.framework.WebAppDescriptor;
 import java.io.OutputStream;
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -67,18 +69,27 @@ public class WebXmlGenerator {
         webAppType = new WebAppType();
         // check if the deployment descriptor should have any context parameters
         Map<String, String> contextParams = applicationDescriptor.getContextParams();
+        
         if( contextParams != null && contextParams.size() > 0 ) {
+
+            List<ContextParamType> contextParameters = new ArrayList<ContextParamType>();
             Iterator<String> contextParamIterator = contextParams.keySet().iterator();
             String paramName = "";
-            if(contextParamIterator.hasNext()) {
+            String paramValue;
+            ContextParamType contextParam;
+            
+            while (contextParamIterator.hasNext()) {
                 paramName = contextParamIterator.next();
+                paramValue = contextParams.get(paramName);
+                contextParam = new ContextParamType();
+                contextParam.setParamName(paramName);
+                contextParam.setParamValue(paramValue);
+                contextParameters.add(contextParam);
             }
-            String paramValue = contextParams.get(paramName);
-            ContextParamType contextParamType = new ContextParamType();
-            contextParamType.setParamName(paramName);
-            contextParamType.setParamValue(paramValue);
-            webAppType.setContextParam(contextParamType);
+            
+            webAppType.setContextParam(contextParameters);
         }
+
         // check if the deployment descriptor should have any context listener defined
         if( applicationDescriptor.getContextListenerClass() != null &&
                 !applicationDescriptor.getContextListenerClass().getName().equals("")) {
@@ -86,24 +97,32 @@ public class WebXmlGenerator {
             listener.setListenerClass(applicationDescriptor.getContextListenerClass().getName());
             webAppType.setListener(listener);
         }
+
         // add the servlet information to the deployment descriptor
         ServletType servlet = new ServletType();
         servlet.setServletName("Jersey Web Application");
         servlet.setServletClass(applicationDescriptor.getServletClass().getName());
+
         //any init params
         Map<String, String> initParams = applicationDescriptor.getInitParams();
         if(initParams != null) {
+            List<ServletInitParamType> servletInitParams = new ArrayList<ServletInitParamType>();
             Iterator<String> initParamIterator = initParams.keySet().iterator();
-            if (initParamIterator.hasNext()) {
-                String paramName = initParamIterator.next();
-                ServletInitParamType servletInitParam =
-                        new ServletInitParamType(paramName, initParams.get(paramName));
-                servlet.setInitParam(servletInitParam);
+            ServletInitParamType servletInitParam;
+            String paramName;
+            while (initParamIterator.hasNext()) {
+                paramName = initParamIterator.next();
+                servletInitParam = new ServletInitParamType(paramName, initParams.get(paramName));
+                servletInitParams.add(servletInitParam);
             }
+            servlet.setInitParam(servletInitParams);
+            
         }
+
         // load-on-startup
         servlet.setLoadOnStartup("1");
         webAppType.setServletType(servlet);
+
         // add the servlet mapping info
         ServletMappingType servletMapping = new ServletMappingType();
         servletMapping.setServletName("Jersey Web Application");
