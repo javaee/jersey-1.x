@@ -2,73 +2,76 @@
 <html><head><title>Jersey-EJB Example</title></head>
 
 
-  <body>
-      <h1>Jersey EJB Example</h1>
-      
-      <p>This example demonstrates how to develop RESTful web service with a Servlet 2.5 container.</p>
-      
-      <h2>Contents</h2>
-      <p>TODO</p>
-      <dl>
-          <dt><code>TODO</code></dt>
-          <dd>A resource class that produces a textual response to an HTTP GET.</dd>
-      </dl>
-    <p>The mapping of the URI path space is presented in the following table:</p>
-<table border="1">
-  <tbody>
-    <tr>
-      <th>URI path</th>
-      <th>Resource class</th>
-      <th>HTTP method</th>
-      <th>Description</th>
-    </tr>
-    <tr>
-      <td>/jersey-ejb</td>
-      <td>---</td>
-      <td>GET</td>
-      <td>Simple html/ajax client</td>
-    </tr>
-    <tr>
-      <td>/jersey-ejb/app/messages</td>
-      <td>MessageBoardResourceBean</td>
-      <td>GET</td>
-      <td>Returns first ten messsages</td>
-    </tr>
-    <tr>
-      <td>/jersey-ejb/app/messages/{id}</td>
-      <td>MessageBoardResourceBean</td>
-      <td>GET</td>
-      <td>Returns message with uniqueId = {id} or returns HTTP 404 if
-message does not exist</td>
-    </tr>
-    <tr>
-      <td>/jersey-ejb/app/messages/{id}</td>
-      <td>MessageBoardResourceBean</td>
-      <td>DELETE</td>
-      <td>Deletes message with uniqueId = {id} or returns HTTP 404 if
-message does not exist</td>
-    </tr>
-    <tr>
-      <td>/jersey-ejb/app/messages/<br>
-(with message as request entity)</td>
-      <td>MessageBoardResourceBean</td>
-      <td>POST</td>
-      <td>Creates new message and allocates unique id for it</td>
-    </tr>
-  </tbody>
-</table>
+    <body>
+        <h1>Jersey EJB Example</h1>
+
+        <p>This example demonstrates how to develop RESTful web service with a
+            Servlet 2.5 container.</p>
+
+        <h2>Contents</h2>
+        <p>TODO</p>
+        <dl>
+            <dt><code>TODO</code></dt>
+            <dd>A resource class that produces a textual response to an HTTP GET.</dd>
+        </dl>
+        <p>The mapping of the URI path space is presented in the following table:</p>
+        <table border="1">
+            <tbody>
+                <tr>
+                    <th>URI path</th>
+                    <th>Resource class</th>
+                    <th>HTTP method</th>
+                    <th>Description</th>
+                </tr>
+                <tr>
+                    <td>/jersey-ejb</td>
+                    <td>---</td>
+                    <td>GET</td>
+                    <td>Simple html/ajax client</td>
+                </tr>
+                <tr>
+                    <td>/jersey-ejb/app/messages</td>
+                    <td>MessageBoardResourceBean</td>
+                    <td>GET</td>
+                    <td>Returns first ten messsages</td>
+                </tr>
+                <tr>
+                    <td>/jersey-ejb/app/messages/{id}</td>
+                    <td>MessageBoardResourceBean</td>
+                    <td>GET</td>
+                    <td>Returns message with uniqueId = {id} or returns HTTP 404 if
+                        message does not exist</td>
+                </tr>
+                <tr>
+                    <td>/jersey-ejb/app/messages/{id}</td>
+                    <td>MessageBoardResourceBean</td>
+                    <td>DELETE</td>
+                    <td>Deletes message with uniqueId = {id} or returns HTTP 404 if
+                        message does not exist</td>
+                </tr>
+                <tr>
+                    <td>/jersey-ejb/app/messages/<br>
+                        (with message as request entity)</td>
+                    <td>MessageBoardResourceBean</td>
+                    <td>POST</td>
+                    <td>Creates new message and allocates unique id for it</td>
+                </tr>
+            </tbody>
+        </table>
 
 
-      <h2>Running the Example</h2>
+        <h2>Running the Example</h2>
 
-	<p style="color: red">This sample utilizes features of the GlassFish EJB 3.1 container only avalable in Glassfish V3 Preview 
-  and later versions. This sample will not work with Glassfish V3 Prelude.</p>
+        <p style="color: red">This sample utilizes features of the GlassFish
+            EJB 3.1 container only available in Glassfish V3 build 58
+            and later versions. This sample will not work with Glassfish V3
+            Prelude or Preview.</p>
 
-      <p>If you are working with Jersey GlassFish update center module installed into your existing GlassFish instance, 
-you will need to follow instructions at <a href="../../README.html">the module README file</a> in order to deploy the example.
-<p>Otherwise, you can run the example using embedded GlassFish as follows:</p>
-      <p> run 
-      <blockquote><code>mvn glassfish:run</code><p></blockquote>
-      <p>From a web browser, visit:</p>
-      <blockquote><code><a href="http://localhost:8080/jersey-ejb">http://localhost:8080/jersey-ejb</a></code></blockquote>
- </body></html>
+        <p>If you are working with Jersey GlassFish update center module
+            installed into your existing GlassFish instance,
+            you will need to follow instructions at
+            <a href="../../README.html">the module README file</a> in order to
+            deploy the sample.</p>
+        <p>From a web browser, visit:</p>
+        <blockquote><code><a href="http://localhost:8080/jersey-ejb">http://localhost:8080/jersey-ejb</a></code></blockquote>
+    </body></html>

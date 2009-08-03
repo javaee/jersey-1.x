@@ -49,6 +49,7 @@ import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
+import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
@@ -79,11 +80,15 @@ public class MessageBoardResourceBean {
 
     @Path("{msgNum}")
     @GET
-    public Message getMessage(@PathParam("msgNum") int msgNum) throws NotFoundException {
+    public Message getMessage(@PathParam("msgNum") int msgNum) {
         Message m = singleton.getMessage(msgNum);
 
-        if(m == null)
-            throw new NotFoundException();
+        if(m == null) {
+            // This exception will be passed through to the JAX-RS runtime
+            // No other runtime exception will behave this way unless the
+            // exception is annotated with javax.ejb.ApplicationException
+            throw new WebApplicationException(Response.Status.NOT_FOUND);
+        }
 
         return m;
 
@@ -94,8 +99,10 @@ public class MessageBoardResourceBean {
     public void deleteMessage(@PathParam("msgNum") int msgNum) throws NotFoundException {
         boolean deleted = singleton.deleteMessage(msgNum);
 
-        if(!deleted)
+        if(!deleted) {
+            // This exception will be mapped to a 404 response
             throw new NotFoundException();
+        }
     }
 }
 

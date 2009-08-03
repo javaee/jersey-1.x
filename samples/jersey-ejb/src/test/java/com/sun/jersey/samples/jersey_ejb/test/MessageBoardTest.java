@@ -69,7 +69,17 @@ public class MessageBoardTest extends JerseyTest {
                 caught = true;
             }
         }
+        assertTrue(caught);
 
+        caught = false;
+
+        try {
+            client().resource(u).delete();
+        } catch (UniformInterfaceException e) {
+            if (e.getResponse().getStatus() == 404) {
+                caught = true;
+            }
+        }
         assertTrue(caught);
     }
 }
