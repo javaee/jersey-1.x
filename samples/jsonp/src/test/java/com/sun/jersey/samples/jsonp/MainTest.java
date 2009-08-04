@@ -56,20 +56,6 @@ import static org.junit.Assert.*;
  */
 public class MainTest extends JerseyTest {
 
-    public MainTest() throws Exception {
-        super();
-        /*
-        super("jsonp", "", "com.sun.jersey.samples.jsonp");
-        ClientConfig cc = new DefaultClientConfig();
-        // use the following jaxb context resolver
-        cc.getClasses().add(JAXBContextResolver.class);
-        Client c = Client.create(cc);
-        r1 = c.resource(CommonUtils.getBaseURI("jsonp", ""));
-        r1.addFilter(new LoggingFilter());
-         *
-         */
-    }
-
      protected AppDescriptor configure() {
         ClientConfig cc = new DefaultClientConfig();
         // use the following jaxb context resolver
