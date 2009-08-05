@@ -67,6 +67,22 @@
             	</xsl:copy>
           </xsl:template>
 
+          <xsl:template match="pom:dependencies">
+            	<xsl:copy>
+              	<xsl:apply-templates/>
+              		<dependency>
+                            <groupId>com.sun.jersey.glassfish.v3.osgi</groupId>
+                            <artifactId>jersey-gf-statsproviders</artifactId>
+                            <version>${project.version}</version>
+                        </dependency>
+                        <dependency>
+                            <groupId>com.sun.jersey.contribs</groupId>
+                            <artifactId>jersey-multipart</artifactId>
+                            <version>${project.version}</version>
+                        </dependency>
+            	</xsl:copy>
+          </xsl:template>
+
           <xsl:template match="comment()">
             <xsl:comment><xsl:value-of select="."/></xsl:comment>
           </xsl:template>
