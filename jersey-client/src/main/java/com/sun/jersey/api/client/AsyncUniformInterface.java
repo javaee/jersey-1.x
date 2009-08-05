@@ -37,6 +37,7 @@
 
 package com.sun.jersey.api.client;
 
+import com.sun.jersey.api.client.*;
 import java.util.concurrent.Future;
 
 /**
@@ -63,379 +64,534 @@ import java.util.concurrent.Future;
  * @author Paul.Sandoz@Sun.Com
  */
 public interface AsyncUniformInterface {
-    
+
     /**
      * Invoke the HEAD method.
      * 
      * @return the HTTP response.
      */
     Future<ClientResponse> head();
+
+    /**
+     * Invoke the HEAD method.
+     * 
+     * @param l the listener to receive asynchronous callbacks.
+     * @return A Future object that may be used to check the status of the
+     *         request invocation. This object must not be used to try to
+     *         obtain the results of the request, a null value will be returned
+     *         from the call to {@link Future#get() }.
+     */
+    Future<?> head(IAsyncListener<ClientResponse> l);
     
     
     /**
      * Invoke the OPTIONS method.
+     * <p>
+     * The {@link Future#get} method will throw a UniformInterfaceException
+     * if the status of the HTTP response is greater than or equal to 300 and
+     * <code>c</code> is not the type {@link ClientResponse}.
      * 
      * @param <T> the type of the response.
      * @param c the type of the returned response.
      * @return an instance of type <code>c</code>.
-     * @throws UniformInterfaceException if the status of the HTTP response is 
-     *         greater than or equal to 300 and <code>c</code> is not the type
-     *         {@link ClientResponse}.
      */
-    <T> Future<T> options(Class<T> c) throws UniformInterfaceException;
+    <T> Future<T> options(Class<T> c);
     
     
     /**
      * Invoke the OPTIONS method.
+     * <p>
+     * The {@link Future#get} method will throw a UniformInterfaceException
+     * if the status of the HTTP response is greater than or equal to 300 and
+     * <code>gt</code> is not the type {@link ClientResponse}.
      * 
      * @param <T> the type of the response.
      * @param gt the generic type of the returned response.
      * @return an instance of type represented by the generic type.
-     * @throws UniformInterfaceException if the status of the HTTP response is 
-     *         greater than or equal to 300 and <code>gt</code> does not
-     *         represent the type {@link ClientResponse}.
      */
-    <T> Future<T> options(GenericType<T> gt) throws UniformInterfaceException;
+    <T> Future<T> options(GenericType<T> gt);
+
+    /**
+     * Invoke the OPTIONS method.
+     *
+     * @param <T> the type of the response.
+     * @param l the listener to receive asynchronous callbacks.
+     * @return A Future object that may be used to check the status of the
+     *         request invocation. This object must not be used to try to
+     *         obtain the results of the request, a null value will be returned
+     *         from the call to {@link Future#get() }.
+     */
+    <T> Future<?> options(IAsyncListener<T> l);
 
     /**
      * Invoke the GET method.
+     * <p>
+     * The {@link Future#get} method will throw a UniformInterfaceException
+     * if the status of the HTTP response is greater than or equal to 300 and
+     * <code>c</code> is not the type {@link ClientResponse}.
      * 
      * @param <T> the type of the response.
      * @param c the type of the returned response.
      * @return an instance of type <code>c</code>.
-     * @throws UniformInterfaceException if the status of the HTTP response is 
-     *         greater than or equal to 300 and <code>c</code> is not the type
-     *         {@link ClientResponse}.
      */
     <T> Future<T> get(Class<T> c) throws UniformInterfaceException;
 
     /**
      * Invoke the GET method.
+     * <p>
+     * The {@link Future#get} method will throw a UniformInterfaceException
+     * if the status of the HTTP response is greater than or equal to 300 and
+     * <code>gt</code> is not the type {@link ClientResponse}.
      * 
      * @param <T> the type of the response.
      * @param gt the generic type of the returned response.
      * @return an instance of type represented by the generic type.
-     * @throws UniformInterfaceException if the status of the HTTP response is 
-     *         greater than or equal to 300 and <code>gt</code> does not
-     *         represent the type {@link ClientResponse}.
      */
     <T> Future<T> get(GenericType<T> gt) throws UniformInterfaceException;
-            
+
+    /**
+     * Invoke the GET method.
+     * 
+     * @param <T> the type of the response.
+     * @param l the listener to receive asynchronous callbacks.
+     * @return A Future object that may be used to check the status of the
+     *         request invocation. This object must not be used to try to
+     *         obtain the results of the request, a null value will be returned
+     *         from the call to {@link Future#get() }.
+     */
+    <T> Future<?> get(IAsyncListener<T> l);
     
     /**
      * Invoke the PUT method with no request entity or response.
      * <p>
-     * If the status code is less than 300 and a representation is present
-     * then that representation is ignored.
+     * If the status of the HTTP response is less than 300 and a representation
+     * is present then that representation is ignored.
+     * <p>
+     * The {@link Future#get} method will throw a UniformInterfaceException
+     * if the status of the HTTP response is greater than or equal to 300.
      * 
      * @return a void future.
-     * @throws UniformInterfaceException if the status of the HTTP response is
-     *         greater than or equal to 300.
      */
-    Future<?> put() throws UniformInterfaceException;
+    Future<?> put();
     
     /**
      * Invoke the PUT method with a request entity but no response.
      * <p>
-     * If the status code is less than 300 and a representation is present
-     * then that representation is ignored.
+     * If the status of the HTTP response is less than 300 and a representation
+     * is present then that representation is ignored.
+     * <p>
+     * The {@link Future#get} method will throw a UniformInterfaceException
+     * if the status of the HTTP response is greater than or equal to 300.
      * 
      * @param requestEntity the request entity.
      * @return a void future.
-     * @throws UniformInterfaceException if the status of the HTTP response is 
-     *         greater than or equal to 300.
      */
-    Future<?> put(Object requestEntity) throws UniformInterfaceException;
+    Future<?> put(Object requestEntity);
 
     /**
      * Invoke the PUT method with no request entity that returns a response.
+     * <p>
+     * The {@link Future#get} method will throw a UniformInterfaceException
+     * if the status of the HTTP response is greater than or equal to 300 and
+     * <code>c</code> is not the type {@link ClientResponse}.
      * 
      * @param <T> the type of the response.
      * @param c the type of the returned response.
      * @return an instance of type <code>c</code>.
-     * @throws UniformInterfaceException if the status of the HTTP response is 
-     *         greater than or equal to 300 and <code>c</code> is not the type
-     *         {@link ClientResponse}.
      */
-    <T> Future<T> put(Class<T> c) throws UniformInterfaceException;
+    <T> Future<T> put(Class<T> c);
 
     /**
      * Invoke the PUT method with a request entity that returns a response.
+     * <p>
+     * The {@link Future#get} method will throw a UniformInterfaceException
+     * if the status of the HTTP response is greater than or equal to 300 and
+     * <code>gt</code> is not the type {@link ClientResponse}.
      * 
      * @param <T> the type of the response.
      * @param gt the generic type of the returned response.
      * @return an instance of type represented by the generic type.
-     * @throws UniformInterfaceException if the status of the HTTP response is 
-     *         greater than or equal to 300 and <code>gt</code> does not
-     *         represent the type {@link ClientResponse}.
      */
-    <T> Future<T> put(GenericType<T> gt) throws UniformInterfaceException;
+    <T> Future<T> put(GenericType<T> gt);
+
+    /**
+     * Invoke the PUT method.
+     *
+     * @param <T> the type of the response.
+     * @param l the listener to receive asynchronous callbacks.
+     * @return A Future object that may be used to check the status of the
+     *         request invocation. This object must not be used to try to
+     *         obtain the results of the request, a null value will be returned
+     *         from the call to {@link Future#get() }.
+     */
+    <T> Future<?> put(IAsyncListener<T> l);
 
     /**
      * Invoke the PUT method with a request entity that returns a response.
+     * <p>
+     * The {@link Future#get} method will throw a UniformInterfaceException
+     * if the status of the HTTP response is greater than or equal to 300 and
+     * <code>c</code> is not the type {@link ClientResponse}.
      * 
      * @param <T> the type of the response.
      * @param c the type of the returned response.
      * @param requestEntity the request entity.
      * @return an instance of type <code>c</code>.
-     * @throws UniformInterfaceException if the status of the HTTP response is 
-     *         greater than or equal to 300 and <code>c</code> is not the type
-     *         {@link ClientResponse}.
      */
-    <T> Future<T> put(Class<T> c, Object requestEntity) 
-            throws UniformInterfaceException;
+    <T> Future<T> put(Class<T> c, Object requestEntity);
     
     /**
      * Invoke the PUT method with a request entity that returns a response.
+     * <p>
+     * The {@link Future#get} method will throw a UniformInterfaceException
+     * if the status of the HTTP response is greater than or equal to 300 and
+     * <code>gt</code> is not the type {@link ClientResponse}.
      * 
      * @param <T> the type of the response.
      * @param gt the generic type of the returned response.
      * @param requestEntity the request entity.
      * @return an instance of type represented by the generic type.
-     * @throws UniformInterfaceException if the status of the HTTP response is 
-     *         greater than or equal to 300 and <code>gt</code> does not
-     *         represent the type {@link ClientResponse}.
      */
-    <T> Future<T> put(GenericType<T> gt, Object requestEntity) 
-            throws UniformInterfaceException;
-    
+    <T> Future<T> put(GenericType<T> gt, Object requestEntity);
+
+    /**
+     * Invoke the PUT method.
+     *
+     * @param <T> the type of the response.
+     * @param l the listener to receive asynchronous callbacks.
+     * @param requestEntity the request entity.
+     * @return A Future object that may be used to check the status of the
+     *         request invocation. This object must not be used to try to
+     *         obtain the results of the request, a null value will be returned
+     *         from the call to {@link Future#get() }.
+     */
+    <T> Future<?> put(IAsyncListener<T> l, Object requestEntity);
+
     /**
      * Invoke the POST method with no request entity or response.
      * <p>
-     * If the status code is less than 300 and a representation is present
-     * then that representation is ignored.
+     * If the status of the HTTP response is less than 300 and a representation
+     * is present then that representation is ignored.
+     * <p>
+     * The {@link Future#get} method will throw a UniformInterfaceException
+     * if the status of the HTTP response is greater than or equal to 300.
      * 
      * @return a void future.
-     * @throws UniformInterfaceException if the status of the HTTP response is 
-     *         greater than or equal to 300.
      */
-    Future<?> post() throws UniformInterfaceException;
+    Future<?> post();
     
     /**
      * Invoke the POST method with a request entity but no response.
      * <p>
-     * If the status code is less than 300 and a representation is present
-     * then that representation is ignored.
+     * If the status of the HTTP response is less than 300 and a representation
+     * is present then that representation is ignored.
+     * <p>
+     * The {@link Future#get} method will throw a UniformInterfaceException
+     * if the status of the HTTP response is greater than or equal to 300.
      * 
      * @return a void future.
      * @param requestEntity the request entity.
-     * @throws UniformInterfaceException if the status of the HTTP response is 
-     *         greater than or equal to 300.
      */
-    Future<?> post(Object requestEntity) throws UniformInterfaceException;
+    Future<?> post(Object requestEntity);
     
     /**
      * Invoke the POST method with no request entity that returns a response.
+     * <p>
+     * The {@link Future#get} method will throw a UniformInterfaceException
+     * if the status of the HTTP response is greater than or equal to 300 and
+     * <code>c</code> is not the type {@link ClientResponse}.
      * 
      * @param <T> the type of the response.
      * @param c the type of the returned response.
      * @return an instance of type <code>c</code>.
-     * @throws UniformInterfaceException if the status of the HTTP response is 
-     *         greater than or equal to 300 and <code>c</code> is not the type
-     *         {@link ClientResponse}.
      */
-    <T> Future<T> post(Class<T> c) throws UniformInterfaceException;
+    <T> Future<T> post(Class<T> c);
 
     /**
      * Invoke the POST method with a request entity that returns a response.
+     * <p>
+     * The {@link Future#get} method will throw a UniformInterfaceException
+     * if the status of the HTTP response is greater than or equal to 300 and
+     * <code>gt</code> is not the type {@link ClientResponse}.
      * 
      * @param <T> the type of the response.
      * @param gt the generic type of the returned response.
      * @return an instance of type represented by the generic type.
-     * @throws UniformInterfaceException if the status of the HTTP response is 
-     *         greater than or equal to 300 and <code>gt</code> does not
-     *         represent the type {@link ClientResponse}.
      */
-    <T> Future<T> post(GenericType<T> gt) throws UniformInterfaceException;
+    <T> Future<T> post(GenericType<T> gt);
+
+    /**
+     * Invoke the POST method.
+     *
+     * @param <T> the type of the response.
+     * @param l the listener to receive asynchronous callbacks.
+     * @return A Future object that may be used to check the status of the
+     *         request invocation. This object must not be used to try to
+     *         obtain the results of the request, a null value will be returned
+     *         from the call to {@link Future#get() }.
+     */
+    <T> Future<?> post(IAsyncListener<T> l);
 
     /**
      * Invoke the POST method with a request entity that returns a response.
+     * <p>
+     * The {@link Future#get} method will throw a UniformInterfaceException
+     * if the status of the HTTP response is greater than or equal to 300 and
+     * <code>c</code> is not the type {@link ClientResponse}.
      * 
      * @param <T> the type of the response.
      * @param c the type of the returned response.
      * @param requestEntity the request entity.
      * @return an instance of type <code>c</code>.
-     * @throws UniformInterfaceException if the status of the HTTP response is 
-     *         greater than or equal to 300 and <code>c</code> is not the type
-     *         {@link ClientResponse}.
      */
-    <T> Future<T> post(Class<T> c, Object requestEntity) 
-            throws UniformInterfaceException;
+    <T> Future<T> post(Class<T> c, Object requestEntity);
 
     /**
      * Invoke the POST method with a request entity that returns a response.
+     * <p>
+     * The {@link Future#get} method will throw a UniformInterfaceException
+     * if the status of the HTTP response is greater than or equal to 300 and
+     * <code>gt</code> is not the type {@link ClientResponse}.
      * 
      * @param <T> the type of the response.
      * @param gt the generic type of the returned response.
      * @param requestEntity the request entity.
      * @return an instance of type represented by the generic type.
-     * @throws UniformInterfaceException if the status of the HTTP response is 
-     *         greater than or equal to 300 and <code>gt</code> does not
-     *         represent the type {@link ClientResponse}.
      */
-    <T> Future<T> post(GenericType<T> gt, Object requestEntity)
-            throws UniformInterfaceException;
+    <T> Future<T> post(GenericType<T> gt, Object requestEntity);
+    
+    /**
+     * Invoke the POST method.
+     *
+     * @param <T> the type of the response.
+     * @param l the listener to receive asynchronous callbacks.
+     * @param requestEntity the request entity.
+     * @return A Future object that may be used to check the status of the
+     *         request invocation. This object must not be used to try to
+     *         obtain the results of the request, a null value will be returned
+     *         from the call to {@link Future#get() }.
+     */
+    <T> Future<?> post(IAsyncListener<T> l, Object requestEntity);
             
     
     /**
      * Invoke the DELETE method with no request entity or response.
      * <p>
-     * If the status code is less than 300 and a representation is present
-     * then that representation is ignored.
+     * If the status of the HTTP response is less than 300 and a representation
+     * is present then that representation is ignored.
+     * <p>
+     * The {@link Future#get} method will throw a UniformInterfaceException
+     * if the status of the HTTP response is greater than or equal to 300.
      * 
      * @return a void future.
-     * @throws UniformInterfaceException if the status of the HTTP response is 
-     *         greater than or equal to 300.
      */
-    Future<?> delete() throws UniformInterfaceException;
+    Future<?> delete();
     
     /**
      * Invoke the DELETE method with a request entity but no response.
      * <p>
-     * If the status code is less than 300 and a representation is present
-     * then that representation is ignored.
+     * If the status of the HTTP response is less than 300 and a representation
+     * is present then that representation is ignored.
+     * <p>
+     * The {@link Future#get} method will throw a UniformInterfaceException
+     * if the status of the HTTP response is greater than or equal to 300.
      * 
      * @return a void future.
      * @param requestEntity the request entity.
-     * @throws UniformInterfaceException if the status of the HTTP response is 
-     *         greater than or equal to 300.
      */
-    Future<?> delete(Object requestEntity) throws UniformInterfaceException;
+    Future<?> delete(Object requestEntity);
     
     /**
      * Invoke the DELETE method with no request entity that returns a response.
+     * <p>
+     * The {@link Future#get} method will throw a UniformInterfaceException
+     * if the status of the HTTP response is greater than or equal to 300 and
+     * <code>c</code> is not the type {@link ClientResponse}.
      * 
      * @param <T> the type of the response.
      * @param c the type of the returned response.
      * @return an instance of type <code>c</code>.
-     * @throws UniformInterfaceException if the status of the HTTP response is 
-     *         greater than or equal to 300 and <code>c</code> is not the type
-     *         {@link ClientResponse}.
      */
-    <T> Future<T> delete(Class<T> c) throws UniformInterfaceException;
+    <T> Future<T> delete(Class<T> c);
 
     /**
      * Invoke the DELETE method with a request entity that returns a response.
+     * <p>
+     * The {@link Future#get} method will throw a UniformInterfaceException
+     * if the status of the HTTP response is greater than or equal to 300 and
+     * <code>gt</code> is not the type {@link ClientResponse}.
      * 
      * @param <T> the type of the response.
      * @param gt the generic type of the returned response.
      * @return an instance of type represented by the generic type.
-     * @throws UniformInterfaceException if the status of the HTTP response is 
-     *         greater than or equal to 300 and <code>gt</code> does not
-     *         represent the type {@link ClientResponse}.
      */
-    <T> Future<T> delete(GenericType<T> gt) throws UniformInterfaceException;
+    <T> Future<T> delete(GenericType<T> gt);
+
+    /**
+     * Invoke the DELETE method.
+     *
+     * @param <T> the type of the response.
+     * @param l the listener to receive asynchronous callbacks.
+     * @return A Future object that may be used to check the status of the
+     *         request invocation. This object must not be used to try to
+     *         obtain the results of the request, a null value will be returned
+     *         from the call to {@link Future#get() }.
+     */
+    <T> Future<?> delete(IAsyncListener<T> l);
 
     /**
      * Invoke the DELETE method with a request entity that returns a response.
+     * <p>
+     * The {@link Future#get} method will throw a UniformInterfaceException
+     * if the status of the HTTP response is greater than or equal to 300 and
+     * <code>c</code> is not the type {@link ClientResponse}.
      * 
      * @param <T> the type of the response.
      * @param c the type of the returned response.
      * @param requestEntity the request entity.
      * @return an instance of type <code>c</code>.
-     * @throws UniformInterfaceException if the status of the HTTP response is 
-     *         greater than or equal to 300 and <code>c</code> is not the type
-     *         {@link ClientResponse}.
      */
-    <T> Future<T> delete(Class<T> c, Object requestEntity) 
-            throws UniformInterfaceException;
+    <T> Future<T> delete(Class<T> c, Object requestEntity);
 
     /**
      * Invoke the DELETE method with a request entity that returns a response.
+     * <p>
+     * The {@link Future#get} method will throw a UniformInterfaceException
+     * if the status of the HTTP response is greater than or equal to 300 and
+     * <code>gt</code> is not the type {@link ClientResponse}.
      * 
      * @param <T> the type of the response.
      * @param gt the generic type of the returned response.
      * @param requestEntity the request entity.
      * @return an instance of type represented by the generic type.
-     * @throws UniformInterfaceException if the status of the HTTP response is 
-     *         greater than or equal to 300 and <code>gt</code> does not
-     *         represent the type {@link ClientResponse}.
      */
-    <T> Future<T> delete(GenericType<T> gt, Object requestEntity)
-            throws UniformInterfaceException;
+    <T> Future<T> delete(GenericType<T> gt, Object requestEntity);
+    
+    /**
+     * Invoke the DELETE method.
+     *
+     * @param <T> the type of the response.
+     * @param l the listener to receive asynchronous callbacks.
+     * @param requestEntity the request entity.
+     * @return A Future object that may be used to check the status of the
+     *         request invocation. This object must not be used to try to
+     *         obtain the results of the request, a null value will be returned
+     *         from the call to {@link Future#get() }.
+     */
+    <T> Future<?> delete(IAsyncListener<T> l, Object requestEntity);
+
     
     /**
      * Invoke a HTTP method with no request entity or response.
      * <p>
-     * If the status code is less than 300 and a representation is present
-     * then that representation is ignored.
+     * If the status of the HTTP response is less than 300 and a representation
+     * is present then that representation is ignored.
+     * <p>
+     * The {@link Future#get} method will throw a UniformInterfaceException
+     * if the status of the HTTP response is greater than or equal to 300.
      * 
      * @return a void future.
      * @param method the HTTP method.
-     * @throws UniformInterfaceException if the status of the HTTP response is 
-     *         greater than or equal to 300.
      */
-    Future<?> method(String method) throws UniformInterfaceException;
+    Future<?> method(String method);
     
     /**
      * Invoke a HTTP method with a request entity but no response.
      * <p>
-     * If the status code is less than 300 and a representation is present
-     * then that representation is ignored.
+     * If the status of the HTTP response is less than 300 and a representation
+     * is present then that representation is ignored.
+     * <p>
+     * The {@link Future#get} method will throw a UniformInterfaceException
+     * if the status of the HTTP response is greater than or equal to 300.
      * 
      * @return a void future.
      * @param method the HTTP method.
      * @param requestEntity the request entity.
-     * @throws UniformInterfaceException if the status of the HTTP response is 
-     *         greater than or equal to 300.
      */
-    Future<?> method(String method, Object requestEntity) 
-            throws UniformInterfaceException;
+    Future<?> method(String method, Object requestEntity);
     
     /**
      * Invoke a HTTP method with no request entity that returns a response.
+     * <p>
+     * The {@link Future#get} method will throw a UniformInterfaceException
+     * if the status of the HTTP response is greater than or equal to 300 and
+     * <code>c</code> is not the type {@link ClientResponse}.
      * 
      * @param <T> the type of the response.
      * @param method the HTTP method.
      * @param c the type of the returned response.
      * @return an instance of type <code>c</code>.
-     * @throws UniformInterfaceException if the status of the HTTP response is 
-     *         greater than or equal to 300 and <code>c</code> is not the type
-     *         {@link ClientResponse}.
      */
-    <T> Future<T> method(String method, Class<T> c) throws UniformInterfaceException;
+    <T> Future<T> method(String method, Class<T> c);
 
     /**
      * Invoke a HTTP method with no request entity that returns a response.
+     * <p>
+     * The {@link Future#get} method will throw a UniformInterfaceException
+     * if the status of the HTTP response is greater than or equal to 300 and
+     * <code>gt</code> is not the type {@link ClientResponse}.
      * 
      * @param <T> the type of the response.
      * @param method the HTTP method.
      * @param gt the generic type of the returned response.
      * @return an instance of type represented by the generic type.
-     * @throws UniformInterfaceException if the status of the HTTP response is 
-     *         greater than or equal to 300 and <code>gt</code> does not
-     *         represent the type {@link ClientResponse}.
      */
-    <T> Future<T> method(String method, GenericType<T> gt) throws UniformInterfaceException;
+    <T> Future<T> method(String method, GenericType<T> gt);
+
+    /**
+     * Invoke a HTTP method with no request entity that returns a response.
+     *
+     * @param <T> the type of the response.
+     * @param method the HTTP method.
+     * @param l the listener to receive asynchronous callbacks.
+     * @return A Future object that may be used to check the status of the
+     *         request invocation. This object must not be used to try to
+     *         obtain the results of the request, a null value will be returned
+     *         from the call to {@link Future#get() }.
+     */
+    <T> Future<?> method(String method, IAsyncListener<T> l);
 
     /**
      * Invoke a HTTP method with a request entity that returns a response.
+     * <p>
+     * The {@link Future#get} method will throw a UniformInterfaceException
+     * if the status of the HTTP response is greater than or equal to 300 and
+     * <code>c</code> is not the type {@link ClientResponse}.
      * 
      * @param <T> the type of the response.
      * @param method the HTTP method.
      * @param c the type of the returned response.
      * @param requestEntity the request entity.
      * @return an instance of type <code>c</code>.
-     * @throws UniformInterfaceException if the status of the HTTP response is 
-     *         greater than or equal to 300 and <code>c</code> is not the type
-     *         {@link ClientResponse}.
      */
-    <T> Future<T> method(String method, Class<T> c, Object requestEntity) 
-            throws UniformInterfaceException;  
+    <T> Future<T> method(String method, Class<T> c, Object requestEntity);
     
     /**
      * Invoke a HTTP method with a request entity that returns a response.
+     * <p>
+     * The {@link Future#get} method will throw a UniformInterfaceException
+     * if the status of the HTTP response is greater than or equal to 300 and
+     * <code>gt</code> is not the type {@link ClientResponse}.
      * 
      * @param <T> the type of the response.
      * @param method the HTTP method.
      * @param gt the generic type of the returned response.
      * @param requestEntity the request entity.
      * @return an instance of type represented by the generic type.
-     * @throws UniformInterfaceException if the status of the HTTP response is 
-     *         greater than or equal to 300 and <code>gt</code> does not
-     *         represent the type {@link ClientResponse}.
      */
-    <T> Future<T> method(String method, GenericType<T> gt, Object requestEntity) 
-            throws UniformInterfaceException;    
-    
+    <T> Future<T> method(String method, GenericType<T> gt, Object requestEntity);
+
+    /**
+     * Invoke a HTTP method with a request entity that returns a response.
+     *
+     * @param <T> the type of the response.
+     * @param method the HTTP method.
+     * @param l the listener to receive asynchronous callbacks.
+     * @param requestEntity the request entity.
+     * @return A Future object that may be used to check the status of the
+     *         request invocation. This object must not be used to try to
+     *         obtain the results of the request, a null value will be returned
+     *         from the call to {@link Future#get() }.
+     */
+    <T> Future<?> method(String method, IAsyncListener<T> l, Object requestEntity);
 }

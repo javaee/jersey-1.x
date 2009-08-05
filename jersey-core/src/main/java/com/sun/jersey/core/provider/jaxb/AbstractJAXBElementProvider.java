@@ -57,6 +57,10 @@ import javax.xml.bind.UnmarshalException;
 import javax.xml.bind.Unmarshaller;
 
 /**
+ * An abstract provider for {@link JAXBElement}.
+ * <p>
+ * Implementing classes may extend this class to provide specific marshalling
+ * and unmarshalling behaviour.
  *
  * @author Paul.Sandoz@Sun.Com
  */

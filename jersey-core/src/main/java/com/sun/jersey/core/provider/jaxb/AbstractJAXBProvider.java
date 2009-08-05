@@ -53,7 +53,8 @@ import javax.xml.transform.sax.SAXSource;
 import org.xml.sax.InputSource;
 
 /**
- *
+ * A base class for implementing JAXB-based readers and writers.
+ * 
  * @author Paul.Sandoz@Sun.Com
  */
 public abstract class AbstractJAXBProvider<T> extends AbstractMessageReaderWriterProvider<T> {    

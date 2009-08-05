@@ -69,6 +69,16 @@ import javax.xml.stream.XMLStreamReader;
  *
  * @author Paul.Sandoz@Sun.Com
  */
+/**
+ * An abstract provider for <code>T[]</code>, <code>Collection&lt;T&gt;</code>,
+ * or <code>List&lt;T&gt;</code> where <code>T</code> is a JAXB types annotated with
+ * {@link XmlRootElement}.
+ * <p>
+ * Implementing classes may extend this class to provide specific marshalling
+ * and unmarshalling behaviour.
+ *
+ * @author Paul.Sandoz@Sun.Com
+ */
 public abstract class AbstractListElementProvider extends AbstractJAXBProvider<Object> {
 
     public AbstractListElementProvider(Providers ps) {

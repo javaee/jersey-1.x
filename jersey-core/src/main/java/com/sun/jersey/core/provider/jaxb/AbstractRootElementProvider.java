@@ -62,7 +62,7 @@ import javax.xml.transform.stream.StreamSource;
  * {@link XmlRootElement} or {@link XmlType}.
  * <p>
  * Implementing classes may extend this class to provide specific marshalling
- * and unmarshallng behaviour.
+ * and unmarshalling behaviour.
  * 
  * @author Paul.Sandoz@Sun.Com
  */
