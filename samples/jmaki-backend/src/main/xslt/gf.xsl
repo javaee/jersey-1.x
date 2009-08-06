@@ -46,7 +46,7 @@
           </xsl:template>
 
           <xsl:template match="pom:dependency[pom:groupId='com.sun.jersey' or pom:groupId='com.sun.xml.bind']/pom:scope[text()!=test]">
-          		<scope>compile</scope>
+          		<scope>provided</scope>
           </xsl:template>
 
           <xsl:template match="pom:dependency[pom:groupId='javax.servlet']">
@@ -62,24 +62,8 @@
             	<xsl:copy>
               	<xsl:apply-templates/>
               	<xsl:if test="count(pom:scope)=0">
-              		<scope>compile</scope>
+              		<scope>provided</scope>
               	</xsl:if>
-            	</xsl:copy>
-          </xsl:template>
-
-          <xsl:template match="pom:dependencies">
-            	<xsl:copy>
-              	<xsl:apply-templates/>
-              		<dependency>
-                            <groupId>com.sun.jersey.glassfish.v3.osgi</groupId>
-                            <artifactId>jersey-gf-statsproviders</artifactId>
-                            <version>${project.version}</version>
-                        </dependency>
-                        <dependency>
-                            <groupId>com.sun.jersey.contribs</groupId>
-                            <artifactId>jersey-multipart</artifactId>
-                            <version>${project.version}</version>
-                        </dependency>
             	</xsl:copy>
           </xsl:template>
 
