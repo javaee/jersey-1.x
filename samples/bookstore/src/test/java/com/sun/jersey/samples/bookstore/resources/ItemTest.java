@@ -60,7 +60,7 @@ public class ItemTest extends TestSupport {
         String text = item1resource().accept("application/xml").get(String.class);
         System.out.println("Item XML is: " + text);
         
-        Book response = resource().accept("application/xml").get(Book.class);
+        Book response = item1resource().accept("application/xml").get(Book.class);
         assertNotNull("Should have returned an item!", response);
         assertEquals("item title", "Svejk", response.getTitle());
     }
