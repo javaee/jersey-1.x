@@ -83,6 +83,9 @@ public final class SubLocatorRule extends BaseRule {
     }
 
     public boolean accept(CharSequence path, Object resource, UriRuleContext context) {
+        UriRuleProbeProvider.ruleAccept(SubLocatorRule.class.getSimpleName(), path,
+                resource);
+
         // Set the template values
         pushMatch(context);
 
@@ -98,9 +101,6 @@ public final class SubLocatorRule extends BaseRule {
             resource = context.getResource((Class)resource);
         }
         context.pushResource(resource);
-
-        UriRuleProbeProvider.ruleAccept(SubLocatorRule.class.getSimpleName(), path,
-                resource);
         
         // Match sub-rules on the returned resource class
         final Iterator<UriRule> matches = context.getRules(resource.getClass()).

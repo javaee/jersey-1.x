@@ -35,43 +35,22 @@
  * holder.
  */
 
-package com.sun.jersey.server.spi.monitoring.glassfish;
+package com.sun.jersey.server.spi.monitoring.glassfish.ruleevents;
+
+import com.sun.jersey.server.spi.monitoring.glassfish.ApplicationStatsProvider;
 
 /**
  *
  * @author pavel.bucek@sun.com
  */
+public class DummyRuleEvent extends AbstractRuleEvent {
 
-class RuleEvent {
-    private String ruleName;
-    private CharSequence path;
-    private Object clazz;
-
-    public RuleEvent() {
-    }
-
-    public RuleEvent(String ruleName, CharSequence path, Object clazz) {
-        this.ruleName = ruleName;
-        this.path = path;
-        this.clazz = clazz;
-    }
-
-    public String getRuleName() {
-        return ruleName;
-    }
-
-    public CharSequence getPath() {
-        return path;
-    }
-
-    public Object getClazz() {
-        return clazz;
+    public DummyRuleEvent(String ruleName, CharSequence path, Object clazz) {
+        super(ruleName, path, clazz);
     }
 
     @Override
-    public String toString() {
-        return "[" + RuleEvent.class.getSimpleName() +
-                ":\truleName=" + ruleName + ";\tpath=" + path +
-                ";\tclazz=" + clazz + "]";
+    public void process(ApplicationStatsProvider appStatsProvider) {
+        // do nothing
     }
 }

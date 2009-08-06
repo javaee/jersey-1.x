@@ -1,4 +1,3 @@
-
 /*
  *
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
@@ -36,42 +35,42 @@
  * holder.
  */
 
-package com.sun.jersey.server.spi.monitoring.glassfish;
+package com.sun.jersey.server.spi.monitoring.glassfish.ruleevents;
 
-import com.sun.jersey.spi.monitoring.GlassfishMonitoringProvider;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import org.glassfish.external.probe.provider.PluginPoint;
-import org.glassfish.external.probe.provider.StatsProviderManager;
-
+import com.sun.jersey.server.impl.uri.rules.HttpMethodRule;
+import com.sun.jersey.server.impl.uri.rules.TerminatingRule;
+import com.sun.jersey.server.spi.monitoring.glassfish.ApplicationStatsProvider;
+import java.util.List;
 
 /**
  *
  * @author pavel.bucek@sun.com
  */
-public class GlassfishMonitoringServiceProvider implements GlassfishMonitoringProvider {
+public class ResourceClassRuleEvent extends AbstractRuleEvent {
 
-    public static final String MONITORING_CONFIG_ELEMENT = "web-container";
-    public static final String MONITORING_PROBE_REQUEST_START = "glassfish:jersey:server:requestStart";
-    public static final String LOGGER_JERSEY_MONITORING = "Jersey-Monitoring";
+    private final List<AbstractRuleEvent> eventList;
 
+    public ResourceClassRuleEvent(String ruleName, CharSequence path, Object clazz, List<AbstractRuleEvent> eventList) {
+        super(ruleName, path, clazz);
 
-    private static synchronized void start() {
-        if(!StatsProviderManager.hasListeners(MONITORING_PROBE_REQUEST_START)) {
-
-            GlobalStatsProvider gsp = GlobalStatsProvider.getInstance();
-            StatsProviderManager.register(MONITORING_CONFIG_ELEMENT, PluginPoint.SERVER, "/jersey/global", gsp);
-
-            Logger.getLogger(LOGGER_JERSEY_MONITORING).log(Level.INFO, "GlobalStatsProvider registered");
-        }
+        this.eventList = eventList;
     }
+
 
     @Override
-    public void register() {
-        start();
-    }
+    public void process(ApplicationStatsProvider appStatsProvider) {
+        appStatsProvider.rootResourceClassHit(this.getClazz().getClass().getName());
 
-    public GlassfishMonitoringServiceProvider() {
+        int size = eventList.size();
+
+        for(int i = 0; i < size; i++) {
+            if((eventList.get(i) == this) && (size > (i + 1))) {
+                if(eventList.get(i + 1).getRuleName().equals(HttpMethodRule.class.getSimpleName())) {
+                    appStatsProvider.resourceClassHit(this.getClazz().getClass().getName());
+
+                    break;
+                }
+            }
+        }
     }
-    
 }

@@ -1,4 +1,3 @@
-
 /*
  *
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
@@ -36,42 +35,44 @@
  * holder.
  */
 
-package com.sun.jersey.server.spi.monitoring.glassfish;
+package com.sun.jersey.server.spi.monitoring.glassfish.ruleevents;
 
-import com.sun.jersey.spi.monitoring.GlassfishMonitoringProvider;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import org.glassfish.external.probe.provider.PluginPoint;
-import org.glassfish.external.probe.provider.StatsProviderManager;
-
+import com.sun.jersey.server.spi.monitoring.glassfish.ApplicationStatsProvider;
 
 /**
  *
  * @author pavel.bucek@sun.com
  */
-public class GlassfishMonitoringServiceProvider implements GlassfishMonitoringProvider {
 
-    public static final String MONITORING_CONFIG_ELEMENT = "web-container";
-    public static final String MONITORING_PROBE_REQUEST_START = "glassfish:jersey:server:requestStart";
-    public static final String LOGGER_JERSEY_MONITORING = "Jersey-Monitoring";
+public abstract class AbstractRuleEvent {
+    private String ruleName;
+    private CharSequence path;
+    private Object clazz;
 
-
-    private static synchronized void start() {
-        if(!StatsProviderManager.hasListeners(MONITORING_PROBE_REQUEST_START)) {
-
-            GlobalStatsProvider gsp = GlobalStatsProvider.getInstance();
-            StatsProviderManager.register(MONITORING_CONFIG_ELEMENT, PluginPoint.SERVER, "/jersey/global", gsp);
-
-            Logger.getLogger(LOGGER_JERSEY_MONITORING).log(Level.INFO, "GlobalStatsProvider registered");
-        }
+    public AbstractRuleEvent(String ruleName, CharSequence path, Object clazz) {
+        this.ruleName = ruleName;
+        this.path = path;
+        this.clazz = clazz;
     }
+
+    public String getRuleName() {
+        return ruleName;
+    }
+
+    public CharSequence getPath() {
+        return path;
+    }
+
+    public Object getClazz() {
+        return clazz;
+    }
+
+    public abstract void process(ApplicationStatsProvider appStatsProvider);
 
     @Override
-    public void register() {
-        start();
+    public String toString() {
+        return "[" + this.getClass().getSimpleName() +
+                ":\truleName=" + ruleName + ";\tpath=" + path +
+                ";\tclazz=" + clazz + "]";
     }
-
-    public GlassfishMonitoringServiceProvider() {
-    }
-    
 }

@@ -1,4 +1,3 @@
-
 /*
  *
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
@@ -36,42 +35,18 @@
  * holder.
  */
 
-package com.sun.jersey.server.spi.monitoring.glassfish;
+package com.sun.jersey.server.spi.monitoring.glassfish.ruleevents;
 
-import com.sun.jersey.spi.monitoring.GlassfishMonitoringProvider;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import org.glassfish.external.probe.provider.PluginPoint;
-import org.glassfish.external.probe.provider.StatsProviderManager;
-
+import java.util.List;
 
 /**
  *
  * @author pavel.bucek@sun.com
  */
-public class GlassfishMonitoringServiceProvider implements GlassfishMonitoringProvider {
+public class ResourceObjectRuleEvent extends ResourceClassRuleEvent {
 
-    public static final String MONITORING_CONFIG_ELEMENT = "web-container";
-    public static final String MONITORING_PROBE_REQUEST_START = "glassfish:jersey:server:requestStart";
-    public static final String LOGGER_JERSEY_MONITORING = "Jersey-Monitoring";
-
-
-    private static synchronized void start() {
-        if(!StatsProviderManager.hasListeners(MONITORING_PROBE_REQUEST_START)) {
-
-            GlobalStatsProvider gsp = GlobalStatsProvider.getInstance();
-            StatsProviderManager.register(MONITORING_CONFIG_ELEMENT, PluginPoint.SERVER, "/jersey/global", gsp);
-
-            Logger.getLogger(LOGGER_JERSEY_MONITORING).log(Level.INFO, "GlobalStatsProvider registered");
-        }
+    public ResourceObjectRuleEvent(String ruleName, CharSequence path, Object clazz, List<AbstractRuleEvent> eventList) {
+        super(ruleName, path, clazz, eventList);
     }
 
-    @Override
-    public void register() {
-        start();
-    }
-
-    public GlassfishMonitoringServiceProvider() {
-    }
-    
 }

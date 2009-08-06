@@ -37,8 +37,17 @@
 
 package com.sun.jersey.server.spi.monitoring.glassfish;
 
+import com.sun.jersey.server.impl.uri.rules.SubLocatorRule;
+import com.sun.jersey.server.spi.monitoring.glassfish.ruleevents.AbstractRuleEvent;
 import com.sun.enterprise.config.serverbeans.Application;
 import com.sun.enterprise.config.serverbeans.Domain;
+import com.sun.jersey.server.impl.uri.rules.ResourceClassRule;
+import com.sun.jersey.server.impl.uri.rules.ResourceObjectRule;
+import com.sun.jersey.server.spi.monitoring.glassfish.ruleevents.DummyRuleEvent;
+import com.sun.jersey.server.spi.monitoring.glassfish.ruleevents.ResourceClassRuleEvent;
+import com.sun.jersey.server.spi.monitoring.glassfish.ruleevents.ResourceObjectRuleEvent;
+import com.sun.jersey.server.spi.monitoring.glassfish.ruleevents.SubLocatorRuleEvent;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -67,12 +76,15 @@ public class GlobalStatsProvider {
     private Map<String, ApplicationStatsProvider> applicationStatsProviders;
     private static GlobalStatsProvider INSTANCE = null;
 
-    private ThreadLocal<RuleEventProcessor> ruleEventProcessor = new ThreadLocal<RuleEventProcessor>() {
+    private ThreadLocal<List<AbstractRuleEvent>> ruleEvents = new ThreadLocal<List<AbstractRuleEvent>>() {
         @Override
-        protected RuleEventProcessor initialValue() {
-            return null;
+        protected List<AbstractRuleEvent> initialValue() {
+            return new ArrayList<AbstractRuleEvent>();
         }
     };
+
+    private ThreadLocal<ApplicationStatsProvider> currentApplicationStatProvider
+            = new ThreadLocal<ApplicationStatsProvider>();
 
     private GlobalStatsProvider() {
         applications = new HashSet<String>();
@@ -87,7 +99,7 @@ public class GlobalStatsProvider {
     }
 
 
-    @ManagedAttribute(id="applicationList")
+    @ManagedAttribute(id="applicationlist")
     public Set<String> getApplications() {
         return applications;
     }
@@ -124,7 +136,7 @@ public class GlobalStatsProvider {
             applicationStatsProvider = applicationStatsProviders.get(applicationName);
         }
 
-        this.ruleEventProcessor.set(new RuleEventProcessor(applicationStatsProvider));
+        currentApplicationStatProvider.set(applicationStatsProvider);
     }
 
     private String getApplicationName(String path) {
@@ -151,12 +163,25 @@ public class GlobalStatsProvider {
             @ProbeParam("path") CharSequence path,
             @ProbeParam("clazz") Object clazz) {
 
-        RuleEvent ruleAccept = new RuleEvent(ruleName, path, clazz);
+        AbstractRuleEvent ruleEvent;
 
-        ruleEventProcessor.get().process(ruleAccept);
+        if(ruleName.equals(ResourceClassRule.class.getSimpleName())) {
+            ruleEvent = new ResourceClassRuleEvent(ruleName, path, clazz, ruleEvents.get());
+        } else if(ruleName.equals(SubLocatorRule.class.getSimpleName())) {
+            ruleEvent = new SubLocatorRuleEvent(ruleName, path, clazz, ruleEvents.get());
+        } else if(ruleName.equals(ResourceObjectRule.class.getSimpleName())) {
+            ruleEvent = new ResourceObjectRuleEvent(ruleName, path, clazz, ruleEvents.get());
+        } else {
+            ruleEvent = new DummyRuleEvent(ruleName, path, clazz);
+        }
+        
+        ruleEvents.get().add(ruleEvent);
     }
 
     @ProbeListener("glassfish:jersey:server:requestEnd")
     public void requestEnd() {
+        for(AbstractRuleEvent ruleEvent : ruleEvents.get()) {
+            ruleEvent.process(currentApplicationStatProvider.get());
+        }
     }
 }

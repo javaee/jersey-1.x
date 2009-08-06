@@ -35,32 +35,37 @@
  * holder.
  */
 
-package com.sun.jersey.server.spi.monitoring.glassfish;
+package com.sun.jersey.server.spi.monitoring.glassfish.ruleevents;
 
-import com.sun.jersey.server.impl.uri.rules.ResourceClassRule;
+import com.sun.jersey.server.spi.monitoring.glassfish.ApplicationStatsProvider;
+import java.util.List;
 
 /**
  *
  * @author pavel.bucek@sun.com
  */
-public class RuleEventProcessor {
+public class SubLocatorRuleEvent extends AbstractRuleEvent {
 
-    private final ApplicationStatsProvider applicationStatsProvider;
-    private boolean resourceClassReached = false;
+    private final List<AbstractRuleEvent> eventList;
 
-    public RuleEventProcessor(ApplicationStatsProvider asp) {
-        applicationStatsProvider = asp;
+    public SubLocatorRuleEvent(String ruleName, CharSequence path, Object clazz, List<AbstractRuleEvent> eventList) {
+        super(ruleName, path, clazz);
+
+        this.eventList = eventList;
     }
 
+    @Override
+    public void process(ApplicationStatsProvider appStatsProvider) {
+        if(this.getPath().equals("")) {
 
-    public void process(RuleEvent ruleAccept) {
-        if(ruleAccept.getRuleName().equals(ResourceClassRule.class.getSimpleName()))
-            applicationStatsProvider.rootResourceClassHit(ruleAccept.getClazz().getClass().getName());
+            int size = eventList.size();
 
-        if(!resourceClassReached && ruleAccept.getPath().equals("")) {
-            resourceClassReached = true;
-            applicationStatsProvider.resourceClassHit(ruleAccept.getClazz().getClass().getName());
+            for (int i = 0; i < size; i++) {
+                if ((eventList.get(i) == this) && (size > (i + 1))) {
+                    appStatsProvider.resourceClassHit(eventList.get(i + 1).getClazz().getClass().getName());
+                    break;
+                }
+            }
         }
-
     }
 }

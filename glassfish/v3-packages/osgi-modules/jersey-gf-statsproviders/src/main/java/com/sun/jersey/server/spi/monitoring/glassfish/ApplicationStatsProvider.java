@@ -52,7 +52,7 @@ public class ApplicationStatsProvider {
     private final Map<String, Long> rootResourceClassCounter;
     private final Map<String, Long> resourceClassCounter;
 
-    @ManagedAttribute(id="rootResourceClassHitCount-description")
+    @ManagedAttribute(id="rootresourceclasshitcount-description")
     public String getRootResourceClassHitCountDesc() {
         return "Root resource class hit count";
     }
@@ -60,22 +60,22 @@ public class ApplicationStatsProvider {
     private long rootResourceClassHitCountStartTime = new java.util.Date().getTime();
     private long rootResourceClassHitCountLastSampleTime;
 
-    @ManagedAttribute(id="rootResourceClassHitCount-starttime")
+    @ManagedAttribute(id="rootresourceclasshitcount-starttime")
     public long getRootResourceClassHitCountStartTime() {
         return rootResourceClassHitCountStartTime;
     }
 
-    @ManagedAttribute(id="rootResourceClassHitCount-lastsampletime")
+    @ManagedAttribute(id="rootresourceclasshitcount-lastsampletime")
     public long getRootResourceClassHitCountLastSampleTime() {
         return rootResourceClassHitCountLastSampleTime;
     }
 
-    @ManagedAttribute(id="rootResourceClassHitCount")
+    @ManagedAttribute(id="rootresourceclasshitcount")
     public Map<String, Long> getRootResourceClassCounter() {
         return rootResourceClassCounter;
     }
 
-    @ManagedAttribute(id="resourceClassHitCount-description")
+    @ManagedAttribute(id="resourceclasshitcount-description")
     public String getResourceClassHitCountDesc() {
         return "Resource class hit count";
     }
@@ -84,17 +84,17 @@ public class ApplicationStatsProvider {
     private long resourceClassHitCountStartTime = new java.util.Date().getTime();
     private long resourceClassHitCountLastSampleTime;
 
-    @ManagedAttribute(id="resourceClassHitCount-starttime")
+    @ManagedAttribute(id="resourceclasshitcount-starttime")
     public long getResourceClassHitCountStartTime() {
         return resourceClassHitCountStartTime;
     }
 
-    @ManagedAttribute(id="resourceClassHitCount-lastsampletime")
+    @ManagedAttribute(id="resourceclasshitcount-lastsampletime")
     public long getResourceClassHitCountLastSampleTime() {
         return resourceClassHitCountLastSampleTime;
     }
 
-    @ManagedAttribute(id="resourceClassHitCount")
+    @ManagedAttribute(id="resourceclasshitcount")
     public Map<String, Long> getResourceClassCounter() {
         return resourceClassCounter;
     }
