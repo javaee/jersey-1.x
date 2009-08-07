@@ -76,8 +76,6 @@ import com.sun.jersey.api.model.AbstractResource;
 import com.sun.jersey.api.model.ResourceModelIssue;
 import com.sun.jersey.api.core.ExtendedUriInfo;
 import com.sun.jersey.api.uri.UriTemplate;
-import com.sun.jersey.core.impl.provider.xml.SAXParserContextProvider;
-import com.sun.jersey.core.impl.provider.xml.XMLStreamReaderContextProvider;
 import com.sun.jersey.core.spi.component.ComponentInjector;
 import com.sun.jersey.core.spi.component.ioc.IoCComponentProvider;
 import com.sun.jersey.core.spi.component.ioc.IoCComponentProviderFactory;
@@ -142,6 +140,7 @@ import com.sun.jersey.spi.uri.rules.UriRule;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.ParameterizedType;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import javax.ws.rs.ext.ContextResolver;
 import javax.ws.rs.ext.MessageBodyReader;
@@ -354,6 +353,9 @@ public final class WebApplicationImpl implements WebApplication {
     }
 
     private ResourceClass getResourceClass(AbstractResource ar) {
+        if (metaClassMap.containsKey(ar.getResourceClass()))
+            return metaClassMap.get(ar.getResourceClass());
+        
         ResourceClass rc = newResourceClass(ar);
         metaClassMap.put(ar.getResourceClass(), rc);
         rc.init(rcpFactory);
@@ -762,56 +764,67 @@ public final class WebApplicationImpl implements WebApplication {
         return context;
     }
 
-    private void ensureTemplateUnused(UriTemplate t, AbstractResource ar, Set<UriTemplate> templates) {
+    private void ensureTemplateUnused(UriTemplate t, Class<?> c, Set<UriTemplate> templates) {
         if (!templates.contains(t)) {
             templates.add(t);
         } else {
-            LOGGER.severe(ImplMessages.AMBIGUOUS_RR_PATH(ar.getResourceClass(), t));
-            throw new ContainerException(ImplMessages.AMBIGUOUS_RR_PATH(ar.getResourceClass(), t));
+            LOGGER.severe(ImplMessages.AMBIGUOUS_RR_PATH(c, t));
+            throw new ContainerException(ImplMessages.AMBIGUOUS_RR_PATH(c, t));
         }
     }
 
     private RulesMap<UriRule> processRootResources() {
         Set<Class<?>> classes = resourceConfig.getRootResourceClasses();
+
         Set<Object> singletons = resourceConfig.getRootResourceSingletons();
-        if (classes.isEmpty() && singletons.isEmpty()) {
+
+        if (classes.isEmpty() && 
+                singletons.isEmpty() &&
+                resourceConfig.getExplicitRootResources().isEmpty()) {
             LOGGER.severe(ImplMessages.NO_ROOT_RES_IN_RES_CFG());
             throw new ContainerException(ImplMessages.NO_ROOT_RES_IN_RES_CFG());
         }
 
 
-        // Create the set of abstract root resources
+        Map<Class<?>, AbstractResource> rootResourcesMap =
+                new HashMap<Class<?>, AbstractResource>();
+        Set<AbstractResource> rootResourcesSet =
+                new HashSet<AbstractResource>();
 
-        Map<Class<?>, AbstractResource> rootResourcesMap = new HashMap<Class<?>, AbstractResource>();
+        // Add declared singleton instances of root resource classes
         for (Object o : singletons) {
-            rootResourcesMap.put(o.getClass(), getAbstractResource(o));
+            AbstractResource ar = getAbstractResource(o);
+            rootResourcesMap.put(o.getClass(), ar);
+            rootResourcesSet.add(ar);
         }
 
+        // Add declared root resource classes
         for (Class<?> c : classes) {
-            // TODO this should be moved to the validation
-            // as such classes are not root resource classes
-            int modifiers = c.getModifiers();
-            if (Modifier.isAbstract(modifiers) && !Modifier.isInterface(modifiers)) {
-                LOGGER.warning("The " + c + ", registered as a root resource class " +
-                        "of the ResourceConfig cannot be instantiated" +
-                        ". This class will be ignored");
-                continue;
-            } else if (Modifier.isInterface(modifiers)) {
-                LOGGER.warning("The " + c + ", registered as a root resource class " +
-                        "of the ResourceConfig cannot be instantiated" +
-                        ". This interface will be ignored");
-                continue;
+            AbstractResource ar = getAbstractResource(c);
+            rootResourcesMap.put(c, ar);
+            rootResourcesSet.add(ar);
+        }
+        
+        // Add explicit declared root resource classes
+        Map<String, AbstractResource> explicitRootResources = new HashMap<String, AbstractResource>();
+        for (Map.Entry<String, Object> e : resourceConfig.getExplicitRootResources().entrySet()) {
+            Object o = e.getValue();
+            Class c = (o instanceof Class) ? (Class)o : o.getClass();
+
+            AbstractResource ar = rootResourcesMap.get(c);
+            if (ar == null) {
+                ar = getAbstractResource(c);
+                rootResourcesMap.put(c, ar);
             }
 
-            rootResourcesMap.put(c, getAbstractResource(c));
+            ar = new AbstractResource(e.getKey(), ar);
+            rootResourcesSet.add(ar);
+            explicitRootResources.put(e.getKey(), ar);
         }
 
-        Set<AbstractResource> rootResources = new HashSet<AbstractResource>();
-        for (Map.Entry<Class<?>, AbstractResource> e : rootResourcesMap.entrySet()) {
-            rootResources.add(e.getValue());
-        }
 
-        initWadl(rootResources, wadlFactory);
+        // Initiate the WADL with the root resources
+        initWadl(rootResourcesSet, wadlFactory);
 
 
         RulesMap<UriRule> rulesMap = new RulesMap<UriRule>();
@@ -819,6 +832,7 @@ public final class WebApplicationImpl implements WebApplication {
         // need to validate possible conflicts in uri templates
         Set<UriTemplate> uriTemplatesUsed = new HashSet<UriTemplate>();
 
+        // Process singleton instances of root resource classes
         for (Object o : singletons) {
             ComponentInjector ci = new ComponentInjector(injectableFactory, o.getClass());
             ci.inject(o);
@@ -827,7 +841,7 @@ public final class WebApplicationImpl implements WebApplication {
 
             UriTemplate t = new PathTemplate(ar.getPath().getValue());
 
-            ensureTemplateUnused(t, ar, uriTemplatesUsed);
+            ensureTemplateUnused(t, o.getClass(), uriTemplatesUsed);
 
             PathPattern p = new PathPattern(t);
 
@@ -839,28 +853,14 @@ public final class WebApplicationImpl implements WebApplication {
                         t.endsWithSlash(),
                         new ResourceObjectRule(t, o)));
         }
-        
-        for (Class<?> c : classes) {
-            // TODO this should be moved to the validation
-            // as such classes are not root resource classes
-            int modifiers = c.getModifiers();
-            if (Modifier.isAbstract(modifiers) && !Modifier.isInterface(modifiers)) {
-                LOGGER.warning("The " + c + ", registered as a root resource class " +
-                        "of the ResourceConfig cannot be instantiated" +
-                        ". This class will be ignored");
-                continue;
-            } else if (Modifier.isInterface(modifiers)) {
-                LOGGER.warning("The " + c + ", registered as a root resource class " +
-                        "of the ResourceConfig cannot be instantiated" +
-                        ". This interface will be ignored");
-                continue;
-            }
 
+        // Process root resource classes
+        for (Class<?> c : classes) {
             AbstractResource ar = rootResourcesMap.get(c);
 
             UriTemplate t = new PathTemplate(ar.getPath().getValue());
             
-            ensureTemplateUnused(t, ar, uriTemplatesUsed);
+            ensureTemplateUnused(t, c, uriTemplatesUsed);
 
             PathPattern p = new PathPattern(t);
 
@@ -873,10 +873,50 @@ public final class WebApplicationImpl implements WebApplication {
                     new ResourceClassRule(t, c)));
         }
 
+        // Process explicit root resources
+        for (Map.Entry<String, Object> e : resourceConfig.getExplicitRootResources().entrySet()) {
+            String path = e.getKey();
+            Object o = e.getValue();
+            if (o instanceof Class) {
+                Class c = (Class)o;
+                UriTemplate t = new PathTemplate(path);
+
+                ensureTemplateUnused(t, c, uriTemplatesUsed);
+
+                PathPattern p = new PathPattern(t);
+
+                // Configure meta-data
+                getResourceClass(explicitRootResources.get(path));
+
+                rulesMap.put(p, new RightHandPathRule(
+                        resourceConfig.getFeature(ResourceConfig.FEATURE_REDIRECT),
+                        t.endsWithSlash(),
+                        new ResourceClassRule(t, c)));
+            } else {
+                ComponentInjector ci = new ComponentInjector(injectableFactory, o.getClass());
+                ci.inject(o);
+
+                UriTemplate t = new PathTemplate(path);
+
+                ensureTemplateUnused(t, o.getClass(), uriTemplatesUsed);
+
+                PathPattern p = new PathPattern(t);
+
+                // Configure meta-data
+                getResourceClass(explicitRootResources.get(path));
+
+                rulesMap.put(p, new RightHandPathRule(
+                            resourceConfig.getFeature(ResourceConfig.FEATURE_REDIRECT),
+                            t.endsWithSlash(),
+                            new ResourceObjectRule(t, o)));
+            }
+        }
+
         initWadlResource(rulesMap);
         
         return rulesMap;
     }
+
 
     private void initWadl(Set<AbstractResource> rootResources,
             WadlFactory wadlFactory) {

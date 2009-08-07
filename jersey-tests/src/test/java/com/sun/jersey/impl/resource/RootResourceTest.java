@@ -48,7 +48,6 @@ import javax.ws.rs.GET;
  *
  * @author Paul.Sandoz@Sun.Com
  */
-@SuppressWarnings("unchecked")
 public class RootResourceTest extends AbstractResourceTester {
     
     public RootResourceTest(String testName) {

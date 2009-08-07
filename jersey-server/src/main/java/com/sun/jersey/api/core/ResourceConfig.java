@@ -278,7 +278,9 @@ public abstract class ResourceConfig extends Application implements FeaturesAndP
      * <p>is equivalent to:</p>
      * <pre>GET /resource
      *Accept: application/atom+xml</pre>
-     * <p>The default implementation returns an empty map.</p>
+     * <p>
+     * The default implementation returns an empty map.
+     *
      * @return a map of file extension to media type
      */
     public Map<String, MediaType> getMediaTypeMappings() {
@@ -292,13 +294,41 @@ public abstract class ResourceConfig extends Application implements FeaturesAndP
      * <p>is equivalent to:</p>
      * <pre>GET /resource
      *Accept-Language: en</pre>
-     * <p>The default implementation returns an empty map.</p>
+     * <p>
+     * The default implementation returns an empty map.
+     * 
      * @return a map of file extension to language
      */
     public Map<String, String> getLanguageMappings() {
         return Collections.emptyMap();
     }
-    
+
+    /**
+     * Get a map of explicit root resource classes and root resource singleton
+     * instances. The default lifecycle for root resource class instances is
+     * per-request.
+     * <p>
+     * The root resource path template is declared using the key in the map. This
+     * is a substitute for the declaration of a {@link Path} annotation on a root
+     * resource class or singleton instance. The key has the same semantics as the
+     * {@link Path#value() }. If such a {@link Path} annotation is present
+     * it will be ignored.
+     * <p>
+     * For example, the following will register two root resources, first
+     * a root resource class at the path "class" and a root resource singleton
+     * at the path "singleton":
+     * <blockquote><pre>
+     *     getExplicitRootResources().put("class", RootResourceClass.class);
+     *     getExplicitRootResources().put("singleton", new RootResourceSingleton());
+     * </pre></blockquote>
+     *
+     * @return a map of explicit root resource classes and root resource 
+     *         singleton instances.
+     */
+    public Map<String, Object> getExplicitRootResources() {
+        return Collections.emptyMap();
+    }
+
     /**
      * Validate the set of classes and singletons.
      * <p>
@@ -370,14 +400,14 @@ public abstract class ResourceConfig extends Application implements FeaturesAndP
                     "more than one instance of the same root resource class");
         }
     }
-    
+
     /**
      * Get the set of root resource classes.
      * <p>
      * A root resource class is a registered class that is annotated with
      * Path.
      * 
-     * @return the unmodifiable set of root resource classes.
+     * @return the set of root resource classes.
      */
     public Set<Class<?>> getRootResourceClasses() {
         Set<Class<?>> s = new LinkedHashSet<Class<?>>();
@@ -387,7 +417,7 @@ public abstract class ResourceConfig extends Application implements FeaturesAndP
                 s.add(c);
         }
         
-        return Collections.unmodifiableSet(s);
+        return s;
     }
 
     /**
@@ -396,7 +426,7 @@ public abstract class ResourceConfig extends Application implements FeaturesAndP
      * A provider class is a registered class that is not annotated with
      * Path.
      * 
-     * @return the unmodifiable set of provider classes.
+     * @return the set of provider classes.
      */
     public Set<Class<?>> getProviderClasses() {
         Set<Class<?>> s = new LinkedHashSet<Class<?>>();
@@ -406,7 +436,7 @@ public abstract class ResourceConfig extends Application implements FeaturesAndP
                 s.add(c);
         }
         
-        return Collections.unmodifiableSet(s);
+        return s;
     }
 
     /**
@@ -415,7 +445,7 @@ public abstract class ResourceConfig extends Application implements FeaturesAndP
      * A root resource singleton instance is a registered instance whose class
      * is annotated with Path.
      * 
-     * @return the unmodifiable set of root resource singleton instances.
+     * @return the set of root resource singleton instances.
      */
     public Set<Object> getRootResourceSingletons() {
         Set<Object> s = new LinkedHashSet<Object>();
@@ -425,7 +455,7 @@ public abstract class ResourceConfig extends Application implements FeaturesAndP
                 s.add(o);
         }
         
-        return Collections.unmodifiableSet(s);
+        return s;
     }
     
     /**
@@ -434,7 +464,7 @@ public abstract class ResourceConfig extends Application implements FeaturesAndP
      * A provider singleton instances is a registered instance whose class
      * is not annotated with Path.
      * 
-     * @return the unmodifiable set of provider singleton instances.
+     * @return the set of provider singleton instances.
      */
     public Set<Object> getProviderSingletons() {
         Set<Object> s = new LinkedHashSet<Object>();
@@ -444,7 +474,7 @@ public abstract class ResourceConfig extends Application implements FeaturesAndP
                 s.add(o);
         }
         
-        return Collections.unmodifiableSet(s);
+        return s;
     }
 
     /**

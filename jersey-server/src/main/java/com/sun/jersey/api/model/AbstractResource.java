@@ -82,6 +82,27 @@ public class AbstractResource implements PathAnnotated, AbstractModelComponent, 
         this.preDestroyMethods = new ArrayList<Method>(1);
     }
 
+    /**
+     * Create a new instance from an existing AbstractResource but
+     * defining a new path.
+     *
+     * @param path the path.
+     * @param ar the existing abstract resource.
+     */
+    public AbstractResource(String path, AbstractResource ar) {
+        this.uriPath = new PathValue(path);
+
+        this.resourceClass = ar.resourceClass;
+        this.constructors = ar.constructors;
+        this.fields = ar.fields;
+        this.setterMethods = ar.setterMethods;
+        this.resourceMethods = ar.resourceMethods;
+        this.subResourceMethods = ar.subResourceMethods;
+        this.subResourceLocators = ar.subResourceLocators;
+        this.postConstructMethods = ar.postConstructMethods;
+        this.preDestroyMethods = ar.preDestroyMethods;
+    }
+
     public Class<?> getResourceClass() {
         return resourceClass;
     }

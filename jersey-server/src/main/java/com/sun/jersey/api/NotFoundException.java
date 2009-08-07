@@ -39,7 +39,6 @@ package com.sun.jersey.api;
 
 import java.net.URI;
 import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.core.Response;
 
 /**
  * A HTTP 404 (Not Found) exception.
@@ -83,7 +82,7 @@ public class NotFoundException extends WebApplicationException {
      * @param notFoundUri the URI that cannot be found.
      */
     public NotFoundException(String message, URI notFoundUri) {
-        super(Response.status(Responses.NOT_FOUND).
+        super(Responses.notFound().
                 entity(message).type("text/plain").build());
         this.notFoundUri = notFoundUri;
     }

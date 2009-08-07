@@ -1,4 +1,7 @@
 release 1.1.2-ea (2009-09)
+- Support for explcitly adding a root resource class or root resource singleton
+  by programatically declaring the root path, rather than using the @Path
+  annotation. See ResourceConfig.getExplicitRootResources for more details.
 - Support the throwing of WebApplicationException from within a singleton
   or stateless session bean method. This will only work with GF v3 build 58
   or greater.
