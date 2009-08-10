@@ -58,16 +58,16 @@ public class HeadTest extends AbstractResourceTester {
     }
 
     @Path("/")
-    static public class ResourceGetNoHead { 
+    static public class ResourceGetNoHead {
         @GET
         public String get() {
             return "GET";
         }
     }
-        
+
     public void testGetNoHead() {
         initiateWebApplication(ResourceGetNoHead.class);
-        
+
         ClientResponse response = resource("/", false).
                 head();
         assertEquals(200, response.getStatus());
@@ -75,120 +75,120 @@ public class HeadTest extends AbstractResourceTester {
         assertEquals(MediaType.TEXT_PLAIN_TYPE, response.getType());
         assertFalse(response.hasEntity());
     }
-    
+
     @Path("/")
-    static public class ResourceGetWithHead { 
+    static public class ResourceGetWithHead {
         @HEAD
         public Response head() {
             return Response.ok().header("X-TEST", "HEAD").build();
         }
-        
+
         @GET
         public Response get() {
             return Response.ok("GET").header("X-TEST", "GET").build();
         }
     }
-    
+
     public void testGetWithHead() {
         initiateWebApplication(ResourceGetWithHead.class);
-        
+
         ClientResponse response = resource("/", false).
                 head();
         assertEquals(200, response.getStatus());
         assertFalse(response.hasEntity());
         assertEquals("HEAD", response.getMetadata().getFirst("X-TEST"));
     }
-    
+
     @Path("/")
-    static public class ResourceGetWithProduceNoHead { 
+    static public class ResourceGetWithProduceNoHead {
         @GET
         @Produces("application/foo")
         public String getFoo() {
             return "FOO";
         }
-        
+
         @GET
         @Produces("application/bar")
         public String getBar() {
             return "BAR";
         }
     }
-    
+
     public void testGetWithProduceNoHead() {
         initiateWebApplication(ResourceGetWithProduceNoHead.class);
         WebResource r = resource("/", false);
-        
+
         MediaType foo = MediaType.valueOf("application/foo");
         ClientResponse response = r.accept(foo).head();
         assertEquals(200, response.getStatus());
         assertFalse(response.hasEntity());
         assertEquals(foo, response.getType());
-        
+
         MediaType bar = MediaType.valueOf("application/bar");
         response = r.accept(bar).head();
         assertEquals(200, response.getStatus());
         assertFalse(response.hasEntity());
         assertEquals(bar, response.getType());
     }
-    
+
     @Path("/")
-    static public class ResourceGetWithProduceWithHead { 
-        
+    static public class ResourceGetWithProduceWithHead {
+
         @HEAD
         @Produces("application/foo")
         public Response headFoo() {
             return Response.ok().header("X-TEST", "FOO-HEAD").build();
         }
-        
+
         @GET
         @Produces("application/foo")
         public Response getFoo() {
             return Response.ok("GET","application/foo").header("X-TEST", "FOO-GET").build();
         }
-                
+
         @HEAD
         @Produces("application/bar")
         public Response headBar() {
             return Response.ok().header("X-TEST", "BAR-HEAD").build();
         }
-        
+
         @GET
         @Produces("application/bar")
         public Response getBar() {
             return Response.ok("GET").header("X-TEST", "BAR-GET").build();
         }
     }
-    
+
     public void testGetWithProduceWithHead() {
         initiateWebApplication(ResourceGetWithProduceWithHead.class);
         WebResource r = resource("/", false);
-        
+
         MediaType foo = MediaType.valueOf("application/foo");
         ClientResponse response = r.accept(foo).head();
         assertEquals(200, response.getStatus());
         assertFalse(response.hasEntity());
         assertEquals(foo, response.getType());
         assertEquals("FOO-HEAD", response.getMetadata().getFirst("X-TEST").toString());
-        
+
         MediaType bar = MediaType.valueOf("application/bar");
         response = r.accept(bar).head();
         assertEquals(200, response.getStatus());
         assertFalse(response.hasEntity());
-        assertEquals(bar, response.getType());        
+        assertEquals(bar, response.getType());
         assertEquals("BAR-HEAD", response.getMetadata().getFirst("X-TEST").toString());
     }
-    
+
     @Path("/")
-    static public class ResourceGetByteNoHead { 
+    static public class ResourceGetByteNoHead {
         @GET
         public byte[] get() {
             return "GET".getBytes();
         }
     }
-        
+
     public void testGetByteNoHead() {
         initiateWebApplication(ResourceGetByteNoHead.class);
-        
+
         ClientResponse response = resource("/", false).
                 head();
         assertEquals(200, response.getStatus());
@@ -199,4 +199,35 @@ public class HeadTest extends AbstractResourceTester {
         assertFalse(response.hasEntity());
     }
     
+
+    @Path("/")
+    static public class ResourceGetWithNoProduces {
+        @GET
+        public Response getPlain() {
+           return Response.ok("text").header("x-value", "text").
+                   build();
+        }
+
+        @GET
+        @Produces("text/html")
+        public Response getHtml() {
+           return Response.ok("html").header("x-value", "html").
+                   build();
+        }
+    }
+
+    public void testResourceXXX() {
+        initiateWebApplication(ResourceGetWithNoProduces.class);
+
+        WebResource r = resource("/");
+
+        ClientResponse cr = r.accept("text/plain").head();
+        assertEquals(200, cr.getStatus());
+        assertEquals("text", cr.getHeaders().getFirst("x-value"));
+
+        cr = r.accept("text/html").head();
+        assertEquals(200, cr.getStatus());
+        assertEquals("html", cr.getHeaders().getFirst("x-value"));
+    }
+
 }

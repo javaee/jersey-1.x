@@ -1,9 +1,9 @@
 /*
  *
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
- * 
+ *
  * Copyright 1997-2007 Sun Microsystems, Inc. All rights reserved.
- * 
+ *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
  * and Distribution License("CDDL") (collectively, the "License").  You
@@ -11,7 +11,7 @@
  * a copy of the License at https://jersey.dev.java.net/CDDL+GPL.html
  * or jersey/legal/LICENSE.txt.  See the License for the specific
  * language governing permissions and limitations under the License.
- * 
+ *
  * When distributing the software, include this License Header Notice in each
  * file and include the License file at jersey/legal/LICENSE.txt.
  * Sun designates this particular file as subject to the "Classpath" exception
@@ -20,9 +20,9 @@
  * Header, with the fields enclosed by brackets [] replaced by your own
  * identifying information: "Portions Copyrighted [year]
  * [name of copyright owner]"
- * 
+ *
  * Contributor(s):
- * 
+ *
  * If you wish your version of this file to be governed by only the CDDL or
  * only the GPL Version 2, indicate your decision by adding "[Contributor]
  * elects to include this software in this distribution under the [CDDL or GPL
@@ -58,18 +58,18 @@ import javax.ws.rs.core.MediaType;
 
 /**
  * The rule for accepting an HTTP method.
- * 
+ *
  * @author Paul.Sandoz@Sun.Com
  */
 public final class HttpMethodRule implements UriRule {
     private final Map<String, ResourceMethodListPair> map;
-    
+
     private final List<QualitySourceMediaType> priorityMediaTypes;
 
     private final String allow;
-            
+
     private final boolean isSubResource;
-    
+
     public HttpMethodRule(
             Map<String, List<ResourceMethod>> methods,
             List<QualitySourceMediaType> priorityMediaTypes) {
@@ -124,17 +124,17 @@ public final class HttpMethodRule implements UriRule {
         this.isSubResource = isSubResource;
         this.allow = getAllow(methods);
     }
-    
+
     private String getAllow(Map<String, List<ResourceMethod>> methods) {
         StringBuilder s = new StringBuilder();
         boolean first = true;
         for (String method : methods.keySet()) {
             if (!first) s.append(",");
             first = false;
-            
+
             s.append(method);
         }
-        
+
         return s.toString();
     }
 
@@ -144,10 +144,10 @@ public final class HttpMethodRule implements UriRule {
 
         // If the path is not empty then do not accept
         if (path.length() > 0) return false;
-        
+
         final HttpRequestContext request = context.getRequest();
         final HttpResponseContext response = context.getResponse();
-        
+
         // Get the list of resource methods for the HTTP method
         ResourceMethodListPair methods = map.get(request.getMethod());
         if (methods == null) {
@@ -159,7 +159,7 @@ public final class HttpMethodRule implements UriRule {
         }
 
         // Get the list of matching methods
-        List<MediaType> accept = (priorityMediaTypes == null) 
+        List<MediaType> accept = (priorityMediaTypes == null)
                 ? request.getAcceptableMediaTypes()
                 : request.getAcceptableMediaTypes(priorityMediaTypes);
 
@@ -183,11 +183,11 @@ public final class HttpMethodRule implements UriRule {
                 // Should the viewable rule be responsible for those declared on
                 // the class
             }
-            
+
             // If a sub-resource method then need to push the resource
             // (again) as as to keep in sync with the ancestor URIs
             if (isSubResource) {
-                context.pushResource(resource);        
+                context.pushResource(resource);
                 // Set the template values
                 context.pushMatch(method.getTemplate(), method.getTemplate().getTemplateVariables());
             }
@@ -228,14 +228,14 @@ public final class HttpMethodRule implements UriRule {
             // Allow any further matching rules to be processed
             return false;
         }
-        
+
         return true;
     }
 
     private enum MatchStatus {
         MATCH, NO_MATCH_FOR_CONSUME, NO_MATCH_FOR_PRODUCE
     }
-    
+
     private static class Matcher extends LinkedList<ResourceMethod> {
         private MediaType mSelected = null;
 

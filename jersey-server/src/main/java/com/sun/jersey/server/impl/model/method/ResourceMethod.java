@@ -127,7 +127,7 @@ public abstract class ResourceMethod {
     }
     
     public final List<MediaType> getConsumes() {
-        return produceMime;
+        return consumeMime;
     }
     
     public final List<MediaType> getProduces() {
