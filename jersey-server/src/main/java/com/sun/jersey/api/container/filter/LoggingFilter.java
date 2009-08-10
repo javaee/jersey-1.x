@@ -38,6 +38,7 @@ package com.sun.jersey.api.container.filter;
 
 import com.sun.jersey.api.container.ContainerException;
 import com.sun.jersey.api.core.HttpContext;
+import com.sun.jersey.api.core.ResourceConfig;
 import com.sun.jersey.spi.container.ContainerRequest;
 import com.sun.jersey.spi.container.ContainerRequestFilter;
 import com.sun.jersey.spi.container.ContainerResponse;
@@ -48,9 +49,9 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.io.PrintStream;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Logger;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MultivaluedMap;
 
@@ -72,155 +73,166 @@ import javax.ws.rs.core.MultivaluedMap;
  *         &lt;param-value&gt;com.sun.jersey.api.container.filter.LoggingFilter&lt;/param-value&gt;
  *     &lt;/init-param&gt;
  * </pre></blockquote>
+ * <p>
+ * The logging of entities may be disabled by setting the feature
+ * {@link #FEATURE_LOGGING_DISABLE_ENTITY} to true. When an application is
+ * deployed as a Servlet or Filter this Jersey filter can be
+ * registered using the following initialization parameter:
+ * <blockquote><pre>
+ *     &lt;init-param&gt;
+ *         &lt;param-name&gt;com.sun.jersey.config.feature.logging.DisableEntitylogging&lt;/param-name&gt;
+ *         &lt;param-value&gt;true&lt;/param-value&gt;
+ *     &lt;/init-param&gt
+ * </pre></blockquote>
  *
  * @author Paul.Sandoz@Sun.Com
  * @see com.sun.jersey.api.container.filter
  */
 public class LoggingFilter implements ContainerRequestFilter, ContainerResponseFilter {
+    /**
+     * If true the request and response entities (if present) will not be logged.
+     * If false the request and response entities will be logged.
+     * <p>
+     * The default value is false.
+     */
+    public static final String FEATURE_LOGGING_DISABLE_ENTITY
+            = "com.sun.jersey.config.feature.logging.DisableEntitylogging";
+
+    private static final Logger LOGGER = Logger.getLogger(LoggingFilter.class.getName());
+
     private static final String NOTIFICATION_PREFIX = "* ";
     
     private static final String REQUEST_PREFIX = "> ";
     
     private static final String RESPONSE_PREFIX = "< ";
 
+    private final Logger logger;
+
     private @Context HttpContext hc;
     
+    private @Context ResourceConfig rc;
+
     private long id = 0;
 
-    private final PrintStream loggingStream;
-    
     public LoggingFilter() {
-        this(System.out);
+        this(LOGGER);
     }
-    
-    public LoggingFilter(PrintStream loggingStream) {
-        this.loggingStream = loggingStream;
+
+    /**
+     * Create a logging filter with a specified logger.
+     *
+     * @param logger the logger to log the requests and responses.
+     */
+    public LoggingFilter(Logger logger) {
+        this.logger = logger;
     }
 
     private synchronized void setId() {
         hc.getProperties().put("request-id", Long.toString(++id));
     }
 
-    private PrintStream prefixId() {
-        loggingStream.append(hc.getProperties().get("request-id").toString()).
+    private StringBuilder prefixId(StringBuilder b) {
+        b.append(hc.getProperties().get("request-id").toString()).
                 append(" ");
-        return loggingStream;
+        return b;
     }
     
     public ContainerRequest filter(ContainerRequest request) {
         setId();
-        printRequestLine(request);
-        printRequestHeaders(request.getRequestHeaders());
-        
-        ByteArrayOutputStream out = new ByteArrayOutputStream();
-        InputStream in = request.getEntityInputStream();
-        try {
-            int read;
-            final byte[] data = new byte[2048];
-            while ((read = in.read(data)) != -1)
-                out.write(data, 0, read);
 
-            byte[] requestEntity = out.toByteArray();
-            printRequestEntity(requestEntity);
-            request.setEntityInputStream(new ByteArrayInputStream(requestEntity));
+        final StringBuilder b = new StringBuilder();
+        printRequestLine(b, request);
+        printRequestHeaders(b, request.getRequestHeaders());
+
+        if (rc.getFeature(FEATURE_LOGGING_DISABLE_ENTITY)) {
+            logger.info(b.toString());
             return request;
-        } catch (IOException ex) {
-            throw new ContainerException(ex);
-        }
+        } else {
+            ByteArrayOutputStream out = new ByteArrayOutputStream();
+            InputStream in = request.getEntityInputStream();
+            try {
+                int read;
+                final byte[] data = new byte[2048];
+                while ((read = in.read(data)) != -1)
+                    out.write(data, 0, read);
 
+                byte[] requestEntity = out.toByteArray();
+                printEntity(b, requestEntity);
+
+                request.setEntityInputStream(new ByteArrayInputStream(requestEntity));
+                return request;
+            } catch (IOException ex) {
+                throw new ContainerException(ex);
+            } finally {
+                logger.info(b.toString());
+            }
+        }
     }
     
-    private void printRequestLine(ContainerRequest request) {
-        prefixId().append(NOTIFICATION_PREFIX).append("In-bound request received").println();
-        prefixId().append(REQUEST_PREFIX).append(request.getMethod()).append(" ").
-                append(request.getRequestUri().toASCIIString()).println();
+    private void printRequestLine(StringBuilder b, ContainerRequest request) {
+        prefixId(b).append(NOTIFICATION_PREFIX).append("In-bound request received").append('\n');
+        prefixId(b).append(REQUEST_PREFIX).append(request.getMethod()).append(" ").
+                append(request.getRequestUri().toASCIIString()).append('\n');
     }
     
-    private void printRequestHeaders(MultivaluedMap<String, String> headers) {
+    private void printRequestHeaders(StringBuilder b, MultivaluedMap<String, String> headers) {
         for (Map.Entry<String, List<String>> e : headers.entrySet()) {
             String header = e.getKey();
             for (String value : e.getValue()) {
-                prefixId().append(REQUEST_PREFIX).append(header).append(": ").
-                        append(value).println();                
+                prefixId(b).append(REQUEST_PREFIX).append(header).append(": ").
+                        append(value).append('\n');
             }
         }
-        prefixId().println("> ");
+        prefixId(b).append(REQUEST_PREFIX).append('\n');
     }
 
-    private void printRequestEntity(byte[] requestEntity) throws IOException {
-        if (requestEntity.length == 0)
+    private void printEntity(StringBuilder b, byte[] entity) throws IOException {
+        if (entity.length == 0)
             return;
-        loggingStream.write(requestEntity);
-        loggingStream.println();        
-    }
-
-    private final class LoggingOutputStream extends OutputStream {
-        private boolean init = false;
-        private OutputStream out;
-
-        LoggingOutputStream(OutputStream out) {
-            this.out = out;
-        }
-        
-        @Override
-        public void write(byte[] b)  throws IOException {
-            init();
-            loggingStream.write(b);
-            out.write(b);
-        }
-    
-        @Override
-        public void write(byte[] b, int off, int len)  throws IOException {
-            init();
-            loggingStream.write(b, off, len);
-            out.write(b, off, len);
-        }
-
-        @Override
-        public void write(int b) throws IOException {
-            init();
-            loggingStream.write(b);
-            out.write(b);
-        }
-
-        @Override
-        public void close() throws IOException {
-            finish();
-            out.close();
-        }
-        
-        private final void init() {
-            if (init == false) {
-                init = true;
-            }
-        }
-        
-        private final void finish() {
-            if (init) {
-                loggingStream.println();
-                prefixId().append(NOTIFICATION_PREFIX).
-                        append("Out-bound response sent").println();
-                init = false;
-            }            
-        }
+        b.append(new String(entity)).append("\n");
     }
 
     private final class Adapter implements ContainerResponseWriter {
         private final ContainerResponseWriter crw;
-        private LoggingOutputStream out;
+
+        private final boolean disableEntity;
+
+        private ContainerResponse response;
+
+        private ByteArrayOutputStream baos;
+
+        private StringBuilder b = new StringBuilder();
 
         Adapter(ContainerResponseWriter crw) {
             this.crw = crw;
+            this.disableEntity = rc.getFeature(FEATURE_LOGGING_DISABLE_ENTITY);
         }
         
         public OutputStream writeStatusAndHeaders(long contentLength, ContainerResponse response) throws IOException {
-           printResponseLine(response);
-           printResponseHeaders(response.getHttpHeaders());           
-           return out = new LoggingOutputStream(crw.writeStatusAndHeaders(-1, response));
+            printResponseLine(b, response);
+            printResponseHeaders(b, response.getHttpHeaders());
+
+            if (disableEntity) {
+                logger.info(b.toString());
+                return crw.writeStatusAndHeaders(-1, response);
+            } else {
+                this.response = response;
+                return this.baos = new ByteArrayOutputStream();
+            }
         }
 
         public void finish() throws IOException {
-            out.finish();
+            if (!disableEntity) {
+                byte[] entity = baos.toByteArray();
+                printEntity(b, entity);
+
+                // Output to log
+                logger.info(b.toString());
+
+                // Write out the headers and buffered entity
+                OutputStream out = crw.writeStatusAndHeaders(-1, response);
+                out.write(entity);
+            }
         }
     }
 
@@ -230,18 +242,20 @@ public class LoggingFilter implements ContainerRequestFilter, ContainerResponseF
         return response;
     }
     
-    private void printResponseLine(ContainerResponse response) {
-        prefixId().append(RESPONSE_PREFIX).append(Integer.toString(response.getStatus())).println();
+    private void printResponseLine(StringBuilder b, ContainerResponse response) {
+        prefixId(b).append(NOTIFICATION_PREFIX).
+            append("Out-bound response sent").append('\n');
+        prefixId(b).append(RESPONSE_PREFIX).append(Integer.toString(response.getStatus())).append('\n');
     }
     
-    private void printResponseHeaders(MultivaluedMap<String, Object> headers) {
+    private void printResponseHeaders(StringBuilder b, MultivaluedMap<String, Object> headers) {
         for (Map.Entry<String, List<Object>> e : headers.entrySet()) {
             String header = e.getKey();
             for (Object value : e.getValue()) {
-                prefixId().append(RESPONSE_PREFIX).append(header).append(": ").
-                        append(ContainerResponse.getHeaderValue(value)).println();                
+                prefixId(b).append(RESPONSE_PREFIX).append(header).append(": ").
+                        append(ContainerResponse.getHeaderValue(value)).append('\n');
             }
         }
-        prefixId().println(RESPONSE_PREFIX);
+        prefixId(b).append(RESPONSE_PREFIX).append('\n');
     } 
 }
