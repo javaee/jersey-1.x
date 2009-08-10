@@ -211,10 +211,9 @@ public class ContainerResponse implements HttpResponseContext {
      * will be found to write the entity.
      * 
      * @throws WebApplicationException if {@link MessageBodyWriter} cannot be 
-     *         found for the entity with a 406 (Not Acceptable) response.
+     *         found for the entity with a 500 (Internal Server error) response.
      * @throws java.io.IOException if there is an error writing the entity
      */
-    @SuppressWarnings("unchecked")
     public void write() throws IOException {
         if (isCommitted)
             return;        
@@ -243,16 +242,15 @@ public class ContainerResponse implements HttpResponseContext {
                 entity.getClass(), entityType, 
                 annotations, contentType);
         if (p == null) {
-            String message = "A message body writer for Java type, " + entity.getClass() + 
-                    ", and MIME media type, " + contentType + ", was not found";
-
-            LOGGER.severe(message);            
+            LOGGER.severe("A message body writer for Java type, " + entity.getClass() +
+                    ", and MIME media type, " + contentType + ", was not found");
+            
             if (request.getMethod().equals("HEAD")) {
                 responseWriter.writeStatusAndHeaders(-1, this);
                 responseWriter.finish();
                 return;
             } else {
-                throw new WebApplicationException(Response.serverError().entity(message).build());
+                throw new WebApplicationException(500);
             }
         }
 

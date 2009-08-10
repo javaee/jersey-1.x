@@ -108,7 +108,9 @@ public class JSONArrayProvider extends JSONLowLevelProvider<JSONArray>{
             writer.write("\n");
             writer.flush();
         } catch (JSONException je) {
-            throw ThrowHelper.withInitCause(je, new IOException(ImplMessages.ERROR_WRITING_JSON_ARRAY()));
+            throw new WebApplicationException(
+                    new Exception(ImplMessages.ERROR_WRITING_JSON_ARRAY(), je),
+                    500);
         }
     }
 }

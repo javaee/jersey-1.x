@@ -39,7 +39,6 @@ package com.sun.jersey.core.impl.provider.entity;
 
 import com.sun.jersey.core.provider.jaxb.AbstractJAXBProvider;
 import com.sun.jersey.impl.ImplMessages;
-import com.sun.jersey.core.util.ThrowHelper;
 import com.sun.jersey.spi.inject.Injectable;
 import java.io.IOException;
 import java.io.InputStream;
@@ -133,10 +132,8 @@ public class XMLRootObjectProvider extends AbstractJAXBProvider<Object> {
                     unmarshal(getSAXSource(spf.getValue(), entityStream));
         } catch (UnmarshalException ex) {
             throw new WebApplicationException(ex, 400);
-        } catch (JAXBException cause) {
-            throw ThrowHelper.withInitCause(cause,
-                    new IOException(ImplMessages.ERROR_UNMARSHALLING_JAXB(type))
-                    );
+        } catch (JAXBException ex) {
+            throw new WebApplicationException(ex, 500);
         }
     }
 

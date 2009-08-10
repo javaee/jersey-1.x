@@ -45,7 +45,9 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMultipart;
+import javax.mail.internet.ParseException;
 import javax.mail.util.ByteArrayDataSource;
+import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 
@@ -75,10 +77,10 @@ public final class MimeMultipartProvider extends AbstractMessageReaderWriterProv
         ByteArrayDataSource ds = new ByteArrayDataSource(entityStream, mediaType.toString());
         try {
             return new MimeMultipart(ds);
-        } catch (MessagingException cause) {
-            IOException effect = new IOException("Error reading entity as MimeMultipart");
-            effect.initCause(cause);
-            throw effect;
+        } catch (ParseException ex) {
+            throw new WebApplicationException(ex, 400);
+        } catch (MessagingException ex) {
+            throw new WebApplicationException(ex, 500);
         }
     }
 
@@ -98,9 +100,8 @@ public final class MimeMultipartProvider extends AbstractMessageReaderWriterProv
         try {
             // TODO put boundary string as parameter of media type?
             t.writeTo(entityStream);
-        } catch (MessagingException e) {
-            IOException io = new IOException("Error writing entity from MimeMultipart");
-            throw (IOException)io.initCause(e);
+        } catch (MessagingException ex) {
+            throw new WebApplicationException(ex, 500);
         }
     }
 }

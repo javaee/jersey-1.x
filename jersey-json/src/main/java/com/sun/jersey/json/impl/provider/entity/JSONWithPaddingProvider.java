@@ -124,7 +124,7 @@ public class JSONWithPaddingProvider extends AbstractMessageReaderWriterProvider
             } else {
                 LOGGER.severe(ImplMessages.ERROR_JSONP_MSG_BODY_WRITER_NOT_FOUND(jsonEntity, workerMediaType));
             }
-            throw new WebApplicationException();
+            throw new WebApplicationException(500);
         }
 
 

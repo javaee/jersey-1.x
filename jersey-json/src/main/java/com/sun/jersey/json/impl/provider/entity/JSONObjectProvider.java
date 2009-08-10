@@ -108,7 +108,9 @@ public class JSONObjectProvider extends JSONLowLevelProvider<JSONObject>{
             t.write(writer);
             writer.flush();
         } catch (JSONException je) {
-            throw ThrowHelper.withInitCause(je, new IOException(ImplMessages.ERROR_WRITING_JSON_OBJECT()));
+            throw new WebApplicationException(
+                    new Exception(ImplMessages.ERROR_WRITING_JSON_OBJECT(), je),
+                    500);
         }
     }
 }

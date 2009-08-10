@@ -404,8 +404,8 @@ public class ContainerRequest implements HttpRequestContext {
 
         try {
             return bw.readFrom(type, genericType, as, mediaType, headers, entity);
-        } catch (RuntimeException e) {
-            throw new MappableContainerException(e);
+        } catch (WebApplicationException ex) {
+            throw ex;
         } catch (Exception e) {
             throw new MappableContainerException(e);
         }

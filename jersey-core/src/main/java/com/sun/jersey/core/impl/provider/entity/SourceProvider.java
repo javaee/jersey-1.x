@@ -37,7 +37,6 @@
 
 package com.sun.jersey.core.impl.provider.entity;
 
-import com.sun.jersey.core.util.ThrowHelper;
 import com.sun.jersey.spi.inject.Injectable;
 import java.io.IOException;
 import java.io.InputStream;
@@ -46,6 +45,7 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.Produces;
+import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
@@ -64,6 +64,7 @@ import javax.xml.transform.stream.StreamSource;
 import org.w3c.dom.Document;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
+import org.xml.sax.SAXParseException;
 
 /**
  *
@@ -115,10 +116,12 @@ public final class SourceProvider {
             try {
                 return new SAXSource(spf.getValue().newSAXParser().getXMLReader(),
                         new InputSource(entityStream));
-            } catch (Exception ex) {
-                throw ThrowHelper.withInitCause(ex,
-                        new IOException("Error creating SAXSource")
-                        );
+            } catch (SAXParseException ex) {
+                throw new WebApplicationException(ex, 400);
+            } catch (SAXException ex) {
+                throw new WebApplicationException(ex, 500);
+            } catch (ParserConfigurationException ex) {
+                throw new WebApplicationException(ex, 500);
             }
         }
     }
@@ -148,10 +151,12 @@ public final class SourceProvider {
             try {
                 Document d = dbf.getValue().newDocumentBuilder().parse(entityStream);
                 return new DOMSource(d);
+            } catch (SAXParseException ex) {
+                throw new WebApplicationException(ex, 400);
             } catch (SAXException ex) {
-                throw getIOException(ex);
+                throw new WebApplicationException(ex, 500);
             } catch (ParserConfigurationException ex) {
-                throw getIOException(ex);
+                throw new WebApplicationException(ex, 500);
             }
         }
     }
@@ -184,8 +189,8 @@ public final class SourceProvider {
         public void writeTo(Source o, Class<?> t, Type gt, Annotation[] as, 
                 MediaType mediaType, MultivaluedMap<String, Object> httpHeaders, 
                 OutputStream entityStream) throws IOException {
-            try {
 
+            try {
                 if (o instanceof StreamSource) {
                     StreamSource s = (StreamSource)o;
                     InputSource is = new InputSource(s.getInputStream());
@@ -193,15 +198,13 @@ public final class SourceProvider {
                 }
                 StreamResult sr = new StreamResult(entityStream);
                 tf.getValue().newTransformer().transform(o, sr);
-            } catch (Exception ex) {
-                throw getIOException(ex);
+            } catch (SAXException ex) {
+                throw new WebApplicationException(ex, 500);
+            } catch (ParserConfigurationException ex) {
+                throw new WebApplicationException(ex, 500);
+            } catch (TransformerException ex) {
+                throw new WebApplicationException(ex, 500);
             }
         }        
     }
-    
-    private static IOException getIOException(Exception cause) throws IOException {
-        IOException e = new IOException();
-        e.initCause(cause);
-        return e;
-    }    
 }

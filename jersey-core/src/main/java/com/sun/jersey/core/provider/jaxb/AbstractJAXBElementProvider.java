@@ -37,8 +37,6 @@
 
 package com.sun.jersey.core.provider.jaxb;
 
-import com.sun.jersey.impl.ImplMessages;
-import com.sun.jersey.core.util.ThrowHelper;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -61,6 +59,16 @@ import javax.xml.bind.Unmarshaller;
  * <p>
  * Implementing classes may extend this class to provide specific marshalling
  * and unmarshalling behaviour.
+ * <p>
+ * When unmarshalling a {@link UnmarshalException} will result in a
+ * {@link WebApplicationException} being thrown with a status of 400
+ * (Client error), and a {@link JAXBException} will result in a
+ * {@link WebApplicationException} being thrown with a status of 500
+ * (Internal Server error).
+ * <p>
+ * When marshalling a {@link JAXBException} will result in a
+ * {@link WebApplicationException} being thrown with a status of 500
+ * (Internal Server error).
  *
  * @author Paul.Sandoz@Sun.Com
  */
@@ -95,10 +103,8 @@ public abstract class AbstractJAXBElementProvider extends AbstractJAXBProvider<J
             return readFrom(ta, mediaType, getUnmarshaller(ta, mediaType), entityStream);
         } catch (UnmarshalException ex) {
             throw new WebApplicationException(ex, 400);
-        } catch (JAXBException cause) {
-            throw ThrowHelper.withInitCause(cause,
-                    new IOException(ImplMessages.ERROR_UNMARSHALLING_JAXB(type))
-                    );
+        } catch (JAXBException ex) {
+            throw new WebApplicationException(ex, 500);
         }    
     }
 
@@ -122,10 +128,8 @@ public abstract class AbstractJAXBElementProvider extends AbstractJAXBProvider<J
                 m.setProperty(Marshaller.JAXB_ENCODING, c.name());
             }
             writeTo(t, mediaType, c, m, entityStream);
-        } catch (JAXBException cause) {
-            throw ThrowHelper.withInitCause(cause,
-                    new IOException(ImplMessages.ERROR_MARSHALLING_JAXB(t.getClass()))
-                    );
+        } catch (JAXBException ex) {
+            throw new WebApplicationException(ex, 500);
         }
     }
 

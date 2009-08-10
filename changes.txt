@@ -1,4 +1,12 @@
 release 1.1.2-ea (2009-09)
+- Cleaned up the throwing of exceptions by message body readers and writers.
+  If a known checked, or documented runtime, exception is thrown when
+  reading then a WebApplcationException is thrown with the cause. If the
+  exception is related to reading then a 400 (Client error) status code is
+  set, otherwise a 500 (Internal server error) status code is set.
+  If a known checked, or documented runtime, exception is thrown when
+  writing then a WebApplcationException is thrown with the cause and a 
+  500 (Internal server error) status code is set.
 - Fixed issue when a Content-Type request header is absent and resource methods
   consume (explicitly or by default) "*/*".
   When a Content-Type request header is absent resource methods that consume

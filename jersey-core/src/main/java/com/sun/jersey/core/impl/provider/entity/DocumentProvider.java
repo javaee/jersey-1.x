@@ -38,7 +38,6 @@
 package com.sun.jersey.core.impl.provider.entity;
 
 import com.sun.jersey.core.provider.AbstractMessageReaderWriterProvider;
-import com.sun.jersey.core.util.ThrowHelper;
 import com.sun.jersey.spi.inject.Injectable;
 import java.io.IOException;
 import java.io.InputStream;
@@ -53,6 +52,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
@@ -95,8 +95,7 @@ public final class DocumentProvider extends AbstractMessageReaderWriterProvider<
         } catch (SAXException ex) {
             throw new WebApplicationException(ex, 400);
         } catch (ParserConfigurationException ex) {
-            throw ThrowHelper.withInitCause(ex,
-                    new IOException());
+            throw new WebApplicationException(ex, 500);
         }
     }
 
@@ -115,8 +114,8 @@ public final class DocumentProvider extends AbstractMessageReaderWriterProvider<
         try {
             StreamResult sr = new StreamResult(entityStream);
             tf.getValue().newTransformer().transform(new DOMSource(t), sr);
-        } catch (Exception ex) {
-            ThrowHelper.withInitCause(ex, new IOException());
+        } catch (TransformerException ex) {
+            throw new WebApplicationException(ex, 500);
         }
     }
 }

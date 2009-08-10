@@ -186,7 +186,7 @@ public class MultiPartReader implements MessageBodyReader<MultiPart> {
 
                     bodyPart.getContentDisposition();
                 } catch (IllegalArgumentException ex) {
-                    throw new WebApplicationException(ex);
+                    throw new WebApplicationException(ex, 400);
                 }
                 
                 // Copy data into a BodyPartEntity structure
@@ -200,7 +200,7 @@ public class MultiPartReader implements MessageBodyReader<MultiPart> {
             
             return multiPart;
         } catch (MIMEParsingException ex) {
-            throw new WebApplicationException(ex);
+            throw new WebApplicationException(ex, 400);
         }
     }
 }
