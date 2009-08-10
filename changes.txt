@@ -1,4 +1,12 @@
 release 1.1.2-ea (2009-09)
+- Fixed issue when a Content-Type request header is absent and resource methods
+  consume (explicitly or by default) "*/*".
+  When a Content-Type request header is absent resource methods that consume
+  "*/*" take priority over other reosurce methods that consume other media
+  types. Thus "*/*" means consuming any media type or no media type.
+  See also com.sun.jersey.core.provider.EntityHolder to safely consume a
+  request entity if present, otherwise declare that such an entity is not
+  present.
 - Support for explcitly adding a root resource class or root resource singleton
   by programatically declaring the root path, rather than using the @Path
   annotation. See ResourceConfig.getExplicitRootResources for more details.

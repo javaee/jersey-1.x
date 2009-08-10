@@ -168,6 +168,14 @@ public abstract class ResourceMethod {
         return false;
     }
         
+    public final boolean consumesWild() {
+        for (MediaType c : consumeMime) {
+            if (c.getType().equals("*")) return true;
+        }
+
+        return false;
+    }
+
     public final boolean mediaEquals(ResourceMethod that) {
         boolean v = consumeMime.equals(that.consumeMime);
         if (v == false)

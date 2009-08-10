@@ -34,79 +34,52 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-package com.sun.jersey.impl.entity;
 
-import com.sun.jersey.api.client.WebResource;
-import com.sun.jersey.core.provider.EntityHolder;
+package com.sun.jersey.impl.resource;
+
+import com.sun.jersey.api.representation.Form;
 import com.sun.jersey.impl.AbstractResourceTester;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.MultivaluedMap;
 
 /**
  *
  * @author Paul.Sandoz@Sun.Com
  */
-public class EntityHolderTest extends AbstractResourceTester {
-    public EntityHolderTest(String testName) {
+public class PostTest extends AbstractResourceTester {
+    
+    public PostTest(String testName) {
         super(testName);
     }
-    
+
     @Path("/")
-    public static class EntityHolderResource {
-        @Path("string")
+    static public class PostResource {
         @POST
-        public String post(EntityHolder<String> s) {
-            if (s.hasEntity()) {
-                return s.getEntity();
-            } else {
-                return "EMPTY";
-            }
+        public String testMethod() {
+            return "noconsumes";
         }
 
-        @Path("jaxb")
-        @Consumes("application/xml")
-        @Produces("application/xml")
         @POST
-        public JAXBBean post2(EntityHolder<JAXBBean> s) {
-            if (s.hasEntity()) {
-                return s.getEntity();
-            } else {
-                return new JAXBBean("EMPTY");
-            }
+        @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+        public String formPostParameters(MultivaluedMap<String, String> params) {
+            return "form";
         }
-
     }
 
+    public void testNoConsumes() {
+        initiateWebApplication(PostResource.class);
 
-    public void testString() {
-        initiateWebApplication(EntityHolderResource.class);
-
-        WebResource r = resource("/");
-
-        String s = r.path("string").post(String.class);
-        assertEquals("EMPTY", s);
-
-        s = r.path("string").type("text/plain").post(String.class);
-        assertEquals("EMPTY", s);
-
-        s = r.path("string").post(String.class, "CONTENT");
-        assertEquals("CONTENT", s);
+        assertEquals("noconsumes", resource("/").post(String.class));
     }
 
-    public void testJAXB() {
-        initiateWebApplication(EntityHolderResource.class);
+    public void testForm() {
+        initiateWebApplication(PostResource.class);
 
-        WebResource r = resource("/");
-
-        JAXBBean b = r.path("jaxb").post(JAXBBean.class);
-        assertEquals("EMPTY", b.value);
-
-        b = r.path("jaxb").type("application/xml").post(JAXBBean.class);
-        assertEquals("EMPTY", b.value);
-
-        b = r.path("jaxb").post(JAXBBean.class, new JAXBBean("CONTENT"));
-        assertEquals("CONTENT", b.value);
+        Form f = new Form();
+        f.add("x", "y");
+        assertEquals("form", resource("/").type(MediaType.APPLICATION_FORM_URLENCODED).post(String.class, f));
     }
 }

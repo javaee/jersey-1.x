@@ -49,6 +49,8 @@ import com.sun.jersey.spi.container.ContainerRequest;
 import com.sun.jersey.spi.container.ContainerRequestFilter;
 import com.sun.jersey.spi.uri.rules.UriRule;
 import com.sun.jersey.spi.uri.rules.UriRuleContext;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -60,7 +62,7 @@ import javax.ws.rs.core.MediaType;
  * @author Paul.Sandoz@Sun.Com
  */
 public final class HttpMethodRule implements UriRule {
-    private final Map<String, List<ResourceMethod>> map;
+    private final Map<String, ResourceMethodListPair> map;
     
     private final List<QualitySourceMediaType> priorityMediaTypes;
 
@@ -73,12 +75,51 @@ public final class HttpMethodRule implements UriRule {
             List<QualitySourceMediaType> priorityMediaTypes) {
         this(methods, priorityMediaTypes, false);
     }
-          
+
+    private static class ResourceMethodListPair {
+        final List<ResourceMethod> normal;
+        final List<ResourceMethod> wildPriority;
+
+        ResourceMethodListPair(List<ResourceMethod> normal) {
+            this.normal = normal;
+            if (correctOrder(normal)) {
+                this.wildPriority = normal;
+            } else {
+                this.wildPriority = new ArrayList(normal.size());
+                int i = 0;
+                for (ResourceMethod method : normal) {
+                    if (method.consumesWild()) {
+                        wildPriority.add(i++, method);
+                    } else {
+                        wildPriority.add(method);
+                    }
+                }
+            }
+        }
+
+        boolean correctOrder(List<ResourceMethod> normal) {
+            boolean comsumesNonWild = false;
+            for (ResourceMethod method : normal) {
+                if (method.consumesWild()) {
+                    if (comsumesNonWild) return false;
+                } else {
+                    comsumesNonWild = true;
+                }
+            }
+
+            return true;
+        }
+    }
+
     public HttpMethodRule(
             Map<String, List<ResourceMethod>> methods,
             List<QualitySourceMediaType> priorityMediaTypes,
             boolean isSubResource) {
-        this.map = methods;
+        this.map = new HashMap<String, ResourceMethodListPair>();
+        for (Map.Entry<String, List<ResourceMethod>> e : methods.entrySet()) {
+           this.map.put(e.getKey(), new ResourceMethodListPair(e.getValue()));
+        }
+
         this.priorityMediaTypes = priorityMediaTypes;
         this.isSubResource = isSubResource;
         this.allow = getAllow(methods);
@@ -108,7 +149,7 @@ public final class HttpMethodRule implements UriRule {
         final HttpResponseContext response = context.getResponse();
         
         // Get the list of resource methods for the HTTP method
-        List<ResourceMethod> methods = map.get(request.getMethod());
+        ResourceMethodListPair methods = map.get(request.getMethod());
         if (methods == null) {
             // No resource methods are found
             response.setResponse(Responses.methodNotAllowed().
@@ -212,14 +253,14 @@ public final class HttpMethodRule implements UriRule {
          * @return the match status.
          */
         private MatchStatus match(
-                List<ResourceMethod> methods,
+                ResourceMethodListPair methods,
                 MediaType contentType,
                 List<MediaType> acceptableMediaTypes) {
 
             List<ResourceMethod> selected = null;
             if (contentType != null) {
                 // Find all methods that consume the MIME type of 'Content-Type'
-                for (ResourceMethod method : methods)
+                for (ResourceMethod method : methods.normal)
                     if (method.consumes(contentType))
                         add(method);
 
@@ -228,7 +269,7 @@ public final class HttpMethodRule implements UriRule {
 
                 selected = this;
             } else {
-                selected = methods;
+                selected = methods.wildPriority;
             }
 
 
