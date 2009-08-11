@@ -45,23 +45,31 @@ import junit.framework.TestCase;
 
 /**
  *
- * test case for issue#310
+ * test case for issue#338
  *
- * @author Jakub.Podlesak@Sun.COM
+ * @author kytomaki@dev.java.net
  */
-public class FakeArrayTest extends TestCase {
+public class AnotherArrayTest extends TestCase {
 
-    public void testSimpleXmlTypeBean() throws Exception {
+    public void testAnotherSimpleXmlTypeBean() throws Exception {
         
-        final JSONJAXBContext ctx = new JSONJAXBContext(JSONConfiguration.mapped().arrays("color").build(), FakeArrayBean.class);
+        final JSONJAXBContext ctx = new JSONJAXBContext(JSONConfiguration.mapped().arrays("cats").build(), AnotherArrayTestBean.class);
         final JSONMarshaller jm = ctx.createJSONMarshaller();
         final StringWriter sw = new StringWriter();
 
-        final FakeArrayBean one = TestHelper.createTestInstance(FakeArrayBean.class);
-
+        AnotherArrayTestBean one = new AnotherArrayTestBean();
+        Cat c1 = new Cat("Foo", "Kitty");
+        one.addCat(c1);
+        Cat c2 = new Cat("Bar", "Puss");
+        one.addCat(c2);
+        
+        one.setProp("testProp");
+        
         jm.marshallToJSON(one, sw);
         String jsonResult = sw.toString();
-
-        assertEquals("{\"weight\":[\"1kg\",\"2kg\"],\"color\":[\"red\"],\"name\":\"bumper\"}", jsonResult);
+        System.out.println(jsonResult);
+        
+        String excpectedResult = "{\"cats\":[{\"name\":\"Foo\",\"nickName\":\"Kitty\"},{\"name\":\"Bar\",\"nickName\":\"Puss\"}],\"prop\":\"testProp\"}";
+        assertEquals(excpectedResult, jsonResult);
     }
 }

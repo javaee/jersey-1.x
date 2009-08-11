@@ -34,34 +34,42 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-
 package com.sun.jersey.json.impl;
 
-import com.sun.jersey.api.json.JSONConfiguration;
-import com.sun.jersey.api.json.JSONJAXBContext;
-import com.sun.jersey.api.json.JSONMarshaller;
-import java.io.StringWriter;
-import junit.framework.TestCase;
+import java.util.ArrayList;
+import java.util.List;
 
-/**
- *
- * test case for issue#310
- *
- * @author Jakub.Podlesak@Sun.COM
- */
-public class FakeArrayTest extends TestCase {
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
 
-    public void testSimpleXmlTypeBean() throws Exception {
-        
-        final JSONJAXBContext ctx = new JSONJAXBContext(JSONConfiguration.mapped().arrays("color").build(), FakeArrayBean.class);
-        final JSONMarshaller jm = ctx.createJSONMarshaller();
-        final StringWriter sw = new StringWriter();
+@XmlRootElement()
+public class AnotherArrayTestBean {
 
-        final FakeArrayBean one = TestHelper.createTestInstance(FakeArrayBean.class);
+    @XmlElement(required = true)
+    protected List<Cat> cats;
+    protected String prop;
 
-        jm.marshallToJSON(one, sw);
-        String jsonResult = sw.toString();
+    public AnotherArrayTestBean() {
+        this.cats = new ArrayList<Cat>();
+    }
 
-        assertEquals("{\"weight\":[\"1kg\",\"2kg\"],\"color\":[\"red\"],\"name\":\"bumper\"}", jsonResult);
+    public void setCats(List<Cat> cats) {
+        this.cats = cats;
+    }
+
+    public List<Cat> getTheCats() {
+        return this.cats;
+    }
+
+    public void addCat(Cat c) {
+        this.cats.add(c);
+    }
+
+    public String getProp() {
+        return prop;
+    }
+
+    public void setProp(String prop) {
+        this.prop = prop;
     }
 }

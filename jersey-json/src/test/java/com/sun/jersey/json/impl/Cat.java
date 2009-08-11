@@ -46,6 +46,8 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlRootElement(name="cat")
 public class Cat extends Animal {
 
+	private String nickName;
+	
     public Cat() {
     }
 
@@ -53,8 +55,21 @@ public class Cat extends Animal {
         super(name);
     }
     
+    public Cat(String name, String nickName) {
+        super(name);
+        this.nickName = nickName;
+    }
+    
+    public void setNickName(String nickName){
+    	this.nickName = nickName;
+    }
+    
+    public String getNickName(){
+    	return this.nickName;
+    }
+    
     @Override
     public String toString() {
-        return String.format("{ \"cat\" : %s }", super.toString());
+        return String.format("{ \"cat\" : %s , %s}", super.toString(), this.nickName);
     }
 }
